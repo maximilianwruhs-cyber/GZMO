@@ -1,0 +1,52 @@
+[workspace]
+resolver = "2"
+members = ["gzmo-core", "gzmo-cli", "gzmo-chaos"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+authors = ["Maximilian Wruhs"]
+
+[workspace.dependencies]
+# Async Runtime
+tokio = { version = "1", features = ["full"] }
+
+# Serialization
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+serde_yaml = "0.9"
+toml = "0.8"
+
+# Database
+rusqlite = { version = "0.32", features = ["bundled"] }
+
+# Markdown Parsing
+pulldown-cmark = "0.12"
+
+# Filesystem Watching
+notify = "7"
+
+# HTTP Client
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "json", "stream"] }
+reqwest-eventsource = "0.6"
+
+# Error Handling
+anyhow = "1"
+thiserror = "2"
+
+# Async Trait
+async-trait = "0.1"
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# Time
+chrono = { version = "0.4", features = ["serde"] }
+
+# UUID
+uuid = { version = "1", features = ["v4", "serde"] }
+
+# SSE streaming
+futures-util = "0.3"

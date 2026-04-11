@@ -1,0 +1,14 @@
+[package]
+name = "gzmo-chaos"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Deterministic chaos engine — Lorenz attractor, Thought Cabinet, and unified pulse loop for the GZMO sovereign agent."
+
+[dependencies]
+serde = { workspace = true }
+chrono = { workspace = true }
+tokio = { workspace = true, features = ["sync", "time", "rt"] }
+tracing = { workspace = true }
+toml = { workspace = true }

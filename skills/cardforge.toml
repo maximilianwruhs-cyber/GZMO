@@ -1,0 +1,144 @@
+# ═══════════════════════════════════════════════════════════════════
+# The Card Forge — MTG Card Generation Knowledge Base
+# ═══════════════════════════════════════════════════════════════════
+# Baked from NotebookLM "The Architecture of a Trading Card Game"
+# notebook (8ed798c3-58e4-4112-928b-b235eb1e10be)
+#
+# This file encodes the Color Pie, card types, rarity distribution,
+# and generation rules so the LLM can forge authentic cards.
+# ═══════════════════════════════════════════════════════════════════
+
+[meta]
+version = "1.0"
+design_method = "Vision Design → Set Design → Play Design"
+flavor_rule = "Flavor text must perform heavy narrative lifting. Convey vast tenets in as few words as possible."
+text_rule = "Rules text must use strict templates — identical effects must use identical phrasing."
+rarity_ratio = "Mythic:Rare:Uncommon:Common = 1:7:24:88"
+
+# ─── The Color Pie ──────────────────────────────────────────────
+
+[colors.white]
+symbol = "W"
+mana = "☀️"
+philosophy = "Order, community, morality, law, protection"
+strengths = ["lifegain", "creature tokens", "enchantment removal", "small efficient creatures", "board wipes", "exile removal", "vigilance", "flying"]
+weaknesses = ["card draw", "direct damage", "artifact destruction"]
+personality = "The law. Sacrifices the individual for the collective good."
+flavor_tone = "Righteous, virtuous, declarative. Short moral statements."
+
+[colors.blue]
+symbol = "U"
+mana = "💧"
+philosophy = "Knowledge, logic, manipulation, illusion, perfection through intellect"
+strengths = ["card draw", "counterspells", "bounce effects", "flying creatures", "copying", "scrying", "mill", "transformation"]
+weaknesses = ["direct creature removal", "lifegain", "large ground creatures"]
+personality = "The mind. Believes perfection is achievable through sufficient information."
+flavor_tone = "Cerebral, precise, slightly arrogant. Quotes scholars and thinkers."
+
+[colors.black]
+symbol = "B"
+mana = "💀"
+philosophy = "Power, ambition, death, sacrifice, amorality"
+strengths = ["creature destruction", "discard", "reanimation", "drain life", "deathtouch", "sacrifice synergy", "tutoring"]
+weaknesses = ["enchantment removal", "artifact removal", "lifegain"]
+personality = "The abyss. Will pay any price — life, creatures, morality — for advantage."
+flavor_tone = "Dark, transactional, menacing. Speaks of costs, debts, and inevitability."
+
+[colors.red]
+symbol = "R"
+mana = "🔥"
+philosophy = "Freedom, chaos, emotion, impulse, destruction"
+strengths = ["direct damage", "haste", "artifact destruction", "temporary theft", "impulsive draw", "land destruction", "aggression"]
+weaknesses = ["enchantment removal", "card draw", "large toughness creatures", "lifegain"]
+personality = "The flame. Acts now, thinks never. Values freedom above survival."
+flavor_tone = "Visceral, explosive, emotional. Short exclamations. Battle cries."
+
+[colors.green]
+symbol = "G"
+mana = "🌿"
+philosophy = "Nature, growth, instinct, predation, the web of life"
+strengths = ["large creatures", "mana ramp", "trample", "enchantment/artifact removal", "fight effects", "token generation", "lifegain"]
+weaknesses = ["flying creatures", "direct damage", "counterspells", "evasion"]
+personality = "The wild. Accepts the world as it is. Survival of the fittest."
+flavor_tone = "Primal, organic, cyclic. References seasons, growth, roots, predation."
+
+# ─── Card Types ─────────────────────────────────────────────────
+
+[[card_types]]
+name = "Creature"
+has_power_toughness = true
+subtypes_examples = ["Human", "Elf", "Goblin", "Dragon", "Angel", "Zombie", "Beast", "Wizard", "Soldier", "Demon"]
+rules = "Must have a creature type. Must have Power/Toughness. Can have keyword abilities."
+
+[[card_types]]
+name = "Instant"
+has_power_toughness = false
+subtypes_examples = []
+rules = "Can be cast at any time. Effect resolves immediately. One-time use."
+
+[[card_types]]
+name = "Sorcery"
+has_power_toughness = false
+subtypes_examples = []
+rules = "Can only be cast during main phase. One-time use. Generally more powerful than instants."
+
+[[card_types]]
+name = "Enchantment"
+has_power_toughness = false
+subtypes_examples = ["Aura", "Saga"]
+rules = "Persists on the battlefield. Provides ongoing effects. Auras attach to permanents."
+
+[[card_types]]
+name = "Artifact"
+has_power_toughness = false
+subtypes_examples = ["Equipment", "Vehicle"]
+rules = "Colorless by default. Can be any color. Equipment attaches to creatures."
+
+[[card_types]]
+name = "Planeswalker"
+has_power_toughness = false
+subtypes_examples = []
+rules = "Has loyalty counters. Activates abilities at sorcery speed. One loyalty ability per turn."
+
+# ─── Rarity Tiers ───────────────────────────────────────────────
+
+[[rarities]]
+name = "Common"
+symbol = "C"
+icon = "⚪"
+complexity = "Simple, clean effects. One ability max. Bread-and-butter game pieces."
+power_level = "Low to moderate. Workhorses of Limited play."
+
+[[rarities]]
+name = "Uncommon"
+symbol = "U"
+icon = "🔵"
+complexity = "Can have two abilities or one complex ability. Archetype signposts in draft."
+power_level = "Moderate. Often defines Limited archetypes."
+
+[[rarities]]
+name = "Rare"
+symbol = "R"
+icon = "🟡"
+complexity = "Complex. Multiple abilities, unique effects. Build-around potential."
+power_level = "High. Constructed playable. Exciting to open."
+
+[[rarities]]
+name = "Mythic Rare"
+symbol = "M"
+icon = "🟠"
+complexity = "Maximum complexity. Legendary, splashy, game-warping. Must feel special."
+power_level = "Very high. Format-defining potential. Emotional impact."
+
+# ─── Keyword Abilities Pool ─────────────────────────────────────
+
+[keywords]
+evergreen = ["Flying", "First strike", "Double strike", "Deathtouch", "Trample", "Vigilance", "Haste", "Lifelink", "Reach", "Menace", "Flash", "Hexproof", "Indestructible", "Defender"]
+deciduous = ["Cycling", "Kicker", "Flashback", "Scry", "Mill", "Ward", "Prowess"]
+
+# ─── Card Name Fragments (for procedural generation) ───────────
+
+[name_fragments]
+prefixes = ["Ancient", "Shadow", "Storm", "Blood", "Void", "Chaos", "Iron", "Flame", "Frost", "Celestial", "Dread", "Verdant", "Twilight", "Thunder", "Obsidian", "Wraith", "Ember", "Crystal", "Doom", "Rune"]
+nouns = ["Herald", "Sentinel", "Oracle", "Reaver", "Warden", "Golem", "Wyrm", "Titan", "Specter", "Shaman", "Knight", "Phantom", "Stalker", "Colossus", "Invoker", "Leviathan", "Sphinx", "Hydra", "Archon", "Revenant"]
+actions = ["Strike", "Rend", "Bind", "Surge", "Rupture", "Invoke", "Devour", "Shatter", "Eclipse", "Ignite", "Wither", "Banish", "Reclaim", "Unleash", "Condemn", "Transfigure"]

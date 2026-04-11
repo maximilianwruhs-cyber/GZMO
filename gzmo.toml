@@ -1,0 +1,108 @@
+# GZMO — Sovereign Agent Configuration
+# GZMO — Sovereign Agent Configuration
+# ─────────────────────────────────────────────────────────────────────────
+#
+# All paths are relative to the working directory (where you run the agent).
+# Every field has a sensible default — you only need to declare what you
+# want to override.
+
+[identity]
+soul_path = "SOUL.md"
+
+[memory]
+directory = "memory"
+vault_db = "data/vault.db"
+
+[skills]
+directory = "skills"
+dreams_path = "DREAMS.md"
+
+[engine]
+# Provider: "local" | "openai" | "anthropic" | "gemini"
+# "local" = any OpenAI-compatible endpoint (llama.cpp, Ollama, LM Studio, vLLM)
+# "openai" = same protocol as "local" but with auth (also works with Groq, Together, etc.)
+provider = "local"
+url = "http://localhost:1234/v1"
+model = "bartowski/Qwen2.5-7B-Instruct-GGUF"  # Speculative pair: 7B main + 0.5B draft
+api_key = ""                    # required for cloud providers
+temperature = 0.3
+top_p = 0.95
+max_tokens = 4096
+
+# ─── Cloud provider examples (uncomment one to switch) ──────────────
+#
+# provider = "openai"
+# url = "https://api.openai.com/v1"
+# model = "gpt-4o"
+# api_key = "sk-..."
+#
+# provider = "openai"           # Groq is OpenAI-compatible
+# url = "https://api.groq.com/openai/v1"
+# model = "llama-3.3-70b-versatile"
+# api_key = "gsk_..."
+#
+# provider = "openai"           # Together AI is OpenAI-compatible
+# url = "https://api.together.xyz/v1"
+# model = "meta-llama/Llama-3-70b-chat-hf"
+# api_key = "..."
+
+[agent]
+max_tool_iterations = 10
+heartbeat_interval_secs = 1800  # 30 minutes
+
+# ─────────────────────────────────────────────────────────────────────────
+# MCP Servers
+# ─────────────────────────────────────────────────────────────────────────
+#
+# Each [[mcp_servers]] entry spawns a child process on startup.
+# Tools are auto-discovered and registered as mcp__{name}__{tool_name}.
+
+# Disabled default Node.js memory server (uses Native Rust SqliteVault now)
+# [[mcp_servers]]
+# name = "memory"
+# command = "npx"
+# args = ["-y", "@modelcontextprotocol/server-memory"]
+
+# Example:
+#
+# [[mcp_servers]]
+# name = "browser"
+# command = "npx"
+# args = ["-y", "@anthropic/mcp-server-puppeteer"]
+# disabled = true   # skip this server on startup
+
+# MCP "everything" test server — uncomment to verify MCP integration
+# [[mcp_servers]]
+# name = "test"
+# command = "npx"
+# args = ["-y", "@modelcontextprotocol/server-everything"]
+
+# ─────────────────────────────────────────────────────────────────────────
+# Background Orchestration (Daemon Mode)
+# ─────────────────────────────────────────────────────────────────────────
+#
+# Each job runs on a cron schedule (6-field: sec min hour day month weekday).
+# When a job fires, a headless GZMO instance processes the prompt using
+# all available tools, then logs the result to episodic memory.
+#
+# Start daemon mode with: sovereign-agent --daemon
+
+# [orchestration.jobs.morning_brief]
+# cron = "0 0 6 * * *"
+# prompt = "Search the web for the latest tech and finance headlines. Write a concise morning briefing."
+
+[orchestration.jobs.sys_janitor]
+cron = "0 */30 * * * *"
+prompt = "Use the sys_metrics tool to examine my local machine's disk, ram, and cpu. If you detect critical anomalies or see a dangerous unassociated process eating CPU, you are authorized to use sys_kill to terminate it. Keep a concise log of your findings in the knowledge vault."
+
+[orchestration.jobs.test_pulse]
+# Fire every 20 seconds
+cron = "*/20 * * * * *"
+prompt = "Check the current time using bash date. Write a short, single-sentence thought confirming the daemon is awake."
+disabled = true
+
+[orchestration.watchers.inbox_ingest]
+directory = "inbox"
+pattern = "*.txt"
+prompt = "Read the contents of the newly ingested file at {file_path}. Write a concise, 2-sentence summary of the text and store it securely in the knowledge vault."
+

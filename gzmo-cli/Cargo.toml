@@ -1,0 +1,21 @@
+[package]
+name = "gzmo-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[[bin]]
+name = "gzmo"
+path = "src/main.rs"
+
+[dependencies]
+gzmo-core = { path = "../gzmo-core" }
+tokio = { workspace = true }
+anyhow = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+chrono = { workspace = true }
+serde_json = { workspace = true }
+reqwest = { workspace = true }
+gzmo-chaos = { path = "../gzmo-chaos" }

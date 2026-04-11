@@ -1,0 +1,246 @@
+//! # Agentic Loop
+//!
+//! The core cognitive cycle: prompt → LLM → tool dispatch → result injection → LLM.
+//! Runs until the LLM produces a final text response with no tool calls,
+//! or hits the maximum iteration limit (safety valve).
+//!
+//! Uses SSE streaming: text tokens appear in the terminal in real-time.
+//! Tool calls are silently buffered and dispatched after the stream ends.
+
+use std::io::Write;
+
+use anyhow::Result;
+use tracing::{debug, info, warn};
+
+use crate::context::{self, ContextConfig};
+use crate::gateway::{LlmGateway, LlmResponse, ToolDeclaration};
+use crate::tools::{ToolDef, ToolRegistry, ToolResult};
+use crate::types::{Message, MessageToolCall, MessageToolCallFunction, Role};
+
+
+/// Configuration for the agentic loop.
+pub struct AgentLoopConfig {
+    /// Maximum tool-call iterations before forcing a text response.
+    /// Prevents infinite loops if the LLM keeps requesting tools.
+    pub max_iterations: usize,
+    /// If true, log full tool results (can be verbose).
+    pub verbose_tool_output: bool,
+    /// Context window management configuration.
+    /// Controls token budget and pruning behavior.
+    pub context: ContextConfig,
+}
+
+impl Default for AgentLoopConfig {
+    fn default() -> Self {
+        Self {
+            max_iterations: 10,
+            verbose_tool_output: false,
+            context: ContextConfig::default(),
+        }
+    }
+}
+
+/// The result of a complete agentic loop execution.
+#[derive(Debug)]
+pub struct AgentResponse {
+    /// The final text response from the LLM.
+    pub text: String,
+    /// Total LLM calls made (including tool-call rounds).
+    pub llm_calls: usize,
+    /// All tool calls that were executed during the loop.
+    pub tool_results: Vec<ToolResult>,
+}
+
+/// Convert our ToolDef into the LLM-compatible ToolDeclaration format.
+fn to_declarations(defs: &[ToolDef]) -> Vec<ToolDeclaration> {
+    defs.iter()
+        .map(|d| ToolDeclaration {
+            r#type: "function".to_string(),
+            function: crate::gateway::ToolFunction {
+                name: d.name.clone(),
+                description: d.description.clone(),
+                parameters: d.parameters.clone(),
+            },
+        })
+        .collect()
+}
+
+/// Execute the full agentic loop.
+///
+/// Takes a conversation history, available tools, and the LLM gateway.
+/// Runs the cycle until the LLM produces a text response or hits max iterations.
+pub async fn run_agent_loop(
+    gateway: &dyn LlmGateway,
+    tools: &ToolRegistry,
+    messages: &mut Vec<Message>,
+    config: &AgentLoopConfig,
+) -> Result<AgentResponse> {
+    let tool_defs = tools.definitions();
+    let declarations = to_declarations(&tool_defs);
+    let mut total_calls = 0usize;
+    let mut all_results = Vec::new();
+
+    for iteration in 0..config.max_iterations {
+        debug!(iteration, messages = messages.len(), "Agent loop iteration");
+
+        // ─── Call LLM ────────────────────────────────────────────
+        // Stream text tokens to stderr in real-time.
+        // Tool call deltas are buffered silently inside the gateway.
+        // On first token, stop the spinning cogwheel and print text.
+        let spinning = std::sync::Arc::new(std::sync::atomic::AtomicBool::new(true));
+
+        // Spawn spinning cogwheel animation thread
+        let spin_flag = spinning.clone();
+        let spinner_handle = std::thread::spawn(move || {
+            const FRAMES: &[&str] = &["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
+            let mut i = 0usize;
+            while spin_flag.load(std::sync::atomic::Ordering::Relaxed) {
+                eprint!("\r  {} \x1b[2m⚙ cogitating...\x1b[0m", FRAMES[i % FRAMES.len()]);
+                let _ = std::io::stderr().flush();
+                std::thread::sleep(std::time::Duration::from_millis(80));
+                i += 1;
+            }
+        });
+
+        let spin_stop = spinning.clone();
+        let on_chunk = Box::new(move |text: String| {
+            if spin_stop.swap(false, std::sync::atomic::Ordering::Relaxed) {
+                // Stop spinner, clear the line
+                eprint!("\r                              \r");
+            }
+            eprint!("{}", text);
+            let _ = std::io::stderr().flush();
+        });
+        // ─── Prune context to fit token budget ─────────────────
+        let windowed = context::prune_to_budget(messages, &config.context);
+
+        let response = gateway
+            .complete_streaming(&windowed, &declarations, on_chunk)
+            .await;
+        // Ensure spinner is dead
+        spinning.store(false, std::sync::atomic::Ordering::Relaxed);
+        let _ = spinner_handle.join();
+        let response = response?;
+        // Newline after streamed text
+        if matches!(&response, LlmResponse::Text(_)) {
+            eprintln!();
+        }
+        total_calls += 1;
+
+        match response {
+            // ─── Final text response — loop complete ─────────────
+            LlmResponse::Text(text) => {
+                info!(
+                    iterations = iteration + 1,
+                    llm_calls = total_calls,
+                    tools_executed = all_results.len(),
+                    "Agent loop complete"
+                );
+                return Ok(AgentResponse {
+                    text,
+                    llm_calls: total_calls,
+                    tool_results: all_results,
+                });
+            }
+
+            // ─── Tool calls — dispatch and feed results back ─────
+            LlmResponse::ToolCalls(calls) => {
+                info!(
+                    calls = calls.len(),
+                    iteration,
+                    "LLM requested tool calls"
+                );
+
+                // Add the assistant's tool-call message to history
+                // with proper structured tool_calls (OpenAI-compatible format)
+                let structured_calls: Vec<MessageToolCall> = calls
+                    .iter()
+                    .map(|c| MessageToolCall {
+                        id: c.id.clone(),
+                        r#type: "function".to_string(),
+                        function: MessageToolCallFunction {
+                            name: c.function_name.clone(),
+                            arguments: serde_json::to_string(&c.arguments).unwrap_or_default(),
+                        },
+                    })
+                    .collect();
+
+                messages.push(Message {
+                    role: Role::Assistant,
+                    // Content can be empty for tool-call-only assistant messages
+                    content: String::new(),
+                    is_meta: true,
+                    tool_calls: Some(structured_calls),
+                    tool_call_id: None,
+                });
+
+                // Execute each tool call
+                for call in &calls {
+                    info!(
+                        tool = %call.function_name,
+                        call_id = %call.id,
+                        "Dispatching tool"
+                    );
+
+                    let result = tools.dispatch(call).await;
+
+                    if config.verbose_tool_output {
+                        debug!(
+                            tool = %call.function_name,
+                            success = result.success,
+                            output_len = result.output.len(),
+                            "Tool result"
+                        );
+                    }
+
+                    // Inject tool result back into conversation
+                    // with proper tool_call_id linking to the parent
+                    messages.push(Message {
+                        role: Role::Tool,
+                        content: result.output.clone(),
+                        is_meta: true,
+                        tool_calls: None,
+                        tool_call_id: Some(call.id.clone()),
+                    });
+
+                    all_results.push(result);
+                }
+            }
+        }
+    }
+
+    // Safety valve: max iterations reached
+    warn!(
+        max = config.max_iterations,
+        "Agent loop hit max iterations — forcing text response"
+    );
+
+    // Ask the LLM to summarize and stop
+    messages.push(Message {
+        role: Role::System,
+        content: "You have reached the maximum number of tool calls. Provide your final answer now based on the information gathered so far. Do not request any more tools.".to_string(),
+        is_meta: false, tool_calls: None, tool_call_id: None,
+    });
+
+    let on_chunk = Box::new(|text: String| {
+        eprint!("{}", text);
+        let _ = std::io::stderr().flush();
+    });
+    let windowed = context::prune_to_budget(messages, &config.context);
+    let final_response = gateway.complete_streaming(&windowed, &[], on_chunk).await?;
+    eprintln!();
+    total_calls += 1;
+
+    let text = match final_response {
+        LlmResponse::Text(t) => t,
+        LlmResponse::ToolCalls(_) => {
+            "I was unable to complete the task within the allowed number of tool calls.".to_string()
+        }
+    };
+
+    Ok(AgentResponse {
+        text,
+        llm_calls: total_calls,
+        tool_results: all_results,
+    })
+}

@@ -1,0 +1,116 @@
+# ═══════════════════════════════════════════════════════════════════
+# GZMO Skill Registry — The Command Pantheon
+# ═══════════════════════════════════════════════════════════════════
+# Every slash command the agent can execute is defined here.
+# The dispatcher reads this file to route commands to handler scripts.
+
+[meta]
+version = "1.0"
+total_commands = 14
+engine = "chaos"  # All RNG seeded from Randomizer's Lorenz attractor
+
+# ─── Chaos & Games ───────────────────────────────────────────────
+
+[commands.dice]
+description = "Throws a D6 or D20 and generates a chaos-event tied to the result"
+args = "[D6|D20]"
+type = "hybrid"
+handler = "skill_dice.sh"
+icon = "🎲"
+
+[commands.poker]
+description = "Deals a full 5-card poker hand and evaluates the rank"
+args = ""
+type = "static"
+handler = "skill_poker.sh"
+icon = "🃏"
+
+[commands.card]
+description = "Forges a random Magic: The Gathering card from the chaos engine"
+args = "[creature|instant|sorcery|enchantment|artifact]"
+type = "generative"
+handler = "skill_card.sh"
+icon = "🂡"
+
+# ─── Creative & Generative ──────────────────────────────────────
+
+[commands.joke]
+description = "Tells a structurally engineered joke (Setup → Misdirection → Punchline)"
+args = ""
+type = "generative"
+handler = "skill_joke.sh"
+icon = "😂"
+
+[commands.quote]
+description = "Serves a verified historical quote from the Lore Pool"
+args = ""
+type = "static"
+handler = "skill_quote.sh"
+icon = "📜"
+
+[commands.poem]
+description = "Generates a short poem (max 180 characters)"
+args = ""
+type = "generative"
+handler = "skill_poem.sh"
+icon = "🖋️"
+
+[commands.word]
+description = "Invents a brand new word with definition and example sentence"
+args = ""
+type = "generative"
+handler = "skill_word.sh"
+icon = "🔤"
+
+[commands.story]
+description = "Generates a short story from a keyword seed"
+args = "[keyword]"
+type = "generative"
+handler = "skill_story.sh"
+icon = "📖"
+
+# ─── Modifiers & State ──────────────────────────────────────────
+
+[commands.transform]
+description = "Activates a character persona that alters all subsequent output"
+args = "[character name]"
+type = "hybrid"
+handler = "skill_transform.sh"
+icon = "🎭"
+
+[commands.language]
+description = "Switches output language for all generative commands"
+args = "[language code: en|de|ja|fr|es|...]"
+type = "static"
+handler = "skill_language.sh"
+icon = "🌍"
+
+# ─── Utility ────────────────────────────────────────────────────
+
+[commands.sound]
+description = "Triggers a random sound effect (visual + audio if available)"
+args = ""
+type = "static"
+handler = "skill_sound.sh"
+icon = "🔊"
+
+[commands.define]
+description = "Provides definition, pronunciation (IPA), and etymology"
+args = "[term]"
+type = "generative"
+handler = "skill_define.sh"
+icon = "📚"
+
+[commands.calculate]
+description = "Solves a mathematical expression via bc"
+args = "[expression]"
+type = "static"
+handler = "skill_calculate.sh"
+icon = "🧮"
+
+[commands.help]
+description = "Displays all available slash commands"
+args = ""
+type = "static"
+handler = "skill_help.sh"
+icon = "❓"
