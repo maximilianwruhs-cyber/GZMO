@@ -1,0 +1,126 @@
+# Randomizer Lore Pool
+# Machine-readable data source. LORE.md remains as the human-readable essay.
+
+# ─── Jokes: Structural anatomy of humor (meta-comedy) ───
+
+[[jokes]]
+text = "Setup: The establishment of a false, highly logical reality. Must be entirely devoid of comedy to ensure the pattern takes hold."
+
+[[jokes]]
+text = "Misdirection: The invisible cognitive pivot point — the audience's brain is looking left while the punchline arrives from the right."
+
+[[jokes]]
+text = "Punchline: The climax that violently subverts the expectation while still technically complying with the grammatical or logical parameters established in the setup."
+
+[[jokes]]
+text = "The Rule of Three: It takes exactly three data points for the human brain to detect a pattern. First item (premise), second item (confirms pattern), third item (destroys it)."
+
+[[jokes]]
+text = "Superiority Theory (Aristotle): Laughter is the expression of sudden glory over another's failings. Paradoxically weaponized via self-deprecation to lower the comedian's status and engender audience trust."
+
+[[jokes]]
+text = "Relief Theory (Freud): Humor is a biological pressure valve. Tension built through taboo, suspense, or social awkwardness is suddenly purged through the punchline."
+
+[[jokes]]
+text = "Benign Violation Theory: Humor triggers if and only if three conditions occur simultaneously — a violation, a benign context, and simultaneous processing of both."
+
+[[jokes]]
+text = "The Pre-Punchline Pause: Deliberate silence spikes anticipation, signaling an imminent pattern disruption. The post-punchline pause allows the crowd's slower cognitive processors to calculate the incongruity."
+
+# ─── Quotes: Verified wisdom from authenticated historical sources ───
+
+[[quotes]]
+text = "Humanity also needs dreamers, for whom the disinterested development of an enterprise is so captivating that it becomes impossible for them to devote their care to their own material profit."
+author = "Marie Curie"
+
+[[quotes]]
+text = "If you are distressed by anything external, the pain is not due to the thing itself, but to your estimate of it; and this you have the power to revoke at any moment."
+author = "Marcus Aurelius"
+
+[[quotes]]
+text = "I will seize fate by the throat; it shall certainly not bend and crush me completely."
+author = "Ludwig van Beethoven"
+
+[[quotes]]
+text = "Science makes people reach selflessly for truth and objectivity. Life need not be easy, provided only that it is not empty."
+author = "Lise Meitner"
+
+[[quotes]]
+text = "Unlimited tolerance must lead to the disappearance of tolerance. Society must reserve the right to forcefully not tolerate the intolerant."
+author = "Karl Popper"
+
+[[quotes]]
+text = "Never has a generation fallen from such intellectual heights as ours to such moral depths."
+author = "Stefan Zweig"
+
+[[quotes]]
+text = "The plurality of the universe is an illusion. The scientific world-picture is inherently flawed because it attempts to artificially extract human personality and consciousness from physical equations."
+author = "Erwin Schrödinger"
+
+[[quotes]]
+text = "An unexamined life is not worth living."
+author = "Socrates"
+
+[[quotes]]
+text = "When the present determines the future, but the approximate present does not approximately determine the future."
+author = "Edward Lorenz"
+
+[[quotes]]
+text = "Talk is cheap. Show me the code."
+author = "Linus Torvalds"
+
+[[quotes]]
+text = "Akzeptanz — acknowledging reality without retrospective regret. The first pillar of resilience."
+author = "Viktor E. Frankl (Logotherapy)"
+
+[[quotes]]
+text = "Selbstwirksamkeit — the deep conviction that targeted actions can alter outcomes. The seventh and final pillar."
+author = "Viktor E. Frankl (Logotherapy)"
+
+[[quotes]]
+text = "Even in the absolute stripping of physical freedom, the final human freedom remains untouched: the ability to choose one's cognitive attitude toward suffering."
+author = "Viktor E. Frankl"
+
+[[quotes]]
+text = "True wisdom occurs only when the logical part of the soul rules absolutely over irrational courage and base appetites."
+author = "Plato"
+
+[[quotes]]
+text = "Every virtue exists precisely in the middle of two pathological extremes. Bravery is the balance between cowardice and foolhardiness."
+author = "Aristotle"
+
+[[quotes]]
+text = "The core engine of Stoic resilience is the radical decoupling of internal peace from external chaos."
+author = "Epictetus"
+
+# ─── Facts: Verified historical corrections and archival truths ───
+
+[[facts]]
+text = "Albert Einstein never said 'Insanity is doing the same thing over and over again and expecting different results.' This originates from a 1981 Al-Anon meeting."
+
+[[facts]]
+text = "Mahatma Gandhi never wrote 'Be the change you wish to see in the world.' This was coined by Brooklyn teacher Arleen Lorrance in 1974."
+
+[[facts]]
+text = "Winston Churchill never proclaimed 'Success is not final, failure is not fatal: it is the courage to continue that counts.'"
+
+[[facts]]
+text = "The Schmetterlingseffekt was formalized by Edward Lorenz in 1963 when he entered 0.506 instead of 0.506127 as a starting value, causing a completely different weather simulation."
+
+[[facts]]
+text = "The Logistic Map x(n+1) = r·x(n)·(1-x(n)) transitions from periodic to chaotic behavior at r ≈ 3.56995, known as the Feigenbaum limit."
+
+[[facts]]
+text = "Henri Poincaré first discovered sensitive dependence on initial conditions in the late 19th century via the Three-Body Problem — minimal perturbations in celestial starting positions yield radically divergent, non-periodic orbits."
+
+[[facts]]
+text = "The Austrian 'Schmäh' serves as a mass psychological coping mechanism. Phrases like 'Nur net hudln' act as emotional regulators encoded in dialect."
+
+[[facts]]
+text = "Hianzisch, the pannonian Burgenland dialect, lacks any simple past tense (Imperfekt), forcing temporal recollection immediately into the completed perfect tense — a unique epistemological structure."
+
+[[facts]]
+text = "The Lyapunov exponent measures the rate at which nearby trajectories in phase space diverge, defining the absolute 'predictability horizon' of a chaotic system."
+
+[[facts]]
+text = "Quantum mechanics, governed by the linear Schrödinger equation, fundamentally lacks the non-linear amplification required to trigger the classical Butterfly Effect."

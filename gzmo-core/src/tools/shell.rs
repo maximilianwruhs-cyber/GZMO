@@ -1,6 +1,10 @@
 //! # Shell Execution Tool
 //!
 //! Execute shell commands in a sandboxed environment.
+//! Uses an **allowlist** model: only commands whose first token matches a
+//! known-safe prefix are permitted. This prevents the LLM from hallucinating
+//! destructive commands (rm, dd, mkfs, etc.) in daemon mode.
+//!
 //! Host-mode for now, Docker/gVisor isolation in Phase 3.
 
 use anyhow::Result;
@@ -9,6 +13,33 @@ use serde_json::json;
 use std::time::Duration;
 
 use crate::tools::{ToolDef, ToolHandler};
+
+/// Safe command prefixes. Only the first whitespace-delimited token of the
+/// command is checked against this list. Anything outside is rejected.
+const SAFE_COMMAND_PREFIXES: &[&str] = &[
+    // Filesystem inspection (read-only)
+    "ls", "cat", "head", "tail", "wc", "stat", "file", "du", "df",
+    "find", "locate", "tree", "readlink", "realpath", "basename", "dirname",
+    // Text processing (read-only)
+    "grep", "rg", "awk", "sed", "sort", "uniq", "cut", "tr", "jq",
+    "diff", "comm", "paste", "column", "fold", "fmt", "tee",
+    // System inspection
+    "ps", "top", "htop", "uname", "hostname", "whoami", "id", "uptime",
+    "date", "cal", "env", "printenv", "lsblk", "lscpu", "lsusb", "lspci",
+    "free", "vmstat", "iostat", "ip", "ss", "netstat",
+    // Development tools
+    "git", "cargo", "rustc", "python3", "python", "node", "npm", "npx",
+    "pip", "pip3", "make", "cmake",
+    // Archive / compression (read-only ops)
+    "tar", "gzip", "gunzip", "zcat", "bzip2", "xz",
+    // Network (read-only, needed for cloud-mode API/web access)
+    "curl", "wget",
+    // Misc safe
+    "echo", "printf", "true", "false", "test", "[", "which", "type",
+    "man", "help", "sha256sum", "md5sum", "b2sum", "xxd", "hexdump",
+    // GZMO-specific
+    "gzmo",
+];
 
 /// Execute a shell command on the host.
 /// Captures stdout + stderr with a timeout to prevent runaway processes.
@@ -52,14 +83,25 @@ impl ToolHandler for ShellExecTool {
             .as_str()
             .ok_or_else(|| anyhow::anyhow!("Missing 'command' argument"))?;
 
-        // ─── SECURITY BLACKLIST FOR DAEMON SAFETY ───
-        let blacklist = ["rm -rf", "dd ", "mkfs", "shutdown", "reboot", "init 0"];
-        let cmd_lower = command.to_lowercase();
-        for blocked in &blacklist {
-            if cmd_lower.contains(blocked) {
-                tracing::warn!(command = %command, "Blocked execution: matched destructive blacklist");
-                return Ok(format!("ERROR: Command '{}' is BLACKLISTED for safety reasons and cannot be executed.", command));
-            }
+        // ─── SECURITY ALLOWLIST ───
+        // Extract the first token (the actual binary being invoked).
+        // Handles leading env vars like `FOO=bar cmd` and path prefixes like `/usr/bin/ls`.
+        let first_token = command
+            .split_whitespace()
+            .find(|t| !t.contains('='))  // skip env var assignments
+            .unwrap_or("");
+        // Strip any path prefix: "/usr/bin/ls" → "ls"
+        let binary_name = first_token.rsplit('/').next().unwrap_or(first_token);
+
+        if !SAFE_COMMAND_PREFIXES.iter().any(|safe| binary_name == *safe) {
+            tracing::warn!(command = %command, binary = %binary_name, "Blocked: not in allowlist");
+            return Ok(format!(
+                "ERROR: Command '{}' is not in the safe command allowlist. \
+                Permitted commands: {}. \
+                If you need to run this command, ask the user to execute it manually.",
+                command,
+                SAFE_COMMAND_PREFIXES.join(", ")
+            ));
         }
 
         tracing::info!(command = %command, "Executing shell command");

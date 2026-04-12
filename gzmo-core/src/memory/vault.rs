@@ -7,25 +7,27 @@ use anyhow::{Context, Result};
 use chrono::Utc;
 use rusqlite::{params, Connection};
 use std::path::Path;
-use std::sync::Mutex;
+use r2d2::Pool;
+use r2d2_sqlite::SqliteConnectionManager;
 use tracing::info;
 use uuid::Uuid;
 
 use crate::types::{ExtractedTruth, SemanticFact};
 
 /// The permanent semantic vault backed by SQLite.
+#[derive(Clone)]
 pub struct SqliteVault {
-    conn: Mutex<Connection>,
+    pool: Pool<SqliteConnectionManager>,
 }
 
 impl SqliteVault {
     /// Open or create the vault database.
     pub fn open(db_path: impl AsRef<Path>) -> Result<Self> {
-        let conn = Connection::open(db_path.as_ref())
+        let mut init_conn = Connection::open(db_path.as_ref())
             .with_context(|| "Failed to open semantic vault database")?;
 
         // Initialize schema
-        conn.execute_batch(
+        init_conn.execute_batch(
             "CREATE TABLE IF NOT EXISTS semantic_vault (
                 id TEXT PRIMARY KEY,
                 content TEXT NOT NULL,
@@ -58,18 +60,41 @@ impl SqliteVault {
                 ON semantic_vault(last_accessed_at, half_life_days);",
         )?;
 
-        // Non-destructive schema migration (fails silently if column already exists)
-        let _ = conn.execute("ALTER TABLE semantic_vault ADD COLUMN confidence REAL NOT NULL DEFAULT 1.0", []);
+        // Enable WAL mode for concurrent reader safety during background writes
+        init_conn.execute_batch("PRAGMA journal_mode=WAL; PRAGMA busy_timeout=5000;")?;
 
-        info!("Semantic vault initialized");
+        // Non-destructive schema migration — using PRAGMA user_version
+        let user_version: u32 = init_conn.query_row("PRAGMA user_version", [], |row| row.get(0))?;
+        if user_version < 1 {
+            match init_conn.execute("ALTER TABLE semantic_vault ADD COLUMN confidence REAL NOT NULL DEFAULT 1.0", []) {
+                Ok(_) => info!("Applied schema migration: added confidence column"),
+                Err(e) if e.to_string().contains("duplicate column") => { /* already exists */ }
+                Err(e) => {
+                    tracing::error!(error = %e, "Schema migration failed unexpectedly");
+                    return Err(e.into());
+                }
+            }
+            init_conn.execute_batch("PRAGMA user_version = 1")?;
+        }
+
+        info!("Semantic vault initialized (WAL mode + r2d2 pool)");
+        
+        let path = db_path.as_ref().to_owned();
+        let manager = SqliteConnectionManager::file(path)
+            .with_init(|c| c.execute_batch("PRAGMA journal_mode=WAL; PRAGMA busy_timeout=5000;"));
+        let pool = r2d2::Pool::builder()
+            .max_size(5) // Enough for daemon and main loop
+            .build(manager)
+            .with_context(|| "Failed to create connection pool")?;
+
         Ok(Self {
-            conn: Mutex::new(conn),
+            pool,
         })
     }
 
     /// Store a new semantic fact.
     pub fn store(&self, fact: &SemanticFact) -> Result<()> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.pool.get()?;
 
         // Hallucination Prevention Barrier
         if fact.confidence < 0.85 {
@@ -112,7 +137,7 @@ impl SqliteVault {
 
     /// Retrieve items placed in quarantine awaiting HITL validation
     pub fn list_quarantine(&self) -> Result<Vec<(String, String, f64, String)>> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.pool.get()?;
         let mut stmt = conn.prepare("SELECT id, content, confidence, created_at FROM quarantine_vault ORDER BY created_at DESC")?;
         let results = stmt.query_map([], |row| {
             Ok((row.get(0)?, row.get(1)?, row.get(2)?, row.get(3)?))
@@ -123,7 +148,7 @@ impl SqliteVault {
 
     /// Reinforce a fact: increment confirmation_count and reset decay clock.
     pub fn reinforce(&self, fact_id: Uuid) -> Result<()> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.pool.get()?;
         let now = Utc::now().to_rfc3339();
         conn.execute(
             "UPDATE semantic_vault
@@ -144,11 +169,12 @@ impl SqliteVault {
         query_text: &str,
         limit: usize,
     ) -> Result<Vec<(SemanticFact, f64)>> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.pool.get()?;
         let mut stmt = conn.prepare(
             "SELECT id, content, embedding, half_life_days, confirmation_count,
                     created_at, last_accessed_at
-             FROM semantic_vault",
+             FROM semantic_vault
+             WHERE (julianday('now') - julianday(last_accessed_at)) < (half_life_days * 10.0)",
         )?;
 
         let now = Utc::now();
@@ -228,64 +254,84 @@ impl SqliteVault {
     }
 
     /// Promote extracted truths from the dream cycle into permanent storage.
+    /// Batched within a single transaction to avoid N sequential lock acquisitions.
     pub fn promote_truths(&self, truths: &[ExtractedTruth]) -> Result<()> {
-        for truth in truths {
-            // Check if a similar fact already exists (by content hash)
-            let conn = self.conn.lock().unwrap();
-            let existing: Option<String> = conn
-                .query_row(
-                    "SELECT id FROM semantic_vault WHERE content = ?1",
-                    params![truth.content],
-                    |row| row.get(0),
-                )
-                .ok();
+        if truths.is_empty() {
+            return Ok(());
+        }
 
-            if let Some(existing_id) = existing {
-                // Corroboration: increment confirmation_count, reset decay
-                let now = Utc::now().to_rfc3339();
-                conn.execute(
-                    "UPDATE semantic_vault
-                     SET confirmation_count = confirmation_count + 1,
-                         last_accessed_at = ?1
-                     WHERE id = ?2",
-                    params![now, existing_id],
-                )?;
-                info!(id = %existing_id, "Corroborated existing truth");
-            } else {
-                // New truth: insert with appropriate decay class
-                let now = Utc::now();
-                conn.execute(
-                    "INSERT INTO semantic_vault
-                        (id, content, embedding, half_life_days, confirmation_count,
-                         decay_class, created_at, last_accessed_at)
-                    VALUES (?1, ?2, ?3, ?4, 1, ?5, ?6, ?7)",
-                    params![
-                        truth.id.to_string(),
-                        truth.content,
-                        Vec::<u8>::new(), // Embedding computed later
-                        truth.decay_class.half_life_days(),
-                        format!("{:?}", truth.decay_class),
-                        now.to_rfc3339(),
-                        now.to_rfc3339(),
-                    ],
-                )?;
-                info!(id = %truth.id, "Promoted new truth to vault");
+        let conn = self.pool.get()?;
+        conn.execute_batch("BEGIN IMMEDIATE")?;
+
+        let result = (|| -> Result<()> {
+            for truth in truths {
+                let existing: Option<String> = conn
+                    .query_row(
+                        "SELECT id FROM semantic_vault WHERE content = ?1",
+                        params![truth.content],
+                        |row| row.get(0),
+                    )
+                    .ok();
+
+                if let Some(existing_id) = existing {
+                    let now = Utc::now().to_rfc3339();
+                    conn.execute(
+                        "UPDATE semantic_vault
+                         SET confirmation_count = confirmation_count + 1,
+                             last_accessed_at = ?1
+                         WHERE id = ?2",
+                        params![now, existing_id],
+                    )?;
+                    info!(id = %existing_id, "Corroborated existing truth");
+                } else {
+                    let now = Utc::now();
+                    conn.execute(
+                        "INSERT INTO semantic_vault
+                            (id, content, embedding, half_life_days, confirmation_count,
+                             decay_class, created_at, last_accessed_at)
+                        VALUES (?1, ?2, ?3, ?4, 1, ?5, ?6, ?7)",
+                        params![
+                            truth.id.to_string(),
+                            truth.content,
+                            Vec::<u8>::new(),
+                            truth.decay_class.half_life_days(),
+                            format!("{:?}", truth.decay_class),
+                            now.to_rfc3339(),
+                            now.to_rfc3339(),
+                        ],
+                    )?;
+                    info!(id = %truth.id, "Promoted new truth to vault");
+                }
+            }
+            Ok(())
+        })();
+
+        match result {
+            Ok(()) => {
+                conn.execute_batch("COMMIT")?;
+                info!(count = truths.len(), "Batch promoted truths to vault");
+                Ok(())
+            }
+            Err(e) => {
+                let _ = conn.execute_batch("ROLLBACK");
+                Err(e)
             }
         }
-        Ok(())
     }
 
     /// Metacognitive guard: recall past failures for a given command/context.
     pub fn recall_failures(&self, description: &str) -> Result<Vec<String>> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.pool.get()?;
+        let search_pattern = format!("%{}%", description.to_lowercase().replace(' ', "%"));
         let mut stmt = conn.prepare(
             "SELECT content FROM semantic_vault
-             WHERE content LIKE '%error%' OR content LIKE '%failed%' OR content LIKE '%warning%'
+             WHERE (content LIKE '%error%' OR content LIKE '%failed%' OR content LIKE '%warning%')
+               AND lower(content) LIKE ?1
              ORDER BY last_accessed_at DESC LIMIT 5",
         )?;
 
         let results: Vec<String> = stmt
-            .query_map([], |row| row.get(0))?
+            .query_map([search_pattern], |row| row.get(0))?
             .filter_map(|r| r.ok())
             .filter(|content: &String| {
                 let desc_lower = description.to_lowercase();
@@ -303,11 +349,12 @@ impl SqliteVault {
     /// Returns facts where the content matches any of the query keywords,
     /// sorted by recency with temporal decay applied.
     pub fn keyword_search(&self, query_text: &str, limit: usize) -> Result<Vec<(SemanticFact, f64)>> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.pool.get()?;
         let mut stmt = conn.prepare(
             "SELECT id, content, embedding, half_life_days, confirmation_count,
                     created_at, last_accessed_at
-             FROM semantic_vault",
+             FROM semantic_vault
+             WHERE (julianday('now') - julianday(last_accessed_at)) < (half_life_days * 10.0)",
         )?;
 
         let now = Utc::now();
@@ -377,7 +424,7 @@ impl SqliteVault {
     /// Store a plain text fact (no embedding). For use by the interactive REPL
     /// when no embedding model is available.
     pub fn store_text(&self, content: &str, decay_class: &str, confidence: f64) -> Result<()> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.pool.get()?;
         let now = Utc::now();
         let id = Uuid::new_v4();
 
@@ -429,7 +476,7 @@ impl SqliteVault {
 
     /// Get the total number of facts in the vault.
     pub fn count(&self) -> Result<usize> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.pool.get()?;
         let count: usize = conn.query_row(
             "SELECT COUNT(*) FROM semantic_vault",
             [],
@@ -440,7 +487,7 @@ impl SqliteVault {
 
     /// Get the most recent N facts (for context injection).
     pub fn recent(&self, limit: usize) -> Result<Vec<String>> {
-        let conn = self.conn.lock().unwrap();
+        let conn = self.pool.get()?;
         let mut stmt = conn.prepare(
             "SELECT content FROM semantic_vault
              ORDER BY last_accessed_at DESC
@@ -460,7 +507,7 @@ impl SqliteVault {
         let mut groups: std::collections::HashMap<String, String> = std::collections::HashMap::new();
 
         { // Scope the lock so it drops before async I/O
-            let conn = self.conn.lock().unwrap();
+            let conn = self.pool.get()?;
             let mut stmt = conn.prepare(
                 "SELECT id, content, half_life_days, confirmation_count, decay_class, created_at
                  FROM semantic_vault

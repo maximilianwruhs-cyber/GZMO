@@ -15,6 +15,7 @@
 
 use crate::types::Message;
 use crate::types::Role;
+use std::collections::HashSet;
 
 /// Configuration for context window management.
 #[derive(Debug, Clone)]
@@ -124,15 +125,17 @@ pub fn prune_to_budget(messages: &[Message], config: &ContextConfig) -> Vec<Mess
 
     // Tool chain integrity: ensure that if we have a Tool message,
     // we also have the preceding Assistant message that requested it.
-    // Walk forward through our kept indices and check for orphaned tool results.
+    // Use HashSet for O(1) lookups instead of O(N²) Vec::contains.
+    let keep_set: HashSet<usize> = keep_indices.iter().copied().collect();
     let mut final_indices: Vec<usize> = Vec::new();
+
     for &idx in &keep_indices {
         let msg = &conversation[idx];
 
         if msg.role == Role::Tool && idx > 0 {
             // Check if the previous message (the tool-call request) is already included
             let prev_idx = idx - 1;
-            if !final_indices.contains(&prev_idx) && !keep_indices.contains(&prev_idx) {
+            if !keep_set.contains(&prev_idx) {
                 // The parent tool-call message was pruned — we need to drop this
                 // orphaned tool result too, as it makes no sense without context
                 tracing::debug!(

@@ -128,6 +128,19 @@ async fn run_watcher(
         
         info!(watcher = %name, file = %path.display(), "Spawning headless cognitive cycle");
 
+        // Inject +20 energy into chaos engine on file arrival (original Randomizer inbox mechanic)
+        if let Some(ref chaos_tx) = ctx.chaos_feedback_tx {
+            let _ = chaos_tx.send(gzmo_chaos::feedback::ChaosEvent::Custom {
+                tension_delta: -5.0,    // Inbox drops calm the system
+                energy_delta: 20.0,     // +20 energy burst (resurrects if dead)
+                thought_seed: Some(gzmo_chaos::feedback::ThoughtSeed {
+                    category: "inbox".to_string(),
+                    text: format!("File ingested: {}", path.file_name().unwrap_or_default().to_string_lossy()),
+                }),
+            }).await;
+            info!(watcher = %name, "Chaos engine: +20 energy injected from inbox");
+        }
+
         if let Err(e) = execute_headless(&ctx, &name, &active_prompt).await {
             error!(watcher = %name, "Watcher headless cycle failed: {e}");
         }

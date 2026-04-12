@@ -84,21 +84,30 @@ async fn load_soul_from_disk(path: &Path) -> Result<SoulContext> {
     let mut ethical_guardrails: Vec<String> = Vec::new();
 
     if let Some(fm) = frontmatter {
-        if let Ok(yaml) = serde_yaml::from_str::<serde_json::Value>(&fm) {
-            if let Some(name) = yaml.get("persona").and_then(|v| v.as_str()) {
-                persona_name = name.to_string();
+        match serde_yaml::from_str::<serde_json::Value>(&fm) {
+            Ok(yaml) => {
+                if let Some(name) = yaml.get("persona").and_then(|v| v.as_str()) {
+                    persona_name = name.to_string();
+                }
+                if let Some(dirs) = yaml.get("directives").and_then(|v| v.as_array()) {
+                    core_directives = dirs
+                        .iter()
+                        .filter_map(|v| v.as_str().map(String::from))
+                        .collect();
+                }
+                if let Some(guards) = yaml.get("guardrails").and_then(|v| v.as_array()) {
+                    ethical_guardrails = guards
+                        .iter()
+                        .filter_map(|v| v.as_str().map(String::from))
+                        .collect();
+                }
             }
-            if let Some(dirs) = yaml.get("directives").and_then(|v| v.as_array()) {
-                core_directives = dirs
-                    .iter()
-                    .filter_map(|v| v.as_str().map(String::from))
-                    .collect();
-            }
-            if let Some(guards) = yaml.get("guardrails").and_then(|v| v.as_array()) {
-                ethical_guardrails = guards
-                    .iter()
-                    .filter_map(|v| v.as_str().map(String::from))
-                    .collect();
+            Err(e) => {
+                anyhow::bail!(
+                    "SOUL.md contains malformed YAML frontmatter: {}. \
+                     Refusing to boot with a corrupted identity file.",
+                    e
+                );
             }
         }
     }

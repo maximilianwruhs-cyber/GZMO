@@ -11,9 +11,25 @@ use serde_json::json;
 
 use crate::tools::{ToolDef, ToolHandler};
 
-/// Web search tool using DuckDuckGo HTML (no API key needed).
+/// Web search tool — SerpAPI (primary, when key set) + DuckDuckGo HTML (fallback).
 pub struct WebSearchTool {
     http: reqwest::Client,
+    /// SerpAPI key for reliable structured search. Empty = DDG fallback only.
+    serpapi_key: String,
+}
+
+impl WebSearchTool {
+    /// Create with a SerpAPI key for cloud-grade search.
+    pub fn with_serpapi_key(key: String) -> Self {
+        Self {
+            http: reqwest::Client::builder()
+                .user_agent("Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0")
+                .timeout(std::time::Duration::from_secs(15))
+                .build()
+                .unwrap_or_else(|_| reqwest::Client::new()),
+            serpapi_key: key,
+        }
+    }
 }
 
 impl Default for WebSearchTool {
@@ -24,6 +40,7 @@ impl Default for WebSearchTool {
                 .timeout(std::time::Duration::from_secs(15))
                 .build()
                 .unwrap_or_else(|_| reqwest::Client::new()),
+            serpapi_key: String::new(),
         }
     }
 }
@@ -33,7 +50,7 @@ impl ToolHandler for WebSearchTool {
     fn definition(&self) -> ToolDef {
         ToolDef {
             name: "web_search".to_string(),
-            description: "Search the internet using DuckDuckGo. Returns titles, URLs, and snippets for the top results. Use this to find current information, documentation, news, or research topics.".to_string(),
+            description: "Search the internet for current information. Returns titles, URLs, and snippets for the top results. Use this to find documentation, news, APIs, or research topics.".to_string(),
             parameters: json!({
                 "type": "object",
                 "properties": {
@@ -63,7 +80,18 @@ impl ToolHandler for WebSearchTool {
 
         tracing::info!(query = %query, max_results, "Executing web search");
 
-        let results = self.search_ddg(query, max_results).await?;
+        // Try SerpAPI first if key is set, fall back to DDG
+        let results = if !self.serpapi_key.is_empty() {
+            match self.search_serpapi(query, max_results).await {
+                Ok(r) if !r.is_empty() => r,
+                Ok(_) | Err(_) => {
+                    tracing::warn!("SerpAPI returned no results, falling back to DDG");
+                    self.search_ddg(query, max_results).await?
+                }
+            }
+        } else {
+            self.search_ddg(query, max_results).await?
+        };
 
         if results.is_empty() {
             return Ok("No results found for this query.".to_string());
@@ -229,30 +257,33 @@ impl WebSearchTool {
         url.to_string()
     }
 
-    /// Basic URL decoding (handles %XX sequences).
+    /// URL decoding that correctly handles multi-byte UTF-8 sequences.
     fn url_decode(input: &str) -> String {
-        let mut output = String::with_capacity(input.len());
-        let mut chars = input.chars();
+        let mut bytes = Vec::with_capacity(input.len());
+        let mut chars = input.as_bytes().iter();
 
-        while let Some(c) = chars.next() {
-            if c == '%' {
-                let hex: String = chars.by_ref().take(2).collect();
+        while let Some(&b) = chars.next() {
+            if b == b'%' {
+                let hex: Vec<u8> = chars.by_ref().take(2).copied().collect();
                 if hex.len() == 2 {
-                    if let Ok(byte) = u8::from_str_radix(&hex, 16) {
-                        output.push(byte as char);
+                    if let Ok(byte) = u8::from_str_radix(
+                        &String::from_utf8_lossy(&hex),
+                        16,
+                    ) {
+                        bytes.push(byte);
                         continue;
                     }
                 }
-                output.push('%');
-                output.push_str(&hex);
-            } else if c == '+' {
-                output.push(' ');
+                bytes.push(b'%');
+                bytes.extend_from_slice(&hex);
+            } else if b == b'+' {
+                bytes.push(b' ');
             } else {
-                output.push(c);
+                bytes.push(b);
             }
         }
 
-        output
+        String::from_utf8_lossy(&bytes).into_owned()
     }
 
     /// Strip basic HTML tags from text.
@@ -278,6 +309,41 @@ impl WebSearchTool {
             .replace("&#x27;", "'")
             .replace("&nbsp;", " ")
             .replace("&#39;", "'")
+    }
+
+    /// Search using SerpAPI (structured JSON, very reliable).
+    async fn search_serpapi(&self, query: &str, max_results: usize) -> Result<Vec<SearchResult>> {
+        let resp = self.http
+            .get("https://serpapi.com/search")
+            .query(&[
+                ("q", query),
+                ("api_key", &self.serpapi_key),
+                ("engine", "google"),
+                ("num", &max_results.to_string()),
+            ])
+            .send()
+            .await?;
+
+        if !resp.status().is_success() {
+            anyhow::bail!("SerpAPI returned status {}", resp.status());
+        }
+
+        let json: serde_json::Value = resp.json().await?;
+
+        let mut results = Vec::new();
+        if let Some(organic) = json["organic_results"].as_array() {
+            for item in organic.iter().take(max_results) {
+                let title = item["title"].as_str().unwrap_or("").to_string();
+                let url = item["link"].as_str().unwrap_or("").to_string();
+                let snippet = item["snippet"].as_str().unwrap_or("").to_string();
+                if !url.is_empty() {
+                    results.push(SearchResult { title, url, snippet });
+                }
+            }
+        }
+
+        tracing::info!(results = results.len(), "SerpAPI search complete");
+        Ok(results)
     }
 }
 

@@ -91,7 +91,7 @@ impl SessionManager {
         self.sessions_dir.join(format!("{}.json", session_id))
     }
 
-    /// Save a session to disk.
+    /// Save a session to disk atomically (write-then-rename).
     pub async fn save(
         &self,
         session_id: &str,
@@ -113,15 +113,22 @@ impl SessionManager {
             .context("Failed to serialize session")?;
 
         let path = self.session_path(session_id);
-        tokio::fs::write(&path, json.as_bytes())
+        let tmp_path = self.sessions_dir.join(format!("{}.json.tmp", session_id));
+
+        // Atomic write: write to .tmp then rename (POSIX rename is atomic)
+        tokio::fs::write(&tmp_path, json.as_bytes())
             .await
-            .with_context(|| format!("Failed to write session file: {}", path.display()))?;
+            .with_context(|| format!("Failed to write session tmp file: {}", tmp_path.display()))?;
+
+        tokio::fs::rename(&tmp_path, &path)
+            .await
+            .with_context(|| format!("Failed to rename session file: {} -> {}", tmp_path.display(), path.display()))?;
 
         info!(
             session_id = %session_id,
             messages = messages.len(),
             path = %path.display(),
-            "Session saved"
+            "Session saved (atomic)"
         );
         Ok(())
     }

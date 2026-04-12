@@ -19,3 +19,10 @@ chrono = { workspace = true }
 serde_json = { workspace = true }
 reqwest = { workspace = true }
 gzmo-chaos = { path = "../gzmo-chaos" }
+ratatui = "0.26.0"
+crossterm = { version = "0.27.0", features = ["event-stream"] }
+color-eyre = "0.6"
+futures = "0.3"
+tui-input = "0.8"
+sysinfo = "0.38"
+fs2 = "0.4.3"

@@ -134,12 +134,13 @@ impl ToolHandler for SysKillTool {
         if let Some(process) = sys.process(pid) {
             let p_name = process.name().to_string_lossy().to_string();
             
-            // SECURITY: Prevent killing our own agent!
-            if p_name.contains("sovereign-agent") {
-                warn!("Blocked execution: Attempted to kill sovereign-agent daemon");
+            // SECURITY: Prevent killing our own agent — check PID directly, not name
+            let my_pid = sysinfo::Pid::from_u32(std::process::id());
+            if pid == my_pid {
+                warn!("Blocked execution: Attempted to kill own process (PID {})", args.pid);
                 return Ok(serde_json::to_string(&json!({
                     "status": "error",
-                    "error": "SECURITY VIOLATION: Cannot kill the Sovereign Agent self-process."
+                    "error": "SECURITY VIOLATION: Cannot kill the GZMO agent's own process."
                 }))?);
             }
 

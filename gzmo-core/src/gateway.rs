@@ -28,11 +28,24 @@ impl Default for VllmConfig {
     fn default() -> Self {
         Self {
             base_url: "http://localhost:1234/v1".to_string(),
-            model: "qwen2.5-7b-instruct.Q3_K_M.gguf".to_string(),
+            model: "gemma-4-E4B-it-Q4_K_M.gguf".to_string(),
             temperature: 0.7,
             top_p: 0.9,
-            max_tokens: 4096,
+            max_tokens: 8192,
             api_key: String::new(),
+        }
+    }
+}
+
+impl From<crate::config::EngineProfileConfig> for VllmConfig {
+    fn from(p: crate::config::EngineProfileConfig) -> Self {
+        Self {
+            base_url: p.url,
+            model: p.model,
+            temperature: p.temperature,
+            top_p: p.top_p,
+            max_tokens: p.max_tokens,
+            api_key: p.api_key,
         }
     }
 }

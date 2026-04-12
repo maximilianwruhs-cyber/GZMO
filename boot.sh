@@ -180,6 +180,17 @@ fi
 
 ok "Dependencies verified. Locked Payload: $MODEL_FILE"
 
+# ─── AUTO-PATCH gzmo.toml ──────────────────────────────────────────────────
+# Prevent model mismatch: write the dynamically selected model into gzmo.toml
+# so the daemon's engine config matches what boot.sh actually loaded.
+MODEL_BASENAME=$(basename "$MODEL_FILE")
+if [ -f "gzmo.toml" ]; then
+    # Replace the model field under [engine.local] using sed
+    # Match any line starting with 'model' (with optional whitespace) inside engine.local
+    sed -i '/^\[engine\.local\]/,/^\[/ s|^\(model[[:space:]]*=[[:space:]]*\).*|\1"'"$MODEL_BASENAME"'"|' gzmo.toml
+    log "Auto-patched gzmo.toml → model = \"$MODEL_BASENAME\""
+fi
+
 # ─── 4. PHYSICAL EXTRACTION WATCHDOG ──────────────────────────────────────────
 USB_MOUNT_PATH="$(pwd)"
 log "Arming mountpoint watchdog on: $USB_MOUNT_PATH"
@@ -219,7 +230,7 @@ else
         --port 1234 > /dev/null 2>&1 &
 
     log "Waiting for inference engine to surface..."
-    # Give it 30 seconds to boot up
+    # Phase 1: Wait for HTTP server to start (up to 30s)
     MAX_WAIT=30
     for ((i=1; i<=MAX_WAIT; i++)); do
         if curl -s http://127.0.0.1:1234/health >/dev/null; then
@@ -230,7 +241,22 @@ else
             fail "LLM Engine failed to respond on port 1234."
         fi
     done
-    ok "Phantom internal inference engine operational."
+    log "HTTP server alive. Waiting for model to load into VRAM..."
+    
+    # Phase 2: Wait for the model to be fully loaded (up to 120s)
+    # /v1/models returns 503 while loading, 200 once ready
+    MAX_MODEL_WAIT=120
+    for ((i=1; i<=MAX_MODEL_WAIT; i++)); do
+        HTTP_CODE=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:1234/v1/models)
+        if [ "$HTTP_CODE" = "200" ]; then
+            break
+        fi
+        sleep 1
+        if [ "$i" -eq "$MAX_MODEL_WAIT" ]; then
+            fail "Model failed to load within ${MAX_MODEL_WAIT}s (last HTTP status: $HTTP_CODE)."
+        fi
+    done
+    ok "Phantom internal inference engine operational. Model fully loaded."
 fi
 
 log "Spawning GZMO Sovereign Daemon..."

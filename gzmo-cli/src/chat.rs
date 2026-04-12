@@ -7,9 +7,10 @@ use anyhow::Result;
 use chrono::Utc;
 
 use gzmo_core::agent_loop::{run_agent_loop, AgentLoopConfig};
-use gzmo_core::config::GzmoConfig;
+use gzmo_core::config::{GzmoConfig, EngineMode};
 use gzmo_core::context::ContextConfig;
 use gzmo_core::gateway::{TurboQuantGateway, VllmConfig};
+use gzmo_core::identity::IdentityEngine;
 use gzmo_core::memory::episodic::FileEpisodicStore;
 use gzmo_core::memory::vault::SqliteVault;
 use gzmo_core::mcp::{manager::McpManager, bridge::McpServerConfig};
@@ -19,8 +20,9 @@ use gzmo_core::tools::fs::{FileReadTool, FileWriteTool, DirListTool, FileSearchT
 use gzmo_core::tools::shell::ShellExecTool;
 use gzmo_core::tools::sysadmin::{SysMetricsTool, SysKillTool};
 use gzmo_core::tools::web::WebSearchTool;
+use gzmo_core::tools::web_browse::WebBrowseTool;
 use gzmo_core::tools::memory::{MemoryRecordTool, MemorySearchTool};
-use gzmo_core::types::{EpisodicEntry, EpisodicSource, Message, Role, SoulContext};
+use gzmo_core::types::{EpisodicEntry, EpisodicSource, Message, Role};
 use gzmo_core::skills::{SkillRegistry as ChaosSkillRegistry, SkillContext, SkillType};
 use gzmo_core::skills::{dice::DiceSkill, sound::SoundSkill, poker::PokerSkill, quote::QuoteSkill, calculate::CalculateSkill, help::HelpSkill, visual::VisualSkill};
 use gzmo_chaos::triggers::{TriggerEngine, TriggerAction, NotifyLevel};
@@ -37,8 +39,16 @@ const RESET: &str = "\x1b[0m";
 const RED: &str = "\x1b[31m";
 const CYAN: &str = "\x1b[36m";
 
-pub async fn run(config: &GzmoConfig, soul: &SoulContext) -> Result<()> {
+pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
     let mut config = config.clone();
+    let config_path = std::env::var("GZMO_CONFIG")
+        .map(std::path::PathBuf::from)
+        .unwrap_or_else(|_| {
+            std::env::current_dir()
+                .unwrap_or_else(|_| std::path::PathBuf::from("."))
+                .join("gzmo.toml")
+        });
+    let soul = identity.snapshot().await;
 
     // Ensure directories
     tokio::fs::create_dir_all(&config.memory.directory).await?;
@@ -62,21 +72,21 @@ pub async fn run(config: &GzmoConfig, soul: &SoulContext) -> Result<()> {
     };
 
     // ─── Gateway ─────────────────────────────────────────────────
-    let gateway = Arc::new(TurboQuantGateway::new(VllmConfig {
-        base_url: config.engine.url.clone(),
-        model: config.engine.model.clone(),
-        temperature: config.engine.temperature,
-        top_p: config.engine.top_p,
-        max_tokens: config.engine.max_tokens,
-        api_key: config.engine.api_key.clone(),
-    }));
+    let active_profile = config.engine.active_engine();
+    let gateway = Arc::new(tokio::sync::RwLock::new(Arc::new(TurboQuantGateway::new(
+        VllmConfig::from(active_profile),
+    ))));
 
     // ─── Chaos Engine ────────────────────────────────────────────
-    let chaos_config = gzmo_chaos::pulse::ChaosConfig::default();
-    let chaos_handle = gzmo_chaos::pulse::PulseLoop::start(chaos_config);
+    // Load [chaos] config from gzmo.toml, fall back to defaults
+    let chaos_config: gzmo_chaos::pulse::ChaosConfig = config.chaos
+        .as_ref()
+        .and_then(|v| v.clone().try_into().ok())
+        .unwrap_or_default();
+    let mut chaos_handle = gzmo_chaos::pulse::PulseLoop::start(chaos_config);
     let chaos_feedback_tx = chaos_handle.feedback_tx.clone();
     let chaos_snapshot_rx = chaos_handle.snapshot_rx.clone();
-    eprintln!("  {COPPER}⚙ Chaos engine running — 174 BPM{RESET}");
+    eprintln!("  {COPPER}⚙ Chaos engine running — 174 BPM (HW telemetry active){RESET}");
 
     // Trigger notification channel: background → REPL
     let (trigger_notify_tx, mut trigger_notify_rx) = tokio::sync::mpsc::channel::<String>(32);
@@ -84,9 +94,10 @@ pub async fn run(config: &GzmoConfig, soul: &SoulContext) -> Result<()> {
     // Spawn background task: chaos state → gateway + file + trigger evaluation
     {
         let mut snapshot_rx = chaos_handle.snapshot_rx.clone();
-        let gateway_ref = Arc::clone(&gateway);
+        let gateway_ref = gateway.clone();
         let feedback_tx_bg = chaos_handle.feedback_tx.clone();
         let notify_tx = trigger_notify_tx.clone();
+        let state_dir = config.memory.vault_db.parent().unwrap_or(std::path::Path::new(".")).to_path_buf();
         tokio::spawn(async move {
             let mut triggers = TriggerEngine::with_defaults();
             loop {
@@ -95,11 +106,55 @@ pub async fn run(config: &GzmoConfig, soul: &SoulContext) -> Result<()> {
                 }
                 let snap = snapshot_rx.borrow_and_update().clone();
                 // Update gateway LLM parameters from Lorenz coordinates
-                gateway_ref.set_chaos_overrides(snap.llm_temperature, snap.llm_max_tokens);
-                // Write snapshot file for shell skill backward compat
+                let gw = gateway_ref.read().await;
+                gw.set_chaos_overrides(snap.llm_temperature, snap.llm_max_tokens);
+                // Write snapshot files for shell skill backward compat
                 if snap.tick % 15 == 0 {
                     let json = serde_json::to_string_pretty(&snap).unwrap_or_default();
-                    let _ = tokio::fs::write("CHAOS_STATE.json", &json).await;
+                    // Atomic write: write to .tmp then rename (POSIX rename is atomic)
+                    let tmp_path = state_dir.join("CHAOS_STATE.json.tmp");
+                    let target_path = state_dir.join("CHAOS_STATE.json");
+                    if tokio::fs::write(&tmp_path, json.as_bytes()).await.is_ok() {
+                        let _ = tokio::fs::rename(&tmp_path, &target_path).await;
+                    }
+                    // HEARTBEAT.md — human-readable status (ported from original Randomizer)
+                    let heartbeat = format!(
+                        "# GZMO Heartbeat\n\n\
+                        | Field | Value |\n|---|---|\n\
+                        | Status | {} |\n\
+                        | Tick | {} |\n\
+                        | Energy | {:.1}% |\n\
+                        | Phase | {} |\n\
+                        | Deaths | {} |\n\
+                        | Tension | {:.1}% |\n\
+                        | Chaos Val | {:.4} |\n\n\
+                        ## Lorenz Attractor\n\n\
+                        x={:.3}, y={:.3}, z={:.3}\n\n\
+                        ## Thought Cabinet\n\n\
+                        | Metric | Value |\n|---|---|\n\
+                        | Incubating | {} |\n\
+                        | Crystallized | {} |\n\
+                        | Gravity mod | {:+.3} |\n\
+                        | Friction mod | {:+.3} |\n\
+                        | Lorenz ρ mod | {:+.3} |\n\
+                        | Tension bias | {:+.3} |\n\n\
+                        ## LLM Parameters\n\n\
+                        Temperature: {:.3}, Max tokens: {}, Valence: {:+.3}\n\n\
+                        *Updated: {}*\n",
+                        if snap.alive { "ALIVE" } else { "DEAD" },
+                        snap.tick, snap.energy, snap.phase, snap.deaths, snap.tension,
+                        snap.chaos_val, snap.x, snap.y, snap.z,
+                        snap.thoughts_incubating, snap.thoughts_crystallized,
+                        snap.mutations.gravity_mod, snap.mutations.friction_mod,
+                        snap.mutations.lorenz_rho_mod, snap.mutations.tension_bias,
+                        snap.llm_temperature, snap.llm_max_tokens, snap.llm_valence,
+                        snap.timestamp,
+                    );
+                    let hb_tmp = state_dir.join("HEARTBEAT.md.tmp");
+                    let hb_target = state_dir.join("HEARTBEAT.md");
+                    if tokio::fs::write(&hb_tmp, heartbeat.as_bytes()).await.is_ok() {
+                        let _ = tokio::fs::rename(&hb_tmp, &hb_target).await;
+                    }
                 }
                 // Evaluate autonomous triggers
                 let fired = triggers.evaluate(&snap);
@@ -123,15 +178,16 @@ pub async fn run(config: &GzmoConfig, soul: &SoulContext) -> Result<()> {
                                 }
                             ).await;
                         }
-                        TriggerAction::RunSkill { skill_name, .. } => {
-                            // Log skill trigger (actual execution happens via notify for now)
+                        TriggerAction::RunSkill { skill_name, args } => {
+                            // Send a typed command to the REPL loop for actual skill execution
                             let _ = notify_tx.send(
-                                format!("  \x1b[38;2;212;175;55m⚡ AUTO: /{skill_name} triggered by chaos engine\x1b[0m")
+                                format!("__TRIGGER_SKILL__:/{skill_name} {args}")
                             ).await;
                         }
                         TriggerAction::InjectPrompt { prompt } => {
+                            // Send a typed command for prompt injection into conversation
                             let _ = notify_tx.send(
-                                format!("  \x1b[2m\x1b[35m🧠 {prompt}\x1b[0m")
+                                format!("__TRIGGER_INJECT__:{prompt}")
                             ).await;
                         }
                     }
@@ -147,7 +203,14 @@ pub async fn run(config: &GzmoConfig, soul: &SoulContext) -> Result<()> {
     tools.register(Box::new(DirListTool));
     tools.register(Box::new(FileSearchTool));
     tools.register(Box::new(ShellExecTool::default()));
-    tools.register(Box::new(WebSearchTool::default()));
+    // Web search: use SerpAPI if key is available, DDG fallback
+    let serpapi_key = config.api_keys.serpapi_key();
+    if serpapi_key.is_empty() {
+        tools.register(Box::new(WebSearchTool::default()));
+    } else {
+        tools.register(Box::new(WebSearchTool::with_serpapi_key(serpapi_key)));
+    }
+    tools.register(Box::new(WebBrowseTool::default()));
     tools.register(Box::new(SysMetricsTool));
     tools.register(Box::new(SysKillTool));
     
@@ -215,7 +278,11 @@ pub async fn run(config: &GzmoConfig, soul: &SoulContext) -> Result<()> {
 
     // ─── System prompt ───────────────────────────────────────────
     let system_prompt = format!(
-        "{}{}{}\\n\\n---\\nYou are {}. Today is {}.\\nAvailable tools: {}",
+        "{}{}{}
+
+---
+You are {}. Today is {}.
+Available tools: {}",
         soul.raw_markdown,
         memory_context.as_deref().unwrap_or(""),
         vault_context.as_deref().unwrap_or(""),
@@ -254,24 +321,21 @@ pub async fn run(config: &GzmoConfig, soul: &SoulContext) -> Result<()> {
     let loop_config = AgentLoopConfig {
         max_iterations: config.agent.max_tool_iterations,
         verbose_tool_output: true,
-        context: ContextConfig::for_context_length(config.engine.max_tokens as usize * 4),
+        context: ContextConfig::for_context_length(config.engine.active_engine().max_tokens as usize * 4),
+        on_chunk: None,
     };
 
     // ─── Engine health check ─────────────────────────────────────
-    eprintln!("  {DIM}⚙ Pinging engine {}...{RESET}", config.engine.url);
+    let active = config.engine.active_engine();
+    eprintln!("  {DIM}⚙ Pinging engine {}...{RESET}", active.url);
     let (engine_status, engine_latency) = ping_engine(&config).await;
 
     if engine_status == "OFFLINE" {
-        eprintln!("  {RED}⚠ Engine unreachable.{RESET}");
-        eprintln!("  Enter a cloud API key for fallback, or press Enter to skip:");
-        let mut input = String::new();
-        std::io::stdin().read_line(&mut input).ok();
-        let key = input.trim();
-        if !key.is_empty() {
-            config.engine.api_key = key.to_string();
-            config.engine.url = "https://api.groq.com/openai/v1".to_string();
-            config.engine.model = "llama3-70b-8192".to_string();
-            eprintln!("  \x1b[32m✔ Fallback: {} / {}{RESET}", config.engine.url, config.engine.model);
+        eprintln!("  {RED}⚠ Engine unreachable at {}{RESET}", active.url);
+        if config.engine.cloud.is_some() {
+            eprintln!("  {DIM}Tip: type /mode cloud to switch to cloud inference{RESET}");
+        } else {
+            eprintln!("  {DIM}No cloud profile configured — start local engine or add [engine.cloud] to gzmo.toml{RESET}");
         }
     }
 
@@ -279,34 +343,108 @@ pub async fn run(config: &GzmoConfig, soul: &SoulContext) -> Result<()> {
     let vault_count = vault.as_ref().map(|v| v.count().unwrap_or(0)).unwrap_or(0);
     print_splash(&config, engine_status, &engine_latency, vault_count);
 
-    // ─── REPL ────────────────────────────────────────────────────
-    let stdin = io::stdin();
-    let mut reader = stdin.lock();
+    // ─── REPL (async stdin + chaos notifications) ─────────────
+    // Use a channel to receive stdin lines asynchronously so we can
+    // display chaos notifications in real-time while waiting for input.
+    let (stdin_tx, mut stdin_rx) = tokio::sync::mpsc::channel::<String>(4);
+    std::thread::spawn(move || {
+        let stdin = io::stdin();
+        let reader = stdin.lock();
+        for line in reader.lines() {
+            match line {
+                Ok(l) => { if stdin_tx.blocking_send(l).is_err() { break; } }
+                Err(_) => break,
+            }
+        }
+    });
+
+    // Print initial prompt
+    eprint!("\n  {GOLD}★{RESET} {PARCHMENT}{BOLD}you ›{RESET} ");
+    io::stderr().flush()?;
+    let mut prompt_dirty = false; // Track if we need to reprint the prompt
 
     loop {
-        // Drain any trigger notifications from the chaos engine
-        while let Ok(notification) = trigger_notify_rx.try_recv() {
-            eprintln!("{notification}");
-        }
+        // Race between user input and chaos notifications
+        tokio::select! {
+            // ─── User input ─────────────────────────────────
+            line = stdin_rx.recv() => {
+                let Some(raw) = line else { break; }; // EOF
+                let input = raw.trim().to_string();
+                prompt_dirty = false;
 
-        eprint!("\n  {GOLD}★{RESET} {PARCHMENT}{BOLD}you ›{RESET} ");
-        io::stderr().flush()?;
-
-        let mut input = String::new();
-        if reader.read_line(&mut input)? == 0 { break; }
-        let input = input.trim();
-        if input.is_empty() { continue; }
+                if input.is_empty() {
+                    eprint!("\n  {GOLD}★{RESET} {PARCHMENT}{BOLD}you ›{RESET} ");
+                    io::stderr().flush()?;
+                    continue;
+                }
 
         // ─── Slash commands ─────────────────────────────────
         if input.starts_with('/') {
+            let msg_count_before = messages.len();
             if handle_slash_command(
-                input, &mut messages, &session_mgr,
+                &input, &mut messages, &session_mgr,
                 &mut session_id, &mut session_name, session_created_at,
-                &vault, &config, &chaos_snapshot_rx,
+                &vault, &mut config, &chaos_snapshot_rx,
                 &chaos_skills, &chaos_feedback_tx,
+                &gateway, &config_path,
             ).await? {
                 break; // /quit
             }
+
+            // Auto-narration: if a skill injected a message, run one agent loop
+            // so the LLM reacts to the skill output in character
+            if messages.len() > msg_count_before {
+                let last = &messages[messages.len() - 1];
+                if last.role == Role::System && last.is_meta && last.content.starts_with("[Skill") {
+                    // Remove stale chaos/narration context
+                    messages.retain(|m| !(m.role == Role::System && m.is_meta && 
+                        (m.content.contains("[CHAOS_STATE]") || m.content.contains("[NARRATION]"))));
+                    // Append narration instruction at the END (right after skill output)
+                    // so the LLM sees it immediately before generating its response
+                    {
+                        let snap = chaos_snapshot_rx.borrow().clone();
+                        let valence_desc = if snap.llm_valence < -0.5 { "intense, restless" }
+                            else if snap.llm_valence < 0.0 { "tense, focused" }
+                            else if snap.llm_valence < 0.5 { "calm, reflective" }
+                            else { "serene, philosophical" };
+                        let narration_prompt = format!(
+                            "React to the dice event above in ONE short atmospheric sentence. \
+                            Your current mood is {}. Be dramatic and mystical, like a fortune teller. \
+                            Examples of good reactions: \
+                            \"The cosmos held its breath — and exhaled fire.\" \
+                            \"Twenty. The attractor sings. I feel it in every register.\" \
+                            \"A shadow-roll. The engine grows hungry.\" \
+                            Now write YOUR reaction (one sentence, no formatting):",
+                            valence_desc,
+                        );
+                        // Push as a User message at the end so it's the last thing the LLM sees
+                        messages.push(Message {
+                            role: Role::User, content: narration_prompt,
+                            is_meta: true, tool_calls: None, tool_call_id: None,
+                        });
+                    }
+
+                    eprintln!("  {DIM}⚙ narrating...{RESET}");
+                    let start = std::time::Instant::now();
+                    // Use empty tool set for narration — prevents the LLM from
+                    // calling tools (dir_list, etc.) instead of narrating the skill result.
+                    let narration_tools = ToolRegistry::new();
+                    match run_agent_loop(gateway.read().await.as_ref(), &narration_tools, &mut messages, &loop_config).await {
+                        Ok(response) => {
+                            messages.push(Message {
+                                role: Role::Assistant, content: response.text.clone(),
+                                is_meta: false, tool_calls: None, tool_call_id: None,
+                            });
+                            let elapsed = start.elapsed();
+                            eprintln!("  {DIM}⚙ {:.1}s{RESET}", elapsed.as_secs_f64());
+                        }
+                        Err(e) => eprintln!("  {DIM}⚙ narration failed: {e}{RESET}"),
+                    }
+                }
+            }
+            // Reprint prompt after slash command
+            eprint!("\n  {GOLD}★{RESET} {PARCHMENT}{BOLD}you ›{RESET} ");
+            io::stderr().flush()?;
             continue;
         }
 
@@ -321,6 +459,25 @@ pub async fn run(config: &GzmoConfig, soul: &SoulContext) -> Result<()> {
             timestamp: Utc::now(), source: EpisodicSource::UserChat,
             content: input.to_string(), is_silent: false,
         }).await;
+
+        // ─── SOUL.md hot-reload: refresh system prompt if identity changed ─
+        {
+            let live_soul = identity.snapshot().await;
+            if live_soul.loaded_at != soul.loaded_at {
+                eprintln!("  {COPPER}⚙ SOUL.md hot-reloaded — persona: {}{RESET}", live_soul.persona_name);
+                let new_prompt = format!(
+                    "{}\n\n---\nYou are {}. Today is {}.\nAvailable tools: {}",
+                    live_soul.raw_markdown,
+                    live_soul.persona_name,
+                    Utc::now().format("%Y-%m-%d %H:%M UTC"),
+                    if tools.is_empty() { "none".to_string() }
+                    else { tools.definitions().iter().map(|d| d.name.clone()).collect::<Vec<_>>().join(", ") }
+                );
+                if !messages.is_empty() {
+                    messages[0].content = new_prompt;
+                }
+            }
+        }
 
         // ─── Inject chaos context ────────────────────────────
         // Remove any previous chaos context message (is_meta system with "CHAOS_STATE" marker)
@@ -363,7 +520,7 @@ pub async fn run(config: &GzmoConfig, soul: &SoulContext) -> Result<()> {
 
         // ─── Agent loop ─────────────────────────────────────
         let start = std::time::Instant::now();
-        let result = run_agent_loop(gateway.as_ref(), &tools, &mut messages, &loop_config).await;
+        let result = run_agent_loop(gateway.read().await.as_ref(), &tools, &mut messages, &loop_config).await;
         let elapsed = start.elapsed();
 
         match result {
@@ -387,7 +544,77 @@ pub async fn run(config: &GzmoConfig, soul: &SoulContext) -> Result<()> {
                 eprintln!();
             }
         }
-    }
+        // Reprint prompt after response
+        eprint!("\n  {GOLD}★{RESET} {PARCHMENT}{BOLD}you ›{RESET} ");
+        io::stderr().flush()?;
+            } // end stdin arm
+
+            // ─── Trigger notifications (real-time) ──────────────
+            notification = trigger_notify_rx.recv() => {
+                if let Some(notification) = notification {
+                    if prompt_dirty {
+                        eprintln!(); // Newline before notification if prompt is active
+                    }
+                    if let Some(skill_cmd) = notification.strip_prefix("__TRIGGER_SKILL__:") {
+                        let parts: Vec<&str> = skill_cmd.splitn(2, ' ').collect();
+                        let cmd = parts[0];
+                        let args = if parts.len() > 1 { parts[1] } else { "" };
+                        if chaos_skills.has(cmd) {
+                            eprintln!("  {GOLD}⚡ AUTO: /{cmd} triggered by chaos engine{RESET}");
+                            let snap = chaos_snapshot_rx.borrow().clone();
+                            let ctx = SkillContext {
+                                chaos: &snap,
+                                feedback_tx: &chaos_feedback_tx,
+                                args,
+                            };
+                            match chaos_skills.get(cmd).unwrap().execute(ctx).await {
+                                Ok(output) => eprint!("{}", output.display),
+                                Err(e) => eprintln!("  {RED}Auto-skill error: {e}{RESET}"),
+                            }
+                        }
+                    } else if let Some(prompt) = notification.strip_prefix("__TRIGGER_INJECT__:") {
+                        eprintln!("  {DIM}\x1b[35m🧠 {prompt}\x1b[0m{RESET}");
+                        messages.push(Message {
+                            role: Role::System,
+                            content: format!("[AUTONOMOUS MONOLOGUE] {prompt}"),
+                            is_meta: true, tool_calls: None, tool_call_id: None,
+                        });
+                    } else {
+                        eprintln!("{notification}");
+                    }
+                    // Reprint prompt after notification
+                    eprint!("  {GOLD}★{RESET} {PARCHMENT}{BOLD}you ›{RESET} ");
+                    io::stderr().flush()?;
+                    prompt_dirty = true;
+                }
+            }
+
+            // ─── Lore notifications (real-time) ─────────────────
+            lore = chaos_handle.lore_rx.recv() => {
+                if let Some(lore_notif) = lore {
+                    if prompt_dirty {
+                        eprintln!(); // Newline before lore if prompt is active
+                    }
+                    let author_str = lore_notif.author.as_deref().unwrap_or("");
+                    let prefix = match lore_notif.category.as_str() {
+                        "joke" => "🃏",
+                        "quote" => "📜",
+                        "fact" => "📡",
+                        _ => "📖",
+                    };
+                    if author_str.is_empty() {
+                        eprintln!("  {DIM}{prefix} {}{RESET}", lore_notif.text);
+                    } else {
+                        eprintln!("  {DIM}{prefix} \"{}\" — {author_str}{RESET}", lore_notif.text);
+                    }
+                    // Reprint prompt after lore
+                    eprint!("  {GOLD}★{RESET} {PARCHMENT}{BOLD}you ›{RESET} ");
+                    io::stderr().flush()?;
+                    prompt_dirty = true;
+                }
+            }
+        } // end select!
+    } // end loop
 
     Ok(())
 }
@@ -452,13 +679,14 @@ async fn ping_engine(config: &GzmoConfig) -> (&'static str, String) {
         .build()
         .unwrap_or_default();
 
-    let health_url = format!("{}/models", config.engine.url);
+    let active = config.engine.active_engine();
+    let health_url = format!("{}/models", active.url);
     let start = std::time::Instant::now();
 
     for _ in 0..15 {
         let req = http.get(&health_url);
-        let req = if !config.engine.api_key.is_empty() {
-            req.bearer_auth(&config.engine.api_key)
+        let req = if !active.api_key.is_empty() {
+            req.bearer_auth(&active.api_key)
         } else { req };
 
         match req.send().await {
@@ -480,10 +708,12 @@ async fn handle_slash_command(
     session_name: &mut Option<String>,
     session_created_at: chrono::DateTime<Utc>,
     vault: &Option<Arc<SqliteVault>>,
-    config: &GzmoConfig,
+    config: &mut GzmoConfig,
     chaos_snapshot_rx: &tokio::sync::watch::Receiver<gzmo_chaos::pulse::ChaosSnapshot>,
     chaos_skills: &ChaosSkillRegistry,
     chaos_feedback_tx: &tokio::sync::mpsc::Sender<gzmo_chaos::feedback::ChaosEvent>,
+    gateway: &Arc<tokio::sync::RwLock<Arc<TurboQuantGateway>>>,
+    config_path: &std::path::Path,
 ) -> Result<bool> {
     match input {
         "/quit" | "/exit" | "/q" => {
@@ -548,8 +778,78 @@ async fn handle_slash_command(
         }
         "/stats" => {
             let display = session_name.as_deref().unwrap_or(session_id);
-            eprintln!("  {DIM}⚙ Session: {display} | Messages: {} | Model: {}{RESET}",
-                messages.len(), config.engine.model);
+            let active = config.engine.active_engine();
+            let mode_str = match config.engine.active_mode {
+                EngineMode::Local => format!("{COPPER}LOCAL{RESET}"),
+                EngineMode::Cloud => format!("\x1b[38;2;100;200;255mCLOUD{RESET}"),
+            };
+            eprintln!("  {DIM}⚙ Session: {display} | Messages: {} | Mode: {} | Model: {}{RESET}",
+                messages.len(), mode_str, active.model);
+        }
+        _ if input.starts_with("/mode") => {
+            let arg = input.strip_prefix("/mode").unwrap_or("").trim();
+            if arg.is_empty() {
+                // Show current mode
+                let active = config.engine.active_engine();
+                let mode_str = match config.engine.active_mode {
+                    EngineMode::Local => format!("{COPPER}⚙ LOCAL{RESET}"),
+                    EngineMode::Cloud => format!("\x1b[38;2;100;200;255m☁ CLOUD{RESET}"),
+                };
+                eprintln!("  Mode: {mode_str}");
+                eprintln!("  {DIM}Engine: {} → {}{RESET}", active.provider, active.url);
+                eprintln!("  {DIM}Model: {}{RESET}", active.model);
+                eprintln!("  {DIM}Usage: /mode local | /mode cloud{RESET}");
+            } else {
+                match arg.parse::<EngineMode>() {
+                    Ok(new_mode) => {
+                        if new_mode == config.engine.active_mode {
+                            eprintln!("  {DIM}⚙ Already in {} mode{RESET}", new_mode);
+                        } else {
+                            let profile = config.engine.active_engine_for_mode(new_mode);
+                            let test_url = format!("{}/models", profile.url.trim_end_matches('/'));
+                            eprint!("  {DIM}⚙ Pinging {}...{RESET}", profile.url);
+
+                            let ping_ok = match reqwest::Client::new()
+                                .get(&test_url)
+                                .timeout(std::time::Duration::from_secs(5))
+                                .send()
+                                .await
+                            {
+                                Ok(r) if r.status().is_success() || r.status().as_u16() == 401 => true,
+                                _ => false,
+                            };
+
+                            if !ping_ok && new_mode == EngineMode::Local {
+                                eprintln!(" ✗");
+                                eprintln!("  {RED}⚙ Local engine not reachable at {}{RESET}", profile.url);
+                                eprintln!("  {DIM}  Start llama-server or LM Studio first, or run boot.sh{RESET}");
+                            } else {
+                                eprintln!(" ✓");
+                                // Build new gateway
+                                let new_gw = Arc::new(TurboQuantGateway::new(VllmConfig::from(profile.clone())));
+                                // Swap gateway
+                                {
+                                    let mut gw = gateway.write().await;
+                                    *gw = new_gw;
+                                }
+                                // Update config
+                                config.engine.active_mode = new_mode;
+                                // Persist to disk
+                                if let Err(e) = config.persist_active_mode(config_path, new_mode) {
+                                    eprintln!("  {RED}⚙ Failed to persist mode: {e}{RESET}");
+                                }
+                                let mode_str = match new_mode {
+                                    EngineMode::Local => format!("{COPPER}⚙ LOCAL{RESET}"),
+                                    EngineMode::Cloud => format!("\x1b[38;2;100;200;255m☁ CLOUD{RESET}"),
+                                };
+                                eprintln!("  Switched to: {mode_str}");
+                                eprintln!("  {DIM}Model: {} → {}{RESET}", profile.model, profile.url);
+                            }
+                        }
+                    }
+                    Err(e) => eprintln!("  {RED}⚙ {e}{RESET}"),
+                }
+            }
         }
         "/chaos" => {
             let snap = chaos_snapshot_rx.borrow().clone();
@@ -668,11 +968,20 @@ async fn handle_slash_command(
                     Ok(output) => {
                         eprint!("{}", output.display);
                         if output.inject_to_conversation {
+                            // Strip ANSI escapes, box-drawing chars, and excessive whitespace
+                            // to give the LLM clean semantic text, not garbled ASCII art
+                            let clean: String = output.display
+                                .replace('\x1b', "")
+                                .chars()
+                                .filter(|c| !matches!(c, '┌'|'┐'|'└'|'┘'|'├'|'┤'|'─'|'│'|'╔'|'╗'|'╚'|'╝'|'║'|'═'|'╠'|'╣'|'/'|'\\'|'_'))
+                                .collect::<String>()
+                                .split_whitespace()
+                                .collect::<Vec<_>>()
+                                .join(" ");
+                            let clean = clean.chars().take(300).collect::<String>();
                             messages.push(Message {
                                 role: Role::System,
-                                content: format!("[Skill /{}] {}", cmd, 
-                                    output.display.replace('\x1b', "") // Strip ANSI for LLM
-                                        .chars().take(200).collect::<String>()),
+                                content: format!("[Skill /{}] {}", cmd, clean),
                                 is_meta: true, tool_calls: None, tool_call_id: None,
                             });
                         }
@@ -682,26 +991,37 @@ async fn handle_slash_command(
             }
             // ─── Shell skill fallback ─────────────────────────
             else {
-                let skills_dir = std::path::Path::new("skills");
+                let skills_dir = config.skills.directory.clone();
                 let dispatch = skills_dir.join("skill_dispatch.sh");
 
                 if dispatch.exists() {
-                    let mut child_args = vec![cmd.to_string()];
-                    if !args.is_empty() {
-                        child_args.extend(args.split_whitespace().map(String::from));
-                    }
-                    match std::process::Command::new(&dispatch)
-                        .args(&child_args)
-                        .stdin(std::process::Stdio::inherit())
-                        .stdout(std::process::Stdio::inherit())
-                        .stderr(std::process::Stdio::inherit())
-                        .status()
-                    {
-                        Ok(status) if !status.success() => {
-                            // skill_dispatch.sh already printed the error
+                    if let Ok(dispatch_canon) = std::fs::canonicalize(&dispatch) {
+                        let ok_starts_with = std::fs::canonicalize(&config.skills.directory)
+                            .map(|base_canon| dispatch_canon.starts_with(&base_canon))
+                            .unwrap_or(false);
+                            
+                        if ok_starts_with {
+                            let mut child_args = vec![cmd.to_string()];
+                            if !args.is_empty() {
+                                child_args.extend(args.split_whitespace().map(String::from));
+                            }
+                            match tokio::process::Command::new(&dispatch_canon)
+                                .args(&child_args)
+                                .stdin(std::process::Stdio::inherit())
+                                .stdout(std::process::Stdio::inherit())
+                                .stderr(std::process::Stdio::inherit())
+                                .status()
+                                .await
+                            {
+                                Ok(status) if !status.success() => {
+                                    // skill_dispatch.sh already printed the error
+                                }
+                                Ok(_) => {}
+                                Err(e) => eprintln!("  {RED}Skill dispatch error: {e}{RESET}"),
+                            }
+                        } else {
+                            eprintln!("  {RED}Security alert: skill script outside base directory{RESET}");
                         }
-                        Ok(_) => {}
-                        Err(e) => eprintln!("  {RED}Skill dispatch error: {e}{RESET}"),
                     }
                 } else {
                     eprintln!("  {RED}Unknown command: {input}{RESET}");
@@ -730,7 +1050,7 @@ fn print_splash(config: &GzmoConfig, status: &str, latency: &str, vault_count: u
     let side_i = std::cell::Cell::new(0usize);
     let pl = |text: &str, color: &str| {
         let curr = side_i.get();
-        let (l, r) = if curr.is_multiple_of(2) { (&bulb_r, &bulb_g) } else { (&bulb_g, &bulb_r) };
+        let (l, r) = if curr % 2 == 0 { (&bulb_r, &bulb_g) } else { (&bulb_g, &bulb_r) };
         side_i.set(curr+1);
         let w: usize = 47;
         let c = text.chars().count();
@@ -751,15 +1071,20 @@ fn print_splash(config: &GzmoConfig, status: &str, latency: &str, vault_count: u
     pl(" ╚██████╔╝███████╗██║ ╚═╝ ██║╚██████╔╝", &format!("{parchment}{bold}"));
     pl("  ╚═════╝ ╚══════╝╚═╝     ╚═╝ ╚═════╝ ", &format!("{parchment}{bold}"));
     pl("", "");
+    let active = config.engine.active_engine();
+    let mode_tag = match config.engine.active_mode {
+        gzmo_core::config::EngineMode::Local => "LOCAL",
+        gzmo_core::config::EngineMode::Cloud => "CLOUD",
+    };
     pl("⚙  The Incredible Mechanical Marvel  ⚙", copper);
-    pl("100% Local · Air-Gapped · Rust", dim);
+    pl(&format!("Mode: {} · Rust · Sovereign", mode_tag), dim);
     pl(&format!("Engine: {} ({})", status, latency), dim);
-    pl(&format!("Host: {} | Vault: {} records", config.engine.model, vault_count), dim);
+    pl(&format!("Model: {} | Vault: {} records", active.model, vault_count), dim);
     pl("", "");
 
-    let cmds = format!("{copper}/quit{dim} exit{reset} · {copper}/clear{dim} reset{reset} · {copper}/vault{dim} memory{reset} · {copper}/remember{dim} store{reset}");
+    let cmds = format!("{copper}/quit{dim} exit{reset} · {copper}/clear{dim} reset{reset} · {copper}/mode{dim} switch{reset} · {copper}/vault{dim} memory{reset}");
     let curr = side_i.get();
-    let (l, r) = if curr.is_multiple_of(2) { (&bulb_r, &bulb_g) } else { (&bulb_g, &bulb_r) };
+    let (l, r) = if curr % 2 == 0 { (&bulb_r, &bulb_g) } else { (&bulb_g, &bulb_r) };
     side_i.set(curr+1);
     eprintln!("  {}   {}   {}", l, cmds, r);
 

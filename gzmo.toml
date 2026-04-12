@@ -1,5 +1,4 @@
 # GZMO — Sovereign Agent Configuration
-# GZMO — Sovereign Agent Configuration
 # ─────────────────────────────────────────────────────────────────────────
 #
 # All paths are relative to the working directory (where you run the agent).
@@ -17,34 +16,61 @@ vault_db = "data/vault.db"
 directory = "skills"
 dreams_path = "DREAMS.md"
 
-[engine]
-# Provider: "local" | "openai" | "anthropic" | "gemini"
-# "local" = any OpenAI-compatible endpoint (llama.cpp, Ollama, LM Studio, vLLM)
-# "openai" = same protocol as "local" but with auth (also works with Groq, Together, etc.)
-provider = "local"
-url = "http://localhost:1234/v1"
-model = "bartowski/Qwen2.5-7B-Instruct-GGUF"  # Speculative pair: 7B main + 0.5B draft
-api_key = ""                    # required for cloud providers
-temperature = 0.3
-top_p = 0.95
-max_tokens = 4096
+# ─────────────────────────────────────────────────────────────────────────
+# API Keys — centralized key management for cloud services
+# ─────────────────────────────────────────────────────────────────────────
+#
+# Keys can also be set via environment variables:
+#   GZMO_SERPAPI_KEY, GZMO_OPENROUTER_KEY, GZMO_GEMINI_KEY
+# Env vars take precedence over values here.
 
-# ─── Cloud provider examples (uncomment one to switch) ──────────────
+[api_keys]
+serpapi     = "9fdb37e625c89266e5cf7e1a77474ca7b2ac7ee6bc8a0ca7c6a8e1c84959ae1e"
+openrouter  = "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"
+gemini      = "AIzaSyCbgRlMTx2JnJEmuG8nT7ONnZ8BFGAn22Y"
+
+# ─────────────────────────────────────────────────────────────────────────
+# Engine — Dual-mode LLM Configuration
+# ─────────────────────────────────────────────────────────────────────────
 #
-# provider = "openai"
-# url = "https://api.openai.com/v1"
-# model = "gpt-4o"
-# api_key = "sk-..."
-#
-# provider = "openai"           # Groq is OpenAI-compatible
-# url = "https://api.groq.com/openai/v1"
-# model = "llama-3.3-70b-versatile"
-# api_key = "gsk_..."
-#
-# provider = "openai"           # Together AI is OpenAI-compatible
-# url = "https://api.together.xyz/v1"
-# model = "meta-llama/Llama-3-70b-chat-hf"
-# api_key = "..."
+# active_mode: "local" | "cloud"
+#   Switch at runtime with: /mode cloud  or  /mode local
+#   Changes are persisted to this file.
+
+[engine]
+active_mode = "local"
+
+# ─── Local Engine Profile ────────────────────────────────────────────────
+# Targets any OpenAI-compatible local endpoint:
+# llama.cpp, Ollama, LM Studio, vLLM
+
+[engine.local]
+provider    = "local"
+url         = "http://localhost:1234/v1"
+model       = "gemma-4-E4B-it-Q4_K_M.gguf"
+api_key     = ""
+temperature = 0.3
+top_p       = 0.95
+max_tokens  = 8192
+
+# ─── Cloud Engine Profile ───────────────────────────────────────────────
+# Primary: OpenRouter (OpenAI-compatible, routes to any model)
+# Fallback: Google Gemini API (direct)
+
+[engine.cloud]
+provider      = "gemini"
+url           = "https://generativelanguage.googleapis.com/v1beta/openai"
+model         = "gemini-2.5-flash"
+api_key       = "AIzaSyCbgRlMTx2JnJEmuG8nT7ONnZ8BFGAn22Y"
+temperature   = 0.4
+top_p         = 0.95
+max_tokens    = 8192
+
+# Fallback engine — auto-activated if primary cloud endpoint fails
+fallback_provider  = "gemini"
+fallback_url       = "https://generativelanguage.googleapis.com/v1beta/openai"
+fallback_model     = "gemini-2.5-flash"
+fallback_api_key   = "AIzaSyCbgRlMTx2JnJEmuG8nT7ONnZ8BFGAn22Y"
 
 [agent]
 max_tool_iterations = 10
@@ -106,3 +132,36 @@ directory = "inbox"
 pattern = "*.txt"
 prompt = "Read the contents of the newly ingested file at {file_path}. Write a concise, 2-sentence summary of the text and store it securely in the knowledge vault."
 
+# ─────────────────────────────────────────────────────────────────────────
+# Chaos Engine — Lorenz Attractor + Thought Cabinet
+# ─────────────────────────────────────────────────────────────────────────
+#
+# Physics derived from the original Randomizer v2.1 daemon.
+# Tension is driven by live CPU/RAM hardware telemetry.
+
+[chaos]
+gravity = 9.8       # Original Randomizer value
+friction = 0.5      # Original Randomizer value (was 0.7 in hardcoded default)
+seed = 0.506        # Lorenz's historical input value
+initial_tension = 0.0  # Let hardware telemetry drive tension from tick 1
+lore_path = "data/lore.toml"
+
+[chaos.events]
+joke_chance = 0.3   # Probability window for joke emission per tick
+quote_chance = 0.4  # Probability window for quote emission
+fact_chance = 0.3   # Probability window for fact emission
+
+# ─────────────────────────────────────────────────────────────────────────
+# autoDream — Nightly 3-Phase Sleep Consolidation
+# ─────────────────────────────────────────────────────────────────────────
+#
+# Triggers at 3 AM nightly. The dream engine compresses yesterday's
+# episodic memory (Light phase), extracts entities via LLM (REM phase),
+# and writes to Knowledge Graph + SqliteVault (Deep phase).
+# Results are written to DREAMS.md.
+#
+# This runs in daemon mode only (sovereign-agent --daemon).
+
+[orchestration.jobs.auto_dream]
+cron = "0 0 3 * * *"
+prompt = "Run the nightly dream consolidation cycle. Compress yesterday's episodic memory, extract entities and relationships, and write results to the knowledge vault. Write the dream narrative to DREAMS.md."

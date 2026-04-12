@@ -226,6 +226,12 @@ impl ThoughtCabinet {
 
         self.mutations.total_crystallized += 1;
 
+        // Clamp all mutation accumulators to prevent unbounded drift
+        self.mutations.gravity_mod = self.mutations.gravity_mod.clamp(-5.0, 5.0);
+        self.mutations.friction_mod = self.mutations.friction_mod.clamp(-0.5, 0.5);
+        self.mutations.lorenz_rho_mod = self.mutations.lorenz_rho_mod.clamp(-10.0, 10.0);
+        self.mutations.tension_bias = self.mutations.tension_bias.clamp(-30.0, 30.0);
+
         CrystallizationEvent {
             category: thought.category.clone(),
             text_preview: thought.text_preview.clone(),

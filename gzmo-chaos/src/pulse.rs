@@ -11,10 +11,13 @@
 /// The snapshot is the read-only interface for skills, the REPL, the orchestrator,
 /// and any external diagnostic tools.
 
+use std::path::PathBuf;
+use std::sync::{Arc, atomic::{AtomicU64, AtomicBool, Ordering}};
 use std::time::Duration;
 
+use serde::Deserialize;
 use tokio::sync::{mpsc, watch};
-use tracing::{debug, info};
+use tracing::{debug, info, warn};
 
 use crate::chaos::{LogisticMap, LorenzAttractor, Phase};
 use crate::engine::EngineState;
@@ -82,7 +85,7 @@ impl Default for ChaosSnapshot {
 }
 
 /// Configuration for the chaos engine, loaded from TOML
-#[derive(Debug, Clone, serde::Deserialize)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct ChaosConfig {
     #[serde(default = "default_gravity")]
     pub gravity: f64,
@@ -92,12 +95,40 @@ pub struct ChaosConfig {
     pub seed: f64,
     #[serde(default = "default_tension")]
     pub initial_tension: f64,
+    #[serde(default)]
+    pub lore_path: Option<PathBuf>,
+    #[serde(default)]
+    pub events: EventChances,
 }
 
-fn default_gravity() -> f64 { 9.81 }
-fn default_friction() -> f64 { 0.7 }
+/// Probability windows for auto-lore emission per tick
+#[derive(Debug, Clone, Deserialize)]
+pub struct EventChances {
+    #[serde(default = "default_joke_chance")]
+    pub joke_chance: f64,
+    #[serde(default = "default_quote_chance")]
+    pub quote_chance: f64,
+    #[serde(default = "default_fact_chance")]
+    pub fact_chance: f64,
+}
+
+impl Default for EventChances {
+    fn default() -> Self {
+        Self {
+            joke_chance: default_joke_chance(),
+            quote_chance: default_quote_chance(),
+            fact_chance: default_fact_chance(),
+        }
+    }
+}
+
+fn default_gravity() -> f64 { 9.8 }
+fn default_friction() -> f64 { 0.5 }
 fn default_seed() -> f64 { 0.506 }
-fn default_tension() -> f64 { 50.0 }
+fn default_tension() -> f64 { 0.0 }
+fn default_joke_chance() -> f64 { 0.3 }
+fn default_quote_chance() -> f64 { 0.4 }
+fn default_fact_chance() -> f64 { 0.3 }
 
 impl Default for ChaosConfig {
     fn default() -> Self {
@@ -106,8 +137,66 @@ impl Default for ChaosConfig {
             friction: default_friction(),
             seed: default_seed(),
             initial_tension: default_tension(),
+            lore_path: None,
+            events: EventChances::default(),
         }
     }
+}
+
+/// A single lore item from lore.toml
+#[derive(Debug, Clone, Deserialize)]
+pub struct LoreItem {
+    pub text: String,
+    pub author: Option<String>,
+}
+
+/// The loaded lore pool — jokes, quotes, facts
+#[derive(Debug, Clone, Default, Deserialize)]
+pub struct LorePool {
+    #[serde(default)]
+    pub jokes: Vec<LoreItem>,
+    #[serde(default)]
+    pub quotes: Vec<LoreItem>,
+    #[serde(default)]
+    pub facts: Vec<LoreItem>,
+}
+
+impl LorePool {
+    pub fn load(path: &std::path::Path) -> Option<Self> {
+        match std::fs::read_to_string(path) {
+            Ok(content) => match toml::from_str::<LorePool>(&content) {
+                Ok(pool) => {
+                    info!(
+                        jokes = pool.jokes.len(),
+                        quotes = pool.quotes.len(),
+                        facts = pool.facts.len(),
+                        "📖 Lore pool loaded"
+                    );
+                    Some(pool)
+                }
+                Err(e) => {
+                    warn!("Failed to parse lore.toml: {e}");
+                    None
+                }
+            },
+            Err(e) => {
+                warn!("Failed to read lore.toml at {}: {e}", path.display());
+                None
+            }
+        }
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.jokes.is_empty() && self.quotes.is_empty() && self.facts.is_empty()
+    }
+}
+
+/// Auto-lore emission output — sent to REPL for display
+#[derive(Debug, Clone)]
+pub struct LoreNotification {
+    pub category: String,
+    pub text: String,
+    pub author: Option<String>,
 }
 
 /// Handle returned from `PulseLoop::start()` for interacting with the running loop.
@@ -116,8 +205,19 @@ pub struct PulseHandle {
     pub snapshot_rx: watch::Receiver<ChaosSnapshot>,
     /// Send feedback events from skills into the chaos engine
     pub feedback_tx: mpsc::Sender<ChaosEvent>,
+    /// Receive auto-lore notifications for REPL display
+    pub lore_rx: mpsc::Receiver<LoreNotification>,
     /// Task handle for the running pulse loop
     pub task: tokio::task::JoinHandle<()>,
+    /// Flag to stop standard threads
+    pub shutdown_flag: Arc<AtomicBool>,
+}
+
+impl Drop for PulseHandle {
+    fn drop(&mut self) {
+        self.shutdown_flag.store(true, Ordering::Relaxed);
+        self.task.abort();
+    }
 }
 
 /// The unified pulse loop — the heartbeat of GZMO.
@@ -128,10 +228,15 @@ pub struct PulseLoop {
     cabinet: ThoughtCabinet,
     tension: f64,
     config: ChaosConfig,
+    lore: Option<Arc<LorePool>>,
+
+    // Hardware telemetry: written by sysinfo thread, read by tick loop
+    hw_tension: Arc<AtomicU64>,
 
     // Channels
     event_rx: mpsc::Receiver<ChaosEvent>,
     snapshot_tx: watch::Sender<ChaosSnapshot>,
+    lore_tx: mpsc::Sender<LoreNotification>,
 }
 
 impl PulseLoop {
@@ -139,6 +244,35 @@ impl PulseLoop {
     pub fn start(config: ChaosConfig) -> PulseHandle {
         let (feedback_tx, event_rx) = mpsc::channel::<ChaosEvent>(256);
         let (snapshot_tx, snapshot_rx) = watch::channel(ChaosSnapshot::default());
+        let (lore_tx, lore_rx) = mpsc::channel::<LoreNotification>(64);
+
+        // Load lore pool if path configured
+        let lore = config.lore_path.as_ref().and_then(|p| LorePool::load(p)).map(Arc::new);
+
+        // Shared atomic for hardware telemetry tension
+        let hw_tension = Arc::new(AtomicU64::new(config.initial_tension.to_bits()));
+        let shutdown_flag = Arc::new(AtomicBool::new(false));
+
+        // Spawn hardware telemetry thread (like original Randomizer)
+        {
+            let hw_ref = Arc::clone(&hw_tension);
+            let shutdown = Arc::clone(&shutdown_flag);
+            std::thread::spawn(move || {
+                use sysinfo::System;
+                let mut sys = System::new();
+                while !shutdown.load(Ordering::Relaxed) {
+                    sys.refresh_cpu_usage();
+                    sys.refresh_memory();
+                    let cpu: f64 = sys.global_cpu_usage() as f64;
+                    let total_mem = sys.total_memory() as f64;
+                    let used_mem = sys.used_memory() as f64;
+                    let ram = if total_mem > 0.0 { (used_mem / total_mem) * 100.0 } else { 50.0 };
+                    let tension = (cpu * 0.5 + ram * 0.5).min(100.0);
+                    hw_ref.store(tension.to_bits(), Ordering::Relaxed);
+                    std::thread::sleep(Duration::from_millis(344)); // Match heartbeat BPM
+                }
+            });
+        }
 
         let pulse = PulseLoop {
             lorenz: LorenzAttractor::new(config.seed),
@@ -146,8 +280,11 @@ impl PulseLoop {
             state: EngineState::new(),
             cabinet: ThoughtCabinet::new(),
             tension: config.initial_tension,
+            lore,
+            hw_tension,
             event_rx,
             snapshot_tx,
+            lore_tx,
             config,
         };
 
@@ -158,7 +295,9 @@ impl PulseLoop {
         PulseHandle {
             snapshot_rx,
             feedback_tx,
+            lore_rx,
             task,
+            shutdown_flag,
         }
     }
 
@@ -266,8 +405,33 @@ impl PulseLoop {
             // Non-blocking send — if nobody is listening, that's fine
             let _ = self.snapshot_tx.send(snapshot);
 
-            // Tension decays naturally toward 50 (homeostasis)
-            self.tension += (50.0 - self.tension) * 0.001;
+            // Read hardware telemetry tension (replaces static homeostasis)
+            let hw_t = f64::from_bits(self.hw_tension.load(Ordering::Relaxed));
+            // Smooth blend: 90% current + 10% hardware (prevents jarring jumps)
+            self.tension = self.tension * 0.9 + hw_t * 0.1;
+
+            // Auto-lore emission: every 30 ticks (~10 seconds), if alive
+            if self.state.alive && self.state.tick % 30 == 0 {
+                if let Some(lore) = self.lore.clone() {
+                    if let Some((category, item)) = self.select_lore(&lore) {
+                        // Try to absorb into Thought Cabinet
+                        let absorb_roll = self.logistic.next_val();
+                        if self.cabinet.try_absorb(&category, &item.text, self.state.tick, absorb_roll) {
+                            info!(
+                                category = %category,
+                                text = %item.text.chars().take(40).collect::<String>(),
+                                "🧠 Auto-lore absorbed into Thought Cabinet"
+                            );
+                        }
+                        // Notify REPL for display
+                        let _ = self.lore_tx.try_send(LoreNotification {
+                            category: category.clone(),
+                            text: item.text.clone(),
+                            author: item.author.clone(),
+                        });
+                    }
+                }
+            }
         }
     }
 
@@ -304,6 +468,34 @@ impl PulseLoop {
     fn lorenz_to_temperature(&self) -> f32 {
         let normalized = ((self.lorenz.x + 20.0) / 40.0).clamp(0.0, 1.0);
         0.3 + (normalized as f32 * 0.9) // [0.3, 1.2]
+    }
+
+    /// Select a lore item based on chaos_val probability windows (ported from original Randomizer)
+    fn select_lore(&mut self, lore: &LorePool) -> Option<(String, LoreItem)> {
+        if lore.is_empty() { return None; }
+        let chaos_idx = self.logistic.next_val();
+        let joke_end = self.config.events.joke_chance;
+        let quote_end = joke_end + self.config.events.quote_chance;
+        let fact_end = quote_end + self.config.events.fact_chance;
+
+        if chaos_idx < joke_end && !lore.jokes.is_empty() {
+            let idx = self.pick_lore_index(lore.jokes.len());
+            Some(("joke".to_string(), lore.jokes[idx].clone()))
+        } else if chaos_idx < quote_end && !lore.quotes.is_empty() {
+            let idx = self.pick_lore_index(lore.quotes.len());
+            Some(("quote".to_string(), lore.quotes[idx].clone()))
+        } else if chaos_idx < fact_end && !lore.facts.is_empty() {
+            let idx = self.pick_lore_index(lore.facts.len());
+            Some(("fact".to_string(), lore.facts[idx].clone()))
+        } else {
+            None
+        }
+    }
+
+    /// Pick an index from a logistic map value (ported from original)
+    fn pick_lore_index(&mut self, len: usize) -> usize {
+        let n = self.logistic.next_val();
+        ((n * (len.saturating_sub(1)) as f64).round() as usize).min(len.saturating_sub(1))
     }
 
     /// Map Lorenz y ∈ [-30, 30] to max_tokens ∈ [128, 512]
@@ -367,14 +559,18 @@ mod tests {
         let config = ChaosConfig::default();
         let (_, event_rx) = mpsc::channel(1);
         let (snapshot_tx, _) = watch::channel(ChaosSnapshot::default());
+        let (lore_tx, _) = mpsc::channel(1);
         let pulse = PulseLoop {
             lorenz: LorenzAttractor::new(0.506),
             logistic: LogisticMap::new(0.506),
             state: EngineState::new(),
             cabinet: ThoughtCabinet::new(),
             tension: 50.0,
+            lore: None,
+            hw_tension: Arc::new(AtomicU64::new(50.0f64.to_bits())),
             event_rx,
             snapshot_tx,
+            lore_tx,
             config,
         };
 

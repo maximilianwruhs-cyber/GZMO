@@ -28,6 +28,9 @@ pub struct AgentLoopConfig {
     /// Context window management configuration.
     /// Controls token budget and pruning behavior.
     pub context: ContextConfig,
+    /// Optional callback for streaming tokens. When set, replaces the
+    /// default spinner + stderr output so the TUI can intercept tokens.
+    pub on_chunk: Option<std::sync::Arc<dyn Fn(String) + Send + Sync>>,
 }
 
 impl Default for AgentLoopConfig {
@@ -36,6 +39,7 @@ impl Default for AgentLoopConfig {
             max_iterations: 10,
             verbose_tool_output: false,
             context: ContextConfig::default(),
+            on_chunk: None,
         }
     }
 }
@@ -84,45 +88,51 @@ pub async fn run_agent_loop(
         debug!(iteration, messages = messages.len(), "Agent loop iteration");
 
         // ─── Call LLM ────────────────────────────────────────────
-        // Stream text tokens to stderr in real-time.
-        // Tool call deltas are buffered silently inside the gateway.
-        // On first token, stop the spinning cogwheel and print text.
-        let spinning = std::sync::Arc::new(std::sync::atomic::AtomicBool::new(true));
+        // Stream text tokens in real-time.
+        // If a custom on_chunk is provided (TUI mode), use it directly.
+        // Otherwise, use the default spinner + stderr output (REPL mode).
+        let (on_chunk, spinner_cleanup): (Box<dyn Fn(String) + Send>, Option<(std::sync::Arc<std::sync::atomic::AtomicBool>, std::thread::JoinHandle<()>)>) =
+            if let Some(ref callback) = config.on_chunk {
+                let cb = callback.clone();
+                (Box::new(move |text: String| { cb(text); }), None)
+            } else {
+                let spinning = std::sync::Arc::new(std::sync::atomic::AtomicBool::new(true));
+                let spin_flag = spinning.clone();
+                let spinner_handle = std::thread::spawn(move || {
+                    const FRAMES: &[&str] = &["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
+                    let mut i = 0usize;
+                    while spin_flag.load(std::sync::atomic::Ordering::Relaxed) {
+                        eprint!("\r  {} \x1b[2m⚙ cogitating...\x1b[0m", FRAMES[i % FRAMES.len()]);
+                        let _ = std::io::stderr().flush();
+                        std::thread::sleep(std::time::Duration::from_millis(80));
+                        i += 1;
+                    }
+                });
+                let spin_stop = spinning.clone();
+                let cb = Box::new(move |text: String| {
+                    if spin_stop.swap(false, std::sync::atomic::Ordering::Relaxed) {
+                        eprint!("\r                              \r");
+                    }
+                    eprint!("{}", text);
+                    let _ = std::io::stderr().flush();
+                });
+                (cb, Some((spinning, spinner_handle)))
+            };
 
-        // Spawn spinning cogwheel animation thread
-        let spin_flag = spinning.clone();
-        let spinner_handle = std::thread::spawn(move || {
-            const FRAMES: &[&str] = &["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
-            let mut i = 0usize;
-            while spin_flag.load(std::sync::atomic::Ordering::Relaxed) {
-                eprint!("\r  {} \x1b[2m⚙ cogitating...\x1b[0m", FRAMES[i % FRAMES.len()]);
-                let _ = std::io::stderr().flush();
-                std::thread::sleep(std::time::Duration::from_millis(80));
-                i += 1;
-            }
-        });
-
-        let spin_stop = spinning.clone();
-        let on_chunk = Box::new(move |text: String| {
-            if spin_stop.swap(false, std::sync::atomic::Ordering::Relaxed) {
-                // Stop spinner, clear the line
-                eprint!("\r                              \r");
-            }
-            eprint!("{}", text);
-            let _ = std::io::stderr().flush();
-        });
         // ─── Prune context to fit token budget ─────────────────
         let windowed = context::prune_to_budget(messages, &config.context);
 
         let response = gateway
             .complete_streaming(&windowed, &declarations, on_chunk)
             .await;
-        // Ensure spinner is dead
-        spinning.store(false, std::sync::atomic::Ordering::Relaxed);
-        let _ = spinner_handle.join();
+        // Ensure spinner is dead (REPL mode only)
+        if let Some((flag, handle)) = spinner_cleanup {
+            flag.store(false, std::sync::atomic::Ordering::Relaxed);
+            let _ = handle.join();
+        }
         let response = response?;
-        // Newline after streamed text
-        if matches!(&response, LlmResponse::Text(_)) {
+        // Newline after streamed text (REPL mode only — TUI handles its own rendering)
+        if config.on_chunk.is_none() && matches!(&response, LlmResponse::Text(_)) {
             eprintln!();
         }
         total_calls += 1;
@@ -222,13 +232,18 @@ pub async fn run_agent_loop(
         is_meta: false, tool_calls: None, tool_call_id: None,
     });
 
-    let on_chunk = Box::new(|text: String| {
-        eprint!("{}", text);
-        let _ = std::io::stderr().flush();
-    });
+    let on_chunk: Box<dyn Fn(String) + Send> = if let Some(ref callback) = config.on_chunk {
+        let cb = callback.clone();
+        Box::new(move |text: String| { cb(text); })
+    } else {
+        Box::new(|text: String| {
+            eprint!("{}", text);
+            let _ = std::io::stderr().flush();
+        })
+    };
     let windowed = context::prune_to_budget(messages, &config.context);
     let final_response = gateway.complete_streaming(&windowed, &[], on_chunk).await?;
-    eprintln!();
+    if config.on_chunk.is_none() { eprintln!(); }
     total_calls += 1;
 
     let text = match final_response {

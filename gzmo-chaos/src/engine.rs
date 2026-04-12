@@ -3,7 +3,7 @@ use crate::chaos::Phase;
 
 const ENERGY_MIN: f64 = 0.0;
 const ENERGY_MAX: f64 = 100.0;
-const REGEN_BASE: f64 = 1.0;
+const REGEN_BASE: f64 = 2.5;
 const REBIRTH_ENERGY: f64 = 30.0;
 const INBOX_ENERGY: f64 = 20.0;
 
@@ -41,12 +41,18 @@ impl EngineState {
         self.phase = Phase::from_tension(tension);
 
         if !self.alive {
-            // Dead engines tick silently — chaos still runs externally
+            // Dead engines attempt rebirth every tick
+            // 30% chance per tick (chaos roll > 0.7)
+            if chaos_roll > 0.7 {
+                self.alive = true;
+                self.energy = REBIRTH_ENERGY;
+                return true; // Rebirth occurred
+            }
             return false;
         }
 
         // Drain scaled for 174 BPM (~3 ticks/sec), amplified by cognitive load
-        let drain = gravity * friction * 0.1 * self.phase.drain_multiplier() * thought_drain_mod;
+        let drain = gravity * friction * 0.02 * self.phase.drain_multiplier() * thought_drain_mod;
 
         // Inverse regen curve: stronger when depleted, zero at full
         let regen = REGEN_BASE * (1.0 - (self.energy / ENERGY_MAX));

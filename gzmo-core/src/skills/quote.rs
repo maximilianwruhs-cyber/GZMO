@@ -6,6 +6,8 @@
 use anyhow::Result;
 use async_trait::async_trait;
 
+use gzmo_chaos::feedback::ChaosEvent;
+
 use super::{Skill, SkillContext, SkillOutput, SkillType};
 
 const WHITE: &str = "\x1b[97m";
@@ -89,9 +91,13 @@ impl Skill for QuoteSkill {
             quote.text, quote.author,
         );
 
+        // Send feedback to chaos engine — quotes affect the autopoietic loop
+        let feedback_event = ChaosEvent::QuoteSurfaced { text: quote.text.clone() };
+        let _ = ctx.feedback_tx.send(feedback_event.clone()).await;
+
         Ok(SkillOutput {
             display,
-            feedback: vec![],
+            feedback: vec![feedback_event],
             inject_to_conversation: true,
         })
     }

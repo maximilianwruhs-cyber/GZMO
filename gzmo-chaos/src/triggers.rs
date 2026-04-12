@@ -122,11 +122,7 @@ pub struct ChaosTrigger {
     pub cooldown_ticks: u64,
     /// Whether this trigger is currently armed
     pub enabled: bool,
-    /// Last tick this trigger fired (for cooldown tracking)
     last_fired: u64,
-    /// For threshold triggers: was the condition previously met?
-    /// (prevents re-firing while still above/below threshold)
-    was_active: bool,
 }
 
 impl ChaosTrigger {
@@ -138,7 +134,6 @@ impl ChaosTrigger {
             cooldown_ticks,
             enabled: true,
             last_fired: 0,
-            was_active: false,
         }
     }
 

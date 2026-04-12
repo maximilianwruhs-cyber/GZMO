@@ -12,3 +12,5 @@ chrono = { workspace = true }
 tokio = { workspace = true, features = ["sync", "time", "rt"] }
 tracing = { workspace = true }
 toml = { workspace = true }
+sysinfo = "0.38"
+serde_json = { workspace = true }

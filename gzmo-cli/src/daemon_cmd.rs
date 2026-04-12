@@ -45,19 +45,15 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
         since: Duration::from_secs(config.agent.heartbeat_interval_secs),
     });
     heartbeat.add_check(HealthPing {
-        url: format!("{}/models", config.engine.url),
+        url: format!("{}/models", config.engine.active_engine().url),
         service_name: "LLM Engine".to_string(),
     });
 
     // Gateway + Tools for dream cycle
-    let dream_gateway: Arc<dyn LlmGateway> = Arc::new(TurboQuantGateway::new(VllmConfig {
-        base_url: config.engine.url.clone(),
-        model: config.engine.model.clone(),
-        temperature: config.engine.temperature,
-        top_p: config.engine.top_p,
-        max_tokens: config.engine.max_tokens,
-        api_key: config.engine.api_key.clone(),
-    }));
+    let active_profile = config.engine.active_engine();
+    let dream_gateway: Arc<dyn LlmGateway> = Arc::new(TurboQuantGateway::new(
+        VllmConfig::from(active_profile),
+    ));
 
     let dream_vault = SqliteVault::open(&config.memory.vault_db)?;
     let dream_vault = Arc::new(dream_vault);
@@ -94,7 +90,7 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
     let orch_gateway = Arc::clone(&dream_gateway);
     let dream_engine = Arc::new(DreamEngine::new(
         FileEpisodicStore::new(&config.memory.directory),
-        SqliteVault::open(&config.memory.vault_db)?,
+        (*dream_vault).clone(),
         dream_gateway, Arc::clone(&dream_tools),
     ));
     let dream_engine_clone = Arc::clone(&dream_engine);
@@ -112,6 +108,7 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
         ),
         vault: Some(Arc::clone(&dream_vault)),
         episodic: Some(Arc::clone(&dream_episodic)),
+        chaos_feedback_tx: None, // Daemon mode doesn't run PulseLoop yet
     });
 
     let orch_jobs = config.orchestration.jobs.clone();

@@ -6,6 +6,7 @@ pub mod fs;
 pub mod shell;
 pub mod sysadmin;
 pub mod web;
+pub mod web_browse;
 pub mod memory;
 
 use anyhow::Result;

@@ -77,6 +77,8 @@ pub struct OrchestratorContext {
     pub vault: Option<Arc<SqliteVault>>,
     /// Optional episodic store for logging job activity.
     pub episodic: Option<Arc<FileEpisodicStore>>,
+    /// Optional chaos engine feedback channel for energy injection.
+    pub chaos_feedback_tx: Option<tokio::sync::mpsc::Sender<gzmo_chaos::feedback::ChaosEvent>>,
 }
 
 // ─── Wave Resolution (Topological Sort) ─────────────────────────────────
@@ -675,6 +677,7 @@ async fn run_step_inner(
         max_iterations,
         verbose_tool_output: false,
         context: crate::context::ContextConfig::default(),
+        on_chunk: None,
     };
 
     run_agent_loop(gateway, tools, &mut messages, &config).await

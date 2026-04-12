@@ -27,3 +27,5 @@ sysinfo = "0.38"
 tokio-cron-scheduler = "0.13"
 rmcp = { version = "0.16", features = ["client", "transport-child-process"] }
 gzmo-chaos = { path = "../gzmo-chaos" }
+r2d2 = "0.8.10"
+r2d2_sqlite = "0.25.0"

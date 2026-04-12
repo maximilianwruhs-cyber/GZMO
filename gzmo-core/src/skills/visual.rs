@@ -165,13 +165,13 @@ impl Skill for VisualSkill {
         );
 
         // Emit a subtle custom feedback event — visuals drain a bit of energy
-        let feedback = vec![
-            ChaosEvent::Custom {
-                tension_delta: -1.0, // Visual art is calming
-                energy_delta: -0.5,  // Slight energy cost
-                thought_seed: None,
-            }
-        ];
+        let feedback_event = ChaosEvent::Custom {
+            tension_delta: -1.0, // Visual art is calming
+            energy_delta: -0.5,  // Slight energy cost
+            thought_seed: None,
+        };
+        let _ = ctx.feedback_tx.send(feedback_event.clone()).await;
+        let feedback = vec![feedback_event];
 
         Ok(SkillOutput {
             display,

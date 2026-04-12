@@ -34,3 +34,6 @@ pub mod thoughts;
 pub mod feedback;
 pub mod pulse;
 pub mod triggers;
+
+// Re-exports for convenience
+pub use pulse::{ChaosConfig, ChaosSnapshot, LoreNotification, PulseHandle};
