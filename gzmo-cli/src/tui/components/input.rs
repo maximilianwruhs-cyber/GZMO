@@ -54,8 +54,21 @@ impl Component for InputComponent {
         let width = area.width.max(3) - 3;
         let scroll = self.input.visual_scroll(width as usize);
 
-        let p = Paragraph::new(self.input.value())
-            .style(Style::default().fg(Color::Rgb(201, 209, 217)))
+        let is_empty = self.input.value().is_empty();
+        let display_text = if is_empty {
+            "Type a message... (Ctrl+P for palette)"
+        } else {
+            self.input.value()
+        };
+
+        let text_color = if is_empty {
+            Color::Rgb(100, 110, 120)
+        } else {
+            Color::Rgb(201, 209, 217)
+        };
+
+        let p = Paragraph::new(display_text)
+            .style(Style::default().fg(text_color))
             .scroll((0, scroll as u16))
             .block(
                 Block::default()
