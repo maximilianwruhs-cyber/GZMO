@@ -1,7 +1,7 @@
 use ratatui::{
-    layout::Rect,
+    layout::{Alignment, Rect},
     style::{Color, Style},
-    widgets::{Block, Borders, Paragraph},
+    widgets::{block::{Position, Title}, Block, Borders, Paragraph},
     Frame,
 };
 use color_eyre::Result;
@@ -62,6 +62,11 @@ impl Component for InputComponent {
                     .borders(Borders::ALL)
                     .title(" ★ you › ")
                     .title_style(Style::default().fg(Color::Rgb(212, 175, 55)))
+                    .title(
+                        Title::from(" Ctrl+P: Commands │ Ctrl+C: Quit ")
+                            .position(Position::Bottom)
+                            .alignment(Alignment::Right),
+                    )
                     .border_style(Style::default().fg(Color::Rgb(60, 60, 70))),
             );
 
