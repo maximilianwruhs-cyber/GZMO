@@ -54,9 +54,22 @@ impl Component for InputComponent {
         let width = area.width.max(3) - 3;
         let scroll = self.input.visual_scroll(width as usize);
 
-        let p = Paragraph::new(self.input.value())
-            .style(Style::default().fg(Color::Rgb(201, 209, 217)))
-            .scroll((0, scroll as u16))
+        let is_empty = self.input.value().is_empty();
+        let display_text = if is_empty {
+            "Type a message... (Ctrl+P for Palette, Ctrl+C to Quit)"
+        } else {
+            self.input.value()
+        };
+
+        let style = if is_empty {
+            Style::default().fg(Color::Rgb(100, 100, 110))
+        } else {
+            Style::default().fg(Color::Rgb(201, 209, 217))
+        };
+
+        let p = Paragraph::new(display_text)
+            .style(style)
+            .scroll((0, if is_empty { 0 } else { scroll as u16 }))
             .block(
                 Block::default()
                     .borders(Borders::ALL)
@@ -68,7 +81,11 @@ impl Component for InputComponent {
         f.render_widget(p, area);
 
         // Show cursor
-        let cursor_x = area.x + 1 + (self.input.visual_cursor().max(scroll) - scroll) as u16;
+        let cursor_x = if is_empty {
+            area.x + 1
+        } else {
+            area.x + 1 + (self.input.visual_cursor().max(scroll) - scroll) as u16
+        };
         f.set_cursor(cursor_x, area.y + 1);
 
         Ok(())
