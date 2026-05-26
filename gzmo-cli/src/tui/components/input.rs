@@ -1,11 +1,11 @@
+use color_eyre::Result;
+use crossterm::event::{Event, KeyCode, KeyEventKind};
 use ratatui::{
     layout::Rect,
     style::{Color, Style},
     widgets::{Block, Borders, Paragraph},
     Frame,
 };
-use color_eyre::Result;
-use crossterm::event::{Event, KeyCode, KeyEventKind};
 use tokio::sync::mpsc::UnboundedSender;
 use tui_input::{backend::crossterm::EventHandler, Input};
 
@@ -54,8 +54,20 @@ impl Component for InputComponent {
         let width = area.width.max(3) - 3;
         let scroll = self.input.visual_scroll(width as usize);
 
-        let p = Paragraph::new(self.input.value())
-            .style(Style::default().fg(Color::Rgb(201, 209, 217)))
+        let (text, style) = if self.input.value().is_empty() {
+            (
+                "Type a message... (Ctrl+P for commands, Ctrl+C to quit)".to_string(),
+                Style::default().fg(Color::Rgb(100, 100, 110)),
+            )
+        } else {
+            (
+                self.input.value().to_string(),
+                Style::default().fg(Color::Rgb(201, 209, 217)),
+            )
+        };
+
+        let p = Paragraph::new(text)
+            .style(style)
             .scroll((0, scroll as u16))
             .block(
                 Block::default()
