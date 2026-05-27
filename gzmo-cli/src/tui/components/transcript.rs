@@ -6,7 +6,7 @@ use ratatui::{
     Frame,
 };
 use color_eyre::Result;
-use crossterm::event::{Event, KeyCode, KeyEventKind};
+use crossterm::event::{Event, KeyCode, KeyEventKind, MouseEventKind};
 use std::collections::VecDeque;
 
 use crate::tui::action::Action;
@@ -114,17 +114,31 @@ impl Component for TranscriptComponent {
     }
 
     fn handle_events(&mut self, event: Option<Event>) -> Result<Option<Action>> {
-        if let Some(Event::Key(key)) = event {
-            if key.kind == KeyEventKind::Press {
-                match key.code {
-                    KeyCode::PageUp => {
-                        self.scroll_offset = self.scroll_offset.saturating_add(5);
+        if let Some(ev) = event {
+            match ev {
+                Event::Key(key) => {
+                    if key.kind == KeyEventKind::Press {
+                        match key.code {
+                            KeyCode::PageUp => {
+                                self.scroll_offset = self.scroll_offset.saturating_add(5);
+                            }
+                            KeyCode::PageDown => {
+                                self.scroll_offset = self.scroll_offset.saturating_sub(5);
+                            }
+                            _ => {}
+                        }
                     }
-                    KeyCode::PageDown => {
-                        self.scroll_offset = self.scroll_offset.saturating_sub(5);
+                }
+                Event::Mouse(mouse) => match mouse.kind {
+                    MouseEventKind::ScrollUp => {
+                        self.scroll_offset = self.scroll_offset.saturating_add(3);
+                    }
+                    MouseEventKind::ScrollDown => {
+                        self.scroll_offset = self.scroll_offset.saturating_sub(3);
                     }
                     _ => {}
-                }
+                },
+                _ => {}
             }
         }
         Ok(None)
