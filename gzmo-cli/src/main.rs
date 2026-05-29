@@ -5,17 +5,17 @@
 mod chat;
 mod daemon_cmd;
 mod init_cmd;
+pub mod tui;
 #[allow(dead_code)]
 mod ui;
-pub mod tui;
 
 use anyhow::Result;
-use tracing_subscriber::EnvFilter;
 use gzmo_core::memory::vault::SqliteVault;
+use tracing_subscriber::EnvFilter;
 
 enum Command {
     Chat,
-    ChatRepl,  // Legacy REPL mode via --repl flag
+    ChatRepl, // Legacy REPL mode via --repl flag
     Daemon,
     Init,
     MemoryDump,
@@ -24,13 +24,21 @@ enum Command {
 fn parse_args() -> Command {
     let args: Vec<String> = std::env::args().collect();
     if args.len() >= 2 {
-        if args[1] == "daemon" { return Command::Daemon; }
-        if args[1] == "init" { return Command::Init; }
-        if args[1] == "--repl" { return Command::ChatRepl; }
+        if args[1] == "daemon" {
+            return Command::Daemon;
+        }
+        if args[1] == "init" {
+            return Command::Init;
+        }
+        if args[1] == "--repl" {
+            return Command::ChatRepl;
+        }
         if args[1] == "memory" && args.get(2).map(|s| s.as_str()) == Some("dump") {
             return Command::MemoryDump;
         }
-        if args[1] == "dump" { return Command::MemoryDump; }
+        if args[1] == "dump" {
+            return Command::MemoryDump;
+        }
     }
     Command::Chat
 }
@@ -48,8 +56,7 @@ async fn main() -> Result<()> {
 
     tracing_subscriber::fmt()
         .with_env_filter(
-            EnvFilter::try_from_default_env()
-                .unwrap_or_else(|_| EnvFilter::new(default_filter)),
+            EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new(default_filter)),
         )
         .with_target(false)
         .init();
@@ -76,7 +83,8 @@ async fn main() -> Result<()> {
                     if std::path::Path::new(&proc_path).exists() {
                         anyhow::bail!(
                             "GZMO Daemon is already running (PID {}, lockfile {:?}).",
-                            old_pid, pid_file
+                            old_pid,
+                            pid_file
                         );
                     }
                     tracing::warn!(stale_pid = %old_pid, "Reclaiming stale PID lockfile");
@@ -89,17 +97,19 @@ async fn main() -> Result<()> {
                 .write(true)
                 .create_new(true)
                 .open(&pid_file)
-                .map_err(|e| anyhow::anyhow!(
+                .map_err(|e| {
+                    anyhow::anyhow!(
                     "Failed to acquire PID lockfile {:?}: {}. Another instance may have started.",
                     pid_file, e
-                ))?;
+                )
+                })?;
             write!(lock, "{}", std::process::id())?;
             drop(lock);
 
             let res = daemon_cmd::run(&config, identity).await;
             let _ = std::fs::remove_file(&pid_file);
             res
-        },
+        }
         Command::Init => unreachable!(),
         Command::MemoryDump => {
             println!("Exporting Native Vault to Markdown...");

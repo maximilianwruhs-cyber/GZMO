@@ -1,20 +1,20 @@
+use chrono::Utc;
+use color_eyre::Result;
 use std::sync::Arc;
 use tokio::sync::mpsc::UnboundedSender;
-use color_eyre::Result;
-use chrono::Utc;
 
 use gzmo_core::agent_loop::{run_agent_loop, AgentLoopConfig};
 use gzmo_core::context::ContextConfig;
 use gzmo_core::gateway::{TurboQuantGateway, VllmConfig};
-use gzmo_core::types::{SoulContext, EpisodicEntry, EpisodicSource, Message, Role};
+use gzmo_core::types::{EpisodicEntry, EpisodicSource, Message, Role, SoulContext};
 
+use gzmo_chaos::feedback::ChaosEvent;
+use gzmo_chaos::pulse::ChaosSnapshot;
 use gzmo_core::memory::episodic::FileEpisodicStore;
 use gzmo_core::memory::vault::SqliteVault;
 use gzmo_core::session::SessionManager;
+use gzmo_core::skills::{SkillContext, SkillRegistry as ChaosSkillRegistry};
 use gzmo_core::tools::ToolRegistry;
-use gzmo_core::skills::{SkillRegistry as ChaosSkillRegistry, SkillContext};
-use gzmo_chaos::pulse::ChaosSnapshot;
-use gzmo_chaos::feedback::ChaosEvent;
 
 use crate::tui::action::Action;
 use crate::tui::component::Component;
@@ -145,9 +145,7 @@ impl AgentComponent {
             },
         );
     }
-
 }
-
 
 impl Component for AgentComponent {
     fn init(&mut self, action_tx: UnboundedSender<Action>) -> Result<()> {
@@ -191,22 +189,45 @@ impl Component for AgentComponent {
                     match skills.get(&skill_name).unwrap().execute(ctx).await {
                         Ok(output) => {
                             // Strip ANSI for transcript display
-                            let clean: String = output.display
+                            let clean: String = output
+                                .display
                                 .replace('\x1b', "")
                                 .chars()
-                                .filter(|c| !matches!(c, '┌'|'┐'|'└'|'┘'|'├'|'┤'|'─'|'│'|'╔'|'╗'|'╚'|'╝'|'║'|'═'|'╠'|'╣'))
+                                .filter(|c| {
+                                    !matches!(
+                                        c,
+                                        '┌' | '┐'
+                                            | '└'
+                                            | '┘'
+                                            | '├'
+                                            | '┤'
+                                            | '─'
+                                            | '│'
+                                            | '╔'
+                                            | '╗'
+                                            | '╚'
+                                            | '╝'
+                                            | '║'
+                                            | '═'
+                                            | '╠'
+                                            | '╣'
+                                    )
+                                })
                                 .collect::<String>()
                                 .split_whitespace()
                                 .collect::<Vec<_>>()
                                 .join(" ");
-                            let _ = action_tx.send(Action::AgentResponse(
-                                format!("⚡ AUTO /{}: {}", skill_name, clean.chars().take(300).collect::<String>())
-                            ));
+                            let _ = action_tx.send(Action::AgentResponse(format!(
+                                "⚡ AUTO /{}: {}",
+                                skill_name,
+                                clean.chars().take(300).collect::<String>()
+                            )));
                         }
                         Err(e) => {
-                            let _ = action_tx.send(Action::AgentResponse(
-                                format!("⚡ Auto-skill /{} error: {}", skill_name, e)
-                            ));
+                            let _ = action_tx.send(Action::AgentResponse(format!(
+                                "⚡ Auto-skill /{} error: {}",
+                                skill_name, e
+                            )));
                         }
                     }
                 }
@@ -312,7 +333,11 @@ impl Component for AgentComponent {
                         let tool_names = if tool_defs.is_empty() {
                             "none".to_string()
                         } else {
-                            tool_defs.iter().map(|d| d.name.clone()).collect::<Vec<_>>().join(", ")
+                            tool_defs
+                                .iter()
+                                .map(|d| d.name.clone())
+                                .collect::<Vec<_>>()
+                                .join(", ")
                         };
                         // Rebuild system prompt with current soul
                         let new_prompt = format!(
@@ -398,8 +423,14 @@ impl SlashCommandContext {
         match raw_cmd.as_str() {
             "/quit" | "/exit" | "/q" => {
                 if self.messages.len() > 1 {
-                    let _ = self.session_mgr
-                        .save(&self.session_id, self.session_name.as_deref(), &self.messages, self.session_created_at)
+                    let _ = self
+                        .session_mgr
+                        .save(
+                            &self.session_id,
+                            self.session_name.as_deref(),
+                            &self.messages,
+                            self.session_created_at,
+                        )
                         .await;
                 }
                 let _ = self.action_tx.send(Action::Quit);
@@ -409,7 +440,9 @@ impl SlashCommandContext {
                 self.session_id = SessionManager::new_session_id();
                 self.session_name = None;
                 let _ = self.action_tx.send(Action::TranscriptClear);
-                let _ = self.action_tx.send(Action::AgentResponse("⚙ Context cleared — new session.".to_string()));
+                let _ = self.action_tx.send(Action::AgentResponse(
+                    "⚙ Context cleared — new session.".to_string(),
+                ));
             }
             "/resume" => {
                 if let Ok(Some(session)) = self.session_mgr.most_recent().await {
@@ -418,26 +451,51 @@ impl SlashCommandContext {
                     self.messages = session.messages.clone();
                     self.session_id = session.id;
                     self.session_name = session.name;
-                    let _ = self.action_tx.send(Action::TranscriptRestore(self.messages.clone()));
-                    let _ = self.action_tx.send(Action::AgentResponse(format!("⚙ Resumed: {} ({} messages)", display, count)));
+                    let _ = self
+                        .action_tx
+                        .send(Action::TranscriptRestore(self.messages.clone()));
+                    let _ = self.action_tx.send(Action::AgentResponse(format!(
+                        "⚙ Resumed: {} ({} messages)",
+                        display, count
+                    )));
                 } else {
-                    let _ = self.action_tx.send(Action::AgentResponse("⚙ No previous session found.".to_string()));
+                    let _ = self.action_tx.send(Action::AgentResponse(
+                        "⚙ No previous session found.".to_string(),
+                    ));
                 }
             }
             "/new" => {
                 if self.messages.len() > 1 {
-                    let _ = self.session_mgr.save(&self.session_id, self.session_name.as_deref(), &self.messages, self.session_created_at).await;
+                    let _ = self
+                        .session_mgr
+                        .save(
+                            &self.session_id,
+                            self.session_name.as_deref(),
+                            &self.messages,
+                            self.session_created_at,
+                        )
+                        .await;
                 }
                 self.messages.truncate(1);
                 self.session_id = SessionManager::new_session_id();
                 self.session_name = None;
                 self.session_created_at = Utc::now();
                 let _ = self.action_tx.send(Action::TranscriptClear);
-                let _ = self.action_tx.send(Action::AgentResponse(format!("⚙ New session: {}", self.session_id)));
+                let _ = self.action_tx.send(Action::AgentResponse(format!(
+                    "⚙ New session: {}",
+                    self.session_id
+                )));
             }
             "/system" => {
-                let prompt = self.messages.first().map(|m| m.content.clone()).unwrap_or_default();
-                let _ = self.action_tx.send(Action::AgentResponse(format!("--- System Prompt ---\n{}\n--- End ---", prompt)));
+                let prompt = self
+                    .messages
+                    .first()
+                    .map(|m| m.content.clone())
+                    .unwrap_or_default();
+                let _ = self.action_tx.send(Action::AgentResponse(format!(
+                    "--- System Prompt ---\n{}\n--- End ---",
+                    prompt
+                )));
             }
             "/stats" => {
                 let display = self.session_name.as_deref().unwrap_or(&self.session_id);
@@ -447,7 +505,13 @@ impl SlashCommandContext {
                     gzmo_core::config::EngineMode::Local => "LOCAL",
                     gzmo_core::config::EngineMode::Cloud => "CLOUD",
                 };
-                let _ = self.action_tx.send(Action::AgentResponse(format!("⚙ Session: {} | Messages: {} | Mode: {} | Model: {}", display, self.messages.len(), mode_str, active.model)));
+                let _ = self.action_tx.send(Action::AgentResponse(format!(
+                    "⚙ Session: {} | Messages: {} | Mode: {} | Model: {}",
+                    display,
+                    self.messages.len(),
+                    mode_str,
+                    active.model
+                )));
             }
             "/chaos" => {
                 let snap = self.chaos_snapshot_rx.borrow().clone();
@@ -456,10 +520,19 @@ impl SlashCommandContext {
                      Lorenz: ({:.2}, {:.2}, {:.2})\n  Alive: {} | Deaths: {}\n  \
                      Thoughts: {} incubating, {} crystallized\n  \
                      LLM Temp: {:.3} | Tokens: {} | Valence: {:+.3}",
-                    snap.phase, snap.energy, snap.tension,
-                    snap.x, snap.y, snap.z, snap.alive, snap.deaths,
-                    snap.thoughts_incubating, snap.thoughts_crystallized,
-                    snap.llm_temperature, snap.llm_max_tokens, snap.llm_valence,
+                    snap.phase,
+                    snap.energy,
+                    snap.tension,
+                    snap.x,
+                    snap.y,
+                    snap.z,
+                    snap.alive,
+                    snap.deaths,
+                    snap.thoughts_incubating,
+                    snap.thoughts_crystallized,
+                    snap.llm_temperature,
+                    snap.llm_max_tokens,
+                    snap.llm_valence,
                 )));
             }
             "/vault" => {
@@ -469,32 +542,61 @@ impl SlashCommandContext {
                     if count > 0 {
                         if let Ok(recent) = v.recent(5) {
                             for (i, fact) in recent.iter().enumerate() {
-                                let display = if fact.len() > 100 { &fact[..100] } else { fact.as_str() };
+                                let display = if fact.len() > 100 {
+                                    &fact[..100]
+                                } else {
+                                    fact.as_str()
+                                };
                                 text.push_str(&format!("\n  {}. {}", i + 1, display));
                             }
                         }
                     }
                     let _ = self.action_tx.send(Action::AgentResponse(text));
                 } else {
-                    let _ = self.action_tx.send(Action::AgentResponse("⚙ Vault not available".to_string()));
+                    let _ = self
+                        .action_tx
+                        .send(Action::AgentResponse("⚙ Vault not available".to_string()));
                 }
             }
             "/save" => {
                 let name = args.trim();
-                let name_opt = if name.is_empty() { None } else { Some(name.to_string()) };
-                if name_opt.is_some() { self.session_name = name_opt.clone(); }
-                match self.session_mgr.save(&self.session_id, self.session_name.as_deref(), &self.messages, self.session_created_at).await {
+                let name_opt = if name.is_empty() {
+                    None
+                } else {
+                    Some(name.to_string())
+                };
+                if name_opt.is_some() {
+                    self.session_name = name_opt.clone();
+                }
+                match self
+                    .session_mgr
+                    .save(
+                        &self.session_id,
+                        self.session_name.as_deref(),
+                        &self.messages,
+                        self.session_created_at,
+                    )
+                    .await
+                {
                     Ok(()) => {
                         let display = self.session_name.as_deref().unwrap_or(&self.session_id);
-                        let _ = self.action_tx.send(Action::AgentResponse(format!("⚙ Saved: {}", display)));
+                        let _ = self
+                            .action_tx
+                            .send(Action::AgentResponse(format!("⚙ Saved: {}", display)));
                     }
-                    Err(e) => { let _ = self.action_tx.send(Action::AgentResponse(format!("⚙ Save failed: {}", e))); }
+                    Err(e) => {
+                        let _ = self
+                            .action_tx
+                            .send(Action::AgentResponse(format!("⚙ Save failed: {}", e)));
+                    }
                 }
             }
             "/load" => {
                 let target = args.trim();
                 if target.is_empty() {
-                    let _ = self.action_tx.send(Action::AgentResponse("⚙ Usage: /load <id or name>".to_string()));
+                    let _ = self.action_tx.send(Action::AgentResponse(
+                        "⚙ Usage: /load <id or name>".to_string(),
+                    ));
                 } else {
                     let loaded = match self.session_mgr.load(target).await {
                         Ok(s) => Some(s),
@@ -503,28 +605,50 @@ impl SlashCommandContext {
                     match loaded {
                         Some(session) => {
                             let count = session.messages.len().saturating_sub(1);
-                            let display = session.name.clone().unwrap_or_else(|| session.id.clone());
+                            let display =
+                                session.name.clone().unwrap_or_else(|| session.id.clone());
                             self.messages = session.messages.clone();
                             self.session_id = session.id;
                             self.session_name = session.name;
-                            let _ = self.action_tx.send(Action::TranscriptRestore(self.messages.clone()));
-                            let _ = self.action_tx.send(Action::AgentResponse(format!("⚙ Loaded: {} ({} messages)", display, count)));
+                            let _ = self
+                                .action_tx
+                                .send(Action::TranscriptRestore(self.messages.clone()));
+                            let _ = self.action_tx.send(Action::AgentResponse(format!(
+                                "⚙ Loaded: {} ({} messages)",
+                                display, count
+                            )));
                         }
-                        None => { let _ = self.action_tx.send(Action::AgentResponse(format!("⚙ Not found: {}", target))); }
+                        None => {
+                            let _ = self
+                                .action_tx
+                                .send(Action::AgentResponse(format!("⚙ Not found: {}", target)));
+                        }
                     }
                 }
             }
             "/remember" => {
                 let fact = args.trim();
                 if fact.is_empty() {
-                    let _ = self.action_tx.send(Action::AgentResponse("⚙ Usage: /remember <fact>".to_string()));
+                    let _ = self.action_tx.send(Action::AgentResponse(
+                        "⚙ Usage: /remember <fact>".to_string(),
+                    ));
                 } else if let Some(ref v) = self.vault {
                     match v.store_text(fact, "Semantic", 1.0) {
-                        Ok(()) => { let _ = self.action_tx.send(Action::AgentResponse(format!("⚙ Stored: {}", fact))); }
-                        Err(e) => { let _ = self.action_tx.send(Action::AgentResponse(format!("⚙ Store failed: {}", e))); }
+                        Ok(()) => {
+                            let _ = self
+                                .action_tx
+                                .send(Action::AgentResponse(format!("⚙ Stored: {}", fact)));
+                        }
+                        Err(e) => {
+                            let _ = self
+                                .action_tx
+                                .send(Action::AgentResponse(format!("⚙ Store failed: {}", e)));
+                        }
                     }
                 } else {
-                    let _ = self.action_tx.send(Action::AgentResponse("⚙ Vault not available".to_string()));
+                    let _ = self
+                        .action_tx
+                        .send(Action::AgentResponse("⚙ Vault not available".to_string()));
                 }
             }
             "/mode" => {
@@ -545,14 +669,28 @@ impl SlashCommandContext {
                         Ok(new_mode) => {
                             let mut config = self.config.write().await;
                             if new_mode == config.engine.active_mode {
-                                let _ = self.action_tx.send(Action::AgentResponse(format!("⚙ Already in {} mode", new_mode)));
+                                let _ = self.action_tx.send(Action::AgentResponse(format!(
+                                    "⚙ Already in {} mode",
+                                    new_mode
+                                )));
                             } else {
                                 let profile = config.engine.active_engine_for_mode(new_mode);
-                                let test_url = format!("{}/models", profile.url.trim_end_matches('/'));
-                                
+                                let test_url =
+                                    format!("{}/models", profile.url.trim_end_matches('/'));
+
                                 let req_client = reqwest::Client::new();
-                                let ping_ok = match req_client.get(&test_url).timeout(std::time::Duration::from_secs(5)).send().await {
-                                    Ok(r) if r.status().is_success() || r.status().as_u16() == 401 => true,
+                                let ping_ok = match req_client
+                                    .get(&test_url)
+                                    .timeout(std::time::Duration::from_secs(5))
+                                    .send()
+                                    .await
+                                {
+                                    Ok(r)
+                                        if r.status().is_success()
+                                            || r.status().as_u16() == 401 =>
+                                    {
+                                        true
+                                    }
                                     _ => false,
                                 };
 
@@ -562,14 +700,20 @@ impl SlashCommandContext {
                                         profile.url
                                     )));
                                 } else {
-                                    let new_gw = Arc::new(TurboQuantGateway::new(VllmConfig::from(profile.clone())));
+                                    let new_gw = Arc::new(TurboQuantGateway::new(
+                                        VllmConfig::from(profile.clone()),
+                                    ));
                                     {
                                         let mut gw = self.gateway.write().await;
                                         *gw = new_gw;
                                     }
                                     config.engine.active_mode = new_mode;
-                                    if let Err(e) = config.persist_active_mode(&self.config_path, new_mode) {
-                                        let _ = self.action_tx.send(Action::AgentResponse(format!("⚙ Failed to persist config: {}", e)));
+                                    if let Err(e) =
+                                        config.persist_active_mode(&self.config_path, new_mode)
+                                    {
+                                        let _ = self.action_tx.send(Action::AgentResponse(
+                                            format!("⚙ Failed to persist config: {}", e),
+                                        ));
                                     }
                                     let mode_str = match new_mode {
                                         gzmo_core::config::EngineMode::Local => "LOCAL",
@@ -583,14 +727,18 @@ impl SlashCommandContext {
                             }
                         }
                         Err(e) => {
-                            let _ = self.action_tx.send(Action::AgentResponse(format!("⚙ {}", e)));
+                            let _ = self
+                                .action_tx
+                                .send(Action::AgentResponse(format!("⚙ {}", e)));
                         }
                     }
                 }
             }
             _ => {
                 if raw_cmd.len() < 2 {
-                    let _ = self.action_tx.send(Action::AgentResponse(format!("⚙ Unknown command: {}", cmd)));
+                    let _ = self
+                        .action_tx
+                        .send(Action::AgentResponse(format!("⚙ Unknown command: {}", cmd)));
                     return;
                 }
                 let raw_skill = &raw_cmd[1..]; // remove the slash
@@ -616,9 +764,13 @@ impl SlashCommandContext {
                             let mut ui_clean = String::new();
                             let mut in_ansi = false;
                             for c in output.display.chars() {
-                                if c == '\x1b' { in_ansi = true; }
-                                else if in_ansi && c == 'm' { in_ansi = false; }
-                                else if !in_ansi { ui_clean.push(c); }
+                                if c == '\x1b' {
+                                    in_ansi = true;
+                                } else if in_ansi && c == 'm' {
+                                    in_ansi = false;
+                                } else if !in_ansi {
+                                    ui_clean.push(c);
+                                }
                             }
                             // Start on a new line to align the ASCII box
                             let ui_text = format!("\n{}", ui_clean);
@@ -628,13 +780,36 @@ impl SlashCommandContext {
                             if output.inject_to_conversation {
                                 let llm_clean: String = ui_clean
                                     .chars()
-                                    .filter(|c| !matches!(c, '\u{250c}'|'\u{2510}'|'\u{2514}'|'\u{2518}'|'\u{251c}'|'\u{2524}'|'\u{2500}'|'\u{2502}'|'\u{2554}'|'\u{2557}'|'\u{255a}'|'\u{255d}'|'\u{2551}'|'\u{2550}'|'\u{2560}'|'\u{2563}'|'/'|'\\'|'_'))
+                                    .filter(|c| {
+                                        !matches!(
+                                            c,
+                                            '\u{250c}'
+                                                | '\u{2510}'
+                                                | '\u{2514}'
+                                                | '\u{2518}'
+                                                | '\u{251c}'
+                                                | '\u{2524}'
+                                                | '\u{2500}'
+                                                | '\u{2502}'
+                                                | '\u{2554}'
+                                                | '\u{2557}'
+                                                | '\u{255a}'
+                                                | '\u{255d}'
+                                                | '\u{2551}'
+                                                | '\u{2550}'
+                                                | '\u{2560}'
+                                                | '\u{2563}'
+                                                | '/'
+                                                | '\\'
+                                                | '_'
+                                        )
+                                    })
                                     .collect::<String>()
                                     .split_whitespace()
                                     .collect::<Vec<_>>()
                                     .join(" ");
                                 let llm_text = llm_clean.chars().take(300).collect::<String>();
-                                
+
                                 self.messages.push(gzmo_core::types::Message {
                                     role: gzmo_core::types::Role::System,
                                     content: format!("[Skill /{}] {}", skill_cmd, llm_text),
@@ -645,11 +820,15 @@ impl SlashCommandContext {
                             }
                         }
                         Err(e) => {
-                            let _ = self.action_tx.send(Action::AgentResponse(format!("⚙ Skill error: {}", e)));
+                            let _ = self
+                                .action_tx
+                                .send(Action::AgentResponse(format!("⚙ Skill error: {}", e)));
                         }
                     }
                 } else {
-                    let _ = self.action_tx.send(Action::AgentResponse(format!("⚙ Unknown command: {}", cmd)));
+                    let _ = self
+                        .action_tx
+                        .send(Action::AgentResponse(format!("⚙ Unknown command: {}", cmd)));
                 }
             }
         }

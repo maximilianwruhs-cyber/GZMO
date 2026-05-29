@@ -8,19 +8,19 @@ use chrono::{Timelike, Utc};
 use tracing::{error, info};
 
 use gzmo_core::config::GzmoConfig;
-use gzmo_core::daemon::{FileChangeCheck, HeartbeatEngine, HealthPing};
+use gzmo_core::daemon::{FileChangeCheck, HealthPing, HeartbeatEngine};
 use gzmo_core::dreams::DreamEngine;
 use gzmo_core::gateway::{LlmGateway, TurboQuantGateway, VllmConfig};
 use gzmo_core::identity::IdentityEngine;
+use gzmo_core::mcp::{bridge::McpServerConfig, manager::McpManager};
 use gzmo_core::memory::episodic::FileEpisodicStore;
 use gzmo_core::memory::vault::SqliteVault;
-use gzmo_core::mcp::{manager::McpManager, bridge::McpServerConfig};
-use gzmo_core::tools::ToolRegistry;
-use gzmo_core::tools::fs::{FileReadTool, FileWriteTool, DirListTool, FileSearchTool};
-use gzmo_core::tools::shell::ShellExecTool;
-use gzmo_core::tools::sysadmin::{SysMetricsTool, SysKillTool};
-use gzmo_core::tools::web::WebSearchTool;
+use gzmo_core::tools::fs::{DirListTool, FileReadTool, FileSearchTool, FileWriteTool};
 use gzmo_core::tools::memory::{MemoryRecordTool, MemorySearchTool};
+use gzmo_core::tools::shell::ShellExecTool;
+use gzmo_core::tools::sysadmin::{SysKillTool, SysMetricsTool};
+use gzmo_core::tools::web::WebSearchTool;
+use gzmo_core::tools::ToolRegistry;
 
 pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
     let soul = identity.snapshot().await;
@@ -51,9 +51,8 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
 
     // Gateway + Tools for dream cycle
     let active_profile = config.engine.active_engine();
-    let dream_gateway: Arc<dyn LlmGateway> = Arc::new(TurboQuantGateway::new(
-        VllmConfig::from(active_profile),
-    ));
+    let dream_gateway: Arc<dyn LlmGateway> =
+        Arc::new(TurboQuantGateway::new(VllmConfig::from(active_profile)));
 
     let dream_vault = SqliteVault::open(&config.memory.vault_db)?;
     let dream_vault = Arc::new(dream_vault);
@@ -67,18 +66,25 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
     dream_tools.register(Box::new(WebSearchTool::default()));
     dream_tools.register(Box::new(SysMetricsTool));
     dream_tools.register(Box::new(SysKillTool));
-    dream_tools.register(Box::new(MemoryRecordTool { vault: Arc::clone(&dream_vault) }));
-    dream_tools.register(Box::new(MemorySearchTool { vault: Arc::clone(&dream_vault) }));
+    dream_tools.register(Box::new(MemoryRecordTool {
+        vault: Arc::clone(&dream_vault),
+    }));
+    dream_tools.register(Box::new(MemorySearchTool {
+        vault: Arc::clone(&dream_vault),
+    }));
 
     // MCP for dreams
     let mut dream_mcp = McpManager::new();
     for server in config.active_mcp_servers() {
-        match dream_mcp.connect(McpServerConfig {
-            name: server.name.clone(),
-            command: server.command.clone(),
-            args: server.args.clone(),
-            env: server.env.clone(),
-        }).await {
+        match dream_mcp
+            .connect(McpServerConfig {
+                name: server.name.clone(),
+                command: server.command.clone(),
+                args: server.args.clone(),
+                env: server.env.clone(),
+            })
+            .await
+        {
             Ok(count) => info!(server = %server.name, tools = count, "Dream MCP connected"),
             Err(e) => error!(server = %server.name, "Dream MCP failed: {}", e),
         }
@@ -91,7 +97,8 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
     let dream_engine = Arc::new(DreamEngine::new(
         FileEpisodicStore::new(&config.memory.directory),
         (*dream_vault).clone(),
-        dream_gateway, Arc::clone(&dream_tools),
+        dream_gateway,
+        Arc::clone(&dream_tools),
     ));
     let dream_engine_clone = Arc::clone(&dream_engine);
     let dreams_path = config.skills.dreams_path.clone();
@@ -112,10 +119,17 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
     });
 
     let orch_jobs = config.orchestration.jobs.clone();
-    let _scheduler = match gzmo_core::orchestrator::start_orchestrator(orch_jobs, Arc::clone(&orch_ctx)).await {
-        Ok(s) => { info!("Orchestrator online"); Some(s) }
-        Err(e) => { error!("Orchestrator failed: {e}"); None }
-    };
+    let _scheduler =
+        match gzmo_core::orchestrator::start_orchestrator(orch_jobs, Arc::clone(&orch_ctx)).await {
+            Ok(s) => {
+                info!("Orchestrator online");
+                Some(s)
+            }
+            Err(e) => {
+                error!("Orchestrator failed: {e}");
+                None
+            }
+        };
 
     // Watchers
     let orch_watchers = config.orchestration.watchers.clone();
@@ -125,10 +139,14 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
 
     // Heartbeat task
     let heartbeat_handle = tokio::spawn(async move {
-        heartbeat.run(|anomalies| async move {
-            info!(count = anomalies.len(), "Heartbeat triggered");
-            for a in &anomalies { info!(anomaly = %a); }
-        }).await
+        heartbeat
+            .run(|anomalies| async move {
+                info!(count = anomalies.len(), "Heartbeat triggered");
+                for a in &anomalies {
+                    info!(anomaly = %a);
+                }
+            })
+            .await
     });
 
     // Dream cycle task

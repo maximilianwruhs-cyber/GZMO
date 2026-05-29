@@ -6,28 +6,29 @@ use std::sync::Arc;
 use anyhow::Result;
 use chrono::Utc;
 
+use gzmo_chaos::triggers::{NotifyLevel, TriggerAction, TriggerEngine};
 use gzmo_core::agent_loop::{run_agent_loop, AgentLoopConfig};
-use gzmo_core::config::{GzmoConfig, EngineMode};
+use gzmo_core::config::{EngineMode, GzmoConfig};
 use gzmo_core::context::ContextConfig;
 use gzmo_core::gateway::{TurboQuantGateway, VllmConfig};
 use gzmo_core::identity::IdentityEngine;
+use gzmo_core::mcp::{bridge::McpServerConfig, manager::McpManager};
 use gzmo_core::memory::episodic::FileEpisodicStore;
 use gzmo_core::memory::vault::SqliteVault;
-use gzmo_core::mcp::{manager::McpManager, bridge::McpServerConfig};
 use gzmo_core::session::SessionManager;
-use gzmo_core::tools::ToolRegistry;
-use gzmo_core::tools::fs::{FileReadTool, FileWriteTool, DirListTool, FileSearchTool};
+use gzmo_core::skills::{
+    calculate::CalculateSkill, dice::DiceSkill, help::HelpSkill, poker::PokerSkill,
+    quote::QuoteSkill, sound::SoundSkill, visual::VisualSkill,
+};
+use gzmo_core::skills::{SkillContext, SkillRegistry as ChaosSkillRegistry, SkillType};
+use gzmo_core::tools::fs::{DirListTool, FileReadTool, FileSearchTool, FileWriteTool};
+use gzmo_core::tools::memory::{MemoryRecordTool, MemorySearchTool};
 use gzmo_core::tools::shell::ShellExecTool;
-use gzmo_core::tools::sysadmin::{SysMetricsTool, SysKillTool};
+use gzmo_core::tools::sysadmin::{SysKillTool, SysMetricsTool};
 use gzmo_core::tools::web::WebSearchTool;
 use gzmo_core::tools::web_browse::WebBrowseTool;
-use gzmo_core::tools::memory::{MemoryRecordTool, MemorySearchTool};
+use gzmo_core::tools::ToolRegistry;
 use gzmo_core::types::{EpisodicEntry, EpisodicSource, Message, Role};
-use gzmo_core::skills::{SkillRegistry as ChaosSkillRegistry, SkillContext, SkillType};
-use gzmo_core::skills::{dice::DiceSkill, sound::SoundSkill, poker::PokerSkill, quote::QuoteSkill, calculate::CalculateSkill, help::HelpSkill, visual::VisualSkill};
-use gzmo_chaos::triggers::{TriggerEngine, TriggerAction, NotifyLevel};
-
-
 
 // ─── ANSI escape helpers ─────────────────────────────────────────────
 const GOLD: &str = "\x1b[38;2;212;175;55m";
@@ -79,7 +80,8 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
 
     // ─── Chaos Engine ────────────────────────────────────────────
     // Load [chaos] config from gzmo.toml, fall back to defaults
-    let chaos_config: gzmo_chaos::pulse::ChaosConfig = config.chaos
+    let chaos_config: gzmo_chaos::pulse::ChaosConfig = config
+        .chaos
         .as_ref()
         .and_then(|v| v.clone().try_into().ok())
         .unwrap_or_default();
@@ -97,7 +99,12 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
         let gateway_ref = gateway.clone();
         let feedback_tx_bg = chaos_handle.feedback_tx.clone();
         let notify_tx = trigger_notify_tx.clone();
-        let state_dir = config.memory.vault_db.parent().unwrap_or(std::path::Path::new(".")).to_path_buf();
+        let state_dir = config
+            .memory
+            .vault_db
+            .parent()
+            .unwrap_or(std::path::Path::new("."))
+            .to_path_buf();
         tokio::spawn(async move {
             let mut triggers = TriggerEngine::with_defaults();
             loop {
@@ -142,17 +149,32 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
                         Temperature: {:.3}, Max tokens: {}, Valence: {:+.3}\n\n\
                         *Updated: {}*\n",
                         if snap.alive { "ALIVE" } else { "DEAD" },
-                        snap.tick, snap.energy, snap.phase, snap.deaths, snap.tension,
-                        snap.chaos_val, snap.x, snap.y, snap.z,
-                        snap.thoughts_incubating, snap.thoughts_crystallized,
-                        snap.mutations.gravity_mod, snap.mutations.friction_mod,
-                        snap.mutations.lorenz_rho_mod, snap.mutations.tension_bias,
-                        snap.llm_temperature, snap.llm_max_tokens, snap.llm_valence,
+                        snap.tick,
+                        snap.energy,
+                        snap.phase,
+                        snap.deaths,
+                        snap.tension,
+                        snap.chaos_val,
+                        snap.x,
+                        snap.y,
+                        snap.z,
+                        snap.thoughts_incubating,
+                        snap.thoughts_crystallized,
+                        snap.mutations.gravity_mod,
+                        snap.mutations.friction_mod,
+                        snap.mutations.lorenz_rho_mod,
+                        snap.mutations.tension_bias,
+                        snap.llm_temperature,
+                        snap.llm_max_tokens,
+                        snap.llm_valence,
                         snap.timestamp,
                     );
                     let hb_tmp = state_dir.join("HEARTBEAT.md.tmp");
                     let hb_target = state_dir.join("HEARTBEAT.md");
-                    if tokio::fs::write(&hb_tmp, heartbeat.as_bytes()).await.is_ok() {
+                    if tokio::fs::write(&hb_tmp, heartbeat.as_bytes())
+                        .await
+                        .is_ok()
+                    {
                         let _ = tokio::fs::rename(&hb_tmp, &hb_target).await;
                     }
                 }
@@ -162,33 +184,36 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
                     match &f.action {
                         TriggerAction::Notify { message, level } => {
                             let prefix = match level {
-                                NotifyLevel::Whisper  => format!("\x1b[2m  {message}\x1b[0m"),
-                                NotifyLevel::Normal   => format!("  \x1b[36m{message}\x1b[0m"),
-                                NotifyLevel::Urgent   => format!("  \x1b[1m\x1b[33m{message}\x1b[0m"),
-                                NotifyLevel::Critical => format!("  \x1b[1m\x1b[31m⚠ {message}\x1b[0m"),
+                                NotifyLevel::Whisper => format!("\x1b[2m  {message}\x1b[0m"),
+                                NotifyLevel::Normal => format!("  \x1b[36m{message}\x1b[0m"),
+                                NotifyLevel::Urgent => format!("  \x1b[1m\x1b[33m{message}\x1b[0m"),
+                                NotifyLevel::Critical => {
+                                    format!("  \x1b[1m\x1b[31m⚠ {message}\x1b[0m")
+                                }
                             };
                             let _ = notify_tx.send(prefix).await;
                         }
-                        TriggerAction::EmitEvent { tension_delta, energy_delta } => {
-                            let _ = feedback_tx_bg.send(
-                                gzmo_chaos::feedback::ChaosEvent::Custom {
+                        TriggerAction::EmitEvent {
+                            tension_delta,
+                            energy_delta,
+                        } => {
+                            let _ = feedback_tx_bg
+                                .send(gzmo_chaos::feedback::ChaosEvent::Custom {
                                     tension_delta: *tension_delta,
                                     energy_delta: *energy_delta,
                                     thought_seed: None,
-                                }
-                            ).await;
+                                })
+                                .await;
                         }
                         TriggerAction::RunSkill { skill_name, args } => {
                             // Send a typed command to the REPL loop for actual skill execution
-                            let _ = notify_tx.send(
-                                format!("__TRIGGER_SKILL__:/{skill_name} {args}")
-                            ).await;
+                            let _ = notify_tx
+                                .send(format!("__TRIGGER_SKILL__:/{skill_name} {args}"))
+                                .await;
                         }
                         TriggerAction::InjectPrompt { prompt } => {
                             // Send a typed command for prompt injection into conversation
-                            let _ = notify_tx.send(
-                                format!("__TRIGGER_INJECT__:{prompt}")
-                            ).await;
+                            let _ = notify_tx.send(format!("__TRIGGER_INJECT__:{prompt}")).await;
                         }
                     }
                 }
@@ -213,10 +238,14 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
     tools.register(Box::new(WebBrowseTool::default()));
     tools.register(Box::new(SysMetricsTool));
     tools.register(Box::new(SysKillTool));
-    
+
     if let Some(ref v) = vault {
-        tools.register(Box::new(MemoryRecordTool { vault: Arc::clone(v) }));
-        tools.register(Box::new(MemorySearchTool { vault: Arc::clone(v) }));
+        tools.register(Box::new(MemoryRecordTool {
+            vault: Arc::clone(v),
+        }));
+        tools.register(Box::new(MemorySearchTool {
+            vault: Arc::clone(v),
+        }));
     }
 
     // ─── Chaos Skills (Rust-native, priority over shell) ─────────
@@ -228,26 +257,39 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
     chaos_skills.register(Arc::new(CalculateSkill));
     chaos_skills.register(Arc::new(VisualSkill));
     // Build help entries from registered skills
-    let help_entries: Vec<(String, String, &'static str)> = chaos_skills.all().iter().map(|s| {
-        let type_label = match s.skill_type() {
-            SkillType::Mechanical => "mechanical",
-            SkillType::Generative => "generative",
-            SkillType::Mutation => "mutation",
-            SkillType::Info => "info",
-        };
-        (s.name().to_string(), s.description().to_string(), type_label)
-    }).collect();
-    chaos_skills.register(Arc::new(HelpSkill { entries: help_entries }));
+    let help_entries: Vec<(String, String, &'static str)> = chaos_skills
+        .all()
+        .iter()
+        .map(|s| {
+            let type_label = match s.skill_type() {
+                SkillType::Mechanical => "mechanical",
+                SkillType::Generative => "generative",
+                SkillType::Mutation => "mutation",
+                SkillType::Info => "info",
+            };
+            (
+                s.name().to_string(),
+                s.description().to_string(),
+                type_label,
+            )
+        })
+        .collect();
+    chaos_skills.register(Arc::new(HelpSkill {
+        entries: help_entries,
+    }));
 
     // ─── MCP ─────────────────────────────────────────────────────
     let mut mcp = McpManager::new();
     for server in config.active_mcp_servers() {
-        match mcp.connect(McpServerConfig {
-            name: server.name.clone(),
-            command: server.command.clone(),
-            args: server.args.clone(),
-            env: server.env.clone(),
-        }).await {
+        match mcp
+            .connect(McpServerConfig {
+                name: server.name.clone(),
+                command: server.command.clone(),
+                args: server.args.clone(),
+                env: server.env.clone(),
+            })
+            .await
+        {
             Ok(count) => tracing::info!(server = %server.name, tools = count, "MCP connected"),
             Err(e) => tracing::error!(server = %server.name, "MCP failed: {}", e),
         }
@@ -288,8 +330,16 @@ Available tools: {}",
         vault_context.as_deref().unwrap_or(""),
         soul.persona_name,
         Utc::now().format("%Y-%m-%d %H:%M UTC"),
-        if tools.is_empty() { "none".to_string() }
-        else { tools.definitions().iter().map(|d| d.name.clone()).collect::<Vec<_>>().join(", ") }
+        if tools.is_empty() {
+            "none".to_string()
+        } else {
+            tools
+                .definitions()
+                .iter()
+                .map(|d| d.name.clone())
+                .collect::<Vec<_>>()
+                .join(", ")
+        }
     );
 
     // ─── Session ─────────────────────────────────────────────────
@@ -303,7 +353,9 @@ Available tools: {}",
     let mut messages: Vec<Message> = vec![Message {
         role: Role::System,
         content: system_prompt,
-        is_meta: true, tool_calls: None, tool_call_id: None,
+        is_meta: true,
+        tool_calls: None,
+        tool_call_id: None,
     }];
 
     // Offer resume
@@ -311,9 +363,12 @@ Available tools: {}",
         let age = Utc::now() - recent.last_active_at;
         if age.num_hours() < 24 && recent.messages.len() > 1 {
             let name_display = recent.name.as_deref().unwrap_or(&recent.id);
-            eprintln!("  {DIM}⚙ Previous session: {} ({} msgs, {}){RESET}",
-                name_display, recent.messages.len() - 1,
-                recent.last_active_at.format("%H:%M %b %d"));
+            eprintln!(
+                "  {DIM}⚙ Previous session: {} ({} msgs, {}){RESET}",
+                name_display,
+                recent.messages.len() - 1,
+                recent.last_active_at.format("%H:%M %b %d")
+            );
             eprintln!("  {DIM}  Type /resume to continue, or just start typing ›{RESET}");
         }
     }
@@ -321,7 +376,9 @@ Available tools: {}",
     let loop_config = AgentLoopConfig {
         max_iterations: config.agent.max_tool_iterations,
         verbose_tool_output: true,
-        context: ContextConfig::for_context_length(config.engine.active_engine().max_tokens as usize * 4),
+        context: ContextConfig::for_context_length(
+            config.engine.active_engine().max_tokens as usize * 4,
+        ),
         on_chunk: None,
     };
 
@@ -352,7 +409,11 @@ Available tools: {}",
         let reader = stdin.lock();
         for line in reader.lines() {
             match line {
-                Ok(l) => { if stdin_tx.blocking_send(l).is_err() { break; } }
+                Ok(l) => {
+                    if stdin_tx.blocking_send(l).is_err() {
+                        break;
+                    }
+                }
                 Err(_) => break,
             }
         }
@@ -397,7 +458,7 @@ Available tools: {}",
                 let last = &messages[messages.len() - 1];
                 if last.role == Role::System && last.is_meta && last.content.starts_with("[Skill") {
                     // Remove stale chaos/narration context
-                    messages.retain(|m| !(m.role == Role::System && m.is_meta && 
+                    messages.retain(|m| !(m.role == Role::System && m.is_meta &&
                         (m.content.contains("[CHAOS_STATE]") || m.content.contains("[NARRATION]"))));
                     // Append narration instruction at the END (right after skill output)
                     // so the LLM sees it immediately before generating its response
@@ -639,7 +700,10 @@ async fn boot_knowledge_graph(tools: &ToolRegistry) -> Option<String> {
     if let Some(entities) = graph.get("entities").and_then(|e| e.as_array()) {
         for entity in entities {
             let name = entity.get("name").and_then(|n| n.as_str()).unwrap_or("?");
-            let etype = entity.get("entityType").and_then(|t| t.as_str()).unwrap_or("?");
+            let etype = entity
+                .get("entityType")
+                .and_then(|t| t.as_str())
+                .unwrap_or("?");
             block.push_str(&format!("- **{}** ({})", name, etype));
             if let Some(obs) = entity.get("observations").and_then(|o| o.as_array()) {
                 let obs_strs: Vec<&str> = obs.iter().filter_map(|o| o.as_str()).collect();
@@ -658,7 +722,10 @@ async fn boot_knowledge_graph(tools: &ToolRegistry) -> Option<String> {
             for rel in relations {
                 let from = rel.get("from").and_then(|f| f.as_str()).unwrap_or("?");
                 let to = rel.get("to").and_then(|t| t.as_str()).unwrap_or("?");
-                let rtype = rel.get("relationType").and_then(|r| r.as_str()).unwrap_or("?");
+                let rtype = rel
+                    .get("relationType")
+                    .and_then(|r| r.as_str())
+                    .unwrap_or("?");
                 block.push_str(&format!("- {} -> ({}) -> {}\n", from, rtype, to));
                 has_content = true;
             }
@@ -687,7 +754,9 @@ async fn ping_engine(config: &GzmoConfig) -> (&'static str, String) {
         let req = http.get(&health_url);
         let req = if !active.api_key.is_empty() {
             req.bearer_auth(&active.api_key)
-        } else { req };
+        } else {
+            req
+        };
 
         match req.send().await {
             Ok(resp) if resp.status().is_success() => {
@@ -718,7 +787,15 @@ async fn handle_slash_command(
     match input {
         "/quit" | "/exit" | "/q" => {
             if messages.len() > 1 {
-                if let Err(e) = session_mgr.save(session_id, session_name.as_deref(), messages, session_created_at).await {
+                if let Err(e) = session_mgr
+                    .save(
+                        session_id,
+                        session_name.as_deref(),
+                        messages,
+                        session_created_at,
+                    )
+                    .await
+                {
                     eprintln!("  {RED}⚙ Save failed: {e}{RESET}");
                 } else {
                     let display = session_name.as_deref().unwrap_or(session_id);
@@ -726,13 +803,24 @@ async fn handle_slash_command(
                 }
                 // Store session summary in vault
                 if let Some(ref v) = vault {
-                    let topics: Vec<String> = messages.iter()
+                    let topics: Vec<String> = messages
+                        .iter()
                         .filter(|m| m.role == Role::User && !m.content.is_empty())
                         .take(20)
-                        .map(|m| if m.content.len() > 150 { m.content[..150].to_string() } else { m.content.clone() })
+                        .map(|m| {
+                            if m.content.len() > 150 {
+                                m.content[..150].to_string()
+                            } else {
+                                m.content.clone()
+                            }
+                        })
                         .collect();
                     if !topics.is_empty() {
-                        let fact = format!("[Session {}] Topics: {}", Utc::now().format("%Y-%m-%d %H:%M"), topics.join(" | "));
+                        let fact = format!(
+                            "[Session {}] Topics: {}",
+                            Utc::now().format("%Y-%m-%d %H:%M"),
+                            topics.join(" | ")
+                        );
                         let _ = v.store_text(&fact, "Episodic", 1.0);
                         eprintln!("  {COPPER}⚙ Session summary stored in vault{RESET}");
                     }
@@ -749,26 +837,31 @@ async fn handle_slash_command(
         }
         "/new" => {
             if messages.len() > 1 {
-                let _ = session_mgr.save(session_id, session_name.as_deref(), messages, session_created_at).await;
+                let _ = session_mgr
+                    .save(
+                        session_id,
+                        session_name.as_deref(),
+                        messages,
+                        session_created_at,
+                    )
+                    .await;
             }
             messages.truncate(1);
             *session_id = SessionManager::new_session_id();
             *session_name = None;
             eprintln!("  {DIM}⚙ New session: {session_id}{RESET}");
         }
-        "/resume" => {
-            match session_mgr.most_recent().await {
-                Ok(Some(session)) => {
-                    let count = session.messages.len().saturating_sub(1);
-                    let display = session.name.clone().unwrap_or_else(|| session.id.clone());
-                    *messages = session.messages;
-                    *session_id = session.id;
-                    *session_name = session.name;
-                    eprintln!("  {DIM}⚙ Resumed: {display} ({count} messages){RESET}");
-                }
-                _ => eprintln!("  {DIM}⚙ No previous session found{RESET}"),
+        "/resume" => match session_mgr.most_recent().await {
+            Ok(Some(session)) => {
+                let count = session.messages.len().saturating_sub(1);
+                let display = session.name.clone().unwrap_or_else(|| session.id.clone());
+                *messages = session.messages;
+                *session_id = session.id;
+                *session_name = session.name;
+                eprintln!("  {DIM}⚙ Resumed: {display} ({count} messages){RESET}");
             }
-        }
+            _ => eprintln!("  {DIM}⚙ No previous session found{RESET}"),
+        },
         "/system" => {
             eprintln!("  {DIM}--- System Prompt ---{RESET}");
             for line in messages[0].content.lines() {
@@ -783,8 +876,12 @@ async fn handle_slash_command(
                 EngineMode::Local => format!("{COPPER}LOCAL{RESET}"),
                 EngineMode::Cloud => format!("\x1b[38;2;100;200;255mCLOUD{RESET}"),
             };
-            eprintln!("  {DIM}⚙ Session: {display} | Messages: {} | Mode: {} | Model: {}{RESET}",
-                messages.len(), mode_str, active.model);
+            eprintln!(
+                "  {DIM}⚙ Session: {display} | Messages: {} | Mode: {} | Model: {}{RESET}",
+                messages.len(),
+                mode_str,
+                active.model
+            );
         }
         _ if input.starts_with("/mode") => {
             let arg = input.strip_prefix("/mode").unwrap_or("").trim();
@@ -815,18 +912,25 @@ async fn handle_slash_command(
                                 .send()
                                 .await
                             {
-                                Ok(r) if r.status().is_success() || r.status().as_u16() == 401 => true,
+                                Ok(r) if r.status().is_success() || r.status().as_u16() == 401 => {
+                                    true
+                                }
                                 _ => false,
                             };
 
                             if !ping_ok && new_mode == EngineMode::Local {
                                 eprintln!(" ✗");
-                                eprintln!("  {RED}⚙ Local engine not reachable at {}{RESET}", profile.url);
+                                eprintln!(
+                                    "  {RED}⚙ Local engine not reachable at {}{RESET}",
+                                    profile.url
+                                );
                                 eprintln!("  {DIM}  Start llama-server or LM Studio first, or run boot.sh{RESET}");
                             } else {
                                 eprintln!(" ✓");
                                 // Build new gateway
-                                let new_gw = Arc::new(TurboQuantGateway::new(VllmConfig::from(profile.clone())));
+                                let new_gw = Arc::new(TurboQuantGateway::new(VllmConfig::from(
+                                    profile.clone(),
+                                )));
                                 // Swap gateway
                                 {
                                     let mut gw = gateway.write().await;
@@ -840,10 +944,15 @@ async fn handle_slash_command(
                                 }
                                 let mode_str = match new_mode {
                                     EngineMode::Local => format!("{COPPER}⚙ LOCAL{RESET}"),
-                                    EngineMode::Cloud => format!("\x1b[38;2;100;200;255m☁ CLOUD{RESET}"),
+                                    EngineMode::Cloud => {
+                                        format!("\x1b[38;2;100;200;255m☁ CLOUD{RESET}")
+                                    }
                                 };
                                 eprintln!("  Switched to: {mode_str}");
-                                eprintln!("  {DIM}Model: {} → {}{RESET}", profile.model, profile.url);
+                                eprintln!(
+                                    "  {DIM}Model: {} → {}{RESET}",
+                                    profile.model, profile.url
+                                );
                             }
                         }
                     }
@@ -856,38 +965,75 @@ async fn handle_slash_command(
             eprintln!("  {CYAN}╔══════════════════════════════════════╗{RESET}");
             eprintln!("  {CYAN}║  ⚡ Chaos Engine State               ║{RESET}");
             eprintln!("  {CYAN}╠══════════════════════════════════════╣{RESET}");
-            eprintln!("  {CYAN}║{RESET}  Tick: {:<8}  Phase: {:<12}{CYAN}║{RESET}", snap.tick, format!("{}", snap.phase));
-            eprintln!("  {CYAN}║{RESET}  Energy: {:<6.1}  Tension: {:<8.1}{CYAN}║{RESET}", snap.energy, snap.tension);
-            eprintln!("  {CYAN}║{RESET}  Lorenz: ({:.2}, {:.2}, {:.2})    {CYAN}║{RESET}", snap.x, snap.y, snap.z);
-            eprintln!("  {CYAN}║{RESET}  Alive: {:<7}  Deaths: {:<8}{CYAN}║{RESET}", snap.alive, snap.deaths);
+            eprintln!(
+                "  {CYAN}║{RESET}  Tick: {:<8}  Phase: {:<12}{CYAN}║{RESET}",
+                snap.tick,
+                format!("{}", snap.phase)
+            );
+            eprintln!(
+                "  {CYAN}║{RESET}  Energy: {:<6.1}  Tension: {:<8.1}{CYAN}║{RESET}",
+                snap.energy, snap.tension
+            );
+            eprintln!(
+                "  {CYAN}║{RESET}  Lorenz: ({:.2}, {:.2}, {:.2})    {CYAN}║{RESET}",
+                snap.x, snap.y, snap.z
+            );
+            eprintln!(
+                "  {CYAN}║{RESET}  Alive: {:<7}  Deaths: {:<8}{CYAN}║{RESET}",
+                snap.alive, snap.deaths
+            );
             eprintln!("  {CYAN}╠══════════════════════════════════════╣{RESET}");
             eprintln!("  {CYAN}║  🧠 Thought Cabinet                  ║{RESET}");
-            eprintln!("  {CYAN}║{RESET}  Incubating: {}  Crystallized: {:<5}{CYAN}║{RESET}", snap.thoughts_incubating, snap.thoughts_crystallized);
-            eprintln!("  {CYAN}║{RESET}  Gravity mod:  {:<+8.2}           {CYAN}║{RESET}", snap.mutations.gravity_mod);
-            eprintln!("  {CYAN}║{RESET}  Friction mod: {:<+8.2}           {CYAN}║{RESET}", snap.mutations.friction_mod);
-            eprintln!("  {CYAN}║{RESET}  Lorenz ρ mod: {:<+8.2}           {CYAN}║{RESET}", snap.mutations.lorenz_rho_mod);
+            eprintln!(
+                "  {CYAN}║{RESET}  Incubating: {}  Crystallized: {:<5}{CYAN}║{RESET}",
+                snap.thoughts_incubating, snap.thoughts_crystallized
+            );
+            eprintln!(
+                "  {CYAN}║{RESET}  Gravity mod:  {:<+8.2}           {CYAN}║{RESET}",
+                snap.mutations.gravity_mod
+            );
+            eprintln!(
+                "  {CYAN}║{RESET}  Friction mod: {:<+8.2}           {CYAN}║{RESET}",
+                snap.mutations.friction_mod
+            );
+            eprintln!(
+                "  {CYAN}║{RESET}  Lorenz ρ mod: {:<+8.2}           {CYAN}║{RESET}",
+                snap.mutations.lorenz_rho_mod
+            );
             eprintln!("  {CYAN}╠══════════════════════════════════════╣{RESET}");
             eprintln!("  {CYAN}║  🌡  LLM Parameters (Lorenz-derived) ║{RESET}");
-            eprintln!("  {CYAN}║{RESET}  Temperature: {:.3}                {CYAN}║{RESET}", snap.llm_temperature);
-            eprintln!("  {CYAN}║{RESET}  Max tokens:  {:<6}               {CYAN}║{RESET}", snap.llm_max_tokens);
-            eprintln!("  {CYAN}║{RESET}  Valence:     {:<+.3}               {CYAN}║{RESET}", snap.llm_valence);
+            eprintln!(
+                "  {CYAN}║{RESET}  Temperature: {:.3}                {CYAN}║{RESET}",
+                snap.llm_temperature
+            );
+            eprintln!(
+                "  {CYAN}║{RESET}  Max tokens:  {:<6}               {CYAN}║{RESET}",
+                snap.llm_max_tokens
+            );
+            eprintln!(
+                "  {CYAN}║{RESET}  Valence:     {:<+.3}               {CYAN}║{RESET}",
+                snap.llm_valence
+            );
             eprintln!("  {CYAN}╚══════════════════════════════════════╝{RESET}");
         }
-        "/sessions" => {
-            match session_mgr.list().await {
-                Ok(sessions) if sessions.is_empty() => eprintln!("  {DIM}⚙ No saved sessions{RESET}"),
-                Ok(sessions) => {
-                    eprintln!("  {DIM}--- Saved Sessions ---{RESET}");
-                    for s in &sessions {
-                        let name = s.name.as_deref().unwrap_or("(unnamed)");
-                        eprintln!("  {DIM}  {} | {} | {} msgs | {}{RESET}",
-                            s.id, name, s.message_count, s.last_active_at.format("%H:%M %b %d"));
-                    }
-                    eprintln!("  {DIM}--- /load <id or name> to resume ---{RESET}");
+        "/sessions" => match session_mgr.list().await {
+            Ok(sessions) if sessions.is_empty() => eprintln!("  {DIM}⚙ No saved sessions{RESET}"),
+            Ok(sessions) => {
+                eprintln!("  {DIM}--- Saved Sessions ---{RESET}");
+                for s in &sessions {
+                    let name = s.name.as_deref().unwrap_or("(unnamed)");
+                    eprintln!(
+                        "  {DIM}  {} | {} | {} msgs | {}{RESET}",
+                        s.id,
+                        name,
+                        s.message_count,
+                        s.last_active_at.format("%H:%M %b %d")
+                    );
                 }
-                Err(e) => eprintln!("  {RED}⚙ List failed: {e}{RESET}"),
+                eprintln!("  {DIM}--- /load <id or name> to resume ---{RESET}");
             }
-        }
+            Err(e) => eprintln!("  {RED}⚙ List failed: {e}{RESET}"),
+        },
         "/vault" => {
             if let Some(ref v) = vault {
                 let count = v.count().unwrap_or(0);
@@ -905,9 +1051,22 @@ async fn handle_slash_command(
             }
         }
         _ if input.starts_with("/save") => {
-            let name = input.strip_prefix("/save").map(|s| s.trim()).filter(|s| !s.is_empty());
-            if let Some(n) = name { *session_name = Some(n.to_string()); }
-            match session_mgr.save(session_id, session_name.as_deref(), messages, session_created_at).await {
+            let name = input
+                .strip_prefix("/save")
+                .map(|s| s.trim())
+                .filter(|s| !s.is_empty());
+            if let Some(n) = name {
+                *session_name = Some(n.to_string());
+            }
+            match session_mgr
+                .save(
+                    session_id,
+                    session_name.as_deref(),
+                    messages,
+                    session_created_at,
+                )
+                .await
+            {
                 Ok(()) => {
                     let display = session_name.as_deref().unwrap_or(session_id);
                     eprintln!("  {DIM}⚙ Saved: {display}{RESET}");
@@ -970,10 +1129,33 @@ async fn handle_slash_command(
                         if output.inject_to_conversation {
                             // Strip ANSI escapes, box-drawing chars, and excessive whitespace
                             // to give the LLM clean semantic text, not garbled ASCII art
-                            let clean: String = output.display
+                            let clean: String = output
+                                .display
                                 .replace('\x1b', "")
                                 .chars()
-                                .filter(|c| !matches!(c, '┌'|'┐'|'└'|'┘'|'├'|'┤'|'─'|'│'|'╔'|'╗'|'╚'|'╝'|'║'|'═'|'╠'|'╣'|'/'|'\\'|'_'))
+                                .filter(|c| {
+                                    !matches!(
+                                        c,
+                                        '┌' | '┐'
+                                            | '└'
+                                            | '┘'
+                                            | '├'
+                                            | '┤'
+                                            | '─'
+                                            | '│'
+                                            | '╔'
+                                            | '╗'
+                                            | '╚'
+                                            | '╝'
+                                            | '║'
+                                            | '═'
+                                            | '╠'
+                                            | '╣'
+                                            | '/'
+                                            | '\\'
+                                            | '_'
+                                    )
+                                })
                                 .collect::<String>()
                                 .split_whitespace()
                                 .collect::<Vec<_>>()
@@ -982,7 +1164,9 @@ async fn handle_slash_command(
                             messages.push(Message {
                                 role: Role::System,
                                 content: format!("[Skill /{}] {}", cmd, clean),
-                                is_meta: true, tool_calls: None, tool_call_id: None,
+                                is_meta: true,
+                                tool_calls: None,
+                                tool_call_id: None,
                             });
                         }
                     }
@@ -999,7 +1183,7 @@ async fn handle_slash_command(
                         let ok_starts_with = std::fs::canonicalize(&config.skills.directory)
                             .map(|base_canon| dispatch_canon.starts_with(&base_canon))
                             .unwrap_or(false);
-                            
+
                         if ok_starts_with {
                             let mut child_args = vec![cmd.to_string()];
                             if !args.is_empty() {
@@ -1020,7 +1204,9 @@ async fn handle_slash_command(
                                 Err(e) => eprintln!("  {RED}Skill dispatch error: {e}{RESET}"),
                             }
                         } else {
-                            eprintln!("  {RED}Security alert: skill script outside base directory{RESET}");
+                            eprintln!(
+                                "  {RED}Security alert: skill script outside base directory{RESET}"
+                            );
                         }
                     }
                 } else {
@@ -1044,19 +1230,40 @@ fn print_splash(config: &GzmoConfig, status: &str, latency: &str, vault_count: u
     let bulb_g = format!("{gold}○{reset}");
     let bulb_r = format!("{ruby}●{reset}");
 
-    let top: String = (0..26).map(|i| if i%2==0 { &bulb_g } else { &bulb_r }).cloned().collect::<Vec<_>>().join(" ");
-    let bot: String = (0..26).map(|i| if i%2!=0 { &bulb_g } else { &bulb_r }).cloned().collect::<Vec<_>>().join(" ");
+    let top: String = (0..26)
+        .map(|i| if i % 2 == 0 { &bulb_g } else { &bulb_r })
+        .cloned()
+        .collect::<Vec<_>>()
+        .join(" ");
+    let bot: String = (0..26)
+        .map(|i| if i % 2 != 0 { &bulb_g } else { &bulb_r })
+        .cloned()
+        .collect::<Vec<_>>()
+        .join(" ");
 
     let side_i = std::cell::Cell::new(0usize);
     let pl = |text: &str, color: &str| {
         let curr = side_i.get();
-        let (l, r) = if curr % 2 == 0 { (&bulb_r, &bulb_g) } else { (&bulb_g, &bulb_r) };
-        side_i.set(curr+1);
+        let (l, r) = if curr % 2 == 0 {
+            (&bulb_r, &bulb_g)
+        } else {
+            (&bulb_g, &bulb_r)
+        };
+        side_i.set(curr + 1);
         let w: usize = 47;
         let c = text.chars().count();
-        let pl = w.saturating_sub(c)/2;
+        let pl = w.saturating_sub(c) / 2;
         let pr = w.saturating_sub(c).saturating_sub(pl);
-        eprintln!("  {} {}{}{}{}{} {}", l, " ".repeat(pl), color, text, reset, " ".repeat(pr), r);
+        eprintln!(
+            "  {} {}{}{}{}{} {}",
+            l,
+            " ".repeat(pl),
+            color,
+            text,
+            reset,
+            " ".repeat(pr),
+            r
+        );
     };
 
     eprintln!();
@@ -1064,12 +1271,30 @@ fn print_splash(config: &GzmoConfig, status: &str, latency: &str, vault_count: u
     pl("", "");
     pl("★  S T E P   R I G H T   U P  ★", &format!("{ruby}{bold}"));
     pl("", "");
-    pl("  ██████╗ ███████╗███╗   ███╗ ██████╗ ", &format!("{parchment}{bold}"));
-    pl(" ██╔════╝ ╚══███╔╝████╗ ████║██╔═══██╗", &format!("{parchment}{bold}"));
-    pl(" ██║  ███╗  ███╔╝ ██╔████╔██║██║   ██║", &format!("{parchment}{bold}"));
-    pl(" ██║   ██║ ███╔╝  ██║╚██╔╝██║██║   ██║", &format!("{parchment}{bold}"));
-    pl(" ╚██████╔╝███████╗██║ ╚═╝ ██║╚██████╔╝", &format!("{parchment}{bold}"));
-    pl("  ╚═════╝ ╚══════╝╚═╝     ╚═╝ ╚═════╝ ", &format!("{parchment}{bold}"));
+    pl(
+        "  ██████╗ ███████╗███╗   ███╗ ██████╗ ",
+        &format!("{parchment}{bold}"),
+    );
+    pl(
+        " ██╔════╝ ╚══███╔╝████╗ ████║██╔═══██╗",
+        &format!("{parchment}{bold}"),
+    );
+    pl(
+        " ██║  ███╗  ███╔╝ ██╔████╔██║██║   ██║",
+        &format!("{parchment}{bold}"),
+    );
+    pl(
+        " ██║   ██║ ███╔╝  ██║╚██╔╝██║██║   ██║",
+        &format!("{parchment}{bold}"),
+    );
+    pl(
+        " ╚██████╔╝███████╗██║ ╚═╝ ██║╚██████╔╝",
+        &format!("{parchment}{bold}"),
+    );
+    pl(
+        "  ╚═════╝ ╚══════╝╚═╝     ╚═╝ ╚═════╝ ",
+        &format!("{parchment}{bold}"),
+    );
     pl("", "");
     let active = config.engine.active_engine();
     let mode_tag = match config.engine.active_mode {
@@ -1079,13 +1304,20 @@ fn print_splash(config: &GzmoConfig, status: &str, latency: &str, vault_count: u
     pl("⚙  The Incredible Mechanical Marvel  ⚙", copper);
     pl(&format!("Mode: {} · Rust · Sovereign", mode_tag), dim);
     pl(&format!("Engine: {} ({})", status, latency), dim);
-    pl(&format!("Model: {} | Vault: {} records", active.model, vault_count), dim);
+    pl(
+        &format!("Model: {} | Vault: {} records", active.model, vault_count),
+        dim,
+    );
     pl("", "");
 
     let cmds = format!("{copper}/quit{dim} exit{reset} · {copper}/clear{dim} reset{reset} · {copper}/mode{dim} switch{reset} · {copper}/vault{dim} memory{reset}");
     let curr = side_i.get();
-    let (l, r) = if curr % 2 == 0 { (&bulb_r, &bulb_g) } else { (&bulb_g, &bulb_r) };
-    side_i.set(curr+1);
+    let (l, r) = if curr % 2 == 0 {
+        (&bulb_r, &bulb_g)
+    } else {
+        (&bulb_g, &bulb_r)
+    };
+    side_i.set(curr + 1);
     eprintln!("  {}   {}   {}", l, cmds, r);
 
     pl("", "");
