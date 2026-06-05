@@ -18,11 +18,14 @@ use chrono::Utc;
 use tokio_cron_scheduler::{Job, JobScheduler};
 use tracing::{error, info, warn};
 
-use crate::agent_loop::{run_agent_loop, AgentLoopConfig};
+use crate::agent_loop::{run_agent_loop, AgentLoopConfig, AgentMemoryContext};
 use crate::config::{JobConfig, JobStep};
+use crate::context::ContextConfig;
 use crate::gateway::LlmGateway;
 use crate::memory::episodic::FileEpisodicStore;
+use crate::memory::scratch::{ScratchScope, ScratchService};
 use crate::memory::vault::SqliteVault;
+use crate::synapse::{resolve_event_source, EventSource, EventType, SynapseBus, SynapseEvent};
 use crate::tools::ToolRegistry;
 use crate::types::{EpisodicEntry, EpisodicSource, Message, Role};
 
@@ -79,6 +82,23 @@ pub struct OrchestratorContext {
     pub episodic: Option<Arc<FileEpisodicStore>>,
     /// Optional chaos engine feedback channel for energy injection.
     pub chaos_feedback_tx: Option<tokio::sync::mpsc::Sender<gzmo_chaos::feedback::ChaosEvent>>,
+    /// Gated document ingest (watchers use this when [ingest].enabled).
+    pub ingest_engine: Option<Arc<crate::ingest::IngestEngine>>,
+    /// Optional Synapse event bus for append-only observability.
+    pub synapse: Option<Arc<SynapseBus>>,
+    /// Hot memory (scratch + archive @ 90%) for pipeline/simple headless steps.
+    pub scratch: Arc<ScratchService>,
+    /// Shared scope for orchestrator memory_search → scratch inject (updated per job step).
+    pub memory_search_scope: Arc<std::sync::Mutex<ScratchScope>>,
+    /// Context window budget from `[context_memory]` (not 6k default).
+    pub context: ContextConfig,
+}
+
+fn orch_scope(job: &str, step: &str) -> ScratchScope {
+    ScratchScope::Orch {
+        job: job.to_string(),
+        step: step.to_string(),
+    }
 }
 
 // ─── Wave Resolution (Topological Sort) ─────────────────────────────────
@@ -196,17 +216,55 @@ pub async fn start_orchestrator(
             let ctx = Arc::clone(&ctx);
 
             Box::pin(async move {
+                // Fire: DaemonTick
+                if let Some(ref bus) = ctx.synapse {
+                    bus.append(&SynapseEvent::new(
+                        EventType::DaemonTick,
+                        resolve_event_source(EventSource::GzmoDaemon),
+                    ));
+                }
+
                 info!(job = %job_name, "Orchestrator: job fired");
                 let outcome = execute_job(&ctx, &job_name, &job_cfg).await;
                 match &outcome {
-                    Ok(o) => info!(
+                    Ok(o) => {
+                    info!(
                         job = %job_name,
                         status = %o.overall_status,
                         steps = o.steps.len(),
                         duration_ms = o.total_duration_ms,
                         "Orchestrator: job completed"
-                    ),
-                    Err(e) => error!(job = %job_name, error = %e, "Orchestrator: job failed"),
+                    );
+                    // Complete: DaemonJobComplete
+                    if let Some(ref bus) = ctx.synapse {
+                        let data = serde_json::json!({
+                            "job": job_name,
+                            "status": format!("{}", o.overall_status),
+                            "steps": o.steps.len(),
+                            "duration_ms": o.total_duration_ms,
+                        });
+                        bus.append(&SynapseEvent::with_data(
+                            EventType::DaemonJobComplete,
+                            resolve_event_source(EventSource::GzmoDaemon),
+                            data,
+                        ));
+                    }
+                }
+                    Err(e) => {
+                    error!(job = %job_name, error = %e, "Orchestrator: job failed");
+                    // Fail: DaemonJobFail
+                    if let Some(ref bus) = ctx.synapse {
+                        let data = serde_json::json!({
+                            "job": job_name,
+                            "error": e.to_string(),
+                        });
+                        bus.append(&SynapseEvent::with_data(
+                            EventType::DaemonJobFail,
+                            resolve_event_source(EventSource::GzmoDaemon),
+                            data,
+                        ));
+                    }
+                }
                 }
             })
         })?;
@@ -284,7 +342,7 @@ async fn execute_simple(
             format!("[BACKGROUND TASK: {}] {}", job_name, prompt)
         };
 
-        let result = execute_headless_inner(ctx, &effective_prompt, 5).await;
+        let result = execute_headless_inner(ctx, job_name, &effective_prompt, 5).await;
 
         match result {
             Ok(response) => {
@@ -411,7 +469,10 @@ async fn execute_pipeline(
                 let tools = Arc::clone(&ctx.tools);
                 let max_iters = step.max_iterations;
                 let jn = job_name.to_string();
+                let step_name = step.name.clone();
                 let max_retries = config.max_retries;
+                let scratch = Arc::clone(&ctx.scratch);
+                let context = ctx.context.clone();
 
                 handles.push(tokio::spawn(async move {
                     let step_start = Instant::now();
@@ -429,8 +490,19 @@ async fn execute_pipeline(
                         };
 
                         let result = run_step_inner(
-                            gateway.as_ref(), &tools, &system_prompt, &prior_context, &retry_prompt, max_iters,
-                        ).await;
+                            gateway.as_ref(),
+                            &tools,
+                            &system_prompt,
+                            &prior_context,
+                            &retry_prompt,
+                            max_iters,
+                            scratch.clone(),
+                            context.clone(),
+                            &jn,
+                            &step_name,
+                            None,
+                        )
+                        .await;
 
                         match result {
                             Ok(response) => {
@@ -535,9 +607,19 @@ async fn execute_step(
         };
 
         let result = run_step_inner(
-            ctx.gateway.as_ref(), &ctx.tools, &ctx.system_prompt,
-            &prior_context, &retry_prompt, step.max_iterations,
-        ).await;
+            ctx.gateway.as_ref(),
+            &ctx.tools,
+            &ctx.system_prompt,
+            &prior_context,
+            &retry_prompt,
+            step.max_iterations,
+            Arc::clone(&ctx.scratch),
+            ctx.context.clone(),
+            job_name,
+            &step.name,
+            Some(Arc::clone(&ctx.memory_search_scope)),
+        )
+        .await;
 
         match result {
             Ok(response) => {
@@ -653,7 +735,20 @@ async fn run_step_inner(
     prior_context: &str,
     user_prompt: &str,
     max_iterations: usize,
+    scratch: Arc<ScratchService>,
+    context: ContextConfig,
+    job: &str,
+    step: &str,
+    memory_search_scope: Option<Arc<std::sync::Mutex<ScratchScope>>>,
 ) -> Result<crate::agent_loop::AgentResponse> {
+    let scope = orch_scope(job, step);
+    if let Some(cell) = &memory_search_scope {
+        if let Ok(mut g) = cell.lock() {
+            *g = scope.clone();
+        }
+    }
+    let _ = scratch.clear(&scope).await;
+
     let dynamic_skills = scan_skills_metadata();
     
     let mut messages = vec![
@@ -676,8 +771,13 @@ async fn run_step_inner(
     let config = AgentLoopConfig {
         max_iterations,
         verbose_tool_output: false,
-        context: crate::context::ContextConfig::default(),
+        context,
         on_chunk: None,
+        memory: Some(AgentMemoryContext {
+            scratch,
+            session_id: format!("orch:{job}"),
+            scope,
+        }),
     };
 
     run_agent_loop(gateway, tools, &mut messages, &config).await
@@ -686,6 +786,7 @@ async fn run_step_inner(
 /// Execute a single headless agent conversation (used by simple mode and watchers).
 async fn execute_headless_inner(
     ctx: &OrchestratorContext,
+    job: &str,
     prompt: &str,
     max_iterations: usize,
 ) -> Result<crate::agent_loop::AgentResponse> {
@@ -696,7 +797,13 @@ async fn execute_headless_inner(
         "",
         prompt,
         max_iterations,
-    ).await
+        Arc::clone(&ctx.scratch),
+        ctx.context.clone(),
+        job,
+        "main",
+        Some(Arc::clone(&ctx.memory_search_scope)),
+    )
+    .await
 }
 
 /// Public API for watcher.rs and other callers that need simple headless execution.
@@ -706,7 +813,7 @@ pub async fn execute_headless(
     prompt: &str,
 ) -> Result<()> {
     let effective_prompt = format!("[BACKGROUND TASK: {}] {}", job_name, prompt);
-    let response = execute_headless_inner(ctx, &effective_prompt, 5).await?;
+    let response = execute_headless_inner(ctx, job_name, &effective_prompt, 5).await?;
 
     info!(
         job = %job_name,
@@ -716,11 +823,7 @@ pub async fn execute_headless(
         "Orchestrator: job completed"
     );
 
-    let summary = if response.text.len() > 200 {
-        format!("{}...", &response.text[..200])
-    } else {
-        response.text.clone()
-    };
+    let summary = crate::text_util::truncate_chars(&response.text, 200);
     info!(job = %job_name, summary = %summary, "Orchestrator: result");
 
     Ok(())
@@ -773,11 +876,7 @@ fn format_outcome_summary(outcome: &JobOutcome) -> String {
     ];
 
     for step in &outcome.steps {
-        let truncated = if step.result_text.len() > 150 {
-            format!("{}...", &step.result_text[..150])
-        } else {
-            step.result_text.clone()
-        };
+        let truncated = crate::text_util::truncate_chars(&step.result_text, 150);
         parts.push(format!(
             "  {} {} ({}ms, {} LLM, {} tools): {}",
             step.status, step.name, step.duration_ms,

@@ -1,11 +1,15 @@
 //! LLM gateway abstractions for communicating with local vLLM.
 
+use std::collections::HashMap;
+use std::sync::Arc;
+
 use anyhow::Result;
 use async_trait::async_trait;
 use reqwest::Client as HttpClient;
 use serde::{Deserialize, Serialize};
 use tracing::debug;
 
+use crate::config;
 use crate::types::Message;
 
 
@@ -110,6 +114,34 @@ pub trait LlmGateway: Send + Sync {
         schema_name: &str,
         json_schema: serde_json::Value,
     ) -> Result<String>;
+
+    /// Like [`complete_structured`](Self::complete_structured) but with an
+    /// optional per-call temperature override. Useful when a single task (e.g.
+    /// fact-checking) needs near-deterministic decoding regardless of the
+    /// engine's configured default. The default implementation ignores the
+    /// override and delegates, so alternative gateways need not implement it.
+    async fn complete_structured_with_temp(
+        &self,
+        messages: &[Message],
+        schema_name: &str,
+        json_schema: serde_json::Value,
+        _temperature: Option<f32>,
+    ) -> Result<String> {
+        self.complete_structured(messages, schema_name, json_schema).await
+    }
+
+    /// Structured completion with optional temperature and output token cap (shallow jobs).
+    async fn complete_structured_bounded(
+        &self,
+        messages: &[Message],
+        schema_name: &str,
+        json_schema: serde_json::Value,
+        temperature: Option<f32>,
+        max_tokens: Option<u32>,
+    ) -> Result<String> {
+        self.complete_structured_with_temp(messages, schema_name, json_schema, temperature)
+            .await
+    }
 }
 
 // ── Concrete Implementation ─────────────────────────────────────────
@@ -151,6 +183,11 @@ struct ChatRequest<'a> {
     /// Let the model decide whether to call tools
     #[serde(skip_serializing_if = "Option::is_none")]
     tool_choice: Option<&'a str>,
+    /// llama-server: disable Qwen thinking trace for JSON/tool paths
+    #[serde(skip_serializing_if = "Option::is_none")]
+    reasoning_format: Option<&'a str>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    chat_template_kwargs: Option<serde_json::Value>,
 }
 
 #[derive(Serialize)]
@@ -183,6 +220,9 @@ struct Choice {
 #[derive(Deserialize, Debug)]
 struct ResponseMessage {
     content: Option<String>,
+    /// Qwen3.x thinking models may put JSON here when `content` is empty.
+    #[serde(default)]
+    reasoning_content: Option<String>,
     #[serde(default)]
     tool_calls: Vec<ResponseToolCall>,
 }
@@ -381,6 +421,7 @@ impl LlmGateway for TurboQuantGateway {
     ) -> Result<LlmResponse> {
         let has_tools = !tools.is_empty();
 
+        let (reasoning_format, chat_template_kwargs) = no_thinking_request_fields();
         let body = ChatRequest {
             model: &self.config.model,
             messages: Self::to_chat_messages(messages),
@@ -391,6 +432,8 @@ impl LlmGateway for TurboQuantGateway {
             // Enforce sequential execution to avoid llama.cpp parallel bugs
             parallel_tool_calls: if has_tools { Some(false) } else { None },
             tool_choice: if has_tools { Some("auto") } else { None },
+            reasoning_format: Some(reasoning_format),
+            chat_template_kwargs: Some(chat_template_kwargs),
         };
 
         debug!(
@@ -451,9 +494,10 @@ impl LlmGateway for TurboQuantGateway {
                 .collect();
             Ok(LlmResponse::ToolCalls(calls))
         } else {
-            Ok(LlmResponse::Text(
-                choice.message.content.unwrap_or_default(),
-            ))
+            Ok(LlmResponse::Text(assistant_visible_text(
+                choice.message.content,
+                choice.message.reasoning_content,
+            )))
         }
     }
 
@@ -588,25 +632,81 @@ impl LlmGateway for TurboQuantGateway {
         schema_name: &str,
         json_schema: serde_json::Value,
     ) -> Result<String> {
+        self.structured_request(
+            messages,
+            schema_name,
+            &json_schema,
+            self.effective_temperature(),
+            None,
+        )
+        .await
+    }
+
+    async fn complete_structured_with_temp(
+        &self,
+        messages: &[Message],
+        schema_name: &str,
+        json_schema: serde_json::Value,
+        temperature: Option<f32>,
+    ) -> Result<String> {
+        let temp = temperature.unwrap_or_else(|| self.effective_temperature());
+        self.structured_request(messages, schema_name, &json_schema, temp, None)
+            .await
+    }
+
+    async fn complete_structured_bounded(
+        &self,
+        messages: &[Message],
+        schema_name: &str,
+        json_schema: serde_json::Value,
+        temperature: Option<f32>,
+        max_tokens: Option<u32>,
+    ) -> Result<String> {
+        let temp = temperature.unwrap_or_else(|| self.effective_temperature());
+        self.structured_request(messages, schema_name, &json_schema, temp, max_tokens)
+            .await
+    }
+}
+
+impl TurboQuantGateway {
+    /// Shared implementation for structured (JSON-schema constrained) requests.
+    /// Accepts an explicit temperature so callers can pin determinism per-call.
+    async fn structured_request(
+        &self,
+        messages: &[Message],
+        schema_name: &str,
+        json_schema: &serde_json::Value,
+        temperature: f32,
+        max_tokens_override: Option<u32>,
+    ) -> Result<String> {
+        let max_tokens = max_tokens_override
+            .map(|cap| cap.min(self.config.max_tokens))
+            .unwrap_or_else(|| self.effective_max_tokens());
+        // Prime/llama-server: reasoning_format + json_schema triggers sampler init failure (HTTP 400).
+        // Disabling thinking via chat_template_kwargs alone is sufficient for structured calls.
+        let (_, chat_template_kwargs) = no_thinking_request_fields();
         let body = StructuredChatRequest {
             model: &self.config.model,
             messages: Self::to_chat_messages(messages),
-            temperature: self.effective_temperature(),
+            temperature,
             top_p: self.config.top_p,
-            max_tokens: self.effective_max_tokens(),
+            max_tokens,
             response_format: ResponseFormatSpec {
                 r#type: "json_schema",
                 json_schema: JsonSchemaSpec {
                     name: schema_name,
                     strict: true,
-                    schema: &json_schema,
+                    schema: json_schema,
                 },
             },
+            reasoning_format: None,
+            chat_template_kwargs: Some(chat_template_kwargs),
         };
 
         debug!(
             url = %self.url("chat/completions"),
             schema = %schema_name,
+            temperature,
             "Sending structured completion request"
         );
 
@@ -633,8 +733,125 @@ impl LlmGateway for TurboQuantGateway {
             .next()
             .ok_or_else(|| anyhow::anyhow!("TurboQuant returned empty choices array"))?;
 
-        Ok(choice.message.content.unwrap_or_default())
+        let body = extract_structured_json_body(
+            choice.message.content.as_deref(),
+            choice.message.reasoning_content.as_deref(),
+        );
+        if body.is_empty() {
+            anyhow::bail!(
+                "Structured completion returned empty JSON (finish_reason={:?})",
+                choice.finish_reason
+            );
+        }
+        Ok(body)
     }
+}
+
+/// Prefer `content`, then `reasoning_content`, then brace-balanced JSON extraction.
+pub(crate) fn extract_structured_json_body(
+    content: Option<&str>,
+    reasoning_content: Option<&str>,
+) -> String {
+    for text in [content, reasoning_content] {
+        if let Some(t) = text {
+            let trimmed = t.trim();
+            if json_payload_usable(trimmed) {
+                return trimmed.to_string();
+            }
+            if let Some(extracted) = extract_balanced_json_object(trimmed) {
+                return extracted;
+            }
+        }
+    }
+    content.unwrap_or_default().trim().to_string()
+}
+
+fn json_payload_usable(s: &str) -> bool {
+    (s.starts_with('{') && s.ends_with('}')) || (s.starts_with('[') && s.ends_with(']'))
+}
+
+/// Extract the first `{…}` object from a longer thinking trace.
+fn extract_balanced_json_object(text: &str) -> Option<String> {
+    let start = text.find('{')?;
+    let bytes = text.as_bytes();
+    let mut depth = 0i32;
+    for (i, &b) in bytes.iter().enumerate().skip(start) {
+        match b {
+            b'{' => depth += 1,
+            b'}' => {
+                depth -= 1;
+                if depth == 0 {
+                    let slice = &text[start..=i];
+                    if json_payload_usable(slice) {
+                        return Some(slice.to_string());
+                    }
+                }
+            }
+            _ => {}
+        }
+    }
+    None
+}
+
+/// Parse JSON from model output; repair common truncation from token limits.
+pub fn parse_json_lenient<T: serde::de::DeserializeOwned>(raw: &str) -> Result<T> {
+    let trimmed = raw.trim();
+    if let Ok(v) = serde_json::from_str(trimmed) {
+        return Ok(v);
+    }
+    if let Some(extracted) = extract_balanced_json_object(trimmed) {
+        if let Ok(v) = serde_json::from_str(&extracted) {
+            return Ok(v);
+        }
+        let repaired = repair_truncated_json_object(&extracted);
+        if let Ok(v) = serde_json::from_str(&repaired) {
+            return Ok(v);
+        }
+    }
+    let repaired = repair_truncated_json_object(trimmed);
+    serde_json::from_str(&repaired).map_err(|e| {
+        anyhow::anyhow!("JSON parse failed: {e}\nRaw: {trimmed}\nRepaired: {repaired}")
+    })
+}
+
+/// Close an unterminated string and missing `}`/`]` braces (best-effort).
+fn repair_truncated_json_object(s: &str) -> String {
+    let mut out = s.trim().to_string();
+    if out.is_empty() {
+        return "{}".to_string();
+    }
+    if !out.starts_with('{') && !out.starts_with('[') {
+        return out;
+    }
+    let in_string = out
+        .chars()
+        .fold((false, false), |(in_str, escape), c| {
+            if escape {
+                return (in_str, false);
+            }
+            if c == '\\' && in_str {
+                return (true, true);
+            }
+            if c == '"' {
+                return (!in_str, false);
+            }
+            (in_str, false)
+        })
+        .0;
+    if in_string {
+        out.push('"');
+    }
+    let open_brace = out.chars().filter(|&c| c == '{').count();
+    let close_brace = out.chars().filter(|&c| c == '}').count();
+    for _ in close_brace..open_brace {
+        out.push('}');
+    }
+    let open_bracket = out.chars().filter(|&c| c == '[').count();
+    let close_bracket = out.chars().filter(|&c| c == ']').count();
+    for _ in close_bracket..open_bracket {
+        out.push(']');
+    }
+    out
 }
 
 // ── Structured output request types ─────────────────────────────────
@@ -648,6 +865,26 @@ struct StructuredChatRequest<'a> {
     top_p: f32,
     max_tokens: u32,
     response_format: ResponseFormatSpec<'a>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    reasoning_format: Option<&'a str>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    chat_template_kwargs: Option<serde_json::Value>,
+}
+
+/// Prefer normal assistant `content`, then Qwen `reasoning_content` when content is empty.
+pub fn assistant_visible_text(content: Option<String>, reasoning_content: Option<String>) -> String {
+    let c = content.unwrap_or_default();
+    if !c.trim().is_empty() {
+        return c;
+    }
+    reasoning_content.unwrap_or_default()
+}
+
+fn no_thinking_request_fields() -> (&'static str, serde_json::Value) {
+    (
+        "none",
+        serde_json::json!({ "enable_thinking": false }),
+    )
 }
 
 #[derive(Serialize)]
@@ -663,11 +900,138 @@ struct JsonSchemaSpec<'a> {
     schema: &'a serde_json::Value,
 }
 
+// ── Obolus Gateway Router ──────────────────────────────────────────────
+
+/// Resolves `TaskKind` → `Arc<dyn LlmGateway>` using the static routing table.
+///
+/// Caches gateways per engine profile name to avoid redundant construction.
+/// All gateways are created once at construction time and reused for every
+/// task invocation.
+pub struct GatewayRouter {
+    /// Pre-built gateways keyed by engine profile name.
+    gateways: HashMap<String, Arc<dyn LlmGateway>>,
+    /// Routing configuration (task → profile name).
+    routing: config::RoutingConfig,
+}
+
+impl GatewayRouter {
+    /// Create a new router from the loaded config.
+    /// Builds and caches all gateways referenced by the routing table.
+    pub fn new(config: &config::GzmoConfig) -> Self {
+        let mut gateways = HashMap::new();
+
+        // Build gateways for every unique profile referenced in the routing table
+        for mapping in config.routing.mappings.values() {
+            if gateways.contains_key(mapping) {
+                continue;
+            }
+            let profile = Self::resolve_profile_for_name(config, mapping);
+            let vllm = VllmConfig::from(profile);
+            gateways.insert(
+                mapping.clone(),
+                Arc::new(TurboQuantGateway::new(vllm)) as Arc<dyn LlmGateway>,
+            );
+        }
+
+        // Always include the default (active engine) gateway
+        if !gateways.contains_key(&config.routing.default_engine) {
+            let active = config.engine.active_engine();
+            gateways.insert(
+                config.routing.default_engine.clone(),
+                Arc::new(TurboQuantGateway::new(VllmConfig::from(active)))
+                    as Arc<dyn LlmGateway>,
+            );
+        }
+
+        Self {
+            gateways,
+            routing: config.routing.clone(),
+        }
+    }
+
+    /// Resolve a specific engine profile by name.
+    fn resolve_profile_for_name(
+        config: &config::GzmoConfig,
+        name: &str,
+    ) -> config::EngineProfileConfig {
+        // Check inline profiles first
+        if let Some(inline) = config.routing.get_profile(name) {
+            return inline.clone();
+        }
+
+        // Fall back to standard engine sections
+        match name {
+            "local" => config.engine.active_engine(),
+            "cloud" => {
+                if let Some(ref cloud) = config.engine.cloud {
+                    config::EngineProfileConfig {
+                        provider: cloud.provider.clone(),
+                        url: cloud.url.clone(),
+                        model: cloud.model.clone(),
+                        api_key: cloud.api_key.clone(),
+                        temperature: cloud.temperature,
+                        top_p: cloud.top_p,
+                        max_tokens: cloud.max_tokens,
+                    }
+                } else {
+                    config.engine.active_engine()
+                }
+            }
+            "sovereign" => config
+                .engine
+                .sovereign
+                .clone()
+                .unwrap_or_else(|| config.engine.active_engine()),
+            "librarian" => config.librarian.to_engine_profile(),
+            _ => {
+                tracing::warn!(
+                    profile = name,
+                    "Unknown routing profile — falling back to active engine"
+                );
+                config.engine.active_engine()
+            }
+        }
+    }
+
+    /// Resolve the gateway for a specific task kind.
+    pub fn gateway(&self, task: config::TaskKind) -> &Arc<dyn LlmGateway> {
+        let profile_name = self.routing.resolve(task);
+        self.gateways
+            .get(profile_name)
+            .unwrap_or_else(|| {
+                // Safety: the default engine gateway is always present
+                self.gateways
+                    .get(&self.routing.default_engine)
+                    .expect("default gateway must exist")
+            })
+    }
+
+    /// Get a gateway by engine profile name (for manual routing).
+    pub fn gateway_by_name(&self, name: &str) -> Option<&Arc<dyn LlmGateway>> {
+        self.gateways.get(name)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
+    #[test]
+    fn extracts_json_from_reasoning_trace() {
+        let reasoning = "Let me verify.\n{\"supported\":true,\"confidence\":0.9,\"evidence_anchor\":\"foo bar baz\",\"evidence_recent\":\"x y z twelve\"}";
+        let out = extract_structured_json_body(None, Some(reasoning));
+        assert!(out.contains("\"supported\":true"));
+    }
+
+    #[test]
+    fn parse_json_lenient_repairs_truncated_string() {
+        let broken = r#"{"internal_analysis":"short","anchor_label":"A","recent_label":"B","connection":"Link text that got cut off mid"#;
+        let v: serde_json::Value = parse_json_lenient(broken).expect("repaired JSON");
+        assert_eq!(v["anchor_label"], "A");
+    }
+
     #[tokio::test]
+    #[ignore = "requires live llama-server on VllmConfig URL"]
     async fn test_turboquant_live() {
         let gw = TurboQuantGateway::default_local();
 

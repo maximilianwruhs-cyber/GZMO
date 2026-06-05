@@ -337,6 +337,7 @@ impl Component for AgentComponent {
                     verbose_tool_output: false,
                     context: ContextConfig::for_context_length(ctx_budget),
                     on_chunk: Some(on_chunk),
+                    memory: None,
                 };
 
                 let gw = gateway.read().await;
@@ -446,6 +447,7 @@ impl SlashCommandContext {
                 let mode_str = match config.engine.active_mode {
                     gzmo_core::config::EngineMode::Local => "LOCAL",
                     gzmo_core::config::EngineMode::Cloud => "CLOUD",
+                    gzmo_core::config::EngineMode::Sovereign => "SOVEREIGN",
                 };
                 let _ = self.action_tx.send(Action::AgentResponse(format!("⚙ Session: {} | Messages: {} | Mode: {} | Model: {}", display, self.messages.len(), mode_str, active.model)));
             }
@@ -469,7 +471,7 @@ impl SlashCommandContext {
                     if count > 0 {
                         if let Ok(recent) = v.recent(5) {
                             for (i, fact) in recent.iter().enumerate() {
-                                let display = if fact.len() > 100 { &fact[..100] } else { fact.as_str() };
+                                let display = gzmo_core::text_util::truncate_chars(fact, 100);
                                 text.push_str(&format!("\n  {}. {}", i + 1, display));
                             }
                         }
@@ -535,9 +537,10 @@ impl SlashCommandContext {
                     let mode_str = match config.engine.active_mode {
                         gzmo_core::config::EngineMode::Local => "LOCAL",
                         gzmo_core::config::EngineMode::Cloud => "CLOUD",
+                        gzmo_core::config::EngineMode::Sovereign => "SOVEREIGN",
                     };
                     let _ = self.action_tx.send(Action::AgentResponse(format!(
-                        "⚙ Mode: {}\n  Engine: {} → {}\n  Model: {}",
+                        "⚙ Mode: {}\n  Engine: {} → {}\n  Model: {}\n  (local | cloud | sovereign)",
                         mode_str, active.provider, active.url, active.model
                     )));
                 } else {
@@ -556,9 +559,15 @@ impl SlashCommandContext {
                                     _ => false,
                                 };
 
-                                if !ping_ok && new_mode == gzmo_core::config::EngineMode::Local {
+                                if !ping_ok
+                                    && matches!(
+                                        new_mode,
+                                        gzmo_core::config::EngineMode::Local
+                                            | gzmo_core::config::EngineMode::Sovereign
+                                    )
+                                {
                                     let _ = self.action_tx.send(Action::AgentResponse(format!(
-                                        "✗ Local engine not reachable at {}\n  Start llama-server or LM Studio first.",
+                                        "✗ Engine not reachable at {}\n  Prime :8000 | Sovereign :8010 | embed :8002",
                                         profile.url
                                     )));
                                 } else {
@@ -574,6 +583,7 @@ impl SlashCommandContext {
                                     let mode_str = match new_mode {
                                         gzmo_core::config::EngineMode::Local => "LOCAL",
                                         gzmo_core::config::EngineMode::Cloud => "CLOUD",
+                                        gzmo_core::config::EngineMode::Sovereign => "SOVEREIGN",
                                     };
                                     let _ = self.action_tx.send(Action::AgentResponse(format!(
                                         "⚙ Switched to: {}\n  Model: {} → {}",

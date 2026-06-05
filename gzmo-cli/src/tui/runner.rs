@@ -50,7 +50,10 @@ async fn boot_knowledge_graph(tools: &ToolRegistry) -> Option<String> {
     if let Some(entities) = graph.get("entities").and_then(|e| e.as_array()) {
         for entity in entities {
             let name = entity.get("name").and_then(|n| n.as_str()).unwrap_or("?");
-            let etype = entity.get("entityType").and_then(|t| t.as_str()).unwrap_or("?");
+            let etype = entity.get("type")
+                .or_else(|| entity.get("entityType"))
+                .and_then(|t| t.as_str())
+                .unwrap_or("?");
             block.push_str(&format!("- **{}** ({})", name, etype));
             if let Some(obs) = entity.get("observations").and_then(|o| o.as_array()) {
                 let obs_strs: Vec<&str> = obs.iter().filter_map(|o| o.as_str()).collect();
@@ -67,9 +70,18 @@ async fn boot_knowledge_graph(tools: &ToolRegistry) -> Option<String> {
         if !relations.is_empty() {
             block.push_str("\nRelationships:\n");
             for rel in relations {
-                let from = rel.get("from").and_then(|f| f.as_str()).unwrap_or("?");
-                let to = rel.get("to").and_then(|t| t.as_str()).unwrap_or("?");
-                let rtype = rel.get("relationType").and_then(|r| r.as_str()).unwrap_or("?");
+                let from = rel.get("source")
+                    .or_else(|| rel.get("from"))
+                    .and_then(|f| f.as_str())
+                    .unwrap_or("?");
+                let to = rel.get("target")
+                    .or_else(|| rel.get("to"))
+                    .and_then(|t| t.as_str())
+                    .unwrap_or("?");
+                let rtype = rel.get("type")
+                    .or_else(|| rel.get("relationType"))
+                    .and_then(|r| r.as_str())
+                    .unwrap_or("?");
                 block.push_str(&format!("- {} -> ({}) -> {}\n", from, rtype, to));
                 has_content = true;
             }
@@ -154,7 +166,7 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
 
     if let Some(ref v) = vault {
         tools.register(Box::new(MemoryRecordTool { vault: Arc::clone(v) }));
-        tools.register(Box::new(MemorySearchTool { vault: Arc::clone(v) }));
+        tools.register(Box::new(MemorySearchTool::new(Arc::clone(v))));
     }
 
     // ─── MCP ─────────────────────────────────────────────────────

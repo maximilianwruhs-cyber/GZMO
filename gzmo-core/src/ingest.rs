@@ -305,12 +305,7 @@ fn truths_from_pipeline(
     entities
         .iter()
         .flat_map(|ve| {
-            let evidence_span = if !ve.evidence.is_empty() {
-                Some(crate::memory::evidence_localize::localize_evidence(body, &ve.evidence))
-            } else {
-                None
-            };
-            let evidence_span_clone = evidence_span.clone();
+            let obs_count = ve.entity.observations.len();
             ve.entity.observations.iter().map(move |obs| ExtractedTruth {
                 id: Uuid::new_v4(),
                 content: format!(
@@ -322,7 +317,12 @@ fn truths_from_pipeline(
                 source_date: date,
                 decay_class: DecayClass::CuratedVault,
                 source_file: Some(source_file.to_string()),
-                evidence: evidence_span_clone.clone(),
+                evidence: crate::memory::evidence_localize::localize_observation_evidence(
+                    body,
+                    obs,
+                    &ve.evidence,
+                    obs_count,
+                ),
             })
         })
         .collect()

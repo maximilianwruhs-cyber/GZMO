@@ -175,12 +175,28 @@ fn token_overlap(a: &str, b: &str) -> f64 {
     inter / union
 }
 
-/// Dream/spark inferred rows without verification stay out of honeypot.
+/// Derived-cognition rows (dream/spark/session distill) are held to a higher
+/// confidence bar than direct ingest, UNLESS they carry localized evidence.
+/// Covers both legacy (`dream`/`spark`) and current (`verified_*`/`session_distill`)
+/// origin strings so the gate is not silently bypassed by a rename.
 pub fn is_unverified_derived(truth: &ExtractedTruth, origin: &str) -> bool {
     if truth.content.to_lowercase().starts_with("[derives:") {
         return true;
     }
-    matches!(origin, "dream" | "spark") && truth.confidence < 0.92
+    let derived = matches!(
+        origin,
+        "dream" | "verified_dream" | "spark" | "verified_spark" | "session_distill"
+    );
+    if !derived {
+        return false;
+    }
+    // A grounded (evidence-bearing) derived fact has passed verify + localization.
+    let has_evidence = truth
+        .evidence
+        .as_ref()
+        .map(|e| !e.evidence_text.trim().is_empty())
+        .unwrap_or(false);
+    !has_evidence && truth.confidence < 0.92
 }
 
 /// Latest honeypot row for the same entity anchor.
@@ -261,5 +277,42 @@ mod tests {
             extract_primary_entity("[CONCEPT:GZMO] identity formula").as_deref(),
             Some("GZMO")
         );
+    }
+
+    fn derived_truth(conf: f32, with_evidence: bool) -> ExtractedTruth {
+        use crate::types::{DecayClass, EvidenceSpan};
+        ExtractedTruth {
+            id: uuid::Uuid::new_v4(),
+            content: "[CONCEPT:GZMO] is a memory system".to_string(),
+            confidence: conf,
+            mmr_score: 0.0,
+            source_date: chrono::NaiveDate::from_ymd_opt(2026, 6, 5).unwrap(),
+            decay_class: DecayClass::CuratedVault,
+            source_file: Some("memory/2026-06-05.md".to_string()),
+            evidence: with_evidence.then(|| EvidenceSpan {
+                evidence_text: "GZMO is a memory system.".to_string(),
+                quote_verifier: "GZMO is a memory system".to_string(),
+                char_start: Some(0),
+                char_end: Some(24),
+            }),
+        }
+    }
+
+    #[test]
+    fn verified_dream_origin_is_covered_by_gate() {
+        // Low-confidence derived fact without evidence is blocked, regardless of rename.
+        assert!(is_unverified_derived(&derived_truth(0.86, false), "verified_dream"));
+        assert!(is_unverified_derived(&derived_truth(0.86, false), "dream"));
+        assert!(is_unverified_derived(&derived_truth(0.86, false), "session_distill"));
+    }
+
+    #[test]
+    fn grounded_or_high_conf_derived_passes() {
+        // Evidence-bearing derived fact passes even below 0.92.
+        assert!(!is_unverified_derived(&derived_truth(0.86, true), "verified_dream"));
+        // High-confidence derived fact passes.
+        assert!(!is_unverified_derived(&derived_truth(0.95, false), "verified_dream"));
+        // Direct ingest is never treated as derived.
+        assert!(!is_unverified_derived(&derived_truth(0.50, false), "ingest"));
     }
 }

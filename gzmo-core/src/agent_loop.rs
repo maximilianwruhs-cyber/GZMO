@@ -12,8 +12,11 @@ use std::io::Write;
 use anyhow::Result;
 use tracing::{debug, info, warn};
 
+use std::sync::Arc;
+
 use crate::context::{self, ContextConfig};
 use crate::gateway::{LlmGateway, LlmResponse, ToolDeclaration};
+use crate::memory::scratch::{messages_to_transcript, DistillJob, DistillSource, ScratchScope, ScratchService};
 use crate::tools::{ToolDef, ToolRegistry, ToolResult};
 use crate::types::{Message, MessageToolCall, MessageToolCallFunction, Role};
 
@@ -31,6 +34,16 @@ pub struct AgentLoopConfig {
     /// Optional callback for streaming tokens. When set, replaces the
     /// default spinner + stderr output so the TUI can intercept tokens.
     pub on_chunk: Option<std::sync::Arc<dyn Fn(String) + Send + Sync>>,
+    /// Scratch cache + archive/distill hooks (optional).
+    pub memory: Option<AgentMemoryContext>,
+}
+
+/// Per-loop scratch scope and distill session id.
+#[derive(Clone)]
+pub struct AgentMemoryContext {
+    pub scratch: Arc<ScratchService>,
+    pub session_id: String,
+    pub scope: ScratchScope,
 }
 
 impl Default for AgentLoopConfig {
@@ -40,8 +53,57 @@ impl Default for AgentLoopConfig {
             verbose_tool_output: false,
             context: ContextConfig::default(),
             on_chunk: None,
+            memory: None,
         }
     }
+}
+
+async fn build_windowed_messages(
+    messages: &[Message],
+    config: &ContextConfig,
+    memory: Option<&AgentMemoryContext>,
+) -> Result<Vec<Message>> {
+    let prune = context::prune_with_archive(messages, config);
+
+    if let Some(mem) = memory {
+        if !prune.archived.is_empty() {
+            let transcript = messages_to_transcript(&prune.archived);
+            let source = match &mem.scope {
+                ScratchScope::Sub { task_id, .. } => DistillSource::SubArchive {
+                    task_id: task_id.clone(),
+                    role: "subagent".to_string(),
+                },
+                _ => DistillSource::MainArchive,
+            };
+            let job = DistillJob {
+                session_id: mem.session_id.clone(),
+                transcript,
+                source,
+            };
+            if let Err(e) = mem.scratch.enqueue_distill(job).await {
+                warn!(error = %e, "Failed to enqueue distill job");
+            }
+        }
+
+        if let Some(recall) = mem.scratch.format_for_inject(&mem.scope).await? {
+            let mut windowed = prune.windowed;
+            if !windowed.is_empty() {
+                windowed.insert(
+                    1,
+                    Message {
+                        role: Role::System,
+                        content: recall,
+                        is_meta: true,
+                        tool_calls: None,
+                        tool_call_id: None,
+                    },
+                );
+            }
+            return Ok(windowed);
+        }
+    }
+
+    Ok(prune.windowed)
 }
 
 /// The result of a complete agentic loop execution.
@@ -119,8 +181,8 @@ pub async fn run_agent_loop(
                 (cb, Some((spinning, spinner_handle)))
             };
 
-        // ─── Prune context to fit token budget ─────────────────
-        let windowed = context::prune_to_budget(messages, &config.context);
+        let windowed = build_windowed_messages(messages, &config.context, config.memory.as_ref())
+            .await?;
 
         let response = gateway
             .complete_streaming(&windowed, &declarations, on_chunk)
@@ -140,6 +202,9 @@ pub async fn run_agent_loop(
         match response {
             // ─── Final text response — loop complete ─────────────
             LlmResponse::Text(text) => {
+                if let Some(ref mem) = config.memory {
+                    let _ = mem.scratch.clear(&mem.scope).await;
+                }
                 info!(
                     iterations = iteration + 1,
                     llm_calls = total_calls,
@@ -241,7 +306,7 @@ pub async fn run_agent_loop(
             let _ = std::io::stderr().flush();
         })
     };
-    let windowed = context::prune_to_budget(messages, &config.context);
+    let windowed = build_windowed_messages(messages, &config.context, config.memory.as_ref()).await?;
     let final_response = gateway.complete_streaming(&windowed, &[], on_chunk).await?;
     if config.on_chunk.is_none() { eprintln!(); }
     total_calls += 1;
@@ -252,6 +317,10 @@ pub async fn run_agent_loop(
             "I was unable to complete the task within the allowed number of tool calls.".to_string()
         }
     };
+
+    if let Some(ref mem) = config.memory {
+        let _ = mem.scratch.clear(&mem.scope).await;
+    }
 
     Ok(AgentResponse {
         text,

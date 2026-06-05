@@ -43,6 +43,8 @@ pub struct RecallSnippet {
     pub score: f32,
     #[serde(default)]
     pub fact_id: Option<String>,
+    #[serde(default)]
+    pub evidence_text: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -188,10 +190,22 @@ impl ScratchService {
         let mut used = estimate_text_tokens("[RECALL]\n", self.chars_per_token);
 
         for snip in &payload.snippets {
-            let line = if let Some(ref id) = snip.fact_id {
-                format!("- [{:.2}] ({}) {}", snip.score, id, snip.content)
-            } else {
-                format!("- [{:.2}] {}", snip.score, snip.content)
+            let line = match (&snip.fact_id, &snip.evidence_text) {
+                (Some(id), Some(ev)) if !ev.trim().is_empty() => format!(
+                    "- [{:.2}] ({}) {}\n  source_span: {}",
+                    snip.score,
+                    id,
+                    snip.content,
+                    ev.trim()
+                ),
+                (Some(id), _) => format!("- [{:.2}] ({}) {}", snip.score, id, snip.content),
+                (None, Some(ev)) if !ev.trim().is_empty() => format!(
+                    "- [{:.2}] {}\n  source_span: {}",
+                    snip.score,
+                    snip.content,
+                    ev.trim()
+                ),
+                _ => format!("- [{:.2}] {}", snip.score, snip.content),
             };
             let cost = estimate_text_tokens(&line, self.chars_per_token);
             if used + cost > self.scratch_max_tokens {

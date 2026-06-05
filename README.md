@@ -6,6 +6,16 @@ GZMO is a fully sovereign AI agent that runs entirely on your local hardware. Ze
 
 ---
 
+## Architecture & ops (start here)
+
+- **[MACHINE.md](MACHINE.md)** — **what GZMO is** (distillation pipeline; two sentences)
+- **[docs/ROADMAP_TO_M5.md](docs/ROADMAP_TO_M5.md)** — **what to do next** (local production-ready → M5)
+- **[docs/INFRASTRUCTURE_OVERVIEW.md](docs/INFRASTRUCTURE_OVERVIEW.md)** — **canonical** stack (topology, ports, memory layers, eval tier, runbook)
+- **`./scripts/start-production.sh --daemon`** — bring up Prime + embed + daemon
+- **`./scripts/verify-production.sh`** — end-to-end health
+- **`./scripts/p1-readiness-test.sh`** — P1 quality + production gate (see [docs/PRODUCTION_READINESS.md](docs/PRODUCTION_READINESS.md))
+- Legacy one-pagers: [gzmo_placement_architecture.md](docs/gzmo_placement_architecture.md), [INFRASTRUCTURE_REVIEW.md](docs/INFRASTRUCTURE_REVIEW.md) (merged into Overview)
+
 ## Table of Contents
 
 - [Prerequisites](#prerequisites)
@@ -50,7 +60,7 @@ GZMO_v0.0.1/
 │   ├── vault.db            # SQLite semantic knowledge vault
 │   └── sessions/           # Saved chat sessions
 ├── skills/                 # Slash command scripts and skill definitions
-├── inbox/                  # Drop files here → auto-ingested by daemon watcher
+├── inbox/                  # Optional local drop folder (daemon may also watch ~/Schreibtisch/knowledge)
 ├── gzmo.toml               # Master configuration (single source of truth)
 ├── SOUL.md                 # Agent identity and persona definition
 ├── DREAMS.md               # Nightly dream consolidation output
@@ -172,15 +182,21 @@ The daemon is launched automatically by `boot.sh`. To run it manually:
 | Job | Schedule | Description |
 |-----|----------|-------------|
 | `sys_janitor` | Every 30 min | Check CPU/RAM/disk, kill suspicious processes |
-| `auto_dream` | 3 AM daily | Compress yesterday's episodic memory into vault |
+| `DreamEngine` (`[dreams]`) | 1:00 UTC daily (daemon) | Gated consolidation → vault + Neo4j + `DREAMS.md` (`gzmo dream` manual) |
+| `SparkEngine` (`[spark]`) | 09:17 / 14:17 / 21:17 UTC | Serendipitous recall → `HYPOTHESIZED_LINK` only + `## Spark` in `DREAMS.md` (`gzmo spark` manual) |
 
-### Inbox Watcher
+### Knowledge-folder ingest (`[ingest]`)
 
-Drop any `.txt` file into the `inbox/` directory. The daemon will:
-1. Detect the new file
-2. Read its contents
-3. Generate a 2-sentence summary
-4. Store it in the knowledge vault
+When `[ingest].enabled = true`, the daemon watcher on `orchestration.watchers.inbox_ingest` runs **IngestEngine** (not the legacy headless prompt):
+
+1. Detect file change under the configured directory (e.g. `~/Schreibtisch/knowledge`)
+2. Convert non-text docs via markitdown when needed
+3. **Extract → verify → dedupe → promote** to Neo4j + vault (large docs are chunked automatically)
+4. Log an episodic summary
+
+One-shot: `gzmo ingest /path/to/document.md`
+
+Legacy `auto_dream` and orchestrator `spark` jobs are **disabled**; use DreamEngine / SparkEngine instead.
 
 ---
 
@@ -330,7 +346,7 @@ GZMO has a three-tier memory architecture:
 
 ### Dream Consolidation
 
-Every night at 3 AM (daemon mode), the **autoDream** job:
+Every night at `[dreams].cron_hour` UTC (daemon **DreamEngine**, not the legacy orchestrator job):
 1. **Light phase** — compresses yesterday's episodic memory
 2. **REM phase** — extracts entities via LLM
 3. **Deep phase** — writes to Knowledge Graph + Vault

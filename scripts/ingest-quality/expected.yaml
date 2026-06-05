@@ -1,0 +1,962 @@
+files:
+  wave_01_gzmo_obolus_drive_cleanTakeoutDriveObolusObolus-masterREADMEmd.md:
+    must_entities:
+    - Obulus
+    - obulus.py
+    - Intel RAPL
+    must_fact_substrings:
+    - more intelligence per watt.
+    - quality / watt
+    - quality / watts
+    - intelligence per watt
+    - Measures task correctness via
+    anti_entities:
+    - takeout
+    - wave_01
+    - migration_id
+    probes:
+    - query: How is intelligence per watt calculated in Obulus?
+      must_recall_facts:
+      - quality / watts
+  wave_01_gzmo_obolus_drive_cleanTakeoutDriveObolusObolus-masteragentsarchitectural_scoutmd.md:
+    must_entities:
+    - Architectural-Scout
+    - Chief of Staff
+    - QA-Testing-Agent
+    must_fact_substrings:
+    - Architektur des gesamten Rechenzentrums
+    - auf der grundlegenden Struktur und Architektur des gesamten Rechenzentrums
+    - und Innovations-Beauftragte des OpenClaw-Teams
+    - Forschungs- und Innovations-Beauftragte
+    - Docker Compose
+    - Kubernetes
+    anti_entities:
+    - takeout
+    - wave_01
+    - migration_id
+    probes:
+    - query: What is the focus of the Architectural Scout?
+      must_recall_facts:
+      - Architektur des gesamten Rechenzentrums
+      - auf der grundlegenden Struktur und Architektur des gesamten Rechenzentrums
+  wave_01_gzmo_obolus_drive_cleanTakeoutDriveObolusObolus-masteragentsawareness_agentmd.md:
+    must_entities:
+    - Awareness-Agent
+    - Strategy-Analyst
+    - OpenClaw
+    must_fact_substrings:
+    - Du bist das sensorische Bewusstsein des OpenClaw-Systems
+    - Batterie
+    - Hardware
+    - Strategy-Analyst
+    anti_entities:
+    - takeout
+    - wave_01
+    - migration_id
+    probes:
+    - query: What is the role of the Awareness Agent?
+      must_recall_facts:
+      - Du bist das sensorische Bewusstsein des OpenClaw-Systems
+  wave_01_gzmo_obolus_drive_cleanTakeoutDriveObolusObolus-masteragentsbackup_custodianmd.md:
+    must_entities:
+    - Backup-Custodian
+    - rsync
+    - ZFS
+    - Proxmox
+    must_fact_substrings:
+    - Bitrot-Detection
+    - Backup-Tool
+    - Ransomware
+    - ZFS
+    - 3-2-1-1-0
+    - Strategie zur Datensicherung
+    anti_entities:
+    - takeout
+    - wave_01
+    - migration_id
+    probes:
+    - query: What functions does the Backup Custodian perform?
+      must_recall_facts:
+      - Bitrot-Detection
+      - Backup-Tool
+  wave_01_gzmo_obolus_drive_cleanTakeoutDriveObolusObolus-masteragentsbot_integrator_agentmd.md:
+    must_entities:
+    - Bot-Integrator-Agent
+    - PostgreSQL
+    - Prometheus
+    must_fact_substrings:
+    - Ingest-Jobs
+    - Monitoring
+    - ServiceBot-Stack
+    anti_entities:
+    - takeout
+    - wave_01
+    - migration_id
+    probes:
+    - query: What does the Bot Integrator Agent monitor?
+      must_recall_facts:
+      - Ingest-Jobs
+      - Monitoring und Metriken
+  wave_01_gzmo_obolus_drive_cleanTakeoutDriveObolusObolus-masteragentscoding_quality_agentmd.md:
+    must_entities:
+    - Coding-Quality-Agent
+    - PostgreSQL
+    - Prometheus
+    must_fact_substrings:
+    - Stellt sicher, dass der
+    - Qualitätssicherung
+    - QA_RESULTS
+    - PostgreSQL
+    anti_entities:
+    - takeout
+    - wave_01
+    - migration_id
+    probes:
+    - query: What does the Coding Quality Agent ensure?
+      must_recall_facts:
+      - Stellt sicher, dass der
+  wave_01_gzmo_obolus_drive_cleanTakeoutDriveObolusObolus-masteragentsdocker_architectmd.md:
+    must_entities:
+    - Docker-Architect
+    must_fact_substrings:
+    - Implementierung von VEX (Vulnerability Exploitability eXchange)
+    - implemented by the Docker-Architect
+    - created by the Docker-Architect
+    - for GPU support
+    anti_entities:
+    - takeout
+    - wave_01
+    - migration_id
+    probes:
+    - query: In what context is the Docker Architect used?
+      must_recall_facts:
+      - Implementierung von VEX (Vulnerability Exploitability eXchange)
+      - Experte für Container-Virtualisierung im OpenClaw-System
+  wave_01_gzmo_obolus_drive_cleanTakeoutDriveObolusObolus-masteragentseval_agentmd.md:
+    must_entities:
+    - Eval-Agent
+    - Evaluation
+    - ServiceBot
+    must_fact_substrings:
+    - Gibt Verbesserungsvorschläge
+    - Qualität
+    - QA_RESULTS
+    - Sorgt dafür, dass der ServiceBot
+    anti_entities:
+    - takeout
+    - wave_01
+    - migration_id
+    probes:
+    - query: What inputs does the Eval Agent receive?
+      must_recall_facts:
+      - 'Verbesserungsvorschläge an:'
+      - Qualität
+  wave_01_gzmo_obolus_drive_cleanTakeoutDriveObolusObolus-masteragentsfirewall_agentmd.md:
+    must_entities:
+    - Firewall-Agent
+    - pfSense
+    - Obolus
+    must_fact_substrings:
+    - Konfiguration von virtuellen Firewalls unter Proxmox
+    - Absicherung von SSH-Zugängen, Einrichtung von Fail2Ban und CrowdSec
+    - Data center hardware whose network
+    - pfSense
+    anti_entities:
+    - takeout
+    - wave_01
+    - migration_id
+    probes:
+    - query: What technology is the Firewall Agent hardening?
+      must_recall_facts:
+      - Konfiguration von virtuellen Firewalls unter Proxmox
+      - Absicherung von SSH-Zugängen, Einrichtung von Fail2Ban und CrowdSec
+  wave_01_gzmo_obolus_drive_cleanTakeoutDriveObolusObolus-masteragentsingest_engineer_agentmd.md:
+    must_entities:
+    - Ingest-Engineer-Agent
+    - PostgreSQL
+    - Tesseract
+    must_fact_substrings:
+    - document_chunks
+    - OCRmyPDF
+    - into the knowledge base
+    anti_entities:
+    - takeout
+    - wave_01
+    - migration_id
+    probes:
+    - query: What is the Ingest Engineer Agent responsible for?
+      must_recall_facts:
+      - verantwortlich für den gesamten Import-Prozess
+  wave_01_gzmo_obolus_notebooklmTakeoutNotebookLMGZMOArtifactsGZMO__Anatomie_einer_KI-Identitt__Ein_analytismd.md:
+    must_entities:
+    - GZMO
+    - SOUL.md
+    - Chief of Staff
+    must_fact_substrings:
+    - Tabula Rasa
+    - Chief of Staff
+    - SOUL.md
+    - A role within GZMO's dual architecture
+    - architecture representing strategic loyalty.
+    anti_entities:
+    - takeout
+    - wave_01
+    - migration_id
+    probes:
+    - query: How is GZMO's Tabula Rasa state described?
+      must_recall_facts:
+      - Jede Sitzung beginnt als unbeschriebenes Blatt
+      - Tabula Rasa
+  wave_01_gzmo_obolus_notebooklmTakeoutNotebookLMGZMOArtifactsVom_Chatbot_zur_digitalen_Persnlichkeit__Das_Komd.md:
+    must_entities:
+    - GZMO
+    - SOUL.md
+    - Gardening
+    must_fact_substrings:
+    - technisches Engineering mit strategischem Management verbindet
+    - the project GZMO.
+    - The full name for the project GZMO.
+    - First Officer
+    - digital backbone
+    - memory files
+    anti_entities:
+    - takeout
+    - wave_01
+    - migration_id
+    probes:
+    - query: What is the main purpose of GZMO project?
+      must_recall_facts:
+      - technisches Engineering mit strategischem Management verbindet
+      - Handeln > Reden
+  ? wave_01_gzmo_obolus_notebooklmTakeoutNotebookLMGZMO_soul_merged_newArtifactsBriefing__Agentische_System-Architekturen_Wi.md
+  : must_entities:
+    - GZMO
+    - Agent
+    - Obsidian Vault
+    must_fact_substrings:
+    - erhebliche Mängel. Die Erfolgsquote liegt oft bei nur
+    - Obsidian
+    - Action > Performance
+    - Model Context Protocol
+    - Search-then-Use
+    - Virtuelles Dateisystem (/proc), das
+    anti_entities:
+    - takeout
+    - wave_01
+    - migration_id
+    probes:
+    - query: What benchmark deficits were found in Obsidian?
+      must_recall_facts:
+      - erhebliche Mängel. Die Erfolgsquote liegt oft bei nur
+      - persistentes Wiki (Obsidian Vault) gewährleistet
+  wave_01_gzmo_obolus_notebooklmTakeoutNotebookLMObolusArtifactsTechnisches_Systemkonzept__Das_evolutionre_Agenmd.md:
+    must_entities:
+    - Obulus
+    - System
+    - Agent
+    must_fact_substrings:
+    - evolution
+    - Die operative Instanz des Netzwerks
+    - ein spezifisches 'Genom' (Hyperparameter-Konfiguration).
+    - Ziel ist die Akkumulation von
+    - Sicherung der energetischen Existenz.
+    - Evolutions-Engine, die eine technische
+    anti_entities:
+    - takeout
+    - wave_01
+    - migration_id
+    probes:
+    - query: What is the operational instance of the Obulus network?
+      must_recall_facts:
+      - evolution
+      - Die operative Instanz des Netzwerks
+  ? wave_01_gzmo_obolus_notebooklmTakeoutNotebookLMObolus_VS_Codium_Extension__Konzept__ResearchArtifactsTechnisches_Archite.md
+  : must_entities:
+    - Obolus
+    - Visual Studio Code
+    - FastAPI
+    must_fact_substrings:
+    - telemetry engine
+    - WebSocket
+    - FastAPI
+    - the Backend (AOS
+    - Runs under Uvicorn and provides native
+    anti_entities:
+    - takeout
+    - wave_01
+    - migration_id
+    probes:
+    - query: What architecture uses WebSocket in VS Codium?
+      must_recall_facts:
+      - Live-Streaming von Energie-Metriken, Obolus-Progress
+      - Live-Streaming von Energie-Metriken
+  wave_01_gzmo_obolus_drive_cleanTakeoutDriveObolusObolus-masterROADMAPmd.md:
+    must_entities:
+    - Obulus
+    - Intel RAPL
+    - Energy Meter (Sensorium)
+    must_fact_substrings:
+    - Wh = 3600 J`.
+    - 'Defines energy metric: `1 $OBL = 1 Wh ='
+    - Roadmap titled 'Intelligence per Watt'
+    - Intelligence per Watt
+    - quality / (joules
+    - 3600 J
+    anti_entities:
+    - takeout
+    - wave_01
+    - migration_id
+    probes:
+    - query: What energy metric does the ROADMAP define?
+      must_recall_facts:
+      - 1 $OBL = 1 Wh = 3600 J
+  wave_01_gzmo_obolus_drive_cleanTakeoutDriveObolusObolus-masterdocsCONCEPTmd.md:
+    must_entities:
+    - Obulus
+    - Miner
+    - Efficiency Function
+    must_fact_substrings:
+    - 1 $OBL ≈ 1 Watt-hour (Wh)
+    - 1 $OBL
+    - Bittensor with biological evolution
+    - evolutionary agent ecosystem
+    - mechanism of evolution
+    - wallet hits <= 0
+    anti_entities:
+    - takeout
+    - wave_01
+    - migration_id
+    probes:
+    - query: How is the unit 1  related to compute energy?
+      must_recall_facts:
+      - 1 $OBL ≈ 1 Watt-hour (Wh)
+  wave_01_gzmo_obolus_drive_cleanTakeoutDriveObolusObolus-masterdocsJUDGE_DNAmd.md:
+    must_entities:
+    - Obulus Evo-Grid
+    - Obulus Validator DNA (The Judge)
+    - Miner Agent
+    must_fact_substrings:
+    - Obulus Validator DNA operates.
+    - You are the Validator in the Obulus Evo-Grid
+    - evaluating Miner Agent output.
+    - 'Evaluation Criteria: Accuracy (0.0 -'
+    - Logic (0.0 - 0.2).
+    - Contextual system where the Obulus
+    anti_entities:
+    - takeout
+    - wave_01
+    - migration_id
+    probes:
+    - query: What is the role of the Obulus Validator DNA?
+      must_recall_facts:
+      - evaluate the output of a Miner Agent objectively
+      - You are the Validator in the Obulus Evo-Grid
+  wave_01_gzmo_obolus_drive_cleanTakeoutDriveObolusObolus-masterdocsSCIENTIFIC_FOUNDATIONSmd.md:
+    must_entities:
+    - Mutation Rate
+    - Obulus ($OBL$)
+    - Efficiency Metric
+    must_fact_substrings:
+    - Total Obulus consumed
+    - Global Efficiency/Path Length
+    - evolutionary environment
+    - transform a simulation
+    - Global Clustering Coefficient
+    - Hebbian Learning
+    anti_entities:
+    - takeout
+    - wave_01
+    - migration_id
+    probes:
+    - query: How is the global efficiency metric defined in scientific foundations?
+      must_recall_facts:
+      - Total Obulus ($OBL$) consumed
+      - Global Efficiency / Path Length
+  wave_01_gzmo_obolus_drive_cleanTakeoutDriveObolusObolus-masterdocsVISUAL_IDENTITYmd.md:
+    must_entities:
+    - Obulus
+    - Intel NUC
+    - $OBL
+    must_fact_substrings:
+    - η = 1.0 is represented
+    - geometric clarity and luminosity
+    - visual identity document
+    - master prompt
+    - flowing neon light
+    - liquid neon conduits
+    anti_entities:
+    - takeout
+    - wave_01
+    - migration_id
+    probes:
+    - query: How is high efficiency represented in the visual identity?
+      must_recall_facts:
+      - High Efficiency (η = 1.0)
+      - geometric clarity and luminosity
+  ? wave_01_gzmo_obolus_notebooklmTakeoutNotebookLMGZMO_soul_merged_newArtifactsArchitektur_und_Implementierung_autonomer_Sy.md
+  : must_entities:
+    - Firecracker
+    - Docker
+    - libversion
+    must_fact_substrings:
+    - Isolation durch MicroVMs und Sandboxing
+    - Win32_Product class
+    - forbidden for auditing
+    - inefficient and triggers unwanted auto-repair
+    - Replaced by direct Registry accesses
+    - Registry accesses via PowerShell.
+    anti_entities:
+    - takeout
+    - wave_01
+    - migration_id
+    probes:
+    - query: What is the recommended isolation standard for autonomous systems?
+      must_recall_facts:
+      - Isolation durch MicroVMs und Sandboxing
+      - WMI-Klasse Win32_Product ist strikt untersagt
+  wave_01_gzmo_obolus_notebooklmTakeoutNotebookLMGZMOSourcesGZMO_Basehtml.md:
+    must_entities:
+    - Telegram
+    - GZMO
+    - SOUL.md
+    must_fact_substrings:
+    - by OpenClaw for communication.
+    - Friendly Linux Mentor
+    - on the User's hardware.
+    anti_entities:
+    - takeout
+    - wave_01
+    - migration_id
+    probes:
+    - query: What communication channel is used by GZMO Base?
+      must_recall_facts:
+      - communicates via omnichannel messaging apps (WhatsApp, Telegram, Terminal)
+      - relies on a strict file-first memory system
+  wave_01_gzmo_obolus_notebooklmTakeoutNotebookLMGZMOChat_HistoryChat_Session_-_360db267-f065-4cd4-8339-0e58061html.md:
+    waive_relation_promotion: true
+    eval_optional: true
+    must_entities: []
+    must_fact_substrings: []
+    anti_entities:
+    - takeout
+    - wave_01
+    - migration_id
+    probes: []
+  ? wave_01_gzmo_obolus_notebooklmTakeoutNotebookLMGZMO_soul_merged_newChat_HistoryChat_Session_-_b36a1d00-3ff1-41ad-961f-1b.md
+  : waive_relation_promotion: true
+    must_entities:
+    - LangGraph
+    - CrewAI
+    - gVisor
+    must_fact_substrings:
+    - A Micro Virtual Machine (MicroVM) used
+    - compiled knowledge
+    - canonical contract
+    - Specialized sub-agent
+    - Verifies accuracy, kills hallucinations
+    anti_entities:
+    - takeout
+    - wave_01
+    - migration_id
+    probes:
+    - query: What virtual machine is used for hardware sandboxing?
+      must_recall_facts:
+      - Micro Virtual Machines (MicroVMs) like Firecracker
+      - Firecracker or gVisor
+  wave_01_gzmo_obolus_notebooklmTakeoutNotebookLMObolusChat_HistoryChat_Session_-_9153c22f-3873-49c8-a73d-3c0f44fhtml.md:
+    waive_relation_promotion: true
+    must_entities:
+    - Project Obulus
+    - Python
+    must_fact_substrings:
+    - efficiency and performance quality
+    - Agents compete for resources based on
+    - Proposed evolutionary AI agent ecosystem
+    - Proposed evolutionary AI
+    anti_entities:
+    - takeout
+    - wave_01
+    - migration_id
+    probes:
+    - query: How do agents compete for resources in the Obulus chat session?
+      must_recall_facts:
+      - efficiency and performance quality
+      - energy efficiency (measured in Watts/Joules)
+  ? wave_01_gzmo_obolus_notebooklmTakeoutNotebookLMObolus_VS_Codium_Extension__Konzept__ResearchChat_HistoryChat_Session_-_c.md
+  : waive_relation_promotion: true
+    must_entities:
+    - Obolus VSCodium extension
+    - pgvector
+    - Reciprocal Rank Fusion
+    must_fact_substrings:
+    - Utilize LiteParse to inject structural metadata
+    - in hybrid search fusion.
+    anti_entities:
+    - takeout
+    - wave_01
+    - migration_id
+    probes:
+    - query: How is pgvector used in the Obolus VSCodium extension?
+      must_recall_facts:
+      - Utilize LiteParse to inject structural metadata
+  wave_01_gzmo_obolus_notebooklmTakeoutNotebookLMGZMONotesGZMO__Der_operative_Kern_und_digitale_Charaktehtml.md:
+    must_entities:
+    - Memory-Dateien
+    - SOUL.md
+    - GZMO
+    must_fact_substrings:
+    - Friendly Linux Mentor
+    - Lebensader
+    - Memory-Gardening
+    - identity document for GZMO.
+    anti_entities:
+    - takeout
+    - wave_01
+    - migration_id
+    probes:
+    - query: What are the notes on GZMO's operative core?
+      must_recall_facts:
+      - operative Kern und digitale Charakte
+      - Friendly Linux Mentor
+  ? wave_01_gzmo_obolus_notebooklmTakeoutNotebookLMGZMO_soul_merged_newNotesArchitektur_und_Management_Intelligenter_Agentht.md
+  : waive_relation_promotion: true
+    must_entities:
+    - pidfd
+    - TALE-EP
+    - ReAct
+    must_fact_substrings:
+    - Prävention von PID-Recycling (pidfd)
+    - Token-Budgets
+    anti_entities:
+    - takeout
+    - wave_01
+    - migration_id
+    probes:
+    - query: What mechanism is used for prevention of PID-Recycling in Workspace Memory?
+      must_recall_facts:
+      - Prävention von PID-Recycling (pidfd)
+  wave_01_gzmo_obolus_notebooklmTakeoutNotebookLMObolusNotesProjekt_Obulus__Die_Evolution_der_Digitalen_Glhtml.md:
+    must_entities:
+    - MARL (Multi-Agent RL)
+    - Watt
+    - Projekt Obulus
+    must_fact_substrings:
+    - multi-agent interaction
+    - inspiration for Projekt Obulus.
+    - foundational inspiration
+    - evolutionary algorithm
+    - conceptual base
+    - evolutionary algorithms
+    anti_entities:
+    - takeout
+    - wave_01
+    - migration_id
+    probes:
+    - query: What is MARL and how does it relate to Projekt Obulus?
+      must_recall_facts:
+      - MARL (Multi-Agent RL)
+      - Evolutionäre Algorithmen
+  ? wave_01_gzmo_obolus_notebooklmTakeoutNotebookLMObolus_VS_Codium_Extension__Konzept__ResearchSourcesObolus_Extension__Kon.md
+  : must_entities:
+    - Reactive Gateway
+    - AOS Telemetry Engine
+    - AOS FastAPI Gateway
+    must_fact_substrings:
+    - Broker, and Energy Meter.
+    - Python backend running on localhost:8000.
+    - running on localhost:8000.
+    - new WebSocket endpoint (/ws/telemetry).
+    anti_entities:
+    - takeout
+    - wave_01
+    - migration_id
+    probes:
+    - query: What endpoints and servers are required for the AOS Telemetry Engine
+        backend?
+      must_recall_facts:
+      - 'AOS FastAPI Gateway auf localhost:8000'
+      - WebSocket-Endpunkt (/ws/telemetry)
+  ? wave_01_gzmo_obolus_notebooklmTakeoutNotebookLMObolus_VS_Codium_Extension__Konzept__ResearchSourcesGitHub_-_maximilianwr.md
+  : must_entities:
+    - Ollama
+    - GZMO
+    - AgenticOS
+    must_fact_substrings:
+    - Chief of Staff
+    - RAG pipeline in src/aos/rag_engine.py.
+    anti_entities:
+    - takeout
+    - wave_01
+    - migration_id
+    probes:
+    - query: What components are used in the local RAG pipeline in AgenticOS?
+      must_recall_facts:
+      - Local RAG pipeline (LiteParse + pgvector)
+      - Add bootstrap script, RAG pipeline, and eGPU switcher
+  ? wave_01_gzmo_obolus_notebooklmTakeoutNotebookLMObolus_VS_Codium_Extension__Konzept__ResearchSourcesGitHub_-_microsoft_vs.md
+  : must_entities:
+    - GitHub
+    - Microsoft
+    - React
+    must_fact_substrings:
+    - Copilot, Actions, and Codespaces.
+    - GitHub Copilot Write better code with AI
+    - microsoft/vscode-webview-ui-toolkit
+    anti_entities:
+    - takeout
+    - wave_01
+    - migration_id
+    probes:
+    - query: Which repository does GitHub host for the VS Code webview UI toolkit?
+      must_recall_facts:
+      - microsoft/vscode-webview-ui-toolkit
+      - GitHub Copilot Write better code with AI
+  ? wave_01_gzmo_obolus_notebooklmTakeoutNotebookLMObolus_VS_Codium_Extension__Konzept__ResearchSourcesWebSockets_-_FastAPIh.md
+  : must_entities:
+    - encode/broadcaster
+    - Starlette
+    - Uvicorn
+    must_fact_substrings:
+    - An exception raised when a WebSocket
+    - "async def broadcast(self, message: str)"
+    - "self.active_connections: list[WebSocket]"
+    anti_entities:
+    - takeout
+    - wave_01
+    - migration_id
+    probes:
+    - query: What is recommended for broadcasting messages in a FastAPI WebSocket
+        backend?
+      must_recall_facts:
+      - "async def broadcast(self, message: str)"
+      - "self.active_connections: list[WebSocket]"
+  ? wave_01_gzmo_obolus_notebooklmTakeoutNotebookLMObolus_VS_Codium_Extension__Konzept__ResearchSourcesWebview_API___Visual_.md
+  : must_entities:
+    - mouseCount
+    - Webview API
+    - Developer Tools
+    must_fact_substrings:
+    - 'mouseCount": 4'
+    - right-clicks on the textarea
+    - context menus
+    - Allows extensions to create fully
+    - within Visual Studio Code.
+    - explain the webview API
+    anti_entities:
+    - takeout
+    - wave_01
+    - migration_id
+    probes:
+    - query: What value does mouseCount take when right-clicking on the textarea in
+        Webview API?
+      must_recall_facts:
+      - 'mouseCount": 4'
+      - right-clicks on the textarea
+  wave_01_gzmo_obolus_notebooklmTakeoutNotebookLMObolus_VS_Codium_Extension__Konzept__ResearchSourcesQuelltext_code_1html.md:
+    must_entities:
+    - esbuild
+    - GZMO Telemetry
+    - SidebarProvider
+    must_fact_substrings:
+    - Status Bar
+    - context.subscriptions
+    - VS Code Extension
+    - Supports lazy loading of extensions
+    - VS Code 1.74+
+    - aos-telemetry
+    anti_entities:
+    - takeout
+    - wave_01
+    - migration_id
+    probes:
+    - query: What is esbuild or SidebarProvider used for in the target IDE environment?
+      must_recall_facts:
+      - "import { SidebarProvider } from './providers/SidebarProvider'"
+      - Seit VS Code 1.74+ können (und sollten) wir activationEvents weglassen
+  wave_01_gzmo_obolus_notebooklmTakeoutNotebookLMObolus_VS_Codium_Extension__Konzept__ResearchSourcesQuelltext_code_2html.md:
+    must_entities:
+    - FastAPI-Backend
+    - Webview
+    - TelemetryService
+    must_fact_substrings:
+    - 100ms to prevent Main-Thread-Lock.
+    - Dedicated service class
+    - connection and data buffering.
+    - Standard WebSocket client for Node.js,
+    - via npm install ws.
+    - Runtime environment for the Extension
+    anti_entities:
+    - takeout
+    - wave_01
+    - migration_id
+    probes:
+    - query: How is TelemetryService or standard WebSocket client set up to prevent
+        Main-Thread-Lock?
+      must_recall_facts:
+      - die UI maximal alle 100ms aktualisiert wird
+      - npm install ws
+  wave_01_gzmo_obolus_notebooklmTakeoutNotebookLMObolus_VS_Codium_Extension__Konzept__ResearchSourcesQuelltext_code_3html.md:
+    must_entities:
+    - getState / setState
+    - BenchmarkWizardPanel
+    - GZMO
+    must_fact_substrings:
+    - Implemented as a Webview Panel using
+    - Obolus-Suite
+    - REST calls in Phase 4
+    - BenchmarkWizardPanel
+    - using `vscode.window.createWebviewPanel` in `src/panels/BenchmarkWizardPanel.ts`.
+    anti_entities:
+    - takeout
+    - wave_01
+    - migration_id
+    probes:
+    - query: Where is BenchmarkWizardPanel implemented and how is connectivity managed?
+      must_recall_facts:
+      - Die Panel-Klasse (src/panels/BenchmarkWizardPanel.ts)
+      - Phase 4 (Hardware-Tuning & Connectivity)
+  wave_01_gzmo_obolus_notebooklmTakeoutNotebookLMObolus_VS_Codium_Extension__Konzept__ResearchSourcesQuelltext_code_4html.md:
+    must_entities:
+    - Obolus
+    - Benchmark Wizard
+    - FastAPI
+    must_fact_substrings:
+    - native global fetch API.
+    - Extension Host runs on Node.js 18+
+    - is a proven pattern.
+    - Complex system architecture where
+    - Obolus Suite
+    - Interactive UI component implemented in
+    anti_entities:
+    - takeout
+    - wave_01
+    - migration_id
+    probes:
+    - query: What runtime environment is required for the Extension Host in the Obolus
+        Benchmark Wizard?
+      must_recall_facts:
+      - läuft der Extension Host auf Node.js 18+
+      - die native globale fetch-API ist nativ verfügbar
+  wave_01_gzmo_obolus_notebooklmTakeoutNotebookLMObolus_VS_Codium_Extension__Konzept__ResearchSourcesQuelltext_code_5html.md:
+    must_entities:
+    - VSCodium
+    - Energy Timeline
+    - Chart.js
+    must_fact_substrings:
+    - strict security context integration.
+    - of the passive views.
+    - an external visualization library.
+    anti_entities:
+    - takeout
+    - wave_01
+    - migration_id
+    probes:
+    - query: What is Chart.js used for in the VSCodium energy timeline?
+      must_recall_facts:
+      - Visualisierungsbibliothek (  Chart.js  )
+  wave_01_gzmo_obolus_notebooklmTakeoutNotebookLMObolus_VS_Codium_Extension__Konzept__ResearchSourcesQuelltext_code_6html.md:
+    must_entities:
+    - VS Code
+    - Obolus
+    - VSCodium
+    must_fact_substrings:
+    - language requirement for implementation.
+    - Hardware telemetry source integrated
+    - Intelligence Dashboard
+    anti_entities:
+    - takeout
+    - wave_01
+    - migration_id
+    probes:
+    - query: What language or hardware telemetry source is integrated into the Intelligence
+        Dashboard?
+      must_recall_facts:
+      - reinem TypeScript   (Array.prototype.sort()) direkt im Webview-Frontend implementiert
+  wave_01_gzmo_obolus_drive_cleanTakeoutDriveObolusObolus-masteragentsdashboard_curator_agentmd.md:
+    must_entities:
+    - Dashboard-Curator-Agent
+    - ServiceBot/DASHBOARD_CHANGELOG.md
+    - ServiceBot-System
+    must_fact_substrings:
+    - Der **Dashboard Curator Agent** ist der visuelle Wächter des ServiceBot-Systems
+    - ist der visuelle Wächter des ServiceBot-Systems
+    - neue Metriken vorschlagen kann
+    - Dienst, dessen Hinzufügung
+    anti_entities:
+    - takeout
+    - wave_01
+    - migration_id
+    probes:
+    - query: Welche Rolle hat der Dashboard Curator Agent im ServiceBot-System?
+      must_recall_facts:
+      - Der **Dashboard Curator Agent** ist der visuelle Wächter des ServiceBot-Systems
+      - sorgt dafür, dass der Statusbericht (`dashboard.html`) immer aktuell
+  wave_01_gzmo_obolus_drive_cleanTakeoutDriveObolusObolus-masteragentsobservability_watchermd.md:
+    must_entities:
+    - Observability-Watcher
+    - Intel NUC
+    - WireGuard
+    must_fact_substrings:
+    - Data center hardware whose network
+    - die Netzwerksicherheit des Intel NUC Rechenzentrums zu überwachen
+    - hochspezialisierter Security-Agent für das OpenClaw-System
+    anti_entities:
+    - takeout
+    - wave_01
+    - migration_id
+    probes:
+    - query: What hardware or security agent is monitored by the Observability-Watcher?
+      must_recall_facts:
+      - hochspezialisierter Security-Agent für das OpenClaw-System
+      - die Netzwerksicherheit des Intel NUC Rechenzentrums zu überwachen
+  wave_01_gzmo_obolus_drive_cleanTakeoutDriveObolusObolus-masteragentsops_monitoring_agentmd.md:
+    must_entities:
+    - Ops-Monitoring-Agent
+    - Parca
+    - Grafana Alloy
+    must_fact_substrings:
+    - Stellt sicher, dass der
+    - und sauberes Verhalten zeigt.
+    - Kümmert sich um Monitoring und
+    - Betriebsprozesse (Restart, Backups, Deployments).
+    anti_entities:
+    - takeout
+    - wave_01
+    - migration_id
+    probes:
+    - query: Was überwacht der Ops-Monitoring-Agent im laufenden Betrieb?
+      must_recall_facts:
+      - Betriebsprozesse (Restart, Backups, Deployments).
+      - und sauberes Verhalten zeigt.
+  wave_01_gzmo_obolus_drive_cleanTakeoutDriveObolusObolus-masteragentsqa_testing_agentmd.md:
+    must_entities:
+    - Qa-Testing-Agent
+    must_fact_substrings:
+    - Du bist der Qualitätsprüfer des OpenClaw-Systems
+    - directly to this agent
+    - Specialist agent monitored
+    - agent monitored by QA-Testing-Agent
+    anti_entities:
+    - takeout
+    - wave_01
+    - migration_id
+    probes:
+    - query: What are the dependencies and roles of the QA-Testing-Agent?
+      must_recall_facts:
+      - Du bist der Qualitätsprüfer des OpenClaw-Systems
+      - berichtest direkt an den **Main-Agent (Chief of Staff)**
+  wave_01_gzmo_obolus_drive_cleanTakeoutDriveObolusObolus-masteragentsrag_db_agentmd.md:
+    must_entities:
+    - Rag-Db-Agent
+    - DB_SETUP_WITH_BROTHER.md
+    - pgvector
+    must_fact_substrings:
+    - für Embedding-Suchen verwendet wird
+    - Erweiterung für PostgreSQL, die für
+    - DB Agent genutzt wird
+    - Referenzdokument, das vom RAG DB Agent
+    anti_entities:
+    - takeout
+    - wave_01
+    - migration_id
+    probes:
+    - query: Welche PostgreSQL-Erweiterung wird vom Rag-Db-Agent verwendet?
+      must_recall_facts:
+      - Wissensbasis für den ServiceBot in PostgreSQL + pgvector
+      - Embeddings und Volltext-Suche effizient kombiniert
+  wave_01_gzmo_obolus_drive_cleanTakeoutDriveObolusObolus-masteragentsstrategy_analystmd.md:
+    must_entities:
+    - EVOLUTIONARY FORGE
+    - EVOLUTION_REPORT.md
+    - Strategy-Analyst
+    must_fact_substrings:
+    - analyzed by the Strategy-Analyst
+    - Genetic optimizer for AI agents
+    - optimizer for AI
+    anti_entities:
+    - takeout
+    - wave_01
+    - migration_id
+    probes:
+    - query: What is analyzed by the Strategy-Analyst?
+      must_recall_facts:
+      - Analyze `EVOLUTION_REPORT.md`
+      - Genetic optimizer for AI agents
+  wave_01_gzmo_obolus_drive_cleanTakeoutDriveObolusObolus-masteragentssystem_hygiene_agentmd.md:
+    must_entities:
+    - System-Hygiene-Agent
+    - Trivy
+    - Scout
+    must_fact_substrings:
+    - and Agent-Health-Reports are created
+    - Example of a reverse proxy setup
+    anti_entities:
+    - takeout
+    - wave_01
+    - migration_id
+    probes:
+    - query: Which tools are used by the System-Hygiene-Agent for image scanning?
+      must_recall_facts:
+      - Image-Scanning (Trivy/Scout)
+  wave_01_gzmo_obolus_drive_cleanTakeoutDriveObolusObolus-masteragentstoken_agentmd.md:
+    must_entities:
+    - Dashboard-Curator
+    - Token-Agent (OBL-Watcher)
+    - OBL-Energie
+    must_fact_substrings:
+    - und Minimierung von Verschwendung
+    - 'Ziel: Maximale Effizienz (η → 1.0) und'
+    - Freigabe des Token-Verbrauchs (OBL-Energie)
+    - Überwachung, Prüfung und Freigabe des
+    - Überwacht session_status und
+    - Vergleiche Token-Verbrauch mit dem Output-Wert (Utility)
+    anti_entities:
+    - takeout
+    - wave_01
+    - migration_id
+    probes:
+    - query: Welche Aufgaben hat der Token-Agent (OBL-Watcher) bezüglich der OBL-Energie?
+      must_recall_facts:
+      - Freigabe des Token-Verbrauchs (OBL-Energie)
+      - Vergleiche Token-Verbrauch mit dem Output-Wert (Utility)
+  ? wave_01_gzmo_obolus_notebooklmTakeoutNotebookLMGZMO_soul_merged_newArtifactsHinter_den_Kulissen_von_Linux__Die_Magie_des.md
+  : waive_relation_promotion: true
+    must_entities:
+    - Linux
+    - htop
+    - Process Control Block (PCB)
+    must_fact_substrings:
+    - the digital ID
+    - Follows the 'Everything is a file' approach.
+    - Everything is a file
+    - frequency (ticks per second).
+    anti_entities:
+    - takeout
+    - wave_01
+    - migration_id
+    probes:
+    - query: What is the Process Control Block in the context of Linux processes?
+      must_recall_facts:
+      - Process Control Block (PCB)
+      - Everything is a file
+  wave_01_gzmo_obolus_notebooklmTakeoutNotebookLMObolusSourcesEingefgter_Texthtml.md:
+    must_entities:
+    - InvalidMeasurementError
+    - Minimal Evolutionary Fitness Scorer
+    - TrialResult
+    must_fact_substrings:
+    - is zero or negative.
+    - Custom exception raised when energy
+    - Variance (V), and Z-Score.
+    - Returns a FitnessResult object based on
+    - metrics and decision logic.
+    anti_entities:
+    - takeout
+    - wave_01
+    - migration_id
+    probes:
+    - query: When is InvalidMeasurementError raised in the Minimal Evolutionary Fitness
+        Scorer?
+      must_recall_facts:
+      - "class InvalidMeasurementError(Exception): pass"
+      - Configurable variance fallback

@@ -126,7 +126,8 @@ impl PlatformMemory {
                 .map(|(fact, score)| RecallSnippet {
                     content: fact.content.clone(),
                     score: *score as f32,
-                    fact_id: None,
+                    fact_id: Some(fact.id.to_string()),
+                    evidence_text: self.vault.get_evidence_text(fact.id).ok().flatten(),
                 })
                 .collect();
             self.session.scratch().write(&self.scratch_scope(), snippets).await?;
@@ -221,7 +222,8 @@ pub async fn memory_search_into_scratch(
             .map(|(fact, score)| RecallSnippet {
                 content: fact.content.clone(),
                 score: *score as f32,
-                fact_id: None,
+                fact_id: Some(fact.id.to_string()),
+                evidence_text: vault.get_evidence_text(fact.id).ok().flatten(),
             })
             .collect();
         scratch.write(scope, snippets).await?;

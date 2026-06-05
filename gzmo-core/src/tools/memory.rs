@@ -3,6 +3,7 @@ use async_trait::async_trait;
 use serde_json::json;
 use std::sync::Arc;
 
+use crate::memory::scratch::{ScratchScope, ScratchService};
 use crate::memory::vault::SqliteVault;
 use super::{ToolDef, ToolHandler};
 
@@ -65,6 +66,54 @@ impl ToolHandler for MemoryRecordTool {
 /// Tool to search the Native Memory (SqliteVault).
 pub struct MemorySearchTool {
     pub vault: Arc<SqliteVault>,
+    pub scratch: Option<Arc<ScratchService>>,
+    pub scope: Option<ScratchScope>,
+    /// Orchestrator/daemon: scope updated per job step via shared cell.
+    pub scope_cell: Option<Arc<std::sync::Mutex<ScratchScope>>>,
+}
+
+impl MemorySearchTool {
+    pub fn new(vault: Arc<SqliteVault>) -> Self {
+        Self {
+            vault,
+            scratch: None,
+            scope: None,
+            scope_cell: None,
+        }
+    }
+
+    pub fn with_scratch(
+        vault: Arc<SqliteVault>,
+        scratch: Arc<ScratchService>,
+        scope: ScratchScope,
+    ) -> Self {
+        Self {
+            vault,
+            scratch: Some(scratch),
+            scope: Some(scope),
+            scope_cell: None,
+        }
+    }
+
+    pub fn with_orchestrator_scratch(
+        vault: Arc<SqliteVault>,
+        scratch: Arc<ScratchService>,
+        scope_cell: Arc<std::sync::Mutex<ScratchScope>>,
+    ) -> Self {
+        Self {
+            vault,
+            scratch: Some(scratch),
+            scope: None,
+            scope_cell: Some(scope_cell),
+        }
+    }
+
+    fn effective_scope(&self) -> Option<ScratchScope> {
+        if let Some(cell) = &self.scope_cell {
+            return cell.lock().ok().map(|g| g.clone());
+        }
+        self.scope.clone()
+    }
 }
 
 #[async_trait]
@@ -72,7 +121,7 @@ impl ToolHandler for MemorySearchTool {
     fn definition(&self) -> ToolDef {
         ToolDef {
             name: "memory_search".to_string(),
-            description: "Recall relevant context, past failures, or learned entities from the permanent local Knowledge Vault using keywords.".to_string(),
+            description: "Recall relevant context from the curated honeypot memory layer (high-confidence facts) using keywords.".to_string(),
             parameters: json!({
                 "type": "object",
                 "properties": {
@@ -100,20 +149,27 @@ impl ToolHandler for MemorySearchTool {
             .unwrap_or(5)
             .min(20) as usize;
 
-        // Since we killed the embedding node, we rely on Native Rust BM25 text search
-        let results = self.vault.keyword_search(query, limit)?;
-        
+        if let (Some(scratch), Some(scope)) = (&self.scratch, self.effective_scope()) {
+            return crate::platform_memory::memory_search_into_scratch(
+                &self.vault,
+                Arc::clone(scratch),
+                &scope,
+                query,
+                limit,
+            )
+            .await;
+        }
+
+        let results = self.vault.search_recall(query, limit).await?;
         if results.is_empty() {
             return Ok(format!("No relevant memories found for query: '{}'", query));
         }
-        
         let mut out = String::new();
-        out.push_str(&format!("Vault Results for '{}':\n\n", query));
+        out.push_str(&format!("Honeypot recall for '{}':\n\n", query));
         for (fact, score) in results {
             let dt = fact.created_at.format("%Y-%m-%d").to_string();
             out.push_str(&format!("- [{}] (Score: {:.2}) {}\n", dt, score, fact.content));
         }
-
         Ok(out)
     }
 }
@@ -132,7 +188,7 @@ mod tests {
         let vault = Arc::new(SqliteVault::open(&tmp_dir).unwrap());
         
         let record_tool = MemoryRecordTool { vault: Arc::clone(&vault) };
-        let search_tool = MemorySearchTool { vault: Arc::clone(&vault) };
+        let search_tool = MemorySearchTool::new(Arc::clone(&vault));
         
         let exec_res = record_tool.execute(json!({
             "fact": "The user appreciates blunt feedback.",

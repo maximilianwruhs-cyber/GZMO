@@ -62,6 +62,91 @@ use std::path::{Path, PathBuf};
 use anyhow::{Context, Result};
 use serde::Deserialize;
 
+// ─── Task Kind (Obolus routing classification) ──────────────────────────
+
+/// Categories used by the Obolus routing table to dispatch LLM calls.
+/// Each variant maps to a named engine profile in `[routing]`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum TaskKind {
+    /// Interactive chat / tool-use reasoning (always Prime for quality).
+    Chat,
+    /// Daemon main loop — fallback when no specific mapping exists.
+    Daemon,
+    /// Dream consolidation: KG extraction from episodic log.
+    DreamExtract,
+    /// Dream consolidation: fact-checking / verification pass.
+    DreamVerify,
+    /// Spark cycle: hypothesis generation (light model OK).
+    SparkHypothesis,
+    /// Spark cycle: link verification (heavier model for accuracy).
+    SparkVerify,
+    /// Ingest: KG extraction from document chunk.
+    IngestExtract,
+    /// Ingest: fact-checking / verification pass (decoupled from dream_verify).
+    IngestVerify,
+    /// Distill: KG extraction from session transcript.
+    DistillExtract,
+    /// Distill: fact-checking / verification pass.
+    DistillVerify,
+    /// Distill: short narrative summary for episodic.
+    DistillSummary,
+}
+
+impl std::fmt::Display for TaskKind {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Chat => write!(f, "chat"),
+            Self::Daemon => write!(f, "daemon"),
+            Self::DreamExtract => write!(f, "dream_extract"),
+            Self::DreamVerify => write!(f, "dream_verify"),
+            Self::SparkHypothesis => write!(f, "spark_hypothesis"),
+            Self::SparkVerify => write!(f, "spark_verify"),
+            Self::IngestExtract => write!(f, "ingest_extract"),
+            Self::IngestVerify => write!(f, "ingest_verify"),
+            Self::DistillExtract => write!(f, "distill_extract"),
+            Self::DistillVerify => write!(f, "distill_verify"),
+            Self::DistillSummary => write!(f, "distill_summary"),
+        }
+    }
+}
+
+impl TaskKind {
+    /// All task kinds — used for validation.
+    pub fn all() -> &'static [Self] {
+        &[
+            Self::Chat,
+            Self::Daemon,
+            Self::DreamExtract,
+            Self::DreamVerify,
+            Self::SparkHypothesis,
+            Self::SparkVerify,
+            Self::IngestExtract,
+            Self::IngestVerify,
+            Self::DistillExtract,
+            Self::DistillVerify,
+            Self::DistillSummary,
+        ]
+    }
+
+    /// The default engine for this task kind when no mapping exists.
+    pub fn default_engine(&self) -> &'static str {
+        match self {
+            Self::Chat => "local",
+            Self::Daemon => "local",
+            Self::DreamExtract => "local",
+            Self::DreamVerify => "local",
+            Self::SparkHypothesis => "local",
+            Self::SparkVerify => "local",
+            Self::IngestExtract => "local",
+            Self::IngestVerify => "local",
+            Self::DistillExtract => "local",
+            Self::DistillVerify => "local",
+            Self::DistillSummary => "local",
+        }
+    }
+}
+
 // ─── Engine Mode ────────────────────────────────────────────────────────
 
 /// The active engine mode — local or cloud.
@@ -70,6 +155,8 @@ use serde::Deserialize;
 pub enum EngineMode {
     Local,
     Cloud,
+    /// Sovereign 3×7B FrankenMoE on :8010 (when GGUF is built).
+    Sovereign,
 }
 
 impl Default for EngineMode {
@@ -81,6 +168,7 @@ impl std::fmt::Display for EngineMode {
         match self {
             Self::Local => write!(f, "local"),
             Self::Cloud => write!(f, "cloud"),
+            Self::Sovereign => write!(f, "sovereign"),
         }
     }
 }
@@ -91,7 +179,11 @@ impl std::str::FromStr for EngineMode {
         match s.to_lowercase().as_str() {
             "local" => Ok(Self::Local),
             "cloud" => Ok(Self::Cloud),
-            other => anyhow::bail!("Unknown engine mode: '{}'. Use 'local' or 'cloud'.", other),
+            "sovereign" => Ok(Self::Sovereign),
+            other => anyhow::bail!(
+                "Unknown engine mode: '{}'. Use 'local', 'cloud', or 'sovereign'.",
+                other
+            ),
         }
     }
 }
@@ -128,9 +220,941 @@ pub struct GzmoConfig {
     #[serde(default)]
     pub orchestration: OrchestrationConfig,
 
+    /// autoDream consolidation settings (verification, confidence gating)
+    #[serde(default)]
+    pub dreams: DreamsConfig,
+
+    /// Serendipitous recall (SparkEngine) — L3 hypotheses only, never auto-facts at 1.0
+    #[serde(default)]
+    pub spark: SparkConfig,
+
+    /// Gated knowledge-folder ingest (IngestEngine) — replaces headless watcher prompts
+    #[serde(default)]
+    pub ingest: IngestConfig,
+
+    /// Chat session → SessionDistill vault + rich episodic for dream.
+    #[serde(default)]
+    pub session_distill: SessionDistillConfig,
+
+    /// Local embedding server for vault vectors (`/v1/embeddings`).
+    #[serde(default)]
+    pub embeddings: EmbeddingsConfig,
+
     /// Chaos engine configuration (Lorenz attractor, Thought Cabinet physics)
     #[serde(default)]
     pub chaos: Option<toml::Value>,
+
+    /// Startup probe settings (`gzmo health`, daemon boot).
+    #[serde(default)]
+    pub health: HealthConfig,
+
+    /// LXC101 Qdrant mirror for vault vectors (`scripts/sync-vault-to-qdrant.py`).
+    #[serde(default)]
+    pub qdrant: QdrantConfig,
+
+    /// VM200 fast LLM for summaries (optional; `:8083` when deployed).
+    #[serde(default)]
+    pub librarian: LibrarianConfig,
+
+    /// VM200 cross-encoder reranker (`:8082`); post-filters vault recall.
+    #[serde(default)]
+    pub rerank: RerankConfig,
+
+    /// Obolus: static task → engine routing table.
+    #[serde(default)]
+    pub routing: RoutingConfig,
+
+    /// Redis scratch cache + distill job queue (LXC101 :6379).
+    #[serde(default)]
+    pub redis: RedisConfig,
+
+    /// Hot context archive threshold + scratch token budget.
+    #[serde(default)]
+    pub context_memory: ContextMemoryConfig,
+
+    /// Subagent delegation limits (SubagentRunner Lite).
+    #[serde(default)]
+    pub subagent: SubagentConfig,
+}
+
+// ─── Dreams ─────────────────────────────────────────────────────────────
+
+/// Settings for the autoDream consolidation engine.
+///
+/// These knobs are the front line against hallucinated knowledge entering
+/// permanent memory. When `verify` is on, every extracted entity/relation is
+/// fact-checked against the source log before it is written to the knowledge
+/// graph; anything scoring below `min_confidence` (or unsupported by a quotable
+/// span) is dropped instead of promoted.
+#[derive(Debug, Deserialize, Clone)]
+pub struct DreamsConfig {
+    /// Master switch — when false, daemon skips nightly consolidation (CLI `gzmo dream` still runs).
+    #[serde(default = "default_dream_enabled")]
+    pub enabled: bool,
+
+    /// If true, run a second LLM pass that fact-checks each extracted claim
+    /// against the source before writing it to the knowledge graph / vault.
+    #[serde(default = "default_dream_verify")]
+    pub verify: bool,
+
+    /// Minimum verified confidence (0.0–1.0) required to promote a claim.
+    /// Matches the vault's quarantine threshold so the graph and vault agree.
+    #[serde(default = "default_dream_min_confidence")]
+    pub min_confidence: f64,
+
+    /// Temperature for the verification pass. Kept low for near-deterministic
+    /// fact-checking, independent of the engine's creative default.
+    #[serde(default = "default_dream_verify_temperature")]
+    pub verify_temperature: f32,
+
+    /// Hour (UTC) when the daemon runs consolidation for **yesterday's** episodic log.
+    #[serde(default = "default_dream_cron_hour")]
+    pub cron_hour: u32,
+
+    /// Minute (UTC) within `cron_hour` for the nightly dream tick.
+    #[serde(default = "default_dream_cron_minute")]
+    pub cron_minute: u32,
+
+    /// Supported claims must include a quotable evidence span (≥12 chars).
+    #[serde(default = "default_kg_require_evidence")]
+    pub require_evidence: bool,
+
+    /// Abort if Neo4j MCP writes fewer nodes/edges than verified (no silent partial promote).
+    #[serde(default = "default_kg_strict")]
+    pub strict_kg: bool,
+
+    /// Max chars per REM/verify chunk for large daily logs (paragraph-aware split).
+    #[serde(default = "default_pipeline_chunk_chars")]
+    pub chunk_chars: usize,
+
+    /// Drop episodic `### 🧠 INTERNAL` sections whose body matches any of these (case-insensitive).
+    #[serde(default = "default_dream_exclude_episodic_substrings")]
+    pub exclude_episodic_substrings: Vec<String>,
+
+    /// Skip REM/KG when filtered episodic text is shorter than this (ops-only days).
+    #[serde(default = "default_dream_min_consolidation_chars")]
+    pub min_consolidation_chars: usize,
+
+    /// M3: fold honeypot distillates + vector associations into REM (not episodic-only).
+    #[serde(default = "default_dream_honeypot_rem_enabled")]
+    pub honeypot_rem_enabled: bool,
+
+    /// Anchor facts sampled from honeypot for association expansion.
+    #[serde(default = "default_honeypot_rem_anchor_limit")]
+    pub honeypot_rem_anchor_limit: usize,
+
+    /// Similar honeypot facts retrieved per anchor (vector decay search).
+    #[serde(default = "default_honeypot_rem_associate_k")]
+    pub honeypot_rem_associate_k: usize,
+}
+
+fn default_dream_honeypot_rem_enabled() -> bool {
+    true
+}
+
+fn default_honeypot_rem_anchor_limit() -> usize {
+    4
+}
+
+fn default_honeypot_rem_associate_k() -> usize {
+    6
+}
+
+fn default_dream_exclude_episodic_substrings() -> Vec<String> {
+    vec![
+        "sys_janitor".to_string(),
+        "[job: sys_janitor]".to_string(),
+        "[spark ".to_string(),
+        "## spark —".to_string(),
+        "[ingest:".to_string(),
+        "ingested `".to_string(),
+        "filesystem utilization".to_string(),
+        "root filesystem".to_string(),
+        "[hypothesis ".to_string(),
+        "promoted=false".to_string(),
+    ]
+}
+
+fn default_dream_min_consolidation_chars() -> usize {
+    400
+}
+
+impl DreamsConfig {
+    pub fn kg_gate(&self) -> crate::memory::kg_extract::KgGateConfig {
+        crate::memory::kg_extract::KgGateConfig {
+            verify: self.verify,
+            min_confidence: self.min_confidence,
+            verify_temperature: self.verify_temperature,
+            require_evidence: self.require_evidence,
+            strict_kg: self.strict_kg,
+        }
+    }
+}
+
+impl Default for DreamsConfig {
+    fn default() -> Self {
+        Self {
+            enabled: default_dream_enabled(),
+            verify: default_dream_verify(),
+            min_confidence: default_dream_min_confidence(),
+            verify_temperature: default_dream_verify_temperature(),
+            cron_hour: default_dream_cron_hour(),
+            cron_minute: default_dream_cron_minute(),
+            require_evidence: default_kg_require_evidence(),
+            strict_kg: default_kg_strict(),
+            chunk_chars: default_pipeline_chunk_chars(),
+            exclude_episodic_substrings: default_dream_exclude_episodic_substrings(),
+            min_consolidation_chars: default_dream_min_consolidation_chars(),
+            honeypot_rem_enabled: true,
+            honeypot_rem_anchor_limit: default_honeypot_rem_anchor_limit(),
+            honeypot_rem_associate_k: default_honeypot_rem_associate_k(),
+        }
+    }
+}
+
+fn default_pipeline_chunk_chars() -> usize {
+    28_000
+}
+
+// ─── Ingest ─────────────────────────────────────────────────────────────
+
+/// Settings for gated document ingest (knowledge watcher / `gzmo ingest`).
+#[derive(Debug, Deserialize, Clone)]
+pub struct IngestConfig {
+    /// When true, watchers use IngestEngine instead of headless tool loops.
+    #[serde(default = "default_ingest_enabled")]
+    pub enabled: bool,
+
+    #[serde(default = "default_dream_verify")]
+    pub verify: bool,
+
+    #[serde(default = "default_dream_min_confidence")]
+    pub min_confidence: f64,
+
+    #[serde(default = "default_dream_verify_temperature")]
+    pub verify_temperature: f32,
+
+    #[serde(default = "default_kg_require_evidence")]
+    pub require_evidence: bool,
+
+    #[serde(default = "default_kg_strict")]
+    pub strict_kg: bool,
+
+    #[serde(default = "default_ingest_max_source_chars")]
+    pub max_source_chars: usize,
+
+    #[serde(default = "default_pipeline_chunk_chars")]
+    pub chunk_chars: usize,
+}
+
+fn default_ingest_max_source_chars() -> usize {
+    120_000
+}
+
+impl IngestConfig {
+    pub fn kg_gate(&self) -> crate::memory::kg_extract::KgGateConfig {
+        crate::memory::kg_extract::KgGateConfig {
+            verify: self.verify,
+            min_confidence: self.min_confidence,
+            verify_temperature: self.verify_temperature,
+            require_evidence: self.require_evidence,
+            strict_kg: self.strict_kg,
+        }
+    }
+}
+
+impl Default for IngestConfig {
+    fn default() -> Self {
+        Self {
+            enabled: default_ingest_enabled(),
+            verify: default_dream_verify(),
+            min_confidence: default_dream_min_confidence(),
+            verify_temperature: default_dream_verify_temperature(),
+            require_evidence: default_kg_require_evidence(),
+            strict_kg: default_kg_strict(),
+            max_source_chars: default_ingest_max_source_chars(),
+            chunk_chars: default_pipeline_chunk_chars(),
+        }
+    }
+}
+
+// ─── Session distill ──────────────────────────────────────────────────────
+
+/// Settings for `gzmo distill` — sessions JSON → SessionDistill vault + episodic.
+#[derive(Debug, Deserialize, Clone)]
+pub struct SessionDistillConfig {
+    #[serde(default = "default_session_distill_enabled")]
+    pub enabled: bool,
+
+    #[serde(default = "default_sessions_dir")]
+    pub sessions_dir: std::path::PathBuf,
+
+    #[serde(default = "default_dream_verify")]
+    pub verify: bool,
+
+    #[serde(default = "default_dream_min_confidence")]
+    pub min_confidence: f64,
+
+    #[serde(default = "default_dream_verify_temperature")]
+    pub verify_temperature: f32,
+
+    #[serde(default = "default_kg_require_evidence")]
+    pub require_evidence: bool,
+
+    #[serde(default = "default_kg_strict")]
+    pub strict_kg: bool,
+
+    #[serde(default = "default_pipeline_chunk_chars")]
+    pub chunk_chars: usize,
+
+    #[serde(default = "default_session_distill_max_transcript")]
+    pub max_transcript_chars: usize,
+
+    /// Use `[librarian]` for KG extract; Prime (local engine) stays on verify.
+    #[serde(default = "default_session_distill_use_librarian")]
+    pub use_librarian: bool,
+
+    /// Short narrative for episodic via librarian (falls back to entity list).
+    #[serde(default = "default_session_distill_librarian_summary")]
+    pub librarian_summary: bool,
+
+    /// Run `gzmo distill` on a daily cron inside the daemon (default 02:15 UTC).
+    #[serde(default = "default_session_distill_daemon_scheduled")]
+    pub daemon_scheduled: bool,
+
+    #[serde(default = "default_session_distill_cron_hour")]
+    pub cron_hour: u32,
+
+    #[serde(default = "default_session_distill_cron_minute")]
+    pub cron_minute: u32,
+}
+
+fn default_session_distill_enabled() -> bool {
+    true
+}
+
+fn default_sessions_dir() -> std::path::PathBuf {
+    std::path::PathBuf::from("data/sessions")
+}
+
+fn default_session_distill_max_transcript() -> usize {
+    28_000
+}
+
+fn default_session_distill_use_librarian() -> bool {
+    true
+}
+
+fn default_session_distill_librarian_summary() -> bool {
+    true
+}
+
+fn default_session_distill_daemon_scheduled() -> bool {
+    true
+}
+
+fn default_session_distill_cron_hour() -> u32 {
+    2
+}
+
+fn default_session_distill_cron_minute() -> u32 {
+    15
+}
+
+impl SessionDistillConfig {
+    pub fn kg_gate(&self) -> crate::memory::kg_extract::KgGateConfig {
+        crate::memory::kg_extract::KgGateConfig {
+            verify: self.verify,
+            min_confidence: self.min_confidence,
+            verify_temperature: self.verify_temperature,
+            require_evidence: self.require_evidence,
+            strict_kg: self.strict_kg,
+        }
+    }
+}
+
+impl Default for SessionDistillConfig {
+    fn default() -> Self {
+        Self {
+            enabled: default_session_distill_enabled(),
+            sessions_dir: default_sessions_dir(),
+            verify: default_dream_verify(),
+            min_confidence: default_dream_min_confidence(),
+            verify_temperature: default_dream_verify_temperature(),
+            require_evidence: default_kg_require_evidence(),
+            strict_kg: default_kg_strict(),
+            chunk_chars: default_pipeline_chunk_chars(),
+            max_transcript_chars: default_session_distill_max_transcript(),
+            use_librarian: default_session_distill_use_librarian(),
+            librarian_summary: default_session_distill_librarian_summary(),
+            daemon_scheduled: default_session_distill_daemon_scheduled(),
+            cron_hour: default_session_distill_cron_hour(),
+            cron_minute: default_session_distill_cron_minute(),
+        }
+    }
+}
+
+// ─── Spark ──────────────────────────────────────────────────────────────
+
+/// When to run spark: fixed UTC cron slots or dice-scheduler jitter.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Default)]
+#[serde(rename_all = "lowercase")]
+pub enum SparkScheduleMode {
+    #[default]
+    Cron,
+    Dice,
+}
+
+/// Settings for the SparkEngine (serendipitous recall).
+#[derive(Debug, Deserialize, Clone)]
+pub struct SparkConfig {
+    /// Master switch — when false, daemon and CLI skip spark runs.
+    #[serde(default = "default_spark_enabled")]
+    pub enabled: bool,
+
+    #[serde(default = "default_dream_verify")]
+    pub verify: bool,
+
+    #[serde(default = "default_dream_min_confidence")]
+    pub min_confidence: f64,
+
+    #[serde(default = "default_spark_hypothesis_temperature")]
+    pub hypothesis_temperature: f32,
+
+    #[serde(default = "default_dream_verify_temperature")]
+    pub verify_temperature: f32,
+
+    /// How many stale vault facts to consider before picking the anchor.
+    #[serde(default = "default_spark_candidate_limit")]
+    pub candidate_limit: usize,
+
+    /// How many recent facts to offer as contrast context.
+    #[serde(default = "default_spark_recent_limit")]
+    pub recent_limit: usize,
+
+    /// Confidence for optional quarantine audit entries (always below vault gate).
+    #[serde(default = "default_spark_quarantine_confidence")]
+    pub quarantine_confidence: f64,
+
+    /// Hours (UTC) when the daemon runs spark, at minute `cron_minute`.
+    #[serde(default = "default_spark_cron_hours")]
+    pub cron_hours: Vec<u32>,
+
+    #[serde(default = "default_spark_cron_minute")]
+    pub cron_minute: u32,
+
+    /// `cron` = fixed hours above; `dice` = d6 jitter between min/max minutes.
+    #[serde(default)]
+    pub schedule_mode: SparkScheduleMode,
+
+    #[serde(default = "default_spark_dice_min")]
+    pub dice_min_minutes: u32,
+
+    #[serde(default = "default_spark_dice_max")]
+    pub dice_max_minutes: u32,
+
+    /// LCG seed for dice rolls (defaults from `[chaos].seed` in daemon when unset).
+    #[serde(default)]
+    pub dice_seed: Option<u64>,
+
+    /// Shallow job caps — keep spark off the deep-research path (AI-Q pattern).
+    #[serde(default = "default_spark_max_tokens_hypothesis")]
+    pub max_tokens_hypothesis: u32,
+
+    #[serde(default = "default_spark_max_tokens_verify")]
+    pub max_tokens_verify: u32,
+
+    #[serde(default = "default_spark_max_connection_chars")]
+    pub max_connection_chars: usize,
+
+    /// Minimum quotable span length per anchor (LDR / dream firewall).
+    #[serde(default = "default_spark_min_citation_chars")]
+    pub min_citation_chars: usize,
+
+    /// Substrings that disqualify a vault fact from being a spark anchor.
+    #[serde(default = "default_spark_exclude_anchor_substrings")]
+    pub exclude_anchor_substrings: Vec<String>,
+
+    /// Vault `decay_class` values eligible for spark anchors (curated wisdom, not ops noise).
+    #[serde(default = "default_spark_anchor_decay_classes")]
+    pub anchor_decay_classes: Vec<String>,
+
+    /// Minimum days since `last_accessed_at` before an anchor is considered stale enough.
+    #[serde(default = "default_spark_anchor_min_stale_days")]
+    pub anchor_min_stale_days: u32,
+
+    /// Maximum days since `created_at` for anchor candidacy (avoid ancient junk).
+    #[serde(default = "default_spark_anchor_max_stale_days")]
+    pub anchor_max_stale_days: u32,
+
+    /// Anchors must be at least this many hours old (separates fresh ingest slab from recent pool).
+    #[serde(default = "default_spark_anchor_min_age_hours")]
+    pub anchor_min_age_hours: u32,
+
+    /// Recent pool: only facts created within this many hours (ingest window).
+    #[serde(default = "default_spark_recent_max_age_hours")]
+    pub recent_max_age_hours: u32,
+
+    /// Minimum embedding cosine between anchor and at least one recent fact (or shared concept tag).
+    #[serde(default = "default_spark_min_anchor_recent_similarity")]
+    pub min_anchor_recent_similarity: f64,
+
+    /// Drop near-duplicate recent facts above this cosine similarity.
+    #[serde(default = "default_spark_recent_dedupe_similarity")]
+    pub recent_dedupe_similarity: f64,
+
+    /// Session anchors older than this many days are skipped (parsed from `[Session YYYY-MM-DD …]`).
+    #[serde(default = "default_spark_max_session_anchor_age_days")]
+    pub max_session_anchor_age_days: u32,
+}
+
+fn default_spark_anchor_decay_classes() -> Vec<String> {
+    vec!["CuratedVault".to_string(), "SessionDistill".to_string()]
+}
+
+fn default_spark_anchor_min_stale_days() -> u32 {
+    0
+}
+
+fn default_spark_anchor_max_stale_days() -> u32 {
+    60
+}
+
+fn default_spark_anchor_min_age_hours() -> u32 {
+    6
+}
+
+fn default_spark_recent_max_age_hours() -> u32 {
+    72
+}
+
+fn default_spark_min_anchor_recent_similarity() -> f64 {
+    0.35
+}
+
+fn default_spark_recent_dedupe_similarity() -> f64 {
+    0.92
+}
+
+fn default_spark_exclude_anchor_substrings() -> Vec<String> {
+    vec![
+        "[Session ".to_string(),
+        "Topics discussed: GZMO, open sovereign.toml".to_string(),
+        "filesystem utilization".to_string(),
+        "sys_janitor".to_string(),
+        "[ingest:".to_string(),
+        "Root filesystem".to_string(),
+        "CPU | RAM".to_string(),
+    ]
+}
+
+fn default_spark_max_session_anchor_age_days() -> u32 {
+    14
+}
+
+fn default_spark_dice_min() -> u32 {
+    20
+}
+fn default_spark_dice_max() -> u32 {
+    180
+}
+fn default_spark_max_tokens_hypothesis() -> u32 {
+    2048
+}
+fn default_spark_max_tokens_verify() -> u32 {
+    1024
+}
+fn default_spark_max_connection_chars() -> usize {
+    1200
+}
+fn default_spark_min_citation_chars() -> usize {
+    12
+}
+
+impl Default for SparkConfig {
+    fn default() -> Self {
+        Self {
+            enabled: default_spark_enabled(),
+            verify: default_dream_verify(),
+            min_confidence: default_dream_min_confidence(),
+            hypothesis_temperature: default_spark_hypothesis_temperature(),
+            verify_temperature: default_dream_verify_temperature(),
+            candidate_limit: default_spark_candidate_limit(),
+            recent_limit: default_spark_recent_limit(),
+            quarantine_confidence: default_spark_quarantine_confidence(),
+            cron_hours: default_spark_cron_hours(),
+            cron_minute: default_spark_cron_minute(),
+            schedule_mode: SparkScheduleMode::default(),
+            dice_min_minutes: default_spark_dice_min(),
+            dice_max_minutes: default_spark_dice_max(),
+            dice_seed: None,
+            max_tokens_hypothesis: default_spark_max_tokens_hypothesis(),
+            max_tokens_verify: default_spark_max_tokens_verify(),
+            max_connection_chars: default_spark_max_connection_chars(),
+            min_citation_chars: default_spark_min_citation_chars(),
+            exclude_anchor_substrings: default_spark_exclude_anchor_substrings(),
+            anchor_decay_classes: default_spark_anchor_decay_classes(),
+            anchor_min_stale_days: default_spark_anchor_min_stale_days(),
+            anchor_max_stale_days: default_spark_anchor_max_stale_days(),
+            anchor_min_age_hours: default_spark_anchor_min_age_hours(),
+            recent_max_age_hours: default_spark_recent_max_age_hours(),
+            min_anchor_recent_similarity: default_spark_min_anchor_recent_similarity(),
+            recent_dedupe_similarity: default_spark_recent_dedupe_similarity(),
+            max_session_anchor_age_days: default_spark_max_session_anchor_age_days(),
+        }
+    }
+}
+
+// ─── Health ─────────────────────────────────────────────────────────────
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct HealthConfig {
+    /// When true, daemon aborts if Prime/embed/MCP probes fail (Sovereign probe is advisory).
+    #[serde(default)]
+    pub strict_startup: bool,
+}
+
+impl Default for HealthConfig {
+    fn default() -> Self {
+        Self {
+            strict_startup: false,
+        }
+    }
+}
+
+// ─── Embeddings ─────────────────────────────────────────────────────────
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct EmbeddingsConfig {
+    #[serde(default)]
+    pub enabled: bool,
+
+    #[serde(default = "default_embeddings_url")]
+    pub url: String,
+
+    #[serde(default = "default_embeddings_model")]
+    pub model: String,
+
+    #[serde(default)]
+    pub api_key: String,
+}
+
+fn default_embeddings_url() -> String {
+    "http://localhost:8002/v1".to_string()
+}
+
+fn default_embeddings_model() -> String {
+    "Qwen3-Embedding-0.6B".to_string()
+}
+
+impl Default for EmbeddingsConfig {
+    fn default() -> Self {
+        Self {
+            enabled: false,
+            url: default_embeddings_url(),
+            model: default_embeddings_model(),
+            api_key: String::new(),
+        }
+    }
+}
+
+// ─── Qdrant (vault mirror on LXC101) ────────────────────────────────────
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct QdrantConfig {
+    /// When true, `gzmo health` probes collection reachability (SQLite remains source of truth).
+    #[serde(default)]
+    pub enabled: bool,
+
+    #[serde(default = "default_qdrant_url")]
+    pub url: String,
+
+    #[serde(default = "default_qdrant_collection")]
+    pub collection: String,
+
+    /// Daemon runs `scripts/sync-vault-to-qdrant.py` on schedule.
+    #[serde(default)]
+    pub sync_enabled: bool,
+
+    #[serde(default = "default_qdrant_sync_cron_hour")]
+    pub sync_cron_hour: u32,
+
+    #[serde(default = "default_qdrant_sync_cron_minute")]
+    pub sync_cron_minute: u32,
+}
+
+fn default_qdrant_url() -> String {
+    "http://192.168.31.202:6333".to_string()
+}
+
+fn default_qdrant_collection() -> String {
+    "honeypot".to_string()
+}
+
+fn default_qdrant_sync_cron_hour() -> u32 {
+    1
+}
+
+fn default_qdrant_sync_cron_minute() -> u32 {
+    45
+}
+
+impl Default for QdrantConfig {
+    fn default() -> Self {
+        Self {
+            enabled: false,
+            url: default_qdrant_url(),
+            collection: default_qdrant_collection(),
+            sync_enabled: false,
+            sync_cron_hour: default_qdrant_sync_cron_hour(),
+            sync_cron_minute: default_qdrant_sync_cron_minute(),
+        }
+    }
+}
+
+// ─── Librarian (VM200 light LLM) ────────────────────────────────────────
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct LibrarianConfig {
+    #[serde(default)]
+    pub enabled: bool,
+
+    #[serde(default = "default_librarian_url")]
+    pub url: String,
+
+    #[serde(default = "default_librarian_model")]
+    pub model: String,
+
+    #[serde(default)]
+    pub api_key: String,
+}
+
+fn default_librarian_url() -> String {
+    "http://192.168.31.110:8083/v1".to_string()
+}
+
+fn default_librarian_model() -> String {
+    "qwen2.5-coder-1.5b-instruct-q4_k_m.gguf".to_string()
+}
+
+impl Default for LibrarianConfig {
+    fn default() -> Self {
+        Self {
+            enabled: false,
+            url: default_librarian_url(),
+            model: default_librarian_model(),
+            api_key: String::new(),
+        }
+    }
+}
+
+impl LibrarianConfig {
+    /// Engine profile for structured extract / short summaries on VM200 :8083.
+    pub fn to_engine_profile(&self) -> EngineProfileConfig {
+        EngineProfileConfig {
+            provider: "local".into(),
+            url: self.url.clone(),
+            model: self.model.clone(),
+            api_key: self.api_key.clone(),
+            temperature: 0.2,
+            top_p: 0.9,
+            max_tokens: 4096,
+        }
+    }
+}
+
+// ─── Rerank (VM200 bge-reranker) ────────────────────────────────────────
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct RerankConfig {
+    #[serde(default)]
+    pub enabled: bool,
+
+    #[serde(default = "default_rerank_url")]
+    pub url: String,
+
+    #[serde(default = "default_rerank_model")]
+    pub model: String,
+
+    #[serde(default)]
+    pub api_key: String,
+
+    /// Over-fetch decay/BM25 hits before reranking (final limit unchanged).
+    #[serde(default = "default_rerank_prefetch_multiplier")]
+    pub prefetch_multiplier: usize,
+}
+
+fn default_rerank_url() -> String {
+    "http://192.168.31.110:8082/v1".to_string()
+}
+
+fn default_rerank_model() -> String {
+    "bge-reranker-v2-m3-q8_0.gguf".to_string()
+}
+
+fn default_rerank_prefetch_multiplier() -> usize {
+    4
+}
+
+impl Default for RerankConfig {
+    fn default() -> Self {
+        Self {
+            enabled: false,
+            url: default_rerank_url(),
+            model: default_rerank_model(),
+            api_key: String::new(),
+            prefetch_multiplier: default_rerank_prefetch_multiplier(),
+        }
+    }
+}
+
+// ─── Redis scratch + distill queue ───────────────────────────────────────
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct RedisConfig {
+    #[serde(default = "default_redis_enabled")]
+    pub enabled: bool,
+
+    #[serde(default = "default_redis_url")]
+    pub url: String,
+
+    #[serde(default = "default_distill_queue")]
+    pub distill_queue: String,
+
+    /// Fallback directory when Redis is down (`data/distill-queue/`).
+    #[serde(default = "default_distill_fallback_dir")]
+    pub distill_fallback_dir: PathBuf,
+}
+
+fn default_redis_enabled() -> bool {
+    true
+}
+fn default_redis_url() -> String {
+    "redis://192.168.31.202:6379".to_string()
+}
+fn default_distill_queue() -> String {
+    "gzmo:distill:pending".to_string()
+}
+fn default_distill_fallback_dir() -> PathBuf {
+    PathBuf::from("data/distill-queue")
+}
+
+impl Default for RedisConfig {
+    fn default() -> Self {
+        Self {
+            enabled: default_redis_enabled(),
+            url: default_redis_url(),
+            distill_queue: default_distill_queue(),
+            distill_fallback_dir: default_distill_fallback_dir(),
+        }
+    }
+}
+
+// ─── Context memory (archive @ 90%, scratch budget) ─────────────────────
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct ContextMemoryConfig {
+    /// Fraction of hot budget that triggers archival (default 0.90).
+    #[serde(default = "default_archive_threshold")]
+    pub archive_threshold: f64,
+
+    /// Reserve for model response (default 0.10).
+    #[serde(default = "default_response_reserve")]
+    pub response_reserve: f64,
+
+    /// Max tokens injected from scratch recall per turn.
+    #[serde(default = "default_scratch_max_tokens")]
+    pub scratch_max_tokens: usize,
+
+    /// Model context length for hot budget; 0 = use 131072.
+    #[serde(default)]
+    pub context_length: usize,
+}
+
+fn default_archive_threshold() -> f64 {
+    0.90
+}
+fn default_response_reserve() -> f64 {
+    0.10
+}
+fn default_scratch_max_tokens() -> usize {
+    2000
+}
+
+impl Default for ContextMemoryConfig {
+    fn default() -> Self {
+        Self {
+            archive_threshold: default_archive_threshold(),
+            response_reserve: default_response_reserve(),
+            scratch_max_tokens: default_scratch_max_tokens(),
+            context_length: 0,
+        }
+    }
+}
+
+impl ContextMemoryConfig {
+    /// Hot token budget: (context_length * (1 - reserve)) * archive_threshold applied in context.rs.
+    pub fn hot_budget_tokens(&self) -> usize {
+        let ctx = if self.context_length > 0 {
+            self.context_length
+        } else {
+            131_072
+        };
+        let after_reserve = (ctx as f64 * (1.0 - self.response_reserve)) as usize;
+        after_reserve
+    }
+
+    pub fn archive_trigger_tokens(&self) -> usize {
+        (self.hot_budget_tokens() as f64 * self.archive_threshold) as usize
+    }
+}
+
+// ─── Subagent runner ─────────────────────────────────────────────────────
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct SubagentConfig {
+    #[serde(default = "default_subagent_enabled")]
+    pub enabled: bool,
+
+    #[serde(default = "default_subagent_max_concurrent")]
+    pub max_concurrent: usize,
+
+    #[serde(default = "default_subagent_max_depth")]
+    pub max_depth: u8,
+
+    #[serde(default = "default_subagent_context_budget")]
+    pub context_budget_tokens: usize,
+
+    #[serde(default = "default_subagent_summary_max")]
+    pub summary_max_tokens: usize,
+}
+
+fn default_subagent_enabled() -> bool {
+    true
+}
+fn default_subagent_max_concurrent() -> usize {
+    2
+}
+fn default_subagent_max_depth() -> u8 {
+    2
+}
+fn default_subagent_context_budget() -> usize {
+    32_768
+}
+fn default_subagent_summary_max() -> usize {
+    800
+}
+
+impl Default for SubagentConfig {
+    fn default() -> Self {
+        Self {
+            enabled: default_subagent_enabled(),
+            max_concurrent: default_subagent_max_concurrent(),
+            max_depth: default_subagent_max_depth(),
+            context_budget_tokens: default_subagent_context_budget(),
+            summary_max_tokens: default_subagent_summary_max(),
+        }
+    }
 }
 
 // ─── API Keys ───────────────────────────────────────────────────────────
@@ -178,6 +1202,10 @@ pub struct EngineSection {
     #[serde(default)]
     pub cloud: Option<CloudEngineConfig>,
 
+    /// Sovereign FrankenMoE (`llama-server` :8010) — optional until GGUF exists.
+    #[serde(default)]
+    pub sovereign: Option<EngineProfileConfig>,
+
     // ── Legacy flat fields (backward compat) ────────────────────────
     #[serde(default)]
     pub provider: Option<String>,
@@ -201,6 +1229,7 @@ impl Default for EngineSection {
             active_mode: EngineMode::Local,
             local: None,
             cloud: None,
+            sovereign: None,
             provider: None,
             url: None,
             model: None,
@@ -250,6 +1279,14 @@ impl EngineSection {
                     self.active_engine_for_mode(EngineMode::Local)
                 }
             }
+            EngineMode::Sovereign => {
+                if let Some(ref sovereign) = self.sovereign {
+                    sovereign.clone()
+                } else {
+                    tracing::warn!("Sovereign mode requested but no [engine.sovereign] — falling back to local");
+                    self.active_engine_for_mode(EngineMode::Local)
+                }
+            }
         }
     }
 
@@ -282,6 +1319,10 @@ impl EngineSection {
                     EngineProfileConfig::default()
                 }
             }
+            EngineMode::Sovereign => self
+                .sovereign
+                .clone()
+                .unwrap_or_else(EngineProfileConfig::default),
         }
     }
 
@@ -366,6 +1407,122 @@ pub struct CloudEngineConfig {
     pub fallback_api_key: Option<String>,
 }
 
+// ─── Obolus Routing Config ──────────────────────────────────────────────
+
+/// Static task → engine routing table (Obolus, the Economy Organ).
+///
+/// Maps each `TaskKind` to a named engine profile. The named profiles
+/// are resolved by `GatewayRouter` into actual `Arc<dyn LlmGateway>`
+/// instances pointing at the configured endpoint.
+///
+/// Example gzmo.toml:
+/// ```toml
+/// [routing]
+/// default_engine = "local"
+///
+/// [routing.mappings]
+/// dream_extract = "librarian"
+/// distill_extract = "librarian"
+/// distill_summary = "librarian"
+/// spark_hypothesis = "librarian"
+///
+/// [routing.profiles.librarian]
+/// provider = "local"
+/// url = "http://192.168.31.110:8083/v1"
+/// model = "qwen2.5-coder-1.5b-instruct-q4_k_m.gguf"
+/// temperature = 0.2
+/// top_p = 0.9
+/// max_tokens = 4096
+/// ```
+#[derive(Debug, Deserialize, Clone, Default)]
+pub struct RoutingConfig {
+    /// Default engine name when no explicit mapping exists for a task kind.
+    #[serde(default = "default_routing_engine")]
+    pub default_engine: String,
+
+    /// Task-kind → engine-name mappings. Keys are snake_case task kind names;
+    /// values are engine profile names ("local", "librarian", "cloud", "sovereign").
+    #[serde(default)]
+    pub mappings: HashMap<String, String>,
+
+    /// Inline engine profile overrides. Keys are profile names;
+    /// values are full `EngineProfileConfig` structs.
+    /// Used for non-standard profiles like "librarian".
+    #[serde(default)]
+    pub profiles: HashMap<String, EngineProfileConfig>,
+}
+
+fn default_routing_engine() -> String {
+    "local".to_string()
+}
+
+impl RoutingConfig {
+    /// Resolve the engine name for a given task kind.
+    /// Falls back to `default_engine` when no mapping exists.
+    pub fn resolve(&self, task: TaskKind) -> &str {
+        let key = task.to_string();
+        self.mappings
+            .get(&key)
+            .map(|s| s.as_str())
+            .unwrap_or_else(|| &self.default_engine)
+    }
+
+    /// Get a named engine profile. Returns `None` if the profile is not
+    /// defined inline — the caller should fall back to the standard engine
+    /// sections (`engine.local`, `engine.cloud`, etc.).
+    pub fn get_profile(&self, name: &str) -> Option<&EngineProfileConfig> {
+        self.profiles.get(name)
+    }
+
+    /// Resolve a full `EngineProfileConfig` for a task kind.
+    /// Checks inline profiles first, then falls back to standard engine sections.
+    pub fn resolve_profile(&self, task: TaskKind, engine: &EngineSection) -> EngineProfileConfig {
+        let profile_name = self.resolve(task);
+
+        // Check inline profiles first
+        if let Some(inline) = self.get_profile(profile_name) {
+            return inline.clone();
+        }
+
+        // Fall back to standard engine sections by name
+        match profile_name {
+            "local" => engine.active_engine(),
+            "cloud" => {
+                if let Some(ref cloud) = engine.cloud {
+                    EngineProfileConfig {
+                        provider: cloud.provider.clone(),
+                        url: cloud.url.clone(),
+                        model: cloud.model.clone(),
+                        api_key: cloud.api_key.clone(),
+                        temperature: cloud.temperature,
+                        top_p: cloud.top_p,
+                        max_tokens: cloud.max_tokens,
+                    }
+                } else {
+                    tracing::warn!("Routing to 'cloud' but no [engine.cloud] — falling back to local");
+                    engine.active_engine()
+                }
+            }
+            "sovereign" => {
+                engine
+                    .sovereign
+                    .clone()
+                    .unwrap_or_else(|| {
+                        tracing::warn!("Routing to 'sovereign' but no [engine.sovereign] — falling back to local");
+                        engine.active_engine()
+                    })
+            }
+            name => {
+                tracing::warn!(
+                    profile = name,
+                    "Unknown routing profile — falling back to active engine"
+                );
+                engine.active_engine()
+            }
+        }
+    }
+}
+
 // ─── Remaining config structs (unchanged) ───────────────────────────────
 
 #[derive(Debug, Deserialize, Clone)]
@@ -384,6 +1541,14 @@ pub struct MemoryConfig {
     /// Path to the SQLite vault database
     #[serde(default = "default_vault_db")]
     pub vault_db: PathBuf,
+
+    /// `sqlite` (production) or `qdrant` (not implemented — fails fast at connect).
+    #[serde(default = "default_vault_backend")]
+    pub vault_backend: String,
+}
+
+fn default_vault_backend() -> String {
+    "sqlite".to_string()
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -476,6 +1641,14 @@ pub struct WatcherConfig {
     /// If true, this watcher is disabled
     #[serde(default)]
     pub disabled: bool,
+
+    /// Wait this many seconds after the last write event before ingest (coalesce saves).
+    #[serde(default = "default_watcher_debounce_secs")]
+    pub debounce_secs: u64,
+}
+
+fn default_watcher_debounce_secs() -> u64 {
+    3
 }
 
 /// Orchestration configuration for background autonomous tasks
@@ -528,6 +1701,22 @@ fn default_max_tokens() -> u32 { 8192 }
 fn default_max_iterations() -> usize { 10 }
 fn default_heartbeat_secs() -> u64 { 1800 }
 fn default_step_iterations() -> usize { 5 }
+fn default_dream_enabled() -> bool { true }
+fn default_dream_verify() -> bool { true }
+fn default_dream_min_confidence() -> f64 { 0.85 }
+fn default_dream_verify_temperature() -> f32 { 0.1 }
+fn default_dream_cron_hour() -> u32 { 1 }
+fn default_dream_cron_minute() -> u32 { 0 }
+fn default_ingest_enabled() -> bool { true }
+fn default_kg_require_evidence() -> bool { true }
+fn default_kg_strict() -> bool { true }
+fn default_spark_enabled() -> bool { true }
+fn default_spark_hypothesis_temperature() -> f32 { 0.2 }
+fn default_spark_candidate_limit() -> usize { 5 }
+fn default_spark_recent_limit() -> usize { 2 }
+fn default_spark_quarantine_confidence() -> f64 { 0.6 }
+fn default_spark_cron_hours() -> Vec<u32> { vec![9, 14, 21] }
+fn default_spark_cron_minute() -> u32 { 17 }
 
 fn default_cloud_provider() -> String { "openrouter".to_string() }
 fn default_cloud_url() -> String { "https://openrouter.ai/api/v1".to_string() }
@@ -540,7 +1729,11 @@ impl Default for IdentityConfig {
 }
 impl Default for MemoryConfig {
     fn default() -> Self {
-        Self { directory: default_memory_dir(), vault_db: default_vault_db() }
+        Self {
+            directory: default_memory_dir(),
+            vault_db: default_vault_db(),
+            vault_backend: default_vault_backend(),
+        }
     }
 }
 impl Default for SkillsConfig {

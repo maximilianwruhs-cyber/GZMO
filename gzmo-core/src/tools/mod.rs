@@ -8,6 +8,9 @@ pub mod sysadmin;
 pub mod web;
 pub mod web_browse;
 pub mod memory;
+pub mod delegate;
+
+pub use delegate::DelegateTaskTool;
 
 use anyhow::Result;
 use async_trait::async_trait;
@@ -71,6 +74,10 @@ impl ToolRegistry {
 
     pub fn len(&self) -> usize { self.handlers.len() }
     pub fn is_empty(&self) -> bool { self.handlers.is_empty() }
+
+    pub fn has_tool(&self, name: &str) -> bool {
+        self.handlers.contains_key(name)
+    }
 }
 
 impl Default for ToolRegistry {

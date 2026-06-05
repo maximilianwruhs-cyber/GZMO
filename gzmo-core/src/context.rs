@@ -20,36 +20,59 @@ use std::collections::HashSet;
 /// Configuration for context window management.
 #[derive(Debug, Clone)]
 pub struct ContextConfig {
-    /// Maximum token budget for the context window.
-    /// Should be set to ~75% of the model's actual context length
-    /// to leave room for the response.
+    /// Maximum token budget for the hot context window (after response reserve).
     pub max_tokens: usize,
 
     /// Characters-per-token estimate. Conservative default of 3.5.
     /// Lower values = more aggressive pruning (safer).
     pub chars_per_token: f64,
+
+    /// Archive when estimated tokens exceed this (default: 90% of max_tokens).
+    pub archive_trigger_tokens: usize,
 }
 
 impl Default for ContextConfig {
     fn default() -> Self {
-        Self {
-            // Default: ~6144 tokens for an 8K context model
-            // Leaves ~2K tokens for the response
-            max_tokens: 6144,
-            chars_per_token: 3.5,
-        }
+        Self::with_hot_budget(6144)
     }
 }
 
 impl ContextConfig {
-    /// Create a context config for a specific model context length.
-    /// Reserves 25% of the context for the response.
-    pub fn for_context_length(context_length: usize) -> Self {
+    /// Hot budget with 90% archive trigger.
+    pub fn with_hot_budget(hot_tokens: usize) -> Self {
         Self {
-            max_tokens: (context_length as f64 * 0.75) as usize,
+            max_tokens: hot_tokens,
             chars_per_token: 3.5,
+            archive_trigger_tokens: (hot_tokens as f64 * 0.90) as usize,
         }
     }
+
+    /// Create a context config for a specific model context length.
+    /// Reserves 10% for response; hot budget uses remaining space.
+    pub fn for_context_length(context_length: usize) -> Self {
+        let hot = (context_length as f64 * 0.90) as usize;
+        Self::with_hot_budget(hot)
+    }
+
+    /// From `[context_memory]` settings.
+    pub fn from_memory_config(cfg: &crate::config::ContextMemoryConfig) -> Self {
+        Self::with_hot_budget(cfg.hot_budget_tokens())
+    }
+}
+
+/// Result of pruning with optional archival slice.
+#[derive(Debug, Clone)]
+pub struct PruneResult {
+    pub windowed: Vec<Message>,
+    pub archived: Vec<Message>,
+    pub estimated_before: usize,
+    pub estimated_after: usize,
+}
+
+/// Estimate token count for a plain string (role overhead included).
+pub fn estimate_text_tokens(content: &str, chars_per_token: f64) -> usize {
+    let content_tokens = (content.len() as f64 / chars_per_token).ceil() as usize;
+    content_tokens + 4
 }
 
 /// Estimate the token count of a message.
@@ -67,6 +90,68 @@ pub fn estimate_total_tokens(messages: &[Message], chars_per_token: f64) -> usiz
         .sum()
 }
 
+/// Prune with archival: messages dropped from the hot window go to `archived`
+/// when total tokens exceed `archive_trigger_tokens` (90%) or `max_tokens`.
+pub fn prune_with_archive(messages: &[Message], config: &ContextConfig) -> PruneResult {
+    if messages.is_empty() {
+        return PruneResult {
+            windowed: Vec::new(),
+            archived: Vec::new(),
+            estimated_before: 0,
+            estimated_after: 0,
+        };
+    }
+
+    let estimated_before = estimate_total_tokens(messages, config.chars_per_token);
+
+    let target_budget = if estimated_before > config.max_tokens {
+        config.max_tokens
+    } else if estimated_before > config.archive_trigger_tokens {
+        config.archive_trigger_tokens
+    } else {
+        return PruneResult {
+            windowed: messages.to_vec(),
+            archived: Vec::new(),
+            estimated_before,
+            estimated_after: estimated_before,
+        };
+    };
+
+    let mut trim_cfg = config.clone();
+    trim_cfg.max_tokens = target_budget;
+    let windowed = prune_to_budget_inner(messages, &trim_cfg);
+    let archived = messages_not_in_window(messages, &windowed);
+    let estimated_after = estimate_total_tokens(&windowed, config.chars_per_token);
+
+    if !archived.is_empty() {
+        tracing::info!(
+            archived_messages = archived.len(),
+            estimated_before,
+            estimated_after,
+            target_budget,
+            "Context archived"
+        );
+    }
+
+    PruneResult {
+        windowed,
+        archived,
+        estimated_before,
+        estimated_after,
+    }
+}
+
+fn messages_not_in_window(original: &[Message], windowed: &[Message]) -> Vec<Message> {
+    if original.len() <= 1 {
+        return Vec::new();
+    }
+    let keep_from = original.len().saturating_sub(windowed.len().saturating_sub(1));
+    if keep_from <= 1 {
+        return Vec::new();
+    }
+    original[1..keep_from].to_vec()
+}
+
 /// Prune messages to fit within the token budget.
 ///
 /// Returns a new `Vec<Message>` containing:
@@ -76,6 +161,10 @@ pub fn estimate_total_tokens(messages: &[Message], chars_per_token: f64) -> usiz
 ///
 /// The input `messages` is NOT mutated.
 pub fn prune_to_budget(messages: &[Message], config: &ContextConfig) -> Vec<Message> {
+    prune_with_archive(messages, config).windowed
+}
+
+fn prune_to_budget_inner(messages: &[Message], config: &ContextConfig) -> Vec<Message> {
     if messages.is_empty() {
         return Vec::new();
     }
@@ -195,10 +284,7 @@ mod tests {
             make_msg(Role::Assistant, "Hi there!"),
         ];
 
-        let config = ContextConfig {
-            max_tokens: 10000,
-            chars_per_token: 3.5,
-        };
+        let config = ContextConfig::with_hot_budget(10000);
 
         let pruned = prune_to_budget(&messages, &config);
         assert_eq!(pruned.len(), 3);
@@ -214,10 +300,7 @@ mod tests {
             messages.push(make_msg(Role::Assistant, &format!("Assistant response number {} with some extra content to use tokens", i)));
         }
 
-        let config = ContextConfig {
-            max_tokens: 200, // Very tight budget
-            chars_per_token: 3.5,
-        };
+        let config = ContextConfig::with_hot_budget(200);
 
         let pruned = prune_to_budget(&messages, &config);
 
@@ -245,10 +328,7 @@ mod tests {
             make_msg(Role::Assistant, "Recent response"),
         ];
 
-        let config = ContextConfig {
-            max_tokens: 100,
-            chars_per_token: 3.5,
-        };
+        let config = ContextConfig::with_hot_budget(100);
 
         let pruned = prune_to_budget(&messages, &config);
 
@@ -262,6 +342,42 @@ mod tests {
                 );
             }
         }
+    }
+
+    #[test]
+    fn test_prune_with_archive_under_threshold() {
+        let messages = vec![
+            make_msg(Role::System, "System."),
+            make_msg(Role::User, "Short."),
+            make_msg(Role::Assistant, "Ok."),
+        ];
+        let config = ContextConfig::with_hot_budget(10_000);
+        let result = prune_with_archive(&messages, &config);
+        assert!(result.archived.is_empty());
+        assert_eq!(result.windowed.len(), messages.len());
+    }
+
+    #[test]
+    fn test_prune_with_archive_over_threshold() {
+        let mut messages = vec![make_msg(Role::System, "System prompt.")];
+        for i in 0..40 {
+            messages.push(make_msg(
+                Role::User,
+                &format!("User {i} with enough text to consume token budget quickly"),
+            ));
+            messages.push(make_msg(
+                Role::Assistant,
+                &format!("Assistant {i} with enough text to consume token budget quickly"),
+            ));
+        }
+        let config = ContextConfig::with_hot_budget(200);
+        let result = prune_with_archive(&messages, &config);
+        assert!(
+            !result.archived.is_empty(),
+            "expected archival when over 90% trigger"
+        );
+        assert!(result.windowed.len() < messages.len());
+        assert!(result.estimated_after <= config.archive_trigger_tokens + 50);
     }
 
     #[test]

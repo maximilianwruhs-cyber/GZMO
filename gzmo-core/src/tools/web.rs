@@ -385,6 +385,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[ignore = "requires live DuckDuckGo; run with --ignored"]
     async fn test_web_search_live() {
         let tool = WebSearchTool::default();
         let result = tool.execute(json!({"query": "Rust programming language", "max_results": 3})).await;

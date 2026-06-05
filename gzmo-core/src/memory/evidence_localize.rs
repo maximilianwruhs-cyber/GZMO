@@ -77,6 +77,39 @@ pub fn localize_evidence(body: &str, verifier_quote: &str) -> EvidenceSpan {
     }
 }
 
+/// Localize evidence for one observation. Prefers the observation text in `body`;
+/// falls back to entity-level verifier quote only when there is a single observation.
+pub fn localize_observation_evidence(
+    body: &str,
+    observation: &str,
+    entity_evidence: &str,
+    observation_count: usize,
+) -> Option<EvidenceSpan> {
+    let obs = observation.trim();
+    if obs.len() >= 8 {
+        let span = localize_evidence(body, obs);
+        if span.char_start.is_some() {
+            return Some(span);
+        }
+    }
+    if observation_count == 1 {
+        let quote = entity_evidence.trim();
+        if quote.len() >= 12 {
+            let span = localize_evidence(body, quote);
+            if !span.evidence_text.is_empty() {
+                return Some(span);
+            }
+        }
+    }
+    if obs.len() >= 8 {
+        let span = localize_evidence(body, obs);
+        if !span.evidence_text.is_empty() {
+            return Some(span);
+        }
+    }
+    None
+}
+
 /// Helper to normalize a string for matching (lowercase and collapse whitespace).
 fn normalize_only(s: &str) -> String {
     let mut norm = String::new();
@@ -249,5 +282,26 @@ mod tests {
         let span = localize_evidence(body, quote);
         assert!(span.char_start.is_none());
         assert_eq!(span.evidence_text, "Nicht vorhanden");
+    }
+
+    #[test]
+    fn observation_evidence_per_obs_not_shared_entity_quote() {
+        let body = "Alice runs backups nightly on ZFS. \
+            The monitoring dashboard tracks CPU only. \
+            Bob manages the firewall rules on LXC101.";
+        let entity_quote = "Alice runs backups nightly on ZFS";
+        let span_a = localize_observation_evidence(body, "runs backups nightly on ZFS", entity_quote, 2)
+            .expect("obs a");
+        let span_b = localize_observation_evidence(
+            body,
+            "manages the firewall rules on LXC101",
+            entity_quote,
+            2,
+        )
+        .expect("obs b");
+        assert!(span_a.evidence_text.contains("Alice"));
+        assert!(!span_a.evidence_text.contains("Bob"));
+        assert!(span_b.evidence_text.contains("Bob"));
+        assert!(!span_b.evidence_text.contains("Alice"));
     }
 }

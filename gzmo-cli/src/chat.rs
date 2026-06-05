@@ -1,4 +1,5 @@
-//! Interactive chat REPL.
+//! Legacy debug harness REPL (`gzmo chat`). Hot-memory lifecycle via [`AgentSession`].
+//! Not the operator frontend — see `docs/ARCHITECTURE_GZMO_PLATFORM.md`.
 
 use std::io::{self, BufRead, Write};
 use std::sync::Arc;
@@ -6,13 +7,16 @@ use std::sync::Arc;
 use anyhow::Result;
 use chrono::Utc;
 
-use gzmo_core::agent_loop::{run_agent_loop, AgentLoopConfig};
-use gzmo_core::config::{GzmoConfig, EngineMode};
-use gzmo_core::context::ContextConfig;
-use gzmo_core::gateway::{TurboQuantGateway, VllmConfig};
+use gzmo_core::agent_loop::run_agent_loop;
+use gzmo_core::agent_session::AgentSession;
+use gzmo_core::config::{GzmoConfig, EngineMode, TaskKind};
+use gzmo_core::gateway::{GatewayRouter, TurboQuantGateway, VllmConfig};
+use gzmo_core::memory::embeddings;
+use gzmo_core::memory::vault::SqliteVault;
+use gzmo_core::subagent::SubagentRunner;
+use gzmo_core::tools::delegate::DelegateTaskTool;
 use gzmo_core::identity::IdentityEngine;
 use gzmo_core::memory::episodic::FileEpisodicStore;
-use gzmo_core::memory::vault::SqliteVault;
 use gzmo_core::mcp::{manager::McpManager, bridge::McpServerConfig};
 use gzmo_core::session::SessionManager;
 use gzmo_core::tools::ToolRegistry;
@@ -56,8 +60,15 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
         tokio::fs::create_dir_all(parent).await?;
     }
 
-    // ─── Vault ───────────────────────────────────────────────────
-    let vault = match SqliteVault::open(&config.memory.vault_db) {
+    // ─── Vault (embed + rerank for memory_search) ───────────────
+    let vault = match embeddings::open_vault_with_embeddings(
+        &config.memory.vault_db,
+        &config.embeddings,
+        &config.rerank,
+        &config.qdrant,
+    )
+    .await
+    {
         Ok(v) => {
             let count = v.count().unwrap_or(0);
             if count > 0 {
@@ -70,6 +81,19 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
             None
         }
     };
+
+    let mut agent_session = AgentSession::new_main(
+        &config.redis,
+        &config.context_memory,
+        SessionManager::new_session_id(),
+    )
+    .await;
+    if agent_session.uses_redis() {
+        eprintln!("  {COPPER}⚙ Scratch cache: Redis (LXC101){RESET}");
+    } else {
+        eprintln!("  {COPPER}⚙ Scratch cache: in-memory fallback{RESET}");
+    }
+    let scratch = agent_session.scratch();
 
     // ─── Gateway ─────────────────────────────────────────────────
     let active_profile = config.engine.active_engine();
@@ -214,9 +238,11 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
     tools.register(Box::new(SysMetricsTool));
     tools.register(Box::new(SysKillTool));
     
+    let router = GatewayRouter::new(&config);
+    let chat_gateway_dyn = router.gateway(TaskKind::Chat);
+
     if let Some(ref v) = vault {
         tools.register(Box::new(MemoryRecordTool { vault: Arc::clone(v) }));
-        tools.register(Box::new(MemorySearchTool { vault: Arc::clone(v) }));
     }
 
     // ─── Chaos Skills (Rust-native, priority over shell) ─────────
@@ -282,7 +308,9 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
 
 ---
 You are {}. Today is {}.
-Available tools: {}",
+Available tools: {}.
+Use memory_search when you need prior facts (results land in scratch for this turn only).
+Use delegate_task for focused sub-work; you receive a short summary, not full subagent logs.",
         soul.raw_markdown,
         memory_context.as_deref().unwrap_or(""),
         vault_context.as_deref().unwrap_or(""),
@@ -296,9 +324,38 @@ Available tools: {}",
     let session_mgr = SessionManager::new("data/sessions");
     session_mgr.ensure_dir().await?;
 
-    let mut session_id = SessionManager::new_session_id();
     let mut session_name: Option<String> = None;
     let session_created_at = Utc::now();
+
+    let subagent_runner = Arc::new(SubagentRunner::new(
+        config.subagent.clone(),
+        Arc::clone(&scratch),
+        Arc::clone(&chat_gateway_dyn),
+        vault.clone(),
+        system_prompt.clone(),
+    ));
+    agent_session.attach_subagent_runner(Arc::clone(&subagent_runner));
+    if config.subagent.enabled {
+        tools.register(Box::new(DelegateTaskTool {
+            runner: Arc::clone(&subagent_runner),
+            session_id: agent_session.session_id().to_string(),
+            depth: 0,
+        }));
+        eprintln!(
+            "  {COPPER}⚙ SubagentRunner: max {} parallel, {}k ctx budget{RESET}",
+            config.subagent.max_concurrent,
+            config.subagent.context_budget_tokens / 1024
+        );
+    }
+
+    if let Some(ref v) = vault {
+        tools.register(Box::new(MemorySearchTool {
+            vault: Arc::clone(v),
+            scratch: Some(agent_session.scratch()),
+            scope: Some(agent_session.main_scope()),
+            scope_cell: None,
+        }));
+    }
 
     let mut messages: Vec<Message> = vec![Message {
         role: Role::System,
@@ -318,12 +375,7 @@ Available tools: {}",
         }
     }
 
-    let loop_config = AgentLoopConfig {
-        max_iterations: config.agent.max_tool_iterations,
-        verbose_tool_output: true,
-        context: ContextConfig::for_context_length(config.engine.active_engine().max_tokens as usize * 4),
-        on_chunk: None,
-    };
+    let mut loop_config = agent_session.loop_config(config.agent.max_tool_iterations, true, None);
 
     // ─── Engine health check ─────────────────────────────────────
     let active = config.engine.active_engine();
@@ -381,12 +433,14 @@ Available tools: {}",
         // ─── Slash commands ─────────────────────────────────
         if input.starts_with('/') {
             let msg_count_before = messages.len();
+            let subagent_enabled = config.subagent.enabled;
             if handle_slash_command(
-                &input, &mut messages, &session_mgr,
-                &mut session_id, &mut session_name, session_created_at,
+                &input, &mut messages, &mut tools, &session_mgr,
+                &mut agent_session, &mut session_name, session_created_at,
                 &vault, &mut config, &chaos_snapshot_rx,
                 &chaos_skills, &chaos_feedback_tx,
                 &gateway, &config_path,
+                &subagent_runner, subagent_enabled,
             ).await? {
                 break; // /quit
             }
@@ -447,6 +501,10 @@ Available tools: {}",
             io::stderr().flush()?;
             continue;
         }
+
+        // ─── New turn: hot memory lifecycle (platform) ─────────
+        agent_session.turn_start().await;
+        loop_config = agent_session.loop_config(config.agent.max_tool_iterations, true, None);
 
         // ─── Add user message ───────────────────────────────
         messages.push(Message {
@@ -639,7 +697,10 @@ async fn boot_knowledge_graph(tools: &ToolRegistry) -> Option<String> {
     if let Some(entities) = graph.get("entities").and_then(|e| e.as_array()) {
         for entity in entities {
             let name = entity.get("name").and_then(|n| n.as_str()).unwrap_or("?");
-            let etype = entity.get("entityType").and_then(|t| t.as_str()).unwrap_or("?");
+            let etype = entity.get("type")
+                .or_else(|| entity.get("entityType"))
+                .and_then(|t| t.as_str())
+                .unwrap_or("?");
             block.push_str(&format!("- **{}** ({})", name, etype));
             if let Some(obs) = entity.get("observations").and_then(|o| o.as_array()) {
                 let obs_strs: Vec<&str> = obs.iter().filter_map(|o| o.as_str()).collect();
@@ -656,9 +717,18 @@ async fn boot_knowledge_graph(tools: &ToolRegistry) -> Option<String> {
         if !relations.is_empty() {
             block.push_str("\nRelationships:\n");
             for rel in relations {
-                let from = rel.get("from").and_then(|f| f.as_str()).unwrap_or("?");
-                let to = rel.get("to").and_then(|t| t.as_str()).unwrap_or("?");
-                let rtype = rel.get("relationType").and_then(|r| r.as_str()).unwrap_or("?");
+                let from = rel.get("source")
+                    .or_else(|| rel.get("from"))
+                    .and_then(|f| f.as_str())
+                    .unwrap_or("?");
+                let to = rel.get("target")
+                    .or_else(|| rel.get("to"))
+                    .and_then(|t| t.as_str())
+                    .unwrap_or("?");
+                let rtype = rel.get("type")
+                    .or_else(|| rel.get("relationType"))
+                    .and_then(|r| r.as_str())
+                    .unwrap_or("?");
                 block.push_str(&format!("- {} -> ({}) -> {}\n", from, rtype, to));
                 has_content = true;
             }
@@ -700,11 +770,24 @@ async fn ping_engine(config: &GzmoConfig) -> (&'static str, String) {
 }
 
 #[allow(clippy::too_many_arguments)]
+fn reregister_delegate_tool(
+    tools: &mut ToolRegistry,
+    runner: &Arc<SubagentRunner>,
+    session_id: &str,
+) {
+    tools.register(Box::new(DelegateTaskTool {
+        runner: Arc::clone(runner),
+        session_id: session_id.to_string(),
+        depth: 0,
+    }));
+}
+
 async fn handle_slash_command(
     input: &str,
     messages: &mut Vec<Message>,
+    tools: &mut ToolRegistry,
     session_mgr: &SessionManager,
-    session_id: &mut String,
+    agent_session: &mut AgentSession,
     session_name: &mut Option<String>,
     session_created_at: chrono::DateTime<Utc>,
     vault: &Option<Arc<SqliteVault>>,
@@ -714,7 +797,10 @@ async fn handle_slash_command(
     chaos_feedback_tx: &tokio::sync::mpsc::Sender<gzmo_chaos::feedback::ChaosEvent>,
     gateway: &Arc<tokio::sync::RwLock<Arc<TurboQuantGateway>>>,
     config_path: &std::path::Path,
+    subagent_runner: &Arc<SubagentRunner>,
+    subagent_enabled: bool,
 ) -> Result<bool> {
+    let session_id = agent_session.session_id();
     match input {
         "/quit" | "/exit" | "/q" => {
             if messages.len() > 1 {
@@ -729,7 +815,7 @@ async fn handle_slash_command(
                     let topics: Vec<String> = messages.iter()
                         .filter(|m| m.role == Role::User && !m.content.is_empty())
                         .take(20)
-                        .map(|m| if m.content.len() > 150 { m.content[..150].to_string() } else { m.content.clone() })
+                        .map(|m| gzmo_core::text_util::truncate_chars(&m.content, 150))
                         .collect();
                     if !topics.is_empty() {
                         let fact = format!("[Session {}] Topics: {}", Utc::now().format("%Y-%m-%d %H:%M"), topics.join(" | "));
@@ -743,18 +829,26 @@ async fn handle_slash_command(
         }
         "/clear" | "/reset" => {
             messages.truncate(1);
-            *session_id = SessionManager::new_session_id();
+            let new_id = SessionManager::new_session_id();
+            agent_session.set_session_id(new_id.clone());
             *session_name = None;
-            eprintln!("  {DIM}⚙ Context cleared — new session {session_id}{RESET}");
+            if subagent_enabled {
+                reregister_delegate_tool(tools, subagent_runner, agent_session.session_id());
+            }
+            eprintln!("  {DIM}⚙ Context cleared — new session {new_id}{RESET}");
         }
         "/new" => {
             if messages.len() > 1 {
                 let _ = session_mgr.save(session_id, session_name.as_deref(), messages, session_created_at).await;
             }
             messages.truncate(1);
-            *session_id = SessionManager::new_session_id();
+            let new_id = SessionManager::new_session_id();
+            agent_session.set_session_id(new_id.clone());
             *session_name = None;
-            eprintln!("  {DIM}⚙ New session: {session_id}{RESET}");
+            if subagent_enabled {
+                reregister_delegate_tool(tools, subagent_runner, agent_session.session_id());
+            }
+            eprintln!("  {DIM}⚙ New session: {new_id}{RESET}");
         }
         "/resume" => {
             match session_mgr.most_recent().await {
@@ -762,8 +856,11 @@ async fn handle_slash_command(
                     let count = session.messages.len().saturating_sub(1);
                     let display = session.name.clone().unwrap_or_else(|| session.id.clone());
                     *messages = session.messages;
-                    *session_id = session.id;
+                    agent_session.set_session_id(session.id.clone());
                     *session_name = session.name;
+                    if subagent_enabled {
+                        reregister_delegate_tool(tools, subagent_runner, agent_session.session_id());
+                    }
                     eprintln!("  {DIM}⚙ Resumed: {display} ({count} messages){RESET}");
                 }
                 _ => eprintln!("  {DIM}⚙ No previous session found{RESET}"),
@@ -782,6 +879,7 @@ async fn handle_slash_command(
             let mode_str = match config.engine.active_mode {
                 EngineMode::Local => format!("{COPPER}LOCAL{RESET}"),
                 EngineMode::Cloud => format!("\x1b[38;2;100;200;255mCLOUD{RESET}"),
+                EngineMode::Sovereign => format!("\x1b[38;2;180;140;255mSOVEREIGN{RESET}"),
             };
             eprintln!("  {DIM}⚙ Session: {display} | Messages: {} | Mode: {} | Model: {}{RESET}",
                 messages.len(), mode_str, active.model);
@@ -794,11 +892,12 @@ async fn handle_slash_command(
                 let mode_str = match config.engine.active_mode {
                     EngineMode::Local => format!("{COPPER}⚙ LOCAL{RESET}"),
                     EngineMode::Cloud => format!("\x1b[38;2;100;200;255m☁ CLOUD{RESET}"),
+                    EngineMode::Sovereign => format!("\x1b[38;2;180;140;255m⚡ SOVEREIGN{RESET}"),
                 };
                 eprintln!("  Mode: {mode_str}");
                 eprintln!("  {DIM}Engine: {} → {}{RESET}", active.provider, active.url);
                 eprintln!("  {DIM}Model: {}{RESET}", active.model);
-                eprintln!("  {DIM}Usage: /mode local | /mode cloud{RESET}");
+                eprintln!("  {DIM}Usage: /mode local | /mode cloud | /mode sovereign{RESET}");
             } else {
                 match arg.parse::<EngineMode>() {
                     Ok(new_mode) => {
@@ -819,10 +918,17 @@ async fn handle_slash_command(
                                 _ => false,
                             };
 
-                            if !ping_ok && new_mode == EngineMode::Local {
+                            if !ping_ok
+                                && matches!(new_mode, EngineMode::Local | EngineMode::Sovereign)
+                            {
                                 eprintln!(" ✗");
-                                eprintln!("  {RED}⚙ Local engine not reachable at {}{RESET}", profile.url);
-                                eprintln!("  {DIM}  Start llama-server or LM Studio first, or run boot.sh{RESET}");
+                                eprintln!(
+                                    "  {RED}⚙ Engine not reachable at {}{RESET}",
+                                    profile.url
+                                );
+                                eprintln!(
+                                    "  {DIM}  Prime: :8000 | Sovereign: scripts in llama.cpp/prime-bench | embed: scripts/start-embed.sh{RESET}"
+                                );
                             } else {
                                 eprintln!(" ✓");
                                 // Build new gateway
@@ -841,6 +947,9 @@ async fn handle_slash_command(
                                 let mode_str = match new_mode {
                                     EngineMode::Local => format!("{COPPER}⚙ LOCAL{RESET}"),
                                     EngineMode::Cloud => format!("\x1b[38;2;100;200;255m☁ CLOUD{RESET}"),
+                                    EngineMode::Sovereign => {
+                                        format!("\x1b[38;2;180;140;255m⚡ SOVEREIGN{RESET}")
+                                    }
                                 };
                                 eprintln!("  Switched to: {mode_str}");
                                 eprintln!("  {DIM}Model: {} → {}{RESET}", profile.model, profile.url);
@@ -895,7 +1004,7 @@ async fn handle_slash_command(
                 if count > 0 {
                     if let Ok(recent) = v.recent(5) {
                         for (i, fact) in recent.iter().enumerate() {
-                            let display = if fact.len() > 100 { &fact[..100] } else { fact };
+                            let display = gzmo_core::text_util::truncate_chars(fact, 100);
                             eprintln!("  {DIM}  {}. {display}{RESET}", i + 1);
                         }
                     }
@@ -929,8 +1038,11 @@ async fn handle_slash_command(
                         let count = session.messages.len().saturating_sub(1);
                         let display = session.name.clone().unwrap_or_else(|| session.id.clone());
                         *messages = session.messages;
-                        *session_id = session.id;
+                        agent_session.set_session_id(session.id.clone());
                         *session_name = session.name;
+                        if subagent_enabled {
+                            reregister_delegate_tool(tools, subagent_runner, agent_session.session_id());
+                        }
                         eprintln!("  {DIM}⚙ Loaded: {display} ({count} messages){RESET}");
                     }
                     None => eprintln!("  {RED}⚙ Not found: {target}{RESET}"),
@@ -1075,6 +1187,7 @@ fn print_splash(config: &GzmoConfig, status: &str, latency: &str, vault_count: u
     let mode_tag = match config.engine.active_mode {
         gzmo_core::config::EngineMode::Local => "LOCAL",
         gzmo_core::config::EngineMode::Cloud => "CLOUD",
+        gzmo_core::config::EngineMode::Sovereign => "SOVEREIGN",
     };
     pl("⚙  The Incredible Mechanical Marvel  ⚙", copper);
     pl(&format!("Mode: {} · Rust · Sovereign", mode_tag), dim);

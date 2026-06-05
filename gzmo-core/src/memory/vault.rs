@@ -201,6 +201,20 @@ impl SqliteVault {
             init_conn.execute_batch("PRAGMA user_version = 5")?;
             info!("Applied schema migration v5: evidence + evidence_fts");
         }
+        let user_version: u32 = init_conn.query_row("PRAGMA user_version", [], |row| row.get(0))?;
+        if user_version < 6 {
+            init_conn.execute_batch(
+                "CREATE TABLE IF NOT EXISTS distill_dedup (
+                    dedup_key TEXT PRIMARY KEY,
+                    session_id TEXT NOT NULL,
+                    source TEXT NOT NULL,
+                    distilled_at TEXT NOT NULL,
+                    truths_count INTEGER NOT NULL DEFAULT 0
+                );",
+            )?;
+            init_conn.execute_batch("PRAGMA user_version = 6")?;
+            info!("Applied schema migration v6: distill_dedup");
+        }
 
 
         info!("Semantic vault initialized (WAL mode + r2d2 pool)");
@@ -646,8 +660,21 @@ impl SqliteVault {
             [],
             |r| r.get(0),
         )?;
-        let fts: i64 = conn.query_row("SELECT COUNT(*) FROM honeypot_fts", [], |r| r.get(0))?;
-        if hp > 0 && fts >= hp {
+        let fts_latest: i64 = conn.query_row(
+            "SELECT COUNT(*) FROM honeypot_fts f
+             JOIN honeypot h ON f.rowid = h.rowid
+             WHERE h.is_latest = 1",
+            [],
+            |r| r.get(0),
+        )?;
+        let fts_stale: i64 = conn.query_row(
+            "SELECT COUNT(*) FROM honeypot_fts f
+             JOIN honeypot h ON f.rowid = h.rowid
+             WHERE h.is_latest = 0",
+            [],
+            |r| r.get(0),
+        )?;
+        if hp > 0 && fts_latest == hp && fts_stale == 0 {
             return Ok(());
         }
         conn.execute_batch(
@@ -950,6 +977,37 @@ impl SqliteVault {
         }
     }
 
+    /// Returns true when this transcript was already distilled (archive worker + nightly cron dedup).
+    pub fn distill_dedup_seen(&self, dedup_key: &str) -> Result<bool> {
+        let conn = self.pool.get()?;
+        let n: i64 = conn.query_row(
+            "SELECT COUNT(*) FROM distill_dedup WHERE dedup_key = ?1",
+            params![dedup_key],
+            |r| r.get(0),
+        )?;
+        Ok(n > 0)
+    }
+
+    pub fn record_distill_dedup(
+        &self,
+        dedup_key: &str,
+        session_id: &str,
+        source: &str,
+        truths_count: usize,
+    ) -> Result<()> {
+        let conn = self.pool.get()?;
+        let now = Utc::now().to_rfc3339();
+        conn.execute(
+            "INSERT INTO distill_dedup (dedup_key, session_id, source, distilled_at, truths_count)
+             VALUES (?1, ?2, ?3, ?4, ?5)
+             ON CONFLICT(dedup_key) DO UPDATE SET
+                distilled_at = excluded.distilled_at,
+                truths_count = excluded.truths_count",
+            params![dedup_key, session_id, source, now, truths_count as i64],
+        )?;
+        Ok(())
+    }
+
 
     fn load_honeypot_candidate(&self, id: Uuid) -> Result<Option<RecallCandidate>> {
         let conn = self.pool.get()?;
@@ -1020,7 +1078,20 @@ impl SqliteVault {
             scored.truncate(limit);
             return;
         }
-        let docs: Vec<String> = scored.iter().map(|(f, _)| f.content.clone()).collect();
+        let docs: Vec<String> = scored
+            .iter()
+            .map(|(f, _)| {
+                let mut doc = f.content.clone();
+                if let Ok(Some(ev)) = self.get_evidence_text(f.id) {
+                    let ev = ev.trim();
+                    if !ev.is_empty() {
+                        doc.push_str("\n");
+                        doc.push_str(ev);
+                    }
+                }
+                doc
+            })
+            .collect();
         match rr.rerank(query_text, &docs, Some(limit)).await {
             Ok(order) => {
                 let mut reordered = Vec::with_capacity(order.len());

@@ -48,7 +48,7 @@ pub struct KgExtraction {
 
 #[derive(Debug, Clone, Deserialize)]
 struct Verdict {
-    index: usize,
+    index: i64,
     supported: bool,
     confidence: f64,
     #[serde(default)]
@@ -696,10 +696,40 @@ impl KgPromoter {
         relations: &[KgRelation],
         result: &VerificationResult,
     ) -> (Vec<VerifiedEntity>, Vec<VerifiedRelation>, VerifyStats) {
-        let e_verdicts: HashMap<usize, &Verdict> =
-            result.entity_verdicts.iter().map(|v| (v.index, v)).collect();
-        let r_verdicts: HashMap<usize, &Verdict> =
-            result.relation_verdicts.iter().map(|v| (v.index, v)).collect();
+        let e_verdicts: HashMap<usize, &Verdict> = result
+            .entity_verdicts
+            .iter()
+            .filter(|v| v.index >= 0)
+            .filter_map(|v| {
+                let idx = v.index as usize;
+                if idx < entities.len() {
+                    Some((idx, v))
+                } else {
+                    warn!(index = v.index, "Ignoring out-of-range entity verdict index");
+                    None
+                }
+            })
+            .collect();
+        let r_verdicts: HashMap<usize, &Verdict> = result
+            .relation_verdicts
+            .iter()
+            .filter(|v| v.index >= 0)
+            .filter_map(|v| {
+                let idx = v.index as usize;
+                if idx < relations.len() {
+                    Some((idx, v))
+                } else {
+                    warn!(index = v.index, "Ignoring out-of-range relation verdict index");
+                    None
+                }
+            })
+            .collect();
+        for v in result.entity_verdicts.iter().filter(|v| v.index < 0) {
+            warn!(index = v.index, "Ignoring invalid entity verdict index from verifier");
+        }
+        for v in result.relation_verdicts.iter().filter(|v| v.index < 0) {
+            warn!(index = v.index, "Ignoring invalid relation verdict index from verifier");
+        }
 
         let mut stats = VerifyStats::default();
         let mut kept_entities = Vec::new();
@@ -1146,5 +1176,85 @@ mod tests {
         ];
         let out = dedupe_relations(rels, &alias);
         assert_eq!(out.len(), 1);
+    }
+
+    #[test]
+    fn apply_verdicts_ignores_negative_and_out_of_range_indices() {
+        use std::sync::Arc;
+        use crate::gateway::{LlmGateway, LlmResponse, ToolDeclaration};
+        use crate::tools::ToolRegistry;
+        use crate::types::Message;
+        use async_trait::async_trait;
+
+        struct NoopGateway;
+
+        #[async_trait]
+        impl LlmGateway for NoopGateway {
+            async fn complete(
+                &self,
+                _: &[Message],
+                _: &[ToolDeclaration],
+            ) -> anyhow::Result<LlmResponse> {
+                anyhow::bail!("noop")
+            }
+            async fn complete_streaming(
+                &self,
+                _: &[Message],
+                _: &[ToolDeclaration],
+                _: Box<dyn Fn(String) + Send>,
+            ) -> anyhow::Result<LlmResponse> {
+                anyhow::bail!("noop")
+            }
+            async fn complete_structured(
+                &self,
+                _: &[Message],
+                _: &str,
+                _: serde_json::Value,
+            ) -> anyhow::Result<String> {
+                anyhow::bail!("noop")
+            }
+        }
+
+        let promoter = KgPromoter::new(
+            Arc::new(NoopGateway),
+            Arc::new(ToolRegistry::new()),
+            KgGateConfig {
+                min_confidence: 0.5,
+                require_evidence: false,
+                ..Default::default()
+            },
+        );
+        let entities = vec![KgEntity {
+            name: "Firewall Agent".into(),
+            entity_type: "AGENT".into(),
+            observations: vec!["Monitors network policy".into()],
+        }];
+        let result = VerificationResult {
+            entity_verdicts: vec![
+                Verdict {
+                    index: -1,
+                    supported: true,
+                    confidence: 0.99,
+                    evidence: "ignored negative index".into(),
+                },
+                Verdict {
+                    index: 99,
+                    supported: true,
+                    confidence: 0.99,
+                    evidence: "ignored out of range".into(),
+                },
+                Verdict {
+                    index: 0,
+                    supported: true,
+                    confidence: 0.95,
+                    evidence: "valid supporting quote here".into(),
+                },
+            ],
+            relation_verdicts: vec![],
+        };
+        let (kept, _, stats) = promoter.apply_verdicts(&entities, &[], &result);
+        assert_eq!(kept.len(), 1);
+        assert_eq!(kept[0].entity.name, "Firewall Agent");
+        assert_eq!(stats.entities_dropped, 0);
     }
 }

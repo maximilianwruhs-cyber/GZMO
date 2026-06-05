@@ -52,8 +52,11 @@ memscore:
   faithfulness_context_min: 0.90
   # Informational: claim verbatim-grounded in the raw archive (rises as golden is sentence-grounded).
   faithfulness_corpus_min: 0.80
-  # Honest algorithm recall (audit-valid facts, per-hit match). Informational until the RRF sprint.
-  recall_rrf_strict_min: null
+  # Honest algorithm recall (audit-valid facts, per-hit match) over the FULL denominator.
+  # Regression floor below the M0 milestone (31/87 ~= 0.356); post-tiered baseline is 38/87.
+  # certify-production-baseline.sh enforces this so "recall eval PASS" means a real bar, not
+  # just "the script ran". Raise as the store improves; keep below the demonstrated value.
+  recall_rrf_strict_min: 0.35
   judge_max_facts_default: 0          # 0 = all recalled facts
   # Back-compat alias used by older callers.
   faithfulness_judge_min: 0.90

@@ -105,6 +105,26 @@ def search_qdrant(vector: list[float]) -> list[dict]:
 STRICT_MIN_CHARS = 8
 
 
+def strict_claim_is_substantive(fact: str) -> bool:
+    """Reject hollow strict wins: keyword-length tokens or single-word stubs."""
+    stripped = fact.strip()
+    if len(stripped) < STRICT_MIN_CHARS:
+        return False
+    words = [w for w in re.findall(r"\w+", stripped) if w]
+    return len(words) >= 2 or len(stripped) >= 15
+
+# Mirror gzmo-core honeypot::qualifies_for_honeypot path exclusions. Facts from
+# these source files can never enter the honeypot, so strict recall on them is
+# structurally impossible — they must be reported on a separate track, not as a
+# retrieval miss.
+HONEYPOT_EXCLUDED_PATTERNS = ("chat_history", "chat_session", "quelltext", "sources")
+
+
+def is_honeypot_eligible_file(file_name: str) -> bool:
+    fn = (file_name or "").lower()
+    return not any(p in fn for p in HONEYPOT_EXCLUDED_PATTERNS)
+
+
 def hit_source_matches(hit: dict, file_name: str) -> bool:
     sf = hit.get("source_file")
     if not sf or not file_name:
@@ -132,7 +152,7 @@ def is_match(
         # Claim must appear within a SINGLE hit (no cross-hit substring), and be
         # long enough to be a claim rather than a keyword. With require_source,
         # that hit must also be cited from the probe's own file.
-        if len(fact.strip()) < STRICT_MIN_CHARS:
+        if not strict_claim_is_substantive(fact):
             return False
         norm_fact = " ".join(fact.lower().split())
         for h in hits or []:
@@ -258,6 +278,11 @@ def main():
     total_facts = 0
     recalled_facts_count = 0
     lost_facts_list = []
+    # F3: segment strict recall by honeypot eligibility (scope-aware denominator).
+    eligible_total = 0
+    eligible_recalled = 0
+    excluded_total = 0
+    excluded_recalled = 0
     
     eval_files = []
     
@@ -332,12 +357,22 @@ def main():
                     # strict track: skip facts the golden audit marked invalid
                     continue
                 total_facts += 1
-                if is_match(
+                eligible = is_honeypot_eligible_file(filename)
+                matched = is_match(
                     fact_text, concat_text, args.match, hits,
                     file_name=filename, require_source=args.require_source_match,
-                ):
+                )
+                if eligible:
+                    eligible_total += 1
+                else:
+                    excluded_total += 1
+                if matched:
                     recalled_facts_count += 1
                     recalled.append(fact_text)
+                    if eligible:
+                        eligible_recalled += 1
+                    else:
+                        excluded_recalled += 1
                 else:
                     lost.append(fact_text)
                     # Find best snippet in hits for logging
@@ -369,6 +404,18 @@ def main():
             
     recall_at_5 = recalled_facts_count / total_facts if total_facts > 0 else 1.0
     print(f"\nEvaluation complete. Recall@5: {recall_at_5:.4f} ({recalled_facts_count}/{total_facts} facts)")
+
+    eligible_recall = eligible_recalled / eligible_total if eligible_total > 0 else 1.0
+    excluded_recall = excluded_recalled / excluded_total if excluded_total > 0 else 0.0
+    if args.match == "strict":
+        print(
+            f"  honeypot-eligible: {eligible_recall:.4f} "
+            f"({eligible_recalled}/{eligible_total})  <- scope-aware strict recall"
+        )
+        print(
+            f"  excluded-source:   {excluded_recall:.4f} "
+            f"({excluded_recalled}/{excluded_total})  <- structurally unreachable (qualifies_for_honeypot)"
+        )
     
     # Save the recall baseline report
     date_str = datetime.now().strftime("%Y%m%d")
@@ -395,6 +442,11 @@ def main():
         "recall_at_5": recall_at_5,
         "recalled": recalled_facts_count,
         "total": total_facts,
+        "recall_at_5_honeypot_eligible": eligible_recall,
+        "eligible_recalled": eligible_recalled,
+        "eligible_total": eligible_total,
+        "excluded_recalled": excluded_recalled,
+        "excluded_total": excluded_total,
         "timestamp": datetime.now().isoformat(timespec="seconds"),
     }
 
