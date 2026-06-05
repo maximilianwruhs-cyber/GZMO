@@ -95,6 +95,13 @@ fn format_entry(entry: &EpisodicEntry) -> String {
             entry.content
         ),
         EpisodicSource::InternalMonologue => "🧠 INTERNAL",
+        EpisodicSource::SessionDistill { session_id } => {
+            return format!(
+                "\n### 📓 SESSION {session_id} — {}\n{}\n",
+                entry.timestamp.format("%H:%M:%S"),
+                entry.content
+            );
+        }
     };
 
     format!(

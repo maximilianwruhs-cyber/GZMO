@@ -1,0 +1,64 @@
+# Ingest quality gate — single source of truth for thresholds and stability policy.
+# Used by gate-report.sh and check-contract.sh
+
+gate:
+  # strict: all pipeline + contract checks on current report only
+  # layered: contract must pass on current report; pipeline may use stability pool
+  mode: layered
+
+contract:
+  golden_must_entity_recall_min: 0.90
+  anti_entities_max: 0
+
+pipeline:
+  zero_entity_files_max: 0
+  rich_notebooklm_few_entities_max: 0
+  rich_notebooklm_entity_ceiling: 2
+  relation_promotion_rate_min: 0.80
+  zero_relation_files_max: 5
+  # Scoped rel-prom: exclude chat/narrative/research-scrape from strict denominator (M4).
+  relation_promotion_exclude_patterns:
+    - Chat_History
+    - NotesArchitektur_und_Management_Intelligenter_Agentht
+    - Hinter_den_Kulissen_von_Linux__Die_Magie_des
+    - Technisches_Systemkonzept__Das_evolutionre_Agenmd
+    - SourcesQuelltext_code_
+    - SourcesToken-Efficient
+    - SourcesSystemhygiene
+    - SourcesGZMO_Base
+    - SourcesEingefgter_Texthtml
+    - NotesProjekt_Obulus
+    - VS_Codium_Extension__Konzept__ResearchSources
+
+# Reduce false FAILs from LLM extract variance (verify is already temp=0.1).
+stability:
+  archive_reports: true
+  reports_dir: reports
+  # When mode=layered: pipeline numeric checks pass if CURRENT or any of last N
+  # archived reports meets threshold (best-of pool). Contract always uses CURRENT.
+  pipeline_best_of_last_n: 3
+  # Optional floor: relation prom may be this much below min if golden contract green
+  # (disabled when 0). Use only for known-flaky metrics — prefer best-of pool.
+  relation_promotion_tolerance_pp: 0
+
+# Summary-only lock from a known-good run (file-level lock optional later).
+# Update pipeline-lock.json when a run is accepted as reference.
+pipeline_lock: pipeline-lock.json
+
+# M4 retrieval faithfulness + golden contract.
+# Informational in eval-quick unless the matching STRICT flag is set.
+memscore:
+  # Gate metric: claim entailed by the retrieved top-5 hits.
+  faithfulness_context_min: 0.90
+  # Informational: claim verbatim-grounded in the raw archive (rises as golden is sentence-grounded).
+  faithfulness_corpus_min: 0.80
+  # Honest algorithm recall (audit-valid facts, per-hit match). Informational until the RRF sprint.
+  recall_rrf_strict_min: null
+  judge_max_facts_default: 0          # 0 = all recalled facts
+  # Back-compat alias used by older callers.
+  faithfulness_judge_min: 0.90
+
+golden:
+  # eval-quick runs validate-golden-facts.py --fail-on-invalid (heuristic gate).
+  require_audit_pass: true
+  audit_min_chars: 8

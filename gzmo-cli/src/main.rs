@@ -3,13 +3,25 @@
 //! Thin binary shell. All logic lives in `gzmo-core`.
 
 mod chat;
+mod cli_mcp;
 mod daemon_cmd;
+mod dream_cmd;
+mod spark_cmd;
+mod ingest_cmd;
+mod ingest_dir_cmd;
+mod health_cmd;
+mod memory_cmd;
+mod profile_cmd;
+mod embed_cmd;
+mod distill_cmd;
 mod init_cmd;
+mod ingest_eval_cmd;
 #[allow(dead_code)]
 mod ui;
 pub mod tui;
 
 use anyhow::Result;
+use chrono::NaiveDate;
 use tracing_subscriber::EnvFilter;
 use gzmo_core::memory::vault::SqliteVault;
 
@@ -17,8 +29,20 @@ enum Command {
     Chat,
     ChatRepl,  // Legacy REPL mode via --repl flag
     Daemon,
+    /// One-shot dream consolidation for an optional date (default: today).
+    Dream(Option<NaiveDate>),
+    /// One-shot spark (serendipitous recall) for an optional date (default: today).
+    Spark(Option<NaiveDate>),
+    Ingest { path: std::path::PathBuf, dry_run: bool },
+    IngestDir(std::path::PathBuf),
+    IngestEval(std::path::PathBuf),
     Init,
     MemoryDump,
+    MemoryEmbed(Option<usize>),
+    Memory(Vec<String>),
+    Distill(Option<String>),
+    Health,
+    Profile(Vec<String>),
 }
 
 fn parse_args() -> Command {
@@ -27,10 +51,62 @@ fn parse_args() -> Command {
         if args[1] == "daemon" { return Command::Daemon; }
         if args[1] == "init" { return Command::Init; }
         if args[1] == "--repl" { return Command::ChatRepl; }
-        if args[1] == "memory" && args.get(2).map(|s| s.as_str()) == Some("dump") {
-            return Command::MemoryDump;
+        if args[1] == "dream" {
+            let date = args.get(2).and_then(|s| NaiveDate::parse_from_str(s, "%Y-%m-%d").ok());
+            return Command::Dream(date);
+        }
+        if args[1] == "spark" {
+            let date = args.get(2).and_then(|s| NaiveDate::parse_from_str(s, "%Y-%m-%d").ok());
+            return Command::Spark(date);
+        }
+        if args[1] == "ingest" {
+            let mut dry_run = false;
+            let mut path: Option<std::path::PathBuf> = None;
+            for a in args.iter().skip(2) {
+                if a == "--dry-run" {
+                    dry_run = true;
+                } else if path.is_none() {
+                    path = Some(std::path::PathBuf::from(a));
+                }
+            }
+            return Command::Ingest {
+                path: path.unwrap_or_else(|| std::path::PathBuf::from(".")),
+                dry_run,
+            };
+        }
+        if args[1] == "ingest-dir" {
+            let Some(path_arg) = args.get(2) else {
+                eprintln!("Usage: gzmo ingest-dir <directory>");
+                std::process::exit(1);
+            };
+            return Command::IngestDir(std::path::PathBuf::from(path_arg));
+        }
+        if args[1] == "ingest-eval" {
+            let Some(path_arg) = args.get(2) else {
+                eprintln!("Usage: gzmo ingest-eval <file_or_directory>");
+                std::process::exit(1);
+            };
+            return Command::IngestEval(std::path::PathBuf::from(path_arg));
+        }
+        if args[1] == "memory" {
+            if args.get(2).map(|s| s.as_str()) == Some("dump") {
+                return Command::MemoryDump;
+            }
+            if args.get(2).map(|s| s.as_str()) == Some("embed") {
+                let limit = args.get(3).and_then(|s| s.parse().ok());
+                return Command::MemoryEmbed(limit);
+            }
+            return Command::Memory(args[2..].to_vec());
         }
         if args[1] == "dump" { return Command::MemoryDump; }
+        if args[1] == "distill" {
+            let id = args.get(2).cloned();
+            return Command::Distill(id);
+        }
+        if args[1] == "health" { return Command::Health; }
+        if args[1] == "profile" {
+            return Command::Profile(args[2..].to_vec());
+        }
     }
     Command::Chat
 }
@@ -42,11 +118,22 @@ async fn main() -> Result<()> {
     let default_filter = match command {
         Command::Chat | Command::ChatRepl => "warn",
         Command::Daemon => "info",
+        Command::Dream(_) => "info",
+        Command::Spark(_) => "info",
+        Command::Ingest { .. } => "info",
+        Command::IngestDir(_) => "info",
+        Command::IngestEval(_) => "info",
         Command::Init => "warn",
         Command::MemoryDump => "info",
+        Command::MemoryEmbed(_) => "info",
+        Command::Memory(_) => "warn",
+        Command::Distill(_) => "info",
+        Command::Health => "warn",
+        Command::Profile(_) => "warn",
     };
 
     tracing_subscriber::fmt()
+        .with_writer(std::io::stderr)
         .with_env_filter(
             EnvFilter::try_from_default_env()
                 .unwrap_or_else(|_| EnvFilter::new(default_filter)),
@@ -100,6 +187,11 @@ async fn main() -> Result<()> {
             let _ = std::fs::remove_file(&pid_file);
             res
         },
+        Command::Dream(date) => dream_cmd::run(&config, identity, date).await,
+        Command::Spark(date) => spark_cmd::run(&config, identity, date).await,
+        Command::Ingest { path, dry_run } => ingest_cmd::run(&config, identity, path, dry_run).await,
+        Command::IngestDir(path) => ingest_dir_cmd::run(&config, identity, path).await,
+        Command::IngestEval(path) => ingest_eval_cmd::run(&config, identity, path).await,
         Command::Init => unreachable!(),
         Command::MemoryDump => {
             println!("Exporting Native Vault to Markdown...");
@@ -107,5 +199,10 @@ async fn main() -> Result<()> {
             vault.dump_to_markdown(&config.memory.directory).await?;
             Ok(())
         }
+        Command::MemoryEmbed(limit) => embed_cmd::run(&config, &identity, limit).await,
+        Command::Memory(sub) => memory_cmd::run(&config, sub).await,
+        Command::Distill(session_id) => distill_cmd::run(&config, &identity, session_id).await,
+        Command::Health => health_cmd::run(&config, identity).await,
+        Command::Profile(args) => profile_cmd::run(&config, &args).await,
     }
 }

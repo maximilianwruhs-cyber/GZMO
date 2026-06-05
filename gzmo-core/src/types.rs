@@ -33,11 +33,17 @@ pub struct SemanticFact {
     #[serde(default = "default_confidence")]
     pub confidence: f64,
     pub confirmation_count: u32,
+    #[serde(default = "default_semantic_decay_class")]
+    pub decay_class: String,
     pub created_at: DateTime<Utc>,
     pub last_accessed_at: DateTime<Utc>,
 }
 
 fn default_confidence() -> f64 { 1.0 }
+
+fn default_semantic_decay_class() -> String {
+    "Episodic".to_string()
+}
 
 /// Classification of memory decay rates (Atkinson-Shiffrin model).
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
@@ -46,6 +52,8 @@ pub enum DecayClass {
     Episodic,
     /// Partially structured research — 60 day half-life
     CuratedVault,
+    /// Distilled chat session observations — 60 day half-life
+    SessionDistill,
     /// Job titles, current project — 139 day half-life
     FlexibleIdentity,
     /// Birthdate, legal name — 693 day half-life
@@ -58,7 +66,7 @@ impl DecayClass {
     pub fn half_life_days(&self) -> f64 {
         match self {
             Self::Episodic => 30.0,
-            Self::CuratedVault => 60.0,
+            Self::CuratedVault | Self::SessionDistill => 60.0,
             Self::FlexibleIdentity => 139.0,
             Self::AbsoluteIdentity => 693.0,
             Self::Structural => f64::INFINITY,
@@ -81,11 +89,21 @@ pub enum EpisodicSource {
     HeartbeatCheck,
     ToolExecution { tool_name: String },
     InternalMonologue,
+    /// Gated distill from `data/sessions/*.json` (feeds dream, not ops meta).
+    SessionDistill { session_id: String },
 }
 
 // ---------------------------------------------------------------------------
 // Dreaming
 // ---------------------------------------------------------------------------
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct EvidenceSpan {
+    pub evidence_text: String,      // sentence-window text stored in DB
+    pub quote_verifier: String,     // raw verifier quote
+    pub char_start: Option<usize>,
+    pub char_end: Option<usize>,
+}
 
 /// A "Truth" extracted during the Deep Phase of the autoDream cycle.
 /// This is the atomic unit of permanent semantic knowledge.
@@ -97,7 +115,13 @@ pub struct ExtractedTruth {
     pub mmr_score: f32,
     pub source_date: chrono::NaiveDate,
     pub decay_class: DecayClass,
+    /// Ingest filename for wave-scoped purge (None for dreams / session distill).
+    #[serde(default)]
+    pub source_file: Option<String>,
+    #[serde(default)]
+    pub evidence: Option<EvidenceSpan>,
 }
+
 
 // ---------------------------------------------------------------------------
 // Skills

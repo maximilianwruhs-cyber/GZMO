@@ -50,3 +50,6 @@ uuid = { version = "1", features = ["v4", "serde"] }
 
 # SSE streaming
 futures-util = "0.3"
+
+# Scratch cache + distill queue
+redis = { version = "0.27", features = ["tokio-comp", "connection-manager"] }
