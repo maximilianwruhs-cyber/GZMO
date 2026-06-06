@@ -1,5 +1,5 @@
 use color_eyre::Result;
-use crossterm::event::{Event, KeyCode, KeyEventKind};
+use crossterm::event::{Event, KeyCode, KeyEventKind, MouseEventKind};
 use ratatui::{
     layout::{Alignment, Rect},
     style::{Color, Style},
@@ -93,6 +93,12 @@ impl Component for PaletteComponent {
                     _ => {}
                 }
             }
+        } else if let Some(Event::Mouse(mouse)) = event {
+            match mouse.kind {
+                MouseEventKind::ScrollUp => self.previous(),
+                MouseEventKind::ScrollDown => self.next(),
+                _ => {}
+            }
         }
         Ok(None) // Absorb event — palette is modal
     }
@@ -122,10 +128,9 @@ impl Component for PaletteComponent {
         // Clear underlying content for proper z-ordering
         f.render_widget(Clear, palette_area);
 
-        let items_iter = self
-            .items
-            .iter()
-            .map(|i| ListItem::new(i.as_str()).style(Style::default().fg(Color::Rgb(201, 209, 217))));
+        let items_iter = self.items.iter().map(|i| {
+            ListItem::new(i.as_str()).style(Style::default().fg(Color::Rgb(201, 209, 217)))
+        });
 
         let list = List::new(items_iter)
             .block(
