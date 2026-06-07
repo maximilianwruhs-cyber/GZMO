@@ -1,5 +1,5 @@
 use color_eyre::Result;
-use crossterm::event::{Event, KeyCode, KeyEventKind};
+use crossterm::event::{Event, KeyCode, KeyEventKind, MouseEventKind};
 use ratatui::{
     layout::{Alignment, Rect},
     style::{Color, Style},
@@ -70,28 +70,42 @@ impl Component for PaletteComponent {
             return Ok(None);
         }
 
-        if let Some(Event::Key(key)) = event {
-            if key.kind == KeyEventKind::Press {
-                match key.code {
-                    KeyCode::Esc => {
-                        self.is_active = false;
-                        return Ok(Some(Action::ToggleCommandPalette));
-                    }
-                    KeyCode::Down => self.next(),
-                    KeyCode::Up => self.previous(),
-                    KeyCode::Enter => {
-                        if let Some(idx) = self.state.selected() {
-                            let cmd = self.items[idx]
-                                .split_whitespace()
-                                .next()
-                                .unwrap_or("")
-                                .to_string();
-                            self.is_active = false;
-                            return Ok(Some(Action::SubmitInput(cmd)));
+        if let Some(event) = event {
+            match event {
+                Event::Key(key) => {
+                    if key.kind == KeyEventKind::Press {
+                        match key.code {
+                            KeyCode::Esc => {
+                                self.is_active = false;
+                                return Ok(Some(Action::ToggleCommandPalette));
+                            }
+                            KeyCode::Down => self.next(),
+                            KeyCode::Up => self.previous(),
+                            KeyCode::Enter => {
+                                if let Some(idx) = self.state.selected() {
+                                    let cmd = self.items[idx]
+                                        .split_whitespace()
+                                        .next()
+                                        .unwrap_or("")
+                                        .to_string();
+                                    self.is_active = false;
+                                    return Ok(Some(Action::SubmitInput(cmd)));
+                                }
+                            }
+                            _ => {}
                         }
                     }
-                    _ => {}
                 }
+                Event::Mouse(mouse) => match mouse.kind {
+                    MouseEventKind::ScrollUp => {
+                        self.previous();
+                    }
+                    MouseEventKind::ScrollDown => {
+                        self.next();
+                    }
+                    _ => {}
+                },
+                _ => {}
             }
         }
         Ok(None) // Absorb event — palette is modal
