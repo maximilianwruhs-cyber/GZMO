@@ -131,16 +131,21 @@ impl ThoughtCabinet {
         crystallized
     }
 
-    /// Calculate the mutation and apply it permanently
+    /// Calculate the mutation and apply it permanently.
+    ///
+    /// Crystallization impulses on `lorenz_rho_mod` (Δρ): joke −0.2, quote +0.3,
+    /// poem +0.1, story +0.5, persona +0.8. Per-tick decay (1−k)ρ_mod runs in
+    /// `pulse.rs`. See `docs/CHAOS_RHO_CONTROL_MODEL.md`.
     fn crystallize(&mut self, thought: &IncubatingThought) -> CrystallizationEvent {
         let mutation = match thought.category.as_str() {
             "joke" => {
-                // Humor lightens gravity
+                // Negative Δρ impulse (semantic counterweight to story/persona forcing)
                 self.mutations.gravity_mod -= 0.1;
+                self.mutations.lorenz_rho_mod -= 0.2;
                 MutationEffect {
-                    target: "gravity".to_string(),
+                    target: "gravity+rho".to_string(),
                     delta: -0.1,
-                    description: "Humor lightens the engine's gravitational pull".to_string(),
+                    description: "Humor lightens gravity and cools attractor intensity".to_string(),
                 }
             }
             "quote" => {
@@ -258,6 +263,15 @@ impl ThoughtCabinet {
         self.slots.iter().filter_map(|s| s.as_ref()).collect()
     }
 
+    /// Leaky integrator dissipation: ρ_mod ← (1−k)·ρ_mod each tick (k from `ChaosConfig.rho_decay_k`).
+    pub fn apply_rho_decay(&mut self, k: f64) {
+        if k <= 0.0 {
+            return;
+        }
+        self.mutations.lorenz_rho_mod *= 1.0 - k;
+        self.mutations.lorenz_rho_mod = self.mutations.lorenz_rho_mod.clamp(-10.0, 10.0);
+    }
+
     /// Number of occupied slots
     pub fn occupied_slots(&self) -> usize {
         self.slots.iter().filter(|s| s.is_some()).count()
@@ -272,5 +286,34 @@ impl ThoughtCabinet {
 impl Default for ThoughtCabinet {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn joke_cools_rho() {
+        let mut cabinet = ThoughtCabinet::new();
+        cabinet.mutations.lorenz_rho_mod = 3.0;
+        assert!(cabinet.try_absorb("joke", "test", 0, 0.9));
+        for _ in 0..15 {
+            cabinet.tick();
+        }
+        assert!((cabinet.mutations.lorenz_rho_mod - 2.8).abs() < f64::EPSILON);
+    }
+
+    #[test]
+    fn rho_decay_halves_over_half_life() {
+        let mut cabinet = ThoughtCabinet::new();
+        cabinet.mutations.lorenz_rho_mod = 8.0;
+        let k = 0.001_f64;
+        let half_life = (0.693_f64 / k).round() as u64;
+        for _ in 0..half_life {
+            cabinet.apply_rho_decay(k);
+        }
+        assert!(cabinet.mutations.lorenz_rho_mod < 4.5);
+        assert!(cabinet.mutations.lorenz_rho_mod > 3.5);
     }
 }

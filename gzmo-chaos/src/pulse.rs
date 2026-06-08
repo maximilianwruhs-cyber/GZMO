@@ -10,6 +10,10 @@
 ///
 /// The snapshot is the read-only interface for skills, the REPL, the orchestrator,
 /// and any external diagnostic tools.
+///
+/// Synapse observability: do not publish chaos heartbeat events to `SynapseBus`
+/// until `PulseLoop` runs in daemon mode. Today it only starts in chat/TUI;
+/// `daemon_cmd.rs` sets `chaos_feedback_tx: None`.
 
 use std::path::PathBuf;
 use std::sync::{Arc, atomic::{AtomicU64, AtomicBool, Ordering}};
@@ -47,6 +51,11 @@ pub struct ChaosSnapshot {
     pub thoughts_crystallized: u32,
     pub mutations: Mutations,
 
+    // ρ control telemetry (see docs/CHAOS_RHO_CONTROL_MODEL.md)
+    pub rho_effective: f64,   // 28.0 + lorenz_rho_mod
+    pub rho_mod_delta: f64,   // Δρ_mod since previous tick
+    pub rho_forcing_sign: i8, // sign(Δρ_mod): −1 decay/negative impulse, +1 positive impulse, 0 steady
+
     // Derived LLM parameters — computed from Lorenz coordinates
     pub llm_temperature: f32,
     pub llm_max_tokens: u32,
@@ -75,6 +84,9 @@ impl Default for ChaosSnapshot {
             thoughts_incubating: 0,
             thoughts_crystallized: 0,
             mutations: Mutations::default(),
+            rho_effective: 28.0,
+            rho_mod_delta: 0.0,
+            rho_forcing_sign: 0,
             llm_temperature: 0.6,
             llm_max_tokens: 256,
             llm_valence: 0.0,
@@ -99,6 +111,9 @@ pub struct ChaosConfig {
     pub lore_path: Option<PathBuf>,
     #[serde(default)]
     pub events: EventChances,
+    /// Leaky-integrator gain k: ρ_mod ← (1−k)·ρ_mod per tick. 0.0 disables decay.
+    #[serde(default = "default_rho_decay_k")]
+    pub rho_decay_k: f64,
 }
 
 /// Probability windows for auto-lore emission per tick
@@ -129,6 +144,7 @@ fn default_tension() -> f64 { 0.0 }
 fn default_joke_chance() -> f64 { 0.3 }
 fn default_quote_chance() -> f64 { 0.4 }
 fn default_fact_chance() -> f64 { 0.3 }
+fn default_rho_decay_k() -> f64 { 0.001 }
 
 impl Default for ChaosConfig {
     fn default() -> Self {
@@ -139,6 +155,7 @@ impl Default for ChaosConfig {
             initial_tension: default_tension(),
             lore_path: None,
             events: EventChances::default(),
+            rho_decay_k: default_rho_decay_k(),
         }
     }
 }
@@ -311,6 +328,7 @@ impl PulseLoop {
         );
 
         let mut interval = tokio::time::interval(TICK_INTERVAL);
+        let mut prev_rho_mod = 0.0_f64;
 
         loop {
             interval.tick().await;
@@ -373,6 +391,20 @@ impl PulseLoop {
                 );
             }
 
+            // ρ_mod leaky integrator: (1-k)*ρ_mod per tick after crystallization impulses
+            self.cabinet.apply_rho_decay(self.config.rho_decay_k);
+
+            let rho_mod = self.cabinet.mutations.lorenz_rho_mod;
+            let rho_mod_delta = rho_mod - prev_rho_mod;
+            let rho_forcing_sign = if rho_mod_delta > 1e-9 {
+                1
+            } else if rho_mod_delta < -1e-9 {
+                -1
+            } else {
+                0
+            };
+            prev_rho_mod = rho_mod;
+
             let last_crystallization = crystallizations.into_iter().last();
 
             // 6. Compute derived LLM parameters from Lorenz coordinates
@@ -395,6 +427,9 @@ impl PulseLoop {
                 thoughts_incubating: self.cabinet.occupied_slots() as u8,
                 thoughts_crystallized: self.cabinet.mutations.total_crystallized,
                 mutations: self.cabinet.mutations.clone(),
+                rho_effective: 28.0 + rho_mod,
+                rho_mod_delta,
+                rho_forcing_sign,
                 llm_temperature,
                 llm_max_tokens,
                 llm_valence,

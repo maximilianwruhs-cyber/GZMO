@@ -1,0 +1,149 @@
+# Chaos Engine — ρ Control Model (Engineering Spec)
+
+**Replaces mythological framing** in [`LIMIT_CYCLE_BLUEPRINT.md`](../gzmo-chaos/LIMIT_CYCLE_BLUEPRINT.md) for implementation and review.  
+**Revision history:** [`CHAOS_RHO_HOMEOSTASIS_REVISION_REPORT.md`](CHAOS_RHO_HOMEOSTASIS_REVISION_REPORT.md)
+
+---
+
+## 1. What this system actually is
+
+`gzmo-chaos` couples two layers:
+
+1. **Plant (continuous):** Lorenz ODE integrated at 174 BPM; control parameter  
+   \(\rho = 28.0 + \rho_{\mathrm{mod}}\).
+2. **Accumulator (discrete):** `lorenz_rho_mod` updated by Thought Cabinet crystallization events (impulses) and per-tick decay (dissipation).
+
+Semantic content does not create a limit cycle in \((x,y,z)\). It creates **bounded parameter feedback with bursty semantic forcing** on \(\rho_{\mathrm{mod}}\) — the same class of problem as Lorenz Rayleigh-number (\(\rho\)) control in classical and ML literature (parameter feedback / backstepping / restorative perturbations).
+
+---
+
+## 2. State and dynamics
+
+### State variables
+
+| Symbol | Code | Meaning |
+|--------|------|---------|
+| \(\rho_{\mathrm{mod}}\) | `mutations.lorenz_rho_mod` | Additive offset to Lorenz \(\rho\); clamped to \([-10, 10]\) |
+| \(\rho\) | `lorenz.rho` | \(28.0 + \rho_{\mathrm{mod}}\) |
+| \(k\) | `config.rho_decay_k` | Per-tick multiplicative decay gain |
+
+### Discrete-time update (per PulseLoop tick)
+
+After crystallization events on tick \(n\):
+
+\[
+\rho_{\mathrm{mod}}[n^+] = \mathrm{clamp}\Big(\rho_{\mathrm{mod}}[n^-] + \sum_i \Delta\rho_i,\; [-10, 10]\Big)
+\]
+
+\[
+\rho_{\mathrm{mod}}[n+1] = \mathrm{clamp}\big((1 - k)\,\rho_{\mathrm{mod}}[n^+],\; [-10, 10]\big)
+\]
+
+Crystallization impulses \(\Delta\rho_i\) (examples):
+
+| Event category | \(\Delta\rho\) |
+|----------------|----------------|
+| joke | \(-0.2\) |
+| quote | \(+0.3\) |
+| poem | \(+0.1\) |
+| story | \(+0.5\) |
+| persona | \(+0.8\) |
+
+### Steady state (design intent)
+
+Under mean impulse rate \(\mathbb{E}[\sum \Delta\rho]\) per tick, equilibrium approximately satisfies:
+
+\[
+\mathbb{E}\!\left[\sum \Delta\rho\right] \approx k \cdot \rho_{\mathrm{mod}}^{\*}
+\]
+
+Half-life of decay-only response: \(t_{1/2} \approx \ln(2)/k\) ticks (\(k{=}0.001 \Rightarrow\) ~693 ticks ≈ 4 min at 174 BPM).
+
+### Coupled output
+
+Lorenz coordinates map to LLM parameters via normalized clamps on \(x,y,z\). **Failure mode** when \(\rho_{\mathrm{mod}} \to 10\): normalization saturates → temperature/valence lose dynamic range (not ODE divergence).
+
+---
+
+## 3. Terminology map (retire mythological terms)
+
+Use **engineering column** in code comments, docs, and PRs.
+
+| Avoid (myth / blueprint) | Use instead (engineering) |
+|--------------------------|---------------------------|
+| Limit cycle in phase space | Bounded \(\rho_{\mathrm{mod}}\) under impulse + decay; Lorenz remains chaotic in operating band |
+| Breathing | Parameter relaxation with bursty crystallization forcing |
+| Inhale | Positive \(\Delta\rho\) impulse (crystallization) |
+| Exhale | Multiplicative decay \((1-k)\rho_{\mathrm{mod}}\) |
+| Tao / Jing-Jang | *(omit)* |
+| Cosmological engine | Semantic-to-parameter coupling loop |
+| Digital nucleosynthesis | Crystallization → permanent control-parameter mutation |
+| Suicide machine | Open-loop accumulation → saturation / output clipping |
+| Soul of the engine | Dynamic range of derived LLM control outputs |
+| Heartbeat / Pulse (metaphor) | `PulseLoop` tick scheduler (174 BPM) |
+| Cycle phase (Inhale/Exhale) | \(\mathrm{sign}(\Delta\rho_{\mathrm{mod}})\) or \(\rho_{\mathrm{mod}} - \rho_{\mathrm{mod}}^{\mathrm{baseline}}\) *(not yet in `ChaosSnapshot`)* |
+
+---
+
+## 4. Implemented control law (2026-06-08)
+
+| Component | Location | Value |
+|-----------|----------|-------|
+| Decay gain \(k\) | `pulse.rs`, `gzmo.toml` `[chaos].rho_decay_k` | `0.001` (set `0.0` to disable) |
+| Joke impulse | `thoughts.rs` crystallize | \(\Delta\rho = -0.2\) |
+| Clamp | `thoughts.rs` | \(\rho_{\mathrm{mod}} \in [-10, 10]\) |
+
+**Validation:** unit tests, `chaos-breathing-lab` discrete sim, live CLI (see revision report).
+
+**Not implemented:** nonlinear restoring term \(k(\rho_{\mathrm{mod}})\), \(\rho_{\mathrm{mod}}\) telemetry in snapshot, Synapse export, daemon `PulseLoop`.
+
+---
+
+## 5. Observability (engineering roadmap)
+
+| Metric | Definition | Status |
+|--------|------------|--------|
+| `rho_mod` | Current accumulator | In `ChaosSnapshot.mutations` |
+| `rho_effective` | \(28 + \rho_{\mathrm{mod}}\) | Derivable |
+| `rho_mod_delta` | \(\rho_{\mathrm{mod}}[n] - \rho_{\mathrm{mod}}[n-1]\) | **In `ChaosSnapshot`** |
+| `rho_effective` | \(28 + \rho_{\mathrm{mod}}\) | **In `ChaosSnapshot`** |
+| `rho_forcing_sign` | \(\mathrm{sign}(\rho_{\mathrm{mod\_delta}})\) ∈ \(\{-1,0,+1\}\) | **In `ChaosSnapshot`** |
+
+Synapse export of these fields deferred until daemon runs `PulseLoop`.
+
+---
+
+## 6. Extensions (math-first, not myth-first)
+
+| Goal | Control-theoretic form |
+|------|------------------------|
+| Slower mood, same stability | Reduce \(k\) or add negative \(\Delta\rho\) on more categories |
+| Faster recovery after bursts | Increase \(k\) or rebirth scaling \(\rho_{\mathrm{mod}} \leftarrow \alpha \rho_{\mathrm{mod}}\) on energy rebirth |
+| Stronger restoration far from baseline | \( \rho_{\mathrm{mod}} \leftarrow (1 - k(1 + \alpha|\rho_{\mathrm{mod}}|))\rho_{\mathrm{mod}} \) |
+| True oscillation | Two-state or hysteresis scheduler on \(\rho_{\mathrm{mod}}\) (relaxation oscillator) — only if product needs periodic rhythm |
+
+---
+
+## 7. Relation to `LIMIT_CYCLE_BLUEPRINT.md`
+
+Keep the blueprint file as **historical / lore artifact**. All new work should cite **this document** for ρ behavior, tests, and config.
+
+---
+
+## 8. Deployment stance — Path A (chosen)
+
+**Decision:** Keep **in-loop chaos** — `PulseLoop` drives Lorenz state and derived LLM parameters in chat/TUI. Scheduler-only spontaneity ([`gzmo-rebuild`](../../../gzmo-rebuild/README.md) Path B) is **not** the primary architecture.
+
+| Path A commitment | Status |
+|-------------------|--------|
+| ρ leaky integrator + crystallization impulses | Shipped |
+| Engineering terminology (`CHAOS_RHO_CONTROL_MODEL.md`) | Canonical |
+| `rho_mod_delta` / `rho_effective` / `rho_forcing_sign` in snapshot | Shipped |
+| Daemon `PulseLoop` + Synapse | Future |
+| `edge-node` TS parity | Mirror updated; runtime verify pending |
+
+**Next work on Path A:** focused git commit of chaos slice; optional \(k\) tuning via lab; daemon integration when ready.
+
+---
+
+*Canonical engineering reference for gzmo-chaos ρ control.*
