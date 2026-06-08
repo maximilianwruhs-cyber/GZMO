@@ -91,7 +91,7 @@ Use **engineering column** in code comments, docs, and PRs.
 | Component | Location | Value |
 |-----------|----------|-------|
 | Decay gain \(k\) | `pulse.rs`, `gzmo.toml` `[chaos].rho_decay_k` | `0.001` (set `0.0` to disable) |
-| Tanh restore \(\mathcal{R}\) | `thoughts.rs`, `[chaos].rho_restore_alpha/beta` | opt-in (`alpha=0` default); lab winner α=0.01, β=1.0 |
+| Tanh restore \(\mathcal{R}\) | `thoughts.rs`, `[chaos].rho_restore_alpha/beta` | active production default (α=0.01, β=1.0) |
 | EMA gain \(\gamma\) | `pulse.rs`, `[chaos].rho_ema_gamma` | `0.2` |
 | Joke impulse | `thoughts.rs` crystallize | \(\Delta\rho = -0.2\) |
 | Manual stabilize | `ChaosEvent::Stabilize`, `/stabilize` | \(\Delta\rho = -1.0\) default |
