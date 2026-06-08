@@ -39,6 +39,10 @@ pub enum TriggerCondition {
     PhaseEnter {
         phase: Phase,
     },
+    /// Fire on rho breath phase transition (Inhale=1, Exhale=-1, Flat=0)
+    RhoBreathEnter {
+        phase: i8,
+    },
     /// Fire when a thought crystallizes
     Crystallization,
     /// Fire on engine death/rebirth
@@ -60,6 +64,8 @@ pub enum ChaosMetric {
     LorenzY,
     LorenzZ,
     ChaosVal,
+    RhoMod,
+    RhoVelocityEma,
 }
 
 impl ChaosMetric {
@@ -74,6 +80,8 @@ impl ChaosMetric {
             Self::LorenzY => snap.y,
             Self::LorenzZ => snap.z,
             Self::ChaosVal => snap.chaos_val,
+            Self::RhoMod => snap.mutations.lorenz_rho_mod,
+            Self::RhoVelocityEma => snap.rho_velocity_ema,
         }
     }
 }
@@ -156,6 +164,9 @@ impl ChaosTrigger {
             }
             TriggerCondition::PhaseEnter { phase } => {
                 snap.phase == *phase && prev.phase != *phase
+            }
+            TriggerCondition::RhoBreathEnter { phase } => {
+                snap.rho_breath_phase == *phase && prev.rho_breath_phase != *phase
             }
             TriggerCondition::Crystallization => {
                 snap.last_crystallization.is_some()
@@ -281,6 +292,30 @@ impl TriggerEngine {
                          This is an internal monologue — respond in 1-2 sentences.".to_string(),
             },
             520,
+        ));
+
+        // ─── Rho Breath Phase Triggers ─────────────────────────
+        engine.add(ChaosTrigger::new(
+            "rho_exhale_alert",
+            TriggerCondition::RhoBreathEnter { phase: -1 },
+            TriggerAction::Notify {
+                message: "🌬️ Attractor exhale phase initiated — relaxation mode engaged.".to_string(),
+                level: NotifyLevel::Whisper,
+            },
+            180, // ~1 min cooldown
+        ));
+
+        engine.add(ChaosTrigger::new(
+            "rho_critical_high",
+            TriggerCondition::Above {
+                metric: ChaosMetric::RhoMod,
+                threshold: 6.0,
+            },
+            TriggerAction::Notify {
+                message: "⚠ Lorenz ρ mod critically elevated — system dynamics highly unstable.".to_string(),
+                level: NotifyLevel::Urgent,
+            },
+            90, // ~30s cooldown
         ));
 
         engine
@@ -462,5 +497,28 @@ mod tests {
 
         let fired = engine.evaluate(&ChaosSnapshot { tick: 1, ..Default::default() });
         assert!(fired.is_empty());
+    }
+
+    #[test]
+    fn test_rho_breath_trigger() {
+        let mut engine = TriggerEngine::new();
+        engine.add(ChaosTrigger::new(
+            "breath_exhale",
+            TriggerCondition::RhoBreathEnter { phase: -1 },
+            TriggerAction::Notify { message: "Exhale".into(), level: NotifyLevel::Whisper },
+            1,
+        ));
+
+        // Start with phase 0
+        engine.prev_snapshot = ChaosSnapshot { tick: 0, rho_breath_phase: 0, ..Default::default() };
+
+        // Enter phase 1 (inhale) — no fire
+        let fired = engine.evaluate(&ChaosSnapshot { tick: 1, rho_breath_phase: 1, ..Default::default() });
+        assert!(fired.is_empty());
+
+        // Enter phase -1 (exhale) — fire
+        let fired = engine.evaluate(&ChaosSnapshot { tick: 2, rho_breath_phase: -1, ..Default::default() });
+        assert_eq!(fired.len(), 1);
+        assert_eq!(fired[0].trigger_name, "breath_exhale");
     }
 }
