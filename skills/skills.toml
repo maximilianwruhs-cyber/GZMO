@@ -6,7 +6,7 @@
 
 [meta]
 version = "1.0"
-total_commands = 14
+total_commands = 15
 engine = "chaos"  # All RNG seeded from Randomizer's Lorenz attractor
 
 # ─── Chaos & Games ───────────────────────────────────────────────
@@ -84,6 +84,13 @@ args = "[language code: en|de|ja|fr|es|...]"
 type = "static"
 handler = "skill_language.sh"
 icon = "🌍"
+
+[commands.stabilize]
+description = "Stabilizes the chaos engine attractor by decreasing rho"
+args = ""
+type = "static"
+handler = "skill_stabilize.sh"
+icon = "🌀"
 
 # ─── Utility ────────────────────────────────────────────────────
 

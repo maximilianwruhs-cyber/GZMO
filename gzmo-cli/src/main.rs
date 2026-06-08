@@ -3,6 +3,7 @@
 //! Thin binary shell. All logic lives in `gzmo-core`.
 
 mod chat;
+mod chaos_bootstrap;
 mod cli_mcp;
 mod daemon_cmd;
 mod dream_cmd;

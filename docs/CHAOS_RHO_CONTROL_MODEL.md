@@ -82,21 +82,25 @@ Use **engineering column** in code comments, docs, and PRs.
 | Suicide machine | Open-loop accumulation → saturation / output clipping |
 | Soul of the engine | Dynamic range of derived LLM control outputs |
 | Heartbeat / Pulse (metaphor) | `PulseLoop` tick scheduler (174 BPM) |
-| Cycle phase (Inhale/Exhale) | \(\mathrm{sign}(\Delta\rho_{\mathrm{mod}})\) or \(\rho_{\mathrm{mod}} - \rho_{\mathrm{mod}}^{\mathrm{baseline}}\) *(not yet in `ChaosSnapshot`)* |
+| Cycle phase (Inhale/Exhale) | `rho_forcing_sign` (instant) or `rho_breath_phase` (EMA-smoothed) |
 
 ---
 
-## 4. Implemented control law (2026-06-08)
+## 4. Implemented control law (2026-06-08, extended 2026-06-09)
 
 | Component | Location | Value |
 |-----------|----------|-------|
 | Decay gain \(k\) | `pulse.rs`, `gzmo.toml` `[chaos].rho_decay_k` | `0.001` (set `0.0` to disable) |
+| EMA gain \(\gamma\) | `pulse.rs`, `[chaos].rho_ema_gamma` | `0.2` |
 | Joke impulse | `thoughts.rs` crystallize | \(\Delta\rho = -0.2\) |
+| Manual stabilize | `ChaosEvent::Stabilize`, `/stabilize` | \(\Delta\rho = -1.0\) default |
 | Clamp | `thoughts.rs` | \(\rho_{\mathrm{mod}} \in [-10, 10]\) |
+| Daemon `PulseLoop` | `daemon_cmd.rs` + `chaos_bootstrap.rs` | Shipped |
+| Shared bridge | `chaos_bootstrap.rs` | chat, TUI, daemon |
 
-**Validation:** unit tests, `chaos-breathing-lab` discrete sim, live CLI (see revision report).
+**Validation:** 16 `gzmo-chaos` unit tests, lab sim, live CLI `/chaos` + `/stabilize`.
 
-**Not implemented:** nonlinear restoring term \(k(\rho_{\mathrm{mod}})\), EMA breath phase, `skill_stabilize`, Synapse export, daemon `PulseLoop`.
+**Not implemented:** nonlinear restoring term \(k(\rho_{\mathrm{mod}})\), tanh governor, Synapse ρ telemetry export.
 
 ---
 
@@ -109,8 +113,10 @@ Use **engineering column** in code comments, docs, and PRs.
 | `rho_mod_delta` | \(\rho_{\mathrm{mod}}[n] - \rho_{\mathrm{mod}}[n-1]\) | **In `ChaosSnapshot`** |
 | `rho_effective` | \(28 + \rho_{\mathrm{mod}}\) | **In `ChaosSnapshot`** |
 | `rho_forcing_sign` | \(\mathrm{sign}(\rho_{\mathrm{mod\_delta}})\) ∈ \(\{-1,0,+1\}\) | **In `ChaosSnapshot`** |
+| `rho_velocity_ema` | \((1-\gamma)v + \gamma\,\Delta\rho_{\mathrm{mod}}\) | **In `ChaosSnapshot`** |
+| `rho_breath_phase` | \(\mathrm{sign}(v)\) ∈ \(\{-1,0,+1\}\) | **In `ChaosSnapshot`** |
 
-Synapse export of these fields deferred until daemon runs `PulseLoop`.
+Synapse export of these fields still deferred (daemon runs `PulseLoop`; no `chaos.rho_telemetry` event yet).
 
 ---
 
@@ -147,10 +153,13 @@ Keep lore files as **design history**. Cite **this document** for shipped ρ beh
 | ρ leaky integrator + crystallization impulses | Shipped |
 | Engineering terminology (`CHAOS_RHO_CONTROL_MODEL.md`) | Canonical |
 | `rho_mod_delta` / `rho_effective` / `rho_forcing_sign` in snapshot | Shipped |
-| Daemon `PulseLoop` + Synapse | Future |
-| `edge-node` TS parity | Mirror updated; runtime verify pending |
+| EMA `rho_breath_phase` + `/stabilize` | Shipped |
+| `chaos_bootstrap` (chat + TUI + daemon) | Shipped |
+| Daemon `PulseLoop` | Shipped |
+| Synapse ρ telemetry | Future |
+| `edge-node` TS parity | In progress (EMA + Stabilize) |
 
-**Next work on Path A:** focused git commit of chaos slice; optional \(k\) tuning via lab; daemon integration when ready.
+**Next work on Path A:** edge-node parity; optional \(k\) tuning via lab; Synapse export; tanh governor (lab-gated).
 
 ---
 

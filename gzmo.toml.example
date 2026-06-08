@@ -389,6 +389,8 @@ lore_path = "data/lore.toml"
 # Per-tick multiplicative decay on lorenz_rho_mod (~4 min half-life at 0.001).
 # Set to 0.0 to restore legacy behavior (no decay).
 rho_decay_k = 0.001
+# EMA smoothing gain for rho_breath_phase (0.2 = moderate memory across ticks).
+rho_ema_gamma = 0.2
 
 [chaos.events]
 joke_chance = 0.3   # Probability window for joke emission per tick

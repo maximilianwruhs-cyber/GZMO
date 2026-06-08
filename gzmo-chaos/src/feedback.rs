@@ -77,6 +77,11 @@ pub enum ChaosEvent {
         text: String,
     },
 
+    /// Stabilize — manual control of attractor parameter
+    Stabilize {
+        delta_rho: f64,
+    },
+
     /// Custom arbitrary event for extensibility
     Custom {
         tension_delta: f64,

@@ -105,16 +105,25 @@ Set `rho_decay_k = 0.0` to restore legacy (no decay).
 
 **Gap:** Edge runtime not operator-verified on hardware (code parity only).
 
-### 2.5 Explicitly NOT shipped
+### 2.5 Shipped (2026-06-09 execution phase)
+
+| Item | Location |
+|------|----------|
+| `chaos_bootstrap.rs` | Shared `start_chaos_runtime` + `spawn_snapshot_bridge` |
+| Daemon `PulseLoop` | `daemon_cmd.rs` — `chaos_feedback_tx: Some(...)` |
+| EMA breath phase | `rho_ema_gamma`, `rho_breath_phase`, `rho_velocity_ema` |
+| `/stabilize` | `ChaosEvent::Stabilize`, `skill_stabilize.sh`, `help.rs` |
+| HEARTBEAT ρ rows | `chaos_bootstrap.rs` (incl. breath EMA) |
+| `LlmGateway::set_chaos_overrides` | `gateway.rs` trait method |
+
+### 2.6 Explicitly NOT shipped
 
 | Item | Blocker / reason |
 |------|------------------|
-| Daemon `PulseLoop` | `daemon_cmd.rs` L230–231: `chaos_feedback_tx: None` |
-| Synapse chaos heartbeat | Depends on daemon PulseLoop |
-| EMA breath phase (`RhoBreathPhase`) | MASTER Phase II — proposed |
-| `skill_stabilize` | MASTER Phase III — proposed |
+| Synapse `chaos.rho_telemetry` export | Optional Workstream B.5 |
 | Tanh / power-law \(\mathcal{R}\) | Lab-negative or unvalidated |
 | `engine.rs` rebirth ρ halving | Lab policy `linear_decay_rebirth` — not winner |
+| Edge-node EMA + Stabilize | Workstream in progress |
 
 ---
 
@@ -775,15 +784,17 @@ Want agent override?
 
 Copy to PR or issue when transferring ownership:
 
-- [ ] Read §1–3 of this doc + `CHAOS_RHO_CONTROL_MODEL.md`
-- [ ] Tier 1 tests pass locally
-- [ ] `gzmo.toml` has `rho_decay_k = 0.001`
-- [ ] Tier 3 live `/chaos` verified under `/story` load
-- [ ] Understand daemon gap (`chaos_feedback_tx: None`)
-- [ ] Understand `chaos::Phase` ≠ Inhale/Exhale
-- [ ] Know lore specs are non-canonical (math map is Rosetta)
-- [ ] Workstream A docs committed (if not already)
-- [ ] Next task chosen from §7–12 with acceptance criteria agreed
+- [x] Read §1–3 of this doc + `CHAOS_RHO_CONTROL_MODEL.md`
+- [x] Tier 1 tests pass locally (16 `gzmo-chaos` tests)
+- [x] `gzmo.toml` has `rho_decay_k = 0.001`
+- [x] Tier 3 live `/chaos` + `/stabilize` verified
+- [x] Daemon `PulseLoop` wired (`chaos_feedback_tx: Some`)
+- [x] Understand `chaos::Phase` ≠ Inhale/Exhale (`rho_breath_phase` separate)
+- [x] Workstream A docs committed (`2d7cdcf`)
+- [x] Workstreams B, C, E, G implemented
+- [ ] Tier 4 daemon verify on production stack
+- [ ] Edge-node TS parity (EMA + Stabilize)
+- [ ] Workstream F (tanh) — lab gate only if needed
 
 ---
 

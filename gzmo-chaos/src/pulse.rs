@@ -55,6 +55,8 @@ pub struct ChaosSnapshot {
     pub rho_effective: f64,   // 28.0 + lorenz_rho_mod
     pub rho_mod_delta: f64,   // Δρ_mod since previous tick
     pub rho_forcing_sign: i8, // sign(Δρ_mod): −1 decay/negative impulse, +1 positive impulse, 0 steady
+    pub rho_breath_phase: i8, // sign(rho_velocity_ema): -1, 0, +1
+    pub rho_velocity_ema: f64,
 
     // Derived LLM parameters — computed from Lorenz coordinates
     pub llm_temperature: f32,
@@ -87,6 +89,8 @@ impl Default for ChaosSnapshot {
             rho_effective: 28.0,
             rho_mod_delta: 0.0,
             rho_forcing_sign: 0,
+            rho_breath_phase: 0,
+            rho_velocity_ema: 0.0,
             llm_temperature: 0.6,
             llm_max_tokens: 256,
             llm_valence: 0.0,
@@ -114,6 +118,9 @@ pub struct ChaosConfig {
     /// Leaky-integrator gain k: ρ_mod ← (1−k)·ρ_mod per tick. 0.0 disables decay.
     #[serde(default = "default_rho_decay_k")]
     pub rho_decay_k: f64,
+    /// EMA smoothing factor gamma for breath phase calculation
+    #[serde(default = "default_rho_ema_gamma")]
+    pub rho_ema_gamma: f64,
 }
 
 /// Probability windows for auto-lore emission per tick
@@ -145,6 +152,7 @@ fn default_joke_chance() -> f64 { 0.3 }
 fn default_quote_chance() -> f64 { 0.4 }
 fn default_fact_chance() -> f64 { 0.3 }
 fn default_rho_decay_k() -> f64 { 0.001 }
+fn default_rho_ema_gamma() -> f64 { 0.2 }
 
 impl Default for ChaosConfig {
     fn default() -> Self {
@@ -156,6 +164,7 @@ impl Default for ChaosConfig {
             lore_path: None,
             events: EventChances::default(),
             rho_decay_k: default_rho_decay_k(),
+            rho_ema_gamma: default_rho_ema_gamma(),
         }
     }
 }
@@ -246,6 +255,7 @@ pub struct PulseLoop {
     tension: f64,
     config: ChaosConfig,
     lore: Option<Arc<LorePool>>,
+    rho_velocity_ema: f64,
 
     // Hardware telemetry: written by sysinfo thread, read by tick loop
     hw_tension: Arc<AtomicU64>,
@@ -303,6 +313,7 @@ impl PulseLoop {
             snapshot_tx,
             lore_tx,
             config,
+            rho_velocity_ema: 0.0,
         };
 
         let task = tokio::spawn(async move {
@@ -405,6 +416,16 @@ impl PulseLoop {
             };
             prev_rho_mod = rho_mod;
 
+            let gamma = self.config.rho_ema_gamma;
+            self.rho_velocity_ema = (1.0 - gamma) * self.rho_velocity_ema + gamma * rho_mod_delta;
+            let rho_breath_phase = if self.rho_velocity_ema > 1e-9 {
+                1
+            } else if self.rho_velocity_ema < -1e-9 {
+                -1
+            } else {
+                0
+            };
+
             let last_crystallization = crystallizations.into_iter().last();
 
             // 6. Compute derived LLM parameters from Lorenz coordinates
@@ -430,6 +451,8 @@ impl PulseLoop {
                 rho_effective: 28.0 + rho_mod,
                 rho_mod_delta,
                 rho_forcing_sign,
+                rho_breath_phase,
+                rho_velocity_ema: self.rho_velocity_ema,
                 llm_temperature,
                 llm_max_tokens,
                 llm_valence,
@@ -496,6 +519,13 @@ impl PulseLoop {
                     "🧠 Thought absorbed into cabinet"
                 );
             }
+        }
+
+        // Apply stabilize delta directly to lorenz_rho_mod
+        if let ChaosEvent::Stabilize { delta_rho } = event {
+            self.cabinet.mutations.lorenz_rho_mod =
+                (self.cabinet.mutations.lorenz_rho_mod + delta_rho).clamp(-10.0, 10.0);
+            debug!(delta = delta_rho, lorenz_rho_mod = self.cabinet.mutations.lorenz_rho_mod, "lorenz_rho_mod stabilized");
         }
     }
 
@@ -607,9 +637,65 @@ mod tests {
             snapshot_tx,
             lore_tx,
             config,
+            rho_velocity_ema: 0.0,
         };
 
         let temp = pulse.lorenz_to_temperature();
         assert!((0.3..=1.2).contains(&temp), "Initial temperature out of range: {temp}");
+    }
+
+    #[tokio::test]
+    async fn feedback_stabilize_reduces_rho() {
+        let handle = PulseLoop::start(ChaosConfig::default());
+
+        // Wait for initial tick
+        tokio::time::sleep(Duration::from_millis(400)).await;
+
+        // Send a Stabilize event
+        handle.feedback_tx.send(ChaosEvent::Stabilize { delta_rho: -5.0 }).await.unwrap();
+
+        // Wait for processing
+        tokio::time::sleep(Duration::from_millis(400)).await;
+
+        let snap = handle.snapshot_rx.borrow().clone();
+        assert!(snap.mutations.lorenz_rho_mod < -4.0, "lorenz_rho_mod should be reduced, got {}", snap.mutations.lorenz_rho_mod);
+
+        handle.task.abort();
+    }
+
+    #[test]
+    fn ema_smooths_single_spike() {
+        let config = ChaosConfig {
+            rho_ema_gamma: 0.2,
+            ..ChaosConfig::default()
+        };
+        let (_, event_rx) = mpsc::channel(10);
+        let (snapshot_tx, _) = watch::channel(ChaosSnapshot::default());
+        let (lore_tx, _) = mpsc::channel(1);
+        let mut pulse = PulseLoop {
+            lorenz: LorenzAttractor::new(0.506),
+            logistic: LogisticMap::new(0.506),
+            state: EngineState::new(),
+            cabinet: ThoughtCabinet::new(),
+            tension: 50.0,
+            lore: None,
+            hw_tension: Arc::new(AtomicU64::new(50.0f64.to_bits())),
+            event_rx,
+            snapshot_tx,
+            lore_tx,
+            config,
+            rho_velocity_ema: 0.0,
+        };
+
+        let gamma = pulse.config.rho_ema_gamma;
+        assert_eq!(gamma, 0.2);
+
+        let rho_mod_delta = 1.0;
+        pulse.rho_velocity_ema = (1.0 - gamma) * pulse.rho_velocity_ema + gamma * rho_mod_delta;
+        assert!((pulse.rho_velocity_ema - 0.2).abs() < 1e-9);
+
+        let rho_mod_delta = 0.0;
+        pulse.rho_velocity_ema = (1.0 - gamma) * pulse.rho_velocity_ema + gamma * rho_mod_delta;
+        assert!((pulse.rho_velocity_ema - 0.16).abs() < 1e-9);
     }
 }

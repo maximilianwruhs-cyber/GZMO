@@ -10,7 +10,7 @@ use chrono::Utc;
 use gzmo_core::agent_loop::run_agent_loop;
 use gzmo_core::agent_session::AgentSession;
 use gzmo_core::config::{GzmoConfig, EngineMode, TaskKind};
-use gzmo_core::gateway::{GatewayRouter, TurboQuantGateway, VllmConfig};
+use gzmo_core::gateway::{GatewayRouter, TurboQuantGateway, VllmConfig, LlmGateway};
 use gzmo_core::memory::embeddings;
 use gzmo_core::memory::vault::SqliteVault;
 use gzmo_core::subagent::SubagentRunner;
@@ -29,7 +29,7 @@ use gzmo_core::tools::memory::{MemoryRecordTool, MemorySearchTool};
 use gzmo_core::types::{EpisodicEntry, EpisodicSource, Message, Role};
 use gzmo_core::skills::{SkillRegistry as ChaosSkillRegistry, SkillContext, SkillType};
 use gzmo_core::skills::{dice::DiceSkill, sound::SoundSkill, poker::PokerSkill, quote::QuoteSkill, calculate::CalculateSkill, help::HelpSkill, visual::VisualSkill};
-use gzmo_chaos::triggers::{TriggerEngine, TriggerAction, NotifyLevel};
+
 
 
 
@@ -41,6 +41,7 @@ const BOLD: &str = "\x1b[1m";
 const DIM: &str = "\x1b[2m";
 const RESET: &str = "\x1b[0m";
 const RED: &str = "\x1b[31m";
+const GREEN: &str = "\x1b[32m";
 const CYAN: &str = "\x1b[36m";
 
 pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
@@ -105,18 +106,14 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
 
     // ─── Gateway ─────────────────────────────────────────────────
     let active_profile = config.engine.active_engine();
-    let gateway = Arc::new(tokio::sync::RwLock::new(Arc::new(TurboQuantGateway::new(
+    let gateway: Arc<tokio::sync::RwLock<Arc<dyn LlmGateway>>> = Arc::new(tokio::sync::RwLock::new(Arc::new(TurboQuantGateway::new(
         VllmConfig::from(active_profile),
-    ))));
+    )) as Arc<dyn LlmGateway>));
 
     // ─── Chaos Engine ────────────────────────────────────────────
-    // Load [chaos] config from gzmo.toml, fall back to defaults
-    let chaos_config: gzmo_chaos::pulse::ChaosConfig = config.chaos
-        .as_ref()
-        .and_then(|v| v.clone().try_into().ok())
-        .unwrap_or_default();
-    let mut chaos_handle = gzmo_chaos::pulse::PulseLoop::start(chaos_config);
-    let chaos_feedback_tx = chaos_handle.feedback_tx.clone();
+    let chaos_runtime = crate::chaos_bootstrap::start_chaos_runtime(&config);
+    let mut chaos_handle = chaos_runtime.handle;
+    let chaos_feedback_tx = chaos_runtime.feedback_tx.clone();
     let chaos_snapshot_rx = chaos_handle.snapshot_rx.clone();
     eprintln!("  {COPPER}⚙ Chaos engine running — 174 BPM (HW telemetry active){RESET}");
 
@@ -124,109 +121,15 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
     let (trigger_notify_tx, mut trigger_notify_rx) = tokio::sync::mpsc::channel::<String>(32);
 
     // Spawn background task: chaos state → gateway + file + trigger evaluation
-    {
-        let mut snapshot_rx = chaos_handle.snapshot_rx.clone();
-        let gateway_ref = gateway.clone();
-        let feedback_tx_bg = chaos_handle.feedback_tx.clone();
-        let notify_tx = trigger_notify_tx.clone();
-        let state_dir = config.memory.vault_db.parent().unwrap_or(std::path::Path::new(".")).to_path_buf();
-        tokio::spawn(async move {
-            let mut triggers = TriggerEngine::with_defaults();
-            loop {
-                if snapshot_rx.changed().await.is_err() {
-                    break; // PulseLoop dropped
-                }
-                let snap = snapshot_rx.borrow_and_update().clone();
-                // Update gateway LLM parameters from Lorenz coordinates
-                let gw = gateway_ref.read().await;
-                gw.set_chaos_overrides(snap.llm_temperature, snap.llm_max_tokens);
-                // Write snapshot files for shell skill backward compat
-                if snap.tick % 15 == 0 {
-                    let json = serde_json::to_string_pretty(&snap).unwrap_or_default();
-                    // Atomic write: write to .tmp then rename (POSIX rename is atomic)
-                    let tmp_path = state_dir.join("CHAOS_STATE.json.tmp");
-                    let target_path = state_dir.join("CHAOS_STATE.json");
-                    if tokio::fs::write(&tmp_path, json.as_bytes()).await.is_ok() {
-                        let _ = tokio::fs::rename(&tmp_path, &target_path).await;
-                    }
-                    // HEARTBEAT.md — human-readable status (ported from original Randomizer)
-                    let heartbeat = format!(
-                        "# GZMO Heartbeat\n\n\
-                        | Field | Value |\n|---|---|\n\
-                        | Status | {} |\n\
-                        | Tick | {} |\n\
-                        | Energy | {:.1}% |\n\
-                        | Phase | {} |\n\
-                        | Deaths | {} |\n\
-                        | Tension | {:.1}% |\n\
-                        | Chaos Val | {:.4} |\n\n\
-                        ## Lorenz Attractor\n\n\
-                        x={:.3}, y={:.3}, z={:.3}\n\n\
-                        ## Thought Cabinet\n\n\
-                        | Metric | Value |\n|---|---|\n\
-                        | Incubating | {} |\n\
-                        | Crystallized | {} |\n\
-                        | Gravity mod | {:+.3} |\n\
-                        | Friction mod | {:+.3} |\n\
-                        | Lorenz ρ mod | {:+.3} |\n\
-                        | Tension bias | {:+.3} |\n\n\
-                        ## LLM Parameters\n\n\
-                        Temperature: {:.3}, Max tokens: {}, Valence: {:+.3}\n\n\
-                        *Updated: {}*\n",
-                        if snap.alive { "ALIVE" } else { "DEAD" },
-                        snap.tick, snap.energy, snap.phase, snap.deaths, snap.tension,
-                        snap.chaos_val, snap.x, snap.y, snap.z,
-                        snap.thoughts_incubating, snap.thoughts_crystallized,
-                        snap.mutations.gravity_mod, snap.mutations.friction_mod,
-                        snap.mutations.lorenz_rho_mod, snap.mutations.tension_bias,
-                        snap.llm_temperature, snap.llm_max_tokens, snap.llm_valence,
-                        snap.timestamp,
-                    );
-                    let hb_tmp = state_dir.join("HEARTBEAT.md.tmp");
-                    let hb_target = state_dir.join("HEARTBEAT.md");
-                    if tokio::fs::write(&hb_tmp, heartbeat.as_bytes()).await.is_ok() {
-                        let _ = tokio::fs::rename(&hb_tmp, &hb_target).await;
-                    }
-                }
-                // Evaluate autonomous triggers
-                let fired = triggers.evaluate(&snap);
-                for f in fired {
-                    match &f.action {
-                        TriggerAction::Notify { message, level } => {
-                            let prefix = match level {
-                                NotifyLevel::Whisper  => format!("\x1b[2m  {message}\x1b[0m"),
-                                NotifyLevel::Normal   => format!("  \x1b[36m{message}\x1b[0m"),
-                                NotifyLevel::Urgent   => format!("  \x1b[1m\x1b[33m{message}\x1b[0m"),
-                                NotifyLevel::Critical => format!("  \x1b[1m\x1b[31m⚠ {message}\x1b[0m"),
-                            };
-                            let _ = notify_tx.send(prefix).await;
-                        }
-                        TriggerAction::EmitEvent { tension_delta, energy_delta } => {
-                            let _ = feedback_tx_bg.send(
-                                gzmo_chaos::feedback::ChaosEvent::Custom {
-                                    tension_delta: *tension_delta,
-                                    energy_delta: *energy_delta,
-                                    thought_seed: None,
-                                }
-                            ).await;
-                        }
-                        TriggerAction::RunSkill { skill_name, args } => {
-                            // Send a typed command to the REPL loop for actual skill execution
-                            let _ = notify_tx.send(
-                                format!("__TRIGGER_SKILL__:/{skill_name} {args}")
-                            ).await;
-                        }
-                        TriggerAction::InjectPrompt { prompt } => {
-                            // Send a typed command for prompt injection into conversation
-                            let _ = notify_tx.send(
-                                format!("__TRIGGER_INJECT__:{prompt}")
-                            ).await;
-                        }
-                    }
-                }
-            }
-        });
-    }
+    let gateway_ref = gateway.clone();
+    let state_dir = config.memory.vault_db.parent().unwrap_or(std::path::Path::new(".")).to_path_buf();
+    let _chaos_bridge = crate::chaos_bootstrap::spawn_snapshot_bridge(
+        chaos_snapshot_rx.clone(),
+        gateway_ref,
+        chaos_feedback_tx.clone(),
+        state_dir,
+        Some(trigger_notify_tx),
+    );
 
     // ─── Tools ───────────────────────────────────────────────────
     let mut tools = ToolRegistry::new();
@@ -803,7 +706,7 @@ async fn handle_slash_command(
     chaos_snapshot_rx: &tokio::sync::watch::Receiver<gzmo_chaos::pulse::ChaosSnapshot>,
     chaos_skills: &ChaosSkillRegistry,
     chaos_feedback_tx: &tokio::sync::mpsc::Sender<gzmo_chaos::feedback::ChaosEvent>,
-    gateway: &Arc<tokio::sync::RwLock<Arc<TurboQuantGateway>>>,
+    gateway: &Arc<tokio::sync::RwLock<Arc<dyn LlmGateway>>>,
     config_path: &std::path::Path,
     subagent_runner: &Arc<SubagentRunner>,
     subagent_enabled: bool,
@@ -940,7 +843,7 @@ async fn handle_slash_command(
                             } else {
                                 eprintln!(" ✓");
                                 // Build new gateway
-                                let new_gw = Arc::new(TurboQuantGateway::new(VllmConfig::from(profile.clone())));
+                                let new_gw: Arc<dyn LlmGateway> = Arc::new(TurboQuantGateway::new(VllmConfig::from(profile.clone())));
                                 // Swap gateway
                                 {
                                     let mut gw = gateway.write().await;
@@ -984,14 +887,18 @@ async fn handle_slash_command(
             eprintln!("  {CYAN}║{RESET}  Friction mod: {:<+8.2}           {CYAN}║{RESET}", snap.mutations.friction_mod);
             eprintln!("  {CYAN}║{RESET}  Lorenz ρ mod: {:<+8.2}  Δ{:+.3}     {CYAN}║{RESET}",
                 snap.mutations.lorenz_rho_mod, snap.rho_mod_delta);
-            eprintln!("  {CYAN}║{RESET}  ρ_eff: {:.2}  forcing: {:+}          {CYAN}║{RESET}",
-                snap.rho_effective, snap.rho_forcing_sign);
+            eprintln!("  {CYAN}║{RESET}  ρ_eff: {:.2}  forcing: {:+}  breath: {:<2} {CYAN}║{RESET}",
+                snap.rho_effective, snap.rho_forcing_sign, snap.rho_breath_phase);
             eprintln!("  {CYAN}╠══════════════════════════════════════╣{RESET}");
             eprintln!("  {CYAN}║  🌡  LLM Parameters (Lorenz-derived) ║{RESET}");
             eprintln!("  {CYAN}║{RESET}  Temperature: {:.3}                {CYAN}║{RESET}", snap.llm_temperature);
             eprintln!("  {CYAN}║{RESET}  Max tokens:  {:<6}               {CYAN}║{RESET}", snap.llm_max_tokens);
             eprintln!("  {CYAN}║{RESET}  Valence:     {:<+.3}               {CYAN}║{RESET}", snap.llm_valence);
             eprintln!("  {CYAN}╚══════════════════════════════════════╝{RESET}");
+        }
+        "/stabilize" => {
+            let _ = chaos_feedback_tx.send(gzmo_chaos::feedback::ChaosEvent::Stabilize { delta_rho: -1.0 }).await;
+            eprintln!("  {GREEN}🌀 Attractor stabilized. Lorenz ρ mod decreased by 1.0{RESET}");
         }
         "/sessions" => {
             match session_mgr.list().await {

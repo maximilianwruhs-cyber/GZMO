@@ -3,7 +3,7 @@ use anyhow::Result;
 use chrono::Utc;
 
 use gzmo_core::config::GzmoConfig;
-use gzmo_core::gateway::{TurboQuantGateway, VllmConfig};
+use gzmo_core::gateway::{TurboQuantGateway, VllmConfig, LlmGateway};
 use gzmo_core::identity::IdentityEngine;
 use gzmo_core::memory::vault::SqliteVault;
 use gzmo_core::memory::episodic::FileEpisodicStore;

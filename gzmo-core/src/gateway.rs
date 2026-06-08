@@ -142,6 +142,12 @@ pub trait LlmGateway: Send + Sync {
         self.complete_structured_with_temp(messages, schema_name, json_schema, temperature)
             .await
     }
+
+    /// Set chaos-driven overrides for temperature and max_tokens.
+    fn set_chaos_overrides(&self, _temperature: f32, _max_tokens: u32) {}
+
+    /// Disable chaos overrides — revert to config values.
+    fn clear_chaos_overrides(&self) {}
 }
 
 // ── Concrete Implementation ─────────────────────────────────────────
@@ -333,6 +339,8 @@ impl TurboQuantGateway {
     pub fn clear_chaos_overrides(&self) {
         self.chaos_active.store(false, std::sync::atomic::Ordering::Relaxed);
     }
+
+
 
     /// Get the effective temperature (chaos override or config default).
     fn effective_temperature(&self) -> f32 {
@@ -665,6 +673,14 @@ impl LlmGateway for TurboQuantGateway {
         let temp = temperature.unwrap_or_else(|| self.effective_temperature());
         self.structured_request(messages, schema_name, &json_schema, temp, max_tokens)
             .await
+    }
+
+    fn set_chaos_overrides(&self, temperature: f32, max_tokens: u32) {
+        self.set_chaos_overrides(temperature, max_tokens);
+    }
+
+    fn clear_chaos_overrides(&self) {
+        self.clear_chaos_overrides();
     }
 }
 
@@ -1097,6 +1113,18 @@ impl LlmGateway for FallbackGateway {
             }
         }
         Err(last_err.expect("backends is non-empty"))
+    }
+
+    fn set_chaos_overrides(&self, temperature: f32, max_tokens: u32) {
+        for (_, gw) in &self.backends {
+            gw.set_chaos_overrides(temperature, max_tokens);
+        }
+    }
+
+    fn clear_chaos_overrides(&self) {
+        for (_, gw) in &self.backends {
+            gw.clear_chaos_overrides();
+        }
     }
 }
 

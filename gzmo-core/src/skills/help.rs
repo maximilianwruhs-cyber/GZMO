@@ -38,6 +38,7 @@ impl Skill for HelpSkill {
             ("/quit",    "Exit GZMO (auto-saves session)"),
             ("/clear",   "Clear conversation history"),
             ("/chaos",   "Display chaos engine state dashboard"),
+            ("/stabilize","Stabilize attractor parameter (decreases rho)"),
             ("/stats",   "Show session statistics"),
             ("/vault",   "Search semantic vault memory"),
             ("/remember","Store a fact in semantic vault"),
