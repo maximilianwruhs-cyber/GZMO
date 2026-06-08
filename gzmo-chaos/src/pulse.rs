@@ -118,6 +118,12 @@ pub struct ChaosConfig {
     /// Leaky-integrator gain k: ρ_mod ← (1−k)·ρ_mod per tick. 0.0 disables decay.
     #[serde(default = "default_rho_decay_k")]
     pub rho_decay_k: f64,
+    /// Tanh restore α; when > 0, replaces linear decay with ρ ← ρ − α·tanh(β·ρ).
+    #[serde(default)]
+    pub rho_restore_alpha: f64,
+    /// Tanh restore β (steepness); used only when `rho_restore_alpha > 0`.
+    #[serde(default = "default_rho_restore_beta")]
+    pub rho_restore_beta: f64,
     /// EMA smoothing factor gamma for breath phase calculation
     #[serde(default = "default_rho_ema_gamma")]
     pub rho_ema_gamma: f64,
@@ -152,6 +158,7 @@ fn default_joke_chance() -> f64 { 0.3 }
 fn default_quote_chance() -> f64 { 0.4 }
 fn default_fact_chance() -> f64 { 0.3 }
 fn default_rho_decay_k() -> f64 { 0.001 }
+fn default_rho_restore_beta() -> f64 { 1.0 }
 fn default_rho_ema_gamma() -> f64 { 0.2 }
 
 impl Default for ChaosConfig {
@@ -164,6 +171,8 @@ impl Default for ChaosConfig {
             lore_path: None,
             events: EventChances::default(),
             rho_decay_k: default_rho_decay_k(),
+            rho_restore_alpha: 0.0,
+            rho_restore_beta: default_rho_restore_beta(),
             rho_ema_gamma: default_rho_ema_gamma(),
         }
     }
@@ -402,8 +411,12 @@ impl PulseLoop {
                 );
             }
 
-            // ρ_mod leaky integrator: (1-k)*ρ_mod per tick after crystallization impulses
-            self.cabinet.apply_rho_decay(self.config.rho_decay_k);
+            // ρ_mod homeostasis after crystallization impulses (linear or tanh restore)
+            self.cabinet.apply_rho_restoration(
+                self.config.rho_restore_alpha,
+                self.config.rho_restore_beta,
+                self.config.rho_decay_k,
+            );
 
             let rho_mod = self.cabinet.mutations.lorenz_rho_mod;
             let rho_mod_delta = rho_mod - prev_rho_mod;

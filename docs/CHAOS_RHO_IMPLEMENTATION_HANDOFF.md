@@ -633,6 +633,8 @@ cargo run -- --matrix -n 10000 --joke-cooling
 
 If **fail** → stop; document in `RESULTS.md`; do not port.
 
+**Result (2026-06-08):** PASS — `tanh_decay` max ρ=0.93 vs `linear_decay_fast` 5.99. Ported opt-in (`rho_restore_alpha=0` default).
+
 #### F.2 — Rust port (only if F.1 passes)
 
 **File:** `gzmo-chaos/src/thoughts.rs`
@@ -796,7 +798,7 @@ Copy to PR or issue when transferring ownership:
 - [x] Workstreams B, C, E, G implemented
 - [x] Tier 4 daemon verify on production stack (2026-06-08; keepalive fix)
 - [x] Edge-node TS parity (EMA + Stabilize)
-- [ ] Workstream F (tanh) — lab gate only if needed
+- [x] Workstream F (tanh) — lab passed; ported opt-in (`rho_restore_alpha`, `rho_restore_beta`)
 
 ---
 

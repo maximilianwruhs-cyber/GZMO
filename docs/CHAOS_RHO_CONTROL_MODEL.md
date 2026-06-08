@@ -91,6 +91,7 @@ Use **engineering column** in code comments, docs, and PRs.
 | Component | Location | Value |
 |-----------|----------|-------|
 | Decay gain \(k\) | `pulse.rs`, `gzmo.toml` `[chaos].rho_decay_k` | `0.001` (set `0.0` to disable) |
+| Tanh restore \(\mathcal{R}\) | `thoughts.rs`, `[chaos].rho_restore_alpha/beta` | opt-in (`alpha=0` default); lab winner α=0.01, β=1.0 |
 | EMA gain \(\gamma\) | `pulse.rs`, `[chaos].rho_ema_gamma` | `0.2` |
 | Joke impulse | `thoughts.rs` crystallize | \(\Delta\rho = -0.2\) |
 | Manual stabilize | `ChaosEvent::Stabilize`, `/stabilize` | \(\Delta\rho = -1.0\) default |
@@ -98,9 +99,9 @@ Use **engineering column** in code comments, docs, and PRs.
 | Daemon `PulseLoop` | `daemon_cmd.rs` + `chaos_bootstrap.rs` | Shipped |
 | Shared bridge | `chaos_bootstrap.rs` | chat, TUI, daemon |
 
-**Validation:** 16 `gzmo-chaos` unit tests, lab sim, live CLI `/chaos` + `/stabilize`.
+**Validation:** 18+ `gzmo-chaos` unit tests, lab sim, live CLI `/chaos` + `/stabilize`, daemon Tier 4.
 
-**Not implemented:** nonlinear restoring term \(k(\rho_{\mathrm{mod}})\), tanh governor, Synapse ρ telemetry export.
+**Not implemented:** state-dependent linear leak \(k(1+\alpha|\rho_{\mathrm{mod}}|)\) (lab-negative vs `linear_decay_fast`).
 
 ---
 
@@ -137,7 +138,7 @@ Synapse `chaos.rho_telemetry` events append every 15 ticks in **daemon** mode (`
 |------|------|
 | [`LIMIT_CYCLE_BLUEPRINT.md`](../gzmo-chaos/LIMIT_CYCLE_BLUEPRINT.md) | Historical; Phase 1 shipped |
 | [`LIMIT_CYCLE_SPEC_V2.md`](../gzmo-chaos/LIMIT_CYCLE_SPEC_V2.md) | Proposed power-law \(\mathcal{R}\) — lab-negative |
-| [`LIMIT_CYCLE_MASTER_SPEC.md`](../gzmo-chaos/LIMIT_CYCLE_MASTER_SPEC.md) | Proposed tanh \(\mathcal{R}\) + EMA — unvalidated |
+| [`LIMIT_CYCLE_MASTER_SPEC.md`](../gzmo-chaos/LIMIT_CYCLE_MASTER_SPEC.md) | Tanh \(\mathcal{R}\) + EMA — tanh **lab-validated**, shipped opt-in |
 | **[`LIMIT_CYCLE_SPECS_MATH_MAP.md`](LIMIT_CYCLE_SPECS_MATH_MAP.md)** | **Rosetta:** lore → engineering equations |
 
 Keep lore files as **design history**. Cite **this document** for shipped ρ behavior; cite **math map** when translating V2/MASTER proposals.
@@ -157,9 +158,10 @@ Keep lore files as **design history**. Cite **this document** for shipped ρ beh
 | `chaos_bootstrap` (chat + TUI + daemon) | Shipped |
 | Daemon `PulseLoop` | Shipped |
 | Synapse ρ telemetry | Shipped (daemon only) |
-| `edge-node` TS parity | In progress (EMA + Stabilize) |
+| Tanh governor | Shipped opt-in (`rho_restore_alpha > 0`) |
+| `edge-node` TS parity | Shipped (decay + tanh + EMA + Stabilize) |
 
-**Next work on Path A:** edge-node parity; optional \(k\) tuning via lab; Synapse export; tanh governor (lab-gated).
+**Next work on Path A:** optional enable tanh in production `gzmo.toml`; \(k\) tuning sweep if slower mood needed.
 
 ---
 

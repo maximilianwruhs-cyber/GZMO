@@ -272,6 +272,19 @@ impl ThoughtCabinet {
         self.mutations.lorenz_rho_mod = self.mutations.lorenz_rho_mod.clamp(-10.0, 10.0);
     }
 
+    /// Bounded homeostatic restore (MASTER Phase I): ρ ← ρ − α·tanh(β·ρ).
+    /// Falls back to linear `apply_rho_decay(k)` when `alpha <= 0`.
+    pub fn apply_rho_restoration(&mut self, alpha: f64, beta: f64, k: f64) {
+        if alpha > 0.0 {
+            let beta = if beta > 0.0 { beta } else { 1.0 };
+            let restore = alpha * (beta * self.mutations.lorenz_rho_mod).tanh();
+            self.mutations.lorenz_rho_mod -= restore;
+        } else {
+            self.apply_rho_decay(k);
+        }
+        self.mutations.lorenz_rho_mod = self.mutations.lorenz_rho_mod.clamp(-10.0, 10.0);
+    }
+
     /// Number of occupied slots
     pub fn occupied_slots(&self) -> usize {
         self.slots.iter().filter(|s| s.is_some()).count()
@@ -302,6 +315,26 @@ mod tests {
             cabinet.tick();
         }
         assert!((cabinet.mutations.lorenz_rho_mod - 2.8).abs() < f64::EPSILON);
+    }
+
+    #[test]
+    fn tanh_restoration_pulls_toward_zero() {
+        let mut cabinet = ThoughtCabinet::new();
+        cabinet.mutations.lorenz_rho_mod = 5.0;
+        cabinet.apply_rho_restoration(0.01, 1.0, 0.001);
+        assert!(cabinet.mutations.lorenz_rho_mod < 5.0);
+        assert!(cabinet.mutations.lorenz_rho_mod > 4.98);
+    }
+
+    #[test]
+    fn tanh_restoration_falls_back_to_linear_when_alpha_zero() {
+        let mut tanh_cab = ThoughtCabinet::new();
+        let mut linear_cab = ThoughtCabinet::new();
+        tanh_cab.mutations.lorenz_rho_mod = 4.0;
+        linear_cab.mutations.lorenz_rho_mod = 4.0;
+        tanh_cab.apply_rho_restoration(0.0, 1.0, 0.001);
+        linear_cab.apply_rho_decay(0.001);
+        assert!((tanh_cab.mutations.lorenz_rho_mod - linear_cab.mutations.lorenz_rho_mod).abs() < 1e-12);
     }
 
     #[test]
