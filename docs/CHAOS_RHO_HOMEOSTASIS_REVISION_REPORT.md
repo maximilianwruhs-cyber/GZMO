@@ -19,7 +19,7 @@ Work proceeded in three phases:
 
 **Winner policy (simulation):** per-tick multiplicative decay `k = 0.001` on `lorenz_rho_mod`, plus joke crystallization cooling `ρ − 0.2`.
 
-**What was NOT implemented:** Inhale/Exhale cycle phase, limit-cycle ODE, Synapse chaos heartbeat (still deferred — daemon does not run `PulseLoop`).
+**What was NOT implemented:** Inhale/Exhale cycle phase, limit-cycle ODE. Synapse `chaos.rho_telemetry` is shipped in daemon mode (2026-06-08).
 
 **Architecture (Path A chosen):** In-loop chaos — `PulseLoop` drives LLM params. `rho_effective`, `rho_mod_delta`, `rho_forcing_sign` in `ChaosSnapshot`. See [`CHAOS_RHO_CONTROL_MODEL.md`](CHAOS_RHO_CONTROL_MODEL.md) §8.
 
@@ -194,7 +194,7 @@ Homeostasis is **leaky-integrator + partial semantic cooling**, not full bidirec
 | Unit tests | **PASS** | `cargo test -p gzmo-chaos` — 14 tests incl. `joke_cools_rho`, `rho_decay_halves_over_half_life` |
 | Discrete simulation | **PASS** | `chaos-breathing-lab` matrix + hardware single runs (max ρ ≈ 5.95, no clamp under `linear_decay_fast`) |
 | Live CLI execution | **PASS** | Ported `gzmo-cli` binary compiles and runs; ρ homeostasis (decay + joke cooling) produces expected regulation metrics under live execution (operator-verified) |
-| Daemon integration | **N/A** | `PulseLoop` not in daemon |
+| Daemon integration | **Shipped** | `PulseLoop` + keepalive in `daemon_cmd.rs` |
 | TypeScript runtime | **NOT TESTED** | Mirror port only; edge-node deploy unverified |
 
 **Summary:** Multiplicative decay (`rho_decay_k = 0.001`) plus joke cooling is **verified and functional** through unit tests, discrete simulators, and live CLI. Daemon and TypeScript paths remain out of scope for this validation.

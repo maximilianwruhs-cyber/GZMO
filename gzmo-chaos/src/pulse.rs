@@ -13,7 +13,7 @@
 ///
 /// Synapse observability: do not publish chaos heartbeat events to `SynapseBus`
 /// until `PulseLoop` runs in daemon mode. Today it only starts in chat/TUI;
-/// `daemon_cmd.rs` sets `chaos_feedback_tx: None`.
+/// Daemon mode: `daemon_cmd.rs` pins `PulseHandle` for the full process lifetime.
 
 use std::path::PathBuf;
 use std::sync::{Arc, atomic::{AtomicU64, AtomicBool, Ordering}};
