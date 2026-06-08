@@ -63,7 +63,7 @@
 | Component | File | What it does |
 |-----------|------|--------------|
 | Config `rho_decay_k` | `gzmo-chaos/src/pulse.rs` | `ChaosConfig`, default `0.001`, serde from `[chaos]` |
-| Tick decay | `gzmo-chaos/src/pulse.rs` | After crystallization: `apply_rho_decay(k)` |
+| Tick decay | `gzmo-chaos/src/pulse.rs` | After crystallization: `apply_rho_restoration(alpha, beta, k)` |
 | Decay impl | `gzmo-chaos/src/thoughts.rs` | `(1-k)*ρ_mod`, clamp `[-10,10]` |
 | Joke cooling | `gzmo-chaos/src/thoughts.rs` | `crystallize("joke")` → `lorenz_rho_mod -= 0.2` |
 | Telemetry | `gzmo-chaos/src/pulse.rs` | `rho_effective`, `rho_mod_delta`, `rho_forcing_sign` |
@@ -112,14 +112,9 @@ Set `rho_decay_k = 0.0` to restore legacy (no decay).
 | HEARTBEAT ρ rows | `chaos_bootstrap.rs` (incl. breath EMA) |
 | `LlmGateway::set_chaos_overrides` | `gateway.rs` trait method |
 
-### 2.6 Explicitly NOT shipped
+### 2.6 Remaining Homeostasis Tasks (implemented 2026-06-08/09)
 
-| Item | Blocker / reason |
-|------|------------------|
-| Synapse `chaos.rho_telemetry` export | Optional Workstream B.5 |
-| Tanh / power-law \(\mathcal{R}\) | Lab-negative or unvalidated |
-| `engine.rs` rebirth ρ halving | Lab policy `linear_decay_rebirth` — not winner |
-| Edge-node EMA + Stabilize | Workstream in progress |
+All remaining tasks (R1–R9) including Tanh governor default, TUI parity, breath-aware triggers, stabilize config, rebirth ρ halving, and edge node verification are documented and implemented. See [gzmo-chaos/IMPLEMENTATION_PLAN.md](../gzmo-chaos/IMPLEMENTATION_PLAN.md).
 
 ---
 
@@ -747,7 +742,7 @@ Want agent override?
 Copy to PR or issue when transferring ownership:
 
 - [x] Read §1–3 of this doc + `CHAOS_RHO_CONTROL_MODEL.md`
-- [x] Tier 1 tests pass locally (16 `gzmo-chaos` tests)
+- [x] Tier 1 tests pass locally (21 `gzmo-chaos` tests)
 - [x] `gzmo.toml` has `rho_decay_k = 0.001`
 - [x] Tier 3 live `/chaos` + `/stabilize` verified
 - [x] Daemon `PulseLoop` wired (`chaos_feedback_tx: Some`)

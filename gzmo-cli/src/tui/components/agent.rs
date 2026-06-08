@@ -453,16 +453,49 @@ impl SlashCommandContext {
             }
             "/chaos" => {
                 let snap = self.chaos_snapshot_rx.borrow().clone();
+                let config_guard = self.config.read().await;
+                let chaos_config: gzmo_chaos::pulse::ChaosConfig = config_guard.chaos
+                    .as_ref()
+                    .and_then(|v| v.clone().try_into().ok())
+                    .unwrap_or_default();
+                let policy_str = if chaos_config.rho_restore_alpha > 0.0 {
+                    format!("tanh (α={:.2}, β={:.2})", chaos_config.rho_restore_alpha, chaos_config.rho_restore_beta)
+                } else {
+                    format!("linear (k={:.4})", chaos_config.rho_decay_k)
+                };
                 let _ = self.action_tx.send(Action::AgentResponse(format!(
                     "⚡ Chaos Engine\n  Phase: {:?} | Energy: {:.1}% | Tension: {:.1}%\n  \
                      Lorenz: ({:.2}, {:.2}, {:.2})\n  Alive: {} | Deaths: {}\n  \
                      Thoughts: {} incubating, {} crystallized\n  \
+                     Gravity mod: {:+.3} | Friction mod: {:+.3}\n  \
+                     Lorenz ρ mod: {:+.3} | Δ{:+.3} | ρ_eff: {:.2}\n  \
+                     forcing: {:+} | breath: {:+}\n  \
+                     Restore policy: {}\n  \
                      LLM Temp: {:.3} | Tokens: {} | Valence: {:+.3}",
                     snap.phase, snap.energy, snap.tension,
                     snap.x, snap.y, snap.z, snap.alive, snap.deaths,
                     snap.thoughts_incubating, snap.thoughts_crystallized,
+                    snap.mutations.gravity_mod, snap.mutations.friction_mod,
+                    snap.mutations.lorenz_rho_mod, snap.rho_mod_delta, snap.rho_effective,
+                    snap.rho_forcing_sign, snap.rho_breath_phase,
+                    policy_str,
                     snap.llm_temperature, snap.llm_max_tokens, snap.llm_valence,
                 )));
+            }
+            "/stabilize" => {
+                let config_guard = self.config.read().await;
+                let chaos_config: gzmo_chaos::pulse::ChaosConfig = config_guard.chaos
+                    .as_ref()
+                    .and_then(|v| v.clone().try_into().ok())
+                    .unwrap_or_default();
+                let delta = chaos_config.stabilize_delta_rho;
+                let _ = self.chaos_feedback_tx.send(gzmo_chaos::feedback::ChaosEvent::Stabilize { delta_rho: delta }).await;
+                let response = if delta < 0.0 {
+                    format!("🌀 Attractor stabilized. Lorenz ρ mod decreased by {:.1}", -delta)
+                } else {
+                    format!("🌀 Attractor stabilized. Lorenz ρ mod increased by {:.1}", delta)
+                };
+                let _ = self.action_tx.send(Action::AgentResponse(response));
             }
             "/vault" => {
                 if let Some(ref v) = self.vault {

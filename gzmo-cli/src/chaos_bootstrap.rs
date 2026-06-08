@@ -14,6 +14,7 @@ use gzmo_chaos::feedback::ChaosEvent;
 pub struct ChaosRuntime {
     pub handle: PulseHandle,
     pub feedback_tx: mpsc::Sender<ChaosEvent>,
+    pub restore_policy: String,
 }
 
 /// Start the PulseLoop chaos engine with the config's [chaos] parameters.
@@ -22,11 +23,17 @@ pub fn start_chaos_runtime(config: &GzmoConfig) -> ChaosRuntime {
         .as_ref()
         .and_then(|v| v.clone().try_into().ok())
         .unwrap_or_default();
+    let restore_policy = if chaos_config.rho_restore_alpha > 0.0 {
+        format!("tanh (α={:.2}, β={:.2})", chaos_config.rho_restore_alpha, chaos_config.rho_restore_beta)
+    } else {
+        format!("linear (k={:.4})", chaos_config.rho_decay_k)
+    };
     let handle = PulseLoop::start(chaos_config);
     let feedback_tx = handle.feedback_tx.clone();
     ChaosRuntime {
         handle,
         feedback_tx,
+        restore_policy,
     }
 }
 
@@ -40,6 +47,7 @@ pub fn spawn_snapshot_bridge(
     trigger_notify: Option<mpsc::Sender<String>>,
     synapse: Option<Arc<SynapseBus>>,
     synapse_source: EventSource,
+    restore_policy: String,
 ) -> JoinHandle<()> {
     let mut snapshot_rx = snapshot_rx;
     tokio::spawn(async move {
@@ -76,7 +84,8 @@ pub fn spawn_snapshot_bridge(
                     | Phase | {} |\n\
                     | Deaths | {} |\n\
                     | Tension | {:.1}% |\n\
-                    | Chaos Val | {:.4} |\n\n\
+                    | Chaos Val | {:.4} |\n\
+                    | Restore Policy | {} |\n\n\
                     ## Lorenz Attractor\n\n\
                     x={:.3}, y={:.3}, z={:.3}\n\n\
                     ## Thought Cabinet\n\n\
@@ -96,7 +105,9 @@ pub fn spawn_snapshot_bridge(
                     *Updated: {}*\n",
                     if snap.alive { "ALIVE" } else { "DEAD" },
                     snap.tick, snap.energy, snap.phase, snap.deaths, snap.tension,
-                    snap.chaos_val, snap.x, snap.y, snap.z,
+                    snap.chaos_val,
+                    restore_policy,
+                    snap.x, snap.y, snap.z,
                     snap.thoughts_incubating, snap.thoughts_crystallized,
                     snap.mutations.gravity_mod, snap.mutations.friction_mod,
                     snap.mutations.lorenz_rho_mod,

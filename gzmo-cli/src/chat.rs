@@ -131,6 +131,7 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
         Some(trigger_notify_tx),
         None,
         gzmo_core::synapse::EventSource::GzmoCli,
+        chaos_runtime.restore_policy.clone(),
     );
 
     // ─── Tools ───────────────────────────────────────────────────
@@ -891,6 +892,16 @@ async fn handle_slash_command(
                 snap.mutations.lorenz_rho_mod, snap.rho_mod_delta);
             eprintln!("  {CYAN}║{RESET}  ρ_eff: {:.2}  forcing: {:+}  breath: {:<2} {CYAN}║{RESET}",
                 snap.rho_effective, snap.rho_forcing_sign, snap.rho_breath_phase);
+            let chaos_config: gzmo_chaos::pulse::ChaosConfig = config.chaos
+                .as_ref()
+                .and_then(|v| v.clone().try_into().ok())
+                .unwrap_or_default();
+            let policy_str = if chaos_config.rho_restore_alpha > 0.0 {
+                format!("tanh (α={:.2}, β={:.2})", chaos_config.rho_restore_alpha, chaos_config.rho_restore_beta)
+            } else {
+                format!("linear (k={:.4})", chaos_config.rho_decay_k)
+            };
+            eprintln!("  {CYAN}║{RESET}  Restore policy: {:<21}{CYAN}║{RESET}", policy_str);
             eprintln!("  {CYAN}╠══════════════════════════════════════╣{RESET}");
             eprintln!("  {CYAN}║  🌡  LLM Parameters (Lorenz-derived) ║{RESET}");
             eprintln!("  {CYAN}║{RESET}  Temperature: {:.3}                {CYAN}║{RESET}", snap.llm_temperature);
@@ -899,8 +910,17 @@ async fn handle_slash_command(
             eprintln!("  {CYAN}╚══════════════════════════════════════╝{RESET}");
         }
         "/stabilize" => {
-            let _ = chaos_feedback_tx.send(gzmo_chaos::feedback::ChaosEvent::Stabilize { delta_rho: -1.0 }).await;
-            eprintln!("  {GREEN}🌀 Attractor stabilized. Lorenz ρ mod decreased by 1.0{RESET}");
+            let chaos_config: gzmo_chaos::pulse::ChaosConfig = config.chaos
+                .as_ref()
+                .and_then(|v| v.clone().try_into().ok())
+                .unwrap_or_default();
+            let delta = chaos_config.stabilize_delta_rho;
+            let _ = chaos_feedback_tx.send(gzmo_chaos::feedback::ChaosEvent::Stabilize { delta_rho: delta }).await;
+            if delta < 0.0 {
+                eprintln!("  {GREEN}🌀 Attractor stabilized. Lorenz ρ mod decreased by {:.1}{RESET}", -delta);
+            } else {
+                eprintln!("  {GREEN}🌀 Attractor stabilized. Lorenz ρ mod increased by {:.1}{RESET}", delta);
+            }
         }
         "/sessions" => {
             match session_mgr.list().await {
