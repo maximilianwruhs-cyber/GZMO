@@ -326,6 +326,8 @@ rho_restore_alpha = 0.01
 rho_restore_beta = 1.0
 # EMA smoothing gain for rho_breath_phase (0.2 = moderate memory across ticks).
 rho_ema_gamma = 0.2
+# The amount by which to adjust Lorenz ρ mod when /stabilize is invoked (default: -1.0).
+stabilize_delta_rho = -1.0
 
 [chaos.events]
 joke_chance = 0.3   # Probability window for joke emission per tick

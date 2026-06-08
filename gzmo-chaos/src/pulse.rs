@@ -127,6 +127,9 @@ pub struct ChaosConfig {
     /// EMA smoothing factor gamma for breath phase calculation
     #[serde(default = "default_rho_ema_gamma")]
     pub rho_ema_gamma: f64,
+    /// Tunable stabilize delta rho (default: -1.0)
+    #[serde(default = "default_stabilize_delta_rho")]
+    pub stabilize_delta_rho: f64,
 }
 
 /// Probability windows for auto-lore emission per tick
@@ -160,6 +163,7 @@ fn default_fact_chance() -> f64 { 0.3 }
 fn default_rho_decay_k() -> f64 { 0.001 }
 fn default_rho_restore_beta() -> f64 { 1.0 }
 fn default_rho_ema_gamma() -> f64 { 0.2 }
+fn default_stabilize_delta_rho() -> f64 { -1.0 }
 
 impl Default for ChaosConfig {
     fn default() -> Self {
@@ -174,6 +178,7 @@ impl Default for ChaosConfig {
             rho_restore_alpha: 0.0,
             rho_restore_beta: default_rho_restore_beta(),
             rho_ema_gamma: default_rho_ema_gamma(),
+            stabilize_delta_rho: default_stabilize_delta_rho(),
         }
     }
 }
@@ -385,13 +390,18 @@ impl PulseLoop {
             let effective_friction = (self.config.friction + self.cabinet.mutations.friction_mod).max(0.05);
 
             // 4. Tick engine state
-            let _rebirth = self.state.tick_heartbeat(
+            let rebirth = self.state.tick_heartbeat(
                 self.tension + self.cabinet.mutations.tension_bias,
                 effective_gravity,
                 effective_friction,
                 chaos_val,
                 self.cabinet.active_drain_multiplier(),
             );
+
+            if rebirth {
+                self.cabinet.mutations.lorenz_rho_mod *= 0.5;
+                info!(lorenz_rho_mod = self.cabinet.mutations.lorenz_rho_mod, "Engine rebirth: lorenz_rho_mod halved");
+            }
 
             // 5. Tick Thought Cabinet — check for crystallizations
             let mut crystallizations = self.cabinet.tick();
@@ -710,5 +720,67 @@ mod tests {
         let rho_mod_delta = 0.0;
         pulse.rho_velocity_ema = (1.0 - gamma) * pulse.rho_velocity_ema + gamma * rho_mod_delta;
         assert!((pulse.rho_velocity_ema - 0.16).abs() < 1e-9);
+    }
+
+    #[test]
+    fn test_stabilize_delta_rho_config() {
+        let toml_str = r#"
+            gravity = 9.8
+            friction = 0.5
+            seed = 0.506
+            initial_tension = 0.0
+            rho_decay_k = 0.001
+            rho_restore_alpha = 0.01
+            rho_restore_beta = 1.0
+            rho_ema_gamma = 0.2
+            stabilize_delta_rho = -2.5
+        "#;
+        let config: ChaosConfig = toml::from_str(toml_str).unwrap();
+        assert_eq!(config.stabilize_delta_rho, -2.5);
+
+        // default fallback
+        let toml_str_empty = "";
+        let config_default: ChaosConfig = toml::from_str(toml_str_empty).unwrap_or_default();
+        assert_eq!(config_default.stabilize_delta_rho, -1.0);
+    }
+
+    #[test]
+    fn test_rebirth_halves_rho() {
+        let (_, event_rx) = mpsc::channel(10);
+        let (snapshot_tx, _) = watch::channel(ChaosSnapshot::default());
+        let (lore_tx, _) = mpsc::channel(1);
+        let mut pulse = PulseLoop {
+            lorenz: LorenzAttractor::new(0.506),
+            logistic: LogisticMap::new(0.506),
+            state: EngineState::new(),
+            cabinet: ThoughtCabinet::new(),
+            tension: 50.0,
+            lore: None,
+            hw_tension: Arc::new(AtomicU64::new(50.0f64.to_bits())),
+            event_rx,
+            snapshot_tx,
+            lore_tx,
+            config: ChaosConfig::default(),
+            rho_velocity_ema: 0.0,
+        };
+
+        pulse.state.alive = false;
+        pulse.cabinet.mutations.lorenz_rho_mod = 6.0;
+
+        // Tick heartbeat with chaos_roll = 0.8 (should trigger rebirth)
+        let rebirth = pulse.state.tick_heartbeat(
+            pulse.tension,
+            pulse.config.gravity,
+            pulse.config.friction,
+            0.8,
+            1.0,
+        );
+        assert!(rebirth);
+
+        if rebirth {
+            pulse.cabinet.mutations.lorenz_rho_mod *= 0.5;
+        }
+
+        assert_eq!(pulse.cabinet.mutations.lorenz_rho_mod, 3.0);
     }
 }
