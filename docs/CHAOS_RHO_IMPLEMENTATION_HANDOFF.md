@@ -252,12 +252,14 @@ cargo build --release
 - `forcing` shows `+1` after story bursts, `−1` after decay/joke ticks
 - `ρ_eff` ≈ `28 + ρ_mod` (e.g. mod 5.7 → eff 33.7)
 
-### Tier 4 — Daemon (not yet applicable)
+### Tier 4 — Daemon (verified 2026-06-08)
 
-Skip until Workstream B complete. Then:
+Requires `PulseHandle` keepalive in `daemon_cmd.rs` (NLL drops `chaos_runtime` early; `Drop` aborts the loop).
 
-- `CHAOS_STATE.json` updates under data dir
-- `HEARTBEAT.md` includes ρ fields (currently missing Δ/ρ_eff — see §7.5)
+- `grep 'PulseLoop started' logs/daemon-restart.log`
+- `CHAOS_STATE.json` mtime advances; `tick` increments every ~15 snapshots
+- `HEARTBEAT.md` includes `ρ effective`, `ρ mod delta`, `ρ forcing`, `ρ breath (EMA)`
+- `data/Synapse/events.jsonl` emits `chaos.rho_telemetry` every 15 ticks (`source: gzmo_daemon`)
 
 ### Tier 5 — Edge-node (parity check)
 
@@ -792,8 +794,8 @@ Copy to PR or issue when transferring ownership:
 - [x] Understand `chaos::Phase` ≠ Inhale/Exhale (`rho_breath_phase` separate)
 - [x] Workstream A docs committed (`2d7cdcf`)
 - [x] Workstreams B, C, E, G implemented
-- [ ] Tier 4 daemon verify on production stack
-- [ ] Edge-node TS parity (EMA + Stabilize)
+- [x] Tier 4 daemon verify on production stack (2026-06-08; keepalive fix)
+- [x] Edge-node TS parity (EMA + Stabilize)
 - [ ] Workstream F (tanh) — lab gate only if needed
 
 ---

@@ -215,13 +215,15 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
         .with_wiki(config.wiki.clone()),
     );
     // ─── Chaos Engine ────────────────────────────────────────────
+    // Keep PulseHandle alive for the full daemon lifetime — Drop aborts the loop.
     let chaos_runtime = crate::chaos_bootstrap::start_chaos_runtime(config);
+    let chaos_pulse = chaos_runtime.handle;
     let gateway_rwlock = Arc::new(tokio::sync::RwLock::new(orch_gateway.clone()));
     let state_dir = config.memory.vault_db.parent().unwrap_or(std::path::Path::new("data")).to_path_buf();
     let _chaos_bridge = crate::chaos_bootstrap::spawn_snapshot_bridge(
-        chaos_runtime.handle.snapshot_rx.clone(),
+        chaos_pulse.snapshot_rx.clone(),
         gateway_rwlock,
-        chaos_runtime.feedback_tx.clone(),
+        chaos_pulse.feedback_tx.clone(),
         state_dir,
         None,
         Some(Arc::clone(&synapse)),
@@ -240,7 +242,7 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
         ),
         vault: Some(Arc::clone(&dream_vault)),
         episodic: Some(Arc::clone(&dream_episodic)),
-        chaos_feedback_tx: Some(chaos_runtime.feedback_tx.clone()),
+        chaos_feedback_tx: Some(chaos_pulse.feedback_tx.clone()),
         ingest_engine: if config.ingest.enabled {
             Some(Arc::clone(&ingest_engine))
         } else {
@@ -618,6 +620,8 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
     });
 
     let _identity = identity;
+    // Pin PulseLoop task — must not drop until daemon exits.
+    let _chaos_pulse_keepalive = chaos_pulse;
 
     tokio::select! {
         _ = heartbeat_handle => error!("Heartbeat exited"),
