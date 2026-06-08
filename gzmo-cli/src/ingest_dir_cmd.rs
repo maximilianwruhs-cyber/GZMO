@@ -57,6 +57,7 @@ pub async fn run(config: &GzmoConfig, _identity: IdentityEngine, dir: PathBuf) -
         embeddings::open_vault_with_embeddings(
             &config.memory.vault_db,
             &config.embeddings,
+            &config.redis,
             &config.rerank,
             &config.qdrant,
         )
@@ -89,7 +90,8 @@ pub async fn run(config: &GzmoConfig, _identity: IdentityEngine, dir: PathBuf) -
         tools,
         config.ingest.clone(),
         Some(Arc::clone(&synapse)),
-    );
+    )
+    .with_wiki(config.wiki.clone());
 
     let mut ok = 0usize;
     let mut fail = 0usize;

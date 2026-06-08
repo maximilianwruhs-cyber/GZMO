@@ -8,8 +8,9 @@ use serde::{Deserialize, Serialize};
 use serde_json::json;
 
 use crate::agent_session::AgentSession;
-use crate::config::GzmoConfig;
+use crate::config::{EmbeddingsConfig, GzmoConfig, PlatformSearchConfig, QdrantConfig, RedisConfig, RerankConfig};
 use crate::memory::embeddings;
+use crate::platform_search::platform_cross_search;
 use crate::memory::profile::{GzmoProfile, ProfileOptions};
 use crate::memory::scratch::{RecallSnippet, ScratchScope, ScratchService};
 use crate::memory::vault::SqliteVault;
@@ -20,6 +21,11 @@ use crate::tools::{ToolDef, ToolHandler};
 pub struct PlatformMemory {
     pub vault: Arc<SqliteVault>,
     pub session: AgentSession,
+    platform_search: PlatformSearchConfig,
+    qdrant: QdrantConfig,
+    embeddings: EmbeddingsConfig,
+    redis: RedisConfig,
+    rerank: RerankConfig,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -55,7 +61,15 @@ pub struct MemoryStatusReport {
 impl PlatformMemory {
     /// Bind an already-open vault and session (e.g. legacy `gzmo chat` harness).
     pub fn from_parts(vault: Arc<SqliteVault>, session: AgentSession) -> Self {
-        Self { vault, session }
+        Self {
+            vault,
+            session,
+            platform_search: PlatformSearchConfig::default(),
+            qdrant: QdrantConfig::default(),
+            embeddings: EmbeddingsConfig::default(),
+            redis: RedisConfig::default(),
+            rerank: RerankConfig::default(),
+        }
     }
 
     pub async fn open(config: &GzmoConfig, session_id: Option<String>) -> Result<Self> {
@@ -69,6 +83,7 @@ impl PlatformMemory {
         let vault = embeddings::open_vault_with_embeddings(
             &config.memory.vault_db,
             &config.embeddings,
+            &config.redis,
             &config.rerank,
             &config.qdrant,
         )
@@ -80,6 +95,11 @@ impl PlatformMemory {
         Ok(Self {
             vault: Arc::new(vault),
             session,
+            platform_search: config.platform_search.clone(),
+            qdrant: config.qdrant.clone(),
+            embeddings: config.embeddings.clone(),
+            redis: config.redis.clone(),
+            rerank: config.rerank.clone(),
         })
     }
 
@@ -103,31 +123,31 @@ impl PlatformMemory {
         write_scratch: bool,
     ) -> Result<MemorySearchResult> {
         let limit = limit.clamp(1, 20);
-        let (text, results) = memory_search_core(&self.vault, query, limit).await?;
-        let scratch_written = write_scratch && !results.is_empty();
-        let hits = results.len();
-        let items: Vec<MemoryHit> = results
-            .iter()
-            .map(|(fact, score)| {
-                let ev_text = self.vault.get_evidence_text(fact.id).ok().flatten();
-                MemoryHit {
-                    content: fact.content.clone(),
-                    score: *score as f32,
-                    source_file: self.vault.honeypot_source_file(fact.id).ok().flatten(),
-                    fact_id: Some(fact.id),
-                    evidence_text: ev_text,
-                }
-            })
-            .collect();
+        let (text, items) = platform_cross_search(
+            &self.vault,
+            &self.platform_search,
+            &self.qdrant,
+            &self.embeddings,
+            &self.redis,
+            &self.rerank,
+            query,
+            limit,
+        )
+        .await?;
+        let scratch_written = write_scratch && !items.is_empty();
+        let hits = items.len();
 
         if scratch_written {
-            let snippets: Vec<RecallSnippet> = results
+            let snippets: Vec<RecallSnippet> = items
                 .iter()
-                .map(|(fact, score)| RecallSnippet {
-                    content: fact.content.clone(),
-                    score: *score as f32,
-                    fact_id: Some(fact.id.to_string()),
-                    evidence_text: self.vault.get_evidence_text(fact.id).ok().flatten(),
+                .map(|hit| RecallSnippet {
+                    content: hit.content.clone(),
+                    score: hit.score,
+                    fact_id: hit.fact_id.map(|id| id.to_string()),
+                    evidence_text: hit
+                        .fact_id
+                        .and_then(|id| self.vault.get_evidence_text(id).ok().flatten())
+                        .or_else(|| hit.evidence_text.clone()),
                 })
                 .collect();
             self.session.scratch().write(&self.scratch_scope(), snippets).await?;
@@ -161,7 +181,11 @@ impl PlatformMemory {
     pub async fn status(&self) -> Result<MemoryStatusReport> {
         let vault_facts = self.vault.count().unwrap_or(0);
         let scratch_backend = if self.session.uses_redis() {
-            "redis"
+            if self.session.scratch().redis_live().await {
+                "redis"
+            } else {
+                "redis (unreachable — in-memory buffer)"
+            }
         } else {
             "in-memory"
         };
@@ -247,7 +271,7 @@ impl ToolHandler for GzmoMemorySearchTool {
     fn definition(&self) -> ToolDef {
         ToolDef {
             name: "gzmo_memory_search".to_string(),
-            description: "Search GZMO honeypot/vault memory and store hits in session scratch for recall injection.".to_string(),
+            description: "Search GZMO honeypot/vault + Pi knowledge (when [platform_search] enabled); stores hits in session scratch.".to_string(),
             parameters: json!({
                 "type": "object",
                 "properties": {

@@ -231,6 +231,9 @@ pub async fn run() -> Result<()> {
 
     eprintln!();
     eprintln!("  {GREEN}{BOLD}Done!{RESET} Run {BOLD}gzmo{RESET} to start chatting, or {BOLD}gzmo daemon{RESET} for background mode.");
+    if !Path::new(".env").exists() && Path::new(".env.template").exists() {
+        eprintln!("  {DIM}Tip: copy .env.template → .env and set NEO4J_PASSWORD if using MCP memory.{RESET}");
+    }
     eprintln!();
 
     Ok(())

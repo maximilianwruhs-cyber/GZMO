@@ -401,6 +401,8 @@ Daemon PID: `/tmp/gzmo_daemon.pid`
 
 | Topic | Document |
 |-------|----------|
+| **Architecture ingest reference** | [`GZMO_SYSTEM_ARCHITECTURE_INGEST.md`](./GZMO_SYSTEM_ARCHITECTURE_INGEST.md) |
+| **Wave-1 migration runbook** | [`MIGRATION_INGEST_RUNBOOK.md`](./MIGRATION_INGEST_RUNBOOK.md) |
 | **GZMO identity** | [`MACHINE.md`](../MACHINE.md) |
 | **Roadmap (local → M5)** | [`ROADMAP_TO_M5.md`](./ROADMAP_TO_M5.md) |
 | **Antigravity handover** | [`ANTIGRAVITY_HANDOVER.md`](./ANTIGRAVITY_HANDOVER.md) |

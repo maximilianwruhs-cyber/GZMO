@@ -105,6 +105,8 @@ pub enum EventType {
     IngestComplete,
     /// Session distillation completed
     DistillComplete,
+    /// WikiEngine (Knowledge Gardener) emitted/maintained wiki pages
+    WikiComplete,
 
     // --- Senses (HSP — output-only, never feeds back) ---
     /// System tension metric emitted (no cognitive impact)

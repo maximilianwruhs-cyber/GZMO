@@ -1,0 +1,50 @@
+{
+  "label": "baseline-m4-production",
+  "recorded_at": "2026-06-04",
+  "promoted_at": "2026-06-04T20:52:00Z",
+  "source_report": "/home/maximilian-wruhs/Projects/_foundation-audit/survey_GZMO/scripts/ingest-quality/report.json",
+  "note": "M4 production baseline: ingest contract + strict recall + faithfulness_context gate.",
+  "summary": {
+    "total_files": 57,
+    "golden_files": 50,
+    "entities_extracted": 706,
+    "relations_extracted": 430,
+    "entities_promoted": 660,
+    "relations_promoted": 341,
+    "zero_entity_files": 0,
+    "zero_relation_files": 1,
+    "relation_promotion_rate": 0.9368421052631579,
+    "must_entities_recall": 1.0,
+    "must_facts_recall": 0.8264840182648402,
+    "anti_entities_found_count": 0,
+    "relation_promotion_rate_all": 0.7930232558139535,
+    "relation_promotion_waived_files": 23,
+    "relations_extracted_scoped": 190,
+    "relations_promoted_scoped": 178,
+    "mem_score": {
+      "recall_at_5": 0.10344827586206896,
+      "recall_at_5_rrf_strict": 0.10344827586206896,
+      "faithfulness_judge": 1.0,
+      "faithfulness_context": 1.0
+    }
+  },
+  "mem_score": {
+    "recall_at_5": 0.10344827586206896,
+    "recall_at_5_rrf_strict": 0.10344827586206896,
+    "faithfulness_judge": 1.0,
+    "faithfulness_context": 1.0
+  },
+  "m4_aligned": {
+    "recall_at_5_rrf_strict": 0.10344827586206896,
+    "faithfulness_context": 1.0,
+    "faithfulness_corpus": null,
+    "faithfulness_judge": 1.0
+  },
+  "gates": {
+    "contract": "PASS",
+    "strict": "PASS",
+    "layered": "PASS",
+    "golden_audit": "PASS",
+    "faithfulness_context": "PASS"
+  }
+}

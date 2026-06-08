@@ -1,0 +1,18 @@
+[Unit]
+Description=GZMO Prime (Qwen 3.6 35B MoE @ 128K on :8000)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=%i
+WorkingDirectory=%h/Projects/llama.cpp/prime-bench
+Environment=GGML_CUDA_DISABLE_GRAPHS=1
+ExecStart=%h/Projects/llama.cpp/prime-bench/start-prime.sh
+Restart=on-failure
+RestartSec=30
+# Prime load can take several minutes on dual 5070 Ti
+TimeoutStartSec=600
+
+[Install]
+WantedBy=default.target

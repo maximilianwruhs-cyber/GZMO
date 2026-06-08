@@ -1,0 +1,51 @@
+{
+  "timestamp": "2026-06-02T17:53:22+02:00",
+  "sqlite": {
+    "semantic_vault_count": 2400,
+    "quarantine_vault_count": 0,
+    "sample_facts": [
+      "[Session 2026-04-08 16:09] Topics discussed: GZMO, open sovereign.toml in a new Zellij pane next to me using nano.",
+      "Sys-janitor check 2026-05-31 16:22 UTC: CPU 0.8%, RAM 20.5% (12.4/60.6 GB), disk / at 9.2% (1662 GB free), /boot/efi at 0%. No anomalous processes detected. Top processes: gzmo, tokio-rt-worker, vkps, cursor \u2014 all benign.",
+      "System health check 2026-05-31 17:28 UTC: CPU 2.8%, RAM 23.7% (14.4/60.6 GB), Disk / 9.3% (1661/1831 GB free). Top processes: gzmo (23.5%), tokio-rt-worker (23.5%), cursor (9.4%). No anomalies, no rogue processes.",
+      "2026-05-31 17:51 UTC sys_janitor check: CPU 2.8%, RAM 30.5% (18.5/60.5 GB), disk / at 9.4% (1659 GB free). Top CPU consumers: gzmo (24.5%), tokio-rt-worker (20.4%) \u2014 both self-referential. No rogue processes. No action required.",
+      "2026-05-31 17:51 UTC \u2014 sys_janitor check: CPU 1.1%, RAM 30.3% (18.3/60.5 GB), disk / 9.4% (1659 GB free). Top processes: tokio-rt-worker, gzmo, gdbus, gmain, cursor \u2014 all at 0.0% CPU. No anomalies, no unassociated runaway processes."
+    ]
+  },
+  "neo4j": {
+    "node_count": 611,
+    "relationship_count": 446,
+    "sample_entities": [
+      [
+        "GZMO",
+        "SYSTEM"
+      ],
+      [
+        "ObulusWallet",
+        "CONCEPT"
+      ],
+      [
+        "Project Obulus",
+        "PROJECT"
+      ],
+      [
+        "Obulus ($OBL)",
+        "CONCEPT"
+      ],
+      [
+        "Obulus Evo-Grid",
+        "SYSTEM"
+      ]
+    ]
+  },
+  "qdrant": {
+    "points_count": 720
+  },
+  "episodic_ingest_entries_count": 57,
+  "episodic_samples": [
+    "[ingest:wave_01_gzmo_obolus_drive_cleanTakeoutDriveObolusObolus-masteragentsarchitectural_scoutmd.md] ingested `wave_01_gzmo_obolus_drive_cleanTakeoutDriveObolusObolus-masteragentsarchitectural_scoutmd.md`: promoted 15 entities, 14 relations (verify dropped 0E 0R; preprocess dropped 2)",
+    "[ingest:wave_01_gzmo_obolus_drive_cleanTakeoutDriveObolusObolus-masteragentsawareness_agentmd.md] ingested `wave_01_gzmo_obolus_drive_cleanTakeoutDriveObolusObolus-masteragentsawareness_agentmd.md`: promoted 4 entities, 2 relations (verify dropped 0E 0R; preprocess dropped 0)",
+    "[ingest:wave_01_gzmo_obolus_drive_cleanTakeoutDriveObolusObolus-masteragentsbackup_custodianmd.md] ingested `wave_01_gzmo_obolus_drive_cleanTakeoutDriveObolusObolus-masteragentsbackup_custodianmd.md`: promoted 10 entities, 9 relations (verify dropped 0E 0R; preprocess dropped 0)",
+    "[ingest:wave_01_gzmo_obolus_drive_cleanTakeoutDriveObolusObolus-masteragentsbot_integrator_agentmd.md] ingested `wave_01_gzmo_obolus_drive_cleanTakeoutDriveObolusObolus-masteragentsbot_integrator_agentmd.md`: promoted 17 entities, 14 relations (verify dropped 1E 3R; preprocess dropped 2)",
+    "[ingest:wave_01_gzmo_obolus_drive_cleanTakeoutDriveObolusObolus-masteragentscoding_quality_agentmd.md] ingested `wave_01_gzmo_obolus_drive_cleanTakeoutDriveObolusObolus-masteragentscoding_quality_agentmd.md`: promoted 11 entities, 9 relations (verify dropped 0E 1R; preprocess dropped 0)"
+  ]
+}

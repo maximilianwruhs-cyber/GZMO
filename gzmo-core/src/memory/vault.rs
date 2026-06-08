@@ -215,7 +215,18 @@ impl SqliteVault {
             init_conn.execute_batch("PRAGMA user_version = 6")?;
             info!("Applied schema migration v6: distill_dedup");
         }
-
+        let user_version: u32 = init_conn.query_row("PRAGMA user_version", [], |row| row.get(0))?;
+        if user_version < 7 {
+            init_conn.execute_batch(
+                "CREATE TABLE IF NOT EXISTS ingest_dedup (
+                    content_hash TEXT PRIMARY KEY,
+                    source_path TEXT NOT NULL,
+                    ingested_at TEXT NOT NULL
+                );",
+            )?;
+            init_conn.execute_batch("PRAGMA user_version = 7")?;
+            info!("Applied schema migration v7: ingest_dedup");
+        }
 
         info!("Semantic vault initialized (WAL mode + r2d2 pool)");
         
@@ -862,7 +873,12 @@ impl SqliteVault {
         if !script.exists() {
             return Ok(Vec::new());
         }
-        let out = StdCommand::new("python3")
+        let python = if Path::new("scripts/.venv/bin/python3").exists() {
+            "scripts/.venv/bin/python3"
+        } else {
+            "python3"
+        };
+        let out = StdCommand::new(python)
             .arg(script)
             .arg(query)
             .arg(limit.to_string())
@@ -1008,6 +1024,30 @@ impl SqliteVault {
         Ok(())
     }
 
+    /// Returns true when identical prepared ingest body was already processed.
+    pub fn ingest_dedup_seen(&self, content_hash: &str) -> Result<bool> {
+        let conn = self.pool.get()?;
+        let n: i64 = conn.query_row(
+            "SELECT COUNT(*) FROM ingest_dedup WHERE content_hash = ?1",
+            params![content_hash],
+            |r| r.get(0),
+        )?;
+        Ok(n > 0)
+    }
+
+    pub fn record_ingest_dedup(&self, content_hash: &str, source_path: &str) -> Result<()> {
+        let conn = self.pool.get()?;
+        let now = Utc::now().to_rfc3339();
+        conn.execute(
+            "INSERT INTO ingest_dedup (content_hash, source_path, ingested_at)
+             VALUES (?1, ?2, ?3)
+             ON CONFLICT(content_hash) DO UPDATE SET
+                source_path = excluded.source_path,
+                ingested_at = excluded.ingested_at",
+            params![content_hash, source_path, now],
+        )?;
+        Ok(())
+    }
 
     fn load_honeypot_candidate(&self, id: Uuid) -> Result<Option<RecallCandidate>> {
         let conn = self.pool.get()?;

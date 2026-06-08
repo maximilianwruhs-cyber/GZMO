@@ -64,6 +64,7 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
     let vault = match embeddings::open_vault_with_embeddings(
         &config.memory.vault_db,
         &config.embeddings,
+        &config.redis,
         &config.rerank,
         &config.qdrant,
     )
@@ -89,9 +90,16 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
     )
     .await;
     if agent_session.uses_redis() {
-        eprintln!("  {COPPER}⚙ Scratch cache: Redis (LXC101){RESET}");
+        if agent_session.scratch().redis_live().await {
+            eprintln!("  {COPPER}⚙ Scratch cache: Redis (LXC101){RESET}");
+        } else {
+            eprintln!(
+                "  {COPPER}⚙ Scratch cache: Redis configured but unreachable — \
+                 in-memory buffer, retrying{RESET}"
+            );
+        }
     } else {
-        eprintln!("  {COPPER}⚙ Scratch cache: in-memory fallback{RESET}");
+        eprintln!("  {COPPER}⚙ Scratch cache: in-memory (Redis disabled){RESET}");
     }
     let scratch = agent_session.scratch();
 
@@ -974,7 +982,10 @@ async fn handle_slash_command(
             eprintln!("  {CYAN}║{RESET}  Incubating: {}  Crystallized: {:<5}{CYAN}║{RESET}", snap.thoughts_incubating, snap.thoughts_crystallized);
             eprintln!("  {CYAN}║{RESET}  Gravity mod:  {:<+8.2}           {CYAN}║{RESET}", snap.mutations.gravity_mod);
             eprintln!("  {CYAN}║{RESET}  Friction mod: {:<+8.2}           {CYAN}║{RESET}", snap.mutations.friction_mod);
-            eprintln!("  {CYAN}║{RESET}  Lorenz ρ mod: {:<+8.2}           {CYAN}║{RESET}", snap.mutations.lorenz_rho_mod);
+            eprintln!("  {CYAN}║{RESET}  Lorenz ρ mod: {:<+8.2}  Δ{:+.3}     {CYAN}║{RESET}",
+                snap.mutations.lorenz_rho_mod, snap.rho_mod_delta);
+            eprintln!("  {CYAN}║{RESET}  ρ_eff: {:.2}  forcing: {:+}          {CYAN}║{RESET}",
+                snap.rho_effective, snap.rho_forcing_sign);
             eprintln!("  {CYAN}╠══════════════════════════════════════╣{RESET}");
             eprintln!("  {CYAN}║  🌡  LLM Parameters (Lorenz-derived) ║{RESET}");
             eprintln!("  {CYAN}║{RESET}  Temperature: {:.3}                {CYAN}║{RESET}", snap.llm_temperature);

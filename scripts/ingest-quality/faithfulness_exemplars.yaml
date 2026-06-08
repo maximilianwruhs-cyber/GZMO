@@ -1,0 +1,36 @@
+# Few-shot exemplars for retrieval faithfulness judge (M4).
+# Claims are judged against SOURCE only — not retrieval hits.
+
+exemplars:
+  - claim: "intelligence per watt"
+    source_snippet: "Obulus measures intelligence per watt as quality divided by energy."
+    supported: true
+    confidence: 0.95
+    evidence: "intelligence per watt as quality divided by energy"
+
+  - claim: "runs on Kubernetes exclusively in production"
+    source_snippet: "Docker Compose is used for local stacks; Kubernetes is optional."
+    supported: false
+    confidence: 0.05
+    evidence: ""
+
+  - claim: "Bitrot-Detection"
+    source_snippet: "The Backup Custodian performs Bitrot-Detection on archives."
+    supported: true
+    confidence: 0.92
+    evidence: "performs Bitrot-Detection on archives"
+
+  # Real fragment from the 59% run: a truncated, context-free clause. Reject —
+  # it asserts nothing the source can confirm as a standalone claim.
+  - claim: "integrated into the system."
+    source_snippet: "The dashboard reads hardware telemetry from a Rust collector."
+    supported: false
+    confidence: 0.10
+    evidence: ""
+
+  # Real success: a full grounded claim with a verbatim quote.
+  - claim: "Micro Virtual Machines (MicroVMs) like Firecracker"
+    source_snippet: "agents should operate within Micro Virtual Machines (MicroVMs) like Firecracker or gVisor"
+    supported: true
+    confidence: 0.93
+    evidence: "Micro Virtual Machines (MicroVMs) like Firecracker or gVisor"

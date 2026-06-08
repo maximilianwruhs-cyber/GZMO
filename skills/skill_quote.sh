@@ -6,12 +6,10 @@
 SKILLS_DIR="$(cd "$(dirname "$0")" && pwd)"
 source "$SKILLS_DIR/_llm_helper.sh"
 
-LORE_FILE="$RANDOMIZER_ROOT/lore.toml"
-
-if [ ! -f "$LORE_FILE" ]; then
-    echo -e "${C_RED}✗ lore.toml not found at $LORE_FILE${C_RESET}"
+LORE_FILE=$(resolve_lore_file) || {
+    echo -e "${C_RED}✗ lore.toml not found (checked data/lore.toml and legacy paths)${C_RESET}"
     exit 1
-fi
+}
 
 # Extract all quotes (text + author pairs)
 mapfile -t TEXTS < <(grep -A1 '^\[\[quotes\]\]' "$LORE_FILE" | grep '^text = ' | sed 's/^text = "//;s/"$//')

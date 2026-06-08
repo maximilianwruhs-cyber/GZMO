@@ -61,6 +61,7 @@ pub async fn run(
         embeddings::open_vault_with_embeddings(
             &config.memory.vault_db,
             &config.embeddings,
+            &config.redis,
             &config.rerank,
             &config.qdrant,
         )
@@ -93,7 +94,8 @@ pub async fn run(
         tools,
         config.ingest.clone(),
         Some(Arc::clone(&synapse)),
-    );
+    )
+    .with_wiki(config.wiki.clone());
 
     let report = if dry_run {
         engine.ingest_file_dry_run(&path).await?

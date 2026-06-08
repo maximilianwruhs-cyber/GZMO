@@ -1,0 +1,17 @@
+# sandbox_live_probes — evaluated against honeypot after Phase C
+probes:
+  - query: "What is GZMO's SOUL and identity model?"
+    must_contain: ["sovereign", "identity", "rust", "chief of staff"]
+    min_score: 0.35
+  - query: "What is the Prime Directive of the Safe Organism Blueprint?"
+    must_contain: ["sterile", "cognition", "telemetry", "randomness"]
+    min_score: 0.35
+  - query: "What is GZMO's physical and network topology?"
+    must_contain: ["workstation", "vm200", "lxc101", "qdrant"]
+    min_score: 0.35
+  - query: "How does Theodor W. Adorno define negative dialectics?"
+    must_contain: ["identity thinking", "non-identical", "frankfurt school", "reconciliation"]
+    min_score: 0.35
+  - query: "How do Pi coding agent extensions handle dynamic module and dependency resolution?"
+    must_contain: ["package.json", "npm install", "dependencies", "node_modules"]
+    min_score: 0.35

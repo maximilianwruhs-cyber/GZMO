@@ -4,15 +4,19 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use anyhow::Result;
-use chrono::{NaiveDate, Timelike, Utc};
+use chrono::{Datelike, NaiveDate, Timelike, Utc};
 use tracing::{error, info};
 
 use gzmo_core::config::GzmoConfig;
-use gzmo_core::daemon::{FileChangeCheck, HeartbeatEngine, HealthPing};
+use gzmo_core::daemon::{
+    cron_due_today, cron_minutes, spark_cron_slot_due, FileChangeCheck, HeartbeatEngine,
+    HealthPing,
+};
 use gzmo_core::dreams::DreamEngine;
 use gzmo_core::dreams_md::write_dream_narrative;
 use gzmo_core::ingest::IngestEngine;
 use gzmo_core::spark::{append_spark_to_dreams, SparkEngine};
+use gzmo_core::wiki::WikiEngine;
 use gzmo_core::gateway::LlmGateway;
 use gzmo_core::gateway::GatewayRouter;
 use gzmo_core::config::TaskKind;
@@ -81,6 +85,7 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
     let dream_vault = embeddings::open_vault_with_embeddings(
         &config.memory.vault_db,
         &config.embeddings,
+        &config.redis,
         &config.rerank,
         &config.qdrant,
     )
@@ -197,15 +202,18 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
     let spark_config = config.spark.clone();
     let dreams_path_spark = config.skills.dreams_path.clone();
 
-    let ingest_engine = Arc::new(IngestEngine::new_with_verify(
-        (*dream_vault).clone(),
-        FileEpisodicStore::new(&config.memory.directory),
-        Arc::clone(&ingest_gateway),
-        Arc::clone(&ingest_verify_gateway),
-        Arc::clone(&dream_tools),
-        config.ingest.clone(),
-        Some(Arc::clone(&synapse)),
-    ));
+    let ingest_engine = Arc::new(
+        IngestEngine::new_with_verify(
+            (*dream_vault).clone(),
+            FileEpisodicStore::new(&config.memory.directory),
+            Arc::clone(&ingest_gateway),
+            Arc::clone(&ingest_verify_gateway),
+            Arc::clone(&dream_tools),
+            config.ingest.clone(),
+            Some(Arc::clone(&synapse)),
+        )
+        .with_wiki(config.wiki.clone()),
+    );
 
     info!("All subsystems online — entering daemon loop");
 
@@ -219,7 +227,8 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
         ),
         vault: Some(Arc::clone(&dream_vault)),
         episodic: Some(Arc::clone(&dream_episodic)),
-        chaos_feedback_tx: None, // Daemon mode doesn't run PulseLoop yet
+        // Synapse chaos heartbeat deferred: wire only after PulseLoop runs here.
+        chaos_feedback_tx: None,
         ingest_engine: if config.ingest.enabled {
             Some(Arc::clone(&ingest_engine))
         } else {
@@ -263,17 +272,18 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
                 continue;
             }
             let now = Utc::now();
-            if now.hour() != dream_config.cron_hour || now.minute() != dream_config.cron_minute {
+            let yesterday = now.date_naive() - chrono::Duration::days(1);
+            if now.hour() * 60 + now.minute() < cron_minutes(dream_config.cron_hour, dream_config.cron_minute)
+            {
                 continue;
             }
-            let yesterday = now.date_naive() - chrono::Duration::days(1);
             if last_consolidated == Some(yesterday) {
                 continue;
             }
-            last_consolidated = Some(yesterday);
             info!(date = %yesterday, "Dream consolidation starting");
             match dream_engine_clone.consolidate(yesterday).await {
                 Ok(report) => {
+                    last_consolidated = Some(yesterday);
                     info!(
                         entities = report.entities_extracted,
                         kg_relations = report.kg_relations_written,
@@ -308,12 +318,13 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
             }
             let now = Utc::now();
             let today = now.date_naive();
-            let should_run = match spark_config.schedule_mode {
-                SparkScheduleMode::Cron => {
-                    spark_config.cron_hours.contains(&now.hour())
-                        && now.minute() == spark_config.cron_minute
-                        && last_run_key != Some((now.hour(), now.minute(), today))
-                }
+            let cron_slot = match spark_config.schedule_mode {
+                SparkScheduleMode::Cron => spark_cron_slot_due(
+                    &now,
+                    &spark_config.cron_hours,
+                    spark_config.cron_minute,
+                    last_run_key,
+                ),
                 SparkScheduleMode::Dice => {
                     if next_dice_run.is_none() {
                         let (next, seed, roll, minutes) =
@@ -322,23 +333,26 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
                         next_dice_run = Some(next);
                         info!(roll, minutes, next = %next, "Spark dice scheduled next run");
                     }
-                    next_dice_run.is_some_and(|t| now >= t)
+                    if next_dice_run.is_some_and(|t| now >= t) {
+                        Some((now.hour(), now.minute()))
+                    } else {
+                        None
+                    }
                 }
             };
 
-            if !should_run {
+            let Some((slot_hour, slot_minute)) = cron_slot else {
                 continue;
-            }
+            };
 
-            if spark_config.schedule_mode == SparkScheduleMode::Cron {
-                last_run_key = Some((now.hour(), now.minute(), today));
-            } else {
-                next_dice_run = None;
-            }
-
-            info!(date = %today, mode = ?spark_config.schedule_mode, "Spark cycle starting");
+            info!(date = %today, mode = ?spark_config.schedule_mode, hour = slot_hour, minute = slot_minute, "Spark cycle starting");
             match spark_engine_clone.run(today).await {
                 Ok(report) => {
+                    if spark_config.schedule_mode == SparkScheduleMode::Cron {
+                        last_run_key = Some((slot_hour, slot_minute, today));
+                    } else {
+                        next_dice_run = None;
+                    }
                     if let Err(e) = append_spark_to_dreams(&dreams_path_spark, &report.section).await {
                         error!("Failed to append spark to DREAMS.md: {e}");
                     } else {
@@ -367,18 +381,20 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
                 continue;
             }
             let now = Utc::now();
-            if now.hour() != qdrant_cfg.sync_cron_hour || now.minute() != qdrant_cfg.sync_cron_minute {
+            if !cron_due_today(
+                &now,
+                qdrant_cfg.sync_cron_hour,
+                qdrant_cfg.sync_cron_minute,
+                last_sync_date,
+            ) {
                 continue;
             }
             let today = now.date_naive();
-            if last_sync_date == Some(today) {
-                continue;
-            }
-            last_sync_date = Some(today);
             info!(hour = qdrant_cfg.sync_cron_hour, minute = qdrant_cfg.sync_cron_minute, "Qdrant vault sync starting");
             if let Err(e) = sync_vault_to_qdrant(&project_root, &qdrant_cfg, &vault_db_path).await {
                 error!("Qdrant vault sync failed: {e}");
             } else {
+                last_sync_date = Some(today);
                 info!("Qdrant vault sync complete");
             }
         }
@@ -402,14 +418,15 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
                 continue;
             }
             let now = Utc::now();
-            if now.hour() != sd_config.cron_hour || now.minute() != sd_config.cron_minute {
+            if !cron_due_today(
+                &now,
+                sd_config.cron_hour,
+                sd_config.cron_minute,
+                last_distill_date,
+            ) {
                 continue;
             }
             let today = now.date_naive();
-            if last_distill_date == Some(today) {
-                continue;
-            }
-            last_distill_date = Some(today);
             info!(
                 hour = sd_config.cron_hour,
                 minute = sd_config.cron_minute,
@@ -422,6 +439,7 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
                 .await
             {
                 Ok(out) if out.status.success() => {
+                    last_distill_date = Some(today);
                     let summary = String::from_utf8_lossy(&out.stdout);
                     info!(summary = %summary.trim(), "Session distill complete");
                 }
@@ -437,6 +455,156 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
         }
     });
 
+    // Synapse pull — read-only Pi event tail → episodic (feeds Dream)
+    let synapse_cfg = config.synapse_pull.clone();
+    let synapse_episodic = FileEpisodicStore::new(&config.memory.directory);
+    let synapse_root = qdrant_sync::discover_project_root();
+    let synapse_handle = tokio::spawn(async move {
+        let mut interval = tokio::time::interval(Duration::from_secs(60));
+        let mut last_pull_date: Option<NaiveDate> = None;
+        let bus_path = synapse_root.join(&synapse_cfg.bus_path);
+        let state_path = gzmo_core::synapse_reader::default_state_path(&synapse_root);
+        loop {
+            interval.tick().await;
+            if !synapse_cfg.enabled {
+                continue;
+            }
+            let now = Utc::now();
+            if !cron_due_today(
+                &now,
+                synapse_cfg.cron_hour,
+                synapse_cfg.cron_minute,
+                last_pull_date,
+            ) {
+                continue;
+            }
+            let today = now.date_naive();
+            info!("Synapse pull starting (read-only)");
+            match gzmo_core::synapse_reader::pull_and_log_episodic(
+                &bus_path,
+                &state_path,
+                &synapse_episodic,
+                synapse_cfg.max_events,
+            )
+            .await
+            {
+                Ok(summary) => {
+                    last_pull_date = Some(today);
+                    info!(
+                        events = summary.events_read,
+                        quest = summary.quest_complete,
+                        "Synapse pull complete"
+                    );
+                }
+                Err(e) => error!("Synapse pull failed: {e}"),
+            }
+        }
+    });
+
+    // KG reconcile — canonicalize shared Neo4j ontology via MCP memory
+    let kg_cfg = config.kg_reconcile.clone();
+    let kg_tools = Arc::clone(&dream_tools);
+    let kg_handle = tokio::spawn(async move {
+        let mut interval = tokio::time::interval(Duration::from_secs(60));
+        let mut last_run_date: Option<NaiveDate> = None;
+        loop {
+            interval.tick().await;
+            if !kg_cfg.enabled {
+                continue;
+            }
+            let now = Utc::now();
+            if !cron_due_today(&now, kg_cfg.cron_hour, kg_cfg.cron_minute, last_run_date) {
+                continue;
+            }
+            let today = now.date_naive();
+            info!(dry_run = kg_cfg.dry_run, "KG reconcile starting");
+            match gzmo_core::kg_reconcile::run_kg_reconcile(kg_tools.as_ref(), &kg_cfg).await {
+                Ok(report) => {
+                    last_run_date = Some(today);
+                    info!(
+                        entities = report.entities_scanned,
+                        relations_fixed = report.relations_recanonicalized,
+                        dry_run = report.dry_run,
+                        "KG reconcile complete"
+                    );
+                }
+                Err(e) => error!("KG reconcile failed: {e}"),
+            }
+        }
+    });
+
+    // Wiki "Knowledge Gardener" — daily index sync (after Qdrant sync at 01:45).
+    let wiki_sync_cfg = config.wiki.clone();
+    let wiki_sync_handle = tokio::spawn(async move {
+        let mut interval = tokio::time::interval(Duration::from_secs(60));
+        let mut last_sync_date: Option<NaiveDate> = None;
+        loop {
+            interval.tick().await;
+            if !wiki_sync_cfg.enabled {
+                continue;
+            }
+            let now = Utc::now();
+            if !cron_due_today(
+                &now,
+                wiki_sync_cfg.sync_cron_hour,
+                wiki_sync_cfg.sync_cron_minute,
+                last_sync_date,
+            ) {
+                continue;
+            }
+            let today = now.date_naive();
+            info!(
+                hour = wiki_sync_cfg.sync_cron_hour,
+                minute = wiki_sync_cfg.sync_cron_minute,
+                "Wiki sync (Knowledge Gardener) starting"
+            );
+            match WikiEngine::new(wiki_sync_cfg.clone()).sync().await {
+                Ok(r) => {
+                    last_sync_date = Some(today);
+                    info!(pages = r.pages, entries = r.index_entries, "Wiki sync complete");
+                }
+                Err(e) => error!("Wiki sync failed: {e}"),
+            }
+        }
+    });
+
+    // Wiki lint — weekly structural health report (default Sunday 06:00 UTC).
+    let wiki_lint_cfg = config.wiki.clone();
+    let wiki_lint_handle = tokio::spawn(async move {
+        let mut interval = tokio::time::interval(Duration::from_secs(60));
+        let mut last_lint_date: Option<NaiveDate> = None;
+        loop {
+            interval.tick().await;
+            if !wiki_lint_cfg.enabled {
+                continue;
+            }
+            let now = Utc::now();
+            let today = now.date_naive();
+            if last_lint_date == Some(today) {
+                continue;
+            }
+            if now.weekday().num_days_from_sunday() != wiki_lint_cfg.lint_cron_dow {
+                continue;
+            }
+            if now.hour() < wiki_lint_cfg.lint_cron_hour {
+                continue;
+            }
+            info!(weekday = wiki_lint_cfg.lint_cron_dow, hour = wiki_lint_cfg.lint_cron_hour, "Wiki lint starting");
+            match WikiEngine::new(wiki_lint_cfg.clone()).lint().await {
+                Ok(r) => {
+                    last_lint_date = Some(today);
+                    info!(
+                        pages = r.pages,
+                        orphans = r.orphans.len(),
+                        broken = r.broken_links.len(),
+                        "Wiki lint complete"
+                    );
+                }
+                Err(e) => error!("Wiki lint failed: {e}"),
+            }
+        }
+    });
+
     let _identity = identity;
 
     tokio::select! {
@@ -446,6 +614,10 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
         _ = qdrant_handle => error!("Qdrant sync loop exited"),
         _ = distill_handle => error!("Session distill loop exited"),
         _ = distill_worker_handle => error!("Distill archive worker exited"),
+        _ = synapse_handle => error!("Synapse pull loop exited"),
+        _ = kg_handle => error!("KG reconcile loop exited"),
+        _ = wiki_sync_handle => error!("Wiki sync loop exited"),
+        _ = wiki_lint_handle => error!("Wiki lint loop exited"),
     }
 
     Ok(())

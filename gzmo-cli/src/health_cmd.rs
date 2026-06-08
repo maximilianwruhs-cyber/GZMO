@@ -4,7 +4,7 @@ use anyhow::Result;
 use gzmo_core::config::GzmoConfig;
 use gzmo_core::health::{
     format_report, probe_embeddings, probe_librarian, probe_llm_models, probe_mcp_memory,
-    probe_neo4j_bolt, probe_qdrant, probe_rerank, probe_sovereign, ProbeResult,
+    probe_neo4j_bolt, probe_qdrant, probe_redis, probe_rerank, probe_sovereign, ProbeResult,
 };
 use gzmo_core::identity::IdentityEngine;
 use gzmo_core::memory::embeddings;
@@ -21,10 +21,11 @@ pub async fn run(config: &GzmoConfig, _identity: IdentityEngine) -> Result<()> {
 
     let prime = config.engine.active_engine_for_mode(gzmo_core::config::EngineMode::Local);
     results.push(probe_llm_models(&prime).await);
-    results.push(probe_embeddings(&config.embeddings).await);
+    results.push(probe_embeddings(&config.embeddings, &config.redis).await);
     results.push(probe_qdrant(&config.qdrant).await);
     results.push(probe_rerank(&config.rerank).await);
     results.push(probe_librarian(&config.librarian).await);
+    results.push(probe_redis(&config.redis).await);
 
     if let Some(srv) = config.active_mcp_servers().find(|s| s.name == "memory") {
         if let Some(url) = srv.env.get("NEO4J_URL") {

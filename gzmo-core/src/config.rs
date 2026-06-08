@@ -145,6 +145,14 @@ impl TaskKind {
             Self::DistillSummary => "local",
         }
     }
+
+    /// Whether this task runs in the autonomous GZMO loop (daemon/CLI cognition)
+    /// rather than interactive chat. Background tasks are eligible for
+    /// cloud-first routing (`[routing] cloud_first_background`); `Chat` is not,
+    /// so chat-spawned subagents stay on the active engine.
+    pub fn is_background(&self) -> bool {
+        !matches!(self, Self::Chat)
+    }
 }
 
 // ─── Engine Mode ────────────────────────────────────────────────────────
@@ -275,6 +283,22 @@ pub struct GzmoConfig {
     /// Subagent delegation limits (SubagentRunner Lite).
     #[serde(default)]
     pub subagent: SubagentConfig,
+
+    /// Cross-collection platform search (honeypot + Pi knowledge Qdrant).
+    #[serde(default)]
+    pub platform_search: PlatformSearchConfig,
+
+    /// Neo4j ontology reconciliation (canonicalize entity/relation types).
+    #[serde(default)]
+    pub kg_reconcile: KgReconcileConfig,
+
+    /// Read-only Pi Synapse event pull into episodic (append-only bus preserved).
+    #[serde(default)]
+    pub synapse_pull: SynapsePullConfig,
+
+    /// Git-tracked markdown wiki layer (WikiEngine). Emit-only retrieval.
+    #[serde(default)]
+    pub wiki: WikiConfig,
 }
 
 // ─── Dreams ─────────────────────────────────────────────────────────────
@@ -476,6 +500,84 @@ impl Default for IngestConfig {
             chunk_chars: default_pipeline_chunk_chars(),
         }
     }
+}
+
+// ─── Wiki layer ────────────────────────────────────────────────────────────
+
+/// Settings for the git-tracked markdown wiki layer (`WikiEngine`).
+///
+/// The wiki is a browsable, compounding markdown synthesis layer that sits
+/// between raw RAG retrieval and `DREAMS.md`. Pages are derived from already
+/// verified vault facts, so retrieval is **emit-only**: `WikiEngine::search`
+/// greps over `wiki/*.md` and pages are never re-ingested into the honeypot
+/// (which would create circular facts). See `WIKI.md` and `docs/WIKI_LAYER.md`.
+#[derive(Debug, Deserialize, Clone)]
+pub struct WikiConfig {
+    #[serde(default = "default_wiki_enabled")]
+    pub enabled: bool,
+
+    #[serde(default = "default_wiki_directory")]
+    pub directory: String,
+
+    #[serde(default = "default_wiki_index_path")]
+    pub index_path: String,
+
+    #[serde(default = "default_wiki_log_path")]
+    pub log_path: String,
+
+    #[serde(default = "default_wiki_schema_path")]
+    pub schema_path: String,
+
+    /// When true, `IngestEngine` emits a `wiki/sources/` page on promotion.
+    #[serde(default = "default_wiki_emit_on_ingest")]
+    pub emit_on_ingest: bool,
+
+    /// Daemon "Knowledge Gardener" sync loop (UTC hour/minute).
+    #[serde(default = "default_wiki_sync_cron_hour")]
+    pub sync_cron_hour: u32,
+    #[serde(default = "default_wiki_sync_cron_minute")]
+    pub sync_cron_minute: u32,
+
+    /// Daemon weekly lint loop (UTC weekday 0=Sun, hour).
+    #[serde(default = "default_wiki_lint_cron_dow")]
+    pub lint_cron_dow: u32,
+    #[serde(default = "default_wiki_lint_cron_hour")]
+    pub lint_cron_hour: u32,
+}
+
+fn default_wiki_enabled() -> bool { true }
+fn default_wiki_directory() -> String { "wiki".to_string() }
+fn default_wiki_index_path() -> String { "wiki/index.md".to_string() }
+fn default_wiki_log_path() -> String { "wiki/log.md".to_string() }
+fn default_wiki_schema_path() -> String { "WIKI.md".to_string() }
+fn default_wiki_emit_on_ingest() -> bool { true }
+fn default_wiki_sync_cron_hour() -> u32 { 5 }
+fn default_wiki_sync_cron_minute() -> u32 { 30 }
+fn default_wiki_lint_cron_dow() -> u32 { 0 }
+fn default_wiki_lint_cron_hour() -> u32 { 6 }
+
+impl Default for WikiConfig {
+    fn default() -> Self {
+        Self {
+            enabled: default_wiki_enabled(),
+            directory: default_wiki_directory(),
+            index_path: default_wiki_index_path(),
+            log_path: default_wiki_log_path(),
+            schema_path: default_wiki_schema_path(),
+            emit_on_ingest: default_wiki_emit_on_ingest(),
+            sync_cron_hour: default_wiki_sync_cron_hour(),
+            sync_cron_minute: default_wiki_sync_cron_minute(),
+            lint_cron_dow: default_wiki_lint_cron_dow(),
+            lint_cron_hour: default_wiki_lint_cron_hour(),
+        }
+    }
+}
+
+impl WikiConfig {
+    /// Absolute-ish paths relative to the agent working directory.
+    pub fn entities_dir(&self) -> String { format!("{}/entities", self.directory) }
+    pub fn concepts_dir(&self) -> String { format!("{}/concepts", self.directory) }
+    pub fn sources_dir(&self) -> String { format!("{}/sources", self.directory) }
 }
 
 // ─── Session distill ──────────────────────────────────────────────────────
@@ -837,6 +939,21 @@ pub struct EmbeddingsConfig {
 
     #[serde(default)]
     pub api_key: String,
+
+    /// When true and `[redis].enabled`, cache vectors in Redis (24h TTL by default).
+    #[serde(default = "default_true")]
+    pub cache_enabled: bool,
+
+    #[serde(default = "default_embed_cache_ttl_secs")]
+    pub cache_ttl_secs: u64,
+}
+
+fn default_true() -> bool {
+    true
+}
+
+fn default_embed_cache_ttl_secs() -> u64 {
+    86_400
 }
 
 fn default_embeddings_url() -> String {
@@ -854,6 +971,8 @@ impl Default for EmbeddingsConfig {
             url: default_embeddings_url(),
             model: default_embeddings_model(),
             api_key: String::new(),
+            cache_enabled: true,
+            cache_ttl_secs: default_embed_cache_ttl_secs(),
         }
     }
 }
@@ -908,6 +1027,129 @@ impl Default for QdrantConfig {
             sync_enabled: false,
             sync_cron_hour: default_qdrant_sync_cron_hour(),
             sync_cron_minute: default_qdrant_sync_cron_minute(),
+        }
+    }
+}
+
+// ─── Platform search (cross-collection RAG) ─────────────────────────────
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct PlatformSearchConfig {
+    /// When true, `gzmo_memory_search` also queries the Pi `knowledge` Qdrant collection.
+    #[serde(default = "default_platform_search_enabled")]
+    pub include_knowledge_collection: bool,
+
+    /// Qdrant collection name for Pi knowledge docs (legacy mirror, read-only).
+    #[serde(default = "default_knowledge_collection")]
+    pub knowledge_collection: String,
+
+    /// Prefetch multiplier for knowledge vector hits before rerank merge.
+    #[serde(default = "default_knowledge_prefetch")]
+    pub knowledge_prefetch: usize,
+}
+
+fn default_platform_search_enabled() -> bool {
+    true
+}
+
+fn default_knowledge_collection() -> String {
+    "knowledge".to_string()
+}
+
+fn default_knowledge_prefetch() -> usize {
+    12
+}
+
+impl Default for PlatformSearchConfig {
+    fn default() -> Self {
+        Self {
+            include_knowledge_collection: default_platform_search_enabled(),
+            knowledge_collection: default_knowledge_collection(),
+            knowledge_prefetch: default_knowledge_prefetch(),
+        }
+    }
+}
+
+// ─── KG reconcile (shared Neo4j ontology) ───────────────────────────────
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct KgReconcileConfig {
+    #[serde(default)]
+    pub enabled: bool,
+
+    /// UTC hour for weekly reconcile (default Sunday 04:00 if cron not set).
+    #[serde(default = "default_kg_reconcile_hour")]
+    pub cron_hour: u32,
+
+    #[serde(default)]
+    pub cron_minute: u32,
+
+    /// Dry-run: log planned changes without MCP writes.
+    #[serde(default)]
+    pub dry_run: bool,
+}
+
+fn default_kg_reconcile_hour() -> u32 {
+    4
+}
+
+impl Default for KgReconcileConfig {
+    fn default() -> Self {
+        Self {
+            enabled: false,
+            cron_hour: default_kg_reconcile_hour(),
+            cron_minute: 0,
+            dry_run: true,
+        }
+    }
+}
+
+// ─── Synapse pull (read-only Pi event ingest) ───────────────────────────
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct SynapsePullConfig {
+    #[serde(default)]
+    pub enabled: bool,
+
+    #[serde(default = "default_synapse_pull_hour")]
+    pub cron_hour: u32,
+
+    #[serde(default = "default_synapse_pull_minute")]
+    pub cron_minute: u32,
+
+    /// Max Pi events to summarize per pull cycle.
+    #[serde(default = "default_synapse_pull_max_events")]
+    pub max_events: usize,
+
+    /// Path to append-only bus (relative to project root).
+    #[serde(default = "default_synapse_bus_path")]
+    pub bus_path: std::path::PathBuf,
+}
+
+fn default_synapse_pull_hour() -> u32 {
+    2
+}
+
+fn default_synapse_pull_minute() -> u32 {
+    45
+}
+
+fn default_synapse_pull_max_events() -> usize {
+    50
+}
+
+fn default_synapse_bus_path() -> std::path::PathBuf {
+    std::path::PathBuf::from("data/Synapse/events.jsonl")
+}
+
+impl Default for SynapsePullConfig {
+    fn default() -> Self {
+        Self {
+            enabled: false,
+            cron_hour: default_synapse_pull_hour(),
+            cron_minute: default_synapse_pull_minute(),
+            max_events: default_synapse_pull_max_events(),
+            bus_path: default_synapse_bus_path(),
         }
     }
 }
@@ -1326,12 +1568,14 @@ impl EngineSection {
         }
     }
 
-    /// Get the cloud fallback config (if defined).
+    /// Get the cloud fallback config when fully configured (non-empty url,
+    /// model, and api_key). Returns `None` otherwise so callers do not add a
+    /// doomed fallback hop with missing credentials.
     pub fn cloud_fallback(&self) -> Option<EngineProfileConfig> {
         self.cloud.as_ref().and_then(|c| {
-            let url = c.fallback_url.as_ref()?;
-            let model = c.fallback_model.as_ref()?;
-            let key = c.fallback_api_key.as_ref()?;
+            let url = c.fallback_url.as_ref().filter(|s| !s.is_empty())?;
+            let model = c.fallback_model.as_ref().filter(|s| !s.is_empty())?;
+            let key = c.fallback_api_key.as_ref().filter(|s| !s.is_empty())?;
             Some(EngineProfileConfig {
                 provider: c.fallback_provider.clone().unwrap_or_else(|| "gemini".to_string()),
                 url: url.clone(),
@@ -1439,6 +1683,13 @@ pub struct RoutingConfig {
     /// Default engine name when no explicit mapping exists for a task kind.
     #[serde(default = "default_routing_engine")]
     pub default_engine: String,
+
+    /// When true, every background `TaskKind` (all except `Chat`) is routed
+    /// cloud-first: the cloud profile is tried first and the task's legacy
+    /// profile (from `mappings`) is used as automatic fallback. Interactive
+    /// chat is unaffected.
+    #[serde(default)]
+    pub cloud_first_background: bool,
 
     /// Task-kind → engine-name mappings. Keys are snake_case task kind names;
     /// values are engine profile names ("local", "librarian", "cloud", "sovereign").
@@ -1753,6 +2004,104 @@ impl Default for AgentConfig {
 
 // ─── Loader ─────────────────────────────────────────────────────────────
 
+/// Parse `.env` from `base_dir`. Does not mutate process environment.
+fn read_dotenv(base_dir: &Path) -> HashMap<String, String> {
+    let mut vars = HashMap::new();
+    let path = base_dir.join(".env");
+    let Ok(content) = std::fs::read_to_string(&path) else {
+        return vars;
+    };
+    for line in content.lines() {
+        let line = line.trim();
+        if line.is_empty() || line.starts_with('#') {
+            continue;
+        }
+        let Some((key, val)) = line.split_once('=') else {
+            continue;
+        };
+        let key = key.trim();
+        let val = val.trim().trim_matches('"').trim_matches('\'');
+        if !key.is_empty() {
+            vars.insert(key.to_string(), val.to_string());
+        }
+    }
+    vars
+}
+
+fn env_or_dotenv(key: &str, dotenv: &HashMap<String, String>) -> Option<String> {
+    std::env::var(key)
+        .ok()
+        .filter(|v| !v.is_empty())
+        .or_else(|| dotenv.get(key).cloned().filter(|v| !v.is_empty()))
+}
+
+/// Inject cloud profile API keys from env / `[api_keys]` when `engine.cloud.api_key` is empty.
+fn apply_engine_key_overrides(config: &mut GzmoConfig, dotenv: &HashMap<String, String>) {
+    let Some(ref mut cloud) = config.engine.cloud else {
+        return;
+    };
+    if !cloud.api_key.is_empty() {
+        return;
+    }
+    let key = match cloud.provider.as_str() {
+        "openrouter" => env_or_dotenv("GZMO_OPENROUTER_KEY", dotenv)
+            .filter(|k| !k.is_empty())
+            .or_else(|| {
+                let k = config.api_keys.openrouter_key();
+                if k.is_empty() { None } else { Some(k) }
+            }),
+        "gemini" => env_or_dotenv("GZMO_GEMINI_KEY", dotenv)
+            .filter(|k| !k.is_empty())
+            .or_else(|| {
+                let k = config.api_keys.gemini_key();
+                if k.is_empty() { None } else { Some(k) }
+            }),
+        _ => None,
+    };
+    if let Some(key) = key {
+        cloud.api_key = key;
+    }
+
+    // Inject the cloud->cloud fallback key (e.g. Gemini) when configured only in
+    // the environment, so `cloud_fallback()` can activate without storing the
+    // secret in gzmo.toml.
+    if cloud
+        .fallback_api_key
+        .as_ref()
+        .map(|k| k.is_empty())
+        .unwrap_or(true)
+    {
+        let fb_provider = cloud.fallback_provider.as_deref().unwrap_or("gemini");
+        let fb_key = match fb_provider {
+            "gemini" => env_or_dotenv("GZMO_GEMINI_KEY", dotenv).filter(|k| !k.is_empty()),
+            "openrouter" => {
+                env_or_dotenv("GZMO_OPENROUTER_KEY", dotenv).filter(|k| !k.is_empty())
+            }
+            _ => None,
+        };
+        if let Some(fb_key) = fb_key {
+            cloud.fallback_api_key = Some(fb_key);
+        }
+    }
+}
+
+/// Overlay MCP child-process env from process environment or `.env`.
+fn apply_mcp_env_overrides(config: &mut GzmoConfig, dotenv: &HashMap<String, String>) {
+    const KEYS: &[&str] = &[
+        "NEO4J_URL",
+        "NEO4J_USERNAME",
+        "NEO4J_PASSWORD",
+        "NEO4J_DATABASE",
+    ];
+    for server in &mut config.mcp_servers {
+        for key in KEYS {
+            if let Some(val) = env_or_dotenv(key, dotenv) {
+                server.env.insert(key.to_string(), val);
+            }
+        }
+    }
+}
+
 impl GzmoConfig {
     /// Load configuration from a TOML file.
     ///
@@ -1760,6 +2109,7 @@ impl GzmoConfig {
     /// (all hardcoded defaults — zero-config startup).
     pub fn load(path: &Path) -> Result<Self> {
         let base_dir = path.parent().unwrap_or_else(|| Path::new("."));
+        let dotenv = read_dotenv(base_dir);
         let resolve = |p: &PathBuf| -> PathBuf {
             if p.is_absolute() { p.clone() } else { base_dir.join(p) }
         };
@@ -1790,6 +2140,8 @@ impl GzmoConfig {
         config.memory.vault_db = resolve(&config.memory.vault_db);
         config.skills.directory = resolve(&config.skills.directory);
         config.skills.dreams_path = resolve(&config.skills.dreams_path);
+        apply_mcp_env_overrides(&mut config, &dotenv);
+        apply_engine_key_overrides(&mut config, &dotenv);
 
         let active = config.engine.active_engine();
         tracing::info!(

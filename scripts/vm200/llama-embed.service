@@ -1,0 +1,24 @@
+[Unit]
+Description=GZMO embedding server (Qwen3-Embedding-0.6B) on GTX 1070
+After=network.target
+
+[Service]
+Type=simple
+User=maximilian
+Group=maximilian
+Environment=LD_LIBRARY_PATH=/usr/local/lib
+ExecStart=/usr/local/bin/llama-server \
+  -m /opt/models/Qwen3-Embedding-0.6B-Q8_0.gguf \
+  --embedding \
+  --pooling last \
+  -ngl 99 \
+  -c 2048 \
+  --parallel 1 \
+  --flash-attn on \
+  --port 8081 \
+  --host 0.0.0.0
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

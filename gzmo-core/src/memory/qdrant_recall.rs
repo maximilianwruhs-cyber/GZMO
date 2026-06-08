@@ -22,10 +22,18 @@ struct SearchResponse {
     result: Vec<SearchHit>,
 }
 
+#[derive(Debug, Clone)]
+pub struct QdrantPayloadHit {
+    pub score: f64,
+    pub payload: serde_json::Value,
+}
+
 #[derive(Deserialize)]
 struct SearchHit {
     id: serde_json::Value,
     score: Option<f64>,
+    #[serde(default)]
+    payload: Option<serde_json::Value>,
 }
 
 impl QdrantRecall {
@@ -41,8 +49,44 @@ impl QdrantRecall {
         }))
     }
 
+    pub fn with_collection(&self, collection: impl Into<String>) -> Self {
+        let mut s = self.clone();
+        s.collection = collection.into();
+        s
+    }
+
     /// Vector search; returns honeypot fact UUIDs best-first.
     pub async fn search_ids(&self, vector: &[f32], limit: usize) -> Result<Vec<Uuid>> {
+        Ok(self
+            .search_hits(vector, limit, false)
+            .await?
+            .into_iter()
+            .filter_map(|h| parse_point_id(&h.id))
+            .collect())
+    }
+
+    /// Vector search with optional payload (Pi knowledge collection).
+    pub async fn search_with_payload(
+        &self,
+        vector: &[f32],
+        limit: usize,
+    ) -> Result<Vec<QdrantPayloadHit>> {
+        let hits = self.search_hits(vector, limit, true).await?;
+        Ok(hits
+            .into_iter()
+            .map(|h| QdrantPayloadHit {
+                score: h.score.unwrap_or(0.0),
+                payload: h.payload.unwrap_or(serde_json::Value::Null),
+            })
+            .collect())
+    }
+
+    async fn search_hits(
+        &self,
+        vector: &[f32],
+        limit: usize,
+        with_payload: bool,
+    ) -> Result<Vec<SearchHit>> {
         if vector.is_empty() {
             return Ok(Vec::new());
         }
@@ -53,7 +97,7 @@ impl QdrantRecall {
         let body = serde_json::json!({
             "vector": vector,
             "limit": limit,
-            "with_payload": false,
+            "with_payload": with_payload,
         });
         let resp = self
             .http
@@ -66,14 +110,12 @@ impl QdrantRecall {
             .context("Qdrant search HTTP error")?;
 
         let parsed: SearchResponse = resp.json().await.context("Qdrant search JSON")?;
-        let mut ids = Vec::with_capacity(parsed.result.len());
-        for hit in parsed.result {
-            if let Some(id) = parse_point_id(&hit.id) {
-                ids.push(id);
-            }
-        }
-        debug!(count = ids.len(), collection = %self.collection, "Qdrant recall stream");
-        Ok(ids)
+        debug!(
+            count = parsed.result.len(),
+            collection = %self.collection,
+            "Qdrant recall stream"
+        );
+        Ok(parsed.result)
     }
 }
 

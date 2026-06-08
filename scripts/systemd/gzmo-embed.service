@@ -1,0 +1,19 @@
+[Unit]
+Description=Pi knowledge base embed (Qwen3-Embedding on workstation :8002)
+After=network-online.target
+Wants=network-online.target
+# CPU embed (NGl=0); does not require Prime.
+
+[Service]
+Type=simple
+User=%i
+WorkingDirectory=%h/Projects/_foundation-audit/survey_GZMO
+Environment=GZMO_EMBED_NGL=0
+Environment=GZMO_EMBED_PORT=8002
+ExecStart=%h/Projects/_foundation-audit/survey_GZMO/scripts/start-embed.sh
+Restart=on-failure
+RestartSec=10
+TimeoutStartSec=180
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,16 @@
+[Unit]
+Description=GZMO background daemon (vault, dreams, watchers)
+After=network-online.target gzmo-prime.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=%i
+WorkingDirectory=%h/Projects/_foundation-audit/survey_GZMO
+ExecStart=%h/Projects/_foundation-audit/survey_GZMO/target/release/gzmo daemon
+Restart=on-failure
+RestartSec=30
+# VM200 embed/rerank must be up separately (deploy-retrieval-layer on VM200).
+
+[Install]
+WantedBy=default.target

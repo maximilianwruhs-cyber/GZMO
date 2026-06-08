@@ -1,0 +1,25 @@
+[Unit]
+Description=GZMO reranker (bge-reranker-v2-m3) on GTX 1070
+After=network.target
+
+[Service]
+Type=simple
+User=maximilian
+Group=maximilian
+Environment=LD_LIBRARY_PATH=/usr/local/lib
+ExecStart=/usr/local/bin/llama-server \
+  -m /opt/models/bge-reranker-v2-m3-q8_0.gguf \
+  --embedding \
+  --pooling rank \
+  --reranking \
+  -ngl 99 \
+  -c 4096 \
+  --parallel 1 \
+  --flash-attn on \
+  --port 8082 \
+  --host 0.0.0.0
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

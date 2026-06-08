@@ -9,6 +9,7 @@ GZMO is a fully sovereign AI agent that runs entirely on your local hardware. Ze
 ## Architecture & ops (start here)
 
 - **[MACHINE.md](MACHINE.md)** — **what GZMO is** (distillation pipeline; two sentences)
+- **[CONTRIBUTING.md](CONTRIBUTING.md)** — setup, git hygiene, verify commands
 - **[docs/ROADMAP_TO_M5.md](docs/ROADMAP_TO_M5.md)** — **what to do next** (local production-ready → M5)
 - **[docs/INFRASTRUCTURE_OVERVIEW.md](docs/INFRASTRUCTURE_OVERVIEW.md)** — **canonical** stack (topology, ports, memory layers, eval tier, runbook)
 - **`./scripts/start-production.sh --daemon`** — bring up Prime + embed + daemon
@@ -49,26 +50,33 @@ GZMO is a fully sovereign AI agent that runs entirely on your local hardware. Ze
 ## Directory Layout
 
 ```
-GZMO_v0.0.1/
-├── bin/                    # Static binaries
-│   ├── gzmo-static         # Main GZMO binary (what boot.sh launches)
-│   ├── llama-server-cuda    # CUDA inference engine
-│   └── llama-server-cpu     # CPU fallback inference engine
-├── models/                 # GGUF model files (auto-selected by hardware)
-├── memory/                 # Episodic memory logs (YYYY-MM-DD.md)
-├── data/
-│   ├── vault.db            # SQLite semantic knowledge vault
-│   └── sessions/           # Saved chat sessions
-├── skills/                 # Slash command scripts and skill definitions
-├── inbox/                  # Optional local drop folder (daemon may also watch ~/Schreibtisch/knowledge)
-├── gzmo.toml               # Master configuration (single source of truth)
-├── SOUL.md                 # Agent identity and persona definition
-├── DREAMS.md               # Nightly dream consolidation output
-├── CHAOS_STATE.json        # Live chaos engine telemetry
-├── boot.sh                 # Full-stack bootstrapper
-├── gzmo-core/              # Core Rust library (engine, tools, memory)
+survey_GZMO/
+├── Cargo.toml              # Rust workspace root
+├── gzmo-core/              # Core library (engine, tools, memory, daemon)
 ├── gzmo-cli/               # CLI binary (chat REPL, daemon, init)
-└── gzmo-chaos/             # Chaos engine (Lorenz attractor, Thought Cabinet)
+├── gzmo-chaos/             # Chaos engine (Lorenz attractor)
+├── gzmo.toml.example       # Config template (copy → gzmo.toml)
+├── .env.template           # Secrets template (copy → .env)
+├── SOUL.md                 # Agent identity and persona
+├── MACHINE.md              # Canonical two-sentence identity
+├── docs/                   # Canonical documentation (see docs/README.md)
+├── scripts/                # Ops, systemd, eval harnesses
+├── skills/                 # Shell-based slash skills
+├── config/                 # Shared MCP / sidecar config snippets
+├── memory/                 # Episodic logs (runtime, gitignored)
+├── data/                   # Vault DB, sessions (runtime, gitignored)
+└── inbox/                  # Optional local drop folder
+```
+
+Runtime state (`memory/`, `data/vault.db`, `logs/`, `DREAMS.md`) is **never committed**. See [CONTRIBUTING.md](CONTRIBUTING.md).
+
+### First-time config
+
+```bash
+cp gzmo.toml.example gzmo.toml
+cp .env.template .env
+# Edit .env — NEO4J_PASSWORD and optional API keys
+cargo build --release
 ```
 
 ---
@@ -265,9 +273,21 @@ GZMO supports hot-swapping between local and cloud inference at runtime:
 ★ you › /mode           # Show current mode
 ```
 
-Mode changes are **persisted** to `gzmo.toml` automatically.
+Mode changes are **persisted** to `gzmo.toml` automatically. `/mode` controls the
+**interactive chat** engine only.
 
-If the primary cloud endpoint fails, GZMO falls back to the configured `fallback_*` engine (e.g., Google Gemini API).
+### Cloud-first background cognition
+
+Set `[routing] cloud_first_background = true` to route all background loop tasks
+(dream, spark, ingest, distill, daemon orchestration) to `[engine.cloud]`
+(OpenRouter) first for quality. If the cloud endpoint is unreachable, each task
+automatically falls back to its legacy profile from `[routing.mappings]`
+(Prime `:8000` for verify/heavy work, VM200 librarian for light extract/summary).
+Interactive chat and chat-spawned subagents are excluded and stay on the active
+engine.
+
+Optionally, when `[engine.cloud] fallback_*` (or `GZMO_GEMINI_KEY`) is configured,
+the cloud profile itself becomes OpenRouter → Gemini before the local fallback.
 
 ---
 
@@ -371,14 +391,11 @@ View live state with `/chaos` in chat mode, or read `CHAOS_STATE.json`.
 ## Building from Source
 
 ```bash
-# Debug build (faster compilation, larger binary)
-cargo build
+cp gzmo.toml.example gzmo.toml   # first time only
+cp .env.template .env            # first time only
 
-# Release build (optimized, what boot.sh prefers)
 cargo build --release
-
-# Update the static binary that boot.sh uses
-cp target/release/gzmo bin/gzmo-static
+# Binary: target/release/gzmo
 ```
 
 ### Workspace Structure
@@ -393,11 +410,11 @@ Cargo.toml          # Workspace root
 ### Other CLI Commands
 
 ```bash
-./bin/gzmo-static              # Chat mode (default)
-./bin/gzmo-static daemon       # Daemon mode
-./bin/gzmo-static init         # Initialize a new GZMO project
-./bin/gzmo-static dump         # Export vault to markdown
-./bin/gzmo-static memory dump  # Same as above
+cargo run --release --              # Chat mode (default)
+cargo run --release -- daemon       # Daemon mode
+cargo run --release -- init         # Initialize a new GZMO project
+cargo run --release -- dump         # Export vault to markdown
+cargo run --release -- health       # Health check
 ```
 
 ---

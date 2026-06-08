@@ -8,7 +8,8 @@ use reqwest::Client;
 use tracing::{info, warn};
 
 use crate::config::{
-    EmbeddingsConfig, EngineProfileConfig, GzmoConfig, LibrarianConfig, QdrantConfig, RerankConfig,
+    EmbeddingsConfig, EngineProfileConfig, GzmoConfig, LibrarianConfig, QdrantConfig, RedisConfig,
+    RerankConfig,
 };
 use crate::memory::rerank::Reranker;
 use crate::synapse::{resolve_event_source, EventSource, EventType, SynapseBus, SynapseEvent};
@@ -66,11 +67,11 @@ pub async fn probe_llm_models(profile: &EngineProfileConfig) -> ProbeResult {
 }
 
 /// POST a tiny embedding when `[embeddings].enabled`.
-pub async fn probe_embeddings(cfg: &EmbeddingsConfig) -> ProbeResult {
+pub async fn probe_embeddings(cfg: &EmbeddingsConfig, redis_cfg: &RedisConfig) -> ProbeResult {
     if !cfg.enabled {
         return ProbeResult::pass("embeddings", "disabled in config");
     }
-    match crate::memory::embeddings::Embedder::from_config(cfg) {
+    match crate::memory::embeddings::Embedder::from_config(cfg, redis_cfg) {
         Ok(e) => match e.embed("health probe").await {
             Ok(v) if !v.is_empty() => {
                 ProbeResult::pass("embeddings", format!("{} dims @ {}", v.len(), cfg.url))
@@ -99,6 +100,30 @@ pub fn probe_neo4j_bolt(bolt_url: &str) -> ProbeResult {
     match std::net::TcpStream::connect_timeout(&addr, Duration::from_secs(3)) {
         Ok(_) => ProbeResult::pass("neo4j", format!("bolt reachable {addr}")),
         Err(e) => ProbeResult::fail("neo4j", format!("{addr}: {e}")),
+    }
+}
+
+/// PING Redis when `[redis].enabled` — surfaces the scratch backend status
+/// (unreachable, auth required, etc.) instead of it silently degrading to the
+/// in-memory buffer. Authentication errors come back in the PING reply.
+pub async fn probe_redis(cfg: &RedisConfig) -> ProbeResult {
+    if !cfg.enabled {
+        return ProbeResult::pass("redis", "disabled in config");
+    }
+    let client = match redis::Client::open(cfg.url.as_str()) {
+        Ok(c) => c,
+        Err(e) => return ProbeResult::fail("redis", format!("bad url {}: {e}", cfg.url)),
+    };
+    let connect = client.get_connection_manager();
+    let mut conn = match tokio::time::timeout(Duration::from_secs(3), connect).await {
+        Ok(Ok(c)) => c,
+        Ok(Err(e)) => return ProbeResult::fail("redis", format!("{} unreachable: {e}", cfg.url)),
+        Err(_) => return ProbeResult::fail("redis", format!("{} connect timed out", cfg.url)),
+    };
+    let pong: redis::RedisResult<String> = redis::cmd("PING").query_async(&mut conn).await;
+    match pong {
+        Ok(_) => ProbeResult::pass("redis", format!("PONG @ {}", cfg.url)),
+        Err(e) => ProbeResult::fail("redis", format!("{} PING failed: {e}", cfg.url)),
     }
 }
 
@@ -230,10 +255,11 @@ pub async fn run_startup_probes(
     let prime = config.engine.active_engine_for_mode(crate::config::EngineMode::Local);
     results.push(probe_llm_models(&prime).await);
 
-    results.push(probe_embeddings(&config.embeddings).await);
+    results.push(probe_embeddings(&config.embeddings, &config.redis).await);
     results.push(probe_qdrant(&config.qdrant).await);
     results.push(probe_rerank(&config.rerank).await);
     results.push(probe_librarian(&config.librarian).await);
+    results.push(probe_redis(&config.redis).await);
 
     if let Some(srv) = config.active_mcp_servers().find(|s| s.name == "memory") {
         if let Some(url) = srv.env.get("NEO4J_URL") {

@@ -100,6 +100,7 @@ pub async fn run(config: &GzmoConfig, subargs: Vec<String>) -> Result<()> {
             let vault = embeddings::open_vault_with_embeddings(
                 &config.memory.vault_db,
                 &config.embeddings,
+                &config.redis,
                 &config.rerank,
                 &config.qdrant,
             )

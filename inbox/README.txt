@@ -172,15 +172,12 @@ The daemon is launched automatically by `boot.sh`. To run it manually:
 | Job | Schedule | Description |
 |-----|----------|-------------|
 | `sys_janitor` | Every 30 min | Check CPU/RAM/disk, kill suspicious processes |
-| `auto_dream` | 3 AM daily | Compress yesterday's episodic memory into vault |
+| `DreamEngine` (`[dreams]`) | 1:00 UTC daily | Gated dream consolidation (`gzmo dream`) |
+| `SparkEngine` (`[spark]`) | 09/14/21:17 UTC | Gated serendipitous recall (`gzmo spark`) |
 
-### Inbox Watcher
+### Knowledge ingest (`[ingest]`)
 
-Drop any `.txt` file into the `inbox/` directory. The daemon will:
-1. Detect the new file
-2. Read its contents
-3. Generate a 2-sentence summary
-4. Store it in the knowledge vault
+With `[ingest].enabled`, the daemon uses **IngestEngine** on the watcher directory (see `gzmo.toml` `inbox_ingest`). Drop `.md` / docs there for extract→verify→promote. CLI: `gzmo ingest <path>`.
 
 ---
 

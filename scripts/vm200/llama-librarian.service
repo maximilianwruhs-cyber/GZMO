@@ -1,0 +1,22 @@
+[Unit]
+Description=GZMO fast librarian (Qwen2.5-Coder-1.5B) on GTX 1070
+After=network.target
+
+[Service]
+Type=simple
+User=maximilian
+Group=maximilian
+Environment=LD_LIBRARY_PATH=/usr/local/lib
+ExecStart=/usr/local/bin/llama-server \
+  -m /opt/models/qwen2.5-coder-1.5b-instruct-q4_k_m.gguf \
+  -c 8192 \
+  -ngl 99 \
+  --parallel 1 \
+  --flash-attn on \
+  --port 8083 \
+  --host 0.0.0.0
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

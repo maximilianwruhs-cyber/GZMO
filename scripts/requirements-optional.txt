@@ -1,0 +1,6 @@
+# Optional Python deps for GZMO scripts (not required for core pipeline).
+# Install: scripts/setup-optional-deps.sh  (creates scripts/.venv)
+# neo4j  — graph-recall-stream.py + Neo4j purge in purge-all-memory.sh
+# redis  — Redis distill-queue flush in purge-all-memory.sh (NUCLEAR mode)
+neo4j>=5.0
+redis>=4.0

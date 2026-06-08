@@ -1,13 +1,13 @@
 //! LLM gateway abstractions for communicating with local vLLM.
 
 use std::collections::HashMap;
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 
 use anyhow::Result;
 use async_trait::async_trait;
 use reqwest::Client as HttpClient;
 use serde::{Deserialize, Serialize};
-use tracing::debug;
+use tracing::{debug, warn};
 
 use crate::config;
 use crate::types::Message;
@@ -900,6 +900,206 @@ struct JsonSchemaSpec<'a> {
     schema: &'a serde_json::Value,
 }
 
+// ── Fallback Gateway ───────────────────────────────────────────────────
+
+/// A gateway that tries an ordered list of backends, falling back to the next
+/// on any error (connection refused, HTTP 4xx/5xx, timeout, empty output).
+///
+/// Used for cloud-first background routing: the primary is the cloud profile
+/// (OpenRouter) and the fallback is the task's legacy local/librarian profile.
+/// Failover is on transport/HTTP/gateway errors only — verifier rejection and
+/// other task-logic decisions happen in the engine layer above the gateway and
+/// are never seen here.
+pub struct FallbackGateway {
+    /// Ordered (profile label, gateway) pairs. First is primary.
+    backends: Vec<(String, Arc<dyn LlmGateway>)>,
+    /// Human-readable task label for logs (e.g. "distill_extract").
+    task_label: String,
+}
+
+impl FallbackGateway {
+    /// Build a fallback chain. Requires at least one backend.
+    pub fn new(task_label: impl Into<String>, backends: Vec<(String, Arc<dyn LlmGateway>)>) -> Self {
+        assert!(
+            !backends.is_empty(),
+            "FallbackGateway requires at least one backend"
+        );
+        Self {
+            backends,
+            task_label: task_label.into(),
+        }
+    }
+
+    /// Label of the next backend after index `i`, for logging.
+    fn next_label(&self, i: usize) -> &str {
+        self.backends
+            .get(i + 1)
+            .map(|(l, _)| l.as_str())
+            .unwrap_or("<none>")
+    }
+}
+
+#[async_trait]
+impl LlmGateway for FallbackGateway {
+    async fn complete(
+        &self,
+        messages: &[Message],
+        tools: &[ToolDeclaration],
+    ) -> Result<LlmResponse> {
+        let mut last_err = None;
+        for (i, (label, gw)) in self.backends.iter().enumerate() {
+            match gw.complete(messages, tools).await {
+                Ok(r) => return Ok(r),
+                Err(e) => {
+                    warn!(
+                        task = %self.task_label,
+                        from = %label,
+                        to = %self.next_label(i),
+                        error = %e,
+                        "llm_fallback (complete)"
+                    );
+                    last_err = Some(e);
+                }
+            }
+        }
+        Err(last_err.expect("backends is non-empty"))
+    }
+
+    async fn complete_streaming(
+        &self,
+        messages: &[Message],
+        tools: &[ToolDeclaration],
+        on_chunk: Box<dyn Fn(String) + Send>,
+    ) -> Result<LlmResponse> {
+        // The callback can only be moved once; share it across attempts behind a
+        // mutex so each backend gets a fresh forwarding closure. Streaming is not
+        // on the cloud-first background path (chat is excluded), so contention is
+        // not a concern in practice.
+        let shared: Arc<Mutex<Box<dyn Fn(String) + Send>>> = Arc::new(Mutex::new(on_chunk));
+        let mut last_err = None;
+        for (i, (label, gw)) in self.backends.iter().enumerate() {
+            let cb = Arc::clone(&shared);
+            let forward: Box<dyn Fn(String) + Send> = Box::new(move |s: String| {
+                if let Ok(f) = cb.lock() {
+                    f(s);
+                }
+            });
+            match gw.complete_streaming(messages, tools, forward).await {
+                Ok(r) => return Ok(r),
+                Err(e) => {
+                    warn!(
+                        task = %self.task_label,
+                        from = %label,
+                        to = %self.next_label(i),
+                        error = %e,
+                        "llm_fallback (streaming)"
+                    );
+                    last_err = Some(e);
+                }
+            }
+        }
+        Err(last_err.expect("backends is non-empty"))
+    }
+
+    async fn complete_structured(
+        &self,
+        messages: &[Message],
+        schema_name: &str,
+        json_schema: serde_json::Value,
+    ) -> Result<String> {
+        let mut last_err = None;
+        for (i, (label, gw)) in self.backends.iter().enumerate() {
+            match gw
+                .complete_structured(messages, schema_name, json_schema.clone())
+                .await
+            {
+                Ok(r) => return Ok(r),
+                Err(e) => {
+                    warn!(
+                        task = %self.task_label,
+                        from = %label,
+                        to = %self.next_label(i),
+                        error = %e,
+                        "llm_fallback (structured)"
+                    );
+                    last_err = Some(e);
+                }
+            }
+        }
+        Err(last_err.expect("backends is non-empty"))
+    }
+
+    async fn complete_structured_with_temp(
+        &self,
+        messages: &[Message],
+        schema_name: &str,
+        json_schema: serde_json::Value,
+        temperature: Option<f32>,
+    ) -> Result<String> {
+        let mut last_err = None;
+        for (i, (label, gw)) in self.backends.iter().enumerate() {
+            match gw
+                .complete_structured_with_temp(
+                    messages,
+                    schema_name,
+                    json_schema.clone(),
+                    temperature,
+                )
+                .await
+            {
+                Ok(r) => return Ok(r),
+                Err(e) => {
+                    warn!(
+                        task = %self.task_label,
+                        from = %label,
+                        to = %self.next_label(i),
+                        error = %e,
+                        "llm_fallback (structured_with_temp)"
+                    );
+                    last_err = Some(e);
+                }
+            }
+        }
+        Err(last_err.expect("backends is non-empty"))
+    }
+
+    async fn complete_structured_bounded(
+        &self,
+        messages: &[Message],
+        schema_name: &str,
+        json_schema: serde_json::Value,
+        temperature: Option<f32>,
+        max_tokens: Option<u32>,
+    ) -> Result<String> {
+        let mut last_err = None;
+        for (i, (label, gw)) in self.backends.iter().enumerate() {
+            match gw
+                .complete_structured_bounded(
+                    messages,
+                    schema_name,
+                    json_schema.clone(),
+                    temperature,
+                    max_tokens,
+                )
+                .await
+            {
+                Ok(r) => return Ok(r),
+                Err(e) => {
+                    warn!(
+                        task = %self.task_label,
+                        from = %label,
+                        to = %self.next_label(i),
+                        error = %e,
+                        "llm_fallback (structured_bounded)"
+                    );
+                    last_err = Some(e);
+                }
+            }
+        }
+        Err(last_err.expect("backends is non-empty"))
+    }
+}
+
 // ── Obolus Gateway Router ──────────────────────────────────────────────
 
 /// Resolves `TaskKind` → `Arc<dyn LlmGateway>` using the static routing table.
@@ -908,48 +1108,100 @@ struct JsonSchemaSpec<'a> {
 /// All gateways are created once at construction time and reused for every
 /// task invocation.
 pub struct GatewayRouter {
-    /// Pre-built gateways keyed by engine profile name.
-    gateways: HashMap<String, Arc<dyn LlmGateway>>,
-    /// Routing configuration (task → profile name).
-    routing: config::RoutingConfig,
+    /// Effective gateway per task kind (already wrapped for cloud-first when enabled).
+    task_gateways: HashMap<config::TaskKind, Arc<dyn LlmGateway>>,
+    /// Leaf gateways keyed by engine profile name (for `gateway_by_name`).
+    leaves: HashMap<String, Arc<dyn LlmGateway>>,
+    /// Default engine profile name (safety fallback).
+    default_engine: String,
 }
 
 impl GatewayRouter {
     /// Create a new router from the loaded config.
-    /// Builds and caches all gateways referenced by the routing table.
+    ///
+    /// Builds one effective gateway per [`config::TaskKind`]. When
+    /// `[routing] cloud_first_background = true` and the task is a background
+    /// kind (everything except `Chat`), the effective gateway is a
+    /// [`FallbackGateway`] that tries the cloud profile first and falls back to
+    /// the task's legacy profile (the value from `[routing.mappings]`).
     pub fn new(config: &config::GzmoConfig) -> Self {
-        let mut gateways = HashMap::new();
+        let mut leaves: HashMap<String, Arc<dyn LlmGateway>> = HashMap::new();
 
-        // Build gateways for every unique profile referenced in the routing table
-        for mapping in config.routing.mappings.values() {
-            if gateways.contains_key(mapping) {
-                continue;
+        // Helper: get-or-build a leaf TurboQuant gateway for a profile name.
+        let build_leaf = |name: &str, leaves: &mut HashMap<String, Arc<dyn LlmGateway>>| {
+            if let Some(gw) = leaves.get(name) {
+                return Arc::clone(gw);
             }
-            let profile = Self::resolve_profile_for_name(config, mapping);
-            let vllm = VllmConfig::from(profile);
-            gateways.insert(
-                mapping.clone(),
-                Arc::new(TurboQuantGateway::new(vllm)) as Arc<dyn LlmGateway>,
-            );
+            let profile = Self::resolve_profile_for_name(config, name);
+            let gw: Arc<dyn LlmGateway> =
+                Arc::new(TurboQuantGateway::new(VllmConfig::from(profile)));
+            leaves.insert(name.to_string(), Arc::clone(&gw));
+            gw
+        };
+
+        let cloud_first =
+            config.routing.cloud_first_background && config.engine.cloud.is_some();
+
+        // Build the cloud leaf once, optionally wrapping OpenRouter -> Gemini
+        // when `[engine.cloud] fallback_*` (or GZMO_GEMINI_KEY) is configured.
+        let cloud_gw: Option<Arc<dyn LlmGateway>> = if cloud_first {
+            let primary = build_leaf("cloud", &mut leaves);
+            let composed = match config.engine.cloud_fallback() {
+                Some(fb) => {
+                    let gemini: Arc<dyn LlmGateway> =
+                        Arc::new(TurboQuantGateway::new(VllmConfig::from(fb)));
+                    Arc::new(FallbackGateway::new(
+                        "cloud",
+                        vec![
+                            ("openrouter".to_string(), primary),
+                            ("gemini".to_string(), gemini),
+                        ],
+                    )) as Arc<dyn LlmGateway>
+                }
+                None => primary,
+            };
+            Some(composed)
+        } else {
+            None
+        };
+
+        // Build the effective gateway for every task kind.
+        let mut task_gateways: HashMap<config::TaskKind, Arc<dyn LlmGateway>> = HashMap::new();
+        for &task in config::TaskKind::all() {
+            let legacy_name = config.routing.resolve(task).to_string();
+            let legacy_gw = build_leaf(&legacy_name, &mut leaves);
+
+            let effective = match &cloud_gw {
+                Some(cloud) if task.is_background() && legacy_name != "cloud" => {
+                    Arc::new(FallbackGateway::new(
+                        task.to_string(),
+                        vec![
+                            ("cloud".to_string(), Arc::clone(cloud)),
+                            (legacy_name.clone(), legacy_gw),
+                        ],
+                    )) as Arc<dyn LlmGateway>
+                }
+                _ => legacy_gw,
+            };
+            task_gateways.insert(task, effective);
         }
 
-        // Always include the default (active engine) gateway
-        if !gateways.contains_key(&config.routing.default_engine) {
-            let active = config.engine.active_engine();
-            gateways.insert(
-                config.routing.default_engine.clone(),
-                Arc::new(TurboQuantGateway::new(VllmConfig::from(active)))
-                    as Arc<dyn LlmGateway>,
-            );
-        }
+        // Ensure the default engine leaf exists as a safety fallback.
+        let default_engine = config.routing.default_engine.clone();
+        build_leaf(&default_engine, &mut leaves);
 
         Self {
-            gateways,
-            routing: config.routing.clone(),
+            task_gateways,
+            leaves,
+            default_engine,
         }
     }
 
     /// Resolve a specific engine profile by name.
+    ///
+    /// `local`/`prime` are pinned to `[engine.local]` (Prime) regardless of
+    /// `active_mode`, so a cloud-first fallback to "local" never loops back to
+    /// the cloud engine when the operator has `/mode cloud` active.
     fn resolve_profile_for_name(
         config: &config::GzmoConfig,
         name: &str,
@@ -961,7 +1213,9 @@ impl GatewayRouter {
 
         // Fall back to standard engine sections
         match name {
-            "local" => config.engine.active_engine(),
+            "local" | "prime" => {
+                config.engine.active_engine_for_mode(config::EngineMode::Local)
+            }
             "cloud" => {
                 if let Some(ref cloud) = config.engine.cloud {
                     config::EngineProfileConfig {
@@ -995,20 +1249,17 @@ impl GatewayRouter {
 
     /// Resolve the gateway for a specific task kind.
     pub fn gateway(&self, task: config::TaskKind) -> &Arc<dyn LlmGateway> {
-        let profile_name = self.routing.resolve(task);
-        self.gateways
-            .get(profile_name)
-            .unwrap_or_else(|| {
-                // Safety: the default engine gateway is always present
-                self.gateways
-                    .get(&self.routing.default_engine)
-                    .expect("default gateway must exist")
-            })
+        self.task_gateways.get(&task).unwrap_or_else(|| {
+            // Safety: the default engine leaf is always present
+            self.leaves
+                .get(&self.default_engine)
+                .expect("default gateway must exist")
+        })
     }
 
-    /// Get a gateway by engine profile name (for manual routing).
+    /// Get a leaf gateway by engine profile name (for manual routing).
     pub fn gateway_by_name(&self, name: &str) -> Option<&Arc<dyn LlmGateway>> {
-        self.gateways.get(name)
+        self.leaves.get(name)
     }
 }
 
@@ -1028,6 +1279,157 @@ mod tests {
         let broken = r#"{"internal_analysis":"short","anchor_label":"A","recent_label":"B","connection":"Link text that got cut off mid"#;
         let v: serde_json::Value = parse_json_lenient(broken).expect("repaired JSON");
         assert_eq!(v["anchor_label"], "A");
+    }
+
+    // ── FallbackGateway tests ──────────────────────────────────────────
+
+    use std::sync::atomic::{AtomicUsize, Ordering};
+
+    /// Mock gateway that records call count and optionally always errors.
+    struct MockGateway {
+        label: &'static str,
+        fail: bool,
+        calls: Arc<AtomicUsize>,
+    }
+
+    #[async_trait]
+    impl LlmGateway for MockGateway {
+        async fn complete(
+            &self,
+            _messages: &[Message],
+            _tools: &[ToolDeclaration],
+        ) -> Result<LlmResponse> {
+            self.calls.fetch_add(1, Ordering::SeqCst);
+            if self.fail {
+                anyhow::bail!("mock {} failed", self.label);
+            }
+            Ok(LlmResponse::Text(self.label.to_string()))
+        }
+
+        async fn complete_streaming(
+            &self,
+            _messages: &[Message],
+            _tools: &[ToolDeclaration],
+            on_chunk: Box<dyn Fn(String) + Send>,
+        ) -> Result<LlmResponse> {
+            self.calls.fetch_add(1, Ordering::SeqCst);
+            if self.fail {
+                anyhow::bail!("mock {} failed", self.label);
+            }
+            on_chunk(self.label.to_string());
+            Ok(LlmResponse::Text(self.label.to_string()))
+        }
+
+        async fn complete_structured(
+            &self,
+            _messages: &[Message],
+            _schema_name: &str,
+            _json_schema: serde_json::Value,
+        ) -> Result<String> {
+            self.calls.fetch_add(1, Ordering::SeqCst);
+            if self.fail {
+                anyhow::bail!("mock {} failed", self.label);
+            }
+            Ok(self.label.to_string())
+        }
+    }
+
+    fn mock(label: &'static str, fail: bool) -> (Arc<dyn LlmGateway>, Arc<AtomicUsize>) {
+        let calls = Arc::new(AtomicUsize::new(0));
+        let gw: Arc<dyn LlmGateway> = Arc::new(MockGateway {
+            label,
+            fail,
+            calls: Arc::clone(&calls),
+        });
+        (gw, calls)
+    }
+
+    #[tokio::test]
+    async fn fallback_returns_primary_on_success() {
+        let (a, ca) = mock("a", false);
+        let (b, cb) = mock("b", false);
+        let gw = FallbackGateway::new("t", vec![("a".into(), a), ("b".into(), b)]);
+        match gw.complete(&[], &[]).await.unwrap() {
+            LlmResponse::Text(t) => assert_eq!(t, "a"),
+            _ => panic!("expected text"),
+        }
+        assert_eq!(ca.load(Ordering::SeqCst), 1);
+        assert_eq!(cb.load(Ordering::SeqCst), 0, "fallback must not run when primary succeeds");
+    }
+
+    #[tokio::test]
+    async fn fallback_skips_failed_primary() {
+        let (a, ca) = mock("a", true);
+        let (b, cb) = mock("b", false);
+        let gw = FallbackGateway::new("t", vec![("a".into(), a), ("b".into(), b)]);
+        match gw.complete(&[], &[]).await.unwrap() {
+            LlmResponse::Text(t) => assert_eq!(t, "b"),
+            _ => panic!("expected text"),
+        }
+        assert_eq!(ca.load(Ordering::SeqCst), 1);
+        assert_eq!(cb.load(Ordering::SeqCst), 1);
+    }
+
+    #[tokio::test]
+    async fn fallback_all_fail_returns_error() {
+        let (a, ca) = mock("a", true);
+        let (b, cb) = mock("b", true);
+        let gw = FallbackGateway::new("t", vec![("a".into(), a), ("b".into(), b)]);
+        assert!(gw.complete(&[], &[]).await.is_err());
+        assert_eq!(ca.load(Ordering::SeqCst), 1);
+        assert_eq!(cb.load(Ordering::SeqCst), 1);
+    }
+
+    #[tokio::test]
+    async fn fallback_structured_bounded_delegates_through_chain() {
+        // bounded -> with_temp -> structured (default delegation) must still fail over.
+        let (a, ca) = mock("a", true);
+        let (b, cb) = mock("b", false);
+        let gw = FallbackGateway::new("t", vec![("a".into(), a), ("b".into(), b)]);
+        let out = gw
+            .complete_structured_bounded(&[], "s", serde_json::json!({}), Some(0.1), Some(64))
+            .await
+            .unwrap();
+        assert_eq!(out, "b");
+        assert_eq!(ca.load(Ordering::SeqCst), 1);
+        assert_eq!(cb.load(Ordering::SeqCst), 1);
+    }
+
+    // ── Routing semantics tests ────────────────────────────────────────
+
+    #[test]
+    fn chat_is_not_background() {
+        assert!(!config::TaskKind::Chat.is_background());
+        assert!(config::TaskKind::DreamExtract.is_background());
+        assert!(config::TaskKind::Daemon.is_background());
+    }
+
+    #[test]
+    fn legacy_local_pinned_to_prime_under_cloud_mode() {
+        let mut cfg = config::GzmoConfig::default();
+        cfg.engine.local = Some(config::EngineProfileConfig {
+            url: "http://prime:8000/v1".into(),
+            ..Default::default()
+        });
+        cfg.engine.cloud = Some(config::CloudEngineConfig {
+            provider: "openrouter".into(),
+            url: "http://cloud/v1".into(),
+            model: "nemotron".into(),
+            api_key: "k".into(),
+            temperature: 0.4,
+            top_p: 0.95,
+            max_tokens: 100,
+            fallback_provider: None,
+            fallback_url: None,
+            fallback_model: None,
+            fallback_api_key: None,
+        });
+        // Operator switched chat to cloud — legacy fallback "local" must still be Prime.
+        cfg.engine.active_mode = config::EngineMode::Cloud;
+        let prof = GatewayRouter::resolve_profile_for_name(&cfg, "local");
+        assert_eq!(prof.url, "http://prime:8000/v1");
+        let prof_prime = GatewayRouter::resolve_profile_for_name(&cfg, "prime");
+        assert_eq!(prof_prime.url, "http://prime:8000/v1");
     }
 
     #[tokio::test]

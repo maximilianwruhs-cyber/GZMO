@@ -8,7 +8,55 @@ use std::time::Duration;
 
 use anyhow::Result;
 use async_trait::async_trait;
+use chrono::{DateTime, NaiveDate, Timelike, Utc};
 use tracing::{debug, info, warn};
+
+// ---------------------------------------------------------------------------
+// Daily cron scheduling (catch-up after daemon restart)
+// ---------------------------------------------------------------------------
+
+/// UTC minutes since midnight for a wall-clock `(hour, minute)` pair.
+pub fn cron_minutes(hour: u32, minute: u32) -> u32 {
+    hour * 60 + minute
+}
+
+/// True when today's scheduled UTC time has passed and the job has not run today.
+///
+/// Unlike exact `hour == H && minute == M` matching, this fires on the first tick
+/// at or after the scheduled time (including after a daemon restart).
+pub fn cron_due_today(
+    now: &DateTime<Utc>,
+    hour: u32,
+    minute: u32,
+    last_run_date: Option<NaiveDate>,
+) -> bool {
+    let today = now.date_naive();
+    if last_run_date == Some(today) {
+        return false;
+    }
+    let now_mins = now.hour() * 60 + now.minute();
+    now_mins >= cron_minutes(hour, minute)
+}
+
+/// Earliest Spark cron slot that is due today and has not run yet.
+pub fn spark_cron_slot_due(
+    now: &DateTime<Utc>,
+    cron_hours: &[u32],
+    cron_minute: u32,
+    last_run_key: Option<(u32, u32, NaiveDate)>,
+) -> Option<(u32, u32)> {
+    let today = now.date_naive();
+    let now_mins = now.hour() * 60 + now.minute();
+    cron_hours
+        .iter()
+        .copied()
+        .filter(|&h| {
+            now_mins >= cron_minutes(h, cron_minute)
+                && last_run_key != Some((h, cron_minute, today))
+        })
+        .min_by_key(|h| *h)
+        .map(|h| (h, cron_minute))
+}
 
 // ---------------------------------------------------------------------------
 // CheapCheck Trait
@@ -171,5 +219,51 @@ impl HeartbeatEngine {
                 on_anomalies(anomalies).await;
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod cron_tests {
+    use super::*;
+    use chrono::TimeZone;
+
+    fn at(hour: u32, minute: u32) -> DateTime<Utc> {
+        Utc.with_ymd_and_hms(2026, 6, 7, hour, minute, 0).unwrap()
+    }
+
+    #[test]
+    fn cron_due_after_scheduled_time() {
+        let now = at(2, 15);
+        assert!(cron_due_today(&now, 2, 15, None));
+        assert!(cron_due_today(&now, 1, 0, None));
+        assert!(!cron_due_today(&now, 3, 0, None));
+    }
+
+    #[test]
+    fn cron_due_not_repeat_same_day() {
+        let now = at(2, 30);
+        let today = now.date_naive();
+        assert!(!cron_due_today(&now, 2, 15, Some(today)));
+    }
+
+    #[test]
+    fn cron_catch_up_after_restart() {
+        let now = at(1, 47);
+        assert!(cron_due_today(&now, 1, 0, None));
+    }
+
+    #[test]
+    fn spark_slot_due_picks_earliest_missed() {
+        let now = at(4, 0);
+        let slot = spark_cron_slot_due(&now, &[3, 22], 30, None);
+        assert_eq!(slot, Some((3, 30)));
+    }
+
+    #[test]
+    fn spark_slot_skips_already_run() {
+        let now = at(23, 0);
+        let today = now.date_naive();
+        let slot = spark_cron_slot_due(&now, &[3, 22], 30, Some((3, 30, today)));
+        assert_eq!(slot, Some((22, 30)));
     }
 }

@@ -25,9 +25,11 @@ uuid = { workspace = true }
 futures-util = { workspace = true }
 sysinfo = "0.38"
 tokio-cron-scheduler = "0.13"
-rmcp = { version = "0.16", features = ["client", "transport-child-process"] }
+rmcp = { version = "0.16", features = ["client", "server", "macros", "transport-child-process", "transport-io"] }
+schemars = "0.8"
 gzmo-chaos = { path = "../gzmo-chaos" }
 r2d2 = "0.8.10"
 r2d2_sqlite = "0.25.0"
 fs2 = "0.4"
 redis = { workspace = true }
+sha2 = { workspace = true }

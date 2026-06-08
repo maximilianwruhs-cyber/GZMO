@@ -8,6 +8,10 @@ SKILLS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SKILLS_DIR")"
 RANDOMIZER_ROOT="$(dirname "$PROJECT_ROOT")/Randomizer"
 
+# Locale-safe counting and matching (systemd/cron often lack UTF-8 locale)
+export LC_ALL=C.UTF-8
+export LANG="${LANG:-C.UTF-8}"
+
 # ─── LLM Endpoint Configuration ─────────────────────────────────
 LLM_URL="${GZMO_LLM_URL:-http://localhost:1234/v1/chat/completions}"
 LLM_MODEL="${GZMO_LLM_MODEL:-bartowski/Qwen2.5-7B-Instruct-GGUF}"
@@ -159,6 +163,80 @@ chaos_int() {
     local max=$2
     local range=$(( max - min + 1 ))
     echo $(( (RANDOM % range) + min ))
+}
+
+# ─── Lore Pool Path ──────────────────────────────────────────────
+# Usage: resolve_lore_file  → prints path or exits 1
+resolve_lore_file() {
+    local candidates=(
+        "$PROJECT_ROOT/data/lore.toml"
+        "$RANDOMIZER_ROOT/lore.toml"
+        "$PROJECT_ROOT/lore.toml"
+    )
+    local f
+    for f in "${candidates[@]}"; do
+        if [ -f "$f" ]; then
+            echo "$f"
+            return 0
+        fi
+    done
+    return 1
+}
+
+# ─── LLM Output Cleanup ──────────────────────────────────────────
+# Strips wrapping quotes/backticks; trims outer blank lines; keeps internal newlines.
+clean_llm_output() {
+    local text="$1"
+    text="${text//\`/}"
+    text=$(printf '%s' "$text" | sed -e 's/^"//' -e 's/"$//' -e "s/^'//" -e "s/'$//")
+    text=$(printf '%s' "$text" | sed -e '/./,$!d' -e :a -e '/^\s*$/{$d;N;ba' -e '}')
+    text="${text#"${text%%[![:space:]]*}"}"
+    text="${text%"${text##*[![:space:]]}"}"
+    text=$(printf '%s' "$text" | sed -e 's/^"//' -e 's/"$//' -e "s/^'//" -e "s/'$//")
+    printf '%s' "$text"
+}
+
+# ─── Character Count (UTF-8 safe) ────────────────────────────────
+char_count() {
+    printf '%s' "$1" | wc -m | awk '{print $1}'
+}
+
+# ─── Creative Output Quality Gates ───────────────────────────────
+# Return 0 if text passes, 1 if it hits a banned pattern.
+quality_gate_poem() {
+    printf '%s' "$1" | grep -qiE \
+        '(seele|schicksal|ewigkeit|tr[aä]nen|schatten|fl[uü]stern|herz.*schmerz|schmerz.*herz|\bsoul\b|\bfate\b|\beternity\b|\bwhisper\b|\bshadows\b|\btears\b|\bdance\b)' \
+        && return 1
+    return 0
+}
+
+quality_gate_joke() {
+    printf '%s' "$1" | grep -qiE \
+        '(programmier|programming bug|\bcoffee\b|\bkaffee\b|artificial intelligence|\bchatgpt\b|\bki[- ]|dad joke|flachwitz|montagmorgen|\bwlan\b|\bwifi\b|\bbug\b)' \
+        && return 1
+    return 0
+}
+
+quality_gate_story() {
+    printf '%s' "$1" | grep -qiE \
+        '(once upon a time|es war einmal|happily ever after|und sie lebten|moral of the story|lehre des|m[aä]rchen)' \
+        && return 1
+    return 0
+}
+
+# ─── Accept Creative Output ──────────────────────────────────────
+# Usage: accept_creative_output TEXT MAX_CHARS quality_gate_fn
+accept_creative_output() {
+    local text="$1"
+    local max_chars="$2"
+    local gate_fn="$3"
+    local count
+
+    count=$(char_count "$text")
+    if [ "$count" -le 0 ] || [ "$count" -gt "$max_chars" ]; then
+        return 1
+    fi
+    "$gate_fn" "$text"
 }
 
 # ─── Pretty Box ──────────────────────────────────────────────────

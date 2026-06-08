@@ -10,6 +10,9 @@
 
 set -euo pipefail
 
+export LC_ALL=C.UTF-8
+export LANG="${LANG:-C.UTF-8}"
+
 SKILLS_DIR="$(cd "$(dirname "$0")" && pwd)"
 COMMAND="${1:-help}"
 shift 2>/dev/null || true

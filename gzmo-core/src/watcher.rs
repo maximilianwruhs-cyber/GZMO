@@ -136,6 +136,11 @@ fn path_matches_watcher(path: &Path, config: &WatcherConfig) -> bool {
     if path.components().any(|c| c.as_os_str() == ".gzmo_converted") {
         return false;
     }
+    // Never watch the agent-owned wiki/ layer as a raw ingest source — emitted
+    // pages are derived from vault facts and re-ingesting them is circular.
+    if path.components().any(|c| c.as_os_str() == "wiki") {
+        return false;
+    }
     if let Some(ref pattern) = config.pattern {
         if let Some(ext) = pattern.strip_prefix("*.") {
             match path.extension().and_then(|s: &std::ffi::OsStr| s.to_str()) {

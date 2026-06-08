@@ -3,13 +3,14 @@
 use std::collections::HashMap;
 use std::path::PathBuf;
 use std::sync::Arc;
+use std::time::{Duration, Instant};
 
 use anyhow::{Context, Result};
 use chrono::{DateTime, Utc};
 use redis::AsyncCommands;
 use serde::{Deserialize, Serialize};
-use tokio::sync::RwLock;
-use tracing::{debug, warn};
+use tokio::sync::{Mutex, RwLock};
+use tracing::{debug, error, info, warn};
 
 use crate::config::{ContextMemoryConfig, RedisConfig};
 use crate::context::estimate_text_tokens;
@@ -67,8 +68,98 @@ pub struct DistillJob {
     pub source: DistillSource,
 }
 
+/// Bound the initial/reconnect attempt so a dead Redis can't stall startup
+/// or a scratch op on the driver's internal connect timeout.
+const REDIS_CONNECT_TIMEOUT: Duration = Duration::from_secs(3);
+/// Minimum gap between reconnect attempts while Redis is unreachable, so a
+/// persistent outage degrades to the in-memory buffer instead of hammering
+/// the connect path (and log) on every turn.
+const REDIS_RECONNECT_BACKOFF: Duration = Duration::from_secs(15);
+
+/// Redis-backed scratch that lazily (re)establishes its connection.
+///
+/// `redis::aio::ConnectionManager` already auto-reconnects once it exists, so
+/// the failure mode this guards against is the manager never being created —
+/// e.g. Redis briefly down during daemon startup. Instead of permanently
+/// pinning the service to memory, we retain the client and re-attempt the
+/// manager on demand (rate-limited by `next_retry`). While Redis is
+/// unreachable, writes are buffered in `fallback` so the current turn's
+/// scratch is not lost; reads prefer Redis and fall back to the buffer.
+struct RedisBackend {
+    client: redis::Client,
+    conn: Mutex<Option<redis::aio::ConnectionManager>>,
+    next_retry: Mutex<Instant>,
+    fallback: RwLock<HashMap<String, ScratchPayload>>,
+}
+
+impl RedisBackend {
+    fn new(client: redis::Client, conn: Option<redis::aio::ConnectionManager>) -> Self {
+        Self {
+            client,
+            conn: Mutex::new(conn),
+            next_retry: Mutex::new(Instant::now()),
+            fallback: RwLock::new(HashMap::new()),
+        }
+    }
+
+    /// Return a live connection manager, lazily (re)connecting if needed.
+    /// Reconnect attempts are rate-limited and time-bounded; on a real
+    /// (non-backoff) attempt failure we log once so the outage is visible.
+    async fn conn(&self) -> Result<redis::aio::ConnectionManager> {
+        if let Some(c) = self.conn.lock().await.as_ref() {
+            return Ok(c.clone());
+        }
+        {
+            let mut next = self.next_retry.lock().await;
+            if Instant::now() < *next {
+                anyhow::bail!("redis reconnect backing off");
+            }
+            *next = Instant::now() + REDIS_RECONNECT_BACKOFF;
+        }
+        match tokio::time::timeout(REDIS_CONNECT_TIMEOUT, self.client.get_connection_manager())
+            .await
+        {
+            Ok(Ok(conn)) => {
+                info!("Redis scratch backend connected");
+                *self.conn.lock().await = Some(conn.clone());
+                Ok(conn)
+            }
+            Ok(Err(e)) => {
+                warn!("Redis scratch unreachable (using in-memory buffer, retry in {}s): {e}",
+                    REDIS_RECONNECT_BACKOFF.as_secs());
+                anyhow::bail!("redis reconnect failed: {e}")
+            }
+            Err(_) => {
+                warn!("Redis scratch connect timed out (using in-memory buffer, retry in {}s)",
+                    REDIS_RECONNECT_BACKOFF.as_secs());
+                anyhow::bail!("redis connect timed out")
+            }
+        }
+    }
+
+    /// Drop the cached manager so the next op forces a fresh connect.
+    async fn drop_conn(&self) {
+        *self.conn.lock().await = None;
+    }
+
+    /// True if a command round-trips to Redis right now.
+    async fn live(&self) -> bool {
+        match self.conn().await {
+            Ok(mut c) => {
+                let pong: redis::RedisResult<String> =
+                    redis::cmd("PING").query_async(&mut c).await;
+                if pong.is_err() {
+                    self.drop_conn().await;
+                }
+                pong.is_ok()
+            }
+            Err(_) => false,
+        }
+    }
+}
+
 enum ScratchBackend {
-    Redis(redis::aio::ConnectionManager),
+    Redis(RedisBackend),
     Memory(Arc<RwLock<HashMap<String, ScratchPayload>>>),
 }
 
@@ -90,26 +181,55 @@ impl ScratchService {
 
         if redis_cfg.enabled {
             match redis::Client::open(redis_cfg.url.as_str()) {
-                Ok(client) => match client.get_connection_manager().await {
-                    Ok(conn) => {
-                        debug!(url = %redis_cfg.url, "ScratchService using Redis");
-                        return Self {
-                            backend: ScratchBackend::Redis(conn),
-                            redis_enabled: true,
-                            distill_queue,
-                            distill_fallback_dir,
-                            scratch_max_tokens,
-                            chars_per_token: 3.5,
-                        };
-                    }
-                    Err(e) => {
-                        warn!("Redis connection failed, using in-memory scratch: {e}");
-                    }
-                },
+                Ok(client) => {
+                    // Try to connect up front, but a startup failure no longer
+                    // pins us to memory forever: keep the client and reconnect
+                    // lazily (see RedisBackend::conn).
+                    let conn = match tokio::time::timeout(
+                        REDIS_CONNECT_TIMEOUT,
+                        client.get_connection_manager(),
+                    )
+                    .await
+                    {
+                        Ok(Ok(conn)) => {
+                            info!(url = %redis_cfg.url, "ScratchService using Redis");
+                            Some(conn)
+                        }
+                        Ok(Err(e)) => {
+                            error!(
+                                url = %redis_cfg.url,
+                                "Redis enabled but unreachable at startup; \
+                                 buffering scratch in-memory and retrying lazily: {e}"
+                            );
+                            None
+                        }
+                        Err(_) => {
+                            error!(
+                                url = %redis_cfg.url,
+                                "Redis enabled but connect timed out at startup; \
+                                 buffering scratch in-memory and retrying lazily"
+                            );
+                            None
+                        }
+                    };
+                    return Self {
+                        backend: ScratchBackend::Redis(RedisBackend::new(client, conn)),
+                        redis_enabled: true,
+                        distill_queue,
+                        distill_fallback_dir,
+                        scratch_max_tokens,
+                        chars_per_token: 3.5,
+                    };
+                }
                 Err(e) => {
-                    warn!("Redis client open failed, using in-memory scratch: {e}");
+                    error!(
+                        url = %redis_cfg.url,
+                        "Redis client open failed (bad URL?), using in-memory scratch: {e}"
+                    );
                 }
             }
+        } else {
+            debug!("Redis disabled in config; using in-memory scratch");
         }
 
         Self {
@@ -122,16 +242,32 @@ impl ScratchService {
         }
     }
 
+    /// Whether Redis is the configured scratch backend (intent). This stays
+    /// true across transient outages; use [`redis_live`](Self::redis_live)
+    /// for current connectivity.
     pub fn uses_redis(&self) -> bool {
         self.redis_enabled
+    }
+
+    /// Whether a command round-trips to Redis right now (live connectivity).
+    pub async fn redis_live(&self) -> bool {
+        match &self.backend {
+            ScratchBackend::Redis(r) => r.live().await,
+            ScratchBackend::Memory(_) => false,
+        }
     }
 
     pub async fn clear(&self, scope: &ScratchScope) -> Result<()> {
         let key = scope.redis_key();
         match &self.backend {
-            ScratchBackend::Redis(conn) => {
-                let mut conn = conn.clone();
-                let _: () = conn.del(&key).await.context("redis DEL scratch")?;
+            ScratchBackend::Redis(r) => {
+                r.fallback.write().await.remove(&key);
+                if let Ok(mut conn) = r.conn().await {
+                    if let Err(e) = conn.del::<_, ()>(&key).await {
+                        r.drop_conn().await;
+                        debug!("redis DEL scratch failed (cleared buffer anyway): {e}");
+                    }
+                }
             }
             ScratchBackend::Memory(map) => {
                 map.write().await.remove(&key);
@@ -149,11 +285,24 @@ impl ScratchService {
             updated_at: Utc::now(),
         };
         let key = scope.redis_key();
-        let json = serde_json::to_string(&payload)?;
         match &self.backend {
-            ScratchBackend::Redis(conn) => {
-                let mut conn = conn.clone();
-                let _: () = conn.set(&key, json).await.context("redis SET scratch")?;
+            ScratchBackend::Redis(r) => {
+                let json = serde_json::to_string(&payload)?;
+                match r.conn().await {
+                    Ok(mut conn) => match conn.set::<_, _, ()>(&key, &json).await {
+                        Ok(()) => {
+                            r.fallback.write().await.remove(&key);
+                        }
+                        Err(e) => {
+                            r.drop_conn().await;
+                            debug!("redis SET scratch failed, buffering in-memory: {e}");
+                            r.fallback.write().await.insert(key, payload);
+                        }
+                    },
+                    Err(_) => {
+                        r.fallback.write().await.insert(key, payload);
+                    }
+                }
             }
             ScratchBackend::Memory(map) => {
                 map.write().await.insert(key, payload);
@@ -165,13 +314,24 @@ impl ScratchService {
     pub async fn read(&self, scope: &ScratchScope) -> Result<Option<ScratchPayload>> {
         let key = scope.redis_key();
         match &self.backend {
-            ScratchBackend::Redis(conn) => {
-                let mut conn = conn.clone();
-                let val: Option<String> = conn.get(&key).await.context("redis GET scratch")?;
-                Ok(val
-                    .map(|s| serde_json::from_str(&s))
-                    .transpose()
-                    .context("parse scratch JSON")?)
+            ScratchBackend::Redis(r) => {
+                match r.conn().await {
+                    Ok(mut conn) => {
+                        match conn.get::<_, Option<String>>(&key).await {
+                            Ok(Some(s)) => Ok(Some(
+                                serde_json::from_str(&s).context("parse scratch JSON")?,
+                            )),
+                            // Not in Redis — may be a write buffered during an outage.
+                            Ok(None) => Ok(r.fallback.read().await.get(&key).cloned()),
+                            Err(e) => {
+                                r.drop_conn().await;
+                                debug!("redis GET scratch failed, reading in-memory buffer: {e}");
+                                Ok(r.fallback.read().await.get(&key).cloned())
+                            }
+                        }
+                    }
+                    Err(_) => Ok(r.fallback.read().await.get(&key).cloned()),
+                }
             }
             ScratchBackend::Memory(map) => Ok(map.read().await.get(&key).cloned()),
         }
@@ -220,14 +380,18 @@ impl ScratchService {
 
     pub async fn enqueue_distill(&self, job: DistillJob) -> Result<()> {
         let json = serde_json::to_string(&job)?;
-        if self.redis_enabled {
-            if let ScratchBackend::Redis(conn) = &self.backend {
-                let mut conn = conn.clone();
-                let _: usize = conn
-                    .lpush(&self.distill_queue, json)
-                    .await
-                    .context("redis LPUSH distill")?;
-                return Ok(());
+        if let ScratchBackend::Redis(r) = &self.backend {
+            match r.conn().await {
+                Ok(mut conn) => match conn.lpush::<_, _, usize>(&self.distill_queue, &json).await {
+                    Ok(_) => return Ok(()),
+                    Err(e) => {
+                        r.drop_conn().await;
+                        warn!("redis LPUSH distill failed, using file queue: {e}");
+                    }
+                },
+                Err(_) => {
+                    debug!("redis unavailable for distill enqueue, using file queue");
+                }
             }
         }
         self.enqueue_distill_file(&json).await
@@ -248,22 +412,34 @@ impl ScratchService {
 
     /// Pop one job: Redis BRPOP or oldest file in fallback dir.
     pub async fn pop_distill_job(&self, timeout_secs: f64) -> Result<Option<DistillJob>> {
-        if self.redis_enabled {
-            if let ScratchBackend::Redis(conn) = &self.backend {
-                let mut conn = conn.clone();
-                let result: Option<(String, String)> = redis::cmd("BRPOP")
+        if let ScratchBackend::Redis(r) = &self.backend {
+            if let Ok(mut conn) = r.conn().await {
+                let result: redis::RedisResult<Option<(String, String)>> = redis::cmd("BRPOP")
                     .arg(&self.distill_queue)
                     .arg(timeout_secs)
                     .query_async(&mut conn)
-                    .await
-                    .context("redis BRPOP distill")?;
-                if let Some((_, json)) = result {
-                    let job: DistillJob = serde_json::from_str(&json)?;
-                    return Ok(Some(job));
+                    .await;
+                match result {
+                    // BRPOP already blocked up to timeout_secs.
+                    Ok(Some((_, json))) => return Ok(Some(serde_json::from_str(&json)?)),
+                    Ok(None) => return Ok(None),
+                    Err(e) => {
+                        r.drop_conn().await;
+                        debug!("redis BRPOP distill failed, using file queue: {e}");
+                    }
                 }
             }
         }
-        self.pop_distill_file().await
+        // File fallback: emulate BRPOP's blocking so callers polling on this
+        // method don't spin in a tight loop while Redis is down/disabled.
+        if let Some(job) = self.pop_distill_file().await? {
+            return Ok(Some(job));
+        }
+        let nap = timeout_secs.clamp(0.0, 5.0);
+        if nap > 0.0 {
+            tokio::time::sleep(Duration::from_secs_f64(nap)).await;
+        }
+        Ok(None)
     }
 
     async fn pop_distill_file(&self) -> Result<Option<DistillJob>> {

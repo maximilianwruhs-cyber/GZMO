@@ -8,20 +8,33 @@ source "$SKILLS_DIR/_llm_helper.sh"
 
 KEYWORD="${1:-chaos}"
 
-SYSTEM_PROMPT="You are a master storyteller. Write a very short story.
-Rules:
-- Maximum 500 characters
-- The story must be complete: beginning, middle, end
-- Must be based on the keyword provided
-- Vivid imagery. Surprising ending.
-- Output ONLY the story text. No title, no labels."
+SYSTEM_PROMPT="You are a master of the modern short story, writing in the sparse, tense style of Ernest Hemingway or the surreal, absurd style of Franz Kafka.
+Write a very short story based on the keyword provided.
+
+RULES:
+- Maximum 500 characters total.
+- The story must be complete (beginning, middle, end) but have strong subtext or an unresolved, surprising ending.
+- Focus on concrete sensory details, physical objects, and specific textures.
+- STRICTLY FORBIDDEN: Fairy tales, happily ever after, 'once upon a time', obvious moral lessons, or cheesy clichés.
+- Output ONLY the story text. No titles, no labels, no introduction, no markdown blockquotes."
 
 USER_PROMPT="Write a short story based on the keyword: ${KEYWORD}"
 
-STORY=$(llm_call_pretty "$SYSTEM_PROMPT" "$USER_PROMPT" "Weaving a tale of '${KEYWORD}'..." 0.9 384)
+# Try up to 3 times to get a story that satisfies the character limit
+MAX_ATTEMPTS=3
+STORY=""
+for attempt in $(seq 1 $MAX_ATTEMPTS); do
+    RAW_STORY=$(llm_call_pretty "$SYSTEM_PROMPT" "$USER_PROMPT" "Weaving a tale of '${KEYWORD}' (Attempt $attempt)..." 0.85 4096)
+    CLEANED=$(clean_llm_output "$RAW_STORY")
+
+    if accept_creative_output "$CLEANED" 500 quality_gate_story; then
+        STORY="$CLEANED"
+        break
+    fi
+done
 
 if [ -z "$STORY" ]; then
-    echo -e "${C_RED}✗ LLM offline. The story remains untold.${C_RESET}"
+    echo -e "${C_RED}✗ LLM offline or story exceeded limits. The story remains untold.${C_RESET}"
     exit 1
 fi
 

@@ -1,0 +1,19 @@
+{
+  "_comment": "Merge into ~/.pi/agent/settings.json — do not replace entire file",
+  "packages": [
+    "npm:pi-mcp-adapter",
+    "npm:pi-subagents"
+  ],
+  "subagents": {
+    "agentScope": "both",
+    "concurrency": 2,
+    "maxDepth": 2,
+    "disableBuiltins": false,
+    "agentOverrides": {
+      "scout": { "thinking": "low" },
+      "planner": { "thinking": "medium" },
+      "reviewer": { "thinking": "medium" },
+      "worker": { "thinking": "medium" }
+    }
+  }
+}

@@ -7,7 +7,7 @@ use anyhow::Result;
 use chrono::Utc;
 use tracing::{info, warn};
 
-use crate::config::IngestConfig;
+use crate::config::{IngestConfig, WikiConfig};
 use crate::gateway::LlmGateway;
 use crate::ingest_prep::{
     build_provenance, classify_document, extract_system_prompt, infer_agent_name, prepare_body,
@@ -22,6 +22,7 @@ use crate::memory::vault::SqliteVault;
 use crate::synapse::{resolve_event_source, EventSource, EventType, SynapseBus, SynapseEvent};
 use crate::tools::ToolRegistry;
 use crate::types::{DecayClass, EpisodicEntry, EpisodicSource, ExtractedTruth};
+use sha2::{Digest, Sha256};
 use uuid::Uuid;
 
 pub struct IngestEngine {
@@ -30,6 +31,8 @@ pub struct IngestEngine {
     episodic: FileEpisodicStore,
     config: IngestConfig,
     synapse: Option<Arc<SynapseBus>>,
+    /// When set and `emit_on_ingest`, a `wiki/sources` page is written on promotion.
+    wiki: Option<WikiConfig>,
 }
 
 struct PreparedDocument {
@@ -75,23 +78,63 @@ impl IngestEngine {
             episodic,
             config,
             synapse,
+            wiki: None,
         }
+    }
+
+    /// Enable wiki page emission on successful promotion (`[wiki].emit_on_ingest`).
+    pub fn with_wiki(mut self, wiki: WikiConfig) -> Self {
+        self.wiki = Some(wiki);
+        self
+    }
+
+    /// True if `path` lives under the configured wiki directory — such pages are
+    /// agent-owned synthesis and must never be re-ingested as raw sources.
+    fn is_wiki_source(&self, path: &Path) -> bool {
+        let wiki_dir = self
+            .wiki
+            .as_ref()
+            .map(|w| w.directory.clone())
+            .unwrap_or_else(|| "wiki".to_string());
+        let wiki_dir = wiki_dir.trim_end_matches('/');
+        if wiki_dir.is_empty() {
+            return false;
+        }
+        path.components()
+            .any(|c| c.as_os_str() == std::ffi::OsStr::new(wiki_dir))
     }
 
     pub async fn ingest_file(&self, path: &Path) -> Result<IngestReport> {
         if !self.config.enabled {
             anyhow::bail!("IngestEngine disabled in [ingest] config");
         }
+        if self.is_wiki_source(path) {
+            info!(file = %path.display(), "Skipping ingest — path is under the wiki/ layer (agent-owned synthesis)");
+            return Ok(IngestReport::skipped_wiki(path));
+        }
         let prepared = self.load_document(path).await?;
+        let content_hash = ingest_content_hash(&prepared.body);
+        if self.vault.ingest_dedup_seen(&content_hash)? {
+            info!(
+                file = %prepared.file_name,
+                hash = %content_hash,
+                "Skipping ingest — identical content already processed"
+            );
+            return Ok(IngestReport::skipped_duplicate(path, &prepared.file_name));
+        }
         let (pipeline, chunk_count) = self.run_pipeline(&prepared).await?;
-        self.finish_ingest(path, &prepared, pipeline, chunk_count, false)
+        self.finish_ingest(path, &prepared, pipeline, chunk_count, false, &content_hash)
             .await
     }
 
     pub async fn ingest_file_dry_run(&self, path: &Path) -> Result<IngestReport> {
+        if self.is_wiki_source(path) {
+            return Ok(IngestReport::skipped_wiki(path));
+        }
         let prepared = self.load_document(path).await?;
+        let content_hash = ingest_content_hash(&prepared.body);
         let (pipeline, chunk_count) = self.run_pipeline(&prepared).await?;
-        self.finish_ingest(path, &prepared, pipeline, chunk_count, true)
+        self.finish_ingest(path, &prepared, pipeline, chunk_count, true, &content_hash)
             .await
     }
 
@@ -101,6 +144,11 @@ impl IngestEngine {
             .file_name()
             .map(|s| s.to_string_lossy().to_string())
             .unwrap_or_else(|| "document".to_string());
+        if has_synthetic_frontmatter(&raw) {
+            anyhow::bail!(
+                "Refusing to ingest agent-synthesized wiki page (gzmo_synthetic: true): {file_name}"
+            );
+        }
         let (frontmatter, body) = split_frontmatter(&raw);
         let doc_class = classify_document(&file_name, &frontmatter, &body);
         let body = prepare_body(doc_class, &body);
@@ -170,6 +218,7 @@ impl IngestEngine {
         pipeline: PipelineResult,
         chunk_count: usize,
         dry_run: bool,
+        content_hash: &str,
     ) -> Result<IngestReport> {
         let file_name = &prepared.file_name;
         let date = Utc::now().date_naive();
@@ -243,6 +292,13 @@ impl IngestEngine {
         );
 
         if !dry_run {
+            if let Err(e) = self
+                .vault
+                .record_ingest_dedup(content_hash, &path.display().to_string())
+            {
+                warn!(error = %e, "Failed to record ingest dedup key");
+            }
+
             self.log_episodic(file_name, &summary).await?;
 
             if let Some(ref bus) = self.synapse {
@@ -260,6 +316,26 @@ impl IngestEngine {
                     resolve_event_source(EventSource::GzmoDaemon),
                     data,
                 ));
+            }
+
+            // WikiEngine emit hook — derive a wiki/sources page from the
+            // already-verified facts. Non-fatal; pages are emit-only (never
+            // re-ingested — see is_wiki_source / has_synthetic_frontmatter).
+            if let Some(ref wiki_cfg) = self.wiki {
+                if wiki_cfg.enabled && wiki_cfg.emit_on_ingest {
+                    let engine = crate::wiki::WikiEngine::new(wiki_cfg.clone());
+                    if let Err(e) = engine
+                        .emit_source_page(
+                            file_name,
+                            &pipeline.verified_entities,
+                            &pipeline.verified_relations,
+                            date,
+                        )
+                        .await
+                    {
+                        warn!(error = %e, "Wiki page emission failed (non-fatal)");
+                    }
+                }
             }
         }
 
@@ -587,6 +663,67 @@ impl IngestReport {
             verified_facts: Vec::new(),
         }
     }
+
+    fn skipped_wiki(path: &Path) -> Self {
+        Self {
+            file_path: path.display().to_string(),
+            entities_extracted: 0,
+            relations_extracted: 0,
+            entities_promoted: 0,
+            relations_promoted: 0,
+            kg_entities_written: 0,
+            kg_relations_written: 0,
+            vault_truths: 0,
+            summary: "Skipped — path is under the wiki/ layer (agent-owned synthesis, emit-only)"
+                .to_string(),
+            verified_entities: Vec::new(),
+            verified_relations: Vec::new(),
+            verified_facts: Vec::new(),
+        }
+    }
+
+    fn skipped_duplicate(path: &Path, file_name: &str) -> Self {
+        Self {
+            file_path: path.display().to_string(),
+            entities_extracted: 0,
+            relations_extracted: 0,
+            entities_promoted: 0,
+            relations_promoted: 0,
+            kg_entities_written: 0,
+            kg_relations_written: 0,
+            vault_truths: 0,
+            summary: format!(
+                "Skipped duplicate ingest for {file_name} — identical prepared content already processed"
+            ),
+            verified_entities: Vec::new(),
+            verified_relations: Vec::new(),
+            verified_facts: Vec::new(),
+        }
+    }
+}
+
+/// True if the raw document opens with a `---` frontmatter block declaring
+/// `gzmo_synthetic: true`. Such pages are emitted by `WikiEngine` and must not
+/// be re-ingested (would create circular, derived facts).
+fn has_synthetic_frontmatter(raw: &str) -> bool {
+    let trimmed = raw.trim_start_matches('\u{feff}');
+    let Some(rest) = trimmed.strip_prefix("---\n") else {
+        return false;
+    };
+    let Some(end) = rest.find("\n---") else {
+        return false;
+    };
+    rest[..end].lines().any(|l| {
+        let l = l.trim();
+        l == "gzmo_synthetic: true" || l == "gzmo_synthetic:true"
+    })
+}
+
+/// SHA-256 of the prepared ingest body (post frontmatter strip, class prep, truncation).
+pub fn ingest_content_hash(body: &str) -> String {
+    let mut hasher = Sha256::new();
+    hasher.update(body.as_bytes());
+    format!("{:x}", hasher.finalize())
 }
 
 #[cfg(test)]
@@ -608,5 +745,15 @@ mod tests {
         let (_, body) = split_frontmatter(raw);
         assert!(!body.contains("migration_id"));
         assert!(body.contains("# Hello"));
+    }
+
+    #[test]
+    fn ingest_content_hash_stable() {
+        let h1 = ingest_content_hash("same body");
+        let h2 = ingest_content_hash("same body");
+        let h3 = ingest_content_hash("other body");
+        assert_eq!(h1, h2);
+        assert_ne!(h1, h3);
+        assert_eq!(h1.len(), 64);
     }
 }
