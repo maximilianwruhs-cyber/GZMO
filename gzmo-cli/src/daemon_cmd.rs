@@ -224,6 +224,8 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
         chaos_runtime.feedback_tx.clone(),
         state_dir,
         None,
+        Some(Arc::clone(&synapse)),
+        gzmo_core::synapse::EventSource::GzmoDaemon,
     );
 
     info!("All subsystems online — entering daemon loop");

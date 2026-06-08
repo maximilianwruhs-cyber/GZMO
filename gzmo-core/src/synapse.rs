@@ -111,6 +111,9 @@ pub enum EventType {
     // --- Senses (HSP — output-only, never feeds back) ---
     /// System tension metric emitted (no cognitive impact)
     SenseTension,
+    /// Chaos ρ accumulator telemetry (PulseLoop snapshot fields)
+    #[serde(rename = "chaos.rho_telemetry")]
+    SenseChaosRho,
 
     // --- Pi interactions ---
     /// Pi agent sent a memory chunk to GZMO inbox

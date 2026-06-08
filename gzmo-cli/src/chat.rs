@@ -129,6 +129,8 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
         chaos_feedback_tx.clone(),
         state_dir,
         Some(trigger_notify_tx),
+        None,
+        gzmo_core::synapse::EventSource::GzmoCli,
     );
 
     // ─── Tools ───────────────────────────────────────────────────

@@ -5,6 +5,7 @@ use tokio::task::JoinHandle;
 
 use gzmo_core::config::GzmoConfig;
 use gzmo_core::gateway::LlmGateway;
+use gzmo_core::synapse::{EventSource, EventType, SynapseBus, SynapseEvent};
 use gzmo_chaos::pulse::{PulseLoop, PulseHandle, ChaosConfig, ChaosSnapshot};
 use gzmo_chaos::triggers::{TriggerEngine, TriggerAction, NotifyLevel};
 use gzmo_chaos::feedback::ChaosEvent;
@@ -37,6 +38,8 @@ pub fn spawn_snapshot_bridge(
     feedback_tx: mpsc::Sender<ChaosEvent>,
     state_dir: PathBuf,
     trigger_notify: Option<mpsc::Sender<String>>,
+    synapse: Option<Arc<SynapseBus>>,
+    synapse_source: EventSource,
 ) -> JoinHandle<()> {
     let mut snapshot_rx = snapshot_rx;
     tokio::spawn(async move {
@@ -107,6 +110,23 @@ pub fn spawn_snapshot_bridge(
                 let hb_target = state_dir.join("HEARTBEAT.md");
                 if tokio::fs::write(&hb_tmp, heartbeat.as_bytes()).await.is_ok() {
                     let _ = tokio::fs::rename(&hb_tmp, &hb_target).await;
+                }
+
+                if let Some(ref bus) = synapse {
+                    let data = serde_json::json!({
+                        "tick": snap.tick,
+                        "rho_mod": snap.mutations.lorenz_rho_mod,
+                        "rho_effective": snap.rho_effective,
+                        "rho_mod_delta": snap.rho_mod_delta,
+                        "rho_forcing_sign": snap.rho_forcing_sign,
+                        "rho_breath_phase": snap.rho_breath_phase,
+                        "rho_velocity_ema": snap.rho_velocity_ema,
+                    });
+                    bus.append(&SynapseEvent::with_data(
+                        EventType::SenseChaosRho,
+                        synapse_source,
+                        data,
+                    ));
                 }
             }
             

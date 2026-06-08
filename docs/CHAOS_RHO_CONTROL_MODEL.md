@@ -116,7 +116,7 @@ Use **engineering column** in code comments, docs, and PRs.
 | `rho_velocity_ema` | \((1-\gamma)v + \gamma\,\Delta\rho_{\mathrm{mod}}\) | **In `ChaosSnapshot`** |
 | `rho_breath_phase` | \(\mathrm{sign}(v)\) ∈ \(\{-1,0,+1\}\) | **In `ChaosSnapshot`** |
 
-Synapse export of these fields still deferred (daemon runs `PulseLoop`; no `chaos.rho_telemetry` event yet).
+Synapse `chaos.rho_telemetry` events append every 15 ticks in **daemon** mode (`SenseChaosRho` → `data/Synapse/events.jsonl`). Chat passes `synapse: None`.
 
 ---
 
@@ -156,7 +156,7 @@ Keep lore files as **design history**. Cite **this document** for shipped ρ beh
 | EMA `rho_breath_phase` + `/stabilize` | Shipped |
 | `chaos_bootstrap` (chat + TUI + daemon) | Shipped |
 | Daemon `PulseLoop` | Shipped |
-| Synapse ρ telemetry | Future |
+| Synapse ρ telemetry | Shipped (daemon only) |
 | `edge-node` TS parity | In progress (EMA + Stabilize) |
 
 **Next work on Path A:** edge-node parity; optional \(k\) tuning via lab; Synapse export; tanh governor (lab-gated).
