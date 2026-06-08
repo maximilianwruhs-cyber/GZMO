@@ -117,14 +117,10 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
     ))));
 
     // ─── Chaos Engine ────────────────────────────────────────────
-    let chaos_config = config
-        .chaos
-        .as_ref()
-        .and_then(|v| v.clone().try_into().ok())
-        .unwrap_or_default();
-    let mut chaos_handle = gzmo_chaos::pulse::PulseLoop::start(chaos_config);
+    let chaos_runtime = crate::chaos_bootstrap::start_chaos_runtime(&config);
+    let mut chaos_handle = chaos_runtime.handle;
     let chaos_snapshot_rx = chaos_handle.snapshot_rx.clone();
-    let chaos_feedback_tx = chaos_handle.feedback_tx.clone();
+    let chaos_feedback_tx = chaos_runtime.feedback_tx.clone();
 
     // ─── Chaos Skills (Rust-native) ─────────────────────
     let mut chaos_skills = ChaosSkillRegistry::new();

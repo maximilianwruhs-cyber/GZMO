@@ -22,6 +22,7 @@ impl PaletteComponent {
             "/sys - System Diagnostics".to_string(),
             "/vault - Knowledge Vault".to_string(),
             "/chaos - Entropic Status".to_string(),
+            "/stabilize - Stabilize Attractor".to_string(),
             "/stats - Session Statistics".to_string(),
             "/clear - Reset Context".to_string(),
             "/mode - Engine Switch".to_string(),
