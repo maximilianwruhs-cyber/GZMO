@@ -1,5 +1,7 @@
 # Chaos ρ — Remaining Implementation Handoff (Agent Brief)
 
+> **Status: CLOSED (2026-06-08).** R1–R9 delivered on `main` (9 commits ahead of origin). R2 skipped — production policy is **tanh** (`rho_restore_alpha=0.01`, `rho_restore_beta=0.5`). See `gzmo-chaos/IMPLEMENTATION_PLAN.md` for crate status.
+
 **Audience:** Implementation agent picking up after 2026-06-08 Path A completion.  
 **Repos:** `_foundation-audit/survey_GZMO` (Rust), `_foundation-audit/survey_edge-node` (TS), `chaos-breathing-lab` (sim only)  
 **Canonical shipped law:** [`CHAOS_RHO_CONTROL_MODEL.md`](CHAOS_RHO_CONTROL_MODEL.md)  
@@ -442,15 +444,31 @@ Start
 
 ## 9. Sign-off checklist (agent completes when done)
 
-- [ ] R1 production policy chosen and documented
-- [ ] R2 skipped or k sweep recorded in `RESULTS.md`
-- [ ] R3 TUI uses bootstrap + stabilize (or documented defer)
-- [ ] R4 breath triggers or documented defer
-- [ ] R5 stabilize config or documented defer
-- [ ] Tier 1 + Tier 4 green after changes
-- [ ] `IMPLEMENTATION_PLAN.md` updated
-- [ ] No V2 power-law / Toto / lore restoration introduced
+- [x] R1 production policy chosen and documented — **tanh default** (`a79fd6b`)
+- [x] R2 skipped or k sweep recorded in `RESULTS.md` — **skipped** (tanh chosen; see `chaos-breathing-lab/RESULTS.md`)
+- [x] R3 TUI uses bootstrap + stabilize (`65f6019`)
+- [x] R4 breath triggers (`877d066`)
+- [x] R5 stabilize config (`d5eda32`)
+- [x] Tier 1 + Tier 4 green after changes — `cargo test -p gzmo-chaos` **21 passed**, `cargo build --release -p gzmo-cli` clean
+- [x] `IMPLEMENTATION_PLAN.md` updated (`cbc1813`)
+- [x] No V2 power-law / Toto / lore restoration introduced
+
+### Delivered commits (`survey_GZMO`)
+
+| Commit | Workstream |
+|--------|------------|
+| `5f9aae5` | R0 doc cleanup |
+| `a79fd6b` | R1 tanh production default |
+| `877d066` | R4 breath-aware triggers |
+| `65f6019` | R3 TUI parity |
+| `d5eda32` | R5 + R6 rebirth halving (Rust) |
+| `37201ba` | R8 observability + R9 parent handoff repair |
+| `cbc1813` | IMPLEMENTATION_PLAN status |
+
+Edge parity: `survey_edge-node` `e4a4a97` (R6 rebirth halving + R7 verify).
+
+**R2 note:** `k` sweep not run — R1 selected tanh as production policy; linear `rho_decay_k=0.001` remains fallback when `rho_restore_alpha=0`.
 
 ---
 
-*Remaining-work handoff. Parent inventory: `CHAOS_RHO_IMPLEMENTATION_HANDOFF.md`. Update this file when tasks close.*
+*Remaining-work handoff — **closed**. Parent inventory: `CHAOS_RHO_IMPLEMENTATION_HANDOFF.md`.*
