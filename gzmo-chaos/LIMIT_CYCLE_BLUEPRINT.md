@@ -1,6 +1,7 @@
 # Blueprint: The Limit Cycle (The Jing and Jang Engine)
 
 > **STATUS:** Historical lore draft — **superseded for engineering** by [`docs/CHAOS_RHO_CONTROL_MODEL.md`](../docs/CHAOS_RHO_CONTROL_MODEL.md).  
+> **Math map (all three specs):** [`docs/LIMIT_CYCLE_SPECS_MATH_MAP.md`](../docs/LIMIT_CYCLE_SPECS_MATH_MAP.md)  
 > ρ control implemented as **bounded parameter feedback + bursty crystallization forcing**, not a phase-space limit cycle.
 
 ## Audit notes (2026-06-08)

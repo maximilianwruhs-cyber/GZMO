@@ -1,7 +1,8 @@
 # Chaos Engine — ρ Control Model (Engineering Spec)
 
 **Replaces mythological framing** in [`LIMIT_CYCLE_BLUEPRINT.md`](../gzmo-chaos/LIMIT_CYCLE_BLUEPRINT.md) for implementation and review.  
-**Revision history:** [`CHAOS_RHO_HOMEOSTASIS_REVISION_REPORT.md`](CHAOS_RHO_HOMEOSTASIS_REVISION_REPORT.md)
+**Revision history:** [`CHAOS_RHO_HOMEOSTASIS_REVISION_REPORT.md`](CHAOS_RHO_HOMEOSTASIS_REVISION_REPORT.md)  
+**Implementation handoff:** [`CHAOS_RHO_IMPLEMENTATION_HANDOFF.md`](CHAOS_RHO_IMPLEMENTATION_HANDOFF.md)
 
 ---
 
@@ -95,7 +96,7 @@ Use **engineering column** in code comments, docs, and PRs.
 
 **Validation:** unit tests, `chaos-breathing-lab` discrete sim, live CLI (see revision report).
 
-**Not implemented:** nonlinear restoring term \(k(\rho_{\mathrm{mod}})\), \(\rho_{\mathrm{mod}}\) telemetry in snapshot, Synapse export, daemon `PulseLoop`.
+**Not implemented:** nonlinear restoring term \(k(\rho_{\mathrm{mod}})\), EMA breath phase, `skill_stabilize`, Synapse export, daemon `PulseLoop`.
 
 ---
 
@@ -124,9 +125,16 @@ Synapse export of these fields deferred until daemon runs `PulseLoop`.
 
 ---
 
-## 7. Relation to `LIMIT_CYCLE_BLUEPRINT.md`
+## 7. Relation to limit-cycle lore specs
 
-Keep the blueprint file as **historical / lore artifact**. All new work should cite **this document** for ρ behavior, tests, and config.
+| File | Role |
+|------|------|
+| [`LIMIT_CYCLE_BLUEPRINT.md`](../gzmo-chaos/LIMIT_CYCLE_BLUEPRINT.md) | Historical; Phase 1 shipped |
+| [`LIMIT_CYCLE_SPEC_V2.md`](../gzmo-chaos/LIMIT_CYCLE_SPEC_V2.md) | Proposed power-law \(\mathcal{R}\) — lab-negative |
+| [`LIMIT_CYCLE_MASTER_SPEC.md`](../gzmo-chaos/LIMIT_CYCLE_MASTER_SPEC.md) | Proposed tanh \(\mathcal{R}\) + EMA — unvalidated |
+| **[`LIMIT_CYCLE_SPECS_MATH_MAP.md`](LIMIT_CYCLE_SPECS_MATH_MAP.md)** | **Rosetta:** lore → engineering equations |
+
+Keep lore files as **design history**. Cite **this document** for shipped ρ behavior; cite **math map** when translating V2/MASTER proposals.
 
 ---
 
