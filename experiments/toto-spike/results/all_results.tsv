@@ -1,0 +1,109 @@
+task	dataset	horizon	model	mase	crps	mae	brier	auroc	n_eval
+T1_rho_mod	synapse_real	32	persistence	10.280090		0.319265			166
+T1_rho_mod	synapse_real	64	persistence	14.207259		0.441230			134
+T1_rho_mod	synapse_real	96	persistence	11.787101		0.366068			102
+T3_rho_velocity_ema	synapse_real	32	persistence	0.754674		0.005699			166
+T3_rho_velocity_ema	synapse_real	64	persistence	0.931401		0.007034			134
+T3_rho_velocity_ema	synapse_real	96	persistence	0.827973		0.006253			102
+T2_saturate_gt6	synapse_real	32	persistence				0.000000		166
+T2_saturate_gt6	synapse_real	64	persistence				0.000000		134
+T2_saturate_gt6	synapse_real	96	persistence				0.000000		102
+T1_rho_mod	synapse_real	32	linear_trend	19.219542		0.596895			166
+T1_rho_mod	synapse_real	64	linear_trend	47.680373		1.480793			134
+T1_rho_mod	synapse_real	96	linear_trend	67.366182		2.092169			102
+T3_rho_velocity_ema	synapse_real	32	linear_trend	4.312482		0.032566			166
+T3_rho_velocity_ema	synapse_real	64	linear_trend	9.801209		0.074015			134
+T3_rho_velocity_ema	synapse_real	96	linear_trend	15.791095		0.119248			102
+T2_saturate_gt6	synapse_real	32	linear_trend				0.000000		166
+T2_saturate_gt6	synapse_real	64	linear_trend				0.000000		134
+T2_saturate_gt6	synapse_real	96	linear_trend				0.000000		102
+T1_rho_mod	synapse_real	32	ema_carry_forward	12.675325		0.393653			166
+T1_rho_mod	synapse_real	64	ema_carry_forward	21.644790		0.672215			134
+T1_rho_mod	synapse_real	96	ema_carry_forward	24.065862		0.747405			102
+T3_rho_velocity_ema	synapse_real	32	ema_carry_forward	0.754674		0.005699			166
+T3_rho_velocity_ema	synapse_real	64	ema_carry_forward	0.931401		0.007034			134
+T3_rho_velocity_ema	synapse_real	96	ema_carry_forward	0.827973		0.006253			102
+T2_saturate_gt6	synapse_real	32	ema_carry_forward				0.000000		166
+T2_saturate_gt6	synapse_real	64	ema_carry_forward				0.000000		134
+T2_saturate_gt6	synapse_real	96	ema_carry_forward				0.000000		102
+T1_rho_mod	lab_linear_decay_fast	32	persistence	1.441876		0.184008			274
+T1_rho_mod	lab_linear_decay_fast	64	persistence	2.155900		0.275129			242
+T1_rho_mod	lab_linear_decay_fast	96	persistence	1.881167		0.240068			210
+T3_rho_velocity_ema	lab_linear_decay_fast	32	persistence	1.326767		0.036471			274
+T3_rho_velocity_ema	lab_linear_decay_fast	64	persistence	1.910812		0.052526			242
+T3_rho_velocity_ema	lab_linear_decay_fast	96	persistence	1.689229		0.046435			210
+T2_saturate_gt6	lab_linear_decay_fast	32	persistence				0.000000		274
+T2_saturate_gt6	lab_linear_decay_fast	64	persistence				0.000000		242
+T2_saturate_gt6	lab_linear_decay_fast	96	persistence				0.000000		210
+T1_rho_mod	lab_linear_decay_fast	32	linear_trend	3.973971		0.507145			274
+T1_rho_mod	lab_linear_decay_fast	64	linear_trend	8.405508		1.072683			242
+T1_rho_mod	lab_linear_decay_fast	96	linear_trend	13.682849		1.746160			210
+T3_rho_velocity_ema	lab_linear_decay_fast	32	linear_trend	3.533044		0.097119			274
+T3_rho_velocity_ema	lab_linear_decay_fast	64	linear_trend	7.863223		0.216151			242
+T3_rho_velocity_ema	lab_linear_decay_fast	96	linear_trend	12.737777		0.350147			210
+T2_saturate_gt6	lab_linear_decay_fast	32	linear_trend				0.452555		274
+T2_saturate_gt6	lab_linear_decay_fast	64	linear_trend				0.462810		242
+T2_saturate_gt6	lab_linear_decay_fast	96	linear_trend				0.461905		210
+T1_rho_mod	lab_linear_decay_fast	32	ema_carry_forward	17.293052		2.206882			274
+T1_rho_mod	lab_linear_decay_fast	64	ema_carry_forward	34.511072		4.404189			242
+T1_rho_mod	lab_linear_decay_fast	96	ema_carry_forward	51.842378		6.615953			210
+T3_rho_velocity_ema	lab_linear_decay_fast	32	ema_carry_forward	1.326767		0.036471			274
+T3_rho_velocity_ema	lab_linear_decay_fast	64	ema_carry_forward	1.910812		0.052526			242
+T3_rho_velocity_ema	lab_linear_decay_fast	96	ema_carry_forward	1.689229		0.046435			210
+T2_saturate_gt6	lab_linear_decay_fast	32	ema_carry_forward				1.000000		274
+T2_saturate_gt6	lab_linear_decay_fast	64	ema_carry_forward				1.000000		242
+T2_saturate_gt6	lab_linear_decay_fast	96	ema_carry_forward				1.000000		210
+T1_rho_mod	lab_baseline_saturation	32	persistence	0.000000		0.000000			274
+T1_rho_mod	lab_baseline_saturation	64	persistence	0.000000		0.000000			242
+T1_rho_mod	lab_baseline_saturation	96	persistence	0.000000		0.000000			210
+T3_rho_velocity_ema	lab_baseline_saturation	32	persistence	0.000000		0.000000			274
+T3_rho_velocity_ema	lab_baseline_saturation	64	persistence	0.000000		0.000000			242
+T3_rho_velocity_ema	lab_baseline_saturation	96	persistence	0.000000		0.000000			210
+T2_saturate_gt6	lab_baseline_saturation	32	persistence				0.000000		274
+T2_saturate_gt6	lab_baseline_saturation	64	persistence				0.000000		242
+T2_saturate_gt6	lab_baseline_saturation	96	persistence				0.000000		210
+T1_rho_mod	lab_baseline_saturation	32	linear_trend	0.000000		0.000000			274
+T1_rho_mod	lab_baseline_saturation	64	linear_trend	0.000000		0.000000			242
+T1_rho_mod	lab_baseline_saturation	96	linear_trend	0.000000		0.000000			210
+T3_rho_velocity_ema	lab_baseline_saturation	32	linear_trend	0.000000		0.000000			274
+T3_rho_velocity_ema	lab_baseline_saturation	64	linear_trend	0.000000		0.000000			242
+T3_rho_velocity_ema	lab_baseline_saturation	96	linear_trend	0.000000		0.000000			210
+T2_saturate_gt6	lab_baseline_saturation	32	linear_trend				0.000000		274
+T2_saturate_gt6	lab_baseline_saturation	64	linear_trend				0.000000		242
+T2_saturate_gt6	lab_baseline_saturation	96	linear_trend				0.000000		210
+T1_rho_mod	lab_baseline_saturation	32	ema_carry_forward	0.000000		0.000000			274
+T1_rho_mod	lab_baseline_saturation	64	ema_carry_forward	0.000000		0.000000			242
+T1_rho_mod	lab_baseline_saturation	96	ema_carry_forward	0.000000		0.000000			210
+T3_rho_velocity_ema	lab_baseline_saturation	32	ema_carry_forward	0.000000		0.000000			274
+T3_rho_velocity_ema	lab_baseline_saturation	64	ema_carry_forward	0.000000		0.000000			242
+T3_rho_velocity_ema	lab_baseline_saturation	96	ema_carry_forward	0.000000		0.000000			210
+T2_saturate_gt6	lab_baseline_saturation	32	ema_carry_forward				0.000000		274
+T2_saturate_gt6	lab_baseline_saturation	64	ema_carry_forward				0.000000		242
+T2_saturate_gt6	lab_baseline_saturation	96	ema_carry_forward				0.000000		210
+T1_rho_mod	synapse_real	32	toto_4m	10.632999	0.128253	0.330225			166
+T1_rho_mod	synapse_real	64	toto_4m	11.815882	0.157323	0.366962			134
+T1_rho_mod	synapse_real	96	toto_4m	11.932394	0.154680	0.370580			102
+T3_rho_velocity_ema	synapse_real	32	toto_4m	0.754674		0.005699			166
+T3_rho_velocity_ema	synapse_real	64	toto_4m	0.931401		0.007034			134
+T3_rho_velocity_ema	synapse_real	96	toto_4m	0.827973		0.006253			102
+T2_saturate_gt6	synapse_real	32	toto_4m				0.000000		166
+T2_saturate_gt6	synapse_real	64	toto_4m				0.000000		134
+T2_saturate_gt6	synapse_real	96	toto_4m				0.000000		102
+T1_rho_mod	lab_linear_decay_fast	32	toto_4m	0.660969	0.033935	0.084351			274
+T1_rho_mod	lab_linear_decay_fast	64	toto_4m	0.682193	0.034360	0.087059			242
+T1_rho_mod	lab_linear_decay_fast	96	toto_4m	1.190379	0.055450	0.151912			210
+T3_rho_velocity_ema	lab_linear_decay_fast	32	toto_4m	1.326767		0.036471			274
+T3_rho_velocity_ema	lab_linear_decay_fast	64	toto_4m	1.910812		0.052526			242
+T3_rho_velocity_ema	lab_linear_decay_fast	96	toto_4m	1.689229		0.046435			210
+T2_saturate_gt6	lab_linear_decay_fast	32	toto_4m				0.004100		274
+T2_saturate_gt6	lab_linear_decay_fast	64	toto_4m				0.006581		242
+T2_saturate_gt6	lab_linear_decay_fast	96	toto_4m				0.003704		210
+T1_rho_mod	lab_baseline_saturation	32	toto_4m	0.000000	0.000000	0.000000			274
+T1_rho_mod	lab_baseline_saturation	64	toto_4m	0.000000	0.000000	0.000000			242
+T1_rho_mod	lab_baseline_saturation	96	toto_4m	0.000000	0.000000	0.000000			210
+T3_rho_velocity_ema	lab_baseline_saturation	32	toto_4m	0.000000		0.000000			274
+T3_rho_velocity_ema	lab_baseline_saturation	64	toto_4m	0.000000		0.000000			242
+T3_rho_velocity_ema	lab_baseline_saturation	96	toto_4m	0.000000		0.000000			210
+T2_saturate_gt6	lab_baseline_saturation	32	toto_4m				0.000000		274
+T2_saturate_gt6	lab_baseline_saturation	64	toto_4m				0.000000		242
+T2_saturate_gt6	lab_baseline_saturation	96	toto_4m				0.000000		210

@@ -14,11 +14,11 @@
 | Run verification today | §5 |
 | Wire chaos into daemon | §7.1 (Workstream B) |
 | Implement MASTER spec phases | §7.2–7.4 |
-| Translate lore → math | [`LIMIT_CYCLE_SPECS_MATH_MAP.md`](LIMIT_CYCLE_SPECS_MATH_MAP.md) |
+| Proposal lineage → math | [`LIMIT_CYCLE_SPECS_MATH_MAP.md`](LIMIT_CYCLE_SPECS_MATH_MAP.md) |
 | Shipped equations only | [`CHAOS_RHO_CONTROL_MODEL.md`](CHAOS_RHO_CONTROL_MODEL.md) |
-| History / lab numbers | [`CHAOS_RHO_HOMEOSTASIS_REVISION_REPORT.md`](CHAOS_RHO_HOMEOSTASIS_REVISION_REPORT.md) |
+| Lab results | `~/Projects/chaos-breathing-lab/RESULTS.md` |
 
-**Rule:** Lore files (`LIMIT_CYCLE_*.md`) are **design history**. Code and [`CHAOS_RHO_CONTROL_MODEL.md`](CHAOS_RHO_CONTROL_MODEL.md) are **authority**.
+**Rule:** Code and [`CHAOS_RHO_CONTROL_MODEL.md`](CHAOS_RHO_CONTROL_MODEL.md) are **authority**. Mythological drafts were removed from `gzmo-chaos/`.
 
 ---
 
@@ -52,12 +52,7 @@
 | `GZMO` | `main` | `5ff4a94` chaos slice · `0e232a6` platform survey |
 | `edge-node` | `master` | `03c28d9` TS ρ mirror |
 
-**Uncommitted in `survey_GZMO` working tree:**
-
-- `docs/LIMIT_CYCLE_SPECS_MATH_MAP.md` (new)
-- `gzmo-chaos/LIMIT_CYCLE_MASTER_SPEC.md` (new)
-- `gzmo-chaos/LIMIT_CYCLE_SPEC_V2.md` (new)
-- Edits to `LIMIT_CYCLE_BLUEPRINT.md`, `CHAOS_RHO_CONTROL_MODEL.md`
+**Docs cleanup (2026-06-08):** Mythological `LIMIT_CYCLE_*.md` drafts removed from `gzmo-chaos/`. Canonical set: `CHAOS_RHO_CONTROL_MODEL.md`, `LIMIT_CYCLE_SPECS_MATH_MAP.md`, this handoff.
 
 ---
 
@@ -73,7 +68,8 @@
 | Joke cooling | `gzmo-chaos/src/thoughts.rs` | `crystallize("joke")` → `lorenz_rho_mod -= 0.2` |
 | Telemetry | `gzmo-chaos/src/pulse.rs` | `rho_effective`, `rho_mod_delta`, `rho_forcing_sign` |
 | Unit tests | `gzmo-chaos/src/thoughts.rs` | `joke_cools_rho`, `rho_decay_halves_over_half_life` |
-| Lore defer note | `gzmo-chaos/src/pulse.rs` | Synapse until daemon runs `PulseLoop` |
+| Tanh restore (opt-in) | `gzmo-chaos/src/thoughts.rs` | `apply_rho_restoration` when `rho_restore_alpha > 0` |
+| Daemon Synapse | `gzmo-cli/src/chaos_bootstrap.rs` | `chaos.rho_telemetry` every 15 ticks |
 
 ### 2.2 CLI integration
 
@@ -193,7 +189,7 @@ lore_path = "data/lore.toml"
 
 1. [`CHAOS_RHO_CONTROL_MODEL.md`](CHAOS_RHO_CONTROL_MODEL.md) — 10 min  
 2. [`LIMIT_CYCLE_SPECS_MATH_MAP.md`](LIMIT_CYCLE_SPECS_MATH_MAP.md) — 15 min  
-3. Skim [`CHAOS_RHO_HOMEOSTASIS_REVISION_REPORT.md`](CHAOS_RHO_HOMEOSTASIS_REVISION_REPORT.md) §4 matrix — 5 min  
+3. `chaos-breathing-lab/output/matrix/matrix_summary.tsv` — 5 min  
 
 ---
 
@@ -273,47 +269,9 @@ npm test   # if tests exist
 
 ---
 
-## 6. Workstream A — Commit pending documentation
+## 6. Workstream A — Documentation ✅
 
-**Goal:** Land math map + annotated lore specs.  
-**Risk:** Low. **Estimate:** 15 min.
-
-### Steps
-
-1. Review diff:
-   ```bash
-   cd ~/Projects/_foundation-audit/survey_GZMO
-   git diff docs/CHAOS_RHO_CONTROL_MODEL.md
-   git diff gzmo-chaos/LIMIT_CYCLE_BLUEPRINT.md
-   cat docs/LIMIT_CYCLE_SPECS_MATH_MAP.md | head -40
-   ```
-
-2. Stage:
-   ```bash
-   git add docs/LIMIT_CYCLE_SPECS_MATH_MAP.md \
-           docs/CHAOS_RHO_CONTROL_MODEL.md \
-           docs/CHAOS_RHO_IMPLEMENTATION_HANDOFF.md \
-           gzmo-chaos/LIMIT_CYCLE_BLUEPRINT.md \
-           gzmo-chaos/LIMIT_CYCLE_SPEC_V2.md \
-           gzmo-chaos/LIMIT_CYCLE_MASTER_SPEC.md
-   ```
-
-3. Test (unchanged code): `cargo test -p gzmo-chaos`
-
-4. Commit message:
-   ```
-   docs(chaos): math map and ρ homeostasis implementation handoff
-
-   Rosetta for LIMIT_CYCLE lore specs; step-by-step handoff for
-   daemon integration and MASTER spec phases.
-   ```
-
-5. Push to `maximilianwruhs-cyber/GZMO`.
-
-### Acceptance
-
-- All six doc files tracked on `main`
-- No code changes in commit
+**Done:** Math map, control model, handoff on `main`. Lore drafts removed; equations preserved in [`LIMIT_CYCLE_SPECS_MATH_MAP.md`](LIMIT_CYCLE_SPECS_MATH_MAP.md).
 
 ---
 
@@ -726,7 +684,7 @@ stabilize_delta_rho = -1.0
 
 | Workstream | Primary files |
 |------------|---------------|
-| A Docs | `docs/LIMIT_CYCLE_SPECS_MATH_MAP.md`, `LIMIT_CYCLE_*.md`, this file |
+| A Docs | `docs/LIMIT_CYCLE_SPECS_MATH_MAP.md`, `CHAOS_RHO_CONTROL_MODEL.md`, this file |
 | B Daemon | `daemon_cmd.rs`, new `chaos_bootstrap.rs`, `orchestrator.rs`, `watcher.rs` |
 | C HEARTBEAT | `chat.rs` or `chaos_bootstrap.rs` |
 | D Tune k | `pulse.rs`, `gzmo.toml.example`, `chaos-breathing-lab/`, edge `types.ts` |

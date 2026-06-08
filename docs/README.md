@@ -27,9 +27,11 @@ Canonical operator and architecture docs. Session reports and milestone logs bel
 | Doc | Purpose |
 |-----|---------|
 | [CHAOS_RHO_CONTROL_MODEL.md](CHAOS_RHO_CONTROL_MODEL.md) | **Canonical** engineering spec (shipped law) |
-| [CHAOS_RHO_IMPLEMENTATION_HANDOFF.md](CHAOS_RHO_IMPLEMENTATION_HANDOFF.md) | **Step-by-step** handoff — verify, daemon, MASTER phases |
-| [LIMIT_CYCLE_SPECS_MATH_MAP.md](LIMIT_CYCLE_SPECS_MATH_MAP.md) | Lore specs → math Rosetta |
-| [CHAOS_RHO_HOMEOSTASIS_REVISION_REPORT.md](CHAOS_RHO_HOMEOSTASIS_REVISION_REPORT.md) | Audit + lab + port history |
+| [CHAOS_RHO_IMPLEMENTATION_HANDOFF.md](CHAOS_RHO_IMPLEMENTATION_HANDOFF.md) | Completed work inventory + verify tiers |
+| [CHAOS_RHO_REMAINING_IMPLEMENTATION_HANDOFF.md](CHAOS_RHO_REMAINING_IMPLEMENTATION_HANDOFF.md) | **Agent brief** — remaining tasks (start here for new work) |
+| [LIMIT_CYCLE_SPECS_MATH_MAP.md](LIMIT_CYCLE_SPECS_MATH_MAP.md) | Proposal lineage → equations + lab verdicts |
+| [TOTO_GZMO_IMPACT_RESEARCH_BRIEF.md](TOTO_GZMO_IMPACT_RESEARCH_BRIEF.md) | Research protocol — Toto-2.0-4m impact evaluation |
+| [TOTO_GZMO_IMPACT_RESEARCH_REPORT.md](TOTO_GZMO_IMPACT_RESEARCH_REPORT.md) | **Verdict: IMPACT NO** — Toto vs ρ baselines (2026-06-08) |
 
 ## Operations
 

@@ -1,7 +1,7 @@
 # Chaos Engine — ρ Control Model (Engineering Spec)
 
-**Replaces mythological framing** in [`LIMIT_CYCLE_BLUEPRINT.md`](../gzmo-chaos/LIMIT_CYCLE_BLUEPRINT.md) for implementation and review.  
-**Revision history:** [`CHAOS_RHO_HOMEOSTASIS_REVISION_REPORT.md`](CHAOS_RHO_HOMEOSTASIS_REVISION_REPORT.md)  
+**Canonical engineering spec** for ρ homeostasis (replaces removed lore drafts).  
+**Equation Rosetta:** [`LIMIT_CYCLE_SPECS_MATH_MAP.md`](LIMIT_CYCLE_SPECS_MATH_MAP.md)  
 **Implementation handoff:** [`CHAOS_RHO_IMPLEMENTATION_HANDOFF.md`](CHAOS_RHO_IMPLEMENTATION_HANDOFF.md)
 
 ---
@@ -97,7 +97,7 @@ Use **engineering column** in code comments, docs, and PRs.
 | Manual stabilize | `ChaosEvent::Stabilize`, `/stabilize` | \(\Delta\rho = -1.0\) default |
 | Clamp | `thoughts.rs` | \(\rho_{\mathrm{mod}} \in [-10, 10]\) |
 | Daemon `PulseLoop` | `daemon_cmd.rs` + `chaos_bootstrap.rs` | Shipped |
-| Shared bridge | `chaos_bootstrap.rs` | chat, TUI, daemon |
+| Shared bridge | `chaos_bootstrap.rs` | chat + daemon (TUI still inline `PulseLoop`) |
 
 **Validation:** 18+ `gzmo-chaos` unit tests, lab sim, live CLI `/chaos` + `/stabilize`, daemon Tier 4.
 
@@ -132,16 +132,16 @@ Synapse `chaos.rho_telemetry` events append every 15 ticks in **daemon** mode (`
 
 ---
 
-## 7. Relation to limit-cycle lore specs
+## 7. Relation to design proposals
 
-| File | Role |
-|------|------|
-| [`LIMIT_CYCLE_BLUEPRINT.md`](../gzmo-chaos/LIMIT_CYCLE_BLUEPRINT.md) | Historical; Phase 1 shipped |
-| [`LIMIT_CYCLE_SPEC_V2.md`](../gzmo-chaos/LIMIT_CYCLE_SPEC_V2.md) | Proposed power-law \(\mathcal{R}\) — lab-negative |
-| [`LIMIT_CYCLE_MASTER_SPEC.md`](../gzmo-chaos/LIMIT_CYCLE_MASTER_SPEC.md) | Tanh \(\mathcal{R}\) + EMA — tanh **lab-validated**, shipped opt-in |
-| **[`LIMIT_CYCLE_SPECS_MATH_MAP.md`](LIMIT_CYCLE_SPECS_MATH_MAP.md)** | **Rosetta:** lore → engineering equations |
+Mythological limit-cycle drafts were removed from `gzmo-chaos/` (2026-06-08 cleanup). Engineering distillate:
 
-Keep lore files as **design history**. Cite **this document** for shipped ρ behavior; cite **math map** when translating V2/MASTER proposals.
+| Doc | Role |
+|-----|------|
+| **This document** | Shipped ρ behavior |
+| [`LIMIT_CYCLE_SPECS_MATH_MAP.md`](LIMIT_CYCLE_SPECS_MATH_MAP.md) | Blueprint / V2 / MASTER proposals → equations + lab verdicts |
+
+**Do not implement** V2 power-law \(\mathcal{R}\) (lab-negative). **Tanh** (`rho_restore_alpha`) is opt-in after lab win.
 
 ---
 

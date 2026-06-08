@@ -1,10 +1,9 @@
 # Limit-Cycle Specs — Mathematical Map (Engineering Canon)
 
 **Authority:** [`CHAOS_RHO_CONTROL_MODEL.md`](CHAOS_RHO_CONTROL_MODEL.md)  
-**Handoff (step-by-step):** [`CHAOS_RHO_IMPLEMENTATION_HANDOFF.md`](CHAOS_RHO_IMPLEMENTATION_HANDOFF.md)  
-**Maps:** [`LIMIT_CYCLE_BLUEPRINT.md`](../gzmo-chaos/LIMIT_CYCLE_BLUEPRINT.md) · [`LIMIT_CYCLE_SPEC_V2.md`](../gzmo-chaos/LIMIT_CYCLE_SPEC_V2.md) · [`LIMIT_CYCLE_MASTER_SPEC.md`](../gzmo-chaos/LIMIT_CYCLE_MASTER_SPEC.md)
+**Handoff (step-by-step):** [`CHAOS_RHO_IMPLEMENTATION_HANDOFF.md`](CHAOS_RHO_IMPLEMENTATION_HANDOFF.md)
 
-This document translates every claim, equation, layer, and phase in the three lore specs into **one precise control-theoretic vocabulary**. Use it for review, implementation, and lab design — not the mythological source text.
+Distilled Rosetta for the **2026-06-08 limit-cycle design proposals** (mythological drafts removed from `gzmo-chaos/`). Use this for review, implementation, and lab design — not narrative lore.
 
 ---
 
@@ -111,7 +110,7 @@ Using \(\rho_0=28\) in \((\rho_{\mathrm{mod}}-28)^n\) or \(\tanh(\beta(\rho_{\ma
 
 ## 2. Document-by-document map
 
-### 2.1 `LIMIT_CYCLE_BLUEPRINT.md`
+### 2.1 Blueprint lineage (Phase 1–3 proposal)
 
 | Lore section | Lore claim | Engineering translation | Status |
 |--------------|------------|-------------------------|--------|
@@ -122,7 +121,7 @@ Using \(\rho_0=28\) in \((\rho_{\mathrm{mod}}-28)^n\) or \(\tanh(\beta(\rho_{\ma
 | Exhale | Nonlinear pull to baseline | **Dissipation:** originally unspecified; shipped as \((1-k)\rho_{\mathrm{mod}}\) | Phase 1 shipped |
 | Phase 1: baseline pull | Constant decay | \(k=0.001\), `apply_rho_decay` | **Shipped** |
 | Phase 2: nonlinear oscillation | Periodic limit cycle | **Proposed extension** — see §1 lineage; **not shipped**; lab did not show oscillation | Proposed |
-| Phase 3: Synapse heartbeat | Observable Inhale/Exhale | **`rho_forcing_sign`** in `ChaosSnapshot`; Synapse deferred | Partial |
+| Phase 3: Synapse heartbeat | Observable Inhale/Exhale | **`rho_forcing_sign`**, EMA `rho_breath_phase`, Synapse `chaos.rho_telemetry` | **Shipped** |
 
 **Blueprint continuous-time idealization (Phase 1 only):**
 
@@ -135,7 +134,7 @@ Steady mean \(\bar{\mu} \approx k\,\rho_{\mathrm{mod}}^{\*}\). **Classifier:** f
 
 ---
 
-### 2.2 `LIMIT_CYCLE_SPEC_V2.md`
+### 2.2 V2 power-law proposal (lab-negative)
 
 | Lore section | Lore equation / claim | Corrected engineering form | Dynamical class | Status |
 |--------------|----------------------|---------------------------|-----------------|--------|
@@ -146,11 +145,11 @@ Steady mean \(\bar{\mu} \approx k\,\rho_{\mathrm{mod}}^{\*}\). **Classifier:** f
 | §2.2 Inhale | \(\rho(t^+)=\rho(t^-)+\Delta\rho\) | Same as impulse step in §0.2 | Impulsive map | Shipped |
 | §2.3 Limit cycle equilibrium | \(\int_0^T u\,dt = \int_0^T \mathcal{R}\,dt\) | **Period-averaged balance** — defines **steady oscillation** only if trajectory is periodic. With one-state dissipative map + noise → **almost surely aperiodic**; balance holds in **expectation**, not as a closed orbit | Equilibrium / stationary measure | Aspirational |
 | Layer 1 Driver | `ChaosEvent::StoryGenerated` | Stochastic \(\Delta\rho\) at crystallization | Forcing \(u[n]\) | Shipped |
-| Layer 2 Governor | nonlinear `apply_rho_decay` | \(\mathcal{R}(\rho_{\mathrm{mod}})\) per §1 | Restoration | Linear only shipped |
-| Layer 3 Observer | Synapse + TriggerEngine | **`rho_mod_delta`, `rho_effective`, `rho_forcing_sign`**; Synapse blocked | Observation \(y[n]\) | Partial |
-| Phase I | `rho -= alpha * rho.powf(n)` | Discrete: \(\rho \leftarrow \rho - \alpha|\rho|^n\operatorname{sign}(\rho)\) | Nonlinear map | Proposed |
-| Phase II | \(\dot{\rho}_{\mathrm{mod}} \gtrless 0\) | \(\mathrm{sign}(\rho_{\mathrm{mod}}[n]-\rho_{\mathrm{mod}}[n-1])\) | Hysteresis-free classifier | Partial (`rho_forcing_sign`) |
-| Phase III | Agent restorative events | **Manual \(\Delta\rho_{\mathrm{stab}} < 0\)** or temporary \(k \mapsto k'\) | External control \(u_{\mathrm{ext}}\) | Proposed |
+| Layer 2 Governor | nonlinear restore | \(\mathcal{R}(\rho_{\mathrm{mod}})\) per §1 | Restoration | Linear default; tanh opt-in |
+| Layer 3 Observer | Synapse + TriggerEngine | **`rho_mod_delta`, `rho_effective`, `rho_forcing_sign`**, EMA breath, Synapse export | Observation \(y[n]\) | **Shipped** |
+| Phase I | `rho -= alpha * rho.powf(n)` | Discrete: \(\rho \leftarrow \rho - \alpha|\rho|^n\operatorname{sign}(\rho)\) | Nonlinear map | **Rejected** (lab) |
+| Phase II | \(\dot{\rho}_{\mathrm{mod}} \gtrless 0\) | \(\mathrm{sign}(\rho_{\mathrm{mod}}[n]-\rho_{\mathrm{mod}}[n-1])\) + EMA | Hysteresis-free classifier | **Shipped** |
+| Phase III | Agent restorative events | **`/stabilize`**, \(\Delta\rho_{\mathrm{stab}}=-1\) | External control \(u_{\mathrm{ext}}\) | **Shipped** |
 
 **Lab discretization of V2 intent** (`chaos-breathing-lab`, `PolicyKind::NonlinearDecay`):
 
@@ -162,7 +161,7 @@ Steady mean \(\bar{\mu} \approx k\,\rho_{\mathrm{mod}}^{\*}\). **Classifier:** f
 
 ---
 
-### 2.3 `LIMIT_CYCLE_MASTER_SPEC.md` (v2.1)
+### 2.3 MASTER tanh + EMA proposal
 
 | Lore section | Lore equation / claim | Corrected engineering form | Notes | Status |
 |--------------|----------------------|---------------------------|-------|--------|
@@ -171,11 +170,11 @@ Steady mean \(\bar{\mu} \approx k\,\rho_{\mathrm{mod}}^{\*}\). **Classifier:** f
 | §2.1 \(\tanh\) for RK4 stability | Bounded restoration | **Category error:** RK4 integrates **Lorenz** \((x,y,z)\); \(\rho_{\mathrm{mod}}\) is **not integrated by RK4** | Restoration stability is discrete-map issue | Reject rationale |
 | §2.2 Inhale | Stochastic \(\Delta\rho\) | Same as \(u[n]\) | — | Shipped |
 | Layer I Subconscious | Story \(\Rightarrow\) \(\Delta\rho\) | Forcing channel | — | Shipped |
-| Layer II Homeostatic reflex | \(\tanh\) in `thoughts.rs` | \(\mathcal{R}=\alpha\tanh(\beta\rho_{\mathrm{mod}})\) per tick | Smooth saturation of restore rate | **Not shipped** |
-| Layer III Consciousness | EMA of \(\dot{\rho}_{\mathrm{mod}}\) | \(v[n] = (1-\gamma)v[n-1] + \gamma\,\Delta\rho_{\mathrm{mod}}[n]\); phase \(=\mathrm{sign}(v)\) | Low-pass on increment | Proposed |
-| Phase I Sigmoidal transition | Replace linear decay | A/B vs \(k=0.001\) in lab before port | — | Proposed |
-| Phase II Rhythmic pulse | `Phase::Inhale/Exhale` | `RhoBreathPhase` from EMA — **not** `chaos::Phase` | — | Proposed |
-| Phase III `skill_stabilize` | Forced exhale | \(\rho_{\mathrm{mod}} \mathrel{+}= \Delta\rho_{\mathrm{stab}}\) or \(k_{\mathrm{boost}}\) timer | External feedback | Proposed |
+| Layer II Homeostatic reflex | \(\tanh\) in `thoughts.rs` | \(\mathcal{R}=\alpha\tanh(\beta\rho_{\mathrm{mod}})\) per tick | Smooth saturation of restore rate | **Shipped opt-in** (`rho_restore_alpha`) |
+| Layer III Consciousness | EMA of \(\dot{\rho}_{\mathrm{mod}}\) | \(v[n] = (1-\gamma)v[n-1] + \gamma\,\Delta\rho_{\mathrm{mod}}[n]\); phase \(=\mathrm{sign}(v)\) | Low-pass on increment | **Shipped** |
+| Phase I Sigmoidal transition | Replace linear decay | Lab `tanh_decay` max ρ 0.93 vs linear_fast 5.99 | — | **Shipped opt-in** |
+| Phase II Rhythmic pulse | `Phase::Inhale/Exhale` | `RhoBreathPhase` from EMA — **not** `chaos::Phase` | — | **Shipped** |
+| Phase III `skill_stabilize` | Forced exhale | \(\rho_{\mathrm{mod}} \mathrel{+}= \Delta\rho_{\mathrm{stab}}\) or \(k_{\mathrm{boost}}\) timer | External feedback | **Shipped** |
 | §5 Success criterion | **Stable periodic oscillation** | **Strict:** closed orbit in \(\rho_{\mathrm{mod}}\) alone requires **nonlinear + energy injection + phase memory** (e.g. relaxation oscillator). **Relaxed (operational):** \(\mathbb{P}(\rho_{\mathrm{mod}} \geq 10) \approx 0\) under story load | See §4 | Relaxed **met**; strict **not met** |
 
 **Discrete MASTER Phase I candidate:**
@@ -211,12 +210,12 @@ Shipped shortcut: `rho_forcing_sign[n] = \mathrm{sign}(\rho_{\mathrm{mod}}[n]-\r
 | Lore layer | Mathematical role | Input | Output | Implementation |
 |------------|-------------------|-------|--------|----------------|
 | **Driver / Subconscious** | Forcing \(u[n]\) | Crystallization events | \(\sum \Delta\rho_i\) | `thoughts.rs::crystallize` |
-| **Governor / Homeostatic reflex** | Restoration \(\mathcal{R}\) | \(\rho_{\mathrm{mod}}[n^+]\) | Dissipated state | `apply_rho_decay` (linear); tanh/power **proposed** |
+| **Governor / Homeostatic reflex** | Restoration \(\mathcal{R}\) | \(\rho_{\mathrm{mod}}[n^+]\) | Dissipated state | `apply_rho_restoration` (linear default; tanh opt-in) |
 | **Plant** | Lorenz \(\mathcal{P}\) | \(\rho, \sigma\) | \((x,y,z)\) | `chaos.rs::LorenzAttractor` |
 | **Output map** | \(\mathcal{O}\) | \((x,y,z)\) | LLM params | `pulse.rs` Lorenz mappers |
 | **Observer / Consciousness** | \(y[n] = h(\rho_{\mathrm{mod}}[n])\)) | \(\rho_{\mathrm{mod}}\) history | Telemetry | `ChaosSnapshot` fields |
-| **Actuator (agent)** | External \(u_{\mathrm{ext}}\) | Agent command | \(\Delta\rho_{\mathrm{stab}}\) | `skill_stabilize` **proposed** |
-| **Event bus (Synapse)** | Publish \(y[n]\) | Snapshot | IPC | **Deferred** (daemon) |
+| **Actuator (agent)** | External \(u_{\mathrm{ext}}\) | Agent command | \(\Delta\rho_{\mathrm{stab}}\) | `/stabilize`, `skill_stabilize.sh` **shipped** |
+| **Event bus (Synapse)** | Publish \(y[n]\) | Snapshot | IPC | `chaos.rho_telemetry` **shipped** (daemon) |
 
 **Separate subsystem (not in ρ specs):** `engine.rs` energy ODE / phase machine (`Idle/Build/Drop`) — hardware tension, **not** \(\rho_{\mathrm{mod}}\) breathing.
 
@@ -251,33 +250,31 @@ None of the three lore specs write this; they only strengthen \(\mathcal{R}\), w
 | Impulse table \(\Delta\rho_i\) | ✓ | ✓ | ✓ | `thoughts.rs` | ✓ |
 | Linear leak \(k\) | Phase 1 | baseline | superseded | `k=0.001` | `linear_decay_fast` **winner** |
 | Power-law \(\mathcal{R}\) | Phase 2 | Phase I | — | — | `nonlinear_decay` **fail** active_story |
-| Tanh \(\mathcal{R}\) | — | — | Phase I | — | **not run** |
+| Tanh \(\mathcal{R}\) | — | — | Phase I | `rho_restore_alpha` opt-in | `tanh_decay` **pass** |
 | `rho_forcing_sign` | — | Phase II | Phase II | `pulse.rs` | trend column in CSV |
-| EMA phase | — | — | Layer III | — | — |
-| `skill_stabilize` | — | Phase III | Phase III | — | — |
-| Synapse export | Phase 3 | Layer 3 | — | blocked | — |
+| EMA phase | — | — | Layer III | `rho_breath_phase` | shipped |
+| `skill_stabilize` | — | Phase III | Phase III | `feedback.rs`, CLI | shipped |
+| Synapse export | Phase 3 | Layer 3 | — | `chaos_bootstrap.rs` | shipped |
 
 ---
 
 ## 6. Recommended reading order
 
-1. **This map** — translate lore → math  
-2. **`CHAOS_RHO_CONTROL_MODEL.md`** — shipped law + extensions  
-3. **`CHAOS_RHO_HOMEOSTASIS_REVISION_REPORT.md`** — empirical validation  
-4. Lore files — **historical only**, with STATUS headers  
-
-**Before implementing MASTER Phase I (tanh):** add `PolicyKind::TanhDecay` to `chaos-breathing-lab`, re-run `matrix_summary.tsv`, compare to \(k=0.001\) winner.
+1. **`CHAOS_RHO_CONTROL_MODEL.md`** — shipped law (start here)  
+2. **This map** — proposal lineage, lab verdicts, equation corrections  
+3. **`CHAOS_RHO_IMPLEMENTATION_HANDOFF.md`** — verify tiers, daemon, workstreams  
+4. **`chaos-breathing-lab/RESULTS.md`** — simulation numbers
 
 ---
 
-## 7. One-line summary per document
+## 7. One-line summary per proposal lineage
 
-| Document | Engineering one-liner |
-|----------|----------------------|
-| **BLUEPRINT** | Phase 1 leaky integrator + impulses fixes saturation; Phases 2–3 are optional nonlinear restore + telemetry. **Phase 1 shipped.** |
-| **SPEC V2** | Replace linear leak with power-law \(\mathcal{R}(|\rho_{\mathrm{mod}}|^n)\); lab shows **worse** saturation than fast linear under story load. |
-| **MASTER** | Replace linear leak with bounded \(\tanh\) restore + EMA observer + agent stabilize; fix \(\rho_0\to 0\); **unvalidated**; strict limit cycle **not implied** by equation alone. |
+| Lineage | Engineering one-liner |
+|---------|----------------------|
+| **Blueprint** | Leaky integrator + impulses fixes saturation; telemetry + EMA shipped; strict limit cycle **rejected** as dynamical target. |
+| **V2 power-law** | \(\mathcal{R}(|\rho_{\mathrm{mod}}|^n)\) — **lab-negative** vs `linear_decay_fast`; do not implement. |
+| **MASTER tanh** | Bounded \(\tanh\) restore + EMA + stabilize — **lab-validated**, shipped **opt-in**; strict periodic oscillation **not required**. |
 
 ---
 
-*Canonical mathematical Rosetta stone for gzmo-chaos limit-cycle lore. Update when policies or observers change.*
+*Canonical equation Rosetta for gzmo-chaos ρ proposals. Update when policies or observers change.*

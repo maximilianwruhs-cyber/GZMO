@@ -57,6 +57,9 @@ scripts/ingest-quality/report-batch2.json
 scripts/ingest-quality/*.log
 scripts/ingest-quality/*.stderr.log
 scripts/.venv/
+experiments/toto-spike/.venv/
+experiments/toto-spike/results/*.pt
+experiments/toto-spike/.hf_cache/
 
 # ── Session research docs (local working notes) ────────────────────────────
 docs/archive/
