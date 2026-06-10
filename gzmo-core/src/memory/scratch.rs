@@ -12,8 +12,7 @@ use serde::{Deserialize, Serialize};
 use tokio::sync::{Mutex, RwLock};
 use tracing::{debug, error, info, warn};
 
-use crate::config::{ContextMemoryConfig, RedisConfig, ContextCompressConfig};
-use crate::context::estimate_text_tokens;
+use crate::config::{ContextCompressConfig, ContextMemoryConfig, RedisConfig};
 use crate::types::{Message, Role};
 
 const SCRATCH_PREFIX: &str = "gzmo:scratch:";
