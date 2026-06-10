@@ -11,7 +11,7 @@
 
 ## 0. One-paragraph summary
 
-GZMO is a **local-first sovereign agent** whose memory is a **distillation pipeline**, not a chatbot with an attached vector store. Cognition (the LLM "Prime") runs on a Ryzen workstation; retrieval models (embed, rerank, librarian) run on VM200; persistence (Neo4j, Qdrant, Redis) runs on LXC101. The SQLite `vault.db` is the source of truth: facts are extracted by Prime, verified against quotable evidence, promoted into the vault, and only the curated, high-confidence subset is mirrored into the `honeypot` table and synced to Qdrant for RAG. Everything is gated — nothing enters memory without passing verify-on-merged plus, for migration corpora, an operator curation step.
+GZMO is a **local-first sovereign agent** whose memory is a **distillation pipeline**, not a chatbot with an attached vector store. Cognition (Prime) and session distill run on a Ryzen workstation; retrieval models (embed, rerank) run on VM200; persistence (Neo4j, Qdrant, Redis) runs on LXC101. The SQLite `vault.db` is the source of truth: facts are extracted by Prime, verified against quotable evidence, promoted into the vault, and only the curated, high-confidence subset is mirrored into the `honeypot` table and synced to Qdrant for RAG. Everything is gated — nothing enters memory without passing verify-on-merged plus, for migration corpora, an operator curation step.
 
 ---
 
@@ -29,7 +29,7 @@ flowchart TB
   end
   WS -->|":8000 Prime"| WS
   WS -->|":8002 Pi embed"| WS
-  WS -->|":8081-8083"| VM200
+  WS -->|":8081 embed+rerank"| VM200
   WS -->|":7687 bolt MCP stdio"| LXC101
   WS -->|":6333 HTTP"| LXC101
   WS -->|":6379 Redis"| LXC101
@@ -40,7 +40,7 @@ flowchart TB
 | Node | IP | Compute | Role |
 |------|-----|---------|------|
 | Workstation | local | 2x RTX 5070 Ti, Ryzen 9950X | Prime `:8000`, gzmo daemon/CLI, SQLite SoT, Pi frontend, Pi embed `:8002` |
-| VM200 `ollamagpu` | `192.168.31.110` | GTX 1070 8 GB eGPU | Embeddings `:8081`, rerank `:8082`, librarian `:8083` |
+| VM200 `ollamagpu` | `192.168.31.110` | GTX 1070 8 GB eGPU | Retrieval router `:8081` — embed + rerank (librarian moved to Prime `:8000`) |
 | LXC101 | `192.168.31.202` | Docker | Neo4j `:7687`, Qdrant `:6333`, Redis `:6379` |
 | PVE | `192.168.31.200` | i7-6770HQ | Hypervisor for VM200 + LXC containers |
 | LXC100 | `192.168.31.201` | — | Samba — not on hot path |
@@ -62,11 +62,11 @@ All runtime authority flows from a single file: [`gzmo.toml`](../gzmo.toml). Eve
 
 | Section | Endpoint | Used for |
 |---------|----------|----------|
-| `[engine.local]` | `http://localhost:8000/v1` | Chat, ingest extract/verify, dream, spark |
+| `[engine.local]` | `http://localhost:8000/v1` | Chat, ingest extract/verify, dream, spark, session distill verify |
 | `[engine.cloud]` | OpenRouter (opt-in `/mode cloud`) | Fallback cognition |
-| `[embeddings]` | `http://192.168.31.110:8081/v1` | Vault/honeypot vectors, similarity |
-| `[rerank]` | `http://192.168.31.110:8082/v1` | `memory_search` post-filter |
-| `[librarian]` | `http://192.168.31.110:8083/v1` | Session distill extract/summary |
+| `[embeddings]` | `http://192.168.31.110:8081/v1` (`gzmo-embed`) | Vault/honeypot vectors, similarity |
+| `[rerank]` | `http://192.168.31.110:8081/v1` (`gzmo-rerank`) | `memory_search` post-filter |
+| `[librarian]` | disabled — distill on Prime via `[routing.mappings]` | Session distill extract/summary/verify (Prime `:8000`) |
 | `[qdrant]` | `http://192.168.31.202:6333`, collection `honeypot` | Nightly honeypot vector sync (01:45 UTC) |
 | `[redis]` | `redis://192.168.31.202:6379` | Scratch cache + `gzmo:distill:pending` queue |
 | `[[mcp_servers]] memory` | stdio → `mcp-neo4j-memory@0.4.5` | Neo4j KG writes (ingest, dream, spark) |
@@ -77,20 +77,23 @@ All runtime authority flows from a single file: [`gzmo.toml`](../gzmo.toml). Eve
 
 | Port / process | Service | Start |
 |----------------|---------|-------|
-| `:8000` | Prime `llama-server` (Qwen3.6-35B-A3B Q4_K_XL, ctx 131072) | `~/Projects/llama.cpp/prime-bench/start-prime.sh` or [`scripts/systemd/gzmo-prime.service`](../scripts/systemd/gzmo-prime.service) |
-| `:8002` | Local embed (Pi KB / fallback) | [`scripts/start-embed.sh`](../scripts/start-embed.sh) or `gzmo-embed.service` |
+| `:8000` | Prime `llama-server` (Gemma 4 26B-A4B-it champion: draft-mtp+ngram-mod, f16 KV, ctx 262144) | `~/Projects/llama.cpp/prime-bench/start-prime-gemma4-26b-a4b-256k.sh` or [`scripts/systemd/gzmo-prime.service`](../scripts/systemd/gzmo-prime.service) |
+| `:8002` | Local Pi KB embed (**opt-in**, `ENABLE_PI_EMBED=1`) | [`scripts/start-embed.sh`](../scripts/start-embed.sh) or `gzmo-embed.service` |
 | `gzmo` | Daemon or REPL | [`scripts/start-production.sh`](../scripts/start-production.sh) `--daemon` |
 | `:8010` | Sovereign FrankenMoE | **Parked** |
 
 ### 2.3 VM200 retrieval layer
 
-| Port | Model | `gzmo.toml` |
-|------|-------|-------------|
-| `:8081` | Qwen3-Embedding-0.6B Q8 | `[embeddings]` |
-| `:8082` | bge-reranker-v2-m3 Q8 | `[rerank]` |
-| `:8083` | Qwen2.5-1.5B librarian | `[librarian]` |
+Single unified router (`llama-server --models-preset`) serving two presets on one port.
 
-Deploy: `scripts/vm200/deploy-retrieval-layer.sh`, `deploy-rerank.sh`, `deploy-librarian.sh`
+| Port | Preset / Model | `gzmo.toml` |
+|------|----------------|-------------|
+| `:8081` | `gzmo-embed` — Qwen3-Embedding-0.6B Q8 (1024-dim) | `[embeddings]` |
+| `:8081` | `gzmo-rerank` — Qwen3-Reranker-0.6B | `[rerank]` |
+| ~~`:8082`~~ | bge-reranker-v2-m3 (**retired**) | — |
+| ~~`:8083`~~ | Qwen2.5-1.5B librarian (**retired**) | — |
+
+Deploy: `scripts/vm200/deploy-retrieval-router.sh` → `llama-retrieval-router.service`. Librarian distill now on Prime `:8000` via `[routing.mappings]`.
 
 ### 2.4 LXC101 data plane
 
@@ -149,7 +152,7 @@ flowchart LR
 
 | Tier | Store | Schema / code | Recall role |
 |------|-------|---------------|-------------|
-| Hot | Redis scratch | `[redis]` + `[context_memory]` | Per-turn `[RECALL]` block |
+| Hot | Redis scratch + CCR | `[redis]` + `[context_compress]` | Per-turn `[RECALL]` block + Cache-Compress-Retrieve (CCR) store for hot-context compression (keys: `gzmo:ccr:{session_id}:{hash}`) |
 | Vault (ops) | `semantic_vault`, `quarantine_vault` | [`gzmo-core/src/memory/vault.rs`](../gzmo-core/src/memory/vault.rs) | All verified facts; keyword fallback in RRF |
 | Honeypot (Tier-1) | `honeypot`, `honeypot_fts` | `memory/vault.rs`, `honeypot.rs` | Primary RAG; Qdrant mirror source |
 | Evidence (Tier-2) | `evidence`, `evidence_fts` | `memory/vault.rs` | Strict grounding; char spans 1:1 with honeypot |
@@ -250,7 +253,7 @@ flowchart TB
 | MCP | Transport / command | Tools | Role |
 |-----|---------------------|-------|------|
 | `memory` | stdio → `uvx mcp-neo4j-memory@0.4.5` | `create_entities`, `create_relations`, `search_memories`, `read_graph` | Neo4j KG writes |
-| `gzmo-memory` | stdio → `gzmo mcp-serve` | `gzmo_memory_search`, `gzmo_memory_recall_pull`, `gzmo_memory_status`, `gzmo_wiki_search` | Honeypot RAG + Pi cross-search + wiki grep |
+| `gzmo-memory` | stdio → `gzmo mcp-serve` | `gzmo_memory_search`, `gzmo_memory_recall_pull`, `gzmo_memory_status`, `gzmo_wiki_search`, `gzmo_retrieve_context` | Honeypot RAG + Pi cross-search + wiki grep + CCR context retrieval |
 
 **Cross-search:** `[platform_search]` merges honeypot vault recall with the Pi `knowledge` Qdrant collection ([`gzmo-core/src/platform_search.rs`](../gzmo-core/src/platform_search.rs)). Pi never touches Redis or vault SQL directly — it goes through `scripts/pi-gzmo-memory.sh` (see [`PI_GZMO_MEMORY_INTEGRATION.md`](./PI_GZMO_MEMORY_INTEGRATION.md)).
 

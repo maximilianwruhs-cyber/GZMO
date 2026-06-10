@@ -84,9 +84,12 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
         }
     };
 
+    let ccr = gzmo_core::context_compress::CcrStore::new(&config.redis, &config.context_compress);
     let mut agent_session = AgentSession::new_main(
         &config.redis,
         &config.context_memory,
+        &config.context_compress,
+        &ccr,
         SessionManager::new_session_id(),
     )
     .await;
@@ -134,21 +137,53 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
         chaos_runtime.restore_policy.clone(),
     );
 
+    let ccr = gzmo_core::context_compress::CcrStore::new(&config.redis, &config.context_compress);
+    let session_id = agent_session.session_id().to_string();
+    let compress_cfg = config.context_compress.clone();
+
     // ─── Tools ───────────────────────────────────────────────────
     let mut tools = ToolRegistry::new();
-    tools.register(Box::new(FileReadTool));
+    tools.register(Box::new(FileReadTool::new_with_compress(
+        compress_cfg.clone(),
+        ccr.clone(),
+        session_id.clone(),
+    )));
     tools.register(Box::new(FileWriteTool));
     tools.register(Box::new(DirListTool));
-    tools.register(Box::new(FileSearchTool));
-    tools.register(Box::new(ShellExecTool::default()));
+    tools.register(Box::new(FileSearchTool::new_with_compress(
+        compress_cfg.clone(),
+        ccr.clone(),
+        session_id.clone(),
+    )));
+    tools.register(Box::new(ShellExecTool::new_with_compress(
+        std::time::Duration::from_secs(30),
+        None,
+        compress_cfg.clone(),
+        ccr.clone(),
+        session_id.clone(),
+    )));
     // Web search: use SerpAPI if key is available, DDG fallback
     let serpapi_key = config.api_keys.serpapi_key();
     if serpapi_key.is_empty() {
-        tools.register(Box::new(WebSearchTool::default()));
+        tools.register(Box::new(WebSearchTool::new_with_compress(
+            String::new(),
+            compress_cfg.clone(),
+            ccr.clone(),
+            session_id.clone(),
+        )));
     } else {
-        tools.register(Box::new(WebSearchTool::with_serpapi_key(serpapi_key)));
+        tools.register(Box::new(WebSearchTool::new_with_compress(
+            serpapi_key.clone(),
+            compress_cfg.clone(),
+            ccr.clone(),
+            session_id.clone(),
+        )));
     }
-    tools.register(Box::new(WebBrowseTool::default()));
+    tools.register(Box::new(WebBrowseTool::new_with_compress(
+        compress_cfg.clone(),
+        ccr.clone(),
+        session_id.clone(),
+    )));
     tools.register(Box::new(SysMetricsTool));
     tools.register(Box::new(SysKillTool));
     
@@ -244,10 +279,12 @@ Use delegate_task for focused sub-work; you receive a short summary, not full su
     let subagent_runner = Arc::new(SubagentRunner::new(
         config.subagent.clone(),
         config.context_compress.clone(),
+        ccr.clone(),
         Arc::clone(&scratch),
         Arc::clone(&chat_gateway_dyn),
         vault.clone(),
         system_prompt.clone(),
+        serpapi_key.clone(),
     ));
     agent_session.attach_subagent_runner(Arc::clone(&subagent_runner));
     if config.subagent.enabled {

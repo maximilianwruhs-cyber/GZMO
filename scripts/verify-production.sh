@@ -19,16 +19,16 @@ EMBED_URL="$(
 import tomllib, pathlib
 p = pathlib.Path('${ROOT}/gzmo.toml')
 d = tomllib.loads(p.read_text())
-print(d.get('embeddings', {}).get('url', 'http://127.0.0.1:8002/v1').rstrip('/'))
-" 2>/dev/null || echo "http://127.0.0.1:8002/v1"
+print(d.get('embeddings', {}).get('url', 'http://192.168.31.110:8081/v1').rstrip('/'))
+" 2>/dev/null || echo "http://192.168.31.110:8081/v1"
 )"
 EMBED_MODEL="$(
   python3 -c "
 import tomllib, pathlib
 p = pathlib.Path('${ROOT}/gzmo.toml')
 d = tomllib.loads(p.read_text())
-print(d.get('embeddings', {}).get('model', 'Qwen3-Embedding-0.6B-Q8_0.gguf'))
-" 2>/dev/null || echo "Qwen3-Embedding-0.6B-Q8_0.gguf"
+print(d.get('embeddings', {}).get('model', 'gzmo-embed'))
+" 2>/dev/null || echo "gzmo-embed"
 )"
 QDRANT_ENABLED="$(
   python3 -c "
@@ -85,7 +85,14 @@ curl -sf http://127.0.0.1:8000/v1/models >/dev/null && pass "Prime :8000" || fai
 if [[ -n "${REDIS_URL:-}" ]]; then
   redis_host="$(python3 -c "from urllib.parse import urlparse; u=urlparse('${REDIS_URL}'); print(u.hostname or '127.0.0.1')")"
   redis_port="$(python3 -c "from urllib.parse import urlparse; u=urlparse('${REDIS_URL}'); print(u.port or 6379)")"
-  if reply="$(timeout 3 bash -c "exec 3<>/dev/tcp/${redis_host}/${redis_port} && printf 'PING\r\n' >&3 && head -c 16 <&3" 2>/dev/null)" && [[ "$reply" == *PONG* ]]; then
+  if python3 -c "
+import socket
+s = socket.create_connection(('${redis_host}', int('${redis_port}')), timeout=3)
+s.sendall(b'PING\r\n')
+reply = s.recv(16).decode(errors='ignore')
+s.close()
+print(reply)
+" 2>/dev/null | grep -q PONG; then
     pass "Redis scratch ${REDIS_URL}"
   else
     fail "Redis scratch ${REDIS_URL}"
@@ -116,10 +123,17 @@ if [[ -x "$BIN" ]]; then
   fi
   if [[ -n "${RERANK_URL:-}" ]]; then
     health_probe rerank
-    curl -sf "${RERANK_URL}/rerank" \
-      -H 'Content-Type: application/json' \
-      -d "{\"model\":\"${RERANK_MODEL}\",\"query\":\"capital of France\",\"top_n\":1,\"documents\":[\"Paris is the capital of France.\",\"Berlin is in Germany.\"]}" \
-      >/dev/null && pass "Rerank ${RERANK_URL}" || fail "Rerank ${RERANK_URL}"
+    RERANK_SCORE="$(
+      curl -sf "${RERANK_URL}/rerank" \
+        -H 'Content-Type: application/json' \
+        -d "{\"model\":\"${RERANK_MODEL}\",\"query\":\"capital of France\",\"top_n\":1,\"documents\":[\"Paris is the capital of France.\",\"Berlin is in Germany.\"]}" \
+        | python3 -c "import sys,json; r=json.load(sys.stdin)['results'][0]; print(r.get('relevance_score', r.get('score', 0)))" 2>/dev/null || echo 0
+    )"
+    if python3 -c "s=float('${RERANK_SCORE}'); assert abs(s) > 1e-6" 2>/dev/null; then
+      pass "Rerank ${RERANK_URL} (top ${RERANK_SCORE})"
+    else
+      fail "Rerank ${RERANK_URL} (near-zero score ${RERANK_SCORE})"
+    fi
   fi
   if [[ -n "${LIBRARIAN_URL:-}" ]]; then
     health_probe librarian
@@ -202,8 +216,9 @@ PY
   )"
   if echo "$MCP_TOOLS" | grep -q 'gzmo_memory_search' \
      && echo "$MCP_TOOLS" | grep -q 'gzmo_memory_status' \
-     && echo "$MCP_TOOLS" | grep -q 'gzmo_memory_recall_pull'; then
-    pass "gzmo mcp-serve tools/list (gzmo_memory_*)"
+     && echo "$MCP_TOOLS" | grep -q 'gzmo_memory_recall_pull' \
+     && echo "$MCP_TOOLS" | grep -q 'gzmo_retrieve_context'; then
+    pass "gzmo mcp-serve tools/list (gzmo_memory_* + retrieve)"
   else
     fail "gzmo mcp-serve tools/list (got: ${MCP_TOOLS:-none})"
   fi

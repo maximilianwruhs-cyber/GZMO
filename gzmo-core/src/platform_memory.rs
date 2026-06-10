@@ -26,6 +26,8 @@ pub struct PlatformMemory {
     embeddings: EmbeddingsConfig,
     redis: RedisConfig,
     rerank: RerankConfig,
+    pub ccr: crate::context_compress::CcrStore,
+    pub compress_cfg: crate::config::ContextCompressConfig,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -69,6 +71,8 @@ impl PlatformMemory {
             embeddings: EmbeddingsConfig::default(),
             redis: RedisConfig::default(),
             rerank: RerankConfig::default(),
+            ccr: crate::context_compress::CcrStore::mock(),
+            compress_cfg: crate::config::ContextCompressConfig::default(),
         }
     }
 
@@ -89,8 +93,11 @@ impl PlatformMemory {
         )
         .await?;
 
+        let ccr = crate::context_compress::CcrStore::new(&config.redis, &config.context_compress);
+        let compress_cfg = config.context_compress.clone();
+
         let session =
-            AgentSession::new_main(&config.redis, &config.context_memory, sid).await;
+            AgentSession::new_main(&config.redis, &config.context_memory, &compress_cfg, &ccr, sid).await;
 
         Ok(Self {
             vault: Arc::new(vault),
@@ -100,6 +107,8 @@ impl PlatformMemory {
             embeddings: config.embeddings.clone(),
             redis: config.redis.clone(),
             rerank: config.rerank.clone(),
+            ccr,
+            compress_cfg,
         })
     }
 
@@ -166,7 +175,7 @@ impl PlatformMemory {
     pub async fn memory_recall_pull(&self) -> Result<Option<String>> {
         self.session
             .scratch()
-            .format_for_inject(&self.scratch_scope())
+            .format_for_inject(&self.scratch_scope(), &self.compress_cfg)
             .await
     }
 

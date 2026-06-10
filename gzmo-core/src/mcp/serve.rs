@@ -41,7 +41,12 @@ struct WikiSearchParams {
 #[derive(Debug, serde::Deserialize, schemars::JsonSchema)]
 struct ProfileParams {
     #[serde(default)]
-    dynamic_only: Option<bool>,
+    pub dynamic_only: Option<bool>,
+}
+
+#[derive(Debug, serde::Deserialize, schemars::JsonSchema)]
+struct RetrieveParams {
+    hash: String,
 }
 
 #[tool_router]
@@ -65,7 +70,19 @@ impl GzmoMemoryMcpServer {
             .memory_search(&args.query, limit, true)
             .await
         {
-            Ok(res) => Ok(CallToolResult::success(vec![Content::text(res.text)])),
+            Ok(res) => {
+                let text = crate::context_compress::compress_for_context_with_ccr(
+                    &res.text,
+                    self.platform.compress_cfg.recall_compress_budget,
+                    &self.platform.compress_cfg,
+                    &self.platform.ccr,
+                    self.platform.session_id(),
+                    true,
+                )
+                .await
+                .text;
+                Ok(CallToolResult::success(vec![Content::text(text)]))
+            }
             Err(e) => Ok(CallToolResult::error(vec![Content::text(e.to_string())])),
         }
     }
@@ -84,7 +101,19 @@ impl GzmoMemoryMcpServer {
     #[tool(description = "Return the [RECALL] scratch block for this session.")]
     async fn gzmo_memory_recall_pull(&self) -> Result<CallToolResult, McpError> {
         match self.platform.memory_recall_pull().await {
-            Ok(Some(block)) => Ok(CallToolResult::success(vec![Content::text(block)])),
+            Ok(Some(block)) => {
+                let text = crate::context_compress::compress_for_context_with_ccr(
+                    &block,
+                    self.platform.compress_cfg.recall_compress_budget,
+                    &self.platform.compress_cfg,
+                    &self.platform.ccr,
+                    self.platform.session_id(),
+                    true,
+                )
+                .await
+                .text;
+                Ok(CallToolResult::success(vec![Content::text(text)]))
+            }
             Ok(None) => Ok(CallToolResult::success(vec![Content::text(
                 "(no scratch recall for this session)".to_string(),
             )])),
@@ -118,7 +147,17 @@ impl GzmoMemoryMcpServer {
                 h.title, h.path, h.snippet
             ));
         }
-        Ok(CallToolResult::success(vec![Content::text(out)]))
+        let text = crate::context_compress::compress_for_context_with_ccr(
+            &out,
+            1500,
+            &self.platform.compress_cfg,
+            &self.platform.ccr,
+            self.platform.session_id(),
+            true,
+        )
+        .await
+        .text;
+        Ok(CallToolResult::success(vec![Content::text(text)]))
     }
 
     #[tool(description = "Return cached static+dynamic GZMO operator profile from honeypot.")]
@@ -129,9 +168,37 @@ impl GzmoMemoryMcpServer {
         let dynamic_only = args.dynamic_only.unwrap_or(false);
         match self.platform.memory_profile(dynamic_only) {
             Ok(profile) => match serde_json::to_string_pretty(&profile) {
-                Ok(json) => Ok(CallToolResult::success(vec![Content::text(json)])),
+                Ok(json) => {
+                    let text = crate::context_compress::compress_for_context_with_ccr(
+                        &json,
+                        self.platform.compress_cfg.tool_output_max_tokens,
+                        &self.platform.compress_cfg,
+                        &self.platform.ccr,
+                        self.platform.session_id(),
+                        true,
+                    )
+                    .await
+                    .text;
+                    Ok(CallToolResult::success(vec![Content::text(text)]))
+                }
                 Err(e) => Ok(CallToolResult::error(vec![Content::text(e.to_string())])),
             },
+            Err(e) => Ok(CallToolResult::error(vec![Content::text(e.to_string())])),
+        }
+    }
+
+    #[tool(description = "Retrieve full original content by CCR hash from a prior compressed tool/MCP response.")]
+    async fn gzmo_retrieve_context(
+        &self,
+        Parameters(args): Parameters<RetrieveParams>,
+    ) -> Result<CallToolResult, McpError> {
+        let session_id = self.platform.session_id();
+        match self.platform.ccr.retrieve(session_id, &args.hash).await {
+            Ok(Some(original)) => Ok(CallToolResult::success(vec![Content::text(original)])),
+            Ok(None) => Ok(CallToolResult::error(vec![Content::text(format!(
+                "CCR hash '{}' not found or expired for session '{}'.",
+                args.hash, session_id
+            ))])),
             Err(e) => Ok(CallToolResult::error(vec![Content::text(e.to_string())])),
         }
     }

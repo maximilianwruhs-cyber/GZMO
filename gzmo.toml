@@ -276,7 +276,7 @@ scratch_max_tokens = 2000
 context_length = 262144
 
 [context_compress]
-enabled = false
+enabled = true
 ccr_ttl_secs = 3600
 tool_output_max_tokens = 4000
 recall_compress_budget = 2000

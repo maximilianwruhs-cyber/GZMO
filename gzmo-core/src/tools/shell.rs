@@ -48,6 +48,9 @@ pub struct ShellExecTool {
     pub timeout: Duration,
     /// Working directory for commands
     pub cwd: Option<String>,
+    pub compress_config: Option<crate::config::ContextCompressConfig>,
+    pub ccr: Option<crate::context_compress::CcrStore>,
+    pub session_id: Option<String>,
 }
 
 impl Default for ShellExecTool {
@@ -55,6 +58,27 @@ impl Default for ShellExecTool {
         Self {
             timeout: Duration::from_secs(30),
             cwd: None,
+            compress_config: None,
+            ccr: None,
+            session_id: None,
+        }
+    }
+}
+
+impl ShellExecTool {
+    pub fn new_with_compress(
+        timeout: Duration,
+        cwd: Option<String>,
+        compress_config: crate::config::ContextCompressConfig,
+        ccr: crate::context_compress::CcrStore,
+        session_id: String,
+    ) -> Self {
+        Self {
+            timeout,
+            cwd,
+            compress_config: Some(compress_config),
+            ccr: Some(ccr),
+            session_id: Some(session_id),
         }
     }
 }
@@ -126,7 +150,23 @@ impl ToolHandler for ShellExecTool {
                 response.push_str(&format!("Exit code: {}\n", exit_code));
 
                 if !stdout.is_empty() {
-                    let stdout_truncated = if stdout.len() > 6000 {
+                    let stdout_truncated = if let (Some(ref cfg), Some(ref ccr), Some(ref sid)) = (&self.compress_config, &self.ccr, &self.session_id) {
+                        if cfg.enabled {
+                            let view = crate::context_compress::compress_for_context_with_ccr(
+                                &stdout,
+                                cfg.tool_output_max_tokens,
+                                cfg,
+                                ccr,
+                                sid,
+                                true,
+                            ).await;
+                            view.text
+                        } else if stdout.len() > 6000 {
+                            format!("{}\n... [truncated, {} total chars]", &stdout[..6000], stdout.len())
+                        } else {
+                            stdout.to_string()
+                        }
+                    } else if stdout.len() > 6000 {
                         format!(
                             "{}\n... [truncated, {} total chars]",
                             &stdout[..6000],
@@ -139,7 +179,23 @@ impl ToolHandler for ShellExecTool {
                 }
 
                 if !stderr.is_empty() {
-                    let stderr_truncated = if stderr.len() > 2000 {
+                    let stderr_truncated = if let (Some(ref cfg), Some(ref ccr), Some(ref sid)) = (&self.compress_config, &self.ccr, &self.session_id) {
+                        if cfg.enabled {
+                            let view = crate::context_compress::compress_for_context_with_ccr(
+                                &stderr,
+                                cfg.tool_output_max_tokens,
+                                cfg,
+                                ccr,
+                                sid,
+                                true,
+                            ).await;
+                            view.text
+                        } else if stderr.len() > 2000 {
+                            format!("{}\n... [truncated, {} total chars]", &stderr[..2000], stderr.len())
+                        } else {
+                            stderr.to_string()
+                        }
+                    } else if stderr.len() > 2000 {
                         format!(
                             "{}\n... [truncated, {} total chars]",
                             &stderr[..2000],

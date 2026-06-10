@@ -16,6 +16,8 @@ pub struct AgentSession {
     session_id: String,
     context: ContextConfig,
     subagent: Option<Arc<SubagentRunner>>,
+    pub compress_cfg: crate::config::ContextCompressConfig,
+    pub ccr: crate::context_compress::CcrStore,
 }
 
 impl AgentSession {
@@ -23,6 +25,8 @@ impl AgentSession {
     pub async fn new_main(
         redis: &RedisConfig,
         context_memory: &ContextMemoryConfig,
+        compress_cfg: &crate::config::ContextCompressConfig,
+        ccr: &crate::context_compress::CcrStore,
         session_id: String,
     ) -> Self {
         let scratch = Arc::new(ScratchService::from_config(redis, context_memory).await);
@@ -31,6 +35,8 @@ impl AgentSession {
             session_id: session_id.clone(),
             context: ContextConfig::from_memory_config(context_memory),
             subagent: None,
+            compress_cfg: compress_cfg.clone(),
+            ccr: ccr.clone(),
         }
     }
 
@@ -73,6 +79,8 @@ impl AgentSession {
             scratch: Arc::clone(&self.scratch),
             session_id: self.session_id.clone(),
             scope: self.main_scope(),
+            compress_cfg: self.compress_cfg.clone(),
+            ccr: self.ccr.clone(),
         }
     }
 

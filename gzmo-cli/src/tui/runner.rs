@@ -145,10 +145,10 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
 
     // ─── Tools ───────────────────────────────────────────────────
     let mut tools = ToolRegistry::new();
-    tools.register(Box::new(FileReadTool));
+    tools.register(Box::new(FileReadTool::default()));
     tools.register(Box::new(FileWriteTool));
     tools.register(Box::new(DirListTool));
-    tools.register(Box::new(FileSearchTool));
+    tools.register(Box::new(FileSearchTool::default()));
     tools.register(Box::new(ShellExecTool::default()));
     let serpapi_key = config.api_keys.serpapi_key();
     if serpapi_key.is_empty() {

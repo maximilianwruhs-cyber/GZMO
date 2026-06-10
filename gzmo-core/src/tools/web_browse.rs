@@ -16,6 +16,9 @@ use crate::tools::{ToolDef, ToolHandler};
 /// Fetches a web page and extracts readable text.
 pub struct WebBrowseTool {
     http: reqwest::Client,
+    pub compress_config: Option<crate::config::ContextCompressConfig>,
+    pub ccr: Option<crate::context_compress::CcrStore>,
+    pub session_id: Option<String>,
 }
 
 impl Default for WebBrowseTool {
@@ -27,6 +30,29 @@ impl Default for WebBrowseTool {
                 .redirect(reqwest::redirect::Policy::limited(5))
                 .build()
                 .unwrap_or_else(|_| reqwest::Client::new()),
+            compress_config: None,
+            ccr: None,
+            session_id: None,
+        }
+    }
+}
+
+impl WebBrowseTool {
+    pub fn new_with_compress(
+        compress_config: crate::config::ContextCompressConfig,
+        ccr: crate::context_compress::CcrStore,
+        session_id: String,
+    ) -> Self {
+        Self {
+            http: reqwest::Client::builder()
+                .user_agent("Mozilla/5.0 (compatible; GZMO/1.0; +https://gzmo.dev)")
+                .timeout(std::time::Duration::from_secs(30))
+                .redirect(reqwest::redirect::Policy::limited(5))
+                .build()
+                .unwrap_or_else(|_| reqwest::Client::new()),
+            compress_config: Some(compress_config),
+            ccr: Some(ccr),
+            session_id: Some(session_id),
         }
     }
 }
@@ -85,28 +111,46 @@ impl ToolHandler for WebBrowseTool {
         let body = resp.text().await
             .map_err(|e| anyhow::anyhow!("Failed to read body: {}", e))?;
 
-        // If it's not HTML, return as-is (truncated)
-        if !content_type.contains("html") {
-            let mut text = body;
-            if text.len() > max_chars {
-                text.truncate(max_chars);
-                text.push_str("\n\n... [content truncated]");
+        // If it's not HTML, extract raw content, otherwise clean HTML
+        let output = if !content_type.contains("html") {
+            body
+        } else {
+            let text = Self::extract_text(&body);
+            format!("# Content from: {}\n\n{}", url, text)
+        };
+
+        let final_text = if let (Some(ref cfg), Some(ref ccr), Some(ref sid)) = (&self.compress_config, &self.ccr, &self.session_id) {
+            if cfg.enabled {
+                let max_chars_tokens = (max_chars as f64 / 3.5) as usize;
+                let budget = std::cmp::min(max_chars_tokens, cfg.tool_output_max_tokens);
+                let view = crate::context_compress::compress_for_context_with_ccr(
+                    &output,
+                    budget,
+                    cfg,
+                    ccr,
+                    sid,
+                    true,
+                ).await;
+                view.text
+            } else if output.len() > max_chars {
+                let mut temp = output;
+                temp.truncate(max_chars);
+                temp.push_str("\n\n... [content truncated]");
+                temp
+            } else {
+                output
             }
-            return Ok(text);
-        }
+        } else if output.len() > max_chars {
+            let mut temp = output;
+            temp.truncate(max_chars);
+            temp.push_str("\n\n... [content truncated]");
+            temp
+        } else {
+            output
+        };
 
-        // Extract readable text from HTML
-        let text = Self::extract_text(&body);
-
-        let mut output = format!("# Content from: {}\n\n{}", url, text);
-
-        if output.len() > max_chars {
-            output.truncate(max_chars);
-            output.push_str("\n\n... [content truncated]");
-        }
-
-        tracing::info!(chars = output.len(), "Web page extracted");
-        Ok(output)
+        tracing::info!(chars = final_text.len(), "Web page extracted");
+        Ok(final_text)
     }
 }
 

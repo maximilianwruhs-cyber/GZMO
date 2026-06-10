@@ -27,7 +27,7 @@ This is the **single entry document**: where you are, what the stack is, what yo
 ```text
 [You: pi-rust @ workstation]
     │
-    ├─ HTTP :8000  → Prime (Qwen3.6-35B) — chat / code / reasoning
+    ├─ HTTP :8000  → Prime (Gemma 4 26B-A4B, 256K ctx) — chat / code / reasoning
     ├─ scripts/pi-gzmo-memory.sh → gzmo CLI → vault + honeypot + Redis scratch
     └─ MCP (optional) → Neo4j @ 192.168.31.202:7687
 
@@ -37,9 +37,8 @@ This is the **single entry document**: where you are, what the stack is, what yo
     └─ gzmo.toml — single config spine (read-only unless Max asks)
 
 [VM200 — 192.168.31.110]
-    ├─ :8081 embeddings (production for GZMO search)
-    ├─ :8082 rerank
-    └─ :8083 librarian
+    └─ :8081 retrieval router — gzmo-embed + gzmo-rerank (production GZMO search)
+       (legacy :8082 rerank and :8083 librarian retired; distill on Prime :8000)
 
 [LXC101 — 192.168.31.202]
     ├─ :6333 Qdrant — collection honeypot (active), knowledge (legacy, read-only)
@@ -87,6 +86,11 @@ New conversation: `./scripts/pi-gzmo-memory.sh session-new`
 
 **Do not** call `./target/release/gzmo memory …` directly — use this script so `GZMO_SESSION_ID` stays stable and Redis scratch survives across invocations.
 
+### 4.1a Hot-Context Compression & Cache-Compress-Retrieve (CCR)
+When hot-context compression is active (enabled via `[context_compress]` in `gzmo.toml`), GZMO automatically compresses massive outputs in its memory layer (such as large files, tool outputs, and MCP responses) to fit inside target token budgets.
+- **Cache-Compress-Retrieve (CCR) flow:** Large content blocks are cached in Redis under keys matching `gzmo:ccr:{session_id}:{hash}` and replaced with a placeholder: `[ccr:<hash> — gzmo_retrieve_context to expand]`.
+- **Retrieval:** If you (or the client) need the full uncompressed text corresponding to a hash, invoke the MCP tool `gzmo_retrieve_context` with the specific `<hash>`. The tool queries the Redis CCR store and returns the full fidelity text.
+
 Details: [PI_GZMO_MEMORY_INTEGRATION.md](./PI_GZMO_MEMORY_INTEGRATION.md), `.pi/GZMO_MEMORY.md`
 
 ### 4.2 Health & regression (two tiers)
@@ -113,7 +117,7 @@ On a single network blip: retry quick preflight after 30–60 s; do not treat on
 
 ### 4.3 Cognition
 
-- **Prime** `:8000` — your main LLM; ctx 131072 in platform config.
+- **Prime** `:8000` — your main LLM; ctx **262144** in platform config (Gemma 4 26B-A4B).
 - **Do not** start alternate brains on random ports without Max.
 
 ### 4.4 Code & docs in repo

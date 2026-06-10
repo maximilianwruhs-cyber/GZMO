@@ -8,8 +8,26 @@ import re
 from pathlib import Path
 from datetime import datetime
 
-EMBED_URL = os.environ.get("EMBED_URL", "http://192.168.31.110:8081/v1/embeddings")
-EMBED_MODEL = os.environ.get("EMBED_MODEL", "Qwen3-Embedding-0.6B-Q8_0.gguf")
+def _gzmo_toml():
+    try:
+        import tomllib
+        p = Path(__file__).resolve().parents[2] / "gzmo.toml"
+        return tomllib.loads(p.read_text())
+    except Exception:
+        return {}
+
+
+def _embed_cfg():
+    emb = _gzmo_toml().get("embeddings", {})
+    url = emb.get("url", "http://192.168.31.110:8081/v1").rstrip("/")
+    if not url.endswith("/embeddings"):
+        url = f"{url}/embeddings"
+    return url, emb.get("model", "gzmo-embed")
+
+
+_EMBED_URL_DEFAULT, _EMBED_MODEL_DEFAULT = _embed_cfg()
+EMBED_URL = os.environ.get("EMBED_URL", _EMBED_URL_DEFAULT)
+EMBED_MODEL = os.environ.get("EMBED_MODEL", _EMBED_MODEL_DEFAULT)
 QDRANT_BASE = os.environ.get("QDRANT_URL", "http://192.168.31.202:6333").rstrip("/")
 QDRANT_COLLECTION = os.environ.get("QDRANT_COLLECTION", "honeypot")
 QDRANT_URL = f"{QDRANT_BASE}/collections/{QDRANT_COLLECTION}/points/search"

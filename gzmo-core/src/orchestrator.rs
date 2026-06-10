@@ -94,6 +94,8 @@ pub struct OrchestratorContext {
     pub context: ContextConfig,
     /// Hot context compression settings.
     pub compress_config: crate::config::ContextCompressConfig,
+    /// CCR store for context recall.
+    pub ccr: crate::context_compress::CcrStore,
 }
 
 fn orch_scope(job: &str, step: &str) -> ScratchScope {
@@ -475,6 +477,8 @@ async fn execute_pipeline(
                 let max_retries = config.max_retries;
                 let scratch = Arc::clone(&ctx.scratch);
                 let context = ctx.context.clone();
+                let compress_config = ctx.compress_config.clone();
+                let ccr = ctx.ccr.clone();
 
                 handles.push(tokio::spawn(async move {
                     let step_start = Instant::now();
@@ -500,6 +504,8 @@ async fn execute_pipeline(
                             max_iters,
                             scratch.clone(),
                             context.clone(),
+                            compress_config.clone(),
+                            ccr.clone(),
                             &jn,
                             &step_name,
                             None,
@@ -617,6 +623,8 @@ async fn execute_step(
             step.max_iterations,
             Arc::clone(&ctx.scratch),
             ctx.context.clone(),
+            ctx.compress_config.clone(),
+            ctx.ccr.clone(),
             job_name,
             &step.name,
             Some(Arc::clone(&ctx.memory_search_scope)),
@@ -739,6 +747,8 @@ async fn run_step_inner(
     max_iterations: usize,
     scratch: Arc<ScratchService>,
     context: ContextConfig,
+    compress_cfg: crate::config::ContextCompressConfig,
+    ccr: crate::context_compress::CcrStore,
     job: &str,
     step: &str,
     memory_search_scope: Option<Arc<std::sync::Mutex<ScratchScope>>>,
@@ -779,6 +789,8 @@ async fn run_step_inner(
             scratch,
             session_id: format!("orch:{job}"),
             scope,
+            compress_cfg,
+            ccr,
         }),
     };
 
@@ -801,6 +813,8 @@ async fn execute_headless_inner(
         max_iterations,
         Arc::clone(&ctx.scratch),
         ctx.context.clone(),
+        ctx.compress_config.clone(),
+        ctx.ccr.clone(),
         job,
         "main",
         Some(Arc::clone(&ctx.memory_search_scope)),

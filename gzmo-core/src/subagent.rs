@@ -20,6 +20,8 @@ use crate::memory::vault::SqliteVault;
 use crate::tools::fs::{DirListTool, FileReadTool, FileSearchTool, FileWriteTool};
 use crate::tools::memory::{MemoryRecordTool, MemorySearchTool};
 use crate::tools::shell::ShellExecTool;
+use crate::tools::web::WebSearchTool;
+use crate::tools::web_browse::WebBrowseTool;
 use crate::tools::ToolRegistry;
 use crate::types::{Message, Role};
 
@@ -57,10 +59,13 @@ struct RunningSub {
 pub struct SubagentRunner {
     config: SubagentConfig,
     compress_config: crate::config::ContextCompressConfig,
+    ccr: crate::context_compress::CcrStore,
     scratch: Arc<ScratchService>,
     gateway: Arc<dyn LlmGateway>,
     tools: Arc<ToolRegistry>,
+    vault: Option<Arc<SqliteVault>>,
     system_prompt_base: String,
+    serpapi_key: String,
     registry: Arc<RwLock<HashMap<String, Vec<RunningSub>>>>,
     cancel_flags: Arc<Mutex<HashMap<String, bool>>>,
 }
@@ -69,16 +74,18 @@ impl SubagentRunner {
     pub fn new(
         config: SubagentConfig,
         compress_config: crate::config::ContextCompressConfig,
+        ccr: crate::context_compress::CcrStore,
         scratch: Arc<ScratchService>,
         gateway: Arc<dyn LlmGateway>,
         vault: Option<Arc<SqliteVault>>,
         system_prompt_base: String,
+        serpapi_key: String,
     ) -> Self {
         let mut tools = ToolRegistry::new();
-        tools.register(Box::new(FileReadTool));
+        tools.register(Box::new(FileReadTool::default()));
         tools.register(Box::new(FileWriteTool));
         tools.register(Box::new(DirListTool));
-        tools.register(Box::new(FileSearchTool));
+        tools.register(Box::new(FileSearchTool::default()));
         tools.register(Box::new(ShellExecTool::default()));
         if let Some(ref v) = vault {
             tools.register(Box::new(MemoryRecordTool { vault: Arc::clone(v) }));
@@ -88,10 +95,13 @@ impl SubagentRunner {
         Self {
             config,
             compress_config,
+            ccr,
             scratch,
             gateway,
             tools: Arc::new(tools),
+            vault,
             system_prompt_base,
+            serpapi_key,
             registry: Arc::new(RwLock::new(HashMap::new())),
             cancel_flags: Arc::new(Mutex::new(HashMap::new())),
         }
@@ -157,7 +167,52 @@ impl SubagentRunner {
 
         let (tx, rx) = tokio::sync::oneshot::channel();
         let gateway = Arc::clone(&self.gateway);
-        let tools = Arc::clone(&self.tools);
+
+        let mut sub_tools = ToolRegistry::new();
+        sub_tools.register(Box::new(FileReadTool::new_with_compress(
+            self.compress_config.clone(),
+            self.ccr.clone(),
+            spec.parent_session.clone(),
+        )));
+        sub_tools.register(Box::new(FileWriteTool));
+        sub_tools.register(Box::new(DirListTool));
+        sub_tools.register(Box::new(FileSearchTool::new_with_compress(
+            self.compress_config.clone(),
+            self.ccr.clone(),
+            spec.parent_session.clone(),
+        )));
+        sub_tools.register(Box::new(ShellExecTool::new_with_compress(
+            std::time::Duration::from_secs(30),
+            None,
+            self.compress_config.clone(),
+            self.ccr.clone(),
+            spec.parent_session.clone(),
+        )));
+        sub_tools.register(Box::new(WebBrowseTool::new_with_compress(
+            self.compress_config.clone(),
+            self.ccr.clone(),
+            spec.parent_session.clone(),
+        )));
+        if self.serpapi_key.is_empty() {
+            sub_tools.register(Box::new(WebSearchTool::new_with_compress(
+                String::new(),
+                self.compress_config.clone(),
+                self.ccr.clone(),
+                spec.parent_session.clone(),
+            )));
+        } else {
+            sub_tools.register(Box::new(WebSearchTool::new_with_compress(
+                self.serpapi_key.clone(),
+                self.compress_config.clone(),
+                self.ccr.clone(),
+                spec.parent_session.clone(),
+            )));
+        }
+        if let Some(ref v) = self.vault {
+            sub_tools.register(Box::new(MemoryRecordTool { vault: Arc::clone(v) }));
+            sub_tools.register(Box::new(MemorySearchTool::new(Arc::clone(v))));
+        }
+        let tools = Arc::new(sub_tools);
         let scratch = Arc::clone(&self.scratch);
         let session_id = spec.parent_session.clone();
         let role = spec.role.clone();
@@ -169,6 +224,7 @@ impl SubagentRunner {
         let cancel_flags = Arc::clone(&self.cancel_flags);
         let parent_session = spec.parent_session.clone();
         let compress_cfg = self.compress_config.clone();
+        let ccr = self.ccr.clone();
 
         let task_id_spawn = task_id.clone();
         let task_id_for_reg = task_id.clone();
@@ -218,6 +274,8 @@ impl SubagentRunner {
                         scratch: Arc::clone(&scratch),
                         session_id: session_id.clone(),
                         scope: scope.clone(),
+                        compress_cfg: compress_cfg.clone(),
+                        ccr: ccr.clone(),
                     }),
                 };
 

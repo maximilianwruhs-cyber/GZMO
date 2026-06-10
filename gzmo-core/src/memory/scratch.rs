@@ -12,7 +12,7 @@ use serde::{Deserialize, Serialize};
 use tokio::sync::{Mutex, RwLock};
 use tracing::{debug, error, info, warn};
 
-use crate::config::{ContextMemoryConfig, RedisConfig};
+use crate::config::{ContextMemoryConfig, RedisConfig, ContextCompressConfig};
 use crate::context::estimate_text_tokens;
 use crate::types::{Message, Role};
 
@@ -337,8 +337,12 @@ impl ScratchService {
         }
     }
 
-    /// Format scratch for injection as a meta system block.
-    pub async fn format_for_inject(&self, scope: &ScratchScope) -> Result<Option<String>> {
+    /// Format scratch for injection as a meta system block, compressing to budget.
+    pub async fn format_for_inject(
+        &self,
+        scope: &ScratchScope,
+        compress_cfg: &ContextCompressConfig,
+    ) -> Result<Option<String>> {
         let Some(payload) = self.read(scope).await? else {
             return Ok(None);
         };
@@ -346,11 +350,8 @@ impl ScratchService {
             return Ok(None);
         }
 
-        let mut lines = vec!["[RECALL]".to_string()];
-        let mut used = estimate_text_tokens("[RECALL]\n", self.chars_per_token);
-
-        for snip in &payload.snippets {
-            let line = match (&snip.fact_id, &snip.evidence_text) {
+        let format_snippet = |snip: &RecallSnippet| {
+            match (&snip.fact_id, &snip.evidence_text) {
                 (Some(id), Some(ev)) if !ev.trim().is_empty() => format!(
                     "- [{:.2}] ({}) {}\n  source_span: {}",
                     snip.score,
@@ -366,16 +367,40 @@ impl ScratchService {
                     ev.trim()
                 ),
                 _ => format!("- [{:.2}] {}", snip.score, snip.content),
-            };
-            let cost = estimate_text_tokens(&line, self.chars_per_token);
-            if used + cost > self.scratch_max_tokens {
-                break;
             }
-            used += cost;
-            lines.push(line);
-        }
+        };
 
-        Ok(Some(lines.join("\n")))
+        let mut active_snippets = payload.snippets.clone();
+
+        loop {
+            if active_snippets.is_empty() {
+                return Ok(None);
+            }
+
+            let mut lines = vec!["[RECALL]".to_string()];
+            for snip in &active_snippets {
+                lines.push(format_snippet(snip));
+            }
+            let block = lines.join("\n");
+
+            let view = crate::context_compress::compress_for_context(
+                &block,
+                self.scratch_max_tokens,
+                compress_cfg,
+            );
+
+            if view.compressed_tokens <= self.scratch_max_tokens {
+                return Ok(Some(view.text));
+            }
+
+            if let Some(dropped) = active_snippets.pop() {
+                if let Some(ref ev) = dropped.evidence_text {
+                    if !ev.trim().is_empty() {
+                        warn!("Dropping evidence span during scratch recall compression: {}", ev.trim());
+                    }
+                }
+            }
+        }
     }
 
     pub async fn enqueue_distill(&self, job: DistillJob) -> Result<()> {

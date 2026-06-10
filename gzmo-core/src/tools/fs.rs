@@ -12,7 +12,35 @@ use crate::tools::{ToolDef, ToolHandler};
 
 // ─── Read File ──────────────────────────────────────────────────────────
 
-pub struct FileReadTool;
+pub struct FileReadTool {
+    pub compress_config: Option<crate::config::ContextCompressConfig>,
+    pub ccr: Option<crate::context_compress::CcrStore>,
+    pub session_id: Option<String>,
+}
+
+impl Default for FileReadTool {
+    fn default() -> Self {
+        Self {
+            compress_config: None,
+            ccr: None,
+            session_id: None,
+        }
+    }
+}
+
+impl FileReadTool {
+    pub fn new_with_compress(
+        compress_config: crate::config::ContextCompressConfig,
+        ccr: crate::context_compress::CcrStore,
+        session_id: String,
+    ) -> Self {
+        Self {
+            compress_config: Some(compress_config),
+            ccr: Some(ccr),
+            session_id: Some(session_id),
+        }
+    }
+}
 
 #[async_trait]
 impl ToolHandler for FileReadTool {
@@ -39,7 +67,27 @@ impl ToolHandler for FileReadTool {
             .ok_or_else(|| anyhow::anyhow!("Missing 'path' argument"))?;
 
         let content = tokio::fs::read_to_string(path).await?;
-        Ok(if content.len() > 8000 {
+        Ok(if let (Some(ref cfg), Some(ref ccr), Some(ref sid)) = (&self.compress_config, &self.ccr, &self.session_id) {
+            if cfg.enabled {
+                let view = crate::context_compress::compress_for_context_with_ccr(
+                    &content,
+                    cfg.tool_output_max_tokens,
+                    cfg,
+                    ccr,
+                    sid,
+                    true,
+                ).await;
+                view.text
+            } else if content.len() > 8000 {
+                format!(
+                    "{}\n\n... [truncated at 8000 chars, total {} chars]",
+                    &content[..8000],
+                    content.len()
+                )
+            } else {
+                content
+            }
+        } else if content.len() > 8000 {
             format!(
                 "{}\n\n... [truncated at 8000 chars, total {} chars]",
                 &content[..8000],
@@ -152,7 +200,35 @@ impl ToolHandler for DirListTool {
 
 // ─── File Search (grep) ─────────────────────────────────────────────────
 
-pub struct FileSearchTool;
+pub struct FileSearchTool {
+    pub compress_config: Option<crate::config::ContextCompressConfig>,
+    pub ccr: Option<crate::context_compress::CcrStore>,
+    pub session_id: Option<String>,
+}
+
+impl Default for FileSearchTool {
+    fn default() -> Self {
+        Self {
+            compress_config: None,
+            ccr: None,
+            session_id: None,
+        }
+    }
+}
+
+impl FileSearchTool {
+    pub fn new_with_compress(
+        compress_config: crate::config::ContextCompressConfig,
+        ccr: crate::context_compress::CcrStore,
+        session_id: String,
+    ) -> Self {
+        Self {
+            compress_config: Some(compress_config),
+            ccr: Some(ccr),
+            session_id: Some(session_id),
+        }
+    }
+}
 
 #[async_trait]
 impl ToolHandler for FileSearchTool {
@@ -196,14 +272,36 @@ impl ToolHandler for FileSearchTool {
         let stdout = String::from_utf8_lossy(&output.stdout);
         if stdout.is_empty() {
             Ok(format!("No matches for '{}' in {}", pattern, path))
-        } else if stdout.len() > 5000 {
-            Ok(format!(
-                "{}\n\n... [truncated, {} total chars]",
-                &stdout[..5000],
-                stdout.len()
-            ))
         } else {
-            Ok(stdout.to_string())
+            Ok(if let (Some(ref cfg), Some(ref ccr), Some(ref sid)) = (&self.compress_config, &self.ccr, &self.session_id) {
+                if cfg.enabled {
+                    let view = crate::context_compress::compress_for_context_with_ccr(
+                        &stdout,
+                        cfg.tool_output_max_tokens,
+                        cfg,
+                        ccr,
+                        sid,
+                        true,
+                    ).await;
+                    view.text
+                } else if stdout.len() > 5000 {
+                    format!(
+                        "{}\n\n... [truncated, {} total chars]",
+                        &stdout[..5000],
+                        stdout.len()
+                    )
+                } else {
+                    stdout.to_string()
+                }
+            } else if stdout.len() > 5000 {
+                format!(
+                    "{}\n\n... [truncated, {} total chars]",
+                    &stdout[..5000],
+                    stdout.len()
+                )
+            } else {
+                stdout.to_string()
+            })
         }
     }
 }

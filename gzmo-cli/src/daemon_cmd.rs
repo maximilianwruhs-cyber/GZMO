@@ -104,10 +104,10 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
     }));
 
     let mut dream_tools = ToolRegistry::new();
-    dream_tools.register(Box::new(FileReadTool));
+    dream_tools.register(Box::new(FileReadTool::default()));
     dream_tools.register(Box::new(FileWriteTool));
     dream_tools.register(Box::new(DirListTool));
-    dream_tools.register(Box::new(FileSearchTool));
+    dream_tools.register(Box::new(FileSearchTool::default()));
     dream_tools.register(Box::new(ShellExecTool::default()));
     dream_tools.register(Box::new(WebSearchTool::default()));
     dream_tools.register(Box::new(SysMetricsTool));
@@ -229,9 +229,8 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
         gzmo_core::synapse::EventSource::GzmoDaemon,
         chaos_runtime.restore_policy.clone(),
     );
-
     info!("All subsystems online — entering daemon loop");
-
+    let ccr = gzmo_core::context_compress::CcrStore::new(&config.redis, &config.context_compress);
     // Orchestrator (cron jobs) — spark is handled by SparkEngine, not headless prompt
     let orch_ctx = Arc::new(gzmo_core::orchestrator::OrchestratorContext {
         gateway: orch_gateway,
@@ -253,6 +252,7 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
         memory_search_scope: Arc::clone(&memory_search_scope),
         context: gzmo_core::context::ContextConfig::from_memory_config(&config.context_memory),
         compress_config: config.context_compress.clone(),
+        ccr,
     });
 
     let mut orch_jobs = config.orchestration.jobs.clone();

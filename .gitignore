@@ -11,7 +11,7 @@ target/
 gzmo.toml
 
 # ── Runtime / agent state (never commit) ───────────────────────────────────
-memory/
+/memory/
 !memory/.gitkeep
 data/vault.db
 data/vault.db-*
@@ -57,6 +57,7 @@ scripts/ingest-quality/report-batch2.json
 scripts/ingest-quality/*.log
 scripts/ingest-quality/*.stderr.log
 scripts/.venv/
+.venv/
 experiments/toto-spike/.venv/
 experiments/toto-spike/results/*.pt
 experiments/toto-spike/.hf_cache/

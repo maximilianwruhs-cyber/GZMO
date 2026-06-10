@@ -16,6 +16,9 @@ pub struct WebSearchTool {
     http: reqwest::Client,
     /// SerpAPI key for reliable structured search. Empty = DDG fallback only.
     serpapi_key: String,
+    pub compress_config: Option<crate::config::ContextCompressConfig>,
+    pub ccr: Option<crate::context_compress::CcrStore>,
+    pub session_id: Option<String>,
 }
 
 impl WebSearchTool {
@@ -28,6 +31,28 @@ impl WebSearchTool {
                 .build()
                 .unwrap_or_else(|_| reqwest::Client::new()),
             serpapi_key: key,
+            compress_config: None,
+            ccr: None,
+            session_id: None,
+        }
+    }
+
+    pub fn new_with_compress(
+        serpapi_key: String,
+        compress_config: crate::config::ContextCompressConfig,
+        ccr: crate::context_compress::CcrStore,
+        session_id: String,
+    ) -> Self {
+        Self {
+            http: reqwest::Client::builder()
+                .user_agent("Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0")
+                .timeout(std::time::Duration::from_secs(15))
+                .build()
+                .unwrap_or_else(|_| reqwest::Client::new()),
+            serpapi_key,
+            compress_config: Some(compress_config),
+            ccr: Some(ccr),
+            session_id: Some(session_id),
         }
     }
 }
@@ -41,6 +66,9 @@ impl Default for WebSearchTool {
                 .build()
                 .unwrap_or_else(|_| reqwest::Client::new()),
             serpapi_key: String::new(),
+            compress_config: None,
+            ccr: None,
+            session_id: None,
         }
     }
 }
@@ -110,13 +138,33 @@ impl ToolHandler for WebSearchTool {
             ));
         }
 
-        // Truncate if too long
-        if output.len() > 8000 {
-            output.truncate(8000);
-            output.push_str("\n... [results truncated]");
-        }
-
-        Ok(output)
+        Ok(if let (Some(ref cfg), Some(ref ccr), Some(ref sid)) = (&self.compress_config, &self.ccr, &self.session_id) {
+            if cfg.enabled {
+                let view = crate::context_compress::compress_for_context_with_ccr(
+                    &output,
+                    cfg.tool_output_max_tokens,
+                    cfg,
+                    ccr,
+                    sid,
+                    true,
+                ).await;
+                view.text
+            } else if output.len() > 8000 {
+                let mut temp = output;
+                temp.truncate(8000);
+                temp.push_str("\n... [results truncated]");
+                temp
+            } else {
+                output
+            }
+        } else if output.len() > 8000 {
+            let mut temp = output;
+            temp.truncate(8000);
+            temp.push_str("\n... [results truncated]");
+            temp
+        } else {
+            output
+        })
     }
 }
 

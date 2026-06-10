@@ -44,6 +44,8 @@ pub struct AgentMemoryContext {
     pub scratch: Arc<ScratchService>,
     pub session_id: String,
     pub scope: ScratchScope,
+    pub compress_cfg: crate::config::ContextCompressConfig,
+    pub ccr: crate::context_compress::CcrStore,
 }
 
 impl Default for AgentLoopConfig {
@@ -85,7 +87,7 @@ async fn build_windowed_messages(
             }
         }
 
-        if let Some(recall) = mem.scratch.format_for_inject(&mem.scope).await? {
+        if let Some(recall) = mem.scratch.format_for_inject(&mem.scope, &mem.compress_cfg).await? {
             let mut windowed = prune.windowed;
             if !windowed.is_empty() {
                 windowed.insert(
@@ -268,11 +270,26 @@ pub async fn run_agent_loop(
                         );
                     }
 
+                    let output = if let Some(ref mem) = config.memory {
+                        crate::context_compress::compress_for_context_with_ccr(
+                            &result.output,
+                            mem.compress_cfg.tool_output_max_tokens,
+                            &mem.compress_cfg,
+                            &mem.ccr,
+                            &mem.session_id,
+                            true,
+                        )
+                        .await
+                        .text
+                    } else {
+                        result.output.clone()
+                    };
+
                     // Inject tool result back into conversation
                     // with proper tool_call_id linking to the parent
                     messages.push(Message {
                         role: Role::Tool,
-                        content: result.output.clone(),
+                        content: output,
                         is_meta: true,
                         tool_calls: None,
                         tool_call_id: Some(call.id.clone()),
