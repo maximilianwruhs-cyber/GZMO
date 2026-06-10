@@ -227,6 +227,12 @@ pub fn find_latest_honeypot_by_entity(
 pub fn supersede_honeypot(conn: &Connection, old_id: &str) -> anyhow::Result<()> {
     let now = Utc::now().to_rfc3339();
     conn.execute(
+        "DELETE FROM honeypot_fts WHERE rowid IN (
+            SELECT rowid FROM honeypot WHERE (id = ?1 OR vault_id = ?1) AND is_latest = 1
+        )",
+        params![old_id],
+    )?;
+    conn.execute(
         "UPDATE honeypot SET is_latest = 0 WHERE (id = ?1 OR vault_id = ?1) AND is_latest = 1",
         params![old_id],
     )?;

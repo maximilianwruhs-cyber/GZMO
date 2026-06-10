@@ -148,8 +148,7 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
         config
             .session_distill
             .librarian_summary
-            .then(|| Arc::clone(router.gateway(TaskKind::DistillSummary)))
-            .filter(|_| config.librarian.enabled),
+            .then(|| Arc::clone(router.gateway(TaskKind::DistillSummary))),
         Arc::clone(&dream_tools),
         config.session_distill.clone(),
         Some(Arc::clone(&synapse)),
@@ -253,6 +252,7 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
         scratch: Arc::clone(&scratch),
         memory_search_scope: Arc::clone(&memory_search_scope),
         context: gzmo_core::context::ContextConfig::from_memory_config(&config.context_memory),
+        compress_config: config.context_compress.clone(),
     });
 
     let mut orch_jobs = config.orchestration.jobs.clone();

@@ -56,6 +56,7 @@ struct RunningSub {
 
 pub struct SubagentRunner {
     config: SubagentConfig,
+    compress_config: crate::config::ContextCompressConfig,
     scratch: Arc<ScratchService>,
     gateway: Arc<dyn LlmGateway>,
     tools: Arc<ToolRegistry>,
@@ -67,6 +68,7 @@ pub struct SubagentRunner {
 impl SubagentRunner {
     pub fn new(
         config: SubagentConfig,
+        compress_config: crate::config::ContextCompressConfig,
         scratch: Arc<ScratchService>,
         gateway: Arc<dyn LlmGateway>,
         vault: Option<Arc<SqliteVault>>,
@@ -85,6 +87,7 @@ impl SubagentRunner {
 
         Self {
             config,
+            compress_config,
             scratch,
             gateway,
             tools: Arc::new(tools),
@@ -165,6 +168,7 @@ impl SubagentRunner {
         let system = self.role_system_prompt(&role, &brief);
         let cancel_flags = Arc::clone(&self.cancel_flags);
         let parent_session = spec.parent_session.clone();
+        let compress_cfg = self.compress_config.clone();
 
         let task_id_spawn = task_id.clone();
         let task_id_for_reg = task_id.clone();
@@ -221,7 +225,16 @@ impl SubagentRunner {
                     run_agent_loop(gateway.as_ref(), tools.as_ref(), &mut messages, &loop_config)
                         .await?;
 
-                let summary = truncate_chars(&response.text, summary_max * 4);
+                let summary = if compress_cfg.enabled {
+                    let cv = crate::context_compress::compress_for_context(
+                        &response.text,
+                        summary_max,
+                        &compress_cfg,
+                    );
+                    cv.text
+                } else {
+                    truncate_chars(&response.text, summary_max * 4)
+                };
 
                 Ok(SubagentResult {
                     task_id: task_id.clone(),

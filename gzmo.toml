@@ -4,6 +4,14 @@
 # All paths are relative to the working directory (where you run the agent).
 # Every field has a sensible default — you only need to declare what you
 # want to override.
+#
+# LOCKED port layout (steady state) — see docs/PORTS.md
+#   :8000  workstation  Prime Gemma 4 26B-A4B @ 256K ctx (gemma-4-26b-a4b-it)
+#   :8081  VM200 .110   retrieval router (gzmo-embed + gzmo-rerank)
+#   :8002  workstation  Pi KB embed (optional gzmo-embed.service)
+#   :6333  LXC101 .202  Qdrant honeypot
+#   :6379  LXC101 .202  Redis scratch + distill queue
+#   :7687  LXC101 .202  Neo4j (MCP bolt)
 
 [identity]
 soul_path = "SOUL.md"
@@ -44,8 +52,8 @@ honeypot_rem_enabled = true
 [session_distill]
 enabled = true
 sessions_dir = "data/sessions"
-# Extract on VM200 librarian; fact-check on Prime.
-use_librarian = true
+# Extract + summary on Prime; fact-check on Prime.
+use_librarian = false
 librarian_summary = true
 # Nightly in daemon (02:15 UTC — after Qdrant sync 01:45; same-night mirror gap).
 daemon_scheduled = true
@@ -88,12 +96,11 @@ recent_dedupe_similarity = 0.92
 [health]
 strict_startup = false
 
-# GZMO vault/daemon embeddings — VM200 GTX 1070 (:8081).
-# Pi knowledge_search uses workstation :8002 (see ~/.pi/agent/knowledge-base.json), not this URL.
+# VM200 GTX1070 retrieval router — embed preset (docs/PORTS.md :8081).
 [embeddings]
 enabled = true
 url = "http://192.168.31.110:8081/v1"
-model = "Qwen3-Embedding-0.6B-Q8_0.gguf"
+model = "gzmo-embed"
 api_key = ""
 
 # SQLite remains source of truth; sync vectors to LXC101 for shared RAG / future Pi.
@@ -105,18 +112,20 @@ sync_enabled = true
 sync_cron_hour = 1
 sync_cron_minute = 45
 
-# VM200 Qwen2.5-1.5B — light summaries (session distill offload later).
+# RETIRED — VM200 :8083 librarian LLM is decommissioned. Session distill
+# (extract/summary/verify) runs on Prime :8000 via [routing.mappings] distill_* = local.
+# Keep enabled = false; the url below is inert and only retained for schema back-compat.
 [librarian]
-enabled = true
+enabled = false
 url = "http://192.168.31.110:8083/v1"
 model = "qwen2.5-coder-1.5b-instruct-q4_k_m.gguf"
 api_key = ""
 
-# VM200 bge-reranker-v2-m3 — post-filters vault / memory_search recall.
+# VM200 retrieval router — rerank preset (same :8081 host as [embeddings]).
 [rerank]
 enabled = true
-url = "http://192.168.31.110:8082/v1"
-model = "bge-reranker-v2-m3-q8_0.gguf"
+url = "http://192.168.31.110:8081/v1"
+model = "gzmo-rerank"
 api_key = ""
 prefetch_multiplier = 4
 
@@ -161,13 +170,12 @@ active_mode = "local"
 
 [engine.local]
 provider    = "local"
-# Brain = the workstation Prime engine: Qwen3.6-35B-A3B MoE (~3B active params)
-# on the dual RTX 5070 Ti, launched via llama.cpp/prime-bench/start-prime.sh.
-# Fast (140+ tok/s) AND high quality — the real local production model, NOT Opus,
-# so its output is the honest quality signal. (The VM200 7B eGPU was too slow for
-# agentic tool-calling: 9 min with no first token, so we moved cognition here.)
+# Prime = Gemma 4 26B-A4B MoE champion on dual RTX 5070 Ti (:8000).
+# Profile: draft-mtp+ngram-mod, f16 KV, CUDA graphs off, ctx 262144.
+# Locked over Qwen3.6-35B: same hardware runs 256K vs Qwen 128K.
+# Launch: llama.cpp/prime-bench/start-prime-gemma4-26b-a4b-256k.sh
 url         = "http://localhost:8000/v1"
-model       = "qwen3.6-35b-mtp"
+model       = "gemma-4-26b-a4b-it"
 api_key     = ""
 temperature = 0.3
 top_p       = 0.95
@@ -193,13 +201,13 @@ max_tokens = 8192
 # Fallback: Google Gemini API (direct)
 
 [engine.cloud]
-provider      = "gemini"
-url           = "https://generativelanguage.googleapis.com/v1beta/openai"
-model         = "gemini-2.5-flash"
+provider      = "openrouter"
+url           = "https://openrouter.ai/api/v1"
+model         = "google/gemini-2.5-flash-lite"
 api_key       = ""
-temperature   = 0.4
+temperature   = 0.1
 top_p         = 0.95
-max_tokens    = 8192
+max_tokens    = 24576
 
 # Fallback engine — auto-activated if primary cloud endpoint fails
 fallback_provider  = "gemini"
@@ -264,7 +272,16 @@ distill_fallback_dir = "data/distill-queue"
 archive_threshold = 0.90
 response_reserve = 0.10
 scratch_max_tokens = 2000
-context_length = 131072
+# Match Prime Gemma ctx (start-prime-gemma4-26b-a4b-256k.sh PRIME_CTX=262144).
+context_length = 262144
+
+[context_compress]
+enabled = false
+ccr_ttl_secs = 3600
+tool_output_max_tokens = 4000
+recall_compress_budget = 2000
+json_array_row_cap = 20
+log_line_cap = 500
 
 [subagent]
 enabled = true
@@ -386,6 +403,8 @@ prompt = "(legacy — use `gzmo spark` or SparkEngine in daemon)"
 
 [routing]
 default_engine = "local"
+# Local-only ingest retry for stubborn micro FAILs (Prime :8000). Restore true after migration.
+cloud_first_background = false
 
 [routing.mappings]
 # Dream: extract on Prime (heavy KG), verify on Prime (fact-check)
@@ -394,18 +413,36 @@ dream_verify = "local"
 # Spark: hypothesis + verify on Prime (local profile — not librarian)
 spark_hypothesis = "local"
 spark_verify = "local"
-# Ingest: extract + verify on Prime (decoupled from dream_verify)
+# Ingest: Prime local_deterministic (temp 0.1, 24k out) — migration retry pass
 ingest_extract = "local_deterministic"
-ingest_verify = "local"
-# Distill: extract + summary on librarian (light), verify on Prime (accuracy)
-distill_extract = "librarian"
+ingest_verify = "local_deterministic"
+# Distill: extract + summary + verify on Prime
+distill_extract = "local"
 distill_verify = "local"
-distill_summary = "librarian"
+distill_summary = "local"
+
+[routing.profiles.cloud_ingest_extract]
+provider    = "openrouter"
+url         = "https://openrouter.ai/api/v1"
+model       = "google/gemini-2.5-flash-lite"
+api_key     = ""
+temperature = 0.1
+top_p       = 0.95
+max_tokens  = 24576
+
+[routing.profiles.cloud_ingest_verify]
+provider    = "openrouter"
+url         = "https://openrouter.ai/api/v1"
+model       = "google/gemini-2.5-flash-lite"
+api_key     = ""
+temperature = 0.1
+top_p       = 0.95
+max_tokens  = 8192
 
 [routing.profiles.local_deterministic]
 provider    = "local"
 url         = "http://localhost:8000/v1"
-model       = "qwen3.6-35b-mtp"
+model       = "gemma-4-26b-a4b-it"
 api_key     = ""
 temperature = 0.1
 top_p       = 0.95

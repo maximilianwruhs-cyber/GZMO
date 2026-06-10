@@ -243,6 +243,7 @@ Use delegate_task for focused sub-work; you receive a short summary, not full su
 
     let subagent_runner = Arc::new(SubagentRunner::new(
         config.subagent.clone(),
+        config.context_compress.clone(),
         Arc::clone(&scratch),
         Arc::clone(&chat_gateway_dyn),
         vault.clone(),

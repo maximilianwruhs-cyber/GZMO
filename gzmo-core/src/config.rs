@@ -260,11 +260,13 @@ pub struct GzmoConfig {
     #[serde(default)]
     pub qdrant: QdrantConfig,
 
-    /// VM200 fast LLM for summaries (optional; `:8083` when deployed).
+    /// Retired VM200 librarian LLM (`:8083`). Kept for back-compat; session
+    /// distill now runs on Prime via `[routing.mappings]`. Leave disabled.
     #[serde(default)]
     pub librarian: LibrarianConfig,
 
-    /// VM200 cross-encoder reranker (`:8082`); post-filters vault recall.
+    /// VM200 reranker preset on the unified retrieval router (`:8081`);
+    /// post-filters vault recall.
     #[serde(default)]
     pub rerank: RerankConfig,
 
@@ -279,6 +281,10 @@ pub struct GzmoConfig {
     /// Hot context archive threshold + scratch token budget.
     #[serde(default)]
     pub context_memory: ContextMemoryConfig,
+
+    /// Hot context compression settings (Headroom).
+    #[serde(default)]
+    pub context_compress: ContextCompressConfig,
 
     /// Subagent delegation limits (SubagentRunner Lite).
     #[serde(default)]
@@ -1191,7 +1197,8 @@ impl Default for LibrarianConfig {
 }
 
 impl LibrarianConfig {
-    /// Engine profile for structured extract / short summaries on VM200 :8083.
+    /// Engine profile for the retired VM200 librarian (`:8083`). Only used if
+    /// `[librarian].enabled = true`; steady state distills on Prime instead.
     pub fn to_engine_profile(&self) -> EngineProfileConfig {
         EngineProfileConfig {
             provider: "local".into(),
@@ -1205,7 +1212,7 @@ impl LibrarianConfig {
     }
 }
 
-// ─── Rerank (VM200 bge-reranker) ────────────────────────────────────────
+// ─── Rerank (VM200 retrieval router :8081, gzmo-rerank preset) ───────────
 
 #[derive(Debug, Deserialize, Clone)]
 pub struct RerankConfig {
@@ -1227,11 +1234,11 @@ pub struct RerankConfig {
 }
 
 fn default_rerank_url() -> String {
-    "http://192.168.31.110:8082/v1".to_string()
+    "http://192.168.31.110:8081/v1".to_string()
 }
 
 fn default_rerank_model() -> String {
-    "bge-reranker-v2-m3-q8_0.gguf".to_string()
+    "gzmo-rerank".to_string()
 }
 
 fn default_rerank_prefetch_multiplier() -> usize {
@@ -1348,6 +1355,62 @@ impl ContextMemoryConfig {
 
     pub fn archive_trigger_tokens(&self) -> usize {
         (self.hot_budget_tokens() as f64 * self.archive_threshold) as usize
+    }
+}
+
+// ─── Context compression (Headroom) ──────────────────────────────────────
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct ContextCompressConfig {
+    #[serde(default)]
+    pub enabled: bool,
+
+    #[serde(default = "default_ccr_ttl_secs")]
+    pub ccr_ttl_secs: u64,
+
+    #[serde(default = "default_tool_output_max_tokens")]
+    pub tool_output_max_tokens: usize,
+
+    #[serde(default = "default_recall_compress_budget")]
+    pub recall_compress_budget: usize,
+
+    #[serde(default = "default_json_array_row_cap")]
+    pub json_array_row_cap: usize,
+
+    #[serde(default = "default_log_line_cap")]
+    pub log_line_cap: usize,
+}
+
+fn default_ccr_ttl_secs() -> u64 {
+    3600
+}
+
+fn default_tool_output_max_tokens() -> usize {
+    4000
+}
+
+fn default_recall_compress_budget() -> usize {
+    2000
+}
+
+fn default_json_array_row_cap() -> usize {
+    20
+}
+
+fn default_log_line_cap() -> usize {
+    500
+}
+
+impl Default for ContextCompressConfig {
+    fn default() -> Self {
+        Self {
+            enabled: false,
+            ccr_ttl_secs: default_ccr_ttl_secs(),
+            tool_output_max_tokens: default_tool_output_max_tokens(),
+            recall_compress_budget: default_recall_compress_budget(),
+            json_array_row_cap: default_json_array_row_cap(),
+            log_line_cap: default_log_line_cap(),
+        }
     }
 }
 
@@ -1665,18 +1728,11 @@ pub struct CloudEngineConfig {
 /// default_engine = "local"
 ///
 /// [routing.mappings]
-/// dream_extract = "librarian"
-/// distill_extract = "librarian"
-/// distill_summary = "librarian"
-/// spark_hypothesis = "librarian"
-///
-/// [routing.profiles.librarian]
-/// provider = "local"
-/// url = "http://192.168.31.110:8083/v1"
-/// model = "qwen2.5-coder-1.5b-instruct-q4_k_m.gguf"
-/// temperature = 0.2
-/// top_p = 0.9
-/// max_tokens = 4096
+/// # Steady state: all cognition on Prime (:8000).
+/// dream_extract = "local"
+/// distill_extract = "local"
+/// distill_summary = "local"
+/// spark_hypothesis = "local"
 /// ```
 #[derive(Debug, Deserialize, Clone, Default)]
 pub struct RoutingConfig {

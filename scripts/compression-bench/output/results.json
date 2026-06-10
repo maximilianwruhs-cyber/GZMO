@@ -1,0 +1,65 @@
+{
+  "median_savings_pct": 37.95,
+  "results": [
+    {
+      "file": "distill_transcript.txt",
+      "before_tokens": 4755,
+      "headroom_tokens": 1725,
+      "headroom_savings_pct": 63.72
+    },
+    {
+      "file": "gzmo_memory_search.txt",
+      "before_tokens": 114,
+      "headroom_tokens": 114,
+      "headroom_savings_pct": 0.0
+    },
+    {
+      "file": "mcp_status.json",
+      "before_tokens": 122,
+      "headroom_tokens": 122,
+      "headroom_savings_pct": 0.0
+    },
+    {
+      "file": "neo4j_read_graph.json",
+      "before_tokens": 4712,
+      "headroom_tokens": 3555,
+      "headroom_savings_pct": 24.55
+    },
+    {
+      "file": "orchestrator_log.txt",
+      "before_tokens": 1175,
+      "headroom_tokens": 335,
+      "headroom_savings_pct": 71.49
+    },
+    {
+      "file": "read_file_rust.txt",
+      "before_tokens": 2586,
+      "headroom_tokens": 681,
+      "headroom_savings_pct": 73.67
+    },
+    {
+      "file": "shell_grep_large.txt",
+      "before_tokens": 6102,
+      "headroom_tokens": 1245,
+      "headroom_savings_pct": 79.6
+    },
+    {
+      "file": "subagent_summary.txt",
+      "before_tokens": 125,
+      "headroom_tokens": 125,
+      "headroom_savings_pct": 0.0
+    },
+    {
+      "file": "web_search.txt",
+      "before_tokens": 154,
+      "headroom_tokens": 154,
+      "headroom_savings_pct": 0.0
+    },
+    {
+      "file": "wiki_search.txt",
+      "before_tokens": 1297,
+      "headroom_tokens": 631,
+      "headroom_savings_pct": 51.35
+    }
+  ]
+}

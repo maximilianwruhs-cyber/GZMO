@@ -1,0 +1,18 @@
+{
+  "status": "healthy",
+  "mcp_servers": {
+    "notebooklm": {
+      "status": "connected",
+      "latency_ms": 124,
+      "authenticated": true,
+      "capabilities": ["sources", "notes", "chat"]
+    },
+    "memory_mcp": {
+      "status": "connected",
+      "latency_ms": 12,
+      "authenticated": true,
+      "capabilities": ["vault", "recall"]
+    }
+  },
+  "timestamp": "2026-06-10T15:25:00Z"
+}

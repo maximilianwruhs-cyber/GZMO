@@ -1,0 +1,225 @@
+gzmo-core/src/daemon.rs:19:pub fn cron_minutes(hour: u32, minute: u32) -> u32 {
+gzmo-core/src/daemon.rs:27:pub fn cron_due_today(
+gzmo-core/src/daemon.rs:42:pub fn spark_cron_slot_due(
+gzmo-core/src/daemon.rs:170:    pub fn new(interval: Duration) -> Self {
+gzmo-core/src/daemon.rs:177:    pub fn add_check(&mut self, check: impl CheapCheck + 'static) {
+gzmo-core/src/platform_memory.rs:63:    pub fn from_parts(vault: Arc<SqliteVault>, session: AgentSession) -> Self {
+gzmo-core/src/platform_memory.rs:106:    pub fn session_id(&self) -> &str {
+gzmo-core/src/platform_memory.rs:110:    pub fn scratch_scope(&self) -> ScratchScope {
+gzmo-core/src/platform_memory.rs:174:    pub fn memory_profile(&self, dynamic_only: bool) -> Result<GzmoProfile> {
+gzmo-core/src/platform_memory.rs:264:    pub fn new(platform: Arc<PlatformMemory>) -> Self {
+gzmo-core/src/platform_memory.rs:302:    pub fn new(platform: Arc<PlatformMemory>) -> Self {
+gzmo-core/src/platform_memory.rs:332:    pub fn new(platform: Arc<PlatformMemory>) -> Self {
+gzmo-core/src/platform_memory.rs:364:    pub fn new(platform: Arc<PlatformMemory>) -> Self {
+gzmo-core/src/gateway.rs:309:    pub fn new(config: VllmConfig) -> Self {
+gzmo-core/src/gateway.rs:320:    pub fn default_local() -> Self {
+gzmo-core/src/gateway.rs:326:    pub fn set_chaos_overrides(&self, temperature: f32, max_tokens: u32) {
+gzmo-core/src/gateway.rs:339:    pub fn clear_chaos_overrides(&self) {
+gzmo-core/src/gateway.rs:813:pub fn parse_json_lenient<T: serde::de::DeserializeOwned>(raw: &str) -> Result<T> {
+gzmo-core/src/gateway.rs:891:pub fn assistant_visible_text(content: Option<String>, reasoning_content: Option<String>) -> String {
+gzmo-core/src/gateway.rs:938:    pub fn new(task_label: impl Into<String>, backends: Vec<(String, Arc<dyn LlmGateway>)>) -> Self {
+gzmo-core/src/gateway.rs:1155:    pub fn new(config: &config::GzmoConfig) -> Self {
+gzmo-core/src/gateway.rs:1279:    pub fn gateway(&self, task: config::TaskKind) -> &Arc<dyn LlmGateway> {
+gzmo-core/src/gateway.rs:1289:    pub fn gateway_by_name(&self, name: &str) -> Option<&Arc<dyn LlmGateway>> {
+gzmo-core/src/mcp/serve.rs:49:    pub fn new(platform: Arc<PlatformMemory>, wiki: WikiConfig) -> Self {
+gzmo-core/src/mcp/manager.rs:34:    pub fn new() -> Self {
+gzmo-core/src/mcp/manager.rs:134:    pub fn register_all_tools(&mut self, registry: &mut ToolRegistry) {
+gzmo-core/src/mcp/manager.rs:146:    pub fn server_count(&self) -> usize {
+gzmo-core/src/synapse.rs:45:pub fn set_event_source(source: EventSource) {
+gzmo-core/src/synapse.rs:50:pub fn resolve_event_source(fallback: EventSource) -> EventSource {
+gzmo-core/src/synapse.rs:146:    pub fn new(event_type: EventType, source: EventSource) -> Self {
+gzmo-core/src/synapse.rs:157:    pub fn with_data(event_type: EventType, source: EventSource, data: serde_json::Value) -> Self {
+gzmo-core/src/synapse.rs:168:    pub fn to_json_line(&self) -> String {
+gzmo-core/src/synapse.rs:202:    pub fn new() -> Self {
+gzmo-core/src/synapse.rs:209:    pub fn with_path(path: PathBuf) -> Self {
+gzmo-core/src/synapse.rs:220:    pub fn append(&self, event: &SynapseEvent) {
+gzmo-core/src/synapse.rs:308:    pub fn append_batch(&self, events: &[SynapseEvent]) {
+gzmo-core/src/wiki.rs:55:    pub fn new(config: WikiConfig) -> Self {
+gzmo-core/src/wiki.rs:347:    pub fn search(&self, query: &str, limit: usize) -> Vec<SearchHit> {
+gzmo-core/src/config.rs:116:    pub fn all() -> &'static [Self] {
+gzmo-core/src/config.rs:133:    pub fn default_engine(&self) -> &'static str {
+gzmo-core/src/config.rs:153:    pub fn is_background(&self) -> bool {
+gzmo-core/src/config.rs:409:    pub fn kg_gate(&self) -> crate::memory::kg_extract::KgGateConfig {
+gzmo-core/src/config.rs:481:    pub fn kg_gate(&self) -> crate::memory::kg_extract::KgGateConfig {
+gzmo-core/src/config.rs:580:    pub fn entities_dir(&self) -> String { format!("{}/entities", self.directory) }
+gzmo-core/src/config.rs:581:    pub fn concepts_dir(&self) -> String { format!("{}/concepts", self.directory) }
+gzmo-core/src/config.rs:582:    pub fn sources_dir(&self) -> String { format!("{}/sources", self.directory) }
+gzmo-core/src/config.rs:669:    pub fn kg_gate(&self) -> crate::memory::kg_extract::KgGateConfig {
+gzmo-core/src/config.rs:1198:    pub fn to_engine_profile(&self) -> EngineProfileConfig {
+gzmo-core/src/config.rs:1342:    pub fn hot_budget_tokens(&self) -> usize {
+gzmo-core/src/config.rs:1352:    pub fn archive_trigger_tokens(&self) -> usize {
+gzmo-core/src/config.rs:1420:    pub fn serpapi_key(&self) -> String {
+gzmo-core/src/config.rs:1423:    pub fn openrouter_key(&self) -> String {
+gzmo-core/src/config.rs:1426:    pub fn gemini_key(&self) -> String {
+gzmo-core/src/config.rs:1492:    pub fn active_engine(&self) -> EngineProfileConfig {
+gzmo-core/src/config.rs:1539:    pub fn active_engine_for_mode(&self, mode: EngineMode) -> EngineProfileConfig {
+gzmo-core/src/config.rs:1577:    pub fn cloud_fallback(&self) -> Option<EngineProfileConfig> {
+gzmo-core/src/config.rs:1709:    pub fn resolve(&self, task: TaskKind) -> &str {
+gzmo-core/src/config.rs:1720:    pub fn get_profile(&self, name: &str) -> Option<&EngineProfileConfig> {
+gzmo-core/src/config.rs:1726:    pub fn resolve_profile(&self, task: TaskKind, engine: &EngineSection) -> EngineProfileConfig {
+gzmo-core/src/config.rs:2106:    pub fn load(path: &Path) -> Result<Self> {
+gzmo-core/src/config.rs:2157:    pub fn load_auto() -> Result<Self> {
+gzmo-core/src/config.rs:2178:    pub fn active_mcp_servers(&self) -> impl Iterator<Item = &McpServerEntry> {
+gzmo-core/src/config.rs:2184:    pub fn persist_active_mode(&self, config_path: &Path, mode: EngineMode) -> Result<()> {
+gzmo-core/src/context.rs:42:    pub fn with_hot_budget(hot_tokens: usize) -> Self {
+gzmo-core/src/context.rs:52:    pub fn for_context_length(context_length: usize) -> Self {
+gzmo-core/src/context.rs:58:    pub fn from_memory_config(cfg: &crate::config::ContextMemoryConfig) -> Self {
+gzmo-core/src/context.rs:73:pub fn estimate_text_tokens(content: &str, chars_per_token: f64) -> usize {
+gzmo-core/src/context.rs:86:pub fn estimate_total_tokens(messages: &[Message], chars_per_token: f64) -> usize {
+gzmo-core/src/context.rs:95:pub fn prune_with_archive(messages: &[Message], config: &ContextConfig) -> PruneResult {
+gzmo-core/src/context.rs:163:pub fn prune_to_budget(messages: &[Message], config: &ContextConfig) -> Vec<Message> {
+gzmo-core/src/types.rs:66:    pub fn half_life_days(&self) -> f64 {
+gzmo-core/src/types.rs:199:    pub fn as_str(&self) -> &'static str {
+gzmo-core/src/agent_session.rs:37:    pub fn scratch(&self) -> Arc<ScratchService> {
+gzmo-core/src/agent_session.rs:41:    pub fn uses_redis(&self) -> bool {
+gzmo-core/src/agent_session.rs:45:    pub fn session_id(&self) -> &str {
+gzmo-core/src/agent_session.rs:49:    pub fn set_session_id(&mut self, session_id: String) {
+gzmo-core/src/agent_session.rs:53:    pub fn main_scope(&self) -> ScratchScope {
+gzmo-core/src/agent_session.rs:59:    pub fn attach_subagent_runner(&mut self, runner: Arc<SubagentRunner>) {
+gzmo-core/src/agent_session.rs:71:    pub fn memory_context(&self) -> AgentMemoryContext {
+gzmo-core/src/agent_session.rs:79:    pub fn loop_config(
+gzmo-core/src/kg_reconcile.rs:53:pub fn canonicalize_entity_type(raw: &str) -> String {
+gzmo-core/src/spark_schedule.rs:8:pub fn advance_seed(seed: u64) -> u64 {
+gzmo-core/src/spark_schedule.rs:13:pub fn roll_interval_minutes(seed: u64, min_minutes: u32, max_minutes: u32) -> (u32, u32) {
+gzmo-core/src/spark_schedule.rs:23:pub fn next_spark_after(now: DateTime<Utc>, config: &SparkConfig, seed: u64) -> (DateTime<Utc>, u64, u32, u32) {
+gzmo-core/src/memory/rerank.rs:34:    pub fn from_config(cfg: &RerankConfig) -> Result<Arc<Self>> {
+gzmo-core/src/memory/rerank.rs:92:    pub fn prefetch_limit(&self, limit: usize) -> usize {
+gzmo-core/src/memory/scratch.rs:30:    pub fn redis_key(&self) -> String {
+gzmo-core/src/memory/scratch.rs:248:    pub fn uses_redis(&self) -> bool {
+gzmo-core/src/memory/scratch.rs:471:pub fn messages_to_transcript(messages: &[Message]) -> String {
+gzmo-core/src/memory/kg_promotion.rs:15:pub fn sanitize_relation_type(raw: &str) -> String {
+gzmo-core/src/memory/kg_promotion.rs:36:pub fn canonicalize_relation_type(raw: &str) -> String {
+gzmo-core/src/memory/kg_promotion.rs:50:pub fn is_valid_entity_name(name: &str) -> bool {
+gzmo-core/src/memory/kg_promotion.rs:56:pub fn is_valid_relation_endpoints(from: &str, to: &str, relation_type: &str) -> bool {
+gzmo-core/src/memory/kg_promotion.rs:67:pub fn normalize_entity_key(name: &str) -> String {
+gzmo-core/src/memory/kg_promotion.rs:79:pub fn provenance_note(date: NaiveDate, confidence: f64, evidence: &str) -> String {
+gzmo-core/src/memory/kg_promotion.rs:90:pub fn entity_label_from_fact(content: &str) -> String {
+gzmo-core/src/memory/embeddings.rs:122:    pub fn from_config(cfg: &EmbeddingsConfig, redis_cfg: &RedisConfig) -> Result<Arc<Self>> {
+gzmo-core/src/memory/embeddings.rs:275:pub fn assert_vault_backend(backend: &str) -> Result<()> {
+gzmo-core/src/memory/vault.rs:59:    pub fn open(db_path: impl AsRef<Path>) -> Result<Self> {
+gzmo-core/src/memory/vault.rs:250:    pub fn with_embedder(mut self, embedder: Option<Arc<Embedder>>) -> Self {
+gzmo-core/src/memory/vault.rs:256:    pub fn with_qdrant(mut self, qdrant: Option<Arc<QdrantRecall>>) -> Self {
+gzmo-core/src/memory/vault.rs:262:    pub fn with_reranker(mut self, reranker: Option<Arc<Reranker>>) -> Self {
+gzmo-core/src/memory/vault.rs:267:    pub fn rerank_enabled(&self) -> bool {
+gzmo-core/src/memory/vault.rs:272:    pub fn store(&self, fact: &SemanticFact) -> Result<()> {
+gzmo-core/src/memory/vault.rs:315:    pub fn list_quarantine(&self) -> Result<Vec<(String, String, f64, String)>> {
+gzmo-core/src/memory/vault.rs:326:    pub fn reinforce(&self, fact_id: Uuid) -> Result<()> {
+gzmo-core/src/memory/vault.rs:349:    pub fn cognition_memory_layer(&self) -> &'static str {
+gzmo-core/src/memory/vault.rs:392:    pub fn search_with_decay(
+gzmo-core/src/memory/vault.rs:972:    pub fn honeypot_source_file(&self, id: Uuid) -> Result<Option<String>> {
+gzmo-core/src/memory/vault.rs:982:    pub fn get_evidence_text(&self, fact_id: Uuid) -> Result<Option<String>> {
+gzmo-core/src/memory/vault.rs:997:    pub fn distill_dedup_seen(&self, dedup_key: &str) -> Result<bool> {
+gzmo-core/src/memory/vault.rs:1007:    pub fn record_distill_dedup(
+gzmo-core/src/memory/vault.rs:1028:    pub fn ingest_dedup_seen(&self, content_hash: &str) -> Result<bool> {
+gzmo-core/src/memory/vault.rs:1038:    pub fn record_ingest_dedup(&self, content_hash: &str, source_path: &str) -> Result<()> {
+gzmo-core/src/memory/vault.rs:1367:    pub fn get_memory_chain(&self, fact_id: &str) -> Result<Vec<(String, bool, Option<String>)>> {
+gzmo-core/src/memory/vault.rs:1523:    pub fn recall_failures(&self, description: &str) -> Result<Vec<String>> {
+gzmo-core/src/memory/vault.rs:1549:    pub fn keyword_search(&self, query_text: &str, limit: usize) -> Result<Vec<(SemanticFact, f64)>> {
+gzmo-core/src/memory/vault.rs:1675:    pub fn store_text(&self, content: &str, decay_class: &str, confidence: f64) -> Result<()> {
+gzmo-core/src/memory/vault.rs:1728:    pub fn count_missing_embeddings(&self) -> Result<usize> {
+gzmo-core/src/memory/vault.rs:1800:    pub fn count(&self) -> Result<usize> {
+gzmo-core/src/memory/vault.rs:1811:    pub fn recent(&self, limit: usize) -> Result<Vec<String>> {
+gzmo-core/src/memory/vault.rs:1820:    pub fn archive_stale_session_anchors(&self, max_age_days: u32) -> Result<usize> {
+gzmo-core/src/memory/vault.rs:1838:    pub fn stale_candidates(&self, limit: usize) -> Result<Vec<SemanticFact>> {
+gzmo-core/src/memory/vault.rs:1853:    pub fn spark_recent_pool(
+gzmo-core/src/memory/vault.rs:1913:    pub fn spark_anchor_pool(
+gzmo-core/src/memory/vault.rs:1984:    pub fn cognition_uses_honeypot(&self) -> bool {
+gzmo-core/src/memory/vault.rs:2061:    pub fn recent_semantic_facts(&self, limit: usize) -> Result<Vec<SemanticFact>> {
+gzmo-core/src/memory/vault.rs:2211:pub fn normalize_truth_content(content: &str) -> String {
+gzmo-core/src/memory/vault.rs:2216:pub fn embedding_cosine_similarity(a: &[f32], b: &[f32]) -> f64 {
+gzmo-core/src/memory/kg_extract.rs:88:pub fn extraction_schema() -> serde_json::Value {
+gzmo-core/src/memory/kg_extract.rs:170:pub fn filter_noise_entities(entities: Vec<KgEntity>) -> Vec<KgEntity> {
+gzmo-core/src/memory/kg_extract.rs:193:pub fn dedupe_entities(entities: Vec<KgEntity>) -> (Vec<KgEntity>, HashMap<String, String>) {
+gzmo-core/src/memory/kg_extract.rs:308:pub fn prepare_candidates(
+gzmo-core/src/memory/kg_extract.rs:361:pub fn dedupe_relations(
+gzmo-core/src/memory/kg_extract.rs:420:    pub fn new(
+gzmo-core/src/memory/kg_extract.rs:434:    pub fn with_verify_gateway(mut self, verify_gateway: Arc<dyn LlmGateway>) -> Self {
+gzmo-core/src/memory/kg_extract.rs:693:    pub fn apply_verdicts(
+gzmo-core/src/memory/kg_extract.rs:798:    pub fn pass_through_verification(
+gzmo-core/src/memory/kg_extract.rs:953:pub fn chunk_text_for_llm(raw: &str, max_chars: usize) -> Vec<String> {
+gzmo-core/src/memory/kg_extract.rs:987:pub fn merge_extractions_pre_verify(extractions: Vec<KgExtraction>) -> KgExtraction {
+gzmo-core/src/memory/kg_extract.rs:1009:pub fn merge_pipeline_chunks(chunks: Vec<PipelineResult>) -> PipelineResult {
+gzmo-core/src/memory/qdrant_recall.rs:40:    pub fn from_config(cfg: &QdrantConfig) -> Result<Arc<Self>> {
+gzmo-core/src/memory/qdrant_recall.rs:52:    pub fn with_collection(&self, collection: impl Into<String>) -> Self {
+gzmo-core/src/memory/profile.rs:63:    pub fn build_profile(&self, opts: ProfileOptions) -> Result<GzmoProfile> {
+gzmo-core/src/memory/profile.rs:286:pub fn invalidate_profile_cache(container_tag: Option<&str>) {
+gzmo-core/src/memory/profile.rs:297:    pub fn to_markdown(&self) -> String {
+gzmo-core/src/memory/qdrant_sync.rs:75:pub fn discover_project_root() -> PathBuf {
+gzmo-core/src/memory/lifecycle.rs:25:    pub fn graph_rel(self) -> Option<&'static str> {
+gzmo-core/src/memory/lifecycle.rs:36:pub fn extract_primary_entity(content: &str) -> Option<String> {
+gzmo-core/src/memory/lifecycle.rs:51:pub fn classify_truth_pair(old_content: &str, new_content: &str) -> LifecycleKind {
+gzmo-core/src/memory/lifecycle.rs:182:pub fn is_unverified_derived(truth: &ExtractedTruth, origin: &str) -> bool {
+gzmo-core/src/memory/lifecycle.rs:203:pub fn find_latest_honeypot_by_entity(
+gzmo-core/src/memory/lifecycle.rs:227:pub fn supersede_honeypot(conn: &Connection, old_id: &str) -> anyhow::Result<()> {
+gzmo-core/src/memory/recall_rrf.rs:22:pub fn merge_interleaved_rank(a: &[Uuid], b: &[Uuid], cap: usize) -> Vec<Uuid> {
+gzmo-core/src/memory/recall_rrf.rs:50:pub fn rrf_fuse(rank_lists: &[Vec<Uuid>]) -> HashMap<Uuid, f64> {
+gzmo-core/src/memory/recall_rrf.rs:63:pub fn diversify_by_source_file(
+gzmo-core/src/memory/recall_rrf.rs:91:pub fn extract_entity_tokens(query: &str) -> Vec<String> {
+gzmo-core/src/memory/recall_rrf.rs:135:pub fn fts_match_query(query: &str) -> String {
+gzmo-core/src/memory/recall_rrf.rs:140:pub fn fts_match_query_broad(query: &str) -> String {
+gzmo-core/src/memory/honeypot.rs:12:pub fn qualifies_for_honeypot(truth: &ExtractedTruth) -> bool {
+gzmo-core/src/memory/honeypot.rs:44:pub fn insert_honeypot_lifecycle(
+gzmo-core/src/memory/honeypot.rs:85:pub fn upsert_honeypot_row(
+gzmo-core/src/memory/honeypot.rs:132:pub fn sync_honeypot_fts_row(
+gzmo-core/src/memory/honeypot.rs:152:pub fn upsert_evidence_row(
+gzmo-core/src/memory/honeypot.rs:204:pub fn sync_evidence_fts_row(
+gzmo-core/src/memory/filter.rs:26:    pub fn new(store: FileEpisodicStore) -> Self {
+gzmo-core/src/memory/episodic.rs:17:    pub fn new(memory_dir: impl AsRef<Path>) -> Self {
+gzmo-core/src/memory/evidence_localize.rs:5:pub fn localize_evidence(body: &str, verifier_quote: &str) -> EvidenceSpan {
+gzmo-core/src/memory/evidence_localize.rs:82:pub fn localize_observation_evidence(
+gzmo-core/src/health.rs:87:pub fn probe_neo4j_bolt(bolt_url: &str) -> ProbeResult {
+gzmo-core/src/health.rs:361:pub fn format_report(results: &[ProbeResult]) -> String {
+gzmo-core/src/wiki_md.rs:38:    pub fn new(page_type: &str, title: &str, date: &str) -> Self {
+gzmo-core/src/wiki_md.rs:53:pub fn slugify(title: &str) -> String {
+gzmo-core/src/wiki_md.rs:76:pub fn split_frontmatter(content: &str) -> (Option<PageFrontmatter>, String) {
+gzmo-core/src/wiki_md.rs:93:pub fn render_page(fm: &PageFrontmatter, body: &str) -> String {
+gzmo-core/src/wiki_md.rs:124:pub fn upsert_index_entry(index: &str, category: &str, title: &str, link: &str, summary: &str) -> String {
+gzmo-core/src/wiki_md.rs:204:pub fn search(dir: &Path, query: &str, limit: usize) -> Vec<SearchHit> {
+gzmo-core/src/session_distill.rs:37:pub fn session_distill_source(session_id: &str) -> String {
+gzmo-core/src/session_distill.rs:46:pub fn distill_transcript_dedup_key(session_id: &str, transcript: &str) -> String {
+gzmo-core/src/session_distill.rs:65:    pub fn new(
+gzmo-core/src/session.rs:66:    pub fn new(sessions_dir: impl AsRef<Path>) -> Self {
+gzmo-core/src/session.rs:85:    pub fn new_session_id() -> String {
+gzmo-core/src/tools/web.rs:23:    pub fn with_serpapi_key(key: String) -> Self {
+gzmo-core/src/tools/mod.rs:51:    pub fn new() -> Self {
+gzmo-core/src/tools/mod.rs:55:    pub fn register(&mut self, handler: Box<dyn ToolHandler>) {
+gzmo-core/src/tools/mod.rs:61:    pub fn definitions(&self) -> Vec<ToolDef> {
+gzmo-core/src/tools/mod.rs:75:    pub fn len(&self) -> usize { self.handlers.len() }
+gzmo-core/src/tools/mod.rs:76:    pub fn is_empty(&self) -> bool { self.handlers.is_empty() }
+gzmo-core/src/tools/mod.rs:78:    pub fn has_tool(&self, name: &str) -> bool {
+gzmo-core/src/tools/memory.rs:76:    pub fn new(vault: Arc<SqliteVault>) -> Self {
+gzmo-core/src/tools/memory.rs:85:    pub fn with_scratch(
+gzmo-core/src/tools/memory.rs:98:    pub fn with_orchestrator_scratch(
+gzmo-core/src/ingest.rs:46:    pub fn new(
+gzmo-core/src/ingest.rs:65:    pub fn new_with_verify(
+gzmo-core/src/ingest.rs:86:    pub fn with_wiki(mut self, wiki: WikiConfig) -> Self {
+gzmo-core/src/ingest.rs:723:pub fn ingest_content_hash(body: &str) -> String {
+gzmo-core/src/spark.rs:71:    pub fn new(
+gzmo-core/src/spark.rs:91:    pub fn new_with_verify(
+gzmo-core/src/subagent.rs:68:    pub fn new(
+gzmo-core/src/stealth.rs:15:pub fn discover_hardware_stealthily() -> HardwareFingerprint {
+gzmo-core/src/skills/mod.rs:83:    pub fn new() -> Self {
+gzmo-core/src/skills/mod.rs:90:    pub fn register(&mut self, skill: Arc<dyn Skill>) {
+gzmo-core/src/skills/mod.rs:96:    pub fn get(&self, name: &str) -> Option<&Arc<dyn Skill>> {
+gzmo-core/src/skills/mod.rs:101:    pub fn has(&self, name: &str) -> bool {
+gzmo-core/src/skills/mod.rs:106:    pub fn names(&self) -> Vec<&str> {
+gzmo-core/src/skills/mod.rs:111:    pub fn all(&self) -> Vec<&Arc<dyn Skill>> {
+gzmo-core/src/dreams_md.rs:11:pub fn split_dream_and_spark(content: &str) -> (String, String) {
+gzmo-core/src/dreams_md.rs:24:pub fn extract_spark_sections(content: &str) -> String {
+gzmo-core/src/dreams_md.rs:29:pub fn merge_dream_narrative(existing: &str, narrative: &str) -> String {
+gzmo-core/src/dreams.rs:29:pub fn dream_episodic_source(date: NaiveDate) -> String {
+gzmo-core/src/dreams.rs:55:    pub fn new(
+gzmo-core/src/dreams.rs:75:    pub fn new_with_verify(
+gzmo-core/src/dreams.rs:462:pub fn filter_episodic_for_consolidation(raw: &str, exclude_substrings: &[String]) -> String {
+gzmo-core/src/ingest_prep.rs:23:pub fn split_frontmatter(raw: &str) -> (Frontmatter, String) {
+gzmo-core/src/ingest_prep.rs:55:pub fn classify_document(file_name: &str, frontmatter: &Frontmatter, body: &str) -> DocClass {
+gzmo-core/src/ingest_prep.rs:110:pub fn clean_body(doc_class: DocClass, body: &str) -> String {
+gzmo-core/src/ingest_prep.rs:145:pub fn json_tree_to_outline(body: &str) -> Option<String> {
+gzmo-core/src/ingest_prep.rs:172:pub fn prepare_body(doc_class: DocClass, body: &str) -> String {
+gzmo-core/src/ingest_prep.rs:178:pub fn infer_agent_name(file_name: &str, frontmatter: &Frontmatter) -> Option<String> {
+gzmo-core/src/ingest_prep.rs:237:pub fn extract_system_prompt(doc_class: DocClass) -> &'static str {
+gzmo-core/src/ingest_prep.rs:246:pub fn build_provenance(file_name: &str, frontmatter: &Frontmatter) -> String {
+gzmo-core/src/synapse_reader.rs:35:pub fn read_new_pi_events(
+gzmo-core/src/synapse_reader.rs:83:pub fn summarize_pi_events(events: &[SynapseEvent]) -> PiEventSummary {
+gzmo-core/src/synapse_reader.rs:179:pub fn default_state_path(project_root: &Path) -> PathBuf {
+gzmo-core/src/text_util.rs:4:pub fn truncate_chars(s: &str, max_chars: usize) -> String {

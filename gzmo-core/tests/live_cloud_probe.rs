@@ -1,5 +1,6 @@
 //! Live cloud-first routing probes (ignored by default; require network + the
-//! production gzmo.toml/.env and a reachable Prime :8000).
+//! production gzmo.toml/.env, `[routing] cloud_first_background = true`, and
+//! a reachable Prime :8000).
 //!
 //! Run:
 //!   cargo test -p gzmo-core --test live_cloud_probe -- --ignored --nocapture
@@ -55,6 +56,10 @@ fn text_of(r: LlmResponse) -> String {
 async fn live_background_uses_cloud_first() {
     let cfg = GzmoConfig::load(&prod_config_path()).expect("load gzmo.toml + .env");
 
+    if !cfg.routing.cloud_first_background {
+        eprintln!("[probe] skip: cloud_first_background=false (steady-state local-first)");
+        return;
+    }
     assert!(
         cfg.routing.cloud_first_background,
         "cloud_first_background must be true for cloud-first background routing"
@@ -102,6 +107,10 @@ async fn live_background_uses_cloud_first() {
 #[ignore = "live: requires Prime :8000 reachable"]
 async fn live_background_falls_back_to_prime_on_bad_cloud_key() {
     let mut cfg = GzmoConfig::load(&prod_config_path()).expect("load gzmo.toml + .env");
+    if !cfg.routing.cloud_first_background {
+        eprintln!("[probe] skip: cloud_first_background=false (steady-state local-first)");
+        return;
+    }
     assert!(cfg.routing.cloud_first_background);
 
     // Break the cloud key so OpenRouter returns 401 -> FallbackGateway must skip

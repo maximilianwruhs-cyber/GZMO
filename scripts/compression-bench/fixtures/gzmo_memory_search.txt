@@ -1,0 +1,6 @@
+[RECALL] Search Results for query: "Prime infrastructure"
+Hit 1: [vault.db:L100] Prime runs on VM200 on LXC101 with fallback to LXC102.
+Hit 2: [vault.db:L210] Prime's hot budget is configured to 235929 tokens.
+Hit 3: [docs/INFRASTRUCTURE_MAP.md] Section 6 explains the Redis configuration.
+Hit 4: [SOUL.md] Prime's core personality constraints.
+Hit 5: [memory/facts.db] Historical sessions on VM200.

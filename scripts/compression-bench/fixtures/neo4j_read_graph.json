@@ -1,0 +1,508 @@
+[
+  {
+    "file": "wave_01_gzmo_obolus_drive_cleanTakeoutDriveObolusObolus-masterREADMEmd.md",
+    "probes": [
+      {
+        "query": "How is intelligence per watt calculated in Obulus?",
+        "expected_facts": [
+          "Calculated as Quality divided by"
+        ],
+        "hits": [
+          {
+            "score": 0.823574,
+            "content": "[TOOL:obulus.py] A benchmark that measures intelligence per watt of energy on specific hardware."
+          },
+          {
+            "score": 0.77044374,
+            "content": "[PROJECT:Obulus] Roadmap titled 'Intelligence per Watt' with completed v2 phases and future work items."
+          },
+          {
+            "score": 0.7311534,
+            "content": "[METRIC:$OBL] Agents consume Watts to generate thoughts and earn $OBL to recharge."
+          },
+          {
+            "score": 0.7276883,
+            "content": "[PROJECT:Obulus] Defines energy metric: `1 $OBL = 1 Wh = 3600 J`."
+          },
+          {
+            "score": 0.7262708,
+            "content": "[METRIC:z-score] Higher values indicate more intelligence per watt."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "file": "wave_01_gzmo_obolus_drive_cleanTakeoutDriveObolusObolus-masteragentsarchitectural_scoutmd.md",
+    "probes": [
+      {
+        "query": "What is the focus of the Architectural Scout?",
+        "expected_facts": [
+          "Architektur des gesamten Rechenzentrums",
+          "Fokus auf grundlegender Struktur und"
+        ],
+        "hits": [
+          {
+            "score": 0.6350287,
+            "content": "[AGENT:Architectural-Scout] Innovations-Reporting: Erstellung von 'Architectural Proposals' f\u00fcr gro\u00dfe Systemumstellungen"
+          },
+          {
+            "score": 0.63223404,
+            "content": "[TOOL:Scout] Used for image scanning"
+          },
+          {
+            "score": 0.63103676,
+            "content": "[AGENT:Architectural-Scout] Forschungs- und Innovations-Beauftragte des OpenClaw-Teams"
+          },
+          {
+            "score": 0.6190624,
+            "content": "[AGENT:Architectural-Scout] Denkt 'out of box' und sucht nach bahnbrechenden Technologien"
+          },
+          {
+            "score": 0.6147066,
+            "content": "[TOOL:Scout] Tool used for image scanning"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "file": "wave_01_gzmo_obolus_drive_cleanTakeoutDriveObolusObolus-masteragentsawareness_agentmd.md",
+    "probes": [
+      {
+        "query": "What is the role of the Awareness Agent?",
+        "expected_facts": [
+          "System, dessen sensorisches Bewusstsein"
+        ],
+        "hits": [
+          {
+            "score": 0.7563932,
+            "content": "[SYSTEM:OpenClaw-System] System, dessen sensorisches Bewusstsein der Awareness Agent ist"
+          },
+          {
+            "score": 0.75318444,
+            "content": "[SYSTEM:Strategy-Analyst] Empf\u00e4nger pr\u00e4ziser Hardware-Statusmeldungen vom Awareness Agent"
+          },
+          {
+            "score": 0.71817386,
+            "content": "[CONCEPT:Chief of Staff] Orchestrates sub-agents and acts as 'First Officer' directly under the user."
+          },
+          {
+            "score": 0.71795106,
+            "content": "[SYSTEM:Awareness Agent] \u00dcberwachung der physischen Umgebung"
+          },
+          {
+            "score": 0.6964584,
+            "content": "[AGENT:Strategy-Analyst] Verantwortlich f\u00fcr strategische Relevanz"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "file": "wave_01_gzmo_obolus_drive_cleanTakeoutDriveObolusObolus-masteragentsbackup_custodianmd.md",
+    "probes": [
+      {
+        "query": "What functions does the Backup Custodian perform?",
+        "expected_facts": [
+          "Bitrot-Detection",
+          "Backup-Tool"
+        ],
+        "hits": [
+          {
+            "score": 0.7215605,
+            "content": "[AGENT:Backup-Custodian] H\u00fcter der Datenintegrit\u00e4t"
+          },
+          {
+            "score": 0.7056097,
+            "content": "[SYSTEM:RAG DB Agent] Definiert Backup-Strategie und Restore-Tests f\u00fcr die ServiceBot-DB."
+          },
+          {
+            "score": 0.6927632,
+            "content": "[AGENT:Backup-Custodian] Priorisierung der Sicherung von Konfigurationsdateien und Datenbanken"
+          },
+          {
+            "score": 0.68669033,
+            "content": "[AGENT:Backup-Custodian] Meldet jeden erfolgreichen und fehlgeschlagenen Backup-Lauf"
+          },
+          {
+            "score": 0.674554,
+            "content": "[AGENT:Backup-Custodian] Erstellung von Skripten f\u00fcr Datenbank-Dumps und Datei-Synchronisation"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "file": "wave_01_gzmo_obolus_drive_cleanTakeoutDriveObolusObolus-masteragentsbot_integrator_agentmd.md",
+    "probes": [
+      {
+        "query": "What does the Bot Integrator Agent monitor?",
+        "expected_facts": [
+          "Ingest-Jobs",
+          "Monitoring"
+        ],
+        "hits": [
+          {
+            "score": 0.8501718,
+            "content": "[SYSTEM:Bot Integrator Agent] Arbeitet eng mit Ops & Monitoring Agent zusammen."
+          },
+          {
+            "score": 0.8273008,
+            "content": "[SYSTEM:Bot Integrator Agent] Erh\u00e4lt Verbesserungsvorschl\u00e4ge bei Prompting/LLM-Einstellungen."
+          },
+          {
+            "score": 0.8192099,
+            "content": "[SYSTEM:Ops & Monitoring Agent] Gibt Verbesserungsvorschl\u00e4ge an Ingest Engineer, RAG DB Agent, Bot Integrator Agent."
+          },
+          {
+            "score": 0.77136785,
+            "content": "[SYSTEM:Bot Integrator Agent] Erh\u00e4lt Verbesserungsvorschl\u00e4ge bez\u00fcglich Prompting/LLM-Einstellungen"
+          },
+          {
+            "score": 0.7707617,
+            "content": "[SYSTEM:Evaluation & QA Agent] Gibt Verbesserungsvorschl\u00e4ge an Ingest Engineer, RAG DB Agent und Bot Integrator Agent"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "file": "wave_01_gzmo_obolus_drive_cleanTakeoutDriveObolusObolus-masteragentscoding_quality_agentmd.md",
+    "probes": [
+      {
+        "query": "What does the Coding Quality Agent ensure?",
+        "expected_facts": [
+          "Stellt sicher, dass der"
+        ],
+        "hits": [
+          {
+            "score": 0.7709937,
+            "content": "[AGENT:QA-Testing-Agent] Responsibility: Verify correctness, logic, and functionality of other agents' work and outputs"
+          },
+          {
+            "score": 0.7581259,
+            "content": "[PERSON:Validator] Participates in the quality assessment and scoring of agents."
+          },
+          {
+            "score": 0.7350297,
+            "content": "[TOOL:Validator] Provides the Quality score ($Q$) used in the Efficiency Metric calculation, ranging from 0.0 to 1.0."
+          },
+          {
+            "score": 0.73207873,
+            "content": "[AGENT:Main-Agent] Dependency: QA-Testing-Agent reports directly to this agent"
+          },
+          {
+            "score": 0.73206174,
+            "content": "[AGENT:Coding-Quality-Agent] Primary agent defined in wave_01_gzmo_obolus_drive_cleanTakeoutDriveObolusObolus-masteragentscoding_quality_agentmd.md (inferred from path/filename)"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "file": "wave_01_gzmo_obolus_drive_cleanTakeoutDriveObolusObolus-masteragentsdocker_architectmd.md",
+    "probes": [
+      {
+        "query": "In what context is the Docker Architect used?",
+        "expected_facts": [
+          "Context in which VEX and",
+          "implemented by the Docker-Architect"
+        ],
+        "hits": [
+          {
+            "score": 0.7832161,
+            "content": "[SYSTEM:Docker-Architect] Responsible for deploying services efficiently, scalably, and securely in Docker containers"
+          },
+          {
+            "score": 0.778227,
+            "content": "[SYSTEM:Strategy-Analyst] Works closely with the Docker-Architect"
+          },
+          {
+            "score": 0.7742911,
+            "content": "[SYSTEM:OpenClaw] System in which the Docker-Architect operates as an expert for container virtualization"
+          },
+          {
+            "score": 0.7677113,
+            "content": "[SYSTEM:OpenClaw-System] System in which the Docker-Architect operates"
+          },
+          {
+            "score": 0.7440976,
+            "content": "[CONCEPT:DevSecOps] Pipeline context in which Docker-Architect implements VEX and Waterline-Modell"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "file": "wave_01_gzmo_obolus_drive_cleanTakeoutDriveObolusObolus-masteragentseval_agentmd.md",
+    "probes": [
+      {
+        "query": "What inputs does the Eval Agent receive?",
+        "expected_facts": [
+          "Erh\u00e4lt Verbesserungsvorschl\u00e4ge",
+          "Qualit\u00e4t"
+        ],
+        "hits": [
+          {
+            "score": 0.7019746,
+            "content": "[TOOL:Miner Agent] Agent whose output is evaluated by the Validator."
+          },
+          {
+            "score": 0.69975287,
+            "content": "[AGENT:QA-Testing-Agent] Responsibility: Verify correctness, logic, and functionality of other agents' work and outputs"
+          },
+          {
+            "score": 0.6899154,
+            "content": "[SYSTEM:Evaluation & QA Agent] Arbeitet ausschlie\u00dflich mit dem Systemstand (DB, Dokumente, Bot-Ausgaben)"
+          },
+          {
+            "score": 0.6879997,
+            "content": "[SYSTEM:Evaluation & QA Agent] Gibt Verbesserungsvorschl\u00e4ge an Ingest Engineer, RAG DB Agent und Bot Integrator Agent"
+          },
+          {
+            "score": 0.68385077,
+            "content": "[SYSTEM:Evaluation & QA Agent] Vergleicht Antworten des Bots mit erwarteten Antworten"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "file": "wave_01_gzmo_obolus_drive_cleanTakeoutDriveObolusObolus-masteragentsfirewall_agentmd.md",
+    "probes": [
+      {
+        "query": "What technology is the Firewall Agent hardening?",
+        "expected_facts": [
+          "Virtual firewall technology used for",
+          "hardened by the agent"
+        ],
+        "hits": [
+          {
+            "score": 0.804071,
+            "content": "[SYSTEM:Firewall & Security Agent] Hardening: Securing SSH access, setting up Fail2Ban and CrowdSec"
+          },
+          {
+            "score": 0.7977023,
+            "content": "[SYSTEM:Firewall & Security Agent] Network Sandboxing: Enforcing strict network policies for agent workloads (unattended executions)"
+          },
+          {
+            "score": 0.79413664,
+            "content": "[SYSTEM:Firewall & Security Agent] Prioritizes security over comfort"
+          },
+          {
+            "score": 0.7795906,
+            "content": "[SYSTEM:Firewall & Security Agent] Highly specialized Security-Agent for the OpenClaw-System"
+          },
+          {
+            "score": 0.7789586,
+            "content": "[AGENT:Firewall] Specialist agent monitored by QA-Testing-Agent"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "file": "wave_01_gzmo_obolus_drive_cleanTakeoutDriveObolusObolus-masteragentsingest_engineer_agentmd.md",
+    "probes": [
+      {
+        "query": "Where is the primary Ingest Engineer Agent defined?",
+        "expected_facts": [
+          "Primary agent defined in"
+        ],
+        "hits": [
+          {
+            "score": 0.7933881,
+            "content": "[AGENT:Ingest Engineer Agent] Uses only offline available resources (local files, local DB), no web search"
+          },
+          {
+            "score": 0.77518624,
+            "content": "[SYSTEM:Ingest Engineer Agent] Arbeitspartner des RAG DB Agent bei der Integration."
+          },
+          {
+            "score": 0.7678368,
+            "content": "[AGENT:Ingest Engineer Agent] Runs as a manually started process initially, not as a cron job"
+          },
+          {
+            "score": 0.7603831,
+            "content": "[SYSTEM:Ops & Monitoring Agent] Gibt Verbesserungsvorschl\u00e4ge an Ingest Engineer, RAG DB Agent, Bot Integrator Agent."
+          },
+          {
+            "score": 0.7514099,
+            "content": "[SYSTEM:Evaluation & QA Agent] Gibt Verbesserungsvorschl\u00e4ge an Ingest Engineer, RAG DB Agent und Bot Integrator Agent"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "file": "wave_01_gzmo_obolus_notebooklmTakeoutNotebookLMGZMOArtifactsGZMO__Anatomie_einer_KI-Identitt__Ein_analytismd.md",
+    "probes": [
+      {
+        "query": "How is GZMO's Tabula Rasa state described?",
+        "expected_facts": [
+          "Described as a proactive digital",
+          "Tabula Rasa"
+        ],
+        "hits": [
+          {
+            "score": 0.6774081,
+            "content": "[PERSON:GZMO] Maintains identity and role through SOUL.md."
+          },
+          {
+            "score": 0.6756048,
+            "content": "[CONCEPT:SOUL.md] The document that defines the nature and identity of the GZMO system."
+          },
+          {
+            "score": 0.67315936,
+            "content": "[SYSTEM:GZMO] Operates with a dual architecture of 'Chief of Staff' and 'Zahnrad' (Gear) roles."
+          },
+          {
+            "score": 0.6590578,
+            "content": "[CONCEPT:GZMO] A specialized AI personality described as a 'First Officer' to the user."
+          },
+          {
+            "score": 0.65284437,
+            "content": "[CONCEPT:GZMO] Used as an example for Identity & Soul."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "file": "wave_01_gzmo_obolus_notebooklmTakeoutNotebookLMGZMOArtifactsVom_Chatbot_zur_digitalen_Persnlichkeit__Das_Komd.md",
+    "probes": [
+      {
+        "query": "What is the main purpose of GZMO project?",
+        "expected_facts": [
+          "Used to create an AI that connects",
+          "the project GZMO."
+        ],
+        "hits": [
+          {
+            "score": 0.80271256,
+            "content": "[PROJECT:Gizmo] The full name for the project GZMO."
+          },
+          {
+            "score": 0.7613701,
+            "content": "[PROJECT:GZMO] The team is focusing on a local-first development strategy for GZMO post-handover."
+          },
+          {
+            "score": 0.7438922,
+            "content": "[PROJECT:GZMO] Target system for a local-first development strategy post-handover."
+          },
+          {
+            "score": 0.71133876,
+            "content": "[PROJECT:Gizmo] Used to create an AI that connects technical engineering with strategic management."
+          },
+          {
+            "score": 0.6835466,
+            "content": "[CONCEPT:Zahnrad (Gear)] A role within GZMO's architecture focused on stabilizing micro-force."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "file": "wave_01_gzmo_obolus_notebooklmTakeoutNotebookLMGZMO_soul_merged_newArtifactsBriefing__Agentische_System-Architekturen_Wi.md",
+    "probes": [
+      {
+        "query": "What benchmark deficits were found in Obsidian?",
+        "expected_facts": [
+          "Benchmark, der erhebliche M\u00e4ngel bei",
+          "Obsidian"
+        ],
+        "hits": [
+          {
+            "score": 0.63362837,
+            "content": "[CONCEPT:Markdown] Listed alongside Obsidian."
+          },
+          {
+            "score": 0.6127573,
+            "content": "[TOOL:Obsidian Vault] Keine Standarddatenbank wird verwendet."
+          },
+          {
+            "score": 0.6101178,
+            "content": "[METRIC:Efficiency Function] Calculates Miner profit."
+          },
+          {
+            "score": 0.60958844,
+            "content": "[TOOL:Obsidian] Used for Workspace Memory."
+          },
+          {
+            "score": 0.60590535,
+            "content": "[PROJECT:Obulus] Uses $OBL as currency where 1 $OBL \u2248 1 Watt-hour (Wh) of compute."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "file": "wave_01_gzmo_obolus_notebooklmTakeoutNotebookLMObolusArtifactsTechnisches_Systemkonzept__Das_evolutionre_Agenmd.md",
+    "probes": [
+      {
+        "query": "What is the operational instance of the Obulus network?",
+        "expected_facts": [
+          "evolution",
+          "Operative Instanz des Netzwerks,"
+        ],
+        "hits": [
+          {
+            "score": 0.72663015,
+            "content": "[SYSTEM:Obolus] Used in test suites (Math, Code, Full) and provides $OBL token data."
+          },
+          {
+            "score": 0.7169738,
+            "content": "[SYSTEM:Bittensor] Provides decentralized architecture used by Obulus."
+          },
+          {
+            "score": 0.71084857,
+            "content": "[PROJECT:Obulus] Uses $OBL as currency where 1 $OBL \u2248 1 Watt-hour (Wh) of compute."
+          },
+          {
+            "score": 0.7043373,
+            "content": "[PROJECT:Project Obulus] Uses 'Obulus' ($OBL$) as the total energy currency consumed for processing."
+          },
+          {
+            "score": 0.6982304,
+            "content": "[PROJECT:Obulus] Combines decentralized architecture of Bittensor with biological evolution."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "file": "wave_01_gzmo_obolus_notebooklmTakeoutNotebookLMObolus_VS_Codium_Extension__Konzept__ResearchArtifactsTechnisches_Archite.md",
+    "probes": [
+      {
+        "query": "What architecture uses WebSocket in VS Codium?",
+        "expected_facts": [
+          "Described as AgenticOS",
+          "WebSocket"
+        ],
+        "hits": [
+          {
+            "score": 0.69584835,
+            "content": "[SYSTEM:Visual Studio Code] Used via a TypeScript-based extension."
+          },
+          {
+            "score": 0.67549837,
+            "content": "[SYSTEM:Visual Studio Code] The environment into which the AOS Telemetry Engine is integrated."
+          },
+          {
+            "score": 0.66947794,
+            "content": "[TOOL:TypeScript] Language used for the VS Code Extension frontend."
+          },
+          {
+            "score": 0.65190953,
+            "content": "[TOOL:FastAPI] Runs under Uvicorn and provides native WebSocket implementation."
+          },
+          {
+            "score": 0.64126456,
+            "content": "[CONCEPT:Web Components] Used for the frontend instead of the Webview UI Toolkit."
+          }
+        ]
+      }
+    ]
+  }
+]

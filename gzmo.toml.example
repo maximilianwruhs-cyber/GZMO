@@ -46,8 +46,8 @@ honeypot_rem_enabled = true
 [session_distill]
 enabled = true
 sessions_dir = "data/sessions"
-# Extract on VM200 librarian; fact-check on Prime.
-use_librarian = true
+# Extract + summary on Prime; fact-check on Prime.
+use_librarian = false
 librarian_summary = true
 # Nightly in daemon (02:15 UTC — after Qdrant sync 01:45; same-night mirror gap).
 daemon_scheduled = true
@@ -90,12 +90,11 @@ recent_dedupe_similarity = 0.92
 [health]
 strict_startup = false
 
-# GZMO vault/daemon embeddings — VM200 GTX 1070 (:8081).
-# Pi knowledge_search uses workstation :8002 (see ~/.pi/agent/knowledge-base.json), not this URL.
+# VM200 retrieval router embed preset (:8081).
 [embeddings]
 enabled = true
 url = "http://192.168.31.110:8081/v1"
-model = "Qwen3-Embedding-0.6B-Q8_0.gguf"
+model = "gzmo-embed"
 api_key = ""
 cache_ttl_secs = 86400
 
@@ -129,18 +128,18 @@ cron_minute = 45
 max_events = 50
 bus_path = "data/Synapse/events.jsonl"
 
-# VM200 Qwen2.5-1.5B — light summaries (session distill offload later).
+# Retired VM200 :8083 — distill uses Prime via routing.
 [librarian]
-enabled = true
+enabled = false
 url = "http://192.168.31.110:8083/v1"
 model = "qwen2.5-coder-1.5b-instruct-q4_k_m.gguf"
 api_key = ""
 
-# VM200 bge-reranker-v2-m3 — post-filters vault / memory_search recall.
+# VM200 retrieval router rerank preset (same :8081 host).
 [rerank]
 enabled = true
-url = "http://192.168.31.110:8082/v1"
-model = "bge-reranker-v2-m3-q8_0.gguf"
+url = "http://192.168.31.110:8081/v1"
+model = "gzmo-rerank"
 api_key = ""
 prefetch_multiplier = 4
 
@@ -310,6 +309,14 @@ response_reserve = 0.10
 scratch_max_tokens = 2000
 context_length = 131072
 
+[context_compress]
+enabled = false
+ccr_ttl_secs = 3600
+tool_output_max_tokens = 4000
+recall_compress_budget = 2000
+json_array_row_cap = 20
+log_line_cap = 500
+
 [subagent]
 enabled = true
 max_concurrent = 2
@@ -477,9 +484,9 @@ spark_verify = "local"
 ingest_extract = "local_deterministic"
 ingest_verify = "local"
 # Distill: extract + summary on librarian (light), verify on Prime (accuracy)
-distill_extract = "librarian"
+distill_extract = "local"
 distill_verify = "local"
-distill_summary = "librarian"
+distill_summary = "local"
 
 [routing.profiles.local_deterministic]
 provider    = "local"

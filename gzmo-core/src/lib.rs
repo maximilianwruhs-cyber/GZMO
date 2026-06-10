@@ -38,3 +38,5 @@ pub mod kg_reconcile;
 pub mod platform_search;
 pub mod text_util;
 pub mod subagent;
+pub mod context_compress;
+

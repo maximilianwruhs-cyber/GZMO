@@ -92,6 +92,8 @@ pub struct OrchestratorContext {
     pub memory_search_scope: Arc<std::sync::Mutex<ScratchScope>>,
     /// Context window budget from `[context_memory]` (not 6k default).
     pub context: ContextConfig,
+    /// Hot context compression settings.
+    pub compress_config: crate::config::ContextCompressConfig,
 }
 
 fn orch_scope(job: &str, step: &str) -> ScratchScope {
@@ -823,7 +825,16 @@ pub async fn execute_headless(
         "Orchestrator: job completed"
     );
 
-    let summary = crate::text_util::truncate_chars(&response.text, 200);
+    let summary = if ctx.compress_config.enabled {
+        let cv = crate::context_compress::compress_for_context(
+            &response.text,
+            200,
+            &ctx.compress_config,
+        );
+        cv.text
+    } else {
+        crate::text_util::truncate_chars(&response.text, 200)
+    };
     info!(job = %job_name, summary = %summary, "Orchestrator: result");
 
     Ok(())
@@ -834,7 +845,7 @@ pub async fn execute_headless(
 /// Persist a job outcome to the semantic vault.
 async fn persist_outcome(ctx: &OrchestratorContext, outcome: &JobOutcome) {
     if let Some(ref vault) = ctx.vault {
-        let summary = format_outcome_summary(outcome);
+        let summary = format_outcome_summary(outcome, &ctx.compress_config);
         if let Err(e) = vault.store_text(&summary, "Procedural", 1.0) {
             error!(
                 job = %outcome.job_name,
@@ -853,7 +864,7 @@ async fn persist_outcome(ctx: &OrchestratorContext, outcome: &JobOutcome) {
 /// Log a job outcome to episodic memory.
 async fn log_to_episodic(ctx: &OrchestratorContext, outcome: &JobOutcome) {
     if let Some(ref episodic) = ctx.episodic {
-        let summary = format_outcome_summary(outcome);
+        let summary = format_outcome_summary(outcome, &ctx.compress_config);
         let _ = episodic.append(&EpisodicEntry {
             timestamp: outcome.timestamp,
             source: EpisodicSource::InternalMonologue,
@@ -864,7 +875,7 @@ async fn log_to_episodic(ctx: &OrchestratorContext, outcome: &JobOutcome) {
 }
 
 /// Format a job outcome as a human-readable summary for storage.
-fn format_outcome_summary(outcome: &JobOutcome) -> String {
+fn format_outcome_summary(outcome: &JobOutcome, compress_config: &crate::config::ContextCompressConfig) -> String {
     let mut parts = vec![
         format!(
             "[Job: {}] {} | {} step(s) | {}ms",
@@ -876,7 +887,16 @@ fn format_outcome_summary(outcome: &JobOutcome) -> String {
     ];
 
     for step in &outcome.steps {
-        let truncated = crate::text_util::truncate_chars(&step.result_text, 150);
+        let truncated = if compress_config.enabled {
+            let cv = crate::context_compress::compress_for_context(
+                &step.result_text,
+                150,
+                compress_config,
+            );
+            cv.text
+        } else {
+            crate::text_util::truncate_chars(&step.result_text, 150)
+        };
         parts.push(format!(
             "  {} {} ({}ms, {} LLM, {} tools): {}",
             step.status, step.name, step.duration_ms,
@@ -1034,7 +1054,7 @@ mod tests {
             timestamp: Utc::now(),
         };
 
-        let summary = format_outcome_summary(&outcome);
+        let summary = format_outcome_summary(&outcome, &crate::config::ContextCompressConfig::default());
         assert!(summary.contains("test_job"));
         assert!(summary.contains("gather"));
         assert!(summary.contains("All systems nominal"));

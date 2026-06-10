@@ -166,11 +166,12 @@ pub async fn probe_qdrant(cfg: &QdrantConfig) -> ProbeResult {
     }
 }
 
-/// VM200 reranker (:8082) when `[rerank].enabled`.
+/// VM200 retrieval router rerank preset when `[rerank].enabled`.
 pub async fn probe_rerank(cfg: &RerankConfig) -> ProbeResult {
     if !cfg.enabled {
         return ProbeResult::pass("rerank", "disabled in config");
     }
+    const MIN_RERANK_SCORE: f64 = 1e-6;
     match Reranker::from_config(cfg) {
         Ok(r) => match r
             .rerank(
@@ -183,11 +184,18 @@ pub async fn probe_rerank(cfg: &RerankConfig) -> ProbeResult {
             )
             .await
         {
-            Ok(hits) if !hits.is_empty() => ProbeResult::pass(
+            Ok(hits) if hits.is_empty() => ProbeResult::fail("rerank", "empty rerank results"),
+            Ok(hits) if hits[0].1.abs() < MIN_RERANK_SCORE => ProbeResult::fail(
+                "rerank",
+                format!(
+                    "near-zero top score {:.3e} — broken GGUF or wrong model preset",
+                    hits[0].1
+                ),
+            ),
+            Ok(hits) => ProbeResult::pass(
                 "rerank",
                 format!("{} @ {} (top {:.3})", cfg.model, cfg.url, hits[0].1),
             ),
-            Ok(_) => ProbeResult::fail("rerank", "empty rerank results"),
             Err(e) => ProbeResult::fail("rerank", e.to_string()),
         },
         Err(e) => ProbeResult::fail("rerank", e.to_string()),

@@ -1,0 +1,103 @@
+[2m2026-06-03T07:15:58.068217Z[0m [32m INFO[0m Loaded gzmo.toml [3mpath[0m[2m=[0m/home/maximilian-wruhs/Projects/_foundation-audit/survey_GZMO/gzmo.toml [3mmcp_servers[0m[2m=[0m1 [3mmode[0m[2m=[0mlocal [3mengine_url[0m[2m=[0mhttp://localhost:8000/v1 [3mmodel[0m[2m=[0mqwen3.6-35b-mtp
+[2m2026-06-03T07:15:58.068349Z[0m [32m INFO[0m Tabula Rasa boot complete — identity loaded [3mpersona[0m[2m=[0mGZMO [3mdirectives[0m[2m=[0m0
+[2m2026-06-03T07:15:58.068430Z[0m [32m INFO[0m ╔══════════════════════════════════════════════╗
+[2m2026-06-03T07:15:58.068433Z[0m [32m INFO[0m ║          GZMO — Manual Spark Cycle           ║
+[2m2026-06-03T07:15:58.068435Z[0m [32m INFO[0m ╚══════════════════════════════════════════════╝
+[2m2026-06-03T07:15:58.068436Z[0m [32m INFO[0m Spark settings [3menabled[0m[2m=[0mtrue [3mverify[0m[2m=[0mtrue [3mmin_confidence[0m[2m=[0m0.85
+[2m2026-06-03T07:15:58.068859Z[0m [32m INFO[0m Semantic vault initialized (WAL mode + r2d2 pool)
+[2m2026-06-03T07:15:58.151154Z[0m [32m INFO[0m Embedding server ready [3mdims[0m[2m=[0m1024 [3murl[0m[2m=[0mhttp://192.168.31.110:8081/v1
+[2m2026-06-03T07:15:58.211137Z[0m [32m INFO[0m Rerank server ready [3murl[0m[2m=[0mhttp://192.168.31.110:8082/v1
+[2m2026-06-03T07:15:58.211150Z[0m [32m INFO[0m Registered tool [3mtool[0m[2m=[0mfile_read
+[2m2026-06-03T07:15:58.211156Z[0m [32m INFO[0m Registered tool [3mtool[0m[2m=[0mfile_write
+[2m2026-06-03T07:15:58.211158Z[0m [32m INFO[0m Registered tool [3mtool[0m[2m=[0mdir_list
+[2m2026-06-03T07:15:58.211160Z[0m [32m INFO[0m Registered tool [3mtool[0m[2m=[0mfile_search
+[2m2026-06-03T07:15:58.211167Z[0m [32m INFO[0m Registered tool [3mtool[0m[2m=[0mshell_exec
+[2m2026-06-03T07:15:58.211197Z[0m [32m INFO[0m Registered tool [3mtool[0m[2m=[0mweb_search
+[2m2026-06-03T07:15:58.211200Z[0m [32m INFO[0m Registered tool [3mtool[0m[2m=[0msys_metrics
+[2m2026-06-03T07:15:58.211202Z[0m [32m INFO[0m Registered tool [3mtool[0m[2m=[0msys_kill
+[2m2026-06-03T07:15:58.211205Z[0m [32m INFO[0m Registered tool [3mtool[0m[2m=[0mmemory_record
+[2m2026-06-03T07:15:58.211208Z[0m [32m INFO[0m Registered tool [3mtool[0m[2m=[0mmemory_search
+[2m2026-06-03T07:15:58.211214Z[0m [32m INFO[0m Connecting to MCP server [3mserver[0m[2m=[0mmemory [3mcmd[0m[2m=[0m/home/maximilian-wruhs/.local/bin/uvx [3margs[0m[2m=[0m["mcp-neo4j-memory@0.4.5"]
+/home/maximilian-wruhs/.cache/uv/archive-v0/tilD3SFWExvN3InC/lib/python3.12/site-packages/fastmcp/server/auth/providers/jwt.py:10: AuthlibDeprecationWarning: authlib.jose module is deprecated, please use joserfc instead.
+It will be compatible before version 2.0.0.
+  from authlib.jose import JsonWebKey, JsonWebToken
+Warning: No transport type provided. Using default: stdio
+/home/maximilian-wruhs/.cache/uv/archive-v0/tilD3SFWExvN3InC/lib/python3.12/site-packages/fastmcp/server/server.py:285: DeprecationWarning: Providing `stateless_http` when creating a server is deprecated. Provide it when calling `run` or as a global setting instead.
+  self._handle_deprecated_settings(
+
+
+╭──────────────────────────────────────────────────────────────────────────────╮
+│                                                                              │
+│                                                                              │
+│                         ▄▀▀ ▄▀█ █▀▀ ▀█▀ █▀▄▀█ █▀▀ █▀█                        │
+│                         █▀  █▀█ ▄▄█  █  █ ▀ █ █▄▄ █▀▀                        │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                FastMCP 2.14.7                                │
+│                            https://gofastmcp.com                             │
+│                                                                              │
+│                    🖥  Server:      mcp-neo4j-memory                          │
+│                    🚀 Deploy free: https://fastmcp.cloud                     │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭──────────────────────────────────────────────────────────────────────────────╮
+│                          ✨ FastMCP 3.0 is coming!                           │
+│       Pin `fastmcp < 3` in production, then upgrade when you're ready.       │
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭──────────────────────────────────────────────────────────────────────────────╮
+│                          🎉 Update available: 3.4.0                          │
+│                      Run: pip install --upgrade fastmcp                      │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+
+[06/03/26 09:15:58] INFO     Starting MCP server                  server.py:2506
+                             'mcp-neo4j-memory' with transport                  
+                             'stdio'                                            
+[2m2026-06-03T07:15:58.939584Z[0m [32m INFO[0m [1mserve_inner[0m[2m:[0m Service initialized as client [3mpeer_info[0m[2m=[0mSome(InitializeResult { protocol_version: ProtocolVersion("2025-03-26"), capabilities: ServerCapabilities { experimental: Some({}), extensions: None, logging: None, completions: None, prompts: Some(PromptsCapability { list_changed: Some(false) }), resources: Some(ResourcesCapability { subscribe: Some(false), list_changed: Some(false) }), tools: Some(ToolsCapability { list_changed: Some(true) }), tasks: Some(TasksCapability { requests: Some(TaskRequestsCapability { sampling: None, elicitation: None, tools: Some(ToolsTaskCapability { call: Some({}) }) }), list: Some({}), cancel: Some({}) }) }, server_info: Implementation { name: "mcp-neo4j-memory", title: None, version: "2.14.7", description: None, icons: None, website_url: None }, instructions: None })
+[2m2026-06-03T07:15:58.939615Z[0m [32m INFO[0m MCP handshake complete [3mserver[0m[2m=[0mmemory [3mpeer_name[0m[2m=[0mmcp-neo4j-memory [3mpeer_version[0m[2m=[0m2.14.7
+[2m2026-06-03T07:15:58.940675Z[0m [32m INFO[0m Discovered MCP tools [3mserver[0m[2m=[0mmemory [3mtool_count[0m[2m=[0m9
+[2m2026-06-03T07:15:58.940679Z[0m [32m INFO[0m   → discovered [3mtool[0m[2m=[0mmcp__memory__read_graph [3mmcp_name[0m[2m=[0mread_graph
+[2m2026-06-03T07:15:58.940687Z[0m [32m INFO[0m   → discovered [3mtool[0m[2m=[0mmcp__memory__create_entities [3mmcp_name[0m[2m=[0mcreate_entities
+[2m2026-06-03T07:15:58.940693Z[0m [32m INFO[0m   → discovered [3mtool[0m[2m=[0mmcp__memory__create_relations [3mmcp_name[0m[2m=[0mcreate_relations
+[2m2026-06-03T07:15:58.940697Z[0m [32m INFO[0m   → discovered [3mtool[0m[2m=[0mmcp__memory__add_observations [3mmcp_name[0m[2m=[0madd_observations
+[2m2026-06-03T07:15:58.940699Z[0m [32m INFO[0m   → discovered [3mtool[0m[2m=[0mmcp__memory__delete_entities [3mmcp_name[0m[2m=[0mdelete_entities
+[2m2026-06-03T07:15:58.940702Z[0m [32m INFO[0m   → discovered [3mtool[0m[2m=[0mmcp__memory__delete_observations [3mmcp_name[0m[2m=[0mdelete_observations
+[2m2026-06-03T07:15:58.940707Z[0m [32m INFO[0m   → discovered [3mtool[0m[2m=[0mmcp__memory__delete_relations [3mmcp_name[0m[2m=[0mdelete_relations
+[2m2026-06-03T07:15:58.940709Z[0m [32m INFO[0m   → discovered [3mtool[0m[2m=[0mmcp__memory__search_memories [3mmcp_name[0m[2m=[0msearch_memories
+[2m2026-06-03T07:15:58.940711Z[0m [32m INFO[0m   → discovered [3mtool[0m[2m=[0mmcp__memory__find_memories_by_name [3mmcp_name[0m[2m=[0mfind_memories_by_name
+[2m2026-06-03T07:15:58.940713Z[0m [32m INFO[0m MCP connected [3mserver[0m[2m=[0mmemory [3mtools[0m[2m=[0m9
+[2m2026-06-03T07:15:58.940715Z[0m [32m INFO[0m Registering MCP tool [3mtool[0m[2m=[0mmcp__memory__read_graph [3mserver[0m[2m=[0mmemory
+[2m2026-06-03T07:15:58.940719Z[0m [32m INFO[0m Registered tool [3mtool[0m[2m=[0mmcp__memory__read_graph
+[2m2026-06-03T07:15:58.940721Z[0m [32m INFO[0m Registering MCP tool [3mtool[0m[2m=[0mmcp__memory__create_entities [3mserver[0m[2m=[0mmemory
+[2m2026-06-03T07:15:58.940725Z[0m [32m INFO[0m Registered tool [3mtool[0m[2m=[0mmcp__memory__create_entities
+[2m2026-06-03T07:15:58.940728Z[0m [32m INFO[0m Registering MCP tool [3mtool[0m[2m=[0mmcp__memory__create_relations [3mserver[0m[2m=[0mmemory
+[2m2026-06-03T07:15:58.940730Z[0m [32m INFO[0m Registered tool [3mtool[0m[2m=[0mmcp__memory__create_relations
+[2m2026-06-03T07:15:58.940731Z[0m [32m INFO[0m Registering MCP tool [3mtool[0m[2m=[0mmcp__memory__add_observations [3mserver[0m[2m=[0mmemory
+[2m2026-06-03T07:15:58.940732Z[0m [32m INFO[0m Registered tool [3mtool[0m[2m=[0mmcp__memory__add_observations
+[2m2026-06-03T07:15:58.940733Z[0m [32m INFO[0m Registering MCP tool [3mtool[0m[2m=[0mmcp__memory__delete_entities [3mserver[0m[2m=[0mmemory
+[2m2026-06-03T07:15:58.940734Z[0m [32m INFO[0m Registered tool [3mtool[0m[2m=[0mmcp__memory__delete_entities
+[2m2026-06-03T07:15:58.940737Z[0m [32m INFO[0m Registering MCP tool [3mtool[0m[2m=[0mmcp__memory__delete_observations [3mserver[0m[2m=[0mmemory
+[2m2026-06-03T07:15:58.940738Z[0m [32m INFO[0m Registered tool [3mtool[0m[2m=[0mmcp__memory__delete_observations
+[2m2026-06-03T07:15:58.940739Z[0m [32m INFO[0m Registering MCP tool [3mtool[0m[2m=[0mmcp__memory__delete_relations [3mserver[0m[2m=[0mmemory
+[2m2026-06-03T07:15:58.940741Z[0m [32m INFO[0m Registered tool [3mtool[0m[2m=[0mmcp__memory__delete_relations
+[2m2026-06-03T07:15:58.940742Z[0m [32m INFO[0m Registering MCP tool [3mtool[0m[2m=[0mmcp__memory__search_memories [3mserver[0m[2m=[0mmemory
+[2m2026-06-03T07:15:58.940743Z[0m [32m INFO[0m Registered tool [3mtool[0m[2m=[0mmcp__memory__search_memories
+[2m2026-06-03T07:15:58.940743Z[0m [32m INFO[0m Registering MCP tool [3mtool[0m[2m=[0mmcp__memory__find_memories_by_name [3mserver[0m[2m=[0mmemory
+[2m2026-06-03T07:15:58.940744Z[0m [32m INFO[0m Registered tool [3mtool[0m[2m=[0mmcp__memory__find_memories_by_name
+[2m2026-06-03T07:15:58.940745Z[0m [32m INFO[0m Registered all tools [3mserver[0m[2m=[0mmemory [3mtools[0m[2m=[0m9
+[2m2026-06-03T07:15:58.940747Z[0m [32m INFO[0m SynapseBus initialized (CLI spark) [3mpath[0m[2m=[0mdata/Synapse/events.jsonl
+[2m2026-06-03T07:15:58.940750Z[0m [32m INFO[0m Starting spark cycle [3mdate[0m[2m=[0m2026-06-03
+[2m2026-06-03T07:15:58.942568Z[0m [32m INFO[0m Spark selection found no anchor/recent pair — skipped
+[2m2026-06-03T07:15:58.942730Z[0m [32m INFO[0m Spark complete [3mpromoted[0m[2m=[0mfalse [3mkg_relations[0m[2m=[0m0
+
+## Spark — 2026-06-03
+
+Skipped: No curated anchor/recent pair passed smart selection (check vault ingest and [spark] gates).
+
+Appended to /home/maximilian-wruhs/Projects/_foundation-audit/survey_GZMO/DREAMS.md
+[2m2026-06-03T07:15:58.942737Z[0m [32m INFO[0m Shutting down MCP connections [3mservers[0m[2m=[0m1
+[2m2026-06-03T07:15:58.942738Z[0m [32m INFO[0m Shutting down [3mserver[0m[2m=[0mmemory
+[2m2026-06-03T07:15:58.942757Z[0m [32m INFO[0m [1mserve_inner[0m[2m:[0m task cancelled
+[2m2026-06-03T07:15:59.047580Z[0m [32m INFO[0m [1mserve_inner[0m[2m:[0m Child exited gracefully exit status: 0
+[2m2026-06-03T07:15:59.047589Z[0m [32m INFO[0m [1mserve_inner[0m[2m:[0m serve finished [3mquit_reason[0m[2m=[0mCancelled

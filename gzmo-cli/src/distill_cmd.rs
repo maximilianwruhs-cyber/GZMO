@@ -44,8 +44,7 @@ pub async fn run(config: &GzmoConfig, _identity: &IdentityEngine, session_id: Op
     let summary_gateway: Option<Arc<dyn LlmGateway>> = config
         .session_distill
         .librarian_summary
-        .then(|| Arc::clone(router.gateway(TaskKind::DistillSummary)))
-        .filter(|_| config.librarian.enabled);
+        .then(|| Arc::clone(router.gateway(TaskKind::DistillSummary)));
 
     let vault = Arc::new(
         embeddings::open_vault_with_embeddings(

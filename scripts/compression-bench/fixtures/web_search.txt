@@ -1,0 +1,10 @@
+Search Results for "context compression LLM":
+1. LLMLingua: Compressing Prompts for Efficient Inference
+   Url: https://arxiv.org/abs/2310.05736
+   Abstract: This paper presents LLMLingua to compress prompt contexts up to 20x.
+2. LongLLMLingua: Accelerating Long-Context LLMs
+   Url: https://arxiv.org/abs/2310.06839
+   Abstract: Enhancing RAG density and latency by pruning non-essential context.
+3. Headroom: Context Compression Layer for AI Agents
+   Url: https://github.com/chopratejas/headroom
+   Abstract: Local-first, reversible context compression with 6 algorithms.

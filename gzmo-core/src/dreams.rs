@@ -309,40 +309,7 @@ impl DreamEngine {
     }
 
     fn light_phase(&self, text: &str) -> String {
-        let mut output = String::with_capacity(text.len() / 10);
-
-        for line in text.lines() {
-            let trimmed = line.trim();
-
-            if trimmed.is_empty() || trimmed == "---" {
-                continue;
-            }
-
-            if trimmed.len() > 200
-                && trimmed
-                    .chars()
-                    .all(|c| c.is_alphanumeric() || c == '+' || c == '/' || c == '=')
-            {
-                output.push_str("[BASE64_DATA_STRIPPED]\n");
-                continue;
-            }
-
-            if trimmed.starts_with('<') && trimmed.ends_with('>') && trimmed.len() > 100 {
-                output.push_str("[HTML_STRIPPED]\n");
-                continue;
-            }
-
-            if trimmed.len() > 500 {
-                output.push_str(&trimmed[..500]);
-                output.push_str("... [TRUNCATED]\n");
-                continue;
-            }
-
-            output.push_str(trimmed);
-            output.push('\n');
-        }
-
-        output
+        crate::context_compress::logs::compress_logs(text, 500)
     }
 
     fn to_vault_truths(
