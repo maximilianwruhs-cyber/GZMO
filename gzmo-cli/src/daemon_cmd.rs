@@ -472,48 +472,105 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
         }
     });
 
-    // Synapse pull — read-only Pi event tail → episodic (feeds Dream)
+    // Synapse pull — Pi event tail → episodic + session_end → distill pi
     let synapse_cfg = config.synapse_pull.clone();
     let synapse_episodic = FileEpisodicStore::new(&config.memory.directory);
     let synapse_root = qdrant_sync::discover_project_root();
     let synapse_handle = tokio::spawn(async move {
         let mut interval = tokio::time::interval(Duration::from_secs(60));
-        let mut last_pull_date: Option<NaiveDate> = None;
         let bus_path = synapse_root.join(&synapse_cfg.bus_path);
         let state_path = gzmo_core::synapse_reader::default_state_path(&synapse_root);
+        let distill_state_path =
+            gzmo_core::synapse_reader::default_distill_state_path(&synapse_root);
+        let gzmo_bin = std::env::current_exe().ok();
         loop {
             interval.tick().await;
             if !synapse_cfg.enabled {
                 continue;
             }
-            let now = Utc::now();
-            if !cron_due_today(
-                &now,
-                synapse_cfg.cron_hour,
-                synapse_cfg.cron_minute,
-                last_pull_date,
-            ) {
-                continue;
-            }
-            let today = now.date_naive();
-            info!("Synapse pull starting (read-only)");
-            match gzmo_core::synapse_reader::pull_and_log_episodic(
+            match gzmo_core::synapse_reader::poll_pi_synapse(
                 &bus_path,
                 &state_path,
                 &synapse_episodic,
                 synapse_cfg.max_events,
+                true,
             )
             .await
             {
-                Ok(summary) => {
-                    last_pull_date = Some(today);
-                    info!(
-                        events = summary.events_read,
-                        quest = summary.quest_complete,
-                        "Synapse pull complete"
-                    );
+                Ok(result) => {
+                    if result.summary.events_read > 0 {
+                        info!(
+                            events = result.summary.events_read,
+                            quest = result.summary.quest_complete,
+                            session_end = result.summary.session_end,
+                            "Synapse poll complete"
+                        );
+                    }
+                    if !synapse_cfg.distill_on_session_end {
+                        continue;
+                    }
+                    let Some(bin) = gzmo_bin.as_ref() else {
+                        continue;
+                    };
+                    for session_file in &result.session_end_files {
+                        let path = std::path::Path::new(session_file);
+                        match gzmo_core::synapse_reader::should_distill_pi_session(
+                            path,
+                            &distill_state_path,
+                        ) {
+                            Ok(true) => {
+                                info!(
+                                    path = %session_file,
+                                    "Spawning Pi session distill (session_end)"
+                                );
+                                let bin = bin.clone();
+                                let session_file = session_file.clone();
+                                let distill_state_path = distill_state_path.clone();
+                                let synapse_root = synapse_root.clone();
+                                tokio::spawn(async move {
+                                    match tokio::process::Command::new(&bin)
+                                        .args(["distill", "pi", &session_file])
+                                        .current_dir(&synapse_root)
+                                        .output()
+                                        .await
+                                    {
+                                        Ok(out) if out.status.success() => {
+                                            if let Err(e) =
+                                                gzmo_core::synapse_reader::mark_pi_session_distilled(
+                                                    &session_file,
+                                                    &distill_state_path,
+                                                )
+                                            {
+                                                error!("Pi distill state update failed: {e}");
+                                            } else {
+                                                info!(
+                                                    path = %session_file,
+                                                    "Pi session distill complete"
+                                                );
+                                            }
+                                        }
+                                        Ok(out) => error!(
+                                            path = %session_file,
+                                            code = ?out.status.code(),
+                                            stderr = %String::from_utf8_lossy(&out.stderr).trim(),
+                                            "Pi session distill failed"
+                                        ),
+                                        Err(e) => error!(
+                                            path = %session_file,
+                                            "Pi session distill spawn failed: {e}"
+                                        ),
+                                    }
+                                });
+                            }
+                            Ok(false) => {}
+                            Err(e) => error!(
+                                path = %session_file,
+                                "Pi distill eligibility check failed: {e}"
+                            ),
+                        }
+                    }
                 }
-                Err(e) => error!("Synapse pull failed: {e}"),
+                Err(e) => error!("Synapse poll failed: {e}"),
             }
         }
     });
@@ -623,11 +680,20 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
     });
 
     let _identity = identity;
+    let mentor_chaos_tx = chaos_pulse.feedback_tx.clone();
+    let mentor_chaos_snap = chaos_pulse.snapshot_rx.clone();
     // Pin PulseLoop task — must not drop until daemon exits.
     let _chaos_pulse_keepalive = chaos_pulse;
 
     let mentor_handle = if config.pedagogy.enabled && config.pedagogy.mentor_api_enabled {
-        let mentor_state = Arc::new(MentorServerState::boot(config).await?);
+        let mentor_state = Arc::new(
+            MentorServerState::boot_with_chaos(
+                config,
+                Some(mentor_chaos_tx),
+                Some(mentor_chaos_snap),
+            )
+            .await?,
+        );
         let mentor_socket = mentor_ipc::socket_path(config);
         info!(path = %mentor_socket.display(), "Starting mentor API");
         Some(tokio::spawn(async move {

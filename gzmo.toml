@@ -465,3 +465,5 @@ cron_hour = 2
 cron_minute = 45
 max_events = 50
 bus_path = "data/Synapse/events.jsonl"
+# Poll every 60s (daemon); on Pi session_end spawn `gzmo distill pi <jsonl>`
+distill_on_session_end = true

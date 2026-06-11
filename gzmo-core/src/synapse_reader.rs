@@ -14,12 +14,24 @@ use crate::synapse::{EventSource, EventType, SynapseEvent};
 use crate::types::{EpisodicEntry, EpisodicSource};
 
 const STATE_FILE: &str = "data/synapse-reader.state.json";
+const DISTILL_STATE_FILE: &str = "data/synapse-pi-distill.state.json";
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct SynapseReaderState {
     pub byte_offset: u64,
     pub last_pull_at: Option<DateTime<Utc>>,
     pub events_processed: u64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct PiDistillState {
+    pub distilled_paths: Vec<String>,
+}
+
+#[derive(Debug, Clone)]
+pub struct PiSynapsePollResult {
+    pub summary: PiEventSummary,
+    pub session_end_files: Vec<String>,
 }
 
 #[derive(Debug, Clone)]
@@ -144,6 +156,68 @@ pub fn summarize_pi_events(events: &[SynapseEvent]) -> PiEventSummary {
     }
 }
 
+/// Paths from Pi `session_end` events (`targetSessionFile` in event data).
+pub fn session_end_distill_targets(events: &[SynapseEvent]) -> Vec<String> {
+    let mut out = Vec::new();
+    for e in events {
+        if e.event_type != EventType::SessionEnd {
+            continue;
+        }
+        let Some(data) = &e.data else {
+            continue;
+        };
+        let Some(path) = data.get("targetSessionFile").and_then(|v| v.as_str()) else {
+            continue;
+        };
+        if path.is_empty() {
+            continue;
+        }
+        if !out.iter().any(|p| p == path) {
+            out.push(path.to_string());
+        }
+    }
+    out
+}
+
+/// Tail Pi synapse bus: optional episodic batch + session-end distill targets.
+pub async fn poll_pi_synapse(
+    bus_path: &Path,
+    state_path: &Path,
+    episodic: &FileEpisodicStore,
+    max_events: usize,
+    log_episodic_on_events: bool,
+) -> Result<PiSynapsePollResult> {
+    let (events, state) = read_new_pi_events(bus_path, state_path, max_events)?;
+    let summary = summarize_pi_events(&events);
+    let session_end_files = session_end_distill_targets(&events);
+
+    if log_episodic_on_events && summary.events_read > 0 {
+        let entry = EpisodicEntry {
+            timestamp: Utc::now(),
+            source: EpisodicSource::InternalMonologue,
+            content: format!(
+                "### Pi Synapse Pull ({} events, offset {})\n\n{}",
+                summary.events_read, state.byte_offset, summary.summary_text
+            ),
+            is_silent: false,
+        };
+        episodic.append(&entry).await?;
+        info!(
+            events = summary.events_read,
+            quest = summary.quest_complete,
+            session_end = summary.session_end,
+            "Synapse pull logged to episodic"
+        );
+    } else if summary.events_read == 0 {
+        info!("Synapse pull: no new Pi events");
+    }
+
+    Ok(PiSynapsePollResult {
+        summary,
+        session_end_files,
+    })
+}
+
 /// Append Pi activity summary to episodic (feeds DreamEngine on next cycle).
 pub async fn pull_and_log_episodic(
     bus_path: &Path,
@@ -151,29 +225,31 @@ pub async fn pull_and_log_episodic(
     episodic: &FileEpisodicStore,
     max_events: usize,
 ) -> Result<PiEventSummary> {
-    let (events, state) = read_new_pi_events(bus_path, state_path, max_events)?;
-    let summary = summarize_pi_events(&events);
-    if summary.events_read == 0 {
-        info!("Synapse pull: no new Pi events");
-        return Ok(summary);
-    }
+    let result = poll_pi_synapse(bus_path, state_path, episodic, max_events, true).await?;
+    Ok(result.summary)
+}
 
-    let entry = EpisodicEntry {
-        timestamp: Utc::now(),
-        source: EpisodicSource::InternalMonologue,
-        content: format!(
-            "### Pi Synapse Pull ({} events, offset {})\n\n{}",
-            summary.events_read, state.byte_offset, summary.summary_text
-        ),
-        is_silent: false,
-    };
-    episodic.append(&entry).await?;
-    info!(
-        events = summary.events_read,
-        quest = summary.quest_complete,
-        "Synapse pull logged to episodic"
-    );
-    Ok(summary)
+pub fn should_distill_pi_session(session_path: &Path, state_path: &Path) -> Result<bool> {
+    if !session_path.exists() {
+        return Ok(false);
+    }
+    let key = session_path.to_string_lossy().to_string();
+    let state = load_distill_state(state_path)?;
+    Ok(!state.distilled_paths.contains(&key))
+}
+
+pub fn mark_pi_session_distilled(session_path: &str, state_path: &Path) -> Result<()> {
+    let mut state = load_distill_state(state_path)?;
+    if state.distilled_paths.iter().any(|p| p == session_path) {
+        return Ok(());
+    }
+    state.distilled_paths.push(session_path.to_string());
+    const MAX_TRACKED: usize = 500;
+    if state.distilled_paths.len() > MAX_TRACKED {
+        let drop = state.distilled_paths.len() - MAX_TRACKED;
+        state.distilled_paths.drain(0..drop);
+    }
+    save_distill_state(state_path, &state)
 }
 
 fn load_state(path: &Path) -> Result<SynapseReaderState> {
@@ -194,4 +270,81 @@ fn save_state(path: &Path, state: &SynapseReaderState) -> Result<()> {
 
 pub fn default_state_path(project_root: &Path) -> PathBuf {
     project_root.join(STATE_FILE)
+}
+
+pub fn default_distill_state_path(project_root: &Path) -> PathBuf {
+    project_root.join(DISTILL_STATE_FILE)
+}
+
+fn load_distill_state(path: &Path) -> Result<PiDistillState> {
+    if !path.exists() {
+        return Ok(PiDistillState::default());
+    }
+    let raw = fs::read_to_string(path)?;
+    Ok(serde_json::from_str(&raw).unwrap_or_default())
+}
+
+fn save_distill_state(path: &Path, state: &PiDistillState) -> Result<()> {
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent)?;
+    }
+    fs::write(path, serde_json::to_string_pretty(state)?)?;
+    Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::synapse::{EventSource, SynapseEvent};
+    use uuid::Uuid;
+
+    #[tokio::test]
+    async fn poll_pi_synapse_reads_session_end_from_bus() {
+        let dir = std::env::temp_dir().join(format!(
+            "gzmo_synapse_test_{}",
+            uuid::Uuid::new_v4()
+        ));
+        std::fs::create_dir_all(&dir).unwrap();
+        let bus = dir.join("events.jsonl");
+        let state = dir.join("reader.state.json");
+        let mem = dir.join("memory");
+        let fixture = dir.join("pi_fixture.jsonl");
+        std::fs::write(&fixture, "fixture\n").unwrap();
+        std::fs::write(
+            &bus,
+            format!(
+                r#"{{"id":"{}","event_type":"session_end","source":"pi_agent","timestamp":"2026-06-11T15:00:00Z","data":{{"reason":"shutdown","targetSessionFile":"{}"}}}}
+"#,
+                uuid::Uuid::new_v4(),
+                fixture.display()
+            ),
+        )
+        .unwrap();
+
+        let episodic = FileEpisodicStore::new(&mem);
+        let result = poll_pi_synapse(&bus, &state, &episodic, 50, false)
+            .await
+            .unwrap();
+        assert_eq!(result.summary.session_end, 1);
+        assert_eq!(result.session_end_files, vec![fixture.to_string_lossy().to_string()]);
+        let _ = std::fs::remove_dir_all(dir);
+    }
+
+    #[test]
+    fn session_end_targets_from_events() {
+        let events = vec![SynapseEvent {
+            id: Uuid::new_v4(),
+            event_type: EventType::SessionEnd,
+            source: EventSource::PiAgent,
+            timestamp: Utc::now(),
+            data: Some(serde_json::json!({
+                "reason": "shutdown",
+                "targetSessionFile": "/tmp/foo.jsonl"
+            })),
+        }];
+        assert_eq!(
+            session_end_distill_targets(&events),
+            vec!["/tmp/foo.jsonl".to_string()]
+        );
+    }
 }

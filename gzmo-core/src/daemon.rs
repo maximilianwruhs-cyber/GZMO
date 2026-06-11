@@ -4,12 +4,46 @@
 //! protocol to preserve GPU resources by running deterministic checks before
 //! invoking the expensive LLM inference pipeline.
 
+use std::path::{Path, PathBuf};
 use std::time::Duration;
 
 use anyhow::Result;
 use async_trait::async_trait;
 use chrono::{DateTime, NaiveDate, Timelike, Utc};
 use tracing::{debug, info, warn};
+
+/// Canonical singleton PID lockfile for `gzmo daemon`.
+pub const DAEMON_PID_FILE: &str = "/tmp/gzmo_daemon.pid";
+
+/// Legacy lockfile path (pre-2026-06 unification).
+pub const DAEMON_PID_FILE_LEGACY: &str = "/tmp/gzmo_rust.pid";
+
+pub fn daemon_pid_path() -> PathBuf {
+    PathBuf::from(DAEMON_PID_FILE)
+}
+
+/// True when a live `gzmo daemon` process holds the PID lockfile.
+pub fn daemon_running() -> bool {
+    for path in [DAEMON_PID_FILE, DAEMON_PID_FILE_LEGACY] {
+        if pid_file_alive(Path::new(path)) {
+            return true;
+        }
+    }
+    false
+}
+
+fn pid_file_alive(path: &Path) -> bool {
+    if !path.exists() {
+        return false;
+    }
+    let Ok(pid_str) = std::fs::read_to_string(path) else {
+        return false;
+    };
+    let Ok(pid) = pid_str.trim().parse::<u32>() else {
+        return false;
+    };
+    Path::new(&format!("/proc/{pid}")).exists()
+}
 
 // ---------------------------------------------------------------------------
 // Daily cron scheduling (catch-up after daemon restart)

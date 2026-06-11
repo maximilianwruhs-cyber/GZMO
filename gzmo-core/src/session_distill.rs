@@ -10,6 +10,7 @@ use tracing::{info, warn};
 use uuid::Uuid;
 
 use crate::config::SessionDistillConfig;
+use crate::pi_session;
 use crate::gateway::{LlmGateway, LlmResponse};
 use crate::memory::episodic::FileEpisodicStore;
 use crate::memory::kg_extract::{chunk_text_for_llm, merge_pipeline_chunks, KgPromoter};
@@ -103,6 +104,14 @@ impl SessionDistillEngine {
             reports.push(self.distill_one(&id).await?);
         }
         Ok(reports)
+    }
+
+    /// Distill a Pi agent JSONL session file (`~/.pi/agent/sessions/.../*.jsonl`).
+    pub async fn distill_pi_jsonl(&self, path: &Path) -> Result<SessionDistillReport> {
+        let (session_id, transcript) =
+            pi_session::parse_pi_jsonl_transcript(path, self.config.max_transcript_chars)?;
+        self.distill_transcript(&session_id, &transcript, DistillSource::MainArchive)
+            .await
     }
 
     /// Distill a single session by id.

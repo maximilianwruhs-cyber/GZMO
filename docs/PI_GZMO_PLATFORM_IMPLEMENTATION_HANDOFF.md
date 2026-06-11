@@ -4,9 +4,10 @@
 **Repo:** `~/Projects/_foundation-audit/survey_GZMO`  
 **Pi agent:** `~/.pi/agent/`  
 **Bridge summary:** `~/gzmo_skills/BRIDGE.md`  
-**Prior mentor-only handoff:** `docs/PI_GZMO_MENTOR_DIALOG_HANDOFF.md` (superseded by this doc for ops)
+**Prior mentor-only handoff:** `docs/PI_GZMO_MENTOR_DIALOG_HANDOFF.md` (superseded by this doc for ops)  
+**Remaining tasks (step-by-step):** [`PI_GZMO_REMAINING_TASKS_IMPLEMENTATION_GUIDE.md`](./PI_GZMO_REMAINING_TASKS_IMPLEMENTATION_GUIDE.md)
 
-This document is the **single authoritative handoff** for the next implementer. It covers:
+This document is the **single authoritative handoff** for what is shipped. Use the **remaining tasks guide** for what to do next. It covers:
 
 1. Pi ↔ GZMO **mentor dialog** (Socratic teaching over Unix socket)
 2. **Synapse telemetry** (Pi → bus → daemon → episodic)

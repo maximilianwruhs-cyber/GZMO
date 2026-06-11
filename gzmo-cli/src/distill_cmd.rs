@@ -1,5 +1,6 @@
 //! Distill persisted chat sessions into SessionDistill vault + rich episodic.
 
+use std::path::Path;
 use std::sync::Arc;
 
 use anyhow::Result;
@@ -24,20 +25,14 @@ use gzmo_core::tools::ToolRegistry;
 
 use crate::cli_mcp::McpSession;
 
-pub async fn run(config: &GzmoConfig, _identity: &IdentityEngine, session_id: Option<String>) -> Result<()> {
-    info!("╔══════════════════════════════════════════════╗");
-    info!("║       GZMO — Session Distill (→ dream)       ║");
-    info!("╚══════════════════════════════════════════════╝");
-
-    // Set event source for this thread (CLI)
-    set_event_source(gzmo_core::synapse::EventSource::GzmoCli);
-
+async fn build_distill_engine(
+    config: &GzmoConfig,
+) -> Result<(SessionDistillEngine, McpSession)> {
     tokio::fs::create_dir_all(&config.memory.directory).await?;
     if let Some(parent) = config.memory.vault_db.parent() {
         tokio::fs::create_dir_all(parent).await?;
     }
 
-    // Use Obolus GatewayRouter for distill routing
     let router = GatewayRouter::new(config);
     let verify_gateway: Arc<dyn LlmGateway> = Arc::clone(router.gateway(TaskKind::DistillVerify));
     let extract_gateway: Arc<dyn LlmGateway> = Arc::clone(router.gateway(TaskKind::DistillExtract));
@@ -58,10 +53,10 @@ pub async fn run(config: &GzmoConfig, _identity: &IdentityEngine, session_id: Op
     );
 
     let mut tools = ToolRegistry::new();
-    tools.register(Box::new(FileReadTool));
+    tools.register(Box::new(FileReadTool::default()));
     tools.register(Box::new(FileWriteTool));
     tools.register(Box::new(DirListTool));
-    tools.register(Box::new(FileSearchTool));
+    tools.register(Box::new(FileSearchTool::default()));
     tools.register(Box::new(ShellExecTool::default()));
     tools.register(Box::new(WebSearchTool::default()));
     tools.register(Box::new(SysMetricsTool));
@@ -87,6 +82,18 @@ pub async fn run(config: &GzmoConfig, _identity: &IdentityEngine, session_id: Op
         Some(Arc::clone(&synapse)),
     );
 
+    Ok((engine, session))
+}
+
+pub async fn run(config: &GzmoConfig, _identity: &IdentityEngine, session_id: Option<String>) -> Result<()> {
+    info!("╔══════════════════════════════════════════════╗");
+    info!("║       GZMO — Session Distill (→ dream)       ║");
+    info!("╚══════════════════════════════════════════════╝");
+
+    set_event_source(gzmo_core::synapse::EventSource::GzmoCli);
+
+    let (engine, session) = build_distill_engine(config).await?;
+
     if let Some(id) = session_id {
         let report = engine.distill_one(&id).await?;
         println!("{}", report.summary);
@@ -99,6 +106,26 @@ pub async fn run(config: &GzmoConfig, _identity: &IdentityEngine, session_id: Op
         println!("Total vault truths from sessions: {promoted}");
     }
 
+    session.close().await;
+    Ok(())
+}
+
+/// Distill a Pi agent session JSONL (`gzmo distill pi <path>`).
+pub async fn run_pi(
+    config: &GzmoConfig,
+    _identity: &IdentityEngine,
+    pi_session_path: &Path,
+) -> Result<()> {
+    info!(
+        path = %pi_session_path.display(),
+        "GZMO — Pi session distill (session_end → vault)"
+    );
+
+    set_event_source(gzmo_core::synapse::EventSource::GzmoCli);
+
+    let (engine, session) = build_distill_engine(config).await?;
+    let report = engine.distill_pi_jsonl(pi_session_path).await?;
+    println!("{}", report.summary);
     session.close().await;
     Ok(())
 }

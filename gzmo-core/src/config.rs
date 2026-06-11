@@ -27,7 +27,7 @@
 //!
 //! [engine.local]
 //! provider = "local"
-//! url = "http://localhost:1234/v1"
+//! url = "http://localhost:8000/v1"
 //! model = "qwen2.5-7b-instruct.Q3_K_M.gguf"
 //! temperature = 0.3
 //! top_p = 0.95
@@ -60,7 +60,7 @@ use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 // ─── Task Kind (Obolus routing classification) ──────────────────────────
 
@@ -91,6 +91,8 @@ pub enum TaskKind {
     DistillVerify,
     /// Distill: short narrative summary for episodic.
     DistillSummary,
+    /// Agentic Teacher internal agents (Diagnoser, Planner, Affective, learn prep).
+    PedagogyInternal,
 }
 
 impl std::fmt::Display for TaskKind {
@@ -107,6 +109,7 @@ impl std::fmt::Display for TaskKind {
             Self::DistillExtract => write!(f, "distill_extract"),
             Self::DistillVerify => write!(f, "distill_verify"),
             Self::DistillSummary => write!(f, "distill_summary"),
+            Self::PedagogyInternal => write!(f, "pedagogy_internal"),
         }
     }
 }
@@ -126,6 +129,7 @@ impl TaskKind {
             Self::DistillExtract,
             Self::DistillVerify,
             Self::DistillSummary,
+            Self::PedagogyInternal,
         ]
     }
 
@@ -143,6 +147,7 @@ impl TaskKind {
             Self::DistillExtract => "local",
             Self::DistillVerify => "local",
             Self::DistillSummary => "local",
+            Self::PedagogyInternal => "local",
         }
     }
 
@@ -151,7 +156,19 @@ impl TaskKind {
     /// cloud-first routing (`[routing] cloud_first_background`); `Chat` is not,
     /// so chat-spawned subagents stay on the active engine.
     pub fn is_background(&self) -> bool {
-        !matches!(self, Self::Chat)
+        matches!(
+            self,
+            Self::Daemon
+                | Self::DreamExtract
+                | Self::DreamVerify
+                | Self::SparkHypothesis
+                | Self::SparkVerify
+                | Self::IngestExtract
+                | Self::IngestVerify
+                | Self::DistillExtract
+                | Self::DistillVerify
+                | Self::DistillSummary
+        )
     }
 }
 
@@ -305,6 +322,10 @@ pub struct GzmoConfig {
     /// Git-tracked markdown wiki layer (WikiEngine). Emit-only retrieval.
     #[serde(default)]
     pub wiki: WikiConfig,
+
+    /// Agentic Teacher pedagogy orchestrator, learner profile, EDF trail.
+    #[serde(default)]
+    pub pedagogy: PedagogyConfig,
 }
 
 // ─── Dreams ─────────────────────────────────────────────────────────────
@@ -586,6 +607,134 @@ impl WikiConfig {
     pub fn sources_dir(&self) -> String { format!("{}/sources", self.directory) }
 }
 
+// ─── Pedagogy (Agentic Teacher) ───────────────────────────────────────────
+
+/// Default interaction mode when pedagogy orchestrator is enabled.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize, Default)]
+#[serde(rename_all = "snake_case")]
+pub enum PedagogyDefaultMode {
+    /// Socratic mentor via internal 4-agent orchestrator.
+    #[default]
+    Mentor,
+    /// Direct execution (legacy ops daemon behavior).
+    Ops,
+}
+
+/// Settings for the Agentic Teacher stack.
+#[derive(Debug, Deserialize, Clone)]
+pub struct PedagogyConfig {
+    #[serde(default = "default_pedagogy_enabled")]
+    pub enabled: bool,
+
+    #[serde(default)]
+    pub default_mode: PedagogyDefaultMode,
+
+    #[serde(default = "default_learner_data_dir")]
+    pub learner_data_dir: String,
+
+    #[serde(default = "default_prereq_graphs_dir")]
+    pub prerequisite_graphs_dir: String,
+
+    #[serde(default = "default_edf_log_path")]
+    pub edf_log_path: String,
+
+    #[serde(default = "default_max_hint_level")]
+    pub max_hint_level: u8,
+
+    #[serde(default = "default_solution_leakage_penalty")]
+    pub solution_leakage_penalty: f64,
+
+    /// Max tokens for internal agent calls (Diagnoser, Planner, etc.).
+    #[serde(default = "default_pedagogy_internal_max_tokens")]
+    pub internal_max_tokens: u32,
+
+    /// Teaching turns between teachback checkpoints (0 = disabled).
+    #[serde(default = "default_teachback_interval")]
+    pub teachback_interval: u32,
+
+    /// Active learner ID (set at CLI boot from `--learner` / `GZMO_LEARNER_ID`).
+    #[serde(skip)]
+    pub active_learner_id: Option<String>,
+
+    /// Unix-socket headless mentor API (daemon + `gzmo mentor` client).
+    #[serde(default = "default_mentor_api_enabled")]
+    pub mentor_api_enabled: bool,
+
+    #[serde(default = "default_mentor_socket")]
+    pub mentor_socket: String,
+}
+
+fn default_pedagogy_enabled() -> bool { true }
+fn default_learner_data_dir() -> String { "data/learner".to_string() }
+fn default_prereq_graphs_dir() -> String { "data/pedagogy/graphs".to_string() }
+fn default_edf_log_path() -> String { "data/pedagogy/edf_log.jsonl".to_string() }
+fn default_max_hint_level() -> u8 { 5 }
+fn default_solution_leakage_penalty() -> f64 { 1.0 }
+fn default_pedagogy_internal_max_tokens() -> u32 { 512 }
+fn default_teachback_interval() -> u32 { 8 }
+fn default_mentor_api_enabled() -> bool { true }
+fn default_mentor_socket() -> String { "data/gzmo_mentor.sock".to_string() }
+
+impl Default for PedagogyConfig {
+    fn default() -> Self {
+        Self {
+            enabled: default_pedagogy_enabled(),
+            default_mode: PedagogyDefaultMode::default(),
+            learner_data_dir: default_learner_data_dir(),
+            prerequisite_graphs_dir: default_prereq_graphs_dir(),
+            edf_log_path: default_edf_log_path(),
+            max_hint_level: default_max_hint_level(),
+            solution_leakage_penalty: default_solution_leakage_penalty(),
+            internal_max_tokens: default_pedagogy_internal_max_tokens(),
+            teachback_interval: default_teachback_interval(),
+            active_learner_id: None,
+            mentor_api_enabled: default_mentor_api_enabled(),
+            mentor_socket: default_mentor_socket(),
+        }
+    }
+}
+
+impl PedagogyConfig {
+    /// Resolve learner ID: `--learner` flag → `GZMO_LEARNER_ID` env → `"operator"`.
+    pub fn resolve_learner_id(cli_flag: Option<&str>) -> String {
+        if let Some(id) = cli_flag.filter(|s| !s.is_empty()) {
+            return id.to_string();
+        }
+        if let Ok(id) = std::env::var("GZMO_LEARNER_ID") {
+            if !id.is_empty() {
+                return id;
+            }
+        }
+        "operator".to_string()
+    }
+
+    pub fn learner_id(&self) -> &str {
+        self.active_learner_id
+            .as_deref()
+            .unwrap_or("operator")
+    }
+
+    pub fn learner_dir(&self) -> std::path::PathBuf {
+        std::path::PathBuf::from(&self.learner_data_dir).join(self.learner_id())
+    }
+
+    pub fn profile_path(&self) -> std::path::PathBuf {
+        self.learner_dir().join("profile.json")
+    }
+
+    pub fn session_path(&self) -> std::path::PathBuf {
+        self.learner_dir().join("session.json")
+    }
+
+    pub fn episodes_dir(&self) -> std::path::PathBuf {
+        self.learner_dir().join("episodes")
+    }
+
+    pub fn mentor_socket_path(&self) -> std::path::PathBuf {
+        std::path::PathBuf::from(&self.mentor_socket)
+    }
+}
+
 // ─── Session distill ──────────────────────────────────────────────────────
 
 /// Settings for `gzmo distill` — sessions JSON → SessionDistill vault + episodic.
@@ -635,6 +784,18 @@ pub struct SessionDistillConfig {
 
     #[serde(default = "default_session_distill_cron_minute")]
     pub cron_minute: u32,
+
+    /// Phase 2: distill when topic embedding drifts mid-session (not implemented).
+    #[serde(default)]
+    pub topic_shift_enabled: bool,
+
+    /// Cosine distance threshold for topic-shift trigger (phase 2).
+    #[serde(default = "default_topic_shift_threshold")]
+    pub topic_shift_threshold: f32,
+}
+
+fn default_topic_shift_threshold() -> f32 {
+    0.35
 }
 
 fn default_session_distill_enabled() -> bool {
@@ -685,6 +846,8 @@ impl Default for SessionDistillConfig {
     fn default() -> Self {
         Self {
             enabled: default_session_distill_enabled(),
+            topic_shift_enabled: false,
+            topic_shift_threshold: default_topic_shift_threshold(),
             sessions_dir: default_sessions_dir(),
             verify: default_dream_verify(),
             min_confidence: default_dream_min_confidence(),
@@ -1130,6 +1293,14 @@ pub struct SynapsePullConfig {
     /// Path to append-only bus (relative to project root).
     #[serde(default = "default_synapse_bus_path")]
     pub bus_path: std::path::PathBuf,
+
+    /// Run `gzmo distill pi <session.jsonl>` when Pi emits `session_end` on the bus.
+    #[serde(default = "default_synapse_distill_on_session_end")]
+    pub distill_on_session_end: bool,
+}
+
+fn default_synapse_distill_on_session_end() -> bool {
+    true
 }
 
 fn default_synapse_pull_hour() -> u32 {
@@ -1156,6 +1327,7 @@ impl Default for SynapsePullConfig {
             cron_minute: default_synapse_pull_minute(),
             max_events: default_synapse_pull_max_events(),
             bus_path: default_synapse_bus_path(),
+            distill_on_session_end: default_synapse_distill_on_session_end(),
         }
     }
 }
@@ -2000,8 +2172,37 @@ fn default_vault_db() -> PathBuf { PathBuf::from("data/vault.db") }
 fn default_skills_dir() -> PathBuf { PathBuf::from("skills") }
 fn default_dreams_path() -> PathBuf { PathBuf::from("DREAMS.md") }
 fn default_provider() -> String { "local".to_string() }
-fn default_engine_url() -> String { "http://localhost:1234/v1".to_string() }
-fn default_model_name() -> String { "gemma-4-E4B-it-Q4_K_M.gguf".to_string() }
+/// Resolve `gzmo.toml` for CLI invocations from any cwd (e.g. Pi started in `~`).
+fn discover_config_path() -> PathBuf {
+    if let Ok(path) = std::env::var("GZMO_CONFIG") {
+        return PathBuf::from(path);
+    }
+
+    let cwd = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
+    let cwd_config = cwd.join("gzmo.toml");
+    if cwd_config.exists() {
+        return cwd_config;
+    }
+
+    if let Ok(exe) = std::env::current_exe() {
+        let mut dir = exe;
+        dir.pop(); // strip binary name
+        for _ in 0..8 {
+            let candidate = dir.join("gzmo.toml");
+            if candidate.exists() {
+                return candidate;
+            }
+            if !dir.pop() {
+                break;
+            }
+        }
+    }
+
+    cwd_config
+}
+
+fn default_engine_url() -> String { "http://localhost:8000/v1".to_string() }
+fn default_model_name() -> String { "qwen3.6-27b".to_string() }
 fn default_temperature() -> f32 { 0.3 }
 fn default_top_p() -> f32 { 0.95 }
 fn default_max_tokens() -> u32 { 8192 }
@@ -2212,25 +2413,10 @@ impl GzmoConfig {
         Ok(config)
     }
 
-    /// Load from `gzmo.toml` anchored to the executable directory, 
-    /// or an explicit path via the `GZMO_CONFIG` environment variable.
+    /// Load from `gzmo.toml` via `GZMO_CONFIG`, cwd, or by walking up from the executable
+    /// (e.g. `.../survey_GZMO/target/release/gzmo` → repo-root `gzmo.toml`).
     pub fn load_auto() -> Result<Self> {
-        let path = std::env::var("GZMO_CONFIG")
-            .map(PathBuf::from)
-            .unwrap_or_else(|_| {
-                let cwd_path = std::env::current_dir()
-                    .unwrap_or_else(|_| PathBuf::from("."))
-                    .join("gzmo.toml");
-                if cwd_path.exists() {
-                    return cwd_path;
-                }
-                
-                // Portable mode fallback: anchor to the physical location of the executable
-                let mut exe = std::env::current_exe().unwrap_or_else(|_| PathBuf::from("."));
-                exe.pop(); // Remove executable name
-                exe.join("gzmo.toml")
-            });
-
+        let path = discover_config_path();
         Self::load(&path)
     }
 

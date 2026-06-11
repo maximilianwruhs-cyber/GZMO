@@ -49,6 +49,8 @@ enum Command {
     MemoryEmbed(Option<usize>),
     Memory(Vec<String>),
     Distill(Option<String>),
+    /// Distill a Pi agent session JSONL (`gzmo distill pi <path>`).
+    DistillPi(std::path::PathBuf),
     Health,
     Profile(Vec<String>),
     McpServe,
@@ -60,6 +62,45 @@ enum Command {
     Pedagogy(Vec<String>),
     /// Headless mentor API client (`gzmo mentor teach <message>`).
     Mentor(Vec<String>),
+    Help,
+}
+
+fn print_cli_help() {
+    eprintln!(
+        "\
+GZMO — Sovereign Agent CLI
+
+COGNITION (Prime)
+  Local LLM default: http://localhost:8000/v1  ([engine.local] in gzmo.toml)
+  Legacy LM Studio:  http://localhost:1234/v1  (optional; not the GZMO default)
+
+PLATFORM
+  Retrieval/embed:   http://192.168.31.110:8081  (VM200)
+  Neo4j / Qdrant:    192.168.31.202
+
+USAGE
+  gzmo                          Interactive chat (mentor-first)
+  gzmo --repl                   Legacy TUI
+  gzmo daemon                   Background daemon + mentor socket
+  gzmo health                   Probe Prime, embed, vault, graph, MCP
+  gzmo mentor ping|status|teach Headless Socratic API (data/gzmo_mentor.sock)
+  gzmo dream [YYYY-MM-DD]       DreamEngine consolidation
+  gzmo spark [YYYY-MM-DD]       SparkEngine serendipity
+  gzmo memory <sub>             Platform memory bridge
+  gzmo chaos skill <cmd> [args] Chaos slash skills (Rust registry)
+  gzmo wiki <action>            Knowledge Gardener (wiki/ layer)
+  gzmo pedagogy graph validate  Prerequisite graph lint
+  gzmo distill [session_id]     Distill GZMO chat sessions → vault
+  gzmo distill pi <path.jsonl>  Distill Pi session on session_end
+  gzmo init                     First-time setup
+  gzmo mcp-serve                MCP stdio (memory + wiki search)
+
+FLAGS
+  --learner <id>                Learner profile (default: operator or GZMO_LEARNER_ID)
+
+Config: gzmo.toml in repo root (or GZMO_CONFIG). Build: target/release/gzmo
+"
+    );
 }
 
 /// Strip global flags (`--learner <id>`) before subcommand parsing.
@@ -85,6 +126,9 @@ fn parse_args() -> (Option<String>, Command) {
     let raw: Vec<String> = std::env::args().collect();
     let (learner, args) = strip_global_flags(&raw);
     if args.len() >= 2 {
+        if args[1] == "--help" || args[1] == "-h" || args[1] == "help" {
+            return (learner, Command::Help);
+        }
         if args[1] == "daemon" { return (learner, Command::Daemon); }
         if args[1] == "init" { return (learner, Command::Init); }
         if args[1] == "--repl" { return (learner, Command::ChatRepl); }
@@ -142,6 +186,13 @@ fn parse_args() -> (Option<String>, Command) {
         }
         if args[1] == "dump" { return (learner, Command::MemoryDump); }
         if args[1] == "distill" {
+            if args.get(2).map(|s| s.as_str()) == Some("pi") {
+                let Some(path) = args.get(3) else {
+                    eprintln!("Usage: gzmo distill pi <session.jsonl>");
+                    std::process::exit(1);
+                };
+                return (learner, Command::DistillPi(std::path::PathBuf::from(path)));
+            }
             let id = args.get(2).cloned();
             return (learner, Command::Distill(id));
         }
@@ -176,7 +227,7 @@ async fn main() -> Result<()> {
         Command::MemoryDump => "info",
         Command::MemoryEmbed(_) => "info",
         Command::Memory(_) => "warn",
-        Command::Distill(_) => "info",
+        Command::Distill(_) | Command::DistillPi(_) => "info",
         Command::Health => "warn",
         Command::Profile(_) => "warn",
         Command::McpServe => "warn",
@@ -184,6 +235,7 @@ async fn main() -> Result<()> {
         Command::ChaosSkill { .. } => "warn",
         Command::Pedagogy(_) => "warn",
         Command::Mentor(_) => "warn",
+        Command::Help => "warn",
     };
 
     tracing_subscriber::fmt()
@@ -195,9 +247,13 @@ async fn main() -> Result<()> {
         .with_target(false)
         .init();
 
-    // Init doesn't need existing config
+    // Init / help don't need existing config
     if matches!(command, Command::Init) {
         return init_cmd::run().await;
+    }
+    if matches!(command, Command::Help) {
+        print_cli_help();
+        return Ok(());
     }
 
     let mut config = gzmo_core::config::GzmoConfig::load_auto()?;
@@ -210,8 +266,8 @@ async fn main() -> Result<()> {
         Command::Chat => chat::run(&config, &identity).await,
         Command::ChatRepl => tui::runner::run(&config, &identity).await,
         Command::Daemon => {
-            // OS-level singleton lock file
-            let pid_file = std::path::PathBuf::from("/tmp/gzmo_rust.pid");
+            // OS-level singleton lock file (shared with start-production.sh / scripts)
+            let pid_file = gzmo_core::daemon::daemon_pid_path();
 
             if pid_file.exists() {
                 if let Ok(old_pid_str) = std::fs::read_to_string(&pid_file) {
@@ -259,6 +315,7 @@ async fn main() -> Result<()> {
         Command::MemoryEmbed(limit) => embed_cmd::run(&config, &identity, limit).await,
         Command::Memory(sub) => memory_cmd::run(&config, sub).await,
         Command::Distill(session_id) => distill_cmd::run(&config, &identity, session_id).await,
+        Command::DistillPi(path) => distill_cmd::run_pi(&config, &identity, &path).await,
         Command::Health => health_cmd::run(&config, identity).await,
         Command::Profile(args) => profile_cmd::run(&config, &args).await,
         Command::McpServe => mcp_serve_cmd::run(&config).await,
@@ -266,5 +323,6 @@ async fn main() -> Result<()> {
         Command::ChaosSkill { cmd, args } => chaos_skill_cmd::run(&config, &cmd, &args).await,
         Command::Pedagogy(args) => pedagogy_graph_cmd::run(&args).await,
         Command::Mentor(args) => mentor_cmd::run(&config, &args).await,
+        Command::Help => unreachable!(),
     }
 }
