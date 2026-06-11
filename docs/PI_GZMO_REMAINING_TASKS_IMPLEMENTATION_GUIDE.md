@@ -14,7 +14,7 @@
 | R2 | Post-deploy verify | **Done** — `pong`, `smoke.sh` pass |
 | R3 | Doc sync | **Partial** — platform handoff updated; this guide §2 needs periodic refresh |
 | M5 | E2E session_end distill | **Done** — state file + daemon poll verified |
-| P1 | Topic-shift distill | **Done (default off)** — enable in `gzmo.toml` + new Pi session |
+| P1 | Topic-shift distill | **Done + enabled** — `topic_shift_enabled = true` in `gzmo.toml`; new Pi session to test |
 | P2 | Distill ergonomics | **Partial** — `gzmo_distill` accepts `.jsonl`; dedicated tool optional |
 | P3 | HTTP mentor bridge | Not started |
 | D1 / F1 | Deferred / future | Not started |

@@ -59,7 +59,7 @@ librarian_summary = true
 daemon_scheduled = true
 cron_hour = 2
 cron_minute = 15
-topic_shift_enabled = false
+topic_shift_enabled = true
 topic_shift_threshold = 0.35
 
 # SparkEngine — gated serendipitous recall (replaces headless orchestrator spark job)
