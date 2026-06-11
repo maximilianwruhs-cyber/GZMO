@@ -449,27 +449,27 @@ GZMO_DISTILL_SMOKE=1 ./scripts/pi/test_distill_pi.sh
 
 ### Low hanging (do first)
 
-| # | Task | Effort | Files |
-|---|------|--------|-------|
-| L1 | Run `restart-daemon.sh --build` on operator machine | 2 min | ops |
-| L2 | Git commit + push mentor/distill branch | 15 min | git |
-| L3 | Add `distillOnSessionEnd` to Pi `settings.json` explicitly | 1 min | settings.json |
+| # | Task | Effort | Files | Status |
+|---|------|--------|-------|--------|
+| L1 | Run `restart-daemon.sh --build` on operator machine | -- | ops | **Done** |
+| L2 | Git commit + push mentor/distill branch | -- | git | **Done** (locally committed, push pending auth) |
+| L3 | Add `distillOnSessionEnd` to Pi `settings.json` explicitly | -- | settings.json | **Done** |
 
 ### Medium (next sprint)
 
 | # | Task | Effort | Notes |
 |---|------|--------|-------|
 | M1 | MCP `gzmo_mentor_ping/teach` on `mcp-serve` | -- | **Done** (shipped 2026-06-12) |
-| M2 | `scripts/pi/test_session_end_distill.sh` | 2h | Inject fake session_end event; assert spawn |
-| M3 | Unify PID files (`gzmo_rust.pid` vs `gzmo_daemon.pid`) | 1h | `daemon_cmd` / `start-production.sh` |
-| M4 | Mark distill complete in state only after subprocess exit | 2h | Avoid losing retry on spawn-without-run |
+| M2 | `scripts/pi/test_session_end_distill.sh` | -- | **Done** (shipped 2026-06-12) |
+| M3 | Unify PID files (`gzmo_rust.pid` vs `gzmo_daemon.pid`) | -- | **Done** (shipped 2026-06-12) |
+| M4 | Mark distill complete in state only after subprocess exit | -- | **Done** (shipped 2026-06-12) |
 
 ### Phase 2 (product)
 
 | # | Task | Effort | Notes |
 |---|------|--------|-------|
 | P1 | Topic-shift embedding distill trigger | **Stub** | `topic_shift_enabled` in config (default false); hook TBD |
-| P2 | On-demand `gzmo_distill` Pi path in skill | **Done** | `sessionId` ending in `.jsonl` → `distill pi` |
+| P2 | On-demand `gzmo_distill` Pi path in skill | -- | **Done** |
 | P3 | HTTP mentor bridge for remote Pi | 2+ days | Out of scope v1 |
 
 ---
