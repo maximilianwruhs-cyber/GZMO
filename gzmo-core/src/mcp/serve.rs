@@ -21,7 +21,25 @@ use crate::wiki::WikiEngine;
 pub struct GzmoMemoryMcpServer {
     platform: Arc<PlatformMemory>,
     wiki: WikiConfig,
+    mentor_socket_path: std::path::PathBuf,
     tool_router: ToolRouter<Self>,
+}
+
+#[derive(Debug, serde::Deserialize, schemars::JsonSchema)]
+struct TeachParams {
+    /// The user message / question to ask the Socratic mentor.
+    message: String,
+    /// Optional conversation history turns to maintain Socratic dialog context.
+    #[serde(default)]
+    conversation: Option<Vec<McpMentorTurn>>,
+}
+
+#[derive(Debug, serde::Deserialize, schemars::JsonSchema)]
+struct McpMentorTurn {
+    /// Role of the turn (either 'user' or 'assistant'/'gzmo'/'mentor').
+    role: String,
+    /// Message content of the turn.
+    content: String,
 }
 
 #[derive(Debug, serde::Deserialize, schemars::JsonSchema)]
@@ -51,11 +69,73 @@ struct RetrieveParams {
 
 #[tool_router]
 impl GzmoMemoryMcpServer {
-    pub fn new(platform: Arc<PlatformMemory>, wiki: WikiConfig) -> Self {
+    pub fn new(platform: Arc<PlatformMemory>, wiki: WikiConfig, mentor_socket_path: std::path::PathBuf) -> Self {
         Self {
             platform,
             wiki,
+            mentor_socket_path,
             tool_router: Self::tool_router(),
+        }
+    }
+
+    #[tool(description = "Ping the GZMO Socratic mentor API daemon socket to verify status/liveness.")]
+    async fn gzmo_mentor_ping(&self) -> Result<CallToolResult, McpError> {
+        let req = crate::mentor_client::MentorRequest {
+            method: "ping".to_string(),
+            message: String::new(),
+            conversation: Vec::new(),
+        };
+        match crate::mentor_client::client_request(&self.mentor_socket_path, &req).await {
+            Ok(resp) => {
+                if resp.ok {
+                    let text = resp.response.unwrap_or_else(|| "pong".to_string());
+                    Ok(CallToolResult::success(vec![Content::text(text)]))
+                } else {
+                    let err = resp.error.unwrap_or_else(|| "ping failed".to_string());
+                    Ok(CallToolResult::error(vec![Content::text(err)]))
+                }
+            }
+            Err(e) => Ok(CallToolResult::error(vec![Content::text(format!(
+                "Failed to connect to mentor socket: {e}"
+            ))])),
+        }
+    }
+
+    #[tool(description = "Send a Socratic teaching query to the GZMO pedagogy orchestrator over the daemon socket.")]
+    async fn gzmo_mentor_teach(
+        &self,
+        Parameters(args): Parameters<TeachParams>,
+    ) -> Result<CallToolResult, McpError> {
+        let conversation = args.conversation.unwrap_or_default().into_iter().map(|t| {
+            crate::mentor_client::MentorTurn {
+                role: t.role,
+                content: t.content,
+            }
+        }).collect();
+
+        let req = crate::mentor_client::MentorRequest {
+            method: "teach".to_string(),
+            message: args.message,
+            conversation,
+        };
+
+        match crate::mentor_client::client_request(&self.mentor_socket_path, &req).await {
+            Ok(resp) => {
+                if resp.ok {
+                    if let Some(text) = resp.response {
+                        Ok(CallToolResult::success(vec![Content::text(text)]))
+                    } else {
+                        let err = resp.error.unwrap_or_else(|| "not a mentor turn".to_string());
+                        Ok(CallToolResult::success(vec![Content::text(format!("(Skipped: {err})"))]))
+                    }
+                } else {
+                    let err = resp.error.unwrap_or_else(|| "teach failed".to_string());
+                    Ok(CallToolResult::error(vec![Content::text(err)]))
+                }
+            }
+            Err(e) => Ok(CallToolResult::error(vec![Content::text(format!(
+                "Failed to connect to mentor socket: {e}"
+            ))])),
         }
     }
 
@@ -209,7 +289,7 @@ impl ServerHandler for GzmoMemoryMcpServer {
     fn get_info(&self) -> ServerInfo {
         ServerInfo {
             instructions: Some(
-                "GZMO platform memory — honeypot RAG search/recall across vault and Pi knowledge, plus gzmo_wiki_search over the git-tracked wiki/ markdown layer."
+                "GZMO platform memory and Socratic mentor — honeypot RAG search/recall, wiki search, and mentor Socratic teaching."
                     .into(),
             ),
             capabilities: ServerCapabilities::builder().enable_tools().build(),
@@ -225,7 +305,11 @@ pub async fn run_mcp_serve(config: &GzmoConfig) -> Result<()> {
         session = %platform.session_id(),
         "GZMO memory MCP server starting (stdio)"
     );
-    let server = GzmoMemoryMcpServer::new(platform, config.wiki.clone());
+    let server = GzmoMemoryMcpServer::new(
+        platform,
+        config.wiki.clone(),
+        config.pedagogy.mentor_socket_path(),
+    );
     let service = server.serve(stdio()).await?;
     service.waiting().await?;
     Ok(())

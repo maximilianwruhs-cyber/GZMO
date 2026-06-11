@@ -25,6 +25,7 @@ pub mod ingest_prep;
 pub mod wiki;
 pub mod wiki_md;
 pub mod session_distill;
+pub mod pi_session;
 pub mod mcp;
 pub mod stealth;
 pub mod orchestrator;
@@ -39,4 +40,6 @@ pub mod platform_search;
 pub mod text_util;
 pub mod subagent;
 pub mod context_compress;
+pub mod pedagogy;
+pub mod mentor_client;
 
