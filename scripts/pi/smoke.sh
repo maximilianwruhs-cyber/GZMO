@@ -6,6 +6,7 @@ ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 "$ROOT/scripts/pi/test_mentor_dialog.sh"
 "$ROOT/scripts/pi/test_distill_pi.sh"
 "$ROOT/scripts/pi/test_session_end_distill.sh"
+"$ROOT/scripts/pi/test_topic_shift_distill.sh"
 if [[ -S "$ROOT/data/gzmo_mentor.sock" ]]; then
   python3 "$ROOT/scripts/pi/test_mcp_mentor.py"
 else

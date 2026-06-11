@@ -14,8 +14,8 @@
 | R2 | Post-deploy verify | **Done** — `pong`, `smoke.sh` pass |
 | R3 | Doc sync | **Partial** — platform handoff updated; this guide §2 needs periodic refresh |
 | M5 | E2E session_end distill | **Done** — state file + daemon poll verified |
-| P1 | Topic-shift distill | **Done + enabled** — `topic_shift_enabled = true` in `gzmo.toml`; new Pi session to test |
-| P2 | Distill ergonomics | **Partial** — `gzmo_distill` accepts `.jsonl`; dedicated tool optional |
+| P1 | Topic-shift distill | **Done + enabled** — `topic_shift_enabled = true`; `./scripts/pi/test_topic_shift_distill.sh` passes |
+| P2 | Distill ergonomics | **Done** — `gzmo_distill_pi` + `distill_latest_pi_session.sh` |
 | P3 | HTTP mentor bridge | Not started |
 | D1 / F1 | Deferred / future | Not started |
 
@@ -105,8 +105,7 @@ Each task section follows the same shape:
 | ID | Task |
 |----|------|
 | R1 | Push + PR (operator action) |
-| P1 live | Enable `topic_shift_enabled = true` and test mid-session shift |
-| P2 | Dedicated `gzmo_distill_pi` tool + `distill_latest_pi_session.sh` |
+| P1 live | New Pi session mid-topic switch → `topic_shift_distill` in `events.jsonl` |
 | P3 | HTTP mentor bridge for remote Pi |
 | D1 | TUI `maybe_teach` parity, multi-learner split, GeoGebra, etc. |
 | F1 | Unified `/help` from `skills.toml`, cognitive sandbox |
@@ -549,30 +548,20 @@ GZMO_DISTILL_SMOKE=1 ./scripts/pi/test_distill_pi.sh --range
 
 ## 9. P2 — On-demand distill ergonomics
 
-**Status:** Mostly done (`gzmo_distill` accepts `.jsonl`)  
+**Status:** **Done** — `gzmo_distill_pi` in `~/.pi/agent/skills/gzmo-integration/index.ts`, synapse map, `distill_latest_pi_session.sh`  
 **Goal:** Polish operator UX for manual distill.
 
-### Remaining steps
+### Shipped
 
-1. **Optional dedicated tool** `gzmo_distill_pi` in `index.ts`:
-   - Parameter: `sessionPath` (required)
-   - Clearer than overloading `gzmo_distill`
-
-2. **Synapse:** Map `gzmo_distill_pi` in `TOOL_EVENT_MAP` → `distill_complete`
-
-3. **SKILL.md:** Document when to use manual distill:
-   - Long session before quit
-   - After major decision
-   - Override failed automatic session_end
-
-4. **Helper script:** `scripts/pi/distill_latest_pi_session.sh`
-   - Finds newest `~/.pi/agent/sessions/**/*.jsonl`
-   - Runs `gzmo distill pi`
+1. **`gzmo_distill_pi`** — optional `sessionPath`; omit for latest Pi session
+2. **Synapse** — `TOOL_EVENT_MAP` → `distill_complete`
+3. **`scripts/pi/distill_latest_pi_session.sh`** — shell one-liner
+4. **SKILL.md** — when to use manual distill (long session, major decision, failed auto distill)
 
 ### Acceptance
 
-- [ ] Pi agent can distill latest session in one tool call
-- [ ] Synapse shows `distill_complete` on manual run
+- [x] Pi agent can distill latest session in one tool call
+- [x] Synapse shows `distill_complete` on manual run (via `gzmo_distill_pi` / `gzmo_distill`)
 
 ---
 
