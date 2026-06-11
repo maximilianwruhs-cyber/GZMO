@@ -120,6 +120,27 @@ On a single network blip: retry quick preflight after 30–60 s; do not treat on
 - **Prime** `:8000` — your main LLM; ctx **262144** in platform config (Gemma 4 26B-A4B).
 - **Do not** start alternate brains on random ports without Max.
 
+### 4.3a Mentor dialog (GZMO Socratic brain)
+
+Teaching questions use **GZMO pedagogy** over the daemon Unix socket — not Prime.
+
+| Task | Use |
+|------|-----|
+| Code, CI, shell, repo grep | **Prime** |
+| "Teach me …", how/why/what-is, learn mode | **`gzmo_mentor_teach`** (tools in `gzmo-integration` skill) |
+
+```text
+Pi → gzmo_mentor_* → scripts/pi/mentor.sh → data/gzmo_mentor.sock → gzmo daemon → PedagogyOrchestrator
+```
+
+- Learner profile: `GZMO_LEARNER_ID=operator` (shared with `gzmo chat` / TUI).
+- **Learn mode:** `gzmo_mentor_learn_start` → repeated `gzmo_mentor_teach` → `gzmo_mentor_learn_end`.
+- Optional prep: `gzmo_chaos({ command: "learn", args: "<topic>" })` or `run_learn_prep: true` on learn start.
+- Check daemon: `gzmo_mentor_ping` / `gzmo mentor ping` (expect `pong`, not `pong (local)`).
+- Synapse: mentor tool calls emit `mentor_teach` events; daemon `[synapse_pull]` tails them into episodic.
+
+Present GZMO mentor replies faithfully in learn mode; paraphrase only when needed for clarity.
+
 ### 4.4 Code & docs in repo
 
 - Edit application/docs **outside** `gzmo-core/` / `gzmo-cli/` when task is product/docs/ops.

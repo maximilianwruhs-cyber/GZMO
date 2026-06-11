@@ -5,6 +5,7 @@
 mod chat;
 mod chaos_bootstrap;
 mod cli_mcp;
+mod pedagogy_bridge;
 mod daemon_cmd;
 mod dream_cmd;
 mod spark_cmd;
@@ -16,9 +17,13 @@ mod mcp_serve_cmd;
 mod profile_cmd;
 mod embed_cmd;
 mod distill_cmd;
+mod chaos_skill_cmd;
 mod init_cmd;
 mod ingest_eval_cmd;
 mod wiki_cmd;
+mod pedagogy_graph_cmd;
+mod mentor_ipc;
+mod mentor_cmd;
 #[allow(dead_code)]
 mod ui;
 pub mod tui;
@@ -49,21 +54,49 @@ enum Command {
     McpServe,
     /// Knowledge Gardener ops over the wiki/ layer (sync|lint|search|file-back|status).
     Wiki(Vec<String>),
+    /// Run a chaos slash skill with daemon IPC (`gzmo chaos skill joke`).
+    ChaosSkill { cmd: String, args: String },
+    /// Pedagogy tooling (`gzmo pedagogy graph validate <path>`).
+    Pedagogy(Vec<String>),
+    /// Headless mentor API client (`gzmo mentor teach <message>`).
+    Mentor(Vec<String>),
 }
 
-fn parse_args() -> Command {
-    let args: Vec<String> = std::env::args().collect();
+/// Strip global flags (`--learner <id>`) before subcommand parsing.
+fn strip_global_flags(args: &[String]) -> (Option<String>, Vec<String>) {
+    let mut learner = None;
+    let mut out = vec![args[0].clone()];
+    let mut i = 1;
+    while i < args.len() {
+        if args[i] == "--learner" {
+            if let Some(id) = args.get(i + 1) {
+                learner = Some(id.clone());
+                i += 2;
+                continue;
+            }
+        }
+        out.push(args[i].clone());
+        i += 1;
+    }
+    (learner, out)
+}
+
+fn parse_args() -> (Option<String>, Command) {
+    let raw: Vec<String> = std::env::args().collect();
+    let (learner, args) = strip_global_flags(&raw);
     if args.len() >= 2 {
-        if args[1] == "daemon" { return Command::Daemon; }
-        if args[1] == "init" { return Command::Init; }
-        if args[1] == "--repl" { return Command::ChatRepl; }
+        if args[1] == "daemon" { return (learner, Command::Daemon); }
+        if args[1] == "init" { return (learner, Command::Init); }
+        if args[1] == "--repl" { return (learner, Command::ChatRepl); }
+        if args[1] == "pedagogy" { return (learner, Command::Pedagogy(args[2..].to_vec())); }
+        if args[1] == "mentor" { return (learner, Command::Mentor(args[2..].to_vec())); }
         if args[1] == "dream" {
             let date = args.get(2).and_then(|s| NaiveDate::parse_from_str(s, "%Y-%m-%d").ok());
-            return Command::Dream(date);
+            return (learner, Command::Dream(date));
         }
         if args[1] == "spark" {
             let date = args.get(2).and_then(|s| NaiveDate::parse_from_str(s, "%Y-%m-%d").ok());
-            return Command::Spark(date);
+            return (learner, Command::Spark(date));
         }
         if args[1] == "ingest" {
             let mut dry_run = false;
@@ -75,53 +108,61 @@ fn parse_args() -> Command {
                     path = Some(std::path::PathBuf::from(a));
                 }
             }
-            return Command::Ingest {
-                path: path.unwrap_or_else(|| std::path::PathBuf::from(".")),
-                dry_run,
-            };
+            return (
+                learner,
+                Command::Ingest {
+                    path: path.unwrap_or_else(|| std::path::PathBuf::from(".")),
+                    dry_run,
+                },
+            );
         }
         if args[1] == "ingest-dir" {
             let Some(path_arg) = args.get(2) else {
                 eprintln!("Usage: gzmo ingest-dir <directory>");
                 std::process::exit(1);
             };
-            return Command::IngestDir(std::path::PathBuf::from(path_arg));
+            return (learner, Command::IngestDir(std::path::PathBuf::from(path_arg)));
         }
         if args[1] == "ingest-eval" {
             let Some(path_arg) = args.get(2) else {
                 eprintln!("Usage: gzmo ingest-eval <file_or_directory>");
                 std::process::exit(1);
             };
-            return Command::IngestEval(std::path::PathBuf::from(path_arg));
+            return (learner, Command::IngestEval(std::path::PathBuf::from(path_arg)));
         }
         if args[1] == "memory" {
             if args.get(2).map(|s| s.as_str()) == Some("dump") {
-                return Command::MemoryDump;
+                return (learner, Command::MemoryDump);
             }
             if args.get(2).map(|s| s.as_str()) == Some("embed") {
                 let limit = args.get(3).and_then(|s| s.parse().ok());
-                return Command::MemoryEmbed(limit);
+                return (learner, Command::MemoryEmbed(limit));
             }
-            return Command::Memory(args[2..].to_vec());
+            return (learner, Command::Memory(args[2..].to_vec()));
         }
-        if args[1] == "dump" { return Command::MemoryDump; }
+        if args[1] == "dump" { return (learner, Command::MemoryDump); }
         if args[1] == "distill" {
             let id = args.get(2).cloned();
-            return Command::Distill(id);
+            return (learner, Command::Distill(id));
         }
-        if args[1] == "health" { return Command::Health; }
-        if args[1] == "wiki" { return Command::Wiki(args[2..].to_vec()); }
-        if args[1] == "mcp-serve" { return Command::McpServe; }
+        if args[1] == "health" { return (learner, Command::Health); }
+        if args[1] == "wiki" { return (learner, Command::Wiki(args[2..].to_vec())); }
+        if args[1] == "chaos" && args.get(2).map(|s| s.as_str()) == Some("skill") {
+            let cmd = args.get(3).cloned().unwrap_or_else(|| "help".to_string());
+            let skill_args = args[4..].join(" ");
+            return (learner, Command::ChaosSkill { cmd, args: skill_args });
+        }
+        if args[1] == "mcp-serve" { return (learner, Command::McpServe); }
         if args[1] == "profile" {
-            return Command::Profile(args[2..].to_vec());
+            return (learner, Command::Profile(args[2..].to_vec()));
         }
     }
-    Command::Chat
+    (learner, Command::Chat)
 }
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    let command = parse_args();
+    let (learner_flag, command) = parse_args();
 
     let default_filter = match command {
         Command::Chat | Command::ChatRepl => "warn",
@@ -140,6 +181,9 @@ async fn main() -> Result<()> {
         Command::Profile(_) => "warn",
         Command::McpServe => "warn",
         Command::Wiki(_) => "info",
+        Command::ChaosSkill { .. } => "warn",
+        Command::Pedagogy(_) => "warn",
+        Command::Mentor(_) => "warn",
     };
 
     tracing_subscriber::fmt()
@@ -156,7 +200,10 @@ async fn main() -> Result<()> {
         return init_cmd::run().await;
     }
 
-    let config = gzmo_core::config::GzmoConfig::load_auto()?;
+    let mut config = gzmo_core::config::GzmoConfig::load_auto()?;
+    let learner_id =
+        gzmo_core::config::PedagogyConfig::resolve_learner_id(learner_flag.as_deref());
+    config.pedagogy.active_learner_id = Some(learner_id);
     let identity = gzmo_core::identity::IdentityEngine::boot(&config.identity.soul_path).await?;
 
     match command {
@@ -216,5 +263,8 @@ async fn main() -> Result<()> {
         Command::Profile(args) => profile_cmd::run(&config, &args).await,
         Command::McpServe => mcp_serve_cmd::run(&config).await,
         Command::Wiki(args) => wiki_cmd::run(&config, args).await,
+        Command::ChaosSkill { cmd, args } => chaos_skill_cmd::run(&config, &cmd, &args).await,
+        Command::Pedagogy(args) => pedagogy_graph_cmd::run(&args).await,
+        Command::Mentor(args) => mentor_cmd::run(&config, &args).await,
     }
 }

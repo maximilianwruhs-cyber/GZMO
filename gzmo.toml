@@ -6,7 +6,7 @@
 # want to override.
 #
 # LOCKED port layout (steady state) — see docs/PORTS.md
-#   :8000  workstation  Prime Gemma 4 26B-A4B @ 256K ctx (gemma-4-26b-a4b-it)
+#   :8000  workstation  Prime Qwen3.6-27B TurboQuant @ 256K ctx (qwen3.6-27b)
 #   :8081  VM200 .110   retrieval router (gzmo-embed + gzmo-rerank)
 #   :8002  workstation  Pi KB embed (optional gzmo-embed.service)
 #   :6333  LXC101 .202  Qdrant honeypot
@@ -170,14 +170,13 @@ active_mode = "local"
 
 [engine.local]
 provider    = "local"
-# Prime = Gemma 4 26B-A4B MoE champion on dual RTX 5070 Ti (:8000).
-# Profile: draft-mtp+ngram-mod, f16 KV, CUDA graphs off, ctx 262144.
-# Locked over Qwen3.6-35B: same hardware runs 256K vs Qwen 128K.
-# Launch: llama.cpp/prime-bench/start-prime-gemma4-26b-a4b-256k.sh
+# Prime = Qwen3.6-27B dense + TurboQuant KV on dual RTX 5070 Ti (:8000).
+# Profile: layer-split, turbo3/turbo4 KV, MTP, ctx 262144.
+# Launch: llama.cpp/prime-bench/start-prime-turboquant-256k.sh
 url         = "http://localhost:8000/v1"
-model       = "gemma-4-26b-a4b-it"
+model       = "qwen3.6-27b"
 api_key     = ""
-temperature = 0.3
+temperature = 0.6
 top_p       = 0.95
 # 24k output budget: dream extraction of a dense document can emit dozens of
 # entities + relations as one JSON object; 8k truncated mid-array and aborted
@@ -239,7 +238,7 @@ command = "/home/maximilian-wruhs/.local/bin/uvx"
 args = ["mcp-neo4j-memory@0.4.5"]
 
 [mcp_servers.env]
-NEO4J_URL = "bolt://192.168.31.202:7687"
+NEO4J_URI = "bolt://192.168.31.202:7687"
 NEO4J_USERNAME = "neo4j"
 NEO4J_PASSWORD = "Easycheesy0815!"
 NEO4J_DATABASE = "neo4j"
@@ -403,7 +402,7 @@ prompt = "(legacy — use `gzmo spark` or SparkEngine in daemon)"
 
 [routing]
 default_engine = "local"
-# Local-only ingest retry for stubborn micro FAILs (Prime :8000). Restore true after migration.
+# Steady state: all background cognition on Prime (:8000). No cloud-first fallback.
 cloud_first_background = false
 
 [routing.mappings]
@@ -413,7 +412,7 @@ dream_verify = "local"
 # Spark: hypothesis + verify on Prime (local profile — not librarian)
 spark_hypothesis = "local"
 spark_verify = "local"
-# Ingest: Prime local_deterministic (temp 0.1, 24k out) — migration retry pass
+# Ingest: Prime local_deterministic (temp 0.1, 24k out)
 ingest_extract = "local_deterministic"
 ingest_verify = "local_deterministic"
 # Distill: extract + summary + verify on Prime
@@ -442,8 +441,27 @@ max_tokens  = 8192
 [routing.profiles.local_deterministic]
 provider    = "local"
 url         = "http://localhost:8000/v1"
-model       = "gemma-4-26b-a4b-it"
+model       = "qwen3.6-27b"
 api_key     = ""
 temperature = 0.1
 top_p       = 0.95
 max_tokens  = 24576
+
+[pedagogy]
+enabled = true
+default_mode = "mentor"
+learner_data_dir = "data/learner"
+prerequisite_graphs_dir = "data/pedagogy/graphs"
+edf_log_path = "data/pedagogy/edf_log.jsonl"
+max_hint_level = 5
+solution_leakage_penalty = 1.0
+internal_max_tokens = 512
+mentor_api_enabled = true
+mentor_socket = "data/gzmo_mentor.sock"
+
+[synapse_pull]
+enabled = true
+cron_hour = 2
+cron_minute = 45
+max_events = 50
+bus_path = "data/Synapse/events.jsonl"

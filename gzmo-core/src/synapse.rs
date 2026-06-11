@@ -120,6 +120,12 @@ pub enum EventType {
     PiMemorySent,
     /// Pi agent requested GZMO health
     PiHealthRequested,
+    /// Pi invoked GZMO Socratic mentor (`gzmo_mentor_teach`)
+    MentorTeach,
+    /// Pi started a learn-mode session with GZMO mentor
+    MentorLearnStart,
+    /// Pi ended a learn-mode session with GZMO mentor
+    MentorLearnEnd,
 }
 
 /// A single Synapse event frame — the unit of observability.

@@ -28,6 +28,7 @@ pub struct PiEventSummary {
     pub quest_complete: usize,
     pub session_start: usize,
     pub session_end: usize,
+    pub mentor_teach: usize,
     pub summary_text: String,
 }
 
@@ -84,6 +85,7 @@ pub fn summarize_pi_events(events: &[SynapseEvent]) -> PiEventSummary {
     let mut quest_complete = 0usize;
     let mut session_start = 0usize;
     let mut session_end = 0usize;
+    let mut mentor_teach = 0usize;
     let mut snippets = Vec::new();
 
     for e in events {
@@ -101,16 +103,29 @@ pub fn summarize_pi_events(events: &[SynapseEvent]) -> PiEventSummary {
             }
             EventType::SessionStart => session_start += 1,
             EventType::SessionEnd => session_end += 1,
+            EventType::MentorTeach => {
+                mentor_teach += 1;
+                if let Some(data) = &e.data {
+                    if let Some(text) = data.get("message").and_then(|v| v.as_str()) {
+                        let clip: String = text.chars().take(400).collect();
+                        if !clip.trim().is_empty() {
+                            snippets.push(format!("[mentor] {clip}"));
+                        }
+                    }
+                }
+            }
+            EventType::MentorLearnStart | EventType::MentorLearnEnd => {}
             _ => {}
         }
     }
 
     let mut summary = format!(
-        "Pi Synapse pull: {} events (quest_complete={}, session_start={}, session_end={})",
+        "Pi Synapse pull: {} events (quest_complete={}, session_start={}, session_end={}, mentor_teach={})",
         events.len(),
         quest_complete,
         session_start,
-        session_end
+        session_end,
+        mentor_teach
     );
     if !snippets.is_empty() {
         summary.push_str("\n\nRecent Pi turn excerpts:\n");
@@ -124,6 +139,7 @@ pub fn summarize_pi_events(events: &[SynapseEvent]) -> PiEventSummary {
         quest_complete,
         session_start,
         session_end,
+        mentor_teach,
         summary_text: summary,
     }
 }

@@ -40,6 +40,8 @@ use gzmo_core::tools::sysadmin::{SysMetricsTool, SysKillTool};
 use gzmo_core::tools::web::WebSearchTool;
 use gzmo_core::tools::memory::{MemoryRecordTool, MemorySearchTool};
 
+use crate::mentor_ipc::{self, MentorServerState};
+
 pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
     let soul = identity.snapshot().await;
 
@@ -624,7 +626,27 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
     // Pin PulseLoop task — must not drop until daemon exits.
     let _chaos_pulse_keepalive = chaos_pulse;
 
+    let mentor_handle = if config.pedagogy.enabled && config.pedagogy.mentor_api_enabled {
+        let mentor_state = Arc::new(MentorServerState::boot(config).await?);
+        let mentor_socket = mentor_ipc::socket_path(config);
+        info!(path = %mentor_socket.display(), "Starting mentor API");
+        Some(tokio::spawn(async move {
+            if let Err(e) = mentor_ipc::run_mentor_server(mentor_state, mentor_socket).await {
+                error!("Mentor API exited: {e}");
+            }
+        }))
+    } else {
+        None
+    };
+
     tokio::select! {
+        _ = async {
+            if let Some(h) = mentor_handle {
+                h.await.ok();
+            } else {
+                std::future::pending::<()>().await;
+            }
+        } => error!("Mentor API exited"),
         _ = heartbeat_handle => error!("Heartbeat exited"),
         _ = dream_handle => error!("Dream cycle exited"),
         _ = spark_handle => error!("Spark cycle exited"),
