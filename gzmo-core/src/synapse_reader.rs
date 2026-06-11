@@ -41,6 +41,7 @@ pub struct PiEventSummary {
     pub session_start: usize,
     pub session_end: usize,
     pub mentor_teach: usize,
+    pub topic_shift_distill: usize,
     pub summary_text: String,
 }
 
@@ -98,6 +99,7 @@ pub fn summarize_pi_events(events: &[SynapseEvent]) -> PiEventSummary {
     let mut session_start = 0usize;
     let mut session_end = 0usize;
     let mut mentor_teach = 0usize;
+    let mut topic_shift_distill = 0usize;
     let mut snippets = Vec::new();
 
     for e in events {
@@ -127,17 +129,26 @@ pub fn summarize_pi_events(events: &[SynapseEvent]) -> PiEventSummary {
                 }
             }
             EventType::MentorLearnStart | EventType::MentorLearnEnd => {}
+            EventType::TopicShiftDistill => {
+                topic_shift_distill += 1;
+                if let Some(data) = &e.data {
+                    if let Some(dist) = data.get("distance").and_then(|v| v.as_f64()) {
+                        snippets.push(format!("[topic-shift] Triggered mid-session distill (distance: {:.4})", dist));
+                    }
+                }
+            }
             _ => {}
         }
     }
 
     let mut summary = format!(
-        "Pi Synapse pull: {} events (quest_complete={}, session_start={}, session_end={}, mentor_teach={})",
+        "Pi Synapse pull: {} events (quest_complete={}, session_start={}, session_end={}, mentor_teach={}, topic_shift_distill={})",
         events.len(),
         quest_complete,
         session_start,
         session_end,
-        mentor_teach
+        mentor_teach,
+        topic_shift_distill
     );
     if !snippets.is_empty() {
         summary.push_str("\n\nRecent Pi turn excerpts:\n");
@@ -152,6 +163,7 @@ pub fn summarize_pi_events(events: &[SynapseEvent]) -> PiEventSummary {
         session_start,
         session_end,
         mentor_teach,
+        topic_shift_distill,
         summary_text: summary,
     }
 }

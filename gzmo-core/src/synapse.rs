@@ -126,6 +126,8 @@ pub enum EventType {
     MentorLearnStart,
     /// Pi ended a learn-mode session with GZMO mentor
     MentorLearnEnd,
+    /// Pi triggered a mid-session topic-shift distillation
+    TopicShiftDistill,
 }
 
 /// A single Synapse event frame — the unit of observability.
