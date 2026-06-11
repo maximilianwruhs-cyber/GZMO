@@ -6,6 +6,9 @@
 
 This is the **single entry document**: where you are, what the stack is, what you may do, and what is forbidden. Deeper detail lives in linked docs — read them in §7 order when unsure.
 
+**Shipped baseline:** [`PI_GZMO_PLATFORM_IMPLEMENTATION_HANDOFF.md`](./PI_GZMO_PLATFORM_IMPLEMENTATION_HANDOFF.md)  
+**Remaining tasks (step-by-step):** [`PI_GZMO_REMAINING_TASKS_IMPLEMENTATION_GUIDE.md`](./PI_GZMO_REMAINING_TASKS_IMPLEMENTATION_GUIDE.md)
+
 ---
 
 ## 1. Who you are in this stack
@@ -137,7 +140,8 @@ Pi → gzmo_mentor_* → scripts/pi/mentor.sh → data/gzmo_mentor.sock → gzmo
 - **Learn mode:** `gzmo_mentor_learn_start` → repeated `gzmo_mentor_teach` → `gzmo_mentor_learn_end`.
 - Optional prep: `gzmo_chaos({ command: "learn", args: "<topic>" })` or `run_learn_prep: true` on learn start.
 - Check daemon: `gzmo_mentor_ping` / `gzmo mentor ping` (expect `pong`, not `pong (local)`).
-- Synapse: mentor tool calls emit `mentor_teach` events; daemon `[synapse_pull]` tails them into episodic.
+- Synapse: mentor tool calls emit `mentor_teach` events; daemon `[synapse_pull]` polls every 60s into episodic.
+- **Session end → distill:** on `session_shutdown`, Pi emits `session_end` and spawns `gzmo distill pi <jsonl>` (daemon also tails the bus). Facts land in vault + episodic for Dream.
 
 Present GZMO mentor replies faithfully in learn mode; paraphrase only when needed for clarity.
 

@@ -1,9 +1,13 @@
 # Pi ↔ GZMO Mentor Dialog — Implementation Handoff
 
-**Status:** Open (2026-06-11)  
+> **Superseded for ops and next steps by** [`PI_GZMO_PLATFORM_IMPLEMENTATION_HANDOFF.md`](./PI_GZMO_PLATFORM_IMPLEMENTATION_HANDOFF.md)  
+> (mentor + synapse + session_end distill — comprehensive step-by-step).  
+> This file is kept for historical phase specs and plan traceability.
+
+**Status:** Shipped (2026-06-11) — mentor bridge + session_end distill  
 **Repo:** `~/Projects/_foundation-audit/survey_GZMO`  
 **Plan authority:** `.cursor/plans/pi_gzmo_mentor_dialog_03feb791.plan.md` (do not edit)  
-**Foundation:** Mentor Unix-socket API shipped; Pi bridge **not started**
+**Foundation:** Mentor Unix-socket API + Pi `gzmo_mentor_*` tools + `session_end` → `gzmo distill pi`
 
 This document is the **complete handoff** for the next implementation agent. It states what is already live, what remains, locked product decisions, file touchpoints, acceptance criteria, and known bugs.
 
@@ -13,9 +17,9 @@ This document is the **complete handoff** for the next implementation agent. It 
 
 **Goal:** Pi acts as the front-end (voice/UI); GZMO daemon runs the Socratic mentor stack over the existing Unix socket. Prime stays the default brain for coding and ops; GZMO mentor is invoked for teaching (one-off or learn-mode session).
 
-**Current gap:** Rust mentor API exists (`gzmo mentor`, daemon socket). Pi has **no** `gzmo_mentor_*` tools, no `scripts/pi/mentor.sh`, no learn-mode session state, and no Synapse events for mentor calls. The Pi mentor dialog plan todos are **all pending**.
+**Shipped:** Pi `gzmo_mentor_*` tools (`~/.pi/agent/skills/gzmo-integration/`), `scripts/pi/mentor.sh`, learn mode, Synapse `mentor_teach` / `mentor_learn_*`, and `session_end` → `gzmo distill pi` (Pi notifier + daemon `[synapse_pull]`).
 
-**First milestone:** Phase 0A + 1A + 1B + docs → Pi can call `gzmo_mentor_teach` once and read a Socratic reply from the daemon.
+**Remaining (optional):** MCP `gzmo_mentor_*` on `mcp-serve`; topic-shift embedding distill trigger (phase 2).
 
 ---
 
@@ -67,16 +71,18 @@ See [`DEFERRED_WORK_HANDOFF.md`](./DEFERRED_WORK_HANDOFF.md) §0 and [`OPEN_WORK
 
 **Response fields:** `ok`, `response`, `mentor`, `ops_mode`, `learner_id`, `error`.
 
-### 3.3 Pi integration today (no mentor)
+### 3.3 Pi integration (shipped)
 
 | Piece | Path | Role |
 |-------|------|------|
-| GZMO skill tools | `~/.pi/agent/skills/gzmo-integration/index.ts` | `gzmo_health`, `gzmo_dream`, `gzmo_chaos`, etc. — **no `gzmo_mentor_*`** |
+| GZMO skill tools | `~/.pi/agent/skills/gzmo-integration/index.ts` | `gzmo_mentor_*`, `gzmo_health`, `gzmo_dream`, `gzmo_chaos`, … |
+| Mentor bridge | `scripts/pi/mentor.sh` | NDJSON → `data/gzmo_mentor.sock` |
 | Chaos bridge | `scripts/pi/chaos_skill.sh` | `gzmo chaos skill` |
 | Memory bridge | `scripts/pi-gzmo-memory.sh` | Hot memory per turn |
-| Synapse notifier | `~/.pi/agent/extensions/synapse-notifier.ts` | Pi → `data/Synapse/events.jsonl` |
-| MCP | `~/.pi/agent/mcp.json` | `gzmo mcp-serve` (memory/wiki only) |
-| Operator guide | `docs/PI_OPERATOR_GUIDE.md` | Prime default; no mentor dialog section yet |
+| Synapse notifier | `~/.pi/agent/extensions/synapse-notifier.ts` | Pi → bus; `session_end` → `gzmo distill pi` |
+| MCP | `~/.pi/agent/mcp.json` | `gzmo mcp-serve` (memory/wiki only; mentor not on MCP) |
+| Operator guide | `docs/PI_OPERATOR_GUIDE.md` | §4.3a mentor + session_end distill |
+| Smoke | `scripts/pi/smoke.sh` | mentor + distill parser tests |
 
 ---
 
@@ -115,14 +121,15 @@ sequenceDiagram
 
 | ID | Phase | Task | Status |
 |----|-------|------|--------|
-| `phase-0-reload` | 0A | `reload_from_disk()` on socket `teach`/`status`; optional `reload` method | **Pending** |
-| `phase-0-synapse` | 0B | Add `[synapse_pull]` to live `gzmo.toml` | **Pending** |
-| `phase-1-shell` | 1A | `scripts/pi/mentor.sh` | **Pending** |
-| `phase-1-pi-tool` | 1B | `gzmo_mentor_*` in `gzmo-integration/index.ts` | **Pending** |
-| `phase-1-docs` | 1C | `SKILL.md`, `PI_OPERATOR_GUIDE.md`, `BRIDGE.md` | **Pending** |
-| `phase-1-synapse` | 1D | Synapse events on `gzmo_mentor_*` | **Pending** |
-| `phase-2-learn` | 2 | Learn-mode session buffer + routing + `/learn` | **Pending** |
-| `phase-3-harden` | 3 | Timeouts, CLI JSON stdin, test script, optional MCP | **Pending** |
+| `phase-0-reload` | 0A | `reload_from_disk()` on socket `teach`/`status`; optional `reload` method | **Done** |
+| `phase-0-synapse` | 0B | Add `[synapse_pull]` to live `gzmo.toml` | **Done** |
+| `phase-1-shell` | 1A | `scripts/pi/mentor.sh` | **Done** |
+| `phase-1-pi-tool` | 1B | `gzmo_mentor_*` in `gzmo-integration/index.ts` | **Done** |
+| `phase-1-docs` | 1C | `SKILL.md`, `PI_OPERATOR_GUIDE.md`, `BRIDGE.md` | **Done** |
+| `phase-1-synapse` | 1D | Synapse events on `gzmo_mentor_*` | **Done** |
+| `phase-2-learn` | 2 | Learn-mode session buffer + routing + `/learn` | **Done** |
+| `phase-3-harden` | 3 | Timeouts, CLI JSON stdin, test script, optional MCP | **Partial** (MCP mentor optional) |
+| `session-end-distill` | — | `gzmo distill pi` + daemon poll + Pi notifier | **Done** |
 
 **Recommended order:** 0A → 0B → 1A → 1B → 1C → 1D → 2 → 3.
 
