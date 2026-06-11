@@ -115,16 +115,24 @@ pub async fn run_pi(
     config: &GzmoConfig,
     _identity: &IdentityEngine,
     pi_session_path: &Path,
+    start_turn: usize,
+    max_turns: Option<usize>,
 ) -> Result<()> {
     info!(
         path = %pi_session_path.display(),
+        start_turn,
+        ?max_turns,
         "GZMO — Pi session distill (session_end → vault)"
     );
 
     set_event_source(gzmo_core::synapse::EventSource::GzmoCli);
 
     let (engine, session) = build_distill_engine(config).await?;
-    let report = engine.distill_pi_jsonl(pi_session_path).await?;
+    let report = if start_turn > 0 || max_turns.is_some() {
+        engine.distill_pi_jsonl_range(pi_session_path, start_turn, max_turns).await?
+    } else {
+        engine.distill_pi_jsonl(pi_session_path).await?
+    };
     println!("{}", report.summary);
     session.close().await;
     Ok(())

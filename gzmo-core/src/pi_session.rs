@@ -137,6 +137,102 @@ struct PiContentBlock {
     text: Option<String>,
 }
 
+/// Parse Pi JSONL into `(session_id, transcript)` for SessionDistill with turn range constraints.
+pub fn parse_pi_jsonl_transcript_range(
+    path: &Path,
+    start_turn: usize,
+    max_turns: Option<usize>,
+    max_chars: usize,
+) -> Result<(String, String)> {
+    let file = File::open(path).with_context(|| format!("open Pi session {}", path.display()))?;
+    let reader = BufReader::new(file);
+
+    let mut session_id = pi_session_id_from_path(path);
+    let mut created_at: Option<DateTime<Utc>> = None;
+    let mut out = String::new();
+    let mut current_turn_index = 0;
+    let mut message_count = 0;
+
+    for line in reader.lines() {
+        let line = line?;
+        if line.trim().is_empty() {
+            continue;
+        }
+        let row: PiJsonlRow = match serde_json::from_str(&line) {
+            Ok(r) => r,
+            Err(_) => continue,
+        };
+
+        if row.row_type == "session" {
+            if let Some(id) = row.id.as_deref().or(row.header.as_ref().map(|h| h.id.as_str())) {
+                session_id = format!("pi-{id}");
+            }
+            let ts_str = row
+                .timestamp
+                .as_deref()
+                .or(row.header.as_ref().map(|h| h.timestamp.as_str()));
+            if let Some(ts) = ts_str {
+                if let Ok(parsed) = DateTime::parse_from_rfc3339(ts) {
+                    created_at = Some(parsed.with_timezone(&Utc));
+                }
+            }
+            continue;
+        }
+
+        if row.row_type != "message" {
+            continue;
+        }
+        let Some(msg) = row.message else {
+            continue;
+        };
+        let role = msg.role.as_str();
+        if role != "user" && role != "assistant" {
+            continue;
+        }
+
+        let turn_idx = current_turn_index;
+        current_turn_index += 1;
+
+        if turn_idx < start_turn {
+            continue;
+        }
+        if let Some(limit) = max_turns {
+            if message_count >= limit {
+                break;
+            }
+        }
+
+        let text = extract_message_text(&msg);
+        if text.trim().is_empty() {
+            continue;
+        }
+        let label = if role == "user" { "USER" } else { "ASSISTANT" };
+        out.push_str(&format!("{label}: {text}\n\n"));
+        message_count += 1;
+
+        if out.len() >= max_chars {
+            out.truncate(max_chars);
+            break;
+        }
+    }
+
+    let created = created_at
+        .map(|t| t.format("%Y-%m-%d %H:%M UTC").to_string())
+        .unwrap_or_else(|| "unknown".to_string());
+    
+    let suffix = if let Some(limit) = max_turns {
+        format!("-shift-{}-{}", start_turn, start_turn + limit)
+    } else {
+        format!("-shift-{}", start_turn)
+    };
+    let range_session_id = format!("{session_id}{suffix}");
+
+    let mut transcript = format!("Pi session {range_session_id} — started {created}\n\n");
+    transcript.push_str(&out);
+
+    Ok((range_session_id, transcript))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -165,6 +261,28 @@ mod tests {
         assert_eq!(id, "pi-abc-123");
         assert!(transcript.contains("USER: hello distill"));
         assert!(transcript.contains("ASSISTANT: hi there"));
+        let _ = std::fs::remove_file(dir);
+    }
+
+    #[test]
+    fn parse_pi_jsonl_range_shape() {
+        let dir = std::env::temp_dir().join("gzmo_pi_session_range_test.jsonl");
+        std::fs::write(
+            &dir,
+            r#"{"type":"session","id":"abc-123","timestamp":"2026-06-11T14:49:34.959Z"}
+{"type":"message","message":{"role":"user","content":[{"type":"text","text":"turn 0"}]}}
+{"type":"message","message":{"role":"assistant","content":[{"type":"text","text":"turn 1"}]}}
+{"type":"message","message":{"role":"user","content":[{"type":"text","text":"turn 2"}]}}
+{"type":"message","message":{"role":"assistant","content":[{"type":"text","text":"turn 3"}]}}
+"#,
+        )
+        .unwrap();
+        let (id, transcript) = parse_pi_jsonl_transcript_range(&dir, 1, Some(2), 50_000).unwrap();
+        assert_eq!(id, "pi-abc-123-shift-1-3");
+        assert!(!transcript.contains("USER: turn 0"));
+        assert!(transcript.contains("ASSISTANT: turn 1"));
+        assert!(transcript.contains("USER: turn 2"));
+        assert!(!transcript.contains("ASSISTANT: turn 3"));
         let _ = std::fs::remove_file(dir);
     }
 }

@@ -50,7 +50,7 @@ enum Command {
     Memory(Vec<String>),
     Distill(Option<String>),
     /// Distill a Pi agent session JSONL (`gzmo distill pi <path>`).
-    DistillPi(std::path::PathBuf),
+    DistillPi { path: std::path::PathBuf, start_turn: usize, max_turns: Option<usize> },
     Health,
     Profile(Vec<String>),
     McpServe,
@@ -188,10 +188,37 @@ fn parse_args() -> (Option<String>, Command) {
         if args[1] == "distill" {
             if args.get(2).map(|s| s.as_str()) == Some("pi") {
                 let Some(path) = args.get(3) else {
-                    eprintln!("Usage: gzmo distill pi <session.jsonl>");
+                    eprintln!("Usage: gzmo distill pi <session.jsonl> [--from-turn <N>] [--max-turns <N>]");
                     std::process::exit(1);
                 };
-                return (learner, Command::DistillPi(std::path::PathBuf::from(path)));
+                let mut start_turn = 0;
+                let mut max_turns = None;
+                let mut i = 4;
+                while i < args.len() {
+                    if args[i] == "--from-turn" {
+                        if let Some(val) = args.get(i + 1) {
+                            if let Ok(n) = val.parse::<usize>() {
+                                start_turn = n;
+                            }
+                            i += 2;
+                            continue;
+                        }
+                    } else if args[i] == "--max-turns" {
+                        if let Some(val) = args.get(i + 1) {
+                            if let Ok(n) = val.parse::<usize>() {
+                                max_turns = Some(n);
+                            }
+                            i += 2;
+                            continue;
+                        }
+                    }
+                    i += 1;
+                }
+                return (learner, Command::DistillPi {
+                    path: std::path::PathBuf::from(path),
+                    start_turn,
+                    max_turns,
+                });
             }
             let id = args.get(2).cloned();
             return (learner, Command::Distill(id));
@@ -227,7 +254,7 @@ async fn main() -> Result<()> {
         Command::MemoryDump => "info",
         Command::MemoryEmbed(_) => "info",
         Command::Memory(_) => "warn",
-        Command::Distill(_) | Command::DistillPi(_) => "info",
+        Command::Distill(_) | Command::DistillPi { .. } => "info",
         Command::Health => "warn",
         Command::Profile(_) => "warn",
         Command::McpServe => "warn",
@@ -315,7 +342,7 @@ async fn main() -> Result<()> {
         Command::MemoryEmbed(limit) => embed_cmd::run(&config, &identity, limit).await,
         Command::Memory(sub) => memory_cmd::run(&config, sub).await,
         Command::Distill(session_id) => distill_cmd::run(&config, &identity, session_id).await,
-        Command::DistillPi(path) => distill_cmd::run_pi(&config, &identity, &path).await,
+        Command::DistillPi { path, start_turn, max_turns } => distill_cmd::run_pi(&config, &identity, &path, start_turn, max_turns).await,
         Command::Health => health_cmd::run(&config, identity).await,
         Command::Profile(args) => profile_cmd::run(&config, &args).await,
         Command::McpServe => mcp_serve_cmd::run(&config).await,

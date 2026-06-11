@@ -114,6 +114,23 @@ impl SessionDistillEngine {
             .await
     }
 
+    /// Distill a Pi agent JSONL session file with a turn range constraint.
+    pub async fn distill_pi_jsonl_range(
+        &self,
+        path: &Path,
+        start_turn: usize,
+        max_turns: Option<usize>,
+    ) -> Result<SessionDistillReport> {
+        let (session_id, transcript) = pi_session::parse_pi_jsonl_transcript_range(
+            path,
+            start_turn,
+            max_turns,
+            self.config.max_transcript_chars,
+        )?;
+        self.distill_transcript(&session_id, &transcript, DistillSource::MainArchive)
+            .await
+    }
+
     /// Distill a single session by id.
     pub async fn distill_one(&self, session_id: &str) -> Result<SessionDistillReport> {
         if !self.config.enabled {
