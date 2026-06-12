@@ -20,11 +20,12 @@
 | D1 / F1 | Deferred / future | Not started |
 
 **Companion docs:**
+- **Master remaining-work guide:** [`REMAINING_WORK_STEP_BY_STEP_GUIDE.md`](./REMAINING_WORK_STEP_BY_STEP_GUIDE.md) ← start here (2026-06-12)
 - Shipped baseline: [`PI_GZMO_PLATFORM_IMPLEMENTATION_HANDOFF.md`](./PI_GZMO_PLATFORM_IMPLEMENTATION_HANDOFF.md)
 - Bridge summary: `~/gzmo_skills/BRIDGE.md`
 - Broader deferred backlog: [`DEFERRED_WORK_HANDOFF.md`](./DEFERRED_WORK_HANDOFF.md)
 
-This document is the **step-by-step implementation guide for everything not yet landed on the remote branch**. Read §2 first so you do not re-implement work that exists locally but is uncommitted.
+This document is the **historical task-ID guide (R0–P3)**. Some status lines are stale after PR #23; use the master guide above for current steps. Read §2 first so you do not re-implement work that exists locally but is uncommitted.
 
 ---
 
