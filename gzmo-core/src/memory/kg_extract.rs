@@ -957,13 +957,22 @@ pub fn chunk_text_for_llm(raw: &str, max_chars: usize) -> Vec<String> {
     let mut chunks = Vec::new();
     let mut start = 0;
     while start < raw.len() {
-        let mut end = (start + max_chars).min(raw.len());
+        let mut end = raw.floor_char_boundary((start + max_chars).min(raw.len()));
         if end < raw.len() {
             if let Some(rel) = raw[start..end].rfind("\n\n") {
                 if rel > max_chars / 4 {
-                    end = start + rel + 2;
+                    end = raw.floor_char_boundary(start + rel + 2);
                 }
             }
+        }
+        if end <= start {
+            // Advance at least one scalar so we never spin on a split inside a multibyte char.
+            end = raw
+                .char_indices()
+                .find(|(i, _)| *i > start)
+                .map(|(i, c)| i + c.len_utf8())
+                .unwrap_or(raw.len());
+            end = raw.floor_char_boundary(end);
         }
         chunks.push(raw[start..end].to_string());
         start = end;
@@ -1256,5 +1265,25 @@ mod tests {
         assert_eq!(kept.len(), 1);
         assert_eq!(kept[0].entity.name, "Firewall Agent");
         assert_eq!(stats.entities_dropped, 0);
+    }
+
+    #[test]
+    fn chunk_text_handles_non_ascii_char_boundary() {
+        let text = "a".repeat(27999) + "ü" + &"b".repeat(100);
+        let chunks = chunk_text_for_llm(&text, 28000);
+        assert!(!chunks.is_empty());
+        assert_eq!(chunks[0].len(), 27999);
+        assert!(chunks[1].starts_with('ü'));
+        let joined: String = chunks.concat();
+        assert_eq!(joined, text);
+    }
+
+    #[test]
+    fn chunk_text_preserves_utf8_with_paragraph_splits() {
+        let para = "Zürich läuft.\n\n";
+        let text = para.repeat(1800) + "ü" + &"x".repeat(500);
+        let chunks = chunk_text_for_llm(&text, 28000);
+        assert!(chunks.len() > 1);
+        assert_eq!(chunks.concat(), text);
     }
 }
