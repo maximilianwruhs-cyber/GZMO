@@ -461,6 +461,14 @@ internal_max_tokens = 512
 mentor_api_enabled = true
 mentor_socket = "data/gzmo_mentor.sock"
 
+[pedagogy.sandbox]
+enabled = true
+max_code_chars = 2000
+timeout_secs = 10
+max_output_chars = 4000
+blocked_imports = ["os", "subprocess", "socket", "shutil", "sys"]
+orchestrator_offload = true
+
 [synapse_pull]
 enabled = true
 cron_hour = 2
