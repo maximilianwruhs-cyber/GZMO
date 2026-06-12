@@ -6,10 +6,13 @@ use anyhow::{Context, Result, bail};
 
 use gzmo_core::config::{GzmoConfig, TaskKind};
 use gzmo_core::gateway::GatewayRouter;
+use gzmo_core::mentor_client::MentorResponse;
 use gzmo_core::types::{Message, Role};
 
-use crate::mentor_ipc::{self, MentorRequest, MentorResponse, MentorTurn};
-use crate::pedagogy_bridge::PedagogyRuntime;
+use crate::mentor_ipc::{self, MentorRequest, MentorTurn};
+use crate::pedagogy_bridge::{
+    delegate_exec_response, should_delegate_exec, PedagogyRuntime,
+};
 
 pub async fn run(config: &GzmoConfig, args: &[String]) -> Result<()> {
     let sub = args.first().map(|s| s.as_str()).unwrap_or("teach");
@@ -21,7 +24,13 @@ pub async fn run(config: &GzmoConfig, args: &[String]) -> Result<()> {
             let req = parse_teach_request(&args[1..])?;
             run_teach_request(config, req).await
         }
-        _ => bail!("Usage: gzmo mentor <ping|status|reload|teach [message]|teach --json-file path>"),
+        "compute" => {
+            crate::mentor_compute_cmd::run(config, &args[1..]).await
+        }
+        "plot" => {
+            crate::mentor_plot_cmd::run(config, &args[1..]).await
+        }
+        _ => bail!("Usage: gzmo mentor <ping|status|reload|teach [message]|teach --json-file path|compute [expression]|plot [expression]>"),
     }
 }
 
@@ -130,6 +139,15 @@ async fn run_teach_request(config: &GzmoConfig, req: MentorRequest) -> Result<()
     if !resp.ok {
         bail!(resp.error.unwrap_or_else(|| "teach failed".into()));
     }
+    if resp.action == Some(gzmo_core::mentor_client::MentorAction::DelegateExec) {
+        if let Some(hint) = &resp.delegate_hint {
+            eprintln!("{hint}");
+        }
+        if let Some(payload) = &resp.delegate_payload {
+            eprintln!("delegate_payload: {payload}");
+        }
+        return Ok(());
+    }
     if let Some(text) = resp.response {
         println!("{text}");
     } else {
@@ -156,10 +174,8 @@ async fn local_dispatch(config: &GzmoConfig, req: MentorRequest) -> Result<Mento
         "ping" => Ok(MentorResponse {
             ok: true,
             response: Some("pong (local)".into()),
-            mentor: None,
-            ops_mode: None,
             learner_id: Some(config.pedagogy.learner_id().to_string()),
-            error: None,
+            ..MentorResponse::base()
         }),
         "reload" => {
             let mut runtime = PedagogyRuntime::boot(config).await?;
@@ -170,7 +186,7 @@ async fn local_dispatch(config: &GzmoConfig, req: MentorRequest) -> Result<Mento
                 mentor: Some(!runtime.session.ops_mode),
                 ops_mode: Some(runtime.session.ops_mode),
                 learner_id: Some(config.pedagogy.learner_id().to_string()),
-                error: None,
+                ..MentorResponse::base()
             })
         }
         "status" => {
@@ -178,11 +194,10 @@ async fn local_dispatch(config: &GzmoConfig, req: MentorRequest) -> Result<Mento
             runtime.reload_from_disk().await?;
             Ok(MentorResponse {
                 ok: true,
-                response: None,
                 mentor: Some(!runtime.session.ops_mode),
                 ops_mode: Some(runtime.session.ops_mode),
                 learner_id: Some(config.pedagogy.learner_id().to_string()),
-                error: None,
+                ..MentorResponse::base()
             })
         }
         "teach" => local_teach(config, &req).await,
@@ -202,32 +217,18 @@ async fn local_teach(config: &GzmoConfig, req: &MentorRequest) -> Result<MentorR
     let tutor = router.gateway(TaskKind::Chat);
     let mut runtime = PedagogyRuntime::boot(config).await?;
     runtime.reload_from_disk().await?;
-    if runtime.session.ops_mode {
-        return Ok(MentorResponse {
-            ok: false,
-            response: None,
-            mentor: Some(false),
-            ops_mode: Some(true),
-            learner_id: Some(config.pedagogy.learner_id().to_string()),
-            error: Some("ops mode active".into()),
-        });
+    let learner_id = config.pedagogy.learner_id().to_string();
+    if should_delegate_exec(&runtime.session, message) {
+        return Ok(delegate_exec_response(message, &runtime.session, &learner_id));
     }
     let messages = build_messages(&req.conversation, message);
     let text = runtime
         .maybe_teach(config, &router, tutor.as_ref(), message, &messages)
         .await?;
-    Ok(MentorResponse {
-        ok: true,
-        response: text.clone(),
-        mentor: Some(text.is_some()),
-        ops_mode: Some(false),
-        learner_id: Some(config.pedagogy.learner_id().to_string()),
-        error: if text.is_none() {
-            Some("not a mentor turn".into())
-        } else {
-            None
-        },
-    })
+    match text {
+        Some(response) => Ok(MentorResponse::teach(response, learner_id)),
+        None => Ok(delegate_exec_response(message, &runtime.session, &learner_id)),
+    }
 }
 
 fn build_messages(conversation: &[MentorTurn], user_message: &str) -> Vec<Message> {

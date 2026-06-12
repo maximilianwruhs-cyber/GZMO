@@ -662,7 +662,41 @@ pub struct PedagogyConfig {
 
     #[serde(default = "default_mentor_socket")]
     pub mentor_socket: String,
+
+    #[serde(default)]
+    pub sandbox: SandboxConfig,
 }
+
+#[derive(Debug, Deserialize, Serialize, Clone, Default)]
+pub struct SandboxConfig {
+    #[serde(default = "default_sandbox_enabled")]
+    pub enabled: bool,
+    #[serde(default = "default_sandbox_max_code_chars")]
+    pub max_code_chars: usize,
+    #[serde(default = "default_sandbox_timeout_secs")]
+    pub timeout_secs: u64,
+    #[serde(default = "default_sandbox_max_output_chars")]
+    pub max_output_chars: usize,
+    #[serde(default = "default_sandbox_blocked_imports")]
+    pub blocked_imports: Vec<String>,
+    #[serde(default = "default_sandbox_orchestrator_offload")]
+    pub orchestrator_offload: bool,
+}
+
+fn default_sandbox_enabled() -> bool { true }
+fn default_sandbox_max_code_chars() -> usize { 2000 }
+fn default_sandbox_timeout_secs() -> u64 { 10 }
+fn default_sandbox_max_output_chars() -> usize { 4000 }
+fn default_sandbox_blocked_imports() -> Vec<String> {
+    vec![
+        "os".to_string(),
+        "subprocess".to_string(),
+        "socket".to_string(),
+        "shutil".to_string(),
+        "sys".to_string(),
+    ]
+}
+fn default_sandbox_orchestrator_offload() -> bool { false }
 
 fn default_pedagogy_enabled() -> bool { true }
 fn default_learner_data_dir() -> String { "data/learner".to_string() }
@@ -690,6 +724,7 @@ impl Default for PedagogyConfig {
             active_learner_id: None,
             mentor_api_enabled: default_mentor_api_enabled(),
             mentor_socket: default_mentor_socket(),
+            sandbox: SandboxConfig::default(),
         }
     }
 }

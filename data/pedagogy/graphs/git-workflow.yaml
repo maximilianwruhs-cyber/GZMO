@@ -1,0 +1,43 @@
+domain: git-workflow
+nodes:
+  - id: git_init
+    title: Git Init & Config
+    description: Initializing repositories with git init, configuring user.name and user.email, understanding the .git directory.
+    prerequisites: []
+    bloom_level: remember
+
+  - id: git_staging
+    title: Git Staging & Commits
+    description: Staging files with git add, reviewing changes with git status/diff, and committing with git commit.
+    prerequisites:
+      - git_init
+    bloom_level: understand
+
+  - id: git_branches
+    title: Git Branching
+    description: Creating, switching, and listing branches with git branch and git checkout/switch.
+    prerequisites:
+      - git_staging
+    bloom_level: apply
+
+  - id: git_remotes
+    title: Git Remotes & Collaboration
+    description: Working with remote repositories using git remote, git push, git pull, and git clone.
+    prerequisites:
+      - git_branches
+    bloom_level: apply
+
+  - id: git_merging
+    title: Git Merging & Conflict Resolution
+    description: Merging branches with git merge and resolving merge conflicts cleanly.
+    prerequisites:
+      - git_branches
+      - git_remotes
+    bloom_level: analyze
+
+  - id: git_rebasing
+    title: Git Rebasing
+    description: Rewriting history using git rebase (interactive and standard) vs merge.
+    prerequisites:
+      - git_merging
+    bloom_level: evaluate

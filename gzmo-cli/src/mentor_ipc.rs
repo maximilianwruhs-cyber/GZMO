@@ -20,8 +20,10 @@ use gzmo_chaos::feedback_ipc;
 use gzmo_chaos::pulse::ChaosSnapshot;
 use gzmo_core::skills::dispatch::{self, data_dir};
 
-use crate::pedagogy_bridge::PedagogyRuntime;
-pub use gzmo_core::mentor_client::{MentorRequest, MentorResponse, MentorTurn, client_request};
+use crate::pedagogy_bridge::{delegate_exec_response, should_delegate_exec, PedagogyRuntime};
+pub use gzmo_core::mentor_client::{
+    client_request, MentorAction, MentorRequest, MentorResponse, MentorTurn,
+};
 
 pub struct MentorServerState {
     pub config: Arc<GzmoConfig>,
@@ -94,11 +96,9 @@ async fn handle_connection(stream: UnixStream, state: &Arc<MentorServerState>) -
                 &mut writer,
                 &MentorResponse {
                     ok: false,
-                    response: None,
-                    mentor: None,
-                    ops_mode: None,
                     learner_id: None,
                     error: Some("empty request".into()),
+                    ..MentorResponse::base()
                 },
             )
             .await?;
@@ -127,10 +127,8 @@ async fn dispatch_request(req: MentorRequest, state: &Arc<MentorServerState>) ->
         "ping" => MentorResponse {
             ok: true,
             response: Some("pong".into()),
-            mentor: None,
-            ops_mode: None,
             learner_id: Some(state.config.pedagogy.learner_id().to_string()),
-            error: None,
+            ..MentorResponse::base()
         },
         "status" => status_response(state).await,
         "reload" => reload_response(state).await,
@@ -138,20 +136,25 @@ async fn dispatch_request(req: MentorRequest, state: &Arc<MentorServerState>) ->
             Ok(resp) => resp,
             Err(e) => MentorResponse {
                 ok: false,
-                response: None,
-                mentor: None,
-                ops_mode: None,
                 learner_id: Some(state.config.pedagogy.learner_id().to_string()),
                 error: Some(e.to_string()),
+                ..MentorResponse::base()
+            },
+        },
+        "compute" => match compute(&req, state).await {
+            Ok(resp) => resp,
+            Err(e) => MentorResponse {
+                ok: false,
+                learner_id: Some(state.config.pedagogy.learner_id().to_string()),
+                error: Some(e.to_string()),
+                ..MentorResponse::base()
             },
         },
         other => MentorResponse {
             ok: false,
-            response: None,
-            mentor: None,
-            ops_mode: None,
             learner_id: None,
             error: Some(format!("unknown method: {other}")),
+            ..MentorResponse::base()
         },
     }
 }
@@ -161,20 +164,17 @@ async fn status_response(state: &Arc<MentorServerState>) -> MentorResponse {
     if let Err(e) = pedagogy.reload_from_disk().await {
         return MentorResponse {
             ok: false,
-            response: None,
-            mentor: None,
-            ops_mode: None,
             learner_id: Some(state.config.pedagogy.learner_id().to_string()),
             error: Some(e.to_string()),
+            ..MentorResponse::base()
         };
     }
     MentorResponse {
         ok: true,
-        response: None,
         mentor: Some(!pedagogy.session.ops_mode),
         ops_mode: Some(pedagogy.session.ops_mode),
         learner_id: Some(state.config.pedagogy.learner_id().to_string()),
-        error: None,
+        ..MentorResponse::base()
     }
 }
 
@@ -187,15 +187,13 @@ async fn reload_response(state: &Arc<MentorServerState>) -> MentorResponse {
             mentor: Some(!pedagogy.session.ops_mode),
             ops_mode: Some(pedagogy.session.ops_mode),
             learner_id: Some(state.config.pedagogy.learner_id().to_string()),
-            error: None,
+            ..MentorResponse::base()
         },
         Err(e) => MentorResponse {
             ok: false,
-            response: None,
-            mentor: None,
-            ops_mode: None,
             learner_id: Some(state.config.pedagogy.learner_id().to_string()),
             error: Some(e.to_string()),
+            ..MentorResponse::base()
         },
     }
 }
@@ -211,15 +209,9 @@ async fn teach(req: &MentorRequest, state: &Arc<MentorServerState>) -> Result<Me
 
     let mut pedagogy = state.pedagogy.lock().await;
     pedagogy.reload_from_disk().await?;
-    if pedagogy.session.ops_mode {
-        return Ok(MentorResponse {
-            ok: false,
-            response: None,
-            mentor: Some(false),
-            ops_mode: Some(true),
-            learner_id: Some(state.config.pedagogy.learner_id().to_string()),
-            error: Some("ops mode active — mentor path disabled; toggle via /ops or session.json".into()),
-        });
+    let learner_id = state.config.pedagogy.learner_id().to_string();
+    if should_delegate_exec(&pedagogy.session, message) {
+        return Ok(delegate_exec_response(message, &pedagogy.session, &learner_id));
     }
 
     let messages = build_messages(&req.conversation, message);
@@ -242,24 +234,39 @@ async fn teach(req: &MentorRequest, state: &Arc<MentorServerState>) -> Result<Me
                 &response,
                 req.conversation.len() as u32 + 1,
             );
-            Ok(MentorResponse {
-                ok: true,
-                response: Some(response),
-                mentor: Some(true),
-                ops_mode: Some(false),
-                learner_id: Some(state.config.pedagogy.learner_id().to_string()),
-                error: None,
-            })
+            Ok(MentorResponse::teach(response, learner_id))
         }
-        None => Ok(MentorResponse {
-            ok: true,
-            response: None,
-            mentor: Some(false),
-            ops_mode: Some(false),
-            learner_id: Some(state.config.pedagogy.learner_id().to_string()),
-            error: Some("not a mentor turn (ops intent or routing fallback)".into()),
-        }),
+        None => Ok(delegate_exec_response(message, &pedagogy.session, &learner_id)),
     }
+}
+
+async fn compute(req: &MentorRequest, state: &Arc<MentorServerState>) -> Result<MentorResponse> {
+    if !state.config.pedagogy.enabled {
+        bail!("pedagogy disabled");
+    }
+    let message = req.message.trim();
+    if message.is_empty() {
+        bail!("message required");
+    }
+
+    let code = if message.contains('\n') || message.contains(';') || message.contains("print(") {
+        message.to_string()
+    } else {
+        format!("print({})", message)
+    };
+
+    use gzmo_core::tools::{python_sandbox::PythonSandboxTool, ToolHandler};
+    let tool = PythonSandboxTool::new(&state.config.pedagogy);
+    let output = tool.execute(serde_json::json!({ "code": code })).await?;
+
+    Ok(MentorResponse {
+        ok: true,
+        response: Some(output.trim().to_string()),
+        mentor: Some(false),
+        action: Some(MentorAction::DelegateCompute),
+        learner_id: Some(state.config.pedagogy.learner_id().to_string()),
+        ..MentorResponse::base()
+    })
 }
 
 fn build_messages(conversation: &[MentorTurn], user_message: &str) -> Vec<Message> {

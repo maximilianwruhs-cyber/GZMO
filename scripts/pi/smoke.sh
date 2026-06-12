@@ -3,6 +3,10 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+
+echo "== Validating Pedagogy Graphs =="
+"$ROOT/target/release/gzmo" pedagogy graph validate "$ROOT/data/pedagogy/graphs/"
+
 "$ROOT/scripts/pi/test_mentor_dialog.sh"
 "$ROOT/scripts/pi/test_distill_pi.sh"
 "$ROOT/scripts/pi/test_session_end_distill.sh"

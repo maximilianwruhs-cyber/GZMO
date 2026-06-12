@@ -24,6 +24,8 @@ mod wiki_cmd;
 mod pedagogy_graph_cmd;
 mod mentor_ipc;
 mod mentor_cmd;
+mod mentor_compute_cmd;
+mod mentor_plot_cmd;
 #[allow(dead_code)]
 mod ui;
 pub mod tui;

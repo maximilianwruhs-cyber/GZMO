@@ -6,11 +6,44 @@ use anyhow::Result;
 
 use gzmo_core::config::{GzmoConfig, PedagogyDefaultMode, TaskKind};
 use gzmo_core::gateway::{GatewayRouter, LlmGateway};
+use gzmo_core::mentor_client::MentorResponse;
 use gzmo_core::pedagogy::{
     classify_intent, InteractionIntent, LearnerProfile, LearnerStore, OrchestratorInput,
     PedagogyOrchestrator, PedagogySession, PrerequisiteGraph,
 };
 use gzmo_core::types::{Message, Role};
+
+const DELEGATE_HINT_OPS_MODE: &str = "Ops mode active. Run the request with bash/shell tools; \
+    do not call gzmo_mentor_teach until /ops toggles mentor back.";
+
+const DELEGATE_HINT_OPS_INTENT: &str = "Ops intent detected. Run the request with bash/shell tools, \
+    or toggle /ops for sustained execution mode.";
+
+/// True when the client should execute locally instead of running the Socratic orchestrator.
+pub fn should_delegate_exec(session: &PedagogySession, input: &str) -> bool {
+    if session.ops_mode {
+        return true;
+    }
+    classify_intent(
+        input,
+        false,
+        session.learn_prep_topic.is_some(),
+        session.learn_prep_notes.is_some(),
+    ) == InteractionIntent::Ops
+}
+
+pub fn delegate_exec_response(
+    message: &str,
+    session: &PedagogySession,
+    learner_id: &str,
+) -> MentorResponse {
+    let hint = if session.ops_mode {
+        DELEGATE_HINT_OPS_MODE
+    } else {
+        DELEGATE_HINT_OPS_INTENT
+    };
+    MentorResponse::delegate_exec(message, session.ops_mode, learner_id.to_string(), hint)
+}
 
 pub struct PedagogyRuntime {
     pub orchestrator: PedagogyOrchestrator,
@@ -171,5 +204,32 @@ impl PedagogyRuntime {
         self.session = PedagogySession::load(self.learner_store.pedagogy_config()).await?;
         self.learner_profile = self.learner_store.load().await?;
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use gzmo_core::pedagogy::PedagogySession;
+
+    #[test]
+    fn should_delegate_when_ops_mode() {
+        let session = PedagogySession {
+            ops_mode: true,
+            ..Default::default()
+        };
+        assert!(should_delegate_exec(&session, "what is a symlink?"));
+    }
+
+    #[test]
+    fn should_delegate_on_ops_intent_phrase() {
+        let session = PedagogySession::default();
+        assert!(should_delegate_exec(&session, "run ls -la /tmp"));
+    }
+
+    #[test]
+    fn should_not_delegate_socratic_question() {
+        let session = PedagogySession::default();
+        assert!(!should_delegate_exec(&session, "what is a symlink?"));
     }
 }
