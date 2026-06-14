@@ -1,0 +1,3 @@
+## 2024-06-25 - Terminal scroll events swallowed by mouse capture in Ratatui/crossterm
+**Learning:** When `crossterm::event::EnableMouseCapture` is active, native terminal scrolling is swallowed. Components like the command palette overlay in a TUI must explicitly handle `MouseEventKind::ScrollUp` and `MouseEventKind::ScrollDown` to restore scroll functionality inside the menu.
+**Action:** Always ensure that scrollable components manually capture and route mouse scroll events (`ScrollUp`/`ScrollDown`) to their respective state-update functions (like `self.previous()` and `self.next()`) to prevent broken scroll UX.
