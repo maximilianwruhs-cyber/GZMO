@@ -13,6 +13,9 @@ pub enum LifecycleKind {
     Duplicate,
     /// Enrichment — both stay `is_latest`.
     Extends,
+    /// Same entity, different predicates, moderate token overlap → complementary
+    /// observations. Both stay `is_latest`, both inserted independently.
+    Complements,
     /// Replacement — old `is_latest = 0`, new row links `update`.
     Contradicts,
     /// No cluster match — independent insert.
@@ -25,6 +28,7 @@ impl LifecycleKind {
     pub fn graph_rel(self) -> Option<&'static str> {
         match self {
             Self::Extends => Some("extends"),
+            Self::Complements => Some("complements"),
             Self::Contradicts => Some("update"),
             Self::Derives => Some("derives"),
             _ => None,
@@ -59,6 +63,13 @@ pub fn classify_truth_pair(old_content: &str, new_content: &str) -> LifecycleKin
         return LifecycleKind::Contradicts;
     }
 
+    // Check complements before is_extension: same-entity facts with different
+    // predicates (e.g. "uses SQLite" vs "uses Neo4j") should be Complements,
+    // not Extends, even if most old tokens appear in the new one.
+    if complements_heuristic(old_content, new_content) {
+        return LifecycleKind::Complements;
+    }
+
     if is_extension(&old_n, &new_n) {
         return LifecycleKind::Extends;
     }
@@ -75,7 +86,11 @@ fn has_negation_shift(old_n: &str, new_n: &str) -> bool {
     new_has && !old_has
 }
 
-/// New fact enriches old (all old tokens appear in order; new is longer).
+/// New fact enriches old (majority of old tokens appear in order; new is longer).
+/// Tuned (2026-06-15): requires ≥60% token match instead of all tokens
+/// to reduce false Extends on same-entity facts with different observations.
+/// Guard: if both facts share the same entity but have different predicates
+/// with moderate token overlap, prefer Complements over Extends.
 fn is_extension(old_n: &str, new_n: &str) -> bool {
     if new_n == old_n || has_negation_shift(old_n, new_n) {
         return false;
@@ -87,14 +102,30 @@ fn is_extension(old_n: &str, new_n: &str) -> bool {
     if old_tokens.len() < 2 {
         return false;
     }
+    // Require at least 60% of old tokens to appear in order in new_n
+    let mut matched = 0usize;
     let mut pos = 0usize;
     for t in &old_tokens {
-        let Some(idx) = new_n[pos..].find(t) else {
-            return false;
-        };
-        pos += idx + t.len();
+        if let Some(idx) = new_n[pos..].find(t) {
+            matched += 1;
+            pos += idx + t.len();
+        }
     }
-    new_n.len() > old_n.len() + 8
+    let match_ratio = matched as f64 / old_tokens.len() as f64;
+    if match_ratio < 0.6 {
+        return false;
+    }
+    // Guard: if predicates differ with moderate overlap, this is likely
+    // a complement (different aspect), not an extension.
+    let overlap = token_overlap(old_n, new_n);
+    if overlap >= 0.3 && overlap < 0.5 {
+        if let (Some(op), Some(np)) = (predicate_tail(old_n), predicate_tail(new_n)) {
+            if op != np {
+                return false;
+            }
+        }
+    }
+    new_n.len() > old_n.len() + 4
 }
 
 fn contradicts_heuristic(old: &str, new: &str) -> bool {
@@ -130,9 +161,49 @@ fn contradicts_heuristic(old: &str, new: &str) -> bool {
         return token_overlap(old, new) >= 0.25;
     }
 
-    // Same entity, different role/object predicate (e.g. "is X" vs "is Y").
+    // Same entity, different role/object predicate with VERY HIGH token overlap
+    // → likely contradiction (same topic, different claim).
+    // Moderate overlap (≥0.2, <0.5) falls through to complements.
     if let (Some(old_pred), Some(new_pred)) = (predicate_tail(old), predicate_tail(new)) {
-        if old_pred != new_pred && token_overlap(old, new) >= 0.2 {
+        if old_pred != new_pred && token_overlap(old, new) >= 0.5 {
+            return true;
+        }
+    }
+
+    false
+}
+
+/// Same entity, moderate token overlap, different predicates → complementary.
+/// Both facts describe different aspects of the same entity — e.g.
+/// "GZMO uses SQLite for vault" + "GZMO uses Neo4j for graph".
+/// Both stay `is_latest`, both inserted independently.
+fn complements_heuristic(old: &str, new: &str) -> bool {
+    let Some(old_ent) = extract_primary_entity(old) else {
+        return false;
+    };
+    let Some(new_ent) = extract_primary_entity(new) else {
+        return false;
+    };
+    if normalize_entity_key(&old_ent) != normalize_entity_key(&new_ent) {
+        return false;
+    }
+
+    // Overlap too high → contradicts already caught it.
+    let overlap = token_overlap(old, new);
+    if overlap >= 0.5 {
+        return false;
+    }
+
+    // If is_extension fired, skip complements.
+    let old_n = normalize_truth_content(old);
+    let new_n = normalize_truth_content(new);
+    if is_extension(&old_n, &new_n) {
+        return false;
+    }
+
+    // Same entity, different predicates, moderate token overlap → complements.
+    if let (Some(old_pred), Some(new_pred)) = (predicate_tail(old), predicate_tail(new)) {
+        if old_pred != new_pred && overlap >= 0.2 {
             return true;
         }
     }
@@ -274,6 +345,69 @@ mod tests {
                 "[AGENT:Firewall] no longer manages rules on LXC101"
             ),
             LifecycleKind::Contradicts
+        );
+    }
+
+    #[test]
+    fn partial_token_overlap_below_60pct_is_complements() {
+        // Different observations on same entity — moderate token overlap,
+        // different predicates → Complements (both valid, different aspects).
+        assert_eq!(
+            classify_truth_pair(
+                "[SYSTEM:GZMO] uses SQLite for vault storage",
+                "[SYSTEM:GZMO] uses Neo4j for graph storage"
+            ),
+            LifecycleKind::Complements
+        );
+    }
+
+    #[test]
+    fn high_overlap_same_entity_is_contradicts() {
+        // Same entity, high token overlap, different predicates → Contradicts.
+        assert_eq!(
+            classify_truth_pair(
+                "[SYSTEM:GZMO] uses SQLite for all persistent storage",
+                "[SYSTEM:GZMO] uses PostgreSQL for all persistent storage"
+            ),
+            LifecycleKind::Contradicts
+        );
+    }
+
+    #[test]
+    fn complements_different_aspects_same_entity() {
+        // Two different aspects of the same entity — both should stay latest.
+        // Moderate token overlap ("GZMO", "memory", "system" shared), different predicates.
+        assert_eq!(
+            classify_truth_pair(
+                "[SYSTEM:GZMO] is a sovereign memory system with Neo4j graph layer",
+                "[SYSTEM:GZMO] is a sovereign memory system with SQLite persistent storage"
+            ),
+            LifecycleKind::Complements
+        );
+    }
+
+    #[test]
+    fn low_overlap_same_entity_is_unrelated() {
+        // Very different predicates on same entity — low token overlap → unrelated.
+        assert_eq!(
+            classify_truth_pair(
+                "[SYSTEM:GZMO] uses SQLite for vault storage",
+                "[SYSTEM:GZMO] identity formula for sovereign memory"
+            ),
+            LifecycleKind::Unrelated
+        );
+    }
+
+
+    #[test]
+    fn extension_still_works_with_high_overlap() {
+        // Genuine enrichment — most tokens preserved, new content added.
+        assert_eq!(
+            classify_truth_pair(
+                "[SYSTEM:GZMO] uses SQLite for vault storage",
+                "[SYSTEM:GZMO] uses SQLite for vault storage with WAL mode"
+            ),
+            LifecycleKind::Extends
         );
     }
 

@@ -17,7 +17,7 @@ use std::sync::Arc;
 
 use crate::memory::embeddings::Embedder;
 use crate::memory::qdrant_recall::QdrantRecall;
-use crate::memory::honeypot::{self, qualifies_for_honeypot};
+use crate::memory::honeypot::{self};
 use crate::memory::lifecycle::{
     classify_truth_pair, extract_primary_entity, find_latest_honeypot_by_entity,
     is_unverified_derived, supersede_honeypot, LifecycleKind,
@@ -226,6 +226,24 @@ impl SqliteVault {
             )?;
             init_conn.execute_batch("PRAGMA user_version = 7")?;
             info!("Applied schema migration v7: ingest_dedup");
+        }
+        let user_version: u32 = init_conn.query_row("PRAGMA user_version", [], |row| row.get(0))?;
+        if user_version < 8 {
+            init_conn.execute_batch(
+                "CREATE TABLE IF NOT EXISTS honeypot_review_queue (
+                    vault_id TEXT PRIMARY KEY,
+                    reason TEXT NOT NULL,
+                    content_preview TEXT NOT NULL,
+                    confidence REAL,
+                    source_file TEXT,
+                    queued_at TEXT NOT NULL,
+                    reviewed INTEGER NOT NULL DEFAULT 0
+                );
+                CREATE INDEX IF NOT EXISTS idx_honeypot_review_pending
+                    ON honeypot_review_queue(reviewed, queued_at);",
+            )?;
+            init_conn.execute_batch("PRAGMA user_version = 8")?;
+            info!("Applied schema migration v8: honeypot_review_queue");
         }
 
         info!("Semantic vault initialized (WAL mode + r2d2 pool)");
@@ -1173,6 +1191,63 @@ fn maybe_upsert_evidence(
     Ok(())
 }
 
+    /// Promote to honeypot when eligible; otherwise append structured reject log.
+    fn promote_honeypot_or_log(
+        conn: &Connection,
+        vault_id: &str,
+        truth: &ExtractedTruth,
+        embedding: &[u8],
+        content_norm: &str,
+        origin: &str,
+        evidence_embedding: &[u8],
+        lifecycle: Option<(Option<&str>, Option<&str>)>,
+    ) -> Result<()> {
+        if is_unverified_derived(truth, origin) {
+            return Ok(());
+        }
+        match honeypot::honeypot_eligibility(truth) {
+            Ok(()) => {
+                if let Some((graph_rel, supersedes_id)) = lifecycle {
+                    honeypot::insert_honeypot_lifecycle(
+                        conn,
+                        vault_id,
+                        truth,
+                        embedding,
+                        content_norm,
+                        origin,
+                        graph_rel,
+                        supersedes_id,
+                    )?;
+                } else {
+                    honeypot::upsert_honeypot_row(
+                        conn,
+                        vault_id,
+                        truth,
+                        embedding,
+                        content_norm,
+                        origin,
+                    )?;
+                }
+                Self::maybe_upsert_evidence(conn, vault_id, truth, evidence_embedding)
+            }
+            Err(reason) => {
+                let _ = honeypot::append_reject_log(
+                    Path::new(honeypot::HONEYPOT_REJECT_LOG),
+                    &reason,
+                    truth,
+                    vault_id,
+                );
+                let _ = honeypot::enqueue_review(
+                    conn,
+                    vault_id,
+                    &reason,
+                    truth,
+                );
+                Ok(())
+            }
+        }
+    }
+
     fn promote_corroborate_vault(
         &self,
         conn: &Connection,
@@ -1195,17 +1270,16 @@ fn maybe_upsert_evidence(
             params![now, confidence, content_norm, existing_id],
         )?;
         info!(id = %existing_id, "Corroborated existing truth");
-        if qualifies_for_honeypot(truth) && !is_unverified_derived(truth, origin) {
-            honeypot::upsert_honeypot_row(
-                conn,
-                existing_id,
-                truth,
-                embedding,
-                content_norm,
-                origin,
-            )?;
-            Self::maybe_upsert_evidence(conn, existing_id, truth, evidence_embedding)?;
-        }
+        Self::promote_honeypot_or_log(
+            conn,
+            existing_id,
+            truth,
+            embedding,
+            content_norm,
+            origin,
+            evidence_embedding,
+            None,
+        )?;
         Ok(())
     }
 
@@ -1264,19 +1338,19 @@ fn maybe_upsert_evidence(
                             ],
                         )?;
                         supersede_honeypot(conn, &old_hp_id)?;
-                        if qualifies_for_honeypot(truth) && !is_unverified_derived(truth, origin) {
-                            honeypot::insert_honeypot_lifecycle(
-                                conn,
-                                &truth.id.to_string(),
-                                truth,
-                                embedding,
-                                content_norm,
-                                origin,
+                        Self::promote_honeypot_or_log(
+                            conn,
+                            &truth.id.to_string(),
+                            truth,
+                            embedding,
+                            content_norm,
+                            origin,
+                            evidence_embedding,
+                            Some((
                                 LifecycleKind::Contradicts.graph_rel(),
-                                Some(&old_hp_id),
-                            )?;
-                            Self::maybe_upsert_evidence(conn, &truth.id.to_string(), truth, evidence_embedding)?;
-                        }
+                                Some(old_hp_id.as_str()),
+                            )),
+                        )?;
                         info!(
                             id = %truth.id,
                             superseded = %old_hp_id,
@@ -1305,20 +1379,63 @@ fn maybe_upsert_evidence(
                                 content_norm,
                             ],
                         )?;
-                        if qualifies_for_honeypot(truth) && !is_unverified_derived(truth, origin) {
-                            honeypot::insert_honeypot_lifecycle(
-                                conn,
-                                &truth.id.to_string(),
-                                truth,
-                                embedding,
-                                content_norm,
-                                origin,
+                        Self::promote_honeypot_or_log(
+                            conn,
+                            &truth.id.to_string(),
+                            truth,
+                            embedding,
+                            content_norm,
+                            origin,
+                            evidence_embedding,
+                            Some((
                                 LifecycleKind::Extends.graph_rel(),
-                                Some(&old_hp_id),
-                            )?;
-                            Self::maybe_upsert_evidence(conn, &truth.id.to_string(), truth, evidence_embedding)?;
-                        }
+                                Some(old_hp_id.as_str()),
+                            )),
+                        )?;
                         info!(id = %truth.id, extends = %old_hp_id, "Promoted extending truth");
+                        return Ok(());
+                    }
+                    LifecycleKind::Complements => {
+                        // Same entity, different observations — both stay latest.
+                        // Insert independently without superseding the old fact.
+                        let now = Utc::now();
+                        conn.execute(
+                            "INSERT INTO semantic_vault
+                                (id, content, embedding, half_life_days, confidence,
+                                 confirmation_count, decay_class, created_at, last_accessed_at,
+                                 source_file, content_norm)
+                            VALUES (?1, ?2, ?3, ?4, ?5, 1, ?6, ?7, ?8, ?9, ?10)",
+                            params![
+                                truth.id.to_string(),
+                                truth.content,
+                                embedding.to_vec(),
+                                truth.decay_class.half_life_days(),
+                                confidence,
+                                format!("{:?}", truth.decay_class),
+                                now.to_rfc3339(),
+                                now.to_rfc3339(),
+                                truth.source_file,
+                                content_norm,
+                            ],
+                        )?;
+                        Self::promote_honeypot_or_log(
+                            conn,
+                            &truth.id.to_string(),
+                            truth,
+                            embedding,
+                            content_norm,
+                            origin,
+                            evidence_embedding,
+                            Some((
+                                LifecycleKind::Complements.graph_rel(),
+                                Some(old_hp_id.as_str()),
+                            )),
+                        )?;
+                        info!(
+                            id = %truth.id,
+                            complements = %old_hp_id,
+                            "Promoted complementary truth (same entity, different observation)"
+                        );
                         return Ok(());
                     }
                     LifecycleKind::Derives | LifecycleKind::Unrelated => {}
@@ -1347,19 +1464,16 @@ fn maybe_upsert_evidence(
             ],
         )?;
         info!(id = %truth.id, "Promoted new truth to vault");
-        if qualifies_for_honeypot(truth) && !is_unverified_derived(truth, origin) {
-            honeypot::insert_honeypot_lifecycle(
-                conn,
-                &truth.id.to_string(),
-                truth,
-                embedding,
-                content_norm,
-                origin,
-                None,
-                None,
-            )?;
-            Self::maybe_upsert_evidence(conn, &truth.id.to_string(), truth, evidence_embedding)?;
-        }
+        Self::promote_honeypot_or_log(
+            conn,
+            &truth.id.to_string(),
+            truth,
+            embedding,
+            content_norm,
+            origin,
+            evidence_embedding,
+            Some((None, None)),
+        )?;
         Ok(())
     }
 
@@ -2200,6 +2314,37 @@ fn maybe_upsert_evidence(
         }
 
         Ok(())
+    }
+
+    /// Pending honeypot review rows (operator queue).
+    pub fn list_honeypot_review_queue(
+        &self,
+        limit: usize,
+    ) -> Result<Vec<(String, String, String, f64)>> {
+        let conn = self.db_conn()?;
+        honeypot::list_review_queue(&conn, limit).map_err(Into::into)
+    }
+
+    /// Operator override: promote a queued vault row into honeypot.
+    pub fn promote_honeypot_from_review(
+        &self,
+        vault_id: &str,
+        embedding: &[u8],
+        content_norm: &str,
+    ) -> Result<()> {
+        let conn = self.db_conn()?;
+        honeypot::promote_reviewed(&conn, vault_id, embedding, content_norm, "review_promote")
+    }
+
+    /// Load semantic vault content by id (CLI / review tools).
+    pub fn semantic_content(&self, vault_id: &str) -> Result<String> {
+        let conn = self.db_conn()?;
+        conn.query_row(
+            "SELECT content FROM semantic_vault WHERE id = ?1",
+            params![vault_id],
+            |r| r.get(0),
+        )
+        .map_err(Into::into)
     }
 }
 
