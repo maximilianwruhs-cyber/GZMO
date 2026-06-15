@@ -5,31 +5,31 @@
 
 use anyhow::{Context, Result};
 use chrono::Utc;
+use r2d2::Pool;
+use r2d2_sqlite::SqliteConnectionManager;
 use rusqlite::{params, Connection};
 use std::collections::HashMap;
 use std::path::Path;
-use r2d2::Pool;
-use r2d2_sqlite::SqliteConnectionManager;
 use tracing::info;
 use uuid::Uuid;
 
 use std::sync::Arc;
 
 use crate::memory::embeddings::Embedder;
-use crate::memory::qdrant_recall::QdrantRecall;
 use crate::memory::honeypot::{self, qualifies_for_honeypot};
 use crate::memory::lifecycle::{
     classify_truth_pair, extract_primary_entity, find_latest_honeypot_by_entity,
     is_unverified_derived, supersede_honeypot, LifecycleKind,
 };
+use crate::memory::qdrant_recall::QdrantRecall;
 use crate::memory::recall_rrf::{
     diversify_by_source_file, extract_entity_tokens, fts_match_query, fts_match_query_broad,
-    merge_interleaved_rank, rrf_fuse, RecallCandidate, PREFETCH_K, MAX_PER_SOURCE_FILE,
+    merge_interleaved_rank, rrf_fuse, RecallCandidate, MAX_PER_SOURCE_FILE, PREFETCH_K,
     RERANK_PREFETCH,
 };
-use std::process::Command as StdCommand;
 use crate::memory::rerank::Reranker;
 use crate::types::{ExtractedTruth, SemanticFact};
+use std::process::Command as StdCommand;
 
 /// Result of `SqliteVault::backfill_missing_embeddings`.
 #[derive(Debug, Clone, Copy)]
@@ -49,9 +49,7 @@ pub struct SqliteVault {
 }
 
 impl SqliteVault {
-    pub(crate) fn db_conn(
-        &self,
-    ) -> Result<r2d2::PooledConnection<SqliteConnectionManager>> {
+    pub(crate) fn db_conn(&self) -> Result<r2d2::PooledConnection<SqliteConnectionManager>> {
         self.pool.get().map_err(Into::into)
     }
 
@@ -102,7 +100,10 @@ impl SqliteVault {
         // Non-destructive schema migration — using PRAGMA user_version
         let user_version: u32 = init_conn.query_row("PRAGMA user_version", [], |row| row.get(0))?;
         if user_version < 1 {
-            match init_conn.execute("ALTER TABLE semantic_vault ADD COLUMN confidence REAL NOT NULL DEFAULT 1.0", []) {
+            match init_conn.execute(
+                "ALTER TABLE semantic_vault ADD COLUMN confidence REAL NOT NULL DEFAULT 1.0",
+                [],
+            ) {
                 Ok(_) => info!("Applied schema migration: added confidence column"),
                 Err(e) if e.to_string().contains("duplicate column") => { /* already exists */ }
                 Err(e) => {
@@ -229,7 +230,7 @@ impl SqliteVault {
         }
 
         info!("Semantic vault initialized (WAL mode + r2d2 pool)");
-        
+
         let path = db_path.as_ref().to_owned();
         let manager = SqliteConnectionManager::file(path)
             .with_init(|c| c.execute_batch("PRAGMA journal_mode=WAL; PRAGMA busy_timeout=5000;"));
@@ -315,10 +316,11 @@ impl SqliteVault {
     pub fn list_quarantine(&self) -> Result<Vec<(String, String, f64, String)>> {
         let conn = self.pool.get()?;
         let mut stmt = conn.prepare("SELECT id, content, confidence, created_at FROM quarantine_vault ORDER BY created_at DESC")?;
-        let results = stmt.query_map([], |row| {
-            Ok((row.get(0)?, row.get(1)?, row.get(2)?, row.get(3)?))
-        })?
-        .collect::<Result<Vec<_>, _>>()?;
+        let results = stmt
+            .query_map([], |row| {
+                Ok((row.get(0)?, row.get(1)?, row.get(2)?, row.get(3)?))
+            })?
+            .collect::<Result<Vec<_>, _>>()?;
         Ok(results)
     }
 
@@ -431,8 +433,16 @@ impl SqliteVault {
                 ))
             })?;
             for row in rows.filter_map(|r| r.ok()) {
-                let (id_str, content, embed_blob, decay_class, confidence, conf_count, created_str, accessed_str) =
-                    row;
+                let (
+                    id_str,
+                    content,
+                    embed_blob,
+                    decay_class,
+                    confidence,
+                    conf_count,
+                    created_str,
+                    accessed_str,
+                ) = row;
                 let embedding = decode_embed(&embed_blob);
                 let half_life = Self::half_life_from_decay_class(&decay_class);
                 let content_lower = content.to_lowercase();
@@ -536,7 +546,11 @@ impl SqliteVault {
     }
 
     /// Best-effort vault recall: honeypot RRF when populated, else legacy vector/BM25.
-    pub async fn search_recall(&self, query: &str, limit: usize) -> Result<Vec<(SemanticFact, f64)>> {
+    pub async fn search_recall(
+        &self,
+        query: &str,
+        limit: usize,
+    ) -> Result<Vec<(SemanticFact, f64)>> {
         self.recall_rrf(query, limit, "obolus").await
     }
 
@@ -603,7 +617,8 @@ impl SqliteVault {
             if !vector_ids.is_empty() {
                 rank_lists.push(vector_ids);
             }
-            let evidence_vector_ids = self.honeypot_evidence_vector_stream(&emb, container_tag, PREFETCH_K)?;
+            let evidence_vector_ids =
+                self.honeypot_evidence_vector_stream(&emb, container_tag, PREFETCH_K)?;
             if !evidence_vector_ids.is_empty() {
                 rank_lists.push(evidence_vector_ids);
             }
@@ -641,16 +656,18 @@ impl SqliteVault {
         const RERANK_STAGE_PER_FILE: usize = 12;
         let diversified =
             diversify_by_source_file(ranked, RERANK_PREFETCH.max(limit), RERANK_STAGE_PER_FILE);
-        let mut scored: Vec<(SemanticFact, f64)> = diversified
-            .into_iter()
-            .map(|(c, s)| (c.fact, s))
-            .collect();
+        let mut scored: Vec<(SemanticFact, f64)> =
+            diversified.into_iter().map(|(c, s)| (c.fact, s)).collect();
 
         self.apply_rerank(q, limit, &mut scored).await;
         Ok(scored)
     }
 
-    async fn search_recall_legacy(&self, query: &str, limit: usize) -> Result<Vec<(SemanticFact, f64)>> {
+    async fn search_recall_legacy(
+        &self,
+        query: &str,
+        limit: usize,
+    ) -> Result<Vec<(SemanticFact, f64)>> {
         if let Some(embedder) = &self.embedder {
             let emb = embedder.embed(query).await?;
             return self.search_with_decay_reranked(&emb, query, limit).await;
@@ -693,7 +710,10 @@ impl SqliteVault {
              INSERT INTO honeypot_fts(rowid, content, content_norm)
              SELECT rowid, content, content_norm FROM honeypot WHERE is_latest = 1;",
         )?;
-        tracing::info!(honeypot = hp, "Backfilled honeypot_fts for RRF lexical stream");
+        tracing::info!(
+            honeypot = hp,
+            "Backfilled honeypot_fts for RRF lexical stream"
+        );
         Ok(())
     }
 
@@ -712,12 +732,21 @@ impl SqliteVault {
              INSERT INTO evidence_fts(rowid, evidence_text, evidence_norm)
              SELECT rowid, evidence_text, evidence_norm FROM evidence WHERE verify_pass = 1;",
         )?;
-        tracing::info!(evidence = ev, "Backfilled evidence_fts for RRF lexical stream");
+        tracing::info!(
+            evidence = ev,
+            "Backfilled evidence_fts for RRF lexical stream"
+        );
         Ok(())
     }
 
-    fn honeypot_fts_stream(&self, query: &str, container_tag: &str, limit: usize) -> Result<Vec<Uuid>> {
-        let narrow = self.honeypot_fts_stream_query(query, container_tag, limit, &fts_match_query(query))?;
+    fn honeypot_fts_stream(
+        &self,
+        query: &str,
+        container_tag: &str,
+        limit: usize,
+    ) -> Result<Vec<Uuid>> {
+        let narrow =
+            self.honeypot_fts_stream_query(query, container_tag, limit, &fts_match_query(query))?;
         if !narrow.is_empty() {
             return Ok(narrow);
         }
@@ -758,12 +787,27 @@ impl SqliteVault {
         Ok(ids)
     }
 
-    fn honeypot_evidence_fts_stream(&self, query: &str, container_tag: &str, limit: usize) -> Result<Vec<Uuid>> {
-        let narrow = self.honeypot_evidence_fts_stream_query(query, container_tag, limit, &fts_match_query(query))?;
+    fn honeypot_evidence_fts_stream(
+        &self,
+        query: &str,
+        container_tag: &str,
+        limit: usize,
+    ) -> Result<Vec<Uuid>> {
+        let narrow = self.honeypot_evidence_fts_stream_query(
+            query,
+            container_tag,
+            limit,
+            &fts_match_query(query),
+        )?;
         if !narrow.is_empty() {
             return Ok(narrow);
         }
-        self.honeypot_evidence_fts_stream_query(query, container_tag, limit, &fts_match_query_broad(query))
+        self.honeypot_evidence_fts_stream_query(
+            query,
+            container_tag,
+            limit,
+            &fts_match_query_broad(query),
+        )
     }
 
     fn honeypot_evidence_fts_stream_query(
@@ -822,10 +866,7 @@ impl SqliteVault {
                AND h.container_tag = ?1",
         )?;
         let rows = stmt.query_map(params![container_tag], |row| {
-            Ok((
-                row.get::<_, String>(0)?,
-                row.get::<_, Vec<u8>>(1)?,
-            ))
+            Ok((row.get::<_, String>(0)?, row.get::<_, Vec<u8>>(1)?))
         })?;
         let mut scored: Vec<(Uuid, f64)> = Vec::new();
         for row in rows.filter_map(|r| r.ok()) {
@@ -849,7 +890,6 @@ impl SqliteVault {
         }
         Ok(ids)
     }
-
 
     fn honeypot_keyword_stream(&self, query: &str, limit: usize) -> Result<Vec<Uuid>> {
         let scored = self.keyword_search(query, limit)?;
@@ -882,10 +922,22 @@ impl SqliteVault {
             .arg(script)
             .arg(query)
             .arg(limit.to_string())
-            .env("NEO4J_URL", std::env::var("NEO4J_URL").unwrap_or_else(|_| "bolt://192.168.31.202:7687".into()))
-            .env("NEO4J_USERNAME", std::env::var("NEO4J_USERNAME").unwrap_or_else(|_| "neo4j".into()))
-            .env("NEO4J_PASSWORD", std::env::var("NEO4J_PASSWORD").unwrap_or_default())
-            .env("NEO4J_DATABASE", std::env::var("NEO4J_DATABASE").unwrap_or_else(|_| "neo4j".into()))
+            .env(
+                "NEO4J_URL",
+                std::env::var("NEO4J_URL").unwrap_or_else(|_| "bolt://192.168.31.202:7687".into()),
+            )
+            .env(
+                "NEO4J_USERNAME",
+                std::env::var("NEO4J_USERNAME").unwrap_or_else(|_| "neo4j".into()),
+            )
+            .env(
+                "NEO4J_PASSWORD",
+                std::env::var("NEO4J_PASSWORD").unwrap_or_default(),
+            )
+            .env(
+                "NEO4J_DATABASE",
+                std::env::var("NEO4J_DATABASE").unwrap_or_else(|_| "neo4j".into()),
+            )
             .output();
         let Ok(output) = out else {
             return Ok(Vec::new());
@@ -931,9 +983,8 @@ impl SqliteVault {
         if ids.len() < limit {
             let tokens = extract_entity_tokens(hints.join(" ").as_str());
             let mut scored: Vec<(Uuid, usize)> = Vec::new();
-            let mut stmt = conn.prepare(
-                "SELECT id, content, content_norm FROM honeypot WHERE is_latest = 1",
-            )?;
+            let mut stmt =
+                conn.prepare("SELECT id, content, content_norm FROM honeypot WHERE is_latest = 1")?;
             for row in stmt.query_map([], |row| {
                 Ok((
                     row.get::<_, String>(0)?,
@@ -984,7 +1035,7 @@ impl SqliteVault {
         let res = conn.query_row(
             "SELECT evidence_text FROM evidence WHERE fact_id = ?1 LIMIT 1",
             params![fact_id.to_string()],
-            |row| row.get::<_, String>(0)
+            |row| row.get::<_, String>(0),
         );
         match res {
             Ok(text) => Ok(Some(text)),
@@ -1086,8 +1137,8 @@ impl SqliteVault {
         };
         let now = Utc::now();
         let half_life = Self::half_life_from_decay_class(&decay_class);
-        let accessed_at = chrono::DateTime::parse_from_rfc3339(&accessed_str)
-            .unwrap_or_else(|_| now.into());
+        let accessed_at =
+            chrono::DateTime::parse_from_rfc3339(&accessed_str).unwrap_or_else(|_| now.into());
         let fact = SemanticFact {
             id: Uuid::parse_str(&id_str).unwrap_or(id),
             content,
@@ -1149,29 +1200,29 @@ impl SqliteVault {
         scored.truncate(limit);
     }
 
-fn maybe_upsert_evidence(
-    conn: &Connection,
-    fact_id: &str,
-    truth: &ExtractedTruth,
-    evidence_embedding: &[u8],
-) -> Result<()> {
-    if let Some(ev) = &truth.evidence {
-        let ev_norm = ev.evidence_text.to_lowercase();
-        crate::memory::honeypot::upsert_evidence_row(
-            conn,
-            fact_id, // evidence_id = fact_id for 1:1 first iteration
-            fact_id,
-            truth.source_file.as_deref(),
-            &ev.evidence_text,
-            &ev_norm,
-            ev.char_start,
-            ev.char_end,
-            Some(&ev.quote_verifier),
-            evidence_embedding,
-        )?;
+    fn maybe_upsert_evidence(
+        conn: &Connection,
+        fact_id: &str,
+        truth: &ExtractedTruth,
+        evidence_embedding: &[u8],
+    ) -> Result<()> {
+        if let Some(ev) = &truth.evidence {
+            let ev_norm = ev.evidence_text.to_lowercase();
+            crate::memory::honeypot::upsert_evidence_row(
+                conn,
+                fact_id, // evidence_id = fact_id for 1:1 first iteration
+                fact_id,
+                truth.source_file.as_deref(),
+                &ev.evidence_text,
+                &ev_norm,
+                ev.char_start,
+                ev.char_end,
+                Some(&ev.quote_verifier),
+                evidence_embedding,
+            )?;
+        }
+        Ok(())
     }
-    Ok(())
-}
 
     fn promote_corroborate_vault(
         &self,
@@ -1275,7 +1326,12 @@ fn maybe_upsert_evidence(
                                 LifecycleKind::Contradicts.graph_rel(),
                                 Some(&old_hp_id),
                             )?;
-                            Self::maybe_upsert_evidence(conn, &truth.id.to_string(), truth, evidence_embedding)?;
+                            Self::maybe_upsert_evidence(
+                                conn,
+                                &truth.id.to_string(),
+                                truth,
+                                evidence_embedding,
+                            )?;
                         }
                         info!(
                             id = %truth.id,
@@ -1316,7 +1372,12 @@ fn maybe_upsert_evidence(
                                 LifecycleKind::Extends.graph_rel(),
                                 Some(&old_hp_id),
                             )?;
-                            Self::maybe_upsert_evidence(conn, &truth.id.to_string(), truth, evidence_embedding)?;
+                            Self::maybe_upsert_evidence(
+                                conn,
+                                &truth.id.to_string(),
+                                truth,
+                                evidence_embedding,
+                            )?;
                         }
                         info!(id = %truth.id, extends = %old_hp_id, "Promoted extending truth");
                         return Ok(());
@@ -1509,7 +1570,10 @@ fn maybe_upsert_evidence(
         match result {
             Ok(()) => {
                 conn.execute_batch("COMMIT")?;
-                info!(count = truths.len(), origin, "Batch promoted truths to vault");
+                info!(
+                    count = truths.len(),
+                    origin, "Batch promoted truths to vault"
+                );
                 Ok(())
             }
             Err(e) => {
@@ -1546,7 +1610,11 @@ fn maybe_upsert_evidence(
     }
 
     /// Keyword-only search (no embeddings required). Uses honeypot when populated (M3).
-    pub fn keyword_search(&self, query_text: &str, limit: usize) -> Result<Vec<(SemanticFact, f64)>> {
+    pub fn keyword_search(
+        &self,
+        query_text: &str,
+        limit: usize,
+    ) -> Result<Vec<(SemanticFact, f64)>> {
         let conn = self.pool.get()?;
         let use_hp = Self::cognition_from_honeypot(&conn)?;
         let sql = if use_hp {
@@ -1572,22 +1640,36 @@ fn maybe_upsert_evidence(
 
         let mut scored: Vec<(SemanticFact, f64)> = Vec::new();
         if use_hp {
-            for row in stmt.query_map([], |row| {
-                Ok((
-                    row.get::<_, String>(0)?,
-                    row.get::<_, String>(1)?,
-                    row.get::<_, Vec<u8>>(2)?,
-                    row.get::<_, String>(3)?,
-                    row.get::<_, f64>(4)?,
-                    row.get::<_, u32>(5)?,
-                    row.get::<_, String>(6)?,
-                    row.get::<_, String>(7)?,
-                ))
-            })?.filter_map(|r| r.ok()) {
-                let (id_str, content, embed_blob, decay_class, confidence, conf_count, created_str, accessed_str) =
-                    row;
+            for row in stmt
+                .query_map([], |row| {
+                    Ok((
+                        row.get::<_, String>(0)?,
+                        row.get::<_, String>(1)?,
+                        row.get::<_, Vec<u8>>(2)?,
+                        row.get::<_, String>(3)?,
+                        row.get::<_, f64>(4)?,
+                        row.get::<_, u32>(5)?,
+                        row.get::<_, String>(6)?,
+                        row.get::<_, String>(7)?,
+                    ))
+                })?
+                .filter_map(|r| r.ok())
+            {
+                let (
+                    id_str,
+                    content,
+                    embed_blob,
+                    decay_class,
+                    confidence,
+                    conf_count,
+                    created_str,
+                    accessed_str,
+                ) = row;
                 let content_lower = content.to_lowercase();
-                let matched = query_words.iter().filter(|w| content_lower.contains(**w)).count();
+                let matched = query_words
+                    .iter()
+                    .filter(|w| content_lower.contains(**w))
+                    .count();
                 if matched == 0 {
                     continue;
                 }
@@ -1634,7 +1716,10 @@ fn maybe_upsert_evidence(
                 let (id_str, content, embed_blob, half_life, conf_count, created_str, accessed_str) =
                     row;
                 let content_lower = content.to_lowercase();
-                let matched = query_words.iter().filter(|w| content_lower.contains(**w)).count();
+                let matched = query_words
+                    .iter()
+                    .filter(|w| content_lower.contains(**w))
+                    .count();
                 if matched == 0 {
                     continue;
                 }
@@ -1799,11 +1884,8 @@ fn maybe_upsert_evidence(
     /// Get the total number of facts in the vault.
     pub fn count(&self) -> Result<usize> {
         let conn = self.pool.get()?;
-        let count: usize = conn.query_row(
-            "SELECT COUNT(*) FROM semantic_vault",
-            [],
-            |row| row.get(0),
-        )?;
+        let count: usize =
+            conn.query_row("SELECT COUNT(*) FROM semantic_vault", [], |row| row.get(0))?;
         Ok(count)
     }
 
@@ -2156,9 +2238,11 @@ fn maybe_upsert_evidence(
 
     /// Dump the entire vault to a human-readable Markdown directory.
     pub async fn dump_to_markdown(&self, out_dir: impl AsRef<Path>) -> Result<()> {
-        let mut groups: std::collections::HashMap<String, String> = std::collections::HashMap::new();
+        let mut groups: std::collections::HashMap<String, String> =
+            std::collections::HashMap::new();
 
-        { // Scope the lock so it drops before async I/O
+        {
+            // Scope the lock so it drops before async I/O
             let conn = self.pool.get()?;
             let mut stmt = conn.prepare(
                 "SELECT id, content, half_life_days, confirmation_count, decay_class, created_at
@@ -2178,10 +2262,10 @@ fn maybe_upsert_evidence(
 
             for r in rows.flatten() {
                 let (id, content, hld, conf, dclass, created) = r;
-                let md = groups.entry(dclass.clone()).or_insert_with(|| {
-                    format!("# GZMO Memory Vault: {}\n\n", dclass)
-                });
-                
+                let md = groups
+                    .entry(dclass.clone())
+                    .or_insert_with(|| format!("# GZMO Memory Vault: {}\n\n", dclass));
+
                 md.push_str(&format!(
                     "## Entry: {}\n- **Created:** {}\n- **Confirmations:** {}\n- **Half-life:** {} days\n\n> {}\n\n---\n",
                     id, created, conf, hld, content.replace('\n', "\n> ")
@@ -2209,7 +2293,11 @@ fn maybe_upsert_evidence(
 
 /// Normalize vault fact text for dedup (lowercase, collapsed whitespace).
 pub fn normalize_truth_content(content: &str) -> String {
-    content.split_whitespace().collect::<Vec<_>>().join(" ").to_lowercase()
+    content
+        .split_whitespace()
+        .collect::<Vec<_>>()
+        .join(" ")
+        .to_lowercase()
 }
 
 /// Cosine similarity for vault embeddings (spark pre-filter and search).
@@ -2217,7 +2305,11 @@ pub fn embedding_cosine_similarity(a: &[f32], b: &[f32]) -> f64 {
     if a.len() != b.len() || a.is_empty() {
         return 0.0;
     }
-    let dot: f64 = a.iter().zip(b.iter()).map(|(x, y)| *x as f64 * *y as f64).sum();
+    let dot: f64 = a
+        .iter()
+        .zip(b.iter())
+        .map(|(x, y)| *x as f64 * *y as f64)
+        .sum();
     let mag_a: f64 = a.iter().map(|x| (*x as f64).powi(2)).sum::<f64>().sqrt();
     let mag_b: f64 = b.iter().map(|x| (*x as f64).powi(2)).sum::<f64>().sqrt();
     if mag_a == 0.0 || mag_b == 0.0 {
@@ -2227,10 +2319,7 @@ pub fn embedding_cosine_similarity(a: &[f32], b: &[f32]) -> f64 {
 }
 
 fn bincode_embed(embedding: &[f32]) -> Vec<u8> {
-    embedding
-        .iter()
-        .flat_map(|f| f.to_le_bytes())
-        .collect()
+    embedding.iter().flat_map(|f| f.to_le_bytes()).collect()
 }
 
 #[cfg(test)]

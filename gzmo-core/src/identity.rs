@@ -6,10 +6,10 @@
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
+use crate::types::SoulContext;
 use anyhow::{Context, Result};
 use chrono::Utc;
 use notify::{Event, EventKind, RecommendedWatcher, RecursiveMode, Watcher};
-use crate::types::SoulContext;
 use tokio::sync::RwLock;
 use tracing::{info, warn};
 

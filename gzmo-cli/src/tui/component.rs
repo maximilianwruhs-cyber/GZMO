@@ -1,6 +1,6 @@
-use ratatui::{layout::Rect, Frame};
 use color_eyre::Result;
 use crossterm::event::Event;
+use ratatui::{layout::Rect, Frame};
 use tokio::sync::mpsc::UnboundedSender;
 
 use super::action::Action;

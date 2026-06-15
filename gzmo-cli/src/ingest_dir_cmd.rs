@@ -112,7 +112,9 @@ pub async fn run(config: &GzmoConfig, _identity: IdentityEngine, dir: PathBuf) -
     session.close().await;
 
     let project_root = qdrant_sync::discover_project_root();
-    if let Err(e) = sync_vault_to_qdrant(&project_root, &config.qdrant, &config.memory.vault_db).await {
+    if let Err(e) =
+        sync_vault_to_qdrant(&project_root, &config.qdrant, &config.memory.vault_db).await
+    {
         tracing::warn!(error = %e, "Post-ingest-dir Qdrant sync failed (non-fatal)");
     } else {
         info!("Post-ingest-dir Qdrant sync complete");

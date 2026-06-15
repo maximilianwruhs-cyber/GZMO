@@ -9,7 +9,11 @@ use tracing::{info, warn};
 use crate::config::QdrantConfig;
 
 /// Run `scripts/sync-vault-to-qdrant.py` from `project_root`.
-pub async fn sync_vault_to_qdrant(project_root: &Path, cfg: &QdrantConfig, vault_db: &Path) -> Result<()> {
+pub async fn sync_vault_to_qdrant(
+    project_root: &Path,
+    cfg: &QdrantConfig,
+    vault_db: &Path,
+) -> Result<()> {
     if !cfg.enabled || !cfg.sync_enabled {
         return Ok(());
     }

@@ -97,10 +97,7 @@ impl CheapCheck for FileChangeCheck {
             if let Ok(meta) = entry.metadata().await {
                 if let Ok(modified) = meta.modified() {
                     if modified > cutoff {
-                        return Ok(Some(format!(
-                            "File modified: {:?}",
-                            entry.file_name()
-                        )));
+                        return Ok(Some(format!("File modified: {:?}", entry.file_name())));
                     }
                 }
             }

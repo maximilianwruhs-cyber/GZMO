@@ -2,41 +2,44 @@
 //!
 //! Thin binary shell. All logic lives in `gzmo-core`.
 
-mod chat;
 mod chaos_bootstrap;
+mod chat;
 mod cli_mcp;
 mod daemon_cmd;
+mod distill_cmd;
 mod dream_cmd;
-mod spark_cmd;
+mod embed_cmd;
+mod health_cmd;
 mod ingest_cmd;
 mod ingest_dir_cmd;
-mod health_cmd;
-mod memory_cmd;
-mod mcp_serve_cmd;
-mod profile_cmd;
-mod embed_cmd;
-mod distill_cmd;
-mod init_cmd;
 mod ingest_eval_cmd;
-mod wiki_cmd;
+mod init_cmd;
+mod mcp_serve_cmd;
+mod memory_cmd;
+mod profile_cmd;
+mod spark_cmd;
+pub mod tui;
 #[allow(dead_code)]
 mod ui;
-pub mod tui;
+mod wiki_cmd;
 
 use anyhow::Result;
 use chrono::NaiveDate;
-use tracing_subscriber::EnvFilter;
 use gzmo_core::memory::vault::SqliteVault;
+use tracing_subscriber::EnvFilter;
 
 enum Command {
     Chat,
-    ChatRepl,  // Legacy REPL mode via --repl flag
+    ChatRepl, // Legacy REPL mode via --repl flag
     Daemon,
     /// One-shot dream consolidation for an optional date (default: today).
     Dream(Option<NaiveDate>),
     /// One-shot spark (serendipitous recall) for an optional date (default: today).
     Spark(Option<NaiveDate>),
-    Ingest { path: std::path::PathBuf, dry_run: bool },
+    Ingest {
+        path: std::path::PathBuf,
+        dry_run: bool,
+    },
     IngestDir(std::path::PathBuf),
     IngestEval(std::path::PathBuf),
     Init,
@@ -54,15 +57,25 @@ enum Command {
 fn parse_args() -> Command {
     let args: Vec<String> = std::env::args().collect();
     if args.len() >= 2 {
-        if args[1] == "daemon" { return Command::Daemon; }
-        if args[1] == "init" { return Command::Init; }
-        if args[1] == "--repl" { return Command::ChatRepl; }
+        if args[1] == "daemon" {
+            return Command::Daemon;
+        }
+        if args[1] == "init" {
+            return Command::Init;
+        }
+        if args[1] == "--repl" {
+            return Command::ChatRepl;
+        }
         if args[1] == "dream" {
-            let date = args.get(2).and_then(|s| NaiveDate::parse_from_str(s, "%Y-%m-%d").ok());
+            let date = args
+                .get(2)
+                .and_then(|s| NaiveDate::parse_from_str(s, "%Y-%m-%d").ok());
             return Command::Dream(date);
         }
         if args[1] == "spark" {
-            let date = args.get(2).and_then(|s| NaiveDate::parse_from_str(s, "%Y-%m-%d").ok());
+            let date = args
+                .get(2)
+                .and_then(|s| NaiveDate::parse_from_str(s, "%Y-%m-%d").ok());
             return Command::Spark(date);
         }
         if args[1] == "ingest" {
@@ -104,14 +117,22 @@ fn parse_args() -> Command {
             }
             return Command::Memory(args[2..].to_vec());
         }
-        if args[1] == "dump" { return Command::MemoryDump; }
+        if args[1] == "dump" {
+            return Command::MemoryDump;
+        }
         if args[1] == "distill" {
             let id = args.get(2).cloned();
             return Command::Distill(id);
         }
-        if args[1] == "health" { return Command::Health; }
-        if args[1] == "wiki" { return Command::Wiki(args[2..].to_vec()); }
-        if args[1] == "mcp-serve" { return Command::McpServe; }
+        if args[1] == "health" {
+            return Command::Health;
+        }
+        if args[1] == "wiki" {
+            return Command::Wiki(args[2..].to_vec());
+        }
+        if args[1] == "mcp-serve" {
+            return Command::McpServe;
+        }
         if args[1] == "profile" {
             return Command::Profile(args[2..].to_vec());
         }
@@ -145,8 +166,7 @@ async fn main() -> Result<()> {
     tracing_subscriber::fmt()
         .with_writer(std::io::stderr)
         .with_env_filter(
-            EnvFilter::try_from_default_env()
-                .unwrap_or_else(|_| EnvFilter::new(default_filter)),
+            EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new(default_filter)),
         )
         .with_target(false)
         .init();
@@ -173,7 +193,8 @@ async fn main() -> Result<()> {
                     if std::path::Path::new(&proc_path).exists() {
                         anyhow::bail!(
                             "GZMO Daemon is already running (PID {}, lockfile {:?}).",
-                            old_pid, pid_file
+                            old_pid,
+                            pid_file
                         );
                     }
                     tracing::warn!(stale_pid = %old_pid, "Reclaiming stale PID lockfile");
@@ -186,20 +207,24 @@ async fn main() -> Result<()> {
                 .write(true)
                 .create_new(true)
                 .open(&pid_file)
-                .map_err(|e| anyhow::anyhow!(
+                .map_err(|e| {
+                    anyhow::anyhow!(
                     "Failed to acquire PID lockfile {:?}: {}. Another instance may have started.",
                     pid_file, e
-                ))?;
+                )
+                })?;
             write!(lock, "{}", std::process::id())?;
             drop(lock);
 
             let res = daemon_cmd::run(&config, identity).await;
             let _ = std::fs::remove_file(&pid_file);
             res
-        },
+        }
         Command::Dream(date) => dream_cmd::run(&config, identity, date).await,
         Command::Spark(date) => spark_cmd::run(&config, identity, date).await,
-        Command::Ingest { path, dry_run } => ingest_cmd::run(&config, identity, path, dry_run).await,
+        Command::Ingest { path, dry_run } => {
+            ingest_cmd::run(&config, identity, path, dry_run).await
+        }
         Command::IngestDir(path) => ingest_dir_cmd::run(&config, identity, path).await,
         Command::IngestEval(path) => ingest_eval_cmd::run(&config, identity, path).await,
         Command::Init => unreachable!(),

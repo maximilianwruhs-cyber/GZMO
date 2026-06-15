@@ -2,21 +2,23 @@
 //!
 //! Semantic vault (SQLite), episodic daily logs, and shell blacklist filter.
 
+pub mod embeddings;
+pub mod episodic;
+pub mod evidence_localize;
+pub mod filter;
 pub mod honeypot;
+pub mod kg_extract;
+pub mod kg_promotion;
 pub mod lifecycle;
 pub mod profile;
 pub mod qdrant_recall;
-pub mod recall_rrf;
-pub mod vault;
-pub mod episodic;
-pub mod filter;
-pub mod kg_promotion;
-pub mod evidence_localize;
-pub mod kg_extract;
-pub mod vault_backend;
-pub mod embeddings;
-pub mod rerank;
 pub mod qdrant_sync;
+pub mod recall_rrf;
+pub mod rerank;
 pub mod scratch;
+pub mod vault;
+pub mod vault_backend;
 
-pub use scratch::{DistillJob, DistillSource, RecallSnippet, ScratchPayload, ScratchScope, ScratchService};
+pub use scratch::{
+    DistillJob, DistillSource, RecallSnippet, ScratchPayload, ScratchScope, ScratchService,
+};

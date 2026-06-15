@@ -5,8 +5,7 @@ use gzmo_core::config::GzmoConfig;
 use gzmo_core::memory::embeddings;
 use gzmo_core::memory::profile::{GzmoProfile, ProfileOptions};
 
-const USAGE: &str =
-    "Usage:\n  \
+const USAGE: &str = "Usage:\n  \
      gzmo profile [--scope obolus] [--format yaml|json|md] [--dynamic-only]\n  \
      \n\
      Builds cached static+dynamic profile from honeypot (Spec §5).";

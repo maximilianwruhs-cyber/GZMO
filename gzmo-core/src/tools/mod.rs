@@ -2,13 +2,13 @@
 //!
 //! Pluggable tool registry. Each tool implements `ToolHandler`.
 
+pub mod delegate;
 pub mod fs;
+pub mod memory;
 pub mod shell;
 pub mod sysadmin;
 pub mod web;
 pub mod web_browse;
-pub mod memory;
-pub mod delegate;
 
 pub use delegate::DelegateTaskTool;
 
@@ -49,7 +49,9 @@ pub struct ToolRegistry {
 
 impl ToolRegistry {
     pub fn new() -> Self {
-        Self { handlers: HashMap::new() }
+        Self {
+            handlers: HashMap::new(),
+        }
     }
 
     pub fn register(&mut self, handler: Box<dyn ToolHandler>) {
@@ -65,15 +67,31 @@ impl ToolRegistry {
     pub async fn dispatch(&self, call: &ToolCall) -> ToolResult {
         match self.handlers.get(&call.function_name) {
             Some(handler) => match handler.execute(call.arguments.clone()).await {
-                Ok(output) => ToolResult { call_id: call.id.clone(), success: true, output },
-                Err(e) => ToolResult { call_id: call.id.clone(), success: false, output: format!("Tool error: {e}") },
+                Ok(output) => ToolResult {
+                    call_id: call.id.clone(),
+                    success: true,
+                    output,
+                },
+                Err(e) => ToolResult {
+                    call_id: call.id.clone(),
+                    success: false,
+                    output: format!("Tool error: {e}"),
+                },
             },
-            None => ToolResult { call_id: call.id.clone(), success: false, output: format!("Unknown tool: {}", call.function_name) },
+            None => ToolResult {
+                call_id: call.id.clone(),
+                success: false,
+                output: format!("Unknown tool: {}", call.function_name),
+            },
         }
     }
 
-    pub fn len(&self) -> usize { self.handlers.len() }
-    pub fn is_empty(&self) -> bool { self.handlers.is_empty() }
+    pub fn len(&self) -> usize {
+        self.handlers.len()
+    }
+    pub fn is_empty(&self) -> bool {
+        self.handlers.is_empty()
+    }
 
     pub fn has_tool(&self, name: &str) -> bool {
         self.handlers.contains_key(name)
@@ -81,5 +99,7 @@ impl ToolRegistry {
 }
 
 impl Default for ToolRegistry {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }

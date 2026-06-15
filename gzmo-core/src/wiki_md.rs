@@ -121,7 +121,13 @@ pub async fn upsert_page(path: &Path, mut fm: PageFrontmatter, body: &str) -> Re
 /// Insert or repoint a catalog entry under a `## <Category>` heading in
 /// `index.md`. Idempotent: an existing bullet for the same `title` is replaced,
 /// and the placeholder italic line for an empty category is removed.
-pub fn upsert_index_entry(index: &str, category: &str, title: &str, link: &str, summary: &str) -> String {
+pub fn upsert_index_entry(
+    index: &str,
+    category: &str,
+    title: &str,
+    link: &str,
+    summary: &str,
+) -> String {
     let heading = format!("## {category}");
     let bullet = format!("- [{title}]({link}) — {summary}");
     let mut lines: Vec<String> = index.lines().map(|l| l.to_string()).collect();
@@ -176,7 +182,9 @@ pub fn upsert_index_entry(index: &str, category: &str, title: &str, link: &str, 
 /// Append a chronological log line, ensuring a single trailing newline.
 pub async fn append_log(log_path: &Path, line: &str) -> Result<()> {
     let mut content = if log_path.exists() {
-        tokio::fs::read_to_string(log_path).await.unwrap_or_default()
+        tokio::fs::read_to_string(log_path)
+            .await
+            .unwrap_or_default()
     } else {
         String::from("# Wiki Log\n")
     };
@@ -220,14 +228,11 @@ pub fn search(dir: &Path, query: &str, limit: usize) -> Vec<SearchHit> {
             continue;
         };
         let (fm, body) = split_frontmatter(&content);
-        let title = fm
-            .as_ref()
-            .map(|f| f.title.clone())
-            .unwrap_or_else(|| {
-                path.file_stem()
-                    .map(|s| s.to_string_lossy().to_string())
-                    .unwrap_or_default()
-            });
+        let title = fm.as_ref().map(|f| f.title.clone()).unwrap_or_else(|| {
+            path.file_stem()
+                .map(|s| s.to_string_lossy().to_string())
+                .unwrap_or_default()
+        });
 
         let title_lc = title.to_ascii_lowercase();
         let body_lc = body.to_ascii_lowercase();
@@ -330,7 +335,13 @@ mod tests {
         let entities_section = once.split("## Concepts").next().unwrap();
         assert!(!entities_section.contains("_No entries yet._"));
         // Re-point the same title — no duplicate.
-        let twice = upsert_index_entry(&once, "Entities", "GZMO", "entities/gzmo.md", "updated summary");
+        let twice = upsert_index_entry(
+            &once,
+            "Entities",
+            "GZMO",
+            "entities/gzmo.md",
+            "updated summary",
+        );
         assert_eq!(twice.matches("- [GZMO]").count(), 1);
         assert!(twice.contains("updated summary"));
     }

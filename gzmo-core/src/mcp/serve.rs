@@ -54,17 +54,15 @@ impl GzmoMemoryMcpServer {
         }
     }
 
-    #[tool(description = "Search GZMO honeypot/vault memory and optional Pi knowledge collection; writes session scratch.")]
+    #[tool(
+        description = "Search GZMO honeypot/vault memory and optional Pi knowledge collection; writes session scratch."
+    )]
     async fn gzmo_memory_search(
         &self,
         Parameters(args): Parameters<SearchParams>,
     ) -> Result<CallToolResult, McpError> {
         let limit = args.limit.unwrap_or(5) as usize;
-        match self
-            .platform
-            .memory_search(&args.query, limit, true)
-            .await
-        {
+        match self.platform.memory_search(&args.query, limit, true).await {
             Ok(res) => Ok(CallToolResult::success(vec![Content::text(res.text)])),
             Err(e) => Ok(CallToolResult::error(vec![Content::text(e.to_string())])),
         }
@@ -92,7 +90,9 @@ impl GzmoMemoryMcpServer {
         }
     }
 
-    #[tool(description = "Search the git-tracked wiki/ markdown layer (entity/concept/source pages). Emit-only: reads pages directly, no honeypot writes.")]
+    #[tool(
+        description = "Search the git-tracked wiki/ markdown layer (entity/concept/source pages). Emit-only: reads pages directly, no honeypot writes."
+    )]
     async fn gzmo_wiki_search(
         &self,
         Parameters(args): Parameters<WikiSearchParams>,
@@ -113,10 +113,7 @@ impl GzmoMemoryMcpServer {
         }
         let mut out = format!("Wiki search '{}' — {} hit(s):\n", args.query, hits.len());
         for h in hits {
-            out.push_str(&format!(
-                "\n## {} ({})\n{}\n",
-                h.title, h.path, h.snippet
-            ));
+            out.push_str(&format!("\n## {} ({})\n{}\n", h.title, h.path, h.snippet));
         }
         Ok(CallToolResult::success(vec![Content::text(out)]))
     }

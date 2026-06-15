@@ -2,7 +2,7 @@ use crate::tools::{ToolDef, ToolHandler};
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
-use sysinfo::{System, Disks};
+use sysinfo::{Disks, System};
 use tracing::{info, warn};
 
 // ============================================================================
@@ -29,7 +29,7 @@ impl ToolHandler for SysMetricsTool {
         info!("Executing sys_metrics tool");
         let mut sys = System::new_all();
         sys.refresh_all();
-        
+
         // Memory
         let total_mem_mb = sys.total_memory() / 1024 / 1024;
         let used_mem_mb = sys.used_memory() / 1024 / 1024;
@@ -41,16 +41,24 @@ impl ToolHandler for SysMetricsTool {
 
         // Top 5 heavy processes
         let mut processes: Vec<_> = sys.processes().values().collect();
-        processes.sort_by(|a, b| b.cpu_usage().partial_cmp(&a.cpu_usage()).unwrap_or(std::cmp::Ordering::Equal));
-        
-        let top_processes: Vec<Value> = processes.iter().take(5).map(|p| {
-            json!({
-                "pid": p.pid().as_u32(),
-                "name": p.name().to_string_lossy(),
-                "cpu_usage": format!("{:.1}%", p.cpu_usage()),
-                "mem_mb": p.memory() / 1024 / 1024
+        processes.sort_by(|a, b| {
+            b.cpu_usage()
+                .partial_cmp(&a.cpu_usage())
+                .unwrap_or(std::cmp::Ordering::Equal)
+        });
+
+        let top_processes: Vec<Value> = processes
+            .iter()
+            .take(5)
+            .map(|p| {
+                json!({
+                    "pid": p.pid().as_u32(),
+                    "name": p.name().to_string_lossy(),
+                    "cpu_usage": format!("{:.1}%", p.cpu_usage()),
+                    "mem_mb": p.memory() / 1024 / 1024
+                })
             })
-        }).collect();
+            .collect();
 
         // Disks
         let disks = Disks::new_with_refreshed_list();
@@ -128,16 +136,19 @@ impl ToolHandler for SysKillTool {
 
         let mut sys = System::new();
         sys.refresh_processes(sysinfo::ProcessesToUpdate::All, true);
-        
+
         let pid = sysinfo::Pid::from_u32(args.pid);
-        
+
         if let Some(process) = sys.process(pid) {
             let p_name = process.name().to_string_lossy().to_string();
-            
+
             // SECURITY: Prevent killing our own agent — check PID directly, not name
             let my_pid = sysinfo::Pid::from_u32(std::process::id());
             if pid == my_pid {
-                warn!("Blocked execution: Attempted to kill own process (PID {})", args.pid);
+                warn!(
+                    "Blocked execution: Attempted to kill own process (PID {})",
+                    args.pid
+                );
                 return Ok(serde_json::to_string(&json!({
                     "status": "error",
                     "error": "SECURITY VIOLATION: Cannot kill the GZMO agent's own process."

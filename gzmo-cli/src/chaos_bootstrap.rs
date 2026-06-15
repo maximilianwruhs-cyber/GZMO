@@ -3,12 +3,12 @@ use std::sync::Arc;
 use tokio::sync::{mpsc, watch, RwLock};
 use tokio::task::JoinHandle;
 
+use gzmo_chaos::feedback::ChaosEvent;
+use gzmo_chaos::pulse::{ChaosConfig, ChaosSnapshot, PulseHandle, PulseLoop};
+use gzmo_chaos::triggers::{NotifyLevel, TriggerAction, TriggerEngine};
 use gzmo_core::config::GzmoConfig;
 use gzmo_core::gateway::LlmGateway;
 use gzmo_core::synapse::{EventSource, EventType, SynapseBus, SynapseEvent};
-use gzmo_chaos::pulse::{PulseLoop, PulseHandle, ChaosConfig, ChaosSnapshot};
-use gzmo_chaos::triggers::{TriggerEngine, TriggerAction, NotifyLevel};
-use gzmo_chaos::feedback::ChaosEvent;
 
 /// Handle representing the running chaos runtime.
 pub struct ChaosRuntime {
@@ -19,12 +19,16 @@ pub struct ChaosRuntime {
 
 /// Start the PulseLoop chaos engine with the config's [chaos] parameters.
 pub fn start_chaos_runtime(config: &GzmoConfig) -> ChaosRuntime {
-    let chaos_config: ChaosConfig = config.chaos
+    let chaos_config: ChaosConfig = config
+        .chaos
         .as_ref()
         .and_then(|v| v.clone().try_into().ok())
         .unwrap_or_default();
     let restore_policy = if chaos_config.rho_restore_alpha > 0.0 {
-        format!("tanh (α={:.2}, β={:.2})", chaos_config.rho_restore_alpha, chaos_config.rho_restore_beta)
+        format!(
+            "tanh (α={:.2}, β={:.2})",
+            chaos_config.rho_restore_alpha, chaos_config.rho_restore_beta
+        )
     } else {
         format!("linear (k={:.4})", chaos_config.rho_decay_k)
     };
@@ -57,13 +61,13 @@ pub fn spawn_snapshot_bridge(
                 break; // PulseLoop dropped
             }
             let snap = snapshot_rx.borrow_and_update().clone();
-            
+
             // Update gateway LLM parameters from Lorenz coordinates
             {
                 let gw = gateway.read().await;
                 gw.set_chaos_overrides(snap.llm_temperature, snap.llm_max_tokens);
             }
-            
+
             // Write snapshot files for shell skill backward compat
             if snap.tick % 15 == 0 {
                 let json = serde_json::to_string_pretty(&snap).unwrap_or_default();
@@ -73,7 +77,7 @@ pub fn spawn_snapshot_bridge(
                 if tokio::fs::write(&tmp_path, json.as_bytes()).await.is_ok() {
                     let _ = tokio::fs::rename(&tmp_path, &target_path).await;
                 }
-                
+
                 // HEARTBEAT.md — human-readable status (containing the Workstream C rows)
                 let heartbeat = format!(
                     "# GZMO Heartbeat\n\n\
@@ -104,22 +108,37 @@ pub fn spawn_snapshot_bridge(
                     Temperature: {:.3}, Max tokens: {}, Valence: {:+.3}\n\n\
                     *Updated: {}*\n",
                     if snap.alive { "ALIVE" } else { "DEAD" },
-                    snap.tick, snap.energy, snap.phase, snap.deaths, snap.tension,
+                    snap.tick,
+                    snap.energy,
+                    snap.phase,
+                    snap.deaths,
+                    snap.tension,
                     snap.chaos_val,
                     restore_policy,
-                    snap.x, snap.y, snap.z,
-                    snap.thoughts_incubating, snap.thoughts_crystallized,
-                    snap.mutations.gravity_mod, snap.mutations.friction_mod,
+                    snap.x,
+                    snap.y,
+                    snap.z,
+                    snap.thoughts_incubating,
+                    snap.thoughts_crystallized,
+                    snap.mutations.gravity_mod,
+                    snap.mutations.friction_mod,
                     snap.mutations.lorenz_rho_mod,
-                    snap.rho_effective, snap.rho_mod_delta, snap.rho_forcing_sign,
+                    snap.rho_effective,
+                    snap.rho_mod_delta,
+                    snap.rho_forcing_sign,
                     snap.rho_breath_phase,
                     snap.mutations.tension_bias,
-                    snap.llm_temperature, snap.llm_max_tokens, snap.llm_valence,
+                    snap.llm_temperature,
+                    snap.llm_max_tokens,
+                    snap.llm_valence,
                     snap.timestamp,
                 );
                 let hb_tmp = state_dir.join("HEARTBEAT.md.tmp");
                 let hb_target = state_dir.join("HEARTBEAT.md");
-                if tokio::fs::write(&hb_tmp, heartbeat.as_bytes()).await.is_ok() {
+                if tokio::fs::write(&hb_tmp, heartbeat.as_bytes())
+                    .await
+                    .is_ok()
+                {
                     let _ = tokio::fs::rename(&hb_tmp, &hb_target).await;
                 }
 
@@ -140,7 +159,7 @@ pub fn spawn_snapshot_bridge(
                     ));
                 }
             }
-            
+
             // Evaluate autonomous triggers
             let fired = triggers.evaluate(&snap);
             for f in fired {
@@ -148,35 +167,38 @@ pub fn spawn_snapshot_bridge(
                     TriggerAction::Notify { message, level } => {
                         if let Some(ref notify_tx) = trigger_notify {
                             let prefix = match level {
-                                NotifyLevel::Whisper  => format!("\x1b[2m  {message}\x1b[0m"),
-                                NotifyLevel::Normal   => format!("  \x1b[36m{message}\x1b[0m"),
-                                NotifyLevel::Urgent   => format!("  \x1b[1m\x1b[33m{message}\x1b[0m"),
-                                NotifyLevel::Critical => format!("  \x1b[1m\x1b[31m⚠ {message}\x1b[0m"),
+                                NotifyLevel::Whisper => format!("\x1b[2m  {message}\x1b[0m"),
+                                NotifyLevel::Normal => format!("  \x1b[36m{message}\x1b[0m"),
+                                NotifyLevel::Urgent => format!("  \x1b[1m\x1b[33m{message}\x1b[0m"),
+                                NotifyLevel::Critical => {
+                                    format!("  \x1b[1m\x1b[31m⚠ {message}\x1b[0m")
+                                }
                             };
                             let _ = notify_tx.send(prefix).await;
                         }
                     }
-                    TriggerAction::EmitEvent { tension_delta, energy_delta } => {
-                        let _ = feedback_tx.send(
-                            ChaosEvent::Custom {
+                    TriggerAction::EmitEvent {
+                        tension_delta,
+                        energy_delta,
+                    } => {
+                        let _ = feedback_tx
+                            .send(ChaosEvent::Custom {
                                 tension_delta: *tension_delta,
                                 energy_delta: *energy_delta,
                                 thought_seed: None,
-                            }
-                        ).await;
+                            })
+                            .await;
                     }
                     TriggerAction::RunSkill { skill_name, args } => {
                         if let Some(ref notify_tx) = trigger_notify {
-                            let _ = notify_tx.send(
-                                format!("__TRIGGER_SKILL__:/{skill_name} {args}")
-                            ).await;
+                            let _ = notify_tx
+                                .send(format!("__TRIGGER_SKILL__:/{skill_name} {args}"))
+                                .await;
                         }
                     }
                     TriggerAction::InjectPrompt { prompt } => {
                         if let Some(ref notify_tx) = trigger_notify {
-                            let _ = notify_tx.send(
-                                format!("__TRIGGER_INJECT__:{prompt}")
-                            ).await;
+                            let _ = notify_tx.send(format!("__TRIGGER_INJECT__:{prompt}")).await;
                         }
                     }
                 }

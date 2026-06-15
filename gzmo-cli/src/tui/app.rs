@@ -3,9 +3,9 @@ use crossterm::event::{Event, EventStream, KeyCode, KeyEventKind};
 use futures::{FutureExt, StreamExt};
 use ratatui::{backend::CrosstermBackend, Terminal};
 use std::io::stdout;
+use std::time::Duration;
 use tokio::sync::mpsc;
 use tokio::time::interval;
-use std::time::Duration;
 
 use super::action::Action;
 use super::component::Component;

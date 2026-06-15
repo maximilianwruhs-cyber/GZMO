@@ -7,15 +7,15 @@ use anyhow::Result;
 use tracing::info;
 
 use gzmo_core::config::GzmoConfig;
-use gzmo_core::gateway::LlmGateway;
-use gzmo_core::gateway::GatewayRouter;
 use gzmo_core::config::TaskKind;
-use gzmo_core::synapse::set_event_source;
+use gzmo_core::gateway::GatewayRouter;
+use gzmo_core::gateway::LlmGateway;
 use gzmo_core::identity::IdentityEngine;
 use gzmo_core::ingest::IngestEngine;
 use gzmo_core::memory::embeddings;
 use gzmo_core::memory::episodic::FileEpisodicStore;
 use gzmo_core::memory::qdrant_sync::{self, sync_vault_to_qdrant};
+use gzmo_core::synapse::set_event_source;
 
 use gzmo_core::synapse::SynapseBus;
 use gzmo_core::tools::fs::{DirListTool, FileReadTool, FileSearchTool, FileWriteTool};
@@ -52,10 +52,8 @@ pub async fn run(
     }
 
     let router = GatewayRouter::new(config);
-    let gateway: Arc<dyn LlmGateway> =
-        Arc::clone(router.gateway(TaskKind::IngestExtract));
-    let verify_gateway: Arc<dyn LlmGateway> =
-        Arc::clone(router.gateway(TaskKind::IngestVerify));
+    let gateway: Arc<dyn LlmGateway> = Arc::clone(router.gateway(TaskKind::IngestExtract));
+    let verify_gateway: Arc<dyn LlmGateway> = Arc::clone(router.gateway(TaskKind::IngestVerify));
 
     let vault = Arc::new(
         embeddings::open_vault_with_embeddings(
@@ -77,7 +75,9 @@ pub async fn run(
     tools.register(Box::new(WebSearchTool::default()));
     tools.register(Box::new(SysMetricsTool));
     tools.register(Box::new(SysKillTool));
-    tools.register(Box::new(MemoryRecordTool { vault: Arc::clone(&vault) }));
+    tools.register(Box::new(MemoryRecordTool {
+        vault: Arc::clone(&vault),
+    }));
     tools.register(Box::new(MemorySearchTool::new(Arc::clone(&vault))));
 
     let session = McpSession::connect(config, &mut tools).await?;

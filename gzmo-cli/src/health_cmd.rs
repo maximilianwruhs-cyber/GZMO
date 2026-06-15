@@ -8,9 +8,9 @@ use gzmo_core::health::{
 };
 use gzmo_core::identity::IdentityEngine;
 use gzmo_core::memory::embeddings;
-use gzmo_core::tools::ToolRegistry;
 use gzmo_core::tools::fs::{DirListTool, FileReadTool, FileSearchTool, FileWriteTool};
 use gzmo_core::tools::shell::ShellExecTool;
+use gzmo_core::tools::ToolRegistry;
 
 use crate::cli_mcp::McpSession;
 
@@ -19,7 +19,9 @@ pub async fn run(config: &GzmoConfig, _identity: IdentityEngine) -> Result<()> {
 
     let mut results: Vec<ProbeResult> = Vec::new();
 
-    let prime = config.engine.active_engine_for_mode(gzmo_core::config::EngineMode::Local);
+    let prime = config
+        .engine
+        .active_engine_for_mode(gzmo_core::config::EngineMode::Local);
     results.push(probe_llm_models(&prime).await);
     results.push(probe_embeddings(&config.embeddings, &config.redis).await);
     results.push(probe_qdrant(&config.qdrant).await);

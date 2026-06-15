@@ -382,24 +382,24 @@ fn truths_from_pipeline(
         .iter()
         .flat_map(|ve| {
             let obs_count = ve.entity.observations.len();
-            ve.entity.observations.iter().map(move |obs| ExtractedTruth {
-                id: Uuid::new_v4(),
-                content: format!(
-                    "[{}:{}] {}",
-                    ve.entity.entity_type, ve.entity.name, obs
-                ),
-                confidence: ve.confidence as f32,
-                mmr_score: 0.0,
-                source_date: date,
-                decay_class: DecayClass::CuratedVault,
-                source_file: Some(source_file.to_string()),
-                evidence: crate::memory::evidence_localize::localize_observation_evidence(
-                    body,
-                    obs,
-                    &ve.evidence,
-                    obs_count,
-                ),
-            })
+            ve.entity
+                .observations
+                .iter()
+                .map(move |obs| ExtractedTruth {
+                    id: Uuid::new_v4(),
+                    content: format!("[{}:{}] {}", ve.entity.entity_type, ve.entity.name, obs),
+                    confidence: ve.confidence as f32,
+                    mmr_score: 0.0,
+                    source_date: date,
+                    decay_class: DecayClass::CuratedVault,
+                    source_file: Some(source_file.to_string()),
+                    evidence: crate::memory::evidence_localize::localize_observation_evidence(
+                        body,
+                        obs,
+                        &ve.evidence,
+                        obs_count,
+                    ),
+                })
         })
         .collect()
 }
@@ -414,7 +414,10 @@ fn truths_from_relations(
         .iter()
         .map(|vr| {
             let evidence_span = if !vr.evidence.is_empty() {
-                Some(crate::memory::evidence_localize::localize_evidence(body, &vr.evidence))
+                Some(crate::memory::evidence_localize::localize_evidence(
+                    body,
+                    &vr.evidence,
+                ))
             } else {
                 None
             };
@@ -434,7 +437,6 @@ fn truths_from_relations(
         })
         .collect()
 }
-
 
 fn entity_name_in_set(name: &str, kept: &std::collections::HashSet<String>) -> bool {
     let key = normalize_entity_key(name);
@@ -464,7 +466,9 @@ fn relink_relations_after_entities(
     let kept: Vec<VerifiedRelation> = pipeline
         .candidate_relations
         .iter()
-        .filter(|r| entity_name_in_set(&r.from, &kept_names) && entity_name_in_set(&r.to, &kept_names))
+        .filter(|r| {
+            entity_name_in_set(&r.from, &kept_names) && entity_name_in_set(&r.to, &kept_names)
+        })
         .map(|r| VerifiedRelation {
             relation: r.clone(),
             confidence: agent_conf,

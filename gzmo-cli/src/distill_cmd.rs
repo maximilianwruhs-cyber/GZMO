@@ -6,14 +6,14 @@ use anyhow::Result;
 use tracing::info;
 
 use gzmo_core::config::GzmoConfig;
-use gzmo_core::gateway::LlmGateway;
-use gzmo_core::gateway::GatewayRouter;
 use gzmo_core::config::TaskKind;
-use gzmo_core::synapse::set_event_source;
+use gzmo_core::gateway::GatewayRouter;
+use gzmo_core::gateway::LlmGateway;
 use gzmo_core::identity::IdentityEngine;
-use gzmo_core::memory::episodic::FileEpisodicStore;
 use gzmo_core::memory::embeddings;
+use gzmo_core::memory::episodic::FileEpisodicStore;
 use gzmo_core::session_distill::SessionDistillEngine;
+use gzmo_core::synapse::set_event_source;
 use gzmo_core::synapse::SynapseBus;
 use gzmo_core::tools::fs::{DirListTool, FileReadTool, FileSearchTool, FileWriteTool};
 use gzmo_core::tools::memory::{MemoryRecordTool, MemorySearchTool};
@@ -24,7 +24,11 @@ use gzmo_core::tools::ToolRegistry;
 
 use crate::cli_mcp::McpSession;
 
-pub async fn run(config: &GzmoConfig, _identity: &IdentityEngine, session_id: Option<String>) -> Result<()> {
+pub async fn run(
+    config: &GzmoConfig,
+    _identity: &IdentityEngine,
+    session_id: Option<String>,
+) -> Result<()> {
     info!("╔══════════════════════════════════════════════╗");
     info!("║       GZMO — Session Distill (→ dream)       ║");
     info!("╚══════════════════════════════════════════════╝");
@@ -67,7 +71,9 @@ pub async fn run(config: &GzmoConfig, _identity: &IdentityEngine, session_id: Op
     tools.register(Box::new(WebSearchTool::default()));
     tools.register(Box::new(SysMetricsTool));
     tools.register(Box::new(SysKillTool));
-    tools.register(Box::new(MemoryRecordTool { vault: Arc::clone(&vault) }));
+    tools.register(Box::new(MemoryRecordTool {
+        vault: Arc::clone(&vault),
+    }));
     tools.register(Box::new(MemorySearchTool::new(Arc::clone(&vault))));
 
     let session = McpSession::connect(config, &mut tools).await?;

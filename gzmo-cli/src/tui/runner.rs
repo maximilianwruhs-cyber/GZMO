@@ -1,34 +1,33 @@
-use std::sync::Arc;
 use anyhow::Result;
 use chrono::Utc;
+use std::sync::Arc;
 
+use gzmo_chaos::triggers::{NotifyLevel, TriggerAction, TriggerEngine};
 use gzmo_core::config::GzmoConfig;
-use gzmo_core::gateway::{TurboQuantGateway, VllmConfig, LlmGateway};
+use gzmo_core::gateway::{LlmGateway, TurboQuantGateway, VllmConfig};
 use gzmo_core::identity::IdentityEngine;
-use gzmo_core::memory::vault::SqliteVault;
+use gzmo_core::mcp::{bridge::McpServerConfig, manager::McpManager};
 use gzmo_core::memory::episodic::FileEpisodicStore;
+use gzmo_core::memory::vault::SqliteVault;
 use gzmo_core::session::SessionManager;
-use gzmo_core::mcp::{manager::McpManager, bridge::McpServerConfig};
-use gzmo_core::tools::ToolRegistry;
-use gzmo_core::tools::fs::{FileReadTool, FileWriteTool, DirListTool, FileSearchTool};
+use gzmo_core::skills::{
+    calculate::CalculateSkill, dice::DiceSkill, help::HelpSkill, poker::PokerSkill,
+    quote::QuoteSkill, sound::SoundSkill, visual::VisualSkill,
+};
+use gzmo_core::skills::{SkillRegistry as ChaosSkillRegistry, SkillType};
+use gzmo_core::tools::fs::{DirListTool, FileReadTool, FileSearchTool, FileWriteTool};
+use gzmo_core::tools::memory::{MemoryRecordTool, MemorySearchTool};
 use gzmo_core::tools::shell::ShellExecTool;
-use gzmo_core::tools::sysadmin::{SysMetricsTool, SysKillTool};
+use gzmo_core::tools::sysadmin::{SysKillTool, SysMetricsTool};
 use gzmo_core::tools::web::WebSearchTool;
 use gzmo_core::tools::web_browse::WebBrowseTool;
-use gzmo_core::tools::memory::{MemoryRecordTool, MemorySearchTool};
-use gzmo_core::skills::{SkillRegistry as ChaosSkillRegistry, SkillType};
-use gzmo_core::skills::{dice::DiceSkill, sound::SoundSkill, poker::PokerSkill, quote::QuoteSkill, calculate::CalculateSkill, help::HelpSkill, visual::VisualSkill};
-use gzmo_chaos::triggers::{TriggerEngine, TriggerAction, NotifyLevel};
+use gzmo_core::tools::ToolRegistry;
 
 use crate::tui::action::Action;
 use crate::tui::app::App;
 use crate::tui::components::{
-    input::InputComponent,
-    transcript::TranscriptComponent,
-    status_bar::StatusBarComponent,
-    chaos_canvas::ChaosCanvasComponent,
-    agent::AgentComponent,
-    palette::PaletteComponent,
+    agent::AgentComponent, chaos_canvas::ChaosCanvasComponent, input::InputComponent,
+    palette::PaletteComponent, status_bar::StatusBarComponent, transcript::TranscriptComponent,
 };
 
 /// Boot the Knowledge Graph MCP and return a context string for injection.
@@ -50,7 +49,8 @@ async fn boot_knowledge_graph(tools: &ToolRegistry) -> Option<String> {
     if let Some(entities) = graph.get("entities").and_then(|e| e.as_array()) {
         for entity in entities {
             let name = entity.get("name").and_then(|n| n.as_str()).unwrap_or("?");
-            let etype = entity.get("type")
+            let etype = entity
+                .get("type")
                 .or_else(|| entity.get("entityType"))
                 .and_then(|t| t.as_str())
                 .unwrap_or("?");
@@ -70,15 +70,18 @@ async fn boot_knowledge_graph(tools: &ToolRegistry) -> Option<String> {
         if !relations.is_empty() {
             block.push_str("\nRelationships:\n");
             for rel in relations {
-                let from = rel.get("source")
+                let from = rel
+                    .get("source")
                     .or_else(|| rel.get("from"))
                     .and_then(|f| f.as_str())
                     .unwrap_or("?");
-                let to = rel.get("target")
+                let to = rel
+                    .get("target")
                     .or_else(|| rel.get("to"))
                     .and_then(|t| t.as_str())
                     .unwrap_or("?");
-                let rtype = rel.get("type")
+                let rtype = rel
+                    .get("type")
                     .or_else(|| rel.get("relationType"))
                     .and_then(|r| r.as_str())
                     .unwrap_or("?");
@@ -88,7 +91,11 @@ async fn boot_knowledge_graph(tools: &ToolRegistry) -> Option<String> {
         }
     }
 
-    if has_content { Some(block) } else { None }
+    if has_content {
+        Some(block)
+    } else {
+        None
+    }
 }
 
 /// Boot and run the full-screen TUI interface.
@@ -131,16 +138,26 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
     chaos_skills.register(Arc::new(CalculateSkill));
     chaos_skills.register(Arc::new(VisualSkill));
     // Build help entries from registered skills
-    let help_entries: Vec<(String, String, &'static str)> = chaos_skills.all().iter().map(|s| {
-        let type_label = match s.skill_type() {
-            SkillType::Mechanical => "mechanical",
-            SkillType::Generative => "generative",
-            SkillType::Mutation => "mutation",
-            SkillType::Info => "info",
-        };
-        (s.name().to_string(), s.description().to_string(), type_label)
-    }).collect();
-    chaos_skills.register(Arc::new(HelpSkill { entries: help_entries }));
+    let help_entries: Vec<(String, String, &'static str)> = chaos_skills
+        .all()
+        .iter()
+        .map(|s| {
+            let type_label = match s.skill_type() {
+                SkillType::Mechanical => "mechanical",
+                SkillType::Generative => "generative",
+                SkillType::Mutation => "mutation",
+                SkillType::Info => "info",
+            };
+            (
+                s.name().to_string(),
+                s.description().to_string(),
+                type_label,
+            )
+        })
+        .collect();
+    chaos_skills.register(Arc::new(HelpSkill {
+        entries: help_entries,
+    }));
     let chaos_skills = Arc::new(chaos_skills);
 
     // ─── Tools ───────────────────────────────────────────────────
@@ -161,7 +178,9 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
     tools.register(Box::new(SysKillTool));
 
     if let Some(ref v) = vault {
-        tools.register(Box::new(MemoryRecordTool { vault: Arc::clone(v) }));
+        tools.register(Box::new(MemoryRecordTool {
+            vault: Arc::clone(v),
+        }));
         tools.register(Box::new(MemorySearchTool::new(Arc::clone(v))));
     }
 
@@ -267,8 +286,12 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
         let mut rx = chaos_snapshot_rx.clone();
         let gateway_ref = Arc::clone(&gateway);
         let feedback_tx_bg = chaos_feedback_tx.clone();
-        let state_dir = config.memory.vault_db.parent()
-            .unwrap_or(std::path::Path::new(".")).to_path_buf();
+        let state_dir = config
+            .memory
+            .vault_db
+            .parent()
+            .unwrap_or(std::path::Path::new("."))
+            .to_path_buf();
         tokio::spawn(async move {
             let mut triggers = TriggerEngine::with_defaults();
             loop {
@@ -301,27 +324,27 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
                     match &f.action {
                         TriggerAction::Notify { message, level } => {
                             let formatted = match level {
-                                NotifyLevel::Whisper  => format!("[dim] {}", message),
-                                NotifyLevel::Normal   => message.clone(),
-                                NotifyLevel::Urgent   => format!("⚠ {}", message),
+                                NotifyLevel::Whisper => format!("[dim] {}", message),
+                                NotifyLevel::Normal => message.clone(),
+                                NotifyLevel::Urgent => format!("⚠ {}", message),
                                 NotifyLevel::Critical => format!("⚠⚠ {}", message),
                             };
                             let _ = tx.send(Action::TriggerNotification(formatted));
                         }
-                        TriggerAction::EmitEvent { tension_delta, energy_delta } => {
-                            let _ = feedback_tx_bg.send(
-                                gzmo_chaos::feedback::ChaosEvent::Custom {
+                        TriggerAction::EmitEvent {
+                            tension_delta,
+                            energy_delta,
+                        } => {
+                            let _ = feedback_tx_bg
+                                .send(gzmo_chaos::feedback::ChaosEvent::Custom {
                                     tension_delta: *tension_delta,
                                     energy_delta: *energy_delta,
                                     thought_seed: None,
-                                }
-                            ).await;
+                                })
+                                .await;
                         }
                         TriggerAction::RunSkill { skill_name, args } => {
-                            let _ = tx.send(Action::TriggerSkill(
-                                skill_name.clone(),
-                                args.clone(),
-                            ));
+                            let _ = tx.send(Action::TriggerSkill(skill_name.clone(), args.clone()));
                         }
                         TriggerAction::InjectPrompt { prompt } => {
                             let _ = tx.send(Action::TriggerInject(prompt.clone()));

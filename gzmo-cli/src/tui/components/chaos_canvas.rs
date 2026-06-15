@@ -1,13 +1,10 @@
+use color_eyre::Result;
 use ratatui::{
     layout::Rect,
     style::{Color, Style},
-    widgets::{
-        canvas::Canvas,
-        Block, Borders,
-    },
+    widgets::{canvas::Canvas, Block, Borders},
     Frame,
 };
-use color_eyre::Result;
 use std::collections::VecDeque;
 
 use crate::tui::action::Action;

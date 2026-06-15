@@ -18,25 +18,101 @@ use crate::tools::{ToolDef, ToolHandler};
 /// command is checked against this list. Anything outside is rejected.
 const SAFE_COMMAND_PREFIXES: &[&str] = &[
     // Filesystem inspection (read-only)
-    "ls", "cat", "head", "tail", "wc", "stat", "file", "du", "df",
-    "find", "locate", "tree", "readlink", "realpath", "basename", "dirname",
+    "ls",
+    "cat",
+    "head",
+    "tail",
+    "wc",
+    "stat",
+    "file",
+    "du",
+    "df",
+    "find",
+    "locate",
+    "tree",
+    "readlink",
+    "realpath",
+    "basename",
+    "dirname",
     // Text processing (read-only)
-    "grep", "rg", "awk", "sed", "sort", "uniq", "cut", "tr", "jq",
-    "diff", "comm", "paste", "column", "fold", "fmt", "tee",
+    "grep",
+    "rg",
+    "awk",
+    "sed",
+    "sort",
+    "uniq",
+    "cut",
+    "tr",
+    "jq",
+    "diff",
+    "comm",
+    "paste",
+    "column",
+    "fold",
+    "fmt",
+    "tee",
     // System inspection
-    "ps", "top", "htop", "uname", "hostname", "whoami", "id", "uptime",
-    "date", "cal", "env", "printenv", "lsblk", "lscpu", "lsusb", "lspci",
-    "free", "vmstat", "iostat", "ip", "ss", "netstat",
+    "ps",
+    "top",
+    "htop",
+    "uname",
+    "hostname",
+    "whoami",
+    "id",
+    "uptime",
+    "date",
+    "cal",
+    "env",
+    "printenv",
+    "lsblk",
+    "lscpu",
+    "lsusb",
+    "lspci",
+    "free",
+    "vmstat",
+    "iostat",
+    "ip",
+    "ss",
+    "netstat",
     // Development tools
-    "git", "cargo", "rustc", "python3", "python", "node", "npm", "npx",
-    "pip", "pip3", "make", "cmake",
+    "git",
+    "cargo",
+    "rustc",
+    "python3",
+    "python",
+    "node",
+    "npm",
+    "npx",
+    "pip",
+    "pip3",
+    "make",
+    "cmake",
     // Archive / compression (read-only ops)
-    "tar", "gzip", "gunzip", "zcat", "bzip2", "xz",
+    "tar",
+    "gzip",
+    "gunzip",
+    "zcat",
+    "bzip2",
+    "xz",
     // Network (read-only, needed for cloud-mode API/web access)
-    "curl", "wget",
+    "curl",
+    "wget",
     // Misc safe
-    "echo", "printf", "true", "false", "test", "[", "which", "type",
-    "man", "help", "sha256sum", "md5sum", "b2sum", "xxd", "hexdump",
+    "echo",
+    "printf",
+    "true",
+    "false",
+    "test",
+    "[",
+    "which",
+    "type",
+    "man",
+    "help",
+    "sha256sum",
+    "md5sum",
+    "b2sum",
+    "xxd",
+    "hexdump",
     // GZMO-specific
     "gzmo",
 ];
@@ -88,12 +164,15 @@ impl ToolHandler for ShellExecTool {
         // Handles leading env vars like `FOO=bar cmd` and path prefixes like `/usr/bin/ls`.
         let first_token = command
             .split_whitespace()
-            .find(|t| !t.contains('='))  // skip env var assignments
+            .find(|t| !t.contains('=')) // skip env var assignments
             .unwrap_or("");
         // Strip any path prefix: "/usr/bin/ls" → "ls"
         let binary_name = first_token.rsplit('/').next().unwrap_or(first_token);
 
-        if !SAFE_COMMAND_PREFIXES.iter().any(|safe| binary_name == *safe) {
+        if !SAFE_COMMAND_PREFIXES
+            .iter()
+            .any(|safe| binary_name == *safe)
+        {
             tracing::warn!(command = %command, binary = %binary_name, "Blocked: not in allowlist");
             return Ok(format!(
                 "ERROR: Command '{}' is not in the safe command allowlist. \

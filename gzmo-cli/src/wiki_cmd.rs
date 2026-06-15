@@ -80,7 +80,9 @@ pub async fn run(config: &GzmoConfig, args: Vec<String>) -> Result<()> {
             println!("  sources:        {}", count_md(&format!("{dir}/sources")));
         }
         other => {
-            eprintln!("Unknown wiki subcommand '{other}'. Use: sync | lint | search | file-back | status");
+            eprintln!(
+                "Unknown wiki subcommand '{other}'. Use: sync | lint | search | file-back | status"
+            );
         }
     }
     Ok(())
@@ -111,10 +113,7 @@ fn count_md(dir: &str) -> usize {
                 .flatten()
                 .filter(|e| {
                     e.path().extension().and_then(|x| x.to_str()) == Some("md")
-                        && !e
-                            .file_name()
-                            .to_string_lossy()
-                            .starts_with("_lint-")
+                        && !e.file_name().to_string_lossy().starts_with("_lint-")
                 })
                 .count()
         })

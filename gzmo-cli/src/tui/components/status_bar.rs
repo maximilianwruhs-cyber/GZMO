@@ -1,3 +1,5 @@
+use color_eyre::Result;
+use gzmo_chaos::pulse::ChaosSnapshot;
 use ratatui::{
     layout::{Alignment, Rect},
     style::{Color, Style},
@@ -5,8 +7,6 @@ use ratatui::{
     widgets::{Block, Borders, Paragraph},
     Frame,
 };
-use color_eyre::Result;
-use gzmo_chaos::pulse::ChaosSnapshot;
 
 use crate::tui::action::Action;
 use crate::tui::component::Component;

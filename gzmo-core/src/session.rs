@@ -109,8 +109,7 @@ impl SessionManager {
             messages: messages.to_vec(),
         };
 
-        let json = serde_json::to_string_pretty(&session)
-            .context("Failed to serialize session")?;
+        let json = serde_json::to_string_pretty(&session).context("Failed to serialize session")?;
 
         let path = self.session_path(session_id);
         let tmp_path = self.sessions_dir.join(format!("{}.json.tmp", session_id));
@@ -120,9 +119,13 @@ impl SessionManager {
             .await
             .with_context(|| format!("Failed to write session tmp file: {}", tmp_path.display()))?;
 
-        tokio::fs::rename(&tmp_path, &path)
-            .await
-            .with_context(|| format!("Failed to rename session file: {} -> {}", tmp_path.display(), path.display()))?;
+        tokio::fs::rename(&tmp_path, &path).await.with_context(|| {
+            format!(
+                "Failed to rename session file: {} -> {}",
+                tmp_path.display(),
+                path.display()
+            )
+        })?;
 
         info!(
             session_id = %session_id,
@@ -183,26 +186,24 @@ impl SessionManager {
             }
 
             match tokio::fs::read_to_string(&path).await {
-                Ok(content) => {
-                    match serde_json::from_str::<Session>(&content) {
-                        Ok(session) => {
-                            metas.push(SessionMeta {
-                                id: session.id,
-                                name: session.name,
-                                created_at: session.created_at,
-                                last_active_at: session.last_active_at,
-                                message_count: session.messages.len(),
-                            });
-                        }
-                        Err(e) => {
-                            warn!(
-                                path = %path.display(),
-                                error = %e,
-                                "Skipping corrupt session file"
-                            );
-                        }
+                Ok(content) => match serde_json::from_str::<Session>(&content) {
+                    Ok(session) => {
+                        metas.push(SessionMeta {
+                            id: session.id,
+                            name: session.name,
+                            created_at: session.created_at,
+                            last_active_at: session.last_active_at,
+                            message_count: session.messages.len(),
+                        });
                     }
-                }
+                    Err(e) => {
+                        warn!(
+                            path = %path.display(),
+                            error = %e,
+                            "Skipping corrupt session file"
+                        );
+                    }
+                },
                 Err(e) => {
                     debug!(
                         path = %path.display(),
@@ -258,12 +259,16 @@ mod tests {
             Message {
                 role: Role::System,
                 content: "You are GZMO.".to_string(),
-                is_meta: true, tool_calls: None, tool_call_id: None,
+                is_meta: true,
+                tool_calls: None,
+                tool_call_id: None,
             },
             Message {
                 role: Role::User,
                 content: "Hello".to_string(),
-                is_meta: false, tool_calls: None, tool_call_id: None,
+                is_meta: false,
+                tool_calls: None,
+                tool_call_id: None,
             },
         ];
 
@@ -283,7 +288,10 @@ mod tests {
         assert_eq!(list[0].message_count, 2);
 
         // Load by name
-        let by_name = mgr.load_by_name("test_session").await.expect("load_by_name failed");
+        let by_name = mgr
+            .load_by_name("test_session")
+            .await
+            .expect("load_by_name failed");
         assert!(by_name.is_some());
 
         // Cleanup

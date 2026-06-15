@@ -6,7 +6,11 @@ use gzmo_core::identity::IdentityEngine;
 use gzmo_core::memory::embeddings;
 use tracing::info;
 
-pub async fn run(config: &GzmoConfig, _identity: &IdentityEngine, limit: Option<usize>) -> Result<()> {
+pub async fn run(
+    config: &GzmoConfig,
+    _identity: &IdentityEngine,
+    limit: Option<usize>,
+) -> Result<()> {
     let missing = {
         let vault = gzmo_core::memory::vault::SqliteVault::open(&config.memory.vault_db)?;
         vault.count_missing_embeddings()?
@@ -19,24 +23,20 @@ pub async fn run(config: &GzmoConfig, _identity: &IdentityEngine, limit: Option<
         return Ok(());
     }
 
-    let vault =
-        embeddings::open_vault_with_embeddings(
-            &config.memory.vault_db,
-            &config.embeddings,
-            &config.redis,
-            &config.rerank,
-            &config.qdrant,
-        )
-        .await?;
+    let vault = embeddings::open_vault_with_embeddings(
+        &config.memory.vault_db,
+        &config.embeddings,
+        &config.redis,
+        &config.rerank,
+        &config.qdrant,
+    )
+    .await?;
 
     let report = vault.backfill_missing_embeddings(limit).await?;
 
     println!(
         "Embedding backfill: {} updated, {} failed, {} attempted ({} still missing before run).",
-        report.updated,
-        report.failed,
-        report.attempted,
-        missing
+        report.updated, report.failed, report.attempted, missing
     );
 
     Ok(())

@@ -20,12 +20,13 @@ pub fn roll_interval_minutes(seed: u64, min_minutes: u32, max_minutes: u32) -> (
 }
 
 /// Next UTC instant for a spark run after `now`.
-pub fn next_spark_after(now: DateTime<Utc>, config: &SparkConfig, seed: u64) -> (DateTime<Utc>, u64, u32, u32) {
-    let (roll, minutes) = roll_interval_minutes(
-        seed,
-        config.dice_min_minutes,
-        config.dice_max_minutes,
-    );
+pub fn next_spark_after(
+    now: DateTime<Utc>,
+    config: &SparkConfig,
+    seed: u64,
+) -> (DateTime<Utc>, u64, u32, u32) {
+    let (roll, minutes) =
+        roll_interval_minutes(seed, config.dice_min_minutes, config.dice_max_minutes);
     let next_seed = advance_seed(seed);
     let next = now + Duration::minutes(minutes as i64);
     (next, next_seed, roll, minutes)

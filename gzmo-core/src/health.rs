@@ -11,10 +11,10 @@ use crate::config::{
     EmbeddingsConfig, EngineProfileConfig, GzmoConfig, LibrarianConfig, QdrantConfig, RedisConfig,
     RerankConfig,
 };
+use crate::gateway::ToolCall;
 use crate::memory::rerank::Reranker;
 use crate::synapse::{resolve_event_source, EventSource, EventType, SynapseBus, SynapseEvent};
 use crate::tools::ToolRegistry;
-use crate::gateway::ToolCall;
 
 /// Outcome of a subsystem probe.
 #[derive(Debug, Clone)]
@@ -58,10 +58,7 @@ pub async fn probe_llm_models(profile: &EngineProfileConfig) -> ProbeResult {
         Ok(r) if r.status().is_success() => {
             ProbeResult::pass("llm", format!("{} → {}", profile.model, url))
         }
-        Ok(r) => ProbeResult::fail(
-            "llm",
-            format!("{} returned HTTP {}", url, r.status()),
-        ),
+        Ok(r) => ProbeResult::fail("llm", format!("{} returned HTTP {}", url, r.status())),
         Err(e) => ProbeResult::fail("llm", format!("{} unreachable: {e}", url)),
     }
 }
@@ -149,19 +146,13 @@ pub async fn probe_qdrant(cfg: &QdrantConfig) -> ProbeResult {
                 Ok(v) => {
                     let pts = v["result"]["points_count"].as_u64().unwrap_or(0);
                     let status = v["result"]["status"].as_str().unwrap_or("?");
-                    format!(
-                        "{} → {} points ({status})",
-                        cfg.collection, pts
-                    )
+                    format!("{} → {} points ({status})", cfg.collection, pts)
                 }
                 Err(_) => format!("{} OK", cfg.collection),
             };
             ProbeResult::pass("qdrant", detail)
         }
-        Ok(r) => ProbeResult::fail(
-            "qdrant",
-            format!("{} returned HTTP {}", url, r.status()),
-        ),
+        Ok(r) => ProbeResult::fail("qdrant", format!("{} returned HTTP {}", url, r.status())),
         Err(e) => ProbeResult::fail("qdrant", format!("{url} unreachable: {e}")),
     }
 }
@@ -224,13 +215,15 @@ pub async fn probe_mcp_memory(tools: &ToolRegistry) -> ProbeResult {
         arguments: serde_json::json!({}),
     };
     match tools.dispatch(&call).await {
-        crate::tools::ToolResult { success: true, output, .. } => {
+        crate::tools::ToolResult {
+            success: true,
+            output,
+            ..
+        } => {
             let preview: String = output.chars().take(120).collect();
             ProbeResult::pass("mcp_memory", format!("read_graph OK ({preview}…)"))
         }
-        crate::tools::ToolResult { output, .. } => {
-            ProbeResult::fail("mcp_memory", output)
-        }
+        crate::tools::ToolResult { output, .. } => ProbeResult::fail("mcp_memory", output),
     }
 }
 
@@ -252,7 +245,9 @@ pub async fn run_startup_probes(
 
     let mut results = Vec::new();
 
-    let prime = config.engine.active_engine_for_mode(crate::config::EngineMode::Local);
+    let prime = config
+        .engine
+        .active_engine_for_mode(crate::config::EngineMode::Local);
     results.push(probe_llm_models(&prime).await);
 
     results.push(probe_embeddings(&config.embeddings, &config.redis).await);
@@ -274,10 +269,7 @@ pub async fn run_startup_probes(
         let mut r = probe_sovereign(sovereign).await;
         r.name = "sovereign";
         if !r.ok {
-            r.detail = format!(
-                "{} (expected until sovereign-moe GGUF is built)",
-                r.detail
-            );
+            r.detail = format!("{} (expected until sovereign-moe GGUF is built)", r.detail);
         }
         results.push(r);
     }
