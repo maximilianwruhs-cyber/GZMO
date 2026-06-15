@@ -32,35 +32,20 @@ pub struct SoundSkill;
 
 #[derive(Clone, Copy)]
 enum SoundType {
-    Explosion,
-    Thunder,
-    Alarm,
-    Roar,
-    Bell,
-    Guitar,
-    Drum,
-    Wave,
-    Chime,
-    Piano,
-    Wind,
-    Hum,
+    Explosion, Thunder, Alarm, Roar,
+    Bell, Guitar, Drum, Wave,
+    Chime, Piano, Wind, Hum,
 }
 
 impl SoundType {
     fn name(&self) -> &str {
         match self {
-            Self::Explosion => "explosion",
-            Self::Thunder => "thunder",
-            Self::Alarm => "alarm",
-            Self::Roar => "roar",
-            Self::Bell => "bell",
-            Self::Guitar => "guitar",
-            Self::Drum => "drum",
-            Self::Wave => "wave",
-            Self::Chime => "chime",
-            Self::Piano => "piano",
-            Self::Wind => "wind",
-            Self::Hum => "hum",
+            Self::Explosion => "explosion", Self::Thunder => "thunder",
+            Self::Alarm => "alarm", Self::Roar => "roar",
+            Self::Bell => "bell", Self::Guitar => "guitar",
+            Self::Drum => "drum", Self::Wave => "wave",
+            Self::Chime => "chime", Self::Piano => "piano",
+            Self::Wind => "wind", Self::Hum => "hum",
         }
     }
 
@@ -84,17 +69,17 @@ impl SoundType {
     fn sox_args(&self) -> Option<&str> {
         Some(match self {
             Self::Explosion => "synth 0.4 noise vol 0.5",
-            Self::Thunder => "synth 0.6 brownnoise synth 0.1 sine 100 vol 0.4",
-            Self::Alarm => "synth 0.15 sine 880 synth 0.15 sine 660 repeat 3 vol 0.3",
-            Self::Roar => "synth 0.5 brownnoise tremolo 5 80 vol 0.4",
-            Self::Bell => "synth 0.8 sine 1200 fade 0 0.8 0.5 vol 0.3",
-            Self::Guitar => "synth 0.6 pluck 330 vol 0.4",
-            Self::Drum => "synth 0.05 noise synth 0.3 sine 80 vol 0.4",
-            Self::Wave => "synth 1.0 pinknoise tremolo 0.5 60 vol 0.3",
-            Self::Chime => "synth 0.5 sine 2000 fade 0 0.5 0.3 vol 0.2",
-            Self::Piano => "synth 0.5 pluck 440 vol 0.3",
-            Self::Wind => "synth 0.8 pinknoise vol 0.2",
-            Self::Hum => "synth 0.6 sine 220 tremolo 8 50 vol 0.2",
+            Self::Thunder   => "synth 0.6 brownnoise synth 0.1 sine 100 vol 0.4",
+            Self::Alarm     => "synth 0.15 sine 880 synth 0.15 sine 660 repeat 3 vol 0.3",
+            Self::Roar      => "synth 0.5 brownnoise tremolo 5 80 vol 0.4",
+            Self::Bell      => "synth 0.8 sine 1200 fade 0 0.8 0.5 vol 0.3",
+            Self::Guitar    => "synth 0.6 pluck 330 vol 0.4",
+            Self::Drum      => "synth 0.05 noise synth 0.3 sine 80 vol 0.4",
+            Self::Wave      => "synth 1.0 pinknoise tremolo 0.5 60 vol 0.3",
+            Self::Chime     => "synth 0.5 sine 2000 fade 0 0.5 0.3 vol 0.2",
+            Self::Piano     => "synth 0.5 pluck 440 vol 0.3",
+            Self::Wind      => "synth 0.8 pinknoise vol 0.2",
+            Self::Hum       => "synth 0.6 sine 220 tremolo 8 50 vol 0.2",
         })
     }
 }
@@ -103,26 +88,11 @@ impl SoundType {
 fn pick_sound(snap: &gzmo_chaos::pulse::ChaosSnapshot) -> SoundType {
     let tension = snap.tension;
     let pool = if tension > 60.0 {
-        &[
-            SoundType::Explosion,
-            SoundType::Thunder,
-            SoundType::Alarm,
-            SoundType::Roar,
-        ]
+        &[SoundType::Explosion, SoundType::Thunder, SoundType::Alarm, SoundType::Roar]
     } else if tension > 30.0 {
-        &[
-            SoundType::Bell,
-            SoundType::Guitar,
-            SoundType::Drum,
-            SoundType::Wave,
-        ]
+        &[SoundType::Bell, SoundType::Guitar, SoundType::Drum, SoundType::Wave]
     } else {
-        &[
-            SoundType::Chime,
-            SoundType::Piano,
-            SoundType::Wind,
-            SoundType::Hum,
-        ]
+        &[SoundType::Chime, SoundType::Piano, SoundType::Wind, SoundType::Hum]
     };
     let idx = ((snap.chaos_val * 1000.0 + snap.x.abs()) as usize) % pool.len();
     pool[idx]
@@ -286,15 +256,9 @@ fn render_visual(sound: SoundType) -> String {
 
 #[async_trait]
 impl Skill for SoundSkill {
-    fn name(&self) -> &str {
-        "sound"
-    }
-    fn description(&self) -> &str {
-        "Chaos-reactive sound effect with visual + sox audio"
-    }
-    fn skill_type(&self) -> SkillType {
-        SkillType::Mechanical
-    }
+    fn name(&self) -> &str { "sound" }
+    fn description(&self) -> &str { "Chaos-reactive sound effect with visual + sox audio" }
+    fn skill_type(&self) -> SkillType { SkillType::Mechanical }
 
     async fn execute(&self, ctx: SkillContext<'_>) -> Result<SkillOutput> {
         let sound = pick_sound(ctx.chaos);
@@ -306,9 +270,7 @@ impl Skill for SoundSkill {
 
         // Build display
         let phase_str = match ctx.chaos.phase {
-            Phase::Idle => "Idle",
-            Phase::Build => "Build",
-            Phase::Drop => "Drop",
+            Phase::Idle => "Idle", Phase::Build => "Build", Phase::Drop => "Drop",
         };
         let display = format!(
             "\n{DIM}┌─────────────────────────────────────────────────┐{RESET}\n\
@@ -317,10 +279,7 @@ impl Skill for SoundSkill {
              {visual}\n\n\
              {DIM}  ⚙ Tension:{:.0}% Energy:{:.0} Phase:{}{RESET}\n\
              {DIM}└─────────────────────────────────────────────────┘{RESET}\n",
-            sound.name(),
-            ctx.chaos.tension,
-            ctx.chaos.energy,
-            phase_str,
+            sound.name(), ctx.chaos.tension, ctx.chaos.energy, phase_str,
         );
 
         let feedback_event = ChaosEvent::SoundFired { category };

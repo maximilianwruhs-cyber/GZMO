@@ -15,8 +15,8 @@ use crate::config::SubagentConfig;
 use crate::context::ContextConfig;
 use crate::gateway::LlmGateway;
 use crate::memory::scratch::{ScratchScope, ScratchService};
-use crate::memory::vault::SqliteVault;
 use crate::text_util::truncate_chars;
+use crate::memory::vault::SqliteVault;
 use crate::tools::fs::{DirListTool, FileReadTool, FileSearchTool, FileWriteTool};
 use crate::tools::memory::{MemoryRecordTool, MemorySearchTool};
 use crate::tools::shell::ShellExecTool;
@@ -79,9 +79,7 @@ impl SubagentRunner {
         tools.register(Box::new(FileSearchTool));
         tools.register(Box::new(ShellExecTool::default()));
         if let Some(ref v) = vault {
-            tools.register(Box::new(MemoryRecordTool {
-                vault: Arc::clone(v),
-            }));
+            tools.register(Box::new(MemoryRecordTool { vault: Arc::clone(v) }));
             tools.register(Box::new(MemorySearchTool::new(Arc::clone(v))));
         }
 
@@ -123,7 +121,8 @@ impl SubagentRunner {
             Complete only the task in the user message. \
             Do not delegate further sub-tasks. \
             Your final reply must be a concise summary under {} tokens.\n\nTask:\n{brief}",
-            self.system_prompt_base, self.config.summary_max_tokens,
+            self.system_prompt_base,
+            self.config.summary_max_tokens,
         )
     }
 
@@ -132,11 +131,7 @@ impl SubagentRunner {
             bail!("Subagents disabled in [subagent] config");
         }
         if spec.depth > self.config.max_depth {
-            bail!(
-                "Subagent depth {} exceeds max {}",
-                spec.depth,
-                self.config.max_depth
-            );
+            bail!("Subagent depth {} exceeds max {}", spec.depth, self.config.max_depth);
         }
 
         {
@@ -222,13 +217,9 @@ impl SubagentRunner {
                     }),
                 };
 
-                let response: AgentResponse = run_agent_loop(
-                    gateway.as_ref(),
-                    tools.as_ref(),
-                    &mut messages,
-                    &loop_config,
-                )
-                .await?;
+                let response: AgentResponse =
+                    run_agent_loop(gateway.as_ref(), tools.as_ref(), &mut messages, &loop_config)
+                        .await?;
 
                 let summary = truncate_chars(&response.text, summary_max * 4);
 

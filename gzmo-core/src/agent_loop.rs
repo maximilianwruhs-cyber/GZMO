@@ -16,11 +16,10 @@ use std::sync::Arc;
 
 use crate::context::{self, ContextConfig};
 use crate::gateway::{LlmGateway, LlmResponse, ToolDeclaration};
-use crate::memory::scratch::{
-    messages_to_transcript, DistillJob, DistillSource, ScratchScope, ScratchService,
-};
+use crate::memory::scratch::{messages_to_transcript, DistillJob, DistillSource, ScratchScope, ScratchService};
 use crate::tools::{ToolDef, ToolRegistry, ToolResult};
 use crate::types::{Message, MessageToolCall, MessageToolCallFunction, Role};
+
 
 /// Configuration for the agentic loop.
 pub struct AgentLoopConfig {
@@ -154,49 +153,36 @@ pub async fn run_agent_loop(
         // Stream text tokens in real-time.
         // If a custom on_chunk is provided (TUI mode), use it directly.
         // Otherwise, use the default spinner + stderr output (REPL mode).
-        let (on_chunk, spinner_cleanup): (
-            Box<dyn Fn(String) + Send>,
-            Option<(
-                std::sync::Arc<std::sync::atomic::AtomicBool>,
-                std::thread::JoinHandle<()>,
-            )>,
-        ) = if let Some(ref callback) = config.on_chunk {
-            let cb = callback.clone();
-            (
-                Box::new(move |text: String| {
-                    cb(text);
-                }),
-                None,
-            )
-        } else {
-            let spinning = std::sync::Arc::new(std::sync::atomic::AtomicBool::new(true));
-            let spin_flag = spinning.clone();
-            let spinner_handle = std::thread::spawn(move || {
-                const FRAMES: &[&str] = &["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
-                let mut i = 0usize;
-                while spin_flag.load(std::sync::atomic::Ordering::Relaxed) {
-                    eprint!(
-                        "\r  {} \x1b[2m⚙ cogitating...\x1b[0m",
-                        FRAMES[i % FRAMES.len()]
-                    );
+        let (on_chunk, spinner_cleanup): (Box<dyn Fn(String) + Send>, Option<(std::sync::Arc<std::sync::atomic::AtomicBool>, std::thread::JoinHandle<()>)>) =
+            if let Some(ref callback) = config.on_chunk {
+                let cb = callback.clone();
+                (Box::new(move |text: String| { cb(text); }), None)
+            } else {
+                let spinning = std::sync::Arc::new(std::sync::atomic::AtomicBool::new(true));
+                let spin_flag = spinning.clone();
+                let spinner_handle = std::thread::spawn(move || {
+                    const FRAMES: &[&str] = &["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
+                    let mut i = 0usize;
+                    while spin_flag.load(std::sync::atomic::Ordering::Relaxed) {
+                        eprint!("\r  {} \x1b[2m⚙ cogitating...\x1b[0m", FRAMES[i % FRAMES.len()]);
+                        let _ = std::io::stderr().flush();
+                        std::thread::sleep(std::time::Duration::from_millis(80));
+                        i += 1;
+                    }
+                });
+                let spin_stop = spinning.clone();
+                let cb = Box::new(move |text: String| {
+                    if spin_stop.swap(false, std::sync::atomic::Ordering::Relaxed) {
+                        eprint!("\r                              \r");
+                    }
+                    eprint!("{}", text);
                     let _ = std::io::stderr().flush();
-                    std::thread::sleep(std::time::Duration::from_millis(80));
-                    i += 1;
-                }
-            });
-            let spin_stop = spinning.clone();
-            let cb = Box::new(move |text: String| {
-                if spin_stop.swap(false, std::sync::atomic::Ordering::Relaxed) {
-                    eprint!("\r                              \r");
-                }
-                eprint!("{}", text);
-                let _ = std::io::stderr().flush();
-            });
-            (cb, Some((spinning, spinner_handle)))
-        };
+                });
+                (cb, Some((spinning, spinner_handle)))
+            };
 
-        let windowed =
-            build_windowed_messages(messages, &config.context, config.memory.as_ref()).await?;
+        let windowed = build_windowed_messages(messages, &config.context, config.memory.as_ref())
+            .await?;
 
         let response = gateway
             .complete_streaming(&windowed, &declarations, on_chunk)
@@ -234,7 +220,11 @@ pub async fn run_agent_loop(
 
             // ─── Tool calls — dispatch and feed results back ─────
             LlmResponse::ToolCalls(calls) => {
-                info!(calls = calls.len(), iteration, "LLM requested tool calls");
+                info!(
+                    calls = calls.len(),
+                    iteration,
+                    "LLM requested tool calls"
+                );
 
                 // Add the assistant's tool-call message to history
                 // with proper structured tool_calls (OpenAI-compatible format)
@@ -309,21 +299,16 @@ pub async fn run_agent_loop(
 
     let on_chunk: Box<dyn Fn(String) + Send> = if let Some(ref callback) = config.on_chunk {
         let cb = callback.clone();
-        Box::new(move |text: String| {
-            cb(text);
-        })
+        Box::new(move |text: String| { cb(text); })
     } else {
         Box::new(|text: String| {
             eprint!("{}", text);
             let _ = std::io::stderr().flush();
         })
     };
-    let windowed =
-        build_windowed_messages(messages, &config.context, config.memory.as_ref()).await?;
+    let windowed = build_windowed_messages(messages, &config.context, config.memory.as_ref()).await?;
     let final_response = gateway.complete_streaming(&windowed, &[], on_chunk).await?;
-    if config.on_chunk.is_none() {
-        eprintln!();
-    }
+    if config.on_chunk.is_none() { eprintln!(); }
     total_calls += 1;
 
     let text = match final_response {

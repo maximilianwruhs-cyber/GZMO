@@ -99,12 +99,7 @@ pub fn entity_label_from_fact(content: &str) -> String {
             }
         }
     }
-    content
-        .chars()
-        .take(48)
-        .collect::<String>()
-        .trim()
-        .to_string()
+    content.chars().take(48).collect::<String>().trim().to_string()
 }
 
 #[cfg(test)]

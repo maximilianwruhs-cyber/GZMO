@@ -16,12 +16,12 @@ use gzmo_chaos::feedback::ChaosEvent;
 use gzmo_chaos::pulse::ChaosSnapshot;
 use tokio::sync::mpsc;
 
-pub mod calculate;
 pub mod dice;
-pub mod help;
+pub mod sound;
 pub mod poker;
 pub mod quote;
-pub mod sound;
+pub mod calculate;
+pub mod help;
 pub mod visual;
 
 /// The type of skill — affects display and feedback behavior.

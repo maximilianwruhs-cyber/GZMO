@@ -120,13 +120,20 @@ fn resolve_waves(steps: &[JobStep]) -> Result<Vec<Vec<usize>>> {
     for step in steps {
         for dep in &step.depends_on {
             if !name_to_idx.contains_key(dep.as_str()) {
-                bail!("Step '{}' depends on unknown step '{}'", step.name, dep);
+                bail!(
+                    "Step '{}' depends on unknown step '{}'",
+                    step.name,
+                    dep
+                );
             }
         }
     }
 
     // Build in-degree map
-    let mut in_degree: Vec<usize> = steps.iter().map(|s| s.depends_on.len()).collect();
+    let mut in_degree: Vec<usize> = steps
+        .iter()
+        .map(|s| s.depends_on.len())
+        .collect();
 
     // Build adjacency list (dependency → dependents)
     let mut dependents: Vec<Vec<usize>> = vec![vec![]; steps.len()];
@@ -184,7 +191,10 @@ pub async fn start_orchestrator(
 ) -> Result<JobScheduler> {
     let sched = JobScheduler::new().await?;
 
-    let active_jobs: Vec<_> = jobs.into_iter().filter(|(_, j)| !j.disabled).collect();
+    let active_jobs: Vec<_> = jobs
+        .into_iter()
+        .filter(|(_, j)| !j.disabled)
+        .collect();
 
     if active_jobs.is_empty() {
         info!("Orchestrator: no active jobs configured");
@@ -196,11 +206,7 @@ pub async fn start_orchestrator(
     for (name, job_config) in active_jobs {
         let job_name = name.clone();
         let cron_expr = job_config.cron.clone();
-        let mode = if job_config.steps.is_empty() {
-            "simple"
-        } else {
-            "pipeline"
-        };
+        let mode = if job_config.steps.is_empty() { "simple" } else { "pipeline" };
         let step_count = job_config.steps.len();
         let ctx = Arc::clone(&ctx);
 
@@ -222,43 +228,43 @@ pub async fn start_orchestrator(
                 let outcome = execute_job(&ctx, &job_name, &job_cfg).await;
                 match &outcome {
                     Ok(o) => {
-                        info!(
-                            job = %job_name,
-                            status = %o.overall_status,
-                            steps = o.steps.len(),
-                            duration_ms = o.total_duration_ms,
-                            "Orchestrator: job completed"
-                        );
-                        // Complete: DaemonJobComplete
-                        if let Some(ref bus) = ctx.synapse {
-                            let data = serde_json::json!({
-                                "job": job_name,
-                                "status": format!("{}", o.overall_status),
-                                "steps": o.steps.len(),
-                                "duration_ms": o.total_duration_ms,
-                            });
-                            bus.append(&SynapseEvent::with_data(
-                                EventType::DaemonJobComplete,
-                                resolve_event_source(EventSource::GzmoDaemon),
-                                data,
-                            ));
-                        }
+                    info!(
+                        job = %job_name,
+                        status = %o.overall_status,
+                        steps = o.steps.len(),
+                        duration_ms = o.total_duration_ms,
+                        "Orchestrator: job completed"
+                    );
+                    // Complete: DaemonJobComplete
+                    if let Some(ref bus) = ctx.synapse {
+                        let data = serde_json::json!({
+                            "job": job_name,
+                            "status": format!("{}", o.overall_status),
+                            "steps": o.steps.len(),
+                            "duration_ms": o.total_duration_ms,
+                        });
+                        bus.append(&SynapseEvent::with_data(
+                            EventType::DaemonJobComplete,
+                            resolve_event_source(EventSource::GzmoDaemon),
+                            data,
+                        ));
                     }
+                }
                     Err(e) => {
-                        error!(job = %job_name, error = %e, "Orchestrator: job failed");
-                        // Fail: DaemonJobFail
-                        if let Some(ref bus) = ctx.synapse {
-                            let data = serde_json::json!({
-                                "job": job_name,
-                                "error": e.to_string(),
-                            });
-                            bus.append(&SynapseEvent::with_data(
-                                EventType::DaemonJobFail,
-                                resolve_event_source(EventSource::GzmoDaemon),
-                                data,
-                            ));
-                        }
+                    error!(job = %job_name, error = %e, "Orchestrator: job failed");
+                    // Fail: DaemonJobFail
+                    if let Some(ref bus) = ctx.synapse {
+                        let data = serde_json::json!({
+                            "job": job_name,
+                            "error": e.to_string(),
+                        });
+                        bus.append(&SynapseEvent::with_data(
+                            EventType::DaemonJobFail,
+                            resolve_event_source(EventSource::GzmoDaemon),
+                            data,
+                        ));
                     }
+                }
                 }
             })
         })?;
@@ -274,7 +280,10 @@ pub async fn start_orchestrator(
     }
 
     sched.start().await?;
-    info!(jobs = job_count, "Orchestrator: scheduler running");
+    info!(
+        jobs = job_count,
+        "Orchestrator: scheduler running"
+    );
 
     Ok(sched)
 }
@@ -436,8 +445,7 @@ async fn execute_pipeline(
             // Single step — no need for join overhead
             let step_idx = wave[0];
             let step = &config.steps[step_idx];
-            let outcome =
-                execute_step(ctx, job_name, step, &step_results, config.max_retries).await;
+            let outcome = execute_step(ctx, job_name, step, &step_results, config.max_retries).await;
             if outcome.status == StepStatus::Failed {
                 pipeline_failed = true;
             }
@@ -846,32 +854,33 @@ async fn persist_outcome(ctx: &OrchestratorContext, outcome: &JobOutcome) {
 async fn log_to_episodic(ctx: &OrchestratorContext, outcome: &JobOutcome) {
     if let Some(ref episodic) = ctx.episodic {
         let summary = format_outcome_summary(outcome);
-        let _ = episodic
-            .append(&EpisodicEntry {
-                timestamp: outcome.timestamp,
-                source: EpisodicSource::InternalMonologue,
-                content: summary,
-                is_silent: true,
-            })
-            .await;
+        let _ = episodic.append(&EpisodicEntry {
+            timestamp: outcome.timestamp,
+            source: EpisodicSource::InternalMonologue,
+            content: summary,
+            is_silent: true,
+        }).await;
     }
 }
 
 /// Format a job outcome as a human-readable summary for storage.
 fn format_outcome_summary(outcome: &JobOutcome) -> String {
-    let mut parts = vec![format!(
-        "[Job: {}] {} | {} step(s) | {}ms",
-        outcome.job_name,
-        outcome.overall_status,
-        outcome.steps.len(),
-        outcome.total_duration_ms,
-    )];
+    let mut parts = vec![
+        format!(
+            "[Job: {}] {} | {} step(s) | {}ms",
+            outcome.job_name,
+            outcome.overall_status,
+            outcome.steps.len(),
+            outcome.total_duration_ms,
+        ),
+    ];
 
     for step in &outcome.steps {
         let truncated = crate::text_util::truncate_chars(&step.result_text, 150);
         parts.push(format!(
             "  {} {} ({}ms, {} LLM, {} tools): {}",
-            step.status, step.name, step.duration_ms, step.llm_calls, step.tool_calls, truncated,
+            step.status, step.name, step.duration_ms,
+            step.llm_calls, step.tool_calls, truncated,
         ));
     }
 
@@ -888,22 +897,16 @@ mod tests {
     fn test_wave_resolution_linear() {
         let steps = vec![
             JobStep {
-                name: "a".into(),
-                prompt: "".into(),
-                depends_on: vec![],
-                max_iterations: 5,
+                name: "a".into(), prompt: "".into(),
+                depends_on: vec![], max_iterations: 5,
             },
             JobStep {
-                name: "b".into(),
-                prompt: "".into(),
-                depends_on: vec!["a".into()],
-                max_iterations: 5,
+                name: "b".into(), prompt: "".into(),
+                depends_on: vec!["a".into()], max_iterations: 5,
             },
             JobStep {
-                name: "c".into(),
-                prompt: "".into(),
-                depends_on: vec!["b".into()],
-                max_iterations: 5,
+                name: "c".into(), prompt: "".into(),
+                depends_on: vec!["b".into()], max_iterations: 5,
             },
         ];
 
@@ -918,29 +921,23 @@ mod tests {
     fn test_wave_resolution_parallel() {
         let steps = vec![
             JobStep {
-                name: "a".into(),
-                prompt: "".into(),
-                depends_on: vec![],
-                max_iterations: 5,
+                name: "a".into(), prompt: "".into(),
+                depends_on: vec![], max_iterations: 5,
             },
             JobStep {
-                name: "b".into(),
-                prompt: "".into(),
-                depends_on: vec![],
-                max_iterations: 5,
+                name: "b".into(), prompt: "".into(),
+                depends_on: vec![], max_iterations: 5,
             },
             JobStep {
-                name: "c".into(),
-                prompt: "".into(),
-                depends_on: vec!["a".into(), "b".into()],
-                max_iterations: 5,
+                name: "c".into(), prompt: "".into(),
+                depends_on: vec!["a".into(), "b".into()], max_iterations: 5,
             },
         ];
 
         let waves = resolve_waves(&steps).unwrap();
         assert_eq!(waves.len(), 2);
         assert_eq!(waves[0], vec![0, 1]); // a + b in parallel
-        assert_eq!(waves[1], vec![2]); // c after both
+        assert_eq!(waves[1], vec![2]);    // c after both
     }
 
     #[test]
@@ -948,52 +945,40 @@ mod tests {
         // Classic diamond: a → b, a → c, b+c → d
         let steps = vec![
             JobStep {
-                name: "a".into(),
-                prompt: "".into(),
-                depends_on: vec![],
-                max_iterations: 5,
+                name: "a".into(), prompt: "".into(),
+                depends_on: vec![], max_iterations: 5,
             },
             JobStep {
-                name: "b".into(),
-                prompt: "".into(),
-                depends_on: vec!["a".into()],
-                max_iterations: 5,
+                name: "b".into(), prompt: "".into(),
+                depends_on: vec!["a".into()], max_iterations: 5,
             },
             JobStep {
-                name: "c".into(),
-                prompt: "".into(),
-                depends_on: vec!["a".into()],
-                max_iterations: 5,
+                name: "c".into(), prompt: "".into(),
+                depends_on: vec!["a".into()], max_iterations: 5,
             },
             JobStep {
-                name: "d".into(),
-                prompt: "".into(),
-                depends_on: vec!["b".into(), "c".into()],
-                max_iterations: 5,
+                name: "d".into(), prompt: "".into(),
+                depends_on: vec!["b".into(), "c".into()], max_iterations: 5,
             },
         ];
 
         let waves = resolve_waves(&steps).unwrap();
         assert_eq!(waves.len(), 3);
-        assert_eq!(waves[0], vec![0]); // a
+        assert_eq!(waves[0], vec![0]);    // a
         assert_eq!(waves[1], vec![1, 2]); // b + c parallel
-        assert_eq!(waves[2], vec![3]); // d
+        assert_eq!(waves[2], vec![3]);    // d
     }
 
     #[test]
     fn test_wave_resolution_cycle_detected() {
         let steps = vec![
             JobStep {
-                name: "a".into(),
-                prompt: "".into(),
-                depends_on: vec!["b".into()],
-                max_iterations: 5,
+                name: "a".into(), prompt: "".into(),
+                depends_on: vec!["b".into()], max_iterations: 5,
             },
             JobStep {
-                name: "b".into(),
-                prompt: "".into(),
-                depends_on: vec!["a".into()],
-                max_iterations: 5,
+                name: "b".into(), prompt: "".into(),
+                depends_on: vec!["a".into()], max_iterations: 5,
             },
         ];
 
@@ -1004,12 +989,12 @@ mod tests {
 
     #[test]
     fn test_wave_resolution_unknown_dep() {
-        let steps = vec![JobStep {
-            name: "a".into(),
-            prompt: "".into(),
-            depends_on: vec!["nonexistent".into()],
-            max_iterations: 5,
-        }];
+        let steps = vec![
+            JobStep {
+                name: "a".into(), prompt: "".into(),
+                depends_on: vec!["nonexistent".into()], max_iterations: 5,
+            },
+        ];
 
         let result = resolve_waves(&steps);
         assert!(result.is_err());
@@ -1018,12 +1003,12 @@ mod tests {
 
     #[test]
     fn test_wave_resolution_single_step() {
-        let steps = vec![JobStep {
-            name: "only".into(),
-            prompt: "".into(),
-            depends_on: vec![],
-            max_iterations: 5,
-        }];
+        let steps = vec![
+            JobStep {
+                name: "only".into(), prompt: "".into(),
+                depends_on: vec![], max_iterations: 5,
+            },
+        ];
 
         let waves = resolve_waves(&steps).unwrap();
         assert_eq!(waves.len(), 1);
@@ -1034,14 +1019,16 @@ mod tests {
     fn test_format_outcome_summary() {
         let outcome = JobOutcome {
             job_name: "test_job".to_string(),
-            steps: vec![StepOutcome {
-                name: "gather".to_string(),
-                status: StepStatus::Success,
-                result_text: "All systems nominal".to_string(),
-                duration_ms: 1234,
-                llm_calls: 2,
-                tool_calls: 3,
-            }],
+            steps: vec![
+                StepOutcome {
+                    name: "gather".to_string(),
+                    status: StepStatus::Success,
+                    result_text: "All systems nominal".to_string(),
+                    duration_ms: 1234,
+                    llm_calls: 2,
+                    tool_calls: 3,
+                },
+            ],
             overall_status: StepStatus::Success,
             total_duration_ms: 5000,
             timestamp: Utc::now(),

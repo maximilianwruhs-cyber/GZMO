@@ -9,7 +9,9 @@ use crate::gateway::ToolCall;
 use crate::memory::kg_promotion::canonicalize_relation_type;
 use crate::tools::{ToolRegistry, ToolResult};
 
-const CANONICAL_ENTITY_TYPES: &[&str] = &["PEOPLE", "SYSTEMS", "PROJECTS", "TOOLS", "DECISIONS"];
+const CANONICAL_ENTITY_TYPES: &[&str] = &[
+    "PEOPLE", "SYSTEMS", "PROJECTS", "TOOLS", "DECISIONS",
+];
 
 #[derive(Debug, Deserialize)]
 #[allow(dead_code)]
@@ -102,7 +104,8 @@ pub async fn run_kg_reconcile(
         }
         let note = format!(
             "[ontology] canonical type {} (was {})",
-            canonical, entity.entity_type
+            canonical,
+            entity.entity_type
         );
         if cfg.dry_run {
             info!(entity = %entity.name, from = %entity.entity_type, to = %canonical, "dry-run entity note");

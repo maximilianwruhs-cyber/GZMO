@@ -2,9 +2,9 @@
 
 use std::path::{Path, PathBuf};
 
-use crate::types::{EpisodicEntry, EpisodicSource};
 use anyhow::{Context, Result};
 use chrono::{NaiveDate, Utc};
+use crate::types::{EpisodicEntry, EpisodicSource};
 use tokio::io::AsyncWriteExt;
 use tracing::debug;
 
@@ -88,14 +88,12 @@ fn format_entry(entry: &EpisodicEntry) -> String {
     let source_tag = match &entry.source {
         EpisodicSource::UserChat => "💬 USER",
         EpisodicSource::HeartbeatCheck => "💓 HEARTBEAT",
-        EpisodicSource::ToolExecution { tool_name } => {
-            return format!(
-                "\n### 🔧 TOOL: {} — {}\n{}\n",
-                tool_name,
-                entry.timestamp.format("%H:%M:%S"),
-                entry.content
-            )
-        }
+        EpisodicSource::ToolExecution { tool_name } => return format!(
+            "\n### 🔧 TOOL: {} — {}\n{}\n",
+            tool_name,
+            entry.timestamp.format("%H:%M:%S"),
+            entry.content
+        ),
         EpisodicSource::InternalMonologue => "🧠 INTERNAL",
         EpisodicSource::SessionDistill { session_id } => {
             return format!(

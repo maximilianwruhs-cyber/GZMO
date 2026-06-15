@@ -7,10 +7,10 @@ use std::sync::Arc;
 use anyhow::Result;
 use tracing::{info, warn};
 
-use rmcp::service::Peer;
-use rmcp::transport::TokioChildProcess;
-use rmcp::RoleClient;
 use rmcp::ServiceExt;
+use rmcp::service::Peer;
+use rmcp::RoleClient;
+use rmcp::transport::TokioChildProcess;
 use tokio::process::Command;
 
 use crate::tools::ToolRegistry;
@@ -59,9 +59,7 @@ impl McpManager {
             .map_err(|e| anyhow::anyhow!("Failed to spawn MCP server '{}': {}", config.name, e))?;
 
         // Perform MCP handshake
-        let client: McpClient = ()
-            .serve(transport)
-            .await
+        let client: McpClient = ().serve(transport).await
             .map_err(|e| anyhow::anyhow!("MCP handshake failed for '{}': {}", config.name, e))?;
 
         // Log server info
@@ -78,9 +76,7 @@ impl McpManager {
         let peer: &Peer<RoleClient> = client.peer();
 
         // Discover tools (handles pagination)
-        let tools = peer
-            .list_all_tools()
-            .await
+        let tools = peer.list_all_tools().await
             .map_err(|e| anyhow::anyhow!("Failed to list tools from '{}': {}", config.name, e))?;
 
         info!(
@@ -153,10 +149,7 @@ impl McpManager {
 
     /// Gracefully shutdown all MCP connections.
     pub async fn shutdown(&mut self) -> Result<()> {
-        info!(
-            servers = self.servers.len(),
-            "Shutting down MCP connections"
-        );
+        info!(servers = self.servers.len(), "Shutting down MCP connections");
         for server in self.servers.drain(..) {
             info!(server = %server.config.name, "Shutting down");
             // Drop the peer Arc first (bridges should already be drained)

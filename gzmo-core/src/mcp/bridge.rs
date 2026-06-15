@@ -10,8 +10,8 @@ use anyhow::Result;
 use async_trait::async_trait;
 
 use rmcp::model::CallToolRequestParams;
-use rmcp::service::{Peer, RunningService};
 use rmcp::RoleClient;
+use rmcp::service::{Peer, RunningService};
 
 use crate::tools::{ToolDef, ToolHandler};
 
@@ -69,9 +69,8 @@ impl ToolHandler for McpToolBridge {
         };
 
         // Execute via JSON-RPC over stdio
-        let result = self.peer.call_tool(params).await.map_err(|e| {
-            anyhow::anyhow!("MCP call_tool failed for '{}': {}", self.mcp_tool_name, e)
-        })?;
+        let result = self.peer.call_tool(params).await
+            .map_err(|e| anyhow::anyhow!("MCP call_tool failed for '{}': {}", self.mcp_tool_name, e))?;
 
         // Extract text content from the result.
         // Content = Annotated<RawContent>, which has an `raw` field.
@@ -89,11 +88,7 @@ impl ToolHandler for McpToolBridge {
         }
 
         if result.is_error.unwrap_or(false) {
-            anyhow::bail!(
-                "MCP tool '{}' returned error: {}",
-                self.mcp_tool_name,
-                output
-            );
+            anyhow::bail!("MCP tool '{}' returned error: {}", self.mcp_tool_name, output);
         }
 
         if output.is_empty() {

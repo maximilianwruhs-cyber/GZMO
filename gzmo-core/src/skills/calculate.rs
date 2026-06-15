@@ -19,15 +19,9 @@ pub struct CalculateSkill;
 
 #[async_trait]
 impl Skill for CalculateSkill {
-    fn name(&self) -> &str {
-        "calculate"
-    }
-    fn description(&self) -> &str {
-        "Solve a mathematical expression via bc"
-    }
-    fn skill_type(&self) -> SkillType {
-        SkillType::Mechanical
-    }
+    fn name(&self) -> &str { "calculate" }
+    fn description(&self) -> &str { "Solve a mathematical expression via bc" }
+    fn skill_type(&self) -> SkillType { SkillType::Mechanical }
 
     async fn execute(&self, ctx: SkillContext<'_>) -> Result<SkillOutput> {
         let expr = ctx.args.trim();
@@ -57,11 +51,7 @@ impl Skill for CalculateSkill {
             .and_then(|output| {
                 if output.status.success() {
                     let result = String::from_utf8_lossy(&output.stdout).trim().to_string();
-                    if result.is_empty() {
-                        None
-                    } else {
-                        Some(result)
-                    }
+                    if result.is_empty() { None } else { Some(result) }
                 } else {
                     None
                 }

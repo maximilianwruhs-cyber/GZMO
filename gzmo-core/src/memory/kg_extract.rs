@@ -12,7 +12,8 @@ use uuid::Uuid;
 use crate::gateway::{LlmGateway, ToolCall};
 use crate::memory::kg_promotion::{
     canonicalize_relation_type, is_valid_entity_name, is_valid_relation_endpoints,
-    normalize_entity_key, provenance_note, KG_BATCH_SIZE, MIN_EVIDENCE_CHARS,
+    normalize_entity_key, provenance_note, KG_BATCH_SIZE,
+    MIN_EVIDENCE_CHARS,
 };
 use crate::tools::{ToolRegistry, ToolResult};
 use crate::types::{Message, Role};
@@ -373,11 +374,7 @@ pub fn dedupe_relations(
         if rel.is_empty() {
             continue;
         }
-        let key = (
-            normalize_entity_key(&r.from),
-            normalize_entity_key(&r.to),
-            rel.clone(),
-        );
+        let key = (normalize_entity_key(&r.from), normalize_entity_key(&r.to), rel.clone());
         if seen.insert(key) {
             r.relation_type = rel;
             out.push(r);
@@ -420,7 +417,11 @@ pub struct KgPromoter {
 }
 
 impl KgPromoter {
-    pub fn new(gateway: Arc<dyn LlmGateway>, tools: Arc<ToolRegistry>, gate: KgGateConfig) -> Self {
+    pub fn new(
+        gateway: Arc<dyn LlmGateway>,
+        tools: Arc<ToolRegistry>,
+        gate: KgGateConfig,
+    ) -> Self {
         Self {
             gateway,
             verify_gateway: None,
@@ -526,12 +527,14 @@ impl KgPromoter {
         }
 
         let merged = merge_extractions_pre_verify(extractions);
-        let (entities, relations, prep) = prepare_candidates(merged.entities, merged.relations);
+        let (entities, relations, prep) =
+            prepare_candidates(merged.entities, merged.relations);
 
         let (verified_entities, verified_relations, stats) = if self.gate.verify {
             if skip_relation_verify {
                 let result = self.verify(full_source, &entities, &[]).await?;
-                let (verified_entities, _, stats) = self.apply_verdicts(&entities, &[], &result);
+                let (verified_entities, _, stats) =
+                    self.apply_verdicts(&entities, &[], &result);
                 let kept_names: std::collections::HashSet<&str> = verified_entities
                     .iter()
                     .map(|e| e.entity.name.as_str())
@@ -539,7 +542,9 @@ impl KgPromoter {
                 let agent_conf = self.gate.min_confidence.max(0.8);
                 let verified_relations: Vec<VerifiedRelation> = relations
                     .iter()
-                    .filter(|r| Self::relation_endpoints_match(&r.from, &r.to, &kept_names))
+                    .filter(|r| {
+                        Self::relation_endpoints_match(&r.from, &r.to, &kept_names)
+                    })
                     .map(|r| VerifiedRelation {
                         relation: r.clone(),
                         confidence: agent_conf,
@@ -548,7 +553,9 @@ impl KgPromoter {
                     .collect();
                 (verified_entities, verified_relations, stats)
             } else {
-                let result = self.verify(full_source, &entities, &relations).await?;
+                let result = self
+                    .verify(full_source, &entities, &relations)
+                    .await?;
                 self.apply_verdicts(&entities, &relations, &result)
             }
         } else {
@@ -678,7 +685,8 @@ impl KgPromoter {
     }
 
     fn relation_endpoints_match(from: &str, to: &str, kept: &HashSet<&str>) -> bool {
-        kept.iter().any(|n| Self::entity_keys_match(from, n))
+        kept.iter()
+            .any(|n| Self::entity_keys_match(from, n))
             && kept.iter().any(|n| Self::entity_keys_match(to, n))
     }
 
@@ -697,10 +705,7 @@ impl KgPromoter {
                 if idx < entities.len() {
                     Some((idx, v))
                 } else {
-                    warn!(
-                        index = v.index,
-                        "Ignoring out-of-range entity verdict index"
-                    );
+                    warn!(index = v.index, "Ignoring out-of-range entity verdict index");
                     None
                 }
             })
@@ -714,25 +719,16 @@ impl KgPromoter {
                 if idx < relations.len() {
                     Some((idx, v))
                 } else {
-                    warn!(
-                        index = v.index,
-                        "Ignoring out-of-range relation verdict index"
-                    );
+                    warn!(index = v.index, "Ignoring out-of-range relation verdict index");
                     None
                 }
             })
             .collect();
         for v in result.entity_verdicts.iter().filter(|v| v.index < 0) {
-            warn!(
-                index = v.index,
-                "Ignoring invalid entity verdict index from verifier"
-            );
+            warn!(index = v.index, "Ignoring invalid entity verdict index from verifier");
         }
         for v in result.relation_verdicts.iter().filter(|v| v.index < 0) {
-            warn!(
-                index = v.index,
-                "Ignoring invalid relation verdict index from verifier"
-            );
+            warn!(index = v.index, "Ignoring invalid relation verdict index from verifier");
         }
 
         let mut stats = VerifyStats::default();
@@ -763,14 +759,13 @@ impl KgPromoter {
             }
         }
 
-        let kept_names: HashSet<&str> = kept_entities
-            .iter()
-            .map(|e| e.entity.name.as_str())
-            .collect();
+        let kept_names: HashSet<&str> =
+            kept_entities.iter().map(|e| e.entity.name.as_str()).collect();
 
         let mut kept_relations = Vec::new();
         for (i, r) in relations.iter().enumerate() {
-            let endpoints_ok = Self::relation_endpoints_match(&r.from, &r.to, &kept_names);
+            let endpoints_ok =
+                Self::relation_endpoints_match(&r.from, &r.to, &kept_names);
             match r_verdicts.get(&i) {
                 Some(v) if self.verdict_passes(v, true) && endpoints_ok => {
                     kept_relations.push(VerifiedRelation {
@@ -1065,7 +1060,10 @@ pub fn merge_pipeline_chunks(chunks: Vec<PipelineResult>) -> PipelineResult {
     let mut verified_entities: Vec<VerifiedEntity> = Vec::new();
     for e in deduped_entities {
         let key = crate::memory::kg_promotion::normalize_entity_key(&e.name);
-        let confidence = entity_by_key.get(&key).map(|v| v.confidence).unwrap_or(0.0);
+        let confidence = entity_by_key
+            .get(&key)
+            .map(|v| v.confidence)
+            .unwrap_or(0.0);
         let evidence = entity_by_key
             .get(&key)
             .map(|v| v.evidence.clone())
@@ -1182,11 +1180,11 @@ mod tests {
 
     #[test]
     fn apply_verdicts_ignores_negative_and_out_of_range_indices() {
+        use std::sync::Arc;
         use crate::gateway::{LlmGateway, LlmResponse, ToolDeclaration};
         use crate::tools::ToolRegistry;
         use crate::types::Message;
         use async_trait::async_trait;
-        use std::sync::Arc;
 
         struct NoopGateway;
 

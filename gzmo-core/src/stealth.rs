@@ -1,6 +1,6 @@
-use serde::{Deserialize, Serialize};
 use std::path::Path;
 use tracing::{debug, info};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct HardwareFingerprint {
@@ -45,7 +45,9 @@ pub fn discover_hardware_stealthily() -> HardwareFingerprint {
 
     info!(
         "Stealth discovery complete. CUDA: {}, ROCm: {}, AVX2: {}",
-        fingerprint.has_nvidia_gpu, fingerprint.has_amd_gpu, fingerprint.has_avx2
+        fingerprint.has_nvidia_gpu,
+        fingerprint.has_amd_gpu,
+        fingerprint.has_avx2
     );
 
     fingerprint

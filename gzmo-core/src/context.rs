@@ -145,9 +145,7 @@ fn messages_not_in_window(original: &[Message], windowed: &[Message]) -> Vec<Mes
     if original.len() <= 1 {
         return Vec::new();
     }
-    let keep_from = original
-        .len()
-        .saturating_sub(windowed.len().saturating_sub(1));
+    let keep_from = original.len().saturating_sub(windowed.len().saturating_sub(1));
     if keep_from <= 1 {
         return Vec::new();
     }
@@ -274,9 +272,7 @@ mod tests {
         Message {
             role,
             content: content.to_string(),
-            is_meta: false,
-            tool_calls: None,
-            tool_call_id: None,
+            is_meta: false, tool_calls: None, tool_call_id: None,
         }
     }
 
@@ -300,20 +296,8 @@ mod tests {
 
         // Add 50 user/assistant pairs with substantial content
         for i in 0..50 {
-            messages.push(make_msg(
-                Role::User,
-                &format!(
-                    "User message number {} with some extra content to use tokens",
-                    i
-                ),
-            ));
-            messages.push(make_msg(
-                Role::Assistant,
-                &format!(
-                    "Assistant response number {} with some extra content to use tokens",
-                    i
-                ),
-            ));
+            messages.push(make_msg(Role::User, &format!("User message number {} with some extra content to use tokens", i)));
+            messages.push(make_msg(Role::Assistant, &format!("Assistant response number {} with some extra content to use tokens", i)));
         }
 
         let config = ContextConfig::with_hot_budget(200);
@@ -321,10 +305,7 @@ mod tests {
         let pruned = prune_to_budget(&messages, &config);
 
         // Should keep system prompt + some recent messages
-        assert!(
-            pruned.len() < messages.len(),
-            "Should have pruned some messages"
-        );
+        assert!(pruned.len() < messages.len(), "Should have pruned some messages");
         assert!(pruned.len() >= 2, "Should keep at least system + 1 message");
 
         // First message should always be system

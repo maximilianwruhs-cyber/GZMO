@@ -20,37 +20,24 @@ const RESET: &str = "\x1b[0m";
 
 const SUITS: [&str; 4] = ["♠", "♥", "♦", "♣"];
 const SUIT_COLORS: [&str; 4] = [WHITE, RED, RED, WHITE];
-const RANKS: [&str; 13] = [
-    "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A",
-];
+const RANKS: [&str; 13] = ["2","3","4","5","6","7","8","9","10","J","Q","K","A"];
 
 pub struct PokerSkill;
 
 #[derive(Clone)]
-struct Card {
-    rank_idx: usize,
-    suit_idx: usize,
-}
+struct Card { rank_idx: usize, suit_idx: usize }
 
 impl Card {
-    fn value(&self) -> u8 {
-        (self.rank_idx + 2) as u8
-    }
+    fn value(&self) -> u8 { (self.rank_idx + 2) as u8 }
     fn display(&self) -> String {
-        format!(
-            "{}{}{}{}",
-            SUIT_COLORS[self.suit_idx], RANKS[self.rank_idx], SUITS[self.suit_idx], RESET
-        )
+        format!("{}{}{}{}", SUIT_COLORS[self.suit_idx], RANKS[self.rank_idx], SUITS[self.suit_idx], RESET)
     }
 }
 
 fn deal_hand(snap: &gzmo_chaos::pulse::ChaosSnapshot) -> Vec<Card> {
-    let mut deck: Vec<Card> = (0..52)
-        .map(|i| Card {
-            rank_idx: i % 13,
-            suit_idx: i / 13,
-        })
-        .collect();
+    let mut deck: Vec<Card> = (0..52).map(|i| Card {
+        rank_idx: i % 13, suit_idx: i / 13,
+    }).collect();
 
     // Fisher-Yates shuffle using chaos values
     let mut entropy = snap.chaos_val * 10000.0 + snap.x.abs() * 100.0 + snap.y.abs();
@@ -68,13 +55,12 @@ fn evaluate_hand(hand: &[Card]) -> (&str, &str) {
     values.sort();
 
     let is_flush = hand.iter().all(|c| c.suit_idx == hand[0].suit_idx);
-    let is_straight = values.windows(2).all(|w| w[1] - w[0] == 1) || values == vec![2, 3, 4, 5, 14]; // Ace-low
+    let is_straight = values.windows(2).all(|w| w[1] - w[0] == 1)
+        || values == vec![2, 3, 4, 5, 14]; // Ace-low
 
     // Count occurrences
     let mut counts = [0u8; 15];
-    for &v in &values {
-        counts[v as usize] += 1;
-    }
+    for &v in &values { counts[v as usize] += 1; }
     let mut sorted_counts: Vec<u8> = counts.iter().filter(|&&c| c > 0).copied().collect();
     sorted_counts.sort_unstable_by(|a, b| b.cmp(a));
 
@@ -94,15 +80,9 @@ fn evaluate_hand(hand: &[Card]) -> (&str, &str) {
 
 #[async_trait]
 impl Skill for PokerSkill {
-    fn name(&self) -> &str {
-        "poker"
-    }
-    fn description(&self) -> &str {
-        "Deal a chaos-driven 5-card poker hand"
-    }
-    fn skill_type(&self) -> SkillType {
-        SkillType::Mechanical
-    }
+    fn name(&self) -> &str { "poker" }
+    fn description(&self) -> &str { "Deal a chaos-driven 5-card poker hand" }
+    fn skill_type(&self) -> SkillType { SkillType::Mechanical }
 
     async fn execute(&self, ctx: SkillContext<'_>) -> Result<SkillOutput> {
         let hand = deal_hand(ctx.chaos);
@@ -116,11 +96,8 @@ impl Skill for PokerSkill {
                   {}  {}  {}  {}  {}\n\n\
              {BOLD}{YELLOW}  {icon} {name}{RESET}\n\n\
              {DIM}└─────────────────────────────────────────────────┘{RESET}\n",
-            cards_display[0],
-            cards_display[1],
-            cards_display[2],
-            cards_display[3],
-            cards_display[4],
+            cards_display[0], cards_display[1], cards_display[2],
+            cards_display[3], cards_display[4],
         );
 
         // Strong hands generate feedback

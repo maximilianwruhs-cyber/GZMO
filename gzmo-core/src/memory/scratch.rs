@@ -30,10 +30,7 @@ impl ScratchScope {
     pub fn redis_key(&self) -> String {
         match self {
             Self::Main { session_id } => format!("{SCRATCH_PREFIX}main:{session_id}"),
-            Self::Sub {
-                session_id,
-                task_id,
-            } => {
+            Self::Sub { session_id, task_id } => {
                 format!("{SCRATCH_PREFIX}sub:{session_id}:{task_id}")
             }
             Self::Orch { job, step } => format!("{SCRATCH_PREFIX}orch:{job}:{step}"),
@@ -128,17 +125,13 @@ impl RedisBackend {
                 Ok(conn)
             }
             Ok(Err(e)) => {
-                warn!(
-                    "Redis scratch unreachable (using in-memory buffer, retry in {}s): {e}",
-                    REDIS_RECONNECT_BACKOFF.as_secs()
-                );
+                warn!("Redis scratch unreachable (using in-memory buffer, retry in {}s): {e}",
+                    REDIS_RECONNECT_BACKOFF.as_secs());
                 anyhow::bail!("redis reconnect failed: {e}")
             }
             Err(_) => {
-                warn!(
-                    "Redis scratch connect timed out (using in-memory buffer, retry in {}s)",
-                    REDIS_RECONNECT_BACKOFF.as_secs()
-                );
+                warn!("Redis scratch connect timed out (using in-memory buffer, retry in {}s)",
+                    REDIS_RECONNECT_BACKOFF.as_secs());
                 anyhow::bail!("redis connect timed out")
             }
         }
@@ -153,7 +146,8 @@ impl RedisBackend {
     async fn live(&self) -> bool {
         match self.conn().await {
             Ok(mut c) => {
-                let pong: redis::RedisResult<String> = redis::cmd("PING").query_async(&mut c).await;
+                let pong: redis::RedisResult<String> =
+                    redis::cmd("PING").query_async(&mut c).await;
                 if pong.is_err() {
                     self.drop_conn().await;
                 }
@@ -449,7 +443,9 @@ impl ScratchService {
     }
 
     async fn pop_distill_file(&self) -> Result<Option<DistillJob>> {
-        let mut entries = tokio::fs::read_dir(&self.distill_fallback_dir).await.ok();
+        let mut entries = tokio::fs::read_dir(&self.distill_fallback_dir)
+            .await
+            .ok();
         let Some(ref mut rd) = entries else {
             return Ok(None);
         };

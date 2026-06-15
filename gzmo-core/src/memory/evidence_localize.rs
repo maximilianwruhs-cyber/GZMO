@@ -155,10 +155,7 @@ fn normalize_with_map(s: &str) -> (String, Vec<usize>) {
 }
 
 /// Finds the longest common substring between body and quote characters, requiring length >= 12.
-fn longest_common_substring_chars(
-    body_chars: &[char],
-    quote_chars: &[char],
-) -> Option<(usize, usize)> {
+fn longest_common_substring_chars(body_chars: &[char], quote_chars: &[char]) -> Option<(usize, usize)> {
     let m = body_chars.len();
     let n = quote_chars.len();
     if m == 0 || n == 0 {
@@ -230,11 +227,7 @@ fn segment_sentences(body: &str) -> Vec<(usize, usize)> {
                 while i + 1 < n && chars[i + 1].1.is_whitespace() {
                     i += 1;
                 }
-                let next_byte_idx = if i + 1 < n {
-                    chars[i + 1].0
-                } else {
-                    body.len()
-                };
+                let next_byte_idx = if i + 1 < n { chars[i + 1].0 } else { body.len() };
                 sentences.push((start, next_byte_idx));
                 start = next_byte_idx;
             }
@@ -279,10 +272,7 @@ mod tests {
         let quote = "Scout fokussiert auf die";
         let span = localize_evidence(body, quote);
         assert!(span.char_start.is_some());
-        assert_eq!(
-            span.evidence_text,
-            "Der  Scout  fokussiert  auf  die  Struktur."
-        );
+        assert_eq!(span.evidence_text, "Der  Scout  fokussiert  auf  die  Struktur.");
     }
 
     #[test]
@@ -300,9 +290,8 @@ mod tests {
             The monitoring dashboard tracks CPU only. \
             Bob manages the firewall rules on LXC101.";
         let entity_quote = "Alice runs backups nightly on ZFS";
-        let span_a =
-            localize_observation_evidence(body, "runs backups nightly on ZFS", entity_quote, 2)
-                .expect("obs a");
+        let span_a = localize_observation_evidence(body, "runs backups nightly on ZFS", entity_quote, 2)
+            .expect("obs a");
         let span_b = localize_observation_evidence(
             body,
             "manages the firewall rules on LXC101",

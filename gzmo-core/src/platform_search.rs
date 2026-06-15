@@ -3,9 +3,7 @@
 use anyhow::Result;
 use tracing::warn;
 
-use crate::config::{
-    EmbeddingsConfig, PlatformSearchConfig, QdrantConfig, RedisConfig, RerankConfig,
-};
+use crate::config::{EmbeddingsConfig, PlatformSearchConfig, QdrantConfig, RedisConfig, RerankConfig};
 use crate::memory::embeddings::Embedder;
 use crate::memory::qdrant_recall::QdrantRecall;
 use crate::memory::rerank::Reranker;
@@ -87,11 +85,7 @@ async fn search_knowledge_collection(
         .filter_map(|hit| {
             let path = hit.payload.get("path")?.as_str()?.to_string();
             let text = hit.payload.get("text")?.as_str()?.to_string();
-            let chunk = hit
-                .payload
-                .get("chunk")
-                .and_then(|v| v.as_u64())
-                .unwrap_or(0);
+            let chunk = hit.payload.get("chunk").and_then(|v| v.as_u64()).unwrap_or(0);
             let content = format!("[knowledge:{path}#chunk{chunk}] {text}");
             Some((
                 content.clone(),
@@ -128,11 +122,7 @@ async fn search_knowledge_collection(
         }
     }
 
-    candidates.sort_by(|a, b| {
-        b.1.score
-            .partial_cmp(&a.1.score)
-            .unwrap_or(std::cmp::Ordering::Equal)
-    });
+    candidates.sort_by(|a, b| b.1.score.partial_cmp(&a.1.score).unwrap_or(std::cmp::Ordering::Equal));
     Ok(candidates.into_iter().take(limit).map(|(_, h)| h).collect())
 }
 
@@ -147,20 +137,17 @@ fn vault_fact_to_hit(vault: &SqliteVault, fact: &SemanticFact, score: f64) -> Me
 }
 
 fn format_combined_output(query: &str, items: &[MemoryHit], limit: usize) -> String {
-    let mut vault_items: Vec<&MemoryHit> = items.iter().filter(|h| h.fact_id.is_some()).collect();
-    let mut knowledge_items: Vec<&MemoryHit> =
-        items.iter().filter(|h| h.fact_id.is_none()).collect();
+    let mut vault_items: Vec<&MemoryHit> = items
+        .iter()
+        .filter(|h| h.fact_id.is_some())
+        .collect();
+    let mut knowledge_items: Vec<&MemoryHit> = items
+        .iter()
+        .filter(|h| h.fact_id.is_none())
+        .collect();
 
-    vault_items.sort_by(|a, b| {
-        b.score
-            .partial_cmp(&a.score)
-            .unwrap_or(std::cmp::Ordering::Equal)
-    });
-    knowledge_items.sort_by(|a, b| {
-        b.score
-            .partial_cmp(&a.score)
-            .unwrap_or(std::cmp::Ordering::Equal)
-    });
+    vault_items.sort_by(|a, b| b.score.partial_cmp(&a.score).unwrap_or(std::cmp::Ordering::Equal));
+    knowledge_items.sort_by(|a, b| b.score.partial_cmp(&a.score).unwrap_or(std::cmp::Ordering::Equal));
 
     let mut out = String::new();
     out.push_str(&format!("Platform recall for '{query}':\n\n"));
@@ -181,7 +168,10 @@ fn format_combined_output(query: &str, items: &[MemoryHit], limit: usize) -> Str
     if !knowledge_items.is_empty() {
         out.push_str("## Pi Knowledge (Qdrant)\n\n");
         for (i, hit) in knowledge_items.iter().take(limit).enumerate() {
-            let src = hit.source_file.as_deref().unwrap_or("unknown");
+            let src = hit
+                .source_file
+                .as_deref()
+                .unwrap_or("unknown");
             out.push_str(&format!(
                 "- [{}] (Score: {:.2}, src: {src}) {}\n",
                 i + 1,

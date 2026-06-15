@@ -74,7 +74,8 @@ pub fn classify_document(file_name: &str, frontmatter: &Frontmatter, body: &str)
     if body.contains("MODEL:") && body.contains("USER:") {
         return DocClass::ChatExport;
     }
-    if path_key.contains("/agents/") || (name_key.contains("agents") && name_key.ends_with("md.md"))
+    if path_key.contains("/agents/")
+        || (name_key.contains("agents") && name_key.ends_with("md.md"))
     {
         return DocClass::AgentSpec;
     }
@@ -207,7 +208,9 @@ fn agent_slug_from_path(path: &str) -> Option<String> {
     for segment in path.split('/') {
         if segment.ends_with(".md") || segment.ends_with(".html") {
             if path.contains("/agents/") || path.contains("agents/") {
-                let slug = segment.trim_end_matches(".md").trim_end_matches(".html");
+                let slug = segment
+                    .trim_end_matches(".md")
+                    .trim_end_matches(".html");
                 if !slug.is_empty() {
                     return Some(slug.to_string());
                 }

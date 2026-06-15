@@ -26,13 +26,13 @@ pub struct DiscoveredEndpoint {
 
 /// Known local LLM endpoint patterns to probe.
 const KNOWN_ENDPOINTS: &[(&str, &str, &str)] = &[
-    ("LM Studio", "http://localhost:1234/v1", "/models"),
-    ("Ollama", "http://localhost:11434/v1", "/models"),
-    ("vLLM", "http://localhost:8000/v1", "/models"),
-    ("LocalAI", "http://localhost:8080/v1", "/models"),
-    ("text-gen-ui", "http://localhost:5000/v1", "/models"),
-    ("Jan", "http://localhost:1337/v1", "/models"),
-    ("LiteLLM", "http://localhost:4000/v1", "/models"),
+    ("LM Studio",   "http://localhost:1234/v1",    "/models"),
+    ("Ollama",      "http://localhost:11434/v1",    "/models"),
+    ("vLLM",        "http://localhost:8000/v1",     "/models"),
+    ("LocalAI",     "http://localhost:8080/v1",     "/models"),
+    ("text-gen-ui", "http://localhost:5000/v1",     "/models"),
+    ("Jan",         "http://localhost:1337/v1",     "/models"),
+    ("LiteLLM",    "http://localhost:4000/v1",     "/models"),
 ];
 
 /// OpenAI-compatible models list response.

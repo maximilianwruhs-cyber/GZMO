@@ -20,30 +20,19 @@ const MODES: &[&str] = &["lorenz", "energy", "mood", "sigil"];
 
 #[async_trait]
 impl Skill for VisualSkill {
-    fn name(&self) -> &str {
-        "visual"
-    }
-    fn description(&self) -> &str {
-        "Chaos-driven procedural art rendered in the terminal"
-    }
-    fn skill_type(&self) -> SkillType {
-        SkillType::Mechanical
-    }
+    fn name(&self) -> &str { "visual" }
+    fn description(&self) -> &str { "Chaos-driven procedural art rendered in the terminal" }
+    fn skill_type(&self) -> SkillType { SkillType::Mechanical }
 
     async fn execute(&self, ctx: SkillContext<'_>) -> Result<SkillOutput> {
         let snap = ctx.chaos;
 
         let mode = if ctx.args.trim().is_empty() {
             // Auto-select based on tension/chaos
-            if snap.tension > 70.0 {
-                "energy"
-            } else if snap.tension < 30.0 {
-                "mood"
-            } else if snap.chaos_val > 0.7 {
-                "sigil"
-            } else {
-                "lorenz"
-            }
+            if snap.tension > 70.0 { "energy" }
+            else if snap.tension < 30.0 { "mood" }
+            else if snap.chaos_val > 0.7 { "sigil" }
+            else { "lorenz" }
         } else {
             let requested = ctx.args.trim();
             let lower = requested.to_lowercase();
@@ -149,15 +138,10 @@ impl Skill for VisualSkill {
 
         // Build output
         let phase_str = format!("{}", snap.phase);
-        let valence_desc = if snap.llm_valence < -0.5 {
-            "dark"
-        } else if snap.llm_valence < 0.0 {
-            "tense"
-        } else if snap.llm_valence < 0.5 {
-            "calm"
-        } else {
-            "serene"
-        };
+        let valence_desc = if snap.llm_valence < -0.5 { "dark" }
+            else if snap.llm_valence < 0.0 { "tense" }
+            else if snap.llm_valence < 0.5 { "calm" }
+            else { "serene" };
 
         let display = format!(
             "\n\
@@ -170,8 +154,7 @@ impl Skill for VisualSkill {
             └─────────────────────────────────────────────────────────────┘",
             mode = mode,
             tick = snap.tick,
-            art = rendered
-                .lines()
+            art = rendered.lines()
                 .map(|l| format!("  {l}"))
                 .collect::<Vec<_>>()
                 .join("\n"),

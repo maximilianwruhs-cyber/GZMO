@@ -111,8 +111,7 @@ impl DreamEngine {
             });
         }
 
-        let filtered =
-            filter_episodic_for_consolidation(&raw, &self.dreams.exclude_episodic_substrings);
+        let filtered = filter_episodic_for_consolidation(&raw, &self.dreams.exclude_episodic_substrings);
         if filtered.trim().len() < self.dreams.min_consolidation_chars {
             info!(
                 original = raw.len(),
@@ -243,7 +242,9 @@ impl DreamEngine {
         {
             Ok(w) => w,
             Err(e) => {
-                warn!("KG promotion failed — vault may still update but graph incomplete: {e}");
+                warn!(
+                    "KG promotion failed — vault may still update but graph incomplete: {e}"
+                );
                 (0, 0)
             }
         };
@@ -358,21 +359,24 @@ impl DreamEngine {
                 let confidence = ve.confidence as f32;
                 let source_file = source_file.clone();
                 let obs_count = entity.observations.len();
-                entity.observations.iter().map(move |obs| ExtractedTruth {
-                    id: Uuid::new_v4(),
-                    content: format!("[{}:{}] {}", entity.entity_type, entity.name, obs),
-                    confidence,
-                    mmr_score: 0.0,
-                    source_date: date,
-                    decay_class: DecayClass::CuratedVault,
-                    source_file: source_file.clone(),
-                    evidence: crate::memory::evidence_localize::localize_observation_evidence(
-                        body,
-                        obs,
-                        &ve.evidence,
-                        obs_count,
-                    ),
-                })
+                entity
+                    .observations
+                    .iter()
+                    .map(move |obs| ExtractedTruth {
+                        id: Uuid::new_v4(),
+                        content: format!("[{}:{}] {}", entity.entity_type, entity.name, obs),
+                        confidence,
+                        mmr_score: 0.0,
+                        source_date: date,
+                        decay_class: DecayClass::CuratedVault,
+                        source_file: source_file.clone(),
+                        evidence: crate::memory::evidence_localize::localize_observation_evidence(
+                            body,
+                            obs,
+                            &ve.evidence,
+                            obs_count,
+                        ),
+                    })
             })
             .collect()
     }
