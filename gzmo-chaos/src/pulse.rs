@@ -1,19 +1,19 @@
-/// PulseLoop — The unified heartbeat of GZMO.
-///
-/// Replaces the standalone Randomizer binary. Runs as a `tokio::task` inside the
-/// GZMO process. Each tick at 174 BPM:
-///   1. Drains feedback events from skills
-///   2. Advances the Lorenz attractor
-///   3. Ticks the Thought Cabinet (incubation, crystallization)
-///   4. Computes derived LLM parameters from Lorenz coordinates
-///   5. Broadcasts a `ChaosSnapshot` to all consumers via `tokio::sync::watch`
-///
-/// The snapshot is the read-only interface for skills, the REPL, the orchestrator,
-/// and any external diagnostic tools.
-///
-/// Synapse observability: do not publish chaos heartbeat events to `SynapseBus`
-/// until `PulseLoop` runs in daemon mode. Today it only starts in chat/TUI;
-/// Daemon mode: `daemon_cmd.rs` pins `PulseHandle` for the full process lifetime.
+//! PulseLoop — The unified heartbeat of GZMO.
+//!
+//! Replaces the standalone Randomizer binary. Runs as a `tokio::task` inside the
+//! GZMO process. Each tick at 174 BPM:
+//!   1. Drains feedback events from skills
+//!   2. Advances the Lorenz attractor
+//!   3. Ticks the Thought Cabinet (incubation, crystallization)
+//!   4. Computes derived LLM parameters from Lorenz coordinates
+//!   5. Broadcasts a `ChaosSnapshot` to all consumers via `tokio::sync::watch`
+//!
+//! The snapshot is the read-only interface for skills, the REPL, the orchestrator,
+//! and any external diagnostic tools.
+//!
+//! Synapse observability: do not publish chaos heartbeat events to `SynapseBus`
+//! until `PulseLoop` runs in daemon mode. Today it only starts in chat/TUI;
+//! Daemon mode: `daemon_cmd.rs` pins `PulseHandle` for the full process lifetime.
 
 use std::path::PathBuf;
 use std::sync::{Arc, atomic::{AtomicU64, AtomicBool, Ordering}};
@@ -31,9 +31,30 @@ use crate::thoughts::{CrystallizationEvent, Mutations, ThoughtCabinet};
 /// 174 BPM = 344ms per beat
 const TICK_INTERVAL: Duration = Duration::from_millis(344);
 
+/// LLM temperature band — chaos-modulated sampling range.
+pub const LLM_TEMP_MIN: f32 = 0.3;
+pub const LLM_TEMP_MAX: f32 = 1.2;
+
+/// Map organism state to LLM temperature in [`LLM_TEMP_MIN`, `LLM_TEMP_MAX`].
+///
+/// Blends Lorenz x (slow orbit drift) with tension/energy (immediate skill feedback).
+/// Low τ → exploratory; high τ → stabilizing — aligned with phase prompt steering.
+pub fn compute_llm_temperature(lorenz_x: f64, tension: f64, energy: f64) -> f32 {
+    let normalized = ((lorenz_x + 20.0) / 40.0).clamp(0.0, 1.0);
+    let from_lorenz = LLM_TEMP_MIN + (normalized as f32 * (LLM_TEMP_MAX - LLM_TEMP_MIN));
+
+    let tau = tension.clamp(0.0, 100.0);
+    let from_tension = LLM_TEMP_MIN + ((100.0 - tau) / 100.0) as f32 * (LLM_TEMP_MAX - LLM_TEMP_MIN);
+
+    let energy_scale = (energy.clamp(0.0, 100.0) / 100.0) as f32;
+    let from_state = from_tension * (0.4 + 0.6 * energy_scale);
+
+    (from_lorenz * 0.4 + from_state * 0.6).clamp(LLM_TEMP_MIN, LLM_TEMP_MAX)
+}
+
 /// Read-only snapshot of current chaos state, cheaply cloneable.
 /// This is the ONLY communication channel between the chaos engine and the rest of GZMO.
-#[derive(Debug, Clone, serde::Serialize)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct ChaosSnapshot {
     pub tick: u64,
     pub x: f64,
@@ -66,6 +87,8 @@ pub struct ChaosSnapshot {
     // Last crystallization event (if any on this tick)
     pub last_crystallization: Option<CrystallizationEvent>,
 
+    pub incubating_previews: Vec<String>,
+
     // Timestamp for external observers
     pub timestamp: String,
 }
@@ -95,6 +118,7 @@ impl Default for ChaosSnapshot {
             llm_max_tokens: 256,
             llm_valence: 0.0,
             last_crystallization: None,
+            incubating_previews: Vec::new(),
             timestamp: String::new(),
         }
     }
@@ -164,6 +188,39 @@ fn default_rho_decay_k() -> f64 { 0.001 }
 fn default_rho_restore_beta() -> f64 { 1.0 }
 fn default_rho_ema_gamma() -> f64 { 0.2 }
 fn default_stabilize_delta_rho() -> f64 { -1.0 }
+
+fn finite_or(value: f64, fallback: f64) -> f64 {
+    if value.is_finite() {
+        value
+    } else {
+        fallback
+    }
+}
+
+impl EventChances {
+    fn sanitized(mut self) -> Self {
+        self.joke_chance = finite_or(self.joke_chance, default_joke_chance()).clamp(0.0, 1.0);
+        self.quote_chance = finite_or(self.quote_chance, default_quote_chance()).clamp(0.0, 1.0);
+        self.fact_chance = finite_or(self.fact_chance, default_fact_chance()).clamp(0.0, 1.0);
+        self
+    }
+}
+
+impl ChaosConfig {
+    pub fn sanitized(mut self) -> Self {
+        self.gravity = finite_or(self.gravity, default_gravity()).max(0.0);
+        self.friction = finite_or(self.friction, default_friction()).max(0.0);
+        self.seed = finite_or(self.seed, default_seed());
+        self.initial_tension = finite_or(self.initial_tension, default_tension()).clamp(0.0, 100.0);
+        self.events = self.events.sanitized();
+        self.rho_decay_k = finite_or(self.rho_decay_k, default_rho_decay_k()).clamp(0.0, 1.0);
+        self.rho_restore_alpha = finite_or(self.rho_restore_alpha, 0.0).max(0.0);
+        self.rho_restore_beta = finite_or(self.rho_restore_beta, default_rho_restore_beta()).max(f64::EPSILON);
+        self.rho_ema_gamma = finite_or(self.rho_ema_gamma, default_rho_ema_gamma()).clamp(0.0, 1.0);
+        self.stabilize_delta_rho = finite_or(self.stabilize_delta_rho, default_stabilize_delta_rho()).clamp(-10.0, 10.0);
+        self
+    }
+}
 
 impl Default for ChaosConfig {
     fn default() -> Self {
@@ -286,6 +343,7 @@ impl PulseLoop {
         let (feedback_tx, event_rx) = mpsc::channel::<ChaosEvent>(256);
         let (snapshot_tx, snapshot_rx) = watch::channel(ChaosSnapshot::default());
         let (lore_tx, lore_rx) = mpsc::channel::<LoreNotification>(64);
+        let config = config.sanitized();
 
         // Load lore pool if path configured
         let lore = config.lore_path.as_ref().and_then(|p| LorePool::load(p)).map(Arc::new);
@@ -368,30 +426,29 @@ impl PulseLoop {
                 debug!(events = events_processed, "Processed feedback events");
             }
 
-            // 2. Advance chaos generators
-            let (x, y, z) = self.lorenz.step();
-            self.lorenz.update_phase(&self.state.phase);
+            // 2. Compute effective physics with thought mutations
+            let effective_tension =
+                (self.tension + self.cabinet.mutations.tension_bias).clamp(0.0, 100.0);
+            let effective_phase = Phase::from_tension(effective_tension);
+            let effective_gravity = (self.config.gravity + self.cabinet.mutations.gravity_mod).max(1.0);
+            let effective_friction = (self.config.friction + self.cabinet.mutations.friction_mod).max(0.05);
 
-            // Apply cognitive noise from incubating thoughts
+            // 3. Advance chaos generators using the current tick's phase and mutations.
+            self.lorenz.update_phase(&effective_phase);
             self.lorenz.apply_cognitive_noise(self.cabinet.active_lorenz_noise());
-
-            // Apply permanent rho mutation from crystallized thoughts
             self.lorenz.apply_rho_mutation(self.cabinet.mutations.lorenz_rho_mod);
+            let (x, y, z) = self.lorenz.step();
 
             // Couple logistic map to Lorenz every 10 ticks
-            if self.state.tick % 10 == 0 {
+            if self.state.tick.is_multiple_of(10) {
                 self.logistic.reseed_from_lorenz(self.lorenz.normalized_output());
             }
 
             let chaos_val = self.logistic.next_val();
 
-            // 3. Compute effective physics with thought mutations
-            let effective_gravity = (self.config.gravity + self.cabinet.mutations.gravity_mod).max(1.0);
-            let effective_friction = (self.config.friction + self.cabinet.mutations.friction_mod).max(0.05);
-
             // 4. Tick engine state
             let rebirth = self.state.tick_heartbeat(
-                self.tension + self.cabinet.mutations.tension_bias,
+                effective_tension,
                 effective_gravity,
                 effective_friction,
                 chaos_val,
@@ -451,8 +508,9 @@ impl PulseLoop {
 
             let last_crystallization = crystallizations.into_iter().last();
 
-            // 6. Compute derived LLM parameters from Lorenz coordinates
-            let llm_temperature = self.lorenz_to_temperature();
+            // 6. Compute derived LLM parameters (Lorenz + live τ/ε)
+            let llm_temperature =
+                compute_llm_temperature(x, effective_tension, self.state.energy);
             let llm_max_tokens = self.lorenz_to_tokens();
             let llm_valence = self.lorenz_to_valence();
 
@@ -462,7 +520,7 @@ impl PulseLoop {
                 x,
                 y,
                 z,
-                tension: self.tension + self.cabinet.mutations.tension_bias,
+                tension: effective_tension,
                 energy: self.state.energy,
                 phase: self.state.phase,
                 alive: self.state.alive,
@@ -480,6 +538,10 @@ impl PulseLoop {
                 llm_max_tokens,
                 llm_valence,
                 last_crystallization,
+                incubating_previews: self.cabinet.incubating_snapshot()
+                    .iter()
+                    .map(|t| t.text_preview.clone())
+                    .collect(),
                 timestamp: chrono::Local::now().format("%H:%M:%S").to_string(),
             };
 
@@ -492,7 +554,7 @@ impl PulseLoop {
             self.tension = self.tension * 0.9 + hw_t * 0.1;
 
             // Auto-lore emission: every 30 ticks (~10 seconds), if alive
-            if self.state.alive && self.state.tick % 30 == 0 {
+            if self.state.alive && self.state.tick.is_multiple_of(30) {
                 if let Some(lore) = self.lore.clone() {
                     if let Some((category, item)) = self.select_lore(&lore) {
                         // Try to absorb into Thought Cabinet
@@ -521,7 +583,7 @@ impl PulseLoop {
         // Apply tension delta
         let tension_delta = event.tension_delta();
         if tension_delta.abs() > 0.01 {
-            self.tension = (self.tension + tension_delta).clamp(0.0, 100.0);
+            self.tension = self.state.apply_tension_delta(self.tension, tension_delta);
             debug!(delta = tension_delta, tension = self.tension, "Tension shifted");
         }
 
@@ -546,16 +608,12 @@ impl PulseLoop {
 
         // Apply stabilize delta directly to lorenz_rho_mod
         if let ChaosEvent::Stabilize { delta_rho } = event {
-            self.cabinet.mutations.lorenz_rho_mod =
-                (self.cabinet.mutations.lorenz_rho_mod + delta_rho).clamp(-10.0, 10.0);
-            debug!(delta = delta_rho, lorenz_rho_mod = self.cabinet.mutations.lorenz_rho_mod, "lorenz_rho_mod stabilized");
+            if delta_rho.is_finite() {
+                self.cabinet.mutations.lorenz_rho_mod =
+                    (self.cabinet.mutations.lorenz_rho_mod + delta_rho).clamp(-10.0, 10.0);
+                debug!(delta = delta_rho, lorenz_rho_mod = self.cabinet.mutations.lorenz_rho_mod, "lorenz_rho_mod stabilized");
+            }
         }
-    }
-
-    /// Map Lorenz x ∈ [-20, 20] to temperature ∈ [0.3, 1.2]
-    fn lorenz_to_temperature(&self) -> f32 {
-        let normalized = ((self.lorenz.x + 20.0) / 40.0).clamp(0.0, 1.0);
-        0.3 + (normalized as f32 * 0.9) // [0.3, 1.2]
     }
 
     /// Select a lore item based on chaos_val probability windows (ported from original Randomizer)
@@ -586,10 +644,10 @@ impl PulseLoop {
         ((n * (len.saturating_sub(1)) as f64).round() as usize).min(len.saturating_sub(1))
     }
 
-    /// Map Lorenz y ∈ [-30, 30] to max_tokens ∈ [128, 512]
+    /// Map Lorenz y ∈ [-30, 30] to max_tokens ∈ [512, 2048] (tutor-scale band)
     fn lorenz_to_tokens(&self) -> u32 {
         let normalized = ((self.lorenz.y + 30.0) / 60.0).clamp(0.0, 1.0);
-        128 + (normalized * 384.0) as u32
+        512 + (normalized * 1536.0) as u32
     }
 
     /// Map Lorenz z ∈ [0, 50] to emotional valence ∈ [-1.0, 1.0]
@@ -663,8 +721,36 @@ mod tests {
             rho_velocity_ema: 0.0,
         };
 
-        let temp = pulse.lorenz_to_temperature();
-        assert!((0.3..=1.2).contains(&temp), "Initial temperature out of range: {temp}");
+        let temp = compute_llm_temperature(pulse.lorenz.x, pulse.tension, pulse.state.energy);
+        assert!(
+            (LLM_TEMP_MIN..=LLM_TEMP_MAX).contains(&temp),
+            "Initial temperature out of range: {temp}"
+        );
+    }
+
+    #[test]
+    fn compute_llm_temperature_responds_to_tension() {
+        let lorenz_x = 0.0_f64;
+        let idle = compute_llm_temperature(lorenz_x, 8.0, 95.0);
+        let drop = compute_llm_temperature(lorenz_x, 88.0, 42.0);
+        assert!(
+            idle - drop > 0.15,
+            "τ swing should move temperature meaningfully: idle={idle:.3} drop={drop:.3}"
+        );
+        assert!((LLM_TEMP_MIN..=LLM_TEMP_MAX).contains(&idle));
+        assert!((LLM_TEMP_MIN..=LLM_TEMP_MAX).contains(&drop));
+    }
+
+    #[test]
+    fn compute_llm_temperature_dice_crit_fail_vs_success() {
+        let lorenz_x = 5.0_f64;
+        // D20 nat 1 stacked τ ≈ 29 after spike from ~10 baseline; nat 20 ≈ −5 from ~10
+        let after_fail = compute_llm_temperature(lorenz_x, 29.0, 55.0);
+        let after_success = compute_llm_temperature(lorenz_x, 0.0, 80.0);
+        assert!(
+            after_success > after_fail,
+            "crit success should raise T vs crit fail: fail={after_fail:.3} success={after_success:.3}"
+        );
     }
 
     #[tokio::test]

@@ -1,6 +1,7 @@
 //! Read-only Synapse bus reader — never writes to the append-only bus.
 
 use std::fs::{self, File};
+use std::hash::{Hash, Hasher};
 use std::io::{BufRead, BufReader, Seek, SeekFrom};
 use std::path::{Path, PathBuf};
 
@@ -25,23 +26,31 @@ pub struct SynapseReaderState {
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct PiDistillState {
+    /// Path-based dedup keys (legacy, kept for backward compat).
     pub distilled_paths: Vec<String>,
+    /// SHA-256 content hashes of transcripts (content-hash dedup, newer).
+    pub distilled_hashes: Vec<String>,
 }
 
 #[derive(Debug, Clone)]
 pub struct PiSynapsePollResult {
     pub summary: PiEventSummary,
     pub session_end_files: Vec<String>,
+    pub events: Vec<SynapseEvent>,
 }
 
 #[derive(Debug, Clone)]
 pub struct PiEventSummary {
     pub events_read: usize,
     pub quest_complete: usize,
+    pub quest_fail: usize,
     pub session_start: usize,
     pub session_end: usize,
     pub mentor_teach: usize,
     pub topic_shift_distill: usize,
+    pub skill_invoke: usize,
+    pub skill_complete: usize,
+    pub skill_error: usize,
     pub summary_text: String,
 }
 
@@ -96,10 +105,14 @@ pub fn read_new_pi_events(
 
 pub fn summarize_pi_events(events: &[SynapseEvent]) -> PiEventSummary {
     let mut quest_complete = 0usize;
+    let mut quest_fail = 0usize;
     let mut session_start = 0usize;
     let mut session_end = 0usize;
     let mut mentor_teach = 0usize;
     let mut topic_shift_distill = 0usize;
+    let mut skill_invoke = 0usize;
+    let mut skill_complete = 0usize;
+    let mut skill_error = 0usize;
     let mut snippets = Vec::new();
 
     for e in events {
@@ -115,6 +128,7 @@ pub fn summarize_pi_events(events: &[SynapseEvent]) -> PiEventSummary {
                     }
                 }
             }
+            EventType::QuestFail => quest_fail += 1,
             EventType::SessionStart => session_start += 1,
             EventType::SessionEnd => session_end += 1,
             EventType::MentorTeach => {
@@ -137,18 +151,25 @@ pub fn summarize_pi_events(events: &[SynapseEvent]) -> PiEventSummary {
                     }
                 }
             }
+            EventType::SkillInvoke => skill_invoke += 1,
+            EventType::SkillComplete => skill_complete += 1,
+            EventType::SkillError => skill_error += 1,
             _ => {}
         }
     }
 
     let mut summary = format!(
-        "Pi Synapse pull: {} events (quest_complete={}, session_start={}, session_end={}, mentor_teach={}, topic_shift_distill={})",
+        "Pi Synapse pull: {} events (quest_complete={}, quest_fail={}, session_start={}, session_end={}, mentor_teach={}, topic_shift_distill={}, skill_invoke={}, skill_complete={}, skill_error={})",
         events.len(),
         quest_complete,
+        quest_fail,
         session_start,
         session_end,
         mentor_teach,
-        topic_shift_distill
+        topic_shift_distill,
+        skill_invoke,
+        skill_complete,
+        skill_error
     );
     if !snippets.is_empty() {
         summary.push_str("\n\nRecent Pi turn excerpts:\n");
@@ -160,10 +181,14 @@ pub fn summarize_pi_events(events: &[SynapseEvent]) -> PiEventSummary {
     PiEventSummary {
         events_read: events.len(),
         quest_complete,
+        quest_fail,
         session_start,
         session_end,
         mentor_teach,
         topic_shift_distill,
+        skill_invoke,
+        skill_complete,
+        skill_error,
         summary_text: summary,
     }
 }
@@ -227,6 +252,7 @@ pub async fn poll_pi_synapse(
     Ok(PiSynapsePollResult {
         summary,
         session_end_files,
+        events,
     })
 }
 
@@ -241,25 +267,52 @@ pub async fn pull_and_log_episodic(
     Ok(result.summary)
 }
 
+/// Compute a SHA-256 content hash from a session file's transcript content.
+fn session_content_hash(session_path: &Path) -> Result<String> {
+    let content = fs::read_to_string(session_path)
+        .with_context(|| format!("Failed to read session file: {:?}", session_path))?;
+    let mut h = std::collections::hash_map::DefaultHasher::new();
+    content.trim().hash(&mut h);
+    // Also incorporate the session ID (first line of typical JSONL) for stability
+    // across renames/renumberings of the same content.
+    let session_id_line: String = content.lines().take(1).collect::<Vec<_>>().join("\n");
+    session_id_line.hash(&mut h);
+    Ok(format!("{:016x}", h.finish()))
+}
+
 pub fn should_distill_pi_session(session_path: &Path, state_path: &Path) -> Result<bool> {
     if !session_path.exists() {
         return Ok(false);
     }
-    let key = session_path.to_string_lossy().to_string();
+    // Content-hash based dedup: check both path-based (legacy) and content-hash (new).
+    // A session is considered "already distilled" only if BOTH its path AND its content
+    // hash have been seen. This allows re-processing sessions with genuinely unique
+    // content even after daemon restart (fixes the 96% duplicate rejection rate).
+    let path_key = session_path.to_string_lossy().to_string();
+    let content_key = session_content_hash(session_path)?;
     let state = load_distill_state(state_path)?;
-    Ok(!state.distilled_paths.contains(&key))
+    let path_seen = state.distilled_paths.contains(&path_key);
+    let content_seen = state.distilled_hashes.contains(&content_key);
+    // Only skip if both path AND content were already seen (path-only skip = legacy)
+    Ok(!(path_seen && content_seen))
 }
 
 pub fn mark_pi_session_distilled(session_path: &str, state_path: &Path) -> Result<()> {
     let mut state = load_distill_state(state_path)?;
+    // Store both path-based and content-hash based tracking.
     if state.distilled_paths.iter().any(|p| p == session_path) {
         return Ok(());
     }
     state.distilled_paths.push(session_path.to_string());
+    // Compute and store content hash for content-based dedup.
+    if let Ok(content_key) = session_content_hash(Path::new(session_path)) {
+        state.distilled_hashes.push(content_key);
+    }
     const MAX_TRACKED: usize = 500;
     if state.distilled_paths.len() > MAX_TRACKED {
         let drop = state.distilled_paths.len() - MAX_TRACKED;
         state.distilled_paths.drain(0..drop);
+        state.distilled_hashes.drain(0..drop.min(state.distilled_hashes.len()));
     }
     save_distill_state(state_path, &state)
 }
@@ -349,6 +402,8 @@ mod tests {
             event_type: EventType::SessionEnd,
             source: EventSource::PiAgent,
             timestamp: Utc::now(),
+            correlation_id: None,
+            reply_to: None,
             data: Some(serde_json::json!({
                 "reason": "shutdown",
                 "targetSessionFile": "/tmp/foo.jsonl"

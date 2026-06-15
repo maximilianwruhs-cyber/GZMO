@@ -31,35 +31,133 @@ pub async fn platform_cross_search(
         .map(|(fact, score)| vault_fact_to_hit(vault, fact, *score))
         .collect();
 
-    if !platform_cfg.include_knowledge_collection || !qdrant_cfg.enabled || !embed_cfg.enabled {
-        return Ok((vault_text, items));
-    }
-
-    let knowledge_hits = match search_knowledge_collection(
-        platform_cfg,
-        qdrant_cfg,
-        embed_cfg,
-        redis_cfg,
-        rerank_cfg,
-        query,
-        limit,
-    )
-    .await
-    {
-        Ok(h) => h,
-        Err(e) => {
-            warn!(error = %e, "Knowledge collection search failed — honeypot-only");
-            return Ok((vault_text, items));
+    let mut text = if platform_cfg.include_knowledge_collection && qdrant_cfg.enabled && embed_cfg.enabled {
+        let knowledge_hits = match search_knowledge_collection(
+            platform_cfg,
+            qdrant_cfg,
+            embed_cfg,
+            redis_cfg,
+            rerank_cfg,
+            query,
+            limit,
+        )
+        .await
+        {
+            Ok(h) => h,
+            Err(e) => {
+                warn!(error = %e, "Knowledge collection search failed — honeypot-only");
+                Vec::new()
+            }
+        };
+        if !knowledge_hits.is_empty() {
+            items.extend(knowledge_hits);
+            format_combined_output(query, &items, limit)
+        } else {
+            vault_text
         }
+    } else {
+        vault_text
     };
 
-    if knowledge_hits.is_empty() {
-        return Ok((vault_text, items));
+    if platform_cfg.neo4j_graph_search {
+        append_neo4j_graph_search(&mut text, platform_cfg, query);
     }
 
-    items.extend(knowledge_hits);
-    let text = format_combined_output(query, &items, limit);
     Ok((text, items))
+}
+
+fn append_neo4j_graph_search(text: &mut String, platform_cfg: &PlatformSearchConfig, query: &str) {
+    let Some((program, mut args)) = resolve_neo4j_cli(platform_cfg) else {
+        return;
+    };
+    args.extend(["--search".to_string(), query.to_string(), "--format".to_string(), "text".to_string()]);
+
+    let mut cmd = std::process::Command::new(program);
+    cmd.args(&args);
+    apply_neo4j_cli_env(&mut cmd, platform_cfg);
+
+    match cmd.output() {
+        Ok(output) if output.status.success() => {
+            let s = String::from_utf8_lossy(&output.stdout).into_owned();
+            if !s.trim().is_empty() {
+                text.push_str("\n\n");
+                text.push_str(s.trim());
+            }
+        }
+        Ok(output) => {
+            let err = String::from_utf8_lossy(&output.stderr);
+            warn!(
+                "Neo4j CLI search failed with status {:?}: {}",
+                output.status, err
+            );
+        }
+        Err(e) => {
+            warn!("Failed to execute Neo4j CLI search command: {}", e);
+        }
+    }
+}
+
+fn resolve_neo4j_cli(platform_cfg: &PlatformSearchConfig) -> Option<(String, Vec<String>)> {
+    let uri = platform_cfg
+        .neo4j_uri
+        .clone()
+        .or_else(|| std::env::var("NEO4J_URI").ok())
+        .or_else(|| std::env::var("NEO4J_URL").ok())?;
+    if uri.is_empty() {
+        return None;
+    }
+
+    let uvx = platform_cfg
+        .neo4j_mcp_uvx
+        .clone()
+        .or_else(|| std::env::var("NEO4J_MCP_UVX").ok())
+        .unwrap_or_else(|| "uvx".to_string());
+
+    if let Some(from) = platform_cfg
+        .neo4j_mcp_from
+        .clone()
+        .or_else(|| std::env::var("NEO4J_MCP_FROM").ok())
+    {
+        return Some((
+            uvx,
+            vec![
+                "--from".to_string(),
+                from,
+                "mcp-neo4j-memory".to_string(),
+            ],
+        ));
+    }
+
+    Some(( "mcp-neo4j-memory".to_string(), Vec::new() ))
+}
+
+fn apply_neo4j_cli_env(cmd: &mut std::process::Command, platform_cfg: &PlatformSearchConfig) {
+    let uri = platform_cfg
+        .neo4j_uri
+        .clone()
+        .or_else(|| std::env::var("NEO4J_URI").ok())
+        .or_else(|| std::env::var("NEO4J_URL").ok());
+    if let Some(uri) = uri {
+        cmd.env("NEO4J_URI", &uri);
+        cmd.env("NEO4J_URL", &uri);
+    }
+    if let Some(user) = platform_cfg
+        .neo4j_username
+        .clone()
+        .or_else(|| std::env::var("NEO4J_USERNAME").ok())
+    {
+        cmd.env("NEO4J_USERNAME", user);
+    }
+    if let Some(pass) = platform_cfg
+        .neo4j_password
+        .clone()
+        .or_else(|| std::env::var("NEO4J_PASSWORD").ok())
+    {
+        cmd.env("NEO4J_PASSWORD", pass);
+    }
+    if let Ok(db) = std::env::var("NEO4J_DATABASE") {
+        cmd.env("NEO4J_DATABASE", db);
+    }
 }
 
 async fn search_knowledge_collection(

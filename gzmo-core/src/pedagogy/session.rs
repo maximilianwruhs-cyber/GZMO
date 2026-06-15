@@ -25,6 +25,13 @@ pub struct PedagogySession {
     /// Prior turn asked for teachback; next student message is the response.
     #[serde(default)]
     pub awaiting_teachback: bool,
+    /// Daemon autopoietic triggers: low-tension Socratic dialogue, /dice follow-up loop.
+    #[serde(default = "default_auto_triggers_enabled")]
+    pub auto_triggers_enabled: bool,
+}
+
+fn default_auto_triggers_enabled() -> bool {
+    true
 }
 
 impl Default for PedagogySession {
@@ -36,6 +43,7 @@ impl Default for PedagogySession {
             learn_prep_notes: None,
             turns_since_teachback: 0,
             awaiting_teachback: false,
+            auto_triggers_enabled: true,
         }
     }
 }
@@ -66,6 +74,11 @@ impl PedagogySession {
     pub fn toggle_ops(&mut self) -> bool {
         self.ops_mode = !self.ops_mode;
         self.ops_mode
+    }
+
+    pub fn toggle_auto_triggers(&mut self) -> bool {
+        self.auto_triggers_enabled = !self.auto_triggers_enabled;
+        self.auto_triggers_enabled
     }
 
     pub fn set_learn_prep(&mut self, topic: &str) {

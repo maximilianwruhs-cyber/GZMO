@@ -1,5 +1,7 @@
+# DEPRECATED — session distill runs on Prime (:8000). Do not enable on VM200;
+# kept only for historical reference.
 [Unit]
-Description=GZMO fast librarian (Qwen2.5-Coder-1.5B) on GTX 1070
+Description=[RETIRED] GZMO fast librarian (Qwen2.5-Coder-1.5B) on GTX 1070
 After=network.target
 
 [Service]

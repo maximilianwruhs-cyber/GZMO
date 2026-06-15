@@ -1,0 +1,217 @@
+---
+type: source
+title: drive-research-financial-time-series-lyapunov-exponents
+created: 2026-06-08
+updated: 2026-06-08
+sources: 1
+tags: []
+status: stable
+gzmo_synthetic: true
+---
+
+# drive-research-financial-time-series-lyapunov-exponents
+
+Ingested source summary (2026-06-08).
+
+## Entities
+- [[market-liquidity|Market Liquidity]] (CONCEPT)
+- [[neuropsychology|Neuropsychology]] (ORGANIZATION)
+- [[correlation-dimension-d2|correlation dimension (D2)]] (CONCEPT)
+- [[diva-portal-org|Diva-Portal.org]] (ORGANIZATION)
+- [[excess-volatility-puzzle|excess volatility puzzle]] (CONCEPT)
+- [[recurrent-neural-networks|Recurrent Neural Networks]] (TOOL)
+- [[ieee-xplore|IEEE Xplore]] (ORGANIZATION)
+- [[convolutional-neural-network|Convolutional neural network]] (TOOL)
+- [[finite-time-lyapunov-exponents|finite-time Lyapunov exponents]] (CONCEPT)
+- [[echo-state-networks-esns|Echo State Networks (ESNs)]] (TOOL)
+- [[shannon-entropy|Shannon entropy]] (CONCEPT)
+- [[pmc|PMC]] (ORGANIZATION)
+- [[python-3-15-0a3|Python 3.15.0a3]] (TOOL)
+- [[time-series-data|time series data]] (CONCEPT)
+- [[economics|economics]] (CONCEPT)
+- [[scuola-normale-superiore|Scuola Normale Superiore]] (ORGANIZATION)
+- [[bensa-da-and-litimi-approach|BenSaïda and Litimi approach]] (TOOL)
+- [[amari-dynamics|amari-dynamics]] (TOOL)
+- [[c|C++]] (TOOL)
+- [[value-at-risk-var|value-at-risk (VaR)]] (CONCEPT)
+- [[aviral-kumar-tiwari|Aviral Kumar Tiwari]] (PERSON)
+- [[cschoel-nolds|CSchoel/nolds]] (TOOL)
+- [[bitcoin-market|Bitcoin Market]] (CONCEPT)
+- [[ornstein-uhlenbeck-processes|Ornstein–Uhlenbeck Processes]] (CONCEPT)
+- [[ideas-repec|IDEAS/RePEc]] (ORGANIZATION)
+- [[financial-time-series-prediction|financial time series prediction]] (CONCEPT)
+- [[risk-spillover-network|risk spillover network]] (CONCEPT)
+- [[systemic-crises|systemic crises]] (CONCEPT)
+- [[endo-exo-problem|endo-exo problem]] (CONCEPT)
+- [[phase-space-reconstruction|phase space reconstruction]] (CONCEPT)
+- [[researchgate|ResearchGate]] (ORGANIZATION)
+- [[iris|IRIS]] (ORGANIZATION)
+- [[predicting-extreme-events|predicting extreme events]] (CONCEPT)
+- [[plos-one|PLOS One]] (ORGANIZATION)
+- [[eckmann-et-al-algorithm|Eckmann et al. algorithm]] (TOOL)
+- [[physionet|PhysioNet]] (ORGANIZATION)
+- [[non-uniformly-sampled-dynamical-systems|Non-uniformly Sampled Dynamical Systems]] (CONCEPT)
+- [[majiayu000-claude-skill-registry|majiayu000/claude-skill-registry]] (PROJECT)
+- [[machine-learning|Machine Learning]] (CONCEPT)
+- [[bensa-da-litimi-2013|BenSaïda & Litimi (2013)]] (BOOK)
+- [[rosenstein-s-algorithm|Rosenstein's algorithm]] (ALGORITHM)
+- [[scaling-exponents|Scaling Exponents]] (CONCEPT)
+- [[information-flow|information flow]] (CONCEPT)
+- [[ruvnet-midstream|ruvnet/midstream]] (PROJECT)
+- [[wavelet-decomposition|wavelet decomposition]] (TOOL)
+- [[scholarship-claremont|Scholarship @ Claremont]] (ORGANIZATION)
+- [[eckmann-et-al-1986|Eckmann et al. (1986)]] (BOOK)
+- [[arxiv|arXiv]] (ORGANIZATION)
+- [[market-efficiency|market efficiency]] (CONCEPT)
+- [[preprints-org|Preprints.org]] (ORGANIZATION)
+- [[local-moving-averages|local moving averages]] (TOOL)
+- [[whang-linton-1997|Whang & Linton (1997)]] (BOOK)
+- [[kantz-algorithm|Kantz algorithm]] (TOOL)
+- [[matlab|MATLAB]] (TOOL)
+- [[neurokit2|NeuroKit2]] (TOOL)
+- [[pipelines|pipelines]] (CONCEPT)
+- [[g7-stock-markets|G7 Stock Markets]] (CONCEPT)
+- [[financial-stability|Financial Stability]] (CONCEPT)
+- [[time-series-prediction|time series prediction]] (CONCEPT)
+- [[financial-model|financial model]] (CONCEPT)
+- [[dynamics-informed-deep-learning|Dynamics-Informed Deep Learning]] (CONCEPT)
+- [[dchaos|DChaos]] (TOOL)
+- [[scirs2-linalg|scirs2-linalg]] (TOOL)
+- [[embedding-theorems|Embedding Theorems]] (CONCEPT)
+- [[nonlinear-measures|Nonlinear measures]] (CONCEPT)
+- [[stack-overflow|Stack Overflow]] (ORGANIZATION)
+- [[aimds-analysis|aimds-analysis]] (TOOL)
+- [[ruvnet-ruview|ruvnet/RuView]] (PROJECT)
+- [[sandubete-escot-2020|Sandubete & Escot (2020)]] (BOOK)
+- [[mdpi|MDPI]] (ORGANIZATION)
+- [[financial-markets|financial markets]] (CONCEPT)
+- [[0-1-test-for-chaos|0-1 test for chaos]] (TOOL)
+- [[flash-crashes|flash crashes]] (CONCEPT)
+- [[noisy-signals|noisy signals]] (CONCEPT)
+- [[one-dimensional-time-series|one-dimensional time series]] (CONCEPT)
+- [[complex-network-approaches|complex network approaches]] (CONCEPT)
+- [[otd-modes-subspace-2026|OTD-Modes Subspace (2026)]] (BOOK)
+- [[renewable-energy-systems|Renewable Energy Systems]] (CONCEPT)
+- [[pressure-signals|pressure signals]] (CONCEPT)
+- [[garch-family-modeling|GARCH-family modeling]] (TOOL)
+- [[transfer-entropy|transfer entropy]] (CONCEPT)
+- [[theiler-window|Theiler window]] (CONCEPT)
+- [[short-term-voltage-instability|Short-Term Voltage Instability]] (CONCEPT)
+- [[finite-time-lyapunov-exponent-ftle|Finite-Time Lyapunov Exponent (FTLE)]] (CONCEPT)
+- [[optimal-time-dependent-otd-modes|Optimal Time-Dependent (OTD) modes]] (CONCEPT)
+- [[short-term-future-behavior|short-term future behavior]] (CONCEPT)
+- [[g20-stock-markets|G20 stock markets]] (CONCEPT)
+- [[temporal-attractor-studio-2026|temporal-attractor-studio (2026)]] (TOOL)
+- [[financial-point-process-modelling|Financial point process modelling]] (CONCEPT)
+- [[rangan-gupta|Rangan Gupta]] (PERSON)
+- [[high-frequency-dynamics-and-chaotic-instabilities-practical-rolling-window-lyapunov-estimators-for-limit-order-book-and-mid-price-series|High-Frequency Dynamics and Chaotic Instabilities: Practical Rolling Window Lyapunov Estimators for Limit Order Book and Mid-Price Series]] (CONCEPT)
+- [[lagrangian|lagrangian]] (TOOL)
+- [[university-of-pretoria|University of Pretoria]] (ORGANIZATION)
+- [[early-warning-signals|early-warning signals]] (CONCEPT)
+- [[data-sets|data sets]] (CONCEPT)
+- [[rust|Rust]] (TOOL)
+- [[sample-entropy|sample entropy]] (CONCEPT)
+- [[rosenstein-et-al-1993|Rosenstein et al. (1993)]] (BOOK)
+- [[chaos-model-data-paradox|chaos model-data paradox]] (CONCEPT)
+- [[frontiers-in-physics|Frontiers in Physics]] (ORGANIZATION)
+- [[butterfly-effect|butterfly effect]] (CONCEPT)
+
+## Relations
+- High-Frequency Dynamics and Chaotic Instabilities: Practical Rolling Window Lyapunov Estimators for Limit Order Book and Mid-Price Series → RELATED_TO → finite-time Lyapunov exponents
+- chaos model-data paradox → RELATED_TO → finite-time Lyapunov exponents
+- Rosenstein's algorithm → USES → finite-time Lyapunov exponents
+- Rosenstein's algorithm → USES → Theiler window
+- Kantz algorithm → USES → finite-time Lyapunov exponents
+- Eckmann et al. algorithm → USES → finite-time Lyapunov exponents
+- BenSaïda and Litimi approach → USES → finite-time Lyapunov exponents
+- Finite-Time Lyapunov Exponent (FTLE) → USES → Optimal Time-Dependent (OTD) modes
+- 0-1 test for chaos → USES → finite-time Lyapunov exponents
+- GARCH-family modeling → USES → finite-time Lyapunov exponents
+- wavelet decomposition → USES → finite-time Lyapunov exponents
+- local moving averages → USES → finite-time Lyapunov exponents
+- CSchoel/nolds → USES → Rosenstein's algorithm
+- CSchoel/nolds → USES → Eckmann et al. algorithm
+- CSchoel/nolds → PART_OF → Python 3.15.0a3
+- temporal-attractor-studio (2026) → USES → finite-time Lyapunov exponents
+- temporal-attractor-studio (2026) → PART_OF → Rust
+- amari-dynamics → USES → finite-time Lyapunov exponents
+- amari-dynamics → PART_OF → Rust
+- scirs2-linalg → USES → finite-time Lyapunov exponents
+- scirs2-linalg → PART_OF → Rust
+- Echo State Networks (ESNs) → USES → finite-time Lyapunov exponents
+- correlation dimension (D2) → RELATED_TO → finite-time Lyapunov exponents
+- sample entropy → RELATED_TO → finite-time Lyapunov exponents
+- value-at-risk (VaR) → RELATED_TO → finite-time Lyapunov exponents
+- Rosenstein et al. (1993) → RELATED_TO → CSchoel/nolds
+- Sandubete & Escot (2020) → RELATED_TO → finite-time Lyapunov exponents
+- BenSaïda & Litimi (2013) → RELATED_TO → finite-time Lyapunov exponents
+- OTD-Modes Subspace (2026) → RELATED_TO → Finite-Time Lyapunov Exponent (FTLE)
+- temporal-attractor-studio (2026) → RELATED_TO → finite-time Lyapunov exponents
+- Eckmann et al. (1986) → RELATED_TO → CSchoel/nolds
+- Whang & Linton (1997) → RELATED_TO → DChaos
+- BenSaïda & Litimi (2013) → USES → MATLAB
+- Sandubete & Escot (2020) → USES → C++
+- OTD-Modes Subspace (2026) → USES → C++
+- OTD-Modes Subspace (2026) → USES → Rust
+- Rosenstein's algorithm → RELATED_TO → finite-time Lyapunov exponents
+- PhysioNet → RELATED_TO → Rosenstein's algorithm
+- CSchoel/nolds → RELATED_TO → time series data
+- CSchoel/nolds → RELATED_TO → Non-uniformly Sampled Dynamical Systems
+- ResearchGate → RELATED_TO → Kantz algorithm
+- ResearchGate → RELATED_TO → Rosenstein's algorithm
+- ResearchGate → RELATED_TO → Nonlinear measures
+- NeuroKit2 → RELATED_TO → Complexity
+- University of Pretoria → RELATED_TO → G7 Stock Markets
+- Aviral Kumar Tiwari → AUTHORED_BY → Chaos in G7 Stock Markets using Over One Century of Data
+- Rangan Gupta → AUTHORED_BY → Chaos in G7 Stock Markets using Over One Century of Data
+- lagrangian → RELATED_TO → documentation
+- Dynamics-Informed Deep Learning → RELATED_TO → Extreme Events
+- arXiv → RELATED_TO → Dynamics-Informed Deep Learning
+- arXiv → RELATED_TO → Echo State Networks (ESNs)
+- Neuropsychology → RELATED_TO → NeuroKit2
+- Shannon entropy → RELATED_TO → market efficiency
+- Scuola Normale Superiore → RELATED_TO → Shannon entropy
+- CSchoel/nolds → RELATED_TO → Nonlinear measures
+- Convolutional neural network → RELATED_TO → financial time series prediction
+- PMC → RELATED_TO → Convolutional neural network
+- PMC → RELATED_TO → Machine Learning
+- High-Frequency Dynamics and Chaotic Instabilities: Practical Rolling Window Lyapunov Estimators for Limit Order Book and Mid-Price Series → RELATED_TO → Financial Markets
+- Preprints.org → RELATED_TO → High-Frequency Dynamics and Chaotic Instabilities: Practical Rolling Window Lyapunov Estimators for Limit Order Book and Mid-Price Series
+- Analysis of the risk spillover network of G20 stock markets based on transfer entropy and complex network approaches → RELATED_TO → G20 stock markets
+- Analysis of the risk spillover network of G20 stock markets based on transfer entropy and complex network approaches → RELATED_TO → transfer entropy
+- Analysis of the risk spillover network of G20 stock markets based on transfer entropy and complex network approaches → RELATED_TO → complex network approaches
+- PLOS One → RELATED_TO → Analysis of the risk spillover network of G20 stock markets based on transfer entropy and complex network approaches
+- Nonlinear measures → RELATED_TO → Non-uniformly Sampled Dynamical Systems
+- excess volatility puzzle → RELATED_TO → Bitcoin Market
+- Frontiers in Physics → RELATED_TO → excess volatility puzzle
+- phase space reconstruction → RELATED_TO → pressure signals
+- ruvnet/midstream → PART_OF → ARCHITECTURE.md
+- ruvnet/midstream → PART_OF → ADR-099-midstream-introspection-tap.md
+- ruvnet/RuView → PART_OF → ADR-099-midstream-introspection-tap.md
+- Ornstein–Uhlenbeck Processes → RELATED_TO → Machine Learning
+- MDPI → RELATED_TO → Ornstein–Uhlenbeck Processes
+- Python 3.15.0a3 → RELATED_TO → Microbenchmark Performance Analysis
+- temporal-attractor-studio (2026) → PART_OF → Rust Package Registry
+- aimds-analysis → PART_OF → Rust Package Registry
+- amari-dynamics → PART_OF → Rust Package Registry
+- scirs2-linalg → PART_OF → Rust Package Registry
+- A Novel Data-Driven Approach for Managing Renewable Energy Systems During Short-Term Voltage Instability → RELATED_TO → Renewable Energy Systems
+- A Novel Data-Driven Approach for Managing Renewable Energy Systems During Short-Term Voltage Instability → RELATED_TO → Short-Term Voltage Instability
+- IEEE Xplore → RELATED_TO → A Novel Data-Driven Approach for Managing Renewable Energy Systems During Short-Term Voltage Instability
+- Scaling Exponents → RELATED_TO → Time Series Data
+- Scaling Exponents → RELATED_TO → Machine Learning
+- PMC → RELATED_TO → Scaling Exponents
+- Embedding Theorems → RELATED_TO → Non-uniformly Sampled Dynamical Systems
+- majiayu000/claude-skill-registry → RELATED_TO → aimds-analysis
+- A New Test for Chaotic Dynamics Using Lyapunov Exponents → RELATED_TO → High-Frequency Dynamics and Chaotic Instabilities: Practical Rolling Window Lyapunov Estimators for Limit Order Book and Mid-Price Series
+- IDEAS/RePEc → RELATED_TO → A New Test for Chaotic Dynamics Using Lyapunov Exponents
+- Echo State Networks (ESNs) → RELATED_TO → Bitcoin Market
+- Echo State Networks (ESNs) → RELATED_TO → Time Series Prediction
+- The butterfly effect → RELATED_TO → economics
+- The butterfly effect → RELATED_TO → financial model
+- Scholarship @ Claremont → RELATED_TO → The butterfly effect
+- Financial point process modelling → RELATED_TO → endo-exo problem
+- Financial point process modelling → RELATED_TO → flash crashes
+- Financial point process modelling → RELATED_TO → excess volatility puzzle
+- IRIS → RELATED_TO → Market Liquidity
+- IRIS → RELATED_TO → Financial Stability

@@ -1,0 +1,7 @@
+domain: generated-stub
+nodes:
+  - id: example_concept
+    title: Example Concept
+    description: Neo4j export pending — install neo4j driver.
+    prerequisites: []
+    bloom_level: remember

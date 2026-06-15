@@ -1,0 +1,18 @@
+---
+type: entity
+title: GPQA
+created: 2026-06-08
+updated: 2026-06-08
+sources: 1
+tags: []
+status: draft
+gzmo_synthetic: true
+---
+
+# GPQA
+
+Type: PROJECT
+
+## From [[ai-research-part2|ai-research-part2]] (2026-06-08)
+- A dataset that SuperGPQA evolved from.
+- Developed by Rein et al., 2024.

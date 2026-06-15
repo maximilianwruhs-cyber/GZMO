@@ -1,5 +1,5 @@
 [Unit]
-Description=Pi knowledge base embed (Qwen3-Embedding on workstation :8002)
+Description=RETIRED — Pi KB embed moved to VM200 :8081 (do not enable)
 After=network-online.target
 Wants=network-online.target
 # CPU embed (NGl=0); does not require Prime.

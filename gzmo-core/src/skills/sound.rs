@@ -289,6 +289,7 @@ impl Skill for SoundSkill {
             display,
             feedback: vec![feedback_event],
             inject_to_conversation: true,
+            evidence: None,
         })
     }
 }

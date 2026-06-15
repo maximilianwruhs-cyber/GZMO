@@ -1,0 +1,50 @@
+domain: rust-basics
+nodes:
+  - id: rust_syntax
+    title: Rust Syntax
+    description: Variables, mutability, functions, structs, enums, and pattern matching basics.
+    prerequisites: []
+    bloom_level: remember
+
+  - id: ownership
+    title: Ownership
+    description: Move semantics, stack vs heap, and why the borrow checker exists.
+    prerequisites:
+      - rust_syntax
+    bloom_level: understand
+
+  - id: borrowing
+    title: Borrowing
+    description: Immutable/mutable references, borrow rules, and common compiler errors.
+    prerequisites:
+      - ownership
+    bloom_level: understand
+
+  - id: lifetimes
+    title: Lifetimes
+    description: Lifetime annotations, elision rules, and when explicit lifetimes are required.
+    prerequisites:
+      - borrowing
+    bloom_level: analyze
+
+  - id: traits
+    title: Traits
+    description: Trait bounds, impl blocks, dyn dispatch vs generics, and common std traits.
+    prerequisites:
+      - borrowing
+    bloom_level: apply
+
+  - id: error_handling
+    title: Error Handling
+    description: Result, Option, ? operator, and designing recoverable vs fatal errors.
+    prerequisites:
+      - traits
+    bloom_level: apply
+
+  - id: async_rust
+    title: Async Rust
+    description: async/await, executors, Futures, and blocking vs non-blocking I/O.
+    prerequisites:
+      - error_handling
+      - traits
+    bloom_level: analyze

@@ -299,6 +299,18 @@ impl SessionDistillEngine {
                 resolve_event_source(EventSource::GzmoCli),
                 data,
             ));
+            let data_dir = bus.path.parent().unwrap_or(std::path::Path::new("data"));
+            let names: Vec<String> = pipeline
+                .verified_entities
+                .iter()
+                .map(|e| e.entity.name.clone())
+                .collect();
+            let _ = crate::pi_recent_discoveries::record_distill(
+                data_dir,
+                session_id,
+                &names,
+                pipeline.verified_relations.len(),
+            );
         }
 
         Ok(SessionDistillReport {

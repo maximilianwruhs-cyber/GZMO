@@ -1,0 +1,43 @@
+domain: networking
+nodes:
+  - id: osi_model
+    title: OSI Model
+    description: Seven-layer mental model; where protocols live; encapsulation vs decapsulation.
+    prerequisites: []
+    bloom_level: remember
+
+  - id: tcp_ip_stack
+    title: TCP/IP Stack
+    description: IPv4/IPv6 addressing, subnets, default gateway, and basic socket concepts.
+    prerequisites:
+      - osi_model
+    bloom_level: understand
+
+  - id: dns_resolution
+    title: DNS Resolution
+    description: Resolver chain, /etc/resolv.conf, dig/nslookup, and common failure modes.
+    prerequisites:
+      - tcp_ip_stack
+    bloom_level: apply
+
+  - id: routing_basics
+    title: Routing Basics
+    description: ip route, default routes, traceroute, and asymmetric path debugging.
+    prerequisites:
+      - tcp_ip_stack
+    bloom_level: apply
+
+  - id: listening_ports
+    title: Listening Ports
+    description: ss/netstat, bind addresses, ephemeral ports, and service correlation.
+    prerequisites:
+      - tcp_ip_stack
+    bloom_level: apply
+
+  - id: firewall_concepts
+    title: Firewall Concepts
+    description: nftables/iptables mindset, allow/deny rules, and stateful filtering.
+    prerequisites:
+      - listening_ports
+      - routing_basics
+    bloom_level: analyze

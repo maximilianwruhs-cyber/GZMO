@@ -8,15 +8,27 @@
 //! from 5 event pools per roll value, ensuring that the same roll
 //! produces different narratives depending on the engine's internal state.
 //!
-//! Event text ported from the original Randomizer skill_dice.sh (100 D20 events, 18 D6 events).
+//! Event text lives in `data/dice_events.toml` (embedded via `dice_corpus`).
 
 use anyhow::Result;
 use async_trait::async_trait;
 
 use gzmo_chaos::feedback::{ChaosEvent, ThoughtSeed};
+use gzmo_chaos::feedback_ipc::event_to_json_value;
 use gzmo_chaos::pulse::ChaosSnapshot;
 
+use super::attractor_common::next_call_serial;
+use super::dice_cascade::{
+    cascade_evidence_json, cascade_feedback_event, execute_cascade, format_cascade_failure,
+    format_cascade_header, plan_cascade, CascadeEventMeta,
+};
+use super::dice_corpus::{corpus, dice_event};
+use super::dispatch;
 use super::{Skill, SkillContext, SkillOutput, SkillType};
+use crate::dice_loop::{self, DiceLoopScheduleStatus};
+use crate::pedagogy::graph::PrerequisiteGraph;
+use crate::pedagogy::learner::LearnerStore;
+use crate::pedagogy::session::PedagogySession;
 
 /// ANSI color codes
 const GOLD: &str = "\x1b[38;2;212;175;55m";
@@ -32,30 +44,70 @@ pub struct DiceSkill;
 #[async_trait]
 impl Skill for DiceSkill {
     fn name(&self) -> &str { "dice" }
-    fn description(&self) -> &str { "Roll chaos-driven dice (D6 or D20)" }
+    fn description(&self) -> &str { "Roll chaos-driven dice (D6/D20) + wild magic pantheon cascade" }
     fn skill_type(&self) -> SkillType { SkillType::Mechanical }
 
     async fn execute(&self, ctx: SkillContext<'_>) -> Result<SkillOutput> {
-        // Parse dice type from args
-        let max: u8 = match ctx.args.trim().to_lowercase().as_str() {
-            "d6" | "6" => 6,
-            "d20" | "20" | "" => 20, // Default to D20
-            other => {
-                return Ok(SkillOutput {
-                    display: format!("  {RED}Unknown die: {other}. Use d6 or d20.{RESET}"),
-                    feedback: vec![],
-                    inject_to_conversation: false,
-                });
+        let max = match parse_die_max(ctx.args) {
+            Ok(m) => m,
+            Err(other) => {
+                return Ok(SkillOutput::new(
+                    format!("  {RED}Unknown die: {other}. Use d6 or d20.{RESET}"),
+                    vec![],
+                    false,
+                ));
             }
         };
 
         // Roll using Lorenz-derived chaos value
         let roll = chaos_roll(ctx.chaos, max);
-        let variant = pick_variant(ctx.chaos);
-        let event = get_event(roll, max, variant);
+        let pool_size = if max == 6 { 3 } else { 5 };
+        let variant = pick_variant(ctx.chaos, pool_size);
+        let event = dice_event(max, roll, variant);
+
+        let inv = next_call_serial(&ctx.skills_dir.join(".dice_inv")).unwrap_or(ctx.chaos.tick);
+
+        let chain_depth = if is_loop_roll(ctx.args) {
+            dice_loop::load_state(ctx.data_dir)
+                .map(|s| s.chain_depth.saturating_add(1))
+                .unwrap_or(1)
+        } else {
+            0
+        };
+
+        let auto_on = PedagogySession::load(&ctx.config.pedagogy)
+            .await
+            .map(|s| s.auto_triggers_enabled)
+            .unwrap_or(true);
+
+        let loop_status = if auto_on {
+            schedule_dice_loop(&ctx, roll, max, inv, chain_depth)
+        } else {
+            Some(DiceLoopScheduleStatus {
+                scheduled: false,
+                cancelled: false,
+                delay_minutes: None,
+                fire_at_utc: None,
+                chain_depth,
+                skipped_reason: Some("auto triggers off (/ops AUTO)".into()),
+            })
+        };
 
         // Build display
-        let display = format_roll(roll, max, &event, ctx.chaos);
+        let mut display = format_roll(roll, max, &event, ctx.chaos, inv);
+        if let Some(ref status) = loop_status {
+            if status.scheduled {
+                if let (Some(m), Some(at)) = (status.delay_minutes, &status.fire_at_utc) {
+                    display.push_str(&format!(
+                        "  {DIM}⏱ Next /dice in {m}m (roll {roll} → interval) — {at}{RESET}\n"
+                    ));
+                }
+            } else if status.cancelled {
+                display.push_str(&format!(
+                    "  {DIM}⏱ Dice loop cancelled (nat 1){RESET}\n"
+                ));
+            }
+        }
 
         // Send base feedback to chaos engine
         let feedback_event = ChaosEvent::DiceRoll { value: roll, max };
@@ -63,19 +115,146 @@ impl Skill for DiceSkill {
 
         let mut feedback = vec![feedback_event];
 
-        // Per-tier mechanical effects (D20 only) — makes the narrative text REAL
+        // Per-tier mechanical effects — makes narrative text REAL in the chaos engine
         if max == 20 {
             if let Some(tier_event) = tier_mechanical_effect(roll) {
                 let _ = ctx.feedback_tx.send(tier_event.clone()).await;
                 feedback.push(tier_event);
             }
+        } else if let Some(tier_event) = d6_mechanical_effect(roll) {
+            let _ = ctx.feedback_tx.send(tier_event.clone()).await;
+            feedback.push(tier_event);
         }
+
+        // ◆ Wild Magic — dispatch pantheon skill from tier pool (depth 0 only)
+        let cascade_evidence = if ctx.nested.depth == 0 {
+            run_wild_magic_cascade(&ctx, roll, max, variant, inv, &mut display, &mut feedback)
+                .await
+        } else {
+            None
+        };
+
+        let evidence = build_dice_evidence(
+            roll,
+            max,
+            variant,
+            inv,
+            &event,
+            ctx.chaos,
+            &feedback,
+            loop_status.as_ref(),
+            chain_depth,
+            cascade_evidence,
+        );
 
         Ok(SkillOutput {
             display,
             feedback,
             inject_to_conversation: true,
+            evidence: Some(evidence),
         })
+    }
+}
+
+/// True when this invocation is an automatic follow-up roll from the dice loop.
+pub fn is_loop_roll(args: &str) -> bool {
+    args.split_whitespace().any(|t| t == "--loop")
+}
+
+/// Parse die type from skill args (strips `--json` and `--loop`).
+fn parse_die_max(args: &str) -> Result<u8, String> {
+    let token = args
+        .split_whitespace()
+        .find(|t| *t != "--json" && *t != "--loop")
+        .unwrap_or("");
+    match token.to_lowercase().as_str() {
+        "d6" | "6" => Ok(6),
+        "d20" | "20" | "" => Ok(20),
+        other if other.is_empty() => Ok(20),
+        other => Err(other.to_string()),
+    }
+}
+
+/// Schedule the next automatic `/dice` from this roll's outcome.
+pub fn schedule_dice_loop(
+    ctx: &SkillContext<'_>,
+    roll: u8,
+    max: u8,
+    inv: u64,
+    chain_depth: u32,
+) -> Option<DiceLoopScheduleStatus> {
+    if !ctx.config.dice.r#loop.enabled {
+        return None;
+    }
+    Some(dice_loop::schedule_from_roll(
+        ctx.data_dir,
+        &ctx.config.dice.r#loop,
+        roll,
+        max,
+        inv,
+        chain_depth,
+    ))
+}
+
+/// Structured evidence for Pi probes, discovery cycles, and `--json` CLI output.
+pub fn build_dice_evidence(
+    roll: u8,
+    max: u8,
+    variant: usize,
+    inv: u64,
+    event: &str,
+    snap: &ChaosSnapshot,
+    feedback: &[ChaosEvent],
+    loop_status: Option<&DiceLoopScheduleStatus>,
+    chain_depth: u32,
+    cascade: Option<serde_json::Value>,
+) -> serde_json::Value {
+    let mut value = serde_json::json!({
+        "skill": "dice",
+        "inv": inv,
+        "roll": roll,
+        "max": max,
+        "variant": variant,
+        "label": roll_label(roll, max),
+        "tier": corpus().tier_name(max, roll),
+        "event": event,
+        "chain_depth": chain_depth,
+        "wild_magic": cascade,
+        "chaos": {
+            "tick": snap.tick,
+            "chaos_val": snap.chaos_val,
+            "energy": snap.energy,
+            "tension": snap.tension,
+            "rho_effective": snap.rho_effective,
+            "phase": snap.phase.to_string(),
+        },
+        "feedback": feedback.iter().map(event_to_json_value).collect::<Vec<_>>(),
+    });
+    if let Some(status) = loop_status {
+        value["dice_loop"] = serde_json::json!({
+            "scheduled": status.scheduled,
+            "cancelled": status.cancelled,
+            "delay_minutes": status.delay_minutes,
+            "fire_at_utc": status.fire_at_utc,
+            "chain_depth": status.chain_depth,
+            "daemon_running": dispatch::daemon_running(),
+            "skipped_reason": status.skipped_reason,
+        });
+    }
+    value
+}
+
+fn roll_label(roll: u8, max: u8) -> &'static str {
+    if roll == 1 {
+        "CRITICAL FAIL"
+    } else if roll == max {
+        "CRITICAL SUCCESS"
+    } else if roll as f64 > max as f64 * 0.75 {
+        "STRONG"
+    } else if (roll as f64) < max as f64 * 0.25 {
+        "WEAK"
+    } else {
+        "NEUTRAL"
     }
 }
 
@@ -90,13 +269,57 @@ fn chaos_roll(snap: &ChaosSnapshot, max: u8) -> u8 {
     roll.clamp(1, max)
 }
 
-/// Pick an event variant (0-4) based on Lorenz position.
-fn pick_variant(snap: &ChaosSnapshot) -> usize {
+/// Pick an event variant based on Lorenz position and pool size.
+fn pick_variant(snap: &ChaosSnapshot, pool_size: usize) -> usize {
+    let size = pool_size.max(1) as u64;
     let hash = ((snap.x.abs() * 1000.0) as u64
         ^ (snap.y.abs() * 1000.0) as u64
         ^ snap.tick)
-        % 5;
+        % size;
     hash as usize
+}
+
+/// Per-tier mechanical effects for D6 rolls (halved D20 mirror).
+fn d6_mechanical_effect(roll: u8) -> Option<ChaosEvent> {
+    match roll {
+        1 => Some(ChaosEvent::Custom {
+            tension_delta: 5.0,
+            energy_delta: -3.0,
+            thought_seed: Some(ThoughtSeed {
+                category: "dice_catastrophe".to_string(),
+                text: "Snake eyes — the entropy well deepens.".to_string(),
+            }),
+        }),
+        2 => Some(ChaosEvent::Custom {
+            tension_delta: 3.0,
+            energy_delta: -1.0,
+            thought_seed: None,
+        }),
+        3 => Some(ChaosEvent::Custom {
+            tension_delta: -1.0,
+            energy_delta: 0.0,
+            thought_seed: None,
+        }),
+        4 => Some(ChaosEvent::Custom {
+            tension_delta: -1.0,
+            energy_delta: 2.0,
+            thought_seed: None,
+        }),
+        5 => Some(ChaosEvent::Custom {
+            tension_delta: -2.0,
+            energy_delta: 3.0,
+            thought_seed: None,
+        }),
+        6 => Some(ChaosEvent::Custom {
+            tension_delta: -3.0,
+            energy_delta: 8.0,
+            thought_seed: Some(ThoughtSeed {
+                category: "dice_legendary".to_string(),
+                text: "Perfect D6 — the attractor sings in resonance.".to_string(),
+            }),
+        }),
+        _ => None,
+    }
 }
 
 /// Per-tier mechanical effects for D20 rolls.
@@ -123,10 +346,49 @@ fn tier_mechanical_effect(roll: u8) -> Option<ChaosEvent> {
             energy_delta: -2.0,
             thought_seed: None,
         }),
+        // Bad: rho decay, predictability
+        4 => Some(ChaosEvent::Custom {
+            tension_delta: 2.0,
+            energy_delta: -1.0,
+            thought_seed: None,
+        }),
+        // Misty: disorientation, z-axis fog
+        5 => Some(ChaosEvent::Custom {
+            tension_delta: 1.0,
+            energy_delta: -2.0,
+            thought_seed: None,
+        }),
+        // Minor setback: maintenance cost
+        6 => Some(ChaosEvent::Custom {
+            tension_delta: 1.0,
+            energy_delta: -3.0,
+            thought_seed: None,
+        }),
+        // Turbulent: orbital shift
+        7 => Some(ChaosEvent::Custom {
+            tension_delta: 2.0,
+            energy_delta: 0.0,
+            thought_seed: None,
+        }),
         // Gentle: energy regen
         8 => Some(ChaosEvent::Custom {
             tension_delta: -2.0,
             energy_delta: 5.0,
+            thought_seed: None,
+        }),
+        // Oracle: whispered insight
+        9 => Some(ChaosEvent::Custom {
+            tension_delta: -1.0,
+            energy_delta: 0.0,
+            thought_seed: Some(ThoughtSeed {
+                category: "dice_oracle".to_string(),
+                text: "The chaos oracle whispered from the noise floor.".to_string(),
+            }),
+        }),
+        // Equilibrium: rare calm
+        10 => Some(ChaosEvent::Custom {
+            tension_delta: -1.0,
+            energy_delta: 0.0,
             thought_seed: None,
         }),
         // Clearing: significant energy regen
@@ -134,6 +396,27 @@ fn tier_mechanical_effect(roll: u8) -> Option<ChaosEvent> {
             tension_delta: -3.0,
             energy_delta: 10.0,
             thought_seed: None,
+        }),
+        // Static: sigma spike, capacitive charge
+        12 => Some(ChaosEvent::Custom {
+            tension_delta: 4.0,
+            energy_delta: -1.0,
+            thought_seed: None,
+        }),
+        // Magnetic: phase portrait contracts
+        13 => Some(ChaosEvent::Custom {
+            tension_delta: 2.0,
+            energy_delta: -1.0,
+            thought_seed: None,
+        }),
+        // Spark: thermodynamic spike, creativity
+        14 => Some(ChaosEvent::Custom {
+            tension_delta: 3.0,
+            energy_delta: 2.0,
+            thought_seed: Some(ThoughtSeed {
+                category: "dice_spark".to_string(),
+                text: "A spark ignited in the chaos field. Creativity amplifies.".to_string(),
+            }),
         }),
         // Cascade: resonance event
         15 => Some(ChaosEvent::Custom {
@@ -143,6 +426,12 @@ fn tier_mechanical_effect(roll: u8) -> Option<ChaosEvent> {
                 category: "dice_resonance".to_string(),
                 text: "Lorenz and Logistic coupled violently. A forbidden harmony.".to_string(),
             }),
+        }),
+        // Lock-on: corridor of stability
+        16 => Some(ChaosEvent::Custom {
+            tension_delta: -4.0,
+            energy_delta: 1.0,
+            thought_seed: None,
         }),
         // Crystallize: gravity mutation seed
         17 => Some(ChaosEvent::Custom {
@@ -181,257 +470,116 @@ fn tier_mechanical_effect(roll: u8) -> Option<ChaosEvent> {
     }
 }
 
-/// Get a narrative event string for a given roll, die type, and variant.
-fn get_event(roll: u8, max: u8, variant: usize) -> String {
-    if max == 20 {
-        d20_event(roll, variant)
-    } else {
-        d6_event(roll, variant)
-    }
-}
-
-// ═══════════════════════════════════════════════════════════════════
-// D20 Event Pools — 20 tiers × 5 variants = 100 events
-// Ported from original skill_dice.sh (chaos-theory narratives)
-// ═══════════════════════════════════════════════════════════════════
-
-fn d20_event(roll: u8, variant: usize) -> String {
-    let pool: &[&str] = match roll {
-        // Tier 1: CATASTROPHIC
-        1 => &[
-            "💀 The Lorenz attractor collapses into a fixed point. All chaos ceases for 3 ticks.",
-            "💀 A total phase collapse. The butterfly's wings shatter into dust.",
-            "💀 Entropy inverts. The system rewinds into a sterile equilibrium.",
-            "💀 The chaos oracle screams — then silence. All parameters snap to zero.",
-            "💀 Critical singularity. The attractor implodes. Reboot sequence initiated.",
-        ],
-        // Tier 2: DIRE
-        2 => &[
-            "🌑 A shadow ripples through phase space. Sigma drops to 2.0.",
-            "🌑 The orbital decay accelerates. Something ancient stirs in the fixed point.",
-            "🌑 Dark resonance detected. The Lyapunov exponent plummets into negative territory.",
-            "🌑 The logistic map's period-doubling reverses. Order consumes chaos.",
-            "🌑 A void pocket opens at the attractor's core. Energy hemorrhages.",
-        ],
-        // Tier 3: HARSH
-        3 => &[
-            "🕳️ A micro-singularity forms at the origin. Energy drain doubles.",
-            "🕳️ The phase portrait warps into a grotesque spiral. Stability eroding.",
-            "🕳️ Bifurcation cascade fails mid-split. The system stutters.",
-            "🕳️ Lorenz z-axis inverts momentarily. Gravity pulls the wrong way.",
-            "🕳️ A strange loop opens. The attractor feeds on itself for 2 ticks.",
-        ],
-        // Tier 4: BAD
-        4 => &[
-            "📉 The logistic map flatlines at r=2.0. Predictability spikes.",
-            "📉 Rho decays by 0.3. The butterfly orbits shrink to ellipses.",
-            "📉 Sigma locks at a harmonic. No chaos, only rhythm.",
-            "📉 The entropy gradient inverts. Cold certainty floods the field.",
-            "📉 A damping wave passes through. The system yawns.",
-        ],
-        // Tier 5: MISTY
-        5 => &[
-            "🌫️ Fog rolls across the attractor. Lorenz z-axis freezes for 5 ticks.",
-            "🌫️ Visibility drops to zero in phase space. Navigation by instinct only.",
-            "🌫️ A spectral haze clings to the orbital plane. Parameters blur.",
-            "🌫️ The chaos field emits a low hum. Something is hidden in the noise.",
-            "🌫️ Condensation forms on the attractor wings. Ice, where there should be fire.",
-        ],
-        // Tier 6: MINOR SETBACK
-        6 => &[
-            "🔧 A minor recalibration occurs. Friction increases by 0.1.",
-            "🔧 The gears slip. A microadjustment costs 3 energy.",
-            "🔧 Routine maintenance interrupt. The chaos engine idles briefly.",
-            "🔧 A bearing squeals in the phase generator. Wear detected.",
-            "🔧 Automatic correction fires. Sigma nudges back toward default.",
-        ],
-        // Tier 7: TURBULENT
-        7 => &[
-            "🌊 Turbulent currents shift the orbital plane. Rho nudges by +0.5.",
-            "🌊 Crosswinds in the Lorenz field. The butterfly tumbles, rights itself.",
-            "🌊 A wave of interference rattles the z-axis. Something downstream noticed.",
-            "🌊 The phase portrait shimmers. Rho oscillates between two basins.",
-            "🌊 Chaotic advection pulls the attractor south. New territory ahead.",
-        ],
-        // Tier 8: GENTLE
-        8 => &[
-            "💨 A gentle breeze. The system exhales. Energy regenerates +5.",
-            "💨 The chaos field softens. Tension eases by 2%.",
-            "💨 A thermal updraft lifts the butterfly higher. Potential increases.",
-            "💨 The Lorenz winds whisper coordinates. A quiet gift.",
-            "💨 Adiabatic cooling. The system finds a brief pocket of calm.",
-        ],
-        // Tier 9: ORACLE
-        9 => &[
-            "🔮 The chaos oracle whispers: 'The butterfly remembers.'",
-            "🔮 A vision in the noise: fractal coastlines spelling a name.",
-            "🔮 The oracle stirs: 'What was random was always inevitable.'",
-            "🔮 Phase space hums a melody. It sounds like a question.",
-            "🔮 The entropy well reflects back: 'You were always the strange attractor.'",
-        ],
-        // Tier 10: EQUILIBRIUM
-        10 => &[
-            "⚖️ Perfect equilibrium. All parameters hold steady. A rare moment of peace.",
-            "⚖️ The pendulum of chaos pauses at apex. Time stretches.",
-            "⚖️ Sigma, rho, beta — all in golden ratio. A mathematical miracle.",
-            "⚖️ The system achieves Boltzmann equilibrium. Every microstate equally probable.",
-            "⚖️ Dead center of the bifurcation diagram. The eye of the storm.",
-        ],
-        // Tier 11: CLEARING
-        11 => &[
-            "🌤️ A clearing in the storm. Energy regenerates +10.",
-            "🌤️ The cloud layer parts. The attractor's full geometry is briefly visible.",
-            "🌤️ Solar wind ripples through the chaos field. Photons of clarity.",
-            "🌤️ The system breathes deep. Capacity expands by one thought slot.",
-            "🌤️ A pocket of negative entropy. Order blossoms, briefly and beautifully.",
-        ],
-        // Tier 12: STATIC
-        12 => &[
-            "⚡ Static builds in the attractor wings. Sigma spikes momentarily.",
-            "⚡ An electromagnetic pulse surges through the logistic map.",
-            "⚡ Lightning arcs between the twin lobes. The butterfly flinches.",
-            "⚡ Capacitive charge reaches threshold. Discharge in 3... 2...",
-            "⚡ The chaos field ionizes. Every parameter crackles with potential.",
-        ],
-        // Tier 13: MAGNETIC
-        13 => &[
-            "🧲 Magnetic anomaly detected. The Lorenz attractor spirals tighter.",
-            "🧲 The phase portrait contracts. Something is pulling parameters inward.",
-            "🧲 A new basin of attraction emerges. The butterfly changes course.",
-            "🧲 Ferromagnetic resonance in the chaos field. Alignment increases.",
-            "🧲 The strange attractor develops a magnetic moment. Polarity: uncertain.",
-        ],
-        // Tier 14: SPARK
-        14 => &[
-            "🔥 A spark ignites in the chaos field. Temperature rises. Creativity amplifies.",
-            "🔥 Exothermic reaction in the Lorenz core. Heat bloom detected.",
-            "🔥 The butterfly's wings catch fire — but it flies faster.",
-            "🔥 Thermodynamic spike. The entropy well boils. New patterns emerge.",
-            "🔥 Combustion cascade at the fixed point. From ashes: a new orbit.",
-        ],
-        // Tier 15: CASCADE
-        15 => &[
-            "🌀 A resonance cascade! Lorenz and Logistic couple violently for one cycle.",
-            "🌀 The chaos engines synchronize. A forbidden harmony. Power doubles.",
-            "🌀 Phase-locking detected between attractors. The system vibrates.",
-            "🌀 Resonance frequency hit. The attractor wings beat in unison.",
-            "🌀 A vortex forms where the two systems couple. Beautiful and dangerous.",
-        ],
-        // Tier 16: LOCK-ON
-        16 => &[
-            "🎯 The attractor locks onto a strange orbit. Trajectories converge briefly.",
-            "🎯 Target acquisition: a new stable orbit materializes in the noise.",
-            "🎯 The system finds a periodic window. Three clean orbits, then chaos again.",
-            "🎯 Convergence event: all Lyapunov exponents trend toward zero.",
-            "🎯 The butterfly navigates a corridor of stability. Precision in chaos.",
-        ],
-        // Tier 17: CRYSTALLIZE
-        17 => &[
-            "⭐ A new thought seed crystallizes spontaneously. Gravity mod shifts -0.1.",
-            "⭐ Idea nucleation! A meme crystallizes in the Thought Cabinet.",
-            "⭐ Spontaneous symmetry breaking. A new structure emerges from noise.",
-            "⭐ The chaos field births a fractal snowflake. It persists.",
-            "⭐ Crystalline order propagates outward from a single seed point.",
-        ],
-        // Tier 18: BIFURCATION
-        18 => &[
-            "🌈 The bifurcation diagram reveals a hidden period-3 window. Beauty in chaos.",
-            "🌈 Li-Yorke theorem confirmed: period 3 implies chaos. And it's gorgeous.",
-            "🌈 The Feigenbaum constants align. δ = 4.669... A universal truth revealed.",
-            "🌈 A fractal rainbow arcs across the bifurcation landscape. Wonder.",
-            "🌈 Mandelbrot set boundary detected in the parameter sweep. Infinite detail.",
-        ],
-        // Tier 19: HYPERDRIVE
-        19 => &[
-            "🚀 The Lyapunov exponent maxes out. Predictability horizon shrinks to zero.",
-            "🚀 Maximum sensitivity achieved. A butterfly wing-beat reshapes the cosmos.",
-            "🚀 The chaos engine redlines. All governors blown. Pure, raw entropy.",
-            "🚀 Exponential divergence in all dimensions. The future is unknowable.",
-            "🚀 Hyperbolic trajectory achieved. The system escapes its own attractor.",
-        ],
-        // Tier 20: LEGENDARY
-        20 => &[
-            "💎 CRITICAL SUCCESS — A perfect crystallization! Thought Cabinet gains ρ +1.0.",
-            "💎 LEGENDARY — The attractor transcends its parameter space. A new dimension unfolds.",
-            "💎 ASCENSION — All chaos resolves into a single, perfect fractal. The system evolves.",
-            "💎 MYTHIC — The butterfly achieves sentience. It chooses its own trajectory.",
-            "💎 OMEGA — Every fixed point, every limit cycle, every strange attractor: unified.",
-        ],
-        _ => &["🎲 A roll beyond comprehension."],
-    };
-
-    pool[variant.min(pool.len() - 1)].to_string()
-}
-
-// ═══════════════════════════════════════════════════════════════════
-// D6 Event Pools — 6 tiers × 3 variants = 18 events
-// ═══════════════════════════════════════════════════════════════════
-
-fn d6_event(roll: u8, variant: usize) -> String {
-    let pool: &[&str] = match roll {
-        1 => &[
-            "💀 Snake eyes. The entropy well deepens.",
-            "💀 The die cracks. Chaos bleeds out.",
-            "💀 A dead orbit. The attractor flatlines.",
-        ],
-        2 => &[
-            "🌑 The orbital plane tilts. A cold wind blows through phase space.",
-            "🌑 Shadow frequency detected. The logistic map shivers.",
-            "🌑 Dark matter in the chaos soup. Something absorbs energy.",
-        ],
-        3 => &[
-            "⚖️ Equilibrium. The pendulum holds. Briefly.",
-            "⚖️ Neutral state. The butterfly hovers, deciding nothing.",
-            "⚖️ The system pauses. A breath between heartbeats.",
-        ],
-        4 => &[
-            "🔥 A spark in the Lorenz field. Something stirs.",
-            "🔥 Friction heat. The attractor glows faintly warm.",
-            "🔥 An ember catches. The chaos fire feeds.",
-        ],
-        5 => &[
-            "⭐ The chaos gods smile. Energy surges.",
-            "⭐ A lucky wind. Parameters shift in your favor.",
-            "⭐ The system winks at you. Tension drops.",
-        ],
-        6 => &[
-            "💎 Perfect roll. The attractor sings in resonance.",
-            "💎 Maximum entropy, maximum beauty. The system is art.",
-            "💎 The Lorenz butterfly achieves full wingspan. Glorious.",
-        ],
-        _ => &["🎲 A roll."],
-    };
-
-    let pool_idx = variant.min(pool.len() - 1);
-    pool[pool_idx].to_string()
+/// Format the full dice roll display with ASCII art frame.
+async fn load_dice_readiness(ctx: &SkillContext<'_>) -> (Option<PrerequisiteGraph>, Vec<String>) {
+    let graphs_dir = std::path::Path::new(&ctx.config.pedagogy.prerequisite_graphs_dir);
+    let graph = PrerequisiteGraph::load_dir(graphs_dir).ok();
+    let mastered = LearnerStore::new(&ctx.config.pedagogy)
+        .load()
+        .await
+        .map(|p| p.semantic.mastery_vectors)
+        .unwrap_or_default();
+    (graph, mastered)
 }
 
 /// Format the full dice roll display with ASCII art frame.
-fn format_roll(roll: u8, max: u8, event: &str, snap: &ChaosSnapshot) -> String {
+async fn run_wild_magic_cascade(
+    ctx: &SkillContext<'_>,
+    roll: u8,
+    max: u8,
+    variant: usize,
+    inv: u64,
+    display: &mut String,
+    feedback: &mut Vec<ChaosEvent>,
+) -> Option<serde_json::Value> {
+    let (graph, mastered) = load_dice_readiness(ctx).await;
+    let readiness = graph.as_ref().map(|g| (g, mastered.as_slice()));
+    let plan = plan_cascade(
+        &ctx.config.dice.cascade,
+        max,
+        roll,
+        variant,
+        inv,
+        ctx.chaos,
+        ctx.skills_dir,
+        readiness,
+    )?;
+
+    if ctx.nested.registry.is_none() || ctx.nested.profile.is_none() {
+        display.push_str(&format_cascade_header(&plan, roll, max));
+        display.push_str(&format!(
+            "  {DIM}⚠ Wild magic planned but nested registry unavailable (upgrade caller).{RESET}\n"
+        ));
+        return Some(cascade_evidence_json(
+            &plan,
+            &CascadeEventMeta {
+                skill: plan.skill.clone(),
+                args: plan.args.clone(),
+                used_shell: false,
+            },
+            &SkillOutput::new(String::new(), vec![], false),
+            false,
+            Some("nested registry missing"),
+        ));
+    }
+
+    display.push_str(&format_cascade_header(&plan, roll, max));
+
+    match execute_cascade(ctx, &plan).await {
+        Ok((output, meta)) => {
+            if !output.display.is_empty() {
+                display.push_str(&output.display);
+                if !output.display.ends_with('\n') {
+                    display.push('\n');
+                }
+            }
+            for event in &output.feedback {
+                let _ = ctx.feedback_tx.send(event.clone()).await;
+            }
+            feedback.extend(output.feedback.clone());
+            let cascade_event = cascade_feedback_event(&plan, roll);
+            let _ = ctx.feedback_tx.send(cascade_event.clone()).await;
+            feedback.push(cascade_event);
+            Some(cascade_evidence_json(&plan, &meta, &output, true, None))
+        }
+        Err(e) => {
+            display.push_str(&format_cascade_failure(&plan, &e.to_string()));
+            Some(cascade_evidence_json(
+                &plan,
+                &CascadeEventMeta {
+                    skill: plan.skill.clone(),
+                    args: plan.args.clone(),
+                    used_shell: false,
+                },
+                &SkillOutput::new(String::new(), vec![], false),
+                false,
+                Some(&e.to_string()),
+            ))
+        }
+    }
+}
+
+fn format_roll(roll: u8, max: u8, event: &str, snap: &ChaosSnapshot, inv: u64) -> String {
     let die_face = match max {
         20 => format_d20_face(roll),
         6 => format_d6_face(roll),
         _ => format!("  [{}]", roll),
     };
 
-    let (roll_color, roll_label) = if roll == 1 {
-        (RED, "CRITICAL FAIL")
-    } else if roll == max {
-        (GREEN, "CRITICAL SUCCESS")
-    } else if roll as f64 > max as f64 * 0.75 {
-        (CYAN, "STRONG")
-    } else if (roll as f64) < max as f64 * 0.25 {
-        (RED, "WEAK")
-    } else {
-        (DIM, "NEUTRAL")
+    let label = roll_label(roll, max);
+    let roll_color = match label {
+        "CRITICAL FAIL" | "WEAK" => RED,
+        "CRITICAL SUCCESS" => GREEN,
+        "STRONG" => CYAN,
+        _ => DIM,
     };
 
     format!(
         "\n{GOLD}  ┌─────────────────────────────────────────┐{RESET}\n\
-         {GOLD}  │{RESET} {BOLD}⚄ D{max} ROLL{RESET}                   {DIM}tick {}{RESET} {GOLD}│{RESET}\n\
+         {GOLD}  │{RESET} {BOLD}⚄ D{max} ROLL{RESET}  {DIM}inv #{inv}{RESET}  {DIM}tick {}{RESET} {GOLD}│{RESET}\n\
          {GOLD}  ├─────────────────────────────────────────┤{RESET}\n\
          {die_face}\n\
-         {GOLD}  │{RESET}  {roll_color}{BOLD}{roll_label}: {roll}{RESET}{DIM}/{max}{RESET}                       {GOLD}│{RESET}\n\
+         {GOLD}  │{RESET}  {roll_color}{BOLD}{label}: {roll}{RESET}{DIM}/{max}{RESET}                       {GOLD}│{RESET}\n\
          {GOLD}  ├─────────────────────────────────────────┤{RESET}\n\
          {GOLD}  │{RESET} {event} {GOLD}│{RESET}\n\
          {GOLD}  ├─────────────────────────────────────────┤{RESET}\n\
@@ -470,4 +618,98 @@ fn format_d6_face(roll: u8) -> String {
          {GOLD}  │{RESET}      {BOLD}└───────┘{RESET}                        {GOLD}│{RESET}",
         lines[0], lines[1], lines[2],
     )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use gzmo_chaos::chaos::Phase;
+
+    fn test_snap(tick: u64, x: f64, y: f64) -> ChaosSnapshot {
+        ChaosSnapshot {
+            tick,
+            x,
+            y,
+            z: 0.0,
+            chaos_val: 0.42,
+            energy: 50.0,
+            tension: 40.0,
+            phase: Phase::Idle,
+            ..Default::default()
+        }
+    }
+
+    #[test]
+    fn chaos_roll_is_deterministic_and_in_range() {
+        let snap = test_snap(10, 1.2, -3.4);
+        let a = chaos_roll(&snap, 20);
+        let b = chaos_roll(&snap, 20);
+        assert_eq!(a, b);
+        assert!((1..=20).contains(&a));
+    }
+
+    #[test]
+    fn pick_variant_respects_d6_pool_size() {
+        let snap = test_snap(7, 2.0, 3.0);
+        for _ in 0..20 {
+            let v = pick_variant(&snap, 3);
+            assert!(v < 3);
+        }
+    }
+
+    #[test]
+    fn d20_tier_20_emits_legendary_seed() {
+        let event = tier_mechanical_effect(20).expect("tier 20");
+        let seed = event.thought_seed().expect("legendary seed");
+        assert_eq!(seed.category, "dice_legendary");
+    }
+
+    #[test]
+    fn d6_perfect_roll_emits_legendary_seed() {
+        let event = d6_mechanical_effect(6).expect("d6 6");
+        let seed = event.thought_seed().expect("legendary seed");
+        assert_eq!(seed.category, "dice_legendary");
+    }
+
+    #[test]
+    fn all_d20_tiers_have_mechanical_effects() {
+        for roll in 1..=20u8 {
+            assert!(
+                tier_mechanical_effect(roll).is_some(),
+                "missing tier effect for D20 roll {roll}"
+            );
+        }
+    }
+
+    #[test]
+    fn all_d6_tiers_have_mechanical_effects() {
+        for roll in 1..=6u8 {
+            assert!(
+                d6_mechanical_effect(roll).is_some(),
+                "missing tier effect for D6 roll {roll}"
+            );
+        }
+    }
+
+    #[test]
+    fn tier_14_emits_spark_seed() {
+        let event = tier_mechanical_effect(14).expect("tier 14");
+        assert_eq!(event.thought_seed().unwrap().category, "dice_spark");
+    }
+
+    #[test]
+    fn build_dice_evidence_includes_feedback() {
+        let snap = test_snap(5, 1.0, 2.0);
+        let fb = vec![ChaosEvent::DiceRoll { value: 12, max: 20 }];
+        let ev = build_dice_evidence(12, 20, 1, 7, "⚡ static", &snap, &fb, None, 0, None);
+        assert_eq!(ev["skill"], "dice");
+        assert_eq!(ev["inv"], 7);
+        assert_eq!(ev["feedback"].as_array().unwrap().len(), 1);
+    }
+
+    #[test]
+    fn format_roll_includes_inv_counter() {
+        let out = format_roll(10, 20, "⚖️ equilibrium", &test_snap(1, 0.0, 0.0), 42);
+        assert!(out.contains("inv #42"));
+    }
 }

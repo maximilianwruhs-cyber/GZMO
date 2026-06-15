@@ -1,0 +1,169 @@
+---
+type: source
+title: aether-grid-micro02
+created: 2026-06-09
+updated: 2026-06-09
+sources: 1
+tags: []
+status: stable
+gzmo_synthetic: true
+---
+
+# aether-grid-micro02
+
+Ingested source summary (2026-06-09).
+
+## Entities
+- [[lora-push|LoRA-Push]] (CONCEPT)
+- [[snmp-v3-toner-papier-ipp-druck-knx-dali-licht-manufacturer-rest-canon-ricoh-hp|SNMP v3 (Toner/Papier), IPP (Druck), KNX/DALI (Licht), Manufacturer-REST (Canon/Ricoh/HP)]] (CONCEPT)
+- [[model-mesh|Model-Mesh]] (CONCEPT)
+- [[wireguard-tunnel|WireGuard-Tunnel]] (CONCEPT)
+- [[riva-nemotron-asr-25-ms-tts-50-ms|Riva Nemotron (ASR <25 ms, TTS <50 ms)]] (TOOL)
+- [[web-und-x-suchen|Web- und X-Suchen]] (CONCEPT)
+- [[hashicorp-vault-pki|HashiCorp Vault PKI]] (TOOL)
+- [[nvidia-base-command-manager-bcm-11|NVIDIA Base Command Manager (BCM) 11]] (TOOL)
+- [[blackwell-gpu|Blackwell-GPU]] (SYSTEM)
+- [[nvidia-docs|NVIDIA-Docs]] (BOOK)
+- [[jarvis-persona|JARVIS-PERSONA]] (BOOK)
+- [[lpddr5x-unified-memory|LPDDR5X unified memory]] (SYSTEM)
+- [[software-integration-specification-sis|SOFTWARE-INTEGRATION-SPECIFICATION (SIS)]] (BOOK)
+- [[ki-pipeline|KI-Pipeline]] (CONCEPT)
+- [[deepstream-sdk-8-0-gpu-dekodiert-parallel-zu-llm|DeepStream SDK 8.0 (GPU-dekodiert, parallel zu LLM)]] (TOOL)
+- [[sovereign-ai-best-practices|Sovereign AI-Best Practices]] (CONCEPT)
+- [[home-assistant-core-docker-net-host|Home Assistant Core Docker (--net=host)]] (SYSTEM)
+- [[hcm-hardware-control|HCM (Hardware Control)]] (CONCEPT)
+- [[blueprint|BLUEPRINT]] (BOOK)
+- [[tensorrt-llm-1-x-nvfp4|TensorRT-LLM 1.x NVFP4]] (TOOL)
+- [[kubernetes-gpu-operator-run-ai-1-000-sparks|Kubernetes + GPU Operator + Run:ai (1.000+ Sparks)]] (SYSTEM)
+- [[nvidia-gpu-operator|NVIDIA GPU Operator]] (TOOL)
+- [[dgx-spark-a|DGX Spark A]] (SYSTEM)
+- [[aether-grid|aether-grid]] (PROJECT)
+- [[aether-os|AETHER-OS]] (SYSTEM)
+- [[subagent-stack-dgx-spark|Subagent-Stack (DGX Spark)]] (SYSTEM)
+- [[gh200-cluster|GH200-cluster]] (SYSTEM)
+- [[grpc-over-wireguard|gRPC-over-WireGuard]] (CONCEPT)
+- [[strategy-summary-md|STRATEGY-SUMMARY.md]] (BOOK)
+- [[qdrant-distributed|Qdrant Distributed]] (TOOL)
+- [[anticipation-loops|Anticipation-Loops]] (CONCEPT)
+- [[bcm-on-premise|BCM-On-Premise]] (TOOL)
+- [[pki-engine|PKI-Engine]] (TOOL)
+- [[core-stack-dgx-gh200|Core-Stack (DGX GH200)]] (SYSTEM)
+- [[llava-1-6|LLaVA-1.6]] (TOOL)
+- [[real-time-kernel|Real-Time Kernel]] (CONCEPT)
+- [[k8s-pods|K8s-Pods]] (SYSTEM)
+- [[cni-plugin-z-b-cilium|CNI-Plugin (z.B. Cilium)]] (TOOL)
+- [[multi-process-service-mps|Multi-Process Service (MPS)]] (CONCEPT)
+- [[triton-inference-server-400b-modelle-multi-instance|Triton Inference Server (400B+ Modelle, Multi-Instance)]] (TOOL)
+- [[aether-link|AETHER-LINK]] (CONCEPT)
+- [[security-audits|Security Audits]] (CONCEPT)
+- [[prototyp-simulation|Prototyp-Simulation]] (CONCEPT)
+- [[adversarial-attacks|Adversarial Attacks]] (CONCEPT)
+- [[k3s|K3s]] (SYSTEM)
+- [[hybride-intelligenz|Hybride Intelligenz]] (CONCEPT)
+- [[skalierbarkeit|Skalierbarkeit]] (CONCEPT)
+- [[hardware-bridge-bus|HARDWARE-BRIDGE-BUS]] (CONCEPT)
+- [[core-logic|CORE-LOGIC]] (BOOK)
+- [[health-audits|Health-Audits]] (CONCEPT)
+- [[release-notes|Release-Notes]] (BOOK)
+- [[mtls-verschl-sselung|mTLS-Verschlüsselung]] (CONCEPT)
+- [[implementation-plan|IMPLEMENTATION-PLAN]] (BOOK)
+- [[nvidia-management-plane|NVIDIA-management-plane]] (SYSTEM)
+- [[eagle3-speculative-decoding|Eagle3-Speculative-Decoding]] (CONCEPT)
+- [[dgx-spark-gb10|DGX Spark / GB10]] (SYSTEM)
+- [[nvfp4-quantisierung|NVFP4-Quantisierung]] (CONCEPT)
+- [[ubuntu-24-04-real-time-image|Ubuntu 24.04 Real-Time-Image]] (SYSTEM)
+- [[arm64|ARM64]] (CONCEPT)
+- [[data-sovereignty|Data Sovereignty]] (CONCEPT)
+- [[phase-2-synthesis|Phase 2 (Synthesis)]] (PROJECT)
+- [[voice-spoofing|Voice-Spoofing]] (CONCEPT)
+- [[nvidia-hardware|NVIDIA-hardware]] (SYSTEM)
+- [[phase-1-deep-research-analyse|Phase 1: Deep Research & Analyse]] (PROJECT)
+- [[jetson-agx-orin|Jetson AGX Orin]] (SYSTEM)
+- [[nvidia-grace-blackwell|NVIDIA Grace-Blackwell]] (SYSTEM)
+- [[cuda-context-sharing-regeln|CUDA-Context-Sharing-Regeln]] (CONCEPT)
+
+## Relations
+- aether-grid → RELATED_TO → SOFTWARE-INTEGRATION-SPECIFICATION (SIS)
+- DGX Spark A → PART_OF → aether-grid
+- GH200-cluster → PART_OF → aether-grid
+- Anticipation-Loops → PART_OF → GH200-cluster
+- K8s-Pods → PART_OF → GH200-cluster
+- JARVIS-PERSONA → RELATED_TO → aether-grid
+- Phase 2 (Synthesis) → RELATED_TO → aether-grid
+- Phase 1: Deep Research & Analyse → RELATED_TO → SOFTWARE-INTEGRATION-SPECIFICATION (SIS)
+- SOFTWARE-INTEGRATION-SPECIFICATION (SIS) → RELATED_TO → aether-grid
+- aether-grid → USES → NVIDIA Grace-Blackwell
+- aether-grid → USES → NVIDIA Base Command Manager (BCM) 11
+- aether-grid → USES → TensorRT-LLM 1.x NVFP4
+- aether-grid → USES → DeepStream SDK 8.0 (GPU-dekodiert, parallel zu LLM)
+- aether-grid → USES → Riva Nemotron (ASR <25 ms, TTS <50 ms)
+- aether-grid → USES → Qdrant Distributed
+- aether-grid → USES → Triton Inference Server (400B+ Modelle, Multi-Instance)
+- aether-grid → USES → HashiCorp Vault PKI
+- aether-grid → USES → gRPC-over-WireGuard
+- aether-grid → USES → Home Assistant Core Docker (--net=host)
+- aether-grid → USES → LoRA-Push
+- aether-grid → USES → Health-Audits
+- NVIDIA Base Command Manager (BCM) 11 → USES → Ubuntu 24.04 Real-Time-Image
+- NVIDIA Base Command Manager (BCM) 11 → USES → Kubernetes + GPU Operator + Run:ai (1.000+ Sparks)
+- NVIDIA Base Command Manager (BCM) 11 → USES → NVIDIA GPU Operator
+- TensorRT-LLM 1.x NVFP4 → USES → DGX Spark A
+- DeepStream SDK 8.0 (GPU-dekodiert, parallel zu LLM) → USES → DGX Spark A
+- DeepStream SDK 8.0 (GPU-dekodiert, parallel zu LLM) → USES → TensorRT-LLM 1.x NVFP4
+- Riva Nemotron (ASR <25 ms, TTS <50 ms) → USES → DGX Spark A
+- Kubernetes + GPU Operator + Run:ai (1.000+ Sparks) → USES → NVIDIA GPU Operator
+- Kubernetes + GPU Operator + Run:ai (1.000+ Sparks) → USES → Triton Inference Server (400B+ Modelle, Multi-Instance)
+- Qdrant Distributed → USES → GH200-cluster
+- Triton Inference Server (400B+ Modelle, Multi-Instance) → USES → GH200-cluster
+- HashiCorp Vault PKI → USES → GH200-cluster
+- Home Assistant Core Docker (--net=host) → USES → DGX Spark A
+- gRPC-over-WireGuard → USES → HashiCorp Vault PKI
+- STRATEGY-SUMMARY.md → RELATED_TO → aether-grid
+- DGX Spark / GB10 → USES → aether-grid
+- DGX Spark / GB10 → USES → NVIDIA Base Command Manager (BCM) 11
+- DGX Spark / GB10 → USES → TensorRT-LLM 1.x NVFP4
+- NVIDIA Base Command Manager (BCM) 11 → USES → DGX Spark / GB10
+- TensorRT-LLM 1.x NVFP4 → USES → DGX Spark / GB10
+- NVFP4-Quantisierung → USES → TensorRT-LLM 1.x NVFP4
+- Eagle3-Speculative-Decoding → USES → TensorRT-LLM 1.x NVFP4
+- DGX Spark / GB10 → PART_OF → LPDDR5X unified memory
+- Ubuntu 24.04 Real-Time-Image → USES → DGX Spark / GB10
+- Real-Time Kernel → USES → Ubuntu 24.04 Real-Time-Image
+- aether-grid → RELATED_TO → Voice-Spoofing
+- aether-grid → RELATED_TO → Adversarial Attacks
+- BCM-On-Premise → USES → aether-grid
+- NVIDIA Base Command Manager (BCM) 11 → USES → NVIDIA-management-plane
+- LLaVA-1.6 → USES → DGX Spark A
+- HCM (Hardware Control) → RELATED_TO → Home Assistant Core Docker (--net=host)
+- Real-Time Kernel → RELATED_TO → CNI-Plugin (z.B. Cilium)
+- CNI-Plugin (z.B. Cilium) → USES → K3s
+- SNMP v3 (Toner/Papier), IPP (Druck), KNX/DALI (Licht), Manufacturer-REST (Canon/Ricoh/HP) → USES → Home Assistant Core Docker (--net=host)
+- PKI-Engine → USES → HashiCorp Vault PKI
+- NVIDIA Base Command Manager (BCM) 11 → USES → ARM64
+- Riva Nemotron (ASR <25 ms, TTS <50 ms) → USES → ARM64
+- NVIDIA-hardware → RELATED_TO → aether-grid
+- Sovereign AI-Best Practices → RELATED_TO → aether-grid
+- Web- und X-Suchen → RELATED_TO → STRATEGY-SUMMARY.md
+- Hybride Intelligenz → RELATED_TO → aether-grid
+- Data Sovereignty → RELATED_TO → aether-grid
+- Skalierbarkeit → RELATED_TO → aether-grid
+- Security Audits → RELATED_TO → aether-grid
+- Prototyp-Simulation → RELATED_TO → aether-grid
+- Subagent-Stack (DGX Spark) → PART_OF → AETHER-OS
+- Core-Stack (DGX GH200) → PART_OF → AETHER-OS
+- Home Assistant Core Docker (--net=host) → USES → HARDWARE-BRIDGE-BUS
+- Release-Notes → RELATED_TO → Phase 1: Deep Research & Analyse
+- Sovereign AI-Best Practices → RELATED_TO → Phase 1: Deep Research & Analyse
+- NVIDIA Grace-Blackwell → USES → aether-grid
+- DeepStream SDK 8.0 (GPU-dekodiert, parallel zu LLM) → USES → DGX Spark / GB10
+- Riva Nemotron (ASR <25 ms, TTS <50 ms) → USES → DGX Spark / GB10
+- Kubernetes + GPU Operator + Run:ai (1.000+ Sparks) → USES → DGX GH200
+- Qdrant Distributed → USES → DGX GH200
+- Triton Inference Server (400B+ Modelle, Multi-Instance) → USES → DGX GH200
+- HashiCorp Vault PKI → USES → DGX GH200
+- HARDWARE-BRIDGE-BUS → USES → Home Assistant Core Docker (--net=host)
+- KI-Pipeline → USES → DeepStream SDK 8.0 (GPU-dekodiert, parallel zu LLM)
+- KI-Pipeline → USES → TensorRT-LLM 1.x NVFP4
+- KI-Pipeline → USES → Qdrant Distributed
+- KI-Pipeline → USES → Home Assistant Core Docker (--net=host)
+- KI-Pipeline → USES → Riva TTS

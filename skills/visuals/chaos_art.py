@@ -3,14 +3,15 @@
 GZMO Visual Engine — Procedural Chaos Art Generator
 
 Generates images driven by chaos engine state (Lorenz coordinates,
-tension, energy, valence). Supports multiple visual modes:
+tension, energy, valence). Supported visual modes:
 
   - lorenz: Plot the Lorenz attractor orbit
   - energy: Abstract energy field visualization
-  - card: MTG-style card frame with art
-  - dice: D20/D6 visual result
   - mood: Valence-driven abstract mood painting
   - sigil: Sacred geometry / chaos sigil
+
+Note: MTG card art is NOT generated here — /card uses ASCII frames only.
+See docs/CARD_FORGE_MASTER_HANDOFF.md §8 (image generation out of scope).
 
 Usage:
   python3 visuals/chaos_art.py <mode> <output_path> [--state JSON_PATH]

@@ -1,0 +1,194 @@
+---
+type: source
+title: ai-research-part7
+created: 2026-06-08
+updated: 2026-06-08
+sources: 1
+tags: []
+status: stable
+gzmo_synthetic: true
+---
+
+# ai-research-part7
+
+Ingested source summary (2026-06-08).
+
+## Entities
+- [[dua-et-al-2019|Dua et al., 2019]] (AUTHOR)
+- [[soul-md|SOUL.md]] (CONCEPT)
+- [[zhang-and-sennrich-2019|Zhang and Sennrich, 2019]] (AUTHOR)
+- [[greensheep01201-claw-empire|GreenSheep01201/claw-empire]] (TOOL)
+- [[rope|RoPE]] (CONCEPT)
+- [[taskforge|TaskForge]] (SYSTEM)
+- [[omc|OMC]] (SYSTEM)
+- [[onlycrabs-ai|onlycrabs.ai]] (ORGANIZATION)
+- [[rust|Rust]] (CONCEPT)
+- [[huanqi-cao|Huanqi Cao]] (PERSON)
+- [[omx|OmX]] (SYSTEM)
+- [[skill-md|SKILL.md]] (CONCEPT)
+- [[romanklis-openclaw-contained|romanklis/openclaw-contained]] (SYSTEM)
+- [[git-notes-memory-systems|Git-Notes Memory Systems]] (CONCEPT)
+- [[yixuan-wei|Yixuan Wei]] (PERSON)
+- [[loshchilov-and-hutter-2017|Loshchilov and Hutter, 2017]] (AUTHOR)
+- [[yeachan-heo-clawhip|Yeachan-Heo/clawhip]] (SYSTEM)
+- [[architecting-autonomous-development-an-ecosystem-analysis-for-enhancing-the-claw-code-framework|Architecting Autonomous Development: An Ecosystem Analysis for Enhancing the Claw-Code Framework]] (BOOK)
+- [[recursive-language-model-rlm|Recursive Language Model (RLM)]] (CONCEPT)
+- [[json-application-programming-interface-api|JSON Application Programming Interface (API)]] (CONCEPT)
+- [[jiang-chang|Jiang Chang]] (PERSON)
+- [[exa|Exa]] (TOOL)
+- [[factcheck-guard|factcheck-guard]] (CONCEPT)
+- [[deepseek-v3|DeepSeek-V3]] (SYSTEM)
+- [[visual-verdict|visual-verdict]] (CONCEPT)
+- [[virustotal|VirusTotal]] (TOOL)
+- [[shengding-hu|Shengding Hu]] (PERSON)
+- [[agent-skills|Agent Skills]] (CONCEPT)
+- [[tree-sitter|tree-sitter]] (TOOL)
+- [[residual-matrix-transformer-rmt|Residual Matrix Transformer (RMT)]] (CONCEPT)
+- [[python|Python]] (CONCEPT)
+- [[openai-text-embedding-models|OpenAI text-embedding models]] (TOOL)
+- [[slack|Slack]] (SYSTEM)
+- [[openclaw-clawhub|openclaw/clawhub]] (SYSTEM)
+- [[haiku|Haiku]] (CONCEPT)
+- [[hangwin-mcp-chrome|hangwin/mcp-chrome]] (PROJECT)
+- [[wang-et-al-2024|Wang et al., 2024]] (AUTHOR)
+- [[vibeeval-vibecosystem|vibeeval/vibecosystem]] (PROJECT)
+- [[sqlite|SQLite]] (TOOL)
+- [[opus|Opus]] (CONCEPT)
+- [[shangyan-zhou|Shangyan Zhou]] (PERSON)
+- [[suzgun-et-al-2022|Suzgun et al., 2022]] (AUTHOR)
+- [[liu-et-al-2024a|Liu et al., 2024a]] (AUTHOR)
+- [[yeachan-heo-oh-my-claudecode|Yeachan-Heo/oh-my-claudecode]] (PROJECT)
+- [[ai-slop-cleaner|ai-slop-cleaner]] (CONCEPT)
+- [[muddformer|MUDDFormer]] (CONCEPT)
+- [[wangding-zeng|Wangding Zeng]] (PERSON)
+- [[nix-plugin-bundle|Nix plugin bundle]] (CONCEPT)
+- [[voltagent-awesome-openclaw-skills|VoltAgent/awesome-openclaw-skills]] (PROJECT)
+- [[chromedevtools-chrome-devtools-mcp|ChromeDevTools/chrome-devtools-mcp]] (TOOL)
+- [[tavily|Tavily]] (TOOL)
+- [[sinkhorn-knopp-algorithm|Sinkhorn-Knopp algorithm]] (CONCEPT)
+- [[mla|MLA]] (CONCEPT)
+- [[jiashi-li|Jiashi Li]] (PERSON)
+- [[zhengyan-zhang|Zhengyan Zhang]] (PERSON)
+- [[rmsnorm|RMSNorm]] (CONCEPT)
+- [[liu-et-al-2024b|Liu et al., 2024b]] (AUTHOR)
+- [[chengqi-deng|Chengqi Deng]] (PERSON)
+- [[adamw|AdamW]] (ALGORITHM)
+- [[mit-csail|MIT CSAIL]] (ORGANIZATION)
+- [[commit-trailers|commit-trailers]] (CONCEPT)
+- [[huazuo-gao|Huazuo Gao]] (PERSON)
+- [[jaredstewart-coderlm|JaredStewart/coderlm]] (SYSTEM)
+- [[birkhoff-polytope|Birkhoff polytope]] (CONCEPT)
+- [[oh-my-codex|oh-my-codex]] (PROJECT)
+- [[neural-web-automation|Neural Web Automation]] (CONCEPT)
+- [[yuqing-wang|Yuqing Wang]] (PERSON)
+- [[human-in-the-loop-hitl|Human-in-the-Loop (HITL)]] (CONCEPT)
+- [[bloopai-vibe-kanban|BloopAI/vibe-kanban]] (PROJECT)
+- [[dualpipe|DualPipe]] (CONCEPT)
+- [[lean-wang|Lean Wang]] (PERSON)
+- [[learnable-mappings|Learnable Mappings]] (CONCEPT)
+- [[deepseek-ai|DeepSeek-AI]] (ORGANIZATION)
+- [[sonnet|Sonnet]] (CONCEPT)
+- [[mhc|mHC]] (CONCEPT)
+- [[omo|OmO]] (SYSTEM)
+- [[discord|Discord]] (SYSTEM)
+- [[zhenda-xie|Zhenda Xie]] (PERSON)
+- [[trivy|Trivy]] (TOOL)
+- [[wenfeng-liang|Wenfeng Liang]] (PERSON)
+- [[tilelang|TileLang]] (TOOL)
+- [[google|Google]] (ORGANIZATION)
+- [[drop|DROP]] (BENCHMARK)
+- [[docker|Docker]] (TOOL)
+- [[puppeteer|Puppeteer]] (TOOL)
+- [[convex|Convex]] (SYSTEM)
+- [[jingyang-yuan|Jingyang Yuan]] (PERSON)
+- [[resnets|ResNets]] (CONCEPT)
+- [[gvisor|gVisor]] (SYSTEM)
+- [[bbh|BBH]] (BENCHMARK)
+- [[self-improvement-loops|Self-Improvement Loops]] (CONCEPT)
+- [[office-pack-profiles|Office Pack Profiles]] (CONCEPT)
+- [[residual-connection|Residual Connection]] (CONCEPT)
+- [[model-context-protocol-mcp|Model Context Protocol (MCP)]] (CONCEPT)
+- [[chenggang-zhao|Chenggang Zhao]] (PERSON)
+
+## Relations
+- mHC → RELATED_TO → Residual Connection
+- mHC → USES → Sinkhorn-Knopp algorithm
+- mHC → USES → Birkhoff polytope
+- mHC → USES → TileLang
+- mHC → USES → DualPipe
+- Zhenda Xie → PART_OF → DeepSeek-AI
+- Yixuan Wei → PART_OF → DeepSeek-AI
+- Huanqi Cao → PART_OF → DeepSeek-AI
+- Chenggang Zhao → PART_OF → DeepSeek-AI
+- Chengqi Deng → PART_OF → DeepSeek-AI
+- Jiashi Li → PART_OF → DeepSeek-AI
+- Huazuo Gao → PART_OF → DeepSeek-AI
+- Jiang Chang → PART_OF → DeepSeek-AI
+- Shangyan Zhou → PART_OF → DeepSeek-AI
+- Zhengyan Zhang → PART_OF → DeepSeek-AI
+- Wangding Zeng → PART_OF → DeepSeek-AI
+- Shengding Hu → PART_OF → DeepSeek-AI
+- Yuqing Wang → PART_OF → DeepSeek-AI
+- Jingyang Yuan → PART_OF → DeepSeek-AI
+- Lean Wang → PART_OF → DeepSeek-AI
+- Wenfeng Liang → PART_OF → DeepSeek-AI
+- mHC → USES → RMSNorm
+- DualPipe → AUTHORED_BY → Liu et al., 2024b
+- DeepSeek-V3 → AUTHORED_BY → Liu et al., 2024b
+- BBH → AUTHORED_BY → Suzgun et al., 2022
+- DROP → AUTHORED_BY → Dua et al., 2019
+- AdamW → AUTHORED_BY → Loshchilov and Hutter, 2017
+- MLA → AUTHORED_BY → Liu et al., 2024a
+- RMSNorm → AUTHORED_BY → Zhang and Sennrich, 2019
+- DeepSeek-V3 → USES → MLA
+- DeepSeek-V3 → USES → RoPE
+- DeepSeek-V3 → USES → RMSNorm
+- DeepSeek-V3 → USES → Wang et al., 2024
+- Architecting Autonomous Development: An Ecosystem Analysis for Enhancing the Claw-Code Framework → USES → OmX
+- Architecting Autonomous Development: An Ecosystem Analysis for Enhancing the Claw-Code Framework → USES → OMC
+- Architecting Autonomous Development: An Ecosystem Analysis for Enhancing the Claw-Code Framework → USES → Yeachan-Heo/clawhip
+- Architecting Autonomous Development: An Ecosystem Analysis for Enhancing the Claw-Code Framework → USES → OmO
+- Architecting Autonomous Development: An Ecosystem Analysis for Enhancing the Claw-Code Framework → USES → BloopAI/vibe-kanban
+- Architecting Autonomous Development: An Ecosystem Analysis for Enhancing the Claw-Code Framework → USES → GreenSheep01201/claw-empire
+- Architecting Autonomous Development: An Ecosystem Analysis for Enhancing the Claw-Code Framework → USES → vibeeval/vibecosystem
+- Architecting Autonomous Development: An Ecosystem Analysis for Enhancing the Claw-Code Framework → USES → JaredStewart/coderlm
+- Architecting Autonomous Development: An Ecosystem Analysis for Enhancing the Claw-Code Framework → USES → hangwin/mcp-chrome
+- Architecting Autonomous Development: An Ecosystem Analysis for Enhancing the Claw-Code Framework → USES → romanklis/openclaw-contained
+- romanklis/openclaw-contained → USES → gVisor
+- Architecting Autonomous Development: An Ecosystem Analysis for Enhancing the Claw-Code Framework → USES → Python
+- Architecting Autonomous Development: An Ecosystem Analysis for Enhancing the Claw-Code Framework → USES → Rust
+- OMC → PART_OF → Yeachan-Heo/oh-my-claudecode
+- OmX → PART_OF → oh-my-codex
+- Yeachan-Heo/oh-my-claudecode → USES → Haiku
+- Yeachan-Heo/oh-my-claudecode → USES → Sonnet
+- Yeachan-Heo/oh-my-claudecode → USES → Opus
+- vibeeval/vibecosystem → USES → visual-verdict
+- vibeeval/vibecosystem → USES → ai-slop-cleaner
+- vibeeval/vibecosystem → USES → factcheck-guard
+- vibeeval/vibecosystem → USES → commit-trailers
+- Recursive Language Model (RLM) → AUTHORED_BY → MIT CSAIL
+- JaredStewart/coderlm → USES → Recursive Language Model (RLM)
+- JaredStewart/coderlm → USES → tree-sitter
+- JaredStewart/coderlm → USES → JSON Application Programming Interface (API)
+- Model Context Protocol (MCP) → PART_OF → ChromeDevTools/chrome-devtools-mcp
+- Model Context Protocol (MCP) → PART_OF → hangwin/mcp-chrome
+- hangwin/mcp-chrome → USES → Model Context Protocol (MCP)
+- hangwin/mcp-chrome → USES → ChromeDevTools/chrome-devtools-mcp
+- Yeachan-Heo/clawhip → USES → Discord
+- Yeachan-Heo/clawhip → USES → Slack
+- TaskForge → PART_OF → romanklis/openclaw-contained
+- TaskForge → USES → gVisor
+- TaskForge → USES → Docker
+- gVisor → AUTHORED_BY → Google
+- TaskForge → USES → Human-in-the-Loop (HITL)
+- GreenSheep01201/claw-empire → USES → SQLite
+- openclaw/clawhub → USES → Convex
+- openclaw/clawhub → USES → OpenAI text-embedding models
+- openclaw/clawhub → USES → Agent Skills
+- Agent Skills → PART_OF → SKILL.md
+- onlycrabs.ai → USES → SOUL.md
+- VoltAgent/awesome-openclaw-skills → USES → VirusTotal
+- Neural Web Automation → USES → Exa
+- Neural Web Automation → USES → Tavily
+- openclaw/clawhub → USES → Architecting Autonomous Development: An Ecosystem Analysis for Enhancing the Claw-Code Framework
+- VoltAgent/awesome-openclaw-skills → RELATED_TO → Architecting Autonomous Development: An Ecosystem Analysis for Enhancing the Claw-Code Framework

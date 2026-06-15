@@ -1,0 +1,233 @@
+---
+type: source
+title: cybernetics-and-mythos-the-architecture-of-intell-part2
+created: 2026-06-08
+updated: 2026-06-08
+sources: 1
+tags: []
+status: stable
+gzmo_synthetic: true
+---
+
+# cybernetics-and-mythos-the-architecture-of-intell-part2
+
+Ingested source summary (2026-06-08).
+
+## Entities
+- [[jean-paul-sartre|Jean-Paul Sartre]] (PERSON)
+- [[task-layer|Task Layer]] (CONCEPT)
+- [[encyclopaedia-logic|Encyclopaedia Logic]] (BOOK)
+- [[from-the-papers-of-one-still-living|From the Papers of One Still Living]] (BOOK)
+- [[karl-marx|Karl Marx]] (PERSON)
+- [[the-concept-of-irony|The Concept of Irony]] (BOOK)
+- [[theodor-w-adorno|Theodor W. Adorno]] (PERSON)
+- [[the-child-and-the-curriculum|The Child and the Curriculum]] (BOOK)
+- [[sagittarius|Sagittarius]] (CONCEPT)
+- [[umpire-agent|Umpire Agent]] (SYSTEM)
+- [[pyxis|pyxis]] (TOOL)
+- [[plato|Plato]] (PERSON)
+- [[theogony|Theogony]] (BOOK)
+- [[two-ideas-of-dialectic-hegel-and-adorno|Two Ideas of Dialectic: Hegel and Adorno]] (PERSON)
+- [[library|Library]] (BOOK)
+- [[coordination-layer|Coordination Layer]] (CONCEPT)
+- [[pithos|pithos]] (TOOL)
+- [[z-a-jordan|Z. A. Jordan]] (PERSON)
+- [[dialectical-materialism|Dialectical Materialism]] (CONCEPT)
+- [[master-slave-dialectic|Master-Slave Dialectic]] (CONCEPT)
+- [[dialectical-engine|Dialectical Engine]] (SYSTEM)
+- [[borderline-personality-disorder|Borderline Personality Disorder]] (CONCEPT)
+- [[teachback-generation|Teachback Generation]] (CONCEPT)
+- [[auschwitz|Auschwitz]] (CONCEPT)
+- [[distress-tolerance|Distress Tolerance]] (CONCEPT)
+- [[berger-and-wild|Berger and Wild]] (PERSON)
+- [[vscodium|VSCodium]] (TOOL)
+- [[tripartite-identity-layering|Tripartite Identity Layering]] (CONCEPT)
+- [[science-of-logic|Science of Logic]] (BOOK)
+- [[a-precarious-happiness|A Precarious Happiness]] (BOOK)
+- [[critique-of-dialectical-reason|Critique of Dialectical Reason]] (BOOK)
+- [[karl-popper|Karl Popper]] (PERSON)
+- [[republic|Republic]] (BOOK)
+- [[deucalion|Deucalion]] (PERSON)
+- [[hephaestus|Hephaestus]] (PERSON)
+- [[priority-of-the-object|priority of the object]] (CONCEPT)
+- [[holocaust|Holocaust]] (CONCEPT)
+- [[an-african-american-and-latinx-history-of-the-united-states|An African American and Latinx History of the United States]] (BOOK)
+- [[trick-at-mecone|Trick at Mecone]] (CONCEPT)
+- [[formal-conversational-protocol-fcop|Formal Conversational Protocol (FCoP)]] (SYSTEM)
+- [[democracy-and-education|Democracy and Education]] (BOOK)
+- [[s-ren-kierkegaard|Søren Kierkegaard]] (PERSON)
+- [[johann-gottlieb-fichte|Johann Gottlieb Fichte]] (PERSON)
+- [[ladon|Ladon]] (PERSON)
+- [[determinate-negation|determinate negation]] (CONCEPT)
+- [[the-secret-of-thetis|The Secret of Thetis]] (CONCEPT)
+- [[frankfurt-school-of-critical-theory|Frankfurt School of Critical Theory]] (ORGANIZATION)
+- [[hermes|Hermes]] (PERSON)
+- [[chokidar|chokidar]] (TOOL)
+- [[defender-agent|Defender Agent]] (SYSTEM)
+- [[negative-dialectics|Negative Dialectics]] (CONCEPT)
+- [[either-or|Either/Or]] (BOOK)
+- [[paulo-freire|Paulo Freire]] (PERSON)
+- [[friedrich-engels|Friedrich Engels]] (PERSON)
+- [[chiron|Chiron]] (PERSON)
+- [[peter-e-gordon|Peter E. Gordon]] (PERSON)
+- [[erasmus-of-rotterdam|Erasmus of Rotterdam]] (PERSON)
+- [[peleus|Peleus]] (PERSON)
+- [[golden-age|Golden Age]] (CONCEPT)
+- [[atlas|Atlas]] (PERSON)
+- [[elpis|Elpis]] (CONCEPT)
+- [[obsidian|Obsidian]] (TOOL)
+- [[pedagogy-of-the-oppressed|Pedagogy of the Oppressed]] (BOOK)
+- [[achilles|Achilles]] (PERSON)
+- [[identity-thinking|identity thinking]] (CONCEPT)
+- [[unbound-state|UNBOUND State]] (CONCEPT)
+- [[theft-of-fire|Theft of Fire]] (CONCEPT)
+- [[platonic-forms|Platonic Forms]] (CONCEPT)
+- [[protagoras|Protagoras]] (PERSON)
+- [[issue-state|ISSUE state]] (CONCEPT)
+- [[richard-rothstein|Richard Rothstein]] (PERSON)
+- [[typescript|TypeScript]] (TOOL)
+- [[prometheus-bound|Prometheus Bound]] (BOOK)
+- [[phenomenology-of-spirit|Phenomenology of Spirit]] (BOOK)
+- [[timaeus|Timaeus]] (BOOK)
+- [[emotion-regulation|Emotion Regulation]] (CONCEPT)
+- [[zeus|Zeus]] (PERSON)
+- [[prosecutor-defender-umpire-framework|Prosecutor-Defender-Umpire framework]] (SYSTEM)
+- [[immanuel-kant|Immanuel Kant]] (PERSON)
+- [[math-for-social-justice|Math for Social Justice]] (CONCEPT)
+- [[promethean-illusion|Promethean illusion]] (CONCEPT)
+- [[metamorphoses|Metamorphoses]] (BOOK)
+- [[paul-ortiz|Paul Ortiz]] (PERSON)
+- [[socratic-elenchus|Socratic Elenchus]] (CONCEPT)
+- [[works-and-days|Works and Days]] (BOOK)
+- [[heracles|Heracles]] (PERSON)
+- [[epimetheus|Epimetheus]] (PERSON)
+- [[mount-caucasus|Mount Caucasus]] (CONCEPT)
+- [[non-identical|non-identical]] (CONCEPT)
+- [[color-of-law|Color of Law]] (BOOK)
+- [[king-eurystheus|King Eurystheus]] (PERSON)
+- [[aufhebung|Aufhebung]] (CONCEPT)
+- [[mount-elbrus|Mount Elbrus]] (CONCEPT)
+- [[socrates|Socrates]] (PERSON)
+- [[historicism|Historicism]] (CONCEPT)
+- [[aeschylus|Aeschylus]] (PERSON)
+- [[dialectical-behavior-therapy|Dialectical Behavior Therapy]] (CONCEPT)
+- [[pyrrha|Pyrrha]] (PERSON)
+- [[prosecutor-agent|Prosecutor Agent]] (SYSTEM)
+- [[apollodorus|Apollodorus]] (PERSON)
+- [[john-dewey|John Dewey]] (PERSON)
+- [[sicyon|Sicyon]] (ORGANIZATION)
+- [[sovereign-software-factory|Sovereign Software Factory]] (SYSTEM)
+- [[clarification-generation|Clarification Generation]] (CONCEPT)
+- [[hesiod|Hesiod]] (PERSON)
+- [[active-conversation-protocol-acp|Active Conversation Protocol (ACP)]] (SYSTEM)
+- [[interpersonal-effectiveness|Interpersonal Effectiveness]] (CONCEPT)
+- [[pandora-s-box|Pandora's Box]] (PERSON)
+- [[exchange-principle|exchange principle]] (CONCEPT)
+- [[eleventh-labor|Eleventh Labor]] (PROJECT)
+- [[golden-apples-of-the-hesperides|Golden Apples of the Hesperides]] (CONCEPT)
+- [[copernican-revolution|Copernican revolution]] (CONCEPT)
+- [[categorical-imperative|categorical imperative]] (CONCEPT)
+- [[socratic-seminar|Socratic Seminar]] (CONCEPT)
+- [[w-t-stace|W.T. Stace]] (PERSON)
+- [[caucasian-eagle|Caucasian eagle]] (PERSON)
+- [[mindfulness|Mindfulness]] (CONCEPT)
+- [[addendum|addendum]] (CONCEPT)
+- [[mount-kazbek|Mount Kazbek]] (CONCEPT)
+- [[the-open-society-and-its-enemies|The Open Society and Its Enemies]] (BOOK)
+- [[ovid|Ovid]] (PERSON)
+- [[context-layer|Context Layer]] (CONCEPT)
+
+## Relations
+- Plato → RELATED_TO → Socrates
+- Socrates → USES → Socratic Elenchus
+- Plato → USES → Master-Slave Dialectic
+- Plato → AUTHORED_BY → Republic
+- Two Ideas of Dialectic: Hegel and Adorno → AUTHORED_BY → Phenomenology of Spirit
+- Phenomenology of Spirit → PART_OF → Master-Slave Dialectic
+- Negative Dialectics → USES → Aufhebung
+- Karl Marx → USES → Dialectical Materialism
+- Friedrich Engels → USES → Dialectical Materialism
+- Søren Kierkegaard → AUTHORED_BY → From the Papers of One Still Living
+- Søren Kierkegaard → AUTHORED_BY → The Concept of Irony
+- Søren Kierkegaard → AUTHORED_BY → Either/Or
+- Jean-Paul Sartre → AUTHORED_BY → Critique of Dialectical Reason
+- Karl Popper → AUTHORED_BY → The Open Society and Its Enemies
+- Karl Popper → RELATED_TO → Historicism
+- Theodor W. Adorno → PART_OF → Frankfurt School of Critical Theory
+- Theodor W. Adorno → AUTHORED_BY → Negative Dialectics
+- Theodor W. Adorno → RELATED_TO → Two Ideas of Dialectic: Hegel and Adorno
+- Theodor W. Adorno → USES → Master-Slave Dialectic
+- Theodor W. Adorno → RELATED_TO → Immanuel Kant
+- Theodor W. Adorno → RELATED_TO → Copernican revolution
+- Theodor W. Adorno → USES → identity thinking
+- Theodor W. Adorno → RELATED_TO → exchange principle
+- Theodor W. Adorno → USES → non-identical
+- Theodor W. Adorno → USES → priority of the object
+- Theodor W. Adorno → USES → addendum
+- Theodor W. Adorno → RELATED_TO → Holocaust
+- Theodor W. Adorno → USES → categorical imperative
+- Theodor W. Adorno → RELATED_TO → Auschwitz
+- Peter E. Gordon → AUTHORED_BY → Two Ideas of Dialectic: Hegel and Adorno
+- Peter E. Gordon → AUTHORED_BY → A Precarious Happiness
+- John Dewey → AUTHORED_BY → Democracy and Education
+- John Dewey → AUTHORED_BY → The Child and the Curriculum
+- Paulo Freire → AUTHORED_BY → Pedagogy of the Oppressed
+- Socratic Seminar → RELATED_TO → Berger and Wild
+- Socratic Seminar → USES → Paul Ortiz
+- Socratic Seminar → USES → An African American and Latinx History of the United States
+- Socratic Seminar → USES → Richard Rothstein
+- Socratic Seminar → USES → Color of Law
+- Dialectical Behavior Therapy → USES → Borderline Personality Disorder
+- Dialectical Behavior Therapy → USES → Mindfulness
+- Dialectical Behavior Therapy → USES → Distress Tolerance
+- Dialectical Behavior Therapy → USES → Emotion Regulation
+- Dialectical Behavior Therapy → USES → Interpersonal Effectiveness
+- Karl Marx → RELATED_TO → Friedrich Engels
+- Søren Kierkegaard → RELATED_TO → Theodor W. Adorno
+- Søren Kierkegaard → RELATED_TO → Karl Popper
+- Karl Popper → RELATED_TO → Theodor W. Adorno
+- Protagoras → PART_OF → Plato
+- Library → AUTHORED_BY → Apollodorus
+- Metamorphoses → AUTHORED_BY → Ovid
+- Pyrrha → RELATED_TO → Epimetheus
+- Pyrrha → RELATED_TO → Pandora's Box
+- Theogony → AUTHORED_BY → Hesiod
+- Works and Days → AUTHORED_BY → Hesiod
+- Pandora's Box → RELATED_TO → pithos
+- pithos → RELATED_TO → pyxis
+- Achilles → RELATED_TO → The Secret of Thetis
+- Achilles → RELATED_TO → Peleus
+- Heracles → RELATED_TO → Zeus
+- Chiron → RELATED_TO → Heracles
+- Atlas → RELATED_TO → Prometheus Bound
+- Prometheus Bound → AUTHORED_BY → Aeschylus
+- Mount Elbrus → PART_OF → Mount Caucasus
+- Mount Kazbek → PART_OF → Mount Caucasus
+- Timaeus → AUTHORED_BY → Plato
+- Prometheus Bound → USES → Hephaestus
+- Prometheus Bound → RELATED_TO → Theft of Fire
+- Prometheus Bound → RELATED_TO → Trick at Mecone
+- Prometheus Bound → RELATED_TO → The Secret of Thetis
+- Epimetheus → RELATED_TO → Pandora's Box
+- Zeus → RELATED_TO → Pandora's Box
+- Zeus → RELATED_TO → Prometheus Bound
+- Heracles → RELATED_TO → Eleventh Labor
+- Eleventh Labor → RELATED_TO → Golden Apples of the Hesperides
+- Golden Apples of the Hesperides → RELATED_TO → Ladon
+- Heracles → RELATED_TO → King Eurystheus
+- FCoP → USES → Obsidian
+- FCoP → USES → VSCodium
+- Tripartite Identity Layering → PART_OF → Task Layer
+- Tripartite Identity Layering → PART_OF → Context Layer
+- Tripartite Identity Layering → PART_OF → Coordination Layer
+- Dialectical Engine → USES → Prosecutor-Defender-Umpire framework
+- Prosecutor-Defender-Umpire framework → PART_OF → Prosecutor Agent
+- Prosecutor-Defender-Umpire framework → PART_OF → Defender Agent
+- Prosecutor-Defender-Umpire framework → PART_OF → Umpire Agent
+- Active Conversation Protocol (ACP) → PART_OF → Teachback Generation
+- Active Conversation Protocol (ACP) → PART_OF → Clarification Generation
+- TypeScript → USES → Sovereign Software Factory
+- Sovereign Software Factory → USES → Obsidian
+- Sovereign Software Factory → USES → VSCodium
+- FCoP → USES → chokidar
+- UNBOUND State → RELATED_TO → ISSUE state

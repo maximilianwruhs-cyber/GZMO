@@ -18,6 +18,7 @@ use gzmo_core::types::{Message, Role};
 use gzmo_chaos::feedback::ChaosEvent;
 use gzmo_chaos::feedback_ipc;
 use gzmo_chaos::pulse::ChaosSnapshot;
+use gzmo_core::pedagogy::orchestrator::chaos_teaching_context;
 use gzmo_core::skills::dispatch::{self, data_dir};
 
 use crate::pedagogy_bridge::{delegate_exec_response, should_delegate_exec, PedagogyRuntime};
@@ -173,6 +174,7 @@ async fn status_response(state: &Arc<MentorServerState>) -> MentorResponse {
         ok: true,
         mentor: Some(!pedagogy.session.ops_mode),
         ops_mode: Some(pedagogy.session.ops_mode),
+        auto_triggers: Some(pedagogy.session.auto_triggers_enabled),
         learner_id: Some(state.config.pedagogy.learner_id().to_string()),
         ..MentorResponse::base()
     }
@@ -186,6 +188,7 @@ async fn reload_response(state: &Arc<MentorServerState>) -> MentorResponse {
             response: Some("reloaded".into()),
             mentor: Some(!pedagogy.session.ops_mode),
             ops_mode: Some(pedagogy.session.ops_mode),
+            auto_triggers: Some(pedagogy.session.auto_triggers_enabled),
             learner_id: Some(state.config.pedagogy.learner_id().to_string()),
             ..MentorResponse::base()
         },
@@ -196,6 +199,18 @@ async fn reload_response(state: &Arc<MentorServerState>) -> MentorResponse {
             ..MentorResponse::base()
         },
     }
+}
+
+pub fn build_discovery_context(req: &MentorRequest) -> Option<String> {
+    let pillar = req.discovery_pillar.as_deref()?.trim();
+    if pillar.is_empty() { return None; }
+    let topic = req.learn_topic.as_deref().unwrap_or("");
+    let probe = req.probe_context.as_deref().unwrap_or("");
+    Some(format!(
+        "pillar={pillar}; learn_topic={topic}; probe={probe}; \
+         soul=S chaos+pedagogy+honeypot; personality=A dreams+spark+synapse+wiki+personas+ops; \
+         body=B daemon+skills+ingest+distill+routing; skeleton=C health+tools+MCP+vector+systemd"
+    ))
 }
 
 async fn teach(req: &MentorRequest, state: &Arc<MentorServerState>) -> Result<MentorResponse> {
@@ -215,29 +230,50 @@ async fn teach(req: &MentorRequest, state: &Arc<MentorServerState>) -> Result<Me
     }
 
     let messages = build_messages(&req.conversation, message);
-    apply_chaos_snapshot_to_tutor(state);
-    let mentor_text = pedagogy
+    let chaos_context = apply_chaos_snapshot_to_tutor(state);
+    let discovery_context = build_discovery_context(req);
+    let mentor_turn = pedagogy
         .maybe_teach(
             state.config.as_ref(),
             state.router.as_ref(),
             state.tutor_gateway.as_ref(),
             message,
             &messages,
+            chaos_context.as_deref(),
+            discovery_context.as_deref(),
+            state.chaos_snapshot_rx.as_ref(),
         )
         .await?;
 
-    match mentor_text {
-        Some(response) => {
+    match mentor_turn {
+        Some(turn) => {
             emit_mentor_chaos_feedback_state(
                 state,
                 message,
-                &response,
+                &turn.response,
                 req.conversation.len() as u32 + 1,
             );
-            Ok(MentorResponse::teach(response, learner_id))
+            Ok(MentorResponse::teach_with_pedagogy(
+                turn.response,
+                learner_id,
+                &turn.edf_record,
+            ))
         }
         None => Ok(delegate_exec_response(message, &pedagogy.session, &learner_id)),
     }
+}
+
+/// Headless autonomous teach (daemon low-tension watcher).
+pub async fn teach_autonomous(
+    state: &Arc<MentorServerState>,
+    message: &str,
+) -> Result<MentorResponse> {
+    let req = MentorRequest {
+        method: "teach".to_string(),
+        message: message.to_string(),
+        ..Default::default()
+    };
+    teach(&req, state).await
 }
 
 async fn compute(req: &MentorRequest, state: &Arc<MentorServerState>) -> Result<MentorResponse> {
@@ -299,14 +335,13 @@ pub fn daemon_running() -> bool {
     dispatch::daemon_running()
 }
 
-fn apply_chaos_snapshot_to_tutor(state: &MentorServerState) {
-    let Some(rx) = state.chaos_snapshot_rx.as_ref() else {
-        return;
-    };
+fn apply_chaos_snapshot_to_tutor(state: &MentorServerState) -> Option<String> {
+    let rx = state.chaos_snapshot_rx.as_ref()?;
     let snap = rx.borrow().clone();
     state
         .tutor_gateway
         .set_chaos_overrides(snap.llm_temperature, snap.llm_max_tokens);
+    Some(chaos_teaching_context(&snap))
 }
 
 /// Perturb chaos after a mentor turn — direct tx when in-process, inbox when daemon-only.

@@ -130,7 +130,7 @@ pub struct ChaosTrigger {
     pub cooldown_ticks: u64,
     /// Whether this trigger is currently armed
     pub enabled: bool,
-    last_fired: u64,
+    last_fired: Option<u64>,
 }
 
 impl ChaosTrigger {
@@ -141,14 +141,16 @@ impl ChaosTrigger {
             action,
             cooldown_ticks,
             enabled: true,
-            last_fired: 0,
+            last_fired: None,
         }
     }
 
     /// Check if this trigger should fire given the current and previous snapshots.
     fn should_fire(&self, snap: &ChaosSnapshot, prev: &ChaosSnapshot) -> bool {
         if !self.enabled { return false; }
-        if snap.tick.saturating_sub(self.last_fired) < self.cooldown_ticks { return false; }
+        if let Some(last_fired) = self.last_fired {
+            if snap.tick.saturating_sub(last_fired) < self.cooldown_ticks { return false; }
+        }
 
         match &self.condition {
             TriggerCondition::Above { metric, threshold } => {
@@ -175,7 +177,7 @@ impl ChaosTrigger {
                 snap.deaths > prev.deaths
             }
             TriggerCondition::Periodic { interval_ticks } => {
-                snap.tick % interval_ticks == 0
+                *interval_ticks > 0 && snap.tick > 0 && snap.tick.is_multiple_of(*interval_ticks)
             }
         }
     }
@@ -349,7 +351,7 @@ impl TriggerEngine {
                     trigger_name: trigger.name.clone(),
                     action: trigger.action.clone(),
                 });
-                trigger.last_fired = snap.tick;
+                trigger.last_fired = Some(snap.tick);
             }
         }
 
@@ -360,12 +362,13 @@ impl TriggerEngine {
     /// Get a diagnostic summary of all triggers.
     pub fn status_summary(&self, current_tick: u64) -> Vec<TriggerStatus> {
         self.triggers.iter().map(|t| {
-            let ticks_since = current_tick.saturating_sub(t.last_fired);
-            let cooldown_remaining = if ticks_since >= t.cooldown_ticks { 0 } else { t.cooldown_ticks - ticks_since };
+            let last_fired = t.last_fired.unwrap_or(0);
+            let ticks_since = current_tick.saturating_sub(last_fired);
+            let cooldown_remaining = t.cooldown_ticks.saturating_sub(ticks_since);
             TriggerStatus {
                 name: t.name.clone(),
                 enabled: t.enabled,
-                last_fired: t.last_fired,
+                last_fired,
                 cooldown_remaining,
                 condition_summary: format!("{:?}", t.condition),
             }
@@ -397,13 +400,6 @@ mod tests {
 
     fn snap_with_tension(tick: u64, tension: f64) -> ChaosSnapshot {
         ChaosSnapshot { tick, tension, ..Default::default() }
-    }
-
-    fn snap_with_phase(tick: u64, phase: Phase, prev_phase: Phase) -> (ChaosSnapshot, ChaosSnapshot) {
-        (
-            ChaosSnapshot { tick, phase, ..Default::default() },
-            ChaosSnapshot { tick: tick.saturating_sub(1), phase: prev_phase, ..Default::default() },
-        )
     }
 
     #[test]
@@ -454,6 +450,34 @@ mod tests {
         engine.prev_snapshot.tick = 19;
         let fired = engine.evaluate(&ChaosSnapshot { tick: 20, ..Default::default() });
         assert_eq!(fired.len(), 1);
+    }
+
+    #[test]
+    fn first_crossing_is_not_blocked_by_cooldown() {
+        let mut engine = TriggerEngine::new();
+        engine.add(ChaosTrigger::new(
+            "high_tension",
+            TriggerCondition::Above { metric: ChaosMetric::Tension, threshold: 80.0 },
+            TriggerAction::Notify { message: "Alert!".into(), level: NotifyLevel::Urgent },
+            90,
+        ));
+
+        let fired = engine.evaluate(&snap_with_tension(1, 85.0));
+        assert_eq!(fired.len(), 1);
+    }
+
+    #[test]
+    fn periodic_zero_interval_never_fires() {
+        let mut engine = TriggerEngine::new();
+        engine.add(ChaosTrigger::new(
+            "broken_periodic",
+            TriggerCondition::Periodic { interval_ticks: 0 },
+            TriggerAction::Notify { message: "tick".into(), level: NotifyLevel::Normal },
+            0,
+        ));
+
+        let fired = engine.evaluate(&ChaosSnapshot { tick: 10, ..Default::default() });
+        assert!(fired.is_empty());
     }
 
     #[test]

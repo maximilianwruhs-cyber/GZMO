@@ -128,8 +128,13 @@ pub async fn probe_redis(cfg: &RedisConfig) -> ProbeResult {
 }
 
 /// Optional Sovereign FrankenMoE on :8010 (GGUF may not exist yet).
-pub async fn probe_sovereign(profile: &EngineProfileConfig) -> ProbeResult {
-    probe_llm_models(profile).await
+pub async fn probe_sovereign(profile: &EngineProfileConfig, active_mode: crate::config::EngineMode) -> ProbeResult {
+    let mut r = probe_llm_models(profile).await;
+    r.name = "sovereign";
+    if !r.ok && active_mode != crate::config::EngineMode::Sovereign {
+        r.detail = "PARKED (sovereign is deprioritized and port is down)".to_string();
+    }
+    r
 }
 
 /// GET Qdrant collection info when `[qdrant].enabled`.
@@ -279,9 +284,8 @@ pub async fn run_startup_probes(
     }
 
     if let Some(ref sovereign) = config.engine.sovereign {
-        let mut r = probe_sovereign(sovereign).await;
-        r.name = "sovereign";
-        if !r.ok {
+        let mut r = probe_sovereign(sovereign, config.engine.active_mode).await;
+        if !r.ok && config.engine.active_mode == crate::config::EngineMode::Sovereign {
             r.detail = format!(
                 "{} (expected until sovereign-moe GGUF is built)",
                 r.detail
@@ -357,11 +361,51 @@ pub async fn run_startup_probes(
     Ok(results)
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum HealthPerspective {
+    Host,
+    Container,
+}
+
+impl std::fmt::Display for HealthPerspective {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Host => write!(f, "host"),
+            Self::Container => write!(f, "container"),
+        }
+    }
+}
+
+pub fn detect_perspective() -> HealthPerspective {
+    if let Ok(val) = std::env::var("GZMO_HEALTH_PERSPECTIVE") {
+        match val.to_lowercase().as_str() {
+            "container" => return HealthPerspective::Container,
+            "host" => return HealthPerspective::Host,
+            _ => {}
+        }
+    }
+    if std::path::Path::new("/.dockerenv").exists() {
+        return HealthPerspective::Container;
+    }
+    if std::env::var("CONTAINER").is_ok() || std::path::Path::new("/run/.containerenv").exists() {
+        return HealthPerspective::Container;
+    }
+    HealthPerspective::Host
+}
+
 /// Format probe list for `gzmo health` CLI.
 pub fn format_report(results: &[ProbeResult]) -> String {
-    let mut out = String::from("GZMO health report\n");
+    let perspective = detect_perspective();
+    let hostname = sysinfo::System::host_name().unwrap_or_else(|| "unknown".to_string());
+    let mut out = format!("GZMO health report [perspective={perspective} hostname={hostname}]\n");
     for r in results {
-        let mark = if r.ok { "OK" } else { "FAIL" };
+        let mark = if r.ok {
+            "OK"
+        } else if r.name == "sovereign" && r.detail.contains("PARKED") {
+            "PARKED"
+        } else {
+            "FAIL"
+        };
         out.push_str(&format!("  [{mark}] {} — {}\n", r.name, r.detail));
     }
     out

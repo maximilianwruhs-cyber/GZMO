@@ -1,5 +1,7 @@
+# DEPRECATED — replaced by llama-retrieval-router.service (unified :8081 embed+rerank).
+# Do not enable on VM200; kept only for historical reference.
 [Unit]
-Description=GZMO embedding server (Qwen3-Embedding-0.6B) on GTX 1070
+Description=[RETIRED] GZMO embedding server (Qwen3-Embedding-0.6B) on GTX 1070
 After=network.target
 
 [Service]

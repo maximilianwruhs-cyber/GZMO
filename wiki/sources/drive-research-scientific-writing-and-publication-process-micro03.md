@@ -1,0 +1,310 @@
+---
+type: source
+title: drive-research-scientific-writing-and-publication-process-micro03
+created: 2026-06-09
+updated: 2026-06-09
+sources: 1
+tags: []
+status: stable
+gzmo_synthetic: true
+---
+
+# drive-research-scientific-writing-and-publication-process-micro03
+
+Ingested source summary (2026-06-09).
+
+## Entities
+- [[major-revisions|Major Revisions]] (CONCEPT)
+- [[smart-citation-badges|Smart Citation badges]] (CONCEPT)
+- [[likelihood-of-acceptance|likelihood of acceptance]] (CONCEPT)
+- [[objective-evaluation|objective evaluation]] (CONCEPT)
+- [[ai-powered-journal-suggester|AI-powered Journal Suggester]] (TOOL)
+- [[conception|conception]] (CONCEPT)
+- [[scopus|Scopus]] (TOOL)
+- [[explicit-page-and-line-numbers|explicit page and line numbers]] (CONCEPT)
+- [[civility|civility]] (CONCEPT)
+- [[authorship-changes-made-without-notification|authorship changes made without notification]] (CONCEPT)
+- [[scientific-ideas|scientific ideas]] (CONCEPT)
+- [[hallucination-of-fabricated-citations|hallucination of fabricated citations]] (CONCEPT)
+- [[acknowledgments-section|Acknowledgments section]] (DOCUMENT)
+- [[unverified-or-flawed-research|unverified or flawed research]] (CONCEPT)
+- [[fair-principles|FAIR principles]] (CONCEPT)
+- [[stem-fields|STEM fields]] (CONCEPT)
+- [[global-south|Global South]] (CONCEPT)
+- [[worldwide-knowledge-community|worldwide knowledge community]] (CONCEPT)
+- [[adversarial-barriers|adversarial barriers]] (CONCEPT)
+- [[criticism-from-the-author|criticism from the author]] (CONCEPT)
+- [[orcid|ORCID]] (TOOL)
+- [[expressions-of-concern|Expressions of Concern]] (CONCEPT)
+- [[retractions|Retractions]] (CONCEPT)
+- [[speed-metrics|speed metrics]] (CONCEPT)
+- [[submission-agents|submission agents]] (ORGANIZATION)
+- [[negative-results|negative results]] (CONCEPT)
+- [[prejudice|prejudice]] (CONCEPT)
+- [[top-tier-journals|top-tier journals]] (CONCEPT)
+- [[open-access|open access]] (CONCEPT)
+- [[opaque-data|opaque data]] (CONCEPT)
+- [[clarity|clarity]] (CONCEPT)
+- [[study-s-integrity|study's integrity]] (CONCEPT)
+- [[ethical-policies|ethical policies]] (CONCEPT)
+- [[statistician|statistician]] (PERSON)
+- [[intellectual-contribution|intellectual contribution]] (CONCEPT)
+- [[primary-databases|primary databases]] (SYSTEM)
+- [[home-institutions|home institutions]] (ORGANIZATION)
+- [[open-science-frameworks|open science frameworks]] (CONCEPT)
+- [[clear-prose|clear prose]] (CONCEPT)
+- [[order-of-authors|order of authors]] (CONCEPT)
+- [[fear-of-retaliation|fear of retaliation]] (CONCEPT)
+- [[taylor-francis|Taylor & Francis]] (ORGANIZATION)
+- [[immediate-payment|immediate payment]] (CONCEPT)
+- [[modern-digital-submission-systems|modern digital submission systems]] (SYSTEM)
+- [[methods-section|Methods section]] (DOCUMENT)
+- [[removals|Removals]] (CONCEPT)
+- [[methodological-rigor|methodological rigor]] (CONCEPT)
+- [[niche-work|niche work]] (CONCEPT)
+- [[subscription-model|subscription model]] (CONCEPT)
+- [[flaws-in-methodology|flaws in methodology]] (CONCEPT)
+- [[polite-feedback|polite feedback]] (CONCEPT)
+- [[manuscript-s-prestige|manuscript's prestige]] (CONCEPT)
+- [[algorithmic-layouts|algorithmic layouts]] (CONCEPT)
+- [[post-publication-open-peer-review-model|post-publication open peer review model]] (CONCEPT)
+- [[grammatical-errors|grammatical errors]] (CONCEPT)
+- [[different-font-colors|different font colors]] (TOOL)
+- [[updated-statistical-analyses|updated statistical analyses]] (CONCEPT)
+- [[legal-entities|legal entities]] (CONCEPT)
+- [[moral-agency|moral agency]] (CONCEPT)
+- [[scaffold-for-writing|scaffold for writing]] (CONCEPT)
+- [[open-data-badges|Open Data badges]] (CONCEPT)
+- [[dimensions|Dimensions]] (TOOL)
+- [[financial-conflicts-of-interest|financial conflicts of interest]] (CONCEPT)
+- [[scholarly-effort|scholarly effort]] (CONCEPT)
+- [[open-peer-review|Open Peer Review]] (CONCEPT)
+- [[algorithmic-bias|algorithmic bias]] (CONCEPT)
+- [[academic-misconduct|academic misconduct]] (CONCEPT)
+- [[grammar|grammar]] (CONCEPT)
+- [[ethical-conduct|ethical conduct]] (CONCEPT)
+- [[underleaf|Underleaf]] (TOOL)
+- [[journal-citation-reports|Journal Citation Reports]] (TOOL)
+- [[unsolicited-emails|unsolicited emails]] (CONCEPT)
+- [[subject-matter-experts|subject matter experts]] (PERSON)
+- [[direct-quotes-from-the-revised-text|direct quotes from the revised text]] (CONCEPT)
+- [[reviewer-misunderstands-a-methodology|reviewer misunderstands a methodology]] (CONCEPT)
+- [[ethical-dissemination|ethical dissemination]] (CONCEPT)
+- [[think-check-submit|Think.Check.Submit.]] (TOOL)
+- [[publication-ethics-bodies|publication ethics bodies]] (ORGANIZATION)
+- [[appreciation|appreciation]] (CONCEPT)
+- [[fairness|fairness]] (CONCEPT)
+- [[version-of-record-vor|Version of Record (VoR)]] (DOCUMENT)
+- [[discoveries|discoveries]] (CONCEPT)
+- [[datasets|datasets]] (CONCEPT)
+- [[exact-versions-and-applications|exact versions and applications]] (CONCEPT)
+- [[resource-constrained-regions|resource-constrained regions]] (CONCEPT)
+- [[latex|LaTeX]] (TOOL)
+- [[unfeasibly-long-or-short-author-lists|unfeasibly long or short author lists]] (CONCEPT)
+- [[triple-blind-peer-review|Triple-Blind Peer Review]] (CONCEPT)
+- [[experimental-design|experimental design]] (CONCEPT)
+- [[mathematical-typography|mathematical typography]] (CONCEPT)
+- [[reproducible-data-management|reproducible data management]] (CONCEPT)
+- [[access-programs|access programs]] (PROJECT)
+- [[academic-record|academic record]] (CONCEPT)
+- [[unethical-practices|unethical practices]] (CONCEPT)
+- [[questions-related-to-any-part-of-the-work|questions related to any part of the work]] (CONCEPT)
+- [[crossref|CrossRef]] (TOOL)
+- [[credit-taxonomy|CRediT taxonomy]] (CONCEPT)
+- [[collaborative-review|Collaborative Review]] (CONCEPT)
+- [[author-s-gender|author's gender]] (CONCEPT)
+- [[requested-change|requested change]] (CONCEPT)
+- [[generated-tables|generated tables]] (CONCEPT)
+- [[analysis-of-data|analysis of data]] (CONCEPT)
+- [[local-researchers|local researchers]] (PERSON)
+- [[formatting|formatting]] (CONCEPT)
+- [[revising-it-critically-for-intellectual-content|revising it critically for intellectual content]] (CONCEPT)
+- [[acquisition-of-data|acquisition of data]] (CONCEPT)
+- [[author-s-nationality|author's nationality]] (CONCEPT)
+- [[explanation-of-changes|explanation of changes]] (CONCEPT)
+- [[constructive-feedback|constructive feedback]] (CONCEPT)
+- [[cross-references|cross-references]] (CONCEPT)
+- [[robust-rationale|robust rationale]] (CONCEPT)
+- [[cumulative-edifice-of-human-knowledge|cumulative edifice of human knowledge]] (CONCEPT)
+- [[policy-data|policy data]] (CONCEPT)
+- [[drafting-the-work|drafting the work]] (CONCEPT)
+- [[reciprocal-favor|reciprocal favor]] (CONCEPT)
+- [[funding-data|funding data]] (CONCEPT)
+- [[specific-points|specific points]] (CONCEPT)
+- [[word|Word]] (TOOL)
+- [[agreement-to-be-accountable-for-all-aspects-of-the-work-s-accuracy-and-integrity|agreement to be accountable for all aspects of the work's accuracy and integrity]] (CONCEPT)
+- [[rebuttal|rebuttal]] (CONCEPT)
+- [[formal-indexing-approvals|formal indexing approvals]] (CONCEPT)
+- [[completeness|completeness]] (CONCEPT)
+- [[personal-obligation|personal obligation]] (CONCEPT)
+- [[professional-respect|professional respect]] (CONCEPT)
+- [[data-interpretation|data interpretation]] (CONCEPT)
+- [[world-association-of-medical-editors-wame|World Association of Medical Editors (WAME)]] (ORGANIZATION)
+- [[non-native-english-speakers|non-native English speakers]] (PERSON)
+- [[friends|friends]] (PERSON)
+- [[emotional-detachment|emotional detachment]] (CONCEPT)
+- [[double-blind-peer-review|Double-Blind Peer Review]] (CONCEPT)
+- [[scholarly-conversation|scholarly conversation]] (CONCEPT)
+- [[editorial-chain|editorial chain]] (CONCEPT)
+- [[context|context]] (CONCEPT)
+- [[organized-strategic-execution|organized strategic execution]] (CONCEPT)
+- [[open-transparent-review|Open & Transparent Review]] (CONCEPT)
+- [[research-merit|research merit]] (CONCEPT)
+- [[author-s-affiliation|author's affiliation]] (CONCEPT)
+- [[subtly-misspelled-domain-names|subtly misspelled domain names]] (CONCEPT)
+- [[complex-equations|complex equations]] (CONCEPT)
+- [[generative-ai|generative AI]] (SYSTEM)
+- [[response-letter|response letter]] (DOCUMENT)
+- [[jama-network|JAMA Network]] (ORGANIZATION)
+- [[journal-prestige|journal prestige]] (CONCEPT)
+- [[future-readers|future readers]] (PERSON)
+- [[dynamic-democratic-correction|dynamic, democratic correction]] (CONCEPT)
+- [[junior-researcher|junior researcher]] (PERSON)
+- [[citation-metrics|citation metrics]] (CONCEPT)
+- [[original-text|original text]] (DOCUMENT)
+- [[scientific-rigor|scientific rigor]] (CONCEPT)
+- [[pubmed|PubMed]] (TOOL)
+- [[committee-on-publication-ethics-cope|Committee on Publication Ethics (COPE)]] (ORGANIZATION)
+- [[holistic-quality-benchmarks|holistic quality benchmarks]] (CONCEPT)
+- [[reviewers|reviewers]] (PERSON)
+- [[orthographic-errors|orthographic errors]] (CONCEPT)
+- [[artificial-intelligence|Artificial Intelligence]] (CONCEPT)
+- [[large-language-models-llms|Large Language Models (LLMs)]] (SYSTEM)
+- [[inaccurate-journal-scopes|inaccurate journal scopes]] (CONCEPT)
+- [[psychological-dynamics|psychological dynamics]] (CONCEPT)
+- [[diagnostic-signal|diagnostic signal]] (CONCEPT)
+- [[final-approval-of-the-version-to-be-published|final approval of the version to be published]] (CONCEPT)
+- [[contributor-roles|contributor roles]] (CONCEPT)
+- [[editorial-board-transparency|editorial board transparency]] (CONCEPT)
+- [[ommwriter|OmmWriter]] (TOOL)
+- [[star-program|STAR program]] (PROJECT)
+- [[mellel|Mellel]] (TOOL)
+- [[single-blind-peer-review|Single-Blind Peer Review]] (CONCEPT)
+- [[complete-anonymity|complete anonymity]] (CONCEPT)
+- [[manuscript-s-success|manuscript's success]] (CONCEPT)
+- [[editor|editor]] (PERSON)
+- [[code-structure|code structure]] (CONCEPT)
+- [[micro-typography|micro-typography]] (CONCEPT)
+- [[patent-data|patent data]] (CONCEPT)
+- [[predatory-publishers|predatory publishers]] (ORGANIZATION)
+- [[human-authors|human authors]] (PERSON)
+- [[strict-ethical-codes|strict ethical codes]] (CONCEPT)
+- [[page-line-metrics|page/line metrics]] (CONCEPT)
+- [[low-and-middle-income-countries-lmics|low- and middle-income countries (LMICs)]] (CONCEPT)
+- [[f1000research|F1000Research]] (ORGANIZATION)
+- [[plagiarism|plagiarism]] (CONCEPT)
+- [[peer-review-system|peer review system]] (CONCEPT)
+- [[scite|scite]] (TOOL)
+- [[senior-scholars|senior scholars]] (PERSON)
+- [[journal-impact-factor-jif|Journal Impact Factor (JIF)]] (CONCEPT)
+- [[global-research-equity|global research equity]] (CONCEPT)
+- [[unresponsive-corresponding-authors|unresponsive corresponding authors]] (PERSON)
+- [[dissemination-of-science|dissemination of science]] (CONCEPT)
+- [[international-committee-of-medical-journal-editors-icmje|International Committee of Medical Journal Editors (ICMJE)]] (ORGANIZATION)
+- [[corrections|Corrections]] (CONCEPT)
+- [[intellectual-accountability|intellectual accountability]] (CONCEPT)
+- [[bibliography-management|bibliography management]] (CONCEPT)
+- [[conclusions-drawn|conclusions drawn]] (CONCEPT)
+- [[copyright|copyright]] (CONCEPT)
+
+## Relations
+- LaTeX → RELATED_TO → STEM fields
+- LaTeX → RELATED_TO → mathematical typography
+- LaTeX → RELATED_TO → complex equations
+- LaTeX → RELATED_TO → algorithmic layouts
+- LaTeX → RELATED_TO → bibliography management
+- LaTeX → RELATED_TO → cross-references
+- Mellel → RELATED_TO → LaTeX
+- Journal Impact Factor (JIF) → RELATED_TO → journal prestige
+- Scopus → PART_OF → holistic quality benchmarks
+- PubMed → PART_OF → holistic quality benchmarks
+- AI-powered Journal Suggester → USES → citation metrics
+- AI-powered Journal Suggester → USES → speed metrics
+- scite → RELATED_TO → Smart Citation badges
+- Dimensions → RELATED_TO → funding data
+- Dimensions → RELATED_TO → policy data
+- Dimensions → RELATED_TO → patent data
+- F1000Research → USES → post-publication open peer review model
+- Think.Check.Submit. → RELATED_TO → predatory publishers
+- Taylor & Francis → RELATED_TO → STAR program
+- STAR program → RELATED_TO → Global South
+- STAR program → RELATED_TO → resource-constrained regions
+- CRediT taxonomy → RELATED_TO → contributor roles
+- ORCID → RELATED_TO → contributor roles
+- International Committee of Medical Journal Editors (ICMJE) → RELATED_TO → Artificial Intelligence
+- Committee on Publication Ethics (COPE) → RELATED_TO → Artificial Intelligence
+- World Association of Medical Editors (WAME) → RELATED_TO → Artificial Intelligence
+- JAMA Network → RELATED_TO → Artificial Intelligence
+- FAIR principles → RELATED_TO → Open Data badges
+- Open Peer Review → RELATED_TO → F1000Research
+- Single-Blind Peer Review → RELATED_TO → fear of retaliation
+- Single-Blind Peer Review → RELATED_TO → criticism from the author
+- Double-Blind Peer Review → RELATED_TO → research merit
+- Double-Blind Peer Review → RELATED_TO → prejudice
+- Triple-Blind Peer Review → RELATED_TO → editorial chain
+- Open & Transparent Review → RELATED_TO → intellectual accountability
+- Open & Transparent Review → RELATED_TO → civility
+- Collaborative Review → RELATED_TO → adversarial barriers
+- Collaborative Review → RELATED_TO → objective evaluation
+- post-publication open peer review model → RELATED_TO → dissemination of science
+- post-publication open peer review model → RELATED_TO → dynamic, democratic correction
+- reviewers → RELATED_TO → non-native English speakers
+- reviewers → RELATED_TO → specific points
+- reviewers → RELATED_TO → page/line metrics
+- polite feedback → RELATED_TO → research
+- reviewers → RELATED_TO → subject matter experts
+- response letter → RELATED_TO → Major Revisions
+- response letter → RELATED_TO → rebuttal
+- response letter → RELATED_TO → explanation of changes
+- requested change → RELATED_TO → authors
+- reviewer misunderstands a methodology → RELATED_TO → study's integrity
+- reviewer misunderstands a methodology → RELATED_TO → robust rationale
+- original text → RELATED_TO → future readers
+- updated statistical analyses → RELATED_TO → data interpretation
+- generated tables → RELATED_TO → data interpretation
+- authorship changes made without notification → RELATED_TO → intellectual accountability
+- International Committee of Medical Journal Editors (ICMJE) → RELATED_TO → unethical practices
+- Committee on Publication Ethics (COPE) → RELATED_TO → unethical practices
+- authorship changes made without notification → RELATED_TO → conception
+- authorship changes made without notification → RELATED_TO → experimental design
+- authorship changes made without notification → RELATED_TO → acquisition of data
+- authorship changes made without notification → RELATED_TO → analysis of data
+- authorship changes made without notification → RELATED_TO → drafting the work
+- authorship changes made without notification → RELATED_TO → revising it critically for intellectual content
+- authorship changes made without notification → RELATED_TO → final approval of the version to be published
+- authorship changes made without notification → RELATED_TO → agreement to be accountable for all aspects of the work's accuracy and integrity
+- authorship changes made without notification → RELATED_TO → questions related to any part of the work
+- authorship changes made without notification → RELATED_TO → order of authors
+- authorship changes made without notification → RELATED_TO → academic misconduct
+- unfeasibly long or short author lists → RELATED_TO → authorship changes made without notification
+- unresponsive corresponding authors → RELATED_TO → authorship changes made without notification
+- local researchers → RELATED_TO → low- and middle-income countries (LMICs)
+- local researchers → RELATED_TO → fairness
+- local researchers → RELATED_TO → context
+- Corrections → RELATED_TO → Version of Record (VoR)
+- Expressions of Concern → RELATED_TO → Version of Record (VoR)
+- Retractions → RELATED_TO → Version of Record (VoR)
+- Removals → RELATED_TO → Version of Record (VoR)
+- Large Language Models (LLMs) → RELATED_TO → publication ethics bodies
+- generative AI → RELATED_TO → publication ethics bodies
+- Artificial Intelligence → RELATED_TO → legal entities
+- Artificial Intelligence → RELATED_TO → moral agency
+- Artificial Intelligence → RELATED_TO → copyright
+- Artificial Intelligence → RELATED_TO → financial conflicts of interest
+- Artificial Intelligence → RELATED_TO → scaffold for writing
+- Artificial Intelligence → RELATED_TO → scientific ideas
+- researchers → USES → grammar
+- researchers → USES → hallucination of fabricated citations
+- researchers → USES → code structure
+- Methods section → RELATED_TO → Artificial Intelligence
+- Acknowledgments section → RELATED_TO → Artificial Intelligence
+- human authors → RELATED_TO → study's integrity
+- human authors → RELATED_TO → agreement to be accountable for all aspects of the work's accuracy and integrity
+- Artificial Intelligence → RELATED_TO → algorithmic bias
+- Artificial Intelligence → RELATED_TO → plagiarism
+- Artificial Intelligence → RELATED_TO → hallucination of fabricated citations
+- manuscript → RELATED_TO → scholarly effort
+- research → RELATED_TO → experimental design
+- research → RELATED_TO → reproducible data management
+- research → RELATED_TO → clear prose
+- research → RELATED_TO → ethical dissemination

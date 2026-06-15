@@ -7,6 +7,14 @@ const REGEN_BASE: f64 = 2.5;
 const REBIRTH_ENERGY: f64 = 30.0;
 const INBOX_ENERGY: f64 = 20.0;
 
+fn finite_or(value: f64, fallback: f64) -> f64 {
+    if value.is_finite() {
+        value
+    } else {
+        fallback
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct EngineState {
     pub tick: u64,
@@ -38,12 +46,12 @@ impl EngineState {
         thought_drain_mod: f64,
     ) -> bool {
         self.tick += 1;
-        self.phase = Phase::from_tension(tension);
+        self.phase = Phase::from_tension(finite_or(tension, 0.0));
 
         if !self.alive {
             // Dead engines attempt rebirth every tick
             // 30% chance per tick (chaos roll > 0.7)
-            if chaos_roll > 0.7 {
+            if finite_or(chaos_roll, 0.0) > 0.7 {
                 self.alive = true;
                 self.energy = REBIRTH_ENERGY;
                 return true; // Rebirth occurred
@@ -52,6 +60,9 @@ impl EngineState {
         }
 
         // Drain scaled for 174 BPM (~3 ticks/sec), amplified by cognitive load
+        let gravity = finite_or(gravity, 9.8).max(0.0);
+        let friction = finite_or(friction, 0.5).max(0.0);
+        let thought_drain_mod = finite_or(thought_drain_mod, 1.0).max(0.0);
         let drain = gravity * friction * 0.02 * self.phase.drain_multiplier() * thought_drain_mod;
 
         // Inverse regen curve: stronger when depleted, zero at full
@@ -71,7 +82,7 @@ impl EngineState {
             self.deaths += 1;
 
             // Spontaneous rebirth: 30% chance (chaos roll > 0.7)
-            if chaos_roll > 0.7 {
+            if finite_or(chaos_roll, 0.0) > 0.7 {
                 self.alive = true;
                 self.energy = REBIRTH_ENERGY;
                 return true;
@@ -96,6 +107,9 @@ impl EngineState {
 
     /// Inject or drain energy from a skill feedback event
     pub fn apply_energy_delta(&mut self, delta: f64) {
+        if !delta.is_finite() {
+            return;
+        }
         self.energy = (self.energy + delta).clamp(ENERGY_MIN, ENERGY_MAX);
         if self.energy <= ENERGY_MIN && self.alive {
             self.alive = false;
@@ -105,6 +119,10 @@ impl EngineState {
 
     /// Inject tension directly (clamped to 0-100)
     pub fn apply_tension_delta(&mut self, current_tension: f64, delta: f64) -> f64 {
+        let current_tension = finite_or(current_tension, 0.0);
+        if !delta.is_finite() {
+            return current_tension.clamp(0.0, 100.0);
+        }
         (current_tension + delta).clamp(0.0, 100.0)
     }
 }
@@ -112,5 +130,29 @@ impl EngineState {
 impl Default for EngineState {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn heartbeat_ignores_non_finite_inputs() {
+        let mut state = EngineState::new();
+        let rebirth = state.tick_heartbeat(f64::NAN, f64::NAN, f64::NAN, f64::NAN, f64::NAN);
+
+        assert!(!rebirth);
+        assert!(state.energy.is_finite());
+        assert_eq!(state.phase, Phase::Idle);
+    }
+
+    #[test]
+    fn energy_delta_ignores_nan() {
+        let mut state = EngineState::new();
+        state.apply_energy_delta(f64::NAN);
+
+        assert_eq!(state.energy, ENERGY_MAX);
+        assert!(state.alive);
     }
 }

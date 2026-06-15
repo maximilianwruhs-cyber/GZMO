@@ -1,0 +1,25 @@
+---
+type: entity
+title: Bazel
+created: 2026-06-08
+updated: 2026-06-08
+sources: 2
+tags: []
+status: draft
+gzmo_synthetic: true
+---
+
+
+# Bazel
+
+Type: TOOL
+
+## From [[high-performance-typescript-execution-and-architec-part2|high-performance-typescript-execution-and-architec-part2]] (2026-06-08)
+- It is a complex structural paradigm used in large-scale enterprise monorepos.
+- It manages inter-dependent TypeScript packages.
+- It provides advantages like unified versioning and centralized tooling.
+
+## From [[drive-research-agentic-typescript-monorepo-context-management|drive-research-agentic-typescript-monorepo-context-management]] (2026-06-08)
+- A structural paradigm used in large-scale enterprise monorepos.
+- Helps manage inter-dependent TypeScript packages.
+- Executes a dependency resolution stage to build a topological graph.

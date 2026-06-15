@@ -1,0 +1,164 @@
+---
+type: source
+title: openclaw-deep-research-part2
+created: 2026-06-08
+updated: 2026-06-08
+sources: 1
+tags: []
+status: stable
+gzmo_synthetic: true
+---
+
+# openclaw-deep-research-part2
+
+Ingested source summary (2026-06-08).
+
+## Entities
+- [[cve-2024-3094|CVE-2024-3094]] (CONCEPT)
+- [[cve-2021-44228|CVE-2021-44228]] (CONCEPT)
+- [[crowdstrike|CrowdStrike]] (ORGANIZATION)
+- [[peter-steinberger|Peter Steinberger]] (PERSON)
+- [[yaml|YAML]] (CONCEPT)
+- [[github-copilot|GitHub Copilot]] (SYSTEM)
+- [[signal|Signal]] (SYSTEM)
+- [[the-verge|The Verge]] (ORGANIZATION)
+- [[shadow|Shadow]] (PERSON)
+- [[the-hacker-news|The Hacker News]] (ORGANIZATION)
+- [[ai-agent-hacker|AI Agent Hacker]] (TOOL)
+- [[openclaw-json|openclaw.json]] (CONCEPT)
+- [[owasp-s-top-10-for-llm-applications|OWASP's Top 10 for LLM Applications]] (CONCEPT)
+- [[clawhub|ClawHub]] (SYSTEM)
+- [[owasp-foundation|OWASP Foundation]] (ORGANIZATION)
+- [[yara|YARA]] (CONCEPT)
+- [[linux|Linux]] (SYSTEM)
+- [[claude-code|Claude Code]] (SYSTEM)
+- [[moltbot|Moltbot]] (SYSTEM)
+- [[nanobot|Nanobot]] (SYSTEM)
+- [[trend-micro|Trend Micro]] (ORGANIZATION)
+- [[platformer|Platformer]] (ORGANIZATION)
+- [[datacamp|DataCamp]] (ORGANIZATION)
+- [[lighthouse|Lighthouse]] (SYSTEM)
+- [[virustotal|VirusTotal]] (TOOL)
+- [[aws-bedrock-agents|AWS Bedrock Agents]] (TOOL)
+- [[deepseek|DeepSeek]] (SYSTEM)
+- [[bex-tuychiev|Bex Tuychiev]] (PERSON)
+- [[artificial-intelligence|Artificial Intelligence]] (CONCEPT)
+- [[nvd|NVD]] (ORGANIZATION)
+- [[atomic-macos-stealer-amos|Atomic macOS Stealer (AMOS)]] (CONCEPT)
+- [[tom-s-hardware|Tom's Hardware]] (ORGANIZATION)
+- [[developing-llm-applications-with-langchain|Developing LLM Applications with LangChain]] (TOOL)
+- [[livehunt|Livehunt]] (CONCEPT)
+- [[wechat|WeChat]] (SYSTEM)
+- [[tencent-cloud|Tencent Cloud]] (ORGANIZATION)
+- [[nvidia|NVIDIA]] (ORGANIZATION)
+- [[penligent|Penligent]] (ORGANIZATION)
+- [[ai-powered-pentesting-tool|AI-powered Pentesting Tool]] (TOOL)
+- [[moltbook|Moltbook]] (PROJECT)
+- [[ai-agents-with-hugging-face-smolagents|AI Agents with Hugging Face smolagents]] (COURSE)
+- [[supply-chain-vulnerabilities|Supply Chain Vulnerabilities]] (CONCEPT)
+- [[docker|Docker]] (TOOL)
+- [[cisco|Cisco]] (ORGANIZATION)
+- [[nemoclaw|NemoClaw]] (SYSTEM)
+- [[n8n|n8n]] (TOOL)
+- [[anthropic|Anthropic]] (ORGANIZATION)
+- [[clawdbot|Clawdbot]] (SYSTEM)
+- [[ai-assisted-coding-for-developers|AI-Assisted Coding for Developers]] (COURSE)
+- [[dgx-station|DGX Station]] (SYSTEM)
+- [[google-threat-intelligence|Google Threat Intelligence]] (ORGANIZATION)
+- [[litellm|LiteLLM]] (TOOL)
+- [[whatsapp|WhatsApp]] (SYSTEM)
+- [[gpt|GPT]] (SYSTEM)
+- [[rtx-pcs|RTX PCs]] (SYSTEM)
+- [[derrick-mwiti|Derrick Mwiti]] (PERSON)
+- [[toxicskills|ToxicSkills]] (PROJECT)
+- [[cve-2026-25253|CVE-2026-25253]] (CONCEPT)
+- [[z-ai|Z.ai]] (ORGANIZATION)
+- [[discord|Discord]] (SYSTEM)
+- [[snyk|Snyk]] (ORGANIZATION)
+- [[moltmatch|MoltMatch]] (PROJECT)
+- [[openshell|OpenShell]] (SYSTEM)
+- [[curtis-priem|Curtis Priem]] (PERSON)
+- [[dgx-spark-systems|DGX Spark systems]] (SYSTEM)
+- [[prompt-injection|Prompt Injection]] (CONCEPT)
+- [[jack-luo|Jack Luo]] (PERSON)
+- [[nemotron|Nemotron]] (SYSTEM)
+- [[openai|OpenAI]] (ORGANIZATION)
+- [[jensen-huang|Jensen Huang]] (PERSON)
+- [[telegram|Telegram]] (SYSTEM)
+- [[code-insight|Code Insight]] (TOOL)
+- [[austin-chia|Austin Chia]] (PERSON)
+- [[matt-schlicht|Matt Schlicht]] (PERSON)
+- [[chris-malachowsky|Chris Malachowsky]] (PERSON)
+
+## Relations
+- openclaw.json → USES → Tencent Cloud
+- openclaw.json → USES → Lighthouse
+- Clawdbot → RELATED_TO → openclaw.json
+- NemoClaw → USES → openclaw.json
+- NemoClaw → AUTHORED_BY → NVIDIA
+- NemoClaw → USES → OpenShell
+- NemoClaw → USES → Nemotron
+- NemoClaw → USES → OpenAI
+- NemoClaw → USES → Anthropic
+- Jensen Huang → PART_OF → NVIDIA
+- Chris Malachowsky → PART_OF → NVIDIA
+- Curtis Priem → PART_OF → NVIDIA
+- CrowdStrike → RELATED_TO → openclaw.json
+- NemoClaw → RELATED_TO → openclaw.json
+- NemoClaw → USES → YAML
+- NemoClaw → USES → Linux
+- Jensen Huang → RELATED_TO → openclaw.json
+- Jensen Huang → RELATED_TO → Linux
+- openclaw.json → USES → Docker
+- NemoClaw → PART_OF → NVIDIA
+- NemoClaw → USES → RTX PCs
+- NemoClaw → USES → DGX Station
+- NemoClaw → USES → DGX Spark systems
+- Derrick Mwiti → RELATED_TO → Artificial Intelligence
+- Derrick Mwiti → RELATED_TO → AI Agents with Hugging Face smolagents
+- openclaw.json → PART_OF → ClawHub
+- openclaw.json → USES → VirusTotal
+- VirusTotal → USES → Code Insight
+- Snyk → RELATED_TO → ToxicSkills
+- Trend Micro → RELATED_TO → Atomic macOS Stealer (AMOS)
+- OWASP Foundation → RELATED_TO → Prompt Injection
+- OWASP Foundation → RELATED_TO → Supply Chain Vulnerabilities
+- NVD → RELATED_TO → CVE-2026-25253
+- The Hacker News → RELATED_TO → openclaw.json
+- The Hacker News → RELATED_TO → VirusTotal
+- Tom's Hardware → RELATED_TO → ClawHub
+- The Verge → RELATED_TO → ClawHub
+- Nanobot → RELATED_TO → openclaw.json
+- Austin Chia → RELATED_TO → openclaw.json
+- Claude Code → RELATED_TO → openclaw.json
+- Claude Code → PART_OF → Anthropic
+- Bex Tuychiev → RELATED_TO → openclaw.json
+- Derrick Mwiti → AUTHORED_BY → Nanobot
+- Derrick Mwiti → AUTHORED_BY → openclaw.json
+- Derrick Mwiti → AUTHORED_BY → Claude Code
+- Austin Chia → AUTHORED_BY → openclaw.json
+- Bex Tuychiev → AUTHORED_BY → openclaw.json
+- Snyk → AUTHORED_BY → ToxicSkills
+- OWASP Foundation → AUTHORED_BY → OWASP's Top 10 for LLM Applications
+- Google Threat Intelligence → RELATED_TO → openclaw.json
+- NVD → RELATED_TO → CVE-2024-3094
+- openclaw.json → RELATED_TO → CVE-2026-25253
+- openclaw.json → RELATED_TO → OWASP's Top 10 for LLM Applications
+- Penligent → RELATED_TO → openclaw.json
+- YARA → RELATED_TO → Livehunt
+- AI-powered Pentesting Tool → PART_OF → Penligent
+- Peter Steinberger → AUTHORED_BY → openclaw.json
+- Moltbot → RELATED_TO → openclaw.json
+- Anthropic → RELATED_TO → Clawdbot
+- Moltbook → AUTHORED_BY → Matt Schlicht
+- Moltbook → USES → openclaw.json
+- openclaw.json → USES → GitHub Copilot
+- openclaw.json → USES → DeepSeek
+- openclaw.json → USES → WeChat
+- Tencent Cloud → USES → openclaw.json
+- Z.ai → USES → openclaw.json
+- Peter Steinberger → RELATED_TO → OpenAI
+- openclaw.json → USES → GPT
+- openclaw.json → USES → Claude Code
+- openclaw.json → USES → Signal
+- openclaw.json → USES → Telegram

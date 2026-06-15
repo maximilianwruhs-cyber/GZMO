@@ -3,7 +3,7 @@ use anyhow::Result;
 use chrono::Utc;
 
 use gzmo_core::config::GzmoConfig;
-use gzmo_core::gateway::{TurboQuantGateway, VllmConfig, LlmGateway};
+use gzmo_core::gateway::{TurboQuantGateway, VllmConfig};
 use gzmo_core::identity::IdentityEngine;
 use gzmo_core::memory::vault::SqliteVault;
 use gzmo_core::memory::episodic::FileEpisodicStore;
@@ -16,8 +16,8 @@ use gzmo_core::tools::sysadmin::{SysMetricsTool, SysKillTool};
 use gzmo_core::tools::web::WebSearchTool;
 use gzmo_core::tools::web_browse::WebBrowseTool;
 use gzmo_core::tools::memory::{MemoryRecordTool, MemorySearchTool};
-use gzmo_core::skills::{SkillRegistry as ChaosSkillRegistry, SkillType};
-use gzmo_core::skills::{dice::DiceSkill, sound::SoundSkill, poker::PokerSkill, quote::QuoteSkill, calculate::CalculateSkill, help::HelpSkill, visual::VisualSkill};
+use gzmo_core::skills::{SkillRegistry, SkillType, NestedDispatch};
+use gzmo_core::skills::registry::build_chaos_skill_registry;
 use gzmo_chaos::triggers::{TriggerEngine, TriggerAction, NotifyLevel};
 
 use crate::tui::action::Action;
@@ -43,52 +43,7 @@ async fn boot_knowledge_graph(tools: &ToolRegistry) -> Option<String> {
         return None;
     }
 
-    let graph: serde_json::Value = serde_json::from_str(&result.output).ok()?;
-    let mut block = String::from("\n\n## Persistent Memory (Knowledge Graph)\n\n");
-    let mut has_content = false;
-
-    if let Some(entities) = graph.get("entities").and_then(|e| e.as_array()) {
-        for entity in entities {
-            let name = entity.get("name").and_then(|n| n.as_str()).unwrap_or("?");
-            let etype = entity.get("type")
-                .or_else(|| entity.get("entityType"))
-                .and_then(|t| t.as_str())
-                .unwrap_or("?");
-            block.push_str(&format!("- **{}** ({})", name, etype));
-            if let Some(obs) = entity.get("observations").and_then(|o| o.as_array()) {
-                let obs_strs: Vec<&str> = obs.iter().filter_map(|o| o.as_str()).collect();
-                if !obs_strs.is_empty() {
-                    block.push_str(&format!(": {}", obs_strs.join("; ")));
-                }
-            }
-            block.push('\n');
-            has_content = true;
-        }
-    }
-
-    if let Some(relations) = graph.get("relations").and_then(|r| r.as_array()) {
-        if !relations.is_empty() {
-            block.push_str("\nRelationships:\n");
-            for rel in relations {
-                let from = rel.get("source")
-                    .or_else(|| rel.get("from"))
-                    .and_then(|f| f.as_str())
-                    .unwrap_or("?");
-                let to = rel.get("target")
-                    .or_else(|| rel.get("to"))
-                    .and_then(|t| t.as_str())
-                    .unwrap_or("?");
-                let rtype = rel.get("type")
-                    .or_else(|| rel.get("relationType"))
-                    .and_then(|r| r.as_str())
-                    .unwrap_or("?");
-                block.push_str(&format!("- {} -> ({}) -> {}\n", from, rtype, to));
-                has_content = true;
-            }
-        }
-    }
-
-    if has_content { Some(block) } else { None }
+    gzmo_core::kg_reconcile::format_knowledge_graph_boot_context(&result.output)
 }
 
 /// Boot and run the full-screen TUI interface.
@@ -122,26 +77,8 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
     let chaos_snapshot_rx = chaos_handle.snapshot_rx.clone();
     let chaos_feedback_tx = chaos_runtime.feedback_tx.clone();
 
-    // ─── Chaos Skills (Rust-native) ─────────────────────
-    let mut chaos_skills = ChaosSkillRegistry::new();
-    chaos_skills.register(Arc::new(DiceSkill));
-    chaos_skills.register(Arc::new(SoundSkill));
-    chaos_skills.register(Arc::new(PokerSkill));
-    chaos_skills.register(Arc::new(QuoteSkill));
-    chaos_skills.register(Arc::new(CalculateSkill));
-    chaos_skills.register(Arc::new(VisualSkill));
-    // Build help entries from registered skills
-    let help_entries: Vec<(String, String, &'static str)> = chaos_skills.all().iter().map(|s| {
-        let type_label = match s.skill_type() {
-            SkillType::Mechanical => "mechanical",
-            SkillType::Generative => "generative",
-            SkillType::Mutation => "mutation",
-            SkillType::Info => "info",
-        };
-        (s.name().to_string(), s.description().to_string(), type_label)
-    }).collect();
-    chaos_skills.register(Arc::new(HelpSkill { entries: help_entries }));
-    let chaos_skills = Arc::new(chaos_skills);
+    // ─── Chaos Skills (full Rust pantheon) ─────────────────────
+    let chaos_skills = Arc::new(build_chaos_skill_registry(&config.pedagogy));
 
     // ─── Tools ───────────────────────────────────────────────────
     let mut tools = ToolRegistry::new();

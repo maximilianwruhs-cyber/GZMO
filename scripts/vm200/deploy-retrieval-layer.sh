@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Deploy VM200 (:110) as GZMO retrieval GPU: embed :8081, retire legacy 7B :8080.
+# DEPRECATED — use deploy-retrieval-router.sh (unified :8081 router).
+# Legacy: standalone embed :8081 only.
 set -euo pipefail
 
 VM_HOST="${GZMO_VM200_HOST:-192.168.31.110}"

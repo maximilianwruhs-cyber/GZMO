@@ -12,7 +12,7 @@ use gzmo_core::memory::episodic::FileEpisodicStore;
 use gzmo_core::memory::vault::SqliteVault;
 use gzmo_core::session::SessionManager;
 use gzmo_core::tools::ToolRegistry;
-use gzmo_core::skills::{SkillRegistry as ChaosSkillRegistry, SkillContext};
+use gzmo_core::skills::{dispatch, NestedDispatch, SkillRegistry};
 use gzmo_chaos::pulse::ChaosSnapshot;
 use gzmo_chaos::feedback::ChaosEvent;
 
@@ -37,7 +37,7 @@ pub struct AgentComponent {
     pub session_name: Option<String>,
     pub session_created_at: chrono::DateTime<Utc>,
     pub chaos_snapshot_rx: tokio::sync::watch::Receiver<ChaosSnapshot>,
-    pub chaos_skills: Arc<ChaosSkillRegistry>,
+    pub chaos_skills: Arc<SkillRegistry>,
     pub chaos_feedback_tx: tokio::sync::mpsc::Sender<ChaosEvent>,
     pub config: Arc<tokio::sync::RwLock<gzmo_core::config::GzmoConfig>>,
     pub config_path: std::path::PathBuf,
@@ -57,7 +57,7 @@ impl AgentComponent {
         episodic: Arc<FileEpisodicStore>,
         session_mgr: Arc<SessionManager>,
         chaos_snapshot_rx: tokio::sync::watch::Receiver<ChaosSnapshot>,
-        chaos_skills: Arc<ChaosSkillRegistry>,
+        chaos_skills: Arc<SkillRegistry>,
         chaos_feedback_tx: tokio::sync::mpsc::Sender<ChaosEvent>,
         config: Arc<tokio::sync::RwLock<gzmo_core::config::GzmoConfig>>,
         config_path: std::path::PathBuf,
@@ -180,14 +180,28 @@ impl Component for AgentComponent {
             let snap = self.chaos_snapshot_rx.borrow().clone();
             let feedback_tx = self.chaos_feedback_tx.clone();
             let action_tx = self.action_tx.as_ref().unwrap().clone();
+            let gateway = Arc::clone(&self.gateway);
+            let config = Arc::clone(&self.config);
 
             tokio::spawn(async move {
                 if skills.has(&skill_name) {
-                    let ctx = SkillContext {
-                        chaos: &snap,
-                        feedback_tx: &feedback_tx,
-                        args: &args,
+                    let gw = gateway.read().await;
+                    let cfg = config.read().await;
+                    let profile = cfg.engine.active_engine();
+                    let nested = NestedDispatch {
+                        registry: Some(skills.as_ref()),
+                        profile: Some(&profile),
+                        depth: 0,
                     };
+                    let ctx = dispatch::skill_context(
+                        &snap,
+                        &feedback_tx,
+                        &args,
+                        Some(gw.as_ref() as &dyn gzmo_core::gateway::LlmGateway),
+                        None,
+                        &cfg,
+                        nested,
+                    );
                     match skills.get(&skill_name).unwrap().execute(ctx).await {
                         Ok(output) => {
                             // Strip ANSI for transcript display
@@ -383,7 +397,7 @@ struct SlashCommandContext {
     session_name: Option<String>,
     session_created_at: chrono::DateTime<Utc>,
     chaos_snapshot_rx: tokio::sync::watch::Receiver<ChaosSnapshot>,
-    chaos_skills: Arc<ChaosSkillRegistry>,
+    chaos_skills: Arc<SkillRegistry>,
     chaos_feedback_tx: tokio::sync::mpsc::Sender<ChaosEvent>,
     config: Arc<tokio::sync::RwLock<gzmo_core::config::GzmoConfig>>,
     config_path: std::path::PathBuf,
@@ -648,11 +662,23 @@ impl SlashCommandContext {
 
                 if self.chaos_skills.has(skill_cmd) {
                     let snap = self.chaos_snapshot_rx.borrow().clone();
-                    let ctx = SkillContext {
-                        chaos: &snap,
-                        feedback_tx: &self.chaos_feedback_tx,
-                        args,
+                    let gw = self.gateway.read().await;
+                    let cfg = self.config.read().await;
+                    let profile = cfg.engine.active_engine();
+                    let nested = NestedDispatch {
+                        registry: Some(self.chaos_skills.as_ref()),
+                        profile: Some(&profile),
+                        depth: 0,
                     };
+                    let ctx = dispatch::skill_context(
+                        &snap,
+                        &self.chaos_feedback_tx,
+                        args,
+                        Some(gw.as_ref() as &dyn gzmo_core::gateway::LlmGateway),
+                        None,
+                        &cfg,
+                        nested,
+                    );
                     match self.chaos_skills.get(skill_cmd).unwrap().execute(ctx).await {
                         Ok(output) => {
                             // 1. Clean for TUI display (strip ANSI but keep ASCII formatting)

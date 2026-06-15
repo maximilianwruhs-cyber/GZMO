@@ -54,24 +54,24 @@ EMBED_MODEL="${EMBED_MODEL:-$(
 import tomllib, pathlib
 p = pathlib.Path('${ROOT}/gzmo.toml')
 d = tomllib.loads(p.read_text())
-print(d.get('embeddings', {}).get('model', 'Qwen3-Embedding-0.6B-Q8_0.gguf'))
-" 2>/dev/null || echo 'Qwen3-Embedding-0.6B-Q8_0.gguf'
+print(d.get('embeddings', {}).get('model', 'gzmo-embed'))
+" 2>/dev/null || echo 'gzmo-embed'
 )}"
 RERANK_URL="${RERANK_PROBE_URL:-$(
   python3 -c "
 import tomllib, pathlib
 p = pathlib.Path('${ROOT}/gzmo.toml')
 d = tomllib.loads(p.read_text())
-print(d.get('rerank', {}).get('url', 'http://192.168.31.110:8082/v1').rstrip('/'))
-" 2>/dev/null || echo 'http://192.168.31.110:8082/v1'
+print(d.get('rerank', {}).get('url', 'http://192.168.31.110:8081/v1').rstrip('/'))
+" 2>/dev/null || echo 'http://192.168.31.110:8081/v1'
 )}"
 RERANK_MODEL="${RERANK_MODEL:-$(
   python3 -c "
 import tomllib, pathlib
 p = pathlib.Path('${ROOT}/gzmo.toml')
 d = tomllib.loads(p.read_text())
-print(d.get('rerank', {}).get('model', 'bge-reranker-v2-m3-q8_0.gguf'))
-" 2>/dev/null || echo 'bge-reranker-v2-m3-q8_0.gguf'
+print(d.get('rerank', {}).get('model', 'gzmo-rerank'))
+" 2>/dev/null || echo 'gzmo-rerank'
 )}"
 REDIS_URL="${REDIS_PROBE_URL:-$(
   python3 -c "
@@ -102,14 +102,29 @@ rerank_api_ok() {
 }
 
 redis_ping_ok() {
-  local host port reply
+  local host port
   host="$(python3 -c "from urllib.parse import urlparse; u=urlparse('${REDIS_URL}'); print(u.hostname or '127.0.0.1')")"
   port="$(python3 -c "from urllib.parse import urlparse; u=urlparse('${REDIS_URL}'); print(u.port or 6379)")"
-  reply="$(timeout 3 bash -c "exec 3<>/dev/tcp/${host}/${port} && printf 'PING\r\n' >&3 && head -c 16 <&3" 2>/dev/null || true)"
-  [[ "$reply" == *PONG* ]]
+  python3 -c "
+import socket
+s = socket.create_connection(('${host}', int('${port}')), timeout=3)
+s.sendall(b'PING\r\n')
+reply = s.recv(16).decode(errors='ignore')
+s.close()
+print(reply)
+" 2>/dev/null | grep -q PONG
 }
 
-echo "🏥 Operator preflight (quick) — $(date +%H:%M:%S)"
+GZMO_HEALTH_PERSPECTIVE="${GZMO_HEALTH_PERSPECTIVE:-}"
+if [[ -z "$GZMO_HEALTH_PERSPECTIVE" ]]; then
+  if [[ -f "/.dockerenv" ]]; then
+    GZMO_HEALTH_PERSPECTIVE="container"
+  else
+    GZMO_HEALTH_PERSPECTIVE="host"
+  fi
+fi
+HOSTNAME_VAL="$(hostname 2>/dev/null || echo "unknown")"
+echo "🏥 Operator preflight (quick) [perspective=${GZMO_HEALTH_PERSPECTIVE} hostname=${HOSTNAME_VAL}] — $(date +%H:%M:%S)"
 echo "─────────────────────────────────────────"
 
 # ── 1. Prime :8000 ──
@@ -192,6 +207,15 @@ else
 fi
 
 # ── Summary ──
+echo ""
+if [[ -x "$ROOT/scripts/verify-mcp-json.sh" ]]; then
+  if "$ROOT/scripts/verify-mcp-json.sh" >/dev/null 2>&1; then
+    ok "Repo .mcp.json valid"
+  else
+    warn "Repo .mcp.json missing or empty — Pi cwd MCP may fail"
+    NOTES+=("Run ./scripts/install-shared-mcp.sh or ./scripts/verify-mcp-json.sh")
+  fi
+fi
 echo ""
 echo "════════════════════════════════════════"
 echo -e "  ${GREEN}PASS: $PASS${NC}  ${RED}FAIL: $FAIL${NC}  ${YELLOW}WARN: $WARN${NC}"

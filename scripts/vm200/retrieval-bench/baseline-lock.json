@@ -1,0 +1,55 @@
+{
+  "promoted_at": "2026-06-09T07:54:08.294721+00:00",
+  "run_id": "post-router-qwen3_20260609_074822_post-cutover",
+  "run_dir": "/home/maximilian-wruhs/Projects/_foundation-audit/survey_GZMO/scripts/vm200/retrieval-bench/runs/post-router-qwen3_20260609_074822_post-cutover",
+  "summary": {
+    "run_id": "post-router-qwen3_20260609_074822_post-cutover",
+    "profile": "post-router-qwen3",
+    "timestamp": "2026-06-09T07:48:22.772620+00:00",
+    "embed": {
+      "dims": 1024,
+      "n": 30,
+      "p50_ms": 71.17,
+      "p90_ms": 96.22,
+      "p95_ms": 132.57,
+      "p99_ms": 831.99,
+      "mean_ms": 108.86
+    },
+    "rerank": [
+      {
+        "batch_size": 1,
+        "n": 7,
+        "top_score": 0.009681402705609798,
+        "p50_ms": 133.41,
+        "p95_ms": 201.71
+      },
+      {
+        "batch_size": 5,
+        "n": 7,
+        "top_score": 0.009679838083684444,
+        "p50_ms": 452.6,
+        "p95_ms": 592.99
+      },
+      {
+        "batch_size": 15,
+        "n": 7,
+        "top_score": 0.009688674472272396,
+        "p50_ms": 1205.93,
+        "p95_ms": 1457.6
+      },
+      {
+        "batch_size": 40,
+        "n": 7,
+        "top_score": 0.009688674472272396,
+        "p50_ms": 3121.05,
+        "p95_ms": 3157.9
+      }
+    ],
+    "vram": "unavailable (Command '['ssh', '-i', '/home/maximilian-wruhs/.ssh/id_sidecar_proxmox', '-o', 'BatchMode=yes', 'maximilian@192.168.31.110', 'nvidia-smi --query-gpu=memory.used,memory.total --format=csv,noheader']' returned non-zero exit status 255.)",
+    "memory_search": [
+      {
+        "error": "gzmo binary missing"
+      }
+    ]
+  }
+}

@@ -1,0 +1,236 @@
+---
+type: source
+title: drive-research-die-architektur-der-wissenschaftlichen-forschung
+created: 2026-06-08
+updated: 2026-06-08
+sources: 1
+tags: []
+status: stable
+gzmo_synthetic: true
+---
+
+# drive-research-die-architektur-der-wissenschaftlichen-forschung
+
+Ingested source summary (2026-06-08).
+
+## Entities
+- [[pandas|Pandas]] (TOOL)
+- [[pubmed|PubMed]] (TOOL)
+- [[spider-framework|SPIDER framework]] (CONCEPT)
+- [[scoro|Scoro]] (TOOL)
+- [[version-of-record-vor|Version of Record (VoR)]] (CONCEPT)
+- [[trello|Trello]] (TOOL)
+- [[python|Python]] (TOOL)
+- [[dataverse|Dataverse]] (TOOL)
+- [[european-research-council-erc|European Research Council (ERC)]] (ORGANIZATION)
+- [[strobe|STROBE]] (CONCEPT)
+- [[medical-subject-headings-mesh|Medical Subject Headings (MeSH)]] (CONCEPT)
+- [[paperpile|Paperpile]] (TOOL)
+- [[large-language-models-llms|Large Language Models (LLMs)]] (SYSTEM)
+- [[f1000research|F1000Research]] (PLATFORM)
+- [[stard|STARD]] (CONCEPT)
+- [[external-validity|External Validity]] (CONCEPT)
+- [[post-publication-review|Post-Publication Review]] (CONCEPT)
+- [[arrive|ARRIVE]] (CONCEPT)
+- [[openaire|OpenAIRE]] (ORGANIZATION)
+- [[scite|scite]] (TOOL)
+- [[eclipse-framework|ECLIPSE framework]] (CONCEPT)
+- [[jama-network|JAMA Network]] (ORGANIZATION)
+- [[rspace|RSpace]] (TOOL)
+- [[rmarkdown|RMarkdown]] (TOOL)
+- [[lancet|Lancet]] (ORGANIZATION)
+- [[ggplot2|ggplot2]] (TOOL)
+- [[gpu-jupyter|GPU-Jupyter]] (TOOL)
+- [[matplotlib|Matplotlib]] (TOOL)
+- [[seaborn|Seaborn]] (TOOL)
+- [[leaflet|Leaflet]] (TOOL)
+- [[eudat|EUDAT]] (ORGANIZATION)
+- [[conda-virtual-environments|Conda Virtual Environments]] (TOOL)
+- [[nejm|NEJM]] (ORGANIZATION)
+- [[elsevier|Elsevier]] (ORGANIZATION)
+- [[horizon-europe|Horizon Europe]] (ORGANIZATION)
+- [[deep-learning|Deep Learning]] (CONCEPT)
+- [[scientific-method|Scientific Method]] (CONCEPT)
+- [[data-management-plans-dmps|Data Management Plans (DMPs)]] (CONCEPT)
+- [[open-transparent-review|Open & Transparent Review]] (CONCEPT)
+- [[gift-authorship|Gift Authorship]] (CONCEPT)
+- [[docker|Docker]] (TOOL)
+- [[dmptool|DMPTool]] (TOOL)
+- [[microsoft-excel|Microsoft Excel]] (TOOL)
+- [[single-blind-peer-review|Single-Blind Peer Review]] (CONCEPT)
+- [[mendeley|Mendeley]] (TOOL)
+- [[computational-reproducibility|Computational Reproducibility]] (CONCEPT)
+- [[k-nstliche-intelligenz|Künstliche Intelligenz]] (CONCEPT)
+- [[cochrane-diagnostic-and-screening-test-methods-working-group|Cochrane Diagnostic and Screening Test Methods Working Group]] (ORGANIZATION)
+- [[machine-learning|Machine Learning]] (CONCEPT)
+- [[open-data-mandates|Open-Data Mandates]] (CONCEPT)
+- [[imrad|IMRaD]] (CONCEPT)
+- [[credit-taxonomy|CRediT taxonomy]] (CONCEPT)
+- [[halluzination|Halluzination]] (CONCEPT)
+- [[zenodo|Zenodo]] (TOOL)
+- [[crossref|CrossRef]] (TOOL)
+- [[corrections|Corrections]] (CONCEPT)
+- [[biorender-graph|BioRender Graph]] (TOOL)
+- [[star-program|STAR program]] (PROJECT)
+- [[guest-authorship|Guest Authorship]] (CONCEPT)
+- [[omniplanner|OmniPlanner]] (TOOL)
+- [[algorithmische-voreingenommenheit|algorithmische Voreingenommenheit]] (CONCEPT)
+- [[taylor-francis|Taylor & Francis]] (ORGANIZATION)
+- [[care|CARE]] (CONCEPT)
+- [[d3-js|D3.js]] (TOOL)
+- [[consort|CONSORT]] (CONCEPT)
+- [[grammar-of-graphics|Grammar of Graphics]] (CONCEPT)
+- [[committee-on-publication-ethics-cope|Committee on Publication Ethics (COPE)]] (ORGANIZATION)
+- [[jupyter-notebooks|Jupyter Notebooks]] (TOOL)
+- [[argos|Argos]] (TOOL)
+- [[figshare|Figshare]] (TOOL)
+- [[triple-blind-peer-review|Triple-Blind Peer Review]] (CONCEPT)
+- [[internal-validity|Internal Validity]] (CONCEPT)
+- [[double-blind-peer-review|Double-Blind Peer Review]] (CONCEPT)
+- [[zotero|Zotero]] (TOOL)
+- [[latex|LaTeX]] (TOOL)
+- [[endnote|EndNote]] (TOOL)
+- [[collaborative-review|Collaborative Review]] (CONCEPT)
+- [[nih-data-sharing-policy|NIH Data Sharing Policy]] (ORGANIZATION)
+- [[expressions-of-concern|Expressions of Concern]] (CONCEPT)
+- [[prisma|PRISMA]] (CONCEPT)
+- [[replication-crisis|Replication Crisis]] (CONCEPT)
+- [[think-check-submit|Think.Check.Submit.]] (TOOL)
+- [[orcid|ORCID]] (TOOL)
+- [[open-science|Open Science]] (CONCEPT)
+- [[dmponline|DMPonline]] (TOOL)
+- [[spice-framework|SPICE framework]] (CONCEPT)
+- [[retractions|Retractions]] (CONCEPT)
+- [[medline|MEDLINE]] (SYSTEM)
+- [[mellel|Mellel]] (TOOL)
+- [[digital-curation-centre|Digital Curation Centre]] (ORGANIZATION)
+- [[tableau|Tableau]] (TOOL)
+- [[github|GitHub]] (TOOL)
+- [[finer-criteria|FINER criteria]] (CONCEPT)
+- [[spirit|SPIRIT]] (CONCEPT)
+- [[die-architektur-der-wissenschaftlichen-forschung-prinzipien-der-arbeit-methodologie-und-akademisches-publizieren|Die Architektur der Wissenschaftlichen Forschung: Prinzipien der Arbeit, Methodologie und Akademisches Publizieren]] (BOOK)
+- [[fair-principles|FAIR principles]] (CONCEPT)
+- [[dryad|Dryad]] (TOOL)
+- [[git|Git]] (TOOL)
+- [[journal-impact-factor-jif|Journal Impact Factor (JIF)]] (CONCEPT)
+- [[ghost-authorship|Ghost Authorship]] (CONCEPT)
+- [[bokeh|Bokeh]] (TOOL)
+- [[underleaf|Underleaf]] (TOOL)
+- [[gestalt-principles-of-visual-perception|Gestalt principles of visual perception]] (CONCEPT)
+- [[ki-tools|KI-Tools]] (TOOL)
+- [[international-committee-of-medical-journal-editors-icmje|International Committee of Medical Journal Editors (ICMJE)]] (ORGANIZATION)
+- [[looker|Looker]] (TOOL)
+- [[microsoft-word|Microsoft Word]] (TOOL)
+- [[plagiat|Plagiat]] (CONCEPT)
+- [[data-to-ink-ratio|Data-to-Ink Ratio]] (CONCEPT)
+- [[pickle-jar-theory|Pickle Jar Theory]] (CONCEPT)
+- [[removals|Removals]] (CONCEPT)
+- [[tripod|TRIPOD]] (CONCEPT)
+- [[bmj|BMJ]] (ORGANIZATION)
+- [[dimensions|Dimensions]] (TOOL)
+- [[citavi|Citavi]] (TOOL)
+- [[world-association-of-medical-editors-wame|World Association of Medical Editors (WAME)]] (ORGANIZATION)
+- [[ommwriter|OmmWriter]] (TOOL)
+- [[open-peer-review|Open Peer Review]] (CONCEPT)
+- [[trust-principles|TRUST principles]] (CONCEPT)
+
+## Relations
+- Die Architektur der Wissenschaftlichen Forschung: Prinzipien der Arbeit, Methodologie und Akademisches Publizieren → USES → PubMed
+- Die Architektur der Wissenschaftlichen Forschung: Prinzipien der Arbeit, Methodologie und Akademisches Publizieren → USES → Medical Subject Headings (MeSH)
+- Die Architektur der Wissenschaftlichen Forschung: Prinzipien der Arbeit, Methodologie und Akademisches Publizieren → USES → SPIDER framework
+- Die Architektur der Wissenschaftlichen Forschung: Prinzipien der Arbeit, Methodologie und Akademisches Publizieren → USES → SPICE framework
+- Die Architektur der Wissenschaftlichen Forschung: Prinzipien der Arbeit, Methodologie und Akademisches Publizieren → USES → ECLIPSE framework
+- Die Architektur der Wissenschaftlichen Forschung: Prinzipien der Arbeit, Methodologie und Akademisches Publizieren → USES → FINER criteria
+- Die Architektur der Wissenschaftlichen Forschung: Prinzipien der Arbeit, Methodologie und Akademisches Publizieren → USES → EndNote
+- Die Architektur der Wissenschaftlichen Forschung: Prinzipien der Arbeit, Methodologie und Akademisches Publizieren → USES → Zotero
+- Die Architektur der Wissenschaftlichen Forschung: Prinzipien der Arbeit, Methodologie und Akademisches Publizieren → USES → Mendeley
+- Die Architektur der Wissenschaftlichen Forschung: Prinzipien der Arbeit, Methodologie und Akademisches Publizieren → USES → Citavi
+- Die Architektur der Wissenschaftlichen Forschung: Prinzipien der Arbeit, Methodologie und Akademisches Publizieren → USES → Paperpile
+- Die Architektur der Wissenschaftlichen Forschung: Prinzipien der Arbeit, Methodologie und Akademisches Publizieren → USES → CONSORT
+- Die Architektur der Wissenschaftlichen Forschung: Prinzipien der Arbeit, Methodologie und Akademisches Publizieren → USES → PRISMA
+- Die Architektur der Wissenschaftlichen Forschung: Prinzipien der Arbeit, Methodologie und Akademisches Publizieren → USES → STROBE
+- Die Architektur der Wissenschaftlichen Forschung: Prinzipien der Arbeit, Methodologie und Akademisches Publizieren → USES → STARD
+- Die Architektur der Wissenschaftlichen Forschung: Prinzipien der Arbeit, Methodologie und Akademisches Publizieren → USES → ARRIVE
+- Die Architektur der Wissenschaftlichen Forschung: Prinzipien der Arbeit, Methodologie und Akademisches Publizieren → USES → CARE
+- Die Architektur der Wissenschaftlichen Forschung: Prinzipien der Arbeit, Methodologie und Akademisches Publizieren → USES → SPIRIT
+- Die Architektur der Wissenschaftlichen Forschung: Prinzipien der Arbeit, Methodologie und Akademisches Publizieren → USES → TRIPOD
+- Die Architektur der Wissenschaftlichen Forschung: Prinzipien der Arbeit, Methodologie und Akademisches Publizieren → USES → FAIR principles
+- Die Architektur der Wissenschaftlichen Forschung: Prinzipien der Arbeit, Methodologie und Akademisches Publizieren → USES → DMPonline
+- Die Architektur der Wissenschaftlichen Forschung: Prinzipien der Arbeit, Methodologie und Akademisches Publizieren → USES → Argos
+- Die Architektur der Wissenschaftlichen Forschung: Prinzipien der Arbeit, Methodologie und Akademisches Publizieren → USES → Zenodo
+- Die Architektur der Wissenschaftlichen Forschung: Prinzipien der Arbeit, Methodologie und Akademisches Publizieren → USES → Figshare
+- Die Architektur der Wissenschaftlichen Forschung: Prinzipien der Arbeit, Methodologie und Akademisches Publizieren → USES → Dataverse
+- Die Architektur der Wissenschaftlichen Forschung: Prinzipien der Arbeit, Methodologie und Akademisches Publizieren → USES → Dryad
+- Die Architektur der Wissenschaftlichen Forschung: Prinzipien der Arbeit, Methodologie und Akademisches Publizieren → USES → Python
+- Die Architektur der Wissenschaftlichen Forschung: Prinzipien der Arbeit, Methodologie und Akademisches Publizieren → USES → Jupyter Notebooks
+- Die Architektur der Wissenschaftlichen Forschung: Prinzipien der Arbeit, Methodologie und Akademisches Publizieren → USES → RMarkdown
+- Die Architektur der Wissenschaftlichen Forschung: Prinzipien der Arbeit, Methodologie und Akademisches Publizieren → USES → Git
+- Die Architektur der Wissenschaftlichen Forschung: Prinzipien der Arbeit, Methodologie und Akademisches Publizieren → USES → GitHub
+- Die Architektur der Wissenschaftlichen Forschung: Prinzipien der Arbeit, Methodologie und Akademisches Publizieren → USES → Docker
+- Die Architektur der Wissenschaftlichen Forschung: Prinzipien der Arbeit, Methodologie und Akademisches Publizieren → USES → Conda Virtual Environments
+- Die Architektur der Wissenschaftlichen Forschung: Prinzipien der Arbeit, Methodologie und Akademisches Publizieren → USES → Trello
+- Die Architektur der Wissenschaftlichen Forschung: Prinzipien der Arbeit, Methodologie und Akademisches Publizieren → USES → Scoro
+- Die Architektur der Wissenschaftlichen Forschung: Prinzipien der Arbeit, Methodologie und Akademisches Publizieren → USES → OmniPlanner
+- Die Architektur der Wissenschaftlichen Forschung: Prinzipien der Arbeit, Methodologie und Akademisches Publizieren → USES → Pickle Jar Theory
+- Die Architektur der Wissenschaftlichen Forschung: Prinzipien der Arbeit, Methodologie und Akademisches Publizieren → USES → NIH Data Sharing Policy
+- Die Architektur der Wissenschaftlichen Forschung: Prinzipien der Arbeit, Methodologie und Akademisches Publizieren → USES → European Research Council (ERC)
+- Die Architektur der Wissenschaftlichen Forschung: Prinzipien der Arbeit, Methodologie und Akademisches Publizieren → USES → DMPTool
+- Die Architektur der Wissenschaftlichen Forschung: Prinzipien der Arbeit, Methodologie und Akademisches Publizieren → USES → RSpace
+- Die Architektur der Wissenschaftlichen Forschung: Prinzipien der Arbeit, Methodologie und Akademisches Publizieren → USES → Open Science
+- Die Architektur der Wissenschaftlichen Forschung: Prinzipien der Arbeit, Methodologie und Akademisches Publizieren → USES → TRUST principles
+- Die Architektur der Wissenschaftlichen Forschung: Prinzipien der Arbeit, Methodologie und Akademisches Publizieren → USES → Horizon Europe
+- Die Architektur der Wissenschaftlichen Forschung: Prinzipien der Arbeit, Methodologie und Akademisches Publizieren → USES → OpenAIRE
+- Die Architektur der Wissenschaftlichen Forschung: Prinzipien der Arbeit, Methodologie und Akademisches Publizieren → USES → EUDAT
+- Die Architektur der Wissenschaftlichen Forschung: Prinzipien der Arbeit, Methodologie und Akademisches Publizieren → USES → Scientific Method
+- Die Architektur der Wissenschaftlichen Forschung: Prinzipien der Arbeit, Methodologie und Akademisches Publizieren → USES → Internal Validity
+- Die Architektur der Wissenschaftlichen Forschung: Prinzipien der Arbeit, Methodologie und Akademisches Publizieren → USES → External Validity
+- Die Architektur der Wissenschaftlichen Forschung: Prinzipien der Arbeit, Methodologie und Akademisches Publizieren → USES → Replication Crisis
+- Die Architektur der Wissenschaftlichen Forschung: Prinzipien der Arbeit, Methodologie und Akademisches Publizieren → USES → Data Management Plans (DMPs)
+- Die Architektur der Wissenschaftlichen Forschung: Prinzipien der Arbeit, Methodologie und Akademisches Publizieren → USES → Computational Reproducibility
+- Die Architektur der Wissenschaftlichen Forschung: Prinzipien der Arbeit, Methodologie und Akademisches Publizieren → USES → Data-to-Ink Ratio
+- Die Architektur der Wissenschaftlichen Forschung: Prinzipien der Arbeit, Methodologie und Akademisches Publizieren → USES → Gestalt principles of visual perception
+- Die Architektur der Wissenschaftlichen Forschung: Prinzipien der Arbeit, Methodologie und Akademisches Publizieren → USES → Machine Learning
+- Die Architektur der Wissenschaftlichen Forschung: Prinzipien der Arbeit, Methodologie und Akademisches Publizieren → USES → Deep Learning
+- Die Architektur der Wissenschaftlichen Forschung: Prinzipien der Arbeit, Methodologie und Akademisches Publizieren → USES → Open-Data Mandates
+- Die Architektur der Wissenschaftlichen Forschung: Prinzipien der Arbeit, Methodologie und Akademisches Publizieren → USES → GPU-Jupyter
+- PubMed → PART_OF → MEDLINE
+- Mendeley → RELATED_TO → Elsevier
+- NIH Data Sharing Policy → USES → Data Management Plans (DMPs)
+- European Research Council (ERC) → USES → Data Management Plans (DMPs)
+- DMPonline → PART_OF → Digital Curation Centre
+- Argos → PART_OF → OpenAIRE
+- Argos → PART_OF → EUDAT
+- Zenodo → RELATED_TO → Open-Data Mandates
+- Figshare → RELATED_TO → Open-Data Mandates
+- Dataverse → RELATED_TO → Open-Data Mandates
+- Dryad → RELATED_TO → Open-Data Mandates
+- Python → USES → Computational Reproducibility
+- Jupyter Notebooks → USES → Computational Reproducibility
+- RMarkdown → USES → Computational Reproducibility
+- Git → USES → Computational Reproducibility
+- GitHub → USES → Computational Reproducibility
+- Docker → USES → Computational Reproducibility
+- Conda Virtual Environments → USES → Computational Reproducibility
+- GPU-Jupyter → USES → Machine Learning
+- GPU-Jupyter → USES → Deep Learning
+- NEJM → USES → CONSORT
+- JAMA Network → USES → CONSORT
+- Lancet → USES → CONSORT
+- BMJ → USES → CONSORT
+- Cochrane Diagnostic and Screening Test Methods Working Group → RELATED_TO → STARD
+- Microsoft Excel → RELATED_TO → Computational Reproducibility
+- European Research Council (ERC) → RELATED_TO → Data Management Plans (DMPs)
+- Digital Curation Centre → RELATED_TO → DMPonline
+- OpenAIRE → RELATED_TO → Argos
+- EUDAT → RELATED_TO → Argos
+- ggplot2 → RELATED_TO → Grammar of Graphics
+- Matplotlib → PART_OF → Python ecosystem
+- Seaborn → RELATED_TO → Matplotlib
+- Seaborn → USES → Pandas
+- Seaborn → PART_OF → Python ecosystem
+- Bokeh → PART_OF → Python ecosystem
+- Underleaf → RELATED_TO → LaTeX
+- F1000Research → USES → Open Peer Review
+- Taylor & Francis → USES → STAR program
+- CRediT taxonomy → RELATED_TO → Authorship
+- ORCID → RELATED_TO → Authorship

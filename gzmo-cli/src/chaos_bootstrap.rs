@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::path::PathBuf;
 use std::sync::Arc;
 use tokio::sync::{mpsc, watch, RwLock};
@@ -57,6 +58,39 @@ pub fn spawn_snapshot_bridge(
                 break; // PulseLoop dropped
             }
             let snap = snapshot_rx.borrow_and_update().clone();
+
+            // Drain external skill feedback (Pi / `gzmo chaos skill`)
+            let inbox = state_dir.join("chaos_feedback_inbox.jsonl");
+            let drained = gzmo_chaos::feedback_ipc::drain_inbox(&inbox);
+            if !drained.is_empty() {
+                let mut by_type: HashMap<String, usize> = HashMap::new();
+                for event in &drained {
+                    let label = gzmo_chaos::feedback_ipc::event_type_label(event).to_string();
+                    *by_type.entry(label).or_default() += 1;
+                    let _ = gzmo_chaos::feedback_ipc::append_audit(&state_dir, event, "drained");
+                    let _ = feedback_tx.send(event.clone()).await;
+                }
+                if let Some(ref bus) = synapse {
+                    let count = drained.len();
+                    let summary: Vec<String> = by_type
+                        .iter()
+                        .map(|(k, v)| format!("{k}×{v}"))
+                        .collect();
+                    let display_plain = format!(
+                        "Drained {count} chaos feedback event(s): {}",
+                        summary.join(", ")
+                    );
+                    bus.append(&SynapseEvent::with_data(
+                        EventType::ChaosFeedbackDrained,
+                        synapse_source,
+                        serde_json::json!({
+                            "count": count,
+                            "by_type": by_type,
+                            "display_plain": display_plain,
+                        }),
+                    ));
+                }
+            }
             
             // Update gateway LLM parameters from Lorenz coordinates
             {

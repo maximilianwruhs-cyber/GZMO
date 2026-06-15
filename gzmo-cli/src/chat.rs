@@ -27,8 +27,8 @@ use gzmo_core::tools::web::WebSearchTool;
 use gzmo_core::tools::web_browse::WebBrowseTool;
 use gzmo_core::tools::memory::{MemoryRecordTool, MemorySearchTool};
 use gzmo_core::types::{EpisodicEntry, EpisodicSource, Message, Role};
-use gzmo_core::skills::{SkillRegistry as ChaosSkillRegistry, SkillContext, SkillType};
-use gzmo_core::skills::{dice::DiceSkill, sound::SoundSkill, poker::PokerSkill, quote::QuoteSkill, calculate::CalculateSkill, help::HelpSkill, visual::VisualSkill};
+use gzmo_core::skills::{dispatch, NestedDispatch, SkillRegistry, SkillType};
+use gzmo_core::skills::registry::build_chaos_skill_registry;
 
 
 
@@ -194,25 +194,8 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
         tools.register(Box::new(MemoryRecordTool { vault: Arc::clone(v) }));
     }
 
-    // ─── Chaos Skills (Rust-native, priority over shell) ─────────
-    let mut chaos_skills = ChaosSkillRegistry::new();
-    chaos_skills.register(Arc::new(DiceSkill));
-    chaos_skills.register(Arc::new(SoundSkill));
-    chaos_skills.register(Arc::new(PokerSkill));
-    chaos_skills.register(Arc::new(QuoteSkill));
-    chaos_skills.register(Arc::new(CalculateSkill));
-    chaos_skills.register(Arc::new(VisualSkill));
-    // Build help entries from registered skills
-    let help_entries: Vec<(String, String, &'static str)> = chaos_skills.all().iter().map(|s| {
-        let type_label = match s.skill_type() {
-            SkillType::Mechanical => "mechanical",
-            SkillType::Generative => "generative",
-            SkillType::Mutation => "mutation",
-            SkillType::Info => "info",
-        };
-        (s.name().to_string(), s.description().to_string(), type_label)
-    }).collect();
-    chaos_skills.register(Arc::new(HelpSkill { entries: help_entries }));
+    // ─── Chaos Skills (full Rust pantheon — wild magic cascade needs all skills) ─
+    let chaos_skills: SkillRegistry = build_chaos_skill_registry(&config.pedagogy);
 
     // ─── MCP ─────────────────────────────────────────────────────
     let mut mcp = McpManager::new();
@@ -391,7 +374,7 @@ Use delegate_task for focused sub-work; you receive a short summary, not full su
                 &mut agent_session, &mut session_name, session_created_at,
                 &vault, &mut config, &chaos_snapshot_rx,
                 &chaos_skills, &chaos_feedback_tx,
-                &gateway, &config_path,
+                &gateway, &router, &config_path,
                 &subagent_runner, subagent_enabled,
             ).await? {
                 break; // /quit
@@ -572,11 +555,22 @@ Use delegate_task for focused sub-work; you receive a short summary, not full su
                         if chaos_skills.has(cmd) {
                             eprintln!("  {GOLD}⚡ AUTO: /{cmd} triggered by chaos engine{RESET}");
                             let snap = chaos_snapshot_rx.borrow().clone();
-                            let ctx = SkillContext {
-                                chaos: &snap,
-                                feedback_tx: &chaos_feedback_tx,
-                                args,
+                            let gw = gateway.read().await;
+                            let profile = config.engine.active_engine();
+                            let nested = NestedDispatch {
+                                registry: Some(&chaos_skills),
+                                profile: Some(&profile),
+                                depth: 0,
                             };
+                            let ctx = dispatch::skill_context(
+                                &snap,
+                                &chaos_feedback_tx,
+                                args,
+                                Some(gw.as_ref()),
+                                Some(&router),
+                                &config,
+                                nested,
+                            );
                             match chaos_skills.get(cmd).unwrap().execute(ctx).await {
                                 Ok(output) => eprint!("{}", output.display),
                                 Err(e) => eprintln!("  {RED}Auto-skill error: {e}{RESET}"),
@@ -642,57 +636,11 @@ async fn boot_knowledge_graph(tools: &ToolRegistry) -> Option<String> {
         return None;
     }
 
-    let graph: serde_json::Value = serde_json::from_str(&result.output).ok()?;
-    let mut block = String::from("\n\n## Persistent Memory (Knowledge Graph)\n\n");
-    let mut has_content = false;
-
-    if let Some(entities) = graph.get("entities").and_then(|e| e.as_array()) {
-        for entity in entities {
-            let name = entity.get("name").and_then(|n| n.as_str()).unwrap_or("?");
-            let etype = entity.get("type")
-                .or_else(|| entity.get("entityType"))
-                .and_then(|t| t.as_str())
-                .unwrap_or("?");
-            block.push_str(&format!("- **{}** ({})", name, etype));
-            if let Some(obs) = entity.get("observations").and_then(|o| o.as_array()) {
-                let obs_strs: Vec<&str> = obs.iter().filter_map(|o| o.as_str()).collect();
-                if !obs_strs.is_empty() {
-                    block.push_str(&format!(": {}", obs_strs.join("; ")));
-                }
-            }
-            block.push('\n');
-            has_content = true;
-        }
-    }
-
-    if let Some(relations) = graph.get("relations").and_then(|r| r.as_array()) {
-        if !relations.is_empty() {
-            block.push_str("\nRelationships:\n");
-            for rel in relations {
-                let from = rel.get("source")
-                    .or_else(|| rel.get("from"))
-                    .and_then(|f| f.as_str())
-                    .unwrap_or("?");
-                let to = rel.get("target")
-                    .or_else(|| rel.get("to"))
-                    .and_then(|t| t.as_str())
-                    .unwrap_or("?");
-                let rtype = rel.get("type")
-                    .or_else(|| rel.get("relationType"))
-                    .and_then(|r| r.as_str())
-                    .unwrap_or("?");
-                block.push_str(&format!("- {} -> ({}) -> {}\n", from, rtype, to));
-                has_content = true;
-            }
-        }
-    }
-
-    if has_content {
+    let block = gzmo_core::kg_reconcile::format_knowledge_graph_boot_context(&result.output);
+    if block.is_some() {
         eprintln!("  {COPPER}⚙ Persistent memory loaded from Knowledge Graph{RESET}");
-        Some(block)
-    } else {
-        None
     }
+    block
 }
 
 async fn ping_engine(config: &GzmoConfig) -> (&'static str, String) {
@@ -745,9 +693,10 @@ async fn handle_slash_command(
     vault: &Option<Arc<SqliteVault>>,
     config: &mut GzmoConfig,
     chaos_snapshot_rx: &tokio::sync::watch::Receiver<gzmo_chaos::pulse::ChaosSnapshot>,
-    chaos_skills: &ChaosSkillRegistry,
+    chaos_skills: &SkillRegistry,
     chaos_feedback_tx: &tokio::sync::mpsc::Sender<gzmo_chaos::feedback::ChaosEvent>,
     gateway: &Arc<tokio::sync::RwLock<Arc<dyn LlmGateway>>>,
+    router: &GatewayRouter,
     config_path: &std::path::Path,
     subagent_runner: &Arc<SubagentRunner>,
     subagent_enabled: bool,
@@ -1049,11 +998,22 @@ async fn handle_slash_command(
             // ─── Rust skill dispatch (priority) ───────────────
             if chaos_skills.has(cmd) {
                 let snap = chaos_snapshot_rx.borrow().clone();
-                let ctx = SkillContext {
-                    chaos: &snap,
-                    feedback_tx: chaos_feedback_tx,
-                    args,
+                let gw = gateway.read().await;
+                let profile = config.engine.active_engine();
+                let nested = NestedDispatch {
+                    registry: Some(&chaos_skills),
+                    profile: Some(&profile),
+                    depth: 0,
                 };
+                let ctx = dispatch::skill_context(
+                    &snap,
+                    chaos_feedback_tx,
+                    args,
+                    Some(gw.as_ref()),
+                    Some(router),
+                    config,
+                    nested,
+                );
                 match chaos_skills.get(cmd).unwrap().execute(ctx).await {
                     Ok(output) => {
                         eprint!("{}", output.display);

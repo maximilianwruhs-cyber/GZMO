@@ -1,0 +1,17 @@
+---
+type: entity
+title: Ari Shaffir's Skeptic Tank
+created: 2026-06-09
+updated: 2026-06-09
+sources: 1
+tags: []
+status: draft
+gzmo_synthetic: true
+---
+
+# Ari Shaffir's Skeptic Tank
+
+Type: TOOL
+
+## From [[the-archival-truth-part1-micro07|the-archival-truth-part1-micro07]] (2026-06-09)
+- Is a podcast that frequently features episodes offering long-form album commentary and breakdowns of specials.

@@ -1,13 +1,13 @@
-/// Thought Cabinet — Disco Elysium-inspired internalization mechanic
-///
-/// Lore items and skill outputs emitted by the chaos engine have a chance to be
-/// "absorbed" into the cabinet as unprocessed thoughts. They incubate for N ticks,
-/// imposing cognitive debuffs (increased drain). When incubation completes, they
-/// "crystallize" — permanently mutating the engine's physical constants.
-///
-/// The engine learns from its own output. It becomes autopoietic.
+//! Thought Cabinet — Disco Elysium-inspired internalization mechanic
+//!
+//! Lore items and skill outputs emitted by the chaos engine have a chance to be
+//! "absorbed" into the cabinet as unprocessed thoughts. They incubate for N ticks,
+//! imposing cognitive debuffs (increased drain). When incubation completes, they
+//! "crystallize" — permanently mutating the engine's physical constants.
+//!
+//! The engine learns from its own output. It becomes autopoietic.
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 const MAX_SLOTS: usize = 5; // Expanded from 3 — more capacity for skill output thoughts
 const ABSORB_THRESHOLD: f64 = 0.82; // ~18% chance per emission
@@ -21,14 +21,24 @@ fn incubation_period(category: &str) -> u64 {
         "poem" => 25,       // ~8 seconds — verse resonates moderately
         "story" => 40,      // ~14 seconds — narrative needs digestion
         "card" => 35,       // ~12 seconds — a forged card leaves an imprint
-        "dice_crit" => 10,  // ~3 seconds — critical moments are absorbed instantly
+        "card_mythic" => 45, // mythic resonance lingers longer
+        "pkm" => 35,
+        "pkm_ex" => 45,
+        "dice_crit" | "dice_crit_fail" | "dice_crit_success" => 10,
+        "dice_catastrophe" => 12,
+        "dice_resonance" => 20,
+        "dice_oracle" => 30,
+        "dice_spark" => 18,
+        "dice_crystallize" | "dice_bifurcation" => 25,
+        "dice_legendary" => 15,
+        "dice_cascade" => 22,
         "sound" => 8,       // ~3 seconds — sensory input is fast
         "persona" => 60,    // ~20 seconds — identity shifts take time
         _ => 30,
     }
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct IncubatingThought {
     pub category: String,
     pub text_preview: String, // First 80 chars
@@ -37,7 +47,7 @@ pub struct IncubatingThought {
     pub total_ticks: u64,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CrystallizationEvent {
     pub category: String,
     pub text_preview: String,
@@ -45,7 +55,7 @@ pub struct CrystallizationEvent {
     pub tick_crystallized: u64,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MutationEffect {
     pub target: String,     // "gravity", "friction", "lorenz_rho", or "tension_bias"
     pub delta: f64,
@@ -53,7 +63,7 @@ pub struct MutationEffect {
 }
 
 /// Accumulated permanent mutations from all crystallized thoughts
-#[derive(Debug, Clone, Default, Serialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct Mutations {
     pub gravity_mod: f64,      // Additive modifier (negative = lighter)
     pub friction_mod: f64,     // Additive modifier (negative = smoother)
@@ -194,13 +204,105 @@ impl ThoughtCabinet {
                     description: "A forged card greases the gears of chaos".to_string(),
                 }
             }
-            "dice_crit" => {
-                // Critical dice rolls create tension bias (the system "remembers" luck)
-                self.mutations.tension_bias -= 2.0; // Good crits calm the system
+            "pkm" => {
+                self.mutations.friction_mod -= 0.03;
+                MutationEffect {
+                    target: "friction".to_string(),
+                    delta: -0.03,
+                    description: "A forged pokemon card greases the gears of chaos".to_string(),
+                }
+            }
+            "pkm_ex" => {
+                self.mutations.friction_mod -= 0.03;
+                MutationEffect {
+                    target: "friction".to_string(),
+                    delta: -0.03,
+                    description: "An ex pokemon card greases the gears of chaos".to_string(),
+                }
+            }
+            "dice_crit" | "dice_crit_success" => {
+                self.mutations.tension_bias -= 2.0;
                 MutationEffect {
                     target: "tension_bias".to_string(),
                     delta: -2.0,
                     description: "Fortune's memory lowers the system's baseline anxiety".to_string(),
+                }
+            }
+            "dice_crit_fail" => {
+                self.mutations.tension_bias += 2.0;
+                MutationEffect {
+                    target: "tension_bias".to_string(),
+                    delta: 2.0,
+                    description: "Misfortune's memory raises the system's baseline anxiety".to_string(),
+                }
+            }
+            "dice_catastrophe" => {
+                self.mutations.lorenz_rho_mod += 0.5;
+                self.mutations.tension_bias += 3.0;
+                MutationEffect {
+                    target: "rho+tension".to_string(),
+                    delta: 0.5,
+                    description: "Phase collapse scars the attractor and elevates baseline dread".to_string(),
+                }
+            }
+            "dice_resonance" => {
+                self.mutations.lorenz_rho_mod += 0.4;
+                self.mutations.friction_mod -= 0.02;
+                MutationEffect {
+                    target: "rho+friction".to_string(),
+                    delta: 0.4,
+                    description: "Lorenz–Logistic coupling reshapes rho and greases the field".to_string(),
+                }
+            }
+            "dice_oracle" => {
+                self.mutations.friction_mod -= 0.01;
+                self.mutations.lorenz_rho_mod += 0.15;
+                MutationEffect {
+                    target: "friction+rho".to_string(),
+                    delta: 0.15,
+                    description: "Oracle insight smooths friction and nudges the attractor".to_string(),
+                }
+            }
+            "dice_spark" => {
+                self.mutations.lorenz_rho_mod += 0.2;
+                MutationEffect {
+                    target: "lorenz_rho".to_string(),
+                    delta: 0.2,
+                    description: "Creative spark raises attractor intensity".to_string(),
+                }
+            }
+            "dice_crystallize" => {
+                self.mutations.gravity_mod -= 0.1;
+                MutationEffect {
+                    target: "gravity".to_string(),
+                    delta: -0.1,
+                    description: "Spontaneous nucleation lightens the engine's gravity well".to_string(),
+                }
+            }
+            "dice_bifurcation" => {
+                self.mutations.friction_mod -= 0.02;
+                MutationEffect {
+                    target: "friction".to_string(),
+                    delta: -0.02,
+                    description: "Period-3 window discovery smooths turbulent transitions".to_string(),
+                }
+            }
+            "dice_legendary" => {
+                self.mutations.lorenz_rho_mod += 1.0;
+                self.mutations.gravity_mod -= 0.05;
+                MutationEffect {
+                    target: "rho+gravity".to_string(),
+                    delta: 1.0,
+                    description: "Legendary crystallization expands ρ and transcends parameter space".to_string(),
+                }
+            }
+            "dice_cascade" => {
+                self.mutations.lorenz_rho_mod += 0.25;
+                self.mutations.friction_mod -= 0.01;
+                MutationEffect {
+                    target: "rho+friction".to_string(),
+                    delta: 0.25,
+                    description: "Wild magic imprints the pantheon echo on the attractor".to_string(),
                 }
             }
             "sound" => {
@@ -265,9 +367,10 @@ impl ThoughtCabinet {
 
     /// Leaky integrator dissipation: ρ_mod ← (1−k)·ρ_mod each tick (k from `ChaosConfig.rho_decay_k`).
     pub fn apply_rho_decay(&mut self, k: f64) {
-        if k <= 0.0 {
+        if !k.is_finite() || k <= 0.0 {
             return;
         }
+        let k = k.clamp(0.0, 1.0);
         self.mutations.lorenz_rho_mod *= 1.0 - k;
         self.mutations.lorenz_rho_mod = self.mutations.lorenz_rho_mod.clamp(-10.0, 10.0);
     }
@@ -275,9 +378,10 @@ impl ThoughtCabinet {
     /// Bounded homeostatic restore (MASTER Phase I): ρ ← ρ − α·tanh(β·ρ).
     /// Falls back to linear `apply_rho_decay(k)` when `alpha <= 0`.
     pub fn apply_rho_restoration(&mut self, alpha: f64, beta: f64, k: f64) {
-        if alpha > 0.0 {
+        if alpha.is_finite() && alpha > 0.0 {
             let beta = if beta > 0.0 { beta } else { 1.0 };
-            let restore = alpha * (beta * self.mutations.lorenz_rho_mod).tanh();
+            let rho = self.mutations.lorenz_rho_mod;
+            let restore = (alpha * (beta * rho).tanh()).clamp(-rho.abs(), rho.abs());
             self.mutations.lorenz_rho_mod -= restore;
         } else {
             self.apply_rho_decay(k);
@@ -348,5 +452,76 @@ mod tests {
         }
         assert!(cabinet.mutations.lorenz_rho_mod < 4.5);
         assert!(cabinet.mutations.lorenz_rho_mod > 3.5);
+    }
+
+    #[test]
+    fn rho_decay_does_not_invert_with_large_gain() {
+        let mut cabinet = ThoughtCabinet::new();
+        cabinet.mutations.lorenz_rho_mod = 4.0;
+        cabinet.apply_rho_decay(2.0);
+
+        assert_eq!(cabinet.mutations.lorenz_rho_mod, 0.0);
+    }
+
+    #[test]
+    fn tanh_restoration_does_not_overshoot_zero() {
+        let mut cabinet = ThoughtCabinet::new();
+        cabinet.mutations.lorenz_rho_mod = 0.25;
+        cabinet.apply_rho_restoration(10.0, 10.0, 0.001);
+
+        assert_eq!(cabinet.mutations.lorenz_rho_mod, 0.0);
+    }
+
+    fn crystallize_category(category: &str) -> Mutations {
+        let mut cabinet = ThoughtCabinet::new();
+        assert!(cabinet.try_absorb(category, "test seed", 0, 0.9));
+        while cabinet.occupied_slots() > 0 {
+            cabinet.tick();
+        }
+        cabinet.mutations
+    }
+
+    #[test]
+    fn dice_cascade_crystallizes_rho() {
+        let m = crystallize_category("dice_cascade");
+        assert!((m.lorenz_rho_mod - 0.25).abs() < f64::EPSILON);
+    }
+
+    #[test]
+    fn dice_legendary_crystallizes_rho_plus_one() {
+        let m = crystallize_category("dice_legendary");
+        assert!((m.lorenz_rho_mod - 1.0).abs() < f64::EPSILON);
+    }
+
+    #[test]
+    fn dice_crystallize_lightens_gravity() {
+        let m = crystallize_category("dice_crystallize");
+        assert!((m.gravity_mod - (-0.1)).abs() < f64::EPSILON);
+    }
+
+    #[test]
+    fn dice_catastrophe_scars_rho_and_tension() {
+        let m = crystallize_category("dice_catastrophe");
+        assert!((m.lorenz_rho_mod - 0.5).abs() < f64::EPSILON);
+        assert!((m.tension_bias - 3.0).abs() < f64::EPSILON);
+    }
+
+    #[test]
+    fn dice_crit_fail_raises_tension_bias() {
+        let m = crystallize_category("dice_crit_fail");
+        assert!((m.tension_bias - 2.0).abs() < f64::EPSILON);
+    }
+
+    #[test]
+    fn dice_spark_raises_rho() {
+        let m = crystallize_category("dice_spark");
+        assert!((m.lorenz_rho_mod - 0.2).abs() < f64::EPSILON);
+    }
+
+    #[test]
+    fn dice_oracle_nudges_rho_and_friction() {
+        let m = crystallize_category("dice_oracle");
+        assert!((m.lorenz_rho_mod - 0.15).abs() < f64::EPSILON);
+        assert!((m.friction_mod - (-0.01)).abs() < f64::EPSILON);
     }
 }

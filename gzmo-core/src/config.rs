@@ -326,6 +326,104 @@ pub struct GzmoConfig {
     /// Agentic Teacher pedagogy orchestrator, learner profile, EDF trail.
     #[serde(default)]
     pub pedagogy: PedagogyConfig,
+
+    /// `/dice` skill — autopoietic follow-up roll scheduling.
+    #[serde(default)]
+    pub dice: DiceConfig,
+
+    /// Kurator monitor (phase 1: read-only + spawn.recommended).
+    #[serde(default)]
+    pub kurator: KuratorConfig,
+
+    /// Bibliothek stable-promotion gate (dream cycle counter).
+    #[serde(default)]
+    pub bibliothek: BibliothekConfig,
+
+    /// Synapse Writer gate for chaos skill CLI dispatch.
+    #[serde(default)]
+    pub synapse_writer: SynapseWriterConfig,
+}
+
+// ─── Dice autopoietic loop ──────────────────────────────────────────────
+
+/// Schedule follow-up `/dice` rolls from each outcome (interval ∝ roll value).
+#[derive(Debug, Deserialize, Clone)]
+pub struct DiceConfig {
+    #[serde(default)]
+    pub r#loop: DiceLoopConfig,
+    #[serde(default)]
+    pub cascade: DiceCascadeConfig,
+}
+
+impl Default for DiceConfig {
+    fn default() -> Self {
+        Self {
+            r#loop: DiceLoopConfig::default(),
+            cascade: DiceCascadeConfig::default(),
+        }
+    }
+}
+
+/// Wild magic — after each roll, dispatch a pantheon skill from the tier pool.
+#[derive(Debug, Deserialize, Clone)]
+pub struct DiceCascadeConfig {
+    #[serde(default = "default_true")]
+    pub enabled: bool,
+    /// Extra skills to exclude beyond `data/dice_cascade.toml` defaults.
+    #[serde(default)]
+    pub exclude: Vec<String>,
+}
+
+impl Default for DiceCascadeConfig {
+    fn default() -> Self {
+        Self {
+            enabled: true,
+            exclude: Vec::new(),
+        }
+    }
+}
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct DiceLoopConfig {
+    /// When true, each roll schedules the next automatic `/dice` for the daemon.
+    #[serde(default)]
+    pub enabled: bool,
+
+    /// Minimum delay (minutes) — mapped from roll 1.
+    #[serde(default = "default_dice_loop_min")]
+    pub min_minutes: u32,
+
+    /// Maximum delay (minutes) — mapped from roll max on the active die.
+    #[serde(default = "default_dice_loop_max")]
+    pub max_minutes: u32,
+
+    /// Stop scheduling after this many chained auto-rolls (0 = unlimited).
+    #[serde(default)]
+    pub max_chain_depth: u32,
+
+    /// When true, roll 1 clears any pending follow-up.
+    #[serde(default = "default_true")]
+    pub cancel_on_nat_1: bool,
+}
+
+impl Default for DiceLoopConfig {
+    fn default() -> Self {
+        Self {
+            enabled: false,
+            min_minutes: default_dice_loop_min(),
+            max_minutes: default_dice_loop_max(),
+            max_chain_depth: 0,
+            cancel_on_nat_1: true,
+        }
+    }
+}
+
+fn default_dice_loop_min() -> u32 {
+    5
+}
+
+fn default_dice_loop_max() -> u32 {
+    120
 }
 
 // ─── Dreams ─────────────────────────────────────────────────────────────
@@ -422,12 +520,12 @@ fn default_dream_exclude_episodic_substrings() -> Vec<String> {
         "filesystem utilization".to_string(),
         "root filesystem".to_string(),
         "[hypothesis ".to_string(),
-        "promoted=false".to_string(),
+        // "promoted=false" removed (2026-06-15) — spark summaries often contain entity info worth dreaming on
     ]
 }
 
 fn default_dream_min_consolidation_chars() -> usize {
-    400
+    200  // lowered from 400 (2026-06-15) — ops-only days were skipping REM too aggressively
 }
 
 impl DreamsConfig {
@@ -665,6 +763,106 @@ pub struct PedagogyConfig {
 
     #[serde(default)]
     pub sandbox: SandboxConfig,
+
+    /// Autonomous Socratic dialogue when tension drops below threshold.
+    #[serde(default)]
+    pub low_tension_dialogue: LowTensionDialogueConfig,
+
+    /// Path to `gzmo_skills` (pi-mentor-discovery scripts).
+    #[serde(default = "default_discovery_scripts_root")]
+    pub discovery_scripts_root: String,
+}
+
+/// Daemon-initiated mentor turn when chaos tension is very low.
+#[derive(Debug, Deserialize, Clone)]
+pub struct LowTensionDialogueConfig {
+    #[serde(default)]
+    pub enabled: bool,
+
+    /// Fire when tension crosses below this value (edge-triggered).
+    #[serde(default = "default_low_tension_threshold")]
+    pub threshold: f64,
+
+    /// Minimum seconds between autonomous dialogue turns.
+    #[serde(default = "default_low_tension_cooldown")]
+    pub cooldown_secs: u64,
+
+    /// Seed message for bare `maybe_teach` — placeholders: `{tension}`, `{tick}`, `{phase}`.
+    /// Ignored when `discovery_cycle` is true.
+    #[serde(default = "default_low_tension_opening")]
+    pub opening_template: String,
+
+    /// Run full pi-mentor-discovery cycle (pillar probe + cycle report) instead of bare mentor teach.
+    #[serde(default = "default_low_tension_discovery_cycle")]
+    pub discovery_cycle: bool,
+
+    /// Minimum ticks of low-tension plateau to fire dialogue trigger.
+    #[serde(default)]
+    pub idle_ticks_threshold: Option<u64>,
+
+    /// Discovery queue config (max pending, max concurrent, session priority).
+    #[serde(default)]
+    pub discovery_queue: DiscoveryQueueConfig,
+}
+
+/// Discovery queue configuration for AUTO Socratic cycles.
+#[derive(Debug, Deserialize, Clone, Default)]
+pub struct DiscoveryQueueConfig {
+    /// Maximum pending discovery cycles in the queue.
+    #[serde(default = "default_discovery_max_pending")]
+    pub max_pending: usize,
+
+    /// Maximum concurrent discovery cycles.
+    #[serde(default = "default_discovery_max_concurrent")]
+    pub max_concurrent: usize,
+
+    /// Prioritize session-bound cycles over AUTO cycles.
+    #[serde(default = "default_discovery_session_priority")]
+    pub session_priority: bool,
+}
+
+fn default_discovery_max_pending() -> usize { 2 }
+fn default_discovery_max_concurrent() -> usize { 1 }
+fn default_discovery_session_priority() -> bool { true }
+
+impl Default for LowTensionDialogueConfig {
+    fn default() -> Self {
+        Self {
+            enabled: false,
+            threshold: default_low_tension_threshold(),
+            cooldown_secs: default_low_tension_cooldown(),
+            opening_template: default_low_tension_opening(),
+            discovery_cycle: default_low_tension_discovery_cycle(),
+            idle_ticks_threshold: None,
+            discovery_queue: DiscoveryQueueConfig::default(),
+        }
+    }
+}
+
+fn default_low_tension_discovery_cycle() -> bool {
+    true
+}
+
+fn default_discovery_scripts_root() -> String {
+    std::env::var("GZMO_SKILLS_ROOT").unwrap_or_else(|_| {
+        let home = std::env::var("HOME").unwrap_or_else(|_| "/home/maximilian-wruhs".into());
+        format!("{home}/gzmo_skills")
+    })
+}
+
+fn default_low_tension_threshold() -> f64 {
+    15.0
+}
+
+fn default_low_tension_cooldown() -> u64 {
+    300
+}
+
+fn default_low_tension_opening() -> String {
+    "[AUTONOMOUS — low tension] System tension is very low (τ={tension}%, tick {tick}, phase {phase}). \
+     Begin a Socratic dialogue with the learner: ask one inviting question about stillness, dormancy, \
+     or what the organism should attend to when the chaos field is calm. Do not lecture; do not give the answer."
+        .to_string()
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, Default)]
@@ -725,6 +923,8 @@ impl Default for PedagogyConfig {
             mentor_api_enabled: default_mentor_api_enabled(),
             mentor_socket: default_mentor_socket(),
             sandbox: SandboxConfig::default(),
+            low_tension_dialogue: LowTensionDialogueConfig::default(),
+            discovery_scripts_root: default_discovery_scripts_root(),
         }
     }
 }
@@ -827,7 +1027,15 @@ pub struct SessionDistillConfig {
     /// Cosine distance threshold for topic-shift trigger (phase 2).
     #[serde(default = "default_topic_shift_threshold")]
     pub topic_shift_threshold: f32,
+
+    /// Use SHA-256 content hash for dedup instead of path-based tracking.
+    /// When true, sessions with genuinely unique content are re-processed
+    /// even after daemon restart (prevents 96% duplicate rejection rate).
+    #[serde(default = "default_content_hash_dedup")]
+    pub content_hash_dedup: bool,
 }
+
+fn default_content_hash_dedup() -> bool { true }
 
 fn default_topic_shift_threshold() -> f32 {
     0.35
@@ -896,6 +1104,7 @@ impl Default for SessionDistillConfig {
             daemon_scheduled: default_session_distill_daemon_scheduled(),
             cron_hour: default_session_distill_cron_hour(),
             cron_minute: default_session_distill_cron_minute(),
+            content_hash_dedup: default_content_hash_dedup(),
         }
     }
 }
@@ -1250,6 +1459,30 @@ pub struct PlatformSearchConfig {
     /// Prefetch multiplier for knowledge vector hits before rerank merge.
     #[serde(default = "default_knowledge_prefetch")]
     pub knowledge_prefetch: usize,
+
+    /// Append Neo4j graph compact search results to unified recall text.
+    #[serde(default = "default_neo4j_graph_search")]
+    pub neo4j_graph_search: bool,
+
+    /// Path to `uvx` for Neo4j MCP CLI search (falls back to `NEO4J_MCP_UVX` env).
+    #[serde(default)]
+    pub neo4j_mcp_uvx: Option<String>,
+
+    /// Local fork path passed to `uvx --from` (falls back to `NEO4J_MCP_FROM` env).
+    #[serde(default)]
+    pub neo4j_mcp_from: Option<String>,
+
+    /// Bolt URI for Neo4j CLI subprocess (falls back to `NEO4J_URI` / `NEO4J_URL` env).
+    #[serde(default)]
+    pub neo4j_uri: Option<String>,
+
+    /// Neo4j username for CLI subprocess (falls back to env).
+    #[serde(default)]
+    pub neo4j_username: Option<String>,
+
+    /// Neo4j password for CLI subprocess (falls back to `NEO4J_PASSWORD` env).
+    #[serde(default)]
+    pub neo4j_password: Option<String>,
 }
 
 fn default_platform_search_enabled() -> bool {
@@ -1264,12 +1497,22 @@ fn default_knowledge_prefetch() -> usize {
     12
 }
 
+fn default_neo4j_graph_search() -> bool {
+    true
+}
+
 impl Default for PlatformSearchConfig {
     fn default() -> Self {
         Self {
             include_knowledge_collection: default_platform_search_enabled(),
             knowledge_collection: default_knowledge_collection(),
             knowledge_prefetch: default_knowledge_prefetch(),
+            neo4j_graph_search: default_neo4j_graph_search(),
+            neo4j_mcp_uvx: None,
+            neo4j_mcp_from: None,
+            neo4j_uri: None,
+            neo4j_username: None,
+            neo4j_password: None,
         }
     }
 }
@@ -1363,6 +1606,133 @@ impl Default for SynapsePullConfig {
             max_events: default_synapse_pull_max_events(),
             bus_path: default_synapse_bus_path(),
             distill_on_session_end: default_synapse_distill_on_session_end(),
+        }
+    }
+}
+
+// ─── Kurator monitor (phase 1) ───────────────────────────────────────────
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct KuratorConfig {
+    #[serde(default)]
+    pub enabled: bool,
+
+    #[serde(default = "default_kurator_max_turns")]
+    pub max_turns_before_recommend: u32,
+
+    #[serde(default = "default_kurator_max_session_tokens")]
+    pub max_session_tokens: u64,
+
+    #[serde(default = "default_kurator_skill_error_rate")]
+    pub skill_error_rate_threshold: f64,
+
+    #[serde(default = "default_kurator_max_dice_loops")]
+    pub max_dice_loops_per_hour: u32,
+
+    #[serde(default = "default_kurator_agent_profile")]
+    pub default_agent_profile: String,
+
+    /// Phase 2: `gzmo kurator approve` spawns a governed sub-agent.
+    #[serde(default = "default_kurator_approve_enabled")]
+    pub approve_spawns_subagent: bool,
+
+    #[serde(default = "default_kurator_spawn_brief_max")]
+    pub spawn_brief_max_chars: usize,
+}
+
+fn default_kurator_max_turns() -> u32 {
+    40
+}
+
+fn default_kurator_max_session_tokens() -> u64 {
+    500_000
+}
+
+fn default_kurator_skill_error_rate() -> f64 {
+    0.3
+}
+
+fn default_kurator_max_dice_loops() -> u32 {
+    12
+}
+
+fn default_kurator_agent_profile() -> String {
+    "prometheus".to_string()
+}
+
+fn default_kurator_approve_enabled() -> bool {
+    true
+}
+
+fn default_kurator_spawn_brief_max() -> usize {
+    4000
+}
+
+impl Default for KuratorConfig {
+    fn default() -> Self {
+        Self {
+            enabled: false,
+            max_turns_before_recommend: default_kurator_max_turns(),
+            max_session_tokens: default_kurator_max_session_tokens(),
+            skill_error_rate_threshold: default_kurator_skill_error_rate(),
+            max_dice_loops_per_hour: default_kurator_max_dice_loops(),
+            default_agent_profile: default_kurator_agent_profile(),
+            approve_spawns_subagent: default_kurator_approve_enabled(),
+            spawn_brief_max_chars: default_kurator_spawn_brief_max(),
+        }
+    }
+}
+
+// ─── Synapse Writer gate ────────────────────────────────────────────────
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct SynapseWriterConfig {
+    /// When true, `gzmo chaos skill` requires a matching Pi `skill.invoke` on the bus.
+    #[serde(default)]
+    pub gate_enabled: bool,
+
+    #[serde(default = "default_synapse_writer_invoke_window")]
+    pub invoke_window_secs: u64,
+
+    #[serde(default = "default_synapse_writer_tail_scan")]
+    pub tail_scan_lines: usize,
+}
+
+fn default_synapse_writer_invoke_window() -> u64 {
+    120
+}
+
+fn default_synapse_writer_tail_scan() -> usize {
+    2000
+}
+
+impl Default for SynapseWriterConfig {
+    fn default() -> Self {
+        Self {
+            gate_enabled: false,
+            invoke_window_secs: default_synapse_writer_invoke_window(),
+            tail_scan_lines: default_synapse_writer_tail_scan(),
+        }
+    }
+}
+
+// ─── Bibliothek promotion gate ──────────────────────────────────────────
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct BibliothekConfig {
+    /// Skip vault/KG promotion until this many dream cycles completed.
+    #[serde(default = "default_bibliothek_min_dream_cycles")]
+    pub min_dream_cycles: u32,
+}
+
+fn default_bibliothek_min_dream_cycles() -> u32 {
+    50
+}
+
+impl Default for BibliothekConfig {
+    fn default() -> Self {
+        Self {
+            min_dream_cycles: default_bibliothek_min_dream_cycles(),
         }
     }
 }

@@ -13,7 +13,7 @@ export LC_ALL=C.UTF-8
 export LANG="${LANG:-C.UTF-8}"
 
 # ─── LLM Endpoint Configuration ─────────────────────────────────
-LLM_URL="${GZMO_LLM_URL:-http://localhost:1234/v1/chat/completions}"
+LLM_URL="${GZMO_LLM_URL:-http://localhost:8000/v1/chat/completions}"
 LLM_MODEL="${GZMO_LLM_MODEL:-bartowski/Qwen2.5-7B-Instruct-GGUF}"
 LLM_TEMPERATURE="${GZMO_LLM_TEMP:-0.8}"
 LLM_MAX_TOKENS="${GZMO_LLM_MAX_TOKENS:-512}"
@@ -184,9 +184,35 @@ resolve_lore_file() {
 }
 
 # ─── LLM Output Cleanup ──────────────────────────────────────────
-# Strips wrapping quotes/backticks; trims outer blank lines; keeps internal newlines.
+# Strips thinking-channel wrappers, quotes/backticks; trims outer blank lines.
+strip_thinking_channels() {
+    local text="$1"
+    local line stripped out=""
+
+    while IFS= read -r line || [ -n "$line" ]; do
+        line="${line#"${line%%[![:space:]]*}"}"
+        line="${line%"${line##*[![:space:]]}"}"
+        case "$line" in
+            "<|channel>thought"|"<channel>thought") continue ;;
+        esac
+        stripped="${line#<|channel|>}"
+        stripped="${stripped#<channel|>}"
+        stripped="${stripped#"${stripped%%[![:space:]]*}"}"
+        stripped="${stripped%"${stripped##*[![:space:]]}"}"
+        if [ -n "$stripped" ]; then
+            if [ -n "$out" ]; then
+                out="${out}"$'\n'"${stripped}"
+            else
+                out="$stripped"
+            fi
+        fi
+    done <<< "$text"
+    printf '%s' "$out"
+}
+
 clean_llm_output() {
     local text="$1"
+    text=$(strip_thinking_channels "$text")
     text="${text//\`/}"
     text=$(printf '%s' "$text" | sed -e 's/^"//' -e 's/"$//' -e "s/^'//" -e "s/'$//")
     text=$(printf '%s' "$text" | sed -e '/./,$!d' -e :a -e '/^\s*$/{$d;N;ba' -e '}')
@@ -220,6 +246,30 @@ quality_gate_joke() {
 quality_gate_story() {
     printf '%s' "$1" | grep -qiE \
         '(once upon a time|es war einmal|happily ever after|und sie lebten|moral of the story|lehre des|m[aä]rchen)' \
+        && return 1
+    return 0
+}
+
+quality_gate_word() {
+    printf '%s' "$1" | grep -q '^WORD:' || return 1
+    printf '%s' "$1" | grep -qiE \
+        '(wordsmith|neologism of the day|made-up word:|fake word:|lorem ipsum)' \
+        && return 1
+    return 0
+}
+
+quality_gate_card() {
+    printf '%s' "$1" | grep -q '^NAME:' || return 1
+    printf '%s' "$1" | grep -qiE \
+        '(as an ai|i cannot|placeholder|lorem ipsum|\[card name\])' \
+        && return 1
+    return 0
+}
+
+quality_gate_define() {
+    printf '%s' "$1" | grep -q '^DEFINITION:' || return 1
+    printf '%s' "$1" | grep -qiE \
+        '(as an ai|i don.t know|cannot define|no definition|lorem ipsum)' \
         && return 1
     return 0
 }
@@ -265,6 +315,40 @@ spin() {
         sleep 0.1
     done
     printf "\r%*s\r" 60 "" >&2
+}
+
+# ─── Chaos feedback bridge (stderr → gzmo-core shell_bridge.rs) ──
+# Shell skills emit structured events so Thought Cabinet can absorb output.
+emit_chaos_event_json() {
+    printf 'GZMO_CHAOS_EVENT:%s\n' "$1" >&2
+}
+
+emit_joke() {
+    emit_chaos_event_json "$(jq -nc --arg t "$1" '{type:"JokeGenerated",text:$t}')"
+}
+
+emit_poem() {
+    emit_chaos_event_json "$(jq -nc --arg t "$1" '{type:"PoemGenerated",text:$t}')"
+}
+
+emit_story() {
+    emit_chaos_event_json "$(jq -nc --arg t "$1" '{type:"StoryGenerated",text:$t}')"
+}
+
+emit_card() {
+    emit_chaos_event_json "$(jq -nc --arg n "$1" --arg ct "$2" '{type:"CardForged",name:$n,card_type:$ct}')"
+}
+
+emit_word() {
+    emit_chaos_event_json "$(jq -nc --arg w "$1" --arg d "$2" '{type:"WordGenerated",word:$w,definition:$d}')"
+}
+
+emit_persona_shift() {
+    emit_chaos_event_json "$(jq -nc --arg p "$1" '{type:"PersonaShift",persona:$p}')"
+}
+
+emit_persona_cleared() {
+    emit_chaos_event_json '{"type":"PersonaCleared"}'
 }
 
 # ─── LLM Call with Spinner ───────────────────────────────────────

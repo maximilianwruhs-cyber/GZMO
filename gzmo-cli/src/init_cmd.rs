@@ -99,7 +99,7 @@ pub async fn run() -> Result<()> {
         eprintln!("  {DIM}Start LM Studio, Ollama, or vLLM, then re-run 'gzmo init'.{RESET}");
         eprintln!();
 
-        let url = prompt_text("Enter your LLM endpoint URL", "http://localhost:1234/v1");
+        let url = prompt_text("Enter your LLM endpoint URL", "http://localhost:8000/v1");
 
         // Try to probe the custom URL
         match scanner::probe_endpoint(&url).await {

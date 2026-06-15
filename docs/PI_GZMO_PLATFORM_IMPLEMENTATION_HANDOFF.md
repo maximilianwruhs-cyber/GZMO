@@ -445,6 +445,25 @@ GZMO_DISTILL_SMOKE=1 ./scripts/pi/test_distill_pi.sh
 
 ---
 
+### Infrastructure stages (2026-06-15) — **SHIPPED locally**
+
+| Stage | Deliverable | Docs |
+|-------|-------------|------|
+| 0 | `session_id` on Pi events, ownership matrix | `docs/SYNAPSE_EVENT_OWNERSHIP.md` |
+| 1 | `/calculate` v2 steps + German interpretation | `docs/CALCULATE_V2_FORMATTER_CONTRACT.md` |
+| 2 | `skill.invoke` / `skill.complete` / `skill.error` | `scripts/pi/synapse-notifier.reference.ts` |
+| 3 | Forum Romanum envelope + agent/proposal types | `docs/FORUM_ROMANUM_SCHEMA.md` |
+| 4 | Obolus routing doc + example mappings | `docs/OBOLUS_ROUTING.md` |
+| 5 | Kurator monitor + `spawn.recommended` + `gzmo kurator status` | `gzmo-core/src/kurator_monitor.rs` |
+| 6 | `wuerfel-cron` synapse tag + Bibliothek dream gate | `[bibliothek]` in `gzmo.toml` |
+| 7 | Synapse Writer gate + Kurator approve + Forum Romanum emitters | `synapse_writer.rs`, `forum-romanum-bridge.reference.ts` |
+
+Pi live extensions:
+- `scripts/pi/synapse-notifier.reference.ts` -> `~/.pi/agent/extensions/synapse-notifier.ts`
+- `scripts/pi/forum-romanum-bridge.reference.ts` -> `~/.pi/agent/extensions/forum-romanum-bridge.ts` (optional, requires pi-crew)
+
+---
+
 ## 13. Remaining work — prioritized
 
 ### Low hanging (do first)

@@ -73,10 +73,10 @@ pub async fn run(config: &GzmoConfig, _identity: IdentityEngine, date: Option<Na
     );
 
     let mut tools = ToolRegistry::new();
-    tools.register(Box::new(FileReadTool));
+    tools.register(Box::new(FileReadTool::default()));
     tools.register(Box::new(FileWriteTool));
     tools.register(Box::new(DirListTool));
-    tools.register(Box::new(FileSearchTool));
+    tools.register(Box::new(FileSearchTool::default()));
     tools.register(Box::new(ShellExecTool::default()));
     tools.register(Box::new(WebSearchTool::default()));
     tools.register(Box::new(SysMetricsTool));
@@ -98,6 +98,7 @@ pub async fn run(config: &GzmoConfig, _identity: IdentityEngine, date: Option<Na
         verify_gateway,
         tools,
         config.dreams.clone(),
+        config.bibliothek.min_dream_cycles,
         Some(Arc::clone(&synapse)),
     );
 

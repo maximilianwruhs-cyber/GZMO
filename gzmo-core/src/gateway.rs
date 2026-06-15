@@ -31,8 +31,8 @@ pub struct VllmConfig {
 impl Default for VllmConfig {
     fn default() -> Self {
         Self {
-            base_url: "http://localhost:1234/v1".to_string(),
-            model: "gemma-4-E4B-it-Q4_K_M.gguf".to_string(),
+            base_url: "http://localhost:8000/v1".to_string(),
+            model: "qwen3.6-27b".to_string(),
             temperature: 0.7,
             top_p: 0.9,
             max_tokens: 8192,
@@ -148,6 +148,17 @@ pub trait LlmGateway: Send + Sync {
 
     /// Disable chaos overrides — revert to config values.
     fn clear_chaos_overrides(&self) {}
+
+    /// Unstructured completion with optional per-call temperature / top_p overrides.
+    async fn complete_with_persona(
+        &self,
+        messages: &[Message],
+        tools: &[ToolDeclaration],
+        _temperature: Option<f32>,
+        _top_p: Option<f32>,
+    ) -> Result<LlmResponse> {
+        self.complete(messages, tools).await
+    }
 }
 
 // ── Concrete Implementation ─────────────────────────────────────────
@@ -316,7 +327,7 @@ impl TurboQuantGateway {
         }
     }
 
-    /// Create a gateway with default TurboQuant config (localhost:1234).
+    /// Create a gateway with default Prime config (localhost:8000).
     pub fn default_local() -> Self {
         Self::new(VllmConfig::default())
     }
@@ -355,8 +366,8 @@ impl TurboQuantGateway {
     fn effective_max_tokens(&self) -> u32 {
         if self.chaos_active.load(std::sync::atomic::Ordering::Relaxed) {
             let chaos_val = self.chaos_max_tokens.load(std::sync::atomic::Ordering::Relaxed);
-            // Use whichever is larger: config or chaos (don't truncate below config)
-            chaos_val.max(self.config.max_tokens / 2)
+            // Chaos caps generation length; profile max_tokens is the hard ceiling.
+            chaos_val.clamp(256, self.config.max_tokens)
         } else {
             self.config.max_tokens
         }
@@ -422,6 +433,26 @@ impl TurboQuantGateway {
 
 #[async_trait]
 impl LlmGateway for TurboQuantGateway {
+    async fn complete_with_persona(
+        &self,
+        messages: &[Message],
+        tools: &[ToolDeclaration],
+        temperature: Option<f32>,
+        top_p: Option<f32>,
+    ) -> Result<LlmResponse> {
+        if temperature.is_none() && top_p.is_none() {
+            return self.complete(messages, tools).await;
+        }
+        let mut cfg = self.config.clone();
+        if let Some(t) = temperature {
+            cfg.temperature = t;
+        }
+        if let Some(p) = top_p {
+            cfg.top_p = p;
+        }
+        TurboQuantGateway::new(cfg).complete(messages, tools).await
+    }
+
     async fn complete(
         &self,
         messages: &[Message],
@@ -1428,6 +1459,7 @@ mod tests {
     #[test]
     fn chat_is_not_background() {
         assert!(!config::TaskKind::Chat.is_background());
+        assert!(!config::TaskKind::PedagogyInternal.is_background());
         assert!(config::TaskKind::DreamExtract.is_background());
         assert!(config::TaskKind::Daemon.is_background());
     }

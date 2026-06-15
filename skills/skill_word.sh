@@ -1,49 +1,21 @@
 #!/usr/bin/env bash
 # ═══════════════════════════════════════════════════════════════════
-# /word — Invent a brand new word with definition and example
+# /word — Invent a brand new word with definition and example (Deprecated)
+# Delegates to Rust-native word implementation
 # ═══════════════════════════════════════════════════════════════════
 
 SKILLS_DIR="$(cd "$(dirname "$0")" && pwd)"
-source "$SKILLS_DIR/_llm_helper.sh"
+PROJECT_ROOT="$(dirname "$SKILLS_DIR")"
 
-SYSTEM_PROMPT="You are a neologist — an inventor of words.
-Create one completely new word that does not exist in any language.
-The word should:
-- Sound natural and pronounceable
-- Have a specific, useful meaning that fills a gap in language
-- Come with a believable etymology
+echo -e "\033[33mWarning: skills/skill_word.sh is deprecated. Routing to Rust-native /word skill...\033[0m" >&2
 
-Format your response EXACTLY like this (3 lines only):
-WORD: [the new word] ([pronunciation])
-DEFINITION: [clear definition]
-EXAMPLE: [one example sentence using the word]
-
-No other text. No commentary."
-
-USER_PROMPT="Invent a new word."
-
-RESULT=$(llm_call_pretty "$SYSTEM_PROMPT" "$USER_PROMPT" "Inventing linguistics..." 0.95 256)
-
-if [ -z "$RESULT" ]; then
-    echo -e "${C_RED}✗ LLM offline. Cannot invent words without a brain.${C_RESET}"
+# Check for release or debug binary
+if [ -f "$PROJECT_ROOT/target/release/gzmo" ]; then
+    exec "$PROJECT_ROOT/target/release/gzmo" chaos skill word "$@"
+elif [ -f "$PROJECT_ROOT/target/debug/gzmo" ]; then
+    exec "$PROJECT_ROOT/target/debug/gzmo" chaos skill word "$@"
+else
+    echo -e "\033[31mError: gzmo binary not found. Please compile the project first using 'cargo build --release'.\033[0m" >&2
     exit 1
 fi
 
-echo ""
-echo -e "${C_DIM}┌─────────────────────────────────────────────────┐${C_RESET}"
-echo -e "${C_BOLD}${C_GREEN}  🔤 NEW WORD${C_RESET}"
-echo -e "${C_DIM}├─────────────────────────────────────────────────┤${C_RESET}"
-echo ""
-echo "$RESULT" | while IFS= read -r line; do
-    if [[ "$line" == WORD:* ]]; then
-        echo -e "  ${C_BOLD}${C_CYAN}${line}${C_RESET}"
-    elif [[ "$line" == DEFINITION:* ]]; then
-        echo -e "  ${C_WHITE}${line}${C_RESET}"
-    elif [[ "$line" == EXAMPLE:* ]]; then
-        echo -e "  ${C_DIM}${line}${C_RESET}"
-    else
-        echo -e "  ${line}"
-    fi
-done
-echo ""
-echo -e "${C_DIM}└─────────────────────────────────────────────────┘${C_RESET}"

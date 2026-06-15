@@ -1,0 +1,219 @@
+---
+type: source
+title: ai-research-part2
+created: 2026-06-08
+updated: 2026-06-08
+sources: 1
+tags: []
+status: stable
+gzmo_synthetic: true
+---
+
+# ai-research-part2
+
+Ingested source summary (2026-06-08).
+
+## Entities
+- [[curriculum-agent|Curriculum Agent]] (CONCEPT)
+- [[purdue-anvil-ai|Purdue Anvil AI]] (ORGANIZATION)
+- [[li-x|Li, X.]] (AUTHOR)
+- [[zhang-x|Zhang, X.]] (AUTHOR)
+- [[wang-z|Wang, Z.]] (AUTHOR)
+- [[ttrl-test-time-reinforcement-learning|Ttrl: Test-time reinforcement learning]] (BOOK)
+- [[zhao-et-al-2025|Zhao et al., 2025]] (AUTHOR)
+- [[tir|TIR]] (CONCEPT)
+- [[zhang-y|Zhang, Y.]] (AUTHOR)
+- [[socratic-zero|Socratic-Zero]] (SYSTEM)
+- [[spiral|SPIRAL]] (SYSTEM)
+- [[zhang-k|Zhang, K.]] (AUTHOR)
+- [[group-relative-policy-optimization-grpo|Group Relative Policy Optimization (GRPO)]] (CONCEPT)
+- [[xia-p|Xia, P.]] (AUTHOR)
+- [[sheng-l|Sheng, L.]] (AUTHOR)
+- [[lewkowycz-et-al-2022|Lewkowycz et al., 2022]] (AUTHOR)
+- [[zhang-z|Zhang, Z.]] (AUTHOR)
+- [[kwon-et-al-2023|Kwon et al., 2023]] (AUTHOR)
+- [[repetition-penalty|Repetition Penalty]] (CONCEPT)
+- [[achiam-et-al-2023|Achiam et al., 2023]] (AUTHOR)
+- [[song-l|Song, L.]] (AUTHOR)
+- [[distributed-execution-orchestrator|Distributed Execution Orchestrator]] (CONCEPT)
+- [[python-based-code-execution-sandbox|Python-based code execution sandbox]] (TOOL)
+- [[multi-turn-reasoning|Multi-turn Reasoning]] (CONCEPT)
+- [[caiming-xiong|Caiming Xiong]] (PERSON)
+- [[ambiguity-dynamic-policy-optimization-adpo|Ambiguity-Dynamic Policy Optimization (ADPO)]] (CONCEPT)
+- [[yiyang-zhou|Yiyang Zhou]] (PERSON)
+- [[chengsong-huang|Chengsong Huang]] (PERSON)
+- [[simpletir|SimpleTIR]] (SYSTEM)
+- [[huang-et-al-2025|Huang et al., 2025]] (AUTHOR)
+- [[du-et-al-2025|Du et al., 2025]] (AUTHOR)
+- [[levine-s|Levine, S.]] (AUTHOR)
+- [[qwen3-4b-base|Qwen3-4B-Base]] (SYSTEM)
+- [[zuo-y|Zuo, Y.]] (AUTHOR)
+- [[gsm8k|GSM8K]] (PROJECT)
+- [[srivastava-et-al-2023|Srivastava et al., 2023]] (AUTHOR)
+- [[fang-wu|Fang Wu]] (PERSON)
+- [[peng-xia|Peng Xia]] (PERSON)
+- [[ambiguity-scaling-mechanism|Ambiguity Scaling Mechanism]] (CONCEPT)
+- [[hendrycks-et-al-2021|Hendrycks et al., 2021]] (AUTHOR)
+- [[he-et-al-2024|He et al., 2024]] (AUTHOR)
+- [[evolving-language-models-without-labels-majority-drives-selection-novelty-promotes-variation|Evolving language models without labels: Majority drives selection, novelty promotes variation]] (BOOK)
+- [[tool-reward|Tool Reward]] (CONCEPT)
+- [[gpt-4o|GPT-4o]] (SYSTEM)
+- [[yu-d|Yu, D.]] (AUTHOR)
+- [[xue-et-al-2025|Xue et al., 2025]] (AUTHOR)
+- [[olympiad-bench|Olympiad-Bench]] (PROJECT)
+- [[kaide-zeng|Kaide Zeng]] (PERSON)
+- [[gpqa|GPQA]] (PROJECT)
+- [[verl-tool|VeRL-Tool]] (SYSTEM)
+- [[self-challenging-language-model-agents|Self-challenging language model agents]] (BOOK)
+- [[cheng-et-al-2025|Cheng et al., 2025]] (AUTHOR)
+- [[jiaqi-liu|Jiaqi Liu]] (PERSON)
+- [[base-model|Base Model]] (SYSTEM)
+- [[zheng-w|Zheng, W.]] (AUTHOR)
+- [[can-qin|Can Qin]] (PERSON)
+- [[wang-et-al-2024b|Wang et al., 2024b]] (AUTHOR)
+- [[supergpqa|SuperGPQA]] (PROJECT)
+- [[weston-j|Weston, J.]] (AUTHOR)
+- [[anypre-fer-an-agentic-framework-for-preference-data-synthesis|Anypre-fer: An agentic framework for preference data synthesis]] (BOOK)
+- [[wang-t|Wang, T.]] (AUTHOR)
+- [[agent0|Agent0]] (SYSTEM)
+- [[lin-xu-2025|Lin & Xu, 2025]] (AUTHOR)
+- [[salesforce-research|Salesforce Research]] (ORGANIZATION)
+- [[long-x|Long, X.]] (AUTHOR)
+- [[hendrycks-et-al-2020|Hendrycks et al., 2020]] (AUTHOR)
+- [[r-zero|R-Zero]] (SYSTEM)
+- [[executor-agent|Executor Agent]] (SYSTEM)
+- [[vllm|vLLM]] (TOOL)
+- [[amc|AMC]] (PROJECT)
+- [[multi-turn-interaction-protocol|Multi-Turn Interaction Protocol]] (CONCEPT)
+- [[qwen3-8b-base|Qwen3-8B-Base]] (SYSTEM)
+- [[li-h|Li, H.]] (AUTHOR)
+- [[xing-s|Xing, S.]] (AUTHOR)
+- [[mmlu-pro|MMLU-Pro]] (PROJECT)
+- [[mi-h|Mi, H.]] (AUTHOR)
+- [[zhou-y|Zhou, Y.]] (AUTHOR)
+- [[aspo|ASPO]] (SYSTEM)
+- [[minerva|Minerva]] (PROJECT)
+- [[liu-et-al-2025a|Liu et al., 2025a]] (AUTHOR)
+- [[math|MATH]] (PROJECT)
+- [[hua-e|Hua, E.]] (AUTHOR)
+- [[aime24|AIME24]] (PROJECT)
+- [[cui-g|Cui, G.]] (AUTHOR)
+- [[cobbe-et-al-2021|Cobbe et al., 2021]] (AUTHOR)
+- [[rein-et-al-2024|Rein et al., 2024]] (AUTHOR)
+- [[liang-z|Liang, Z.]] (AUTHOR)
+- [[big-bench-suite|Big-Bench suite]] (PROJECT)
+- [[zheng-k|Zheng, K.]] (AUTHOR)
+- [[liu-h|Liu, H.]] (AUTHOR)
+- [[renaissance-philanthropy|Renaissance Philanthropy]] (ORGANIZATION)
+- [[absolute-zero|Absolute Zero]] (SYSTEM)
+- [[wang-et-al-2025d|Wang et al., 2025d]] (AUTHOR)
+- [[bbeh|BBEH]] (PROJECT)
+- [[national-artificial-intelligence-research-resource-nairr-pilot|National Artificial Intelligence Research Resource (NAIRR) Pilot]] (ORGANIZATION)
+- [[unc-chapel-hill|UNC-Chapel Hill]] (ORGANIZATION)
+- [[execution-agent|Execution Agent]] (CONCEPT)
+- [[chen-z|Chen, Z.]] (AUTHOR)
+- [[panaganti-k|Panaganti, K.]] (AUTHOR)
+- [[flask|Flask]] (TOOL)
+- [[huaxiu-yao|Huaxiu Yao]] (PERSON)
+- [[stanford-university|Stanford University]] (ORGANIZATION)
+- [[chen-et-al-2025|Chen et al., 2025]] (AUTHOR)
+- [[large-language-model-llm-agents|Large Language Model (LLM) Agents]] (CONCEPT)
+- [[reinforcement-learning-rl|Reinforcement Learning (RL)]] (CONCEPT)
+- [[yu-w|Yu, W.]] (AUTHOR)
+- [[qu-s|Qu, S.]] (AUTHOR)
+- [[kazemi-et-al-2025|Kazemi et al., 2025]] (AUTHOR)
+- [[zhu-x|Zhu, X.]] (AUTHOR)
+- [[li-b|Li, B.]] (AUTHOR)
+- [[aime25|AIME25]] (PROJECT)
+
+## Relations
+- Peng Xia → AUTHORED_BY → Agent0
+- Kaide Zeng → AUTHORED_BY → Agent0
+- Jiaqi Liu → AUTHORED_BY → Agent0
+- Can Qin → AUTHORED_BY → Agent0
+- Fang Wu → AUTHORED_BY → Agent0
+- Yiyang Zhou → AUTHORED_BY → Agent0
+- Caiming Xiong → AUTHORED_BY → Agent0
+- Huaxiu Yao → AUTHORED_BY → Agent0
+- Peng Xia → PART_OF → UNC-Chapel Hill
+- Kaide Zeng → PART_OF → UNC-Chapel Hill
+- Jiaqi Liu → PART_OF → UNC-Chapel Hill
+- Yiyang Zhou → PART_OF → UNC-Chapel Hill
+- Huaxiu Yao → PART_OF → UNC-Chapel Hill
+- Can Qin → PART_OF → Salesforce Research
+- Caiming Xiong → PART_OF → Salesforce Research
+- Fang Wu → PART_OF → Stanford University
+- Agent0 → USES → Qwen3-8B-Base
+- Agent0 → USES → Qwen3-4B-Base
+- Agent0 → USES → Reinforcement Learning (RL)
+- Agent0 → USES → Group Relative Policy Optimization (GRPO)
+- Agent0 → USES → Ambiguity-Dynamic Policy Optimization (ADPO)
+- Agent0 → USES → VeRL-Tool
+- R-Zero → RELATED_TO → Agent0
+- Absolute Zero → RELATED_TO → Agent0
+- Socratic-Zero → RELATED_TO → Agent0
+- SPIRAL → RELATED_TO → Agent0
+- Agent0 → USES → Curriculum Agent
+- Agent0 → USES → Execution Agent
+- Curriculum Agent → USES → Tool Reward
+- Execution Agent → USES → Group Relative Policy Optimization (GRPO)
+- Execution Agent → USES → Ambiguity Scaling Mechanism
+- R-Zero → AUTHORED_BY → Huang et al., 2025
+- AI for Math Fund → PART_OF → Renaissance Philanthropy
+- ASPO → AUTHORED_BY → Lin & Xu, 2025
+- SimpleTIR → AUTHORED_BY → Xue et al., 2025
+- Zhou, Y. → AUTHORED_BY → Self-challenging language model agents
+- Levine, S. → AUTHORED_BY → Self-challenging language model agents
+- Weston, J. → AUTHORED_BY → Self-challenging language model agents
+- Li, X. → AUTHORED_BY → Self-challenging language model agents
+- Zhou, Y. → AUTHORED_BY → Evolving language models without labels: Majority drives selection, novelty promotes variation
+- Liang, Z. → AUTHORED_BY → Evolving language models without labels: Majority drives selection, novelty promotes variation
+- Liu, H. → AUTHORED_BY → Evolving language models without labels: Majority drives selection, novelty promotes variation
+- Yu, W. → AUTHORED_BY → Evolving language models without labels: Majority drives selection, novelty promotes variation
+- Panaganti, K. → AUTHORED_BY → Evolving language models without labels: Majority drives selection, novelty promotes variation
+- Song, L. → AUTHORED_BY → Evolving language models without labels: Majority drives selection, novelty promotes variation
+- Yu, D. → AUTHORED_BY → Evolving language models without labels: Majority drives selection, novelty promotes variation
+- Zhang, X. → AUTHORED_BY → Evolving language models without labels: Majority drives selection, novelty promotes variation
+- Mi, H. → AUTHORED_BY → Evolving language models without labels: Majority drives selection, novelty promotes variation
+- Zhou, Y. → AUTHORED_BY → Anypre-fer: An agentic framework for preference data synthesis
+- Wang, Z. → AUTHORED_BY → Anypre-fer: An agentic framework for preference data synthesis
+- Wang, T. → AUTHORED_BY → Anypre-fer: An agentic framework for preference data synthesis
+- Xing, S. → AUTHORED_BY → Anypre-fer: An agentic framework for preference data synthesis
+- Xia, P. → AUTHORED_BY → Anypre-fer: An agentic framework for preference data synthesis
+- Li, B. → AUTHORED_BY → Anypre-fer: An agentic framework for preference data synthesis
+- Zheng, K. → AUTHORED_BY → Anypre-fer: An agentic framework for preference data synthesis
+- Zhang, Z. → AUTHORED_BY → Anypre-fer: An agentic framework for preference data synthesis
+- Chen, Z. → AUTHORED_BY → Anypre-fer: An agentic framework for preference data synthesis
+- Zheng, W. → AUTHORED_BY → Anypre-fer: An agentic framework for preference data synthesis
+- Zuo, Y. → AUTHORED_BY → Ttrl: Test-time reinforcement learning
+- Zhang, K. → AUTHORED_BY → Ttrl: Test-time reinforcement learning
+- Sheng, L. → AUTHORED_BY → Ttrl: Test-time reinforcement learning
+- Qu, S. → AUTHORED_BY → Ttrl: Test-time reinforcement learning
+- Cui, G. → AUTHORED_BY → Ttrl: Test-time reinforcement learning
+- Zhu, X. → AUTHORED_BY → Ttrl: Test-time reinforcement learning
+- Li, H. → AUTHORED_BY → Ttrl: Test-time reinforcement learning
+- Zhang, Y. → AUTHORED_BY → Ttrl: Test-time reinforcement learning
+- Long, X. → AUTHORED_BY → Ttrl: Test-time reinforcement learning
+- Hua, E. → AUTHORED_BY → Ttrl: Test-time reinforcement learning
+- Agent0 → USES → Executor Agent
+- Agent0 → USES → Python-based code execution sandbox
+- Python-based code execution sandbox → PART_OF → Multi-Turn Interaction Protocol
+- Python-based code execution sandbox → PART_OF → Distributed Execution Orchestrator
+- Cheng et al., 2025 → AUTHORED_BY → Python-based code execution sandbox
+- Flask → USES → Agent0
+- vLLM → USES → Agent0
+- Kwon et al., 2023 → AUTHORED_BY → vLLM
+- Absolute Zero → AUTHORED_BY → Zhao et al., 2025
+- SPIRAL → AUTHORED_BY → Liu et al., 2025a
+- Socratic-Zero → AUTHORED_BY → Wang et al., 2025d
+- Minerva → AUTHORED_BY → Lewkowycz et al., 2022
+- MATH → AUTHORED_BY → Hendrycks et al., 2021
+- GSM8K → AUTHORED_BY → Cobbe et al., 2021
+- Olympiad-Bench → AUTHORED_BY → He et al., 2024
+- SuperGPQA → RELATED_TO → GPQA
+- SuperGPQA → AUTHORED_BY → Du et al., 2025
+- GPQA → AUTHORED_BY → Rein et al., 2024
+- MMLU-Pro → AUTHORED_BY → Wang et al., 2024b
+- MMLU-Pro → AUTHORED_BY → Hendrycks et al., 2020
+- BBEH → PART_OF → Big-Bench suite
+- BBEH → AUTHORED_BY → Kazemi et al., 2025

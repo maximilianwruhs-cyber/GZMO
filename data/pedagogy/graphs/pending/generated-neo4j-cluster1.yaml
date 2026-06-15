@@ -1,0 +1,1061 @@
+domain: generated-neo4j-cluster1
+nodes:
+  - id: 32gb_vram_constraints
+    title: 32Gb Vram Constraints
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: abstract_syntax_tree_ast
+    title: Abstract Syntax Tree Ast
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: active_conversation_protocol_acp
+    title: Active Conversation Protocol Acp
+    description: Exported from Neo4j (1 prereqs in cluster).
+    prerequisites:
+      - dialogic_soul_specification
+    bloom_level: understand
+  - id: agentic_architecture
+    title: Agentic Architecture
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: agentic_artificial_intelligence
+    title: Agentic Artificial Intelligence
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: agentic_memory
+    title: Agentic Memory
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: agentic_reverse_engineering
+    title: Agentic Reverse Engineering
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: agentic_reverse_software_engineering
+    title: Agentic Reverse Software Engineering
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: agentic_software
+    title: Agentic Software
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: agentic_software_engineering_se_3_0
+    title: Agentic Software Engineering Se 3 0
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: ai
+    title: Ai
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: ai_agent_loop
+    title: Ai Agent Loop
+    description: Exported from Neo4j (2 prereqs in cluster).
+    prerequisites:
+      - artificial_intelligence_ai
+      - multi_agent_systems_mas
+    bloom_level: understand
+  - id: ai_agents
+    title: Ai Agents
+    description: Exported from Neo4j (3 prereqs in cluster).
+    prerequisites:
+      - junior_developer_talent_pipeline
+      - large_language_models_llms
+      - spec_driven_development
+    bloom_level: understand
+  - id: algorithmic_bias
+    title: Algorithmic Bias
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: anthropogeny
+    title: Anthropogeny
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: artificial_intelligence
+    title: Artificial Intelligence
+    description: Exported from Neo4j (13 prereqs in cluster).
+    prerequisites:
+      - algorithmic_bias
+      - authorship
+      - copyright
+      - cybersecurity
+      - ethics_in_publication_and_research
+      - financial_conflicts_of_interest
+      - hallucination_of_fabricated_citations
+      - latent_space_poisoning
+      - legal_entities
+      - moral_agency
+      - plagiarism
+      - scaffold_for_writing
+      - scientific_ideas
+    bloom_level: understand
+  - id: artificial_intelligence_ai
+    title: Artificial Intelligence Ai
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: authorship
+    title: Authorship
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: authorship_criteria
+    title: Authorship Criteria
+    description: Exported from Neo4j (1 prereqs in cluster).
+    prerequisites:
+      - ethics_in_publication_and_research
+    bloom_level: understand
+  - id: autonomous_agentic_trading_systems
+    title: Autonomous Agentic Trading Systems
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: autopoiesis
+    title: Autopoiesis
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: cascading_honeypot
+    title: Cascading Honeypot
+    description: Exported from Neo4j (2 prereqs in cluster).
+    prerequisites:
+      - llm_compiler_wiki_architecture
+      - retrieval_augmented_generation_rag
+    bloom_level: understand
+  - id: cascading_honeypot_theorem_of_wisdom
+    title: Cascading Honeypot Theorem Of Wisdom
+    description: Exported from Neo4j (1 prereqs in cluster).
+    prerequisites:
+      - human_cognitive_psychology
+    bloom_level: understand
+  - id: chain_of_thought_cot_distillation
+    title: Chain Of Thought Cot Distillation
+    description: Exported from Neo4j (1 prereqs in cluster).
+    prerequisites:
+      - knowledge_distillation_kd
+    bloom_level: understand
+  - id: civilizational_myth
+    title: Civilizational Myth
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: classical_antiquity
+    title: Classical Antiquity
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: coase_s_theory_of_the_firm
+    title: Coase S Theory Of The Firm
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: communication
+    title: Communication
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: compute_unified_device_architecture_cuda
+    title: Compute Unified Device Architecture Cuda
+    description: Exported from Neo4j (1 prereqs in cluster).
+    prerequisites:
+      - artificial_intelligence
+    bloom_level: understand
+  - id: context_dilution
+    title: Context Dilution
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: context_engineering
+    title: Context Engineering
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: continuity_workspace_memory
+    title: Continuity Workspace Memory
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: contributor_roles
+    title: Contributor Roles
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: conversation_theory
+    title: Conversation Theory
+    description: Exported from Neo4j (2 prereqs in cluster).
+    prerequisites:
+      - second_order_cybernetics
+      - teachback_mechanism
+    bloom_level: understand
+  - id: copyright
+    title: Copyright
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: core_truths
+    title: Core Truths
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: corrections
+    title: Corrections
+    description: Exported from Neo4j (2 prereqs in cluster).
+    prerequisites:
+      - ethics_in_publication_and_research
+      - version_of_record_vor
+    bloom_level: understand
+  - id: creative_artificial_agent
+    title: Creative Artificial Agent
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: credit_taxonomy
+    title: Credit Taxonomy
+    description: Exported from Neo4j (2 prereqs in cluster).
+    prerequisites:
+      - authorship_criteria
+      - contributor_roles
+    bloom_level: understand
+  - id: cybernetics_3_0
+    title: Cybernetics 3 0
+    description: Exported from Neo4j (1 prereqs in cluster).
+    prerequisites:
+      - artificial_intelligence_ai
+    bloom_level: understand
+  - id: cybersecurity
+    title: Cybersecurity
+    description: Exported from Neo4j (2 prereqs in cluster).
+    prerequisites:
+      - latent_space_activations
+      - the_cascading_honeypot_theorem_of_wisdom
+    bloom_level: understand
+  - id: data_sparsity
+    title: Data Sparsity
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: datenbank_anbindung
+    title: Datenbank Anbindung
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: deepnorm
+    title: Deepnorm
+    description: Exported from Neo4j (1 prereqs in cluster).
+    prerequisites:
+      - post_norm
+    bloom_level: understand
+  - id: dialogic_soul_specification
+    title: Dialogic Soul Specification
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: dikwp_model
+    title: Dikwp Model
+    description: Exported from Neo4j (1 prereqs in cluster).
+    prerequisites:
+      - cascading_honeypot_theorem_of_wisdom
+    bloom_level: understand
+  - id: dikwp_triz_framework
+    title: Dikwp Triz Framework
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: ears_framework
+    title: Ears Framework
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: epimetheus
+    title: Epimetheus
+    description: Exported from Neo4j (6 prereqs in cluster).
+    prerequisites:
+      - anthropogeny
+      - civilizational_myth
+      - classical_antiquity
+      - large_language_model_llm
+      - the_promethean_and_epimethean_dichotomy
+      - titanomachy
+    bloom_level: understand
+  - id: ethics_in_publication_and_research
+    title: Ethics In Publication And Research
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: executable_wisdom
+    title: Executable Wisdom
+    description: Exported from Neo4j (1 prereqs in cluster).
+    prerequisites:
+      - cascading_honeypot
+    bloom_level: understand
+  - id: expressions_of_concern
+    title: Expressions Of Concern
+    description: Exported from Neo4j (2 prereqs in cluster).
+    prerequisites:
+      - ethics_in_publication_and_research
+      - version_of_record_vor
+    bloom_level: understand
+  - id: external_vector_memory
+    title: External Vector Memory
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: financial_conflicts_of_interest
+    title: Financial Conflicts Of Interest
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: first_order_cybernetics
+    title: First Order Cybernetics
+    description: Exported from Neo4j (2 prereqs in cluster).
+    prerequisites:
+      - large_language_models_llms
+      - second_order_cybernetics
+    bloom_level: understand
+  - id: formal_conversational_protocol_fcop
+    title: Formal Conversational Protocol Fcop
+    description: Exported from Neo4j (2 prereqs in cluster).
+    prerequisites:
+      - dialogic_soul_specification
+      - soul_md
+    bloom_level: understand
+  - id: fp8_kv_cache
+    title: Fp8 Kv Cache
+    description: Exported from Neo4j (2 prereqs in cluster).
+    prerequisites:
+      - memory_dynamics
+      - quantization_techniques
+    bloom_level: understand
+  - id: freudian_theory
+    title: Freudian Theory
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: function_calling
+    title: Function Calling
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: gardening_directive
+    title: Gardening Directive
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: gated_deltanet_architecture
+    title: Gated Deltanet Architecture
+    description: Exported from Neo4j (2 prereqs in cluster).
+    prerequisites:
+      - memory_dynamics
+      - model_architectures
+    bloom_level: understand
+  - id: ghost_authorship
+    title: Ghost Authorship
+    description: Exported from Neo4j (1 prereqs in cluster).
+    prerequisites:
+      - authorship_criteria
+    bloom_level: understand
+  - id: gift_authorship
+    title: Gift Authorship
+    description: Exported from Neo4j (1 prereqs in cluster).
+    prerequisites:
+      - authorship_criteria
+    bloom_level: understand
+  - id: guest_authorship
+    title: Guest Authorship
+    description: Exported from Neo4j (1 prereqs in cluster).
+    prerequisites:
+      - authorship_criteria
+    bloom_level: understand
+  - id: gzmo
+    title: Gzmo
+    description: Exported from Neo4j (10 prereqs in cluster).
+    prerequisites:
+      - agentic_architecture
+      - communication
+      - continuity_workspace_memory
+      - core_truths
+      - openclaw_autonomy
+      - operational_boundaries_security
+      - prime_directive
+      - sovereign_ai
+      - technical_standards
+      - user
+    bloom_level: understand
+  - id: hallucination_of_fabricated_citations
+    title: Hallucination Of Fabricated Citations
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: hierarchical_abstraction
+    title: Hierarchical Abstraction
+    description: Exported from Neo4j (1 prereqs in cluster).
+    prerequisites:
+      - human_cognitive_psychology
+    bloom_level: understand
+  - id: human_cognitive_psychology
+    title: Human Cognitive Psychology
+    description: Exported from Neo4j (1 prereqs in cluster).
+    prerequisites:
+      - purposeful_forgetting
+    bloom_level: understand
+  - id: hyper_connections
+    title: Hyper Connections
+    description: Exported from Neo4j (1 prereqs in cluster).
+    prerequisites:
+      - mhc
+    bloom_level: understand
+  - id: information_bottleneck_ib_theory
+    title: Information Bottleneck Ib Theory
+    description: Exported from Neo4j (2 prereqs in cluster).
+    prerequisites:
+      - cascading_honeypot_theorem_of_wisdom
+      - human_cognitive_psychology
+    bloom_level: understand
+  - id: int2_kv_caching
+    title: Int2 Kv Caching
+    description: Exported from Neo4j (1 prereqs in cluster).
+    prerequisites:
+      - quantization_techniques
+    bloom_level: understand
+  - id: int4_kv_caching
+    title: Int4 Kv Caching
+    description: Exported from Neo4j (1 prereqs in cluster).
+    prerequisites:
+      - quantization_techniques
+    bloom_level: understand
+  - id: intelligence_dashboard
+    title: Intelligence Dashboard
+    description: Exported from Neo4j (1 prereqs in cluster).
+    prerequisites:
+      - gzmo
+    bloom_level: understand
+  - id: junior_developer_talent_pipeline
+    title: Junior Developer Talent Pipeline
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: key_value_kv_cache
+    title: Key Value Kv Cache
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: knowledge_distillation_kd
+    title: Knowledge Distillation Kd
+    description: Exported from Neo4j (2 prereqs in cluster).
+    prerequisites:
+      - cascading_honeypot_theorem_of_wisdom
+      - latent_space_activations
+    bloom_level: understand
+  - id: large_language_model_llm
+    title: Large Language Model Llm
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: large_language_models
+    title: Large Language Models
+    description: Exported from Neo4j (7 prereqs in cluster).
+    prerequisites:
+      - agentic_memory
+      - ai_agents
+      - autonomous_agentic_trading_systems
+      - context_engineering
+      - creative_artificial_agent
+      - ears_framework
+      - zipf_s_law
+    bloom_level: understand
+  - id: large_language_models_llms
+    title: Large Language Models Llms
+    description: Exported from Neo4j (8 prereqs in cluster).
+    prerequisites:
+      - agentic_software_engineering_se_3_0
+      - artificial_intelligence
+      - data_sparsity
+      - key_value_kv_cache
+      - poverty_of_the_stimulus
+      - reverse_software_engineering
+      - scaling_laws
+      - speicherbandbreiten_engpass_memory_wall
+    bloom_level: understand
+  - id: latent_space_activations
+    title: Latent Space Activations
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: latent_space_poisoning
+    title: Latent Space Poisoning
+    description: Exported from Neo4j (1 prereqs in cluster).
+    prerequisites:
+      - latent_space_activations
+    bloom_level: understand
+  - id: law_of_requisite_variety
+    title: Law Of Requisite Variety
+    description: Exported from Neo4j (1 prereqs in cluster).
+    prerequisites:
+      - second_order_cybernetics
+    bloom_level: understand
+  - id: legal_entities
+    title: Legal Entities
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: llm_compiler_wiki_architecture
+    title: Llm Compiler Wiki Architecture
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: long_term_memory
+    title: Long Term Memory
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: major_revisions
+    title: Major Revisions
+    description: Exported from Neo4j (1 prereqs in cluster).
+    prerequisites:
+      - peer_review
+    bloom_level: understand
+  - id: manifold_constrained_hyper_connections
+    title: Manifold Constrained Hyper Connections
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: markdown
+    title: Markdown
+    description: Exported from Neo4j (1 prereqs in cluster).
+    prerequisites:
+      - system_prompt_leakage
+    bloom_level: understand
+  - id: mecone
+    title: Mecone
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: memory_dynamics
+    title: Memory Dynamics
+    description: Exported from Neo4j (1 prereqs in cluster).
+    prerequisites:
+      - 32gb_vram_constraints
+    bloom_level: understand
+  - id: mhc
+    title: Mhc
+    description: Exported from Neo4j (1 prereqs in cluster).
+    prerequisites:
+      - residual_connection
+    bloom_level: understand
+  - id: mixture_of_depths_attention
+    title: Mixture Of Depths Attention
+    description: Exported from Neo4j (2 prereqs in cluster).
+    prerequisites:
+      - ai
+      - manifold_constrained_hyper_connections
+    bloom_level: understand
+  - id: mixture_of_depths_attention_moda
+    title: Mixture Of Depths Attention Moda
+    description: Exported from Neo4j (2 prereqs in cluster).
+    prerequisites:
+      - large_language_model_llm
+      - mixture_of_depths_attention
+    bloom_level: understand
+  - id: model_architectures
+    title: Model Architectures
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: model_context_protocol_mcp
+    title: Model Context Protocol Mcp
+    description: Exported from Neo4j (11 prereqs in cluster).
+    prerequisites:
+      - agentic_artificial_intelligence
+      - agentic_reverse_engineering
+      - agentic_reverse_software_engineering
+      - agentic_software
+      - datenbank_anbindung
+      - function_calling
+      - large_language_models_llms
+      - long_term_memory
+      - orchestration_boundaries
+      - spec_driven_development
+      - web_browsing
+    bloom_level: understand
+  - id: moral_agency
+    title: Moral Agency
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: multi_agent_systems_mas
+    title: Multi Agent Systems Mas
+    description: Exported from Neo4j (3 prereqs in cluster).
+    prerequisites:
+      - coase_s_theory_of_the_firm
+      - large_language_models_llms
+      - token_economics
+    bloom_level: understand
+  - id: openclaw_autonomy
+    title: Openclaw Autonomy
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: operational_boundaries_security
+    title: Operational Boundaries Security
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: orchestration_boundaries
+    title: Orchestration Boundaries
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: owasp_llm01
+    title: Owasp Llm01
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: peer_review
+    title: Peer Review
+    description: Exported from Neo4j (1 prereqs in cluster).
+    prerequisites:
+      - ethics_in_publication_and_research
+    bloom_level: understand
+  - id: pi_registertool
+    title: Pi Registertool
+    description: Exported from Neo4j (1 prereqs in cluster).
+    prerequisites:
+      - large_language_model_llm
+    bloom_level: understand
+  - id: plagiarism
+    title: Plagiarism
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: post_norm
+    title: Post Norm
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: post_norm_path
+    title: Post Norm Path
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: post_normalization
+    title: Post Normalization
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: poverty_of_the_stimulus
+    title: Poverty Of The Stimulus
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: pre_norm
+    title: Pre Norm
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: pre_norm_path
+    title: Pre Norm Path
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: pre_normalization
+    title: Pre Normalization
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: prime_directive
+    title: Prime Directive
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: prometheus
+    title: Prometheus
+    description: Exported from Neo4j (10 prereqs in cluster).
+    prerequisites:
+      - anthropogeny
+      - civilizational_myth
+      - classical_antiquity
+      - epimetheus
+      - mecone
+      - soul_md
+      - the_promethean_and_epimethean_dichotomy
+      - the_trick_at_mecone
+      - theft_of_fire
+      - titanomachy
+    bloom_level: understand
+  - id: prompt_injection
+    title: Prompt Injection
+    description: Exported from Neo4j (3 prereqs in cluster).
+    prerequisites:
+      - model_context_protocol_mcp
+      - owasp_llm01
+      - system_prompt_leakage
+    bloom_level: understand
+  - id: purposeful_forgetting
+    title: Purposeful Forgetting
+    description: Exported from Neo4j (1 prereqs in cluster).
+    prerequisites:
+      - freudian_theory
+    bloom_level: understand
+  - id: q4_k_m
+    title: Q4 K M
+    description: Exported from Neo4j (2 prereqs in cluster).
+    prerequisites:
+      - ai
+      - quantization_techniques
+    bloom_level: understand
+  - id: q5_k_m
+    title: Q5 K M
+    description: Exported from Neo4j (1 prereqs in cluster).
+    prerequisites:
+      - quantization_techniques
+    bloom_level: understand
+  - id: quantization_techniques
+    title: Quantization Techniques
+    description: Exported from Neo4j (1 prereqs in cluster).
+    prerequisites:
+      - 32gb_vram_constraints
+    bloom_level: understand
+  - id: radical_constructivism
+    title: Radical Constructivism
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: removals
+    title: Removals
+    description: Exported from Neo4j (2 prereqs in cluster).
+    prerequisites:
+      - ethics_in_publication_and_research
+      - version_of_record_vor
+    bloom_level: understand
+  - id: residual_connection
+    title: Residual Connection
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: retractions
+    title: Retractions
+    description: Exported from Neo4j (2 prereqs in cluster).
+    prerequisites:
+      - ethics_in_publication_and_research
+      - version_of_record_vor
+    bloom_level: understand
+  - id: retrieval_augmented_generation
+    title: Retrieval Augmented Generation
+    description: Exported from Neo4j (1 prereqs in cluster).
+    prerequisites:
+      - agentic_memory
+    bloom_level: understand
+  - id: retrieval_augmented_generation_rag
+    title: Retrieval Augmented Generation Rag
+    description: Exported from Neo4j (6 prereqs in cluster).
+    prerequisites:
+      - abstract_syntax_tree_ast
+      - ai
+      - external_vector_memory
+      - multi_agent_systems_mas
+      - support_relations
+      - token_economics
+    bloom_level: understand
+  - id: reverse_software_engineering
+    title: Reverse Software Engineering
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: scaffold_for_writing
+    title: Scaffold For Writing
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: scaling_laws
+    title: Scaling Laws
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: scientific_ideas
+    title: Scientific Ideas
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: second_order_cybernetics
+    title: Second Order Cybernetics
+    description: Exported from Neo4j (2 prereqs in cluster).
+    prerequisites:
+      - autopoiesis
+      - radical_constructivism
+    bloom_level: understand
+  - id: self_perception_instability
+    title: Self Perception Instability
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: siamesenorm
+    title: Siamesenorm
+    description: Exported from Neo4j (9 prereqs in cluster).
+    prerequisites:
+      - ai
+      - hyper_connections
+      - mhc
+      - post_norm
+      - post_norm_path
+      - post_normalization
+      - pre_norm
+      - pre_norm_path
+      - pre_normalization
+    bloom_level: understand
+  - id: soul_md
+    title: Soul Md
+    description: Exported from Neo4j (13 prereqs in cluster).
+    prerequisites:
+      - communication
+      - context_dilution
+      - continuity_workspace_memory
+      - core_truths
+      - gardening_directive
+      - gzmo
+      - openclaw_autonomy
+      - operational_boundaries_security
+      - prime_directive
+      - self_perception_instability
+      - static_soul_document
+      - tabula_rasa
+      - technical_standards
+    bloom_level: understand
+  - id: sovereign_ai
+    title: Sovereign Ai
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: spec_driven_development
+    title: Spec Driven Development
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: speicherbandbreiten_engpass_memory_wall
+    title: Speicherbandbreiten Engpass Memory Wall
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: static_soul_document
+    title: Static Soul Document
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: support_relations
+    title: Support Relations
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: system_prompt_leakage
+    title: System Prompt Leakage
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: tabula_rasa
+    title: Tabula Rasa
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: teachback_mechanism
+    title: Teachback Mechanism
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: teachback_method
+    title: Teachback Method
+    description: Exported from Neo4j (1 prereqs in cluster).
+    prerequisites:
+      - conversation_theory
+    bloom_level: understand
+  - id: technical_standards
+    title: Technical Standards
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: the_architecture_of_wisdom_a_unifying_theory_of_abstraction_compression_and_purposeful_forgetting_in_artificial_and_human_cognition
+    title: The Architecture Of Wisdom A Unifying Theory Of Abstraction Compression And Purposeful Forgetting In Artificial And Human Cognition
+    description: Exported from Neo4j (2 prereqs in cluster).
+    prerequisites:
+      - cascading_honeypot_theorem_of_wisdom
+      - freudian_theory
+    bloom_level: understand
+  - id: the_cascading_honeypot
+    title: The Cascading Honeypot
+    description: Exported from Neo4j (1 prereqs in cluster).
+    prerequisites:
+      - executable_wisdom
+    bloom_level: understand
+  - id: the_cascading_honeypot_theorem_of_wisdom
+    title: The Cascading Honeypot Theorem Of Wisdom
+    description: Exported from Neo4j (3 prereqs in cluster).
+    prerequisites:
+      - dikwp_triz_framework
+      - human_cognitive_psychology
+      - information_bottleneck_ib_theory
+    bloom_level: understand
+  - id: the_promethean_and_epimethean_dichotomy
+    title: The Promethean And Epimethean Dichotomy
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: the_trick_at_mecone
+    title: The Trick At Mecone
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: theft_of_fire
+    title: Theft Of Fire
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: thinking_preservation_mechanism
+    title: Thinking Preservation Mechanism
+    description: Exported from Neo4j (1 prereqs in cluster).
+    prerequisites:
+      - memory_dynamics
+    bloom_level: understand
+  - id: titanomachy
+    title: Titanomachy
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: token_economics
+    title: Token Economics
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: topic_based_colored_petri_nets_tb_cspn
+    title: Topic Based Colored Petri Nets Tb Cspn
+    description: Exported from Neo4j (1 prereqs in cluster).
+    prerequisites:
+      - multi_agent_systems_mas
+    bloom_level: understand
+  - id: triz
+    title: Triz
+    description: Exported from Neo4j (1 prereqs in cluster).
+    prerequisites:
+      - cascading_honeypot_theorem_of_wisdom
+    bloom_level: understand
+  - id: user
+    title: User
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: version_of_record_vor
+    title: Version Of Record Vor
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: web_browsing
+    title: Web Browsing
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: wisdom
+    title: Wisdom
+    description: Exported from Neo4j (1 prereqs in cluster).
+    prerequisites:
+      - purposeful_forgetting
+    bloom_level: understand
+  - id: zipf_s_law
+    title: Zipf S Law
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand

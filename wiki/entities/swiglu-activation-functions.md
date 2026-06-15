@@ -1,0 +1,19 @@
+---
+type: entity
+title: SwiGLU activation functions
+created: 2026-06-09
+updated: 2026-06-09
+sources: 1
+tags: []
+status: draft
+gzmo_synthetic: true
+---
+
+
+# SwiGLU activation functions
+
+Type: CONCEPT
+
+## From [[drive-research-32gb-vram-ai-reasoning-models-micro02|drive-research-32gb-vram-ai-reasoning-models-micro02]] (2026-06-09)
+- Utilized by Qwen3-32B.
+- Hardware-efficient.

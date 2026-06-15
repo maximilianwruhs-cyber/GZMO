@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
-# Qwen3 embedding server on the workstation (:8002).
-# Primary for Pi knowledge_search; GZMO daemon normally uses VM200 :8081 (gzmo.toml).
+# RETIRED (2026-06-13): Pi KB embed now uses VM200 :8081 only. Do not start.
+# Kept for reference; use pi-kb-reindex.sh / knowledge-base.ts instead.
+# Qwen3 embedding server on the workstation (:8002) — optional Pi KB offline fallback.
+# Pi KB primary embed is VM200 :8081 (gzmo-embed); GZMO daemon uses the same (gzmo.toml).
 # Default CPU inference (NGl=0) so Prime keeps VRAM on the 5070 Ti pair.
 set -euo pipefail
 
@@ -22,6 +24,7 @@ fi
 echo "[*] embed server :${PORT} ngl=${NGl} — $(basename "${EMBED_GGUF}")"
 exec "${SERVER}" \
   -m "${EMBED_GGUF}" \
+  --alias gzmo-embed \
   --embedding \
   --pooling last \
   -ngl "${NGl}" \

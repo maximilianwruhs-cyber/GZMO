@@ -30,6 +30,7 @@ if [ -z "$CHARACTER" ]; then
         echo -e "  ${C_WHITE}Persona cleared. Back to default GZMO voice.${C_RESET}"
         echo ""
         echo -e "${C_DIM}└─────────────────────────────────────────────────┘${C_RESET}"
+        emit_persona_cleared
     else
         # No persona active — show available characters
         echo ""
@@ -193,3 +194,5 @@ if llm_available; then
         echo ""
     fi
 fi
+
+emit_persona_shift "$char_name"

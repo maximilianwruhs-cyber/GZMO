@@ -1,0 +1,315 @@
+---
+type: source
+title: drive-research-bun-typescript-performance-tips-micro03
+created: 2026-06-09
+updated: 2026-06-09
+sources: 1
+tags: []
+status: stable
+gzmo_synthetic: true
+---
+
+# drive-research-bun-typescript-performance-tips-micro03
+
+Ingested source summary (2026-06-09).
+
+## Entities
+- [[bun-sqlite|bun:sqlite]] (TOOL)
+- [[zig-based-javascriptcore-powered-foundation|Zig-based, JavaScriptCore-powered foundation]] (SYSTEM)
+- [[coveragethreshold-metrics|coverageThreshold metrics]] (CONCEPT)
+- [[mathematical-simulations|mathematical simulations]] (CONCEPT)
+- [[deno|Deno]] (SYSTEM)
+- [[compile-time-execution-macros|compile-time execution macros]] (CONCEPT)
+- [[dependency-resolution|dependency resolution]] (CONCEPT)
+- [[containerized-cloud-environments|containerized cloud environments]] (CONCEPT)
+- [[heap-size|heap size]] (CONCEPT)
+- [[enterprise-microservices|enterprise microservices]] (CONCEPT)
+- [[aws-lambda-environments|AWS Lambda environments]] (SYSTEM)
+- [[c-runtime|C++ runtime]] (SYSTEM)
+- [[cstring|CString]] (CONCEPT)
+- [[file-system-buffer|file system buffer]] (CONCEPT)
+- [[database-query-execution-times|database query execution times]] (CONCEPT)
+- [[dependency-tree|dependency tree]] (CONCEPT)
+- [[real-world-scenarios|real-world scenarios]] (CONCEPT)
+- [[legacy-packages|legacy packages]] (CONCEPT)
+- [[pure-typescript-packages|Pure TypeScript packages]] (CONCEPT)
+- [[rust|Rust]] (CONCEPT)
+- [[single-instruction-multiple-data-simd|Single Instruction, Multiple Data (SIMD)]] (CONCEPT)
+- [[local-development-tooling|local development tooling]] (CONCEPT)
+- [[os-level-system-calls|OS-level system calls]] (CONCEPT)
+- [[utf-16|UTF-16]] (CONCEPT)
+- [[jsc-engine|JSC engine]] (SYSTEM)
+- [[network-socket|network socket]] (CONCEPT)
+- [[bunfig-toml|bunfig.toml]] (TOOL)
+- [[write-ahead-logging-wal-mode|Write-Ahead Logging (WAL) mode]] (CONCEPT)
+- [[typedarray|TypedArray]] (CONCEPT)
+- [[preload-array|preload array]] (CONCEPT)
+- [[v8-engine|V8 engine]] (SYSTEM)
+- [[paradigm-shift|paradigm shift]] (CONCEPT)
+- [[bun-write|Bun.write()]] (TOOL)
+- [[memory-safe-native-execution|memory-safe native execution]] (CONCEPT)
+- [[runtime-heuristics|runtime heuristics]] (CONCEPT)
+- [[image-processing|image processing]] (CONCEPT)
+- [[shared-state-modules|shared-state modules]] (CONCEPT)
+- [[tinycc|TinyCC]] (TOOL)
+- [[dependency-locks|dependency locks]] (CONCEPT)
+- [[garbage-collector|Garbage collector]] (TOOL)
+- [[docker|Docker]] (SYSTEM)
+- [[monolithic-architectures|monolithic architectures]] (CONCEPT)
+- [[user-space|user space]] (CONCEPT)
+- [[sharp|sharp]] (TOOL)
+- [[memory-consumption-footprints|memory consumption footprints]] (CONCEPT)
+- [[io-uring|io_uring]] (TOOL)
+- [[randomize-true|randomize = true]] (CONCEPT)
+- [[serverless-deployments|serverless deployments]] (CONCEPT)
+- [[native-typescript-execution|native TypeScript execution]] (CONCEPT)
+- [[npm|npm]] (TOOL)
+- [[explicit-resource-management|Explicit Resource Management]] (CONCEPT)
+- [[deterministic-builds|deterministic builds]] (CONCEPT)
+- [[postgresql|PostgreSQL]] (CONCEPT)
+- [[database-lock-contention|database lock contention]] (CONCEPT)
+- [[clonefile|clonefile]] (TOOL)
+- [[bun-file|Bun.file()]] (TOOL)
+- [[startup-latency|startup latency]] (CONCEPT)
+- [[cost-sensitive-cloud-deployments|cost-sensitive cloud deployments]] (CONCEPT)
+- [[shared-library|shared library]] (CONCEPT)
+- [[smol-mode|smol mode]] (CONCEPT)
+- [[cross-test-state-mutations|cross-test state mutations]] (CONCEPT)
+- [[node-pty|node-pty]] (TOOL)
+- [[better-sqlite3|better-sqlite3]] (TOOL)
+- [[libuv-event-loops|libuv event loops]] (SYSTEM)
+- [[type-safe-architectures|type-safe architectures]] (CONCEPT)
+- [[http-response-object|HTTP Response object]] (CONCEPT)
+- [[monitoring-telemetry-endpoints|monitoring telemetry endpoints]] (CONCEPT)
+- [[operating-system-syscalls|operating system syscalls]] (CONCEPT)
+- [[finalizationregistry|FinalizationRegistry]] (TOOL)
+- [[ci-pipelines|CI pipelines]] (SYSTEM)
+- [[ram|RAM]] (CONCEPT)
+- [[multi-tenant|multi-tenant]] (CONCEPT)
+- [[typescript-applications|TypeScript applications]] (CONCEPT)
+- [[bcrypt-js|bcrypt.js]] (CONCEPT)
+- [[linux|Linux]] (CONCEPT)
+- [[dlopen|dlopen]] (TOOL)
+- [[bun-serve|Bun.serve()]] (TOOL)
+- [[bun-password-hash|Bun.password.hash()]] (TOOL)
+- [[bun-lockb|bun.lockb]] (TOOL)
+- [[semantic-versioning-drift|semantic versioning drift]] (CONCEPT)
+- [[connection-pooling-limits|connection pooling limits]] (CONCEPT)
+- [[kernel-space|kernel space]] (CONCEPT)
+- [[jscallback|JSCallback]] (CONCEPT)
+- [[test-execution|test execution]] (CONCEPT)
+- [[javascript-runtime-ecosystem|JavaScript runtime ecosystem]] (CONCEPT)
+- [[bun-test|bun test]] (TOOL)
+- [[authentication-flows|authentication flows]] (CONCEPT)
+- [[http-request|HTTP request]] (CONCEPT)
+- [[jest|Jest]] (TOOL)
+- [[bun-dns-prefetch|Bun.dns.prefetch()]] (TOOL)
+- [[production-environments|production environments]] (CONCEPT)
+- [[db-transaction|db.transaction()]] (TOOL)
+- [[caret|caret (^)]] (CONCEPT)
+- [[statement-coverage|statement coverage]] (CONCEPT)
+- [[64-bit-processors|64-bit processors]] (CONCEPT)
+- [[package-management|package management]] (CONCEPT)
+- [[proprietary-binary-lockfile-format|proprietary binary lockfile format]] (CONCEPT)
+- [[server-side-architectures|server-side architectures]] (CONCEPT)
+- [[business-logic|business logic]] (CONCEPT)
+- [[api-compatibility|API compatibility]] (CONCEPT)
+- [[testing-domain|testing domain]] (CONCEPT)
+- [[data-intensive-microservices|data-intensive microservices]] (CONCEPT)
+- [[synthetic-benchmarks|synthetic benchmarks]] (CONCEPT)
+- [[cryptography|cryptography]] (CONCEPT)
+- [[asynchronous-event-loop|asynchronous event loop]] (CONCEPT)
+- [[hello-world-http-benchmarks|Hello World HTTP benchmarks]] (CONCEPT)
+- [[transpilation-friction|transpilation friction]] (CONCEPT)
+- [[database-driver|database driver]] (CONCEPT)
+- [[memory-expansion|memory expansion]] (CONCEPT)
+- [[cold-start|cold start]] (CONCEPT)
+- [[requests-per-second-req-s|requests per second (req/s)]] (CONCEPT)
+- [[initialization-phase|initialization phase]] (CONCEPT)
+- [[package-json|package.json]] (TOOL)
+- [[crud-applications|CRUD applications]] (CONCEPT)
+- [[yaml-lockfiles|YAML lockfiles]] (TOOL)
+- [[relational-databases|relational databases]] (CONCEPT)
+- [[segmentation-faults|segmentation faults]] (CONCEPT)
+- [[scaling-economics|scaling economics]] (CONCEPT)
+- [[n-api-translation-layer|N-API translation layer]] (TOOL)
+- [[raw-execution-velocity|raw execution velocity]] (CONCEPT)
+- [[tcp-sockets|TCP sockets]] (CONCEPT)
+- [[float32array|Float32Array]] (CONCEPT)
+- [[redis-clients|Redis clients]] (CONCEPT)
+- [[ini|Ini]] (TOOL)
+- [[runtime-i-o-latency|runtime I/O latency]] (CONCEPT)
+- [[development-environments|development environments]] (CONCEPT)
+- [[foreign-function-interface-bun-ffi|Foreign Function Interface (bun:ffi)]] (TOOL)
+- [[oven-bun-image|oven/bun image]] (CONCEPT)
+- [[jvm|JVM]] (SYSTEM)
+- [[null-terminated-utf-8-strings|null-terminated UTF-8 strings]] (CONCEPT)
+- [[database-connection-pools|database connection pools]] (CONCEPT)
+- [[jit-compilation|JIT compilation]] (CONCEPT)
+- [[arraybuffer|ArrayBuffer]] (CONCEPT)
+- [[c-application-binary-interface-abi|C Application Binary Interface (ABI)]] (CONCEPT)
+- [[kubernetes|Kubernetes]] (SYSTEM)
+- [[fetch-callback|fetch callback]] (CONCEPT)
+- [[flaky-assertions|flaky assertions]] (CONCEPT)
+- [[container-footprints|container footprints]] (CONCEPT)
+- [[disposable-interface|Disposable interface]] (CONCEPT)
+- [[node-js-24|Node.js 24]] (SYSTEM)
+- [[rapid-iteration-velocity|rapid iteration velocity]] (CONCEPT)
+- [[domain-name-resolution|domain name resolution]] (CONCEPT)
+- [[greenfield-edge-services|greenfield edge services]] (CONCEPT)
+- [[serverless-edge-functions|serverless edge functions]] (SYSTEM)
+- [[uint8array|Uint8Array]] (CONCEPT)
+- [[global-binary-cache|global binary cache]] (CONCEPT)
+- [[node-api-n-api|Node-API (N-API)]] (TOOL)
+- [[bun-peek|Bun.peek()]] (TOOL)
+- [[api-gateways|API gateways]] (CONCEPT)
+- [[dependency-trees|dependency trees]] (CONCEPT)
+- [[fs-writefilesync|fs.writeFileSync()]] (TOOL)
+- [[http-server|HTTP server]] (SYSTEM)
+- [[audio-manipulation|audio manipulation]] (CONCEPT)
+- [[tcp-handshakes|TCP handshakes]] (CONCEPT)
+- [[out-of-memory-oom-terminations|Out-Of-Memory (OOM) terminations]] (CONCEPT)
+- [[macos|macOS]] (CONCEPT)
+- [[c-native-addons|C++ native addons]] (CONCEPT)
+- [[language-boundaries|language boundaries]] (CONCEPT)
+- [[argon2id|Argon2id]] (CONCEPT)
+- [[node-gyp|node-gyp]] (TOOL)
+- [[bun-install|bun install]] (TOOL)
+- [[install-exact-true|install.exact = true]] (CONCEPT)
+- [[free-functions|free() functions]] (TOOL)
+- [[web-workers|Web Workers]] (SYSTEM)
+- [[risk-free-operational-stability|risk-free operational stability]] (CONCEPT)
+- [[zig|Zig]] (CONCEPT)
+- [[virtual-memory-addressing|virtual memory addressing]] (CONCEPT)
+- [[test-configuration-block|[test] configuration block]] (CONCEPT)
+- [[java|Java]] (CONCEPT)
+- [[memory-leakage|memory leakage]] (CONCEPT)
+- [[hardlinks|hardlinks]] (TOOL)
+- [[network-i-o-limits|network I/O limits]] (CONCEPT)
+- [[json-lockfiles|JSON lockfiles]] (TOOL)
+- [[tilde|tilde (~)]] (CONCEPT)
+- [[incompatible-modules|incompatible modules]] (CONCEPT)
+
+## Relations
+- Node.js 24 → USES → Node-API (N-API)
+- Node.js 24 → USES → node-gyp
+- Node.js 24 → USES → V8 engine
+- Foreign Function Interface (bun:ffi) → USES → TinyCC
+- bun:sqlite → USES → JIT compilation
+- bun:sqlite → USES → Pure TypeScript packages
+- bun:sqlite → USES → Zig-based, JavaScriptCore-powered foundation
+- bun:sqlite → USES → Garbage collector
+- bun:sqlite → USES → Explicit Resource Management
+- bun:sqlite → USES → Disposable interface
+- bun:sqlite → USES → JSCallback
+- JSCallback → USES → Pure TypeScript packages
+- HTTP server → USES → Bun.serve()
+- bun:sqlite → USES → Single Instruction, Multiple Data (SIMD)
+- bun:sqlite → USES → Bun.password.hash()
+- bun:sqlite → USES → Argon2id
+- bun:sqlite → USES → bcrypt.js
+- bun:sqlite → USES → Bun.dns.prefetch()
+- bun:sqlite → USES → bunfig.toml
+- bun:sqlite → USES → JSC engine
+- bun:sqlite → USES → smol mode
+- bun:sqlite → USES → preload array
+- bun:sqlite → USES → package management
+- bun:sqlite → USES → bun install
+- bun install → USES → operating system syscalls
+- bun install → USES → clonefile
+- bun install → USES → hardlinks
+- bun:sqlite → USES → bun.lockb
+- bunfig.toml → USES → install.exact = true
+- install.exact = true → USES → package.json
+- bun:sqlite → USES → bun test
+- bun test → USES → Jest
+- bunfig.toml → USES → [test] configuration block
+- [test] configuration block → USES → coverageThreshold metrics
+- [test] configuration block → USES → randomize = true
+- bun:sqlite → USES → synthetic benchmarks
+- bun:sqlite → RELATED_TO → Node.js 24
+- bun:sqlite → RELATED_TO → Deno
+- bun:sqlite → USES → AWS Lambda environments
+- bun:sqlite → USES → serverless edge functions
+- bun:sqlite → USES → relational databases
+- Node.js 24 → USES → relational databases
+- Deno → USES → relational databases
+- bun:sqlite → USES → connection pooling limits
+- bun:sqlite → USES → database lock contention
+- bun:sqlite → RELATED_TO → C++ native addons
+- Node.js 24 → USES → C++ native addons
+- Node.js 24 → USES → libuv event loops
+- bun:sqlite → USES → N-API translation layer
+- bun:sqlite → USES → Docker
+- bun:sqlite → USES → greenfield edge services
+- bun:sqlite → USES → API gateways
+- bun:sqlite → USES → local development tooling
+- bun:sqlite → USES → raw execution velocity
+- Node.js 24 → USES → risk-free operational stability
+- bun:sqlite → USES → paradigm shift
+- bun:sqlite → USES → startup latency
+- bun:sqlite → USES → transpilation friction
+- bun:sqlite → USES → Bun.peek()
+- bun:sqlite → USES → compile-time execution macros
+- bun:sqlite → USES → bun:ffi
+- bun:sqlite → USES → type-safe architectures
+- bun:sqlite → USES → serverless deployments
+- bun:sqlite → USES → data-intensive microservices
+- bun:sqlite → USES → development environments
+- Node.js 24 → USES → cryptography
+- bun:sqlite → USES → cryptography
+- bun:sqlite → USES → image processing
+- bun:sqlite → USES → mathematical simulations
+- bun:sqlite → USES → audio manipulation
+- bun:sqlite → USES → 64-bit processors
+- bun:sqlite → USES → virtual memory addressing
+- bun:sqlite → USES → UTF-16
+- bun:sqlite → USES → null-terminated UTF-8 strings
+- CString → USES → free() functions
+- bun:sqlite → USES → memory leakage
+- bun:sqlite → USES → segmentation faults
+- Node.js 24 → USES → kernel space
+- Node.js 24 → USES → user space
+- Node.js 24 → USES → file system buffer
+- bun:sqlite → USES → file system buffer
+- bun:sqlite → USES → network socket
+- bun:sqlite → USES → TCP sockets
+- bun:sqlite → USES → database driver
+- bun:sqlite → USES → authentication flows
+- bun:sqlite → USES → domain name resolution
+- bun:sqlite → USES → TCP handshakes
+- bunfig.toml → USES → runtime heuristics
+- bunfig.toml → USES → test execution
+- bunfig.toml → USES → dependency resolution
+- bun:sqlite → USES → Kubernetes
+- smol mode → USES → JSC engine
+- smol mode → USES → Garbage collector
+- smol mode → USES → heap size
+- bun:sqlite → USES → Out-Of-Memory (OOM) terminations
+- preload array → USES → shared-state modules
+- preload array → USES → database connection pools
+- preload array → USES → Redis clients
+- preload array → USES → monitoring telemetry endpoints
+- bun install → RELATED_TO → npm
+- bun install → USES → global binary cache
+- bun.lockb → RELATED_TO → JSON lockfiles
+- bun.lockb → RELATED_TO → YAML lockfiles
+- install.exact = true → USES → deterministic builds
+- install.exact = true → USES → semantic versioning drift
+- bun test → USES → [test] configuration block
+- [test] configuration block → USES → CI pipelines
+- randomize = true → USES → cross-test state mutations
+- bun:sqlite → USES → CRUD applications
+- Node.js 24 → USES → CRUD applications
+- Deno → USES → CRUD applications
+- bun:sqlite → USES → API compatibility
+- bun:sqlite → RELATED_TO → incompatible modules
+- Node.js 24 → USES → legacy packages
+- bun:sqlite → RELATED_TO → Java
+- bun:sqlite → RELATED_TO → JVM
+- bun:sqlite → USES → memory-safe native execution
+- bun:sqlite → USES → language boundaries
+- bun:sqlite → USES → memory consumption footprints
+- bun:sqlite → USES → dependency locks
+- bunfig.toml → PART_OF → bun:sqlite
+- bun:sqlite → USES → rapid iteration velocity

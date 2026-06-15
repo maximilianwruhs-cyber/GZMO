@@ -1,0 +1,144 @@
+# ═══════════════════════════════════════════════════════════════════
+# The Pokemon Card Forge — Pokemon Card Generation Knowledge Base
+# ═══════════════════════════════════════════════════════════════════
+
+[meta]
+version = "1.0"
+design_method = "Concept Design → Archetype Design → Balance Design"
+flavor_rule = "Flavor text should capture the essence, lore, and behavior of the Pokemon or the utility of the trainer/energy."
+text_rule = "Rules text must follow standard Pokemon TCG card formats."
+set_prefix = "PKM"
+hp_range = "30-340"
+
+# ─── Elements ───────────────────────────────────────────────────
+
+[elements.fire]
+symbol = "R"
+mana = "🔥"
+philosophy = "Aggressive, explosive, high risk/reward, burn mechanics"
+flavor_tone = "Fiery, intense, energetic"
+strengths = ["burn status", "high damage", "energy discard"]
+weaknesses = ["Water", "heavy energy costs"]
+personality = "Primal heat and raw passion. Attacks fast and hot."
+
+[elements.water]
+symbol = "W"
+mana = "💧"
+philosophy = "Fluid, healing, control, energy manipulation"
+flavor_tone = "Serene, deep, washing"
+strengths = ["healing", "energy acceleration", "paralysis status"]
+weaknesses = ["Lightning", "lower damage outputs"]
+personality = "Calm adaptation. Wears down opponents and controls energy flow."
+
+[elements.grass]
+symbol = "G"
+mana = "🌿"
+philosophy = "Growth, status effects, healing, swarming"
+flavor_tone = "Natural, organic, toxic"
+strengths = ["poison status", "sleep status", "damage reduction"]
+weaknesses = ["Fire", "reliance on setup"]
+personality = "The cycle of nature. Slowly chokes or poisons the opponent."
+
+[elements.electric]
+symbol = "L"
+mana = "⚡"
+philosophy = "Volatile speed, coin flips, paralysis, recoil damage"
+flavor_tone = "Sparking, hyperactive, sudden"
+strengths = ["paralysis status", "coin-flip high damage", "bench damage"]
+weaknesses = ["Fighting", "self-damage"]
+personality = "Uncontained voltage. High-frequency energy that shocks everything."
+
+[elements.psychic]
+symbol = "P"
+mana = "👁️"
+philosophy = "Mysterious, damage counter placement, status control"
+flavor_tone = "Cerebral, bizarre, enigmatic"
+strengths = ["confusion status", "moving damage counters", "ability locking"]
+weaknesses = ["Darkness", "low physical attack values"]
+personality = "Mental manipulation. Disorients opponents and warps the battlefield."
+
+[elements.darkness]
+symbol = "D"
+mana = "💀"
+philosophy = "Amoral power, poison, hand disruption, sacrifice"
+flavor_tone = "Menacing, transactional, shadow"
+strengths = ["poison status", "discarding opponent cards", "retreat disruption"]
+weaknesses = ["Grass", "self-damage/sacrifice"]
+personality = "The dark abyss. Uses underhanded tactics to weaken the opponent."
+
+[elements.metal]
+symbol = "M"
+mana = "⚙️"
+philosophy = "Steadfast defense, damage reduction, heavy attacks"
+flavor_tone = "Metallic, resolute, industrial"
+strengths = ["damage reduction", "high HP", "consistent high damage"]
+weaknesses = ["Fire", "high retreat costs"]
+personality = "Ironclad resolve. Takes minimal damage and strikes like an anvil."
+
+[elements.colorless]
+symbol = "C"
+mana = "⚪"
+philosophy = "Adaptable utility, draw power, basic attacks"
+flavor_tone = "Neutral, plain, universal"
+strengths = ["flexible energy costs", "card drawing", "basic status curation"]
+weaknesses = ["Fighting", "lack of high damage ceiling"]
+personality = "The blank slate. Fits into any deck as a reliable support piece."
+
+# ─── Categories ──────────────────────────────────────────────────
+
+[[categories]]
+name = "Pokemon"
+required = ["NAME", "ELEMENT", "HP", "CATEGORY", "RARITY", "ATTACK1"]
+
+[[categories]]
+name = "Trainer"
+required = ["NAME", "CATEGORY", "RARITY", "TRAINER_TYPE", "EFFECT"]
+
+[[categories]]
+name = "Energy"
+required = ["NAME", "CATEGORY", "RARITY", "ENERGY_TYPE"]
+
+# ─── Rarity Tiers ────────────────────────────────────────────────
+
+[[rarities]]
+name = "Common"
+symbol = "C"
+icon = "⚪"
+complexity = "Simple cards, basic attacks. Basic stage Pokemon."
+
+[[rarities]]
+name = "Uncommon"
+symbol = "U"
+icon = "🔵"
+complexity = "Minor utility, secondary attacks, stage 1 evolutions, standard Trainer/Energy cards."
+
+[[rarities]]
+name = "Rare"
+symbol = "R"
+icon = "🟡"
+complexity = "Signature attacks, standard abilities. Stage 2 evolutions, special Trainer/Energy cards."
+
+[[rarities]]
+name = "Ultra Rare"
+symbol = "UR"
+icon = "🟠"
+complexity = "ex/V style rules, major impact, high HP. Rules text modifies knockouts."
+
+[[rarities]]
+name = "Secret Rare"
+symbol = "SR"
+icon = "✨"
+complexity = "Alternate representation, maximum prestige. Game-warping mechanics."
+
+# ─── Abilities & Status Effects Pool ─────────────────────────────
+
+[abilities]
+ex_rule = "When your Pokemon ex is Knocked Out, your opponent takes 2 Prize cards."
+status_effects = ["Poisoned", "Paralyzed", "Asleep", "Confused", "Burned"]
+
+# ─── Pokemon Name Fragments ──────────────────────────────────────
+
+[name_fragments]
+prefixes = ["Volt", "Aqua", "Pyro", "Flora", "Giga", "Mega", "Shadow", "Terra", "Aero", "Chrono", "Ember", "Hydra", "Toxic", "Spark", "Lumina", "Dread", "Iron", "Storm", "Frost", "Void"]
+nouns = ["ix", "saur", "leon", "chu", "gon", "reon", "don", "champ", "puff", "mite", "fox", "shell", "claw", "wing", "fang", "blade", "growth", "golem", "geist", "strike"]
+actions = ["Strike", "Blast", "Charge", "Whip", "Burst", "Tail", "Fang", "Claw", "Shield", "Howl", "Slash", "Shock", "Slam", "Bite", "Beam", "Pulse", "Wave", "Stomp", "Reap", "Guard"]

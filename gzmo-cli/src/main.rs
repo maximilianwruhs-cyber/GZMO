@@ -21,8 +21,11 @@ mod chaos_skill_cmd;
 mod init_cmd;
 mod ingest_eval_cmd;
 mod wiki_cmd;
+mod honeypot_cmd;
 mod pedagogy_graph_cmd;
+mod kurator_cmd;
 mod mentor_ipc;
+mod low_tension_dialogue;
 mod mentor_cmd;
 mod mentor_compute_cmd;
 mod mentor_plot_cmd;
@@ -59,11 +62,16 @@ enum Command {
     /// Knowledge Gardener ops over the wiki/ layer (sync|lint|search|file-back|status).
     Wiki(Vec<String>),
     /// Run a chaos slash skill with daemon IPC (`gzmo chaos skill joke`).
-    ChaosSkill { cmd: String, args: String },
+    ChaosSkill { cmd: String, args: String, json: bool },
+    ChaosFeedbackAudit { tail: usize },
     /// Pedagogy tooling (`gzmo pedagogy graph validate <path>`).
     Pedagogy(Vec<String>),
+    /// Honeypot reject log (`gzmo honeypot rejects`).
+    Honeypot(Vec<String>),
     /// Headless mentor API client (`gzmo mentor teach <message>`).
     Mentor(Vec<String>),
+    /// Kurator monitor status (`gzmo kurator status`).
+    Kurator(Vec<String>),
     Help,
 }
 
@@ -90,8 +98,12 @@ USAGE
   gzmo spark [YYYY-MM-DD]       SparkEngine serendipity
   gzmo memory <sub>             Platform memory bridge
   gzmo chaos skill <cmd> [args] Chaos slash skills (Rust registry)
+  gzmo chaos skill dice --json     Structured evidence JSON (Pi probes)
   gzmo wiki <action>            Knowledge Gardener (wiki/ layer)
   gzmo pedagogy graph validate  Prerequisite graph lint
+  gzmo honeypot rejects         Honeypot promotion reject log
+  gzmo honeypot review list     Pending honeypot review queue
+  gzmo honeypot review promote  Operator promote from review queue
   gzmo distill [session_id]     Distill GZMO chat sessions → vault
   gzmo distill pi <path.jsonl>  Distill Pi session on session_end
   gzmo init                     First-time setup
@@ -135,7 +147,9 @@ fn parse_args() -> (Option<String>, Command) {
         if args[1] == "init" { return (learner, Command::Init); }
         if args[1] == "--repl" { return (learner, Command::ChatRepl); }
         if args[1] == "pedagogy" { return (learner, Command::Pedagogy(args[2..].to_vec())); }
+        if args[1] == "honeypot" { return (learner, Command::Honeypot(args[2..].to_vec())); }
         if args[1] == "mentor" { return (learner, Command::Mentor(args[2..].to_vec())); }
+        if args[1] == "kurator" { return (learner, Command::Kurator(args[2..].to_vec())); }
         if args[1] == "dream" {
             let date = args.get(2).and_then(|s| NaiveDate::parse_from_str(s, "%Y-%m-%d").ok());
             return (learner, Command::Dream(date));
@@ -227,10 +241,38 @@ fn parse_args() -> (Option<String>, Command) {
         }
         if args[1] == "health" { return (learner, Command::Health); }
         if args[1] == "wiki" { return (learner, Command::Wiki(args[2..].to_vec())); }
-        if args[1] == "chaos" && args.get(2).map(|s| s.as_str()) == Some("skill") {
-            let cmd = args.get(3).cloned().unwrap_or_else(|| "help".to_string());
-            let skill_args = args[4..].join(" ");
-            return (learner, Command::ChaosSkill { cmd, args: skill_args });
+        if args[1] == "chaos" {
+            if args.get(2).map(|s| s.as_str()) == Some("skill") {
+                let cmd = args.get(3).cloned().unwrap_or_else(|| "help".to_string());
+                let mut json = false;
+                let mut skill_args_parts: Vec<&str> = Vec::new();
+                for a in args.iter().skip(4) {
+                    if a == "--json" {
+                        json = true;
+                    } else {
+                        skill_args_parts.push(a.as_str());
+                    }
+                }
+                let skill_args = skill_args_parts.join(" ");
+                return (learner, Command::ChaosSkill { cmd, args: skill_args, json });
+            }
+            if args.get(2).map(|s| s.as_str()) == Some("feedback-audit") {
+                let mut tail = 20;
+                let mut i = 3;
+                while i < args.len() {
+                    if args[i] == "--tail" {
+                        if let Some(val) = args.get(i + 1) {
+                            if let Ok(n) = val.parse::<usize>() {
+                                tail = n;
+                            }
+                            i += 2;
+                            continue;
+                        }
+                    }
+                    i += 1;
+                }
+                return (learner, Command::ChaosFeedbackAudit { tail });
+            }
         }
         if args[1] == "mcp-serve" { return (learner, Command::McpServe); }
         if args[1] == "profile" {
@@ -262,8 +304,11 @@ async fn main() -> Result<()> {
         Command::McpServe => "warn",
         Command::Wiki(_) => "info",
         Command::ChaosSkill { .. } => "warn",
+        Command::ChaosFeedbackAudit { .. } => "warn",
         Command::Pedagogy(_) => "warn",
+        Command::Honeypot(_) => "warn",
         Command::Mentor(_) => "warn",
+        Command::Kurator(_) => "warn",
         Command::Help => "warn",
     };
 
@@ -349,9 +394,28 @@ async fn main() -> Result<()> {
         Command::Profile(args) => profile_cmd::run(&config, &args).await,
         Command::McpServe => mcp_serve_cmd::run(&config).await,
         Command::Wiki(args) => wiki_cmd::run(&config, args).await,
-        Command::ChaosSkill { cmd, args } => chaos_skill_cmd::run(&config, &cmd, &args).await,
+        Command::ChaosSkill { cmd, args, json } => chaos_skill_cmd::run(&config, &cmd, &args, json).await,
+        Command::ChaosFeedbackAudit { tail } => {
+            use std::io::BufRead;
+            let data_dir = gzmo_core::skills::dispatch::data_dir(&config);
+            let audit_file = data_dir.join("chaos_feedback_audit.jsonl");
+            if !audit_file.exists() {
+                println!("No audit trail found at {}", audit_file.display());
+                return Ok(());
+            }
+            let file = std::fs::File::open(&audit_file)?;
+            let reader = std::io::BufReader::new(file);
+            let lines: Vec<String> = reader.lines().map_while(Result::ok).collect();
+            let start = lines.len().saturating_sub(tail);
+            for line in &lines[start..] {
+                println!("{line}");
+            }
+            Ok(())
+        }
         Command::Pedagogy(args) => pedagogy_graph_cmd::run(&args).await,
+        Command::Honeypot(args) => honeypot_cmd::run(&config, &args).await,
         Command::Mentor(args) => mentor_cmd::run(&config, &args).await,
+        Command::Kurator(args) => kurator_cmd::run(&args, &config).await,
         Command::Help => unreachable!(),
     }
 }

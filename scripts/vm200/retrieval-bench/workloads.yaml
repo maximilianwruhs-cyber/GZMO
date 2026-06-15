@@ -1,0 +1,20 @@
+# Representative GZMO retrieval workloads for VM200 bench.
+
+embed_texts:
+  - "[SYSTEM:Prime] Gemma 4 26B-A4B runs on workstation :8000 for cognition and session distill."
+  - "[NODE:VM200] Retrieval router on GTX 1070 serves gzmo-embed and gzmo-rerank on :8081."
+  - "SessionDistill promotes verified facts from chat transcripts into honeypot recall."
+
+rerank:
+  query: "Where does GZMO run Prime cognition?"
+  documents:
+    - "[SYSTEM:Prime] Workstation dual RTX 5070 Ti hosts Gemma 4 26B at :8000."
+    - "[NODE:VM200] Embeddings and rerank on GTX 1070 eGPU."
+    - "Unrelated weather forecast for Berlin next week."
+
+rerank_batch_sizes: [1, 5, 15, 40]
+
+memory_search_queries:
+  - "Obulus quality gate"
+  - "VM200 retrieval"
+  - "session distill Prime"

@@ -1,0 +1,19 @@
+---
+type: entity
+title: Mengyu Zhou
+created: 2026-06-09
+updated: 2026-06-09
+sources: 1
+tags: []
+status: draft
+gzmo_synthetic: true
+---
+
+# Mengyu Zhou
+
+Type: AUTHOR
+
+## From [[ai-research-part6-micro01|ai-research-part6-micro01]] (2026-06-09)
+- Author of SiameseNorm.
+- Affiliated with Qwen Large Model Application Team, Alibaba.
+- Corresponding author.

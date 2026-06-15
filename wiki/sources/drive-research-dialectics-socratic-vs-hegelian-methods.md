@@ -1,0 +1,185 @@
+---
+type: source
+title: drive-research-dialectics-socratic-vs-hegelian-methods
+created: 2026-06-08
+updated: 2026-06-08
+sources: 1
+tags: []
+status: stable
+gzmo_synthetic: true
+---
+
+# drive-research-dialectics-socratic-vs-hegelian-methods
+
+Ingested source summary (2026-06-08).
+
+## Entities
+- [[a-precarious-happiness|A Precarious Happiness]] (BOOK)
+- [[two-ideas-of-dialectic-hegel-and-adorno|Two Ideas of Dialectic: Hegel and Adorno]] (BOOK)
+- [[ap-u-s-history|AP U.S. History]] (PROJECT)
+- [[all-or-nothing-thinking|all-or-nothing thinking]] (CONCEPT)
+- [[johann-gottlieb-fichte|Johann Gottlieb Fichte]] (PERSON)
+- [[socrates|Socrates]] (PERSON)
+- [[thesis-antithesis-synthesis|Thesis-Antithesis-Synthesis]] (CONCEPT)
+- [[plato|Plato]] (PERSON)
+- [[aporia|Aporia]] (CONCEPT)
+- [[corporeal-imprint-of-society|corporeal imprint of society]] (CONCEPT)
+- [[the-open-society-and-its-enemies|The Open Society and Its Enemies]] (BOOK)
+- [[distress-tolerance|Distress Tolerance]] (CONCEPT)
+- [[immanuel-kant|Immanuel Kant]] (PERSON)
+- [[kantian-copernican-revolution|Kantian 'Copernican revolution']] (CONCEPT)
+- [[paulo-freire|Paulo Freire]] (PERSON)
+- [[socratic-seminar|Socratic Seminar]] (TOOL)
+- [[the-child-and-the-curriculum|The Child and the Curriculum]] (BOOK)
+- [[democracy-and-education|Democracy and Education]] (BOOK)
+- [[determinate-negation|determinate negation]] (CONCEPT)
+- [[richard-rothstein|Richard Rothstein]] (PERSON)
+- [[karl-popper|Karl Popper]] (PERSON)
+- [[socratic-dialogue|Socratic dialogue]] (CONCEPT)
+- [[historical-materialism|Historical Materialism]] (CONCEPT)
+- [[critique-of-dialectical-reason|Critique of Dialectical Reason]] (BOOK)
+- [[hegelian-distinction-between-a-being-in-itself-and-a-being-for-itself|Hegelian distinction between a 'being in-itself' and a 'being for-itself']] (CONCEPT)
+- [[categorical-imperative|categorical imperative]] (CONCEPT)
+- [[kantian-practical-reason|Kantian practical reason]] (CONCEPT)
+- [[external-aims|external aims]] (CONCEPT)
+- [[the-phenomenology-of-spirit|The Phenomenology of Spirit]] (BOOK)
+- [[socratic-method|Socratic method]] (TOOL)
+- [[friedrich-engels|Friedrich Engels]] (PERSON)
+- [[mindfulness|Mindfulness]] (CONCEPT)
+- [[color-of-law|Color of Law]] (BOOK)
+- [[negative-dialectics|Negative Dialectics]] (BOOK)
+- [[constitutive-subjectivity|constitutive subjectivity]] (CONCEPT)
+- [[being-in-itself|being in-itself]] (CONCEPT)
+- [[dialectical-behavior-therapy-dbt|Dialectical Behavior Therapy (DBT)]] (TOOL)
+- [[peter-e-gordon|Peter E. Gordon]] (PERSON)
+- [[jean-paul-sartre|Jean-Paul Sartre]] (PERSON)
+- [[master-slave-dialectic|Master-Slave Dialectic]] (CONCEPT)
+- [[georg-wilhelm-friedrich-hegel|Georg Wilhelm Friedrich Hegel]] (PERSON)
+- [[aristotelian-logic|Aristotelian logic]] (CONCEPT)
+- [[historicism|Historicism]] (CONCEPT)
+- [[certified-dbt-therapist-cdbt|Certified DBT therapist (CDBT)]] (CONCEPT)
+- [[karl-marx|Karl Marx]] (PERSON)
+- [[exchange-principle|exchange principle]] (CONCEPT)
+- [[john-dewey|John Dewey]] (PERSON)
+- [[critical-theory|Critical Theory]] (CONCEPT)
+- [[berger-and-wild|Berger and Wild]] (PERSON)
+- [[elenchus|Elenchus]] (CONCEPT)
+- [[acceptance-and-change|acceptance and change]] (CONCEPT)
+- [[interpersonal-effectiveness|Interpersonal Effectiveness]] (CONCEPT)
+- [[marxist-dialectics|Marxist dialectics]] (CONCEPT)
+- [[an-african-american-and-latinx-history-of-the-united-states|An African American and Latinx History of the United States]] (BOOK)
+- [[identity-thinking|identity thinking]] (CONCEPT)
+- [[s-ren-kierkegaard|Søren Kierkegaard]] (PERSON)
+- [[hegelian-dialectical-development|Hegelian dialectical development]] (CONCEPT)
+- [[frankfurt-school|Frankfurt School]] (ORGANIZATION)
+- [[theodor-w-adorno|Theodor W. Adorno]] (PERSON)
+- [[priority-of-the-object-vorrang-des-objekts|priority of the object (Vorrang des Objekts)]] (CONCEPT)
+- [[dialectical-materialism|Dialectical Materialism]] (CONCEPT)
+- [[hegelian-self-othering|Hegelian self-othering]] (CONCEPT)
+- [[holocaust|Holocaust]] (CONCEPT)
+- [[platonic-forms|Platonic Forms]] (CONCEPT)
+- [[emotion-regulation|Emotion Regulation]] (CONCEPT)
+- [[borderline-personality-disorder-bpd|Borderline Personality Disorder (BPD)]] (CONCEPT)
+- [[aufhebung|Aufhebung]] (CONCEPT)
+- [[non-identical-das-nichtidentische|non-identical (das Nichtidentische)]] (CONCEPT)
+- [[math-for-social-justice-m4sj|Math for Social Justice (M4SJ)]] (TOOL)
+- [[pedagogy-of-the-oppressed|Pedagogy of the Oppressed]] (BOOK)
+- [[paul-ortiz|Paul Ortiz]] (PERSON)
+
+## Relations
+- Socrates → USES → Elenchus
+- Plato → USES → Elenchus
+- Plato → RELATED_TO → Socrates
+- Elenchus → RELATED_TO → Aporia
+- Plato → RELATED_TO → Platonic Forms
+- Georg Wilhelm Friedrich Hegel → USES → Two Ideas of Dialectic: Hegel and Adorno
+- Georg Wilhelm Friedrich Hegel → USES → Aufhebung
+- Georg Wilhelm Friedrich Hegel → AUTHORED_BY → The Phenomenology of Spirit
+- The Phenomenology of Spirit → PART_OF → Master-Slave Dialectic
+- Karl Marx → USES → Dialectical Materialism
+- Friedrich Engels → USES → Dialectical Materialism
+- Karl Marx → RELATED_TO → Georg Wilhelm Friedrich Hegel
+- Friedrich Engels → RELATED_TO → Karl Marx
+- Dialectical Materialism → RELATED_TO → Historical Materialism
+- Karl Marx → USES → Historical Materialism
+- Søren Kierkegaard → RELATED_TO → Georg Wilhelm Friedrich Hegel
+- Søren Kierkegaard → RELATED_TO → Aufhebung
+- Jean-Paul Sartre → AUTHORED_BY → Critique of Dialectical Reason
+- Jean-Paul Sartre → RELATED_TO → Dialectical Materialism
+- Karl Popper → AUTHORED_BY → The Open Society and Its Enemies
+- The Open Society and Its Enemies → RELATED_TO → Historicism
+- Karl Popper → RELATED_TO → Georg Wilhelm Friedrich Hegel
+- Karl Popper → RELATED_TO → Karl Marx
+- Karl Popper → RELATED_TO → Plato
+- Theodor W. Adorno → AUTHORED_BY → Negative Dialectics
+- Theodor W. Adorno → RELATED_TO → Georg Wilhelm Friedrich Hegel
+- Theodor W. Adorno → PART_OF → Frankfurt School
+- Frankfurt School → RELATED_TO → Critical Theory
+- Immanuel Kant → RELATED_TO → Thesis-Antithesis-Synthesis
+- Johann Gottlieb Fichte → RELATED_TO → Thesis-Antithesis-Synthesis
+- Aristotelian logic → RELATED_TO → Georg Wilhelm Friedrich Hegel
+- Two Ideas of Dialectic: Hegel and Adorno → RELATED_TO → Socrates
+- Two Ideas of Dialectic: Hegel and Adorno → RELATED_TO → Plato
+- Two Ideas of Dialectic: Hegel and Adorno → RELATED_TO → Georg Wilhelm Friedrich Hegel
+- Two Ideas of Dialectic: Hegel and Adorno → RELATED_TO → Karl Marx
+- Two Ideas of Dialectic: Hegel and Adorno → RELATED_TO → Friedrich Engels
+- Two Ideas of Dialectic: Hegel and Adorno → RELATED_TO → Søren Kierkegaard
+- Two Ideas of Dialectic: Hegel and Adorno → RELATED_TO → Jean-Paul Sartre
+- Two Ideas of Dialectic: Hegel and Adorno → RELATED_TO → Karl Popper
+- Two Ideas of Dialectic: Hegel and Adorno → RELATED_TO → Theodor W. Adorno
+- Two Ideas of Dialectic: Hegel and Adorno → USES → determinate negation
+- Two Ideas of Dialectic: Hegel and Adorno → USES → Dialectic
+- Two Ideas of Dialectic: Hegel and Adorno → RELATED_TO → Kantian 'Copernican revolution'
+- Two Ideas of Dialectic: Hegel and Adorno → RELATED_TO → constitutive subjectivity
+- Two Ideas of Dialectic: Hegel and Adorno → RELATED_TO → identity thinking
+- Two Ideas of Dialectic: Hegel and Adorno → RELATED_TO → exchange principle
+- Two Ideas of Dialectic: Hegel and Adorno → RELATED_TO → non-identical (das Nichtidentische)
+- Two Ideas of Dialectic: Hegel and Adorno → RELATED_TO → priority of the object (Vorrang des Objekts)
+- Two Ideas of Dialectic: Hegel and Adorno → RELATED_TO → Kantian practical reason
+- Two Ideas of Dialectic: Hegel and Adorno → RELATED_TO → Holocaust
+- Two Ideas of Dialectic: Hegel and Adorno → RELATED_TO → corporeal imprint of society
+- Two Ideas of Dialectic: Hegel and Adorno → RELATED_TO → categorical imperative
+- identity thinking → RELATED_TO → exchange principle
+- Peter E. Gordon → RELATED_TO → Two Ideas of Dialectic: Hegel and Adorno
+- Peter E. Gordon → AUTHORED_BY → Two Ideas of Dialectic: Hegel and Adorno
+- Peter E. Gordon → AUTHORED_BY → A Precarious Happiness
+- John Dewey → USES → Dialectic
+- John Dewey → AUTHORED_BY → Democracy and Education
+- John Dewey → AUTHORED_BY → The Child and the Curriculum
+- John Dewey → RELATED_TO → external aims
+- John Dewey → USES → Hegelian dialectical development
+- Paulo Freire → USES → Marxist dialectics
+- Paulo Freire → AUTHORED_BY → Pedagogy of the Oppressed
+- Paulo Freire → RELATED_TO → being in-itself
+- Paulo Freire → RELATED_TO → Hegelian distinction between a 'being in-itself' and a 'being for-itself'
+- Paulo Freire → RELATED_TO → Hegelian self-othering
+- Socratic Seminar → USES → Dialectic
+- Socratic Seminar → RELATED_TO → Socratic method
+- Math for Social Justice (M4SJ) → USES → Dialectic
+- Dialectical Behavior Therapy (DBT) → USES → Dialectic
+- Dialectical Behavior Therapy (DBT) → RELATED_TO → Borderline Personality Disorder (BPD)
+- Dialectical Behavior Therapy (DBT) → RELATED_TO → acceptance and change
+- Dialectical Behavior Therapy (DBT) → USES → Socratic dialogue
+- Dialectical Behavior Therapy (DBT) → RELATED_TO → all-or-nothing thinking
+- Dialectical Behavior Therapy (DBT) → PART_OF → Mindfulness
+- Dialectical Behavior Therapy (DBT) → PART_OF → Distress Tolerance
+- Dialectical Behavior Therapy (DBT) → PART_OF → Emotion Regulation
+- Dialectical Behavior Therapy (DBT) → PART_OF → Interpersonal Effectiveness
+- Certified DBT therapist (CDBT) → RELATED_TO → Dialectical Behavior Therapy (DBT)
+- Karl Marx → USES → Dialectic
+- Friedrich Engels → USES → Dialectic
+- Søren Kierkegaard → RELATED_TO → Dialectic
+- Karl Popper → RELATED_TO → Dialectic
+- Immanuel Kant → RELATED_TO → Kantian 'Copernican revolution'
+- Immanuel Kant → RELATED_TO → Kantian practical reason
+- Paul Ortiz → AUTHORED_BY → An African American and Latinx History of the United States
+- AP U.S. History → USES → Socratic method
+- AP U.S. History → RELATED_TO → An African American and Latinx History of the United States
+- AP U.S. History → RELATED_TO → Color of Law
+- Richard Rothstein → AUTHORED_BY → Color of Law
+- Socratic method → RELATED_TO → Socrates
+- Hegelian dialectical development → RELATED_TO → Two Ideas of Dialectic: Hegel and Adorno
+- Marxist dialectics → RELATED_TO → Karl Marx
+- Berger and Wild → RELATED_TO → Socratic Seminar
+- The Phenomenology of Spirit → AUTHORED_BY → Two Ideas of Dialectic: Hegel and Adorno
+- The Open Society and Its Enemies → AUTHORED_BY → Karl Popper

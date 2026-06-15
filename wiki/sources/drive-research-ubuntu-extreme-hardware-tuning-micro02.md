@@ -1,0 +1,169 @@
+---
+type: source
+title: drive-research-ubuntu-extreme-hardware-tuning-micro02
+created: 2026-06-09
+updated: 2026-06-09
+sources: 1
+tags: []
+status: stable
+gzmo_synthetic: true
+---
+
+# drive-research-ubuntu-extreme-hardware-tuning-micro02
+
+Ingested source summary (2026-06-09).
+
+## Entities
+- [[99-performance-tuning-conf|99-performance-tuning.conf]] (SYSTEM)
+- [[nvidia-persistenced-service|nvidia-persistenced.service]] (SYSTEM)
+- [[realtek-rtl8126|Realtek RTL8126]] (SYSTEM)
+- [[amd-pstate-active|amd_pstate=active]] (CONCEPT)
+- [[phison-e31t|Phison E31T]] (SYSTEM)
+- [[edc|EDC]] (CONCEPT)
+- [[fair-queueing-fq|Fair Queueing (fq)]] (CONCEPT)
+- [[dmesg|dmesg]] (TOOL)
+- [[net-core-wmem-max|net.core.wmem_max]] (CONCEPT)
+- [[net-ipv4-ip-local-port-range|net.ipv4.ip_local_port_range]] (CONCEPT)
+- [[6-ghz|6 GHz]] (CONCEPT)
+- [[nvml|nvml]] (TOOL)
+- [[5gbe|5GbE]] (CONCEPT)
+- [[vm-swappiness|vm.swappiness]] (CONCEPT)
+- [[curve-shaper|Curve Shaper]] (CONCEPT)
+- [[mediatek-mt7925|MediaTek MT7925]] (TOOL)
+- [[nvoc-info|nvoc info]] (TOOL)
+- [[cppc-collaborative-processor-performance-control|CPPC (Collaborative Processor Performance Control)]] (CONCEPT)
+- [[zen-5|Zen 5]] (CONCEPT)
+- [[ethtool|ethtool]] (TOOL)
+- [[iommu-pt|iommu=pt]] (CONCEPT)
+- [[net-ipv4-tcp-max-tw-buckets|net.ipv4.tcp_max_tw_buckets]] (CONCEPT)
+- [[net-core-rmem-max|net.core.rmem_max]] (CONCEPT)
+- [[bios-version-4-20|BIOS version 4.20]] (SYSTEM)
+- [[vm-dirty-background-ratio|vm.dirty_background_ratio]] (CONCEPT)
+- [[git|git]] (TOOL)
+- [[rcutree-enable-rcu-lazy|rcutree.enable_rcu_lazy]] (CONCEPT)
+- [[net-ipv4-tcp-max-syn-backlog|net.ipv4.tcp_max_syn_backlog]] (CONCEPT)
+- [[ppt|PPT]] (CONCEPT)
+- [[build-essential|build-essential]] (TOOL)
+- [[cargo|cargo]] (TOOL)
+- [[amd-overclocking|AMD Overclocking]] (TOOL)
+- [[tdc|TDC]] (CONCEPT)
+- [[bandwidth-delay-product-bdp|Bandwidth-Delay Product (BDP)]] (CONCEPT)
+- [[net-core-wmem-default|net.core.wmem_default]] (CONCEPT)
+- [[nvme-cli|nvme-cli]] (TOOL)
+- [[uefi|UEFI]] (SYSTEM)
+- [[nvidia-gsp-conf|nvidia-gsp.conf]] (SYSTEM)
+- [[60-nvme-tuning-rules|60-nvme-tuning.rules]] (SYSTEM)
+- [[gpu-oc-service|gpu-oc.service]] (SYSTEM)
+- [[nvme-id-ns|nvme id-ns]] (TOOL)
+- [[net-core-default-qdisc|net.core.default_qdisc]] (CONCEPT)
+- [[wayland|Wayland]] (SYSTEM)
+- [[nvme-hmb-conf|nvme-hmb.conf]] (SYSTEM)
+- [[net-ipv4-tcp-window-scaling|net.ipv4.tcp_window_scaling]] (CONCEPT)
+- [[grub-cmdline-linux-default|GRUB_CMDLINE_LINUX_DEFAULT]] (CONCEPT)
+- [[net-ipv4-tcp-wmem|net.ipv4.tcp_wmem]] (CONCEPT)
+- [[cubic|CUBIC]] (CONCEPT)
+- [[networkmanager-dispatcher|NetworkManager dispatcher]] (SYSTEM)
+- [[wi-fi-7|Wi-Fi 7]] (CONCEPT)
+- [[nvme-format|nvme format]] (TOOL)
+- [[audit-0|audit=0]] (CONCEPT)
+- [[net-ipv4-tcp-rmem|net.ipv4.tcp_rmem]] (CONCEPT)
+- [[nvme-core-default-ps-max-latency-us-0|nvme_core.default_ps_max_latency_us=0]] (CONCEPT)
+- [[napi|NAPI]] (CONCEPT)
+- [[bbr-bottleneck-bandwidth-and-round-trip-propagation-time|BBR (Bottleneck Bandwidth and Round-trip propagation time)]] (CONCEPT)
+- [[kioxia-exceria-plus-g4|KIOXIA Exceria Plus G4]] (SYSTEM)
+- [[dkms|DKMS]] (TOOL)
+- [[noatime|noatime]] (CONCEPT)
+- [[net-core-somaxconn|net.core.somaxconn]] (CONCEPT)
+- [[net-ipv4-tcp-congestion-control|net.ipv4.tcp_congestion_control]] (CONCEPT)
+- [[amd-iommu-on|amd_iommu=on]] (CONCEPT)
+- [[net-ipv4-tcp-fastopen|net.ipv4.tcp_fastopen]] (CONCEPT)
+- [[net-ipv4-tcp-tw-reuse|net.ipv4.tcp_tw_reuse]] (CONCEPT)
+- [[r8126-driver|r8126 driver]] (TOOL)
+- [[pcie-active-state-power-management-aspm|PCIe Active State Power Management (ASPM)]] (CONCEPT)
+- [[rq-affinity|rq_affinity]] (CONCEPT)
+- [[tcp-ip-stack|TCP/IP Stack]] (CONCEPT)
+- [[pbo-precision-boost-overdrive|PBO (Precision Boost Overdrive)]] (CONCEPT)
+- [[net-core-netdev-max-backlog|net.core.netdev_max_backlog]] (CONCEPT)
+- [[net-core-rmem-default|net.core.rmem_default]] (CONCEPT)
+- [[apt|apt]] (TOOL)
+- [[cat-proc-driver-nvidia-gsp-status|cat /proc/driver/nvidia/gsp/status]] (TOOL)
+- [[ubuntu|Ubuntu]] (SYSTEM)
+- [[systemd|systemd]] (SYSTEM)
+
+## Relations
+- Phison E31T → RELATED_TO → nvme_core.default_ps_max_latency_us=0
+- Realtek RTL8126 → USES → r8126 driver
+- Realtek RTL8126 → USES → DKMS
+- Realtek RTL8126 → USES → ethtool
+- MediaTek MT7925 → RELATED_TO → PCIe Active State Power Management (ASPM)
+- MediaTek MT7925 → USES → NetworkManager dispatcher
+- BBR (Bottleneck Bandwidth and Round-trip propagation time) → RELATED_TO → Fair Queueing (fq)
+- Bandwidth-Delay Product (BDP) → RELATED_TO → TCP/IP Stack
+- Ubuntu → USES → GRUB_CMDLINE_LINUX_DEFAULT
+- GRUB_CMDLINE_LINUX_DEFAULT → PART_OF → nvme_core.default_ps_max_latency_us=0
+- nvoc info → USES → nvml
+- gpu-oc.service → PART_OF → systemd
+- gpu-oc.service → USES → nvoc info
+- gpu-oc.service → RELATED_TO → nvidia-persistenced.service
+- AMD Overclocking → RELATED_TO → PBO (Precision Boost Overdrive)
+- AMD Overclocking → RELATED_TO → PPT
+- AMD Overclocking → RELATED_TO → TDC
+- AMD Overclocking → RELATED_TO → EDC
+- AMD Overclocking → RELATED_TO → Curve Shaper
+- Curve Shaper → RELATED_TO → Zen 5
+- CPPC (Collaborative Processor Performance Control) → RELATED_TO → GRUB_CMDLINE_LINUX_DEFAULT
+- apt → USES → Ubuntu
+- build-essential → PART_OF → apt
+- nvme-cli → USES → nvme format
+- nvme-cli → USES → nvme id-ns
+- nvme_core.default_ps_max_latency_us=0 → RELATED_TO → Phison E31T
+- rq_affinity → RELATED_TO → GRUB_CMDLINE_LINUX_DEFAULT
+- noatime → RELATED_TO → GRUB_CMDLINE_LINUX_DEFAULT
+- 5GbE → RELATED_TO → Realtek RTL8126
+- Wi-Fi 7 → RELATED_TO → MediaTek MT7925
+- NAPI → RELATED_TO → r8126 driver
+- 6 GHz → RELATED_TO → Wi-Fi 7
+- TCP/IP Stack → RELATED_TO → GRUB_CMDLINE_LINUX_DEFAULT
+- net.core.rmem_max → RELATED_TO → TCP/IP Stack
+- net.core.wmem_max → RELATED_TO → TCP/IP Stack
+- net.ipv4.tcp_rmem → RELATED_TO → TCP/IP Stack
+- net.ipv4.tcp_wmem → RELATED_TO → TCP/IP Stack
+- net.core.somaxconn → RELATED_TO → TCP/IP Stack
+- net.core.netdev_max_backlog → RELATED_TO → TCP/IP Stack
+- net.core.default_qdisc → RELATED_TO → BBR (Bottleneck Bandwidth and Round-trip propagation time)
+- net.ipv4.tcp_congestion_control → RELATED_TO → BBR (Bottleneck Bandwidth and Round-trip propagation time)
+- amd_iommu=on → PART_OF → GRUB_CMDLINE_LINUX_DEFAULT
+- iommu=pt → PART_OF → GRUB_CMDLINE_LINUX_DEFAULT
+- amd_pstate=active → PART_OF → GRUB_CMDLINE_LINUX_DEFAULT
+- rcutree.enable_rcu_lazy → PART_OF → GRUB_CMDLINE_LINUX_DEFAULT
+- audit=0 → PART_OF → GRUB_CMDLINE_LINUX_DEFAULT
+- nvidia-gsp.conf → RELATED_TO → nvidia-persistenced.service
+- nvme-hmb.conf → RELATED_TO → nvme-cli
+- 60-nvme-tuning.rules → RELATED_TO → nvme-cli
+- 99-performance-tuning.conf → RELATED_TO → GRUB_CMDLINE_LINUX_DEFAULT
+- vm.swappiness → RELATED_TO → GRUB_CMDLINE_LINUX_DEFAULT
+- vm.dirty_background_ratio → RELATED_TO → GRUB_CMDLINE_LINUX_DEFAULT
+- net.core.rmem_default → RELATED_TO → TCP/IP Stack
+- net.core.wmem_default → RELATED_TO → TCP/IP Stack
+- net.ipv4.tcp_window_scaling → RELATED_TO → TCP/IP Stack
+- net.ipv4.tcp_fastopen → RELATED_TO → TCP/IP Stack
+- net.ipv4.tcp_max_syn_backlog → RELATED_TO → TCP/IP Stack
+- net.ipv4.ip_local_port_range → RELATED_TO → TCP/IP Stack
+- net.ipv4.tcp_tw_reuse → RELATED_TO → TCP/IP Stack
+- net.ipv4.tcp_max_tw_buckets → RELATED_TO → TCP/IP Stack
+- BIOS version 4.20 → PART_OF → UEFI
+- AMD Overclocking → PART_OF → BIOS version 4.20
+- PBO (Precision Boost Overdrive) → RELATED_TO → AMD Overclocking
+- dkms → PART_OF → apt
+- git → PART_OF → apt
+- nvme-cli → PART_OF → apt
+- ethtool → PART_OF → apt
+- cargo → PART_OF → apt
+- nvoc info → USES → cargo
+- gpu-oc.service → USES → systemd
+- dmesg → USES → nvme-cli
+- cat /proc/driver/nvidia/gsp/status → USES → nvidia-persistenced.service
+- AMD Overclocking → PART_OF → UEFI
+- nvme-cli → RELATED_TO → GRUB_CMDLINE_LINUX_DEFAULT
+- nvidia-persistenced.service → RELATED_TO → GRUB_CMDLINE_LINUX_DEFAULT
+- MediaTek MT7925 → RELATED_TO → GRUB_CMDLINE_LINUX_DEFAULT

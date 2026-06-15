@@ -69,6 +69,114 @@ pub fn canonicalize_entity_type(raw: &str) -> String {
     }
 }
 
+/// Format MCP `read_graph` JSON (summary or full) for chat/TUI boot context injection.
+pub fn format_knowledge_graph_boot_context(output: &str) -> Option<String> {
+    let graph: serde_json::Value = serde_json::from_str(output).ok()?;
+    let mut block = String::from("\n\n## Persistent Memory (Knowledge Graph)\n\n");
+    let mut has_content = false;
+
+    if graph.get("summary").and_then(|s| s.as_bool()) == Some(true) {
+        let entities = graph.get("entity_count").and_then(|n| n.as_u64()).unwrap_or(0);
+        let relations = graph.get("relation_count").and_then(|n| n.as_u64()).unwrap_or(0);
+        let observations = graph
+            .get("observation_count")
+            .and_then(|n| n.as_u64())
+            .unwrap_or(0);
+        block.push_str(&format!(
+            "- **Overview:** {entities} entities, {relations} relations, {observations} observations\n"
+        ));
+        has_content = true;
+
+        if let Some(types) = graph.get("entity_types").and_then(|t| t.as_object()) {
+            let mut pairs: Vec<(String, u64)> = types
+                .iter()
+                .filter_map(|(k, v)| v.as_u64().map(|n| (k.clone(), n)))
+                .collect();
+            pairs.sort_by(|a, b| b.1.cmp(&a.1));
+            if !pairs.is_empty() {
+                block.push_str("- **Top types:** ");
+                let top: Vec<String> = pairs
+                    .iter()
+                    .take(8)
+                    .map(|(t, n)| format!("{t} ({n})"))
+                    .collect();
+                block.push_str(&top.join(", "));
+                block.push('\n');
+            }
+        }
+
+        if let Some(samples) = graph.get("sample_entities").and_then(|s| s.as_array()) {
+            if !samples.is_empty() {
+                block.push_str("- **Sample entities:** ");
+                let names: Vec<String> = samples
+                    .iter()
+                    .take(12)
+                    .filter_map(|e| {
+                        let name = e.get("name").and_then(|n| n.as_str()).unwrap_or("?");
+                        let etype = e.get("type").and_then(|t| t.as_str()).unwrap_or("?");
+                        Some(format!("{name} ({etype})"))
+                    })
+                    .collect();
+                block.push_str(&names.join(", "));
+                block.push('\n');
+            }
+        }
+
+        if let Some(hint) = graph.get("hint").and_then(|h| h.as_str()) {
+            block.push_str(&format!("- **Hint:** {hint}\n"));
+        }
+    } else if let Some(entities) = graph.get("entities").and_then(|e| e.as_array()) {
+        for entity in entities {
+            let name = entity.get("name").and_then(|n| n.as_str()).unwrap_or("?");
+            let etype = entity
+                .get("type")
+                .or_else(|| entity.get("entityType"))
+                .and_then(|t| t.as_str())
+                .unwrap_or("?");
+            block.push_str(&format!("- **{}** ({})", name, etype));
+            if let Some(obs) = entity.get("observations").and_then(|o| o.as_array()) {
+                let obs_strs: Vec<&str> = obs.iter().filter_map(|o| o.as_str()).collect();
+                if !obs_strs.is_empty() {
+                    block.push_str(&format!(": {}", obs_strs.join("; ")));
+                }
+            }
+            block.push('\n');
+            has_content = true;
+        }
+
+        if let Some(relations) = graph.get("relations").and_then(|r| r.as_array()) {
+            if !relations.is_empty() {
+                block.push_str("\nRelationships:\n");
+                for rel in relations {
+                    let from = rel
+                        .get("source")
+                        .or_else(|| rel.get("from"))
+                        .and_then(|f| f.as_str())
+                        .unwrap_or("?");
+                    let to = rel
+                        .get("target")
+                        .or_else(|| rel.get("to"))
+                        .and_then(|t| t.as_str())
+                        .unwrap_or("?");
+                    let rtype = rel
+                        .get("type")
+                        .or_else(|| rel.get("relationType"))
+                        .and_then(|r| r.as_str())
+                        .unwrap_or("?");
+                    block.push_str(&format!("- {} -> ({}) -> {}\n", from, rtype, to));
+                    has_content = true;
+                }
+            }
+        }
+    }
+
+    if has_content {
+        Some(block)
+    } else {
+        None
+    }
+}
+
 pub async fn run_kg_reconcile(
     tools: &ToolRegistry,
     cfg: &KgReconcileConfig,
@@ -80,7 +188,7 @@ pub async fn run_kg_reconcile(
     let call = ToolCall {
         id: "kg_reconcile_read".into(),
         function_name: "mcp__memory__read_graph".to_string(),
-        arguments: serde_json::json!({}),
+        arguments: serde_json::json!({ "full": true }),
     };
     let result = tools.dispatch(&call).await;
     if !result.success {
@@ -119,7 +227,7 @@ pub async fn run_kg_reconcile(
                 arguments: serde_json::json!({
                     "observations": [{
                         "entityName": entity.name,
-                        "contents": [note]
+                        "observations": [note]
                     }]
                 }),
             };
@@ -217,5 +325,14 @@ mod tests {
     #[test]
     fn relation_canonicalization_matches_kg_promotion() {
         assert_eq!(canonicalize_relation_type("WROTE"), "AUTHORED_BY");
+    }
+
+    #[test]
+    fn boot_context_formats_summary_payload() {
+        let summary = r#"{"summary":true,"entity_count":10,"relation_count":5,"observation_count":20,"entity_types":{"SYSTEM":3},"sample_entities":[{"name":"Neo4j","type":"SYSTEM","observation_count":2}],"hint":"use search"}"#;
+        let block = format_knowledge_graph_boot_context(summary).expect("summary block");
+        assert!(block.contains("10 entities"));
+        assert!(block.contains("Neo4j"));
+        assert!(block.contains("use search"));
     }
 }

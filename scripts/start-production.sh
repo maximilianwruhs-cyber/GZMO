@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# Production stack: Prime (:8000) + VM200 embed (:8081) + gzmo health/daemon.
-# Sovereign (:8010) is intentionally not started (FrankenMoE deprioritized).
+# Production stack: Prime (:8000) + VM200 retrieval router (:8081) + gzmo health/daemon.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 LLAMA="${GZMO_LLAMA_ROOT:-${HOME}/Projects/llama.cpp}"
+PRIME_START="${LLAMA}/prime-bench/start-prime-gemma4-26b-a4b-256k.sh"
 LOG_DIR="${ROOT}/logs"
 mkdir -p "${LOG_DIR}"
 
@@ -35,23 +35,13 @@ wait_url() {
 
 if ! curl -sf "http://127.0.0.1:8000/v1/models" >/dev/null 2>&1; then
   echo "[*] Starting Prime on :8000…"
-  nohup "${LLAMA}/prime-bench/start-prime.sh" >>"${LOG_DIR}/prime.log" 2>&1 &
+  nohup "${PRIME_START}" >>"${LOG_DIR}/prime.log" 2>&1 &
   wait_url "http://127.0.0.1:8000/v1/models" "Prime"
 else
   echo "[OK] Prime already listening on :8000"
 fi
 
-# Pi knowledge_search — always local :8002 (see ~/.pi/agent/knowledge-base.json)
-PI_EMBED_HEALTH="http://127.0.0.1:8002/v1/models"
-if ! curl -sf "${PI_EMBED_HEALTH}" >/dev/null 2>&1; then
-  echo "[*] Starting Pi KB embed on :8002…"
-  nohup "${ROOT}/scripts/start-embed.sh" >>"${LOG_DIR}/embed-pi.log" 2>&1 &
-  wait_url "${PI_EMBED_HEALTH}" "Pi KB embed" 120
-else
-  echo "[OK] Pi KB embed already on :8002"
-fi
-
-# GZMO daemon embeddings (gzmo.toml — typically VM200 :8081)
+# GZMO daemon embeddings (gzmo.toml — VM200 :8081)
 GZMO_EMBED_URL="${GZMO_EMBED_URL:-$(
   python3 -c "
 import tomllib, pathlib
@@ -64,7 +54,7 @@ if curl -sf "${GZMO_EMBED_HEALTH}" >/dev/null 2>&1; then
   echo "[OK] GZMO embed reachable (${GZMO_EMBED_URL})"
 else
   echo "[!] GZMO embed not reachable: ${GZMO_EMBED_URL}" >&2
-  echo "    VM200: ./scripts/vm200/deploy-retrieval-layer.sh" >&2
+  echo "    VM200: ./scripts/vm200/deploy-retrieval-router.sh" >&2
 fi
 
 BIN="$(gzmo_bin)"
@@ -78,15 +68,24 @@ if [[ "${1:-}" == "--daemon" ]]; then
   else
     echo "[*] Starting GZMO daemon…"
     nohup "${BIN}" daemon >>"${LOG_DIR}/daemon.log" 2>&1 &
-    echo $! >"${PID_FILE}"
-    echo "[OK] Daemon PID $(cat "${PID_FILE}") — log: ${LOG_DIR}/daemon.log"
+    disown
+    for _ in $(seq 1 40); do
+      if [[ -f "${PID_FILE}" ]] && kill -0 "$(cat "${PID_FILE}")" 2>/dev/null; then
+        echo "[OK] Daemon PID $(cat "${PID_FILE}") — log: ${LOG_DIR}/daemon.log"
+        break
+      fi
+      sleep 0.25
+    done
+    if [[ ! -f "${PID_FILE}" ]]; then
+      echo "[!] Daemon started but ${PID_FILE} not written yet — check ${LOG_DIR}/daemon.log" >&2
+    fi
   fi
 fi
 
 echo ""
 echo "Production stack:"
-echo "  Prime   http://127.0.0.1:8000/v1  (chat / dreams / spark)"
-echo "  Pi KB   http://127.0.0.1:8002/v1  (knowledge_search)"
-echo "  GZMO    ${GZMO_EMBED_URL}  (daemon vault; VM200)"
+echo "  Prime   http://127.0.0.1:8000/v1  (chat / dreams / spark / distill)"
+echo "  GZMO    ${GZMO_EMBED_URL}  (daemon embed + rerank; VM200 router)"
+echo "  Pi KB   ${GZMO_EMBED_URL%/v1}/embeddings  (knowledge_search / pi-kb-reindex.sh)"
 echo "  Boot    ./scripts/install-boot-stack.sh  |  verify: ./scripts/after-boot-verify.sh"
 echo "  Pi sync ./scripts/pi-kb-reindex.sh"

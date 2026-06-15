@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # ═══════════════════════════════════════════════════════════════════
-# /calculate [expression] — Math solver via bc
+# /calculate [expression] — DEPRECATED: use Rust pantheon (gzmo chaos skill calculate)
+# Kept as fallback; LLM parse path exists here only, not in Rust.
 # ═══════════════════════════════════════════════════════════════════
 
 SKILLS_DIR="$(cd "$(dirname "$0")" && pwd)"

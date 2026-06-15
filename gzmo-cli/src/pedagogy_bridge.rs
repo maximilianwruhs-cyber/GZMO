@@ -9,7 +9,7 @@ use gzmo_core::gateway::{GatewayRouter, LlmGateway};
 use gzmo_core::mentor_client::MentorResponse;
 use gzmo_core::pedagogy::{
     classify_intent, InteractionIntent, LearnerProfile, LearnerStore, OrchestratorInput,
-    PedagogyOrchestrator, PedagogySession, PrerequisiteGraph,
+    OrchestratorOutput, PedagogyOrchestrator, PedagogySession, PrerequisiteGraph,
 };
 use gzmo_core::types::{Message, Role};
 
@@ -115,7 +115,12 @@ impl PedagogyRuntime {
         tutor_gateway: &dyn LlmGateway,
         input: &str,
         messages: &[Message],
-    ) -> Result<Option<String>> {
+        chaos_context: Option<&str>,
+        discovery_context: Option<&str>,
+        chaos_snapshot_rx: Option<
+            &tokio::sync::watch::Receiver<gzmo_chaos::pulse::ChaosSnapshot>,
+        >,
+    ) -> Result<Option<OrchestratorOutput>> {
         let internal_gateway = router.gateway(TaskKind::PedagogyInternal);
         if !config.pedagogy.enabled {
             return Ok(None);
@@ -173,8 +178,11 @@ impl PedagogyRuntime {
                     trio_mode: self.session.trio_mode,
                     learn_prep_notes: prep_notes,
                     conversation_tail: &tail,
+                    chaos_context,
+                    discovery_context,
                     max_hint_level: config.pedagogy.max_hint_level,
                     teachback_due,
+                    chaos_snapshot_rx,
                 },
             )
             .await?;
@@ -196,7 +204,7 @@ impl PedagogyRuntime {
         }
         self.session.save(&config.pedagogy).await?;
 
-        Ok(Some(output.response))
+        Ok(Some(output))
     }
 
     /// Reload session + learner profile from disk (after `/ops`, `/learn`, etc.).

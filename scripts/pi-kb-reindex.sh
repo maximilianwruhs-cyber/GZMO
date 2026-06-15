@@ -12,9 +12,8 @@ home = pathlib.Path.home()
 cfg_path = home / ".pi/agent/knowledge-base.json"
 defaults = {
     "docsDir": str(home / "Schreibtisch/knowledge"),
-    "embedUrl": "http://127.0.0.1:8002/v1/embeddings",
-    "embedFallbackUrl": "http://192.168.31.110:8081/v1/embeddings",
-    "embedModel": "Qwen3-Embedding-0.6B-Q8_0.gguf",
+    "embedUrl": "http://192.168.31.110:8081/v1/embeddings",
+    "embedModel": "gzmo-embed",
     "qdrantUrl": "http://192.168.31.202:6333",
     "collection": "knowledge",
     "skipDirs": ["archive", ".gzmo_converted"],
@@ -24,7 +23,6 @@ if cfg_path.exists():
     defaults.update({k: raw[k] for k in raw if k in defaults or k == "skipDirs"})
 for env, key in [
     ("PI_KB_EMBED_URL", "embedUrl"),
-    ("PI_KB_EMBED_FALLBACK_URL", "embedFallbackUrl"),
     ("PI_KB_DOCS_DIR", "docsDir"),
     ("PI_KB_QDRANT_URL", "qdrantUrl"),
     ("PI_KB_COLLECTION", "collection"),
@@ -34,7 +32,6 @@ for env, key in [
 
 DOCS = pathlib.Path(defaults["docsDir"].replace("~/", str(home) + "/"))
 EMBED_URL = defaults["embedUrl"]
-EMBED_FB = defaults["embedFallbackUrl"]
 MODEL = defaults["embedModel"]
 QDRANT = defaults["qdrantUrl"].rstrip("/")
 COLLECTION = defaults["collection"]
@@ -79,13 +76,7 @@ def embed_at(url, texts):
     return [d["embedding"] for d in sorted(j["data"], key=lambda x: x["index"])]
 
 def embed(texts):
-    try:
-        return embed_at(EMBED_URL, texts)
-    except Exception as e:
-        if EMBED_FB == EMBED_URL:
-            raise
-        print(f"[!] primary embed failed ({e}); trying fallback", file=sys.stderr)
-        return embed_at(EMBED_FB, texts)
+    return embed_at(EMBED_URL, texts)
 
 def walk(root, include_skip):
     for dirpath, dirnames, filenames in os.walk(root):

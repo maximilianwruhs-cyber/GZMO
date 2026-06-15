@@ -1,0 +1,171 @@
+---
+type: source
+title: drive-research-hermes-anthropic-openrouter-cache-investigation
+created: 2026-06-08
+updated: 2026-06-08
+sources: 1
+tags: []
+status: stable
+gzmo_synthetic: true
+---
+
+# drive-research-hermes-anthropic-openrouter-cache-investigation
+
+Ingested source summary (2026-06-08).
+
+## Entities
+- [[tail-segment|Tail Segment]] (CONCEPT)
+- [[books-of-life-toolkit-bolt|Books of Life Toolkit (BOLT)]] (TOOL)
+- [[chat-completions-api-modus|chat_completions-API-Modus]] (CONCEPT)
+- [[perplexity-ppl|Perplexity (PPL)]] (CONCEPT)
+- [[marginal-hit-ratios|Marginal Hit Ratios]] (CONCEPT)
+- [[8-bit-arrays|8-bit arrays]] (CONCEPT)
+- [[hermes|Hermes]] (SYSTEM)
+- [[head-segment|Head Segment]] (CONCEPT)
+- [[anthropic-prompt-cache-policy|_anthropic_prompt_cache_policy()]] (TOOL)
+- [[stateful-interactions|Stateful Interactions]] (CONCEPT)
+- [[attention-mechanism|Attention Mechanism]] (CONCEPT)
+- [[continuous-batching|Continuous Batching]] (CONCEPT)
+- [[claude-opus|Claude Opus]] (SYSTEM)
+- [[context-windows|Context Windows]] (CONCEPT)
+- [[provider-prefix-caching-reality|Provider Prefix Caching Reality]] (CONCEPT)
+- [[multi-stage-live-migration|Multi-stage Live Migration]] (CONCEPT)
+- [[quantization-noise|Quantization Noise]] (CONCEPT)
+- [[book-of-life-bol|Book of Life (BoL)]] (CONCEPT)
+- [[3-bit-arrays|3-bit arrays]] (CONCEPT)
+- [[middle-segment|Middle Segment]] (CONCEPT)
+- [[auxiliary-llm|Auxiliary LLM]] (SYSTEM)
+- [[length-max-tokenizer|Length-MAX Tokenizer]] (TOOL)
+- [[flashattention|FlashAttention]] (CONCEPT)
+- [[inngest|Inngest]] (SYSTEM)
+- [[pauli-test|Pauli-Test]] (TOOL)
+- [[github|GitHub]] (ORGANIZATION)
+- [[decoding-phase|Decoding Phase]] (CONCEPT)
+- [[microchip-technology|Microchip Technology]] (ORGANIZATION)
+- [[turboquant|TurboQuant]] (TOOL)
+- [[fp16|FP16]] (CONCEPT)
+- [[wolfgang-pauli|Wolfgang Pauli]] (PERSON)
+- [[qwen3-5-122b|Qwen3.5-122B]] (SYSTEM)
+- [[greedy-approximation-algorithm|Greedy approximation algorithm]] (TOOL)
+- [[poorman-s-two-way-set-associative-cache|poorman's two-way set-associative cache]] (TOOL)
+- [[eviction-semantics|Eviction Semantics]] (CONCEPT)
+- [[ray|Ray]] (SYSTEM)
+- [[nintendo-64|Nintendo 64]] (SYSTEM)
+- [[anthropic-messages-wire-format|anthropic_messages-Wire-Format]] (CONCEPT)
+- [[claude-haiku|Claude Haiku]] (SYSTEM)
+- [[claude-sonnet|Claude Sonnet]] (SYSTEM)
+- [[boot-segment|Boot Segment]] (CONCEPT)
+- [[walsh-hadamard-transform-wht|Walsh-Hadamard Transform (WHT)]] (TOOL)
+- [[agent-contextcompressor|Agent ContextCompressor]] (TOOL)
+- [[gpt-2|GPT-2]] (SYSTEM)
+- [[tool-calls|Tool Calls]] (CONCEPT)
+- [[greater-miami-jewish-federation|Greater Miami Jewish Federation]] (ORGANIZATION)
+- [[gateway-session-hygiene|Gateway Session Hygiene]] (CONCEPT)
+- [[apply-anthropic-cache-control|apply_anthropic_cache_control()]] (CONCEPT)
+- [[arxiv|arXiv]] (ORGANIZATION)
+- [[mindstudio|MindStudio]] (ORGANIZATION)
+- [[run-agent-py|run_agent.py]] (TOOL)
+- [[length-weighted-graph-partitioning|Length-weighted graph partitioning]] (CONCEPT)
+- [[researchgate|ResearchGate]] (ORGANIZATION)
+- [[provider-sticky-routing|Provider Sticky Routing]] (CONCEPT)
+- [[pagedattention|PagedAttention]] (CONCEPT)
+- [[reddit|Reddit]] (ORGANIZATION)
+- [[n8n|n8n]] (ORGANIZATION)
+- [[system-and-3|system_and_3]] (CONCEPT)
+- [[sanitize-tool-pairs|_sanitize_tool_pairs()]] (TOOL)
+- [[byte-pair-encoding-bpe|Byte Pair Encoding (BPE)]] (TOOL)
+- [[duke-university|Duke University]] (ORGANIZATION)
+- [[kv-cache|KV-Cache]] (CONCEPT)
+- [[attention-smoothing|Attention Smoothing]] (CONCEPT)
+- [[vram|VRAM]] (CONCEPT)
+- [[usenix|USENIX]] (ORGANIZATION)
+- [[context-length-exception|Context Length Exception]] (CONCEPT)
+- [[gpu|GPU]] (SYSTEM)
+- [[contextcompressor-compress|ContextCompressor.compress()]] (TOOL)
+- [[korean|Korean]] (CONCEPT)
+- [[prefill-phase|Prefill Phase]] (CONCEPT)
+- [[randomtrees|RandomTrees]] (ORGANIZATION)
+- [[agent-prompt-caching-py|agent/prompt_caching.py]] (CONCEPT)
+- [[llumnix|Llumnix]] (SYSTEM)
+- [[block-started-by-symbol-bss|Block Started by Symbol (BSS)]] (CONCEPT)
+- [[nous-portal|Nous Portal]] (ORGANIZATION)
+- [[bill-of-lading-bol-processing-agent|Bill of Lading (BoL) Processing Agent]] (TOOL)
+- [[openrouter|OpenRouter]] (ORGANIZATION)
+
+## Relations
+- Hermes → USES → KV-Cache
+- Hermes → USES → Book of Life (BoL)
+- Hermes → USES → _anthropic_prompt_cache_policy()
+- Hermes → USES → OpenRouter
+- Book of Life (BoL) → RELATED_TO → KV-Cache
+- _anthropic_prompt_cache_policy() → USES → KV-Cache
+- OpenRouter → USES → _anthropic_prompt_cache_policy()
+- Attention Mechanism → RELATED_TO → Context Windows
+- Tool Calls → RELATED_TO → Stateful Interactions
+- Hermes → USES → agent/prompt_caching.py
+- Book of Life (BoL) → PART_OF → Boot Segment
+- Books of Life Toolkit (BOLT) → RELATED_TO → Book of Life (BoL)
+- Bill of Lading (BoL) Processing Agent → RELATED_TO → Book of Life (BoL)
+- agent/prompt_caching.py → USES → _anthropic_prompt_cache_policy()
+- Hermes → USES → run_agent.py
+- run_agent.py → USES → apply_anthropic_cache_control()
+- OpenRouter → USES → Provider Sticky Routing
+- Hermes → USES → Provider Sticky Routing
+- _anthropic_prompt_cache_policy() → USES → OpenRouter
+- run_agent.py → USES → chat_completions-API-Modus
+- _anthropic_prompt_cache_policy() → USES → anthropic_messages-Wire-Format
+- Nous Portal → USES → _anthropic_prompt_cache_policy()
+- Hermes → USES → Nous Portal
+- Inngest → RELATED_TO → agent/prompt_caching.py
+- Hermes → USES → Gateway Session Hygiene
+- Hermes → USES → Agent ContextCompressor
+- Agent ContextCompressor → USES → ContextCompressor.compress()
+- ContextCompressor.compress() → USES → Book of Life (BoL)
+- ContextCompressor.compress() → USES → Auxiliary LLM
+- Head Segment → PART_OF → Book of Life (BoL)
+- Middle Segment → USES → Auxiliary LLM
+- Auxiliary LLM → USES → Book of Life (BoL)
+- Hermes → PART_OF → Book of Life (BoL)
+- Hermes → USES → _sanitize_tool_pairs()
+- Book of Life (BoL) → RELATED_TO → Agent ContextCompressor
+- KV-Cache → PART_OF → GPU
+- Prefill Phase → RELATED_TO → KV-Cache
+- Decoding Phase → RELATED_TO → KV-Cache
+- Ray → USES → Continuous Batching
+- Ray → USES → FlashAttention
+- Ray → USES → PagedAttention
+- Llumnix → USES → Multi-stage Live Migration
+- Llumnix → USES → Auxiliary LLM
+- Length-MAX Tokenizer → RELATED_TO → Byte Pair Encoding (BPE)
+- Length-MAX Tokenizer → USES → Length-weighted graph partitioning
+- Length-MAX Tokenizer → USES → Greedy approximation algorithm
+- TurboQuant → USES → KV-Cache
+- TurboQuant → USES → Walsh-Hadamard Transform (WHT)
+- TurboQuant → USES → Pauli-Test
+- Walsh-Hadamard Transform (WHT) → RELATED_TO → Quantization Noise
+- Perplexity (PPL) → RELATED_TO → TurboQuant
+- Pauli-Test → RELATED_TO → Perplexity (PPL)
+- Pauli-Test → RELATED_TO → Wolfgang Pauli
+- Nintendo 64 → RELATED_TO → Boot Segment
+- Nintendo 64 → RELATED_TO → Block Started by Symbol (BSS)
+- Nintendo 64 → USES → poorman's two-way set-associative cache
+- poorman's two-way set-associative cache → RELATED_TO → Marginal Hit Ratios
+- system_and_3 → USES → _anthropic_prompt_cache_policy()
+- system_and_3 → PART_OF → Hermes
+- Quantization Noise → RELATED_TO → Attention Smoothing
+- Attention Smoothing → RELATED_TO → Attention Mechanism
+- GPT-2 → RELATED_TO → Length-MAX Tokenizer
+- Qwen3.5-122B → RELATED_TO → TurboQuant
+- Length-weighted graph partitioning → RELATED_TO → Length-MAX Tokenizer
+- Greedy approximation algorithm → RELATED_TO → Length-MAX Tokenizer
+- Walsh-Hadamard Transform (WHT) → RELATED_TO → TurboQuant
+- Wolfgang Pauli → RELATED_TO → Korean
+- Provider Prefix Caching Reality → RELATED_TO → Auxiliary LLM
+- apply_anthropic_cache_control() → RELATED_TO → _anthropic_prompt_cache_policy()
+- Eviction Semantics → RELATED_TO → Hermes
+- chat_completions-API-Modus → RELATED_TO → OpenRouter
+- Auxiliary LLM → USES → KV-Cache
+- Auxiliary LLM → RELATED_TO → Prefill Phase
+- Auxiliary LLM → RELATED_TO → Decoding Phase
+- Auxiliary LLM → USES → GPU
+- VRAM → PART_OF → GPU

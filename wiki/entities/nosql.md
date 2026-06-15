@@ -1,0 +1,17 @@
+---
+type: entity
+title: NoSQL
+created: 2026-06-08
+updated: 2026-06-08
+sources: 1
+tags: []
+status: draft
+gzmo_synthetic: true
+---
+
+# NoSQL
+
+Type: TOOL
+
+## From [[prompt-agent-engineering-part1|prompt-agent-engineering-part1]] (2026-06-08)
+- Mentioned as a modern web architecture concept for deliverables.

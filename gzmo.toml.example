@@ -487,6 +487,28 @@ ingest_verify = "local"
 distill_extract = "local"
 distill_verify = "local"
 distill_summary = "local"
+# Kurator phase 2 only (not wired in phase 1):
+# agent_monitor = "local_deterministic"
+# agent_spawn = "local"
+
+[kurator]
+enabled = false
+max_turns_before_recommend = 40
+max_session_tokens = 500000
+skill_error_rate_threshold = 0.3
+max_dice_loops_per_hour = 12
+default_agent_profile = "prometheus"
+approve_spawns_subagent = true
+spawn_brief_max_chars = 4000
+
+[synapse_writer]
+# When true, `gzmo chaos skill` requires a matching Pi `skill.invoke` on the bus.
+gate_enabled = false
+invoke_window_secs = 120
+tail_scan_lines = 2000
+
+[bibliothek]
+min_dream_cycles = 50
 
 [routing.profiles.local_deterministic]
 provider    = "local"

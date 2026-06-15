@@ -115,6 +115,14 @@ pub enum EventType {
     #[serde(rename = "chaos.rho_telemetry")]
     SenseChaosRho,
 
+    /// Headless `/dice` autopoietic loop follow-up roll (Pi display via synapse consumer)
+    #[serde(rename = "chaos.dice_loop")]
+    ChaosDiceLoop,
+
+    /// Daemon drained external chaos feedback inbox (skill IPC batch)
+    #[serde(rename = "chaos.feedback_drained")]
+    ChaosFeedbackDrained,
+
     // --- Pi interactions ---
     /// Pi agent sent a memory chunk to GZMO inbox
     PiMemorySent,
@@ -128,6 +136,42 @@ pub enum EventType {
     MentorLearnEnd,
     /// Pi triggered a mid-session topic-shift distillation
     TopicShiftDistill,
+
+    // --- Skill boundary (Pi chaos pantheon) ---
+    /// Pi invoked a chaos skill (`gzmo_chaos`)
+    #[serde(rename = "skill.invoke")]
+    SkillInvoke,
+    /// Chaos skill completed successfully
+    #[serde(rename = "skill.complete")]
+    SkillComplete,
+    /// Chaos skill failed
+    #[serde(rename = "skill.error")]
+    SkillError,
+
+    // --- Forum Romanum MVP (multi-agent coordination) ---
+    /// Agent instance spawned
+    #[serde(rename = "agent.spawned")]
+    AgentSpawned,
+    /// Agent utterance (debate / synthesize / explore modes in payload)
+    #[serde(rename = "agent.message")]
+    AgentMessage,
+    /// Agent final artifact
+    #[serde(rename = "agent.result")]
+    AgentResult,
+    /// Agent-level failure
+    #[serde(rename = "agent.error")]
+    AgentError,
+    /// Prometheus draft proposal
+    #[serde(rename = "proposal.created")]
+    ProposalCreated,
+    /// Epimetheus review outcome
+    #[serde(rename = "proposal.reviewed")]
+    ProposalReviewed,
+
+    // --- Kurator monitor (phase 1: recommend only) ---
+    /// Kurator recommends spawning a sub-agent (human approval required)
+    #[serde(rename = "spawn.recommended")]
+    SpawnRecommended,
 }
 
 /// A single Synapse event frame — the unit of observability.
@@ -144,6 +188,12 @@ pub struct SynapseEvent {
     pub source: EventSource,
     /// ISO 8601 UTC timestamp
     pub timestamp: DateTime<Utc>,
+    /// Conversation / debate scope (optional; backward compatible)
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub correlation_id: Option<Uuid>,
+    /// Parent event for threading (optional)
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reply_to: Option<Uuid>,
     /// Arbitrary JSON payload (optional)
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub data: Option<serde_json::Value>,
@@ -157,6 +207,8 @@ impl SynapseEvent {
             event_type,
             source,
             timestamp: Utc::now(),
+            correlation_id: None,
+            reply_to: None,
             data: None,
         }
     }
@@ -168,7 +220,28 @@ impl SynapseEvent {
             event_type,
             source,
             timestamp: Utc::now(),
+            correlation_id: None,
+            reply_to: None,
             data: Some(data),
+        }
+    }
+
+    /// Create an event with envelope threading fields.
+    pub fn with_envelope(
+        event_type: EventType,
+        source: EventSource,
+        correlation_id: Option<Uuid>,
+        reply_to: Option<Uuid>,
+        data: Option<serde_json::Value>,
+    ) -> Self {
+        Self {
+            id: Uuid::new_v4(),
+            event_type,
+            source,
+            timestamp: Utc::now(),
+            correlation_id,
+            reply_to,
+            data,
         }
     }
 
@@ -464,6 +537,38 @@ mod tests {
 
         // Cleanup
         let _ = fs::remove_dir_all(&tmp_dir);
+    }
+
+    #[test]
+    fn test_envelope_fields_round_trip() {
+        let corr = Uuid::new_v4();
+        let parent = Uuid::new_v4();
+        let event = SynapseEvent::with_envelope(
+            EventType::AgentMessage,
+            EventSource::PiAgent,
+            Some(corr),
+            Some(parent),
+            Some(serde_json::json!({"agent_id": "prometheus"})),
+        );
+        let parsed: SynapseEvent = serde_json::from_str(&event.to_json_line()).unwrap();
+        assert_eq!(parsed.correlation_id, Some(corr));
+        assert_eq!(parsed.reply_to, Some(parent));
+        assert_eq!(parsed.event_type, EventType::AgentMessage);
+    }
+
+    #[test]
+    fn test_legacy_event_without_envelope_deserializes() {
+        let legacy = r#"{"id":"550e8400-e29b-41d4-a716-446655440000","event_type":"session_start","source":"pi_agent","timestamp":"2026-06-15T12:00:00Z","data":{"reason":"startup"}}"#;
+        let parsed: SynapseEvent = serde_json::from_str(legacy).unwrap();
+        assert!(parsed.correlation_id.is_none());
+        assert!(parsed.reply_to.is_none());
+    }
+
+    #[test]
+    fn test_forum_romanum_event_type_names() {
+        let event = SynapseEvent::new(EventType::ProposalCreated, EventSource::PiAgent);
+        let json = event.to_json_line();
+        assert!(json.contains("\"proposal.created\""));
     }
 
     #[test]

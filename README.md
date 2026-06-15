@@ -315,7 +315,7 @@ Built-in Rust skills (execute instantly, no LLM call):
 
 | Skill | Description |
 |-------|-------------|
-| `/dice [NdM]` | Roll dice (e.g., `/dice 2d20`) |
+| `/dice [d6\|d20]` | Roll dice (e.g., `/dice d20`) |
 | `/poker` | Draw a poker hand |
 | `/quote` | Random quote from lore |
 | `/calculate <expr>` | Evaluate a math expression |

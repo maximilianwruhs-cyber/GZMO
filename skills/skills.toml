@@ -5,8 +5,8 @@
 # The dispatcher reads this file to route commands to handler scripts.
 
 [meta]
-version = "1.0"
-total_commands = 15
+version = "1.1"
+total_commands = 17
 engine = "chaos"  # All RNG seeded from Randomizer's Lorenz attractor
 
 # ─── Chaos & Games ───────────────────────────────────────────────
@@ -26,17 +26,24 @@ handler = "skill_poker.sh"
 icon = "🃏"
 
 [commands.card]
-description = "Forges a random Magic: The Gathering card from the chaos engine"
-args = "[creature|instant|sorcery|enchantment|artifact]"
+description = "Legendary Attractor Forge — MTG cards (Color Pie, phase lens, forge sparks, corpus, ASCII frame)"
+args = "[creature|instant|sorcery|enchantment|artifact|planeswalker]"
 type = "generative"
 handler = "skill_card.sh"
 icon = "🂡"
 
+[commands.pkm]
+description = "Legendary Attractor Forge — Pokemon cards (Element, phase lens, forge sparks, corpus, ASCII frame)"
+args = "[pokemon|trainer|energy]"
+type = "generative"
+handler = "skill_pkm.sh"
+icon = "⚡"
+
 # ─── Creative & Generative ──────────────────────────────────────
 
 [commands.joke]
-description = "Tells a structurally engineered joke (Setup → Misdirection → Punchline)"
-args = ""
+description = "Chaos-coupled Attractor Comedy (BVT, live Lorenz coordinates)"
+args = "[topic]"
 type = "generative"
 handler = "skill_joke.sh"
 icon = "😂"
@@ -49,21 +56,21 @@ handler = "skill_quote.sh"
 icon = "📜"
 
 [commands.poem]
-description = "Generates a short poem (max 180 characters)"
-args = ""
+description = "Chaos-coupled Attractor Poetry (live Lorenz coordinates)"
+args = "[motif]"
 type = "generative"
 handler = "skill_poem.sh"
 icon = "🖋️"
 
 [commands.word]
-description = "Invents a brand new word with definition and example sentence"
+description = "Chaos-coupled Attractor Word (phase-driven neologism modes)"
 args = ""
 type = "generative"
 handler = "skill_word.sh"
 icon = "🔤"
 
 [commands.story]
-description = "Generates a short story from a keyword seed"
+description = "Generates a chaos-coupled short story (Attractor Fiction) from a keyword"
 args = "[keyword]"
 type = "generative"
 handler = "skill_story.sh"
@@ -92,6 +99,22 @@ type = "static"
 handler = "skill_stabilize.sh"
 icon = "🌀"
 
+[commands.ops]
+description = "Toggle execution-first ops mode (bypass Socratic mentor)"
+args = ""
+type = "mutation"
+# Rust registry authoritative (gzmo-core/src/skills/ops.rs); shell stub for legacy tooling
+handler = "skill_ops.sh"
+icon = "⚙️"
+
+[commands.learn]
+description = "Flipped-classroom prep for a topic, then Socratic sync session"
+args = "[topic]"
+type = "mutation"
+# Rust registry authoritative (gzmo-core/src/skills/learn.rs); shell stub for legacy tooling
+handler = "skill_learn.sh"
+icon = "📚"
+
 # ─── Utility ────────────────────────────────────────────────────
 
 [commands.sound]
@@ -102,7 +125,7 @@ handler = "skill_sound.sh"
 icon = "🔊"
 
 [commands.define]
-description = "Provides definition, pronunciation (IPA), and etymology"
+description = "Chaos-coupled Attractor Define (phase etymology; dictionary fallback when offline)"
 args = "[term]"
 type = "generative"
 handler = "skill_define.sh"

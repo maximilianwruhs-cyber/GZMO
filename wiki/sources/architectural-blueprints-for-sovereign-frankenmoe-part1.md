@@ -1,0 +1,203 @@
+---
+type: source
+title: architectural-blueprints-for-sovereign-frankenmoe-part1
+created: 2026-06-08
+updated: 2026-06-08
+sources: 1
+tags: []
+status: stable
+gzmo_synthetic: true
+---
+
+# architectural-blueprints-for-sovereign-frankenmoe-part1
+
+Ingested source summary (2026-06-08).
+
+## Entities
+- [[mistral-model|Mistral model]] (MODEL)
+- [[qwen-qwen2-5-7b-instruct-hugging-face|Qwen/Qwen2.5-7B-Instruct - Hugging Face]] (BOOK)
+- [[dare-drop-and-rescale-elect|DARE (Drop And Rescale Elect)]] (CONCEPT)
+- [[beowolx-codeninja-1-0-openchat-7b|beowolx/CodeNinja-1.0-OpenChat-7B]] (MODEL)
+- [[chunked-prefill|Chunked Prefill]] (CONCEPT)
+- [[mhm-8x7b-frankenmoe-v1-0|mhm-8x7B-FrankenMoE-v1.0]] (MODEL)
+- [[phi-model|Phi model]] (MODEL)
+- [[feed-forward-networks-ffn|feed-forward networks (FFN)]] (CONCEPT)
+- [[charles-goddard|Charles Goddard]] (PERSON)
+- [[alphamonarch-7b|AlphaMonarch-7B]] (MODEL)
+- [[mergemoe-efficient-compression-of-moe-models-via-expert-output-merging-arxiv|MergeMoE: Efficient Compression of MoE Models via Expert Output Merging - arXiv]] (ORGANIZATION)
+- [[lora-adapter-moes|LoRA Adapter MoEs]] (CONCEPT)
+- [[model-soup-linear-averaging|Model Soup (Linear Averaging)]] (ALGORITHM)
+- [[lazymergekit|LazyMergekit]] (TOOL)
+- [[maxime-labonne|Maxime Labonne]] (PERSON)
+- [[llama-3-8b|Llama-3-8B]] (MODEL)
+- [[ionio|Ionio]] (ORGANIZATION)
+- [[expert-parallelism-and-mixed-parallelism-strategies-in-vllm-jarvis-labs-blog|Expert Parallelism and Mixed Parallelism Strategies in vLLM | Jarvis Labs Blog]] (BOOK)
+- [[neuraldaredevil-7b|NeuralDaredevil-7B]] (MODEL)
+- [[pocketdoc-dans-adventurouswinds-7b|PocketDoc/Dans-AdventurousWinds-7b]] (MODEL)
+- [[raw-embedding-mapping|Raw Embedding Mapping]] (CONCEPT)
+- [[mixtral-style-architectures|Mixtral-style architectures]] (CONCEPT)
+- [[bee-spoke-data-smol-llama-220m-gqa|BEE-spoke-data/smol_llama-220M-GQA]] (MODEL)
+- [[create-your-own-mixture-of-experts-model-with-mergekit-and-runpod-by-plaban-nayak|Create Your Own Mixture of Experts Model with Mergekit and Runpod | by Plaban Nayak]] (TOOL)
+- [[random-gating-mode|random gating mode]] (CONCEPT)
+- [[moe-svd|MoE-SVD]] (CONCEPT)
+- [[qwen-moe-configurations|Qwen MoE configurations]] (CONCEPT)
+- [[gguf-q6-k|GGUF Q6_K]] (CONCEPT)
+- [[d2-moe|D2-MoE]] (CONCEPT)
+- [[plaban-nayak|Plaban Nayak]] (PERSON)
+- [[gguf-q4-k-m|GGUF Q4_K_M]] (CONCEPT)
+- [[routing-distribution-g-v|routing distribution G(v)]] (CONCEPT)
+- [[phi-2|Phi-2]] (MODEL)
+- [[mlabonne-beyonder-4x7b-v3|mlabonne/Beyonder-4x7B-v3]] (MODEL)
+- [[w-g|W_g]] (CONCEPT)
+- [[gguf-q2-k|GGUF Q2_K]] (CONCEPT)
+- [[dynamic-model-depth|Dynamic Model Depth]] (CONCEPT)
+- [[task-arithmetic|Task Arithmetic]] (ALGORITHM)
+- [[hidden-state-mapping-heuristic|Hidden State Mapping Heuristic]] (CONCEPT)
+- [[gguf-q5-k-m|GGUF Q5_K_M]] (CONCEPT)
+- [[ties-merging|TIES Merging]] (CONCEPT)
+- [[deepseek-ai-deepseek-r1-distill-qwen-7b|deepseek-ai/DeepSeek-R1-Distill-Qwen-7B]] (MODEL)
+- [[deepseek-moe-target|DeepSeek MoE Target]] (MODEL)
+- [[tensor-parallelism-tp|Tensor Parallelism (TP)]] (CONCEPT)
+- [[qwen-2-5-7b|Qwen-2.5-7B]] (MODEL)
+- [[arcee-ai|arcee-ai]] (ORGANIZATION)
+- [[meme-trix-moe-14b-a8b-v2|Meme-Trix-MoE-14B-A8B-v2]] (MODEL)
+- [[hidden-gating-mode|hidden gating mode]] (CONCEPT)
+- [[native-fp16|Native FP16]] (CONCEPT)
+- [[spherical-linear-interpolation-slerp|Spherical Linear Interpolation (SLERP)]] (CONCEPT)
+- [[noisy-moes|Noisy MoEs]] (CONCEPT)
+- [[qwen-moe-target|Qwen MoE Target]] (CONCEPT)
+- [[fedmerge|FedMerge]] (FRAMEWORK)
+- [[clore-ai|Clore.ai]] (ORGANIZATION)
+- [[biomistral-biomistral-7b-dare|BioMistral/BioMistral-7B-DARE]] (MODEL)
+- [[mc-smoe-multi-center-sparse-moe|MC-SMoE (Multi-Center Sparse MoE)]] (CONCEPT)
+- [[topk-function|TopK function]] (CONCEPT)
+- [[gguf-q3-k-m|GGUF Q3_K_M]] (CONCEPT)
+- [[mixtral-target|Mixtral Target]] (CONCEPT)
+- [[random-gate-initialization|Random Gate Initialization]] (CONCEPT)
+- [[homogeneous-merging|homogeneous merging]] (CONCEPT)
+- [[kunoichi-dpo-v2-7b|Kunoichi-DPO-v2-7B]] (MODEL)
+- [[beyonder-4x7b-v2|Beyonder-4x7B-v2]] (MODEL)
+- [[transformer-block|Transformer block]] (CONCEPT)
+- [[gguf-q8-0|GGUF Q8_0]] (CONCEPT)
+- [[qwen2-5-7b-7b-transformer-llm-emergent-mind|Qwen2.5-7B: 7B Transformer LLM - Emergent Mind]] (BOOK)
+- [[mergeme|MergeME]] (FRAMEWORK)
+- [[frozen-experts-and-routing-glue|Frozen Experts and Routing Glue]] (CONCEPT)
+- [[codellama|CodeLlama]] (MODEL)
+- [[aiplanet|AIPlanet]] (ORGANIZATION)
+- [[fisher-weighted-averaging|Fisher-Weighted Averaging]] (ALGORITHM)
+- [[expert-parallelism-ep|Expert Parallelism (EP)]] (CONCEPT)
+- [[llama-cpp|llama.cpp]] (TOOL)
+- [[modelslab|ModelsLab]] (ORGANIZATION)
+- [[heterogeneous-merging|heterogeneous merging]] (CONCEPT)
+- [[mergemoe|MergeMoE]] (CONCEPT)
+- [[qwen-qwen2-5-math-7b-instruct|Qwen/Qwen2.5-Math-7B-Instruct]] (MODEL)
+- [[gate-less-moes|Gate-less MoEs]] (CONCEPT)
+- [[qwen-qwen2-5-coder-7b-instruct|Qwen/Qwen2.5-Coder-7B-Instruct]] (MODEL)
+- [[expert-pruning|Expert Pruning]] (CONCEPT)
+- [[the-vllm-moe-playbook-a-practical-guide-to-tp-dp-pp-and-expert-parallelism|The vLLM MoE Playbook: A Practical Guide to TP, DP, PP and Expert Parallelism]] (BOOK)
+- [[laserrmt|LaserRMT]] (CONCEPT)
+- [[qtip|QTIP]] (CONCEPT)
+- [[alphalora|AlphaLoRA]] (CONCEPT)
+- [[openchat-openchat-3-5-1210|openchat/openchat-3.5-1210]] (MODEL)
+- [[phixtral|Phixtral]] (MODEL)
+- [[nousresearch-hermes-2-pro-mistral-7b|NousResearch/Hermes-2-Pro-Mistral-7B]] (MODEL)
+- [[mixture-of-experts-moe|Mixture of Experts (MoE)]] (CONCEPT)
+- [[model-runner-v2-mrv2|Model Runner V2 (MRV2)]] (CONCEPT)
+- [[cheap-embed-gating-mode|cheap_embed gating mode]] (CONCEPT)
+- [[moe-i2|MoE-I2]] (CONCEPT)
+- [[gating-network|gating network]] (CONCEPT)
+- [[olmo|Olmo]] (MODEL)
+- [[sovereign-moe-yaml|sovereign-moe.yaml]] (SYSTEM)
+
+## Relations
+- mhm-8x7B-FrankenMoE-v1.0 → RELATED_TO → Mixture of Experts (MoE)
+- mhm-8x7B-FrankenMoE-v1.0 → USES → Transformer block
+- Transformer block → PART_OF → feed-forward networks (FFN)
+- mhm-8x7B-FrankenMoE-v1.0 → USES → gating network
+- mlabonne/Beyonder-4x7B-v3 → USES → AlphaMonarch-7B
+- mlabonne/Beyonder-4x7B-v3 → USES → beowolx/CodeNinja-1.0-OpenChat-7B
+- mlabonne/Beyonder-4x7B-v3 → USES → Kunoichi-DPO-v2-7B
+- mlabonne/Beyonder-4x7B-v3 → USES → NeuralDaredevil-7B
+- Expert Parallelism and Mixed Parallelism Strategies in vLLM | Jarvis Labs Blog → USES → Model Runner V2 (MRV2)
+- Expert Parallelism and Mixed Parallelism Strategies in vLLM | Jarvis Labs Blog → USES → Expert Parallelism (EP)
+- Homogeneous Merging → USES → Spherical Linear Interpolation (SLERP)
+- Homogeneous Merging → USES → TIES Merging
+- Homogeneous Merging → USES → DARE (Drop And Rescale Elect)
+- FedMerge → RELATED_TO → Homogeneous Merging
+- Heterogeneous Merging → USES → MergeME
+- Expert Pruning → RELATED_TO → MC-SMoE (Multi-Center Sparse MoE)
+- Expert Pruning → RELATED_TO → MoE-I2
+- Expert Pruning → RELATED_TO → D2-MoE
+- Expert Pruning → RELATED_TO → MoE-SVD
+- gating network → USES → mhm-8x7B-FrankenMoE-v1.0
+- routing distribution G(v) → PART_OF → gating network
+- W_g → USES → routing distribution G(v)
+- TopK function → USES → routing distribution G(v)
+- random gating mode → USES → W_g
+- cheap_embed gating mode → USES → W_g
+- hidden gating mode → USES → W_g
+- Mixtral-style architectures → RELATED_TO → hidden gating mode
+- Qwen MoE configurations → RELATED_TO → mhm-8x7B-FrankenMoE-v1.0
+- homogeneous merging → RELATED_TO → mhm-8x7B-FrankenMoE-v1.0
+- Llama-3-8B → RELATED_TO → homogeneous merging
+- Qwen-2.5-7B → RELATED_TO → homogeneous merging
+- Model Soup (Linear Averaging) → RELATED_TO → homogeneous merging
+- Fisher-Weighted Averaging → RELATED_TO → homogeneous merging
+- Spherical Linear Interpolation (SLERP) → RELATED_TO → homogeneous merging
+- TIES Merging → RELATED_TO → homogeneous merging
+- DARE (Drop And Rescale Elect) → RELATED_TO → homogeneous merging
+- Task Arithmetic → RELATED_TO → homogeneous merging
+- heterogeneous merging → RELATED_TO → mhm-8x7B-FrankenMoE-v1.0
+- Phi model → RELATED_TO → heterogeneous merging
+- Mistral model → RELATED_TO → heterogeneous merging
+- CodeLlama → RELATED_TO → heterogeneous merging
+- Olmo → RELATED_TO → heterogeneous merging
+- MergeME → USES → heterogeneous merging
+- Create Your Own Mixture of Experts Model with Mergekit and Runpod | by Plaban Nayak → USES → mhm-8x7B-FrankenMoE-v1.0
+- openchat/openchat-3.5-1210 → USES → Create Your Own Mixture of Experts Model with Mergekit and Runpod | by Plaban Nayak
+- beowolx/CodeNinja-1.0-OpenChat-7B → USES → Create Your Own Mixture of Experts Model with Mergekit and Runpod | by Plaban Nayak
+- Qwen/Qwen2.5-7B-Instruct - Hugging Face → USES → Create Your Own Mixture of Experts Model with Mergekit and Runpod | by Plaban Nayak
+- Qwen/Qwen2.5-Math-7B-Instruct → USES → Create Your Own Mixture of Experts Model with Mergekit and Runpod | by Plaban Nayak
+- mlabonne/Beyonder-4x7B-v3 → USES → LazyMergekit
+- AlphaMonarch-7B → PART_OF → mlabonne/Beyonder-4x7B-v3
+- beowolx/CodeNinja-1.0-OpenChat-7B → PART_OF → mlabonne/Beyonder-4x7B-v3
+- Kunoichi-DPO-v2-7B → PART_OF → mlabonne/Beyonder-4x7B-v3
+- NeuralDaredevil-7B → PART_OF → mlabonne/Beyonder-4x7B-v3
+- llama.cpp → USES → mhm-8x7B-FrankenMoE-v1.0
+- Expert Parallelism and Mixed Parallelism Strategies in vLLM | Jarvis Labs Blog → USES → mhm-8x7B-FrankenMoE-v1.0
+- Expert Parallelism (EP) → USES → Expert Parallelism and Mixed Parallelism Strategies in vLLM | Jarvis Labs Blog
+- Tensor Parallelism (TP) → RELATED_TO → Expert Parallelism (EP)
+- Model Runner V2 (MRV2) → USES → Expert Parallelism and Mixed Parallelism Strategies in vLLM | Jarvis Labs Blog
+- Chunked Prefill → USES → Expert Parallelism and Mixed Parallelism Strategies in vLLM | Jarvis Labs Blog
+- Expert Pruning → RELATED_TO → mhm-8x7B-FrankenMoE-v1.0
+- MC-SMoE (Multi-Center Sparse MoE) → RELATED_TO → mhm-8x7B-FrankenMoE-v1.0
+- MoE-I2 → RELATED_TO → mhm-8x7B-FrankenMoE-v1.0
+- D2-MoE → RELATED_TO → mhm-8x7B-FrankenMoE-v1.0
+- MoE-SVD → RELATED_TO → mhm-8x7B-FrankenMoE-v1.0
+- Gate-less MoEs → RELATED_TO → mhm-8x7B-FrankenMoE-v1.0
+- Noisy MoEs → RELATED_TO → mhm-8x7B-FrankenMoE-v1.0
+- LoRA Adapter MoEs → RELATED_TO → mhm-8x7B-FrankenMoE-v1.0
+- Qwen/Qwen2.5-Coder-7B-Instruct → PART_OF → Qwen/Qwen2.5-7B-Instruct - Hugging Face
+- deepseek-ai/DeepSeek-R1-Distill-Qwen-7B → PART_OF → Qwen/Qwen2.5-7B-Instruct - Hugging Face
+- mhm-8x7B-FrankenMoE-v1.0 → USES → Create Your Own Mixture of Experts Model with Mergekit and Runpod | by Plaban Nayak
+- Create Your Own Mixture of Experts Model with Mergekit and Runpod | by Plaban Nayak → USES → sovereign-moe.yaml
+- Model Runner V2 (MRV2) → USES → Chunked Prefill
+- Qwen2.5-7B: 7B Transformer LLM - Emergent Mind → RELATED_TO → Qwen/Qwen2.5-7B-Instruct - Hugging Face
+- MergeMoE: Efficient Compression of MoE Models via Expert Output Merging - arXiv → RELATED_TO → Qwen/Qwen2.5-Coder-7B-Instruct
+- Create Your Own Mixture of Experts Model with Mergekit and Runpod | by Plaban Nayak → AUTHORED_BY → Plaban Nayak
+- The vLLM MoE Playbook: A Practical Guide to TP, DP, PP and Expert Parallelism → RELATED_TO → Expert Parallelism and Mixed Parallelism Strategies in vLLM | Jarvis Labs Blog
+- MergeMoE: Efficient Compression of MoE Models via Expert Output Merging - arXiv → RELATED_TO → MergeMoE
+- Phixtral → USES → Phi-2
+- Meme-Trix-MoE-14B-A8B-v2 → USES → Llama-3-8B
+- Meme-Trix-MoE-14B-A8B-v2 → USES → Mistral model
+- mhm-8x7B-FrankenMoE-v1.0 → USES → Llama-3-8B
+- mhm-8x7B-FrankenMoE-v1.0 → USES → Mistral model
+- Create Your Own Mixture of Experts Model with Mergekit and Runpod | by Plaban Nayak → RELATED_TO → Mixtral-style architectures
+- Create Your Own Mixture of Experts Model with Mergekit and Runpod | by Plaban Nayak → RELATED_TO → DeepSeek MoE Target
+- Create Your Own Mixture of Experts Model with Mergekit and Runpod | by Plaban Nayak → RELATED_TO → Qwen MoE configurations
+- Create Your Own Mixture of Experts Model with Mergekit and Runpod | by Plaban Nayak → USES → Hidden State Mapping Heuristic
+- Create Your Own Mixture of Experts Model with Mergekit and Runpod | by Plaban Nayak → USES → Raw Embedding Mapping
+- Create Your Own Mixture of Experts Model with Mergekit and Runpod | by Plaban Nayak → USES → Random Gate Initialization
+- Maxime Labonne → AUTHORED_BY → mlabonne/Beyonder-4x7B-v3
+- Clore.ai → RELATED_TO → Create Your Own Mixture of Experts Model with Mergekit and Runpod | by Plaban Nayak
+- Qwen/Qwen2.5-7B-Instruct - Hugging Face → RELATED_TO → Create Your Own Mixture of Experts Model with Mergekit and Runpod | by Plaban Nayak

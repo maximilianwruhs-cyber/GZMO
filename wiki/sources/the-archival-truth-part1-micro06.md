@@ -1,0 +1,169 @@
+---
+type: source
+title: the-archival-truth-part1-micro06
+created: 2026-06-09
+updated: 2026-06-09
+sources: 1
+tags: []
+status: stable
+gzmo_synthetic: true
+---
+
+# the-archival-truth-part1-micro06
+
+Ingested source summary (2026-06-09).
+
+## Entities
+- [[ian-bagg|Ian Bagg]] (PERSON)
+- [[steven-wright|Steven Wright]] (PERSON)
+- [[big-jay-oakerson|Big Jay Oakerson]] (PERSON)
+- [[spaceballs|Spaceballs]] (CONCEPT)
+- [[practice-snack-methodology|Practice Snack Methodology]] (CONCEPT)
+- [[observational|Observational]] (CONCEPT)
+- [[the-big-lebowski|The Big Lebowski]] (BOOK)
+- [[callback|Callback]] (CONCEPT)
+- [[sarah-silverman|Sarah Silverman]] (PERSON)
+- [[the-superiority-theory|The Superiority Theory]] (CONCEPT)
+- [[american-fiction|American Fiction]] (BOOK)
+- [[oscar-wilde|Oscar Wilde]] (PERSON)
+- [[emotional-intelligence-eq|Emotional Intelligence (EQ)]] (CONCEPT)
+- [[kevin-hart|Kevin Hart]] (PERSON)
+- [[the-shep-framework|The SHEP Framework]] (CONCEPT)
+- [[social-intelligence|Social Intelligence]] (CONCEPT)
+- [[bill-burr|Bill Burr]] (PERSON)
+- [[charlie-chaplin|Charlie Chaplin]] (PERSON)
+- [[ali-g|Ali G]] (CONCEPT)
+- [[when-harry-met-sally|When Harry Met Sally]] (BOOK)
+- [[anecdotal|Anecdotal]] (CONCEPT)
+- [[the-mighty-boosh|The Mighty Boosh]] (CONCEPT)
+- [[dave-chappelle|Dave Chappelle]] (PERSON)
+- [[the-office-uk-us|The Office (UK/US)]] (CONCEPT)
+- [[tim-robinson|Tim Robinson]] (PERSON)
+- [[commedia-dell-arte|Commedia dell'arte]] (CONCEPT)
+- [[home-alone|Home Alone]] (BOOK)
+- [[social-awareness|Social Awareness]] (CONCEPT)
+- [[the-curse|The Curse]] (CONCEPT)
+- [[buster-keaton|Buster Keaton]] (PERSON)
+- [[the-colbert-report|The Colbert Report]] (CONCEPT)
+- [[situational-cringe-awkward|Situational / Cringe (Awkward)]] (CONCEPT)
+- [[laughs-per-minute-lpm|Laughs-Per-Minute (LPM)]] (CONCEPT)
+- [[friends|Friends]] (CONCEPT)
+- [[parody-satire|Parody / Satire]] (CONCEPT)
+- [[larry-david|Larry David]] (PERSON)
+- [[stewart-lee|Stewart Lee]] (PERSON)
+- [[jerry-seinfeld|Jerry Seinfeld]] (PERSON)
+- [[the-onion|The Onion]] (CONCEPT)
+- [[clueless|Clueless]] (BOOK)
+- [[the-hangover|The Hangover]] (BOOK)
+- [[anthony-jeselnik|Anthony Jeselnik]] (PERSON)
+- [[jim-carrey|Jim Carrey]] (PERSON)
+- [[the-relief-theory|The Relief Theory]] (CONCEPT)
+- [[the-importance-of-being-earnest|The Importance of Being Earnest]] (BOOK)
+- [[curb-your-enthusiasm|Curb Your Enthusiasm]] (CONCEPT)
+- [[farce|Farce]] (CONCEPT)
+- [[chris-rock|Chris Rock]] (PERSON)
+- [[comedic-mindset|Comedic Mindset]] (CONCEPT)
+- [[the-incongruity-theory|The Incongruity Theory]] (CONCEPT)
+- [[i-think-you-should-leave|I Think You Should Leave]] (CONCEPT)
+- [[the-benign-violation-theory|The Benign Violation Theory]] (CONCEPT)
+- [[character|Character]] (CONCEPT)
+- [[monty-python-s-flying-circus|Monty Python's Flying Circus]] (CONCEPT)
+- [[frankie-boyle|Frankie Boyle]] (PERSON)
+- [[daniel-coyle|Daniel Coyle]] (PERSON)
+- [[modern-family|Modern Family]] (CONCEPT)
+- [[demetri-martin|Demetri Martin]] (PERSON)
+- [[nathan-for-you|Nathan For You]] (CONCEPT)
+- [[george-carlin|George Carlin]] (PERSON)
+- [[rowan-atkinson|Rowan Atkinson]] (PERSON)
+- [[juno|Juno]] (BOOK)
+- [[kristen-schaal|Kristen Schaal]] (PERSON)
+- [[sacha-baron-cohen|Sacha Baron Cohen]] (PERSON)
+- [[dark-aggressive|Dark / Aggressive]] (CONCEPT)
+- [[crowd-work|Crowd Work]] (CONCEPT)
+- [[little-miss-sunshine|Little Miss Sunshine]] (BOOK)
+- [[mr-bean|Mr. Bean]] (CONCEPT)
+- [[lenny-bruce|Lenny Bruce]] (PERSON)
+- [[james-acaster|James Acaster]] (PERSON)
+- [[alternative|Alternative]] (CONCEPT)
+- [[deadpan-dry|Deadpan (Dry)]] (CONCEPT)
+- [[the-comedy-writing-tool|The Comedy Writing Tool]] (TOOL)
+- [[absurdist-surreal|Absurdist / Surreal]] (CONCEPT)
+- [[hannah-gadsby|Hannah Gadsby]] (PERSON)
+- [[slapstick-physical|Slapstick / Physical]] (CONCEPT)
+- [[the-three-stooges|the Three Stooges]] (PERSON)
+- [[romantic|Romantic]] (CONCEPT)
+- [[the-little-book-of-talent|The Little Book of Talent]] (BOOK)
+
+## Relations
+- The Benign Violation Theory → RELATED_TO → Absurdist / Surreal
+- The Benign Violation Theory → RELATED_TO → Situational / Cringe (Awkward)
+- The SHEP Framework → RELATED_TO → Anecdotal
+- The Relief Theory → RELATED_TO → Situational / Cringe (Awkward)
+- The Relief Theory → RELATED_TO → Dark / Aggressive
+- The Superiority Theory → RELATED_TO → Observational
+- The Superiority Theory → RELATED_TO → Slapstick / Physical
+- The Superiority Theory → RELATED_TO → Parody / Satire
+- The Superiority Theory → RELATED_TO → Anecdotal
+- The Incongruity Theory → RELATED_TO → Observational
+- The Incongruity Theory → RELATED_TO → Deadpan (Dry)
+- The Incongruity Theory → RELATED_TO → Absurdist / Surreal
+- The Incongruity Theory → RELATED_TO → Alternative
+- The Incongruity Theory → RELATED_TO → Parody / Satire
+- The Incongruity Theory → RELATED_TO → Farce
+- Daniel Coyle → AUTHOR_OF → The Little Book of Talent
+- Daniel Coyle → RELATED_TO → Practice Snack Methodology
+- The Little Book of Talent → RELATED_TO → Practice Snack Methodology
+- Observational → RELATED_TO → Jerry Seinfeld
+- Observational → RELATED_TO → Larry David
+- Deadpan (Dry) → RELATED_TO → Steven Wright
+- Deadpan (Dry) → RELATED_TO → Demetri Martin
+- Deadpan (Dry) → RELATED_TO → The Big Lebowski
+- Absurdist / Surreal → RELATED_TO → Tim Robinson
+- Absurdist / Surreal → RELATED_TO → I Think You Should Leave
+- Absurdist / Surreal → RELATED_TO → The Mighty Boosh
+- Absurdist / Surreal → RELATED_TO → Monty Python's Flying Circus
+- Absurdist / Surreal → RELATED_TO → The Curse
+- Situational / Cringe (Awkward) → RELATED_TO → The Office (UK/US)
+- Situational / Cringe (Awkward) → RELATED_TO → Curb Your Enthusiasm
+- Situational / Cringe (Awkward) → RELATED_TO → Nathan For You
+- Dark / Aggressive → RELATED_TO → George Carlin
+- Dark / Aggressive → RELATED_TO → Anthony Jeselnik
+- Dark / Aggressive → RELATED_TO → Frankie Boyle
+- Dark / Aggressive → RELATED_TO → Bill Burr
+- Dark / Aggressive → RELATED_TO → Sarah Silverman
+- Slapstick / Physical → RELATED_TO → Charlie Chaplin
+- Slapstick / Physical → RELATED_TO → Buster Keaton
+- Slapstick / Physical → RELATED_TO → the Three Stooges
+- Slapstick / Physical → RELATED_TO → Jim Carrey
+- Slapstick / Physical → RELATED_TO → Rowan Atkinson
+- Slapstick / Physical → RELATED_TO → Mr. Bean
+- Slapstick / Physical → RELATED_TO → Commedia dell'arte
+- Alternative → RELATED_TO → Stewart Lee
+- Alternative → RELATED_TO → James Acaster
+- Alternative → RELATED_TO → Hannah Gadsby
+- Alternative → RELATED_TO → Kristen Schaal
+- Parody / Satire → RELATED_TO → Spaceballs
+- Parody / Satire → RELATED_TO → The Onion
+- Parody / Satire → RELATED_TO → The Colbert Report
+- Parody / Satire → RELATED_TO → American Fiction
+- Anecdotal → RELATED_TO → Dave Chappelle
+- Anecdotal → RELATED_TO → Chris Rock
+- Anecdotal → RELATED_TO → Kevin Hart
+- Anecdotal → RELATED_TO → Lenny Bruce
+- Character → RELATED_TO → Sacha Baron Cohen
+- Character → RELATED_TO → Ali G
+- Romantic → RELATED_TO → When Harry Met Sally
+- Romantic → RELATED_TO → Clueless
+- Farce → RELATED_TO → Oscar Wilde
+- Farce → RELATED_TO → The Importance of Being Earnest
+- Farce → RELATED_TO → The Hangover
+- Farce → RELATED_TO → Home Alone
+- Social Intelligence → RELATED_TO → Emotional Intelligence (EQ)
+- Social Intelligence → RELATED_TO → Crowd Work
+- Emotional Intelligence (EQ) → RELATED_TO → Crowd Work
+- Crowd Work → RELATED_TO → Big Jay Oakerson
+- Crowd Work → RELATED_TO → Ian Bagg
+- Crowd Work → RELATED_TO → Callback
+- Friends → RELATED_TO → Modern Family
+- Practice Snack Methodology → RELATED_TO → Comedic Mindset
+- Social Awareness → RELATED_TO → Social Intelligence

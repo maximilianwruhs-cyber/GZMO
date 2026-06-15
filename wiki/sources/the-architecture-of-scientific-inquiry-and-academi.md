@@ -1,0 +1,322 @@
+---
+type: source
+title: the-architecture-of-scientific-inquiry-and-academi
+created: 2026-06-08
+updated: 2026-06-08
+sources: 1
+tags: []
+status: stable
+gzmo_synthetic: true
+---
+
+# the-architecture-of-scientific-inquiry-and-academi
+
+Ingested source summary (2026-06-08).
+
+## Entities
+- [[bokeh|Bokeh]] (TOOL)
+- [[data-to-ink-ratio|Data-to-Ink Ratio]] (CONCEPT)
+- [[time-management-strategies-for-researchers|Time Management Strategies for Researchers]] (CONCEPT)
+- [[finer-criteria|FINER criteria]] (FRAMEWORK)
+- [[pandas|Pandas]] (TOOL)
+- [[guest-authorship|Guest Authorship]] (CONCEPT)
+- [[conda|Conda]] (TOOL)
+- [[replication|Replication]] (CONCEPT)
+- [[scoro|Scoro]] (TOOL)
+- [[google-workspace|Google Workspace]] (SYSTEM)
+- [[journal-impact-factor-jif|Journal Impact Factor (JIF)]] (CONCEPT)
+- [[f1000research|F1000Research]] (ORGANIZATION)
+- [[crossref|CrossRef]] (TOOL)
+- [[nejm|NEJM]] (ORGANIZATION)
+- [[scientific-review-article|Scientific Review Article]] (CONCEPT)
+- [[ommwriter|OmmWriter]] (TOOL)
+- [[dimensionality|Dimensionality]] (CONCEPT)
+- [[care|CARE]] (FRAMEWORK)
+- [[windows|Windows]] (SYSTEM)
+- [[external-validity|External Validity]] (CONCEPT)
+- [[eudat|EUDAT]] (ORGANIZATION)
+- [[dmponline|DMPonline]] (TOOL)
+- [[microsoft-excel|Microsoft Excel]] (TOOL)
+- [[authors-and-contributors|Authors and Contributors]] (CONCEPT)
+- [[think-check-submit|Think.Check.Submit.]] (TOOL)
+- [[cochrane-diagnostic-and-screening-test-methods-working-group|Cochrane Diagnostic and Screening Test Methods Working Group]] (CONCEPT)
+- [[chartjunk|Chartjunk]] (CONCEPT)
+- [[seaborn|Seaborn]] (TOOL)
+- [[international-committee-of-medical-journal-editors-icmje|International Committee of Medical Journal Editors (ICMJE)]] (ORGANIZATION)
+- [[the-architecture-of-scientific-inquiry-principles-of-working-methodology-and-academic-publishing|The Architecture of Scientific Inquiry: Principles of Working, Methodology, and Academic Publishing]] (CONCEPT)
+- [[major-revisions|Major Revisions]] (CONCEPT)
+- [[literature-review|Literature Review]] (CONCEPT)
+- [[scientific-inquiry|Scientific Inquiry]] (CONCEPT)
+- [[boolean-logic|Boolean logic]] (CONCEPT)
+- [[medical-subject-headings-mesh|Medical Subject Headings (MeSH)]] (CONCEPT)
+- [[spirit|SPIRIT]] (FRAMEWORK)
+- [[expressions-of-concern|Expressions of Concern]] (CONCEPT)
+- [[retractions|Retractions]] (CONCEPT)
+- [[latex|LaTeX]] (TOOL)
+- [[color-theory|Color Theory]] (CONCEPT)
+- [[jama-network|JAMA Network]] (ORGANIZATION)
+- [[task-segmentation|Task Segmentation]] (CONCEPT)
+- [[tripod|TRIPOD]] (FRAMEWORK)
+- [[matplotlib|Matplotlib]] (TOOL)
+- [[open-access|Open Access]] (CONCEPT)
+- [[european-research-council-erc|European Research Council (ERC)]] (ORGANIZATION)
+- [[organizational-tools-and-strategies-for-researchers|Organizational Tools and Strategies for Researchers]] (TOOL)
+- [[clarity-concision|Clarity & Concision]] (CONCEPT)
+- [[computational-reproducibility|Computational Reproducibility]] (CONCEPT)
+- [[data-visualization-best-practices|Data Visualization Best Practices]] (CONCEPT)
+- [[world-association-of-medical-editors-wame|World Association of Medical Editors (WAME)]] (ORGANIZATION)
+- [[pickle-jar-theory|Pickle Jar Theory]] (CONCEPT)
+- [[version-of-record-vor|Version of Record (VoR)]] (CONCEPT)
+- [[stard|STARD]] (FRAMEWORK)
+- [[project-management-tools-for-researchers|Project management tools for researchers]] (TOOL)
+- [[introduction|Introduction]] (CONCEPT)
+- [[javascript-web|JavaScript & Web]] (CONCEPT)
+- [[academic-prose|Academic Prose]] (CONCEPT)
+- [[artificial-intelligence|Artificial Intelligence]] (CONCEPT)
+- [[hedging-techniques-in-academic-writing|Hedging Techniques in Academic Writing]] (CONCEPT)
+- [[elsevier|Elsevier]] (ORGANIZATION)
+- [[imrad-structure|IMRAD structure]] (CONCEPT)
+- [[microsoft-word|Microsoft Word]] (TOOL)
+- [[ggplot2|ggplot2]] (TOOL)
+- [[git|Git]] (TOOL)
+- [[gift-authorship|Gift Authorship]] (CONCEPT)
+- [[nih-data-sharing-policy|NIH Data Sharing Policy]] (ORGANIZATION)
+- [[hedging-softening-and-writer-s-distance|Hedging, Softening, and Writer's Distance]] (CONCEPT)
+- [[open-science|Open Science]] (CONCEPT)
+- [[choosing-a-journal|Choosing a journal]] (CONCEPT)
+- [[high-performance-computing-hpc-clusters|High-Performance Computing (HPC) clusters]] (SYSTEM)
+- [[predatory-publishers|predatory publishers]] (CONCEPT)
+- [[abstract|Abstract]] (CONCEPT)
+- [[authorship-criteria|Authorship Criteria]] (CONCEPT)
+- [[python-ecosystem|Python Ecosystem]] (CONCEPT)
+- [[titles-and-abstracts|Titles and Abstracts]] (CONCEPT)
+- [[gantt-charts|Gantt charts]] (CONCEPT)
+- [[color-vision-deficiencies-cvd|Color Vision Deficiencies (CVD)]] (CONCEPT)
+- [[data-management-plans-dmps|Data Management Plans (DMPs)]] (CONCEPT)
+- [[ghost-authorship|Ghost Authorship]] (CONCEPT)
+- [[endnote|EndNote]] (TOOL)
+- [[large-language-models-llms|Large Language Models (LLMs)]] (SYSTEM)
+- [[bmj|BMJ]] (ORGANIZATION)
+- [[tableau|Tableau]] (TOOL)
+- [[credit-taxonomy|CRediT taxonomy]] (TOOL)
+- [[four-cs-of-effective-writing|Four Cs of Effective Writing]] (CONCEPT)
+- [[argos|Argos]] (TOOL)
+- [[prisma|PRISMA]] (FRAMEWORK)
+- [[dimensions|Dimensions]] (TOOL)
+- [[reviewers-comments|Reviewers' comments]] (CONCEPT)
+- [[institutional-review-boards-irbs|Institutional Review Boards (IRBs)]] (ORGANIZATION)
+- [[dryad|Dryad]] (TOOL)
+- [[github|GitHub]] (TOOL)
+- [[docker|Docker]] (TOOL)
+- [[digital-curation-centre|Digital Curation Centre]] (ORGANIZATION)
+- [[clear-precise-and-concise-writing|Clear, Precise, and Concise Writing]] (CONCEPT)
+- [[gestalt-principles|Gestalt principles]] (CONCEPT)
+- [[hedges-softening-claims-in-academic-writing|Hedges: Softening Claims in Academic Writing]] (CONCEPT)
+- [[openaire|OpenAIRE]] (ORGANIZATION)
+- [[ethics-in-publication-and-research|Ethics in Publication and Research]] (CONCEPT)
+- [[leaflet|Leaflet]] (TOOL)
+- [[eclipse-framework|ECLIPSE framework]] (FRAMEWORK)
+- [[gpu-jupyter|GPU-Jupyter]] (TOOL)
+- [[cope-flowcharts|COPE flowcharts]] (ORGANIZATION)
+- [[blocking|Blocking]] (CONCEPT)
+- [[biorender-graph|BioRender Graph]] (TOOL)
+- [[mendeley|Mendeley]] (TOOL)
+- [[reporting-guidelines|Reporting Guidelines]] (CONCEPT)
+- [[strobe|STROBE]] (FRAMEWORK)
+- [[arrive|ARRIVE]] (FRAMEWORK)
+- [[looker|Looker]] (TOOL)
+- [[results|Results]] (CONCEPT)
+- [[scite|scite]] (TOOL)
+- [[citavi|Citavi]] (TOOL)
+- [[rmarkdown|RMarkdown]] (TOOL)
+- [[double-blind-review|Double-Blind Review]] (CONCEPT)
+- [[randomization|Randomization]] (CONCEPT)
+- [[collaborative-review|Collaborative Review]] (CONCEPT)
+- [[methodological-rigor|Methodological Rigor]] (CONCEPT)
+- [[dmptool|DMPTool]] (TOOL)
+- [[corrections|Corrections]] (CONCEPT)
+- [[figshare|Figshare]] (TOOL)
+- [[peer-review|Peer Review]] (CONCEPT)
+- [[ethical-guidelines|Ethical Guidelines]] (CONCEPT)
+- [[google-data-studio|Google Data Studio]] (TOOL)
+- [[jupyter-notebooks|Jupyter Notebooks]] (TOOL)
+- [[hedging-in-scientific-manuscripts|Hedging in Scientific Manuscripts]] (CONCEPT)
+- [[consort|CONSORT]] (FRAMEWORK)
+- [[open-transparent-review|Open & Transparent Review]] (CONCEPT)
+- [[taylor-francis|Taylor & Francis]] (ORGANIZATION)
+- [[removals|Removals]] (CONCEPT)
+- [[data-visualizations|Data visualizations]] (CONCEPT)
+- [[style-and-clarity|Style and Clarity]] (CONCEPT)
+- [[lancet|Lancet]] (ORGANIZATION)
+- [[orcid-identifiers|ORCID identifiers]] (TOOL)
+- [[single-blind-review|Single-Blind Review]] (CONCEPT)
+- [[r-ecosystem|R Ecosystem]] (CONCEPT)
+- [[underleaf|Underleaf]] (TOOL)
+- [[discussion|Discussion]] (CONCEPT)
+- [[zenodo|Zenodo]] (TOOL)
+- [[fair-principles|FAIR Principles]] (CONCEPT)
+- [[mellel|Mellel]] (TOOL)
+- [[medline|MEDLINE]] (CONCEPT)
+- [[rspace|RSpace]] (TOOL)
+- [[pubmed|PubMed]] (TOOL)
+- [[zotero|Zotero]] (TOOL)
+- [[title|Title]] (CONCEPT)
+- [[post-publication-review|Post-Publication Review]] (CONCEPT)
+- [[platform-solutions|Platform Solutions]] (CONCEPT)
+- [[reproducr|reproducr]] (TOOL)
+- [[d3-js|D3.js]] (TOOL)
+- [[dataverse|Dataverse]] (TOOL)
+- [[writing-tools|Writing Tools]] (TOOL)
+- [[ai-powered-journal-suggester-tools|AI-powered Journal Suggester tools]] (TOOL)
+- [[omniplanner|OmniPlanner]] (TOOL)
+- [[internal-validity|Internal Validity]] (CONCEPT)
+- [[paperpile|Paperpile]] (TOOL)
+- [[spice-framework|SPICE framework]] (FRAMEWORK)
+- [[authorship-guidelines|Authorship Guidelines]] (CONCEPT)
+- [[spider-framework|SPIDER framework]] (FRAMEWORK)
+- [[star-program|STAR program]] (PROJECT)
+- [[triple-blind-review|Triple-Blind Review]] (CONCEPT)
+- [[trello|Trello]] (TOOL)
+
+## Relations
+- MEDLINE → PART_OF → PubMed
+- Medical Subject Headings (MeSH) → RELATED_TO → PubMed
+- Mendeley → USES → Elsevier
+- CONSORT → RELATED_TO → JAMA Network
+- CONSORT → RELATED_TO → Lancet
+- CONSORT → RELATED_TO → BMJ
+- PRISMA → RELATED_TO → NEJM
+- PRISMA → RELATED_TO → JAMA Network
+- PRISMA → RELATED_TO → Lancet
+- PRISMA → RELATED_TO → BMJ
+- STROBE → RELATED_TO → NEJM
+- STROBE → RELATED_TO → JAMA Network
+- STROBE → RELATED_TO → Lancet
+- STROBE → RELATED_TO → BMJ
+- STARD → RELATED_TO → NEJM
+- STARD → RELATED_TO → JAMA Network
+- STARD → RELATED_TO → Lancet
+- STARD → RELATED_TO → BMJ
+- ARRIVE → RELATED_TO → NEJM
+- ARRIVE → RELATED_TO → JAMA Network
+- ARRIVE → RELATED_TO → Lancet
+- ARRIVE → RELATED_TO → BMJ
+- CARE → RELATED_TO → NEJM
+- CARE → RELATED_TO → JAMA Network
+- CARE → RELATED_TO → Lancet
+- CARE → RELATED_TO → BMJ
+- SPIRIT → RELATED_TO → NEJM
+- SPIRIT → RELATED_TO → JAMA Network
+- SPIRIT → RELATED_TO → Lancet
+- SPIRIT → RELATED_TO → BMJ
+- TRIPOD → RELATED_TO → NEJM
+- TRIPOD → RELATED_TO → JAMA Network
+- TRIPOD → RELATED_TO → Lancet
+- TRIPOD → RELATED_TO → BMJ
+- FAIR Principles → RELATED_TO → NIH Data Sharing Policy
+- FAIR Principles → RELATED_TO → European Research Council (ERC)
+- Data Management Plans (DMPs) → RELATED_TO → NIH Data Sharing Policy
+- Data Management Plans (DMPs) → RELATED_TO → European Research Council (ERC)
+- DMPonline → PART_OF → Digital Curation Centre
+- Argos → PART_OF → OpenAIRE
+- Argos → PART_OF → EUDAT
+- Zenodo → RELATED_TO → FAIR Principles
+- Figshare → RELATED_TO → FAIR Principles
+- Dataverse → RELATED_TO → FAIR Principles
+- Dryad → RELATED_TO → FAIR Principles
+- DMPTool → USES → RSpace
+- RSpace → USES → Figshare
+- RSpace → USES → Dataverse
+- Jupyter Notebooks → RELATED_TO → Computational Reproducibility
+- RMarkdown → RELATED_TO → Computational Reproducibility
+- Git → RELATED_TO → GitHub
+- Docker → RELATED_TO → Computational Reproducibility
+- Conda → RELATED_TO → Computational Reproducibility
+- GPU-Jupyter → RELATED_TO → Computational Reproducibility
+- Trello → RELATED_TO → Time Management Strategies for Researchers
+- Scoro → RELATED_TO → Time Management Strategies for Researchers
+- OmniPlanner → USES → Gantt charts
+- Data Visualization Best Practices → USES → Gestalt principles
+- Data Visualization Best Practices → USES → Color Theory
+- Data Visualization Best Practices → RELATED_TO → Color Vision Deficiencies (CVD)
+- ggplot2 → PART_OF → R Ecosystem
+- Matplotlib → PART_OF → Python Ecosystem
+- Seaborn → PART_OF → Python Ecosystem
+- Bokeh → PART_OF → Python Ecosystem
+- D3.js → PART_OF → JavaScript & Web
+- Leaflet → PART_OF → JavaScript & Web
+- Tableau → PART_OF → Platform Solutions
+- Google Data Studio → PART_OF → Platform Solutions
+- Looker → PART_OF → Platform Solutions
+- BioRender Graph → PART_OF → Platform Solutions
+- IMRAD structure → RELATED_TO → The Architecture of Scientific Inquiry: Principles of Working, Methodology, and Academic Publishing
+- STARD → RELATED_TO → Cochrane Diagnostic and Screening Test Methods Working Group
+- Citavi → USES → Windows
+- Seaborn → USES → Pandas
+- Python Ecosystem → USES → Jupyter Notebooks
+- Python Ecosystem → USES → RMarkdown
+- Docker → RELATED_TO → High-Performance Computing (HPC) clusters
+- Conda → RELATED_TO → High-Performance Computing (HPC) clusters
+- Introduction → PART_OF → IMRAD structure
+- Cochrane Diagnostic and Screening Test Methods Working Group → PART_OF → IMRAD structure
+- Results → PART_OF → IMRAD structure
+- Discussion → PART_OF → IMRAD structure
+- Abstract → RELATED_TO → IMRAD structure
+- Title → RELATED_TO → IMRAD structure
+- LaTeX → RELATED_TO → Microsoft Word
+- Underleaf → RELATED_TO → LaTeX
+- OmmWriter → RELATED_TO → Academic Prose
+- Mellel → RELATED_TO → Academic Prose
+- Open Access → RELATED_TO → Open Science
+- F1000Research → RELATED_TO → Open Access
+- predatory publishers → RELATED_TO → Open Access
+- Think.Check.Submit. → USES → predatory publishers
+- Taylor & Francis → RELATED_TO → STAR program
+- STAR program → RELATED_TO → Open Access
+- Peer Review → RELATED_TO → Ethics in Publication and Research
+- Single-Blind Review → PART_OF → Peer Review
+- Double-Blind Review → PART_OF → Peer Review
+- Triple-Blind Review → PART_OF → Peer Review
+- Open & Transparent Review → PART_OF → Peer Review
+- Collaborative Review → PART_OF → Peer Review
+- Post-Publication Review → PART_OF → Peer Review
+- Major Revisions → RELATED_TO → Peer Review
+- Authorship Criteria → RELATED_TO → Ethics in Publication and Research
+- Ghost Authorship → RELATED_TO → Authorship Criteria
+- Guest Authorship → RELATED_TO → Authorship Criteria
+- Gift Authorship → RELATED_TO → Authorship Criteria
+- CRediT taxonomy → RELATED_TO → Authorship Criteria
+- ORCID identifiers → RELATED_TO → Authorship Criteria
+- Corrections → RELATED_TO → Ethics in Publication and Research
+- Expressions of Concern → RELATED_TO → Ethics in Publication and Research
+- Retractions → RELATED_TO → Ethics in Publication and Research
+- Removals → RELATED_TO → Ethics in Publication and Research
+- Artificial Intelligence → RELATED_TO → Ethics in Publication and Research
+- Large Language Models (LLMs) → RELATED_TO → Artificial Intelligence
+- COPE flowcharts → RELATED_TO → Artificial Intelligence
+- WAME → RELATED_TO → Artificial Intelligence
+- JAMA Network → RELATED_TO → Artificial Intelligence
+- International Committee of Medical Journal Editors (ICMJE) → RELATED_TO → Artificial Intelligence
+- International Committee of Medical Journal Editors (ICMJE) → RELATED_TO → Authorship Criteria
+- Corrections → PART_OF → Version of Record (VoR)
+- Expressions of Concern → PART_OF → Version of Record (VoR)
+- Retractions → PART_OF → Version of Record (VoR)
+- Removals → PART_OF → Version of Record (VoR)
+- Artificial Intelligence → USES → PubMed
+- Artificial Intelligence → USES → CrossRef
+- Project management tools for researchers → RELATED_TO → researchers
+- Organizational Tools and Strategies for Researchers → RELATED_TO → researchers
+- Time Management Strategies for Researchers → RELATED_TO → researchers
+- Data Visualization Best Practices → RELATED_TO → Data visualization
+- IMRAD structure → PART_OF → Scientific Review Article
+- Clarity & Concision → RELATED_TO → style
+- Hedging in Scientific Manuscripts → RELATED_TO → Scientific Manuscripts
+- Choosing a journal → RELATED_TO → Publication
+- Journal Impact Factor (JIF) → RELATED_TO → journal
+- Peer Review → RELATED_TO → Manuscript
+- Reviewers' comments → RELATED_TO → reviewers
+- Authors and Contributors → RELATED_TO → authors
+- Authors and Contributors → RELATED_TO → contributors
+- Authorship Guidelines → RELATED_TO → authorship
+- Ethics in Publication and Research → RELATED_TO → Publication
+- Ethics in Publication and Research → RELATED_TO → Research

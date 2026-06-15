@@ -48,6 +48,7 @@ fn parse_teach_request(args: &[String]) -> Result<MentorRequest> {
             method: "teach".into(),
             message: msg.to_string(),
             conversation: vec![],
+            ..Default::default()
         });
     }
 
@@ -67,12 +68,16 @@ fn parse_teach_request(args: &[String]) -> Result<MentorRequest> {
                 method: "teach".into(),
                 message: req.message,
                 conversation: req.conversation,
+                discovery_pillar: req.discovery_pillar,
+                learn_topic: req.learn_topic,
+                probe_context: req.probe_context,
             });
         }
         return Ok(MentorRequest {
             method: "teach".into(),
             message: trimmed.to_string(),
             conversation: vec![],
+            ..Default::default()
         });
     }
 
@@ -86,6 +91,7 @@ async fn run_ping(config: &GzmoConfig) -> Result<()> {
             method: "ping".into(),
             message: String::new(),
             conversation: vec![],
+            ..Default::default()
         },
     )
     .await?;
@@ -104,14 +110,18 @@ async fn run_status(config: &GzmoConfig) -> Result<()> {
             method: "status".into(),
             message: String::new(),
             conversation: vec![],
+            ..Default::default()
         },
     )
     .await?;
     println!(
-        "learner={} mentor={} ops_mode={}",
+        "learner={} mentor={} ops_mode={} auto_triggers={}",
         resp.learner_id.unwrap_or_default(),
         resp.mentor.map(|m| m.to_string()).unwrap_or_else(|| "?".into()),
         resp.ops_mode.map(|m| m.to_string()).unwrap_or_else(|| "?".into()),
+        resp.auto_triggers
+            .map(|m| m.to_string())
+            .unwrap_or_else(|| "?".into()),
     );
     Ok(())
 }
@@ -123,6 +133,7 @@ async fn run_reload(config: &GzmoConfig) -> Result<()> {
             method: "reload".into(),
             message: String::new(),
             conversation: vec![],
+            ..Default::default()
         },
     )
     .await?;
@@ -185,6 +196,7 @@ async fn local_dispatch(config: &GzmoConfig, req: MentorRequest) -> Result<Mento
                 response: Some("reloaded (local)".into()),
                 mentor: Some(!runtime.session.ops_mode),
                 ops_mode: Some(runtime.session.ops_mode),
+                auto_triggers: Some(runtime.session.auto_triggers_enabled),
                 learner_id: Some(config.pedagogy.learner_id().to_string()),
                 ..MentorResponse::base()
             })
@@ -196,6 +208,7 @@ async fn local_dispatch(config: &GzmoConfig, req: MentorRequest) -> Result<Mento
                 ok: true,
                 mentor: Some(!runtime.session.ops_mode),
                 ops_mode: Some(runtime.session.ops_mode),
+                auto_triggers: Some(runtime.session.auto_triggers_enabled),
                 learner_id: Some(config.pedagogy.learner_id().to_string()),
                 ..MentorResponse::base()
             })
@@ -222,11 +235,25 @@ async fn local_teach(config: &GzmoConfig, req: &MentorRequest) -> Result<MentorR
         return Ok(delegate_exec_response(message, &runtime.session, &learner_id));
     }
     let messages = build_messages(&req.conversation, message);
-    let text = runtime
-        .maybe_teach(config, &router, tutor.as_ref(), message, &messages)
+    let discovery_context = mentor_ipc::build_discovery_context(req);
+    let turn = runtime
+        .maybe_teach(
+            config,
+            &router,
+            tutor.as_ref(),
+            message,
+            &messages,
+            None,
+            discovery_context.as_deref(),
+            None,
+        )
         .await?;
-    match text {
-        Some(response) => Ok(MentorResponse::teach(response, learner_id)),
+    match turn {
+        Some(turn) => Ok(MentorResponse::teach_with_pedagogy(
+            turn.response,
+            learner_id,
+            &turn.edf_record,
+        )),
         None => Ok(delegate_exec_response(message, &runtime.session, &learner_id)),
     }
 }

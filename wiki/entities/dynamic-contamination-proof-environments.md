@@ -1,0 +1,18 @@
+---
+type: entity
+title: dynamic, contamination-proof environments
+created: 2026-06-09
+updated: 2026-06-09
+sources: 1
+tags: []
+status: draft
+gzmo_synthetic: true
+---
+
+# dynamic, contamination-proof environments
+
+Type: CONCEPT
+
+## From [[the-evolution-of-artificial-intelligence-evaluatio-micro04|the-evolution-of-artificial-intelligence-evaluatio-micro04]] (2026-06-09)
+- Are relied upon by the modern framework.
+- Are used to prevent model memorization.

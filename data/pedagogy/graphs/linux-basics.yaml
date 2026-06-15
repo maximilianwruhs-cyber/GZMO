@@ -1,0 +1,52 @@
+domain: linux-basics
+nodes:
+  - id: shell_navigation
+    title: Shell Navigation
+    description: Moving around the filesystem with cd, pwd, ls; understanding paths and home directory.
+    prerequisites: []
+    bloom_level: remember
+
+  - id: file_permissions
+    title: File Permissions
+    description: Reading and interpreting ls -l output; chmod, chown basics; ugo/rwx model.
+    prerequisites:
+      - shell_navigation
+    bloom_level: understand
+
+  - id: pipes_redirection
+    title: Pipes and Redirection
+    description: stdin/stdout/stderr; pipes, redirects, and basic process chaining.
+    prerequisites:
+      - shell_navigation
+    bloom_level: apply
+
+  - id: systemd_units
+    title: Systemd Units
+    description: systemctl, unit files, enable/start/status; understanding daemons vs one-shot services.
+    prerequisites:
+      - file_permissions
+      - pipes_redirection
+    bloom_level: apply
+
+  - id: journal_debugging
+    title: Journal Debugging
+    description: journalctl filters, following logs, correlating service failures with unit state.
+    prerequisites:
+      - systemd_units
+      - pipes_redirection
+    bloom_level: analyze
+
+  - id: package_management
+    title: Package Management
+    description: apt/dnf basics, installing packages, resolving dependencies, holding packages.
+    prerequisites:
+      - shell_navigation
+      - file_permissions
+    bloom_level: apply
+
+  - id: networking_basics
+    title: Networking Basics
+    description: ip/ss, listening ports, curl, DNS resolution, basic firewall concepts.
+    prerequisites:
+      - pipes_redirection
+    bloom_level: understand

@@ -86,7 +86,11 @@ async fn load_soul_from_disk(path: &Path) -> Result<SoulContext> {
     if let Some(fm) = frontmatter {
         match serde_yaml::from_str::<serde_json::Value>(&fm) {
             Ok(yaml) => {
-                if let Some(name) = yaml.get("persona").and_then(|v| v.as_str()) {
+                if let Some(name) = yaml
+                    .get("persona_name")
+                    .or_else(|| yaml.get("persona"))
+                    .and_then(|v| v.as_str())
+                {
                     persona_name = name.to_string();
                 }
                 if let Some(dirs) = yaml.get("directives").and_then(|v| v.as_array()) {
@@ -170,4 +174,34 @@ fn setup_hot_reload(
 
     watcher.watch(&soul_path, RecursiveMode::NonRecursive)?;
     Ok(watcher)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn split_frontmatter_extracts_body() {
+        let raw = "---\npersona_name: GZMO\n---\n# Body\nHello";
+        let (fm, body) = split_frontmatter(raw);
+        assert!(fm.is_some());
+        assert!(body.contains("Hello"));
+    }
+
+    #[tokio::test]
+    async fn load_soul_accepts_persona_name() {
+        let path = std::env::temp_dir().join(format!(
+            "gzmo_soul_test_{}.md",
+            uuid::Uuid::new_v4()
+        ));
+        std::fs::write(
+            &path,
+            "---\npersona_name: TestBot\nversion: \"2.0\"\n---\n\n# Identity\nMentor.",
+        )
+        .unwrap();
+        let ctx = load_soul_from_disk(&path).await.unwrap();
+        assert_eq!(ctx.persona_name, "TestBot");
+        assert!(ctx.raw_markdown.contains("Mentor"));
+        let _ = std::fs::remove_file(path);
+    }
 }

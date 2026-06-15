@@ -1,0 +1,174 @@
+---
+type: source
+title: drive-research-du-hast-gesagt-part1
+created: 2026-06-08
+updated: 2026-06-08
+sources: 1
+tags: []
+status: stable
+gzmo_synthetic: true
+---
+
+# drive-research-du-hast-gesagt-part1
+
+Ingested source summary (2026-06-08).
+
+## Entities
+- [[qwen2-5-coder-32b-instruct|Qwen2.5-Coder-32B-Instruct]] (SYSTEM)
+- [[turboquant|TurboQuant]] (CONCEPT)
+- [[03-build-queue|03_Build_Queue]] (CONCEPT)
+- [[matmul-free-1-58-bit-models|Matmul-free 1.58-bit models]] (SYSTEM)
+- [[qwen2-5-coder-7b-instruct|Qwen2.5-Coder-7B-Instruct]] (SYSTEM)
+- [[oai-openapi-specification|OAI/OpenAPI-Specification]] (REPOSITORY)
+- [[nvidia-gpu|Nvidia GPU]] (HARDWARE)
+- [[node-based-model-context-protocol-mcp|Node-based Model Context Protocol (MCP)]] (CONCEPT)
+- [[local-embeddings-rag|Local Embeddings (RAG)]] (CONCEPT)
+- [[dev-containers|Dev Containers]] (TOOL)
+- [[aider-ai-aider|Aider-AI/aider]] (REPOSITORY)
+- [[foss-personas|FOSS Personas]] (CONCEPT)
+- [[rag-retrieval-augmented-generation|RAG (Retrieval-Augmented Generation)]] (CONCEPT)
+- [[cpu|CPU]] (SYSTEM)
+- [[llama-3-2-1b-instruct|Llama-3.2-1B-Instruct]] (SYSTEM)
+- [[1-58-bit-matmul-free-revolution|1.58-bit 'Matmul-Free' Revolution]] (CONCEPT)
+- [[linux|Linux]] (SYSTEM)
+- [[deepseek-r1-distill-qwen-14b|DeepSeek-R1-Distill-Qwen-14B]] (MODEL)
+- [[deepseek-r1-distill-qwen-1-5b|DeepSeek-R1-Distill-Qwen-1.5B]] (SYSTEM)
+- [[qjl-quantized-johnson-lindenstrauss|QJL (Quantized Johnson-Lindenstrauss)]] (CONCEPT)
+- [[openai-compatible-api-server|OpenAI-Compatible API Server]] (SYSTEM)
+- [[chief-architect|Chief Architect]] (PERSON)
+- [[nvidia-drivers|NVIDIA drivers]] (TOOL)
+- [[cuda-toolkit|CUDA toolkit]] (TOOL)
+- [[void-ide|Void IDE]] (SYSTEM)
+- [[staff-architect|Staff Architect]] (CONCEPT)
+- [[02-architecture-queue|02_Architecture_Queue]] (CONCEPT)
+- [[core-builder|Core Builder]] (PERSON)
+- [[appimage|AppImage]] (CONCEPT)
+- [[huggingface|HuggingFace]] (TOOL)
+- [[01-ideas-inbox|01_Ideas_Inbox]] (CONCEPT)
+- [[bitnet-cpp|bitnet.cpp]] (TOOL)
+- [[qa-sentinel|QA Sentinel]] (PERSON)
+- [[qwen2-5-coder-1-5b-instruct|Qwen2.5-Coder-1.5B-Instruct]] (SYSTEM)
+- [[roo-code-mcp-settings|Roo Code MCP Settings]] (CONCEPT)
+- [[python|Python]] (SYSTEM)
+- [[05-completed-prs|05_Completed_PRs]] (CONCEPT)
+- [[blueprint-md|Blueprint.md]] (CONCEPT)
+- [[ternary-model|Ternary Model]] (SYSTEM)
+- [[google-gemini-gemini-cli|google-gemini/gemini-cli]] (REPOSITORY)
+- [[stanfordnlp-dspy|stanfordnlp/dspy]] (REPOSITORY)
+- [[modelcontextprotocol-servers|modelcontextprotocol/servers]] (REPOSITORY)
+- [[devcontainers|DevContainers]] (TOOL)
+- [[sqlite|SQLite]] (TOOL)
+- [[qwen-2-5-coder-0-5b-instruct|Qwen-2.5-Coder-0.5B-Instruct]] (SYSTEM)
+- [[architect-server|Architect Server]] (SYSTEM)
+- [[inference-engine|Inference Engine]] (SYSTEM)
+- [[markdown|Markdown]] (CONCEPT)
+- [[qwen-32b|Qwen-32B]] (SYSTEM)
+- [[meta-engineer|Meta-Engineer]] (PERSON)
+- [[1bitllm-bitnet-b1-58-3b-gguf|1bitLLM/bitnet_b1_58-3B_gguf]] (SYSTEM)
+- [[lm-studio|LM Studio]] (TOOL)
+- [[nomic-embed-text-v1-5|nomic-embed-text-v1.5]] (TOOL)
+- [[git-agent|git-agent]] (SYSTEM)
+- [[openclaw|OpenClaw]] (TOOL)
+- [[node-version-manager-nvm|Node Version Manager (NVM)]] (TOOL)
+- [[node-js|Node.js]] (SYSTEM)
+- [[roomodes|.roomodes]] (CONCEPT)
+- [[kv-context-caching|KV Context Caching]] (CONCEPT)
+- [[prompt-caching-kv-cache|Prompt Caching (KV Cache)]] (CONCEPT)
+- [[deepseek-r1-32b|DeepSeek-R1-32B]] (MODEL)
+- [[qwen-14b|Qwen-14B]] (SYSTEM)
+- [[llm|LLM]] (CONCEPT)
+- [[microsoft-research|Microsoft Research]] (ORGANIZATION)
+- [[global-brain-rules|Global Brain Rules]] (CONCEPT)
+- [[cursor|Cursor]] (SYSTEM)
+- [[browser-use-browser-use|browser-use/browser-use]] (REPOSITORY)
+- [[obsidian-vault|Obsidian Vault]] (SYSTEM)
+- [[the-sovereign-node|The Sovereign Node]] (PROJECT)
+- [[continue-dev|Continue.dev]] (TOOL)
+- [[taylorwilsdon-google-workspace-mcp|taylorwilsdon/google_workspace_mcp]] (REPOSITORY)
+- [[sovereign-software-factory|Sovereign Software Factory]] (CONCEPT)
+- [[msitarzewski-agency-agents|msitarzewski/agency-agents]] (REPOSITORY)
+- [[agentic-workflow|Agentic workflow]] (CONCEPT)
+- [[embedding-model|Embedding Model]] (CONCEPT)
+- [[windsurf|Windsurf]] (SYSTEM)
+- [[sickn33-antigravity-awesome-skills|sickn33/antigravity-awesome-skills]] (REPOSITORY)
+- [[bitnet-3b|bitnet-3b]] (SYSTEM)
+- [[docker|Docker]] (TOOL)
+- [[vscodium|VSCodium]] (SYSTEM)
+- [[04-qa-review|04_QA_Review]] (CONCEPT)
+- [[clinerules|.clinerules]] (CONCEPT)
+- [[google-docs|Google Docs]] (TOOL)
+- [[llama-cpp|llama.cpp]] (TOOL)
+- [[hkuds-cli-anything|HKUDS/CLI-Anything]] (REPOSITORY)
+- [[polarquant|PolarQuant]] (CONCEPT)
+- [[qwen2-5-coder-0-5b|Qwen2.5-Coder-0.5B]] (MODEL)
+- [[server-filesystem|server-filesystem]] (TOOL)
+- [[heterogeneous-compute-cluster|Heterogeneous Compute Cluster]] (CONCEPT)
+- [[llama-3-1-8b-instruct|Llama-3.1-8B-Instruct]] (SYSTEM)
+- [[qwen2-5-coder-14b-instruct|Qwen2.5-Coder-14B-Instruct]] (MODEL)
+- [[watchdog|watchdog]] (TOOL)
+- [[ubuntu|Ubuntu]] (SYSTEM)
+- [[du-hast-gesagt|Du hast gesagt]] (BOOK)
+- [[idosal-git-mcp|idosal/git-mcp]] (REPOSITORY)
+- [[falcon-edge|Falcon-Edge]] (ORGANIZATION)
+- [[speculative-decoding|Speculative Decoding]] (CONCEPT)
+- [[gguf|GGUF]] (CONCEPT)
+- [[foss-builder|FOSS Builder]] (CONCEPT)
+- [[pearai|PearAI]] (SYSTEM)
+- [[stigmergy|Stigmergy]] (CONCEPT)
+- [[fuse|FUSE]] (CONCEPT)
+
+## Relations
+- Continue.dev → PART_OF → VSCodium
+- Roo Code MCP Settings → PART_OF → VSCodium
+- Aider-AI/aider → PART_OF → VSCodium
+- OpenClaw → USES → VSCodium
+- Roo Code MCP Settings → USES → LM Studio
+- Continue.dev → USES → LM Studio
+- Aider-AI/aider → USES → LM Studio
+- Void IDE → USES → LM Studio
+- PearAI → PART_OF → VSCodium
+- Agentic workflow → RELATED_TO → VSCodium
+- Roo Code MCP Settings → USES → Node-based Model Context Protocol (MCP)
+- LM Studio → USES → Speculative Decoding
+- Continue.dev → USES → Qwen2.5-Coder-1.5B-Instruct
+- Roo Code MCP Settings → USES → DeepSeek-R1-Distill-Qwen-14B
+- Roo Code MCP Settings → USES → Qwen2.5-Coder-32B-Instruct
+- LM Studio → USES → KV Context Caching
+- Llama-3.1-8B-Instruct → RELATED_TO → Llama-3.2-1B-Instruct
+- DeepSeek-R1-Distill-Qwen-14B → RELATED_TO → DeepSeek-R1-Distill-Qwen-1.5B
+- Du hast gesagt → RELATED_TO → Agentic workflow
+- RAG (Retrieval-Augmented Generation) → USES → Embedding Model
+- Continue.dev → USES → RAG (Retrieval-Augmented Generation)
+- Continue.dev → USES → SQLite
+- Continue.dev → USES → LLM
+- Embedding Model → RELATED_TO → LLM
+- nomic-embed-text-v1.5 → RELATED_TO → Embedding Model
+- nomic-embed-text-v1.5 → USES → LM Studio
+- LM Studio → USES → GGUF
+- LM Studio → USES → LLM
+- LM Studio → USES → llama.cpp
+- LM Studio → USES → Prompt Caching (KV Cache)
+- LM Studio → USES → TurboQuant
+- DevContainers → USES → Roo Code MCP Settings
+- DevContainers → USES → Docker
+- DevContainers → USES → VSCodium
+- Roo Code MCP Settings → USES → DevContainers
+- Roo Code MCP Settings → USES → LLM
+- Roo Code MCP Settings → USES → Obsidian Vault
+- Roo Code MCP Settings → USES → msitarzewski/agency-agents
+- Roo Code MCP Settings → USES → sickn33/antigravity-awesome-skills
+- Roo Code MCP Settings → USES → idosal/git-mcp
+- Roo Code MCP Settings → USES → HKUDS/CLI-Anything
+- Roo Code MCP Settings → USES → Aider-AI/aider
+- Docker → USES → DevContainers
+- VSCodium → USES → DevContainers
+- VSCodium → USES → Continue.dev
+- VSCodium → USES → Roo Code MCP Settings
+- 1.58-bit 'Matmul-Free' Revolution → RELATED_TO → bitnet.cpp
+- 1.58-bit 'Matmul-Free' Revolution → RELATED_TO → Falcon-Edge
+- 1.58-bit 'Matmul-Free' Revolution → USES → LM Studio
+- 1.58-bit 'Matmul-Free' Revolution → USES → llama.cpp
+- 1.58-bit 'Matmul-Free' Revolution → USES → bitnet.cpp
+- bitnet.cpp → RELATED_TO → 1.58-bit 'Matmul-Free' Revolution
+- Falcon-Edge → RELATED_TO → 1.58-bit 'Matmul-Free' Revolution
+- LM Studio → USES → 1.58-bit 'Matmul-Free' Revolution

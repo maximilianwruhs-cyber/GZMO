@@ -1,0 +1,257 @@
+---
+type: source
+title: ai-research-part8-micro08
+created: 2026-06-09
+updated: 2026-06-09
+sources: 1
+tags: []
+status: stable
+gzmo_synthetic: true
+---
+
+# ai-research-part8-micro08
+
+Ingested source summary (2026-06-09).
+
+## Entities
+- [[mixture-of-depths-attention-moda-paper|Mixture-of-Depths Attention (MoDA) paper]] (BOOK)
+- [[hangwin-mcp-chrome|hangwin/mcp-chrome]] (TOOL)
+- [[omo-multi-modell-koordination|OmO: Multi-Modell Koordination]] (TOOL)
+- [[ephemeral-containers|Ephemeral Containers]] (CONCEPT)
+- [[expressivity-loss|Expressivity Loss]] (CONCEPT)
+- [[darwin-g-del-machine-dgm-code-mutationen|Darwin Gödel Machine (DGM): Code-Mutationen]] (CONCEPT)
+- [[mcp-chrome-browser-automatisierung|MCP-Chrome: Browser-Automatisierung]] (TOOL)
+- [[mathematische-architektur-innovationen|Mathematische Architektur-Innovationen]] (CONCEPT)
+- [[greensheep01201-claw-empire|GreenSheep01201/claw-empire]] (TOOL)
+- [[schema-contracts|Schema Contracts]] (CONCEPT)
+- [[yeachan-heo-oh-my-claudecode|Yeachan-Heo/oh-my-claudecode]] (PERSON)
+- [[untrusted-code-execution|Untrusted Code Execution]] (CONCEPT)
+- [[fla-org-flash-linear-attention|fla-org/flash-linear-attention]] (TOOL)
+- [[live-deployments|Live Deployments]] (CONCEPT)
+- [[omc-oh-my-claudecode-multi-agenten-routing|OMC (oh-my-claudecode): Multi-Agenten-Routing]] (TOOL)
+- [[ui-layouts|UI Layouts]] (CONCEPT)
+- [[minicpm-sala-sparse-linear-topologie|MiniCPM-SALA: Sparse-Linear Topologie]] (CONCEPT)
+- [[autonome-software-entwicklung-claw-code|Autonome Software-Entwicklung (Claw-Code)]] (PROJECT)
+- [[orchestrierung-workflow|Orchestrierung & Workflow]] (CONCEPT)
+- [[autojunjie-awesome-agent-harness|AutoJunjie/awesome-agent-harness]] (TOOL)
+- [[bytedance-hust|ByteDance/HUST]] (ORGANIZATION)
+- [[vibe-kanban-visuelles-task-management|Vibe Kanban: Visuelles Task-Management]] (TOOL)
+- [[intel-auto-round|intel/auto-round]] (TOOL)
+- [[huxley-g-del-machine-hgm-paper|Huxley-Gödel Machine (HGM) paper]] (BOOK)
+- [[claw-empire-virtuelle-firmen-oberfl-che|Claw-Empire: Virtuelle Firmen-Oberfläche]] (TOOL)
+- [[l-sung-der-prenorm-dilution|Lösung der PreNorm-Dilution]] (CONCEPT)
+- [[siamesenorm-breaking-the-barrier-to-reconciling-pre-post-norm-paper|SiameseNorm: Breaking the Barrier to Reconciling Pre/Post-Norm paper]] (CONCEPT)
+- [[mhc-manifold-constrained-hyper-connections-paper|mHC: Manifold-Constrained Hyper-Connections paper]] (TOOL)
+- [[agent0-unleashing-self-evolving-agents-via-tool-integrated-reasoning-paper|Agent0: Unleashing Self-Evolving Agents via Tool-Integrated Reasoning paper]] (CONCEPT)
+- [[kognitive-optimierung|Kognitive Optimierung]] (CONCEPT)
+- [[agent-frameworks-orchestration-tools|Agent Frameworks & Orchestration Tools]] (CONCEPT)
+- [[container-isolation|Container Isolation]] (CONCEPT)
+- [[transformer-architectural-improvements|Transformer Architectural Improvements]] (CONCEPT)
+- [[clawhip-asynchrones-event-routing|Clawhip: Asynchrones Event-Routing]] (TOOL)
+- [[areal|AReaL]] (TOOL)
+- [[build-logs|Build Logs]] (CONCEPT)
+- [[test-driven-execution|Test-Driven Execution]] (CONCEPT)
+- [[moonshotai-attention-residuals|MoonshotAI/Attention-Residuals]] (TOOL)
+- [[vibeeval-vibecosystem|vibeeval/vibecosystem]] (TOOL)
+- [[chromedevtools-chrome-devtools-mcp|ChromeDevTools/chrome-devtools-mcp]] (TOOL)
+- [[openclaw-clawhub|openclaw/clawhub]] (TOOL)
+- [[coderlm-ast-basierte-indizierung|CodeRLM: AST-basierte Indizierung]] (TOOL)
+- [[design-tokens|Design Tokens]] (CONCEPT)
+- [[component-structures|Component Structures]] (CONCEPT)
+- [[supervised-fine-tuning-sft|Supervised Fine-Tuning (SFT)]] (CONCEPT)
+- [[group-relative-policy-optimization-grpo|Group Relative Policy Optimization (GRPO)]] (CONCEPT)
+- [[still-intra-layer-linearisierung|STILL: Intra-Layer Linearisierung]] (TOOL)
+- [[g-del-agent-runtime-monkey-patching|Gödel Agent: Runtime Monkey-Patching]] (TOOL)
+- [[omx|OmX]] (TOOL)
+- [[koyeb-sandboxes|Koyeb Sandboxes]] (TOOL)
+- [[microsandbox|Microsandbox]] (TOOL)
+- [[mensch-maschine-schnittstelle|Mensch-Maschine-Schnittstelle]] (CONCEPT)
+- [[notion-mcp|Notion MCP]] (TOOL)
+- [[self-referential-agents|Self-Referential Agents]] (CONCEPT)
+- [[hierarchical-skill-library|Hierarchical Skill Library]] (CONCEPT)
+- [[llm-reasoning|LLM Reasoning]] (CONCEPT)
+- [[advanced-model-context-protocol-mcp-servers|Advanced Model Context Protocol (MCP) Servers]] (CONCEPT)
+- [[hyperagents-metakognitive-programme|Hyperagents: Metakognitive Programme]] (CONCEPT)
+- [[signal-divergence|Signal Divergence]] (CONCEPT)
+- [[attention-residuals-attnres-softmax-tiefe|Attention Residuals (AttnRes): Softmax-Tiefe]] (TOOL)
+- [[linear-mcp|Linear MCP]] (TOOL)
+- [[autonomous-agent-evolution|Autonomous Agent Evolution]] (CONCEPT)
+- [[prompt-composition|Prompt Composition]] (CONCEPT)
+- [[residual-connections|Residual Connections]] (CONCEPT)
+- [[vibecosystem-mikro-anpassungen-skills|Vibecosystem: Mikro-Anpassungen & Skills]] (TOOL)
+- [[taskforge|TaskForge]] (TOOL)
+- [[project-status|Project Status]] (CONCEPT)
+- [[jaredstewart-coderlm|JaredStewart/coderlm]] (TOOL)
+- [[agent-sandbox|Agent-Sandbox]] (TOOL)
+- [[bloopai-vibe-kanban|BloopAI/vibe-kanban]] (TOOL)
+- [[selbstmodifikation|Selbstmodifikation]] (CONCEPT)
+- [[mariushobbhahn-swebench-verified-mini|mariushobbhahn/SWEBench-verified-mini]] (TOOL)
+- [[internal-documentation|Internal Documentation]] (CONCEPT)
+- [[attention-residuals-paper|Attention Residuals paper]] (BOOK)
+- [[open-compass-opencompass|open-compass/opencompass]] (TOOL)
+- [[context-efficiency|Context Efficiency]] (CONCEPT)
+- [[open-ended-self-improvement|Open-Ended Self-Improvement]] (CONCEPT)
+- [[kimi-linear-hybrid-moe|Kimi Linear: Hybrid-MoE]] (TOOL)
+- [[structured-debugging|Structured Debugging]] (CONCEPT)
+- [[backlogs|Backlogs]] (CONCEPT)
+- [[trl|TRL]] (TOOL)
+- [[transport-diagnostics|Transport Diagnostics]] (CONCEPT)
+- [[sandboxing-secure-execution-environments|Sandboxing & Secure Execution Environments]] (CONCEPT)
+- [[aider-ai-aider|Aider-AI/aider]] (TOOL)
+- [[github-mcp-server|GitHub MCP Server]] (TOOL)
+- [[stateful-agents|Stateful Agents]] (CONCEPT)
+- [[infrastruktur-sicherheit|Infrastruktur & Sicherheit]] (CONCEPT)
+- [[persistent-workspaces|Persistent Workspaces]] (CONCEPT)
+- [[transformer-depth|Transformer Depth]] (CONCEPT)
+- [[ishandutta2007-open-antigravity|ishandutta2007/open-antigravity]] (TOOL)
+- [[voltagent-awesome-openclaw-skills|VoltAgent/awesome-openclaw-skills]] (TOOL)
+- [[stoneforge-ai-stoneforge|stoneforge-ai/stoneforge]] (TOOL)
+- [[reinforcement-learning-self-evolution-libraries|Reinforcement Learning & Self-Evolution Libraries]] (CONCEPT)
+- [[context-length|Context Length]] (CONCEPT)
+- [[environment-configurations|Environment Configurations]] (CONCEPT)
+- [[fast-agent|fast-agent]] (TOOL)
+- [[repository-management|Repository Management]] (CONCEPT)
+- [[self-evolving-metacognitive-ai-agents|Self-Evolving/Metacognitive AI Agents]] (CONCEPT)
+- [[huxley-g-del-machine-hgm-clade-metaproduktivit-t|Huxley-Gödel Machine (HGM): Clade-Metaproduktivität]] (TOOL)
+- [[n-chste-generation-der-ki-entwicklung-2025-2026|Nächste Generation der KI-Entwicklung (2025-2026)]] (PROJECT)
+- [[daytona|Daytona]] (TOOL)
+- [[vercel-mcp|Vercel MCP]] (TOOL)
+- [[attention-mechanisms|Attention Mechanisms]] (CONCEPT)
+- [[direct-preference-optimization-dpo|Direct Preference Optimization (DPO)]] (CONCEPT)
+- [[openclaw-contained-gvisor-sandboxing|OpenClaw-Contained: gVisor Sandboxing]] (TOOL)
+- [[pydanticai|PydanticAI]] (TOOL)
+- [[reinforcement-learning-training|Reinforcement Learning Training]] (CONCEPT)
+- [[zhang-et-al|Zhang et al.]] (PERSON)
+- [[transformer-language-models|Transformer Language Models]] (CONCEPT)
+- [[openbmb-minicpm|OpenBMB/MiniCPM]] (TOOL)
+- [[openbmb-team|OpenBMB Team]] (ORGANIZATION)
+- [[interactive-stochastic-environments|Interactive, Stochastic Environments]] (CONCEPT)
+- [[evolution-re-strategien|Evolutionäre Strategien]] (CONCEPT)
+- [[genesis-embodied-ai-genesis|Genesis-Embodied-AI/Genesis]] (TOOL)
+- [[deterministic-workflow-control|Deterministic Workflow Control]] (CONCEPT)
+- [[ragen|RAGEN]] (TOOL)
+- [[harness-kit|Harness-Kit]] (TOOL)
+- [[ultra-long-context-1m-tokens|Ultra-Long Context (1M+ Tokens)]] (CONCEPT)
+- [[langgraph|LangGraph]] (TOOL)
+- [[figma-mcp|Figma MCP]] (TOOL)
+- [[reusable-behavioral-patterns|Reusable Behavioral Patterns]] (CONCEPT)
+- [[cost-aware-delegation|Cost-Aware Delegation]] (CONCEPT)
+- [[metaproductivity-performance-mismatch|Metaproductivity-Performance Mismatch]] (CONCEPT)
+- [[selbst-evolving-metakognitive-agenten|Selbst-Evolving & Metakognitive Agenten]] (CONCEPT)
+- [[code-yeongyu-oh-my-openagent|code-yeongyu/oh-my-openagent]] (TOOL)
+- [[normalisierung-konnektivit-t|Normalisierung & Konnektivität]] (CONCEPT)
+- [[network-isolation|Network Isolation]] (CONCEPT)
+- [[company-knowledge|Company Knowledge]] (CONCEPT)
+- [[optimization-stability|Optimization Stability]] (CONCEPT)
+- [[code-analysis|Code Analysis]] (CONCEPT)
+- [[rust-migration-performance-portierung|Rust-Migration: Performance-Portierung]] (CONCEPT)
+- [[gemini-cli-extensions-conductor|gemini-cli-extensions/conductor]] (TOOL)
+- [[skillrl|SkillRL]] (TOOL)
+
+## Relations
+- Autonome Software-Entwicklung (Claw-Code) → PART_OF → Nächste Generation der KI-Entwicklung (2025-2026)
+- Orchestrierung & Workflow → PART_OF → Autonome Software-Entwicklung (Claw-Code)
+- OMC (oh-my-claudecode): Multi-Agenten-Routing → PART_OF → Orchestrierung & Workflow
+- Vibecosystem: Mikro-Anpassungen & Skills → PART_OF → Orchestrierung & Workflow
+- OmO: Multi-Modell Koordination → PART_OF → Orchestrierung & Workflow
+- Kognitive Optimierung → PART_OF → Autonome Software-Entwicklung (Claw-Code)
+- CodeRLM: AST-basierte Indizierung → PART_OF → Kognitive Optimierung
+- MCP-Chrome: Browser-Automatisierung → PART_OF → Kognitive Optimierung
+- Infrastruktur & Sicherheit → PART_OF → Autonome Software-Entwicklung (Claw-Code)
+- Clawhip: Asynchrones Event-Routing → PART_OF → Infrastruktur & Sicherheit
+- OpenClaw-Contained: gVisor Sandboxing → PART_OF → Infrastruktur & Sicherheit
+- Rust-Migration: Performance-Portierung → PART_OF → Infrastruktur & Sicherheit
+- Mensch-Maschine-Schnittstelle → PART_OF → Autonome Software-Entwicklung (Claw-Code)
+- Vibe Kanban: Visuelles Task-Management → PART_OF → Mensch-Maschine-Schnittstelle
+- Claw-Empire: Virtuelle Firmen-Oberfläche → PART_OF → Mensch-Maschine-Schnittstelle
+- Mathematische Architektur-Innovationen → PART_OF → Nächste Generation der KI-Entwicklung (2025-2026)
+- Lösung der PreNorm-Dilution → PART_OF → Mathematische Architektur-Innovationen
+- Attention Residuals (AttnRes): Softmax-Tiefe → PART_OF → Lösung der PreNorm-Dilution
+- Mixture-of-Depths Attention (MoDA) paper → PART_OF → Lösung der PreNorm-Dilution
+- Normalisierung & Konnektivität → PART_OF → Mathematische Architektur-Innovationen
+- SiameseNorm: Breaking the Barrier to Reconciling Pre/Post-Norm paper → PART_OF → Normalisierung & Konnektivität
+- mHC: Manifold-Constrained Hyper-Connections paper → PART_OF → Normalisierung & Konnektivität
+- Ultra-Long Context (1M+ Tokens) → PART_OF → Mathematische Architektur-Innovationen
+- Kimi Linear: Hybrid-MoE → PART_OF → Ultra-Long Context (1M+ Tokens)
+- MiniCPM-SALA: Sparse-Linear Topologie → PART_OF → Ultra-Long Context (1M+ Tokens)
+- STILL: Intra-Layer Linearisierung → PART_OF → Ultra-Long Context (1M+ Tokens)
+- Selbst-Evolving & Metakognitive Agenten → PART_OF → Nächste Generation der KI-Entwicklung (2025-2026)
+- Selbstmodifikation → PART_OF → Selbst-Evolving & Metakognitive Agenten
+- Darwin Gödel Machine (DGM): Code-Mutationen → PART_OF → Selbstmodifikation
+- Hyperagents: Metakognitive Programme → PART_OF → Selbstmodifikation
+- Gödel Agent: Runtime Monkey-Patching → PART_OF → Selbstmodifikation
+- Evolutionäre Strategien → PART_OF → Selbst-Evolving & Metakognitive Agenten
+- Huxley-Gödel Machine (HGM): Clade-Metaproduktivität → PART_OF → Evolutionäre Strategien
+- Agent0: Unleashing Self-Evolving Agents via Tool-Integrated Reasoning paper → PART_OF → Evolutionäre Strategien
+- Huxley-Gödel Machine (HGM) paper → RELATED_TO → Huxley-Gödel Machine (HGM): Clade-Metaproduktivität
+- code-yeongyu/oh-my-openagent → RELATED_TO → OmO: Multi-Modell Koordination
+- Yeachan-Heo/oh-my-claudecode → RELATED_TO → OMC (oh-my-claudecode): Multi-Agenten-Routing
+- vibeeval/vibecosystem → RELATED_TO → Vibecosystem: Mikro-Anpassungen & Skills
+- MoonshotAI/Attention-Residuals → RELATED_TO → Attention Residuals (AttnRes): Softmax-Tiefe
+- OpenBMB/MiniCPM → RELATED_TO → MiniCPM-SALA: Sparse-Linear Topologie
+- JaredStewart/coderlm → RELATED_TO → CodeRLM: AST-basierte Indizierung
+- Yeachan-Heo/oh-my-claudecode → RELATED_TO → Clawhip: Asynchrones Event-Routing
+- BloopAI/vibe-kanban → RELATED_TO → Vibe Kanban: Visuelles Task-Management
+- GreenSheep01201/claw-empire → RELATED_TO → Claw-Empire: Virtuelle Firmen-Oberfläche
+- hangwin/mcp-chrome → RELATED_TO → MCP-Chrome: Browser-Automatisierung
+- Attention Residuals paper → RELATED_TO → Attention Residuals (AttnRes): Softmax-Tiefe
+- Transformer Architectural Improvements → RELATED_TO → Nächste Generation der KI-Entwicklung (2025-2026)
+- Self-Evolving/Metacognitive AI Agents → RELATED_TO → Nächste Generation der KI-Entwicklung (2025-2026)
+- Lösung der PreNorm-Dilution → RELATED_TO → Mathematische Architektur-Innovationen
+- MoonshotAI/Attention-Residuals → RELATED_TO → Lösung der PreNorm-Dilution
+- SiameseNorm: Breaking the Barrier to Reconciling Pre/Post-Norm paper → RELATED_TO → Normalisierung & Konnektivität
+- mHC: Manifold-Constrained Hyper-Connections paper → RELATED_TO → Normalisierung & Konnektivität
+- MiniCPM-SALA: Sparse-Linear Topologie → RELATED_TO → Ultra-Long Context (1M+ Tokens)
+- Hyperagents: Metakognitive Programme → RELATED_TO → Selbstmodifikation
+- Darwin Gödel Machine (DGM): Code-Mutationen → RELATED_TO → Selbstmodifikation
+- Huxley-Gödel Machine (HGM) paper → RELATED_TO → Evolutionäre Strategien
+- Agent0: Unleashing Self-Evolving Agents via Tool-Integrated Reasoning paper → RELATED_TO → Evolutionäre Strategien
+- Agent Frameworks & Orchestration Tools → RELATED_TO → Autonome Software-Entwicklung (Claw-Code)
+- Sandboxing & Secure Execution Environments → RELATED_TO → Infrastruktur & Sicherheit
+- Advanced Model Context Protocol (MCP) Servers → RELATED_TO → Kognitive Optimierung
+- Reinforcement Learning & Self-Evolution Libraries → RELATED_TO → Selbst-Evolving & Metakognitive Agenten
+- Transformer Depth → RELATED_TO → Lösung der PreNorm-Dilution
+- Residual Connections → RELATED_TO → Mathematische Architektur-Innovationen
+- Attention Mechanisms → RELATED_TO → Mathematische Architektur-Innovationen
+- Optimization Stability → RELATED_TO → Normalisierung & Konnektivität
+- Expressivity Loss → RELATED_TO → Normalisierung & Konnektivität
+- Signal Divergence → RELATED_TO → Normalisierung & Konnektivität
+- Context Length → RELATED_TO → Ultra-Long Context (1M+ Tokens)
+- Self-Referential Agents → RELATED_TO → Selbstmodifikation
+- Open-Ended Self-Improvement → RELATED_TO → Selbstmodifikation
+- Metaproductivity-Performance Mismatch → RELATED_TO → Evolutionäre Strategien
+- Autonomous Agent Evolution → RELATED_TO → Evolutionäre Strategien
+- Stateful Agents → RELATED_TO → LangGraph
+- Deterministic Workflow Control → RELATED_TO → LangGraph
+- Schema Contracts → RELATED_TO → PydanticAI
+- Test-Driven Execution → RELATED_TO → Harness-Kit
+- Structured Debugging → RELATED_TO → Harness-Kit
+- Cost-Aware Delegation → RELATED_TO → Harness-Kit
+- Persistent Workspaces → RELATED_TO → Daytona
+- Untrusted Code Execution → RELATED_TO → Microsandbox
+- Untrusted Code Execution → RELATED_TO → Agent-Sandbox
+- Container Isolation → RELATED_TO → Agent-Sandbox
+- Ephemeral Containers → RELATED_TO → Koyeb Sandboxes
+- Network Isolation → RELATED_TO → Koyeb Sandboxes
+- Advanced Model Context Protocol (MCP) Servers → RELATED_TO → GitHub MCP Server
+- Advanced Model Context Protocol (MCP) Servers → RELATED_TO → Vercel MCP
+- Advanced Model Context Protocol (MCP) Servers → RELATED_TO → Figma MCP
+- Advanced Model Context Protocol (MCP) Servers → RELATED_TO → Notion MCP
+- Advanced Model Context Protocol (MCP) Servers → RELATED_TO → Linear MCP
+- Prompt Composition → RELATED_TO → fast-agent
+- Transport Diagnostics → RELATED_TO → fast-agent
+- Reinforcement Learning Training → RELATED_TO → AReaL
+- LLM Reasoning → RELATED_TO → AReaL
+- Hierarchical Skill Library → RELATED_TO → SkillRL
+- Reusable Behavioral Patterns → RELATED_TO → SkillRL
+- Context Efficiency → RELATED_TO → SkillRL
+- Transformer Language Models → RELATED_TO → TRL
+- Supervised Fine-Tuning (SFT) → RELATED_TO → TRL
+- Group Relative Policy Optimization (GRPO) → RELATED_TO → TRL
+- Direct Preference Optimization (DPO) → RELATED_TO → TRL
+- Interactive, Stochastic Environments → RELATED_TO → RAGEN
+- LLM Reasoning → RELATED_TO → RAGEN
+- OpenBMB Team → AUTHORED_BY → MiniCPM-SALA: Sparse-Linear Topologie
+- Zhang et al. → AUTHORED_BY → Hyperagents: Metakognitive Programme
+- Zhang et al. → AUTHORED_BY → Darwin Gödel Machine (DGM): Code-Mutationen
+- Yeachan-Heo/oh-my-claudecode → RELATED_TO → Autonome Software-Entwicklung (Claw-Code)

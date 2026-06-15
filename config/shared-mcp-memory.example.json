@@ -1,0 +1,25 @@
+{
+  "mcpServers": {
+    "memory": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "/path/to/mcp-neo4j-memory-gzmo",
+        "mcp-neo4j-memory"
+      ],
+      "env": {
+        "NEO4J_URL": "bolt://127.0.0.1:7687",
+        "NEO4J_USERNAME": "neo4j",
+        "NEO4J_PASSWORD": "SET_IN_LOCAL_CONFIG",
+        "NEO4J_DATABASE": "neo4j"
+      }
+    },
+    "gzmo-memory": {
+      "command": "/path/to/gzmo/target/release/gzmo",
+      "args": ["mcp-serve"],
+      "env": {
+        "GZMO_CONFIG": "/path/to/gzmo.toml"
+      }
+    }
+  }
+}

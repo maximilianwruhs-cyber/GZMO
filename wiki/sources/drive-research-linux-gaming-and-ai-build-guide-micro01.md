@@ -1,0 +1,162 @@
+---
+type: source
+title: drive-research-linux-gaming-and-ai-build-guide-micro01
+created: 2026-06-09
+updated: 2026-06-09
+sources: 1
+tags: []
+status: stable
+gzmo_synthetic: true
+---
+
+# drive-research-linux-gaming-and-ai-build-guide-micro01
+
+Ingested source summary (2026-06-09).
+
+## Entities
+- [[tensorrt-llm|TensorRT-LLM]] (TOOL)
+- [[rx-9070-xt|RX 9070 XT]] (SYSTEM)
+- [[sway-1-11|Sway 1.11]] (SYSTEM)
+- [[nvidia-570-86-16-beta-driver|NVIDIA 570.86.16 Beta driver]] (TOOL)
+- [[cpu|CPU]] (SYSTEM)
+- [[amdgpu-driver|amdgpu driver]] (TOOL)
+- [[zen-4-architecture|Zen 4 architecture]] (ARCHITECTURE)
+- [[tensor-cores|Tensor Cores]] (CONCEPT)
+- [[generic-buffer-management-gbm-api|Generic Buffer Management (GBM) API]] (SYSTEM)
+- [[tile-based-programming|tile-based programming]] (CONCEPT)
+- [[pytorch|PyTorch]] (TOOL)
+- [[compute-unified-device-architecture-cuda|Compute Unified Device Architecture (CUDA)]] (TOOL)
+- [[amd-threadripper-7980x|AMD Threadripper 7980X]] (SYSTEM)
+- [[drive-research-linux-gaming-and-ai-build-guide-md|drive-research-linux-gaming-and-ai-build-guide.md]] (BOOK)
+- [[sglang|SGLang]] (TOOL)
+- [[amd-rdna-4-successors|AMD RDNA 4 successors]] (ARCHITECTURE)
+- [[mesa-3d-graphics-library|Mesa 3D graphics library]] (TOOL)
+- [[intel-s-arrow-lake-refresh-counterparts|Intel's Arrow Lake Refresh counterparts]] (SYSTEM)
+- [[linux-gaming-and-ai-build-guide-docx|Linux Gaming and AI Build Guide.docx]] (BOOK)
+- [[nvidia-rtx-4090|NVIDIA RTX 4090]] (SYSTEM)
+- [[ptx-assembly|PTX assembly]] (CONCEPT)
+- [[kde-plasma|KDE Plasma]] (SYSTEM)
+- [[llama-4-scout|Llama 4 Scout]] (SYSTEM)
+- [[radeon-open-compute-rocm|Radeon Open Compute (ROCm)]] (TOOL)
+- [[fp8|FP8]] (CONCEPT)
+- [[google-takeout|Google Takeout]] (TOOL)
+- [[llama-70b-model|Llama 70B model]] (SYSTEM)
+- [[amd-mi300x|AMD MI300X]] (SYSTEM)
+- [[core-ultra-7-270k-plus|Core Ultra 7 270K Plus]] (SYSTEM)
+- [[deep-learning-super-sampling-dlss|Deep Learning Super Sampling (DLSS)]] (TOOL)
+- [[amd-radeon-rx-9000-series|AMD Radeon RX 9000 Series]] (SYSTEM)
+- [[explicit-sync|explicit sync]] (CONCEPT)
+- [[linux-workstation|Linux Workstation]] (SYSTEM)
+- [[fluid-motion-frames-4|Fluid Motion Frames 4]] (TOOL)
+- [[hip-heterogeneous-compute-interface-for-portability-runtime-apis|HIP (Heterogeneous-compute Interface for Portability) runtime APIs]] (TOOL)
+- [[wlroots-0-19-0|wlroots 0.19.0]] (SYSTEM)
+- [[apple-silicon-unified-memory-clusters|Apple Silicon unified memory clusters]] (SYSTEM)
+- [[3d-v-cache|3D V-Cache]] (CONCEPT)
+- [[flashattention-3|FlashAttention 3]] (TOOL)
+- [[proton-enable-wayland|PROTON_ENABLE_WAYLAND]] (SYSTEM)
+- [[trx50|TRX50]] (SYSTEM)
+- [[miopen|MIOpen]] (TOOL)
+- [[amd-rx-7900-xtx|AMD RX 7900 XTX]] (SYSTEM)
+- [[large-language-models-llms|Large Language Models (LLMs)]] (CONCEPT)
+- [[nvidia-570-driver-branch|NVIDIA 570 driver branch]] (TOOL)
+- [[nvml|NVML]] (TOOL)
+- [[amd-mi355x|AMD MI355X]] (SYSTEM)
+- [[gddr7-memory|GDDR7 memory]] (SYSTEM)
+- [[llama-4-family|Llama 4 family]] (SYSTEM)
+- [[multi-frame-generation|multi-frame generation]] (CONCEPT)
+- [[amd-rdna-5|AMD RDNA 5]] (ARCHITECTURE)
+- [[mixture-of-experts-moe-architectures|Mixture-of-Experts (MoE) architectures]] (ARCHITECTURE)
+- [[nvidia-nim-containers|NVIDIA NIM containers]] (TOOL)
+- [[eglstreams|EGLStreams]] (SYSTEM)
+- [[rocm-7-1|ROCm 7.1]] (TOOL)
+- [[comfyui|ComfyUI]] (TOOL)
+- [[nvidia-geforce-rtx-5090|NVIDIA GeForce RTX 5090]] (SYSTEM)
+- [[vllm|vLLM]] (TOOL)
+- [[zen-5-architecture|Zen 5 architecture]] (ARCHITECTURE)
+- [[nv-control-api|NV-CONTROL API]] (TOOL)
+- [[dlss-4-5|DLSS 4.5]] (TOOL)
+- [[stable-diffusion-xl|Stable Diffusion XL]] (SYSTEM)
+- [[variable-refresh-rate-vrr|Variable Refresh Rate (VRR)]] (CONCEPT)
+- [[nvidia-blackwell-architecture|NVIDIA Blackwell architecture]] (ARCHITECTURE)
+- [[nvidia-settings-control-panel|NVIDIA Settings control panel]] (TOOL)
+- [[int4|INT4]] (CONCEPT)
+- [[vram|VRAM]] (CONCEPT)
+- [[fp16-precision|FP16 precision]] (CONCEPT)
+- [[gnome|GNOME]] (SYSTEM)
+- [[q4-k-m-quantization|Q4_K_M quantization]] (CONCEPT)
+- [[amd-ryzen-9-9950x3d|AMD Ryzen 9 9950X3D]] (SYSTEM)
+- [[hip-assembly|HIP assembly]] (CONCEPT)
+- [[ai-tops|AI TOPS]] (CONCEPT)
+- [[black-myth-wukong|Black Myth: Wukong]] (BOOK)
+- [[artificial-intelligence|Artificial Intelligence]] (CONCEPT)
+- [[kv-cache|KV cache]] (CONCEPT)
+- [[ultra-5-250k-plus|Ultra 5 250K Plus]] (SYSTEM)
+- [[llama-4-maverick|Llama 4 Maverick]] (SYSTEM)
+- [[amd-ryzen-7-9800x3d|AMD Ryzen 7 9800X3D]] (SYSTEM)
+- [[35-billion-parameter-model|35-billion parameter model]] (SYSTEM)
+- [[1024x1024-images|1024x1024 images]] (CONCEPT)
+- [[cuda-cores|CUDA cores]] (CONCEPT)
+- [[cuda-toolkit-13-0|CUDA Toolkit 13.0]] (TOOL)
+- [[meta|Meta]] (ORGANIZATION)
+- [[nvidia-565-driver-branch|NVIDIA 565 driver branch]] (TOOL)
+- [[x11-protocol|X11 protocol]] (SYSTEM)
+- [[implicit-sync|implicit sync]] (CONCEPT)
+- [[flash-attention-2|Flash Attention 2]] (TOOL)
+
+## Relations
+- NVIDIA GeForce RTX 5090 → PART_OF → NVIDIA Blackwell architecture
+- NVIDIA Blackwell architecture → RELATED_TO → drive-research-linux-gaming-and-ai-build-guide.md
+- AMD RDNA 4 successors → RELATED_TO → drive-research-linux-gaming-and-ai-build-guide.md
+- NVIDIA GeForce RTX 5090 → USES → AI TOPS
+- NVIDIA GeForce RTX 5090 → USES → GDDR7 memory
+- NVIDIA GeForce RTX 5090 → USES → Llama 70B model
+- NVIDIA GeForce RTX 5090 → USES → Tensor Cores
+- Tensor Cores → USES → FP8
+- Tensor Cores → USES → INT4
+- Tensor Cores → USES → Large Language Models (LLMs)
+- NVIDIA GeForce RTX 5090 → USES → Stable Diffusion XL
+- Stable Diffusion XL → USES → ComfyUI
+- NVIDIA GeForce RTX 5090 → USES → Black Myth: Wukong
+- NVIDIA GeForce RTX 5090 → USES → Deep Learning Super Sampling (DLSS)
+- NVIDIA GeForce RTX 5090 → USES → multi-frame generation
+- DLSS 4.5 → RELATED_TO → multi-frame generation
+- AMD Radeon RX 9000 Series → USES → amdgpu driver
+- amdgpu driver → RELATED_TO → Mesa 3D graphics library
+- amdgpu driver → PART_OF → drive-research-linux-gaming-and-ai-build-guide.md
+- RX 9070 XT → PART_OF → AMD RDNA 4 successors
+- AMD Radeon RX 9000 Series → USES → Fluid Motion Frames 4
+- AMD MI300X → RELATED_TO → Artificial Intelligence
+- AMD MI355X → RELATED_TO → Artificial Intelligence
+- PROTON_ENABLE_WAYLAND → PART_OF → GNOME
+- PROTON_ENABLE_WAYLAND → PART_OF → KDE Plasma
+- NVIDIA → USES → EGLStreams
+- NVIDIA → USES → Generic Buffer Management (GBM) API
+- NVIDIA → USES → implicit sync
+- PROTON_ENABLE_WAYLAND → USES → explicit sync
+- Sway 1.11 → PART_OF → PROTON_ENABLE_WAYLAND
+- wlroots 0.19.0 → PART_OF → PROTON_ENABLE_WAYLAND
+- NVIDIA 565 driver branch → USES → explicit sync
+- NVIDIA 570 driver branch → USES → explicit sync
+- NVIDIA 570.86.16 Beta driver → USES → Generic Buffer Management (GBM) API
+- NVIDIA 570.86.16 Beta driver → USES → Variable Refresh Rate (VRR)
+- NVIDIA Settings control panel → USES → NVML
+- NVIDIA Settings control panel → USES → NV-CONTROL API
+- PROTON_ENABLE_WAYLAND → RELATED_TO → NVIDIA
+- Compute Unified Device Architecture (CUDA) → RELATED_TO → Artificial Intelligence
+- Compute Unified Device Architecture (CUDA) → RELATED_TO → drive-research-linux-gaming-and-ai-build-guide.md
+- CUDA Toolkit 13.0 → USES → tile-based programming
+- CUDA Toolkit 13.0 → USES → Tensor Cores
+- CUDA Toolkit 13.0 → RELATED_TO → NVIDIA
+- FlashAttention 3 → USES → CUDA
+- FlashAttention 3 → USES → NVIDIA Blackwell architecture
+- FlashAttention 3 → RELATED_TO → ROCm
+- TensorRT-LLM → USES → CUDA
+- NVIDIA NIM containers → USES → CUDA
+- Radeon Open Compute (ROCm) → USES → HIP (Heterogeneous-compute Interface for Portability) runtime APIs
+- Radeon Open Compute (ROCm) → USES → PyTorch
+- Radeon Open Compute (ROCm) → USES → vLLM
+- Radeon Open Compute (ROCm) → USES → SGLang
+- ROCm 7.1 → USES → AMD Radeon RX 9000 Series
+- HIP (Heterogeneous-compute Interface for Portability) runtime APIs → RELATED_TO → CUDA
+- HIP (Heterogeneous-compute Interface for Portability) runtime APIs → USES → tile-based programming
+- PyTorch → USES → ROCm

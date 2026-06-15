@@ -1,0 +1,185 @@
+---
+type: source
+title: drive-research-ultimate-linux-workstation-tuning-blueprint
+created: 2026-06-08
+updated: 2026-06-08
+sources: 1
+tags: []
+status: stable
+gzmo_synthetic: true
+---
+
+# drive-research-ultimate-linux-workstation-tuning-blueprint
+
+Ingested source summary (2026-06-08).
+
+## Entities
+- [[transparent-hugepage|transparent_hugepage]] (CONCEPT)
+- [[flash-attention-3|Flash Attention 3]] (CONCEPT)
+- [[autonomous-power-state-transitions-apst|Autonomous Power State Transitions (APST)]] (CONCEPT)
+- [[amd-curve-shaper|AMD Curve Shaper]] (CONCEPT)
+- [[rpm-ostree-kargs|rpm-ostree kargs]] (TOOL)
+- [[blackwell-rtx-50-series|Blackwell RTX 50-series]] (SYSTEM)
+- [[vllm-flash-attn-version-2|VLLM_FLASH_ATTN_VERSION=2]] (CONCEPT)
+- [[flake-nix|flake.nix]] (SYSTEM)
+- [[cuda-13-0-binaries|CUDA 13.0 binaries]] (TOOL)
+- [[am5-platform|AM5 platform]] (HARDWARE)
+- [[amd-ryzen-9-9950x3d|AMD Ryzen 9 9950X3D]] (HARDWARE)
+- [[ld-library-path|LD_LIBRARY_PATH]] (CONCEPT)
+- [[nvidia-rtx-5090-blackwell|NVIDIA RTX 5090 Blackwell]] (HARDWARE)
+- [[large-language-model-llm|Large Language Model (LLM)]] (CONCEPT)
+- [[nvcc-compiler|NVCC compiler]] (TOOL)
+- [[rtx-5090-blackwell-architecture|RTX 5090 / Blackwell architecture]] (SYSTEM)
+- [[tensorrt-llm|TensorRT-LLM]] (TOOL)
+- [[the-linux-kernel-documentation|The Linux Kernel documentation]] (SYSTEM)
+- [[meltdown|Meltdown]] (CONCEPT)
+- [[uefi-bios|UEFI/BIOS]] (SYSTEM)
+- [[cudapackages-13-0-cudnn|cudaPackages_13_0.cudnn]] (TOOL)
+- [[proton-cachyos|Proton-CachyOS]] (SYSTEM)
+- [[infinity-fabric-clock-fclk|Infinity Fabric Clock (FCLK)]] (HARDWARE)
+- [[pytorch-execution-engine|PyTorch Execution Engine]] (SYSTEM)
+- [[nvme-issues|NVMe issues]] (HARDWARE)
+- [[xinnor|Xinnor]] (ORGANIZATION)
+- [[upwind|Upwind]] (ORGANIZATION)
+- [[timharbakon-com|timharbakon.com]] (ORGANIZATION)
+- [[error-correcting-code-ecc|Error-Correcting Code (ECC)]] (CONCEPT)
+- [[wine-11-ntsync-explained|Wine 11 NTSYNC Explained]] (BOOK)
+- [[rocky9|Rocky9]] (SYSTEM)
+- [[cuda-sm-120|CUDA sm_120]] (CONCEPT)
+- [[frogging-family-wine-tkg-git|Frogging-Family/wine-tkg-git]] (TOOL)
+- [[pam3-pulse-amplitude-modulation-3-level|PAM3 (Pulse-Amplitude Modulation 3-level)]] (CONCEPT)
+- [[ai-infrastructure|AI Infrastructure]] (CONCEPT)
+- [[cpuset-isolation|CPUset Isolation]] (CONCEPT)
+- [[nvidia-persistenced-service|nvidia-persistenced.service]] (SYSTEM)
+- [[spectre|Spectre]] (CONCEPT)
+- [[wayland-compositing|Wayland compositing]] (CONCEPT)
+- [[ddr5-memory-performance-scaling-with-amd-zen-5|DDR5 Memory Performance Scaling with AMD Zen 5]] (CONCEPT)
+- [[ddr5-nitro-mode|DDR5 Nitro Mode]] (TOOL)
+- [[nvidia-management-library-nvml|NVIDIA Management Library (NVML)]] (TOOL)
+- [[martinstark-nvoc|martinstark/nvoc]] (TOOL)
+- [[pcie-gen5-storage-optimization|PCIe Gen5 Storage Optimization]] (CONCEPT)
+- [[endeavouros-forum|EndeavourOS Forum]] (ORGANIZATION)
+- [[ddr5-6000|DDR5-6000]] (HARDWARE)
+- [[torch-cuda-arch-list-12-0|TORCH_CUDA_ARCH_LIST="12.0"]] (CONCEPT)
+- [[systemd-control-groups-version-2-cgroups-v2|systemd control groups version 2 (cgroups v2)]] (SYSTEM)
+- [[discuss-vllm-ai|discuss.vllm.ai]] (ORGANIZATION)
+- [[cudapackages-13-0-cudatoolkit|cudaPackages_13_0.cudatoolkit]] (TOOL)
+- [[bazzite-os|Bazzite OS]] (SYSTEM)
+- [[torch-2-9-0-cu128|torch 2.9.0 cu128]] (TOOL)
+- [[framework-knowledge-base|Framework Knowledge Base]] (ORGANIZATION)
+- [[reddit|Reddit]] (ORGANIZATION)
+- [[medium|Medium]] (ORGANIZATION)
+- [[precision-boost-overdrive-2-pbo2|Precision Boost Overdrive 2 (PBO2)]] (TOOL)
+- [[ocinside-de|ocinside.de]] (ORGANIZATION)
+- [[ryzen-9-9950x3d-temperatures|Ryzen 9 9950X3D temperatures]] (CONCEPT)
+- [[oneuptime|OneUptime]] (ORGANIZATION)
+- [[nixos-nixpkgs|NixOS/nixpkgs]] (TOOL)
+- [[fastsync|Fastsync]] (CONCEPT)
+- [[vulkan-video-driver|Vulkan video driver]] (TOOL)
+- [[crucial-t705-pcie-gen-5-ssd|Crucial T705 PCIe Gen 5 SSD]] (HARDWARE)
+- [[gaming-performance|Gaming Performance]] (CONCEPT)
+- [[hackr-io|hackr.io]] (ORGANIZATION)
+- [[techpowerup|TechPowerUp]] (ORGANIZATION)
+- [[gddr7-vram|GDDR7 VRAM]] (CONCEPT)
+- [[gb20-streaming-multiprocessors|GB20 Streaming Multiprocessors]] (CONCEPT)
+- [[gddr7-bandwidth|GDDR7 bandwidth]] (CONCEPT)
+- [[linuxpackages-nvidia-x11|linuxPackages.nvidia_x11]] (TOOL)
+- [[cuda-home|CUDA_HOME]] (CONCEPT)
+- [[directx-d3d12|DirectX (D3D12)]] (SYSTEM)
+- [[blackwell-sm-120|Blackwell sm_120]] (CONCEPT)
+- [[direct-scanout|Direct Scanout]] (CONCEPT)
+- [[winesync|Winesync]] (CONCEPT)
+- [[amd-collaborative-processor-performance-control-cppc|AMD Collaborative Processor Performance Control (CPPC)]] (TOOL)
+- [[bore-burst-oriented-response-enhancer|BORE (Burst-Oriented Response Enhancer)]] (TOOL)
+- [[completely-fair-scheduler-cfs|Completely Fair Scheduler (CFS)]] (TOOL)
+- [[retbleed|Retbleed]] (CONCEPT)
+- [[large-language-model-inferencing|Large Language Model inferencing]] (CONCEPT)
+- [[input-output-memory-management-unit-iommu|Input-Output Memory Management Unit (IOMMU)]] (CONCEPT)
+- [[podman|Podman]] (TOOL)
+- [[io-uring|io_uring]] (SYSTEM)
+- [[kde-plasma-kwin|KDE Plasma (KWin)]] (SYSTEM)
+- [[kernel-bypass-for-storage-i-o|Kernel Bypass for Storage I/O]] (CONCEPT)
+- [[curve-optimizer|Curve Optimizer]] (TOOL)
+- [[python312packages-pip|python312Packages.pip]] (TOOL)
+
+## Relations
+- AMD Ryzen 9 9950X3D → PART_OF → DDR5 Memory Performance Scaling with AMD Zen 5
+- NVIDIA RTX 5090 Blackwell → PART_OF → Blackwell RTX 50-series
+- Bazzite OS → USES → The Linux Kernel documentation
+- Bazzite OS → USES → KDE Plasma (KWin)
+- Bazzite OS → USES → Wayland compositing
+- AMD Ryzen 9 9950X3D → USES → Precision Boost Overdrive 2 (PBO2)
+- AMD Ryzen 9 9950X3D → USES → Curve Optimizer
+- DDR5 Memory Performance Scaling with AMD Zen 5 → USES → AMD Curve Shaper
+- DDR5-6000 → PART_OF → AM5 platform
+- Infinity Fabric Clock (FCLK) → PART_OF → AM5 platform
+- rpm-ostree kargs → USES → The Linux Kernel documentation
+- Crucial T705 PCIe Gen 5 SSD → PART_OF → NVMe issues
+- Completely Fair Scheduler (CFS) → USES → The Linux Kernel documentation
+- BORE (Burst-Oriented Response Enhancer) → USES → The Linux Kernel documentation
+- systemd control groups version 2 (cgroups v2) → USES → The Linux Kernel documentation
+- Proton-CachyOS → USES → systemd control groups version 2 (cgroups v2)
+- io_uring → USES → The Linux Kernel documentation
+- martinstark/nvoc → USES → NVIDIA RTX 5090 Blackwell
+- martinstark/nvoc → USES → NVIDIA Management Library (NVML)
+- GDDR7 VRAM → PART_OF → NVIDIA RTX 5090 Blackwell
+- PAM3 (Pulse-Amplitude Modulation 3-level) → USES → GDDR7 VRAM
+- Error-Correcting Code (ECC) → USES → GDDR7 VRAM
+- KDE Plasma (KWin) → USES → Wayland compositing
+- Direct Scanout → USES → KDE Plasma (KWin)
+- CUDA 13.0 binaries → USES → PyTorch Execution Engine
+- CUDA 13.0 binaries → USES → TensorRT-LLM
+- Podman → USES → systemd control groups version 2 (cgroups v2)
+- Podman → USES → The Linux Kernel documentation
+- PyTorch Execution Engine → USES → flake.nix
+- TensorRT-LLM → USES → flake.nix
+- CUDA sm_120 → PART_OF → NVIDIA RTX 5090 Blackwell
+- Large Language Model (LLM) → USES → AMD Ryzen 9 9950X3D
+- Large Language Model (LLM) → USES → NVIDIA RTX 5090 Blackwell
+- UEFI/BIOS → USES → AMD Ryzen 9 9950X3D
+- Proton-CachyOS → USES → esync
+- Proton-CachyOS → USES → Wine 11 NTSYNC Explained
+- Vulkan video driver → RELATED_TO → DirectX (D3D12)
+- flake.nix → USES → Blackwell sm_120
+- flake.nix → USES → NVCC compiler
+- flake.nix → USES → TORCH_CUDA_ARCH_LIST="12.0"
+- flake.nix → USES → VLLM_FLASH_ATTN_VERSION=2
+- NVCC compiler → USES → GB20 Streaming Multiprocessors
+- GB20 Streaming Multiprocessors → PART_OF → Blackwell sm_120
+- VLLM_FLASH_ATTN_VERSION=2 → USES → Flash Attention 3
+- PyTorch Execution Engine → USES → NVIDIA RTX 5090 Blackwell
+- PyTorch Execution Engine → USES → Large Language Model inferencing
+- NVIDIA RTX 5090 Blackwell → USES → GDDR7 bandwidth
+- Large Language Model inferencing → USES → NVIDIA RTX 5090 Blackwell
+- Large Language Model inferencing → RELATED_TO → Wayland compositing
+- Ryzen 9 9950X3D temperatures → RELATED_TO → AMD Curve Shaper
+- TechPowerUp → RELATED_TO → DDR5 Memory Performance Scaling with AMD Zen 5
+- Framework Knowledge Base → RELATED_TO → Bazzite OS
+- Kernel Bypass for Storage I/O → USES → io_uring
+- Upwind → RELATED_TO → io_uring
+- Xinnor → RELATED_TO → PCIe Gen5 Storage Optimization
+- martinstark/nvoc → USES → Blackwell RTX 50-series
+- Frogging-Family/wine-tkg-git → RELATED_TO → Wine 11 NTSYNC Explained
+- Wine 11 NTSYNC Explained → RELATED_TO → Winesync
+- Wine 11 NTSYNC Explained → RELATED_TO → Fastsync
+- hackr.io → RELATED_TO → Wine 11 NTSYNC Explained
+- Wine 11 NTSYNC Explained → RELATED_TO → The Linux Kernel documentation
+- Wine 11 NTSYNC Explained → RELATED_TO → Gaming Performance
+- EndeavourOS Forum → RELATED_TO → KDE Plasma (KWin)
+- EndeavourOS Forum → RELATED_TO → Wayland compositing
+- PyTorch Execution Engine → RELATED_TO → CUDA sm_120
+- CUDA sm_120 → RELATED_TO → RTX 5090 / Blackwell architecture
+- PyTorch Execution Engine → RELATED_TO → CUDA 13.0 binaries
+- The Linux Kernel documentation → USES → AI Infrastructure
+- The Linux Kernel documentation → USES → flake.nix
+- The Linux Kernel documentation → USES → Wayland compositing
+- The Linux Kernel documentation → USES → io_uring
+- The Linux Kernel documentation → USES → NTSync
+- flake.nix → USES → nixpkgs
+- flake.nix → USES → cudaPackages_13_0.cudatoolkit
+- flake.nix → USES → cudaPackages_13_0.cudnn
+- flake.nix → USES → linuxPackages.nvidia_x11
+- flake.nix → USES → Frogging-Family/wine-tkg-git
+- flake.nix → USES → python312Packages.pip
+- cudaPackages_13_0.cudatoolkit → RELATED_TO → CUDA_HOME
+- CUDA_HOME → RELATED_TO → LD_LIBRARY_PATH

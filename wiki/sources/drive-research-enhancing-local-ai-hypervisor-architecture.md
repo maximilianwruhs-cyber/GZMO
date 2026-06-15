@@ -1,0 +1,184 @@
+---
+type: source
+title: drive-research-enhancing-local-ai-hypervisor-architecture
+created: 2026-06-08
+updated: 2026-06-08
+sources: 1
+tags: []
+status: stable
+gzmo_synthetic: true
+---
+
+# drive-research-enhancing-local-ai-hypervisor-architecture
+
+Ingested source summary (2026-06-08).
+
+## Entities
+- [[llama-3-3-70b-instruct|Llama-3.3-70B-Instruct]] (SYSTEM)
+- [[self-distillation-loop|Self-Distillation Loop]] (CONCEPT)
+- [[lxc-101|LXC 101]] (SYSTEM)
+- [[radixattention|RadixAttention]] (CONCEPT)
+- [[mcp-rust-sdk|MCP Rust SDK]] (TOOL)
+- [[ecs-agent-lifecycle|ECS Agent Lifecycle]] (SYSTEM)
+- [[proxmox-ve|Proxmox VE]] (SYSTEM)
+- [[nvidia-linux-driver-installer|NVIDIA Linux driver installer]] (TOOL)
+- [[snowflake|Snowflake]] (ORGANIZATION)
+- [[telemetry-stripping|Telemetry Stripping]] (CONCEPT)
+- [[mcp-sdk-rmcp-server|MCP SDK (rmcp) Server]] (TOOL)
+- [[lxc-container-device-nodes|LXC container device nodes]] (CONCEPT)
+- [[axum-routing|Axum routing]] (CONCEPT)
+- [[chatml|ChatML]] (CONCEPT)
+- [[tokio-async-event-loop|Tokio Async Event Loop]] (SYSTEM)
+- [[lxc-100|LXC 100]] (SYSTEM)
+- [[rust-native-execution-plane|Rust-Native Execution Plane]] (CONCEPT)
+- [[software-defined-network|Software-Defined Network]] (CONCEPT)
+- [[local-offline-fine-tuning|Local Offline Fine-Tuning]] (CONCEPT)
+- [[sglang|SGLang]] (TOOL)
+- [[ratatui|ratatui]] (TOOL)
+- [[vfio|VFIO]] (CONCEPT)
+- [[vllm|vLLM]] (TOOL)
+- [[kv-cache|KV Cache]] (CONCEPT)
+- [[proxmox-virtual-environment-pve|Proxmox Virtual Environment (PVE)]] (SYSTEM)
+- [[rust-native-execution-layer|Rust-Native Execution Layer]] (CONCEPT)
+- [[llama-3-1-8b|Llama-3.1-8B]] (SYSTEM)
+- [[sentence-transformers|sentence-transformers]] (TOOL)
+- [[arctic-inference|Arctic Inference]] (CONCEPT)
+- [[entity-component-system-ecs-architectural-layer|Entity Component System (ECS) Architectural Layer]] (CONCEPT)
+- [[proxmox-lxc|Proxmox LXC]] (SYSTEM)
+- [[nvidia-smi|nvidia-smi]] (TOOL)
+- [[redhatai-qwen3-8b-speculator-eagle3|RedHatAI/Qwen3-8B-speculator.eagle3]] (SYSTEM)
+- [[draft-model|Draft Model]] (CONCEPT)
+- [[dkms|DKMS]] (TOOL)
+- [[onnx-runtime|ONNX Runtime]] (TOOL)
+- [[axum-http-gateway|Axum HTTP Gateway]] (SYSTEM)
+- [[terminal-user-interface-tui-dashboard|Terminal User Interface (TUI) dashboard]] (SYSTEM)
+- [[proxmox-software-defined-networking-sdn|Proxmox Software-Defined Networking (SDN)]] (TOOL)
+- [[high-performance-architectural-blueprint-for-a-sovereign-local-intelligence-hypervisor|High-Performance Architectural Blueprint for a Sovereign Local Intelligence Hypervisor]] (BOOK)
+- [[target-model|Target Model]] (CONCEPT)
+- [[iommu|IOMMU]] (CONCEPT)
+- [[symbolic-verification-pipeline|Symbolic Verification Pipeline]] (CONCEPT)
+- [[model-context-protocol-mcp|Model Context Protocol (MCP)]] (CONCEPT)
+- [[lxc-102|LXC 102]] (SYSTEM)
+- [[docker|Docker]] (SYSTEM)
+- [[pytorch|PyTorch]] (TOOL)
+- [[peft-lora|PEFT/LoRA]] (TOOL)
+- [[automated-data-distillation-pipeline|Automated Data Distillation Pipeline]] (CONCEPT)
+- [[shared-prefix|Shared Prefix]] (CONCEPT)
+- [[hardened-sovereign-isolation|Hardened Sovereign Isolation]] (CONCEPT)
+- [[speculative-decoding|Speculative Decoding]] (CONCEPT)
+- [[radixcache|RadixCache]] (SYSTEM)
+- [[fastembed|FastEmbed]] (TOOL)
+- [[git|Git]] (SYSTEM)
+- [[arctic-training|Arctic Training]] (CONCEPT)
+- [[prefix-caching|Prefix Caching]] (CONCEPT)
+- [[nvidia-drivers|NVIDIA drivers]] (TOOL)
+- [[dnsmasq|dnsmasq]] (TOOL)
+- [[local-sinkholing|Local Sinkholing]] (CONCEPT)
+- [[microsegmentation|Microsegmentation]] (CONCEPT)
+- [[neuro-symbolic-cognitive-loops|Neuro-Symbolic Cognitive Loops]] (CONCEPT)
+- [[anthropic|Anthropic]] (ORGANIZATION)
+- [[nvidia-container-toolkit|NVIDIA Container Toolkit]] (TOOL)
+- [[crossterm|crossterm]] (TOOL)
+
+## Relations
+- Proxmox LXC → PART_OF → Proxmox Virtual Environment (PVE)
+- Proxmox Virtual Environment (PVE) → USES → IOMMU
+- Proxmox Virtual Environment (PVE) → USES → VFIO
+- Proxmox LXC → USES → NVIDIA drivers
+- Proxmox LXC → USES → DKMS
+- Proxmox LXC → USES → nvidia-smi
+- Proxmox LXC → USES → LXC container device nodes
+- Proxmox LXC → USES → NVIDIA Container Toolkit
+- Proxmox LXC → USES → FastEmbed
+- Proxmox LXC → USES → sentence-transformers
+- Proxmox LXC → USES → Speculative Decoding
+- Proxmox LXC → USES → SGLang
+- Proxmox LXC → USES → RadixAttention
+- Proxmox LXC → USES → Rust-Native Execution Layer
+- Proxmox LXC → USES → MCP Rust SDK
+- Proxmox LXC → USES → Tokio Async Event Loop
+- Proxmox LXC → USES → Axum routing
+- Proxmox LXC → USES → Entity Component System (ECS) Architectural Layer
+- Proxmox LXC → USES → ratatui
+- Proxmox LXC → USES → crossterm
+- Proxmox LXC → USES → Neuro-Symbolic Cognitive Loops
+- Proxmox LXC → USES → Self-Distillation Loop
+- Proxmox LXC → USES → PEFT/LoRA
+- Proxmox LXC → USES → Proxmox Software-Defined Networking (SDN)
+- Proxmox LXC → USES → dnsmasq
+- Proxmox LXC → PART_OF → LXC 100
+- Proxmox LXC → PART_OF → LXC 101
+- Proxmox LXC → PART_OF → LXC 102
+- Speculative Decoding → RELATED_TO → Draft Model
+- Speculative Decoding → RELATED_TO → Target Model
+- Speculative Decoding → USES → vLLM
+- SGLang → USES → RadixAttention
+- RadixAttention → USES → RadixCache
+- Rust-Native Execution Layer → USES → MCP Rust SDK
+- Rust-Native Execution Layer → USES → Tokio Async Event Loop
+- Axum routing → USES → Tokio Async Event Loop
+- Entity Component System (ECS) Architectural Layer → USES → Tokio Async Event Loop
+- Neuro-Symbolic Cognitive Loops → RELATED_TO → Self-Distillation Loop
+- Self-Distillation Loop → USES → PEFT/LoRA
+- Proxmox Software-Defined Networking (SDN) → USES → Microsegmentation
+- Proxmox Software-Defined Networking (SDN) → USES → Local Sinkholing
+- Proxmox Software-Defined Networking (SDN) → USES → Telemetry Stripping
+- Proxmox Software-Defined Networking (SDN) → USES → dnsmasq
+- LXC 100 → USES → Git
+- LXC 101 → USES → PEFT/LoRA
+- LXC 102 → USES → Rust-Native Execution Plane
+- Rust-Native Execution Plane → USES → Axum HTTP Gateway
+- Rust-Native Execution Plane → USES → Tokio Async Event Loop
+- Axum HTTP Gateway → USES → MCP SDK (rmcp) Server
+- Tokio Async Event Loop → USES → ECS Agent Lifecycle
+- Tokio Async Event Loop → USES → MCP SDK (rmcp) Server
+- ECS Agent Lifecycle → PART_OF → Entity Component System (ECS) Architectural Layer
+- MCP SDK (rmcp) Server → USES → Model Context Protocol (MCP)
+- Axum routing → USES → Axum HTTP Gateway
+- Terminal User Interface (TUI) dashboard → USES → ratatui
+- Terminal User Interface (TUI) dashboard → USES → crossterm
+- Automated Data Distillation Pipeline → RELATED_TO → Symbolic Verification Pipeline
+- Symbolic Verification Pipeline → USES → Git
+- Local Offline Fine-Tuning → USES → PEFT/LoRA
+- Hardened Sovereign Isolation → USES → Proxmox Software-Defined Networking (SDN)
+- Hardened Sovereign Isolation → USES → Local Sinkholing
+- Microsegmentation → USES → Proxmox Software-Defined Networking (SDN)
+- Local Sinkholing → USES → dnsmasq
+- Telemetry Stripping → RELATED_TO → Local Sinkholing
+- LXC 100 → PART_OF → Proxmox LXC
+- LXC 101 → PART_OF → Proxmox LXC
+- LXC 102 → PART_OF → Proxmox LXC
+- FastEmbed → USES → ONNX Runtime
+- sentence-transformers → USES → PyTorch
+- Speculative Decoding → RELATED_TO → Llama-3.3-70B-Instruct
+- Speculative Decoding → RELATED_TO → Llama-3.1-8B
+- Speculative Decoding → RELATED_TO → RedHatAI/Qwen3-8B-speculator.eagle3
+- vLLM → USES → Llama-3.3-70B-Instruct
+- vLLM → USES → Llama-3.1-8B
+- vLLM → USES → RedHatAI/Qwen3-8B-speculator.eagle3
+- SGLang → USES → RadixCache
+- RadixCache → PART_OF → RadixAttention
+- Rust-Native Execution Plane → USES → Axum routing
+- High-Performance Architectural Blueprint for a Sovereign Local Intelligence Hypervisor → RELATED_TO → Proxmox LXC
+- High-Performance Architectural Blueprint for a Sovereign Local Intelligence Hypervisor → RELATED_TO → Rust-Native Execution Layer
+- High-Performance Architectural Blueprint for a Sovereign Local Intelligence Hypervisor → RELATED_TO → Isolated SDN Microsegmentation
+- NVIDIA drivers → USES → Proxmox LXC
+- NVIDIA drivers → USES → DKMS
+- NVIDIA Container Toolkit → USES → Docker
+- Rust-Native Execution Plane → USES → MCP Rust SDK
+- ratatui → USES → Terminal User Interface (TUI) dashboard
+- crossterm → USES → Terminal User Interface (TUI) dashboard
+- SGLang → RELATED_TO → Shared Prefix
+- SGLang → RELATED_TO → KV Cache
+- SGLang → RELATED_TO → RadixAttention
+- SGLang → RELATED_TO → Prefix Caching
+- MCP Rust SDK → PART_OF → Model Context Protocol (MCP)
+- Anthropic → RELATED_TO → Model Context Protocol (MCP)
+- vLLM → USES → Arctic Inference
+- vLLM → USES → Arctic Training
+- Snowflake → RELATED_TO → vLLM
+- Snowflake → RELATED_TO → Arctic Inference
+- Snowflake → RELATED_TO → Arctic Training
+- Proxmox Software-Defined Networking (SDN) → USES → Proxmox VE
+- Proxmox VE → USES → Software-Defined Network
+- Proxmox Software-Defined Networking (SDN) → PART_OF → Software-Defined Network

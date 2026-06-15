@@ -9,11 +9,12 @@
 # ═══════════════════════════════════════════════════════════════════
 
 [meta]
-version = "1.0"
+version = "1.1"
 design_method = "Vision Design → Set Design → Play Design"
 flavor_rule = "Flavor text must perform heavy narrative lifting. Convey vast tenets in as few words as possible."
 text_rule = "Rules text must use strict templates — identical effects must use identical phrasing."
 rarity_ratio = "Mythic:Rare:Uncommon:Common = 1:7:24:88"
+set_prefix = "ATR"
 
 # ─── The Color Pie ──────────────────────────────────────────────
 

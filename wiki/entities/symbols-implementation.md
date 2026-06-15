@@ -1,0 +1,18 @@
+---
+type: entity
+title: /symbols/implementation
+created: 2026-06-09
+updated: 2026-06-09
+sources: 1
+tags: []
+status: draft
+gzmo_synthetic: true
+---
+
+# /symbols/implementation
+
+Type: ENDPOINT
+
+## From [[ai-research-part6-micro05|ai-research-part6-micro05]] (2026-06-09)
+- Extracts exact AST nodes of a function.
+- Saves token bandwidth by avoiding irrelevant noise.

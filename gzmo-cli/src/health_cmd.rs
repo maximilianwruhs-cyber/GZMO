@@ -17,6 +17,9 @@ use crate::cli_mcp::McpSession;
 pub async fn run(config: &GzmoConfig, _identity: IdentityEngine) -> Result<()> {
     embeddings::assert_vault_backend(&config.memory.vault_backend)?;
 
+    let perspective = gzmo_core::health::detect_perspective();
+    tracing::info!("Probing health check from perspective: {}", perspective);
+
     let mut results: Vec<ProbeResult> = Vec::new();
 
     let prime = config.engine.active_engine_for_mode(gzmo_core::config::EngineMode::Local);
@@ -33,10 +36,10 @@ pub async fn run(config: &GzmoConfig, _identity: IdentityEngine) -> Result<()> {
         }
 
         let mut tools = ToolRegistry::new();
-        tools.register(Box::new(FileReadTool));
+        tools.register(Box::new(FileReadTool::default()));
         tools.register(Box::new(FileWriteTool));
         tools.register(Box::new(DirListTool));
-        tools.register(Box::new(FileSearchTool));
+        tools.register(Box::new(FileSearchTool::default()));
         tools.register(Box::new(ShellExecTool::default()));
 
         let session = McpSession::connect(config, &mut tools).await?;
@@ -45,8 +48,7 @@ pub async fn run(config: &GzmoConfig, _identity: IdentityEngine) -> Result<()> {
     }
 
     if let Some(ref sovereign) = config.engine.sovereign {
-        let mut r = probe_sovereign(sovereign).await;
-        r.name = "sovereign";
+        let r = probe_sovereign(sovereign, config.engine.active_mode).await;
         results.push(r);
     }
 

@@ -1,0 +1,17 @@
+---
+type: entity
+title: Elasticsearch
+created: 2026-06-09
+updated: 2026-06-09
+sources: 1
+tags: []
+status: draft
+gzmo_synthetic: true
+---
+
+# Elasticsearch
+
+Type: TOOL
+
+## From [[the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro02|the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro02]] (2026-06-09)
+- A vector database that custom API connectors can interface with.

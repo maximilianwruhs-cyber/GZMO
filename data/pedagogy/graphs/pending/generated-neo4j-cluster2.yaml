@@ -1,0 +1,383 @@
+domain: generated-neo4j-cluster2
+nodes:
+  - id: alphalora
+    title: Alphalora
+    description: Exported from Neo4j (1 prereqs in cluster).
+    prerequisites:
+      - mixture_of_experts_moe
+    bloom_level: understand
+  - id: assisted_generation
+    title: Assisted Generation
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: autoregressive_generation
+    title: Autoregressive Generation
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: beschleunigte_token_generierung
+    title: Beschleunigte Token Generierung
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: d2_moe
+    title: D2 Moe
+    description: Exported from Neo4j (2 prereqs in cluster).
+    prerequisites:
+      - mhm_8x7b_frankenmoe_v1_0
+      - mixture_of_experts_moe
+    bloom_level: understand
+  - id: dare_drop_and_rescale_elect
+    title: Dare Drop And Rescale Elect
+    description: Exported from Neo4j (1 prereqs in cluster).
+    prerequisites:
+      - homogeneous_merging
+    bloom_level: understand
+  - id: deepseek_r1_distill_qwen_14b
+    title: Deepseek R1 Distill Qwen 14B
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: deepseek_r1_distill_qwen_1_5b
+    title: Deepseek R1 Distill Qwen 1 5B
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: draft_and_verify
+    title: Draft And Verify
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: draft_model
+    title: Draft Model
+    description: Exported from Neo4j (2 prereqs in cluster).
+    prerequisites:
+      - speculative_decoding
+      - target_model
+    bloom_level: understand
+  - id: draft_model_junior_dev
+    title: Draft Model Junior Dev
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: eagle
+    title: Eagle
+    description: Exported from Neo4j (2 prereqs in cluster).
+    prerequisites:
+      - medusa_architectures
+      - ml_specqd
+    bloom_level: understand
+  - id: edge_hardware
+    title: Edge Hardware
+    description: Exported from Neo4j (1 prereqs in cluster).
+    prerequisites:
+      - vram
+    bloom_level: understand
+  - id: expert_pruning
+    title: Expert Pruning
+    description: Exported from Neo4j (7 prereqs in cluster).
+    prerequisites:
+      - d2_moe
+      - frankenmoe
+      - mc_smoe_multi_center_sparse_moe
+      - mhm_8x7b_frankenmoe_v1_0
+      - mixture_of_experts_moe
+      - moe_i2
+      - moe_svd
+    bloom_level: understand
+  - id: frankenmoe
+    title: Frankenmoe
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: gate_less_moes
+    title: Gate Less Moes
+    description: Exported from Neo4j (2 prereqs in cluster).
+    prerequisites:
+      - mhm_8x7b_frankenmoe_v1_0
+      - mixture_of_experts_moe
+    bloom_level: understand
+  - id: general_matrix_multiply_gemm
+    title: General Matrix Multiply Gemm
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: gpu
+    title: Gpu
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: heterogeneous_merging
+    title: Heterogeneous Merging
+    description: Exported from Neo4j (1 prereqs in cluster).
+    prerequisites:
+      - mhm_8x7b_frankenmoe_v1_0
+    bloom_level: understand
+  - id: hidden_state_mapping_heuristic
+    title: Hidden State Mapping Heuristic
+    description: Exported from Neo4j (1 prereqs in cluster).
+    prerequisites:
+      - mixture_of_experts_moe
+    bloom_level: understand
+  - id: homogeneous_merging
+    title: Homogeneous Merging
+    description: Exported from Neo4j (1 prereqs in cluster).
+    prerequisites:
+      - mhm_8x7b_frankenmoe_v1_0
+    bloom_level: understand
+  - id: inference_acceleration
+    title: Inference Acceleration
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: laserrmt
+    title: Laserrmt
+    description: Exported from Neo4j (2 prereqs in cluster).
+    prerequisites:
+      - frankenmoe
+      - mixture_of_experts_moe
+    bloom_level: understand
+  - id: llama_3_8b
+    title: Llama 3 8B
+    description: Exported from Neo4j (1 prereqs in cluster).
+    prerequisites:
+      - homogeneous_merging
+    bloom_level: understand
+  - id: lora_adapter_moes
+    title: Lora Adapter Moes
+    description: Exported from Neo4j (3 prereqs in cluster).
+    prerequisites:
+      - mhm_8x7b_frankenmoe_v1_0
+      - mixture_of_experts
+      - mixture_of_experts_moe
+    bloom_level: understand
+  - id: mc_smoe_multi_center_sparse_moe
+    title: Mc Smoe Multi Center Sparse Moe
+    description: Exported from Neo4j (2 prereqs in cluster).
+    prerequisites:
+      - mhm_8x7b_frankenmoe_v1_0
+      - mixture_of_experts_moe
+    bloom_level: understand
+  - id: medusa
+    title: Medusa
+    description: Exported from Neo4j (2 prereqs in cluster).
+    prerequisites:
+      - ml_specqd
+      - speculative_decoding
+    bloom_level: understand
+  - id: medusa_architectures
+    title: Medusa Architectures
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: memory_wall
+    title: Memory Wall
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: mergemoe
+    title: Mergemoe
+    description: Exported from Neo4j (2 prereqs in cluster).
+    prerequisites:
+      - frankenmoe
+      - mixture_of_experts_moe
+    bloom_level: understand
+  - id: mhm_8x7b_frankenmoe_v1_0
+    title: Mhm 8X7B Frankenmoe V1 0
+    description: Exported from Neo4j (1 prereqs in cluster).
+    prerequisites:
+      - mixture_of_experts_moe
+    bloom_level: understand
+  - id: mixture_of_experts
+    title: Mixture Of Experts
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: mixture_of_experts_moe
+    title: Mixture Of Experts Moe
+    description: Exported from Neo4j (2 prereqs in cluster).
+    prerequisites:
+      - general_matrix_multiply_gemm
+      - nvfp4
+    bloom_level: understand
+  - id: ml_specqd
+    title: Ml Specqd
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: moe_i2
+    title: Moe I2
+    description: Exported from Neo4j (2 prereqs in cluster).
+    prerequisites:
+      - mhm_8x7b_frankenmoe_v1_0
+      - mixture_of_experts_moe
+    bloom_level: understand
+  - id: moe_i_o_prefetching_moe_speq
+    title: Moe I O Prefetching Moe Speq
+    description: Exported from Neo4j (1 prereqs in cluster).
+    prerequisites:
+      - online_speculative_decoding_osd
+    bloom_level: understand
+  - id: moe_svd
+    title: Moe Svd
+    description: Exported from Neo4j (2 prereqs in cluster).
+    prerequisites:
+      - mhm_8x7b_frankenmoe_v1_0
+      - mixture_of_experts_moe
+    bloom_level: understand
+  - id: multi_token_prediction_mtp
+    title: Multi Token Prediction Mtp
+    description: Exported from Neo4j (5 prereqs in cluster).
+    prerequisites:
+      - deepseek_r1_distill_qwen_14b
+      - deepseek_r1_distill_qwen_1_5b
+      - inference_acceleration
+      - nvfp4_format
+      - qwen
+    bloom_level: understand
+  - id: noisy_moes
+    title: Noisy Moes
+    description: Exported from Neo4j (2 prereqs in cluster).
+    prerequisites:
+      - mhm_8x7b_frankenmoe_v1_0
+      - mixture_of_experts_moe
+    bloom_level: understand
+  - id: nvfp4
+    title: Nvfp4
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: nvfp4_format
+    title: Nvfp4 Format
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: online_speculative_decoding_osd
+    title: Online Speculative Decoding Osd
+    description: Exported from Neo4j (1 prereqs in cluster).
+    prerequisites:
+      - autoregressive_generation
+    bloom_level: understand
+  - id: oom_crash
+    title: Oom Crash
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: prompt_lookup_decoding
+    title: Prompt Lookup Decoding
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: qwen
+    title: Qwen
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: qwen_moe_configurations
+    title: Qwen Moe Configurations
+    description: Exported from Neo4j (1 prereqs in cluster).
+    prerequisites:
+      - mhm_8x7b_frankenmoe_v1_0
+    bloom_level: understand
+  - id: random_gate_initialization
+    title: Random Gate Initialization
+    description: Exported from Neo4j (2 prereqs in cluster).
+    prerequisites:
+      - mixture_of_experts_moe
+      - sparse_upcycling
+    bloom_level: understand
+  - id: raw_embedding_mapping
+    title: Raw Embedding Mapping
+    description: Exported from Neo4j (1 prereqs in cluster).
+    prerequisites:
+      - mixture_of_experts_moe
+    bloom_level: understand
+  - id: sparse_upcycling
+    title: Sparse Upcycling
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: speculative_decoding
+    title: Speculative Decoding
+    description: Exported from Neo4j (14 prereqs in cluster).
+    prerequisites:
+      - assisted_generation
+      - autoregressive_generation
+      - beschleunigte_token_generierung
+      - draft_and_verify
+      - draft_model_junior_dev
+      - eagle
+      - gpu
+      - medusa_architectures
+      - memory_wall
+      - multi_token_prediction_mtp
+      - prompt_lookup_decoding
+      - target_model
+      - target_model_senior_dev
+      - vram
+    bloom_level: understand
+  - id: spherical_linear_interpolation_slerp
+    title: Spherical Linear Interpolation Slerp
+    description: Exported from Neo4j (1 prereqs in cluster).
+    prerequisites:
+      - homogeneous_merging
+    bloom_level: understand
+  - id: target_model
+    title: Target Model
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: target_model_senior_dev
+    title: Target Model Senior Dev
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: ties_merging
+    title: Ties Merging
+    description: Exported from Neo4j (1 prereqs in cluster).
+    prerequisites:
+      - homogeneous_merging
+    bloom_level: understand
+  - id: transformer
+    title: Transformer
+    description: Exported from Neo4j (2 prereqs in cluster).
+    prerequisites:
+      - autoregressive_generation
+      - frankenmoe
+    bloom_level: understand
+  - id: turbospec
+    title: Turbospec
+    description: Exported from Neo4j (1 prereqs in cluster).
+    prerequisites:
+      - online_speculative_decoding_osd
+    bloom_level: understand
+  - id: vram
+    title: Vram
+    description: Exported from Neo4j (1 prereqs in cluster).
+    prerequisites:
+      - oom_crash
+    bloom_level: understand

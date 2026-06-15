@@ -4,19 +4,30 @@ use serde::{Deserialize, Serialize};
 use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
 use tokio::net::UnixStream;
 
+use crate::pedagogy::{EdfRecord, StealthMetrics, ZpdPhase};
+
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct MentorTurn {
     pub role: String,
     pub content: String,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, Default)]
 pub struct MentorRequest {
     pub method: String,
     #[serde(default)]
     pub message: String,
     #[serde(default)]
     pub conversation: Vec<MentorTurn>,
+    /// S/A/B/C discovery pillar (Pi mutual discovery sessions)
+    #[serde(default)]
+    pub discovery_pillar: Option<String>,
+    /// Pillar learn topic (matches gzmo_mentor_learn_start)
+    #[serde(default)]
+    pub learn_topic: Option<String>,
+    /// Current probe id e.g. S03, or short action summary
+    #[serde(default)]
+    pub probe_context: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, Copy, PartialEq, Eq)]
@@ -25,6 +36,32 @@ pub enum MentorAction {
     Teach,
     DelegateExec,
     DelegateCompute,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct MentorPedagogyMeta {
+    pub zpd_phase: ZpdPhase,
+    pub hint_level: u8,
+    pub stealth: StealthMetrics,
+    #[serde(default)]
+    pub leakage_detected: bool,
+    #[serde(default)]
+    pub leakage_retries: u8,
+    #[serde(default)]
+    pub compute_used: bool,
+}
+
+impl From<&EdfRecord> for MentorPedagogyMeta {
+    fn from(record: &EdfRecord) -> Self {
+        Self {
+            zpd_phase: record.zpd_phase,
+            hint_level: record.hint_level,
+            stealth: record.stealth.clone(),
+            leakage_detected: record.leakage_detected,
+            leakage_retries: record.leakage_retries,
+            compute_used: record.compute_used,
+        }
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -37,6 +74,8 @@ pub struct MentorResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ops_mode: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub auto_triggers: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub learner_id: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub error: Option<String>,
@@ -46,6 +85,8 @@ pub struct MentorResponse {
     pub delegate_payload: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub delegate_hint: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pedagogy: Option<MentorPedagogyMeta>,
 }
 
 impl MentorResponse {
@@ -56,11 +97,13 @@ impl MentorResponse {
             response: None,
             mentor: None,
             ops_mode: None,
+            auto_triggers: None,
             learner_id: None,
             error: None,
             action: None,
             delegate_payload: None,
             delegate_hint: None,
+            pedagogy: None,
         }
     }
 
@@ -73,6 +116,13 @@ impl MentorResponse {
             learner_id: Some(learner_id),
             action: Some(MentorAction::Teach),
             ..Self::base()
+        }
+    }
+
+    pub fn teach_with_pedagogy(response: String, learner_id: String, record: &EdfRecord) -> Self {
+        Self {
+            pedagogy: Some(MentorPedagogyMeta::from(record)),
+            ..Self::teach(response, learner_id)
         }
     }
 
@@ -108,6 +158,40 @@ mod tests {
         let back: MentorResponse = serde_json::from_str(&json).expect("deserialize");
         assert_eq!(back.action, Some(MentorAction::DelegateExec));
         assert_eq!(back.delegate_payload.as_deref(), Some("list files in /tmp"));
+    }
+
+    #[test]
+    fn teach_response_can_include_pedagogy_metadata() {
+        let record = EdfRecord {
+            timestamp: chrono::Utc::now(),
+            user_input: "what is a symlink?".into(),
+            evidence: "question about filesystem concepts".into(),
+            decision: "zpd=we_do hint=3".into(),
+            zpd_phase: ZpdPhase::WeDo,
+            hint_level: 3,
+            stealth: StealthMetrics {
+                psu: 0.7,
+                sdr: 0.6,
+                lvd: 0.8,
+            },
+            tutor_response_preview: "What relationship do you expect?".into(),
+            leakage_detected: false,
+            leakage_retries: 0,
+            compute_used: true,
+        };
+        let resp = MentorResponse::teach_with_pedagogy(
+            "What relationship do you expect?".to_string(),
+            "operator".to_string(),
+            &record,
+        );
+        let json = serde_json::to_string(&resp).expect("serialize");
+        assert!(json.contains("\"pedagogy\""));
+        assert!(json.contains("\"zpd_phase\":\"we_do\""));
+        let back: MentorResponse = serde_json::from_str(&json).expect("deserialize");
+        let meta = back.pedagogy.expect("pedagogy metadata");
+        assert_eq!(meta.zpd_phase, ZpdPhase::WeDo);
+        assert_eq!(meta.hint_level, 3);
+        assert!(meta.compute_used);
     }
 
     #[test]

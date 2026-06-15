@@ -1,0 +1,173 @@
+---
+type: source
+title: drive-research-license-and-native-binding-analysis
+created: 2026-06-08
+updated: 2026-06-08
+sources: 1
+tags: []
+status: stable
+gzmo_synthetic: true
+---
+
+# drive-research-license-and-native-binding-analysis
+
+Ingested source summary (2026-06-08).
+
+## Entities
+- [[gnu-c-compiler-gcc|GNU C Compiler (gcc)]] (TOOL)
+- [[node-api-n-api|Node-API (N-API)]] (TOOL)
+- [[v8|V8]] (SYSTEM)
+- [[native-abstractions-for-node-js-nan|Native Abstractions for Node.js (NAN)]] (TOOL)
+- [[systemd-interactions|Systemd Interactions]] (SYSTEM)
+- [[ssh2|ssh2]] (TOOL)
+- [[ci-cd-pipeline|CI/CD pipeline]] (SYSTEM)
+- [[build-essential-suite|build-essential suite]] (TOOL)
+- [[javascriptcore-jsc|JavaScriptCore (JSC)]] (SYSTEM)
+- [[affero-general-public-license-agpl|Affero General Public License (AGPL)]] (CONCEPT)
+- [[c-native-libraries|C++ native libraries]] (CONCEPT)
+- [[transformers-js|transformers.js]] (TOOL)
+- [[onnx-runtime|ONNX runtime]] (TOOL)
+- [[codex|Codex]] (TOOL)
+- [[bun-install|bun install]] (TOOL)
+- [[automated-license-whitelisting|Automated License Whitelisting]] (CONCEPT)
+- [[cap|cap]] (TOOL)
+- [[bootstrap-selectpicker|bootstrap-selectpicker]] (TOOL)
+- [[tensorflow-node|TensorFlow Node]] (TOOL)
+- [[bun-sqlite|bun:sqlite]] (TOOL)
+- [[gzmo-daemon|gzmo-daemon]] (CONCEPT)
+- [[apache-license-2-0|Apache License 2.0]] (CONCEPT)
+- [[make|make]] (TOOL)
+- [[local-pglite|local PGLite]] (TOOL)
+- [[mit-license|MIT License]] (CONCEPT)
+- [[subprocess-architecture|Subprocess Architecture]] (CONCEPT)
+- [[sqlite3|sqlite3]] (TOOL)
+- [[pytorch|PyTorch]] (TOOL)
+- [[general-public-license-gpl|General Public License (GPL)]] (CONCEPT)
+- [[python3|python3]] (TOOL)
+- [[jquery|jquery]] (TOOL)
+- [[claude|Claude]] (TOOL)
+- [[bun-ffi|bun:ffi]] (TOOL)
+- [[ubuntu-linux|Ubuntu Linux]] (SYSTEM)
+- [[mozilla-public-license-mpl|Mozilla Public License (MPL)]] (CONCEPT)
+- [[bsd-licenses|BSD Licenses]] (CONCEPT)
+- [[extjs|ExtJS]] (TOOL)
+- [[heads-up-display-hud|Heads-Up Display (HUD)]] (CONCEPT)
+- [[gnu-c-compiler-g|GNU C++ Compiler (g++)]] (TOOL)
+- [[http|HTTP]] (CONCEPT)
+- [[highcharts|Highcharts]] (TOOL)
+- [[user-datagram-protocol-udp|user datagram protocol (UDP)]] (CONCEPT)
+- [[isc-license|ISC License]] (CONCEPT)
+- [[python-3|Python 3]] (TOOL)
+- [[gnu-lesser-general-public-license-lgpl|GNU Lesser General Public License (LGPL)]] (CONCEPT)
+- [[node-gyp|node-gyp]] (TOOL)
+- [[angular-ui-bootstrap|angular-ui-bootstrap]] (TOOL)
+- [[bsd-license|BSD license]] (CONCEPT)
+- [[foreign-function-interfaces-ffi|Foreign Function Interfaces (FFI)]] (CONCEPT)
+- [[proprietary-restrictive-license|proprietary restrictive license]] (CONCEPT)
+- [[routeros-interaction|RouterOS interaction]] (CONCEPT)
+- [[ubuntu-base-images|Ubuntu base images]] (SYSTEM)
+- [[stdio-streams|stdio streams]] (CONCEPT)
+- [[gpl-derivative-work-clause|GPL derivative work clause]] (CONCEPT)
+- [[bun-runtime|Bun runtime]] (TOOL)
+- [[pcap|pcap]] (TOOL)
+- [[link-layer-discovery-protocol-lldp|Link Layer Discovery Protocol (LLDP)]] (CONCEPT)
+- [[inter-process-communication|inter-process communication]] (CONCEPT)
+
+## Relations
+- gzmo-daemon → USES → Bun runtime
+- gzmo-daemon → USES → Ubuntu Linux
+- gzmo-daemon → USES → RouterOS interaction
+- gzmo-daemon → USES → Link Layer Discovery Protocol (LLDP)
+- gzmo-daemon → USES → user datagram protocol (UDP)
+- gzmo-daemon → USES → HTTP
+- gzmo-daemon → USES → Heads-Up Display (HUD)
+- gzmo-daemon → USES → Systemd Interactions
+- gzmo-daemon → USES → General Public License (GPL)
+- gzmo-daemon → USES → Affero General Public License (AGPL)
+- gzmo-daemon → USES → MIT License
+- gzmo-daemon → USES → Apache License 2.0
+- gzmo-daemon → USES → BSD Licenses
+- gzmo-daemon → USES → ISC License
+- gzmo-daemon → USES → Mozilla Public License (MPL)
+- gzmo-daemon → USES → GNU Lesser General Public License (LGPL)
+- gzmo-daemon → USES → Foreign Function Interfaces (FFI)
+- gzmo-daemon → USES → bun:sqlite
+- Bun runtime → USES → JavaScriptCore (JSC)
+- Bun runtime → USES → Node-API (N-API)
+- Bun runtime → USES → node-gyp
+- Bun runtime → USES → build-essential suite
+- Bun runtime → USES → Python 3
+- Bun runtime → USES → bun:ffi
+- Bun runtime → USES → bun:sqlite
+- Ubuntu Linux → USES → build-essential suite
+- Ubuntu Linux → USES → Python 3
+- Ubuntu Linux → USES → Systemd Interactions
+- Native Abstractions for Node.js (NAN) → USES → V8
+- node-gyp → USES → Python 3
+- node-gyp → USES → build-essential suite
+- node-gyp → USES → GNU C Compiler (gcc)
+- node-gyp → USES → GNU C++ Compiler (g++)
+- node-gyp → USES → make
+- Foreign Function Interfaces (FFI) → USES → bun:ffi
+- bun:ffi → USES → Ubuntu Linux
+- transformers.js → USES → ONNX runtime
+- sqlite3 → USES → node-pre-gyp
+- local PGLite → USES → JavaScript
+- Codex → RELATED_TO → gzmo-daemon
+- Claude → RELATED_TO → gzmo-daemon
+- jquery → PART_OF → gzmo-daemon
+- angular-ui-bootstrap → PART_OF → gzmo-daemon
+- bootstrap-selectpicker → PART_OF → gzmo-daemon
+- Highcharts → PART_OF → gzmo-daemon
+- ExtJS → PART_OF → gzmo-daemon
+- pcap → PART_OF → gzmo-daemon
+- cap → PART_OF → gzmo-daemon
+- ssh2 → PART_OF → gzmo-daemon
+- transformers.js → PART_OF → gzmo-daemon
+- TensorFlow Node → PART_OF → gzmo-daemon
+- PyTorch → PART_OF → gzmo-daemon
+- General Public License (GPL) → RELATED_TO → gzmo-daemon
+- Affero General Public License (AGPL) → RELATED_TO → gzmo-daemon
+- MIT License → RELATED_TO → gzmo-daemon
+- Apache License 2.0 → RELATED_TO → gzmo-daemon
+- BSD Licenses → RELATED_TO → gzmo-daemon
+- ISC License → RELATED_TO → gzmo-daemon
+- Mozilla Public License (MPL) → RELATED_TO → gzmo-daemon
+- GNU Lesser General Public License (LGPL) → RELATED_TO → gzmo-daemon
+- JavaScriptCore (JSC) → PART_OF → Bun runtime
+- V8 → PART_OF → Native Abstractions for Node.js (NAN)
+- build-essential suite → PART_OF → Ubuntu Linux
+- Python 3 → PART_OF → Ubuntu Linux
+- GNU C Compiler (gcc) → PART_OF → build-essential suite
+- GNU C++ Compiler (g++) → PART_OF → build-essential suite
+- make → PART_OF → build-essential suite
+- Systemd Interactions → PART_OF → Ubuntu Linux
+- bun:ffi → PART_OF → Bun runtime
+- bun:sqlite → PART_OF → Bun runtime
+- ONNX runtime → RELATED_TO → transformers.js
+- CI/CD pipeline → USES → bun install
+- CI/CD pipeline → REQUIRES_ENVIRONMENT_STRIPPED_OF → build-essential suite
+- CI/CD pipeline → REQUIRES_ENVIRONMENT_STRIPPED_OF → GNU C Compiler (gcc)
+- CI/CD pipeline → REQUIRES_ENVIRONMENT_STRIPPED_OF → GNU C++ Compiler (g++)
+- CI/CD pipeline → REQUIRES_ENVIRONMENT_STRIPPED_OF → python3
+- CI/CD pipeline → INTEGRATES → Automated License Whitelisting
+- Automated License Whitelisting → PERMITS → MIT License
+- Automated License Whitelisting → PERMITS → Apache License 2.0
+- Automated License Whitelisting → PERMITS → BSD license
+- Automated License Whitelisting → PERMITS → ISC License
+- General Public License (GPL) → TRIGGERS_FAILURE_IN → CI/CD pipeline
+- GNU Lesser General Public License (LGPL) → TRIGGERS_FAILURE_IN → CI/CD pipeline
+- Affero General Public License (AGPL) → TRIGGERS_FAILURE_IN → CI/CD pipeline
+- proprietary restrictive license → TRIGGERS_FAILURE_IN → CI/CD pipeline
+- Subprocess Architecture → APPLIES_TO → RouterOS interaction
+- Subprocess Architecture → APPLIES_TO → C++ native libraries
+- General Public License (GPL) → REQUIRES → Subprocess Architecture
+- C++ native libraries → REQUIRES → Subprocess Architecture
+- gzmo-daemon → USES → Subprocess Architecture
+- gzmo-daemon → INTERACTS_VIA → stdio streams
+- gzmo-daemon → INTERACTS_VIA → inter-process communication
+- gzmo-daemon → DEPLOYS_ON → Ubuntu base images
+- gzmo-daemon → MAINTAINS_AUTHORITY_OVER → Systemd Interactions
+- gzmo-daemon → AVOIDS → Systemd Interactions
+- Subprocess Architecture → MITIGATES → GPL derivative work clause
+- Bun runtime → SUPPORTS_DEPLOYMENT_OF → gzmo-daemon

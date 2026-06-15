@@ -8,6 +8,7 @@
 //! by the REPL's slash command handler.
 
 use std::collections::HashMap;
+use std::path::Path;
 use std::sync::Arc;
 
 use anyhow::Result;
@@ -16,13 +17,48 @@ use gzmo_chaos::feedback::ChaosEvent;
 use gzmo_chaos::pulse::ChaosSnapshot;
 use tokio::sync::mpsc;
 
+use crate::gateway::LlmGateway;
+
 pub mod dice;
+pub mod dice_corpus;
+pub mod dice_cascade;
 pub mod sound;
 pub mod poker;
 pub mod quote;
 pub mod calculate;
 pub mod help;
 pub mod visual;
+pub mod shell_bridge;
+pub mod generative;
+pub mod persona;
+pub mod joke;
+pub mod poem;
+pub mod story;
+pub mod story_brief;
+pub mod poem_brief;
+pub mod joke_brief;
+pub mod attractor_common;
+pub mod skill_ccl;
+pub mod word;
+pub mod word_brief;
+pub mod define;
+pub mod define_brief;
+pub mod card;
+pub mod card_forge;
+pub mod card_forge_brief;
+pub mod card_corpus;
+pub mod pkm;
+pub mod pkm_forge;
+pub mod pkm_forge_brief;
+pub mod pkm_corpus;
+pub mod transform;
+pub mod language;
+pub mod stabilize;
+pub mod ops;
+pub mod learn;
+pub mod discover;
+pub mod registry;
+pub mod dispatch;
 
 /// The type of skill — affects display and feedback behavior.
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -46,6 +82,31 @@ pub struct SkillOutput {
     /// If true, also inject the display text as a system message
     /// into the conversation (so the LLM "sees" what happened)
     pub inject_to_conversation: bool,
+    /// Optional structured evidence (JSON) for headless runners / Pi probes
+    pub evidence: Option<serde_json::Value>,
+}
+
+impl SkillOutput {
+    pub fn new(
+        display: impl Into<String>,
+        feedback: Vec<ChaosEvent>,
+        inject_to_conversation: bool,
+    ) -> Self {
+        Self {
+            display: display.into(),
+            feedback,
+            inject_to_conversation,
+            evidence: None,
+        }
+    }
+}
+
+/// Nested skill dispatch (wild magic cascade from `/dice`).
+#[derive(Clone, Copy, Default)]
+pub struct NestedDispatch<'a> {
+    pub registry: Option<&'a SkillRegistry>,
+    pub profile: Option<&'a crate::config::EngineProfileConfig>,
+    pub depth: u8,
 }
 
 /// Context provided to every skill execution.
@@ -56,6 +117,18 @@ pub struct SkillContext<'a> {
     pub feedback_tx: &'a mpsc::Sender<ChaosEvent>,
     /// Arguments provided after the slash command
     pub args: &'a str,
+    /// LLM gateway for generative skills (None if unavailable)
+    pub gateway: Option<&'a dyn LlmGateway>,
+    /// Router for pedagogy-internal gateway selection (`/learn` prep).
+    pub router: Option<&'a crate::gateway::GatewayRouter>,
+    /// Full GZMO config (paths, dice cascade, pedagogy).
+    pub config: &'a crate::config::GzmoConfig,
+    /// Path to `skills/` directory (persona, language state files)
+    pub skills_dir: &'a Path,
+    /// GZMO data directory (`data/`)
+    pub data_dir: &'a Path,
+    /// Nested dispatch for `/dice` wild magic cascade.
+    pub nested: NestedDispatch<'a>,
 }
 
 /// Core trait for all GZMO skills.

@@ -8,7 +8,7 @@
 #   ./scripts/slow-reingest-migration.sh --interval 300 --start 5
 #   QDRANT_SYNC=1 ./scripts/slow-reingest-migration.sh --interval 300
 #
-# Env: SKIP_BUILD=1, QDRANT_SYNC=0|1, MANIFEST=path
+# Env: SKIP_BUILD=1, QDRANT_SYNC=0|1, MANIFEST=path, CLOUD_INGEST=1 (skip Prime preflight)
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -58,7 +58,7 @@ if [[ -f "$PROGRESS" ]]; then
 fi
 
 echo "=== slow-reingest-migration $(date -Is) ===" | tee "$LOG"
-echo "manifest=$MANIFEST queue=$total interval=${INTERVAL}s dry_run=$DRY_RUN start=$START_AT" | tee -a "$LOG"
+echo "manifest=$MANIFEST queue=$total interval=${INTERVAL}s dry_run=$DRY_RUN start=$START_AT cloud_ingest=${CLOUD_INGEST:-0}" | tee -a "$LOG"
 
 if [[ "$DRY_RUN" -eq 1 ]]; then
   idx=0
@@ -80,10 +80,24 @@ if pgrep -f '/target/release/gzmo daemon' >/dev/null 2>&1; then
   exit 1
 fi
 
-prime_code="$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8000/v1/models 2>/dev/null || echo 000)"
-if [[ "$prime_code" != "200" ]]; then
-  echo "[!] Prime not reachable at :8000 (HTTP $prime_code)" >&2
-  exit 1
+if [[ "${CLOUD_INGEST:-0}" == "1" ]]; then
+  echo "[*] CLOUD_INGEST=1 — skipping Prime :8000 preflight (cloud_first_background ingest)" | tee -a "$LOG"
+  if [[ -z "${GZMO_OPENROUTER_KEY:-}" ]] && [[ -f "$ROOT/.env" ]]; then
+    set -a
+    # shellcheck disable=SC1091
+    source "$ROOT/.env"
+    set +a
+  fi
+  if [[ -z "${GZMO_OPENROUTER_KEY:-}" ]]; then
+    echo "[!] CLOUD_INGEST=1 but GZMO_OPENROUTER_KEY is not set (.env)" >&2
+    exit 1
+  fi
+else
+  prime_code="$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8000/v1/models 2>/dev/null || echo 000)"
+  if [[ "$prime_code" != "200" ]]; then
+    echo "[!] Prime not reachable at :8000 (HTTP $prime_code)" >&2
+    exit 1
+  fi
 fi
 
 if [[ "${SKIP_BUILD:-0}" != "1" ]]; then

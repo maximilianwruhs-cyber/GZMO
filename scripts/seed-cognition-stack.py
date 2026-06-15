@@ -25,44 +25,43 @@ ORIGIN = "manual"
 CONTAINER = "obolus"
 MIN_CONF = 0.95
 
-# Verified from gzmo.toml, llama.cpp/prime-bench/*, llama-cpp-turboquant, GEMMA4_PRIME.md
+# Verified from gzmo.toml, llama.cpp/prime-bench/*, GEMMA4_26B_PRIME.md (champion sweep 2026-06)
 FACTS: list[tuple[str, str]] = [
     (
-        "[SYSTEM:Prime] Production cognition on workstation port :8000 uses Qwen3.6-35B-A3B MoE "
-        "(alias qwen3.6-35b-mtp) via stock llama.cpp llama-server with dual RTX 5070 Ti layer-split."
+        "[SYSTEM:Prime] Production cognition on workstation port :8000 uses Gemma 4 26B-A4B-it MoE "
+        "(alias gemma-4-26b-a4b-it, ctx 262144) via stock llama.cpp llama-server with dual RTX 5070 Ti "
+        "layer-split and champion profile draft-mtp+ngram-mod, f16 KV, CUDA graphs off."
     ),
     (
-        "[SYSTEM:Prime] VM200 Qwen2.5-Coder-7B on :8080 was retired for agent workloads "
-        "(unacceptable latency); extract, verify, dream, and Spark run on workstation Prime only."
+        "[SYSTEM:Prime] VM200 Qwen2.5-Coder-7B on :8080 and Qwen2.5-1.5B librarian on :8083 were "
+        "retired; extract, verify, dream, Spark, and session distill run on workstation Prime only."
     ),
     (
-        "[CONCEPT:TurboQuant] TurboQuant KV cache (turbo2/turbo3/turbo4) lives in "
-        "~/Projects/llama-cpp-turboquant — a llama.cpp fork enabling 256K context on ~32 GB VRAM "
-        "with perplexity within 5% of q8_0 per scripts/turbo-quality-gate.sh."
+        "[CONCEPT:Prime-Champion-Profile] Gemma 4 26B champion sweep winner: draft-mtp+ngram-mod stacked "
+        "spec, assistant gemma-4-26B-A4B-it-assistant-Q2_K.gguf, spec-draft-n-max=3, f16/f16 KV, "
+        "GGML_CUDA_DISABLE_GRAPHS=1 — ~185 tok/s mtp-bench mean @ dual 5070 Ti."
     ),
     (
-        "[CONCEPT:Gemma4-Prime-Cutover] Planned Prime cutover: Gemma 4 31B dense "
-        "(gemma-4-31B-it-UD-Q4_K_XL.gguf) @ 256K via TurboQuant llama-server after "
-        "setup-turboquant-llama.sh succeeds; interim fallback uses stock llama.cpp + RAM KV spill."
+        "[CONCEPT:Gemma4-Chat-Template] Gemma 4 instruct uses gemma4 chat template via llama-server; "
+        "legacy --chat-template gemma (Gemma 3) causes repetition/gibberish."
     ),
     (
-        "[CONCEPT:Gemma4-Chat-Template] Gemma 4 instruct requires "
-        "google-gemma-4-31B-it-interleaved.jinja with --jinja — legacy --chat-template gemma "
-        "(Gemma 3) causes repetition/gibberish."
+        "[SYSTEM:Prime] gzmo.toml engine.local points at http://localhost:8000/v1 (gemma-4-26b-a4b-it); "
+        "[librarian] is disabled and session distill routes to Prime via [routing.mappings] distill_*=local; "
+        "sovereign FrankenMoE :8010 remains intentionally down."
     ),
     (
-        "[CONCEPT:14B-Swap-Eval] 14B-class models (Qwen2.5-14B-Instruct speculative, MoE A14B active "
-        "params) are benchmark/eval targets in llama-cpp-turboquant — not the current gzmo.toml "
-        "engine.local model until an explicit Prime profile swap and quality gate pass."
+        "[CONCEPT:Cognition-Stack-Decision] Stack decision (2026-06): Gemma 4 26B-A4B @ 256K is "
+        "production Prime (locked over Qwen3.6-35B 128K); ingest routes local_deterministic/local on "
+        ":8000; do not bulk-ingest or swap Prime without eval gate."
     ),
     (
-        "[SYSTEM:Prime] gzmo.toml engine.local points at http://localhost:8000/v1; "
-        "sovereign FrankenMoE :8010 remains intentionally down until a working MoE GGUF exists."
+        "[SERVICE:Librarian] Session distill extract/summary/verify routes to Prime :8000 via gzmo.toml "
+        "[routing.mappings] distill_*=local; [librarian] is disabled and VM200 :8083 Qwen 1.5B is retired."
     ),
     (
-        "[CONCEPT:Cognition-Stack-Decision] Current stack decision (2026-06): keep Qwen3.6-35B-A3B "
-        "as production Prime; pursue Gemma 4 31B + TurboQuant KV as the next profile when build "
-        "and turbo-quality-gate.sh are green — do not bulk-ingest or swap without eval gate."
+        "[CONCEPT:TurboQuant] TurboQuant KV cache fork (llama-cpp-turboquant) is not required for "
+        "current Prime — stock llama.cpp + f16 KV achieves 256K on dual 5070 Ti with champion profile."
     ),
 ]
 

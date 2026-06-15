@@ -11,7 +11,7 @@ rm -f /tmp/gzmo_rust.pid 2>/dev/null || true
 
 # Shell skills use _llm_helper.sh — need FULL chat/completions URL, not gzmo.toml base /v1
 export GZMO_LLM_URL="${GZMO_LLM_URL:-http://localhost:8000/v1/chat/completions}"
-export GZMO_LLM_MODEL="${GZMO_LLM_MODEL:-qwen3.6-35b-mtp}"
+export GZMO_LLM_MODEL="${GZMO_LLM_MODEL:-gemma-4-26b-a4b-it}"
 
 unset CARGO_TARGET_DIR
 cargo build --release -p gzmo-cli -q

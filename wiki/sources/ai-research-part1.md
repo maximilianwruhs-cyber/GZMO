@@ -1,0 +1,204 @@
+---
+type: source
+title: ai-research-part1
+created: 2026-06-08
+updated: 2026-06-08
+sources: 1
+tags: []
+status: stable
+gzmo_synthetic: true
+---
+
+# ai-research-part1
+
+Ingested source summary (2026-06-08).
+
+## Entities
+- [[muon-optimizer|Muon optimizer]] (TOOL)
+- [[full-attnres|Full AttnRes]] (SYSTEM)
+- [[dan-hendrycks|Dan Hendrycks]] (AUTHOR)
+- [[jonas-knupp|Jonas Knupp]] (AUTHOR)
+- [[rnns|RNNs]] (SYSTEM)
+- [[block-attnres|Block AttnRes]] (CONCEPT)
+- [[muddformer|MUDDFormer]] (SYSTEM)
+- [[songlin-yang|Songlin Yang]] (AUTHOR)
+- [[weixin-xu|Weixin Xu]] (AUTHOR)
+- [[weiran-he|Weiran He]] (AUTHOR)
+- [[kyunghyun-cho|Kyunghyun Cho]] (AUTHOR)
+- [[y-charles|Y. Charles]] (AUTHOR)
+- [[postnorm|PostNorm]] (CONCEPT)
+- [[hongyu-wang|Hongyu Wang]] (AUTHOR)
+- [[guangyu-chen|Guangyu Chen]] (AUTHOR)
+- [[deltanet|DeltaNet]] (SYSTEM)
+- [[kimi-linear-architecture|Kimi Linear architecture]] (SYSTEM)
+- [[ddl|DDL]] (SYSTEM)
+- [[rico-sennrich|Rico Sennrich]] (AUTHOR)
+- [[hyper-connections|Hyper-Connections]] (SYSTEM)
+- [[yilang-zhang|Yilang Zhang]] (AUTHOR)
+- [[yanping-huang|Yanping Huang]] (AUTHOR)
+- [[mirac-suzgun|Mirac Suzgun]] (AUTHOR)
+- [[weixiao-huang|Weixiao Huang]] (AUTHOR)
+- [[mandar-joshi|Mandar Joshi]] (AUTHOR)
+- [[multi-head-latent-attention-mla|Multi-Head Latent Attention (MLA)]] (CONCEPT)
+- [[ruibin-xiong|Ruibin Xiong]] (AUTHOR)
+- [[shengding-hu|Shengding Hu]] (AUTHOR)
+- [[denseformer|DenseFormer]] (SYSTEM)
+- [[aitor-lewkowycz|Aitor Lewkowycz]] (AUTHOR)
+- [[freda-shi|Freda Shi]] (AUTHOR)
+- [[biao-zhang|Biao Zhang]] (AUTHOR)
+- [[ravi-kumar|Ravi Kumar]] (AUTHOR)
+- [[peter-clark|Peter Clark]] (AUTHOR)
+- [[zaida-zhou|Zaida Zhou]] (AUTHOR)
+- [[ali-hatamizadeh|Ali Hatamizadeh]] (AUTHOR)
+- [[guokun-lai|Guokun Lai]] (AUTHOR)
+- [[bohong-yin|Bohong Yin]] (AUTHOR)
+- [[kaiming-he|Kaiming He]] (AUTHOR)
+- [[zhilin-yang|Zhilin Yang]] (AUTHOR)
+- [[bowen-yang|Bowen Yang]] (AUTHOR)
+- [[yaoyu-wang|Yaoyu Wang]] (AUTHOR)
+- [[xin-men|Xin Men]] (AUTHOR)
+- [[y-zhang|Y. Zhang]] (AUTHOR)
+- [[lin-sui|Lin Sui]] (AUTHOR)
+- [[lai-wei|Lai Wei]] (AUTHOR)
+- [[deepak-narayanan|Deepak Narayanan]] (AUTHOR)
+- [[maxim-milakov|Maxim Milakov]] (AUTHOR)
+- [[yuzhen-huang|Yuzhen Huang]] (AUTHOR)
+- [[zhenda-xie|Zhenda Xie]] (AUTHOR)
+- [[imanol-schlag|Imanol Schlag]] (AUTHOR)
+- [[value-residual-learning|Value Residual Learning]] (SYSTEM)
+- [[jianlin-su|Jianlin Su]] (AUTHOR)
+- [[siyuan-pan|Siyuan Pan]] (AUTHOR)
+- [[enzhe-lu|Enzhe Lu]] (AUTHOR)
+- [[xinran-xu|Xinran Xu]] (AUTHOR)
+- [[david-rein|David Rein]] (AUTHOR)
+- [[reiner-pope|Reiner Pope]] (AUTHOR)
+- [[guangxuan-xiao|Guangxuan Xiao]] (AUTHOR)
+- [[rowan-zellers|Rowan Zellers]] (AUTHOR)
+- [[xiaotong-xie|Xiaotong Xie]] (AUTHOR)
+- [[natalia-gimelshein|Natalia Gimelshein]] (AUTHOR)
+- [[yuxin-wu|Yuxin Wu]] (AUTHOR)
+- [[prenorm-baseline|PreNorm baseline]] (CONCEPT)
+- [[jordan-hoffmann|Jordan Hoffmann]] (AUTHOR)
+- [[rezero|ReZero]] (SYSTEM)
+- [[layerscale|LayerScale]] (SYSTEM)
+- [[densenet|DenseNet]] (SYSTEM)
+- [[zhen-qin|Zhen Qin]] (AUTHOR)
+- [[elmo|ELMo]] (SYSTEM)
+- [[thomas-bachlechner|Thomas Bachlechner]] (AUTHOR)
+- [[yoshua-bengio|Yoshua Bengio]] (AUTHOR)
+- [[klaus-greff|Klaus Greff]] (AUTHOR)
+- [[shawn-tan|Shawn Tan]] (AUTHOR)
+- [[kimi-delta-attention-kda|Kimi Delta Attention (KDA)]] (CONCEPT)
+- [[fanqing-meng|Fanqing Meng]] (AUTHOR)
+- [[haiqing-guo|Haiqing Guo]] (AUTHOR)
+- [[jacob-austin|Jacob Austin]] (AUTHOR)
+- [[yutao-sun|Yutao Sun]] (AUTHOR)
+- [[jan-kautz|Jan Kautz]] (AUTHOR)
+- [[tri-dao|Tri Dao]] (AUTHOR)
+- [[sanjiv-kumar|Sanjiv Kumar]] (AUTHOR)
+- [[moonshotai|MoonshotAI]] (ORGANIZATION)
+- [[yongyi-yang|Yongyi Yang]] (AUTHOR)
+- [[angelos-katharopoulos|Angelos Katharopoulos]] (AUTHOR)
+- [[ming-wei|Ming Wei]] (AUTHOR)
+- [[deepseek-v3|DeepSeek-V3]] (SYSTEM)
+- [[siamesenorm|SiameseNorm]] (SYSTEM)
+- [[fast-weight-programmers|Fast Weight Programmers]] (SYSTEM)
+- [[attention-residuals-technical-report|Attention Residuals TECHNICAL REPORT]] (BOOK)
+- [[dzmitry-bahdanau|Dzmitry Bahdanau]] (AUTHOR)
+- [[transformer|Transformer]] (SYSTEM)
+- [[guanduo-chen|Guanduo Chen]] (AUTHOR)
+- [[swa-sliding-window-aggregation|SWA (sliding-window aggregation)]] (CONCEPT)
+- [[tianyu-li|Tianyu Li]] (AUTHOR)
+- [[highway-networks|Highway networks]] (CONCEPT)
+- [[haoyu-lu|Haoyu Lu]] (AUTHOR)
+- [[jinguo-zhu|Jinguo Zhu]] (AUTHOR)
+- [[gaurav-menghani|Gaurav Menghani]] (AUTHOR)
+- [[residual-connections|Residual connections]] (CONCEPT)
+- [[keel|KEEL]] (SYSTEM)
+- [[tsendsuren-munkhdalai|Tsendsuren Munkhdalai]] (AUTHOR)
+- [[laurel|LAuReL]] (SYSTEM)
+- [[junjie-yan|Junjie Yan]] (AUTHOR)
+- [[jingyuan-liu|Jingyuan Liu]] (AUTHOR)
+- [[yunpeng-tai|Yunpeng Tai]] (AUTHOR)
+- [[xinyu-zhou|Xinyu Zhou]] (AUTHOR)
+- [[phase-1|Phase 1]] (CONCEPT)
+- [[toan-q-nguyen|Toan Q. Nguyen]] (AUTHOR)
+- [[albert-gu|Albert Gu]] (AUTHOR)
+- [[chao-hong|Chao Hong]] (AUTHOR)
+- [[mark-chen|Mark Chen]] (AUTHOR)
+- [[wsd-warmup-stable-decay-learning-rate-schedule|WSD (Warmup–Stable–Decay) learning rate schedule]] (CONCEPT)
+- [[haonan-li|Haonan Li]] (AUTHOR)
+- [[jianyang-gao|Jianyang Gao]] (AUTHOR)
+- [[yifan-zhang|Yifan Zhang]] (AUTHOR)
+- [[yubo-wang|Yubo Wang]] (AUTHOR)
+- [[yuzhi-wang|Yuzhi Wang]] (AUTHOR)
+- [[shaowei-liu|Shaowei Liu]] (AUTHOR)
+- [[tian-xie|Tian Xie]] (AUTHOR)
+- [[online-softmax|online softmax]] (CONCEPT)
+- [[deepnorm|DeepNorm]] (SYSTEM)
+- [[robert-a-jacobs|Robert A. Jacobs]] (AUTHOR)
+- [[ashish-vaswani|Ashish Vaswani]] (AUTHOR)
+- [[openai|OpenAI]] (ORGANIZATION)
+- [[jeffrey-flanigan|Jeffrey Flanigan]] (AUTHOR)
+- [[matthew-e-peters|Matthew E. Peters]] (AUTHOR)
+- [[karl-cobbe|Karl Cobbe]] (AUTHOR)
+- [[yu-zhang|Yu Zhang]] (AUTHOR)
+- [[phase-2|Phase 2]] (CONCEPT)
+- [[yanru-chen|Yanru Chen]] (AUTHOR)
+- [[hugo-touvron|Hugo Touvron]] (AUTHOR)
+- [[yanwen-fang|Yanwen Fang]] (AUTHOR)
+- [[zhijian-zhuo|Zhijian Zhuo]] (AUTHOR)
+- [[dreamer|Dreamer]] (SYSTEM)
+- [[jared-kaplan|Jared Kaplan]] (AUTHOR)
+- [[kimi-team|Kimi Team]] (ORGANIZATION)
+- [[kazuki-irie|Kazuki Irie]] (AUTHOR)
+- [[yu-sun|Yu Sun]] (AUTHOR)
+- [[yucheng-wang|Yucheng Wang]] (AUTHOR)
+- [[deepseek-ai|DeepSeek-AI]] (ORGANIZATION)
+- [[andrey-gromov|Andrey Gromov]] (AUTHOR)
+- [[test-time-training-ttt|Test-Time Training (TTT)]] (CONCEPT)
+- [[yutian-chen|Yutian Chen]] (AUTHOR)
+- [[zhanchao-zhou|Zhanchao Zhou]] (AUTHOR)
+- [[brian-mak|Brian Mak]] (AUTHOR)
+- [[rupesh-kumar-srivastava|Rupesh Kumar Srivastava]] (AUTHOR)
+- [[bowen-peng|Bowen Peng]] (AUTHOR)
+- [[ancre|ANCRe]] (SYSTEM)
+- [[matteo-pagliardini|Matteo Pagliardini]] (AUTHOR)
+- [[defa-zhu|Defa Zhu]] (AUTHOR)
+- [[mrla|MRLA]] (SYSTEM)
+- [[rmsnorm|RMSNorm]] (CONCEPT)
+- [[da-xiao|Da Xiao]] (AUTHOR)
+- [[shu-zhong|Shu Zhong]] (AUTHOR)
+- [[yulun-du|Yulun Du]] (AUTHOR)
+- [[moonlight|Moonlight]] (SYSTEM)
+- [[julian-salazar|Julian Salazar]] (AUTHOR)
+- [[j-rgen-schmidhuber|Jürgen Schmidhuber]] (AUTHOR)
+- [[mhc|mHC]] (SYSTEM)
+- [[gla|GLA]] (SYSTEM)
+
+## Relations
+- Attention Residuals TECHNICAL REPORT → AUTHORED_BY → Kimi Team
+- Kimi Team → PART_OF → MoonshotAI
+- Block AttnRes → PART_OF → Attention Residuals TECHNICAL REPORT
+- Attention Residuals TECHNICAL REPORT → RELATED_TO → PreNorm baseline
+- Attention Residuals TECHNICAL REPORT → USES → Kimi Linear architecture
+- Block AttnRes → USES → Kimi Linear architecture
+- Attention Residuals TECHNICAL REPORT → RELATED_TO → Residual connections
+- Transformer → RELATED_TO → RNNs
+- Attention Residuals TECHNICAL REPORT → RELATED_TO → Transformer
+- Highway networks → RELATED_TO → Residual connections
+- Phase 2 → USES → online softmax
+- Kimi Linear architecture → RELATED_TO → Moonlight
+- Kimi Linear architecture → RELATED_TO → DeepSeek-V3
+- Kimi Linear architecture → USES → Kimi Delta Attention (KDA)
+- Kimi Linear architecture → USES → Multi-Head Latent Attention (MLA)
+- Full AttnRes → USES → RMSNorm
+- Kimi Linear architecture → USES → Muon optimizer
+- Kimi Linear architecture → USES → WSD (Warmup–Stable–Decay) learning rate schedule
+- MRLA → RELATED_TO → GLA
+- Test-Time Training (TTT) → RELATED_TO → Fast Weight Programmers
+- Block AttnRes → RELATED_TO → Full AttnRes
+- DDL → RELATED_TO → DeltaNet
+- SiameseNorm → USES → PreNorm baseline
+- SiameseNorm → USES → PostNorm
+- Hyper-Connections → RELATED_TO → mHC

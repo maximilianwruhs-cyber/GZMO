@@ -1,0 +1,22 @@
+{
+  "uri": "bolt://192.168.31.202:7687",
+  "edges": 500,
+  "nodes": 507,
+  "clusters_written": [
+    {
+      "domain": "generated-neo4j-cluster1",
+      "nodes": 158,
+      "path": "/home/maximilian-wruhs/Projects/_foundation-audit/survey_GZMO/data/pedagogy/graphs/pending/generated-neo4j-cluster1.yaml"
+    },
+    {
+      "domain": "generated-neo4j-cluster2",
+      "nodes": 57,
+      "path": "/home/maximilian-wruhs/Projects/_foundation-audit/survey_GZMO/data/pedagogy/graphs/pending/generated-neo4j-cluster2.yaml"
+    },
+    {
+      "domain": "generated-neo4j-cluster3",
+      "nodes": 55,
+      "path": "/home/maximilian-wruhs/Projects/_foundation-audit/survey_GZMO/data/pedagogy/graphs/pending/generated-neo4j-cluster3.yaml"
+    }
+  ]
+}

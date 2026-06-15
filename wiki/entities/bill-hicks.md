@@ -1,0 +1,17 @@
+---
+type: entity
+title: Bill Hicks
+created: 2026-06-09
+updated: 2026-06-09
+sources: 1
+tags: []
+status: draft
+gzmo_synthetic: true
+---
+
+# Bill Hicks
+
+Type: PERSON
+
+## From [[the-archival-truth-part1-micro07|the-archival-truth-part1-micro07]] (2026-06-09)
+- Is cited for his aggressive philosophical rants.

@@ -32,6 +32,7 @@ pub mod chaos;
 pub mod engine;
 pub mod thoughts;
 pub mod feedback;
+pub mod feedback_ipc;
 pub mod pulse;
 pub mod triggers;
 

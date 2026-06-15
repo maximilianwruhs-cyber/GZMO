@@ -4,11 +4,27 @@ target/
 # ── Secrets & local config ───────────────────────────────────────────────
 .env
 .env.local
+.env.*
+!.env.template
 *.pem
 *.key
+.mcp.json
 
 # Local operator config (copy from gzmo.toml.example)
 gzmo.toml
+config/shared-mcp-memory.json
+
+# Accidental home / IDE dotfiles (never commit)
+.bash_profile
+.bashrc
+.zshrc
+.zprofile
+.profile
+.gitconfig
+.claude/
+.idea/
+.vscode/
+.ripgreprc
 
 # ── Runtime / agent state (never commit) ───────────────────────────────────
 /memory/
@@ -32,6 +48,21 @@ CHAOS_STATE.json
 data/HEARTBEAT.md
 data/pi-frontend-session.id
 data/synapse-reader.state.json
+data/kurator-monitor.state.json
+data/synapse-pi-distill.state.json
+data/synapse-pi-display.state.json
+data/synapse-writer-gate.state.json
+data/dice_loop_state.json
+data/chaos_feedback_audit.jsonl
+data/honeypot-confidence-report.json
+data/learner/
+data/skills/
+data/pedagogy/edf_log.jsonl
+data/pedagogy/low_tension_dialogue.jsonl
+data/pi-mentor-discovery-cycle-*.md
+data/cycle-*.md
+cycle-*.md
+chaos_card_output.log
 
 # Keep static seed data
 !data/lore.toml

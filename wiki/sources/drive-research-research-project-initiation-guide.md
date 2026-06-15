@@ -1,0 +1,197 @@
+---
+type: source
+title: drive-research-research-project-initiation-guide
+created: 2026-06-08
+updated: 2026-06-08
+sources: 1
+tags: []
+status: stable
+gzmo_synthetic: true
+---
+
+# drive-research-research-project-initiation-guide
+
+Ingested source summary (2026-06-08).
+
+## Entities
+- [[dropbox|Dropbox]] (TOOL)
+- [[zettelkasten-method|Zettelkasten method]] (CONCEPT)
+- [[pathways-to-knowledge|Pathways to Knowledge]] (CONCEPT)
+- [[adams|Adams]] (PERSON)
+- [[google-docs|Google Docs]] (TOOL)
+- [[prompt|PROMPT]] (CONCEPT)
+- [[bibtex-biblatex|BibTeX / BibLaTeX]] (TOOL)
+- [[sift-framework|SIFT framework]] (CONCEPT)
+- [[big6-skills|Big6 Skills]] (CONCEPT)
+- [[bi-lstm-crf|bi-LSTM-CRF]] (TOOL)
+- [[craap|CRAAP]] (CONCEPT)
+- [[jamie-mckenzie|Jamie McKenzie]] (PERSON)
+- [[the-epistemological-landscape-of-academic-inquiry-models-stages-and-institutional-divergences|The Epistemological Landscape of Academic Inquiry: Models, Stages, and Institutional Divergences]] (BOOK)
+- [[acorn|ACORN]] (CONCEPT)
+- [[maps-of-content-mocs|Maps of Content (MOCs)]] (CONCEPT)
+- [[5-ws|5 Ws]] (CONCEPT)
+- [[finer|FINER]] (CONCEPT)
+- [[prisma-protocol|PRISMA protocol]] (CONCEPT)
+- [[elicit-org|Elicit.org]] (TOOL)
+- [[richardson-et-al-1995|Richardson et al. (1995)]] (PERSON)
+- [[zotero|Zotero]] (TOOL)
+- [[niklas-luhmann|Niklas Luhmann]] (PERSON)
+- [[craapo|CRAAPO]] (CONCEPT)
+- [[raven|RAVEN]] (CONCEPT)
+- [[seven-pillars-of-information-literacy|Seven Pillars of Information Literacy]] (CONCEPT)
+- [[naive-bayes-classifier|Naive Bayes classifier]] (TOOL)
+- [[ape|APE]] (CONCEPT)
+- [[endnote|EndNote]] (TOOL)
+- [[organized-investigator-model|Organized Investigator model]] (CONCEPT)
+- [[helen-thompson|Helen Thompson]] (PERSON)
+- [[picos|PICOS]] (CONCEPT)
+- [[snopes|Snopes]] (ORGANIZATION)
+- [[susan-henley|Susan Henley]] (PERSON)
+- [[tag|TAG]] (CONCEPT)
+- [[clarivate|Clarivate]] (ORGANIZATION)
+- [[seven-pillars-of-information-skills|Seven Pillars of Information Skills]] (CONCEPT)
+- [[declaration-of-helsinki|Declaration of Helsinki]] (CONCEPT)
+- [[personal-knowledge-management-pkm|Personal Knowledge Management (PKM)]] (CONCEPT)
+- [[marjorie-pappas|Marjorie Pappas]] (PERSON)
+- [[robins-i|ROBINS-I]] (TOOL)
+- [[plus|PLUS]] (CONCEPT)
+- [[association-of-research-libraries-arl|Association of Research Libraries (ARL)]] (ORGANIZATION)
+- [[nuremberg-code|Nuremberg Code]] (CONCEPT)
+- [[create|CREATE]] (CONCEPT)
+- [[elsevier|Elsevier]] (ORGANIZATION)
+- [[notion|Notion]] (TOOL)
+- [[juris-m|Juris-M]] (TOOL)
+- [[sconul|SCONUL]] (ORGANIZATION)
+- [[roam-research|Roam Research]] (TOOL)
+- [[lateral-io|Lateral.io]] (TOOL)
+- [[microsoft-word|Microsoft Word]] (TOOL)
+- [[pico|PICo]] (CONCEPT)
+- [[rob-2|RoB 2]] (TOOL)
+- [[grade|GRADE]] (CONCEPT)
+- [[full-fact|Full Fact]] (ORGANIZATION)
+- [[bbc-verify|BBC Verify]] (ORGANIZATION)
+- [[reuters-fact-check|Reuters Fact Check]] (ORGANIZATION)
+- [[david-loertscher|David Loertscher]] (PERSON)
+- [[ollama|Ollama]] (TOOL)
+- [[corporation-for-digital-scholarship|Corporation for Digital Scholarship]] (ORGANIZATION)
+- [[hennesy|Hennesy]] (PERSON)
+- [[refworks|RefWorks]] (TOOL)
+- [[spice|SPICE]] (CONCEPT)
+- [[race|RACE]] (CONCEPT)
+- [[infozone|INFOZONE]] (CONCEPT)
+- [[pgce|PGCE]] (CONCEPT)
+- [[ann-tepe|Ann Tepe]] (PERSON)
+- [[spider|SPIDER]] (CONCEPT)
+- [[libreoffice|LibreOffice]] (TOOL)
+- [[prospero|PROSPERO]] (SYSTEM)
+- [[scholarcy|Scholarcy]] (TOOL)
+- [[latex-editors|LaTeX Editors]] (TOOL)
+- [[michael-b-eisenberg|Michael B. Eisenberg]] (PERSON)
+- [[paperpile|Paperpile]] (TOOL)
+- [[picot-pecot|PICOT/PECOT]] (CONCEPT)
+- [[winnipeg|Winnipeg]] (ORGANIZATION)
+- [[llama-3-8b|Llama 3 (8B)]] (SYSTEM)
+- [[obsidian|Obsidian]] (TOOL)
+- [[structure-notes|Structure Notes]] (CONCEPT)
+- [[research-cycle|Research Cycle]] (CONCEPT)
+- [[support-vector-machine-svm|Support Vector Machine (SVM)]] (TOOL)
+- [[eclipse|ECLIPSE]] (CONCEPT)
+- [[qwen-2-5-7b|Qwen 2.5 (7B)]] (SYSTEM)
+- [[robert-e-berkowitz|Robert E. Berkowitz]] (PERSON)
+- [[care|CARE]] (CONCEPT)
+- [[systematizing-academic-inquiry-a-comprehensive-guide-to-the-modern-research-lifecycle-cognitive-frameworks-and-knowledge-management-architectures|Systematizing Academic Inquiry: A Comprehensive Guide to the Modern Research Lifecycle, Cognitive Frameworks, and Knowledge Management Architectures]] (BOOK)
+- [[mendeley|Mendeley]] (TOOL)
+
+## Relations
+- SCONUL → AUTHORED_BY → Seven Pillars of Information Skills
+- SCONUL → AUTHORED_BY → Seven Pillars of Information Literacy
+- PLUS → RELATED_TO → Systematizing Academic Inquiry: A Comprehensive Guide to the Modern Research Lifecycle, Cognitive Frameworks, and Knowledge Management Architectures
+- PGCE → RELATED_TO → Systematizing Academic Inquiry: A Comprehensive Guide to the Modern Research Lifecycle, Cognitive Frameworks, and Knowledge Management Architectures
+- David Loertscher → AUTHORED_BY → Organized Investigator model
+- Helen Thompson → RELATED_TO → Systematizing Academic Inquiry: A Comprehensive Guide to the Modern Research Lifecycle, Cognitive Frameworks, and Knowledge Management Architectures
+- Susan Henley → RELATED_TO → Systematizing Academic Inquiry: A Comprehensive Guide to the Modern Research Lifecycle, Cognitive Frameworks, and Knowledge Management Architectures
+- Michael B. Eisenberg → AUTHORED_BY → Big6 Skills
+- Robert E. Berkowitz → AUTHORED_BY → Big6 Skills
+- Winnipeg → AUTHORED_BY → INFOZONE
+- Marjorie Pappas → AUTHORED_BY → Pathways to Knowledge
+- Ann Tepe → AUTHORED_BY → Pathways to Knowledge
+- Jamie McKenzie → AUTHORED_BY → Research Cycle
+- Hennesy → RELATED_TO → Systematizing Academic Inquiry: A Comprehensive Guide to the Modern Research Lifecycle, Cognitive Frameworks, and Knowledge Management Architectures
+- Adams → RELATED_TO → Systematizing Academic Inquiry: A Comprehensive Guide to the Modern Research Lifecycle, Cognitive Frameworks, and Knowledge Management Architectures
+- Association of Research Libraries (ARL) → RELATED_TO → Systematizing Academic Inquiry: A Comprehensive Guide to the Modern Research Lifecycle, Cognitive Frameworks, and Knowledge Management Architectures
+- PICOS → RELATED_TO → Systematizing Academic Inquiry: A Comprehensive Guide to the Modern Research Lifecycle, Cognitive Frameworks, and Knowledge Management Architectures
+- PICOT/PECOT → RELATED_TO → Systematizing Academic Inquiry: A Comprehensive Guide to the Modern Research Lifecycle, Cognitive Frameworks, and Knowledge Management Architectures
+- SPIDER → RELATED_TO → Systematizing Academic Inquiry: A Comprehensive Guide to the Modern Research Lifecycle, Cognitive Frameworks, and Knowledge Management Architectures
+- PICo → RELATED_TO → Systematizing Academic Inquiry: A Comprehensive Guide to the Modern Research Lifecycle, Cognitive Frameworks, and Knowledge Management Architectures
+- SPICE → RELATED_TO → Systematizing Academic Inquiry: A Comprehensive Guide to the Modern Research Lifecycle, Cognitive Frameworks, and Knowledge Management Architectures
+- ECLIPSE → RELATED_TO → Systematizing Academic Inquiry: A Comprehensive Guide to the Modern Research Lifecycle, Cognitive Frameworks, and Knowledge Management Architectures
+- Richardson et al. (1995) → RELATED_TO → Systematizing Academic Inquiry: A Comprehensive Guide to the Modern Research Lifecycle, Cognitive Frameworks, and Knowledge Management Architectures
+- FINER → RELATED_TO → Systematizing Academic Inquiry: A Comprehensive Guide to the Modern Research Lifecycle, Cognitive Frameworks, and Knowledge Management Architectures
+- Nuremberg Code → RELATED_TO → Systematizing Academic Inquiry: A Comprehensive Guide to the Modern Research Lifecycle, Cognitive Frameworks, and Knowledge Management Architectures
+- Declaration of Helsinki → RELATED_TO → Systematizing Academic Inquiry: A Comprehensive Guide to the Modern Research Lifecycle, Cognitive Frameworks, and Knowledge Management Architectures
+- PRISMA protocol → RELATED_TO → Systematizing Academic Inquiry: A Comprehensive Guide to the Modern Research Lifecycle, Cognitive Frameworks, and Knowledge Management Architectures
+- PROSPERO → RELATED_TO → PRISMA protocol
+- RoB 2 → RELATED_TO → Systematizing Academic Inquiry: A Comprehensive Guide to the Modern Research Lifecycle, Cognitive Frameworks, and Knowledge Management Architectures
+- ROBINS-I → RELATED_TO → Systematizing Academic Inquiry: A Comprehensive Guide to the Modern Research Lifecycle, Cognitive Frameworks, and Knowledge Management Architectures
+- GRADE → RELATED_TO → Systematizing Academic Inquiry: A Comprehensive Guide to the Modern Research Lifecycle, Cognitive Frameworks, and Knowledge Management Architectures
+- bi-LSTM-CRF → RELATED_TO → Systematizing Academic Inquiry: A Comprehensive Guide to the Modern Research Lifecycle, Cognitive Frameworks, and Knowledge Management Architectures
+- Support Vector Machine (SVM) → RELATED_TO → Systematizing Academic Inquiry: A Comprehensive Guide to the Modern Research Lifecycle, Cognitive Frameworks, and Knowledge Management Architectures
+- Naive Bayes classifier → RELATED_TO → Systematizing Academic Inquiry: A Comprehensive Guide to the Modern Research Lifecycle, Cognitive Frameworks, and Knowledge Management Architectures
+- CRAAP → RELATED_TO → Systematizing Academic Inquiry: A Comprehensive Guide to the Modern Research Lifecycle, Cognitive Frameworks, and Knowledge Management Architectures
+- CRAAPO → RELATED_TO → CRAAP
+- SIFT framework → RELATED_TO → Systematizing Academic Inquiry: A Comprehensive Guide to the Modern Research Lifecycle, Cognitive Frameworks, and Knowledge Management Architectures
+- PROMPT → RELATED_TO → Systematizing Academic Inquiry: A Comprehensive Guide to the Modern Research Lifecycle, Cognitive Frameworks, and Knowledge Management Architectures
+- RAVEN → RELATED_TO → Systematizing Academic Inquiry: A Comprehensive Guide to the Modern Research Lifecycle, Cognitive Frameworks, and Knowledge Management Architectures
+- 5 Ws → RELATED_TO → Systematizing Academic Inquiry: A Comprehensive Guide to the Modern Research Lifecycle, Cognitive Frameworks, and Knowledge Management Architectures
+- ACORN → RELATED_TO → Systematizing Academic Inquiry: A Comprehensive Guide to the Modern Research Lifecycle, Cognitive Frameworks, and Knowledge Management Architectures
+- Full Fact → USES → SIFT framework
+- BBC Verify → USES → SIFT framework
+- Reuters Fact Check → USES → SIFT framework
+- Snopes → USES → SIFT framework
+- RACE → RELATED_TO → Systematizing Academic Inquiry: A Comprehensive Guide to the Modern Research Lifecycle, Cognitive Frameworks, and Knowledge Management Architectures
+- CARE → RELATED_TO → Systematizing Academic Inquiry: A Comprehensive Guide to the Modern Research Lifecycle, Cognitive Frameworks, and Knowledge Management Architectures
+- APE → RELATED_TO → Systematizing Academic Inquiry: A Comprehensive Guide to the Modern Research Lifecycle, Cognitive Frameworks, and Knowledge Management Architectures
+- CREATE → RELATED_TO → Systematizing Academic Inquiry: A Comprehensive Guide to the Modern Research Lifecycle, Cognitive Frameworks, and Knowledge Management Architectures
+- TAG → RELATED_TO → Systematizing Academic Inquiry: A Comprehensive Guide to the Modern Research Lifecycle, Cognitive Frameworks, and Knowledge Management Architectures
+- Qwen 2.5 (7B) → USES → Ollama
+- Llama 3 (8B) → USES → Ollama
+- Personal Knowledge Management (PKM) → RELATED_TO → Systematizing Academic Inquiry: A Comprehensive Guide to the Modern Research Lifecycle, Cognitive Frameworks, and Knowledge Management Architectures
+- Zettelkasten method → RELATED_TO → Personal Knowledge Management (PKM)
+- Niklas Luhmann → AUTHORED_BY → Zettelkasten method
+- Obsidian → USES → Zettelkasten method
+- Notion → USES → Zettelkasten method
+- Roam Research → USES → Zettelkasten method
+- Structure Notes → RELATED_TO → Zettelkasten method
+- Maps of Content (MOCs) → RELATED_TO → Zettelkasten method
+- Scholarcy → RELATED_TO → Personal Knowledge Management (PKM)
+- Elicit.org → RELATED_TO → Personal Knowledge Management (PKM)
+- Lateral.io → RELATED_TO → Personal Knowledge Management (PKM)
+- Obsidian → USES → Scholarcy
+- Notion → USES → Scholarcy
+- Roam Research → USES → Scholarcy
+- Zotero → AUTHORED_BY → Corporation for Digital Scholarship
+- Mendeley → AUTHORED_BY → Elsevier
+- EndNote → AUTHORED_BY → Clarivate
+- Paperpile → RELATED_TO → Systematizing Academic Inquiry: A Comprehensive Guide to the Modern Research Lifecycle, Cognitive Frameworks, and Knowledge Management Architectures
+- Juris-M → RELATED_TO → Zotero
+- BibTeX / BibLaTeX → RELATED_TO → Systematizing Academic Inquiry: A Comprehensive Guide to the Modern Research Lifecycle, Cognitive Frameworks, and Knowledge Management Architectures
+- RefWorks → RELATED_TO → Systematizing Academic Inquiry: A Comprehensive Guide to the Modern Research Lifecycle, Cognitive Frameworks, and Knowledge Management Architectures
+- Zotero → USES → Microsoft Word
+- Zotero → USES → Google Docs
+- Zotero → USES → LibreOffice
+- Mendeley → USES → Microsoft Word
+- RefWorks → USES → Google Docs
+- EndNote → USES → Microsoft Word
+- Mendeley → USES → LibreOffice
+- Paperpile → USES → Google Docs
+- Paperpile → USES → Microsoft Word
+- Juris-M → USES → Microsoft Word
+- Juris-M → USES → Google Docs
+- Juris-M → USES → LibreOffice
+- BibTeX / BibLaTeX → USES → LaTeX Editors
+- RefWorks → USES → Microsoft Word
+- RefWorks → USES → Dropbox
+- Scholarcy → RELATED_TO → Zettelkasten method
+- Elicit.org → RELATED_TO → Zettelkasten method
+- Lateral.io → RELATED_TO → Zettelkasten method
+- Zotero → RELATED_TO → EndNote

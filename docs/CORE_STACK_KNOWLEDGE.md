@@ -43,13 +43,13 @@ Every entity is one card:
   - [NODE:Workstation] Because there is no NVLink, Prime is layer-split across both RTX 5070 Ti GPUs over PCIe (`-sm layer -dev CUDA0,CUDA1`).
 
 ### [NODE:VM200]
-- What: The retrieval-model node (`ollamagpu`) hosting embeddings, rerank, and the librarian.
-- How: VM at `192.168.31.110` with a GTX 1070 8 GB eGPU; serves three llama-server ports.
-- Use: Reached over HTTP from the workstation at `:8081` (embed), `:8082` (rerank), `:8083` (librarian). Deployed via `scripts/vm200/deploy-*.sh`.
+- What: The retrieval-model node (`ollamagpu`) hosting embeddings and rerank.
+- How: VM at `192.168.31.110` with a GTX 1070 8 GB eGPU; serves a single unified retrieval router on `:8081` (`gzmo-embed` + `gzmo-rerank` presets).
+- Use: Reached over HTTP from the workstation at `:8081` for both embed and rerank. Deployed via `scripts/vm200/deploy-retrieval-router.sh`. Librarian distill moved to Prime `:8000`.
 - Why: Offloads light, frequent retrieval work onto cheap older GPU silicon so the workstation GPUs stay dedicated to Prime cognition.
-- Related: [SERVICE:Embed], [SERVICE:Rerank], [SERVICE:Librarian]
+- Related: [SERVICE:Embed], [SERVICE:Rerank]
 - Injected facts:
-  - [NODE:VM200] VM200 (ollamagpu, 192.168.31.110, GTX 1070 eGPU) is the retrieval layer: embeddings :8081, rerank :8082, librarian :8083 — offloaded from the workstation so Prime keeps both 5070 Ti GPUs.
+  - [NODE:VM200] VM200 (ollamagpu, 192.168.31.110, GTX 1070 eGPU) is the retrieval layer: a unified llama-server router on :8081 serving embed + rerank — offloaded from the workstation so Prime keeps both 5070 Ti GPUs. Session distill uses Prime :8000 (VM200 :8082 rerank and :8083 librarian retired).
 
 ### [NODE:LXC101]
 - What: The persistence node — Neo4j, Qdrant, and Redis.
@@ -93,14 +93,14 @@ Every entity is one card:
 
 ### [SERVICE:Prime]
 - What: Production cognition endpoint at `http://localhost:8000/v1` on the workstation.
-- How: Stock llama.cpp `llama-server` serving Qwen3.6-35B-A3B MoE (alias `qwen3.6-35b-mtp`, Q4_K_XL, ctx 131072), dual-GPU layer-split, `GGML_CUDA_DISABLE_GRAPHS=1`. Serves chat, ingest extract+verify, dream, and spark.
-- Use: Start `~/Projects/llama.cpp/prime-bench/start-prime.sh` or systemd `gzmo-prime.service`; health `curl http://localhost:8000/v1/models` → HTTP 200; configured in `gzmo.toml [engine.local]`.
-- Why: One local endpoint for all heavy cognition; MoE gives ~35B quality at ~3B active cost. CUDA graphs are disabled because graph capture corrupts output on the no-NVLink dual-GPU rig.
-- Related: [MODEL:Prime], [CONFIG:engine.local], [NODE:Workstation], [MODEL:Gemma4Cutover]
+- How: Stock llama.cpp `llama-server` serving **Gemma 4 26B-A4B-it** MoE QAT (alias `gemma-4-26b-a4b-it`, ctx **262144**), dual-GPU layer-split, champion profile **draft-mtp+ngram-mod** (assistant Q2_K), f16 KV, CUDA graphs off (`GGML_CUDA_DISABLE_GRAPHS=1`). Serves chat, ingest extract+verify, dream, spark, and session distill.
+- Use: Start `~/Projects/llama.cpp/prime-bench/start-prime-gemma4-26b-a4b-256k.sh` or systemd `gzmo-prime.service`; health `curl http://localhost:8000/v1/models` → HTTP 200; configured in `gzmo.toml [engine.local]`.
+- Why: **Locked over Qwen3.6-35B:** same dual-5070 Ti rig runs **256K ctx** vs Qwen's 128K — more headroom for long ingest chunks, dream REM, and archive-aware chat without cloud.
+- Related: [MODEL:Prime], [CONFIG:engine.local], [NODE:Workstation]
 - Injected facts:
-  - [SERVICE:Prime] Production cognition runs at http://localhost:8000/v1 via stock llama.cpp llama-server; it is the single heavy-inference endpoint for chat, ingest extract/verify, dream, and spark.
-  - [SERVICE:Prime] Start Prime with prime-bench/start-prime.sh (or systemd gzmo-prime.service); confirm health with curl http://localhost:8000/v1/models returning HTTP 200.
-  - [SERVICE:Prime] Prime uses dual RTX 5070 Ti layer-split with GGML_CUDA_DISABLE_GRAPHS=1 because CUDA graph capture corrupts output on the no-NVLink dual-GPU setup.
+  - [SERVICE:Prime] Production cognition runs at http://localhost:8000/v1 via stock llama.cpp llama-server with draft-mtp+ngram-mod champion profile; it is the heavy-inference endpoint for chat, ingest extract/verify, dream, spark, and session distill.
+  - [SERVICE:Prime] Start Prime with start-prime-gemma4-26b-a4b-256k.sh (or systemd gzmo-prime.service); confirm health with curl http://localhost:8000/v1/models returning HTTP 200.
+  - [SERVICE:Prime] Prime is Gemma 4 26B-A4B MoE at ctx 262144 — chosen over Qwen3.6-35B because the same hardware achieves double the context window (256K vs 128K).
 
 ### [SERVICE:Embed]
 - What: GZMO vault/honeypot embedding endpoint.
@@ -114,21 +114,21 @@ Every entity is one card:
 
 ### [SERVICE:Rerank]
 - What: Recall post-filter reranker.
-- How: VM200 `http://192.168.31.110:8082/v1`, model `bge-reranker-v2-m3-q8_0.gguf`, `prefetch_multiplier = 4`.
+- How: VM200 retrieval router `http://192.168.31.110:8081/v1`, model `gzmo-rerank` (Qwen3-Reranker-0.6B), `prefetch_multiplier = 4`.
 - Use: Applied after RRF fusion in `memory_search`; config `gzmo.toml [rerank]`.
 - Why: Cross-encoder reranking sharply improves top-k precision; prefetch 4x gives it candidates to reorder.
 - Related: [PROC:Recall], [CONFIG:rerank]
 - Injected facts:
-  - [SERVICE:Rerank] Recall is post-filtered by the VM200 reranker :8082 (bge-reranker-v2-m3-q8, prefetch_multiplier 4) after RRF fusion, per gzmo.toml [rerank].
+  - [SERVICE:Rerank] Recall is post-filtered by the VM200 reranker preset gzmo-rerank on the :8081 router (Qwen3-Reranker-0.6B, prefetch_multiplier 4) after RRF fusion, per gzmo.toml [rerank]. The legacy standalone :8082 bge reranker is retired.
 
 ### [SERVICE:Librarian]
-- What: Light summarization/extract model for session distill.
-- How: VM200 `http://192.168.31.110:8083/v1`, model `qwen2.5-coder-1.5b-instruct-q4_k_m.gguf`.
-- Use: SessionDistill extract offload; config `gzmo.toml [librarian]`, `use_librarian = true`.
-- Why: Cheap small model handles bulk summarization so Prime is reserved for verification/cognition.
-- Related: [SYSTEM:SessionDistill], [CONFIG:librarian]
+- What: Session distill extract/summary routing profile (points at Prime).
+- How: `http://localhost:8000/v1`, model `gemma-4-26b-a4b-it`, temp 0.2, max_tokens 4096 via `LibrarianConfig::to_engine_profile`.
+- Use: SessionDistill extract + summary; config `gzmo.toml [routing.mappings]` (`distill_* = local`). `[librarian].enabled = false`, `use_librarian = false`.
+- Why: MoE A4B (~4B active params/token) handles distill bulk work on Prime; VM200 :8083 Qwen 1.5B retired.
+- Related: [SYSTEM:SessionDistill], [CONFIG:librarian], [SERVICE:Prime]
 - Injected facts:
-  - [SERVICE:Librarian] The VM200 librarian :8083 (Qwen2.5-1.5B) does light session-distill extraction so Prime is reserved for verification, per gzmo.toml [librarian].
+  - [SERVICE:Librarian] Session distill extract/summary routes to Prime :8000 (gemma-4-26b-a4b-it, temp 0.2) via gzmo.toml [librarian]; VM200 :8083 is deprecated.
 
 ### [SERVICE:PiEmbed]
 - What: Pi knowledge-base embedding endpoint (and GZMO fallback).
@@ -182,12 +182,12 @@ Every entity is one card:
 
 ### [MODEL:Prime]
 - What: The production cognition model.
-- How: Qwen3.6-35B-A3B MoE, Q4_K_XL, alias `qwen3.6-35b-mtp`, served by stock llama.cpp at ctx 131072.
+- How: **Gemma 4 26B-A4B-it** MoE QAT (UD-Q4_K_XL), alias `gemma-4-26b-a4b-it`, served by stock llama.cpp at ctx **262144**.
 - Use: `gzmo.toml [engine.local] model`. Temperature 0.3 for chat; 0.1 deterministic profile for ingest extract.
-- Why: MoE A3B = 35B-class quality at ~3B active params, fitting dual-16 GB GPUs while staying fully local.
-- Related: [SERVICE:Prime], [CONFIG:engine.local], [MODEL:Gemma4Cutover]
+- Why: **256K context on dual 16 GB GPUs** — primary reason for choosing Gemma over Qwen3.6-35B (128K max on same rig). MoE A4B keeps active compute manageable.
+- Related: [SERVICE:Prime], [CONFIG:engine.local]
 - Injected facts:
-  - [MODEL:Prime] The Prime model is Qwen3.6-35B-A3B MoE (Q4_K_XL, alias qwen3.6-35b-mtp) at ctx 131072 — 35B-class quality at ~3B active params so it fits dual 16 GB GPUs locally.
+  - [MODEL:Prime] The Prime model is Gemma 4 26B-A4B-it MoE QAT (alias gemma-4-26b-a4b-it) at ctx 262144 — locked over Qwen3.6-35B for double the context window on the same dual-5070 Ti hardware.
 
 ### [MODEL:Embed]
 - What: Embedding model for GZMO memory.
@@ -200,21 +200,21 @@ Every entity is one card:
 
 ### [MODEL:Rerank]
 - What: Cross-encoder reranker.
-- How: `bge-reranker-v2-m3-q8_0.gguf`.
-- Use: VM200 :8082; recall post-filter.
-- Why: Strong multilingual reranker improves precision after fusion.
+- How: `Qwen3-Reranker-0.6B` (`gzmo-rerank` preset on the VM200 :8081 router).
+- Use: VM200 :8081; recall post-filter.
+- Why: Unifies embed + rerank on one llama-server; shares the Qwen3 retrieval stack.
 - Related: [SERVICE:Rerank]
 - Injected facts:
-  - [MODEL:Rerank] The reranker is bge-reranker-v2-m3-q8 on VM200 :8082, used to post-filter recall candidates.
+  - [MODEL:Rerank] The reranker is Qwen3-Reranker-0.6B (gzmo-rerank preset) on the VM200 :8081 router, used to post-filter recall candidates. The former bge-reranker-v2-m3 on :8082 is retired.
 
 ### [MODEL:Librarian]
-- What: Light summarization model.
-- How: `qwen2.5-coder-1.5b-instruct-q4_k_m.gguf`.
-- Use: VM200 :8083; session distill extract.
-- Why: Cheap bulk summarizer; keeps Prime free.
-- Related: [SERVICE:Librarian]
+- What: Session distill routing alias (same weights as Prime).
+- How: `gemma-4-26b-a4b-it` on Prime `:8000`; librarian profile uses lower temp (0.2) for extract/summary.
+- Use: Session distill extract + summary via `[librarian]` shortcut.
+- Why: Unified stack on champion Prime; MoE keeps per-token cost manageable for off-peak distill cron.
+- Related: [SERVICE:Librarian], [MODEL:Prime]
 - Injected facts:
-  - [MODEL:Librarian] The librarian model is Qwen2.5-Coder-1.5B on VM200 :8083 for light session-distill summaries.
+  - [MODEL:Librarian] The librarian profile uses Prime gemma-4-26b-a4b-it at :8000 (temp 0.2) for session-distill extract and summary.
 
 ### [MODEL:Cloud]
 - What: Optional cloud fallback cognition.
@@ -235,13 +235,13 @@ Every entity is one card:
   - [MODEL:TurboQuant] TurboQuant (~/Projects/llama-cpp-turboquant) is a llama.cpp fork giving ~256K context on ~32 GB VRAM within ~5% perplexity of q8_0, gated by turbo-quality-gate.sh.
 
 ### [MODEL:Gemma4Cutover]
-- What: Planned next Prime profile.
-- How: Gemma 4 31B dense (`gemma-4-31B-it-UD-Q4_K_XL.gguf`) @ 256K via TurboQuant; requires `google-gemma-4-31B-it-interleaved.jinja` with `--jinja` (legacy `--chat-template gemma` causes gibberish).
-- Use: Only after `setup-turboquant-llama.sh` builds and the quality gate passes; do not swap without an eval gate.
-- Why: Larger dense context model is the target once TurboQuant is proven; chat-template caveat avoids Gemma 3 repetition bugs.
-- Related: [MODEL:Prime], [MODEL:TurboQuant], [POLICY:NoBulkSwap]
+- What: **Completed** — Gemma 4 26B-A4B MoE is now Prime (not a future cutover).
+- How: `gemma-4-26B-A4B-it-qat-UD-Q4_K_XL.gguf` @ 262144 via stock llama.cpp; requires `google-gemma-4-31B-it-interleaved.jinja` with `--jinja`.
+- Use: `start-prime-gemma4-26b-a4b-256k.sh`; retired Qwen path is `start-prime.sh` (128K rollback only).
+- Why: 256K ctx on dual 5070 Ti without TurboQuant fork; champion profile draft-mtp+ngram-mod, f16 KV, CUDA graphs off.
+- Related: [MODEL:Prime], [SERVICE:Prime], [POLICY:NoBulkSwap]
 - Injected facts:
-  - [MODEL:Gemma4Cutover] The planned Prime cutover is Gemma 4 31B dense @ 256K via TurboQuant, only after setup-turboquant-llama.sh builds and turbo-quality-gate.sh passes — never swap the engine without an eval gate.
+  - [MODEL:Gemma4Cutover] Prime cutover to Gemma 4 26B-A4B champion (draft-mtp+ngram-mod @ 256K) is complete; Qwen3.6-35B @ 128K is retired to start-prime.sh for rollback only.
   - [MODEL:Gemma4Cutover] Gemma 4 instruct requires google-gemma-4-31B-it-interleaved.jinja with --jinja; the legacy --chat-template gemma (Gemma 3) causes repetition/gibberish.
 
 ---
@@ -259,13 +259,13 @@ Every entity is one card:
 
 ### [CONFIG:engine.local]
 - What: Local Prime engine profile.
-- How: `url = http://localhost:8000/v1`, `model = qwen3.6-35b-mtp`, `temperature = 0.3`, `top_p = 0.95`, `max_tokens = 24576`; ingest extract uses the `local_deterministic` profile at `temperature = 0.1`.
+- How: `url = http://localhost:8000/v1`, `model = gemma-4-26b-a4b-it`, `temperature = 0.3`, `top_p = 0.95`, `max_tokens = 24576`; ingest extract uses the `local_deterministic` profile at `temperature = 0.1`.
 - Use: Active mode set by `[engine] active_mode = "local"`; switch with `/mode`.
-- Why: 24k output cap is a guardrail so a runaway generation fails fast rather than consuming the full 128k context.
+- Why: 24k output cap is a guardrail so a runaway generation fails fast rather than consuming the full 256K context.
 - Related: [SERVICE:Prime], [MODEL:Prime], [CONFIG:ingest]
 - Injected facts:
-  - [CONFIG:engine.local] gzmo.toml [engine.local] points Prime at http://localhost:8000/v1 (qwen3.6-35b-mtp, temp 0.3, max_tokens 24576); ingest extraction uses a deterministic temp 0.1 profile.
-  - [CONFIG:engine.local] The 24576 max_tokens cap is a deliberate guardrail so a looping generation fails fast instead of consuming the full 131072 context.
+  - [CONFIG:engine.local] gzmo.toml [engine.local] points Prime at http://localhost:8000/v1 (gemma-4-26b-a4b-it, temp 0.3, max_tokens 24576); ingest extraction uses a deterministic temp 0.1 profile.
+  - [CONFIG:engine.local] The 24576 max_tokens cap is a deliberate guardrail so a looping generation fails fast instead of consuming the full 262144 context.
 
 ### [CONFIG:ingest]
 - What: IngestEngine gates.
@@ -296,12 +296,12 @@ Every entity is one card:
 
 ### [CONFIG:context_memory]
 - What: Hot-context budget config.
-- How: `archive_threshold = 0.90`, `scratch_max_tokens = 2000`, `context_length = 131072`.
+- How: `archive_threshold = 0.90`, `scratch_max_tokens = 2000`, `context_length = 262144`.
 - Use: Drives context prune → archive → distill at 90% budget.
 - Why: Prevents context overflow while capturing pruned content into the distill pipeline.
 - Related: [SERVICE:Redis], [SYSTEM:DistillWorker], [PROC:Recall]
 - Injected facts:
-  - [CONFIG:context_memory] gzmo.toml [context_memory] prunes hot context at 90% of the 131072 budget (scratch_max_tokens 2000), enqueueing archived content for distillation.
+  - [CONFIG:context_memory] gzmo.toml [context_memory] prunes hot context at 90% of the 262144 budget (scratch_max_tokens 2000), enqueueing archived content for distillation.
 
 ### [CONFIG:subagent]
 - What: Subagent concurrency.
@@ -387,12 +387,12 @@ Every entity is one card:
 
 ### [PROC:Recall]
 - What: The hybrid recall pipeline.
-- How: `recall_rrf` fuses honeypot FTS, evidence FTS, graph/keyword, vector (Qdrant + local), and evidence-vector streams via Reciprocal Rank Fusion, then reranks on VM200 :8082 and diversifies by source_file.
+- How: `recall_rrf` fuses honeypot FTS, evidence FTS, graph/keyword, vector (Qdrant + local), and evidence-vector streams via Reciprocal Rank Fusion, then reranks on the VM200 :8081 router and diversifies by source_file.
 - Use: `gzmo memory search`, `gzmo_memory_search` MCP, Pi bridge.
 - Why: No single retrieval method is enough; RRF + rerank balances lexical, semantic, and graph signals.
 - Related: [SERVICE:Rerank], [CONCEPT:Honeypot], [SERVICE:Qdrant]
 - Injected facts:
-  - [PROC:Recall] Recall (recall_rrf) fuses honeypot FTS, evidence FTS, graph/keyword, and vector streams with RRF, then reranks on VM200 :8082 and diversifies by source_file.
+  - [PROC:Recall] Recall (recall_rrf) fuses honeypot FTS, evidence FTS, graph/keyword, and vector streams with RRF, then reranks on the VM200 :8081 router and diversifies by source_file.
 
 ---
 
@@ -411,12 +411,12 @@ Every entity is one card:
 
 ### [SYSTEM:SessionDistill]
 - What: Turns chat sessions into vault facts.
-- How: 02:15 UTC; reads `data/sessions/*.json`, extracts on the librarian, fact-checks on Prime, promotes to vault + honeypot.
+- How: 02:15 UTC; reads `data/sessions/*.json`, extracts + summarizes on Prime (librarian profile), fact-checks on Prime, promotes to vault + honeypot.
 - Use: `[session_distill]`; also runs via the Redis distill worker on archived context.
 - Why: Captures durable facts from conversations without manual curation of every turn.
 - Related: [SERVICE:Librarian], [SYSTEM:DistillWorker], [PATH:sessions_dir]
 - Injected facts:
-  - [SYSTEM:SessionDistill] SessionDistill ([session_distill], 02:15 UTC) distills data/sessions/*.json into vault+honeypot via librarian extract + Prime fact-check. Currently disabled during clean-slate rebuild.
+  - [SYSTEM:SessionDistill] SessionDistill ([session_distill], 02:15 UTC) distills data/sessions/*.json into vault+honeypot via Prime librarian-profile extract/summary + Prime fact-check.
 
 ### [SYSTEM:Spark]
 - What: Serendipitous recall connecting old and recent memory.

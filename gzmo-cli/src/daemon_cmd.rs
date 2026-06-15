@@ -40,6 +40,7 @@ use gzmo_core::tools::sysadmin::{SysMetricsTool, SysKillTool};
 use gzmo_core::tools::web::WebSearchTool;
 use gzmo_core::tools::memory::{MemoryRecordTool, MemorySearchTool};
 
+use crate::low_tension_dialogue;
 use crate::mentor_ipc::{self, MentorServerState};
 
 pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
@@ -184,6 +185,7 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
         Arc::clone(&dream_verify_gateway),
         Arc::clone(&dream_tools),
         config.dreams.clone(),
+        config.bibliothek.min_dream_cycles,
         Some(Arc::clone(&synapse)),
     ));
     let dream_engine_clone = Arc::clone(&dream_engine);
@@ -221,6 +223,9 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
     let chaos_pulse = chaos_runtime.handle;
     let gateway_rwlock = Arc::new(tokio::sync::RwLock::new(orch_gateway.clone()));
     let state_dir = config.memory.vault_db.parent().unwrap_or(std::path::Path::new("data")).to_path_buf();
+    let dice_loop_data_dir = state_dir.clone();
+    let dice_kurator_cfg = config.kurator.clone();
+    let dice_kurator_root = state_dir.clone();
     let _chaos_bridge = crate::chaos_bootstrap::spawn_snapshot_bridge(
         chaos_pulse.snapshot_rx.clone(),
         gateway_rwlock,
@@ -264,6 +269,100 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
         Ok(s) => { info!("Orchestrator online"); Some(s) }
         Err(e) => { error!("Orchestrator failed: {e}"); None }
     };
+
+    // `/dice` autopoietic loop — fire follow-up rolls when scheduled
+    let dice_loop_config = config.dice.r#loop.clone();
+    let dice_loop_config_full = config.clone();
+    let dice_feedback_tx = chaos_pulse.feedback_tx.clone();
+    let dice_snapshot_rx = chaos_pulse.snapshot_rx.clone();
+    let dice_synapse = Arc::clone(&synapse);
+    tokio::spawn(async move {
+        let registry = gzmo_core::skills::registry::build_chaos_skill_registry(
+            &dice_loop_config_full.pedagogy,
+        );
+        let mut interval = tokio::time::interval(Duration::from_secs(5));
+        loop {
+            interval.tick().await;
+            if !dice_loop_config.enabled {
+                continue;
+            }
+            if !gzmo_core::pedagogy::session::PedagogySession::load(&dice_loop_config_full.pedagogy)
+                .await
+                .map(|s| s.auto_triggers_enabled)
+                .unwrap_or(true)
+            {
+                continue;
+            }
+            let Some(state) = gzmo_core::dice_loop::load_state(&dice_loop_data_dir) else {
+                continue;
+            };
+            let now = Utc::now();
+            if !gzmo_core::dice_loop::is_due(now, &state) {
+                continue;
+            }
+            // Mark state as "in-flight" so the next 5s tick skips it.
+            // schedule_from_roll (called inside the skill) will overwrite with a new fire_at.
+            let _ = gzmo_core::dice_loop::mark_processing(&dice_loop_data_dir, &state);
+            let snap = dice_snapshot_rx.borrow().clone();
+            let die_arg = if state.die_max == 6 { "d6" } else { "d20" };
+            let args = format!("--loop {die_arg}");
+            let gateway = gzmo_core::skills::dispatch::headless_gateway(&dice_loop_config_full, &snap);
+            info!(
+                parent_inv = state.parent_inv,
+                parent_roll = state.parent_roll,
+                chain_depth = state.chain_depth,
+                die = die_arg,
+                "Dice loop: firing scheduled /dice"
+            );
+            match gzmo_core::skills::dispatch::run_registry_skill_with_gateway(
+                &registry,
+                &dice_loop_config_full,
+                "dice",
+                &args,
+                &snap,
+                &dice_feedback_tx,
+                Some(gateway),
+            )
+            .await
+            {
+                Ok(output) => {
+                    if let Some(evidence) = output.evidence {
+                        info!(
+                            roll = evidence.get("roll").and_then(|v| v.as_u64()),
+                            inv = evidence.get("inv").and_then(|v| v.as_u64()),
+                            "Dice loop: follow-up roll complete"
+                        );
+                        let mut data = evidence;
+                        data["display_plain"] =
+                            serde_json::Value::String(gzmo_core::text_util::pi_skill_display(
+                                &output.display,
+                            ));
+                        data["headless"] = serde_json::json!(true);
+                        data["source"] =
+                            serde_json::json!(gzmo_core::bibliothek::WUERFEL_CRON_SOURCE);
+                        dice_synapse.append(&gzmo_core::synapse::SynapseEvent::with_data(
+                            gzmo_core::synapse::EventType::ChaosDiceLoop,
+                            gzmo_core::synapse::EventSource::GzmoDaemon,
+                            data,
+                        ));
+                        if dice_kurator_cfg.enabled {
+                            let kpath = gzmo_core::kurator_monitor::default_state_path(
+                                &dice_kurator_root,
+                            );
+                            if let Err(e) = gzmo_core::kurator_monitor::record_dice_loop_fire(
+                                &dice_synapse,
+                                &kpath,
+                                &dice_kurator_cfg,
+                            ) {
+                                error!(error = %e, "Kurator dice-loop record failed");
+                            }
+                        }
+                    }
+                }
+                Err(e) => error!(error = %e, "Dice loop: follow-up roll failed"),
+            }
+        }
+    });
 
     // Watchers
     let orch_watchers = config.orchestration.watchers.clone();
@@ -474,8 +573,10 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
 
     // Synapse pull — Pi event tail → episodic + session_end → distill pi
     let synapse_cfg = config.synapse_pull.clone();
+    let kurator_cfg = config.kurator.clone();
     let synapse_episodic = FileEpisodicStore::new(&config.memory.directory);
     let synapse_root = qdrant_sync::discover_project_root();
+    let kurator_synapse = Arc::clone(&synapse);
     let synapse_handle = tokio::spawn(async move {
         let mut interval = tokio::time::interval(Duration::from_secs(60));
         let bus_path = synapse_root.join(&synapse_cfg.bus_path);
@@ -505,6 +606,18 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
                             session_end = result.summary.session_end,
                             "Synapse poll complete"
                         );
+                    }
+                    if kurator_cfg.enabled {
+                        let kurator_state =
+                            gzmo_core::kurator_monitor::default_state_path(&synapse_root);
+                        if let Err(e) = gzmo_core::kurator_monitor::process_pi_poll(
+                            &kurator_synapse,
+                            &kurator_state,
+                            &kurator_cfg,
+                            &result.events,
+                        ) {
+                            error!(error = %e, "Kurator monitor failed");
+                        }
                     }
                     if !synapse_cfg.distill_on_session_end {
                         continue;
@@ -682,18 +795,53 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
     let _identity = identity;
     let mentor_chaos_tx = chaos_pulse.feedback_tx.clone();
     let mentor_chaos_snap = chaos_pulse.snapshot_rx.clone();
+    let low_tension_snap = chaos_pulse.snapshot_rx.clone();
     // Pin PulseLoop task — must not drop until daemon exits.
     let _chaos_pulse_keepalive = chaos_pulse;
 
     let mentor_handle = if config.pedagogy.enabled && config.pedagogy.mentor_api_enabled {
         let mentor_state = Arc::new(
-            MentorServerState::boot_with_chaos(
+            mentor_ipc::MentorServerState::boot_with_chaos(
                 config,
                 Some(mentor_chaos_tx),
                 Some(mentor_chaos_snap),
             )
             .await?,
         );
+
+        if config.pedagogy.low_tension_dialogue.enabled {
+            let lt_state = Arc::clone(&mentor_state);
+            let lt_cfg = config.pedagogy.low_tension_dialogue.clone();
+            let lt_log = config
+                .memory
+                .vault_db
+                .parent()
+                .unwrap_or(std::path::Path::new("data"))
+                .join("pedagogy/low_tension_dialogue.jsonl");
+            let lt_gzmo_root = config
+                .memory
+                .vault_db
+                .parent()
+                .unwrap_or(std::path::Path::new("data"))
+                .parent()
+                .unwrap_or(std::path::Path::new("."))
+                .to_path_buf();
+            let lt_scripts_root = config.pedagogy.discovery_scripts_root.clone();
+            let lt_tools = Some(Arc::clone(&dream_tools));
+            tokio::spawn(async move {
+                low_tension_dialogue::run_low_tension_watcher(
+                    lt_state,
+                    low_tension_snap,
+                    lt_cfg,
+                    lt_scripts_root,
+                    lt_log,
+                    lt_gzmo_root,
+                    lt_tools,
+                )
+                .await;
+            });
+        }
+
         let mentor_socket = mentor_ipc::socket_path(config);
         info!(path = %mentor_socket.display(), "Starting mentor API");
         Some(tokio::spawn(async move {

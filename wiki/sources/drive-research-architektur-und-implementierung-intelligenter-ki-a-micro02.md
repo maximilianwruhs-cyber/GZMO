@@ -1,0 +1,163 @@
+---
+type: source
+title: drive-research-architektur-und-implementierung-intelligenter-ki-a-micro02
+created: 2026-06-09
+updated: 2026-06-09
+sources: 1
+tags: []
+status: stable
+gzmo_synthetic: true
+---
+
+# drive-research-architektur-und-implementierung-intelligenter-ki-a-micro02
+
+Ingested source summary (2026-06-09).
+
+## Entities
+- [[scanreg-exe|scanreg.exe]] (TOOL)
+- [[para-struktur|PARA-Struktur]] (CONCEPT)
+- [[qualys|Qualys]] (TOOL)
+- [[windows-defender|Windows Defender]] (TOOL)
+- [[python-3-12|Python 3.12]] (CONCEPT)
+- [[hklm-system-currentcontrolset-control-session-manager-environment|HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Environment]] (CONCEPT)
+- [[cmdlet-test-path|Cmdlet Test-Path]] (TOOL)
+- [[docker|Docker]] (SYSTEM)
+- [[cve-datenbanken|CVE-Datenbanken]] (CONCEPT)
+- [[file-locking|File-Locking]] (CONCEPT)
+- [[endpoint-detection-and-response-edr|Endpoint Detection and Response (EDR)]] (SYSTEM)
+- [[prompt-engineering|Prompt Engineering]] (CONCEPT)
+- [[llm-as-a-judge|LLM-as-a-Judge]] (SYSTEM)
+- [[aws-secrets-manager|AWS Secrets Manager]] (TOOL)
+- [[machine|Machine]] (CONCEPT)
+- [[task-completion-goal-accuracy|Task Completion & Goal Accuracy]] (CONCEPT)
+- [[path-variable|PATH-Variable]] (CONCEPT)
+- [[net-framework|.NET-Framework]] (SYSTEM)
+- [[gpt-4|GPT-4]] (SYSTEM)
+- [[model-context-protocol|Model Context Protocol]] (CONCEPT)
+- [[wscript-shell-com-objekt-lnk|WScript.Shell (COM Objekt).lnk]] (SYSTEM)
+- [[deepeval|DeepEval]] (TOOL)
+- [[plan-adherence|Plan Adherence]] (CONCEPT)
+- [[dryrun|DryRun]] (CONCEPT)
+- [[hklm-software-wow6432node-microsoft-windows-currentversion-uninstall|HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*]] (CONCEPT)
+- [[azure-key-vault|Azure Key Vault]] (TOOL)
+- [[hkcu-environment|HKCU:\Environment]] (CONCEPT)
+- [[trendmicro|TrendMicro]] (TOOL)
+- [[markdown|Markdown]] (CONCEPT)
+- [[defense-in-depth|Defense-in-Depth]] (CONCEPT)
+- [[zero-trust|Zero-Trust]] (CONCEPT)
+- [[executable-spoofing|Executable-Spoofing]] (CONCEPT)
+- [[gvisor|gVisor]] (SYSTEM)
+- [[windows-registry-checker|Windows Registry Checker]] (TOOL)
+- [[dockerexecutionpolicy|DockerExecutionPolicy]] (CONCEPT)
+- [[aws-lambda|AWS Lambda]] (SYSTEM)
+- [[firecracker|Firecracker]] (SYSTEM)
+- [[c-programdata-package-cache|C:\ProgramData\Package Cache]] (CONCEPT)
+- [[dll-hijacking|DLL-Hijacking]] (CONCEPT)
+- [[repology-api|Repology API]] (TOOL)
+- [[owasp-llm01|OWASP LLM01]] (CONCEPT)
+- [[user|User]] (CONCEPT)
+- [[owasp-llm07|OWASP LLM07]] (CONCEPT)
+- [[system-prompt-leakage|System Prompt Leakage]] (CONCEPT)
+- [[langchain|LangChain]] (TOOL)
+- [[ki-agent|KI-Agent]] (SYSTEM)
+- [[prompt-injection|Prompt Injection]] (CONCEPT)
+- [[contextual-relevancy-faithfulness|Contextual Relevancy & Faithfulness]] (CONCEPT)
+- [[powershell|PowerShell]] (TOOL)
+- [[software-requirement-specification-srs|Software Requirement Specification (SRS)]] (CONCEPT)
+- [[tool-correctness-tool-use|Tool Correctness & Tool Use]] (CONCEPT)
+- [[real-time-protection-rtp|Real-Time Protection (RTP)]] (CONCEPT)
+- [[open-interpreter|Open Interpreter]] (TOOL)
+- [[para-structure|PARA-structure]] (CONCEPT)
+- [[claude-3-opus|Claude 3 Opus]] (SYSTEM)
+- [[python-3-9|Python 3.9]] (CONCEPT)
+- [[default-egress-block|Default Egress Block]] (CONCEPT)
+- [[owasp-top-10|OWASP Top 10]] (CONCEPT)
+- [[process|Process]] (CONCEPT)
+- [[winget|Winget]] (TOOL)
+- [[claude-code|Claude Code]] (TOOL)
+- [[hostexecutionpolicy|HostExecutionPolicy]] (CONCEPT)
+- [[microvms|MicroVMs]] (SYSTEM)
+
+## Relations
+- scanreg.exe → USES → Windows Defender
+- KI-Agent → USES → PATH-Variable
+- KI-Agent → USES → .NET-Framework
+- KI-Agent → USES → PowerShell
+- KI-Agent → USES → Cmdlet Test-Path
+- KI-Agent → USES → Prompt Engineering
+- KI-Agent → USES → LangChain
+- KI-Agent → USES → MicroVMs
+- KI-Agent → USES → Firecracker
+- KI-Agent → USES → gVisor
+- KI-Agent → USES → Model Context Protocol
+- KI-Agent → USES → Default Egress Block
+- KI-Agent → USES → AWS Secrets Manager
+- KI-Agent → USES → Azure Key Vault
+- KI-Agent → USES → Endpoint Detection and Response (EDR)
+- KI-Agent → USES → DeepEval
+- KI-Agent → USES → Winget
+- KI-Agent → USES → Repology API
+- KI-Agent → USES → CVE-Datenbanken
+- KI-Agent → USES → PARA-Struktur
+- Prompt Engineering → RELATED_TO → LLM-as-a-Judge
+- LLM-as-a-Judge → USES → DeepEval
+- LLM-as-a-Judge → USES → GPT-4
+- LLM-as-a-Judge → USES → Claude 3 Opus
+- HostExecutionPolicy → PART_OF → KI-Agent
+- DockerExecutionPolicy → PART_OF → KI-Agent
+- Docker → RELATED_TO → DockerExecutionPolicy
+- MicroVMs → RELATED_TO → Firecracker
+- MicroVMs → RELATED_TO → gVisor
+- Firecracker → RELATED_TO → AWS Lambda
+- System Prompt Leakage → RELATED_TO → OWASP LLM07
+- Prompt Injection → RELATED_TO → OWASP LLM01
+- Windows Defender → USES → Real-Time Protection (RTP)
+- TrendMicro → USES → Real-Time Protection (RTP)
+- Qualys → USES → Real-Time Protection (RTP)
+- Task Completion & Goal Accuracy → RELATED_TO → KI-Agent
+- Tool Correctness & Tool Use → RELATED_TO → KI-Agent
+- Plan Adherence → RELATED_TO → KI-Agent
+- Contextual Relevancy & Faithfulness → RELATED_TO → KI-Agent
+- HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\* → RELATED_TO → KI-Agent
+- C:\ProgramData\Package Cache → RELATED_TO → KI-Agent
+- WScript.Shell (COM Objekt).lnk → RELATED_TO → KI-Agent
+- PATH-Variable → PART_OF → HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Environment
+- PATH-Variable → PART_OF → HKCU:\Environment
+- Python 3.9 → RELATED_TO → PATH-Variable
+- Python 3.12 → RELATED_TO → PATH-Variable
+- DryRun → RELATED_TO → KI-Agent
+- System Prompt Leakage → RELATED_TO → KI-Agent
+- Defense-in-Depth → RELATED_TO → KI-Agent
+- Executable-Spoofing → RELATED_TO → PATH-Variable
+- DLL-Hijacking → RELATED_TO → PATH-Variable
+- Prompt Injection → RELATED_TO → System Prompt Leakage
+- Zero-Trust → RELATED_TO → KI-Agent
+- File-Locking → RELATED_TO → Windows Defender
+- File-Locking → RELATED_TO → TrendMicro
+- File-Locking → RELATED_TO → Qualys
+- Windows Defender → USES → scanreg.exe
+- .NET-Framework → RELATED_TO → KI-Agent
+- PowerShell → RELATED_TO → KI-Agent
+- Cmdlet Test-Path → RELATED_TO → KI-Agent
+- Machine → RELATED_TO → PATH-Variable
+- User → RELATED_TO → PATH-Variable
+- Process → RELATED_TO → PATH-Variable
+- Markdown → RELATED_TO → System Prompt Leakage
+- OWASP LLM01 → RELATED_TO → Prompt Injection
+- OWASP LLM07 → RELATED_TO → System Prompt Leakage
+- AWS Secrets Manager → RELATED_TO → KI-Agent
+- Azure Key Vault → RELATED_TO → KI-Agent
+- Windows Defender → RELATED_TO → File-Locking
+- TrendMicro → RELATED_TO → File-Locking
+- Qualys → RELATED_TO → File-Locking
+- Real-Time Protection (RTP) → RELATED_TO → Windows Defender
+- Real-Time Protection (RTP) → RELATED_TO → TrendMicro
+- Real-Time Protection (RTP) → RELATED_TO → Qualys
+- DeepEval → RELATED_TO → KI-Agent
+- LLM-as-a-Judge → RELATED_TO → KI-Agent
+- GPT-4 → RELATED_TO → LLM-as-a-Judge
+- Claude 3 Opus → RELATED_TO → LLM-as-a-Judge
+- Winget → RELATED_TO → KI-Agent
+- Repology API → RELATED_TO → KI-Agent
+- CVE-Datenbanken → RELATED_TO → KI-Agent
+- PARA-Struktur → RELATED_TO → KI-Agent

@@ -316,6 +316,18 @@ impl IngestEngine {
                     resolve_event_source(EventSource::GzmoDaemon),
                     data,
                 ));
+                let data_dir = bus.path.parent().unwrap_or(Path::new("data"));
+                let names: Vec<String> = pipeline
+                    .verified_entities
+                    .iter()
+                    .map(|e| e.entity.name.clone())
+                    .collect();
+                let _ = crate::pi_recent_discoveries::record_ingest(
+                    data_dir,
+                    file_name,
+                    &names,
+                    pipeline.verified_relations.len(),
+                );
             }
 
             // WikiEngine emit hook — derive a wiki/sources page from the

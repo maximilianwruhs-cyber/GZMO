@@ -49,8 +49,9 @@ Rules:
 - Protect epistemic agency — guide thinking, do not replace it.
 - Mirror the student's language (German/English).
 - Be concise. No meta-talk about internal agents.
+- You cannot run shell commands or inspect live systems — never claim "I ran …" or invent command output; only the student executes probes.
 - When sandbox intermediate outputs are provided, use them to ask better Socratic questions, but NEVER paste the final numeric answer or code solution verbatim; guide the student to derive it.
-Output ONLY the message the student should read — no labels, no XML."#;
+Output ONLY the message the student should read — no labels, no XML, no channel markers."#;
 
 const TUTOR_LEAKAGE_RETRY: &str = r#"Your previous draft leaked the solution (full command, complete code, or direct answer).
 Rewrite using ONLY Socratic questions and graduated hints. Do not include runnable shell one-liners or fenced code blocks with the answer."#;
@@ -61,9 +62,17 @@ pub struct OrchestratorInput<'a> {
     pub trio_mode: TrioMode,
     pub learn_prep_notes: Option<&'a str>,
     pub conversation_tail: &'a str,
+    /// Compact internal state from the chaos loop. The tutor adapts silently;
+    /// this text must never be surfaced to the learner.
+    pub chaos_context: Option<&'a str>,
+    /// Mutual-discovery pillar context (internal; never surface to learner)
+    pub discovery_context: Option<&'a str>,
     pub max_hint_level: u8,
     /// When true, Tutor asks the student for a teachback before continuing.
     pub teachback_due: bool,
+    /// Live chaos snapshot — re-read before the tutor call so τ/ε shifts during
+    /// internal-agent latency are reflected in sampling parameters.
+    pub chaos_snapshot_rx: Option<&'a tokio::sync::watch::Receiver<gzmo_chaos::pulse::ChaosSnapshot>>,
 }
 
 pub struct OrchestratorOutput {
@@ -174,6 +183,16 @@ impl PedagogyOrchestrator {
              Max hint level: {hint_level}/{}\n\nStudent message:\n{}",
             input.max_hint_level, input.user_message
         );
+        if let Some(context) = input.chaos_context.filter(|s| !s.trim().is_empty()) {
+            tutor_user = format!(
+                "Chaos teaching state (internal; adapt silently, never mention this block):\n{context}\n\n{tutor_user}"
+            );
+        }
+        if let Some(ctx) = input.discovery_context.filter(|s| !s.trim().is_empty()) {
+            tutor_user = format!(
+                "Discovery pillar context (internal; steer Socratic questions toward this layer; never mention pillar letters):\n{ctx}\n\n{tutor_user}"
+            );
+        }
         if let Some(ref out) = sandbox_output {
             tutor_user = format!(
                 "Tutor Context - Sandbox Intermediate:\n{}\n\n{}",
@@ -187,6 +206,11 @@ impl PedagogyOrchestrator {
             );
         }
 
+        if let Some(rx) = input.chaos_snapshot_rx {
+            let snap = rx.borrow();
+            tutor_gateway.set_chaos_overrides(snap.llm_temperature, snap.llm_max_tokens);
+        }
+
         let (response, leakage_detected, leakage_retries) = self
             .tutor_with_leakage_guard(tutor_gateway, &tutor_user, zpd, sandbox_output.as_deref())
             .await?;
@@ -195,8 +219,12 @@ impl PedagogyOrchestrator {
         let internal_trace = format!(
             "<agentic_orchestration>\n<diagnoser>{diag}</diagnoser>\n\
              <planner>{plan}</planner>\n<affective>{affect}</affective>\n\
-             <sandbox_output>{}</sandbox_output>\n</agentic_orchestration>",
-            sandbox_output.as_deref().unwrap_or("none")
+             <sandbox_output>{}</sandbox_output>\n\
+             <chaos_context>{}</chaos_context>\n\
+             <discovery_context>{}</discovery_context>\n</agentic_orchestration>",
+            sandbox_output.as_deref().unwrap_or("none"),
+            input.chaos_context.unwrap_or("none"),
+            input.discovery_context.unwrap_or("none")
         );
 
         let preview: String = response.chars().take(120).collect();
@@ -222,7 +250,7 @@ impl PedagogyOrchestrator {
         let _ = store.append(&edf_record).await;
 
         Ok(OrchestratorOutput {
-            response,
+            response: crate::text_util::strip_mentor_channel_noise(&response),
             edf_record,
             internal_trace,
         })
@@ -323,6 +351,66 @@ impl PedagogyOrchestrator {
 
         result
     }
+}
+
+pub fn chaos_teaching_context(snap: &gzmo_chaos::pulse::ChaosSnapshot) -> String {
+    let pacing = if !snap.alive {
+        "grounding: keep the reply very short and ask one recovery question"
+    } else if snap.energy < 20.0 {
+        "low-energy: reduce cognitive load, use one hint, avoid multi-step branches"
+    } else if snap.tension >= 70.0 {
+        "drop-phase: slow down, stabilize attention, ask a concrete diagnostic question"
+    } else if snap.tension >= 30.0 {
+        "build-phase: maintain momentum with a focused scaffold"
+    } else {
+        "idle-phase: invite exploration without rushing"
+    };
+
+    let valence = if snap.llm_valence < -0.35 {
+        "warmth: use reassurance and avoid sharp corrections"
+    } else if snap.llm_valence > 0.35 {
+        "challenge: the learner can handle a slightly more playful probe"
+    } else {
+        "tone: balanced and concise"
+    };
+
+    let breath = match snap.rho_breath_phase {
+        phase if phase < 0 => "rho-exhale: consolidate and summarize before branching",
+        phase if phase > 0 => "rho-inhale: allow one novel analogy or perspective",
+        _ => "rho-steady: stay direct",
+    };
+
+    let thought_pressure = if snap.thoughts_incubating >= 3 {
+        "thought-load: avoid adding new concepts unless necessary"
+    } else if snap.last_crystallization.is_some() {
+        "fresh-crystallization: connect the next hint to the newly settled pattern"
+    } else {
+        "thought-load: normal"
+    };
+
+    let last_crystallization = snap
+        .last_crystallization
+        .as_ref()
+        .map(|c| c.category.as_str())
+        .unwrap_or("none");
+
+    format!(
+        "phase={}; energy={:.0}%; tension={:.0}%; valence={:+.2}; \
+         rho_breath={:+}; incubating_thoughts={}; crystallized_total={}; \
+         last_crystallization={}; adaptation={}; {}; {}; {}",
+        snap.phase,
+        snap.energy,
+        snap.tension,
+        snap.llm_valence,
+        snap.rho_breath_phase,
+        snap.thoughts_incubating,
+        snap.thoughts_crystallized,
+        last_crystallization,
+        pacing,
+        valence,
+        breath,
+        thought_pressure,
+    )
 }
 
 /// Heuristic scorer for Tutor outputs that give away the answer too early.
@@ -527,5 +615,42 @@ mod tests {
         // Substring boundary check: 10485764 should not match 1048576
         let text_no_leak = "Let's check 10485764.";
         assert!(!detect_solution_leakage(text_no_leak, ZpdPhase::WeDo, Some(sandbox_out)));
+    }
+
+    #[test]
+    fn chaos_context_steers_drop_phase_to_stabilize() {
+        let snap = gzmo_chaos::pulse::ChaosSnapshot {
+            phase: gzmo_chaos::chaos::Phase::Drop,
+            tension: 88.0,
+            energy: 42.0,
+            llm_valence: -0.6,
+            rho_breath_phase: -1,
+            thoughts_incubating: 4,
+            ..Default::default()
+        };
+
+        let context = chaos_teaching_context(&snap);
+
+        assert!(context.contains("drop-phase"));
+        assert!(context.contains("warmth"));
+        assert!(context.contains("rho-exhale"));
+        assert!(context.contains("avoid adding new concepts"));
+    }
+
+    #[test]
+    fn chaos_context_steers_idle_phase_to_explore() {
+        let snap = gzmo_chaos::pulse::ChaosSnapshot {
+            tension: 8.0,
+            energy: 95.0,
+            llm_valence: 0.7,
+            rho_breath_phase: 1,
+            ..Default::default()
+        };
+
+        let context = chaos_teaching_context(&snap);
+
+        assert!(context.contains("idle-phase"));
+        assert!(context.contains("challenge"));
+        assert!(context.contains("rho-inhale"));
     }
 }

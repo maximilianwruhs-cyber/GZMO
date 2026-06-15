@@ -1,0 +1,244 @@
+---
+type: source
+title: drive-research-ki-berater-fragebogen-für-kundenanalyse-part2
+created: 2026-06-08
+updated: 2026-06-08
+sources: 1
+tags: []
+status: stable
+gzmo_synthetic: true
+---
+
+# drive-research-ki-berater-fragebogen-für-kundenanalyse-part2
+
+Ingested source summary (2026-06-08).
+
+## Entities
+- [[modul-e-governance-regulierung-ethik-und-ux-vertrauen-trust-compliance|Modul E: Governance, Regulierung, Ethik und UX-Vertrauen (Trust & Compliance)]] (CONCEPT)
+- [[tensorflow|TensorFlow]] (TOOL)
+- [[pytorch|PyTorch]] (TOOL)
+- [[aws|AWS]] (SYSTEM)
+- [[discovery-assessment|Discovery-Assessment]] (TOOL)
+- [[total-cost-of-ownership-tco|Total Cost of Ownership (TCO)]] (CONCEPT)
+- [[data-lineage|Data Lineage]] (CONCEPT)
+- [[ki-strategieberater|KI-Strategieberater]] (PERSON)
+- [[entdecker-defined-level-3|Entdecker / Defined (Level 3)]] (CONCEPT)
+- [[gemini|Gemini]] (SYSTEM)
+- [[modul-b-prozesslandschaft-operations-und-die-analyse-von-ineffizienzen-process-mining|Modul B: Prozesslandschaft, Operations und die Analyse von Ineffizienzen (Process Mining)]] (CONCEPT)
+- [[sensorfusion|Sensorfusion]] (CONCEPT)
+- [[prompt-engineering|Prompt Engineering]] (CONCEPT)
+- [[eit-ai-maturity-tool|EIT AI Maturity Tool]] (TOOL)
+- [[eu-ai-act|EU AI Act]] (CONCEPT)
+- [[ki-adoption|KI-Adoption]] (CONCEPT)
+- [[ai-berater|AI-Berater]] (PERSON)
+- [[machine-vision|Machine Vision]] (TOOL)
+- [[data-literacy|Data Literacy]] (CONCEPT)
+- [[data-readiness|Data Readiness]] (CONCEPT)
+- [[pharmazeutische-industrie-und-life-sciences|Pharmazeutische Industrie und Life Sciences]] (ORGANIZATION)
+- [[datenschutz-grundverordnung-dsgvo|Datenschutz-Grundverordnung (DSGVO)]] (CONCEPT)
+- [[customer-lifetime-value-ltv|Customer Lifetime Value (LTV)]] (CONCEPT)
+- [[google-cloud-platform|Google Cloud Platform]] (ORGANIZATION)
+- [[generative-ki|generative KI]] (CONCEPT)
+- [[anthropic|Anthropic]] (ORGANIZATION)
+- [[unternehmensberatung|Unternehmensberatung]] (CONCEPT)
+- [[automobilindustrie-automotive|Automobilindustrie (Automotive)]] (ORGANIZATION)
+- [[systemischer-bias|systemischer Bias]] (CONCEPT)
+- [[data-scientists|Data Scientists]] (PERSON)
+- [[black-box-ki-modelle|Black-Box-KI-Modelle]] (CONCEPT)
+- [[machine-learning-experten|Machine Learning Experten]] (PERSON)
+- [[modul-c-datenarchitektur-technologische-infrastruktur-und-mlops|Modul C: Datenarchitektur, Technologische Infrastruktur und MLOps]] (CONCEPT)
+- [[ai-data-consultants|AI Data Consultants]] (PERSON)
+- [[chatgpt|ChatGPT]] (SYSTEM)
+- [[claude|Claude]] (SYSTEM)
+- [[fragebogen-framework|Fragebogen-Framework]] (CONCEPT)
+- [[return-on-investment-roi|Return on Investment (ROI)]] (CONCEPT)
+- [[infosys-ai-capability-maturity-model|Infosys AI Capability Maturity Model]] (TOOL)
+- [[prompt-design|Prompt Design]] (CONCEPT)
+- [[hipaa-richtlinien|HIPAA-Richtlinien]] (CONCEPT)
+- [[amazon-sagemaker|Amazon SageMaker]] (SYSTEM)
+- [[likert-skala|Likert-Skala]] (TOOL)
+- [[ovaledge|OvalEdge]] (TOOL)
+- [[anwender-optimized-level-5|Anwender / Optimized (Level 5)]] (CONCEPT)
+- [[predictive-maintenance|Predictive Maintenance]] (CONCEPT)
+- [[k-nstliche-intelligenz-ki|Künstliche Intelligenz (KI)]] (CONCEPT)
+- [[erkunder-repeatable-level-2|Erkunder / Repeatable (Level 2)]] (CONCEPT)
+- [[soft-skills|Soft Skills]] (CONCEPT)
+- [[novize-initial-level-1|Novize / Initial (Level 1)]] (CONCEPT)
+- [[kundenakquise-cac|Kundenakquise (CAC)]] (CONCEPT)
+- [[cloud-native-ml-plattformen|Cloud-native ML-Plattformen]] (SYSTEM)
+- [[executive-sponsorship|Executive Sponsorship]] (CONCEPT)
+- [[fraud-detection|Fraud Detection]] (CONCEPT)
+- [[ai-enhanced-process-mining|AI-enhanced Process Mining]] (CONCEPT)
+- [[ai-canvas|AI Canvas]] (TOOL)
+- [[explainability|Explainability]] (CONCEPT)
+- [[automatisierungsspezialisten|Automatisierungsspezialisten]] (PERSON)
+- [[nlp|NLP]] (TOOL)
+- [[gesch-tzte-gesundheitsdaten-phi|geschützte Gesundheitsdaten (PHI)]] (CONCEPT)
+- [[rag-architekturen|RAG-Architekturen]] (CONCEPT)
+- [[personally-identifiable-information-pii|Personally Identifiable Information (PII)]] (CONCEPT)
+- [[data-engineers|Data Engineers]] (PERSON)
+- [[survey-fatigue|Survey Fatigue]] (CONCEPT)
+- [[vertex-ai|Vertex AI]] (SYSTEM)
+- [[crm-system|CRM-System]] (SYSTEM)
+- [[microsoft-genaiops-maturity-model|Microsoft GenAIOps Maturity Model]] (TOOL)
+- [[ai-readiness|AI-Readiness]] (CONCEPT)
+- [[microsoft-azure|Microsoft Azure]] (SYSTEM)
+- [[data-ownership|Data Ownership]] (CONCEPT)
+- [[discovery-prozess|Discovery-Prozess]] (CONCEPT)
+- [[algorithm-verification-und-conformance-testing|Algorithm Verification und Conformance Testing]] (CONCEPT)
+- [[kundenabwanderungsrate-churn|Kundenabwanderungsrate (Churn)]] (CONCEPT)
+- [[human-in-the-loop|Human-in-the-loop]] (CONCEPT)
+- [[ki-berater|KI-Berater]] (PERSON)
+- [[ethik-compliance-und-regulierungsberater|Ethik-, Compliance- und Regulierungsberater]] (PERSON)
+- [[business-model-canvas|Business Model Canvas]] (TOOL)
+- [[modul-d-arbeitsumfeld-unternehmenskultur-change-management-und-mitbestimmung-people-culture|Modul D: Arbeitsumfeld, Unternehmenskultur, Change Management und Mitbestimmung (People & Culture)]] (CONCEPT)
+- [[change-management-und-trainings-experten|Change-Management- und Trainings-Experten]] (PERSON)
+- [[ki-reifegradmodelle|KI-Reifegradmodelle]] (TOOL)
+- [[data-governance|Data Governance]] (CONCEPT)
+- [[ki-halluzinationen|KI-Halluzinationen]] (CONCEPT)
+- [[celonis-pi-graph|Celonis PI Graph]] (TOOL)
+- [[vorbereiter-managed-level-4|Vorbereiter / Managed (Level 4)]] (CONCEPT)
+- [[finanzwesen-und-retail|Finanzwesen und Retail]] (ORGANIZATION)
+- [[modul-a-strategische-ausrichtung-gesch-ftsmodell-und-marktdynamik-business-strategy-canvas|Modul A: Strategische Ausrichtung, Geschäftsmodell und Marktdynamik (Business Strategy & Canvas)]] (CONCEPT)
+- [[innovations-und-startup-berater|Innovations- und Startup-Berater]] (PERSON)
+- [[dnv-ai-maturity-assessment|DNV AI Maturity Assessment]] (TOOL)
+- [[lego-serious-play|Lego Serious Play]] (TOOL)
+- [[data-drift|Data Drift]] (CONCEPT)
+- [[data-catalog|Data Catalog]] (TOOL)
+- [[large-language-models-llms|Large Language Models (LLMs)]] (SYSTEM)
+- [[knowledge-extraction|Knowledge Extraction]] (CONCEPT)
+- [[fairness-testing|Fairness Testing]] (CONCEPT)
+- [[ki-strategieberatungen|KI-Strategieberatungen]] (ORGANIZATION)
+- [[ki-readiness|KI-Readiness]] (CONCEPT)
+- [[mckinsey|McKinsey]] (ORGANIZATION)
+- [[lilli|Lilli]] (SYSTEM)
+- [[gxp-standards|GxP-Standards]] (CONCEPT)
+- [[python|Python]] (TOOL)
+- [[technologische-implementierer|Technologische Implementierer]] (PERSON)
+- [[few-shot-learning|Few-shot Learning]] (CONCEPT)
+- [[algorithmic-bias|algorithmic bias]] (CONCEPT)
+- [[chain-of-thought-reasoning|Chain-of-thought Reasoning]] (CONCEPT)
+- [[use-case-worksheet|Use Case Worksheet]] (TOOL)
+- [[ai-orchestrator|AI-Orchestrator]] (CONCEPT)
+
+## Relations
+- Künstliche Intelligenz (KI) → RELATED_TO → Unternehmensberatung
+- Lilli → PART_OF → McKinsey
+- AI-Orchestrator → RELATED_TO → Unternehmensberatung
+- AI-Berater → USES → Künstliche Intelligenz (KI)
+- AI-Berater → RELATED_TO → Unternehmensberatung
+- Discovery-Assessment → TOOL → AI-Berater
+- KI-Strategieberater → RELATED_TO → AI-Berater
+- Technologische Implementierer → RELATED_TO → AI-Berater
+- AI Data Consultants → RELATED_TO → AI-Berater
+- Automatisierungsspezialisten → RELATED_TO → AI-Berater
+- Ethik-, Compliance- und Regulierungsberater → RELATED_TO → AI-Berater
+- Ethik-, Compliance- und Regulierungsberater → RELATED_TO → EU AI Act
+- Ethik-, Compliance- und Regulierungsberater → RELATED_TO → Datenschutz-Grundverordnung (DSGVO)
+- Ethik-, Compliance- und Regulierungsberater → RELATED_TO → HIPAA-Richtlinien
+- Innovations- und Startup-Berater → RELATED_TO → AI-Berater
+- Change-Management- und Trainings-Experten → RELATED_TO → AI-Berater
+- Soft Skills → RELATED_TO → AI-Berater
+- ChatGPT → RELATED_TO → Large Language Models (LLMs)
+- Claude → PART_OF → Anthropic
+- Claude → RELATED_TO → Large Language Models (LLMs)
+- Gemini → PART_OF → Google Cloud Platform
+- Gemini → RELATED_TO → Large Language Models (LLMs)
+- KI-Berater → RELATED_TO → AI-Berater
+- AI-Berater → USES → Prompt Engineering
+- AI-Berater → USES → Soft Skills
+- KI-Reifegradmodelle → TOOL → AI-Berater
+- KI-Reifegradmodelle → RELATED_TO → AI-Readiness
+- OvalEdge → RELATED_TO → KI-Reifegradmodelle
+- DNV AI Maturity Assessment → RELATED_TO → KI-Reifegradmodelle
+- Infosys AI Capability Maturity Model → RELATED_TO → KI-Reifegradmodelle
+- EIT AI Maturity Tool → RELATED_TO → KI-Reifegradmodelle
+- Microsoft GenAIOps Maturity Model → RELATED_TO → KI-Reifegradmodelle
+- Data Readiness → RELATED_TO → Künstliche Intelligenz (KI)
+- AI-Readiness → RELATED_TO → Künstliche Intelligenz (KI)
+- Novize / Initial (Level 1) → RELATED_TO → KI-Reifegradmodelle
+- Erkunder / Repeatable (Level 2) → RELATED_TO → KI-Reifegradmodelle
+- Entdecker / Defined (Level 3) → RELATED_TO → KI-Reifegradmodelle
+- Vorbereiter / Managed (Level 4) → RELATED_TO → KI-Reifegradmodelle
+- Anwender / Optimized (Level 5) → RELATED_TO → KI-Reifegradmodelle
+- Technologische Implementierer → USES → Large Language Models (LLMs)
+- Technologische Implementierer → USES → Python
+- Technologische Implementierer → USES → TensorFlow
+- Technologische Implementierer → USES → PyTorch
+- Technologische Implementierer → USES → Cloud-native ML-Plattformen
+- AI Data Consultants → RELATED_TO → Data Readiness
+- Data Scientists → RELATED_TO → AI-Berater
+- Data Engineers → RELATED_TO → AI-Berater
+- Machine Learning Experten → RELATED_TO → AI-Berater
+- Modul C: Datenarchitektur, Technologische Infrastruktur und MLOps → RELATED_TO → Anwender / Optimized (Level 5)
+- Data Drift → RELATED_TO → Anwender / Optimized (Level 5)
+- KI-Berater → USES → Fragebogen-Framework
+- Fragebogen-Framework → PART_OF → Discovery-Assessment
+- Modul A: Strategische Ausrichtung, Geschäftsmodell und Marktdynamik (Business Strategy & Canvas) → RELATED_TO → Business Model Canvas
+- Celonis PI Graph → RELATED_TO → Modul B: Prozesslandschaft, Operations und die Analyse von Ineffizienzen (Process Mining)
+- EU AI Act → RELATED_TO → Modul E: Governance, Regulierung, Ethik und UX-Vertrauen (Trust & Compliance)
+- Datenschutz-Grundverordnung (DSGVO) → RELATED_TO → Modul E: Governance, Regulierung, Ethik und UX-Vertrauen (Trust & Compliance)
+- Lego Serious Play → RELATED_TO → Modul D: Arbeitsumfeld, Unternehmenskultur, Change Management und Mitbestimmung (People & Culture)
+- KI-Berater → USES → Modul A: Strategische Ausrichtung, Geschäftsmodell und Marktdynamik (Business Strategy & Canvas)
+- KI-Berater → USES → Modul B: Prozesslandschaft, Operations und die Analyse von Ineffizienzen (Process Mining)
+- KI-Berater → USES → Modul C: Datenarchitektur, Technologische Infrastruktur und MLOps
+- KI-Berater → USES → Modul D: Arbeitsumfeld, Unternehmenskultur, Change Management und Mitbestimmung (People & Culture)
+- KI-Berater → USES → Modul E: Governance, Regulierung, Ethik und UX-Vertrauen (Trust & Compliance)
+- KI-Adoption → RELATED_TO → Modul A: Strategische Ausrichtung, Geschäftsmodell und Marktdynamik (Business Strategy & Canvas)
+- Likert-Skala → RELATED_TO → Discovery-Assessment
+- Executive Sponsorship → RELATED_TO → Modul A: Strategische Ausrichtung, Geschäftsmodell und Marktdynamik (Business Strategy & Canvas)
+- Return on Investment (ROI) → RELATED_TO → Modul A: Strategische Ausrichtung, Geschäftsmodell und Marktdynamik (Business Strategy & Canvas)
+- Total Cost of Ownership (TCO) → RELATED_TO → Modul A: Strategische Ausrichtung, Geschäftsmodell und Marktdynamik (Business Strategy & Canvas)
+- Customer Lifetime Value (LTV) → RELATED_TO → Modul A: Strategische Ausrichtung, Geschäftsmodell und Marktdynamik (Business Strategy & Canvas)
+- Kundenakquise (CAC) → RELATED_TO → Modul A: Strategische Ausrichtung, Geschäftsmodell und Marktdynamik (Business Strategy & Canvas)
+- Kundenabwanderungsrate (Churn) → RELATED_TO → Modul A: Strategische Ausrichtung, Geschäftsmodell und Marktdynamik (Business Strategy & Canvas)
+- generative KI → RELATED_TO → Modul A: Strategische Ausrichtung, Geschäftsmodell und Marktdynamik (Business Strategy & Canvas)
+- AI-enhanced Process Mining → RELATED_TO → Modul B: Prozesslandschaft, Operations und die Analyse von Ineffizienzen (Process Mining)
+- Machine Learning Experten → RELATED_TO → AI-enhanced Process Mining
+- NLP → RELATED_TO → Modul C: Datenarchitektur, Technologische Infrastruktur und MLOps
+- RAG-Architekturen → RELATED_TO → Modul C: Datenarchitektur, Technologische Infrastruktur und MLOps
+- Data Governance → RELATED_TO → Modul C: Datenarchitektur, Technologische Infrastruktur und MLOps
+- Data Lineage → RELATED_TO → Modul C: Datenarchitektur, Technologische Infrastruktur und MLOps
+- Data Ownership → RELATED_TO → Data Governance
+- Data Catalog → RELATED_TO → Modul C: Datenarchitektur, Technologische Infrastruktur und MLOps
+- OvalEdge → RELATED_TO → Data Catalog
+- AWS → RELATED_TO → Modul C: Datenarchitektur, Technologische Infrastruktur und MLOps
+- Microsoft Azure → RELATED_TO → Modul C: Datenarchitektur, Technologische Infrastruktur und MLOps
+- Google Cloud Platform → RELATED_TO → Modul C: Datenarchitektur, Technologische Infrastruktur und MLOps
+- Amazon SageMaker → RELATED_TO → Modul C: Datenarchitektur, Technologische Infrastruktur und MLOps
+- Vertex AI → RELATED_TO → Modul C: Datenarchitektur, Technologische Infrastruktur und MLOps
+- Personally Identifiable Information (PII) → RELATED_TO → Modul C: Datenarchitektur, Technologische Infrastruktur und MLOps
+- geschützte Gesundheitsdaten (PHI) → RELATED_TO → Modul C: Datenarchitektur, Technologische Infrastruktur und MLOps
+- Data Literacy → RELATED_TO → Modul D: Arbeitsumfeld, Unternehmenskultur, Change Management und Mitbestimmung (People & Culture)
+- Prompt Design → RELATED_TO → Modul D: Arbeitsumfeld, Unternehmenskultur, Change Management und Mitbestimmung (People & Culture)
+- Few-shot Learning → RELATED_TO → Modul D: Arbeitsumfeld, Unternehmenskultur, Change Management und Mitbestimmung (People & Culture)
+- Chain-of-thought Reasoning → RELATED_TO → Modul D: Arbeitsumfeld, Unternehmenskultur, Change Management und Mitbestimmung (People & Culture)
+- Prompt Engineering → RELATED_TO → generative KI
+- AI Canvas → RELATED_TO → Modul D: Arbeitsumfeld, Unternehmenskultur, Change Management und Mitbestimmung (People & Culture)
+- KI-Halluzinationen → RELATED_TO → Modul D: Arbeitsumfeld, Unternehmenskultur, Change Management und Mitbestimmung (People & Culture)
+- systemischer Bias → RELATED_TO → Modul D: Arbeitsumfeld, Unternehmenskultur, Change Management und Mitbestimmung (People & Culture)
+- algorithmic bias → RELATED_TO → Modul E: Governance, Regulierung, Ethik und UX-Vertrauen (Trust & Compliance)
+- Fairness Testing → RELATED_TO → algorithmic bias
+- Explainability → RELATED_TO → Modul E: Governance, Regulierung, Ethik und UX-Vertrauen (Trust & Compliance)
+- Black-Box-KI-Modelle → RELATED_TO → Explainability
+- KI-Berater → USES → Künstliche Intelligenz (KI)
+- KI-Berater → USES → Discovery-Assessment
+- KI-Berater → USES → Use Case Worksheet
+- KI-Strategieberatungen → USES → Discovery-Prozess
+- KI-Strategieberatungen → PART_OF → KI-Berater
+- Large Language Models (LLMs) → USES → Knowledge Extraction
+- generative KI → RELATED_TO → Pharmazeutische Industrie und Life Sciences
+- generative KI → RELATED_TO → Automobilindustrie (Automotive)
+- Predictive Maintenance → RELATED_TO → Automobilindustrie (Automotive)
+- Machine Vision → RELATED_TO → Automobilindustrie (Automotive)
+- Sensorfusion → RELATED_TO → Automobilindustrie (Automotive)
+- Fraud Detection → RELATED_TO → Finanzwesen und Retail
+- Modul B: Prozesslandschaft, Operations und die Analyse von Ineffizienzen (Process Mining) → USES → KI-Readiness
+- KI-Readiness → RELATED_TO → Discovery-Assessment
+- Modul D: Arbeitsumfeld, Unternehmenskultur, Change Management und Mitbestimmung (People & Culture) → RELATED_TO → Discovery-Assessment
+- KI-Berater → RELATED_TO → Human-in-the-loop
+- KI-Berater → RELATED_TO → Algorithm Verification und Conformance Testing
+- KI-Berater → RELATED_TO → Return on Investment (ROI)
+- KI-Berater → USES → Pharmazeutische Industrie und Life Sciences
+- KI-Berater → USES → Automobilindustrie (Automotive)
+- KI-Berater → USES → Finanzwesen und Retail

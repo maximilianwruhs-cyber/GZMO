@@ -1,0 +1,65 @@
+{
+  "run_id": "post-router-qwen3_20260609_075548_live-quality",
+  "profile": "post-router-qwen3",
+  "timestamp": "2026-06-09T07:55:48.482196+00:00",
+  "embed": {
+    "dims": 1024,
+    "n": 30,
+    "p50_ms": 69.0,
+    "p90_ms": 81.69,
+    "p95_ms": 83.54,
+    "p99_ms": 586.53,
+    "mean_ms": 91.29
+  },
+  "rerank": [
+    {
+      "batch_size": 1,
+      "n": 7,
+      "top_score": 0.009681402705609798,
+      "p50_ms": 141.62,
+      "p95_ms": 146.9
+    },
+    {
+      "batch_size": 5,
+      "n": 7,
+      "top_score": 0.009679838083684444,
+      "p50_ms": 464.36,
+      "p95_ms": 666.66
+    },
+    {
+      "batch_size": 15,
+      "n": 7,
+      "top_score": 0.009688674472272396,
+      "p50_ms": 1201.68,
+      "p95_ms": 1248.88
+    },
+    {
+      "batch_size": 40,
+      "n": 7,
+      "top_score": 0.009688674472272396,
+      "p50_ms": 3195.95,
+      "p95_ms": 3351.87
+    }
+  ],
+  "vram": "3485 MiB, 8192 MiB",
+  "memory_search": [
+    {
+      "query": "Obulus quality gate",
+      "wall_ms": 9708.05,
+      "hits": 10,
+      "ok": true
+    },
+    {
+      "query": "VM200 retrieval",
+      "wall_ms": 9767.6,
+      "hits": 10,
+      "ok": true
+    },
+    {
+      "query": "session distill Prime",
+      "wall_ms": 9964.03,
+      "hits": 10,
+      "ok": true
+    }
+  ]
+}

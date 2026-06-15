@@ -1,0 +1,173 @@
+---
+type: source
+title: cybernetics-and-mythos-the-architecture-of-intell-part1
+created: 2026-06-08
+updated: 2026-06-08
+sources: 1
+tags: []
+status: stable
+gzmo_synthetic: true
+---
+
+# cybernetics-and-mythos-the-architecture-of-intell-part1
+
+Ingested source summary (2026-06-08).
+
+## Entities
+- [[plato|Plato]] (PERSON)
+- [[identity-md|IDENTITY.md]] (CONCEPT)
+- [[artificial-intelligence|Artificial Intelligence]] (CONCEPT)
+- [[ai-agent-loop|AI Agent Loop]] (CONCEPT)
+- [[task-level-object-language|Task Level (Object Language)]] (CONCEPT)
+- [[francisco-varela|Francisco Varela]] (PERSON)
+- [[sqlite|SQLite]] (TOOL)
+- [[agents-md|AGENTS.md]] (CONCEPT)
+- [[chromadb|ChromaDB]] (TOOL)
+- [[age-of-noise|Age of Noise]] (CONCEPT)
+- [[viable-system-model-vsm|Viable System Model (VSM)]] (CONCEPT)
+- [[stafford-beer|Stafford Beer]] (PERSON)
+- [[cybernetics-3-0|Cybernetics 3.0]] (CONCEPT)
+- [[latency|latency]] (CONCEPT)
+- [[openclaw-architectures|OpenClaw architectures]] (SYSTEM)
+- [[allostatic-adjustment|allostatic adjustment]] (CONCEPT)
+- [[radical-constructivism|Radical Constructivism]] (CONCEPT)
+- [[heinz-von-foerster|Heinz von Foerster]] (PERSON)
+- [[dreams-md|DREAMS.md]] (CONCEPT)
+- [[socratic-philosophy|Socratic philosophy]] (TOOL)
+- [[second-order-cybernetics|second-order cybernetics]] (CONCEPT)
+- [[reduced-order-surrogate-models-rosms|Reduced Order Surrogate Models (ROSMs)]] (TOOL)
+- [[formal-conversational-protocol-fcop|Formal Conversational Protocol (FCoP)]] (SYSTEM)
+- [[steady-state-model|steady-state model]] (CONCEPT)
+- [[bell-telephone-laboratories|Bell Telephone Laboratories]] (ORGANIZATION)
+- [[positive-feedback|Positive Feedback]] (CONCEPT)
+- [[margaret-mead|Margaret Mead]] (PERSON)
+- [[coordination-layer|Coordination Layer]] (CONCEPT)
+- [[teachback-method|teachback method]] (CONCEPT)
+- [[hegelian-dialectics|Hegelian dialectics]] (CONCEPT)
+- [[llm-instance|LLM instance]] (SYSTEM)
+- [[aeon|Aeon]] (SYSTEM)
+- [[dialectical-prompting-frameworks|dialectical prompting frameworks]] (CONCEPT)
+- [[prosecutor-defender-umpire-architecture|Prosecutor-Defender-Umpire architecture]] (SYSTEM)
+- [[umpire-synthesis-agent|Umpire (Synthesis) Agent]] (SYSTEM)
+- [[epimetheus|Epimetheus]] (CONCEPT)
+- [[semantic-noise|semantic noise]] (CONCEPT)
+- [[information-theory|Information Theory]] (CONCEPT)
+- [[first-order-cybernetics|first-order cybernetics]] (CONCEPT)
+- [[feedback-loop|feedback loop]] (CONCEPT)
+- [[hegelian-principles|Hegelian principles]] (CONCEPT)
+- [[conversation-theory|Conversation Theory]] (CONCEPT)
+- [[large-language-models-llms|Large Language Models (LLMs)]] (SYSTEM)
+- [[stateless-chatbots|Stateless Chatbots]] (SYSTEM)
+- [[norbert-wiener|Norbert Wiener]] (PERSON)
+- [[georg-wilhelm-friedrich-hegel|Georg Wilhelm Friedrich Hegel]] (PERSON)
+- [[single-agent-loops|Single-Agent Loops]] (SYSTEM)
+- [[defender-agent|Defender Agent]] (SYSTEM)
+- [[memory-md|MEMORY.md]] (CONCEPT)
+- [[reinforcement-learning-from-human-feedback-rlhf|Reinforcement Learning from Human Feedback (RLHF)]] (CONCEPT)
+- [[autonomous-ai-agent|Autonomous AI agent]] (SYSTEM)
+- [[effector-sharing|effector sharing]] (CONCEPT)
+- [[proportional-integral-derivative-pid-controllers|Proportional-Integral-Derivative (PID) controllers]] (TOOL)
+- [[macy-conferences|Macy conferences]] (PROJECT)
+- [[negative-feedback|Negative Feedback]] (CONCEPT)
+- [[soul-spec-architecture|Soul Spec architecture]] (CONCEPT)
+- [[prometheus|Prometheus]] (CONCEPT)
+- [[explanatory-level-metalanguage|Explanatory Level (Metalanguage)]] (CONCEPT)
+- [[centaurian-systems|Centaurian systems]] (SYSTEM)
+- [[style-md|STYLE.md]] (CONCEPT)
+- [[warren-weaver|Warren Weaver]] (PERSON)
+- [[gordon-pask|Gordon Pask]] (PERSON)
+- [[henri-poincar|Henri Poincaré]] (PERSON)
+- [[controller|Controller]] (CONCEPT)
+- [[soul-md|SOUL.md]] (CONCEPT)
+- [[active-conversation-protocol-acp|Active Conversation Protocol (ACP)]] (CONCEPT)
+- [[colored-petri-nets-cpn|Colored Petri Nets (CPN)]] (CONCEPT)
+- [[context-layer|Context Layer]] (CONCEPT)
+- [[autopoiesis|autopoiesis]] (CONCEPT)
+- [[shannon-weaver-paradigm|Shannon-Weaver paradigm]] (CONCEPT)
+- [[multi-agent-systems-mas|Multi-Agent Systems (MAS)]] (SYSTEM)
+- [[law-of-requisite-variety|Law of Requisite Variety]] (CONCEPT)
+- [[knowledgeops|KnowledgeOps]] (CONCEPT)
+- [[humberto-maturana|Humberto Maturana]] (PERSON)
+- [[multi-agent-reflection-loops|multi-agent reflection loops]] (CONCEPT)
+- [[shannon-weaver-model|Shannon-Weaver model]] (CONCEPT)
+- [[w-ross-ashby|W. Ross Ashby]] (PERSON)
+- [[social-cybernetics|Social cybernetics]] (CONCEPT)
+- [[faiss|FAISS]] (TOOL)
+- [[topic-based-colored-petri-nets-tb-cspn|Topic-Based Colored Petri Nets (TB-CSPN)]] (SYSTEM)
+- [[prosecutor-agent|Prosecutor Agent]] (SYSTEM)
+- [[claude-shannon|Claude Shannon]] (PERSON)
+- [[sensor|Sensor]] (CONCEPT)
+- [[engineering-noise|engineering noise]] (CONCEPT)
+- [[ernst-von-glasersfeld|Ernst von Glasersfeld]] (PERSON)
+- [[team-syntegrity-model|Team Syntegrity model]] (CONCEPT)
+
+## Relations
+- OpenClaw architectures → USES → SOUL.md
+- Aeon → USES → SOUL.md
+- Soul Spec architecture → USES → SOUL.md
+- IDENTITY.md → PART_OF → Soul Spec architecture
+- STYLE.md → PART_OF → Soul Spec architecture
+- AGENTS.md → PART_OF → Soul Spec architecture
+- MEMORY.md → PART_OF → Soul Spec architecture
+- Norbert Wiener → PART_OF → Macy conferences
+- Claude Shannon → PART_OF → Macy conferences
+- Shannon-Weaver paradigm → RELATED_TO → Claude Shannon
+- Shannon-Weaver paradigm → RELATED_TO → Warren Weaver
+- Conversation Theory → AUTHORED_BY → Gordon Pask
+- teachback method → PART_OF → Conversation Theory
+- Socratic philosophy → RELATED_TO → Plato
+- Active Conversation Protocol (ACP) → RELATED_TO → Henri Poincaré
+- Socratic philosophy → USES → KnowledgeOps
+- Hegelian dialectics → AUTHORED_BY → Georg Wilhelm Friedrich Hegel
+- multi-agent reflection loops → USES → Hegelian principles
+- dialectical prompting frameworks → USES → Hegelian principles
+- Prosecutor-Defender-Umpire architecture → REPLACES → SOUL.md
+- Centaurian systems → RELATED_TO → Multi-Agent Systems (MAS)
+- Context Layer → USES → MEMORY.md
+- Context Layer → USES → DREAMS.md
+- MEMORY.md → PART_OF → OpenClaw architectures
+- DREAMS.md → PART_OF → OpenClaw architectures
+- teachback method → RELATED_TO → Gordon Pask
+- teachback method → RELATED_TO → Conversation Theory
+- Context Layer → USES → SQLite
+- Context Layer → USES → ChromaDB
+- feedback loop → USES → Sensor
+- feedback loop → USES → Controller
+- feedback loop → USES → effector sharing
+- allostatic adjustment → RELATED_TO → effector sharing
+- Information Theory → RELATED_TO → cybernetics
+- Shannon-Weaver model → PART_OF → Information Theory
+- Claude Shannon → AUTHORED_BY → Shannon-Weaver model
+- Shannon-Weaver model → PART_OF → Bell Telephone Laboratories
+- engineering noise → PART_OF → Shannon-Weaver model
+- Warren Weaver → RELATED_TO → Shannon-Weaver model
+- Warren Weaver → RELATED_TO → semantic noise
+- semantic noise → RELATED_TO → Shannon-Weaver model
+- PID controllers → RELATED_TO → latency
+- first-order cybernetics → PART_OF → Macy conferences
+- second-order cybernetics → AUTHORED_BY → Heinz von Foerster
+- second-order cybernetics → RELATED_TO → Margaret Mead
+- second-order cybernetics → RELATED_TO → Radical Constructivism
+- Radical Constructivism → AUTHORED_BY → Ernst von Glasersfeld
+- autopoiesis → AUTHORED_BY → Humberto Maturana
+- autopoiesis → AUTHORED_BY → Francisco Varela
+- second-order cybernetics → RELATED_TO → autopoiesis
+- Law of Requisite Variety → AUTHORED_BY → W. Ross Ashby
+- Conversation Theory → USES → teachback method
+- Conversation Theory → USES → Task Level (Object Language)
+- Conversation Theory → USES → Explanatory Level (Metalanguage)
+- Social cybernetics → USES → steady-state model
+- Viable System Model (VSM) → AUTHORED_BY → Stafford Beer
+- Social cybernetics → USES → Viable System Model (VSM)
+- Social cybernetics → USES → Team Syntegrity model
+- Cybernetics 3.0 → USES → Artificial Intelligence
+- Cybernetics 3.0 → USES → Multi-Agent Systems (MAS)
+- Multi-Agent Systems (MAS) → USES → AI Agent Loop
+- Large Language Models (LLMs) → USES → AI Agent Loop
+- AI Agent Loop → PART_OF → Autonomous AI agent
+- Autonomous AI agent → RELATED_TO → Single-Agent Loops
+- Multi-Agent Systems (MAS) → RELATED_TO → Centaurian systems
+- Gordon Pask → AUTHORED_BY → Conversation Theory
+- Conversation Theory → RELATED_TO → Gordon Pask
+- Centaurian systems → USES → Colored Petri Nets (CPN)
+- Multi-Agent Systems (MAS) → USES → FAISS

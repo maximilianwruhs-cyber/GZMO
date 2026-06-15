@@ -1,0 +1,11 @@
+{
+  "name": "post-router-qwen3",
+  "embed_url": "http://192.168.31.110:8081/v1",
+  "embed_model": "gzmo-embed",
+  "rerank_url": "http://192.168.31.110:8081/v1",
+  "rerank_model": "gzmo-rerank",
+  "vm_host": "192.168.31.110",
+  "ssh_user": "maximilian",
+  "ssh_key": "~/.ssh/id_sidecar_proxmox",
+  "iterations": 30
+}

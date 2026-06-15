@@ -1,0 +1,17 @@
+---
+type: entity
+title: Token-Budget-Aware LLM Reasoning
+created: 2026-06-09
+updated: 2026-06-09
+sources: 1
+tags: []
+status: draft
+gzmo_synthetic: true
+---
+
+# Token-Budget-Aware LLM Reasoning
+
+Type: CONCEPT
+
+## From [[drive-research-agentic-token-economy-blueprint-micro03|drive-research-agentic-token-economy-blueprint-micro03]] (2026-06-09)
+- Framework for LLM reasoning

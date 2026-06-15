@@ -1,0 +1,18 @@
+---
+type: entity
+title: Ladon
+created: 2026-06-08
+updated: 2026-06-08
+sources: 1
+tags: []
+status: draft
+gzmo_synthetic: true
+---
+
+# Ladon
+
+Type: PERSON
+
+## From [[cybernetics-and-mythos-the-architecture-of-intell-part2|cybernetics-and-mythos-the-architecture-of-intell-part2]] (2026-06-08)
+- A dragon.
+- Guarded the Golden Apples of the Hesperides.

@@ -119,6 +119,7 @@ impl Skill for PokerSkill {
             display,
             feedback,
             inject_to_conversation: true,
+            evidence: None,
         })
     }
 }

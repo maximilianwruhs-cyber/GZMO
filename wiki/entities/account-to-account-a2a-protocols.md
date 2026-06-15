@@ -1,0 +1,17 @@
+---
+type: entity
+title: Account-to-Account (A2A) protocols
+created: 2026-06-08
+updated: 2026-06-08
+sources: 1
+tags: []
+status: draft
+gzmo_synthetic: true
+---
+
+# Account-to-Account (A2A) protocols
+
+Type: CONCEPT
+
+## From [[openclaw-autonomous-ai-agents-in-financial-operat|openclaw-autonomous-ai-agents-in-financial-operat]] (2026-06-08)
+- Protocol utilized by moltycash for autonomous transfers.

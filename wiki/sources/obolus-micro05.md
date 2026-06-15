@@ -1,0 +1,250 @@
+---
+type: source
+title: obolus-micro05
+created: 2026-06-09
+updated: 2026-06-09
+sources: 1
+tags: []
+status: stable
+gzmo_synthetic: true
+---
+
+# obolus-micro05
+
+Ingested source summary (2026-06-09).
+
+## Entities
+- [[syft|syft]] (TOOL)
+- [[obulus-obl|Obulus ($OBL)]] (CONCEPT)
+- [[scientific-foundations-for-project-obulus-evo-grid|Scientific Foundations for Project Obulus (Evo-Grid)]] (CONCEPT)
+- [[docker-v29-identity-fields|Docker v29 Identity-Fields]] (CONCEPT)
+- [[openclaw|OpenClaw]] (ORGANIZATION)
+- [[ollama|Ollama]] (TOOL)
+- [[k3s|K3s]] (SYSTEM)
+- [[nixos|NixOS]] (SYSTEM)
+- [[token-agent-obl-watcher|Token-Agent (OBL-Watcher)]] (ORGANIZATION)
+- [[openapi-3-2|OpenAPI 3.2]] (CONCEPT)
+- [[ingest-engineer-agent|Ingest Engineer Agent]] (ORGANIZATION)
+- [[visual-identity-of-project-obulus|Visual Identity of Project Obulus]] (CONCEPT)
+- [[architectural-scout|Architectural-Scout]] (ORGANIZATION)
+- [[gpu-unterst-tzung|GPU-Unterstützung]] (CONCEPT)
+- [[obolus|obolus]] (PROJECT)
+- [[semantisches-llm-monitoring|Semantisches LLM-Monitoring]] (CONCEPT)
+- [[global-efficiency-path-length|Global Efficiency / Path Length (λ)]] (CONCEPT)
+- [[pgvector|pgvector]] (SYSTEM)
+- [[docker-architect|Docker-Architect]] (ORGANIZATION)
+- [[servicebot-db-changelog-md|ServiceBot/DB_CHANGELOG.md]] (SYSTEM)
+- [[docker-compose-ai-stack-yaml|docker-compose.ai-stack.yaml]] (BOOK)
+- [[service-bot-tech-stack-md|SERVICE_BOT_TECH_STACK.md]] (BOOK)
+- [[test-results-md|TEST_RESULTS.md]] (BOOK)
+- [[cve-filtering|CVE-Filtering]] (CONCEPT)
+- [[memory-token-efficiency-md|memory/token_efficiency.md]] (BOOK)
+- [[the-forge-the-engine-of-rebirth|The Forge (The Engine of Rebirth)]] (CONCEPT)
+- [[strategy-analyst|Strategy-Analyst]] (ORGANIZATION)
+- [[fisher-s-fundamental-theorem|Fisher's Fundamental Theorem]] (CONCEPT)
+- [[main-agent-chief-of-staff|Main-Agent (Chief of Staff)]] (ORGANIZATION)
+- [[validator-the-judge|Validator (The Judge)]] (CONCEPT)
+- [[system-hygiene-agent|System Hygiene Agent]] (ORGANIZATION)
+- [[awareness-agent-system-bewusstsein|Awareness Agent (System-Bewusstsein)]] (ORGANIZATION)
+- [[qa-testing-agent|QA-Testing-Agent]] (ORGANIZATION)
+- [[nuc6i7kyk-project|NUC6i7KYK Project]] (PROJECT)
+- [[traefik|Traefik]] (TOOL)
+- [[monitoring-konzept|Monitoring-Konzept]] (CONCEPT)
+- [[nginx-proxy-manager|Nginx Proxy Manager]] (TOOL)
+- [[hebbian-learning-logic|Hebbian Learning Logic]] (CONCEPT)
+- [[the-process|The Process]] (CONCEPT)
+- [[vex-vulnerability-exploitability-exchange|VEX (Vulnerability Exploitability eXchange)]] (CONCEPT)
+- [[docker-sandboxes|Docker Sandboxes]] (TOOL)
+- [[docker-compose-ki-stack-yaml|docker-compose.ki-stack.yaml]] (BOOK)
+- [[global-clustering-coefficient-c|Global Clustering Coefficient (C)]] (CONCEPT)
+- [[the-vessel|The Vessel]] (CONCEPT)
+- [[landauer-s-limit|Landauer's Limit]] (CONCEPT)
+- [[miner-the-gladiator|Miner (The Gladiator)]] (CONCEPT)
+- [[economics|economics]] (CONCEPT)
+- [[efficiency-metric|Efficiency Metric (η)]] (CONCEPT)
+- [[the-evolutionary-engine|The Evolutionary Engine]] (CONCEPT)
+- [[proxy|Φ_proxy]] (CONCEPT)
+- [[intel-nuc|Intel NUC]] (SYSTEM)
+- [[prometheus-2026-standard|Prometheus 2026 standard]] (CONCEPT)
+- [[bot-integrator-agent|Bot Integrator Agent]] (ORGANIZATION)
+- [[proxmox|Proxmox]] (SYSTEM)
+- [[wireguard|WireGuard]] (SYSTEM)
+- [[composite-metrics|Composite Metrics]] (CONCEPT)
+- [[local-sandbox-proof-of-concept|Local Sandbox (Proof of Concept)]] (CONCEPT)
+- [[the-state|The State]] (CONCEPT)
+- [[sbom|SBOM]] (CONCEPT)
+- [[backup-strategy-md|BACKUP_STRATEGY.md]] (BOOK)
+- [[cosign|Cosign]] (TOOL)
+- [[waterline-model|Waterline model]] (CONCEPT)
+- [[backups-wiederherstellung|Backups & Wiederherstellung]] (CONCEPT)
+- [[sandboxing|Sandboxing]] (CONCEPT)
+- [[decentralization|Decentralization]] (CONCEPT)
+- [[neon-conduits|Neon Conduits]] (CONCEPT)
+- [[dhi-standard|DHI-Standard]] (CONCEPT)
+- [[golden-crystals|Golden Crystals]] (CONCEPT)
+- [[mutation-rate|Mutation Rate (μ)]] (CONCEPT)
+- [[promql-3-0|PromQL 3.0+]] (CONCEPT)
+- [[cdi|CDI]] (CONCEPT)
+- [[distroless-docker-images|Distroless-Docker-Images]] (CONCEPT)
+- [[master-image-generation-prompt|Master Image Generation Prompt]] (CONCEPT)
+- [[watt-hour-wh|Watt-hour (Wh)]] (CONCEPT)
+- [[betriebsprozesse|Betriebsprozesse]] (CONCEPT)
+- [[trivy|Trivy]] (TOOL)
+- [[sigstore|Sigstore]] (TOOL)
+- [[db-setup-with-brother-md|DB_SETUP_WITH_BROTHER.md]] (BOOK)
+- [[grey-smoke|Grey Smoke]] (CONCEPT)
+- [[opentelemetry|OpenTelemetry]] (CONCEPT)
+- [[bittensor|Bittensor]] (SYSTEM)
+- [[gzmo|GZMO]] (PERSON)
+- [[alerting|Alerting]] (CONCEPT)
+- [[the-lifeblood|The Lifeblood]] (CONCEPT)
+- [[nvidia-container-toolkit|NVIDIA Container Toolkit]] (TOOL)
+- [[loki|Loki]] (TOOL)
+- [[thermodynamics|thermodynamics]] (CONCEPT)
+- [[rag-db-agent|RAG DB Agent]] (ORGANIZATION)
+- [[grype|grype]] (TOOL)
+- [[ebpf|eBPF]] (CONCEPT)
+- [[postgresql|PostgreSQL]] (SYSTEM)
+- [[devsecops|DevSecOps]] (CONCEPT)
+- [[rootless-docker|Rootless-Docker]] (CONCEPT)
+- [[grafana-alloy|Grafana Alloy]] (TOOL)
+- [[tailscale|Tailscale]] (SYSTEM)
+- [[quality-score-q|Quality score (Q)]] (CONCEPT)
+- [[monitoring-plan-md|MONITORING_PLAN.md]] (BOOK)
+- [[grafana-beyla|Grafana Beyla]] (TOOL)
+- [[agent-health-report|Agent-Health-Report]] (CONCEPT)
+- [[project-obulus-the-evolutionary-grid-evo-grid|Project Obulus: The Evolutionary Grid (Evo-Grid)]] (PROJECT)
+- [[consciousness-metric|Consciousness Metric (Φ)]] (CONCEPT)
+- [[parca|Parca]] (TOOL)
+- [[harden-linux-vm-sh|harden_linux_vm.sh]] (BOOK)
+- [[awareness-termination|Awareness & Termination]] (CONCEPT)
+- [[information-gain-i|Information Gain (I)]] (CONCEPT)
+- [[integrated-information-theory-iit-lite|Integrated Information Theory (IIT Lite)]] (CONCEPT)
+- [[docker-hardened-images|Docker Hardened Images]] (TOOL)
+
+## Relations
+- Monitoring-Konzept → USES → PostgreSQL
+- Monitoring-Konzept → USES → Grafana Alloy
+- Monitoring-Konzept → USES → Prometheus 2026 standard
+- Monitoring-Konzept → USES → Loki
+- Monitoring-Konzept → USES → eBPF
+- Monitoring-Konzept → USES → Grafana Beyla
+- Monitoring-Konzept → USES → OpenAPI 3.2
+- Monitoring-Konzept → USES → PromQL 3.0+
+- Monitoring-Konzept → USES → Distroless-Docker-Images
+- Monitoring-Konzept → USES → Composite Metrics
+- Monitoring-Konzept → USES → Semantisches LLM-Monitoring
+- Monitoring-Konzept → USES → Parca
+- Backups & Wiederherstellung → USES → ServiceBot/DB_CHANGELOG.md
+- Backups & Wiederherstellung → USES → BACKUP_STRATEGY.md
+- RAG DB Agent → USES → PostgreSQL
+- RAG DB Agent → USES → pgvector
+- RAG DB Agent → USES → SERVICE_BOT_TECH_STACK.md
+- RAG DB Agent → USES → DB_SETUP_WITH_BROTHER.md
+- RAG DB Agent → USES → ServiceBot/DB_CHANGELOG.md
+- RAG DB Agent → RELATED_TO → Ingest Engineer Agent
+- RAG DB Agent → RELATED_TO → Bot Integrator Agent
+- Project Obulus: The Evolutionary Grid (Evo-Grid) → RELATED_TO → thermodynamics
+- Project Obulus: The Evolutionary Grid (Evo-Grid) → RELATED_TO → economics
+- Project Obulus: The Evolutionary Grid (Evo-Grid) → USES → Bittensor
+- Project Obulus: The Evolutionary Grid (Evo-Grid) → USES → Obulus ($OBL)
+- Miner (The Gladiator) → USES → Obulus ($OBL)
+- Validator (The Judge) → USES → Obulus ($OBL)
+- The Forge (The Engine of Rebirth) → RELATED_TO → Miner (The Gladiator)
+- The Forge (The Engine of Rebirth) → RELATED_TO → Validator (The Judge)
+- Awareness & Termination → RELATED_TO → Miner (The Gladiator)
+- The Evolutionary Engine → USES → The Forge (The Engine of Rebirth)
+- Decentralization → USES → Bittensor
+- RAG DB Agent → RELATED_TO → Monitoring-Konzept
+- Scientific Foundations for Project Obulus (Evo-Grid) → RELATED_TO → thermodynamics
+- Efficiency Metric (η) → USES → Quality score (Q)
+- Efficiency Metric (η) → USES → Information Gain (I)
+- Efficiency Metric (η) → USES → Obulus ($OBL)
+- Efficiency Metric (η) → USES → Validator (The Judge)
+- Consciousness Metric (Φ) → USES → Integrated Information Theory (IIT Lite)
+- Φ_proxy → USES → Global Clustering Coefficient (C)
+- Φ_proxy → USES → Global Efficiency / Path Length (λ)
+- Φ_proxy → USES → Obulus ($OBL)
+- Mutation Rate (μ) → USES → Fisher's Fundamental Theorem
+- Mutation Rate (μ) → USES → The Forge (The Engine of Rebirth)
+- Hebbian Learning Logic → USES → ObolusBrain.prune()
+- Token-Agent (OBL-Watcher) → USES → Obulus ($OBL)
+- Token-Agent (OBL-Watcher) → USES → Efficiency Metric (η)
+- Token-Agent (OBL-Watcher) → USES → memory/token_efficiency.md
+- The Vessel → RELATED_TO → Intel NUC
+- The Lifeblood → RELATED_TO → Obulus ($OBL)
+- The State → RELATED_TO → Efficiency Metric (η)
+- The Process → RELATED_TO → The Forge (The Engine of Rebirth)
+- Master Image Generation Prompt → USES → Intel NUC
+- Master Image Generation Prompt → USES → Obulus ($OBL)
+- Master Image Generation Prompt → USES → The Forge (The Engine of Rebirth)
+- Master Image Generation Prompt → USES → Efficiency Metric (η)
+- Master Image Generation Prompt → USES → thermodynamics
+- Golden Crystals → RELATED_TO → Efficiency Metric (η)
+- Grey Smoke → RELATED_TO → Efficiency Metric (η)
+- Neon Conduits → RELATED_TO → Obulus ($OBL)
+- GZMO → AUTHORED_BY → Visual Identity of Project Obulus
+- Architectural-Scout → PART_OF → OpenClaw
+- Architectural-Scout → RELATED_TO → QA-Testing-Agent
+- Architectural-Scout → RELATED_TO → Strategy-Analyst
+- Architectural-Scout → RELATED_TO → Main-Agent (Chief of Staff)
+- Architectural-Scout → USES → NUC6i7KYK Project
+- Architectural-Scout → RELATED_TO → K3s
+- Architectural-Scout → RELATED_TO → docker-compose.ai-stack.yaml
+- Docker-Architect → PART_OF → OpenClaw
+- Docker-Architect → USES → docker-compose.ai-stack.yaml
+- Docker-Architect → USES → Ollama
+- Docker-Architect → USES → GPU-Unterstützung
+- Docker-Architect → USES → NVIDIA Container Toolkit
+- Docker-Architect → USES → CDI
+- Docker-Architect → USES → Trivy
+- Docker-Architect → USES → Architectural-Scout
+- Docker-Architect → USES → SBOM
+- Docker-Architect → USES → syft
+- Docker-Architect → USES → grype
+- Docker-Architect → USES → Docker v29 Identity-Fields
+- Docker-Architect → USES → Sigstore
+- Docker-Architect → USES → Cosign
+- Docker-Architect → USES → Nginx Proxy Manager
+- Docker-Architect → USES → Traefik
+- Docker-Architect → USES → DHI-Standard
+- Docker-Architect → USES → Docker Hardened Images
+- Docker-Architect → USES → CVE-Filtering
+- Docker-Architect → USES → VEX (Vulnerability Exploitability eXchange)
+- Docker-Architect → USES → Waterline model
+- Docker-Architect → USES → DevSecOps
+- Docker-Architect → USES → Sandboxing
+- Docker-Architect → USES → Docker Sandboxes
+- Docker-Architect → USES → Rootless-Docker
+- Docker-Architect → USES → docker-compose.ki-stack.yaml
+- System Hygiene Agent → PART_OF → OpenClaw
+- System Hygiene Agent → USES → docker-compose.ai-stack.yaml
+- System Hygiene Agent → USES → Ollama
+- System Hygiene Agent → USES → GPU-Unterstützung
+- System Hygiene Agent → USES → NVIDIA Container Toolkit
+- System Hygiene Agent → USES → CDI
+- System Hygiene Agent → USES → Trivy
+- System Hygiene Agent → USES → Architectural-Scout
+- System Hygiene Agent → USES → SBOM
+- System Hygiene Agent → USES → syft
+- System Hygiene Agent → USES → grype
+- System Hygiene Agent → USES → Docker v29 Identity-Fields
+- System Hygiene Agent → USES → Sigstore
+- System Hygiene Agent → USES → Cosign
+- System Hygiene Agent → USES → Nginx Proxy Manager
+- System Hygiene Agent → USES → Traefik
+- System Hygiene Agent → USES → DHI-Standard
+- System Hygiene Agent → USES → Docker Hardened Images
+- System Hygiene Agent → USES → CVE-Filtering
+- System Hygiene Agent → USES → VEX (Vulnerability Exploitability eXchange)
+- System Hygiene Agent → USES → Waterline model
+- System Hygiene Agent → USES → DevSecOps
+- System Hygiene Agent → USES → Sandboxing
+- System Hygiene Agent → USES → Docker Sandboxes
+- System Hygiene Agent → USES → Rootless-Docker
+- System Hygiene Agent → RELATED_TO → Main-Agent (Chief of Staff)
+- System Hygiene Agent → USES → TEST_RESULTS.md
+- System Hygiene Agent → RELATED_TO → Strategy-Analyst
+- System Hygiene Agent → USES → harden_linux_vm.sh
+- System Hygiene Agent → USES → Agent-Health-Report
+- Awareness Agent (System-Bewusstsein) → PART_OF → OpenClaw

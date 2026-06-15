@@ -20,4 +20,7 @@ if [[ ! -x "$GZMO_BIN" ]]; then
   GZMO_BIN="$ROOT/target/debug/gzmo"
 fi
 
+export GZMO_SYNAPSE_TOOL_CALL_ID="${GZMO_SYNAPSE_TOOL_CALL_ID:-}"
+export GZMO_SYNAPSE_GATE_BYPASS="${GZMO_SYNAPSE_GATE_BYPASS:-}"
+
 exec "$GZMO_BIN" chaos skill "$CMD" $ARGS

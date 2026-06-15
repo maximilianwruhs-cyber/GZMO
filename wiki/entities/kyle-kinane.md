@@ -1,0 +1,17 @@
+---
+type: entity
+title: Kyle Kinane
+created: 2026-06-09
+updated: 2026-06-09
+sources: 1
+tags: []
+status: draft
+gzmo_synthetic: true
+---
+
+# Kyle Kinane
+
+Type: PERSON
+
+## From [[the-archival-truth-part1-micro07|the-archival-truth-part1-micro07]] (2026-06-09)
+- His specials are sometimes broken down on Ari Shaffir's Skeptic Tank.

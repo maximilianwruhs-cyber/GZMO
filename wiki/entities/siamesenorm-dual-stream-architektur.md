@@ -1,0 +1,18 @@
+---
+type: entity
+title: 'SiameseNorm: Dual-Stream Architektur'
+created: 2026-06-09
+updated: 2026-06-09
+sources: 1
+tags: []
+status: draft
+gzmo_synthetic: true
+---
+
+# SiameseNorm: Dual-Stream Architektur
+
+Type: CONCEPT
+
+## From [[ai-research-part8-micro08|ai-research-part8-micro08]] (2026-06-09)
+- Part of 'Normalisierung & Konnektivität'.
+- Proposes a dual-stream architecture that couples Pre-Norm-like and Post-Norm-like streams.

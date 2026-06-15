@@ -1,0 +1,202 @@
+---
+type: source
+title: ai-research-part6-micro04
+created: 2026-06-09
+updated: 2026-06-09
+sources: 1
+tags: []
+status: stable
+gzmo_synthetic: true
+---
+
+# ai-research-part6-micro04
+
+Ingested source summary (2026-06-09).
+
+## Entities
+- [[dateimengen|Dateimengen]] (DATA_VOLUME)
+- [[temporale-workflows|Temporale Workflows]] (WORKFLOW_TYPE)
+- [[cpu-throttling|CPU-Throttling]] (PERFORMANCE_ISSUE)
+- [[allenai-olmo-1b|allenai/OLMo-1B]] (TOKENIZER)
+- [[tree-sitter|tree-sitter]] (PARSER)
+- [[architektur-validierung|Architektur-Validierung]] (PRIORITY)
+- [[autopilot|Autopilot]] (EXECUTION_MODE)
+- [[zero-trust-methodik|Zero-Trust-Methodik]] (METHODOLOGY)
+- [[compiler|Compiler]] (TOOL)
+- [[strategischer-direktor|strategischer Direktor]] (ROLE)
+- [[feature-implementierung|Feature-Implementierung]] (TASK)
+- [[hocheffiziente-expertenteams|hocheffiziente Expertenteams]] (TEAM_TYPE)
+- [[autonome-entwicklung|autonome Entwicklung]] (CONCEPT)
+- [[olmo-1-3b|OLMo-1.3B]] (MODEL)
+- [[stabilit-t|Stabilität]] (QUALITY)
+- [[context-dilution|Context Dilution]] (CONCEPT)
+- [[rmsnorm|RMSNorm]] (NORMALIZATION_TYPE)
+- [[handoffs|Handoffs]] (PROCESS)
+- [[prenorm-dilution|PreNorm Dilution]] (CONCEPT)
+- [[netzwerkzugriff|Netzwerkzugriff]] (ACCESS_RIGHT)
+- [[multi-agenten-orchestrierung|Multi-Agenten-Orchestrierung]] (CONCEPT)
+- [[planung|Planung]] (STAGE)
+- [[json-api|JSON API]] (API)
+- [[tdd-workflows|TDD-Workflows]] (WORKFLOW)
+- [[leaks|Leaks]] (RISK)
+- [[kognitive-last|kognitive Last]] (BURDEN)
+- [[exploration|Exploration]] (TASK)
+- [[association-for-computational-linguistics|Association for Computational Linguistics]] (ORGANIZATION)
+- [[unabh-ngiger-verifikations-sub-agent|unabhängiger Verifikations-Sub-Agent]] (AGENT_TYPE)
+- [[asynchrones-memory|Asynchrones Memory]] (MEMORY_CONFIGURATION)
+- [[ast-basierte-indexierung|AST-basierte Indexierung]] (INDEXING_METHOD)
+- [[symbole|Symbole]] (CODE_ELEMENT)
+- [[deep-interview|Deep-Interview]] (EXECUTION_MODE)
+- [[coderlm-server|CodeRLM-Server]] (SERVER)
+- [[siamesenorm|SiameseNorm]] (CONCEPT)
+- [[workflow-scaffolding|Workflow-Scaffolding]] (LAYER)
+- [[opus|Opus]] (MODEL)
+- [[schwachstellenanalyse|Schwachstellenanalyse]] (TASK)
+- [[strikte-qa|strikte QA]] (PROCESS)
+- [[ralph-ralph|Ralph (ralph)]] (EXECUTION_MODE)
+- [[gvisor-runsc|gVisor (runsc)]] (SANDBOXING_TECHNOLOGY)
+- [[operative-basis|operative Basis]] (FOUNDATION)
+- [[sicher|sicher]] (CHARACTERISTIC)
+- [[python-harnass|Python-Harnass]] (FRAMEWORK_IMPLEMENTATION)
+- [[memory-starvation|Memory-Starvation]] (PERFORMANCE_ISSUE)
+- [[logik-updates|Logik-Updates]] (TASK)
+- [[proaktiv|proaktiv]] (CHARACTERISTIC)
+- [[transformers-without-normalization|Transformers without normalization]] (CONCEPT)
+- [[systemdesign|Systemdesign]] (TASK)
+- [[amp-bf16|AMP (BF16)]] (PRECISION_MODE)
+- [[isolierte-umgebung|isolierte Umgebung]] (ENVIRONMENT)
+- [[entwicklungszyklus-workflow|Entwicklungszyklus-Workflow]] (WORKFLOW)
+- [[adamw|AdamW]] (OPTIMIZER)
+- [[pipeline-audits|Pipeline-Audits]] (TASK)
+- [[advances-in-neural-information-processing-systems|Advances in neural information processing systems]] (PUBLICATION)
+- [[r-umliche-orientierung|räumliche Orientierung]] (ORIENTATION)
+- [[multi-agenten-architektur|Multi-Agenten-Architektur]] (ARCHITECTURE)
+- [[integrationstests|Integrationstests]] (TEST_TYPE)
+- [[hyper-connections|Hyper-connections]] (CONCEPT)
+- [[post-norm|Post-Norm]] (CONCEPT)
+- [[token-verbrauch|Token-Verbrauch]] (RESOURCE_CONSUMPTION)
+- [[mustererkennung|Mustererkennung]] (TASK)
+- [[sub-agenten|Sub-Agenten]] (AGENT_TYPE)
+- [[globbing|Globbing]] (PROBLEM)
+- [[syntax-fixes|Syntax-Fixes]] (TASK)
+- [[context-collapse|Context Collapse]] (PROBLEM)
+- [[direktive|Direktive]] (INSTRUCTION)
+- [[verifikation|Verifikation]] (STAGE)
+- [[frac-connections|Frac-connections]] (CONCEPT)
+- [[kernel-sandboxing|Kernel-Sandboxing]] (SECURITY_MEASURE)
+- [[hybridnorm|Hybridnorm]] (CONCEPT)
+- [[confused-deputy|Confused Deputy]] (SECURITY_PROBLEM)
+- [[kanonisches-guidance-schema|kanonisches Guidance-Schema]] (SCHEMA)
+- [[laborintensive-t-tigkeit|laborintensive Tätigkeit]] (ACTIVITY_TYPE)
+- [[makro-orchestrierungsschicht|Makro-Orchestrierungsschicht]] (LAYER)
+- [[tripartite-architektur|Tripartite-Architektur]] (ARCHITECTURE)
+- [[sicherer-genehmigungsprozess|sicherer Genehmigungsprozess]] (PROCESS)
+- [[root-mean-square-layer-normalization|Root mean square layer normalization]] (CONCEPT)
+- [[residual|ResiDual]] (CONCEPT)
+- [[planlos-ressourcen-verbrennen|planlos Ressourcen verbrennen]] (NEGATIVE_OUTCOME)
+- [[refactorings|Refactorings]] (CODE_ACTIVITY)
+- [[haiku|Haiku]] (MODEL)
+- [[planungs-keywords|Planungs-Keywords]] (KEYWORD_TYPE)
+- [[hellaswag|Hellaswag]] (CONCEPT)
+- [[repository|Repository]] (CODE_STRUCTURE)
+- [[omc-framework|OMC-Framework]] (FRAMEWORK)
+- [[expertenteam|Expertenteam]] (CONCEPT)
+- [[clawhip|clawhip]] (ROUTER)
+- [[arbeitsged-chtnis|Arbeitsgedächtnis]] (MEMORY_TYPE)
+- [[rust-server|Rust-Server]] (SERVER_IMPLEMENTATION)
+- [[minimale-base-images|minimale Base-Images]] (ENVIRONMENT_CONFIGURATION)
+- [[strategischer-prozess|strategischer Prozess]] (PROCESS_TYPE)
+- [[hc|HC]] (CONCEPT)
+- [[claw-code|claw-code]] (FRAMEWORK)
+- [[mhc|mHC]] (CONCEPT)
+- [[qwen3|Qwen3]] (MODEL)
+- [[swiglu|SwiGLU]] (ACTIVATION_FUNCTION)
+- [[rust-port|Rust-Port]] (LANGUAGE_IMPLEMENTATION)
+- [[ultrawork-ulw|Ultrawork (ulw)]] (EXECUTION_MODE)
+- [[capability|Capability]] (PERMISSION)
+- [[abstraktionstiefe|Abstraktionstiefe]] (CONCEPT)
+- [[feature-speed|Feature-Speed]] (PRIORITY)
+- [[multi-agenten-dynamik|Multi-Agenten-Dynamik]] (CONCEPT)
+- [[spezialisierte-agenten-ketten|spezialisierte Agenten-Ketten]] (ARCHITECTURE)
+- [[rechenpower|Rechenpower]] (COMPUTATIONAL_RESOURCE)
+- [[allrounder|Allrounder]] (AGENT_TYPE)
+- [[priorit-tenkonflikte|Prioritätenkonflikte]] (CONFLICT_TYPE)
+- [[abstract-syntax-tree-ast|Abstract Syntax Tree (AST)]] (DATA_STRUCTURE)
+- [[rope|RoPE]] (POSITIONAL_EMBEDDING)
+- [[taskforge|TaskForge]] (SYSTEM)
+- [[strukturelle-integrit-t|strukturelle Integrität]] (QUALITY)
+- [[modell-tier|Modell-Tier]] (TIER)
+- [[ausf-hrungsmodi|Ausführungsmodi]] (MODE)
+- [[kernel-level-isolierung|Kernel-Level-Isolierung]] (ISOLATION_METHOD)
+- [[the-thirteenth-international-conference-on-learning-representations|The Thirteenth International Conference on Learning Representations]] (CONFERENCE)
+- [[so-what-effekt|So what?"-Effekt]] (BENEFIT)
+- [[deterministisch-steuerbar|deterministisch steuerbar]] (CHARACTERISTIC)
+- [[omo|OmO]] (COORDINATION_INSTANCE)
+- [[ambiguit-ts-score|Ambiguitäts-Score]] (METRIC)
+- [[menschliche-freigabe|menschliche Freigabe]] (APPROVAL)
+- [[sicherheitsrisiken|Sicherheitsrisiken]] (RISK)
+- [[kontextfenster|Kontextfenster]] (MEMORY_COMPONENT)
+- [[computer-vision-and-pattern-recognition-conference|Computer Vision and Pattern Recognition Conference]] (CONFERENCE)
+- [[sonnet|Sonnet]] (MODEL)
+- [[human-in-the-loop-hitl|Human-in-the-Loop (HITL)]] (PROCESS)
+- [[telemetrie-daten|Telemetrie-Daten]] (DATA_TYPE)
+- [[native-sparse-attention|Native sparse attention]] (CONCEPT)
+- [[ki-entwicklung|KI-Entwicklung]] (CONCEPT)
+- [[reviews|Reviews]] (TASK)
+- [[asynchroner-event-und-benachrichtigungs-router|asynchroner Event- und Benachrichtigungs-Router]] (COMPONENT_TYPE)
+- [[code-lookup|Code-Lookup]] (TASK)
+- [[spezialisierte-agenten-personas|spezialisierte Agenten-Personas]] (CONCEPT)
+- [[team-mode|Team-Mode]] (EXECUTION_MODE)
+- [[unit-tests|Unit-Tests]] (TEST_TYPE)
+- [[parallelisierung|Parallelisierung]] (STAGE)
+
+## Relations
+- ResiDual → RELATED_TO → SiameseNorm
+- Hyper-connections → RELATED_TO → mHC
+- SiameseNorm → RELATED_TO → Hyper-Connections
+- SiameseNorm → RELATED_TO → mHC
+- OLMo-1.3B → USES → AdamW
+- OLMo-1.3B → USES → allenai/OLMo-1B
+- OMC-Framework → USES → claw-code
+- claw-code → USES → Rust-Port
+- Tripartite-Architektur → PART_OF → OMC-Framework
+- Tripartite-Architektur → PART_OF → clawhip
+- Tripartite-Architektur → PART_OF → OmO
+- OMC-Framework → USES → Planungs-Keywords
+- clawhip → USES → Arbeitsgedächtnis
+- OmO → USES → Handoffs
+- OmO → USES → Prioritätenkonflikte
+- OMC-Framework → USES → spezialisierte Agenten-Personas
+- CodeRLM-Server → USES → AST-basierte Indexierung
+- CodeRLM-Server → USES → tree-sitter
+- CodeRLM-Server → USES → JSON API
+- TaskForge → USES → gVisor (runsc)
+- TaskForge → USES → Kernel-Level-Isolierung
+- OMC-Framework → USES → Ausführungsmodi
+- Autopilot → CONTROLLED_BY → OMC-Framework
+- Team-Mode → USES → Handoffs
+- Ultrawork (ulw) → USES → Sub-Agenten
+- Ralph (ralph) → USES → unabhängiger Verifikations-Sub-Agent
+- Deep-Interview → CALCULATES → Ambiguitäts-Score
+- Entwicklungszyklus-Workflow → HAS_STAGE → Planung
+- Entwicklungszyklus-Workflow → HAS_STAGE → Parallelisierung
+- Entwicklungszyklus-Workflow → HAS_STAGE → Verifikation
+- Planung → USES → Deep-Interview
+- Parallelisierung → USES → Ultrawork (ulw)
+- Verifikation → USES → Ralph (ralph)
+- CodeRLM-Server → USES → Symbole
+- CodeRLM-Server → USES → Repository
+- CodeRLM-Server → PRESERVES → Kontextfenster
+- TaskForge → PREVENTS → Confused Deputy
+- Zero-Trust-Methodik → USES → minimale Base-Images
+- Zero-Trust-Methodik → RESTRICTS → Netzwerkzugriff
+- Zero-Trust-Methodik → RESTRICTS → Compiler
+- Temporale Workflows → REQUIRES → Capability
+- Human-in-the-Loop (HITL) → REQUIRES → menschliche Freigabe
+- Kernel-Level-Isolierung → PROVIDED_BY → gVisor (runsc)
+- Kernel-Sandboxing → USES → gVisor (runsc)
+- Asynchrones Memory → USES → clawhip
+- clawhip → REMOVES → Telemetrie-Daten
+- Multi-Agenten-Architektur → PREVENTS → Confused Deputy
+- Multi-Agenten-Architektur → PREVENTS → planlos Ressourcen verbrennen
+- spezialisierte Agenten-Ketten → ENABLES → autonome Entwicklung

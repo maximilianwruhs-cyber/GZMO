@@ -10,7 +10,7 @@ WorkingDirectory=%h/Projects/_foundation-audit/survey_GZMO
 ExecStart=%h/Projects/_foundation-audit/survey_GZMO/target/release/gzmo daemon
 Restart=on-failure
 RestartSec=30
-# VM200 embed/rerank must be up separately (deploy-retrieval-layer on VM200).
+# VM200 retrieval router (:8081) must be up separately (deploy-retrieval-router.sh).
 
 [Install]
 WantedBy=default.target

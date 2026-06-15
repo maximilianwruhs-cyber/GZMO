@@ -229,7 +229,7 @@ pub async fn start_orchestrator(
                 }
 
                 info!(job = %job_name, "Orchestrator: job fired");
-                let outcome = execute_job(&ctx, &job_name, &job_cfg).await;
+                let outcome = fire_job(&ctx, &job_name, &job_cfg, None).await;
                 match &outcome {
                     Ok(o) => {
                     info!(
@@ -293,6 +293,24 @@ pub async fn start_orchestrator(
 }
 
 // ─── Job Execution ──────────────────────────────────────────────────────
+
+/// Execute a job immediately (used by `/dice` trigger and cron scheduler).
+pub async fn fire_job(
+    ctx: &OrchestratorContext,
+    job_name: &str,
+    config: &JobConfig,
+    prompt_suffix: Option<&str>,
+) -> Result<JobOutcome> {
+    let mut effective = config.clone();
+    if let Some(suffix) = prompt_suffix {
+        if effective.steps.is_empty() {
+            effective.prompt = format!("{}\n\n{suffix}", effective.prompt);
+        } else if let Some(first) = effective.steps.first_mut() {
+            first.prompt = format!("{}\n\n{suffix}", first.prompt);
+        }
+    }
+    execute_job(ctx, job_name, &effective).await
+}
 
 /// Execute a job. Routes to simple or pipeline mode based on config.
 async fn execute_job(

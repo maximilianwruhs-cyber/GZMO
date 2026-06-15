@@ -16,7 +16,7 @@ use tracing::debug;
 pub struct DiscoveredEndpoint {
     /// Human-readable name (e.g. "LM Studio", "Ollama", "vLLM")
     pub name: String,
-    /// Full base URL (e.g. "http://localhost:1234/v1")
+    /// Full base URL (e.g. "http://localhost:8000/v1")
     pub url: String,
     /// Latency of the probe in milliseconds
     pub latency_ms: u64,
@@ -26,6 +26,7 @@ pub struct DiscoveredEndpoint {
 
 /// Known local LLM endpoint patterns to probe.
 const KNOWN_ENDPOINTS: &[(&str, &str, &str)] = &[
+    ("Prime (GZMO)", "http://localhost:8000/v1",     "/models"),
     ("LM Studio",   "http://localhost:1234/v1",    "/models"),
     ("Ollama",      "http://localhost:11434/v1",    "/models"),
     ("vLLM",        "http://localhost:8000/v1",     "/models"),

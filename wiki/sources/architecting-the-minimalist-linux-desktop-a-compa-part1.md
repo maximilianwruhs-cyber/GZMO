@@ -1,0 +1,265 @@
+---
+type: source
+title: architecting-the-minimalist-linux-desktop-a-compa-part1
+created: 2026-06-08
+updated: 2026-06-08
+sources: 1
+tags: []
+status: stable
+gzmo_synthetic: true
+---
+
+# architecting-the-minimalist-linux-desktop-a-compa-part1
+
+Ingested source summary (2026-06-08).
+
+## Entities
+- [[x86-64-unknown-linux-musl|x86_64-unknown-linux-musl]] (CONCEPT)
+- [[metacopy|metacopy]] (CONCEPT)
+- [[overlayfs-penalty|OverlayFS Penalty]] (CONCEPT)
+- [[clang|Clang]] (TOOL)
+- [[lhc-computing-infrastructure|LHC computing infrastructure]] (ORGANIZATION)
+- [[glibc|glibc]] (CONCEPT)
+- [[node-js|Node.js]] (SYSTEM)
+- [[busybox|BusyBox]] (TOOL)
+- [[samsung|Samsung]] (ORGANIZATION)
+- [[xorg-server|xorg-server]] (SYSTEM)
+- [[systemd-homed|systemd-homed]] (TOOL)
+- [[powerctl|powerctl]] (TOOL)
+- [[fedora-iot|Fedora IoT]] (SYSTEM)
+- [[compute-unified-device-architecture-cuda|Compute Unified Device Architecture (CUDA)]] (CONCEPT)
+- [[flatpaks|Flatpaks]] (TOOL)
+- [[global-overlayfs|Global OverlayFS]] (CONCEPT)
+- [[mesa-drivers|Mesa drivers]] (TOOL)
+- [[linux-5-10|Linux 5.10]] (SYSTEM)
+- [[luks|LUKS]] (SYSTEM)
+- [[turnstile|turnstile]] (TOOL)
+- [[mate|Mate]] (CONCEPT)
+- [[socklog|socklog]] (TOOL)
+- [[numpy|NumPy]] (TOOL)
+- [[pipewire|PipeWire]] (TOOL)
+- [[npm|NPM]] (TOOL)
+- [[alpine-linux|Alpine Linux]] (SYSTEM)
+- [[acpi|ACPI]] (CONCEPT)
+- [[manylinux|manylinux]] (CONCEPT)
+- [[electron|Electron]] (CONCEPT)
+- [[f2fs|F2FS]] (CONCEPT)
+- [[nvk-user-space-driver|NVK user-space driver]] (SYSTEM)
+- [[aports|aports]] (TOOL)
+- [[ubuntu|Ubuntu]] (ORGANIZATION)
+- [[debian-gnu-linux|Debian GNU/Linux]] (SYSTEM)
+- [[kubernetes|Kubernetes]] (TOOL)
+- [[gcompat|gcompat]] (TOOL)
+- [[openrc|OpenRC]] (SYSTEM)
+- [[xbps-src|xbps-src]] (TOOL)
+- [[musl-gcc|musl-gcc]] (TOOL)
+- [[docker|Docker]] (TOOL)
+- [[selective-persistence|Selective Persistence]] (CONCEPT)
+- [[dynamic-kernel-module-support-dkms|Dynamic Kernel Module Support (DKMS)]] (SYSTEM)
+- [[runit|runit]] (SYSTEM)
+- [[dev-nvidia0|/dev/nvidia0]] (SYSTEM)
+- [[secure-boot|Secure Boot]] (CONCEPT)
+- [[nvidia-container-toolkit-libnvidia-container|NVIDIA Container Toolkit (libnvidia-container)]] (ORGANIZATION)
+- [[widevine-drm|Widevine DRM]] (CONCEPT)
+- [[voidnsrun|voidnsrun]] (TOOL)
+- [[overlay-filesystem|Overlay Filesystem]] (CONCEPT)
+- [[visual-studio-code|Visual Studio Code]] (TOOL)
+- [[grub|GRUB]] (SYSTEM)
+- [[khronos-vulkan-installable-client-driver-icd-loader|Khronos Vulkan Installable Client Driver (ICD) loader]] (SYSTEM)
+- [[llama-cpp|llama.cpp]] (TOOL)
+- [[live-os|Live OS]] (SYSTEM)
+- [[cernvm-file-system-cvmfs|CernVM File System (CVMFS)]] (SYSTEM)
+- [[appimage|AppImage]] (SYSTEM)
+- [[netbsd|NetBSD]] (SYSTEM)
+- [[python|Python]] (CONCEPT)
+- [[mesa-shader-cache-dir|MESA_SHADER_CACHE_DIR]] (CONCEPT)
+- [[xfs|XFS]] (CONCEPT)
+- [[linux-kernel|Linux kernel]] (SYSTEM)
+- [[kingston-datatraveler-3-0-128gb|Kingston DataTraveler 3.0 (128GB)]] (TOOL)
+- [[wayland|Wayland]] (CONCEPT)
+- [[fully-writable-rootfs|Fully Writable Rootfs]] (CONCEPT)
+- [[arch-linux|Arch Linux]] (SYSTEM)
+- [[flatpak|Flatpak]] (TOOL)
+- [[zzz|zzz]] (TOOL)
+- [[nouveau|Nouveau]] (TOOL)
+- [[pep-600|PEP 600]] (CONCEPT)
+- [[flash-translation-layer-ftl|Flash Translation Layer (FTL)]] (CONCEPT)
+- [[rust|Rust]] (SYSTEM)
+- [[turing-generation-rtx-2000|Turing-generation (RTX 2000)]] (SYSTEM)
+- [[tails-os|Tails OS]] (SYSTEM)
+- [[journald|journald]] (TOOL)
+- [[musllinux|musllinux]] (CONCEPT)
+- [[containerd|containerd]] (TOOL)
+- [[intel-mkl|Intel MKL]] (TOOL)
+- [[systemd-logind|systemd-logind]] (TOOL)
+- [[leaf-project|LEAF project]] (PROJECT)
+- [[debian-free-software-guidelines-dfsg|Debian Free Software Guidelines (DFSG)]] (CONCEPT)
+- [[zfs|ZFS]] (CONCEPT)
+- [[aes-xts|AES-XTS]] (CONCEPT)
+- [[swupdate|swupdate]] (TOOL)
+- [[open-gpu-kernel-modules-o-kmd|Open GPU Kernel Modules (O-KMD)]] (CONCEPT)
+- [[zink|Zink]] (TOOL)
+- [[cryptography|cryptography]] (TOOL)
+- [[cpu-only-inference|CPU-only inference]] (CONCEPT)
+- [[slack|Slack]] (TOOL)
+- [[nand-flash-memory|NAND flash memory]] (CONCEPT)
+- [[gnu-coreutils|GNU Coreutils]] (TOOL)
+- [[rustup|rustup]] (TOOL)
+- [[sway|Sway]] (TOOL)
+- [[apt|APT]] (TOOL)
+- [[ext4|Ext4]] (CONCEPT)
+- [[swaylock|swaylock]] (TOOL)
+- [[tmpfs|tmpfs]] (SYSTEM)
+- [[vk-driver-files|VK_DRIVER_FILES]] (CONCEPT)
+- [[sysvinit|SysVinit]] (SYSTEM)
+- [[avx-512|AVX-512]] (CONCEPT)
+- [[d-bus|D-Bus]] (CONCEPT)
+- [[plasma|Plasma]] (CONCEPT)
+- [[firefox|Firefox]] (TOOL)
+- [[debian-12-bookworm|Debian 12 (Bookworm)]] (SYSTEM)
+- [[red-hat|Red Hat]] (ORGANIZATION)
+- [[freebsd|FreeBSD]] (SYSTEM)
+- [[fallback-ladder|Fallback Ladder]] (CONCEPT)
+- [[xfce|XFCE]] (CONCEPT)
+- [[amd|AMD]] (ORGANIZATION)
+- [[obsidian|Obsidian]] (TOOL)
+- [[pip|pip]] (TOOL)
+- [[libcuda-so|libcuda.so]] (SYSTEM)
+- [[gnome|GNOME]] (CONCEPT)
+- [[svlogtail|svlogtail]] (TOOL)
+- [[libc6-compat|libc6-compat]] (TOOL)
+- [[llamafile|llamafile]] (TOOL)
+- [[amx|AMX]] (CONCEPT)
+- [[steam|Steam]] (TOOL)
+- [[apk|APK]] (TOOL)
+- [[discord|Discord]] (TOOL)
+- [[btrfs|Btrfs]] (CONCEPT)
+- [[void-linux|Void Linux]] (SYSTEM)
+- [[boot-sh|boot.sh]] (SYSTEM)
+- [[squashfs|SquashFS]] (TOOL)
+
+## Relations
+- Alpine Linux → USES → x86_64-unknown-linux-musl
+- Alpine Linux → USES → BusyBox
+- Alpine Linux → USES → OpenRC
+- Alpine Linux → USES → APK
+- Alpine Linux → RELATED_TO → LEAF project
+- Void Linux → USES → glibc
+- Void Linux → USES → runit
+- Void Linux → USES → xbps-src
+- Void Linux → RELATED_TO → NetBSD
+- Debian GNU/Linux → USES → glibc
+- Debian GNU/Linux → USES → systemd-homed
+- Debian GNU/Linux → USES → APT
+- Debian GNU/Linux → USES → GNU Coreutils
+- runit → RELATED_TO → socklog
+- OpenRC → RELATED_TO → SysVinit
+- Electron → USES → Visual Studio Code
+- Electron → USES → Discord
+- Electron → USES → Slack
+- Electron → USES → Obsidian
+- Flatpak → USES → glibc
+- Alpine Linux → USES → gcompat
+- Alpine Linux → USES → libc6-compat
+- gcompat → USES → Widevine DRM
+- Widevine DRM → USES → Firefox
+- Void Linux → USES → voidnsrun
+- Void Linux → USES → socklog
+- socklog → RELATED_TO → svlogtail
+- Void Linux → USES → turnstile
+- Alpine Linux → USES → zzz
+- Alpine Linux → USES → powerctl
+- Sway → USES → Wayland
+- Sway → USES → swaylock
+- Alpine Linux → USES → aports
+- xbps-src → RELATED_TO → NetBSD
+- xbps-src → RELATED_TO → FreeBSD
+- Debian GNU/Linux → RELATED_TO → Debian Free Software Guidelines (DFSG)
+- Debian 12 (Bookworm) → PART_OF → Debian GNU/Linux
+- Alpine Linux → USES → Mesa drivers
+- Void Linux → USES → Mesa drivers
+- Alpine Linux → USES → xorg-server
+- Void Linux → USES → xorg-server
+- Intel MKL → RELATED_TO → Mesa drivers
+- AMD → RELATED_TO → Mesa drivers
+- Alpine Linux → USES → Docker
+- Alpine Linux → USES → Kubernetes
+- Python → USES → pip
+- Python → USES → NumPy
+- Python → USES → cryptography
+- Alpine Linux → USES → GNOME
+- Alpine Linux → USES → Plasma
+- Alpine Linux → USES → Sway
+- Alpine Linux → USES → XFCE
+- Alpine Linux → USES → Mate
+- musllinux → RELATED_TO → PEP 600
+- Node.js → USES → NPM
+- NPM → USES → glibc
+- libc6-compat → USES → x86_64-unknown-linux-musl
+- Rust → USES → rustup
+- Void Linux → RELATED_TO → Arch Linux
+- Void Linux → USES → musl-gcc
+- Void Linux → USES → Clang
+- Debian GNU/Linux → USES → NVIDIA Container Toolkit (libnvidia-container)
+- Debian GNU/Linux → USES → Discord
+- Debian GNU/Linux → USES → Slack
+- Alpine Linux → USES → Flatpaks
+- Void Linux → USES → Steam
+- Void Linux → USES → Electron
+- Overlay Filesystem → PART_OF → Live OS
+- Fully Writable Rootfs → PART_OF → Live OS
+- Live OS → USES → SquashFS
+- Overlay Filesystem → USES → Linux kernel
+- Docker → USES → Overlay Filesystem
+- containerd → USES → Overlay Filesystem
+- Overlay Filesystem → USES → Ext4
+- Overlay Filesystem → USES → XFS
+- Overlay Filesystem → USES → F2FS
+- Fully Writable Rootfs → USES → Btrfs
+- Fully Writable Rootfs → USES → ZFS
+- OverlayFS Penalty → RELATED_TO → Overlay Filesystem
+- metacopy → RELATED_TO → Overlay Filesystem
+- Ext4 → USES → Fully Writable Rootfs
+- OverlayFS Penalty → USES → Ext4
+- Ubuntu → USES → Ext4
+- Ubuntu → USES → OverlayFS Penalty
+- Alpine Linux → USES → tmpfs
+- F2FS → AUTHORED_BY → Samsung
+- F2FS → USES → NAND flash memory
+- OverlayFS Penalty → USES → Linux 5.10
+- CernVM File System (CVMFS) → USES → OverlayFS Penalty
+- CernVM File System (CVMFS) → USES → LHC computing infrastructure
+- Docker → USES → OverlayFS Penalty
+- LUKS → USES → AES-XTS
+- Tails OS → USES → SquashFS
+- Tails OS → USES → tmpfs
+- Tails OS → USES → LUKS
+- Tails OS → USES → Selective Persistence
+- systemd-homed → USES → tmpfs
+- Fedora IoT → USES → swupdate
+- Ext4 → USES → Flash Translation Layer (FTL)
+- Fully Writable Rootfs → USES → Ext4
+- Fully Writable Rootfs → USES → F2FS
+- Global OverlayFS → PART_OF → OverlayFS Penalty
+- Selective Persistence → PART_OF → OverlayFS Penalty
+- NVIDIA Container Toolkit (libnvidia-container) → USES → Compute Unified Device Architecture (CUDA)
+- Compute Unified Device Architecture (CUDA) → USES → Dynamic Kernel Module Support (DKMS)
+- llamafile → USES → CPU-only inference
+- llama.cpp → USES → CPU-only inference
+- llama.cpp → USES → Khronos Vulkan Installable Client Driver (ICD) loader
+- NVK user-space driver → USES → Zink
+- Zink → USES → Khronos Vulkan Installable Client Driver (ICD) loader
+- NVK user-space driver → USES → Khronos Vulkan Installable Client Driver (ICD) loader
+- Red Hat → RELATED_TO → NVK user-space driver
+- Flatpak → USES → MESA_SHADER_CACHE_DIR
+- AppImage → USES → MESA_SHADER_CACHE_DIR
+- boot.sh → PART_OF → Fallback Ladder
+- Compute Unified Device Architecture (CUDA) → USES → /dev/nvidia0
+- Compute Unified Device Architecture (CUDA) → USES → NVIDIA Container Toolkit (libnvidia-container)
+- Compute Unified Device Architecture (CUDA) → USES → libcuda.so
+- Secure Boot → RELATED_TO → NVIDIA Container Toolkit (libnvidia-container)
+- Nouveau → USES → Turing-generation (RTX 2000)
+- NVK user-space driver → USES → VK_DRIVER_FILES
+- llama.cpp → USES → NVK user-space driver
+- CPU-only inference → USES → AMX
+- CPU-only inference → USES → AVX-512

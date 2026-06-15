@@ -2,8 +2,9 @@
 
 **Document role:** Self-contained architecture, configuration, and entanglement map for live memory ingest.  
 **Repo:** `/home/maximilian-wruhs/Projects/_foundation-audit/survey_GZMO`  
-**Config authority:** `gzmo.toml` (this document reflects production values as of 2026-06-05)  
-**Version:** 1.0 — post tiered-memory (HEAD `4f2320e`), schema v6 `distill_dedup`
+**Config authority:** `gzmo.toml`  
+**Port layout (locked):** [`docs/PORTS.md`](PORTS.md) — steady state 2026-06-09  
+**Version:** 1.1 — locked port topology, post takeout migration
 
 ---
 
@@ -48,9 +49,7 @@ flowchart TB
     VaultDB["data/vault.db SQLite"]
   end
   subgraph vm200 [VM200 192.168.31.110 GTX1070]
-    Emb["Embeddings :8081"]
-    Rerank["Rerank :8082"]
-    Lib["Librarian :8083"]
+    Router["Retrieval router :8081\ngzmo-embed + gzmo-rerank"]
   end
   subgraph lxc101 [LXC101 192.168.31.202]
     Neo4j["Neo4j :7687"]
@@ -58,9 +57,7 @@ flowchart TB
     Redis["Redis :6379"]
   end
   Gzmo --> Prime
-  Gzmo --> Emb
-  Gzmo --> Rerank
-  Gzmo --> Lib
+  Gzmo -->|"embed + rerank"| Router
   Gzmo --> VaultDB
   Gzmo -->|"MCP stdio"| Neo4j
   Gzmo --> Qdrant
@@ -69,9 +66,9 @@ flowchart TB
 
 | Node | Address | Compute | Production role |
 |------|---------|---------|-----------------|
-| Workstation | local | 2× RTX 5070 Ti, Ryzen 9950X | Prime Qwen3.6-35B on `:8000`; `gzmo` daemon/CLI; SQLite vault SoT |
+| Workstation | local | 2× RTX 5070 Ti, Ryzen 9950X | Prime **Gemma 4 26B-A4B** on `:8000` (256K ctx); `gzmo` daemon/CLI; SQLite vault SoT |
 | PVE | `192.168.31.200` | i7-6770HQ | Hypervisor for VM200 + LXC containers |
-| VM200 `ollamagpu` | `192.168.31.110` | GTX 1070 8 GB eGPU | Embeddings, rerank, librarian (light extract) |
+| VM200 `ollamagpu` | `192.168.31.110` | GTX 1070 8 GB eGPU | Unified retrieval router `:8081` — embed + rerank (librarian retired) |
 | LXC101 | `192.168.31.202` | Docker | Neo4j knowledge graph; Qdrant vectors; Redis scratch/distill queue |
 | LXC100 | `192.168.31.201` | — | Samba — not on hot path |
 | LXC102 | `192.168.31.203` | — | Optional MCP hub (Pi era) |
@@ -84,26 +81,31 @@ flowchart TB
 
 ## 3. Service ports and endpoints
 
+> **Locked steady-state map:** [`docs/PORTS.md`](PORTS.md). Do not reassign ports without updating that file and `gzmo.toml` URLs together.
+
 ### 3.1 Workstation (cognition)
 
 | Port / process | Service | Start command |
 |----------------|---------|---------------|
-| **:8000** | Prime `llama-server` — Qwen3.6-35B-A3B Q4_K_XL | `~/Projects/llama.cpp/prime-bench/start-prime.sh` or `gzmo-prime.service` |
-| **:8002** | Local embed fallback (Pi KB) | `scripts/start-embed.sh` |
+| **:8000** | Prime `llama-server` — **Gemma 4 26B-A4B-it** QAT (ctx 262144) | `~/Projects/llama.cpp/prime-bench/start-prime-gemma4-26b-a4b-256k.sh` or `gzmo-prime.service` |
+| **:8002** | Local Pi KB embed (**opt-in**, `ENABLE_PI_EMBED=1`) | `scripts/start-embed.sh` or `gzmo-embed.service` |
 | **`gzmo`** | Daemon or REPL | `scripts/start-production.sh --daemon` |
 | **:8010** | Sovereign FrankenMoE | **Parked** — broken MoE output |
 
-Prime typical: ctx 131072, `GGML_CUDA_DISABLE_GRAPHS=1` on dual 5070 Ti.
+Prime typical: ctx **262144**, ngram-mod speculative decoding, CUDA graphs on (Gemma QAT profile), dual 5070 Ti layer-split.
 
 ### 3.2 VM200 (retrieval layer)
 
-| Port | Model | `gzmo.toml` section |
-|------|-------|---------------------|
-| **:8081** | Qwen3-Embedding-0.6B Q8 | `[embeddings]` |
-| **:8082** | bge-reranker-v2-m3 Q8 | `[rerank]` |
-| **:8083** | Qwen2.5-Coder-1.5B librarian | `[librarian]` |
+Single `llama-server --models-preset` router; both presets share `:8081`.
 
-Deploy scripts: `scripts/vm200/deploy-retrieval-layer.sh`, `deploy-rerank.sh`, `deploy-librarian.sh`
+| Port | Preset / Model | `gzmo.toml` section |
+|------|----------------|---------------------|
+| **:8081** | `gzmo-embed` — Qwen3-Embedding-0.6B Q8 (1024-dim) | `[embeddings]` |
+| **:8081** | `gzmo-rerank` — Qwen3-Reranker-0.6B | `[rerank]` |
+| ~~:8082~~ | bge-reranker-v2-m3 Q8 | **Retired** |
+| ~~:8083~~ | Qwen2.5-Coder-1.5B librarian | **Retired** (distill on Prime `:8000`) |
+
+Deploy: `scripts/vm200/deploy-retrieval-router.sh` → `llama-retrieval-router.service`
 
 ### 3.3 LXC101 (persistence)
 
@@ -135,7 +137,7 @@ Single runtime authority. All clients and daemon read this file.
 |---------|-----|-------|
 | `[engine]` | `active_mode` | `local` |
 | `[engine.local]` | `url` | `http://localhost:8000/v1` |
-| `[engine.local]` | `model` | `qwen3.6-35b-mtp` |
+| `[engine.local]` | `model` | `gemma-4-26b-a4b-it` |
 | `[engine.local]` | `temperature` | `0.3` |
 | `[engine.local]` | `max_tokens` | `24576` |
 | `[routing.profiles.local_deterministic]` | `temperature` | `0.1` (ingest extract) |
@@ -144,11 +146,14 @@ Single runtime authority. All clients and daemon read this file.
 
 | Section | Key | Value |
 |---------|-----|-------|
+| `[embeddings]` | `enabled` | **`true`** (VM200 `:8081`) |
 | `[embeddings]` | `url` | `http://192.168.31.110:8081/v1` |
-| `[embeddings]` | `model` | `Qwen3-Embedding-0.6B-Q8_0.gguf` |
-| `[rerank]` | `url` | `http://192.168.31.110:8082/v1` |
+| `[embeddings]` | `model` | `gzmo-embed` (Qwen3-Embedding-0.6B-Q8_0.gguf) |
+| `[rerank]` | `enabled` | **`true`** (VM200 `:8081` router) |
+| `[rerank]` | `url` | `http://192.168.31.110:8081/v1` |
+| `[rerank]` | `model` | `gzmo-rerank` (Qwen3-Reranker-0.6B) |
 | `[rerank]` | `prefetch_multiplier` | `4` |
-| `[librarian]` | `url` | `http://192.168.31.110:8083/v1` |
+| `[librarian]` | `enabled` | **`false`** (retired; distill on Prime) |
 | `[qdrant]` | `url` | `http://192.168.31.202:6333` |
 | `[qdrant]` | `collection` | **`honeypot`** |
 | `[qdrant]` | `sync_cron_hour/minute` | **1 / 45** UTC |
@@ -158,7 +163,7 @@ Single runtime authority. All clients and daemon read this file.
 | Section | `enabled` | Notable gates |
 |---------|-----------|---------------|
 | `[dreams]` | `true` | `min_confidence=0.85`, `require_evidence=true`, `strict_kg=true`, `cron_hour=1`, `cron_minute=0`, `min_consolidation_chars=400`, `honeypot_rem_enabled=true` |
-| `[session_distill]` | `true` | `daemon_scheduled=true`, `cron_hour=2`, `cron_minute=15`, `use_librarian=true` |
+| `[session_distill]` | `true` | `daemon_scheduled=true`, `cron_hour=2`, `cron_minute=15`, `use_librarian=false` (distill on Prime) |
 | `[spark]` | `true` | `schedule_mode=cron`, `cron_hours=[3,22]`, `cron_minute=30`, `quarantine_confidence=0.6`, `anchor_decay_classes=["CuratedVault","SessionDistill"]` |
 | `[ingest]` | `true` | `min_confidence=0.85`, `require_evidence=true`, `strict_kg=true`, `max_source_chars=120000`, `chunk_chars=28000` |
 
@@ -170,7 +175,7 @@ Single runtime authority. All clients and daemon read this file.
 | `[redis]` | `distill_queue` | `gzmo:distill:pending` |
 | `[context_memory]` | `archive_threshold` | `0.90` |
 | `[context_memory]` | `scratch_max_tokens` | `2000` |
-| `[context_memory]` | `context_length` | `131072` |
+| `[context_memory]` | `context_length` | `262144` |
 | `[subagent]` | `max_concurrent` | `2` |
 
 ### 4.6 MCP Neo4j
@@ -197,7 +202,7 @@ Single runtime authority. All clients and daemon read this file.
 
 `GatewayRouter` resolves `TaskKind` → profile name → URL/model from `[routing.mappings]` + `[routing.profiles.*]`.
 
-**Cloud-first background routing:** when `[routing] cloud_first_background = true`,
+**Cloud-first background routing (optional):** when `[routing] cloud_first_background = true`,
 every background `TaskKind` (all except `Chat`) is wrapped as
 `FallbackGateway(cloud → legacy)`. The cloud profile (`[engine.cloud]`,
 OpenRouter) is tried first; the profile in the table below is the automatic
@@ -208,16 +213,16 @@ subagents stay on the active engine.
 
 | TaskKind | Fallback profile | URL | Model | Temp | Used by |
 |----------|---------|-----|-------|------|---------|
-| `IngestExtract` | `local_deterministic` | `http://localhost:8000/v1` | `qwen3.6-35b-mtp` | **0.1** | IngestEngine live + `gzmo ingest` |
-| `IngestVerify` | `local` | `:8000` | `qwen3.6-35b-mtp` | 0.3 | IngestEngine verify pass |
-| `DreamExtract` | `local` | `:8000` | `qwen3.6-35b-mtp` | 0.3 | DreamEngine REM consolidation |
-| `DreamVerify` | `local` | `:8000` | `qwen3.6-35b-mtp` | 0.3 | DreamEngine fact-check |
-| `SparkHypothesis` | `local` | `:8000` | `qwen3.6-35b-mtp` | 0.3 | SparkEngine serendipity |
-| `SparkVerify` | `local` | `:8000` | `qwen3.6-35b-mtp` | 0.3 | SparkEngine citation verify |
-| `DistillExtract` | `librarian` | `http://192.168.31.110:8083/v1` | qwen2.5-1.5B | 0.2 | SessionDistill transcript extract |
-| `DistillVerify` | `local` | `:8000` | `qwen3.6-35b-mtp` | 0.3 | SessionDistill verify |
-| `DistillSummary` | `librarian` | `:8083` | qwen2.5-1.5B | 0.2 | SessionDistill summary |
-| Chat / default | `local` | `:8000` | `qwen3.6-35b-mtp` | 0.3 | `gzmo chat`, daemon |
+| `IngestExtract` | `local_deterministic` | `http://localhost:8000/v1` | `gemma-4-26b-a4b-it` | **0.1** | IngestEngine live + `gzmo ingest` |
+| `IngestVerify` | `local` | `:8000` | `gemma-4-26b-a4b-it` | 0.3 | IngestEngine verify pass |
+| `DreamExtract` | `local` | `:8000` | `gemma-4-26b-a4b-it` | 0.3 | DreamEngine REM consolidation |
+| `DreamVerify` | `local` | `:8000` | `gemma-4-26b-a4b-it` | 0.3 | DreamEngine fact-check |
+| `SparkHypothesis` | `local` | `:8000` | `gemma-4-26b-a4b-it` | 0.3 | SparkEngine serendipity |
+| `SparkVerify` | `local` | `:8000` | `gemma-4-26b-a4b-it` | 0.3 | SparkEngine citation verify |
+| `DistillExtract` | `local` | `:8000` | `gemma-4-26b-a4b-it` | 0.1 | SessionDistill transcript extract |
+| `DistillVerify` | `local` | `:8000` | `gemma-4-26b-a4b-it` | 0.3 | SessionDistill verify |
+| `DistillSummary` | `local` | `:8000` | `gemma-4-26b-a4b-it` | 0.3 | SessionDistill summary |
+| Chat / default | `local` | `:8000` | `gemma-4-26b-a4b-it` | 0.3 | `gzmo chat`, daemon |
 
 **Routing mappings in `gzmo.toml`:**
 
@@ -229,9 +234,9 @@ spark_hypothesis = "local"
 spark_verify = "local"
 ingest_extract = "local_deterministic"
 ingest_verify = "local"
-distill_extract = "librarian"
+distill_extract = "local"
 distill_verify = "local"
-distill_summary = "librarian"
+distill_summary = "local"
 ```
 
 ---

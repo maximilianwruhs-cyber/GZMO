@@ -1,0 +1,19 @@
+---
+type: entity
+title: Email triage
+created: 2026-06-09
+updated: 2026-06-09
+sources: 1
+tags: []
+status: draft
+gzmo_synthetic: true
+---
+
+# Email triage
+
+Type: CONCEPT
+
+## From [[openclaw-deep-research-part11-micro07|openclaw-deep-research-part11-micro07]] (2026-06-09)
+- An example workflow demonstrating Lobster's capabilities.
+- Involves checking email, summarizing, drafting replies, and sending.
+- Can be executed with a single Lobster tool call.

@@ -56,9 +56,14 @@ fi
 log ""
 
 log "--- 4. Chat visible text (content or reasoning) ---"
+PRIME_MODEL="$(python3 -c "
+import tomllib, pathlib
+d = tomllib.loads(pathlib.Path('${ROOT}/gzmo.toml').read_text())
+print(d['engine']['local']['model'])
+" 2>/dev/null || echo 'gemma-4-26b-a4b-it')"
 CHAT=$(curl -sf http://127.0.0.1:8000/v1/chat/completions \
   -H 'Content-Type: application/json' \
-  -d '{"model":"qwen3.6-35b-mtp","messages":[{"role":"user","content":"Say hello in one word."}],"max_tokens":64,"temperature":0.2,"reasoning_format":"none","chat_template_kwargs":{"enable_thinking":false}}' 2>/dev/null) || CHAT=""
+  -d "{\"model\":\"${PRIME_MODEL}\",\"messages\":[{\"role\":\"user\",\"content\":\"Say hello in one word.\"}],\"max_tokens\":64,\"temperature\":0.2}" 2>/dev/null) || CHAT=""
 
 if echo "$CHAT" | python3 -c "
 import sys,json

@@ -1,5 +1,7 @@
+# DEPRECATED — replaced by llama-retrieval-router.service (gzmo-rerank preset on :8081).
+# Do not enable on VM200; kept only for historical reference.
 [Unit]
-Description=GZMO reranker (bge-reranker-v2-m3) on GTX 1070
+Description=[RETIRED] GZMO reranker (bge-reranker-v2-m3) on GTX 1070
 After=network.target
 
 [Service]

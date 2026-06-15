@@ -307,11 +307,15 @@ Tier 3 — Live chat stress (ONE owner: no daemon on same data/)
   pkill -f './target/release/gzmo daemon' || true
   # Shell skills need FULL completions URL (gzmo.toml [engine.local].url is base /v1 only)
   export GZMO_LLM_URL=http://localhost:8000/v1/chat/completions
-  export GZMO_LLM_MODEL=qwen3.6-35b-mtp   # match [engine.local].model in gzmo.toml
+  export GZMO_LLM_MODEL=gemma-4-26b-a4b-it   # match [engine.local].model in gzmo.toml
   bash scripts/qa/tier3_stress_chat.sh
   Pass criteria:
     - Startup: "Chaos engine running — 174 BPM"
     - Each /story prints non-empty prose (not LLM/curl errors)
+    - Output shows the new "📖 ATTRACTOR FICTION" header with `inv #N`, tick, phase, valence, and ρ
+    - Two consecutive `/story` calls with the same keyword produce different prose and different `inv #N`
+    - `data/skills/.story_call_serial` increments; `.story_recent_hashes` records distinct SHA-256 bodies
+    - Output shows the "incubating echo" footer if thoughts are in the cabinet
     - Story 1 may show Incubating: 1, ρ mod unchanged (cabinet incubates ~40 ticks)
     - Later stories: crystallization fires; ρ mod moves; forcing/breath may go +1
     - Lorenz ρ mod stays < 7 (with tanh default, expect small |ρ_mod| ≪ 7)
@@ -362,7 +366,7 @@ Tier 3 redo — story load only. QA only, no code changes.
 Prerequisites:
   pkill -f './target/release/gzmo daemon' || true
   export GZMO_LLM_URL=http://localhost:8000/v1/chat/completions
-  export GZMO_LLM_MODEL=qwen3.6-35b-mtp
+  export GZMO_LLM_MODEL=gemma-4-26b-a4b-it
   bash scripts/qa/tier3_stress_chat.sh
 
 Report table: Action | ρ mod | forcing/breath | story text excerpt (first line).

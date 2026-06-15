@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Start Qwen2.5-1.5B on VM200 :8083 (fast summaries / future session-distill offload).
+# DEPRECATED — session distill runs on Prime; router replaces VM200 librarian.
 set -euo pipefail
 
 VM_HOST="${GZMO_VM200_HOST:-192.168.31.110}"

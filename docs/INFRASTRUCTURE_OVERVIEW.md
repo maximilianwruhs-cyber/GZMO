@@ -1,8 +1,8 @@
 # GZMO — Infrastructure Overview (canonical)
 
-**Status:** 2026-06-05  
+**Status:** 2026-06-09  
 **Repo:** `/home/maximilian-wruhs/Projects/_foundation-audit/survey_GZMO`  
-**Authority:** Live `gzmo.toml` → this document → `./scripts/verify-production.sh`  
+**Authority:** Live `gzmo.toml` → **[`docs/PORTS.md`](PORTS.md)** (locked port map) → this document → `./scripts/verify-production.sh`  
 **Supersedes:** [`gzmo_placement_architecture.md`](./gzmo_placement_architecture.md), [`INFRASTRUCTURE_REVIEW.md`](./INFRASTRUCTURE_REVIEW.md) as **entry points** (those files remain as historical detail).
 
 **Refresh after any infra change:**
@@ -22,8 +22,8 @@ GZMO is a **local-first, air-gapped agent** on a Ryzen workstation with retrieva
 
 | Tier | Host | Role |
 |------|------|------|
-| **Cognition** | Workstation (2× RTX 5070 Ti) | Prime Qwen3.6-35B on `:8000` — chat, dreams, spark, ingest verify |
-| **Retrieval** | VM200 `192.168.31.110` (GTX 1070) | Embeddings `:8081`, rerank `:8082`, librarian `:8083` |
+| **Cognition** | Workstation (2× RTX 5070 Ti) | Prime **Gemma 4 26B-A4B** on `:8000` (256K ctx) — chat, dreams, spark, ingest |
+| **Retrieval** | VM200 `192.168.31.110` (GTX 1070) | Unified router `:8081` — embed (`gzmo-embed`) + rerank (`gzmo-rerank`); librarian retired |
 | **Persistence** | LXC101 `192.168.31.202` | Neo4j `:7687`, Qdrant `:6333` |
 | **Orchestration** | Workstation | Rust `gzmo` daemon — cron engines, watchers, MCP stdio |
 
@@ -50,7 +50,7 @@ flowchart TB
     LXC102["LXC102 .203\nMCP hub optional"]
   end
   WS -->|HTTP :8000| WS
-  WS -->|HTTP :8081-8083| VM
+  WS -->|HTTP :8081 embed+rerank| VM
   WS -->|bolt :7687 MCP stdio| LXC101
   WS -->|HTTP :6333| LXC101
   PVE --> VM
@@ -61,7 +61,7 @@ flowchart TB
 |------|---------|---------|-----------------|
 | Workstation | local | 2× 16 GB RTX 5070 Ti, Ryzen 9950X | Prime, GZMO daemon/CLI, knowledge-dir ingest |
 | PVE | `192.168.31.200` | i7-6770HQ | Hypervisor |
-| VM200 `ollamagpu` | `192.168.31.110` | GTX 1070 8 GB (eGPU) | Embed, rerank, librarian |
+| VM200 `ollamagpu` | `192.168.31.110` | GTX 1070 8 GB (eGPU) | Unified retrieval router `:8081` (embed + rerank) |
 | LXC101 | `192.168.31.202` | Docker | Neo4j, Qdrant, Redis (Redis not wired to GZMO) |
 | LXC100 | `192.168.31.201` | — | Samba — not on hot path |
 | LXC102 | `192.168.31.203` | — | Optional MCP hub / Pi era |
@@ -74,27 +74,32 @@ flowchart TB
 
 ## 3. Service inventory (ports)
 
+> **Locked steady-state map:** [`PORTS.md`](PORTS.md). Section below is operational detail; port assignments must match that file.
+
 ### 3.1 Workstation — live
 
 | Port / process | Service | Start |
 |----------------|---------|-------|
-| **:8000** | `llama-server` Prime (Qwen3.6-35B-A3B Q4_K_XL) | `~/Projects/llama.cpp/prime-bench/start-prime.sh` or `gzmo-prime.service` |
-| **:8002** | Local embed (Pi KB / fallback) | `scripts/start-embed.sh` |
+| **:8000** | `llama-server` Prime (Gemma 4 26B-A4B-it QAT, ctx 262144) | `~/Projects/llama.cpp/prime-bench/start-prime-gemma4-26b-a4b-256k.sh` or `gzmo-prime.service` |
+| **:8002** | Local Pi KB embed (**opt-in**, `ENABLE_PI_EMBED=1`) | `scripts/start-embed.sh` or `gzmo-embed.service` |
 | **`gzmo`** | Daemon or REPL | `scripts/start-production.sh --daemon` |
 | **:8010** | Sovereign FrankenMoE | **Parked** — `start-sovereign.sh` |
 
-Prime (typical): ctx 131072, speculative decoding off, `GGML_CUDA_DISABLE_GRAPHS=1` on dual 5070 Ti.
+Prime (typical): ctx **262144**, ngram-mod speculative decoding, CUDA graphs **on** (Gemma QAT profile), dual 5070 Ti layer-split.
 
 ### 3.2 VM200 — retrieval layer
 
-| Port | Model | GZMO `gzmo.toml` |
-|------|-------|------------------|
-| ~~:8080~~ | Qwen2.5-Coder 7B | **Stopped** (retired) |
-| **:8081** | Qwen3-Embedding-0.6B Q8 | `[embeddings]` |
-| **:8082** | bge-reranker-v2-m3 Q8 | `[rerank]` |
-| **:8083** | Qwen2.5-1.5B librarian | `[librarian]` |
+Single `llama-server --models-preset` router; two presets share one port.
 
-Deploy: `scripts/vm200/deploy-retrieval-layer.sh`, `deploy-rerank.sh`, `deploy-librarian.sh`
+| Port | Preset / Model | GZMO `gzmo.toml` |
+|------|----------------|------------------|
+| **:8081** | `gzmo-embed` — Qwen3-Embedding-0.6B Q8 (1024-dim) | `[embeddings]` |
+| **:8081** | `gzmo-rerank` — Qwen3-Reranker-0.6B | `[rerank]` |
+| ~~:8080~~ | Qwen2.5-Coder 7B | **Retired** |
+| ~~:8082~~ | bge-reranker-v2-m3 Q8 | **Retired** (now `gzmo-rerank` on `:8081`) |
+| ~~:8083~~ | Qwen2.5-1.5B librarian | **Retired** (distill on Prime `:8000`) |
+
+Deploy: `scripts/vm200/deploy-retrieval-router.sh` → `llama-retrieval-router.service`
 
 ### 3.3 LXC101 — data plane
 
@@ -126,9 +131,9 @@ Deploy: `scripts/vm200/deploy-retrieval-layer.sh`, `deploy-rerank.sh`, `deploy-l
 | Section | Endpoint | Used for |
 |---------|----------|----------|
 | `[engine.local]` | `http://localhost:8000/v1` | Chat, dreams, spark, ingest verify |
-| `[embeddings]` | `http://192.168.31.110:8081/v1` | Vault/honeypot vectors, similarity |
-| `[rerank]` | `http://192.168.31.110:8082/v1` | `memory_search` post-filter |
-| `[librarian]` | `http://192.168.31.110:8083/v1` | Session distill extract |
+| `[embeddings]` | `http://192.168.31.110:8081/v1` (`gzmo-embed`) | Vault/honeypot vectors, similarity |
+| `[rerank]` | `http://192.168.31.110:8081/v1` (`gzmo-rerank`) | `memory_search` post-filter |
+| `[librarian]` | disabled — distill on Prime `:8000` via `[routing.mappings]` | Session distill extract/summary/verify |
 | `[qdrant]` | `http://192.168.31.202:6333`, `collection = "honeypot"` | Nightly sync from honeypot |
 | `[[mcp_servers]]` memory | stdio → Neo4j | KG writes (dream, spark, ingest) |
 
@@ -196,7 +201,7 @@ flowchart LR
 
 ```
 User → gzmo chat → Prime :8000 → tools (fs, shell, web, memory_*, mcp__memory__*)
-                  → SQLite vault (embed VM200 :8081, rerank :8082 on search)
+                  → SQLite vault (embed + rerank on VM200 :8081 router during search)
                   → episodic markdown append
 ```
 
@@ -206,7 +211,7 @@ User → gzmo chat → Prime :8000 → tools (fs, shell, web, memory_*, mcp__mem
 |------|-----|--------|
 | **01:00** | DreamEngine | Episodic → vault + Neo4j |
 | **01:45** | Qdrant sync | `honeypot` collection on LXC101 |
-| **02:15** | Session distill | Librarian :8083 + Prime verify → vault (+ honeypot when `source_file` qualifies) |
+| **02:15** | Session distill | Prime :8000 (extract/summary/verify) → vault (+ honeypot when `source_file` qualifies) |
 | **03:30, 22:30** | SparkEngine | Serendipity hypothesis + verify |
 | ***/30** | sys_janitor | Orchestrator maintenance |
 | Continuous | Ingest watcher | `~/Schreibtisch/knowledge` |
@@ -329,9 +334,9 @@ Daemon PID: `/tmp/gzmo_daemon.pid`
 | Check | Expected |
 |-------|----------|
 | Prime `:8000` | OK |
-| Embed `:8081` | OK, 1024-dim |
-| Rerank `:8082` | OK |
-| Librarian `:8083` | OK |
+| Embed `:8081` (`gzmo-embed`) | OK, 1024-dim |
+| Rerank `:8081` (`gzmo-rerank`) | OK, top score > 0 |
+| Librarian | disabled in config |
 | Neo4j + MCP | OK |
 | Qdrant sync dry-run | OK |
 | `vault.db` | Present |

@@ -1,0 +1,373 @@
+domain: generated-neo4j-cluster3
+nodes:
+  - id: agentic_ai_governance
+    title: Agentic Ai Governance
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: agentic_loop
+    title: Agentic Loop
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: agi
+    title: Agi
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: ai_agent_security
+    title: Ai Agent Security
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: ai_assisted_automation
+    title: Ai Assisted Automation
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: ansi_escape_codes
+    title: Ansi Escape Codes
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: array_of_structures_aos
+    title: Array Of Structures Aos
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: austrian_data_protection_act_datenschutzgesetz
+    title: Austrian Data Protection Act Datenschutzgesetz
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: bash_tool
+    title: Bash Tool
+    description: Exported from Neo4j (1 prereqs in cluster).
+    prerequisites:
+      - openclaw
+    bloom_level: understand
+  - id: c_application_binary_interface_abi
+    title: C Application Binary Interface Abi
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: channel_adapters
+    title: Channel Adapters
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: claude_code
+    title: Claude Code
+    description: Exported from Neo4j (3 prereqs in cluster).
+    prerequisites:
+      - ai_assisted_automation
+      - openclaw_json
+      - spec_driven_development_sdd
+    bloom_level: understand
+  - id: compatible_bundles
+    title: Compatible Bundles
+    description: Exported from Neo4j (1 prereqs in cluster).
+    prerequisites:
+      - claude_code
+    bloom_level: understand
+  - id: crustafarianism
+    title: Crustafarianism
+    description: Exported from Neo4j (1 prereqs in cluster).
+    prerequisites:
+      - moltbook
+    bloom_level: understand
+  - id: cve_2026_25253
+    title: Cve 2026 25253
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: discord
+    title: Discord
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: ebbinghaus_s_forgetting_curve
+    title: Ebbinghaus S Forgetting Curve
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: eu_artificial_intelligence_act_ai_act
+    title: Eu Artificial Intelligence Act Ai Act
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: europ_ische_datenschutzstandards
+    title: Europ Ische Datenschutzstandards
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: frontmatter
+    title: Frontmatter
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: gdpr_datenschutz_grundverordnung
+    title: Gdpr Datenschutz Grundverordnung
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: go
+    title: Go
+    description: Exported from Neo4j (1 prereqs in cluster).
+    prerequisites:
+      - rust
+    bloom_level: understand
+  - id: governance_richtlinien
+    title: Governance Richtlinien
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: gpt
+    title: Gpt
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: graceful_environmental_discovery
+    title: Graceful Environmental Discovery
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: heartbeat_feature
+    title: Heartbeat Feature
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: javascript
+    title: Javascript
+    description: Exported from Neo4j (4 prereqs in cluster).
+    prerequisites:
+      - c_application_binary_interface_abi
+      - rust
+      - typescript_5_2
+      - zig
+    bloom_level: understand
+  - id: malware_dropper
+    title: Malware Dropper
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: memory_scalability
+    title: Memory Scalability
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: moltbook
+    title: Moltbook
+    description: Exported from Neo4j (1 prereqs in cluster).
+    prerequisites:
+      - openclaw
+    bloom_level: understand
+  - id: object_oriented_design
+    title: Object Oriented Design
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: openclaw
+    title: Openclaw
+    description: Exported from Neo4j (21 prereqs in cluster).
+    prerequisites:
+      - agentic_ai_governance
+      - agi
+      - ai_agent_security
+      - austrian_data_protection_act_datenschutzgesetz
+      - cve_2026_25253
+      - discord
+      - ebbinghaus_s_forgetting_curve
+      - eu_artificial_intelligence_act_ai_act
+      - europ_ische_datenschutzstandards
+      - gdpr_datenschutz_grundverordnung
+      - governance_richtlinien
+      - gpt
+      - memory_scalability
+      - privacy_by_design
+      - rag_agents
+      - rust
+      - skill_security
+      - strength_theory
+      - telegram
+      - wasm_sandboxing
+      - workflow_orchestration
+    bloom_level: understand
+  - id: openclaw_json
+    title: Openclaw Json
+    description: Exported from Neo4j (7 prereqs in cluster).
+    prerequisites:
+      - agentic_loop
+      - channel_adapters
+      - cve_2026_25253
+      - heartbeat_feature
+      - owasp_s_top_10_for_llm_applications
+      - skills
+      - typescript_cli_application
+    bloom_level: understand
+  - id: owasp_s_top_10_for_llm_applications
+    title: Owasp S Top 10 For Llm Applications
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: privacy_by_design
+    title: Privacy By Design
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: python
+    title: Python
+    description: Exported from Neo4j (2 prereqs in cluster).
+    prerequisites:
+      - malware_dropper
+      - yaml_front_matter
+    bloom_level: understand
+  - id: q1_2026
+    title: Q1 2026
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: rag_agents
+    title: Rag Agents
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: real_time_observability_to_audio_synthesis
+    title: Real Time Observability To Audio Synthesis
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: rust
+    title: Rust
+    description: Exported from Neo4j (7 prereqs in cluster).
+    prerequisites:
+      - array_of_structures_aos
+      - graceful_environmental_discovery
+      - object_oriented_design
+      - q1_2026
+      - real_time_observability_to_audio_synthesis
+      - structure_of_arrays_soa
+      - terminal_user_interfaces
+    bloom_level: understand
+  - id: skill_security
+    title: Skill Security
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: skills
+    title: Skills
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: spec_driven_development_sdd
+    title: Spec Driven Development Sdd
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: strength_theory
+    title: Strength Theory
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: structure_of_arrays_soa
+    title: Structure Of Arrays Soa
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: telegram
+    title: Telegram
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: terminal_user_interfaces
+    title: Terminal User Interfaces
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: tui_terminal_user_interface_workspace_anwendung
+    title: Tui Terminal User Interface Workspace Anwendung
+    description: Exported from Neo4j (4 prereqs in cluster).
+    prerequisites:
+      - ansi_escape_codes
+      - go
+      - python
+      - rust
+    bloom_level: understand
+  - id: typescript_5_2
+    title: Typescript 5 2
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: typescript_cli_application
+    title: Typescript Cli Application
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: wasm_sandboxing
+    title: Wasm Sandboxing
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: whatsapp
+    title: Whatsapp
+    description: Exported from Neo4j (1 prereqs in cluster).
+    prerequisites:
+      - openclaw
+    bloom_level: understand
+  - id: workflow_orchestration
+    title: Workflow Orchestration
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand
+  - id: yaml_front_matter
+    title: Yaml Front Matter
+    description: Exported from Neo4j (1 prereqs in cluster).
+    prerequisites:
+      - frontmatter
+    bloom_level: understand
+  - id: zig
+    title: Zig
+    description: Exported from Neo4j (0 prereqs in cluster).
+    prerequisites:
+      []
+    bloom_level: understand

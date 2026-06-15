@@ -1,0 +1,296 @@
+---
+type: source
+title: drive-research-linux-gaming-and-ai-build-guide-micro03
+created: 2026-06-09
+updated: 2026-06-09
+sources: 1
+tags: []
+status: stable
+gzmo_synthetic: true
+---
+
+# drive-research-linux-gaming-and-ai-build-guide-micro03
+
+Ingested source summary (2026-06-09).
+
+## Entities
+- [[youtube|YouTube]] (ORGANIZATION)
+- [[hyperpc-ae|hyperpc.ae]] (ORGANIZATION)
+- [[github-com-ostris-ai-toolkit|github.com/ostris/ai-toolkit]] (CONCEPT)
+- [[thundercompute-com|thundercompute.com]] (ORGANIZATION)
+- [[extremetech|Extremetech]] (ORGANIZATION)
+- [[cpu|CPU]] (SYSTEM)
+- [[ram|RAM]] (SYSTEM)
+- [[x11|X11]] (SYSTEM)
+- [[amd-gpu-support-on-linux|AMD GPU Support On Linux]] (SYSTEM)
+- [[16-pin-connector|16-pin connector]] (SYSTEM)
+- [[wayland|Wayland]] (SYSTEM)
+- [[frame-generation|frame generation]] (CONCEPT)
+- [[l33tsource-com|l33tsource.com]] (ORGANIZATION)
+- [[nvidia-geforce-rtx-5090|NVIDIA GeForce RTX 5090]] (SYSTEM)
+- [[linux-gaming|Linux gaming]] (CONCEPT)
+- [[amd-ryzen|AMD Ryzen]] (SYSTEM)
+- [[m-2-nvme-ssd|M.2 NVMe SSD]] (SYSTEM)
+- [[storagereview-com|StorageReview.com]] (ORGANIZATION)
+- [[12v-2x6-connector|12V-2x6 Connector]] (SYSTEM)
+- [[battlefield-6|Battlefield 6]] (BOOK)
+- [[linuxteck|LinuxTeck]] (ORGANIZATION)
+- [[nix-flakes|Nix Flakes]] (TOOL)
+- [[gradient-flow|Gradient Flow]] (ORGANIZATION)
+- [[howmanyfps-com|howmanyfps.com]] (ORGANIZATION)
+- [[pcie-4-0|PCIe 4.0]] (SYSTEM)
+- [[docker|Docker]] (TOOL)
+- [[windows-11|Windows 11]] (SYSTEM)
+- [[grafickekarty-sk|grafickekarty.sk]] (ORGANIZATION)
+- [[reddit|Reddit]] (ORGANIZATION)
+- [[amd-zen-6|AMD Zen 6]] (SYSTEM)
+- [[nvidia-technical-blog|NVIDIA Technical Blog]] (ORGANIZATION)
+- [[nvidia-570-86-16-beta-linux-driver|NVIDIA 570.86.16 Beta Linux Driver]] (CONCEPT)
+- [[ddr6|DDR6]] (SYSTEM)
+- [[hypercyber|HyperCyber]] (ORGANIZATION)
+- [[wikipedia|Wikipedia]] (ORGANIZATION)
+- [[cuda-toolkit-13-0|CUDA Toolkit 13.0]] (SYSTEM)
+- [[crucial-t705-4-tb|Crucial T705 4 TB]] (SYSTEM)
+- [[samsung-990-pro-ssd-4-tb|Samsung 990 Pro SSD 4 TB]] (SYSTEM)
+- [[nvidia-s-latest-50-series-gpus|Nvidia's Latest 50 Series GPUs]] (SYSTEM)
+- [[storedbits-com|StoredBits.com]] (ORGANIZATION)
+- [[localllm-in|localllm.in]] (ORGANIZATION)
+- [[techtimes|TechTimes]] (ORGANIZATION)
+- [[rtx50series-co-uk|rtx50series.co.uk]] (ORGANIZATION)
+- [[orange-hardwares|Orange Hardwares]] (ORGANIZATION)
+- [[club386|Club386]] (ORGANIZATION)
+- [[smitpipaliya-medium-com|smitpipaliya.medium.com]] (ORGANIZATION)
+- [[overclock3d|Overclock3D]] (ORGANIZATION)
+- [[phoronix|Phoronix]] (ORGANIZATION)
+- [[kernel|Kernel]] (SYSTEM)
+- [[gamingonlinux|GamingOnLinux]] (ORGANIZATION)
+- [[rtx-4090|RTX 4090]] (SYSTEM)
+- [[instinct-mi350-series|Instinct MI350 Series]] (SYSTEM)
+- [[windowsforum-com|windowsforum.com]] (ORGANIZATION)
+- [[aimultiple|AIMultiple]] (ORGANIZATION)
+- [[intel-nova-lake-s|Intel Nova Lake-S]] (SYSTEM)
+- [[database-mart|Database Mart]] (ORGANIZATION)
+- [[gpcb|GPCB]] (ORGANIZATION)
+- [[runpod-blog|Runpod Blog]] (ORGANIZATION)
+- [[box|Box]] (ORGANIZATION)
+- [[developer-nvidia-com|developer.nvidia.com]] (ORGANIZATION)
+- [[dev-community|DEV Community]] (ORGANIZATION)
+- [[rx-8900-xtx|RX 8900 XTX]] (SYSTEM)
+- [[linuxjournal|LinuxJournal]] (ORGANIZATION)
+- [[ordinarytech|OrdinaryTech]] (ORGANIZATION)
+- [[corsair|Corsair]] (ORGANIZATION)
+- [[raid-0|RAID 0]] (CONCEPT)
+- [[sabrepc|SabrePC]] (ORGANIZATION)
+- [[stable-diffusion-xl|Stable Diffusion XL]] (CONCEPT)
+- [[spheron|Spheron]] (ORGANIZATION)
+- [[diskinternals|DiskInternals]] (ORGANIZATION)
+- [[tom-s-hardware|Tom's Hardware]] (ORGANIZATION)
+- [[jameswillia-ms|jameswillia.ms]] (PERSON)
+- [[github-com-nvidia-multi-storage-client|github.com/NVIDIA/multi-storage-client]] (PROJECT)
+- [[blog-elcomsoft-com|blog.elcomsoft.com]] (ORGANIZATION)
+- [[amd-rocm-7-1|AMD ROCm 7.1]] (SYSTEM)
+- [[ddr5|DDR5]] (SYSTEM)
+- [[proton-software|Proton (software)]] (TOOL)
+- [[wine-11|Wine 11]] (TOOL)
+- [[system-plus|System Plus]] (ORGANIZATION)
+- [[podman|Podman]] (TOOL)
+- [[intel-core|Intel Core]] (SYSTEM)
+- [[dasroot|Dasroot]] (ORGANIZATION)
+- [[pcie-5-0-connector|PCIe 5.0 connector]] (SYSTEM)
+- [[geforce-rtx-5080|GeForce RTX 5080]] (SYSTEM)
+- [[comfyui|ComfyUI]] (SYSTEM)
+- [[llama-cpp|llama.cpp]] (TOOL)
+- [[oscoo|OSCOO]] (ORGANIZATION)
+- [[xda-developers|XDA Developers]] (ORGANIZATION)
+- [[steamos|SteamOS]] (SYSTEM)
+- [[wccftech-com|wccftech.com]] (ORGANIZATION)
+- [[michael-stapelberg|Michael Stapelberg]] (PERSON)
+- [[pcgamer-com|pcgamer.com]] (ORGANIZATION)
+- [[local-llms|Local LLMs]] (CONCEPT)
+- [[techpowerup-com|techpowerup.com]] (ORGANIZATION)
+- [[ollama|Ollama]] (TOOL)
+- [[rx-7900-xtx|RX 7900 XTX]] (SYSTEM)
+- [[llama-4|Llama 4]] (CONCEPT)
+
+## Relations
+- RX 7900 XTX → RELATED_TO → NVIDIA GeForce RTX 5090
+- NVIDIA GeForce RTX 5090 → RELATED_TO → RTX 4090
+- NVIDIA GeForce RTX 5090 → RELATED_TO → github.com/ostris/ai-toolkit
+- NVIDIA GeForce RTX 5090 → RELATED_TO → Linux gaming
+- NVIDIA GeForce RTX 5090 → USES → Stable Diffusion XL
+- NVIDIA GeForce RTX 5090 → USES → ComfyUI
+- github.com/ostris/ai-toolkit → RELATED_TO → frame generation
+- AMD GPU Support On Linux → PART_OF → NVIDIA 570.86.16 Beta Linux Driver
+- RX 8900 XTX → RELATED_TO → NVIDIA GeForce RTX 5090
+- RX 8900 XTX → RELATED_TO → Battlefield 6
+- NVIDIA Technical Blog → RELATED_TO → AMD Ryzen
+- NVIDIA Technical Blog → RELATED_TO → github.com/ostris/ai-toolkit
+- NVIDIA Technical Blog → RELATED_TO → Linux gaming
+- NVIDIA Technical Blog → RELATED_TO → NVIDIA 570.86.16 Beta Linux Driver
+- NVIDIA Technical Blog → RELATED_TO → NVIDIA GeForce RTX 5090
+- AMD Ryzen → RELATED_TO → NVIDIA Technical Blog
+- AMD Ryzen → RELATED_TO → github.com/ostris/ai-toolkit
+- AMD Ryzen → RELATED_TO → Linux gaming
+- AMD Ryzen → RELATED_TO → NVIDIA 570.86.16 Beta Linux Driver
+- AMD ROCm 7.1 → RELATED_TO → CUDA Toolkit 13.0
+- AMD ROCm 7.1 → RELATED_TO → AMD GPU Support On Linux
+- CUDA Toolkit 13.0 → RELATED_TO → AMD ROCm 7.1
+- CUDA Toolkit 13.0 → RELATED_TO → AMD GPU Support On Linux
+- CUDA Toolkit 13.0 → RELATED_TO → github.com/ostris/ai-toolkit
+- X11 → RELATED_TO → Wayland
+- X11 → PART_OF → NVIDIA 570.86.16 Beta Linux Driver
+- Wayland → RELATED_TO → X11
+- Wayland → PART_OF → NVIDIA 570.86.16 Beta Linux Driver
+- Wayland → RELATED_TO → NVIDIA Technical Blog
+- NVIDIA 570.86.16 Beta Linux Driver → RELATED_TO → NVIDIA GeForce RTX 5090
+- AMD ROCm 7.1 → RELATED_TO → Instinct MI350 Series
+- llama.cpp → RELATED_TO → Local LLMs
+- Ollama → RELATED_TO → Local LLMs
+- Llama 4 → RELATED_TO → Local LLMs
+- github.com/ostris/ai-toolkit → RELATED_TO → AMD GPU Support On Linux
+- CPU → RELATED_TO → AMD Ryzen
+- CPU → RELATED_TO → Intel Core
+- CPU → RELATED_TO → AMD Zen 6
+- CPU → RELATED_TO → Intel Nova Lake-S
+- AMD Ryzen → RELATED_TO → RAM
+- AMD Zen 6 → RELATED_TO → Intel Nova Lake-S
+- DDR6 → RELATED_TO → DDR5
+- RAM → RELATED_TO → AMD Ryzen
+- Samsung 990 Pro SSD 4 TB → RELATED_TO → Crucial T705 4 TB
+- Samsung 990 Pro SSD 4 TB → PART_OF → M.2 NVMe SSD
+- M.2 NVMe SSD → RELATED_TO → PCIe 5.0 connector
+- M.2 NVMe SSD → RELATED_TO → PCIe 4.0
+- Crucial T705 4 TB → RELATED_TO → Samsung 990 Pro
+- PCIe 5.0 connector → RELATED_TO → PCIe 4.0
+- PCIe 5.0 connector → RELATED_TO → AMD GPU Support On Linux
+- PCIe 4.0 → RELATED_TO → AMD GPU Support On Linux
+- RAID 0 → RELATED_TO → SSD
+- RAID 0 → RELATED_TO → NVMe
+- NVIDIA 570.86.16 Beta Linux Driver → RELATED_TO → Linux gaming
+- NVIDIA 570.86.16 Beta Linux Driver → RELATED_TO → NVIDIA Technical Blog
+- Linux gaming → RELATED_TO → Kernel
+- Linux gaming → RELATED_TO → Wine 11
+- Linux gaming → RELATED_TO → Proton (software)
+- Linux gaming → RELATED_TO → SteamOS
+- Linux gaming → RELATED_TO → Windows 11
+- Linux gaming → RELATED_TO → AMD Ryzen
+- Kernel → RELATED_TO → Linux gaming
+- Wine 11 → RELATED_TO → Proton (software)
+- Proton (software) → RELATED_TO → Wine 11
+- SteamOS → RELATED_TO → Windows 11
+- SteamOS → RELATED_TO → AMD Ryzen
+- Docker → RELATED_TO → Podman
+- Docker → RELATED_TO → github.com/ostris/ai-toolkit
+- Podman → RELATED_TO → Docker
+- Podman → RELATED_TO → github.com/ostris/ai-toolkit
+- Nix Flakes → RELATED_TO → github.com/ostris/ai-toolkit
+- Nix Flakes → RELATED_TO → github.com/NVIDIA/multi-storage-client
+- NVIDIA GeForce RTX 5090 → RELATED_TO → 12V-2x6 Connector
+- Intel Nova Lake-S → RELATED_TO → AMD Zen 6
+- HyperCyber → RELATED_TO → RX 7900 XTX
+- HyperCyber → RELATED_TO → NVIDIA GeForce RTX 5090
+- OrdinaryTech → RELATED_TO → NVIDIA GeForce RTX 5090
+- OrdinaryTech → RELATED_TO → RTX 4090
+- OrdinaryTech → RELATED_TO → github.com/ostris/ai-toolkit
+- OrdinaryTech → RELATED_TO → Linux gaming
+- Box → RELATED_TO → Nvidia's Latest 50 Series GPUs
+- Database Mart → RELATED_TO → Stable Diffusion XL
+- Database Mart → RELATED_TO → ComfyUI
+- Database Mart → RELATED_TO → NVIDIA GeForce RTX 5090
+- XDA Developers → RELATED_TO → github.com/ostris/ai-toolkit
+- XDA Developers → RELATED_TO → frame generation
+- XDA Developers → RELATED_TO → PCIe 5.0 connector
+- Phoronix → RELATED_TO → AMD GPU Support On Linux
+- Phoronix → RELATED_TO → NVIDIA 570.86.16 Beta Linux Driver
+- Phoronix → RELATED_TO → AMD ROCm 7.1
+- rtx50series.co.uk → RELATED_TO → NVIDIA GeForce RTX 5090
+- rtx50series.co.uk → RELATED_TO → RX 8900 XTX
+- rtx50series.co.uk → RELATED_TO → Battlefield 6
+- TechTimes → RELATED_TO → NVIDIA Technical Blog
+- TechTimes → RELATED_TO → AMD Ryzen
+- TechTimes → RELATED_TO → Linux gaming
+- TechTimes → RELATED_TO → github.com/ostris/ai-toolkit
+- System Plus → RELATED_TO → Nvidia
+- System Plus → RELATED_TO → AMD Ryzen
+- Spheron → RELATED_TO → AMD ROCm 7.1
+- Spheron → RELATED_TO → CUDA Toolkit 13.0
+- Spheron → RELATED_TO → AMD GPU Support On Linux
+- Spheron → RELATED_TO → github.com/ostris/ai-toolkit
+- AIMultiple → RELATED_TO → CUDA Toolkit 13.0
+- AIMultiple → RELATED_TO → AMD ROCm 7.1
+- AIMultiple → RELATED_TO → github.com/ostris/ai-toolkit
+- LinuxTeck → RELATED_TO → X11
+- LinuxTeck → RELATED_TO → Wayland
+- LinuxTeck → RELATED_TO → NVIDIA 570.86.16 Beta Linux Driver
+- Michael Stapelberg → RELATED_TO → Wayland
+- developer.nvidia.com → RELATED_TO → NVIDIA GeForce RTX 5090
+- developer.nvidia.com → RELATED_TO → NVIDIA 570.86.16 Beta Linux Driver
+- Reddit → RELATED_TO → NVIDIA Technical Blog
+- Reddit → RELATED_TO → Wayland
+- Reddit → RELATED_TO → Kernel
+- Reddit → RELATED_TO → Linux gaming
+- Reddit → RELATED_TO → RAM
+- Reddit → RELATED_TO → AMD Ryzen
+- thundercompute.com → RELATED_TO → AMD ROCm 7.1
+- thundercompute.com → RELATED_TO → CUDA Toolkit 13.0
+- NVIDIA Technical Blog → RELATED_TO → CUDA Toolkit 13.0
+- localllm.in → RELATED_TO → llama.cpp
+- localllm.in → RELATED_TO → Ollama
+- localllm.in → RELATED_TO → Local LLMs
+- Gradient Flow → RELATED_TO → Llama 4
+- Runpod Blog → RELATED_TO → Llama 4
+- smitpipaliya.medium.com → RELATED_TO → Local LLMs
+- smitpipaliya.medium.com → RELATED_TO → NVIDIA 570.86.16 Beta Linux Driver
+- smitpipaliya.medium.com → RELATED_TO → Linux gaming
+- Club386 → RELATED_TO → CPU
+- Club386 → RELATED_TO → AMD Ryzen
+- Club386 → RELATED_TO → Intel Core
+- Tom's Hardware → RELATED_TO → CPU
+- Tom's Hardware → RELATED_TO → Linux gaming
+- hyperpc.ae → RELATED_TO → AMD Zen 6
+- hyperpc.ae → RELATED_TO → Intel Nova Lake-S
+- StorageReview.com → RELATED_TO → github.com/ostris/ai-toolkit
+- OSCOO → RELATED_TO → DDR6
+- OSCOO → RELATED_TO → DDR5
+- Corsair → RELATED_TO → RAM
+- Corsair → RELATED_TO → AMD Ryzen
+- Orange Hardwares → RELATED_TO → RAM
+- Orange Hardwares → RELATED_TO → AMD Ryzen
+- howmanyfps.com → RELATED_TO → Samsung 990 Pro SSD 4 TB
+- howmanyfps.com → RELATED_TO → Crucial T705 4 TB
+- GPCB → RELATED_TO → M.2 NVMe SSD
+- StoredBits.com → RELATED_TO → Crucial T705
+- StoredBits.com → RELATED_TO → Samsung 990 Pro
+- SabrePC → RELATED_TO → PCIe 5.0 connector
+- DiskInternals → RELATED_TO → RAID 0
+- GamingOnLinux → RELATED_TO → NVIDIA 570.86.16 Beta Linux Driver
+- GamingOnLinux → RELATED_TO → Linux gaming
+- LinuxJournal → RELATED_TO → NVIDIA 570.86.16 Beta Linux Driver
+- LinuxJournal → RELATED_TO → Linux gaming
+- YouTube → RELATED_TO → NVIDIA 570.86.16 Beta Linux Driver
+- YouTube → RELATED_TO → NVIDIA Technical Blog
+- pcgamer.com → RELATED_TO → Linux gaming
+- pcgamer.com → RELATED_TO → Wine 11
+- Wikipedia → RELATED_TO → Proton (software)
+- Wikipedia → RELATED_TO → AMD Zen 6
+- windowsforum.com → RELATED_TO → Linux Gaming
+- windowsforum.com → RELATED_TO → SteamOS
+- windowsforum.com → RELATED_TO → Windows 11
+- windowsforum.com → RELATED_TO → AMD Ryzen
+- Dasroot → RELATED_TO → Docker
+- Dasroot → RELATED_TO → Podman
+- Dasroot → RELATED_TO → github.com/ostris/ai-toolkit
+- DEV Community → RELATED_TO → Docker
+- DEV Community → RELATED_TO → Podman
+- l33tsource.com → RELATED_TO → Nix Flakes
+- github.com/ostris/ai-toolkit → RELATED_TO → Nix Flakes
+- techpowerup.com → RELATED_TO → NVIDIA GeForce RTX 5090
+- techpowerup.com → RELATED_TO → 12V-2x6 Connector
+- wccftech.com → RELATED_TO → 16-pin connector
+- blog.elcomsoft.com → RELATED_TO → NVIDIA GeForce RTX 5090
+- grafickekarty.sk → RELATED_TO → PCIe 4.0
+- grafickekarty.sk → RELATED_TO → PCIe 5.0 connector
+- grafickekarty.sk → RELATED_TO → AMD GPU Support On Linux
+- Extremetech → RELATED_TO → Intel Nova Lake-S
+- Extremetech → RELATED_TO → AMD Zen 6
+- Overclock3D → RELATED_TO → AMD Zen 6

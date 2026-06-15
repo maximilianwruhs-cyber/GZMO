@@ -1,0 +1,199 @@
+---
+type: source
+title: drive-research-setting-up-autonomous-trading-agents-micro01
+created: 2026-06-09
+updated: 2026-06-09
+sources: 1
+tags: []
+status: stable
+gzmo_synthetic: true
+---
+
+# drive-research-setting-up-autonomous-trading-agents-micro01
+
+Ingested source summary (2026-06-09).
+
+## Entities
+- [[social-copy-trading|social copy-trading]] (CONCEPT)
+- [[multi-broker-compatibility|multi-broker compatibility]] (CONCEPT)
+- [[account-management|account management]] (CONCEPT)
+- [[google-takeout|Google Takeout]] (TOOL)
+- [[order-routing|order routing]] (CONCEPT)
+- [[coinrule|Coinrule]] (TOOL)
+- [[tradesanta|TradeSanta]] (TOOL)
+- [[ui-bakery|UI Bakery]] (TOOL)
+- [[no-code-platforms|no-code platforms]] (CONCEPT)
+- [[traditional-exchange-traded-derivatives|traditional exchange-traded derivatives]] (CONCEPT)
+- [[finnhub|Finnhub]] (TOOL)
+- [[data-ingestion-engines|data ingestion engines]] (SYSTEM)
+- [[latency|latency]] (CONCEPT)
+- [[asset-class-support|asset class support]] (CONCEPT)
+- [[itick|iTick]] (TOOL)
+- [[market-data-ingestion|market data ingestion]] (CONCEPT)
+- [[fix-connection|FIX connection]] (CONCEPT)
+- [[relative-strength-index-rsi|Relative Strength Index (RSI)]] (CONCEPT)
+- [[websocket-streams|WebSocket streams]] (CONCEPT)
+- [[wundertrading|WunderTrading]] (TOOL)
+- [[google-s-agent2agent-a2a|Google's Agent2Agent (A2A)]] (CONCEPT)
+- [[infrastructure-maintenance|infrastructure maintenance]] (CONCEPT)
+- [[alpha-vantage|Alpha Vantage]] (TOOL)
+- [[asset-class-diversity|asset class diversity]] (CONCEPT)
+- [[market-coverage|market coverage]] (CONCEPT)
+- [[polygon|Polygon]] (TOOL)
+- [[post-trade-settlement-reporting|post-trade settlement reporting]] (CONCEPT)
+- [[langgraph|LangGraph]] (TOOL)
+- [[webhook-signals|webhook signals]] (CONCEPT)
+- [[signal-orchestration|Signal Orchestration]] (CONCEPT)
+- [[zapier|Zapier]] (TOOL)
+- [[protocol-support|protocol support]] (CONCEPT)
+- [[regional-regulatory-availability|regional regulatory availability]] (CONCEPT)
+- [[capitalise-ai|Capitalise.ai]] (TOOL)
+- [[funding|funding]] (CONCEPT)
+- [[react-reason-act|ReAct (Reason + Act)]] (CONCEPT)
+- [[account-notifications|account notifications]] (CONCEPT)
+- [[drive-clean-takeout-drive-setting-up-autonomous-trading-agents-docx|drive_clean/Takeout/Drive/Setting Up Autonomous Trading Agents.docx]] (BOOK)
+- [[pine-script-strategy-code|Pine Script strategy code]] (CONCEPT)
+- [[python|Python]] (TOOL)
+- [[on-chain-support|on-chain support]] (CONCEPT)
+- [[visual-no-code-application-builders|visual no-code application builders]] (CONCEPT)
+- [[alert-dialogue-box|alert dialogue box]] (CONCEPT)
+- [[grok4|Grok4]] (TOOL)
+- [[risk-management|risk management]] (CONCEPT)
+- [[oauth-2-0|OAuth 2.0]] (CONCEPT)
+- [[unified-terminal-interface|unified terminal interface]] (CONCEPT)
+- [[brokerage-api|brokerage API]] (SYSTEM)
+- [[pricing-structures|pricing structures]] (CONCEPT)
+- [[trading-operations|trading operations]] (CONCEPT)
+- [[asset-classes|asset classes]] (CONCEPT)
+- [[drive-research-setting-up-autonomous-trading-agents-md|drive-research-setting-up-autonomous-trading-agents.md]] (BOOK)
+- [[interactive-brokers-ibkr|Interactive Brokers (IBKR)]] (ORGANIZATION)
+- [[airtable|Airtable]] (TOOL)
+- [[autonomous-agentic-trading-systems-a-comprehensive-guide-to-architecture-implementation-and-regulatory-compliance|Autonomous Agentic Trading Systems: A Comprehensive Guide to Architecture, Implementation, and Regulatory Compliance]] (CONCEPT)
+- [[traderspost|TradersPost]] (TOOL)
+- [[client-portal-gateway|Client Portal Gateway]] (SYSTEM)
+- [[receiver-endpoint|receiver endpoint]] (CONCEPT)
+- [[agentic-orchestration-frameworks|agentic orchestration frameworks]] (CONCEPT)
+- [[c|C++]] (TOOL)
+- [[global-markets|global markets]] (CONCEPT)
+- [[signal-generation|signal generation]] (CONCEPT)
+- [[n8n|n8n]] (TOOL)
+- [[tick-data|tick data]] (CONCEPT)
+- [[make-formerly-integromat|Make (formerly Integromat)]] (TOOL)
+- [[tws-api|TWS API]] (SYSTEM)
+- [[technical-indicators|technical indicators]] (CONCEPT)
+- [[fingpt|FinGPT]] (SYSTEM)
+- [[trader-workstation-tws|Trader Workstation (TWS)]] (SYSTEM)
+- [[langchain|LangChain]] (TOOL)
+- [[large-language-models-llms|Large Language Models (LLMs)]] (CONCEPT)
+- [[fmp|FMP]] (TOOL)
+- [[json-web-token-jwt|JSON Web Token (JWT)]] (CONCEPT)
+- [[ai-agent|AI agent]] (CONCEPT)
+- [[quantitative-algorithms|quantitative algorithms]] (CONCEPT)
+- [[low-code-approach|low-code approach]] (CONCEPT)
+- [[vendor-dependency-risk|vendor dependency risk]] (CONCEPT)
+- [[crewai|CrewAI]] (TOOL)
+- [[tcp-socket-protocol|TCP Socket Protocol]] (CONCEPT)
+- [[cryptographic-authentication|cryptographic authentication]] (CONCEPT)
+- [[microsoft-autogen|Microsoft AutoGen]] (TOOL)
+- [[dollar-cost-averaging-dca|Dollar-Cost Averaging (DCA)]] (CONCEPT)
+- [[anthropic-s-model-context-protocol-mcp|Anthropic's Model Context Protocol (MCP)]] (CONCEPT)
+- [[algorithmic-trading|algorithmic trading]] (CONCEPT)
+- [[pricing-models|pricing models]] (CONCEPT)
+- [[strategic-complexity|strategic complexity]] (CONCEPT)
+- [[automation-platform|automation platform]] (CONCEPT)
+- [[chain-of-thought-prompting|Chain-of-thought prompting]] (CONCEPT)
+- [[web-api|Web API]] (SYSTEM)
+- [[cryptocurrency-futures|cryptocurrency futures]] (CONCEPT)
+- [[real-time-market-data-api|real-time market data API]] (CONCEPT)
+- [[ib-gateway|IB Gateway]] (SYSTEM)
+- [[strategy-marketplace|strategy marketplace]] (CONCEPT)
+- [[volume-weighted-average-price-vwap|Volume Weighted Average Price (VWAP)]] (CONCEPT)
+- [[java|Java]] (TOOL)
+- [[json-webhook-payload|JSON webhook payload]] (CONCEPT)
+- [[spot-instruments|spot instruments]] (CONCEPT)
+- [[tradingview|TradingView]] (SYSTEM)
+- [[tradetron|Tradetron]] (TOOL)
+- [[authentication-mechanisms|authentication mechanisms]] (CONCEPT)
+
+## Relations
+- Autonomous Agentic Trading Systems: A Comprehensive Guide to Architecture, Implementation, and Regulatory Compliance → RELATED_TO → Large Language Models (LLMs)
+- Autonomous Agentic Trading Systems: A Comprehensive Guide to Architecture, Implementation, and Regulatory Compliance → RELATED_TO → AI agent
+- Autonomous Agentic Trading Systems: A Comprehensive Guide to Architecture, Implementation, and Regulatory Compliance → RELATED_TO → algorithmic trading
+- Autonomous Agentic Trading Systems: A Comprehensive Guide to Architecture, Implementation, and Regulatory Compliance → RELATED_TO → quantitative algorithms
+- Autonomous Agentic Trading Systems: A Comprehensive Guide to Architecture, Implementation, and Regulatory Compliance → RELATED_TO → agentic orchestration frameworks
+- Autonomous Agentic Trading Systems: A Comprehensive Guide to Architecture, Implementation, and Regulatory Compliance → RELATED_TO → visual no-code application builders
+- Autonomous Agentic Trading Systems: A Comprehensive Guide to Architecture, Implementation, and Regulatory Compliance → RELATED_TO → market data ingestion
+- Autonomous Agentic Trading Systems: A Comprehensive Guide to Architecture, Implementation, and Regulatory Compliance → RELATED_TO → signal generation
+- Autonomous Agentic Trading Systems: A Comprehensive Guide to Architecture, Implementation, and Regulatory Compliance → RELATED_TO → order routing
+- Autonomous Agentic Trading Systems: A Comprehensive Guide to Architecture, Implementation, and Regulatory Compliance → RELATED_TO → post-trade settlement reporting
+- Autonomous Agentic Trading Systems: A Comprehensive Guide to Architecture, Implementation, and Regulatory Compliance → RELATED_TO → risk management
+- Autonomous Agentic Trading Systems: A Comprehensive Guide to Architecture, Implementation, and Regulatory Compliance → RELATED_TO → infrastructure maintenance
+- LangChain → PART_OF → agentic orchestration frameworks
+- LangGraph → PART_OF → agentic orchestration frameworks
+- CrewAI → PART_OF → agentic orchestration frameworks
+- Microsoft AutoGen → PART_OF → agentic orchestration frameworks
+- CrewAI → USES → FinGPT
+- CrewAI → USES → Python
+- AI agent → USES → Large Language Models (LLMs)
+- AI agent → USES → long-term memory structures
+- AI agent → USES → iterative feedback loops
+- ReAct (Reason + Act) → RELATED_TO → Chain-of-thought prompting
+- Google's Agent2Agent (A2A) → RELATED_TO → custom agentic setup
+- Anthropic's Model Context Protocol (MCP) → RELATED_TO → custom agentic setup
+- n8n → PART_OF → visual no-code application builders
+- Make (formerly Integromat) → PART_OF → visual no-code application builders
+- Zapier → PART_OF → visual no-code application builders
+- n8n → USES → brokerage API
+- UI Bakery → PART_OF → no-code platforms
+- Airtable → PART_OF → no-code platforms
+- Capitalise.ai → PART_OF → no-code platforms
+- Coinrule → PART_OF → no-code platforms
+- TradersPost → PART_OF → no-code platforms
+- Tradetron → PART_OF → no-code platforms
+- Capitalise.ai → RELATED_TO → Dollar-Cost Averaging (DCA)
+- Capitalise.ai → USES → Interactive Brokers (IBKR)
+- Capitalise.ai → USES → FIX connection
+- TradersPost → USES → webhook signals
+- Tradetron → RELATED_TO → strategy marketplace
+- Coinrule → RELATED_TO → on-chain support
+- WunderTrading → RELATED_TO → social copy-trading
+- Signal Orchestration → RELATED_TO → TradingView
+- TradingView → USES → market data
+- TradingView → USES → Pine Script strategy code
+- TradingView → USES → technical indicators
+- Grok4 → USES → Pine Script strategy code
+- TradingView → USES → n8n
+- TradingView → USES → Capitalise.ai
+- TradingView → USES → TradersPost
+- TradingView → USES → JSON webhook payload
+- n8n → USES → JSON webhook payload
+- TradersPost → USES → JSON webhook payload
+- brokerage API → USES → trade execution
+- TradingView → RELATED_TO → data ingestion engines
+- iTick → USES → WebSocket
+- Polygon → USES → WebSocket
+- Finnhub → USES → WebSocket
+- FMP → USES → WebSocket
+- Interactive Brokers (IBKR) → USES → Web API
+- Interactive Brokers (IBKR) → USES → TWS API
+- Interactive Brokers (IBKR) → USES → FIX connection
+- Web API → USES → account management
+- Web API → USES → post-trade settlement reporting
+- Web API → USES → funding
+- Web API → USES → trading operations
+- Web API → USES → WebSocket streaming
+- Web API → USES → OAuth 2.0
+- Web API → USES → JSON Web Token (JWT)
+- TWS API → USES → Python
+- TWS API → USES → Java
+- TWS API → USES → C++
+- TWS API → USES → Trader Workstation (TWS)
+- TWS API → USES → IB Gateway
+- TWS API → USES → TCP Socket Protocol
+- Trader Workstation (TWS) → RELATED_TO → TWS API
+- IB Gateway → RELATED_TO → TWS API
+- Client Portal Gateway → USES → Java
+- Client Portal Gateway → USES → cryptographic authentication
+- Google Takeout → RELATED_TO → drive-research-setting-up-autonomous-trading-agents.md
+- drive-research-setting-up-autonomous-trading-agents.md → RELATED_TO → Autonomous Agentic Trading Systems: A Comprehensive Guide to Architecture, Implementation, and Regulatory Compliance
+- drive_clean/Takeout/Drive/Setting Up Autonomous Trading Agents.docx → AUTHORED_BY → Autonomous Agentic Trading Systems: A Comprehensive Guide to Architecture, Implementation, and Regulatory Compliance

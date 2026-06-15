@@ -1,0 +1,18 @@
+---
+type: entity
+title: Bollt (2021)
+created: 2026-06-08
+updated: 2026-06-08
+sources: 1
+tags: []
+status: draft
+gzmo_synthetic: true
+---
+
+# Bollt (2021)
+
+Type: PERSON
+
+## From [[drive-research-nvar-financial-forecasting-parameter-search|drive-research-nvar-financial-forecasting-parameter-search]] (2026-06-08)
+- Established the mathematical equivalence between classical reservoir computing and nonlinear vector autoregression.
+- Is cited for establishing mathematical equivalence.

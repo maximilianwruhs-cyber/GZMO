@@ -1,0 +1,18 @@
+---
+type: entity
+title: Virtual Software Company
+created: 2026-06-09
+updated: 2026-06-09
+sources: 1
+tags: []
+status: draft
+gzmo_synthetic: true
+---
+
+# Virtual Software Company
+
+Type: MODEL
+
+## From [[ai-research-part6-micro05|ai-research-part6-micro05]] (2026-06-09)
+- A model provided by Claw-Empire.
+- Offers an observability layer for heterogeneous AI resources.

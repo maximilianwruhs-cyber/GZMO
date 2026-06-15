@@ -1,0 +1,11 @@
+{
+  "name": "pre-router-baseline",
+  "embed_url": "http://192.168.31.110:8081/v1",
+  "embed_model": "Qwen3-Embedding-0.6B-Q8_0.gguf",
+  "rerank_url": "http://192.168.31.110:8082/v1",
+  "rerank_model": "bge-reranker-v2-m3-q8_0.gguf",
+  "vm_host": "192.168.31.110",
+  "ssh_user": "maximilian",
+  "ssh_key": "~/.ssh/id_sidecar_proxmox",
+  "iterations": 30
+}

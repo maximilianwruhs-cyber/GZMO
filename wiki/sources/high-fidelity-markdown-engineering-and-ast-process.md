@@ -1,0 +1,167 @@
+---
+type: source
+title: high-fidelity-markdown-engineering-and-ast-process
+created: 2026-06-08
+updated: 2026-06-08
+sources: 1
+tags: []
+status: stable
+gzmo_synthetic: true
+---
+
+# high-fidelity-markdown-engineering-and-ast-process
+
+Ingested source summary (2026-06-08).
+
+## Entities
+- [[remark-stringify|remark-stringify]] (TOOL)
+- [[remark-preset-lint-markdown-style-guide|remark-preset-lint-markdown-style-guide]] (TOOL)
+- [[programmatic-appends|programmatic appends]] (CONCEPT)
+- [[rehype-sanitize|rehype-sanitize]] (TOOL)
+- [[markdown-lists|markdown lists]] (CONCEPT)
+- [[paragraph|Paragraph]] (CONCEPT)
+- [[yaml-front-matter|yaml-front-matter]] (CONCEPT)
+- [[code-block-directives|Code Block Directives]] (CONCEPT)
+- [[unified-ecosystem|unified ecosystem]] (TOOL)
+- [[custom-parser-handlers|custom parser handlers]] (CONCEPT)
+- [[ast-manipulation-plugins|AST manipulation plugins]] (CONCEPT)
+- [[universal-syntax-tree-unist|Universal Syntax Tree (unist)]] (CONCEPT)
+- [[tightdefinitions|tightDefinitions]] (CONCEPT)
+- [[markdown-abstract-syntax-tree-mdast|Markdown Abstract Syntax Tree (MDAST)]] (CONCEPT)
+- [[gray-matter|gray-matter]] (TOOL)
+- [[regular-expressions|regular expressions]] (TOOL)
+- [[unist-util-visit-parents|unist-util-visit-parents]] (TOOL)
+- [[remark-lint-ecosystem|remark-lint ecosystem]] (TOOL)
+- [[string-manipulation|string manipulation]] (TOOL)
+- [[listitemgfm|ListItemGfm]] (CONCEPT)
+- [[javascript|JavaScript]] (SYSTEM)
+- [[gzmo-system|GZMO System]] (SYSTEM)
+- [[remark-gfm|remark-gfm]] (TOOL)
+- [[json|JSON]] (CONCEPT)
+- [[remark-lint-list-item-indent|remark-lint-list-item-indent]] (TOOL)
+- [[hast|hast]] (CONCEPT)
+- [[listitem|ListItem]] (CONCEPT)
+- [[textdirective|TextDirective]] (CONCEPT)
+- [[abstract-syntax-trees|Abstract Syntax Trees]] (CONCEPT)
+- [[front-matter|front-matter]] (TOOL)
+- [[containerdirective|ContainerDirective]] (CONCEPT)
+- [[custom-join-functions|custom join functions]] (CONCEPT)
+- [[raw-html-nodes|raw HTML nodes]] (CONCEPT)
+- [[remark-lint-hard-break-spaces|remark-lint-hard-break-spaces]] (TOOL)
+- [[location-interface|Location interface]] (CONCEPT)
+- [[github-flavored-markdown-gfm|GitHub Flavored Markdown (GFM)]] (CONCEPT)
+- [[remark-preset-lint-consistent|remark-preset-lint-consistent]] (TOOL)
+- [[structural-separators-and-headings|Structural Separators and Headings]] (CONCEPT)
+- [[text-node|Text node]] (CONCEPT)
+- [[commonmark|CommonMark]] (CONCEPT)
+- [[closeatx|closeAtx]] (CONCEPT)
+- [[parentnode-interface|ParentNode interface]] (CONCEPT)
+- [[blockquote|Blockquote]] (CONCEPT)
+- [[rule|rule]] (CONCEPT)
+- [[phrasingcontent-model|PhrasingContent model]] (CONCEPT)
+- [[frontmatter|frontmatter]] (CONCEPT)
+- [[root-node|Root node]] (CONCEPT)
+- [[remark-rehype|remark-rehype]] (TOOL)
+- [[rehype-raw|rehype-raw]] (TOOL)
+- [[coffeescript|CoffeeScript]] (CONCEPT)
+- [[listitemindent|listItemIndent]] (CONCEPT)
+- [[node-interface|Node interface]] (CONCEPT)
+- [[listcontent-model|ListContent model]] (CONCEPT)
+- [[literalnode-interface|LiteralNode interface]] (CONCEPT)
+- [[inlinecode|InlineCode]] (CONCEPT)
+- [[heading|Heading]] (CONCEPT)
+- [[node-js|Node.js]] (SYSTEM)
+- [[custom-directives|custom directives]] (CONCEPT)
+- [[rehype-parse|rehype-parse]] (TOOL)
+- [[point-interface|Point interface]] (CONCEPT)
+- [[abstract-syntax-tree-ast|Abstract Syntax Tree (AST)]] (CONCEPT)
+- [[fences|fences]] (CONCEPT)
+- [[toml|TOML]] (CONCEPT)
+- [[custom-nodes|custom nodes]] (CONCEPT)
+- [[python|Python]] (SYSTEM)
+- [[leafdirective|LeafDirective]] (CONCEPT)
+- [[incrementlistmarker|incrementListMarker]] (CONCEPT)
+
+## Relations
+- GZMO System → USES → remark-preset-lint-markdown-style-guide
+- GZMO System → USES → yaml-front-matter
+- GZMO System → USES → Abstract Syntax Tree (AST)
+- GZMO System → USES → gray-matter
+- GZMO System → USES → Markdown Abstract Syntax Tree (MDAST)
+- GZMO System → USES → unified ecosystem
+- GZMO System → USES → unist-util-visit-parents
+- GZMO System → USES → remark-stringify
+- GZMO System → USES → GitHub Flavored Markdown (GFM)
+- GZMO System → USES → remark-gfm
+- remark-preset-lint-markdown-style-guide → RELATED_TO → regular expressions
+- remark-preset-lint-markdown-style-guide → RELATED_TO → string manipulation
+- gray-matter → USES → yaml-front-matter
+- gray-matter → USES → JSON
+- gray-matter → USES → TOML
+- gray-matter → USES → CoffeeScript
+- front-matter → USES → yaml-front-matter
+- Markdown Abstract Syntax Tree (MDAST) → PART_OF → Universal Syntax Tree (unist)
+- Markdown Abstract Syntax Tree (MDAST) → USES → Node interface
+- Markdown Abstract Syntax Tree (MDAST) → USES → ParentNode interface
+- Markdown Abstract Syntax Tree (MDAST) → USES → LiteralNode interface
+- Markdown Abstract Syntax Tree (MDAST) → USES → Heading
+- Markdown Abstract Syntax Tree (MDAST) → USES → Code Block Directives
+- Markdown Abstract Syntax Tree (MDAST) → USES → remark-lint-list-item-indent
+- Markdown Abstract Syntax Tree (MDAST) → USES → ListItem
+- Node interface → USES → Location interface
+- Location interface → USES → Point interface
+- Heading → USES → PhrasingContent model
+- remark-lint-list-item-indent → USES → ListContent model
+- ListItem → RELATED_TO → GitHub Flavored Markdown (GFM)
+- ListItemGfm → RELATED_TO → ListItem
+- unified ecosystem → USES → unist-util-visit-parents
+- unist-util-visit-parents → USES → Node interface
+- remark-stringify → USES → Markdown Abstract Syntax Tree (MDAST)
+- remark-gfm → USES → ListItem
+- Node.js → USES → front-matter
+- Node.js → USES → yaml-front-matter
+- Node.js → USES → gray-matter
+- JavaScript → USES → front-matter
+- JavaScript → USES → yaml-front-matter
+- JavaScript → USES → gray-matter
+- Python → RELATED_TO → yaml-front-matter
+- markdown lists → RELATED_TO → listItemIndent
+- GZMO System → RELATED_TO → Code Block Directives
+- GZMO System → USES → fences
+- GZMO System → USES → remark-lint ecosystem
+- GZMO System → USES → custom directives
+- GZMO System → USES → Abstract Syntax Trees
+- remark-stringify → RELATED_TO → CommonMark
+- remark-stringify → RELATED_TO → custom nodes
+- remark-stringify → RELATED_TO → raw HTML nodes
+- remark-stringify → USES → custom join functions
+- Markdown Abstract Syntax Tree (MDAST) → RELATED_TO → custom nodes
+- Markdown Abstract Syntax Tree (MDAST) → RELATED_TO → raw HTML nodes
+- remark-lint ecosystem → PART_OF → remark-preset-lint-consistent
+- remark-lint ecosystem → PART_OF → remark-preset-lint-markdown-style-guide
+- remark-lint ecosystem → PART_OF → remark-lint-list-item-indent
+- remark-lint ecosystem → PART_OF → remark-lint-hard-break-spaces
+- unified ecosystem → RELATED_TO → Markdown Abstract Syntax Tree (MDAST)
+- unified ecosystem → RELATED_TO → hast
+- unified ecosystem → USES → remark-rehype
+- Markdown Abstract Syntax Tree (MDAST) → RELATED_TO → hast
+- remark-rehype → USES → Markdown Abstract Syntax Tree (MDAST)
+- remark-rehype → RELATED_TO → hast
+- hast → USES → rehype-sanitize
+- hast → RELATED_TO → rehype-parse
+- rehype-parse → RELATED_TO → remark-rehype
+- remark-rehype → RELATED_TO → remark-stringify
+- rehype-raw → RELATED_TO → rehype-parse
+- Markdown Abstract Syntax Tree (MDAST) → RELATED_TO → custom directives
+- Markdown Abstract Syntax Tree (MDAST) → RELATED_TO → TextDirective
+- Markdown Abstract Syntax Tree (MDAST) → RELATED_TO → LeafDirective
+- Markdown Abstract Syntax Tree (MDAST) → RELATED_TO → ContainerDirective
+- unist-util-visit-parents → USES → custom directives
+- unist-util-visit-parents → USES → TextDirective
+- unist-util-visit-parents → USES → LeafDirective
+- unist-util-visit-parents → USES → ContainerDirective
+- unist-util-visit-parents → USES → Abstract Syntax Trees
+- gray-matter → RELATED_TO → frontmatter
+- Abstract Syntax Trees → RELATED_TO → Markdown Abstract Syntax Tree (MDAST)
+- Markdown Abstract Syntax Tree (MDAST) → RELATED_TO → Abstract Syntax Trees
+- yaml-front-matter → RELATED_TO → frontmatter

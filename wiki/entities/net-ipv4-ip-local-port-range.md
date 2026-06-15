@@ -1,0 +1,18 @@
+---
+type: entity
+title: net.ipv4.ip_local_port_range
+created: 2026-06-09
+updated: 2026-06-09
+sources: 1
+tags: []
+status: draft
+gzmo_synthetic: true
+---
+
+# net.ipv4.ip_local_port_range
+
+Type: CONCEPT
+
+## From [[drive-research-ubuntu-extreme-hardware-tuning-micro02|drive-research-ubuntu-extreme-hardware-tuning-micro02]] (2026-06-09)
+- Kernel parameter for local port range.
+- Set to 1024 65535.

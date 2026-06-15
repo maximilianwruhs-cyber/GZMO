@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Deploy bge-reranker-v2-m3 on VM200 :8082 (OpenAI-compatible /v1/rerank).
+# DEPRECATED — use deploy-retrieval-router.sh (unified :8081 router).
+# Legacy: standalone bge rerank :8082.
 set -euo pipefail
 
 VM_HOST="${GZMO_VM200_HOST:-192.168.31.110}"

@@ -1,0 +1,18 @@
+---
+type: entity
+title: lateral movement
+created: 2026-06-09
+updated: 2026-06-09
+sources: 1
+tags: []
+status: draft
+gzmo_synthetic: true
+---
+
+# lateral movement
+
+Type: CONCEPT
+
+## From [[drive-research-architecting-zero-configuration-portable-agents-s-micro03|drive-research-architecting-zero-configuration-portable-agents-s-micro03]] (2026-06-09)
+- Interpreted by endpoint protection platforms.
+- Sequential TCP SYN requests can be an indicator of this.

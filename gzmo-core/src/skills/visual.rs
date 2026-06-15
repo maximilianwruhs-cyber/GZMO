@@ -56,6 +56,7 @@ impl Skill for VisualSkill {
                     ),
                     feedback: vec![],
                     inject_to_conversation: false,
+            evidence: None,
                 });
             }
         };
@@ -85,6 +86,7 @@ impl Skill for VisualSkill {
                         display: format!("  ⚠ Generator failed: {}", stdout),
                         feedback: vec![],
                         inject_to_conversation: false,
+            evidence: None,
                     });
                 }
             }
@@ -94,6 +96,7 @@ impl Skill for VisualSkill {
                     display: format!("  ⚠ Generator error: {}", stderr),
                     feedback: vec![],
                     inject_to_conversation: false,
+            evidence: None,
                 });
             }
             Err(e) => {
@@ -101,6 +104,7 @@ impl Skill for VisualSkill {
                     display: format!("  ⚠ Failed to run generator: {}", e),
                     feedback: vec![],
                     inject_to_conversation: false,
+            evidence: None,
                 });
             }
         }
@@ -122,6 +126,7 @@ impl Skill for VisualSkill {
                     display: format!("  ⚠ chafa error: {}", stderr),
                     feedback: vec![],
                     inject_to_conversation: false,
+            evidence: None,
                 });
             }
             Err(_) => {
@@ -129,6 +134,7 @@ impl Skill for VisualSkill {
                     display: "  ⚠ chafa not found. Install: apt install chafa".to_string(),
                     feedback: vec![],
                     inject_to_conversation: false,
+            evidence: None,
                 });
             }
         };
@@ -177,6 +183,7 @@ impl Skill for VisualSkill {
             display,
             feedback,
             inject_to_conversation: false,
+            evidence: None,
         })
     }
 }

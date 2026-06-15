@@ -1,0 +1,188 @@
+---
+type: source
+title: openclaw-part2
+created: 2026-06-08
+updated: 2026-06-08
+sources: 1
+tags: []
+status: stable
+gzmo_synthetic: true
+---
+
+# openclaw-part2
+
+Ingested source summary (2026-06-08).
+
+## Entities
+- [[agent2agent-a2a-protocol|Agent2Agent (A2A) protocol]] (CONCEPT)
+- [[autogen|AutoGen]] (TOOL)
+- [[memory-yyyy-mm-dd-md|memory/YYYY-MM-DD.md]] (CONCEPT)
+- [[xai|xAI]] (ORGANIZATION)
+- [[google-cloud-armor|Google Cloud Armor]] (SYSTEM)
+- [[github|GitHub]] (SYSTEM)
+- [[langchain|LangChain]] (FRAMEWORK)
+- [[lumma|Lumma]] (TOOL)
+- [[google-cloud-platform-gcp|Google Cloud Platform (GCP)]] (ORGANIZATION)
+- [[pi-mono-agent-runtime|pi-mono Agent Runtime]] (SYSTEM)
+- [[microsoft-copilot|Microsoft Copilot]] (SYSTEM)
+- [[google-lyria|Google Lyria]] (TOOL)
+- [[nemoclaw-nvidia|NemoClaw (NVIDIA)]] (SYSTEM)
+- [[hermes-agent|Hermes Agent]] (SYSTEM)
+- [[kms|KMS]] (TOOL)
+- [[nvidia-dgx|NVIDIA DGX]] (TOOL)
+- [[node-js|Node.js]] (TOOL)
+- [[crustafarianism|Crustafarianism]] (CONCEPT)
+- [[lm-studio|LM Studio]] (TOOL)
+- [[moltbot|Moltbot]] (SYSTEM)
+- [[argocd|ArgoCD]] (TOOL)
+- [[tailscale|Tailscale]] (TOOL)
+- [[twin-so|Twin.so]] (PLATFORM)
+- [[hyperdisk-ml|Hyperdisk ML]] (SYSTEM)
+- [[flux|Flux]] (TOOL)
+- [[google-cloud-secret-manager|Google Cloud Secret Manager]] (TOOL)
+- [[gitops-backed-brain-repository|GitOps-backed "Brain" Repository]] (CONCEPT)
+- [[vertex-ai-agent-engine|Vertex AI Agent Engine]] (SYSTEM)
+- [[google-cloud-infrastructure|Google Cloud Infrastructure]] (SYSTEM)
+- [[google-cloud-application-load-balancer|Google Cloud Application Load Balancer]] (SYSTEM)
+- [[hyde|HyDE]] (CONCEPT)
+- [[mmr|MMR]] (CONCEPT)
+- [[vertex-ai-memory-bank|Vertex AI Memory Bank]] (SYSTEM)
+- [[gzmo|GZMO]] (PERSON)
+- [[prompt-injection|Prompt Injection]] (CONCEPT)
+- [[runway|Runway]] (TOOL)
+- [[comfyui|ComfyUI]] (TOOL)
+- [[google-kubernetes-engine-gke|Google Kubernetes Engine (GKE)]] (SYSTEM)
+- [[mit-license|MIT License]] (CONCEPT)
+- [[nanoclaw|NanoClaw]] (SYSTEM)
+- [[heartbeat-md|HEARTBEAT.md]] (CONCEPT)
+- [[cloud-iam|Cloud IAM]] (TOOL)
+- [[google-veo-minimax-apis|Google Veo/MiniMax APIs]] (SYSTEM)
+- [[hyperdisk-balanced|Hyperdisk Balanced]] (SYSTEM)
+- [[openclaw-gateway|OpenClaw Gateway]] (SYSTEM)
+- [[cisco-s-ai-security-division|Cisco's AI security division]] (ORGANIZATION)
+- [[bluebubbles|BlueBubbles]] (TOOL)
+- [[shenzhen-longgang-district|Shenzhen Longgang District]] (ORGANIZATION)
+- [[soul-md|SOUL.md]] (CONCEPT)
+- [[qdrant|Qdrant]] (SYSTEM)
+- [[cloud-audit-logs|Cloud Audit Logs]] (TOOL)
+- [[pairing-code|Pairing Code]] (CONCEPT)
+- [[gcp-application-load-balancer|GCP Application Load Balancer]] (SYSTEM)
+- [[redline|RedLine]] (TOOL)
+- [[fast-io|Fast.io]] (SERVICE)
+- [[clawhub|ClawHub]] (SYSTEM)
+- [[atkinson-shiffrin-subsystem|Atkinson-Shiffrin Subsystem]] (CONCEPT)
+- [[agent-development-kit-adk|Agent Development Kit (ADK)]] (SYSTEM)
+- [[clawdbot|Clawdbot]] (SYSTEM)
+- [[moltbook|Moltbook]] (SYSTEM)
+- [[terraform|Terraform]] (TOOL)
+- [[anthropic-claude-4-6|Anthropic Claude 4.6]] (SYSTEM)
+- [[autogpt|AutoGPT]] (SYSTEM)
+- [[gke|GKE]] (SYSTEM)
+- [[typescript|TypeScript]] (CONCEPT)
+- [[hashicorp-vault|HashiCorp Vault]] (TOOL)
+- [[openai-gpt-5-4|OpenAI GPT-5.4]] (SYSTEM)
+- [[moltmatch|MoltMatch]] (PROJECT)
+- [[anygen|AnyGen]] (SYSTEM)
+- [[taskade-genesis|Taskade Genesis]] (SYSTEM)
+- [[sqlite-vec|sqlite-vec]] (TOOL)
+- [[peter-steinberger|Peter Steinberger]] (PERSON)
+- [[openrouter|OpenRouter]] (SYSTEM)
+- [[google-cloud-filestore-zonal-tier|Google Cloud Filestore (Zonal tier)]] (TOOL)
+- [[zeroclaw|ZeroClaw]] (SYSTEM)
+- [[agentic-loop|Agentic Loop]] (CONCEPT)
+- [[ollama|Ollama]] (TOOL)
+- [[openshell|OpenShell]] (SYSTEM)
+- [[pinecone|Pinecone]] (SYSTEM)
+- [[skill|Skill]] (CONCEPT)
+- [[dreams-md|DREAMS.md]] (CONCEPT)
+
+## Relations
+- OpenClaw Gateway → RELATED_TO → Clawdbot
+- Clawdbot → AUTHORED_BY → Peter Steinberger
+- OpenClaw Gateway → RELATED_TO → Moltbot
+- OpenClaw Gateway → USES → MIT License
+- OpenClaw Gateway → USES → GitHub
+- OpenClaw Gateway → PART_OF → pi-mono Agent Runtime
+- Google Cloud Infrastructure → USES → Google Kubernetes Engine (GKE)
+- Google Cloud Infrastructure → USES → Vertex AI Agent Engine
+- Google Cloud Infrastructure → USES → Agent Development Kit (ADK)
+- OpenClaw Gateway → USES → Google Kubernetes Engine (GKE)
+- OpenClaw Gateway → USES → GitOps-backed "Brain" Repository
+- GitOps-backed "Brain" Repository → USES → ArgoCD
+- GitOps-backed "Brain" Repository → USES → Flux
+- OpenClaw Gateway → USES → ClawHub
+- OpenClaw Gateway → RELATED_TO → Pinecone
+- OpenClaw Gateway → RELATED_TO → Qdrant
+- OpenClaw Gateway → USES → sqlite-vec
+- OpenClaw Gateway → USES → Google Cloud Filestore (Zonal tier)
+- OpenClaw Gateway → USES → Hyperdisk ML
+- OpenClaw Gateway → USES → Fast.io
+- OpenClaw Gateway → USES → Google Cloud Application Load Balancer
+- OpenClaw Gateway → RELATED_TO → Prompt Injection
+- ClawHub → PART_OF → OpenClaw Gateway
+- Cisco's AI security division → RELATED_TO → ClawHub
+- MoltMatch → USES → OpenClaw Gateway
+- Google Cloud Armor → USES → OpenClaw Gateway
+- Google Cloud Application Load Balancer → USES → GKE
+- OpenClaw Gateway → USES → Vertex AI Agent Engine
+- OpenClaw Gateway → USES → Anthropic Claude 4.6
+- RedLine → RELATED_TO → OpenClaw Gateway
+- Lumma → RELATED_TO → OpenClaw Gateway
+- Google Cloud Secret Manager → PART_OF → Google Cloud Platform (GCP)
+- Google Cloud Secret Manager → USES → Cloud IAM
+- Google Cloud Secret Manager → USES → Cloud Audit Logs
+- Vertex AI Memory Bank → USES → OpenClaw Gateway
+- Agent Development Kit (ADK) → USES → Agent2Agent (A2A) protocol
+- Agent Development Kit (ADK) → USES → Vertex AI Agent Engine
+- OpenClaw Gateway → USES → Node.js
+- OpenClaw Gateway → USES → TypeScript
+- OpenClaw Gateway → USES → Tailscale
+- OpenClaw Gateway → USES → HashiCorp Vault
+- OpenClaw Gateway → USES → KMS
+- OpenClaw Gateway → USES → BlueBubbles
+- OpenClaw Gateway → USES → Atkinson-Shiffrin Subsystem
+- Atkinson-Shiffrin Subsystem → USES → HyDE
+- OpenClaw Gateway → USES → Runway
+- OpenClaw Gateway → USES → Google Veo/MiniMax APIs
+- OpenClaw Gateway → USES → xAI
+- OpenClaw Gateway → USES → Google Lyria
+- OpenClaw Gateway → USES → ComfyUI
+- OpenClaw Gateway → USES → OpenAI GPT-5.4
+- OpenClaw Gateway → USES → Ollama
+- OpenClaw Gateway → USES → LM Studio
+- OpenClaw Gateway → USES → NVIDIA DGX
+- Moltbot → RELATED_TO → Anthropic Claude 4.6
+- Peter Steinberger → PART_OF → OpenAI GPT-5.4
+- OpenClaw Gateway → RELATED_TO → Shenzhen Longgang District
+- LangChain → RELATED_TO → OpenClaw Gateway
+- AutoGen → RELATED_TO → OpenClaw Gateway
+- AutoGPT → RELATED_TO → OpenClaw Gateway
+- NanoClaw → RELATED_TO → OpenClaw Gateway
+- NemoClaw (NVIDIA) → RELATED_TO → OpenClaw Gateway
+- NemoClaw (NVIDIA) → USES → OpenShell
+- AnyGen → RELATED_TO → OpenClaw Gateway
+- Taskade Genesis → RELATED_TO → OpenClaw Gateway
+- ZeroClaw → RELATED_TO → OpenClaw Gateway
+- Crustafarianism → RELATED_TO → Moltbook
+- OpenShell → USES → NemoClaw
+- Skill → PART_OF → OpenClaw Gateway
+- SOUL.md → PART_OF → OpenClaw Gateway
+- OpenClaw Gateway → USES → Google Cloud Platform (GCP)
+- GitOps-backed "Brain" Repository → PART_OF → Google Cloud Platform (GCP)
+- Google Cloud Filestore (Zonal tier) → PART_OF → Google Cloud Platform (GCP)
+- Hyperdisk Balanced → PART_OF → Google Cloud Platform (GCP)
+- GCP Application Load Balancer → PART_OF → Google Cloud Platform (GCP)
+- Google Cloud Armor → PART_OF → Google Cloud Platform (GCP)
+- Vertex AI Agent Engine → PART_OF → Google Cloud Platform (GCP)
+- Agent Development Kit (ADK) → PART_OF → Google Cloud Platform (GCP)
+- OpenClaw Gateway → USES → GZMO
+- SOUL.md → USES → GZMO
+- HEARTBEAT.md → USES → GZMO
+- memory/YYYY-MM-DD.md → USES → GZMO
+- DREAMS.md → USES → GZMO
+- HyDE → USES → GZMO
+- MMR → USES → GZMO
+- GKE → PART_OF → Google Cloud Platform (GCP)
+- GKE → PART_OF → Google Kubernetes Engine (GKE)
+- ComfyUI → USES → OpenClaw Gateway
+- Google Veo/MiniMax APIs → USES → OpenClaw Gateway

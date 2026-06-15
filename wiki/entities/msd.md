@@ -1,0 +1,25 @@
+---
+type: entity
+title: MSD
+created: 2026-06-09
+updated: 2026-06-10
+sources: 2
+tags: []
+status: draft
+gzmo_synthetic: true
+---
+
+
+# MSD
+
+Type: CONCEPT
+
+## From [[drive-research-marlin-baseline-for-early-deployments-micro02|drive-research-marlin-baseline-for-early-deployments-micro02]] (2026-06-09)
+- Multi-Precision Split Decomposition.
+- Decomposes high-precision BF16 activations into low-precision components.
+- Bypasses register-heavy vector dequantization.
+
+## From [[optimizing-nvidia-blackwell-sm120-part1-micro05|optimizing-nvidia-blackwell-sm120-part1-micro05]] (2026-06-10)
+- Multi-Precision Split Decomposition framework
+- Decomposes high-precision BF16 activations into low-precision components
+- Bypasses register-heavy vector dequantization

@@ -47,6 +47,8 @@ pub struct DreamEngine {
     vault: SqliteVault,
     promoter: KgPromoter,
     dreams: DreamsConfig,
+    /// Bibliothek gate: min dream cycles before vault/KG promotion.
+    bibliothek_min_dream_cycles: u32,
     /// Optional Synapse bus for observability.
     synapse: Option<Arc<SynapseBus>>,
 }
@@ -67,6 +69,7 @@ impl DreamEngine {
             gateway,
             tools,
             dreams,
+            crate::config::BibliothekConfig::default().min_dream_cycles,
             synapse,
         )
     }
@@ -79,6 +82,7 @@ impl DreamEngine {
         verify_gateway: Arc<dyn LlmGateway>,
         tools: Arc<ToolRegistry>,
         dreams: DreamsConfig,
+        bibliothek_min_dream_cycles: u32,
         synapse: Option<Arc<SynapseBus>>,
     ) -> Self {
         Self {
@@ -87,6 +91,7 @@ impl DreamEngine {
             promoter: KgPromoter::new(extract_gateway, tools, dreams.kg_gate())
                 .with_verify_gateway(verify_gateway),
             dreams,
+            bibliothek_min_dream_cycles,
             synapse,
         }
     }
@@ -230,32 +235,51 @@ impl DreamEngine {
         );
 
         let provenance = format!("[dream] date={date}");
-        let (kg_entities, kg_relations) = match self
-            .promoter
-            .promote_to_kg(
-                &pipeline.verified_entities,
-                &pipeline.verified_relations,
-                date,
-                &provenance,
-            )
-            .await
-        {
-            Ok(w) => w,
-            Err(e) => {
-                warn!(
-                    "KG promotion failed — vault may still update but graph incomplete: {e}"
-                );
-                (0, 0)
+        let bib_path = std::path::PathBuf::from("data/bibliothek_state.json");
+        let promote = crate::bibliothek::promotion_allowed(
+            &bib_path,
+            self.bibliothek_min_dream_cycles,
+        );
+
+        let (kg_entities, kg_relations) = if promote {
+            match self
+                .promoter
+                .promote_to_kg(
+                    &pipeline.verified_entities,
+                    &pipeline.verified_relations,
+                    date,
+                    &provenance,
+                )
+                .await
+            {
+                Ok(w) => w,
+                Err(e) => {
+                    warn!(
+                        "KG promotion failed — vault may still update but graph incomplete: {e}"
+                    );
+                    (0, 0)
+                }
             }
+        } else {
+            info!(
+                min_cycles = self.bibliothek_min_dream_cycles,
+                completed = crate::bibliothek::load_state(&bib_path).dream_cycles_completed,
+                "Bibliothek gate: skipping KG promotion"
+            );
+            (0, 0)
         };
 
         let truths = self.to_vault_truths(&pipeline.verified_entities, date, &compressed);
-        if let Err(e) = self
-            .vault
-            .promote_truths_with_origin(&truths, "verified_dream")
-            .await
-        {
-            warn!("Vault promotion failed (non-fatal): {e}");
+        if promote {
+            if let Err(e) = self
+                .vault
+                .promote_truths_with_origin(&truths, "verified_dream")
+                .await
+            {
+                warn!("Vault promotion failed (non-fatal): {e}");
+            }
+        } else {
+            info!("Bibliothek gate: skipping vault promotion");
         }
 
         info!(
@@ -283,7 +307,8 @@ impl DreamEngine {
                 "relations_extracted": pipeline.raw_relations,
                 "kg_entities_written": kg_entities,
                 "kg_relations_written": kg_relations,
-                "truths_promoted": truths.len(),
+                "truths_promoted": if promote { truths.len() } else { 0 },
+                "bibliothek_promotion": promote,
                 "memory_layer": self.vault.cognition_memory_layer(),
                 "cognition_source": self.vault.cognition_memory_layer(),
                 "honeypot_rem_chars": honeypot_rem_chars,
@@ -294,6 +319,8 @@ impl DreamEngine {
                 data,
             ));
         }
+
+        let _ = crate::bibliothek::increment_dream_cycles(&bib_path);
 
         Ok(DreamReport {
             date,

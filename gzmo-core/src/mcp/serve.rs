@@ -14,6 +14,7 @@ use rmcp::{
 use tracing::info;
 
 use crate::config::{GzmoConfig, WikiConfig};
+use crate::mentor_client::MentorAction;
 use crate::platform_memory::PlatformMemory;
 use crate::wiki::WikiEngine;
 
@@ -32,6 +33,15 @@ struct TeachParams {
     /// Optional conversation history turns to maintain Socratic dialog context.
     #[serde(default)]
     conversation: Option<Vec<McpMentorTurn>>,
+    /// S/A/B/C discovery pillar (Pi mutual discovery sessions)
+    #[serde(default)]
+    discovery_pillar: Option<String>,
+    /// Pillar learn topic (matches gzmo_mentor_learn_start)
+    #[serde(default)]
+    learn_topic: Option<String>,
+    /// Current probe id e.g. S03, or short action summary
+    #[serde(default)]
+    probe_context: Option<String>,
 }
 
 #[derive(Debug, serde::Deserialize, schemars::JsonSchema)]
@@ -84,6 +94,7 @@ impl GzmoMemoryMcpServer {
             method: "ping".to_string(),
             message: String::new(),
             conversation: Vec::new(),
+            ..Default::default()
         };
         match crate::mentor_client::client_request(&self.mentor_socket_path, &req).await {
             Ok(resp) => {
@@ -117,16 +128,30 @@ impl GzmoMemoryMcpServer {
             method: "teach".to_string(),
             message: args.message,
             conversation,
+            discovery_pillar: args.discovery_pillar,
+            learn_topic: args.learn_topic,
+            probe_context: args.probe_context,
         };
 
         match crate::mentor_client::client_request(&self.mentor_socket_path, &req).await {
             Ok(resp) => {
                 if resp.ok {
+                    if resp.action == Some(MentorAction::DelegateExec) {
+                        let hint = resp.delegate_hint.unwrap_or_else(|| {
+                            "Ops intent detected; execute with the caller's shell/tools.".to_string()
+                        });
+                        let payload = resp.delegate_payload.unwrap_or_default();
+                        return Ok(CallToolResult::success(vec![Content::text(format!(
+                            "delegate_exec\nhint: {hint}\npayload: {payload}"
+                        ))]));
+                    }
                     if let Some(text) = resp.response {
                         Ok(CallToolResult::success(vec![Content::text(text)]))
                     } else {
                         let err = resp.error.unwrap_or_else(|| "not a mentor turn".to_string());
-                        Ok(CallToolResult::success(vec![Content::text(format!("(Skipped: {err})"))]))
+                        Ok(CallToolResult::success(vec![Content::text(format!(
+                            "(Skipped: {err})"
+                        ))]))
                     }
                 } else {
                     let err = resp.error.unwrap_or_else(|| "teach failed".to_string());
