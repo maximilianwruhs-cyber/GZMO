@@ -27,7 +27,7 @@ Facts from origins containing `wuerfel`, `dice_cascade`, or `wuerfel-cron` use
 
 `kurator_monitor::record_dice_loop_fire` increments `dice_loops_seen` for session
 `daemon`. When `dice_loops_seen >= [kurator].max_dice_loops_per_hour`, emits
-`spawn.recommended` (human approval only; no autospawn).
+`spawn.recommended` triggers daemon autospawn when `[kurator] auto_spawn_on_recommend = true` (default); manual `gzmo kurator approve` remains available.
 
 ## Bibliothek gate
 

@@ -499,6 +499,7 @@ skill_error_rate_threshold = 0.3
 max_dice_loops_per_hour = 12
 default_agent_profile = "prometheus"
 approve_spawns_subagent = true
+auto_spawn_on_recommend = true
 spawn_brief_max_chars = 4000
 
 [synapse_writer]

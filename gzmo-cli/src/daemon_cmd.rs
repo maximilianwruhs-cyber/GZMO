@@ -21,6 +21,9 @@ use gzmo_core::gateway::LlmGateway;
 use gzmo_core::gateway::GatewayRouter;
 use gzmo_core::config::TaskKind;
 use gzmo_core::synapse::set_event_source;
+use gzmo_core::context_compress::CcrStore;
+use gzmo_core::kurator_spawn;
+use gzmo_core::subagent::SubagentRunner;
 use gzmo_core::identity::IdentityEngine;
 use gzmo_core::memory::episodic::FileEpisodicStore;
 use gzmo_core::config::SparkScheduleMode;
@@ -142,6 +145,34 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
     let synapse = Arc::new(SynapseBus::new());
     info!(path = %synapse.path.display(), "SynapseBus initialized");
 
+    let kurator_runner: Option<Arc<SubagentRunner>> =
+        if config.kurator.enabled
+            && config.kurator.auto_spawn_on_recommend
+            && config.kurator.approve_spawns_subagent
+            && config.subagent.enabled
+        {
+            let gateway = Arc::clone(router.gateway(TaskKind::Chat));
+            let system_prompt = std::fs::read_to_string(&config.identity.soul_path)
+                .unwrap_or_else(|_| "You are a focused GZMO sub-agent.".to_string());
+            let serpapi_key = std::env::var("SERPAPI_API_KEY").unwrap_or_default();
+            let ccr = CcrStore::new(&config.redis, &config.context_compress);
+            Some(Arc::new(SubagentRunner::new(
+                config.subagent.clone(),
+                config.context_compress.clone(),
+                ccr,
+                Arc::clone(&scratch),
+                gateway,
+                Some(Arc::clone(&dream_vault)),
+                system_prompt,
+                serpapi_key,
+            )))
+        } else {
+            None
+        };
+    if kurator_runner.is_some() {
+        info!("Kurator autospawn runner ready (phase 3)");
+    }
+
     let distill_engine = Arc::new(SessionDistillEngine::new(
         (*dream_vault).clone(),
         FileEpisodicStore::new(&config.memory.directory),
@@ -226,6 +257,8 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
     let dice_loop_data_dir = state_dir.clone();
     let dice_kurator_cfg = config.kurator.clone();
     let dice_kurator_root = state_dir.clone();
+    let dice_kurator_runner = kurator_runner.clone();
+    let dice_subagent_enabled = config.subagent.enabled;
     let _chaos_bridge = crate::chaos_bootstrap::spawn_snapshot_bridge(
         chaos_pulse.snapshot_rx.clone(),
         gateway_rwlock,
@@ -349,12 +382,24 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
                             let kpath = gzmo_core::kurator_monitor::default_state_path(
                                 &dice_kurator_root,
                             );
-                            if let Err(e) = gzmo_core::kurator_monitor::record_dice_loop_fire(
+                            match gzmo_core::kurator_monitor::record_dice_loop_fire(
                                 &dice_synapse,
                                 &kpath,
                                 &dice_kurator_cfg,
                             ) {
-                                error!(error = %e, "Kurator dice-loop record failed");
+                                Ok(new_recs) => {
+                                    if let Some(runner) = dice_kurator_runner.as_ref() {
+                                        kurator_spawn::autospawn_new_recommendations(
+                                            Arc::clone(runner),
+                                            Arc::clone(&dice_synapse),
+                                            kpath,
+                                            dice_kurator_cfg.clone(),
+                                            dice_subagent_enabled,
+                                            new_recs,
+                                        );
+                                    }
+                                }
+                                Err(e) => error!(error = %e, "Kurator dice-loop record failed"),
                             }
                         }
                     }
@@ -574,6 +619,8 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
     // Synapse pull — Pi event tail → episodic + session_end → distill pi
     let synapse_cfg = config.synapse_pull.clone();
     let kurator_cfg = config.kurator.clone();
+    let kurator_runner_poll = kurator_runner.clone();
+    let subagent_enabled = config.subagent.enabled;
     let synapse_episodic = FileEpisodicStore::new(&config.memory.directory);
     let synapse_root = qdrant_sync::discover_project_root();
     let kurator_synapse = Arc::clone(&synapse);
@@ -610,13 +657,25 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
                     if kurator_cfg.enabled {
                         let kurator_state =
                             gzmo_core::kurator_monitor::default_state_path(&synapse_root);
-                        if let Err(e) = gzmo_core::kurator_monitor::process_pi_poll(
+                        match gzmo_core::kurator_monitor::process_pi_poll(
                             &kurator_synapse,
                             &kurator_state,
                             &kurator_cfg,
                             &result.events,
                         ) {
-                            error!(error = %e, "Kurator monitor failed");
+                            Ok(new_recs) => {
+                                if let Some(runner) = kurator_runner_poll.as_ref() {
+                                    kurator_spawn::autospawn_new_recommendations(
+                                        Arc::clone(runner),
+                                        Arc::clone(&kurator_synapse),
+                                        kurator_state,
+                                        kurator_cfg.clone(),
+                                        subagent_enabled,
+                                        new_recs,
+                                    );
+                                }
+                            }
+                            Err(e) => error!(error = %e, "Kurator monitor failed"),
                         }
                     }
                     if !synapse_cfg.distill_on_session_end {

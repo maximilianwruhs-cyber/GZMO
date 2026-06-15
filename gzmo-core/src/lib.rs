@@ -37,6 +37,7 @@ pub mod health;
 pub mod synapse;
 pub mod synapse_reader;
 pub mod kurator_monitor;
+pub mod kurator_spawn;
 pub mod synapse_writer;
 pub mod bibliothek;
 pub mod kg_reconcile;

@@ -1,5 +1,6 @@
-//! Kurator phase-1 monitor — aggregates Pi Synapse metrics and emits
-//! `spawn.recommended` when thresholds are exceeded. Never autospawns agents.
+//! Kurator monitor — aggregates Pi Synapse metrics and emits
+//! `spawn.recommended` when thresholds are exceeded. With `auto_spawn_on_recommend`,
+//! the daemon spawns governed sub-agents without operator approval.
 
 use std::collections::HashMap;
 use std::fs;
@@ -129,6 +130,18 @@ pub fn ingest_dice_loop_events(state: &mut KuratorMonitorState, events: &[Synaps
     }
 }
 
+/// True when this session already has a pending or completed spawn recommendation.
+pub fn session_already_claimed(state: &KuratorMonitorState, session_id: &str) -> bool {
+    state
+        .pending_recommendations
+        .values()
+        .any(|p| p.session_id == session_id)
+        || state
+            .spawn_history
+            .values()
+            .any(|p| p.session_id == session_id)
+}
+
 /// Evaluate thresholds and return recommendations (does not write bus).
 pub fn evaluate_thresholds(
     state: &KuratorMonitorState,
@@ -140,6 +153,9 @@ pub fn evaluate_thresholds(
 
     let mut out = Vec::new();
     for (session_id, metrics) in &state.sessions {
+        if session_already_claimed(state, session_id) {
+            continue;
+        }
         let total_tokens = metrics.input_tokens.saturating_add(metrics.output_tokens);
         let error_rate = if metrics.skill_invokes > 0 {
             metrics.skill_errors as f64 / metrics.skill_invokes as f64
@@ -187,13 +203,19 @@ pub fn evaluate_thresholds(
     out
 }
 
-/// Append `spawn.recommended` events for each recommendation (phase 1: human approval only).
+/// Append `spawn.recommended` events for each recommendation.
 pub fn emit_recommendations(
     bus: &SynapseBus,
     state: &mut KuratorMonitorState,
+    config: &KuratorConfig,
     recommendations: &[SpawnRecommendation],
-) {
+) -> Vec<PendingRecommendation> {
+    let mut emitted = Vec::new();
     for rec in recommendations {
+        if session_already_claimed(state, &rec.session_id) {
+            continue;
+        }
+        let approval_required = !config.auto_spawn_on_recommend;
         let data = serde_json::json!({
             "session_id": rec.session_id,
             "reason": rec.reason,
@@ -206,7 +228,8 @@ pub fn emit_recommendations(
                 "skill_invokes": rec.metrics.skill_invokes,
                 "dice_loops_seen": rec.metrics.dice_loops_seen,
             },
-            "approval_required": true,
+            "approval_required": approval_required,
+            "auto_spawn": config.auto_spawn_on_recommend,
         });
         let corr = Uuid::parse_str(&rec.session_id).ok();
         let event = SynapseEvent::with_envelope(
@@ -219,25 +242,28 @@ pub fn emit_recommendations(
         let event_id = event.id.to_string();
         bus.append(&event);
         state.recommendations_emitted += 1;
-        state.pending_recommendations.insert(
-            event_id.clone(),
-            PendingRecommendation {
-                event_id,
-                session_id: rec.session_id.clone(),
-                reason: rec.reason.clone(),
-                suggested_agent_profile: rec.suggested_agent_profile.clone(),
-                created_at: Utc::now(),
-                approved: false,
-                spawn_task_id: None,
-            },
-        );
+        let pending = PendingRecommendation {
+            event_id: event_id.clone(),
+            session_id: rec.session_id.clone(),
+            reason: rec.reason.clone(),
+            suggested_agent_profile: rec.suggested_agent_profile.clone(),
+            created_at: Utc::now(),
+            approved: false,
+            spawn_task_id: None,
+        };
+        state
+            .pending_recommendations
+            .insert(event_id, pending.clone());
+        emitted.push(pending);
         info!(
             session = %rec.session_id,
             reason = %rec.reason,
+            auto_spawn = config.auto_spawn_on_recommend,
             "Kurator: spawn.recommended emitted"
         );
     }
     state.last_eval_at = Some(Utc::now());
+    emitted
 }
 
 /// Record one Würfel dice-loop fire (daemon path, not Pi poll).
@@ -245,7 +271,7 @@ pub fn record_dice_loop_fire(
     bus: &SynapseBus,
     state_path: &Path,
     config: &KuratorConfig,
-) -> anyhow::Result<Vec<SpawnRecommendation>> {
+) -> anyhow::Result<Vec<PendingRecommendation>> {
     if !config.enabled {
         return Ok(Vec::new());
     }
@@ -256,11 +282,13 @@ pub fn record_dice_loop_fire(
         .or_default()
         .dice_loops_seen += 1;
     let recommendations = evaluate_thresholds(&state, config);
-    if !recommendations.is_empty() {
-        emit_recommendations(bus, &mut state, &recommendations);
-    }
+    let emitted = if recommendations.is_empty() {
+        Vec::new()
+    } else {
+        emit_recommendations(bus, &mut state, config, &recommendations)
+    };
     save_state(state_path, &state)?;
-    Ok(recommendations)
+    Ok(emitted)
 }
 
 /// Process Pi poll results: update metrics, evaluate, optionally emit recommendations.
@@ -269,15 +297,17 @@ pub fn process_pi_poll(
     state_path: &Path,
     config: &KuratorConfig,
     pi_events: &[SynapseEvent],
-) -> anyhow::Result<Vec<SpawnRecommendation>> {
+) -> anyhow::Result<Vec<PendingRecommendation>> {
     let mut state = load_state(state_path);
     ingest_pi_events(&mut state, pi_events);
     let recommendations = evaluate_thresholds(&state, config);
-    if !recommendations.is_empty() {
-        emit_recommendations(bus, &mut state, &recommendations);
-    }
+    let emitted = if recommendations.is_empty() {
+        Vec::new()
+    } else {
+        emit_recommendations(bus, &mut state, config, &recommendations)
+    };
     save_state(state_path, &state)?;
-    Ok(recommendations)
+    Ok(emitted)
 }
 
 /// Approve a pending `spawn.recommended` event and return its metadata for spawn.
@@ -435,5 +465,37 @@ mod tests {
         let recs = evaluate_thresholds(&state, &config);
         assert_eq!(recs.len(), 1);
         assert!(recs[0].reason.contains("dice_loops"));
+    }
+
+    #[test]
+    fn no_duplicate_recommendation_for_claimed_session() {
+        let mut state = KuratorMonitorState::default();
+        let sid = Uuid::new_v4().to_string();
+        state.sessions.insert(
+            sid.clone(),
+            SessionMetrics {
+                turn_count: 50,
+                ..Default::default()
+            },
+        );
+        state.spawn_history.insert(
+            "prev".to_string(),
+            PendingRecommendation {
+                event_id: "prev".to_string(),
+                session_id: sid.clone(),
+                reason: "already spawned".to_string(),
+                suggested_agent_profile: "prometheus".to_string(),
+                created_at: Utc::now(),
+                approved: true,
+                spawn_task_id: Some("task-1".to_string()),
+            },
+        );
+        let config = KuratorConfig {
+            enabled: true,
+            max_turns_before_recommend: 40,
+            ..Default::default()
+        };
+        let recs = evaluate_thresholds(&state, &config);
+        assert!(recs.is_empty());
     }
 }

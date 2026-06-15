@@ -1636,8 +1636,16 @@ pub struct KuratorConfig {
     #[serde(default = "default_kurator_approve_enabled")]
     pub approve_spawns_subagent: bool,
 
+    /// Phase 3: daemon autospawns on `spawn.recommended` (no operator).
+    #[serde(default = "default_kurator_auto_spawn")]
+    pub auto_spawn_on_recommend: bool,
+
     #[serde(default = "default_kurator_spawn_brief_max")]
     pub spawn_brief_max_chars: usize,
+}
+
+fn default_kurator_auto_spawn() -> bool {
+    true
 }
 
 fn default_kurator_max_turns() -> u32 {
@@ -1678,6 +1686,7 @@ impl Default for KuratorConfig {
             max_dice_loops_per_hour: default_kurator_max_dice_loops(),
             default_agent_profile: default_kurator_agent_profile(),
             approve_spawns_subagent: default_kurator_approve_enabled(),
+            auto_spawn_on_recommend: default_kurator_auto_spawn(),
             spawn_brief_max_chars: default_kurator_spawn_brief_max(),
         }
     }
