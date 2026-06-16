@@ -44,6 +44,8 @@ both observe the same operation.
 | `chaos.dice_loop` | GZMO | daemon_cmd | Würfel autopoietic roll |
 | `chaos.feedback_drained` | GZMO | chaos_bootstrap | Skill IPC batch |
 | `spawn.recommended` | GZMO | kurator_monitor | Read-only recommendation |
+| `spawn.denied` | GZMO | spawn_gate | Autospawn blocked (budget/cooldown/tier) |
+| `spawn.executed` | GZMO | spawn_gate | Sub-agent spawn audit (complements `agent.spawned`) |
 
 ## session_id convention
 

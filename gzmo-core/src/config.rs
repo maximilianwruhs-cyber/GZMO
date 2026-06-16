@@ -342,6 +342,10 @@ pub struct GzmoConfig {
     /// Synapse Writer gate for chaos skill CLI dispatch.
     #[serde(default)]
     pub synapse_writer: SynapseWriterConfig,
+
+    /// Token ledger + efficiency analytics for Prime (:8000). Distinct from `[routing]`.
+    #[serde(default)]
+    pub obolus_analytics: ObolusAnalyticsConfig,
 }
 
 // ─── Dice autopoietic loop ──────────────────────────────────────────────
@@ -1642,6 +1646,119 @@ pub struct KuratorConfig {
 
     #[serde(default = "default_kurator_spawn_brief_max")]
     pub spawn_brief_max_chars: usize,
+
+    /// Spawn epimetheus/fixer sub-agent when discovery reports contain FAIL/GAP findings.
+    #[serde(default = "default_discovery_fixer_enabled")]
+    pub discovery_fixer_enabled: bool,
+
+    #[serde(default = "default_kurator_fixer_profile")]
+    pub fixer_agent_profile: String,
+
+    /// Minimum actionable FAIL+GAP markers before emitting a fixer spawn.
+    #[serde(default = "default_discovery_fixer_min_findings")]
+    pub discovery_fixer_min_findings: u32,
+
+    /// Spawn gate — central autospawn policy (rate limits, tiers).
+    #[serde(default)]
+    pub spawn_gate: SpawnGateConfig,
+}
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct SpawnGateConfig {
+    #[serde(default = "default_spawn_gate_enabled")]
+    pub enabled: bool,
+
+    #[serde(default = "default_max_autospawns_per_hour")]
+    pub max_autospawns_per_hour: u32,
+
+    #[serde(default = "default_spawn_cooldown_secs")]
+    pub spawn_cooldown_secs: u64,
+
+    /// Block prometheus/session_triage autospawn while discovery_fix is pending or in cooldown.
+    #[serde(default = "default_prometheus_requires_idle")]
+    pub prometheus_requires_idle: bool,
+
+    #[serde(default = "default_duplicate_reason_max_per_hour")]
+    pub duplicate_reason_max_per_hour: u32,
+
+    /// Autospawn epimetheus discovery fixer (separate from session_triage).
+    #[serde(default = "default_auto_spawn_discovery_fix")]
+    pub auto_spawn_discovery_fix: bool,
+
+    /// Redis hourly Prime slot budget before sub-agent spawn (protects :8000).
+    #[serde(default = "default_prime_budget_enabled")]
+    pub prime_budget_enabled: bool,
+
+    #[serde(default = "default_prime_spawn_budget_per_hour")]
+    pub prime_spawn_budget_per_hour: u32,
+
+    /// When Redis is unreachable, allow spawn and log (homelab default).
+    #[serde(default = "default_prime_budget_fail_open")]
+    pub prime_budget_fail_open: bool,
+
+    #[serde(default)]
+    pub prime_budget_key_prefix: Option<String>,
+
+    #[serde(default = "default_prime_budget_ttl_secs")]
+    pub prime_budget_ttl_secs: u64,
+}
+
+fn default_spawn_gate_enabled() -> bool {
+    true
+}
+
+fn default_max_autospawns_per_hour() -> u32 {
+    3
+}
+
+fn default_spawn_cooldown_secs() -> u64 {
+    600
+}
+
+fn default_prometheus_requires_idle() -> bool {
+    true
+}
+
+fn default_duplicate_reason_max_per_hour() -> u32 {
+    3
+}
+
+fn default_auto_spawn_discovery_fix() -> bool {
+    true
+}
+
+fn default_prime_budget_enabled() -> bool {
+    true
+}
+
+fn default_prime_spawn_budget_per_hour() -> u32 {
+    3
+}
+
+fn default_prime_budget_fail_open() -> bool {
+    true
+}
+
+fn default_prime_budget_ttl_secs() -> u64 {
+    7200
+}
+
+impl Default for SpawnGateConfig {
+    fn default() -> Self {
+        Self {
+            enabled: default_spawn_gate_enabled(),
+            max_autospawns_per_hour: default_max_autospawns_per_hour(),
+            spawn_cooldown_secs: default_spawn_cooldown_secs(),
+            prometheus_requires_idle: default_prometheus_requires_idle(),
+            duplicate_reason_max_per_hour: default_duplicate_reason_max_per_hour(),
+            auto_spawn_discovery_fix: default_auto_spawn_discovery_fix(),
+            prime_budget_enabled: default_prime_budget_enabled(),
+            prime_spawn_budget_per_hour: default_prime_spawn_budget_per_hour(),
+            prime_budget_fail_open: default_prime_budget_fail_open(),
+            prime_budget_key_prefix: None,
+            prime_budget_ttl_secs: default_prime_budget_ttl_secs(),
+        }
+    }
 }
 
 fn default_kurator_auto_spawn() -> bool {
@@ -1676,6 +1793,18 @@ fn default_kurator_spawn_brief_max() -> usize {
     4000
 }
 
+fn default_discovery_fixer_enabled() -> bool {
+    true
+}
+
+fn default_kurator_fixer_profile() -> String {
+    "epimetheus".to_string()
+}
+
+fn default_discovery_fixer_min_findings() -> u32 {
+    1
+}
+
 impl Default for KuratorConfig {
     fn default() -> Self {
         Self {
@@ -1688,6 +1817,10 @@ impl Default for KuratorConfig {
             approve_spawns_subagent: default_kurator_approve_enabled(),
             auto_spawn_on_recommend: default_kurator_auto_spawn(),
             spawn_brief_max_chars: default_kurator_spawn_brief_max(),
+            discovery_fixer_enabled: default_discovery_fixer_enabled(),
+            fixer_agent_profile: default_kurator_fixer_profile(),
+            discovery_fixer_min_findings: default_discovery_fixer_min_findings(),
+            spawn_gate: SpawnGateConfig::default(),
         }
     }
 }
@@ -1721,6 +1854,101 @@ impl Default for SynapseWriterConfig {
             gate_enabled: false,
             invoke_window_secs: default_synapse_writer_invoke_window(),
             tail_scan_lines: default_synapse_writer_tail_scan(),
+        }
+    }
+}
+
+// ─── Obolus analytics (token ledger on Prime) ─────────────────────────────
+
+/// Token consumption ledger for Prime LLM calls. Not the routing table (`[routing]`).
+#[derive(Debug, Deserialize, Clone)]
+pub struct ObolusAnalyticsConfig {
+    #[serde(default = "default_obolus_analytics_enabled")]
+    pub enabled: bool,
+
+    #[serde(default = "default_obolus_ledger_path")]
+    pub ledger_path: String,
+
+    /// llama-server log file or journalctl wrapper script for external client reconcile.
+    #[serde(default)]
+    pub llama_log_path: String,
+
+    #[serde(default = "default_obolus_prime_port")]
+    pub prime_port: u16,
+
+    #[serde(default = "default_obolus_prime_context_tokens")]
+    pub prime_context_tokens: u64,
+
+    #[serde(default = "default_obolus_reconcile_interval_secs")]
+    pub reconcile_interval_secs: u64,
+
+    #[serde(default = "default_obolus_tokens_per_obl")]
+    pub tokens_per_obl: u64,
+
+    #[serde(default = "default_obolus_rollup_retention_days")]
+    pub rollup_retention_days: u32,
+
+    #[serde(default = "default_obolus_writer_batch_size")]
+    pub writer_batch_size: usize,
+
+    #[serde(default = "default_obolus_writer_flush_ms")]
+    pub writer_flush_ms: u64,
+
+    /// Emit `obolus.efficiency_tick` on reconcile when an hour bucket changes.
+    #[serde(default)]
+    pub efficiency_tick_enabled: bool,
+}
+
+fn default_obolus_analytics_enabled() -> bool {
+    true
+}
+
+fn default_obolus_ledger_path() -> String {
+    "data/Obolus/ledger.jsonl".to_string()
+}
+
+fn default_obolus_prime_port() -> u16 {
+    8000
+}
+
+fn default_obolus_prime_context_tokens() -> u64 {
+    131_072
+}
+
+fn default_obolus_reconcile_interval_secs() -> u64 {
+    60
+}
+
+fn default_obolus_tokens_per_obl() -> u64 {
+    1000
+}
+
+fn default_obolus_rollup_retention_days() -> u32 {
+    90
+}
+
+fn default_obolus_writer_batch_size() -> usize {
+    50
+}
+
+fn default_obolus_writer_flush_ms() -> u64 {
+    200
+}
+
+impl Default for ObolusAnalyticsConfig {
+    fn default() -> Self {
+        Self {
+            enabled: default_obolus_analytics_enabled(),
+            ledger_path: default_obolus_ledger_path(),
+            llama_log_path: String::new(),
+            prime_port: default_obolus_prime_port(),
+            prime_context_tokens: default_obolus_prime_context_tokens(),
+            reconcile_interval_secs: default_obolus_reconcile_interval_secs(),
+            tokens_per_obl: default_obolus_tokens_per_obl(),
+            rollup_retention_days: default_obolus_rollup_retention_days(),
+            writer_batch_size: default_obolus_writer_batch_size(),
+            writer_flush_ms: default_obolus_writer_flush_ms(),
+            efficiency_tick_enabled: false,
         }
     }
 }
@@ -2018,6 +2246,23 @@ pub struct SubagentConfig {
 
     #[serde(default = "default_subagent_summary_max")]
     pub summary_max_tokens: usize,
+
+    /// Extra shell first-token binaries for governed sub-agents (discovery fixer, etc.).
+    #[serde(default = "default_subagent_shell_extra")]
+    pub shell_extra_commands: Vec<String>,
+}
+
+fn default_subagent_shell_extra() -> Vec<String> {
+    vec![
+        "cd".into(),
+        "mkdir".into(),
+        "cp".into(),
+        "mv".into(),
+        "touch".into(),
+        "ln".into(),
+        "chmod".into(),
+        "install".into(),
+    ]
 }
 
 fn default_subagent_enabled() -> bool {
@@ -2044,6 +2289,7 @@ impl Default for SubagentConfig {
             max_depth: default_subagent_max_depth(),
             context_budget_tokens: default_subagent_context_budget(),
             summary_max_tokens: default_subagent_summary_max(),
+            shell_extra_commands: default_subagent_shell_extra(),
         }
     }
 }

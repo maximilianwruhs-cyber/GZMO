@@ -73,20 +73,22 @@ pub fn cron_due_today(
 }
 
 /// Earliest Spark cron slot that is due today and has not run yet.
+///
+/// `completed_slots_today` lists `(hour, minute)` pairs already executed today
+/// (typically both entries from `[spark].cron_hours` once each).
 pub fn spark_cron_slot_due(
     now: &DateTime<Utc>,
     cron_hours: &[u32],
     cron_minute: u32,
-    last_run_key: Option<(u32, u32, NaiveDate)>,
+    completed_slots_today: &[(u32, u32)],
 ) -> Option<(u32, u32)> {
-    let today = now.date_naive();
     let now_mins = now.hour() * 60 + now.minute();
     cron_hours
         .iter()
         .copied()
         .filter(|&h| {
             now_mins >= cron_minutes(h, cron_minute)
-                && last_run_key != Some((h, cron_minute, today))
+                && !completed_slots_today.contains(&(h, cron_minute))
         })
         .min_by_key(|h| *h)
         .map(|h| (h, cron_minute))
@@ -289,15 +291,36 @@ mod cron_tests {
     #[test]
     fn spark_slot_due_picks_earliest_missed() {
         let now = at(4, 0);
-        let slot = spark_cron_slot_due(&now, &[3, 22], 30, None);
+        let slot = spark_cron_slot_due(&now, &[3, 22], 30, &[]);
         assert_eq!(slot, Some((3, 30)));
     }
 
     #[test]
     fn spark_slot_skips_already_run() {
         let now = at(23, 0);
-        let today = now.date_naive();
-        let slot = spark_cron_slot_due(&now, &[3, 22], 30, Some((3, 30, today)));
+        let slot = spark_cron_slot_due(&now, &[3, 22], 30, &[(3, 30)]);
         assert_eq!(slot, Some((22, 30)));
+    }
+
+    #[test]
+    fn spark_slot_stops_after_all_cron_hours_complete() {
+        let now = at(23, 1);
+        let completed = [(3, 30), (22, 30)];
+        assert_eq!(spark_cron_slot_due(&now, &[3, 22], 30, &completed), None);
+    }
+
+    #[test]
+    fn spark_slot_does_not_oscillate_after_both_slots_run() {
+        let now = at(22, 31);
+        // 3:30 catch-up just finished; 22:30 slot still pending.
+        assert_eq!(
+            spark_cron_slot_due(&now, &[3, 22], 30, &[(3, 30)]),
+            Some((22, 30))
+        );
+        // Both slots done — no third run on the next tick.
+        assert_eq!(
+            spark_cron_slot_due(&now, &[3, 22], 30, &[(3, 30), (22, 30)]),
+            None
+        );
     }
 }

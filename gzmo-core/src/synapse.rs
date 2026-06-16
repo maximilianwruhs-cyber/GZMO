@@ -172,6 +172,16 @@ pub enum EventType {
     /// Kurator recommends spawning a sub-agent (human approval required)
     #[serde(rename = "spawn.recommended")]
     SpawnRecommended,
+    /// Spawn gate denied an autospawn (budget, cooldown, tier)
+    #[serde(rename = "spawn.denied")]
+    SpawnDenied,
+    /// Governed sub-agent spawn completed (audit trail; complements agent.spawned)
+    #[serde(rename = "spawn.executed")]
+    SpawnExecuted,
+
+    /// Hourly Obolus efficiency rollup (η per process family)
+    #[serde(rename = "obolus.efficiency_tick")]
+    ObolusEfficiencyTick,
 }
 
 /// A single Synapse event frame — the unit of observability.

@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 use tracing::{info, warn};
 use uuid::Uuid;
 
-use crate::gateway::{LlmGateway, ToolCall};
+use crate::gateway::{parse_json_lenient, LlmGateway, ToolCall};
 use crate::memory::kg_promotion::{
     canonicalize_relation_type, is_valid_entity_name, is_valid_relation_endpoints,
     normalize_entity_key, provenance_note, KG_BATCH_SIZE,
@@ -604,8 +604,8 @@ impl KgPromoter {
             .complete_structured(&messages, schema_name, extraction_schema())
             .await?;
 
-        serde_json::from_str(&raw)
-            .map_err(|e| anyhow::anyhow!("Failed to parse extraction JSON: {e}\nRaw: {raw}"))
+        parse_json_lenient(&raw)
+            .map_err(|e| anyhow::anyhow!("Failed to parse extraction JSON: {e}"))
     }
 
     pub async fn verify(
@@ -671,8 +671,8 @@ impl KgPromoter {
             )
             .await?;
 
-        serde_json::from_str(&raw)
-            .map_err(|e| anyhow::anyhow!("Failed to parse verification JSON: {e}\nRaw: {raw}"))
+        parse_json_lenient(&raw)
+            .map_err(|e| anyhow::anyhow!("Failed to parse verification JSON: {e}"))
     }
 
     fn entity_keys_match(a: &str, b: &str) -> bool {

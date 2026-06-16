@@ -10,6 +10,7 @@ use serde::{Deserialize, Serialize};
 use tracing::{debug, warn};
 
 use crate::config;
+use crate::obolus::TokenUsage;
 use crate::types::Message;
 
 
@@ -149,6 +150,11 @@ pub trait LlmGateway: Send + Sync {
     /// Disable chaos overrides — revert to config values.
     fn clear_chaos_overrides(&self) {}
 
+    /// Last token usage from the most recent successful inference (if supported).
+    fn take_last_usage(&self) -> Option<TokenUsage> {
+        None
+    }
+
     /// Unstructured completion with optional per-call temperature / top_p overrides.
     async fn complete_with_persona(
         &self,
@@ -181,6 +187,7 @@ pub struct TurboQuantGateway {
     chaos_temperature: std::sync::atomic::AtomicU32,
     chaos_max_tokens: std::sync::atomic::AtomicU32,
     chaos_active: std::sync::atomic::AtomicBool,
+    last_usage: std::sync::Mutex<Option<TokenUsage>>,
 }
 
 // ── OpenAI-compatible request types ──────────────────────────────────
@@ -222,9 +229,18 @@ struct ChatMessage<'a> {
 
 // ── OpenAI-compatible response types ────────────────────────────────
 
+#[derive(Deserialize, Debug, Clone, Default)]
+struct Usage {
+    prompt_tokens: u64,
+    completion_tokens: u64,
+    total_tokens: u64,
+}
+
 #[derive(Deserialize, Debug)]
 struct ChatResponse {
     choices: Vec<Choice>,
+    #[serde(default)]
+    usage: Option<Usage>,
 }
 
 #[derive(Deserialize, Debug)]
@@ -274,13 +290,26 @@ struct StreamChatRequest<'a> {
     parallel_tool_calls: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     tool_choice: Option<&'a str>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    reasoning_format: Option<&'a str>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    chat_template_kwargs: Option<serde_json::Value>,
     stream: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    stream_options: Option<StreamOptions>,
+}
+
+#[derive(Serialize)]
+struct StreamOptions {
+    include_usage: bool,
 }
 
 /// A single SSE chunk from the streaming response.
 #[derive(Deserialize, Debug)]
 struct StreamChunk {
     choices: Vec<StreamChoice>,
+    #[serde(default)]
+    usage: Option<Usage>,
 }
 
 #[derive(Deserialize, Debug)]
@@ -324,7 +353,15 @@ impl TurboQuantGateway {
             chaos_temperature: std::sync::atomic::AtomicU32::new(0),
             chaos_max_tokens: std::sync::atomic::AtomicU32::new(0),
             chaos_active: std::sync::atomic::AtomicBool::new(false),
+            last_usage: std::sync::Mutex::new(None),
         }
+    }
+
+    fn store_usage(&self, usage: Option<&Usage>) {
+        let mut guard = self.last_usage.lock().expect("last_usage lock");
+        *guard = usage.map(|u| {
+            TokenUsage::from_openai(u.prompt_tokens, u.completion_tokens, u.total_tokens)
+        });
     }
 
     /// Create a gateway with default Prime config (localhost:8000).
@@ -499,6 +536,7 @@ impl LlmGateway for TurboQuantGateway {
         }
 
         let chat_resp: ChatResponse = resp.json().await?;
+        self.store_usage(chat_resp.usage.as_ref());
         let choice = chat_resp
             .choices
             .into_iter()
@@ -550,6 +588,7 @@ impl LlmGateway for TurboQuantGateway {
         use reqwest_eventsource::{Event, EventSource};
 
         let has_tools = !tools.is_empty();
+        let (reasoning_format, chat_template_kwargs) = no_thinking_request_fields();
 
         // Build the same request body but with stream: true
         let body = StreamChatRequest {
@@ -561,13 +600,19 @@ impl LlmGateway for TurboQuantGateway {
             tools: tools.iter().collect(),
             parallel_tool_calls: if has_tools { Some(false) } else { None },
             tool_choice: if has_tools { Some("auto") } else { None },
+            reasoning_format: Some(reasoning_format),
+            chat_template_kwargs: Some(chat_template_kwargs),
             stream: true,
+            stream_options: Some(StreamOptions {
+                include_usage: true,
+            }),
         };
 
         debug!(
             url = %self.url("chat/completions"),
             model = %self.config.model,
             stream = true,
+            messages = messages.len(),
             "Sending streaming completion request"
         );
 
@@ -601,6 +646,10 @@ impl LlmGateway for TurboQuantGateway {
                             continue;
                         }
                     };
+
+                    if let Some(ref usage) = chunk.usage {
+                        self.store_usage(Some(usage));
+                    }
 
                     for choice in chunk.choices {
                         // Capture finish_reason
@@ -639,7 +688,12 @@ impl LlmGateway for TurboQuantGateway {
                 Err(reqwest_eventsource::Error::StreamEnded) => break,
                 Err(e) => {
                     es.close();
-                    anyhow::bail!("SSE stream error: {}", e);
+                    let hint = if format!("{e}").contains("400") {
+                        " (hint: llama.cpp/Qwen rejects trailing system messages — use Role::User for late-turn instructions)"
+                    } else {
+                        ""
+                    };
+                    anyhow::bail!("SSE stream error: {e}{hint}");
                 }
             }
         }
@@ -713,6 +767,10 @@ impl LlmGateway for TurboQuantGateway {
     fn clear_chaos_overrides(&self) {
         self.clear_chaos_overrides();
     }
+
+    fn take_last_usage(&self) -> Option<TokenUsage> {
+        self.last_usage.lock().expect("last_usage lock").take()
+    }
 }
 
 impl TurboQuantGateway {
@@ -774,6 +832,7 @@ impl TurboQuantGateway {
         }
 
         let chat_resp: ChatResponse = resp.json().await?;
+        self.store_usage(chat_resp.usage.as_ref());
         let choice = chat_resp
             .choices
             .into_iter()
@@ -1157,6 +1216,15 @@ impl LlmGateway for FallbackGateway {
             gw.clear_chaos_overrides();
         }
     }
+
+    fn take_last_usage(&self) -> Option<TokenUsage> {
+        for (_, gw) in &self.backends {
+            if let Some(u) = gw.take_last_usage() {
+                return Some(u);
+            }
+        }
+        None
+    }
 }
 
 // ── Obolus Gateway Router ──────────────────────────────────────────────
@@ -1173,6 +1241,8 @@ pub struct GatewayRouter {
     leaves: HashMap<String, Arc<dyn LlmGateway>>,
     /// Default engine profile name (safety fallback).
     default_engine: String,
+    /// Token ledger when `[obolus_analytics] enabled = true`.
+    obolus_ledger: Option<Arc<crate::obolus::ObolusLedger>>,
 }
 
 impl GatewayRouter {
@@ -1184,7 +1254,28 @@ impl GatewayRouter {
     /// [`FallbackGateway`] that tries the cloud profile first and falls back to
     /// the task's legacy profile (the value from `[routing.mappings]`).
     pub fn new(config: &config::GzmoConfig) -> Self {
+        let obolus_ledger = if config.obolus_analytics.enabled {
+            crate::obolus::ObolusLedger::open(&config.obolus_analytics).ok()
+        } else {
+            None
+        };
+        let ledger = obolus_ledger.clone();
+        let prime_port = config.obolus_analytics.prime_port;
         let mut leaves: HashMap<String, Arc<dyn LlmGateway>> = HashMap::new();
+
+        let wrap_for_task =
+            |gw: Arc<dyn LlmGateway>, task: config::TaskKind, profile_name: &str| {
+                let profile = Self::resolve_profile_for_name(config, profile_name);
+                let vllm = VllmConfig::from(profile);
+                crate::obolus::instrument_if_enabled(
+                    gw,
+                    ledger.clone(),
+                    prime_port,
+                    &vllm,
+                    crate::obolus::process_from_task_kind(task),
+                    Some(task.to_string()),
+                )
+            };
 
         // Helper: get-or-build a leaf TurboQuant gateway for a profile name.
         let build_leaf = |name: &str, leaves: &mut HashMap<String, Arc<dyn LlmGateway>>| {
@@ -1242,7 +1333,7 @@ impl GatewayRouter {
                 }
                 _ => legacy_gw,
             };
-            task_gateways.insert(task, effective);
+            task_gateways.insert(task, wrap_for_task(effective, task, &legacy_name));
         }
 
         // Ensure the default engine leaf exists as a safety fallback.
@@ -1253,7 +1344,13 @@ impl GatewayRouter {
             task_gateways,
             leaves,
             default_engine,
+            obolus_ledger,
         }
+    }
+
+    /// Shared Obolus token ledger (daemon reconcile, CLI reports).
+    pub fn obolus_ledger(&self) -> Option<&Arc<crate::obolus::ObolusLedger>> {
+        self.obolus_ledger.as_ref()
     }
 
     /// Resolve a specific engine profile by name.

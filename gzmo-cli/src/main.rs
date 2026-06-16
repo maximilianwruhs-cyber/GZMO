@@ -24,6 +24,7 @@ mod wiki_cmd;
 mod honeypot_cmd;
 mod pedagogy_graph_cmd;
 mod kurator_cmd;
+mod obolus_cmd;
 mod mentor_ipc;
 mod low_tension_dialogue;
 mod mentor_cmd;
@@ -72,6 +73,8 @@ enum Command {
     Mentor(Vec<String>),
     /// Kurator monitor status (`gzmo kurator status`).
     Kurator(Vec<String>),
+    /// Obolus token analytics (`gzmo obolus status|report|context`).
+    Obolus(Vec<String>),
     Help,
 }
 
@@ -106,6 +109,8 @@ USAGE
   gzmo honeypot review promote  Operator promote from review queue
   gzmo distill [session_id]     Distill GZMO chat sessions → vault
   gzmo distill pi <path.jsonl>  Distill Pi session on session_end
+  gzmo obolus status|report     Prime token ledger (E_total, ctx_%)
+  gzmo obolus efficiency        Wirkungsgrad η = (Q·I)/E_total
   gzmo init                     First-time setup
   gzmo mcp-serve                MCP stdio (memory + wiki search)
 
@@ -150,6 +155,7 @@ fn parse_args() -> (Option<String>, Command) {
         if args[1] == "honeypot" { return (learner, Command::Honeypot(args[2..].to_vec())); }
         if args[1] == "mentor" { return (learner, Command::Mentor(args[2..].to_vec())); }
         if args[1] == "kurator" { return (learner, Command::Kurator(args[2..].to_vec())); }
+        if args[1] == "obolus" { return (learner, Command::Obolus(args[2..].to_vec())); }
         if args[1] == "dream" {
             let date = args.get(2).and_then(|s| NaiveDate::parse_from_str(s, "%Y-%m-%d").ok());
             return (learner, Command::Dream(date));
@@ -309,6 +315,7 @@ async fn main() -> Result<()> {
         Command::Honeypot(_) => "warn",
         Command::Mentor(_) => "warn",
         Command::Kurator(_) => "warn",
+        Command::Obolus(_) => "warn",
         Command::Help => "warn",
     };
 
@@ -416,6 +423,7 @@ async fn main() -> Result<()> {
         Command::Honeypot(args) => honeypot_cmd::run(&config, &args).await,
         Command::Mentor(args) => mentor_cmd::run(&config, &args).await,
         Command::Kurator(args) => kurator_cmd::run(&args, &config).await,
+        Command::Obolus(args) => obolus_cmd::run(&args, &config).await,
         Command::Help => unreachable!(),
     }
 }

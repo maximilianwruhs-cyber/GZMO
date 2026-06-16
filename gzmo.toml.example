@@ -491,6 +491,16 @@ distill_summary = "local"
 # agent_monitor = "local_deterministic"
 # agent_spawn = "local"
 
+[obolus_analytics]
+enabled = true
+ledger_path = "data/Obolus/ledger.jsonl"
+# llama_log_path = ""   # journalctl wrapper or --log-file path for Pi/external reconcile
+prime_port = 8000
+prime_context_tokens = 131072   # Prime n_ctx (128K) — not [context_memory].context_length
+reconcile_interval_secs = 60
+tokens_per_obl = 1000
+# efficiency_tick_enabled = false   # hourly obolus.efficiency_tick on Synapse bus
+
 [kurator]
 enabled = false
 max_turns_before_recommend = 40

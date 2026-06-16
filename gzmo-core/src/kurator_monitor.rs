@@ -39,6 +39,11 @@ pub struct PendingRecommendation {
     pub approved: bool,
     #[serde(default)]
     pub spawn_task_id: Option<String>,
+    /// `discovery_fix` for remediation spawns; absent for Pi metric thresholds.
+    #[serde(default)]
+    pub kind: Option<String>,
+    #[serde(default)]
+    pub report_path: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
@@ -57,6 +62,9 @@ pub struct SpawnRecommendation {
     pub reason: String,
     pub metrics: SessionMetrics,
     pub suggested_agent_profile: String,
+    #[allow(clippy::option_option)]
+    pub kind: Option<String>,
+    pub report_path: Option<String>,
 }
 
 pub fn default_state_path(project_root: &Path) -> std::path::PathBuf {
@@ -67,10 +75,41 @@ pub fn load_state(path: &Path) -> KuratorMonitorState {
     if !path.exists() {
         return KuratorMonitorState::default();
     }
-    fs::read_to_string(path)
+    let mut state = fs::read_to_string(path)
         .ok()
         .and_then(|raw| serde_json::from_str(&raw).ok())
-        .unwrap_or_default()
+        .unwrap_or_default();
+    if compact_pending_recommendations(&mut state) > 0 {
+        let _ = save_state(path, &state);
+    }
+    state
+}
+
+/// Collapse duplicate pending entries (pre-phase-3 backlog) to one per session.
+/// Keeps the newest recommendation by `created_at`.
+pub fn compact_pending_recommendations(state: &mut KuratorMonitorState) -> usize {
+    let before = state.pending_recommendations.len();
+    if before <= 1 {
+        return 0;
+    }
+
+    let mut best_by_session: HashMap<String, PendingRecommendation> = HashMap::new();
+    for rec in state.pending_recommendations.values().cloned() {
+        match best_by_session.get_mut(&rec.session_id) {
+            Some(existing) if rec.created_at > existing.created_at => *existing = rec,
+            Some(_) => {}
+            None => {
+                best_by_session.insert(rec.session_id.clone(), rec);
+            }
+        }
+    }
+
+    state.pending_recommendations = best_by_session
+        .into_values()
+        .map(|rec| (rec.event_id.clone(), rec))
+        .collect();
+
+    before.saturating_sub(state.pending_recommendations.len())
 }
 
 pub fn save_state(path: &Path, state: &KuratorMonitorState) -> anyhow::Result<()> {
@@ -198,6 +237,8 @@ pub fn evaluate_thresholds(
             reason: reasons.join("; "),
             metrics: metrics.clone(),
             suggested_agent_profile: config.default_agent_profile.clone(),
+            kind: None,
+            report_path: None,
         });
     }
     out
@@ -216,7 +257,7 @@ pub fn emit_recommendations(
             continue;
         }
         let approval_required = !config.auto_spawn_on_recommend;
-        let data = serde_json::json!({
+        let mut data = serde_json::json!({
             "session_id": rec.session_id,
             "reason": rec.reason,
             "suggested_agent_profile": rec.suggested_agent_profile,
@@ -231,6 +272,12 @@ pub fn emit_recommendations(
             "approval_required": approval_required,
             "auto_spawn": config.auto_spawn_on_recommend,
         });
+        if let Some(kind) = &rec.kind {
+            data["kind"] = serde_json::Value::String(kind.clone());
+        }
+        if let Some(report_path) = &rec.report_path {
+            data["report_path"] = serde_json::Value::String(report_path.clone());
+        }
         let corr = Uuid::parse_str(&rec.session_id).ok();
         let event = SynapseEvent::with_envelope(
             EventType::SpawnRecommended,
@@ -250,6 +297,19 @@ pub fn emit_recommendations(
             created_at: Utc::now(),
             approved: false,
             spawn_task_id: None,
+            kind: rec
+                .kind
+                .clone()
+                .or_else(|| {
+                    if rec.reason.starts_with("discovery_fail_gap:")
+                        || rec.session_id.starts_with("discovery-fix:")
+                    {
+                        Some("discovery_fix".to_string())
+                    } else {
+                        None
+                    }
+                }),
+            report_path: rec.report_path.clone(),
         };
         state
             .pending_recommendations
@@ -310,6 +370,58 @@ pub fn process_pi_poll(
     Ok(emitted)
 }
 
+/// After a published discovery report, emit a fixer `spawn.recommended` when FAIL/GAP findings exist.
+pub fn process_discovery_report(
+    bus: &SynapseBus,
+    state_path: &Path,
+    config: &KuratorConfig,
+    report_path: &Path,
+    discovery_session_id: &str,
+) -> anyhow::Result<Option<PendingRecommendation>> {
+    if !config.enabled || !config.discovery_fixer_enabled {
+        return Ok(None);
+    }
+    if !report_path.is_file() {
+        anyhow::bail!("discovery report not found: {}", report_path.display());
+    }
+
+    let analysis = crate::discovery_fixer::analyze_discovery_report(report_path)?;
+    if analysis.actionable_count() < config.discovery_fixer_min_findings as usize {
+        info!(
+            report = %report_path.display(),
+            actionable = analysis.actionable_count(),
+            min = config.discovery_fixer_min_findings,
+            "Kurator: discovery report has no actionable FAIL/GAP findings"
+        );
+        return Ok(None);
+    }
+
+    let fix_session_id =
+        crate::discovery_fixer::discovery_fix_session_id(discovery_session_id, report_path);
+    let mut state = load_state(state_path);
+    if session_already_claimed(&state, &fix_session_id) {
+        info!(
+            session = %fix_session_id,
+            "Kurator: discovery fixer already pending or spawned for this report"
+        );
+        return Ok(None);
+    }
+
+    let reason = crate::discovery_fixer::discovery_fix_reason(&analysis);
+    let recommendation = SpawnRecommendation {
+        session_id: fix_session_id,
+        reason,
+        metrics: SessionMetrics::default(),
+        suggested_agent_profile: config.fixer_agent_profile.clone(),
+        kind: Some("discovery_fix".to_string()),
+        report_path: Some(report_path.to_string_lossy().into_owned()),
+    };
+
+    let emitted = emit_recommendations(bus, &mut state, config, &[recommendation]);
+    save_state(state_path, &state)?;
+    Ok(emitted.into_iter().next())
+}
+
 /// Approve a pending `spawn.recommended` event and return its metadata for spawn.
 pub fn take_pending_recommendation(
     state_path: &Path,
@@ -353,6 +465,27 @@ pub fn mark_recommendation_spawned(
     Ok(())
 }
 
+/// Put a recommendation back in pending after a failed spawn attempt.
+/// Skips restore when the session already has an approved spawn in history.
+pub fn restore_pending_recommendation(
+    state_path: &Path,
+    rec: PendingRecommendation,
+) -> anyhow::Result<()> {
+    let mut state = load_state(state_path);
+    if state
+        .spawn_history
+        .values()
+        .any(|p| p.session_id == rec.session_id && p.approved)
+    {
+        return Ok(());
+    }
+    state
+        .pending_recommendations
+        .insert(rec.event_id.clone(), rec);
+    save_state(state_path, &state)?;
+    Ok(())
+}
+
 pub fn list_pending_recommendations(state_path: &Path) -> Vec<PendingRecommendation> {
     let state = load_state(state_path);
     let mut out: Vec<_> = state.pending_recommendations.values().cloned().collect();
@@ -364,6 +497,49 @@ pub fn list_pending_recommendations(state_path: &Path) -> Vec<PendingRecommendat
 mod tests {
     use super::*;
     use crate::synapse::{EventSource, SynapseEvent};
+
+    #[test]
+    fn discovery_report_triggers_fixer_recommendation() {
+        let dir = std::env::temp_dir().join(format!("kurator_disc_{}", Uuid::new_v4()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let bus_path = dir.join("events.jsonl");
+        let state_path = dir.join("kurator.state.json");
+        let report_path = dir.join("report.md");
+        std::fs::write(
+            &report_path,
+            r#"### F1 — orphans
+- Observation: 39 orphaned sessions remain.
+- Risk or opportunity: **FAIL**: orphans not cleaned.
+"#,
+        )
+        .unwrap();
+
+        let bus = crate::synapse::SynapseBus::with_path(bus_path.clone());
+        let config = KuratorConfig {
+            enabled: true,
+            discovery_fixer_enabled: true,
+            fixer_agent_profile: "epimetheus".to_string(),
+            discovery_fixer_min_findings: 1,
+            ..Default::default()
+        };
+
+        let rec = process_discovery_report(
+            &bus,
+            &state_path,
+            &config,
+            &report_path,
+            "test-session",
+        )
+        .expect("process_discovery_report")
+        .expect("recommendation");
+
+        assert_eq!(rec.kind.as_deref(), Some("discovery_fix"));
+        assert!(rec.reason.contains("discovery_fail_gap"));
+        let raw = std::fs::read_to_string(&bus_path).unwrap();
+        assert!(raw.contains("spawn.recommended"));
+
+        let _ = std::fs::remove_dir_all(dir);
+    }
 
     #[test]
     fn evaluate_turn_threshold() {
@@ -468,6 +644,118 @@ mod tests {
     }
 
     #[test]
+    fn compact_pending_keeps_newest_per_session() {
+        let sid = Uuid::new_v4().to_string();
+        let older = PendingRecommendation {
+            event_id: "old".to_string(),
+            session_id: sid.clone(),
+            reason: "older".to_string(),
+            suggested_agent_profile: "prometheus".to_string(),
+            created_at: Utc::now() - chrono::Duration::hours(1),
+            approved: false,
+            spawn_task_id: None,
+            kind: None,
+            report_path: None,
+        };
+        let newer = PendingRecommendation {
+            event_id: "new".to_string(),
+            session_id: sid,
+            reason: "newer".to_string(),
+            suggested_agent_profile: "prometheus".to_string(),
+            created_at: Utc::now(),
+            approved: false,
+            spawn_task_id: None,
+            kind: None,
+            report_path: None,
+        };
+        let mut state = KuratorMonitorState::default();
+        state
+            .pending_recommendations
+            .insert(older.event_id.clone(), older);
+        state
+            .pending_recommendations
+            .insert(newer.event_id.clone(), newer.clone());
+
+        let removed = compact_pending_recommendations(&mut state);
+        assert_eq!(removed, 1);
+        assert_eq!(state.pending_recommendations.len(), 1);
+        assert_eq!(
+            state.pending_recommendations.get("new").unwrap().reason,
+            "newer"
+        );
+    }
+
+    #[test]
+    fn restore_pending_skips_when_session_already_spawned() {
+        let sid = Uuid::new_v4().to_string();
+        let mut state = KuratorMonitorState::default();
+        state.spawn_history.insert(
+            "done".to_string(),
+            PendingRecommendation {
+                event_id: "done".to_string(),
+                session_id: sid.clone(),
+                reason: "spawned".to_string(),
+                suggested_agent_profile: "prometheus".to_string(),
+                created_at: Utc::now(),
+                approved: true,
+                spawn_task_id: Some("task-1".to_string()),
+                kind: None,
+                report_path: None,
+            },
+        );
+        let dir = std::env::temp_dir().join(format!("kurator_restore_{}", Uuid::new_v4()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let path = dir.join("state.json");
+        save_state(&path, &state).unwrap();
+
+        let failed = PendingRecommendation {
+            event_id: "retry".to_string(),
+            session_id: sid,
+            reason: "turn_count 70 >= 40".to_string(),
+            suggested_agent_profile: "prometheus".to_string(),
+            created_at: Utc::now(),
+            approved: false,
+            spawn_task_id: None,
+            kind: None,
+            report_path: None,
+        };
+        restore_pending_recommendation(&path, failed).unwrap();
+        let loaded = load_state(&path);
+        assert!(loaded.pending_recommendations.is_empty());
+
+        let _ = std::fs::remove_dir_all(dir);
+    }
+
+    #[test]
+    fn restore_pending_puts_failed_recommendation_back() {
+        let sid = Uuid::new_v4().to_string();
+        let dir = std::env::temp_dir().join(format!("kurator_restore_{}", Uuid::new_v4()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let path = dir.join("state.json");
+
+        let failed = PendingRecommendation {
+            event_id: "retry".to_string(),
+            session_id: sid.clone(),
+            reason: "turn_count 70 >= 40".to_string(),
+            suggested_agent_profile: "prometheus".to_string(),
+            created_at: Utc::now(),
+            approved: false,
+            spawn_task_id: None,
+            kind: None,
+            report_path: None,
+        };
+        restore_pending_recommendation(&path, failed.clone()).unwrap();
+        let loaded = load_state(&path);
+        assert_eq!(loaded.pending_recommendations.len(), 1);
+        assert_eq!(
+            loaded.pending_recommendations.get("retry").unwrap().session_id,
+            sid
+        );
+
+        let _ = std::fs::remove_dir_all(dir);
+    }
+
+    #[test]
     fn no_duplicate_recommendation_for_claimed_session() {
         let mut state = KuratorMonitorState::default();
         let sid = Uuid::new_v4().to_string();
@@ -488,6 +776,8 @@ mod tests {
                 created_at: Utc::now(),
                 approved: true,
                 spawn_task_id: Some("task-1".to_string()),
+                kind: None,
+                report_path: None,
             },
         );
         let config = KuratorConfig {

@@ -25,8 +25,10 @@ Phase 1 Kurator uses heuristics only — no LLM `agent_monitor` calls yet.
 
 ## Not routed through Obolus
 
-- `/dice` autopoietic loop (`headless_gateway` + chaos overrides)
+- `/dice` autopoietic loop (`headless_gateway` + chaos overrides) — **instrumented** when `[obolus_analytics] enabled`
 - Mechanical skills (`/calculate`, etc.)
+
+Token ledger and efficiency metrics: **[OBOLUS_EFFICIENCY.md](OBOLUS_EFFICIENCY.md)**.
 
 ## Cost predictability
 

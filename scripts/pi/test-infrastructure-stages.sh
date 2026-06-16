@@ -123,6 +123,15 @@ for s in "${SCRIPTS[@]}"; do
 done
 
 echo ""
+echo "── Three modes integration (gzmo_skills) ──"
+THREE_MODES="${GZMO_SKILLS_ROOT:-$HOME/gzmo_skills}/scripts/test-three-modes-integration.sh"
+if [[ -f "$THREE_MODES" ]]; then
+  run_step "test-three-modes-integration.sh" bash "$THREE_MODES"
+else
+  skip "test-three-modes-integration.sh (gzmo_skills)"
+fi
+
+echo ""
 echo "── Stage 0: synapse-notifier + forum-romanum bridge sync ──"
 REF="$ROOT/scripts/pi/synapse-notifier.reference.ts"
 LIVE="${PI_SYNAPSE_NOTIFIER:-$HOME/.pi/agent/extensions/synapse-notifier.ts}"

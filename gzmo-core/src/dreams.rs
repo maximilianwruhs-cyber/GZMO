@@ -186,6 +186,7 @@ impl DreamEngine {
 
         let chunks = chunk_text_for_llm(&compressed, self.dreams.chunk_chars);
         let mut chunk_results = Vec::with_capacity(chunks.len());
+        let mut failed_chunks = Vec::new();
         for (i, chunk) in chunks.iter().enumerate() {
             let label = if chunks.len() == 1 {
                 "Extract entities and relationships from this daily log:".to_string()
@@ -203,23 +204,37 @@ impl DreamEngine {
             {
                 Ok(p) => chunk_results.push(p),
                 Err(e) => {
-                    warn!(chunk = i + 1, "REM/verify pipeline failed: {e}");
-                    return Ok(DreamReport {
-                        date,
-                        original_bytes: raw.len(),
-                        compressed_bytes: compressed.len(),
-                        entities_extracted: 0,
-                        relations_extracted: 0,
-                        kg_entities_written: 0,
-                        kg_relations_written: 0,
-                        truths_promoted: 0,
-                        narrative: format!(
-                            "# Dream Consolidation — {date}\n\nPipeline failed on chunk {}: {e}\nEpisodic data preserved.\n",
-                            i + 1
-                        ),
-                    });
+                    warn!(chunk = i + 1, total = chunks.len(), "REM/verify pipeline failed: {e}");
+                    failed_chunks.push((i + 1, e.to_string()));
                 }
             }
+        }
+        if chunk_results.is_empty() {
+            let detail = failed_chunks
+                .first()
+                .map(|(n, e)| format!("chunk {n}: {e}"))
+                .unwrap_or_else(|| "no chunks processed".to_string());
+            return Ok(DreamReport {
+                date,
+                original_bytes: raw.len(),
+                compressed_bytes: compressed.len(),
+                entities_extracted: 0,
+                relations_extracted: 0,
+                kg_entities_written: 0,
+                kg_relations_written: 0,
+                truths_promoted: 0,
+                narrative: format!(
+                    "# Dream Consolidation — {date}\n\nPipeline failed on all chunks ({detail}).\nEpisodic data preserved.\n",
+                ),
+            });
+        }
+        if !failed_chunks.is_empty() {
+            warn!(
+                failed = failed_chunks.len(),
+                succeeded = chunk_results.len(),
+                total = chunks.len(),
+                "Dream consolidation partial: some chunks failed"
+            );
         }
         let pipeline = merge_pipeline_chunks(chunk_results);
 

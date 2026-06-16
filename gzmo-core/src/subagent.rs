@@ -181,13 +181,16 @@ impl SubagentRunner {
             self.ccr.clone(),
             spec.parent_session.clone(),
         )));
-        sub_tools.register(Box::new(ShellExecTool::new_with_compress(
-            std::time::Duration::from_secs(30),
-            None,
-            self.compress_config.clone(),
-            self.ccr.clone(),
-            spec.parent_session.clone(),
-        )));
+        sub_tools.register(Box::new(
+            ShellExecTool::new_with_compress_and_extra(
+                std::time::Duration::from_secs(30),
+                None,
+                self.compress_config.clone(),
+                self.ccr.clone(),
+                spec.parent_session.clone(),
+                self.config.shell_extra_commands.clone(),
+            ),
+        ));
         sub_tools.register(Box::new(WebBrowseTool::new_with_compress(
             self.compress_config.clone(),
             self.ccr.clone(),
@@ -217,19 +220,19 @@ impl SubagentRunner {
         let session_id = spec.parent_session.clone();
         let role = spec.role.clone();
         let brief = spec.brief.clone();
+        let is_discovery_fixer = brief.contains("Discovery fixer");
         let max_iterations = spec.max_iterations.min(15);
         let summary_max = self.config.summary_max_tokens;
         let context_budget = self.config.context_budget_tokens;
         let system = self.role_system_prompt(&role, &brief);
         let cancel_flags = Arc::clone(&self.cancel_flags);
-        let parent_session = spec.parent_session.clone();
         let compress_cfg = self.compress_config.clone();
         let ccr = self.ccr.clone();
 
         let task_id_spawn = task_id.clone();
-        let task_id_for_reg = task_id.clone();
+        let task_id_cleanup = task_id.clone();
         let parent_for_reg = spec.parent_session.clone();
-
+        let parent_session = parent_for_reg.clone();
         let handle = tokio::spawn(async move {
             let result: Result<SubagentResult> = async {
                 if cancel_flags
@@ -279,6 +282,19 @@ impl SubagentRunner {
                     }),
                 };
 
+                let process = if is_discovery_fixer {
+                    crate::obolus::kurator_process_label("discovery_fix")
+                } else {
+                    crate::obolus::kurator_process_label("session_triage")
+                };
+                let _obolus_ctx = crate::obolus::CallContextGuard::new(crate::obolus::ObolusCallContext {
+                    process,
+                    task_kind: Some("chat".into()),
+                    caller: "subagent".into(),
+                    correlation_id: Some(parent_session.clone()),
+                    action_id: Some(task_id.clone()),
+                });
+
                 let response: AgentResponse =
                     run_agent_loop(gateway.as_ref(), tools.as_ref(), &mut messages, &loop_config)
                         .await?;
@@ -324,8 +340,8 @@ impl SubagentRunner {
 
         {
             let mut reg = self.registry.write().await;
-            if let Some(subs) = reg.get_mut(&spec.parent_session) {
-                subs.retain(|s| s.task_id != task_id_for_reg);
+            if let Some(subs) = reg.get_mut(&parent_for_reg) {
+                subs.retain(|s| s.task_id != task_id_cleanup);
                 if subs.is_empty() {
                     reg.remove(&spec.parent_session);
                 }

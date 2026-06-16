@@ -10,6 +10,7 @@ use tokio::sync::mpsc;
 
 use crate::config::GzmoConfig;
 use crate::gateway::{LlmGateway, TurboQuantGateway, VllmConfig};
+use crate::obolus;
 
 use super::shell_bridge::{self, ShellSkillOptions};
 use super::{NestedDispatch, SkillContext, SkillOutput, SkillRegistry};
@@ -175,9 +176,21 @@ pub async fn run_registry_skill_with_gateway(
 }
 
 /// Build a gateway for headless generative skills (daemon dice loop wild magic).
-pub fn headless_gateway(config: &GzmoConfig, snap: &ChaosSnapshot) -> Arc<dyn LlmGateway> {
+pub fn headless_gateway(
+    config: &GzmoConfig,
+    snap: &ChaosSnapshot,
+    ledger: Option<std::sync::Arc<obolus::ObolusLedger>>,
+) -> Arc<dyn LlmGateway> {
     let profile = config.engine.active_engine();
     let gateway = TurboQuantGateway::new(VllmConfig::from(profile.clone()));
     gateway.set_chaos_overrides(snap.llm_temperature, snap.llm_max_tokens);
-    Arc::new(gateway)
+    let raw: Arc<dyn LlmGateway> = Arc::new(gateway);
+    obolus::instrument_if_enabled(
+        raw,
+        ledger,
+        config.obolus_analytics.prime_port,
+        &VllmConfig::from(profile),
+        "dice_loop".to_string(),
+        None,
+    )
 }

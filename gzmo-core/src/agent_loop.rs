@@ -307,25 +307,16 @@ pub async fn run_agent_loop(
         "Agent loop hit max iterations — forcing text response"
     );
 
-    // Ask the LLM to summarize and stop
+    // Ask the LLM to summarize and stop. Must be Role::User — Qwen/llama.cpp chat
+    // templates reject a trailing system message ("System message must be at the beginning").
     messages.push(Message {
-        role: Role::System,
+        role: Role::User,
         content: "You have reached the maximum number of tool calls. Provide your final answer now based on the information gathered so far. Do not request any more tools.".to_string(),
         is_meta: false, tool_calls: None, tool_call_id: None,
     });
 
-    let on_chunk: Box<dyn Fn(String) + Send> = if let Some(ref callback) = config.on_chunk {
-        let cb = callback.clone();
-        Box::new(move |text: String| { cb(text); })
-    } else {
-        Box::new(|text: String| {
-            eprint!("{}", text);
-            let _ = std::io::stderr().flush();
-        })
-    };
     let windowed = build_windowed_messages(messages, &config.context, config.memory.as_ref()).await?;
-    let final_response = gateway.complete_streaming(&windowed, &[], on_chunk).await?;
-    if config.on_chunk.is_none() { eprintln!(); }
+    let final_response = gateway.complete(&windowed, &[]).await?;
     total_calls += 1;
 
     let text = match final_response {

@@ -80,6 +80,7 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
 
     // Gateway + Tools for dream cycle — use Obolus GatewayRouter
     let router = GatewayRouter::new(config);
+    let obolus_ledger = router.obolus_ledger().cloned();
     let dream_gateway: Arc<dyn LlmGateway> = Arc::clone(router.gateway(TaskKind::DreamExtract));
     let dream_verify_gateway: Arc<dyn LlmGateway> = Arc::clone(router.gateway(TaskKind::DreamVerify));
     let ingest_verify_gateway: Arc<dyn LlmGateway> =
@@ -173,6 +174,25 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
         info!("Kurator autospawn runner ready (phase 3)");
     }
 
+    if config.obolus_analytics.enabled {
+        if let Some(ledger) = obolus_ledger.clone() {
+            let obolus_cfg = config.clone();
+            tokio::spawn(async move {
+                let secs = obolus_cfg.obolus_analytics.reconcile_interval_secs.max(10);
+                let mut interval = tokio::time::interval(Duration::from_secs(secs));
+                loop {
+                    interval.tick().await;
+                    if let Err(e) =
+                        gzmo_core::obolus::reconcile::run_tick(&obolus_cfg, &ledger).await
+                    {
+                        tracing::warn!(error = %e, "obolus reconcile tick failed");
+                    }
+                }
+            });
+            info!("Obolus reconcile task started");
+        }
+    }
+
     let distill_engine = Arc::new(SessionDistillEngine::new(
         (*dream_vault).clone(),
         FileEpisodicStore::new(&config.memory.directory),
@@ -256,6 +276,7 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
     let state_dir = config.memory.vault_db.parent().unwrap_or(std::path::Path::new("data")).to_path_buf();
     let dice_loop_data_dir = state_dir.clone();
     let dice_kurator_cfg = config.kurator.clone();
+    let dice_redis_cfg = config.redis.clone();
     let dice_kurator_root = state_dir.clone();
     let dice_kurator_runner = kurator_runner.clone();
     let dice_subagent_enabled = config.subagent.enabled;
@@ -309,6 +330,7 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
     let dice_feedback_tx = chaos_pulse.feedback_tx.clone();
     let dice_snapshot_rx = chaos_pulse.snapshot_rx.clone();
     let dice_synapse = Arc::clone(&synapse);
+    let dice_obolus_ledger = obolus_ledger.clone();
     tokio::spawn(async move {
         let registry = gzmo_core::skills::registry::build_chaos_skill_registry(
             &dice_loop_config_full.pedagogy,
@@ -339,7 +361,11 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
             let snap = dice_snapshot_rx.borrow().clone();
             let die_arg = if state.die_max == 6 { "d6" } else { "d20" };
             let args = format!("--loop {die_arg}");
-            let gateway = gzmo_core::skills::dispatch::headless_gateway(&dice_loop_config_full, &snap);
+            let gateway = gzmo_core::skills::dispatch::headless_gateway(
+                &dice_loop_config_full,
+                &snap,
+                dice_obolus_ledger.clone(),
+            );
             info!(
                 parent_inv = state.parent_inv,
                 parent_roll = state.parent_roll,
@@ -394,6 +420,7 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
                                             Arc::clone(&dice_synapse),
                                             kpath,
                                             dice_kurator_cfg.clone(),
+                                            dice_redis_cfg.clone(),
                                             dice_subagent_enabled,
                                             new_recs,
                                         );
@@ -469,7 +496,8 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
         .unwrap_or(506);
     let spark_handle = tokio::spawn(async move {
         let mut interval = tokio::time::interval(Duration::from_secs(60));
-        let mut last_run_key: Option<(u32, u32, NaiveDate)> = None;
+        let mut completed_spark_slots: Vec<(u32, u32)> = Vec::new();
+        let mut completed_spark_date: Option<NaiveDate> = None;
         let mut next_dice_run: Option<chrono::DateTime<Utc>> = None;
         let mut dice_seed = spark_config.dice_seed.unwrap_or(chaos_seed);
         loop {
@@ -479,12 +507,16 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
             }
             let now = Utc::now();
             let today = now.date_naive();
+            if completed_spark_date != Some(today) {
+                completed_spark_slots.clear();
+                completed_spark_date = Some(today);
+            }
             let cron_slot = match spark_config.schedule_mode {
                 SparkScheduleMode::Cron => spark_cron_slot_due(
                     &now,
                     &spark_config.cron_hours,
                     spark_config.cron_minute,
-                    last_run_key,
+                    &completed_spark_slots,
                 ),
                 SparkScheduleMode::Dice => {
                     if next_dice_run.is_none() {
@@ -510,7 +542,9 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
             match spark_engine_clone.run(today).await {
                 Ok(report) => {
                     if spark_config.schedule_mode == SparkScheduleMode::Cron {
-                        last_run_key = Some((slot_hour, slot_minute, today));
+                        if !completed_spark_slots.contains(&(slot_hour, slot_minute)) {
+                            completed_spark_slots.push((slot_hour, slot_minute));
+                        }
                     } else {
                         next_dice_run = None;
                     }
@@ -619,6 +653,7 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
     // Synapse pull — Pi event tail → episodic + session_end → distill pi
     let synapse_cfg = config.synapse_pull.clone();
     let kurator_cfg = config.kurator.clone();
+    let kurator_redis_cfg = config.redis.clone();
     let kurator_runner_poll = kurator_runner.clone();
     let subagent_enabled = config.subagent.enabled;
     let synapse_episodic = FileEpisodicStore::new(&config.memory.directory);
@@ -670,6 +705,7 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
                                         Arc::clone(&kurator_synapse),
                                         kurator_state,
                                         kurator_cfg.clone(),
+                                        kurator_redis_cfg.clone(),
                                         subagent_enabled,
                                         new_recs,
                                     );

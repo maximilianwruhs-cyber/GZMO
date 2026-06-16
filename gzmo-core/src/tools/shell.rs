@@ -41,6 +41,23 @@ const SAFE_COMMAND_PREFIXES: &[&str] = &[
     "gzmo",
 ];
 
+/// First shell token (binary name) from a command string.
+pub fn shell_command_binary(command: &str) -> &str {
+    let first_token = command
+        .split_whitespace()
+        .find(|t| !t.contains('='))
+        .unwrap_or("");
+    first_token.rsplit('/').next().unwrap_or(first_token)
+}
+
+/// Whether `binary` is permitted by base allowlist plus optional extras.
+pub fn is_shell_command_allowed(binary: &str, extra_prefixes: &[String]) -> bool {
+    SAFE_COMMAND_PREFIXES
+        .iter()
+        .any(|safe| binary == *safe)
+        || extra_prefixes.iter().any(|safe| binary == safe.as_str())
+}
+
 /// Execute a shell command on the host.
 /// Captures stdout + stderr with a timeout to prevent runaway processes.
 pub struct ShellExecTool {
@@ -51,6 +68,8 @@ pub struct ShellExecTool {
     pub compress_config: Option<crate::config::ContextCompressConfig>,
     pub ccr: Option<crate::context_compress::CcrStore>,
     pub session_id: Option<String>,
+    /// Additional first-token binaries (e.g. subagent remediation: `cd`, `mkdir`).
+    pub extra_prefixes: Vec<String>,
 }
 
 impl Default for ShellExecTool {
@@ -61,11 +80,17 @@ impl Default for ShellExecTool {
             compress_config: None,
             ccr: None,
             session_id: None,
+            extra_prefixes: Vec::new(),
         }
     }
 }
 
 impl ShellExecTool {
+    pub fn with_extra_prefixes(mut self, extra_prefixes: Vec<String>) -> Self {
+        self.extra_prefixes = extra_prefixes;
+        self
+    }
+
     pub fn new_with_compress(
         timeout: Duration,
         cwd: Option<String>,
@@ -73,12 +98,31 @@ impl ShellExecTool {
         ccr: crate::context_compress::CcrStore,
         session_id: String,
     ) -> Self {
+        Self::new_with_compress_and_extra(
+            timeout,
+            cwd,
+            compress_config,
+            ccr,
+            session_id,
+            Vec::new(),
+        )
+    }
+
+    pub fn new_with_compress_and_extra(
+        timeout: Duration,
+        cwd: Option<String>,
+        compress_config: crate::config::ContextCompressConfig,
+        ccr: crate::context_compress::CcrStore,
+        session_id: String,
+        extra_prefixes: Vec<String>,
+    ) -> Self {
         Self {
             timeout,
             cwd,
             compress_config: Some(compress_config),
             ccr: Some(ccr),
             session_id: Some(session_id),
+            extra_prefixes,
         }
     }
 }
@@ -108,23 +152,22 @@ impl ToolHandler for ShellExecTool {
             .ok_or_else(|| anyhow::anyhow!("Missing 'command' argument"))?;
 
         // ─── SECURITY ALLOWLIST ───
-        // Extract the first token (the actual binary being invoked).
-        // Handles leading env vars like `FOO=bar cmd` and path prefixes like `/usr/bin/ls`.
-        let first_token = command
-            .split_whitespace()
-            .find(|t| !t.contains('='))  // skip env var assignments
-            .unwrap_or("");
-        // Strip any path prefix: "/usr/bin/ls" → "ls"
-        let binary_name = first_token.rsplit('/').next().unwrap_or(first_token);
+        let binary_name = shell_command_binary(command);
 
-        if !SAFE_COMMAND_PREFIXES.iter().any(|safe| binary_name == *safe) {
+        if !is_shell_command_allowed(binary_name, &self.extra_prefixes) {
             tracing::warn!(command = %command, binary = %binary_name, "Blocked: not in allowlist");
+            let mut permitted: Vec<&str> = SAFE_COMMAND_PREFIXES.to_vec();
+            for extra in &self.extra_prefixes {
+                if !permitted.contains(&extra.as_str()) {
+                    permitted.push(extra.as_str());
+                }
+            }
             return Ok(format!(
                 "ERROR: Command '{}' is not in the safe command allowlist. \
                 Permitted commands: {}. \
                 If you need to run this command, ask the user to execute it manually.",
                 command,
-                SAFE_COMMAND_PREFIXES.join(", ")
+                permitted.join(", ")
             ));
         }
 
@@ -216,5 +259,26 @@ impl ToolHandler for ShellExecTool {
                 command
             )),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn base_allowlist_blocks_cd() {
+        assert!(!is_shell_command_allowed("cd", &[]));
+        assert!(is_shell_command_allowed("grep", &[]));
+    }
+
+    #[test]
+    fn extra_prefixes_allow_cd_chains() {
+        let extras = vec!["cd".to_string()];
+        assert!(is_shell_command_allowed("cd", &extras));
+        assert_eq!(
+            shell_command_binary("cd /tmp && find . -name foo"),
+            "cd"
+        );
     }
 }
