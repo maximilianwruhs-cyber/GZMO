@@ -32,6 +32,10 @@ pub struct SubagentSpec {
     pub max_iterations: usize,
     pub depth: u8,
     pub parent_session: String,
+    #[serde(default)]
+    pub working_dir: Option<String>,
+    #[serde(default)]
+    pub shell_extra_commands: Vec<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -49,6 +53,10 @@ pub struct SubagentResult {
     pub summary: String,
     pub llm_calls: usize,
     pub tool_calls: usize,
+    #[serde(default)]
+    pub hit_max_iterations: bool,
+    #[serde(default)]
+    pub written_paths: Vec<String>,
 }
 
 struct RunningSub {
@@ -184,44 +192,61 @@ impl SubagentRunner {
         sub_tools.register(Box::new(
             ShellExecTool::new_with_compress_and_extra(
                 std::time::Duration::from_secs(30),
-                None,
+                spec.working_dir.clone(),
                 self.compress_config.clone(),
                 self.ccr.clone(),
                 spec.parent_session.clone(),
-                self.config.shell_extra_commands.clone(),
+                {
+                    let mut extras = self.config.shell_extra_commands.clone();
+                    extras.extend(spec.shell_extra_commands.clone());
+                    extras.sort();
+                    extras.dedup();
+                    extras
+                },
             ),
         ));
-        sub_tools.register(Box::new(WebBrowseTool::new_with_compress(
-            self.compress_config.clone(),
-            self.ccr.clone(),
-            spec.parent_session.clone(),
-        )));
-        if self.serpapi_key.is_empty() {
-            sub_tools.register(Box::new(WebSearchTool::new_with_compress(
-                String::new(),
-                self.compress_config.clone(),
-                self.ccr.clone(),
-                spec.parent_session.clone(),
-            )));
-        } else {
-            sub_tools.register(Box::new(WebSearchTool::new_with_compress(
-                self.serpapi_key.clone(),
-                self.compress_config.clone(),
-                self.ccr.clone(),
-                spec.parent_session.clone(),
-            )));
-        }
         if let Some(ref v) = self.vault {
             sub_tools.register(Box::new(MemoryRecordTool { vault: Arc::clone(v) }));
             sub_tools.register(Box::new(MemorySearchTool::new(Arc::clone(v))));
+        }
+        let is_discovery_agent = crate::discovery_code_implementer::is_discovery_agent_brief(&spec.brief);
+        if !is_discovery_agent {
+            sub_tools.register(Box::new(WebBrowseTool::new_with_compress(
+                self.compress_config.clone(),
+                self.ccr.clone(),
+                spec.parent_session.clone(),
+            )));
+            if self.serpapi_key.is_empty() {
+                sub_tools.register(Box::new(WebSearchTool::new_with_compress(
+                    String::new(),
+                    self.compress_config.clone(),
+                    self.ccr.clone(),
+                    spec.parent_session.clone(),
+                )));
+            } else {
+                sub_tools.register(Box::new(WebSearchTool::new_with_compress(
+                    self.serpapi_key.clone(),
+                    self.compress_config.clone(),
+                    self.ccr.clone(),
+                    spec.parent_session.clone(),
+                )));
+            }
         }
         let tools = Arc::new(sub_tools);
         let scratch = Arc::clone(&self.scratch);
         let session_id = spec.parent_session.clone();
         let role = spec.role.clone();
         let brief = spec.brief.clone();
-        let is_discovery_fixer = brief.contains("Discovery fixer");
-        let max_iterations = spec.max_iterations.min(15);
+        let max_iterations = if is_discovery_agent {
+            spec.max_iterations
+        } else {
+            spec.max_iterations.min(15)
+        };
+        const DISCOVERY_AGENT_WRITE_PHASE_LEAD: usize = 10;
+        const DISCOVERY_AGENT_WRITE_PHASE_MSG: &str = "WRITE PHASE — stop exploration now. \
+Use file_write to create or patch remediation scripts/config under gzmo_skills/ or the GZMO repo. \
+Run at most one short shell_exec to verify. Do not finish until file_write succeeded for at least one fix. \
+Do not prefix shell_exec commands with # comment lines.";
         let summary_max = self.config.summary_max_tokens;
         let context_budget = self.config.context_budget_tokens;
         let system = self.role_system_prompt(&role, &brief);
@@ -248,6 +273,8 @@ impl SubagentRunner {
                         summary: "Subagent cancelled.".to_string(),
                         llm_calls: 0,
                         tool_calls: 0,
+                        hit_max_iterations: false,
+                        written_paths: Vec::new(),
                     });
                 }
 
@@ -280,10 +307,25 @@ impl SubagentRunner {
                         compress_cfg: compress_cfg.clone(),
                         ccr: ccr.clone(),
                     }),
+                    write_phase_at: if is_discovery_agent {
+                        Some(max_iterations.saturating_sub(DISCOVERY_AGENT_WRITE_PHASE_LEAD))
+                    } else {
+                        None
+                    },
+                    write_phase_message: if is_discovery_agent {
+                        Some(DISCOVERY_AGENT_WRITE_PHASE_MSG.to_string())
+                    } else {
+                        None
+                    },
+                    require_file_write_before_done: is_discovery_agent,
                 };
 
-                let process = if is_discovery_fixer {
-                    crate::obolus::kurator_process_label("discovery_fix")
+                let process = if is_discovery_agent {
+                    if spec.brief.contains("Discovery code implementer") {
+                        crate::obolus::kurator_process_label("discovery_code_implement")
+                    } else {
+                        crate::obolus::kurator_process_label("discovery_fix")
+                    }
                 } else {
                     crate::obolus::kurator_process_label("session_triage")
                 };
@@ -316,6 +358,8 @@ impl SubagentRunner {
                     summary,
                     llm_calls: response.llm_calls,
                     tool_calls: response.tool_results.len(),
+                    hit_max_iterations: response.hit_max_iterations,
+                    written_paths: response.written_paths,
                 })
             }
             .await;

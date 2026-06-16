@@ -3,7 +3,8 @@ use anyhow::Result;
 use chrono::Utc;
 
 use gzmo_core::config::GzmoConfig;
-use gzmo_core::gateway::{TurboQuantGateway, VllmConfig};
+use gzmo_core::config::TaskKind;
+use gzmo_core::gateway::{GatewayRouter, LlmGateway};
 use gzmo_core::identity::IdentityEngine;
 use gzmo_core::memory::vault::SqliteVault;
 use gzmo_core::memory::episodic::FileEpisodicStore;
@@ -65,11 +66,11 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
     let session_mgr = Arc::new(SessionManager::new("data/sessions"));
     let _ = session_mgr.ensure_dir().await;
 
-    // ─── Gateway (RwLock-wrapped for /mode hot-swap) ─────────────
-    let active_profile = config.engine.active_engine();
-    let gateway = Arc::new(tokio::sync::RwLock::new(Arc::new(TurboQuantGateway::new(
-        VllmConfig::from(active_profile.clone()),
-    ))));
+    // ─── Gateway (instrumented via GatewayRouter) ────────────────
+    let router = GatewayRouter::new(&config);
+    let gateway: Arc<tokio::sync::RwLock<Arc<dyn LlmGateway>>> = Arc::new(
+        tokio::sync::RwLock::new(Arc::clone(router.gateway(TaskKind::Chat))),
+    );
 
     // ─── Chaos Engine ────────────────────────────────────────────
     let chaos_runtime = crate::chaos_bootstrap::start_chaos_runtime(&config);
@@ -161,6 +162,7 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
     );
 
     // ─── Build Components ────────────────────────────────────────
+    let active_profile = config.engine.active_engine();
     let context_budget = active_profile.max_tokens as usize * 4;
     let max_iterations = config.agent.max_tool_iterations;
     // Share the inner soul Arc — IdentityEngine itself isn't Clone (contains watcher)

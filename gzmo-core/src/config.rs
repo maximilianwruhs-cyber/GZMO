@@ -346,6 +346,14 @@ pub struct GzmoConfig {
     /// Token ledger + efficiency analytics for Prime (:8000). Distinct from `[routing]`.
     #[serde(default)]
     pub obolus_analytics: ObolusAnalyticsConfig,
+
+    /// ARCH-DIR sovereignty compliance (verify script + policy knobs).
+    #[serde(default)]
+    pub compliance: ComplianceConfig,
+
+    /// Obolus runtime energy governance (ObolusGate decisions).
+    #[serde(default)]
+    pub obolus_governance: ObolusGovernanceConfig,
 }
 
 // ─── Dice autopoietic loop ──────────────────────────────────────────────
@@ -1647,16 +1655,42 @@ pub struct KuratorConfig {
     #[serde(default = "default_kurator_spawn_brief_max")]
     pub spawn_brief_max_chars: usize,
 
-    /// Spawn epimetheus/fixer sub-agent when discovery reports contain FAIL/GAP findings.
+    /// Spawn epimetheus/fixer sub-agent when discovery reports contain actionable items
+    /// (FAIL/GAP markers or Recommended next actions).
     #[serde(default = "default_discovery_fixer_enabled")]
     pub discovery_fixer_enabled: bool,
 
     #[serde(default = "default_kurator_fixer_profile")]
     pub fixer_agent_profile: String,
 
-    /// Minimum actionable FAIL+GAP markers before emitting a fixer spawn.
+    /// After deterministic probes, spawn agent to write code/config remediations.
+    #[serde(default = "default_discovery_code_implementer_enabled")]
+    pub discovery_code_implementer_enabled: bool,
+
+    #[serde(default = "default_code_implementer_agent_profile")]
+    pub code_implementer_agent_profile: String,
+
+    #[serde(default = "default_discovery_code_implementer_max_iterations")]
+    pub discovery_code_implementer_max_iterations: usize,
+
+    #[serde(default = "default_discovery_code_implementer_max_retries")]
+    pub discovery_code_implementer_max_retries: u32,
+
+    /// Minimum actionable items (FAIL + GAP + ACTION) before emitting a fixer spawn.
     #[serde(default = "default_discovery_fixer_min_findings")]
     pub discovery_fixer_min_findings: u32,
+
+    /// Max tool-call rounds for discovery fixer sub-agents (epimetheus remediation).
+    #[serde(default = "default_discovery_fixer_max_iterations")]
+    pub discovery_fixer_max_iterations: usize,
+
+    /// Extra single-finding retry spawns after verify_gate FAIL (0 = no retries).
+    #[serde(default = "default_discovery_fixer_max_retries")]
+    pub discovery_fixer_max_retries: u32,
+
+    /// Extra shell binaries for discovery fixer only (merged with [subagent].shell_extra_commands).
+    #[serde(default = "default_discovery_fixer_shell_extra")]
+    pub discovery_fixer_shell_extra_commands: Vec<String>,
 
     /// Spawn gate — central autospawn policy (rate limits, tiers).
     #[serde(default)]
@@ -1797,12 +1831,40 @@ fn default_discovery_fixer_enabled() -> bool {
     true
 }
 
+fn default_discovery_code_implementer_enabled() -> bool {
+    true
+}
+
+fn default_code_implementer_agent_profile() -> String {
+    "epimetheus".to_string()
+}
+
+fn default_discovery_code_implementer_max_iterations() -> usize {
+    40
+}
+
+fn default_discovery_code_implementer_max_retries() -> u32 {
+    2
+}
+
 fn default_kurator_fixer_profile() -> String {
     "epimetheus".to_string()
 }
 
 fn default_discovery_fixer_min_findings() -> u32 {
     1
+}
+
+fn default_discovery_fixer_max_iterations() -> usize {
+    35
+}
+
+fn default_discovery_fixer_max_retries() -> u32 {
+    1
+}
+
+fn default_discovery_fixer_shell_extra() -> Vec<String> {
+    vec!["bash".into(), "sh".into()]
 }
 
 impl Default for KuratorConfig {
@@ -1819,7 +1881,14 @@ impl Default for KuratorConfig {
             spawn_brief_max_chars: default_kurator_spawn_brief_max(),
             discovery_fixer_enabled: default_discovery_fixer_enabled(),
             fixer_agent_profile: default_kurator_fixer_profile(),
+            discovery_code_implementer_enabled: default_discovery_code_implementer_enabled(),
+            code_implementer_agent_profile: default_code_implementer_agent_profile(),
+            discovery_code_implementer_max_iterations: default_discovery_code_implementer_max_iterations(),
+            discovery_code_implementer_max_retries: default_discovery_code_implementer_max_retries(),
             discovery_fixer_min_findings: default_discovery_fixer_min_findings(),
+            discovery_fixer_max_iterations: default_discovery_fixer_max_iterations(),
+            discovery_fixer_max_retries: default_discovery_fixer_max_retries(),
+            discovery_fixer_shell_extra_commands: default_discovery_fixer_shell_extra(),
             spawn_gate: SpawnGateConfig::default(),
         }
     }
@@ -1854,6 +1923,142 @@ impl Default for SynapseWriterConfig {
             gate_enabled: false,
             invoke_window_secs: default_synapse_writer_invoke_window(),
             tail_scan_lines: default_synapse_writer_tail_scan(),
+        }
+    }
+}
+
+// ─── Compliance (ARCH-DIR) ───────────────────────────────────────────────
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct ComplianceConfig {
+    #[serde(default = "default_compliance_mode")]
+    pub mode: String,
+
+    #[serde(default)]
+    pub require_obolus_governance: bool,
+
+    #[serde(default)]
+    pub allow_cloud_tools: bool,
+
+    #[serde(default)]
+    pub allow_cloud_engine: bool,
+
+    #[serde(default = "default_trusted_cidrs")]
+    pub trusted_cidrs: Vec<String>,
+
+    #[serde(default = "default_max_binary_mb")]
+    pub max_binary_mb: u64,
+
+    #[serde(default = "default_max_workspace_deps")]
+    pub max_workspace_deps: usize,
+}
+
+fn default_compliance_mode() -> String {
+    "sovereign".to_string()
+}
+
+fn default_trusted_cidrs() -> Vec<String> {
+    vec!["127.0.0.0/8".into(), "192.168.31.0/24".into()]
+}
+
+fn default_max_binary_mb() -> u64 {
+    80
+}
+
+fn default_max_workspace_deps() -> usize {
+    25
+}
+
+impl Default for ComplianceConfig {
+    fn default() -> Self {
+        Self {
+            mode: default_compliance_mode(),
+            require_obolus_governance: true,
+            allow_cloud_tools: false,
+            allow_cloud_engine: false,
+            trusted_cidrs: default_trusted_cidrs(),
+            max_binary_mb: default_max_binary_mb(),
+            max_workspace_deps: default_max_workspace_deps(),
+        }
+    }
+}
+
+// ─── Obolus governance (runtime energy bilanz) ───────────────────────────
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct ObolusGovernanceConfig {
+    #[serde(default = "default_obolus_governance_enabled")]
+    pub enabled: bool,
+
+    #[serde(default = "default_max_e_total_per_hour")]
+    pub max_e_total_per_hour: u64,
+
+    #[serde(default = "default_max_ctx_pressure_pct")]
+    pub max_ctx_pressure_pct: f64,
+
+    #[serde(default = "default_spawn_discovery_fix_reserve_obl")]
+    pub spawn_discovery_fix_reserve_obl: u64,
+
+    #[serde(default = "default_spawn_session_triage_reserve_obl")]
+    pub spawn_session_triage_reserve_obl: u64,
+
+    #[serde(default = "default_dice_loop_reserve_obl")]
+    pub dice_loop_reserve_obl: u64,
+
+    #[serde(default = "default_on_budget_exceeded")]
+    pub on_budget_exceeded: String,
+
+    #[serde(default = "default_operator_warn_only")]
+    pub operator_warn_only: bool,
+
+    #[serde(default)]
+    pub fail_open_if_ledger_unreadable: bool,
+}
+
+fn default_obolus_governance_enabled() -> bool {
+    true
+}
+
+fn default_max_e_total_per_hour() -> u64 {
+    2_000_000
+}
+
+fn default_max_ctx_pressure_pct() -> f64 {
+    400.0
+}
+
+fn default_spawn_discovery_fix_reserve_obl() -> u64 {
+    50
+}
+
+fn default_spawn_session_triage_reserve_obl() -> u64 {
+    20
+}
+
+fn default_dice_loop_reserve_obl() -> u64 {
+    10
+}
+
+fn default_on_budget_exceeded() -> String {
+    "deny".to_string()
+}
+
+fn default_operator_warn_only() -> bool {
+    true
+}
+
+impl Default for ObolusGovernanceConfig {
+    fn default() -> Self {
+        Self {
+            enabled: default_obolus_governance_enabled(),
+            max_e_total_per_hour: default_max_e_total_per_hour(),
+            max_ctx_pressure_pct: default_max_ctx_pressure_pct(),
+            spawn_discovery_fix_reserve_obl: default_spawn_discovery_fix_reserve_obl(),
+            spawn_session_triage_reserve_obl: default_spawn_session_triage_reserve_obl(),
+            dice_loop_reserve_obl: default_dice_loop_reserve_obl(),
+            on_budget_exceeded: default_on_budget_exceeded(),
+            operator_warn_only: default_operator_warn_only(),
+            fail_open_if_ledger_unreadable: false,
         }
     }
 }

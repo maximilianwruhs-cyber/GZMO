@@ -499,7 +499,27 @@ prime_port = 8000
 prime_context_tokens = 131072   # Prime n_ctx (128K) — not [context_memory].context_length
 reconcile_interval_secs = 60
 tokens_per_obl = 1000
-# efficiency_tick_enabled = false   # hourly obolus.efficiency_tick on Synapse bus
+efficiency_tick_enabled = true
+
+[obolus_governance]
+enabled = true
+max_e_total_per_hour = 2000000
+max_ctx_pressure_pct = 500          # headroom over chat-heavy hours (~320% typical)
+spawn_discovery_fix_reserve_obl = 50
+spawn_session_triage_reserve_obl = 20
+dice_loop_reserve_obl = 10
+on_budget_exceeded = "deny"
+operator_warn_only = true
+fail_open_if_ledger_unreadable = false
+
+[compliance]
+mode = "sovereign"
+require_obolus_governance = true
+allow_cloud_tools = false
+allow_cloud_engine = false
+trusted_cidrs = ["127.0.0.0/8", "192.168.31.0/24"]
+max_binary_mb = 80
+max_workspace_deps = 25
 
 [kurator]
 enabled = false
@@ -511,6 +531,18 @@ default_agent_profile = "prometheus"
 approve_spawns_subagent = true
 auto_spawn_on_recommend = true
 spawn_brief_max_chars = 4000
+
+[kurator.spawn_gate]
+enabled = true
+max_autospawns_per_hour = 3
+spawn_cooldown_secs = 600
+prometheus_requires_idle = true
+duplicate_reason_max_per_hour = 3
+auto_spawn_discovery_fix = true
+prime_budget_enabled = true
+prime_spawn_budget_per_hour = 3
+prime_budget_fail_open = false
+prime_budget_ttl_secs = 7200
 
 [synapse_writer]
 # When true, `gzmo chaos skill` requires a matching Pi `skill.invoke` on the bus.

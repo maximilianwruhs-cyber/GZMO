@@ -11,6 +11,7 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::config::SpawnGateConfig;
+use crate::discovery_code_implementer;
 use crate::discovery_fixer;
 use crate::kurator_monitor::{KuratorMonitorState, PendingRecommendation};
 use crate::synapse::{EventSource, EventType, SynapseBus, SynapseEvent};
@@ -33,7 +34,9 @@ impl SpawnKind {
 }
 
 pub fn spawn_kind(rec: &PendingRecommendation) -> SpawnKind {
-    if discovery_fixer::is_discovery_fix_recommendation(rec) {
+    if discovery_fixer::is_discovery_fix_recommendation(rec)
+        || discovery_code_implementer::is_discovery_code_implement_recommendation(rec)
+    {
         SpawnKind::DiscoveryFix
     } else {
         SpawnKind::SessionTriage

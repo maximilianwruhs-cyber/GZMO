@@ -5,7 +5,7 @@ use chrono::Utc;
 
 use gzmo_core::agent_loop::{run_agent_loop, AgentLoopConfig};
 use gzmo_core::context::ContextConfig;
-use gzmo_core::gateway::{TurboQuantGateway, VllmConfig};
+use gzmo_core::gateway::{GatewayRouter, LlmGateway};
 use gzmo_core::types::{SoulContext, EpisodicEntry, EpisodicSource, Message, Role};
 
 use gzmo_core::memory::episodic::FileEpisodicStore;
@@ -24,7 +24,7 @@ use crate::tui::component::Component;
 /// episodic logging, and streaming token dispatch.
 pub struct AgentComponent {
     pub action_tx: Option<UnboundedSender<Action>>,
-    pub gateway: Arc<tokio::sync::RwLock<Arc<TurboQuantGateway>>>,
+    pub gateway: Arc<tokio::sync::RwLock<Arc<dyn LlmGateway>>>,
     pub tools: Arc<ToolRegistry>,
     pub messages: Vec<Message>,
     pub max_iterations: usize,
@@ -47,7 +47,7 @@ pub struct AgentComponent {
 
 impl AgentComponent {
     pub fn new(
-        gateway: Arc<tokio::sync::RwLock<Arc<TurboQuantGateway>>>,
+        gateway: Arc<tokio::sync::RwLock<Arc<dyn LlmGateway>>>,
         tools: Arc<ToolRegistry>,
         system_prompt: String,
         max_iterations: usize,
@@ -317,6 +317,8 @@ impl Component for AgentComponent {
             let episodic = Arc::clone(&self.episodic);
             let soul = Arc::clone(&self.soul);
             let tool_defs = self.tools.definitions();
+            let session_id = self.session_id.clone();
+            let gzmo_config = Arc::clone(&self.config);
 
             tokio::spawn(async move {
                 // SOUL.md hot-reload check
@@ -352,7 +354,31 @@ impl Component for AgentComponent {
                     context: ContextConfig::for_context_length(ctx_budget),
                     on_chunk: Some(on_chunk),
                     memory: None,
+                    write_phase_at: None,
+                    write_phase_message: None,
+                    require_file_write_before_done: false,
                 };
+
+                let _obolus_ctx = gzmo_core::obolus::CallContextGuard::new(
+                    gzmo_core::obolus::ObolusCallContext {
+                        process: "chat".into(),
+                        task_kind: Some("chat".into()),
+                        caller: "gzmo tui".into(),
+                        correlation_id: Some(session_id.clone()),
+                        action_id: None,
+                    },
+                );
+                let gzmo_cfg = gzmo_config.read().await;
+                if let Ok(gzmo_core::obolus::ObolusVerdict::Warn { reason }) =
+                    gzmo_core::obolus::gate::evaluate_from_config(
+                        &gzmo_cfg,
+                        gzmo_core::obolus::ObolusAction::OperatorChat,
+                        gzmo_core::obolus::ObolusTier::Operator,
+                    )
+                {
+                    tracing::warn!(%reason, "obolus budget warning (tui)");
+                }
+                drop(gzmo_cfg);
 
                 let gw = gateway.read().await;
                 let res = run_agent_loop(gw.as_ref(), tools.as_ref(), &mut msgs, &config).await;
@@ -401,7 +427,7 @@ struct SlashCommandContext {
     chaos_feedback_tx: tokio::sync::mpsc::Sender<ChaosEvent>,
     config: Arc<tokio::sync::RwLock<gzmo_core::config::GzmoConfig>>,
     config_path: std::path::PathBuf,
-    gateway: Arc<tokio::sync::RwLock<Arc<TurboQuantGateway>>>,
+    gateway: Arc<tokio::sync::RwLock<Arc<dyn LlmGateway>>>,
 }
 
 impl SlashCommandContext {
@@ -618,7 +644,8 @@ impl SlashCommandContext {
                                         profile.url
                                     )));
                                 } else {
-                                    let new_gw = Arc::new(TurboQuantGateway::new(VllmConfig::from(profile.clone())));
+                                    let new_router = GatewayRouter::new(&config);
+                                    let new_gw = Arc::clone(new_router.gateway(gzmo_core::config::TaskKind::Chat));
                                     {
                                         let mut gw = self.gateway.write().await;
                                         *gw = new_gw;

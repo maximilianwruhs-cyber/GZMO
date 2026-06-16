@@ -37,6 +37,10 @@ Canonical operator and architecture docs. Session reports and milestone logs bel
 
 | Doc | Purpose |
 |-----|---------|
+| [ARCH-DIR-001-GZMO.md](ARCH-DIR-001-GZMO.md) | Sovereignty constitution |
+| [OBOLUS_GOVERNANCE.md](OBOLUS_GOVERNANCE.md) | Runtime energy bilanz + tiers |
+| [Obolus/instrumentation-map.md](Obolus/instrumentation-map.md) | Prime path coverage |
+| [OBOLUS_EFFICIENCY.md](OBOLUS_EFFICIENCY.md) | η metric |
 | [PI_OPERATOR_GUIDE.md](PI_OPERATOR_GUIDE.md) | Pi agent onboarding |
 | [REBOOT_STARTUP.md](REBOOT_STARTUP.md) | Cold-start after reboot |
 | [EVAL_TIERS.md](EVAL_TIERS.md) | Eval tier definitions |

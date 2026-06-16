@@ -242,6 +242,8 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
     let dream_engine_clone = Arc::clone(&dream_engine);
     let dreams_path = config.skills.dreams_path.clone();
     let dream_config = config.dreams.clone();
+    let obolus_daemon_cfg = config.clone();
+    let dream_synapse = Arc::clone(&synapse);
 
     let spark_engine = Arc::new(SparkEngine::new_with_verify(
         (*dream_vault).clone(),
@@ -254,6 +256,8 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
     ));
     let spark_engine_clone = Arc::clone(&spark_engine);
     let spark_config = config.spark.clone();
+    let spark_obolus_cfg = obolus_daemon_cfg.clone();
+    let spark_synapse = Arc::clone(&synapse);
     let dreams_path_spark = config.skills.dreams_path.clone();
 
     let ingest_engine = Arc::new(
@@ -355,6 +359,31 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
             if !gzmo_core::dice_loop::is_due(now, &state) {
                 continue;
             }
+            match gzmo_core::obolus::gate::evaluate_from_config(
+                &dice_loop_config_full,
+                gzmo_core::obolus::ObolusAction::DiceLoop,
+                gzmo_core::obolus::ObolusTier::Autonomous,
+            ) {
+                Ok(gzmo_core::obolus::ObolusVerdict::Allow) => {}
+                Ok(gzmo_core::obolus::ObolusVerdict::Warn { reason }) => {
+                    tracing::warn!(%reason, "obolus warn: dice loop deferred path");
+                }
+                Ok(gzmo_core::obolus::ObolusVerdict::Defer { reason })
+                | Ok(gzmo_core::obolus::ObolusVerdict::Deny { reason }) => {
+                    gzmo_core::obolus::gate::emit_obolus_denied(
+                        &dice_synapse,
+                        gzmo_core::obolus::ObolusAction::DiceLoop,
+                        &reason,
+                    );
+                    continue;
+                }
+                Err(e) => {
+                    tracing::warn!(error = %e, "obolus gate dice loop");
+                    if !dice_loop_config_full.obolus_governance.fail_open_if_ledger_unreadable {
+                        continue;
+                    }
+                }
+            }
             // Mark state as "in-flight" so the next 5s tick skips it.
             // schedule_from_roll (called inside the skill) will overwrite with a new fire_at.
             let _ = gzmo_core::dice_loop::mark_processing(&dice_loop_data_dir, &state);
@@ -412,6 +441,7 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
                                 &dice_synapse,
                                 &kpath,
                                 &dice_kurator_cfg,
+                                Some(&dice_loop_config_full),
                             ) {
                                 Ok(new_recs) => {
                                     if let Some(runner) = dice_kurator_runner.as_ref() {
@@ -421,6 +451,7 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
                                             kpath,
                                             dice_kurator_cfg.clone(),
                                             dice_redis_cfg.clone(),
+                                            dice_loop_config_full.clone(),
                                             dice_subagent_enabled,
                                             new_recs,
                                         );
@@ -451,6 +482,8 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
     });
 
     // Dream cycle task (DreamEngine — replaces headless auto_dream orchestrator job)
+    let dream_obolus_cfg = obolus_daemon_cfg.clone();
+    let dream_synapse_tick = Arc::clone(&dream_synapse);
     let dream_handle = tokio::spawn(async move {
         let mut interval = tokio::time::interval(Duration::from_secs(60));
         let mut last_consolidated: Option<NaiveDate> = None;
@@ -467,6 +500,31 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
             }
             if last_consolidated == Some(yesterday) {
                 continue;
+            }
+            match gzmo_core::obolus::gate::evaluate_from_config(
+                &dream_obolus_cfg,
+                gzmo_core::obolus::ObolusAction::DreamTick,
+                gzmo_core::obolus::ObolusTier::Autonomous,
+            ) {
+                Ok(gzmo_core::obolus::ObolusVerdict::Allow) => {}
+                Ok(gzmo_core::obolus::ObolusVerdict::Warn { reason }) => {
+                    tracing::warn!(%reason, "obolus warn: dream tick");
+                }
+                Ok(gzmo_core::obolus::ObolusVerdict::Defer { reason })
+                | Ok(gzmo_core::obolus::ObolusVerdict::Deny { reason }) => {
+                    gzmo_core::obolus::gate::emit_obolus_denied(
+                        &dream_synapse_tick,
+                        gzmo_core::obolus::ObolusAction::DreamTick,
+                        &reason,
+                    );
+                    continue;
+                }
+                Err(e) => {
+                    tracing::warn!(error = %e, "obolus gate dream tick");
+                    if !dream_obolus_cfg.obolus_governance.fail_open_if_ledger_unreadable {
+                        continue;
+                    }
+                }
             }
             info!(date = %yesterday, "Dream consolidation starting");
             match dream_engine_clone.consolidate(yesterday).await {
@@ -494,6 +552,7 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
         .and_then(|v| v.as_float())
         .map(|f| (f * 1_000_000.0) as u64)
         .unwrap_or(506);
+    let spark_synapse_tick = Arc::clone(&spark_synapse);
     let spark_handle = tokio::spawn(async move {
         let mut interval = tokio::time::interval(Duration::from_secs(60));
         let mut completed_spark_slots: Vec<(u32, u32)> = Vec::new();
@@ -537,6 +596,32 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
             let Some((slot_hour, slot_minute)) = cron_slot else {
                 continue;
             };
+
+            match gzmo_core::obolus::gate::evaluate_from_config(
+                &spark_obolus_cfg,
+                gzmo_core::obolus::ObolusAction::SparkTick,
+                gzmo_core::obolus::ObolusTier::Autonomous,
+            ) {
+                Ok(gzmo_core::obolus::ObolusVerdict::Allow) => {}
+                Ok(gzmo_core::obolus::ObolusVerdict::Warn { reason }) => {
+                    tracing::warn!(%reason, "obolus warn: spark tick");
+                }
+                Ok(gzmo_core::obolus::ObolusVerdict::Defer { reason })
+                | Ok(gzmo_core::obolus::ObolusVerdict::Deny { reason }) => {
+                    gzmo_core::obolus::gate::emit_obolus_denied(
+                        &spark_synapse_tick,
+                        gzmo_core::obolus::ObolusAction::SparkTick,
+                        &reason,
+                    );
+                    continue;
+                }
+                Err(e) => {
+                    tracing::warn!(error = %e, "obolus gate spark tick");
+                    if !spark_obolus_cfg.obolus_governance.fail_open_if_ledger_unreadable {
+                        continue;
+                    }
+                }
+            }
 
             info!(date = %today, mode = ?spark_config.schedule_mode, hour = slot_hour, minute = slot_minute, "Spark cycle starting");
             match spark_engine_clone.run(today).await {
@@ -655,10 +740,12 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
     let kurator_cfg = config.kurator.clone();
     let kurator_redis_cfg = config.redis.clone();
     let kurator_runner_poll = kurator_runner.clone();
+    let kurator_poll_cfg = config.clone();
     let subagent_enabled = config.subagent.enabled;
     let synapse_episodic = FileEpisodicStore::new(&config.memory.directory);
     let synapse_root = qdrant_sync::discover_project_root();
     let kurator_synapse = Arc::clone(&synapse);
+    let kurator_poll_cfg_move = kurator_poll_cfg.clone();
     let synapse_handle = tokio::spawn(async move {
         let mut interval = tokio::time::interval(Duration::from_secs(60));
         let bus_path = synapse_root.join(&synapse_cfg.bus_path);
@@ -697,6 +784,7 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
                             &kurator_state,
                             &kurator_cfg,
                             &result.events,
+                            Some(&kurator_poll_cfg_move),
                         ) {
                             Ok(new_recs) => {
                                 if let Some(runner) = kurator_runner_poll.as_ref() {
@@ -706,6 +794,7 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
                                         kurator_state,
                                         kurator_cfg.clone(),
                                         kurator_redis_cfg.clone(),
+                                        kurator_poll_cfg_move.clone(),
                                         subagent_enabled,
                                         new_recs,
                                     );

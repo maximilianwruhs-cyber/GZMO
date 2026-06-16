@@ -810,6 +810,9 @@ async fn run_step_inner(
             compress_cfg,
             ccr,
         }),
+        write_phase_at: None,
+        write_phase_message: None,
+        require_file_write_before_done: false,
     };
 
     run_agent_loop(gateway, tools, &mut messages, &config).await

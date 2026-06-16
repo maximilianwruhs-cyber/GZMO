@@ -63,6 +63,8 @@ impl ToolHandler for DelegateTaskTool {
             max_iterations,
             depth: self.depth.saturating_add(1),
             parent_session: self.session_id.clone(),
+            working_dir: None,
+            shell_extra_commands: Vec::new(),
         };
 
         match self.runner.spawn(spec).await {

@@ -96,6 +96,9 @@ impl AgentSession {
             context: self.context.clone(),
             on_chunk,
             memory: Some(self.memory_context()),
+            write_phase_at: None,
+            write_phase_message: None,
+            require_file_write_before_done: false,
         }
     }
 }

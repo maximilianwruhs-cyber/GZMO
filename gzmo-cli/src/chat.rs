@@ -10,7 +10,7 @@ use chrono::Utc;
 use gzmo_core::agent_loop::run_agent_loop;
 use gzmo_core::agent_session::AgentSession;
 use gzmo_core::config::{GzmoConfig, EngineMode, TaskKind};
-use gzmo_core::gateway::{GatewayRouter, TurboQuantGateway, VllmConfig, LlmGateway};
+use gzmo_core::gateway::{GatewayRouter, LlmGateway};
 use gzmo_core::memory::embeddings;
 use gzmo_core::memory::vault::SqliteVault;
 use gzmo_core::subagent::SubagentRunner;
@@ -107,11 +107,11 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
     }
     let scratch = agent_session.scratch();
 
-    // ─── Gateway ─────────────────────────────────────────────────
-    let active_profile = config.engine.active_engine();
-    let gateway: Arc<tokio::sync::RwLock<Arc<dyn LlmGateway>>> = Arc::new(tokio::sync::RwLock::new(Arc::new(TurboQuantGateway::new(
-        VllmConfig::from(active_profile),
-    )) as Arc<dyn LlmGateway>));
+    // ─── Gateway (instrumented via GatewayRouter) ────────────────
+    let router = GatewayRouter::new(&config);
+    let chat_gateway_dyn = router.gateway(TaskKind::Chat);
+    let gateway: Arc<tokio::sync::RwLock<Arc<dyn LlmGateway>>> =
+        Arc::new(tokio::sync::RwLock::new(Arc::clone(chat_gateway_dyn)));
 
     // ─── Chaos Engine ────────────────────────────────────────────
     let chaos_runtime = crate::chaos_bootstrap::start_chaos_runtime(&config);
@@ -186,9 +186,6 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
     )));
     tools.register(Box::new(SysMetricsTool));
     tools.register(Box::new(SysKillTool));
-    
-    let router = GatewayRouter::new(&config);
-    let chat_gateway_dyn = router.gateway(TaskKind::Chat);
 
     if let Some(ref v) = vault {
         tools.register(Box::new(MemoryRecordTool { vault: Arc::clone(v) }));
@@ -512,6 +509,31 @@ Use delegate_task for focused sub-work; you receive a short summary, not full su
         }
 
         // ─── Agent loop ─────────────────────────────────────
+        let _obolus_ctx = gzmo_core::obolus::CallContextGuard::new(
+            gzmo_core::obolus::ObolusCallContext {
+                process: "chat".into(),
+                task_kind: Some(TaskKind::Chat.to_string()),
+                caller: "gzmo chat".into(),
+                correlation_id: Some(session_id.clone()),
+                action_id: None,
+            },
+        );
+        if let Ok(gzmo_core::obolus::ObolusVerdict::Warn { reason }) =
+            gzmo_core::obolus::gate::evaluate_from_config(
+                &config,
+                gzmo_core::obolus::ObolusAction::OperatorChat,
+                gzmo_core::obolus::ObolusTier::Operator,
+            )
+        {
+            tracing::warn!(%reason, "obolus budget warning (operator chat)");
+            let bus = gzmo_core::synapse::SynapseBus::new();
+            gzmo_core::obolus::gate::emit_obolus_warn(
+                &bus,
+                gzmo_core::obolus::ObolusAction::OperatorChat,
+                &reason,
+            );
+        }
+
         let start = std::time::Instant::now();
         let result = run_agent_loop(gateway.read().await.as_ref(), &tools, &mut messages, &loop_config).await;
         let elapsed = start.elapsed();
@@ -832,16 +854,13 @@ async fn handle_slash_command(
                                 );
                             } else {
                                 eprintln!(" ✓");
-                                // Build new gateway
-                                let new_gw: Arc<dyn LlmGateway> = Arc::new(TurboQuantGateway::new(VllmConfig::from(profile.clone())));
-                                // Swap gateway
+                                config.engine.active_mode = new_mode;
+                                let new_router = GatewayRouter::new(&config);
+                                let new_gw = Arc::clone(new_router.gateway(TaskKind::Chat));
                                 {
                                     let mut gw = gateway.write().await;
                                     *gw = new_gw;
                                 }
-                                // Update config
-                                config.engine.active_mode = new_mode;
-                                // Persist to disk
                                 if let Err(e) = config.persist_active_mode(config_path, new_mode) {
                                     eprintln!("  {RED}⚙ Failed to persist mode: {e}{RESET}");
                                 }

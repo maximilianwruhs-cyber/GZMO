@@ -11,7 +11,8 @@ use serde::{Deserialize, Serialize};
 use tracing::info;
 use uuid::Uuid;
 
-use crate::config::KuratorConfig;
+use crate::config::{GzmoConfig, KuratorConfig};
+use crate::obolus::gate::ledger_session_tokens;
 use crate::synapse::{EventSource, EventType, SynapseBus, SynapseEvent};
 
 const STATE_FILE: &str = "data/kurator-monitor.state.json";
@@ -185,6 +186,7 @@ pub fn session_already_claimed(state: &KuratorMonitorState, session_id: &str) ->
 pub fn evaluate_thresholds(
     state: &KuratorMonitorState,
     config: &KuratorConfig,
+    gzmo: Option<&GzmoConfig>,
 ) -> Vec<SpawnRecommendation> {
     if !config.enabled {
         return Vec::new();
@@ -195,7 +197,23 @@ pub fn evaluate_thresholds(
         if session_already_claimed(state, session_id) {
             continue;
         }
-        let total_tokens = metrics.input_tokens.saturating_add(metrics.output_tokens);
+        let synapse_tokens = metrics.input_tokens.saturating_add(metrics.output_tokens);
+        let ledger_tokens = if let Some(gz) = gzmo {
+            if gz.obolus_analytics.enabled {
+                let since = Utc::now() - chrono::Duration::hours(24);
+                ledger_session_tokens(gz, session_id, since)
+            } else {
+                None
+            }
+        } else {
+            None
+        };
+        let total_tokens = ledger_tokens.unwrap_or(synapse_tokens);
+        let token_source = if ledger_tokens.is_some() {
+            "ledger"
+        } else {
+            "synapse"
+        };
         let error_rate = if metrics.skill_invokes > 0 {
             metrics.skill_errors as f64 / metrics.skill_invokes as f64
         } else {
@@ -211,8 +229,8 @@ pub fn evaluate_thresholds(
         }
         if total_tokens >= config.max_session_tokens {
             reasons.push(format!(
-                "session_tokens {} >= {}",
-                total_tokens, config.max_session_tokens
+                "session_tokens {} >= {} ({})",
+                total_tokens, config.max_session_tokens, token_source
             ));
         }
         if metrics.skill_invokes > 0 && error_rate >= config.skill_error_rate_threshold {
@@ -331,6 +349,7 @@ pub fn record_dice_loop_fire(
     bus: &SynapseBus,
     state_path: &Path,
     config: &KuratorConfig,
+    gzmo: Option<&GzmoConfig>,
 ) -> anyhow::Result<Vec<PendingRecommendation>> {
     if !config.enabled {
         return Ok(Vec::new());
@@ -341,7 +360,7 @@ pub fn record_dice_loop_fire(
         .entry("daemon".to_string())
         .or_default()
         .dice_loops_seen += 1;
-    let recommendations = evaluate_thresholds(&state, config);
+    let recommendations = evaluate_thresholds(&state, config, gzmo);
     let emitted = if recommendations.is_empty() {
         Vec::new()
     } else {
@@ -357,10 +376,11 @@ pub fn process_pi_poll(
     state_path: &Path,
     config: &KuratorConfig,
     pi_events: &[SynapseEvent],
+    gzmo: Option<&GzmoConfig>,
 ) -> anyhow::Result<Vec<PendingRecommendation>> {
     let mut state = load_state(state_path);
     ingest_pi_events(&mut state, pi_events);
-    let recommendations = evaluate_thresholds(&state, config);
+    let recommendations = evaluate_thresholds(&state, config, gzmo);
     let emitted = if recommendations.is_empty() {
         Vec::new()
     } else {
@@ -391,9 +411,32 @@ pub fn process_discovery_report(
             report = %report_path.display(),
             actionable = analysis.actionable_count(),
             min = config.discovery_fixer_min_findings,
-            "Kurator: discovery report has no actionable FAIL/GAP findings"
+            "Kurator: discovery report has no actionable FAIL/GAP/ACTION items"
         );
         return Ok(None);
+    }
+
+    let tracker_path = crate::remediation_tracker::default_tracker_path();
+    if let Err(e) = crate::remediation_tracker::register_findings_from_report(
+        &tracker_path,
+        report_path,
+        discovery_session_id,
+        &analysis.findings,
+    ) {
+        tracing::warn!(error = %e, "remediation tracker: failed to register findings");
+    }
+
+    let pending = crate::remediation_tracker::count_pending_for_report(&tracker_path, report_path);
+    if pending == 0 {
+        let fixed = crate::remediation_tracker::count_fixed_for_report(&tracker_path, report_path);
+        if fixed > 0 || !analysis.has_actionable() {
+            info!(
+                report = %report_path.display(),
+                fixed,
+                "Kurator: all discovery findings already implemented — fixer spawn skipped"
+            );
+            return Ok(None);
+        }
     }
 
     let fix_session_id =
@@ -414,6 +457,59 @@ pub fn process_discovery_report(
         metrics: SessionMetrics::default(),
         suggested_agent_profile: config.fixer_agent_profile.clone(),
         kind: Some("discovery_fix".to_string()),
+        report_path: Some(report_path.to_string_lossy().into_owned()),
+    };
+
+    let emitted = emit_recommendations(bus, &mut state, config, &[recommendation]);
+    save_state(state_path, &state)?;
+    Ok(emitted.into_iter().next())
+}
+
+/// Emit spawn.recommended for Epimetheus code implementer when findings are probed.
+pub fn process_discovery_code_implement(
+    bus: &SynapseBus,
+    state_path: &Path,
+    config: &KuratorConfig,
+    report_path: &Path,
+    discovery_session_id: &str,
+) -> anyhow::Result<Option<PendingRecommendation>> {
+    if !config.enabled || !config.discovery_code_implementer_enabled {
+        return Ok(None);
+    }
+    if !report_path.is_file() {
+        anyhow::bail!("discovery report not found: {}", report_path.display());
+    }
+
+    let tracker_path = crate::remediation_tracker::default_tracker_path();
+    let probed = crate::remediation_tracker::count_probed_for_report(&tracker_path, report_path);
+    if probed == 0 {
+        info!(
+            report = %report_path.display(),
+            "Kurator: no probed findings — code implementer spawn skipped"
+        );
+        return Ok(None);
+    }
+
+    let implement_session_id = crate::discovery_code_implementer::discovery_implement_session_id(
+        discovery_session_id,
+        report_path,
+    );
+    let mut state = load_state(state_path);
+    if session_already_claimed(&state, &implement_session_id) {
+        info!(
+            session = %implement_session_id,
+            "Kurator: discovery code implementer already pending or spawned for this report"
+        );
+        return Ok(None);
+    }
+
+    let reason = crate::discovery_code_implementer::discovery_code_implement_reason(probed);
+    let recommendation = SpawnRecommendation {
+        session_id: implement_session_id,
+        reason,
+        metrics: SessionMetrics::default(),
+        suggested_agent_profile: config.code_implementer_agent_profile.clone(),
+        kind: Some("discovery_code_implement".to_string()),
         report_path: Some(report_path.to_string_lossy().into_owned()),
     };
 
@@ -557,7 +653,7 @@ mod tests {
             max_turns_before_recommend: 40,
             ..Default::default()
         };
-        let recs = evaluate_thresholds(&state, &config);
+        let recs = evaluate_thresholds(&state, &config, None);
         assert_eq!(recs.len(), 1);
         assert!(recs[0].reason.contains("turn_count"));
     }
@@ -612,7 +708,7 @@ mod tests {
         };
 
         let recs =
-            process_pi_poll(&bus, &state_path, &config, &events).expect("process_pi_poll");
+            process_pi_poll(&bus, &state_path, &config, &events, None).expect("process_pi_poll");
         assert_eq!(recs.len(), 1);
 
         let raw = std::fs::read_to_string(&bus_path).unwrap();
@@ -638,7 +734,7 @@ mod tests {
             max_session_tokens: u64::MAX,
             ..Default::default()
         };
-        let recs = evaluate_thresholds(&state, &config);
+        let recs = evaluate_thresholds(&state, &config, None);
         assert_eq!(recs.len(), 1);
         assert!(recs[0].reason.contains("dice_loops"));
     }
@@ -785,7 +881,7 @@ mod tests {
             max_turns_before_recommend: 40,
             ..Default::default()
         };
-        let recs = evaluate_thresholds(&state, &config);
+        let recs = evaluate_thresholds(&state, &config, None);
         assert!(recs.is_empty());
     }
 }

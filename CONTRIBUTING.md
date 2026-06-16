@@ -43,8 +43,11 @@ docs/        # Canonical documentation (see docs/README.md)
 cargo fmt --all
 cargo clippy --all-targets -- -D warnings
 cargo test
+./scripts/sovereignty-verify.sh   # ARCH-DIR + Obolus (no live infra)
 ./scripts/verify-production.sh   # if infra is up
 ```
+
+New `[workspace.dependencies]` entries require a file in `docs/zero-bloat-reviews/`.
 
 ## Secrets
 

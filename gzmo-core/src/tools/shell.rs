@@ -42,12 +42,26 @@ const SAFE_COMMAND_PREFIXES: &[&str] = &[
 ];
 
 /// First shell token (binary name) from a command string.
+/// Skips blank lines and `#` comment lines so agents can annotate multi-line scripts.
 pub fn shell_command_binary(command: &str) -> &str {
-    let first_token = command
-        .split_whitespace()
-        .find(|t| !t.contains('='))
-        .unwrap_or("");
-    first_token.rsplit('/').next().unwrap_or(first_token)
+    for line in command.lines() {
+        let trimmed = line.trim();
+        if trimmed.is_empty() || trimmed.starts_with('#') {
+            continue;
+        }
+        let executable = trimmed.split('#').next().unwrap_or(trimmed).trim();
+        if executable.is_empty() {
+            continue;
+        }
+        let first_token = executable
+            .split_whitespace()
+            .find(|t| !t.contains('='))
+            .unwrap_or("");
+        if !first_token.is_empty() {
+            return first_token.rsplit('/').next().unwrap_or(first_token);
+        }
+    }
+    ""
 }
 
 /// Whether `binary` is permitted by base allowlist plus optional extras.
@@ -280,5 +294,17 @@ mod tests {
             shell_command_binary("cd /tmp && find . -name foo"),
             "cd"
         );
+    }
+
+    #[test]
+    fn skips_leading_comment_lines() {
+        let cmd = "# Check session files\nfind /tmp -name foo";
+        assert_eq!(shell_command_binary(cmd), "find");
+        assert!(is_shell_command_allowed(shell_command_binary(cmd), &[]));
+    }
+
+    #[test]
+    fn inline_comment_does_not_hide_binary() {
+        assert_eq!(shell_command_binary("wc -l /tmp/foo  # count lines"), "wc");
     }
 }

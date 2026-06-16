@@ -205,6 +205,106 @@ pub async fn run(args: &[String], config: &GzmoConfig) -> Result<()> {
                 );
             }
         }
+        "balance" => {
+            let balance = gzmo_core::obolus::gate::load_balance_since(
+                config,
+                chrono::Utc::now() - chrono::Duration::hours(1),
+            )?;
+            if args.iter().any(|a| a == "--json") {
+                println!(
+                    "{}",
+                    serde_json::to_string_pretty(&serde_json::json!({
+                        "balance_1h": balance,
+                        "limits": {
+                            "max_e_total_per_hour": config.obolus_governance.max_e_total_per_hour,
+                            "max_ctx_pressure_pct": config.obolus_governance.max_ctx_pressure_pct,
+                        },
+                    }))?
+                );
+            } else {
+                println!("Obolus system balance (rolling 1h)");
+                println!("  E_total:      {}", balance.e_total);
+                println!("  ctx_% (max process): {:.1}%", balance.ctx_pressure_pct);
+                println!("  peak call ctx_%:     {:.1}%", balance.peak_call_ctx_pct);
+                println!("  ledger entries: {}", balance.entry_count);
+                println!(
+                    "  limits: E_total <= {} | ctx_% <= {}",
+                    config.obolus_governance.max_e_total_per_hour,
+                    config.obolus_governance.max_ctx_pressure_pct,
+                );
+            }
+        }
+        "preflight" => {
+            let action = args.get(1).map(|s| s.as_str()).unwrap_or("");
+            let (obolus_action, tier) = match action {
+                "discovery_cycle" => (
+                    gzmo_core::obolus::ObolusAction::DiscoveryCycle,
+                    gzmo_core::obolus::ObolusTier::SemiAutonomous,
+                ),
+                "spawn_discovery_fix" => (
+                    gzmo_core::obolus::ObolusAction::SpawnDiscoveryFix,
+                    gzmo_core::obolus::ObolusTier::Autonomous,
+                ),
+                "dice_loop" => (
+                    gzmo_core::obolus::ObolusAction::DiceLoop,
+                    gzmo_core::obolus::ObolusTier::Autonomous,
+                ),
+                "dream_tick" => (
+                    gzmo_core::obolus::ObolusAction::DreamTick,
+                    gzmo_core::obolus::ObolusTier::Autonomous,
+                ),
+                "spark_tick" => (
+                    gzmo_core::obolus::ObolusAction::SparkTick,
+                    gzmo_core::obolus::ObolusTier::Autonomous,
+                ),
+                "spawn_session_triage" => (
+                    gzmo_core::obolus::ObolusAction::SpawnSessionTriage,
+                    gzmo_core::obolus::ObolusTier::Autonomous,
+                ),
+                "operator_chat" => (
+                    gzmo_core::obolus::ObolusAction::OperatorChat,
+                    gzmo_core::obolus::ObolusTier::Operator,
+                ),
+                other => bail!("unknown preflight action '{other}'"),
+            };
+            let verdict =
+                gzmo_core::obolus::gate::evaluate_from_config(config, obolus_action, tier)?;
+            let balance = gzmo_core::obolus::gate::load_balance_since(
+                config,
+                chrono::Utc::now() - chrono::Duration::hours(1),
+            )?;
+            let exit_code = match &verdict {
+                gzmo_core::obolus::ObolusVerdict::Allow => 0,
+                gzmo_core::obolus::ObolusVerdict::Warn { .. } => 0,
+                gzmo_core::obolus::ObolusVerdict::Defer { .. } => 2,
+                gzmo_core::obolus::ObolusVerdict::Deny { .. } => 1,
+            };
+            if args.iter().any(|a| a == "--json") {
+                println!(
+                    "{}",
+                    serde_json::to_string_pretty(&serde_json::json!({
+                        "action": action,
+                        "tier": format!("{:?}", tier),
+                        "verdict": format!("{:?}", verdict),
+                        "balance_1h": balance,
+                        "limits": {
+                            "max_e_total_per_hour": config.obolus_governance.max_e_total_per_hour,
+                            "max_ctx_pressure_pct": config.obolus_governance.max_ctx_pressure_pct,
+                        },
+                    }))?
+                );
+            } else {
+                println!(
+                    "obolus preflight {action}: {verdict:?}\n  1h E_total={} ctx_%={:.1} peak_call={:.1}%",
+                    balance.e_total,
+                    balance.ctx_pressure_pct,
+                    balance.peak_call_ctx_pct,
+                );
+            }
+            if exit_code != 0 {
+                std::process::exit(exit_code);
+            }
+        }
         "efficiency" => {
             let opts = parse_opts(&args[1..], false);
             let entries = load_entries(config, opts.since)?;
@@ -225,7 +325,7 @@ pub async fn run(args: &[String], config: &GzmoConfig) -> Result<()> {
         }
         other => {
             bail!(
-                "unknown obolus subcommand '{other}' — use: status | report | context | efficiency [--since 24h|7d] [--json] [--gaps]"
+                "unknown obolus subcommand '{other}' — use: status | report | context | balance | efficiency | preflight <action> [--json] [--since 24h|7d] [--gaps]"
             );
         }
     }

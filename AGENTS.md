@@ -31,8 +31,16 @@ Sovereign Rust agent: honeypot memory pipeline + local LLM. Read `MACHINE.md` fi
 ```bash
 cargo test
 cargo clippy --all-targets
+./scripts/sovereignty-verify.sh   # ARCH-DIR + Obolus (local, no infra)
 ./scripts/verify-production.sh    # needs live infra
 ```
+
+## Sovereignty + Obolus
+
+- Constitution: `docs/ARCH-DIR-001-GZMO.md`, pointer `ARCH-DIR-001.md`
+- Energy governance: `docs/OBOLUS_GOVERNANCE.md`
+- Verify: `./scripts/sovereignty-verify.sh`
+- New workspace deps require `docs/zero-bloat-reviews/` entry
 
 ## Do not touch without reason
 

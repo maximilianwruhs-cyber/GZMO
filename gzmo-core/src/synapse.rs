@@ -179,9 +179,29 @@ pub enum EventType {
     #[serde(rename = "spawn.executed")]
     SpawnExecuted,
 
+    /// Discovery fixer verify_gate passed — finding(s) closed with on-disk artifacts
+    #[serde(rename = "discovery_fix.closed")]
+    DiscoveryFixClosed,
+
+    /// Discovery fixer verify_gate failed — remediation still open
+    #[serde(rename = "discovery_fix.failed")]
+    DiscoveryFixFailed,
+
     /// Hourly Obolus efficiency rollup (η per process family)
     #[serde(rename = "obolus.efficiency_tick")]
     ObolusEfficiencyTick,
+
+    /// ObolusGate denied an autonomous action (energy budget)
+    #[serde(rename = "obolus.denied")]
+    ObolusDenied,
+
+    /// ObolusGate warned operator-tier path (measure + warn, no deny)
+    #[serde(rename = "obolus.warn")]
+    ObolusWarn,
+
+    /// Hourly system balance snapshot (E_total, ctx_%)
+    #[serde(rename = "obolus.budget_tick")]
+    ObolusBudgetTick,
 }
 
 /// A single Synapse event frame — the unit of observability.

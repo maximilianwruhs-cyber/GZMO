@@ -36,6 +36,12 @@ pub struct AgentLoopConfig {
     pub on_chunk: Option<std::sync::Arc<dyn Fn(String) + Send + Sync>>,
     /// Scratch cache + archive/distill hooks (optional).
     pub memory: Option<AgentMemoryContext>,
+    /// At this iteration (0-based), inject `write_phase_message` before the LLM call.
+    pub write_phase_at: Option<usize>,
+    /// Reminder to stop exploring and use file_write (discovery fixer write phase).
+    pub write_phase_message: Option<String>,
+    /// When true, reject a final text response until at least one file_write succeeded.
+    pub require_file_write_before_done: bool,
 }
 
 /// Per-loop scratch scope and distill session id.
@@ -56,6 +62,9 @@ impl Default for AgentLoopConfig {
             context: ContextConfig::default(),
             on_chunk: None,
             memory: None,
+            write_phase_at: None,
+            write_phase_message: None,
+            require_file_write_before_done: false,
         }
     }
 }
@@ -117,6 +126,10 @@ pub struct AgentResponse {
     pub llm_calls: usize,
     /// All tool calls that were executed during the loop.
     pub tool_results: Vec<ToolResult>,
+    /// True when the loop exhausted `max_iterations` and forced a final text response.
+    pub hit_max_iterations: bool,
+    /// Paths successfully written via `file_write` during the loop.
+    pub written_paths: Vec<String>,
 }
 
 /// Convert our ToolDef into the LLM-compatible ToolDeclaration format.
@@ -147,9 +160,22 @@ pub async fn run_agent_loop(
     let declarations = to_declarations(&tool_defs);
     let mut total_calls = 0usize;
     let mut all_results = Vec::new();
+    let mut written_paths = Vec::new();
 
     for iteration in 0..config.max_iterations {
         debug!(iteration, messages = messages.len(), "Agent loop iteration");
+
+        if config.write_phase_at == Some(iteration) {
+            if let Some(msg) = &config.write_phase_message {
+                messages.push(Message {
+                    role: Role::User,
+                    content: msg.clone(),
+                    is_meta: false,
+                    tool_calls: None,
+                    tool_call_id: None,
+                });
+            }
+        }
 
         // ─── Call LLM ────────────────────────────────────────────
         // Stream text tokens in real-time.
@@ -204,6 +230,19 @@ pub async fn run_agent_loop(
         match response {
             // ─── Final text response — loop complete ─────────────
             LlmResponse::Text(text) => {
+                if config.require_file_write_before_done
+                    && written_paths.is_empty()
+                    && iteration + 1 < config.max_iterations
+                {
+                    messages.push(Message {
+                        role: Role::User,
+                        content: "STOP — you have not called file_write yet. Use file_write now to create at least one remediation script or config under gzmo_skills/scripts/ (or patch an existing file). Do not reply with text only.".to_string(),
+                        is_meta: false,
+                        tool_calls: None,
+                        tool_call_id: None,
+                    });
+                    continue;
+                }
                 if let Some(ref mem) = config.memory {
                     let _ = mem.scratch.clear(&mem.scope).await;
                 }
@@ -217,6 +256,8 @@ pub async fn run_agent_loop(
                     text,
                     llm_calls: total_calls,
                     tool_results: all_results,
+                    hit_max_iterations: false,
+                    written_paths,
                 });
             }
 
@@ -260,6 +301,12 @@ pub async fn run_agent_loop(
                     );
 
                     let result = tools.dispatch(call).await;
+
+                    if call.function_name == "file_write" && result.success {
+                        if let Some(path) = call.arguments.get("path").and_then(|v| v.as_str()) {
+                            written_paths.push(path.to_string());
+                        }
+                    }
 
                     if config.verbose_tool_output {
                         debug!(
@@ -311,7 +358,7 @@ pub async fn run_agent_loop(
     // templates reject a trailing system message ("System message must be at the beginning").
     messages.push(Message {
         role: Role::User,
-        content: "You have reached the maximum number of tool calls. Provide your final answer now based on the information gathered so far. Do not request any more tools.".to_string(),
+        content: "You have reached the maximum number of tool calls. Provide your final answer now based on the information gathered so far. Do not request any more tools. Do not output tool-call XML, markup, or pseudo file_write blocks — plain text summary only.".to_string(),
         is_meta: false, tool_calls: None, tool_call_id: None,
     });
 
@@ -334,5 +381,7 @@ pub async fn run_agent_loop(
         text,
         llm_calls: total_calls,
         tool_results: all_results,
+        hit_max_iterations: true,
+        written_paths,
     })
 }

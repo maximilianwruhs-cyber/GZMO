@@ -65,6 +65,12 @@ pub async fn dispatch_skill(
         });
     }
 
+    if ctx.config.obolus_governance.enabled {
+        anyhow::bail!(
+            "shell skill fallback for '{cmd}' blocked under [obolus_governance] — implement in Rust registry"
+        );
+    }
+
     let llm_url = shell_bridge::llm_completions_url(&profile.url);
     let shell_opts = ShellSkillOptions {
         skills_dir: ctx.skills_dir,

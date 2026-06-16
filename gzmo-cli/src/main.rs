@@ -109,7 +109,8 @@ USAGE
   gzmo honeypot review promote  Operator promote from review queue
   gzmo distill [session_id]     Distill GZMO chat sessions → vault
   gzmo distill pi <path.jsonl>  Distill Pi session on session_end
-  gzmo obolus status|report     Prime token ledger (E_total, ctx_%)
+  gzmo obolus status|report|balance  Prime token ledger (E_total, ctx_%)
+  gzmo obolus preflight <action>   Gate check (discovery_cycle, spawn_*)
   gzmo obolus efficiency        Wirkungsgrad η = (Q·I)/E_total
   gzmo init                     First-time setup
   gzmo mcp-serve                MCP stdio (memory + wiki search)

@@ -1,6 +1,5 @@
 //! `gzmo chaos skill <command> [args]` — external skill runner with daemon IPC.
 
-use std::sync::Arc;
 use std::time::Instant;
 
 use anyhow::{bail, Result};
@@ -9,10 +8,8 @@ use gzmo_chaos::pulse::ChaosSnapshot;
 use tokio::sync::mpsc;
 
 use gzmo_core::config::GzmoConfig;
-use gzmo_core::gateway::{TurboQuantGateway, VllmConfig};
-use gzmo_core::skills::dispatch::{self, data_dir, load_live_chaos_snapshot};
+use gzmo_core::skills::dispatch::{self, data_dir, headless_gateway, load_live_chaos_snapshot};
 use gzmo_core::skills::registry::build_chaos_skill_registry;
-use gzmo_core::skills::NestedDispatch;
 use gzmo_core::synapse::SynapseBus;
 use gzmo_core::synapse_writer::{
     self, claim_skill_invoke, disabled_claim, emit_skill_complete, emit_skill_error,
@@ -98,9 +95,9 @@ pub async fn run(config: &GzmoConfig, cmd: &str, args: &str, json_flag: bool) ->
 
     let snap = load_live_chaos_snapshot(data_dir(config), &fallback_snap);
 
-    let gateway = TurboQuantGateway::new(VllmConfig::from(profile.clone()));
-    gateway.set_chaos_overrides(snap.llm_temperature, snap.llm_max_tokens);
-    let gateway_dyn: Arc<dyn gzmo_core::gateway::LlmGateway> = Arc::new(gateway);
+    let router = gzmo_core::gateway::GatewayRouter::new(config);
+    let ledger = router.obolus_ledger().cloned();
+    let gateway_dyn = headless_gateway(config, &snap, ledger);
 
     let nested = gzmo_core::skills::NestedDispatch {
         registry: Some(&registry),

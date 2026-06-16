@@ -10,7 +10,11 @@ use std::time::{Duration, Instant};
 use gzmo_chaos::chaos::Phase;
 use gzmo_chaos::pulse::ChaosSnapshot;
 use gzmo_core::config::LowTensionDialogueConfig;
+use gzmo_core::kurator_spawn;
+use gzmo_core::obolus::{ObolusAction, ObolusTier};
+use gzmo_core::obolus::gate::preflight_allowed;
 use gzmo_core::pedagogy::{build_opening, persist_socratic_dialogue, LowTensionOpening};
+use gzmo_core::synapse::SynapseBus;
 use std::sync::Arc;
 use gzmo_core::tools::ToolRegistry;
 use tokio::sync::watch;
@@ -174,6 +178,28 @@ pub async fn run_low_tension_watcher(
 
         let opening_ctx = resolve_opening(&state, tools.as_deref(), &snap, &cfg).await;
         let opening = opening_ctx.prompt.clone();
+
+        let bus = SynapseBus::with_path(kurator_spawn::synapse_bus_path(&state.config));
+        match preflight_allowed(
+            &state.config,
+            ObolusAction::DiscoveryCycle,
+            ObolusTier::SemiAutonomous,
+            Some(&bus),
+        ) {
+            Ok(true) => {}
+            Ok(false) => {
+                info!(
+                    tension = snap.tension,
+                    tick = snap.tick,
+                    "Low-tension discovery deferred by ObolusGate"
+                );
+                continue;
+            }
+            Err(e) => {
+                warn!(error = %e, "Obolus preflight failed — skipping low-tension discovery");
+                continue;
+            }
+        }
 
         if cfg.discovery_cycle {
             match spawn_discovery_cycle(&scripts_root, &snap, &gzmo_root, Some(&opening)).await {
