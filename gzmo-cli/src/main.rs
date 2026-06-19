@@ -23,6 +23,9 @@ mod ingest_eval_cmd;
 mod wiki_cmd;
 mod honeypot_cmd;
 mod pedagogy_graph_cmd;
+mod pedagogy_oscillate_cmd;
+mod pedagogy_certify_cmd;
+mod pedagogy_cron;
 mod kurator_cmd;
 mod obolus_cmd;
 mod mentor_ipc;
@@ -420,7 +423,13 @@ async fn main() -> Result<()> {
             }
             Ok(())
         }
-        Command::Pedagogy(args) => pedagogy_graph_cmd::run(&args).await,
+        Command::Pedagogy(args) => {
+            match args.first().map(|s| s.as_str()) {
+                Some("oscillate") => pedagogy_oscillate_cmd::run(&config, &args[1..]).await,
+                Some("certify") => pedagogy_certify_cmd::run(&config, &args[1..]).await,
+                _ => pedagogy_graph_cmd::run(&args).await,
+            }
+        }
         Command::Honeypot(args) => honeypot_cmd::run(&config, &args).await,
         Command::Mentor(args) => mentor_cmd::run(&config, &args).await,
         Command::Kurator(args) => kurator_cmd::run(&args, &config).await,

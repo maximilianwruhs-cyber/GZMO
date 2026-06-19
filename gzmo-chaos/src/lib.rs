@@ -33,6 +33,7 @@ pub mod engine;
 pub mod thoughts;
 pub mod feedback;
 pub mod feedback_ipc;
+pub mod pedagogy_oscillator;
 pub mod pulse;
 pub mod triggers;
 

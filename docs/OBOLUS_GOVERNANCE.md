@@ -16,6 +16,7 @@ Runtime energy bilanz for Prime cognition. Complements ARCH-DIR (build/deploy so
 - `ctx_%` — **max per-process** cumulative input / `prime_context_tokens` in that window (matches CLI report semantics; not summed across processes)
 - `peak_call_ctx_%` — largest single-call input in the window (observability only)
 - η (efficiency) — advisory only until Phase C; see [OBOLUS_EFFICIENCY.md](OBOLUS_EFFICIENCY.md)
+- **Joules (observability)** — CPU RAPL + GPU watt integration in `power.jsonl`; see [OBOLUS_ENERGY.md](OBOLUS_ENERGY.md). Not used for gates until calibration.
 
 ## Config
 
@@ -37,6 +38,7 @@ Autospawn requires **both** Redis `prime_spawn_budget` slots **and** Obolus allo
 | `obolus.denied` | T1/T2 action blocked |
 | `obolus.warn` | T0 over budget warning |
 | `obolus.budget_tick` | Hourly `SystemBalance` snapshot |
+| `obolus.energy_tick` | Hourly joules + `tokens_per_wh` correlation |
 | `obolus.efficiency_tick` | Hourly η rollups |
 
 ## Operator runbook
@@ -44,6 +46,8 @@ Autospawn requires **both** Redis `prime_spawn_budget` slots **and** Obolus allo
 ```bash
 gzmo obolus status
 gzmo obolus balance              # rolling 1h SystemBalance for gates
+gzmo obolus energy --since 1h    # hardware power.jsonl samples
+gzmo obolus correlate --since 24h
 gzmo obolus report --since 1h
 gzmo obolus preflight discovery_cycle   # exit 0=allow, 1=deny, 2=defer
 ./scripts/sovereignty-verify.sh

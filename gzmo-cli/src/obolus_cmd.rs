@@ -5,7 +5,10 @@ use std::path::PathBuf;
 use anyhow::{bail, Result};
 use chrono::{DateTime, Duration, Utc};
 use gzmo_core::config::GzmoConfig;
-use gzmo_core::obolus::{aggregate_by_process, compute_from_sources, synapse_bus_path, ObolusLedger};
+use gzmo_core::obolus::{
+    aggregate_by_process, compute_energy_correlation, compute_from_sources, synapse_bus_path,
+    ObolusLedger, PowerLedger,
+};
 
 struct ReportOpts {
     since: DateTime<Utc>,
@@ -51,6 +54,17 @@ fn ledger_path(config: &GzmoConfig) -> PathBuf {
     PathBuf::from(&config.obolus_analytics.ledger_path)
 }
 
+fn power_ledger_path(config: &GzmoConfig) -> PathBuf {
+    PathBuf::from(&config.obolus_analytics.power_ledger_path)
+}
+
+fn load_power_entries(
+    config: &GzmoConfig,
+    since: DateTime<Utc>,
+) -> Result<Vec<gzmo_core::obolus::PowerLedgerEntry>> {
+    PowerLedger::read_since(since, &power_ledger_path(config))
+}
+
 fn load_entries(config: &GzmoConfig, since: DateTime<Utc>) -> Result<Vec<gzmo_core::obolus::LedgerEntry>> {
     ObolusLedger::read_since(since, &ledger_path(config))
 }
@@ -86,6 +100,89 @@ fn print_table(
             r.context_share_pct,
             r.max_input_single_call,
         );
+    }
+}
+
+fn print_balance_human(
+    balance: &gzmo_core::obolus::SystemBalance,
+    config: &GzmoConfig,
+) {
+    println!("Obolus system balance (rolling 1h)");
+    println!("  E_total (tokens):    {}", balance.e_total);
+    println!(
+        "  ctx_% (max process): {:.1}%",
+        balance.ctx_pressure_pct
+    );
+    println!(
+        "  peak call ctx_%:     {:.1}%",
+        balance.peak_call_ctx_pct
+    );
+    println!("  token ledger rows:   {}", balance.entry_count);
+    if config.obolus_analytics.energy_sampler_enabled {
+        println!("  CPU joules (RAPL):   {:.1} J  ({:.4} Wh)", balance.joules_cpu_1h, balance.joules_wh_cpu_1h);
+        println!(
+            "  GPU joules (est):    {:.1} J  ({:.4} Wh)",
+            balance.joules_gpu_est_1h,
+            balance.joules_gpu_est_1h / 3600.0
+        );
+        println!(
+            "  Total Wh (est):      {:.4}",
+            balance.joules_wh_total_est_1h
+        );
+        if let Some(tpw) = balance.tokens_per_wh {
+            println!("  tokens/Wh:           {:.1}", tpw);
+        }
+        println!("  power samples:       {}", balance.power_sample_count);
+    }
+    println!(
+        "  limits (token gate): max_e_total={} | max_ctx={}%",
+        config.obolus_governance.max_e_total_per_hour,
+        config.obolus_governance.max_ctx_pressure_pct,
+    );
+}
+
+fn print_energy_table(entries: &[gzmo_core::obolus::PowerLedgerEntry]) {
+    println!(
+        "{:<20} {:>10} {:>10} {:>10} {:>8} {:>8} {:>12}",
+        "TIMESTAMP", "CPU_J", "GPU_Jest", "CPU_W", "GPU_W", "CPU_SRC", "GPU_SRC"
+    );
+    for e in entries {
+        println!(
+            "{:<20} {:>10.2} {:>10.2} {:>10.1} {:>8.1} {:>8?} {:>12?}",
+            e.ts.format("%Y-%m-%d %H:%M"),
+            e.cpu_joules,
+            e.gpu_joules_est,
+            e.cpu_watts_avg,
+            e.gpu_power_w.unwrap_or(0.0),
+            e.cpu_energy_source,
+            e.gpu_energy_source,
+        );
+    }
+}
+
+fn print_correlation_table(report: &gzmo_core::obolus::EnergyCorrelationReport) {
+    println!(
+        "{:<14} {:>12} {:>12} {:>12} {:>12} {:>8} {:>8}",
+        "HOUR", "E_TOTAL", "CPU_J", "GPU_Jest", "Wh_est", "tok/Wh", "samples"
+    );
+    for b in &report.buckets {
+        println!(
+            "{:<14} {:>12} {:>12.1} {:>12.1} {:>12.4} {:>12} {:>8}",
+            b.hour_bucket,
+            b.e_total,
+            b.joules_cpu,
+            b.joules_gpu_est,
+            b.joules_wh_total_est,
+            b.tokens_per_wh
+                .map(|v| format!("{v:.1}"))
+                .unwrap_or_else(|| "-".into()),
+            b.power_samples,
+        );
+    }
+    if let Some(r) = report.pearson_tokens_wh {
+        println!("\nPearson r(E_total, Wh_est) = {r:.4}");
+    } else {
+        println!("\nPearson r: insufficient paired hourly buckets");
     }
 }
 
@@ -222,16 +319,61 @@ pub async fn run(args: &[String], config: &GzmoConfig) -> Result<()> {
                     }))?
                 );
             } else {
-                println!("Obolus system balance (rolling 1h)");
-                println!("  E_total:      {}", balance.e_total);
-                println!("  ctx_% (max process): {:.1}%", balance.ctx_pressure_pct);
-                println!("  peak call ctx_%:     {:.1}%", balance.peak_call_ctx_pct);
-                println!("  ledger entries: {}", balance.entry_count);
+                print_balance_human(&balance, config);
+            }
+        }
+        "energy" => {
+            let opts = parse_opts(&args[1..], false);
+            let entries = load_power_entries(config, opts.since)?;
+            if opts.json {
                 println!(
-                    "  limits: E_total <= {} | ctx_% <= {}",
-                    config.obolus_governance.max_e_total_per_hour,
-                    config.obolus_governance.max_ctx_pressure_pct,
+                    "{}",
+                    serde_json::to_string_pretty(&serde_json::json!({
+                        "since": opts.since,
+                        "power_ledger": power_ledger_path(config),
+                        "samples": entries.len(),
+                        "entries": entries,
+                    }))?
                 );
+            } else {
+                println!(
+                    "Obolus hardware energy samples (since {}) — {}",
+                    opts.since.to_rfc3339(),
+                    power_ledger_path(config).display()
+                );
+                print_energy_table(&entries);
+                println!("\nSamples: {}", entries.len());
+            }
+        }
+        "sample" => {
+            if !config.obolus_analytics.energy_sampler_enabled {
+                bail!("energy sampler disabled — set energy_sampler_enabled = true in [obolus_analytics]");
+            }
+            gzmo_core::obolus::energy_reconcile::sample_and_record_energy(config).await;
+            std::thread::sleep(std::time::Duration::from_millis(400));
+            let entries = load_power_entries(
+                config,
+                Utc::now() - Duration::minutes(5),
+            )?;
+            println!(
+                "energy sample recorded — {} recent row(s) in {}",
+                entries.len(),
+                power_ledger_path(config).display()
+            );
+        }
+        "correlate" => {
+            let opts = parse_opts(&args[1..], false);
+            let token_entries = load_entries(config, opts.since)?;
+            let power_entries = load_power_entries(config, opts.since)?;
+            let report = compute_energy_correlation(opts.since, &token_entries, &power_entries);
+            if opts.json {
+                println!("{}", serde_json::to_string_pretty(&report)?);
+            } else {
+                println!(
+                    "Obolus token ↔ joule correlation (since {})",
+                    opts.since.to_rfc3339()
+                );
+                print_correlation_table(&report);
             }
         }
         "preflight" => {
@@ -239,6 +381,10 @@ pub async fn run(args: &[String], config: &GzmoConfig) -> Result<()> {
             let (obolus_action, tier) = match action {
                 "discovery_cycle" => (
                     gzmo_core::obolus::ObolusAction::DiscoveryCycle,
+                    gzmo_core::obolus::ObolusTier::SemiAutonomous,
+                ),
+                "discovery_plan" => (
+                    gzmo_core::obolus::ObolusAction::DiscoveryPlan,
                     gzmo_core::obolus::ObolusTier::SemiAutonomous,
                 ),
                 "spawn_discovery_fix" => (
@@ -325,7 +471,7 @@ pub async fn run(args: &[String], config: &GzmoConfig) -> Result<()> {
         }
         other => {
             bail!(
-                "unknown obolus subcommand '{other}' — use: status | report | context | balance | efficiency | preflight <action> [--json] [--since 24h|7d] [--gaps]"
+                "unknown obolus subcommand '{other}' — use: status | report | context | balance | energy | correlate | sample | efficiency | preflight <action> [--json] [--since 24h|7d] [--gaps]"
             );
         }
     }

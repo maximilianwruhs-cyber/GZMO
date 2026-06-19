@@ -26,6 +26,10 @@ use tracing::{debug, info, warn};
 use crate::chaos::{LogisticMap, LorenzAttractor, Phase};
 use crate::engine::EngineState;
 use crate::feedback::ChaosEvent;
+use crate::pedagogy_oscillator::{
+    PedagogyOscillateAction, PedagogyOscillationSettings, PedagogyOscillator,
+    PedagogyTransitionKind,
+};
 use crate::thoughts::{CrystallizationEvent, Mutations, ThoughtCabinet};
 
 /// 174 BPM = 344ms per beat
@@ -67,6 +71,32 @@ pub struct ChaosSnapshot {
     pub deaths: u32,
     pub chaos_val: f64,
 
+    /// Organic logistic-map value (always populated when oscillation runs).
+    #[serde(default)]
+    pub chaos_val_raw: f64,
+
+    /// Pedagogy oscillation active this tick.
+    #[serde(default)]
+    pub pedagogy_oscillation_active: bool,
+
+    #[serde(default)]
+    pub pedagogy_target: Option<f64>,
+
+    #[serde(default)]
+    pub pedagogy_step: u32,
+
+    #[serde(default)]
+    pub pedagogy_transition_seq: u64,
+
+    #[serde(default)]
+    pub pedagogy_last_transition: Option<crate::pedagogy_oscillator::PedagogyTransitionInfo>,
+
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub oscillation_id: Option<uuid::Uuid>,
+
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub chaos_val_baseline: Option<f64>,
+
     // Thought Cabinet state
     pub thoughts_incubating: u8,
     pub thoughts_crystallized: u32,
@@ -106,6 +136,14 @@ impl Default for ChaosSnapshot {
             alive: true,
             deaths: 0,
             chaos_val: 0.5,
+            chaos_val_raw: 0.5,
+            pedagogy_oscillation_active: false,
+            pedagogy_target: None,
+            pedagogy_step: 0,
+            pedagogy_transition_seq: 0,
+            pedagogy_last_transition: None,
+            oscillation_id: None,
+            chaos_val_baseline: None,
             thoughts_incubating: 0,
             thoughts_crystallized: 0,
             mutations: Mutations::default(),
@@ -335,11 +373,20 @@ pub struct PulseLoop {
     event_rx: mpsc::Receiver<ChaosEvent>,
     snapshot_tx: watch::Sender<ChaosSnapshot>,
     lore_tx: mpsc::Sender<LoreNotification>,
+    pedagogy_oscillator: PedagogyOscillator,
 }
 
 impl PulseLoop {
     /// Create and start the pulse loop. Returns a `PulseHandle` for interaction.
     pub fn start(config: ChaosConfig) -> PulseHandle {
+        Self::start_with_pedagogy(config, PedagogyOscillationSettings::default())
+    }
+
+    /// Start with pedagogy oscillation settings from `[pedagogy.tension_oscillation]`.
+    pub fn start_with_pedagogy(
+        config: ChaosConfig,
+        pedagogy: PedagogyOscillationSettings,
+    ) -> PulseHandle {
         let (feedback_tx, event_rx) = mpsc::channel::<ChaosEvent>(256);
         let (snapshot_tx, snapshot_rx) = watch::channel(ChaosSnapshot::default());
         let (lore_tx, lore_rx) = mpsc::channel::<LoreNotification>(64);
@@ -386,6 +433,7 @@ impl PulseLoop {
             lore_tx,
             config,
             rho_velocity_ema: 0.0,
+            pedagogy_oscillator: PedagogyOscillator::new(pedagogy),
         };
 
         let task = tokio::spawn(async move {
@@ -444,7 +492,17 @@ impl PulseLoop {
                 self.logistic.reseed_from_lorenz(self.lorenz.normalized_output());
             }
 
-            let chaos_val = self.logistic.next_val();
+            let chaos_val_raw = self.logistic.next_val();
+            let (chaos_val, pedagogy_meta) =
+                self.pedagogy_oscillator.apply(chaos_val_raw, self.state.tick);
+            if pedagogy_meta
+                .pedagogy_last_transition
+                .as_ref()
+                .is_some_and(|t| t.kind == PedagogyTransitionKind::CycleStart)
+            {
+                self.pedagogy_oscillator
+                    .set_chaos_val_baseline(chaos_val_raw);
+            }
 
             // 4. Tick engine state
             let rebirth = self.state.tick_heartbeat(
@@ -526,6 +584,14 @@ impl PulseLoop {
                 alive: self.state.alive,
                 deaths: self.state.deaths,
                 chaos_val,
+                chaos_val_raw: pedagogy_meta.chaos_val_raw,
+                pedagogy_oscillation_active: pedagogy_meta.pedagogy_oscillation_active,
+                pedagogy_target: pedagogy_meta.pedagogy_target,
+                pedagogy_step: pedagogy_meta.pedagogy_step,
+                pedagogy_transition_seq: pedagogy_meta.pedagogy_transition_seq,
+                pedagogy_last_transition: pedagogy_meta.pedagogy_last_transition,
+                oscillation_id: pedagogy_meta.oscillation_id,
+                chaos_val_baseline: pedagogy_meta.chaos_val_baseline,
                 thoughts_incubating: self.cabinet.occupied_slots() as u8,
                 thoughts_crystallized: self.cabinet.mutations.total_crystallized,
                 mutations: self.cabinet.mutations.clone(),
@@ -613,6 +679,11 @@ impl PulseLoop {
                     (self.cabinet.mutations.lorenz_rho_mod + delta_rho).clamp(-10.0, 10.0);
                 debug!(delta = delta_rho, lorenz_rho_mod = self.cabinet.mutations.lorenz_rho_mod, "lorenz_rho_mod stabilized");
             }
+        }
+
+        if let ChaosEvent::PedagogyOscillate { action } = event {
+            let ok = self.pedagogy_oscillator.handle_action(*action, self.state.tick);
+            info!(?action, ok, "Pedagogy oscillation command");
         }
     }
 
@@ -719,6 +790,7 @@ mod tests {
             lore_tx,
             config,
             rho_velocity_ema: 0.0,
+            pedagogy_oscillator: PedagogyOscillator::new(PedagogyOscillationSettings::default()),
         };
 
         let temp = compute_llm_temperature(pulse.lorenz.x, pulse.tension, pulse.state.energy);
@@ -794,6 +866,7 @@ mod tests {
             lore_tx,
             config,
             rho_velocity_ema: 0.0,
+            pedagogy_oscillator: PedagogyOscillator::new(PedagogyOscillationSettings::default()),
         };
 
         let gamma = pulse.config.rho_ema_gamma;
@@ -848,6 +921,7 @@ mod tests {
             lore_tx,
             config: ChaosConfig::default(),
             rho_velocity_ema: 0.0,
+            pedagogy_oscillator: PedagogyOscillator::new(PedagogyOscillationSettings::default()),
         };
 
         pulse.state.alive = false;

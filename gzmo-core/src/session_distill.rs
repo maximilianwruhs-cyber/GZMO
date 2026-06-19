@@ -36,11 +36,55 @@ const SESSION_DISTILL_SYSTEM: &str = concat!(
 /// Avoids the `chat_history`/`chat_session` exclusion patterns (these are *distilled,
 /// verified* facts, not raw chat) so spark `SessionDistill` anchors are reachable.
 pub fn session_distill_source(session_id: &str) -> String {
+    if let Ok(cycle) = std::env::var("GZMO_DISCOVERY_CYCLE") {
+        let trimmed = cycle.trim();
+        if !trimmed.is_empty() {
+            let safe: String = trimmed
+                .chars()
+                .map(|c| {
+                    if c.is_alphanumeric() || c == '-' || c == '_' {
+                        c
+                    } else {
+                        '_'
+                    }
+                })
+                .collect();
+            return format!("sessions/discovery-{safe}.md");
+        }
+    }
     let safe: String = session_id
         .chars()
         .map(|c| if c.is_alphanumeric() || c == '-' || c == '_' { c } else { '_' })
         .collect();
     format!("sessions/{safe}.md")
+}
+
+fn discovery_distill_metadata() -> serde_json::Value {
+    let mut data = serde_json::json!({});
+    if let Ok(v) = std::env::var("GZMO_DISCOVERY_CYCLE") {
+        if !v.trim().is_empty() {
+            data["discovery_cycle"] = serde_json::Value::String(v);
+        }
+    }
+    if let Ok(v) = std::env::var("GZMO_DISCOVERY_PILLAR") {
+        if !v.trim().is_empty() {
+            data["discovery_pillar"] = serde_json::Value::String(v);
+        }
+    }
+    if let Ok(v) = std::env::var("GZMO_CORRELATION_ID") {
+        if !v.trim().is_empty() {
+            data["correlation_id"] = serde_json::Value::String(v);
+        }
+    }
+    data
+}
+
+fn spark_lineage_for_distill(project_root: Option<&Path>) -> serde_json::Value {
+    let Some(root) = project_root else {
+        return serde_json::json!({});
+    };
+    let cache_path = root.join("data/spark-distill-bridge-cache.json");
+    crate::spark_distill_bridge::SparkDistillBridge::lineage_from_cache_file(&cache_path, 30)
 }
 
 /// Stable key for deduplicating archive-worker vs nightly-cron distill of the same transcript.
@@ -286,14 +330,29 @@ impl SessionDistillEngine {
 
         // DistillComplete: append to Synapse bus
         if let Some(ref bus) = self.synapse {
-            let data = serde_json::json!({
+            let project_root = bus.path.parent().map(|p| p.to_path_buf());
+            let mut data = serde_json::json!({
                 "session_id": session_id,
                 "entities_promoted": pipeline.verified_entities.len(),
                 "relations_promoted": pipeline.verified_relations.len(),
                 "kg_entities_written": kg_entities,
                 "kg_relations_written": kg_relations,
                 "vault_truths": truths.len(),
+                "source_file": session_source,
             });
+            if let Some(obj) = data.as_object_mut() {
+                if let Some(meta) = discovery_distill_metadata().as_object() {
+                    for (k, v) in meta {
+                        obj.insert(k.clone(), v.clone());
+                    }
+                }
+                let spark = spark_lineage_for_distill(project_root.as_deref());
+                if let Some(spark_obj) = spark.as_object() {
+                    for (k, v) in spark_obj {
+                        obj.insert(format!("spark_{k}"), v.clone());
+                    }
+                }
+            }
             bus.append(&SynapseEvent::with_data(
                 EventType::DistillComplete,
                 resolve_event_source(EventSource::GzmoCli),

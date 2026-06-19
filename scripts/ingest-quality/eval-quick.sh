@@ -37,6 +37,17 @@ scripts/check-fts-sanity.sh 2>/dev/null || true
 scripts/memory-status.sh | head -6
 python3 scripts/ingest-quality/mem-score.py 2>/dev/null || true
 
+if [[ "${DISCOVERY_LOOP:-0}" == "1" ]]; then
+  echo ""
+  echo "=== Discovery ↔ KB loop gate ==="
+  if DISCOVERY_LOOP_STRICT="$STRICT" bash scripts/ingest-quality/gate-discovery-loop.sh; then
+    echo "[PASS] discovery loop gate"
+  else
+    FAIL=1
+    echo "[FAIL] discovery loop gate"
+  fi
+fi
+
 if [[ "${FAITHFULNESS_JUDGE:-0}" == "1" ]]; then
   echo ""
   echo "=== M4 faithfulness judge — context grounding (Prime LLM) ==="

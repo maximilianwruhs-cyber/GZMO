@@ -53,7 +53,10 @@ Legacy events without `correlation_id` / `reply_to` remain valid.
   "proposal_id": "uuid",
   "title": "...",
   "body": "...",
-  "status": "draft"
+  "status": "draft",
+  "concepts_established": ["..."],
+  "applied_concept": "...",
+  "novel_application": true
 }
 ```
 

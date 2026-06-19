@@ -42,6 +42,8 @@ pub struct AgentLoopConfig {
     pub write_phase_message: Option<String>,
     /// When true, reject a final text response until at least one file_write succeeded.
     pub require_file_write_before_done: bool,
+    /// Injected when `require_file_write_before_done` blocks a text-only reply.
+    pub require_file_write_prompt: Option<String>,
 }
 
 /// Per-loop scratch scope and distill session id.
@@ -65,6 +67,7 @@ impl Default for AgentLoopConfig {
             write_phase_at: None,
             write_phase_message: None,
             require_file_write_before_done: false,
+            require_file_write_prompt: None,
         }
     }
 }
@@ -234,9 +237,15 @@ pub async fn run_agent_loop(
                     && written_paths.is_empty()
                     && iteration + 1 < config.max_iterations
                 {
+                    let prompt = config
+                        .require_file_write_prompt
+                        .as_deref()
+                        .unwrap_or(
+                            "STOP — you have not called file_write yet. Use file_write now to create at least one remediation script or config under gzmo_skills/scripts/ (or patch an existing file). Do not reply with text only.",
+                        );
                     messages.push(Message {
                         role: Role::User,
-                        content: "STOP — you have not called file_write yet. Use file_write now to create at least one remediation script or config under gzmo_skills/scripts/ (or patch an existing file). Do not reply with text only.".to_string(),
+                        content: prompt.to_string(),
                         is_meta: false,
                         tool_calls: None,
                         tool_call_id: None,

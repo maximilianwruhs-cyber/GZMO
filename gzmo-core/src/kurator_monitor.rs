@@ -2,7 +2,7 @@
 //! `spawn.recommended` when thresholds are exceeded. With `auto_spawn_on_recommend`,
 //! the daemon spawns governed sub-agents without operator approval.
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::fs;
 use std::path::Path;
 
@@ -27,6 +27,9 @@ pub struct KuratorMonitorState {
     /// Approved spawns (removed from pending on `take_pending_recommendation`).
     #[serde(default)]
     pub spawn_history: HashMap<String, PendingRecommendation>,
+    /// Layer-1 verify JSON oscillation_ids already recommended for certification.
+    #[serde(default)]
+    pub processed_learning_verify_ids: HashSet<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -180,6 +183,14 @@ pub fn session_already_claimed(state: &KuratorMonitorState, session_id: &str) ->
             .spawn_history
             .values()
             .any(|p| p.session_id == session_id)
+}
+
+/// Allow replan when prior plan spawn did not produce artifacts.
+pub fn clear_session_spawn_claims(state: &mut KuratorMonitorState, session_id: &str) {
+    state
+        .pending_recommendations
+        .retain(|_, p| p.session_id != session_id);
+    state.spawn_history.retain(|_, p| p.session_id != session_id);
 }
 
 /// Evaluate thresholds and return recommendations (does not write bus).
@@ -390,6 +401,71 @@ pub fn process_pi_poll(
     Ok(emitted)
 }
 
+/// When Layer-1 verify JSON reports `learning_verified=true`, emit a recommend-only
+/// spawn hint so the operator can run `gzmo pedagogy certify` (no autospawn).
+pub fn process_learning_verify_reports(
+    bus: &SynapseBus,
+    state_path: &Path,
+    config: &KuratorConfig,
+    project_root: &Path,
+) -> anyhow::Result<Vec<PendingRecommendation>> {
+    if !config.enabled {
+        return Ok(Vec::new());
+    }
+    let runs_dir = project_root.join("data/research/runs");
+    if !runs_dir.is_dir() {
+        return Ok(Vec::new());
+    }
+
+    let mut state = load_state(state_path);
+    let mut recommendations = Vec::new();
+    for entry in fs::read_dir(&runs_dir)? {
+        let path = entry?.path();
+        let name = path.file_name().and_then(|n| n.to_str()).unwrap_or("");
+        if !name.starts_with("verify-learning-") || !name.ends_with(".json") {
+            continue;
+        }
+        let raw = match fs::read_to_string(&path) {
+            Ok(r) => r,
+            Err(_) => continue,
+        };
+        let v: serde_json::Value = match serde_json::from_str(&raw) {
+            Ok(v) => v,
+            Err(_) => continue,
+        };
+        if !v.get("learning_verified").and_then(|x| x.as_bool()).unwrap_or(false) {
+            continue;
+        }
+        let osc_id = v
+            .get("oscillation_id")
+            .and_then(|x| x.as_str())
+            .unwrap_or("")
+            .to_string();
+        if osc_id.is_empty() || state.processed_learning_verify_ids.contains(&osc_id) {
+            continue;
+        }
+        recommendations.push(SpawnRecommendation {
+            session_id: format!("learning-certify:{osc_id}"),
+            reason: format!(
+                "layer1_learning_verified:oscillation_id={osc_id} — run `gzmo pedagogy certify --oscillation-id {osc_id}`"
+            ),
+            metrics: SessionMetrics::default(),
+            suggested_agent_profile: "operator".to_string(),
+            kind: Some("learning_certified".to_string()),
+            report_path: Some(path.display().to_string()),
+        });
+        state.processed_learning_verify_ids.insert(osc_id);
+    }
+
+    let emitted = if recommendations.is_empty() {
+        Vec::new()
+    } else {
+        emit_recommendations(bus, &mut state, config, &recommendations)
+    };
+    save_state(state_path, &state)?;
+    Ok(emitted)
+}
+
 /// After a published discovery report, emit a fixer `spawn.recommended` when FAIL/GAP findings exist.
 pub fn process_discovery_report(
     bus: &SynapseBus,
@@ -511,6 +587,113 @@ pub fn process_discovery_code_implement(
         suggested_agent_profile: config.code_implementer_agent_profile.clone(),
         kind: Some("discovery_code_implement".to_string()),
         report_path: Some(report_path.to_string_lossy().into_owned()),
+    };
+
+    let emitted = emit_recommendations(bus, &mut state, config, &[recommendation]);
+    save_state(state_path, &state)?;
+    Ok(emitted.into_iter().next())
+}
+
+/// Emit spawn.recommended for plan agent when actionable findings exist.
+pub fn process_discovery_plan(
+    bus: &SynapseBus,
+    state_path: &Path,
+    config: &KuratorConfig,
+    report_path: &Path,
+    discovery_session_id: &str,
+    force_replan: bool,
+) -> anyhow::Result<Option<PendingRecommendation>> {
+    if !config.enabled || !config.discovery_plan_agent_enabled {
+        return Ok(None);
+    }
+    if !report_path.is_file() {
+        anyhow::bail!("discovery report not found: {}", report_path.display());
+    }
+
+    let analysis = crate::discovery_fixer::analyze_discovery_report(report_path)?;
+    if !analysis.has_actionable() {
+        info!(
+            report = %report_path.display(),
+            "Kurator: no actionable findings — plan agent spawn skipped"
+        );
+        return Ok(None);
+    }
+
+    let plan_id = crate::discovery_plan_agent::plan_id_from_report(report_path, discovery_session_id);
+    let plan_session_id = crate::discovery_plan_agent::discovery_plan_session_id(&plan_id);
+    let output = crate::discovery_plan_agent::resolve_plan_output_paths(&plan_id);
+    let artifacts_ok = output.plan_json.is_file() && output.plan_md.is_file();
+    let mut state = load_state(state_path);
+    if session_already_claimed(&state, &plan_session_id) {
+        if force_replan || !artifacts_ok {
+            clear_session_spawn_claims(&mut state, &plan_session_id);
+            save_state(state_path, &state)?;
+        } else {
+            info!(
+                session = %plan_session_id,
+                "Kurator: discovery plan agent already pending or spawned for this report"
+            );
+            return Ok(None);
+        }
+    }
+
+    let reason = crate::discovery_plan_agent::discovery_plan_reason(analysis.actionable_count());
+    let recommendation = SpawnRecommendation {
+        session_id: plan_session_id,
+        reason,
+        metrics: SessionMetrics::default(),
+        suggested_agent_profile: config.discovery_plan_agent_profile.clone(),
+        kind: Some("discovery_plan".to_string()),
+        report_path: Some(report_path.to_string_lossy().into_owned()),
+    };
+
+    let emitted = emit_recommendations(bus, &mut state, config, &[recommendation]);
+    save_state(state_path, &state)?;
+    Ok(emitted.into_iter().next())
+}
+
+/// Emit spawn.recommended for a single plan workstream execute pass.
+pub fn process_discovery_execute(
+    bus: &SynapseBus,
+    state_path: &Path,
+    config: &KuratorConfig,
+    plan_dir: &Path,
+    workstream_id: &str,
+    force_reexecute: bool,
+) -> anyhow::Result<Option<PendingRecommendation>> {
+    if !config.enabled || !config.discovery_code_implementer_enabled {
+        return Ok(None);
+    }
+    let plan_json = crate::discovery_execute::resolve_plan_json_path(plan_dir);
+    if !plan_json.is_file() {
+        anyhow::bail!("plan.json not found: {}", plan_json.display());
+    }
+    let _ws = crate::discovery_execute::load_workstream(plan_dir, workstream_id)?;
+
+    let plan_id = plan_dir
+        .file_name()
+        .and_then(|s| s.to_str())
+        .unwrap_or("plan");
+    let session_id = crate::discovery_execute::discovery_execute_session_id(plan_id, workstream_id);
+    let mut state = load_state(state_path);
+    if session_already_claimed(&state, &session_id) {
+        if force_reexecute {
+            clear_session_spawn_claims(&mut state, &session_id);
+            save_state(state_path, &state)?;
+        } else {
+            info!(session = %session_id, "Kurator: workstream execute already claimed");
+            return Ok(None);
+        }
+    }
+
+    let reason = crate::discovery_execute::discovery_execute_reason(workstream_id);
+    let recommendation = SpawnRecommendation {
+        session_id,
+        reason,
+        metrics: SessionMetrics::default(),
+        suggested_agent_profile: config.code_implementer_agent_profile.clone(),
+        kind: Some("discovery_execute".to_string()),
+        report_path: Some(plan_dir.to_string_lossy().into_owned()),
     };
 
     let emitted = emit_recommendations(bus, &mut state, config, &[recommendation]);

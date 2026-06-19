@@ -86,6 +86,10 @@ for hook in \
   "obolus preflight spawn_discovery_fix" \
   "kurator fix-from-discovery" \
   "run_discovery_implementation_pipeline" \
+  "enqueue-discovery-report.sh" \
+  "run-discovery-implement.sh" \
+  "eval-implementation-plan.sh" \
+  "DISCOVERY_INLINE_IMPLEMENT" \
   "implement-discovery-actions.sh" \
   "build_session_log_extra" \
   "session-final criteria not met" \
@@ -123,7 +127,8 @@ section "6 — Remediation scripts (exist + dry-run)"
 for script in \
   "${SKILLS}/scripts/cleanup_unbounded_sessions.sh" \
   "${SKILLS}/scripts/synapse_event_supplement.sh" \
-  "${SKILLS}/scripts/synapse-health-check.sh"; do
+  "${SKILLS}/scripts/synapse-health-check.sh" \
+  "${SKILLS}/scripts/synapse-dashboard.sh"; do
   if [[ -x "$script" ]]; then
     pass "executable: $(basename "$script")"
   else
@@ -268,6 +273,35 @@ if [[ -x "${SKILLS}/scripts/verify-discovery-action-pipeline.sh" ]]; then
   done
 else
   fail "verify-discovery-action-pipeline.sh missing"
+fi
+
+if [[ -d "${SKILLS}/data/discovery-implementation/schemas" && -f "${SKILLS}/data/discovery-implementation/queue.jsonl" ]]; then
+  pass "discovery-implementation Forum-2 scaffold"
+else
+  fail "discovery-implementation Forum-2 scaffold missing (run init-discovery-implementation.sh)"
+fi
+
+IFP="${SKILLS}/scripts/verify-implement-fixer-pipeline.sh"
+if [[ -x "$IFP" ]]; then
+  if bash "$IFP" >/dev/null 2>&1; then
+    pass "verify-implement-fixer-pipeline.sh"
+  else
+    fail "verify-implement-fixer-pipeline.sh"
+  fi
+else
+  fail "missing $IFP"
+fi
+
+section "9 — Spark/distill e2e verify bundle"
+E2E="${SKILLS}/scripts/discovery-remediations/e2e-verify-17-35-00/run-all.sh"
+if [[ -x "$E2E" ]]; then
+  if bash "$E2E" >/dev/null 2>&1; then
+    pass "e2e-verify-17-35-00/run-all.sh"
+  else
+    fail "e2e-verify-17-35-00/run-all.sh"
+  fi
+else
+  fail "missing $E2E"
 fi
 
 section "Summary"

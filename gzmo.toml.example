@@ -86,6 +86,33 @@ anchor_min_age_hours = 0
 recent_max_age_hours = 72
 min_anchor_recent_similarity = 0.35
 recent_dedupe_similarity = 0.92
+anchor_refresh_enabled = true
+anchor_refresh_min_recent = 4
+
+# Pedagogy tension oscillation — setpoint-controlled chaos_val cycle (0.9→0.5→0.9).
+# Start via `gzmo pedagogy oscillate start`; requires enabled = true and daemon running.
+[pedagogy.tension_oscillation]
+enabled = false
+schedule_mode = "manual"
+spawn_discovery_on_low = true
+low_phase_threshold = 0.55
+cooldown_secs = 3600
+blend_ticks = 8
+
+[[pedagogy.tension_oscillation.sequence]]
+target = 0.9
+duration_secs = 60
+label = "High tension — confirmation machine"
+
+[[pedagogy.tension_oscillation.sequence]]
+target = 0.5
+duration_secs = 60
+label = "Low tension — discovery machine"
+
+[[pedagogy.tension_oscillation.sequence]]
+target = 0.9
+duration_secs = 60
+label = "High tension — confirmation machine"
 
 [health]
 strict_startup = false
@@ -494,12 +521,20 @@ distill_summary = "local"
 [obolus_analytics]
 enabled = true
 ledger_path = "data/Obolus/ledger.jsonl"
+power_ledger_path = "data/Obolus/power.jsonl"
 # llama_log_path = ""   # journalctl wrapper or --log-file path for Pi/external reconcile
 prime_port = 8000
 prime_context_tokens = 131072   # Prime n_ctx (128K) — not [context_memory].context_length
 reconcile_interval_secs = 60
 tokens_per_obl = 1000
 efficiency_tick_enabled = true
+# Hardware energy bridge (observability-only; gates remain token-based)
+energy_sampler_enabled = false
+hsp_state_url = "http://127.0.0.1:8001/state"
+nvidia_smi_fallback = true
+gpu_joules_integration = true
+energy_sample_min_interval_secs = 55
+rapl_energy_path = "/sys/class/powercap/intel-rapl:0/energy_uj"
 
 [obolus_governance]
 enabled = true

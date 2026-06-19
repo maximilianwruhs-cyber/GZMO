@@ -9,7 +9,8 @@ use gzmo_core::discovery_fixer::analyze_discovery_report;
 use gzmo_core::gateway::GatewayRouter;
 use gzmo_core::kurator_monitor::{
     self, list_pending_recommendations, process_discovery_code_implement,
-    process_discovery_report, take_pending_recommendation,
+    process_discovery_execute, process_discovery_plan, process_discovery_report,
+    take_pending_recommendation,
 };
 use gzmo_core::kurator_spawn::{self, autospawn_new_recommendations, build_subagent_runner, spawn_recommendation};
 use gzmo_core::memory::scratch::ScratchService;
@@ -392,6 +393,239 @@ pub async fn run(args: &[String], config: &GzmoConfig) -> Result<()> {
         return Ok(());
     }
 
+    if args[0] == "plan-from-discovery" {
+        let mut report_path = None;
+        let mut session_id = String::new();
+        let mut spawn_now = false;
+        let mut force_replan = false;
+
+        let mut i = 1;
+        while i < args.len() {
+            match args[i].as_str() {
+                "--report" => {
+                    i += 1;
+                    if i >= args.len() {
+                        bail!("--report requires a path");
+                    }
+                    report_path = Some(PathBuf::from(&args[i]));
+                }
+                "--session-id" => {
+                    i += 1;
+                    if i >= args.len() {
+                        bail!("--session-id requires a value");
+                    }
+                    session_id = args[i].clone();
+                }
+                "--spawn" => spawn_now = true,
+                "--force-replan" => force_replan = true,
+                other => bail!("unknown arg for plan-from-discovery: {other}"),
+            }
+            i += 1;
+        }
+
+        let report_path = report_path.ok_or_else(|| anyhow::anyhow!("--report is required"))?;
+        if session_id.is_empty() {
+            session_id = format!("discovery-{}", chrono::Utc::now().format("%Y-%m-%dT%H-%M-%SZ"));
+        }
+        if !config.kurator.enabled {
+            bail!("kurator disabled in gzmo.toml");
+        }
+        if !config.kurator.discovery_plan_agent_enabled {
+            bail!("kurator discovery_plan_agent_enabled is false");
+        }
+
+        let analysis = analyze_discovery_report(&report_path)?;
+        println!(
+            "Discovery plan: {} actionable ({} FAIL, {} GAP, {} ACTION)",
+            analysis.actionable_count(),
+            analysis.fail_count,
+            analysis.gap_count,
+            analysis.action_count
+        );
+        if !analysis.has_actionable() {
+            println!("No actionable findings — plan agent spawn skipped");
+            return Ok(());
+        }
+
+        let plan_id = gzmo_core::discovery_plan_agent::plan_id_from_report(&report_path, &session_id);
+        let output = gzmo_core::discovery_plan_agent::resolve_plan_output_paths(&plan_id);
+        println!("Plan output dir: {}", output.plan_dir.display());
+
+        let bus = SynapseBus::with_path(kurator_spawn::synapse_bus_path(config));
+        let pending = process_discovery_plan(
+            &bus,
+            &state_path,
+            &config.kurator,
+            &report_path,
+            &session_id,
+            force_replan,
+        )?;
+
+        let Some(rec) = pending else {
+            println!("Plan agent not emitted (already claimed or disabled)");
+            return Ok(());
+        };
+
+        println!("Emitted spawn.recommended (plan agent)");
+        println!("  recommendation_id: {}", rec.event_id);
+        println!("  session_id: {}", rec.session_id);
+        println!("  profile: {}", rec.suggested_agent_profile);
+        println!("  reason: {}", rec.reason);
+
+        let should_spawn = spawn_now
+            || (config.kurator.spawn_gate.auto_spawn_discovery_fix
+                && config.kurator.approve_spawns_subagent
+                && config.subagent.enabled);
+
+        if should_spawn {
+            let runner = runner_for_config(config).await?;
+            if spawn_now {
+                let taken = take_pending_recommendation(&state_path, &rec.event_id)?;
+                let result = spawn_recommendation(
+                    &runner,
+                    &bus,
+                    &state_path,
+                    taken,
+                    &config.kurator,
+                    &config.redis,
+                    config,
+                    "gzmo kurator plan-from-discovery",
+                )
+                .await?;
+                println!("Plan agent sub-agent spawned");
+                println!("  task_id: {}", result.task_id);
+                println!("  status: {:?}", result.status);
+                println!("  summary: {}", truncate_chars(&result.summary, 500));
+                if !result.written_paths.is_empty() {
+                    println!("  written_paths: {}", result.written_paths.join(", "));
+                }
+                println!("  plan_dir: {}", output.plan_dir.display());
+                if matches!(result.status, gzmo_core::subagent::SubStatus::Failed) {
+                    bail!(
+                        "plan agent verify gate failed: {}",
+                        truncate_chars(&result.summary, 400)
+                    );
+                }
+            } else {
+                autospawn_new_recommendations(
+                    runner,
+                    Arc::new(bus),
+                    state_path,
+                    config.kurator.clone(),
+                    config.redis.clone(),
+                    config.clone(),
+                    config.subagent.enabled,
+                    vec![rec],
+                );
+                println!("Plan agent autospawn queued");
+            }
+        } else {
+            println!("Autospawn disabled — run `gzmo kurator approve {}` to spawn", rec.event_id);
+        }
+        return Ok(());
+    }
+
+    if args[0] == "execute-workstream" {
+        let mut plan_path = None;
+        let mut workstream_id = String::new();
+        let mut spawn_now = false;
+        let mut force_reexecute = false;
+
+        let mut i = 1;
+        while i < args.len() {
+            match args[i].as_str() {
+                "--plan" => {
+                    i += 1;
+                    if i >= args.len() {
+                        bail!("--plan requires a path");
+                    }
+                    plan_path = Some(PathBuf::from(&args[i]));
+                }
+                "--workstream" => {
+                    i += 1;
+                    if i >= args.len() {
+                        bail!("--workstream requires an id");
+                    }
+                    workstream_id = args[i].clone();
+                }
+                "--spawn" => spawn_now = true,
+                "--force-reexecute" => force_reexecute = true,
+                other => bail!("unknown arg for execute-workstream: {other}"),
+            }
+            i += 1;
+        }
+
+        let plan_path = plan_path.ok_or_else(|| anyhow::anyhow!("--plan is required"))?;
+        if workstream_id.is_empty() {
+            bail!("--workstream is required");
+        }
+        if !config.kurator.enabled {
+            bail!("kurator disabled in gzmo.toml");
+        }
+
+        let plan_dir = if plan_path.is_dir() {
+            plan_path
+        } else {
+            plan_path.parent().unwrap_or(&plan_path).to_path_buf()
+        };
+
+        println!(
+            "Execute workstream {workstream_id} from plan {}",
+            plan_dir.display()
+        );
+
+        let bus = SynapseBus::with_path(kurator_spawn::synapse_bus_path(config));
+        let pending = process_discovery_execute(
+            &bus,
+            &state_path,
+            &config.kurator,
+            &plan_dir,
+            &workstream_id,
+            force_reexecute,
+        )?;
+
+        let Some(rec) = pending else {
+            println!("Execute not emitted (already claimed)");
+            return Ok(());
+        };
+
+        println!("Emitted spawn.recommended (execute)");
+        println!("  recommendation_id: {}", rec.event_id);
+        println!("  session_id: {}", rec.session_id);
+
+        if spawn_now {
+            let runner = runner_for_config(config).await?;
+            let taken = take_pending_recommendation(&state_path, &rec.event_id)?;
+            let result = spawn_recommendation(
+                &runner,
+                &bus,
+                &state_path,
+                taken,
+                &config.kurator,
+                &config.redis,
+                config,
+                "gzmo kurator execute-workstream",
+            )
+            .await?;
+            println!("Execute sub-agent spawned");
+            println!("  task_id: {}", result.task_id);
+            println!("  status: {:?}", result.status);
+            println!("  summary: {}", truncate_chars(&result.summary, 500));
+            if !result.written_paths.is_empty() {
+                println!("  written_paths: {}", result.written_paths.join(", "));
+            }
+            if matches!(result.status, gzmo_core::subagent::SubStatus::Failed) {
+                bail!(
+                    "execute verify gate failed: {}",
+                    truncate_chars(&result.summary, 400)
+                );
+            }
+        } else {
+            println!("Run with --spawn or `gzmo kurator approve {}`", rec.event_id);
+        }
+        return Ok(());
+    }
+
     if args[0] == "approve" {
         if args.len() < 2 {
             bail!("usage: gzmo kurator approve <recommendation-id|session-id>");
@@ -435,7 +669,7 @@ pub async fn run(args: &[String], config: &GzmoConfig) -> Result<()> {
     }
 
     eprintln!(
-        "Usage: gzmo kurator status | gzmo kurator remediation-status [--json] | gzmo kurator approve <id> | gzmo kurator fix-from-discovery --report <path> [--session-id <id>] [--register-only] [--spawn] | gzmo kurator implement-from-discovery --report <path> [--session-id <id>] [--spawn]"
+        "Usage: gzmo kurator status | gzmo kurator remediation-status [--json] | gzmo kurator approve <id> | gzmo kurator fix-from-discovery --report <path> [--session-id <id>] [--register-only] [--spawn] | gzmo kurator implement-from-discovery --report <path> [--session-id <id>] [--spawn] | gzmo kurator plan-from-discovery --report <path> [--session-id <id>] [--spawn] [--force-replan] | gzmo kurator execute-workstream --plan <dir> --workstream <id> [--spawn]"
     );
     Ok(())
 }

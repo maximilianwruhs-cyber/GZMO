@@ -87,6 +87,11 @@ pub struct MentorResponse {
     pub delegate_hint: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub pedagogy: Option<MentorPedagogyMeta>,
+    /// Operator metadata — elenchic heuristic, not exposed to learner as grade.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub confidence_estimate: Option<f32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub novel_application: Option<bool>,
 }
 
 impl MentorResponse {
@@ -104,10 +109,41 @@ impl MentorResponse {
             delegate_payload: None,
             delegate_hint: None,
             pedagogy: None,
+            confidence_estimate: None,
+            novel_application: None,
         }
     }
 
+    /// Heuristic Layer-2 metadata for verify-learning predicate 5 (not learner-facing).
+    pub fn estimate_teach_metadata(response: &str) -> (f32, bool) {
+        let lower = response.to_lowercase();
+        let mut confidence = 0.5f32;
+        if response.contains('?') {
+            confidence = 0.45;
+        }
+        if lower.contains("correct")
+            || lower.contains("exactly")
+            || lower.contains("precisely")
+            || lower.contains("well done")
+        {
+            confidence = 0.75;
+        }
+        if lower.contains("not quite")
+            || lower.contains("incorrect")
+            || lower.contains("missed")
+            || lower.contains("wrong")
+        {
+            confidence = 0.35;
+        }
+        let novel = !lower.contains("rephrase")
+            && !lower.contains("again")
+            && !lower.contains("repeat")
+            && response.len() > 80;
+        (confidence, novel)
+    }
+
     pub fn teach(response: String, learner_id: String) -> Self {
+        let (confidence_estimate, novel_application) = Self::estimate_teach_metadata(&response);
         Self {
             ok: true,
             response: Some(response),
@@ -115,6 +151,8 @@ impl MentorResponse {
             ops_mode: Some(false),
             learner_id: Some(learner_id),
             action: Some(MentorAction::Teach),
+            confidence_estimate: Some(confidence_estimate),
+            novel_application: Some(novel_application),
             ..Self::base()
         }
     }
@@ -143,6 +181,15 @@ impl MentorResponse {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn estimate_teach_metadata_heuristic() {
+        let text = "That is correct — now apply it to a new scenario with bounded chaos and \
+            explain how oscillation_complete differs from mere discovery activity on the bus.";
+        let (conf, novel) = MentorResponse::estimate_teach_metadata(text);
+        assert!(conf >= 0.6);
+        assert!(novel);
+    }
 
     #[test]
     fn mentor_response_round_trip_includes_delegate_fields() {

@@ -11,7 +11,8 @@ use tracing::{debug, info};
 
 use crate::config::GzmoConfig;
 use crate::obolus::efficiency::compute_from_sources;
-use crate::obolus::gate::{self, emit_budget_tick, load_balance_since};
+use crate::obolus::energy_reconcile::sample_and_record_energy;
+use crate::obolus::gate::{emit_budget_tick, emit_energy_tick, load_balance_since};
 use crate::obolus::ledger::{LedgerEntry, LedgerSource, ObolusLedger};
 use crate::synapse::{EventSource, EventType, SynapseBus, SynapseEvent};
 
@@ -19,6 +20,7 @@ const SYNAPSE_STATE: &str = "data/Obolus/reconcile-synapse.state.json";
 const LOG_STATE: &str = "data/Obolus/reconcile-log.state.json";
 const EFFICIENCY_TICK_STATE: &str = "data/Obolus/efficiency-tick.state.json";
 const BUDGET_TICK_STATE: &str = "data/Obolus/budget-tick.state.json";
+const ENERGY_TICK_STATE: &str = "data/Obolus/energy-tick.state.json";
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 struct EfficiencyTickState {
@@ -73,11 +75,15 @@ fn project_data_dir(config: &GzmoConfig) -> PathBuf {
 pub async fn run_tick(config: &GzmoConfig, ledger: &ObolusLedger) -> Result<()> {
     let pi = reconcile_synapse_pi(config, ledger)?;
     let log_n = reconcile_llama_log(config, ledger)?;
+    sample_and_record_energy(config).await;
     if config.obolus_analytics.efficiency_tick_enabled {
         maybe_emit_efficiency_tick(config, ledger)?;
     }
     if config.obolus_governance.enabled {
         maybe_emit_budget_tick(config)?;
+    }
+    if config.obolus_analytics.energy_sampler_enabled {
+        maybe_emit_energy_tick(config)?;
     }
     if pi > 0 || log_n > 0 {
         info!(pi_events = pi, log_lines = log_n, "obolus reconcile tick");
@@ -148,6 +154,34 @@ fn maybe_emit_budget_tick(config: &GzmoConfig) -> Result<()> {
     let balance = load_balance_since(config, since)?;
     let bus_handle = SynapseBus::with_path(synapse_bus_path(config));
     emit_budget_tick(&bus_handle, &balance);
+
+    state.last_hour_bucket = Some(hour_bucket);
+    if let Some(parent) = state_path.parent() {
+        std::fs::create_dir_all(parent)?;
+    }
+    std::fs::write(&state_path, serde_json::to_string_pretty(&state)?)?;
+    Ok(())
+}
+
+fn maybe_emit_energy_tick(config: &GzmoConfig) -> Result<()> {
+    let hour_bucket = chrono::Utc::now().format("%Y%m%d%H").to_string();
+    let state_path = project_data_dir(config).join(ENERGY_TICK_STATE);
+    let mut state: EfficiencyTickState = if state_path.exists() {
+        std::fs::read_to_string(&state_path)
+            .ok()
+            .and_then(|s| serde_json::from_str(&s).ok())
+            .unwrap_or_default()
+    } else {
+        EfficiencyTickState::default()
+    };
+    if state.last_hour_bucket.as_deref() == Some(hour_bucket.as_str()) {
+        return Ok(());
+    }
+
+    let since = chrono::Utc::now() - chrono::Duration::hours(1);
+    let balance = load_balance_since(config, since)?;
+    let bus_handle = SynapseBus::with_path(synapse_bus_path(config));
+    emit_energy_tick(&bus_handle, &balance);
 
     state.last_hour_bucket = Some(hour_bucket);
     if let Some(parent) = state_path.parent() {

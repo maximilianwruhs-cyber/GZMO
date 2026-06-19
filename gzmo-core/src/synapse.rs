@@ -115,6 +115,10 @@ pub enum EventType {
     #[serde(rename = "chaos.rho_telemetry")]
     SenseChaosRho,
 
+    /// Thought Cabinet crystallization — soul hook (category + ρ delta on same tick)
+    #[serde(rename = "chaos.thought_crystallized")]
+    ThoughtCrystallized,
+
     /// Headless `/dice` autopoietic loop follow-up roll (Pi display via synapse consumer)
     #[serde(rename = "chaos.dice_loop")]
     ChaosDiceLoop,
@@ -122,6 +126,34 @@ pub enum EventType {
     /// Daemon drained external chaos feedback inbox (skill IPC batch)
     #[serde(rename = "chaos.feedback_drained")]
     ChaosFeedbackDrained,
+
+    /// Pedagogy tension oscillation cycle started
+    #[serde(rename = "pedagogy.oscillation_start")]
+    PedagogyOscillationStart,
+
+    /// Pedagogy tension oscillation entered a step
+    #[serde(rename = "pedagogy.oscillation_step")]
+    PedagogyOscillationStep,
+
+    /// Pedagogy tension oscillation cycle completed
+    #[serde(rename = "pedagogy.oscillation_complete")]
+    PedagogyOscillationComplete,
+
+    /// Operator/Kurator certification that learning was verified (Layer 3)
+    #[serde(rename = "pedagogy.learning_certified")]
+    PedagogyLearningCertified,
+
+    /// Socratic handoff written to disk (Hybrid Modus C)
+    #[serde(rename = "pedagogy.handoff_written")]
+    PedagogyHandoffWritten,
+
+    /// Discovery session started
+    #[serde(rename = "discovery.session_started")]
+    DiscoverySessionStarted,
+
+    /// Discovery cycle triggered
+    #[serde(rename = "discovery.cycle_triggered")]
+    DiscoveryCycleTriggered,
 
     // --- Pi interactions ---
     /// Pi agent sent a memory chunk to GZMO inbox
@@ -202,6 +234,10 @@ pub enum EventType {
     /// Hourly system balance snapshot (E_total, ctx_%)
     #[serde(rename = "obolus.budget_tick")]
     ObolusBudgetTick,
+
+    /// Hourly hardware energy snapshot (CPU/GPU joules + token correlation)
+    #[serde(rename = "obolus.energy_tick")]
+    ObolusEnergyTick,
 }
 
 /// A single Synapse event frame — the unit of observability.

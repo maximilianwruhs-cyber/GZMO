@@ -101,6 +101,11 @@ pub enum ChaosEvent {
         energy_delta: f64,
         thought_seed: Option<ThoughtSeed>,
     },
+
+    /// Start or stop pedagogy chaos_val oscillation cycle.
+    PedagogyOscillate {
+        action: crate::pedagogy_oscillator::PedagogyOscillateAction,
+    },
 }
 
 /// A thought seed destined for the Thought Cabinet

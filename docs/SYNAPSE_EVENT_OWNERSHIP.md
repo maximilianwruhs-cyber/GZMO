@@ -23,7 +23,7 @@ both observe the same operation.
 | `session_end` | Pi | synapse-notifier | `targetSessionFile` for distill |
 | `quest_complete` | Pi | synapse-notifier | Per-turn audit |
 | `quest_fail` | Pi | synapse-notifier | Turn/tool failure |
-| `mentor_teach` | Pi | synapse-notifier | Socratic exchange |
+| `mentor_teach` | Pi | synapse-notifier | Socratic exchange; optional `confidence_score`, `novel_application` |
 | `mentor_learn_start` / `mentor_learn_end` | Pi | synapse-notifier | Learn mode |
 | `topic_shift_distill` | Pi | synapse-notifier | Mid-session distill trigger |
 | `skill.invoke` / `skill.complete` / `skill.error` | Pi | synapse-notifier | Chaos skill boundary |
@@ -43,16 +43,19 @@ both observe the same operation.
 | `chaos.rho_telemetry` | GZMO | chaos_bootstrap | PulseLoop snapshot |
 | `chaos.dice_loop` | GZMO | daemon_cmd | Würfel autopoietic roll |
 | `chaos.feedback_drained` | GZMO | chaos_bootstrap | Skill IPC batch |
+| `pedagogy.oscillation_start` / `_step` / `_complete` | GZMO | chaos_bootstrap | `correlation_id` = `oscillation_id` UUID |
+| `pedagogy.learning_certified` | GZMO | `gzmo pedagogy certify` | Layer 3 operator certification |
+| `pedagogy.handoff_written` | GZMO | `emit-pedagogy-handoff-to-synapse.sh` | Hybrid C handoff bridge |
 | `spawn.recommended` | GZMO | kurator_monitor | Read-only recommendation |
 | `spawn.denied` | GZMO | spawn_gate | Autospawn blocked (budget/cooldown/tier) |
 | `spawn.executed` | GZMO | spawn_gate | Sub-agent spawn audit (complements `agent.spawned`) |
 
 ## session_id convention
 
-- Generated as UUID v4 on `session_start`.
+- Generated as UUID v4 on `session_start`, **or** propagated from `GZMO_CORRELATION_ID` / `GZMO_OSCILLATION_ID` during F5 discovery spawns.
 - Copied into `data.session_id` on every Pi event in that session.
 - Becomes `correlation_id` on the envelope for Forum Romanum multi-agent flows
-  (Stage 3).
+  (Stage 3) and pedagogy oscillation cycles (`oscillation_id`).
 
 ## Backward compatibility
 

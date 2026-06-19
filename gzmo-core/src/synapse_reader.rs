@@ -341,6 +341,42 @@ pub fn default_distill_state_path(project_root: &Path) -> PathBuf {
     project_root.join(DISTILL_STATE_FILE)
 }
 
+/// Tail recent GZMO engine events (spark/distill) for correlation bridges.
+pub fn read_recent_engine_events(bus_path: &Path, max_events: usize) -> Result<Vec<SynapseEvent>> {
+    if !bus_path.exists() || max_events == 0 {
+        return Ok(Vec::new());
+    }
+    let raw = fs::read_to_string(bus_path)?;
+    let mut out = Vec::new();
+    for line in raw.lines().rev() {
+        if line.trim().is_empty() {
+            continue;
+        }
+        let event: SynapseEvent = match serde_json::from_str(line) {
+            Ok(e) => e,
+            Err(_) => continue,
+        };
+        if !matches!(
+            event.source,
+            EventSource::GzmoDaemon | EventSource::GzmoCli
+        ) {
+            continue;
+        }
+        if !matches!(
+            event.event_type,
+            EventType::SparkComplete | EventType::DistillComplete
+        ) {
+            continue;
+        }
+        out.push(event);
+        if out.len() >= max_events {
+            break;
+        }
+    }
+    out.reverse();
+    Ok(out)
+}
+
 fn load_distill_state(path: &Path) -> Result<PiDistillState> {
     if !path.exists() {
         return Ok(PiDistillState::default());

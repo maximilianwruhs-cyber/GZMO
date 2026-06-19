@@ -12,6 +12,11 @@ Prime paths, process labels, and ObolusGate tiers. Update when adding a new LLM 
 | Dice daemon loop | `dice_loop` | T2 | Yes |
 | Shell skill fallback | — | — | **Blocked** when `[obolus_governance] enabled` |
 | Pi via reconcile | `pi_agent` | — | Yes (`synapse_pi`) |
+| Reconcile energy sampler | `reconcile_sampler` | — | Yes (`power.jsonl`) |
+
+## Dual signal (tokens + joules)
+
+When `[obolus_analytics] energy_sampler_enabled = true`, the daemon reconcile loop appends hardware samples to `data/Obolus/power.jsonl` (CPU RAPL + GPU ∫P·dt). Gates still use **token** `E_total` only. See [OBOLUS_ENERGY.md](../OBOLUS_ENERGY.md).
 
 ## CallContextGuard
 

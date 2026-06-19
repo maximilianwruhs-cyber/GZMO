@@ -10,12 +10,13 @@ use gzmo_core::config::GzmoConfig;
 use gzmo_core::gateway::LlmGateway;
 use gzmo_core::gateway::GatewayRouter;
 use gzmo_core::config::TaskKind;
-use gzmo_core::synapse::set_event_source;
+use gzmo_core::synapse::{set_event_source, SynapseBus};
 use gzmo_core::identity::IdentityEngine;
 use gzmo_core::memory::episodic::FileEpisodicStore;
 use gzmo_core::memory::embeddings;
 use gzmo_core::session_distill::SessionDistillEngine;
-use gzmo_core::synapse::SynapseBus;
+use gzmo_core::memory::qdrant_sync;
+use gzmo_core::synapse_reader;
 use gzmo_core::tools::fs::{DirListTool, FileReadTool, FileSearchTool, FileWriteTool};
 use gzmo_core::tools::memory::{MemoryRecordTool, MemorySearchTool};
 use gzmo_core::tools::shell::ShellExecTool;
@@ -133,6 +134,14 @@ pub async fn run_pi(
     } else {
         engine.distill_pi_jsonl(pi_session_path).await?
     };
+    if !report.skipped {
+        let project_root = qdrant_sync::discover_project_root();
+        let distill_state = synapse_reader::default_distill_state_path(&project_root);
+        let path_key = pi_session_path.to_string_lossy().to_string();
+        if let Err(e) = synapse_reader::mark_pi_session_distilled(&path_key, &distill_state) {
+            tracing::warn!(error = %e, "Failed to mark Pi session distilled (dedup state)");
+        }
+    }
     println!("{}", report.summary);
     session.close().await;
     Ok(())

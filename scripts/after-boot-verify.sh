@@ -87,6 +87,24 @@ echo ""
 if [[ "${FAIL}" -eq 0 ]]; then
   echo "Boot check passed (${WARN} warning(s))."
   echo "Pi KB incremental sync: ${ROOT}/scripts/pi-kb-reindex.sh"
+  FUNC_HEALTH="${HOME}/gzmo_skills/scripts/functional-health-check.sh"
+  SEED_OPS="${ROOT}/scripts/seed-ops-graph.py"
+  NEO4J_PY="${NEO4J_PYTHON:-$HOME/Projects/mcp-neo4j-memory-gzmo/.venv/bin/python}"
+  if [[ -f "$SEED_OPS" ]] && [[ -x "$NEO4J_PY" ]]; then
+    echo ""
+    echo "=== Ops graph seed (non-blocking) ==="
+    set +e
+    NEO4J_PASSWORD="${NEO4J_PASSWORD:-Easycheesy0815!}" "$NEO4J_PY" "$SEED_OPS" --gzmo-root "$ROOT" \
+      || echo "  [WARN] seed-ops-graph failed (see above)"
+    set -e
+  fi
+  if [[ -x "$FUNC_HEALTH" ]]; then
+    echo ""
+    echo "=== Functional health (non-blocking) ==="
+    set +e
+    "$FUNC_HEALTH" || echo "  [WARN] functional-health-check failed (see above)"
+    set -e
+  fi
 else
   echo "${FAIL} check(s) failed, ${WARN} warning(s). See docs/REBOOT_STARTUP.md"
   exit 1

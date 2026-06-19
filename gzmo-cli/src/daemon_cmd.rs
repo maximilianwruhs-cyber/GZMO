@@ -1,6 +1,6 @@
 //! Daemon mode — heartbeat + dreams + orchestrator.
 
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
 use anyhow::Result;
@@ -256,6 +256,7 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
     ));
     let spark_engine_clone = Arc::clone(&spark_engine);
     let spark_config = config.spark.clone();
+    let spark_vault_refresh = (*dream_vault).clone();
     let spark_obolus_cfg = obolus_daemon_cfg.clone();
     let spark_synapse = Arc::clone(&synapse);
     let dreams_path_spark = config.skills.dreams_path.clone();
@@ -284,6 +285,23 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
     let dice_kurator_root = state_dir.clone();
     let dice_kurator_runner = kurator_runner.clone();
     let dice_subagent_enabled = config.subagent.enabled;
+    let gzmo_root_for_pedagogy = config
+        .memory
+        .vault_db
+        .parent()
+        .unwrap_or(std::path::Path::new("data"))
+        .parent()
+        .unwrap_or(std::path::Path::new("."))
+        .to_path_buf();
+    let pedagogy_bridge = crate::chaos_bootstrap::PedagogyBridgeConfig {
+        oscillation: config.pedagogy.tension_oscillation.to_chaos_settings(),
+        scripts_root: config.pedagogy.discovery_scripts_root.clone(),
+        gzmo_root: gzmo_root_for_pedagogy,
+        gzmo_config: Arc::new(config.clone()),
+        cycle_ctx: Arc::new(Mutex::new(
+            crate::chaos_bootstrap::PedagogyOscillationContext::default(),
+        )),
+    };
     let _chaos_bridge = crate::chaos_bootstrap::spawn_snapshot_bridge(
         chaos_pulse.snapshot_rx.clone(),
         gateway_rwlock,
@@ -293,7 +311,20 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
         Some(Arc::clone(&synapse)),
         gzmo_core::synapse::EventSource::GzmoDaemon,
         chaos_runtime.restore_policy.clone(),
+        Some(pedagogy_bridge),
     );
+    let pedagogy_cron_cfg = config.clone();
+    tokio::spawn(async move {
+        let mut interval = tokio::time::interval(Duration::from_secs(3600));
+        loop {
+            interval.tick().await;
+            let hour = chrono::Utc::now().hour();
+            if let Err(e) = crate::pedagogy_cron::maybe_queue_cron_start(&pedagogy_cron_cfg, hour)
+            {
+                tracing::warn!(error = %e, "pedagogy cron tick failed");
+            }
+        }
+    });
     info!("All subsystems online — entering daemon loop");
     let ccr = gzmo_core::context_compress::CcrStore::new(&config.redis, &config.context_compress);
     // Orchestrator (cron jobs) — spark is handled by SparkEngine, not headless prompt
@@ -613,6 +644,7 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
                         gzmo_core::obolus::ObolusAction::SparkTick,
                         &reason,
                     );
+                    spark_engine_clone.emit_obolus_budget_skip(today, &reason);
                     continue;
                 }
                 Err(e) => {
@@ -624,6 +656,18 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
             }
 
             info!(date = %today, mode = ?spark_config.schedule_mode, hour = slot_hour, minute = slot_minute, "Spark cycle starting");
+            match gzmo_core::spark_anchor_refresh::maybe_refresh_recent_pool(
+                &spark_vault_refresh,
+                &spark_config,
+            ) {
+                Ok(Some(touched)) => {
+                    info!(touched, "Pre-spark anchor refresh applied");
+                }
+                Ok(None) => {}
+                Err(e) => {
+                    tracing::warn!(error = %e, "Pre-spark anchor refresh failed (non-fatal)");
+                }
+            }
             match spark_engine_clone.run(today).await {
                 Ok(report) => {
                     if spark_config.schedule_mode == SparkScheduleMode::Cron {
@@ -748,6 +792,9 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
     let kurator_poll_cfg_move = kurator_poll_cfg.clone();
     let synapse_handle = tokio::spawn(async move {
         let mut interval = tokio::time::interval(Duration::from_secs(60));
+        let mut spark_distill_bridge = gzmo_core::spark_distill_bridge::SparkDistillBridge::new(
+            gzmo_core::spark_distill_bridge::SparkDistillBridgeConfig::default(),
+        );
         let bus_path = synapse_root.join(&synapse_cfg.bus_path);
         let state_path = gzmo_core::synapse_reader::default_state_path(&synapse_root);
         let distill_state_path =
@@ -768,6 +815,19 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
             .await
             {
                 Ok(result) => {
+                    let engine_events = gzmo_core::synapse_reader::read_recent_engine_events(
+                        &bus_path,
+                        100,
+                    )
+                    .unwrap_or_default();
+                    spark_distill_bridge.ingest_synapse_events(&engine_events);
+                    spark_distill_bridge.ingest_synapse_events(&result.events);
+                    let cache_path = synapse_root.join("data/spark-distill-bridge-cache.json");
+                    if let Err(e) = spark_distill_bridge.persist_cache(&cache_path) {
+                        tracing::warn!(error = %e, "spark-distill cache persist failed");
+                    }
+                    spark_distill_bridge.log_distill_correlations(&engine_events);
+                    spark_distill_bridge.log_distill_correlations(&result.events);
                     if result.summary.events_read > 0 {
                         info!(
                             events = result.summary.events_read,
@@ -777,11 +837,11 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
                         );
                     }
                     if kurator_cfg.enabled {
-                        let kurator_state =
+                        let kurator_state_path =
                             gzmo_core::kurator_monitor::default_state_path(&synapse_root);
                         match gzmo_core::kurator_monitor::process_pi_poll(
                             &kurator_synapse,
-                            &kurator_state,
+                            &kurator_state_path,
                             &kurator_cfg,
                             &result.events,
                             Some(&kurator_poll_cfg_move),
@@ -791,7 +851,7 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
                                     kurator_spawn::autospawn_new_recommendations(
                                         Arc::clone(runner),
                                         Arc::clone(&kurator_synapse),
-                                        kurator_state,
+                                        kurator_state_path.clone(),
                                         kurator_cfg.clone(),
                                         kurator_redis_cfg.clone(),
                                         kurator_poll_cfg_move.clone(),
@@ -801,6 +861,28 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
                                 }
                             }
                             Err(e) => error!(error = %e, "Kurator monitor failed"),
+                        }
+                        match gzmo_core::kurator_monitor::process_learning_verify_reports(
+                            &kurator_synapse,
+                            &kurator_state_path,
+                            &kurator_cfg,
+                            &synapse_root,
+                        ) {
+                            Ok(cert_recs) => {
+                                if let Some(runner) = kurator_runner_poll.as_ref() {
+                                    kurator_spawn::autospawn_new_recommendations(
+                                        Arc::clone(runner),
+                                        Arc::clone(&kurator_synapse),
+                                        kurator_state_path,
+                                        kurator_cfg.clone(),
+                                        kurator_redis_cfg.clone(),
+                                        kurator_poll_cfg_move.clone(),
+                                        subagent_enabled,
+                                        cert_recs,
+                                    );
+                                }
+                            }
+                            Err(e) => error!(error = %e, "Kurator learning-verify scan failed"),
                         }
                     }
                     if !synapse_cfg.distill_on_session_end {

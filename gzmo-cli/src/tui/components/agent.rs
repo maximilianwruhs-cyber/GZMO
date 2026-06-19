@@ -357,6 +357,7 @@ impl Component for AgentComponent {
                     write_phase_at: None,
                     write_phase_message: None,
                     require_file_write_before_done: false,
+                    require_file_write_prompt: None,
                 };
 
                 let _obolus_ctx = gzmo_core::obolus::CallContextGuard::new(

@@ -1,5 +1,5 @@
 [Unit]
-Description=GZMO Prime (HauhauCS Qwen3.6-35B uncensored IQ4_XS @ 256K on :8000)
+Description=GZMO Prime (Gemma 4 26B-A4B MoE QAT @ 256K on :8000)
 After=network-online.target
 Wants=network-online.target
 
@@ -8,7 +8,7 @@ Type=simple
 User=%i
 WorkingDirectory=%h/Projects/llama.cpp/prime-bench
 Environment=GGML_CUDA_DISABLE_GRAPHS=1
-ExecStart=%h/Projects/llama.cpp/prime-bench/start-prime-qwen-hauhaucs-iq4xs-256k.sh
+ExecStart=%h/Projects/llama.cpp/prime-bench/start-prime-gemma4-26b-a4b-256k.sh
 Restart=on-failure
 RestartSec=30
 # Prime load can take several minutes on dual 5070 Ti (256K + MTP assistant)

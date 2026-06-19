@@ -6,6 +6,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::config::GzmoConfig;
 use crate::obolus::ledger::{LedgerEntry, ObolusLedger};
+use crate::obolus::power_ledger::{rolling_power_rollups, PowerLedger, PowerRollup};
 use crate::synapse::{EventSource, EventType, SynapseBus, SynapseEvent};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -23,6 +24,7 @@ pub enum ObolusAction {
     DiceLoop,
     DreamTick,
     SparkTick,
+    DiscoveryPlan,
     OperatorChat,
 }
 
@@ -32,6 +34,7 @@ impl ObolusAction {
             Self::SpawnDiscoveryFix => "spawn_discovery_fix",
             Self::SpawnSessionTriage => "spawn_session_triage",
             Self::DiscoveryCycle => "discovery_cycle",
+            Self::DiscoveryPlan => "discovery_plan",
             Self::DiceLoop => "dice_loop",
             Self::DreamTick => "dream_tick",
             Self::SparkTick => "spark_tick",
@@ -42,7 +45,7 @@ impl ObolusAction {
     pub fn default_tier(self) -> ObolusTier {
         match self {
             Self::OperatorChat => ObolusTier::Operator,
-            Self::DiscoveryCycle => ObolusTier::SemiAutonomous,
+            Self::DiscoveryCycle | Self::DiscoveryPlan => ObolusTier::SemiAutonomous,
             Self::SpawnDiscoveryFix
             | Self::SpawnSessionTriage
             | Self::DiceLoop
@@ -70,6 +73,20 @@ pub struct SystemBalance {
     pub peak_call_ctx_pct: f64,
     pub window_hours: f64,
     pub entry_count: usize,
+    /// CPU joules from RAPL samples in the rolling window (observability only).
+    #[serde(default)]
+    pub joules_cpu_1h: f64,
+    #[serde(default)]
+    pub joules_wh_cpu_1h: f64,
+    #[serde(default)]
+    pub joules_gpu_est_1h: f64,
+    #[serde(default)]
+    pub joules_wh_total_est_1h: f64,
+    #[serde(default)]
+    pub power_sample_count: usize,
+    /// `e_total / joules_wh_total_est` when Wh > 0.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub tokens_per_wh: Option<f64>,
 }
 
 /// Aggregate ledger rows for the rolling window (default: 1h).
@@ -94,7 +111,32 @@ pub fn rolling_rollups(entries: &[LedgerEntry], prime_context_tokens: u64) -> Sy
         peak_call_ctx_pct: (peak_input as f64 / ctx_denom) * 100.0,
         window_hours: 1.0,
         entry_count: entries.len(),
+        joules_cpu_1h: 0.0,
+        joules_wh_cpu_1h: 0.0,
+        joules_gpu_est_1h: 0.0,
+        joules_wh_total_est_1h: 0.0,
+        power_sample_count: 0,
+        tokens_per_wh: None,
     }
+}
+
+fn merge_power_into_balance(mut balance: SystemBalance, power: &PowerRollup) -> SystemBalance {
+    balance.joules_cpu_1h = power.joules_cpu_1h;
+    balance.joules_wh_cpu_1h = power.joules_wh_cpu_1h;
+    balance.joules_gpu_est_1h = power.joules_gpu_est_1h;
+    balance.joules_wh_total_est_1h = power.joules_wh_total_est_1h;
+    balance.power_sample_count = power.power_sample_count;
+    if power.joules_wh_total_est_1h > 0.0 {
+        balance.tokens_per_wh =
+            Some(balance.e_total as f64 / power.joules_wh_total_est_1h);
+    }
+    balance
+}
+
+pub fn load_power_rollups_since(cfg: &GzmoConfig, since: DateTime<Utc>) -> Result<PowerRollup> {
+    let path = std::path::PathBuf::from(&cfg.obolus_analytics.power_ledger_path);
+    let entries = PowerLedger::read_since(since, &path)?;
+    Ok(rolling_power_rollups(&entries))
 }
 
 fn reserve_tokens_for_action(action: ObolusAction, cfg: &GzmoConfig) -> u64 {
@@ -167,10 +209,16 @@ pub fn evaluate_budget(
 pub fn load_balance_since(cfg: &GzmoConfig, since: DateTime<Utc>) -> Result<SystemBalance> {
     let path = std::path::PathBuf::from(&cfg.obolus_analytics.ledger_path);
     let entries = ObolusLedger::read_since(since, &path)?;
-    Ok(rolling_rollups(
+    let balance = rolling_rollups(
         &entries,
         cfg.obolus_analytics.prime_context_tokens,
-    ))
+    );
+    if cfg.obolus_analytics.energy_sampler_enabled {
+        let power = load_power_rollups_since(cfg, since)?;
+        Ok(merge_power_into_balance(balance, &power))
+    } else {
+        Ok(balance)
+    }
 }
 
 pub fn evaluate_from_config(
@@ -242,6 +290,22 @@ pub fn emit_budget_tick(bus: &SynapseBus, balance: &SystemBalance) {
         EventSource::GzmoDaemon,
         serde_json::json!({
             "balance": balance,
+        }),
+    ));
+}
+
+pub fn emit_energy_tick(bus: &SynapseBus, balance: &SystemBalance) {
+    let _ = bus.append(&SynapseEvent::with_data(
+        EventType::ObolusEnergyTick,
+        EventSource::GzmoDaemon,
+        serde_json::json!({
+            "joules_cpu_1h": balance.joules_cpu_1h,
+            "joules_wh_cpu_1h": balance.joules_wh_cpu_1h,
+            "joules_gpu_est_1h": balance.joules_gpu_est_1h,
+            "joules_wh_total_est_1h": balance.joules_wh_total_est_1h,
+            "e_total": balance.e_total,
+            "tokens_per_wh": balance.tokens_per_wh,
+            "power_sample_count": balance.power_sample_count,
         }),
     ));
 }
@@ -337,6 +401,12 @@ mod tests {
             peak_call_ctx_pct: 5.0,
             window_hours: 1.0,
             entry_count: 1,
+            joules_cpu_1h: 0.0,
+            joules_wh_cpu_1h: 0.0,
+            joules_gpu_est_1h: 0.0,
+            joules_wh_total_est_1h: 0.0,
+            power_sample_count: 0,
+            tokens_per_wh: None,
         };
         let v = evaluate_budget(
             &cfg,

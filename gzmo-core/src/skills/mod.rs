@@ -57,6 +57,9 @@ pub mod stabilize;
 pub mod ops;
 pub mod learn;
 pub mod discover;
+pub mod discovery_ops;
+pub mod implement;
+pub mod fixer;
 pub mod registry;
 pub mod dispatch;
 

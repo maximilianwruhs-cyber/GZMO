@@ -151,6 +151,12 @@ impl SparkEngine {
         ));
     }
 
+    /// Record a budget-gated spark skip on Synapse (obolus deny/defer) so denied/spark ratio is visible.
+    pub fn emit_obolus_budget_skip(&self, date: NaiveDate, reason: &str) {
+        let skip = format!("obolus: {reason}");
+        self.emit_spark_complete(date, false, 0, Some(&skip), None);
+    }
+
     /// Run one spark cycle for `date` (used in logs and DREAMS.md headings).
     pub async fn run(&self, date: NaiveDate) -> Result<SparkReport> {
         if !self.config.enabled {

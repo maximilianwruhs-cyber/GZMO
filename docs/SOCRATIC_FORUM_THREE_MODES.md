@@ -133,10 +133,21 @@ HANDOFF_PATH=~/gzmo_skills/data/research/handoffs/<id>-socratic_brief.json \
 ## Verifikation (Querschnitt)
 
 ```bash
+# F5 oscillation + correlation_id chain
+~/gzmo_skills/scripts/discovery-probes/probe-pedagogy-oscillation.sh
+
+# Layer-1 learning predicates (extern, Synapse-firewall-konform)
+~/gzmo_skills/scripts/verify-learning-after-oscillation.sh --oscillation-id <UUID>
+
+# Strict CLI wait (bus completeness)
+gzmo pedagogy oscillate start --wait --strict --json
+
 ~/gzmo_skills/scripts/test-three-modes-integration.sh
 cd ~/Projects/_foundation-audit/survey_GZMO
 ./scripts/pi/test_forum_romanum_schema.sh
 ```
+
+**Defaults:** Hybrid C-Full nutzt `FORUM_MODE=b-lite` bis B-Full stabil; Handoff v2 setzt `GZMO_HANDOFF_PATH` für Oscillation-Ingest.
 
 ## Erfolgskriterien
 

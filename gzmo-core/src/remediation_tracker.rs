@@ -339,10 +339,12 @@ pub fn next_open_finding(path: &Path, report_path: &Path) -> Option<ActionableFi
     })
 }
 
+/// When `finding_ids` is empty, all `in_flight` rows for the report are updated (fixer bulk mode).
 pub fn record_spawn_outcome(
     path: &Path,
     report_path: &Path,
     task_id: &str,
+    finding_ids: &[String],
     verification: &DiscoveryFixVerification,
     written_paths: &[String],
     max_retries: u32,
@@ -353,9 +355,13 @@ pub fn record_spawn_outcome(
     let mut changed = false;
 
     let verified_artifacts: Vec<String> = written_paths.to_vec();
+    let filter_ids = !finding_ids.is_empty();
 
     for f in &mut state.findings {
         if f.report_path != report_str || f.status != RemediationStatus::InFlight {
+            continue;
+        }
+        if filter_ids && !finding_ids.iter().any(|id| id == &f.finding_id) {
             continue;
         }
         changed = true;
@@ -453,6 +459,42 @@ pub fn emit_discovery_fix_failed(
     id
 }
 
+/// Revert a single `in_flight` row after spawn gateway failure (before verify).
+pub fn reset_in_flight_finding(
+    path: &Path,
+    report_path: &Path,
+    finding_id: &str,
+    kind: FindingKind,
+) -> anyhow::Result<()> {
+    let report_str = report_path.to_string_lossy();
+    let kind_str = kind.as_str();
+    let mut state = load(path);
+    let now = Utc::now();
+    let mut changed = false;
+    for f in &mut state.findings {
+        if f.report_path != report_str
+            || f.finding_id != finding_id
+            || f.kind != kind_str
+            || f.status != RemediationStatus::InFlight
+        {
+            continue;
+        }
+        f.spawn_attempts += 1;
+        f.status = if f.kind == "ACTION" {
+            RemediationStatus::Probed
+        } else {
+            RemediationStatus::Open
+        };
+        f.last_verify_notes = Some("spawn gateway error — reverted from in_flight".into());
+        f.updated_at = now;
+        changed = true;
+    }
+    if changed {
+        save(path, &state)?;
+    }
+    Ok(())
+}
+
 pub fn in_flight_finding_ids(path: &Path, report_path: &Path) -> Vec<String> {
     let report_str = report_path.to_string_lossy();
     load(path)
@@ -510,8 +552,16 @@ mod tests {
             hit_max_iterations: false,
             notes: "verified file_write: scripts/fix.sh".into(),
         };
-        record_spawn_outcome(&path, &report, "task-1", &verification, &["scripts/fix.sh".into()], 1)
-            .unwrap();
+        record_spawn_outcome(
+            &path,
+            &report,
+            "task-1",
+            &[],
+            &verification,
+            &["scripts/fix.sh".into()],
+            1,
+        )
+        .unwrap();
         let state = load(&path);
         assert_eq!(state.findings[0].status, RemediationStatus::Fixed);
         assert_eq!(state.summary().fixed, 1);
@@ -537,13 +587,65 @@ mod tests {
             hit_max_iterations: true,
             notes: "missing".into(),
         };
-        record_spawn_outcome(&path, &report, "t1", &fail, &[], 1).unwrap();
+        record_spawn_outcome(&path, &report, "t1", &[], &fail, &[], 1).unwrap();
         assert_eq!(load(&path).findings[0].status, RemediationStatus::Open);
         assert_eq!(load(&path).findings[0].spawn_attempts, 1);
 
         mark_finding_in_flight(&path, &report, "F1", FindingKind::Gap).unwrap();
-        record_spawn_outcome(&path, &report, "t2", &fail, &[], 1).unwrap();
+        record_spawn_outcome(&path, &report, "t2", &[], &fail, &[], 1).unwrap();
         assert_eq!(load(&path).findings[0].status, RemediationStatus::Failed);
+        cleanup(&dir);
+    }
+
+    #[test]
+    fn record_spawn_outcome_scoped_to_finding_ids() {
+        let (path, report) = temp_tracker("scoped");
+        let dir = path.parent().unwrap().to_path_buf();
+        register_findings_from_report(
+            &path,
+            &report,
+            "s",
+            &[
+                ActionableFinding {
+                    finding_id: "F1".into(),
+                    title: "A".into(),
+                    kind: FindingKind::Action,
+                    excerpt: "a".into(),
+                },
+                ActionableFinding {
+                    finding_id: "F2".into(),
+                    title: "B".into(),
+                    kind: FindingKind::Action,
+                    excerpt: "b".into(),
+                },
+            ],
+        )
+        .unwrap();
+        mark_finding_in_flight(&path, &report, "F1", FindingKind::Action).unwrap();
+        mark_finding_in_flight(&path, &report, "F2", FindingKind::Action).unwrap();
+
+        let verification = DiscoveryFixVerification {
+            passed: true,
+            missing_paths: vec![],
+            hit_max_iterations: false,
+            notes: "ok".into(),
+        };
+        record_spawn_outcome(
+            &path,
+            &report,
+            "task-1",
+            &["F1".into()],
+            &verification,
+            &["scripts/a.sh".into()],
+            1,
+        )
+        .unwrap();
+
+        let state = load(&path);
+        let f1 = state.findings.iter().find(|f| f.finding_id == "F1").unwrap();
+        let f2 = state.findings.iter().find(|f| f.finding_id == "F2").unwrap();
+        assert_eq!(f1.status, RemediationStatus::Fixed);
+        assert_eq!(f2.status, RemediationStatus::InFlight);
         cleanup(&dir);
     }
 

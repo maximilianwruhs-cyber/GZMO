@@ -45,6 +45,16 @@ Canonical operator and architecture docs. Session reports and milestone logs bel
 | [REBOOT_STARTUP.md](REBOOT_STARTUP.md) | Cold-start after reboot |
 | [EVAL_TIERS.md](EVAL_TIERS.md) | Eval tier definitions |
 
+## Pedagogy & discovery
+
+| Doc | Purpose |
+|-----|---------|
+| [DISCOVERY_KB_FEEDBACK_LOOP.md](DISCOVERY_KB_FEEDBACK_LOOP.md) | **Canonical** — discovery cycles ↔ KB read/write/recall + daemon orchestrator |
+| [SOCRATIC_FORUM_THREE_MODES.md](SOCRATIC_FORUM_THREE_MODES.md) | Socratic / Forum / Hybrid modes |
+| [PI_GZMO_SOCRATIC_KNOWLEDGE_DIALOGUE.md](PI_GZMO_SOCRATIC_KNOWLEDGE_DIALOGUE.md) | Emergent mutual-discovery sessions |
+| [WORKSTREAM_C_CONTINUATION.md](WORKSTREAM_C_CONTINUATION.md) | Low-tension discovery handoff |
+| [SYNAPSE_EVENT_OWNERSHIP.md](SYNAPSE_EVENT_OWNERSHIP.md) | Pi vs daemon Synapse writers |
+
 ## Research (non-canonical)
 
 Ad-hoc research notes live in `docs/research/` and may be archived over time.

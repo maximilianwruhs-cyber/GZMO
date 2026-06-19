@@ -2023,6 +2023,132 @@ fn maybe_upsert_evidence(
         self.query_semantic_facts(&mut stmt, param_refs.as_slice())
     }
 
+    /// Count of curated facts in the spark recent window (honeypot when M3 populated).
+    pub fn spark_recent_pool_count(
+        &self,
+        decay_classes: &[String],
+        max_age_hours: u32,
+    ) -> Result<usize> {
+        if decay_classes.is_empty() {
+            return Ok(0);
+        }
+        let conn = self.pool.get()?;
+        let use_hp = Self::cognition_from_honeypot(&conn)?;
+        if !use_hp {
+            let placeholders = decay_classes
+                .iter()
+                .map(|_| "?")
+                .collect::<Vec<_>>()
+                .join(", ");
+            let sql = format!(
+                "SELECT COUNT(*) FROM semantic_vault
+                 WHERE decay_class IN ({placeholders})
+                   AND created_at >= datetime('now', ?)"
+            );
+            let mut params: Vec<Box<dyn rusqlite::types::ToSql>> = decay_classes
+                .iter()
+                .map(|c| Box::new(c.clone()) as Box<dyn rusqlite::types::ToSql>)
+                .collect();
+            params.push(Box::new(format!("-{} hours", max_age_hours)));
+            let param_refs: Vec<&dyn rusqlite::types::ToSql> =
+                params.iter().map(|p| p.as_ref()).collect();
+            let mut stmt = conn.prepare(&sql)?;
+            let count: i64 = stmt.query_row(param_refs.as_slice(), |row| row.get(0))?;
+            return Ok(count as usize);
+        }
+        let placeholders = decay_classes
+            .iter()
+            .map(|_| "?")
+            .collect::<Vec<_>>()
+            .join(", ");
+        let sql = format!(
+            "SELECT COUNT(*) FROM honeypot
+             WHERE decay_class IN ({placeholders})
+               AND is_latest = 1
+               AND datetime(promoted_at) >= datetime('now', ?)"
+        );
+        let mut params: Vec<Box<dyn rusqlite::types::ToSql>> = decay_classes
+            .iter()
+            .map(|c| Box::new(c.clone()) as Box<dyn rusqlite::types::ToSql>)
+            .collect();
+        params.push(Box::new(format!("-{} hours", max_age_hours)));
+        let param_refs: Vec<&dyn rusqlite::types::ToSql> =
+            params.iter().map(|p| p.as_ref()).collect();
+        let mut stmt = conn.prepare(&sql)?;
+        let count: i64 = stmt.query_row(param_refs.as_slice(), |row| row.get(0))?;
+        Ok(count as usize)
+    }
+
+    /// Bump `promoted_at` on a diverse sample so spark recent pool stays viable when ingest dedup blocks re-ingest.
+    pub fn refresh_spark_recent_promoted_at(&self, touch_count: usize) -> Result<usize> {
+        if touch_count == 0 {
+            return Ok(0);
+        }
+        let conn = self.pool.get()?;
+        if !Self::cognition_from_honeypot(&conn)? {
+            return Ok(0);
+        }
+        let session_n = (touch_count / 2).max(2).min(touch_count);
+        let mut ids: Vec<String> = conn
+            .prepare(
+                "SELECT id FROM honeypot WHERE is_latest = 1 AND decay_class = 'SessionDistill'
+                 ORDER BY datetime(promoted_at) DESC LIMIT ?1",
+            )?
+            .query_map([session_n as i64], |row| row.get(0))?
+            .filter_map(Result::ok)
+            .collect();
+        let need = touch_count.saturating_sub(ids.len());
+        if need > 0 {
+            let curated_sql = if ids.is_empty() {
+                "SELECT id FROM honeypot WHERE is_latest = 1 AND decay_class = 'CuratedVault'
+                 AND embedding IS NOT NULL ORDER BY RANDOM() LIMIT ?1"
+                    .to_string()
+            } else {
+                let ph = ids.iter().map(|_| "?").collect::<Vec<_>>().join(", ");
+                format!(
+                    "SELECT id FROM honeypot WHERE is_latest = 1 AND decay_class = 'CuratedVault'
+                     AND embedding IS NOT NULL AND id NOT IN ({ph})
+                     ORDER BY RANDOM() LIMIT ?"
+                )
+            };
+            let mut stmt = conn.prepare(&curated_sql)?;
+            let curated: Vec<String> = if ids.is_empty() {
+                stmt.query_map([need as i64], |row| row.get(0))?
+                    .filter_map(Result::ok)
+                    .collect()
+            } else {
+                let mut params: Vec<Box<dyn rusqlite::types::ToSql>> = ids
+                    .iter()
+                    .map(|id| Box::new(id.clone()) as Box<dyn rusqlite::types::ToSql>)
+                    .collect();
+                params.push(Box::new(need as i64));
+                let param_refs: Vec<&dyn rusqlite::types::ToSql> =
+                    params.iter().map(|p| p.as_ref()).collect();
+                stmt.query_map(param_refs.as_slice(), |row| row.get(0))?
+                    .filter_map(Result::ok)
+                    .collect()
+            };
+            ids.extend(curated);
+        }
+        if ids.is_empty() {
+            return Ok(0);
+        }
+        let now = Utc::now().to_rfc3339();
+        let ph = ids.iter().map(|_| "?").collect::<Vec<_>>().join(", ");
+        let sql = format!(
+            "UPDATE honeypot SET promoted_at = ?1, last_recalled_at = ?1 WHERE id IN ({ph})"
+        );
+        let mut params: Vec<Box<dyn rusqlite::types::ToSql>> =
+            vec![Box::new(now) as Box<dyn rusqlite::types::ToSql>];
+        for id in &ids {
+            params.push(Box::new(id.clone()));
+        }
+        let param_refs: Vec<&dyn rusqlite::types::ToSql> =
+            params.iter().map(|p| p.as_ref()).collect();
+        conn.execute(&sql, param_refs.as_slice())?;
+        Ok(ids.len())
+    }
+
     /// Stale curated facts for spark anchors (honeypot when M3 populated).
     pub fn spark_anchor_pool(
         &self,

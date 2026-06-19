@@ -135,6 +135,7 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
         None,
         gzmo_core::synapse::EventSource::GzmoCli,
         chaos_runtime.restore_policy.clone(),
+        None,
     );
 
     let ccr = gzmo_core::context_compress::CcrStore::new(&config.redis, &config.context_compress);

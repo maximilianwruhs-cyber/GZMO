@@ -783,6 +783,132 @@ pub struct PedagogyConfig {
     /// Path to `gzmo_skills` (pi-mentor-discovery scripts).
     #[serde(default = "default_discovery_scripts_root")]
     pub discovery_scripts_root: String,
+
+    /// Structured chaos_val oscillation for discovery sprints (0.9→0.5→0.9).
+    #[serde(default)]
+    pub tension_oscillation: TensionOscillationConfig,
+}
+
+/// One phase in a pedagogy tension oscillation cycle.
+#[derive(Debug, Deserialize, Clone, Serialize)]
+pub struct TensionOscillationStepConfig {
+    pub target: f64,
+    pub duration_secs: u32,
+    #[serde(default)]
+    pub label: String,
+}
+
+/// Pedagogy chaos_val setpoint controller (PulseLoop integration).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Default)]
+#[serde(rename_all = "lowercase")]
+pub enum TensionOscillationScheduleMode {
+    /// CLI / inbox trigger only (v1 default).
+    #[default]
+    Manual,
+    /// Reserved: daemon cron (not wired in v1).
+    Cron,
+}
+
+/// Pedagogy chaos_val setpoint controller (PulseLoop integration).
+#[derive(Debug, Deserialize, Clone)]
+pub struct TensionOscillationConfig {
+    #[serde(default)]
+    pub enabled: bool,
+
+    #[serde(default)]
+    pub schedule_mode: TensionOscillationScheduleMode,
+
+    /// Reserved for future daemon cron when `schedule_mode = "cron"`.
+    #[serde(default)]
+    pub cron_hours: Vec<u32>,
+
+    #[serde(default = "default_tension_oscillation_spawn_discovery")]
+    pub spawn_discovery_on_low: bool,
+
+    #[serde(default = "default_tension_oscillation_low_threshold")]
+    pub low_phase_threshold: f64,
+
+    #[serde(default = "default_tension_oscillation_cooldown_secs")]
+    pub cooldown_secs: u64,
+
+    #[serde(default = "default_tension_oscillation_blend_ticks")]
+    pub blend_ticks: u64,
+
+    #[serde(default = "default_tension_oscillation_sequence")]
+    pub sequence: Vec<TensionOscillationStepConfig>,
+}
+
+fn default_tension_oscillation_spawn_discovery() -> bool {
+    true
+}
+
+fn default_tension_oscillation_low_threshold() -> f64 {
+    0.55
+}
+
+fn default_tension_oscillation_cooldown_secs() -> u64 {
+    3600
+}
+
+fn default_tension_oscillation_blend_ticks() -> u64 {
+    8
+}
+
+fn default_tension_oscillation_sequence() -> Vec<TensionOscillationStepConfig> {
+    vec![
+        TensionOscillationStepConfig {
+            target: 0.9,
+            duration_secs: 60,
+            label: "High tension — confirmation machine".to_string(),
+        },
+        TensionOscillationStepConfig {
+            target: 0.5,
+            duration_secs: 60,
+            label: "Low tension — discovery machine".to_string(),
+        },
+        TensionOscillationStepConfig {
+            target: 0.9,
+            duration_secs: 60,
+            label: "High tension — confirmation machine".to_string(),
+        },
+    ]
+}
+
+impl Default for TensionOscillationConfig {
+    fn default() -> Self {
+        Self {
+            enabled: false,
+            schedule_mode: TensionOscillationScheduleMode::default(),
+            cron_hours: Vec::new(),
+            spawn_discovery_on_low: default_tension_oscillation_spawn_discovery(),
+            low_phase_threshold: default_tension_oscillation_low_threshold(),
+            cooldown_secs: default_tension_oscillation_cooldown_secs(),
+            blend_ticks: default_tension_oscillation_blend_ticks(),
+            sequence: default_tension_oscillation_sequence(),
+        }
+    }
+}
+
+impl TensionOscillationConfig {
+    /// Convert to gzmo-chaos PulseLoop settings.
+    pub fn to_chaos_settings(&self) -> gzmo_chaos::pedagogy_oscillator::PedagogyOscillationSettings {
+        gzmo_chaos::pedagogy_oscillator::PedagogyOscillationSettings {
+            enabled: self.enabled,
+            spawn_discovery_on_low: self.spawn_discovery_on_low,
+            low_phase_threshold: self.low_phase_threshold,
+            cooldown_secs: self.cooldown_secs,
+            blend_ticks: self.blend_ticks,
+            sequence: self
+                .sequence
+                .iter()
+                .map(|s| gzmo_chaos::pedagogy_oscillator::OscillationStep {
+                    target: s.target,
+                    duration_secs: s.duration_secs,
+                    label: s.label.clone(),
+                })
+                .collect(),
+        }
+    }
 }
 
 /// Daemon-initiated mentor turn when chaos tension is very low.
@@ -937,6 +1063,7 @@ impl Default for PedagogyConfig {
             sandbox: SandboxConfig::default(),
             low_tension_dialogue: LowTensionDialogueConfig::default(),
             discovery_scripts_root: default_discovery_scripts_root(),
+            tension_oscillation: TensionOscillationConfig::default(),
         }
     }
 }
@@ -1233,6 +1360,14 @@ pub struct SparkConfig {
     /// Session anchors older than this many days are skipped (parsed from `[Session YYYY-MM-DD …]`).
     #[serde(default = "default_spark_max_session_anchor_age_days")]
     pub max_session_anchor_age_days: u32,
+
+    /// Before each daemon spark run, refresh honeypot `promoted_at` when recent pool is thin.
+    #[serde(default = "default_spark_anchor_refresh_enabled")]
+    pub anchor_refresh_enabled: bool,
+
+    /// Minimum recent-pool facts required; refresh runs when count is below this.
+    #[serde(default = "default_spark_anchor_refresh_min_recent")]
+    pub anchor_refresh_min_recent: usize,
 }
 
 fn default_spark_anchor_decay_classes() -> Vec<String> {
@@ -1298,6 +1433,14 @@ fn default_spark_min_citation_chars() -> usize {
     12
 }
 
+fn default_spark_anchor_refresh_enabled() -> bool {
+    true
+}
+
+fn default_spark_anchor_refresh_min_recent() -> usize {
+    4
+}
+
 impl Default for SparkConfig {
     fn default() -> Self {
         Self {
@@ -1328,6 +1471,8 @@ impl Default for SparkConfig {
             min_anchor_recent_similarity: default_spark_min_anchor_recent_similarity(),
             recent_dedupe_similarity: default_spark_recent_dedupe_similarity(),
             max_session_anchor_age_days: default_spark_max_session_anchor_age_days(),
+            anchor_refresh_enabled: default_spark_anchor_refresh_enabled(),
+            anchor_refresh_min_recent: default_spark_anchor_refresh_min_recent(),
         }
     }
 }
@@ -1676,6 +1821,19 @@ pub struct KuratorConfig {
     #[serde(default = "default_discovery_code_implementer_max_retries")]
     pub discovery_code_implementer_max_retries: u32,
 
+    /// Spawn plan agent to write Forum-2 plan dossier before fixer execute.
+    #[serde(default = "default_discovery_plan_agent_enabled")]
+    pub discovery_plan_agent_enabled: bool,
+
+    #[serde(default = "default_discovery_plan_agent_profile")]
+    pub discovery_plan_agent_profile: String,
+
+    #[serde(default = "default_discovery_plan_max_iterations")]
+    pub discovery_plan_max_iterations: usize,
+
+    #[serde(default = "default_discovery_plan_max_retries")]
+    pub discovery_plan_max_retries: u32,
+
     /// Minimum actionable items (FAIL + GAP + ACTION) before emitting a fixer spawn.
     #[serde(default = "default_discovery_fixer_min_findings")]
     pub discovery_fixer_min_findings: u32,
@@ -1847,6 +2005,22 @@ fn default_discovery_code_implementer_max_retries() -> u32 {
     2
 }
 
+fn default_discovery_plan_agent_enabled() -> bool {
+    true
+}
+
+fn default_discovery_plan_agent_profile() -> String {
+    "epimetheus".to_string()
+}
+
+fn default_discovery_plan_max_iterations() -> usize {
+    50
+}
+
+fn default_discovery_plan_max_retries() -> u32 {
+    1
+}
+
 fn default_kurator_fixer_profile() -> String {
     "epimetheus".to_string()
 }
@@ -1885,6 +2059,10 @@ impl Default for KuratorConfig {
             code_implementer_agent_profile: default_code_implementer_agent_profile(),
             discovery_code_implementer_max_iterations: default_discovery_code_implementer_max_iterations(),
             discovery_code_implementer_max_retries: default_discovery_code_implementer_max_retries(),
+            discovery_plan_agent_enabled: default_discovery_plan_agent_enabled(),
+            discovery_plan_agent_profile: default_discovery_plan_agent_profile(),
+            discovery_plan_max_iterations: default_discovery_plan_max_iterations(),
+            discovery_plan_max_retries: default_discovery_plan_max_retries(),
             discovery_fixer_min_findings: default_discovery_fixer_min_findings(),
             discovery_fixer_max_iterations: default_discovery_fixer_max_iterations(),
             discovery_fixer_max_retries: default_discovery_fixer_max_retries(),
@@ -2102,6 +2280,28 @@ pub struct ObolusAnalyticsConfig {
     /// Emit `obolus.efficiency_tick` on reconcile when an hour bucket changes.
     #[serde(default)]
     pub efficiency_tick_enabled: bool,
+
+    /// Sample CPU RAPL + GPU power into `power_ledger_path` on reconcile ticks.
+    #[serde(default)]
+    pub energy_sampler_enabled: bool,
+
+    #[serde(default = "default_obolus_power_ledger_path")]
+    pub power_ledger_path: String,
+
+    #[serde(default = "default_obolus_rapl_energy_path")]
+    pub rapl_energy_path: String,
+
+    #[serde(default = "default_obolus_energy_sample_min_interval_secs")]
+    pub energy_sample_min_interval_secs: u64,
+
+    #[serde(default = "default_obolus_hsp_state_url")]
+    pub hsp_state_url: String,
+
+    #[serde(default = "default_obolus_nvidia_smi_fallback")]
+    pub nvidia_smi_fallback: bool,
+
+    #[serde(default = "default_obolus_gpu_joules_integration")]
+    pub gpu_joules_integration: bool,
 }
 
 fn default_obolus_analytics_enabled() -> bool {
@@ -2140,6 +2340,30 @@ fn default_obolus_writer_flush_ms() -> u64 {
     200
 }
 
+fn default_obolus_power_ledger_path() -> String {
+    "data/Obolus/power.jsonl".to_string()
+}
+
+fn default_obolus_rapl_energy_path() -> String {
+    "/sys/class/powercap/intel-rapl:0/energy_uj".to_string()
+}
+
+fn default_obolus_energy_sample_min_interval_secs() -> u64 {
+    55
+}
+
+fn default_obolus_hsp_state_url() -> String {
+    "http://127.0.0.1:8001/state".to_string()
+}
+
+fn default_obolus_nvidia_smi_fallback() -> bool {
+    true
+}
+
+fn default_obolus_gpu_joules_integration() -> bool {
+    true
+}
+
 impl Default for ObolusAnalyticsConfig {
     fn default() -> Self {
         Self {
@@ -2154,6 +2378,13 @@ impl Default for ObolusAnalyticsConfig {
             writer_batch_size: default_obolus_writer_batch_size(),
             writer_flush_ms: default_obolus_writer_flush_ms(),
             efficiency_tick_enabled: false,
+            energy_sampler_enabled: false,
+            power_ledger_path: default_obolus_power_ledger_path(),
+            rapl_energy_path: default_obolus_rapl_energy_path(),
+            energy_sample_min_interval_secs: default_obolus_energy_sample_min_interval_secs(),
+            hsp_state_url: default_obolus_hsp_state_url(),
+            nvidia_smi_fallback: default_obolus_nvidia_smi_fallback(),
+            gpu_joules_integration: default_obolus_gpu_joules_integration(),
         }
     }
 }

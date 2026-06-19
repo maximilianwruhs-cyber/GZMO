@@ -86,7 +86,7 @@ fn build_code_implementer_brief_for_findings(
     discovery_session_id: &str,
     manifest_path: &Path,
     findings: &[ActionableFinding],
-    retry_mode: bool,
+    single_finding_mode: bool,
     max_chars: usize,
 ) -> String {
     let probe_dir = resolve_probe_results_dir();
@@ -94,9 +94,9 @@ fn build_code_implementer_brief_for_findings(
         "gzmo_skills/scripts/discovery-remediations/{discovery_session_id}"
     );
 
-    let intro = if retry_mode {
+    let intro = if single_finding_mode {
         format!(
-            "Discovery code implementer RETRY for session `{discovery_session_id}` — one finding, one code patch."
+            "Discovery code implementer for session `{discovery_session_id}` — ONE finding, ONE code patch."
         )
     } else {
         format!(
@@ -106,34 +106,35 @@ fn build_code_implementer_brief_for_findings(
 
     let mut lines = vec![
         intro,
-        format!("Report: {}", report_path.display()),
-        format!("Probe manifest: {}", manifest_path.display()),
-        format!("Probe results dir: {}", probe_dir.display()),
+        format!("Report path (file_read): {}", report_path.display()),
+        format!("Probe manifest (file_read): {}", manifest_path.display()),
+        format!("Probe results dir (file_read): {}", probe_dir.display()),
         format!(
             "Write session remediations under: {remediation_dir}/ (create dir via file_write)"
         ),
         String::new(),
-        "Context: deterministic probes already ran. JSON probe outputs contain measured facts.".to_string(),
+        "Context: deterministic probes already ran. Use file_read on probe JSON — do not assume report text in this brief.".to_string(),
         String::new(),
-        "Findings to implement in code/config:".to_string(),
+        "Finding to implement:".to_string(),
     ];
 
     for f in findings {
+        let excerpt = crate::text_util::truncate_chars(&f.excerpt, 500);
         lines.push(format!(
             "- {} {} — {}: {}",
             f.kind.as_str(),
             f.finding_id,
             f.title,
-            f.excerpt
+            excerpt
         ));
     }
 
     lines.push(String::new());
     lines.push("Task:".to_string());
-    lines.push("1. Read the probe manifest and matching probe-*.json files for this session.".to_string());
-    if retry_mode {
+    lines.push("1. file_read the probe manifest and the probe-*.json for this finding's session.".to_string());
+    if single_finding_mode {
         lines.push(
-            "2. Focus ONLY on the single finding above — one concrete code/config change with file_write.".to_string(),
+            "2. file_read the report section for this finding_id only — implement one concrete code/config change.".to_string(),
         );
     } else {
         lines.push(
@@ -164,7 +165,41 @@ fn build_code_implementer_brief_for_findings(
 }
 
 pub fn is_discovery_agent_brief(brief: &str) -> bool {
-    brief.contains("Discovery fixer") || brief.contains("Discovery code implementer")
+    brief.contains("Discovery fixer")
+        || brief.contains("Discovery code implementer")
+        || crate::discovery_plan_agent::is_discovery_agent_brief(brief)
+}
+
+/// Write-phase tuning for discovery sub-agents (plan, fixer, code implementer).
+pub struct DiscoveryAgentWriteConfig {
+    pub write_phase_at: usize,
+    pub write_phase_message: String,
+    pub require_file_write_prompt: String,
+}
+
+pub fn discovery_agent_write_config(brief: &str, max_iterations: usize) -> Option<DiscoveryAgentWriteConfig> {
+    if !is_discovery_agent_brief(brief) {
+        return None;
+    }
+    if crate::discovery_plan_agent::is_discovery_agent_brief(brief) {
+        let write_phase_at = 8.min(max_iterations.saturating_sub(3));
+        return Some(DiscoveryAgentWriteConfig {
+            write_phase_at,
+            write_phase_message: crate::discovery_plan_agent::plan_agent_write_phase_message(),
+            require_file_write_prompt: crate::discovery_plan_agent::plan_agent_require_file_write_prompt(brief),
+        });
+    }
+    let write_phase_at = max_iterations.saturating_sub(10).max(5);
+    let fixer_msg = "WRITE PHASE — stop exploration now. \
+Use file_write to create or patch remediation scripts/config under gzmo_skills/ or the GZMO repo. \
+Run at most one short shell_exec to verify. Do not finish until file_write succeeded for at least one fix. \
+Do not prefix shell_exec commands with # comment lines. \
+Never output tool-call XML or pseudo file_write blocks — call the file_write tool.";
+    Some(DiscoveryAgentWriteConfig {
+        write_phase_at,
+        write_phase_message: fixer_msg.to_string(),
+        require_file_write_prompt: "STOP — you have not called file_write yet. Use file_write now to create at least one remediation script or config under gzmo_skills/scripts/ (or patch an existing file). Do not reply with text only or tool-call markup.".to_string(),
+    })
 }
 
 /// Extend remediation artifact detection for code-implementer writes.

@@ -128,6 +128,27 @@ else
   fail "12 cannot run obolus status (no binary)"
 fi
 
+ENERGY_EN="$(toml_get obolus_analytics.energy_sampler_enabled)"
+if [[ "$ENERGY_EN" == "True" || "$ENERGY_EN" == "true" ]]; then
+  POWER="$(toml_get obolus_analytics.power_ledger_path)"
+  POWER_PATH="${ROOT}/${POWER:-data/Obolus/power.jsonl}"
+  mkdir -p "$(dirname "$POWER_PATH")"
+  touch "$POWER_PATH"
+  if [[ -w "$POWER_PATH" ]]; then
+    pass "13 power ledger writable: $POWER_PATH"
+  else
+    fail "13 power ledger not writable: $POWER_PATH"
+  fi
+  if [[ -x "$BIN" ]] && "$BIN" obolus balance --json >/dev/null 2>&1; then
+    pass "14 obolus balance --json (energy fields)"
+  else
+    fail "14 gzmo obolus balance --json failed"
+  fi
+else
+  pass "13 energy_sampler disabled (optional)"
+  pass "14 energy balance skipped (sampler off)"
+fi
+
 echo
 if (( FAIL > 0 )); then
   echo "SOVEREIGNTY VERIFY: FAIL ($FAIL checks)"

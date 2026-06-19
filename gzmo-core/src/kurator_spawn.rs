@@ -76,6 +76,18 @@ pub fn spec_from_recommendation(
     rec: &PendingRecommendation,
     config: &KuratorConfig,
 ) -> SubagentSpec {
+    if crate::discovery_execute::is_discovery_execute_recommendation(rec) {
+        let plan_dir = rec
+            .report_path
+            .as_deref()
+            .map(PathBuf::from)
+            .unwrap_or_else(|| PathBuf::from("."));
+        return build_discovery_execute_spec(rec, config, &plan_dir);
+    }
+    if crate::discovery_plan_agent::is_discovery_plan_recommendation(rec) {
+        let report_path = crate::discovery_fixer::resolve_discovery_report_path(rec, None);
+        return build_discovery_plan_spec(rec, config, &report_path, None);
+    }
     if crate::discovery_code_implementer::is_discovery_code_implement_recommendation(rec) {
         let report_path = crate::discovery_fixer::resolve_discovery_report_path(rec, None);
         return build_code_implement_spec(rec, config, &report_path, None);
@@ -201,7 +213,41 @@ fn build_code_implement_spec(
     }
 }
 
-async fn spawn_discovery_code_implement_with_retries(
+fn build_discovery_execute_spec(
+    rec: &PendingRecommendation,
+    config: &KuratorConfig,
+    plan_dir: &Path,
+) -> SubagentSpec {
+    let workstream_id = rec
+        .reason
+        .strip_prefix("discovery_execute: workstream ")
+        .unwrap_or("W1");
+    let plan_id = plan_dir
+        .file_name()
+        .and_then(|s| s.to_str())
+        .unwrap_or("plan");
+    let git_tag = format!("discovery-baseline/{plan_id}");
+    let workstream =
+        crate::discovery_execute::load_workstream(plan_dir, workstream_id).unwrap_or(serde_json::json!({}));
+    let brief = crate::discovery_execute::build_execute_brief(
+        plan_dir,
+        workstream_id,
+        &workstream,
+        &git_tag,
+        config.spawn_brief_max_chars,
+    );
+    SubagentSpec {
+        role: rec.suggested_agent_profile.clone(),
+        brief,
+        max_iterations: config.discovery_code_implementer_max_iterations,
+        depth: 1,
+        parent_session: rec.session_id.clone(),
+        working_dir: Some(crate::discovery_fixer::discovery_fixer_working_dir()),
+        shell_extra_commands: config.discovery_fixer_shell_extra_commands.clone(),
+    }
+}
+
+async fn spawn_discovery_execute(
     runner: &SubagentRunner,
     bus: &SynapseBus,
     rec: &PendingRecommendation,
@@ -209,8 +255,11 @@ async fn spawn_discovery_code_implement_with_retries(
     project_root: &Path,
     initial_spec: SubagentSpec,
 ) -> Result<SubagentResult> {
-    let tracker_path = crate::remediation_tracker::default_tracker_path();
-    let report_path = crate::discovery_fixer::resolve_discovery_report_path(rec, None);
+    let plan_dir = rec
+        .report_path
+        .as_deref()
+        .map(Path::new)
+        .unwrap_or_else(|| Path::new("."));
     let roots = crate::discovery_fixer::discovery_fixer_search_roots(project_root);
     let max_retries = config.discovery_code_implementer_max_retries;
 
@@ -218,24 +267,237 @@ async fn spawn_discovery_code_implement_with_retries(
     let mut last_result: Option<SubagentResult> = None;
 
     for attempt in 0..=max_retries {
-        if attempt == 0 {
-            let _ = crate::remediation_tracker::mark_all_probed_in_flight(&tracker_path, &report_path);
-        } else {
-            let Some(finding) =
-                crate::remediation_tracker::next_probed_finding(&tracker_path, &report_path)
-            else {
-                break;
-            };
-            let _ = crate::remediation_tracker::mark_finding_in_flight(
-                &tracker_path,
-                &report_path,
-                &finding.finding_id,
-                finding.kind,
-            );
-            spec = build_code_implement_spec(rec, config, &report_path, Some(&finding));
+        if attempt > 0 {
+            spec = build_discovery_execute_spec(rec, config, plan_dir);
         }
 
-        let mut result = runner.spawn(spec.clone()).await?;
+        let mut result = match runner.spawn(spec.clone()).await {
+            Ok(r) => r,
+            Err(e) => {
+                tracing::warn!(attempt, error = %e, "Discovery execute spawn failed");
+                if attempt >= max_retries {
+                    return Err(e);
+                }
+                continue;
+            }
+        };
+        let verification = crate::discovery_execute::verify_execute_outcome(
+            &result.summary,
+            result.hit_max_iterations,
+            &roots,
+            &result.written_paths,
+        );
+
+        if verification.passed {
+            last_result = Some(result);
+            break;
+        }
+
+        tracing::warn!(
+            task_id = %result.task_id,
+            attempt,
+            notes = %verification.notes,
+            "Discovery execute verify gate failed"
+        );
+
+        result.status = SubStatus::Failed;
+        result.summary = format!(
+            "{}\n\n[verify_gate FAILED] {}",
+            result.summary, verification.notes
+        );
+        crate::remediation_tracker::emit_discovery_fix_failed(
+            bus,
+            rec,
+            &result.task_id,
+            plan_dir,
+            &verification,
+            attempt,
+        );
+        last_result = Some(result);
+
+        if attempt >= max_retries {
+            break;
+        }
+    }
+
+    last_result.ok_or_else(|| anyhow::anyhow!("discovery execute produced no result"))
+}
+
+fn build_discovery_plan_spec(
+    rec: &PendingRecommendation,
+    config: &KuratorConfig,
+    report_path: &Path,
+    eval_feedback: Option<&str>,
+) -> SubagentSpec {
+    let discovery_session_id = rec
+        .session_id
+        .strip_prefix("discovery-plan:")
+        .unwrap_or(&rec.session_id);
+    let plan_id = crate::discovery_plan_agent::plan_id_from_report(report_path, discovery_session_id);
+    let output = crate::discovery_plan_agent::resolve_plan_output_paths(&plan_id);
+    let analysis = crate::discovery_fixer::analyze_discovery_report(report_path).unwrap_or_default();
+    let env_feedback = std::env::var("DISCOVERY_PLAN_EVAL_FEEDBACK")
+        .ok()
+        .filter(|s| !s.is_empty());
+    let feedback = eval_feedback.or(env_feedback.as_deref());
+    let brief = crate::discovery_plan_agent::build_plan_agent_brief(
+        report_path,
+        discovery_session_id,
+        &plan_id,
+        &analysis.findings,
+        &output,
+        feedback,
+        config.spawn_brief_max_chars,
+    );
+
+    SubagentSpec {
+        role: rec.suggested_agent_profile.clone(),
+        brief,
+        max_iterations: config.discovery_plan_max_iterations,
+        depth: 1,
+        parent_session: rec.session_id.clone(),
+        working_dir: Some(crate::discovery_fixer::discovery_fixer_working_dir()),
+        shell_extra_commands: config.discovery_fixer_shell_extra_commands.clone(),
+    }
+}
+
+async fn spawn_discovery_plan_with_retries(
+    runner: &SubagentRunner,
+    bus: &SynapseBus,
+    rec: &PendingRecommendation,
+    config: &KuratorConfig,
+    _project_root: &Path,
+    initial_spec: SubagentSpec,
+) -> Result<SubagentResult> {
+    let report_path = crate::discovery_fixer::resolve_discovery_report_path(rec, None);
+    let discovery_session_id = rec
+        .session_id
+        .strip_prefix("discovery-plan:")
+        .unwrap_or(&rec.session_id);
+    let plan_id = crate::discovery_plan_agent::plan_id_from_report(&report_path, discovery_session_id);
+    let output = crate::discovery_plan_agent::resolve_plan_output_paths(&plan_id);
+    let analysis = crate::discovery_fixer::analyze_discovery_report(&report_path)?;
+    let max_retries = config.discovery_plan_max_retries;
+
+    let mut spec = initial_spec;
+    let mut last_result: Option<SubagentResult> = None;
+    let mut last_verify_notes: Option<String> = None;
+
+    for attempt in 0..=max_retries {
+        if attempt > 0 {
+            spec = build_discovery_plan_spec(
+                rec,
+                config,
+                &report_path,
+                last_verify_notes.as_deref(),
+            );
+        }
+
+        let mut result = match runner.spawn(spec.clone()).await {
+            Ok(r) => r,
+            Err(e) => {
+                tracing::warn!(attempt, error = %e, "Discovery plan agent spawn failed");
+                if attempt >= max_retries {
+                    return Err(e);
+                }
+                continue;
+            }
+        };
+        let verification = crate::discovery_plan_agent::verify_plan_agent_outcome(
+            &output,
+            &result.written_paths,
+            analysis.actionable_count(),
+        );
+
+        if verification.passed {
+            last_result = Some(result);
+            break;
+        }
+
+        tracing::warn!(
+            task_id = %result.task_id,
+            attempt,
+            notes = %verification.notes,
+            "Discovery plan agent verify gate failed"
+        );
+
+        result.status = SubStatus::Failed;
+        result.summary = format!(
+            "{}\n\n[verify_gate FAILED] {}",
+            result.summary, verification.notes
+        );
+        crate::remediation_tracker::emit_discovery_fix_failed(
+            bus,
+            rec,
+            &result.task_id,
+            &report_path,
+            &crate::discovery_fixer::DiscoveryFixVerification {
+                passed: false,
+                missing_paths: vec![],
+                hit_max_iterations: result.hit_max_iterations,
+                notes: verification.notes.clone(),
+            },
+            attempt,
+        );
+        last_verify_notes = Some(verification.notes.clone());
+        last_result = Some(result);
+
+        if attempt >= max_retries {
+            break;
+        }
+    }
+
+    last_result.ok_or_else(|| anyhow::anyhow!("discovery plan agent produced no result"))
+}
+
+async fn spawn_discovery_code_implement_with_retries(
+    runner: &SubagentRunner,
+    bus: &SynapseBus,
+    rec: &PendingRecommendation,
+    config: &KuratorConfig,
+    project_root: &Path,
+    _initial_spec: SubagentSpec,
+) -> Result<SubagentResult> {
+    let tracker_path = crate::remediation_tracker::default_tracker_path();
+    let report_path = crate::discovery_fixer::resolve_discovery_report_path(rec, None);
+    let roots = crate::discovery_fixer::discovery_fixer_search_roots(project_root);
+    let max_retries = config.discovery_code_implementer_max_retries;
+
+    let mut last_result: Option<SubagentResult> = None;
+
+    while let Some(finding) =
+        crate::remediation_tracker::next_probed_finding(&tracker_path, &report_path)
+    {
+        let finding_id = finding.finding_id.clone();
+        let finding_kind = finding.kind;
+        let _ = crate::remediation_tracker::mark_finding_in_flight(
+            &tracker_path,
+            &report_path,
+            &finding_id,
+            finding_kind,
+        );
+
+        let spec = build_code_implement_spec(rec, config, &report_path, Some(&finding));
+
+        let mut result = match runner.spawn(spec).await {
+            Ok(r) => r,
+            Err(e) => {
+                if let Err(reset_err) = crate::remediation_tracker::reset_in_flight_finding(
+                    &tracker_path,
+                    &report_path,
+                    &finding_id,
+                    finding_kind,
+                ) {
+                    tracing::warn!(
+                        error = %reset_err,
+                        finding_id = %finding_id,
+                        "remediation tracker: failed to reset in_flight after spawn error"
+                    );
+                }
+                return Err(e);
+            }
+        };
+
         let verification = crate::discovery_code_implementer::verify_code_implement_outcome(
             &result.summary,
             result.hit_max_iterations,
@@ -243,12 +505,12 @@ async fn spawn_discovery_code_implement_with_retries(
             &result.written_paths,
         );
 
-        let closed_ids =
-            crate::remediation_tracker::in_flight_finding_ids(&tracker_path, &report_path);
+        let closed_ids = vec![finding_id.clone()];
         if let Err(e) = crate::remediation_tracker::record_spawn_outcome(
             &tracker_path,
             &report_path,
             &result.task_id,
+            &closed_ids,
             &verification,
             &result.written_paths,
             max_retries,
@@ -266,12 +528,12 @@ async fn spawn_discovery_code_implement_with_retries(
                 &closed_ids,
             );
             last_result = Some(result);
-            break;
+            continue;
         }
 
         tracing::warn!(
             task_id = %result.task_id,
-            attempt,
+            finding_id = %finding_id,
             notes = %verification.notes,
             "Discovery code implementer verify gate failed"
         );
@@ -287,9 +549,22 @@ async fn spawn_discovery_code_implement_with_retries(
             &result.task_id,
             &report_path,
             &verification,
-            attempt,
+            0,
         );
         last_result = Some(result);
+
+        let state = crate::remediation_tracker::load(&tracker_path);
+        let exhausted = state.findings.iter().any(|f| {
+            f.report_path == report_path.to_string_lossy()
+                && f.finding_id == finding_id
+                && f.status == crate::remediation_tracker::RemediationStatus::Failed
+        });
+        if exhausted {
+            tracing::warn!(
+                finding_id = %finding_id,
+                "Discovery code implementer max retries exceeded for finding"
+            );
+        }
     }
 
     last_result.ok_or_else(|| anyhow::anyhow!("code implementer produced no result"))
@@ -343,6 +618,7 @@ async fn spawn_discovery_fix_with_retries(
             &tracker_path,
             &report_path,
             &result.task_id,
+            &closed_ids,
             &verification,
             &result.written_paths,
             max_retries,
@@ -406,7 +682,11 @@ async fn spawn_with_remediation_loop(
     project_root: &Path,
     spec: SubagentSpec,
 ) -> Result<SubagentResult> {
-    if crate::discovery_code_implementer::is_discovery_code_implement_recommendation(rec) {
+    if crate::discovery_execute::is_discovery_execute_recommendation(rec) {
+        spawn_discovery_execute(runner, bus, rec, config, project_root, spec).await
+    } else if crate::discovery_plan_agent::is_discovery_plan_recommendation(rec) {
+        spawn_discovery_plan_with_retries(runner, bus, rec, config, project_root, spec).await
+    } else if crate::discovery_code_implementer::is_discovery_code_implement_recommendation(rec) {
         spawn_discovery_code_implement_with_retries(runner, bus, rec, config, project_root, spec)
             .await
     } else if crate::discovery_fixer::is_discovery_fix_recommendation(rec) {
@@ -419,12 +699,17 @@ async fn spawn_with_remediation_loop(
 fn discovery_agent_closed_loop(rec: &PendingRecommendation, result: &SubagentResult) -> bool {
     !crate::discovery_fixer::is_discovery_fix_recommendation(rec)
         && !crate::discovery_code_implementer::is_discovery_code_implement_recommendation(rec)
+        && !crate::discovery_plan_agent::is_discovery_plan_recommendation(rec)
+        && !crate::discovery_execute::is_discovery_execute_recommendation(rec)
         || !matches!(result.status, SubStatus::Failed)
 }
 
 fn obolus_action_for_rec(rec: &PendingRecommendation) -> ObolusAction {
-    if crate::discovery_fixer::is_discovery_fix_recommendation(rec)
+    if crate::discovery_plan_agent::is_discovery_plan_recommendation(rec) {
+        ObolusAction::DiscoveryPlan
+    } else if crate::discovery_fixer::is_discovery_fix_recommendation(rec)
         || crate::discovery_code_implementer::is_discovery_code_implement_recommendation(rec)
+        || crate::discovery_execute::is_discovery_execute_recommendation(rec)
     {
         ObolusAction::SpawnDiscoveryFix
     } else {

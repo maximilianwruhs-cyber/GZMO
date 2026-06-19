@@ -11,7 +11,9 @@ use super::{
     define::DefineSkill,
     dice::DiceSkill,
     discover::DiscoverSkill,
+    fixer::FixerSkill,
     help::HelpSkill,
+    implement::ImplementSkill,
     joke::JokeSkill,
     language::LanguageSkill,
     learn::LearnSkill,
@@ -77,6 +79,12 @@ pub fn build_chaos_skill_registry(pedagogy: &PedagogyConfig) -> SkillRegistry {
         pedagogy_config: pedagogy.clone(),
     }));
     registry.register(Arc::new(DiscoverSkill {
+        pedagogy_config: pedagogy.clone(),
+    }));
+    registry.register(Arc::new(ImplementSkill {
+        pedagogy_config: pedagogy.clone(),
+    }));
+    registry.register(Arc::new(FixerSkill {
         pedagogy_config: pedagogy.clone(),
     }));
 

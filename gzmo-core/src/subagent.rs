@@ -137,14 +137,22 @@ impl SubagentRunner {
     }
 
     fn role_system_prompt(&self, role: &str, brief: &str) -> String {
-        format!(
+        let mut prompt = format!(
             "{}\n\n---\nYou are a focused sub-agent (role: {role}). \
             Complete only the task in the user message. \
             Do not delegate further sub-tasks. \
             Your final reply must be a concise summary under {} tokens.\n\nTask:\n{brief}",
             self.system_prompt_base,
             self.config.summary_max_tokens,
-        )
+        );
+        if crate::discovery_code_implementer::is_discovery_agent_brief(brief) {
+            prompt.push_str(
+                "\n\nTool discipline: use the file_write tool for all file outputs. \
+                Never embed <tool_call>, <function=file_write>, or fenced code blocks as a substitute for file_write. \
+                Do not narrate tool calls — invoke them.",
+            );
+        }
+        prompt
     }
 
     pub async fn spawn(&self, spec: SubagentSpec) -> Result<SubagentResult> {
@@ -210,6 +218,22 @@ impl SubagentRunner {
             sub_tools.register(Box::new(MemorySearchTool::new(Arc::clone(v))));
         }
         let is_discovery_agent = crate::discovery_code_implementer::is_discovery_agent_brief(&spec.brief);
+        if is_discovery_agent {
+            crate::discovery_plan_agent::log_spawn_brief(&spec.parent_session, &spec.brief);
+            if crate::discovery_plan_agent::is_discovery_agent_brief(&spec.brief) {
+                crate::discovery_plan_agent::assert_discovery_parent_session(
+                    "discovery-plan:",
+                    &spec.parent_session,
+                    "plan agent",
+                );
+            } else if spec.brief.contains("execute workstream") {
+                crate::discovery_plan_agent::assert_discovery_parent_session(
+                    "discovery-fix:",
+                    &spec.parent_session,
+                    "execute workstream",
+                );
+            }
+        }
         if !is_discovery_agent {
             sub_tools.register(Box::new(WebBrowseTool::new_with_compress(
                 self.compress_config.clone(),
@@ -242,11 +266,11 @@ impl SubagentRunner {
         } else {
             spec.max_iterations.min(15)
         };
-        const DISCOVERY_AGENT_WRITE_PHASE_LEAD: usize = 10;
-        const DISCOVERY_AGENT_WRITE_PHASE_MSG: &str = "WRITE PHASE — stop exploration now. \
-Use file_write to create or patch remediation scripts/config under gzmo_skills/ or the GZMO repo. \
-Run at most one short shell_exec to verify. Do not finish until file_write succeeded for at least one fix. \
-Do not prefix shell_exec commands with # comment lines.";
+        let discovery_write = if is_discovery_agent {
+            crate::discovery_code_implementer::discovery_agent_write_config(&spec.brief, max_iterations)
+        } else {
+            None
+        };
         let summary_max = self.config.summary_max_tokens;
         let context_budget = self.config.context_budget_tokens;
         let system = self.role_system_prompt(&role, &brief);
@@ -307,22 +331,19 @@ Do not prefix shell_exec commands with # comment lines.";
                         compress_cfg: compress_cfg.clone(),
                         ccr: ccr.clone(),
                     }),
-                    write_phase_at: if is_discovery_agent {
-                        Some(max_iterations.saturating_sub(DISCOVERY_AGENT_WRITE_PHASE_LEAD))
-                    } else {
-                        None
-                    },
-                    write_phase_message: if is_discovery_agent {
-                        Some(DISCOVERY_AGENT_WRITE_PHASE_MSG.to_string())
-                    } else {
-                        None
-                    },
+                    write_phase_at: discovery_write.as_ref().map(|c| c.write_phase_at),
+                    write_phase_message: discovery_write.as_ref().map(|c| c.write_phase_message.clone()),
                     require_file_write_before_done: is_discovery_agent,
+                    require_file_write_prompt: discovery_write
+                        .as_ref()
+                        .map(|c| c.require_file_write_prompt.clone()),
                 };
 
                 let process = if is_discovery_agent {
                     if spec.brief.contains("Discovery code implementer") {
                         crate::obolus::kurator_process_label("discovery_code_implement")
+                    } else if crate::discovery_plan_agent::is_discovery_agent_brief(&spec.brief) {
+                        crate::obolus::kurator_process_label("discovery_plan")
                     } else {
                         crate::obolus::kurator_process_label("discovery_fix")
                     }

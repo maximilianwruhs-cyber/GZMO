@@ -13,6 +13,8 @@ use uuid::Uuid;
 use crate::config::SpawnGateConfig;
 use crate::discovery_code_implementer;
 use crate::discovery_fixer;
+use crate::discovery_execute;
+use crate::discovery_plan_agent;
 use crate::kurator_monitor::{KuratorMonitorState, PendingRecommendation};
 use crate::synapse::{EventSource, EventType, SynapseBus, SynapseEvent};
 
@@ -36,6 +38,8 @@ impl SpawnKind {
 pub fn spawn_kind(rec: &PendingRecommendation) -> SpawnKind {
     if discovery_fixer::is_discovery_fix_recommendation(rec)
         || discovery_code_implementer::is_discovery_code_implement_recommendation(rec)
+        || discovery_plan_agent::is_discovery_plan_recommendation(rec)
+        || discovery_execute::is_discovery_execute_recommendation(rec)
     {
         SpawnKind::DiscoveryFix
     } else {

@@ -533,7 +533,14 @@ export default function (pi: ExtensionAPI): void {
   // --- Session lifecycle ---
 
   pi.on("session_start", async (event, _ctx) => {
-    currentSessionId = randomUUID();
+    const envCorr = process.env.GZMO_CORRELATION_ID?.trim();
+    const uuidRe =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    if (envCorr && uuidRe.test(envCorr)) {
+      currentSessionId = envCorr;
+    } else {
+      currentSessionId = randomUUID();
+    }
     emit(EVT.sessionStart, { reason: event.reason, session_id: currentSessionId });
   });
 
@@ -637,6 +644,30 @@ export default function (pi: ExtensionAPI): void {
       const toolName = (tr as { toolName?: string }).toolName;
       const toolCallId = (tr as { toolCallId?: string }).toolCallId ?? "";
       const isError = (tr as { isError?: boolean }).isError === true;
+
+      if (toolName === "gzmo_mentor_teach" && !isError) {
+        const content = (tr as { content?: Array<{ type?: string; text?: string }> }).content ?? [];
+        const text = content
+          .filter((c) => c.type === "text")
+          .map((c) => c.text ?? "")
+          .join("\n");
+        let confidence = 0.5;
+        if (text.includes("?")) confidence = 0.45;
+        if (/\b(correct|exactly|precisely|well done)\b/i.test(text)) confidence = 0.75;
+        if (/\b(not quite|incorrect|missed|wrong)\b/i.test(text)) confidence = 0.35;
+        const novel =
+          !/\b(rephrase|again|repeat)\b/i.test(text) && text.length > 80;
+        emit(EVT.mentorTeach, {
+          toolName: "gzmo_mentor_teach",
+          toolCallId,
+          confidence_score: confidence,
+          novel_application: novel,
+          response_excerpt: text.slice(0, 400),
+          emitted_by: "pi_tool_echo",
+          phase: "mentor_response",
+        });
+      }
+
       if (toolName === "gzmo_chaos" || pendingSkillInvokes.has(toolCallId)) {
         const pending = pendingSkillInvokes.get(toolCallId);
         const skill = pending?.skill ?? "unknown";

@@ -39,6 +39,7 @@ pub fn event_type_label(event: &ChaosEvent) -> &'static str {
         ChaosEvent::Stabilize { .. } => "Stabilize",
         ChaosEvent::MentorTeach { .. } => "MentorTeach",
         ChaosEvent::Custom { .. } => "Custom",
+        ChaosEvent::PedagogyOscillate { .. } => "PedagogyOscillate",
     }
 }
 
@@ -134,6 +135,9 @@ enum ChaosEventDto {
         energy_delta: f64,
         thought_seed: Option<ThoughtSeedDto>,
     },
+    PedagogyOscillate {
+        action: crate::pedagogy_oscillator::PedagogyOscillateAction,
+    },
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -202,6 +206,9 @@ impl From<&ChaosEvent> for ChaosEventDto {
                 energy_delta: *energy_delta,
                 thought_seed: thought_seed.as_ref().map(ThoughtSeedDto::from),
             },
+            ChaosEvent::PedagogyOscillate { action } => ChaosEventDto::PedagogyOscillate {
+                action: *action,
+            },
         }
     }
 }
@@ -250,6 +257,9 @@ impl ChaosEventDto {
                     text: s.text,
                 }),
             },
+            ChaosEventDto::PedagogyOscillate { action } => {
+                ChaosEvent::PedagogyOscillate { action }
+            }
         })
     }
 }
