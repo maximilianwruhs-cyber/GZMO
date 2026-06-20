@@ -1,27 +1,24 @@
 #!/usr/bin/env bash
-# Push to GitHub using GITHUB_TOKEN from .env.local (never commit tokens).
+# Push GZMO repos to GitHub (manual fallback — discovery cycle auto-pushes via discovery-github-backup.sh).
 set -euo pipefail
 
-ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-cd "$ROOT"
+GZMO_SKILLS_ROOT="${GZMO_SKILLS_ROOT:-$HOME/gzmo_skills}"
+BACKUP_SCRIPT="$GZMO_SKILLS_ROOT/scripts/discovery-github-backup.sh"
 
-ENV_FILE="${ROOT}/.env.local"
-if [[ ! -f "$ENV_FILE" ]]; then
-  echo "Missing $ENV_FILE — set GITHUB_TOKEN=ghp_…" >&2
-  exit 1
+if [[ -x "$BACKUP_SCRIPT" ]]; then
+  exec "$BACKUP_SCRIPT" --flush "$@"
 fi
 
+# Legacy single-repo push if backup script missing
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$ROOT"
+ENV_FILE="${ROOT}/.env.local"
+[[ -f "$ENV_FILE" ]] || { echo "Missing $ENV_FILE" >&2; exit 1; }
 set -a
 # shellcheck disable=SC1090
 source "$ENV_FILE"
 set +a
-
-if [[ -z "${GITHUB_TOKEN:-}" ]]; then
-  echo "GITHUB_TOKEN not set in $ENV_FILE" >&2
-  exit 1
-fi
-
+[[ -n "${GITHUB_TOKEN:-}" ]] || { echo "GITHUB_TOKEN not set" >&2; exit 1; }
 REF="${1:-HEAD}"
 REMOTE="${GITHUB_REMOTE:-https://github.com/maximilianwruhs-cyber/GZMO.git}"
-
 git push "https://x-access-token:${GITHUB_TOKEN}@${REMOTE#https://}" "$REF"
