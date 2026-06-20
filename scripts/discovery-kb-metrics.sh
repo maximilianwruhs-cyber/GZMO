@@ -50,8 +50,11 @@ fi
 distill_attempts=0
 distill_skips=0
 if [[ -f "$DISTILL_LOG" ]]; then
-  distill_attempts="$(grep -cE 'Distill OK|WARN: distill failed' "$DISTILL_LOG" 2>/dev/null || echo 0)"
-  distill_skips="$(grep -cE 'Duplicate transcript \(dedup\)|skipped:.*dedup' "$DISTILL_LOG" 2>/dev/null || echo 0)"
+  # grep -c exits 1 on zero matches; avoid "0\n0" from `|| echo 0`.
+  distill_attempts="$(grep -cE 'Distill OK|WARN: distill failed' "$DISTILL_LOG" 2>/dev/null || true)"
+  distill_skips="$(grep -cE 'Duplicate transcript \(dedup\)|skipped:.*dedup' "$DISTILL_LOG" 2>/dev/null || true)"
+  distill_attempts="${distill_attempts:-0}"
+  distill_skips="${distill_skips:-0}"
 fi
 dedup_skip_rate=0
 if [[ "$distill_attempts" -gt 0 ]]; then

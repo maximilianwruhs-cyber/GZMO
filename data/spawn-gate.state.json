@@ -395,6 +395,33 @@
       "session_id": "discovery-plan:session-final-2026-06-19T18-04-44Z",
       "task_id": "18fa6b59-e97d-4985-98a8-41e7e94b4d1e",
       "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-06-20T11:18:46.165767456Z",
+      "kind": "discovery_fix",
+      "reason_hash": 10202602841496960384,
+      "recommendation_id": "f6d06531-0993-4c6f-9607-c57ac7742c05",
+      "session_id": "discovery-fix:mechanics-live-20260620T111817Z:.mechanics-verify-report",
+      "task_id": "89056966-4d50-43e3-8c04-89807b797b75",
+      "approved_via": "gzmo kurator fix-from-discovery"
+    },
+    {
+      "at": "2026-06-20T11:20:25.669679790Z",
+      "kind": "discovery_fix",
+      "reason_hash": 6481516134551136506,
+      "recommendation_id": "4fdd3df6-b12a-4aa1-80cc-246e33c96e77",
+      "session_id": "discovery-implement:retry-partial-20260620T111902Z:session-final-2026-06-19T18-04-44Z",
+      "task_id": "4b6a8fe8-5d2c-4e44-9a74-51cc2ad11d9f",
+      "approved_via": "gzmo kurator implement-from-discovery"
+    },
+    {
+      "at": "2026-06-20T11:20:54.842281755Z",
+      "kind": "discovery_fix",
+      "reason_hash": 7375763451266208240,
+      "recommendation_id": "5948fcdd-b91f-4f37-ac8d-f7dbddd383c6",
+      "session_id": "discovery-fix:retry-partial-20260620T111902Z:session-final-2026-06-19T18-04-44Z",
+      "task_id": "f41da03b-aea3-41f8-bee1-1316a074117c",
+      "approved_via": "gzmo kurator fix-from-discovery"
     }
   ],
   "denials": [
