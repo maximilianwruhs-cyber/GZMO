@@ -87,7 +87,7 @@ for hook in \
   "kurator fix-from-discovery" \
   "run_discovery_implementation_pipeline" \
   "enqueue-discovery-report.sh" \
-  "run-discovery-implement.sh" \
+  "run-discovery-implementation-pipeline.sh" \
   "eval-implementation-plan.sh" \
   "DISCOVERY_INLINE_IMPLEMENT" \
   "implement-discovery-actions.sh" \
@@ -206,7 +206,7 @@ if [[ "${MECHANICS_LIVE_SPAWN:-0}" == "1" ]]; then
 
 ### F1 — Mechanics verification marker
 - Observation: E2E autospawn test needs a proof file on disk.
-- Risk or opportunity: **GAP**: marker file missing at `gzmo_skills/data/.mechanics-verify-marker`.
+- Risk or opportunity: **GAP**: marker file missing at \`$GZMO_SKILLS_ROOT/data/.mechanics-verify-marker\`.
 
 ### F2 — Write proof
 - Observation: Fixer must create the marker via shell or file write.
@@ -238,15 +238,7 @@ MD
   if [[ -f "$MARKER" ]]; then
     pass "verify_gate: marker file exists"
   else
-  # verify_gate may pass via written_paths even if path differs — check synapse result
-    if grep "$SESSION_ID" "$SYNAPSE" | grep -q '"status":"done"'; then
-      pass "agent.result status=done (marker path may differ)"
-    elif grep "$SESSION_ID" "$SYNAPSE" | grep -q '"status":"failed"'; then
-      fail "agent.result status=failed — verify_gate or agent error"
-      grep "$SESSION_ID" "$SYNAPSE" | tail -3
-    else
-      fail "marker missing and no agent.result for $SESSION_ID"
-    fi
+    fail "verify_gate: marker file missing at $MARKER"
   fi
 
   AFTER_N="$(grep -c 'agent.result' "$SYNAPSE" 2>/dev/null || echo 0)"

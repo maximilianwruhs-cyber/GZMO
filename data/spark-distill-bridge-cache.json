@@ -1,6 +1,146 @@
 {
-  "updated_at": "2026-06-20T11:20:28.598578371+00:00",
+  "updated_at": "2026-06-20T12:35:28.597390302+00:00",
   "sparks": [
+    {
+      "event_type": "spark_complete",
+      "id": "b0eb6107-b6d0-4b46-b429-31343542eb39",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-18T15:23:35.078386383+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-18",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "a0f10c78-218c-4b22-b7d2-2c89932247ff",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-18T15:26:51.024335232+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-18",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "3cece580-d433-46b4-aec3-b09d90e7deeb",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-18T15:28:49.673057149+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-18",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "bf1488dd-77fb-4e71-be26-f4fd9a8d4ced",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-18T15:32:41.135765414+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-18",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "78c68656-879d-40a2-a79d-34176ee0f65b",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-18T15:39:04.368999266+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-18",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "4f2a262b-91ce-421b-b455-5c71ea0eaa16",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-18T15:42:04.114761010+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-18",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "5dff57a6-a308-4a80-95cc-a9f0885495a7",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-18T18:04:26.707256024+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-18",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "3a2ac160-e394-4c4d-bfd0-534c1f50c1ae",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-18T19:29:27.574508040+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-18",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "91005bfa-e1fb-4e06-bc04-dc8b28856ccb",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-18T19:56:20.255143360+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-18",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "3c083a25-c146-4adb-acad-7bc630999216",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-18T19:56:30.513242122+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-18",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
     {
       "event_type": "spark_complete",
       "id": "92c2cf05-9468-46c1-a06a-990522e721c6",
@@ -388,76 +528,6 @@
         "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
         "cognition_source": "honeypot",
         "date": "2026-06-20",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "0eaecd23-6587-4ce6-bba0-94be798f49d5",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-17T15:21:59.317397688+00:00",
-      "data": {
-        "cognition_source": "honeypot",
-        "date": "2026-06-17",
-        "kg_relations_written": 0,
-        "memory_layer": "honeypot",
-        "promoted": false,
-        "skip_reason": "Hypothesis generation failed: TurboQuant structured output returned HTTP 503: {\"error\":{\"message\":\"Loading model\",\"type\":\"unavailable_error\",\"code\":503}}"
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "693fa809-a41a-4757-8f45-677528088073",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-17T15:32:04.578045974+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-17",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "86ecfaae-962a-4eb0-9dc7-84caf8fb2364",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-17T15:34:55.346581801+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-17",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "eea3663f-b838-4dc9-863d-3704e3c6c95e",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-17T15:37:32.015790723+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-17",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "ef2ab501-ba43-4745-972d-c9330dbf87f7",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-17T15:39:58.836508766+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-17",
         "kg_relations_written": 1,
         "memory_layer": "honeypot",
         "promoted": true
@@ -1592,76 +1662,6 @@
         "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
         "cognition_source": "honeypot",
         "date": "2026-06-20",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "0eaecd23-6587-4ce6-bba0-94be798f49d5",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-17T15:21:59.317397688+00:00",
-      "data": {
-        "cognition_source": "honeypot",
-        "date": "2026-06-17",
-        "kg_relations_written": 0,
-        "memory_layer": "honeypot",
-        "promoted": false,
-        "skip_reason": "Hypothesis generation failed: TurboQuant structured output returned HTTP 503: {\"error\":{\"message\":\"Loading model\",\"type\":\"unavailable_error\",\"code\":503}}"
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "693fa809-a41a-4757-8f45-677528088073",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-17T15:32:04.578045974+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-17",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "86ecfaae-962a-4eb0-9dc7-84caf8fb2364",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-17T15:34:55.346581801+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-17",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "eea3663f-b838-4dc9-863d-3704e3c6c95e",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-17T15:37:32.015790723+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-17",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "ef2ab501-ba43-4745-972d-c9330dbf87f7",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-17T15:39:58.836508766+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-17",
         "kg_relations_written": 1,
         "memory_layer": "honeypot",
         "promoted": true

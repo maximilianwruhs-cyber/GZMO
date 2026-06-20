@@ -13,9 +13,10 @@ pub fn discovery_execute_session_id(plan_id: &str, workstream_id: &str) -> Strin
 pub fn is_discovery_execute_recommendation(
     rec: &crate::kurator_monitor::PendingRecommendation,
 ) -> bool {
+    // Do not match `discovery-fix:` session ids — discovery_fix uses the same prefix
+    // (see discovery_fix_session_id). Execute spawns always carry kind + reason.
     rec.kind.as_deref() == Some("discovery_execute")
         || rec.reason.starts_with("discovery_execute:")
-        || rec.session_id.starts_with("discovery-fix:")
 }
 
 pub fn resolve_plan_json_path(plan_path: &Path) -> PathBuf {
@@ -102,6 +103,32 @@ pub fn verify_execute_outcome(
 mod tests {
     use super::*;
     use std::io::Write;
+
+    #[test]
+    fn execute_recommendation_not_confused_with_discovery_fix_session() {
+        use crate::kurator_monitor::PendingRecommendation;
+        use chrono::Utc;
+        let fix_rec = PendingRecommendation {
+            event_id: "e1".into(),
+            session_id: "discovery-fix:manual:cycle-1-report".into(),
+            kind: Some("discovery_fix".into()),
+            reason: "discovery_actionable: 1 FAIL, 1 GAP (2 actionable)".into(),
+            suggested_agent_profile: "epimetheus".into(),
+            created_at: Utc::now(),
+            approved: false,
+            spawn_task_id: None,
+            report_path: None,
+        };
+        assert!(!is_discovery_execute_recommendation(&fix_rec));
+
+        let exec_rec = PendingRecommendation {
+            kind: Some("discovery_execute".into()),
+            reason: discovery_execute_reason("W1"),
+            session_id: discovery_execute_session_id("plan-a", "W1"),
+            ..fix_rec
+        };
+        assert!(is_discovery_execute_recommendation(&exec_rec));
+    }
 
     #[test]
     fn load_workstream_from_plan() {

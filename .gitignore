@@ -116,3 +116,6 @@ wiki/assets/
 !.crew/graphs/
 !.crew/artifacts/.gitkeep
 !.crew/graphs/.gitkeep
+
+# GZMO skills Chimera dir
+/gzmo_skills/

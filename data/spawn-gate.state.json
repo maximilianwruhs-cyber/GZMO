@@ -422,6 +422,51 @@
       "session_id": "discovery-fix:retry-partial-20260620T111902Z:session-final-2026-06-19T18-04-44Z",
       "task_id": "f41da03b-aea3-41f8-bee1-1316a074117c",
       "approved_via": "gzmo kurator fix-from-discovery"
+    },
+    {
+      "at": "2026-06-20T11:26:35.624299310Z",
+      "kind": "discovery_fix",
+      "reason_hash": 7375763451266208240,
+      "recommendation_id": "74e45b94-6fc5-4eb1-94f3-607f724333db",
+      "session_id": "discovery-fix:fix-f234-r1-20260620T112610Z:session-final-2026-06-19T18-04-44Z",
+      "task_id": "40c702f1-1cd5-4626-b7bc-6cd46590bccd",
+      "approved_via": "gzmo kurator fix-from-discovery"
+    },
+    {
+      "at": "2026-06-20T11:27:02.208297538Z",
+      "kind": "discovery_fix",
+      "reason_hash": 7375763451266208240,
+      "recommendation_id": "a0744d4a-7b89-48ed-80bb-f6d700628bc4",
+      "session_id": "discovery-fix:fix-f234-r2-20260620T112635Z:session-final-2026-06-19T18-04-44Z",
+      "task_id": "c111d71f-0b6a-4f17-99be-fa5e6e066505",
+      "approved_via": "gzmo kurator fix-from-discovery"
+    },
+    {
+      "at": "2026-06-20T11:28:14.488938899Z",
+      "kind": "discovery_fix",
+      "reason_hash": 7375763451266208240,
+      "recommendation_id": "e4052bd0-7ad5-4a7b-969f-f78b443f8da3",
+      "session_id": "discovery-fix:fix-f234-r3-20260620T112702Z:session-final-2026-06-19T18-04-44Z",
+      "task_id": "bc4048dc-c607-4240-9a3e-ac59bcf2b4fe",
+      "approved_via": "gzmo kurator fix-from-discovery"
+    },
+    {
+      "at": "2026-06-20T11:29:39.809308075Z",
+      "kind": "discovery_fix",
+      "reason_hash": 7375763451266208240,
+      "recommendation_id": "e61889a8-e98e-4d49-9f1a-8838ce148181",
+      "session_id": "discovery-fix:fix-f234-r4-20260620T112814Z:session-final-2026-06-19T18-04-44Z",
+      "task_id": "46fb2065-6212-402a-a7f3-283f1ed0cf4b",
+      "approved_via": "gzmo kurator fix-from-discovery"
+    },
+    {
+      "at": "2026-06-20T11:32:39.307249193Z",
+      "kind": "discovery_fix",
+      "reason_hash": 7375763451266208240,
+      "recommendation_id": "9f5cda01-3e98-439e-ae78-00251330c765",
+      "session_id": "discovery-fix:fix-f234-routing-fix-20260620T113151Z:session-final-2026-06-19T18-04-44Z",
+      "task_id": "fefbb4df-fa86-43da-8c33-2b1c615c1f8c",
+      "approved_via": "gzmo kurator fix-from-discovery"
     }
   ],
   "denials": [

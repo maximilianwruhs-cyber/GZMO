@@ -218,14 +218,22 @@ pub fn verify_code_implement_outcome(
     if v.passed {
         return v;
     }
+
+    let gzmo_root = roots.get(0).cloned().unwrap_or_else(|| PathBuf::from("."));
+    let skills_root = roots.get(1).cloned().unwrap_or_else(|| discovery_fixer::canonical_skills_root());
+    let claimed = discovery_fixer::extract_claimed_artifact_paths(summary);
+
+    let has_invalid = claimed.iter().chain(written_paths.iter()).any(|p| {
+        discovery_fixer::classify_artifact_path(p, &gzmo_root, &skills_root) == discovery_fixer::ArtifactClassification::Invalid
+    });
+    if has_invalid {
+        return v;
+    }
+
     let code_writes: Vec<String> = written_paths
         .iter()
         .filter(|p| is_code_remediation_artifact(p))
-        .filter(|p| {
-            let path = Path::new(p.as_str());
-            path.is_absolute() && path.exists()
-                || roots.iter().any(|root| root.join(p).exists())
-        })
+        .filter(|p| discovery_fixer::artifact_path_exists(p, roots))
         .cloned()
         .collect();
     if !code_writes.is_empty() {

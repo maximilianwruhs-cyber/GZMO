@@ -459,6 +459,18 @@ pub fn build_fixer_brief_for_findings(
     lines.push(
         "8. Do not prefix shell_exec commands with # — put comments in the brief only. First command token must be a real binary (find, cat, bash, …).".to_string(),
     );
+    let skills_root = canonical_skills_root();
+    let gzmo_root = std::env::var("GZMO_ROOT")
+        .map(PathBuf::from)
+        .unwrap_or_else(|_| std::env::current_dir().unwrap_or_else(|_| PathBuf::from(".")));
+    let gzmo_root_abs = std::fs::canonicalize(&gzmo_root).unwrap_or(gzmo_root);
+    let skills_root_abs = std::fs::canonicalize(&skills_root).unwrap_or(skills_root);
+
+    lines.push(format!("GZMO_SKILLS_ROOT={}", skills_root_abs.display()));
+    lines.push(format!("GZMO_ROOT={}", gzmo_root_abs.display()));
+    lines.push(
+        "Skills-Artefakte nur unter $GZMO_SKILLS_ROOT/...; nie survey_GZMO/gzmo_skills oder relatives gzmo_skills/ vom Repo-CWD.".to_string(),
+    );
     lines.push(String::new());
     lines.push(
         "Scope: GZMO project root and gzmo_skills only. Do NOT run broad recursive greps across /home, /data, or /var.".to_string(),
@@ -534,8 +546,174 @@ fn looks_like_artifact_path(s: &str) -> bool {
         || s.ends_with(".yml")
 }
 
-fn is_remediation_artifact(path: &str) -> bool {
-    let lower = path.to_lowercase();
+pub fn canonical_skills_root() -> PathBuf {
+    let home = std::env::var("HOME").unwrap_or_default();
+    std::env::var("GZMO_SKILLS_ROOT")
+        .map(PathBuf::from)
+        .unwrap_or_else(|_| PathBuf::from(&home).join("gzmo_skills"))
+}
+
+pub fn is_chimera_path(s: &str) -> bool {
+    s.contains("survey_GZMO/gzmo_skills")
+        || s.contains("gzmo_skills/survey_GZMO")
+        || s.contains("GZMO_SKILLS_ROOT/survey_GZMO/")
+        || s.contains("$GZMO_SKILLS_ROOT/survey_GZMO/")
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ArtifactClassification {
+    Skills,
+    Repo,
+    Invalid,
+}
+
+pub fn classify_artifact_path(raw: &str, gzmo_root: &Path, skills_root: &Path) -> ArtifactClassification {
+    if is_chimera_path(raw) {
+        return ArtifactClassification::Invalid;
+    }
+
+    let mut path_str = raw;
+    while let Some(stripped) = path_str.strip_prefix("./") {
+        path_str = stripped;
+    }
+
+    // Determine logical classification based on structural name
+    let is_repo_type = path_str == "gzmo.toml"
+        || path_str.ends_with("/gzmo.toml")
+        || path_str.contains("/gzmo-core/")
+        || path_str.starts_with("gzmo-core/")
+        || path_str.contains("/scripts/")
+        || path_str.starts_with("scripts/")
+        || path_str == "Cargo.toml"
+        || path_str.ends_with("/Cargo.toml")
+        || path_str == "Cargo.lock"
+        || path_str.ends_with("/Cargo.lock")
+        || path_str.contains("/systemd/")
+        || path_str.starts_with("systemd/")
+        || path_str.contains("/tests/")
+        || path_str.starts_with("tests/");
+
+    let is_skills_type = path_str.contains("gzmo_skills/")
+        || path_str.starts_with("gzmo_skills/");
+
+    // If it is absolute:
+    let path = Path::new(path_str);
+    if path.is_absolute() {
+        // If it starts with gzmo_root/gzmo_skills, it's a Chimera path
+        if path.starts_with(gzmo_root.join("gzmo_skills")) {
+            return ArtifactClassification::Invalid;
+        }
+        
+        let canon = std::fs::canonicalize(path).ok();
+        let test_path = canon.as_deref().unwrap_or(path);
+
+        if test_path.starts_with(gzmo_root.join("gzmo_skills")) {
+            return ArtifactClassification::Invalid;
+        }
+
+        // If it's under skills_root:
+        if test_path.starts_with(skills_root) {
+            // But wait, if it's logically repo (like gzmo.toml under skills_root), it's Invalid!
+            if is_repo_type {
+                return ArtifactClassification::Invalid;
+            }
+            return ArtifactClassification::Skills;
+        }
+
+        // If it's under gzmo_root:
+        if test_path.starts_with(gzmo_root) {
+            // But wait, if it's logically skills (like gzmo_skills/ under gzmo_root), it's Invalid!
+            if is_skills_type {
+                return ArtifactClassification::Invalid;
+            }
+            return ArtifactClassification::Repo;
+        }
+
+        return ArtifactClassification::Invalid;
+    }
+
+    // Relative paths
+    if is_skills_type {
+        ArtifactClassification::Skills
+    } else if is_repo_type {
+        ArtifactClassification::Repo
+    } else {
+        ArtifactClassification::Invalid
+    }
+}
+
+pub fn resolve_canonical_artifact(raw: &str, gzmo_root: &Path, skills_root: &Path) -> Option<PathBuf> {
+    if is_chimera_path(raw) {
+        return None;
+    }
+
+    let mut path_str = raw;
+    while let Some(stripped) = path_str.strip_prefix("./") {
+        path_str = stripped;
+    }
+
+    let classification = classify_artifact_path(raw, gzmo_root, skills_root);
+    match classification {
+        ArtifactClassification::Skills => {
+            let path = Path::new(path_str);
+            if path.is_absolute() {
+                if path.exists() {
+                    if let Ok(canon) = std::fs::canonicalize(path) {
+                        if canon.starts_with(skills_root) && !canon.starts_with(gzmo_root.join("gzmo_skills")) {
+                            return Some(canon);
+                        }
+                    }
+                }
+                return None;
+            }
+            
+            let suffix = path_str.strip_prefix("gzmo_skills/").unwrap_or(path_str);
+            let target = skills_root.join(suffix);
+            if target.exists() {
+                if let Ok(canon) = std::fs::canonicalize(&target) {
+                    if canon.starts_with(skills_root) {
+                        return Some(canon);
+                    }
+                }
+            }
+            None
+        }
+        ArtifactClassification::Repo => {
+            let path = Path::new(path_str);
+            if path.is_absolute() {
+                if path.exists() {
+                    if let Ok(canon) = std::fs::canonicalize(path) {
+                        if canon.starts_with(gzmo_root) && !canon.starts_with(gzmo_root.join("gzmo_skills")) {
+                            return Some(canon);
+                        }
+                    }
+                }
+                return None;
+            }
+
+            let target = gzmo_root.join(path_str);
+            if target.exists() {
+                if let Ok(canon) = std::fs::canonicalize(&target) {
+                    if canon.starts_with(gzmo_root) {
+                        return Some(canon);
+                    }
+                }
+            }
+            None
+        }
+        ArtifactClassification::Invalid => None,
+    }
+}
+
+fn is_remediation_artifact(p: &str, roots: &[PathBuf]) -> bool {
+    let gzmo_root = roots.get(0).cloned().unwrap_or_else(|| PathBuf::from("."));
+    let skills_root = roots.get(1).cloned().unwrap_or_else(|| canonical_skills_root());
+    
+    if resolve_canonical_artifact(p, &gzmo_root, &skills_root).is_none() {
+        return false;
+    }
+
+    let lower = p.to_lowercase();
     if lower.ends_with("events.jsonl") || lower.ends_with("state.json") {
         return false;
     }
@@ -552,12 +730,10 @@ fn summary_hallucinates_file_write(summary: &str, written_paths: &[String]) -> b
             || summary.contains("<tool_call>"))
 }
 
-fn artifact_path_exists(claimed: &str, roots: &[PathBuf]) -> bool {
-    let path = Path::new(claimed);
-    if path.is_absolute() && path.exists() {
-        return true;
-    }
-    roots.iter().any(|root| root.join(claimed).exists())
+pub fn artifact_path_exists(claimed: &str, roots: &[PathBuf]) -> bool {
+    let gzmo_root = roots.get(0).cloned().unwrap_or_else(|| PathBuf::from("."));
+    let skills_root = roots.get(1).cloned().unwrap_or_else(|| canonical_skills_root());
+    resolve_canonical_artifact(claimed, &gzmo_root, &skills_root).is_some()
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -584,15 +760,33 @@ pub fn verify_discovery_fix_outcome(
 
     let verified_writes: Vec<String> = written_paths
         .iter()
-        .filter(|p| artifact_path_exists(p, roots) && is_remediation_artifact(p))
+        .filter(|p| artifact_path_exists(p, roots) && is_remediation_artifact(p, roots))
         .cloned()
         .collect();
+
+    let gzmo_root = roots.get(0).cloned().unwrap_or_else(|| PathBuf::from("."));
+    let skills_root = roots.get(1).cloned().unwrap_or_else(|| canonical_skills_root());
+
+    let mut invalid_paths = Vec::new();
+    for p in claimed.iter().chain(written_paths.iter()) {
+        if classify_artifact_path(p, &gzmo_root, &skills_root) == ArtifactClassification::Invalid {
+            invalid_paths.push(p.clone());
+        }
+    }
+    invalid_paths.sort();
+    invalid_paths.dedup();
 
     let mut issues = Vec::new();
     if !missing_paths.is_empty() {
         issues.push(format!(
             "claimed artifacts missing on disk: {}",
             missing_paths.join(", ")
+        ));
+    }
+    if !invalid_paths.is_empty() {
+        issues.push(format!(
+            "chimera or non-canonical path: {}",
+            invalid_paths.join(", ")
         ));
     }
     if hit_max_iterations {
@@ -607,8 +801,9 @@ pub fn verify_discovery_fix_outcome(
         issues.push("no remediation file_write on disk".to_string());
     }
 
-    let passed = !verified_writes.is_empty()
-        || (missing_paths.is_empty() && !claimed.is_empty() && !hit_max_iterations);
+    let passed = (!verified_writes.is_empty()
+        || (missing_paths.is_empty() && !claimed.is_empty() && !hit_max_iterations))
+        && invalid_paths.is_empty();
 
     let notes = if !passed {
         issues.join("; ")
@@ -764,5 +959,85 @@ Done.
         let v = verify_discovery_fix_outcome("Deferred all fixes.", true, &[], &[]);
         assert!(!v.passed);
         assert!(v.notes.contains("max tool iterations"));
+    }
+
+    #[test]
+    fn verify_gate_harden_rules() {
+        let project_id = std::process::id();
+        let tmp_dir = std::env::temp_dir().join(format!("gzmo-test-harden-{project_id}"));
+        let _ = std::fs::remove_dir_all(&tmp_dir);
+        std::fs::create_dir_all(&tmp_dir).unwrap();
+        
+        let project_root = tmp_dir.join("project");
+        let skills_root = tmp_dir.join("skills");
+        std::fs::create_dir_all(&project_root).unwrap();
+        std::fs::create_dir_all(&skills_root).unwrap();
+
+        let roots = vec![project_root.clone(), skills_root.clone()];
+
+        // 1. Chimera path under project_root/gzmo_skills/ -> FAIL
+        let chimera_dir = project_root.join("gzmo_skills/data");
+        std::fs::create_dir_all(&chimera_dir).unwrap();
+        let chimera_file = chimera_dir.join(".mechanics-verify-marker");
+        std::fs::write(&chimera_file, "marker").unwrap();
+
+        let v_chimera = verify_discovery_fix_outcome(
+            "Created `gzmo_skills/data/.mechanics-verify-marker`.",
+            false,
+            &roots,
+            &[chimera_file.to_string_lossy().to_string()]
+        );
+        assert!(!v_chimera.passed);
+        assert!(v_chimera.notes.contains("chimera or non-canonical path"));
+
+        let v_chimera_claimed = verify_discovery_fix_outcome(
+            "Created `survey_GZMO/gzmo_skills/data/.mechanics-verify-marker`.",
+            false,
+            &roots,
+            &[]
+        );
+        assert!(!v_chimera_claimed.passed);
+        assert!(v_chimera_claimed.notes.contains("chimera or non-canonical path"));
+
+        // 2. Same relative path under real skills_root -> PASS
+        let real_dir = skills_root.join("data");
+        std::fs::create_dir_all(&real_dir).unwrap();
+        let real_file = real_dir.join(".mechanics-verify-marker");
+        std::fs::write(&real_file, "marker").unwrap();
+
+        let v_real = verify_discovery_fix_outcome(
+            "Created `gzmo_skills/data/.mechanics-verify-marker`.",
+            false,
+            &roots,
+            &[]
+        );
+        assert!(v_real.passed, "Expected pass, got notes: {}", v_real.notes);
+
+        // 3. gzmo.toml only under project_root -> PASS; under skills_root -> FAIL
+        let real_toml = project_root.join("gzmo.toml");
+        std::fs::write(&real_toml, "toml").unwrap();
+
+        let v_toml_repo = verify_discovery_fix_outcome(
+            "Modified `gzmo.toml`.",
+            false,
+            &roots,
+            &[]
+        );
+        assert!(v_toml_repo.passed, "Expected pass for toml under repo, got notes: {}", v_toml_repo.notes);
+
+        let fake_toml = skills_root.join("gzmo.toml");
+        std::fs::write(&fake_toml, "toml").unwrap();
+
+        let fake_toml_abs = fake_toml.to_string_lossy().to_string();
+        let v_toml_skills = verify_discovery_fix_outcome(
+            &format!("Modified `{}`.", fake_toml_abs),
+            false,
+            &roots,
+            &[]
+        );
+        assert!(!v_toml_skills.passed);
+        assert!(v_toml_skills.notes.contains("chimera or non-canonical path") || v_toml_skills.notes.contains("claimed artifacts missing"));
+
+        let _ = std::fs::remove_dir_all(&tmp_dir);
     }
 }
