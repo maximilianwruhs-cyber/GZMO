@@ -13,7 +13,7 @@ use crate::config::DreamsConfig;
 use crate::gateway::LlmGateway;
 use crate::memory::episodic::FileEpisodicStore;
 use crate::memory::kg_extract::{
-    chunk_text_for_llm, merge_pipeline_chunks, KgEntity, KgPromoter, KgRelation, VerifiedEntity,
+    chunk_text_for_llm, KgEntity, KgPromoter, KgRelation, VerifiedEntity,
     VerifiedRelation, VerifyStats,
 };
 use crate::memory::vault::SqliteVault;
@@ -100,6 +100,12 @@ impl DreamEngine {
     pub async fn consolidate(&self, date: NaiveDate) -> Result<DreamReport> {
         info!(date = %date, "Starting autoDream consolidation cycle");
 
+        let _cycle_guard: Option<crate::cycle_guard::CycleGuard> =
+            crate::cycle_guard::CycleGuard::acquire(&self.episodic.data_root(), "dream").ok();
+        if _cycle_guard.is_none() {
+            warn!("Dream cycle guard not acquired");
+        }
+
         let raw = self.episodic.read_day(date).await?;
         if raw.trim().is_empty() {
             info!("No episodic data for {date} — skipping dream cycle");
@@ -185,58 +191,37 @@ impl DreamEngine {
         );
 
         let chunks = chunk_text_for_llm(&compressed, self.dreams.chunk_chars);
-        let mut chunk_results = Vec::with_capacity(chunks.len());
-        let mut failed_chunks = Vec::new();
-        for (i, chunk) in chunks.iter().enumerate() {
-            let label = if chunks.len() == 1 {
-                "Extract entities and relationships from this daily log:".to_string()
-            } else {
-                format!(
-                    "Extract entities and relationships from this daily log (part {}/{})",
-                    i + 1,
-                    chunks.len()
-                )
-            };
-            match self
-                .promoter
-                .run_pipeline(chunk, "dream_extraction", DREAM_EXTRACT_SYSTEM, &label)
-                .await
-            {
-                Ok(p) => chunk_results.push(p),
-                Err(e) => {
-                    warn!(chunk = i + 1, total = chunks.len(), "REM/verify pipeline failed: {e}");
-                    failed_chunks.push((i + 1, e.to_string()));
-                }
+        let pipeline = match self
+            .promoter
+            .run_merged_pipeline(
+                &compressed,
+                &chunks,
+                "dream_extraction",
+                DREAM_EXTRACT_SYSTEM,
+                &date.to_string(),
+                false,
+            )
+            .await
+        {
+            Ok(p) => p,
+            Err(e) => {
+                warn!("REM/verify merged pipeline failed: {e}");
+                let detail = e.to_string();
+                return Ok(DreamReport {
+                    date,
+                    original_bytes: raw.len(),
+                    compressed_bytes: compressed.len(),
+                    entities_extracted: 0,
+                    relations_extracted: 0,
+                    kg_entities_written: 0,
+                    kg_relations_written: 0,
+                    truths_promoted: 0,
+                    narrative: format!(
+                        "# Dream Consolidation — {date}\n\nMerged pipeline failed ({detail}).\nEpisodic data preserved.\n",
+                    ),
+                });
             }
-        }
-        if chunk_results.is_empty() {
-            let detail = failed_chunks
-                .first()
-                .map(|(n, e)| format!("chunk {n}: {e}"))
-                .unwrap_or_else(|| "no chunks processed".to_string());
-            return Ok(DreamReport {
-                date,
-                original_bytes: raw.len(),
-                compressed_bytes: compressed.len(),
-                entities_extracted: 0,
-                relations_extracted: 0,
-                kg_entities_written: 0,
-                kg_relations_written: 0,
-                truths_promoted: 0,
-                narrative: format!(
-                    "# Dream Consolidation — {date}\n\nPipeline failed on all chunks ({detail}).\nEpisodic data preserved.\n",
-                ),
-            });
-        }
-        if !failed_chunks.is_empty() {
-            warn!(
-                failed = failed_chunks.len(),
-                succeeded = chunk_results.len(),
-                total = chunks.len(),
-                "Dream consolidation partial: some chunks failed"
-            );
-        }
-        let pipeline = merge_pipeline_chunks(chunk_results);
+        };
 
         info!(
             raw_entities = pipeline.raw_entities,

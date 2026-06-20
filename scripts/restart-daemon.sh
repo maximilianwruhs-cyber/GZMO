@@ -5,6 +5,26 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
+FORCE=0
+if [[ "${1:-}" == "--force" ]]; then
+  FORCE=1
+  shift
+fi
+
+GUARD="$ROOT/data/cycle-guard.json"
+if [[ -f "$GUARD" && "$FORCE" -ne 1 ]]; then
+  kind="$(jq -r '.kind // "unknown"' "$GUARD" 2>/dev/null || echo unknown)"
+  echo "[!] Critical cycle in progress ($kind) — waiting up to 120s (use --force to override)"
+  for _ in $(seq 1 120); do
+    [[ -f "$GUARD" ]] || break
+    sleep 1
+  done
+  if [[ -f "$GUARD" ]]; then
+    echo "[!] Cycle still active — aborting restart (pass --force to override)" >&2
+    exit 1
+  fi
+fi
+
 if [[ "${1:-}" == "--build" ]]; then
   "$ROOT/scripts/build-gzmo.sh"
   shift

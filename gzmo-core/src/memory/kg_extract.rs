@@ -42,7 +42,9 @@ pub struct KgRelation {
 pub struct KgExtraction {
     #[allow(dead_code)]
     pub internal_analysis: String,
+    #[serde(default)]
     pub entities: Vec<KgEntity>,
+    #[serde(default)]
     pub relations: Vec<KgRelation>,
 }
 
@@ -519,7 +521,7 @@ impl KgPromoter {
                 )
             };
             let extraction = self
-                .extract(chunk, schema_name, extract_system, &label)
+                .extract_with_halved_retry(chunk, schema_name, extract_system, &label)
                 .await?;
             raw_entities += extraction.entities.len();
             raw_relations += extraction.relations.len();
@@ -573,6 +575,41 @@ impl KgPromoter {
             candidates_relations: relations.len(),
             candidate_relations: relations,
         })
+    }
+
+    /// On parse failure, retry once by splitting the chunk in half and merging sub-extractions.
+    async fn extract_with_halved_retry(
+        &self,
+        chunk: &str,
+        schema_name: &str,
+        extract_system: &str,
+        user_label: &str,
+    ) -> Result<KgExtraction> {
+        match self
+            .extract(chunk, schema_name, extract_system, user_label)
+            .await
+        {
+            Ok(extraction) => Ok(extraction),
+            Err(first_err) => {
+                let Some((left, right)) = split_chunk_halves(chunk) else {
+                    return Err(first_err);
+                };
+                tracing::warn!(
+                    chunk_chars = chunk.len(),
+                    error = %first_err,
+                    "KG extract failed — retrying with halved sub-chunks"
+                );
+                let left_label = format!("{user_label} (retry sub-part a/2)");
+                let right_label = format!("{user_label} (retry sub-part b/2)");
+                let left_ext = self
+                    .extract(&left, schema_name, extract_system, &left_label)
+                    .await?;
+                let right_ext = self
+                    .extract(&right, schema_name, extract_system, &right_label)
+                    .await?;
+                Ok(merge_extractions_pre_verify(vec![left_ext, right_ext]))
+            }
+        }
     }
 
     pub async fn extract(
@@ -980,6 +1017,19 @@ pub fn chunk_text_for_llm(raw: &str, max_chars: usize) -> Vec<String> {
     chunks
 }
 
+/// Split a chunk into two UTF-8-safe halves for parse-error retry.
+pub fn split_chunk_halves(chunk: &str) -> Option<(String, String)> {
+    const MIN_SPLIT_CHARS: usize = 512;
+    if chunk.len() < MIN_SPLIT_CHARS {
+        return None;
+    }
+    let mid = chunk.floor_char_boundary(chunk.len() / 2);
+    if mid == 0 || mid >= chunk.len() {
+        return None;
+    }
+    Some((chunk[..mid].to_string(), chunk[mid..].to_string()))
+}
+
 fn merge_verified_entity(existing: &mut VerifiedEntity, incoming: &VerifiedEntity) {
     if incoming.confidence > existing.confidence {
         existing.confidence = incoming.confidence;
@@ -1285,5 +1335,98 @@ mod tests {
         let chunks = chunk_text_for_llm(&text, 28000);
         assert!(chunks.len() > 1);
         assert_eq!(chunks.concat(), text);
+    }
+
+    #[test]
+    fn split_chunk_halves_is_utf8_safe() {
+        let text = "a".repeat(600) + "ü" + &"b".repeat(600);
+        let (left, right) = split_chunk_halves(&text).expect("splittable");
+        assert_eq!(left.len() + right.len(), text.len());
+        assert_eq!(format!("{left}{right}"), text);
+    }
+
+    #[test]
+    fn split_chunk_halves_rejects_tiny_chunks() {
+        assert!(split_chunk_halves("short").is_none());
+    }
+
+    #[tokio::test]
+    async fn merged_pipeline_halved_retry_recovers_from_truncated_json() {
+        use std::sync::atomic::{AtomicUsize, Ordering};
+        use std::sync::Arc;
+        use async_trait::async_trait;
+        use crate::gateway::{LlmGateway, LlmResponse, ToolDeclaration};
+        use crate::tools::ToolRegistry;
+        use crate::types::Message;
+
+        struct TruncThenValidGateway {
+            calls: Arc<AtomicUsize>,
+        }
+
+        #[async_trait]
+        impl LlmGateway for TruncThenValidGateway {
+            async fn complete(
+                &self,
+                _: &[Message],
+                _: &[ToolDeclaration],
+            ) -> anyhow::Result<LlmResponse> {
+                anyhow::bail!("unused")
+            }
+
+            async fn complete_streaming(
+                &self,
+                _: &[Message],
+                _: &[ToolDeclaration],
+                _: Box<dyn Fn(String) + Send>,
+            ) -> anyhow::Result<LlmResponse> {
+                anyhow::bail!("unused")
+            }
+
+            async fn complete_structured(
+                &self,
+                _: &[Message],
+                _: &str,
+                _: serde_json::Value,
+            ) -> anyhow::Result<String> {
+                let n = self.calls.fetch_add(1, Ordering::SeqCst);
+                if n == 0 {
+                    Ok(r#"{"internal_analysis":"","entities":[],"relations": ["#.into())
+                } else {
+                    Ok(r#"{"internal_analysis":"","entities":[{"name":"GZMO","type":"SYSTEM","observations":["local-first agent"]}],"relations":[]}"#.into())
+                }
+            }
+        }
+
+        let calls = Arc::new(AtomicUsize::new(0));
+        let gw: Arc<dyn LlmGateway> = Arc::new(TruncThenValidGateway {
+            calls: Arc::clone(&calls),
+        });
+        let tools = Arc::new(ToolRegistry::new());
+        let promoter = KgPromoter::new(
+            gw,
+            tools,
+            KgGateConfig {
+                verify: false,
+                ..Default::default()
+            },
+        );
+        let chunk = "word ".repeat(300);
+        let result = promoter
+            .run_merged_pipeline(
+                &chunk,
+                std::slice::from_ref(&chunk),
+                "dream_extraction",
+                "extract",
+                "smoke",
+                false,
+            )
+            .await
+            .expect("merged pipeline should recover via halved retry");
+        assert!(
+            result.raw_entities >= 1,
+            "expected entities from halved retry, calls={}",
+            calls.load(Ordering::SeqCst)
+        );
+        assert_eq!(calls.load(Ordering::SeqCst), 3, "full chunk + 2 halves");
     }
 }

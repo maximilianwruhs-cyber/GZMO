@@ -358,7 +358,27 @@ pub async fn run_startup_probes(
         }
     }
 
+    if let Some(bus) = synapse {
+        append_routing_cognition_tick(config, bus);
+    }
+
     Ok(results)
+}
+
+/// Emit HealthTick with routing/librarian config for daemon cognition alignment (F4).
+pub fn append_routing_cognition_tick(config: &GzmoConfig, bus: &SynapseBus) {
+    let routing_blindness =
+        !config.librarian.enabled && !config.session_distill.use_librarian;
+    bus.append(&SynapseEvent::with_data(
+        EventType::HealthTick,
+        resolve_event_source(EventSource::GzmoDaemon),
+        serde_json::json!({
+            "librarian_enabled": config.librarian.enabled,
+            "use_librarian": config.session_distill.use_librarian,
+            "librarian_summary": config.session_distill.librarian_summary,
+            "routing_blindness": routing_blindness,
+        }),
+    ));
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

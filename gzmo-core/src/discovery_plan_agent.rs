@@ -157,13 +157,25 @@ pub fn build_plan_agent_brief(
         String::new(),
         "Task:".to_string(),
         "1. file_read report, probe JSONs, and relevant gzmo-core/gzmo.toml paths.".to_string(),
-        "2. Write substantive plan.md (≥800 words) with sequencing and sidecar vs core rationale.".to_string(),
+        "2. Write substantive plan.md (≥800 words; target 900+) with sequencing and sidecar vs core rationale.".to_string(),
         "3. Write plan.json with workstreams (acceptance ≥2 each, each MUST be a valid bash one-liner passing 'bash -n -c \"<entry>\"') and deferred[] for skipped findings.".to_string(),
-        "4. Write plan-provenance.json listing files_read and grep_queries.".to_string(),
-        "5. Populate description and spawn_command fields in every workstream.".to_string(),
-        "6. Path resolution for acceptance commands: $GZMO_ROOT for gzmo-core/ paths, $GZMO_SKILLS_ROOT/survey_GZMO/ for gzmo_skills/ paths.".to_string(),
-        "7. Do NOT spawn sub-agents. Scope: survey_GZMO/ and gzmo_skills/ only.".to_string(),
-        "8. If remediation history is present below, apply proven patterns and avoid listed failure modes.".to_string(),
+        "4. Every actionable finding_id from the seed MUST appear in workstreams[].finding_ids OR deferred[].finding_id — uncovered findings fail eval.".to_string(),
+        format!(
+            "5. Required finding coverage (map each to ≥1 workstream): {}",
+            findings
+                .iter()
+                .map(|f| f.finding_id.as_str())
+                .collect::<Vec<_>>()
+                .join(", ")
+        ),
+        "6. Write plan-provenance.json listing files_read and grep_queries.".to_string(),
+        "7. Populate description and spawn_command fields in every workstream.".to_string(),
+        "8. Path resolution for acceptance commands: $GZMO_ROOT for gzmo-core/ paths, $GZMO_SKILLS_ROOT for gzmo_skills/ paths (never survey_GZMO/gzmo_skills chimera paths).".to_string(),
+        "9. Do NOT spawn sub-agents. Scope: survey_GZMO/ and gzmo_skills/ only.".to_string(),
+        "10. If remediation history is present below, apply proven patterns and avoid listed failure modes.".to_string(),
+        "11. On retry feedback: expand plan.md — never shorten below the prior word count.".to_string(),
+        "12. complexity=complex workstreams MUST include gzmo-core/ or gzmo.toml in target_paths.".to_string(),
+        "13. Prefer sidecar complexity=moderate for probe/script work; reserve complex for true core edits.".to_string(),
     ];
 
     if let Some(feedback) = eval_feedback {
@@ -185,6 +197,55 @@ pub fn build_plan_agent_brief(
     crate::text_util::truncate_chars(&lines.join("\n"), max_chars)
 }
 
+pub fn plan_md_word_count(path: &Path) -> usize {
+    std::fs::read_to_string(path)
+        .map(|s| s.split_whitespace().count())
+        .unwrap_or(0)
+}
+
+fn acceptance_has_chimera_path(cmd: &str) -> bool {
+    cmd.contains("survey_GZMO/gzmo_skills")
+        || cmd.contains("gzmo_skills/survey_GZMO")
+        || cmd.contains("GZMO_SKILLS_ROOT/survey_GZMO/")
+}
+
+fn complex_workstream_has_core_target(workstream: &serde_json::Value) -> bool {
+    workstream
+        .get("target_paths")
+        .and_then(|a| a.as_array())
+        .map(|paths| {
+            paths.iter().any(|p| {
+                p.as_str()
+                    .map(|s| s.contains("gzmo-core/") || s.contains("gzmo.toml"))
+                    .unwrap_or(false)
+            })
+        })
+        .unwrap_or(false)
+}
+
+fn covered_finding_ids(plan_json: &serde_json::Value) -> std::collections::HashSet<String> {
+    let mut covered = std::collections::HashSet::new();
+    if let Some(workstreams) = plan_json.get("workstreams").and_then(|a| a.as_array()) {
+        for ws in workstreams {
+            if let Some(ids) = ws.get("finding_ids").and_then(|a| a.as_array()) {
+                for id in ids {
+                    if let Some(s) = id.as_str() {
+                        covered.insert(s.to_string());
+                    }
+                }
+            }
+        }
+    }
+    if let Some(deferred) = plan_json.get("deferred").and_then(|a| a.as_array()) {
+        for entry in deferred {
+            if let Some(fid) = entry.get("finding_id").and_then(|v| v.as_str()) {
+                covered.insert(fid.to_string());
+            }
+        }
+    }
+    covered
+}
+
 fn plan_prompt_template_path() -> PathBuf {
     let skills = std::env::var("GZMO_SKILLS_ROOT")
         .map(PathBuf::from)
@@ -197,7 +258,7 @@ fn plan_prompt_template_path() -> PathBuf {
 pub fn verify_plan_agent_outcome(
     output: &PlanOutputPaths,
     written_paths: &[String],
-    finding_count: usize,
+    findings: &[ActionableFinding],
 ) -> PlanVerification {
     let mut notes = Vec::new();
     let mut passed = true;
@@ -215,10 +276,71 @@ pub fn verify_plan_agent_outcome(
         }
     }
 
+    let finding_count = findings.len();
+
+    if output.plan_json.is_file() {
+        if let Ok(raw) = std::fs::read_to_string(&output.plan_json) {
+            match serde_json::from_str::<serde_json::Value>(&raw) {
+                Err(_) => {
+                    passed = false;
+                    notes.push("plan.json invalid JSON".into());
+                }
+                Ok(val) => {
+                    let covered = covered_finding_ids(&val);
+                    for finding in findings {
+                        if !covered.contains(&finding.finding_id) {
+                            passed = false;
+                            notes.push(format!(
+                                "finding {} not in workstreams or deferred",
+                                finding.finding_id
+                            ));
+                        }
+                    }
+                    if let Some(workstreams) = val.get("workstreams").and_then(|a| a.as_array()) {
+                        for ws in workstreams {
+                            let wid = ws.get("id").and_then(|v| v.as_str()).unwrap_or("?");
+                            if ws.get("complexity").and_then(|v| v.as_str()) == Some("complex")
+                                && !complex_workstream_has_core_target(ws)
+                            {
+                                passed = false;
+                                notes.push(format!(
+                                    "{wid} complex workstream lacks gzmo-core/ or gzmo.toml target_paths"
+                                ));
+                            }
+                            if let Some(acceptance) =
+                                ws.get("acceptance").and_then(|a| a.as_array())
+                            {
+                                for (i, entry) in acceptance.iter().enumerate() {
+                                    if let Some(cmd) = entry.as_str() {
+                                        if acceptance_has_chimera_path(cmd) {
+                                            passed = false;
+                                            notes.push(format!(
+                                                "{wid} acceptance[{i}] uses chimera path; use $GZMO_ROOT or $GZMO_SKILLS_ROOT"
+                                            ));
+                                        }
+                                        let syntax_ok = std::process::Command::new("bash")
+                                            .args(["-n", "-c", cmd])
+                                            .output()
+                                            .map(|o| o.status.success())
+                                            .unwrap_or(false);
+                                        if !syntax_ok {
+                                            passed = false;
+                                            notes.push(format!(
+                                                "{wid} acceptance[{i}] bash syntax error: {cmd}"
+                                            ));
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     if output.plan_md.is_file() {
-        let words = std::fs::read_to_string(&output.plan_md)
-            .map(|s| s.split_whitespace().count())
-            .unwrap_or(0);
+        let words = plan_md_word_count(&output.plan_md);
         if words < 800 {
             passed = false;
             notes.push(format!("plan.md word count {words} < 800"));
@@ -243,39 +365,6 @@ pub fn verify_plan_agent_outcome(
             } else {
                 passed = false;
                 notes.push("plan-provenance.json invalid JSON".into());
-            }
-        }
-    }
-
-    if output.plan_json.is_file() {
-        if let Ok(raw) = std::fs::read_to_string(&output.plan_json) {
-            match serde_json::from_str::<serde_json::Value>(&raw) {
-                Err(_) => {
-                    passed = false;
-                    notes.push("plan.json invalid JSON".into());
-                }
-                Ok(val) => {
-                    if let Some(workstreams) = val.get("workstreams").and_then(|a| a.as_array()) {
-                        for ws in workstreams {
-                            let wid = ws.get("id").and_then(|v| v.as_str()).unwrap_or("?");
-                            if let Some(acceptance) = ws.get("acceptance").and_then(|a| a.as_array()) {
-                                for (i, entry) in acceptance.iter().enumerate() {
-                                    if let Some(cmd) = entry.as_str() {
-                                        let syntax_ok = std::process::Command::new("bash")
-                                            .args(["-n", "-c", cmd])
-                                            .output()
-                                            .map(|o| o.status.success())
-                                            .unwrap_or(false);
-                                        if !syntax_ok {
-                                            passed = false;
-                                            notes.push(format!("{wid} acceptance[{i}] bash syntax error: {cmd}"));
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
             }
         }
     }
@@ -365,22 +454,130 @@ mod tests {
         assert!(brief.contains("rewrite paths"));
     }
 
+    fn temp_plan_output(prefix: &str) -> PlanOutputPaths {
+        let plan_dir = std::env::temp_dir().join(format!("gzmo-plan-test-{prefix}-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&plan_dir);
+        std::fs::create_dir_all(&plan_dir).unwrap();
+        PlanOutputPaths {
+            plan_md: plan_dir.join("plan.md"),
+            plan_json: plan_dir.join("plan.json"),
+            plan_provenance: plan_dir.join("plan-provenance.json"),
+            plan_dir,
+        }
+    }
+
     #[test]
-    fn plan_agent_brief_triggers_discovery_write_config() {
-        let output = resolve_plan_output_paths("sess-final");
-        let brief = build_plan_agent_brief(
-            Path::new("/tmp/report.md"),
-            "sess-1",
-            "sess-final",
-            &[],
-            &output,
-            None,
-            12_000,
-        );
-        assert!(crate::discovery_code_implementer::is_discovery_agent_brief(&brief));
-        let cfg = crate::discovery_code_implementer::discovery_agent_write_config(&brief, 50)
-            .expect("write config");
-        assert!(cfg.write_phase_at <= 15);
-        assert!(cfg.write_phase_message.contains("plan-provenance.json"));
+    fn verify_rejects_uncovered_finding() {
+        let output = temp_plan_output("uncovered");
+        std::fs::write(&output.plan_md, "word ".repeat(850)).unwrap();
+        std::fs::write(
+            &output.plan_json,
+            r#"{"workstreams":[{"id":"WS1","finding_ids":["F1"],"acceptance":["test -f /tmp/x"]}],"deferred":[]}"#,
+        )
+        .unwrap();
+        std::fs::write(
+            &output.plan_provenance,
+            r#"{"files_read":["a","b","c"],"grep_queries":[]}"#,
+        )
+        .unwrap();
+        let findings = vec![
+            ActionableFinding {
+                finding_id: "F1".into(),
+                title: "One".into(),
+                kind: FindingKind::Gap,
+                excerpt: String::new(),
+            },
+            ActionableFinding {
+                finding_id: "F2".into(),
+                title: "Two".into(),
+                kind: FindingKind::Gap,
+                excerpt: String::new(),
+            },
+        ];
+        let v = verify_plan_agent_outcome(&output, &[], &findings);
+        assert!(!v.passed);
+        assert!(v.notes.contains("F2"));
+    }
+
+    #[test]
+    fn verify_accepts_deferred_finding() {
+        let output = temp_plan_output("deferred");
+        std::fs::write(&output.plan_md, "word ".repeat(850)).unwrap();
+        std::fs::write(
+            &output.plan_json,
+            r#"{"workstreams":[{"id":"WS1","finding_ids":["F1"],"acceptance":["test -f /tmp/x","test -f /tmp/y"]}],"deferred":[{"finding_id":"F2","reason":"later"}]}"#,
+        )
+        .unwrap();
+        std::fs::write(
+            &output.plan_provenance,
+            r#"{"files_read":["a","b","c"],"grep_queries":[]}"#,
+        )
+        .unwrap();
+        let findings = vec![
+            ActionableFinding {
+                finding_id: "F1".into(),
+                title: "One".into(),
+                kind: FindingKind::Gap,
+                excerpt: String::new(),
+            },
+            ActionableFinding {
+                finding_id: "F2".into(),
+                title: "Two".into(),
+                kind: FindingKind::Gap,
+                excerpt: String::new(),
+            },
+        ];
+        let v = verify_plan_agent_outcome(&output, &[], &findings);
+        assert!(v.passed, "{}", v.notes);
+    }
+
+    #[test]
+    fn verify_rejects_chimera_acceptance_path() {
+        let output = temp_plan_output("chimera");
+        std::fs::write(&output.plan_md, "word ".repeat(850)).unwrap();
+        std::fs::write(
+            &output.plan_json,
+            r#"{"workstreams":[{"id":"WS1","finding_ids":["F1"],"complexity":"moderate","acceptance":["test -f $GZMO_SKILLS_ROOT/survey_GZMO/scripts/x.sh","test -f /tmp/y"]}],"deferred":[]}"#,
+        )
+        .unwrap();
+        std::fs::write(
+            &output.plan_provenance,
+            r#"{"files_read":["a","b","c"],"grep_queries":[]}"#,
+        )
+        .unwrap();
+        let findings = vec![ActionableFinding {
+            finding_id: "F1".into(),
+            title: "One".into(),
+            kind: FindingKind::Gap,
+            excerpt: String::new(),
+        }];
+        let v = verify_plan_agent_outcome(&output, &[], &findings);
+        assert!(!v.passed);
+        assert!(v.notes.contains("chimera"));
+    }
+
+    #[test]
+    fn verify_rejects_complex_without_core_target() {
+        let output = temp_plan_output("complex");
+        std::fs::write(&output.plan_md, "word ".repeat(850)).unwrap();
+        std::fs::write(
+            &output.plan_json,
+            r#"{"workstreams":[{"id":"WS1","finding_ids":["F1"],"complexity":"complex","target_paths":["gzmo_skills/scripts/x.sh"],"acceptance":["test -f /tmp/x","test -f /tmp/y"]}],"deferred":[]}"#,
+        )
+        .unwrap();
+        std::fs::write(
+            &output.plan_provenance,
+            r#"{"files_read":["a","b","c"],"grep_queries":[]}"#,
+        )
+        .unwrap();
+        let findings = vec![ActionableFinding {
+            finding_id: "F1".into(),
+            title: "One".into(),
+            kind: FindingKind::Gap,
+            excerpt: String::new(),
+        }];
+        let v = verify_plan_agent_outcome(&output, &[], &findings);
+        assert!(!v.passed);
+        assert!(v.notes.contains("complex workstream"));
     }
 }

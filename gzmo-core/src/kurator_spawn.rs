@@ -382,6 +382,7 @@ async fn spawn_discovery_plan_with_retries(
     let mut spec = initial_spec;
     let mut last_result: Option<SubagentResult> = None;
     let mut last_verify_notes: Option<String> = None;
+    let mut prev_words: Option<usize> = None;
 
     for attempt in 0..=max_retries {
         if attempt > 0 {
@@ -406,13 +407,34 @@ async fn spawn_discovery_plan_with_retries(
         let verification = crate::discovery_plan_agent::verify_plan_agent_outcome(
             &output,
             &result.written_paths,
-            analysis.actionable_count(),
+            &analysis.findings,
         );
 
         if verification.passed {
             last_result = Some(result);
             break;
         }
+
+        let current_words = if output.plan_md.is_file() {
+            crate::discovery_plan_agent::plan_md_word_count(&output.plan_md)
+        } else {
+            0
+        };
+        if attempt > 0 {
+            if let Some(prev) = prev_words {
+                if current_words < prev {
+                    tracing::warn!(
+                        attempt,
+                        prev_words = prev,
+                        current_words,
+                        "Discovery plan regressed on retry — aborting further attempts"
+                    );
+                    last_result = Some(result);
+                    break;
+                }
+            }
+        }
+        prev_words = Some(current_words);
 
         tracing::warn!(
             task_id = %result.task_id,
@@ -439,7 +461,19 @@ async fn spawn_discovery_plan_with_retries(
             },
             attempt,
         );
-        last_verify_notes = Some(verification.notes.clone());
+        last_verify_notes = Some({
+            let mut notes = verification.notes.clone();
+            if output.plan_md.is_file() {
+                let words =
+                    crate::discovery_plan_agent::plan_md_word_count(&output.plan_md);
+                if words < 900 {
+                    notes.push_str(&format!(
+                        "; Current plan.md: {words} words — expand to ≥900 (never shorten on retry)"
+                    ));
+                }
+            }
+            notes
+        });
         last_result = Some(result);
 
         if attempt >= max_retries {

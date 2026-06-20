@@ -3,9 +3,11 @@
 use anyhow::Result;
 use gzmo_core::config::GzmoConfig;
 use gzmo_core::health::{
-    format_report, probe_embeddings, probe_librarian, probe_llm_models, probe_mcp_memory,
-    probe_neo4j_bolt, probe_qdrant, probe_redis, probe_rerank, probe_sovereign, ProbeResult,
+    append_routing_cognition_tick, format_report, probe_embeddings, probe_librarian,
+    probe_llm_models, probe_mcp_memory, probe_neo4j_bolt, probe_qdrant, probe_redis,
+    probe_rerank, probe_sovereign, ProbeResult,
 };
+use gzmo_core::synapse::{set_event_source, EventSource, SynapseBus};
 use gzmo_core::identity::IdentityEngine;
 use gzmo_core::memory::embeddings;
 use gzmo_core::tools::ToolRegistry;
@@ -52,7 +54,10 @@ pub async fn run(config: &GzmoConfig, _identity: IdentityEngine) -> Result<()> {
         results.push(r);
     }
 
-    // CLI health is one-shot — no synapse bus needed
+    set_event_source(EventSource::GzmoCli);
+    let synapse = SynapseBus::with_path(config.synapse_pull.bus_path.clone());
+    append_routing_cognition_tick(config, &synapse);
+
     let report = format_report(&results);
     print!("{report}");
     if results.iter().any(|r| !r.ok && r.name != "sovereign") {

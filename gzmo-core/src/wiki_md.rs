@@ -10,11 +10,21 @@ use std::path::Path;
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum PageType {
+    Entity,
+    Concept,
+    Source,
+    Index,
+    Log,
+}
+
 /// YAML frontmatter on every wiki page (consumed by Obsidian Dataview).
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PageFrontmatter {
     #[serde(rename = "type")]
-    pub page_type: String, // entity | concept | source
+    pub page_type: PageType, // entity | concept | source | index | log
     pub title: String,
     pub created: String, // YYYY-MM-DD
     pub updated: String, // YYYY-MM-DD
@@ -28,6 +38,8 @@ pub struct PageFrontmatter {
     /// any file carrying this flag, preventing derived-fact feedback loops.
     #[serde(default)]
     pub gzmo_synthetic: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub okf_version: Option<String>,
 }
 
 fn default_status() -> String {
@@ -35,9 +47,9 @@ fn default_status() -> String {
 }
 
 impl PageFrontmatter {
-    pub fn new(page_type: &str, title: &str, date: &str) -> Self {
+    pub fn new(page_type: PageType, title: &str, date: &str) -> Self {
         Self {
-            page_type: page_type.to_string(),
+            page_type,
             title: title.to_string(),
             created: date.to_string(),
             updated: date.to_string(),
@@ -45,6 +57,7 @@ impl PageFrontmatter {
             tags: Vec::new(),
             status: default_status(),
             gzmo_synthetic: true,
+            okf_version: None,
         }
     }
 }
@@ -309,12 +322,12 @@ mod tests {
 
     #[test]
     fn frontmatter_roundtrip() {
-        let fm = PageFrontmatter::new("entity", "GZMO", "2026-06-07");
+        let fm = PageFrontmatter::new(PageType::Entity, "GZMO", "2026-06-07");
         let rendered = render_page(&fm, "Body text.");
         let (parsed, body) = split_frontmatter(&rendered);
         let parsed = parsed.expect("frontmatter parses");
         assert_eq!(parsed.title, "GZMO");
-        assert_eq!(parsed.page_type, "entity");
+        assert_eq!(parsed.page_type, PageType::Entity);
         assert!(parsed.gzmo_synthetic);
         assert_eq!(body.trim(), "Body text.");
     }

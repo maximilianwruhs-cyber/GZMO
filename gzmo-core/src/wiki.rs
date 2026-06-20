@@ -42,6 +42,8 @@ pub struct LintReport {
     pub missing_frontmatter: Vec<String>,
     pub broken_links: Vec<String>,
     pub stale: Vec<String>,
+    pub wikilinks_detected: Vec<String>,
+    pub okf_missing_index_version: bool,
     pub report_path: String,
 }
 
@@ -107,7 +109,7 @@ impl WikiEngine {
             let (fm, body) = match read_page(&path).await {
                 Some((fm, body)) => (fm, body),
                 None => (
-                    PageFrontmatter::new("entity", name, &date_str),
+                    PageFrontmatter::new(crate::wiki_md::PageType::Entity, name, &date_str),
                     format!("# {name}\n\nType: {}\n", ve.entity.entity_type),
                 ),
             };
@@ -161,7 +163,7 @@ impl WikiEngine {
                 ));
             }
         }
-        let mut fm = PageFrontmatter::new("source", &source_title, &date_str);
+        let mut fm = PageFrontmatter::new(crate::wiki_md::PageType::Source, &source_title, &date_str);
         fm.sources = 1;
         fm.status = "stable".to_string();
         let source_path = self.sources_dir().join(format!("{source_slug}.md"));
@@ -235,7 +237,7 @@ impl WikiEngine {
 
         let mut index = read_string(&self.index_path()).await;
         if index.trim().is_empty() {
-            index = "---\ntitle: Wiki Index\ntype: index\n---\n\n# Wiki Index\n".to_string();
+            index = "---\ntitle: Wiki Index\ntype: index\nokf_version: \"0.1\"\n---\n\n# Wiki Index\n".to_string();
         }
         let mut entries = 0usize;
         for (category, rows) in &by_category {
@@ -259,7 +261,6 @@ impl WikiEngine {
         })
     }
 
-    /// Structural health check (report-only). Writes `sources/_lint-DATE.md`.
     pub async fn lint(&self) -> Result<LintReport> {
         let pages = list_md_recursive(&self.dir());
         let mut report = LintReport {
@@ -292,6 +293,16 @@ impl WikiEngine {
                 .and_then(|s| s.to_str())
                 .unwrap_or_default()
                 .to_string();
+            if stem == "index" {
+                let (fm, _body) = wiki_md::split_frontmatter(content);
+                if let Some(f) = fm {
+                    if f.okf_version != Some("0.1".to_string()) {
+                        report.okf_missing_index_version = true;
+                    }
+                } else {
+                    report.okf_missing_index_version = true;
+                }
+            }
             // Skip index/log/lint reports themselves.
             if stem == "index" || stem == "log" || stem.starts_with("_lint-") {
                 continue;
@@ -311,6 +322,7 @@ impl WikiEngine {
             }
             // Broken links: [[target]] with no matching page slug.
             for target in extract_wikilinks(content) {
+                report.wikilinks_detected.push(format!("{name}: [[{target}]]"));
                 if !page_slugs.contains(&target) {
                     report
                         .broken_links
@@ -322,6 +334,8 @@ impl WikiEngine {
         report.orphans.dedup();
         report.broken_links.sort();
         report.broken_links.dedup();
+        report.wikilinks_detected.sort();
+        report.wikilinks_detected.dedup();
 
         let body = render_lint(&report, &today);
         let report_path = self.sources_dir().join(format!("_lint-{today}.md"));
@@ -353,7 +367,7 @@ impl WikiEngine {
         let date_str = chrono::Utc::now().format("%Y-%m-%d").to_string();
         let slug = wiki_md::slugify(title);
         let path = self.concepts_dir().join(format!("{slug}.md"));
-        let mut fm = PageFrontmatter::new("concept", title, &date_str);
+        let mut fm = PageFrontmatter::new(crate::wiki_md::PageType::Concept, title, &date_str);
         fm.updated = date_str.clone();
         let page_body = format!("# {title}\n\n{}\n", body.trim());
         upsert_page(&path, fm, &page_body).await?;
@@ -470,6 +484,15 @@ fn render_lint(report: &LintReport, date: &str) -> String {
     section(&mut s, "Broken wikilinks", &report.broken_links);
     section(&mut s, "Missing frontmatter", &report.missing_frontmatter);
     section(&mut s, "Stale pages", &report.stale);
+    section(&mut s, "Wikilinks detected (CommonMark preferred)", &report.wikilinks_detected);
+    
+    s.push_str("\n## OKF Compliance\n");
+    if report.okf_missing_index_version {
+        s.push_str("- [FAIL] index.md is missing `okf_version: \"0.1\"`\n");
+    } else {
+        s.push_str("- [OK] index.md carries `okf_version: \"0.1\"`\n");
+    }
+    
     s.push_str("\n_Report-only: fixes stay human-directed (see WIKI.md)._\n");
     s
 }

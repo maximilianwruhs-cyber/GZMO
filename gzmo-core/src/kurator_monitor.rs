@@ -331,6 +331,7 @@ pub fn emit_recommendations(
                 .clone()
                 .or_else(|| {
                     if rec.reason.starts_with("discovery_fail_gap:")
+                        || rec.reason.starts_with("discovery_actionable:")
                         || rec.session_id.starts_with("discovery-fix:")
                     {
                         Some("discovery_fix".to_string())
@@ -813,7 +814,7 @@ mod tests {
         .expect("recommendation");
 
         assert_eq!(rec.kind.as_deref(), Some("discovery_fix"));
-        assert!(rec.reason.contains("discovery_fail_gap"));
+        assert!(rec.reason.contains("discovery_actionable"));
         let raw = std::fs::read_to_string(&bus_path).unwrap();
         assert!(raw.contains("spawn.recommended"));
 

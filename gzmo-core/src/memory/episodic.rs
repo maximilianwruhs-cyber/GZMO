@@ -20,6 +20,14 @@ impl FileEpisodicStore {
         }
     }
 
+    /// Project `data/` directory sibling to `memory/`.
+    pub fn data_root(&self) -> PathBuf {
+        self.memory_dir
+            .parent()
+            .map(|p| p.join("data"))
+            .unwrap_or_else(|| PathBuf::from("data"))
+    }
+
     /// Get the path for a specific date's log file.
     fn path_for_date(&self, date: NaiveDate) -> PathBuf {
         self.memory_dir

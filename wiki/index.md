@@ -12021,3 +12021,7 @@
 - [My View of the World](entities/my-view-of-the-world.md) — draft — 1 source(s)
 - [Merge Manager](entities/merge-manager.md) — draft — 1 source(s)
 - [Snort](entities/snort.md) — draft — 1 source(s)
+- [Agent-Reach](entities/agent-reach.md) — draft — 1 source(s)
+- [Agent-Reach Patterns](entities/agent-reach-patterns.md) — draft — 1 source(s)
+- [Agentic Resource Discovery](entities/agentic-resource-discovery.md) — draft — 1 source(s)
+- [Open Knowledge Format](entities/open-knowledge-format.md) — draft — 1 source(s)
