@@ -566,6 +566,8 @@ default_agent_profile = "prometheus"
 approve_spawns_subagent = true
 auto_spawn_on_recommend = true
 spawn_brief_max_chars = 4000
+fixer_worktree_isolation = false
+
 
 [kurator.spawn_gate]
 enabled = true

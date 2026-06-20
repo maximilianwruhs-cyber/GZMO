@@ -219,6 +219,14 @@ pub enum EventType {
     #[serde(rename = "discovery_fix.failed")]
     DiscoveryFixFailed,
 
+    /// Agent stuck in a loop
+    #[serde(rename = "agent.stuck")]
+    AgentStuck,
+
+    /// Remediation/Fixer retries exhausted, requiring operator escalation
+    #[serde(rename = "remediation.escalated")]
+    RemediationEscalated,
+
     /// Hourly Obolus efficiency rollup (η per process family)
     #[serde(rename = "obolus.efficiency_tick")]
     ObolusEfficiencyTick,
@@ -347,9 +355,10 @@ pub struct SynapseBus {
 impl SynapseBus {
     /// Create a new SynapseBus with the default path.
     pub fn new() -> Self {
-        Self {
-            path: PathBuf::from("data/Synapse/events.jsonl"),
-        }
+        let path = std::env::var("GZMO_SYNAPSE_BUS")
+            .map(PathBuf::from)
+            .unwrap_or_else(|_| PathBuf::from("data/Synapse/events.jsonl"));
+        Self { path }
     }
 
     /// Create a new SynapseBus with a custom path.

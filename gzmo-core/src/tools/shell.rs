@@ -206,6 +206,7 @@ impl ToolHandler for ShellExecTool {
 
         if let Some(cwd) = &self.cwd {
             cmd.current_dir(cwd);
+            cmd.env("GZMO_SKILLS_ROOT", cwd);
         }
 
         // Execute with timeout

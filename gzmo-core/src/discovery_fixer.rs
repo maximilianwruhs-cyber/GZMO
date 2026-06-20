@@ -476,6 +476,8 @@ pub fn build_fixer_brief_for_findings(
         "Scope: GZMO project root and gzmo_skills only. Do NOT run broad recursive greps across /home, /data, or /var.".to_string(),
     );
 
+    lines.push(crate::discovery_git_context::collect_git_context(&gzmo_root_abs));
+
     crate::text_util::truncate_chars(&lines.join("\n"), max_chars)
 }
 
@@ -582,8 +584,8 @@ pub fn classify_artifact_path(raw: &str, gzmo_root: &Path, skills_root: &Path) -
         || path_str.ends_with("/gzmo.toml")
         || path_str.contains("/gzmo-core/")
         || path_str.starts_with("gzmo-core/")
-        || path_str.contains("/scripts/")
-        || path_str.starts_with("scripts/")
+        || (path_str.contains("/scripts/") && !path_str.contains("gzmo_skills/scripts/"))
+        || (path_str.starts_with("scripts/") && !path_str.starts_with("gzmo_skills/scripts/"))
         || path_str == "Cargo.toml"
         || path_str.ends_with("/Cargo.toml")
         || path_str == "Cargo.lock"
@@ -742,6 +744,7 @@ pub struct DiscoveryFixVerification {
     pub missing_paths: Vec<String>,
     pub hit_max_iterations: bool,
     pub notes: String,
+    pub acceptance_failed: Vec<String>,
 }
 
 /// Post-spawn verify gate: proven file_write paths or claimed artifacts must exist on disk.
@@ -818,6 +821,7 @@ pub fn verify_discovery_fix_outcome(
         missing_paths,
         hit_max_iterations,
         notes,
+        acceptance_failed: vec![],
     }
 }
 
@@ -1037,6 +1041,20 @@ Done.
         );
         assert!(!v_toml_skills.passed);
         assert!(v_toml_skills.notes.contains("chimera or non-canonical path") || v_toml_skills.notes.contains("claimed artifacts missing"));
+
+        // 4. Script under skills_root/scripts -> PASS
+        let real_script_dir = skills_root.join("scripts/discovery-remediations");
+        std::fs::create_dir_all(&real_script_dir).unwrap();
+        let real_script = real_script_dir.join("fix.sh");
+        std::fs::write(&real_script, "#!/bin/sh").unwrap();
+
+        let v_script = verify_discovery_fix_outcome(
+            "Created `gzmo_skills/scripts/discovery-remediations/fix.sh`.",
+            false,
+            &roots,
+            &[]
+        );
+        assert!(v_script.passed, "Expected pass for skills script, got notes: {}", v_script.notes);
 
         let _ = std::fs::remove_dir_all(&tmp_dir);
     }

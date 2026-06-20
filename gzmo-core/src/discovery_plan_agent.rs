@@ -176,6 +176,8 @@ pub fn build_plan_agent_brief(
         "11. On retry feedback: expand plan.md — never shorten below the prior word count.".to_string(),
         "12. complexity=complex workstreams MUST include gzmo-core/ or gzmo.toml in target_paths.".to_string(),
         "13. Prefer sidecar complexity=moderate for probe/script work; reserve complex for true core edits.".to_string(),
+        "14. Populate optional file_ownership map (path -> workstream id) for parallel dispatch safety.".to_string(),
+        "15. Optional unaddressable[] for findings that cannot be automated (issue, reason, suggested_owner).".to_string(),
     ];
 
     if let Some(feedback) = eval_feedback {
@@ -193,6 +195,11 @@ pub fn build_plan_agent_brief(
             lines.push(remediation_history);
         }
     }
+
+    let gzmo_root = std::env::var("GZMO_ROOT")
+        .map(std::path::PathBuf::from)
+        .unwrap_or_else(|_| std::env::current_dir().unwrap_or_else(|_| std::path::PathBuf::from(".")));
+    lines.push(crate::discovery_git_context::collect_git_context(&gzmo_root));
 
     crate::text_util::truncate_chars(&lines.join("\n"), max_chars)
 }
@@ -347,6 +354,11 @@ pub fn verify_plan_agent_outcome(
                             }
                         }
                     }
+                    let ownership_conflicts = validate_workstream_ownership(&val);
+                    if !ownership_conflicts.is_empty() {
+                        passed = false;
+                        notes.extend(ownership_conflicts);
+                    }
                 }
             }
         }
@@ -390,6 +402,78 @@ pub fn verify_plan_agent_outcome(
             notes.join("; ")
         },
     }
+}
+
+/// Jules fleet-dispatch pattern: no two workstreams may claim the same target path.
+pub fn workstream_target_paths(workstream: &serde_json::Value) -> Vec<String> {
+    let mut paths = Vec::new();
+    if let Some(arr) = workstream.get("target_paths").and_then(|a| a.as_array()) {
+        for p in arr {
+            if let Some(s) = p.as_str() {
+                paths.push(s.to_string());
+            }
+        }
+    }
+    if let Some(spawn) = workstream.get("spawn_command").and_then(|v| v.as_str()) {
+        paths.push(spawn.to_string());
+    }
+    paths
+}
+
+pub fn validate_workstream_ownership(plan_json: &serde_json::Value) -> Vec<String> {
+    let mut claimed: std::collections::HashMap<String, String> = std::collections::HashMap::new();
+    let mut conflicts = Vec::new();
+    let Some(workstreams) = plan_json.get("workstreams").and_then(|a| a.as_array()) else {
+        return conflicts;
+    };
+    for ws in workstreams {
+        let wid = ws.get("id").and_then(|v| v.as_str()).unwrap_or("?");
+        for path in workstream_target_paths(ws) {
+            if let Some(other) = claimed.get(&path) {
+                conflicts.push(format!(
+                    "ownership conflict: \"{path}\" claimed by both \"{other}\" and \"{wid}\""
+                ));
+            } else {
+                claimed.insert(path, wid.to_string());
+            }
+        }
+    }
+    conflicts
+}
+
+pub fn plan_approval_required() -> bool {
+    std::env::var("DISCOVERY_PLAN_REQUIRE_APPROVAL")
+        .map(|v| !matches!(v.as_str(), "0" | "false" | "no"))
+        .unwrap_or(true)
+}
+
+pub fn is_plan_approved(plan_dir: &Path) -> bool {
+    let path = plan_dir.join("plan.json");
+    let Ok(raw) = std::fs::read_to_string(&path) else {
+        return false;
+    };
+    let Ok(val) = serde_json::from_str::<serde_json::Value>(&raw) else {
+        return false;
+    };
+    val.get("approved_at")
+        .and_then(|v| v.as_str())
+        .map(|s| !s.is_empty())
+        .unwrap_or(false)
+}
+
+pub fn approve_plan(plan_dir: &Path) -> anyhow::Result<()> {
+    let path = plan_dir.join("plan.json");
+    let raw = std::fs::read_to_string(&path)?;
+    let mut val: serde_json::Value = serde_json::from_str(&raw)?;
+    let obj = val
+        .as_object_mut()
+        .ok_or_else(|| anyhow::anyhow!("plan.json root must be object"))?;
+    obj.insert(
+        "approved_at".to_string(),
+        serde_json::Value::String(chrono::Utc::now().to_rfc3339()),
+    );
+    std::fs::write(&path, serde_json::to_string_pretty(&val)?)?;
+    Ok(())
 }
 
 pub fn is_discovery_agent_brief(brief: &str) -> bool {
@@ -542,6 +626,52 @@ mod tests {
         ];
         let v = verify_plan_agent_outcome(&output, &[], &findings);
         assert!(v.passed, "{}", v.notes);
+    }
+
+    #[test]
+    fn verify_rejects_overlapping_workstream_paths() {
+        let output = temp_plan_output("ownership");
+        std::fs::write(&output.plan_md, "word ".repeat(850)).unwrap();
+        std::fs::write(
+            &output.plan_json,
+            r#"{"workstreams":[
+              {"id":"WS1","finding_ids":["F1"],"target_paths":["gzmo-core/src/foo.rs"],"acceptance":["test -f /tmp/x","test -f /tmp/y"]},
+              {"id":"WS2","finding_ids":["F2"],"target_paths":["gzmo-core/src/foo.rs"],"acceptance":["test -f /tmp/z","test -f /tmp/w"]}
+            ],"deferred":[]}"#,
+        )
+        .unwrap();
+        std::fs::write(
+            &output.plan_provenance,
+            r#"{"files_read":["a","b","c"],"grep_queries":[]}"#,
+        )
+        .unwrap();
+        let findings = vec![
+            ActionableFinding {
+                finding_id: "F1".into(),
+                title: "One".into(),
+                kind: FindingKind::Gap,
+                excerpt: String::new(),
+            },
+            ActionableFinding {
+                finding_id: "F2".into(),
+                title: "Two".into(),
+                kind: FindingKind::Gap,
+                excerpt: String::new(),
+            },
+        ];
+        let v = verify_plan_agent_outcome(&output, &[], &findings);
+        assert!(!v.passed);
+        assert!(v.notes.contains("ownership conflict"));
+    }
+
+    #[test]
+    fn approve_plan_sets_timestamp() {
+        let output = temp_plan_output("approve");
+        std::fs::write(&output.plan_json, r#"{"workstreams":[]}"#).unwrap();
+        assert!(!is_plan_approved(&output.plan_dir));
+        approve_plan(&output.plan_dir).unwrap();
+        assert!(is_plan_approved(&output.plan_dir));
+        let _ = std::fs::remove_dir_all(&output.plan_dir);
     }
 
     #[test]

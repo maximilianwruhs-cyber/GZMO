@@ -281,12 +281,36 @@ async fn spawn_discovery_execute(
                 continue;
             }
         };
-        let verification = crate::discovery_execute::verify_execute_outcome(
+
+        let workstream_id = rec
+            .reason
+            .strip_prefix("discovery_execute: workstream ")
+            .unwrap_or("W1");
+
+        let acceptance_failed = crate::discovery_acceptance_gate::run_execute_acceptance(
+            plan_dir,
+            workstream_id,
+            project_root,
+            &crate::discovery_fixer::canonical_skills_root(),
+        );
+
+        let mut verification = crate::discovery_execute::verify_execute_outcome(
             &result.summary,
             result.hit_max_iterations,
             &roots,
             &result.written_paths,
         );
+
+        if !acceptance_failed.is_empty() {
+            verification.passed = false;
+            let acc_notes = format!("[acceptance FAILED] {}", acceptance_failed.join("; "));
+            if verification.notes.is_empty() {
+                verification.notes = acc_notes;
+            } else {
+                verification.notes = format!("{}; {}", verification.notes, acc_notes);
+            }
+            verification.acceptance_failed = acceptance_failed;
+        }
 
         if verification.passed {
             last_result = Some(result);
@@ -458,6 +482,7 @@ async fn spawn_discovery_plan_with_retries(
                 missing_paths: vec![],
                 hit_max_iterations: result.hit_max_iterations,
                 notes: verification.notes.clone(),
+                acceptance_failed: vec![],
             },
             attempt,
         );
@@ -511,11 +536,32 @@ async fn spawn_discovery_code_implement_with_retries(
             finding_kind,
         );
 
-        let spec = build_code_implement_spec(rec, config, &report_path, Some(&finding));
+        let mut spec = build_code_implement_spec(rec, config, &report_path, Some(&finding));
+
+        let skills_root = crate::discovery_fixer::canonical_skills_root();
+        let mut active_skills_root = skills_root.clone();
+        let mut fix_id = None;
+
+        if config.fixer_worktree_isolation {
+            let fid = uuid::Uuid::new_v4().to_string();
+            match create_git_worktree(&skills_root, &fid) {
+                Ok(wt_dir) => {
+                    spec.working_dir = Some(wt_dir.to_string_lossy().into_owned());
+                    active_skills_root = wt_dir;
+                    fix_id = Some(fid);
+                }
+                Err(e) => {
+                    tracing::error!(error = %e, "Failed to create git worktree, falling back to non-isolated");
+                }
+            }
+        }
 
         let mut result = match runner.spawn(spec).await {
             Ok(r) => r,
             Err(e) => {
+                if let Some(ref fid) = fix_id {
+                    let _ = remove_git_worktree(&skills_root, fid);
+                }
                 if let Err(reset_err) = crate::remediation_tracker::reset_in_flight_finding(
                     &tracker_path,
                     &report_path,
@@ -532,12 +578,42 @@ async fn spawn_discovery_code_implement_with_retries(
             }
         };
 
-        let verification = crate::discovery_code_implementer::verify_code_implement_outcome(
+        let discovery_session_id = rec
+            .session_id
+            .strip_prefix("discovery-implement:")
+            .and_then(|s| s.split(':').next())
+            .unwrap_or(&rec.session_id);
+        let plan_id = crate::discovery_plan_agent::plan_id_from_report(&report_path, discovery_session_id);
+        let plan_paths = crate::discovery_plan_agent::resolve_plan_output_paths(&plan_id);
+        let acceptance_failed = crate::discovery_acceptance_gate::run_code_implement_acceptance(
+            &plan_paths.plan_json,
+            &finding_id,
+            project_root,
+            &active_skills_root,
+        );
+
+        let mut active_roots = roots.clone();
+        if active_roots.len() > 1 {
+            active_roots[1] = active_skills_root.clone();
+        }
+
+        let mut verification = crate::discovery_code_implementer::verify_code_implement_outcome(
             &result.summary,
             result.hit_max_iterations,
-            &roots,
+            &active_roots,
             &result.written_paths,
         );
+
+        if !acceptance_failed.is_empty() {
+            verification.passed = false;
+            let acc_notes = format!("[acceptance FAILED] {}", acceptance_failed.join("; "));
+            if verification.notes.is_empty() {
+                verification.notes = acc_notes;
+            } else {
+                verification.notes = format!("{}; {}", verification.notes, acc_notes);
+            }
+            verification.acceptance_failed = acceptance_failed;
+        }
 
         let closed_ids = vec![finding_id.clone()];
         if let Err(e) = crate::remediation_tracker::record_spawn_outcome(
@@ -553,6 +629,14 @@ async fn spawn_discovery_code_implement_with_retries(
         }
 
         if verification.passed {
+            if let Some(ref fid) = fix_id {
+                if let Err(e) = copy_written_paths_back(&skills_root, &active_skills_root, &result.written_paths) {
+                    tracing::error!(error = %e, "Failed to copy isolated worktree files back");
+                }
+            }
+            if let Some(ref fid) = fix_id {
+                let _ = remove_git_worktree(&skills_root, fid);
+            }
             crate::remediation_tracker::emit_discovery_fix_closed(
                 bus,
                 rec,
@@ -563,6 +647,10 @@ async fn spawn_discovery_code_implement_with_retries(
             );
             last_result = Some(result);
             continue;
+        }
+
+        if let Some(ref fid) = fix_id {
+            let _ = remove_git_worktree(&skills_root, fid);
         }
 
         tracing::warn!(
@@ -597,6 +685,22 @@ async fn spawn_discovery_code_implement_with_retries(
             tracing::warn!(
                 finding_id = %finding_id,
                 "Discovery code implementer max retries exceeded for finding"
+            );
+
+            if !config.fixer_worktree_isolation {
+                let git_baseline_tag = format!("discovery-baseline/{}", plan_id);
+                if let Err(e) = rollback_skills_repo(&skills_root, &git_baseline_tag) {
+                    tracing::error!(error = %e, "Failed to rollback skills repo after max retries exhausted");
+                }
+            }
+
+            crate::remediation_tracker::emit_remediation_escalated(
+                bus,
+                rec,
+                &last_result.as_ref().map(|r| r.task_id.clone()).unwrap_or_default(),
+                &report_path,
+                &finding_id,
+                &verification.notes,
             );
         }
     }
@@ -638,13 +742,84 @@ async fn spawn_discovery_fix_with_retries(
             spec = build_discovery_fix_spec(rec, config, &report_path, Some(&finding));
         }
 
-        let mut result = runner.spawn(spec.clone()).await?;
-        let verification = crate::discovery_fixer::verify_discovery_fix_outcome(
+        let mut active_spec = spec.clone();
+        let skills_root = crate::discovery_fixer::canonical_skills_root();
+        let mut active_skills_root = skills_root.clone();
+        let mut fix_id = None;
+
+        if config.fixer_worktree_isolation {
+            let fid = uuid::Uuid::new_v4().to_string();
+            match create_git_worktree(&skills_root, &fid) {
+                Ok(wt_dir) => {
+                    active_spec.working_dir = Some(wt_dir.to_string_lossy().into_owned());
+                    active_skills_root = wt_dir;
+                    fix_id = Some(fid);
+                }
+                Err(e) => {
+                    tracing::error!(error = %e, "Failed to create git worktree, falling back to non-isolated");
+                }
+            }
+        }
+
+        let mut result = match runner.spawn(active_spec).await {
+            Ok(r) => r,
+            Err(e) => {
+                if let Some(ref fid) = fix_id {
+                    let _ = remove_git_worktree(&skills_root, fid);
+                }
+                return Err(e);
+            }
+        };
+
+        let state_after = crate::remediation_tracker::load(&tracker_path);
+        let findings_to_check: Vec<crate::discovery_fixer::ActionableFinding> = state_after.findings.iter()
+            .filter(|f| f.report_path == report_path.to_string_lossy() && f.status == crate::remediation_tracker::RemediationStatus::InFlight)
+            .map(|f| crate::discovery_fixer::ActionableFinding {
+                finding_id: f.finding_id.clone(),
+                title: f.title.clone(),
+                kind: match f.kind.as_str() {
+                    "FAIL" => crate::discovery_fixer::FindingKind::Fail,
+                    "GAP" => crate::discovery_fixer::FindingKind::Gap,
+                    _ => crate::discovery_fixer::FindingKind::Action,
+                },
+                excerpt: f.excerpt.clone(),
+            })
+            .collect();
+
+        let mut acceptance_failed = Vec::new();
+        for finding in findings_to_check {
+            if finding.kind == crate::discovery_fixer::FindingKind::Action {
+                let failed_cmds = crate::discovery_acceptance_gate::run_fixer_probe(
+                    &finding,
+                    project_root,
+                    &active_skills_root,
+                );
+                acceptance_failed.extend(failed_cmds);
+            }
+        }
+
+        let mut active_roots = roots.clone();
+        if active_roots.len() > 1 {
+            active_roots[1] = active_skills_root.clone();
+        }
+
+        let mut verification = crate::discovery_fixer::verify_discovery_fix_outcome(
             &result.summary,
             result.hit_max_iterations,
-            &roots,
+            &active_roots,
             &result.written_paths,
         );
+
+        if !acceptance_failed.is_empty() {
+            verification.passed = false;
+            let acc_notes = format!("[acceptance FAILED] {}", acceptance_failed.join("; "));
+            if verification.notes.is_empty() {
+                verification.notes = acc_notes;
+            } else {
+                verification.notes = format!("{}; {}", verification.notes, acc_notes);
+            }
+            verification.acceptance_failed = acceptance_failed;
+        }
 
         let closed_ids =
             crate::remediation_tracker::in_flight_finding_ids(&tracker_path, &report_path);
@@ -661,6 +836,14 @@ async fn spawn_discovery_fix_with_retries(
         }
 
         if verification.passed {
+            if let Some(ref fid) = fix_id {
+                if let Err(e) = copy_written_paths_back(&skills_root, &active_skills_root, &result.written_paths) {
+                    tracing::error!(error = %e, "Failed to copy isolated worktree files back");
+                }
+            }
+            if let Some(ref fid) = fix_id {
+                let _ = remove_git_worktree(&skills_root, fid);
+            }
             crate::remediation_tracker::emit_discovery_fix_closed(
                 bus,
                 rec,
@@ -671,6 +854,10 @@ async fn spawn_discovery_fix_with_retries(
             );
             last_result = Some(result);
             break;
+        }
+
+        if let Some(ref fid) = fix_id {
+            let _ = remove_git_worktree(&skills_root, fid);
         }
 
         tracing::warn!(
@@ -695,9 +882,32 @@ async fn spawn_discovery_fix_with_retries(
             &verification,
             attempt,
         );
-        last_result = Some(result);
+        last_result = Some(result.clone());
 
         if attempt >= max_retries {
+            if !config.fixer_worktree_isolation {
+                let discovery_session_id = rec
+                    .session_id
+                    .strip_prefix("discovery-fix:")
+                    .and_then(|s| s.split(':').next())
+                    .unwrap_or(&rec.session_id);
+                let plan_id = crate::discovery_plan_agent::plan_id_from_report(&report_path, discovery_session_id);
+                let git_baseline_tag = format!("discovery-baseline/{}", plan_id);
+                if let Err(e) = rollback_skills_repo(&skills_root, &git_baseline_tag) {
+                    tracing::error!(error = %e, "Failed to rollback skills repo after max retries exhausted");
+                }
+            }
+
+            for finding_id in &closed_ids {
+                crate::remediation_tracker::emit_remediation_escalated(
+                    bus,
+                    rec,
+                    &result.task_id,
+                    &report_path,
+                    finding_id,
+                    &verification.notes,
+                );
+            }
             break;
         }
         if crate::remediation_tracker::next_open_finding(&tracker_path, &report_path).is_none() {
@@ -1074,3 +1284,115 @@ pub fn autospawn_new_recommendations(
         });
     }
 }
+
+fn create_git_worktree(skills_root: &Path, fix_id: &str) -> anyhow::Result<PathBuf> {
+    let worktree_dir = skills_root.join(".worktrees").join(format!("fix-{}", fix_id));
+    let branch_name = format!("fix/{}", fix_id);
+
+    let parent = skills_root.join(".worktrees");
+    if !parent.exists() {
+        std::fs::create_dir_all(&parent)?;
+    }
+
+    let mut cmd = std::process::Command::new("git");
+    cmd.arg("worktree")
+        .arg("add")
+        .arg(&worktree_dir)
+        .arg("-b")
+        .arg(&branch_name);
+    cmd.current_dir(skills_root);
+
+    let status = cmd.status()?;
+    if !status.success() {
+        anyhow::bail!("git worktree add failed with status {:?}", status);
+    }
+
+    Ok(worktree_dir)
+}
+
+fn remove_git_worktree(skills_root: &Path, fix_id: &str) -> anyhow::Result<()> {
+    let worktree_dir = skills_root.join(".worktrees").join(format!("fix-{}", fix_id));
+    let branch_name = format!("fix/{}", fix_id);
+
+    if worktree_dir.exists() {
+        let mut cmd = std::process::Command::new("git");
+        cmd.arg("worktree")
+            .arg("remove")
+            .arg("--force")
+            .arg(&worktree_dir);
+        cmd.current_dir(skills_root);
+        let _ = cmd.status();
+    }
+
+    let mut cmd = std::process::Command::new("git");
+    cmd.arg("branch")
+        .arg("-D")
+        .arg(&branch_name);
+    cmd.current_dir(skills_root);
+    let _ = cmd.status();
+
+    Ok(())
+}
+
+fn copy_written_paths_back(
+    skills_root: &Path,
+    worktree_dir: &Path,
+    written_paths: &[String],
+) -> anyhow::Result<()> {
+    for path_str in written_paths {
+        let path = Path::new(path_str);
+        let (src_path, dest_path) = if path.is_absolute() {
+            if let Ok(rel) = path.strip_prefix(worktree_dir) {
+                (path.to_path_buf(), skills_root.join(rel))
+            } else {
+                continue;
+            }
+        } else {
+            (worktree_dir.join(path), skills_root.join(path))
+        };
+
+        if src_path.is_file() {
+            if let Some(parent) = dest_path.parent() {
+                std::fs::create_dir_all(parent)?;
+            }
+            std::fs::copy(&src_path, &dest_path)?;
+            tracing::info!(
+                src = %src_path.display(),
+                dest = %dest_path.display(),
+                "Copied isolated file back to skills root"
+            );
+        }
+    }
+    Ok(())
+}
+
+fn rollback_skills_repo(skills_root: &Path, git_baseline_tag: &str) -> anyhow::Result<()> {
+    tracing::info!(
+        skills_root = %skills_root.display(),
+        tag = %git_baseline_tag,
+        "Rolling back skills repository to baseline tag"
+    );
+
+    // 1. Revert tracked changes to match the baseline tag
+    let mut cmd1 = std::process::Command::new("git");
+    cmd1.arg("checkout").arg(git_baseline_tag).arg("--").arg(".");
+    cmd1.current_dir(skills_root);
+    let status1 = cmd1.status()?;
+    if !status1.success() {
+        tracing::warn!("git checkout baseline tag failed, trying git checkout -- .");
+        let mut cmd_fallback = std::process::Command::new("git");
+        cmd_fallback.arg("checkout").arg("--").arg(".");
+        cmd_fallback.current_dir(skills_root);
+        let _ = cmd_fallback.status();
+    }
+
+    // 2. Clean any untracked files/directories
+    let mut cmd2 = std::process::Command::new("git");
+    cmd2.arg("clean").arg("-fd");
+    cmd2.current_dir(skills_root);
+    let _ = cmd2.status();
+
+    Ok(())
+}
+
+

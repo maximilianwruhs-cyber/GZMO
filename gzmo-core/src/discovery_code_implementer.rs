@@ -157,6 +157,32 @@ fn build_code_implementer_brief_for_findings(
         "7. Summary must list every path you created or modified — only claim paths you wrote.".to_string(),
     );
     lines.push(String::new());
+    lines.push("TDD workflow (red-green-refactor — Jules tdd skill):".to_string());
+    lines.push(
+        "1. RED: If adding Rust logic, write or extend ONE failing `cargo test` first (run shell_exec).".to_string(),
+    );
+    lines.push(
+        "2. GREEN: Implement the minimal fix until that single test passes — no horizontal splurging.".to_string(),
+    );
+    lines.push(
+        "3. REFACTOR: Clean up only after green; re-run the same test after each refactor step.".to_string(),
+    );
+    lines.push(
+        "4. Never weaken an existing test to make broken code pass.".to_string(),
+    );
+    let skills_root = discovery_fixer::canonical_skills_root();
+    let gzmo_root = std::env::var("GZMO_ROOT")
+        .map(PathBuf::from)
+        .unwrap_or_else(|_| std::env::current_dir().unwrap_or_else(|_| PathBuf::from(".")));
+    let gzmo_root_abs = std::fs::canonicalize(&gzmo_root).unwrap_or(gzmo_root);
+    let skills_root_abs = std::fs::canonicalize(&skills_root).unwrap_or(skills_root);
+    lines.push(String::new());
+    lines.push(format!("GZMO_SKILLS_ROOT={}", skills_root_abs.display()));
+    lines.push(format!("GZMO_ROOT={}", gzmo_root_abs.display()));
+    lines.push(
+        "Skills-Artefakte nur unter $GZMO_SKILLS_ROOT/...; nie survey_GZMO/gzmo_skills.".to_string(),
+    );
+    lines.push(String::new());
     lines.push(
         "Scope: survey_GZMO/ (gzmo-core, gzmo.toml, systemd/) and gzmo_skills/ only. No greps across /home or /var.".to_string(),
     );
@@ -278,6 +304,8 @@ mod tests {
         );
         assert!(brief.contains("Discovery code implementer"));
         assert!(brief.contains("discovery-remediations/sess-1"));
+        assert!(brief.contains("TDD workflow"));
+        assert!(brief.contains("GZMO_SKILLS_ROOT="));
     }
 
     #[test]

@@ -1850,6 +1850,10 @@ pub struct KuratorConfig {
     #[serde(default = "default_discovery_fixer_shell_extra")]
     pub discovery_fixer_shell_extra_commands: Vec<String>,
 
+    /// Run fixing agents in temporary git worktrees to prevent state contamination.
+    #[serde(default)]
+    pub fixer_worktree_isolation: bool,
+
     /// Spawn gate — central autospawn policy (rate limits, tiers).
     #[serde(default)]
     pub spawn_gate: SpawnGateConfig,
@@ -2067,6 +2071,7 @@ impl Default for KuratorConfig {
             discovery_fixer_max_iterations: default_discovery_fixer_max_iterations(),
             discovery_fixer_max_retries: default_discovery_fixer_max_retries(),
             discovery_fixer_shell_extra_commands: default_discovery_fixer_shell_extra(),
+            fixer_worktree_isolation: false,
             spawn_gate: SpawnGateConfig::default(),
         }
     }

@@ -12,15 +12,75 @@ cd "$ROOT"
 BIN="${ROOT}/target/release/gzmo"
 [[ -x "$BIN" ]] || BIN="${ROOT}/target/debug/gzmo"
 SKILLS="${GZMO_SKILLS_ROOT:-$HOME/gzmo_skills}"
+export GZMO_ROOT="$ROOT"
+export GZMO_SKILLS_ROOT="$SKILLS"
 SYNAPSE="${ROOT}/data/Synapse/events.jsonl"
 MARKER="${SKILLS}/data/.mechanics-verify-marker"
 TEST_REPORT="${ROOT}/data/.mechanics-verify-report.md"
+CHIMERA_MARKERS=(
+  "${ROOT}/skills/data/.mechanics-verify-marker"
+  "${ROOT}/gzmo_skills/data/.mechanics-verify-marker"
+)
 FAIL=0
 PASS=0
 
 pass() { echo "[PASS] $*"; PASS=$((PASS + 1)); }
 fail() { echo "[FAIL] $*"; FAIL=$((FAIL + 1)); }
 section() { echo; echo "═══ $* ═══"; }
+
+is_chimera_path() {
+  local p="$1"
+  [[ "$p" == *survey_GZMO/gzmo_skills* ]] && return 0
+  [[ "$p" == *gzmo_skills/survey_GZMO* ]] && return 0
+  return 1
+}
+
+run_cargo_test() {
+  local label="$1"
+  shift
+  set +e
+  local out
+  out="$(cargo test "$@" 2>&1)"
+  local rc=$?
+  set -e
+  if [[ $rc -eq 0 ]]; then
+    pass "$label"
+  else
+    echo "$out" | tail -20
+    fail "$label"
+  fi
+}
+
+section "0 — Canonical path guards"
+if [[ ! -d "$SKILLS" ]]; then
+  fail "GZMO_SKILLS_ROOT not a directory: $SKILLS"
+else
+  pass "GZMO_SKILLS_ROOT is directory: $SKILLS"
+fi
+
+CHIMERA_TREE="${ROOT}/gzmo_skills"
+if [[ -d "$CHIMERA_TREE" ]] && [[ -n "$(find "$CHIMERA_TREE" -type f -print -quit 2>/dev/null)" ]]; then
+  fail "chimera tree ${CHIMERA_TREE}/ still has files (run migrate-chimera-skills-artifacts.sh)"
+else
+  pass "no chimera files under ${CHIMERA_TREE}/"
+fi
+
+chimera_marker_found=0
+for c in "${CHIMERA_MARKERS[@]}"; do
+  if [[ -f "$c" ]]; then
+    fail "chimera marker must not exist: $c (canonical: $MARKER)"
+    chimera_marker_found=1
+  fi
+done
+if [[ $chimera_marker_found -eq 0 ]]; then
+  pass "no chimera markers under repo skills/ or gzmo_skills/"
+fi
+
+if [[ -f "${SKILLS}/scripts/pi-mentor-discovery-cycle.sh" ]]; then
+  pass "skills discovery cycle script present"
+else
+  fail "missing ${SKILLS}/scripts/pi-mentor-discovery-cycle.sh"
+fi
 
 section "1 — Sovereignty baseline"
 if ./scripts/sovereignty-verify.sh; then
@@ -30,16 +90,8 @@ else
 fi
 
 section "2 — Rust unit tests (discovery_fixer + obolus gate)"
-if cargo test -p gzmo-core --lib discovery_fixer 2>&1 | tail -5; then
-  pass "discovery_fixer unit tests"
-else
-  fail "discovery_fixer unit tests"
-fi
-if cargo test -p gzmo-core --lib obolus::gate 2>&1 | tail -5; then
-  pass "obolus gate unit tests"
-else
-  fail "obolus gate unit tests"
-fi
+run_cargo_test "discovery_fixer unit tests" -p gzmo-core --lib discovery_fixer
+run_cargo_test "obolus gate unit tests" -p gzmo-core --lib obolus::gate
 
 section "3 — Obolus preflight matrix"
 for action in operator_chat discovery_cycle spawn_discovery_fix spawn_session_triage dice_loop dream_tick spark_tick; do
@@ -234,7 +286,23 @@ MD
   fi
 
   if [[ -f "$MARKER" ]]; then
-    pass "verify_gate: marker file exists"
+    marker_canon="$(realpath "$MARKER")"
+    skills_canon="$(realpath "$SKILLS")"
+    if [[ "$marker_canon" == "$skills_canon"/* ]]; then
+      pass "verify_gate: marker at canonical path $marker_canon"
+    else
+      fail "verify_gate: marker not under GZMO_SKILLS_ROOT ($marker_canon)"
+    fi
+    chimera_after_spawn=0
+    for c in "${CHIMERA_MARKERS[@]}"; do
+      if [[ -f "$c" ]]; then
+        fail "verify_gate: chimera marker still exists at $c"
+        chimera_after_spawn=1
+      fi
+    done
+    if [[ $chimera_after_spawn -eq 0 ]]; then
+      pass "verify_gate: no chimera markers after spawn"
+    fi
   else
     fail "verify_gate: marker file missing at $MARKER"
   fi
@@ -247,16 +315,24 @@ MD
   fi
 fi
 
-section "8 — Discovery implementation pipeline E2E"
+section "11 — Discovery implementation pipeline E2E"
 if [[ -x "${SKILLS}/scripts/verify-discovery-action-pipeline.sh" ]]; then
   for rpt in \
     "${SKILLS}/data/pi-mentor-discovery/reports/session-final-2026-06-16T16-25-43Z.md" \
     "${SKILLS}/data/pi-mentor-discovery/reports/session-final-2026-06-16T14-57-29Z.md"; do
     if [[ -f "$rpt" ]]; then
-      if GZMO_BIN="$BIN" DISCOVERY_FIXER_AUTOSPAWN=0 \
-        "${SKILLS}/scripts/verify-discovery-action-pipeline.sh" "$rpt" "mechanics-$(basename "$rpt" .md)" 2>&1 | tail -3; then
+      sess_id="mechanics-$(basename "$rpt" .md)-$(date -u +%H%M%S)"
+      set +e
+      pipe_out="$(
+        GZMO_BIN="$BIN" DISCOVERY_FIXER_AUTOSPAWN=0 \
+          "${SKILLS}/scripts/verify-discovery-action-pipeline.sh" "$rpt" "$sess_id" 2>&1
+      )"
+      pipe_rc=$?
+      set -e
+      if [[ $pipe_rc -eq 0 ]]; then
         pass "pipeline E2E $(basename "$rpt")"
       else
+        echo "$pipe_out" | tail -20
         fail "pipeline E2E $(basename "$rpt")"
       fi
     fi
@@ -282,7 +358,7 @@ else
   fail "missing $IFP"
 fi
 
-section "9 — Spark/distill e2e verify bundle"
+section "12 — Spark/distill e2e verify bundle"
 E2E="${SKILLS}/scripts/discovery-remediations/e2e-verify-17-35-00/run-all.sh"
 if [[ -x "$E2E" ]]; then
   if bash "$E2E" >/dev/null 2>&1; then

@@ -626,6 +626,34 @@ pub async fn run(args: &[String], config: &GzmoConfig) -> Result<()> {
         return Ok(());
     }
 
+    if args[0] == "approve-plan" {
+        let mut plan_path = None;
+        let mut i = 1;
+        while i < args.len() {
+            match args[i].as_str() {
+                "--plan" => {
+                    i += 1;
+                    if i >= args.len() {
+                        bail!("--plan requires a path");
+                    }
+                    plan_path = Some(PathBuf::from(&args[i]));
+                }
+                other => bail!("unknown arg for approve-plan: {other}"),
+            }
+            i += 1;
+        }
+        let plan_dir = plan_path.ok_or_else(|| anyhow::anyhow!("--plan is required"))?;
+        let plan_dir = if plan_dir.is_dir() {
+            plan_dir
+        } else {
+            plan_dir.parent().unwrap_or(&plan_dir).to_path_buf()
+        };
+        gzmo_core::discovery_plan_agent::approve_plan(&plan_dir)?;
+        println!("Plan approved: {}", plan_dir.display());
+        println!("  plan.json now has approved_at — execute-workstream may proceed");
+        return Ok(());
+    }
+
     if args[0] == "approve" {
         if args.len() < 2 {
             bail!("usage: gzmo kurator approve <recommendation-id|session-id>");
@@ -669,7 +697,7 @@ pub async fn run(args: &[String], config: &GzmoConfig) -> Result<()> {
     }
 
     eprintln!(
-        "Usage: gzmo kurator status | gzmo kurator remediation-status [--json] | gzmo kurator approve <id> | gzmo kurator fix-from-discovery --report <path> [--session-id <id>] [--register-only] [--spawn] | gzmo kurator implement-from-discovery --report <path> [--session-id <id>] [--spawn] | gzmo kurator plan-from-discovery --report <path> [--session-id <id>] [--spawn] [--force-replan] | gzmo kurator execute-workstream --plan <dir> --workstream <id> [--spawn]"
+        "Usage: gzmo kurator status | gzmo kurator remediation-status [--json] | gzmo kurator approve <id> | gzmo kurator approve-plan --plan <dir> | gzmo kurator fix-from-discovery --report <path> [--session-id <id>] [--register-only] [--spawn] | gzmo kurator implement-from-discovery --report <path> [--session-id <id>] [--spawn] | gzmo kurator plan-from-discovery --report <path> [--session-id <id>] [--spawn] [--force-replan] | gzmo kurator execute-workstream --plan <dir> --workstream <id> [--spawn]"
     );
     Ok(())
 }

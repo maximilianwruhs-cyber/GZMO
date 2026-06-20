@@ -669,6 +669,7 @@ pub fn process_discovery_execute(
     if !plan_json.is_file() {
         anyhow::bail!("plan.json not found: {}", plan_json.display());
     }
+    crate::discovery_execute::ensure_plan_executable(plan_dir)?;
     let _ws = crate::discovery_execute::load_workstream(plan_dir, workstream_id)?;
 
     let plan_id = plan_dir

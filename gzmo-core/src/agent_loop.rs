@@ -164,6 +164,8 @@ pub async fn run_agent_loop(
     let mut total_calls = 0usize;
     let mut all_results = Vec::new();
     let mut written_paths = Vec::new();
+    let mut tool_history: Vec<(String, String)> = Vec::new();
+    let mut consecutive_text_only_turns = 0;
 
     for iteration in 0..config.max_iterations {
         debug!(iteration, messages = messages.len(), "Agent loop iteration");
@@ -237,6 +239,20 @@ pub async fn run_agent_loop(
                     && written_paths.is_empty()
                     && iteration + 1 < config.max_iterations
                 {
+                    consecutive_text_only_turns += 1;
+                    if consecutive_text_only_turns >= 3 {
+                        let stuck_reason = "3+ consecutive text-only turns blocked by require_file_write_before_done";
+                        warn!("StuckDetector tripped: {}", stuck_reason);
+                        emit_agent_stuck(config, stuck_reason);
+
+                        return Ok(AgentResponse {
+                            text: format!("I aborted execution because a tool loop deadlock was detected: {}", stuck_reason),
+                            llm_calls: total_calls,
+                            tool_results: all_results,
+                            hit_max_iterations: true,
+                            written_paths,
+                        });
+                    }
                     let prompt = config
                         .require_file_write_prompt
                         .as_deref()
@@ -277,6 +293,48 @@ pub async fn run_agent_loop(
                     iteration,
                     "LLM requested tool calls"
                 );
+
+                consecutive_text_only_turns = 0;
+
+                for call in &calls {
+                    let canonical_args = serde_json::to_string(&call.arguments).unwrap_or_default();
+                    tool_history.push((call.function_name.clone(), canonical_args));
+                }
+
+                let mut stuck_reason = None;
+                if tool_history.len() >= 3 {
+                    let len = tool_history.len();
+                    if tool_history[len - 1] == tool_history[len - 2] && tool_history[len - 2] == tool_history[len - 3] {
+                        stuck_reason = Some(format!(
+                            "3x consecutive identical tool call: {} with args {}",
+                            tool_history[len - 1].0,
+                            tool_history[len - 1].1
+                        ));
+                    }
+                }
+                if stuck_reason.is_none() && tool_history.len() >= 4 {
+                    let len = tool_history.len();
+                    if tool_history[len - 1] == tool_history[len - 3] && tool_history[len - 2] == tool_history[len - 4] {
+                        stuck_reason = Some(format!(
+                            "tool call ping-pong detected: A ({}) -> B ({}) -> A -> B",
+                            tool_history[len - 2].0,
+                            tool_history[len - 1].0
+                        ));
+                    }
+                }
+
+                if let Some(reason) = stuck_reason {
+                    warn!("StuckDetector tripped: {}", reason);
+                    emit_agent_stuck(config, &reason);
+
+                    return Ok(AgentResponse {
+                        text: format!("I aborted execution because a tool loop deadlock was detected: {}", reason),
+                        llm_calls: total_calls,
+                        tool_results: all_results,
+                        hit_max_iterations: true,
+                        written_paths,
+                    });
+                }
 
                 // Add the assistant's tool-call message to history
                 // with proper structured tool_calls (OpenAI-compatible format)
@@ -393,4 +451,27 @@ pub async fn run_agent_loop(
         hit_max_iterations: true,
         written_paths,
     })
+}
+
+fn emit_agent_stuck(config: &AgentLoopConfig, reason: &str) {
+    if let Some(ref mem) = config.memory {
+        let bus = crate::synapse::SynapseBus::new();
+        let corr = uuid::Uuid::parse_str(&mem.session_id).ok();
+        let task_id = match &mem.scope {
+            crate::memory::scratch::ScratchScope::Sub { task_id, .. } => Some(task_id.clone()),
+            _ => None,
+        };
+        let event = crate::synapse::SynapseEvent::with_envelope(
+            crate::synapse::EventType::AgentStuck,
+            crate::synapse::EventSource::GzmoDaemon,
+            corr,
+            None,
+            Some(serde_json::json!({
+                "task_id": task_id,
+                "session_id": mem.session_id,
+                "reason": reason,
+            })),
+        );
+        bus.append(&event);
+    }
 }

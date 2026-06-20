@@ -28,6 +28,7 @@ pub fn resolve_plan_json_path(plan_path: &Path) -> PathBuf {
 }
 
 pub fn load_workstream(plan_path: &Path, workstream_id: &str) -> anyhow::Result<Value> {
+    ensure_plan_executable(plan_path)?;
     let json_path = resolve_plan_json_path(plan_path);
     let raw = std::fs::read_to_string(&json_path)?;
     let doc: Value = serde_json::from_str(&raw)?;
@@ -43,6 +44,19 @@ pub fn load_workstream(plan_path: &Path, workstream_id: &str) -> anyhow::Result<
 
 pub fn discovery_execute_reason(workstream_id: &str) -> String {
     format!("discovery_execute: workstream {workstream_id}")
+}
+
+/// Jules requirePlanApproval — block execute until operator approves plan.json.
+pub fn ensure_plan_executable(plan_path: &Path) -> anyhow::Result<()> {
+    if crate::discovery_plan_agent::plan_approval_required()
+        && !crate::discovery_plan_agent::is_plan_approved(plan_path)
+    {
+        anyhow::bail!(
+            "plan not approved: run `gzmo kurator approve-plan --plan {}` first",
+            plan_path.display()
+        );
+    }
+    Ok(())
 }
 
 pub fn build_execute_brief(
@@ -76,11 +90,11 @@ pub fn build_execute_brief(
     }
     lines.push("Task:".to_string());
     lines.push("1. file_read plan.md section for this workstream and relevant probe JSON.".to_string());
-    lines.push("2. Implement ONLY this workstream — file_write under survey_GZMO/ or gzmo_skills/.".to_string());
+    lines.push("2. Implement ONLY this workstream — file_write under $GZMO_ROOT/ or $GZMO_SKILLS_ROOT/.".to_string());
     lines.push("3. Run each acceptance[] command via shell_exec before finishing.".to_string());
     lines.push("4. Summary lists only paths you actually wrote.".to_string());
     lines.push(String::new());
-    lines.push("Scope: survey_GZMO/ and gzmo_skills/ only.".to_string());
+    lines.push("Scope: GZMO project root and gzmo_skills only.".to_string());
 
     crate::text_util::truncate_chars(&lines.join("\n"), max_chars)
 }
@@ -132,6 +146,7 @@ mod tests {
 
     #[test]
     fn load_workstream_from_plan() {
+        std::env::set_var("DISCOVERY_PLAN_REQUIRE_APPROVAL", "0");
         let dir = std::env::temp_dir().join(format!("plan-exec-test-{}", std::process::id()));
         std::fs::create_dir_all(&dir).unwrap();
         let plan = dir.join("plan.json");
@@ -144,5 +159,6 @@ mod tests {
         let ws = load_workstream(&dir, "W1").unwrap();
         assert_eq!(ws["id"], "W1");
         let _ = std::fs::remove_dir_all(&dir);
+        std::env::remove_var("DISCOVERY_PLAN_REQUIRE_APPROVAL");
     }
 }

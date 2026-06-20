@@ -122,13 +122,29 @@ pub fn default_tracker_path() -> PathBuf {
 }
 
 pub fn load(path: &Path) -> RemediationTrackerState {
+    load_with_polling(path, true)
+}
+
+/// Load tracker state; retries briefly when `use_polling` to handle post-spawn flush races.
+pub fn load_with_polling(path: &Path, use_polling: bool) -> RemediationTrackerState {
     if !path.is_file() {
         return RemediationTrackerState::default();
+    }
+    if use_polling && polling_enabled() {
+        let config = crate::spawn_polling::PollConfig::default();
+        return crate::spawn_polling::load_json_with_retry(path, &config)
+            .unwrap_or_default();
     }
     std::fs::read_to_string(path)
         .ok()
         .and_then(|raw| serde_json::from_str(&raw).ok())
         .unwrap_or_default()
+}
+
+fn polling_enabled() -> bool {
+    std::env::var("SPAWN_LOAD_POLLING")
+        .map(|v| !matches!(v.as_str(), "0" | "false" | "no"))
+        .unwrap_or(true)
 }
 
 pub fn save(path: &Path, state: &RemediationTrackerState) -> anyhow::Result<()> {
@@ -395,8 +411,64 @@ pub fn record_spawn_outcome(
 
     if changed {
         save(path, &state)?;
+        write_spawn_snapshot(
+            task_id,
+            &state,
+            report_path,
+            finding_ids,
+            verification,
+            written_paths,
+        );
     }
     Ok(())
+}
+
+/// Jules SessionSnapshot — persist timeline after each spawn outcome.
+fn write_spawn_snapshot(
+    task_id: &str,
+    state: &RemediationTrackerState,
+    report_path: &Path,
+    finding_ids: &[String],
+    verification: &DiscoveryFixVerification,
+    written_paths: &[String],
+) {
+    let report_str = report_path.to_string_lossy();
+    let session_id = state
+        .findings
+        .iter()
+        .find(|f| {
+            f.report_path == report_str
+                && (finding_ids.is_empty() || finding_ids.iter().any(|id| id == &f.finding_id))
+        })
+        .map(|f| f.discovery_session_id.clone())
+        .unwrap_or_else(|| "unknown".to_string());
+
+    let mut activities = Vec::new();
+    let activity_type = if verification.passed {
+        crate::remediation_snapshot::RemediationActivityType::SessionCompleted
+    } else {
+        crate::remediation_snapshot::RemediationActivityType::SessionFailed
+    };
+    crate::remediation_snapshot::append_activity(
+        &mut activities,
+        activity_type,
+        verification.notes.clone(),
+        crate::remediation_snapshot::extract_shell_exit_codes(&verification.notes)
+            .last()
+            .copied(),
+    );
+
+    let snapshot = crate::remediation_snapshot::build_snapshot(
+        task_id,
+        &session_id,
+        report_path,
+        verification,
+        written_paths,
+        activities,
+    );
+    if let Err(e) = crate::remediation_snapshot::write_snapshot(&snapshot) {
+        tracing::warn!(error = %e, task_id = %task_id, "remediation snapshot write failed");
+    }
 }
 
 pub fn emit_discovery_fix_closed(
@@ -458,6 +530,37 @@ pub fn emit_discovery_fix_failed(
     let _ = bus.append(&event);
     id
 }
+
+pub fn emit_remediation_escalated(
+    bus: &SynapseBus,
+    rec: &PendingRecommendation,
+    task_id: &str,
+    report_path: &Path,
+    finding_id: &str,
+    verify_notes: &str,
+) -> Uuid {
+    let corr = Uuid::parse_str(&rec.session_id).ok();
+    let reply = Uuid::parse_str(&rec.event_id).ok();
+    let event = SynapseEvent::with_envelope(
+        EventType::RemediationEscalated,
+        EventSource::GzmoDaemon,
+        corr,
+        reply,
+        Some(serde_json::json!({
+            "recommendation_id": rec.event_id,
+            "session_id": rec.session_id,
+            "task_id": task_id,
+            "report_path": report_path.display().to_string(),
+            "finding_id": finding_id,
+            "escalation_reason": "max_retries_exhausted",
+            "verify_notes": verify_notes,
+        })),
+    );
+    let id = event.id;
+    let _ = bus.append(&event);
+    id
+}
+
 
 /// Revert a single `in_flight` row after spawn gateway failure (before verify).
 pub fn reset_in_flight_finding(
@@ -551,6 +654,7 @@ mod tests {
             missing_paths: vec![],
             hit_max_iterations: false,
             notes: "verified file_write: scripts/fix.sh".into(),
+            acceptance_failed: vec![],
         };
         record_spawn_outcome(
             &path,
@@ -586,6 +690,7 @@ mod tests {
             missing_paths: vec!["x.sh".into()],
             hit_max_iterations: true,
             notes: "missing".into(),
+            acceptance_failed: vec![],
         };
         record_spawn_outcome(&path, &report, "t1", &[], &fail, &[], 1).unwrap();
         assert_eq!(load(&path).findings[0].status, RemediationStatus::Open);
@@ -629,6 +734,7 @@ mod tests {
             missing_paths: vec![],
             hit_max_iterations: false,
             notes: "ok".into(),
+            acceptance_failed: vec![],
         };
         record_spawn_outcome(
             &path,
