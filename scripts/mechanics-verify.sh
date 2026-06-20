@@ -88,9 +88,7 @@ for hook in \
   "run_discovery_implementation_pipeline" \
   "enqueue-discovery-report.sh" \
   "run-discovery-implementation-pipeline.sh" \
-  "eval-implementation-plan.sh" \
   "DISCOVERY_INLINE_IMPLEMENT" \
-  "implement-discovery-actions.sh" \
   "build_session_log_extra" \
   "session-final criteria not met" \
   "DISCOVERY_SESSION_FINAL_ACTIONABILITY_RETRY" \
