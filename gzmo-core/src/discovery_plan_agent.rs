@@ -169,7 +169,7 @@ pub fn build_plan_agent_brief(
                 .join(", ")
         ),
         "6. Write plan-provenance.json listing files_read and grep_queries.".to_string(),
-        "7. Populate description and spawn_command fields in every workstream.".to_string(),
+        "7. Populate description in every workstream. spawn_command is OPTIONAL — omit it to use the default fixer path (gzmo kurator execute-workstream). If set, MUST start with `gzmo ` or `bash ` (examples: `bash $GZMO_SKILLS_ROOT/scripts/foo.sh`, `bash -c \"grep -q x $GZMO_ROOT/gzmo.toml\"`, `gzmo kurator execute-workstream --plan ABS_PLAN_DIR --workstream W1 --spawn`). Never bare script paths or unqualified shell one-liners.".to_string(),
         "8. Path resolution for acceptance commands: $GZMO_ROOT for gzmo-core/ paths, $GZMO_SKILLS_ROOT for gzmo_skills/ paths (never survey_GZMO/gzmo_skills chimera paths).".to_string(),
         "9. Do NOT spawn sub-agents. Scope: survey_GZMO/ and gzmo_skills/ only.".to_string(),
         "10. If remediation history is present below, apply proven patterns and avoid listed failure modes.".to_string(),
@@ -221,6 +221,11 @@ fn complex_workstream_has_core_target(workstream: &serde_json::Value) -> bool {
             })
         })
         .unwrap_or(false)
+}
+
+fn spawn_command_valid(cmd: &str) -> bool {
+    let cmd = cmd.trim();
+    cmd.is_empty() || cmd.starts_with("gzmo ") || cmd.starts_with("bash ")
 }
 
 fn covered_finding_ids(plan_json: &serde_json::Value) -> std::collections::HashSet<String> {
@@ -330,6 +335,14 @@ pub fn verify_plan_agent_outcome(
                                             ));
                                         }
                                     }
+                                }
+                            }
+                            if let Some(spawn_cmd) = ws.get("spawn_command").and_then(|v| v.as_str()) {
+                                if !spawn_command_valid(spawn_cmd) {
+                                    passed = false;
+                                    notes.push(format!(
+                                        "{wid} spawn_command must start with 'gzmo ' or 'bash ' (or omit spawn_command)"
+                                    ));
                                 }
                             }
                         }
@@ -579,5 +592,30 @@ mod tests {
         let v = verify_plan_agent_outcome(&output, &[], &findings);
         assert!(!v.passed);
         assert!(v.notes.contains("complex workstream"));
+    }
+
+    #[test]
+    fn verify_rejects_invalid_spawn_command() {
+        let output = temp_plan_output("spawn");
+        std::fs::write(&output.plan_md, "word ".repeat(850)).unwrap();
+        std::fs::write(
+            &output.plan_json,
+            r#"{"workstreams":[{"id":"WS1","finding_ids":["F1"],"complexity":"moderate","spawn_command":"grep -q foo /tmp/x","acceptance":["test -f /tmp/x","test -f /tmp/y"]}],"deferred":[]}"#,
+        )
+        .unwrap();
+        std::fs::write(
+            &output.plan_provenance,
+            r#"{"files_read":["a","b","c"],"grep_queries":[]}"#,
+        )
+        .unwrap();
+        let findings = vec![ActionableFinding {
+            finding_id: "F1".into(),
+            title: "One".into(),
+            kind: FindingKind::Gap,
+            excerpt: String::new(),
+        }];
+        let v = verify_plan_agent_outcome(&output, &[], &findings);
+        assert!(!v.passed);
+        assert!(v.notes.contains("spawn_command"));
     }
 }
