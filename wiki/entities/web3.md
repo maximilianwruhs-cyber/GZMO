@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[prompt-agent-engineering-part5-micro02|prompt-agent-engineering-part5-micro02]] (2026-06-09)
+## From [prompt-agent-engineering-part5-micro02](/entities/prompt-agent-engineering-part5-micro02.md) (2026-06-09)
 - Mentioned as an emerging technology.
 - Integrations can elevate the structure.
 - Can be part of future-proofing roadmap.

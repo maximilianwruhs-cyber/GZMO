@@ -14,11 +14,11 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-llama-bench-performance-benchmarking-tool-micro01|drive-research-llama-bench-performance-benchmarking-tool-micro01]] (2026-06-09)
+## From [drive-research-llama-bench-performance-benchmarking-tool-micro01](/entities/drive-research-llama-bench-performance-benchmarking-tool-micro01.md) (2026-06-09)
 - Hardware platform with 128 GB Unified LPDDR5x memory.
 - Uses CUDA backend engine.
 
-## From [[prompt-agent-engineering-part4-micro01|prompt-agent-engineering-part4-micro01]] (2026-06-09)
+## From [prompt-agent-engineering-part4-micro01](/entities/prompt-agent-engineering-part4-micro01.md) (2026-06-09)
 - Target hardware for the Edge Node.
 - Processes raw environmental data locally.
 - Achieves sub-50ms latency for perception tasks.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[obolus-micro05|obolus-micro05]] (2026-06-09)
+## From [obolus-micro05](/entities/obolus-micro05.md) (2026-06-09)
 - Primarily used according to DHI-Standard.
 - Minimizes attack surface.
 - Now free available.

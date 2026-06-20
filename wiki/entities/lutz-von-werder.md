@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[the-archival-truth-part1-micro03|the-archival-truth-part1-micro03]] (2026-06-09)
+## From [the-archival-truth-part1-micro03](/entities/the-archival-truth-part1-micro03.md) (2026-06-09)
 - German protagonist of creative writing.
 - Significantly shaped the connection between writing texts and mental health.
 - His work is reflected in specialized Master's programs.

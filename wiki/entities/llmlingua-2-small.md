@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-llmlingua-cpu-leistung-und-leistungstests|drive-research-llmlingua-cpu-leistung-und-leistungstests]] (2026-06-08)
+## From [drive-research-llmlingua-cpu-leistung-und-leistungstests](/entities/drive-research-llmlingua-cpu-leistung-und-leistungstests.md) (2026-06-08)
 - Refers to the mBERT Base (Multilingual) model variant of LLMLingua-2.
 - Extremely lightweight with minimal RAM requirements.
 - Suitable for CPU operation and containerized environments.

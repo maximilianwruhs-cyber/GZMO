@@ -14,16 +14,16 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-10).
 
 ## Entities
-- [[tale-ep-token-aware-llm-execution-via-prompting|TALE-EP (Token-Aware LLM Execution via Prompting)]] (SYSTEM)
-- [[librarian-agent|Librarian Agent]] (SYSTEM)
-- [[supervisoragent|SupervisorAgent]] (SYSTEM)
-- [[fact-checker-agent|Fact-Checker Agent]] (SYSTEM)
-- [[agentic-rag|Agentic RAG]] (SYSTEM)
-- [[specialist-reader-agent|Specialist / Reader Agent]] (SYSTEM)
-- [[gzmo|GZMO]] (PROJECT)
-- [[editor-critic-agent|Editor / Critic Agent]] (SYSTEM)
-- [[director-orchestrator-agent|Director / Orchestrator Agent]] (SYSTEM)
-- [[model-context-protocol-mcp|Model Context Protocol (MCP)]] (SYSTEM)
+- [TALE-EP (Token-Aware LLM Execution via Prompting)](/entities/tale-ep-token-aware-llm-execution-via-prompting.md) (SYSTEM)
+- [Librarian Agent](/entities/librarian-agent.md) (SYSTEM)
+- [SupervisorAgent](/entities/supervisoragent.md) (SYSTEM)
+- [Fact-Checker Agent](/entities/fact-checker-agent.md) (SYSTEM)
+- [Agentic RAG](/entities/agentic-rag.md) (SYSTEM)
+- [Specialist / Reader Agent](/entities/specialist-reader-agent.md) (SYSTEM)
+- [GZMO](/entities/gzmo.md) (PROJECT)
+- [Editor / Critic Agent](/entities/editor-critic-agent.md) (SYSTEM)
+- [Director / Orchestrator Agent](/entities/director-orchestrator-agent.md) (SYSTEM)
+- [Model Context Protocol (MCP)](/entities/model-context-protocol-mcp.md) (SYSTEM)
 
 ## Relations
 - Director / Orchestrator Agent → ORCHESTRATES → Librarian Agent

@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[migrating-openclaw-to-vercel-ai-sdk-for-local-llm|migrating-openclaw-to-vercel-ai-sdk-for-local-llm]] (2026-06-08)
+## From [migrating-openclaw-to-vercel-ai-sdk-for-local-llm](/entities/migrating-openclaw-to-vercel-ai-sdk-for-local-llm.md) (2026-06-08)
 - A primitive in the Vercel AI SDK for defining tools.
 - Relies heavily on static, compile-time Zod schemas.
 - A tool defined with this primitive consists of a description, an input schema, and an execution callback.
@@ -25,7 +25,7 @@ Type: CONCEPT
 - Prevents compromising the underlying host infrastructure.
 - Used for rigorous execution security.
 
-## From [[high-performance-typescript-execution-and-architec-part1-micro05|high-performance-typescript-execution-and-architec-part1-micro05]] (2026-06-09)
+## From [high-performance-typescript-execution-and-architec-part1-micro05](/entities/high-performance-typescript-execution-and-architec-part1-micro05.md) (2026-06-09)
 - A native tool shipped with the Pi agent.
 - Designed to provide universal filesystem manipulation.
 - Part of a minimal set of native tools.

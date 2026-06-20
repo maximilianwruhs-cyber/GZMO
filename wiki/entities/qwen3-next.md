@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[ai-research-part4|ai-research-part4]] (2026-06-08)
+## From [ai-research-part4](/entities/ai-research-part4.md) (2026-06-08)
 - Qwen3 models' results are sourced from its official documentation.
 - MiniCPM-SALA surpasses its 80B-A3B-Instruct model at 1000K context length (86.3 vs. 80.3).
 - Documentation is available at https://huggingface.co/Qwen/Qwen3-Next-80B-A3B-Instruct.

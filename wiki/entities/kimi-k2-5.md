@@ -18,16 +18,16 @@ gzmo_synthetic: true
 
 Type: MODEL
 
-## From [[drive-research-agentic-reverse-engineering-state-and-future-micro02|drive-research-agentic-reverse-engineering-state-and-future-micro02]] (2026-06-09)
+## From [drive-research-agentic-reverse-engineering-state-and-future-micro02](/entities/drive-research-agentic-reverse-engineering-state-and-future-micro02.md) (2026-06-09)
 - Demonstrates advanced capabilities in detecting, patching, and exploiting smart contract vulnerabilities.
 - Outperforms DeepSeek V3.2 in automated EVMBench evaluations.
 
-## From [[drive-research-agentic-reverse-engineering-state-and-future1-micro02|drive-research-agentic-reverse-engineering-state-and-future1-micro02]] (2026-06-09)
+## From [drive-research-agentic-reverse-engineering-state-and-future1-micro02](/entities/drive-research-agentic-reverse-engineering-state-and-future1-micro02.md) (2026-06-09)
 - Demonstrates advanced capabilities in detecting, patching, and exploiting smart contract vulnerabilities.
 - Outperforms DeepSeek V3.2 in automated EVMBench evaluations.
 
-## From [[openclaw-deep-research-part7-micro06|openclaw-deep-research-part7-micro06]] (2026-06-10)
+## From [openclaw-deep-research-part7-micro06](/entities/openclaw-deep-research-part7-micro06.md) (2026-06-10)
 - One of the five AI models used for initial analysis
 
-## From [[the-dawn-of-agentic-software-reverse-engineering-micro02|the-dawn-of-agentic-software-reverse-engineering-micro02]] (2026-06-10)
+## From [the-dawn-of-agentic-software-reverse-engineering-micro02](/entities/the-dawn-of-agentic-software-reverse-engineering-micro02.md) (2026-06-10)
 - Frontier model demonstrating advanced capabilities in detecting and exploiting smart contract vulnerabilities.

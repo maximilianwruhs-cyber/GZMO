@@ -14,11 +14,11 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[prfaas-cross-datacenter-llm-serving-via-selective-micro04|prfaas-cross-datacenter-llm-serving-via-selective-micro04]] (2026-06-09)
+## From [prfaas-cross-datacenter-llm-serving-via-selective-micro04](/entities/prfaas-cross-datacenter-llm-serving-via-selective-micro04.md) (2026-06-09)
 - Performs PD-disaggregated serving.
 - Can complete inference for a request end to end.
 - Contains prefill nodes and decode nodes.
 
-## From [[prfaas-cross-datacenter-llm-serving-via-selective-micro05|prfaas-cross-datacenter-llm-serving-via-selective-micro05]] (2026-06-10)
+## From [prfaas-cross-datacenter-llm-serving-via-selective-micro05](/entities/prfaas-cross-datacenter-llm-serving-via-selective-micro05.md) (2026-06-10)
 - A local cluster used for decoding and prefill.
 - In the PrfaaS-PD configuration, it uses 64 H20 GPUs.

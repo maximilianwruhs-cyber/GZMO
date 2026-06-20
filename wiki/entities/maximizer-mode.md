@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[openclaw-deep-research-part10-micro04|openclaw-deep-research-part10-micro04]] (2026-06-09)
+## From [openclaw-deep-research-part10-micro04](/entities/openclaw-deep-research-part10-micro04.md) (2026-06-09)
 - A feature discussed in recent podcasts by Paperclip's creator.
 - Has not been fully detailed yet.

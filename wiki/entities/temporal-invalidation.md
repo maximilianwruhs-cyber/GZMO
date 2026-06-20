@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[architectures-for-agentic-memory-virtual-context-micro05|architectures-for-agentic-memory-virtual-context-micro05]] (2026-06-09)
+## From [architectures-for-agentic-memory-virtual-context-micro05](/entities/architectures-for-agentic-memory-virtual-context-micro05.md) (2026-06-09)
 - Zep architecture approaches conflict resolution through this philosophy.
 - Involves updating the outdated edge with an invalidation timestamp.
 - Preserves the complete historical state.

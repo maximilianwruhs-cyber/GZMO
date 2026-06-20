@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-safe-unzip-practices-for-threat-model-micro03|drive-research-safe-unzip-practices-for-threat-model-micro03]] (2026-06-09)
+## From [drive-research-safe-unzip-practices-for-threat-model-micro03](/entities/drive-research-safe-unzip-practices-for-threat-model-micro03.md) (2026-06-09)
 - Used for strict canonical path validation.
 - Equivalent function for determining true filesystem destination.

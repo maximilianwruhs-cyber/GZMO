@@ -14,9 +14,9 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[drive-research-cybernetics-information-loops-between-entities|drive-research-cybernetics-information-loops-between-entities]] (CONCEPT)
-- [[cybernetics|Cybernetics]] (CONCEPT)
-- [[google-takeout|Google Takeout]] (TOOL)
+- [drive-research-cybernetics-information-loops-between-entities](/entities/drive-research-cybernetics-information-loops-between-entities.md) (CONCEPT)
+- [Cybernetics](/entities/cybernetics.md) (CONCEPT)
+- [Google Takeout](/entities/google-takeout.md) (TOOL)
 
 ## Relations
 - drive-research-cybernetics-information-loops-between-entities → RELATED_TO → Cybernetics

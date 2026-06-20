@@ -17,22 +17,22 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[openclaw-part2|openclaw-part2]] (2026-06-08)
+## From [openclaw-part2](/entities/openclaw-part2.md) (2026-06-08)
 - The permissive license under which OpenClaw is distributed.
 
-## From [[drive-research-license-and-native-binding-analysis|drive-research-license-and-native-binding-analysis]] (2026-06-08)
+## From [drive-research-license-and-native-binding-analysis](/entities/drive-research-license-and-native-binding-analysis.md) (2026-06-08)
 - A highly permissive license.
 - Allows for unrestricted modification, static linking, and commercial redistribution.
 - Packages governed by this license are classified as Green.
 - Permitted license.
 
-## From [[drive-research-bun-file-parsing-dependency-shortlist-micro01|drive-research-bun-file-parsing-dependency-shortlist-micro01]] (2026-06-09)
+## From [drive-research-bun-file-parsing-dependency-shortlist-micro01](/entities/drive-research-bun-file-parsing-dependency-shortlist-micro01.md) (2026-06-09)
 - permissive open-source license
 - ensures unencumbered integration into proprietary and enterprise-grade software architectures
 
-## From [[prompt-agent-engineering-part5-micro04|prompt-agent-engineering-part5-micro04]] (2026-06-09)
+## From [prompt-agent-engineering-part5-micro04](/entities/prompt-agent-engineering-part5-micro04.md) (2026-06-09)
 - The license for OpenClaw.
 - NuclearClaw aims to remain open-source compatible with this license.
 
-## From [[prompt-agent-engineering-part2-micro03|prompt-agent-engineering-part2-micro03]] (2026-06-10)
+## From [prompt-agent-engineering-part2-micro03](/entities/prompt-agent-engineering-part2-micro03.md) (2026-06-10)
 - Default license suggested by the Open Source Maintainer

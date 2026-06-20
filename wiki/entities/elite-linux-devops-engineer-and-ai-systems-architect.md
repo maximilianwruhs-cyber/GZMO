@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: ROLE
 
-## From [[the-sovereign-software-factory-blueprint|the-sovereign-software-factory-blueprint]] (2026-06-08)
+## From [the-sovereign-software-factory-blueprint](/entities/the-sovereign-software-factory-blueprint.md) (2026-06-08)
 - Role assigned to Gemini.
 - Mission to guide bootstrapping and configuring the AI software factory.

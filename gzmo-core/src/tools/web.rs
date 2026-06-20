@@ -9,6 +9,7 @@ use anyhow::Result;
 use async_trait::async_trait;
 use serde_json::json;
 
+use crate::config::ComplianceConfig;
 use crate::tools::{ToolDef, ToolHandler};
 
 /// Web search tool — SerpAPI (primary, when key set) + DuckDuckGo HTML (fallback).
@@ -19,6 +20,7 @@ pub struct WebSearchTool {
     pub compress_config: Option<crate::config::ContextCompressConfig>,
     pub ccr: Option<crate::context_compress::CcrStore>,
     pub session_id: Option<String>,
+    pub compliance: ComplianceConfig,
 }
 
 impl WebSearchTool {
@@ -34,7 +36,13 @@ impl WebSearchTool {
             compress_config: None,
             ccr: None,
             session_id: None,
+            compliance: ComplianceConfig::default(),
         }
+    }
+
+    pub fn with_compliance(mut self, compliance: ComplianceConfig) -> Self {
+        self.compliance = compliance;
+        self
     }
 
     pub fn new_with_compress(
@@ -53,6 +61,7 @@ impl WebSearchTool {
             compress_config: Some(compress_config),
             ccr: Some(ccr),
             session_id: Some(session_id),
+            compliance: ComplianceConfig::default(),
         }
     }
 }
@@ -69,6 +78,7 @@ impl Default for WebSearchTool {
             compress_config: None,
             ccr: None,
             session_id: None,
+            compliance: ComplianceConfig::default(),
         }
     }
 }
@@ -97,6 +107,10 @@ impl ToolHandler for WebSearchTool {
     }
 
     async fn execute(&self, args: serde_json::Value) -> Result<String> {
+        if let Some(reason) = crate::compliance::web_tool_block_reason(&self.compliance) {
+            return Ok(format!("ERROR: {reason}"));
+        }
+
         let query = args["query"]
             .as_str()
             .ok_or_else(|| anyhow::anyhow!("Missing 'query' argument"))?;

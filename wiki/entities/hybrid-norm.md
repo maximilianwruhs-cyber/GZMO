@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part6-micro01|ai-research-part6-micro01]] (2026-06-09)
+## From [ai-research-part6-micro01](/entities/ai-research-part6-micro01.md) (2026-06-09)
 - A type of hybrid design attempting to combine Pre-Norm and Post-Norm.
 - Often lack training robustness outside specific settings.

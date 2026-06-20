@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-token-efficient-bol-processing-architecture|drive-research-token-efficient-bol-processing-architecture]] (2026-06-08)
+## From [drive-research-token-efficient-bol-processing-architecture](/entities/drive-research-token-efficient-bol-processing-architecture.md) (2026-06-08)
 - Leverages explicit document elements identified by VDU tools.
 - Docling enables multi-granular hierarchical chunking natively.
 - The complete heading path and metadata are attached to every single chunk.

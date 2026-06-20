@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[drive-research-dialectics-socratic-vs-hegelian-methods|drive-research-dialectics-socratic-vs-hegelian-methods]] (2026-06-08)
+## From [drive-research-dialectics-socratic-vs-hegelian-methods](/entities/drive-research-dialectics-socratic-vs-hegelian-methods.md) (2026-06-08)
 - Published in 1807 by Hegel.
 - Serves as a 'ladder' tracing consciousness from sensory immediacy to 'absolute knowing'.
 - Contains the influential Master-Slave dialectic.

@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[ai-research-part2|ai-research-part2]] (2026-06-08)
+## From [ai-research-part2](/entities/ai-research-part2.md) (2026-06-08)
 - Used in the infrastructure of the system.
 - Helps ensure high throughput.

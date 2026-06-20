@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[google-antigravity-the-architects-configuration-micro06|google-antigravity-the-architects-configuration-micro06]] (2026-06-09)
+## From [google-antigravity-the-architects-configuration-micro06](/entities/google-antigravity-the-architects-configuration-micro06.md) (2026-06-09)
 - Verletzt durch "Junk Drawer"-Ordner.

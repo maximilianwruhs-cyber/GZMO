@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[tui-framework|tui-framework]] (2026-06-08)
+## From [tui-framework](/entities/tui-framework.md) (2026-06-08)
 - Used within VSCodium Webview panels.
 - Provides native buttons and dropdowns.
 
-## From [[obolus-vs-codium-extension-konzept-research-part1-micro07|obolus-vs-codium-extension-konzept-research-part1-micro07]] (2026-06-09)
+## From [obolus-vs-codium-extension-konzept-research-part1-micro07](/entities/obolus-vs-codium-extension-konzept-research-part1-micro07.md) (2026-06-09)
 - A component library for building webview-based extensions in Visual Studio Code.
 - Mentioned in a GitHub repository title.

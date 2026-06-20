@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-ubuntu-extreme-hardware-tuning-micro02|drive-research-ubuntu-extreme-hardware-tuning-micro02]] (2026-06-09)
+## From [drive-research-ubuntu-extreme-hardware-tuning-micro02](/entities/drive-research-ubuntu-extreme-hardware-tuning-micro02.md) (2026-06-09)
 - Kernel parameter to disable Autonomous Power State Transitions (APST).
 - Ensures immediate response times for read and write commands.
 - Kernel parameter to control NVMe power state transition latency.

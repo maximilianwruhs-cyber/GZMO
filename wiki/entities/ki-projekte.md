@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part1-micro04|drive-research-ki-berater-fragebogen-für-kundenanalyse-part1-micro04]] (2026-06-09)
+## From [drive-research-ki-berater-fragebogen-für-kundenanalyse-part1-micro04](/entities/drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part1-micro04.md) (2026-06-09)
 - die Dauer von Software-Implementierungen verlängert und die Kosten für das Scheitern von KI-Projekten massiv in die Höhe treibt
 - Kein KI-Projekt darf jemals ohne eine methodisch saubere, evidenzbasierte Erhebung der KI-Readiness über alle definierten Dimensionen gestartet werden

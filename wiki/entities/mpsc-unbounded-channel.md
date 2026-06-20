@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-rust-tui-architecture-tech-stack1-micro05|drive-research-rust-tui-architecture-tech-stack1-micro05]] (2026-06-09)
+## From [drive-research-rust-tui-architecture-tech-stack1-micro05](/entities/drive-research-rust-tui-architecture-tech-stack1-micro05.md) (2026-06-09)
 - Acts as a central message bus.
 - Used for communication between asynchronous layers.

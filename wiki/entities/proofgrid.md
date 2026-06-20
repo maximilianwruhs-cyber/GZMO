@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-synthesizing-wisdom-from-heterogeneous-data|drive-research-synthesizing-wisdom-from-heterogeneous-data]] (2026-06-08)
+## From [drive-research-synthesizing-wisdom-from-heterogeneous-data](/entities/drive-research-synthesizing-wisdom-from-heterogeneous-data.md) (2026-06-08)
 - A formal logic domain used for generating abstract problems.
 - Used by the Teacher Agent in the Teacher-Student-Orchestrator loop.
 - Contributes to evaluating distilled heuristics.

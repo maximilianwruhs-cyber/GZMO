@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-financial-time-series-lyapunov-exponents|drive-research-financial-time-series-lyapunov-exponents]] (2026-06-08)
+## From [drive-research-financial-time-series-lyapunov-exponents](/entities/drive-research-financial-time-series-lyapunov-exponents.md) (2026-06-08)
 - A phenomenon that has historically impeded identifying deterministic signatures in asset price series.
 - Characterized by theoretical models generating chaotic trajectories while empirical analyses fail to reject the random walk hypothesis.

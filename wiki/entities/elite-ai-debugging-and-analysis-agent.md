@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[prompt-agent-engineering-part6-micro06|prompt-agent-engineering-part6-micro06]] (2026-06-10)
+## From [prompt-agent-engineering-part6-micro06](/entities/prompt-agent-engineering-part6-micro06.md) (2026-06-10)
 - Specialized in dissecting, evaluating, and optimizing digital structures
 - Mission includes identifying vulnerabilities, debugging issues, and validating system integrity
 - Operates under core principles like Holistic Approach and Chain of Thought Reasoning

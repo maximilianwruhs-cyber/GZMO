@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[dynamics-of-the-unpredictable-micro06|dynamics-of-the-unpredictable-micro06]] (2026-06-09)
+## From [dynamics-of-the-unpredictable-micro06](/entities/dynamics-of-the-unpredictable-micro06.md) (2026-06-09)
 - A lower-level, platform-specific graphics backend.
 - Abstracted over by wgpu.

@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[the-evolution-of-artificial-intelligence-evaluatio-micro02|the-evolution-of-artificial-intelligence-evaluatio-micro02]] (2026-06-09)
+## From [the-evolution-of-artificial-intelligence-evaluatio-micro02](/entities/the-evolution-of-artificial-intelligence-evaluatio-micro02.md) (2026-06-09)
 - Expands on EQ-Bench by evaluating models against human baselines in multi-turn emotional support dialogues.
 - Assessments follow a rubric grounded in interpersonal communication science.
 
-## From [[the-evolution-of-artificial-intelligence-evaluatio-micro04|the-evolution-of-artificial-intelligence-evaluatio-micro04]] (2026-06-09)
+## From [the-evolution-of-artificial-intelligence-evaluatio-micro04](/entities/the-evolution-of-artificial-intelligence-evaluatio-micro04.md) (2026-06-09)
 - Is a psychometric assessment.
 - Evaluates a model's capacity for empathy, attunement, adaptive reframing, and self-correction.

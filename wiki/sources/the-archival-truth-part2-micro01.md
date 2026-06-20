@@ -14,5 +14,5 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[curated-research-corpus|curated research corpus]] (CONCEPT)
-- [[the-archival-truth-part2|the-archival-truth-part2]] (PROJECT)
+- [curated research corpus](/entities/curated-research-corpus.md) (CONCEPT)
+- [the-archival-truth-part2](/entities/the-archival-truth-part2.md) (PROJECT)

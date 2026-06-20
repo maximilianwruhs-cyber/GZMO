@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[tui-framework|tui-framework]] (2026-06-08)
+## From [tui-framework](/entities/tui-framework.md) (2026-06-08)
 - Used with cat command to write files.
 - Facilitates multi-line input for configuration files.
 - Used to provision Zellij layout files.

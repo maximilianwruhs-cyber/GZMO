@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[optimizing-nvidia-blackwell-sm120-part3-micro03|optimizing-nvidia-blackwell-sm120-part3-micro03]] (2026-06-10)
+## From [optimizing-nvidia-blackwell-sm120-part3-micro03](/entities/optimizing-nvidia-blackwell-sm120-part3-micro03.md) (2026-06-10)
 - Allocates GPU memory via the kernel's Translation Table Manager (TTM).
 - Strix Halo (gfx1151) architecture is an example of an AMD APU.

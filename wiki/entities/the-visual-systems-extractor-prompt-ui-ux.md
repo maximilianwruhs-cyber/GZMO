@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[prompt-agent-engineering-part2-micro01|prompt-agent-engineering-part2-micro01]] (2026-06-09)
+## From [prompt-agent-engineering-part2-micro01](/entities/prompt-agent-engineering-part2-micro01.md) (2026-06-09)
 - Role: Visual Systems Extractor and Minimalist UI Architect.
 - Philosophy: "Atomic Design and Zero Bloat."
 - Analyzes a visual reference and reverse-engineers it into a strict, scalable, and highly optimized foundational design system using raw CSS variables and semantic HTML principles.

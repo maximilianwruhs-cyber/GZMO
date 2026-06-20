@@ -14,20 +14,20 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-08).
 
 ## Entities
-- [[gzmo-daemon|GZMO Daemon]] (PROJECT)
-- [[node-js|Node.js]] (TOOL)
-- [[linux-io-uring|Linux io_uring]] (SYSTEM)
-- [[index-ts|index.ts]] (BOOK)
-- [[tsc-noemit|tsc --noEmit]] (TOOL)
-- [[zero-copy-i-o-optimization|Zero-Copy I/O Optimization]] (CONCEPT)
-- [[2026-04-20-08-39-36-gap-detective-md|2026-04-20_08-39-36_gap_detective.md]] (BOOK)
-- [[self-ask-ts|self_ask.ts]] (BOOK)
-- [[bunfig-toml-environment-tuning|bunfig.toml Environment Tuning]] (CONCEPT)
-- [[memory-ts|memory.ts]] (BOOK)
-- [[ollama|Ollama]] (SYSTEM)
-- [[bun-run-test-full-pipeline-ts|bun run test_full_pipeline.ts]] (TOOL)
-- [[pulse-ts|pulse.ts]] (BOOK)
-- [[dreams-ts|dreams.ts]] (BOOK)
+- [GZMO Daemon](/entities/gzmo-daemon.md) (PROJECT)
+- [Node.js](/entities/node-js.md) (TOOL)
+- [Linux io_uring](/entities/linux-io-uring.md) (SYSTEM)
+- [index.ts](/entities/index-ts.md) (BOOK)
+- [tsc --noEmit](/entities/tsc-noemit.md) (TOOL)
+- [Zero-Copy I/O Optimization](/entities/zero-copy-i-o-optimization.md) (CONCEPT)
+- [2026-04-20_08-39-36_gap_detective.md](/entities/2026-04-20-08-39-36-gap-detective-md.md) (BOOK)
+- [self_ask.ts](/entities/self-ask-ts.md) (BOOK)
+- [bunfig.toml Environment Tuning](/entities/bunfig-toml-environment-tuning.md) (CONCEPT)
+- [memory.ts](/entities/memory-ts.md) (BOOK)
+- [Ollama](/entities/ollama.md) (SYSTEM)
+- [bun run test_full_pipeline.ts](/entities/bun-run-test-full-pipeline-ts.md) (TOOL)
+- [pulse.ts](/entities/pulse-ts.md) (BOOK)
+- [dreams.ts](/entities/dreams-ts.md) (BOOK)
 
 ## Relations
 - GZMO Daemon → USES → bun run test_full_pipeline.ts

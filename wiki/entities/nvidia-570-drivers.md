@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-linux-gaming-and-ai-build-guide-micro06|drive-research-linux-gaming-and-ai-build-guide-micro06]] (2026-06-10)
+## From [drive-research-linux-gaming-and-ai-build-guide-micro06](/entities/drive-research-linux-gaming-and-ai-build-guide-micro06.md) (2026-06-10)
 - Proprietary drivers
 - Pre-injected directly into the Bazzite OS image

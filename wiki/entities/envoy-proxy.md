@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[aether-grid-micro03|aether-grid-micro03]] (2026-06-09)
+## From [aether-grid-micro03](/entities/aether-grid-micro03.md) (2026-06-09)
 - Security component to be set up in Phase 2.

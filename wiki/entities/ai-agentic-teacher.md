@@ -14,12 +14,12 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-ai-agentic-teacher|drive-research-ai-agentic-teacher]] (2026-06-08)
+## From [drive-research-ai-agentic-teacher](/entities/drive-research-ai-agentic-teacher.md) (2026-06-08)
 - An autonomous, stateful pedagogical orchestration system.
 - Operates on a continuous "Think-Plan-Act" cognitive cycle.
 - Purpose is the strategic, longitudinal orchestration of a student's cognitive development.
 
-## From [[drive-research-ai-agentic-teacher-research-report|drive-research-ai-agentic-teacher-research-report]] (2026-06-08)
+## From [drive-research-ai-agentic-teacher-research-report](/entities/drive-research-ai-agentic-teacher-research-report.md) (2026-06-08)
 - An autonomous artificial intelligence system utilizing multi-agent orchestration, persistent multi-tier memory, and dynamic self-reflection loops.
 - Capable of proactive, goal-directed action in learning environments.
 - Operates on a continuous 'Think–Plan–Act' cognitive cycle.

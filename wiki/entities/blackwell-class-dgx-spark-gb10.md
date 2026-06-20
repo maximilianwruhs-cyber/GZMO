@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[optimizing-nvidia-blackwell-sm120-part1-micro02|optimizing-nvidia-blackwell-sm120-part1-micro02]] (2026-06-09)
+## From [optimizing-nvidia-blackwell-sm120-part1-micro02](/entities/optimizing-nvidia-blackwell-sm120-part1-micro02.md) (2026-06-09)
 - Deep benchmarking on the Blackwell-class DGX Spark GB10 utilizing a 128K context window demonstrates immense scale of architectural savings from KV cache quantization.

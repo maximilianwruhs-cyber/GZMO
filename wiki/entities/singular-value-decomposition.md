@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-nvar-financial-forecasting-parameter-search|drive-research-nvar-financial-forecasting-parameter-search]] (2026-06-08)
+## From [drive-research-nvar-financial-forecasting-parameter-search](/entities/drive-research-nvar-financial-forecasting-parameter-search.md) (2026-06-08)
 - Can be used to solve the regularized least-squares problem.
 - Truncates singular values below a specified numerical threshold.
 - Produces stable forecasts without requiring a Tikhonov parameter grid search.

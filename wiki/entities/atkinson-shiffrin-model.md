@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-cognitive-architecture-of-openclaw-agents-micro03|the-cognitive-architecture-of-openclaw-agents-micro03]] (2026-06-09)
+## From [the-cognitive-architecture-of-openclaw-agents-micro03](/entities/the-cognitive-architecture-of-openclaw-agents-micro03.md) (2026-06-09)
 - A model of cognitive memory.
 - Explicitly dictates that memories must fade without use and strengthen with access.
 - Heavily applied within the OpenClaw framework.
 
-## From [[openclaw-part1-micro03|openclaw-part1-micro03]] (2026-06-10)
+## From [openclaw-part1-micro03](/entities/openclaw-part1-micro03.md) (2026-06-10)
 - A multi-store model of human memory used as the basis for the cognitive memory layer.

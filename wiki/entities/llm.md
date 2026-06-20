@@ -28,34 +28,34 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[from-static-vaults-to-autonomous-knowledge-engines|from-static-vaults-to-autonomous-knowledge-engines]] (2026-06-08)
+## From [from-static-vaults-to-autonomous-knowledge-engines](/entities/from-static-vaults-to-autonomous-knowledge-engines.md) (2026-06-08)
 - It stands for Large Language Model.
 - It is integrated with vector embeddings into local filesystems for semantic vault connectivity.
 - The Smart Connections framework injects retrieved notes into the LLM's context window.
 
-## From [[openclaw-deep-research-part6|openclaw-deep-research-part6]] (2026-06-08)
+## From [openclaw-deep-research-part6](/entities/openclaw-deep-research-part6.md) (2026-06-08)
 - OpenClaw differs from traditional LLMs by transitioning to an autonomous agent.
 - OpenClaw uses LLMs to execute tool calls.
 
-## From [[drive-research-agentic-typescript-monorepo-context-management|drive-research-agentic-typescript-monorepo-context-management]] (2026-06-08)
+## From [drive-research-agentic-typescript-monorepo-context-management](/entities/drive-research-agentic-typescript-monorepo-context-management.md) (2026-06-08)
 - Can be prevented from hallucination by strict parameter contracts.
 - System prompt is injected with JSON-schema representations.
 - Receives precise, actionable instructions via promptSnippet and promptGuidelines.
 
-## From [[drive-research-du-hast-gesagt-part1|drive-research-du-hast-gesagt-part1]] (2026-06-08)
+## From [drive-research-du-hast-gesagt-part1](/entities/drive-research-du-hast-gesagt-part1.md) (2026-06-08)
 - Local LLMs are fed specific files by Continue.dev.
 - Standard AI models use 16-bit or 8-bit floating-point numbers.
 - Local open-weights models are more literal than cloud models.
 
-## From [[drive-research-hermes-session-storage-migration-analysis|drive-research-hermes-session-storage-migration-analysis]] (2026-06-08)
+## From [drive-research-hermes-session-storage-migration-analysis](/entities/drive-research-hermes-session-storage-migration-analysis.md) (2026-06-08)
 - Large Language Models.
 - Context window is a limitation for LLMs.
 - Hermes avoids expensive API calls to LLMs for retrospective segmentation.
 
-## From [[drive-research-to-product-engineering-leadership|drive-research-to-product-engineering-leadership]] (2026-06-08)
+## From [drive-research-to-product-engineering-leadership](/entities/drive-research-to-product-engineering-leadership.md) (2026-06-08)
 - Local LLM service is probed via HTTP GET request to API endpoint.
 
-## From [[architectures-for-agentic-memory-virtual-context-micro07|architectures-for-agentic-memory-virtual-context-micro07]] (2026-06-09)
+## From [architectures-for-agentic-memory-virtual-context-micro07](/entities/architectures-for-agentic-memory-virtual-context-micro07.md) (2026-06-09)
 - Vector databases convert textual information into high-dimensional numerical arrays (embeddings) for LLMs.
 - A pure vector search might surface general chunks about Alice and unrelated chunks about permissions, but it possesses no underlying mechanism to connect those two distinct facts into a coherent answer for an LLM.
 - The system remembers the text perfectly, but it understands absolutely none of the underlying relationships for an LLM.
@@ -129,43 +129,43 @@ Type: SYSTEM
 - By extracting memory curation from the LLM and delegating it to purpose-built deterministic pipelines, the SEKG framework guarantees behavioral consistency, unlocks deep causal reasoning via spreading activation, and achieves production-grade latency for LLMs.
 - In the pursuit of reliable, long-horizon autonomous enterprise agents, abandoning the operating system analogy in favor of engineered cognitive neuro-structures is not an overcomplication; it is an architectural necessity for LLMs.
 
-## From [[google-antigravity-the-architects-configuration-micro02|google-antigravity-the-architects-configuration-micro02]] (2026-06-09)
+## From [google-antigravity-the-architects-configuration-micro02](/entities/google-antigravity-the-architects-configuration-micro02.md) (2026-06-09)
 - Stands for Large Language Model.
 - An autonomous agent powered by an LLM is prone to architectural hallucinations, stylistic inconsistencies, and potentially catastrophic security actions.
 - Standard generative processes output tokens sequentially based on probabilistic weights.
 
-## From [[google-antigravity-the-architects-configuration-micro04|google-antigravity-the-architects-configuration-micro04]] (2026-06-09)
+## From [google-antigravity-the-architects-configuration-micro04](/entities/google-antigravity-the-architects-configuration-micro04.md) (2026-06-09)
 - Highly autonomous LLM cannot be unleashed into a sensitive monorepo without governance.
 - Raw cognitive power and advanced LLM reasoning capabilities are useless without structural control.
 
-## From [[obolus-micro03|obolus-micro03]] (2026-06-09)
+## From [obolus-micro03](/entities/obolus-micro03.md) (2026-06-09)
 - Called by the Engine to generate a new configuration.
 - Used to analyze errors and create optimized system prompts.
 
-## From [[openclaw-deep-research-part10-micro05|openclaw-deep-research-part10-micro05]] (2026-06-09)
+## From [openclaw-deep-research-part10-micro05](/entities/openclaw-deep-research-part10-micro05.md) (2026-06-09)
 - Memory can be squeezed by TurboQuant.
 
-## From [[the-architects-handbook-for-autonomous-agentic-tr-micro03|the-architects-handbook-for-autonomous-agentic-tr-micro03]] (2026-06-09)
+## From [the-architects-handbook-for-autonomous-agentic-tr-micro03](/entities/the-architects-handbook-for-autonomous-agentic-tr-micro03.md) (2026-06-09)
 - Multi-agent LLM frameworks can be engineered using SDKs like LangChain or AutoGen.
 
-## From [[the-cognitive-architecture-of-openclaw-agents-micro04|the-cognitive-architecture-of-openclaw-agents-micro04]] (2026-06-09)
+## From [the-cognitive-architecture-of-openclaw-agents-micro04](/entities/the-cognitive-architecture-of-openclaw-agents-micro04.md) (2026-06-09)
 - Probabilistic operations are physically isolated within deterministic execution limits.
 - Expensive invocation is triggered only if an anomaly or trigger is found.
 - Used to write a hypothetical summary of user intent in REM phase.
 - System prompt can include a compressed metadata index.
 
-## From [[the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro01|the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro01]] (2026-06-09)
+## From [the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro01](/entities/the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro01.md) (2026-06-09)
 - Large Language Models.
 - OpenClaw transforms LLMs into persistent digital entities.
 - The core reasoning engine of OpenClaw.
 
-## From [[the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro02|the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro02]] (2026-06-09)
+## From [the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro02](/entities/the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro02.md) (2026-06-09)
 - Possess finite context windows.
 - Can hallucinate if isolated from the internet.
 - Can have inherent conversational verbosity.
 - Can attempt to generate unauthorized narrative prose.
 
-## From [[the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro06|the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro06]] (2026-06-09)
+## From [the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro06](/entities/the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro06.md) (2026-06-09)
 - Large Language Model.
 - AI transition from reactive interfaces to autonomous systems.
 - Can process Markdown-based context.

@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[prompt-agent-engineering-part7-micro02|prompt-agent-engineering-part7-micro02]] (2026-06-09)
+## From [prompt-agent-engineering-part7-micro02](/entities/prompt-agent-engineering-part7-micro02.md) (2026-06-09)
 - The domain being audited.
 - Requires <20ms end-to-end latency and high 'data-to-timbre' fidelity.

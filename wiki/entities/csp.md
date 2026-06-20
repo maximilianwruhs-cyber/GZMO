@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[tui-framework|tui-framework]] (2026-06-08)
+## From [tui-framework](/entities/tui-framework.md) (2026-06-08)
 - Strict Content Security Policy.
 - Must be enforced for Webview route.
 - Blocks unsafe-inline scripts.

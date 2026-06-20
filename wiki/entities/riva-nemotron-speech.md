@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[aether-grid-micro04|aether-grid-micro04]] (2026-06-09)
+## From [aether-grid-micro04](/entities/aether-grid-micro04.md) (2026-06-09)
 - Handles Audio processing.
 - Provides ASR (Speech-to-Text) with <25 ms First-Chunk latency.
 - Provides TTS (Text-to-Speech) with <50 ms latency.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TECHNIQUE
 
-## From [[drive-research-neuro-symbolic-prompt-engineering-research|drive-research-neuro-symbolic-prompt-engineering-research]] (2026-06-08)
+## From [drive-research-neuro-symbolic-prompt-engineering-research](/entities/drive-research-neuro-symbolic-prompt-engineering-research.md) (2026-06-08)
 - A zero-shot, logits-layer debiasing method.
 - Extracts semantic vectors from context tokens and applies targeted penalties.
 - Aims to ensure the model remains aligned and unbiased.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[prompt-agent-engineering-part2-micro04|prompt-agent-engineering-part2-micro04]] (2026-06-09)
+## From [prompt-agent-engineering-part2-micro04](/entities/prompt-agent-engineering-part2-micro04.md) (2026-06-09)
 - Core philosophy is 'Atomic Design and Zero Bloat'.
 - Rejects inline styles, bloated frameworks, and pixel-perfect guesswork.
 - Focuses on minimalist UI/UX tokens.

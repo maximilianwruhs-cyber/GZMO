@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[drive-research-financial-time-series-lyapunov-exponents|drive-research-financial-time-series-lyapunov-exponents]] (2026-06-08)
+## From [drive-research-financial-time-series-lyapunov-exponents](/entities/drive-research-financial-time-series-lyapunov-exponents.md) (2026-06-08)
 - GitHub repository with ARCHITECTURE.md
 - GitHub repository with ADR-099-midstream-introspection-tap.md
 - midstream/docs/ARCHITECTURE.md at main - GitHub

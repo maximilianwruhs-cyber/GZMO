@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[openclaw-deep-research-part2|openclaw-deep-research-part2]] (2026-06-08)
+## From [openclaw-deep-research-part2](/entities/openclaw-deep-research-part2.md) (2026-06-08)
 - Nanobot is mentioned as an alternative to OpenClaw.
 - It is described as a lightweight OpenClaw alternative.
 - Derrick Mwiti authored a tutorial on Nanobot.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-cache-optimization-with-ai-chaos-theory|drive-research-cache-optimization-with-ai-chaos-theory]] (2026-06-08)
+## From [drive-research-cache-optimization-with-ai-chaos-theory](/entities/drive-research-cache-optimization-with-ai-chaos-theory.md) (2026-06-08)
 - A safe-code approach in Rust for aligned memory.
 - Wraps data arrays in a custom, aligned block structure using #[repr(align(...))].
 - Ensures vector elements carry required alignment, forcing correct layout usage.

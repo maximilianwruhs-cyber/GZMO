@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-cascading-honeypot-theorem-of-wisdom|the-cascading-honeypot-theorem-of-wisdom]] (2026-06-08)
+## From [the-cascading-honeypot-theorem-of-wisdom](/entities/the-cascading-honeypot-theorem-of-wisdom.md) (2026-06-08)
 - The two breaths of knowledge work.
 - The rhythm of human thought is an endless cycle of compression and expansion.

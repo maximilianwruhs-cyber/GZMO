@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-synthesizing-wisdom-from-heterogeneous-data|drive-research-synthesizing-wisdom-from-heterogeneous-data]] (2026-06-08)
+## From [drive-research-synthesizing-wisdom-from-heterogeneous-data](/entities/drive-research-synthesizing-wisdom-from-heterogeneous-data.md) (2026-06-08)
 - Parameterizes transition probabilities via a neural sampler and path encoder.
 - Captures invariant subgraphs under strong topological shifts.
 - Uses kernel density estimation mutual info loss.

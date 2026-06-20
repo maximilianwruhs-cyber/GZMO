@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[prompt-agent-engineering-part3|prompt-agent-engineering-part3]] (2026-06-08)
+## From [prompt-agent-engineering-part3](/entities/prompt-agent-engineering-part3.md) (2026-06-08)
 - Allows the AI to handle tasks concurrently without blocking.
 - Ensures error resilience.

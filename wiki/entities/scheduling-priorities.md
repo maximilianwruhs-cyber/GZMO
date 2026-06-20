@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-architecting-a-linux-task-manager-design-principl|drive-research-architecting-a-linux-task-manager-design-principl]] (2026-06-08)
+## From [drive-research-architecting-a-linux-task-manager-design-principl](/entities/drive-research-architecting-a-linux-task-manager-design-principl.md) (2026-06-08)
 - Task managers allow users to alter a process's priority.
 - Adjusting priority is referred to as adjusting its 'niceness'.

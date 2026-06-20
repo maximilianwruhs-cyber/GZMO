@@ -14,12 +14,12 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[obolus-vs-codium-extension-konzept-research-part1-micro05|obolus-vs-codium-extension-konzept-research-part1-micro05]] (2026-06-09)
+## From [obolus-vs-codium-extension-konzept-research-part1-micro05](/entities/obolus-vs-codium-extension-konzept-research-part1-micro05.md) (2026-06-09)
 - Node.js process where the extension runs.
 - Handles WebSocket connection and throttling.
 - Can be frozen by unfiltered data streams.
 
-## From [[obolus-vs-codium-extension-konzept-research-part1-micro06|obolus-vs-codium-extension-konzept-research-part1-micro06]] (2026-06-09)
+## From [obolus-vs-codium-extension-konzept-research-part1-micro06](/entities/obolus-vs-codium-extension-konzept-research-part1-micro06.md) (2026-06-09)
 - Runs on Node.js 18+ since VSCodium / VS Code 1.79.
 - Receives IPC messages from the Wizard.
 - Is the context for the BenchmarkWizardPanel.

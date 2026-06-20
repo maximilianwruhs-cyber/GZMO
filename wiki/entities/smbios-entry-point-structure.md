@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-automating-linux-hardware-detection-micro02|drive-research-automating-linux-hardware-detection-micro02]] (2026-06-10)
+## From [drive-research-automating-linux-hardware-detection-micro02](/entities/drive-research-automating-linux-hardware-detection-micro02.md) (2026-06-10)
 - Located via raw memory scan between 0x000F0000h and 0x000FFFFFh in legacy environments
 - Retrieved by kernel via EFI Configuration Table on UEFI systems

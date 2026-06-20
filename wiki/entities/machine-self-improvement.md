@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part3-micro03|ai-research-part3-micro03]] (2026-06-09)
+## From [ai-research-part3-micro03](/entities/ai-research-part3-micro03.md) (2026-06-09)
 - general concepts of machine self-improvement were first systematically articulated by Good (1966)
 - Early work on explicit self-improvements dates back to Schmidhuber (1987)

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-cache-optimization-blueprint|drive-research-cache-optimization-blueprint]] (2026-06-08)
+## From [drive-research-cache-optimization-blueprint](/entities/drive-research-cache-optimization-blueprint.md) (2026-06-08)
 - Prevented by the production-grade code.
 - Can occur from under-alignment of larger native types.
 - Miri flags failures related to UB.

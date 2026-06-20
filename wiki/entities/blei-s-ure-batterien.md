@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-technologischer-branchen-report-hilfsbetriebeumri-micro02|drive-research-technologischer-branchen-report-hilfsbetriebeumri-micro02]] (2026-06-09)
+## From [drive-research-technologischer-branchen-report-hilfsbetriebeumri-micro02](/entities/drive-research-technologischer-branchen-report-hilfsbetriebeumri-micro02.md) (2026-06-09)
 - Historically dominated energy storage in rail vehicles.
 - Often used as sealed VR types.
 - Being replaced by Lithium-Ion systems.

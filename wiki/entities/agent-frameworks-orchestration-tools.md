@@ -14,6 +14,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part8-micro08|ai-research-part8-micro08]] (2026-06-09)
+## From [ai-research-part8-micro08](/entities/ai-research-part8-micro08.md) (2026-06-09)
 - A category of tools and frameworks.
 - Includes Agent0, Darwin Gödel Machine (DGM), Huxley-Gödel Machine (HGM), ultraworkers/claw-code, code-yeongyu/oh-my-openagent (OmO), AutoJunjie/awesome-agent-harness, Yeachan-Heo/oh-my-claudecode (OMC), Yeachan-Heo/oh-my-codex (OmX), vibeeval/vibecosystem, stoneforge-ai/stoneforge, and gemini-cli-extensions/conductor.

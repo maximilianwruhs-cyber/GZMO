@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-benchmarking-llamacpp-server-prefill-tokens-micro02|drive-research-benchmarking-llamacpp-server-prefill-tokens-micro02]] (2026-06-09)
+## From [drive-research-benchmarking-llamacpp-server-prefill-tokens-micro02](/entities/drive-research-benchmarking-llamacpp-server-prefill-tokens-micro02.md) (2026-06-09)
 - Protecting prefix cache immutability prevents expensive prompt re-evaluation passes on subsequent multi-turn requests.
 - Ordering prompt payloads to protect prefix cache immutability is recommended.
 - Dynamic variables, timestamps, and user turns must be appended strictly at the end of the sequence to protect it.

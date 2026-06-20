@@ -15,9 +15,9 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-automating-linux-hardware-detection-micro03|drive-research-automating-linux-hardware-detection-micro03]] (2026-06-09)
+## From [drive-research-automating-linux-hardware-detection-micro03](/entities/drive-research-automating-linux-hardware-detection-micro03.md) (2026-06-09)
 - Output is harvested by hw-probe.
 
-## From [[drive-research-automating-linux-hardware-detection-micro02|drive-research-automating-linux-hardware-detection-micro02]] (2026-06-10)
+## From [drive-research-automating-linux-hardware-detection-micro02](/entities/drive-research-automating-linux-hardware-detection-micro02.md) (2026-06-10)
 - Generates granular technical configurations
 - Originally developed for SUSE distributions

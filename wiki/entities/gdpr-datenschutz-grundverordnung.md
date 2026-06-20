@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[openclaw-part1-micro06|openclaw-part1-micro06]] (2026-06-09)
+## From [openclaw-part1-micro06](/entities/openclaw-part1-micro06.md) (2026-06-09)
 - Binding regulations for AI agents operated in the European Union.
 - Principle of data minimization (Art. 5 Abs. 1 GDPR) is endangered by autonomous agents.
 - Requires lawful logging and auditing of AI agent activities.

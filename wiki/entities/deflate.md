@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-safe-unzip-practices-for-threat-model-micro01|drive-research-safe-unzip-practices-for-threat-model-micro01]] (2026-06-10)
+## From [drive-research-safe-unzip-practices-for-threat-model-micro01](/entities/drive-research-safe-unzip-practices-for-threat-model-micro01.md) (2026-06-10)
 - A lossless data compression algorithm used within the ZIP specification.
 - Combines Lempel-Ziv (LZ77) substitution with Huffman coding.
 - Has a theoretical maximum compression ratio of 1032:1.

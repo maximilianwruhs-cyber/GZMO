@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[high-performance-typescript-execution-and-architec-part1-micro05|high-performance-typescript-execution-and-architec-part1-micro05]] (2026-06-09)
+## From [high-performance-typescript-execution-and-architec-part1-micro05](/entities/high-performance-typescript-execution-and-architec-part1-micro05.md) (2026-06-09)
 - A native tool shipped with the Pi agent.
 - Designed to provide universal filesystem manipulation.
 - Part of a minimal set of native tools.

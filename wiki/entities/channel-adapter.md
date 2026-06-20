@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[openclaw-deep-research-part11-micro04|openclaw-deep-research-part11-micro04]] (2026-06-09)
+## From [openclaw-deep-research-part11-micro04](/entities/openclaw-deep-research-part11-micro04.md) (2026-06-09)
 - Normalizes messages from various messaging platforms before they reach the agent.
 - Transforms messages into a single, consistent message object.
 - Handles transcription for voice notes.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-frankenmoe-merging-ai-models|drive-research-frankenmoe-merging-ai-models]] (2026-06-08)
+## From [drive-research-frankenmoe-merging-ai-models](/entities/drive-research-frankenmoe-merging-ai-models.md) (2026-06-08)
 - Techniques pioneered by the open-source software and machine learning engineering communities.
 - Colloquially known as 'FrankenMoE' construction or Mixture of Experts (MoE) merging.
 - Allows practitioners to consolidate multiple independently trained or fine-tuned dense models into a unified sparse MoE architecture.

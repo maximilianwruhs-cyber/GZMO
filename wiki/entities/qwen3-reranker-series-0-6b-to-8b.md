@@ -14,13 +14,13 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-small-models|drive-research-small-models]] (2026-06-08)
+## From [drive-research-small-models](/entities/drive-research-small-models.md) (2026-06-08)
 - Dominates reranking benchmarks in 2026.
 - Tiny 0.6B version is incredibly fast and cost-effective for general filtering.
 - 4B and 8B versions are exceptional for highly complex academic, legal, or technical documents.
 - Have a massive 32k context window.
 
-## From [[the-architecture-of-speculative-decoding-and-infer-part2-micro03|the-architecture-of-speculative-decoding-and-infer-part2-micro03]] (2026-06-09)
+## From [the-architecture-of-speculative-decoding-and-infer-part2-micro03](/entities/the-architecture-of-speculative-decoding-and-infer-part2-micro03.md) (2026-06-09)
 - Dominates reranking benchmarks in 2026.
 - Tiny 0.6B version is fast and cost-effective for general filtering.
 - 4B and 8B versions are exceptional for complex academic, legal, or technical documents.

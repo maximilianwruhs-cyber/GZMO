@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[engineering-ignorance-eliminating-affirmative-bia|engineering-ignorance-eliminating-affirmative-bia]] (2026-06-08)
+## From [engineering-ignorance-eliminating-affirmative-bia](/entities/engineering-ignorance-eliminating-affirmative-bia.md) (2026-06-08)
 - Range from 1 billion to 8 billion parameters.
 - Democratized access to edge-deployed, latency-optimized AI architectures.
 - Struggle to admit ignorance, exhibiting an affirmative bias.
@@ -28,6 +28,6 @@ Type: CONCEPT
 - Will inevitably hallucinate, hedge, and over-predict the Supported class when faced with missing information.
 - Can achieve strict, unyielding accuracy when properly constrained.
 
-## From [[drive-research-create-a-tier-list-of-specialized-small-models|drive-research-create-a-tier-list-of-specialized-small-models]] (2026-06-08)
+## From [drive-research-create-a-tier-list-of-specialized-small-models](/entities/drive-research-create-a-tier-list-of-specialized-small-models.md) (2026-06-08)
 - Capped under 15B parameters.
 - Prioritizes pure task execution, local hardware friendliness, and actual utility over marketing benchmarks.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[google-antigravity-the-architects-configuration-micro05|google-antigravity-the-architects-configuration-micro05]] (2026-06-10)
+## From [google-antigravity-the-architects-configuration-micro05](/entities/google-antigravity-the-architects-configuration-micro05.md) (2026-06-10)
 - Role: Eternal UX/Product Sovereign and Seasoned Sales Strategist
 - Objective: Define USPs, pinpoint market gaps, and integrate additive features
 - Protocol: Includes USP Weaponization & SWOT, Sales Messaging & Application, Pure Accretion Doctrine, and Prioritized Matrix & Roadmap

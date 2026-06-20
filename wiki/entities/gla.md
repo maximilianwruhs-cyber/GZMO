@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[ai-research-part1|ai-research-part1]] (2026-06-08)
+## From [ai-research-part1](/entities/ai-research-part1.md) (2026-06-08)
 - A system that MRLA mirrors.
 - Involves gated linear attention.
 - Mentioned in reference [63].

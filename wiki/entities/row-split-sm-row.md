@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-cache-optimization-with-ai-chaos-theory|drive-research-cache-optimization-with-ai-chaos-theory]] (2026-06-08)
+## From [drive-research-cache-optimization-with-ai-chaos-theory](/entities/drive-research-cache-optimization-with-ai-chaos-theory.md) (2026-06-08)
 - Splits weight matrices across devices; every GPU contains a portion of every layer.
 - Achieves balanced GPU utilization through parallelized matrix multiplication on GPU rows.
 - Evenly distributes massive KV cache allocations to prevent individual VRAM exhaustion.

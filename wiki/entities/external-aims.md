@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-dialectics-socratic-vs-hegelian-methods|drive-research-dialectics-socratic-vs-hegelian-methods]] (2026-06-08)
+## From [drive-research-dialectics-socratic-vs-hegelian-methods](/entities/drive-research-dialectics-socratic-vs-hegelian-methods.md) (2026-06-08)
 - argued against by John Dewey
 - arbitrary grades or standardized test scores, termed an 'artificial bribe'

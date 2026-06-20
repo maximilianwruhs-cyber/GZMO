@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[architectural-analysis-of-the-openclaw-ai-plugin-s|architectural-analysis-of-the-openclaw-ai-plugin-s]] (2026-06-08)
+## From [architectural-analysis-of-the-openclaw-ai-plugin-s](/entities/architectural-analysis-of-the-openclaw-ai-plugin-s.md) (2026-06-08)
 - An example of a highly hardened enterprise environment.
 - Pairs the installation pipeline with stringent DAC locking.
 - A secure, containerized environment.

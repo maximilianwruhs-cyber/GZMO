@@ -14,18 +14,18 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-10).
 
 ## Entities
-- [[heartbeat-md|HEARTBEAT.md]] (TOOL)
-- [[fts5|FTS5]] (TOOL)
-- [[memory-md|MEMORY.md]] (TOOL)
-- [[mmr|MMR]] (CONCEPT)
-- [[atkinson-shiffrin-modell|Atkinson-Shiffrin-Modell]] (CONCEPT)
-- [[soul-md|SOUL.md]] (TOOL)
-- [[art-5-dsgvo|Art. 5 DSGVO]] (CONCEPT)
-- [[sqlite-vec|sqlite-vec]] (TOOL)
-- [[gzmo|GZMO]] (PERSON)
-- [[openclaw-2026-4-5|OpenClaw 2026.4.5]] (SYSTEM)
-- [[pi-mono|pi-mono]] (SYSTEM)
-- [[hyde|HyDE]] (CONCEPT)
+- [HEARTBEAT.md](/entities/heartbeat-md.md) (TOOL)
+- [FTS5](/entities/fts5.md) (TOOL)
+- [MEMORY.md](/entities/memory-md.md) (TOOL)
+- [MMR](/entities/mmr.md) (CONCEPT)
+- [Atkinson-Shiffrin-Modell](/entities/atkinson-shiffrin-modell.md) (CONCEPT)
+- [SOUL.md](/entities/soul-md.md) (TOOL)
+- [Art. 5 DSGVO](/entities/art-5-dsgvo.md) (CONCEPT)
+- [sqlite-vec](/entities/sqlite-vec.md) (TOOL)
+- [GZMO](/entities/gzmo.md) (PERSON)
+- [OpenClaw 2026.4.5](/entities/openclaw-2026-4-5.md) (SYSTEM)
+- [pi-mono](/entities/pi-mono.md) (SYSTEM)
+- [HyDE](/entities/hyde.md) (CONCEPT)
 
 ## Relations
 - pi-mono → USES → HEARTBEAT.md

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[optimizing-nvidia-blackwell-sm120-part1-micro04|optimizing-nvidia-blackwell-sm120-part1-micro04]] (2026-06-09)
+## From [optimizing-nvidia-blackwell-sm120-part1-micro04](/entities/optimizing-nvidia-blackwell-sm120-part1-micro04.md) (2026-06-09)
 - Contains critical bugs when deploying MoE models using native NVFP4 weight formats on SM120.
 - Templates have a shared memory layout mismatch when compiled for SM120.
 - Grouped GEMM tactics are hardcoded to assume SM100-class hardware parameters.

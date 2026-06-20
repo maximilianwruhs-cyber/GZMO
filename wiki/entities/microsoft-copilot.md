@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[openclaw-part2|openclaw-part2]] (2026-06-08)
+## From [openclaw-part2](/entities/openclaw-part2.md) (2026-06-08)
 - Integrates seamlessly into localized ecosystems like Microsoft 365.
 - Limited in its ability to orchestrate highly complex, multi-step workflows across disparate, non-vendor software.

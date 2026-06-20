@@ -15,7 +15,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[aether-grid-micro02|aether-grid-micro02]] (2026-06-09)
+## From [aether-grid-micro02](/entities/aether-grid-micro02.md) (2026-06-09)
 - Provisioning & Real-Time
 - ARM64-native, Real-Time Kernel
 - Fleet-management: Zero-Touch-Provisioning of Edge-nodes
@@ -31,9 +31,9 @@ Type: TOOL
 - provisioning and Real-Time
 - fleet-management: Zero-Touch-Provisioning of Edge-nodes
 
-## From [[aether-grid-micro04|aether-grid-micro04]] (2026-06-09)
+## From [aether-grid-micro04](/entities/aether-grid-micro04.md) (2026-06-09)
 - Central zero-touch provisioning for all nodes.
 - Used for Host-OS & Provisioning.
 
-## From [[aether-grid-micro03|aether-grid-micro03]] (2026-06-09)
+## From [aether-grid-micro03](/entities/aether-grid-micro03.md) (2026-06-09)
 - Operating system to be set up on Ubuntu 24.04 Real-Time Images in Phase 2.

@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-deep-dive-google-antigravity-architecture|drive-research-deep-dive-google-antigravity-architecture]] (2026-06-08)
+## From [drive-research-deep-dive-google-antigravity-architecture](/entities/drive-research-deep-dive-google-antigravity-architecture.md) (2026-06-08)
 - Provides progressive disclosure efficiency.
 - Part of the Agent Manager's capabilities.

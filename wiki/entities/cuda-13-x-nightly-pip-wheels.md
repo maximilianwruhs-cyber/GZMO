@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-what-else-can-directly-be-aligned-with-our-common|drive-research-what-else-can-directly-be-aligned-with-our-common]] (2026-06-08)
+## From [drive-research-what-else-can-directly-be-aligned-with-our-common](/entities/drive-research-what-else-can-directly-be-aligned-with-our-common.md) (2026-06-08)
 - Operating on a bare-metal Linux stack using these can surface silent linker traps during custom extension builds.

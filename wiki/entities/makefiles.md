@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[allgemeine-informationen|allgemeine-informationen]] (2026-06-08)
+## From [allgemeine-informationen](/entities/allgemeine-informationen.md) (2026-06-08)
 - They can be used to script automation for setup, environment configuration, and repetitive terminal tasks.

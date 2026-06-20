@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[drive-research-ubuntu-extreme-hardware-tuning-micro01|drive-research-ubuntu-extreme-hardware-tuning-micro01]] (2026-06-09)
+## From [drive-research-ubuntu-extreme-hardware-tuning-micro01](/entities/drive-research-ubuntu-extreme-hardware-tuning-micro01.md) (2026-06-09)
 - Title of the research content.
 - Focuses on hardware and kernel optimization.
 - Motherboard platform for AMD Ryzen 9 9950X.

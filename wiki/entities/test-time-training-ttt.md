@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part1|ai-research-part1]] (2026-06-08)
+## From [ai-research-part1](/entities/ai-research-part1.md) (2026-06-08)
 - Formalizes the sequence side of the sequence-depth duality.
 - Casts each recurrent step as gradient descent on a self-supervised loss.
 - Mentioned in reference [46].

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[drive-research-cuda-graph-capture-failure-workarounds-micro03|drive-research-cuda-graph-capture-failure-workarounds-micro03]] (2026-06-09)
+## From [drive-research-cuda-graph-capture-failure-workarounds-micro03](/entities/drive-research-cuda-graph-capture-failure-workarounds-micro03.md) (2026-06-09)
 - GitHub discussion related to the topic.
 - Backend merges sequential kernels to minimize memory traffic.
 - Performance is enhanced by dispatching independent attention projection computations.

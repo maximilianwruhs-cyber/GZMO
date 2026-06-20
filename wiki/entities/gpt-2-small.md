@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-llmlingua-cpu-leistung-und-leistungstests|drive-research-llmlingua-cpu-leistung-und-leistungstests]] (2026-06-08)
+## From [drive-research-llmlingua-cpu-leistung-und-leistungstests](/entities/drive-research-llmlingua-cpu-leistung-und-leistungstests.md) (2026-06-08)
 - Backbone of early LLMLingua development.
 - Can be executed on a CPU with low memory requirements.
 - Its causal (autoregressive) architecture leads to sequential processing and unacceptable delays for long prompts on CPU.

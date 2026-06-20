@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[the-definitive-pantheon|the-definitive-pantheon]] (2026-06-08)
+## From [the-definitive-pantheon](/entities/the-definitive-pantheon.md) (2026-06-08)
 - Wolverine brought a darker, grittier edge to them.

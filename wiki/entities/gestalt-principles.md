@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-architecture-of-scientific-inquiry-and-academi|the-architecture-of-scientific-inquiry-and-academi]] (2026-06-08)
+## From [the-architecture-of-scientific-inquiry-and-academi](/entities/the-architecture-of-scientific-inquiry-and-academi.md) (2026-06-08)
 - Principles of visual perception used to reduce cognitive load in graphics.
 - Includes closure, connection, proximity, and similarity.
 - Help viewers interpret data more easily.

@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[dynamics-of-the-unpredictable-micro04|dynamics-of-the-unpredictable-micro04]] (2026-06-09)
+## From [dynamics-of-the-unpredictable-micro04](/entities/dynamics-of-the-unpredictable-micro04.md) (2026-06-09)
 - Pioneered the use of non-linear dynamic models to explore personality structures.
 - Explored complex conditions like schizophrenia using these models.

@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[obolus-micro06|obolus-micro06]] (2026-06-09)
+## From [obolus-micro06](/entities/obolus-micro06.md) (2026-06-09)
 - Used for file synchronization.
 - Used by Backup Custodian.

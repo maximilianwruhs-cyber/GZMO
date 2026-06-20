@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[optimizing-nvidia-blackwell-sm120-part1-micro04|optimizing-nvidia-blackwell-sm120-part1-micro04]] (2026-06-09)
+## From [optimizing-nvidia-blackwell-sm120-part1-micro04](/entities/optimizing-nvidia-blackwell-sm120-part1-micro04.md) (2026-06-09)
 - Marlin requires a minimum compute capability of >= 8.0, which includes Ampere.

@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-mcp-landscape-research-report|drive-research-mcp-landscape-research-report]] (2026-06-08)
+## From [drive-research-mcp-landscape-research-report](/entities/drive-research-mcp-landscape-research-report.md) (2026-06-08)
 - Malicious actors can deploy rug-pull tactics, presenting benign behavior during the initial capability handshake but altering tool execution logic post-approval.
 - A poisoned server could silently exfiltrate a user's entire local application history.

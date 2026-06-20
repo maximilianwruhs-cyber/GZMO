@@ -1,0 +1,38 @@
+{
+  "generated_at": "2026-06-20T08:41:00Z",
+  "total_queries": 5,
+  "passed": 5,
+  "pass_rate": 1.0,
+  "results": [
+    {
+      "link_id": "L19",
+      "recall_query": "<semantic expression>",
+      "hit": true,
+      "preview": "Platform recall for '<semantic expression>':\n\n## Honeypot / Vault\n\n- [1] (Score: 0.05) [TOOL:AST-Parsing] A semantic tool.\n- [2] (Score: 0.04) [TOOL:WordPiece] Favors highly informative semantic units"
+    },
+    {
+      "link_id": "L20",
+      "recall_query": "<persona collision>",
+      "hit": true,
+      "preview": "Platform recall for '<persona collision>':\n\n## Honeypot / Vault\n\n- [1] (Score: 0.96) [SYSTEM:Emergency-LLM] Faces a 'Persona-Bruch' (persona break) in offline mode.\n- [2] (Score: 0.84) [CONCEPT:Person"
+    },
+    {
+      "link_id": "L21",
+      "recall_query": "<synaptic pruning>",
+      "hit": true,
+      "preview": "Platform recall for '<synaptic pruning>':\n\n## Honeypot / Vault\n\n- [1] (Score: 1.00) [CONCEPT:Hebbian Learning Logic] Pruning removes edges with lowest weight-to-age ratio.\n- [2] (Score: 0.99) [CONCEPT"
+    },
+    {
+      "link_id": "L22",
+      "recall_query": "<consolidation>",
+      "hit": true,
+      "preview": "Platform recall for '<consolidation>':\n\n## Honeypot / Vault\n\n- [1] (Score: 0.96) [CONCEPT:CONSORT] Consolidated Standards of Reporting Trials.\n- [2] (Score: 0.95) [PROCESS:Dream Consolidation] Process"
+    },
+    {
+      "link_id": "L23",
+      "recall_query": "<dream_state_transition>",
+      "hit": true,
+      "preview": "Platform recall for '<dream_state_transition>':\n\n## Honeypot / Vault\n\n- [1] (Score: 0.05) [TOOL:fastembed] Used in the REM Phase of autoDream.\n- [2] (Score: 0.04) [SYSTEM:Dreaming-Engine] Simulates bi"
+    }
+  ]
+}

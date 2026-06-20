@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-enhancing-local-ai-hypervisor-architecture|drive-research-enhancing-local-ai-hypervisor-architecture]] (2026-06-08)
+## From [drive-research-enhancing-local-ai-hypervisor-architecture](/entities/drive-research-enhancing-local-ai-hypervisor-architecture.md) (2026-06-08)
 - Is a core crate used in the Rust-native execution plane.
 - Part of the MCP Rust SDK.
 - Used for server-side operations.

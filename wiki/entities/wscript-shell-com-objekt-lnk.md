@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-architektur-und-implementierung-intelligenter-ki-a-micro02|drive-research-architektur-und-implementierung-intelligenter-ki-a-micro02]] (2026-06-09)
+## From [drive-research-architektur-und-implementierung-intelligenter-ki-a-micro02](/entities/drive-research-architektur-und-implementierung-intelligenter-ki-a-micro02.md) (2026-06-09)
 - WScript.Shell is an example of a COM object used for shortcuts.
 - Represents desktop and start menu shortcuts.
 - Analyzed for dead links pointing to deleted or moved executables.

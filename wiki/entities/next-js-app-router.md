@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[google-antigravity-the-architects-configuration-micro05|google-antigravity-the-architects-configuration-micro05]] (2026-06-10)
+## From [google-antigravity-the-architects-configuration-micro05](/entities/google-antigravity-the-architects-configuration-micro05.md) (2026-06-10)
 - Mandated for frontend architecture within workspace rules
 - Alternative to the old pages/ directory

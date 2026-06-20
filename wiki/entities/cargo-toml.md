@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[prompt-agent-engineering-part7-micro03|prompt-agent-engineering-part7-micro03]] (2026-06-10)
+## From [prompt-agent-engineering-part7-micro03](/entities/prompt-agent-engineering-part7-micro03.md) (2026-06-10)
 - May need correction to ensure internal logic is exposed for testing.

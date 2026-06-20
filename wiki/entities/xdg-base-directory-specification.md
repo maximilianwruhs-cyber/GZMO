@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-pi-coding-agent-local-deployment-customization|drive-research-pi-coding-agent-local-deployment-customization]] (2026-06-08)
+## From [drive-research-pi-coding-agent-local-deployment-customization](/entities/drive-research-pi-coding-agent-local-deployment-customization.md) (2026-06-08)
 - Supports standard XDG Base Directory configurations for the global configuration directory.
 - Standard modern Linux path resolution.

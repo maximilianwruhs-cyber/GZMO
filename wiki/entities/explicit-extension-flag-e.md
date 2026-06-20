@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[high-performance-typescript-execution-and-architec-part1-micro07|high-performance-typescript-execution-and-architec-part1-micro07]] (2026-06-09)
+## From [high-performance-typescript-execution-and-architec-part1-micro07](/entities/high-performance-typescript-execution-and-architec-part1-micro07.md) (2026-06-09)
 - Used to test logic securely without infecting global state.
 - Forces the runtime to bypass standard auto-discovery mechanisms.
 - Injects a specified module path directly into the execution sandbox.

@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-agentic-token-economy-blueprint-micro02|drive-research-agentic-token-economy-blueprint-micro02]] (2026-06-09)
+## From [drive-research-agentic-token-economy-blueprint-micro02](/entities/drive-research-agentic-token-economy-blueprint-micro02.md) (2026-06-09)
 - A strict rate limiter applied per identity tuple (user, project, model).
 - Refills tokens continuously, allowing for specific burst capacity.
 - Acts as the primary boundary for token consumption.

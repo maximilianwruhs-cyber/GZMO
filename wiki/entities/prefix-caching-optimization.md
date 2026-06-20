@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-agentic-token-economy-blueprint-micro01|drive-research-agentic-token-economy-blueprint-micro01]] (2026-06-09)
+## From [drive-research-agentic-token-economy-blueprint-micro01](/entities/drive-research-agentic-token-economy-blueprint-micro01.md) (2026-06-09)
 - Strictly separates static context from dynamic context.
 - Keeps static prefix identical across multiple invocations to leverage caching.
 - Reduces input costs by up to 90% and prefill latency by 75%.

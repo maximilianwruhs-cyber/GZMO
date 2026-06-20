@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-recursivemas-ki-agenten-kommunikation-der-zukunft|drive-research-recursivemas-ki-agenten-kommunikation-der-zukunft]] (2026-06-08)
+## From [drive-research-recursivemas-ki-agenten-kommunikation-der-zukunft](/entities/drive-research-recursivemas-ki-agenten-kommunikation-der-zukunft.md) (2026-06-08)
 - Technical core enabling continuous vector collaboration
 - Lightweight design with ~13 million parameters
 - Enables cross-agent latent state transfer

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part5|ai-research-part5]] (2026-06-08)
+## From [ai-research-part5](/entities/ai-research-part5.md) (2026-06-08)
 - Flattens the depth cache along a single axis.
 - Turns depth lookup into contiguous block reads.
 - Compatible with FlashAttention-style kernels.

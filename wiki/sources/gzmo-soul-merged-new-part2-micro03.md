@@ -14,20 +14,20 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-10).
 
 ## Entities
-- [[crewai-framework|CrewAI framework]] (TOOL)
-- [[agcat|AgCAT]] (SYSTEM)
-- [[south-korean-university-library|South Korean University Library]] (ORGANIZATION)
-- [[chatgpt|ChatGPT]] (TOOL)
-- [[apache-kafka|Apache Kafka]] (TOOL)
-- [[deepwidesearch-benchmark|DeepWideSearch benchmark]] (CONCEPT)
-- [[librarian-agent|Librarian agent]] (SYSTEM)
-- [[citation-machine|Citation Machine]] (TOOL)
-- [[milos-framework|MILOS framework]] (SYSTEM)
-- [[sourcely|Sourcely]] (TOOL)
-- [[salesforce|Salesforce]] (SYSTEM)
-- [[association-of-college-and-research-libraries-acrl|Association of College and Research Libraries (ACRL)]] (ORGANIZATION)
-- [[palo-alto-city-library|Palo Alto City Library]] (ORGANIZATION)
-- [[quillbot|Quillbot]] (TOOL)
+- [CrewAI framework](/entities/crewai-framework.md) (TOOL)
+- [AgCAT](/entities/agcat.md) (SYSTEM)
+- [South Korean University Library](/entities/south-korean-university-library.md) (ORGANIZATION)
+- [ChatGPT](/entities/chatgpt.md) (TOOL)
+- [Apache Kafka](/entities/apache-kafka.md) (TOOL)
+- [DeepWideSearch benchmark](/entities/deepwidesearch-benchmark.md) (CONCEPT)
+- [Librarian agent](/entities/librarian-agent.md) (SYSTEM)
+- [Citation Machine](/entities/citation-machine.md) (TOOL)
+- [MILOS framework](/entities/milos-framework.md) (SYSTEM)
+- [Sourcely](/entities/sourcely.md) (TOOL)
+- [Salesforce](/entities/salesforce.md) (SYSTEM)
+- [Association of College and Research Libraries (ACRL)](/entities/association-of-college-and-research-libraries-acrl.md) (ORGANIZATION)
+- [Palo Alto City Library](/entities/palo-alto-city-library.md) (ORGANIZATION)
+- [Quillbot](/entities/quillbot.md) (TOOL)
 
 ## Relations
 - AgCAT → PART_OF → MILOS framework

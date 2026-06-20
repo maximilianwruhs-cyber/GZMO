@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-32gb-vram-ai-reasoning-models-micro03|drive-research-32gb-vram-ai-reasoning-models-micro03]] (2026-06-09)
+## From [drive-research-32gb-vram-ai-reasoning-models-micro03](/entities/drive-research-32gb-vram-ai-reasoning-models-micro03.md) (2026-06-09)
 - Optimal architectural choice when pure execution speed, multimodal capacity, and long-context stability are prioritized.
 - Incredible throughput exceeding 200 tokens per second.
 - Premier engine for multi-step autonomous loops, rapid tool-calling, and web-scraping agents.

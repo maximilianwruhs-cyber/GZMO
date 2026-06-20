@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-hermes-system-untersuchung-und-erweiterung|drive-research-hermes-system-untersuchung-und-erweiterung]] (2026-06-08)
+## From [drive-research-hermes-system-untersuchung-und-erweiterung](/entities/drive-research-hermes-system-untersuchung-und-erweiterung.md) (2026-06-08)
 - Primarily controlled via the /rollback command.
 - Explicitly and exclusively responsible for persisting the file system state.
 - Managed by an internal Checkpoint Manager.

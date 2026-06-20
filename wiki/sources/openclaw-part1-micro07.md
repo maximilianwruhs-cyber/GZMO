@@ -14,14 +14,14 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[vektorsuchalgorithmen|Vektorsuchalgorithmen]] (TOOL)
-- [[openclaw|OpenClaw]] (SYSTEM)
-- [[bm25|BM25]] (TOOL)
-- [[governance-richtlinien|Governance-Richtlinien]] (CONCEPT)
-- [[kognitionswissenschaftliche-prinzipien|kognitionswissenschaftliche Prinzipien]] (CONCEPT)
-- [[hyde|HyDE]] (TOOL)
-- [[mmr|MMR]] (TOOL)
-- [[europ-ische-datenschutzstandards|europäische Datenschutzstandards]] (CONCEPT)
+- [Vektorsuchalgorithmen](/entities/vektorsuchalgorithmen.md) (TOOL)
+- [OpenClaw](/entities/openclaw.md) (SYSTEM)
+- [BM25](/entities/bm25.md) (TOOL)
+- [Governance-Richtlinien](/entities/governance-richtlinien.md) (CONCEPT)
+- [kognitionswissenschaftliche Prinzipien](/entities/kognitionswissenschaftliche-prinzipien.md) (CONCEPT)
+- [HyDE](/entities/hyde.md) (TOOL)
+- [MMR](/entities/mmr.md) (TOOL)
+- [europäische Datenschutzstandards](/entities/europ-ische-datenschutzstandards.md) (CONCEPT)
 
 ## Relations
 - OpenClaw → USES → kognitionswissenschaftliche Prinzipien

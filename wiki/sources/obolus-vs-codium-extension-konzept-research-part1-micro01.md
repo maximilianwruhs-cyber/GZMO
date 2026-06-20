@@ -14,14 +14,14 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[webview-api|Webview API]] (API)
-- [[command-palette|Command Palette]] (CONCEPT)
-- [[cat-coding|Cat Coding]] (PROJECT)
-- [[visual-studio-code|Visual Studio Code]] (SYSTEM)
-- [[extension-api|Extension API]] (API)
-- [[webview-view|Webview View]] (CONCEPT)
-- [[webview-panel|Webview Panel]] (CONCEPT)
-- [[custom-editor|Custom Editor]] (CONCEPT)
+- [Webview API](/entities/webview-api.md) (API)
+- [Command Palette](/entities/command-palette.md) (CONCEPT)
+- [Cat Coding](/entities/cat-coding.md) (PROJECT)
+- [Visual Studio Code](/entities/visual-studio-code.md) (SYSTEM)
+- [Extension API](/entities/extension-api.md) (API)
+- [Webview View](/entities/webview-view.md) (CONCEPT)
+- [Webview Panel](/entities/webview-panel.md) (CONCEPT)
+- [Custom Editor](/entities/custom-editor.md) (CONCEPT)
 
 ## Relations
 - Webview API → PART_OF → Visual Studio Code

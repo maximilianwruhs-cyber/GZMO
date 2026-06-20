@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[high-performance-typescript-execution-and-architec-part2|high-performance-typescript-execution-and-architec-part2]] (2026-06-08)
+## From [high-performance-typescript-execution-and-architec-part2](/entities/high-performance-typescript-execution-and-architec-part2.md) (2026-06-08)
 - It is the state-of-the-art approach for context management in source code.
 - It allows an indexer to understand the code's hierarchical structure.
 - AST-aware systems intelligently split files into discrete semantic chunks.

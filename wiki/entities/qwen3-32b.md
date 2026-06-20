@@ -14,12 +14,12 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-32gb-vram-ai-reasoning-models-micro01|drive-research-32gb-vram-ai-reasoning-models-micro01]] (2026-06-09)
+## From [drive-research-32gb-vram-ai-reasoning-models-micro01](/entities/drive-research-32gb-vram-ai-reasoning-models-micro01.md) (2026-06-09)
 - A leading reasoning model for 32 GB VRAM CUDA environments
 - Part of the 26B to 32B parameter tier
 - Can be deployed with 8-bit (FP8) or custom mixed-quantization formats
 
-## From [[drive-research-32gb-vram-ai-reasoning-models-micro02|drive-research-32gb-vram-ai-reasoning-models-micro02]] (2026-06-09)
+## From [drive-research-32gb-vram-ai-reasoning-models-micro02](/entities/drive-research-32gb-vram-ai-reasoning-models-micro02.md) (2026-06-09)
 - Core dense model contains 32.8 billion total parameters.
 - Architecturally constructed with 64 layers and a hidden dimension size of 5,120.
 - Natively implements Grouped-Query Attention (GQA).

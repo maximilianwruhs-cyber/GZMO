@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part2|ai-research-part2]] (2026-06-08)
+## From [ai-research-part2](/entities/ai-research-part2.md) (2026-06-08)
 - Employs a “stop-and-go” strategy for multi-step reasoning.
 - Extracts and runs code in an isolated sandbox.
 - Appends execution results to conversation history.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[ai-research-part2|ai-research-part2]] (2026-06-08)
+## From [ai-research-part2](/entities/ai-research-part2.md) (2026-06-08)
 - A self-improvement method mentioned as a baseline.
 - A non-tool method.
 - Agent0 significantly surpasses it.

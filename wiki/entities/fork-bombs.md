@@ -14,11 +14,11 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-architektur-und-implementierung-intelligenter-ki-a-micro02|drive-research-architektur-und-implementierung-intelligenter-ki-a-micro02]] (2026-06-09)
+## From [drive-research-architektur-und-implementierung-intelligenter-ki-a-micro02](/entities/drive-research-architektur-und-implementierung-intelligenter-ki-a-micro02.md) (2026-06-09)
 - A type of script that can cause resource exhaustion.
 - Resource limitations prevent agents from causing such issues.
 
-## From [[drive-research-safe-unzip-practices-for-threat-model-micro02|drive-research-safe-unzip-practices-for-threat-model-micro02]] (2026-06-09)
+## From [drive-research-safe-unzip-practices-for-threat-model-micro02](/entities/drive-research-safe-unzip-practices-for-threat-model-micro02.md) (2026-06-09)
 - Malicious code snippets that utilize the fork() system call to rapidly spawn child processes.
 - Consume the operating system's process table until no further commands can be executed.
 - Can result in application hanging and memory exhaustion.

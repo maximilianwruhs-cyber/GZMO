@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-crafting-a-creative-agent-prompt|drive-research-crafting-a-creative-agent-prompt]] (2026-06-08)
+## From [drive-research-crafting-a-creative-agent-prompt](/entities/drive-research-crafting-a-creative-agent-prompt.md) (2026-06-08)
 - A training-free framework used by PromptBridge.
 - Preserves prompt effectiveness by using a small calibration suite of alignment tasks.
 - Maps a highly optimized source prompt to a target-style prompt.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[drive-research-optimizing-cuda-performance-with-fp4-fp6-micro01|drive-research-optimizing-cuda-performance-with-fp4-fp6-micro01]] (2026-06-09)
+## From [drive-research-optimizing-cuda-performance-with-fp4-fp6-micro01](/entities/drive-research-optimizing-cuda-performance-with-fp4-fp6-micro01.md) (2026-06-09)
 - A working CUTLASS mainloop that uses cute::array_aligned, defaulting to a 16-byte alignment for shared memory scale factor arrays.
 - A consumer/desktop workstation variant of the NVIDIA Blackwell GPU architecture (e.g., RTX 5090, RTX PRO 6000).
 - Routes FP4/FP6 instructions through a different hardware mechanism than SM100, necessitating distinct compile-time flag structures.

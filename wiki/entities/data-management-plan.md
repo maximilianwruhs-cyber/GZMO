@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-scientific-writing-and-publication-process-micro04|drive-research-scientific-writing-and-publication-process-micro04]] (2026-06-09)
+## From [drive-research-scientific-writing-and-publication-process-micro04](/entities/drive-research-scientific-writing-and-publication-process-micro04.md) (2026-06-09)
 - a plan for data sharing
 - can be written and included in data sharing plans

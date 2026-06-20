@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[prompt-agent-engineering-part1|prompt-agent-engineering-part1]] (2026-06-08)
+## From [prompt-agent-engineering-part1](/entities/prompt-agent-engineering-part1.md) (2026-06-08)
 - Designed to prevent 'Context Window Neglect' in AI agents.
 - Forces self-reflection and knowledge re-mapping.
 - Includes steps for resource inventory, utilization check, blind-spot identification, and strategic course correction.

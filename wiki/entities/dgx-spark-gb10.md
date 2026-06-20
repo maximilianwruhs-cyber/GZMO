@@ -19,13 +19,13 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-blackwell-sm120-gemm-optimization-guide|drive-research-blackwell-sm120-gemm-optimization-guide]] (2026-06-08)
+## From [drive-research-blackwell-sm120-gemm-optimization-guide](/entities/drive-research-blackwell-sm120-gemm-optimization-guide.md) (2026-06-08)
 - A platform with sm_120 and sm_121 compute capabilities.
 - A consumer-grade Blackwell GPU.
 - Is DGX Spark Actually Blackwell?
 - DGX Spark / GB10
 
-## From [[aether-grid-micro02|aether-grid-micro02]] (2026-06-09)
+## From [aether-grid-micro02](/entities/aether-grid-micro02.md) (2026-06-09)
 - real and available since 2025
 - Specs: 20-Core Arm-CPU (10 Cortex-X925 + 10 Cortex-A725), Blackwell-GPU, 128 GB LPDDR5X unified memory (273 GB/s), 1 PFLOP FP4 AI-Performance, 4 TB NVMe, compact (150x150x50.5 mm), 240 W TDP, price from 4,699 USD
 - 2026-Updates: 2.5x Performance through NVFP4-Quantization and Eagle3-Decoding
@@ -40,7 +40,7 @@ Type: SYSTEM
 - Seamless ecosystem integration with existing Jetson AGX Orin fleets is now possible
 - Best Practice (Fleet-management): Mandatory use of NVIDIA Base Command Manager (BCM 11) for zero-touch provisioning of edge nodes to prevent OS image drift in fleets >100 devices
 
-## From [[aether-grid-micro03|aether-grid-micro03]] (2026-06-09)
+## From [aether-grid-micro03](/entities/aether-grid-micro03.md) (2026-06-09)
 - Cost is $4,699 per unit.
 - Has a TDP of 240W.
 - Can be cloned with 3 seconds of audio material using 2026-tools.
@@ -53,16 +53,16 @@ Type: SYSTEM
 - Nodes form a P2P mesh network.
 - Edge hardware to be procured, budget starting from $4,699/Node.
 
-## From [[drive-research-llamacpp-optimization-blueprint-micro03|drive-research-llamacpp-optimization-blueprint-micro03]] (2026-06-09)
+## From [drive-research-llamacpp-optimization-blueprint-micro03](/entities/drive-research-llamacpp-optimization-blueprint-micro03.md) (2026-06-09)
 - Deep benchmarking on the Blackwell-class DGX Spark GB10 demonstrated architectural savings with KV cache quantization.
 
-## From [[optimizing-nvidia-blackwell-sm120-part1-micro04|optimizing-nvidia-blackwell-sm120-part1-micro04]] (2026-06-09)
+## From [optimizing-nvidia-blackwell-sm120-part1-micro04](/entities/optimizing-nvidia-blackwell-sm120-part1-micro04.md) (2026-06-09)
 - Is a workstation-class Blackwell GPU.
 - Represents the SM121 variant.
 
-## From [[drive-research-marlin-baseline-for-early-deployments-micro01|drive-research-marlin-baseline-for-early-deployments-micro01]] (2026-06-10)
+## From [drive-research-marlin-baseline-for-early-deployments-micro01](/entities/drive-research-marlin-baseline-for-early-deployments-micro01.md) (2026-06-10)
 - Workstation-class Blackwell GPU.
 - Part of the SM121 architecture.
 
-## From [[optimizing-nvidia-blackwell-sm120-part2-micro02|optimizing-nvidia-blackwell-sm120-part2-micro02]] (2026-06-10)
+## From [optimizing-nvidia-blackwell-sm120-part2-micro02](/entities/optimizing-nvidia-blackwell-sm120-part2-micro02.md) (2026-06-10)
 - Hardware platform utilizing sm_121 compute capability.

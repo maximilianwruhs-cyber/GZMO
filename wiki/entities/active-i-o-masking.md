@@ -14,6 +14,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[architectures-and-optimizations-for-speculative-de-micro06|architectures-and-optimizations-for-speculative-de-micro06]] (2026-06-09)
+## From [architectures-and-optimizations-for-speculative-de-micro06](/entities/architectures-and-optimizations-for-speculative-de-micro06.md) (2026-06-09)
 - A new hardware dimension for speculative decoding with MoE models.
 - Aims to mask devastating I/O latency.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[architecting-the-minimalist-linux-desktop-a-compa-part2|architecting-the-minimalist-linux-desktop-a-compa-part2]] (2026-06-08)
+## From [architecting-the-minimalist-linux-desktop-a-compa-part2](/entities/architecting-the-minimalist-linux-desktop-a-compa-part2.md) (2026-06-08)
 - It was initially developed by Intel in 1998 under the Intel Boot Initiative (IBI).
 - It runs in a 32-bit or 64-bit protected mode environment.
 - It possesses native, built-in support for specific partition schemes, specifically the GUID Partition Table (GPT).

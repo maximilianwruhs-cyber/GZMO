@@ -1,0 +1,14 @@
+{
+  "generated_at": "2026-06-19T00:08:10Z",
+  "total_queries": 1,
+  "passed": 1,
+  "pass_rate": 1.0,
+  "results": [
+    {
+      "link_id": "L01",
+      "recall_query": "vm200",
+      "hit": true,
+      "preview": "Platform recall for 'vm200':\n\n## Honeypot / Vault\n\n- [1] (Score: 0.09) [SYSTEM:Librarian] Runs on VM200 at port :8083.\n- [2] (Score: 0.08) [SYSTEM:Librarian] Runs on VM200 :8083.\n- [3] (Score: 0.08) ["
+    }
+  ]
+}

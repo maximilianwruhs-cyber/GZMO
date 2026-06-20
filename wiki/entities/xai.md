@@ -14,11 +14,11 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[openclaw-part2|openclaw-part2]] (2026-06-08)
+## From [openclaw-part2](/entities/openclaw-part2.md) (2026-06-08)
 - Natively integrates with xAI for video generation.
 - It is a video provider.
 - Part of the asynchronous multi-modal pipelines.
 
-## From [[openclaw-part1-micro04|openclaw-part1-micro04]] (2026-06-10)
+## From [openclaw-part1-micro04](/entities/openclaw-part1-micro04.md) (2026-06-10)
 - A video generation provider supporting Text, Image, and Video.
 - Supports remote video editing and extension flows.

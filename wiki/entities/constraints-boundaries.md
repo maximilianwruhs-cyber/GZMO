@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-architektur-und-implementierung-intelligenter-ki-a-micro02|drive-research-architektur-und-implementierung-intelligenter-ki-a-micro02]] (2026-06-09)
+## From [drive-research-architektur-und-implementierung-intelligenter-ki-a-micro02](/entities/drive-research-architektur-und-implementierung-intelligenter-ki-a-micro02.md) (2026-06-09)
 - A critical part of a system prompt for system hygiene.
 - Sets strict guidelines for the agent's actions, such as not modifying critical system folders.

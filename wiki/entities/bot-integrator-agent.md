@@ -14,9 +14,9 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[obolus-micro05|obolus-micro05]] (2026-06-09)
+## From [obolus-micro05](/entities/obolus-micro05.md) (2026-06-09)
 - Works closely with RAG DB Agent and Ingest Engineer Agent.
 - Works closely with RAG DB Agent.
 
-## From [[obolus-micro06|obolus-micro06]] (2026-06-09)
+## From [obolus-micro06](/entities/obolus-micro06.md) (2026-06-09)
 - Receives improvement suggestions for prompting/LLM settings.

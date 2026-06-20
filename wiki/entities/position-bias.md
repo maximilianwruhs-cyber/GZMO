@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-llmlingua-cpu-leistung-und-leistungstests|drive-research-llmlingua-cpu-leistung-und-leistungstests]] (2026-06-08)
+## From [drive-research-llmlingua-cpu-leistung-und-leistungstests](/entities/drive-research-llmlingua-cpu-leistung-und-leistungstests.md) (2026-06-08)
 - LLMs have a bias towards information at the beginning and end of a prompt.
 - LongLLMLingua leverages this by placing critical passages at the start and end.

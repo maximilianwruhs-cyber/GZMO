@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-cuda-graph-capture-failure-workarounds-micro03|drive-research-cuda-graph-capture-failure-workarounds-micro03]] (2026-06-09)
+## From [drive-research-cuda-graph-capture-failure-workarounds-micro03](/entities/drive-research-cuda-graph-capture-failure-workarounds-micro03.md) (2026-06-09)
 - Tensor-split parameters should match these for respective devices.

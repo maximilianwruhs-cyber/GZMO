@@ -14,17 +14,17 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[predictive-hardware-management|predictive hardware management]] (CONCEPT)
-- [[sparse-mixture-of-experts-moe-models|Sparse Mixture of Experts (MoE) models]] (CONCEPT)
-- [[mixtral|Mixtral]] (SYSTEM)
-- [[expert-lookahead-buffer-elb|Expert Lookahead Buffer (ELB)]] (SYSTEM)
-- [[autoregressive-generation|autoregressive generation]] (CONCEPT)
-- [[gpu-vram|GPU VRAM]] (SYSTEM)
-- [[qwen-moe-variants|Qwen MoE variants]] (SYSTEM)
-- [[active-i-o-masking|active I/O masking]] (CONCEPT)
-- [[moe-speq|MoE-SpeQ]] (TOOL)
-- [[gpu-cache|GPU cache]] (SYSTEM)
-- [[speculative-decoding|speculative decoding]] (CONCEPT)
+- [predictive hardware management](/entities/predictive-hardware-management.md) (CONCEPT)
+- [Sparse Mixture of Experts (MoE) models](/entities/sparse-mixture-of-experts-moe-models.md) (CONCEPT)
+- [Mixtral](/entities/mixtral.md) (SYSTEM)
+- [Expert Lookahead Buffer (ELB)](/entities/expert-lookahead-buffer-elb.md) (SYSTEM)
+- [autoregressive generation](/entities/autoregressive-generation.md) (CONCEPT)
+- [GPU VRAM](/entities/gpu-vram.md) (SYSTEM)
+- [Qwen MoE variants](/entities/qwen-moe-variants.md) (SYSTEM)
+- [active I/O masking](/entities/active-i-o-masking.md) (CONCEPT)
+- [MoE-SpeQ](/entities/moe-speq.md) (TOOL)
+- [GPU cache](/entities/gpu-cache.md) (SYSTEM)
+- [speculative decoding](/entities/speculative-decoding.md) (CONCEPT)
 
 ## Relations
 - speculative decoding → RELATED_TO → active I/O masking

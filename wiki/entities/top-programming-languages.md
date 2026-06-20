@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: METRIC
 
-## From [[drive-research-creating-a-comprehensive-readmemd-micro02|drive-research-creating-a-comprehensive-readmemd-micro02]] (2026-06-09)
+## From [drive-research-creating-a-comprehensive-readmemd-micro02](/entities/drive-research-creating-a-comprehensive-readmemd-micro02.md) (2026-06-09)
 - Displayed in profile READMEs, often via dynamic progress bars.

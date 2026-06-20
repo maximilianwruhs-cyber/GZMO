@@ -14,22 +14,22 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-10).
 
 ## Entities
-- [[llm-as-a-judge|LLM-as-a-Judge]] (ARCHITECTURE_PATTERN)
-- [[gzmo|GZMO]] (AGENT)
-- [[firecracker|Firecracker]] (TECHNOLOGY)
-- [[codeact|CodeAct]] (PARADIGM)
-- [[supervised-multi-agent-system-smas|Supervised Multi-Agent System (SMAS)]] (ARCHITECTURE_PATTERN)
-- [[fact-checker|Fact-Checker]] (AGENT_ROLE)
-- [[spec-md|spec.md]] (DOCUMENT)
-- [[soul-md|SOUL.md]] (DOCUMENT)
-- [[memory|memory/]] (DIRECTORY)
-- [[reader-agent|Reader Agent]] (AGENT_ROLE)
-- [[editor|Editor]] (AGENT_ROLE)
-- [[multi-agent-topology|Multi-Agent Topology]] (ARCHITECTURE_PATTERN)
-- [[skill-md|SKILL.md]] (DOCUMENT)
-- [[model-context-protocol-mcp|Model Context Protocol (MCP)]] (PROTOCOL)
-- [[librarian-agent|Librarian Agent]] (AGENT_ROLE)
-- [[supervisoragent|SupervisorAgent]] (AGENT_ROLE)
+- [LLM-as-a-Judge](/entities/llm-as-a-judge.md) (ARCHITECTURE_PATTERN)
+- [GZMO](/entities/gzmo.md) (AGENT)
+- [Firecracker](/entities/firecracker.md) (TECHNOLOGY)
+- [CodeAct](/entities/codeact.md) (PARADIGM)
+- [Supervised Multi-Agent System (SMAS)](/entities/supervised-multi-agent-system-smas.md) (ARCHITECTURE_PATTERN)
+- [Fact-Checker](/entities/fact-checker.md) (AGENT_ROLE)
+- [spec.md](/entities/spec-md.md) (DOCUMENT)
+- [SOUL.md](/entities/soul-md.md) (DOCUMENT)
+- [memory/](/entities/memory.md) (DIRECTORY)
+- [Reader Agent](/entities/reader-agent.md) (AGENT_ROLE)
+- [Editor](/entities/editor.md) (AGENT_ROLE)
+- [Multi-Agent Topology](/entities/multi-agent-topology.md) (ARCHITECTURE_PATTERN)
+- [SKILL.md](/entities/skill-md.md) (DOCUMENT)
+- [Model Context Protocol (MCP)](/entities/model-context-protocol-mcp.md) (PROTOCOL)
+- [Librarian Agent](/entities/librarian-agent.md) (AGENT_ROLE)
+- [SupervisorAgent](/entities/supervisoragent.md) (AGENT_ROLE)
 
 ## Relations
 - GZMO → IS_DEFINED_BY → SOUL.md

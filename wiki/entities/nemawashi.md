@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-cognitive-architecture-of-openclaw-agents-micro02|the-cognitive-architecture-of-openclaw-agents-micro02]] (2026-06-09)
+## From [the-cognitive-architecture-of-openclaw-agents-micro02](/entities/the-cognitive-architecture-of-openclaw-agents-micro02.md) (2026-06-09)
 - Japanese horticultural metaphor for the Gardening directive.
 - Refers to the careful preparation and wrapping of individual roots prior to transplantation to ensure survival.

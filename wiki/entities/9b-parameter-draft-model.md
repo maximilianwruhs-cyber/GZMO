@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[architectures-and-optimizations-for-speculative-de-micro04|architectures-and-optimizations-for-speculative-de-micro04]] (2026-06-09)
+## From [architectures-and-optimizations-for-speculative-de-micro04](/entities/architectures-and-optimizations-for-speculative-de-micro04.md) (2026-06-09)
 - A proportionally scaled draft model for a 27B target.
 - A Q4_K_M format requires approximately 5.5 GB.

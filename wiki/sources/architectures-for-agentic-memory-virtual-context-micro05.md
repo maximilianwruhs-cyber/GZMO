@@ -14,17 +14,17 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[llm-driven-conflict-resolution|LLM-Driven Conflict Resolution]] (CONCEPT)
-- [[cognee|Cognee]] (SYSTEM)
-- [[knowledge-graph|Knowledge Graph]] (CONCEPT)
-- [[uuid-collision-prevention|UUID Collision Prevention]] (CONCEPT)
-- [[falkordb|FalkorDB]] (TOOL)
-- [[reciprocal-rank-fusion|Reciprocal Rank Fusion]] (TOOL)
-- [[prompt-engineering|Prompt Engineering]] (CONCEPT)
-- [[vector-graph-hybrid-traversal|Vector-Graph Hybrid Traversal]] (CONCEPT)
-- [[mem0|Mem0]] (SYSTEM)
-- [[zep|Zep]] (SYSTEM)
-- [[temporal-invalidation|Temporal Invalidation]] (CONCEPT)
+- [LLM-Driven Conflict Resolution](/entities/llm-driven-conflict-resolution.md) (CONCEPT)
+- [Cognee](/entities/cognee.md) (SYSTEM)
+- [Knowledge Graph](/entities/knowledge-graph.md) (CONCEPT)
+- [UUID Collision Prevention](/entities/uuid-collision-prevention.md) (CONCEPT)
+- [FalkorDB](/entities/falkordb.md) (TOOL)
+- [Reciprocal Rank Fusion](/entities/reciprocal-rank-fusion.md) (TOOL)
+- [Prompt Engineering](/entities/prompt-engineering.md) (CONCEPT)
+- [Vector-Graph Hybrid Traversal](/entities/vector-graph-hybrid-traversal.md) (CONCEPT)
+- [Mem0](/entities/mem0.md) (SYSTEM)
+- [Zep](/entities/zep.md) (SYSTEM)
+- [Temporal Invalidation](/entities/temporal-invalidation.md) (CONCEPT)
 
 ## Relations
 - Mem0 → USES → LLM-Driven Conflict Resolution

@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-rust-tui-architecture-tech-stack1-micro05|drive-research-rust-tui-architecture-tech-stack1-micro05]] (2026-06-09)
+## From [drive-research-rust-tui-architecture-tech-stack1-micro05](/entities/drive-research-rust-tui-architecture-tech-stack1-micro05.md) (2026-06-09)
 - Introduced in ratatui for advanced layout management.
 - Mimics CSS flexbox alignment algorithms.
 - Uses Flex enum variants like Center, SpaceAround, SpaceBetween.
 
-## From [[prompt-agent-engineering-part2-micro05|prompt-agent-engineering-part2-micro05]] (2026-06-09)
+## From [prompt-agent-engineering-part2-micro05](/entities/prompt-agent-engineering-part2-micro05.md) (2026-06-09)
 - A layout primitive

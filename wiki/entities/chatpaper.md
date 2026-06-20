@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[architectures-and-optimizations-for-speculative-de-micro03|architectures-and-optimizations-for-speculative-de-micro03]] (2026-06-09)
+## From [architectures-and-optimizations-for-speculative-de-micro03](/entities/architectures-and-optimizations-for-speculative-de-micro03.md) (2026-06-09)
 - Provides a platform to chat about papers on Recursive Multi-Agent Systems.

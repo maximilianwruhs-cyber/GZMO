@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[beyond-the-dark-room-allostatic-regulation-and-co|beyond-the-dark-room-allostatic-regulation-and-co]] (2026-06-08)
+## From [beyond-the-dark-room-allostatic-regulation-and-co](/entities/beyond-the-dark-room-allostatic-regulation-and-co.md) (2026-06-08)
 - Reframes the cessation of a task, stating it's rarely due to a peaceful return to homeostasis.
 - Its structural mechanics are rigid and mathematically governed.
 - Its variables (Anchory, Slip) can be mapped to complex biological metrics like EEG or HRV.
@@ -22,7 +22,7 @@ Type: SYSTEM
 - It was formalized through Lagunian Dynamics introduced in 2025.
 - It proposes that volitional effort, motivation, and dynamic equilibrium are emergent properties of a closed-loop control system.
 
-## From [[drive-research-homeostatic-regulation-and-dynamic-equilibrium-in|drive-research-homeostatic-regulation-and-dynamic-equilibrium-in]] (2026-06-08)
+## From [drive-research-homeostatic-regulation-and-dynamic-equilibrium-in](/entities/drive-research-homeostatic-regulation-and-dynamic-equilibrium-in.md) (2026-06-08)
 - Formalized by Lagunian Dynamics (2025).
 - Models drive through six variables in three functional domains: Ignition, Tension, and Flux.
 - Integrates allostatic mechanisms for maintaining willful effort.

@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part3-micro06|ai-research-part3-micro06]] (2026-06-09)
+## From [ai-research-part3-micro06](/entities/ai-research-part3-micro06.md) (2026-06-09)
 - An error type indicating a syntax error in Python code.
 - Can potentially be fixed using automated tools.
 
-## From [[ai-research-part3-micro07|ai-research-part3-micro07]] (2026-06-09)
+## From [ai-research-part3-micro07](/entities/ai-research-part3-micro07.md) (2026-06-09)
 - A type of error diagnosed by diagnose_errors.
 - Can be fixed by apply_automated_fix.

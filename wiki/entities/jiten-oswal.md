@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[openclaw-deep-research-part12|openclaw-deep-research-part12]] (2026-06-08)
+## From [openclaw-deep-research-part12](/entities/openclaw-deep-research-part12.md) (2026-06-08)
 - Author of the article 'Unlocking the “Lobster Way”: A Technical Deep Dive into OpenClaw's Architecture'.
 - Writes about AI systems, AI & Data engineering, LLM internals, and Platform Architecture.

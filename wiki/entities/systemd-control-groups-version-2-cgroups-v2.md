@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-ultimate-linux-workstation-tuning-blueprint|drive-research-ultimate-linux-workstation-tuning-blueprint]] (2026-06-08)
+## From [drive-research-ultimate-linux-workstation-tuning-blueprint](/entities/drive-research-ultimate-linux-workstation-tuning-blueprint.md) (2026-06-08)
 - Used to build a hierarchical CPU partition shield.
 - Enforces absolute hardware isolation for the Ryzen 9 9950X3D's dual-CCD design.
 - Leverages AllowedCPUs parameters.

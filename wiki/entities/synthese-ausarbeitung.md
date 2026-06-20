@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[prompt-agent-engineering-part1|prompt-agent-engineering-part1]] (2026-06-08)
+## From [prompt-agent-engineering-part1](/entities/prompt-agent-engineering-part1.md) (2026-06-08)
 - Phase 2 of Prompt Agent Engineering.
 - Involves developing a comprehensive elaboration based on research.
 - Requires logical structuring, precision, and risk management.

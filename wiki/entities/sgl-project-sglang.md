@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[ai-research-part8-micro05|ai-research-part8-micro05]] (2026-06-09)
+## From [ai-research-part8-micro05](/entities/ai-research-part8-micro05.md) (2026-06-09)
 - Supports Large-Scale Expert Parallelism (EP) and prefill-decode disaggregation.
 - Supports Multiple Token Prediction (MTP) for rapid code generation.

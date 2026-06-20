@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-building-pi-coding-agent-extensions|drive-research-building-pi-coding-agent-extensions]] (2026-06-08)
+## From [drive-research-building-pi-coding-agent-extensions](/entities/drive-research-building-pi-coding-agent-extensions.md) (2026-06-08)
 - Requires a unique string identifier for mount points.
 - Accepts a content parameter which can be an array of strings or a dynamic factory function.
 - The options object accepts a placement property for spatial placement.

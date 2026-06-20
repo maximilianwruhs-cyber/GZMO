@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[gzmo-soul-merged-new-part1|gzmo-soul-merged-new-part1]] (2026-06-09)
+## From [gzmo-soul-merged-new-part1](/entities/gzmo-soul-merged-new-part1.md) (2026-06-09)
 - Asynchronous multicast socket interface for real-time process events
 - Introduced in Linux kernel version 2.6.15

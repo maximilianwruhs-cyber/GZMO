@@ -14,22 +14,22 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-10).
 
 ## Entities
-- [[ct100|CT100]] (SYSTEM)
-- [[aether-grid|AETHER-GRID]] (SYSTEM)
-- [[gzmo-watchdog-py|gzmo_watchdog.py]] (SYSTEM)
-- [[telemetry-compiler-py|telemetry_compiler.py]] (TOOL)
-- [[aetherdagexecutor|AetherDAGExecutor]] (SYSTEM)
-- [[projekt-obulus|Projekt Obulus]] (PROJECT)
-- [[obl|$OBL]] (CONCEPT)
-- [[a2a-protocol|A2A protocol]] (CONCEPT)
-- [[ct101|CT101]] (SYSTEM)
-- [[infra-core|INFRA_CORE]] (SYSTEM)
-- [[aether-link|AETHER-LINK]] (CONCEPT)
-- [[strategy-core|STRATEGY_CORE]] (SYSTEM)
-- [[quality-core|QUALITY_CORE]] (SYSTEM)
-- [[trigger-dag-py|trigger_dag.py]] (TOOL)
-- [[servicebot|ServiceBot]] (PROJECT)
-- [[service-core|SERVICE_CORE]] (SYSTEM)
+- [CT100](/entities/ct100.md) (SYSTEM)
+- [AETHER-GRID](/entities/aether-grid.md) (SYSTEM)
+- [gzmo_watchdog.py](/entities/gzmo-watchdog-py.md) (SYSTEM)
+- [telemetry_compiler.py](/entities/telemetry-compiler-py.md) (TOOL)
+- [AetherDAGExecutor](/entities/aetherdagexecutor.md) (SYSTEM)
+- [Projekt Obulus](/entities/projekt-obulus.md) (PROJECT)
+- [$OBL](/entities/obl.md) (CONCEPT)
+- [A2A protocol](/entities/a2a-protocol.md) (CONCEPT)
+- [CT101](/entities/ct101.md) (SYSTEM)
+- [INFRA_CORE](/entities/infra-core.md) (SYSTEM)
+- [AETHER-LINK](/entities/aether-link.md) (CONCEPT)
+- [STRATEGY_CORE](/entities/strategy-core.md) (SYSTEM)
+- [QUALITY_CORE](/entities/quality-core.md) (SYSTEM)
+- [trigger_dag.py](/entities/trigger-dag-py.md) (TOOL)
+- [ServiceBot](/entities/servicebot.md) (PROJECT)
+- [SERVICE_CORE](/entities/service-core.md) (SYSTEM)
 
 ## Relations
 - gzmo_watchdog.py → USES → telemetry_compiler.py

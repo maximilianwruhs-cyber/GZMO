@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-deep-dive-google-antigravity-architecture|drive-research-deep-dive-google-antigravity-architecture]] (2026-06-08)
+## From [drive-research-deep-dive-google-antigravity-architecture](/entities/drive-research-deep-dive-google-antigravity-architecture.md) (2026-06-08)
 - Enables the agent to execute specific, predefined operational actions on external platforms safely and autonomously.

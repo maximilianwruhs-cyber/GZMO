@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-install-the-google-workspace-extension|drive-research-install-the-google-workspace-extension]] (2026-06-08)
+## From [drive-research-install-the-google-workspace-extension](/entities/drive-research-install-the-google-workspace-extension.md) (2026-06-08)
 - Agent Manager is opened in Antigravity
 - Agent is launched in the Playground or IDE

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-llmlingua-cpu-leistung-und-leistungstests|drive-research-llmlingua-cpu-leistung-und-leistungstests]] (2026-06-08)
+## From [drive-research-llmlingua-cpu-leistung-und-leistungstests](/entities/drive-research-llmlingua-cpu-leistung-und-leistungstests.md) (2026-06-08)
 - The LLMLingua package itself is lightweight.
 - The true system load comes from its dependencies.
 - Key dependencies include torch, transformers, tiktoken, numpy, nltk, accelerate.

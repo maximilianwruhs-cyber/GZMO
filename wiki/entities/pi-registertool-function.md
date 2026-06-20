@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-building-pi-coding-agent-extensions|drive-research-building-pi-coding-agent-extensions]] (2026-06-08)
+## From [drive-research-building-pi-coding-agent-extensions](/entities/drive-research-building-pi-coding-agent-extensions.md) (2026-06-08)
 - Serves as the declarative bridge between the TypeScript runtime and the LLM's function-calling API.
 - Exposes renderCall and renderResult functions to customize visual layout.
 - Serves as the definitive declarative bridge between the TypeScript runtime and the LLM's function-calling API.

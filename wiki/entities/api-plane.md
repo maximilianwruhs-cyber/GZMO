@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-dawn-of-agentic-software-reverse-engineering-micro03|the-dawn-of-agentic-software-reverse-engineering-micro03]] (2026-06-09)
+## From [the-dawn-of-agentic-software-reverse-engineering-micro03](/entities/the-dawn-of-agentic-software-reverse-engineering-micro03.md) (2026-06-09)
 - Target of extraction for tool chaining sequences revealing internal workflow patterns and API calls.
 - Mitigation involves dynamic task randomization and encrypted tool descriptors.

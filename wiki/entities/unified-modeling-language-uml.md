@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[spec-driven-development-architecting-the-era-of-a-micro02|spec-driven-development-architecting-the-era-of-a-micro02]] (2026-06-10)
+## From [spec-driven-development-architecting-the-era-of-a-micro02](/entities/spec-driven-development-architecting-the-era-of-a-micro02.md) (2026-06-10)
 - Used in Model-Driven Development to generate functional applications.

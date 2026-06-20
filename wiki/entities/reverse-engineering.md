@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-dawn-of-agentic-software-reverse-engineering-micro04|the-dawn-of-agentic-software-reverse-engineering-micro04]] (2026-06-09)
+## From [the-dawn-of-agentic-software-reverse-engineering-micro04](/entities/the-dawn-of-agentic-software-reverse-engineering-micro04.md) (2026-06-09)
 - Applied to agentic software.

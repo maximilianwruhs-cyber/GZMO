@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-automating-linux-hardware-detection-micro01|drive-research-automating-linux-hardware-detection-micro01]] (2026-06-09)
+## From [drive-research-automating-linux-hardware-detection-micro01](/entities/drive-research-automating-linux-hardware-detection-micro01.md) (2026-06-09)
 - Original conceptualization for DMIBIOS in the mid-1990s.

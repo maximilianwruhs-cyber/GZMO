@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-architecting-a-linux-task-manager-design-principl|drive-research-architecting-a-linux-task-manager-design-principl]] (2026-06-08)
+## From [drive-research-architecting-a-linux-task-manager-design-principl](/entities/drive-research-architecting-a-linux-task-manager-design-principl.md) (2026-06-08)
 - Used within the pidfd API framework.
 - Delivers a signal to the exact original process or fails safely.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[the-architecture-of-engagement-an-analysis-of-gam-micro04|the-architecture-of-engagement-an-analysis-of-gam-micro04]] (2026-06-09)
+## From [the-architecture-of-engagement-an-analysis-of-gam-micro04](/entities/the-architecture-of-engagement-an-analysis-of-gam-micro04.md) (2026-06-09)
 - A therapeutic approach.
 - Institutions are encouraged to deploy digital modules of ACT.
 - Aims to build resilience against digital stress.

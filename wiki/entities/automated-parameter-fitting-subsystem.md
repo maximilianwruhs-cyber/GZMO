@@ -14,12 +14,12 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-llamacpp-gpu-memory-reporting-bug|drive-research-llamacpp-gpu-memory-reporting-bug]] (2026-06-08)
+## From [drive-research-llamacpp-gpu-memory-reporting-bug](/entities/drive-research-llamacpp-gpu-memory-reporting-bug.md) (2026-06-08)
 - Controls runtime variables to maximize performance without exceeding physical memory boundaries.
 - Acts as a pre-allocation constraint-satisfaction solver.
 - Can be controlled via the --fit on command-line argument.
 
-## From [[optimizing-nvidia-blackwell-sm120-part3-micro04|optimizing-nvidia-blackwell-sm120-part3-micro04]] (2026-06-09)
+## From [optimizing-nvidia-blackwell-sm120-part3-micro04](/entities/optimizing-nvidia-blackwell-sm120-part3-micro04.md) (2026-06-09)
 - Should be disabled in production environments by setting --fit off.
 - Optimizes layer offloading to the limit of free memory.
 - Can frequently trigger extreme tensor splitting.

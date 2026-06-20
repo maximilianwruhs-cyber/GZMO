@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-architecture-of-scientific-inquiry-and-academi|the-architecture-of-scientific-inquiry-and-academi]] (2026-06-08)
+## From [the-architecture-of-scientific-inquiry-and-academi](/entities/the-architecture-of-scientific-inquiry-and-academi.md) (2026-06-08)
 - A critical synthesis evaluating strengths, weaknesses, and gaps in existing knowledge.
 - Serves as the epistemological anchor for any subsequent research question.
 - Synthesizes extant knowledge and creates a solid starting point.

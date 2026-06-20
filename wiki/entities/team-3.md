@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[prompt-agent-engineering-part4-micro04|prompt-agent-engineering-part4-micro04]] (2026-06-09)
+## From [prompt-agent-engineering-part4-micro04](/entities/prompt-agent-engineering-part4-micro04.md) (2026-06-09)
 - Tasked with running a command on GH200 Core
 - Tasked with preparing the database

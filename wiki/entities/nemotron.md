@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[openclaw-deep-research-part2|openclaw-deep-research-part2]] (2026-06-08)
+## From [openclaw-deep-research-part2](/entities/openclaw-deep-research-part2.md) (2026-06-08)
 - It is a model family from NVIDIA.
 - NemoClaw natively integrates with it.
 - Nemotran 3 Super 12b-a12 is an option during NemoClaw setup.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-bun-file-parsing-dependency-shortlist-micro01|drive-research-bun-file-parsing-dependency-shortlist-micro01]] (2026-06-09)
+## From [drive-research-bun-file-parsing-dependency-shortlist-micro01](/entities/drive-research-bun-file-parsing-dependency-shortlist-micro01.md) (2026-06-09)
 - used by Node.js
 - handles garbage collection and heap allocation differently than JavaScriptCore
 - traditional engine for server-side JavaScript and TypeScript execution

@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[ai-research-part3-micro06|ai-research-part3-micro06]] (2026-06-09)
+## From [ai-research-part3-micro06](/entities/ai-research-part3-micro06.md) (2026-06-09)
 - A module containing bash-related tools.
 - Includes the diagnose_errors function.

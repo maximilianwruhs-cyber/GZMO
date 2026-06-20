@@ -14,8 +14,8 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[ai-research-part3-micro01|ai-research-part3-micro01]] (2026-06-09)
+## From [ai-research-part3-micro01](/entities/ai-research-part3-micro01.md) (2026-06-09)
 - Affiliated with the authors of the HUXLEY-GÖDEL MACHINE paper.
 
-## From [[ai-research-part3-micro03|ai-research-part3-micro03]] (2026-06-09)
+## From [ai-research-part3-micro03](/entities/ai-research-part3-micro03.md) (2026-06-09)
 - research reported in this publication was supported by funding from King Abdullah University of Science and Technology (KAUST)

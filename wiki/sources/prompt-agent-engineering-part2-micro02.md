@@ -14,19 +14,19 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[oklch|oklch()]] (TOOL)
-- [[visual-systems-extractor-prompt|Visual Systems Extractor Prompt]] (TOOL)
-- [[container-queries|container queries]] (CONCEPT)
-- [[modern-css-primitives|Modern CSS Primitives]] (CONCEPT)
-- [[open-source-maintainer-git-enforcer-prompt|Open Source Maintainer & Git Enforcer Prompt]] (TOOL)
-- [[css-custom-properties|CSS Custom Properties]] (CONCEPT)
-- [[semantic-html|Semantic HTML]] (CONCEPT)
-- [[github|GitHub]] (PLATFORM)
-- [[readme-md|README.md]] (DOCUMENT)
-- [[atomic-design|Atomic Design]] (CONCEPT)
-- [[wcag-2-1-2-2-aa|WCAG 2.1/2.2 AA]] (CONCEPT)
-- [[clamp|clamp()]] (TOOL)
-- [[conventional-commits|Conventional Commits]] (CONCEPT)
+- [oklch()](/entities/oklch.md) (TOOL)
+- [Visual Systems Extractor Prompt](/entities/visual-systems-extractor-prompt.md) (TOOL)
+- [container queries](/entities/container-queries.md) (CONCEPT)
+- [Modern CSS Primitives](/entities/modern-css-primitives.md) (CONCEPT)
+- [Open Source Maintainer & Git Enforcer Prompt](/entities/open-source-maintainer-git-enforcer-prompt.md) (TOOL)
+- [CSS Custom Properties](/entities/css-custom-properties.md) (CONCEPT)
+- [Semantic HTML](/entities/semantic-html.md) (CONCEPT)
+- [GitHub](/entities/github.md) (PLATFORM)
+- [README.md](/entities/readme-md.md) (DOCUMENT)
+- [Atomic Design](/entities/atomic-design.md) (CONCEPT)
+- [WCAG 2.1/2.2 AA](/entities/wcag-2-1-2-2-aa.md) (CONCEPT)
+- [clamp()](/entities/clamp.md) (TOOL)
+- [Conventional Commits](/entities/conventional-commits.md) (CONCEPT)
 
 ## Relations
 - Visual Systems Extractor Prompt → USES → Atomic Design

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[high-fidelity-markdown-engineering-and-ast-process|high-fidelity-markdown-engineering-and-ast-process]] (2026-06-08)
+## From [high-fidelity-markdown-engineering-and-ast-process](/entities/high-fidelity-markdown-engineering-and-ast-process.md) (2026-06-08)
 - Represents a block of preformatted text (fenced code block).
 - Is a Literal node.
 - Actual code snippet stored in its value string.

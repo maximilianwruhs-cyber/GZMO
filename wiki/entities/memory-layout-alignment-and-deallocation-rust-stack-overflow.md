@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[drive-research-cache-optimization-with-ai-chaos-theory|drive-research-cache-optimization-with-ai-chaos-theory]] (2026-06-08)
+## From [drive-research-cache-optimization-with-ai-chaos-theory](/entities/drive-research-cache-optimization-with-ai-chaos-theory.md) (2026-06-08)
 - Cited as a source.
 - Argument used in Rust's memory allocators.
 - Specifies size and alignment requirements for memory allocation and deallocation.

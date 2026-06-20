@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part2|drive-research-ki-berater-fragebogen-für-kundenanalyse-part2]] (2026-06-08)
+## From [drive-research-ki-berater-fragebogen-für-kundenanalyse-part2](/entities/drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part2.md) (2026-06-08)
 - Bridge the socio-technical gap when employees do not accept or cannot operate advanced AI solutions.
 - Design training programs, conduct practical workshops, create playbooks, and build internal 'AI academies'.

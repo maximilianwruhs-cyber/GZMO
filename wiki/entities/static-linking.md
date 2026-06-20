@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[phantom-drive-autonomous-llm-deployment-architect-micro01|phantom-drive-autonomous-llm-deployment-architect-micro01]] (2026-06-09)
+## From [phantom-drive-autonomous-llm-deployment-architect-micro01](/entities/phantom-drive-autonomous-llm-deployment-architect-micro01.md) (2026-06-09)
 - Achieves absolute hardware and operating system agnosticism.
 - Ensures the binary executes entirely within its own encapsulated memory space.
 - musl libc is explicitly engineered for static linking.

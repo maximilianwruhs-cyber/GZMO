@@ -16,21 +16,21 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-advanced-inference-acceleration|drive-research-advanced-inference-acceleration]] (2026-06-08)
+## From [drive-research-advanced-inference-acceleration](/entities/drive-research-advanced-inference-acceleration.md) (2026-06-08)
 - The standard generation method where each token is produced sequentially.
 - Each token prediction requires a full forward pass.
 - Leads to low arithmetic intensity and is memory-bandwidth bound.
 
-## From [[architectures-and-optimizations-for-speculative-de-micro04|architectures-and-optimizations-for-speculative-de-micro04]] (2026-06-09)
+## From [architectures-and-optimizations-for-speculative-de-micro04](/entities/architectures-and-optimizations-for-speculative-de-micro04.md) (2026-06-09)
 - Each token is produced sequentially.
 - Model must complete a full forward pass for each token.
 - Forces AI accelerators into a regime of drastically low arithmetic intensity.
 - Operation is heavily memory-bandwidth bound rather than compute-bound.
 
-## From [[architectures-and-optimizations-for-speculative-de-micro06|architectures-and-optimizations-for-speculative-de-micro06]] (2026-06-09)
+## From [architectures-and-optimizations-for-speculative-de-micro06](/entities/architectures-and-optimizations-for-speculative-de-micro06.md) (2026-06-09)
 - Standard generation process that introduces latency when loading expert weights.
 
-## From [[the-architecture-of-speculative-decoding-and-infer-part1-micro01|the-architecture-of-speculative-decoding-and-infer-part1-micro01]] (2026-06-09)
+## From [the-architecture-of-speculative-decoding-and-infer-part1-micro01](/entities/the-architecture-of-speculative-decoding-and-infer-part1-micro01.md) (2026-06-09)
 - The standard generation method where each token is generated sequentially.
 - Each token prediction requires a full forward pass.
 - This sequential dependency limits modern AI accelerators to low arithmetic intensity.

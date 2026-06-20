@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[engineering-ignorance-eliminating-affirmative-bia|engineering-ignorance-eliminating-affirmative-bia]] (2026-06-08)
+## From [engineering-ignorance-eliminating-affirmative-bia](/entities/engineering-ignorance-eliminating-affirmative-bia.md) (2026-06-08)
 - Instructs the SLM to adopt the identity of a strict auditor.
 - Significantly reduces biases, heuristic guessing, and unsupported claims.
 - Shifts the model's internal routing away from conversational compliance.

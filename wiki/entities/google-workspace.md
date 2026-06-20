@@ -14,11 +14,11 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[openclaw-deep-research-part4|openclaw-deep-research-part4]] (2026-06-08)
+## From [openclaw-deep-research-part4](/entities/openclaw-deep-research-part4.md) (2026-06-08)
 - OpenClaw has native integrations into it.
 - Community skills for OpenClaw cover it.
 
-## From [[the-architecture-of-scientific-inquiry-and-academi|the-architecture-of-scientific-inquiry-and-academi]] (2026-06-08)
+## From [the-architecture-of-scientific-inquiry-and-academi](/entities/the-architecture-of-scientific-inquiry-and-academi.md) (2026-06-08)
 - A cloud ecosystem with which Paperpile offers smooth integration.
 - Includes tools like Google Docs and Google Drive.
 - Paperpile operates as a Google Docs/Drive-optimized PDF and citation manager within it.

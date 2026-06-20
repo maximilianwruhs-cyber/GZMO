@@ -16,10 +16,10 @@ gzmo_synthetic: true
 
 Type: FRAMEWORK
 
-## From [[architectures-for-agentic-memory-virtual-context-micro06|architectures-for-agentic-memory-virtual-context-micro06]] (2026-06-09)
+## From [architectures-for-agentic-memory-virtual-context-micro06](/entities/architectures-for-agentic-memory-virtual-context-micro06.md) (2026-06-09)
 - Utilizes the SEKG methodology.
 
-## From [[architectures-for-agentic-memory-virtual-context-micro07|architectures-for-agentic-memory-virtual-context-micro07]] (2026-06-09)
+## From [architectures-for-agentic-memory-virtual-context-micro07](/entities/architectures-for-agentic-memory-virtual-context-micro07.md) (2026-06-09)
 - Integrates a Knowledge Graph alongside the vector store.
 - Achieves an impressive accuracy.
 - Graph enhancement specifically improves temporal and relational reasoning.

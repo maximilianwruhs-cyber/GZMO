@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-advanced-typescript-execution-in-the-bun-runtime-micro01|drive-research-advanced-typescript-execution-in-the-bun-runtime-micro01]] (2026-06-09)
+## From [drive-research-advanced-typescript-execution-in-the-bun-runtime-micro01](/entities/drive-research-advanced-typescript-execution-in-the-bun-runtime-micro01.md) (2026-06-09)
 - Execution environment for TypeScript.
 - Title of the research.
 - Focuses on TypeScript execution in Bun Runtime.

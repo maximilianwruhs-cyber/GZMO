@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-archival-truth-part1-micro07|the-archival-truth-part1-micro07]] (2026-06-09)
+## From [the-archival-truth-part1-micro07](/entities/the-archival-truth-part1-micro07.md) (2026-06-09)
 - Can be engineered through understanding behavioral psychology, joke structure, timing, silence, and emotional intelligence.
 - Its acquisition is a complex, multifaceted, and deeply intellectual discipline.
 - Are specific, daily exercises identified by Willibald Ruch and his team.

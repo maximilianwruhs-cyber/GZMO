@@ -14,8 +14,8 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[google-takeout|Google Takeout]] (ORGANIZATION)
-- [[drive-research-architecting-zero-configuration-portable-agents|Drive Research Architecting Zero-Configuration Portable Agents]] (BOOK)
+- [Google Takeout](/entities/google-takeout.md) (ORGANIZATION)
+- [Drive Research Architecting Zero-Configuration Portable Agents](/entities/drive-research-architecting-zero-configuration-portable-agents.md) (BOOK)
 
 ## Relations
 - Drive Research Architecting Zero-Configuration Portable Agents → PART_OF → Google Takeout

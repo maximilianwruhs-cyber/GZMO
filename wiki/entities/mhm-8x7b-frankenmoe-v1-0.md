@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: MODEL
 
-## From [[architectural-blueprints-for-sovereign-frankenmoe-part1|architectural-blueprints-for-sovereign-frankenmoe-part1]] (2026-06-08)
+## From [architectural-blueprints-for-sovereign-frankenmoe-part1](/entities/architectural-blueprints-for-sovereign-frankenmoe-part1.md) (2026-06-08)
 - It is a model that demonstrates ensembling specialized Llama and Mistral checkpoints.
 - It is a FrankenMoE model.
 - It is a versatile multitask model.
@@ -28,7 +28,7 @@ Type: MODEL
 - Its creation is via weight-space stream-loading using mergekit-moe.
 - It is a type of sparse MoE architecture synthesized from pre-trained dense models.
 
-## From [[drive-research-mergekit-moe-model-creation-guide|drive-research-mergekit-moe-model-creation-guide]] (2026-06-08)
+## From [drive-research-mergekit-moe-model-creation-guide](/entities/drive-research-mergekit-moe-model-creation-guide.md) (2026-06-08)
 - Another term for Mixture of Experts (MoE) fusion.
 - Synthesizes a sparse MoE architecture from pre-trained dense models.
 - An alternative name for the Mixture of Experts (MoE) fusion paradigm.

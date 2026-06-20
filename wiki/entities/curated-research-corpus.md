@@ -15,13 +15,13 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[dynamics-of-the-unpredictable-micro01|dynamics-of-the-unpredictable-micro01]] (2026-06-09)
+## From [dynamics-of-the-unpredictable-micro01](/entities/dynamics-of-the-unpredictable-micro01.md) (2026-06-09)
 - Consolidated from Google Takeout.
 - Sources: 2 documents.
 
-## From [[the-archival-truth-part2-micro01|the-archival-truth-part2-micro01]] (2026-06-09)
+## From [the-archival-truth-part2-micro01](/entities/the-archival-truth-part2-micro01.md) (2026-06-09)
 - Split archive (wave_02_notebooklm).
 
-## From [[the-cognitive-architecture-of-openclaw-agents-micro01|the-cognitive-architecture-of-openclaw-agents-micro01]] (2026-06-09)
+## From [the-cognitive-architecture-of-openclaw-agents-micro01](/entities/the-cognitive-architecture-of-openclaw-agents-micro01.md) (2026-06-09)
 - Consolidated from Google Takeout.
 - Sources: 2 documents.

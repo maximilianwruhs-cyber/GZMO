@@ -15,17 +15,17 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[cybernetics-and-mythos-the-architecture-of-intell-part1|cybernetics-and-mythos-the-architecture-of-intell-part1]] (2026-06-08)
+## From [cybernetics-and-mythos-the-architecture-of-intell-part1](/entities/cybernetics-and-mythos-the-architecture-of-intell-part1.md) (2026-06-08)
 - This layer defines inter-agent roles, Socratic escalation protocols, and interaction thresholds.
 - It explicitly positions the agent within a communication graph.
 - It represents a crucial cybernetic evolution.
 
-## From [[cybernetics-and-mythos-the-architecture-of-intell-part2|cybernetics-and-mythos-the-architecture-of-intell-part2]] (2026-06-08)
+## From [cybernetics-and-mythos-the-architecture-of-intell-part2](/entities/cybernetics-and-mythos-the-architecture-of-intell-part2.md) (2026-06-08)
 - It rigorously defines inter-agent roles.
 - It defines Socratic escalation protocols and interaction thresholds.
 - It includes roles like PROSECUTOR, DEFENDER, UMPIRE, and EXECUTOR.
 
-## From [[drive-research-redefining-agentic-soulmd-to-dialog-micro04|drive-research-redefining-agentic-soulmd-to-dialog-micro04]] (2026-06-09)
+## From [drive-research-redefining-agentic-soulmd-to-dialog-micro04](/entities/drive-research-redefining-agentic-soulmd-to-dialog-micro04.md) (2026-06-09)
 - Represents a crucial cybernetic evolution.
 - Rigorously defines inter-agent roles, Socratic escalation protocols, and interaction thresholds.
 - Explicitly positions the agent within a communication graph.

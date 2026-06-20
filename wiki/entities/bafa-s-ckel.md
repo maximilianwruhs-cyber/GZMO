@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[the-archival-truth-part1-micro04|the-archival-truth-part1-micro04]] (2026-06-09)
+## From [the-archival-truth-part1-micro04](/entities/the-archival-truth-part1-micro04.md) (2026-06-09)
 - A 'small Burgenland dictionary for emergencies'.
 - Issued as part of the 'Burgenland liest' initiative.

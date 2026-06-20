@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-developing-pi-coding-agent-ide-extensions|drive-research-developing-pi-coding-agent-ide-extensions]] (2026-06-08)
+## From [drive-research-developing-pi-coding-agent-ide-extensions](/entities/drive-research-developing-pi-coding-agent-ide-extensions.md) (2026-06-08)
 - Allows for the dynamic injection of TypeScript-based logic, custom LLM tools, TUI components, and lifecycle event hooks.
 - Designed for a 'permissive' execution environment where extensions run with user's full system permissions.
 - Provides a middleware-like architecture for existing tools.

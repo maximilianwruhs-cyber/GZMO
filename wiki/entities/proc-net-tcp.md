@@ -14,11 +14,11 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[architectural-strategy-for-stealthy-portable-cli-a|architectural-strategy-for-stealthy-portable-cli-a]] (2026-06-08)
+## From [architectural-strategy-for-stealthy-portable-cli-a](/entities/architectural-strategy-for-stealthy-portable-cli-a.md) (2026-06-08)
 - Virtual file on Linux.
 - Contains real-time kernel network statistics and socket states.
 - Used for passive enumeration of local services.
 
-## From [[drive-research-architecting-zero-configuration-portable-agents-s-micro03|drive-research-architecting-zero-configuration-portable-agents-s-micro03]] (2026-06-09)
+## From [drive-research-architecting-zero-configuration-portable-agents-s-micro03](/entities/drive-research-architecting-zero-configuration-portable-agents-s-micro03.md) (2026-06-09)
 - Virtual file on Linux containing kernel network statistics and socket states.
 - Used for passive methodology of detecting local services.

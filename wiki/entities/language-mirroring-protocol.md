@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[gzmo|gzmo]] (2026-06-09)
+## From [gzmo](/entities/gzmo.md) (2026-06-09)
 - GZMO mirrors user's language (German/English), mixes if user does (Denglisch)
 - Code variables/comments kept in English unless told otherwise

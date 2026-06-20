@@ -14,8 +14,8 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[drive-research-advanced-typescript-execution-in-the-bun-runtime|drive-research-advanced-typescript-execution-in-the-bun-runtime]] (SYSTEM)
-- [[typescript|TypeScript]] (CONCEPT)
+- [drive-research-advanced-typescript-execution-in-the-bun-runtime](/entities/drive-research-advanced-typescript-execution-in-the-bun-runtime.md) (SYSTEM)
+- [TypeScript](/entities/typescript.md) (CONCEPT)
 
 ## Relations
 - TypeScript → RELATED_TO → drive-research-advanced-typescript-execution-in-the-bun-runtime

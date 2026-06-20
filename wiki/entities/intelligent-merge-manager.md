@@ -16,10 +16,10 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-agentic-reverse-engineering-state-and-future-micro02|drive-research-agentic-reverse-engineering-state-and-future-micro02]] (2026-06-09)
+## From [drive-research-agentic-reverse-engineering-state-and-future-micro02](/entities/drive-research-agentic-reverse-engineering-state-and-future-micro02.md) (2026-06-09)
 - Commits definitive changes to the primary database after consensus is achieved.
 - Used in the IDA Swarm project.
 
-## From [[drive-research-agentic-reverse-engineering-state-and-future1-micro02|drive-research-agentic-reverse-engineering-state-and-future1-micro02]] (2026-06-09)
+## From [drive-research-agentic-reverse-engineering-state-and-future1-micro02](/entities/drive-research-agentic-reverse-engineering-state-and-future1-micro02.md) (2026-06-09)
 - Commits definitive changes to the primary database after consensus.
 - Operates within the IDA Swarm framework.

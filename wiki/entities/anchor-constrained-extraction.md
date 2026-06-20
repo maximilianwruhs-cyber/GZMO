@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[engineering-ignorance-eliminating-affirmative-bia|engineering-ignorance-eliminating-affirmative-bia]] (2026-06-08)
+## From [engineering-ignorance-eliminating-affirmative-bia](/entities/engineering-ignorance-eliminating-affirmative-bia.md) (2026-06-08)
 - Transforms open-ended text generation into a constrained combinatorial selection problem.
 - Identifies semantically meaningful spans ('Anchors') in the source text.
 - Strictly dictates that the response must be constructed using only these identified anchors.

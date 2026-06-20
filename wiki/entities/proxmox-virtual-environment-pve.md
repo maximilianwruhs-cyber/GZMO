@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-enhancing-local-ai-hypervisor-architecture|drive-research-enhancing-local-ai-hypervisor-architecture]] (2026-06-08)
+## From [drive-research-enhancing-local-ai-hypervisor-architecture](/entities/drive-research-enhancing-local-ai-hypervisor-architecture.md) (2026-06-08)
 - Requires Virtualization Technology (VT-d or AMD-Vi) to be enabled.
 - Requires disabling Secure Boot.
 - Kernel command line parameters can be edited in /etc/default/grub.

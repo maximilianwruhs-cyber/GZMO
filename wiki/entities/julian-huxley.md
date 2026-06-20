@@ -14,5 +14,5 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[ai-research-part8-micro04|ai-research-part8-micro04]] (2026-06-09)
+## From [ai-research-part8-micro04](/entities/ai-research-part8-micro04.md) (2026-06-09)
 - Concept of clades (lineages sharing common ancestry) was drawn inspiration from.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-autonomous-devops-ai-safety-boundaries|drive-research-autonomous-devops-ai-safety-boundaries]] (2026-06-08)
+## From [drive-research-autonomous-devops-ai-safety-boundaries](/entities/drive-research-autonomous-devops-ai-safety-boundaries.md) (2026-06-08)
 - A Linux kernel feature.
 - Provides dynamic, kernel-level behavioral enforcement.
 - Acts as an omniscient observer of system calls.

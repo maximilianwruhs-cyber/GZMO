@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-hermes-system-untersuchung-und-erweiterung|drive-research-hermes-system-untersuchung-und-erweiterung]] (2026-06-08)
+## From [drive-research-hermes-system-untersuchung-und-erweiterung](/entities/drive-research-hermes-system-untersuchung-und-erweiterung.md) (2026-06-08)
 - Has a checkpoint and snapshot infrastructure.
 - The investigation focuses on Gap 6 in its existing infrastructure.
 - The agent's user interface and command-line tools assign different responsibilities to snapshots and checkpoints.

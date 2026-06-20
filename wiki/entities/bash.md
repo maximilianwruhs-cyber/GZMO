@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[allgemeine-informationen|allgemeine-informationen]] (2026-06-08)
+## From [allgemeine-informationen](/entities/allgemeine-informationen.md) (2026-06-08)
 - It can be used to script automation for setup, environment configuration, and repetitive terminal tasks.
 
-## From [[tui-framework|tui-framework]] (2026-06-08)
+## From [tui-framework](/entities/tui-framework.md) (2026-06-08)
 - Shell used in the Ubuntu environment.
 - Used for executing commands.
 - Can be configured with aliases and hotkeys.

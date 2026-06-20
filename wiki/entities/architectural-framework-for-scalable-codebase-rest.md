@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[architectural-framework-for-scalable-codebase-rest|architectural-framework-for-scalable-codebase-rest]] (2026-06-08)
+## From [architectural-framework-for-scalable-codebase-rest](/entities/architectural-framework-for-scalable-codebase-rest.md) (2026-06-08)
 - This is the title of the document.
 - It describes a comprehensive architectural framework for strategic codebase restructuring and file tree migration.
 - It aims to address the imperatives of legacy codebase modernization.

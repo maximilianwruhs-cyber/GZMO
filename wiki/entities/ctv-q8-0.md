@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[optimizing-nvidia-blackwell-sm120-part1-micro02|optimizing-nvidia-blackwell-sm120-part1-micro02]] (2026-06-09)
+## From [optimizing-nvidia-blackwell-sm120-part1-micro02](/entities/optimizing-nvidia-blackwell-sm120-part1-micro02.md) (2026-06-09)
 - Quantizes the Value cache to 8-bit.
 - Quantizes the Key and Value cache to 8-bit.
 - Moving the KV cache from raw 16-bit floats (f16) to 8-bit (q8_0) drops the KV cache buffer size by 47%.

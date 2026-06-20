@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: ARCHITECTURE
 
-## From [[drive-research-linux-gaming-and-ai-build-guide-micro01|drive-research-linux-gaming-and-ai-build-guide-micro01]] (2026-06-09)
+## From [drive-research-linux-gaming-and-ai-build-guide-micro01](/entities/drive-research-linux-gaming-and-ai-build-guide-micro01.md) (2026-06-09)
 - The Llama 4 family relies heavily on these architectures.
 - Inference is rapid because only a small subset of parameters is active per token.
 - The entire parameter set must still be loaded into VRAM.

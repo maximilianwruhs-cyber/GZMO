@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[prompt-agent-engineering-part5-micro05|prompt-agent-engineering-part5-micro05]] (2026-06-09)
+## From [prompt-agent-engineering-part5-micro05](/entities/prompt-agent-engineering-part5-micro05.md) (2026-06-09)
 - Local Ollama ecosystem compatibility is a goal
 - Local Ollama ecosystem
 - Used for tool-calling and structured outputs

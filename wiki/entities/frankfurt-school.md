@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[drive-research-dialectics-socratic-vs-hegelian-methods|drive-research-dialectics-socratic-vs-hegelian-methods]] (2026-06-08)
+## From [drive-research-dialectics-socratic-vs-hegelian-methods](/entities/drive-research-dialectics-socratic-vs-hegelian-methods.md) (2026-06-08)
 - Associated with Critical Theory.
 - Produced sophisticated internal critiques of Hegelianism.
 - Theodor W. Adorno is a prominent figure.

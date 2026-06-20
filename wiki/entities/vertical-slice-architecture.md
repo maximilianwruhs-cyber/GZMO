@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[prompt-agent-engineering-part5-micro03|prompt-agent-engineering-part5-micro03]] (2026-06-09)
+## From [prompt-agent-engineering-part5-micro03](/entities/prompt-agent-engineering-part5-micro03.md) (2026-06-09)
 - Mentioned as a clean architecture style

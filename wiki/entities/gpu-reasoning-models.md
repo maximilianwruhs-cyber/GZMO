@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: MODEL
 
-## From [[the-sovereign-software-factory-blueprint|the-sovereign-software-factory-blueprint]] (2026-06-08)
+## From [the-sovereign-software-factory-blueprint](/entities/the-sovereign-software-factory-blueprint.md) (2026-06-08)
 - Used for deep architecture.
 - Run on GPU.

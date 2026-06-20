@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[drive-research-research-project-initiation-guide|drive-research-research-project-initiation-guide]] (2026-06-08)
+## From [drive-research-research-project-initiation-guide](/entities/drive-research-research-project-initiation-guide.md) (2026-06-08)
 - Suggested the first framework for building structured foreground questions.
 - Their work is the origin of systematic clinical question formulation.

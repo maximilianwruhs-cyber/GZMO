@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[high-fidelity-markdown-engineering-and-ast-process|high-fidelity-markdown-engineering-and-ast-process]] (2026-06-08)
+## From [high-fidelity-markdown-engineering-and-ast-process](/entities/high-fidelity-markdown-engineering-and-ast-process.md) (2026-06-08)
 - Offer a highly scalable and secure solution for injecting complex, interactive elements.
 - Parsed into distinct, strongly typed nodes within the AST.
 - Allow deep integration of highly interactive elements without violating core Markdown formatting guidelines.

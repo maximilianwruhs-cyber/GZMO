@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[dynamics-of-the-unpredictable-micro04|dynamics-of-the-unpredictable-micro04]] (2026-06-09)
+## From [dynamics-of-the-unpredictable-micro04](/entities/dynamics-of-the-unpredictable-micro04.md) (2026-06-09)
 - It is the historical birthplace of modern chaos theory.
 - It is the most visible application of non-linear dynamics.
 - The finite predictability of weather is linked to the atmospheric Lyapunov time.

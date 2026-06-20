@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[dynamics-of-the-unpredictable-micro02|dynamics-of-the-unpredictable-micro02]] (2026-06-10)
+## From [dynamics-of-the-unpredictable-micro02](/entities/dynamics-of-the-unpredictable-micro02.md) (2026-06-10)
 - Physicist and theologian who suggested sensitive dependence on initial conditions creates ontological openness.

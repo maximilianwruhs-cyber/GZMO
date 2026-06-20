@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[the-archival-truth-part1-micro06|the-archival-truth-part1-micro06]] (2026-06-09)
+## From [the-archival-truth-part1-micro06](/entities/the-archival-truth-part1-micro06.md) (2026-06-09)
 - His 'Lima, Ohio' routine is analyzed for narrative architecture.
 - His routine featured references to Civil War cannons and 5- and 10-cent stores.

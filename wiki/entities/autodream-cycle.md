@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-cognitive-architecture-of-openclaw-agents-micro02|the-cognitive-architecture-of-openclaw-agents-micro02]] (2026-06-09)
+## From [the-cognitive-architecture-of-openclaw-agents-micro02](/entities/the-cognitive-architecture-of-openclaw-agents-micro02.md) (2026-06-09)
 - Background cognitive consolidation loop.
 - Operates in three distinct phases: Light Phase (Deterministic Compression), REM Phase (Abstract Connection).
 - Minimizes large language model token costs while maximizing abstraction density.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-bun-file-parsing-dependency-shortlist-micro02|drive-research-bun-file-parsing-dependency-shortlist-micro02]] (2026-06-09)
+## From [drive-research-bun-file-parsing-dependency-shortlist-micro02](/entities/drive-research-bun-file-parsing-dependency-shortlist-micro02.md) (2026-06-09)
 - Developed to directly combat the memory and performance overhead of SheetJS.
 - A library explicitly tailored for the Bun runtime.
 - Implements streaming to mitigate memory spikes.

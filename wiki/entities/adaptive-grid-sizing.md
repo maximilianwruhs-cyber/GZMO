@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-imagine-creating-sm120-according-to-our-progress|drive-research-imagine-creating-sm120-according-to-our-progress]] (2026-06-08)
+## From [drive-research-imagine-creating-sm120-according-to-our-progress](/entities/drive-research-imagine-creating-sm120-according-to-our-progress.md) (2026-06-08)
 - Adaptive Grid Sizing.
 - Standard GEMM kernels utilize massive thread blocks (256 to 512 threads) optimized for large batch saturation, leading to poor SM occupancy during small-token decode phases.
 - Implement an adaptive scheduling algorithm that dynamically adjusts boundaries to the payload shape.

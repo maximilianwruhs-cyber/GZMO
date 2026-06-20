@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-rust-ecs-cache-optimization-research|drive-research-rust-ecs-cache-optimization-research]] (2026-06-08)
+## From [drive-research-rust-ecs-cache-optimization-research](/entities/drive-research-rust-ecs-cache-optimization-research.md) (2026-06-08)
 - Temporarily disables the operating system's automated NUMA page migration.
 - Prevents latency spikes and memory bus contention in multi-socket CPU topologies.
 - Requires root/sudo privileges.

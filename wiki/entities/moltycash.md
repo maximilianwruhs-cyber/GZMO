@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[openclaw-autonomous-ai-agents-in-financial-operat|openclaw-autonomous-ai-agents-in-financial-operat]] (2026-06-08)
+## From [openclaw-autonomous-ai-agents-in-financial-operat](/entities/openclaw-autonomous-ai-agents-in-financial-operat.md) (2026-06-08)
 - Community skill providing autonomous transfer capabilities.
 - Utilizes stablecoins (USDC) over Account-to-Account (A2A) protocols.

@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[openclaw-deep-research-part11-micro05|openclaw-deep-research-part11-micro05]] (2026-06-10)
+## From [openclaw-deep-research-part11-micro05](/entities/openclaw-deep-research-part11-micro05.md) (2026-06-10)
 - Announced restructuring of the compiler stack for its MLU (Siyuan) series chips.

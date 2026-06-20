@@ -44,6 +44,7 @@ pub struct LintReport {
     pub stale: Vec<String>,
     pub wikilinks_detected: Vec<String>,
     pub okf_missing_index_version: bool,
+    pub okf_unknown_types: Vec<String>,
     pub report_path: String,
 }
 
@@ -113,7 +114,7 @@ impl WikiEngine {
                     format!("# {name}\n\nType: {}\n", ve.entity.entity_type),
                 ),
             };
-            let section_marker = format!("## From [[{source_slug}|{source_title}]]");
+            let section_marker = format!("## From [{source_title}](/entities/{source_slug}.md)");
             let mut new_body = body.clone();
             if !new_body.contains(&section_marker) {
                 let mut section = format!("\n{section_marker} ({date_str})\n");
@@ -125,7 +126,7 @@ impl WikiEngine {
                 }
                 new_body = format!("{}\n{}", new_body.trim_end(), section);
             }
-            let source_count = new_body.matches("## From [[").count() as u32;
+            let source_count = new_body.matches("## From [").count() as u32;
             let mut fm = fm;
             fm.updated = date_str.clone();
             fm.sources = source_count;
@@ -142,7 +143,10 @@ impl WikiEngine {
             );
             write_string(&self.index_path(), &updated).await?;
 
-            entity_links.push(format!("- [[{slug}|{name}]] ({})", ve.entity.entity_type));
+            entity_links.push(format!(
+                "- [{name}](/entities/{slug}.md) ({})",
+                ve.entity.entity_type
+            ));
         }
 
         // --- source summary page -----------------------------------------
@@ -268,7 +272,7 @@ impl WikiEngine {
             ..Default::default()
         };
 
-        // Build link graph: which page basenames are referenced via [[link]].
+        // Build link graph: wikilinks + internal CommonMark links (index uses CommonMark).
         let mut referenced: std::collections::HashSet<String> = std::collections::HashSet::new();
         let mut page_slugs: std::collections::HashSet<String> = std::collections::HashSet::new();
         let mut contents: Vec<(PathBuf, String)> = Vec::new();
@@ -279,7 +283,7 @@ impl WikiEngine {
             if let Some(stem) = path.file_stem().and_then(|s| s.to_str()) {
                 page_slugs.insert(stem.to_string());
             }
-            for target in extract_wikilinks(&content) {
+            for target in extract_all_internal_link_targets(&content) {
                 referenced.insert(target);
             }
             contents.push((path.clone(), content));
@@ -314,19 +318,38 @@ impl WikiEngine {
                     if f.status == "stale" {
                         report.stale.push(name.clone());
                     }
+                    let type_str = match f.page_type {
+                        crate::wiki_md::PageType::Entity => "entity",
+                        crate::wiki_md::PageType::Concept => "concept",
+                        crate::wiki_md::PageType::Source => "source",
+                        crate::wiki_md::PageType::Index => "index",
+                        crate::wiki_md::PageType::Log => "log",
+                        crate::wiki_md::PageType::Runbook => "runbook",
+                        crate::wiki_md::PageType::Topic => "topic",
+                        crate::wiki_md::PageType::Metric => "metric",
+                    };
+                    if !wiki_md::okf_concept_type_names().contains(&type_str) {
+                        report
+                            .okf_unknown_types
+                            .push(format!("{name}: type={type_str}"));
+                    }
                 }
             }
             // Orphan: never referenced by any other page.
             if !referenced.contains(&stem) {
                 report.orphans.push(name.clone());
             }
-            // Broken links: [[target]] with no matching page slug.
             for target in extract_wikilinks(content) {
                 report.wikilinks_detected.push(format!("{name}: [[{target}]]"));
                 if !page_slugs.contains(&target) {
                     report
                         .broken_links
                         .push(format!("{name} -> [[{target}]]"));
+                }
+            }
+            for (target, raw) in extract_markdown_internal_links(content) {
+                if !page_slugs.contains(&target) {
+                    report.broken_links.push(format!("{name} -> {raw}"));
                 }
             }
         }
@@ -448,14 +471,8 @@ fn extract_wikilinks(content: &str) -> Vec<String> {
         if let Some(end) = after.find("]]") {
             let inner = &after[..end];
             let target = inner.split('|').next().unwrap_or(inner).trim();
-            // Normalize to basename slug (strip any path / extension).
-            let base = target
-                .rsplit('/')
-                .next()
-                .unwrap_or(target)
-                .trim_end_matches(".md");
-            if !base.is_empty() {
-                out.push(base.to_string());
+            if let Some(slug) = slug_from_link_target(target) {
+                out.push(slug);
             }
             rest = &after[end + 2..];
         } else {
@@ -463,6 +480,57 @@ fn extract_wikilinks(content: &str) -> Vec<String> {
         }
     }
     out
+}
+
+fn extract_all_internal_link_targets(content: &str) -> Vec<String> {
+    let mut out = extract_wikilinks(content);
+    out.extend(
+        extract_markdown_internal_links(content)
+            .into_iter()
+            .map(|(slug, _)| slug),
+    );
+    out.sort();
+    out.dedup();
+    out
+}
+
+fn extract_markdown_internal_links(content: &str) -> Vec<(String, String)> {
+    let mut out = Vec::new();
+    let mut rest = content;
+    while let Some(start) = rest.find("](") {
+        let after = &rest[start + 2..];
+        if let Some(end) = after.find(')') {
+            let href = after[..end].trim();
+            if let Some(slug) = slug_from_markdown_href(href) {
+                out.push((slug, href.to_string()));
+            }
+            rest = &after[end + 1..];
+        } else {
+            break;
+        }
+    }
+    out
+}
+
+fn slug_from_link_target(target: &str) -> Option<String> {
+    let base = target
+        .rsplit('/')
+        .next()
+        .unwrap_or(target)
+        .trim_end_matches(".md");
+    if base.is_empty() {
+        None
+    } else {
+        Some(base.to_string())
+    }
+}
+
+fn slug_from_markdown_href(href: &str) -> Option<String> {
+    let path = href.trim_start_matches('/');
+    if !(path.starts_with("entities/") || path.starts_with("sources/")) {
+        return None;
+    }
+    slug_from_link_target(path)
 }
 
 fn render_lint(report: &LintReport, date: &str) -> String {
@@ -492,6 +560,11 @@ fn render_lint(report: &LintReport, date: &str) -> String {
     } else {
         s.push_str("- [OK] index.md carries `okf_version: \"0.1\"`\n");
     }
+    section(
+        &mut s,
+        "OKF unknown types (informational)",
+        &report.okf_unknown_types,
+    );
     
     s.push_str("\n_Report-only: fixes stay human-directed (see WIKI.md)._\n");
     s
@@ -563,7 +636,7 @@ mod tests {
             .await
             .unwrap();
         let ent = std::fs::read_to_string(dir.join("entities/gzmo.md")).unwrap();
-        assert_eq!(ent.matches("## From [[architecture|Architecture]]").count(), 1);
+        assert_eq!(ent.matches("## From [Architecture](/entities/architecture.md)").count(), 1);
 
         std::fs::remove_dir_all(&dir).ok();
     }

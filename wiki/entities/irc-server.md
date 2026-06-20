@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-agentic-reverse-engineering-state-and-future-micro02|drive-research-agentic-reverse-engineering-state-and-future-micro02]] (2026-06-09)
+## From [drive-research-agentic-reverse-engineering-state-and-future-micro02](/entities/drive-research-agentic-reverse-engineering-state-and-future-micro02.md) (2026-06-09)
 - A dedicated IRC server is used for structured debates when conflicts arise.
 - Agents present evidence-based reasoning on the IRC server.
 
-## From [[drive-research-agentic-reverse-engineering-state-and-future1-micro02|drive-research-agentic-reverse-engineering-state-and-future1-micro02]] (2026-06-09)
+## From [drive-research-agentic-reverse-engineering-state-and-future1-micro02](/entities/drive-research-agentic-reverse-engineering-state-and-future1-micro02.md) (2026-06-09)
 - Used for 'structured debate' when conflicts arise.
 - Agents present evidence-based reasoning on this server.

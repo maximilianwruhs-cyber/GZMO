@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-ai-agentic-teacher|drive-research-ai-agentic-teacher]] (2026-06-08)
+## From [drive-research-ai-agentic-teacher](/entities/drive-research-ai-agentic-teacher.md) (2026-06-08)
 - Translates the constraints of other agents into the final conversational response.
 - Uses the Evidence-Decision-Feedback (EDF) framework.

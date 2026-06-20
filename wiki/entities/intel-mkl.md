@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[architecting-the-minimalist-linux-desktop-a-compa-part1|architecting-the-minimalist-linux-desktop-a-compa-part1]] (2026-06-08)
+## From [architecting-the-minimalist-linux-desktop-a-compa-part1](/entities/architecting-the-minimalist-linux-desktop-a-compa-part1.md) (2026-06-08)
 - A traditional, heavyweight mathematical library.
 - Custom kernels have been empirically demonstrated to execute up to twice as fast as highly optimized vendor libraries like it.
 - Used for matrix multiplication.

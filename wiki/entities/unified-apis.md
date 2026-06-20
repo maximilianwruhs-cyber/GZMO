@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-der-aufstieg-und-die-absicht-des-bibliothekars-age|drive-research-der-aufstieg-und-die-absicht-des-bibliothekars-age]] (2026-06-08)
+## From [drive-research-der-aufstieg-und-die-absicht-des-bibliothekars-age](/entities/drive-research-der-aufstieg-und-die-absicht-des-bibliothekars-age.md) (2026-06-08)
 - Dienen als Vermittlungsschicht.
 - Stören oft die Agentenfunktionalität, indem sie anbieterspezifische Abfragesprachen entfernen.

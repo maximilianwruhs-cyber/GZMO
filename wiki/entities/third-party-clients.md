@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[openclaw-autonomous-ai-agents-in-financial-operat|openclaw-autonomous-ai-agents-in-financial-operat]] (2026-06-08)
+## From [openclaw-autonomous-ai-agents-in-financial-operat](/entities/openclaw-autonomous-ai-agents-in-financial-operat.md) (2026-06-08)
 - If OpenClaw provides services to them, it legally transitions into a regulated entity.
 - Requires an AMLD5 license from the FMA.

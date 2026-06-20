@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-scientific-writing-and-publication-process-micro03|drive-research-scientific-writing-and-publication-process-micro03]] (2026-06-09)
+## From [drive-research-scientific-writing-and-publication-process-micro03](/entities/drive-research-scientific-writing-and-publication-process-micro03.md) (2026-06-09)
 - Remains highly efficient for documents lacking complex mathematical formulas.
 - Users make significantly more orthographic and grammatical errors than Word users.

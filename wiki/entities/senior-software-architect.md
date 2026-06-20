@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[tui-framework|tui-framework]] (2026-06-08)
+## From [tui-framework](/entities/tui-framework.md) (2026-06-08)
 - Role taken to understand and restructure code.
 - Focuses on modularity, clean architecture, and best practices.
 - Analyzes TUI architecture and tech stacks.

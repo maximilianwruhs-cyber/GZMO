@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-pi-coding-agent-ecosystem-tier-list|drive-research-pi-coding-agent-ecosystem-tier-list]] (2026-06-08)
+## From [drive-research-pi-coding-agent-ecosystem-tier-list](/entities/drive-research-pi-coding-agent-ecosystem-tier-list.md) (2026-06-08)
 - Registers three native commands: rag_index, rag_query, and rag_status.
 - Handles large text bases without exhausting the model's prompt buffer.
 - Executes a hybrid search blending lexical retrieval with dense vector similarity.

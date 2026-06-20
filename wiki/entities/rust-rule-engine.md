@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[aether-grid-micro04|aether-grid-micro04]] (2026-06-09)
+## From [aether-grid-micro04](/entities/aether-grid-micro04.md) (2026-06-09)
 - Acts as middleware between LLM and Home Assistant.
 - Checks command legality against a hardcoded permission tree.
 - Prevents hardware hallucinations.

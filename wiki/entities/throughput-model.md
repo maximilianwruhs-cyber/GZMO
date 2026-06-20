@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[prfaas-cross-datacenter-llm-serving-via-selective-micro04|prfaas-cross-datacenter-llm-serving-via-selective-micro04]] (2026-06-09)
+## From [prfaas-cross-datacenter-llm-serving-via-selective-micro04](/entities/prfaas-cross-datacenter-llm-serving-via-selective-micro04.md) (2026-06-09)
 - Analytical model to derive scheduling policies.
 - Captures compute and bandwidth constraints.
 - Used to guide routing and resource allocation.

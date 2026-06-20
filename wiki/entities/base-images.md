@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SOFTWARE_COMPONENT
 
-## From [[ai-research-part6-micro05|ai-research-part6-micro05]] (2026-06-09)
+## From [ai-research-part6-micro05](/entities/ai-research-part6-micro05.md) (2026-06-09)
 - Should be minimal and without compilers or network tools (Zero-Trust-Images).
 - Contribute to agent security.

@@ -14,11 +14,11 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-recursivemas-ki-agenten-kommunikation-der-zukunft|drive-research-recursivemas-ki-agenten-kommunikation-der-zukunft]] (2026-06-08)
+## From [drive-research-recursivemas-ki-agenten-kommunikation-der-zukunft](/entities/drive-research-recursivemas-ki-agenten-kommunikation-der-zukunft.md) (2026-06-08)
 - Conceptual foundation for RecursiveMAS
 - Information flow iteratively through same layers
 - Deepens computation without increasing parameters
 
-## From [[architectures-and-optimizations-for-speculative-de-micro01|architectures-and-optimizations-for-speculative-de-micro01]] (2026-06-09)
+## From [architectures-and-optimizations-for-speculative-de-micro01](/entities/architectures-and-optimizations-for-speculative-de-micro01.md) (2026-06-09)
 - Information flow is iteratively guided through the same layers.
 - Deepens computation and logical reasoning over the same latent states without increasing memory requirements.

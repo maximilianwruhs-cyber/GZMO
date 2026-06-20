@@ -14,11 +14,11 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part2|drive-research-ki-berater-fragebogen-für-kundenanalyse-part2]] (2026-06-08)
+## From [drive-research-ki-berater-fragebogen-für-kundenanalyse-part2](/entities/drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part2.md) (2026-06-08)
 - Structures the AI journey specifically for communication service providers and complex IT environments.
 - Assesses the technological landscape, information architecture, data quality, organizational culture, and governance structures.
 
-## From [[drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part1-micro01|drive-research-ki-berater-fragebogen-für-kundenanalyse-part1-micro01]] (2026-06-09)
+## From [drive-research-ki-berater-fragebogen-für-kundenanalyse-part1-micro01](/entities/drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part1-micro01.md) (2026-06-09)
 - Developed an AI Capability Maturity Model.
 - Model is structured for communication service providers and complex IT environments.
 - Assesses technological landscape, information architecture, data quality, organizational culture, and governance structures.

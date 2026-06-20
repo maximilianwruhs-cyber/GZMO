@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[the-architecture-of-speculative-decoding-and-infer-part1-micro06|the-architecture-of-speculative-decoding-and-infer-part1-micro06]] (2026-06-09)
+## From [the-architecture-of-speculative-decoding-and-infer-part1-micro06](/entities/the-architecture-of-speculative-decoding-and-infer-part1-micro06.md) (2026-06-09)
 - Community-developed turboquant Python package provides a drop-in TurboQuantCache class that replaces standard Hugging Face dynamic caches
 - Practitioners utilize the assistant_model parameter within the .generate() API for speculative drafting

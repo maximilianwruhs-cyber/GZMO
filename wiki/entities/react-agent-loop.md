@@ -14,12 +14,12 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[prompt-agent-engineering-part5-micro04|prompt-agent-engineering-part5-micro04]] (2026-06-09)
+## From [prompt-agent-engineering-part5-micro04](/entities/prompt-agent-engineering-part5-micro04.md) (2026-06-09)
 - Described as the 'brain' of the system.
 - Involves searching memory, LLM decision, tool calls, and reflection.
 - Implemented with a maximum iteration limit.
 
-## From [[prompt-agent-engineering-part5-micro05|prompt-agent-engineering-part5-micro05]] (2026-06-09)
+## From [prompt-agent-engineering-part5-micro05](/entities/prompt-agent-engineering-part5-micro05.md) (2026-06-09)
 - Uses Message-Array
 - Uses Ollama Tool-Calling / Structured Outputs
 - String concatenation is fragile

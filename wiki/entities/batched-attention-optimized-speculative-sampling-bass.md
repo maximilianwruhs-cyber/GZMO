@@ -14,12 +14,12 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-erbandbreite-und-latenzengp-sse|drive-research-erbandbreite-und-latenzengpässe]] (2026-06-08)
+## From [drive-research-erbandbreite-und-latenzengpässe](/entities/drive-research-erbandbreite-und-latenzengp-sse.md) (2026-06-08)
 - implements customized CUDA kernels
 - engineered to handle ragged tensors directly during attention calculation
 - establishes state-of-the-art multi-sequence generation latency while preserving peak GPU utilization
 
-## From [[the-architecture-of-speculative-decoding-and-infer-part2-micro02|the-architecture-of-speculative-decoding-and-infer-part2-micro02]] (2026-06-09)
+## From [the-architecture-of-speculative-decoding-and-infer-part2-micro02](/entities/the-architecture-of-speculative-decoding-and-infer-part2-micro02.md) (2026-06-09)
 - Implements customized CUDA kernels.
 - Engineered to handle ragged tensors directly during attention calculation.
 - Establishes state-of-the-art multi-sequence generation latency.

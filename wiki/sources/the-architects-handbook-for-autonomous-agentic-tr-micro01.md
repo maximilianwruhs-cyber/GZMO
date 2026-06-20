@@ -14,9 +14,9 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[wave-02-notebooklm|wave_02_notebooklm]] (PROJECT)
-- [[the-architect-s-handbook-for-autonomous-agentic-tr|The Architect’s Handbook for Autonomous Agentic Tr]] (BOOK)
-- [[google-takeout|Google Takeout]] (SYSTEM)
+- [wave_02_notebooklm](/entities/wave-02-notebooklm.md) (PROJECT)
+- [The Architect’s Handbook for Autonomous Agentic Tr](/entities/the-architect-s-handbook-for-autonomous-agentic-tr.md) (BOOK)
+- [Google Takeout](/entities/google-takeout.md) (SYSTEM)
 
 ## Relations
 - The Architect’s Handbook for Autonomous Agentic Tr → PART_OF → wave_02_notebooklm

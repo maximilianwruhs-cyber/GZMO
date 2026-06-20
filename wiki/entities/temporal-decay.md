@@ -14,11 +14,11 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[openclaw-part1-micro06|openclaw-part1-micro06]] (2026-06-09)
+## From [openclaw-part1-micro06](/entities/openclaw-part1-micro06.md) (2026-06-09)
 - Algorithm used by the short-term memory to prioritize recency and operational relevance.
 - Relevance of an entry decreases exponentially with age.
 - Has a configurable half-life, defaulting to 30 days in the GZMO architecture.
 
-## From [[openclaw-part1-micro01|openclaw-part1-micro01]] (2026-06-10)
+## From [openclaw-part1-micro01](/entities/openclaw-part1-micro01.md) (2026-06-10)
 - A concept where old memories lose weight over time
 - Uses a half-life of 30 days

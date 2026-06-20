@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[gzmo-soul-merged-new-part1|gzmo-soul-merged-new-part1]] (2026-06-09)
+## From [gzmo-soul-merged-new-part1](/entities/gzmo-soul-merged-new-part1.md) (2026-06-09)
 - Encompasses a broad spectrum of disciplines: structured file organization, verification of logical consistency of folder hierarchies, rigorous patch management, validation of software installations, and deep control of system paths and environment variables.
 - Historically based on rigid scripts, manual audits, and reactive maintenance windows.
 - Transforms file management from a purely syntactic to a semantic discipline.

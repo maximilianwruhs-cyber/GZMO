@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[aether-grid-micro04|aether-grid-micro04]] (2026-06-09)
+## From [aether-grid-micro04](/entities/aether-grid-micro04.md) (2026-06-09)
 - Addresses strict EU AI Act guidelines for autonomous systems.
 - Includes 'Right to be Forgotten' and WORM-logging.

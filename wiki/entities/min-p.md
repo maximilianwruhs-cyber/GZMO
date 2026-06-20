@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-llamacpp-optimization-blueprint-micro03|drive-research-llamacpp-optimization-blueprint-micro03]] (2026-06-09)
+## From [drive-research-llamacpp-optimization-blueprint-micro03](/entities/drive-research-llamacpp-optimization-blueprint-micro03.md) (2026-06-09)
 - A dynamic, confidence-scaled thresholding algorithm for probabilistic sampling.
 - Scales dynamically based on the confidence of the top token.
 - Replaces legacy Top-K and Top-P samplers.

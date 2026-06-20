@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part6-micro03|ai-research-part6-micro03]] (2026-06-09)
+## From [ai-research-part6-micro03](/entities/ai-research-part6-micro03.md) (2026-06-09)
 - Achieve linear scaling with respect to sequence length.
 - A micro-architectural design.

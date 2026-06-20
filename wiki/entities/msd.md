@@ -14,12 +14,12 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-marlin-baseline-for-early-deployments-micro02|drive-research-marlin-baseline-for-early-deployments-micro02]] (2026-06-09)
+## From [drive-research-marlin-baseline-for-early-deployments-micro02](/entities/drive-research-marlin-baseline-for-early-deployments-micro02.md) (2026-06-09)
 - Multi-Precision Split Decomposition.
 - Decomposes high-precision BF16 activations into low-precision components.
 - Bypasses register-heavy vector dequantization.
 
-## From [[optimizing-nvidia-blackwell-sm120-part1-micro05|optimizing-nvidia-blackwell-sm120-part1-micro05]] (2026-06-10)
+## From [optimizing-nvidia-blackwell-sm120-part1-micro05](/entities/optimizing-nvidia-blackwell-sm120-part1-micro05.md) (2026-06-10)
 - Multi-Precision Split Decomposition framework
 - Decomposes high-precision BF16 activations into low-precision components
 - Bypasses register-heavy vector dequantization

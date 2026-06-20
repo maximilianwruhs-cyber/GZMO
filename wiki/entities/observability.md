@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[aether-grid-micro04|aether-grid-micro04]] (2026-06-09)
+## From [aether-grid-micro04](/entities/aether-grid-micro04.md) (2026-06-09)
 - One of the four invisible pillars of enterprise systems.
 - Crucial for reconstructing past errors.

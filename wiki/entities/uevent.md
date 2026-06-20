@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-automating-linux-hardware-detection-micro01|drive-research-automating-linux-hardware-detection-micro01]] (2026-06-09)
+## From [drive-research-automating-linux-hardware-detection-micro01](/entities/drive-research-automating-linux-hardware-detection-micro01.md) (2026-06-09)
 - Userspace event notification dispatched from the kernel.
 - Utilizes a highly specialized netlink socket belonging to the NETLINK_KOBJECT_UEVENT address family.
 - Payload is a structured, null-terminated string containing vital environmental variables that describe the precise nature of the hotplug event.

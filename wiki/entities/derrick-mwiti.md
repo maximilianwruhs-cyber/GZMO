@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[openclaw-deep-research-part2|openclaw-deep-research-part2]] (2026-06-08)
+## From [openclaw-deep-research-part2](/entities/openclaw-deep-research-part2.md) (2026-06-08)
 - Derrick Mwiti is listed as an author.
 - He authored the blog post 'OpenClaw vs Nanobot: Which AI Agent Framework Should You Use in 2026?'.
 - He authored the tutorial 'Nanobot Tutorial: A Lightweight OpenClaw Alternative'.

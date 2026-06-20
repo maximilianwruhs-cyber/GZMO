@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[cybernetics-and-mythos-the-architecture-of-intell-part2|cybernetics-and-mythos-the-architecture-of-intell-part2]] (2026-06-08)
+## From [cybernetics-and-mythos-the-architecture-of-intell-part2](/entities/cybernetics-and-mythos-the-architecture-of-intell-part2.md) (2026-06-08)
 - A constellation.
 - Chiron's soul was placed among the stars as this constellation by Zeus.

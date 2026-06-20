@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[drive-research-cache-optimization-blueprint|drive-research-cache-optimization-blueprint]] (2026-06-08)
+## From [drive-research-cache-optimization-blueprint](/entities/drive-research-cache-optimization-blueprint.md) (2026-06-08)
 - Curated research corpus consolidated from Google Takeout (wave_04_drive_research).
 - Provides a comprehensive, step-by-step implementation plan.
 - Details exact file architecture, step-by-step commands, and a robust implementation script.

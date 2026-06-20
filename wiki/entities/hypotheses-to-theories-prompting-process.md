@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-synthesizing-wisdom-from-heterogeneous-data|drive-research-synthesizing-wisdom-from-heterogeneous-data]] (2026-06-08)
+## From [drive-research-synthesizing-wisdom-from-heterogeneous-data](/entities/drive-research-synthesizing-wisdom-from-heterogeneous-data.md) (2026-06-08)
 - Used in Concept Distillation (CD).
 - Involves initialization, induction, verification, and deduction steps.
 - Promotes hypotheses to 'Theories' if verified.

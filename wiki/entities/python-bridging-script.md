@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[local-first-rag-architecting-sovereign-ai-with-li|local-first-rag-architecting-sovereign-ai-with-li]] (2026-06-08)
+## From [local-first-rag-architecting-sovereign-ai-with-li](/entities/local-first-rag-architecting-sovereign-ai-with-li.md) (2026-06-08)
 - Automates the conversion of parsed JSON bounding boxes and spatial text grids into a structured .md file.
 - Operates as a highly specialized formatting agent.
 - Must programmatically construct and inject a robust YAML schema during the creation of the .md file.

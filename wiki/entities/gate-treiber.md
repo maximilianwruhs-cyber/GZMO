@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-technologischer-branchen-report-hilfsbetriebeumri-micro02|drive-research-technologischer-branchen-report-hilfsbetriebeumri-micro02]] (2026-06-09)
+## From [drive-research-technologischer-branchen-report-hilfsbetriebeumri-micro02](/entities/drive-research-technologischer-branchen-report-hilfsbetriebeumri-micro02.md) (2026-06-09)
 - Can suffer from false triggering due to EMV issues.
 - Responsible for switching MOSFETs.
 - Failure can lead to shoot-through and converter destruction.

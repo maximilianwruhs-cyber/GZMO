@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-token-efficient-bol-processing-architecture|drive-research-token-efficient-bol-processing-architecture]] (2026-06-08)
+## From [drive-research-token-efficient-bol-processing-architecture](/entities/drive-research-token-efficient-bol-processing-architecture.md) (2026-06-08)
 - Dictates token consumption based on the structural format of data supplied in the LLM prompt.
 - Converting from verbose JSON to concise YAML or custom delimiter-separated schemas drastically minimizes the token footprint.
 - YAML relies heavily on semantic whitespace, line breaks, and indentation, which tokenizers process significantly more efficiently than nested JSON syntax.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[openclaw-deep-research-part6|openclaw-deep-research-part6]] (2026-06-08)
+## From [openclaw-deep-research-part6](/entities/openclaw-deep-research-part6.md) (2026-06-08)
 - A language model provider that OpenClaw can be configured to work with.
 - Pricing is ~$0.10 (Input) / $0.40 (Output) per 1M tokens.
 - Often used for cheaper 'heartbeats'.

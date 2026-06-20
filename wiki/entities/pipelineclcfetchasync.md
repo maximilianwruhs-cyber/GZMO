@@ -14,12 +14,12 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-blackwell-sm120-gemm-optimization-guide|drive-research-blackwell-sm120-gemm-optimization-guide]] (2026-06-08)
+## From [drive-research-blackwell-sm120-gemm-optimization-guide](/entities/drive-research-blackwell-sm120-gemm-optimization-guide.md) (2026-06-08)
 - A class implemented in CUTLASS to manage CLC.
 - Decouples the scheduler warp from MMA and epilogue warps.
 - Implements a depth of 3.
 
-## From [[optimizing-nvidia-blackwell-sm120-part2-micro03|optimizing-nvidia-blackwell-sm120-part2-micro03]] (2026-06-10)
+## From [optimizing-nvidia-blackwell-sm120-part2-micro03](/entities/optimizing-nvidia-blackwell-sm120-part2-micro03.md) (2026-06-10)
 - Implemented in CUTLASS
 - Decouples scheduler warp from MMA and epilogue warps
 - Implements a pipeline depth of 3

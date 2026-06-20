@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[prompt-agent-engineering-part5-micro04|prompt-agent-engineering-part5-micro04]] (2026-06-09)
+## From [prompt-agent-engineering-part5-micro04](/entities/prompt-agent-engineering-part5-micro04.md) (2026-06-09)
 - Used for workflow orchestration.
 - Enables parallel steps, retries, and human approvals.
 - Can be implemented via YAML/TypeScript.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[gzmo-chaos-engine-architecture-audit-and-behaviora|gzmo-chaos-engine-architecture-audit-and-behaviora]] (2026-06-08)
+## From [gzmo-chaos-engine-architecture-audit-and-behaviora](/entities/gzmo-chaos-engine-architecture-audit-and-behaviora.md) (2026-06-08)
 - Absorbs 18% to incubate and crystallize
 - Receives input from Task Events
 - Permanent Mutations are derived from it

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[prompt-agent-engineering-part4-micro01|prompt-agent-engineering-part4-micro01]] (2026-06-09)
+## From [prompt-agent-engineering-part4-micro01](/entities/prompt-agent-engineering-part4-micro01.md) (2026-06-09)
 - Mutual TLS authentication.
 - Used in conjunction with WireGuard for secure transmission.
 - Part of Aether-Link.

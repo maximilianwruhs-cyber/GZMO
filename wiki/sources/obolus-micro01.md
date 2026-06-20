@@ -14,14 +14,14 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[validator-richter|Validator (Richter)]] (SYSTEM)
-- [[obolus-watt-konomie|Obolus-Watt-Ökonomie]] (CONCEPT)
-- [[miner-agenten|Miner (Agenten)]] (SYSTEM)
-- [[obulus|Obulus]] (SYSTEM)
-- [[proof-of-efficiency|Proof-of-Efficiency]] (CONCEPT)
-- [[fitness-scorer|Fitness-Scorer]] (TOOL)
-- [[genom|Genom]] (CONCEPT)
-- [[forge-evolutions-engine|Forge (Evolutions-Engine)]] (SYSTEM)
+- [Validator (Richter)](/entities/validator-richter.md) (SYSTEM)
+- [Obolus-Watt-Ökonomie](/entities/obolus-watt-konomie.md) (CONCEPT)
+- [Miner (Agenten)](/entities/miner-agenten.md) (SYSTEM)
+- [Obulus](/entities/obulus.md) (SYSTEM)
+- [Proof-of-Efficiency](/entities/proof-of-efficiency.md) (CONCEPT)
+- [Fitness-Scorer](/entities/fitness-scorer.md) (TOOL)
+- [Genom](/entities/genom.md) (CONCEPT)
+- [Forge (Evolutions-Engine)](/entities/forge-evolutions-engine.md) (SYSTEM)
 
 ## Relations
 - Obolus-Watt-Ökonomie → PART_OF → Obulus

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[drive-research-proxmox-agent-data-storage-micro01|drive-research-proxmox-agent-data-storage-micro01]] (2026-06-09)
+## From [drive-research-proxmox-agent-data-storage-micro01](/entities/drive-research-proxmox-agent-data-storage-micro01.md) (2026-06-09)
 - Ingest micro-split from drive-research-proxmox-agent-data-storage.md
 - Curated research corpus consolidated from Google Takeout
 - Sources: 1 documents.

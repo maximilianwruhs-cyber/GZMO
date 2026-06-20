@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-architecture-of-engagement-an-analysis-of-gam-micro03|the-architecture-of-engagement-an-analysis-of-gam-micro03]] (2026-06-09)
+## From [the-architecture-of-engagement-an-analysis-of-gam-micro03](/entities/the-architecture-of-engagement-an-analysis-of-gam-micro03.md) (2026-06-09)
 - Highlighting the actions, reviews, or presence of the crowd to validate a choice.
 - Mitigates user hesitation and anxiety.
 - Significantly increases conversion rates and platform trust.

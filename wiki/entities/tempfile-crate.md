@@ -14,8 +14,8 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[architectural-strategy-for-stealthy-portable-cli-a|architectural-strategy-for-stealthy-portable-cli-a]] (2026-06-08)
+## From [architectural-strategy-for-stealthy-portable-cli-a](/entities/architectural-strategy-for-stealthy-portable-cli-a.md) (2026-06-08)
 - Perform an OS-level atomic rename to replace config.yaml (e.g., using the tempfile crate).
 
-## From [[drive-research-to-product-engineering-leadership|drive-research-to-product-engineering-leadership]] (2026-06-08)
+## From [drive-research-to-product-engineering-leadership](/entities/drive-research-to-product-engineering-leadership.md) (2026-06-08)
 - Used in Rust for atomic writes (via OS-level atomic rename).

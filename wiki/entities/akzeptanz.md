@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-archival-truth-part1-micro02|the-archival-truth-part1-micro02]] (2026-06-09)
+## From [the-archival-truth-part1-micro02](/entities/the-archival-truth-part1-micro02.md) (2026-06-09)
 - The fundamental admission of unchangeable reality.
 - Related to the Stoic acceptance of the uncontrollable.
 - Involves refraining from retrospective brooding and acknowledging losses or crises as facts.

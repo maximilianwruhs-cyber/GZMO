@@ -25,31 +25,31 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[architectural-blueprints-for-sovereign-frankenmoe-part2|architectural-blueprints-for-sovereign-frankenmoe-part2]] (2026-06-08)
+## From [architectural-blueprints-for-sovereign-frankenmoe-part2](/entities/architectural-blueprints-for-sovereign-frankenmoe-part2.md) (2026-06-08)
 - It is used for Production Serving Manifest.
 - It is executed inside the dedicated Proxmox VM.
 - It uses flags like -m, --host, --port, -ngl, --split-mode, --tensor-split, and -ctx.
 
-## From [[drive-research-llamacpp-gpu-memory-reporting-bug|drive-research-llamacpp-gpu-memory-reporting-bug]] (2026-06-08)
+## From [drive-research-llamacpp-gpu-memory-reporting-bug](/entities/drive-research-llamacpp-gpu-memory-reporting-bug.md) (2026-06-08)
 - Executes proxy processes in distributed 'router' or proxy mode.
 - Can consume significant VRAM in router mode without hosting any model.
 
-## From [[drive-research-so-what-is-your-final-model-constellation|drive-research-so-what-is-your-final-model-constellation]] (2026-06-08)
+## From [drive-research-so-what-is-your-final-model-constellation](/entities/drive-research-so-what-is-your-final-model-constellation.md) (2026-06-08)
 - Production Serving Manifest.
 - Used to spin up the unquantized database engine.
 - Supports Layer-Splitting Mode (--split-mode layer).
 
-## From [[drive-research-benchmarking-llamacpp-server-prefill-tokens-micro02|drive-research-benchmarking-llamacpp-server-prefill-tokens-micro02]] (2026-06-09)
+## From [drive-research-benchmarking-llamacpp-server-prefill-tokens-micro02](/entities/drive-research-benchmarking-llamacpp-server-prefill-tokens-micro02.md) (2026-06-09)
 - A common bottleneck occurs when scaling parallel workloads on llama-server.
 - Running identical concurrent workloads on llama-server (-np 32) can degrade total generation throughput.
 - llama-server -m model.gguf --backend-sampling -bs enables experimental GPU-accelerated sampling.
 
-## From [[phantom-drive-autonomous-llm-deployment-architect-micro01|phantom-drive-autonomous-llm-deployment-architect-micro01]] (2026-06-09)
+## From [phantom-drive-autonomous-llm-deployment-architect-micro01](/entities/phantom-drive-autonomous-llm-deployment-architect-micro01.md) (2026-06-09)
 - The static inference binary for the Phantom Drive architecture.
 - Must be compiled fully statically against musl libc.
 - Statically linked binary is expected to be between 22.5 MB and 24.1 MB.
 
-## From [[resilient-rust-based-mcp-client-and-llm-orchestrat-micro06|resilient-rust-based-mcp-client-and-llm-orchestrat-micro06]] (2026-06-09)
+## From [resilient-rust-based-mcp-client-and-llm-orchestrat-micro06](/entities/resilient-rust-based-mcp-client-and-llm-orchestrat-micro06.md) (2026-06-09)
 - Used with agentic frameworks.
 - Core maintainers reverted default serialization behavior.
 - Supports parallel tool calling, but disabled by default.
@@ -59,7 +59,7 @@ Type: TOOL
 - Standalone binary requires careful orchestration for function calling.
 - Offers its own OpenAI-compatible web server built on C/C++ bindings.
 
-## From [[resilient-rust-based-mcp-client-and-llm-orchestrat-micro07|resilient-rust-based-mcp-client-and-llm-orchestrat-micro07]] (2026-06-09)
+## From [resilient-rust-based-mcp-client-and-llm-orchestrat-micro07](/entities/resilient-rust-based-mcp-client-and-llm-orchestrat-micro07.md) (2026-06-09)
 - Receives JSON payload from LangChain.
 - Processes Jinja template.
 - Neural network evaluates context and generates tool call.
@@ -83,24 +83,24 @@ Type: TOOL
 - Insulates systems engineers from manual prompt engineering and raw text parsing.
 - Receives clean, strictly formatted tool_calls arrays directly from inference endpoint.
 
-## From [[drive-research-research-process-steps-micro02|drive-research-research-process-steps-micro02]] (2026-06-10)
+## From [drive-research-research-process-steps-micro02](/entities/drive-research-research-process-steps-micro02.md) (2026-06-10)
 - Modern replacement for the 'server' utility.
 - Lightweight, OpenAI-compatible REST API server.
 
-## From [[optimizing-nvidia-blackwell-sm120-part3-micro01|optimizing-nvidia-blackwell-sm120-part3-micro01]] (2026-06-10)
+## From [optimizing-nvidia-blackwell-sm120-part3-micro01](/entities/optimizing-nvidia-blackwell-sm120-part3-micro01.md) (2026-06-10)
 - Lightweight, OpenAI-compatible REST API server.
 - Modern replacement for the 'server' binary.
 
-## From [[phantom-drive-autonomous-llm-deployment-architect-micro02|phantom-drive-autonomous-llm-deployment-architect-micro02]] (2026-06-10)
+## From [phantom-drive-autonomous-llm-deployment-architect-micro02](/entities/phantom-drive-autonomous-llm-deployment-architect-micro02.md) (2026-06-10)
 - An inference server process.
 - Can be invoked with flags like -c, --cache-type-k, --cache-type-v, and --no-mmap.
 
-## From [[resilient-rust-based-mcp-client-and-llm-orchestrat-micro04|resilient-rust-based-mcp-client-and-llm-orchestrat-micro04]] (2026-06-10)
+## From [resilient-rust-based-mcp-client-and-llm-orchestrat-micro04](/entities/resilient-rust-based-mcp-client-and-llm-orchestrat-micro04.md) (2026-06-10)
 - An inference engine acting as the cognitive core of the proposed system.
 - Contains C++ codebase with reported regex backtracking failures and format leakage.
 - Supports native tool-calling via the /v1/chat/completions endpoint.
 
-## From [[resilient-rust-based-mcp-client-and-llm-orchestrat-micro05|resilient-rust-based-mcp-client-and-llm-orchestrat-micro05]] (2026-06-10)
+## From [resilient-rust-based-mcp-client-and-llm-orchestrat-micro05](/entities/resilient-rust-based-mcp-client-and-llm-orchestrat-micro05.md) (2026-06-10)
 - An HTTP component of llama.cpp.
 - Supports OpenAI-compatible tool calling specification.
 - Uses an embedded Jinja parsing engine called minja.

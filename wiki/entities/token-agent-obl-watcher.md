@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[obolus-micro05|obolus-micro05]] (2026-06-09)
+## From [obolus-micro05](/entities/obolus-micro05.md) (2026-06-09)
 - Monitors, checks, and approves Token consumption (OBL-energy).
 - Goal: Maximize efficiency (η → 1.0) and minimize waste.
 - Monitors session_status and Token-Usage metrics.

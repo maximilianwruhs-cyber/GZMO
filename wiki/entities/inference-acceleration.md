@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-agentic-workflows-fastest-best-models|drive-research-agentic-workflows-fastest-best-models]] (2026-06-08)
+## From [drive-research-agentic-workflows-fastest-best-models](/entities/drive-research-agentic-workflows-fastest-best-models.md) (2026-06-08)
 - High throughput (tokens per second) is required for agentic loops.
 - Speculative decoding frameworks are used for acceleration.
 - Multi-Token Prediction (MTP) is an inference acceleration technique.

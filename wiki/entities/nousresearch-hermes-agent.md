@@ -14,11 +14,11 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[drive-research-hermes-agent-prompt-builder-analysis|drive-research-hermes-agent-prompt-builder-analysis]] (2026-06-08)
+## From [drive-research-hermes-agent-prompt-builder-analysis](/entities/drive-research-hermes-agent-prompt-builder-analysis.md) (2026-06-08)
 - The GitHub repository for the Hermes Agent.
 - Contains various files and documentation related to the project.
 
-## From [[drive-research-hermes-session-storage-migration-analysis|drive-research-hermes-session-storage-migration-analysis]] (2026-06-08)
+## From [drive-research-hermes-session-storage-migration-analysis](/entities/drive-research-hermes-session-storage-migration-analysis.md) (2026-06-08)
 - Sends Tool-Progress-Indicators to the chat.
 - Has a configuration `cleanup_progress: true` to delete progress messages.
 - Architecture requires implementation of an asynchronous delete() method on DiscordAdapter.

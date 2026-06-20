@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part9|ai-research-part9]] (2026-06-08)
+## From [ai-research-part9](/entities/ai-research-part9.md) (2026-06-08)
 - GreenSheep01201/claw-empire lets you orchestrate them visually.
 - ChromeDevTools/chrome-devtools-mcp gives them access to Chrome DevTools.

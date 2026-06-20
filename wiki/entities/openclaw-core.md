@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[openclaw-deep-research-part11-micro06|openclaw-deep-research-part11-micro06]] (2026-06-09)
+## From [openclaw-deep-research-part11-micro06](/entities/openclaw-deep-research-part11-micro06.md) (2026-06-09)
 - Runs work in the background through tasks, scheduled jobs, event hooks, and standing instructions.
 - Uses a Gateway's built-in scheduler for precise timing.
 - Has a background task ledger that tracks all detached work.
@@ -28,6 +28,6 @@ Type: PROJECT
 - Contains configuration modules like `openclaw_core::config`.
 - Has dependencies like `tokio`, `serde`, `reqwest`.
 
-## From [[the-cognitive-architecture-of-openclaw-agents-micro04|the-cognitive-architecture-of-openclaw-agents-micro04]] (2026-06-09)
+## From [the-cognitive-architecture-of-openclaw-agents-micro04](/entities/the-cognitive-architecture-of-openclaw-agents-micro04.md) (2026-06-09)
 - Part of the Cargo workspace.
 - Contains foundational traits, schemas, and LLM API gateway abstractions.

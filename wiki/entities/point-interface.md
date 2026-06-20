@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[high-fidelity-markdown-engineering-and-ast-process|high-fidelity-markdown-engineering-and-ast-process]] (2026-06-08)
+## From [high-fidelity-markdown-engineering-and-ast-process](/entities/high-fidelity-markdown-engineering-and-ast-process.md) (2026-06-08)
 - Interface implemented by start and end properties of Location.
 - Details line and column numbers, and character offset.

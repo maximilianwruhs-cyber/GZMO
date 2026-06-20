@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-agentic-token-economy-blueprint-micro01|drive-research-agentic-token-economy-blueprint-micro01]] (2026-06-09)
+## From [drive-research-agentic-token-economy-blueprint-micro01](/entities/drive-research-agentic-token-economy-blueprint-micro01.md) (2026-06-09)
 - Permanently abandons the append-only log concept.
 - Context is treated as a collection of isolated, immutable segments stored in a dedicated Storage Layer.
 - The active context window is dictated by a 'Manifest'—a list of segment identifiers.

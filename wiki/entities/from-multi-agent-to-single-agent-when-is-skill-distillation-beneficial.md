@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-synthesizing-wisdom-from-heterogeneous-data|drive-research-synthesizing-wisdom-from-heterogeneous-data]] (2026-06-08)
+## From [drive-research-synthesizing-wisdom-from-heterogeneous-data](/entities/drive-research-synthesizing-wisdom-from-heterogeneous-data.md) (2026-06-08)
 - Its benefits are investigated in multi-agent to single-agent transitions.
 - Investigates the benefits of skill distillation.
 - Compares multi-agent to single-agent systems.

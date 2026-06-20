@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-creating-a-comprehensive-readmemd-micro01|drive-research-creating-a-comprehensive-readmemd-micro01]] (2026-06-09)
+## From [drive-research-creating-a-comprehensive-readmemd-micro01](/entities/drive-research-creating-a-comprehensive-readmemd-micro01.md) (2026-06-09)
 - GitHub Flavored Markdown supports specialized blockquote extensions known as Alerts.
 - These are utilized to emphasize critical operational information using standardized colors and iconography.
 - By prefacing a standard blockquote with specific bracketed keywords, authors can generate distinct visual callouts.

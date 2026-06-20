@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro02|the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro02]] (2026-06-09)
+## From [the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro02](/entities/the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro02.md) (2026-06-09)
 - Can be wrapped by OpenClaw as an OpenAI-compatible API.

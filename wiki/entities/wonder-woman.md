@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[the-definitive-pantheon|the-definitive-pantheon]] (2026-06-08)
+## From [the-definitive-pantheon](/entities/the-definitive-pantheon.md) (2026-06-08)
 - Real Name: Princess Diana of Themyscira / Diana Prince
 - Debut: All Star Comics #8 (1941)
 - The definitive female superhero.

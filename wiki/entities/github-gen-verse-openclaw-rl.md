@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[openclaw-deep-research-part9-micro06|openclaw-deep-research-part9-micro06]] (2026-06-09)
+## From [openclaw-deep-research-part9-micro06](/entities/openclaw-deep-research-part9-micro06.md) (2026-06-09)
 - Repository for OpenClaw-RL
 - Description: Train any agent simply by talking

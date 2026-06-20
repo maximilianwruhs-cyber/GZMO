@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-pdf-text-vs-scan-detection-heuristics-micro02|drive-research-pdf-text-vs-scan-detection-heuristics-micro02]] (2026-06-09)
+## From [drive-research-pdf-text-vs-scan-detection-heuristics-micro02](/entities/drive-research-pdf-text-vs-scan-detection-heuristics-micro02.md) (2026-06-09)
 - Primary metric for character density analysis.
 - Calculated by dividing total raw textual payload by an expected threshold.

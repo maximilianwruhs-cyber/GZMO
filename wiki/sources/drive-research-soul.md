@@ -14,21 +14,21 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-08).
 
 ## Entities
-- [[openclaw-autonomy|OpenClaw Autonomy]] (CONCEPT)
-- [[core-truths|Core Truths]] (CONCEPT)
-- [[communication|Communication]] (CONCEPT)
-- [[continuity-workspace-memory|Continuity & Workspace Memory]] (CONCEPT)
-- [[technical-standards|Technical Standards]] (CONCEPT)
-- [[telegram|Telegram]] (TOOL)
-- [[prime-directive|Prime Directive]] (CONCEPT)
-- [[obsidian-vault|Obsidian Vault]] (SYSTEM)
-- [[whatsapp|WhatsApp]] (TOOL)
-- [[signal|Signal]] (TOOL)
-- [[operational-boundaries-security|Operational Boundaries & Security]] (CONCEPT)
-- [[google-takeout|Google Takeout]] (TOOL)
-- [[soul-md|SOUL.md]] (BOOK)
-- [[gzmo|GZMO]] (SYSTEM)
-- [[user|User]] (PERSON)
+- [OpenClaw Autonomy](/entities/openclaw-autonomy.md) (CONCEPT)
+- [Core Truths](/entities/core-truths.md) (CONCEPT)
+- [Communication](/entities/communication.md) (CONCEPT)
+- [Continuity & Workspace Memory](/entities/continuity-workspace-memory.md) (CONCEPT)
+- [Technical Standards](/entities/technical-standards.md) (CONCEPT)
+- [Telegram](/entities/telegram.md) (TOOL)
+- [Prime Directive](/entities/prime-directive.md) (CONCEPT)
+- [Obsidian Vault](/entities/obsidian-vault.md) (SYSTEM)
+- [WhatsApp](/entities/whatsapp.md) (TOOL)
+- [Signal](/entities/signal.md) (TOOL)
+- [Operational Boundaries & Security](/entities/operational-boundaries-security.md) (CONCEPT)
+- [Google Takeout](/entities/google-takeout.md) (TOOL)
+- [SOUL.md](/entities/soul-md.md) (BOOK)
+- [GZMO](/entities/gzmo.md) (SYSTEM)
+- [User](/entities/user.md) (PERSON)
 
 ## Relations
 - SOUL.md → USES → Google Takeout

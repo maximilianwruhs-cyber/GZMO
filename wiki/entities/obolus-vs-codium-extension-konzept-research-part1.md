@@ -14,13 +14,13 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[obolus-vs-codium-extension-konzept-research-part1-micro05|obolus-vs-codium-extension-konzept-research-part1-micro05]] (2026-06-09)
+## From [obolus-vs-codium-extension-konzept-research-part1-micro05](/entities/obolus-vs-codium-extension-konzept-research-part1-micro05.md) (2026-06-09)
 - Market data is processed.
 - Suites can be started via Benchmark Wizard.
 - Price is displayed in the Intelligence Dashboard.
 - Micro-split from a larger document for cloud KG extraction.
 - Part 1 of a research project.
 
-## From [[obolus-vs-codium-extension-konzept-research-part1-micro06|obolus-vs-codium-extension-konzept-research-part1-micro06]] (2026-06-09)
+## From [obolus-vs-codium-extension-konzept-research-part1-micro06](/entities/obolus-vs-codium-extension-konzept-research-part1-micro06.md) (2026-06-09)
 - Document title is obolus-vs-codium-extension-konzept-research-part1 (micro 6/8).
 - Ingests micro-split for cloud KG extraction.

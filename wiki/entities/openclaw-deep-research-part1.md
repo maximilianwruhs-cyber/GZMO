@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[openclaw-deep-research-part1-micro04|openclaw-deep-research-part1-micro04]] (2026-06-09)
+## From [openclaw-deep-research-part1-micro04](/entities/openclaw-deep-research-part1-micro04.md) (2026-06-09)
 - The main project identifier.
 - Contains micro-splits for further processing.
 - Ingests micro-splits for cloud KG extraction.

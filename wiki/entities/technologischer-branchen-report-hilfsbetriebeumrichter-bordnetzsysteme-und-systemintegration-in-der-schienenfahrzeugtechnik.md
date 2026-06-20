@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[drive-research-technologischer-branchen-report-hilfsbetriebeumri-micro02|drive-research-technologischer-branchen-report-hilfsbetriebeumri-micro02]] (2026-06-09)
+## From [drive-research-technologischer-branchen-report-hilfsbetriebeumri-micro02](/entities/drive-research-technologischer-branchen-report-hilfsbetriebeumri-micro02.md) (2026-06-09)
 - Analyzes technological trends in the rail vehicle industry.
 - Covers auxiliary converters, onboard power supply systems, and system integration.
 - Discusses market players, regulatory frameworks, and validation methods.

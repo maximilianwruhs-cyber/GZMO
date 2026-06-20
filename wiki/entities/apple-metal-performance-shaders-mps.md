@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[architectural-strategy-for-stealthy-portable-cli-a|architectural-strategy-for-stealthy-portable-cli-a]] (2026-06-08)
+## From [architectural-strategy-for-stealthy-portable-cli-a](/entities/architectural-strategy-for-stealthy-portable-cli-a.md) (2026-06-08)
 - Specialized hardware accelerator for Apple devices.
 - Discovery requires avoiding system profiler commands.
 - Can be detected using the sysctl interface or checking for /System/Library/Frameworks/Metal.framework.

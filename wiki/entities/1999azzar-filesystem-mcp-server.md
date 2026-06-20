@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-proxmox-agent-data-storage-micro03|drive-research-proxmox-agent-data-storage-micro03]] (2026-06-09)
+## From [drive-research-proxmox-agent-data-storage-micro03](/entities/drive-research-proxmox-agent-data-storage-micro03.md) (2026-06-09)
 - Proxied by the gateway to LXC 100.
 - Normalizes the path.
 - Verifies that the path resides within the allowed host-mounted directory.

@@ -14,20 +14,20 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-10).
 
 ## Entities
-- [[openclaw|OpenClaw]] (SYSTEM)
-- [[heartbeat|Heartbeat]] (CONCEPT)
-- [[cron|Cron]] (CONCEPT)
-- [[node|Node]] (SYSTEM)
-- [[claude-opus-4-6|Claude Opus 4.6]] (SYSTEM)
-- [[docker|Docker]] (TOOL)
-- [[hooks|Hooks]] (CONCEPT)
-- [[skills|Skills]] (CONCEPT)
-- [[sub-agent|Sub-agent]] (SYSTEM)
-- [[gateway|Gateway]] (SYSTEM)
-- [[aws-bedrock|AWS Bedrock]] (ORGANIZATION)
-- [[plugins|Plugins]] (CONCEPT)
-- [[telegram|Telegram]] (TOOL)
-- [[loki|Loki]] (SYSTEM)
+- [OpenClaw](/entities/openclaw.md) (SYSTEM)
+- [Heartbeat](/entities/heartbeat.md) (CONCEPT)
+- [Cron](/entities/cron.md) (CONCEPT)
+- [Node](/entities/node.md) (SYSTEM)
+- [Claude Opus 4.6](/entities/claude-opus-4-6.md) (SYSTEM)
+- [Docker](/entities/docker.md) (TOOL)
+- [Hooks](/entities/hooks.md) (CONCEPT)
+- [Skills](/entities/skills.md) (CONCEPT)
+- [Sub-agent](/entities/sub-agent.md) (SYSTEM)
+- [Gateway](/entities/gateway.md) (SYSTEM)
+- [AWS Bedrock](/entities/aws-bedrock.md) (ORGANIZATION)
+- [Plugins](/entities/plugins.md) (CONCEPT)
+- [Telegram](/entities/telegram.md) (TOOL)
+- [Loki](/entities/loki.md) (SYSTEM)
 
 ## Relations
 - Loki → PART_OF → OpenClaw

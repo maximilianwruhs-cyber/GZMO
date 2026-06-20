@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[building-a-private-local-ai-development-environmen-micro03|building-a-private-local-ai-development-environmen-micro03]] (2026-06-09)
+## From [building-a-private-local-ai-development-environmen-micro03](/entities/building-a-private-local-ai-development-environmen-micro03.md) (2026-06-09)
 - The primary bottleneck in local inference speed
 - Relates to the speed of data transfer from RAM to GPU
 - Speculative Decoding aims to overcome this bottleneck

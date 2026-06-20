@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-unfold-a-comprehensive-step-by-step-implementation|drive-research-unfold-a-comprehensive-step-by-step-implementation]] (2026-06-08)
+## From [drive-research-unfold-a-comprehensive-step-by-step-implementation](/entities/drive-research-unfold-a-comprehensive-step-by-step-implementation.md) (2026-06-08)
 - Define a strict type system for communication envelopes (TASK, REPORT, ISSUE).
 - Includes types for EnvelopeState and Envelope.
 - Used to implement a dialectical, stateful protocol.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[prompt-agent-engineering-part1|prompt-agent-engineering-part1]] (2026-06-08)
+## From [prompt-agent-engineering-part1](/entities/prompt-agent-engineering-part1.md) (2026-06-08)
 - Phase 2 of the Elite UI/UX Web Design Prompt.
 - Breaks down the web page layout section by section.
 - Describes spatial arrangement, grid structure, and content hierarchy.

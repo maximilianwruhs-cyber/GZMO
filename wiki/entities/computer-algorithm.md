@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-setting-up-autonomous-trading-agents-micro05|drive-research-setting-up-autonomous-trading-agents-micro05]] (2026-06-09)
+## From [drive-research-setting-up-autonomous-trading-agents-micro05](/entities/drive-research-setting-up-autonomous-trading-agents-micro05.md) (2026-06-09)
 - Automatically determines individual parameters of orders in algorithmic trading.
 - Can determine parameters with limited or no human intervention.

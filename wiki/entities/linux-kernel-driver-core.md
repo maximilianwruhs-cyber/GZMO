@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-automating-linux-hardware-detection-micro01|drive-research-automating-linux-hardware-detection-micro01]] (2026-06-09)
+## From [drive-research-automating-linux-hardware-detection-micro01](/entities/drive-research-automating-linux-hardware-detection-micro01.md) (2026-06-09)
 - The process begins deep within the kernel driver core as physical silicon is probed.
 - The driver core then triggers the generation of a userspace event notification known as a uevent.
 - Strictly responsible for detecting physical state changes and loading device drivers.

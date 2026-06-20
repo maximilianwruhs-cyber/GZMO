@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-autonomous-devops-ai-safety-boundaries|drive-research-autonomous-devops-ai-safety-boundaries]] (2026-06-08)
+## From [drive-research-autonomous-devops-ai-safety-boundaries](/entities/drive-research-autonomous-devops-ai-safety-boundaries.md) (2026-06-08)
 - Extensible Scheduler Class.
 - Enables custom kernel thread schedulers as BPF programs.
 - Allows dynamic loading, modification, and unloading at runtime.

@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-deep-dive-google-antigravity-architecture1|drive-research-deep-dive-google-antigravity-architecture1]] (2026-06-08)
+## From [drive-research-deep-dive-google-antigravity-architecture1](/entities/drive-research-deep-dive-google-antigravity-architecture1.md) (2026-06-08)
 - An issue tracking system.
 - An example of an external resource used by modern enterprise software architecture.
 
-## From [[google-antigravity-the-architects-configuration-micro03|google-antigravity-the-architects-configuration-micro03]] (2026-06-10)
+## From [google-antigravity-the-architects-configuration-micro03](/entities/google-antigravity-the-architects-configuration-micro03.md) (2026-06-10)
 - External system that can be integrated via MCP.
 - Allows agents to query ticket definitions and acceptance criteria.

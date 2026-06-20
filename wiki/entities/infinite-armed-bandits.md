@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part3-micro03|ai-research-part3-micro03]] (2026-06-09)
+## From [ai-research-part3-micro03](/entities/ai-research-part3-micro03.md) (2026-06-09)
 - capture the explore-discover tradeoff
 - typically model discoveries as i.i.d. draws from a reservoir
 - missing tree structure, and hierarchical dependencies

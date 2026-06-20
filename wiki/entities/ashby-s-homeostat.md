@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[beyond-the-dark-room-allostatic-regulation-and-co|beyond-the-dark-room-allostatic-regulation-and-co]] (2026-06-08)
+## From [beyond-the-dark-room-allostatic-regulation-and-co](/entities/beyond-the-dark-room-allostatic-regulation-and-co.md) (2026-06-08)
 - It was an early artificial agent that mechanized the biological principle of homeostasis.
 - It sought to maintain a rigid steady state in the face of continuously varying environmental inputs.
 - It implemented circular, nonlinear feedback loops.

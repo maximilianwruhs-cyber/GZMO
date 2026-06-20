@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-mcp-landscape-research-report|drive-research-mcp-landscape-research-report]] (2026-06-08)
+## From [drive-research-mcp-landscape-research-report](/entities/drive-research-mcp-landscape-research-report.md) (2026-06-08)
 - Provides the ability to read, write, and traverse local directories.
 - Essential baseline for coding agents needing to manipulate local files.
 - Configurable access controls allow scoping to specific directories.

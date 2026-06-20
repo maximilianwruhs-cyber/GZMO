@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[the-architecture-of-a-trading-card-game-micro02|the-architecture-of-a-trading-card-game-micro02]] (2026-06-09)
+## From [the-architecture-of-a-trading-card-game-micro02](/entities/the-architecture-of-a-trading-card-game-micro02.md) (2026-06-09)
 - Creator of Magic: The Gathering.
 - Initial design assumptions were based on localized playgroups.

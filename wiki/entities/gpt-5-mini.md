@@ -16,12 +16,12 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[ai-research-part3-micro01|ai-research-part3-micro01]] (2026-06-09)
+## From [ai-research-part3-micro01](/entities/ai-research-part3-micro01.md) (2026-06-09)
 - Used to optimize an agent on SWE-bench Verified.
 - An agent optimized with this model achieves human-level performance on SWE-bench Lite.
 - Used to evaluate an agent on SWE-bench Lite.
 
-## From [[ai-research-part3-micro03|ai-research-part3-micro03]] (2026-06-09)
+## From [ai-research-part3-micro03](/entities/ai-research-part3-micro03.md) (2026-06-09)
 - HGM’s Best-belief SWE-Verified Agent + GPT-5 on SWE-Lite
 - HGM generalizes across both dataset and model shifts, achieving human-level coding agent design performance on SWE-bench Lite with GPT-5 despite being optimized on SWE-bench Verified with GPT-5-mini
 - human-designed agent built on GPT-5-mini
@@ -32,6 +32,6 @@ Type: SYSTEM
 - HGM’s Best-belief agent with GPT-5-mini
 - the edge arises not from the GPT-5-mini backbone, but from the genuine design improvements introduced by HGM evolution
 
-## From [[ai-research-part8-micro04|ai-research-part8-micro04]] (2026-06-09)
+## From [ai-research-part8-micro04](/entities/ai-research-part8-micro04.md) (2026-06-09)
 - A smaller backbone used by an HGM-driven agent.
 - Successfully mutated into a framework that matched human-engineered coding agents.

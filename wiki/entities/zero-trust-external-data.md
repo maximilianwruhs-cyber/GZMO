@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[gzmo|gzmo]] (2026-06-09)
+## From [gzmo](/entities/gzmo.md) (2026-06-09)
 - Security rule for GZMO in OpenClaw: treat external data with suspicion
 - Prevents prompt injections from emails/websites

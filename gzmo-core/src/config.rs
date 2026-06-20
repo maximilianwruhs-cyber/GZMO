@@ -2129,6 +2129,19 @@ pub struct ComplianceConfig {
 
     #[serde(default = "default_max_workspace_deps")]
     pub max_workspace_deps: usize,
+
+    /// Permanent network exception tier (Tier 2 SND): always allowed outbound even in sovereign mode.
+    #[serde(default = "default_network_exceptions")]
+    pub network_exceptions: Vec<String>,
+}
+
+fn default_network_exceptions() -> Vec<String> {
+    vec![
+        "web_search".into(),
+        "web_read".into(),
+        "agent-reach".into(),
+        "arxiv".into(),
+    ]
 }
 
 fn default_compliance_mode() -> String {
@@ -2157,6 +2170,7 @@ impl Default for ComplianceConfig {
             trusted_cidrs: default_trusted_cidrs(),
             max_binary_mb: default_max_binary_mb(),
             max_workspace_deps: default_max_workspace_deps(),
+            network_exceptions: default_network_exceptions(),
         }
     }
 }

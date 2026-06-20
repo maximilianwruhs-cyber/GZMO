@@ -14,9 +14,9 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[obolus-vs-codium-extension-konzept-research-part1-micro04|obolus-vs-codium-extension-konzept-research-part1-micro04]] (2026-06-09)
+## From [obolus-vs-codium-extension-konzept-research-part1-micro04](/entities/obolus-vs-codium-extension-konzept-research-part1-micro04.md) (2026-06-09)
 - FastAPI's WebSocket implementation comes from Starlette.
 - Provides the WebSocket object.
 
-## From [[obolus-vs-codium-extension-konzept-research-part1-micro05|obolus-vs-codium-extension-konzept-research-part1-micro05]] (2026-06-09)
+## From [obolus-vs-codium-extension-konzept-research-part1-micro05](/entities/obolus-vs-codium-extension-konzept-research-part1-micro05.md) (2026-06-09)
 - Documentation for WebSocket class and class-based WebSocket handling is available.

@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[dynamics-of-the-unpredictable-micro04|dynamics-of-the-unpredictable-micro04]] (2026-06-09)
+## From [dynamics-of-the-unpredictable-micro04](/entities/dynamics-of-the-unpredictable-micro04.md) (2026-06-09)
 - Minimalist SPNs are deployed alongside CFBC ciphers.
 - They are used in standard Cipher Block Chaining (CBC) modes.

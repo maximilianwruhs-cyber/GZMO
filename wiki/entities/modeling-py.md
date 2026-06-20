@@ -14,12 +14,12 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-recursivemas-add-info|drive-research-recursivemas-add-info]] (2026-06-08)
+## From [drive-research-recursivemas-add-info](/entities/drive-research-recursivemas-add-info.md) (2026-06-08)
 - The core of the innovation.
 - Defines the RecursiveLink modules.
 - Implemented as two-layer MLPs with LayerNorm and residual connections.
 
-## From [[architectures-and-optimizations-for-speculative-de-micro03|architectures-and-optimizations-for-speculative-de-micro03]] (2026-06-09)
+## From [architectures-and-optimizations-for-speculative-de-micro03](/entities/architectures-and-optimizations-for-speculative-de-micro03.md) (2026-06-09)
 - The core of the innovation.
 - RecursiveLink modules are defined here.
 - Implemented as two-layer MLPs with LayerNorm and residual connections.

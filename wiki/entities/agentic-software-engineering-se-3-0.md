@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-agentic-reverse-engineering-state-and-future1-micro01|drive-research-agentic-reverse-engineering-state-and-future1-micro01]] (2026-06-09)
+## From [drive-research-agentic-reverse-engineering-state-and-future1-micro01](/entities/drive-research-agentic-reverse-engineering-state-and-future1-micro01.md) (2026-06-09)
 - A phase characterized by intelligent agents.
 - Agents are capable of achieving complex, goal-oriented objectives.
 - Agents execute tasks through continuous environmental perception, long-term planning, dynamic tool orchestration, and recursive reflection.

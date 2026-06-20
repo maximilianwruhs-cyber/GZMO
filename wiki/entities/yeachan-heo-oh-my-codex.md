@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[ai-research-part9|ai-research-part9]] (2026-06-08)
+## From [ai-research-part9](/entities/ai-research-part9.md) (2026-06-08)
 - Orchestration layer designed to extend the OpenAI Codex CLI.
 - Provides structured teamwork and automated workflows.
 
-## From [[ai-research-part8-micro08|ai-research-part8-micro08]] (2026-06-09)
+## From [ai-research-part8-micro08](/entities/ai-research-part8-micro08.md) (2026-06-09)
 - Also known as OmX.
 - An orchestration layer extending the OpenAI Codex CLI.

@@ -17,7 +17,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[the-architecture-of-scientific-inquiry-and-academi|the-architecture-of-scientific-inquiry-and-academi]] (2026-06-08)
+## From [the-architecture-of-scientific-inquiry-and-academi](/entities/the-architecture-of-scientific-inquiry-and-academi.md) (2026-06-08)
 - A WYSIWYG (What You See Is What You Get) word processor.
 - Generally preferred for humanities, short documents, quick drafts, and collaborative environments.
 - Has a low barrier to entry and robust track-changes capabilities.
@@ -27,18 +27,18 @@ Type: TOOL
 - Ultimate guide for academic writing with LaTeX by inscrive.io
 - Comparison with LaTeX for scientific papers by Chuniversiteit
 
-## From [[drive-research-die-architektur-der-wissenschaftlichen-forschung|drive-research-die-architektur-der-wissenschaftlichen-forschung]] (2026-06-08)
+## From [drive-research-die-architektur-der-wissenschaftlichen-forschung](/entities/drive-research-die-architektur-der-wissenschaftlichen-forschung.md) (2026-06-08)
 - WYSIWYG (What You See Is What You Get) word processor
 - Generally preferred for humanities, short documents, and collaborative environments
 - Struggles with long documents and complex mathematical notation
 
-## From [[drive-research-research-project-initiation-guide|drive-research-research-project-initiation-guide]] (2026-06-08)
+## From [drive-research-research-project-initiation-guide](/entities/drive-research-research-project-initiation-guide.md) (2026-06-08)
 - Used by EndNote, Mendeley, Paperpile, Juris-M, RefWorks.
 
-## From [[drive-research-scientific-writing-and-publication-process-micro02|drive-research-scientific-writing-and-publication-process-micro02]] (2026-06-09)
+## From [drive-research-scientific-writing-and-publication-process-micro02](/entities/drive-research-scientific-writing-and-publication-process-micro02.md) (2026-06-09)
 - A WYSIWYG word processor.
 - Generally preferred for humanities, short documents, quick drafts, and collaborative environments.
 - Struggles with lengthy documents, extensive cross-referencing, and complex mathematical notation.
 
-## From [[drive-research-scientific-writing-and-publication-process-micro04|drive-research-scientific-writing-and-publication-process-micro04]] (2026-06-09)
+## From [drive-research-scientific-writing-and-publication-process-micro04](/entities/drive-research-scientific-writing-and-publication-process-micro04.md) (2026-06-09)
 - compared to LaTeX for academic writing

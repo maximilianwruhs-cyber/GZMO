@@ -15,7 +15,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[architectural-blueprints-for-sovereign-frankenmoe-part1|architectural-blueprints-for-sovereign-frankenmoe-part1]] (2026-06-08)
+## From [architectural-blueprints-for-sovereign-frankenmoe-part1](/entities/architectural-blueprints-for-sovereign-frankenmoe-part1.md) (2026-06-08)
 - It is a structural compression and fusion technique for MoEs.
 - It integrates Layer-Selective Rank Reduction (LASER) with the Marchenko-Pastur law from Random Matrix Theory.
 - It identifies and prunes redundant noise components inside weight matrices.
@@ -23,14 +23,14 @@ Type: CONCEPT
 - It combines Layer-Selective Rank Reduction (LASER) with the Marchenko-Pastur law.
 - It identifies and prunes redundant components (noise) within the model's weight matrices.
 
-## From [[drive-research-frankenmoe-blueprint-analysis|drive-research-frankenmoe-blueprint-analysis]] (2026-06-08)
+## From [drive-research-frankenmoe-blueprint-analysis](/entities/drive-research-frankenmoe-blueprint-analysis.md) (2026-06-08)
 - Integrates Layer-Selective Rank Reduction (LASER) with Marchenko-Pastur law.
 - Analyzes weight matrices of transformer layers.
 - Identifies and prunes redundant noise components.
 - Integrates Layer-Selective Rank Reduction (LASER) with the Marchenko-Pastur law.
 - Identifies and prunes redundant noise components inside weight matrices.
 
-## From [[drive-research-mergekit-moe-model-creation-guide|drive-research-mergekit-moe-model-creation-guide]] (2026-06-08)
+## From [drive-research-mergekit-moe-model-creation-guide](/entities/drive-research-mergekit-moe-model-creation-guide.md) (2026-06-08)
 - An optimization protocol integrated into merging pipelines.
 - Combines Layer-Selective Rank Reduction (LASER) with the Marchenko-Pastur law.
 - Shrinks the model's complexity and parameter footprint.

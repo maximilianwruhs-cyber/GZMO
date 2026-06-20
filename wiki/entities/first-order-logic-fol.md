@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-neuro-symbolic-prompt-engineering-research|drive-research-neuro-symbolic-prompt-engineering-research]] (2026-06-08)
+## From [drive-research-neuro-symbolic-prompt-engineering-research](/entities/drive-research-neuro-symbolic-prompt-engineering-research.md) (2026-06-08)
 - Provides a formal mathematical language for representing objects, predicates, and relations.
 - Allows for rigorous deduction via rules like Modus Ponens.
 - Used to validate the consistency of premises and conclusions.

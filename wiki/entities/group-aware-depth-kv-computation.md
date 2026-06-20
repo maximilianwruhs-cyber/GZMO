@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part5|ai-research-part5]] (2026-06-08)
+## From [ai-research-part5](/entities/ai-research-part5.md) (2026-06-08)
 - Leverages the mapping Tq = G*Tkv where adjacent query rows share the same base-time index.
 - Reduces the required depth span by reusing depth KV blocks.

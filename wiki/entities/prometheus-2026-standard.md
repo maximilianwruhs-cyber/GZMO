@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[obolus-micro05|obolus-micro05]] (2026-06-09)
+## From [obolus-micro05](/entities/obolus-micro05.md) (2026-06-09)
 - Standard for native Composite Types.
 - Used for Monitoring-Konzept.
 - Has OpenAPI 3.2 specification.

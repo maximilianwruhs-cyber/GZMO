@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[prompt-agent-engineering-part7-micro05|prompt-agent-engineering-part7-micro05]] (2026-06-09)
+## From [prompt-agent-engineering-part7-micro05](/entities/prompt-agent-engineering-part7-micro05.md) (2026-06-09)
 - Palo Alto PAN-OS is a required vendor/OS for network simulation.
 - Palo Alto firewalls are supported by EVE-NG.

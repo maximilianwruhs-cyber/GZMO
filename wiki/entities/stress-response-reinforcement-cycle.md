@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-architecture-of-engagement-an-analysis-of-gam-micro04|the-architecture-of-engagement-an-analysis-of-gam-micro04]] (2026-06-09)
+## From [the-architecture-of-engagement-an-analysis-of-gam-micro04](/entities/the-architecture-of-engagement-an-analysis-of-gam-micro04.md) (2026-06-09)
 - A vicious cycle described by the I-PACE model.
 - Individual turns back to digital device for immediate emotional relief.
 - Reinforces problematic dependency on the platform.

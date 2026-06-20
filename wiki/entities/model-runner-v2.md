@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-hidden-mode-technical-analysis-and-configurati|drive-research-hidden-mode-technical-analysis-and-configurati]] (2026-06-08)
+## From [drive-research-hidden-mode-technical-analysis-and-configurati](/entities/drive-research-hidden-mode-technical-analysis-and-configurati.md) (2026-06-08)
 - Explicitly enabled via VLLM_USE_V2_MODEL_RUNNER=1.
 - Uses GPU-native Triton kernels and asynchronous scheduling to improve throughput.
 - An optimization within vLLM for model serving.

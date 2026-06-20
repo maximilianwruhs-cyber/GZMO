@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-agentic-token-economy-blueprint-micro01|drive-research-agentic-token-economy-blueprint-micro01]] (2026-06-09)
+## From [drive-research-agentic-token-economy-blueprint-micro01](/entities/drive-research-agentic-token-economy-blueprint-micro01.md) (2026-06-09)
 - Orchestration layer must run payloads through an aggressive minifier before passing them to the model.
 - Strips all formatting, removing unnecessary whitespace, empty lines, and verbose inline comments.
 - Relies on local tools to parse terminal output, grabbing only relevant information.

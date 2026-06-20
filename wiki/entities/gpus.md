@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-advanced-inference-acceleration|drive-research-advanced-inference-acceleration]] (2026-06-08)
+## From [drive-research-advanced-inference-acceleration](/entities/drive-research-advanced-inference-acceleration.md) (2026-06-08)
 - Modern AI accelerators.
 - Can be memory-bandwidth bound during decoding.
 - Consumer GPUs like NVIDIA RTX 4060 with 8GB VRAM can host small models.

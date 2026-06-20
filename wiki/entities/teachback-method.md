@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[cybernetics-and-mythos-the-architecture-of-intell-part1|cybernetics-and-mythos-the-architecture-of-intell-part1]] (2026-06-08)
+## From [cybernetics-and-mythos-the-architecture-of-intell-part1](/entities/cybernetics-and-mythos-the-architecture-of-intell-part1.md) (2026-06-08)
 - A critical cybernetic mechanism proposed by Pask.
 - One participant actively demonstrates or verbally reconstructs their understanding to another.
 - Aims to verify alignment and reduce semantic noise.

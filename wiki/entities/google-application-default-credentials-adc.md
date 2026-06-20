@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-deep-dive-google-antigravity-architecture1|drive-research-deep-dive-google-antigravity-architecture1]] (2026-06-08)
+## From [drive-research-deep-dive-google-antigravity-architecture1](/entities/drive-research-deep-dive-google-antigravity-architecture1.md) (2026-06-08)
 - Natively supported for deep integration with Google Cloud services.
 - A type of authentication protocol managed by MCP.

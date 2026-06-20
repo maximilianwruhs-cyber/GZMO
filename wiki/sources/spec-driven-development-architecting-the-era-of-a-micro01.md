@@ -14,4 +14,4 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[spec-driven-development-architecting-the-era-of-a|spec-driven-development-architecting-the-era-of-a]] (CONCEPT)
+- [spec-driven-development-architecting-the-era-of-a](/entities/spec-driven-development-architecting-the-era-of-a.md) (CONCEPT)

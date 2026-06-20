@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[the-archival-truth-part1-micro07|the-archival-truth-part1-micro07]] (2026-06-09)
+## From [the-archival-truth-part1-micro07](/entities/the-archival-truth-part1-micro07.md) (2026-06-09)
 - Is a venue in Vienna where the 'Comedy Factory' open mic is held every Saturday.

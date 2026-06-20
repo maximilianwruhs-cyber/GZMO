@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[from-static-vaults-to-autonomous-knowledge-engines|from-static-vaults-to-autonomous-knowledge-engines]] (2026-06-08)
+## From [from-static-vaults-to-autonomous-knowledge-engines](/entities/from-static-vaults-to-autonomous-knowledge-engines.md) (2026-06-08)
 - It is a plugin for scriptural cross-referencing.
 - It automates rigorous, standardized citation formats within specialized fields.
 - It has an extremely narrow scope and its logic is hardcoded to specific external APIs or text patterns.

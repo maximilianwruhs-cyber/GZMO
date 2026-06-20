@@ -14,8 +14,8 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[drive-research-agentic-token-economy-blueprint-micro03|drive-research-agentic-token-economy-blueprint-micro03]] (2026-06-09)
+## From [drive-research-agentic-token-economy-blueprint-micro03](/entities/drive-research-agentic-token-economy-blueprint-micro03.md) (2026-06-09)
 - Hosts article on Zero-Waste Agentic RAG
 
-## From [[openclaw-deep-research-part8-micro04|openclaw-deep-research-part8-micro04]] (2026-06-09)
+## From [openclaw-deep-research-part8-micro04](/entities/openclaw-deep-research-part8-micro04.md) (2026-06-09)
 - Independent reviews from sources like Towards Data Science are used for analysis.

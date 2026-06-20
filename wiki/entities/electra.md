@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-subword-tokenization-mitigates-llm-sparsity-micro02|drive-research-subword-tokenization-mitigates-llm-sparsity-micro02]] (2026-06-09)
+## From [drive-research-subword-tokenization-mitigates-llm-sparsity-micro02](/entities/drive-research-subword-tokenization-mitigates-llm-sparsity-micro02.md) (2026-06-09)
 - WordPiece was widely popularized by the BERT family of language models.

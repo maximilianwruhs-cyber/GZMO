@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[migrating-openclaw-to-vercel-ai-sdk-for-local-llm|migrating-openclaw-to-vercel-ai-sdk-for-local-llm]] (2026-06-08)
+## From [migrating-openclaw-to-vercel-ai-sdk-for-local-llm](/entities/migrating-openclaw-to-vercel-ai-sdk-for-local-llm.md) (2026-06-08)
 - A lifecycle callback.
 - Allows developers to inject detailed telemetry logging.
 - Records exact execution durations, argument payloads, and error traces.

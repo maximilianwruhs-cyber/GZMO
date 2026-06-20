@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-markitdown-format-parity-checklist|drive-research-markitdown-format-parity-checklist]] (2026-06-08)
+## From [drive-research-markitdown-format-parity-checklist](/entities/drive-research-markitdown-format-parity-checklist.md) (2026-06-08)
 - External APIs used by markitdown-ocr for visual text extraction.
 - The markitdown-ocr plugin formulates network requests to these APIs.
 - MarkItDown facilitates seamless automated data ingestion workflows for LLM processing pipelines.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[the-definitive-pantheon|the-definitive-pantheon]] (2026-06-08)
+## From [the-definitive-pantheon](/entities/the-definitive-pantheon.md) (2026-06-08)
 - Real Name: Thor Odinson
 - Debut: Journey into Mystery #83 (1962)
 - Marvel brought a literal god into the superhero mix by adapting Norse mythology.

@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[resilient-rust-based-mcp-client-and-llm-orchestrat-micro02|resilient-rust-based-mcp-client-and-llm-orchestrat-micro02]] (2026-06-10)
+## From [resilient-rust-based-mcp-client-and-llm-orchestrat-micro02](/entities/resilient-rust-based-mcp-client-and-llm-orchestrat-micro02.md) (2026-06-10)
 - HTTP client used by Bollard for all HTTP transactions.

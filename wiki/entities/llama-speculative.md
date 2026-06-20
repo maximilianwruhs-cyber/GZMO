@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-research-process-steps-micro02|drive-research-research-process-steps-micro02]] (2026-06-10)
+## From [drive-research-research-process-steps-micro02](/entities/drive-research-research-process-steps-micro02.md) (2026-06-10)
 - Modern replacement for 'speculative'.
 - Orchestrates draft-and-target model speculative decoding.

@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[obolus-micro05|obolus-micro05]] (2026-06-09)
+## From [obolus-micro05](/entities/obolus-micro05.md) (2026-06-09)
 - Template to be created by Docker-Architect.
 - Syntax to be validated by System Hygiene Agent.

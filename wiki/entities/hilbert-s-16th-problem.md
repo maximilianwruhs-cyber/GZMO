@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[dynamics-of-the-unpredictable-micro04|dynamics-of-the-unpredictable-micro04]] (2026-06-09)
+## From [dynamics-of-the-unpredictable-micro04](/entities/dynamics-of-the-unpredictable-micro04.md) (2026-06-09)
 - This is Smale's 13th Problem.
 - It remains unresolved even for algebraic curves with a degree as low as 8.

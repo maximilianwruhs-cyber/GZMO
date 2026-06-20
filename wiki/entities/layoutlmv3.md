@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-token-efficient-bol-processing-architecture|drive-research-token-efficient-bol-processing-architecture]] (2026-06-08)
+## From [drive-research-token-efficient-bol-processing-architecture](/entities/drive-research-token-efficient-bol-processing-architecture.md) (2026-06-08)
 - A prominent multimodal transformer that jointly models text and image features.
 - Utilizes word-image alignment to map text directly to its spatial bounding box.
 - Enables the model to understand complex forms.

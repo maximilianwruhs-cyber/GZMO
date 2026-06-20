@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-erbandbreite-und-latenzengp-sse|drive-research-erbandbreite-und-latenzengpässe]] (2026-06-08)
+## From [drive-research-erbandbreite-und-latenzengpässe](/entities/drive-research-erbandbreite-und-latenzengp-sse.md) (2026-06-08)
 - customized kernels implemented by BASS
 - engineered to handle ragged tensors directly during attention calculation

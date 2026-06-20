@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-nvar-financial-forecasting-parameter-search|drive-research-nvar-financial-forecasting-parameter-search]] (2026-06-08)
+## From [drive-research-nvar-financial-forecasting-parameter-search](/entities/drive-research-nvar-financial-forecasting-parameter-search.md) (2026-06-08)
 - Are implemented in high-dimensional environments.
 - Penalize non-essential polynomial features via Lasso-type shrinkage.
 - Isolate key network pathways.

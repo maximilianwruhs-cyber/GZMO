@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[gzmo-chaos-engine-architecture-audit-and-behaviora|gzmo-chaos-engine-architecture-audit-and-behaviora]] (2026-06-08)
+## From [gzmo-chaos-engine-architecture-audit-and-behaviora](/entities/gzmo-chaos-engine-architecture-audit-and-behaviora.md) (2026-06-08)
 - Runs but does not emit events to the chaos engine
 - Proposed to emit self_ask_completed event
 - Scheduling is proposed to be chaos-responsive

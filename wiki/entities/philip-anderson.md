@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[dynamics-of-the-unpredictable-micro03|dynamics-of-the-unpredictable-micro03]] (2026-06-09)
+## From [dynamics-of-the-unpredictable-micro03](/entities/dynamics-of-the-unpredictable-micro03.md) (2026-06-09)
 - Summarized the paradigm of complex systems with 'more is different'.

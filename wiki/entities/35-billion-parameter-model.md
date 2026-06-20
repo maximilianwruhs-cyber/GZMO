@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-linux-gaming-and-ai-build-guide-micro01|drive-research-linux-gaming-and-ai-build-guide-micro01]] (2026-06-09)
+## From [drive-research-linux-gaming-and-ai-build-guide-micro01](/entities/drive-research-linux-gaming-and-ai-build-guide-micro01.md) (2026-06-09)
 - Requires approximately 21.67GB of VRAM at Q4_K_M quantization for weights and a 32K context window.
 - Pushing context to 262K tokens forces VRAM consumption to 27.3GB.
 - Can be deployed locally on a Linux workstation with sufficient VRAM.

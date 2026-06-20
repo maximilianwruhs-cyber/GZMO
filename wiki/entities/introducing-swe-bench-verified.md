@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part3-micro03|ai-research-part3-micro03]] (2026-06-09)
+## From [ai-research-part3-micro03](/entities/ai-research-part3-micro03.md) (2026-06-09)
 - leaderboard
 - HGM discovered an optimized agent that solves 61.4% tasks, surpassing the best human-designed agent built on GPT-5-mini on the SWE-Verified leaderboard
 - HGM’s self-evolution produces agents with stronger general coding ability, rather than overfitting to SWE-Verified

@@ -14,8 +14,8 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[drive-research-the-anatomy-of-a-world-class-readme|drive-research-the-anatomy-of-a-world-class-readme]] (2026-06-08)
+## From [drive-research-the-anatomy-of-a-world-class-readme](/entities/drive-research-the-anatomy-of-a-world-class-readme.md) (2026-06-08)
 - Uses a philosophical essay format for documentation.
 
-## From [[drive-research-creating-a-comprehensive-readmemd-micro03|drive-research-creating-a-comprehensive-readmemd-micro03]] (2026-06-09)
+## From [drive-research-creating-a-comprehensive-readmemd-micro03](/entities/drive-research-creating-a-comprehensive-readmemd-micro03.md) (2026-06-09)
 - Documentation stands out by adopting a highly unconventional, well-written philosophical essay format, focusing deeply on the technological paradigm and how it fits into the broader ecosystem, rather than rushing straight to installation commands.

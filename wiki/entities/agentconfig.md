@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[openclaw-deep-research-part11-micro06|openclaw-deep-research-part11-micro06]] (2026-06-09)
+## From [openclaw-deep-research-part11-micro06](/entities/openclaw-deep-research-part11-micro06.md) (2026-06-09)
 - Represents Agent configurations.
 - Stored in a HashMap keyed by agent ID within the `Config` struct.

@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-llm-inference-engine-audit-2026-micro02|drive-research-llm-inference-engine-audit-2026-micro02]] (2026-06-09)
+## From [drive-research-llm-inference-engine-audit-2026-micro02](/entities/drive-research-llm-inference-engine-audit-2026-micro02.md) (2026-06-09)
 - Smaller models utilized by Panther Lake for AI agent tasks.

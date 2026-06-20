@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[the-archival-truth-part1-micro07|the-archival-truth-part1-micro07]] (2026-06-09)
+## From [the-archival-truth-part1-micro07](/entities/the-archival-truth-part1-micro07.md) (2026-06-09)
 - Is a foundational acting and improv workshop offered at Kulturschloss Tabor.

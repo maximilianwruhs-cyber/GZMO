@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[prompt-agent-engineering-part2-micro02|prompt-agent-engineering-part2-micro02]] (2026-06-09)
+## From [prompt-agent-engineering-part2-micro02](/entities/prompt-agent-engineering-part2-micro02.md) (2026-06-09)
 - Used by the Visual Systems Extractor for minimal code.

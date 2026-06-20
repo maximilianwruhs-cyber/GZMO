@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-erbandbreite-und-latenzengp-sse|drive-research-erbandbreite-und-latenzengpässe]] (2026-06-08)
+## From [drive-research-erbandbreite-und-latenzengpässe](/entities/drive-research-erbandbreite-und-latenzengp-sse.md) (2026-06-08)
 - advanced scheduler that dynamically regroups sequences by accepted length into uniform micro-batches
 - abandons strict matrix realignment entirely
 - maintains a sliding pool of sequences
@@ -22,7 +22,7 @@ Type: TOOL
 - bypasses padding overhead
 - maintains significant throughput improvements even at high batch sizes
 
-## From [[the-architecture-of-speculative-decoding-and-infer-part2-micro02|the-architecture-of-speculative-decoding-and-infer-part2-micro02]] (2026-06-09)
+## From [the-architecture-of-speculative-decoding-and-infer-part2-micro02](/entities/the-architecture-of-speculative-decoding-and-infer-part2-micro02.md) (2026-06-09)
 - An advanced scheduler that dynamically regroups sequences by accepted length into uniform micro-batches.
 - Abandons strict matrix realignment entirely.
 - Maintains a sliding pool of sequences and dynamically regroups requests.

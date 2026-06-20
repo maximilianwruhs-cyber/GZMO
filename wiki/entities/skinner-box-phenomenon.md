@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-architecture-of-engagement-an-analysis-of-gam-micro06|the-architecture-of-engagement-an-analysis-of-gam-micro06]] (2026-06-09)
+## From [the-architecture-of-engagement-an-analysis-of-gam-micro06](/entities/the-architecture-of-engagement-an-analysis-of-gam-micro06.md) (2026-06-09)
 - Occurs when players perform repetitive, unenjoyable tasks purely for a statistical payout.
 - An over-reliance on extrinsic frameworks in video games.

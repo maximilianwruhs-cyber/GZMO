@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[prfaas-cross-datacenter-llm-serving-via-selective-micro02|prfaas-cross-datacenter-llm-serving-via-selective-micro02]] (2026-06-10)
+## From [prfaas-cross-datacenter-llm-serving-via-selective-micro02](/entities/prfaas-cross-datacenter-llm-serving-via-selective-micro02.md) (2026-06-10)
 - An open framework mentioned in collaboration with Moonshot AI.

@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[the-archival-truth-part1-micro06|the-archival-truth-part1-micro06]] (2026-06-09)
+## From [the-archival-truth-part1-micro06](/entities/the-archival-truth-part1-micro06.md) (2026-06-09)
 - Associated with Oscar Wilde.
 - An example of Farce.

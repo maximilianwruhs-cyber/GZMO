@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[drive-research-architecting-a-linux-task-manager-design-principl|drive-research-architecting-a-linux-task-manager-design-principl]] (2026-06-08)
+## From [drive-research-architecting-a-linux-task-manager-design-principl](/entities/drive-research-architecting-a-linux-task-manager-design-principl.md) (2026-06-08)
 - Title: Drive Research Architecting a Linux Task Manager_ Design Principl
 - Contains research on architecting a Linux Task Manager.
 - Discusses design principles, procfs interaction, and process lifecycle management.

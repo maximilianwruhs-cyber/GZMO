@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: AUTHOR
 
-## From [[ai-research-part3-micro02|ai-research-part3-micro02]] (2026-06-09)
+## From [ai-research-part3-micro02](/entities/ai-research-part3-micro02.md) (2026-06-09)
 - Authored the original Gödel Machine concept.

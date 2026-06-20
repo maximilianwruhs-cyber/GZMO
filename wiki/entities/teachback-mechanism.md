@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-redefining-agentic-soulmd-to-dialog-micro02|drive-research-redefining-agentic-soulmd-to-dialog-micro02]] (2026-06-09)
+## From [drive-research-redefining-agentic-soulmd-to-dialog-micro02](/entities/drive-research-redefining-agentic-soulmd-to-dialog-micro02.md) (2026-06-09)
 - A critical cybernetic mechanism from Conversation Theory.
 - One participant reconstructs their understanding to verify alignment and reduce semantic noise.
 - In AI, the agent must periodically perform internal or external teachbacks.

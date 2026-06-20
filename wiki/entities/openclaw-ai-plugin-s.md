@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[architectural-analysis-of-the-openclaw-ai-plugin-s|architectural-analysis-of-the-openclaw-ai-plugin-s]] (2026-06-08)
+## From [architectural-analysis-of-the-openclaw-ai-plugin-s](/entities/architectural-analysis-of-the-openclaw-ai-plugin-s.md) (2026-06-08)
 - This document provides an architectural analysis of the OpenClaw AI Plugin S.
 - It is part of a curated research corpus consolidated from Google Takeout (wave_02_notebooklm).

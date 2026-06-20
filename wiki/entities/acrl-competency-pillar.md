@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-der-aufstieg-und-die-absicht-des-bibliothekars-age|drive-research-der-aufstieg-und-die-absicht-des-bibliothekars-age]] (2026-06-08)
+## From [drive-research-der-aufstieg-und-die-absicht-des-bibliothekars-age](/entities/drive-research-der-aufstieg-und-die-absicht-des-bibliothekars-age.md) (2026-06-08)
 - Ein Rahmenwerk, das von der ACRL entwickelt wurde.
 - Umfasst Fokusbereiche wie Ethische Überlegungen, Wissen & Verständnis, Analyse & Bewertung und Nutzung & Anwendung.

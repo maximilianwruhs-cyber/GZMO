@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[drive-research-markitdown-format-parity-checklist|drive-research-markitdown-format-parity-checklist]] (2026-06-08)
+## From [drive-research-markitdown-format-parity-checklist](/entities/drive-research-markitdown-format-parity-checklist.md) (2026-06-08)
 - Section title within the document.
 - Focuses on the use of AI for file format detection.
 - Magika is an AI-powered content-type detection tool.

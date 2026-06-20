@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-license-and-native-binding-analysis|drive-research-license-and-native-binding-analysis]] (2026-06-08)
+## From [drive-research-license-and-native-binding-analysis](/entities/drive-research-license-and-native-binding-analysis.md) (2026-06-08)
 - Used on an Ubuntu Linux target environment for the gzmo-daemon.
 - Offers advantages in runtime execution speed and installation caching.
 - Utilizes Apple's JavaScriptCore (JSC) engine.

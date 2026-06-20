@@ -14,8 +14,8 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-llamacpp-optimization-blueprint-micro02|drive-research-llamacpp-optimization-blueprint-micro02]] (2026-06-09)
+## From [drive-research-llamacpp-optimization-blueprint-micro02](/entities/drive-research-llamacpp-optimization-blueprint-micro02.md) (2026-06-09)
 - Benchmark analysis using strict NUMA optimization on architectures such as the Neoverse N2 yields performance uplifts of over +53% in tokens per second.
 
-## From [[optimizing-nvidia-blackwell-sm120-part1-micro01|optimizing-nvidia-blackwell-sm120-part1-micro01]] (2026-06-10)
+## From [optimizing-nvidia-blackwell-sm120-part1-micro01](/entities/optimizing-nvidia-blackwell-sm120-part1-micro01.md) (2026-06-10)
 - An architecture that shows performance uplifts when using strict NUMA optimization.

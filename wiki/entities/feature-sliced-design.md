@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[architectural-framework-for-scalable-codebase-rest|architectural-framework-for-scalable-codebase-rest]] (2026-06-08)
+## From [architectural-framework-for-scalable-codebase-rest](/entities/architectural-framework-for-scalable-codebase-rest.md) (2026-06-08)
 - It is a principle around which the file structure must be reorganized.
 - It is used for grouping core business domains within the optimized file tree.
 - It supports modern development paradigms.
 
-## From [[google-antigravity-the-architects-configuration-micro06|google-antigravity-the-architects-configuration-micro06]] (2026-06-09)
+## From [google-antigravity-the-architects-configuration-micro06](/entities/google-antigravity-the-architects-configuration-micro06.md) (2026-06-09)
 - Moderne Architektur, auf der die Migration basieren soll.

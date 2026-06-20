@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[universal-syntax-and-the-architecture-of-human-lan-micro02|universal-syntax-and-the-architecture-of-human-lan-micro02]] (2026-06-09)
+## From [universal-syntax-and-the-architecture-of-human-lan-micro02](/entities/universal-syntax-and-the-architecture-of-human-lan-micro02.md) (2026-06-09)
 - Represents a departure from the modularity of the Minimalist Program.
 - Rejects the sharp dichotomy between lexical items and grammatical rules.
 - Proposes a continuum of 'constructions' defined as learned pairings of form and meaning.

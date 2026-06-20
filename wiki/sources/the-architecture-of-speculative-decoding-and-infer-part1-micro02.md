@@ -14,4 +14,4 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[key-value-kv-cache|Key-Value (KV) Cache]] (CONCEPT)
+- [Key-Value (KV) Cache](/entities/key-value-kv-cache.md) (CONCEPT)

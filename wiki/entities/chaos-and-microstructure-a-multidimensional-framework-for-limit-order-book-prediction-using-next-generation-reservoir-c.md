@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[drive-research-algorithmic-trading-with-chaos-theory|drive-research-algorithmic-trading-with-chaos-theory]] (2026-06-08)
+## From [drive-research-algorithmic-trading-with-chaos-theory](/entities/drive-research-algorithmic-trading-with-chaos-theory.md) (2026-06-08)
 - Details a triad of advanced quantitative techniques to exploit chaotic microstructure.
 - Focuses on limit order book prediction.
 - Utilizes Next-Generation Reservoir Computing.

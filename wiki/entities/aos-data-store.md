@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-ran-command-bash-c-cd-home-maximilian-wruhs-d|drive-research-ran-command-bash--c-cd-home-maximilian-wruhs-d]] (2026-06-08)
+## From [drive-research-ran-command-bash--c-cd-home-maximilian-wruhs-d](/entities/drive-research-ran-command-bash-c-cd-home-maximilian-wruhs-d.md) (2026-06-08)
 - Benchmark results are permanently logged into it
 - Located at /home/maximilian-wruhs/Dokumente/Vergleich/AOS/data/benchmark_results.json

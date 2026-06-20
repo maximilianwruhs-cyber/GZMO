@@ -14,21 +14,21 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-08).
 
 ## Entities
-- [[cohere-rerank-3|Cohere Rerank 3]] (SYSTEM)
-- [[alibaba|Alibaba]] (ORGANIZATION)
-- [[bge-reranker-v2-m3|BGE-Reranker (v2-M3)]] (SYSTEM)
-- [[baai|BAAI]] (ORGANIZATION)
-- [[google-gemma-3-or-gemma-2-2b-9b|Google Gemma 3 (or Gemma 2 2B/9B)]] (ORGANIZATION)
-- [[microsoft-phi-3-5-mini-3-8b-or-phi-4|Microsoft Phi-3.5 Mini (3.8B) or Phi-4]] (SYSTEM)
-- [[meta-llama-3-2-1b-and-3b|Meta Llama 3.2 (1B and 3B)]] (ORGANIZATION)
-- [[query-rewriting|Query Rewriting]] (CONCEPT)
-- [[ultra-fast-data-parsing|Ultra-Fast Data Parsing]] (CONCEPT)
-- [[context-reranking|Context Reranking]] (CONCEPT)
-- [[qwen3-reranker-series-0-6b-to-8b|Qwen3-Reranker Series (0.6B to 8B)]] (SYSTEM)
-- [[qwen-2-5-0-5b|Qwen 2.5 (0.5B)]] (SYSTEM)
-- [[retrieval-augmented-generation-rag-pipelines|Retrieval-Augmented Generation (RAG) pipelines]] (CONCEPT)
-- [[gemini|Gemini]] (SYSTEM)
-- [[output-verification|Output Verification]] (CONCEPT)
+- [Cohere Rerank 3](/entities/cohere-rerank-3.md) (SYSTEM)
+- [Alibaba](/entities/alibaba.md) (ORGANIZATION)
+- [BGE-Reranker (v2-M3)](/entities/bge-reranker-v2-m3.md) (SYSTEM)
+- [BAAI](/entities/baai.md) (ORGANIZATION)
+- [Google Gemma 3 (or Gemma 2 2B/9B)](/entities/google-gemma-3-or-gemma-2-2b-9b.md) (ORGANIZATION)
+- [Microsoft Phi-3.5 Mini (3.8B) or Phi-4](/entities/microsoft-phi-3-5-mini-3-8b-or-phi-4.md) (SYSTEM)
+- [Meta Llama 3.2 (1B and 3B)](/entities/meta-llama-3-2-1b-and-3b.md) (ORGANIZATION)
+- [Query Rewriting](/entities/query-rewriting.md) (CONCEPT)
+- [Ultra-Fast Data Parsing](/entities/ultra-fast-data-parsing.md) (CONCEPT)
+- [Context Reranking](/entities/context-reranking.md) (CONCEPT)
+- [Qwen3-Reranker Series (0.6B to 8B)](/entities/qwen3-reranker-series-0-6b-to-8b.md) (SYSTEM)
+- [Qwen 2.5 (0.5B)](/entities/qwen-2-5-0-5b.md) (SYSTEM)
+- [Retrieval-Augmented Generation (RAG) pipelines](/entities/retrieval-augmented-generation-rag-pipelines.md) (CONCEPT)
+- [Gemini](/entities/gemini.md) (SYSTEM)
+- [Output Verification](/entities/output-verification.md) (CONCEPT)
 
 ## Relations
 - Microsoft Phi-3.5 Mini (3.8B) or Phi-4 → USES → Query Rewriting

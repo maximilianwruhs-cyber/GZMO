@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-nvar-financial-forecasting-parameter-search|drive-research-nvar-financial-forecasting-parameter-search]] (2026-06-08)
+## From [drive-research-nvar-financial-forecasting-parameter-search](/entities/drive-research-nvar-financial-forecasting-parameter-search.md) (2026-06-08)
 - Is a type of reservoir computing architecture.
 - Requires intensive, trial-and-error metaparameter tuning.
 - Is sensitive to noise-driven ill-conditioning.

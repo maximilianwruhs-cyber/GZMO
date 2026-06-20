@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: BENCHMARK
 
-## From [[engineering-ignorance-eliminating-affirmative-bia|engineering-ignorance-eliminating-affirmative-bia]] (2026-06-08)
+## From [engineering-ignorance-eliminating-affirmative-bia](/entities/engineering-ignorance-eliminating-affirmative-bia.md) (2026-06-08)
 - Focuses on human-coded scientific citation contexts.
 - Engineers can explicitly measure how frequently the model defaults to Supported when the ground truth demands a Not Enough Information label.

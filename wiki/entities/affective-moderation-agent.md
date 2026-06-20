@@ -14,12 +14,12 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-ai-agentic-teacher|drive-research-ai-agentic-teacher]] (2026-06-08)
+## From [drive-research-ai-agentic-teacher](/entities/drive-research-ai-agentic-teacher.md) (2026-06-08)
 - Acts as an asynchronous safety and engagement monitor.
 - Checks for frustration or cognitive overload.
 - Adapts instruction to the learner's profile.
 
-## From [[drive-research-ai-agentic-teacher-research-report|drive-research-ai-agentic-teacher-research-report]] (2026-06-08)
+## From [drive-research-ai-agentic-teacher-research-report](/entities/drive-research-ai-agentic-teacher-research-report.md) (2026-06-08)
 - Operates as an asynchronous safety and engagement monitor.
 - Analyzes biometric proxies or sentiment in unstructured textual data.
 - Maintains the capability to trigger an emergency 'fail-safe'.

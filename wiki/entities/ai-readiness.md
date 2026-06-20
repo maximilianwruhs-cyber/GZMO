@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part2|drive-research-ki-berater-fragebogen-für-kundenanalyse-part2]] (2026-06-08)
+## From [drive-research-ki-berater-fragebogen-für-kundenanalyse-part2](/entities/drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part2.md) (2026-06-08)
 - Refers to the general organizational readiness and technological capability for AI.
 - Assessed using structured maturity models.
 - Companies are typically classified on a five-stage scale.

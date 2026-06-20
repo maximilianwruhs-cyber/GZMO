@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[drive-research-analyze-the-pdf-to-create-a-step-by-step-guide-of|drive-research-analyze-the-pdf-to-create-a-step-by-step-guide-of]] (2026-06-08)
+## From [drive-research-analyze-the-pdf-to-create-a-step-by-step-guide-of](/entities/drive-research-analyze-the-pdf-to-create-a-step-by-step-guide-of.md) (2026-06-08)
 - Details structural documentation.
 - Used as a source for the step-by-step guide.

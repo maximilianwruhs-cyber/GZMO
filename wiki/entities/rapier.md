@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[dynamics-of-the-unpredictable-micro06|dynamics-of-the-unpredictable-micro06]] (2026-06-09)
+## From [dynamics-of-the-unpredictable-micro06](/entities/dynamics-of-the-unpredictable-micro06.md) (2026-06-09)
 - The preeminent pure-Rust physics engine.
 - Available in mutually exclusive rapier2d and rapier3d crates.
 - Designed to integrate seamlessly into custom engine loops and ECS architectures.

@@ -14,9 +14,9 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[openclaw-autonomous-ai-agents-in-financial-operat|openclaw-autonomous-ai-agents-in-financial-operat]] (2026-06-08)
+## From [openclaw-autonomous-ai-agents-in-financial-operat](/entities/openclaw-autonomous-ai-agents-in-financial-operat.md) (2026-06-08)
 - Library used to fire parallel multi-exchange orders.
 - Used for latency optimization.
 
-## From [[the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro05|the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro05]] (2026-06-09)
+## From [the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro05](/entities/the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro05.md) (2026-06-09)
 - Used to manage high-concurrency scraping tasks.

@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro07|the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro07]] (2026-06-09)
+## From [the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro07](/entities/the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro07.md) (2026-06-09)
 - The evidence hierarchy is applied as this.
 - Contradictions lead to immediate devaluation of source credibility.

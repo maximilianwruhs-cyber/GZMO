@@ -14,8 +14,8 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[google-takeout|Google Takeout]] (TOOL)
-- [[the-2026-linux-workstation|The 2026 Linux Workstation]] (PROJECT)
+- [Google Takeout](/entities/google-takeout.md) (TOOL)
+- [The 2026 Linux Workstation](/entities/the-2026-linux-workstation.md) (PROJECT)
 
 ## Relations
 - The 2026 Linux Workstation → USES → Google Takeout

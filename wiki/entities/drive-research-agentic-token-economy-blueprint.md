@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[drive-research-agentic-token-economy-blueprint-micro03|drive-research-agentic-token-economy-blueprint-micro03]] (2026-06-09)
+## From [drive-research-agentic-token-economy-blueprint-micro03](/entities/drive-research-agentic-token-economy-blueprint-micro03.md) (2026-06-09)
 - Micro split from drive-research-agentic-token-economy-blueprint.md
 - For cloud KG extraction
 - Related to AI agents

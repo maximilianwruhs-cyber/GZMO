@@ -15,19 +15,19 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-setting-up-autonomous-trading-agents-micro01|drive-research-setting-up-autonomous-trading-agents-micro01]] (2026-06-09)
+## From [drive-research-setting-up-autonomous-trading-agents-micro01](/entities/drive-research-setting-up-autonomous-trading-agents-micro01.md) (2026-06-09)
 - A specialized no-code trading automation platform.
 - Utilizes a visual flowchart strategy builder.
 - Connects to over 35 global brokers.
 - Features a strategy marketplace.
 
-## From [[the-architects-handbook-for-autonomous-agentic-tr-micro02|the-architects-handbook-for-autonomous-agentic-tr-micro02]] (2026-06-09)
+## From [the-architects-handbook-for-autonomous-agentic-tr-micro02](/entities/the-architects-handbook-for-autonomous-agentic-tr-micro02.md) (2026-06-09)
 - A specialized no-code trading automation platform.
 - Utilizes a visual flowchart strategy builder.
 - Connects to over 35 global brokers.
 - Specialized no-code trading automation platform.
 
-## From [[drive-research-setting-up-autonomous-trading-agents-micro04|drive-research-setting-up-autonomous-trading-agents-micro04]] (2026-06-10)
+## From [drive-research-setting-up-autonomous-trading-agents-micro04](/entities/drive-research-setting-up-autonomous-trading-agents-micro04.md) (2026-06-10)
 - Uses a visual flowchart strategy builder for complex conditional logic.
 - Connects to over 35 global brokers.
 - Features a strategy marketplace for developers.

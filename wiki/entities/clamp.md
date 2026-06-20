@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[prompt-agent-engineering-part2-micro02|prompt-agent-engineering-part2-micro02]] (2026-06-09)
+## From [prompt-agent-engineering-part2-micro02](/entities/prompt-agent-engineering-part2-micro02.md) (2026-06-09)
 - Modern CSS feature preferred by the Visual Systems Extractor for fluid type/scale.

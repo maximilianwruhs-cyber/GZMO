@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part1|ai-research-part1]] (2026-06-08)
+## From [ai-research-part1](/entities/ai-research-part1.md) (2026-06-08)
 - A simple way to reduce memory cost for cross-layer access.
 - Retains only the most recent W=8 layer outputs plus the token embedding.
 - Improves over baseline (1.764) but falls short of Full and Block AttnRes.

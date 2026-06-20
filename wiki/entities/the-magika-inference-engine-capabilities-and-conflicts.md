@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-markitdown-format-parity-checklist|drive-research-markitdown-format-parity-checklist]] (2026-06-08)
+## From [drive-research-markitdown-format-parity-checklist](/entities/drive-research-markitdown-format-parity-checklist.md) (2026-06-08)
 - An artificial intelligence-powered content-type detection tool developed and open-sourced by Google.
 - Integrates into the MarkItDown detection engine.
 - Utilizes a highly optimized, heavily quantized deep learning model.

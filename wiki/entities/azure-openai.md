@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[drive-research-pi-coding-agent-local-deployment-customization|drive-research-pi-coding-agent-local-deployment-customization]] (2026-06-08)
+## From [drive-research-pi-coding-agent-local-deployment-customization](/entities/drive-research-pi-coding-agent-local-deployment-customization.md) (2026-06-08)
 - Provider name for the azure-openai-responses API wire protocol.

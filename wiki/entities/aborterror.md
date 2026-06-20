@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[high-performance-typescript-execution-and-architec-part1-micro06|high-performance-typescript-execution-and-architec-part1-micro06]] (2026-06-09)
+## From [high-performance-typescript-execution-and-architec-part1-micro06](/entities/high-performance-typescript-execution-and-architec-part1-micro06.md) (2026-06-09)
 - An error thrown by execAsync when killed.
 - Indicates that execution was successfully terminated by the user.

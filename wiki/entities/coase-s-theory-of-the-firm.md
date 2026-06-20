@@ -14,6 +14,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-agentic-token-economy-blueprint-micro01|drive-research-agentic-token-economy-blueprint-micro01]] (2026-06-09)
+## From [drive-research-agentic-token-economy-blueprint-micro01](/entities/drive-research-agentic-token-economy-blueprint-micro01.md) (2026-06-09)
 - An organization will expand until the cost of organizing an extra transaction internally equals the cost of carrying out the same transaction on the open market.
 - Applied to LLM token economics, it formulates MAS orchestration as a Coasian boundary optimization problem.

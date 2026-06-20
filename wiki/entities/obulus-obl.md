@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[obolus-micro03|obolus-micro03]] (2026-06-09)
+## From [obolus-micro03](/entities/obolus-micro03.md) (2026-06-09)
 - Native resource (token) of the Obulus system.
 - Represents stored energy (Watt-hour).
 - Initial funding for new agents.
@@ -22,7 +22,7 @@ Type: CONCEPT
 - Reward for quality output.
 - Agent terminates when balance is <= 0.
 
-## From [[obolus-micro05|obolus-micro05]] (2026-06-09)
+## From [obolus-micro05](/entities/obolus-micro05.md) (2026-06-09)
 - Currency for Obulus.
 - Represents stored energy.
 - 1 $OBL ≈ 1 Watt-hour (Wh) of compute.

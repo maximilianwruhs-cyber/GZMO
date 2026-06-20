@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[optimizing-nvidia-blackwell-sm120-part1-micro02|optimizing-nvidia-blackwell-sm120-part1-micro02]] (2026-06-09)
+## From [optimizing-nvidia-blackwell-sm120-part1-micro02](/entities/optimizing-nvidia-blackwell-sm120-part1-micro02.md) (2026-06-09)
 - Advanced implementations integrate TurboQuant algorithms into the llama.cpp CUDA backend.
 - The --samplers flag in llama.cpp dictates the execution order of samplers.
 - System architects can push llama.cpp to the absolute limits of silicon performance.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[obolus-vs-codium-extension-konzept-research-part1-micro01|obolus-vs-codium-extension-konzept-research-part1-micro01]] (2026-06-09)
+## From [obolus-vs-codium-extension-konzept-research-part1-micro01](/entities/obolus-vs-codium-extension-konzept-research-part1-micro01.md) (2026-06-09)
 - A simple extension that uses a webview to show a GIF of a cat writing code.
 - Contributes a command called catCoding.start.
 - Uses webview.html to set its content.

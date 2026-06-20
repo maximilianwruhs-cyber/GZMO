@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[gzmo-soul-merged-new-part2-micro07|gzmo-soul-merged-new-part2-micro07]] (2026-06-10)
+## From [gzmo-soul-merged-new-part2-micro07](/entities/gzmo-soul-merged-new-part2-micro07.md) (2026-06-10)
 - Targets suspicious or absolute claims
 - Executes secondary searches to mitigate hallucinations

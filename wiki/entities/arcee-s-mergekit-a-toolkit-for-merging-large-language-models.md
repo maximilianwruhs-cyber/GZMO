@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[drive-research-frankenmoe-merging-ai-models|drive-research-frankenmoe-merging-ai-models]] (2026-06-08)
+## From [drive-research-frankenmoe-merging-ai-models](/entities/drive-research-frankenmoe-merging-ai-models.md) (2026-06-08)
 - A research paper on the mergekit toolkit.
 - Published on arXiv.
 - The standard tooling for model merging in the open-source community.

@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[local-first-rag-architecting-sovereign-ai-with-li|local-first-rag-architecting-sovereign-ai-with-li]] (2026-06-08)
+## From [local-first-rag-architecting-sovereign-ai-with-li](/entities/local-first-rag-architecting-sovereign-ai-with-li.md) (2026-06-08)
 - Used for image conversions (PNG, JPG, TIFF).
 - Part of LiteParse's unified format normalization strategy.

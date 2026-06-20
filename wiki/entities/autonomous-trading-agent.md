@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-setting-up-autonomous-trading-agents-micro05|drive-research-setting-up-autonomous-trading-agents-micro05]] (2026-06-09)
+## From [drive-research-setting-up-autonomous-trading-agents-micro05](/entities/drive-research-setting-up-autonomous-trading-agents-micro05.md) (2026-06-09)
 - Entails assuming total legal responsibility for its actions.
 - Can execute hundreds or thousands of micro-trades within a month.
 - Requires meticulous tax reporting.

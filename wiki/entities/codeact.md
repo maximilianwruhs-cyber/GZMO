@@ -16,18 +16,18 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[gzmo-soul-merged-new-part3|gzmo-soul-merged-new-part3]] (2026-06-08)
+## From [gzmo-soul-merged-new-part3](/entities/gzmo-soul-merged-new-part3.md) (2026-06-08)
 - CodeAct is mentioned in the context of Token-Effizienz & Optimierung.
 - It is used instead of ReAct for Python execution.
 
-## From [[gzmo-soul-merged-new-part2-micro05|gzmo-soul-merged-new-part2-micro05]] (2026-06-09)
+## From [gzmo-soul-merged-new-part2-micro05](/entities/gzmo-soul-merged-new-part2-micro05.md) (2026-06-09)
 - Agents generate executable Python code directly instead of verbal 'Thought/Action' cycles.
 - Reduces token usage significantly.
 - Also referred to as CodeAgents.
 
-## From [[gzmo-soul-merged-new-part2-micro04|gzmo-soul-merged-new-part2-micro04]] (2026-06-10)
+## From [gzmo-soul-merged-new-part2-micro04](/entities/gzmo-soul-merged-new-part2-micro04.md) (2026-06-10)
 - A framework where logic is formulated directly in executable Python code.
 - Reduces token consumption compared to ReAct.
 
-## From [[gzmo-soul-merged-new-part2-micro08|gzmo-soul-merged-new-part2-micro08]] (2026-06-10)
+## From [gzmo-soul-merged-new-part2-micro08](/entities/gzmo-soul-merged-new-part2-micro08.md) (2026-06-10)
 - Paradigma: Ausführbarer Code statt natürlicher Sprache (Reasoning + Acting)

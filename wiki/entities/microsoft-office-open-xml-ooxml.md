@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-safe-unzip-practices-for-threat-model-micro01|drive-research-safe-unzip-practices-for-threat-model-micro01]] (2026-06-10)
+## From [drive-research-safe-unzip-practices-for-threat-model-micro01](/entities/drive-research-safe-unzip-practices-for-threat-model-micro01.md) (2026-06-10)
 - Standardized by ECMA International as ECMA-376 and ISO/IEC 29500.
 - Consists of multi-layered ZIP containers housing interconnected XML files.
 - Includes formats such as .docx, .xlsx, and .pptx.

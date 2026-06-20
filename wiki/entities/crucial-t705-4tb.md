@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-linux-gaming-and-ai-build-guide-micro02|drive-research-linux-gaming-and-ai-build-guide-micro02]] (2026-06-09)
+## From [drive-research-linux-gaming-and-ai-build-guide-micro02](/entities/drive-research-linux-gaming-and-ai-build-guide-micro02.md) (2026-06-09)
 - A primary drive recommendation.
 - Operates over the PCIe 5.0 x4 interface.
 - Achieves sequential read speeds of up to 14,100 MB/s.
@@ -22,7 +22,7 @@ Type: TOOL
 - Max Sequential Read: 14,100 MB/s.
 - Max Sequential Write: 12,600 MB/s.
 
-## From [[the-2026-linux-workstation-micro03|the-2026-linux-workstation-micro03]] (2026-06-09)
+## From [the-2026-linux-workstation-micro03](/entities/the-2026-linux-workstation-micro03.md) (2026-06-09)
 - PCIe Generation: Gen 5.0 x4
 - Max Sequential Read: 14,100 MB/s
 - Max Sequential Write: 12,600 MB/s

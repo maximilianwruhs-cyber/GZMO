@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-definitive-pantheon|the-definitive-pantheon]] (2026-06-08)
+## From [the-definitive-pantheon](/entities/the-definitive-pantheon.md) (2026-06-08)
 - Wonder Woman completes this alongside Superman and Batman.

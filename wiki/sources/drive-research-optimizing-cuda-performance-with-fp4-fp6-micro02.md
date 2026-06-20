@@ -14,17 +14,17 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[tiledattention-a-cuda-tile-sdpa-kernel-for-pytorch|TiledAttention: a CUDA Tile SDPA Kernel for PyTorch]] (BOOK)
-- [[cuda-programming-guide|CUDA Programming Guide]] (BOOK)
-- [[cutlass|CUTLASS]] (TOOL)
-- [[nvrtc-13-2-documentation|NVRTC 13.2 documentation]] (BOOK)
-- [[cutile|cuTile]] (TOOL)
-- [[fp6|FP6]] (CONCEPT)
-- [[blackwell|Blackwell]] (CONCEPT)
-- [[tensorrt-10-13-2-release-notes|TensorRT 10.13.2 Release Notes]] (BOOK)
-- [[cuda-toolkit-13-1-update-2-release-notes|CUDA Toolkit 13.1 Update 2 - Release Notes]] (BOOK)
-- [[msvc|MSVC]] (TOOL)
-- [[rtx-pro-6000|RTX PRO 6000]] (SYSTEM)
+- [TiledAttention: a CUDA Tile SDPA Kernel for PyTorch](/entities/tiledattention-a-cuda-tile-sdpa-kernel-for-pytorch.md) (BOOK)
+- [CUDA Programming Guide](/entities/cuda-programming-guide.md) (BOOK)
+- [CUTLASS](/entities/cutlass.md) (TOOL)
+- [NVRTC 13.2 documentation](/entities/nvrtc-13-2-documentation.md) (BOOK)
+- [cuTile](/entities/cutile.md) (TOOL)
+- [FP6](/entities/fp6.md) (CONCEPT)
+- [Blackwell](/entities/blackwell.md) (CONCEPT)
+- [TensorRT 10.13.2 Release Notes](/entities/tensorrt-10-13-2-release-notes.md) (BOOK)
+- [CUDA Toolkit 13.1 Update 2 - Release Notes](/entities/cuda-toolkit-13-1-update-2-release-notes.md) (BOOK)
+- [MSVC](/entities/msvc.md) (TOOL)
+- [RTX PRO 6000](/entities/rtx-pro-6000.md) (SYSTEM)
 
 ## Relations
 - cuTile → USES → TiledAttention: a CUDA Tile SDPA Kernel for PyTorch

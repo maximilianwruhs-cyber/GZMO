@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[openclaw-deep-research-part7-micro07|openclaw-deep-research-part7-micro07]] (2026-06-10)
+## From [openclaw-deep-research-part7-micro07](/entities/openclaw-deep-research-part7-micro07.md) (2026-06-10)
 - Deployment type with Cloudflare as trust boundary
 - Risk includes no egress filtering and R2 breach
 - Sandbox can exfiltrate to any server

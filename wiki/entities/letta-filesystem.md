@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[architectures-for-agentic-memory-virtual-context-micro07|architectures-for-agentic-memory-virtual-context-micro07]] (2026-06-09)
+## From [architectures-for-agentic-memory-virtual-context-micro07](/entities/architectures-for-agentic-memory-virtual-context-micro07.md) (2026-06-09)
 - Defaults to standard vector databases for its Archival Memory.
 - Relies on agent-driven semantic search.
 - Its agentic loop incurs severe TTFT penalties.

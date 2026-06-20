@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-bun-file-parsing-dependency-shortlist-micro01|drive-research-bun-file-parsing-dependency-shortlist-micro01]] (2026-06-09)
+## From [drive-research-bun-file-parsing-dependency-shortlist-micro01](/entities/drive-research-bun-file-parsing-dependency-shortlist-micro01.md) (2026-06-09)
 - used for TXT and JSON file parsing
 - default encoding is UTF-8

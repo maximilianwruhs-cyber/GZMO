@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[architectural-analysis-of-the-openclaw-ai-plugin-s|architectural-analysis-of-the-openclaw-ai-plugin-s]] (2026-06-08)
+## From [architectural-analysis-of-the-openclaw-ai-plugin-s](/entities/architectural-analysis-of-the-openclaw-ai-plugin-s.md) (2026-06-08)
 - Plugins can return this to modify the output payload before it is processed by the orchestration layer.
 - Properties include assistantText/assistantTexts and usage.
 - It is essential for post-processing constraints, such as output scanning protocols or rehydrating masked PII tokens.

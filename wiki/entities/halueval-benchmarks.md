@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: BENCHMARK
 
-## From [[engineering-ignorance-eliminating-affirmative-bia|engineering-ignorance-eliminating-affirmative-bia]] (2026-06-08)
+## From [engineering-ignorance-eliminating-affirmative-bia](/entities/engineering-ignorance-eliminating-affirmative-bia.md) (2026-06-08)
 - Provides large-scale hallucination evaluation benchmarks.
 - Contains tens of thousands of questions from diverse domains.
 - Offers rigorous evaluation metrics for assessing factuality.

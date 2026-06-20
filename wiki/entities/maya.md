@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-archival-truth-part2-micro03|the-archival-truth-part2-micro03]] (2026-06-10)
+## From [the-archival-truth-part2-micro03](/entities/the-archival-truth-part2-micro03.md) (2026-06-10)
 - Described as an appearance or illusion.
 - Compared to a multifaceted crystal.

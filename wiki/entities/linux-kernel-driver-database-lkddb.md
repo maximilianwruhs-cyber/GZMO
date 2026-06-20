@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[drive-research-automating-linux-hardware-detection-micro03|drive-research-automating-linux-hardware-detection-micro03]] (2026-06-09)
+## From [drive-research-automating-linux-hardware-detection-micro03](/entities/drive-research-automating-linux-hardware-detection-micro03.md) (2026-06-09)
 - hw-probe is integrated with LKDDb.
 - Used to suggest minimum upstream Linux kernel version for hardware incompatibility.
 - Hardware management can be done outside its purview.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[allgemeine-informationen|allgemeine-informationen]] (2026-06-08)
+## From [allgemeine-informationen](/entities/allgemeine-informationen.md) (2026-06-08)
 - It is used as a central hub for code.
 - It is used with GitLab CI/CD for automating pipelines.
 - It automates pipelines (testing, building, linting, and deploying).

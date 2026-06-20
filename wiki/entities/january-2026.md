@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: DATE
 
-## From [[ai-research-part6-micro05|ai-research-part6-micro05]] (2026-06-09)
+## From [ai-research-part6-micro05](/entities/ai-research-part6-micro05.md) (2026-06-09)
 - Date when the danger of autonomous agents was drastically clarified.
 - Associated with Shodan exposures and prompt injection incidents.

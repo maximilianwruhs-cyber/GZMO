@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[building-a-private-local-ai-development-environmen-micro04|building-a-private-local-ai-development-environmen-micro04]] (2026-06-09)
+## From [building-a-private-local-ai-development-environmen-micro04](/entities/building-a-private-local-ai-development-environmen-micro04.md) (2026-06-09)
 - A model that can be run in LM Studio.
 - Mentioned as a capable coding model.

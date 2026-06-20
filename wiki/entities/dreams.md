@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[gzmo-chaos-engine-architecture-audit-and-behaviora|gzmo-chaos-engine-architecture-audit-and-behaviora]] (2026-06-08)
+## From [gzmo-chaos-engine-architecture-audit-and-behaviora](/entities/gzmo-chaos-engine-architecture-audit-and-behaviora.md) (2026-06-08)
 - Emit events via dream_proposed
 - Scheduling is proposed to be chaos-responsive

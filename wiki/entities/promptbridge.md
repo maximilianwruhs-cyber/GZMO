@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-crafting-a-creative-agent-prompt|drive-research-crafting-a-creative-agent-prompt]] (2026-06-08)
+## From [drive-research-crafting-a-creative-agent-prompt](/entities/drive-research-crafting-a-creative-agent-prompt.md) (2026-06-08)
 - Utilizes Model-Adaptive Reflective Prompt Evolution (MAP-RPE).
 - Preserves prompt effectiveness using a small calibration suite of alignment tasks.
 - Enables zero-shot, in-context prompt adaptation.

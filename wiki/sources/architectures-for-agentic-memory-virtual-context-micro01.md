@@ -14,10 +14,10 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[cloud-kg-extraction|cloud KG extraction]] (CONCEPT)
-- [[architectures-for-agentic-memory-virtual-context-md|architectures-for-agentic-memory-virtual-context.md]] (CONCEPT)
-- [[google-takeout|Google Takeout]] (TOOL)
-- [[wave-02-notebooklm|wave_02_notebooklm]] (CONCEPT)
+- [cloud KG extraction](/entities/cloud-kg-extraction.md) (CONCEPT)
+- [architectures-for-agentic-memory-virtual-context.md](/entities/architectures-for-agentic-memory-virtual-context-md.md) (CONCEPT)
+- [Google Takeout](/entities/google-takeout.md) (TOOL)
+- [wave_02_notebooklm](/entities/wave-02-notebooklm.md) (CONCEPT)
 
 ## Relations
 - architectures-for-agentic-memory-virtual-context.md → RELATED_TO → cloud KG extraction

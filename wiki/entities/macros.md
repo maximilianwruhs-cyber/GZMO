@@ -18,7 +18,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-advanced-typescript-execution-in-the-bun-runtime-micro02|drive-research-advanced-typescript-execution-in-the-bun-runtime-micro02]] (2026-06-09)
+## From [drive-research-advanced-typescript-execution-in-the-bun-runtime-micro02](/entities/drive-research-advanced-typescript-execution-in-the-bun-runtime-micro02.md) (2026-06-09)
 - A native metaprogramming construct in Bun.
 - Shifts runtime execution to build time.
 - Executed during the build process by Bun's native transpiler.
@@ -28,7 +28,7 @@ Type: CONCEPT
 - Cannot accept runtime-dynamic arguments.
 - Enable zero-latency data initialization and advanced dead code elimination.
 
-## From [[drive-research-bun-typescript-performance-tips-micro02|drive-research-bun-typescript-performance-tips-micro02]] (2026-06-09)
+## From [drive-research-bun-typescript-performance-tips-micro02](/entities/drive-research-bun-typescript-performance-tips-micro02.md) (2026-06-09)
 - A native metaprogramming construct in Bun.
 - Allows shifting runtime execution to build time.
 - Executed during the transpiler's AST visiting phase.
@@ -36,11 +36,11 @@ Type: CONCEPT
 - Output must be serializable.
 - Can be used for zero-latency data initialization and dead code elimination.
 
-## From [[drive-research-bun-typescript-performance-tips-micro04|drive-research-bun-typescript-performance-tips-micro04]] (2026-06-09)
+## From [drive-research-bun-typescript-performance-tips-micro04](/entities/drive-research-bun-typescript-performance-tips-micro04.md) (2026-06-09)
 - A feature of Bun.
 - Related documentation available on Mintlify.
 
-## From [[high-performance-typescript-execution-and-architec-part1-micro02|high-performance-typescript-execution-and-architec-part1-micro02]] (2026-06-09)
+## From [high-performance-typescript-execution-and-architec-part1-micro02](/entities/high-performance-typescript-execution-and-architec-part1-micro02.md) (2026-06-09)
 - A native metaprogramming construct in Bun.
 - Shifts runtime execution to build time.
 - Executed during the transpiler's AST visiting phase.
@@ -49,6 +49,6 @@ Type: CONCEPT
 - Enable zero-latency data initialization and advanced dead code elimination.
 - Enhance security by executing privileged operations at build time.
 
-## From [[high-performance-typescript-execution-and-architec-part1-micro04|high-performance-typescript-execution-and-architec-part1-micro04]] (2026-06-09)
+## From [high-performance-typescript-execution-and-architec-part1-micro04](/entities/high-performance-typescript-execution-and-architec-part1-micro04.md) (2026-06-09)
 - Bun has a Macros feature.
 - Mentioned as a cool Bun feature.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part4|ai-research-part4]] (2026-06-08)
+## From [ai-research-part4](/entities/ai-research-part4.md) (2026-06-08)
 - Applied to linear attention layers in MiniCPM-SALA.
 - Facilitates position-sensitive memory.
 - Removed from sparse attention layers to prevent decay of long-distance information.

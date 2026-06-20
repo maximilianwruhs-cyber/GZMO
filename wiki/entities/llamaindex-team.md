@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[local-first-rag-architecting-sovereign-ai-with-li|local-first-rag-architecting-sovereign-ai-with-li]] (2026-06-08)
+## From [local-first-rag-architecting-sovereign-ai-with-li](/entities/local-first-rag-architecting-sovereign-ai-with-li.md) (2026-06-08)
 - Developed LiteParse.
 - Engineered LiteParse to resolve the spatial collapse problem.
 - Released LiteParse under an open-source Apache 2.0 license.

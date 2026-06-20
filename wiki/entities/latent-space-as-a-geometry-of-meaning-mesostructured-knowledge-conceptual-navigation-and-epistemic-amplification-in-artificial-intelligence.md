@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-synthesizing-wisdom-from-heterogeneous-data|drive-research-synthesizing-wisdom-from-heterogeneous-data]] (2026-06-08)
+## From [drive-research-synthesizing-wisdom-from-heterogeneous-data](/entities/drive-research-synthesizing-wisdom-from-heterogeneous-data.md) (2026-06-08)
 - Discussed in the context of latent space and AI.
 - Used to map disparate datasets by projecting information into a shared latent space.
 - Reasoning is modeled as continuous movement across curved conceptual surfaces.

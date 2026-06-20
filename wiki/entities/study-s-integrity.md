@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-scientific-writing-and-publication-process-micro03|drive-research-scientific-writing-and-publication-process-micro03]] (2026-06-09)
+## From [drive-research-scientific-writing-and-publication-process-micro03](/entities/drive-research-scientific-writing-and-publication-process-micro03.md) (2026-06-09)
 - Authors must decline reviewer suggestions that compromise this.
 - Maintaining integrity throughout the authorship and publication process is paramount for preserving trust in the academic record.

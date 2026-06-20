@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-architecture-of-speculative-decoding-and-infer-part1-micro06|the-architecture-of-speculative-decoding-and-infer-part1-micro06]] (2026-06-09)
+## From [the-architecture-of-speculative-decoding-and-infer-part1-micro06](/entities/the-architecture-of-speculative-decoding-and-infer-part1-micro06.md) (2026-06-09)
 - Critical optimization deployed in vLLM setups
 - Empirical audits of TurboQuant revealed that Key (K) and Value (V) matrices exhibit differing sensitivities to quantization noise
 - Optimal vLLM configurations allocate mixed precisions: 3-bit for Keys and 4-bit for Values

@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-du-hast-gesagt-part1|drive-research-du-hast-gesagt-part1]] (2026-06-08)
+## From [drive-research-du-hast-gesagt-part1](/entities/drive-research-du-hast-gesagt-part1.md) (2026-06-08)
 - AI can plan, navigate workspace, edit files, run terminal commands, and self-correct.
 - Can be combined with a modern IDE.
 
-## From [[ultimate-local-ai-development-stack-for-vscodium-micro01|ultimate-local-ai-development-stack-for-vscodium-micro01]] (2026-06-09)
+## From [ultimate-local-ai-development-stack-for-vscodium-micro01](/entities/ultimate-local-ai-development-stack-for-vscodium-micro01.md) (2026-06-09)
 - Involves AI planning, navigating workspaces, editing files, running terminal commands, and self-correcting.
 - Can be combined with modern IDEs.

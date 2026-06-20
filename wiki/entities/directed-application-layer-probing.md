@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-to-product-engineering-leadership|drive-research-to-product-engineering-leadership]] (2026-06-08)
+## From [drive-research-to-product-engineering-leadership](/entities/drive-research-to-product-engineering-leadership.md) (2026-06-08)
 - Method for stealthy local service probing.
 - Utilizes well-formed HTTP GET requests to API endpoints.

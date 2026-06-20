@@ -13,6 +13,8 @@ use rmcp::model::CallToolRequestParams;
 use rmcp::RoleClient;
 use rmcp::service::{Peer, RunningService};
 
+use crate::config::GzmoConfig;
+use crate::obolus::gate::{evaluate_from_config, ObolusAction, ObolusTier, ObolusVerdict};
 use crate::tools::{ToolDef, ToolHandler};
 
 /// The live MCP client type.
@@ -36,6 +38,9 @@ pub struct McpToolBridge {
 
     /// The live MCP peer handle (Arc-shared across all bridges from same server)
     pub peer: Arc<Peer<RoleClient>>,
+
+    /// When set, MCP calls are gated by Obolus budget (ARD integration).
+    pub obolus_config: Option<Arc<GzmoConfig>>,
 }
 
 #[async_trait]
@@ -49,6 +54,22 @@ impl ToolHandler for McpToolBridge {
     }
 
     async fn execute(&self, args: serde_json::Value) -> Result<String> {
+        if let Some(ref cfg) = self.obolus_config {
+            match evaluate_from_config(cfg, ObolusAction::McpToolInvoke, ObolusTier::SemiAutonomous)? {
+                ObolusVerdict::Allow => {}
+                ObolusVerdict::Warn { reason } => {
+                    tracing::warn!(tool = %self.prefixed_name, %reason, "MCP invoke under budget warn");
+                }
+                ObolusVerdict::Defer { reason } | ObolusVerdict::Deny { reason } => {
+                    anyhow::bail!(
+                        "MCP tool '{}' blocked by Obolus gate: {}",
+                        self.prefixed_name,
+                        reason
+                    );
+                }
+            }
+        }
+
         tracing::info!(
             tool = %self.prefixed_name,
             mcp_name = %self.mcp_tool_name,

@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[drive-research-financial-time-series-lyapunov-exponents|drive-research-financial-time-series-lyapunov-exponents]] (2026-06-08)
+## From [drive-research-financial-time-series-lyapunov-exponents](/entities/drive-research-financial-time-series-lyapunov-exponents.md) (2026-06-08)
 - Hosts 'A convolutional neural network based approach to financial time series prediction'
 - Hosts 'Scaling Exponents of Time Series Data: A Machine Learning Approach'

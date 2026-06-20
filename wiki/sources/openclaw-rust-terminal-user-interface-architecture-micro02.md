@@ -14,19 +14,19 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-10).
 
 ## Entities
-- [[tmux|tmux]] (TOOL)
-- [[catppuccin|Catppuccin]] (CONCEPT)
-- [[rust|Rust]] (SYSTEM)
-- [[dracula|Dracula]] (CONCEPT)
-- [[nord|Nord]] (CONCEPT)
-- [[ratatui|ratatui]] (TOOL)
-- [[opencrust|OpenCrust]] (PROJECT)
-- [[cassowary-algorithm|Cassowary algorithm]] (CONCEPT)
-- [[crossterm|crossterm]] (TOOL)
-- [[node-js|Node.js]] (SYSTEM)
-- [[openclaw|OpenClaw]] (PROJECT)
-- [[zeroclaw|ZeroClaw]] (PROJECT)
-- [[zellij|zellij]] (TOOL)
+- [tmux](/entities/tmux.md) (TOOL)
+- [Catppuccin](/entities/catppuccin.md) (CONCEPT)
+- [Rust](/entities/rust.md) (SYSTEM)
+- [Dracula](/entities/dracula.md) (CONCEPT)
+- [Nord](/entities/nord.md) (CONCEPT)
+- [ratatui](/entities/ratatui.md) (TOOL)
+- [OpenCrust](/entities/opencrust.md) (PROJECT)
+- [Cassowary algorithm](/entities/cassowary-algorithm.md) (CONCEPT)
+- [crossterm](/entities/crossterm.md) (TOOL)
+- [Node.js](/entities/node-js.md) (SYSTEM)
+- [OpenClaw](/entities/openclaw.md) (PROJECT)
+- [ZeroClaw](/entities/zeroclaw.md) (PROJECT)
+- [zellij](/entities/zellij.md) (TOOL)
 
 ## Relations
 - OpenCrust → USES → Rust

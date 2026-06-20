@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[openclaw-deep-research-part5-micro01|openclaw-deep-research-part5-micro01]] (2026-06-09)
+## From [openclaw-deep-research-part5-micro01](/entities/openclaw-deep-research-part5-micro01.md) (2026-06-09)
 - The AI that actually does things.
 - Clears your inbox, sends emails, manages your calendar, checks you in for flights.
 - Micro-split from openclaw-deep-research-part5.md

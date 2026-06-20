@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[prompt-agent-engineering-part3|prompt-agent-engineering-part3]] (2026-06-08)
+## From [prompt-agent-engineering-part3](/entities/prompt-agent-engineering-part3.md) (2026-06-08)
 - Lokales Textmodell für Ollama

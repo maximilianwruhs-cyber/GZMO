@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[architectures-for-agentic-memory-virtual-context-micro03|architectures-for-agentic-memory-virtual-context-micro03]] (2026-06-09)
+## From [architectures-for-agentic-memory-virtual-context-micro03](/entities/architectures-for-agentic-memory-virtual-context-micro03.md) (2026-06-09)
 - Provides definitive empirical data regarding the reliability of sub-10B models.
 - Published in 2026.
 - Framework purposefully isolates critical reliability metrics.

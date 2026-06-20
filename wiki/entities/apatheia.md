@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-archival-truth-part1-micro02|the-archival-truth-part1-micro02]] (2026-06-09)
+## From [the-archival-truth-part1-micro02](/entities/the-archival-truth-part1-micro02.md) (2026-06-09)
 - True inner serenity.
 - Arises in Stoic teaching through the systematic decoupling of personal happiness from unreliable external variables.
 - Is a core concept of Stoic philosophy.

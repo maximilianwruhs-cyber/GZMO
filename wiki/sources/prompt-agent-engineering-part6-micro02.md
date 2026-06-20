@@ -14,13 +14,13 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[asyncio|asyncio]] (TOOL)
-- [[ki-ai|KI (AI)]] (CONCEPT)
-- [[human-in-the-loop-hitl|Human-in-the-Loop (HITL)]] (CONCEPT)
-- [[a2a-protocol|A2A protocol]] (CONCEPT)
-- [[werkstatt-helfer|Werkstatt-Helfer]] (SYSTEM)
-- [[httpx|httpx]] (TOOL)
-- [[dag-executor|DAG executor]] (SYSTEM)
+- [asyncio](/entities/asyncio.md) (TOOL)
+- [KI (AI)](/entities/ki-ai.md) (CONCEPT)
+- [Human-in-the-Loop (HITL)](/entities/human-in-the-loop-hitl.md) (CONCEPT)
+- [A2A protocol](/entities/a2a-protocol.md) (CONCEPT)
+- [Werkstatt-Helfer](/entities/werkstatt-helfer.md) (SYSTEM)
+- [httpx](/entities/httpx.md) (TOOL)
+- [DAG executor](/entities/dag-executor.md) (SYSTEM)
 
 ## Relations
 - DAG executor → USES → Human-in-the-Loop (HITL)

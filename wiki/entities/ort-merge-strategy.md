@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[architectural-framework-for-scalable-codebase-rest|architectural-framework-for-scalable-codebase-rest]] (2026-06-08)
+## From [architectural-framework-for-scalable-codebase-rest](/entities/architectural-framework-for-scalable-codebase-rest.md) (2026-06-08)
 - It is a modern three-way merge algorithm.
 - It is explicitly designed to handle complex merges involving extensive renames and directory restructuring.
 - It results in significantly fewer mismerges compared to legacy algorithms.

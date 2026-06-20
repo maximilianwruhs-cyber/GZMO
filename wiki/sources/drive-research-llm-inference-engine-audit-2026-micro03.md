@@ -14,8 +14,8 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[mlx|MLX]] (TOOL)
-- [[apple-silicon|Apple Silicon]] (ORGANIZATION)
-- [[llama-cpp|llama.cpp]] (TOOL)
-- [[ollama|Ollama]] (TOOL)
-- [[vllm|vLLM]] (TOOL)
+- [MLX](/entities/mlx.md) (TOOL)
+- [Apple Silicon](/entities/apple-silicon.md) (ORGANIZATION)
+- [llama.cpp](/entities/llama-cpp.md) (TOOL)
+- [Ollama](/entities/ollama.md) (TOOL)
+- [vLLM](/entities/vllm.md) (TOOL)

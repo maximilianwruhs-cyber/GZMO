@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-speicherbandbreiten-engpass-memory-wall|drive-research-speicherbandbreiten-engpass-memory-wall]] (2026-06-08)
+## From [drive-research-speicherbandbreiten-engpass-memory-wall](/entities/drive-research-speicherbandbreiten-engpass-memory-wall.md) (2026-06-08)
 - The distribution that data converges to after PolarQuant rotation.
 - Approaches a normal distribution.
 - Lloyd-Max optimization runs over it.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-llamacpp-gpu-memory-reporting-bug|drive-research-llamacpp-gpu-memory-reporting-bug]] (2026-06-08)
+## From [drive-research-llamacpp-gpu-memory-reporting-bug](/entities/drive-research-llamacpp-gpu-memory-reporting-bug.md) (2026-06-08)
 - System that must dynamically adapt to a broad spectrum of hardware accelerators.
 - Utilizes an automated parameter-fitting subsystem.
 - Cross-platform portability requires matching host operating system data structures.

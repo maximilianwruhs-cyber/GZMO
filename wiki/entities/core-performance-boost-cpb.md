@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-ubuntu-extreme-hardware-tuning-micro01|drive-research-ubuntu-extreme-hardware-tuning-micro01]] (2026-06-09)
+## From [drive-research-ubuntu-extreme-hardware-tuning-micro01](/entities/drive-research-ubuntu-extreme-hardware-tuning-micro01.md) (2026-06-09)
 - Allows individual cores to dynamically exceed base clock frequency.
 - Can introduce clock-jitter in variable workloads.
 - Can be toggled dynamically via sysfs.

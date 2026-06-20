@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-agentic-token-economy-blueprint-micro02|drive-research-agentic-token-economy-blueprint-micro02]] (2026-06-09)
+## From [drive-research-agentic-token-economy-blueprint-micro02](/entities/drive-research-agentic-token-economy-blueprint-micro02.md) (2026-06-09)
 - Essential for managing a token economy.
 - Requires tracking metrics across system performance, resource utilization, and agent behavior.
 - Correlates token budget with the specific subset of the context window that influenced a decision.

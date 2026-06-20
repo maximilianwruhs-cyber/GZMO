@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[prompt-agent-engineering-part1|prompt-agent-engineering-part1]] (2026-06-08)
+## From [prompt-agent-engineering-part1](/entities/prompt-agent-engineering-part1.md) (2026-06-08)
 - An elevated version of the Omni-Dimensional UI/UX Oracle prompt.
 - Balances persona with specific technical constraints.
 - Focuses on actionable, world-class UI/UX architecture.

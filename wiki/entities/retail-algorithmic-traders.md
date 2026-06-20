@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[drive-research-setting-up-autonomous-trading-agents-micro05|drive-research-setting-up-autonomous-trading-agents-micro05]] (2026-06-09)
+## From [drive-research-setting-up-autonomous-trading-agents-micro05](/entities/drive-research-setting-up-autonomous-trading-agents-micro05.md) (2026-06-09)
 - Can utilize Bitpanda as an infrastructure play.
 - Face existential threats from DIY infrastructure failure and tax reporting burden.
 - Must comply with MAR.

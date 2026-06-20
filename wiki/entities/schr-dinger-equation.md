@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[dynamics-of-the-unpredictable-micro03|dynamics-of-the-unpredictable-micro03]] (2026-06-09)
+## From [dynamics-of-the-unpredictable-micro03](/entities/dynamics-of-the-unpredictable-micro03.md) (2026-06-09)
 - Governs the evolution of quantum states linearly and unitarily over time.
 - Its linear nature suppresses the non-linear amplification necessary for the Butterfly Effect.

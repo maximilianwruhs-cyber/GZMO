@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[drive-research-setting-up-autonomous-trading-agents-micro01|drive-research-setting-up-autonomous-trading-agents-micro01]] (2026-06-09)
+## From [drive-research-setting-up-autonomous-trading-agents-micro01](/entities/drive-research-setting-up-autonomous-trading-agents-micro01.md) (2026-06-09)
 - The source document from which a micro-split was taken.
 - Contains research on setting up autonomous trading agents.

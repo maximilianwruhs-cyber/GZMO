@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-architecture-of-engagement-an-analysis-of-gam-micro01|the-architecture-of-engagement-an-analysis-of-gam-micro01]] (2026-06-09)
+## From [the-architecture-of-engagement-an-analysis-of-gam-micro01](/entities/the-architecture-of-engagement-an-analysis-of-gam-micro01.md) (2026-06-09)
 - Restricts addictive feeds and algorithmic delivery to minors.
 - Signals the end of the unverified, infinite-scroll internet for American youth.

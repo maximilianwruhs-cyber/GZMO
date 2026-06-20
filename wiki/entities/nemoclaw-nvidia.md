@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[openclaw-part2|openclaw-part2]] (2026-06-08)
+## From [openclaw-part2](/entities/openclaw-part2.md) (2026-06-08)
 - A secure runtime layer that sits on top of OpenClaw.
 - Uses an OpenShell runtime to block unauthorized network connections.
 - Requires human-in-the-loop approvals for sensitive tasks.

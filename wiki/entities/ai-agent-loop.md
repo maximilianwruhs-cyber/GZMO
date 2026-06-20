@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[cybernetics-and-mythos-the-architecture-of-intell-part1|cybernetics-and-mythos-the-architecture-of-intell-part1]] (2026-06-08)
+## From [cybernetics-and-mythos-the-architecture-of-intell-part1](/entities/cybernetics-and-mythos-the-architecture-of-intell-part1.md) (2026-06-08)
 - Transforms an LLM into a cybernetic controller.
 - Enables autonomous iteration and goal-directed behavior.
 - Core architecture of an autonomous AI agent.
@@ -22,7 +22,7 @@ Type: CONCEPT
 - Implied as a fundamental process within multi-agent systems.
 - Represents the operational cycle of an AI agent.
 
-## From [[drive-research-cybernetics-information-loops-between-entities-micro03|drive-research-cybernetics-information-loops-between-entities-micro03]] (2026-06-09)
+## From [drive-research-cybernetics-information-loops-between-entities-micro03](/entities/drive-research-cybernetics-information-loops-between-entities-micro03.md) (2026-06-09)
 - An architectural framework for autonomous AI agents.
 - Defined by a five-stage loop: Perceive, Reason, Plan, Act, Observe.
 - Capable of autonomous iteration and goal-directed behavior.

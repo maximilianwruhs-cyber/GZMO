@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-proxmox-agent-data-storage-micro02|drive-research-proxmox-agent-data-storage-micro02]] (2026-06-09)
+## From [drive-research-proxmox-agent-data-storage-micro02](/entities/drive-research-proxmox-agent-data-storage-micro02.md) (2026-06-09)
 - The official first-party Python library from Neo4j.
 - Enables developers to build unified retrieval pipelines.
 - A system that integrates structural relations with high-dimensional vectors.

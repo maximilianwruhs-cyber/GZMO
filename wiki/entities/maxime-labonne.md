@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[architectural-blueprints-for-sovereign-frankenmoe-part1|architectural-blueprints-for-sovereign-frankenmoe-part1]] (2026-06-08)
+## From [architectural-blueprints-for-sovereign-frankenmoe-part1](/entities/architectural-blueprints-for-sovereign-frankenmoe-part1.md) (2026-06-08)
 - He constructed the Beyonder-4x7B-v3 model.
 - He is associated with creating Mixtures of Experts with MergeKit.
 - His work is referenced in the context of community models.
 
-## From [[drive-research-mergekit-moe-model-creation-guide|drive-research-mergekit-moe-model-creation-guide]] (2026-06-08)
+## From [drive-research-mergekit-moe-model-creation-guide](/entities/drive-research-mergekit-moe-model-creation-guide.md) (2026-06-08)
 - Constructed the Beyonder-4x7B-v3 model.

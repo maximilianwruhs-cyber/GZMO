@@ -14,9 +14,9 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[drive-research-llamacpp-optimization-blueprint|drive-research-llamacpp-optimization-blueprint]] (CONCEPT)
-- [[llama-cpp|llama.cpp]] (TOOL)
-- [[google-takeout|Google Takeout]] (TOOL)
+- [drive-research-llamacpp-optimization-blueprint](/entities/drive-research-llamacpp-optimization-blueprint.md) (CONCEPT)
+- [llama.cpp](/entities/llama-cpp.md) (TOOL)
+- [Google Takeout](/entities/google-takeout.md) (TOOL)
 
 ## Relations
 - drive-research-llamacpp-optimization-blueprint → USES → llama.cpp

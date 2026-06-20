@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-redefining-agentic-soulmd-to-dialog-micro02|drive-research-redefining-agentic-soulmd-to-dialog-micro02]] (2026-06-09)
+## From [drive-research-redefining-agentic-soulmd-to-dialog-micro02](/entities/drive-research-redefining-agentic-soulmd-to-dialog-micro02.md) (2026-06-09)
 - A failure of the static SOUL.md paradigm under extended, multi-turn interactions.
 - Caused by context dilution.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[openclaw-part1-micro06|openclaw-part1-micro06]] (2026-06-09)
+## From [openclaw-part1-micro06](/entities/openclaw-part1-micro06.md) (2026-06-09)
 - Retrieval technique used in the REM phase of the Dreaming-Engine.
 - Generates a hypothetical, ideal synthesis document based on input fragments.
 - Helps bridge the semantic gap between problem reports and underlying causes.

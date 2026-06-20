@@ -14,15 +14,15 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-10).
 
 ## Entities
-- [[elite-ai-debugging-and-analysis-agent|Elite AI Debugging and Analysis Agent]] (CONCEPT)
-- [[junit|JUnit]] (TOOL)
-- [[gemini-ai|Gemini AI]] (SYSTEM)
-- [[chain-of-thought-reasoning|Chain of Thought Reasoning]] (CONCEPT)
-- [[pytest|pytest]] (TOOL)
-- [[gdb|gdb]] (TOOL)
-- [[mermaid|Mermaid]] (TOOL)
-- [[pdb|pdb]] (TOOL)
-- [[owasp-top-10|OWASP Top 10]] (CONCEPT)
+- [Elite AI Debugging and Analysis Agent](/entities/elite-ai-debugging-and-analysis-agent.md) (CONCEPT)
+- [JUnit](/entities/junit.md) (TOOL)
+- [Gemini AI](/entities/gemini-ai.md) (SYSTEM)
+- [Chain of Thought Reasoning](/entities/chain-of-thought-reasoning.md) (CONCEPT)
+- [pytest](/entities/pytest.md) (TOOL)
+- [gdb](/entities/gdb.md) (TOOL)
+- [Mermaid](/entities/mermaid.md) (TOOL)
+- [pdb](/entities/pdb.md) (TOOL)
+- [OWASP Top 10](/entities/owasp-top-10.md) (CONCEPT)
 
 ## Relations
 - Elite AI Debugging and Analysis Agent → USES → Chain of Thought Reasoning

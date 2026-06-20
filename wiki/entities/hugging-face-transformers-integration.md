@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-speicherbandbreiten-engpass-memory-wall|drive-research-speicherbandbreiten-engpass-memory-wall]] (2026-06-08)
+## From [drive-research-speicherbandbreiten-engpass-memory-wall](/entities/drive-research-speicherbandbreiten-engpass-memory-wall.md) (2026-06-08)
 - Integrates TurboQuant via the turboquant Python package.
 - Speculative drafting is enabled via the assistant_model parameter in the .generate() API.
 - Executes a 'hybrid decode' that saves VRAM but must dequantize historical vectors.

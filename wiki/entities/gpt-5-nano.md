@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[openclaw-deep-research-part12|openclaw-deep-research-part12]] (2026-06-08)
+## From [openclaw-deep-research-part12](/entities/openclaw-deep-research-part12.md) (2026-06-08)
 - An example of a cheap model for heartbeats.
 - Costs approximately $0.0001 per heartbeat.

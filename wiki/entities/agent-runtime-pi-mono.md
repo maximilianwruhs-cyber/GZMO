@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[openclaw-deep-research-part9-micro01|openclaw-deep-research-part9-micro01]] (2026-06-10)
+## From [openclaw-deep-research-part9-micro01](/entities/openclaw-deep-research-part9-micro01.md) (2026-06-10)
 - The embedded runtime that handles LLM interaction.
 - Handles prompt assembly, tool execution, and memory search.

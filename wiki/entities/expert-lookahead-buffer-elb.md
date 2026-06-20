@@ -14,6 +14,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[architectures-and-optimizations-for-speculative-de-micro06|architectures-and-optimizations-for-speculative-de-micro06]] (2026-06-09)
+## From [architectures-and-optimizations-for-speculative-de-micro06](/entities/architectures-and-optimizations-for-speculative-de-micro06.md) (2026-06-09)
 - Used by a runtime orchestrator.
 - Enables prefetching of massive expert weights into GPU cache.

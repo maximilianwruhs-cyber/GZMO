@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-ubuntu-extreme-hardware-tuning-micro03|drive-research-ubuntu-extreme-hardware-tuning-micro03]] (2026-06-09)
+## From [drive-research-ubuntu-extreme-hardware-tuning-micro03](/entities/drive-research-ubuntu-extreme-hardware-tuning-micro03.md) (2026-06-09)
 - CPU Performance Scaling Driver.
 - Mentioned in Linux Kernel documentation and archives.
 - AMD P-State EPP Scaling Driver is discussed.

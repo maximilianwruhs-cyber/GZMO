@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[obolus-micro02|obolus-micro02]] (2026-06-09)
+## From [obolus-micro02](/entities/obolus-micro02.md) (2026-06-09)
 - Research topic for Evo-Grid
 - Focuses on how an agent's 'DNA' is structured (System Prompt, Tool Access, Fine-tuning Data)

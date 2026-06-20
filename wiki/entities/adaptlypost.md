@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[openclaw-deep-research-part7-micro03|openclaw-deep-research-part7-micro03]] (2026-06-09)
+## From [openclaw-deep-research-part7-micro03](/entities/openclaw-deep-research-part7-micro03.md) (2026-06-09)
 - Schedule and manage social media posts across Instagram, X (Twitter), Bluesky, TikTok, Threads, LinkedIn, Facebook.

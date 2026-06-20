@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-research-project-initiation-guide|drive-research-research-project-initiation-guide]] (2026-06-08)
+## From [drive-research-research-project-initiation-guide](/entities/drive-research-research-project-initiation-guide.md) (2026-06-08)
 - A variant of the CRAAP test.
 - Includes Objectivity as an additional metric.
 - Helpful for assessing peer-reviewed papers and formal institutional publications.

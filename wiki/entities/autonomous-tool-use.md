@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-ai-agentic-teacher-research-report|drive-research-ai-agentic-teacher-research-report]] (2026-06-08)
+## From [drive-research-ai-agentic-teacher-research-report](/entities/drive-research-ai-agentic-teacher-research-report.md) (2026-06-08)
 - Capability of an Agentic Teacher to actively manipulate its digital environment.
 - Governed by frameworks like ReAct (Reasoning and Acting) or ToolOmni.
 - Allows the system to ground its instruction in verifiable, real-world execution.

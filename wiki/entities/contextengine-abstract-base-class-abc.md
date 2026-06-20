@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-hermes-compression-and-bol-architecture|drive-research-hermes-compression-and-bol-architecture]] (2026-06-08)
+## From [drive-research-hermes-compression-and-bol-architecture](/entities/drive-research-hermes-compression-and-bol-architecture.md) (2026-06-08)
 - Abstracts Hermes's context mechanics.
 - Allows developers to replace the default ContextCompressor with custom plugins.
 - Defined by the ContextEngine Abstract Base Class (ABC).

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[ai-research-part8-micro07|ai-research-part8-micro07]] (2026-06-09)
+## From [ai-research-part8-micro07](/entities/ai-research-part8-micro07.md) (2026-06-09)
 - It empirically mutates its own Python codebase.
 - It evaluates patches against strict benchmarks like SWE-bench.
 - It preserves successful mutations.

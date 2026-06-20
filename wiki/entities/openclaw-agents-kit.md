@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro03|the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro03]] (2026-06-09)
+## From [the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro03](/entities/the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro03.md) (2026-06-09)
 - Developed by the academic community.
 - Used to provision a fleet of specialized AI entities.

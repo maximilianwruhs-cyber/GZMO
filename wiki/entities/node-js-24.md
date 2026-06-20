@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-bun-typescript-performance-tips-micro03|drive-research-bun-typescript-performance-tips-micro03]] (2026-06-09)
+## From [drive-research-bun-typescript-performance-tips-micro03](/entities/drive-research-bun-typescript-performance-tips-micro03.md) (2026-06-09)
 - Ecosystem historically relied on Node-API (N-API) or node-gyp.
 - FFI implementations operate via Node-API.
 - Traditionally executes file reads via standard C++ abstractions.

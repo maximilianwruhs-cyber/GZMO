@@ -18,7 +18,7 @@ gzmo_synthetic: true
 
 Type: MODEL
 
-## From [[architectural-blueprints-for-sovereign-frankenmoe-part1|architectural-blueprints-for-sovereign-frankenmoe-part1]] (2026-06-08)
+## From [architectural-blueprints-for-sovereign-frankenmoe-part1](/entities/architectural-blueprints-for-sovereign-frankenmoe-part1.md) (2026-06-08)
 - Serves as the Base Model / General Chat Expert within Beyonder-4x7B-v3.
 - Base Model / General Chat Expert within Beyonder-4x7B-v3.
 - Scores 45.37 on AGIEval and 77.01 on GPT4All.
@@ -30,29 +30,29 @@ Type: MODEL
 - It is a chat expert.
 - It is fused into Beyonder-4x7B-v3.
 
-## From [[drive-research-frankenmoe-blueprint-analysis|drive-research-frankenmoe-blueprint-analysis]] (2026-06-08)
+## From [drive-research-frankenmoe-blueprint-analysis](/entities/drive-research-frankenmoe-blueprint-analysis.md) (2026-06-08)
 - A specialized 7B model.
 - Used in the mlabonne/Beyonder-4x7B-v3 architecture.
 - Primary synthesis role: Base Skeleton / General conversational guide.
 - Serves as the Base Skeleton / General conversational guide.
 - Part of the mlabonne/Beyonder-4x7B-v3 architecture.
 
-## From [[drive-research-frankenmoe-merging-ai-models|drive-research-frankenmoe-merging-ai-models]] (2026-06-08)
+## From [drive-research-frankenmoe-merging-ai-models](/entities/drive-research-frankenmoe-merging-ai-models.md) (2026-06-08)
 - Serves as the Base Model / General Chat Expert for mlabonne/Beyonder-4x7B-v3.
 - A specialized 7B model.
 - Serves as the Base Model / General Chat Expert in Beyonder-4x7B-v3.
 - A specialized 7B model used in Beyonder-4x7B-v3.
 - Acts as the general chat expert.
 
-## From [[drive-research-hidden-mode-technical-analysis-and-configurati|drive-research-hidden-mode-technical-analysis-and-configurati]] (2026-06-08)
+## From [drive-research-hidden-mode-technical-analysis-and-configurati](/entities/drive-research-hidden-mode-technical-analysis-and-configurati.md) (2026-06-08)
 - Serves as the Base Model / General Chat Expert for mlabonne/Beyonder-4x7B-v3.
 - Achieved an average score of 62.74 on key benchmarks.
 
-## From [[drive-research-hidden-mode-technical-analysis-and-configuration|drive-research-hidden-mode-technical-analysis-and-configuration]] (2026-06-08)
+## From [drive-research-hidden-mode-technical-analysis-and-configuration](/entities/drive-research-hidden-mode-technical-analysis-and-configuration.md) (2026-06-08)
 - Serves as the Base Model / General Chat Expert for mlabonne/Beyonder-4x7B-v3.
 - Achieved an average score of 62.74 on key benchmarks.
 
-## From [[drive-research-mergekit-moe-model-creation-guide|drive-research-mergekit-moe-model-creation-guide]] (2026-06-08)
+## From [drive-research-mergekit-moe-model-creation-guide](/entities/drive-research-mergekit-moe-model-creation-guide.md) (2026-06-08)
 - A specialized Mistral-7B checkpoint fused into Beyonder-4x7B-v3.
 - Focuses on chat.
 - Serves as the chat expert.

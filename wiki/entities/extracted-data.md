@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[architectures-for-agentic-memory-virtual-context-micro03|architectures-for-agentic-memory-virtual-context-micro03]] (2026-06-09)
+## From [architectures-for-agentic-memory-virtual-context-micro03](/entities/architectures-for-agentic-memory-virtual-context-micro03.md) (2026-06-09)
 - A strict, rigid data structure containing the final parsed values.
 - Follows the augmented schema design.

@@ -14,9 +14,9 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[prompt-agent-engineering-part4-micro04|prompt-agent-engineering-part4-micro04]] (2026-06-09)
+## From [prompt-agent-engineering-part4-micro04](/entities/prompt-agent-engineering-part4-micro04.md) (2026-06-09)
 - Requests help from Core
 - Sends heartbeat to Watchdog
 
-## From [[prompt-agent-engineering-part7-micro04|prompt-agent-engineering-part7-micro04]] (2026-06-10)
+## From [prompt-agent-engineering-part7-micro04](/entities/prompt-agent-engineering-part7-micro04.md) (2026-06-10)
 - Suggested tool for data processing

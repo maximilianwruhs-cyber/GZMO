@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-architektur-token-effizienter-ki-agenten-strategi|drive-research-architektur-token-effizienter-ki-agenten-strategi]] (2026-06-08)
+## From [drive-research-architektur-token-effizienter-ki-agenten-strategi](/entities/drive-research-architektur-token-effizienter-ki-agenten-strategi.md) (2026-06-08)
 - Compresses interaction history into a dense 400-token summary block.
 - Saves approximately 3,600 input tokens per subsequent reasoning call.
 - Uses a smaller model like Claude Haiku for compression.

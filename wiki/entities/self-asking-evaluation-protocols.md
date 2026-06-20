@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[from-static-vaults-to-autonomous-knowledge-engines|from-static-vaults-to-autonomous-knowledge-engines]] (2026-06-08)
+## From [from-static-vaults-to-autonomous-knowledge-engines](/entities/from-static-vaults-to-autonomous-knowledge-engines.md) (2026-06-08)
 - Used by the agent to cross-reference initial findings against the vault's current state and operational constraints.
 - Actively identifies gaps in coverage and recognizes superficial data points.
 - Executes secondary, highly targeted searches to find missing angles or entities.

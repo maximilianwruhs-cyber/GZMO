@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-soul|drive-research-soul]] (2026-06-08)
+## From [drive-research-soul](/entities/drive-research-soul.md) (2026-06-08)
 - States that OpenClaw workspace text files are the only cognitive continuity.
 - Emphasizes active recall and gardening of memory.
 - Maintains a persistent wiki in the Obsidian Vault.

@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[openclaw-autonomous-ai-agents-in-financial-operat|openclaw-autonomous-ai-agents-in-financial-operat]] (2026-06-08)
+## From [openclaw-autonomous-ai-agents-in-financial-operat](/entities/openclaw-autonomous-ai-agents-in-financial-operat.md) (2026-06-08)
 - Python cron script to prevent Interactive Brokers connection timeouts.
 - Pings the gateway to maintain the biometric 2FA session.

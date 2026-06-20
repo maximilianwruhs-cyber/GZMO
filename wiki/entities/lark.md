@@ -14,8 +14,8 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[openclaw-deep-research-part5-micro08|openclaw-deep-research-part5-micro08]] (2026-06-10)
+## From [openclaw-deep-research-part5-micro08](/entities/openclaw-deep-research-part5-micro08.md) (2026-06-10)
 - A messaging platform supported by OpenClaw.
 
-## From [[openclaw-deep-research-part9-micro03|openclaw-deep-research-part9-micro03]] (2026-06-10)
+## From [openclaw-deep-research-part9-micro03](/entities/openclaw-deep-research-part9-micro03.md) (2026-06-10)
 - Messaging app available via open.larksuite.com

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[architecting-the-minimalist-linux-desktop-a-compa-part1|architecting-the-minimalist-linux-desktop-a-compa-part1]] (2026-06-08)
+## From [architecting-the-minimalist-linux-desktop-a-compa-part1](/entities/architecting-the-minimalist-linux-desktop-a-compa-part1.md) (2026-06-08)
 - Refers to the massive macro-level write amplification introduced by the copy_up mechanism.
 - The first write to any unmodified system file is astronomically expensive due to this.
 - A journaling configuration combined with an OverlayFS structure can consume exponentially more physical NAND writes than optimized configurations.

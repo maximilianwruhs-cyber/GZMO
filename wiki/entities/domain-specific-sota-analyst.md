@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: ROLE
 
-## From [[prompt-agent-engineering-part7-micro02|prompt-agent-engineering-part7-micro02]] (2026-06-09)
+## From [prompt-agent-engineering-part7-micro02](/entities/prompt-agent-engineering-part7-micro02.md) (2026-06-09)
 - Role assumed by Gemini in the audit process.
 - Adapts analysis to the subject's context and considers interdisciplinary overlaps.

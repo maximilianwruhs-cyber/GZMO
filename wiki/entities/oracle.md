@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-synthesizing-wisdom-from-heterogeneous-data|drive-research-synthesizing-wisdom-from-heterogeneous-data]] (2026-06-08)
+## From [drive-research-synthesizing-wisdom-from-heterogeneous-data](/entities/drive-research-synthesizing-wisdom-from-heterogeneous-data.md) (2026-06-08)
 - A black-box interaction used for generating abstract problems.
 - Used by the Teacher Agent in the Teacher-Student-Orchestrator loop.
 - Contributes to evaluating distilled heuristics.
 
-## From [[drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part1-micro02|drive-research-ki-berater-fragebogen-für-kundenanalyse-part1-micro02]] (2026-06-10)
+## From [drive-research-ki-berater-fragebogen-für-kundenanalyse-part1-micro02](/entities/drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part1-micro02.md) (2026-06-10)
 - Ein zentrales Informationssystem

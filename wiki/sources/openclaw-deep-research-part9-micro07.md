@@ -14,19 +14,19 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-10).
 
 ## Entities
-- [[sdpo|SDPO]] (CONCEPT)
-- [[openclaw-combine|openclaw-combine]] (SYSTEM)
-- [[openclaw-tinker|openclaw-tinker]] (SYSTEM)
-- [[binary-rl|Binary RL]] (CONCEPT)
-- [[yinjie-wang|Yinjie Wang]] (PERSON)
-- [[apache-2-0|Apache 2.0]] (CONCEPT)
-- [[sdft|SDFT]] (CONCEPT)
-- [[openclaw-opd|openclaw-opd]] (SYSTEM)
-- [[qwen3-8b|Qwen3-8B]] (SYSTEM)
-- [[slime|Slime]] (SYSTEM)
-- [[combination-method|Combination Method]] (CONCEPT)
-- [[on-policy-distillation|On-Policy Distillation]] (CONCEPT)
-- [[openclaw-rl|OpenClaw-RL]] (SYSTEM)
+- [SDPO](/entities/sdpo.md) (CONCEPT)
+- [openclaw-combine](/entities/openclaw-combine.md) (SYSTEM)
+- [openclaw-tinker](/entities/openclaw-tinker.md) (SYSTEM)
+- [Binary RL](/entities/binary-rl.md) (CONCEPT)
+- [Yinjie Wang](/entities/yinjie-wang.md) (PERSON)
+- [Apache 2.0](/entities/apache-2-0.md) (CONCEPT)
+- [SDFT](/entities/sdft.md) (CONCEPT)
+- [openclaw-opd](/entities/openclaw-opd.md) (SYSTEM)
+- [Qwen3-8B](/entities/qwen3-8b.md) (SYSTEM)
+- [Slime](/entities/slime.md) (SYSTEM)
+- [Combination Method](/entities/combination-method.md) (CONCEPT)
+- [On-Policy Distillation](/entities/on-policy-distillation.md) (CONCEPT)
+- [OpenClaw-RL](/entities/openclaw-rl.md) (SYSTEM)
 
 ## Relations
 - OpenClaw-RL → USES → Binary RL

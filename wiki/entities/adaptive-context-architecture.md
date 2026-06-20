@@ -14,6 +14,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-agentic-token-economy-blueprint-micro01|drive-research-agentic-token-economy-blueprint-micro01]] (2026-06-09)
+## From [drive-research-agentic-token-economy-blueprint-micro01](/entities/drive-research-agentic-token-economy-blueprint-micro01.md) (2026-06-09)
 - A paradigm that requires the system to actively budget, route, compress, and cache its context usage dynamically.
 - Maps computational expenditure directly to the specific complexity of the task at hand.

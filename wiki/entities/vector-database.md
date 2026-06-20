@@ -15,17 +15,17 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[the-honeypot-compiler-architecture-distilling-dat|the-honeypot-compiler-architecture-distilling-dat]] (2026-06-08)
+## From [the-honeypot-compiler-architecture-distilling-dat](/entities/the-honeypot-compiler-architecture-distilling-dat.md) (2026-06-08)
 - Mentioned as something not needed in the described system.
 - Tries to remember everything and freezes noise in time.
 - Contrasted with the 'purposeful forgetting' of the Linting process.
 
-## From [[drive-research-cascading-honeypot-ai-architecture|drive-research-cascading-honeypot-ai-architecture]] (2026-06-08)
+## From [drive-research-cascading-honeypot-ai-architecture](/entities/drive-research-cascading-honeypot-ai-architecture.md) (2026-06-08)
 - Underlies traditional RAG systems.
 - Stores information in a high-dimensional mathematical vector space.
 - Retrieves information via nearest-neighbor search based on cosine similarity.
 
-## From [[architectures-for-agentic-memory-virtual-context-micro04|architectures-for-agentic-memory-virtual-context-micro04]] (2026-06-09)
+## From [architectures-for-agentic-memory-virtual-context-micro04](/entities/architectures-for-agentic-memory-virtual-context-micro04.md) (2026-06-09)
 - Paired with Knowledge Graphs in advanced cognitive architectures.
 - Used for semantic similarity searches.
 - Used for narrowing candidates via vector search.

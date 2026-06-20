@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-algorithmic-trading-with-chaos-theory|drive-research-algorithmic-trading-with-chaos-theory]] (2026-06-08)
+## From [drive-research-algorithmic-trading-with-chaos-theory](/entities/drive-research-algorithmic-trading-with-chaos-theory.md) (2026-06-08)
 - A linear stochastic process used for modeling volatility.
 - Traditionally used for macroeconomic trends.
 - Fails to capture high-frequency microstructural dynamics.

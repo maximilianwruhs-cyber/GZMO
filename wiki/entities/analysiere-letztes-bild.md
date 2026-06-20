@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[prompt-agent-engineering-part3|prompt-agent-engineering-part3]] (2026-06-08)
+## From [prompt-agent-engineering-part3](/entities/prompt-agent-engineering-part3.md) (2026-06-08)
 - A tool defined for the AI to use.
 - Used when the user asks a question about a previously sent image.
 - Called by the Python script to execute LLaVA.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[drive-research-optimizing-cuda-performance-with-fp4-fp6-micro01|drive-research-optimizing-cuda-performance-with-fp4-fp6-micro01]] (2026-06-09)
+## From [drive-research-optimizing-cuda-performance-with-fp4-fp6-micro01](/entities/drive-research-optimizing-cuda-performance-with-fp4-fp6-micro01.md) (2026-06-09)
 - A document analyzing structural and microarchitectural causes of execution failures in FP4/FP6 configurations on Blackwell.
 - Provides a framework for achieving stable, maximum-throughput native FP4/FP6 execution.
 - Source code format accepted by the NVRTC library.

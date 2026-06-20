@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-architecture-of-engagement-an-analysis-of-gam-micro08|the-architecture-of-engagement-an-analysis-of-gam-micro08]] (2026-06-09)
+## From [the-architecture-of-engagement-an-analysis-of-gam-micro08](/entities/the-architecture-of-engagement-an-analysis-of-gam-micro08.md) (2026-06-09)
 - A profound, paradigm-shifting evolution in how modern organizations interact with human motivation.
 - Not a superficial, cynical layering of digital badges onto tedious software interfaces.
 - The rigorous, strategic application of behavioral science, neuroeconomics, and sophisticated game design to influence decision-making, reduce friction, and foster deep habit formation.

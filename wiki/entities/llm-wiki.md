@@ -14,12 +14,12 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[local-first-rag-architecting-sovereign-ai-with-li|local-first-rag-architecting-sovereign-ai-with-li]] (2026-06-08)
+## From [local-first-rag-architecting-sovereign-ai-with-li](/entities/local-first-rag-architecting-sovereign-ai-with-li.md) (2026-06-08)
 - Assumes the knowledge base is relatively small, highly focused, and structurally stable.
 - No embedding pipeline, vector database, or chunking strategy.
 - The entire relevant Markdown document is loaded directly into the LLM's system prompt or context window.
 
-## From [[drive-research-cascading-honeypot-ai-architecture|drive-research-cascading-honeypot-ai-architecture]] (2026-06-08)
+## From [drive-research-cascading-honeypot-ai-architecture](/entities/drive-research-cascading-honeypot-ai-architecture.md) (2026-06-08)
 - An emerging engineering paradigm.
 - Maps to the Cascading Honeypot framework.
 - Processes complex research questions.

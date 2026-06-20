@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: AGENT
 
-## From [[obolus-micro04|obolus-micro04]] (2026-06-09)
+## From [obolus-micro04](/entities/obolus-micro04.md) (2026-06-09)
 - ensures the ServiceBot stack (DB, API, Bot, Ingest-Jobs) is stable, observable, and exhibits clean behavior
 - handles monitoring and metrics, logs and alerts, operational processes (restart, backups, deployments)
 - defines metrics for PostgreSQL, API service, and Ingest-Jobs

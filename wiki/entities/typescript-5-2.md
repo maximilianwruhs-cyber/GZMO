@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-advanced-typescript-execution-in-the-bun-runtime-micro03|drive-research-advanced-typescript-execution-in-the-bun-runtime-micro03]] (2026-06-09)
+## From [drive-research-advanced-typescript-execution-in-the-bun-runtime-micro03](/entities/drive-research-advanced-typescript-execution-in-the-bun-runtime-micro03.md) (2026-06-09)
 - TypeScript numbers are double-precision floats that provide 53 bits of safe integer space.
 - Bun's FFI system supports JSCallback, allowing native C or Rust code to asynchronously invoke TypeScript functions.
 - The definitive technique for safe memory management in Bun FFI involves utilizing TypeScript 5.2's Explicit Resource Management (the using keyword).

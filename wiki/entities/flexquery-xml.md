@@ -14,8 +14,8 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-setting-up-autonomous-trading-agents-micro02|drive-research-setting-up-autonomous-trading-agents-micro02]] (2026-06-09)
+## From [drive-research-setting-up-autonomous-trading-agents-micro02](/entities/drive-research-setting-up-autonomous-trading-agents-micro02.md) (2026-06-09)
 - Proprietary data export format provided by international brokers.
 
-## From [[the-architects-handbook-for-autonomous-agentic-tr-micro03|the-architects-handbook-for-autonomous-agentic-tr-micro03]] (2026-06-09)
+## From [the-architects-handbook-for-autonomous-agentic-tr-micro03](/entities/the-architects-handbook-for-autonomous-agentic-tr-micro03.md) (2026-06-09)
 - A type of proprietary data export provided by international brokers.

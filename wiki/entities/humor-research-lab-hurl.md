@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[the-archival-truth-part1-micro05|the-archival-truth-part1-micro05]] (2026-06-09)
+## From [the-archival-truth-part1-micro05](/entities/the-archival-truth-part1-micro05.md) (2026-06-09)
 - Serves as the theoretical foundation for the Benign Violation Theory (BVT).
 - Identifies categories of violations that can trigger humor.

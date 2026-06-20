@@ -14,11 +14,11 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-bun-file-parsing-dependency-shortlist-micro01|drive-research-bun-file-parsing-dependency-shortlist-micro01]] (2026-06-09)
+## From [drive-research-bun-file-parsing-dependency-shortlist-micro01](/entities/drive-research-bun-file-parsing-dependency-shortlist-micro01.md) (2026-06-09)
 - heavily dependent on robust encoding detection
 - corrupted glyphs occur if legacy encoding is not explicitly handled
 
-## From [[drive-research-bun-file-parsing-dependency-shortlist-micro02|drive-research-bun-file-parsing-dependency-shortlist-micro02]] (2026-06-09)
+## From [drive-research-bun-file-parsing-dependency-shortlist-micro02](/entities/drive-research-bun-file-parsing-dependency-shortlist-micro02.md) (2026-06-09)
 - Ubiquitous, highly standardized unformatted primitive.
 - Plain text files should be ingested utilizing Bun’s highly optimized native file API.
 - Core complexity lies in character encoding variance.

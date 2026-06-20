@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[cybernetics-and-mythos-the-architecture-of-intell-part2|cybernetics-and-mythos-the-architecture-of-intell-part2]] (2026-06-08)
+## From [cybernetics-and-mythos-the-architecture-of-intell-part2](/entities/cybernetics-and-mythos-the-architecture-of-intell-part2.md) (2026-06-08)
 - A small, portable box.
 - The Latin translation of 'pithos' by Erasmus of Rotterdam.
 - Led to the popular term "Pandora's Box".

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-prometheus-and-epimetheus-myth-exploration-micro03|drive-research-prometheus-and-epimetheus-myth-exploration-micro03]] (2026-06-09)
+## From [drive-research-prometheus-and-epimetheus-myth-exploration-micro03](/entities/drive-research-prometheus-and-epimetheus-myth-exploration-micro03.md) (2026-06-09)
 - Used to bind Prometheus to Mount Caucasus.
 - Forged by Hephaestus.
 - Broken by Heracles.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-architecture-of-scientific-inquiry-and-academi|the-architecture-of-scientific-inquiry-and-academi]] (2026-06-08)
+## From [the-architecture-of-scientific-inquiry-and-academi](/entities/the-architecture-of-scientific-inquiry-and-academi.md) (2026-06-08)
 - Both authors and reviewers remain completely anonymous to each other.
 - Maximizes fair evaluation by judging research solely on merit.
 - Difficult to guarantee complete anonymity and can be time-consuming.

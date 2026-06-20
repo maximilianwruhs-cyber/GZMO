@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: PRECISION_MODE
 
-## From [[ai-research-part6-micro04|ai-research-part6-micro04]] (2026-06-09)
+## From [ai-research-part6-micro04](/entities/ai-research-part6-micro04.md) (2026-06-09)
 - Precision used in OLMo-1.3B training setup

@@ -15,13 +15,13 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-research-project-initiation-guide|drive-research-research-project-initiation-guide]] (2026-06-08)
+## From [drive-research-research-project-initiation-guide](/entities/drive-research-research-project-initiation-guide.md) (2026-06-08)
 - Criteria applied to ensure a research question is viable.
 - Stands for Feasible, Interesting, Novel, Ethical, Relevant.
 - Helps assess technical expertise, budget, time, and participant recruitment.
 
-## From [[optimizing-nvidia-blackwell-sm120-part2-micro06|optimizing-nvidia-blackwell-sm120-part2-micro06]] (2026-06-10)
+## From [optimizing-nvidia-blackwell-sm120-part2-micro06](/entities/optimizing-nvidia-blackwell-sm120-part2-micro06.md) (2026-06-10)
 - Criteria used to ensure research question viability
 
-## From [[optimizing-nvidia-blackwell-sm120-part2-micro08|optimizing-nvidia-blackwell-sm120-part2-micro08]] (2026-06-10)
+## From [optimizing-nvidia-blackwell-sm120-part2-micro08](/entities/optimizing-nvidia-blackwell-sm120-part2-micro08.md) (2026-06-10)
 - A research framework

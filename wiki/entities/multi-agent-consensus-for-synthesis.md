@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-synthesizing-wisdom-from-heterogeneous-data|drive-research-synthesizing-wisdom-from-heterogeneous-data]] (2026-06-08)
+## From [drive-research-synthesizing-wisdom-from-heterogeneous-data](/entities/drive-research-synthesizing-wisdom-from-heterogeneous-data.md) (2026-06-08)
 - Scales the synthesis process using a hierarchical multi-agent architecture.
 - Separates the Designer (Meta-Agent Designer) from the Executor (Executor Agents).
 - Uses MetaAgent-X to jointly optimize both roles.

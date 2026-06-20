@@ -14,9 +14,9 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[wave-02-notebooklm|wave_02_notebooklm]] (PROJECT)
-- [[google-takeout|Google Takeout]] (TOOL)
-- [[openclaw-rust-terminal-user-interface-architecture|OpenClaw Rust Terminal User Interface Architecture]] (PROJECT)
+- [wave_02_notebooklm](/entities/wave-02-notebooklm.md) (PROJECT)
+- [Google Takeout](/entities/google-takeout.md) (TOOL)
+- [OpenClaw Rust Terminal User Interface Architecture](/entities/openclaw-rust-terminal-user-interface-architecture.md) (PROJECT)
 
 ## Relations
 - OpenClaw Rust Terminal User Interface Architecture → USES → Google Takeout

@@ -15,10 +15,10 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-32gb-vram-ai-reasoning-models-micro02|drive-research-32gb-vram-ai-reasoning-models-micro02]] (2026-06-09)
+## From [drive-research-32gb-vram-ai-reasoning-models-micro02](/entities/drive-research-32gb-vram-ai-reasoning-models-micro02.md) (2026-06-09)
 - Has massive unified memory architecture.
 - Can be linked with an RTX 5090 host PC via the EXO framework.
 
-## From [[optimizing-nvidia-blackwell-sm120-part3-micro02|optimizing-nvidia-blackwell-sm120-part3-micro02]] (2026-06-10)
+## From [optimizing-nvidia-blackwell-sm120-part3-micro02](/entities/optimizing-nvidia-blackwell-sm120-part3-micro02.md) (2026-06-10)
 - Equipped with M2 Max chip
 - Demonstrates significant difference between GPU core power and system DC wall draw

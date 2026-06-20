@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[ai-research-part2|ai-research-part2]] (2026-06-08)
+## From [ai-research-part2](/entities/ai-research-part2.md) (2026-06-08)
 - Refers to the pre-trained base model without any fine-tuning.
 - Can be evaluated in a zero-shot setting with access to a code interpreter.

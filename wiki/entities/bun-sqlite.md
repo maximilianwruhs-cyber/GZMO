@@ -15,16 +15,16 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-license-and-native-binding-analysis|drive-research-license-and-native-binding-analysis]] (2026-06-08)
+## From [drive-research-license-and-native-binding-analysis](/entities/drive-research-license-and-native-binding-analysis.md) (2026-06-08)
 - A fast, highly optimized SQLite implementation natively embedded in the Bun runtime.
 - Requires no installation or external dependencies.
 - Classified as Green.
 
-## From [[drive-research-advanced-typescript-execution-in-the-bun-runtime-micro03|drive-research-advanced-typescript-execution-in-the-bun-runtime-micro03]] (2026-06-09)
+## From [drive-research-advanced-typescript-execution-in-the-bun-runtime-micro03](/entities/drive-research-advanced-typescript-execution-in-the-bun-runtime-micro03.md) (2026-06-09)
 - Bun integrates a native SQLite client (bun:sqlite) directly into the runtime binary.
 - Because the database driver is compiled alongside the runtime, it circumvents the Node-API boundary entirely, executing queries 3 to 6 times faster than popular libraries like better-sqlite3.
 
-## From [[drive-research-bun-typescript-performance-tips-micro03|drive-research-bun-typescript-performance-tips-micro03]] (2026-06-09)
+## From [drive-research-bun-typescript-performance-tips-micro03](/entities/drive-research-bun-typescript-performance-tips-micro03.md) (2026-06-09)
 - Bun integrates a native SQLite client directly into the runtime binary.
 - Executes queries 3 to 6 times faster than popular libraries like better-sqlite3.
 - Bun integrates a native SQLite client.

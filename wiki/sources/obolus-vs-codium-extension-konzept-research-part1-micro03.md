@@ -14,20 +14,20 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-10).
 
 ## Entities
-- [[obl|$OBL]] (CONCEPT)
-- [[aos-telemetrie-engine|AOS-Telemetrie-Engine]] (SYSTEM)
-- [[intel-rapl|Intel RAPL]] (TOOL)
-- [[aos-agenticos|AOS (AgenticOS)]] (SYSTEM)
-- [[esbuild|esbuild]] (TOOL)
-- [[market-broker|Market Broker]] (SYSTEM)
-- [[obolus-benchmark-runner|Obolus-Benchmark-Runner]] (SYSTEM)
-- [[ubuntu-24-04-lts|Ubuntu 24.04 LTS]] (SYSTEM)
-- [[gzmo|GZMO]] (SYSTEM)
-- [[fastapi|FastAPI]] (SYSTEM)
-- [[uvicorn|Uvicorn]] (SYSTEM)
-- [[typescript|TypeScript]] (TOOL)
-- [[chart-js|Chart.js]] (TOOL)
-- [[vs-code|VS Code]] (SYSTEM)
+- [$OBL](/entities/obl.md) (CONCEPT)
+- [AOS-Telemetrie-Engine](/entities/aos-telemetrie-engine.md) (SYSTEM)
+- [Intel RAPL](/entities/intel-rapl.md) (TOOL)
+- [AOS (AgenticOS)](/entities/aos-agenticos.md) (SYSTEM)
+- [esbuild](/entities/esbuild.md) (TOOL)
+- [Market Broker](/entities/market-broker.md) (SYSTEM)
+- [Obolus-Benchmark-Runner](/entities/obolus-benchmark-runner.md) (SYSTEM)
+- [Ubuntu 24.04 LTS](/entities/ubuntu-24-04-lts.md) (SYSTEM)
+- [GZMO](/entities/gzmo.md) (SYSTEM)
+- [FastAPI](/entities/fastapi.md) (SYSTEM)
+- [Uvicorn](/entities/uvicorn.md) (SYSTEM)
+- [TypeScript](/entities/typescript.md) (TOOL)
+- [Chart.js](/entities/chart-js.md) (TOOL)
+- [VS Code](/entities/vs-code.md) (SYSTEM)
 
 ## Relations
 - AOS-Telemetrie-Engine → PART_OF → VS Code

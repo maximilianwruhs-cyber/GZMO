@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-nvar-financial-forecasting-parameter-search|drive-research-nvar-financial-forecasting-parameter-search]] (2026-06-08)
+## From [drive-research-nvar-financial-forecasting-parameter-search](/entities/drive-research-nvar-financial-forecasting-parameter-search.md) (2026-06-08)
 - Serves as a universal approximator over bounded input sequences.
 - Is used in Infinite-Dimensional Kernel NGRC.
 - Has recurrence properties.

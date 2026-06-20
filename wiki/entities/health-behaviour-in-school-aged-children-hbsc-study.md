@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: STUDY
 
-## From [[the-architecture-of-engagement-an-analysis-of-gam-micro04|the-architecture-of-engagement-an-analysis-of-gam-micro04]] (2026-06-09)
+## From [the-architecture-of-engagement-an-analysis-of-gam-micro04](/entities/the-architecture-of-engagement-an-analysis-of-gam-micro04.md) (2026-06-09)
 - A massive study across 44 countries.
 - Provided data for a 2024 WHO report.
 - Highlighted trends in problematic social media use among adolescents.

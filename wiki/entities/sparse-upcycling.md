@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-mergekit-moe-model-creation-guide|drive-research-mergekit-moe-model-creation-guide]] (2026-06-08)
+## From [drive-research-mergekit-moe-model-creation-guide](/entities/drive-research-mergekit-moe-model-creation-guide.md) (2026-06-08)
 - A dense model is duplicated into a sparse MoE structure to initialize continued pre-training.
 - Bypasses the initial stages of training a sparse architecture from scratch.
 - The random gating mode is ideal for sparse upcycling workflows.

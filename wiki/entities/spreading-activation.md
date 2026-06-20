@@ -15,11 +15,11 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[architectures-for-agentic-memory-virtual-context-micro06|architectures-for-agentic-memory-virtual-context-micro06]] (2026-06-09)
+## From [architectures-for-agentic-memory-virtual-context-micro06](/entities/architectures-for-agentic-memory-virtual-context-micro06.md) (2026-06-09)
 - A mechanism used in SEKG stack's semantic memory.
 - Relational spreading activation is prioritized over Letta's flat-vector retrieval.
 
-## From [[architectures-for-agentic-memory-virtual-context-micro07|architectures-for-agentic-memory-virtual-context-micro07]] (2026-06-09)
+## From [architectures-for-agentic-memory-virtual-context-micro07](/entities/architectures-for-agentic-memory-virtual-context-micro07.md) (2026-06-09)
 - A neurobiologically inspired mechanism used by graph-based memory systems.
 - The retrieval pipeline first identifies anchor nodes via standard embedding similarity.
 - The system programmatically spreads activation energy outward along defined graph edges.

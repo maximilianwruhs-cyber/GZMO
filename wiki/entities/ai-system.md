@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[prompt-agent-engineering-part5-micro03|prompt-agent-engineering-part5-micro03]] (2026-06-09)
+## From [prompt-agent-engineering-part5-micro03](/entities/prompt-agent-engineering-part5-micro03.md) (2026-06-09)
 - Designed to analyze and enhance future features
 - Primary goal is to evaluate existing capabilities and propose enhancements

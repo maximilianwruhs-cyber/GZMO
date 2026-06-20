@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-cache-optimization-with-ai-chaos-theory|drive-research-cache-optimization-with-ai-chaos-theory]] (2026-06-08)
+## From [drive-research-cache-optimization-with-ai-chaos-theory](/entities/drive-research-cache-optimization-with-ai-chaos-theory.md) (2026-06-08)
 - The attractor encounters an unstable fixed point or periodic solution located inside its own basin of attraction, causing a sudden expansion in its physical size.
 - Manifests as an instantaneous, violent spike in market volatility.

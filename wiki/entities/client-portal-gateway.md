@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-setting-up-autonomous-trading-agents-micro01|drive-research-setting-up-autonomous-trading-agents-micro01]] (2026-06-09)
+## From [drive-research-setting-up-autonomous-trading-agents-micro01](/entities/drive-research-setting-up-autonomous-trading-agents-micro01.md) (2026-06-09)
 - A lightweight Java program for retail clients of Interactive Brokers.
 - Routes local web requests with appropriate cryptographic authentication.
 
-## From [[the-architects-handbook-for-autonomous-agentic-tr-micro02|the-architects-handbook-for-autonomous-agentic-tr-micro02]] (2026-06-09)
+## From [the-architects-handbook-for-autonomous-agentic-tr-micro02](/entities/the-architects-handbook-for-autonomous-agentic-tr-micro02.md) (2026-06-09)
 - Lightweight Java program for retail clients of IBKR's Web API.
 - Routes local web requests with appropriate cryptographic authentication.

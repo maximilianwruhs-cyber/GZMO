@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-markitdown-format-parity-checklist|drive-research-markitdown-format-parity-checklist]] (2026-06-08)
+## From [drive-research-markitdown-format-parity-checklist](/entities/drive-research-markitdown-format-parity-checklist.md) (2026-06-08)
 - Format is .doc.
 - Support is deferred.
 - Implementation relies on Pull Request 1316 utilizing olefile.

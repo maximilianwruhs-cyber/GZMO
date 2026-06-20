@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[aether-grid-micro01|aether-grid-micro01]] (2026-06-09)
+## From [aether-grid-micro01](/entities/aether-grid-micro01.md) (2026-06-09)
 - Reason + Act pattern.
 - Used in combination with a multi-agent hierarchy.
 - Can lead to ReAct Deadlock.

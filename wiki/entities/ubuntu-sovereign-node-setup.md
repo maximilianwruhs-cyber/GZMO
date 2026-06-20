@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[the-sovereign-software-factory-blueprint|the-sovereign-software-factory-blueprint]] (2026-06-08)
+## From [the-sovereign-software-factory-blueprint](/entities/the-sovereign-software-factory-blueprint.md) (2026-06-08)
 - The Sovereign Node setup is built on Ubuntu.
 - Used for the Linux Kernel / Sandbox.
 - The best OS for compiling FOSS C++ repositories.

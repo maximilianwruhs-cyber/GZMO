@@ -14,21 +14,21 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-10).
 
 ## Entities
-- [[whatsapp|WhatsApp]] (SYSTEM)
-- [[grammy|grammY]] (TOOL)
-- [[slack|Slack]] (SYSTEM)
-- [[aws-bedrock|AWS Bedrock]] (SYSTEM)
-- [[telegram|Telegram]] (SYSTEM)
-- [[openclaw|OpenClaw]] (SYSTEM)
-- [[discord|Discord]] (SYSTEM)
-- [[openai|OpenAI]] (ORGANIZATION)
-- [[signal|Signal]] (SYSTEM)
-- [[gateway|Gateway]] (SYSTEM)
-- [[sqlite|SQLite]] (TOOL)
-- [[baileys|Baileys]] (TOOL)
-- [[royosherove|royosherove]] (PERSON)
-- [[agent-runtime-pi-mono|Agent Runtime (pi-mono)]] (SYSTEM)
-- [[anthropic|Anthropic]] (ORGANIZATION)
+- [WhatsApp](/entities/whatsapp.md) (SYSTEM)
+- [grammY](/entities/grammy.md) (TOOL)
+- [Slack](/entities/slack.md) (SYSTEM)
+- [AWS Bedrock](/entities/aws-bedrock.md) (SYSTEM)
+- [Telegram](/entities/telegram.md) (SYSTEM)
+- [OpenClaw](/entities/openclaw.md) (SYSTEM)
+- [Discord](/entities/discord.md) (SYSTEM)
+- [OpenAI](/entities/openai.md) (ORGANIZATION)
+- [Signal](/entities/signal.md) (SYSTEM)
+- [Gateway](/entities/gateway.md) (SYSTEM)
+- [SQLite](/entities/sqlite.md) (TOOL)
+- [Baileys](/entities/baileys.md) (TOOL)
+- [royosherove](/entities/royosherove.md) (PERSON)
+- [Agent Runtime (pi-mono)](/entities/agent-runtime-pi-mono.md) (SYSTEM)
+- [Anthropic](/entities/anthropic.md) (ORGANIZATION)
 
 ## Relations
 - Gateway → USES → WhatsApp

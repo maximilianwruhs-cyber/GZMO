@@ -14,6 +14,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-32gb-vram-ai-reasoning-models-micro02|drive-research-32gb-vram-ai-reasoning-models-micro02]] (2026-06-09)
+## From [drive-research-32gb-vram-ai-reasoning-models-micro02](/entities/drive-research-32gb-vram-ai-reasoning-models-micro02.md) (2026-06-09)
 - Defines the state-of-the-art for dense reasoning models in the 30B class.
 - Encompasses several foundational improvements over prior generations.

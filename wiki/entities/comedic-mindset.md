@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-archival-truth-part1-micro06|the-archival-truth-part1-micro06]] (2026-06-09)
+## From [the-archival-truth-part1-micro06](/entities/the-archival-truth-part1-micro06.md) (2026-06-09)
 - Requires daily cultivation of a humorous perspective.
 - Involves continuously exercising the 'humor muscle'.

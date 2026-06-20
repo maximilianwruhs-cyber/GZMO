@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[gzmo-soul-merged-new-part1|gzmo-soul-merged-new-part1]] (2026-06-09)
+## From [gzmo-soul-merged-new-part1](/entities/gzmo-soul-merged-new-part1.md) (2026-06-09)
 - Column in task managers indicating the exact amount of physical RAM currently occupied by a process

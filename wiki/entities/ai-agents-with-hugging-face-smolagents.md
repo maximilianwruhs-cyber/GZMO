@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: COURSE
 
-## From [[openclaw-deep-research-part2|openclaw-deep-research-part2]] (2026-06-08)
+## From [openclaw-deep-research-part2](/entities/openclaw-deep-research-part2.md) (2026-06-08)
 - This course teaches how to build intelligent agents that reason, act, and solve real-world tasks using Python.
 - The course duration is 3 hours.
 - It involves Hugging Face smolagents.

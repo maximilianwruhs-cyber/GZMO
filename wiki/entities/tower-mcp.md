@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[resilient-rust-based-mcp-client-and-llm-orchestrat-micro04|resilient-rust-based-mcp-client-and-llm-orchestrat-micro04]] (2026-06-10)
+## From [resilient-rust-based-mcp-client-and-llm-orchestrat-micro04](/entities/resilient-rust-based-mcp-client-and-llm-orchestrat-micro04.md) (2026-06-10)
 - A crate that maps MCP interactions into standard tower::Service traits.
 - Allows integration of middleware like distributed tracing and rate-limiting.

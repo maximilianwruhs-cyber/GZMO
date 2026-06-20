@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-safe-unzip-practices-for-threat-model-micro02|drive-research-safe-unzip-practices-for-threat-model-micro02]] (2026-06-09)
+## From [drive-research-safe-unzip-practices-for-threat-model-micro02](/entities/drive-research-safe-unzip-practices-for-threat-model-micro02.md) (2026-06-09)
 - Has a symlink vulnerability (CVE-2025-11001) leading to RCE.
 - Modern versions allow theoretical limits extending to 16 Exabytes.

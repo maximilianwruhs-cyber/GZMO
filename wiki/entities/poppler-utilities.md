@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-pdf-text-vs-scan-detection-heuristics-micro03|drive-research-pdf-text-vs-scan-detection-heuristics-micro03]] (2026-06-09)
+## From [drive-research-pdf-text-vs-scan-detection-heuristics-micro03](/entities/drive-research-pdf-text-vs-scan-detection-heuristics-micro03.md) (2026-06-09)
 - Provides unparalleled throughput via direct shell scripting for massive batch processing at the operating system level.
 - Includes tools highly relevant to triage heuristics: pdftotext, pdffonts, pdfinfo.

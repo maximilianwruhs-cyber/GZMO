@@ -14,11 +14,11 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[cybernetics-and-mythos-the-architecture-of-intell-part2|cybernetics-and-mythos-the-architecture-of-intell-part2]] (2026-06-08)
+## From [cybernetics-and-mythos-the-architecture-of-intell-part2](/entities/cybernetics-and-mythos-the-architecture-of-intell-part2.md) (2026-06-08)
 - A monstrous bird sent by Zeus to torment Prometheus.
 - Feasted upon Prometheus's liver daily.
 - Killed by Heracles, ending Prometheus's torment.
 
-## From [[drive-research-prometheus-and-epimetheus-myth-exploration-micro03|drive-research-prometheus-and-epimetheus-myth-exploration-micro03]] (2026-06-09)
+## From [drive-research-prometheus-and-epimetheus-myth-exploration-micro03](/entities/drive-research-prometheus-and-epimetheus-myth-exploration-micro03.md) (2026-06-09)
 - Tormented Prometheus daily by eating his liver.
 - Killed by Heracles.

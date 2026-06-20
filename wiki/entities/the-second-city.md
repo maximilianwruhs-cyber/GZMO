@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[the-archival-truth-part1-micro07|the-archival-truth-part1-micro07]] (2026-06-09)
+## From [the-archival-truth-part1-micro07](/entities/the-archival-truth-part1-micro07.md) (2026-06-09)
 - Has long served as breeding grounds for comedic legends.
 - Teaches skills like quick thinking, stage presence, and comfort with absurdity through improvisation.

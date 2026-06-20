@@ -14,12 +14,12 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[project-obulus|Project Obulus]] (PROJECT)
-- [[update-live-dashboard-py|update_live_dashboard.py]] (SCRIPT)
-- [[dashboard-curator-agent|Dashboard Curator Agent]] (AGENT)
-- [[evaluation-qa-agent|Evaluation & QA Agent]] (AGENT)
-- [[ops-monitoring-agent|Ops & Monitoring Agent]] (AGENT)
-- [[ingest-engineer-agent|Ingest Engineer Agent]] (AGENT)
+- [Project Obulus](/entities/project-obulus.md) (PROJECT)
+- [update_live_dashboard.py](/entities/update-live-dashboard-py.md) (SCRIPT)
+- [Dashboard Curator Agent](/entities/dashboard-curator-agent.md) (AGENT)
+- [Evaluation & QA Agent](/entities/evaluation-qa-agent.md) (AGENT)
+- [Ops & Monitoring Agent](/entities/ops-monitoring-agent.md) (AGENT)
+- [Ingest Engineer Agent](/entities/ingest-engineer-agent.md) (AGENT)
 
 ## Relations
 - Dashboard Curator Agent → USES → update_live_dashboard.py

@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[prompt-agent-engineering-part5-micro06|prompt-agent-engineering-part5-micro06]] (2026-06-09)
+## From [prompt-agent-engineering-part5-micro06](/entities/prompt-agent-engineering-part5-micro06.md) (2026-06-09)
 - Used for asynchronous event systems, previously Promises/Fibers.
 - Helps in pausing and resuming Effect flows.

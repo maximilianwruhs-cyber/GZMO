@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-architecture-of-engagement-an-analysis-of-gam-micro01|the-architecture-of-engagement-an-analysis-of-gam-micro01]] (2026-06-09)
+## From [the-architecture-of-engagement-an-analysis-of-gam-micro01](/entities/the-architecture-of-engagement-an-analysis-of-gam-micro01.md) (2026-06-09)
 - Actively being prepared by the European Commission.
 - Directly targets the systemic failures of the attention economy.
 - Includes provisions for addictive design prohibition and algorithmic transparency.

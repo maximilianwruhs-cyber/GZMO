@@ -14,12 +14,12 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[architectural-blueprints-for-sovereign-frankenmoe-part1|architectural-blueprints-for-sovereign-frankenmoe-part1]] (2026-06-08)
+## From [architectural-blueprints-for-sovereign-frankenmoe-part1](/entities/architectural-blueprints-for-sovereign-frankenmoe-part1.md) (2026-06-08)
 - Uses raw token embeddings directly from the input layer to build routing parameters.
 - Applies a uniform matrix across all layers.
 - Moderate-low routing quality due to lack of layer-specific context.
 
-## From [[drive-research-hidden-mode-technical-analysis-and-configurati|drive-research-hidden-mode-technical-analysis-and-configurati]] (2026-06-08)
+## From [drive-research-hidden-mode-technical-analysis-and-configurati](/entities/drive-research-hidden-mode-technical-analysis-and-configurati.md) (2026-06-08)
 - Uses raw token embeddings directly from the input layer to build routing parameters.
 - Lacks layer-specific routing context, leading to coarse routing decisions.
 - Requires loading only the initial embedding layer.

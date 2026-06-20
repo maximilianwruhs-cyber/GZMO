@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-crafting-a-creative-agent-prompt|drive-research-crafting-a-creative-agent-prompt]] (2026-06-08)
+## From [drive-research-crafting-a-creative-agent-prompt](/entities/drive-research-crafting-a-creative-agent-prompt.md) (2026-06-08)
 - Zooms out from the specific query.
 - Determines the broader systemic context and macro-level implications.

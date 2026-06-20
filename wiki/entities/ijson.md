@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[architectures-for-agentic-memory-virtual-context-micro03|architectures-for-agentic-memory-virtual-context-micro03]] (2026-06-09)
+## From [architectures-for-agentic-memory-virtual-context-micro03](/entities/architectures-for-agentic-memory-virtual-context-micro03.md) (2026-06-09)
 - A streaming JSON parser.
 - Allows processing incoming arrays sequentially.
 - Can salvage partial data if the stream truncates prematurely.

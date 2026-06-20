@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[drive-research-small-models|drive-research-small-models]] (2026-06-08)
+## From [drive-research-small-models](/entities/drive-research-small-models.md) (2026-06-08)
 - Built Gemma models.
 - Gemini architecture is used for Gemma models.
 - Built on the same architecture as Gemini.

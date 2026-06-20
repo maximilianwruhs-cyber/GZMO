@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[architectures-for-agentic-memory-virtual-context-micro04|architectures-for-agentic-memory-virtual-context-micro04]] (2026-06-09)
+## From [architectures-for-agentic-memory-virtual-context-micro04](/entities/architectures-for-agentic-memory-virtual-context-micro04.md) (2026-06-09)
 - The graph-enhanced variant of Mem0.
 - Utilizes a two-phase pipeline: Extraction and Update.

@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part6-micro05|ai-research-part6-micro05]] (2026-06-09)
+## From [ai-research-part6-micro05](/entities/ai-research-part6-micro05.md) (2026-06-09)
 - Risk from operative telemetry corrupting an agent's focus.
 - Occurs when an agent generates code and formats status messages simultaneously.

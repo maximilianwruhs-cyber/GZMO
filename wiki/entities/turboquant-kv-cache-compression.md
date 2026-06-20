@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[the-architecture-of-speculative-decoding-and-infer-part2-micro03|the-architecture-of-speculative-decoding-and-infer-part2-micro03]] (2026-06-09)
+## From [the-architecture-of-speculative-decoding-and-infer-part2-micro03](/entities/the-architecture-of-speculative-decoding-and-infer-part2-micro03.md) (2026-06-09)
 - Can liberate approximately 8 GB of VRAM on a 24GB VRAM GPU.
 - Extreme 3-bit quantization can cause logic degradation for lightweight draft models.

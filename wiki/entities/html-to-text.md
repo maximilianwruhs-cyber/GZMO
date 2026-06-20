@@ -14,12 +14,12 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-bun-file-parsing-dependency-shortlist-micro01|drive-research-bun-file-parsing-dependency-shortlist-micro01]] (2026-06-09)
+## From [drive-research-bun-file-parsing-dependency-shortlist-micro01](/entities/drive-research-bun-file-parsing-dependency-shortlist-micro01.md) (2026-06-09)
 - primary package for HTML to text conversion
 - advanced selectors can be slow
 - complex CSS-driven layouts or tabular data may transpose rigidly or incorrectly when converted to text
 
-## From [[drive-research-bun-file-parsing-dependency-shortlist-micro02|drive-research-bun-file-parsing-dependency-shortlist-micro02]] (2026-06-09)
+## From [drive-research-bun-file-parsing-dependency-shortlist-micro02](/entities/drive-research-bun-file-parsing-dependency-shortlist-micro02.md) (2026-06-09)
 - Parses HTML structure logically and applies strict formatting rules to yield highly readable plain text.
 - Operates under the MIT license.
 - Dual-mode package supporting both CommonJS and ES Modules.

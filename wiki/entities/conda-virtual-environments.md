@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-die-architektur-der-wissenschaftlichen-forschung|drive-research-die-architektur-der-wissenschaftlichen-forschung]] (2026-06-08)
+## From [drive-research-die-architektur-der-wissenschaftlichen-forschung](/entities/drive-research-die-architektur-der-wissenschaftlichen-forschung.md) (2026-06-08)
 - Used for advanced reproducibility setups.
 - Encapsulates exact software, OS-level dependencies, and libraries.
 - Ensures computational portability.

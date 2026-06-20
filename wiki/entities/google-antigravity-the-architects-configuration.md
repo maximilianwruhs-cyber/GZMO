@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[google-antigravity-the-architects-configuration-micro01|google-antigravity-the-architects-configuration-micro01]] (2026-06-09)
+## From [google-antigravity-the-architects-configuration-micro01](/entities/google-antigravity-the-architects-configuration-micro01.md) (2026-06-09)
 - Ingest micro-split from google-antigravity-the-architects-configuration.md
 - Curated research corpus consolidated from Google Takeout (wave_02_notebooklm)

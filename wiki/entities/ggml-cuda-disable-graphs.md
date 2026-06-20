@@ -14,14 +14,14 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-llamacpp-gpu-memory-reporting-bug|drive-research-llamacpp-gpu-memory-reporting-bug]] (2026-06-08)
+## From [drive-research-llamacpp-gpu-memory-reporting-bug](/entities/drive-research-llamacpp-gpu-memory-reporting-bug.md) (2026-06-08)
 - An active backend queried by llama_params_fit.
 - Driver frameworks can allocate a base memory footprint during enumeration.
 - CUDA graphs can accumulate and cause memory leaks.
 - Environment variable to disable CUDA graphs.
 - Prevents memory exhaustion caused by unbound CUDA graph allocations.
 
-## From [[drive-research-cuda-graph-capture-failure-workarounds-micro03|drive-research-cuda-graph-capture-failure-workarounds-micro03]] (2026-06-09)
+## From [drive-research-cuda-graph-capture-failure-workarounds-micro03](/entities/drive-research-cuda-graph-capture-failure-workarounds-micro03.md) (2026-06-09)
 - Environment variable to set.
 - Forces the backend to bypass graph capture.
 - Avoids cache leaks and instantiation failures.

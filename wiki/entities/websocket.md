@@ -14,12 +14,12 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[obolus-vs-codium-extension-konzept-research-part2|obolus-vs-codium-extension-konzept-research-part2]] (2026-06-08)
+## From [obolus-vs-codium-extension-konzept-research-part2](/entities/obolus-vs-codium-extension-konzept-research-part2.md) (2026-06-08)
 - for Live-Telemetrie
 - 1 new WebSocket-Endpunkt (/ws/telemetry)
 - Fortschrittsanzeige via WebSocket
 - FastAPI WebSocket implementation.
 
-## From [[the-architects-handbook-for-autonomous-agentic-tr-micro03|the-architects-handbook-for-autonomous-agentic-tr-micro03]] (2026-06-09)
+## From [the-architects-handbook-for-autonomous-agentic-tr-micro03](/entities/the-architects-handbook-for-autonomous-agentic-tr-micro03.md) (2026-06-09)
 - A protocol supported by Kraken's API infrastructure for automated cryptocurrency trading.
 - Used for providing real-time, tick-by-tick price feeds and order book depth.

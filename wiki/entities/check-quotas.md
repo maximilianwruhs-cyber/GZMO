@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[openclaw-deep-research-part12|openclaw-deep-research-part12]] (2026-06-08)
+## From [openclaw-deep-research-part12](/entities/openclaw-deep-research-part12.md) (2026-06-08)
 - An optional script to check quota usage across providers.

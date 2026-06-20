@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[engineering-ignorance-eliminating-affirmative-bia|engineering-ignorance-eliminating-affirmative-bia]] (2026-06-08)
+## From [engineering-ignorance-eliminating-affirmative-bia](/entities/engineering-ignorance-eliminating-affirmative-bia.md) (2026-06-08)
 - Measures the factual consistency of a generated response against the retrieved context.
 - A response is faithful if all claims can be directly inferred from the context.
 - Calculated as the ratio of truthful claims supported by the context to the total number of claims.

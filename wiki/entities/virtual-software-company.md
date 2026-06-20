@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: MODEL
 
-## From [[ai-research-part6-micro05|ai-research-part6-micro05]] (2026-06-09)
+## From [ai-research-part6-micro05](/entities/ai-research-part6-micro05.md) (2026-06-09)
 - A model provided by Claw-Empire.
 - Offers an observability layer for heterogeneous AI resources.

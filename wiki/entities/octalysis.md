@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[the-architecture-of-engagement-an-analysis-of-gam-micro08|the-architecture-of-engagement-an-analysis-of-gam-micro08]] (2026-06-09)
+## From [the-architecture-of-engagement-an-analysis-of-gam-micro08](/entities/the-architecture-of-engagement-an-analysis-of-gam-micro08.md) (2026-06-09)
 - A robust framework that can guide gamification.
 - When gamification is anchored deeply in this framework, it possesses the unique capacity to perfectly align corporate objectives with innate human psychological needs.

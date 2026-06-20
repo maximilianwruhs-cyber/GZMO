@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-setting-up-autonomous-trading-agents-micro02|drive-research-setting-up-autonomous-trading-agents-micro02]] (2026-06-09)
+## From [drive-research-setting-up-autonomous-trading-agents-micro02](/entities/drive-research-setting-up-autonomous-trading-agents-micro02.md) (2026-06-09)
 - Proactively mitigates the risk of long-term exposure of dormant or forgotten API credentials.
 
-## From [[the-architects-handbook-for-autonomous-agentic-tr-micro03|the-architects-handbook-for-autonomous-agentic-tr-micro03]] (2026-06-09)
+## From [the-architects-handbook-for-autonomous-agentic-tr-micro03](/entities/the-architects-handbook-for-autonomous-agentic-tr-micro03.md) (2026-06-09)
 - Regularly delete old API keys and generate new ones.
 - Enable mandatory Two-Factor Authentication for all account access.
 - Proactively mitigates the risk of long-term exposure of dormant credentials.

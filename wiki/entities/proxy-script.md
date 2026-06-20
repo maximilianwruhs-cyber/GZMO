@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-install-the-google-workspace-extension|drive-research-install-the-google-workspace-extension]] (2026-06-08)
+## From [drive-research-install-the-google-workspace-extension](/entities/drive-research-install-the-google-workspace-extension.md) (2026-06-08)
 - May be needed to sanitize tool names if there are errors due to tool naming conventions.

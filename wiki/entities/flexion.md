@@ -14,12 +14,12 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[beyond-the-dark-room-allostatic-regulation-and-co|beyond-the-dark-room-allostatic-regulation-and-co]] (2026-06-08)
+## From [beyond-the-dark-room-allostatic-regulation-and-co](/entities/beyond-the-dark-room-allostatic-regulation-and-co.md) (2026-06-08)
 - One of three specific variables interacting within the Tension domain.
 - Operates as the "Error Signal" in control-theoretic terms.
 - Measures structural elasticity and fundamental alignment between external task constraints and agent's internal cognitive architecture.
 
-## From [[drive-research-autonomous-devops-ai-safety-boundaries|drive-research-autonomous-devops-ai-safety-boundaries]] (2026-06-08)
+## From [drive-research-autonomous-devops-ai-safety-boundaries](/entities/drive-research-autonomous-devops-ai-safety-boundaries.md) (2026-06-08)
 - Represents the agent's innate drive to maximize theoretical computational output.
 - A measure of untapped potential.
 - Forces the agent to constantly seek higher throughput, lower latency, and better hardware utilization.

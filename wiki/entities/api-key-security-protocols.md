@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-architects-handbook-for-autonomous-agentic-tr-micro03|the-architects-handbook-for-autonomous-agentic-tr-micro03]] (2026-06-09)
+## From [the-architects-handbook-for-autonomous-agentic-tr-micro03](/entities/the-architects-handbook-for-autonomous-agentic-tr-micro03.md) (2026-06-09)
 - Rigorous adherence is an absolute necessity to prevent capital loss.
 - Includes Principle of Least Privilege, IP Whitelisting, Nonce Window Optimization, Environment Isolation, and Key Rotation & 2FA.

@@ -14,20 +14,20 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-10).
 
 ## Entities
-- [[hyper|hyper]] (TOOL)
-- [[logoutput|LogOutput]] (CONCEPT)
-- [[hostconfig|HostConfig]] (CONCEPT)
-- [[containerd|containerd]] (SYSTEM)
-- [[runsc|runsc]] (TOOL)
-- [[moby-project|Moby project]] (ORGANIZATION)
-- [[rust|Rust]] (CONCEPT)
-- [[podman|Podman]] (SYSTEM)
-- [[bollard|Bollard]] (TOOL)
-- [[config|Config]] (CONCEPT)
-- [[docker|Docker]] (SYSTEM)
-- [[gvisor|gVisor]] (SYSTEM)
-- [[tokio|tokio]] (TOOL)
-- [[cgroups|cgroups]] (CONCEPT)
+- [hyper](/entities/hyper.md) (TOOL)
+- [LogOutput](/entities/logoutput.md) (CONCEPT)
+- [HostConfig](/entities/hostconfig.md) (CONCEPT)
+- [containerd](/entities/containerd.md) (SYSTEM)
+- [runsc](/entities/runsc.md) (TOOL)
+- [Moby project](/entities/moby-project.md) (ORGANIZATION)
+- [Rust](/entities/rust.md) (CONCEPT)
+- [Podman](/entities/podman.md) (SYSTEM)
+- [Bollard](/entities/bollard.md) (TOOL)
+- [Config](/entities/config.md) (CONCEPT)
+- [Docker](/entities/docker.md) (SYSTEM)
+- [gVisor](/entities/gvisor.md) (SYSTEM)
+- [tokio](/entities/tokio.md) (TOOL)
+- [cgroups](/entities/cgroups.md) (CONCEPT)
 
 ## Relations
 - Bollard → USES → Docker

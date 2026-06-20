@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-blackwell-sm120-gemm-optimization-guide|drive-research-blackwell-sm120-gemm-optimization-guide]] (2026-06-08)
+## From [drive-research-blackwell-sm120-gemm-optimization-guide](/entities/drive-research-blackwell-sm120-gemm-optimization-guide.md) (2026-06-08)
 - Hardware-supported implementation of dynamic persistent tile scheduling on Blackwell.
 - Driven by clusterlaunchcontrol PTX instructions.
 - CUTLASS implements the PipelineCLCFetchAsync class to manage CLC.

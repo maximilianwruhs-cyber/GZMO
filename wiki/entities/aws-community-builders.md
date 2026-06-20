@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[openclaw-deep-research-part11-micro03|openclaw-deep-research-part11-micro03]] (2026-06-09)
+## From [openclaw-deep-research-part11-micro03](/entities/openclaw-deep-research-part11-micro03.md) (2026-06-09)
 - Indika_Wimalasuriya is part of this group.
 - Promotes becoming an AWS Community Builder.
 - OpenClaw can be set up and run on AWS.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part1|ai-research-part1]] (2026-06-08)
+## From [ai-research-part1](/entities/ai-research-part1.md) (2026-06-08)
 - Used by Phase 2 to merge with Phase 1 outputs.
 - Its merge is elementwise, admitting kernel fusion with surrounding operations.
 - Integrates into the standard TP all-reduce communication path during memory-efficient prefilling.

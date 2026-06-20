@@ -15,11 +15,11 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[gzmo-soul-merged-new-part1|gzmo-soul-merged-new-part1]] (2026-06-09)
+## From [gzmo-soul-merged-new-part1](/entities/gzmo-soul-merged-new-part1.md) (2026-06-09)
 - Ist eine fundamentale konzeptionelle Schwachstelle
 - Wird als OWASP LLM07 bezeichnet
 
-## From [[drive-research-architektur-und-implementierung-intelligenter-ki-a-micro02|drive-research-architektur-und-implementierung-intelligenter-ki-a-micro02]] (2026-06-09)
+## From [drive-research-architektur-und-implementierung-intelligenter-ki-a-micro02](/entities/drive-research-architektur-und-implementierung-intelligenter-ki-a-micro02.md) (2026-06-09)
 - Functions as the agent's operating system.
 - Defines persona, behavior rules, tool usage, and goals.
 - Precise formulation is crucial for effective agent operation.

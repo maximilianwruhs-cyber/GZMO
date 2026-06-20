@@ -14,18 +14,18 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-08).
 
 ## Entities
-- [[google-workspace-extension|Google Workspace Extension]] (TOOL)
-- [[gas-fakes-auth|gas-fakes auth]] (TOOL)
-- [[antigravity|Antigravity]] (SYSTEM)
-- [[manage-mcp-servers|Manage MCP Servers]] (CONCEPT)
-- [[ide|IDE]] (SYSTEM)
-- [[mcp-config-json|mcp_config.json]] (TOOL)
-- [[gemini-cli|gemini CLI]] (TOOL)
-- [[proxy-script|proxy script]] (TOOL)
-- [[playground|Playground]] (SYSTEM)
-- [[agent-manager|Agent Manager]] (SYSTEM)
-- [[google-drive|Google Drive]] (SYSTEM)
-- [[mcp-server|MCP server]] (SYSTEM)
+- [Google Workspace Extension](/entities/google-workspace-extension.md) (TOOL)
+- [gas-fakes auth](/entities/gas-fakes-auth.md) (TOOL)
+- [Antigravity](/entities/antigravity.md) (SYSTEM)
+- [Manage MCP Servers](/entities/manage-mcp-servers.md) (CONCEPT)
+- [IDE](/entities/ide.md) (SYSTEM)
+- [mcp_config.json](/entities/mcp-config-json.md) (TOOL)
+- [gemini CLI](/entities/gemini-cli.md) (TOOL)
+- [proxy script](/entities/proxy-script.md) (TOOL)
+- [Playground](/entities/playground.md) (SYSTEM)
+- [Agent Manager](/entities/agent-manager.md) (SYSTEM)
+- [Google Drive](/entities/google-drive.md) (SYSTEM)
+- [MCP server](/entities/mcp-server.md) (SYSTEM)
 
 ## Relations
 - gemini CLI → USES → Google Workspace Extension

@@ -14,8 +14,8 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[drive-research-setting-up-autonomous-trading-agents-micro06|drive-research-setting-up-autonomous-trading-agents-micro06]] (2026-06-09)
+## From [drive-research-setting-up-autonomous-trading-agents-micro06](/entities/drive-research-setting-up-autonomous-trading-agents-micro06.md) (2026-06-09)
 - Published information on Algorithmischer Handel und Hochfrequenzhandel (algorithmic trading and high-frequency trading).
 
-## From [[the-architects-handbook-for-autonomous-agentic-tr-micro03|the-architects-handbook-for-autonomous-agentic-tr-micro03]] (2026-06-09)
+## From [the-architects-handbook-for-autonomous-agentic-tr-micro03](/entities/the-architects-handbook-for-autonomous-agentic-tr-micro03.md) (2026-06-09)
 - German Federal Financial Supervisory Authority.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[obolus-vs-codium-extension-konzept-research-part1-micro06|obolus-vs-codium-extension-konzept-research-part1-micro06]] (2026-06-09)
+## From [obolus-vs-codium-extension-konzept-research-part1-micro06](/entities/obolus-vs-codium-extension-konzept-research-part1-micro06.md) (2026-06-09)
 - Connected to the FastAPI backend.
 - Local eGPU benchmark can take minutes.
 - Has an HTML wizard with a loading bar.

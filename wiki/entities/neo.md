@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-linux-gaming-and-ai-build-guide-micro07|drive-research-linux-gaming-and-ai-build-guide-micro07]] (2026-06-09)
+## From [drive-research-linux-gaming-and-ai-build-guide-micro07](/entities/drive-research-linux-gaming-and-ai-build-guide-micro07.md) (2026-06-09)
 - Mentioned in context of RAM for AMD Ryzen 9 9950X3D

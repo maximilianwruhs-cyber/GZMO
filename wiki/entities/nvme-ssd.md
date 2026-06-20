@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-linux-gaming-and-ai-build-guide-micro02|drive-research-linux-gaming-and-ai-build-guide-micro02]] (2026-06-09)
+## From [drive-research-linux-gaming-and-ai-build-guide-micro02](/entities/drive-research-linux-gaming-and-ai-build-guide-micro02.md) (2026-06-09)
 - Requires a native PCIe 5.0 NVMe SSD architecture.
 - NVMe RAID 0 is actively discouraged for this build.
 - Modern PCIe 5.0 drives saturate the bandwidth required for local AI training and gaming.

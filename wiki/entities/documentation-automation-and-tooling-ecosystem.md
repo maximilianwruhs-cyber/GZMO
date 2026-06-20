@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-creating-a-comprehensive-readmemd-micro02|drive-research-creating-a-comprehensive-readmemd-micro02]] (2026-06-09)
+## From [drive-research-creating-a-comprehensive-readmemd-micro02](/entities/drive-research-creating-a-comprehensive-readmemd-micro02.md) (2026-06-09)
 - Designed to eliminate boilerplate generation and enforce structural standardization.
 - Operates on a spectrum from CLI scaffolding tools to AI-driven engines.

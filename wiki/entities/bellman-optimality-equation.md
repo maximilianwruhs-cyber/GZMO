@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part3-micro05|ai-research-part3-micro05]] (2026-06-09)
+## From [ai-research-part3-micro05](/entities/ai-research-part3-micro05.md) (2026-06-09)
 - The Gödel Machine is optimal due to this equation.

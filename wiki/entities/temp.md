@@ -14,9 +14,9 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[optimizing-nvidia-blackwell-sm120-part1-micro02|optimizing-nvidia-blackwell-sm120-part1-micro02]] (2026-06-09)
+## From [optimizing-nvidia-blackwell-sm120-part1-micro02](/entities/optimizing-nvidia-blackwell-sm120-part1-micro02.md) (2026-06-09)
 - Optimal base configuration for Min-P is --min-p 0.05 --temp 0.8.
 
-## From [[resilient-rust-based-mcp-client-and-llm-orchestrat-micro06|resilient-rust-based-mcp-client-and-llm-orchestrat-micro06]] (2026-06-09)
+## From [resilient-rust-based-mcp-client-and-llm-orchestrat-micro06](/entities/resilient-rust-based-mcp-client-and-llm-orchestrat-micro06.md) (2026-06-09)
 - Parameter for sampling temperature.
 - Setting lower (e.g., 0.1 or 0.2) forces model to select probable tokens for function calling.

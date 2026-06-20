@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-license-and-native-binding-analysis|drive-research-license-and-native-binding-analysis]] (2026-06-08)
+## From [drive-research-license-and-native-binding-analysis](/entities/drive-research-license-and-native-binding-analysis.md) (2026-06-08)
 - A weak copyleft license.
 - Dynamically linking to an LGPL library is permissible without infecting the parent application.
 - Packages governed by this license may be classified as Yellow.

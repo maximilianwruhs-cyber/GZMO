@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-setting-up-autonomous-trading-agents-micro05|drive-research-setting-up-autonomous-trading-agents-micro05]] (2026-06-09)
+## From [drive-research-setting-up-autonomous-trading-agents-micro05](/entities/drive-research-setting-up-autonomous-trading-agents-micro05.md) (2026-06-09)
 - Every closed position constitutes a taxable event in Austria and Germany.
 - Requires meticulous calculation and tracking.
 - Currently set at 27.5% in Austria for securities and cryptocurrencies.

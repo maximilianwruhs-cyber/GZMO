@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[prompt-agent-engineering-part1|prompt-agent-engineering-part1]] (2026-06-08)
+## From [prompt-agent-engineering-part1](/entities/prompt-agent-engineering-part1.md) (2026-06-08)
 - A functional domain for video platform features.
 - Includes features like search filters and related video sidebars.
 - Part of the Video Platform Feature Architect Prompt.

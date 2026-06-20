@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-agentic-reverse-engineering-state-and-future-micro01|drive-research-agentic-reverse-engineering-state-and-future-micro01]] (2026-06-09)
+## From [drive-research-agentic-reverse-engineering-state-and-future-micro01](/entities/drive-research-agentic-reverse-engineering-state-and-future-micro01.md) (2026-06-09)
 - An in-memory document acting as the pipeline's operational RAM in SentinelOne's architecture.
 - Findings from specialized agents are committed here.

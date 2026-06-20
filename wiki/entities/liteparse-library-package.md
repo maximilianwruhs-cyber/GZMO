@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[local-first-rag-architecting-sovereign-ai-with-li|local-first-rag-architecting-sovereign-ai-with-li]] (2026-06-08)
+## From [local-first-rag-architecting-sovereign-ai-with-li](/entities/local-first-rag-architecting-sovereign-ai-with-li.md) (2026-06-08)
 - Utilized by the Python bridging script.
 - Used to automate the conversion of parsed JSON bounding boxes and spatial text grids.
 - An open-source, layout-aware parsing library developed by the LlamaIndex team.

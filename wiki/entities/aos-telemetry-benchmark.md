@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[drive-research-ran-command-bash-c-cd-home-maximilian-wruhs-d|drive-research-ran-command-bash--c-cd-home-maximilian-wruhs-d]] (2026-06-08)
+## From [drive-research-ran-command-bash--c-cd-home-maximilian-wruhs-d](/entities/drive-research-ran-command-bash-c-cd-home-maximilian-wruhs-d.md) (2026-06-08)
 - Successfully completed
 - Framework used for benchmarking models
 - Logs results to a data store

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[obolus-micro06|obolus-micro06]] (2026-06-09)
+## From [obolus-micro06](/entities/obolus-micro06.md) (2026-06-09)
 - Specialized security agent for the OpenClaw system.
 - Monitors and hardens network security of the Intel NUC data center.
 - Expertise in OPNsense/pfSense configuration.

@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[cybernetics-and-mythos-the-architecture-of-intell-part2|cybernetics-and-mythos-the-architecture-of-intell-part2]] (2026-06-08)
+## From [cybernetics-and-mythos-the-architecture-of-intell-part2](/entities/cybernetics-and-mythos-the-architecture-of-intell-part2.md) (2026-06-08)
 - The origin of a sophisticated internal critique of Hegelianism.
 - Theodor W. Adorno was a prominent figure associated with it.

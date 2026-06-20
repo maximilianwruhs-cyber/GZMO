@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[architectural-strategy-for-stealthy-portable-cli-a|architectural-strategy-for-stealthy-portable-cli-a]] (2026-06-08)
+## From [architectural-strategy-for-stealthy-portable-cli-a](/entities/architectural-strategy-for-stealthy-portable-cli-a.md) (2026-06-08)
 - Relying on host-specific hardware cryptographic mechanisms—such as Linux LUKS—violates the strict cross-platform portability requirement.
 
-## From [[drive-research-architecting-zero-configuration-portable-agents-s-micro03|drive-research-architecting-zero-configuration-portable-agents-s-micro03]] (2026-06-09)
+## From [drive-research-architecting-zero-configuration-portable-agents-s-micro03](/entities/drive-research-architecting-zero-configuration-portable-agents-s-micro03.md) (2026-06-09)
 - A host-specific hardware cryptographic mechanism.
 - Violates cross-platform portability requirement if relied upon.
 - Host-specific hardware cryptographic mechanism.

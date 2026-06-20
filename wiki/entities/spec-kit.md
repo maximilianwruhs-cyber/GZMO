@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-ai-agents-and-spec-driven-development1-micro03|drive-research-ai-agents-and-spec-driven-development1-micro03]] (2026-06-09)
+## From [drive-research-ai-agents-and-spec-driven-development1-micro03](/entities/drive-research-ai-agents-and-spec-driven-development1-micro03.md) (2026-06-09)
 - A toolkit to help get started with Spec-Driven Development.
 - Mentioned in relation to GitHub.

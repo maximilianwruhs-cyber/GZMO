@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part3-micro05|ai-research-part3-micro05]] (2026-06-09)
+## From [ai-research-part3-micro05](/entities/ai-research-part3-micro05.md) (2026-06-09)
 - Is finite and known.
 - Self-modification costs one unit of the budget.

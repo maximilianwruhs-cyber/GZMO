@@ -14,14 +14,14 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[openclaw-deep-research-part5-micro06|openclaw-deep-research-part5-micro06]] (2026-06-10)
+## From [openclaw-deep-research-part5-micro06](/entities/openclaw-deep-research-part5-micro06.md) (2026-06-10)
 - A curated library of pre-built skills and plugins.
 - Contains over 6000+ plugins.
 - An open-source AI assistant application.
 - Formerly known as Clawdbot or Moltbot.
 - Supports integration with various messaging platforms like WhatsApp, Discord, and Telegram.
 
-## From [[openclaw-deep-research-part5-micro08|openclaw-deep-research-part5-micro08]] (2026-06-10)
+## From [openclaw-deep-research-part5-micro08](/entities/openclaw-deep-research-part5-micro08.md) (2026-06-10)
 - Contains 6000+ plugins.
 - A curated library of pre-built skills and plugins.
 - An open-source AI assistant application.

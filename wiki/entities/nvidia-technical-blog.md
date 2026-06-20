@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[drive-research-linux-gaming-and-ai-build-guide-micro03|drive-research-linux-gaming-and-ai-build-guide-micro03]] (2026-06-09)
+## From [drive-research-linux-gaming-and-ai-build-guide-micro03](/entities/drive-research-linux-gaming-and-ai-build-guide-micro03.md) (2026-06-09)
 - Published What's New and Important in CUDA Toolkit 13.0
 - Competes with AMD in GPU Showdown for Gaming, AI, and Performance
 - Competes with AMD in GPU comparison

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-sovereign-software-factory-blueprint|the-sovereign-software-factory-blueprint]] (2026-06-08)
+## From [the-sovereign-software-factory-blueprint](/entities/the-sovereign-software-factory-blueprint.md) (2026-06-08)
 - Runs bitnet.cpp on Port 8080.
 - Blasts out 80+ words a second using barely any RAM or power.
 - Profile in Roo Code.

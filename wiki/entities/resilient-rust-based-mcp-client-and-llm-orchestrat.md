@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[resilient-rust-based-mcp-client-and-llm-orchestrat-micro01|resilient-rust-based-mcp-client-and-llm-orchestrat-micro01]] (2026-06-09)
+## From [resilient-rust-based-mcp-client-and-llm-orchestrat-micro01](/entities/resilient-rust-based-mcp-client-and-llm-orchestrat-micro01.md) (2026-06-09)
 - It is a client and orchestrator.
 - It is based on Rust.
 - It is resilient.

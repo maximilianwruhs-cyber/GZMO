@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-token-efficient-bol-processing-architecture|drive-research-token-efficient-bol-processing-architecture]] (2026-06-08)
+## From [drive-research-token-efficient-bol-processing-architecture](/entities/drive-research-token-efficient-bol-processing-architecture.md) (2026-06-08)
 - Deployed when dealing with contiguous blocks of text that lack explicit headers.
 - Groups sentences by underlying meaning, evaluating the cosine similarity of their vector embeddings.
 - Maximizes retrieval relevance and eliminates the injection of tangentially related text.

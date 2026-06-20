@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-neuro-symbolic-prompt-engineering-research|drive-research-neuro-symbolic-prompt-engineering-research]] (2026-06-08)
+## From [drive-research-neuro-symbolic-prompt-engineering-research](/entities/drive-research-neuro-symbolic-prompt-engineering-research.md) (2026-06-08)
 - Neuro-symbolic methods occasionally lag behind traditional CoT prompting in raw speed or simplicity.
 - Standard CoT is often a stream of consciousness.

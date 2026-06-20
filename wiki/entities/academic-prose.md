@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-architecture-of-scientific-inquiry-and-academi|the-architecture-of-scientific-inquiry-and-academi]] (2026-06-08)
+## From [the-architecture-of-scientific-inquiry-and-academi](/entities/the-architecture-of-scientific-inquiry-and-academi.md) (2026-06-08)
 - Aesthetic quality defined by clarity, precision, and conciseness.
 - Primary goal is to transfer complex information with minimal cognitive friction.
 - Requires elimination of unnecessary words, clichés, and colloquial expressions.

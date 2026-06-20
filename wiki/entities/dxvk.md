@@ -15,13 +15,13 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-linux-gaming-and-ai-build-guide-micro02|drive-research-linux-gaming-and-ai-build-guide-micro02]] (2026-06-09)
+## From [drive-research-linux-gaming-and-ai-build-guide-micro02](/entities/drive-research-linux-gaming-and-ai-build-guide-micro02.md) (2026-06-09)
 - Used by Proton to translate DirectX 11 and 12 graphical API calls into Vulkan instructions.
 - Part of the gaming translation layer.
 
-## From [[the-2026-linux-workstation-micro03|the-2026-linux-workstation-micro03]] (2026-06-09)
+## From [the-2026-linux-workstation-micro03](/entities/the-2026-linux-workstation-micro03.md) (2026-06-09)
 - Used in the gaming translation layer.
 - Translates DirectX 11 and 12 API calls into Vulkan instructions.
 
-## From [[drive-research-linux-gaming-and-ai-build-guide-micro06|drive-research-linux-gaming-and-ai-build-guide-micro06]] (2026-06-10)
+## From [drive-research-linux-gaming-and-ai-build-guide-micro06](/entities/drive-research-linux-gaming-and-ai-build-guide-micro06.md) (2026-06-10)
 - Translates DirectX calls into Vulkan instructions

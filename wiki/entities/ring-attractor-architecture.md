@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[beyond-the-dark-room-allostatic-regulation-and-co|beyond-the-dark-room-allostatic-regulation-and-co]] (2026-06-08)
+## From [beyond-the-dark-room-allostatic-regulation-and-co](/entities/beyond-the-dark-room-allostatic-regulation-and-co.md) (2026-06-08)
 - It is an architecture coupled with the Hammel allostatic microcircuit model in AlloNet architectures.
 - It involves a "bump" whose critical allostatic control is achieved in distinct stages.

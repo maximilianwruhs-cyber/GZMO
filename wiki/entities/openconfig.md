@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[prompt-agent-engineering-part7-micro05|prompt-agent-engineering-part7-micro05]] (2026-06-09)
+## From [prompt-agent-engineering-part7-micro05](/entities/prompt-agent-engineering-part7-micro05.md) (2026-06-09)
 - Native support for OpenConfig is paramount for AI network data ingestion.
 - Containerlab natively supports modern streaming telemetry like OpenConfig.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: FRAMEWORK
 
-## From [[architectural-blueprints-for-sovereign-frankenmoe-part1|architectural-blueprints-for-sovereign-frankenmoe-part1]] (2026-06-08)
+## From [architectural-blueprints-for-sovereign-frankenmoe-part1](/entities/architectural-blueprints-for-sovereign-frankenmoe-part1.md) (2026-06-08)
 - A collaborative framework.
 - Consolidates model weights on a central server.
 - Constructs personalized model configurations for decentralized clients.

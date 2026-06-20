@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: MEMORY_COMPONENT
 
-## From [[ai-research-part6-micro04|ai-research-part6-micro04]] (2026-06-09)
+## From [ai-research-part6-micro04](/entities/ai-research-part6-micro04.md) (2026-06-09)
 - Preserved by CodeRLM's precise symbol retrieval

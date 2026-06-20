@@ -14,11 +14,11 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[cybernetics-and-mythos-the-architecture-of-intell-part2|cybernetics-and-mythos-the-architecture-of-intell-part2]] (2026-06-08)
+## From [cybernetics-and-mythos-the-architecture-of-intell-part2](/entities/cybernetics-and-mythos-the-architecture-of-intell-part2.md) (2026-06-08)
 - Emotion Regulation is a DBT Skill Module.
 - Emotion Regulation involves strategies designed to actively change and manage intense emotional states.
 - Emotion Regulation synthesizes radical acceptance with proactive behavioral modification.
 
-## From [[drive-research-dialectics-socratic-vs-hegelian-methods|drive-research-dialectics-socratic-vs-hegelian-methods]] (2026-06-08)
+## From [drive-research-dialectics-socratic-vs-hegelian-methods](/entities/drive-research-dialectics-socratic-vs-hegelian-methods.md) (2026-06-08)
 - a DBT skill module
 - strategies to actively change and manage intense emotional states

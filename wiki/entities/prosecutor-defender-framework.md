@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-redefining-agentic-soulmd-to-dialog-micro04|drive-research-redefining-agentic-soulmd-to-dialog-micro04]] (2026-06-09)
+## From [drive-research-redefining-agentic-soulmd-to-dialog-micro04](/entities/drive-research-redefining-agentic-soulmd-to-dialog-micro04.md) (2026-06-09)
 - Utilized by the Coordination Layer to identify underlying contradictions.
 - Part of multi-agent dialectical evaluation for rule enforcement.

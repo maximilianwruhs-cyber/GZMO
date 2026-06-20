@@ -14,9 +14,9 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[ultimate-local-ai-development-stack-for-vscodium-micro03|ultimate-local-ai-development-stack-for-vscodium-micro03]] (2026-06-09)
+## From [ultimate-local-ai-development-stack-for-vscodium-micro03](/entities/ultimate-local-ai-development-stack-for-vscodium-micro03.md) (2026-06-09)
 - An installation required for the cutting-edge fix.
 - Can be replaced by OrbStack/Podman for a lighter FOSS alternative.
 
-## From [[openclaw-deep-research-part7-micro06|openclaw-deep-research-part7-micro06]] (2026-06-10)
+## From [openclaw-deep-research-part7-micro06](/entities/openclaw-deep-research-part7-micro06.md) (2026-06-10)
 - Used for the Docker Model Runner deployment

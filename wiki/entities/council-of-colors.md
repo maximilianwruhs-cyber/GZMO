@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[the-architecture-of-a-trading-card-game-micro02|the-architecture-of-a-trading-card-game-micro02]] (2026-06-09)
+## From [the-architecture-of-a-trading-card-game-micro02](/entities/the-architecture-of-a-trading-card-game-micro02.md) (2026-06-09)
 - An internal regulatory body functioning similarly to a supreme court for game mechanics.
 - Tasked with ensuring newly designed printed cards strictly adhere to historical mechanical identities.
 
-## From [[the-architecture-of-a-trading-card-game-micro04|the-architecture-of-a-trading-card-game-micro04]] (2026-06-10)
+## From [the-architecture-of-a-trading-card-game-micro04](/entities/the-architecture-of-a-trading-card-game-micro04.md) (2026-06-10)
 - An internal regulatory body.
 - Audits and enforces adherence to the Color Pie.

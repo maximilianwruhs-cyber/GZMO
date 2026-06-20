@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[prompt-agent-engineering-part3|prompt-agent-engineering-part3]] (2026-06-08)
+## From [prompt-agent-engineering-part3](/entities/prompt-agent-engineering-part3.md) (2026-06-08)
 - Used for non-blocking processing in Telegram bots.
 - Improves real-time performance.
 - Avoids the bot 'hanging'.

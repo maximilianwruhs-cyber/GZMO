@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[google-antigravity-the-architects-configuration-micro02|google-antigravity-the-architects-configuration-micro02]] (2026-06-09)
+## From [google-antigravity-the-architects-configuration-micro02](/entities/google-antigravity-the-architects-configuration-micro02.md) (2026-06-09)
 - Examples include SQL injection, XSS, CSRF, insecure direct object references.
 - Scanned for in the /audit_security Workflow.
 - An organization that defines vulnerabilities.

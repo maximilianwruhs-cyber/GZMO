@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[aether-grid-micro03|aether-grid-micro03]] (2026-06-09)
+## From [aether-grid-micro03](/entities/aether-grid-micro03.md) (2026-06-09)
 - Programming language for Swarm Consensus Module.
 - Lightweight BFT algorithm to be implemented over UDP.
 - Future logic engine where Rust code is recompiled by LLMs at runtime.

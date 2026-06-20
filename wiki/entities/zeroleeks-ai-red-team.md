@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[openclaw-deep-research-part7-micro06|openclaw-deep-research-part7-micro06]] (2026-06-10)
+## From [openclaw-deep-research-part7-micro06](/entities/openclaw-deep-research-part7-micro06.md) (2026-06-10)
 - Conducted a third security audit

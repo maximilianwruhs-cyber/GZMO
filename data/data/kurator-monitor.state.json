@@ -1,0 +1,29 @@
+{
+  "sessions": {
+    "daemon": {
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "turn_count": 0,
+      "skill_errors": 0,
+      "skill_invokes": 0,
+      "dice_loops_seen": 43
+    }
+  },
+  "recommendations_emitted": 2,
+  "last_eval_at": "2026-06-17T05:33:34.797148465Z",
+  "pending_recommendations": {},
+  "spawn_history": {
+    "c061947a-8caa-4d89-a561-98a950be1c67": {
+      "event_id": "c061947a-8caa-4d89-a561-98a950be1c67",
+      "session_id": "daemon",
+      "reason": "dice_loops 13 >= 12",
+      "suggested_agent_profile": "prometheus",
+      "created_at": "2026-06-17T05:33:34.797143206Z",
+      "approved": true,
+      "spawn_task_id": "24ca7b3c-8a1a-4dcd-bd4e-6e094569fec2",
+      "kind": null,
+      "report_path": null
+    }
+  },
+  "processed_learning_verify_ids": []
+}

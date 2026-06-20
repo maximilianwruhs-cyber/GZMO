@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-tools-for-thought-research-explained|drive-research-tools-for-thought-research-explained]] (2026-06-08)
+## From [drive-research-tools-for-thought-research-explained](/entities/drive-research-tools-for-thought-research-explained.md) (2026-06-08)
 - A strategic reading system.
 - Helps researchers contextualize unfamiliar information by generating comparative statements.
 
-## From [[drive-research-scientific-writing-and-publication-process-micro04|drive-research-scientific-writing-and-publication-process-micro04]] (2026-06-09)
+## From [drive-research-scientific-writing-and-publication-process-micro04](/entities/drive-research-scientific-writing-and-publication-process-micro04.md) (2026-06-09)
 - guideline for reporting
 - mentioned in the context of research reporting

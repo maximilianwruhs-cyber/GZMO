@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[the-archival-truth-part1-micro02|the-archival-truth-part1-micro02]] (2026-06-09)
+## From [the-archival-truth-part1-micro02](/entities/the-archival-truth-part1-micro02.md) (2026-06-09)
 - Analyzes the deep structural levels of life wisdom in all its facets.
 - Spans from etymological roots and systematic foundations in ancient and Far Eastern philosophy systems to empirically measurable effects in modern clinical psychology, cognitive research, and psychotherapy.
 - Includes specific linguistic, agrarian, and cultural codification using Austrian folk wisdom and the Hiancian dialect in the Pannonian region of Burgenland as examples.

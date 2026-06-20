@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-building-pi-coding-agent-extensions|drive-research-building-pi-coding-agent-extensions]] (2026-06-08)
+## From [drive-research-building-pi-coding-agent-extensions](/entities/drive-research-building-pi-coding-agent-extensions.md) (2026-06-08)
 - Renders the user interface entirely within the terminal.
 - Utilizes a highly sophisticated differential rendering engine.
 - Relies entirely on the CSI 2026 synchronous update standard.

@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[gzmo-soul-merged-new-part2-micro03|gzmo-soul-merged-new-part2-micro03]] (2026-06-10)
+## From [gzmo-soul-merged-new-part2-micro03](/entities/gzmo-soul-merged-new-part2-micro03.md) (2026-06-10)
 - An agent-based federated catalog.
 - Utilized Librarian agents to import and standardize metadata.

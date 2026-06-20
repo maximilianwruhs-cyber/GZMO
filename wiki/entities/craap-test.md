@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[optimizing-nvidia-blackwell-sm120-part2-micro07|optimizing-nvidia-blackwell-sm120-part2-micro07]] (2026-06-10)
+## From [optimizing-nvidia-blackwell-sm120-part2-micro07](/entities/optimizing-nvidia-blackwell-sm120-part2-micro07.md) (2026-06-10)
 - Traditional checklist for evaluating peer-reviewed papers and formal institutional publications
 - Consists of Currency, Relevance, Authority, Accuracy, and Purpose

@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-marlin-baseline-for-early-deployments-micro01|drive-research-marlin-baseline-for-early-deployments-micro01]] (2026-06-10)
+## From [drive-research-marlin-baseline-for-early-deployments-micro01](/entities/drive-research-marlin-baseline-for-early-deployments-micro01.md) (2026-06-10)
 - Instruction set architecture (ISA) for 5th generation Tensor Cores.
 - Enables single-thread instruction issue and native hardware multicast.

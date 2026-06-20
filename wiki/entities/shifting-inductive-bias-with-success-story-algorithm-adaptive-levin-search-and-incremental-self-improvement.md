@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[ai-research-part3-micro04|ai-research-part3-micro04]] (2026-06-09)
+## From [ai-research-part3-micro04](/entities/ai-research-part3-micro04.md) (2026-06-09)
 - Published in Machine Learning, 28(1): 105–130, 1997.

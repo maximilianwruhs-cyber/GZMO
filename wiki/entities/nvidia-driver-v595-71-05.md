@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SOFTWARE
 
-## From [[drive-research-ubuntu-extreme-hardware-tuning-micro01|drive-research-ubuntu-extreme-hardware-tuning-micro01]] (2026-06-09)
+## From [drive-research-ubuntu-extreme-hardware-tuning-micro01](/entities/drive-research-ubuntu-extreme-hardware-tuning-micro01.md) (2026-06-09)
 - Proprietary driver used for RTX 50-series cards.
 - Implements GPU System Processor (GSP) firmware by default.
 - Prone to GSP-related bugs and '35W Power Lock'.

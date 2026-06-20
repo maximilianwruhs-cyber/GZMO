@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[openclaw-deep-research-part2|openclaw-deep-research-part2]] (2026-06-08)
+## From [openclaw-deep-research-part2](/entities/openclaw-deep-research-part2.md) (2026-06-08)
 - Includes Prompt Injection (LLM01) as a major risk.
 - Includes Supply Chain Vulnerabilities (LLM05) as a major risk.
 - OWASP continues to treat prompt injection as a top risk.

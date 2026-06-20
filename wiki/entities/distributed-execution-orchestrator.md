@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part2|ai-research-part2]] (2026-06-08)
+## From [ai-research-part2](/entities/ai-research-part2.md) (2026-06-08)
 - Manages parallel candidate generation.
 - Decouples execution into isolated worker nodes.
 - Uses a thread-safe Round-Robin scheduler.

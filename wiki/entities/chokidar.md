@@ -15,17 +15,17 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[cybernetics-and-mythos-the-architecture-of-intell-part2|cybernetics-and-mythos-the-architecture-of-intell-part2]] (2026-06-08)
+## From [cybernetics-and-mythos-the-architecture-of-intell-part2](/entities/cybernetics-and-mythos-the-architecture-of-intell-part2.md) (2026-06-08)
 - It is a library used to monitor role-locking directories.
 - It acts as the dynamic gateway for agents.
 - It is part of the FCoP Message Bus implementation.
 
-## From [[bun-versus-nodejs-architectural-evaluation-for-b|bun-versus-nodejs-architectural-evaluation-for-b]] (2026-06-08)
+## From [bun-versus-nodejs-architectural-evaluation-for-b](/entities/bun-versus-nodejs-architectural-evaluation-for-b.md) (2026-06-08)
 - Third-party wrapper library for filesystem watching in Node.js
 - Normalizes erratic filesystem events across various operating systems
 - Rewritten in TypeScript in recent iterations
 - User-land JavaScript abstraction layered over native bindings
 
-## From [[drive-research-unfold-a-comprehensive-step-by-step-implementation|drive-research-unfold-a-comprehensive-step-by-step-implementation]] (2026-06-08)
+## From [drive-research-unfold-a-comprehensive-step-by-step-implementation](/entities/drive-research-unfold-a-comprehensive-step-by-step-implementation.md) (2026-06-08)
 - A library used to implement the file system watcher.
 - Monitors role-locking directories for pending JSON files.

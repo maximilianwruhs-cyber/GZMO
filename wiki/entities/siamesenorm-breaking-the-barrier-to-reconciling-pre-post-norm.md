@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part6-micro01|ai-research-part6-micro01]] (2026-06-09)
+## From [ai-research-part6-micro01](/entities/ai-research-part6-micro01.md) (2026-06-09)
 - A paradigm predominantly adopted by modern Transformers for optimization stability.
 - Applies LN to the input of the residual branch.
 - Suffers from restricted effective depth and representational capacity.
@@ -22,6 +22,6 @@ Type: CONCEPT
 - Decouples the optimization dynamics of the two streams.
 - Retains distinct characteristics of both Pre-Norm and Post-Norm.
 
-## From [[ai-research-part8-micro08|ai-research-part8-micro08]] (2026-06-09)
+## From [ai-research-part8-micro08](/entities/ai-research-part8-micro08.md) (2026-06-09)
 - Authored by Li et al.
 - Proposes a dual-stream architecture that couples Pre-Norm-like and Post-Norm-like streams.

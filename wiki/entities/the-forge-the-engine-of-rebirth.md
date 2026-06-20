@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[obolus-micro05|obolus-micro05]] (2026-06-09)
+## From [obolus-micro05](/entities/obolus-micro05.md) (2026-06-09)
 - Mechanism of evolution.
 - Handles Termination, Autopsy, Crossover, Mutation, and Spawn when an agent's wallet hits <= 0.
 - Visual translation of DNA Mutation and Rebirth process.

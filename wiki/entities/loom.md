@@ -14,11 +14,11 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[mastering-remote-work-a-comprehensive-guide-to-ho|mastering-remote-work-a-comprehensive-guide-to-ho]] (2026-06-08)
+## From [mastering-remote-work-a-comprehensive-guide-to-ho](/entities/mastering-remote-work-a-comprehensive-guide-to-ho.md) (2026-06-08)
 - Used for asynchronous communication.
 - Allows for recorded video messages.
 
-## From [[drive-research-home-office-leitfaden-struktur-gesundheit-erfol|drive-research-home-office-leitfaden-struktur-gesundheit-erfol]] (2026-06-08)
+## From [drive-research-home-office-leitfaden-struktur-gesundheit-erfol](/entities/drive-research-home-office-leitfaden-struktur-gesundheit-erfol.md) (2026-06-08)
 - A tool for asynchronous communication.
 - Used for recorded video messages.
 - Suitable for status updates and complex explanations.

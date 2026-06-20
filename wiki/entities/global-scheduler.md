@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[prfaas-cross-datacenter-llm-serving-via-selective-micro04|prfaas-cross-datacenter-llm-serving-via-selective-micro04]] (2026-06-09)
+## From [prfaas-cross-datacenter-llm-serving-via-selective-micro04](/entities/prfaas-cross-datacenter-llm-serving-via-selective-micro04.md) (2026-06-09)
 - Routes requests to clusters and nodes.
 - Maximizes end-to-end throughput under cross-cluster bandwidth constraints.
 - Monitors PrfaaS egress utilization and request queue depth.

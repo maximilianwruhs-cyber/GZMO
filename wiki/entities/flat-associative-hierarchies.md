@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-crafting-a-creative-agent-prompt|drive-research-crafting-a-creative-agent-prompt]] (2026-06-08)
+## From [drive-research-crafting-a-creative-agent-prompt](/entities/drive-research-crafting-a-creative-agent-prompt.md) (2026-06-08)
 - A defining psychological trait of highly creative individuals.
 - Characterized by a less skewed distribution of associative strengths.
 - Generative models possess incredibly steep associative hierarchies that need to be artificially flattened.

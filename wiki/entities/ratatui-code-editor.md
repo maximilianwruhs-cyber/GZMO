@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-rust-tui-architecture-tech-stack1-micro01|drive-research-rust-tui-architecture-tech-stack1-micro01]] (2026-06-09)
+## From [drive-research-rust-tui-architecture-tech-stack1-micro01](/entities/drive-research-rust-tui-architecture-tech-stack1-micro01.md) (2026-06-09)
 - The definitive, state-of-the-art framework for building TUIs in Rust.
 - A community-driven fork and continuation of the tui-rs library.
 - Boasts widespread adoption by enterprise engineering teams and open-source projects.
@@ -34,7 +34,7 @@ Type: TOOL
 - Provides a generic FocusManager to handle tabbed focus transitions between fields.
 - Implements precise hit-testing logic for mouse clicks.
 
-## From [[drive-research-rust-tui-architecture-tech-stack1-micro04|drive-research-rust-tui-architecture-tech-stack1-micro04]] (2026-06-09)
+## From [drive-research-rust-tui-architecture-tech-stack1-micro04](/entities/drive-research-rust-tui-architecture-tech-stack1-micro04.md) (2026-06-09)
 - Integrates with the tree-sitter parsing library.
 - Provides high-performance, real-time syntax highlighting within the TUI.
 - Used for displaying, inspecting, or editing configuration files or query languages.

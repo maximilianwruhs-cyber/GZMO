@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[openclaw-part2|openclaw-part2]] (2026-06-08)
+## From [openclaw-part2](/entities/openclaw-part2.md) (2026-06-08)
 - A platform for orchestrating enterprise-grade autonomous workforces.
 - Provides solutions for Compute & State Management, Storage & Memory Optimization, Networking & Load Balancing, and Edge Security & Sandboxing.
 - Recommended for enterprise scale deployments of OpenClaw.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[openclaw-part1-micro06|openclaw-part1-micro06]] (2026-06-09)
+## From [openclaw-part1-micro06](/entities/openclaw-part1-micro06.md) (2026-06-09)
 - Implemented in OpenClaw 4.5 to execute a three-phase consolidation cycle.
 - Simulates biological sleep.
 - Performs consolidation during idle times at night.

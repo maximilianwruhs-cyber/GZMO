@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[the-cognitive-architecture-of-openclaw-agents-micro03|the-cognitive-architecture-of-openclaw-agents-micro03]] (2026-06-09)
+## From [the-cognitive-architecture-of-openclaw-agents-micro03](/entities/the-cognitive-architecture-of-openclaw-agents-micro03.md) (2026-06-09)
 - Used for generating high-dimensional embeddings.
 - Generates 384-dimensional embeddings.

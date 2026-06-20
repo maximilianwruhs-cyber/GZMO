@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[drive-research-du-hast-gesagt-part1|drive-research-du-hast-gesagt-part1]] (2026-06-08)
+## From [drive-research-du-hast-gesagt-part1](/entities/drive-research-du-hast-gesagt-part1.md) (2026-06-08)
 - Model: DeepSeek-R1-14B or 32B.
 - Reads vague ideas and writes a technical Blueprint.md.
 - Moves the Blueprint to 03_Build_Queue/.

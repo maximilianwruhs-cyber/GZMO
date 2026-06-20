@@ -16,11 +16,11 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-agentic-reverse-engineering-state-and-future-micro01|drive-research-agentic-reverse-engineering-state-and-future-micro01]] (2026-06-09)
+## From [drive-research-agentic-reverse-engineering-state-and-future-micro01](/entities/drive-research-agentic-reverse-engineering-state-and-future-micro01.md) (2026-06-09)
 - Powers the orchestrator agent in SentinelOne's architecture.
 
-## From [[drive-research-agentic-reverse-engineering-state-and-future1-micro01|drive-research-agentic-reverse-engineering-state-and-future1-micro01]] (2026-06-09)
+## From [drive-research-agentic-reverse-engineering-state-and-future1-micro01](/entities/drive-research-agentic-reverse-engineering-state-and-future1-micro01.md) (2026-06-09)
 - Powers the orchestrator agent in SentinelOne's Adversarial Consensus Engine.
 
-## From [[the-dawn-of-agentic-software-reverse-engineering-micro01|the-dawn-of-agentic-software-reverse-engineering-micro01]] (2026-06-09)
+## From [the-dawn-of-agentic-software-reverse-engineering-micro01](/entities/the-dawn-of-agentic-software-reverse-engineering-micro01.md) (2026-06-09)
 - Powers the orchestrator agent in SentinelOne's Adversarial Consensus Engine.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-agentic-typescript-monorepo-context-management|drive-research-agentic-typescript-monorepo-context-management]] (2026-06-08)
+## From [drive-research-agentic-typescript-monorepo-context-management](/entities/drive-research-agentic-typescript-monorepo-context-management.md) (2026-06-08)
 - Aims for absolute LSP-usability for AI.
 - Achieves process isolation by spawning a hidden application window.
 - Hosts a fully independent instance of the language server for the agent's workspace.

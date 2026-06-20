@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[cybernetics-and-mythos-the-architecture-of-intell-part1|cybernetics-and-mythos-the-architecture-of-intell-part1]] (2026-06-08)
+## From [cybernetics-and-mythos-the-architecture-of-intell-part1](/entities/cybernetics-and-mythos-the-architecture-of-intell-part1.md) (2026-06-08)
 - These are used in contemporary artificial intelligence engineering.
 - They operationalize highly abstract Hegelian principles.
 - They involve multi-agent reflection loops.

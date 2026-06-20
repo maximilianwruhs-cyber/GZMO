@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[building-a-private-local-ai-development-environmen-micro01|building-a-private-local-ai-development-environmen-micro01]] (2026-06-09)
+## From [building-a-private-local-ai-development-environmen-micro01](/entities/building-a-private-local-ai-development-environmen-micro01.md) (2026-06-09)
 - Used to create a local vector database of the entire codebase
 - Enables 'Codebase Telepathy'

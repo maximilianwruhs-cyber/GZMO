@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[ai-research-part2|ai-research-part2]] (2026-06-08)
+## From [ai-research-part2](/entities/ai-research-part2.md) (2026-06-08)
 - A base model evaluated with Agent0.
 - Agent0 improved its mathematical reasoning by 18% and general reasoning by 24%.
 - Achieved the highest overall average score among all approaches on general-domain reasoning benchmarks when used with Agent0.

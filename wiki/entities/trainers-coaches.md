@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part1-micro01|drive-research-ki-berater-fragebogen-für-kundenanalyse-part1-micro01]] (2026-06-09)
+## From [drive-research-ki-berater-fragebogen-für-kundenanalyse-part1-micro01](/entities/drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part1-micro01.md) (2026-06-09)
 - Bridge the socio-technical gap when employees don't accept or can't use AI solutions.
 - Design training programs and practical workshops.
 - Create playbooks and build internal 'AI Academies'.

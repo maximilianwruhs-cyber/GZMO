@@ -14,8 +14,8 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[openclaw-deep-research-part7-micro06|openclaw-deep-research-part7-micro06]] (2026-06-10)
+## From [openclaw-deep-research-part7-micro06](/entities/openclaw-deep-research-part7-micro06.md) (2026-06-10)
 - One of the five AI models used for initial analysis
 
-## From [[openclaw-deep-research-part8-micro06|openclaw-deep-research-part8-micro06]] (2026-06-10)
+## From [openclaw-deep-research-part8-micro06](/entities/openclaw-deep-research-part8-micro06.md) (2026-06-10)
 - A model available via Synthetic provider

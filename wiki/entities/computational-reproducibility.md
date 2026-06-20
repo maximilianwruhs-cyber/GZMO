@@ -14,12 +14,12 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-architecture-of-scientific-inquiry-and-academi|the-architecture-of-scientific-inquiry-and-academi]] (2026-06-08)
+## From [the-architecture-of-scientific-inquiry-and-academi](/entities/the-architecture-of-scientific-inquiry-and-academi.md) (2026-06-08)
 - Necessitated by the complexity of modern data analysis.
 - Achieved using scientific programming languages and computational notebooks.
 - Ensures that analytical steps can be repeated exactly.
 
-## From [[drive-research-die-architektur-der-wissenschaftlichen-forschung|drive-research-die-architektur-der-wissenschaftlichen-forschung]] (2026-06-08)
+## From [drive-research-die-architektur-der-wissenschaftlichen-forschung](/entities/drive-research-die-architektur-der-wissenschaftlichen-forschung.md) (2026-06-08)
 - A shift away from simple GUIs like Microsoft Excel.
 - Involves using scientific programming languages and computational notebooks.
 - Ensures that analyses can be repeated exactly.

@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-advanced-prompt-engineering-for-comprehensive-code|drive-research-advanced-prompt-engineering-for-comprehensive-code]] (2026-06-08)
+## From [drive-research-advanced-prompt-engineering-for-comprehensive-code](/entities/drive-research-advanced-prompt-engineering-for-comprehensive-code.md) (2026-06-08)
 - A dimension evaluated in holistic codebase reviews.
 - Refers to a software design philosophy.

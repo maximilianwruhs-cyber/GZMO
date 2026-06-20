@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[gzmo-chaos-engine-architecture-audit-and-behaviora|gzmo-chaos-engine-architecture-audit-and-behaviora]] (2026-06-08)
+## From [gzmo-chaos-engine-architecture-audit-and-behaviora](/entities/gzmo-chaos-engine-architecture-audit-and-behaviora.md) (2026-06-08)
 - Computed from the Lorenz attractor's z-axis
 - Currently not used by engine.ts
 - Proposed to control response verbosity

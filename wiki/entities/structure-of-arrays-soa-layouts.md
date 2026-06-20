@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-cache-optimization-with-ai-chaos-theory|drive-research-cache-optimization-with-ai-chaos-theory]] (2026-06-08)
+## From [drive-research-cache-optimization-with-ai-chaos-theory](/entities/drive-research-cache-optimization-with-ai-chaos-theory.md) (2026-06-08)
 - A memory layout that strips logical agents of direct data fields, representing them solely by a lightweight AgentId mapped to parallel vectors representing contiguous component columns.
 - Achieves optimal read/write speeds and cache-dense traversal.
 - Isolates variables like escalation states into their own parallel vectors, aligning elements sequentially without padding bytes.

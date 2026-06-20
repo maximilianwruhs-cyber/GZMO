@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[architectures-and-optimizations-for-speculative-de-micro02|architectures-and-optimizations-for-speculative-de-micro02]] (2026-06-09)
+## From [architectures-and-optimizations-for-speculative-de-micro02](/entities/architectures-and-optimizations-for-speculative-de-micro02.md) (2026-06-09)
 - The first phase of the training process.
 - Each agent is considered in isolation.
 - Primary goal is to train the model-specific InnerLink module.

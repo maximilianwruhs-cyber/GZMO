@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[architectures-and-optimizations-for-speculative-de-micro05|architectures-and-optimizations-for-speculative-de-micro05]] (2026-06-09)
+## From [architectures-and-optimizations-for-speculative-de-micro05](/entities/architectures-and-optimizations-for-speculative-de-micro05.md) (2026-06-09)
 - Introduced by the llama.cpp project.
 - Requires no additional model weights and consumes zero extra VRAM.
 - Operates by searching token history for established patterns.

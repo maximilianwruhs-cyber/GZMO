@@ -15,12 +15,12 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[architectures-for-agentic-memory-virtual-context-micro02|architectures-for-agentic-memory-virtual-context-micro02]] (2026-06-09)
+## From [architectures-for-agentic-memory-virtual-context-micro02](/entities/architectures-for-agentic-memory-virtual-context-micro02.md) (2026-06-09)
 - GGML Backus-Naur Form
 - An extension of traditional Backus-Naur Form augmented with modern, regex-like operators
 - Defines strict production rules for token generation
 
-## From [[architectures-for-agentic-memory-virtual-context-micro03|architectures-for-agentic-memory-virtual-context-micro03]] (2026-06-09)
+## From [architectures-for-agentic-memory-virtual-context-micro03](/entities/architectures-for-agentic-memory-virtual-context-micro03.md) (2026-06-09)
 - Guarantees syntactic determinism.
 - Mathematically ensures the output string will compile as valid JSON.
 - Can be applied via high-level abstraction layers like LM Studio's response_format protocol.

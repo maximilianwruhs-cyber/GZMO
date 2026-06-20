@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-deep-dive-google-antigravity-architecture1|drive-research-deep-dive-google-antigravity-architecture1]] (2026-06-08)
+## From [drive-research-deep-dive-google-antigravity-architecture1](/entities/drive-research-deep-dive-google-antigravity-architecture1.md) (2026-06-08)
 - Powers the dual-view architecture of Google Antigravity.
 - Utilizes a Sparse Mixture-of-Experts (MoE) architecture.
 - Has parameters exceeding one trillion.

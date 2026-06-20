@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-optimizing-cuda-performance-with-fp4-fp6-micro01|drive-research-optimizing-cuda-performance-with-fp4-fp6-micro01]] (2026-06-09)
+## From [drive-research-optimizing-cuda-performance-with-fp4-fp6-micro01](/entities/drive-research-optimizing-cuda-performance-with-fp4-fp6-micro01.md) (2026-06-09)
 - Falls back to slow, non-TMA templates when compute_120a causes runtime errors on SM120.
 - Executes fastest TMA Warp-Specialized grouped GEMM tactics when compiled under compute_120f.
 - A library where GDC execution is controlled by the #ifndef CUTLASS_GDC_ENABLED preprocessor guard.

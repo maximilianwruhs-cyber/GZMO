@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-crafting-a-creative-agent-prompt|drive-research-crafting-a-creative-agent-prompt]] (2026-06-08)
+## From [drive-research-crafting-a-creative-agent-prompt](/entities/drive-research-crafting-a-creative-agent-prompt.md) (2026-06-08)
 - Recasts the agent as a polymathic synthesizer with high epistemic cognition.
 - Ensures the model questions hidden axioms, dogmas, and assumptions.

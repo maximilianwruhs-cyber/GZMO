@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-sovereign-software-factory-blueprint|the-sovereign-software-factory-blueprint]] (2026-06-08)
+## From [the-sovereign-software-factory-blueprint](/entities/the-sovereign-software-factory-blueprint.md) (2026-06-08)
 - LM Studio loading the Architect model on port 1234.
 - Enables TurboQuant.
 - Runs llama.cpp (via LM Studio AppImage) using TurboQuant 4-bit KV Cache compression.

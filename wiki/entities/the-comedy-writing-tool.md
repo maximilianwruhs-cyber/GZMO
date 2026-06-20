@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[the-archival-truth-part1-micro06|the-archival-truth-part1-micro06]] (2026-06-09)
+## From [the-archival-truth-part1-micro06](/entities/the-archival-truth-part1-micro06.md) (2026-06-09)
 - Used for analyzing comedic structures.
 - Helps identify setup/punchline patterns.
 - Used to analyze comedic structures.

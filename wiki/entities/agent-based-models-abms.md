@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-algorithmic-trading-with-chaos-theory|drive-research-algorithmic-trading-with-chaos-theory]] (2026-06-08)
+## From [drive-research-algorithmic-trading-with-chaos-theory](/entities/drive-research-algorithmic-trading-with-chaos-theory.md) (2026-06-08)
 - Provide empirical evidence for LOB dynamics.
 - Suggest LOB is a complex, non-linear dynamical system.
 - Can reveal intrinsic bistability and multistability in micro-level trading rules.

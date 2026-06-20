@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-advanced-prompt-engineering-for-comprehensive-c|drive-research-advanced-prompt-engineering-for-comprehensive-c]] (2026-06-08)
+## From [drive-research-advanced-prompt-engineering-for-comprehensive-c](/entities/drive-research-advanced-prompt-engineering-for-comprehensive-c.md) (2026-06-08)
 - An advanced topology for complex systems.
 - Decomposes a massive task into a series of smaller, sequential sub-problems.
 - The output of the first execution serves as the direct input for the second.

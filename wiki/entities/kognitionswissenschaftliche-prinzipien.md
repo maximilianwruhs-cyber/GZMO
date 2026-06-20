@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[openclaw-part1-micro07|openclaw-part1-micro07]] (2026-06-09)
+## From [openclaw-part1-micro07](/entities/openclaw-part1-micro07.md) (2026-06-09)
 - deep structural adaptation of the architecture.
 - principles are fundamental to the system's breakthrough.

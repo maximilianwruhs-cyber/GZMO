@@ -14,6 +14,6 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[curated-research-corpus|curated research corpus]] (CONCEPT)
-- [[openclaw-agents|OpenClaw Agents]] (CONCEPT)
-- [[google-takeout|Google Takeout]] (TOOL)
+- [curated research corpus](/entities/curated-research-corpus.md) (CONCEPT)
+- [OpenClaw Agents](/entities/openclaw-agents.md) (CONCEPT)
+- [Google Takeout](/entities/google-takeout.md) (TOOL)

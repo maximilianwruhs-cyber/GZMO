@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[prompt-agent-engineering-part7-micro02|prompt-agent-engineering-part7-micro02]] (2026-06-09)
+## From [prompt-agent-engineering-part7-micro02](/entities/prompt-agent-engineering-part7-micro02.md) (2026-06-09)
 - An enhanced, fully autonomous SOTA auditor protocol.
 - Includes phases for Contextual Grounding, Environmental Scan, Comprehensive Audit, Verdict, and Forward-Looking Recommendations.

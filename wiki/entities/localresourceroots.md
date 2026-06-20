@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[obolus-vs-codium-extension-konzept-research-part1-micro02|obolus-vs-codium-extension-konzept-research-part1-micro02]] (2026-06-10)
+## From [obolus-vs-codium-extension-konzept-research-part1-micro02](/entities/obolus-vs-codium-extension-konzept-research-part1-micro02.md) (2026-06-10)
 - Option used to control access to local resources in webviews
 - Defines a set of root URIs from which local content may be loaded

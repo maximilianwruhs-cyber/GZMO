@@ -14,14 +14,14 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-08).
 
 ## Entities
-- [[proxmox-egpu-hypervisor|Proxmox eGPU hypervisor]] (SYSTEM)
-- [[llama-server|llama-server]] (TOOL)
-- [[kvm-vm-101-core-database-ai|KVM VM 101: Core Database AI]] (SYSTEM)
-- [[deepseek-ai-deepseek-r1-distill-qwen-7b|deepseek-ai/DeepSeek-R1-Distill-Qwen-7B]] (SYSTEM)
-- [[layer-splitting-mode|Layer-Splitting Mode]] (CONCEPT)
-- [[sovereign-moe-yaml|sovereign-moe.yaml]] (TOOL)
-- [[intelligent-self-learning-database|intelligent, self-learning database]] (CONCEPT)
-- [[proxmox-virtualization-hardware-topology|Proxmox Virtualization & Hardware Topology]] (CONCEPT)
+- [Proxmox eGPU hypervisor](/entities/proxmox-egpu-hypervisor.md) (SYSTEM)
+- [llama-server](/entities/llama-server.md) (TOOL)
+- [KVM VM 101: Core Database AI](/entities/kvm-vm-101-core-database-ai.md) (SYSTEM)
+- [deepseek-ai/DeepSeek-R1-Distill-Qwen-7B](/entities/deepseek-ai-deepseek-r1-distill-qwen-7b.md) (SYSTEM)
+- [Layer-Splitting Mode](/entities/layer-splitting-mode.md) (CONCEPT)
+- [sovereign-moe.yaml](/entities/sovereign-moe-yaml.md) (TOOL)
+- [intelligent, self-learning database](/entities/intelligent-self-learning-database.md) (CONCEPT)
+- [Proxmox Virtualization & Hardware Topology](/entities/proxmox-virtualization-hardware-topology.md) (CONCEPT)
 
 ## Relations
 - intelligent, self-learning database → USES → Proxmox eGPU hypervisor

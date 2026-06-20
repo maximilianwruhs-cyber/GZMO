@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-archival-truth-part1-micro02|the-archival-truth-part1-micro02]] (2026-06-09)
+## From [the-archival-truth-part1-micro02](/entities/the-archival-truth-part1-micro02.md) (2026-06-09)
 - A model used in psychological adult education and preventive coaching.
 - Forms the foundation for not only surviving challenges but growing from them.
 - Includes factors like Acceptance, Attachment, Solution Orientation, Healthy Optimism, and Self-Awareness.

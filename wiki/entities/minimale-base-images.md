@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: ENVIRONMENT_CONFIGURATION
 
-## From [[ai-research-part6-micro04|ai-research-part6-micro04]] (2026-06-09)
+## From [ai-research-part6-micro04](/entities/ai-research-part6-micro04.md) (2026-06-09)
 - Starting point for agents under Zero-Trust methodology

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[prompt-agent-engineering-part6-micro04|prompt-agent-engineering-part6-micro04]] (2026-06-10)
+## From [prompt-agent-engineering-part6-micro04](/entities/prompt-agent-engineering-part6-micro04.md) (2026-06-10)
 - Metrics used to evaluate performance.
 - Includes LCP, CLS, FID, and INP.
 - Role assigned to analyze UI input for performance bottlenecks and optimization plans.

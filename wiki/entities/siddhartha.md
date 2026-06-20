@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[the-archival-truth-part1-micro03|the-archival-truth-part1-micro03]] (2026-06-09)
+## From [the-archival-truth-part1-micro03](/entities/the-archival-truth-part1-micro03.md) (2026-06-09)
 - A spiritual novel by Hermann Hesse.
 - Published between 1919-1922.
 - Contains psychoanalytically precise admonitions.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[drive-research-proxmox-agent-data-storage-micro03|drive-research-proxmox-agent-data-storage-micro03]] (2026-06-09)
+## From [drive-research-proxmox-agent-data-storage-micro03](/entities/drive-research-proxmox-agent-data-storage-micro03.md) (2026-06-09)
 - Part of the Neo4j GenAI ecosystem.
 - Database server running on LXC 101.
 - Executes read-only schema Cypher query.

@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-install-the-google-workspace-extension|drive-research-install-the-google-workspace-extension]] (2026-06-08)
+## From [drive-research-install-the-google-workspace-extension](/entities/drive-research-install-the-google-workspace-extension.md) (2026-06-08)
 - The Antigravity agent can be launched in the IDE.
 - Prompt-based authentication occurs in the IDE.

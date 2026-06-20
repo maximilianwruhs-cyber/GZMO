@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[openclaw-deep-research-part1-micro02|openclaw-deep-research-part1-micro02]] (2026-06-09)
+## From [openclaw-deep-research-part1-micro02](/entities/openclaw-deep-research-part1-micro02.md) (2026-06-09)
 - Cited source for information on Blink Claw.
 - A managed hosting service for OpenClaw.
 - Abstracts the complexity of self-hosting.

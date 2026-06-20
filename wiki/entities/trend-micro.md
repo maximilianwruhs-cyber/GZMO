@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[openclaw-deep-research-part2|openclaw-deep-research-part2]] (2026-06-08)
+## From [openclaw-deep-research-part2](/entities/openclaw-deep-research-part2.md) (2026-06-08)
 - Snyk's ToxicSkills audit and Trend Micro's AMOS campaign analysis show the ecosystem is already being abused in the wild.
 - Trend Micro documented malicious OpenClaw skills used to distribute Atomic macOS Stealer (AMOS).
 - Trend Micro's AMOS story is a reminder of how valuable local data access is.

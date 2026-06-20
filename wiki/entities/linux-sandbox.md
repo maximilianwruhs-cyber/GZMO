@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[ultimate-local-ai-development-stack-for-vscodium-micro03|ultimate-local-ai-development-stack-for-vscodium-micro03]] (2026-06-09)
+## From [ultimate-local-ai-development-stack-for-vscodium-micro03](/entities/ultimate-local-ai-development-stack-for-vscodium-micro03.md) (2026-06-09)
 - Terminal commands are executed entirely trapped inside it.
 - Provides isolation for AI actions.

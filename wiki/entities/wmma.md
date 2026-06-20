@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-marlin-baseline-for-early-deployments-micro01|drive-research-marlin-baseline-for-early-deployments-micro01]] (2026-06-10)
+## From [drive-research-marlin-baseline-for-early-deployments-micro01](/entities/drive-research-marlin-baseline-for-early-deployments-micro01.md) (2026-06-10)
 - Warp-Level Matrix Multiply-Accumulate.
 - Compatible with Volta- and Ampere-class hardware architectures.

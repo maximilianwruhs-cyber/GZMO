@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-rust-ecs-cache-optimization-research|drive-research-rust-ecs-cache-optimization-research]] (2026-06-08)
+## From [drive-research-rust-ecs-cache-optimization-research](/entities/drive-research-rust-ecs-cache-optimization-research.md) (2026-06-08)
 - Manages GPU contexts and access.
 - Allows only one active CUDA context per device in EXCLUSIVE_PROCESS mode.
 - Denies access to external processes attempting to initialize a context.

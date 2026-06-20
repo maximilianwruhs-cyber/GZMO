@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[the-evolution-of-artificial-intelligence-evaluatio-micro03|the-evolution-of-artificial-intelligence-evaluatio-micro03]] (2026-06-09)
+## From [the-evolution-of-artificial-intelligence-evaluatio-micro03](/entities/the-evolution-of-artificial-intelligence-evaluatio-micro03.md) (2026-06-09)
 - Lightweight, highly efficient edge models optimized for low-latency, on-device operation without cloud dependency

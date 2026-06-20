@@ -14,11 +14,11 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[high-performance-typescript-execution-and-architec-part1-micro05|high-performance-typescript-execution-and-architec-part1-micro05]] (2026-06-09)
+## From [high-performance-typescript-execution-and-architec-part1-micro05](/entities/high-performance-typescript-execution-and-architec-part1-micro05.md) (2026-06-09)
 - Fires immediately before the runtime tears down the current extension instance.
 - Strictly designated for garbage collection and graceful termination.
 - Fires before the Node.js module cache is flushed during a /reload.
 
-## From [[high-performance-typescript-execution-and-architec-part1-micro07|high-performance-typescript-execution-and-architec-part1-micro07]] (2026-06-09)
+## From [high-performance-typescript-execution-and-architec-part1-micro07](/entities/high-performance-typescript-execution-and-architec-part1-micro07.md) (2026-06-09)
 - An event that triggers garbage collection logic.
 - Clears intervals and unmounts widgets.

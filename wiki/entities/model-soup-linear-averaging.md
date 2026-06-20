@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: ALGORITHM
 
-## From [[architectural-blueprints-for-sovereign-frankenmoe-part1|architectural-blueprints-for-sovereign-frankenmoe-part1]] (2026-06-08)
+## From [architectural-blueprints-for-sovereign-frankenmoe-part1](/entities/architectural-blueprints-for-sovereign-frankenmoe-part1.md) (2026-06-08)
 - Linearly interpolates weights: W_{\text{merged}} = \sum_{i=1}^N \alpha_i W_i.
 - Occasionally optimized greedily based on validation accuracy.
 - Primary use case is baseline merging of models trained on identical datasets with different hyperparameters.

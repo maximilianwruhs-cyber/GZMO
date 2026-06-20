@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: AUTHOR
 
-## From [[ai-research-part3-micro04|ai-research-part3-micro04]] (2026-06-09)
+## From [ai-research-part3-micro04](/entities/ai-research-part3-micro04.md) (2026-06-09)
 - Co-authored 'Reinforcement learning: An introduction, volume 1'.

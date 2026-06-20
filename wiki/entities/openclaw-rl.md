@@ -21,7 +21,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[the-openclaw-architecture-and-tri-circuit-autonomo-part2|the-openclaw-architecture-and-tri-circuit-autonomo-part2]] (2026-06-08)
+## From [the-openclaw-architecture-and-tri-circuit-autonomo-part2](/entities/the-openclaw-architecture-and-tri-circuit-autonomo-part2.md) (2026-06-08)
 - Deployed as a hardened systemd service.
 - Orchestration framework for the fact-checker agent.
 - An orchestration framework.
@@ -30,7 +30,7 @@ Type: SYSTEM
 - Runs locally.
 - Guarantees deterministic, verified truth without performance, padding, or personality.
 
-## From [[the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro02|the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro02]] (2026-06-09)
+## From [the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro02](/entities/the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro02.md) (2026-06-09)
 - A fully asynchronous reinforcement learning architecture created by the Gen-Verse team.
 - Intercepts live, multi-turn conversations and continuously optimizes the policy model in the background.
 - Operates through a fundamentally different paradigm than traditional static fine-tuning.
@@ -43,7 +43,7 @@ Type: SYSTEM
 - Provides multiple mechanisms to secure the runtime against threats like indirect prompt injection.
 - Agents possess temporal agency, allowing proactive operation through Heartbeats and Cron scheduling.
 
-## From [[the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro03|the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro03]] (2026-06-09)
+## From [the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro03](/entities/the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro03.md) (2026-06-09)
 - Used for continuous alignment of the agent.
 - Enables training agents by talking.
 - A framework for multi-agent routing topologies.
@@ -57,12 +57,12 @@ Type: SYSTEM
 - Scales to handle enterprise-level investigative workflows as a 'Critic' node.
 - A sovereign, self-improving verification engine.
 
-## From [[the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro04|the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro04]] (2026-06-09)
+## From [the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro04](/entities/the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro04.md) (2026-06-09)
 - Framework for the Live Operational Interface.
 - Asynchronous reinforcement learning framework.
 - Features a hierarchical architecture with a Manager and Workers.
 
-## From [[the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro05|the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro05]] (2026-06-09)
+## From [the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro05](/entities/the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro05.md) (2026-06-09)
 - A framework that continues to mature.
 - Potential for systems to operate on low-power, agent-specific hardware.
 - Train any agent.
@@ -74,24 +74,24 @@ Type: SYSTEM
 - Custom skill creation guide available.
 - 16 skills listed for AI Agents.
 
-## From [[the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro06|the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro06]] (2026-06-09)
+## From [the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro06](/entities/the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro06.md) (2026-06-09)
 - Asynchronous reinforcement learning framework.
 - Optimizes the policy model in the background based on real interactions.
 - Achieves hyper-accurate verification status.
 
-## From [[the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro08|the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro08]] (2026-06-09)
+## From [the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro08](/entities/the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro08.md) (2026-06-09)
 - Forms the basis for Circuit II: Live Agency.
 - Utilizes an in-process Command-Queue for execution serialization.
 - Has different queue modes: collect, steer, followup, steer-backlog.
 - Implements a drop policy 'summarize' for overload protection.
 
-## From [[the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro09|the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro09]] (2026-06-09)
+## From [the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro09](/entities/the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro09.md) (2026-06-09)
 - Installed via npm.
 - Onboarding involves guided CLI setup for channels and model providers.
 - Deployed as a systemd service in Circuit II.
 - Uses local LM Studio model bridging.
 
-## From [[openclaw-deep-research-part9-micro07|openclaw-deep-research-part9-micro07]] (2026-06-10)
+## From [openclaw-deep-research-part9-micro07](/entities/openclaw-deep-research-part9-micro07.md) (2026-06-10)
 - A fully asynchronous reinforcement learning framework for training personalized AI agents.
 - Supports three learning paradigms: Binary RL, OPD, and Combination Method.
 - Turns everyday conversations into training signals.

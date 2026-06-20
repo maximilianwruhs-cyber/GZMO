@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part1|ai-research-part1]] (2026-06-08)
+## From [ai-research-part1](/entities/ai-research-part1.md) (2026-06-08)
 - Computes intra-block attention sequentially for each layer using the evolving partial sum.
 - Merges with Phase 1 outputs through online softmax.
 - Preserves an I/O footprint similar to that of standard residual connections.

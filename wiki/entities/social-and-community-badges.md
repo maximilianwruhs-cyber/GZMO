@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-creating-a-comprehensive-readmemd-micro02|drive-research-creating-a-comprehensive-readmemd-micro02]] (2026-06-09)
+## From [drive-research-creating-a-comprehensive-readmemd-micro02](/entities/drive-research-creating-a-comprehensive-readmemd-micro02.md) (2026-06-09)
 - Display real-time engagement metrics.
 - Can display Discord server member counts, GitHub repository stars, active forks, or financial sponsorship funding targets.

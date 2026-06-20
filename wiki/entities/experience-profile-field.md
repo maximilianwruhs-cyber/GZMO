@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[prompt-agent-engineering-part7-micro02|prompt-agent-engineering-part7-micro02]] (2026-06-09)
+## From [prompt-agent-engineering-part7-micro02](/entities/prompt-agent-engineering-part7-micro02.md) (2026-06-09)
 - Structurally a stub in the system.
 - Accepted, stored, and acknowledged but not utilized by map_to_midi.
 - Represents a critical gap in novelty.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part4|ai-research-part4]] (2026-06-08)
+## From [ai-research-part4](/entities/ai-research-part4.md) (2026-06-08)
 - An auxiliary technique for context window extension.
 - MiniCPM-SALA's extrapolation requires no auxiliary techniques like YaRN.
 - Authored by Peng et al., 2024.

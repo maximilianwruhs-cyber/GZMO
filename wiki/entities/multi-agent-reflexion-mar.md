@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: FRAMEWORK
 
-## From [[reflexion-framework-architectures-for-mitigating|reflexion-framework-architectures-for-mitigating]] (2026-06-08)
+## From [reflexion-framework-architectures-for-mitigating](/entities/reflexion-framework-architectures-for-mitigating.md) (2026-06-08)
 - Represents a critical milestone in the development of autonomous language agents.
 - Demonstrates that carefully structured linguistic feedback can serve as a highly efficient, interpretable substitute for computationally expensive gradient-based weight updates.
 - Maintains an episodic memory of its own failures.

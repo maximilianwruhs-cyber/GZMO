@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part1|ai-research-part1]] (2026-06-08)
+## From [ai-research-part1](/entities/ai-research-part1.md) (2026-06-08)
 - Maintains bounded magnitudes but distorts gradients.
 - Repeated normalization on the residual path compounds into gradient vanishing at depth.
 - AttnRes avoids its repeated scale contraction.

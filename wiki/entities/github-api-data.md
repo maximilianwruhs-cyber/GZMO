@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[openclaw-deep-research-part1-micro02|openclaw-deep-research-part1-micro02]] (2026-06-09)
+## From [openclaw-deep-research-part1-micro02](/entities/openclaw-deep-research-part1-micro02.md) (2026-06-09)
 - OpenClaw is an open-source AI agent framework hosted on GitHub.
 - OpenClaw repository surpassed React to become the most-starred software project on GitHub.
 - Cited source for OpenClaw repository statistics.

@@ -14,14 +14,14 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-research-project-initiation-guide|drive-research-research-project-initiation-guide]] (2026-06-08)
+## From [drive-research-research-project-initiation-guide](/entities/drive-research-research-project-initiation-guide.md) (2026-06-08)
 - A method for building networked knowledge graphs.
 - Popularized by sociologist Niklas Luhmann.
 - Relies on three progressive tiers of notes: Fleeting, Literature, and Permanent/Atomic.
 - A networked note-taking architecture.
 - Enables dynamic construction of complex literature matrices.
 
-## From [[optimizing-nvidia-blackwell-sm120-part2-micro07|optimizing-nvidia-blackwell-sm120-part2-micro07]] (2026-06-10)
+## From [optimizing-nvidia-blackwell-sm120-part2-micro07](/entities/optimizing-nvidia-blackwell-sm120-part2-micro07.md) (2026-06-10)
 - Personal Knowledge Management (PKM) system used to build networked knowledge graphs
 - Popularized by Niklas Luhmann
 - Relies on Fleeting Notes, Literature Notes, and Permanent/Atomic Notes

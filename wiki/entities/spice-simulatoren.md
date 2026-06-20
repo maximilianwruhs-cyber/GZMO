@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-technologischer-branchen-report-hilfsbetriebeumri-micro03|drive-research-technologischer-branchen-report-hilfsbetriebeumri-micro03]] (2026-06-09)
+## From [drive-research-technologischer-branchen-report-hilfsbetriebeumri-micro03](/entities/drive-research-technologischer-branchen-report-hilfsbetriebeumri-micro03.md) (2026-06-09)
 - Classical simulators that can run into numerical convergence problems with fast switching transients.

@@ -14,9 +14,9 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[architectures-for-agentic-memory-virtual-context-micro07|architectures-for-agentic-memory-virtual-context-micro07]] (2026-06-09)
+## From [architectures-for-agentic-memory-virtual-context-micro07](/entities/architectures-for-agentic-memory-virtual-context-micro07.md) (2026-06-09)
 - A method used by vector databases to retrieve data based purely on geometric proximity.
 
-## From [[openclaw-part1-micro06|openclaw-part1-micro06]] (2026-06-09)
+## From [openclaw-part1-micro06](/entities/openclaw-part1-micro06.md) (2026-06-09)
 - Used by the semantic component of OpenClaw's search architecture.
 - Compares high-dimensional numerical vectors.

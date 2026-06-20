@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[drive-research-algorithmic-trading-with-chaos-theory|drive-research-algorithmic-trading-with-chaos-theory]] (2026-06-08)
+## From [drive-research-algorithmic-trading-with-chaos-theory](/entities/drive-research-algorithmic-trading-with-chaos-theory.md) (2026-06-08)
 - Fuses multidimensional phase space reconstruction, continuous Lyapunov exponent tracking, and Next-Generation Reservoir Computing.
 - Does not rely on flawed linear assumptions of traditional econometrics.
 - Operates on the physical geometry, thermodynamic stability, and deterministic execution of the order flow.

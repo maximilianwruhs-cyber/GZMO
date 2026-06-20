@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[the-archival-truth-part1-micro04|the-archival-truth-part1-micro04]] (2026-06-09)
+## From [the-archival-truth-part1-micro04](/entities/the-archival-truth-part1-micro04.md) (2026-06-09)
 - An initiative to sensitize youth to the dialect.
 - Issued a 'small Burgenland dictionary for emergencies' (the 'Bafa-Säckel').

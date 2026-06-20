@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[dynamics-of-the-unpredictable-micro06|dynamics-of-the-unpredictable-micro06]] (2026-06-09)
+## From [dynamics-of-the-unpredictable-micro06](/entities/dynamics-of-the-unpredictable-micro06.md) (2026-06-09)
 - A logical representation of the GPU.
 - Responsible for creating buffers, textures, and pipeline states.

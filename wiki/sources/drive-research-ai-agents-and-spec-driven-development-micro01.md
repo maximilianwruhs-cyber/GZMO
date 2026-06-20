@@ -14,8 +14,8 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[drive-research-ai-agents-and-spec-driven-development|drive-research-ai-agents-and-spec-driven-development]] (PROJECT)
-- [[google-takeout|Google Takeout]] (TOOL)
+- [drive-research-ai-agents-and-spec-driven-development](/entities/drive-research-ai-agents-and-spec-driven-development.md) (PROJECT)
+- [Google Takeout](/entities/google-takeout.md) (TOOL)
 
 ## Relations
 - drive-research-ai-agents-and-spec-driven-development → USES → Google Takeout

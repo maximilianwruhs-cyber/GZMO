@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[aether-grid-micro04|aether-grid-micro04]] (2026-06-09)
+## From [aether-grid-micro04](/entities/aether-grid-micro04.md) (2026-06-09)
 - A single, all-encompassing master architecture document.
 - Aggregates information from five deep-research documents.
 - Is the Single Source of Truth (SSOT).

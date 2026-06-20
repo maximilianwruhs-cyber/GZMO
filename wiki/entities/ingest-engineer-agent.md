@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: AGENT
 
-## From [[obolus-micro04|obolus-micro04]] (2026-06-09)
+## From [obolus-micro04](/entities/obolus-micro04.md) (2026-06-09)
 - responsible for the entire import process of Vectron documentation into the knowledge base
 - ensures PDFs, TXT, and HTML files are cleanly converted to text
 - writes documents into documents + document_chunks of the PostgreSQL database
@@ -26,6 +26,6 @@ Type: AGENT
 - performs DB write operations
 - handles logging and error management
 
-## From [[obolus-micro05|obolus-micro05]] (2026-06-09)
+## From [obolus-micro05](/entities/obolus-micro05.md) (2026-06-09)
 - Works closely with RAG DB Agent.
 - Works closely with Bot Integrator Agent.

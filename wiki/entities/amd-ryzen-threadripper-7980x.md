@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-linux-gaming-and-ai-build-guide-micro05|drive-research-linux-gaming-and-ai-build-guide-micro05]] (2026-06-09)
+## From [drive-research-linux-gaming-and-ai-build-guide-micro05](/entities/drive-research-linux-gaming-and-ai-build-guide-micro05.md) (2026-06-09)
 - HEDT processor.
 - 64 cores, 128 threads.
 - Base clock 3.2GHz, boost 5.1GHz.
@@ -23,5 +23,5 @@ Type: SYSTEM
 - Offers massive PCIe lane scaling for quad-GPU clusters.
 - Lower single-core frequencies bottleneck high-refresh-rate gaming.
 
-## From [[the-2026-linux-workstation-micro02|the-2026-linux-workstation-micro02]] (2026-06-10)
+## From [the-2026-linux-workstation-micro02](/entities/the-2026-linux-workstation-micro02.md) (2026-06-10)
 - 64 cores, Zen 4 architecture

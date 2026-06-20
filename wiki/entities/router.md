@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-hidden-mode-technical-analysis-and-configuration|drive-research-hidden-mode-technical-analysis-and-configuration]] (2026-06-08)
+## From [drive-research-hidden-mode-technical-analysis-and-configuration](/entities/drive-research-hidden-mode-technical-analysis-and-configuration.md) (2026-06-08)
 - Synonym for gating network.
 - Must be carefully calibrated to avoid routing imbalances and ensure effective expert utilization.
 - Operates by assigning a routing distribution over the set of experts.

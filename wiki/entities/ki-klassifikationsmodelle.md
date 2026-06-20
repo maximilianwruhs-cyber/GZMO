@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part1-micro04|drive-research-ki-berater-fragebogen-für-kundenanalyse-part1-micro04]] (2026-06-09)
+## From [drive-research-ki-berater-fragebogen-für-kundenanalyse-part1-micro04](/entities/drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part1-micro04.md) (2026-06-09)
 - etablierte KI-Klassifikationsmodelle (wie komplexe logistische Regressionen oder Support Vector Machines) zur Erkennung von kriminellen Betrugsmustern (Fraud Detection) in Echtzeit ein

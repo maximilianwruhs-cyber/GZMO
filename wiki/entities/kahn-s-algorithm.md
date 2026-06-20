@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[prompt-agent-engineering-part7-micro06|prompt-agent-engineering-part7-micro06]] (2026-06-10)
+## From [prompt-agent-engineering-part7-micro06](/entities/prompt-agent-engineering-part7-micro06.md) (2026-06-10)
 - Algorithm used for topological sorting in the DAG Executor

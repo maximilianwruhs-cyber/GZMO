@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[architectures-for-agentic-memory-virtual-context-micro04|architectures-for-agentic-memory-virtual-context-micro04]] (2026-06-09)
+## From [architectures-for-agentic-memory-virtual-context-micro04](/entities/architectures-for-agentic-memory-virtual-context-micro04.md) (2026-06-09)
 - The highest layer in Zep's architecture.
 - Inductively clusters highly connected entities using dynamic label propagation.
 - Provides high-level conceptual summaries for global reasoning tasks.

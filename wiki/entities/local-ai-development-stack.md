@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ultimate-local-ai-development-stack-for-vscodium-micro01|ultimate-local-ai-development-stack-for-vscodium-micro01]] (2026-06-09)
+## From [ultimate-local-ai-development-stack-for-vscodium-micro01](/entities/ultimate-local-ai-development-stack-for-vscodium-micro01.md) (2026-06-09)
 - Focuses on privacy-respecting and telemetry-free environments.
 - Can be built using VSCodium, Continue, LM Studio, and OpenClaw.

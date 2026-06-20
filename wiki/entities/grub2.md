@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[architecting-the-minimalist-linux-desktop-a-compa-part2|architecting-the-minimalist-linux-desktop-a-compa-part2]] (2026-06-08)
+## From [architecting-the-minimalist-linux-desktop-a-compa-part2](/entities/architecting-the-minimalist-linux-desktop-a-compa-part2.md) (2026-06-08)
 - It is the core image of the GRUB2 bootloader, which is an absolute necessity for Legacy BIOS booting.
 - Ventoy leaves a deliberate 1MB gap at the beginning of the disk to hold its core image.
 - Engineers can manually construct a hybrid boot USB using GRUB2.

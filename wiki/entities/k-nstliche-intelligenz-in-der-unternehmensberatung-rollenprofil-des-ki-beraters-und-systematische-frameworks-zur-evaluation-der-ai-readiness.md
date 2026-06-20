@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part1-micro01|drive-research-ki-berater-fragebogen-für-kundenanalyse-part1-micro01]] (2026-06-09)
+## From [drive-research-ki-berater-fragebogen-für-kundenanalyse-part1-micro01](/entities/drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part1-micro01.md) (2026-06-09)
 - Organizational readiness and technological capability of an organization for AI.
 - Assessed using structured maturity models.
 - Determines the subsequent strategy of an AI consultant.

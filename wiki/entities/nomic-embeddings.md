@@ -14,8 +14,8 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[the-sovereign-software-factory-blueprint|the-sovereign-software-factory-blueprint]] (2026-06-08)
+## From [the-sovereign-software-factory-blueprint](/entities/the-sovereign-software-factory-blueprint.md) (2026-06-08)
 - Used in the System RAM & NVMe SSD (The Memory) component.
 
-## From [[building-a-private-local-ai-development-environmen-micro06|building-a-private-local-ai-development-environmen-micro06]] (2026-06-09)
+## From [building-a-private-local-ai-development-environmen-micro06](/entities/building-a-private-local-ai-development-environmen-micro06.md) (2026-06-09)
 - A component of Lokales RAG.

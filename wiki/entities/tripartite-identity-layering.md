@@ -14,11 +14,11 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[cybernetics-and-mythos-the-architecture-of-intell-part2|cybernetics-and-mythos-the-architecture-of-intell-part2]] (2026-06-08)
+## From [cybernetics-and-mythos-the-architecture-of-intell-part2](/entities/cybernetics-and-mythos-the-architecture-of-intell-part2.md) (2026-06-08)
 - It fractures the monolithic identity specification into three functional components.
 - It prevents semantic noise from drowning out the system's core directives.
 - It includes the Task Layer, Context Layer, and Coordination Layer.
 
-## From [[drive-research-unfold-a-comprehensive-step-by-step-implementation|drive-research-unfold-a-comprehensive-step-by-step-implementation]] (2026-06-08)
+## From [drive-research-unfold-a-comprehensive-step-by-step-implementation](/entities/drive-research-unfold-a-comprehensive-step-by-step-implementation.md) (2026-06-08)
 - A layered identity object is constructed at runtime based on the context of the envelope.
 - Consists of TaskLayer, ContextLayer, and CoordinationLayer.

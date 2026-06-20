@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[drive-research-scientific-writing-and-publication-process-micro03|drive-research-scientific-writing-and-publication-process-micro03]] (2026-06-09)
+## From [drive-research-scientific-writing-and-publication-process-micro03](/entities/drive-research-scientific-writing-and-publication-process-micro03.md) (2026-06-09)
 - Heavily discourage relying solely on impact factors.
 - Governed by strict ethical codes.
 - Necessitated urgent revisions due to LLMs and generative AI.

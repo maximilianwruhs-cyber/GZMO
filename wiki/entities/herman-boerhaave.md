@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[the-archival-truth-part1-micro02|the-archival-truth-part1-micro02]] (2026-06-09)
+## From [the-archival-truth-part1-micro02](/entities/the-archival-truth-part1-micro02.md) (2026-06-09)
 - A physician who used aphorisms.
 - Used aphorisms as concise medical theorems.
 - Used aphorisms to mnemonically compress complex diagnostic truths, physiological observations, and therapeutic indications.

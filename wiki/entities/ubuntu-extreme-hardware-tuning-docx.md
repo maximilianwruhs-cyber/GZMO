@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: DOCUMENT
 
-## From [[drive-research-ubuntu-extreme-hardware-tuning-micro01|drive-research-ubuntu-extreme-hardware-tuning-micro01]] (2026-06-09)
+## From [drive-research-ubuntu-extreme-hardware-tuning-micro01](/entities/drive-research-ubuntu-extreme-hardware-tuning-micro01.md) (2026-06-09)
 - Source document for the research.
 - Contains details on hardware and kernel optimization.

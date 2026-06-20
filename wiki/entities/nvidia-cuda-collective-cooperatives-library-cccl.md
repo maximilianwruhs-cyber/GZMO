@@ -15,17 +15,17 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-cuda-graph-capture-failure-workarounds-micro02|drive-research-cuda-graph-capture-failure-workarounds-micro02]] (2026-06-09)
+## From [drive-research-cuda-graph-capture-failure-workarounds-micro02](/entities/drive-research-cuda-graph-capture-failure-workarounds-micro02.md) (2026-06-09)
 - Version >3.2 is required for ggml_top_k kernel execution with large tensor dimensions.
 - Used in conjunction with GGML_CUDA_USE_CUB.
 - Required (version >3.2) to prevent illegal memory access when executing ggml_top_k with large tensor dimensions.
 
-## From [[optimizing-nvidia-blackwell-sm120-part3-micro05|optimizing-nvidia-blackwell-sm120-part3-micro05]] (2026-06-09)
+## From [optimizing-nvidia-blackwell-sm120-part3-micro05](/entities/optimizing-nvidia-blackwell-sm120-part3-micro05.md) (2026-06-09)
 - Version >3.2 can mitigate illegal memory access in ggml_top_k.
 - Used with GGML_CUDA_USE_CUB enabled.
 - Related to parallel reduction operations.
 
-## From [[optimizing-nvidia-blackwell-sm120-part3-micro06|optimizing-nvidia-blackwell-sm120-part3-micro06]] (2026-06-09)
+## From [optimizing-nvidia-blackwell-sm120-part3-micro06](/entities/optimizing-nvidia-blackwell-sm120-part3-micro06.md) (2026-06-09)
 - It is a backend for llama.cpp.
 - It is used in conjunction with NVIDIA hardware.
 - It is involved in memory access and graph operations.

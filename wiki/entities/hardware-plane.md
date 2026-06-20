@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-dawn-of-agentic-software-reverse-engineering-micro03|the-dawn-of-agentic-software-reverse-engineering-micro03]] (2026-06-09)
+## From [the-dawn-of-agentic-software-reverse-engineering-micro03](/entities/the-dawn-of-agentic-software-reverse-engineering-micro03.md) (2026-06-09)
 - Target of extraction for timing signatures associated with the agent's automated decision cycles.
 - Mitigation involves control-flow randomization within automation engines.

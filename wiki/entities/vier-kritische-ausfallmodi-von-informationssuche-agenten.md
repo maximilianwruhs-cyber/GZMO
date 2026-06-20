@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-der-aufstieg-und-die-absicht-des-bibliothekars-age|drive-research-der-aufstieg-und-die-absicht-des-bibliothekars-age]] (2026-06-08)
+## From [drive-research-der-aufstieg-und-die-absicht-des-bibliothekars-age](/entities/drive-research-der-aufstieg-und-die-absicht-des-bibliothekars-age.md) (2026-06-08)
 - Heben primäre Modi des systemischen Zusammenbruchs bei der agentischen Informationssuche hervor.
 - Umfassen Mangel an Reflexion, übermäßige Abhängigkeit von internem Wissen (Halluzination), unzureichender Abruf und Kontextüberlauf.

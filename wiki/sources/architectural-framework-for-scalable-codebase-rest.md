@@ -14,18 +14,18 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-08).
 
 ## Entities
-- [[branch-by-abstraction|Branch by Abstraction]] (CONCEPT)
-- [[abstract-syntax-tree-ast|Abstract Syntax Tree (AST)]] (CONCEPT)
-- [[ci-cd-pipelines|CI/CD pipelines]] (SYSTEM)
-- [[domain-driven-design|Domain-Driven Design]] (CONCEPT)
-- [[strangler-fig-pattern|Strangler Fig pattern]] (CONCEPT)
-- [[jscodeshift|jscodeshift]] (TOOL)
-- [[monorepo|Monorepo]] (CONCEPT)
-- [[codemods|Codemods]] (TOOL)
-- [[feature-sliced-design|Feature-Sliced Design]] (CONCEPT)
-- [[architectural-framework-for-scalable-codebase-rest|Architectural Framework for Scalable Codebase Rest]] (CONCEPT)
-- [[git-rerere|git rerere]] (TOOL)
-- [[ort-merge-strategy|ort merge strategy]] (CONCEPT)
+- [Branch by Abstraction](/entities/branch-by-abstraction.md) (CONCEPT)
+- [Abstract Syntax Tree (AST)](/entities/abstract-syntax-tree-ast.md) (CONCEPT)
+- [CI/CD pipelines](/entities/ci-cd-pipelines.md) (SYSTEM)
+- [Domain-Driven Design](/entities/domain-driven-design.md) (CONCEPT)
+- [Strangler Fig pattern](/entities/strangler-fig-pattern.md) (CONCEPT)
+- [jscodeshift](/entities/jscodeshift.md) (TOOL)
+- [Monorepo](/entities/monorepo.md) (CONCEPT)
+- [Codemods](/entities/codemods.md) (TOOL)
+- [Feature-Sliced Design](/entities/feature-sliced-design.md) (CONCEPT)
+- [Architectural Framework for Scalable Codebase Rest](/entities/architectural-framework-for-scalable-codebase-rest.md) (CONCEPT)
+- [git rerere](/entities/git-rerere.md) (TOOL)
+- [ort merge strategy](/entities/ort-merge-strategy.md) (CONCEPT)
 
 ## Relations
 - Architectural Framework for Scalable Codebase Rest → USES → Domain-Driven Design

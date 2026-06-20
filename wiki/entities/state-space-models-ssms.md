@@ -14,11 +14,11 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-ai-agentic-teacher-research-report|drive-research-ai-agentic-teacher-research-report]] (2026-06-08)
+## From [drive-research-ai-agentic-teacher-research-report](/entities/drive-research-ai-agentic-teacher-research-report.md) (2026-06-08)
 - Cutting-edge AIEd frameworks are increasingly employing these models.
 - Such as Mamba architectures.
 - Can capture long-term dynamics, including skill acquisition and degradation.
 
-## From [[the-architecture-of-speculative-decoding-and-infer-part1-micro06|the-architecture-of-speculative-decoding-and-infer-part1-micro06]] (2026-06-09)
+## From [the-architecture-of-speculative-decoding-and-infer-part1-micro06](/entities/the-architecture-of-speculative-decoding-and-infer-part1-micro06.md) (2026-06-09)
 - TurboQuant does not compress hidden states in SSMs
 - Examples include Mamba

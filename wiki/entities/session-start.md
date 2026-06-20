@@ -14,11 +14,11 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[high-performance-typescript-execution-and-architec-part1-micro05|high-performance-typescript-execution-and-architec-part1-micro05]] (2026-06-09)
+## From [high-performance-typescript-execution-and-architec-part1-micro05](/entities/high-performance-typescript-execution-and-architec-part1-micro05.md) (2026-06-09)
 - Triggered when a session is initialized or transitions between interaction states.
 - Receives a reason property to determine initialization logic.
 - Requires full cold-start initialization on 'startup'.
 
-## From [[high-performance-typescript-execution-and-architec-part1-micro07|high-performance-typescript-execution-and-architec-part1-micro07]] (2026-06-09)
+## From [high-performance-typescript-execution-and-architec-part1-micro07](/entities/high-performance-typescript-execution-and-architec-part1-micro07.md) (2026-06-09)
 - An event that triggers initialization of isolated state.
 - Mounts widgets below the editor upon session startup.

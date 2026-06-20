@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[openclaw-deep-research-part1-micro03|openclaw-deep-research-part1-micro03]] (2026-06-09)
+## From [openclaw-deep-research-part1-micro03](/entities/openclaw-deep-research-part1-micro03.md) (2026-06-09)
 - Apple Push Notification Service.
 - Relay-backed push is configured for official iOS builds.
 - Direct APNS is used for local/manual iOS builds.

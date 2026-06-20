@@ -15,9 +15,9 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[drive-research-mastering-ast-grep-a-structured-approach|drive-research-mastering-ast-grep-a-structured-approach]] (2026-06-08)
+## From [drive-research-mastering-ast-grep-a-structured-approach](/entities/drive-research-mastering-ast-grep-a-structured-approach.md) (2026-06-08)
 - Published an article about AST-grep(sg).
 
-## From [[drive-research-based-on-the-given-information-create-a-comprehens-micro01|drive-research-based-on-the-given-information-create-a-comprehens-micro01]] (2026-06-09)
+## From [drive-research-based-on-the-given-information-create-a-comprehens-micro01](/entities/drive-research-based-on-the-given-information-create-a-comprehens-micro01.md) (2026-06-09)
 - Community discussions on OSSU and self-taught CS education
 - Community discussions on alternative free CS degrees

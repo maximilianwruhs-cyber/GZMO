@@ -14,9 +14,9 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[aether-grid-micro01|aether-grid-micro01]] (2026-06-09)
+## From [aether-grid-micro01](/entities/aether-grid-micro01.md) (2026-06-09)
 - Kubernetes Ingress Controller.
 - Can fail to load certificate chains completely, leading to Edge-Agent rejection.
 
-## From [[openclaw-part1-micro03|openclaw-part1-micro03]] (2026-06-10)
+## From [openclaw-part1-micro03](/entities/openclaw-part1-micro03.md) (2026-06-10)
 - Bundled configuration used to enforce HTTP basic authentication for remote access.

@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[prompt-agent-engineering-part2-micro04|prompt-agent-engineering-part2-micro04]] (2026-06-09)
+## From [prompt-agent-engineering-part2-micro04](/entities/prompt-agent-engineering-part2-micro04.md) (2026-06-09)
 - Accessibility standard that the Visual Systems Extractor aims for where possible.
 - Requires 7:1 contrast ratio for normal text.

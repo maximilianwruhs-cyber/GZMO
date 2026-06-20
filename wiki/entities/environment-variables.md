@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[openclaw-deep-research-part1-micro04|openclaw-deep-research-part1-micro04]] (2026-06-09)
+## From [openclaw-deep-research-part1-micro04](/entities/openclaw-deep-research-part1-micro04.md) (2026-06-09)
 - Read by OpenClaw from parent process, .env, and ~/.openclaw/.env.
 - Can be set inline in config.
 - Can be imported from login shell.

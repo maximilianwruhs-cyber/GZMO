@@ -14,20 +14,20 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-10).
 
 ## Entities
-- [[openai|OpenAI]] (ORGANIZATION)
-- [[heartbeat-md|HEARTBEAT.md]] (TOOL)
-- [[llama-3|Llama 3]] (SYSTEM)
-- [[openclaw-4-5|OpenClaw 4.5]] (SYSTEM)
-- [[atkinson-shiffrin|Atkinson-Shiffrin]] (CONCEPT)
-- [[clawhavoc|ClawHavoc]] (CONCEPT)
-- [[autogen|AutoGen]] (SYSTEM)
-- [[crewai|CrewAI]] (SYSTEM)
-- [[gzmo|GZMO]] (CONCEPT)
-- [[skill-md|SKILL.md]] (TOOL)
-- [[clawhub-registry|ClawHub-Registry]] (SYSTEM)
-- [[anthropic|Anthropic]] (ORGANIZATION)
-- [[soul-md|SOUL.md]] (TOOL)
-- [[langgraph|LangGraph]] (SYSTEM)
+- [OpenAI](/entities/openai.md) (ORGANIZATION)
+- [HEARTBEAT.md](/entities/heartbeat-md.md) (TOOL)
+- [Llama 3](/entities/llama-3.md) (SYSTEM)
+- [OpenClaw 4.5](/entities/openclaw-4-5.md) (SYSTEM)
+- [Atkinson-Shiffrin](/entities/atkinson-shiffrin.md) (CONCEPT)
+- [ClawHavoc](/entities/clawhavoc.md) (CONCEPT)
+- [AutoGen](/entities/autogen.md) (SYSTEM)
+- [CrewAI](/entities/crewai.md) (SYSTEM)
+- [GZMO](/entities/gzmo.md) (CONCEPT)
+- [SKILL.md](/entities/skill-md.md) (TOOL)
+- [ClawHub-Registry](/entities/clawhub-registry.md) (SYSTEM)
+- [Anthropic](/entities/anthropic.md) (ORGANIZATION)
+- [SOUL.md](/entities/soul-md.md) (TOOL)
+- [LangGraph](/entities/langgraph.md) (SYSTEM)
 
 ## Relations
 - GZMO → USES → SOUL.md

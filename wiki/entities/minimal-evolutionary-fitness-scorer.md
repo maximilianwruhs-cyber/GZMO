@@ -14,14 +14,14 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[obolus-micro03|obolus-micro03]] (2026-06-09)
+## From [obolus-micro03](/entities/obolus-micro03.md) (2026-06-09)
 - Final version with fixes integrated.
 - Config-driven, energy-based efficiency, explicit error handling.
 - Includes dataclasses for TrialResult and ScoringConfig.
 - Functions for computing quality, efficiency, variance penalty, and z-score.
 - Provides decision logic for approving mutations.
 
-## From [[the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro08|the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro08]] (2026-06-09)
+## From [the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro08](/entities/the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro08.md) (2026-06-09)
 - A Python script for evaluating mutations.
 - Config-driven and robust.
 - Focuses on Quality, Efficiency, and Variance.

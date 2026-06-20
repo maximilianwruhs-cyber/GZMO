@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part7|ai-research-part7]] (2026-06-08)
+## From [ai-research-part7](/entities/ai-research-part7.md) (2026-06-08)
 - It is a pattern implemented by coderlm.
 - It treats the entire codebase as external data that the core language model can recursively examine and decompose.
 - It was developed by researchers at MIT CSAIL.

@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-setting-up-autonomous-trading-agents-micro06|drive-research-setting-up-autonomous-trading-agents-micro06]] (2026-06-09)
+## From [drive-research-setting-up-autonomous-trading-agents-micro06](/entities/drive-research-setting-up-autonomous-trading-agents-micro06.md) (2026-06-09)
 - Is related to Common Reporting Standards (CRS) and foreign securities depots, as reported by Broker-Test.at.

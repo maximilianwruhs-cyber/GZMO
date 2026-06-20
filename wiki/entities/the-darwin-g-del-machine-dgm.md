@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[ai-research-part8-micro08|ai-research-part8-micro08]] (2026-06-09)
+## From [ai-research-part8-micro08](/entities/ai-research-part8-micro08.md) (2026-06-09)
 - Authored by Zhang et al.
 - Establishes the foundation for open-ended self-improvement in coding domains.

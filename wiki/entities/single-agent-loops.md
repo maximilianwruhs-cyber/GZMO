@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[cybernetics-and-mythos-the-architecture-of-intell-part1|cybernetics-and-mythos-the-architecture-of-intell-part1]] (2026-06-08)
+## From [cybernetics-and-mythos-the-architecture-of-intell-part1](/entities/cybernetics-and-mythos-the-architecture-of-intell-part1.md) (2026-06-08)
 - Iterative execution (Perceive, Reason, Plan, Act, Observe).
 - High autonomy for specific tasks.
 - Internal self-correction via tool outputs.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-architektur-und-implementierung-intelligenter-ki-a-micro01|drive-research-architektur-und-implementierung-intelligenter-ki-a-micro01]] (2026-06-09)
+## From [drive-research-architektur-und-implementierung-intelligenter-ki-a-micro01](/entities/drive-research-architektur-und-implementierung-intelligenter-ki-a-micro01.md) (2026-06-09)
 - Located typically under C:\ProgramData\Package Cache.
 - Can accumulate hundreds of outdated MSI installers.
 - Contains metadata for dependency packages.

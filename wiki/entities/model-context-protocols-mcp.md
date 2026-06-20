@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-token-efficient-bol-processing-architecture|drive-research-token-efficient-bol-processing-architecture]] (2026-06-08)
+## From [drive-research-token-efficient-bol-processing-architecture](/entities/drive-research-token-efficient-bol-processing-architecture.md) (2026-06-08)
 - Utilized in dynamic context assembly.
 - Use a user-written manifest where each key encodes a distinct data retrieval instruction.
 - The server materializes these blocks into grouped, tagged XML or Markdown sections.

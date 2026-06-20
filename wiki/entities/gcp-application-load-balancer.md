@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[openclaw-part2|openclaw-part2]] (2026-06-08)
+## From [openclaw-part2](/entities/openclaw-part2.md) (2026-06-08)
 - Can be reconfigured to use the IN_FLIGHT load balancing mode.
 - Tracks the absolute number of concurrent active connections by setting backend trafficDuration to LONG.
 - Safely spills traffic to other zones only when true concurrency thresholds are met.

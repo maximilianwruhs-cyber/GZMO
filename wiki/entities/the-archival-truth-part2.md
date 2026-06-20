@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[the-archival-truth-part2-micro01|the-archival-truth-part2-micro01]] (2026-06-09)
+## From [the-archival-truth-part2-micro01](/entities/the-archival-truth-part2-micro01.md) (2026-06-09)
 - Ingest micro-split for cloud KG extraction.
 - Split archive (wave_02_notebooklm).

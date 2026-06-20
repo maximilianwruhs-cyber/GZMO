@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[obolus-micro01|obolus-micro01]] (2026-06-09)
+## From [obolus-micro01](/entities/obolus-micro01.md) (2026-06-09)
 - The instance of objective quality assurance.
 - Evaluate Miner outputs based on mathematically defined metrics.
 - Control reward distribution and decide on profitability and resource withdrawal.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[obolus-micro01|obolus-micro01]] (2026-06-09)
+## From [obolus-micro01](/entities/obolus-micro01.md) (2026-06-09)
 - Defines the hyperparameters of agent behavior.
 - Includes System_Prompt, Temperature, RAG_Strategy, Tool_Selection_Bias, and Context_Window_Limit.
 - The Forge acts as a modifier of the 'DNA'.

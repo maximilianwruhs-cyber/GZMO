@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-cuda-memory-locking-limits-configuration|drive-research-cuda-memory-locking-limits-configuration]] (2026-06-08)
+## From [drive-research-cuda-memory-locking-limits-configuration](/entities/drive-research-cuda-memory-locking-limits-configuration.md) (2026-06-08)
 - CUDA Runtime API call that registers an existing host virtual address range as page-locked memory.
 - The NVIDIA driver locks these pages in physical memory and maps them directly into the GPU’s page tables.
 - The application registers an existing host virtual address range—such as a memory-mapped GGUF model buffer—as page-locked memory.

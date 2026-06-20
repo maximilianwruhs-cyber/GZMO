@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part6-micro04|ai-research-part6-micro04]] (2026-06-09)
+## From [ai-research-part6-micro04](/entities/ai-research-part6-micro04.md) (2026-06-09)
 - Published in Advances in neural information processing systems
 - Published in 2019

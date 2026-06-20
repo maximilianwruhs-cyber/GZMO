@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[architectures-for-agentic-memory-virtual-context-micro04|architectures-for-agentic-memory-virtual-context-micro04]] (2026-06-09)
+## From [architectures-for-agentic-memory-virtual-context-micro04](/entities/architectures-for-agentic-memory-virtual-context-micro04.md) (2026-06-09)
 - Used by Mem0.
 - Stands for Add, Update, Delete, No-op.
 - Delegates conflict resolution to the language model via tool-calling.

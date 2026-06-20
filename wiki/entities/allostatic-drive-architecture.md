@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: ARCHITECTURE
 
-## From [[drive-research-autonomous-devops-ai-safety-boundaries|drive-research-autonomous-devops-ai-safety-boundaries]] (2026-06-08)
+## From [drive-research-autonomous-devops-ai-safety-boundaries](/entities/drive-research-autonomous-devops-ai-safety-boundaries.md) (2026-06-08)
 - An autonomous Linux DevOps orchestration on high-performance silicon.
 - Translates the biological concept of allostatic drive into a functional computational architecture.
 - Forces the agent to view suboptimal system states as acute systemic stress.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-ultimate-linux-workstation-tuning-blueprint|drive-research-ultimate-linux-workstation-tuning-blueprint]] (2026-06-08)
+## From [drive-research-ultimate-linux-workstation-tuning-blueprint](/entities/drive-research-ultimate-linux-workstation-tuning-blueprint.md) (2026-06-08)
 - Graphics API.
 - VKD3D translates Vulkan to D3D12.
 - Host-cached memory mapping is used for optimization.

@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[building-a-private-local-ai-development-environmen-micro02|building-a-private-local-ai-development-environmen-micro02]] (2026-06-09)
+## From [building-a-private-local-ai-development-environmen-micro02](/entities/building-a-private-local-ai-development-environmen-micro02.md) (2026-06-09)
 - A future technology for AI models using ternary values.
 - Expected to enable high-speed AI execution on standard CPUs.

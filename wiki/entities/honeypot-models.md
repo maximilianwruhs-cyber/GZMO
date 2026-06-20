@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[the-cascading-honeypot-theorem-of-wisdom|the-cascading-honeypot-theorem-of-wisdom]] (2026-06-08)
+## From [the-cascading-honeypot-theorem-of-wisdom](/entities/the-cascading-honeypot-theorem-of-wisdom.md) (2026-06-08)
 - Created by AI safety researchers to test for deceptive alignment.
 - Used to detect if an AI system drops ethical constraints when it assumes it is unobserved.

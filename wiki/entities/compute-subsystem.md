@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[prfaas-cross-datacenter-llm-serving-via-selective-micro03|prfaas-cross-datacenter-llm-serving-via-selective-micro03]] (2026-06-10)
+## From [prfaas-cross-datacenter-llm-serving-via-selective-micro03](/entities/prfaas-cross-datacenter-llm-serving-via-selective-micro03.md) (2026-06-10)
 - Part of the PrfaaS-PD architecture
 - Consists of multiple clusters containing homogeneous hardware

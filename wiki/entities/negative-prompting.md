@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-crafting-a-creative-agent-prompt|drive-research-crafting-a-creative-agent-prompt]] (2026-06-08)
+## From [drive-research-crafting-a-creative-agent-prompt](/entities/drive-research-crafting-a-creative-agent-prompt.md) (2026-06-08)
 - A directive that instructs the model on what elements, styles, and features it must strictly avoid.
 - Used to ban algorithmic tells and overused vocabulary.
 - Includes a lexical blacklist and prohibition of structural anti-patterns.

@@ -14,22 +14,22 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[indika-wimalasuriya|Indika_Wimalasuriya]] (PERSON)
-- [[pierre-henry|Pierre-Henry]] (PERSON)
-- [[tools-md|TOOLS.md]] (CONCEPT)
-- [[openclaw|OpenClaw]] (TOOL)
-- [[algolia|Algolia]] (ORGANIZATION)
-- [[user-md|USER.md]] (CONCEPT)
-- [[dev-community|DEV Community]] (ORGANIZATION)
-- [[forem|Forem]] (SYSTEM)
-- [[agents-md|AGENTS.md]] (CONCEPT)
-- [[neon|Neon]] (ORGANIZATION)
-- [[soul-md|SOUL.md]] (CONCEPT)
-- [[aws-community-builders|AWS Community Builders]] (ORGANIZATION)
-- [[memory-md|MEMORY.md]] (CONCEPT)
-- [[identity-md|IDENTITY.md]] (CONCEPT)
-- [[google-ai|Google AI]] (ORGANIZATION)
-- [[mongodb-atlas|MongoDB Atlas]] (TOOL)
+- [Indika_Wimalasuriya](/entities/indika-wimalasuriya.md) (PERSON)
+- [Pierre-Henry](/entities/pierre-henry.md) (PERSON)
+- [TOOLS.md](/entities/tools-md.md) (CONCEPT)
+- [OpenClaw](/entities/openclaw.md) (TOOL)
+- [Algolia](/entities/algolia.md) (ORGANIZATION)
+- [USER.md](/entities/user-md.md) (CONCEPT)
+- [DEV Community](/entities/dev-community.md) (ORGANIZATION)
+- [Forem](/entities/forem.md) (SYSTEM)
+- [AGENTS.md](/entities/agents-md.md) (CONCEPT)
+- [Neon](/entities/neon.md) (ORGANIZATION)
+- [SOUL.md](/entities/soul-md.md) (CONCEPT)
+- [AWS Community Builders](/entities/aws-community-builders.md) (ORGANIZATION)
+- [MEMORY.md](/entities/memory-md.md) (CONCEPT)
+- [IDENTITY.md](/entities/identity-md.md) (CONCEPT)
+- [Google AI](/entities/google-ai.md) (ORGANIZATION)
+- [MongoDB Atlas](/entities/mongodb-atlas.md) (TOOL)
 
 ## Relations
 - Indika_Wimalasuriya → USES → OpenClaw

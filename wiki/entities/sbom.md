@@ -14,9 +14,9 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[obolus-micro05|obolus-micro05]] (2026-06-09)
+## From [obolus-micro05](/entities/obolus-micro05.md) (2026-06-09)
 - Software Bill of Materials.
 - Creation using syft/grype is a competency of Docker-Architect.
 
-## From [[obolus-micro06|obolus-micro06]] (2026-06-09)
+## From [obolus-micro06](/entities/obolus-micro06.md) (2026-06-09)
 - Integrity verification for backup tools and container images.

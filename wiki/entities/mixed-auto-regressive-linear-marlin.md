@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-imagine-creating-sm120-according-to-our-progress|drive-research-imagine-creating-sm120-according-to-our-progress]] (2026-06-08)
+## From [drive-research-imagine-creating-sm120-according-to-our-progress](/entities/drive-research-imagine-creating-sm120-according-to-our-progress.md) (2026-06-08)
 - Route pipelines through the emulated Mixed Auto-Regressive Linear (Marlin) kernel.
 - Marlin implements dequantization (FP16 x INT4 or FP16 x FP4) entirely in software via inline PTX vector instructions on vector cores.
 - It bypasses broken hardware-level TMA, avoids compiler bugs, and yields ideal 4x speedups up to batch sizes of 16 to 32 tokens.
@@ -23,7 +23,7 @@ Type: TOOL
 - Tier 1: Stable Fallback Path (Marlin Dequantization Baseline).
 - For immediate production stability without runtime crashes, route pipelines through the emulated Mixed Auto-Regressive Linear (Marlin) kernel.
 
-## From [[optimizing-nvidia-blackwell-sm120-part1-micro04|optimizing-nvidia-blackwell-sm120-part1-micro04]] (2026-06-09)
+## From [optimizing-nvidia-blackwell-sm120-part1-micro04](/entities/optimizing-nvidia-blackwell-sm120-part1-micro04.md) (2026-06-09)
 - An emulated dequantization pipeline serving as a fallback baseline for SM120 deployments.
 - An extremely optimized mixed-precision matrix multiplication kernel.
 - Capable of executing FP16 x INT4 or FP16 x FP4 operations.

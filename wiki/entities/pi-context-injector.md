@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[drive-research-optimizing-pi-coding-agent-performance|drive-research-optimizing-pi-coding-agent-performance]] (2026-06-08)
+## From [drive-research-optimizing-pi-coding-agent-performance](/entities/drive-research-optimizing-pi-coding-agent-performance.md) (2026-06-08)
 - A project with GitHub repositories and issues.
 - Has packages like 'coding-agent'.
 - A GitHub repository related to 'pi'.

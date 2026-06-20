@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-hermes-agent-prompt-builder-analysis|drive-research-hermes-agent-prompt-builder-analysis]] (2026-06-08)
+## From [drive-research-hermes-agent-prompt-builder-analysis](/entities/drive-research-hermes-agent-prompt-builder-analysis.md) (2026-06-08)
 - Injects multi-agent peer profiles and derived dialectic conclusions regarding the user's implicit habits and goals when active.
 - Injects its own discrete static block at Layer 3.
 - Introduces deep dialectic reasoning.

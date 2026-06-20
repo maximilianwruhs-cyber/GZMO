@@ -14,11 +14,11 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-hermes-agent-prompt-builder-analysis|drive-research-hermes-agent-prompt-builder-analysis]] (2026-06-08)
+## From [drive-research-hermes-agent-prompt-builder-analysis](/entities/drive-research-hermes-agent-prompt-builder-analysis.md) (2026-06-08)
 - Contains the AIAgent core loop.
 - Houses the _build_system_prompt() method which orchestrates prompt assembly.
 - The prompt_parts array is finalized here.
 
-## From [[drive-research-hermes-anthropic-openrouter-cache-investigation|drive-research-hermes-anthropic-openrouter-cache-investigation]] (2026-06-08)
+## From [drive-research-hermes-anthropic-openrouter-cache-investigation](/entities/drive-research-hermes-anthropic-openrouter-cache-investigation.md) (2026-06-08)
 - The TTL value for caching is hardcoded to '5m' in this file.
 - The system defaults to the chat_completions API mode when the base URL does not end in /anthropic.

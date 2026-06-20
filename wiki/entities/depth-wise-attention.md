@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part8-micro02|ai-research-part8-micro02]] (2026-06-09)
+## From [ai-research-part8-micro02](/entities/ai-research-part8-micro02.md) (2026-06-09)
 - Applied attention mechanisms to inter-layer representations.
 - Anchored the query exclusively to the final layer's hidden state.

@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: AUTHOR
 
-## From [[ai-research-part1|ai-research-part1]] (2026-06-08)
+## From [ai-research-part1](/entities/ai-research-part1.md) (2026-06-08)
 - Authored "SiameseNorm: Breaking the Barrier to Reconciling Pre/Post-Norm" in 2026.
 
-## From [[ai-research-part6-micro01|ai-research-part6-micro01]] (2026-06-09)
+## From [ai-research-part6-micro01](/entities/ai-research-part6-micro01.md) (2026-06-09)
 - Author of SiameseNorm.
 - Affiliated with Leap Lab, Tsinghua University.
 - Contributed equally.

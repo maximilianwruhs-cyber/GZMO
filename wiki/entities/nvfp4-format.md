@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[optimizing-nvidia-blackwell-sm120-part1-micro04|optimizing-nvidia-blackwell-sm120-part1-micro04]] (2026-06-09)
+## From [optimizing-nvidia-blackwell-sm120-part1-micro04](/entities/optimizing-nvidia-blackwell-sm120-part1-micro04.md) (2026-06-09)
 - A narrow-precision format.
 - Natively accelerated by SM100 datacenter GPUs.
 - Causes output corruption on SM120 workstation GPUs due to CUTLASS library and FlashInfer JIT compiler bugs.

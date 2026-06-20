@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[openclaw-deep-research-part4|openclaw-deep-research-part4]] (2026-06-08)
+## From [openclaw-deep-research-part4](/entities/openclaw-deep-research-part4.md) (2026-06-08)
 - Enterprise AI Agent Framework.
 - Persistent agents, tools.
 - More enterprise-ready with monitoring.

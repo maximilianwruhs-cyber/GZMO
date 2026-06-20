@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[architectures-for-agentic-memory-virtual-context-micro02|architectures-for-agentic-memory-virtual-context-micro02]] (2026-06-09)
+## From [architectures-for-agentic-memory-virtual-context-micro02](/entities/architectures-for-agentic-memory-virtual-context-micro02.md) (2026-06-09)
 - Engine that utilizes Earley parsers and lazy automaton construction for dynamic mask generation
 - Yields near-zero compilation latency
 - Can overwhelm the CPU under extremely high concurrency workloads

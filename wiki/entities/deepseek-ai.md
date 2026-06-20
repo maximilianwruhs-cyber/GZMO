@@ -14,9 +14,9 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[ai-research-part1|ai-research-part1]] (2026-06-08)
+## From [ai-research-part1](/entities/ai-research-part1.md) (2026-06-08)
 - Authored "DeepSeek-V3 Technical Report" in 2025.
 
-## From [[ai-research-part7|ai-research-part7]] (2026-06-08)
+## From [ai-research-part7](/entities/ai-research-part7.md) (2026-06-08)
 - The organization associated with the authors of the mHC paper.
 - Zhenda Xie is a corresponding author from this organization.

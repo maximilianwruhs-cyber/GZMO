@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[architecting-the-minimalist-linux-desktop-a-compa-part2|architecting-the-minimalist-linux-desktop-a-compa-part2]] (2026-06-08)
+## From [architecting-the-minimalist-linux-desktop-a-compa-part2](/entities/architecting-the-minimalist-linux-desktop-a-compa-part2.md) (2026-06-08)
 - Should contain a single 0xEE partition according to the GPT specification.
 - Its only purpose is protective.
 - Buggy motherboards refuse to pass execution control to a disk unless they detect an MBR partition marked with the traditional 0x80 active/boot flag.

@@ -14,19 +14,19 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[json-schema-to-grammar-py|json_schema_to_grammar.py]] (TOOL)
-- [[lm-studio|LM Studio]] (SYSTEM)
-- [[openai|OpenAI]] (ORGANIZATION)
-- [[langchain|LangChain]] (TOOL)
-- [[llguidance|LLGuidance]] (TOOL)
-- [[msgspec|msgspec]] (TOOL)
-- [[xgrammar|XGrammar]] (TOOL)
-- [[mlx|MLX]] (SYSTEM)
-- [[outlines|Outlines]] (TOOL)
-- [[pydantic|pydantic]] (TOOL)
-- [[gguf|GGUF]] (CONCEPT)
-- [[ggml-backus-naur-form-gbnf|GGML Backus-Naur Form (GBNF)]] (CONCEPT)
-- [[llama-cpp|llama.cpp]] (SYSTEM)
+- [json_schema_to_grammar.py](/entities/json-schema-to-grammar-py.md) (TOOL)
+- [LM Studio](/entities/lm-studio.md) (SYSTEM)
+- [OpenAI](/entities/openai.md) (ORGANIZATION)
+- [LangChain](/entities/langchain.md) (TOOL)
+- [LLGuidance](/entities/llguidance.md) (TOOL)
+- [msgspec](/entities/msgspec.md) (TOOL)
+- [XGrammar](/entities/xgrammar.md) (TOOL)
+- [MLX](/entities/mlx.md) (SYSTEM)
+- [Outlines](/entities/outlines.md) (TOOL)
+- [pydantic](/entities/pydantic.md) (TOOL)
+- [GGUF](/entities/gguf.md) (CONCEPT)
+- [GGML Backus-Naur Form (GBNF)](/entities/ggml-backus-naur-form-gbnf.md) (CONCEPT)
+- [llama.cpp](/entities/llama-cpp.md) (SYSTEM)
 
 ## Relations
 - LM Studio → USES → llama.cpp

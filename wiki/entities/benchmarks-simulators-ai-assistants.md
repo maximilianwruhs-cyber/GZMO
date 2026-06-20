@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part8-micro08|ai-research-part8-micro08]] (2026-06-09)
+## From [ai-research-part8-micro08](/entities/ai-research-part8-micro08.md) (2026-06-09)
 - A category of tools and concepts.
 - Includes Aider-AI/aider, mariushobbhahn/SWEBench-verified-mini, open-compass/opencompass, and Genesis-Embodied-AI/Genesis.

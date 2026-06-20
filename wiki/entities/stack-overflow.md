@@ -14,8 +14,8 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[drive-research-financial-time-series-lyapunov-exponents|drive-research-financial-time-series-lyapunov-exponents]] (2026-06-08)
+## From [drive-research-financial-time-series-lyapunov-exponents](/entities/drive-research-financial-time-series-lyapunov-exponents.md) (2026-06-08)
 - Hosts 'Lyapunov Exponent Python Implementation'
 
-## From [[drive-research-mastering-ast-grep-a-structured-approach|drive-research-mastering-ast-grep-a-structured-approach]] (2026-06-08)
+## From [drive-research-mastering-ast-grep-a-structured-approach](/entities/drive-research-mastering-ast-grep-a-structured-approach.md) (2026-06-08)
 - Hosts a question about applying ast-grep rewrite rules.

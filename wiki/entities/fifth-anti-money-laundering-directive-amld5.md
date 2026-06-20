@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[openclaw-autonomous-ai-agents-in-financial-operat|openclaw-autonomous-ai-agents-in-financial-operat]] (2026-06-08)
+## From [openclaw-autonomous-ai-agents-in-financial-operat](/entities/openclaw-autonomous-ai-agents-in-financial-operat.md) (2026-06-08)
 - Directive enforced by FMA for services related to virtual currencies and custodian wallets.
 - Requires mandatory registration with FMA for relevant business entities.
 - Regulation related to crypto-asset transfers and wallet custody.

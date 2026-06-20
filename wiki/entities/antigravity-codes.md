@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[drive-research-deep-dive-google-antigravity-architecture|drive-research-deep-dive-google-antigravity-architecture]] (2026-06-08)
+## From [drive-research-deep-dive-google-antigravity-architecture](/entities/drive-research-deep-dive-google-antigravity-architecture.md) (2026-06-08)
 - Provides MCP Servers, AI Rules & Workflows for Antigravity, Cursor & Windsurf.

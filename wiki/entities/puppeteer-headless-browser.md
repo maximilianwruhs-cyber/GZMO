@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro07|the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro07]] (2026-06-09)
+## From [the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro07](/entities/the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro07.md) (2026-06-09)
 - Used for investigation by the agent.
 - Allows writing custom DOM parsing scripts.
 - Accesses 'unconventional primary sources' behind portals.

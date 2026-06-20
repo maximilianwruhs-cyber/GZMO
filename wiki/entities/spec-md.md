@@ -14,8 +14,8 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-ai-agents-and-spec-driven-development1-micro02|drive-research-ai-agents-and-spec-driven-development1-micro02]] (2026-06-09)
+## From [drive-research-ai-agents-and-spec-driven-development1-micro02](/entities/drive-research-ai-agents-and-spec-driven-development1-micro02.md) (2026-06-09)
 - AI agents can suggest EARS reformulations before generating the final SPEC.md
 
-## From [[gzmo-soul-merged-new-part2-micro08|gzmo-soul-merged-new-part2-micro08]] (2026-06-10)
+## From [gzmo-soul-merged-new-part2-micro08](/entities/gzmo-soul-merged-new-part2-micro08.md) (2026-06-10)
 - Speichermedium für Ausführungspläne

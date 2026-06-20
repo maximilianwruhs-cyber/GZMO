@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part2|drive-research-ki-berater-fragebogen-für-kundenanalyse-part2]] (2026-06-08)
+## From [drive-research-ki-berater-fragebogen-für-kundenanalyse-part2](/entities/drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part2.md) (2026-06-08)
 - evaluiert die psychologische, kulturelle und qualifikatorische Resilienz und Bereitschaft der Gesamtorganisation
 - richtet sich an HR-Verantwortliche, das mittlere Management, Arbeitnehmervertretungen und repräsentative Endanwender
 - Der strukturierte Fragebogen ist das erste und wichtigste Instrument.

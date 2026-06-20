@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-advanced-typescript-execution-in-the-bun-runtime-micro03|drive-research-advanced-typescript-execution-in-the-bun-runtime-micro03]] (2026-06-09)
+## From [drive-research-advanced-typescript-execution-in-the-bun-runtime-micro03](/entities/drive-research-advanced-typescript-execution-in-the-bun-runtime-micro03.md) (2026-06-09)
 - By bridging JavaScript APIs directly to OS-level system calls using Zig, Bun achieves dramatic reductions in latency.
 
-## From [[drive-research-bun-typescript-performance-tips-micro03|drive-research-bun-typescript-performance-tips-micro03]] (2026-06-09)
+## From [drive-research-bun-typescript-performance-tips-micro03](/entities/drive-research-bun-typescript-performance-tips-micro03.md) (2026-06-09)
 - Bun bridges JavaScript APIs directly to OS-level system calls using Zig.
 - Bun bridges JavaScript APIs directly to these using Zig.
 - Bun bypasses traditional blocking I/O by heavily leveraging io_uring.

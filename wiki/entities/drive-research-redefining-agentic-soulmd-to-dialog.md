@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[drive-research-redefining-agentic-soulmd-to-dialog-micro01|drive-research-redefining-agentic-soulmd-to-dialog-micro01]] (2026-06-09)
+## From [drive-research-redefining-agentic-soulmd-to-dialog-micro01](/entities/drive-research-redefining-agentic-soulmd-to-dialog-micro01.md) (2026-06-09)
 - This is the title of the document.
 - It is a micro-split from a larger document.

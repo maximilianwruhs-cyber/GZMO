@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-archival-truth-part2-micro02|the-archival-truth-part2-micro02]] (2026-06-09)
+## From [the-archival-truth-part2-micro02](/entities/the-archival-truth-part2-micro02.md) (2026-06-09)
 - Discussed in 'The Archival Truth: An Exhaustive Analysis of Historical Quotations, Attributions, and the Epistemology of Memory'.
 - Relates to how societies recall and invoke authority through quotations.
 - Discusses the transmission of historical wisdom through quotations.

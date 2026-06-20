@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[prompt-agent-engineering-part6-micro01|prompt-agent-engineering-part6-micro01]] (2026-06-10)
+## From [prompt-agent-engineering-part6-micro01](/entities/prompt-agent-engineering-part6-micro01.md) (2026-06-10)
 - Acts as a communication bus for horizontal agent-to-agent interactions.
 - Enables agent discovery via Agent Cards.
 - Supports task delegation and result streaming.

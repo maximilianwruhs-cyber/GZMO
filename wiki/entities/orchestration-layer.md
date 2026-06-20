@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[prompt-agent-engineering-part6-micro01|prompt-agent-engineering-part6-micro01]] (2026-06-10)
+## From [prompt-agent-engineering-part6-micro01](/entities/prompt-agent-engineering-part6-micro01.md) (2026-06-10)
 - Handles high-level goal management.
 - Decomposes user queries into tasks.
 - Uses A2A to delegate to specialist agents.

@@ -16,11 +16,11 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[high-fidelity-markdown-engineering-and-ast-process|high-fidelity-markdown-engineering-and-ast-process]] (2026-06-08)
+## From [high-fidelity-markdown-engineering-and-ast-process](/entities/high-fidelity-markdown-engineering-and-ast-process.md) (2026-06-08)
 - Extension capabilities required for task lists.
 - When applied, ListItem interface is expanded to ListItemGfm.
 
-## From [[the-architecture-of-world-class-software-documenta|the-architecture-of-world-class-software-documenta]] (2026-06-08)
+## From [the-architecture-of-world-class-software-documenta](/entities/the-architecture-of-world-class-software-documenta.md) (2026-06-08)
 - Elite documentation leverages advanced, platform-specific formatting capabilities to enhance readability, create visual hierarchy, and manage complex information density.
 - Supports specialized blockquote extensions known as Alerts.
 - Supports the inline rendering of hexadecimal and RGB color models.
@@ -28,11 +28,11 @@ Type: CONCEPT
 - Provides native, out-of-the-box support for Mermaid syntax.
 - Aggressively sanitizes injected CSS and JavaScript for security reasons.
 
-## From [[drive-research-the-anatomy-of-a-world-class-readme|drive-research-the-anatomy-of-a-world-class-readme]] (2026-06-08)
+## From [drive-research-the-anatomy-of-a-world-class-readme](/entities/drive-research-the-anatomy-of-a-world-class-readme.md) (2026-06-08)
 - Advanced techniques are used to enhance readability.
 - Supports specialized blockquote extensions known as Alerts, utilizing standardized colors and iconography to emphasize critical information.
 
-## From [[drive-research-creating-a-comprehensive-readmemd-micro01|drive-research-creating-a-comprehensive-readmemd-micro01]] (2026-06-09)
+## From [drive-research-creating-a-comprehensive-readmemd-micro01](/entities/drive-research-creating-a-comprehensive-readmemd-micro01.md) (2026-06-09)
 - Advanced techniques are explored for creating an exhaustive README.md file.
 - Elite documentation leverages advanced, platform-specific formatting capabilities to enhance readability, create visual hierarchy, and manage complex information density.
 - GitHub Flavored Markdown supports specialized blockquote extensions known as Alerts.

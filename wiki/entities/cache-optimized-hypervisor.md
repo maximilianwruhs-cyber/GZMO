@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[drive-research-cache-optimization-blueprint|drive-research-cache-optimization-blueprint]] (2026-06-08)
+## From [drive-research-cache-optimization-blueprint](/entities/drive-research-cache-optimization-blueprint.md) (2026-06-08)
 - Project name for the directory structure.
 - Works purely with standard library primitives.

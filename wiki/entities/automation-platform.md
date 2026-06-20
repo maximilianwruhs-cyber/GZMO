@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-setting-up-autonomous-trading-agents-micro01|drive-research-setting-up-autonomous-trading-agents-micro01]] (2026-06-09)
+## From [drive-research-setting-up-autonomous-trading-agents-micro01](/entities/drive-research-setting-up-autonomous-trading-agents-micro01.md) (2026-06-09)
 - Receives JSON webhook payloads from TradingView.
 - Examples include n8n, Capitalise.ai, and TradersPost.
 
-## From [[drive-research-setting-up-autonomous-trading-agents-micro05|drive-research-setting-up-autonomous-trading-agents-micro05]] (2026-06-09)
+## From [drive-research-setting-up-autonomous-trading-agents-micro05](/entities/drive-research-setting-up-autonomous-trading-agents-micro05.md) (2026-06-09)
 - Can utilize a TradingView webhook.
 - Falls within the regulatory scope of algorithmic trading.

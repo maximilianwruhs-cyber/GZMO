@@ -14,9 +14,9 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part9|ai-research-part9]] (2026-06-08)
+## From [ai-research-part9](/entities/ai-research-part9.md) (2026-06-08)
 - ultraworkers/claw-code is focused on workflow orchestration.
 
-## From [[prompt-agent-engineering-part5-micro04|prompt-agent-engineering-part5-micro04]] (2026-06-09)
+## From [prompt-agent-engineering-part5-micro04](/entities/prompt-agent-engineering-part5-micro04.md) (2026-06-09)
 - An area where prompt-driven flows are unreliable.
 - Addressed by a DAG Executor in NuclearClaw.

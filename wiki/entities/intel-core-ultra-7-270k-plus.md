@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[the-2026-linux-workstation-micro02|the-2026-linux-workstation-micro02]] (2026-06-10)
+## From [the-2026-linux-workstation-micro02](/entities/the-2026-linux-workstation-micro02.md) (2026-06-10)
 - Arrow Lake Refresh architecture
 - 24 cores (8P+16E)

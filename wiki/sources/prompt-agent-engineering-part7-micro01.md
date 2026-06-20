@@ -14,10 +14,10 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[cloud-kg-extraction|cloud KG extraction]] (CONCEPT)
-- [[prompt-agent-engineering-part-7|Prompt Agent engineering (part 7)]] (BOOK)
-- [[prompt-agent-engineering-part7|prompt-agent-engineering-part7]] (BOOK)
-- [[wave-02-notebooklm|wave_02_notebooklm]] (BOOK)
+- [cloud KG extraction](/entities/cloud-kg-extraction.md) (CONCEPT)
+- [Prompt Agent engineering (part 7)](/entities/prompt-agent-engineering-part-7.md) (BOOK)
+- [prompt-agent-engineering-part7](/entities/prompt-agent-engineering-part7.md) (BOOK)
+- [wave_02_notebooklm](/entities/wave-02-notebooklm.md) (BOOK)
 
 ## Relations
 - prompt-agent-engineering-part7 → USES → cloud KG extraction

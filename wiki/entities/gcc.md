@@ -14,9 +14,9 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-cuda-memory-locking-limits-configuration|drive-research-cuda-memory-locking-limits-configuration]] (2026-06-08)
+## From [drive-research-cuda-memory-locking-limits-configuration](/entities/drive-research-cuda-memory-locking-limits-configuration.md) (2026-06-08)
 - The document implies the use of GCC for compilation, though not explicitly detailed.
 
-## From [[drive-research-what-else-can-directly-be-aligned-with-our-common|drive-research-what-else-can-directly-be-aligned-with-our-common]] (2026-06-08)
+## From [drive-research-what-else-can-directly-be-aligned-with-our-common](/entities/drive-research-what-else-can-directly-be-aligned-with-our-common.md) (2026-06-08)
 - Uses the -lcudart flag.
 - Expects a raw libcudart.so.

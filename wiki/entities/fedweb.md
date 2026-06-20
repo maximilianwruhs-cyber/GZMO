@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[mastering-remote-work-a-comprehensive-guide-to-ho|mastering-remote-work-a-comprehensive-guide-to-ho]] (2026-06-08)
+## From [mastering-remote-work-a-comprehensive-guide-to-ho](/entities/mastering-remote-work-a-comprehensive-guide-to-ho.md) (2026-06-08)
 - Referenced for an article on how a fake commute could pave the way to work-from-home balance.
 - Access date: May 4, 2026.

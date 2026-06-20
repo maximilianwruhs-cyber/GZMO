@@ -14,12 +14,12 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[beyond-the-dark-room-allostatic-regulation-and-co|beyond-the-dark-room-allostatic-regulation-and-co]] (2026-06-08)
+## From [beyond-the-dark-room-allostatic-regulation-and-co](/entities/beyond-the-dark-room-allostatic-regulation-and-co.md) (2026-06-08)
 - One of three specific variables interacting within the Tension domain.
 - Represents profound system disturbance.
 - Encapsulates internal friction, computational drag, cognitive overload, emotional doubt, and generalized systemic resistance.
 
-## From [[drive-research-autonomous-devops-ai-safety-boundaries|drive-research-autonomous-devops-ai-safety-boundaries]] (2026-06-08)
+## From [drive-research-autonomous-devops-ai-safety-boundaries](/entities/drive-research-autonomous-devops-ai-safety-boundaries.md) (2026-06-08)
 - Represents the current friction within the operating system and hardware topology.
 - Increases with thermal throttling, high I/O wait times, and kernel swapping thrashing.
 - Contributes to the aggregate tension.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[ai-research-part8-micro05|ai-research-part8-micro05]] (2026-06-09)
+## From [ai-research-part8-micro05](/entities/ai-research-part8-micro05.md) (2026-06-09)
 - Also referred to as the Darwin Gödel Machine.
 - Represents the vanguard of evolutionary computing in artificial intelligence.
 - Foundational for the Huxley-Gödel Machine.

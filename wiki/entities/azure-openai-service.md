@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[openclaw-deep-research-part4|openclaw-deep-research-part4]] (2026-06-08)
+## From [openclaw-deep-research-part4](/entities/openclaw-deep-research-part4.md) (2026-06-08)
 - AutoGen is choice for Azure-embedded enterprise teams.
 - AutoGen has native Azure OpenAI Service integration.
 - AutoGen inherits Azure OpenAI Service compliance infrastructure.

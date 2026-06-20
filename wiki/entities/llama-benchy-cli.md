@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-benchmarking-llamacpp-server-prefill-tokens-micro02|drive-research-benchmarking-llamacpp-server-prefill-tokens-micro02]] (2026-06-09)
+## From [drive-research-benchmarking-llamacpp-server-prefill-tokens-micro02](/entities/drive-research-benchmarking-llamacpp-server-prefill-tokens-micro02.md) (2026-06-09)
 - Methodology for prefill profiling.
 - Uses OpenAI endpoint /v1/completions.
 - Captures Estimated Prompt Processing Time (est_ppt).

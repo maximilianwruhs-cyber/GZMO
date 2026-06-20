@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-proxmox-agent-data-storage-micro03|drive-research-proxmox-agent-data-storage-micro03]] (2026-06-09)
+## From [drive-research-proxmox-agent-data-storage-micro03](/entities/drive-research-proxmox-agent-data-storage-micro03.md) (2026-06-09)
 - Identified as the target tool by the hub.
 - Mapped to the Neo4j server.

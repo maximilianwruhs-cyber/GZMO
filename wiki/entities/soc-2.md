@@ -14,9 +14,9 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[openclaw-deep-research-part4|openclaw-deep-research-part4]] (2026-06-08)
+## From [openclaw-deep-research-part4](/entities/openclaw-deep-research-part4.md) (2026-06-08)
 - AutoGen inherits compliance infrastructure for this.
 
-## From [[openclaw-deep-research-part8-micro04|openclaw-deep-research-part8-micro04]] (2026-06-09)
+## From [openclaw-deep-research-part8-micro04](/entities/openclaw-deep-research-part8-micro04.md) (2026-06-09)
 - A 24/7 SOC is established for emergency incident response.
 - Audit framework integrations for CrewAI and OpenClaw.

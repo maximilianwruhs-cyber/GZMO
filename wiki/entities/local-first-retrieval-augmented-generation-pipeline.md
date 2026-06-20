@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[local-first-rag-architecting-sovereign-ai-with-li|local-first-rag-architecting-sovereign-ai-with-li]] (2026-06-08)
+## From [local-first-rag-architecting-sovereign-ai-with-li](/entities/local-first-rag-architecting-sovereign-ai-with-li.md) (2026-06-08)
 - Integrates LiteParse, Obsidian, and a Python-based background synchronization daemon.
 - Aims to resolve bottlenecks of cloud-based RAG regarding data sovereignty, system latency, and scalable cost.
 - Anchored by Obsidian as the central knowledge repository.

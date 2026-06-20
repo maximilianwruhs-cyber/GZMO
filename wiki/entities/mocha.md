@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[google-antigravity-the-architects-configuration-micro03|google-antigravity-the-architects-configuration-micro03]] (2026-06-10)
+## From [google-antigravity-the-architects-configuration-micro03](/entities/google-antigravity-the-architects-configuration-micro03.md) (2026-06-10)
 - A testing framework used by projects.

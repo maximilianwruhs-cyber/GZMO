@@ -14,9 +14,9 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[drive-research-research-project-initiation-guide|drive-research-research-project-initiation-guide]] (2026-06-08)
+## From [drive-research-research-project-initiation-guide](/entities/drive-research-research-project-initiation-guide.md) (2026-06-08)
 - Its websites were studied for library guides.
 - Identified 48 guides specifically targeting graduate students.
 
-## From [[optimizing-nvidia-blackwell-sm120-part2-micro06|optimizing-nvidia-blackwell-sm120-part2-micro06]] (2026-06-10)
+## From [optimizing-nvidia-blackwell-sm120-part2-micro06](/entities/optimizing-nvidia-blackwell-sm120-part2-micro06.md) (2026-06-10)
 - Website analyzed in an empirical study regarding library guides

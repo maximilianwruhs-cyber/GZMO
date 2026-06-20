@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[gzmo|gzmo]] (2026-06-09)
+## From [gzmo](/entities/gzmo.md) (2026-06-09)
 - In OpenClaw, GZMO wakes periodically in background
 - Uses time for memory gardening, monitoring, background jobs
 - Stays silent unless critical alert or finished task

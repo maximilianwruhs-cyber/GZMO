@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-marlin-baseline-for-early-deployments-micro01|drive-research-marlin-baseline-for-early-deployments-micro01]] (2026-06-10)
+## From [drive-research-marlin-baseline-for-early-deployments-micro01](/entities/drive-research-marlin-baseline-for-early-deployments-micro01.md) (2026-06-10)
 - Contains a fused MoE launcher with hardcoded host architecture assertions.

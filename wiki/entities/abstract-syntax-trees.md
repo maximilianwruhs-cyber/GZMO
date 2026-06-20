@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[high-fidelity-markdown-engineering-and-ast-process|high-fidelity-markdown-engineering-and-ast-process]] (2026-06-08)
+## From [high-fidelity-markdown-engineering-and-ast-process](/entities/high-fidelity-markdown-engineering-and-ast-process.md) (2026-06-08)
 - Regular expression-based string manipulation should be abandoned in favor of these.
 - Transitioning raw text body into MDAST specification guarantees programmatic certainty.
 - Decoupled, tree-based approach ensures absolute reliability.
 
-## From [[gzmo-soul-merged-new-part2-micro04|gzmo-soul-merged-new-part2-micro04]] (2026-06-10)
+## From [gzmo-soul-merged-new-part2-micro04](/entities/gzmo-soul-merged-new-part2-micro04.md) (2026-06-10)
 - Used by the agent to understand module dependencies and data flows in code projects.

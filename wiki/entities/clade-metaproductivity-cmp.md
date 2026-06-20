@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part3-micro03|ai-research-part3-micro03]] (2026-06-09)
+## From [ai-research-part3-micro03](/entities/ai-research-part3-micro03.md) (2026-06-09)
 - lineage-based metric inspired by Huxley’s notion of clades
 - oracle is sufficient to implement the Gödel Machine (Theorem 1)
 - approximated by HGM

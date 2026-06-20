@@ -16,12 +16,12 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-ai-agents-and-spec-driven-development-micro02|drive-research-ai-agents-and-spec-driven-development-micro02]] (2026-06-09)
+## From [drive-research-ai-agents-and-spec-driven-development-micro02](/entities/drive-research-ai-agents-and-spec-driven-development-micro02.md) (2026-06-09)
 - Catalyzed the development of a highly specialized stack.
 - Moving the industry away from monolithic, conversational chatbots toward modular, multi-agent frameworks.
 - Stratified into four primary operational layers.
 
-## From [[drive-research-ai-agents-and-spec-driven-development1-micro01|drive-research-ai-agents-and-spec-driven-development1-micro01]] (2026-06-09)
+## From [drive-research-ai-agents-and-spec-driven-development1-micro01](/entities/drive-research-ai-agents-and-spec-driven-development1-micro01.md) (2026-06-09)
 - Catalyzed the development of specialized tools.
 - Stratified into four primary operational layers, with a fifth emerging.
 - Moving the industry away from monolithic, conversational chatbots.

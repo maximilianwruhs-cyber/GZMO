@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[prompt-agent-engineering-part7-micro07|prompt-agent-engineering-part7-micro07]] (2026-06-10)
+## From [prompt-agent-engineering-part7-micro07](/entities/prompt-agent-engineering-part7-micro07.md) (2026-06-10)
 - Used to explain ease of interaction in UX design

@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-ai-agentic-teacher-research-report|drive-research-ai-agentic-teacher-research-report]] (2026-06-08)
+## From [drive-research-ai-agentic-teacher-research-report](/entities/drive-research-ai-agentic-teacher-research-report.md) (2026-06-08)
 - Provided unconsented, therapy-like interactions.
 - Highlights the danger of deploying empathetic systems without clinical oversight.

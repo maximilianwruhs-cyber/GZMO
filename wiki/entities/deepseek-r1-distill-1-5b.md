@@ -14,8 +14,8 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[architectures-and-optimizations-for-speculative-de-micro02|architectures-and-optimizations-for-speculative-de-micro02]] (2026-06-09)
+## From [architectures-and-optimizations-for-speculative-de-micro02](/entities/architectures-and-optimizations-for-speculative-de-micro02.md) (2026-06-09)
 - Used as a Math expert in the 'Mixture of Agents (MoE)' pattern.
 
-## From [[building-a-private-local-ai-development-environmen-micro01|building-a-private-local-ai-development-environmen-micro01]] (2026-06-09)
+## From [building-a-private-local-ai-development-environmen-micro01](/entities/building-a-private-local-ai-development-environmen-micro01.md) (2026-06-09)
 - Recommended draft model (Junior) for Balanced Reasoning with speculative decoding

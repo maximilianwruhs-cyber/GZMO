@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-home-office-leitfaden-struktur-gesundheit-erfol|drive-research-home-office-leitfaden-struktur-gesundheit-erfol]] (2026-06-08)
+## From [drive-research-home-office-leitfaden-struktur-gesundheit-erfol](/entities/drive-research-home-office-leitfaden-struktur-gesundheit-erfol.md) (2026-06-08)
 - Forms the physical foundation for long-term performance.
 - Responsibility often lies with the individual in home office.
 - Employer must provide advice and support.

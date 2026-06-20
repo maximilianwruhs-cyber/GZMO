@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-soul|drive-research-soul]] (2026-06-08)
+## From [drive-research-soul](/entities/drive-research-soul.md) (2026-06-08)
 - Describes proactive heartbeats and self-extending capabilities.
 - Agents should not wait for instructions when waking up.
 - Agents should evolve their own capabilities natively.

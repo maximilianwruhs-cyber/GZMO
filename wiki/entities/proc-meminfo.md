@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-architecting-a-linux-task-manager-design-principl|drive-research-architecting-a-linux-task-manager-design-principl]] (2026-06-08)
+## From [drive-research-architecting-a-linux-task-manager-design-principl](/entities/drive-research-architecting-a-linux-task-manager-design-principl.md) (2026-06-08)
 - Delivers a comprehensive breakdown of physical RAM and swap space utilization.
 - Separates metrics for actively used memory, buffers, cached memory, and shared memory segments.
 - Is parsed to establish the global context of the machine.

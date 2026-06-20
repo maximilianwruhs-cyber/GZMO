@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[drive-research-advanced-local-ai-features-guide|drive-research-advanced-local-ai-features-guide]] (2026-06-08)
+## From [drive-research-advanced-local-ai-features-guide](/entities/drive-research-advanced-local-ai-features-guide.md) (2026-06-08)
 - The guide breaks down features from this playbook.

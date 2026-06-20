@@ -14,12 +14,12 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[github-copilot|GitHub Copilot]] (ORGANIZATION)
-- [[plugin-sdk|plugin-sdk]] (CONCEPT)
-- [[mintlify|Mintlify]] (TOOL)
-- [[npm|npm]] (TOOL)
-- [[openclaw|openclaw]] (PROJECT)
-- [[jiti|jiti]] (TOOL)
+- [GitHub Copilot](/entities/github-copilot.md) (ORGANIZATION)
+- [plugin-sdk](/entities/plugin-sdk.md) (CONCEPT)
+- [Mintlify](/entities/mintlify.md) (TOOL)
+- [npm](/entities/npm.md) (TOOL)
+- [openclaw](/entities/openclaw.md) (PROJECT)
+- [jiti](/entities/jiti.md) (TOOL)
 
 ## Relations
 - openclaw → USES → Mintlify

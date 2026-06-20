@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-archival-truth-part1-micro06|the-archival-truth-part1-micro06]] (2026-06-09)
+## From [the-archival-truth-part1-micro06](/entities/the-archival-truth-part1-micro06.md) (2026-06-09)
 - Humor is derived entirely from unique, exaggerated personalities.
 - Often involves characters interacting with the real world.
 - Notable practitioners include Sacha Baron Cohen.

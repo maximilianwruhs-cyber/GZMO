@@ -1,0 +1,38 @@
+{
+  "generated_at": "2026-06-20T00:19:03Z",
+  "total_queries": 5,
+  "passed": 5,
+  "pass_rate": 1.0,
+  "results": [
+    {
+      "link_id": "L17",
+      "recall_query": "cognitive_divergence",
+      "hit": true,
+      "preview": "Platform recall for 'cognitive_divergence':\n\n## Honeypot / Vault\n\n- [1] (Score: 0.06) [TOOL:NEON-SOUL skill] Counters vulnerability of cognitive drift.\n- [2] (Score: 0.05) [CONCEPT:Kognitive Strukturi"
+    },
+    {
+      "link_id": "L18",
+      "recall_query": "mimicry_from_insight",
+      "hit": true,
+      "preview": "Platform recall for 'mimicry_from_insight':\n\n## Honeypot / Vault\n\n- [1] (Score: 0.00) [CONCEPT:Neurobiologie] Explains how humans unconsciously empathize through observation.\n- [2] (Score: 0.00) [SYST"
+    },
+    {
+      "link_id": "L19",
+      "recall_query": "pedagogical_bifurcation",
+      "hit": true,
+      "preview": "Platform recall for 'pedagogical_bifurcation':\n\n## Honeypot / Vault\n\n- [1] (Score: 0.04) [SYSTEMS:PedagogyOrchestrator] Provides reasoning (orchestration) without authority in 'Teach' mode.\n- [2] (Sco"
+    },
+    {
+      "link_id": "L20",
+      "recall_query": "diagnostic_signal",
+      "hit": true,
+      "preview": "Platform recall for 'diagnostic_signal':\n\n## Honeypot / Vault\n\n- [1] (Score: 0.15) [CONCEPT:diagnostic signals] Used to accurately classify PDF documents.\n- [2] (Score: 0.11) [CONCEPT:diagnostic signa"
+    },
+    {
+      "link_id": "L21",
+      "recall_query": "cognitive_process",
+      "hit": true,
+      "preview": "Platform recall for 'cognitive_process':\n\n## Honeypot / Vault\n\n- [1] (Score: 0.99) [CONCEPT:The Cognitive Processing Architecture] Combines S2A, Trisociation, and Tree of Thoughts.\n- [2] (Score: 0.99)"
+    }
+  ]
+}

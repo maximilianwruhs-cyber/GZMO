@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[local-first-rag-architecting-sovereign-ai-with-li|local-first-rag-architecting-sovereign-ai-with-li]] (2026-06-08)
+## From [local-first-rag-architecting-sovereign-ai-with-li](/entities/local-first-rag-architecting-sovereign-ai-with-li.md) (2026-06-08)
 - The most powerful capability enabled by LiteParse.
 - Utilizes LiteParse as an ultra-fast initial ingestion pass.
 - Selectively escalates problem areas to a multimodal model using screenshot generation.

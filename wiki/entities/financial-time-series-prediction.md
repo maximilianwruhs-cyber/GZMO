@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-financial-time-series-lyapunov-exponents|drive-research-financial-time-series-lyapunov-exponents]] (2026-06-08)
+## From [drive-research-financial-time-series-lyapunov-exponents](/entities/drive-research-financial-time-series-lyapunov-exponents.md) (2026-06-08)
 - Measuring market efficiency: The Shannon entropy of high-frequency financial time series
 - A convolutional neural network based approach to financial time series prediction
 - Echo State Networks for Bitcoin Time Series Prediction

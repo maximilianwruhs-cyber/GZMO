@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: AUTHOR
 
-## From [[the-archival-truth-part1-micro03|the-archival-truth-part1-micro03]] (2026-06-09)
+## From [the-archival-truth-part1-micro03](/entities/the-archival-truth-part1-micro03.md) (2026-06-09)
 - An outstanding example of political poetry.
 - His poems remain relevant.
 - Used compressed language to point out political grievances.

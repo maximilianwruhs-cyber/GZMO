@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-markitdown-format-parity-checklist|drive-research-markitdown-format-parity-checklist]] (2026-06-08)
+## From [drive-research-markitdown-format-parity-checklist](/entities/drive-research-markitdown-format-parity-checklist.md) (2026-06-08)
 - A separate, dedicated package for the LLM Vision plugin architecture.
 - Leverages external language model clients to visually analyze images.
 - A plugin that offloads visual text extraction to external Large Language Model APIs.

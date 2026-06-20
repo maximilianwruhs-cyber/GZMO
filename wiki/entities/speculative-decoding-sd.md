@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-speicherbandbreiten-engpass-memory-wall|drive-research-speicherbandbreiten-engpass-memory-wall]] (2026-06-08)
+## From [drive-research-speicherbandbreiten-engpass-memory-wall](/entities/drive-research-speicherbandbreiten-engpass-memory-wall.md) (2026-06-08)
 - Accelerates LLMs by predicting and verifying multiple tokens simultaneously.
 - The efficacy hinges on the acceptance rate.
 - Can be deployed on VRAM-constrained hardware due to TurboQuant's KV cache reductions.

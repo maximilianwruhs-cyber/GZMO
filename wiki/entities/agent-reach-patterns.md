@@ -13,67 +13,25 @@ tags:
 
 # Agent-Reach Patterns
 
-This document details the compliance and architectural design patterns implemented to integrate Agent-Reach concepts within GZMO under the strict Sovereign Node Directive (SND).
+Agent-Reach integration under GZMO Sovereign Node compliance with a **Tier 2 network exception**.
 
-## Security Compliance & Sovereign Node Directive (SND)
+## Network access
 
-Under the Sovereign Node Directive, GZMO nodes must operate in an offline, air-gapped, and telemetriefreie (telemetry-free) environment. Therefore:
-- Active web-scraping, remote session hijacking, and residential proxy networks are **explicitly blocked** by default.
-- No remote exfiltration of credentials or cookies is permitted.
+When `agent-reach` is listed in `[compliance].network_exceptions` (default), Agent-Reach CLIs and markers are **never blocked** by `compliance.rs`, even in `mode = "sovereign"`.
 
-To research and implement features of Agent-Reach safely, GZMO utilizes **Sandbox Fallback Routing** and the **Operator Confirm Gate**.
+See [Network Exception Tier](/wiki/entities/network-exception-tier.md) for the full tier model.
 
----
+## Workspace isolation (retained)
 
-## 1. Sandbox Fallback Routing
+- Hermetic sandbox under `~/.agent-reach/` — isolates clones, tokens, and temp artifacts from the project tree
+- ASH session material stays on the local host; no vault exfiltration
 
-When an agent or script requests an active Agent-Reach capability (such as scraping an external resource), the request is intercepted and routed to a local hermetic fallback environment.
+## Capabilities
 
-### Design Pattern
-1. **Capability Interception:** The router detects tools tagged with `requires-internet` or `agent-reach`.
-2. **Local Mock Registry:** Instead of making an outbound HTTP/TLS connection, the router queries a local JSON database or mock directory matching the requested signature.
-3. **CLI Fallback Execution:** For interactive tasks, a local headless sandbox CLI (running inside a restricted cgroup/namespace under `~/.agent-reach/sandbox/`) mimics the target interface.
+- Ambient Session Hijacking (ASH) for authenticated platform state
+- Dynamic fallback poly-routing across CLI backends
+- Zero-wrapper CLI multiplexing into agent shell context
 
-```
-[Agent Action]
-      │
-      ▼
-[GZMO Outbound Router]
-      │
-      ├─► [Remote URL Requested?] ──► BLOCKED (SND Compliance)
-      │
-      └─► [Fallback Route] ──► [Restricted Local Sandbox] ──► [Local JSON Mock]
-```
+## Runtime enforcement
 
----
-
-## 2. Operator Confirm Gate (OCG)
-
-The Operator Confirm Gate is a synchronous, blocking approval mechanism designed to prevent accidental execution of unverified sandbox escaping or network execution.
-
-### OCG Schema and Flow
-Every command executing a fallback script containing sandbox commands must pass through an interactive validation check.
-
-```rust
-pub struct OperatorConfirmGate {
-    pub action_id: String,
-    pub command: String,
-    pub risk_tier: String, // "High" or "Critical"
-}
-
-impl OperatorConfirmGate {
-    pub fn verify_operator_consent(&self) -> bool {
-        println!("WARNING: Execution of High-Risk Agent-Reach Command Requested!");
-        println!("Command: {}", self.command);
-        println!("Do you approve this execution? [y/N]");
-        // Block and wait for operator interactive input
-        let mut input = String::new();
-        std::io::stdin().read_line(&mut input).is_ok() && input.trim().to_lowercase() == "y"
-    }
-}
-```
-
-### Allowlist/Blocklist Verification
-Any URL or command payload is verified against a strict hash-based allowlist:
-- **Blocklist:** All external IP ranges, commercial proxy endpoints, and remote credential vaults.
-- **Allowlist:** Local loops (`127.0.0.1`, `localhost`), local MCP server commands, and pre-approved mock testing suites.
+`gzmo-core/src/compliance.rs` — `shell_command_block_reason` skips Agent-Reach markers when the exception is active.

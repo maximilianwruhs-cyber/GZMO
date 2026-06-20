@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[prompt-agent-engineering-part5-micro02|prompt-agent-engineering-part5-micro02]] (2026-06-09)
+## From [prompt-agent-engineering-part5-micro02](/entities/prompt-agent-engineering-part5-micro02.md) (2026-06-09)
 - Can be used for configuration file examples.
 - Mentioned as a framework for implementation.
 - Can be used for Kubernetes YAML examples.

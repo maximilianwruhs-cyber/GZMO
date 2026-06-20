@@ -14,12 +14,12 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-linux-gaming-and-ai-build-guide-micro01|drive-research-linux-gaming-and-ai-build-guide-micro01]] (2026-06-09)
+## From [drive-research-linux-gaming-and-ai-build-guide-micro01](/entities/drive-research-linux-gaming-and-ai-build-guide-micro01.md) (2026-06-09)
 - An example of Intel's Arrow Lake Refresh counterparts.
 - Features 24 cores (8P+16E) and 24 threads.
 - Has a higher power draw compared to AMD's offerings.
 
-## From [[drive-research-linux-gaming-and-ai-build-guide-micro05|drive-research-linux-gaming-and-ai-build-guide-micro05]] (2026-06-09)
+## From [drive-research-linux-gaming-and-ai-build-guide-micro05](/entities/drive-research-linux-gaming-and-ai-build-guide-micro05.md) (2026-06-09)
 - Intel processor.
 - Arrow Lake Refresh architecture.
 - 24 cores (8P+16E), 24 threads.

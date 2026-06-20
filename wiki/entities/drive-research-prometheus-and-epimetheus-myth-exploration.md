@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-prometheus-and-epimetheus-myth-exploration-micro01|drive-research-prometheus-and-epimetheus-myth-exploration-micro01]] (2026-06-09)
+## From [drive-research-prometheus-and-epimetheus-myth-exploration-micro01](/entities/drive-research-prometheus-and-epimetheus-myth-exploration-micro01.md) (2026-06-09)
 - Part of the project title.
 - Related to myth exploration.
 - This is a research project.

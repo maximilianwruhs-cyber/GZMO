@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[dynamics-of-the-unpredictable-micro04|dynamics-of-the-unpredictable-micro04]] (2026-06-09)
+## From [dynamics-of-the-unpredictable-micro04](/entities/dynamics-of-the-unpredictable-micro04.md) (2026-06-09)
 - Utilizing TKFTs, Eva Miranda established that fluid dynamics encode undecidable problems in a single dynamical pass.
 - They prove that fluid systems can compute undecidable logic.

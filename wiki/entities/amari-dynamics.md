@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-financial-time-series-lyapunov-exponents|drive-research-financial-time-series-lyapunov-exponents]] (2026-06-08)
+## From [drive-research-financial-time-series-lyapunov-exponents](/entities/drive-research-financial-time-series-lyapunov-exponents.md) (2026-06-08)
 - A Rust crate for deep stability analysis.
 - Implements adaptive Runge-Kutta solvers.
 - Includes numerical Jacobian computations and QR-based Lyapunov spectrum routines.

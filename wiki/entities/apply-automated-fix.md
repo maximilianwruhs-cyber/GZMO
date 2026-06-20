@@ -14,9 +14,9 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[ai-research-part3-micro06|ai-research-part3-micro06]] (2026-06-09)
+## From [ai-research-part3-micro06](/entities/ai-research-part3-micro06.md) (2026-06-09)
 - A tool within the 'edit' module for applying automated fixes.
 
-## From [[ai-research-part3-micro07|ai-research-part3-micro07]] (2026-06-09)
+## From [ai-research-part3-micro07](/entities/ai-research-part3-micro07.md) (2026-06-09)
 - Applies automated fixes to code content.
 - Used in test_error_diagnosis.py.

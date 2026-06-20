@@ -162,29 +162,30 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
         compress_cfg.clone(),
         ccr.clone(),
         session_id.clone(),
-    )));
+    ).with_compliance(config.compliance.clone())));
     // Web search: use SerpAPI if key is available, DDG fallback
     let serpapi_key = config.api_keys.serpapi_key();
+    let compliance = config.compliance.clone();
     if serpapi_key.is_empty() {
         tools.register(Box::new(WebSearchTool::new_with_compress(
             String::new(),
             compress_cfg.clone(),
             ccr.clone(),
             session_id.clone(),
-        )));
+        ).with_compliance(compliance.clone())));
     } else {
         tools.register(Box::new(WebSearchTool::new_with_compress(
             serpapi_key.clone(),
             compress_cfg.clone(),
             ccr.clone(),
             session_id.clone(),
-        )));
+        ).with_compliance(compliance.clone())));
     }
     tools.register(Box::new(WebBrowseTool::new_with_compress(
         compress_cfg.clone(),
         ccr.clone(),
         session_id.clone(),
-    )));
+    ).with_compliance(compliance)));
     tools.register(Box::new(SysMetricsTool));
     tools.register(Box::new(SysKillTool));
 
@@ -196,7 +197,7 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
     let chaos_skills: SkillRegistry = build_chaos_skill_registry(&config.pedagogy);
 
     // ─── MCP ─────────────────────────────────────────────────────
-    let mut mcp = McpManager::new();
+    let mut mcp = McpManager::new().with_obolus_config(Arc::new(config.clone()));
     for server in config.active_mcp_servers() {
         match mcp.connect(McpServerConfig {
             name: server.name.clone(),

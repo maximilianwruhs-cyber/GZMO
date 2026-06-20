@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[the-architecture-of-engagement-an-analysis-of-gam-micro07|the-architecture-of-engagement-an-analysis-of-gam-micro07]] (2026-06-09)
+## From [the-architecture-of-engagement-an-analysis-of-gam-micro07](/entities/the-architecture-of-engagement-an-analysis-of-gam-micro07.md) (2026-06-09)
 - Is a healthcare app for managing Type 1 diabetes.
 - Personifies the disease as a 'diabetes monster' to be 'tamed'.
 - Achieved an 88% 12-week retention rate in clinical trials.

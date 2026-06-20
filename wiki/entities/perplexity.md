@@ -14,9 +14,9 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-subword-tokenization-mitigates-llm-sparsity-micro02|drive-research-subword-tokenization-mitigates-llm-sparsity-micro02]] (2026-06-09)
+## From [drive-research-subword-tokenization-mitigates-llm-sparsity-micro02](/entities/drive-research-subword-tokenization-mitigates-llm-sparsity-micro02.md) (2026-06-09)
 - Defined as perp(p, \hat{p}) = b^{H(p,\hat{p})}.
 - BPE inherently drives down perplexity by ensuring the model is not forced to make low-confidence predictions on unrepresented rare tokens.
 
-## From [[openclaw-deep-research-part7-micro02|openclaw-deep-research-part7-micro02]] (2026-06-10)
+## From [openclaw-deep-research-part7-micro02](/entities/openclaw-deep-research-part7-micro02.md) (2026-06-10)
 - AI assistant used for AEO visibility and content citation

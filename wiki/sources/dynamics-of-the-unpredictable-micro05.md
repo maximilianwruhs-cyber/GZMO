@@ -14,22 +14,22 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-10).
 
 ## Entities
-- [[cargo|cargo]] (TOOL)
-- [[entity-component-system|Entity Component System]] (CONCEPT)
-- [[data-oriented-design|Data-Oriented Design]] (CONCEPT)
-- [[crossbeam-channel|crossbeam::channel]] (TOOL)
-- [[entity|Entity]] (CONCEPT)
-- [[structure-of-arrays|Structure of Arrays]] (CONCEPT)
-- [[component|Component]] (CONCEPT)
-- [[dashmap|DashMap]] (TOOL)
-- [[siphash|SipHash]] (CONCEPT)
-- [[array-of-structs|Array of Structs]] (CONCEPT)
-- [[c|C++]] (SYSTEM)
-- [[rustup|rustup]] (TOOL)
-- [[rayon|Rayon]] (TOOL)
-- [[crates-io|crates.io]] (SYSTEM)
-- [[flamegraph|flamegraph]] (TOOL)
-- [[fxhasher|FxHasher]] (TOOL)
+- [cargo](/entities/cargo.md) (TOOL)
+- [Entity Component System](/entities/entity-component-system.md) (CONCEPT)
+- [Data-Oriented Design](/entities/data-oriented-design.md) (CONCEPT)
+- [crossbeam::channel](/entities/crossbeam-channel.md) (TOOL)
+- [Entity](/entities/entity.md) (CONCEPT)
+- [Structure of Arrays](/entities/structure-of-arrays.md) (CONCEPT)
+- [Component](/entities/component.md) (CONCEPT)
+- [DashMap](/entities/dashmap.md) (TOOL)
+- [SipHash](/entities/siphash.md) (CONCEPT)
+- [Array of Structs](/entities/array-of-structs.md) (CONCEPT)
+- [C++](/entities/c.md) (SYSTEM)
+- [rustup](/entities/rustup.md) (TOOL)
+- [Rayon](/entities/rayon.md) (TOOL)
+- [crates.io](/entities/crates-io.md) (SYSTEM)
+- [flamegraph](/entities/flamegraph.md) (TOOL)
+- [FxHasher](/entities/fxhasher.md) (TOOL)
 
 ## Relations
 - cargo → USES → crates.io

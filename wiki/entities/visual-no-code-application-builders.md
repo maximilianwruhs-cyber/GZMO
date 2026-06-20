@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-setting-up-autonomous-trading-agents-micro01|drive-research-setting-up-autonomous-trading-agents-micro01]] (2026-06-09)
+## From [drive-research-setting-up-autonomous-trading-agents-micro01](/entities/drive-research-setting-up-autonomous-trading-agents-micro01.md) (2026-06-09)
 - A type of system that has proliferated and democratized access to autonomous market execution.
 - Examples include n8n, Make, and Zapier.
 
-## From [[the-architects-handbook-for-autonomous-agentic-tr-micro02|the-architects-handbook-for-autonomous-agentic-tr-micro02]] (2026-06-09)
+## From [the-architects-handbook-for-autonomous-agentic-tr-micro02](/entities/the-architects-handbook-for-autonomous-agentic-tr-micro02.md) (2026-06-09)
 - Proliferation has democratized access to autonomous market execution by 2026.
 - Fall along a continuous spectrum ranging from highly accessible to custom-engineered.

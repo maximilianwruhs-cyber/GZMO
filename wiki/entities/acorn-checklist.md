@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[optimizing-nvidia-blackwell-sm120-part2-micro07|optimizing-nvidia-blackwell-sm120-part2-micro07]] (2026-06-10)
+## From [optimizing-nvidia-blackwell-sm120-part2-micro07](/entities/optimizing-nvidia-blackwell-sm120-part2-micro07.md) (2026-06-10)
 - Streamlined variant of the CRAAP test
 - Provides a quick baseline for verifying source quality
 - Consists of Accurate, Current, Objective, Relevant, and Named

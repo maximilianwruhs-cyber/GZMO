@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-agentic-token-economy-blueprint-micro01|drive-research-agentic-token-economy-blueprint-micro01]] (2026-06-09)
+## From [drive-research-agentic-token-economy-blueprint-micro01](/entities/drive-research-agentic-token-economy-blueprint-micro01.md) (2026-06-09)
 - Tasks are routed dynamically based on their inherent cognitive complexity.
 - Repetitive, low-reasoning tasks are aggressively offloaded to local, heavily quantized models.
 - Creates a bifurcated token economy: a high-volume, low-cost internal market and a low-volume, high-value market.

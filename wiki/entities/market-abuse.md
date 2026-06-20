@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-setting-up-autonomous-trading-agents-micro06|drive-research-setting-up-autonomous-trading-agents-micro06]] (2026-06-09)
+## From [drive-research-setting-up-autonomous-trading-agents-micro06](/entities/drive-research-setting-up-autonomous-trading-agents-micro06.md) (2026-06-09)
 - Is a topic addressed by Schoellerbank.
 - Is a topic addressed by FMA Österreich.

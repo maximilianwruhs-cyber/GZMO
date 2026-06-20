@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[openclaw-deep-research-part5-micro09|openclaw-deep-research-part5-micro09]] (2026-06-09)
+## From [openclaw-deep-research-part5-micro09](/entities/openclaw-deep-research-part5-micro09.md) (2026-06-09)
 - Author of the article 'What is OpenClaw, and Why Should You Care?'.
 - Senior Associate.

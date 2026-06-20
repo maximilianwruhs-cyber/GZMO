@@ -14,5 +14,5 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[google-takeout|Google Takeout]] (TOOL)
-- [[drive-research-research-process-steps|drive-research-research-process-steps]] (CONCEPT)
+- [Google Takeout](/entities/google-takeout.md) (TOOL)
+- [drive-research-research-process-steps](/entities/drive-research-research-process-steps.md) (CONCEPT)

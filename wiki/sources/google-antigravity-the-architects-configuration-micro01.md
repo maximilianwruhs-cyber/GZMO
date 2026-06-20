@@ -14,9 +14,9 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[google-takeout|Google Takeout]] (TOOL)
-- [[cloud-kg-extraction|cloud KG extraction]] (CONCEPT)
-- [[google-antigravity-the-architects-configuration|google-antigravity-the-architects-configuration]] (PROJECT)
+- [Google Takeout](/entities/google-takeout.md) (TOOL)
+- [cloud KG extraction](/entities/cloud-kg-extraction.md) (CONCEPT)
+- [google-antigravity-the-architects-configuration](/entities/google-antigravity-the-architects-configuration.md) (PROJECT)
 
 ## Relations
 - google-antigravity-the-architects-configuration → USES → cloud KG extraction

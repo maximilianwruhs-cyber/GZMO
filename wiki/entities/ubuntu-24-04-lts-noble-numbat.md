@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro08|the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro08]] (2026-06-09)
+## From [the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro08](/entities/the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro08.md) (2026-06-09)
 - Chosen as the host operating system for a fact-checking system.
 - Supports kernel-level optimizations and precise resource monitoring via Intel RAPL.
 - Features systemd integration for hardened service units and automated recovery.

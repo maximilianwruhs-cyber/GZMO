@@ -14,13 +14,13 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-research-process-steps-micro03|drive-research-research-process-steps-micro03]] (2026-06-10)
+## From [drive-research-research-process-steps-micro03](/entities/drive-research-research-process-steps-micro03.md) (2026-06-10)
 - Requires utility tools like powermetrics or macgputils to query real-time hardware metrics.
 - Uses a unified memory architecture.
 - A companion library to Zeus.
 - Uses Apple's private, undocumented IOReport API to read cumulative energy counters.
 
-## From [[optimizing-nvidia-blackwell-sm120-part3-micro02|optimizing-nvidia-blackwell-sm120-part3-micro02]] (2026-06-10)
+## From [optimizing-nvidia-blackwell-sm120-part3-micro02](/entities/optimizing-nvidia-blackwell-sm120-part3-micro02.md) (2026-06-10)
 - Uses unified memory architecture
 - Requires specialized telemetry to avoid 'efficiency illusion'
 - Companion library to Zeus

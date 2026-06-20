@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro04|the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro04]] (2026-06-09)
+## From [the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro04](/entities/the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro04.md) (2026-06-09)
 - Focuses on the ingestion of technical documentation and developer syntax.
 - Utilizes Crawl4AI for high-speed, asynchronous web scraping.
 - Uses RuVector for neural-graph-based vector storage.

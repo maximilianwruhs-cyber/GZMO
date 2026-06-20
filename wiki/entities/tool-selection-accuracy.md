@@ -16,15 +16,15 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-agentic-reverse-engineering-state-and-future-micro03|drive-research-agentic-reverse-engineering-state-and-future-micro03]] (2026-06-09)
+## From [drive-research-agentic-reverse-engineering-state-and-future-micro03](/entities/drive-research-agentic-reverse-engineering-state-and-future-micro03.md) (2026-06-09)
 - Evaluates the precision with which an agent selects the optimal analytical function, external component, or API.
 - Penalizes agents that rely on random execution over deliberate selection.
 
-## From [[drive-research-agentic-reverse-engineering-state-and-future1-micro03|drive-research-agentic-reverse-engineering-state-and-future1-micro03]] (2026-06-09)
+## From [drive-research-agentic-reverse-engineering-state-and-future1-micro03](/entities/drive-research-agentic-reverse-engineering-state-and-future1-micro03.md) (2026-06-09)
 - Evaluates the precision with which an agent selects the optimal analytical function, external component, or API.
 - Penalizes agents that rely on random, brute-force execution over systematic selection.
 - Frequently paired with TCR.
 
-## From [[the-dawn-of-agentic-software-reverse-engineering-micro03|the-dawn-of-agentic-software-reverse-engineering-micro03]] (2026-06-09)
+## From [the-dawn-of-agentic-software-reverse-engineering-micro03](/entities/the-dawn-of-agentic-software-reverse-engineering-micro03.md) (2026-06-09)
 - Evaluates the precision with which an agent selects the optimal analytical function, external component, or API.
 - Penalizes agents that rely on random, brute-force execution over systematic, deliberate selection.

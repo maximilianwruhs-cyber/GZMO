@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-pi-coding-agent-ecosystem-tier-list|drive-research-pi-coding-agent-ecosystem-tier-list]] (2026-06-08)
+## From [drive-research-pi-coding-agent-ecosystem-tier-list](/entities/drive-research-pi-coding-agent-ecosystem-tier-list.md) (2026-06-08)
 - Provides a drop-in replacement for Pi's default bash execution tool.
 - Automatically redirects all standard command-line instructions into managed tmux windows.
 - Features automated background timeout handling and polling capabilities.

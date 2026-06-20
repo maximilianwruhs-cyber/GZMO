@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[deterministic-polyhedral-dynamics-in-rust-game-eng|deterministic-polyhedral-dynamics-in-rust-game-eng]] (2026-06-08)
+## From [deterministic-polyhedral-dynamics-in-rust-game-eng](/entities/deterministic-polyhedral-dynamics-in-rust-game-eng.md) (2026-06-08)
 - Used in a standard Rust environment for PRNG.
 - A thread-local generator evaluates a bounded range.
 - Example: rand::thread_rng().gen_range(1..=6) for a d6.

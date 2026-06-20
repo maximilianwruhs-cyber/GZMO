@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-blackwell-sm120-gemm-optimization-guide|drive-research-blackwell-sm120-gemm-optimization-guide]] (2026-06-08)
+## From [drive-research-blackwell-sm120-gemm-optimization-guide](/entities/drive-research-blackwell-sm120-gemm-optimization-guide.md) (2026-06-08)
 - Resolves dynamic range limitations by partitioning input matrices.
 - Applies shared, higher-precision scale factors.
 - Two distinct microscaling formats are supported: OCP-Compliant and Blackwell Native.

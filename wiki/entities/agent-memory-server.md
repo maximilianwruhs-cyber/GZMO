@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-proxmox-agent-data-storage-micro02|drive-research-proxmox-agent-data-storage-micro02]] (2026-06-09)
+## From [drive-research-proxmox-agent-data-storage-micro02](/entities/drive-research-proxmox-agent-data-storage-micro02.md) (2026-06-09)
 - A specialized Redis-backed memory management engine.
 - Exposes dedicated MCP tools such as set_working_memory and search_long_term_memory.

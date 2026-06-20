@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[openclaw-deep-research-part10-micro05|openclaw-deep-research-part10-micro05]] (2026-06-09)
+## From [openclaw-deep-research-part10-micro05](/entities/openclaw-deep-research-part10-micro05.md) (2026-06-09)
 - Is at the core of coordination in multi-agent AI.
 - Includes reporting structures, information flow, delegation patterns, feedback loops, and escalation paths.

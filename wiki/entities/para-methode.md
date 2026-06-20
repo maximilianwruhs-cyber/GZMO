@@ -14,12 +14,12 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[gzmo-soul-merged-new-part1|gzmo-soul-merged-new-part1]] (2026-06-09)
+## From [gzmo-soul-merged-new-part1](/entities/gzmo-soul-merged-new-part1.md) (2026-06-09)
 - Ist ein heuristisches Framework
 - Wird für die Einsortierung von Dateien verwendet
 - Developed by Tiago Forte.
 - Categorizes information strictly by its immediate action relevance and separates active, time-bound projects from long-term reference materials and inactive archives.
 
-## From [[gzmo-soul-merged-new-part2-micro04|gzmo-soul-merged-new-part2-micro04]] (2026-06-10)
+## From [gzmo-soul-merged-new-part2-micro04](/entities/gzmo-soul-merged-new-part2-micro04.md) (2026-06-10)
 - A method for semantic file organization.
 - Consists of Projects, Areas, Resources, and Archives.

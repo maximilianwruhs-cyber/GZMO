@@ -1,0 +1,32 @@
+---
+description: ARCH-DIR sovereignty and Obolus energy governance for GZMO changes.
+alwaysApply: true
+---
+
+# ARCH-DIR + Obolus (GZMO)
+
+## Before adding dependencies
+
+1. Copy `docs/zero-bloat-reviews/_TEMPLATE.md` and fill Obolus fields.
+2. Keep `[workspace.dependencies]` within `compliance.max_workspace_deps`.
+
+## Before adding Prime LLM callers
+
+1. Route through `GatewayRouter` or `headless_gateway` with ledger instrumentation.
+2. Update `docs/Obolus/instrumentation-map.md`.
+3. Assign ObolusGate tier (T0 warn / T1 defer / T2 deny).
+
+## Verify
+
+```bash
+./scripts/sovereignty-verify.sh
+gzmo obolus status
+```
+
+## Config knobs
+
+- `[compliance]` — sovereign mode, trusted CIDRs, binary/deps caps
+- `[obolus_analytics]` — ledger (measurement)
+- `[obolus_governance]` — runtime gates (T1/T2 deny; T0 warn-only)
+
+Do not enable hard η gates in Phase B — use `E_total` and `ctx_%` only.

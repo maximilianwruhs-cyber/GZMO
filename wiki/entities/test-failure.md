@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part3-micro06|ai-research-part3-micro06]] (2026-06-09)
+## From [ai-research-part3-micro06](/entities/ai-research-part3-micro06.md) (2026-06-09)
 - An error type indicating a test has failed.
 - May require reviewing implementation and suggesting improvements.

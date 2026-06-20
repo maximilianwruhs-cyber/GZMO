@@ -14,9 +14,9 @@ gzmo_synthetic: true
 
 Type: MODEL
 
-## From [[local-first-rag-architecting-sovereign-ai-with-li|local-first-rag-architecting-sovereign-ai-with-li]] (2026-06-08)
+## From [local-first-rag-architecting-sovereign-ai-with-li](/entities/local-first-rag-architecting-sovereign-ai-with-li.md) (2026-06-08)
 - A model that can be run on Ollama endpoints.
 
-## From [[drive-research-tinyfolder-gzmo-architecture-analysis-product|drive-research-tinyfolder-gzmo-architecture-analysis-product]] (2026-06-08)
+## From [drive-research-tinyfolder-gzmo-architecture-analysis-product](/entities/drive-research-tinyfolder-gzmo-architecture-analysis-product.md) (2026-06-08)
 - Used for Embeddings Store.
 - SHA256 dedup.

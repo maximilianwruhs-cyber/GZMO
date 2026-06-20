@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[drive-research-frankenmoe-merging-ai-models|drive-research-frankenmoe-merging-ai-models]] (2026-06-08)
+## From [drive-research-frankenmoe-merging-ai-models](/entities/drive-research-frankenmoe-merging-ai-models.md) (2026-06-08)
 - The GitHub repository for the mergekit tool.
 - Contains documentation for MoE merging.

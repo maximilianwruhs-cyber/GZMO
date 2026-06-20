@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[mastering-remote-work-a-comprehensive-guide-to-ho|mastering-remote-work-a-comprehensive-guide-to-ho]] (2026-06-08)
+## From [mastering-remote-work-a-comprehensive-guide-to-ho](/entities/mastering-remote-work-a-comprehensive-guide-to-ho.md) (2026-06-08)
 - Involves reserving fixed focus windows without meetings in the calendar.
 - Recommended for complex tasks.
 - Is a method for operative structuring.
@@ -22,7 +22,7 @@ Type: CONCEPT
 - Used for deep work.
 - Aims to achieve flow states during the work phase.
 
-## From [[drive-research-home-office-leitfaden-struktur-gesundheit-erfol|drive-research-home-office-leitfaden-struktur-gesundheit-erfol]] (2026-06-08)
+## From [drive-research-home-office-leitfaden-struktur-gesundheit-erfol](/entities/drive-research-home-office-leitfaden-struktur-gesundheit-erfol.md) (2026-06-08)
 - A time management method where fixed focus windows without meetings are reserved in the calendar.
 - Recommended for complex tasks.
 - A method for operative structuring.

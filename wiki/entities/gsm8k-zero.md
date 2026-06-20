@@ -14,6 +14,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-agentic-token-economy-blueprint-micro02|drive-research-agentic-token-economy-blueprint-micro02]] (2026-06-09)
+## From [drive-research-agentic-token-economy-blueprint-micro02](/entities/drive-research-agentic-token-economy-blueprint-micro02.md) (2026-06-09)
 - A benchmark where TALE achieves remarkable reductions in output token costs.
 - On this benchmark, TALE reduces costs from an average of 252.96 tokens to 22.67 tokens while maintaining 98.72% accuracy.

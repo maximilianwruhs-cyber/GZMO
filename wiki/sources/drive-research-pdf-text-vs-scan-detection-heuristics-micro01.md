@@ -14,5 +14,5 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[drive-research-pdf-text-vs-scan-detection-heuristics|drive-research-pdf-text-vs-scan-detection-heuristics]] (BOOK)
-- [[google-takeout|Google Takeout]] (TOOL)
+- [drive-research-pdf-text-vs-scan-detection-heuristics](/entities/drive-research-pdf-text-vs-scan-detection-heuristics.md) (BOOK)
+- [Google Takeout](/entities/google-takeout.md) (TOOL)

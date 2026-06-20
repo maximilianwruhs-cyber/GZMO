@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part5|ai-research-part5]] (2026-06-08)
+## From [ai-research-part5](/entities/ai-research-part5.md) (2026-06-08)
 - Queries are divided into chunks, and each chunk accesses a corresponding depth-KV span.
 - Reduces unnecessary HBM traffic and improves depth utilization.

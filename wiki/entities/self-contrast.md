@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: METHODOLOGY
 
-## From [[reflexion-framework-architectures-for-mitigating|reflexion-framework-architectures-for-mitigating]] (2026-06-08)
+## From [reflexion-framework-architectures-for-mitigating](/entities/reflexion-framework-architectures-for-mitigating.md) (2026-06-08)
 - A parallel advancement designed to combat inconsistency and overconfidence.
 - Leverages the LLM's capacity to identify discrepancies between distinct texts.
 - Forces the LLM to autonomously create diverse solving perspectives and generate multiple distinct responses to the same problem.

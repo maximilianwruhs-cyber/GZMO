@@ -14,9 +14,9 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[cybernetics-and-mythos-the-architecture-of-intell-part2|cybernetics-and-mythos-the-architecture-of-intell-part2]] (2026-06-08)
+## From [cybernetics-and-mythos-the-architecture-of-intell-part2](/entities/cybernetics-and-mythos-the-architecture-of-intell-part2.md) (2026-06-08)
 - Teachers utilize Socratic methods to have students analyze college-level texts such as Richard Rothstein’s Color of Law.
 
-## From [[drive-research-dialectics-socratic-vs-hegelian-methods|drive-research-dialectics-socratic-vs-hegelian-methods]] (2026-06-08)
+## From [drive-research-dialectics-socratic-vs-hegelian-methods](/entities/drive-research-dialectics-socratic-vs-hegelian-methods.md) (2026-06-08)
 - author of 'Color of Law'
 - texts used in AP U.S. History curricula to foster communication skills and democratic engagement

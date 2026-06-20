@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[architectural-analysis-of-the-openclaw-ai-plugin-s|architectural-analysis-of-the-openclaw-ai-plugin-s]] (2026-06-08)
+## From [architectural-analysis-of-the-openclaw-ai-plugin-s](/entities/architectural-analysis-of-the-openclaw-ai-plugin-s.md) (2026-06-08)
 - Uses uiHints object to map raw schema fields to human-readable titles, descriptions, and placeholder texts.
 - Enables the built-in web Control UI to automatically generate rich, interactive forms.
 - Leverages the gateway's semantic understanding of plugin configuration requirements without instantiating JavaScript code.

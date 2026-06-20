@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-automating-linux-hardware-detection-micro01|drive-research-automating-linux-hardware-detection-micro01]] (2026-06-09)
+## From [drive-research-automating-linux-hardware-detection-micro01](/entities/drive-research-automating-linux-hardware-detection-micro01.md) (2026-06-09)
 - Fundamental building block within the Linux kernel that represents an instantiated entity, such as a physical device, a loaded driver, or a communication subsystem bus.
 - Every active kobject is manifested as a distinct directory within /sys.

@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[prompt-agent-engineering-part7-micro02|prompt-agent-engineering-part7-micro02]] (2026-06-09)
+## From [prompt-agent-engineering-part7-micro02](/entities/prompt-agent-engineering-part7-micro02.md) (2026-06-09)
 - A prompt designed to determine if a subject is State of the Art.
 - Includes sections for Technical Benchmarks, Methodological Innovation, Peer/Market Validation, Ecosystem Integration, and Obsolescence Risk.

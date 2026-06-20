@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ultimate-local-ai-development-stack-for-vscodium-micro03|ultimate-local-ai-development-stack-for-vscodium-micro03]] (2026-06-09)
+## From [ultimate-local-ai-development-stack-for-vscodium-micro03](/entities/ultimate-local-ai-development-stack-for-vscodium-micro03.md) (2026-06-09)
 - Standard AI models use 16-bit or 8-bit floating-point numbers requiring massive GPU VRAM.
 - 1.58-bit Ternary architectures require zero matrix multiplication.

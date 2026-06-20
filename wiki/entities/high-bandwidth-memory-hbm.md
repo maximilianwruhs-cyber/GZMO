@@ -14,9 +14,9 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-erbandbreite-und-latenzengp-sse|drive-research-erbandbreite-und-latenzengpässe]] (2026-06-08)
+## From [drive-research-erbandbreite-und-latenzengpässe](/entities/drive-research-erbandbreite-und-latenzengp-sse.md) (2026-06-08)
 - Parameter weight matrix must be loaded from HBM into computational cores.
 - AI accelerators are starved for data while waiting for memory transfers from HBM.
 
-## From [[drive-research-llamacpp-optimization-blueprint-micro02|drive-research-llamacpp-optimization-blueprint-micro02]] (2026-06-09)
+## From [drive-research-llamacpp-optimization-blueprint-micro02](/entities/drive-research-llamacpp-optimization-blueprint-micro02.md) (2026-06-09)
 - Flash Attention prevents the materialization of the massive attention matrix in HBM.

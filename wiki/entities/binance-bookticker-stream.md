@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-free-lob-data-for-chaos-research|drive-research-free-lob-data-for-chaos-research]] (2026-06-08)
+## From [drive-research-free-lob-data-for-chaos-research](/entities/drive-research-free-lob-data-for-chaos-research.md) (2026-06-08)
 - Records every single change to the best-bid-and-offer (BBO) state in real-time.
 - Provides sub-millisecond precision essential for calculating Lyapunov exponents.
 - Part of Binance's public data archive.

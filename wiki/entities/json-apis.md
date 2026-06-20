@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-benchmarking-llamacpp-server-prefill-tokens-micro01|drive-research-benchmarking-llamacpp-server-prefill-tokens-micro01]] (2026-06-09)
+## From [drive-research-benchmarking-llamacpp-server-prefill-tokens-micro01](/entities/drive-research-benchmarking-llamacpp-server-prefill-tokens-micro01.md) (2026-06-09)
 - Leveraged by developers to profile prefill speeds directly over HTTP.
 - Exposed by llama-server.
 - The /completion endpoint can be used to isolate prefill speed.

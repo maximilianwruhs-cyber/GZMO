@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-agentic-workflows-fastest-best-models|drive-research-agentic-workflows-fastest-best-models]] (2026-06-08)
+## From [drive-research-agentic-workflows-fastest-best-models](/entities/drive-research-agentic-workflows-fastest-best-models.md) (2026-06-08)
 - Newer APUs like the Strix Halo can achieve up to 2.44x speedups with MTP.
 
-## From [[drive-research-llm-inference-engine-audit-2026-micro02|drive-research-llm-inference-engine-audit-2026-micro02]] (2026-06-09)
+## From [drive-research-llm-inference-engine-audit-2026-micro02](/entities/drive-research-llm-inference-engine-audit-2026-micro02.md) (2026-06-09)
 - Code-name for AMD Ryzen AI Max 395 processor.
 - Bridges the historical gap between consumer mobile devices and workstation capabilities.
 - Linux systems running Strix Halo can allocate up to 120GB of standard system RAM directly to VRAM.

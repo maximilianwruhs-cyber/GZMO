@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[openclaw-deep-research-part12|openclaw-deep-research-part12]] (2026-06-08)
+## From [openclaw-deep-research-part12](/entities/openclaw-deep-research-part12.md) (2026-06-08)
 - Refers to the model used for heartbeats.
 - Should use the cheapest model available.
 - Runs often but performs simple checks.

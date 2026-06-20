@@ -14,21 +14,21 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-10).
 
 ## Entities
-- [[burgenl-ndischer-kabarettpreis-2026|Burgenländischer Kabarettpreis 2026]] (PROJECT)
-- [[shep-framework|SHEP Framework]] (CONCEPT)
-- [[benign-violation-theory-bvt|Benign Violation Theory (BVT)]] (CONCEPT)
-- [[sigmund-freud|Sigmund Freud]] (PERSON)
-- [[international-improv-community-vienna-iicv|International Improv Community Vienna (IICV)]] (ORGANIZATION)
-- [[american-improv|American Improv]] (ORGANIZATION)
-- [[comedy-factory|Comedy Factory]] (PROJECT)
-- [[superiority-theory|Superiority Theory]] (CONCEPT)
-- [[the-architecture-of-humor|The Architecture of Humor]] (BOOK)
-- [[peter-mcgraw|Peter McGraw]] (PERSON)
-- [[caleb-warren|Caleb Warren]] (PERSON)
-- [[incongruity-theory|Incongruity Theory]] (CONCEPT)
-- [[aristoteles|Aristoteles]] (PERSON)
-- [[relief-theory|Relief Theory]] (CONCEPT)
-- [[willibald-ruch|Willibald Ruch]] (PERSON)
+- [Burgenländischer Kabarettpreis 2026](/entities/burgenl-ndischer-kabarettpreis-2026.md) (PROJECT)
+- [SHEP Framework](/entities/shep-framework.md) (CONCEPT)
+- [Benign Violation Theory (BVT)](/entities/benign-violation-theory-bvt.md) (CONCEPT)
+- [Sigmund Freud](/entities/sigmund-freud.md) (PERSON)
+- [International Improv Community Vienna (IICV)](/entities/international-improv-community-vienna-iicv.md) (ORGANIZATION)
+- [American Improv](/entities/american-improv.md) (ORGANIZATION)
+- [Comedy Factory](/entities/comedy-factory.md) (PROJECT)
+- [Superiority Theory](/entities/superiority-theory.md) (CONCEPT)
+- [The Architecture of Humor](/entities/the-architecture-of-humor.md) (BOOK)
+- [Peter McGraw](/entities/peter-mcgraw.md) (PERSON)
+- [Caleb Warren](/entities/caleb-warren.md) (PERSON)
+- [Incongruity Theory](/entities/incongruity-theory.md) (CONCEPT)
+- [Aristoteles](/entities/aristoteles.md) (PERSON)
+- [Relief Theory](/entities/relief-theory.md) (CONCEPT)
+- [Willibald Ruch](/entities/willibald-ruch.md) (PERSON)
 
 ## Relations
 - Superiority Theory → RELATED_TO → Aristoteles

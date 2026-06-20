@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part8-micro07|ai-research-part8-micro07]] (2026-06-09)
+## From [ai-research-part8-micro07](/entities/ai-research-part8-micro07.md) (2026-06-09)
 - It is a major paradigm shift defining the 2025–2026 AI landscape.
 - It overcomes physical scaling limits.

@@ -22,12 +22,12 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-llamabench|drive-research-llamabench]] (2026-06-08)
+## From [drive-research-llamabench](/entities/drive-research-llamabench.md) (2026-06-08)
 - Native CLI performance benchmarking tool
 - Bundled with llama.cpp
 - Provides raw, hardware-level performance metrics for GGUF models
 
-## From [[drive-research-ok-so-designing-a-guide-around-llamabench-would-b|drive-research-ok-so-designing-a-guide-around-llamabench-would-b]] (2026-06-08)
+## From [drive-research-ok-so-designing-a-guide-around-llamabench-would-b](/entities/drive-research-ok-so-designing-a-guide-around-llamabench-would-b.md) (2026-06-08)
 - Used to isolate hardware limits.
 - Used to test compilation scaling.
 - Used to map energy efficiency.
@@ -36,7 +36,7 @@ Type: TOOL
 - Can be used to measure how modern KV quantization styles protect throughput.
 - Used as a regression and validation checker for compiling llama.cpp locally.
 
-## From [[drive-research-llama-bench-performance-benchmarking-tool-micro01|drive-research-llama-bench-performance-benchmarking-tool-micro01]] (2026-06-09)
+## From [drive-research-llama-bench-performance-benchmarking-tool-micro01](/entities/drive-research-llama-bench-performance-benchmarking-tool-micro01.md) (2026-06-09)
 - Native command-line interface (CLI) performance benchmarking tool.
 - Bundled directly with the core llama.cpp repository.
 - Bypasses tokenization, sampling, and network dispatch pipeline.
@@ -45,12 +45,12 @@ Type: TOOL
 - Supports multi-parameter grid searches.
 - Can output in Markdown, JSON, JSONL, CSV, and SQL formats.
 
-## From [[drive-research-llama-bench-performance-benchmarking-tool-micro02|drive-research-llama-bench-performance-benchmarking-tool-micro02]] (2026-06-09)
+## From [drive-research-llama-bench-performance-benchmarking-tool-micro02](/entities/drive-research-llama-bench-performance-benchmarking-tool-micro02.md) (2026-06-09)
 - Profiles the C++ engine directly.
 - Used to contrast C++ prefill and decode speeds.
 - Has associated tools/scripts like `llama-bench/README.md`.
 
-## From [[optimizing-nvidia-blackwell-sm120-part3-micro06|optimizing-nvidia-blackwell-sm120-part3-micro06]] (2026-06-09)
+## From [optimizing-nvidia-blackwell-sm120-part3-micro06](/entities/optimizing-nvidia-blackwell-sm120-part3-micro06.md) (2026-06-09)
 - It is a native CLI performance benchmarking tool bundled with llama.cpp.
 - It provides raw, hardware-level performance metrics for GGUF models.
 - It bypasses tokenization, sampling, or networking overhead.
@@ -59,25 +59,25 @@ Type: TOOL
 - It is used to sweep thread counts.
 - It is used to sweep VRAM layer offload.
 
-## From [[drive-research-research-process-steps-micro02|drive-research-research-process-steps-micro02]] (2026-06-10)
+## From [drive-research-research-process-steps-micro02](/entities/drive-research-research-process-steps-micro02.md) (2026-06-10)
 - Modern replacement for 'llama-bench'.
 - Core engine-level micro-benchmarking tool.
 - Executes tensor operations directly inside the libllama C++ library.
 
-## From [[optimizing-nvidia-blackwell-sm120-part2-micro04|optimizing-nvidia-blackwell-sm120-part2-micro04]] (2026-06-10)
+## From [optimizing-nvidia-blackwell-sm120-part2-micro04](/entities/optimizing-nvidia-blackwell-sm120-part2-micro04.md) (2026-06-10)
 - Native command-line interface (CLI) performance benchmarking tool.
 - Bundled directly with the core llama.cpp repository.
 - Bypasses tokenization, sampling, and network dispatch pipelines.
 
-## From [[optimizing-nvidia-blackwell-sm120-part2-micro05|optimizing-nvidia-blackwell-sm120-part2-micro05]] (2026-06-10)
+## From [optimizing-nvidia-blackwell-sm120-part2-micro05](/entities/optimizing-nvidia-blackwell-sm120-part2-micro05.md) (2026-06-10)
 - Identifies bottlenecks in high-level software wrappers
 - Profiles the C++ engine directly
 - Used to measure C++ prefill and decode speeds
 
-## From [[optimizing-nvidia-blackwell-sm120-part3-micro01|optimizing-nvidia-blackwell-sm120-part3-micro01]] (2026-06-10)
+## From [optimizing-nvidia-blackwell-sm120-part3-micro01](/entities/optimizing-nvidia-blackwell-sm120-part3-micro01.md) (2026-06-10)
 - Core engine-level micro-benchmarking tool.
 - Executes tensor operations directly inside the libllama C++ library.
 - Measures raw prompt processing (pp) and token generation (tg) speed.
 
-## From [[optimizing-nvidia-blackwell-sm120-part3-micro02|optimizing-nvidia-blackwell-sm120-part3-micro02]] (2026-06-10)
+## From [optimizing-nvidia-blackwell-sm120-part3-micro02](/entities/optimizing-nvidia-blackwell-sm120-part3-micro02.md) (2026-06-10)
 - Used for benchmarking LLM backends

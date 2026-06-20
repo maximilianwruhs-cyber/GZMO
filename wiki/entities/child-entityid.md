@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[dynamics-of-the-unpredictable-micro06|dynamics-of-the-unpredictable-micro06]] (2026-06-09)
+## From [dynamics-of-the-unpredictable-micro06](/entities/dynamics-of-the-unpredictable-micro06.md) (2026-06-09)
 - A marker component used in ECS to represent parent-child relationships.
 - Used to reconcile scene graphs with flat ECS arrays.

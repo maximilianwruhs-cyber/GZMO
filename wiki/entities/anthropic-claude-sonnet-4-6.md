@@ -14,9 +14,9 @@ gzmo_synthetic: true
 
 Type: MODEL
 
-## From [[openclaw-deep-research-part1-micro03|openclaw-deep-research-part1-micro03]] (2026-06-09)
+## From [openclaw-deep-research-part1-micro03](/entities/openclaw-deep-research-part1-micro03.md) (2026-06-09)
 - A primary model that can be set in OpenClaw.
 - Can be aliased as 'Sonnet'.
 
-## From [[openclaw-deep-research-part9-micro05|openclaw-deep-research-part9-micro05]] (2026-06-10)
+## From [openclaw-deep-research-part9-micro05](/entities/openclaw-deep-research-part9-micro05.md) (2026-06-10)
 - A model used by agents

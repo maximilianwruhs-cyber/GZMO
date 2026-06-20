@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[the-architecture-of-engagement-an-analysis-of-gam-micro01|the-architecture-of-engagement-an-analysis-of-gam-micro01]] (2026-06-09)
+## From [the-architecture-of-engagement-an-analysis-of-gam-micro01](/entities/the-architecture-of-engagement-an-analysis-of-gam-micro01.md) (2026-06-09)
 - Issued a call for tobacco-style warning labels on social media platforms.
 - Cited unquestionable links between excessive social media use and surging rates of adolescent anxiety and depression.

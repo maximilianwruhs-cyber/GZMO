@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-tinyfolder-gzmo-architecture-analysis-product|drive-research-tinyfolder-gzmo-architecture-analysis-product]] (2026-06-08)
+## From [drive-research-tinyfolder-gzmo-architecture-analysis-product](/entities/drive-research-tinyfolder-gzmo-architecture-analysis-product.md) (2026-06-08)
 - An area where GZMO leads.
 - Structured trace persistence with JSONL indexing.
 - Most open-source agents treat LLM calls as opaque.

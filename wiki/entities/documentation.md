@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-creating-a-comprehensive-readmemd-micro03|drive-research-creating-a-comprehensive-readmemd-micro03]] (2026-06-09)
+## From [drive-research-creating-a-comprehensive-readmemd-micro03](/entities/drive-research-creating-a-comprehensive-readmemd-micro03.md) (2026-06-09)
 - The FileShot/FileShotZKE repository highlights documentation strategies for software where trust and verifiable security are paramount.
 - The construction of a comprehensive documentation file is far more than a routine administrative task; it is an exercise in rigorous information architecture, user psychology, and sophisticated technical automation.
 - A world-class documentation architecture serves as the definitive vanguard of a project, dictating its initial reception, its ease of adoption, and its long-term viability.

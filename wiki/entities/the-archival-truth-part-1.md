@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[the-archival-truth-part1-micro01|the-archival-truth-part1-micro01]] (2026-06-09)
+## From [the-archival-truth-part1-micro01](/entities/the-archival-truth-part1-micro01.md) (2026-06-09)
 - Curated research corpus
 - split archive (wave_02_notebooklm)

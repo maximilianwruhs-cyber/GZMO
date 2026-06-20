@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: MODEL
 
-## From [[resilient-rust-based-mcp-client-and-llm-orchestrat-micro05|resilient-rust-based-mcp-client-and-llm-orchestrat-micro05]] (2026-06-10)
+## From [resilient-rust-based-mcp-client-and-llm-orchestrat-micro05](/entities/resilient-rust-based-mcp-client-and-llm-orchestrat-micro05.md) (2026-06-10)
 - A model family dedicated to function calling.

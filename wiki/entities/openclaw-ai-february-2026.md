@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[openclaw-deep-research-part1-micro02|openclaw-deep-research-part1-micro02]] (2026-06-09)
+## From [openclaw-deep-research-part1-micro02](/entities/openclaw-deep-research-part1-micro02.md) (2026-06-09)
 - An AI agent framework.
 - Launched as Clawdbot in late 2025.
 - February 2026 update (v2026.2.23) introduced security hardening and overhauled the plugin ecosystem.

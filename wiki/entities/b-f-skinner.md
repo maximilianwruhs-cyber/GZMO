@@ -15,13 +15,13 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[the-architecture-of-engagement-an-analysis-of-gam-micro01|the-architecture-of-engagement-an-analysis-of-gam-micro01]] (2026-06-09)
+## From [the-architecture-of-engagement-an-analysis-of-gam-micro01](/entities/the-architecture-of-engagement-an-analysis-of-gam-micro01.md) (2026-06-09)
 - Conducted operant conditioning research.
 - His research on variable-ratio reinforcement schedules is applied in digital platforms.
 
-## From [[the-architecture-of-engagement-an-analysis-of-gam-micro03|the-architecture-of-engagement-an-analysis-of-gam-micro03]] (2026-06-09)
+## From [the-architecture-of-engagement-an-analysis-of-gam-micro03](/entities/the-architecture-of-engagement-an-analysis-of-gam-micro03.md) (2026-06-09)
 - Pioneered research in operant conditioning.
 - His research informs variable-ratio reinforcement schedules.
 
-## From [[the-architecture-of-engagement-an-analysis-of-gam-micro06|the-architecture-of-engagement-an-analysis-of-gam-micro06]] (2026-06-09)
+## From [the-architecture-of-engagement-an-analysis-of-gam-micro06](/entities/the-architecture-of-engagement-an-analysis-of-gam-micro06.md) (2026-06-09)
 - His operant conditioning research is the basis for the variable-ratio reinforcement schedule.

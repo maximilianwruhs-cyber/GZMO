@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[ai-research-part7|ai-research-part7]] (2026-06-08)
+## From [ai-research-part7](/entities/ai-research-part7.md) (2026-06-08)
 - Researchers from MIT CSAIL developed the Recursive Language Model (RLM) pattern.

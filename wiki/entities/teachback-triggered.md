@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-unfold-a-comprehensive-step-by-step-implementation|drive-research-unfold-a-comprehensive-step-by-step-implementation]] (2026-06-08)
+## From [drive-research-unfold-a-comprehensive-step-by-step-implementation](/entities/drive-research-unfold-a-comprehensive-step-by-step-implementation.md) (2026-06-08)
 - Occurs when the Teachback Validator detects issues with the resolution.
 - Results in moving to the UNBOUND state and requesting clarification.

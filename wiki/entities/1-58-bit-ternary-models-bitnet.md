@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[building-a-private-local-ai-development-environmen-micro01|building-a-private-local-ai-development-environmen-micro01]] (2026-06-09)
+## From [building-a-private-local-ai-development-environmen-micro01](/entities/building-a-private-local-ai-development-environmen-micro01.md) (2026-06-09)
 - Utilize only values -1, 0, and 1
 - Eliminate expensive matrix multiplications
 - Enable running highly intelligent 30B+ models on conventional CPUs

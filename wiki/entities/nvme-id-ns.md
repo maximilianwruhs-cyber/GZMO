@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-ubuntu-extreme-hardware-tuning-micro02|drive-research-ubuntu-extreme-hardware-tuning-micro02]] (2026-06-09)
+## From [drive-research-ubuntu-extreme-hardware-tuning-micro02](/entities/drive-research-ubuntu-extreme-hardware-tuning-micro02.md) (2026-06-09)
 - Command used to identify NVMe namespaces.
 - Used to verify available LBA formats.

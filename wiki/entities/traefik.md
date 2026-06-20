@@ -14,9 +14,9 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[aether-grid-micro01|aether-grid-micro01]] (2026-06-09)
+## From [aether-grid-micro01](/entities/aether-grid-micro01.md) (2026-06-09)
 - Kubernetes Ingress Controller.
 - Can fail to load certificate chains completely, leading to Edge-Agent rejection.
 
-## From [[obolus-micro05|obolus-micro05]] (2026-06-09)
+## From [obolus-micro05](/entities/obolus-micro05.md) (2026-06-09)
 - Used for setting up Reverse Proxies.

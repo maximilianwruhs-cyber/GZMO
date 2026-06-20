@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[openclaw-deep-research-part7-micro04|openclaw-deep-research-part7-micro04]] (2026-06-10)
+## From [openclaw-deep-research-part7-micro04](/entities/openclaw-deep-research-part7-micro04.md) (2026-06-10)
 - Accesses weather, IP geolocation, SMS, crypto prices, Danish CVR, Whois, phone lookup, UUID, and stock data

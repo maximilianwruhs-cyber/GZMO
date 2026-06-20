@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-linux-gaming-and-ai-build-guide-micro04|drive-research-linux-gaming-and-ai-build-guide-micro04]] (2026-06-09)
+## From [drive-research-linux-gaming-and-ai-build-guide-micro04](/entities/drive-research-linux-gaming-and-ai-build-guide-micro04.md) (2026-06-09)
 - The community-standard API that Wayland compositors use.
 - NVIDIA drivers now have 32-bit compatibility for the GBM back-end.

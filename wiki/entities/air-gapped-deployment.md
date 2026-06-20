@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[phantom-drive-autonomous-llm-deployment-architect-micro01|phantom-drive-autonomous-llm-deployment-architect-micro01]] (2026-06-09)
+## From [phantom-drive-autonomous-llm-deployment-architect-micro01](/entities/phantom-drive-autonomous-llm-deployment-architect-micro01.md) (2026-06-09)
 - A directive of the Phantom Drive deployment.
 - External network dependencies represent dead code.
 - Requires a fully autonomous, air-gapped USB stick.

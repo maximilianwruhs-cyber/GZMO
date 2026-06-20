@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-imagine-creating-sm120-according-to-our-progress|drive-research-imagine-creating-sm120-according-to-our-progress]] (2026-06-08)
+## From [drive-research-imagine-creating-sm120-according-to-our-progress](/entities/drive-research-imagine-creating-sm120-according-to-our-progress.md) (2026-06-08)
 - Five core configuration files (trtllm_nvfp4_moe.py, flashinfer_trtllm_moe.py, flashinfer_cutedsl_moe.py, trtllm_fp8_moe.py, and cutlass_moe.py) lack capability family checks for SM120.
 - They only check for is_device_capability_family(100), causing catastrophic fallback or launch failures on consumer GPUs.
 - These files must be patched to append family 120.

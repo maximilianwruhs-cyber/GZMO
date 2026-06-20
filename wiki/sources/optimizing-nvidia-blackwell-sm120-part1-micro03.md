@@ -14,4 +14,4 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[ggml-org|ggml-org]] (ORGANIZATION)
+- [ggml-org](/entities/ggml-org.md) (ORGANIZATION)

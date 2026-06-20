@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-architecture-of-engagement-an-analysis-of-gam-micro05|the-architecture-of-engagement-an-analysis-of-gam-micro05]] (2026-06-09)
+## From [the-architecture-of-engagement-an-analysis-of-gam-micro05](/entities/the-architecture-of-engagement-an-analysis-of-gam-micro05.md) (2026-06-09)
 - Fiercely protects algorithmic ranking, platform curation, and the presentation of digital content as editorial judgment in the U.S.

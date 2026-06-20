@@ -14,9 +14,9 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[openclaw-part1-micro01|openclaw-part1-micro01]] (2026-06-10)
+## From [openclaw-part1-micro01](/entities/openclaw-part1-micro01.md) (2026-06-10)
 - Describes memory as a system of cascading filters
 - Established in 1968
 
-## From [[openclaw-part1-micro02|openclaw-part1-micro02]] (2026-06-10)
+## From [openclaw-part1-micro02](/entities/openclaw-part1-micro02.md) (2026-06-10)
 - Multi-store model used in cognitive informatics to emulate attention filters

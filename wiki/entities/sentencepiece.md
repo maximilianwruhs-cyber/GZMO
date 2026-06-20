@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-subword-tokenization-mitigates-llm-sparsity-micro03|drive-research-subword-tokenization-mitigates-llm-sparsity-micro03]] (2026-06-09)
+## From [drive-research-subword-tokenization-mitigates-llm-sparsity-micro03](/entities/drive-research-subword-tokenization-mitigates-llm-sparsity-micro03.md) (2026-06-09)
 - often shows greater deviation than WordPiece for protein sequences
 - a subword tokenization methodology

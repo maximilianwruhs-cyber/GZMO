@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[drive-research-universal-syntax-research-prompt|drive-research-universal-syntax-research-prompt]] (2026-06-08)
+## From [drive-research-universal-syntax-research-prompt](/entities/drive-research-universal-syntax-research-prompt.md) (2026-06-08)
 - Proposed the 'Recursion-Only Hypothesis' in 2002.
 - Argued that recursion is the only uniquely human and language-specific component of the Narrow Language Faculty.

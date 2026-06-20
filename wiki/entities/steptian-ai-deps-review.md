@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-pi-coding-agent-ecosystem-tier-list|drive-research-pi-coding-agent-ecosystem-tier-list]] (2026-06-08)
+## From [drive-research-pi-coding-agent-ecosystem-tier-list](/entities/drive-research-pi-coding-agent-ecosystem-tier-list.md) (2026-06-08)
 - A dependency auditing tool that scans local ecosystems.
 - Cross-checks version metadata across Pi Coding Agent, Pi Lens, Pi LSP, Pi TUI Modal, and active packages.
 - Identifies deprecations and security risks.

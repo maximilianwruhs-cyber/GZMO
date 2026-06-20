@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-archival-truth-part1-micro05|the-archival-truth-part1-micro05]] (2026-06-09)
+## From [the-archival-truth-part1-micro05](/entities/the-archival-truth-part1-micro05.md) (2026-06-09)
 - A prominent structural manifestation of Incongruity Theory.
 - Based on the neurological limitations of human pattern recognition requiring a minimum of three data points.
 - Used to rapidly construct and then demolish expectations.

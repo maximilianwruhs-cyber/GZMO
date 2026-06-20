@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-token-efficient-bol-processing-architecture|drive-research-token-efficient-bol-processing-architecture]] (2026-06-08)
+## From [drive-research-token-efficient-bol-processing-architecture](/entities/drive-research-token-efficient-bol-processing-architecture.md) (2026-06-08)
 - Is a high-performance, enterprise-grade control plane.
 - Deployed directly inside the corporate network via Kubernetes (EKS) or Docker.
 - Separates the Control Plane from the Data Plane.

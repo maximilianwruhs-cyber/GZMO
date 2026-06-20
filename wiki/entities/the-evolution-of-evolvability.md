@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[ai-research-part3-micro03|ai-research-part3-micro03]] (2026-06-09)
+## From [ai-research-part3-micro03](/entities/ai-research-part3-micro03.md) (2026-06-09)
 - In Artificial life, pp. 201–220. Routledge, 2019

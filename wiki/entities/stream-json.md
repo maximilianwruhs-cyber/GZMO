@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-bun-file-parsing-dependency-shortlist-micro02|drive-research-bun-file-parsing-dependency-shortlist-micro02]] (2026-06-09)
+## From [drive-research-bun-file-parsing-dependency-shortlist-micro02](/entities/drive-research-bun-file-parsing-dependency-shortlist-micro02.md) (2026-06-09)
 - Purely streaming parser that might be required for JSON files exceeding available RAM.
 - Ubiquitous, highly standardized unformatted primitive.
 - Parsing JSON data into memory operates at the core engine level via JSON.parse().

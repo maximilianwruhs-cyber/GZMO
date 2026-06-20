@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[dynamics-of-the-unpredictable-micro03|dynamics-of-the-unpredictable-micro03]] (2026-06-09)
+## From [dynamics-of-the-unpredictable-micro03](/entities/dynamics-of-the-unpredictable-micro03.md) (2026-06-09)
 - Developed fractal theory.
 - Published papers on fractal theory between 1973 and 1977.
 - Proved that the Coast of Brittany possesses a dimension between 1 and 2.

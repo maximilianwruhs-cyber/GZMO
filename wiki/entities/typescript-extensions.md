@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-pi-coding-agent-ecosystem-tier-list|drive-research-pi-coding-agent-ecosystem-tier-list]] (2026-06-08)
+## From [drive-research-pi-coding-agent-ecosystem-tier-list](/entities/drive-research-pi-coding-agent-ecosystem-tier-list.md) (2026-06-08)
 - Compiled TypeScript or JavaScript modules loaded directly into Pi's memory space.
 - Run with full user permissions and have complete access to the core ExtensionAPI.
 - Reside in global or project-local directories and can be hot-reloaded.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-creating-a-comprehensive-readmemd-micro02|drive-research-creating-a-comprehensive-readmemd-micro02]] (2026-06-09)
+## From [drive-research-creating-a-comprehensive-readmemd-micro02](/entities/drive-research-creating-a-comprehensive-readmemd-micro02.md) (2026-06-09)
 - Offer deep granular customization.
 - Allow modification of default text outputs via query parameters.
 - Can implement compact messaging using boolean symbols or custom emojis.

@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-mcp-landscape-research-report|drive-research-mcp-landscape-research-report]] (2026-06-08)
+## From [drive-research-mcp-landscape-research-report](/entities/drive-research-mcp-landscape-research-report.md) (2026-06-08)
 - Serves as an indexing hub specifically for open-source libraries.
 - Provides the language model with up-to-date API documentation for software frameworks.

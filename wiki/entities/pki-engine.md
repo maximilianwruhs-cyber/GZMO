@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[aether-grid-micro02|aether-grid-micro02]] (2026-06-09)
+## From [aether-grid-micro02](/entities/aether-grid-micro02.md) (2026-06-09)
 - used by Vault
 - can break down under high load (e.g., 1,000+ Sparks requesting certificates)

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-mastering-ast-grep-a-structured-approach|drive-research-mastering-ast-grep-a-structured-approach]] (2026-06-08)
+## From [drive-research-mastering-ast-grep-a-structured-approach](/entities/drive-research-mastering-ast-grep-a-structured-approach.md) (2026-06-08)
 - An extension for VS Code that provides structural search, replace, and more for ast-grep.
 - Represents a paradigm shift in how code is queried and manipulated.
 - Parses source code into syntax trees and enables pattern matching directly against these hierarchical structures.

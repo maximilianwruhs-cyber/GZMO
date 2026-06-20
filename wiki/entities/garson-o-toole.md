@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[the-archival-truth-part2-micro02|the-archival-truth-part2-micro02]] (2026-06-09)
+## From [the-archival-truth-part2-micro02](/entities/the-archival-truth-part2-micro02.md) (2026-06-09)
 - Researcher who tracks the archival origins of quotes.
 - Revealed the earliest evidence for the 'Insanity' quote appeared in a 1981 newspaper article.

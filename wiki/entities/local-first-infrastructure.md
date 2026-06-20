@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[building-a-private-local-ai-development-environmen-micro03|building-a-private-local-ai-development-environmen-micro03]] (2026-06-09)
+## From [building-a-private-local-ai-development-environmen-micro03](/entities/building-a-private-local-ai-development-environmen-micro03.md) (2026-06-09)
 - Strategic reorientation for risk management
 - Ensures innovations remain within company firewalls
 - Minimizes latency and maximizes autonomy

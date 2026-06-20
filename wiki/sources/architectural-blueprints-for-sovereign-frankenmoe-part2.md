@@ -14,16 +14,16 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-08).
 
 ## Entities
-- [[deepseek-ai-deepseek-r1-distill-qwen-7b|deepseek-ai/DeepSeek-R1-Distill-Qwen-7B]] (MODEL)
-- [[proxmox-egpu-hypervisor|Proxmox eGPU hypervisor]] (SYSTEM)
-- [[sovereign-moe-yaml|sovereign-moe.yaml]] (CONCEPT)
-- [[layer-splitting-mode|Layer-Splitting Mode]] (CONCEPT)
-- [[sovereign-frankenmoe|Sovereign FrankenMoE]] (CONCEPT)
-- [[llama-server|llama-server]] (TOOL)
-- [[kvm-vm-101-core-database-ai|KVM VM 101: Core Database AI]] (SYSTEM)
-- [[qwen-qwen2-5-coder-7b-instruct|Qwen/Qwen2.5-Coder-7B-Instruct]] (MODEL)
-- [[proxmox-ve-hypervisor|Proxmox VE HYPERVISOR]] (SYSTEM)
-- [[qwen2-moe|qwen2_moe]] (CONCEPT)
+- [deepseek-ai/DeepSeek-R1-Distill-Qwen-7B](/entities/deepseek-ai-deepseek-r1-distill-qwen-7b.md) (MODEL)
+- [Proxmox eGPU hypervisor](/entities/proxmox-egpu-hypervisor.md) (SYSTEM)
+- [sovereign-moe.yaml](/entities/sovereign-moe-yaml.md) (CONCEPT)
+- [Layer-Splitting Mode](/entities/layer-splitting-mode.md) (CONCEPT)
+- [Sovereign FrankenMoE](/entities/sovereign-frankenmoe.md) (CONCEPT)
+- [llama-server](/entities/llama-server.md) (TOOL)
+- [KVM VM 101: Core Database AI](/entities/kvm-vm-101-core-database-ai.md) (SYSTEM)
+- [Qwen/Qwen2.5-Coder-7B-Instruct](/entities/qwen-qwen2-5-coder-7b-instruct.md) (MODEL)
+- [Proxmox VE HYPERVISOR](/entities/proxmox-ve-hypervisor.md) (SYSTEM)
+- [qwen2_moe](/entities/qwen2-moe.md) (CONCEPT)
 
 ## Relations
 - Sovereign FrankenMoE → USES → Proxmox eGPU hypervisor

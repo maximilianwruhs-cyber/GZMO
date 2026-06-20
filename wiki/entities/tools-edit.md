@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[ai-research-part3-micro06|ai-research-part3-micro06]] (2026-06-09)
+## From [ai-research-part3-micro06](/entities/ai-research-part3-micro06.md) (2026-06-09)
 - A module containing tools for editing files.
 - Includes apply_automated_fix, read_file, and write_file.

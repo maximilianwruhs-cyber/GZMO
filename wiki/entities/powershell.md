@@ -17,21 +17,21 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[gzmo-soul-merged-new-part1|gzmo-soul-merged-new-part1]] (2026-06-09)
+## From [gzmo-soul-merged-new-part1](/entities/gzmo-soul-merged-new-part1.md) (2026-06-09)
 - Used by the AI agent to generate and execute specialized scripts for auditing installation integrity on Windows.
 - Cmdlets like Get-ItemProperty and Select-Object are used to extract parameters from the Windows Registry.
 - Wird für native Registry-Zugriffe verwendet
 
-## From [[drive-research-architektur-und-implementierung-intelligenter-ki-a-micro01|drive-research-architektur-und-implementierung-intelligenter-ki-a-micro01]] (2026-06-09)
+## From [drive-research-architektur-und-implementierung-intelligenter-ki-a-micro01](/entities/drive-research-architektur-und-implementierung-intelligenter-ki-a-micro01.md) (2026-06-09)
 - Used to generate and execute specialized scripts for auditing installation integrity.
 - Utilizes Cmdlets like Get-ItemProperty and Select-Object.
 - Can generate scripts to clean up orphaned registry entries.
 
-## From [[drive-research-architektur-und-implementierung-intelligenter-ki-a-micro02|drive-research-architektur-und-implementierung-intelligenter-ki-a-micro02]] (2026-06-09)
+## From [drive-research-architektur-und-implementierung-intelligenter-ki-a-micro02](/entities/drive-research-architektur-und-implementierung-intelligenter-ki-a-micro02.md) (2026-06-09)
 - Can be used to read environment variables like 'Path' using [Environment]::GetEnvironmentVariable('Path', 'Machine').
 - Can be used to write environment variables back to the registry using [Environment]::SetEnvironmentVariable('Path', $newPath, Target).
 - Can be used to check path existence with Test-Path cmdlet.
 
-## From [[gzmo-soul-merged-new-part2-micro05|gzmo-soul-merged-new-part2-micro05]] (2026-06-09)
+## From [gzmo-soul-merged-new-part2-micro05](/entities/gzmo-soul-merged-new-part2-micro05.md) (2026-06-09)
 - Used by agents to identify 'orphaned' registry entries and dead links.
 - Used to correct the PATH variable.

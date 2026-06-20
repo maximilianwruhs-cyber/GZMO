@@ -14,17 +14,17 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-08).
 
 ## Entities
-- [[mermaid-js|Mermaid.js]] (TOOL)
-- [[shields-io|Shields.io]] (TOOL)
-- [[readme-md|README.md]] (CONCEPT)
-- [[telemetry|Telemetry]] (CONCEPT)
-- [[dry-principle|DRY principle]] (CONCEPT)
-- [[html|HTML]] (TOOL)
-- [[doc-rot|Doc-Rot]] (CONCEPT)
-- [[trust-signals|Trust Signals]] (CONCEPT)
-- [[software-documentation-architecture|Software Documentation Architecture]] (CONCEPT)
-- [[github-flavored-markdown-gfm|GitHub-Flavored Markdown (GFM)]] (CONCEPT)
-- [[javascript|JavaScript]] (TOOL)
+- [Mermaid.js](/entities/mermaid-js.md) (TOOL)
+- [Shields.io](/entities/shields-io.md) (TOOL)
+- [README.md](/entities/readme-md.md) (CONCEPT)
+- [Telemetry](/entities/telemetry.md) (CONCEPT)
+- [DRY principle](/entities/dry-principle.md) (CONCEPT)
+- [HTML](/entities/html.md) (TOOL)
+- [Doc-Rot](/entities/doc-rot.md) (CONCEPT)
+- [Trust Signals](/entities/trust-signals.md) (CONCEPT)
+- [Software Documentation Architecture](/entities/software-documentation-architecture.md) (CONCEPT)
+- [GitHub-Flavored Markdown (GFM)](/entities/github-flavored-markdown-gfm.md) (CONCEPT)
+- [JavaScript](/entities/javascript.md) (TOOL)
 
 ## Relations
 - README.md → PART_OF → Software Documentation Architecture

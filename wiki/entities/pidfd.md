@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[gzmo-soul-merged-new-part2-micro04|gzmo-soul-merged-new-part2-micro04]] (2026-06-10)
+## From [gzmo-soul-merged-new-part2-micro04](/entities/gzmo-soul-merged-new-part2-micro04.md) (2026-06-10)
 - An API providing a stable file descriptor bound to a process lifecycle.
 - Prevents TOCTOU problems during PID recycling.

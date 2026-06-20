@@ -14,9 +14,9 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[aether-grid-micro01|aether-grid-micro01]] (2026-06-09)
+## From [aether-grid-micro01](/entities/aether-grid-micro01.md) (2026-06-09)
 - Deterministic hardware sensors.
 - Override probabilistic model assumptions in Sensor-Contradiction scenario.
 
-## From [[aether-grid-micro03|aether-grid-micro03]] (2026-06-09)
+## From [aether-grid-micro03](/entities/aether-grid-micro03.md) (2026-06-09)
 - Bus experiences latencies.

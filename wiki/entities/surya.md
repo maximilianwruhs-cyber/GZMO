@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-token-efficient-bol-processing-architecture|drive-research-token-efficient-bol-processing-architecture]] (2026-06-08)
+## From [drive-research-token-efficient-bol-processing-architecture](/entities/drive-research-token-efficient-bol-processing-architecture.md) (2026-06-08)
 - A specialized local parser for localized, air-gapped processing.
 - Provides highly accurate line-level bounding box detection and reading order determination.
 - Excels at identifying complex logical blocks across varied document formats.

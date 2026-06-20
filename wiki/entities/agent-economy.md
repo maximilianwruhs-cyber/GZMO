@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-mcp-landscape-research-report|drive-research-mcp-landscape-research-report]] (2026-06-08)
+## From [drive-research-mcp-landscape-research-report](/entities/drive-research-mcp-landscape-research-report.md) (2026-06-08)
 - The foundational infrastructure is being fostered by evolving marketplaces.
 - Emerging platforms integrate bilateral trust models and micro-transaction protocols.

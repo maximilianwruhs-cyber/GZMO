@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part4|ai-research-part4]] (2026-06-08)
+## From [ai-research-part4](/entities/ai-research-part4.md) (2026-06-08)
 - Attempts to mitigate high computational and memory costs of Transformer architecture.
 - Reduces computational complexity to O(N).
 - Achieves efficiency by lossy compression of contextual information, leading to performance degradation.

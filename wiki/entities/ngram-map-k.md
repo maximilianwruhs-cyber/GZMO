@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[architectures-and-optimizations-for-speculative-de-micro05|architectures-and-optimizations-for-speculative-de-micro05]] (2026-06-09)
+## From [architectures-and-optimizations-for-speculative-de-micro05](/entities/architectures-and-optimizations-for-speculative-de-micro05.md) (2026-06-09)
 - Maintains an internal hash-map.
 - Tracks current n-gram and subsequent continuations.
 - Best for structured outputs where sequences frequently recur.

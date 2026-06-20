@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[openclaw-deep-research-part5-micro08|openclaw-deep-research-part5-micro08]] (2026-06-10)
+## From [openclaw-deep-research-part5-micro08](/entities/openclaw-deep-research-part5-micro08.md) (2026-06-10)
 - A collection of pre-built skills and plugins.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: ALGORITHM
 
-## From [[ai-research-part3-micro03|ai-research-part3-micro03]] (2026-06-09)
+## From [ai-research-part3-micro03](/entities/ai-research-part3-micro03.md) (2026-06-09)
 - progressively forces self-modifying policies to discover more effective self-modification strategies
 - core mechanism is based on hindsight
 - enforces continual improvement by ensuring that only those self-modifications associated with demonstrably greater reward intake per unit time are preserved

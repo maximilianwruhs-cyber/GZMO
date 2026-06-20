@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[aether-grid-micro02|aether-grid-micro02]] (2026-06-09)
+## From [aether-grid-micro02](/entities/aether-grid-micro02.md) (2026-06-09)
 - Hardware-Bridge
 - Core (Docker) integrates SNMP v3, IPP, KNX (xknx 3.14+ 2026), Zigbee/Matter
 - --net=host + NVIDIA GPU-Passthrough for parallel inference

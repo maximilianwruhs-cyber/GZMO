@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-cuda-memory-locking-limits-configuration|drive-research-cuda-memory-locking-limits-configuration]] (2026-06-08)
+## From [drive-research-cuda-memory-locking-limits-configuration](/entities/drive-research-cuda-memory-locking-limits-configuration.md) (2026-06-08)
 - Standard PAM settings defined in /etc/security/limits.conf do not apply when a service is managed by systemd.
 - Configuration directives must be defined in the PAM limits configuration subsystem to apply resource limits persistently.
 - Editing /etc/security/limits.conf is standard, but deploying a dedicated configuration file inside /etc/security/limits.d/ is preferred.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part7|ai-research-part7]] (2026-06-08)
+## From [ai-research-part7](/entities/ai-research-part7.md) (2026-06-08)
 - Skills wrapping providers like Exa or Tavily.
 - Provide agents with extremely fast, AI-optimized web search and structured data extraction capabilities.
 - Bypass the noise and high token cost of raw HTML scraping.

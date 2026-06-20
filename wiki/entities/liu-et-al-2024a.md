@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: AUTHOR
 
-## From [[ai-research-part7|ai-research-part7]] (2026-06-08)
+## From [ai-research-part7](/entities/ai-research-part7.md) (2026-06-08)
 - Authored "Deepseek-v2: A strong, economical, and efficient mixture-of-experts language model."
 - Published in arXiv preprint arXiv:2405.04434, 2024a.

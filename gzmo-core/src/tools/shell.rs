@@ -12,6 +12,7 @@ use async_trait::async_trait;
 use serde_json::json;
 use std::time::Duration;
 
+use crate::config::ComplianceConfig;
 use crate::tools::{ToolDef, ToolHandler};
 
 /// Safe command prefixes. Only the first whitespace-delimited token of the
@@ -84,6 +85,8 @@ pub struct ShellExecTool {
     pub session_id: Option<String>,
     /// Additional first-token binaries (e.g. subagent remediation: `cd`, `mkdir`).
     pub extra_prefixes: Vec<String>,
+    /// Sovereign Node compliance (blocks curl/wget/Agent-Reach when cloud disallowed).
+    pub compliance: ComplianceConfig,
 }
 
 impl Default for ShellExecTool {
@@ -95,11 +98,16 @@ impl Default for ShellExecTool {
             ccr: None,
             session_id: None,
             extra_prefixes: Vec::new(),
+            compliance: ComplianceConfig::default(),
         }
     }
 }
 
 impl ShellExecTool {
+    pub fn with_compliance(mut self, compliance: ComplianceConfig) -> Self {
+        self.compliance = compliance;
+        self
+    }
     pub fn with_extra_prefixes(mut self, extra_prefixes: Vec<String>) -> Self {
         self.extra_prefixes = extra_prefixes;
         self
@@ -137,6 +145,7 @@ impl ShellExecTool {
             ccr: Some(ccr),
             session_id: Some(session_id),
             extra_prefixes,
+            compliance: ComplianceConfig::default(),
         }
     }
 }
@@ -164,6 +173,11 @@ impl ToolHandler for ShellExecTool {
         let command = args["command"]
             .as_str()
             .ok_or_else(|| anyhow::anyhow!("Missing 'command' argument"))?;
+
+        if let Some(reason) = crate::compliance::shell_command_block_reason(command, &self.compliance) {
+            tracing::warn!(command = %command, reason = %reason, "Blocked: compliance gate");
+            return Ok(format!("ERROR: {reason}"));
+        }
 
         // ─── SECURITY ALLOWLIST ───
         let binary_name = shell_command_binary(command);

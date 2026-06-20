@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[openclaw-deep-research-part6|openclaw-deep-research-part6]] (2026-06-08)
+## From [openclaw-deep-research-part6](/entities/openclaw-deep-research-part6.md) (2026-06-08)
 - Keeps local AI agents useful, cheap, and safe by running deterministic checks first and escalating to model calls only when needed.
 - A periodic health and state signal that runs a layered decision pipeline.
 - Treats agent health as a disciplined control loop, not a chat-first workflow.

@@ -14,11 +14,11 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[the-2026-linux-workstation-micro01|the-2026-linux-workstation-micro01]] (2026-06-09)
+## From [the-2026-linux-workstation-micro01](/entities/the-2026-linux-workstation-micro01.md) (2026-06-09)
 - Curated research corpus consolidated from Google Takeout.
 - Sources: 2 documents.
 
-## From [[the-2026-linux-workstation-micro03|the-2026-linux-workstation-micro03]] (2026-06-09)
+## From [the-2026-linux-workstation-micro03](/entities/the-2026-linux-workstation-micro03.md) (2026-06-09)
 - The software layer determines workstation functionality.
 - Optimized Linux kernel interfaces with hardware.
 - Maturation of Wayland compositors neutralizes historical NVIDIA penalty.

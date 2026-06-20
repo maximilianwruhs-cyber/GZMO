@@ -14,21 +14,21 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[customizations-starter-pack|Customizations Starter Pack]] (CONCEPT)
-- [[gemini-models|Gemini models]] (SYSTEM)
-- [[owasp|OWASP]] (ORGANIZATION)
-- [[wcag-aa|WCAG AA]] (CONCEPT)
-- [[llm|LLM]] (CONCEPT)
-- [[workflows|Workflows]] (CONCEPT)
-- [[global-rules|Global Rules]] (CONCEPT)
-- [[google-antigravity|Google Antigravity]] (SYSTEM)
-- [[ci-cd|CI/CD]] (CONCEPT)
-- [[jest|Jest]] (TOOL)
-- [[tailwind-css|Tailwind CSS]] (TOOL)
-- [[vitest|Vitest]] (TOOL)
-- [[next-js|Next.js]] (TOOL)
-- [[workspace-rules|Workspace Rules]] (CONCEPT)
-- [[typescript|TypeScript]] (TOOL)
+- [Customizations Starter Pack](/entities/customizations-starter-pack.md) (CONCEPT)
+- [Gemini models](/entities/gemini-models.md) (SYSTEM)
+- [OWASP](/entities/owasp.md) (ORGANIZATION)
+- [WCAG AA](/entities/wcag-aa.md) (CONCEPT)
+- [LLM](/entities/llm.md) (CONCEPT)
+- [Workflows](/entities/workflows.md) (CONCEPT)
+- [Global Rules](/entities/global-rules.md) (CONCEPT)
+- [Google Antigravity](/entities/google-antigravity.md) (SYSTEM)
+- [CI/CD](/entities/ci-cd.md) (CONCEPT)
+- [Jest](/entities/jest.md) (TOOL)
+- [Tailwind CSS](/entities/tailwind-css.md) (TOOL)
+- [Vitest](/entities/vitest.md) (TOOL)
+- [Next.js](/entities/next-js.md) (TOOL)
+- [Workspace Rules](/entities/workspace-rules.md) (CONCEPT)
+- [TypeScript](/entities/typescript.md) (TOOL)
 
 ## Relations
 - Customizations Starter Pack → PART_OF → Global Rules

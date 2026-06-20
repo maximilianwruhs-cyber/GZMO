@@ -14,6 +14,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-automating-linux-hardware-detection-micro03|drive-research-automating-linux-hardware-detection-micro03]] (2026-06-09)
+## From [drive-research-automating-linux-hardware-detection-micro03](/entities/drive-research-automating-linux-hardware-detection-micro03.md) (2026-06-09)
 - Discovery utilities attempt to read arbitrary PCI configuration space registers.
 - Uncorrected PCIe errors are monitored by NVIDIA DRIVE OS safety framework.

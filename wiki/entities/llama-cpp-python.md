@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[drive-research-llamacpp-optimization-blueprint-micro04|drive-research-llamacpp-optimization-blueprint-micro04]] (2026-06-09)
+## From [drive-research-llamacpp-optimization-blueprint-micro04](/entities/drive-research-llamacpp-optimization-blueprint-micro04.md) (2026-06-09)
 - LLM inference in C/C++
 - Used for cloud KG extraction
 - Supports speculative decoding
@@ -23,7 +23,7 @@ Type: PROJECT
 - Related to llama.cpp
 - Has issues regarding default thread count and batched inference
 
-## From [[resilient-rust-based-mcp-client-and-llm-orchestrat-micro06|resilient-rust-based-mcp-client-and-llm-orchestrat-micro06]] (2026-06-09)
+## From [resilient-rust-based-mcp-client-and-llm-orchestrat-micro06](/entities/resilient-rust-based-mcp-client-and-llm-orchestrat-micro06.md) (2026-06-09)
 - Highly popular library.
 - Offers its own OpenAI-compatible web server.
 - Server dependencies installed via pip install llama-cpp-python[server].

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part1|ai-research-part1]] (2026-06-08)
+## From [ai-research-part1](/entities/ai-research-part1.md) (2026-06-08)
 - Involves inter-block attention.
 - Its reads are amortized across all layers in a block through batching.
 - Can partially overlap with the computation of the first layer in the block.

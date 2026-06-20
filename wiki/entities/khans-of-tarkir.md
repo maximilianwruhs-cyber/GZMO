@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[the-architecture-of-a-trading-card-game-micro02|the-architecture-of-a-trading-card-game-micro02]] (2026-06-09)
+## From [the-architecture-of-a-trading-card-game-micro02](/entities/the-architecture-of-a-trading-card-game-micro02.md) (2026-06-09)
 - A set where the team realized the environment was too mechanically dense and the 'morph' mechanic was thematically isolated.
 - The team had the authority to overhaul or replace mechanics.

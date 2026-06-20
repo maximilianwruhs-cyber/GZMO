@@ -14,12 +14,12 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[prfaas-cross-datacenter-llm-serving-via-selective-micro04|prfaas-cross-datacenter-llm-serving-via-selective-micro04]] (2026-06-09)
+## From [prfaas-cross-datacenter-llm-serving-via-selective-micro04](/entities/prfaas-cross-datacenter-llm-serving-via-selective-micro04.md) (2026-06-09)
 - A system comprising PrfaaS and local PD clusters.
 - Increases deployment scalability and lowers cost.
 - Functions as a selective extension to conventional intra-cluster PD disaggregation.
 
-## From [[prfaas-cross-datacenter-llm-serving-via-selective-micro05|prfaas-cross-datacenter-llm-serving-via-selective-micro05]] (2026-06-10)
+## From [prfaas-cross-datacenter-llm-serving-via-selective-micro05](/entities/prfaas-cross-datacenter-llm-serving-via-selective-micro05.md) (2026-06-10)
 - A cluster used for offloading compute-intensive long-context prefill.
 - Currently compute-bound with ample bandwidth headroom.
 - A disaggregation architecture that augments system serving throughput at low cost.

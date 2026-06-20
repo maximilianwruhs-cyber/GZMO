@@ -6,7 +6,7 @@
 
 [meta]
 version = "1.1"
-total_commands = 17
+total_commands = 18
 engine = "chaos"  # All RNG seeded from Randomizer's Lorenz attractor
 
 # ─── Chaos & Games ───────────────────────────────────────────────
@@ -144,3 +144,10 @@ args = ""
 type = "static"
 handler = "skill_help.sh"
 icon = "❓"
+
+[commands.arxiv]
+description = "Live arXiv retrieval — search, OAI-PMH harvest, fetch, Semantic Scholar graph (Tier 2 network)"
+args = "[status|search|harvest|fetch|graph] [options]"
+type = "static"
+handler = "skill_arxiv.sh"
+icon = "📄"

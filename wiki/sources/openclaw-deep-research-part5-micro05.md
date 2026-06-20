@@ -14,22 +14,22 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-10).
 
 ## Entities
-- [[crewai|CrewAI]] (SYSTEM)
-- [[langchain|LangChain]] (SYSTEM)
-- [[feishu|Feishu]] (SYSTEM)
-- [[tencent-cloud|Tencent Cloud]] (ORGANIZATION)
-- [[slack|Slack]] (SYSTEM)
-- [[qq|QQ]] (SYSTEM)
-- [[lighthouse|Lighthouse]] (SYSTEM)
-- [[metagpt|MetaGPT]] (SYSTEM)
-- [[clawhub|Clawhub]] (TOOL)
-- [[whatsapp|WhatsApp]] (SYSTEM)
-- [[wechat-work|WeChat Work]] (SYSTEM)
-- [[dingtalk|DingTalk]] (SYSTEM)
-- [[openclaw|OpenClaw]] (SYSTEM)
-- [[telegram|Telegram]] (SYSTEM)
-- [[autogpt|AutoGPT]] (SYSTEM)
-- [[discord|Discord]] (SYSTEM)
+- [CrewAI](/entities/crewai.md) (SYSTEM)
+- [LangChain](/entities/langchain.md) (SYSTEM)
+- [Feishu](/entities/feishu.md) (SYSTEM)
+- [Tencent Cloud](/entities/tencent-cloud.md) (ORGANIZATION)
+- [Slack](/entities/slack.md) (SYSTEM)
+- [QQ](/entities/qq.md) (SYSTEM)
+- [Lighthouse](/entities/lighthouse.md) (SYSTEM)
+- [MetaGPT](/entities/metagpt.md) (SYSTEM)
+- [Clawhub](/entities/clawhub.md) (TOOL)
+- [WhatsApp](/entities/whatsapp.md) (SYSTEM)
+- [WeChat Work](/entities/wechat-work.md) (SYSTEM)
+- [DingTalk](/entities/dingtalk.md) (SYSTEM)
+- [OpenClaw](/entities/openclaw.md) (SYSTEM)
+- [Telegram](/entities/telegram.md) (SYSTEM)
+- [AutoGPT](/entities/autogpt.md) (SYSTEM)
+- [Discord](/entities/discord.md) (SYSTEM)
 
 ## Relations
 - OpenClaw → USES → Lighthouse

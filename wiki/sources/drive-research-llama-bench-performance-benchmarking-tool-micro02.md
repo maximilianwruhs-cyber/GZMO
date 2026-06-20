@@ -14,18 +14,18 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[estimated-prompt-processing-time-est-ppt|Estimated Prompt Processing Time (est_ppt)]] (CONCEPT)
-- [[llama-benchy|llama-benchy]] (TOOL)
-- [[flash-attention|Flash Attention]] (CONCEPT)
-- [[llama-bench|llama-bench]] (TOOL)
-- [[native-compiled-upstream-servers|native compiled upstream servers]] (SYSTEM)
-- [[optimized-lightweight-api-proxies|optimized, lightweight API proxies]] (SYSTEM)
-- [[amd-hardware|AMD hardware]] (SYSTEM)
-- [[rocm|ROCm]] (TOOL)
-- [[time-to-first-response-ttfr|Time to First Response (TTFR)]] (CONCEPT)
-- [[end-to-end-time-to-first-token-e2e-ttft|End-to-End Time to First Token (e2e_ttft)]] (CONCEPT)
-- [[radv-vulkan-driver|RADV Vulkan driver]] (TOOL)
-- [[software-wrapper|software wrapper]] (CONCEPT)
+- [Estimated Prompt Processing Time (est_ppt)](/entities/estimated-prompt-processing-time-est-ppt.md) (CONCEPT)
+- [llama-benchy](/entities/llama-benchy.md) (TOOL)
+- [Flash Attention](/entities/flash-attention.md) (CONCEPT)
+- [llama-bench](/entities/llama-bench.md) (TOOL)
+- [native compiled upstream servers](/entities/native-compiled-upstream-servers.md) (SYSTEM)
+- [optimized, lightweight API proxies](/entities/optimized-lightweight-api-proxies.md) (SYSTEM)
+- [AMD hardware](/entities/amd-hardware.md) (SYSTEM)
+- [ROCm](/entities/rocm.md) (TOOL)
+- [Time to First Response (TTFR)](/entities/time-to-first-response-ttfr.md) (CONCEPT)
+- [End-to-End Time to First Token (e2e_ttft)](/entities/end-to-end-time-to-first-token-e2e-ttft.md) (CONCEPT)
+- [RADV Vulkan driver](/entities/radv-vulkan-driver.md) (TOOL)
+- [software wrapper](/entities/software-wrapper.md) (CONCEPT)
 
 ## Relations
 - llama-benchy → RELATED_TO → llama-bench

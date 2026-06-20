@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-evolution-of-artificial-intelligence-evaluatio-micro04|the-evolution-of-artificial-intelligence-evaluatio-micro04]] (2026-06-09)
+## From [the-evolution-of-artificial-intelligence-evaluatio-micro04](/entities/the-evolution-of-artificial-intelligence-evaluatio-micro04.md) (2026-06-09)
 - Is featured in the evaluator's prompt.
 - Prevents models from hallucinating false precision on ambiguous data.

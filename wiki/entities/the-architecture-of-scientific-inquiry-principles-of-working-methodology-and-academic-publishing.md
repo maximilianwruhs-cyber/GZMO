@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-architecture-of-scientific-inquiry-and-academi|the-architecture-of-scientific-inquiry-and-academi]] (2026-06-08)
+## From [the-architecture-of-scientific-inquiry-and-academi](/entities/the-architecture-of-scientific-inquiry-and-academi.md) (2026-06-08)
 - A framework employed to communicate scientific discoveries.
 - Mastering the lifecycle of a scientific project is paramount for contributing knowledge.
 - Involves linguistic precision, stylistic conventions, and publication strategies.
@@ -22,7 +22,7 @@ Type: CONCEPT
 - Deconstructs methodologies, tools, and ethical frameworks of scholarly communication.
 - Provides an exhaustive, nuanced examination.
 
-## From [[drive-research-scientific-writing-and-publication-process-micro01|drive-research-scientific-writing-and-publication-process-micro01]] (2026-06-09)
+## From [drive-research-scientific-writing-and-publication-process-micro01](/entities/drive-research-scientific-writing-and-publication-process-micro01.md) (2026-06-09)
 - It is a book about scientific inquiry, principles of working, methodology, and academic publishing.
 - It discusses the lifecycle of a scientific project.
 - It examines the principles governing scientific working and academic paper writing.

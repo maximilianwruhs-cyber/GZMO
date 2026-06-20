@@ -14,8 +14,8 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[cloud-kg-extraction|cloud KG extraction]] (CONCEPT)
-- [[the-architecture-of-a-trading-card-game|the-architecture-of-a-trading-card-game]] (CONCEPT)
+- [cloud KG extraction](/entities/cloud-kg-extraction.md) (CONCEPT)
+- [the-architecture-of-a-trading-card-game](/entities/the-architecture-of-a-trading-card-game.md) (CONCEPT)
 
 ## Relations
 - the-architecture-of-a-trading-card-game → RELATED_TO → cloud KG extraction

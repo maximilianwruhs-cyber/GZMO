@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[optimizing-nvidia-blackwell-sm120-part2-micro06|optimizing-nvidia-blackwell-sm120-part2-micro06]] (2026-06-10)
+## From [optimizing-nvidia-blackwell-sm120-part2-micro06](/entities/optimizing-nvidia-blackwell-sm120-part2-micro06.md) (2026-06-10)
 - Support Vector Machine used in an ensemble model

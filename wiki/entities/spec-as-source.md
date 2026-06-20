@@ -17,17 +17,17 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-ai-agents-and-spec-driven-development-micro02|drive-research-ai-agents-and-spec-driven-development-micro02]] (2026-06-09)
+## From [drive-research-ai-agents-and-spec-driven-development-micro02](/entities/drive-research-ai-agents-and-spec-driven-development-micro02.md) (2026-06-09)
 - The specification is the primary, enduring artifact, and the code is entirely derivative.
 - Human engineers exclusively write and edit specifications.
 - Autonomous AI agents act as highly advanced compilers.
 
-## From [[drive-research-ai-agents-and-spec-driven-development1-micro01|drive-research-ai-agents-and-spec-driven-development1-micro01]] (2026-06-09)
+## From [drive-research-ai-agents-and-spec-driven-development1-micro01](/entities/drive-research-ai-agents-and-spec-driven-development1-micro01.md) (2026-06-09)
 - The specification is the primary, enduring artifact, and the code is entirely derivative.
 - Human engineers exclusively write and edit specifications.
 - Autonomous AI agents act as advanced compilers.
 
-## From [[spec-driven-development-architecting-the-era-of-a-micro02|spec-driven-development-architecting-the-era-of-a-micro02]] (2026-06-10)
+## From [spec-driven-development-architecting-the-era-of-a-micro02](/entities/spec-driven-development-architecting-the-era-of-a-micro02.md) (2026-06-10)
 - The most advanced implementation of SDD.
 - The specification is the primary, enduring artifact and code is derivative.
 - Rooted in Design by Contract principles.

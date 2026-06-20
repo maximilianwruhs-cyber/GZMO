@@ -14,21 +14,21 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-08).
 
 ## Entities
-- [[mercedes-benz-jauernig|Mercedes Benz Jauernig]] (ORGANIZATION)
-- [[mercedes-benz-donaustadt|Mercedes Benz Donaustadt]] (ORGANIZATION)
-- [[pr-gge-kfz|Prügge Kfz]] (ORGANIZATION)
-- [[ell-schienenverkehr|ELL Schienenverkehr]] (ORGANIZATION)
-- [[ki-gest-tzter-technik|KI-gestützter Technik]] (CONCEPT)
-- [[zugsicherungssystemen|Zugsicherungssystemen]] (SYSTEM)
-- [[elektronik-diagnose|Elektronik & Diagnose]] (CONCEPT)
-- [[fahrzeugtechnik|Fahrzeugtechnik]] (CONCEPT)
-- [[etl-schienenverkehr|ETL Schienenverkehr]] (ORGANIZATION)
-- [[it-software|IT & Software]] (CONCEPT)
-- [[schienenverkehrssysteme|Schienenverkehrssysteme]] (SYSTEM)
-- [[maximilian-wruhs|MAXIMILIAN WRUHS]] (PERSON)
-- [[siegfried-marcus-berufsschule-htl-donaustadt|Siegfried Marcus Berufsschule & HTL Donaustadt]] (ORGANIZATION)
-- [[google-takeout|Google Takeout]] (TOOL)
-- [[kfz-mechatronik|KFZ-Mechatronik]] (CONCEPT)
+- [Mercedes Benz Jauernig](/entities/mercedes-benz-jauernig.md) (ORGANIZATION)
+- [Mercedes Benz Donaustadt](/entities/mercedes-benz-donaustadt.md) (ORGANIZATION)
+- [Prügge Kfz](/entities/pr-gge-kfz.md) (ORGANIZATION)
+- [ELL Schienenverkehr](/entities/ell-schienenverkehr.md) (ORGANIZATION)
+- [KI-gestützter Technik](/entities/ki-gest-tzter-technik.md) (CONCEPT)
+- [Zugsicherungssystemen](/entities/zugsicherungssystemen.md) (SYSTEM)
+- [Elektronik & Diagnose](/entities/elektronik-diagnose.md) (CONCEPT)
+- [Fahrzeugtechnik](/entities/fahrzeugtechnik.md) (CONCEPT)
+- [ETL Schienenverkehr](/entities/etl-schienenverkehr.md) (ORGANIZATION)
+- [IT & Software](/entities/it-software.md) (CONCEPT)
+- [Schienenverkehrssysteme](/entities/schienenverkehrssysteme.md) (SYSTEM)
+- [MAXIMILIAN WRUHS](/entities/maximilian-wruhs.md) (PERSON)
+- [Siegfried Marcus Berufsschule & HTL Donaustadt](/entities/siegfried-marcus-berufsschule-htl-donaustadt.md) (ORGANIZATION)
+- [Google Takeout](/entities/google-takeout.md) (TOOL)
+- [KFZ-Mechatronik](/entities/kfz-mechatronik.md) (CONCEPT)
 
 ## Relations
 - MAXIMILIAN WRUHS → USES → ETL Schienenverkehr

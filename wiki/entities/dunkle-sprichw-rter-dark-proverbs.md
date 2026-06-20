@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-archival-truth-part1-micro02|the-archival-truth-part1-micro02]] (2026-06-09)
+## From [the-archival-truth-part1-micro02](/entities/the-archival-truth-part1-micro02.md) (2026-06-09)
 - Culturally ingrained sayings that can have pathological and socioeconomic consequences.
 - Can act as cognitive prisons that severely limit a person's thinking and behavioral repertoire.
 - Examples include 'What little Hans doesn't learn, big Hans will never learn' and 'Cobbler, stick to your last'.

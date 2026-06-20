@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[obolus-micro05|obolus-micro05]] (2026-06-09)
+## From [obolus-micro05](/entities/obolus-micro05.md) (2026-06-09)
 - Syntax to be validated by System Hygiene Agent.
 - Current system structure for NUC6i7KYK Project.
 - Optimized docker-compose.yaml files are a core competency of Docker-Architect.

@@ -15,10 +15,10 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-create-a-tier-list-of-specialized-small-models|drive-research-create-a-tier-list-of-specialized-small-models]] (2026-06-08)
+## From [drive-research-create-a-tier-list-of-specialized-small-models](/entities/drive-research-create-a-tier-list-of-specialized-small-models.md) (2026-06-08)
 - Zeta 2 (8B) is distilled from this model.
 
-## From [[architectures-for-agentic-memory-virtual-context-micro06|architectures-for-agentic-memory-virtual-context-micro06]] (2026-06-09)
+## From [architectures-for-agentic-memory-virtual-context-micro06](/entities/architectures-for-agentic-memory-virtual-context-micro06.md) (2026-06-09)
 - A modern frontier model.
 - Features advanced native reasoning capabilities.
 - Processes complex logic directly within encrypted reasoning tokens.

@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-flashinfer-moe-fp4-jit-error|drive-research-flashinfer-moe-fp4-jit-error]] (2026-06-08)
+## From [drive-research-flashinfer-moe-fp4-jit-error](/entities/drive-research-flashinfer-moe-fp4-jit-error.md) (2026-06-08)
 - CUDA version where CUTLASS template bugs are triggered
 - Compiler target compute_120a is used
 
-## From [[drive-research-optimizing-cuda-performance-with-fp4-fp6-micro01|drive-research-optimizing-cuda-performance-with-fp4-fp6-micro01]] (2026-06-09)
+## From [drive-research-optimizing-cuda-performance-with-fp4-fp6-micro01](/entities/drive-research-optimizing-cuda-performance-with-fp4-fp6-micro01.md) (2026-06-09)
 - An older toolchain under which llama.cpp works reliably with native MMQ enabled.
 - Achieves 201–211 tok/s on RTX 5090.

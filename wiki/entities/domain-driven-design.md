@@ -14,11 +14,11 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[architectural-framework-for-scalable-codebase-rest|architectural-framework-for-scalable-codebase-rest]] (2026-06-08)
+## From [architectural-framework-for-scalable-codebase-rest](/entities/architectural-framework-for-scalable-codebase-rest.md) (2026-06-08)
 - It is a principle around which the file structure must be reorganized.
 - It groups code by business capability.
 - It creates isolated bounded contexts that can scale independently.
 
-## From [[drive-research-advanced-prompt-engineering-for-comprehensive-code|drive-research-advanced-prompt-engineering-for-comprehensive-code]] (2026-06-08)
+## From [drive-research-advanced-prompt-engineering-for-comprehensive-code](/entities/drive-research-advanced-prompt-engineering-for-comprehensive-code.md) (2026-06-08)
 - A dimension evaluated in holistic codebase reviews.
 - An approach to software development that emphasizes the domain model.

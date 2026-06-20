@@ -14,21 +14,21 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[parent-component|Parent component]] (CONCEPT)
-- [[macroquad|Macroquad]] (TOOL)
-- [[ecs|ECS]] (CONCEPT)
-- [[transform-propagation-system|transform_propagation_system]] (SYSTEM)
-- [[bevy|Bevy]] (TOOL)
-- [[archetype-based-entity-component-system|Archetype-based Entity Component System]] (SYSTEM)
-- [[handle-pattern|Handle Pattern]] (CONCEPT)
-- [[rust|Rust]] (TOOL)
-- [[data-oriented-design|Data-Oriented Design]] (CONCEPT)
-- [[ggez|Ggez]] (TOOL)
-- [[webgpu|WebGPU]] (TOOL)
-- [[unity|Unity]] (TOOL)
-- [[godot|Godot]] (TOOL)
-- [[object-oriented-design|Object-Oriented design]] (CONCEPT)
-- [[fyrox|Fyrox]] (TOOL)
+- [Parent component](/entities/parent-component.md) (CONCEPT)
+- [Macroquad](/entities/macroquad.md) (TOOL)
+- [ECS](/entities/ecs.md) (CONCEPT)
+- [transform_propagation_system](/entities/transform-propagation-system.md) (SYSTEM)
+- [Bevy](/entities/bevy.md) (TOOL)
+- [Archetype-based Entity Component System](/entities/archetype-based-entity-component-system.md) (SYSTEM)
+- [Handle Pattern](/entities/handle-pattern.md) (CONCEPT)
+- [Rust](/entities/rust.md) (TOOL)
+- [Data-Oriented Design](/entities/data-oriented-design.md) (CONCEPT)
+- [Ggez](/entities/ggez.md) (TOOL)
+- [WebGPU](/entities/webgpu.md) (TOOL)
+- [Unity](/entities/unity.md) (TOOL)
+- [Godot](/entities/godot.md) (TOOL)
+- [Object-Oriented design](/entities/object-oriented-design.md) (CONCEPT)
+- [Fyrox](/entities/fyrox.md) (TOOL)
 
 ## Relations
 - transform_propagation_system → USES → Parent component

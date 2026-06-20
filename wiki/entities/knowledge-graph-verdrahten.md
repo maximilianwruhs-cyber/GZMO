@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[drive-research-tinyfolder-gzmo-architecture-analysis-product|drive-research-tinyfolder-gzmo-architecture-analysis-product]] (2026-06-08)
+## From [drive-research-tinyfolder-gzmo-architecture-analysis-product](/entities/drive-research-tinyfolder-gzmo-architecture-analysis-product.md) (2026-06-08)
 - An immediate strategic recommendation.
 - Connect graph.ts with task completion and retrieval augmentation.
 - Currently dead code.

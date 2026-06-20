@@ -14,16 +14,16 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[fear-of-missing-out-fomo|Fear of Missing Out (FOMO)]] (CONCEPT)
-- [[european-union|European Union]] (ORGANIZATION)
-- [[digital-fairness-act|Digital Fairness Act]] (CONCEPT)
-- [[united-states|United States]] (ORGANIZATION)
-- [[china|China]] (ORGANIZATION)
-- [[center-for-humane-technology-cht|Center for Humane Technology (CHT)]] (CONCEPT)
-- [[attention-economy|attention economy]] (CONCEPT)
-- [[nppa|NPPA]] (ORGANIZATION)
-- [[user-experience-ux-design|User Experience (UX) design]] (CONCEPT)
-- [[first-amendment|First Amendment]] (CONCEPT)
+- [Fear of Missing Out (FOMO)](/entities/fear-of-missing-out-fomo.md) (CONCEPT)
+- [European Union](/entities/european-union.md) (ORGANIZATION)
+- [Digital Fairness Act](/entities/digital-fairness-act.md) (CONCEPT)
+- [United States](/entities/united-states.md) (ORGANIZATION)
+- [China](/entities/china.md) (ORGANIZATION)
+- [Center for Humane Technology (CHT)](/entities/center-for-humane-technology-cht.md) (CONCEPT)
+- [attention economy](/entities/attention-economy.md) (CONCEPT)
+- [NPPA](/entities/nppa.md) (ORGANIZATION)
+- [User Experience (UX) design](/entities/user-experience-ux-design.md) (CONCEPT)
+- [First Amendment](/entities/first-amendment.md) (CONCEPT)
 
 ## Relations
 - NPPA → PART_OF → China

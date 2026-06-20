@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[the-archival-truth-part2-micro04|the-archival-truth-part2-micro04]] (2026-06-09)
+## From [the-archival-truth-part2-micro04](/entities/the-archival-truth-part2-micro04.md) (2026-06-09)
 - Wrote his memoir, The World of Yesterday (1942), from exile.
 - Witnessed the complete collapse of European humanism.
 - Noted with profound shame that 'Never... has a generation fallen from such intellectual heights as ours to such moral depths'.

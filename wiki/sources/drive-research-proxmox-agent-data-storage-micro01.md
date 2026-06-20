@@ -14,8 +14,8 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[google-takeout|Google Takeout]] (TOOL)
-- [[drive-research-proxmox-agent-data-storage|Drive Research Proxmox Agent Data Storage]] (PROJECT)
+- [Google Takeout](/entities/google-takeout.md) (TOOL)
+- [Drive Research Proxmox Agent Data Storage](/entities/drive-research-proxmox-agent-data-storage.md) (PROJECT)
 
 ## Relations
 - Drive Research Proxmox Agent Data Storage → USES → Google Takeout

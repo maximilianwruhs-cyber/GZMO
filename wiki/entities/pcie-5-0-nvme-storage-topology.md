@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-linux-gaming-and-ai-build-guide-micro02|drive-research-linux-gaming-and-ai-build-guide-micro02]] (2026-06-09)
+## From [drive-research-linux-gaming-and-ai-build-guide-micro02](/entities/drive-research-linux-gaming-and-ai-build-guide-micro02.md) (2026-06-09)
 - Demanded by the storage requirement for modern AI pipelines and advanced game engines.
 - Crucial for AI workloads.
 - Offers 64 GB/s bidirectional bandwidth.
@@ -30,7 +30,7 @@ Type: CONCEPT
 - The interface used by WD_Black SN8100.
 - The interface used by Samsung 990 Pro (4TB).
 
-## From [[the-2026-linux-workstation-micro03|the-2026-linux-workstation-micro03]] (2026-06-09)
+## From [the-2026-linux-workstation-micro03](/entities/the-2026-linux-workstation-micro03.md) (2026-06-09)
 - Critical for AI workloads.
 - Offers diminishing returns for game load times.
 - Provides 64 GB/s bidirectional bandwidth.

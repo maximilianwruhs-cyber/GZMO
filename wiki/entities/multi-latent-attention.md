@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-architecture-of-speculative-decoding-and-infer-part1-micro03|the-architecture-of-speculative-decoding-and-infer-part1-micro03]] (2026-06-10)
+## From [the-architecture-of-speculative-decoding-and-infer-part1-micro03](/entities/the-architecture-of-speculative-decoding-and-infer-part1-micro03.md) (2026-06-10)
 - Compresses the KV cache into a single latent vector.

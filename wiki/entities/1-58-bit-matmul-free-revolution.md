@@ -15,7 +15,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-du-hast-gesagt-part1|drive-research-du-hast-gesagt-part1]] (2026-06-08)
+## From [drive-research-du-hast-gesagt-part1](/entities/drive-research-du-hast-gesagt-part1.md) (2026-06-08)
 - Research spearheaded by Microsoft's BitNet and Falcon-Edge teams.
 - Uses 1.58-bit Ternary architectures.
 - Parameters reduced to -1, 0, or 1.
@@ -24,7 +24,7 @@ Type: CONCEPT
 - Runs locally on CPUs at high speeds.
 - Uses a fraction of memory.
 
-## From [[building-a-private-local-ai-development-environmen-micro06|building-a-private-local-ai-development-environmen-micro06]] (2026-06-09)
+## From [building-a-private-local-ai-development-environmen-micro06](/entities/building-a-private-local-ai-development-environmen-micro06.md) (2026-06-09)
 - Bleeding-edge research in AI model architectures.
 - Models use 1.58-bit Ternary architectures.
 - Parameters are reduced to -1, 0, or 1.

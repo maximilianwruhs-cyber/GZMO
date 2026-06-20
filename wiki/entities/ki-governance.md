@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-der-aufstieg-und-die-absicht-des-bibliothekars-age|drive-research-der-aufstieg-und-die-absicht-des-bibliothekars-age]] (2026-06-08)
+## From [drive-research-der-aufstieg-und-die-absicht-des-bibliothekars-age](/entities/drive-research-der-aufstieg-und-die-absicht-des-bibliothekars-age.md) (2026-06-08)
 - Eine Verlagerung der Rolle des menschlichen Bibliothekars.
 - Erfordert menschliche Aufsicht zur Prüfung von Agenten auf algorithmische Verzerrungen.

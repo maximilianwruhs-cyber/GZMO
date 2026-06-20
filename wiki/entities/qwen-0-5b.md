@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[building-a-private-local-ai-development-environmen-micro02|building-a-private-local-ai-development-environmen-micro02]] (2026-06-09)
+## From [building-a-private-local-ai-development-environmen-micro02](/entities/building-a-private-local-ai-development-environmen-micro02.md) (2026-06-09)
 - A tiny 'Draft-model' used in Speculative Decoding.

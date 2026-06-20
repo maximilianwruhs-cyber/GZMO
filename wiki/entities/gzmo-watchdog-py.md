@@ -15,13 +15,13 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[prompt-agent-engineering-part4-micro04|prompt-agent-engineering-part4-micro04]] (2026-06-09)
+## From [prompt-agent-engineering-part4-micro04](/entities/prompt-agent-engineering-part4-micro04.md) (2026-06-09)
 - Heartbeat script
 
-## From [[prompt-agent-engineering-part4-micro02|prompt-agent-engineering-part4-micro02]] (2026-06-10)
+## From [prompt-agent-engineering-part4-micro02](/entities/prompt-agent-engineering-part4-micro02.md) (2026-06-10)
 - Mentioned as a specific piece of deployment logic to drill into
 
-## From [[prompt-agent-engineering-part4-micro06|prompt-agent-engineering-part4-micro06]] (2026-06-10)
+## From [prompt-agent-engineering-part4-micro06](/entities/prompt-agent-engineering-part4-micro06.md) (2026-06-10)
 - Core Orchestrator
 - Generates DAG JSON payloads
 - Reads TELEMETRY.json to minimize token usage

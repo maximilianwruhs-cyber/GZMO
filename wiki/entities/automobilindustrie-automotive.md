@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part2|drive-research-ki-berater-fragebogen-für-kundenanalyse-part2]] (2026-06-08)
+## From [drive-research-ki-berater-fragebogen-für-kundenanalyse-part2](/entities/drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part2.md) (2026-06-08)
 - KI-Fokus verlagert sich in das Kernprodukt und die Fertigungsstraße.
 - Generative AI spielt eine Rolle im Fahrzeugdesign.
 - Predictive Maintenance ist ein Anwendungsfall.

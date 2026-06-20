@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[obolus-micro05|obolus-micro05]] (2026-06-09)
+## From [obolus-micro05](/entities/obolus-micro05.md) (2026-06-09)
 - Defines metrics for PostgreSQL, API-service, and Ingest-Jobs.
 - Implementation with modern tools like Grafana Alloy, Prometheus, Loki.
 - Focus on eBPF-based monitoring for 'Zero-Instrumentation' Observability.

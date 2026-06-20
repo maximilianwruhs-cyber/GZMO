@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[openclaw-deep-research-part8-micro04|openclaw-deep-research-part8-micro04]] (2026-06-09)
+## From [openclaw-deep-research-part8-micro04](/entities/openclaw-deep-research-part8-micro04.md) (2026-06-09)
 - Requires rigorous attention to security, privacy, and governance.
 - Deploying frameworks like LangChain, AutoGen, CrewAI, and OpenClaw demands attention to this.
 - The year 2026 is mentioned in relation to its evolving landscape.

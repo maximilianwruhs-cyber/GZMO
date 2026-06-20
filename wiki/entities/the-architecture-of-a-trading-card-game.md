@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-architecture-of-a-trading-card-game-micro01|the-architecture-of-a-trading-card-game-micro01]] (2026-06-09)
+## From [the-architecture-of-a-trading-card-game-micro01](/entities/the-architecture-of-a-trading-card-game-micro01.md) (2026-06-09)
 - This is a micro-split from a larger document.
 - It is related to cloud KG extraction.

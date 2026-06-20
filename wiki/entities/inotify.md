@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[bun-versus-nodejs-architectural-evaluation-for-b|bun-versus-nodejs-architectural-evaluation-for-b]] (2026-06-08)
+## From [bun-versus-nodejs-architectural-evaluation-for-b](/entities/bun-versus-nodejs-architectural-evaluation-for-b.md) (2026-06-08)
 - Core event notification subsystem on Linux
 - Used by Bun's native recursive filesystem watcher
 
-## From [[tui-framework|tui-framework]] (2026-06-08)
+## From [tui-framework](/entities/tui-framework.md) (2026-06-08)
 - Used for file watching on Linux.
 - Standard API for directory tree auto-updating.

@@ -14,12 +14,12 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-advanced-inference-acceleration|drive-research-advanced-inference-acceleration]] (2026-06-08)
+## From [drive-research-advanced-inference-acceleration](/entities/drive-research-advanced-inference-acceleration.md) (2026-06-08)
 - A framework for Sparse Mixture of Experts (MoE) models.
 - A tiny draft model predicts the expert sequence.
 - Enables Expert Lookahead Buffer (ELB) to preload expert weights asynchronously.
 
-## From [[the-architecture-of-speculative-decoding-and-infer-part1-micro01|the-architecture-of-speculative-decoding-and-infer-part1-micro01]] (2026-06-09)
+## From [the-architecture-of-speculative-decoding-and-infer-part1-micro01](/entities/the-architecture-of-speculative-decoding-and-infer-part1-micro01.md) (2026-06-09)
 - A technique for Sparse Mixture of Experts (MoE) models.
 - A tiny draft model predicts the expert sequence needed for future tokens.
 - Allows an Expert Lookahead Buffer (ELB) to preload expert weights asynchronously.

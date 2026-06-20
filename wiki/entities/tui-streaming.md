@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-hermes-session-storage-migration-analysis|drive-research-hermes-session-storage-migration-analysis]] (2026-06-08)
+## From [drive-research-hermes-session-storage-migration-analysis](/entities/drive-research-hermes-session-storage-migration-analysis.md) (2026-06-08)
 - Concerns leaks in the reasoning process.
 - When `display.show_reasoning: false`, reasoning flow is hidden during live streaming.
 - Reasoning is incorrectly injected into the segment store after completion.

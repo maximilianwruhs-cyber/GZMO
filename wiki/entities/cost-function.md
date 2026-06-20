@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: METRIC
 
-## From [[drive-research-free-ai-and-cs-self-study-roadmap|drive-research-free-ai-and-cs-self-study-roadmap]] (2026-06-08)
+## From [drive-research-free-ai-and-cs-self-study-roadmap](/entities/drive-research-free-ai-and-cs-self-study-roadmap.md) (2026-06-08)
 - neural networks 'learn' by incrementally adjusting their internal weights to find the absolute minimum of a cost function
 - how cost calculations function mathematically across multiple hidden layers

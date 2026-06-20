@@ -14,19 +14,19 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[sm120-blockscaled-mma-builder-inl|sm120_blockscaled_mma_builder.inl]] (SYSTEM)
-- [[cutlass|CUTLASS]] (TOOL)
-- [[msd|MSD]] (CONCEPT)
-- [[flashinfer|FlashInfer]] (TOOL)
-- [[razer|RaZeR]] (CONCEPT)
-- [[bf16|BF16]] (CONCEPT)
-- [[generate-kernels-py|generate_kernels.py]] (TOOL)
-- [[tensor-core|Tensor Core]] (SYSTEM)
-- [[fp4|FP4]] (CONCEPT)
-- [[marlin|Marlin]] (SYSTEM)
-- [[vllm|vLLM]] (SYSTEM)
-- [[cuda|CUDA]] (SYSTEM)
-- [[mtp|MTP]] (CONCEPT)
+- [sm120_blockscaled_mma_builder.inl](/entities/sm120-blockscaled-mma-builder-inl.md) (SYSTEM)
+- [CUTLASS](/entities/cutlass.md) (TOOL)
+- [MSD](/entities/msd.md) (CONCEPT)
+- [FlashInfer](/entities/flashinfer.md) (TOOL)
+- [RaZeR](/entities/razer.md) (CONCEPT)
+- [BF16](/entities/bf16.md) (CONCEPT)
+- [generate_kernels.py](/entities/generate-kernels-py.md) (TOOL)
+- [Tensor Core](/entities/tensor-core.md) (SYSTEM)
+- [FP4](/entities/fp4.md) (CONCEPT)
+- [Marlin](/entities/marlin.md) (SYSTEM)
+- [vLLM](/entities/vllm.md) (SYSTEM)
+- [CUDA](/entities/cuda.md) (SYSTEM)
+- [MTP](/entities/mtp.md) (CONCEPT)
 
 ## Relations
 - Marlin → RELATED_TO → FP4

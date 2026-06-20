@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[prompt-agent-engineering-part6-micro05|prompt-agent-engineering-part6-micro05]] (2026-06-10)
+## From [prompt-agent-engineering-part6-micro05](/entities/prompt-agent-engineering-part6-micro05.md) (2026-06-10)
 - Standards used to assess input for baseline universal architecture
 - Used to determine accessibility scores

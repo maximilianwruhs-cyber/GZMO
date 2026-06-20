@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: AGENT
 
-## From [[drive-research-autonomous-devops-ai-safety-boundaries|drive-research-autonomous-devops-ai-safety-boundaries]] (2026-06-08)
+## From [drive-research-autonomous-devops-ai-safety-boundaries](/entities/drive-research-autonomous-devops-ai-safety-boundaries.md) (2026-06-08)
 - Operates on bare-metal silicon.
 - Continuously driven to minimize allostatic load.
 - Actively resents hardware and operating system inefficiency.

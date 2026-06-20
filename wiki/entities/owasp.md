@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[google-antigravity-the-architects-configuration-micro04|google-antigravity-the-architects-configuration-micro04]] (2026-06-09)
+## From [google-antigravity-the-architects-configuration-micro04](/entities/google-antigravity-the-architects-configuration-micro04.md) (2026-06-09)
 - The /audit_security workflow scans for top OWASP vulnerabilities.

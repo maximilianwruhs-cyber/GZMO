@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part2|drive-research-ki-berater-fragebogen-für-kundenanalyse-part2]] (2026-06-08)
+## From [drive-research-ki-berater-fragebogen-für-kundenanalyse-part2](/entities/drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part2.md) (2026-06-08)
 - Massively upgraded due to the increasing use of 'Artificial Intelligence'.
 - Include empathy, emotional intelligence, tact, and genuine passion.
 - Crucial for building trust, sensing resistance, reading between the lines in negotiations, and fostering compromise.

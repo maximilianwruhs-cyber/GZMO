@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[openclaw-deep-research-part10-micro04|openclaw-deep-research-part10-micro04]] (2026-06-09)
+## From [openclaw-deep-research-part10-micro04](/entities/openclaw-deep-research-part10-micro04.md) (2026-06-09)
 - An open-source Node.js server with a React dashboard that orchestrates teams of AI agents into structured organizations.
 - Created by the pseudonymous developer @dotta.
 - Launched on March 4, 2026.

@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[universal-syntax-and-the-architecture-of-human-lan-micro01|universal-syntax-and-the-architecture-of-human-lan-micro01]] (2026-06-09)
+## From [universal-syntax-and-the-architecture-of-human-lan-micro01](/entities/universal-syntax-and-the-architecture-of-human-lan-micro01.md) (2026-06-09)
 - Curated research corpus consolidated from Google Takeout
 - Ingest micro-split from universal-syntax-and-the-architecture-of-human-lan.md for cloud KG extraction

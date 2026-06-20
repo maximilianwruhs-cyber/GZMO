@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-hidden-mode-technical-analysis-and-configuration|drive-research-hidden-mode-technical-analysis-and-configuration]] (2026-06-08)
+## From [drive-research-hidden-mode-technical-analysis-and-configuration](/entities/drive-research-hidden-mode-technical-analysis-and-configuration.md) (2026-06-08)
 - Linearly interpolates weights.
 - Baseline merging of models trained on identical datasets with different hyperparameters.

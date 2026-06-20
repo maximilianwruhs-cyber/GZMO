@@ -1,0 +1,38 @@
+{
+  "generated_at": "2026-06-20T00:11:12Z",
+  "total_queries": 5,
+  "passed": 5,
+  "pass_rate": 1.0,
+  "results": [
+    {
+      "link_id": "L01",
+      "recall_query": "dynamic equilibrium",
+      "hit": true,
+      "preview": "Platform recall for 'dynamic equilibrium':\n\n## Honeypot / Vault\n\n- [1] (Score: 1.00) [CONCEPT:Dynamic Equilibrium] A state of continuously and aggressively managed tension.\n- [2] (Score: 1.00) [CONCEP"
+    },
+    {
+      "link_id": "L11",
+      "recall_query": "12092)",
+      "hit": true,
+      "preview": "Platform recall for '12092)':\n\n## Honeypot / Vault\n\n- [1] (Score: 0.04) [SYSTEM:EliteAgent v3.1] Aims to produce correct final answers or complete tasks with minimal high-quality steps.\n- [2] (Score: "
+    },
+    {
+      "link_id": "L12",
+      "recall_query": "learning_trajectory",
+      "hit": true,
+      "preview": "Platform recall for 'learning_trajectory':\n\n## Honeypot / Vault\n\n- [1] (Score: 0.06) [CONCEPT:Off-Policy Learning] New agent uses predecessor's trajectories to avoid errors\n- [2] (Score: 0.04) [CONCEP"
+    },
+    {
+      "link_id": "L13",
+      "recall_query": "zpd_tuning",
+      "hit": true,
+      "preview": "Platform recall for 'zpd_tuning':\n\n## Honeypot / Vault\n\n- [1] (Score: 0.75) [TOOL:Top-P samplers] Custom tuning of this sequence allows architects to fine-tune the exact statistical pipeline.\n- [2] (S"
+    },
+    {
+      "link_id": "L14",
+      "recall_query": "pedagogical_trajectory",
+      "hit": true,
+      "preview": "Platform recall for 'pedagogical_trajectory':\n\n## Honeypot / Vault\n\n- [1] (Score: 0.06) [PERSON:pi-mentor-discovery-arc] Provides pedagogical guidance to Pi through gzmo_mentor_teach.\n- [2] (Score: 0."
+    }
+  ]
+}

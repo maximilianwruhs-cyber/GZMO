@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[drive-research-optimizing-cuda-performance-with-fp4-fp6-micro02|drive-research-optimizing-cuda-performance-with-fp4-fp6-micro02]] (2026-06-09)
+## From [drive-research-optimizing-cuda-performance-with-fp4-fp6-micro02](/entities/drive-research-optimizing-cuda-performance-with-fp4-fp6-micro02.md) (2026-06-09)
 - This is a release note document.
 - It is related to CUDA.

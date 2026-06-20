@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: AGENT
 
-## From [[ai-research-part6-micro05|ai-research-part6-micro05]] (2026-06-09)
+## From [ai-research-part6-micro05](/entities/ai-research-part6-micro05.md) (2026-06-09)
 - Can generate code and format status messages simultaneously, causing Context Pollution.
 - Operates within a gVisor sandbox container in OpenClaw-Contained.
 - Lists security measures like gVisor-Interception, Zero-Trust-Images, etc.

@@ -16,14 +16,14 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-agentic-reverse-engineering-state-and-future-micro02|drive-research-agentic-reverse-engineering-state-and-future-micro02]] (2026-06-09)
+## From [drive-research-agentic-reverse-engineering-state-and-future-micro02](/entities/drive-research-agentic-reverse-engineering-state-and-future-micro02.md) (2026-06-09)
 - An attack technique where adversaries deduce sequences of API calls an agent makes between external tools.
 - Effectively maps an agent's internal processes.
 
-## From [[drive-research-agentic-reverse-engineering-state-and-future1-micro02|drive-research-agentic-reverse-engineering-state-and-future1-micro02]] (2026-06-09)
+## From [drive-research-agentic-reverse-engineering-state-and-future1-micro02](/entities/drive-research-agentic-reverse-engineering-state-and-future1-micro02.md) (2026-06-09)
 - Attackers deduce sequences of API calls an agent makes between external tools.
 - Effectively maps an agent's internal processes.
 
-## From [[the-dawn-of-agentic-software-reverse-engineering-micro03|the-dawn-of-agentic-software-reverse-engineering-micro03]] (2026-06-09)
+## From [the-dawn-of-agentic-software-reverse-engineering-micro03](/entities/the-dawn-of-agentic-software-reverse-engineering-micro03.md) (2026-06-09)
 - Attack technique where adversaries deduce sequences of API calls an agent makes between external tools.
 - Effectively maps an agent's internal processes.

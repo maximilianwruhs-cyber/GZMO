@@ -14,9 +14,9 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[dynamics-of-the-unpredictable|dynamics-of-the-unpredictable]] (CONCEPT)
-- [[curated-research-corpus|curated research corpus]] (CONCEPT)
-- [[google-takeout|Google Takeout]] (TOOL)
+- [dynamics-of-the-unpredictable](/entities/dynamics-of-the-unpredictable.md) (CONCEPT)
+- [curated research corpus](/entities/curated-research-corpus.md) (CONCEPT)
+- [Google Takeout](/entities/google-takeout.md) (TOOL)
 
 ## Relations
 - curated research corpus → USES → Google Takeout

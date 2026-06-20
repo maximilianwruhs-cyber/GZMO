@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-mcp-landscape-research-report|drive-research-mcp-landscape-research-report]] (2026-06-08)
+## From [drive-research-mcp-landscape-research-report](/entities/drive-research-mcp-landscape-research-report.md) (2026-06-08)
 - Represents a notable advancement in local database integration.
 - Operates without complex configuration files, utilizing direct Data Source Names.
 - Connects agents to PostgreSQL, MySQL, and SQLite databases.

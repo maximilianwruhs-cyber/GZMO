@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part7|ai-research-part7]] (2026-06-08)
+## From [ai-research-part7](/entities/ai-research-part7.md) (2026-06-08)
 - Stands for Rotary Position Embedding.
 - Used as a Position Embedding in the DeepSeek-V3 models.
 - Referenced in Su et al., 2024.
 
-## From [[ai-research-part6-micro04|ai-research-part6-micro04]] (2026-06-09)
+## From [ai-research-part6-micro04](/entities/ai-research-part6-micro04.md) (2026-06-09)
 - Position Embedding used in OLMo-1.3B

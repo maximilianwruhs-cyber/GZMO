@@ -14,19 +14,19 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[artificial-scarcity|Artificial Scarcity]] (CONCEPT)
-- [[behavioral-design|behavioral design]] (CONCEPT)
-- [[sunk-cost-prison|Sunk Cost Prison]] (CONCEPT)
-- [[self-determination-theory|Self-Determination Theory]] (CONCEPT)
-- [[white-hat-motivation|White Hat Motivation]] (CONCEPT)
-- [[duolingo|Duolingo]] (ORGANIZATION)
-- [[onboarding|Onboarding]] (CONCEPT)
-- [[confirmshaming|Confirmshaming]] (CONCEPT)
-- [[octalysis|Octalysis]] (TOOL)
-- [[black-hat-gamification|Black Hat gamification]] (CONCEPT)
-- [[deceptive-design-dark-patterns|Deceptive Design (Dark Patterns)]] (CONCEPT)
-- [[the-roach-motel|The Roach Motel]] (CONCEPT)
-- [[endgame|Endgame]] (CONCEPT)
+- [Artificial Scarcity](/entities/artificial-scarcity.md) (CONCEPT)
+- [behavioral design](/entities/behavioral-design.md) (CONCEPT)
+- [Sunk Cost Prison](/entities/sunk-cost-prison.md) (CONCEPT)
+- [Self-Determination Theory](/entities/self-determination-theory.md) (CONCEPT)
+- [White Hat Motivation](/entities/white-hat-motivation.md) (CONCEPT)
+- [Duolingo](/entities/duolingo.md) (ORGANIZATION)
+- [Onboarding](/entities/onboarding.md) (CONCEPT)
+- [Confirmshaming](/entities/confirmshaming.md) (CONCEPT)
+- [Octalysis](/entities/octalysis.md) (TOOL)
+- [Black Hat gamification](/entities/black-hat-gamification.md) (CONCEPT)
+- [Deceptive Design (Dark Patterns)](/entities/deceptive-design-dark-patterns.md) (CONCEPT)
+- [The Roach Motel](/entities/the-roach-motel.md) (CONCEPT)
+- [Endgame](/entities/endgame.md) (CONCEPT)
 
 ## Relations
 - Black Hat gamification → RELATED_TO → Deceptive Design (Dark Patterns)

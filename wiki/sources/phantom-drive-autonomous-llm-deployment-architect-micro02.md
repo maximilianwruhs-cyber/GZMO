@@ -14,20 +14,20 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-10).
 
 ## Entities
-- [[llama-server|llama-server]] (SYSTEM)
-- [[qwen-2-5-7b|Qwen 2.5 (7B)]] (BOOK)
-- [[gemma-2-9b|Gemma 2 (9B)]] (BOOK)
-- [[nemotron-8b|Nemotron (8B)]] (BOOK)
-- [[phantom-drive|Phantom Drive]] (PROJECT)
-- [[google|Google]] (ORGANIZATION)
-- [[nvidia|NVIDIA]] (ORGANIZATION)
-- [[findmnt|findmnt]] (TOOL)
-- [[ministral-8b|Ministral (8B)]] (BOOK)
-- [[gzmo-telemetry-daemon|GZMO telemetry daemon]] (SYSTEM)
-- [[alibaba-cloud|Alibaba Cloud]] (ORGANIZATION)
-- [[q4-k-m|Q4_K_M]] (CONCEPT)
-- [[q5-k-m|Q5_K_M]] (CONCEPT)
-- [[llama-cpp|llama.cpp]] (SYSTEM)
+- [llama-server](/entities/llama-server.md) (SYSTEM)
+- [Qwen 2.5 (7B)](/entities/qwen-2-5-7b.md) (BOOK)
+- [Gemma 2 (9B)](/entities/gemma-2-9b.md) (BOOK)
+- [Nemotron (8B)](/entities/nemotron-8b.md) (BOOK)
+- [Phantom Drive](/entities/phantom-drive.md) (PROJECT)
+- [Google](/entities/google.md) (ORGANIZATION)
+- [NVIDIA](/entities/nvidia.md) (ORGANIZATION)
+- [findmnt](/entities/findmnt.md) (TOOL)
+- [Ministral (8B)](/entities/ministral-8b.md) (BOOK)
+- [GZMO telemetry daemon](/entities/gzmo-telemetry-daemon.md) (SYSTEM)
+- [Alibaba Cloud](/entities/alibaba-cloud.md) (ORGANIZATION)
+- [Q4_K_M](/entities/q4-k-m.md) (CONCEPT)
+- [Q5_K_M](/entities/q5-k-m.md) (CONCEPT)
+- [llama.cpp](/entities/llama-cpp.md) (SYSTEM)
 
 ## Relations
 - Qwen 2.5 (7B) → AUTHORED_BY → Alibaba Cloud

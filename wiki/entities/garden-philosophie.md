@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[gzmo-soul-merged-new-part2-micro04|gzmo-soul-merged-new-part2-micro04]] (2026-06-10)
+## From [gzmo-soul-merged-new-part2-micro04](/entities/gzmo-soul-merged-new-part2-micro04.md) (2026-06-10)
 - A philosophy where knowledge and system states are continuously maintained, distilled, and structured.

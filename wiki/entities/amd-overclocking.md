@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-ubuntu-extreme-hardware-tuning-micro02|drive-research-ubuntu-extreme-hardware-tuning-micro02]] (2026-06-09)
+## From [drive-research-ubuntu-extreme-hardware-tuning-micro02](/entities/drive-research-ubuntu-extreme-hardware-tuning-micro02.md) (2026-06-09)
 - Section within UEFI for applying firmware adjustments.
 - Used to set PBO, PPT, TDC, EDC, and Curve Shaper.
 - A setting within the UEFI interface.

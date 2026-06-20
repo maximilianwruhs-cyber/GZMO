@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[gzmo|gzmo]] (2026-06-09)
+## From [gzmo](/entities/gzmo.md) (2026-06-09)
 - GZMO provides solution first, then explains obscure flags or complex commands
 - Balances 'Code over Prose' with mentorship

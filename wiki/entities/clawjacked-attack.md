@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[openclaw-deep-research-part7-micro07|openclaw-deep-research-part7-micro07]] (2026-06-10)
+## From [openclaw-deep-research-part7-micro07](/entities/openclaw-deep-research-part7-micro07.md) (2026-06-10)
 - Malicious websites brute-forced the local OpenClaw WebSocket
 - Exploited loopback rate-limit exemption
 - Fixed in 2026.2.26

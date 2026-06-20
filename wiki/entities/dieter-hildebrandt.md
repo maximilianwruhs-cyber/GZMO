@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[the-archival-truth-part1-micro03|the-archival-truth-part1-micro03]] (2026-06-09)
+## From [the-archival-truth-part1-micro03](/entities/the-archival-truth-part1-micro03.md) (2026-06-09)
 - Cabaret artist.
 - Stated that society could use a Kästner today.
 - His statement highlights the need for orienting, critical poetry.

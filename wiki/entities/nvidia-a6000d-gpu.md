@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: HARDWARE
 
-## From [[ai-research-part4|ai-research-part4]] (2026-06-08)
+## From [ai-research-part4](/entities/ai-research-part4.md) (2026-06-08)
 - A cloud-grade inference chip.
 - Used for inference speed assessment of MiniCPM-SALA and Qwen3-8B.
 - Has 96GB VRAM.

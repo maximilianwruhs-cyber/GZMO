@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-linux-gaming-and-ai-build-guide-micro03|drive-research-linux-gaming-and-ai-build-guide-micro03]] (2026-06-09)
+## From [drive-research-linux-gaming-and-ai-build-guide-micro03](/entities/drive-research-linux-gaming-and-ai-build-guide-micro03.md) (2026-06-09)
 - RX 7900 XTX vs RTX 5090
 - Best GPU for AI and Gaming in 2026
 - Nvidia's Latest 50 Series GPUs

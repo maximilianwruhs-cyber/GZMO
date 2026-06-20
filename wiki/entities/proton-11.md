@@ -16,7 +16,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-linux-gaming-and-ai-build-guide-micro02|drive-research-linux-gaming-and-ai-build-guide-micro02]] (2026-06-09)
+## From [drive-research-linux-gaming-and-ai-build-guide-micro02](/entities/drive-research-linux-gaming-and-ai-build-guide-micro02.md) (2026-06-09)
 - The primary engine driving the gaming translation layer in 2026.
 - Built atop Wine 11.0.
 - Allows execution of Windows-native games with zero translation latency.
@@ -27,15 +27,15 @@ Type: TOOL
 - Dynamically translates Windows DirectX 11 and 12 graphical API calls into Vulkan instructions.
 - Utilizes Wine 11.0.
 
-## From [[the-2026-linux-workstation-micro03|the-2026-linux-workstation-micro03]] (2026-06-09)
+## From [the-2026-linux-workstation-micro03](/entities/the-2026-linux-workstation-micro03.md) (2026-06-09)
 - Gaming translation layer utilizing DXVK.
 - Built atop Wine 11.0.
 - Dynamically translates Windows DirectX 11 and 12 API calls into Vulkan instructions.
 
-## From [[drive-research-linux-gaming-and-ai-build-guide-micro06|drive-research-linux-gaming-and-ai-build-guide-micro06]] (2026-06-10)
+## From [drive-research-linux-gaming-and-ai-build-guide-micro06](/entities/drive-research-linux-gaming-and-ai-build-guide-micro06.md) (2026-06-10)
 - Gaming translation layer
 - Built atop Wine 11.0
 - Translates DirectX 11 and 12 calls into Vulkan
 
-## From [[the-2026-linux-workstation-micro04|the-2026-linux-workstation-micro04]] (2026-06-10)
+## From [the-2026-linux-workstation-micro04](/entities/the-2026-linux-workstation-micro04.md) (2026-06-10)
 - Gaming translation layer

@@ -14,17 +14,17 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[gemini-production-readiness-framework-prompt|Gemini Production Readiness Framework Prompt]] (CONCEPT)
-- [[opentelemetry|OpenTelemetry]] (TOOL)
-- [[five-pillars-of-production-readiness|Five Pillars of Production Readiness]] (CONCEPT)
-- [[yaml|YAML]] (TOOL)
-- [[the-google-sre-handbook|The Google SRE Handbook]] (BOOK)
-- [[senior-production-readiness-engineer|Senior Production Readiness Engineer]] (PERSON)
-- [[principal-systems-architect-chaos-engineer|Principal Systems Architect & Chaos Engineer]] (PERSON)
-- [[four-pillars-of-production|Four Pillars of Production]] (CONCEPT)
-- [[titan-class-production-readiness-prompt|Titan-Class Production Readiness Prompt]] (CONCEPT)
-- [[the-phoenix-project|The Phoenix Project]] (BOOK)
-- [[terraform|Terraform]] (TOOL)
+- [Gemini Production Readiness Framework Prompt](/entities/gemini-production-readiness-framework-prompt.md) (CONCEPT)
+- [OpenTelemetry](/entities/opentelemetry.md) (TOOL)
+- [Five Pillars of Production Readiness](/entities/five-pillars-of-production-readiness.md) (CONCEPT)
+- [YAML](/entities/yaml.md) (TOOL)
+- [The Google SRE Handbook](/entities/the-google-sre-handbook.md) (BOOK)
+- [Senior Production Readiness Engineer](/entities/senior-production-readiness-engineer.md) (PERSON)
+- [Principal Systems Architect & Chaos Engineer](/entities/principal-systems-architect-chaos-engineer.md) (PERSON)
+- [Four Pillars of Production](/entities/four-pillars-of-production.md) (CONCEPT)
+- [Titan-Class Production Readiness Prompt](/entities/titan-class-production-readiness-prompt.md) (CONCEPT)
+- [The Phoenix Project](/entities/the-phoenix-project.md) (BOOK)
+- [Terraform](/entities/terraform.md) (TOOL)
 
 ## Relations
 - Gemini Production Readiness Framework Prompt → DEFINES_ROLE → Senior Production Readiness Engineer

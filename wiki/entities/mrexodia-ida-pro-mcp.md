@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-agentic-reverse-engineering-state-and-future1-micro01|drive-research-agentic-reverse-engineering-state-and-future1-micro01]] (2026-06-09)
+## From [drive-research-agentic-reverse-engineering-state-and-future1-micro01](/entities/drive-research-agentic-reverse-engineering-state-and-future1-micro01.md) (2026-06-09)
 - An analytical environment for agentic systems.
 - Can be transformed into agent-accessible environments via MCP servers.
 - Exposes discrete tools and REST endpoints to an LLM client through mrexodia/ida-pro-mcp.

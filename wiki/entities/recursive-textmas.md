@@ -14,11 +14,11 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-recursivemas-ki-agenten-kommunikation-der-zukunft|drive-research-recursivemas-ki-agenten-kommunikation-der-zukunft]] (2026-06-08)
+## From [drive-research-recursivemas-ki-agenten-kommunikation-der-zukunft](/entities/drive-research-recursivemas-ki-agenten-kommunikation-der-zukunft.md) (2026-06-08)
 - Control group for comparison
 - Uses text communication
 
-## From [[architectures-and-optimizations-for-speculative-de-micro02|architectures-and-optimizations-for-speculative-de-micro02]] (2026-06-09)
+## From [architectures-and-optimizations-for-speculative-de-micro02](/entities/architectures-and-optimizations-for-speculative-de-micro02.md) (2026-06-09)
 - A control group that used the same recursive loop structure but communicated via text.
 - Used to demonstrate the isolated effect of the latent space.
 - RecursiveMAS showed significant token consumption reduction compared to this system.

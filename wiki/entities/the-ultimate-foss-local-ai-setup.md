@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[ultimate-local-ai-development-stack-for-vscodium-micro02|ultimate-local-ai-development-stack-for-vscodium-micro02]] (2026-06-09)
+## From [ultimate-local-ai-development-stack-for-vscodium-micro02](/entities/ultimate-local-ai-development-stack-for-vscodium-micro02.md) (2026-06-09)
 - A complete, step-by-step guide to building a local AI development environment.
 - Combines Continue.dev and Roo Code powered by LM Studio.

@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[openclaw-deep-research-part10-micro05|openclaw-deep-research-part10-micro05]] (2026-06-09)
+## From [openclaw-deep-research-part10-micro05](/entities/openclaw-deep-research-part10-micro05.md) (2026-06-09)
 - Was launched by Microsoft.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[drive-research-automating-linux-hardware-detection-micro01|drive-research-automating-linux-hardware-detection-micro01]] (2026-06-09)
+## From [drive-research-automating-linux-hardware-detection-micro01](/entities/drive-research-automating-linux-hardware-detection-micro01.md) (2026-06-09)
 - A comprehensive report providing an exhaustive, multi-layered analysis of automated hardware detection mechanisms on Linux.
 - Synthesizes the low-level architecture, programmatic tooling, distributed automation frameworks, and stringent security methodologies required to manage modern hardware configurations at scale.
 - Architecture governing hardware discovery has undergone a profound structural evolution over the past three decades.

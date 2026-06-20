@@ -15,12 +15,12 @@ gzmo_synthetic: true
 
 Type: SANDBOXING_TECHNOLOGY
 
-## From [[ai-research-part6-micro04|ai-research-part6-micro04]] (2026-06-09)
+## From [ai-research-part6-micro04](/entities/ai-research-part6-micro04.md) (2026-06-09)
 - Used for kernel-level isolation in TaskForge
 - Provides kernel-level isolation
 - Used by TaskForge for agent execution environments
 
-## From [[ai-research-part6-micro05|ai-research-part6-micro05]] (2026-06-09)
+## From [ai-research-part6-micro05](/entities/ai-research-part6-micro05.md) (2026-06-09)
 - Used for sandbox containers in OpenClaw-Contained.
 - Intercepts system calls and isolates the agent in a user-space kernel.
 - Provides complete encapsulation of all syscalls via a user-space kernel.

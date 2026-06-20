@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part3-micro02|ai-research-part3-micro02]] (2026-06-09)
+## From [ai-research-part3-micro02](/entities/ai-research-part3-micro02.md) (2026-06-09)
 - A localized variant of Metaproductivity that focuses on the subtree rooted at a given agent.
 - Measures the long-term potential of self-improvement for the entire tree.

@@ -14,5 +14,5 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-10).
 
 ## Entities
-- [[wave-02-notebooklm|wave_02_notebooklm]] (SYSTEM)
-- [[nvidia-blackwell-sm120|NVIDIA Blackwell SM120]] (CONCEPT)
+- [wave_02_notebooklm](/entities/wave-02-notebooklm.md) (SYSTEM)
+- [NVIDIA Blackwell SM120](/entities/nvidia-blackwell-sm120.md) (CONCEPT)

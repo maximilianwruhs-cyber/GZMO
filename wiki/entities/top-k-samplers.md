@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[optimizing-nvidia-blackwell-sm120-part1-micro02|optimizing-nvidia-blackwell-sm120-part1-micro02]] (2026-06-09)
+## From [optimizing-nvidia-blackwell-sm120-part1-micro02](/entities/optimizing-nvidia-blackwell-sm120-part1-micro02.md) (2026-06-09)
 - Arbitrarily truncates the vocabulary to a fixed number of tokens.
 - Must be disabled when using Min-P.
 - Legacy samplers that arbitrarily truncate the vocabulary to a fixed number of tokens.

@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[ai-research-part8-micro01|ai-research-part8-micro01]] (2026-06-09)
+## From [ai-research-part8-micro01](/entities/ai-research-part8-micro01.md) (2026-06-09)
 - micro-split from ai-research-part8.md
 - for cloud KG extraction

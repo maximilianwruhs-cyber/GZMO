@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part8-micro03|ai-research-part8-micro03]] (2026-06-09)
+## From [ai-research-part8-micro03](/entities/ai-research-part8-micro03.md) (2026-06-09)
 - Employed by STILL to correct distribution shift.
 - Decouples a feature's directional vector from its magnitude.
 - Injects original pretrained norms back into the linear representation.

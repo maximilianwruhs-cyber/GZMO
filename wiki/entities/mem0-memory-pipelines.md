@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-hermes-compression-and-bol-architecture|drive-research-hermes-compression-and-bol-architecture]] (2026-06-08)
+## From [drive-research-hermes-compression-and-bol-architecture](/entities/drive-research-hermes-compression-and-bol-architecture.md) (2026-06-08)
 - First-class memory provider plugin for Hermes (plugins/memory/).
 - Orchestrates a continuous, asynchronous pipeline for persistent memory integration.
 - Utilizes an independent LLM call to identify new preferences, constraints, decisions, and entity relationships.

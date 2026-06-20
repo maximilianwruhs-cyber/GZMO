@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[drive-research-architecting-a-linux-task-manager-design-principl|drive-research-architecting-a-linux-task-manager-design-principl]] (2026-06-08)
+## From [drive-research-architecting-a-linux-task-manager-design-principl](/entities/drive-research-architecting-a-linux-task-manager-design-principl.md) (2026-06-08)
 - Title of a document within the research corpus.
 - Covers Introduction to Linux Process Management and Telemetry, The Proc Filesystem, Computational Mechanics, Memory Diagnostics, Telemetry Ingestion Architectures, The Presentation Layer, Designing the Control Interface, Security Models and Concurrency Vulnerabilities, and Implementation Paradigms.
 - The foundation of any Linux task manager.

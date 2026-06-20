@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[obolus-vs-codium-extension-konzept-research-part1-micro02|obolus-vs-codium-extension-konzept-research-part1-micro02]] (2026-06-10)
+## From [obolus-vs-codium-extension-konzept-research-part1-micro02](/entities/obolus-vs-codium-extension-konzept-research-part1-micro02.md) (2026-06-10)
 - Used to debug and inspect webviews
 - Includes an inspect tool and a console for errors and logs

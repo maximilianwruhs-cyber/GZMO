@@ -14,9 +14,9 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[the-architecture-of-a-trading-card-game-micro02|the-architecture-of-a-trading-card-game-micro02]] (2026-06-09)
+## From [the-architecture-of-a-trading-card-game-micro02](/entities/the-architecture-of-a-trading-card-game-micro02.md) (2026-06-09)
 - The publisher of Magic: The Gathering.
 - Instituted a corporate reorganization in 2018, transitioning to a specialized 'studio model'.
 
-## From [[the-architecture-of-a-trading-card-game-micro03|the-architecture-of-a-trading-card-game-micro03]] (2026-06-10)
+## From [the-architecture-of-a-trading-card-game-micro03](/entities/the-architecture-of-a-trading-card-game-micro03.md) (2026-06-10)
 - Relies on external commercial playing card manufacturers

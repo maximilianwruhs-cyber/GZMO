@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[gzmo-soul-merged-new-part2-micro02|gzmo-soul-merged-new-part2-micro02]] (2026-06-09)
+## From [gzmo-soul-merged-new-part2-micro02](/entities/gzmo-soul-merged-new-part2-micro02.md) (2026-06-09)
 - Act as diligent, perpetual stewards of the underlying database.
 - Autonomously scan incoming digital assets to extract key semantic information, streamlining the organization and categorization of metadata within the system.
 - Continuously scan the repository for inconsistencies, duplicate entries, and formatting errors.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-die-architektur-der-wissenschaftlichen-forschung|drive-research-die-architektur-der-wissenschaftlichen-forschung]] (2026-06-08)
+## From [drive-research-die-architektur-der-wissenschaftlichen-forschung](/entities/drive-research-die-architektur-der-wissenschaftlichen-forschung.md) (2026-06-08)
 - A subfield of machine learning.
 - Reproducibility can be enabled by GPU-Jupyter.
 - Involves complex neural network architectures.

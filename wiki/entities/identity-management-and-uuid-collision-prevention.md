@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[architectures-for-agentic-memory-virtual-context-micro05|architectures-for-agentic-memory-virtual-context-micro05]] (2026-06-09)
+## From [architectures-for-agentic-memory-virtual-context-micro05](/entities/architectures-for-agentic-memory-virtual-context-micro05.md) (2026-06-09)
 - Critical for maintaining graph structural integrity.
 - Requires UUID generation algorithms to hash entity name string and semantic category label simultaneously.

@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[drive-research-recursivemas-ki-agenten-kommunikation-der-zukunft|drive-research-recursivemas-ki-agenten-kommunikation-der-zukunft]] (2026-06-08)
+## From [drive-research-recursivemas-ki-agenten-kommunikation-der-zukunft](/entities/drive-research-recursivemas-ki-agenten-kommunikation-der-zukunft.md) (2026-06-08)
 - The codebase architecture of RecursiveMAS.
 - Characterized by high modularity.
 - Framework for recursive latent multi-agent collaboration
@@ -26,7 +26,7 @@ Type: PROJECT
 - Replaces textual bottlenecks with a seamless, vector-based topology.
 - Transforms the multi-agent paradigm into a dynamic, 'telepathic' super-organism.
 
-## From [[architectures-and-optimizations-for-speculative-de-micro02|architectures-and-optimizations-for-speculative-de-micro02]] (2026-06-09)
+## From [architectures-and-optimizations-for-speculative-de-micro02](/entities/architectures-and-optimizations-for-speculative-de-micro02.md) (2026-06-09)
 - A system architecture with topological agility.
 - Acts as a universal 'connective tissue' for modeling cognitive problem-solving strategies.
 - Framework is not bound to a specific, static arrangement of agents.

@@ -14,17 +14,17 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[rocm-deployments|ROCm deployments]] (SYSTEM)
-- [[rocr-visible-devices|ROCR_VISIBLE_DEVICES]] (TOOL)
-- [[oom-crash|OOM crash]] (CONCEPT)
-- [[ggml-sched-max-split-inputs|GGML_SCHED_MAX_SPLIT_INPUTS]] (CONCEPT)
-- [[automated-parameter-fitting-subsystem|automated parameter-fitting subsystem]] (SYSTEM)
-- [[ggml-cuda-disable-graphs-1|GGML_CUDA_DISABLE_GRAPHS=1]] (SYSTEM)
-- [[hip-visible-devices|HIP_VISIBLE_DEVICES]] (TOOL)
-- [[vram|VRAM]] (CONCEPT)
-- [[ggml-assert|GGML_ASSERT]] (CONCEPT)
-- [[ggml-org-llama-cpp|ggml-org/llama.cpp]] (PROJECT)
-- [[pr-22133|PR #22133]] (PROJECT)
+- [ROCm deployments](/entities/rocm-deployments.md) (SYSTEM)
+- [ROCR_VISIBLE_DEVICES](/entities/rocr-visible-devices.md) (TOOL)
+- [OOM crash](/entities/oom-crash.md) (CONCEPT)
+- [GGML_SCHED_MAX_SPLIT_INPUTS](/entities/ggml-sched-max-split-inputs.md) (CONCEPT)
+- [automated parameter-fitting subsystem](/entities/automated-parameter-fitting-subsystem.md) (SYSTEM)
+- [GGML_CUDA_DISABLE_GRAPHS=1](/entities/ggml-cuda-disable-graphs-1.md) (SYSTEM)
+- [HIP_VISIBLE_DEVICES](/entities/hip-visible-devices.md) (TOOL)
+- [VRAM](/entities/vram.md) (CONCEPT)
+- [GGML_ASSERT](/entities/ggml-assert.md) (CONCEPT)
+- [ggml-org/llama.cpp](/entities/ggml-org-llama-cpp.md) (PROJECT)
+- [PR #22133](/entities/pr-22133.md) (PROJECT)
 
 ## Relations
 - VRAM → RELATED_TO → OOM crash

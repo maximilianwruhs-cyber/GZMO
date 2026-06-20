@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[openclaw-deep-research-part10-micro05|openclaw-deep-research-part10-micro05]] (2026-06-09)
+## From [openclaw-deep-research-part10-micro05](/entities/openclaw-deep-research-part10-micro05.md) (2026-06-09)
 - Is a component that enables an autonomous agent to do meaningful work without constant supervision.
 
-## From [[openclaw-deep-research-part11-micro04|openclaw-deep-research-part11-micro04]] (2026-06-09)
+## From [openclaw-deep-research-part11-micro04](/entities/openclaw-deep-research-part11-micro04.md) (2026-06-09)
 - Stores agent's preferences, ongoing projects, and communication style across days and weeks.
 - Lives in plain Markdown files inside the agent workspace.
 - Includes daily logs, MEMORY.md for long-term facts, SOUL.md for personality, and HEARTBEAT.md for proactive tasks.

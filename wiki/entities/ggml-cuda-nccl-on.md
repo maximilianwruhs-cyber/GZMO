@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-cache-optimization-with-ai-chaos-theory|drive-research-cache-optimization-with-ai-chaos-theory]] (2026-06-08)
+## From [drive-research-cache-optimization-with-ai-chaos-theory](/entities/drive-research-cache-optimization-with-ai-chaos-theory.md) (2026-06-08)
 - Allows only one active CUDA context to exist on the device at any time when in EXCLUSIVE_PROCESS mode.
 - Context initialization is lazy.
 - Runtime compilation flag to achieve linear scaling in Graph Split mode.

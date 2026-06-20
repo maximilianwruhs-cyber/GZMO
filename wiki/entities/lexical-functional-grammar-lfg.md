@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-universal-syntax-research-prompt|drive-research-universal-syntax-research-prompt]] (2026-06-08)
+## From [drive-research-universal-syntax-research-prompt](/entities/drive-research-universal-syntax-research-prompt.md) (2026-06-08)
 - Offers a non-transformational, parallel architecture for language.
 - Posits distinct, simultaneous structures for different types of linguistic information (c-structure and f-structure).
 - F-structure is claimed to be the universal level of representation.

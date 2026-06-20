@@ -14,9 +14,9 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[wave-02-notebooklm|wave_02_notebooklm]] (CONCEPT)
-- [[openclaw-deep-research-part10|openclaw-deep-research-part10]] (PROJECT)
-- [[cloud-kg-extraction|cloud KG extraction]] (CONCEPT)
+- [wave_02_notebooklm](/entities/wave-02-notebooklm.md) (CONCEPT)
+- [openclaw-deep-research-part10](/entities/openclaw-deep-research-part10.md) (PROJECT)
+- [cloud KG extraction](/entities/cloud-kg-extraction.md) (CONCEPT)
 
 ## Relations
 - openclaw-deep-research-part10 → USES → cloud KG extraction

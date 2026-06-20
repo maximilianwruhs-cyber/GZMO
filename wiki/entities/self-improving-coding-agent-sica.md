@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[ai-research-part3-micro01|ai-research-part3-micro01]] (2026-06-09)
+## From [ai-research-part3-micro01](/entities/ai-research-part3-micro01.md) (2026-06-09)
 - Belongs to the class of self-referential AI.
 - HGM outperforms SICA on SWE-bench Verified and Polyglot.
 - Encountered repeated errors after consuming 45% of its budget, preventing any further self-modifications.

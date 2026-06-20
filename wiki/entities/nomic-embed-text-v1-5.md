@@ -19,7 +19,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-du-hast-gesagt-part1|drive-research-du-hast-gesagt-part1]] (2026-06-08)
+## From [drive-research-du-hast-gesagt-part1](/entities/drive-research-du-hast-gesagt-part1.md) (2026-06-08)
 - A tiny, highly optimized FOSS embedding model.
 - Under 1GB in size.
 - Available in GGUF format.
@@ -28,19 +28,19 @@ Type: TOOL
 - Used for embeddings.
 - Configured in Continue.dev.
 
-## From [[building-a-private-local-ai-development-environmen-micro01|building-a-private-local-ai-development-environmen-micro01]] (2026-06-09)
+## From [building-a-private-local-ai-development-environmen-micro01](/entities/building-a-private-local-ai-development-environmen-micro01.md) (2026-06-09)
 - Specialized embedding model used for local embeddings
 
-## From [[building-a-private-local-ai-development-environmen-micro02|building-a-private-local-ai-development-environmen-micro02]] (2026-06-09)
+## From [building-a-private-local-ai-development-environmen-micro02](/entities/building-a-private-local-ai-development-environmen-micro02.md) (2026-06-09)
 - Recommended embedding model.
 - Used for mathematical indexing of the entire workspace (RAG).
 
-## From [[building-a-private-local-ai-development-environmen-micro06|building-a-private-local-ai-development-environmen-micro06]] (2026-06-09)
+## From [building-a-private-local-ai-development-environmen-micro06](/entities/building-a-private-local-ai-development-environmen-micro06.md) (2026-06-09)
 - A tiny, highly optimized FOSS embedding model.
 - Under 1GB.
 - Used for RAG.
 
-## From [[ultimate-local-ai-development-stack-for-vscodium-micro02|ultimate-local-ai-development-stack-for-vscodium-micro02]] (2026-06-09)
+## From [ultimate-local-ai-development-stack-for-vscodium-micro02](/entities/ultimate-local-ai-development-stack-for-vscodium-micro02.md) (2026-06-09)
 - A tiny, highly optimized FOSS embedding model.
 - Under 1GB in size.
 - Used for RAG to create code embeddings.

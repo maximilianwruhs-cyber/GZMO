@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[openclaw-deep-research-part11-micro06|openclaw-deep-research-part11-micro06]] (2026-06-09)
+## From [openclaw-deep-research-part11-micro06](/entities/openclaw-deep-research-part11-micro06.md) (2026-06-09)
 - Event-driven scripts triggered by agent lifecycle events ( /new , /reset , /stop ), session compaction, gateway startup, message flow, and tool calls.
 - Automatically discovered from directories and can be managed with `openclaw hooks`.
 
-## From [[openclaw-deep-research-part9-micro02|openclaw-deep-research-part9-micro02]] (2026-06-10)
+## From [openclaw-deep-research-part9-micro02](/entities/openclaw-deep-research-part9-micro02.md) (2026-06-10)
 - Event-driven scripts that fire when events occur in the Gateway
 - Are TypeScript handlers

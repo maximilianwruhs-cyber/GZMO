@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[openclaw-autonomous-ai-agents-in-financial-operat|openclaw-autonomous-ai-agents-in-financial-operat]] (2026-06-08)
+## From [openclaw-autonomous-ai-agents-in-financial-operat](/entities/openclaw-autonomous-ai-agents-in-financial-operat.md) (2026-06-08)
 - Authenticates fibuki skill for PSD2-compliant, read-only open-banking access.
 - Allows AI to stream bank ledgers and cross-reference them against OCR-scanned PDF invoices.
 - Reconciles invoices and categorizes expenses for tax reporting if matching confidence exceeds 89%.

@@ -14,12 +14,12 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-setting-up-autonomous-trading-agents-micro03|drive-research-setting-up-autonomous-trading-agents-micro03]] (2026-06-09)
+## From [drive-research-setting-up-autonomous-trading-agents-micro03](/entities/drive-research-setting-up-autonomous-trading-agents-micro03.md) (2026-06-09)
 - Considered the optimal equilibrium for autonomous trading in 2026.
 - It is an efficient, structurally sound, and technically accessible method.
 - Utilizes specialized orchestration.
 
-## From [[drive-research-setting-up-autonomous-trading-agents-micro05|drive-research-setting-up-autonomous-trading-agents-micro05]] (2026-06-09)
+## From [drive-research-setting-up-autonomous-trading-agents-micro05](/entities/drive-research-setting-up-autonomous-trading-agents-micro05.md) (2026-06-09)
 - Used for execution in the Webhook-to-API Pipeline.
 - Bitpanda has a public API.
 - Bitpanda is described as such.

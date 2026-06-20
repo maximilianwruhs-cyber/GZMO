@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-architecture-of-engagement-an-analysis-of-gam-micro07|the-architecture-of-engagement-an-analysis-of-gam-micro07]] (2026-06-09)
+## From [the-architecture-of-engagement-an-analysis-of-gam-micro07](/entities/the-architecture-of-engagement-an-analysis-of-gam-micro07.md) (2026-06-09)
 - Is a term coined by Margaret Robertson.
 - Refers to the erroneous belief that adding points to an interface makes it a game.
 - Is a critique of superficial gamification.

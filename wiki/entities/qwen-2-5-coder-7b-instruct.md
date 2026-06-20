@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: MODEL
 
-## From [[ultimate-local-ai-development-stack-for-vscodium-micro02|ultimate-local-ai-development-stack-for-vscodium-micro02]] (2026-06-09)
+## From [ultimate-local-ai-development-stack-for-vscodium-micro02](/entities/ultimate-local-ai-development-stack-for-vscodium-micro02.md) (2026-06-09)
 - A highly efficient mid-sized model.
 - Can be used as a fallback when hardware has limited RAM/VRAM.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[the-architecture-of-engagement-an-analysis-of-gam-micro07|the-architecture-of-engagement-an-analysis-of-gam-micro07]] (2026-06-09)
+## From [the-architecture-of-engagement-an-analysis-of-gam-micro07](/entities/the-architecture-of-engagement-an-analysis-of-gam-micro07.md) (2026-06-09)
 - Is a gamified CRM education platform.
 - Uses a hiking motif and allows users to earn badges.
 - Integrates badges directly with LinkedIn.

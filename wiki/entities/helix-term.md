@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-rust-tui-architecture-tech-stack1-micro03|drive-research-rust-tui-architecture-tech-stack1-micro03]] (2026-06-09)
+## From [drive-research-rust-tui-architecture-tech-stack1-micro03](/entities/drive-research-rust-tui-architecture-tech-stack1-micro03.md) (2026-06-09)
 - A Post-Modern Modal Text Editor.
 - Eschews traditional imperative text manipulation in favor of a strictly functional core.
 - Rigidly decouples its logic into helix-core, helix-view, and helix-term crates.

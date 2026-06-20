@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[optimizing-nvidia-blackwell-sm120-part1-micro02|optimizing-nvidia-blackwell-sm120-part1-micro02]] (2026-06-09)
+## From [optimizing-nvidia-blackwell-sm120-part1-micro02](/entities/optimizing-nvidia-blackwell-sm120-part1-micro02.md) (2026-06-09)
 - Defines the maximum number of tokens processed simultaneously during the pipeline evaluation phase.
 - A high value allows the engine to execute massive parallel matrix multiplications during the prompt prefill phase, maximizing the CUDA cores' arithmetic intensity.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-homeostatic-regulation-and-dynamic-equilibrium-in|drive-research-homeostatic-regulation-and-dynamic-equilibrium-in]] (2026-06-08)
+## From [drive-research-homeostatic-regulation-and-dynamic-equilibrium-in](/entities/drive-research-homeostatic-regulation-and-dynamic-equilibrium-in.md) (2026-06-08)
 - Aims to maintain a stable, invariant internal state.
 - Utilizes negative feedback loops to correct deviations after a measurable error has occurred.
 - Can lead to agent sedation if not augmented.

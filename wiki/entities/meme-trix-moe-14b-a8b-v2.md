@@ -14,11 +14,11 @@ gzmo_synthetic: true
 
 Type: MODEL
 
-## From [[architectural-blueprints-for-sovereign-frankenmoe-part1|architectural-blueprints-for-sovereign-frankenmoe-part1]] (2026-06-08)
+## From [architectural-blueprints-for-sovereign-frankenmoe-part1](/entities/architectural-blueprints-for-sovereign-frankenmoe-part1.md) (2026-06-08)
 - It is a model that demonstrates ensembling specialized Llama and Mistral checkpoints.
 - It is a FrankenMoE model.
 - It is a versatile multitask model.
 
-## From [[drive-research-mergekit-moe-model-creation-guide|drive-research-mergekit-moe-model-creation-guide]] (2026-06-08)
+## From [drive-research-mergekit-moe-model-creation-guide](/entities/drive-research-mergekit-moe-model-creation-guide.md) (2026-06-08)
 - Demonstrates ensembling specialized Llama and Mistral checkpoints.
 - Can produce versatile multitask models.

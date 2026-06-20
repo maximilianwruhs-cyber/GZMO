@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-architektur-token-effizienter-ki-agenten-strategi|drive-research-architektur-token-effizienter-ki-agenten-strategi]] (2026-06-08)
+## From [drive-research-architektur-token-effizienter-ki-agenten-strategi](/entities/drive-research-architektur-token-effizienter-ki-agenten-strategi.md) (2026-06-08)
 - Used for tracking interaction lineages as auditable data with TTL parameters.
 - Part of hierarchical memory systems.

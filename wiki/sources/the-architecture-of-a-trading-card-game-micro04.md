@@ -14,18 +14,18 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-10).
 
 ## Entities
-- [[studio-x|Studio X]] (SYSTEM)
-- [[comprehensive-rules|Comprehensive Rules]] (SYSTEM)
-- [[66s|66s]] (CONCEPT)
-- [[council-of-colors|Council of Colors]] (ORGANIZATION)
-- [[magic-the-gathering|Magic: The Gathering]] (CONCEPT)
-- [[delta-team|Delta Team]] (ORGANIZATION)
-- [[play|Play]] (CONCEPT)
-- [[white-under-print-wup|White Under-Print (WUP)]] (TOOL)
-- [[set|Set]] (CONCEPT)
-- [[vision|Vision]] (CONCEPT)
-- [[color-pie|Color Pie]] (CONCEPT)
-- [[print-sheet-matrix|Print Sheet Matrix]] (SYSTEM)
+- [Studio X](/entities/studio-x.md) (SYSTEM)
+- [Comprehensive Rules](/entities/comprehensive-rules.md) (SYSTEM)
+- [66s](/entities/66s.md) (CONCEPT)
+- [Council of Colors](/entities/council-of-colors.md) (ORGANIZATION)
+- [Magic: The Gathering](/entities/magic-the-gathering.md) (CONCEPT)
+- [Delta Team](/entities/delta-team.md) (ORGANIZATION)
+- [Play](/entities/play.md) (CONCEPT)
+- [White Under-Print (WUP)](/entities/white-under-print-wup.md) (TOOL)
+- [Set](/entities/set.md) (CONCEPT)
+- [Vision](/entities/vision.md) (CONCEPT)
+- [Color Pie](/entities/color-pie.md) (CONCEPT)
+- [Print Sheet Matrix](/entities/print-sheet-matrix.md) (SYSTEM)
 
 ## Relations
 - Council of Colors → RELATED_TO → Color Pie

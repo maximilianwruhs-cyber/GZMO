@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-agentic-reverse-engineering-state-and-future-micro02|drive-research-agentic-reverse-engineering-state-and-future-micro02]] (2026-06-09)
+## From [drive-research-agentic-reverse-engineering-state-and-future-micro02](/entities/drive-research-agentic-reverse-engineering-state-and-future-micro02.md) (2026-06-09)
 - A legacy language used in monolithic systems running on mainframe architectures.
 - Agentic AI is used to reverse engineer COBOL code for modernization.
 
-## From [[drive-research-agentic-reverse-engineering-state-and-future1-micro02|drive-research-agentic-reverse-engineering-state-and-future1-micro02]] (2026-06-09)
+## From [drive-research-agentic-reverse-engineering-state-and-future1-micro02](/entities/drive-research-agentic-reverse-engineering-state-and-future1-micro02.md) (2026-06-09)
 - An outdated language used in legacy mainframe architectures.
 - Agentic AI is used to modernize systems written in COBOL.

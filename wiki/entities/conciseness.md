@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-scientific-writing-and-publication-process-micro04|drive-research-scientific-writing-and-publication-process-micro04]] (2026-06-09)
+## From [drive-research-scientific-writing-and-publication-process-micro04](/entities/drive-research-scientific-writing-and-publication-process-micro04.md) (2026-06-09)
 - a characteristic of effective writing
 - important in scholarly writing
 - a guideline for writing

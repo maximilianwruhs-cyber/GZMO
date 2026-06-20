@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[prompt-agent-engineering-part3|prompt-agent-engineering-part3]] (2026-06-08)
+## From [prompt-agent-engineering-part3](/entities/prompt-agent-engineering-part3.md) (2026-06-08)
 - The interface used by the Python script to communicate with Telegram users.
 - Handles sending and receiving messages, photos, and voice notes.
 - Schnittstelle für KI-Agenten

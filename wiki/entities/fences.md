@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[high-fidelity-markdown-engineering-and-ast-process|high-fidelity-markdown-engineering-and-ast-process]] (2026-06-08)
+## From [high-fidelity-markdown-engineering-and-ast-process](/entities/high-fidelity-markdown-engineering-and-ast-process.md) (2026-06-08)
 - Boolean that must be set to true to enforce the use of fences for all code blocks.
 - Prevents fallback to indented code syntax.
 - Further refines by dictating whether to use backticks (```) or tildes (~~~) as the primary boundary.

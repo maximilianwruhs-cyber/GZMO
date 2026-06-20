@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[gzmo-soul-merged-new-part3|gzmo-soul-merged-new-part3]] (2026-06-08)
+## From [gzmo-soul-merged-new-part3](/entities/gzmo-soul-merged-new-part3.md) (2026-06-08)
 - CORTEX.md is referenced for routing information.

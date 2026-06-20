@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-ai-agentic-teacher-research-report|drive-research-ai-agentic-teacher-research-report]] (2026-06-08)
+## From [drive-research-ai-agentic-teacher-research-report](/entities/drive-research-ai-agentic-teacher-research-report.md) (2026-06-08)
 - The challenge of programming a system that possesses vast knowledge to actively and strategically withhold it.
 - Requires specialized online Reinforcement Learning (RL) and multi-objective optimization.
 - Cannot be reliably induced merely through system prompting.

@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[obolus-vs-codium-extension-konzept-research-part2|obolus-vs-codium-extension-konzept-research-part2]] (2026-06-08)
+## From [obolus-vs-codium-extension-konzept-research-part2](/entities/obolus-vs-codium-extension-konzept-research-part2.md) (2026-06-08)
 - building an extension for tinyFolder

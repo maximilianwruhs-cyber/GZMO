@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[cybernetics-and-mythos-the-architecture-of-intell-part2|cybernetics-and-mythos-the-architecture-of-intell-part2]] (2026-06-08)
+## From [cybernetics-and-mythos-the-architecture-of-intell-part2](/entities/cybernetics-and-mythos-the-architecture-of-intell-part2.md) (2026-06-08)
 - His 'Library' prominently features the narrative of Prometheus as the literal sculptor of mankind.
 
-## From [[drive-research-prometheus-and-epimetheus-myth-exploration-micro02|drive-research-prometheus-and-epimetheus-myth-exploration-micro02]] (2026-06-09)
+## From [drive-research-prometheus-and-epimetheus-myth-exploration-micro02](/entities/drive-research-prometheus-and-epimetheus-myth-exploration-micro02.md) (2026-06-09)
 - Later mythographer.
 - Recorded alternate mythological traditions.
 - Featured Prometheus as the literal sculptor of mankind.

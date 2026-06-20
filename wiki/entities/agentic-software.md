@@ -14,9 +14,9 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-dawn-of-agentic-software-reverse-engineering-micro03|the-dawn-of-agentic-software-reverse-engineering-micro03]] (2026-06-09)
+## From [the-dawn-of-agentic-software-reverse-engineering-micro03](/entities/the-dawn-of-agentic-software-reverse-engineering-micro03.md) (2026-06-09)
 - Represents a permanent, foundational shift in how digital systems are analyzed, secured, and modernized.
 - Requires robust defenses against inversion and extraction attacks.
 
-## From [[the-dawn-of-agentic-software-reverse-engineering-micro04|the-dawn-of-agentic-software-reverse-engineering-micro04]] (2026-06-09)
+## From [the-dawn-of-agentic-software-reverse-engineering-micro04](/entities/the-dawn-of-agentic-software-reverse-engineering-micro04.md) (2026-06-09)
 - Subject of reverse engineering.

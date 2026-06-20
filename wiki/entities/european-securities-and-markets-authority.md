@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[drive-research-setting-up-autonomous-trading-agents-micro06|drive-research-setting-up-autonomous-trading-agents-micro06]] (2026-06-09)
+## From [drive-research-setting-up-autonomous-trading-agents-micro06](/entities/drive-research-setting-up-autonomous-trading-agents-micro06.md) (2026-06-09)
 - Published MiFID II Review Report on Algorithmic Trading.
 - Published Supervisory Briefing on Algorithmic Trading in the EU.

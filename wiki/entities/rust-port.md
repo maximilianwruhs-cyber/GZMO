@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: LANGUAGE_IMPLEMENTATION
 
-## From [[ai-research-part6-micro04|ai-research-part6-micro04]] (2026-06-09)
+## From [ai-research-part6-micro04](/entities/ai-research-part6-micro04.md) (2026-06-09)
 - High-performance implementation of the claw-code framework core
 - Ensures memory safety and high throughput

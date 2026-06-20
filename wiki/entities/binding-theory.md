@@ -14,12 +14,12 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-universal-syntax-research-prompt|drive-research-universal-syntax-research-prompt]] (2026-06-08)
+## From [drive-research-universal-syntax-research-prompt](/entities/drive-research-universal-syntax-research-prompt.md) (2026-06-08)
 - Dictates coreference possibilities for different types of noun phrases.
 - Includes Principle A (anaphors), Principle B (pronominals), and Principle C (R-expressions).
 - Relies on C-command relationships.
 
-## From [[universal-syntax-and-the-architecture-of-human-lan-micro02|universal-syntax-and-the-architecture-of-human-lan-micro02]] (2026-06-09)
+## From [universal-syntax-and-the-architecture-of-human-lan-micro02](/entities/universal-syntax-and-the-architecture-of-human-lan-micro02.md) (2026-06-09)
 - Dictates the coreference possibilities for different types of noun phrases.
 - Relies on C-command relationships.
 - Includes principles for anaphors, pronominals, and R-expressions.

@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-maximilian-wruhs|drive-research-maximilian-wruhs]] (2026-06-08)
+## From [drive-research-maximilian-wruhs](/entities/drive-research-maximilian-wruhs.md) (2026-06-08)
 - This is a core competence listed for MAXIMILIAN WRUHS.
 - Includes KFZ-Service, Mechanik, Hydrauliktechnik, Bremsen, Zahnriemen, Klimaanlagen.

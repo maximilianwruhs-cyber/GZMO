@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[prompt-agent-engineering-part7-micro05|prompt-agent-engineering-part7-micro05]] (2026-06-09)
+## From [prompt-agent-engineering-part7-micro05](/entities/prompt-agent-engineering-part7-micro05.md) (2026-06-09)
 - Nokia SR Linux is a containerized NOS supported by Containerlab.
 - Publicly available Nokia SR Linux images can be used.

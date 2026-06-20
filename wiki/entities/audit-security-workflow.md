@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[google-antigravity-the-architects-configuration-micro02|google-antigravity-the-architects-configuration-micro02]] (2026-06-09)
+## From [google-antigravity-the-architects-configuration-micro02](/entities/google-antigravity-the-architects-configuration-micro02.md) (2026-06-09)
 - Performs a deep-dive security check on the current file.
 - Scans for top OWASP vulnerabilities.
 - Provides a refactored version of vulnerable code blocks.

@@ -19,10 +19,10 @@ Type: TOOL
 ## Stub Implementation Note (2026-06-12)
 Full GeoGebra Classic execution integration is deferred due to headless browser execution security concerns and library licensing constraints. Instead, GZMO provides a `geogebra_plot` stub tool that generates formatted graphing calculator URLs. This tool is gated strictly to `ops_mode` (`/ops`).
 
-## From [[drive-research-ai-agentic-teacher|drive-research-ai-agentic-teacher]] (2026-06-08)
+## From [drive-research-ai-agentic-teacher](/entities/drive-research-ai-agentic-teacher.md) (2026-06-08)
 - An example tool for creating interactive visualizations.
 - Used for externalizing complex computations.
 
-## From [[drive-research-ai-agentic-teacher-research-report|drive-research-ai-agentic-teacher-research-report]] (2026-06-08)
+## From [drive-research-ai-agentic-teacher-research-report](/entities/drive-research-ai-agentic-teacher-research-report.md) (2026-06-08)
 - A computational tool for spatial reasoning.
 - Can be interfaced with by an agent to generate custom, interactive 3D visualizations.

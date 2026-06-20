@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-ai-agentic-teacher-research-report|drive-research-ai-agentic-teacher-research-report]] (2026-06-08)
+## From [drive-research-ai-agentic-teacher-research-report](/entities/drive-research-ai-agentic-teacher-research-report.md) (2026-06-08)
 - The core interaction protocol of an AI Agentic Teacher is grounded in this concept.
 - Represents the cognitive space between what a learner can achieve independently and what they can achieve with guidance.
 - The AI agent assumes the role of the 'More Knowledgeable Other'.

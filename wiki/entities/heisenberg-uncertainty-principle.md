@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[dynamics-of-the-unpredictable-micro03|dynamics-of-the-unpredictable-micro03]] (2026-06-09)
+## From [dynamics-of-the-unpredictable-micro03](/entities/dynamics-of-the-unpredictable-micro03.md) (2026-06-09)
 - Fundamentally blurs the classical concept of an exact 'initial condition' or a precise 'trajectory'.
 - Renders traditional diagnostic tools like global Lyapunov exponents theoretically incompatible with quantum systems.

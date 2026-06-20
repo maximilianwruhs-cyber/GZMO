@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[allgemeine-informationen|allgemeine-informationen]] (2026-06-08)
+## From [allgemeine-informationen](/entities/allgemeine-informationen.md) (2026-06-08)
 - It is the standard for designing, mocking, and testing API endpoints.
 - It is a key component for API Development.

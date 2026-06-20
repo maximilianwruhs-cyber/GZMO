@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-ai-agents-and-spec-driven-development-micro04|drive-research-ai-agents-and-spec-driven-development-micro04]] (2026-06-09)
+## From [drive-research-ai-agents-and-spec-driven-development-micro04](/entities/drive-research-ai-agents-and-spec-driven-development-micro04.md) (2026-06-09)
 - requires a fundamental redefinition
 - shifting entirely toward systems design, rigorous validation, and governance
 - burden of work is moving away from raw creation and toward maintenance discipline

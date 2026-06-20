@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-universal-syntax-research-prompt|drive-research-universal-syntax-research-prompt]] (2026-06-08)
+## From [drive-research-universal-syntax-research-prompt](/entities/drive-research-universal-syntax-research-prompt.md) (2026-06-08)
 - Hypothesized universal, innate grammar.
 - Re-imagined as a 'thin' skeletal blueprint in the Minimalist Program.
 - Argument for UG based on the 'poverty of the stimulus'.

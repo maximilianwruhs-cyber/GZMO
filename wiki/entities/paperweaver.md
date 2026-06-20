@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-tools-for-thought-research-explained|drive-research-tools-for-thought-research-explained]] (2026-06-08)
+## From [drive-research-tools-for-thought-research-explained](/entities/drive-research-tools-for-thought-research-explained.md) (2026-06-08)
 - A strategic reading system.
 - Generates comparative statements between concepts across multiple papers.

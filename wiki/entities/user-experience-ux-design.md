@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-architecture-of-engagement-an-analysis-of-gam-micro05|the-architecture-of-engagement-an-analysis-of-gam-micro05]] (2026-06-09)
+## From [the-architecture-of-engagement-an-analysis-of-gam-micro05](/entities/the-architecture-of-engagement-an-analysis-of-gam-micro05.md) (2026-06-09)
 - Requires a complete paradigm shift for the implementation of humane technology.
 - Ethical design frameworks advocate for core, protective principles.

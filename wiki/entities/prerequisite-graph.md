@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-ai-agentic-teacher|drive-research-ai-agentic-teacher]] (2026-06-08)
+## From [drive-research-ai-agentic-teacher](/entities/drive-research-ai-agentic-teacher.md) (2026-06-08)
 - Represents the domain's knowledge structure.
 - Consists of nodes (V) and edges (E).

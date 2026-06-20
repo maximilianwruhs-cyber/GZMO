@@ -14,12 +14,12 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-rust-tui-architecture-tech-stack1-micro06|drive-research-rust-tui-architecture-tech-stack1-micro06]] (2026-06-09)
+## From [drive-research-rust-tui-architecture-tech-stack1-micro06](/entities/drive-research-rust-tui-architecture-tech-stack1-micro06.md) (2026-06-09)
 - Used by Zellij for its architectural foundation.
 - Enables sandboxed plugin systems.
 - Allows isolated payloads to be compiled and executed securely.
 
-## From [[dynamics-of-the-unpredictable-micro06|dynamics-of-the-unpredictable-micro06]] (2026-06-09)
+## From [dynamics-of-the-unpredictable-micro06](/entities/dynamics-of-the-unpredictable-micro06.md) (2026-06-09)
 - A modern, highly secure alternative for embedding scripting.
 - Allows scripts to be written in any language that targets Wasm.
 - Executes binaries within a secure, sandboxed environment.

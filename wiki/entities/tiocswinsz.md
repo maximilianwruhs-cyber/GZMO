@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[tui-framework|tui-framework]] (2026-06-08)
+## From [tui-framework](/entities/tui-framework.md) (2026-06-08)
 - Correct ioctl command for window size changes.
 - Used in PTY management.
 - Bound to UI pane dragging in custom builds.

@@ -14,12 +14,12 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-llamabench|drive-research-llamabench]] (2026-06-08)
+## From [drive-research-llamabench](/entities/drive-research-llamabench.md) (2026-06-08)
 - Also called the decode phase
 - Measures the speed of generating subsequent tokens sequentially
 - Heavily bound by memory bandwidth
 
-## From [[drive-research-llama-bench-performance-benchmarking-tool-micro01|drive-research-llama-bench-performance-benchmarking-tool-micro01]] (2026-06-09)
+## From [drive-research-llama-bench-performance-benchmarking-tool-micro01](/entities/drive-research-llama-bench-performance-benchmarking-tool-micro01.md) (2026-06-09)
 - Commonly called the decode phase.
 - Processes subsequent tokens sequentially in an autoregressive loop.
 - Memory-bandwidth-bound.

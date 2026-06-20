@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part2|drive-research-ki-berater-fragebogen-für-kundenanalyse-part2]] (2026-06-08)
+## From [drive-research-ki-berater-fragebogen-für-kundenanalyse-part2](/entities/drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part2.md) (2026-06-08)
 - Established, automated processes for continuous model monitoring.
 - Part of the 'Anwender / Optimized (Level 5)' stage of organizational maturity.
 - Machine Learning Operations
@@ -22,7 +22,7 @@ Type: CONCEPT
 - bildet das harte, unbestechliche technologische Fundament der Readiness-Bewertung
 - die Qualität der verfügbaren Daten ist der ultimative Flaschenhals jeder KI-Initiative
 
-## From [[drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part1-micro02|drive-research-ki-berater-fragebogen-für-kundenanalyse-part1-micro02]] (2026-06-10)
+## From [drive-research-ki-berater-fragebogen-für-kundenanalyse-part1-micro02](/entities/drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part1-micro02.md) (2026-06-10)
 - Kontinuierliche Modellüberwachung
 - Bildet das technologische Fundament der Readiness-Bewertung
 - Behandelt Dateninventar, Zugänglichkeit und Datenqualität

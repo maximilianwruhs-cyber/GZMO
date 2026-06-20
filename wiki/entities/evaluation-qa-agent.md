@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: AGENT
 
-## From [[obolus-micro04|obolus-micro04]] (2026-06-09)
+## From [obolus-micro04](/entities/obolus-micro04.md) (2026-06-09)
 - ensures ServiceBot delivers reliable and understandable good answers
 - handles test cases and benchmarks for typical questions
 - systematically evaluates answers (quality, completeness, safety)

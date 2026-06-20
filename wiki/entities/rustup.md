@@ -14,8 +14,8 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[architecting-the-minimalist-linux-desktop-a-compa-part1|architecting-the-minimalist-linux-desktop-a-compa-part1]] (2026-06-08)
+## From [architecting-the-minimalist-linux-desktop-a-compa-part1](/entities/architecting-the-minimalist-linux-desktop-a-compa-part1.md) (2026-06-08)
 - Rust's toolchain that elegantly handles targeting x86_64-unknown-linux-musl.
 
-## From [[dynamics-of-the-unpredictable-micro05|dynamics-of-the-unpredictable-micro05]] (2026-06-10)
+## From [dynamics-of-the-unpredictable-micro05](/entities/dynamics-of-the-unpredictable-micro05.md) (2026-06-10)
 - Part of the Rust toolchain.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-archival-truth-part2-micro02|the-archival-truth-part2-micro02]] (2026-06-09)
+## From [the-archival-truth-part2-micro02](/entities/the-archival-truth-part2-micro02.md) (2026-06-09)
 - Rests upon rigorous archival infrastructure.
 - Involves passing unverified digital claims through academic and archival filters.
 - Acts as a structural filtration system for digital claims.

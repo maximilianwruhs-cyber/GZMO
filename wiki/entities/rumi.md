@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: AUTHOR
 
-## From [[the-archival-truth-part1-micro03|the-archival-truth-part1-micro03]] (2026-06-09)
+## From [the-archival-truth-part1-micro03](/entities/the-archival-truth-part1-micro03.md) (2026-06-09)
 - Persian mystic.
 - Provided a poetic plea for radical acceptance and vulnerability.
 - His quote is about wounds being where light enters.

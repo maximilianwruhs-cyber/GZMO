@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-research-process-steps-micro02|drive-research-research-process-steps-micro02]] (2026-06-10)
+## From [drive-research-research-process-steps-micro02](/entities/drive-research-research-process-steps-micro02.md) (2026-06-10)
 - Mixture of Experts configuration used for benchmarking.

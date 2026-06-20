@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-cascading-honeypot-ai-architecture|drive-research-cascading-honeypot-ai-architecture]] (2026-06-08)
+## From [drive-research-cascading-honeypot-ai-architecture](/entities/drive-research-cascading-honeypot-ai-architecture.md) (2026-06-08)
 - Highly structured and human-readable.
 - Contains pre-synthesized concept articles.
 - Is updated by new Markdown artifacts.

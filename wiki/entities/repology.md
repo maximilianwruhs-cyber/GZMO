@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-architektur-und-implementierung-intelligenter-ki-a-micro01|drive-research-architektur-und-implementierung-intelligenter-ki-a-micro01]] (2026-06-09)
+## From [drive-research-architektur-und-implementierung-intelligenter-ki-a-micro01](/entities/drive-research-architektur-und-implementierung-intelligenter-ki-a-micro01.md) (2026-06-09)
 - An aggregation repository.
 - Aggregates and monitors version data from hundreds of package repositories worldwide.
 - Can be accessed via REST APIs.

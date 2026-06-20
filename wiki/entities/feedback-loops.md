@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-cybernetics-information-loops-between-entities-micro04|drive-research-cybernetics-information-loops-between-entities-micro04]] (2026-06-09)
+## From [drive-research-cybernetics-information-loops-between-entities-micro04](/entities/drive-research-cybernetics-information-loops-between-entities-micro04.md) (2026-06-09)
 - Rely upon a strict architecture: sensors, controllers, and effectors.
 - The underlying structural logic remains remarkably identical across different systems.
 - Are the emergent, dynamic properties that bind actors inextricably together.

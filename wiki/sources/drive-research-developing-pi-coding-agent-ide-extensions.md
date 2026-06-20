@@ -14,21 +14,21 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-08).
 
 ## Entities
-- [[typescript|TypeScript]] (CONCEPT)
-- [[vers-vm-extension|Vers VM extension]] (PROJECT)
-- [[json-rpc|JSON-RPC]] (CONCEPT)
-- [[node-js|Node.js]] (SYSTEM)
-- [[llm-tools|LLM tools]] (CONCEPT)
-- [[npm|npm]] (TOOL)
-- [[mariozechner-pi-tui|@mariozechner/pi-tui]] (TOOL)
-- [[extension-system|extension system]] (CONCEPT)
-- [[claude-code|Claude Code]] (SYSTEM)
-- [[mariozechner-pi-coding-agent|@mariozechner/pi-coding-agent]] (PROJECT)
-- [[typebox|TypeBox]] (TOOL)
-- [[vers-api|Vers API]] (SYSTEM)
-- [[jiti|jiti]] (TOOL)
-- [[mario-zechner|Mario Zechner]] (PERSON)
-- [[ssh|SSH]] (CONCEPT)
+- [TypeScript](/entities/typescript.md) (CONCEPT)
+- [Vers VM extension](/entities/vers-vm-extension.md) (PROJECT)
+- [JSON-RPC](/entities/json-rpc.md) (CONCEPT)
+- [Node.js](/entities/node-js.md) (SYSTEM)
+- [LLM tools](/entities/llm-tools.md) (CONCEPT)
+- [npm](/entities/npm.md) (TOOL)
+- [@mariozechner/pi-tui](/entities/mariozechner-pi-tui.md) (TOOL)
+- [extension system](/entities/extension-system.md) (CONCEPT)
+- [Claude Code](/entities/claude-code.md) (SYSTEM)
+- [@mariozechner/pi-coding-agent](/entities/mariozechner-pi-coding-agent.md) (PROJECT)
+- [TypeBox](/entities/typebox.md) (TOOL)
+- [Vers API](/entities/vers-api.md) (SYSTEM)
+- [jiti](/entities/jiti.md) (TOOL)
+- [Mario Zechner](/entities/mario-zechner.md) (PERSON)
+- [SSH](/entities/ssh.md) (CONCEPT)
 
 ## Relations
 - @mariozechner/pi-coding-agent → USES → extension system

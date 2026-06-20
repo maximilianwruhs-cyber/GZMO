@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[drive-research-tools-for-thought-research-explained|drive-research-tools-for-thought-research-explained]] (2026-06-08)
+## From [drive-research-tools-for-thought-research-explained](/entities/drive-research-tools-for-thought-research-explained.md) (2026-06-08)
 - Provide a longitudinal view of AI reshaping the professional landscape.
 - Covered topics from initial LLM potential to collective productivity.
 - Highlight findings on junior talent gap and skill atrophy.

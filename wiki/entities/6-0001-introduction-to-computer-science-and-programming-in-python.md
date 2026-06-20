@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[drive-research-based-on-the-given-information-create-a-comprehens-micro01|drive-research-based-on-the-given-information-create-a-comprehens-micro01]] (2026-06-09)
+## From [drive-research-based-on-the-given-information-create-a-comprehens-micro01](/entities/drive-research-based-on-the-given-information-create-a-comprehens-micro01.md) (2026-06-09)
 - Created by MIT OpenCourseWare
 - Instructed by Dr. Eric Grimson and Dr. John Guttag
 - Primary programming language mentioned

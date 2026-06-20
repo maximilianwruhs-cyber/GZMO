@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-unfold-a-comprehensive-step-by-step-implementation|drive-research-unfold-a-comprehensive-step-by-step-implementation]] (2026-06-08)
+## From [drive-research-unfold-a-comprehensive-step-by-step-implementation](/entities/drive-research-unfold-a-comprehensive-step-by-step-implementation.md) (2026-06-08)
 - Needs to be constructed to implement the dialectical, stateful protocol.
 - Will operate as an asynchronous event-driven architecture instead of monolithic execution scripts.

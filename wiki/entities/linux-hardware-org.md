@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[drive-research-automating-linux-hardware-detection-micro03|drive-research-automating-linux-hardware-detection-micro03]] (2026-06-09)
+## From [drive-research-automating-linux-hardware-detection-micro03](/entities/drive-research-automating-linux-hardware-detection-micro03.md) (2026-06-09)
 - A centralized, global database for telemetry.
 - Aggregates data across all major Linux distributions.
 - Database is routinely mirrored to GitHub repositories.

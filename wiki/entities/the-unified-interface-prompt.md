@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[google-antigravity-the-architects-configuration-micro05|google-antigravity-the-architects-configuration-micro05]] (2026-06-10)
+## From [google-antigravity-the-architects-configuration-micro05](/entities/google-antigravity-the-architects-configuration-micro05.md) (2026-06-10)
 - Role: Omni-Dimensional UI/UX Architect, Frontend Performance Engineer, and Universal Accessibility Specialist
 - Objective: Guarantee pixel-perfect design systems, Core Web Vitals, and WCAG 3.0+ accessibility
 - Protocol: Includes Atomic Design System Extraction, Consistency & Aesthetic Audit, Frontend Performance Optimization, and Universal Compatibility

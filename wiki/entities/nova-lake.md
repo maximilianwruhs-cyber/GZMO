@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-linux-gaming-and-ai-build-guide-micro02|drive-research-linux-gaming-and-ai-build-guide-micro02]] (2026-06-09)
+## From [drive-research-linux-gaming-and-ai-build-guide-micro02](/entities/drive-research-linux-gaming-and-ai-build-guide-micro02.md) (2026-06-09)
 - Intel's architecture.
 - Slated for late 2026 or 2027 releases.
 - Features 'Big Last Level Cache'.
 
-## From [[drive-research-linux-gaming-and-ai-build-guide-micro06|drive-research-linux-gaming-and-ai-build-guide-micro06]] (2026-06-10)
+## From [drive-research-linux-gaming-and-ai-build-guide-micro06](/entities/drive-research-linux-gaming-and-ai-build-guide-micro06.md) (2026-06-10)
 - Slated for late 2026 or 2027

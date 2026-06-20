@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-rust-ecs-cache-optimization-research|drive-research-rust-ecs-cache-optimization-research]] (2026-06-08)
+## From [drive-research-rust-ecs-cache-optimization-research](/entities/drive-research-rust-ecs-cache-optimization-research.md) (2026-06-08)
 - Used by the hypervisor as a physical-to-logical translation table.
 - Maps an agent's logical identity to its slot in parallel component vectors.
 - Needs to be updated during swap-remove operations.

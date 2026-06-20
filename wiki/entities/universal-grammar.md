@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[universal-syntax-and-the-architecture-of-human-lan-micro02|universal-syntax-and-the-architecture-of-human-lan-micro02]] (2026-06-09)
+## From [universal-syntax-and-the-architecture-of-human-lan-micro02](/entities/universal-syntax-and-the-architecture-of-human-lan-micro02.md) (2026-06-09)
 - Hypothesized universal, innate grammar.
 - Re-imagined as a 'thin' skeletal blueprint in the Strong Minimalist Thesis.
 - Argument for its existence is based on the 'poverty of the stimulus'.

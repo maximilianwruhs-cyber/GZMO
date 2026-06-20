@@ -14,11 +14,11 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-cascading-honeypot-theorem-of-wisdom|the-cascading-honeypot-theorem-of-wisdom]] (2026-06-08)
+## From [the-cascading-honeypot-theorem-of-wisdom](/entities/the-cascading-honeypot-theorem-of-wisdom.md) (2026-06-08)
 - A psychological tension resulting from holding conflicting cognitions simultaneously.
 - Occurs when attempting to introduce new paradigms without first unlearning the old.
 - Overcome by "sense-breaking".
 
-## From [[drive-research-ai-wisdom-webs-honeypots-and-forgetting|drive-research-ai-wisdom-webs-honeypots-and-forgetting]] (2026-06-08)
+## From [drive-research-ai-wisdom-webs-honeypots-and-forgetting](/entities/drive-research-ai-wisdom-webs-honeypots-and-forgetting.md) (2026-06-08)
 - A psychological tension resulting from holding conflicting cognitions simultaneously.
 - Occurs when attempting to introduce new paradigms without unlearning the old.

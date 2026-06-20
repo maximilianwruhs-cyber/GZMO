@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[openclaw-deep-research-part11-micro06|openclaw-deep-research-part11-micro06]] (2026-06-09)
+## From [openclaw-deep-research-part11-micro06](/entities/openclaw-deep-research-part11-micro06.md) (2026-06-09)
 - The background task ledger tracks all detached work.
 - Includes ACP runs, subagent spawns, isolated cron executions, and CLI operations.
 - Tasks are records, not schedulers.

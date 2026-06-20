@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-scientific-writing-and-publication-process-micro01|drive-research-scientific-writing-and-publication-process-micro01]] (2026-06-09)
+## From [drive-research-scientific-writing-and-publication-process-micro01](/entities/drive-research-scientific-writing-and-publication-process-micro01.md) (2026-06-09)
 - It facilitates the creation of machine-actionable DMPs.
 - It is a joint effort of OpenAIRE and EUDAT.

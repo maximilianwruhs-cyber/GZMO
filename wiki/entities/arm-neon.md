@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[optimizing-nvidia-blackwell-sm120-part3-micro01|optimizing-nvidia-blackwell-sm120-part3-micro01]] (2026-06-10)
+## From [optimizing-nvidia-blackwell-sm120-part3-micro01](/entities/optimizing-nvidia-blackwell-sm120-part3-micro01.md) (2026-06-10)
 - Vector instructions used for ARM architecture optimization.

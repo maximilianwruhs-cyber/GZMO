@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[architectural-blueprints-for-sovereign-frankenmoe-part1|architectural-blueprints-for-sovereign-frankenmoe-part1]] (2026-06-08)
+## From [architectural-blueprints-for-sovereign-frankenmoe-part1](/entities/architectural-blueprints-for-sovereign-frankenmoe-part1.md) (2026-06-08)
 - A two-stage hybrid strategy.
 - Combines inter-expert pruning to discard less critical experts with low-rank decomposition to compress remaining expert layers.
 - Used to optimize memory usage.
@@ -22,7 +22,7 @@ Type: CONCEPT
 - Uses low-rank decomposition on remaining layers.
 - A multi-stage compression targeting FFN dimension reduction.
 
-## From [[drive-research-frankenmoe-merging-ai-models|drive-research-frankenmoe-merging-ai-models]] (2026-06-08)
+## From [drive-research-frankenmoe-merging-ai-models](/entities/drive-research-frankenmoe-merging-ai-models.md) (2026-06-08)
 - A two-stage hybrid strategy that combines inter-expert pruning with low-rank decomposition.
 - Compresses remaining expert layers after pruning.
 - A two-stage hybrid strategy for MoE compression.

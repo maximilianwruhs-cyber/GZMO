@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-architecture-of-engagement-an-analysis-of-gam-micro04|the-architecture-of-engagement-an-analysis-of-gam-micro04]] (2026-06-09)
+## From [the-architecture-of-engagement-an-analysis-of-gam-micro04](/entities/the-architecture-of-engagement-an-analysis-of-gam-micro04.md) (2026-06-09)
 - The principle on which the DFA operates.
 - Any digital entity targeting EU consumers must comply.
 - Establishes a de facto global standard for digital development.

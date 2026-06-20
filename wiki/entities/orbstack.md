@@ -14,8 +14,8 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[building-a-private-local-ai-development-environmen-micro06|building-a-private-local-ai-development-environmen-micro06]] (2026-06-09)
+## From [building-a-private-local-ai-development-environmen-micro06](/entities/building-a-private-local-ai-development-environmen-micro06.md) (2026-06-09)
 - A lighter FOSS alternative to Docker Desktop.
 
-## From [[ultimate-local-ai-development-stack-for-vscodium-micro03|ultimate-local-ai-development-stack-for-vscodium-micro03]] (2026-06-09)
+## From [ultimate-local-ai-development-stack-for-vscodium-micro03](/entities/ultimate-local-ai-development-stack-for-vscodium-micro03.md) (2026-06-09)
 - A lighter FOSS alternative to Docker Desktop.

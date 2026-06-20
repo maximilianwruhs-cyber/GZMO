@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-architecture-of-scientific-inquiry-and-academi|the-architecture-of-scientific-inquiry-and-academi]] (2026-06-08)
+## From [the-architecture-of-scientific-inquiry-and-academi](/entities/the-architecture-of-scientific-inquiry-and-academi.md) (2026-06-08)
 - The ultimate gatekeeping mechanism ensuring quality and validity of the scientific record.
 - Serves to identify flaws, demand clarification, and verify conclusions.
 - Models include Single-Blind, Double-Blind, Triple-Blind, Open & Transparent, Collaborative, and Post-Publication.
@@ -25,6 +25,6 @@ Type: CONCEPT
 - Different types of peer review discussed by Author Services
 - Step by Step Guide to Reviewing a Manuscript provided by Wiley Authors
 
-## From [[drive-research-scientific-writing-and-publication-process-micro04|drive-research-scientific-writing-and-publication-process-micro04]] (2026-06-09)
+## From [drive-research-scientific-writing-and-publication-process-micro04](/entities/drive-research-scientific-writing-and-publication-process-micro04.md) (2026-06-09)
 - has different types
 - reviewing a manuscript is a step-by-step process

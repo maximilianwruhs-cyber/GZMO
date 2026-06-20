@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-recursivemas-ki-agenten-kommunikation-der-zukunft|drive-research-recursivemas-ki-agenten-kommunikation-der-zukunft]] (2026-06-08)
+## From [drive-research-recursivemas-ki-agenten-kommunikation-der-zukunft](/entities/drive-research-recursivemas-ki-agenten-kommunikation-der-zukunft.md) (2026-06-08)
 - Example base model used in RecursiveMAS

@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[drive-research-technologischer-branchen-report-hilfsbetriebeumri-micro01|drive-research-technologischer-branchen-report-hilfsbetriebeumri-micro01]] (2026-06-10)
+## From [drive-research-technologischer-branchen-report-hilfsbetriebeumri-micro01](/entities/drive-research-technologischer-branchen-report-hilfsbetriebeumri-micro01.md) (2026-06-10)
 - Consolidated research corpus.

@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-research-project-initiation-guide|drive-research-research-project-initiation-guide]] (2026-06-08)
+## From [drive-research-research-project-initiation-guide](/entities/drive-research-research-project-initiation-guide.md) (2026-06-08)
 - An information processing model.
 - Stands for Purpose, Location, Use, Self-evaluation.
 - Emerged to structure information processing.
 
-## From [[optimizing-nvidia-blackwell-sm120-part2-micro06|optimizing-nvidia-blackwell-sm120-part2-micro06]] (2026-06-10)
+## From [optimizing-nvidia-blackwell-sm120-part2-micro06](/entities/optimizing-nvidia-blackwell-sm120-part2-micro06.md) (2026-06-10)
 - Framework consisting of Purpose, Location, Use, and Self-evaluation

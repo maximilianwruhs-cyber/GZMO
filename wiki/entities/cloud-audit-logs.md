@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[openclaw-part2|openclaw-part2]] (2026-06-08)
+## From [openclaw-part2](/entities/openclaw-part2.md) (2026-06-08)
 - Natively integrated with Google Cloud Secret Manager.
 - Records every retrieval of a secret by the OpenClaw agent.
 - Fulfills strict enterprise compliance and forensic auditing requirements.

@@ -14,19 +14,19 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-08).
 
 ## Entities
-- [[llm-compiler-architecture|LLM-Compiler architecture]] (SYSTEM)
-- [[executable-wisdom|Executable Wisdom]] (CONCEPT)
-- [[the-cascading-honeypot|The Cascading Honeypot]] (CONCEPT)
-- [[llm-wiki-architecture|LLM-Wiki architecture]] (SYSTEM)
-- [[neural-pathways|neural pathways]] (CONCEPT)
-- [[rag-pipelines|RAG pipelines]] (CONCEPT)
-- [[large-language-model|Large Language Model]] (SYSTEM)
-- [[vector-databases|Vector databases]] (SYSTEM)
-- [[retrieval-augmented-generation-rag-systems|Retrieval-Augmented Generation (RAG) systems]] (SYSTEM)
-- [[markdown|Markdown]] (CONCEPT)
-- [[schema|Schema]] (CONCEPT)
-- [[q-a-agent|Q&A Agent]] (SYSTEM)
-- [[linting-and-maintenance|Linting and Maintenance]] (CONCEPT)
+- [LLM-Compiler architecture](/entities/llm-compiler-architecture.md) (SYSTEM)
+- [Executable Wisdom](/entities/executable-wisdom.md) (CONCEPT)
+- [The Cascading Honeypot](/entities/the-cascading-honeypot.md) (CONCEPT)
+- [LLM-Wiki architecture](/entities/llm-wiki-architecture.md) (SYSTEM)
+- [neural pathways](/entities/neural-pathways.md) (CONCEPT)
+- [RAG pipelines](/entities/rag-pipelines.md) (CONCEPT)
+- [Large Language Model](/entities/large-language-model.md) (SYSTEM)
+- [Vector databases](/entities/vector-databases.md) (SYSTEM)
+- [Retrieval-Augmented Generation (RAG) systems](/entities/retrieval-augmented-generation-rag-systems.md) (SYSTEM)
+- [Markdown](/entities/markdown.md) (CONCEPT)
+- [Schema](/entities/schema.md) (CONCEPT)
+- [Q&A Agent](/entities/q-a-agent.md) (SYSTEM)
+- [Linting and Maintenance](/entities/linting-and-maintenance.md) (CONCEPT)
 
 ## Relations
 - The Cascading Honeypot → RELATED_TO → LLM-Compiler architecture

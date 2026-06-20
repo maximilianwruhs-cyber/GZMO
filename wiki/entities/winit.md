@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[dynamics-of-the-unpredictable-micro06|dynamics-of-the-unpredictable-micro06]] (2026-06-09)
+## From [dynamics-of-the-unpredictable-micro06](/entities/dynamics-of-the-unpredictable-micro06.md) (2026-06-09)
 - A crate universally utilized by engine developers to spawn a Window and intercept OS-level events via an EventLoop.
 - Used in conjunction with the wgpu::Instance for graphics context initialization.

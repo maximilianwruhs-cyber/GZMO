@@ -14,17 +14,17 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-08).
 
 ## Entities
-- [[bloom-s-taxonomy|Bloom's Taxonomy]] (CONCEPT)
-- [[zone-of-proximal-development-zpd|Zone of Proximal Development (ZPD)]] (CONCEPT)
-- [[curriculum-planner-agent|Curriculum Planner Agent]] (SYSTEM)
-- [[cognitive-load-theory-clt|Cognitive Load Theory (CLT)]] (CONCEPT)
-- [[learner-profile|Learner Profile]] (CONCEPT)
-- [[prerequisite-graph|Prerequisite Graph]] (CONCEPT)
-- [[ai-agentic-teacher|AI Agentic Teacher]] (SYSTEM)
-- [[geogebra|GeoGebra]] (TOOL)
-- [[affective-moderation-agent|Affective/Moderation Agent]] (SYSTEM)
-- [[diagnoser-evaluator-agent|Diagnoser/Evaluator Agent]] (SYSTEM)
-- [[tutor-socratic-agent-pedagogical-engine|Tutor/Socratic Agent (Pedagogical Engine)]] (SYSTEM)
+- [Bloom's Taxonomy](/entities/bloom-s-taxonomy.md) (CONCEPT)
+- [Zone of Proximal Development (ZPD)](/entities/zone-of-proximal-development-zpd.md) (CONCEPT)
+- [Curriculum Planner Agent](/entities/curriculum-planner-agent.md) (SYSTEM)
+- [Cognitive Load Theory (CLT)](/entities/cognitive-load-theory-clt.md) (CONCEPT)
+- [Learner Profile](/entities/learner-profile.md) (CONCEPT)
+- [Prerequisite Graph](/entities/prerequisite-graph.md) (CONCEPT)
+- [AI Agentic Teacher](/entities/ai-agentic-teacher.md) (SYSTEM)
+- [GeoGebra](/entities/geogebra.md) (TOOL)
+- [Affective/Moderation Agent](/entities/affective-moderation-agent.md) (SYSTEM)
+- [Diagnoser/Evaluator Agent](/entities/diagnoser-evaluator-agent.md) (SYSTEM)
+- [Tutor/Socratic Agent (Pedagogical Engine)](/entities/tutor-socratic-agent-pedagogical-engine.md) (SYSTEM)
 
 ## Relations
 - AI Agentic Teacher → PART_OF → Diagnoser/Evaluator Agent

@@ -14,8 +14,8 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[drive-research-ultimate-linux-workstation-tuning-blueprint|drive-research-ultimate-linux-workstation-tuning-blueprint]] (2026-06-08)
+## From [drive-research-ultimate-linux-workstation-tuning-blueprint](/entities/drive-research-ultimate-linux-workstation-tuning-blueprint.md) (2026-06-08)
 - published a reference on How to Use systemd Slices and Scopes for Resource Management on Ubuntu
 
-## From [[drive-research-bun-typescript-performance-tips-micro04|drive-research-bun-typescript-performance-tips-micro04]] (2026-06-09)
+## From [drive-research-bun-typescript-performance-tips-micro04](/entities/drive-research-bun-typescript-performance-tips-micro04.md) (2026-06-09)
 - Hosts an article on optimizing Bun performance.

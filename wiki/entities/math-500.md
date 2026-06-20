@@ -14,5 +14,5 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-32gb-vram-ai-reasoning-models-micro02|drive-research-32gb-vram-ai-reasoning-models-micro02]] (2026-06-09)
+## From [drive-research-32gb-vram-ai-reasoning-models-micro02](/entities/drive-research-32gb-vram-ai-reasoning-models-micro02.md) (2026-06-09)
 - DeepSeek-R1-Distill-Qwen-32B achieves an astonishing 94.3% on this evaluation.

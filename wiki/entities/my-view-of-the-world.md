@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[the-archival-truth-part2-micro03|the-archival-truth-part2-micro03]] (2026-06-10)
+## From [the-archival-truth-part2-micro03](/entities/the-archival-truth-part2-micro03.md) (2026-06-10)
 - Published in 1951.
 - Contains Schrödinger's challenges to the Western scientific worldview.

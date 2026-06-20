@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[prompt-agent-engineering-part5-micro06|prompt-agent-engineering-part5-micro06]] (2026-06-09)
+## From [prompt-agent-engineering-part5-micro06](/entities/prompt-agent-engineering-part5-micro06.md) (2026-06-09)
 - The agent writes, tests, and repairs code for meta-skills.
 - This process is becoming more autonomous and robust.

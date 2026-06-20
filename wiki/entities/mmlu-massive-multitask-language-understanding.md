@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[the-evolution-of-artificial-intelligence-evaluatio-micro02|the-evolution-of-artificial-intelligence-evaluatio-micro02]] (2026-06-09)
+## From [the-evolution-of-artificial-intelligence-evaluatio-micro02](/entities/the-evolution-of-artificial-intelligence-evaluatio-micro02.md) (2026-06-09)
 - Served as a primary yardstick for computational intelligence.
 - Scores for frontier models exceed ninety-three percent.
 - Remains marginally useful for evaluating smaller, mid-tier, or quantized edge models.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[ai-research-part2|ai-research-part2]] (2026-06-08)
+## From [ai-research-part2](/entities/ai-research-part2.md) (2026-06-08)
 - An advanced benchmark aggregating extremely difficult problems from Chinese and International Mathematical Olympiads.
 - Designed to probe the upper limits of LLM reasoning capabilities.
 - Developed by He et al., 2024.

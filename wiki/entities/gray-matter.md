@@ -14,12 +14,12 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[from-static-vaults-to-autonomous-knowledge-engines|from-static-vaults-to-autonomous-knowledge-engines]] (2026-06-08)
+## From [from-static-vaults-to-autonomous-knowledge-engines](/entities/from-static-vaults-to-autonomous-knowledge-engines.md) (2026-06-08)
 - A library used for parsing frontmatter.
 - Utilized by automated testing scripts.
 - Programmatically iterates through every markdown file in the repository.
 
-## From [[high-fidelity-markdown-engineering-and-ast-process|high-fidelity-markdown-engineering-and-ast-process]] (2026-06-08)
+## From [high-fidelity-markdown-engineering-and-ast-process](/entities/high-fidelity-markdown-engineering-and-ast-process.md) (2026-06-08)
 - Industry standard frontmatter parser.
 - Provides symmetric read and write capabilities.
 - Native support for multiple formats (YAML, JSON, TOML, CoffeeScript).

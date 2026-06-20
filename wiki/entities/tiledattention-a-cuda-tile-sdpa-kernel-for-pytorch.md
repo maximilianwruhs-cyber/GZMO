@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[drive-research-optimizing-cuda-performance-with-fp4-fp6-micro02|drive-research-optimizing-cuda-performance-with-fp4-fp6-micro02]] (2026-06-09)
+## From [drive-research-optimizing-cuda-performance-with-fp4-fp6-micro02](/entities/drive-research-optimizing-cuda-performance-with-fp4-fp6-micro02.md) (2026-06-09)
 - This is a research paper or publication.
 - It is related to TiledAttention and PyTorch.
 - cuTile was introduced experimentally in CUDA 13.1 and stabilized in 13.2.

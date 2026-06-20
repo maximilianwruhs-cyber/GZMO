@@ -14,8 +14,8 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-10).
 
 ## Entities
-- [[pymupdf|PyMuPDF]] (TOOL)
-- [[pdfminer|PDFminer]] (TOOL)
-- [[paddleocr|PaddleOCR]] (TOOL)
-- [[ocrmypdf|OCRmyPDF]] (TOOL)
-- [[poppler|Poppler]] (TOOL)
+- [PyMuPDF](/entities/pymupdf.md) (TOOL)
+- [PDFminer](/entities/pdfminer.md) (TOOL)
+- [PaddleOCR](/entities/paddleocr.md) (TOOL)
+- [OCRmyPDF](/entities/ocrmypdf.md) (TOOL)
+- [Poppler](/entities/poppler.md) (TOOL)

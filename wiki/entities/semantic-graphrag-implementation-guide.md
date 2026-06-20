@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-proxmox-agent-data-storage-micro03|drive-research-proxmox-agent-data-storage-micro03]] (2026-06-09)
+## From [drive-research-proxmox-agent-data-storage-micro03](/entities/drive-research-proxmox-agent-data-storage-micro03.md) (2026-06-09)
 - Related to Neo4j and Qdrant for AI knowledge systems.
 - A GitHub project related to Neo4j and Qdrant.
 - A framework involving Qdrant.

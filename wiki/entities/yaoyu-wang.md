@@ -14,8 +14,8 @@ gzmo_synthetic: true
 
 Type: AUTHOR
 
-## From [[ai-research-part1|ai-research-part1]] (2026-06-08)
+## From [ai-research-part1](/entities/ai-research-part1.md) (2026-06-08)
 - Listed as an author for the "Attention Residuals TECHNICAL REPORT".
 
-## From [[prfaas-cross-datacenter-llm-serving-via-selective-micro02|prfaas-cross-datacenter-llm-serving-via-selective-micro02]] (2026-06-10)
+## From [prfaas-cross-datacenter-llm-serving-via-selective-micro02](/entities/prfaas-cross-datacenter-llm-serving-via-selective-micro02.md) (2026-06-10)
 - Author of the document.

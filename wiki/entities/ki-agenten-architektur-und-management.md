@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[gzmo-soul-merged-new-part3|gzmo-soul-merged-new-part3]] (2026-06-08)
+## From [gzmo-soul-merged-new-part3](/entities/gzmo-soul-merged-new-part3.md) (2026-06-08)
 - This is a document titled "KI-Agenten Architektur und Management".
 - It discusses various aspects of AI agent architecture and management.
 - It includes sections on "Identität & Soul (GZMO Beispiel)" and "Librarian Agent (Wissensmanagement)".

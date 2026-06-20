@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[aether-grid-micro01|aether-grid-micro01]] (2026-06-09)
+## From [aether-grid-micro01](/entities/aether-grid-micro01.md) (2026-06-09)
 - Analyzes faulty strings from IoT sensors.
 - Can lead to buffer overflow or prompt injection.

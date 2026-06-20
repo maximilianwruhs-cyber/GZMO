@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[architectures-for-agentic-memory-virtual-context-micro07|architectures-for-agentic-memory-virtual-context-micro07]] (2026-06-09)
+## From [architectures-for-agentic-memory-virtual-context-micro07](/entities/architectures-for-agentic-memory-virtual-context-micro07.md) (2026-06-09)
 - An advanced framework that decouples context from the execution runtime of any individual agent.
 - Explicitly categorizes memory into six distinct types.
 - Utilizes an external Context Hub.

@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[architectural-blueprints-for-sovereign-frankenmoe-part1|architectural-blueprints-for-sovereign-frankenmoe-part1]] (2026-06-08)
+## From [architectural-blueprints-for-sovereign-frankenmoe-part1](/entities/architectural-blueprints-for-sovereign-frankenmoe-part1.md) (2026-06-08)
 - Explicitly enabled via VLLM_USE_V2_MODEL_RUNNER=1.
 - Uses GPU-native Triton kernels and asynchronous scheduling.
 - Aims to improve throughput in vLLM.
@@ -23,7 +23,7 @@ Type: CONCEPT
 - It uses GPU-native Triton kernels and asynchronous scheduling.
 - It works alongside Chunked Prefill to improve token-per-second throughput.
 
-## From [[drive-research-optimizing-qwen36-on-blackwell-gpus|drive-research-optimizing-qwen36-on-blackwell-gpus]] (2026-06-08)
+## From [drive-research-optimizing-qwen36-on-blackwell-gpus](/entities/drive-research-optimizing-qwen36-on-blackwell-gpus.md) (2026-06-08)
 - Used by vLLM to launch the server.
 - Uses native Triton kernels and asynchronous scheduling to improve inference throughput.
 - Enabled by setting the environment variable VLLM_USE_V2_MODEL_RUNNER=1.

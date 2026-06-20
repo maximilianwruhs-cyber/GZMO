@@ -14,9 +14,9 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[openclaw-deep-research-part6|openclaw-deep-research-part6]] (2026-06-08)
+## From [openclaw-deep-research-part6](/entities/openclaw-deep-research-part6.md) (2026-06-08)
 - An attack involving over 340 malicious skills uploaded to ClawHub.
 - Designed to exfiltrate credentials.
 
-## From [[openclaw-part1-micro05|openclaw-part1-micro05]] (2026-06-10)
+## From [openclaw-part1-micro05](/entities/openclaw-part1-micro05.md) (2026-06-10)
 - A historical attack involving MacOS-Stealer malware.

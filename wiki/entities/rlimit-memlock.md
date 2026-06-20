@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-cuda-memory-locking-limits-configuration|drive-research-cuda-memory-locking-limits-configuration]] (2026-06-08)
+## From [drive-research-cuda-memory-locking-limits-configuration](/entities/drive-research-cuda-memory-locking-limits-configuration.md) (2026-06-08)
 - A resource limit designated by the Linux kernel that restricts memory-locking operations.
 - Dictates the maximum virtual address space a process can lock into physical RAM.
 - Significant confusion arose among developers regarding whether driver-level host memory allocations were bound by this parameter.

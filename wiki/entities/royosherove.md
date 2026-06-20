@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[openclaw-deep-research-part9-micro01|openclaw-deep-research-part9-micro01]] (2026-06-10)
+## From [openclaw-deep-research-part9-micro01](/entities/openclaw-deep-research-part9-micro01.md) (2026-06-10)
 - GitHub user associated with the openclaw-arch-deep-dive.md gist.

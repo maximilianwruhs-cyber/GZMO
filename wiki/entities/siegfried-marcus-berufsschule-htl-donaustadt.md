@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[drive-research-maximilian-wruhs|drive-research-maximilian-wruhs]] (2026-06-08)
+## From [drive-research-maximilian-wruhs](/entities/drive-research-maximilian-wruhs.md) (2026-06-08)
 - MAXIMILIAN WRUHS completed Lehre mit Matura (KFZ-Technik und Elektrik) from 2006 to 2010.
 - This is an educational institution.

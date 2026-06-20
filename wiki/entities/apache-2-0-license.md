@@ -15,12 +15,12 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-recursivemas-add-info|drive-research-recursivemas-add-info]] (2026-06-08)
+## From [drive-research-recursivemas-add-info](/entities/drive-research-recursivemas-add-info.md) (2026-06-08)
 - Permissive license under which RecursiveMAS code and weights are published.
 
-## From [[architectures-and-optimizations-for-speculative-de-micro03|architectures-and-optimizations-for-speculative-de-micro03]] (2026-06-09)
+## From [architectures-and-optimizations-for-speculative-de-micro03](/entities/architectures-and-optimizations-for-speculative-de-micro03.md) (2026-06-09)
 - The license under which the source code and weights are published.
 - A permissive license.
 
-## From [[drive-research-bun-file-parsing-dependency-shortlist-micro01|drive-research-bun-file-parsing-dependency-shortlist-micro01]] (2026-06-09)
+## From [drive-research-bun-file-parsing-dependency-shortlist-micro01](/entities/drive-research-bun-file-parsing-dependency-shortlist-micro01.md) (2026-06-09)
 - permissive open-source license

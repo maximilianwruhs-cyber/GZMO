@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[ai-research-part2|ai-research-part2]] (2026-06-08)
+## From [ai-research-part2](/entities/ai-research-part2.md) (2026-06-08)
 - Shows consistent improvement across three co-evolutionary iterations.
 - Achieved a MATH score of 42.6 and General score of 22.0 without a tool.
 - Achieved a MATH score of 52.5 and General score of 32.6 with Agent0.

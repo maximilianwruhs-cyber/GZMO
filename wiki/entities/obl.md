@@ -15,13 +15,13 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[obolus-vs-codium-extension-konzept-research-part1-micro03|obolus-vs-codium-extension-konzept-research-part1-micro03]] (2026-06-10)
+## From [obolus-vs-codium-extension-konzept-research-part1-micro03](/entities/obolus-vs-codium-extension-konzept-research-part1-micro03.md) (2026-06-10)
 - A token with market prices used in telemetry data.
 
-## From [[prompt-agent-engineering-part4-micro05|prompt-agent-engineering-part4-micro05]] (2026-06-10)
+## From [prompt-agent-engineering-part4-micro05](/entities/prompt-agent-engineering-part4-micro05.md) (2026-06-10)
 - A thermodynamic token economy/energy budget
 - Used to optimize agent compute resource economics
 
-## From [[prompt-agent-engineering-part4-micro06|prompt-agent-engineering-part4-micro06]] (2026-06-10)
+## From [prompt-agent-engineering-part4-micro06](/entities/prompt-agent-engineering-part4-micro06.md) (2026-06-10)
 - Thermodynamic energy concept
 - Used to estimate task costs

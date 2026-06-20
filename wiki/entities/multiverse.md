@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-definitive-pantheon|the-definitive-pantheon]] (2026-06-08)
+## From [the-definitive-pantheon](/entities/the-definitive-pantheon.md) (2026-06-08)
 - Introduced to DC Comics by The Flash.
 - A storytelling mechanic that permanently changed the medium.

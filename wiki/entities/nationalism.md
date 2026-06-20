@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-archival-truth-part2-micro04|the-archival-truth-part2-micro04]] (2026-06-09)
+## From [the-archival-truth-part2-micro04](/entities/the-archival-truth-part2-micro04.md) (2026-06-09)
 - Viewed as an 'archpestilence' that poisoned European culture.
 - Fatally succumbed European humanism.

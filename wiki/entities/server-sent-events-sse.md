@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-benchmarking-llamacpp-server-prefill-tokens-micro01|drive-research-benchmarking-llamacpp-server-prefill-tokens-micro01]] (2026-06-09)
+## From [drive-research-benchmarking-llamacpp-server-prefill-tokens-micro01](/entities/drive-research-benchmarking-llamacpp-server-prefill-tokens-micro01.md) (2026-06-09)
 - Chunks emitted by llama-server when 'return_progress' is true and 'stream' is true.
 - Contain prefill metrics before the first token is generated.
 - Used to track progress during long sequence ingestion.

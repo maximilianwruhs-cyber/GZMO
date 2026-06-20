@@ -14,9 +14,9 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[openclaw-deep-research-part12|openclaw-deep-research-part12]] (2026-06-08)
+## From [openclaw-deep-research-part12](/entities/openclaw-deep-research-part12.md) (2026-06-08)
 - An alias for OpenClaw.
 
-## From [[openclaw-deep-research-part5-micro03|openclaw-deep-research-part5-micro03]] (2026-06-09)
+## From [openclaw-deep-research-part5-micro03](/entities/openclaw-deep-research-part5-micro03.md) (2026-06-09)
 - A space lobster AI with a soul.
 - Built OpenClaw.

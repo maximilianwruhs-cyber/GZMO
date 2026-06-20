@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[the-architecture-of-engagement-an-analysis-of-gam-micro01|the-architecture-of-engagement-an-analysis-of-gam-micro01]] (2026-06-09)
+## From [the-architecture-of-engagement-an-analysis-of-gam-micro01](/entities/the-architecture-of-engagement-an-analysis-of-gam-micro01.md) (2026-06-09)
 - Masterfully uses star-based point systems and tiered status levels in loyalty programs.
 - Ensures loyalty program members drive a disproportionate majority of total corporate revenue.

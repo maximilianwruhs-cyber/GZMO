@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-small-models|drive-research-small-models]] (2026-06-08)
+## From [drive-research-small-models](/entities/drive-research-small-models.md) (2026-06-08)
 - Models don't generate text.
 - Take a query and a document, and output a "relevance score."
 - Used to filter messy data so your big LLM only sees the most important chunks.

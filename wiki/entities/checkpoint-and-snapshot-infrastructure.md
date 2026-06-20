@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-hermes-system-untersuchung-und-erweiterung|drive-research-hermes-system-untersuchung-und-erweiterung]] (2026-06-08)
+## From [drive-research-hermes-system-untersuchung-und-erweiterung](/entities/drive-research-hermes-system-untersuchung-und-erweiterung.md) (2026-06-08)
 - Analyzed for autonomous system design.
 - Evaluated for BoL-Manifest rollbacks.
 - Distinguishes between /snapshot and checkpoints commands.

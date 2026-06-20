@@ -14,13 +14,13 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-10).
 
 ## Entities
-- [[matrix|Matrix]] (SYSTEM)
-- [[telegram|Telegram]] (SYSTEM)
-- [[claude-cli|Claude CLI]] (TOOL)
-- [[discord|Discord]] (SYSTEM)
-- [[slack|Slack]] (SYSTEM)
-- [[openclaw|OpenClaw]] (SYSTEM)
-- [[anthropic|Anthropic]] (ORGANIZATION)
-- [[mitre-atlas|MITRE ATLAS]] (CONCEPT)
-- [[whatsapp|WhatsApp]] (SYSTEM)
-- [[tailscale|Tailscale]] (TOOL)
+- [Matrix](/entities/matrix.md) (SYSTEM)
+- [Telegram](/entities/telegram.md) (SYSTEM)
+- [Claude CLI](/entities/claude-cli.md) (TOOL)
+- [Discord](/entities/discord.md) (SYSTEM)
+- [Slack](/entities/slack.md) (SYSTEM)
+- [OpenClaw](/entities/openclaw.md) (SYSTEM)
+- [Anthropic](/entities/anthropic.md) (ORGANIZATION)
+- [MITRE ATLAS](/entities/mitre-atlas.md) (CONCEPT)
+- [WhatsApp](/entities/whatsapp.md) (SYSTEM)
+- [Tailscale](/entities/tailscale.md) (TOOL)

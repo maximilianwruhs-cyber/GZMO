@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: INCIDENT
 
-## From [[ai-research-part6-micro05|ai-research-part6-micro05]] (2026-06-09)
+## From [ai-research-part6-micro05](/entities/ai-research-part6-micro05.md) (2026-06-09)
 - Lessons learned from this incident inform Phase 1 of the roadmap.
 - Related to exfiltration risks and agent security.

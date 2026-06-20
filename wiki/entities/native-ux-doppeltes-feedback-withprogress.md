@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[obolus-vs-codium-extension-konzept-research-part1-micro06|obolus-vs-codium-extension-konzept-research-part1-micro06]] (2026-06-09)
+## From [obolus-vs-codium-extension-konzept-research-part1-micro06](/entities/obolus-vs-codium-extension-konzept-research-part1-micro06.md) (2026-06-09)
 - Utilizes the vscode.window.withProgress API for native IDE integration.
 - Displays a native loading indicator in the bottom right of VSCodium.
 - Allows developers to close tabs and continue benchmarks in the background without losing visual feedback.

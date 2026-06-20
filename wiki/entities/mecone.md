@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-prometheus-and-epimetheus-myth-exploration-micro03|drive-research-prometheus-and-epimetheus-myth-exploration-micro03]] (2026-06-09)
+## From [drive-research-prometheus-and-epimetheus-myth-exploration-micro03](/entities/drive-research-prometheus-and-epimetheus-myth-exploration-micro03.md) (2026-06-09)
 - Site of the trick involving animal sacrifice.
 - Marked the end of communion between gods and humans.

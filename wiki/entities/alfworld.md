@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: ENVIRONMENT
 
-## From [[reflexion-framework-architectures-for-mitigating|reflexion-framework-architectures-for-mitigating]] (2026-06-08)
+## From [reflexion-framework-architectures-for-mitigating](/entities/reflexion-framework-architectures-for-mitigating.md) (2026-06-08)
 - A text-based game engine used for sequential decision-making tasks.
 - Provides deterministic feedback.
 - Demonstrated a 75% baseline performance for Sequential Decision-Making (ReAct).

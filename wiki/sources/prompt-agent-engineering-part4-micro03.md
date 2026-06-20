@@ -14,22 +14,22 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-10).
 
 ## Entities
-- [[llama-3-70b-fp4|Llama-3-70B-FP4]] (SYSTEM)
-- [[dgx-gh200|DGX GH200]] (SYSTEM)
-- [[dgx-spark|DGX Spark]] (SYSTEM)
-- [[triton-inference-server|Triton Inference Server]] (TOOL)
-- [[local-action-bus-lab|Local Action Bus (LAB)]] (SYSTEM)
-- [[the-hive-mind|The Hive-Mind]] (SYSTEM)
-- [[envoy|Envoy]] (TOOL)
-- [[qdrant|Qdrant]] (SYSTEM)
-- [[nvidia-riva|NVIDIA Riva]] (TOOL)
-- [[instinct-threshold-engine|Instinct-Threshold-Engine]] (SYSTEM)
-- [[hashicorp-vault|HashiCorp Vault]] (TOOL)
-- [[nvidia-deepstream-sdk|NVIDIA DeepStream SDK]] (TOOL)
-- [[mistral-7b|Mistral-7B]] (SYSTEM)
-- [[kubernetes|Kubernetes]] (SYSTEM)
-- [[nvidia-tensorrt-llm|NVIDIA TensorRT-LLM]] (TOOL)
-- [[aether-link|AETHER-LINK]] (SYSTEM)
+- [Llama-3-70B-FP4](/entities/llama-3-70b-fp4.md) (SYSTEM)
+- [DGX GH200](/entities/dgx-gh200.md) (SYSTEM)
+- [DGX Spark](/entities/dgx-spark.md) (SYSTEM)
+- [Triton Inference Server](/entities/triton-inference-server.md) (TOOL)
+- [Local Action Bus (LAB)](/entities/local-action-bus-lab.md) (SYSTEM)
+- [The Hive-Mind](/entities/the-hive-mind.md) (SYSTEM)
+- [Envoy](/entities/envoy.md) (TOOL)
+- [Qdrant](/entities/qdrant.md) (SYSTEM)
+- [NVIDIA Riva](/entities/nvidia-riva.md) (TOOL)
+- [Instinct-Threshold-Engine](/entities/instinct-threshold-engine.md) (SYSTEM)
+- [HashiCorp Vault](/entities/hashicorp-vault.md) (TOOL)
+- [NVIDIA DeepStream SDK](/entities/nvidia-deepstream-sdk.md) (TOOL)
+- [Mistral-7B](/entities/mistral-7b.md) (SYSTEM)
+- [Kubernetes](/entities/kubernetes.md) (SYSTEM)
+- [NVIDIA TensorRT-LLM](/entities/nvidia-tensorrt-llm.md) (TOOL)
+- [AETHER-LINK](/entities/aether-link.md) (SYSTEM)
 
 ## Relations
 - Instinct-Threshold-Engine → PART_OF → DGX Spark

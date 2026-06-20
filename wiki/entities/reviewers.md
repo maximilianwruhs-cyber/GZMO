@@ -14,9 +14,9 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[drive-research-scientific-writing-and-publication-process-micro03|drive-research-scientific-writing-and-publication-process-micro03]] (2026-06-09)
+## From [drive-research-scientific-writing-and-publication-process-micro03](/entities/drive-research-scientific-writing-and-publication-process-micro03.md) (2026-06-09)
 - Comments from the reviewers must be copied directly into the response document.
 
-## From [[drive-research-scientific-writing-and-publication-process-micro04|drive-research-scientific-writing-and-publication-process-micro04]] (2026-06-09)
+## From [drive-research-scientific-writing-and-publication-process-micro04](/entities/drive-research-scientific-writing-and-publication-process-micro04.md) (2026-06-09)
 - comments can be responded to
 - manuscripts can be reviewed by them

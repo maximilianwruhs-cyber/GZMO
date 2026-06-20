@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-technologischer-branchen-report-hilfsbetriebeumri-micro02|drive-research-technologischer-branchen-report-hilfsbetriebeumri-micro02]] (2026-06-09)
+## From [drive-research-technologischer-branchen-report-hilfsbetriebeumri-micro02](/entities/drive-research-technologischer-branchen-report-hilfsbetriebeumri-micro02.md) (2026-06-09)
 - Heating, Ventilation, and Air Conditioning.
 - Determines a significant portion of onboard network energy consumption.
 - Fed by the auxiliary converter.

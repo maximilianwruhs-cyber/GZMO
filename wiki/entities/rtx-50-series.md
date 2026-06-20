@@ -14,8 +14,8 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-recursivemas-add-info|drive-research-recursivemas-add-info]] (2026-06-08)
+## From [drive-research-recursivemas-add-info](/entities/drive-research-recursivemas-add-info.md) (2026-06-08)
 - Example of a consumer GPU that can run lighter configurations like 'Sequential Light'.
 
-## From [[architectures-and-optimizations-for-speculative-de-micro03|architectures-and-optimizations-for-speculative-de-micro03]] (2026-06-09)
+## From [architectures-and-optimizations-for-speculative-de-micro03](/entities/architectures-and-optimizations-for-speculative-de-micro03.md) (2026-06-09)
 - A consumer GPU that can run lighter configurations of the system.

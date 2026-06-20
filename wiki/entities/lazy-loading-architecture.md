@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-cognitive-architecture-of-openclaw-agents-micro02|the-cognitive-architecture-of-openclaw-agents-micro02]] (2026-06-09)
+## From [the-cognitive-architecture-of-openclaw-agents-micro02](/entities/the-cognitive-architecture-of-openclaw-agents-micro02.md) (2026-06-09)
 - Skills are not preemptively injected into the system prompt.
 - The engine provides the model with a highly compressed metadata list outlining available capabilities.
 - Dynamically reads the SKILL.md file from the disk and injects it into the active memory sequence.

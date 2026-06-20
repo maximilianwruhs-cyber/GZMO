@@ -4,6 +4,7 @@
 //! All logic — config, LLM gateway, tools, memory, identity,
 //! daemon, dreams, MCP, and stealth discovery — lives here.
 
+pub mod compliance;
 pub mod config;
 pub mod types;
 pub mod gateway;

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[dynamics-of-the-unpredictable-micro03|dynamics-of-the-unpredictable-micro03]] (2026-06-09)
+## From [dynamics-of-the-unpredictable-micro03](/entities/dynamics-of-the-unpredictable-micro03.md) (2026-06-09)
 - A specialized active non-linear device used in Chua's Circuit.
 - Synthesized using an operational amplifier negative impedance converter paired with a diode-resistor network.
 - Its Voltage-Current (V-I) curve features sudden, discontinuous changes.

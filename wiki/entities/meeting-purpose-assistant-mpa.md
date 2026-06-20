@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-tools-for-thought-research-explained|drive-research-tools-for-thought-research-explained]] (2026-06-08)
+## From [drive-research-tools-for-thought-research-explained](/entities/drive-research-tools-for-thought-research-explained.md) (2026-06-08)
 - An AI tool that prompts organizers to articulate success criteria before meetings.
 - Aims to reduce organizational tension and increase alignment.

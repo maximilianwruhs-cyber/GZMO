@@ -14,12 +14,12 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-10).
 
 ## Entities
-- [[discord|Discord]] (SYSTEM)
-- [[telegram|Telegram]] (SYSTEM)
-- [[tencent-cloud-lighthouse|Tencent Cloud Lighthouse]] (ORGANIZATION)
-- [[clawhub-skills|Clawhub/Skills]] (CONCEPT)
-- [[langchain|LangChain]] (TOOL)
-- [[openclaw-skill-marketplace|OpenClaw Skill Marketplace]] (SYSTEM)
-- [[whatsapp|WhatsApp]] (SYSTEM)
-- [[clawdbot|Clawdbot]] (SYSTEM)
-- [[imessage|iMessage]] (SYSTEM)
+- [Discord](/entities/discord.md) (SYSTEM)
+- [Telegram](/entities/telegram.md) (SYSTEM)
+- [Tencent Cloud Lighthouse](/entities/tencent-cloud-lighthouse.md) (ORGANIZATION)
+- [Clawhub/Skills](/entities/clawhub-skills.md) (CONCEPT)
+- [LangChain](/entities/langchain.md) (TOOL)
+- [OpenClaw Skill Marketplace](/entities/openclaw-skill-marketplace.md) (SYSTEM)
+- [WhatsApp](/entities/whatsapp.md) (SYSTEM)
+- [Clawdbot](/entities/clawdbot.md) (SYSTEM)
+- [iMessage](/entities/imessage.md) (SYSTEM)

@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[openclaw-deep-research-part11-micro04|openclaw-deep-research-part11-micro04]] (2026-06-09)
+## From [openclaw-deep-research-part11-micro04](/entities/openclaw-deep-research-part11-micro04.md) (2026-06-09)
 - Required for global installation of OpenClaw.

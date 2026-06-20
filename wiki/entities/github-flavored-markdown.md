@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-creating-a-comprehensive-readmemd-micro03|drive-research-creating-a-comprehensive-readmemd-micro03]] (2026-06-09)
+## From [drive-research-creating-a-comprehensive-readmemd-micro03](/entities/drive-research-creating-a-comprehensive-readmemd-micro03.md) (2026-06-09)
 - Create a GitHub README Template for Projects Today
 - othneildrew/Best-README-Template: An awesome ... - GitHub
 - README Files for Internal Projects

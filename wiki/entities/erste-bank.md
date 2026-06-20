@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[drive-research-setting-up-autonomous-trading-agents-micro02|drive-research-setting-up-autonomous-trading-agents-micro02]] (2026-06-09)
+## From [drive-research-setting-up-autonomous-trading-agents-micro02](/entities/drive-research-setting-up-autonomous-trading-agents-micro02.md) (2026-06-09)
 - Austrian broker that operates as steuereinfach.
 - Charges high per-order fees.
 
-## From [[the-architects-handbook-for-autonomous-agentic-tr-micro03|the-architects-handbook-for-autonomous-agentic-tr-micro03]] (2026-06-09)
+## From [the-architects-handbook-for-autonomous-agentic-tr-micro03](/entities/the-architects-handbook-for-autonomous-agentic-tr-micro03.md) (2026-06-09)
 - An Austrian broker that operates as steuereinfach.
 - Charges high per-order fees.

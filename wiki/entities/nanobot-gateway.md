@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[allgemeine-informationen|allgemeine-informationen]] (2026-06-08)
+## From [allgemeine-informationen](/entities/allgemeine-informationen.md) (2026-06-08)
 - It is a service defined in `docker-compose.yml`.
 - It uses the `ghcr.io/hkuds/nanobot-ai:latest` image.
 - It exposes port 18790.

@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[drive-research-pdf-text-vs-scan-detection-heuristics-micro01|drive-research-pdf-text-vs-scan-detection-heuristics-micro01]] (2026-06-09)
+## From [drive-research-pdf-text-vs-scan-detection-heuristics-micro01](/entities/drive-research-pdf-text-vs-scan-detection-heuristics-micro01.md) (2026-06-09)
 - Title of the research corpus.
 - Consolidated from Google Takeout.

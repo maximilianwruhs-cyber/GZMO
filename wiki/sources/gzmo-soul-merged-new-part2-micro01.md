@@ -14,9 +14,9 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[gzmo-soul-merged-new-part2|gzmo-soul-merged-new-part2]] (BOOK)
-- [[cloud-kg-extraction|cloud KG extraction]] (CONCEPT)
-- [[wave-01-gzmo-obolus|wave_01_gzmo_obolus]] (CONCEPT)
+- [gzmo-soul-merged-new-part2](/entities/gzmo-soul-merged-new-part2.md) (BOOK)
+- [cloud KG extraction](/entities/cloud-kg-extraction.md) (CONCEPT)
+- [wave_01_gzmo_obolus](/entities/wave-01-gzmo-obolus.md) (CONCEPT)
 
 ## Relations
 - gzmo-soul-merged-new-part2 → USES → cloud KG extraction

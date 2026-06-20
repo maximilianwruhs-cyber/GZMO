@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-so-what-is-your-final-model-constellation|drive-research-so-what-is-your-final-model-constellation]] (2026-06-08)
+## From [drive-research-so-what-is-your-final-model-constellation](/entities/drive-research-so-what-is-your-final-model-constellation.md) (2026-06-08)
 - Bypasses system RAM memory bandwidth bottleneck.
 - Unifies the model inside graphics memory by passing GPUs to a single guest environment.

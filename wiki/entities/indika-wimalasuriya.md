@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[openclaw-deep-research-part11-micro03|openclaw-deep-research-part11-micro03]] (2026-06-09)
+## From [openclaw-deep-research-part11-micro03](/entities/openclaw-deep-research-part11-micro03.md) (2026-06-09)
 - Author of the article.
 - Is part of AWS Community Builders.

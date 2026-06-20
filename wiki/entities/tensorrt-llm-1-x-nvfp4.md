@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[aether-grid-micro02|aether-grid-micro02]] (2026-06-09)
+## From [aether-grid-micro02](/entities/aether-grid-micro02.md) (2026-06-09)
 - Edge-Inferenz
 - currently 1.x-Reihe, v0.10+ from 2024 as base
 - NVFP4-Quantisierung, Weight-Streaming, LoRA-Support and Eagle3-Speculative-Decoding

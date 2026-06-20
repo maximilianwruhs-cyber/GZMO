@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-der-aufstieg-und-die-absicht-des-bibliothekars-age|drive-research-der-aufstieg-und-die-absicht-des-bibliothekars-age]] (2026-06-08)
+## From [drive-research-der-aufstieg-und-die-absicht-des-bibliothekars-age](/entities/drive-research-der-aufstieg-und-die-absicht-des-bibliothekars-age.md) (2026-06-08)
 - Stützten sich stark auf extraktive Zusammenfassung in der Vergangenheit.
 - Identifizierten und extrahierten lediglich existierende Sätze, die hochfrequente Stichwörter enthielten.

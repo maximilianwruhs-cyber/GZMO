@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-erbandbreite-und-latenzengp-sse|drive-research-erbandbreite-und-latenzengpässe]] (2026-06-08)
+## From [drive-research-erbandbreite-und-latenzengpässe](/entities/drive-research-erbandbreite-und-latenzengp-sse.md) (2026-06-08)
 - Transformer-based architectures generate text sequentially, processing a single token per forward pass.
 - Requires loading entire parameter weight matrix and KV cache during each step.
 - Low computational intensity leads to data starvation for AI accelerators.

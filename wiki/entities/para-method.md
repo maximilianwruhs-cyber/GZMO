@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-architektur-und-implementierung-intelligenter-ki-a-micro01|drive-research-architektur-und-implementierung-intelligenter-ki-a-micro01]] (2026-06-09)
+## From [drive-research-architektur-und-implementierung-intelligenter-ki-a-micro01](/entities/drive-research-architektur-und-implementierung-intelligenter-ki-a-micro01.md) (2026-06-09)
 - Developed by Tiago Forte.
 - Categorizes information by action relevance: Projects, Areas, Resources, Archives.
 - Provides a deterministic heuristic for AI agents.

@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-evolution-of-artificial-intelligence-evaluatio-micro03|the-evolution-of-artificial-intelligence-evaluatio-micro03]] (2026-06-09)
+## From [the-evolution-of-artificial-intelligence-evaluatio-micro03](/entities/the-evolution-of-artificial-intelligence-evaluatio-micro03.md) (2026-06-09)
 - A standardized dataset encompassing distinct misuse behaviors that violate standard safety policies across ten broad categories
 - Provides a standardized dataset encompassing distinct misuse behaviors that violate standard safety policies across ten broad categories

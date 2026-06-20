@@ -14,9 +14,9 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[the-archival-truth-part1-micro07|the-archival-truth-part1-micro07]] (2026-06-09)
+## From [the-archival-truth-part1-micro07](/entities/the-archival-truth-part1-micro07.md) (2026-06-09)
 - Is a regional competition for emerging comedians.
 - Features preliminary rounds and a finale, offering performers twenty-minute slots.
 
-## From [[drive-research-the-architecture-of-humor-micro01|drive-research-the-architecture-of-humor-micro01]] (2026-06-10)
+## From [drive-research-the-architecture-of-humor-micro01](/entities/drive-research-the-architecture-of-humor-micro01.md) (2026-06-10)
 - A regional competition for comedians.

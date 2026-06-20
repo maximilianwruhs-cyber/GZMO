@@ -14,12 +14,12 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[drive-research-small-models|drive-research-small-models]] (2026-06-08)
+## From [drive-research-small-models](/entities/drive-research-small-models.md) (2026-06-08)
 - Engineered Llama models.
 - Specifically engineered to be ultra-lightweight and run natively on edge devices or frontend servers with limited compute.
 - Lightning-fast and great for simple conversational routing or checking formatting.
 
-## From [[the-architecture-of-speculative-decoding-and-infer-part2-micro03|the-architecture-of-speculative-decoding-and-infer-part2-micro03]] (2026-06-09)
+## From [the-architecture-of-speculative-decoding-and-infer-part2-micro03](/entities/the-architecture-of-speculative-decoding-and-infer-part2-micro03.md) (2026-06-09)
 - Can be a draft model for Llama 3.3 70B / 3.1 70B.
 - Specifically engineered to be ultra-lightweight.
 - Can run natively on edge devices or frontend servers with limited compute.

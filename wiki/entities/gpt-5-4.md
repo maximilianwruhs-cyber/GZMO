@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[openclaw-part1-micro04|openclaw-part1-micro04]] (2026-06-10)
+## From [openclaw-part1-micro04](/entities/openclaw-part1-micro04.md) (2026-06-10)
 - A frontier reasoning and coding model from OpenAI.
 - Features a 'Tool Search' mechanism to reduce token overhead.

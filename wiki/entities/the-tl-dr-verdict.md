@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-sovereign-software-factory-blueprint|the-sovereign-software-factory-blueprint]] (2026-06-08)
+## From [the-sovereign-software-factory-blueprint](/entities/the-sovereign-software-factory-blueprint.md) (2026-06-08)
 - Summarizes the capabilities gained by combining 1.58-bit CPU models, GPU reasoning models, Obsidian, and MCP.
 - Capability of a Silicon Valley enterprise engineering team.

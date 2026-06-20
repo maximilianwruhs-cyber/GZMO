@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[the-archival-truth-part1-micro05|the-archival-truth-part1-micro05]] (2026-06-09)
+## From [the-archival-truth-part1-micro05](/entities/the-archival-truth-part1-micro05.md) (2026-06-09)
 - Noted Ernie Bushmiller's use of three rocks in background scenes.

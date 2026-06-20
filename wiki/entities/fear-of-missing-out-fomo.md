@@ -14,11 +14,11 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-architecture-of-engagement-an-analysis-of-gam-micro01|the-architecture-of-engagement-an-analysis-of-gam-micro01]] (2026-06-09)
+## From [the-architecture-of-engagement-an-analysis-of-gam-micro01](/entities/the-architecture-of-engagement-an-analysis-of-gam-micro01.md) (2026-06-09)
 - A pervasive psychological stressor that compels continuous digital interaction.
 - Preys on the evolutionary human imperative for social inclusion and resource acquisition.
 - Acts as the synthesized emotional output of interwoven biases in digital platforms.
 
-## From [[the-architecture-of-engagement-an-analysis-of-gam-micro05|the-architecture-of-engagement-an-analysis-of-gam-micro05]] (2026-06-09)
+## From [the-architecture-of-engagement-an-analysis-of-gam-micro05](/entities/the-architecture-of-engagement-an-analysis-of-gam-micro05.md) (2026-06-09)
 - Digital platforms effectively weaponize it.
 - Drives unprecedented and unnatural levels of continuous human engagement.

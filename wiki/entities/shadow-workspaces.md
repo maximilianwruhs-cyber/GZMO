@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[high-performance-typescript-execution-and-architec-part2|high-performance-typescript-execution-and-architec-part2]] (2026-06-08)
+## From [high-performance-typescript-execution-and-architec-part2](/entities/high-performance-typescript-execution-and-architec-part2.md) (2026-06-08)
 - They represent a monumental leap in agentic code generation accuracy.
 - Their primary architectural goal is achieving absolute LSP-usability.
 - They achieve process isolation by spawning a hidden application window.

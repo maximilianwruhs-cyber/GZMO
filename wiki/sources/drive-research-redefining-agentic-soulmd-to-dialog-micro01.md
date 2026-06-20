@@ -14,9 +14,9 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[google-takeout|Google Takeout]] (TOOL)
-- [[drive-research-redefining-agentic-soulmd-to-dialog|drive-research-redefining-agentic-soulmd-to-dialog]] (PROJECT)
-- [[cloud-kg-extraction|cloud KG extraction]] (SYSTEM)
+- [Google Takeout](/entities/google-takeout.md) (TOOL)
+- [drive-research-redefining-agentic-soulmd-to-dialog](/entities/drive-research-redefining-agentic-soulmd-to-dialog.md) (PROJECT)
+- [cloud KG extraction](/entities/cloud-kg-extraction.md) (SYSTEM)
 
 ## Relations
 - drive-research-redefining-agentic-soulmd-to-dialog → RELATED_TO → cloud KG extraction

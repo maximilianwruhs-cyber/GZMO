@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-linux-gaming-and-ai-build-guide-micro04|drive-research-linux-gaming-and-ai-build-guide-micro04]] (2026-06-09)
+## From [drive-research-linux-gaming-and-ai-build-guide-micro04](/entities/drive-research-linux-gaming-and-ai-build-guide-micro04.md) (2026-06-09)
 - The architecture around which the AMD RX 9000 Series cards are built.
 - AMD's hardware excels in native Linux compatibility.

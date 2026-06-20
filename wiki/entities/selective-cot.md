@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-architektur-token-effizienter-ki-agenten-strategi|drive-research-architektur-token-effizienter-ki-agenten-strategi]] (2026-06-08)
+## From [drive-research-architektur-token-effizienter-ki-agenten-strategi](/entities/drive-research-architektur-token-effizienter-ki-agenten-strategi.md) (2026-06-08)
 - Injects the 'think step-by-step' heuristic only for complex tasks.

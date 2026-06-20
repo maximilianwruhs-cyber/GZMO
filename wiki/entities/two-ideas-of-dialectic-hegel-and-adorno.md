@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[cybernetics-and-mythos-the-architecture-of-intell-part2|cybernetics-and-mythos-the-architecture-of-intell-part2]] (2026-06-08)
+## From [cybernetics-and-mythos-the-architecture-of-intell-part2](/entities/cybernetics-and-mythos-the-architecture-of-intell-part2.md) (2026-06-08)
 - Adorno retained Hegel's concept of "determinate negation" and the rigorous self-reflection of the dialectic.
 - Hegel posited an ultimate speculative identity between thought and being.
 - Peter E. Gordon's 2024 lecture "Two Ideas of Dialectic: Hegel and Adorno" discusses the contrast between Hegel and Adorno.
@@ -22,7 +22,7 @@ Type: PERSON
 - Formulated dialectic as an internal, self-driving process of logic and historical development.
 - Sought to demonstrate that contradiction was the fundamental, animating engine of reality itself.
 
-## From [[drive-research-dialectics-socratic-vs-hegelian-methods|drive-research-dialectics-socratic-vs-hegelian-methods]] (2026-06-08)
+## From [drive-research-dialectics-socratic-vs-hegelian-methods](/entities/drive-research-dialectics-socratic-vs-hegelian-methods.md) (2026-06-08)
 - lecture by Peter E. Gordon
 - argues that the contrast between Hegel and Adorno is often overstated
 - retained Hegel's concept of 'determinate negation'

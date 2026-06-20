@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-neuro-symbolic-prompt-engineering-research|drive-research-neuro-symbolic-prompt-engineering-research]] (2026-06-08)
+## From [drive-research-neuro-symbolic-prompt-engineering-research](/entities/drive-research-neuro-symbolic-prompt-engineering-research.md) (2026-06-08)
 - Techniques that dramatically improve text classification accuracy in zero-shot settings.
 - Perceive categories through their hierarchical parents and children.

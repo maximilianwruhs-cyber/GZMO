@@ -16,25 +16,25 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[openclaw-part2|openclaw-part2]] (2026-06-08)
+## From [openclaw-part2](/entities/openclaw-part2.md) (2026-06-08)
 - A performance fork of OpenClaw.
 - Rust-based.
 - Rewritten in low-level languages for efficiency/IoT.
 - A high-performance fork of OpenClaw written in Rust.
 - Designed for IoT devices with minimal RAM (under 5MB).
 
-## From [[openclaw-deep-research-part6|openclaw-deep-research-part6]] (2026-06-08)
+## From [openclaw-deep-research-part6](/entities/openclaw-deep-research-part6.md) (2026-06-08)
 - A performance fork rewritten in low-level languages for efficiency/IoT.
 - Rust-based.
 - A high-performance fork of OpenClaw written in Rust, designed for IoT devices with minimal RAM (under 5MB).
 
-## From [[openclaw-deep-research-part5-micro04|openclaw-deep-research-part5-micro04]] (2026-06-09)
+## From [openclaw-deep-research-part5-micro04](/entities/openclaw-deep-research-part5-micro04.md) (2026-06-09)
 - Performance-focused fork of OpenClaw.
 - Written entirely in Rust, compiles to a single 3.40 MB binary.
 - Boots in under 10.00 ms and uses less than 5.00 MB of RAM.
 - Suitable for edge computing and IoT devices.
 - Free to use.
 
-## From [[openclaw-rust-terminal-user-interface-architecture-micro02|openclaw-rust-terminal-user-interface-architecture-micro02]] (2026-06-10)
+## From [openclaw-rust-terminal-user-interface-architecture-micro02](/entities/openclaw-rust-terminal-user-interface-architecture-micro02.md) (2026-06-10)
 - A community fork of the OpenClaw ecosystem
 - Implemented in Rust

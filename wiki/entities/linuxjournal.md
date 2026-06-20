@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[drive-research-linux-gaming-and-ai-build-guide-micro03|drive-research-linux-gaming-and-ai-build-guide-micro03]] (2026-06-09)
+## From [drive-research-linux-gaming-and-ai-build-guide-micro03](/entities/drive-research-linux-gaming-and-ai-build-guide-micro03.md) (2026-06-09)
 - Published Top Linux Gaming Distributions for 2026

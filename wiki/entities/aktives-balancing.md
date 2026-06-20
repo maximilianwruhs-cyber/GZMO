@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-technologischer-branchen-report-hilfsbetriebeumri-micro02|drive-research-technologischer-branchen-report-hilfsbetriebeumri-micro02]] (2026-06-09)
+## From [drive-research-technologischer-branchen-report-hilfsbetriebeumri-micro02](/entities/drive-research-technologischer-branchen-report-hilfsbetriebeumri-micro02.md) (2026-06-09)
 - Modern BMS method for cell balancing in rail vehicles.
 - Transfers charge losslessly between cells using inductive or capacitive components.
 - Maximizes capacity and battery life.

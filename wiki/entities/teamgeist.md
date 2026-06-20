@@ -14,8 +14,8 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[mastering-remote-work-a-comprehensive-guide-to-ho|mastering-remote-work-a-comprehensive-guide-to-ho]] (2026-06-08)
+## From [mastering-remote-work-a-comprehensive-guide-to-ho](/entities/mastering-remote-work-a-comprehensive-guide-to-ho.md) (2026-06-08)
 - Published "5 Übungen für's Homeoffice für mehr Gesundheit und Bewegung im Homeoffice".
 
-## From [[drive-research-home-office-leitfaden-struktur-gesundheit-erfol|drive-research-home-office-leitfaden-struktur-gesundheit-erfol]] (2026-06-08)
+## From [drive-research-home-office-leitfaden-struktur-gesundheit-erfol](/entities/drive-research-home-office-leitfaden-struktur-gesundheit-erfol.md) (2026-06-08)
 - Offers 5 exercises for the home office to promote health and movement.

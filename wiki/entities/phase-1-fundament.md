@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: PHASE
 
-## From [[ai-research-part6-micro05|ai-research-part6-micro05]] (2026-06-09)
+## From [ai-research-part6-micro05](/entities/ai-research-part6-micro05.md) (2026-06-09)
 - Migration to Rust-Engine and gVisor-isolation.
 - Focuses on securing against exfiltration risks (lessons from 2026 incident).

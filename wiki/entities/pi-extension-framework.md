@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-building-pi-coding-agent-extensions|drive-research-building-pi-coding-agent-extensions]] (2026-06-08)
+## From [drive-research-building-pi-coding-agent-extensions](/entities/drive-research-building-pi-coding-agent-extensions.md) (2026-06-08)
 - Offers unparalleled programmatic control over the agent's behavior.
 - Ensures that the prompt context injected into the LLM remains pristine, highly relevant, and precisely controlled.
 - Allows developers to manipulate the global application UI layout.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-erbandbreite-und-latenzengp-sse|drive-research-erbandbreite-und-latenzengpässe]] (2026-06-08)
+## From [drive-research-erbandbreite-und-latenzengpässe](/entities/drive-research-erbandbreite-und-latenzengp-sse.md) (2026-06-08)
 - must be customized to support highly complex, tree-structured cache topologies
 - allows shared prefixes to point to identical physical blocks in GPU memory
 - allows diverging speculative branches to allocate new, distinct pages

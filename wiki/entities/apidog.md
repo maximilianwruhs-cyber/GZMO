@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[openclaw-deep-research-part6|openclaw-deep-research-part6]] (2026-06-08)
+## From [openclaw-deep-research-part6](/entities/openclaw-deep-research-part6.md) (2026-06-08)
 - A platform that helps test heartbeat boundaries in one workspace.
 - Combines design, testing, mocking, and documentation for API contracts.
 - Can be used to test heartbeat endpoints.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[openclaw-part2|openclaw-part2]] (2026-06-08)
+## From [openclaw-part2](/entities/openclaw-part2.md) (2026-06-08)
 - Advanced orchestration used by Google Cloud Platform.
 - The undisputed industry standard for deploying OpenClaw production workloads.
 - Pods are ephemeral by design.

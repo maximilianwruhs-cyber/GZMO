@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[architectures-for-agentic-memory-virtual-context-micro03|architectures-for-agentic-memory-virtual-context-micro03]] (2026-06-09)
+## From [architectures-for-agentic-memory-virtual-context-micro03](/entities/architectures-for-agentic-memory-virtual-context-micro03.md) (2026-06-09)
 - Guarantees syntactic determinism.
 - Ensures the output string will compile as valid JSON.
 - A high-level abstraction layer that translates application-level schemas into engine constraints.

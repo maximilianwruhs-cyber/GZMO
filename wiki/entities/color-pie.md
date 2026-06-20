@@ -14,9 +14,9 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-architecture-of-a-trading-card-game-micro02|the-architecture-of-a-trading-card-game-micro02]] (2026-06-09)
+## From [the-architecture-of-a-trading-card-game-micro02](/entities/the-architecture-of-a-trading-card-game-micro02.md) (2026-06-09)
 - The fundamental organizing principle of the game, a psychological and mechanical division into five distinct colors.
 - Transitioned from a thematic guideline to strict mechanical law.
 
-## From [[the-architecture-of-a-trading-card-game-micro04|the-architecture-of-a-trading-card-game-micro04]] (2026-06-10)
+## From [the-architecture-of-a-trading-card-game-micro04](/entities/the-architecture-of-a-trading-card-game-micro04.md) (2026-06-10)
 - A system of historical, psychological, and mechanical strengths and weaknesses.

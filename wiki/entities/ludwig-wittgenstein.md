@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[the-archival-truth-part2-micro04|the-archival-truth-part2-micro04]] (2026-06-09)
+## From [the-archival-truth-part2-micro04](/entities/the-archival-truth-part2-micro04.md) (2026-06-09)
 - Associated with 'Linguistic Positivism'.
 - Authored Tractatus Logico-Philosophicus.
 
-## From [[the-archival-truth-part2-micro03|the-archival-truth-part2-micro03]] (2026-06-10)
+## From [the-archival-truth-part2-micro03](/entities/the-archival-truth-part2-micro03.md) (2026-06-10)
 - Redefined the boundaries of human thought and logic.
 - Authored Tractatus Logico-Philosophicus and Philosophical Investigations.

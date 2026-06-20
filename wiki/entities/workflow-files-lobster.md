@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[openclaw-deep-research-part11-micro07|openclaw-deep-research-part11-micro07]] (2026-06-09)
+## From [openclaw-deep-research-part11-micro07](/entities/openclaw-deep-research-part11-micro07.md) (2026-06-09)
 - A workflow shell that lets OpenClaw run multi-step tool sequences.
 - Provides deterministic pipelines, explicit approvals, and resumable state.
 - Is an authoring layer above detached background work.

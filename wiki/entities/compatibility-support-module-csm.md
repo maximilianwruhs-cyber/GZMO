@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[architecting-the-minimalist-linux-desktop-a-compa-part2|architecting-the-minimalist-linux-desktop-a-compa-part2]] (2026-06-08)
+## From [architecting-the-minimalist-linux-desktop-a-compa-part2](/entities/architecting-the-minimalist-linux-desktop-a-compa-part2.md) (2026-06-08)
 - It acts as a bridge, allowing a modern UEFI motherboard to emulate a legacy BIOS environment.
 - Utilizing CSM inherently disables modern UEFI features, including Secure Boot.
 - It is being aggressively deprecated and entirely removed by hardware manufacturers.

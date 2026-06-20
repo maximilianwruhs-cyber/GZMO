@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[openclaw-part1-micro06|openclaw-part1-micro06]] (2026-06-09)
+## From [openclaw-part1-micro06](/entities/openclaw-part1-micro06.md) (2026-06-09)
 - Temporal Decay has a default half-life of 30 days in this architecture.
 - The GZMO persona is transformed into a highly autonomous 'Chief of Staff'.

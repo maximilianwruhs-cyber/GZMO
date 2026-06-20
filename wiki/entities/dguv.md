@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[mastering-remote-work-a-comprehensive-guide-to-ho|mastering-remote-work-a-comprehensive-guide-to-ho]] (2026-06-08)
+## From [mastering-remote-work-a-comprehensive-guide-to-ho](/entities/mastering-remote-work-a-comprehensive-guide-to-ho.md) (2026-06-08)
 - Provides recommendations for home office equipment.
 - Referenced by Haufe.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: HARDWARE
 
-## From [[drive-research-ultimate-linux-workstation-tuning-blueprint|drive-research-ultimate-linux-workstation-tuning-blueprint]] (2026-06-08)
+## From [drive-research-ultimate-linux-workstation-tuning-blueprint](/entities/drive-research-ultimate-linux-workstation-tuning-blueprint.md) (2026-06-08)
 - Built upon the Blackwell GB202 silicon layout.
 - Capable of drawing 575W under peak load.
 - Utilizes GDDR7 memory with PAM3 signaling.

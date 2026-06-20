@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[cybernetics-and-mythos-the-architecture-of-intell-part1|cybernetics-and-mythos-the-architecture-of-intell-part1]] (2026-06-08)
+## From [cybernetics-and-mythos-the-architecture-of-intell-part1](/entities/cybernetics-and-mythos-the-architecture-of-intell-part1.md) (2026-06-08)
 - A paradigm for instilling domain knowledge and behavioral rules into an agent.
 - Socratic is an open-source tool in this domain.
 
-## From [[drive-research-redefining-agentic-soulmd-to-dialog-micro03|drive-research-redefining-agentic-soulmd-to-dialog-micro03]] (2026-06-09)
+## From [drive-research-redefining-agentic-soulmd-to-dialog-micro03](/entities/drive-research-redefining-agentic-soulmd-to-dialog-micro03.md) (2026-06-09)
 - Paradigm for instilling domain knowledge and behavioral rules into agents.
 - Treats AI agents like students.

@@ -14,8 +14,8 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[prfaas-cross-datacenter-llm-serving-via-selective-micro02|prfaas-cross-datacenter-llm-serving-via-selective-micro02]] (2026-06-10)
+## From [prfaas-cross-datacenter-llm-serving-via-selective-micro02](/entities/prfaas-cross-datacenter-llm-serving-via-selective-micro02.md) (2026-06-10)
 - Hardware explicitly targeting high-throughput long-context prefill.
 
-## From [[prfaas-cross-datacenter-llm-serving-via-selective-micro05|prfaas-cross-datacenter-llm-serving-via-selective-micro05]] (2026-06-10)
+## From [prfaas-cross-datacenter-llm-serving-via-selective-micro05](/entities/prfaas-cross-datacenter-llm-serving-via-selective-micro05.md) (2026-06-10)
 - A chip that emphasizes compute throughput for prefill.

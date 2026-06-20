@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: FRAMEWORK
 
-## From [[from-static-vaults-to-autonomous-knowledge-engines|from-static-vaults-to-autonomous-knowledge-engines]] (2026-06-08)
+## From [from-static-vaults-to-autonomous-knowledge-engines](/entities/from-static-vaults-to-autonomous-knowledge-engines.md) (2026-06-08)
 - It is the most advanced, documented manifestation of autonomous vault linking.
 - It is an open-source initiative.
 - It shifts the paradigm from retrieving knowledge to autonomously generating it.

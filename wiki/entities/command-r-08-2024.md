@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: MODEL
 
-## From [[drive-research-agentic-workflows-fastest-best-models|drive-research-agentic-workflows-fastest-best-models]] (2026-06-08)
+## From [drive-research-agentic-workflows-fastest-best-models](/entities/drive-research-agentic-workflows-fastest-best-models.md) (2026-06-08)
 - A 35-billion parameter model optimized for Retrieval-Augmented Generation (RAG) and tool use.
 - Commands a 128,000-token context.
 - Executes accurate decision-making algorithms for routing prompts.

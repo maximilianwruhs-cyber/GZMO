@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[prfaas-cross-datacenter-llm-serving-via-selective-micro02|prfaas-cross-datacenter-llm-serving-via-selective-micro02]] (2026-06-10)
+## From [prfaas-cross-datacenter-llm-serving-via-selective-micro02](/entities/prfaas-cross-datacenter-llm-serving-via-selective-micro02.md) (2026-06-10)
 - A deployment paradigm that separates prefill (compute-intensive) from decode (memory-bandwidth-intensive) phases of inference.
 - Conventional deployments are often confined to a single datacenter-scale RDMA fabric.

@@ -23,7 +23,7 @@ Adapted from ARCH-DIR-001 v2.1 for the GZMO Rust stack. This document is normati
 | Cognition | `engine.local` → Prime | `active_mode=cloud` as default |
 | Memory | SQLite vault + honeypot | Cloud memory SaaS |
 | Retrieval | Qdrant/Neo4j on LAN | Public vector DBs |
-| Tools | MCP stdio, governed shell | `web_search` without opt-in |
+| Tools | MCP stdio, governed shell, Tier-2 `network_exceptions` | Ungoverned outbound (generic `curl` without exception markers) |
 | Observability | logs/, `gzmo health`, Obolus ledger | Phoning-home SDKs |
 | Energy | ObolusGate + system bilanz | Autospawn/loops without bilanz |
 | Dependencies | Workspace-pinned, reviewed | New crate without Zero-Bloat Review |

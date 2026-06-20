@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[reflexion-framework-architectures-for-mitigating|reflexion-framework-architectures-for-mitigating]] (2026-06-08)
+## From [reflexion-framework-architectures-for-mitigating](/entities/reflexion-framework-architectures-for-mitigating.md) (2026-06-08)
 - Acts as the execution engine, parameterized by a frozen LLM.
 - Interacts with the environment.
 - Typically utilizes reasoning-and-acting frameworks like ReAct or Chain-of-Thought (CoT).

@@ -14,5 +14,5 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[architectures-for-agentic-memory-virtual-context-micro05|architectures-for-agentic-memory-virtual-context-micro05]] (2026-06-09)
+## From [architectures-for-agentic-memory-virtual-context-micro05](/entities/architectures-for-agentic-memory-virtual-context-micro05.md) (2026-06-09)
 - Integrated with Mem0 for automatic graph isolation.

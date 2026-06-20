@@ -14,9 +14,9 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part2|drive-research-ki-berater-fragebogen-für-kundenanalyse-part2]] (2026-06-08)
+## From [drive-research-ki-berater-fragebogen-für-kundenanalyse-part2](/entities/drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part2.md) (2026-06-08)
 - Wertet Telemetrie- und Sensordaten in Echtzeit aus.
 - Verhindert Maschinenausfälle in der Produktion proaktiv.
 
-## From [[drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part1-micro04|drive-research-ki-berater-fragebogen-für-kundenanalyse-part1-micro04]] (2026-06-09)
+## From [drive-research-ki-berater-fragebogen-für-kundenanalyse-part1-micro04](/entities/drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part1-micro04.md) (2026-06-09)
 - ausgereifte Anwendungsfälle für prädiktive Wartung (Predictive Maintenance), die Telemetrie- und Sensordaten in Echtzeit auswerten, um Maschinenausfälle in der Produktion proaktiv zu verhindern

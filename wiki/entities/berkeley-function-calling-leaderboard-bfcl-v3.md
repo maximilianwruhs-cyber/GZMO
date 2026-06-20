@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-agentic-workflows-fastest-best-models|drive-research-agentic-workflows-fastest-best-models]] (2026-06-08)
+## From [drive-research-agentic-workflows-fastest-best-models](/entities/drive-research-agentic-workflows-fastest-best-models.md) (2026-06-08)
 - Evaluates models through multi-turn, multi-step interactions.
 - Assesses system state changes and execution path correctness.
 - Qwen2.5-Coder achieves an elite score of 90.2 on this leaderboard.

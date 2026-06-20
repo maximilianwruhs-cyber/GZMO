@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-rust-tui-architecture-tech-stack1-micro04|drive-research-rust-tui-architecture-tech-stack1-micro04]] (2026-06-09)
+## From [drive-research-rust-tui-architecture-tech-stack1-micro04](/entities/drive-research-rust-tui-architecture-tech-stack1-micro04.md) (2026-06-09)
 - Represents events processed by the global state in a Component Architecture.
 - Can be returned by handle_events and update methods.

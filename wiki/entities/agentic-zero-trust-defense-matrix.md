@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[openclaw-autonomous-ai-agents-in-financial-operat|openclaw-autonomous-ai-agents-in-financial-operat]] (2026-06-08)
+## From [openclaw-autonomous-ai-agents-in-financial-operat](/entities/openclaw-autonomous-ai-agents-in-financial-operat.md) (2026-06-08)
 - Stringent, heavily enforced architecture to secure high-privilege operations.
 - Mandates critical infrastructure protocols before financial workflows are activated.
 - Includes Network Isolation and Binding, Principle of Least Privilege, and Nightly Security Audits.

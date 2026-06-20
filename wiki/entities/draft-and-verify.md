@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ultimate-local-ai-development-stack-for-vscodium-micro02|ultimate-local-ai-development-stack-for-vscodium-micro02]] (2026-06-09)
+## From [ultimate-local-ai-development-stack-for-vscodium-micro02](/entities/ultimate-local-ai-development-stack-for-vscodium-micro02.md) (2026-06-09)
 - An alternative name for Speculative Decoding.
 - Involves a draft model guessing tokens and a target model verifying them.

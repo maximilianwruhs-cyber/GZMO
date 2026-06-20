@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[cybernetics-and-mythos-the-architecture-of-intell-part2|cybernetics-and-mythos-the-architecture-of-intell-part2]] (2026-06-08)
+## From [cybernetics-and-mythos-the-architecture-of-intell-part2](/entities/cybernetics-and-mythos-the-architecture-of-intell-part2.md) (2026-06-08)
 - Derived from the Ancient Greek term dialektikḗ, denoting the art of conversation or debate.
 - Involves the proposition of an initial idea (thesis), an opposing force (antithesis), and resolution into a higher truth (synthesis).
 - Maintains that opposition and contradiction are catalysts for intellectual, sociopolitical, and psychological evolution.
@@ -25,7 +25,7 @@ Type: CONCEPT
 - Views contradiction not as an error, but as the animating engine of reality.
 - Comprises three 'moments': Understanding, Dialectical/Negatively Rational, and Speculative/Positively Rational.
 
-## From [[drive-research-dialectics-socratic-vs-hegelian-methods|drive-research-dialectics-socratic-vs-hegelian-methods]] (2026-06-08)
+## From [drive-research-dialectics-socratic-vs-hegelian-methods](/entities/drive-research-dialectics-socratic-vs-hegelian-methods.md) (2026-06-08)
 - A 1966 magnum opus by Theodor W. Adorno.
 - Mounts a defense of particularity against Hegelian totalization.
 - Links dialectical method to linguistic form and 'configurative language'.

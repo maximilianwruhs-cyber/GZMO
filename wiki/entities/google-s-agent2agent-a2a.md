@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-setting-up-autonomous-trading-agents-micro01|drive-research-setting-up-autonomous-trading-agents-micro01]] (2026-06-09)
+## From [drive-research-setting-up-autonomous-trading-agents-micro01](/entities/drive-research-setting-up-autonomous-trading-agents-micro01.md) (2026-06-09)
 - An emerging interoperability protocol.
 - Can be integrated into custom agent frameworks.
 
-## From [[the-architects-handbook-for-autonomous-agentic-tr-micro02|the-architects-handbook-for-autonomous-agentic-tr-micro02]] (2026-06-09)
+## From [the-architects-handbook-for-autonomous-agentic-tr-micro02](/entities/the-architects-handbook-for-autonomous-agentic-tr-micro02.md) (2026-06-09)
 - An interoperability protocol.
 - Can be integrated into custom agentic setups.

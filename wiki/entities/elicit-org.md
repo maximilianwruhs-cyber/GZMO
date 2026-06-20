@@ -14,13 +14,13 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-research-project-initiation-guide|drive-research-research-project-initiation-guide]] (2026-06-08)
+## From [drive-research-research-project-initiation-guide](/entities/drive-research-research-project-initiation-guide.md) (2026-06-08)
 - Automated machine learning synthesis tool.
 - Enables dynamic construction of complex literature matrices.
 - An AI-powered synthesis tool.
 - Utilizes language models and Semantic Scholar metadata.
 - Constructs search matrices and extracts answers to researcher queries.
 
-## From [[optimizing-nvidia-blackwell-sm120-part2-micro07|optimizing-nvidia-blackwell-sm120-part2-micro07]] (2026-06-10)
+## From [optimizing-nvidia-blackwell-sm120-part2-micro07](/entities/optimizing-nvidia-blackwell-sm120-part2-micro07.md) (2026-06-10)
 - AI-powered synthesis tool that uses language models and Semantic Scholar metadata
 - Uses GPT-3 Babbage and GPT-3 Davinci models

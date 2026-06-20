@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-creating-a-comprehensive-readmemd-micro01|drive-research-creating-a-comprehensive-readmemd-micro01]] (2026-06-09)
+## From [drive-research-creating-a-comprehensive-readmemd-micro01](/entities/drive-research-creating-a-comprehensive-readmemd-micro01.md) (2026-06-09)
 - Source: `drive_clean/Takeout/Drive/Creating a Comprehensive README.md.docx`
 - Historically conceived as a rudimentary manifest of repository contents, has evolved into the most critical piece of documentation within the software development lifecycle.
 - Serves as the primary interface between the architect’s intent and the user’s execution.

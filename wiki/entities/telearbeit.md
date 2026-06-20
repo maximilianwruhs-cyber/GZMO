@@ -14,12 +14,12 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[mastering-remote-work-a-comprehensive-guide-to-ho|mastering-remote-work-a-comprehensive-guide-to-ho]] (2026-06-08)
+## From [mastering-remote-work-a-comprehensive-guide-to-ho](/entities/mastering-remote-work-a-comprehensive-guide-to-ho.md) (2026-06-08)
 - Defined as work firmly established by the employer.
 - ArbStättV (Arbeitsstättenverordnung) applies fully to it.
 - Distinguished from mobile working.
 
-## From [[drive-research-home-office-leitfaden-struktur-gesundheit-erfol|drive-research-home-office-leitfaden-struktur-gesundheit-erfol]] (2026-06-08)
+## From [drive-research-home-office-leitfaden-struktur-gesundheit-erfol](/entities/drive-research-home-office-leitfaden-struktur-gesundheit-erfol.md) (2026-06-08)
 - Defined as a workstation set up by the employer in the employee's private space.
 - Employer is obligated to provide and install equipment (furniture and IT).
 - ArbStättV applies fully.

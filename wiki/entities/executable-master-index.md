@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[gzmo-soul-merged-new-part2-micro06|gzmo-soul-merged-new-part2-micro06]] (2026-06-10)
+## From [gzmo-soul-merged-new-part2-micro06](/entities/gzmo-soul-merged-new-part2-micro06.md) (2026-06-10)
 - The persistent Wiki that acts as the compiled knowledge.
 - Must generate proposals (Dreams) rather than directly editing identity files.

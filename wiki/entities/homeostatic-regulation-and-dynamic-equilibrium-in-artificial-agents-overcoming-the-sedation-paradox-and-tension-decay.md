@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[beyond-the-dark-room-allostatic-regulation-and-co|beyond-the-dark-room-allostatic-regulation-and-co]] (2026-06-08)
+## From [beyond-the-dark-room-allostatic-regulation-and-co](/entities/beyond-the-dark-room-allostatic-regulation-and-co.md) (2026-06-08)
 - This is the title of the comprehensive analysis.
 - It examines the evolutionary trajectory of regulatory architectures in artificial agents.
 - It aims to overcome the sedation paradox and tension decay in artificial agents.

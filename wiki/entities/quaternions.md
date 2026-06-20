@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[deterministic-polyhedral-dynamics-in-rust-game-eng|deterministic-polyhedral-dynamics-in-rust-game-eng]] (2026-06-08)
+## From [deterministic-polyhedral-dynamics-in-rust-game-eng](/entities/deterministic-polyhedral-dynamics-in-rust-game-eng.md) (2026-06-08)
 - Used for spatial orientation tracking.
 - Intricacies of their use are examined.

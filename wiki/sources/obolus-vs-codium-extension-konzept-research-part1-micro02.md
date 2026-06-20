@@ -14,8 +14,8 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-10).
 
 ## Entities
-- [[giphy|Giphy]] (ORGANIZATION)
-- [[css|CSS]] (TOOL)
-- [[localresourceroots|localResourceRoots]] (CONCEPT)
-- [[developer-tools|Developer Tools]] (TOOL)
-- [[vs-code|VS Code]] (SYSTEM)
+- [Giphy](/entities/giphy.md) (ORGANIZATION)
+- [CSS](/entities/css.md) (TOOL)
+- [localResourceRoots](/entities/localresourceroots.md) (CONCEPT)
+- [Developer Tools](/entities/developer-tools.md) (TOOL)
+- [VS Code](/entities/vs-code.md) (SYSTEM)

@@ -14,8 +14,8 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[prompt-agent-engineering-part4-micro05|prompt-agent-engineering-part4-micro05]] (2026-06-10)
+## From [prompt-agent-engineering-part4-micro05](/entities/prompt-agent-engineering-part4-micro05.md) (2026-06-10)
 - A sub-agent that writes to standardized JSON state files
 
-## From [[prompt-agent-engineering-part4-micro06|prompt-agent-engineering-part4-micro06]] (2026-06-10)
+## From [prompt-agent-engineering-part4-micro06](/entities/prompt-agent-engineering-part4-micro06.md) (2026-06-10)
 - Available node in the DAG protocol

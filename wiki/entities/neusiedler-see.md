@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-archival-truth-part1-micro04|the-archival-truth-part1-micro04]] (2026-06-09)
+## From [the-archival-truth-part1-micro04](/entities/the-archival-truth-part1-micro04.md) (2026-06-09)
 - A steppe lake with a depth of only about one and a half meters.
 - Subject to massive water displacement by wind.
 - Requires precise knowledge of complex current conditions.

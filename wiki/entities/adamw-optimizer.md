@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[ai-research-part5|ai-research-part5]] (2026-06-08)
+## From [ai-research-part5](/entities/ai-research-part5.md) (2026-06-08)
 - Used in training configurations, following OLMo2 implementation.

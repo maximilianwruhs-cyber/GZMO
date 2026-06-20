@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[tui-framework|tui-framework]] (2026-06-08)
+## From [tui-framework](/entities/tui-framework.md) (2026-06-08)
 - Can be leveraged to achieve TUI-like layouts.
 - Uses Extension Host and Webview architecture.
 - An IDE that can host extensions.

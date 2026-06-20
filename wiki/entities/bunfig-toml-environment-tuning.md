@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-gzmo-daemon-high-performance-bun-refactor|the-gzmo-daemon-high-performance-bun-refactor]] (2026-06-08)
+## From [the-gzmo-daemon-high-performance-bun-refactor](/entities/the-gzmo-daemon-high-performance-bun-refactor.md) (2026-06-08)
 - Implemented strict parameters for Bun.
 - Includes smol = true to reduce memory boundary.
 - Includes install.exact = true to prevent dependency drift.

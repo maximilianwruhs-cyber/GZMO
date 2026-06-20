@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[local-first-rag-architecting-sovereign-ai-with-li|local-first-rag-architecting-sovereign-ai-with-li]] (2026-06-08)
+## From [local-first-rag-architecting-sovereign-ai-with-li](/entities/local-first-rag-architecting-sovereign-ai-with-li.md) (2026-06-08)
 - A more expansive, multi-client architecture.
 - Operates as a self-hosted server, frequently utilizing PostgreSQL enhanced with the pgvector extension.
 - Manages its own robust ingestion pipeline, utilizing tools like LangChain.

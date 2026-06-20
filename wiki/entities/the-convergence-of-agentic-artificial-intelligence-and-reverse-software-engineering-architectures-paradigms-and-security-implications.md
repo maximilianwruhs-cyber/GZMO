@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[drive-research-agentic-reverse-engineering-state-and-future-micro01|drive-research-agentic-reverse-engineering-state-and-future-micro01]] (2026-06-09)
+## From [drive-research-agentic-reverse-engineering-state-and-future-micro01](/entities/drive-research-agentic-reverse-engineering-state-and-future-micro01.md) (2026-06-09)
 - Details the integration of LLMs with decompilers.
 - Discusses the emergence of autonomous exploit generation.
 - Covers novel security risks of deploying autonomous agents.

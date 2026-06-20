@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-erbandbreite-und-latenzengp-sse|drive-research-erbandbreite-und-latenzengpässe]] (2026-06-08)
+## From [drive-research-erbandbreite-und-latenzengpässe](/entities/drive-research-erbandbreite-und-latenzengp-sse.md) (2026-06-08)
 - A framework operating at the feature level, attaching a stripped-down Transformer decoder layer to the target model.
 - Leverages the target's own internal mathematical representations.
 - Achieves vastly superior acceptance rates and throughput multipliers compared to traditional independent draft models.
@@ -29,7 +29,7 @@ Type: SYSTEM
 - integrated draft model
 - used with Llama 3.1 8B on NVIDIA A100 yields 2.0x - 3.0x speedup
 
-## From [[the-architecture-of-speculative-decoding-and-infer-part2-micro02|the-architecture-of-speculative-decoding-and-infer-part2-micro02]] (2026-06-09)
+## From [the-architecture-of-speculative-decoding-and-infer-part2-micro02](/entities/the-architecture-of-speculative-decoding-and-infer-part2-micro02.md) (2026-06-09)
 - Transforms the drafting phase into a parallel generation step.
 - Constructs inputs for all requested positions in parallel.
 - Predicts up to ten tokens at once in a single forward pass.

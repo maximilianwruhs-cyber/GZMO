@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-universal-syntax-research-prompt|drive-research-universal-syntax-research-prompt]] (2026-06-08)
+## From [drive-research-universal-syntax-research-prompt](/entities/drive-research-universal-syntax-research-prompt.md) (2026-06-08)
 - Current evolution of the Chomskyan generative tradition.
 - Characterized by a drive toward maximal theoretical parsimony.
 - Primary objective is to determine the extent to which the language faculty is an optimal solution to 'interface conditions'.

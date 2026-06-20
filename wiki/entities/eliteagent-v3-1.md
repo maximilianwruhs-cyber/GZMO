@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[prompt-agent-engineering-part4-micro01|prompt-agent-engineering-part4-micro01]] (2026-06-09)
+## From [prompt-agent-engineering-part4-micro01](/entities/prompt-agent-engineering-part4-micro01.md) (2026-06-09)
 - A world-class, production-grade autonomous reasoning agent.
 - Built for maximum reliability, correctness, and efficiency in 2026.
 - Aims to produce correct final answers or complete tasks with minimal high-quality steps.

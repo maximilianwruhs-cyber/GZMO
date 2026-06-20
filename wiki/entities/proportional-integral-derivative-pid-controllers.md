@@ -14,12 +14,12 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[cybernetics-and-mythos-the-architecture-of-intell-part1|cybernetics-and-mythos-the-architecture-of-intell-part1]] (2026-06-08)
+## From [cybernetics-and-mythos-the-architecture-of-intell-part1](/entities/cybernetics-and-mythos-the-architecture-of-intell-part1.md) (2026-06-08)
 - Engineers routinely employ them to mitigate systemic timing failures.
 - Calculates a corrective term by synthesizing three data points: present errors (proportional), accumulated past errors (integral), and anticipated future errors based on the rate of change (derivative).
 - Provides a dampening effect to smooth out delay-induced oscillations, ensuring the system reaches equilibrium smoothly.
 
-## From [[drive-research-cybernetics-information-loops-between-entities-micro03|drive-research-cybernetics-information-loops-between-entities-micro03]] (2026-06-09)
+## From [drive-research-cybernetics-information-loops-between-entities-micro03](/entities/drive-research-cybernetics-information-loops-between-entities-micro03.md) (2026-06-09)
 - Engineers routinely employ PID controllers to mitigate systemic timing failures.
 - Calculates a corrective term by synthesizing present, accumulated past, and anticipated future errors.
 - Provides a dampening effect to smooth out delay-induced oscillations.

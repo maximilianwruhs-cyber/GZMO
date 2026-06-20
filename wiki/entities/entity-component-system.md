@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[dynamics-of-the-unpredictable-micro05|dynamics-of-the-unpredictable-micro05]] (2026-06-10)
+## From [dynamics-of-the-unpredictable-micro05](/entities/dynamics-of-the-unpredictable-micro05.md) (2026-06-10)
 - Standard, pure Rust functions containing game logic.
 - Queries the component database to operate on specific slices of data.
 - An architecture that decouples data from logic.

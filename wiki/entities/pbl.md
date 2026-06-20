@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-architecture-of-engagement-an-analysis-of-gam-micro07|the-architecture-of-engagement-an-analysis-of-gam-micro07]] (2026-06-09)
+## From [the-architecture-of-engagement-an-analysis-of-gam-micro07](/entities/the-architecture-of-engagement-an-analysis-of-gam-micro07.md) (2026-06-09)
 - Stands for Points, Badges, and Leaderboards.
 - Is a triumvirate of mechanics frequently relied upon for the structural implementation of gamification.
 - Is supplemented by newer mechanics like Streaks.

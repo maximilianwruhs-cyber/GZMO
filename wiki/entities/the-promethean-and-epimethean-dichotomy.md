@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-prometheus-and-epimetheus-myth-exploration-micro02|drive-research-prometheus-and-epimetheus-myth-exploration-micro02]] (2026-06-09)
+## From [drive-research-prometheus-and-epimetheus-myth-exploration-micro02](/entities/drive-research-prometheus-and-epimetheus-myth-exploration-micro02.md) (2026-06-09)
 - Represents the dual nature of intelligence and human progression.
 - Encapsulates the tension between proactive innovation and reactive consequence.
 - Symbolizes the entire human cognitive apparatus.

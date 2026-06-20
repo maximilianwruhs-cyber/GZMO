@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[beyond-the-dark-room-allostatic-regulation-and-co|beyond-the-dark-room-allostatic-regulation-and-co]] (2026-06-08)
+## From [beyond-the-dark-room-allostatic-regulation-and-co](/entities/beyond-the-dark-room-allostatic-regulation-and-co.md) (2026-06-08)
 - Utilizes simulated cortisol stress signals.
 - A theoretical framework for persistent, resilient autonomy.
 - Requires agents to be forcefully driven by phenotypic priors.
@@ -22,7 +22,7 @@ Type: CONCEPT
 - It formalizes the risk of agent sedation as the "dark room problem".
 - It posits that autonomous agents function as "prediction machines" under the Free-Energy Principle.
 
-## From [[drive-research-homeostatic-regulation-and-dynamic-equilibrium-in|drive-research-homeostatic-regulation-and-dynamic-equilibrium-in]] (2026-06-08)
+## From [drive-research-homeostatic-regulation-and-dynamic-equilibrium-in](/entities/drive-research-homeostatic-regulation-and-dynamic-equilibrium-in.md) (2026-06-08)
 - Formalizes the risk of agent sedation as the 'Dark Room Problem'.
 - Postulates that autonomous agents function as 'prediction machines' continuously trying to minimize 'surprise'.
 - Solves the sedation problem by redefining agents' internal generative models with evolutionary prior preferences.

@@ -14,14 +14,14 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-imagine-creating-sm120-according-to-our-progress|drive-research-imagine-creating-sm120-according-to-our-progress]] (2026-06-08)
+## From [drive-research-imagine-creating-sm120-according-to-our-progress](/entities/drive-research-imagine-creating-sm120-according-to-our-progress.md) (2026-06-08)
 - Triggers an 'Arch conditional MMA' compile error within CUTLASS templates.
 - Developers must manually patch critical synchronization and memory alignment bugs across CUTLASS.
 - Internal CUTLASS guards evaluate the GDC enablement check as false.
 - Modify include/cutlass/gemm/collective/sm120_blockscaled_mma_tma.hpp.
 - Modify include/cutlass/epilogue/collective/sm90_epilogue_tma_warpspecialized.hpp.
 
-## From [[drive-research-optimizing-cuda-performance-with-fp4-fp6-micro01|drive-research-optimizing-cuda-performance-with-fp4-fp6-micro01]] (2026-06-09)
+## From [drive-research-optimizing-cuda-performance-with-fp4-fp6-micro01](/entities/drive-research-optimizing-cuda-performance-with-fp4-fp6-micro01.md) (2026-06-09)
 - Native FP4/FP6 CUTLASS templates fail compilation under the compute_120 flag.
 - GDC execution is controlled by the #ifndef CUTLASS_GDC_ENABLED preprocessor guard.
 - Employ NVIDIA's CuTe Domain-Specific Language (DSL) to partition shared memory arrays.

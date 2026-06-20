@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-agentic-token-economy-blueprint-micro01|drive-research-agentic-token-economy-blueprint-micro01]] (2026-06-09)
+## From [drive-research-agentic-token-economy-blueprint-micro01](/entities/drive-research-agentic-token-economy-blueprint-micro01.md) (2026-06-09)
 - A paradigm that requires the system to actively budget, route, compress, and cache its context usage dynamically.
 - Internalizes economic constraints directly into the agent's reasoning loop and operational infrastructure.
 - Enables intelligent systems capable of approaching the Pareto frontier of cost and quality.

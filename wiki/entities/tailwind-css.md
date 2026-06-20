@@ -15,14 +15,14 @@ gzmo_synthetic: true
 
 Type: FRAMEWORK
 
-## From [[google-antigravity-the-architects-configuration-micro02|google-antigravity-the-architects-configuration-micro02]] (2026-06-09)
+## From [google-antigravity-the-architects-configuration-micro02](/entities/google-antigravity-the-architects-configuration-micro02.md) (2026-06-09)
 - A styling framework used in repositories.
 - Styling must be done exclusively with utility classes.
 
-## From [[google-antigravity-the-architects-configuration-micro04|google-antigravity-the-architects-configuration-micro04]] (2026-06-09)
+## From [google-antigravity-the-architects-configuration-micro04](/entities/google-antigravity-the-architects-configuration-micro04.md) (2026-06-09)
 - Styling must be done exclusively with Tailwind CSS utility classes.
 - Used for responsive design with prefixes like sm:, md:, lg:.
 
-## From [[google-antigravity-the-architects-configuration-micro05|google-antigravity-the-architects-configuration-micro05]] (2026-06-10)
+## From [google-antigravity-the-architects-configuration-micro05](/entities/google-antigravity-the-architects-configuration-micro05.md) (2026-06-10)
 - Exclusively used for utility classes in frontend architecture
 - Used for mobile responsiveness via breakpoints

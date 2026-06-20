@@ -14,11 +14,11 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[ai-research-part1|ai-research-part1]] (2026-06-08)
+## From [ai-research-part1](/entities/ai-research-part1.md) (2026-06-08)
 - Generates position-dependent weights via a small MLP across four decoupled streams.
 - A method for input-dependent aggregation.
 
-## From [[ai-research-part7|ai-research-part7]] (2026-06-08)
+## From [ai-research-part7](/entities/ai-research-part7.md) (2026-06-08)
 - Employs multiway dynamic dense connections to optimize cross-layer information flow.
 - An approach that compromises the inherent identity mapping property of the residual connection.
 - Incurs significant memory access overhead due to expanded feature widths.

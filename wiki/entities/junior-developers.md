@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[drive-research-ai-agents-and-spec-driven-development-micro04|drive-research-ai-agents-and-spec-driven-development-micro04]] (2026-06-09)
+## From [drive-research-ai-agents-and-spec-driven-development-micro04](/entities/drive-research-ai-agents-and-spec-driven-development-micro04.md) (2026-06-09)
 - must be integrated not as manual coders, but as operators and validators of agentic systems
 - tasked with writing EARS-compliant specifications, reviewing AI-generated ADRs, and managing the safety-critical boundaries of autonomous logic

@@ -14,9 +14,9 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[the-archival-truth-part2-micro04|the-archival-truth-part2-micro04]] (2026-06-09)
+## From [the-archival-truth-part2-micro04](/entities/the-archival-truth-part2-micro04.md) (2026-06-09)
 - Authored by Sigmund Freud.
 - Argues that human culture is built upon the painful renunciation of natural instincts.
 
-## From [[the-archival-truth-part2-micro03|the-archival-truth-part2-micro03]] (2026-06-10)
+## From [the-archival-truth-part2-micro03](/entities/the-archival-truth-part2-micro03.md) (2026-06-10)
 - A 1930 work by Sigmund Freud.

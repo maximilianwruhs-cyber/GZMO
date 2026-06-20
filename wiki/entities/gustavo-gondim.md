@@ -14,9 +14,9 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[openclaw-deep-research-part10-micro02|openclaw-deep-research-part10-micro02]] (2026-06-10)
+## From [openclaw-deep-research-part10-micro02](/entities/openclaw-deep-research-part10-micro02.md) (2026-06-10)
 - Author of the article
 
-## From [[openclaw-deep-research-part10-micro03|openclaw-deep-research-part10-micro03]] (2026-06-10)
+## From [openclaw-deep-research-part10-micro03](/entities/openclaw-deep-research-part10-micro03.md) (2026-06-10)
 - A user who commented on the article.
 - Author of content regarding migrating from Claude Sub-agents to duckflux.

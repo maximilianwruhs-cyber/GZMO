@@ -15,15 +15,15 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[mastering-remote-work-a-comprehensive-guide-to-ho|mastering-remote-work-a-comprehensive-guide-to-ho]] (2026-06-08)
+## From [mastering-remote-work-a-comprehensive-guide-to-ho](/entities/mastering-remote-work-a-comprehensive-guide-to-ho.md) (2026-06-08)
 - Used for knowledge management.
 - Provides central access to current document versions.
 
-## From [[drive-research-home-office-leitfaden-struktur-gesundheit-erfol|drive-research-home-office-leitfaden-struktur-gesundheit-erfol]] (2026-06-08)
+## From [drive-research-home-office-leitfaden-struktur-gesundheit-erfol](/entities/drive-research-home-office-leitfaden-struktur-gesundheit-erfol.md) (2026-06-08)
 - Used for knowledge management.
 - Provides central access to current document versions.
 - A tool for documentation.
 
-## From [[drive-research-install-the-google-workspace-extension|drive-research-install-the-google-workspace-extension]] (2026-06-08)
+## From [drive-research-install-the-google-workspace-extension](/entities/drive-research-install-the-google-workspace-extension.md) (2026-06-08)
 - Permissions for Google Drive are granted during authentication.
 - Files can be searched on Google Drive.

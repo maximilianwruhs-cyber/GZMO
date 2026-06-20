@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[dynamics-of-the-unpredictable-micro07|dynamics-of-the-unpredictable-micro07]] (2026-06-09)
+## From [dynamics-of-the-unpredictable-micro07](/entities/dynamics-of-the-unpredictable-micro07.md) (2026-06-09)
 - Runs once every frame during rendering.
 - Queries all entities possessing a Parent component.
 - Writes the resulting matrix to the child's global transformation state.

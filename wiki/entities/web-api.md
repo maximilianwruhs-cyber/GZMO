@@ -14,13 +14,13 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-setting-up-autonomous-trading-agents-micro01|drive-research-setting-up-autonomous-trading-agents-micro01]] (2026-06-09)
+## From [drive-research-setting-up-autonomous-trading-agents-micro01](/entities/drive-research-setting-up-autonomous-trading-agents-micro01.md) (2026-06-09)
 - A modern, RESTful architecture for integration with Interactive Brokers.
 - Handles account management, reporting, funding, and trading operations.
 - Utilizes WebSocket streaming for real-time market data.
 - Employs OAuth 2.0 and private key JSON Web Token (JWT) authentication.
 
-## From [[the-architects-handbook-for-autonomous-agentic-tr-micro02|the-architects-handbook-for-autonomous-agentic-tr-micro02]] (2026-06-09)
+## From [the-architects-handbook-for-autonomous-agentic-tr-micro02](/entities/the-architects-handbook-for-autonomous-agentic-tr-micro02.md) (2026-06-09)
 - A modern, RESTful architecture for integration with IBKR.
 - Handles account management, reporting, funding, and trading operations.
 - Utilizes WebSocket streaming for real-time market data.

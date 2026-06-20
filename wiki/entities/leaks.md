@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: RISK
 
-## From [[ai-research-part6-micro04|ai-research-part6-micro04]] (2026-06-09)
+## From [ai-research-part6-micro04](/entities/ai-research-part6-micro04.md) (2026-06-09)
 - Prevention is the goal of the Security-Reviewer persona

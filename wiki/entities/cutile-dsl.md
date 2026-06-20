@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-what-else-can-directly-be-aligned-with-our-common|drive-research-what-else-can-directly-be-aligned-with-our-common]] (2026-06-08)
+## From [drive-research-what-else-can-directly-be-aligned-with-our-common](/entities/drive-research-what-else-can-directly-be-aligned-with-our-common.md) (2026-06-08)
 - Python Domain-Specific Language to break away from template-heavy C++ compilation bottlenecks and gain granular control over execution schedules.
 - Exposes a high-level representation (TileIR) that allows defining, editing, and optimizing sequence block tiling, staging, and shared memory layouts directly in Python.
 - Implements a blockwise online-softmax formulation to stream keys and values through shared memory.

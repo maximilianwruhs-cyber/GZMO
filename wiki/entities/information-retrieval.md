@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-subword-tokenization-mitigates-llm-sparsity-micro03|drive-research-subword-tokenization-mitigates-llm-sparsity-micro03]] (2026-06-09)
+## From [drive-research-subword-tokenization-mitigates-llm-sparsity-micro03](/entities/drive-research-subword-tokenization-mitigates-llm-sparsity-micro03.md) (2026-06-09)
 - principles are utilized by robust neural sparse retrieval systems
 - long-tail queries are handled poorly by traditional n-gram matching due to high noise

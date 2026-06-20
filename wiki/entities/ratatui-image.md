@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-rust-tui-architecture-tech-stack1-micro04|drive-research-rust-tui-architecture-tech-stack1-micro04]] (2026-06-09)
+## From [drive-research-rust-tui-architecture-tech-stack1-micro04](/entities/drive-research-rust-tui-architecture-tech-stack1-micro04.md) (2026-06-09)
 - Definitive crate for implementing native graphics protocols in TUIs.
 - Unified abstraction layer over three primary terminal image protocols.
 - Utilizes a Picker helper to detect terminal capabilities.

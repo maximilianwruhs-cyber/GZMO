@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[obolus-micro02|obolus-micro02]] (2026-06-09)
+## From [obolus-micro02](/entities/obolus-micro02.md) (2026-06-09)
 - Artwork by Sun Yuan and Peng Yu
 - Features a robot arm trying to clean up spilled liquid
 - Metaphor for the agent ecosystem's struggle for resources

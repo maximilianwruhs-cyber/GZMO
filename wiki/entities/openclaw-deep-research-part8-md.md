@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: DOCUMENT
 
-## From [[openclaw-deep-research-part8-micro07|openclaw-deep-research-part8-micro07]] (2026-06-09)
+## From [openclaw-deep-research-part8-micro07](/entities/openclaw-deep-research-part8-micro07.md) (2026-06-09)
 - micro-split from `openclaw-deep-research-part8.md`
 - micro 7/7
 - Ingest micro-split from `openclaw-deep-research-part8.md` for cloud KG extraction

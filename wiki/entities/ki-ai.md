@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[prompt-agent-engineering-part6-micro02|prompt-agent-engineering-part6-micro02]] (2026-06-09)
+## From [prompt-agent-engineering-part6-micro02](/entities/prompt-agent-engineering-part6-micro02.md) (2026-06-09)
 - Intensive focus on its use in workshop everyday life.
 - A system has been developed for workshop assistance.

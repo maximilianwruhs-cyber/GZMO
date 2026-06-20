@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: ENDPOINT
 
-## From [[ai-research-part6-micro05|ai-research-part6-micro05]] (2026-06-09)
+## From [ai-research-part6-micro05](/entities/ai-research-part6-micro05.md) (2026-06-09)
 - Provides precise scopes for debugging complex logic errors.
 - A strategically relevant CodeRLM endpoint.

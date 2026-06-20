@@ -14,11 +14,11 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-ai-agentic-teacher-research-report|drive-research-ai-agentic-teacher-research-report]] (2026-06-08)
+## From [drive-research-ai-agentic-teacher-research-report](/entities/drive-research-ai-agentic-teacher-research-report.md) (2026-06-08)
 - Factual, abstract knowledge independent of specific conversational experiences.
 - Constitutes the core Learner Profile.
 - Tracks overarching mastery vectors, identified neurodivergent traits, baseline knowledge capabilities, and evolving thematic interests.
 
-## From [[architectures-for-agentic-memory-virtual-context-micro06|architectures-for-agentic-memory-virtual-context-micro06]] (2026-06-09)
+## From [architectures-for-agentic-memory-virtual-context-micro06](/entities/architectures-for-agentic-memory-virtual-context-micro06.md) (2026-06-09)
 - A component of the SEKG stack.
 - Involves Knowledge Graphs and Spreading Activation.

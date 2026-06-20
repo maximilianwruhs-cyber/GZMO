@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-architecture-of-engagement-an-analysis-of-gam-micro05|the-architecture-of-engagement-an-analysis-of-gam-micro05]] (2026-06-09)
+## From [the-architecture-of-engagement-an-analysis-of-gam-micro05](/entities/the-architecture-of-engagement-an-analysis-of-gam-micro05.md) (2026-06-09)
 - A counter-movement within the technology sector.
 - Prioritizes human well-being, ethical design practices, and mitigation of psychological exploitation over pure engagement metrics.
 - Requires a complete paradigm shift in User Experience (UX) design.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: API
 
-## From [[drive-research-ubuntu-extreme-hardware-tuning-micro01|drive-research-ubuntu-extreme-hardware-tuning-micro01]] (2026-06-09)
+## From [drive-research-ubuntu-extreme-hardware-tuning-micro01](/entities/drive-research-ubuntu-extreme-hardware-tuning-micro01.md) (2026-06-09)
 - Graphics API.
 - Can have device selection conflicts in multi-GPU systems.
 - Runtimes can be forced to target discrete GPUs using environment variables.

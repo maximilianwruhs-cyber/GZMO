@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[the-definitive-pantheon|the-definitive-pantheon]] (2026-06-08)
+## From [the-definitive-pantheon](/entities/the-definitive-pantheon.md) (2026-06-08)
 - Publisher of Spider-Man, Wolverine, Captain America, Iron Man, The Hulk, and Thor.
 - Brought a literal god into the superhero mix with Thor.

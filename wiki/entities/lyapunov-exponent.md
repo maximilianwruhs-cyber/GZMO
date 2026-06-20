@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[dynamics-of-the-unpredictable-micro03|dynamics-of-the-unpredictable-micro03]] (2026-06-09)
+## From [dynamics-of-the-unpredictable-micro03](/entities/dynamics-of-the-unpredictable-micro03.md) (2026-06-09)
 - Measures the specific rate at which uncertainties multiply within a chaotic system.
 - A positive maximal Lyapunov exponent is a primary diagnostic indicator of deterministic chaos.
 - Defines the absolute 'predictability horizon' of a system.

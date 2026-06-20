@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[the-architects-handbook-for-autonomous-agentic-tr-micro01|the-architects-handbook-for-autonomous-agentic-tr-micro01]] (2026-06-09)
+## From [the-architects-handbook-for-autonomous-agentic-tr-micro01](/entities/the-architects-handbook-for-autonomous-agentic-tr-micro01.md) (2026-06-09)
 - Curated research corpus consolidated from Google Takeout (wave_02_notebooklm).
 - Sources: 1 documents.

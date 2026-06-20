@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: LAW
 
-## From [[the-architecture-of-engagement-an-analysis-of-gam-micro04|the-architecture-of-engagement-an-analysis-of-gam-micro04]] (2026-06-09)
+## From [the-architecture-of-engagement-an-analysis-of-gam-micro04](/entities/the-architecture-of-engagement-an-analysis-of-gam-micro04.md) (2026-06-09)
 - Established a legal framework in the EU.
 - Prohibits 'dark patterns'—deceptive interface designs.
 - Became fully applicable across the EU in 2024.

@@ -17,16 +17,16 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[gzmo-soul-merged-new-part3|gzmo-soul-merged-new-part3]] (2026-06-08)
+## From [gzmo-soul-merged-new-part3](/entities/gzmo-soul-merged-new-part3.md) (2026-06-08)
 - The Obsidian Vault is where GZMO maintains a persistent wiki.
 - GZMO writes proposals for identity changes into Obsidian_Vault/wiki/dreams/YYYY-MM-DD-.
 
-## From [[bun-versus-nodejs-architectural-evaluation-for-b|bun-versus-nodejs-architectural-evaluation-for-b]] (2026-06-08)
+## From [bun-versus-nodejs-architectural-evaluation-for-b](/entities/bun-versus-nodejs-architectural-evaluation-for-b.md) (2026-06-08)
 - Background daemon tasked with recursive, high-frequency monitoring
 - Consists of potentially thousands of Markdown files
 - Fundamentally a localized, highly nested hierarchy of interlinked Markdown (.md) files
 
-## From [[drive-research-du-hast-gesagt-part1|drive-research-du-hast-gesagt-part1]] (2026-06-08)
+## From [drive-research-du-hast-gesagt-part1](/entities/drive-research-du-hast-gesagt-part1.md) (2026-06-08)
 - Acts as a Stigmergic memory broker.
 - Configured with specific folder structures.
 - Accessed via Obsidian app.
@@ -52,11 +52,11 @@ Type: TOOL
 - Installed natively.
 - Used to open folder as vault.
 
-## From [[drive-research-soul|drive-research-soul]] (2026-06-08)
+## From [drive-research-soul](/entities/drive-research-soul.md) (2026-06-08)
 - Stores the persistent wiki.
 - Used for compiling synthesized knowledge.
 - Dreams are written into this vault.
 
-## From [[gzmo-soul-merged-new-part2-micro06|gzmo-soul-merged-new-part2-micro06]] (2026-06-10)
+## From [gzmo-soul-merged-new-part2-micro06](/entities/gzmo-soul-merged-new-part2-micro06.md) (2026-06-10)
 - Serves as the 'Compiled Knowledge' and 'Knowledge Gardener' area.
 - Contains the Wiki, which acts as the canonical contract for identity and directives.

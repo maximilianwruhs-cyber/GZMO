@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[architectural-analysis-of-the-openclaw-ai-plugin-s|architectural-analysis-of-the-openclaw-ai-plugin-s]] (2026-06-08)
+## From [architectural-analysis-of-the-openclaw-ai-plugin-s](/entities/architectural-analysis-of-the-openclaw-ai-plugin-s.md) (2026-06-08)
 - These refer to cross-platform extensions originally built for alternative architectures.
 - Examples include Codex, Claude, or Cursor plugins.
 - OpenClaw intercepts these formats and maps their capabilities to native OpenClaw features.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-linux-gaming-and-ai-build-guide-micro02|drive-research-linux-gaming-and-ai-build-guide-micro02]] (2026-06-09)
+## From [drive-research-linux-gaming-and-ai-build-guide-micro02](/entities/drive-research-linux-gaming-and-ai-build-guide-micro02.md) (2026-06-09)
 - Incorporating explicit sync.
 - Maturation of Wayland compositors neutralizes historical penalty for running NVIDIA on Linux.
 - Maturation of Wayland compositors incorporating explicit sync allows the proprietary GPU to operate with near-native fluidity.

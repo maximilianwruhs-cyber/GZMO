@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[openclaw-part2|openclaw-part2]] (2026-06-08)
+## From [openclaw-part2](/entities/openclaw-part2.md) (2026-06-08)
 - Used for visual and audio generation tasks.
 - Tasks are dispatched asynchronously.
 - Natively integrates with MiniMax for audio generation.

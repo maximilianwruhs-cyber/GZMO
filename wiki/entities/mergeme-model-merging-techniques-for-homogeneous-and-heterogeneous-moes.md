@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-frankenmoe-merging-ai-models|drive-research-frankenmoe-merging-ai-models]] (2026-06-08)
+## From [drive-research-frankenmoe-merging-ai-models](/entities/drive-research-frankenmoe-merging-ai-models.md) (2026-06-08)
 - A framework that introduces linear projection matrices to map inputs and outputs into a shared vector space for heterogeneous merging.
 - Utilizes sequence-level block routing heuristics rather than layer-by-layer gating for variable layer depths.
 - A framework that introduces linear projection matrices for heterogeneous merging.

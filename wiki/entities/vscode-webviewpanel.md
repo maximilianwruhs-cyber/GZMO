@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[obolus-vs-codium-extension-konzept-research-part1-micro07|obolus-vs-codium-extension-konzept-research-part1-micro07]] (2026-06-09)
+## From [obolus-vs-codium-extension-konzept-research-part1-micro07](/entities/obolus-vs-codium-extension-konzept-research-part1-micro07.md) (2026-06-09)
 - Represents a webview panel.
 - Has methods like onDidDispose and webview.html.
 - Created using vscode.window.createWebviewPanel.

@@ -14,13 +14,13 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[websocketdisconnect|WebSocketDisconnect]] (CONCEPT)
-- [[connectionmanager|ConnectionManager]] (SYSTEM)
-- [[websockets|WebSockets]] (CONCEPT)
-- [[starlette|Starlette]] (TOOL)
-- [[fastapi|FastAPI]] (TOOL)
-- [[htmlresponse|HTMLResponse]] (TOOL)
-- [[websocketexception|WebSocketException]] (CONCEPT)
+- [WebSocketDisconnect](/entities/websocketdisconnect.md) (CONCEPT)
+- [ConnectionManager](/entities/connectionmanager.md) (SYSTEM)
+- [WebSockets](/entities/websockets.md) (CONCEPT)
+- [Starlette](/entities/starlette.md) (TOOL)
+- [FastAPI](/entities/fastapi.md) (TOOL)
+- [HTMLResponse](/entities/htmlresponse.md) (TOOL)
+- [WebSocketException](/entities/websocketexception.md) (CONCEPT)
 
 ## Relations
 - WebSockets → RELATED_TO → FastAPI

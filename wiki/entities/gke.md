@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[openclaw-part2|openclaw-part2]] (2026-06-08)
+## From [openclaw-part2](/entities/openclaw-part2.md) (2026-06-08)
 - Pods are routed via an Application Load Balancer.
 - Containerization via GKE naturally provides an initial layer of process isolation.
 - During the pod initialization phase, secrets can be dynamically fetched via authorized service accounts and injected directly into the container.

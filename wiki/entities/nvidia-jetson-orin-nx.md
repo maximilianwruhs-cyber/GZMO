@@ -14,8 +14,8 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-research-process-steps-micro03|drive-research-research-process-steps-micro03]] (2026-06-10)
+## From [drive-research-research-process-steps-micro03](/entities/drive-research-research-process-steps-micro03.md) (2026-06-10)
 - An edge device where memory-bandwidth bottlenecks cause significant system RAM power draw.
 
-## From [[optimizing-nvidia-blackwell-sm120-part3-micro02|optimizing-nvidia-blackwell-sm120-part3-micro02]] (2026-06-10)
+## From [optimizing-nvidia-blackwell-sm120-part3-micro02](/entities/optimizing-nvidia-blackwell-sm120-part3-micro02.md) (2026-06-10)
 - Edge device where memory-bandwidth bottlenecks cause significant power draw

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-optimizing-qwen36-on-blackwell-gpus|drive-research-optimizing-qwen36-on-blackwell-gpus]] (2026-06-08)
+## From [drive-research-optimizing-qwen36-on-blackwell-gpus](/entities/drive-research-optimizing-qwen36-on-blackwell-gpus.md) (2026-06-08)
 - A hybrid sequence mixer that manages context memory efficiently.
 - GDN layers operate with linear complexity, O(n), and constant memory requirements.
 - Extends the Mamba2 architecture by incorporating a delta update rule.

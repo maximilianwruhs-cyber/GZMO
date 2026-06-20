@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-subword-tokenization-mitigates-llm-sparsity-micro01|drive-research-subword-tokenization-mitigates-llm-sparsity-micro01]] (2026-06-09)
+## From [drive-research-subword-tokenization-mitigates-llm-sparsity-micro01](/entities/drive-research-subword-tokenization-mitigates-llm-sparsity-micro01.md) (2026-06-09)
 - Decomposes rare words into smaller, more frequent subword units.
 - Rebalances the empirical token distribution.
 - Intercepts and mitigates extreme sparsity caused by Zipf's law.

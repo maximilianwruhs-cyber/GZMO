@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-agentic-token-economy-blueprint-micro01|drive-research-agentic-token-economy-blueprint-micro01]] (2026-06-09)
+## From [drive-research-agentic-token-economy-blueprint-micro01](/entities/drive-research-agentic-token-economy-blueprint-micro01.md) (2026-06-09)
 - Resolves the profound technical challenge regarding the Key-Value (KV) cache.
 - Includes mechanisms like Truncation from the End, Suffix Recomputation, Asynchronous Rebuilding, and Dirty Segment Bitmap.
 - Aims to manage positional encodings when segments are evicted or recomputed.

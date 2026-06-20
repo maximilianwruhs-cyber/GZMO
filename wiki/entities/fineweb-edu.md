@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part6-micro02|ai-research-part6-micro02]] (2026-06-09)
+## From [ai-research-part6-micro02](/entities/ai-research-part6-micro02.md) (2026-06-09)
 - Dataset used for training OLMo.
 - Penedo et al., 2024

@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-pdf-text-vs-scan-detection-heuristics-micro03|drive-research-pdf-text-vs-scan-detection-heuristics-micro03]] (2026-06-09)
+## From [drive-research-pdf-text-vs-scan-detection-heuristics-micro03](/entities/drive-research-pdf-text-vs-scan-detection-heuristics-micro03.md) (2026-06-09)
 - The ultimate consumers of text extraction for downstream use.

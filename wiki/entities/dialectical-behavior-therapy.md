@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[cybernetics-and-mythos-the-architecture-of-intell-part2|cybernetics-and-mythos-the-architecture-of-intell-part2]] (2026-06-08)
+## From [cybernetics-and-mythos-the-architecture-of-intell-part2](/entities/cybernetics-and-mythos-the-architecture-of-intell-part2.md) (2026-06-08)
 - Dialectical Behavior Therapy (DBT) translates highly abstract dialectical philosophy into a structured, evidence-based clinical intervention.
 - DBT applies the concept of dialectics by fundamentally acknowledging that psychological reality is complex.
 - The core, overarching dialectic in DBT is the profound tension between acceptance and change.

@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[openclaw-rust-terminal-user-interface-architecture-micro02|openclaw-rust-terminal-user-interface-architecture-micro02]] (2026-06-10)
+## From [openclaw-rust-terminal-user-interface-architecture-micro02](/entities/openclaw-rust-terminal-user-interface-architecture-micro02.md) (2026-06-10)
 - A linear constraint solver used by ratatui
 - Powers the spatial orchestration and layout engine

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[aether-grid-micro04|aether-grid-micro04]] (2026-06-09)
+## From [aether-grid-micro04](/entities/aether-grid-micro04.md) (2026-06-09)
 - Activated when internet/core network fails.
 - Uses a locally cached Emergency-LLM.
 - System adopts a 'formal emergency tone' in this mode.

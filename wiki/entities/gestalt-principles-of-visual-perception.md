@@ -14,11 +14,11 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-die-architektur-der-wissenschaftlichen-forschung|drive-research-die-architektur-der-wissenschaftlichen-forschung]] (2026-06-08)
+## From [drive-research-die-architektur-der-wissenschaftlichen-forschung](/entities/drive-research-die-architektur-der-wissenschaftlichen-forschung.md) (2026-06-08)
 - Principles used to reduce cognitive load in data visualization.
 - Include principles like closure, connection, proximity, and similarity.
 - Help make visualizations more intuitive.
 
-## From [[drive-research-scientific-writing-and-publication-process-micro02|drive-research-scientific-writing-and-publication-process-micro02]] (2026-06-09)
+## From [drive-research-scientific-writing-and-publication-process-micro02](/entities/drive-research-scientific-writing-and-publication-process-micro02.md) (2026-06-09)
 - Used to reduce cognitive load in visualizations.
 - Includes principles like closure, connection, proximity, and similarity.

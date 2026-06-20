@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[architectures-for-agentic-memory-virtual-context-micro03|architectures-for-agentic-memory-virtual-context-micro03]] (2026-06-09)
+## From [architectures-for-agentic-memory-virtual-context-micro03](/entities/architectures-for-agentic-memory-virtual-context-micro03.md) (2026-06-09)
 - A field designed to capture intermediate logic directly into the JSON schema.
 - Captures step-by-step logic, data location mapping, and scratchpad calculations.
 - Permits virtually unlimited free-text tokens within its value.

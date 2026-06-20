@@ -61,6 +61,7 @@ data/pedagogy/edf_log.jsonl
 data/pedagogy/low_tension_dialogue.jsonl
 data/pi-mentor-discovery-cycle-*.md
 data/cycle-*.md
+data/arxiv-cache/
 cycle-*.md
 chaos_card_output.log
 

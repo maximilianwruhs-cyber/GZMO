@@ -14,9 +14,9 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-architecture-of-a-trading-card-game-micro03|the-architecture-of-a-trading-card-game-micro03]] (2026-06-10)
+## From [the-architecture-of-a-trading-card-game-micro03](/entities/the-architecture-of-a-trading-card-game-micro03.md) (2026-06-10)
 - A specialized separation file
 - Instructs the press to lay down opaque white ink beneath CMYK layers
 
-## From [[the-architecture-of-a-trading-card-game-micro04|the-architecture-of-a-trading-card-game-micro04]] (2026-06-10)
+## From [the-architecture-of-a-trading-card-game-micro04](/entities/the-architecture-of-a-trading-card-game-micro04.md) (2026-06-10)
 - A layer used on premium foil cards to block holographic effects behind the text box.

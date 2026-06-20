@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-redefining-agentic-soulmd-to-dialog-micro04|drive-research-redefining-agentic-soulmd-to-dialog-micro04]] (2026-06-09)
+## From [drive-research-redefining-agentic-soulmd-to-dialog-micro04](/entities/drive-research-redefining-agentic-soulmd-to-dialog-micro04.md) (2026-06-09)
 - The boundary between human and AI becomes highly permeable within this architecture.
 - The agent learns its identity and values implicitly through continuous interaction.
 - Dynamically adapts ethical parameters, role allocations, and coordination strategies.

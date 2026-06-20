@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[migrating-openclaw-to-vercel-ai-sdk-for-local-llm|migrating-openclaw-to-vercel-ai-sdk-for-local-llm]] (2026-06-08)
+## From [migrating-openclaw-to-vercel-ai-sdk-for-local-llm](/entities/migrating-openclaw-to-vercel-ai-sdk-for-local-llm.md) (2026-06-08)
 - A local language model instance.
 - Exposes its native, highly optimized API at the standard localhost port.
 - Also hosts an OpenAI-compatible endpoint for legacy support.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[the-definitive-pantheon|the-definitive-pantheon]] (2026-06-08)
+## From [the-definitive-pantheon](/entities/the-definitive-pantheon.md) (2026-06-08)
 - Real Name: Peter Parker
 - Debut: Amazing Fantasy #15 (1962)
 - Revolutionized the genre by introducing the superhero as an everyman.

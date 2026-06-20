@@ -15,11 +15,11 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[gzmo-soul-merged-new-part1|gzmo-soul-merged-new-part1]] (2026-06-09)
+## From [gzmo-soul-merged-new-part1](/entities/gzmo-soul-merged-new-part1.md) (2026-06-09)
 - A service that aggregates version data from hundreds of package repositories worldwide.
 - Advanced AI agents query its REST API to determine if software on the system corresponds to the absolute latest available version.
 - Ist eine semantische Werkzeug-Integration
 - Kann für Antworten genutzt werden
 
-## From [[drive-research-architektur-und-implementierung-intelligenter-ki-a-micro02|drive-research-architektur-und-implementierung-intelligenter-ki-a-micro02]] (2026-06-09)
+## From [drive-research-architektur-und-implementierung-intelligenter-ki-a-micro02](/entities/drive-research-architektur-und-implementierung-intelligenter-ki-a-micro02.md) (2026-06-09)
 - Provides data that can be used by an agent for decision-making.

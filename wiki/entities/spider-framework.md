@@ -15,15 +15,15 @@ gzmo_synthetic: true
 
 Type: FRAMEWORK
 
-## From [[the-architecture-of-scientific-inquiry-and-academi|the-architecture-of-scientific-inquiry-and-academi]] (2026-06-08)
+## From [the-architecture-of-scientific-inquiry-and-academi](/entities/the-architecture-of-scientific-inquiry-and-academi.md) (2026-06-08)
 - Effective for qualitative and mixed-methods research.
 - Stands for Sample, Phenomenon of interest, Design, Evaluation, Research type.
 - Helps researchers delineate the 'who,' 'what,' 'why,' and 'how' of a study.
 
-## From [[drive-research-die-architektur-der-wissenschaftlichen-forschung|drive-research-die-architektur-der-wissenschaftlichen-forschung]] (2026-06-08)
+## From [drive-research-die-architektur-der-wissenschaftlichen-forschung](/entities/drive-research-die-architektur-der-wissenschaftlichen-forschung.md) (2026-06-08)
 - A framework for qualitative and mixed-methods research.
 - Stands for Sample, Phenomenon of interest, Design, Evaluation, Research type.
 
-## From [[drive-research-scientific-writing-and-publication-process-micro01|drive-research-scientific-writing-and-publication-process-micro01]] (2026-06-09)
+## From [drive-research-scientific-writing-and-publication-process-micro01](/entities/drive-research-scientific-writing-and-publication-process-micro01.md) (2026-06-09)
 - It is a framework for qualitative and mixed-methods research.
 - It stands for Sample, Phenomenon of interest, Design, Evaluation, Research type.

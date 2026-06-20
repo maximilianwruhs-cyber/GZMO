@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[the-cascading-honeypot-a-blueprint-for-executable|the-cascading-honeypot-a-blueprint-for-executable]] (2026-06-08)
+## From [the-cascading-honeypot-a-blueprint-for-executable](/entities/the-cascading-honeypot-a-blueprint-for-executable.md) (2026-06-08)
 - The prevailing standard of enterprise and personal artificial intelligence memory.
 - Operate fundamentally as digital hoarders.
 - Rely on high-dimensional vector databases.

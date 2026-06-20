@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[prompt-agent-engineering-part4-micro01|prompt-agent-engineering-part4-micro01]] (2026-06-09)
+## From [prompt-agent-engineering-part4-micro01](/entities/prompt-agent-engineering-part4-micro01.md) (2026-06-09)
 - Acts as the Aether-Link Ingress Layer.
 - Performs mTLS Auth & Rate Limit.
 - Handles secure transmission via WireGuard tunnel.

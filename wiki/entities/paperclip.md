@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[openclaw-deep-research-part10-micro05|openclaw-deep-research-part10-micro05]] (2026-06-09)
+## From [openclaw-deep-research-part10-micro05](/entities/openclaw-deep-research-part10-micro05.md) (2026-06-09)
 - Is an open-source project.
 - Asks what if you skip the enterprise vendor and build the company yourself.
 - Core insight is that coordination is the hard problem in multi-agent AI.

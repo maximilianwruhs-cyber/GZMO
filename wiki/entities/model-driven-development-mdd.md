@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[spec-driven-development-architecting-the-era-of-a-micro02|spec-driven-development-architecting-the-era-of-a-micro02]] (2026-06-10)
+## From [spec-driven-development-architecting-the-era-of-a-micro02](/entities/spec-driven-development-architecting-the-era-of-a-micro02.md) (2026-06-10)
 - Attempted to generate applications from UML diagrams or DSLs.
 - Failed to achieve mainstream adoption due to administrative overhead and inflexibility.

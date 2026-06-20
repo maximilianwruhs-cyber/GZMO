@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[openclaw-deep-research-part4|openclaw-deep-research-part4]] (2026-06-08)
+## From [openclaw-deep-research-part4](/entities/openclaw-deep-research-part4.md) (2026-06-08)
 - Characteristic of SaaS growth stage companies.
 - AutoGPT experiments touching revenue workflows require OpenClaw for reliability.

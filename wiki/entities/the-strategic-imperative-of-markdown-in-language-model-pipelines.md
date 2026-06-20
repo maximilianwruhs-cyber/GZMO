@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-markitdown-format-parity-checklist|drive-research-markitdown-format-parity-checklist]] (2026-06-08)
+## From [drive-research-markitdown-format-parity-checklist](/entities/drive-research-markitdown-format-parity-checklist.md) (2026-06-08)
 - The ultimate target output format for MarkItDown.
 - Exceptional token efficiency and native capacity to preserve vital document topology.
 - Retains the semantic scaffolding of the original document, including heading hierarchies, lists, tabular data, and references.

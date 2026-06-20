@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-rust-ecs-cache-optimization-research|drive-research-rust-ecs-cache-optimization-research]] (2026-06-08)
+## From [drive-research-rust-ecs-cache-optimization-research](/entities/drive-research-rust-ecs-cache-optimization-research.md) (2026-06-08)
 - A data-oriented solution for efficient element deletion in vectors.
 - Achieves O(1) efficiency by swapping with the last element and truncating.
 - Must be applied to every component vector in lockstep in a multi-vector system.

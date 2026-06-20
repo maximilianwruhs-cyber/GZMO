@@ -16,14 +16,14 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[openclaw-deep-research-part5-micro05|openclaw-deep-research-part5-micro05]] (2026-06-10)
+## From [openclaw-deep-research-part5-micro05](/entities/openclaw-deep-research-part5-micro05.md) (2026-06-10)
 - A messaging platform supported by OpenClaw's native integration
 
-## From [[openclaw-deep-research-part9-micro03|openclaw-deep-research-part9-micro03]] (2026-06-10)
+## From [openclaw-deep-research-part9-micro03](/entities/openclaw-deep-research-part9-micro03.md) (2026-06-10)
 - Messaging app available via open.feishu.cn
 
-## From [[openclaw-deep-research-part9-micro05|openclaw-deep-research-part9-micro05]] (2026-06-10)
+## From [openclaw-deep-research-part9-micro05](/entities/openclaw-deep-research-part9-micro05.md) (2026-06-10)
 - A supported communication channel
 
-## From [[openclaw-part1-micro03|openclaw-part1-micro03]] (2026-06-10)
+## From [openclaw-part1-micro03](/entities/openclaw-part1-micro03.md) (2026-06-10)
 - An enterprise integration optimized for document reading and writing.

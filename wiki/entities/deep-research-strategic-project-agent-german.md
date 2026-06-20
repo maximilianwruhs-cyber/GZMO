@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[prompt-agent-engineering-part1|prompt-agent-engineering-part1]] (2026-06-08)
+## From [prompt-agent-engineering-part1](/entities/prompt-agent-engineering-part1.md) (2026-06-08)
 - Use Case: Exhaustive research and conceptualization for new projects to avoid shallow AI responses.
 - Rolle: Senior Research Analyst and strategic project developer.
 - Instructions: Phase 1: Deep Research, Phase 2: Synthesis.

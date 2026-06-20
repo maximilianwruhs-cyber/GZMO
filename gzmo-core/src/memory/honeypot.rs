@@ -213,7 +213,7 @@ pub fn insert_honeypot_lifecycle(
             graph_rel, supersedes_id, verify_pass, confidence, decay_class,
             source_file, container_tag, promoted_at, is_latest, recall_count
         ) VALUES (
-            ?1, ?2, ?3, ?4, ?5, ?6, 'fact', ?7, ?8, 1, ?9, ?10, ?11, ?12, 1, 0
+            ?1, ?2, ?3, ?4, ?5, ?6, 'fact', ?7, ?8, 1, ?9, ?10, ?11, ?12, ?13, 1, 0
         )",
         params![
             vault_id,

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[drive-research-maximilian-wruhs|drive-research-maximilian-wruhs]] (2026-06-08)
+## From [drive-research-maximilian-wruhs](/entities/drive-research-maximilian-wruhs.md) (2026-06-08)
 - Employed MAXIMILIAN WRUHS as a Servicetechniker from 05/2021 to 09/2025.
 - Involved in Europaweiter Außendienst.
 - Responsible for Eigenständige Auftragsabwicklung und Wartung von Zugsicherungssystemen.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[optimizing-nvidia-blackwell-sm120-part1-micro04|optimizing-nvidia-blackwell-sm120-part1-micro04]] (2026-06-09)
+## From [optimizing-nvidia-blackwell-sm120-part1-micro04](/entities/optimizing-nvidia-blackwell-sm120-part1-micro04.md) (2026-06-09)
 - Tactics are hardcoded to assume SM100-class hardware parameters.
 - Require 228 KiB or more of shared memory for multi-stage pipelines.
 - Fail hardware compatibility check on SM120 due to shared memory limits.

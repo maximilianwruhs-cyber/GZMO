@@ -14,22 +14,22 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-10).
 
 ## Entities
-- [[dreams-md|DREAMS.md]] (SYSTEM)
-- [[heartbeat|Heartbeat]] (SYSTEM)
-- [[tages-logs|Tages-Logs]] (SYSTEM)
-- [[atkinson-shiffrin-modell|Atkinson-Shiffrin-Modell]] (CONCEPT)
-- [[memory-md|MEMORY.md]] (SYSTEM)
-- [[openclaw-4-5|OpenClaw 4.5]] (SYSTEM)
-- [[fts5-erweiterung|FTS5-Erweiterung]] (TOOL)
-- [[temporal-decay|Temporal Decay]] (CONCEPT)
-- [[dreaming-prozess|Dreaming-Prozess]] (SYSTEM)
-- [[hyde|HyDE]] (TOOL)
-- [[metakognition|Metakognition]] (CONCEPT)
-- [[context-overload|Context Overload]] (CONCEPT)
-- [[mmr-algorithmus|MMR-Algorithmus]] (TOOL)
-- [[hybride-suche|Hybride Suche]] (SYSTEM)
-- [[sqlite-vec|sqlite-vec]] (TOOL)
-- [[silent-turns|Silent Turns]] (CONCEPT)
+- [DREAMS.md](/entities/dreams-md.md) (SYSTEM)
+- [Heartbeat](/entities/heartbeat.md) (SYSTEM)
+- [Tages-Logs](/entities/tages-logs.md) (SYSTEM)
+- [Atkinson-Shiffrin-Modell](/entities/atkinson-shiffrin-modell.md) (CONCEPT)
+- [MEMORY.md](/entities/memory-md.md) (SYSTEM)
+- [OpenClaw 4.5](/entities/openclaw-4-5.md) (SYSTEM)
+- [FTS5-Erweiterung](/entities/fts5-erweiterung.md) (TOOL)
+- [Temporal Decay](/entities/temporal-decay.md) (CONCEPT)
+- [Dreaming-Prozess](/entities/dreaming-prozess.md) (SYSTEM)
+- [HyDE](/entities/hyde.md) (TOOL)
+- [Metakognition](/entities/metakognition.md) (CONCEPT)
+- [Context Overload](/entities/context-overload.md) (CONCEPT)
+- [MMR-Algorithmus](/entities/mmr-algorithmus.md) (TOOL)
+- [Hybride Suche](/entities/hybride-suche.md) (SYSTEM)
+- [sqlite-vec](/entities/sqlite-vec.md) (TOOL)
+- [Silent Turns](/entities/silent-turns.md) (CONCEPT)
 
 ## Relations
 - OpenClaw 4.5 → USES → Heartbeat

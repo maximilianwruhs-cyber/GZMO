@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-free-lob-data-for-chaos-research|drive-research-free-lob-data-for-chaos-research]] (2026-06-08)
+## From [drive-research-free-lob-data-for-chaos-research](/entities/drive-research-free-lob-data-for-chaos-research.md) (2026-06-08)
 - Is a topic on Quantitative Finance Stack Exchange.
 - Involves multiple crypto instruments with different tick sizes.

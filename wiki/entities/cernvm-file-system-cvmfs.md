@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[architecting-the-minimalist-linux-desktop-a-compa-part1|architecting-the-minimalist-linux-desktop-a-compa-part1]] (2026-06-08)
+## From [architecting-the-minimalist-linux-desktop-a-compa-part1](/entities/architecting-the-minimalist-linux-desktop-a-compa-part1.md) (2026-06-08)
 - Distributes software to the global LHC computing infrastructure.
 - Successfully relies on an OverlayFS union mount to manage over 5 billion files across 100,000 worker nodes.
 - Utilizes content-addressable storage and Merkle trees to optimize read-only performance.

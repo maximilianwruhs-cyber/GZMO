@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[prompt-agent-engineering-part2-micro01|prompt-agent-engineering-part2-micro01]] (2026-06-09)
+## From [prompt-agent-engineering-part2-micro01](/entities/prompt-agent-engineering-part2-micro01.md) (2026-06-09)
 - Provide raw CSS variables (:root).
 - Do not suggest external CSS libraries unless explicitly mandated.

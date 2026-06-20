@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: ARCHITECTURE
 
-## From [[from-static-vaults-to-autonomous-knowledge-engines|from-static-vaults-to-autonomous-knowledge-engines]] (2026-06-08)
+## From [from-static-vaults-to-autonomous-knowledge-engines](/entities/from-static-vaults-to-autonomous-knowledge-engines.md) (2026-06-08)
 - It is a Cognitive AI framework.
 - It divides the agent's memory into distinct, neurologically inspired tiers.
 - It is closely mirrored by the implementation of self-asking patterns in PKM.

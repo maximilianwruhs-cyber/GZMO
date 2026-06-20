@@ -14,14 +14,14 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-frankenmoe-blueprint-analysis|drive-research-frankenmoe-blueprint-analysis]] (2026-06-08)
+## From [drive-research-frankenmoe-blueprint-analysis](/entities/drive-research-frankenmoe-blueprint-analysis.md) (2026-06-08)
 - Used for weight-space stream-loading and compilation of homogeneous FrankenMoE.
 - Has command-line routines for compilation.
 - A command-line routine used for compiling homogeneous FrankenMoE.
 - Executes weight-space stream-loading.
 - Governed by a declarative YAML configuration file.
 
-## From [[drive-research-mergekit-moe-model-creation-guide|drive-research-mergekit-moe-model-creation-guide]] (2026-06-08)
+## From [drive-research-mergekit-moe-model-creation-guide](/entities/drive-research-mergekit-moe-model-creation-guide.md) (2026-06-08)
 - A library that allows for the cold-start construction of functional MoEs.
 - Provides a Python API for programmatic execution.
 - Addresses tokenizer configuration block for vocabulary mismatches.

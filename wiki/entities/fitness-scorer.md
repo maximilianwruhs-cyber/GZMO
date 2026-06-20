@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[obolus-micro01|obolus-micro01]] (2026-06-09)
+## From [obolus-micro01](/entities/obolus-micro01.md) (2026-06-09)
 - The objective arbiter over an agent's right to exist.
 - Calculates the Z-Score as the final performance metric.
 - Considers Quality (Q), Efficiency (E), and Variance-Penalty (V).

@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: METRIC
 
-## From [[drive-research-free-ai-and-cs-self-study-roadmap|drive-research-free-ai-and-cs-self-study-roadmap]] (2026-06-08)
+## From [drive-research-free-ai-and-cs-self-study-roadmap](/entities/drive-research-free-ai-and-cs-self-study-roadmap.md) (2026-06-08)
 - vital for modern machine learning frameworks like PyTorch and Scikit-learn
 - principles for model instantiation and data loading

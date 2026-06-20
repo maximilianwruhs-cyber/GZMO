@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[drive-research-frankenmoe-blueprint-analysis|drive-research-frankenmoe-blueprint-analysis]] (2026-06-08)
+## From [drive-research-frankenmoe-blueprint-analysis](/entities/drive-research-frankenmoe-blueprint-analysis.md) (2026-06-08)
 - A specialized 7B model.
 - Used in the mlabonne/Beyonder-4x7B-v3 architecture.
 - Primary synthesis role: Syntactic generation and structural coding.

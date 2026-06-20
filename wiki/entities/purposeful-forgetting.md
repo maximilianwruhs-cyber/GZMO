@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-cascading-honeypot-theorem-of-wisdom|the-cascading-honeypot-theorem-of-wisdom]] (2026-06-08)
+## From [the-cascading-honeypot-theorem-of-wisdom](/entities/the-cascading-honeypot-theorem-of-wisdom.md) (2026-06-08)
 - A systematic, biological, and psychological necessity for the human brain.
 - Mechanisms include Decay and Disuse Theory, Interference Theory, State-Dependent Retrieval, and Purposeful Forgetting.
 - Is a vital, active process that clears intermediate honeypots.

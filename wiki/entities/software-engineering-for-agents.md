@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-agentic-reverse-engineering-state-and-future-micro01|drive-research-agentic-reverse-engineering-state-and-future-micro01]] (2026-06-09)
+## From [drive-research-agentic-reverse-engineering-state-and-future-micro01](/entities/drive-research-agentic-reverse-engineering-state-and-future-micro01.md) (2026-06-09)
 - A symbiotic modality required for agent-driven reverse engineering.
 - Requires specialized environments.

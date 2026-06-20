@@ -14,8 +14,8 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-setting-up-autonomous-trading-agents-micro02|drive-research-setting-up-autonomous-trading-agents-micro02]] (2026-06-09)
+## From [drive-research-setting-up-autonomous-trading-agents-micro02](/entities/drive-research-setting-up-autonomous-trading-agents-micro02.md) (2026-06-09)
 - Can trigger a TradingView webhook.
 
-## From [[drive-research-setting-up-autonomous-trading-agents-micro05|drive-research-setting-up-autonomous-trading-agents-micro05]] (2026-06-09)
+## From [drive-research-setting-up-autonomous-trading-agents-micro05](/entities/drive-research-setting-up-autonomous-trading-agents-micro05.md) (2026-06-09)
 - A technical signal that can trigger an automation platform via a TradingView webhook.

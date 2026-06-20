@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[prompt-agent-engineering-part6-micro05|prompt-agent-engineering-part6-micro05]] (2026-06-10)
+## From [prompt-agent-engineering-part6-micro05](/entities/prompt-agent-engineering-part6-micro05.md) (2026-06-10)
 - Used as a verification method for cross-device testing

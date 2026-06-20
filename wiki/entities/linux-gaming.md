@@ -14,12 +14,12 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-linux-gaming-and-ai-build-guide-micro02|drive-research-linux-gaming-and-ai-build-guide-micro02]] (2026-06-09)
+## From [drive-research-linux-gaming-and-ai-build-guide-micro02](/entities/drive-research-linux-gaming-and-ai-build-guide-micro02.md) (2026-06-09)
 - Architecting a system in 2026 that refuses to compromise on either the bleeding edge of artificial intelligence or the pinnacle of Linux gaming requires navigating a treacherous ecosystem.
 - Native Linux gaming accounts for a fraction of the AAA market.
 - The ultimate Linux gaming stack is shipped with Bazzite.
 
-## From [[drive-research-linux-gaming-and-ai-build-guide-micro03|drive-research-linux-gaming-and-ai-build-guide-micro03]] (2026-06-09)
+## From [drive-research-linux-gaming-and-ai-build-guide-micro03](/entities/drive-research-linux-gaming-and-ai-build-guide-micro03.md) (2026-06-09)
 - RTX 5090 vs RX 8900 XTX performance in Battlefield 6
 - Best GPU for AI and Gaming in 2026
 - Nvidia's 50 Series GPUs Guide for Gamers

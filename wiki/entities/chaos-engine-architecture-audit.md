@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[gzmo-daemon-validation-audit-and-bun-migration-rep|gzmo-daemon-validation-audit-and-bun-migration-rep]] (2026-06-08)
+## From [gzmo-daemon-validation-audit-and-bun-migration-rep](/entities/gzmo-daemon-validation-audit-and-bun-migration-rep.md) (2026-06-08)
 - Notebook 1 with ID e298337b.
 - Defines 6 upgrades to transform the Chaos Engine.
 - All 6 upgrades are fully implemented.

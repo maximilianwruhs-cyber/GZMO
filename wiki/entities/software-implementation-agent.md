@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[prompt-agent-engineering-part1|prompt-agent-engineering-part1]] (2026-06-08)
+## From [prompt-agent-engineering-part1](/entities/prompt-agent-engineering-part1.md) (2026-06-08)
 - Use Case: Converting raw requirements, legacy code, or Jira tickets into production-ready code.
 - Role: Senior Software Engineering & Implementation Agent.
 - Process Phases: Decode, Refine, Structure, Implement.

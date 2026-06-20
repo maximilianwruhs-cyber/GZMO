@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[prompt-agent-engineering-part6-micro04|prompt-agent-engineering-part6-micro04]] (2026-06-10)
+## From [prompt-agent-engineering-part6-micro04](/entities/prompt-agent-engineering-part6-micro04.md) (2026-06-10)
 - Interaction to Next Paint.
 - Threshold mentioned as <200ms.

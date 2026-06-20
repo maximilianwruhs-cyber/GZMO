@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[drive-research-free-ai-and-cs-self-study-roadmap|drive-research-free-ai-and-cs-self-study-roadmap]] (2026-06-08)
+## From [drive-research-free-ai-and-cs-self-study-roadmap](/entities/drive-research-free-ai-and-cs-self-study-roadmap.md) (2026-06-08)
 - Harvard's superior alternative to CS50x for AI roadmap
 - strips away the low-level memory complexities of C and focuses purely on Python from day one
 - curriculum meticulously covers variables, conditional logic, looping mechanisms, exception handling for robust code, file input/output operations, and regular expressions

@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-free-ai-and-cs-self-study-roadmap|drive-research-free-ai-and-cs-self-study-roadmap]] (2026-06-08)
+## From [drive-research-free-ai-and-cs-self-study-roadmap](/entities/drive-research-free-ai-and-cs-self-study-roadmap.md) (2026-06-08)
 - a distinct form of logic
 - entirely reliant on the implementation of software algorithms

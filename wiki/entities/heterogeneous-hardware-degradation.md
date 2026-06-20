@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[aether-grid-micro03|aether-grid-micro03]] (2026-06-09)
+## From [aether-grid-micro03](/entities/aether-grid-micro03.md) (2026-06-09)
 - Grid will consist of DGX Spark (2026) and older Jetson AGX Orin.
 - Load-balancing must detect nodes without NVFP4 support.

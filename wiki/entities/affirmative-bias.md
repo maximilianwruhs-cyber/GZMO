@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[engineering-ignorance-eliminating-affirmative-bia|engineering-ignorance-eliminating-affirmative-bia]] (2026-06-08)
+## From [engineering-ignorance-eliminating-affirmative-bia](/entities/engineering-ignorance-eliminating-affirmative-bia.md) (2026-06-08)
 - Overwhelming bias in SLMs due to optimization for 'helpfulness'.
 - Causes SLMs to default to pattern-matching and hallucinate rather than admit ignorance.
 - A critical vulnerability inherent to SLM size and training paradigms.

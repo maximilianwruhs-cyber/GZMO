@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-archival-truth-part1-micro03|the-archival-truth-part1-micro03]] (2026-06-09)
+## From [the-archival-truth-part1-micro03](/entities/the-archival-truth-part1-micro03.md) (2026-06-09)
 - Illustrates how life wisdom is used as a daily coping mechanism.
 - Reflects a collective mental attitude.
 - Characterized by morbid serenity, joie de vivre, and a sense for nuances.

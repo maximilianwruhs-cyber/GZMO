@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[openclaw-part2|openclaw-part2]] (2026-06-08)
+## From [openclaw-part2](/entities/openclaw-part2.md) (2026-06-08)
 - A purpose-built acceleration for demanding workloads involving massive foundational model weights or vast datasets.
 - Offers aggregate throughput capable of serving thousands of compute instances concurrently.
 - Google's next-generation block storage.

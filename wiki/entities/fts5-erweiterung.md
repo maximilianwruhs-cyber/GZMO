@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[openclaw-part1-micro01|openclaw-part1-micro01]] (2026-06-10)
+## From [openclaw-part1-micro01](/entities/openclaw-part1-micro01.md) (2026-06-10)
 - An extension of SQLite
 - Used for BM25 search to find exact keywords

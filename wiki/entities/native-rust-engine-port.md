@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-optimizing-pi-coding-agent-performance|drive-research-optimizing-pi-coding-agent-performance]] (2026-06-08)
+## From [drive-research-optimizing-pi-coding-agent-performance](/entities/drive-research-optimizing-pi-coding-agent-performance.md) (2026-06-08)
 - Primary language for the Native Rust Engine Port.
 - Prioritized in the 'Performance & Optimization Rules' in AGENTS.md.
 - Used for compiling embedded binaries for size and execution speed.

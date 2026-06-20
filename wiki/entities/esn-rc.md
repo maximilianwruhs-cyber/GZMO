@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-algorithmic-trading-with-chaos-theory|drive-research-algorithmic-trading-with-chaos-theory]] (2026-06-08)
+## From [drive-research-algorithmic-trading-with-chaos-theory](/entities/drive-research-algorithmic-trading-with-chaos-theory.md) (2026-06-08)
 - Traditional Echo State Network.
 - Requires massive historical training datasets.
 - High computational cost, approximately 10^3 - 10^5 steps to desensitize internal nodes.

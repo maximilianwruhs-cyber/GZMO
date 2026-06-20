@@ -14,18 +14,18 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[g-del-machine|Gödel Machine]] (SYSTEM)
-- [[metaproductivity-performance-mismatch|Metaproductivity-Performance Mismatch]] (CONCEPT)
-- [[clade-metaproductivity|Clade-Metaproductivity]] (CONCEPT)
-- [[thompson-sampling|Thompson Sampling]] (TOOL)
-- [[chapelle-li|Chapelle & Li]] (AUTHOR)
-- [[ucb-air|UCB-Air]] (TOOL)
-- [[hgm|HGM]] (SYSTEM)
-- [[sica|SICA]] (SYSTEM)
-- [[agrawal-goyal|Agrawal & Goyal]] (AUTHOR)
-- [[wang-et-al|Wang et al.]] (AUTHOR)
-- [[dgm|DGM]] (SYSTEM)
-- [[schmidhuber|Schmidhuber]] (AUTHOR)
+- [Gödel Machine](/entities/g-del-machine.md) (SYSTEM)
+- [Metaproductivity-Performance Mismatch](/entities/metaproductivity-performance-mismatch.md) (CONCEPT)
+- [Clade-Metaproductivity](/entities/clade-metaproductivity.md) (CONCEPT)
+- [Thompson Sampling](/entities/thompson-sampling.md) (TOOL)
+- [Chapelle & Li](/entities/chapelle-li.md) (AUTHOR)
+- [UCB-Air](/entities/ucb-air.md) (TOOL)
+- [HGM](/entities/hgm.md) (SYSTEM)
+- [SICA](/entities/sica.md) (SYSTEM)
+- [Agrawal & Goyal](/entities/agrawal-goyal.md) (AUTHOR)
+- [Wang et al.](/entities/wang-et-al.md) (AUTHOR)
+- [DGM](/entities/dgm.md) (SYSTEM)
+- [Schmidhuber](/entities/schmidhuber.md) (AUTHOR)
 
 ## Relations
 - Gödel Machine → AUTHORED_BY → Schmidhuber

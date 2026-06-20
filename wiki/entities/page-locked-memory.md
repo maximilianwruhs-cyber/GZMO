@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-cuda-memory-locking-limits-configuration|drive-research-cuda-memory-locking-limits-configuration]] (2026-06-08)
+## From [drive-research-cuda-memory-locking-limits-configuration](/entities/drive-research-cuda-memory-locking-limits-configuration.md) (2026-06-08)
 - Also known as pinned memory.
 - Used within the NVIDIA CUDA architecture to accelerate host-to-device transfers.
 - Standard memory allocated via malloc or anonymous mmap is pageable and requires the CUDA driver to copy data into an internal, page-locked staging buffer.

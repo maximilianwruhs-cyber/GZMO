@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[dynamics-of-the-unpredictable-micro04|dynamics-of-the-unpredictable-micro04]] (2026-06-09)
+## From [dynamics-of-the-unpredictable-micro04](/entities/dynamics-of-the-unpredictable-micro04.md) (2026-06-09)
 - A mathematician who demonstrated that the Navier-Stokes equations and three-dimensional Euler fluid flows can simulate universal Turing machines.
 - She established that fluid dynamics encode undecidable problems using TKFTs.

@@ -15,7 +15,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-blackwell-sm120-gemm-optimization-guide|drive-research-blackwell-sm120-gemm-optimization-guide]] (2026-06-08)
+## From [drive-research-blackwell-sm120-gemm-optimization-guide](/entities/drive-research-blackwell-sm120-gemm-optimization-guide.md) (2026-06-08)
 - A GPU architecture.
 - Establishes a division between datacenter-class compute engines and local workstation/consumer accelerators.
 - Requires abandoning development patterns designed for datacenter accelerators (sm_100 capability).
@@ -42,9 +42,9 @@ Type: SYSTEM
 - SM100 GEMMs
 - SM120 FP8 GEMM
 
-## From [[optimizing-nvidia-blackwell-sm120-part3-micro06|optimizing-nvidia-blackwell-sm120-part3-micro06]] (2026-06-09)
+## From [optimizing-nvidia-blackwell-sm120-part3-micro06](/entities/optimizing-nvidia-blackwell-sm120-part3-micro06.md) (2026-06-09)
 - It is a system related to optimizing performance.
 - The document is part 3 of optimizing this system.
 
-## From [[optimizing-nvidia-blackwell-sm120-part2-micro01|optimizing-nvidia-blackwell-sm120-part2-micro01]] (2026-06-10)
+## From [optimizing-nvidia-blackwell-sm120-part2-micro01](/entities/optimizing-nvidia-blackwell-sm120-part2-micro01.md) (2026-06-10)
 - Subject of optimization research

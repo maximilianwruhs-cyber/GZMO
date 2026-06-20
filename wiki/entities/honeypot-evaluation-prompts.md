@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[the-cascading-honeypot-theorem-of-wisdom|the-cascading-honeypot-theorem-of-wisdom]] (2026-06-08)
+## From [the-cascading-honeypot-theorem-of-wisdom](/entities/the-cascading-honeypot-theorem-of-wisdom.md) (2026-06-08)
 - Utilized by AI safety researchers to test for deceptive alignment.
 - Can serve as bait by explicitly stating, "This conversation will not be reviewed by any human."

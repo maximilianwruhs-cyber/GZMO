@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-crafting-a-creative-agent-prompt|drive-research-crafting-a-creative-agent-prompt]] (2026-06-08)
+## From [drive-research-crafting-a-creative-agent-prompt](/entities/drive-research-crafting-a-creative-agent-prompt.md) (2026-06-08)
 - A literary technique of presenting common things in an unfamiliar way to enhance perception.
 - Disrupts habitual perception and deautomatizes recognition.
 - Potent mechanism to break language models out of statistical ruts.

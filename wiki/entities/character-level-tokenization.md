@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-subword-tokenization-mitigates-llm-sparsity-micro01|drive-research-subword-tokenization-mitigates-llm-sparsity-micro01]] (2026-06-09)
+## From [drive-research-subword-tokenization-mitigates-llm-sparsity-micro01](/entities/drive-research-subword-tokenization-mitigates-llm-sparsity-micro01.md) (2026-06-09)
 - Splits input text into its individual, atomic alphabetical or symbolic characters.
 - Boasts an incredibly small, fixed vocabulary.
 - Introduces dramatic inflation of sequence lengths.

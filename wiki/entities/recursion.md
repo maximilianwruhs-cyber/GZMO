@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-universal-syntax-research-prompt|drive-research-universal-syntax-research-prompt]] (2026-06-08)
+## From [drive-research-universal-syntax-research-prompt](/entities/drive-research-universal-syntax-research-prompt.md) (2026-06-08)
 - Ability to embed a phrase within a phrase of the same type.
 - Argued by HCF to be the only uniquely human component of the Narrow Language Faculty.
 - Challenged by research on endangered languages and LLMs.

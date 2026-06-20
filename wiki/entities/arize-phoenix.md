@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[prompt-agent-engineering-part6-micro01|prompt-agent-engineering-part6-micro01]] (2026-06-10)
+## From [prompt-agent-engineering-part6-micro01](/entities/prompt-agent-engineering-part6-micro01.md) (2026-06-10)
 - An LLM observability tool used to log prompts and tool outputs.

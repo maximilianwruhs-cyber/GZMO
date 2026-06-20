@@ -13,6 +13,7 @@ use rmcp::RoleClient;
 use rmcp::transport::TokioChildProcess;
 use tokio::process::Command;
 
+use crate::config::GzmoConfig;
 use crate::tools::ToolRegistry;
 
 use crate::mcp::bridge::{McpClient, McpServerConfig, McpToolBridge};
@@ -28,13 +29,21 @@ struct ConnectedServer {
 /// Manages all MCP server connections.
 pub struct McpManager {
     servers: Vec<ConnectedServer>,
+    obolus_config: Option<Arc<GzmoConfig>>,
 }
 
 impl McpManager {
     pub fn new() -> Self {
         Self {
             servers: Vec::new(),
+            obolus_config: None,
         }
+    }
+
+    /// Enable Obolus budget gate on MCP tool invocations (ARD).
+    pub fn with_obolus_config(mut self, config: Arc<GzmoConfig>) -> Self {
+        self.obolus_config = Some(config);
+        self
     }
 
     /// Connect to an MCP server, discover its tools.
@@ -114,6 +123,7 @@ impl McpManager {
                     description,
                     input_schema,
                     peer: peer_arc.clone(),
+                    obolus_config: self.obolus_config.clone(),
                 }
             })
             .collect();

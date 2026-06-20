@@ -14,17 +14,17 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[multi-agent-systems-mas|Multi-Agent Systems (MAS)]] (SYSTEM)
-- [[outer-link|Outer Link]] (TOOL)
-- [[inner-link|Inner Link]] (TOOL)
-- [[scaling-laws|Scaling Laws]] (CONCEPT)
-- [[recursivelink-modul|RecursiveLink-Modul]] (TOOL)
-- [[chain-of-thought-cot|Chain-of-Thought (CoT)]] (CONCEPT)
-- [[recursivemas|RecursiveMAS]] (SYSTEM)
-- [[recursive-language-models-rlms|Recursive Language Models (RLMs)]] (CONCEPT)
-- [[large-language-models-llms|Large Language Models (LLMs)]] (SYSTEM)
-- [[stanford-university|Stanford University]] (ORGANIZATION)
-- [[university-of-illinois-urbana-champaign-uiuc|University of Illinois Urbana-Champaign (UIUC)]] (ORGANIZATION)
+- [Multi-Agent Systems (MAS)](/entities/multi-agent-systems-mas.md) (SYSTEM)
+- [Outer Link](/entities/outer-link.md) (TOOL)
+- [Inner Link](/entities/inner-link.md) (TOOL)
+- [Scaling Laws](/entities/scaling-laws.md) (CONCEPT)
+- [RecursiveLink-Modul](/entities/recursivelink-modul.md) (TOOL)
+- [Chain-of-Thought (CoT)](/entities/chain-of-thought-cot.md) (CONCEPT)
+- [RecursiveMAS](/entities/recursivemas.md) (SYSTEM)
+- [Recursive Language Models (RLMs)](/entities/recursive-language-models-rlms.md) (CONCEPT)
+- [Large Language Models (LLMs)](/entities/large-language-models-llms.md) (SYSTEM)
+- [Stanford University](/entities/stanford-university.md) (ORGANIZATION)
+- [University of Illinois Urbana-Champaign (UIUC)](/entities/university-of-illinois-urbana-champaign-uiuc.md) (ORGANIZATION)
 
 ## Relations
 - RecursiveMAS → RELATED_TO → Multi-Agent Systems (MAS)

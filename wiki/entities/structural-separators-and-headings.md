@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[high-fidelity-markdown-engineering-and-ast-process|high-fidelity-markdown-engineering-and-ast-process]] (2026-06-08)
+## From [high-fidelity-markdown-engineering-and-ast-process](/entities/high-fidelity-markdown-engineering-and-ast-process.md) (2026-06-08)
 - Thematic breaks are algorithmically generated based on the rule option, ruleRepetition option, and ruleSpaces boolean.
 - ruleRepetition requires a minimum of 3 markers.
 - ruleSpaces dictates if single spaces are interspersed between markers.

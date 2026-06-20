@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-mastering-ast-grep-a-structured-approach|drive-research-mastering-ast-grep-a-structured-approach]] (2026-06-08)
+## From [drive-research-mastering-ast-grep-a-structured-approach](/entities/drive-research-mastering-ast-grep-a-structured-approach.md) (2026-06-08)
 - Enables ast-grep's integration into the editor ecosystem.
 - An internal Language Server Protocol (LSP) process is initiated by the VS Code extension.
 - Surfaces YAML linting rules as real-time diagnostics within the editor.

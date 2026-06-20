@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-inside-the-pi-coding-agent-optimization-isn|drive-research-inside-the---pi---coding-agent--optimization--isn]] (2026-06-08)
+## From [drive-research-inside-the---pi---coding-agent--optimization--isn](/entities/drive-research-inside-the-pi-coding-agent-optimization-isn.md) (2026-06-08)
 - Used for an 'AgenticOS' style architecture.
 - Delegates specialized tasks to smaller, highly tuned models.

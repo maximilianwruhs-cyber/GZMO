@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-creating-a-comprehensive-readmemd-micro02|drive-research-creating-a-comprehensive-readmemd-micro02]] (2026-06-09)
+## From [drive-research-creating-a-comprehensive-readmemd-micro02](/entities/drive-research-creating-a-comprehensive-readmemd-micro02.md) (2026-06-09)
 - Link to rigorous analysis services like Azure DevOps, Codacy, or Coveralls.
 - Generate a precise percentage metric indicating codebase coverage by automated unit tests.
 - Serve as a direct proxy for code quality.

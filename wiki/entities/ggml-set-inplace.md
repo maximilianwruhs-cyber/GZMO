@@ -14,11 +14,11 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-cuda-graph-capture-failure-workarounds-micro02|drive-research-cuda-graph-capture-failure-workarounds-micro02]] (2026-06-09)
+## From [drive-research-cuda-graph-capture-failure-workarounds-micro02](/entities/drive-research-cuda-graph-capture-failure-workarounds-micro02.md) (2026-06-09)
 - Standard copy allocations that safely copy data across separate device contexts.
 - Replaced with standard copy allocations to resolve illegal memory access violations.
 
-## From [[optimizing-nvidia-blackwell-sm120-part3-micro05|optimizing-nvidia-blackwell-sm120-part3-micro05]] (2026-06-09)
+## From [optimizing-nvidia-blackwell-sm120-part3-micro05](/entities/optimizing-nvidia-blackwell-sm120-part3-micro05.md) (2026-06-09)
 - Standard copy allocation used to resolve illegal memory access.
 - Safely copies data across separate device contexts.
 - Used instead of ggml_set_inplace.

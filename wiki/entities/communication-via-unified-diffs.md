@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-agentic-token-economy-blueprint-micro01|drive-research-agentic-token-economy-blueprint-micro01]] (2026-06-09)
+## From [drive-research-agentic-token-economy-blueprint-micro01](/entities/drive-research-agentic-token-economy-blueprint-micro01.md) (2026-06-09)
 - Instructing the agent to output only a Unified Diff or a highly specific search-and-replace block is mandatory for economic efficiency.
 - Shifts the burden of string manipulation from LLM generation to cheap, deterministic local compute.
 - Enforces patch-style outputs for file manipulation.

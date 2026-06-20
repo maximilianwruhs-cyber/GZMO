@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-soul|drive-research-soul]] (2026-06-08)
+## From [drive-research-soul](/entities/drive-research-soul.md) (2026-06-08)
 - Defines the 'OpenClaw Way'.
 - Emphasizes execution over conversation ('Action > Performance').
 - Values ownership and personality.

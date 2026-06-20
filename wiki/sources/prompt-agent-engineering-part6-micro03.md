@@ -14,15 +14,15 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[midjourney|Midjourney]] (TOOL)
-- [[figma|Figma]] (TOOL)
-- [[ui-consistency-auditor-prompt|UI Consistency Auditor Prompt]] (TOOL)
-- [[gemini|Gemini]] (SYSTEM)
-- [[ui-performance-auditor-prompt|UI Performance Auditor Prompt]] (TOOL)
-- [[dall-e-3|DALL-E 3]] (TOOL)
-- [[style-anchor|Style Anchor]] (CONCEPT)
-- [[core-web-vitals|Core Web Vitals]] (CONCEPT)
-- [[ui-ux|UI/UX]] (CONCEPT)
+- [Midjourney](/entities/midjourney.md) (TOOL)
+- [Figma](/entities/figma.md) (TOOL)
+- [UI Consistency Auditor Prompt](/entities/ui-consistency-auditor-prompt.md) (TOOL)
+- [Gemini](/entities/gemini.md) (SYSTEM)
+- [UI Performance Auditor Prompt](/entities/ui-performance-auditor-prompt.md) (TOOL)
+- [DALL-E 3](/entities/dall-e-3.md) (TOOL)
+- [Style Anchor](/entities/style-anchor.md) (CONCEPT)
+- [Core Web Vitals](/entities/core-web-vitals.md) (CONCEPT)
+- [UI/UX](/entities/ui-ux.md) (CONCEPT)
 
 ## Relations
 - UI Consistency Auditor Prompt → RELATED_TO → UI/UX

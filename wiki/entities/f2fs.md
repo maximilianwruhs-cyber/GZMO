@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[architecting-the-minimalist-linux-desktop-a-compa-part1|architecting-the-minimalist-linux-desktop-a-compa-part1]] (2026-06-08)
+## From [architecting-the-minimalist-linux-desktop-a-compa-part1](/entities/architecting-the-minimalist-linux-desktop-a-compa-part1.md) (2026-06-08)
 - A standard journaling or log-structured filesystem that can be used for the Upperdir in OverlayFS.
 - Flash-Friendly File System, engineered by Samsung in 2012.
 - Explicitly designed to interface with the internal geometry of NAND flash memory.

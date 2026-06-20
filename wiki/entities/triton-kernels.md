@@ -14,12 +14,12 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-speicherbandbreiten-engpass-memory-wall|drive-research-speicherbandbreiten-engpass-memory-wall]] (2026-06-08)
+## From [drive-research-speicherbandbreiten-engpass-memory-wall](/entities/drive-research-speicherbandbreiten-engpass-memory-wall.md) (2026-06-08)
 - Provide deep integration in vLLM for high-throughput serving.
 - Pre-rotate the Query (Q) vector with the inverse of the PolarQuant rotation matrix.
 - Compute attention scores by directly gathering centroid values via table lookups.
 
-## From [[the-architecture-of-speculative-decoding-and-infer-part1-micro06|the-architecture-of-speculative-decoding-and-infer-part1-micro06]] (2026-06-09)
+## From [the-architecture-of-speculative-decoding-and-infer-part1-micro06](/entities/the-architecture-of-speculative-decoding-and-infer-part1-micro06.md) (2026-06-09)
 - Specialized kernels used by vLLM for deep integration
 - Designed for vLLM to bypass the hybrid decode penalty
 - Operate uniquely to bypass the hybrid decode penalty

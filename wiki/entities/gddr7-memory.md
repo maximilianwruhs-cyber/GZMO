@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-linux-gaming-and-ai-build-guide-micro01|drive-research-linux-gaming-and-ai-build-guide-micro01]] (2026-06-09)
+## From [drive-research-linux-gaming-and-ai-build-guide-micro01](/entities/drive-research-linux-gaming-and-ai-build-guide-micro01.md) (2026-06-09)
 - The NVIDIA RTX 5090 has 32GB of ultra-fast GDDR7 memory.
 - Capable of delivering 1,792 GB/s of bandwidth.
 
-## From [[drive-research-linux-gaming-and-ai-build-guide-micro04|drive-research-linux-gaming-and-ai-build-guide-micro04]] (2026-06-09)
+## From [drive-research-linux-gaming-and-ai-build-guide-micro04](/entities/drive-research-linux-gaming-and-ai-build-guide-micro04.md) (2026-06-09)
 - The NVIDIA RTX 5090 features 32GB of ultra-fast GDDR7 memory.
 - Capable of delivering 1,792 GB/s of bandwidth.

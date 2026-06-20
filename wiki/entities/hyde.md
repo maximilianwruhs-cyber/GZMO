@@ -16,7 +16,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[openclaw-part2|openclaw-part2]] (2026-06-08)
+## From [openclaw-part2](/entities/openclaw-part2.md) (2026-06-08)
 - Employed by the REM Phase of the Autonomous 'Dreaming' Engine.
 - Identifies overarching patterns and conceptual connections.
 - Stands for Hypothetical Document Embeddings.
@@ -24,12 +24,12 @@ Type: CONCEPT
 - Used during the REM Phase of the sleep cycle to map abstract patterns across different problem sets.
 - Detects abstract patterns from isolated incidents GZMO encountered during the day.
 
-## From [[openclaw-part1-micro07|openclaw-part1-micro07]] (2026-06-09)
+## From [openclaw-part1-micro07](/entities/openclaw-part1-micro07.md) (2026-06-09)
 - drives the abstract pattern recognition for the Dreaming process.
 
-## From [[openclaw-part1-micro01|openclaw-part1-micro01]] (2026-06-10)
+## From [openclaw-part1-micro01](/entities/openclaw-part1-micro01.md) (2026-06-10)
 - Stands for Hypothetical Document Embeddings
 - Used during the REM Phase to close semantic gaps
 
-## From [[openclaw-part1-micro02|openclaw-part1-micro02]] (2026-06-10)
+## From [openclaw-part1-micro02](/entities/openclaw-part1-micro02.md) (2026-06-10)
 - Hypothetical Document Embeddings used in the REM phase of consolidation

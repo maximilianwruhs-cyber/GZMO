@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[openclaw-deep-research-part8-micro01|openclaw-deep-research-part8-micro01]] (2026-06-10)
+## From [openclaw-deep-research-part8-micro01](/entities/openclaw-deep-research-part8-micro01.md) (2026-06-10)
 - Used CrewAI for prototypes

@@ -14,6 +14,6 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[wave-02-notebooklm|wave_02_notebooklm]] (CONCEPT)
-- [[the-archival-truth-part1|the-archival-truth-part1]] (BOOK)
-- [[the-archival-truth-part-1|The Archival Truth (part 1)]] (BOOK)
+- [wave_02_notebooklm](/entities/wave-02-notebooklm.md) (CONCEPT)
+- [the-archival-truth-part1](/entities/the-archival-truth-part1.md) (BOOK)
+- [The Archival Truth (part 1)](/entities/the-archival-truth-part-1.md) (BOOK)

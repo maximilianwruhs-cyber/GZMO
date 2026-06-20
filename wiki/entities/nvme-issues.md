@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: HARDWARE
 
-## From [[drive-research-ultimate-linux-workstation-tuning-blueprint|drive-research-ultimate-linux-workstation-tuning-blueprint]] (2026-06-08)
+## From [drive-research-ultimate-linux-workstation-tuning-blueprint](/entities/drive-research-ultimate-linux-workstation-tuning-blueprint.md) (2026-06-08)
 - Controller benefits from disabling APST.
 - Requires specific I/O ring parameters.
 - Utilizes io_uring interface for optimization.

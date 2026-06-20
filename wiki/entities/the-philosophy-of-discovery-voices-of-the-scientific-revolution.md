@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[the-archival-truth-part2-micro02|the-archival-truth-part2-micro02]] (2026-06-09)
+## From [the-archival-truth-part2-micro02](/entities/the-archival-truth-part2-micro02.md) (2026-06-09)
 - Discusses authentic quotes from leading scientists.
 - Contrasts these with motivational platitudes.
 - Highlights quotes defining epistemological boundary-markers.

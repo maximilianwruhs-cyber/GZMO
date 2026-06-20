@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-advanced-prompt-engineering-for-comprehensive-c|drive-research-advanced-prompt-engineering-for-comprehensive-c]] (2026-06-08)
+## From [drive-research-advanced-prompt-engineering-for-comprehensive-c](/entities/drive-research-advanced-prompt-engineering-for-comprehensive-c.md) (2026-06-08)
 - A specific focus for a specialized application security auditor persona.

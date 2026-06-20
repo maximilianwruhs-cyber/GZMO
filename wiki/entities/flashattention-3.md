@@ -16,18 +16,18 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-linux-gaming-and-ai-build-guide-micro01|drive-research-linux-gaming-and-ai-build-guide-micro01]] (2026-06-09)
+## From [drive-research-linux-gaming-and-ai-build-guide-micro01](/entities/drive-research-linux-gaming-and-ai-build-guide-micro01.md) (2026-06-09)
 - Strictly limited to the CUDA architecture.
 - Remains unavailable on ROCm.
 - Optimized specifically for Hopper and Blackwell architectures.
 
-## From [[drive-research-linux-gaming-and-ai-build-guide-micro04|drive-research-linux-gaming-and-ai-build-guide-micro04]] (2026-06-09)
+## From [drive-research-linux-gaming-and-ai-build-guide-micro04](/entities/drive-research-linux-gaming-and-ai-build-guide-micro04.md) (2026-06-09)
 - Strictly limited to the CUDA architecture.
 - Optimized specifically for Hopper and Blackwell architectures.
 
-## From [[the-2026-linux-workstation-micro03|the-2026-linux-workstation-micro03]] (2026-06-09)
+## From [the-2026-linux-workstation-micro03](/entities/the-2026-linux-workstation-micro03.md) (2026-06-09)
 - Critical inference infrastructure.
 - Exclusive monopoly by NVIDIA's CUDA ecosystem.
 
-## From [[the-2026-linux-workstation-micro04|the-2026-linux-workstation-micro04]] (2026-06-10)
+## From [the-2026-linux-workstation-micro04](/entities/the-2026-linux-workstation-micro04.md) (2026-06-10)
 - Part of NVIDIA's AI software ecosystem

@@ -14,8 +14,8 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[drive-research-safe-unzip-practices-for-threat-model-micro02|drive-research-safe-unzip-practices-for-threat-model-micro02]] (2026-06-09)
+## From [drive-research-safe-unzip-practices-for-threat-model-micro02](/entities/drive-research-safe-unzip-practices-for-threat-model-micro02.md) (2026-06-09)
 - Constructed overlapping compression bombs with quadratic growth.
 
-## From [[drive-research-safe-unzip-practices-for-threat-model-micro01|drive-research-safe-unzip-practices-for-threat-model-micro01]] (2026-06-10)
+## From [drive-research-safe-unzip-practices-for-threat-model-micro01](/entities/drive-research-safe-unzip-practices-for-threat-model-micro01.md) (2026-06-10)
 - Security researcher who demonstrated non-recursive zip bomb construction in 2019.

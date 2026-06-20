@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[drive-research-32gb-vram-ai-reasoning-models-micro02|drive-research-32gb-vram-ai-reasoning-models-micro02]] (2026-06-09)
+## From [drive-research-32gb-vram-ai-reasoning-models-micro02](/entities/drive-research-32gb-vram-ai-reasoning-models-micro02.md) (2026-06-09)
 - Core dense model contains 32.8 billion total parameters.
 - Architecturally constructed with 64 layers and a hidden dimension size of 5,120.
 - Natively implements Grouped-Query Attention (GQA).

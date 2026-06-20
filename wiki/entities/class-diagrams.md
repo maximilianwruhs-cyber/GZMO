@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-creating-a-comprehensive-readmemd-micro02|drive-research-creating-a-comprehensive-readmemd-micro02]] (2026-06-09)
+## From [drive-research-creating-a-comprehensive-readmemd-micro02](/entities/drive-research-creating-a-comprehensive-readmemd-micro02.md) (2026-06-09)
 - Heavily utilized in Object-Oriented Programming to define system boundaries, object attributes, and structural inheritance paths.
 - Can document a banking module by defining class BankAccount with types and methods like +String owner, +Bigdecimal balance, and +deposit(amount).

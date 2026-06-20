@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[prompt-agent-engineering-part1|prompt-agent-engineering-part1]] (2026-06-08)
+## From [prompt-agent-engineering-part1](/entities/prompt-agent-engineering-part1.md) (2026-06-08)
 - Forbid all propositions of visual metamorphoses, CSS incantations, chromatic realignments, or stylistic evolutions.
 - Channel 100% of essence into wireframe-level integrations, data vortexes, functional hyper-structures, and backend neural synergies.

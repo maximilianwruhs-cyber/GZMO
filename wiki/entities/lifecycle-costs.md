@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-technologischer-branchen-report-hilfsbetriebeumri-micro03|drive-research-technologischer-branchen-report-hilfsbetriebeumri-micro03]] (2026-06-09)
+## From [drive-research-technologischer-branchen-report-hilfsbetriebeumri-micro03](/entities/drive-research-technologischer-branchen-report-hilfsbetriebeumri-micro03.md) (2026-06-09)
 - Can be reduced by up to 25% through strict application of RAMS methodology.

@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: MODEL
 
-## From [[drive-research-agentic-workflows-fastest-best-models|drive-research-agentic-workflows-fastest-best-models]] (2026-06-08)
+## From [drive-research-agentic-workflows-fastest-best-models](/entities/drive-research-agentic-workflows-fastest-best-models.md) (2026-06-08)
 - Undisputed optimal model for agentic workflows on 32GB VRAM.
 - Achieves dominance via profound architectural innovations.
 - Hybrid multimodal model delivering top-tier performance.
@@ -33,7 +33,7 @@ Type: MODEL
 - Has a native speculative decoding head.
 - Can be used with llama.cpp and vLLM.
 
-## From [[drive-research-optimizing-qwen36-on-blackwell-gpus|drive-research-optimizing-qwen36-on-blackwell-gpus]] (2026-06-08)
+## From [drive-research-optimizing-qwen36-on-blackwell-gpus](/entities/drive-research-optimizing-qwen36-on-blackwell-gpus.md) (2026-06-08)
 - A dense model that sees significant speedups from MTP.
 - Experiences up to 2.44x speedups from MTP.
 - VRAM requirements are lower than Qwen3.6-35B-A3B.

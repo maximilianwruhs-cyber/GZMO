@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[dynamics-of-the-unpredictable-micro07|dynamics-of-the-unpredictable-micro07]] (2026-06-09)
+## From [dynamics-of-the-unpredictable-micro07](/entities/dynamics-of-the-unpredictable-micro07.md) (2026-06-09)
 - Entity Component System.
 - Allows for highly cache-friendly, linear iteration.
 - Bevy is built entirely on data-driven principles using ECS.

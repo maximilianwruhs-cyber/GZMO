@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[prompt-agent-engineering-part1|prompt-agent-engineering-part1]] (2026-06-08)
+## From [prompt-agent-engineering-part1](/entities/prompt-agent-engineering-part1.md) (2026-06-08)
 - Use Case: For evaluating existing software/products, identifying gaps, and creating a prioritized roadmap for future development.
 - Role & Objective: Analyze and enhance future features for software, products, or technologies.
 - Output: Prioritized Enhancement Matrix, Implementation Roadmap.

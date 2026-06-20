@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PROCESS
 
-## From [[gzmo|gzmo]] (2026-06-09)
+## From [gzmo](/entities/gzmo.md) (2026-06-09)
 - GZMO's active process of curating knowledge and memory.
 - Involves filtering, structuring new information, and writing down learned preferences/project details.
 - Essential for maintaining identity continuity across sessions.

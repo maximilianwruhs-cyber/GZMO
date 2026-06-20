@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-creating-a-comprehensive-readmemd-micro02|drive-research-creating-a-comprehensive-readmemd-micro02]] (2026-06-09)
+## From [drive-research-creating-a-comprehensive-readmemd-micro02](/entities/drive-research-creating-a-comprehensive-readmemd-micro02.md) (2026-06-09)
 - Experimental tools utilizing Abstract Syntax Tree parsing technologies (e.g., Tree-sitter).
 - Operate via sophisticated AI agent loops (e.g., Vercel AI SDK, GPT, Claude).
 - Deeply analyze code logic, function definitions, and structural flow to write accurate usage documentation.

@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[drive-research-cybernetics-information-loops-between-entities-micro02|drive-research-cybernetics-information-loops-between-entities-micro02]] (2026-06-09)
+## From [drive-research-cybernetics-information-loops-between-entities-micro02](/entities/drive-research-cybernetics-information-loops-between-entities-micro02.md) (2026-06-09)
 - Group involved in the consolidation of early cybernetics.
 - Contributed to multidisciplinary exchanges.

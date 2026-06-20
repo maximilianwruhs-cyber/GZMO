@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[ai-research-part8-micro05|ai-research-part8-micro05]] (2026-06-09)
+## From [ai-research-part8-micro05](/entities/ai-research-part8-micro05.md) (2026-06-09)
 - Provides virtual machine-level isolation at container speeds.
 - Recommended for isolating untrusted code execution.
 - A container runtime for isolated execution.

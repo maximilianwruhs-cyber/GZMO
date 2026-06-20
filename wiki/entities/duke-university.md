@@ -14,9 +14,9 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[drive-research-hermes-anthropic-openrouter-cache-investigation|drive-research-hermes-anthropic-openrouter-cache-investigation]] (2026-06-08)
+## From [drive-research-hermes-anthropic-openrouter-cache-investigation](/entities/drive-research-hermes-anthropic-openrouter-cache-investigation.md) (2026-06-08)
 - Associated with Harold G. Koenig and 'Book of Life' training.
 
-## From [[dynamics-of-the-unpredictable-micro04|dynamics-of-the-unpredictable-micro04]] (2026-06-09)
+## From [dynamics-of-the-unpredictable-micro04](/entities/dynamics-of-the-unpredictable-micro04.md) (2026-06-09)
 - Advancements in AI frameworks for chaotic models were made by institutions like Duke University.
 - These advancements were published in NeurIPS.

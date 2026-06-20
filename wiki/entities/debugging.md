@@ -14,9 +14,9 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-the-most-important-books-in-computer-science|drive-research-the-most-important-books-in-computer-science]] (2026-06-08)
+## From [drive-research-the-most-important-books-in-computer-science](/entities/drive-research-the-most-important-books-in-computer-science.md) (2026-06-08)
 - Focus is on coding, debugging, and testing in Code Complete
 
-## From [[prompt-agent-engineering-part6-micro07|prompt-agent-engineering-part6-micro07]] (2026-06-10)
+## From [prompt-agent-engineering-part6-micro07](/entities/prompt-agent-engineering-part6-micro07.md) (2026-06-10)
 - Phase 3 of the execution protocol.
 - Involves reproducing issues, tracing execution, and root cause analysis.

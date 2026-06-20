@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[prfaas-cross-datacenter-llm-serving-via-selective-micro05|prfaas-cross-datacenter-llm-serving-via-selective-micro05]] (2026-06-10)
+## From [prfaas-cross-datacenter-llm-serving-via-selective-micro05](/entities/prfaas-cross-datacenter-llm-serving-via-selective-micro05.md) (2026-06-10)
 - A method that selectively evicts or quantizes KVCache entries to shrink memory footprints.

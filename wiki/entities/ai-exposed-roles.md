@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-ai-agents-and-spec-driven-development-micro04|drive-research-ai-agents-and-spec-driven-development-micro04]] (2026-06-09)
+## From [drive-research-ai-agents-and-spec-driven-development-micro04](/entities/drive-research-ai-agents-and-spec-driven-development-micro04.md) (2026-06-09)
 - employment in these roles for professionals aged 22 to 25 dropped by roughly 13% following the release of advanced models

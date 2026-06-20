@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-setting-up-autonomous-trading-agents-micro02|drive-research-setting-up-autonomous-trading-agents-micro02]] (2026-06-09)
+## From [drive-research-setting-up-autonomous-trading-agents-micro02](/entities/drive-research-setting-up-autonomous-trading-agents-micro02.md) (2026-06-09)
 - Describes Kraken's domain.

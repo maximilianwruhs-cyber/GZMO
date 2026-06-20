@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[dynamics-of-the-unpredictable-micro05|dynamics-of-the-unpredictable-micro05]] (2026-06-10)
+## From [dynamics-of-the-unpredictable-micro05](/entities/dynamics-of-the-unpredictable-micro05.md) (2026-06-10)
 - Plain Old Data (POD) structures associated with entities.
 - Contains absolute zero behavior or logic.

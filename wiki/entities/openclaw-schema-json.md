@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[openclaw-deep-research-part11-micro01|openclaw-deep-research-part11-micro01]] (2026-06-10)
+## From [openclaw-deep-research-part11-micro01](/entities/openclaw-deep-research-part11-micro01.md) (2026-06-10)
 - An open source project/repository on GitHub
 - Uses Zod for schema definitions
 - Has a CLI tool for configuration management

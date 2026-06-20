@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-cuda-graph-capture-failure-workarounds-micro01|drive-research-cuda-graph-capture-failure-workarounds-micro01]] (2026-06-09)
+## From [drive-research-cuda-graph-capture-failure-workarounds-micro01](/entities/drive-research-cuda-graph-capture-failure-workarounds-micro01.md) (2026-06-09)
 - Curated research corpus consolidated from Google Takeout.
 - Deals with CUDA graph capture failure workarounds.

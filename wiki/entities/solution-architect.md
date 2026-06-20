@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[prompt-agent-engineering-part7-micro04|prompt-agent-engineering-part7-micro04]] (2026-06-10)
+## From [prompt-agent-engineering-part7-micro04](/entities/prompt-agent-engineering-part7-micro04.md) (2026-06-10)
 - A professional role defined for the AI agent
 - Expert in designing large-scale data pipelines

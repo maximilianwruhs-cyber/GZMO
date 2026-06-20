@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[openclaw-deep-research-part7-micro01|openclaw-deep-research-part7-micro01]] (2026-06-10)
+## From [openclaw-deep-research-part7-micro01](/entities/openclaw-deep-research-part7-micro01.md) (2026-06-10)
 - Skill to distill signal around AI-native tools and apps.

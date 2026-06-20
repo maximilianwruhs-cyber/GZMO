@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-linux-gaming-and-ai-build-guide-micro01|drive-research-linux-gaming-and-ai-build-guide-micro01]] (2026-06-09)
+## From [drive-research-linux-gaming-and-ai-build-guide-micro01](/entities/drive-research-linux-gaming-and-ai-build-guide-micro01.md) (2026-06-09)
 - Has entirely replaced X11 as the modern default on GNOME, KDE Plasma, and major distributions.
 - Wayland's architecture collapses the display pipeline into a single unified compositor.
 - NVIDIA's proprietary Linux drivers historically clashed violently with Wayland compositors.

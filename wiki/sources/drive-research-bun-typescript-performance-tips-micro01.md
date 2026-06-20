@@ -14,10 +14,10 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[google-takeout|Google Takeout]] (TOOL)
-- [[drive-research-bun-typescript-performance-tips|drive-research-bun-typescript-performance-tips]] (TOOL)
-- [[cloud-kg-extraction|cloud KG extraction]] (CONCEPT)
-- [[typescript|TypeScript]] (TOOL)
+- [Google Takeout](/entities/google-takeout.md) (TOOL)
+- [drive-research-bun-typescript-performance-tips](/entities/drive-research-bun-typescript-performance-tips.md) (TOOL)
+- [cloud KG extraction](/entities/cloud-kg-extraction.md) (CONCEPT)
+- [TypeScript](/entities/typescript.md) (TOOL)
 
 ## Relations
 - drive-research-bun-typescript-performance-tips → USES → TypeScript

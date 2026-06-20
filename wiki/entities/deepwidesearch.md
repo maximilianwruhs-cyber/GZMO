@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[gzmo-soul-merged-new-part2-micro05|gzmo-soul-merged-new-part2-micro05]] (2026-06-09)
+## From [gzmo-soul-merged-new-part2-micro05](/entities/gzmo-soul-merged-new-part2-micro05.md) (2026-06-09)
 - Benchmark showing significant shortcomings.
 - Success rate often only 2.39%.

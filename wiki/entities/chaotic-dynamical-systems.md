@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-free-lob-data-for-chaos-research|drive-research-free-lob-data-for-chaos-research]] (2026-06-08)
+## From [drive-research-free-lob-data-for-chaos-research](/entities/drive-research-free-lob-data-for-chaos-research.md) (2026-06-08)
 - Research seeks to identify whether price movements are governed by a deterministic, non-linear system.
 - Requires highly granular, tick-level records.
 - A major practical hurdle is distinguishing true limit order book records from standard OHLCV summaries.

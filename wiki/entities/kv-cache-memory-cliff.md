@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-ok-so-designing-a-guide-around-llamabench-would-b|drive-research-ok-so-designing-a-guide-around-llamabench-would-b]] (2026-06-08)
+## From [drive-research-ok-so-designing-a-guide-around-llamabench-would-b](/entities/drive-research-ok-so-designing-a-guide-around-llamabench-would-b.md) (2026-06-08)
 - Memory footprint grows linearly as context length scales.
 - Eats into available VRAM.
 - Can force execution back onto host memory or degrade attention steps.

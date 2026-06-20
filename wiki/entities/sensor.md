@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[cybernetics-and-mythos-the-architecture-of-intell-part1|cybernetics-and-mythos-the-architecture-of-intell-part1]] (2026-06-08)
+## From [cybernetics-and-mythos-the-architecture-of-intell-part1](/entities/cybernetics-and-mythos-the-architecture-of-intell-part1.md) (2026-06-08)
 - The intake mechanism that detects changes in a specified variable.
 - Transforms physical, social, or digital phenomena into transmittable signals for the system to process.
 - Examples include nerve endings in the skin (detecting heat) and thermocouples in an HVAC system.

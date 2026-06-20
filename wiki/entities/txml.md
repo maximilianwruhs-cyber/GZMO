@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-bun-file-parsing-dependency-shortlist-micro02|drive-research-bun-file-parsing-dependency-shortlist-micro02]] (2026-06-09)
+## From [drive-research-bun-file-parsing-dependency-shortlist-micro02](/entities/drive-research-bun-file-parsing-dependency-shortlist-micro02.md) (2026-06-09)
 - Optimal, highest-performance choice for pure extraction of text and data payloads within a Bun environment.
 - Astonishingly small library, compiling to approximately 1.5 KB minified and gzipped.
 - 5 to 10 times faster than legacy xml2js implementations.

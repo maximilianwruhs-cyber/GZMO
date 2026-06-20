@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[the-gzmo-daemon-high-performance-bun-refactor|the-gzmo-daemon-high-performance-bun-refactor]] (2026-06-08)
+## From [the-gzmo-daemon-high-performance-bun-refactor](/entities/the-gzmo-daemon-high-performance-bun-refactor.md) (2026-06-08)
 - Underlying construct used for zero-copy I/O.
 - Enables cutting out buffer copying latency.

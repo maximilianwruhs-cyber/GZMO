@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-cybernetics-information-loops-between-entities-micro04|drive-research-cybernetics-information-loops-between-entities-micro04]] (2026-06-09)
+## From [drive-research-cybernetics-information-loops-between-entities-micro04](/entities/drive-research-cybernetics-information-loops-between-entities-micro04.md) (2026-06-09)
 - Linked with human intentionality through high-speed feedback loops.

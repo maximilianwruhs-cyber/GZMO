@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[architectures-and-optimizations-for-speculative-de-micro02|architectures-and-optimizations-for-speculative-de-micro02]] (2026-06-09)
+## From [architectures-and-optimizations-for-speculative-de-micro02](/entities/architectures-and-optimizations-for-speculative-de-micro02.md) (2026-06-09)
 - A benchmark used for evaluating RecursiveMAS in code generation.
 
-## From [[the-evolution-of-artificial-intelligence-evaluatio-micro02|the-evolution-of-artificial-intelligence-evaluatio-micro02]] (2026-06-09)
+## From [the-evolution-of-artificial-intelligence-evaluatio-micro02](/entities/the-evolution-of-artificial-intelligence-evaluatio-micro02.md) (2026-06-09)
 - Not Saturated.
 - Qwen3.5-plus scores eighty-three point six percent.
 - High utility due to rolling monthly updates preventing memorization.

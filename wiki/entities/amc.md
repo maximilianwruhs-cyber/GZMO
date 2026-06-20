@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[ai-research-part2|ai-research-part2]] (2026-06-08)
+## From [ai-research-part2](/entities/ai-research-part2.md) (2026-06-08)
 - A collection of problems from standard American middle and high school math competitions.
 - Serves as a foundational benchmark for pre-collegiate mathematical reasoning.

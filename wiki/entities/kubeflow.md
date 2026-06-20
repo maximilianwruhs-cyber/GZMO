@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[aether-grid-micro01|aether-grid-micro01]] (2026-06-09)
+## From [aether-grid-micro01](/entities/aether-grid-micro01.md) (2026-06-09)
 - Used for dynamic model routing and RAG-Processing on DGX GH200-Cluster.
 - Integration with Kubernetes for ML orchestration.

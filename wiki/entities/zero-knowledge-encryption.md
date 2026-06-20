@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-creating-a-comprehensive-readmemd-micro03|drive-research-creating-a-comprehensive-readmemd-micro03]] (2026-06-09)
+## From [drive-research-creating-a-comprehensive-readmemd-micro03](/entities/drive-research-creating-a-comprehensive-readmemd-micro03.md) (2026-06-09)
 - It leaves absolutely no ambiguity regarding how zero-knowledge encryption is achieved within the browser environment.

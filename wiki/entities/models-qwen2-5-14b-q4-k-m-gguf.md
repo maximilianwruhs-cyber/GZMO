@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[drive-research-llamabench|drive-research-llamabench]] (2026-06-08)
+## From [drive-research-llamabench](/entities/drive-research-llamabench.md) (2026-06-08)
 - Example model used in a production recipe for profiling context degradation

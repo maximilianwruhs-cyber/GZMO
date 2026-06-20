@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-research-process-steps-micro01|drive-research-research-process-steps-micro01]] (2026-06-09)
+## From [drive-research-research-process-steps-micro01](/entities/drive-research-research-process-steps-micro01.md) (2026-06-09)
 - micro-split from drive-research-research-process.md
 - for cloud KG extraction
 - Curated research corpus consolidated from Google Takeout

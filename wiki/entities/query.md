@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-honeypot-compiler-architecture-distilling-dat|the-honeypot-compiler-architecture-distilling-dat]] (2026-06-08)
+## From [the-honeypot-compiler-architecture-distilling-dat](/entities/the-honeypot-compiler-architecture-distilling-dat.md) (2026-06-08)
 - Allows the LLM to summarize answers from the compiled index.
 - Dips directly into the final honeypot for pure, distilled essence.

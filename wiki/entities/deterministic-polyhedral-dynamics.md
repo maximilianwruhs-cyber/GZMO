@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[deterministic-polyhedral-dynamics-in-rust-game-eng|deterministic-polyhedral-dynamics-in-rust-game-eng]] (2026-06-08)
+## From [deterministic-polyhedral-dynamics-in-rust-game-eng](/entities/deterministic-polyhedral-dynamics-in-rust-game-eng.md) (2026-06-08)
 - Involves implementing deterministic dice mechanics in Rust-based game engines.
 - Requires understanding spatial rotations, vector mathematics, algorithmic determinism, and pipeline execution.
 - Examines mathematical, algorithmic, and architectural implementation of physics-based dice mechanics.

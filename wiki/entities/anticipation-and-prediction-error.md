@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-architecture-of-engagement-an-analysis-of-gam-micro06|the-architecture-of-engagement-an-analysis-of-gam-micro06]] (2026-06-09)
+## From [the-architecture-of-engagement-an-analysis-of-gam-micro06](/entities/the-architecture-of-engagement-an-analysis-of-gam-micro06.md) (2026-06-09)
 - Contemporary neuroscientific paradigms reveal dopamine functions heavily in this.
 - Acts as a teaching signal that underlies reinforcement learning.
 - A digital interface notification triggers a rapid, transient spike in dopamine release, driving motivation to act.

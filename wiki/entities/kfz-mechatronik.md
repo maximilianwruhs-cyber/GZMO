@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-maximilian-wruhs|drive-research-maximilian-wruhs]] (2026-06-08)
+## From [drive-research-maximilian-wruhs](/entities/drive-research-maximilian-wruhs.md) (2026-06-08)
 - MAXIMILIAN WRUHS has expertise in this field.
 - This is a specialization mentioned in the Kurzprofil.

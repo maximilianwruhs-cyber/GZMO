@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[the-archival-truth-part2-micro02|the-archival-truth-part2-micro02]] (2026-06-09)
+## From [the-archival-truth-part2-micro02](/entities/the-archival-truth-part2-micro02.md) (2026-06-09)
 - Prominent victim of the quotation magnet effect.
 - Widely misattributed with the quote 'Insanity is doing the same thing over and over again and expecting different results'.
 - Authentic writings include observations on the spacetime continuum.

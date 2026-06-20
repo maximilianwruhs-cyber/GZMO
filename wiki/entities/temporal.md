@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[ai-research-part8-micro06|ai-research-part8-micro06]] (2026-06-10)
+## From [ai-research-part8-micro06](/entities/ai-research-part8-micro06.md) (2026-06-10)
 - Used for durable execution of workflows.
 - Allows workflows to survive crashes with pause and resume functionality.

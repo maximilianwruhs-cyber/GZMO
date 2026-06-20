@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-architecture-of-engagement-an-analysis-of-gam-micro03|the-architecture-of-engagement-an-analysis-of-gam-micro03]] (2026-06-09)
+## From [the-architecture-of-engagement-an-analysis-of-gam-micro03](/entities/the-architecture-of-engagement-an-analysis-of-gam-micro03.md) (2026-06-09)
 - Emphasizing that a resource is limited, diminishing, or time-bound.
 - Utilized in digital advertising with countdown timers and inventory alerts.
 - Triggers the amygdala to induce mild panic.

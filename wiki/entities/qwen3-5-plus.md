@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[the-evolution-of-artificial-intelligence-evaluatio-micro02|the-evolution-of-artificial-intelligence-evaluatio-micro02]] (2026-06-09)
+## From [the-evolution-of-artificial-intelligence-evaluatio-micro02](/entities/the-evolution-of-artificial-intelligence-evaluatio-micro02.md) (2026-06-09)
 - Scores eighty-three point six percent on LiveCodeBench v6.
 - Scores ninety-one point three percent on AIME 2026.

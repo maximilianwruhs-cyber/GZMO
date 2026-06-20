@@ -15,9 +15,9 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[drive-research-automating-linux-hardware-detection-micro01|drive-research-automating-linux-hardware-detection-micro01]] (2026-06-09)
+## From [drive-research-automating-linux-hardware-detection-micro01](/entities/drive-research-automating-linux-hardware-detection-micro01.md) (2026-06-09)
 - Non-profit industry standards consortium.
 - Continuously updated and maintained the SMBIOS specification.
 
-## From [[drive-research-automating-linux-hardware-detection-micro02|drive-research-automating-linux-hardware-detection-micro02]] (2026-06-10)
+## From [drive-research-automating-linux-hardware-detection-micro02](/entities/drive-research-automating-linux-hardware-detection-micro02.md) (2026-06-10)
 - Maintains the Redfish standard

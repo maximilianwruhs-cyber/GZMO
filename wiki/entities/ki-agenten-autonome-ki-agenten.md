@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[gzmo-soul-merged-new-part1|gzmo-soul-merged-new-part1]] (2026-06-09)
+## From [gzmo-soul-merged-new-part1](/entities/gzmo-soul-merged-new-part1.md) (2026-06-09)
 - Enable semantic, context-aware, and fully autonomous management of complex system architectures.
 - Require a complex synthesis of machine learning, secure execution environments, advanced scripting language integrations, and rigorous prompt-engineering.
 - Must have permissions to read the file system and the cognitive ability to evaluate the semantic meaning of data structures.

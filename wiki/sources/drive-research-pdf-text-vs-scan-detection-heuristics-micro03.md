@@ -14,19 +14,19 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[ocrmypdf|OCRmyPDF]] (TOOL)
-- [[poppler-utilities|Poppler Utilities]] (TOOL)
-- [[pymupdf|PyMuPDF]] (TOOL)
-- [[tesseract|Tesseract]] (TOOL)
-- [[paddleocr|PaddleOCR]] (TOOL)
-- [[pdfminer-six|PDFMiner.six]] (TOOL)
-- [[mupdf|MuPDF]] (SYSTEM)
-- [[dropzone-convert-module|dropzone_convert module]] (SYSTEM)
-- [[vectorized-fonts|Vectorized Fonts]] (CONCEPT)
-- [[text-layer-obfuscation|Text Layer Obfuscation]] (CONCEPT)
-- [[hybrid-pipeline|Hybrid Pipeline]] (CONCEPT)
-- [[language-models|Language Models]] (SYSTEM)
-- [[ocr-sandwich|OCR Sandwich]] (CONCEPT)
+- [OCRmyPDF](/entities/ocrmypdf.md) (TOOL)
+- [Poppler Utilities](/entities/poppler-utilities.md) (TOOL)
+- [PyMuPDF](/entities/pymupdf.md) (TOOL)
+- [Tesseract](/entities/tesseract.md) (TOOL)
+- [PaddleOCR](/entities/paddleocr.md) (TOOL)
+- [PDFMiner.six](/entities/pdfminer-six.md) (TOOL)
+- [MuPDF](/entities/mupdf.md) (SYSTEM)
+- [dropzone_convert module](/entities/dropzone-convert-module.md) (SYSTEM)
+- [Vectorized Fonts](/entities/vectorized-fonts.md) (CONCEPT)
+- [Text Layer Obfuscation](/entities/text-layer-obfuscation.md) (CONCEPT)
+- [Hybrid Pipeline](/entities/hybrid-pipeline.md) (CONCEPT)
+- [Language Models](/entities/language-models.md) (SYSTEM)
+- [OCR Sandwich](/entities/ocr-sandwich.md) (CONCEPT)
 
 ## Relations
 - PyMuPDF → PART_OF → MuPDF

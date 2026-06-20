@@ -14,6 +14,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[architectures-for-agentic-memory-virtual-context-micro07|architectures-for-agentic-memory-virtual-context-micro07]] (2026-06-09)
+## From [architectures-for-agentic-memory-virtual-context-micro07](/entities/architectures-for-agentic-memory-virtual-context-micro07.md) (2026-06-09)
 - An external component utilized by frameworks like MIRIX.
 - Allows seamless handover of output between agents without restating historical information.

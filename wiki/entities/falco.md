@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[the-archival-truth-part2-micro04|the-archival-truth-part2-micro04]] (2026-06-09)
+## From [the-archival-truth-part2-micro04](/entities/the-archival-truth-part2-micro04.md) (2026-06-09)
 - Musician.
 - Observed that 'Those who can remember the 80s weren't actually there'.

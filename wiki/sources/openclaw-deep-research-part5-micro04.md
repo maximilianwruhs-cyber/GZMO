@@ -14,21 +14,21 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[nemoclaw|NemoClaw]] (PROJECT)
-- [[federated-learning|Federated Learning]] (CONCEPT)
-- [[clawdbot|Clawdbot]] (PROJECT)
-- [[chrome-devtools-protocol-cdp|Chrome DevTools Protocol (CDP)]] (TOOL)
-- [[wasm-sandboxing|WASM sandboxing]] (CONCEPT)
-- [[clawhub|ClawHub]] (TOOL)
-- [[zeroclaw|ZeroClaw]] (PROJECT)
-- [[nvidia|NVIDIA]] (ORGANIZATION)
-- [[nanoclaw|NanoClaw]] (PROJECT)
-- [[taskade-genesis|Taskade Genesis]] (PROJECT)
-- [[cve-2026-25253|CVE-2026-25253]] (CONCEPT)
-- [[peter-steinberger|Peter Steinberger]] (PERSON)
-- [[moltbot|Moltbot]] (PROJECT)
-- [[openai|OpenAI]] (ORGANIZATION)
-- [[openclaw|OpenClaw]] (PROJECT)
+- [NemoClaw](/entities/nemoclaw.md) (PROJECT)
+- [Federated Learning](/entities/federated-learning.md) (CONCEPT)
+- [Clawdbot](/entities/clawdbot.md) (PROJECT)
+- [Chrome DevTools Protocol (CDP)](/entities/chrome-devtools-protocol-cdp.md) (TOOL)
+- [WASM sandboxing](/entities/wasm-sandboxing.md) (CONCEPT)
+- [ClawHub](/entities/clawhub.md) (TOOL)
+- [ZeroClaw](/entities/zeroclaw.md) (PROJECT)
+- [NVIDIA](/entities/nvidia.md) (ORGANIZATION)
+- [NanoClaw](/entities/nanoclaw.md) (PROJECT)
+- [Taskade Genesis](/entities/taskade-genesis.md) (PROJECT)
+- [CVE-2026-25253](/entities/cve-2026-25253.md) (CONCEPT)
+- [Peter Steinberger](/entities/peter-steinberger.md) (PERSON)
+- [Moltbot](/entities/moltbot.md) (PROJECT)
+- [OpenAI](/entities/openai.md) (ORGANIZATION)
+- [OpenClaw](/entities/openclaw.md) (PROJECT)
 
 ## Relations
 - Clawdbot → RELATED_TO → OpenClaw

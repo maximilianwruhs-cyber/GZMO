@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-llamacpp-optimization-blueprint-micro03|drive-research-llamacpp-optimization-blueprint-micro03]] (2026-06-09)
+## From [drive-research-llamacpp-optimization-blueprint-micro03](/entities/drive-research-llamacpp-optimization-blueprint-micro03.md) (2026-06-09)
 - Defines the maximum number of tokens processed simultaneously during pipeline evaluation.
 - A high value allows the engine to execute massive parallel matrix multiplications.
 - Pipelined into physical micro-batches if restricted by physical memory.

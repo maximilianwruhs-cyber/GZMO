@@ -15,13 +15,13 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-ai-agents-and-spec-driven-development-micro04|drive-research-ai-agents-and-spec-driven-development-micro04]] (2026-06-09)
+## From [drive-research-ai-agents-and-spec-driven-development-micro04](/entities/drive-research-ai-agents-and-spec-driven-development-micro04.md) (2026-06-09)
 - severe hollowing out of this is a reality
 
-## From [[drive-research-ai-agents-and-spec-driven-development1-micro03|drive-research-ai-agents-and-spec-driven-development1-micro03]] (2026-06-09)
+## From [drive-research-ai-agents-and-spec-driven-development1-micro03](/entities/drive-research-ai-agents-and-spec-driven-development1-micro03.md) (2026-06-09)
 - Is being hollowed out by current industry practices.
 - Requires integration as operators and validators of agentic systems.
 
-## From [[spec-driven-development-architecting-the-era-of-a-micro04|spec-driven-development-architecting-the-era-of-a-micro04]] (2026-06-09)
+## From [spec-driven-development-architecting-the-era-of-a-micro04](/entities/spec-driven-development-architecting-the-era-of-a-micro04.md) (2026-06-09)
 - Is being severely hollowed out.
 - Risk of total epistemic collapse if foundational levels are automated.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-redefining-agentic-soulmd-to-dialog-micro02|drive-research-redefining-agentic-soulmd-to-dialog-micro02]] (2026-06-09)
+## From [drive-research-redefining-agentic-soulmd-to-dialog-micro02](/entities/drive-research-redefining-agentic-soulmd-to-dialog-micro02.md) (2026-06-09)
 - A broader architecture that expands the SOUL.md concept.
 - Deploys supplementary Markdown files like IDENTITY.md, STYLE.md, AGENTS.md, and MEMORY.md.
 - Injects these documents into the underlying large language model's context window.

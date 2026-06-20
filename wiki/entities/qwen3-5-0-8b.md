@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-create-a-tier-list-of-specialized-small-models|drive-research-create-a-tier-list-of-specialized-small-models]] (2026-06-08)
+## From [drive-research-create-a-tier-list-of-specialized-small-models](/entities/drive-research-create-a-tier-list-of-specialized-small-models.md) (2026-06-08)
 - C-Tier model.
 - Ultra-Low Footprint.
 - Great for running text/vision/video on a smartphone or Raspberry Pi.

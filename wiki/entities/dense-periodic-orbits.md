@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[dynamics-of-the-unpredictable-micro02|dynamics-of-the-unpredictable-micro02]] (2026-06-10)
+## From [dynamics-of-the-unpredictable-micro02](/entities/dynamics-of-the-unpredictable-micro02.md) (2026-06-10)
 - Property where a chaotic attractor contains an infinite number of unstable periodic trajectories.

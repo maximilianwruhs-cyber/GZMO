@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[openclaw-deep-research-part1-micro02|openclaw-deep-research-part1-micro02]] (2026-06-09)
+## From [openclaw-deep-research-part1-micro02](/entities/openclaw-deep-research-part1-micro02.md) (2026-06-09)
 - An enterprise-grade digital employee platform.
 - Integrates with corporate workspaces like Lark.
 - Provides out-of-the-box professional skills and RBAC.

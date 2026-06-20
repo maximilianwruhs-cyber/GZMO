@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-llama-bench-performance-benchmarking-tool-micro01|drive-research-llama-bench-performance-benchmarking-tool-micro01]] (2026-06-09)
+## From [drive-research-llama-bench-performance-benchmarking-tool-micro01](/entities/drive-research-llama-bench-performance-benchmarking-tool-micro01.md) (2026-06-09)
 - Engineering high-performance LLM inference platforms requires separation between hardware execution and software latency.
 - Profiling LLM inference is a key use case for llama-bench.
 
-## From [[drive-research-llamacpp-optimization-blueprint-micro04|drive-research-llamacpp-optimization-blueprint-micro04]] (2026-06-09)
+## From [drive-research-llamacpp-optimization-blueprint-micro04](/entities/drive-research-llamacpp-optimization-blueprint-micro04.md) (2026-06-09)
 - Core functionality of llama.cpp
 - Can be performed on CPU or with GPU acceleration

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[openclaw-autonomous-ai-agents-in-financial-operat|openclaw-autonomous-ai-agents-in-financial-operat]] (2026-06-08)
+## From [openclaw-autonomous-ai-agents-in-financial-operat](/entities/openclaw-autonomous-ai-agents-in-financial-operat.md) (2026-06-08)
 - A community-developed tool that acts as an intermediary for OpenClaw to interface with neo-broker accounts.
 - Used for integrating with platforms like Trade Republic or Flatex.at.
 - Community-engineered reverse wrapper for interfacing with modern brokers.

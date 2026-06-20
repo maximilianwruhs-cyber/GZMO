@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[drive-research-linux-gaming-and-ai-build-guide-micro04|drive-research-linux-gaming-and-ai-build-guide-micro04]] (2026-06-09)
+## From [drive-research-linux-gaming-and-ai-build-guide-micro04](/entities/drive-research-linux-gaming-and-ai-build-guide-micro04.md) (2026-06-09)
 - Holds an absolute, unyielding monopoly over the AI compute ecosystem.
 - Its proprietary Linux drivers historically clashed with Wayland.
 - Its 565 and 570+ driver branches fundamentally aligned with explicit sync.

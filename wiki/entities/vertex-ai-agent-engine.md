@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[openclaw-part2|openclaw-part2]] (2026-06-08)
+## From [openclaw-part2](/entities/openclaw-part2.md) (2026-06-08)
 - Specialized agents built with ADK can be containerized and deployed natively on it.
 - Part of the Vertex AI ecosystem.
 - Supports the deployment of ADK agents.

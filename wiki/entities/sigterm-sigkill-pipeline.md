@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[prompt-agent-engineering-part2-micro01|prompt-agent-engineering-part2-micro01]] (2026-06-09)
+## From [prompt-agent-engineering-part2-micro01](/entities/prompt-agent-engineering-part2-micro01.md) (2026-06-09)
 - Assumes processes may resist termination.
 - Design a timed sequence for graceful degradation and escalation to forceful kill.

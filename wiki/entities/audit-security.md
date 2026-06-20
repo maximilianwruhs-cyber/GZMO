@@ -14,9 +14,9 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[google-antigravity-the-architects-configuration-micro03|google-antigravity-the-architects-configuration-micro03]] (2026-06-10)
+## From [google-antigravity-the-architects-configuration-micro03](/entities/google-antigravity-the-architects-configuration-micro03.md) (2026-06-10)
 - Workflow used to scan for OWASP vulnerabilities.
 
-## From [[google-antigravity-the-architects-configuration-micro05|google-antigravity-the-architects-configuration-micro05]] (2026-06-10)
+## From [google-antigravity-the-architects-configuration-micro05](/entities/google-antigravity-the-architects-configuration-micro05.md) (2026-06-10)
 - Workflow that scans files for OWASP vulnerabilities
 - Outputs refactored code with security best practices

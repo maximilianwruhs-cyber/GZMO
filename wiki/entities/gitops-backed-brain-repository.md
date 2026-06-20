@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[openclaw-part2|openclaw-part2]] (2026-06-08)
+## From [openclaw-part2](/entities/openclaw-part2.md) (2026-06-08)
 - A sophisticated Git-backed "brain" repository pattern used to reconcile OpenClaw's stateful mutations with Kubernetes.
 - Treats state as code, introducing a continuous bidirectional synchronization mechanism.
 - Allows GitOps controllers like ArgoCD or Flux to seamlessly manage the deployment lifecycle.

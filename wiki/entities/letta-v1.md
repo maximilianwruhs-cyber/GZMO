@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: FRAMEWORK
 
-## From [[architectures-for-agentic-memory-virtual-context-micro06|architectures-for-agentic-memory-virtual-context-micro06]] (2026-06-09)
+## From [architectures-for-agentic-memory-virtual-context-micro06](/entities/architectures-for-agentic-memory-virtual-context-micro06.md) (2026-06-09)
 - The latest iteration of the Letta platform.
 - Explicitly deprecates the heartbeat mechanism.
 - Utilizes backend integrations like the OpenAI Responses API.

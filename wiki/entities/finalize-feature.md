@@ -14,8 +14,8 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[google-antigravity-the-architects-configuration-micro03|google-antigravity-the-architects-configuration-micro03]] (2026-06-10)
+## From [google-antigravity-the-architects-configuration-micro03](/entities/google-antigravity-the-architects-configuration-micro03.md) (2026-06-10)
 - A master workflow that chains /doc_it, /test_edge, and /audit_security.
 
-## From [[google-antigravity-the-architects-configuration-micro05|google-antigravity-the-architects-configuration-micro05]] (2026-06-10)
+## From [google-antigravity-the-architects-configuration-micro05](/entities/google-antigravity-the-architects-configuration-micro05.md) (2026-06-10)
 - Workflow that chains /doc_it, /test_edge, and /audit_security sequentially

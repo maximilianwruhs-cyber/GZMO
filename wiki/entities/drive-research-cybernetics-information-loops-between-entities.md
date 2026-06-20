@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-cybernetics-information-loops-between-entities-micro01|drive-research-cybernetics-information-loops-between-entities-micro01]] (2026-06-09)
+## From [drive-research-cybernetics-information-loops-between-entities-micro01](/entities/drive-research-cybernetics-information-loops-between-entities-micro01.md) (2026-06-09)
 - Subject of the research corpus
 - Occur between entities
 - Micro-split from drive-research-cybernetics-information-loops-between-entities.md

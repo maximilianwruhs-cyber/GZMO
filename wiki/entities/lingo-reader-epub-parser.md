@@ -14,12 +14,12 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-bun-file-parsing-dependency-shortlist-micro01|drive-research-bun-file-parsing-dependency-shortlist-micro01]] (2026-06-09)
+## From [drive-research-bun-file-parsing-dependency-shortlist-micro01](/entities/drive-research-bun-file-parsing-dependency-shortlist-micro01.md) (2026-06-09)
 - async event-driven architecture requires manual Promise wrapping
 - cannot bypass Digital Rights Management (DRM) encryption
 - secondary package for EPUB parsing
 
-## From [[drive-research-bun-file-parsing-dependency-shortlist-micro02|drive-research-bun-file-parsing-dependency-shortlist-micro02]] (2026-06-09)
+## From [drive-research-bun-file-parsing-dependency-shortlist-micro02](/entities/drive-research-bun-file-parsing-dependency-shortlist-micro02.md) (2026-06-09)
 - Format (specifically EPUB2 and EPUB3 standards) is a self-contained, offline website wrapped inside a highly structured ZIP archive.
 - Contains an Open Package Format (OPF) file that serves as a core manifest.
 - Contains an NCX file for the hierarchical table of contents.

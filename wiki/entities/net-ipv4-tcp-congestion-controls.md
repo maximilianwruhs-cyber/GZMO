@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-ubuntu-extreme-hardware-tuning-micro03|drive-research-ubuntu-extreme-hardware-tuning-micro03]] (2026-06-09)
+## From [drive-research-ubuntu-extreme-hardware-tuning-micro03](/entities/drive-research-ubuntu-extreme-hardware-tuning-micro03.md) (2026-06-09)
 - Used to verify the active congestion control algorithm.

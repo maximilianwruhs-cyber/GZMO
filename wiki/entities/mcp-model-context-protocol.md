@@ -14,13 +14,13 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[openclaw-deep-research-part11-micro04|openclaw-deep-research-part11-micro04]] (2026-06-09)
+## From [openclaw-deep-research-part11-micro04](/entities/openclaw-deep-research-part11-micro04.md) (2026-06-09)
 - A standardized tool layer that connects the agent to external services.
 - Exposes a set of tools with defined schemas.
 - The agent discovers available tools, calls them using a standard request format, and receives a structured result.
 - Provides tool portability: tools built for one MCP-compatible agent can be reused across other systems.
 
-## From [[prompt-agent-engineering-part6-micro01|prompt-agent-engineering-part6-micro01]] (2026-06-10)
+## From [prompt-agent-engineering-part6-micro01](/entities/prompt-agent-engineering-part6-micro01.md) (2026-06-10)
 - Acts as a capability interface for vertical tool integration.
 - Provides standardized tool and resource access.
 - Enables dynamic tool listing and invocation.

@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[gzmo-soul-merged-new-part3|gzmo-soul-merged-new-part3]] (2026-06-08)
+## From [gzmo-soul-merged-new-part3](/entities/gzmo-soul-merged-new-part3.md) (2026-06-08)
 - Agentic-Architecture is a concept related to OpenClaw Autonomy & Heartbeats.
 - It is linked via qmd://wiki/concepts/Agentic-Architecture.md.

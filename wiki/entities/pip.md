@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[allgemeine-informationen|allgemeine-informationen]] (2026-06-08)
+## From [allgemeine-informationen](/entities/allgemeine-informationen.md) (2026-06-08)
 - It is used to install dependencies (`pip install -r pyproject.toml`).
 - It is used to install optional channel plugins (`pip install wecom-aibot-sdk-python`).
 - It is used to install `langsmith` for vulnerability checks (`pip install langsmith`).
 
-## From [[architecting-the-minimalist-linux-desktop-a-compa-part1|architecting-the-minimalist-linux-desktop-a-compa-part1]] (2026-06-08)
+## From [architecting-the-minimalist-linux-desktop-a-compa-part1](/entities/architecting-the-minimalist-linux-desktop-a-compa-part1.md) (2026-06-08)
 - It is used to download pre-compiled binary packages (wheels) in the Python ecosystem.

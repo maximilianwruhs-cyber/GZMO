@@ -14,9 +14,9 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[obolus-vs-codium-extension-konzept-research-part1-micro04|obolus-vs-codium-extension-konzept-research-part1-micro04]] (2026-06-09)
+## From [obolus-vs-codium-extension-konzept-research-part1-micro04](/entities/obolus-vs-codium-extension-konzept-research-part1-micro04.md) (2026-06-09)
 - Raised when a WebSocket connection is closed.
 - Can be caught and handled.
 
-## From [[obolus-vs-codium-extension-konzept-research-part1-micro05|obolus-vs-codium-extension-konzept-research-part1-micro05]] (2026-06-09)
+## From [obolus-vs-codium-extension-konzept-research-part1-micro05](/entities/obolus-vs-codium-extension-konzept-research-part1-micro05.md) (2026-06-09)
 - Event handled by TelemetryService.

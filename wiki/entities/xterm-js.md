@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[tui-framework|tui-framework]] (2026-06-08)
+## From [tui-framework](/entities/tui-framework.md) (2026-06-08)
 - Embedded inside the Webview.
 - Acts as a Terminal VTE (Virtual Terminal Emulator).
 - Receives data via webview.postMessage.

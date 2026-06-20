@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: LANGUAGE
 
-## From [[ai-research-part6-micro05|ai-research-part6-micro05]] (2026-06-09)
+## From [ai-research-part6-micro05](/entities/ai-research-part6-micro05.md) (2026-06-09)
 - Used for the high-performance engine.
 - Offers superior execution speed, memory safety, and thread-safe parallelism.
 - Replaced the original Python-based harness.

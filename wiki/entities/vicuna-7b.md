@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: MODEL
 
-## From [[gzmo-soul-merged-new-part1|gzmo-soul-merged-new-part1]] (2026-06-09)
+## From [gzmo-soul-merged-new-part1](/entities/gzmo-soul-merged-new-part1.md) (2026-06-09)
 - Smaller, localized language model used to evaluate prompt informativeness.

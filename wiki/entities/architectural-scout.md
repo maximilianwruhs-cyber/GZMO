@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[obolus-micro05|obolus-micro05]] (2026-06-09)
+## From [obolus-micro05](/entities/obolus-micro05.md) (2026-06-09)
 - Research and innovation officer of the OpenClaw team.
 - Focuses on fundamental structure and architecture of the data center.
 - Competencies: Architecture research, Efficiency comparison, Innovation reporting.

@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-rust-tui-architecture-tech-stack1-micro02|drive-research-rust-tui-architecture-tech-stack1-micro02]] (2026-06-10)
+## From [drive-research-rust-tui-architecture-tech-stack1-micro02](/entities/drive-research-rust-tui-architecture-tech-stack1-micro02.md) (2026-06-10)
 - Used for implementing semantic theming.

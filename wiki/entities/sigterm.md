@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-architecting-a-linux-task-manager-design-principl|drive-research-architecting-a-linux-task-manager-design-principl]] (2026-06-08)
+## From [drive-research-architecting-a-linux-task-manager-design-principl](/entities/drive-research-architecting-a-linux-task-manager-design-principl.md) (2026-06-08)
 - Signal ID: 15.
 - Terminate signal.
 - The safest signal; politely requests the process to halt and perform cleanup routines.
 
-## From [[prompt-agent-engineering-part2-micro03|prompt-agent-engineering-part2-micro03]] (2026-06-10)
+## From [prompt-agent-engineering-part2-micro03](/entities/prompt-agent-engineering-part2-micro03.md) (2026-06-10)
 - A signal used for graceful process termination

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[prompt-agent-engineering-part7-micro05|prompt-agent-engineering-part7-micro05]] (2026-06-09)
+## From [prompt-agent-engineering-part7-micro05](/entities/prompt-agent-engineering-part7-micro05.md) (2026-06-09)
 - The core objective is to research the best option to simulate/emulate a network infrastructure.
 - The prompt aims to get accurate, tailored, and comprehensive research on network simulation tools.
 - Training an AI Network Analyst requires network simulation.

@@ -16,7 +16,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-du-hast-gesagt-part1|drive-research-du-hast-gesagt-part1]] (2026-06-08)
+## From [drive-research-du-hast-gesagt-part1](/entities/drive-research-du-hast-gesagt-part1.md) (2026-06-08)
 - Inference engine.
 - Adding support for 1.58-bit models.
 - An inference framework for 1.58-bit (ternary) models.
@@ -26,15 +26,15 @@ Type: TOOL
 - Used to serve the Ternary Model.
 - Spearheads 1.58-bit Ternary architecture research.
 
-## From [[drive-research-welcome-to-the-master-assembly-manual-for-the-sove|drive-research-welcome-to-the-master-assembly-manual-for-the-sove]] (2026-06-08)
+## From [drive-research-welcome-to-the-master-assembly-manual-for-the-sove](/entities/drive-research-welcome-to-the-master-assembly-manual-for-the-sove.md) (2026-06-08)
 - Used to compile the Inference Engine.
 - Cloned from a GitHub repository.
 - Serves a Ternary Model via an OpenAI-Compatible API Server.
 
-## From [[building-a-private-local-ai-development-environmen-micro06|building-a-private-local-ai-development-environmen-micro06]] (2026-06-09)
+## From [building-a-private-local-ai-development-environmen-micro06](/entities/building-a-private-local-ai-development-environmen-micro06.md) (2026-06-09)
 - An inference engine that is rapidly adding support for 1.58-bit models.
 - A research project related to 1.58-bit Ternary architectures.
 
-## From [[ultimate-local-ai-development-stack-for-vscodium-micro03|ultimate-local-ai-development-stack-for-vscodium-micro03]] (2026-06-09)
+## From [ultimate-local-ai-development-stack-for-vscodium-micro03](/entities/ultimate-local-ai-development-stack-for-vscodium-micro03.md) (2026-06-09)
 - Spearheaded by Microsoft in bleeding-edge research.
 - An inference engine that supports 1.58-bit models via LM Studio.

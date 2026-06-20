@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[cybernetics-and-mythos-the-architecture-of-intell-part1|cybernetics-and-mythos-the-architecture-of-intell-part1]] (2026-06-08)
+## From [cybernetics-and-mythos-the-architecture-of-intell-part1](/entities/cybernetics-and-mythos-the-architecture-of-intell-part1.md) (2026-06-08)
 - A broader architecture that expands the SOUL.md concept.
 - Deploys supplementary Markdown files alongside the primary SOUL.md document.
 - Includes IDENTITY.md, STYLE.md, AGENTS.md, and MEMORY.md.

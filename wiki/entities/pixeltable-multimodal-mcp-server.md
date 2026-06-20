@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-mcp-landscape-research-report|drive-research-mcp-landscape-research-report]] (2026-06-08)
+## From [drive-research-mcp-landscape-research-report](/entities/drive-research-mcp-landscape-research-report.md) (2026-06-08)
 - A specific MCP server implementation for multimodal AI.
 - Orchestrates complex multi-modal workflows.
 - Handles audio file indexing, transcription, video frame extraction, and semantic search over multimedia content.

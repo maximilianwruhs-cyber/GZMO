@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[openclaw-rust-terminal-user-interface-architecture-micro01|openclaw-rust-terminal-user-interface-architecture-micro01]] (2026-06-09)
+## From [openclaw-rust-terminal-user-interface-architecture-micro01](/entities/openclaw-rust-terminal-user-interface-architecture-micro01.md) (2026-06-09)
 - Title of the document.
 - Curated research corpus consolidated from Google Takeout.

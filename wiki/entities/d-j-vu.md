@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-token-efficient-bol-processing-architecture|drive-research-token-efficient-bol-processing-architecture]] (2026-06-08)
+## From [drive-research-token-efficient-bol-processing-architecture](/entities/drive-research-token-efficient-bol-processing-architecture.md) (2026-06-08)
 - Provides advanced KV cache streaming libraries.
 - Disaggregates prompt processing from token generation.
 - Maximizes memory allocation and enables high-throughput streaming by swapping KV cache state per-microbatch between the host CPU and the GPU.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[architecting-the-minimalist-linux-desktop-a-compa-part2|architecting-the-minimalist-linux-desktop-a-compa-part2]] (2026-06-08)
+## From [architecting-the-minimalist-linux-desktop-a-compa-part2](/entities/architecting-the-minimalist-linux-desktop-a-compa-part2.md) (2026-06-08)
 - It represents a radical paradigm shift in bootable media by utilizing a persistent, multi-payload architecture.
 - It installs a boot environment that reads and boots raw ISO, WIM, IMG, and VHD files directly from the file system.
 - Its partition layout is highly specific, engineered to satisfy both Legacy and UEFI firmware universally.

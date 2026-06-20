@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro09|the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro09]] (2026-06-09)
+## From [the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro09](/entities/the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro09.md) (2026-06-09)
 - Encompasses Knowledge Acquisition, Live Agency, and Evolutionary Laboratory.
 - To be implemented on an Ubuntu 24.04 LTS environment.
 - Requires production-grade persistence and resource monitoring.

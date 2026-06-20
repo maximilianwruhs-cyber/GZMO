@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SECURITY_MEASURE
 
-## From [[ai-research-part6-micro05|ai-research-part6-micro05]] (2026-06-09)
+## From [ai-research-part6-micro05](/entities/ai-research-part6-micro05.md) (2026-06-09)
 - Minimal base images without compilers or network tools.
 - A checklist item for enterprise-grade agent security.

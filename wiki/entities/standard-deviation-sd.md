@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-scientific-writing-and-publication-process-micro02|drive-research-scientific-writing-and-publication-process-micro02]] (2026-06-09)
+## From [drive-research-scientific-writing-and-publication-process-micro02](/entities/drive-research-scientific-writing-and-publication-process-micro02.md) (2026-06-09)
 - An appropriate measure to accurately depict variability in graphs.
 - Communicates data reliability.

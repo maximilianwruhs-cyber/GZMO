@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[prompt-agent-engineering-part7-micro05|prompt-agent-engineering-part7-micro05]] (2026-06-09)
+## From [prompt-agent-engineering-part7-micro05](/entities/prompt-agent-engineering-part7-micro05.md) (2026-06-09)
 - Arista EOS is a required vendor/OS for network simulation.
 - Arista cEOS (Containerized EOS) is a containerized NOS supported by Containerlab.
 - Arista provides free accounts to download cEOS docker images.

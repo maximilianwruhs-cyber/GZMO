@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[drive-research-setting-up-autonomous-trading-agents-micro06|drive-research-setting-up-autonomous-trading-agents-micro06]] (2026-06-09)
+## From [drive-research-setting-up-autonomous-trading-agents-micro06](/entities/drive-research-setting-up-autonomous-trading-agents-micro06.md) (2026-06-09)
 - This document is part 6/6 of this project.
 - This document is an ingest micro-split from a larger document of the same name.

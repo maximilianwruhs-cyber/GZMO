@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-ai-agents-and-spec-driven-development1-micro02|drive-research-ai-agents-and-spec-driven-development1-micro02]] (2026-06-09)
+## From [drive-research-ai-agents-and-spec-driven-development1-micro02](/entities/drive-research-ai-agents-and-spec-driven-development1-micro02.md) (2026-06-09)
 - Documentation is a vital compliance necessity in semiconductor design
 - Manual documentation creates massive latency

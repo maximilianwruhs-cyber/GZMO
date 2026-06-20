@@ -14,6 +14,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-automating-linux-hardware-detection-micro01|drive-research-automating-linux-hardware-detection-micro01]] (2026-06-09)
+## From [drive-research-automating-linux-hardware-detection-micro01](/entities/drive-research-automating-linux-hardware-detection-micro01.md) (2026-06-09)
 - Standalone fork of udev.
 - Providing robust background daemon capabilities and extensive configuration flexibility without requiring the overarching systemd init system.

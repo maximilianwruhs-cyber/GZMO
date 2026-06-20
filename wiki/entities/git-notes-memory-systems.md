@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part7|ai-research-part7]] (2026-06-08)
+## From [ai-research-part7](/entities/ai-research-part7.md) (2026-06-08)
 - Advanced integrations that utilize LanceDB and Git-Notes.
 - Construct persistent, cross-session knowledge graphs.
 - Prevent long-term memory degradation by ensuring context retention over weeks.

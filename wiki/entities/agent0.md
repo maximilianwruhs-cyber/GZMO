@@ -16,7 +16,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[ai-research-part2|ai-research-part2]] (2026-06-08)
+## From [ai-research-part2](/entities/ai-research-part2.md) (2026-06-08)
 - A fully autonomous framework that evolves high-performing agents without external data.
 - Establishes a symbiotic competition between a curriculum agent and an executor agent.
 - Substantially boosts reasoning capabilities, improving the Qwen3-8B-Base model by 18% on mathematical reasoning and 24% on general reasoning benchmarks.
@@ -27,10 +27,10 @@ Type: SYSTEM
 - Its performance is evaluated across various benchmarks.
 - Its effectiveness and robustness are validated through comprehensive results.
 
-## From [[ai-research-part8-micro03|ai-research-part8-micro03]] (2026-06-09)
+## From [ai-research-part8-micro03](/entities/ai-research-part8-micro03.md) (2026-06-09)
 - Addresses hurdles in autonomous self-improvement and zero-data paradigms.
 
-## From [[ai-research-part8-micro04|ai-research-part8-micro04]] (2026-06-09)
+## From [ai-research-part8-micro04](/entities/ai-research-part8-micro04.md) (2026-06-09)
 - Executes a complete 'zero-data' evolution paradigm.
 - Operates via a symbiotic, multi-step co-evolutionary competition between two specialized agents.
 - Employs strict information asymmetry to prevent self-confirmation bias.

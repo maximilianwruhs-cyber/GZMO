@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[openclaw-deep-research-part7-micro04|openclaw-deep-research-part7-micro04]] (2026-06-10)
+## From [openclaw-deep-research-part7-micro04](/entities/openclaw-deep-research-part7-micro04.md) (2026-06-10)
 - Adaptive testing engine with IRT/CAT
 - Features AI question generation and personalized learning recommendations

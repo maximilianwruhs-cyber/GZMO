@@ -14,12 +14,12 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[cybernetics-and-mythos-the-architecture-of-intell-part2|cybernetics-and-mythos-the-architecture-of-intell-part2]] (2026-06-08)
+## From [cybernetics-and-mythos-the-architecture-of-intell-part2](/entities/cybernetics-and-mythos-the-architecture-of-intell-part2.md) (2026-06-08)
 - A work by Jean-Paul Sartre.
 - Stresses the impediments to the conscious creation of world history.
 - Declares that history has no singular subject, but is a 'totalization without a totalizer'.
 
-## From [[drive-research-dialectics-socratic-vs-hegelian-methods|drive-research-dialectics-socratic-vs-hegelian-methods]] (2026-06-08)
+## From [drive-research-dialectics-socratic-vs-hegelian-methods](/entities/drive-research-dialectics-socratic-vs-hegelian-methods.md) (2026-06-08)
 - Written by Jean-Paul Sartre.
 - Critiques Hegel for making the real disappear into the system.
 - Stresses impediments to conscious creation of world history.

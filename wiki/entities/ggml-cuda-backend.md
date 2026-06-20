@@ -14,13 +14,13 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-cuda-graph-capture-failure-workarounds-micro02|drive-research-cuda-graph-capture-failure-workarounds-micro02]] (2026-06-09)
+## From [drive-research-cuda-graph-capture-failure-workarounds-micro02](/entities/drive-research-cuda-graph-capture-failure-workarounds-micro02.md) (2026-06-09)
 - Computational efficiency is dictated by optimization of execution lifecycles.
 - Exposes critical defects in the memory management architecture.
 - Has an internal unordered map for graph entries.
 - Lacks an eviction policy for its cache.
 
-## From [[optimizing-nvidia-blackwell-sm120-part3-micro05|optimizing-nvidia-blackwell-sm120-part3-micro05]] (2026-06-09)
+## From [optimizing-nvidia-blackwell-sm120-part3-micro05](/entities/optimizing-nvidia-blackwell-sm120-part3-micro05.md) (2026-06-09)
 - Heavily relies on CUDA graphs for optimization.
 - Experiences memory management defects.
 - Used for deep learning inference.

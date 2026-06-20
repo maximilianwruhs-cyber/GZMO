@@ -14,11 +14,11 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[cybernetics-and-mythos-the-architecture-of-intell-part2|cybernetics-and-mythos-the-architecture-of-intell-part2]] (2026-06-08)
+## From [cybernetics-and-mythos-the-architecture-of-intell-part2](/entities/cybernetics-and-mythos-the-architecture-of-intell-part2.md) (2026-06-08)
 - Wife of Deucalion.
 - Daughter of Epimetheus and Pandora.
 - Survived a great flood with her husband Deucalion.
 
-## From [[drive-research-prometheus-and-epimetheus-myth-exploration-micro02|drive-research-prometheus-and-epimetheus-myth-exploration-micro02]] (2026-06-09)
+## From [drive-research-prometheus-and-epimetheus-myth-exploration-micro02](/entities/drive-research-prometheus-and-epimetheus-myth-exploration-micro02.md) (2026-06-09)
 - Wife of Deucalion.
 - Daughter of Epimetheus and Pandora.

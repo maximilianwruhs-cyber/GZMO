@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[openclaw-deep-research-part7-micro02|openclaw-deep-research-part7-micro02]] (2026-06-10)
+## From [openclaw-deep-research-part7-micro02](/entities/openclaw-deep-research-part7-micro02.md) (2026-06-10)
 - Activates when the user needs to interact with any website
 - Provides browser automation, web scraping, screenshots, and form interaction

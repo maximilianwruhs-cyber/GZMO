@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-safe-unzip-practices-for-threat-model-micro03|drive-research-safe-unzip-practices-for-threat-model-micro03]] (2026-06-09)
+## From [drive-research-safe-unzip-practices-for-threat-model-micro03](/entities/drive-research-safe-unzip-practices-for-threat-model-micro03.md) (2026-06-09)
 - Symlink extraction risks overwhelmingly outweigh utility.
 - Requires uncompromising enforcement of mathematical boundaries.

@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[ai-research-part1|ai-research-part1]] (2026-06-08)
+## From [ai-research-part1](/entities/ai-research-part1.md) (2026-06-08)
 - Faced challenges over the sequence dimension before attention mechanisms provided an alternative.
 - Compress all prior information into a single state over depth, similar to residual connections.

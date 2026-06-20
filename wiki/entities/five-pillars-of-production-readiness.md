@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[prompt-agent-engineering-part7-micro08|prompt-agent-engineering-part7-micro08]] (2026-06-09)
+## From [prompt-agent-engineering-part7-micro08](/entities/prompt-agent-engineering-part7-micro08.md) (2026-06-09)
 - Analysis criteria for the enhanced production readiness prompt.
 - Includes Reliability & Scalability, Observability & Monitoring, Security & Compliance, Operational Hygiene, and Efficiency & Cost Optimization.

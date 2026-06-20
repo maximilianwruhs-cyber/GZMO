@@ -14,19 +14,19 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[grammy|grammY]] (TOOL)
-- [[peter-steinberger|Peter Steinberger]] (PERSON)
-- [[llm|LLM]] (CONCEPT)
-- [[moltbot|Moltbot]] (SYSTEM)
-- [[baileys|Baileys]] (TOOL)
-- [[clawdbot|Clawdbot]] (SYSTEM)
-- [[openclaw-json|openclaw.json]] (TOOL)
-- [[channel-adapters|Channel Adapters]] (SYSTEM)
-- [[anthropic|Anthropic]] (ORGANIZATION)
-- [[gateway|Gateway]] (SYSTEM)
-- [[identity-canonicalization|Identity Canonicalization]] (CONCEPT)
-- [[fact-checker-agent-prompt-v3|FACT-CHECKER AGENT PROMPT (v3)]] (CONCEPT)
-- [[command-queue|Command Queue]] (SYSTEM)
+- [grammY](/entities/grammy.md) (TOOL)
+- [Peter Steinberger](/entities/peter-steinberger.md) (PERSON)
+- [LLM](/entities/llm.md) (CONCEPT)
+- [Moltbot](/entities/moltbot.md) (SYSTEM)
+- [Baileys](/entities/baileys.md) (TOOL)
+- [Clawdbot](/entities/clawdbot.md) (SYSTEM)
+- [openclaw.json](/entities/openclaw-json.md) (TOOL)
+- [Channel Adapters](/entities/channel-adapters.md) (SYSTEM)
+- [Anthropic](/entities/anthropic.md) (ORGANIZATION)
+- [Gateway](/entities/gateway.md) (SYSTEM)
+- [Identity Canonicalization](/entities/identity-canonicalization.md) (CONCEPT)
+- [FACT-CHECKER AGENT PROMPT (v3)](/entities/fact-checker-agent-prompt-v3.md) (CONCEPT)
+- [Command Queue](/entities/command-queue.md) (SYSTEM)
 
 ## Relations
 - Peter Steinberger → AUTHORED_BY → Clawdbot

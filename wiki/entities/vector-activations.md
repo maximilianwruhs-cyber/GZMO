@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-ai-wisdom-webs-honeypots-and-forgetting|drive-research-ai-wisdom-webs-honeypots-and-forgetting]] (2026-06-08)
+## From [drive-research-ai-wisdom-webs-honeypots-and-forgetting](/entities/drive-research-ai-wisdom-webs-honeypots-and-forgetting.md) (2026-06-08)
 - Tracked across early and middle layers.
 - Can identify directional signatures of deceptive thought.

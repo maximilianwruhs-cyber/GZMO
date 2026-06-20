@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[architectural-blueprints-for-sovereign-frankenmoe-part1|architectural-blueprints-for-sovereign-frankenmoe-part1]] (2026-06-08)
+## From [architectural-blueprints-for-sovereign-frankenmoe-part1](/entities/architectural-blueprints-for-sovereign-frankenmoe-part1.md) (2026-06-08)
 - This architecture incorporates a 'shared expert' that remains active for all tokens.
 - The merge configuration must specify exactly one shared expert.
 - All input models must share the same base architecture (e.g., Llama, Mistral, or Qwen2).

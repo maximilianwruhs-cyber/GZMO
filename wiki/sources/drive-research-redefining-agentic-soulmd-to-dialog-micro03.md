@@ -14,19 +14,19 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[socratic-elenchus|Socratic elenchus]] (TOOL)
-- [[georg-wilhelm-friedrich-hegel|Georg Wilhelm Friedrich Hegel]] (PERSON)
-- [[aufhebung|Aufhebung]] (CONCEPT)
-- [[knowledgeops|KnowledgeOps]] (CONCEPT)
-- [[aristotelian-logic|Aristotelian logic]] (CONCEPT)
-- [[active-conversation-protocol-acp|Active Conversation Protocol (ACP)]] (CONCEPT)
-- [[centaurian-systems|Centaurian systems]] (SYSTEM)
-- [[hegelian-dialectics|Hegelian dialectics]] (CONCEPT)
-- [[formal-conversational-protocol-fcop|Formal Conversational Protocol (FCoP)]] (SYSTEM)
-- [[multi-agent-systems-mas|Multi-Agent Systems (MAS)]] (SYSTEM)
-- [[topic-based-colored-petri-nets-tb-cspn|Topic-Based Colored Petri Nets (TB-CSPN)]] (SYSTEM)
-- [[plato|Plato]] (PERSON)
-- [[soul-md|SOUL.md]] (SYSTEM)
+- [Socratic elenchus](/entities/socratic-elenchus.md) (TOOL)
+- [Georg Wilhelm Friedrich Hegel](/entities/georg-wilhelm-friedrich-hegel.md) (PERSON)
+- [Aufhebung](/entities/aufhebung.md) (CONCEPT)
+- [KnowledgeOps](/entities/knowledgeops.md) (CONCEPT)
+- [Aristotelian logic](/entities/aristotelian-logic.md) (CONCEPT)
+- [Active Conversation Protocol (ACP)](/entities/active-conversation-protocol-acp.md) (CONCEPT)
+- [Centaurian systems](/entities/centaurian-systems.md) (SYSTEM)
+- [Hegelian dialectics](/entities/hegelian-dialectics.md) (CONCEPT)
+- [Formal Conversational Protocol (FCoP)](/entities/formal-conversational-protocol-fcop.md) (SYSTEM)
+- [Multi-Agent Systems (MAS)](/entities/multi-agent-systems-mas.md) (SYSTEM)
+- [Topic-Based Colored Petri Nets (TB-CSPN)](/entities/topic-based-colored-petri-nets-tb-cspn.md) (SYSTEM)
+- [Plato](/entities/plato.md) (PERSON)
+- [SOUL.md](/entities/soul-md.md) (SYSTEM)
 
 ## Relations
 - Socratic elenchus → AUTHORED_BY → Plato

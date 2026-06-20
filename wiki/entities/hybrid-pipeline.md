@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-pdf-text-vs-scan-detection-heuristics-micro03|drive-research-pdf-text-vs-scan-detection-heuristics-micro03]] (2026-06-09)
+## From [drive-research-pdf-text-vs-scan-detection-heuristics-micro03](/entities/drive-research-pdf-text-vs-scan-detection-heuristics-micro03.md) (2026-06-09)
 - A processing approach for mixed-content documents.
 - Involves splitting the PDF and processing native and scanned pages discretely.

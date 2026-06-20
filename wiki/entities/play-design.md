@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-architecture-of-a-trading-card-game-micro02|the-architecture-of-a-trading-card-game-micro02]] (2026-06-09)
+## From [the-architecture-of-a-trading-card-game-micro02](/entities/the-architecture-of-a-trading-card-game-micro02.md) (2026-06-09)
 - A highly specialized team dedicated to the competitive health and numeric balance of the game's core formats.
 - Operates in four three-month segments that overlap with Set Design.
 - Defined by rapid, short-cycle iterations.

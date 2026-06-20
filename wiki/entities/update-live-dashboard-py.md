@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SCRIPT
 
-## From [[obolus-micro04|obolus-micro04]] (2026-06-09)
+## From [obolus-micro04](/entities/obolus-micro04.md) (2026-06-09)
 - Dashboard Curator Agent validates data provided by this script
 - Dashboard Curator Agent uses this script as its primary tool

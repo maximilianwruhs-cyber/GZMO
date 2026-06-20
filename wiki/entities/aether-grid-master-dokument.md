@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[aether-grid-micro03|aether-grid-micro03]] (2026-06-09)
+## From [aether-grid-micro03](/entities/aether-grid-micro03.md) (2026-06-09)
 - Micro-split from aether-grid.md for cloud KG extraction.
 - A complex, distributed AI system.
 - Projected to evolve into a Self-Evolving Swarm by Phase 13.

@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[ai-research-part2|ai-research-part2]] (2026-06-08)
+## From [ai-research-part2](/entities/ai-research-part2.md) (2026-06-08)
 - The framework Agent0 is implemented based on VeRL.
 - A sandboxed code interpreter based on VeRL-Tool is integrated into the Executor Agent.

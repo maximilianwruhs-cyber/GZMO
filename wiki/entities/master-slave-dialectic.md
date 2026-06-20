@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[cybernetics-and-mythos-the-architecture-of-intell-part2|cybernetics-and-mythos-the-architecture-of-intell-part2]] (2026-06-08)
+## From [cybernetics-and-mythos-the-architecture-of-intell-part2](/entities/cybernetics-and-mythos-the-architecture-of-intell-part2.md) (2026-06-08)
 - Adorno retained Hegel's concept of "determinate negation" and the rigorous self-reflection of the dialectic.
 - Adorno's dialectic is "negative" precisely because it refuses resolution.
 - The evolution of the dialectic represents one of the most remarkable and enduring intellectual through-lines in the history of human thought.
@@ -25,7 +25,7 @@ Type: CONCEPT
 - Describes a struggle for recognition between two consciousnesses.
 - Shows how the Slave, through labor, achieves true self-consciousness and independence.
 
-## From [[drive-research-dialectics-socratic-vs-hegelian-methods|drive-research-dialectics-socratic-vs-hegelian-methods]] (2026-06-08)
+## From [drive-research-dialectics-socratic-vs-hegelian-methods](/entities/drive-research-dialectics-socratic-vs-hegelian-methods.md) (2026-06-08)
 - Illustrates how human beings actualize freedom and self-consciousness.
 - Involves a struggle for recognition between two self-consciousnesses.
 - Highlights the role of labor and confrontation with mortality in achieving self-consciousness.

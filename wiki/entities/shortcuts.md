@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-architektur-und-implementierung-intelligenter-ki-a-micro01|drive-research-architektur-und-implementierung-intelligenter-ki-a-micro01]] (2026-06-09)
+## From [drive-research-architektur-und-implementierung-intelligenter-ki-a-micro01](/entities/drive-research-architektur-und-implementierung-intelligenter-ki-a-micro01.md) (2026-06-09)
 - Also known as .lnk files.
 - Can become dead links after software uninstallation or folder moves.
 - Can be corrected or marked for deletion by an agent.

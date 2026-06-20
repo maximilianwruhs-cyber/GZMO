@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[openclaw-deep-research-part5-micro03|openclaw-deep-research-part5-micro03]] (2026-06-09)
+## From [openclaw-deep-research-part5-micro03](/entities/openclaw-deep-research-part5-micro03.md) (2026-06-09)
 - Can be bootstrapped from OpenClaw.

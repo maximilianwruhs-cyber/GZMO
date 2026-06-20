@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[dynamics-of-the-unpredictable-micro05|dynamics-of-the-unpredictable-micro05]] (2026-06-10)
+## From [dynamics-of-the-unpredictable-micro05](/entities/dynamics-of-the-unpredictable-micro05.md) (2026-06-10)
 - An industry-standard data-parallelism crate.
 - Operates on a work-stealing algorithm for parallel execution.

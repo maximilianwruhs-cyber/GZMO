@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[obolus-vs-codium-extension-konzept-research-part1-micro03|obolus-vs-codium-extension-konzept-research-part1-micro03]] (2026-06-10)
+## From [obolus-vs-codium-extension-konzept-research-part1-micro03](/entities/obolus-vs-codium-extension-konzept-research-part1-micro03.md) (2026-06-10)
 - Orchestrated by the FastAPI service.

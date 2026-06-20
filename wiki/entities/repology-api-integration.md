@@ -14,6 +14,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-architektur-und-implementierung-intelligenter-ki-a-micro03|drive-research-architektur-und-implementierung-intelligenter-ki-a-micro03]] (2026-06-09)
+## From [drive-research-architektur-und-implementierung-intelligenter-ki-a-micro03](/entities/drive-research-architektur-und-implementierung-intelligenter-ki-a-micro03.md) (2026-06-09)
 - A semantic tool.
 - Used to equip an agent for detailed system diagnosis.

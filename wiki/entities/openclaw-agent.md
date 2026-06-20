@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[the-openclaw-architecture-and-tri-circuit-autonomo-part2|the-openclaw-architecture-and-tri-circuit-autonomo-part2]] (2026-06-08)
+## From [the-openclaw-architecture-and-tri-circuit-autonomo-part2](/entities/the-openclaw-architecture-and-tri-circuit-autonomo-part2.md) (2026-06-08)
 - A ruthless, surgical fact-checking engine.
 - Governed by strict behavioral parameters and an evolutionary self-improvement loop.

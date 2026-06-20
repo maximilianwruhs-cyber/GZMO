@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-mcp-landscape-research-report|drive-research-mcp-landscape-research-report]] (2026-06-08)
+## From [drive-research-mcp-landscape-research-report](/entities/drive-research-mcp-landscape-research-report.md) (2026-06-08)
 - Acts as the operational gold standard for code-aware assistants.
 - Exposes comprehensive toolsets for repository search, file reads, pull request operations, and commit history analysis.
 - Operating via standard OAuth flows with scoped personal access tokens.

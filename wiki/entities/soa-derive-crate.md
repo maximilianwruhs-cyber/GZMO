@@ -14,12 +14,12 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-cache-optimization-with-ai-chaos-theory|drive-research-cache-optimization-with-ai-chaos-theory]] (2026-06-08)
+## From [drive-research-cache-optimization-with-ai-chaos-theory](/entities/drive-research-cache-optimization-with-ai-chaos-theory.md) (2026-06-08)
 - Automatically generates parallel vectors with separate heap allocations per struct field.
 - Employs Generic Associated Types (GATs) to generate custom Slice/Ref helper types.
 - Demonstrated 6x speedup over AoS layouts in vector arithmetic and dot product tasks.
 
-## From [[drive-research-rust-ecs-cache-optimization-research|drive-research-rust-ecs-cache-optimization-research]] (2026-06-08)
+## From [drive-research-rust-ecs-cache-optimization-research](/entities/drive-research-rust-ecs-cache-optimization-research.md) (2026-06-08)
 - Automatically generates parallel vectors with separate allocations per field.
 - Employs Generic Associated Types (GATs) to generate custom Slice/Ref helper types.
 - Demonstrated 6x speedup over AoS layouts in vector arithmetic tasks.

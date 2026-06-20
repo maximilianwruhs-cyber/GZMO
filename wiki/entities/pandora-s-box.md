@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[cybernetics-and-mythos-the-architecture-of-intell-part2|cybernetics-and-mythos-the-architecture-of-intell-part2]] (2026-06-08)
+## From [cybernetics-and-mythos-the-architecture-of-intell-part2](/entities/cybernetics-and-mythos-the-architecture-of-intell-part2.md) (2026-06-08)
 - The first mortal woman, created as a "beautiful evil" by the Olympians.
 - Accepted by Epimetheus as his bride despite Prometheus's warnings.
 - Unleashed a multitude of evils upon the earth from her pithos, trapping only Elpis inside.
@@ -22,7 +22,7 @@ Type: PERSON
 - Resulted from a 16th-century mistranslation by Erasmus of Rotterdam.
 - The original Greek word was 'pithos'.
 
-## From [[drive-research-prometheus-and-epimetheus-myth-exploration-micro03|drive-research-prometheus-and-epimetheus-myth-exploration-micro03]] (2026-06-09)
+## From [drive-research-prometheus-and-epimetheus-myth-exploration-micro03](/entities/drive-research-prometheus-and-epimetheus-myth-exploration-micro03.md) (2026-06-09)
 - Created by the Olympians as a 'beautiful evil'.
 - Carried a pithos (mistranslated as Pandora's Box).
 - Unleashed evils upon humanity.

@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: AUTHOR
 
-## From [[openclaw-deep-research-part6|openclaw-deep-research-part6]] (2026-06-08)
+## From [openclaw-deep-research-part6](/entities/openclaw-deep-research-part6.md) (2026-06-08)
 - Authored the article 'What is OpenClaw? Features, Use Cases, Benefits & Limitations Explained'.
 - Mentioned as the writer of the article.

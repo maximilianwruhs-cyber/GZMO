@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[bun-versus-nodejs-architectural-evaluation-for-b|bun-versus-nodejs-architectural-evaluation-for-b]] (2026-06-08)
+## From [bun-versus-nodejs-architectural-evaluation-for-b](/entities/bun-versus-nodejs-architectural-evaluation-for-b.md) (2026-06-08)
 - Integrates native TypeScript execution into Node.js
 - Internally wraps the Rust-based SWC

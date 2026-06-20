@@ -17,17 +17,17 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[ai-research-part8-micro05|ai-research-part8-micro05]] (2026-06-09)
+## From [ai-research-part8-micro05](/entities/ai-research-part8-micro05.md) (2026-06-09)
 - A standardized testing framework.
 
-## From [[drive-research-advanced-typescript-execution-in-the-bun-runtime-micro03|drive-research-advanced-typescript-execution-in-the-bun-runtime-micro03]] (2026-06-09)
+## From [drive-research-advanced-typescript-execution-in-the-bun-runtime-micro03](/entities/drive-research-advanced-typescript-execution-in-the-bun-runtime-micro03.md) (2026-06-09)
 - Within the testing domain, bun test operates as a native, Jest-compatible test runner.
 
-## From [[drive-research-bun-typescript-performance-tips-micro03|drive-research-bun-typescript-performance-tips-micro03]] (2026-06-09)
+## From [drive-research-bun-typescript-performance-tips-micro03](/entities/drive-research-bun-typescript-performance-tips-micro03.md) (2026-06-09)
 - bun test is Jest-compatible.
 
-## From [[google-antigravity-the-architects-configuration-micro04|google-antigravity-the-architects-configuration-micro04]] (2026-06-09)
+## From [google-antigravity-the-architects-configuration-micro04](/entities/google-antigravity-the-architects-configuration-micro04.md) (2026-06-09)
 - Mentioned as a potential default testing framework for writing tests.
 
-## From [[google-antigravity-the-architects-configuration-micro03|google-antigravity-the-architects-configuration-micro03]] (2026-06-10)
+## From [google-antigravity-the-architects-configuration-micro03](/entities/google-antigravity-the-architects-configuration-micro03.md) (2026-06-10)
 - A testing framework used by projects.

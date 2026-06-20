@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[obolus-micro05|obolus-micro05]] (2026-06-09)
+## From [obolus-micro05](/entities/obolus-micro05.md) (2026-06-09)
 - Consulted by Architectural-Scout for strategic relevance.
 - Works closely with System Hygiene Agent.
 
-## From [[obolus-micro06|obolus-micro06]] (2026-06-09)
+## From [obolus-micro06](/entities/obolus-micro06.md) (2026-06-09)
 - Receives precise hardware status messages from Obolus.
 - Works closely with QA-Testing Agent.

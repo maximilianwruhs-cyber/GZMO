@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[high-fidelity-markdown-engineering-and-ast-process|high-fidelity-markdown-engineering-and-ast-process]] (2026-06-08)
+## From [high-fidelity-markdown-engineering-and-ast-process](/entities/high-fidelity-markdown-engineering-and-ast-process.md) (2026-06-08)
 - Must be supplied via configuration options if zero modification to specific blank lines is demanded.
 - Evaluate adjacent nodes and return specific boolean or numeric values.
 - Dictate exactly how many blank lines are injected between them.

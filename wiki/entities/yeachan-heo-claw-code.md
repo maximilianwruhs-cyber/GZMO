@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[ai-research-part9|ai-research-part9]] (2026-06-08)
+## From [ai-research-part9](/entities/ai-research-part9.md) (2026-06-08)
 - Original repository for ultraworkers/claw-code.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[optimizing-nvidia-blackwell-sm120-part3-micro04|optimizing-nvidia-blackwell-sm120-part3-micro04]] (2026-06-09)
+## From [optimizing-nvidia-blackwell-sm120-part3-micro04](/entities/optimizing-nvidia-blackwell-sm120-part3-micro04.md) (2026-06-09)
 - Backend for multi-GPU systems.
 - Can experience dynamic VRAM accumulation.
 - Used in ROCm deployments.

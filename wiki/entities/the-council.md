@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[the-architecture-of-a-trading-card-game-micro03|the-architecture-of-a-trading-card-game-micro03]] (2026-06-10)
+## From [the-architecture-of-a-trading-card-game-micro03](/entities/the-architecture-of-a-trading-card-game-micro03.md) (2026-06-10)
 - Delivers verdicts on card acceptability for printing
 - Recommends alterations to the lead developer
 - Researches solutions for structural deficiencies in the color pie

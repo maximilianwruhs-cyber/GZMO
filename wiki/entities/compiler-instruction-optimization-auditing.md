@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-ok-so-designing-a-guide-around-llamabench-would-b|drive-research-ok-so-designing-a-guide-around-llamabench-would-b]] (2026-06-08)
+## From [drive-research-ok-so-designing-a-guide-around-llamabench-would-b](/entities/drive-research-ok-so-designing-a-guide-around-llamabench-would-b.md) (2026-06-08)
 - Used when compiling llama.cpp locally from source.
 - llama-bench is used as a regression and validation checker.
 - Comparing outputs mathematically confirms if architectural extensions boost throughput or introduce stalls.

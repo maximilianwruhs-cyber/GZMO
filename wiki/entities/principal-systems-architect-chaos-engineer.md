@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[prompt-agent-engineering-part7-micro08|prompt-agent-engineering-part7-micro08]] (2026-06-09)
+## From [prompt-agent-engineering-part7-micro08](/entities/prompt-agent-engineering-part7-micro08.md) (2026-06-09)
 - Role in the 'Titan-Class' Production Readiness Prompt.
 - Performs a forensic autopsy on live architectures.
 - Mission is to move the system from 'Functional' to 'Antifragile'.

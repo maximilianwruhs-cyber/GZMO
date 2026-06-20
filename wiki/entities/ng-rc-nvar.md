@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-algorithmic-trading-with-chaos-theory|drive-research-algorithmic-trading-with-chaos-theory]] (2026-06-08)
+## From [drive-research-algorithmic-trading-with-chaos-theory](/entities/drive-research-algorithmic-trading-with-chaos-theory.md) (2026-06-08)
 - Next-Generation Reservoir Computing.
 - Uses Tikhonov Regularized Least-Squares with l_2 norm bias.
 - Negligible computational cost, approximately 2-10 steps to construct explicit polynomial features.

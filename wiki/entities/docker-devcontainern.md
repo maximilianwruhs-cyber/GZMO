@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[building-a-private-local-ai-development-environmen-micro03|building-a-private-local-ai-development-environmen-micro03]] (2026-06-09)
+## From [building-a-private-local-ai-development-environmen-micro03](/entities/building-a-private-local-ai-development-environmen-micro03.md) (2026-06-09)
 - werden für Agentic Sandboxing genutzt
 - Agenten agieren ausschließlich innerhalb dieser isolierten Umgebungen

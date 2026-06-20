@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[prompt-agent-engineering-part2-micro05|prompt-agent-engineering-part2-micro05]] (2026-06-09)
+## From [prompt-agent-engineering-part2-micro05](/entities/prompt-agent-engineering-part2-micro05.md) (2026-06-09)
 - Platform for hosting the repository setup
 - Requires pristine setup
 - Needs atomic commit strategy

@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part8-micro04|ai-research-part8-micro04]] (2026-06-09)
+## From [ai-research-part8-micro04](/entities/ai-research-part8-micro04.md) (2026-06-09)
 - Are used to populate Thompson Sampling.
 - Are represented as $Beta(	au(1 + n^C{success}), 	au(1 + n^C{failure}))$.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-archival-truth-part1-micro06|the-archival-truth-part1-micro06]] (2026-06-09)
+## From [the-archival-truth-part1-micro06](/entities/the-archival-truth-part1-micro06.md) (2026-06-09)
 - States that the perception of a violation and the realization of its benign nature must occur simultaneously.
 - Is a theoretical foundation for Absurdist/Surreal and Situational/Cringe comedic styles.
 - Explains why certain things are perceived as funny.

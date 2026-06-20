@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: AGENT
 
-## From [[obolus-micro04|obolus-micro04]] (2026-06-09)
+## From [obolus-micro04](/entities/obolus-micro04.md) (2026-06-09)
 - visual guardian of the ServiceBot system
 - ensures the status report (dashboard.html) remains up-to-date, technically precise, and visually appealing
 - validates data provided by update_live_dashboard.py

@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-architecture-of-engagement-an-analysis-of-gam-micro01|the-architecture-of-engagement-an-analysis-of-gam-micro01]] (2026-06-09)
+## From [the-architecture-of-engagement-an-analysis-of-gam-micro01](/entities/the-architecture-of-engagement-an-analysis-of-gam-micro01.md) (2026-06-09)
 - Used to understand the psychological transition to Problematic Social Media Use (PSMU).
 - Explains how the digital environment acts as an acute stressor for predisposed individuals.
 
-## From [[the-architecture-of-engagement-an-analysis-of-gam-micro06|the-architecture-of-engagement-an-analysis-of-gam-micro06]] (2026-06-09)
+## From [the-architecture-of-engagement-an-analysis-of-gam-micro06](/entities/the-architecture-of-engagement-an-analysis-of-gam-micro06.md) (2026-06-09)
 - Best understood through this model for the transition to Problematic Social Media Use (PSMU).
 - External stressors activate a vulnerable individual's emotional systems, leading to a 'stress-response-reinforcement' cycle.

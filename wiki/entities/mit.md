@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: LICENSE
 
-## From [[drive-research-bun-file-parsing-dependency-shortlist-micro02|drive-research-bun-file-parsing-dependency-shortlist-micro02]] (2026-06-09)
+## From [drive-research-bun-file-parsing-dependency-shortlist-micro02](/entities/drive-research-bun-file-parsing-dependency-shortlist-micro02.md) (2026-06-09)
 - Permissive open-source license.
 - Guarantees software can be legally utilized, heavily modified, embedded, and distributed within proprietary, closed-source commercial applications.
 - Functionally identical legal instruments to ISC.

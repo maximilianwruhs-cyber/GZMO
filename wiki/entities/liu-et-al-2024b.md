@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: AUTHOR
 
-## From [[ai-research-part7|ai-research-part7]] (2026-06-08)
+## From [ai-research-part7](/entities/ai-research-part7.md) (2026-06-08)
 - This reference is associated with the DualPipe schedule.
 - This reference is associated with MoE architectures inspired by DeepSeek-V3.
 - Authored "Deepseek-v3 technical report."

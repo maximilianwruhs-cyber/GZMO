@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-ultimate-linux-workstation-tuning-blueprint|drive-research-ultimate-linux-workstation-tuning-blueprint]] (2026-06-08)
+## From [drive-research-ultimate-linux-workstation-tuning-blueprint](/entities/drive-research-ultimate-linux-workstation-tuning-blueprint.md) (2026-06-08)
 - Refers to the architecture of the AMD Ryzen 9 9950X3D processor.
 - Introduces Curve Shaper for voltage/frequency adjustments.
 - Features an asymmetric dual-Core Complex Die (CCD) topology.

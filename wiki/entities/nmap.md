@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[designing-stealthy-portable-cli-agents|designing-stealthy-portable-cli-agents]] (2026-06-08)
+## From [designing-stealthy-portable-cli-agents](/entities/designing-stealthy-portable-cli-agents.md) (2026-06-08)
 - Used to periodically scan known, authorized IP ranges.
 - Discovers open ports and running services.

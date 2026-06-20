@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[openclaw-deep-research-part8-micro02|openclaw-deep-research-part8-micro02]] (2026-06-10)
+## From [openclaw-deep-research-part8-micro02](/entities/openclaw-deep-research-part8-micro02.md) (2026-06-10)
 - Tool used for static analysis during plugin audits

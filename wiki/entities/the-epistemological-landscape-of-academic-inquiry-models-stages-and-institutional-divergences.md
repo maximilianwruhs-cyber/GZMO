@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[drive-research-research-project-initiation-guide|drive-research-research-project-initiation-guide]] (2026-06-08)
+## From [drive-research-research-project-initiation-guide](/entities/drive-research-research-project-initiation-guide.md) (2026-06-08)
 - Discusses the traditional, linear depiction of academic inquiry being replaced by a dynamic, iterative paradigm.
 - Explains the research cycle as a recursive feedback loop.
 - Highlights how initial hypotheses, research questions, and methodological assumptions must frequently be refactored.

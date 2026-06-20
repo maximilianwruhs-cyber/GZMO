@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[from-static-vaults-to-autonomous-knowledge-engines|from-static-vaults-to-autonomous-knowledge-engines]] (2026-06-08)
+## From [from-static-vaults-to-autonomous-knowledge-engines](/entities/from-static-vaults-to-autonomous-knowledge-engines.md) (2026-06-08)
 - It is a technical foundation for the transition toward true autonomy.
 - It arrived with the integration of Large Language Models (LLMs) and vector embeddings into local filesystems.
 - It maps the conceptual meaning of each note in high-dimensional mathematical space.

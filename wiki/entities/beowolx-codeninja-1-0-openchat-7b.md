@@ -15,7 +15,7 @@ gzmo_synthetic: true
 
 Type: MODEL
 
-## From [[architectural-blueprints-for-sovereign-frankenmoe-part1|architectural-blueprints-for-sovereign-frankenmoe-part1]] (2026-06-08)
+## From [architectural-blueprints-for-sovereign-frankenmoe-part1](/entities/architectural-blueprints-for-sovereign-frankenmoe-part1.md) (2026-06-08)
 - Serves as the Coding Expert within Beyonder-4x7B-v3.
 - Coding Expert within Beyonder-4x7B-v3.
 - Scores 39.98 on AGIEval and 71.77 on GPT4All.
@@ -30,13 +30,13 @@ Type: MODEL
 - Specialized for coding tasks.
 - Example positive prompts include "code", "python", "javascript".
 
-## From [[drive-research-hidden-mode-technical-analysis-and-configurati|drive-research-hidden-mode-technical-analysis-and-configurati]] (2026-06-08)
+## From [drive-research-hidden-mode-technical-analysis-and-configurati](/entities/drive-research-hidden-mode-technical-analysis-and-configurati.md) (2026-06-08)
 - Used as a source model in a mergekit-moe configuration.
 - Associated with positive prompts like 'code', 'python', 'javascript'.
 - Serves as the Coding Expert for mlabonne/Beyonder-4x7B-v3.
 - Scores poorly on general benchmarks (50.35 average) but preserves coding capabilities when merged.
 
-## From [[drive-research-hidden-mode-technical-analysis-and-configuration|drive-research-hidden-mode-technical-analysis-and-configuration]] (2026-06-08)
+## From [drive-research-hidden-mode-technical-analysis-and-configuration](/entities/drive-research-hidden-mode-technical-analysis-and-configuration.md) (2026-06-08)
 - Serves as the Coding Expert for mlabonne/Beyonder-4x7B-v3.
 - Scores poorly on general benchmarks but preserves coding capabilities when merged.
 - Used as a source model in mergekit-moe configurations.

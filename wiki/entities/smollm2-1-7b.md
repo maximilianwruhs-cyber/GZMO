@@ -14,6 +14,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[architectures-for-agentic-memory-virtual-context-micro03|architectures-for-agentic-memory-virtual-context-micro03]] (2026-06-09)
+## From [architectures-for-agentic-memory-virtual-context-micro03](/entities/architectures-for-agentic-memory-virtual-context-micro03.md) (2026-06-09)
 - Recorded a catastrophic 4.3% schema compliance rate.
 - Rendering it effectively useless for unassisted JSON workflows.

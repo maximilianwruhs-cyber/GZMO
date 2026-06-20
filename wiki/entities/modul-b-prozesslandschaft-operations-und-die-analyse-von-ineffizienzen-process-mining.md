@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part2|drive-research-ki-berater-fragebogen-für-kundenanalyse-part2]] (2026-06-08)
+## From [drive-research-ki-berater-fragebogen-für-kundenanalyse-part2](/entities/drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part2.md) (2026-06-08)
 - verbindet qualitative, strukturierte Mitarbeiterbefragungen mit hochmodernen quantitativen Ansätzen wie dem Process Mining
 - um die tatsächliche Prozessrealität schonungslos offenzulegen
 - hochmodernen quantitativen Ansätzen wie dem Process Mining
@@ -22,7 +22,7 @@ Type: CONCEPT
 - Eine objektive, quantitative Technik zur Validierung von Fragebogenergebnissen.
 - Hilft, die Diskrepanz zwischen gefühlter und tatsächlicher Prozessineffizienz zu schließen.
 
-## From [[drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part1-micro02|drive-research-ki-berater-fragebogen-für-kundenanalyse-part1-micro02]] (2026-06-10)
+## From [drive-research-ki-berater-fragebogen-für-kundenanalyse-part1-micro02](/entities/drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part1-micro02.md) (2026-06-10)
 - Verbindet qualitative Mitarbeiterbefragungen mit quantitativen Ansätzen wie Process Mining
 - Dient der datenbasierten Bewertung von Automatisierungspotenzialen
 - Ein quantitativer Ansatz zur objektiven Prozessanalyse

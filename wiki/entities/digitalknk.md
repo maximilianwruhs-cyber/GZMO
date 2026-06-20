@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: AUTHOR
 
-## From [[openclaw-deep-research-part8-micro07|openclaw-deep-research-part8-micro07]] (2026-06-09)
+## From [openclaw-deep-research-part8-micro07](/entities/openclaw-deep-research-part8-micro07.md) (2026-06-09)
 - commented on Feb 9
 - Recommends asking in discord or reddit

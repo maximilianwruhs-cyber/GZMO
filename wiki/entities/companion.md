@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-architecture-of-a-trading-card-game-micro03|the-architecture-of-a-trading-card-game-micro03]] (2026-06-10)
+## From [the-architecture-of-a-trading-card-game-micro03](/entities/the-architecture-of-a-trading-card-game-micro03.md) (2026-06-10)
 - A highly complex mechanic
 - Required new rules (Rule 103.1b) regarding pre-game setup

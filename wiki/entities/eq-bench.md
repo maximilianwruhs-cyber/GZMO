@@ -14,11 +14,11 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[the-evolution-of-artificial-intelligence-evaluatio-micro02|the-evolution-of-artificial-intelligence-evaluatio-micro02]] (2026-06-09)
+## From [the-evolution-of-artificial-intelligence-evaluatio-micro02](/entities/the-evolution-of-artificial-intelligence-evaluatio-micro02.md) (2026-06-09)
 - A psychometric platform for assessing social and emotional intelligence.
 - Establishes a rigorous standard for evaluating emotional understanding.
 - Utilizes a two-stage evaluation protocol: critique and revision.
 
-## From [[the-evolution-of-artificial-intelligence-evaluatio-micro04|the-evolution-of-artificial-intelligence-evaluatio-micro04]] (2026-06-09)
+## From [the-evolution-of-artificial-intelligence-evaluatio-micro04](/entities/the-evolution-of-artificial-intelligence-evaluatio-micro04.md) (2026-06-09)
 - Is a psychometric assessment.
 - Evaluates a model's capacity for empathy, attunement, adaptive reframing, and self-correction.

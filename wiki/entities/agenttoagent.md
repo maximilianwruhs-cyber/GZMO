@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[openclaw-deep-research-part10-micro02|openclaw-deep-research-part10-micro02]] (2026-06-10)
+## From [openclaw-deep-research-part10-micro02](/entities/openclaw-deep-research-part10-micro02.md) (2026-06-10)
 - Native peer messaging primitive in OpenClaw

@@ -14,12 +14,12 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[openclaw-deep-research-part5-micro06|openclaw-deep-research-part5-micro06]] (2026-06-10)
+## From [openclaw-deep-research-part5-micro06](/entities/openclaw-deep-research-part5-micro06.md) (2026-06-10)
 - The modular capability layer of OpenClaw.
 - Acts as the 'hands' of the agent.
 - A platform where skills are listed and distributed.
 
-## From [[openclaw-deep-research-part5-micro08|openclaw-deep-research-part5-micro08]] (2026-06-10)
+## From [openclaw-deep-research-part5-micro08](/entities/openclaw-deep-research-part5-micro08.md) (2026-06-10)
 - A platform where skills are listed and distributed.
 - The modular capability layer of OpenClaw.
 - Acts as the 'hands' of the agent.

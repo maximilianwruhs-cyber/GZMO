@@ -14,22 +14,22 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[lora|LoRA]] (CONCEPT)
-- [[wireguard|WireGuard]] (TOOL)
-- [[k8s|K8s]] (SYSTEM)
-- [[gemini|Gemini]] (SYSTEM)
-- [[riva|Riva]] (TOOL)
-- [[deepstream|DeepStream]] (TOOL)
-- [[mtls|mTLS]] (CONCEPT)
-- [[eliteagent-v3-1|EliteAgent v3.1]] (SYSTEM)
-- [[nvidia-dgx-spark|NVIDIA DGX Spark]] (SYSTEM)
-- [[nvidia-dgx-gh200|NVIDIA DGX GH200]] (SYSTEM)
-- [[aether-grid|AETHER-GRID]] (PROJECT)
-- [[qdrant|Qdrant]] (SYSTEM)
-- [[grpc-envoy-proxy|gRPC Envoy Proxy]] (TOOL)
-- [[triton|Triton]] (TOOL)
-- [[llama-3-8b|Llama-3-8B]] (SYSTEM)
-- [[hashicorp-vault|HashiCorp Vault]] (TOOL)
+- [LoRA](/entities/lora.md) (CONCEPT)
+- [WireGuard](/entities/wireguard.md) (TOOL)
+- [K8s](/entities/k8s.md) (SYSTEM)
+- [Gemini](/entities/gemini.md) (SYSTEM)
+- [Riva](/entities/riva.md) (TOOL)
+- [DeepStream](/entities/deepstream.md) (TOOL)
+- [mTLS](/entities/mtls.md) (CONCEPT)
+- [EliteAgent v3.1](/entities/eliteagent-v3-1.md) (SYSTEM)
+- [NVIDIA DGX Spark](/entities/nvidia-dgx-spark.md) (SYSTEM)
+- [NVIDIA DGX GH200](/entities/nvidia-dgx-gh200.md) (SYSTEM)
+- [AETHER-GRID](/entities/aether-grid.md) (PROJECT)
+- [Qdrant](/entities/qdrant.md) (SYSTEM)
+- [gRPC Envoy Proxy](/entities/grpc-envoy-proxy.md) (TOOL)
+- [Triton](/entities/triton.md) (TOOL)
+- [Llama-3-8B](/entities/llama-3-8b.md) (SYSTEM)
+- [HashiCorp Vault](/entities/hashicorp-vault.md) (TOOL)
 
 ## Relations
 - Gemini → RELATED_TO → EliteAgent v3.1

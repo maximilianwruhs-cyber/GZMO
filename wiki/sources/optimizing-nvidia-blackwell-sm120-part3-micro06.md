@@ -14,15 +14,15 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[llama-bench|llama-bench]] (TOOL)
-- [[nvidia-cuda-collective-cooperatives-library-cccl|NVIDIA CUDA Collective Cooperatives Library (CCCL)]] (SYSTEM)
-- [[multi-gpu|multi-GPU]] (CONCEPT)
-- [[llama-cpp|llama.cpp]] (PROJECT)
-- [[nvidia-blackwell-sm120|NVIDIA Blackwell SM120]] (SYSTEM)
-- [[tensor-split|tensor-split]] (CONCEPT)
-- [[kv-cache|KV-Cache]] (CONCEPT)
-- [[systemd|systemd]] (TOOL)
-- [[ggml|GGML]] (SYSTEM)
+- [llama-bench](/entities/llama-bench.md) (TOOL)
+- [NVIDIA CUDA Collective Cooperatives Library (CCCL)](/entities/nvidia-cuda-collective-cooperatives-library-cccl.md) (SYSTEM)
+- [multi-GPU](/entities/multi-gpu.md) (CONCEPT)
+- [llama.cpp](/entities/llama-cpp.md) (PROJECT)
+- [NVIDIA Blackwell SM120](/entities/nvidia-blackwell-sm120.md) (SYSTEM)
+- [tensor-split](/entities/tensor-split.md) (CONCEPT)
+- [KV-Cache](/entities/kv-cache.md) (CONCEPT)
+- [systemd](/entities/systemd.md) (TOOL)
+- [GGML](/entities/ggml.md) (SYSTEM)
 
 ## Relations
 - llama-bench → PART_OF → llama.cpp

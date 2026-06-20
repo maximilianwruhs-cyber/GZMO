@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[architecting-the-minimalist-linux-desktop-a-compa-part1|architecting-the-minimalist-linux-desktop-a-compa-part1]] (2026-06-08)
+## From [architecting-the-minimalist-linux-desktop-a-compa-part1](/entities/architecting-the-minimalist-linux-desktop-a-compa-part1.md) (2026-06-08)
 - It is the GNU C Library.
 - It is the ubiquitous, de facto standard across the Linux desktop and enterprise ecosystem.
 - It is highly optimized for performance in complex, large-scale, multithreaded computing environments.
@@ -22,7 +22,7 @@ Type: CONCEPT
 - Void Linux offers a developer experience mirroring Arch Linux when utilizing its edition.
 - Debian utilizes it, guaranteeing proprietary NVIDIA drivers will compile and load correctly.
 
-## From [[phantom-drive-autonomous-llm-deployment-architect-micro01|phantom-drive-autonomous-llm-deployment-architect-micro01]] (2026-06-09)
+## From [phantom-drive-autonomous-llm-deployment-architect-micro01](/entities/phantom-drive-autonomous-llm-deployment-architect-micro01.md) (2026-06-09)
 - The GNU C Library.
 - Dynamically linked binaries against glibc cause execution failures on older hosts.
 - Utilizes aggressive symbol versioning.

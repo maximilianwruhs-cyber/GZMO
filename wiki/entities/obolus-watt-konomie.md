@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[obolus-micro01|obolus-micro01]] (2026-06-09)
+## From [obolus-micro01](/entities/obolus-micro01.md) (2026-06-09)
 - Couples the digital token ($OBL) to the physical unit of energy (Watt).
 - Forces real economic efficiency by linking AI inference to electricity consumption.
 - Determines economic dynamics through the profit equation.

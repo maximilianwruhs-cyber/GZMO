@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[drive-research-the-anatomy-of-a-world-class-readme|drive-research-the-anatomy-of-a-world-class-readme]] (2026-06-08)
+## From [drive-research-the-anatomy-of-a-world-class-readme](/entities/drive-research-the-anatomy-of-a-world-class-readme.md) (2026-06-08)
 - Highlights security strategies by exhaustively and transparently documenting its exact security model (e.g., AES-256-GCM cipher integration, PBKDF2 parameters).
 
-## From [[drive-research-creating-a-comprehensive-readmemd-micro03|drive-research-creating-a-comprehensive-readmemd-micro03]] (2026-06-09)
+## From [drive-research-creating-a-comprehensive-readmemd-micro03](/entities/drive-research-creating-a-comprehensive-readmemd-micro03.md) (2026-06-09)
 - Highlights documentation strategies for software where trust and verifiable security are paramount.
 - As a cryptographic security library, it excels by exhaustively and transparently documenting its exact security model.
 - The README specifically details its AES-256-GCM cipher integration, the PBKDF2 key derivation parameters utilizing 100,000 iterations, and the precise 16-byte salt and 12-byte IV mechanisms.

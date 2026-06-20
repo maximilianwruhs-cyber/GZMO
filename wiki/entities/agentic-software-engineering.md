@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-dawn-of-agentic-software-reverse-engineering-micro01|the-dawn-of-agentic-software-reverse-engineering-micro01]] (2026-06-09)
+## From [the-dawn-of-agentic-software-reverse-engineering-micro01](/entities/the-dawn-of-agentic-software-reverse-engineering-micro01.md) (2026-06-09)
 - A phase characterized by intelligent agents operating as autonomous entities.
 - Agents are capable of achieving complex, goal-oriented objectives.
 - Agents execute tasks through continuous environmental perception, long-term planning, dynamic tool orchestration, and recursive reflection.

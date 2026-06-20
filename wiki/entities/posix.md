@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[prompt-agent-engineering-part2-micro04|prompt-agent-engineering-part2-micro04]] (2026-06-09)
+## From [prompt-agent-engineering-part2-micro04](/entities/prompt-agent-engineering-part2-micro04.md) (2026-06-09)
 - Recommendations for the Lifecycle Manager are based on POSIX standards.
 - Related to bare-metal benchmarks.

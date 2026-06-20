@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[openclaw-part2|openclaw-part2]] (2026-06-08)
+## From [openclaw-part2](/entities/openclaw-part2.md) (2026-06-08)
 - Used by the Agent Development Kit (ADK).
 - Enables communication between specialized agents.
 - Facilitates backend multi-agent systems.

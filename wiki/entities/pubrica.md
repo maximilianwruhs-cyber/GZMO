@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[optimizing-nvidia-blackwell-sm120-part2-micro08|optimizing-nvidia-blackwell-sm120-part2-micro08]] (2026-06-10)
+## From [optimizing-nvidia-blackwell-sm120-part2-micro08](/entities/optimizing-nvidia-blackwell-sm120-part2-micro08.md) (2026-06-10)
 - Provides SPIDER framework guide for qualitative research

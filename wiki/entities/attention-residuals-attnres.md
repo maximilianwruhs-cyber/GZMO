@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[ai-research-part8-micro07|ai-research-part8-micro07]] (2026-06-09)
+## From [ai-research-part8-micro07](/entities/ai-research-part8-micro07.md) (2026-06-09)
 - It is associated with Attention Residuals.
 - It is a leading AI framework for Foundation Architectures.
 - It is an innovation to solve PreNorm Dilution.

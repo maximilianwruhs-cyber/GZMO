@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[aether-grid-micro02|aether-grid-micro02]] (2026-06-09)
+## From [aether-grid-micro02](/entities/aether-grid-micro02.md) (2026-06-09)
 - Home Assistant Core Docker (--net=host)
 - SNMP v3 (Toner/Papier), IPP (Druck), KNX/DALI (Licht), Manufacturer-REST (Canon/Ricoh/HP)

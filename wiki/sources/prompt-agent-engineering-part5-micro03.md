@@ -14,12 +14,12 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[prompt-agent-engineering-part5|prompt-agent-engineering-part5]] (DOCUMENT)
-- [[ai-system|AI system]] (SYSTEM)
-- [[cloud-kg-extraction|cloud KG extraction]] (CONCEPT)
-- [[hexagonal-architecture|Hexagonal architecture]] (CONCEPT)
-- [[vertical-slice-architecture|Vertical slice architecture]] (CONCEPT)
-- [[prompt-template|prompt template]] (TOOL)
+- [prompt-agent-engineering-part5](/entities/prompt-agent-engineering-part5.md) (DOCUMENT)
+- [AI system](/entities/ai-system.md) (SYSTEM)
+- [cloud KG extraction](/entities/cloud-kg-extraction.md) (CONCEPT)
+- [Hexagonal architecture](/entities/hexagonal-architecture.md) (CONCEPT)
+- [Vertical slice architecture](/entities/vertical-slice-architecture.md) (CONCEPT)
+- [prompt template](/entities/prompt-template.md) (TOOL)
 
 ## Relations
 - prompt-agent-engineering-part5 → USES → cloud KG extraction

@@ -14,9 +14,9 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[gemini|Gemini]] (SYSTEM)
-- [[document-implementation-process|Document Implementation Process]] (CONCEPT)
-- [[software-development|Software Development]] (CONCEPT)
+- [Gemini](/entities/gemini.md) (SYSTEM)
+- [Document Implementation Process](/entities/document-implementation-process.md) (CONCEPT)
+- [Software Development](/entities/software-development.md) (CONCEPT)
 
 ## Relations
 - Gemini → USES → Document Implementation Process

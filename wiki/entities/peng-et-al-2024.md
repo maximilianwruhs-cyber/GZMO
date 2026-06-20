@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: AUTHOR
 
-## From [[ai-research-part4|ai-research-part4]] (2026-06-08)
+## From [ai-research-part4](/entities/ai-research-part4.md) (2026-06-08)
 - Authored the concept of YaRN.
 - Reference for 'YaRN: Efficient context window extension of large language models'.

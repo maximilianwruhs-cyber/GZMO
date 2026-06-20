@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-nvar-financial-forecasting-parameter-search|drive-research-nvar-financial-forecasting-parameter-search]] (2026-06-08)
+## From [drive-research-nvar-financial-forecasting-parameter-search](/entities/drive-research-nvar-financial-forecasting-parameter-search.md) (2026-06-08)
 - Can be used as a learnable feature library in Adaptive NVAR.
 - Has parameters that are jointly optimized with linear readout weights.
 - Can integrate a dropout rate to handle noise.

@@ -14,13 +14,13 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[prompt-agent-engineering-part5-micro05|prompt-agent-engineering-part5-micro05]] (2026-06-09)
+## From [prompt-agent-engineering-part5-micro05](/entities/prompt-agent-engineering-part5-micro05.md) (2026-06-09)
 - Requires explicit schema for LanceDB tables
 - Uses LanceDB ~0.5.0+ (2026)
 - Distinguishes 'very good' from 'Nuclear' in production readiness
 - Goal is maximum robustness, minimal footprint, maximum compatibility
 - Refers to a 'Nuclear' agent
 
-## From [[prompt-agent-engineering-part5-micro06|prompt-agent-engineering-part5-micro06]] (2026-06-09)
+## From [prompt-agent-engineering-part5-micro06](/entities/prompt-agent-engineering-part5-micro06.md) (2026-06-09)
 - The agent should learn from its own errors and successes.
 - Successfully deployed meta-skills are written to LanceDB.

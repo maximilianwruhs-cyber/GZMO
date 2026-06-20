@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[obolus-micro06|obolus-micro06]] (2026-06-09)
+## From [obolus-micro06](/entities/obolus-micro06.md) (2026-06-09)
 - Guardian of data integrity.
 - Ensures no bit in the data center exists without a rescue anchor.
 - Implements the 3-2-1-1-0 backup rule.

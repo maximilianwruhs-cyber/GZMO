@@ -14,12 +14,12 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[openprose|OpenProse]] (TOOL)
-- [[email-triage|Email triage]] (CONCEPT)
-- [[workflow-files-lobster|Workflow files (.lobster)]] (TOOL)
-- [[openclaw|OpenClaw]] (SYSTEM)
-- [[llm-task|LLM Task]] (TOOL)
-- [[brain-cli|brain-cli]] (TOOL)
+- [OpenProse](/entities/openprose.md) (TOOL)
+- [Email triage](/entities/email-triage.md) (CONCEPT)
+- [Workflow files (.lobster)](/entities/workflow-files-lobster.md) (TOOL)
+- [OpenClaw](/entities/openclaw.md) (SYSTEM)
+- [LLM Task](/entities/llm-task.md) (TOOL)
+- [brain-cli](/entities/brain-cli.md) (TOOL)
 
 ## Relations
 - Workflow files (.lobster) → USES → LLM Task

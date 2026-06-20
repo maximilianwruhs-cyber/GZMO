@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[tui-framework|tui-framework]] (2026-06-08)
+## From [tui-framework](/entities/tui-framework.md) (2026-06-08)
 - Part of VSCodium's architecture.
 - Can be used with xterm.js for TUI implementation.
 - Provides a sandbox for UI elements.

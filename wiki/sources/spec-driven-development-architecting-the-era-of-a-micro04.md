@@ -14,20 +14,20 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[easy-approach-to-requirements-syntax-ears|Easy Approach to Requirements Syntax (EARS)]] (TOOL)
-- [[mark-russinovich|Mark Russinovich]] (PERSON)
-- [[agent-mode-in-ides|agent mode in IDEs]] (TOOL)
-- [[loop-drift|Loop Drift]] (CONCEPT)
-- [[vibe-coding|vibe coding]] (CONCEPT)
-- [[architecture-decision-records-adrs|Architecture Decision Records (ADRs)]] (TOOL)
-- [[large-language-models|Large Language Models]] (SYSTEM)
-- [[microsoft|Microsoft]] (ORGANIZATION)
-- [[model-context-protocol-mcp|Model Context Protocol (MCP)]] (TOOL)
-- [[junior-developer-talent-pipeline|junior developer talent pipeline]] (CONCEPT)
-- [[agentic-resource-exhaustion|Agentic Resource Exhaustion]] (CONCEPT)
-- [[ai-tools|AI tools]] (TOOL)
-- [[ai-native-enterprise|AI-native enterprise]] (CONCEPT)
-- [[spec-driven-development|Spec-Driven Development]] (CONCEPT)
+- [Easy Approach to Requirements Syntax (EARS)](/entities/easy-approach-to-requirements-syntax-ears.md) (TOOL)
+- [Mark Russinovich](/entities/mark-russinovich.md) (PERSON)
+- [agent mode in IDEs](/entities/agent-mode-in-ides.md) (TOOL)
+- [Loop Drift](/entities/loop-drift.md) (CONCEPT)
+- [vibe coding](/entities/vibe-coding.md) (CONCEPT)
+- [Architecture Decision Records (ADRs)](/entities/architecture-decision-records-adrs.md) (TOOL)
+- [Large Language Models](/entities/large-language-models.md) (SYSTEM)
+- [Microsoft](/entities/microsoft.md) (ORGANIZATION)
+- [Model Context Protocol (MCP)](/entities/model-context-protocol-mcp.md) (TOOL)
+- [junior developer talent pipeline](/entities/junior-developer-talent-pipeline.md) (CONCEPT)
+- [Agentic Resource Exhaustion](/entities/agentic-resource-exhaustion.md) (CONCEPT)
+- [AI tools](/entities/ai-tools.md) (TOOL)
+- [AI-native enterprise](/entities/ai-native-enterprise.md) (CONCEPT)
+- [Spec-Driven Development](/entities/spec-driven-development.md) (CONCEPT)
 
 ## Relations
 - AI tools → RELATED_TO → Spec-Driven Development

@@ -14,13 +14,13 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-10).
 
 ## Entities
-- [[vertex-ai|Vertex AI]] (TOOL)
-- [[dsgvo|DSGVO]] (CONCEPT)
-- [[ovaledge|OvalEdge]] (TOOL)
-- [[google-cloud-platform|Google Cloud Platform]] (ORGANIZATION)
-- [[betrvg|BetrVG]] (CONCEPT)
-- [[lego-serious-play|Lego Serious Play]] (TOOL)
-- [[amazon-sagemaker|Amazon SageMaker]] (TOOL)
-- [[chatgpt|ChatGPT]] (SYSTEM)
-- [[microsoft-azure|Microsoft Azure]] (ORGANIZATION)
-- [[eu-ai-act|EU AI Act]] (CONCEPT)
+- [Vertex AI](/entities/vertex-ai.md) (TOOL)
+- [DSGVO](/entities/dsgvo.md) (CONCEPT)
+- [OvalEdge](/entities/ovaledge.md) (TOOL)
+- [Google Cloud Platform](/entities/google-cloud-platform.md) (ORGANIZATION)
+- [BetrVG](/entities/betrvg.md) (CONCEPT)
+- [Lego Serious Play](/entities/lego-serious-play.md) (TOOL)
+- [Amazon SageMaker](/entities/amazon-sagemaker.md) (TOOL)
+- [ChatGPT](/entities/chatgpt.md) (SYSTEM)
+- [Microsoft Azure](/entities/microsoft-azure.md) (ORGANIZATION)
+- [EU AI Act](/entities/eu-ai-act.md) (CONCEPT)

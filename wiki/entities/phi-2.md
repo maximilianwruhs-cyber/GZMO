@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: MODEL
 
-## From [[architectural-blueprints-for-sovereign-frankenmoe-part1|architectural-blueprints-for-sovereign-frankenmoe-part1]] (2026-06-08)
+## From [architectural-blueprints-for-sovereign-frankenmoe-part1](/entities/architectural-blueprints-for-sovereign-frankenmoe-part1.md) (2026-06-08)
 - It is a model that was combined to create Phixtral.
 - It is a type of model used in early FrankenMoE implementations.
 - Multiple Phi-2 models were used in Phixtral.

@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[high-performance-typescript-execution-and-architec-part1-micro06|high-performance-typescript-execution-and-architec-part1-micro06]] (2026-06-09)
+## From [high-performance-typescript-execution-and-architec-part1-micro06](/entities/high-performance-typescript-execution-and-architec-part1-micro06.md) (2026-06-09)
 - Provides the ctx.ui.setWidget() function.
 - Allows mounting persistent widgets around the central coding editor.

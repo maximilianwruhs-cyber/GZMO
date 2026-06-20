@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[obolus-micro01|obolus-micro01]] (2026-06-09)
+## From [obolus-micro01](/entities/obolus-micro01.md) (2026-06-09)
 - A curated research corpus consolidated from Google Takeout.
 - An evolutionary agent ecosystem.
 - A darwinian network where continuous selection pressure forces the evolution of superior models.

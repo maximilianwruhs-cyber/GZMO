@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-enhancing-local-ai-hypervisor-architecture|drive-research-enhancing-local-ai-hypervisor-architecture]] (2026-06-08)
+## From [drive-research-enhancing-local-ai-hypervisor-architecture](/entities/drive-research-enhancing-local-ai-hypervisor-architecture.md) (2026-06-08)
 - Isolates the physical graphics processor to a single virtualized guest.
 - Requires full physical PCIe passthrough via host-level bindings.
 - If bound to virtual machines via VFIO drivers, the host's native kernel would blacklist NVIDIA modules.

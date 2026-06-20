@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[cybernetics-and-mythos-the-architecture-of-intell-part1|cybernetics-and-mythos-the-architecture-of-intell-part1]] (2026-06-08)
+## From [cybernetics-and-mythos-the-architecture-of-intell-part1](/entities/cybernetics-and-mythos-the-architecture-of-intell-part1.md) (2026-06-08)
 - Associated with the Viable System Model (VSM).
 - His model maps the teleological evolution and symbiotic co-adaptation of organizational entities.
 - A cybernetician.
 
-## From [[drive-research-cybernetics-information-loops-between-entities-micro03|drive-research-cybernetics-information-loops-between-entities-micro03]] (2026-06-09)
+## From [drive-research-cybernetics-information-loops-between-entities-micro03](/entities/drive-research-cybernetics-information-loops-between-entities-micro03.md) (2026-06-09)
 - Expanded upon the cybernetic steady-state model with the Viable System Model.

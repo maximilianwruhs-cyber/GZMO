@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[obolus-micro05|obolus-micro05]] (2026-06-09)
+## From [obolus-micro05](/entities/obolus-micro05.md) (2026-06-09)
 - Equation: μ_next = μ_base ⋅ e^(1 - F̄).
 - F̄: Average fitness of the current population.
 - Forge increases Mutation (Chaos) if the Grid is stagnant.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[openclaw-part1-micro06|openclaw-part1-micro06]] (2026-06-09)
+## From [openclaw-part1-micro06](/entities/openclaw-part1-micro06.md) (2026-06-09)
 - Algorithm used in the Deep Phase of the Dreaming-Engine.
 - Balances relevance against redundancy to ensure diversity in stored concepts.
 - Formula: λ × Relevance - (1-λ) × Maximum_Similarity_to_Selected.

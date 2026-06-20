@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[openclaw-deep-research-part11-micro06|openclaw-deep-research-part11-micro06]] (2026-06-09)
+## From [openclaw-deep-research-part11-micro06](/entities/openclaw-deep-research-part11-micro06.md) (2026-06-09)
 - Grant the agent permanent operating authority for defined programs.
 - Live in workspace files (typically AGENTS.md) and are injected into every session.
 - Can be combined with cron for time-based enforcement.

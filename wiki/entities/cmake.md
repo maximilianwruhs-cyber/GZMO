@@ -14,9 +14,9 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-llamacpp-optimization-blueprint-micro02|drive-research-llamacpp-optimization-blueprint-micro02]] (2026-06-09)
+## From [drive-research-llamacpp-optimization-blueprint-micro02](/entities/drive-research-llamacpp-optimization-blueprint-micro02.md) (2026-06-09)
 - Orchestrates the build process for llama.cpp.
 - Exposes multiple flags that directly manipulate how the underlying ggml backend maps mathematical operations to the hardware layer.
 
-## From [[optimizing-nvidia-blackwell-sm120-part1-micro01|optimizing-nvidia-blackwell-sm120-part1-micro01]] (2026-06-10)
+## From [optimizing-nvidia-blackwell-sm120-part1-micro01](/entities/optimizing-nvidia-blackwell-sm120-part1-micro01.md) (2026-06-10)
 - A build system used to orchestrate the llama.cpp compilation process.

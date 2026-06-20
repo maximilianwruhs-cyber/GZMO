@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[obolus-micro04|obolus-micro04]] (2026-06-09)
+## From [obolus-micro04](/entities/obolus-micro04.md) (2026-06-09)
 - proposed evolutionary AI agent ecosystem
 - agents compete for resources based on their energy efficiency and performance quality
 - relies on mutating and evaluating agents based on their energy efficiency and performance quality

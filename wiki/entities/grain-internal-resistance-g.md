@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-cache-optimization-with-ai-chaos-theory|drive-research-cache-optimization-with-ai-chaos-theory]] (2026-06-08)
+## From [drive-research-cache-optimization-with-ai-chaos-theory](/entities/drive-research-cache-optimization-with-ai-chaos-theory.md) (2026-06-08)
 - A measure of physical friction.
 - Includes unoptimized voltage offsets, Core Complex Die (CCD) cross-talk, memory-mapped page cache swap thrashing, and high input/output (I/O) wait times.

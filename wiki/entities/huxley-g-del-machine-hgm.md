@@ -16,7 +16,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[ai-research-part3-micro03|ai-research-part3-micro03]] (2026-06-09)
+## From [ai-research-part3-micro03](/entities/ai-research-part3-micro03.md) (2026-06-09)
 - demonstrates significant gains and strong absolute performance
 - discovered an optimized agent that solves 61.4% tasks
 - positions it among the top-10 agents over all checked submissions
@@ -31,7 +31,7 @@ Type: SYSTEM
 - uses CMP to guide expansion through Thompson sampling with adaptive scheduling
 - consistently produces higher quality agents than prior self-improving frameworks while also reducing wall-clock time
 
-## From [[ai-research-part3-micro05|ai-research-part3-micro05]] (2026-06-09)
+## From [ai-research-part3-micro05](/entities/ai-research-part3-micro05.md) (2026-06-09)
 - Algorithm 1 presents its procedure.
 - Initializes by expanding the initial agent 5 times with each of the processes in parallel.
 - Asynchronization can introduce bias favoring agents with fewer evaluated results.
@@ -44,11 +44,11 @@ Type: SYSTEM
 - Can be simulated with a CMPπ oracle.
 - Is defined by a prover that produces a proof whether accepting or selecting a given node (or rejecting).
 
-## From [[ai-research-part8-micro03|ai-research-part8-micro03]] (2026-06-09)
+## From [ai-research-part8-micro03](/entities/ai-research-part8-micro03.md) (2026-06-09)
 - Addresses bottlenecks in autonomous self-improvement by analyzing expansion strategies.
 - Identifies a flaw in favoring agents with the highest immediate scores.
 
-## From [[ai-research-part8-micro07|ai-research-part8-micro07]] (2026-06-09)
+## From [ai-research-part8-micro07](/entities/ai-research-part8-micro07.md) (2026-06-09)
 - It replaces immediate benchmark scoring with Clade-Level Metaproductivity (CMP).
 - It prioritizes agents whose code structures lead to superior descendants.
 - It is associated with clade-based estimation.

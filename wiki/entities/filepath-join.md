@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-safe-unzip-practices-for-threat-model-micro02|drive-research-safe-unzip-practices-for-threat-model-micro02]] (2026-06-09)
+## From [drive-research-safe-unzip-practices-for-threat-model-micro02](/entities/drive-research-safe-unzip-practices-for-threat-model-micro02.md) (2026-06-09)
 - Used by Go developers to execute canonical path validation.

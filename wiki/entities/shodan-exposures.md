@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PLATFORM
 
-## From [[ai-research-part6-micro05|ai-research-part6-micro05]] (2026-06-09)
+## From [ai-research-part6-micro05](/entities/ai-research-part6-micro05.md) (2026-06-09)
 - Platform that exposed agent vulnerabilities in January 2026.
 - Showcased risks of prompt injections leading to sensitive data exfiltration.
 - Occurred in January 2026.

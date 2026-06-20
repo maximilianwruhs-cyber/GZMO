@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-architecture-of-engagement-an-analysis-of-gam-micro03|the-architecture-of-engagement-an-analysis-of-gam-micro03]] (2026-06-09)
+## From [the-architecture-of-engagement-an-analysis-of-gam-micro03](/entities/the-architecture-of-engagement-an-analysis-of-gam-micro03.md) (2026-06-09)
 - Meticulously calibrated to tap into the brain's ancient neurobiological pathways.
 - Leverage variable-ratio reinforcement schedules, artificial scarcity, and social proof.
 - Can convert casual usage into habitual, and sometimes problematic, behavioral loops.

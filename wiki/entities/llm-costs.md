@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-agentic-token-economy-blueprint-micro03|drive-research-agentic-token-economy-blueprint-micro03]] (2026-06-09)
+## From [drive-research-agentic-token-economy-blueprint-micro03](/entities/drive-research-agentic-token-economy-blueprint-micro03.md) (2026-06-09)
 - Related to managing token costs and latency trade-offs for AI agents
 - Minimized by Zero-Waste Agentic RAG

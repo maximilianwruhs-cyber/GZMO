@@ -16,7 +16,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-blackwell-sm120-gemm-optimization-guide|drive-research-blackwell-sm120-gemm-optimization-guide]] (2026-06-08)
+## From [drive-research-blackwell-sm120-gemm-optimization-guide](/entities/drive-research-blackwell-sm120-gemm-optimization-guide.md) (2026-06-08)
 - Hardware on Blackwell.
 - Relies on PTX prefetch.tensormap instruction.
 - Descriptor addresses must be strictly aligned to 64-byte boundaries.
@@ -24,7 +24,7 @@ Type: SYSTEM
 - TMA descriptor alignment fix
 - TMA descriptor misalignment
 
-## From [[drive-research-imagine-creating-sm120-according-to-our-progress|drive-research-imagine-creating-sm120-according-to-our-progress]] (2026-06-08)
+## From [drive-research-imagine-creating-sm120-according-to-our-progress](/entities/drive-research-imagine-creating-sm120-according-to-our-progress.md) (2026-06-08)
 - Tensor Memory Accelerator (TMA) Warp-Specialized (WS) tactics fail hardware compatibility checks at runtime.
 - The fastest TMA Warp-Specialized grouped GEMM tactics to execute safely.
 - TMA and Warp-Specialized instructions enforce strict alignment boundaries on physical memory addresses.
@@ -32,7 +32,7 @@ Type: SYSTEM
 - TMA Load Descriptors patch.
 - TMA Warp-Specialized grouped GEMM tactics.
 
-## From [[drive-research-optimizing-cuda-performance-with-fp4-fp6-micro01|drive-research-optimizing-cuda-performance-with-fp4-fp6-micro01]] (2026-06-09)
+## From [drive-research-optimizing-cuda-performance-with-fp4-fp6-micro01](/entities/drive-research-optimizing-cuda-performance-with-fp4-fp6-micro01.md) (2026-06-09)
 - A hardware feature for zero-overhead global-to-shared memory transfers.
 - Requires strict, low-level alignment boundaries on physical memory addresses.
 - The PTX instruction prefetch.tensormap requires TMA descriptors to be strictly aligned to 64-byte boundaries.
@@ -41,7 +41,7 @@ Type: SYSTEM
 - Used for zero-overhead global-to-shared memory transfers.
 - Requires strict alignment boundaries.
 
-## From [[optimizing-nvidia-blackwell-sm120-part1-micro04|optimizing-nvidia-blackwell-sm120-part1-micro04]] (2026-06-09)
+## From [optimizing-nvidia-blackwell-sm120-part1-micro04](/entities/optimizing-nvidia-blackwell-sm120-part1-micro04.md) (2026-06-09)
 - Warp-Specialized (WS) tactics require >= 228KB shared memory.
 - TMA WS tactics fail hardware compatibility checks on SM120.
 - Native FP4 pathways rely on broken hardware-level TMA.

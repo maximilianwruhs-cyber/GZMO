@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[tui-framework|tui-framework]] (2026-06-08)
+## From [tui-framework](/entities/tui-framework.md) (2026-06-08)
 - Part of VSCodium's architecture.
 - Can run node-pty for spawning OS processes.
 - Used in VSCodium Extension development.

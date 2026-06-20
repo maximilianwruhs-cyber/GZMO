@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[drive-research-bun-typescript-performance-tips-micro04|drive-research-bun-typescript-performance-tips-micro04]] (2026-06-09)
+## From [drive-research-bun-typescript-performance-tips-micro04](/entities/drive-research-bun-typescript-performance-tips-micro04.md) (2026-06-09)
 - Hosts articles comparing Node.js, Deno, and Bun.
 - Hosts an introduction to Bun for Node.js users.

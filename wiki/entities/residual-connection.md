@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part7|ai-research-part7]] (2026-06-08)
+## From [ai-research-part7](/entities/ai-research-part7.md) (2026-06-08)
 - A paradigm established over the past decade in deep neural networks.
 - Maintains stability and efficiency during large-scale training due to its identity mapping property.
 - Its original form has been maintained despite the evolution of the residual function F.

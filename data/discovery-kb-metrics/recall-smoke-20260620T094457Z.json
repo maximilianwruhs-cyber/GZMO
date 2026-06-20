@@ -1,0 +1,56 @@
+{
+  "generated_at": "2026-06-20T09:44:57Z",
+  "total_queries": 8,
+  "passed": 8,
+  "pass_rate": 1.0,
+  "results": [
+    {
+      "link_id": "R02",
+      "recall_query": "agentic resource discovery obolus",
+      "hit": true,
+      "preview": "Platform recall for 'agentic resource discovery obolus':\n\n## Honeypot / Vault\n\n- [1] (Score: 0.05) [PROJECT:obolus] Native resource (token) of the system.\n- [2] (Score: 0.05) [PROJECT:obolus] Agents m"
+    },
+    {
+      "link_id": "R03",
+      "recall_query": "mcp least privilege tool discovery",
+      "hit": true,
+      "preview": "Platform recall for 'mcp least privilege tool discovery':\n\n## Honeypot / Vault\n\n- [1] (Score: 1.00) [SYSTEM:Pi] Supports custom extensions for intercepting tool discovery.\n- [2] (Score: 1.00) [TOOL:gz"
+    },
+    {
+      "link_id": "R04",
+      "recall_query": "agent reach sovereign compliance blocked",
+      "hit": true,
+      "preview": "Platform recall for 'agent reach sovereign compliance blocked':\n\n## Honeypot / Vault\n\n- [1] (Score: 0.66) [PERSON:Senior Systems Engineer und Compliance Auditor] An expert role an agent can be placed "
+    },
+    {
+      "link_id": "R05",
+      "recall_query": "okf progressive disclosure honeypot",
+      "hit": true,
+      "preview": "Platform recall for 'okf progressive disclosure honeypot':\n\n## Honeypot / Vault\n\n- [1] (Score: 0.97) [CONCEPT:Progressive Disclosure] Operates across three distinct phases: Discovery, Activation, and "
+    },
+    {
+      "link_id": "R04",
+      "recall_query": "agent reach tier 2 network exception sovereign",
+      "hit": true,
+      "preview": "Platform recall for 'agent reach tier 2 network exception sovereign':\n\n## Honeypot / Vault\n\n- [1] (Score: 0.06) [SYSTEMS:sovereign-moe] Part of the 'heavy tier' of services\n- [2] (Score: 0.05) [SYSTEM"
+    },
+    {
+      "link_id": "R06",
+      "recall_query": "arxiv preprint ecosystem ingestengine",
+      "hit": true,
+      "preview": "Platform recall for 'arxiv preprint ecosystem ingestengine':\n\n## Honeypot / Vault\n\n- [1] (Score: 0.97) [SYSTEM:IngestEngine] Configured with max_tokens: 24576\n- [2] (Score: 0.95) [SYSTEM:IngestEngine]"
+    },
+    {
+      "link_id": "R07",
+      "recall_query": "network exception tier skill arxiv",
+      "hit": true,
+      "preview": "Platform recall for 'network exception tier skill arxiv':\n\n## Honeypot / Vault\n\n- [1] (Score: 0.10) [PROJECT:arc-trust-verifier] Verifies skill provenance and builds trust scores for ClawHub skills.\n-"
+    },
+    {
+      "link_id": "R08",
+      "recall_query": "oai pmh librarian agent retrieval",
+      "hit": true,
+      "preview": "Platform recall for 'oai pmh librarian agent retrieval':\n\n## Honeypot / Vault\n\n- [1] (Score: 0.08) [SYSTEM:Librarian Agent] Transforms information search from a reactive retrieval process into an acti"
+    }
+  ]
+}

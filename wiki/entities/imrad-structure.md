@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-architecture-of-scientific-inquiry-and-academi|the-architecture-of-scientific-inquiry-and-academi]] (2026-06-08)
+## From [the-architecture-of-scientific-inquiry-and-academi](/entities/the-architecture-of-scientific-inquiry-and-academi.md) (2026-06-08)
 - Components include Introduction, Methods, Results, and Discussion.
 - Introduction answers 'Why was the study undertaken?'.
 - Methods answers 'Who, when, where, and how was the study executed?'.
@@ -30,7 +30,7 @@ Type: CONCEPT
 - A logical, reader-friendly architecture.
 - Ensures transparency, reproducibility, and ease of evaluation.
 
-## From [[drive-research-scientific-writing-and-publication-process-micro04|drive-research-scientific-writing-and-publication-process-micro04]] (2026-06-09)
+## From [drive-research-scientific-writing-and-publication-process-micro04](/entities/drive-research-scientific-writing-and-publication-process-micro04.md) (2026-06-09)
 - a structure for scientific articles
 - a fifty-year survey exists
 - can be simplified

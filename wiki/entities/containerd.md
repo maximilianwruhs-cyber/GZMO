@@ -14,8 +14,8 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[architecting-the-minimalist-linux-desktop-a-compa-part1|architecting-the-minimalist-linux-desktop-a-compa-part1]] (2026-06-08)
+## From [architecting-the-minimalist-linux-desktop-a-compa-part1](/entities/architecting-the-minimalist-linux-desktop-a-compa-part1.md) (2026-06-08)
 - A container runtime that heavily utilizes OverlayFS's stacked lower layers via the overlay2 storage driver.
 
-## From [[resilient-rust-based-mcp-client-and-llm-orchestrat-micro02|resilient-rust-based-mcp-client-and-llm-orchestrat-micro02]] (2026-06-10)
+## From [resilient-rust-based-mcp-client-and-llm-orchestrat-micro02](/entities/resilient-rust-based-mcp-client-and-llm-orchestrat-micro02.md) (2026-06-10)
 - Service that receives resource allocation and execution delegation from the Docker Daemon.

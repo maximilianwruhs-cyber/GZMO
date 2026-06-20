@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-agentic-token-economy-blueprint-micro02|drive-research-agentic-token-economy-blueprint-micro02]] (2026-06-09)
+## From [drive-research-agentic-token-economy-blueprint-micro02](/entities/drive-research-agentic-token-economy-blueprint-micro02.md) (2026-06-09)
 - Stands for Budget-Efficient Thinking framework.
 - Models reasoning as a computational investment under uncertainty.
 - Posits that budget should follow the expected return of reasoning, mapping to 'solvability'.

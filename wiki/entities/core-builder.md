@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[drive-research-du-hast-gesagt-part1|drive-research-du-hast-gesagt-part1]] (2026-06-08)
+## From [drive-research-du-hast-gesagt-part1](/entities/drive-research-du-hast-gesagt-part1.md) (2026-06-08)
 - Model: Qwen-2.5-Coder-14B.
 - Reads Blueprint, writes code, commits using git-mcp.
 - Moves Blueprint to 04_QA_Review/.

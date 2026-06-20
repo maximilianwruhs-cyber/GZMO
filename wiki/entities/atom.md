@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-llm-inference-engine-audit-2026-micro01|drive-research-llm-inference-engine-audit-2026-micro01]] (2026-06-10)
+## From [drive-research-llm-inference-engine-audit-2026-micro01](/entities/drive-research-llm-inference-engine-audit-2026-micro01.md) (2026-06-10)
 - Inference engine for AMD Instinct accelerators
 - Features AITER routing

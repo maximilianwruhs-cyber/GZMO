@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[ai-research-part1|ai-research-part1]] (2026-06-08)
+## From [ai-research-part1](/entities/ai-research-part1.md) (2026-06-08)
 - Grants each layer access to all previous outputs.
 - Combines outputs with fixed, input-independent scalar coefficients.
 - Shows no gain over the baseline (1.767) in ablation studies.

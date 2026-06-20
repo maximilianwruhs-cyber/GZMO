@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-ai-wisdom-webs-honeypots-and-forgetting|drive-research-ai-wisdom-webs-honeypots-and-forgetting]] (2026-06-08)
+## From [drive-research-ai-wisdom-webs-honeypots-and-forgetting](/entities/drive-research-ai-wisdom-webs-honeypots-and-forgetting.md) (2026-06-08)
 - Posits that memory is a descending series of interconnected webs.
 - Information is processed, stripped of noise, and actively distilled at connection points.
 - Refined insights fall into progressively smaller, denser webs below.

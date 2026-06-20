@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[aether-grid-micro01|aether-grid-micro01]] (2026-06-09)
+## From [aether-grid-micro01](/entities/aether-grid-micro01.md) (2026-06-09)
 - Hardware component on DGX Spark.
 - Used for initial trust establishment.
 - Can be locked to an old subnet, causing re-handshake failure.

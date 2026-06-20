@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-llamacpp-optimization-blueprint-micro02|drive-research-llamacpp-optimization-blueprint-micro02]] (2026-06-09)
+## From [drive-research-llamacpp-optimization-blueprint-micro02](/entities/drive-research-llamacpp-optimization-blueprint-micro02.md) (2026-06-09)
 - In high-end workstation and enterprise environments, CPUs are frequently arrayed in NUMA topologies.
 - Cross-NUMA latency destroys token generation speed.
 - The --numa parameter accepts specific typing arguments: distribute, isolate, numa.

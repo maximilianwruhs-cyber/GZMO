@@ -14,22 +14,22 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-10).
 
 ## Entities
-- [[bun|Bun]] (TOOL)
-- [[telegram|Telegram]] (TOOL)
-- [[openclaw|OpenClaw]] (PROJECT)
-- [[lancedb|LanceDB]] (TOOL)
-- [[workflow-engine|Workflow Engine]] (SYSTEM)
-- [[isolated-vm|isolated-vm]] (TOOL)
-- [[effect|effect]] (TOOL)
-- [[kahn-s-algorithm|Kahn's Algorithm]] (CONCEPT)
-- [[zod|zod]] (TOOL)
-- [[gemini|Gemini]] (PERSON)
-- [[nuclear-memory|Nuclear Memory]] (SYSTEM)
-- [[typescript|TypeScript]] (TOOL)
-- [[react-loop|ReAct Loop]] (CONCEPT)
-- [[skill-ecosystem|Skill Ecosystem]] (SYSTEM)
-- [[ollama|ollama]] (TOOL)
-- [[nuclearclaw|NuclearClaw]] (PROJECT)
+- [Bun](/entities/bun.md) (TOOL)
+- [Telegram](/entities/telegram.md) (TOOL)
+- [OpenClaw](/entities/openclaw.md) (PROJECT)
+- [LanceDB](/entities/lancedb.md) (TOOL)
+- [Workflow Engine](/entities/workflow-engine.md) (SYSTEM)
+- [isolated-vm](/entities/isolated-vm.md) (TOOL)
+- [effect](/entities/effect.md) (TOOL)
+- [Kahn's Algorithm](/entities/kahn-s-algorithm.md) (CONCEPT)
+- [zod](/entities/zod.md) (TOOL)
+- [Gemini](/entities/gemini.md) (PERSON)
+- [Nuclear Memory](/entities/nuclear-memory.md) (SYSTEM)
+- [TypeScript](/entities/typescript.md) (TOOL)
+- [ReAct Loop](/entities/react-loop.md) (CONCEPT)
+- [Skill Ecosystem](/entities/skill-ecosystem.md) (SYSTEM)
+- [ollama](/entities/ollama.md) (TOOL)
+- [NuclearClaw](/entities/nuclearclaw.md) (PROJECT)
 
 ## Relations
 - NuclearClaw → RELATED_TO → OpenClaw

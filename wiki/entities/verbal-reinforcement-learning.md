@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[reflexion-framework-architectures-for-mitigating|reflexion-framework-architectures-for-mitigating]] (2026-06-08)
+## From [reflexion-framework-architectures-for-mitigating](/entities/reflexion-framework-architectures-for-mitigating.md) (2026-06-08)
 - A novel paradigm operationalized by the Reflexion framework.
 - Instead of updating continuous network weights, it updates an episodic memory buffer with linguistic feedback.
 - Allows the model to self-correct in a few-shot manner.

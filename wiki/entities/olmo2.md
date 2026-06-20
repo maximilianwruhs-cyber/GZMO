@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[ai-research-part8-micro02|ai-research-part8-micro02]] (2026-06-09)
+## From [ai-research-part8-micro02](/entities/ai-research-part8-micro02.md) (2026-06-09)
 - MoDA was used in experiments with this recipe at the 1.5B parameter scale.

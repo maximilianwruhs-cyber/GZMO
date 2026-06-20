@@ -14,6 +14,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[ai-research-part8-micro04|ai-research-part8-micro04]] (2026-06-09)
+## From [ai-research-part8-micro04](/entities/ai-research-part8-micro04.md) (2026-06-09)
 - A type of self-referential agentic framework.
 - Represents a transition from fixed-pipeline tools.

@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[openclaw-deep-research-part5-micro09|openclaw-deep-research-part5-micro09]] (2026-06-09)
+## From [openclaw-deep-research-part5-micro09](/entities/openclaw-deep-research-part5-micro09.md) (2026-06-09)
 - Reports that AI models can now complete apprentice-level cyber tasks 50% of the time.
 - Tested the first model capable of completing expert-level cyber tasks.

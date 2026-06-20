@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-agentic-workflows-fastest-best-models|drive-research-agentic-workflows-fastest-best-models]] (2026-06-08)
+## From [drive-research-agentic-workflows-fastest-best-models](/entities/drive-research-agentic-workflows-fastest-best-models.md) (2026-06-08)
 - Total VRAM during inference is sum of model weights, KV cache, and activation memory.
 - KV cache is the dominant memory consumer as sequence length increases.
 - Exceeding VRAM limits causes massive bandwidth bottlenecks.

@@ -14,14 +14,14 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-08).
 
 ## Entities
-- [[vram-bandwidth-saturation|VRAM Bandwidth Saturation]] (CONCEPT)
-- [[python|Python]] (TOOL)
-- [[energy-efficiency-telemetry-harness|Energy-Efficiency Telemetry Harness]] (CONCEPT)
-- [[llama-bench|llama.bench]] (TOOL)
-- [[llama-cpp|llama.cpp]] (TOOL)
-- [[compiler-instruction-optimization-auditing|Compiler & Instruction Optimization Auditing]] (CONCEPT)
-- [[nvidia-smi|nvidia-smi]] (TOOL)
-- [[kv-cache-memory-cliff|KV-Cache Memory Cliff]] (CONCEPT)
+- [VRAM Bandwidth Saturation](/entities/vram-bandwidth-saturation.md) (CONCEPT)
+- [Python](/entities/python.md) (TOOL)
+- [Energy-Efficiency Telemetry Harness](/entities/energy-efficiency-telemetry-harness.md) (CONCEPT)
+- [llama.bench](/entities/llama-bench.md) (TOOL)
+- [llama.cpp](/entities/llama-cpp.md) (TOOL)
+- [Compiler & Instruction Optimization Auditing](/entities/compiler-instruction-optimization-auditing.md) (CONCEPT)
+- [nvidia-smi](/entities/nvidia-smi.md) (TOOL)
+- [KV-Cache Memory Cliff](/entities/kv-cache-memory-cliff.md) (CONCEPT)
 
 ## Relations
 - llama.bench → USES → VRAM Bandwidth Saturation

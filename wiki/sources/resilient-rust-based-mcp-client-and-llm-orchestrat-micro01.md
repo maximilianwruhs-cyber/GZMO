@@ -14,4 +14,4 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[resilient-rust-based-mcp-client-and-llm-orchestrat|Resilient Rust-Based MCP Client and LLM Orchestrat]] (SYSTEM)
+- [Resilient Rust-Based MCP Client and LLM Orchestrat](/entities/resilient-rust-based-mcp-client-and-llm-orchestrat.md) (SYSTEM)

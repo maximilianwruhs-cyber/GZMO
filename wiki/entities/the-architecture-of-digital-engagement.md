@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-architecture-of-engagement-an-analysis-of-gam-micro03|the-architecture-of-engagement-an-analysis-of-gam-micro03]] (2026-06-09)
+## From [the-architecture-of-engagement-an-analysis-of-gam-micro03](/entities/the-architecture-of-engagement-an-analysis-of-gam-micro03.md) (2026-06-09)
 - Structured around the capture, retention, and monetization of human attention.
 - Evolved from providing basic utility to actively engineering deep engagement.
 - Driven by sophisticated reward systems and exploitation of psychological vulnerabilities like FOMO.

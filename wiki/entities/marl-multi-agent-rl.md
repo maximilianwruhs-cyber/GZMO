@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[obolus-micro03|obolus-micro03]] (2026-06-09)
+## From [obolus-micro03](/entities/obolus-micro03.md) (2026-06-09)
 - Terminated agents' errors are used to generate new agents.
 - Top-performing agents' successes are used to generate new agents.
 - Has a configuration (genome).

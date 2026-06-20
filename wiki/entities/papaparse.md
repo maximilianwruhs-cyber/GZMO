@@ -14,13 +14,13 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-bun-file-parsing-dependency-shortlist-micro01|drive-research-bun-file-parsing-dependency-shortlist-micro01]] (2026-06-09)
+## From [drive-research-bun-file-parsing-dependency-shortlist-micro01](/entities/drive-research-bun-file-parsing-dependency-shortlist-micro01.md) (2026-06-09)
 - offers streaming architectures
 - must be carefully mapped to Bun’s native ReadableStream or AsyncIterable interfaces
 - primary package for CSV parsing
 - Node.js stream API emulation overhead within Bun
 
-## From [[drive-research-bun-file-parsing-dependency-shortlist-micro02|drive-research-bun-file-parsing-dependency-shortlist-micro02]] (2026-06-09)
+## From [drive-research-bun-file-parsing-dependency-shortlist-micro02](/entities/drive-research-bun-file-parsing-dependency-shortlist-micro02.md) (2026-06-09)
 - Definitive choice for CSV extraction under the MIT license.
 - Universally recognized as the fastest, most reliable CSV parser in the JavaScript ecosystem.
 - Strictly compliant with the RFC 4180 specification.

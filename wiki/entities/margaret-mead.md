@@ -15,14 +15,14 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[cybernetics-and-mythos-the-architecture-of-intell-part1|cybernetics-and-mythos-the-architecture-of-intell-part1]] (2026-06-08)
+## From [cybernetics-and-mythos-the-architecture-of-intell-part1](/entities/cybernetics-and-mythos-the-architecture-of-intell-part1.md) (2026-06-08)
 - An anthropologist.
 - Provided key inspirations for the development of second-order cybernetics.
 - Her work contributed to the understanding of reflexivity in systems.
 
-## From [[drive-research-cybernetics-information-loops-between-entities-micro02|drive-research-cybernetics-information-loops-between-entities-micro02]] (2026-06-09)
+## From [drive-research-cybernetics-information-loops-between-entities-micro02](/entities/drive-research-cybernetics-information-loops-between-entities-micro02.md) (2026-06-09)
 - Pioneer of cybernetics.
 - Sought to establish a framework applicable to various systems.
 
-## From [[drive-research-cybernetics-information-loops-between-entities-micro03|drive-research-cybernetics-information-loops-between-entities-micro03]] (2026-06-09)
+## From [drive-research-cybernetics-information-loops-between-entities-micro03](/entities/drive-research-cybernetics-information-loops-between-entities-micro03.md) (2026-06-09)
 - Provided key inspirations for second-order cybernetics.

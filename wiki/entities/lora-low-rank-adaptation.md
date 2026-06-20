@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[openclaw-part1-micro06|openclaw-part1-micro06]] (2026-06-09)
+## From [openclaw-part1-micro06](/entities/openclaw-part1-micro06.md) (2026-06-09)
 - A method for Continual Learning that involves changing parametric weights of a language model.
 - Often leads to catastrophic forgetting.
 - OpenClaw avoids this by storing knowledge in a structured Markdown file.

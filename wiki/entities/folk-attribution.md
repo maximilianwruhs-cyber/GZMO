@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-archival-truth-part2-micro02|the-archival-truth-part2-micro02]] (2026-06-09)
+## From [the-archival-truth-part2-micro02](/entities/the-archival-truth-part2-micro02.md) (2026-06-09)
 - A secondary layer of attribution created by public repositories like BrainyQuote.
 - Frequently propagates inaccurate or insufficiently sourced material.
 - Must be actively dismantled by quotation investigators.

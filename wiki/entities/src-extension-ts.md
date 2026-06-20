@@ -14,12 +14,12 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[obolus-vs-codium-extension-konzept-research-part1-micro06|obolus-vs-codium-extension-konzept-research-part1-micro06]] (2026-06-09)
+## From [obolus-vs-codium-extension-konzept-research-part1-micro06](/entities/obolus-vs-codium-extension-konzept-research-part1-micro06.md) (2026-06-09)
 - The Entry Point for the Extension Host (Node.js).
 - Initializes native elements (Status Bar) and registers the Sidebar Provider.
 - Binds elements to the vscode.ExtensionContext.subscriptions Array.
 
-## From [[obolus-vs-codium-extension-konzept-research-part1-micro07|obolus-vs-codium-extension-konzept-research-part1-micro07]] (2026-06-09)
+## From [obolus-vs-codium-extension-konzept-research-part1-micro07](/entities/obolus-vs-codium-extension-konzept-research-part1-micro07.md) (2026-06-09)
 - Serves as the Extension Host Entry Point.
 - Outsources panel logic to a separate class.
 - Registers the command to open the Benchmark Wizard panel.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-bun-file-parsing-dependency-shortlist-micro01|drive-research-bun-file-parsing-dependency-shortlist-micro01]] (2026-06-09)
+## From [drive-research-bun-file-parsing-dependency-shortlist-micro01](/entities/drive-research-bun-file-parsing-dependency-shortlist-micro01.md) (2026-06-09)
 - modern format is a ZIP archive containing XML files, images, and metadata
 - text extraction requires loading the archive, decompressing, navigating manifests, and parsing document XML
 - source file for the 'Strategic Analysis of Bun-Compatible Text Extraction Dependencies for High-Performance Data Pipelines'

@@ -18,19 +18,19 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-ai-agents-and-spec-driven-development-micro03|drive-research-ai-agents-and-spec-driven-development-micro03]] (2026-06-09)
+## From [drive-research-ai-agents-and-spec-driven-development-micro03](/entities/drive-research-ai-agents-and-spec-driven-development-micro03.md) (2026-06-09)
 - A pathology in autonomous development, often caused by Loop Drift.
 - Leads to massive spikes in cloud computing costs and API quota throttling.
 
-## From [[drive-research-ai-agents-and-spec-driven-development-micro04|drive-research-ai-agents-and-spec-driven-development-micro04]] (2026-06-09)
+## From [drive-research-ai-agents-and-spec-driven-development-micro04](/entities/drive-research-ai-agents-and-spec-driven-development-micro04.md) (2026-06-09)
 - A systemic threat.
 - Caused by Loop Drift.
 - An 'infinite loop' attack of the AI Era.
 
-## From [[drive-research-ai-agents-and-spec-driven-development1-micro02|drive-research-ai-agents-and-spec-driven-development1-micro02]] (2026-06-09)
+## From [drive-research-ai-agents-and-spec-driven-development1-micro02](/entities/drive-research-ai-agents-and-spec-driven-development1-micro02.md) (2026-06-09)
 - A pervasive, economically damaging, and difficult-to-diagnose pathology in autonomous development
 - Caused by Loop Drift
 
-## From [[spec-driven-development-architecting-the-era-of-a-micro04|spec-driven-development-architecting-the-era-of-a-micro04]] (2026-06-09)
+## From [spec-driven-development-architecting-the-era-of-a-micro04](/entities/spec-driven-development-architecting-the-era-of-a-micro04.md) (2026-06-09)
 - A systemic threat.
 - Caused by Loop Drift.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-advanced-local-ai-features-guide|drive-research-advanced-local-ai-features-guide]] (2026-06-08)
+## From [drive-research-advanced-local-ai-features-guide](/entities/drive-research-advanced-local-ai-features-guide.md) (2026-06-08)
 - Use ternary logic (-1, 0, 1).
 - Run incredibly fast on standard Laptop CPUs.
 - Require a fraction of typical RAM.

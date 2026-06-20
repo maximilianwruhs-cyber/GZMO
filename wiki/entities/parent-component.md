@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[dynamics-of-the-unpredictable-micro07|dynamics-of-the-unpredictable-micro07]] (2026-06-09)
+## From [dynamics-of-the-unpredictable-micro07](/entities/dynamics-of-the-unpredictable-micro07.md) (2026-06-09)
 - Entities possessing this component are queried by the transform_propagation_system.
 - Contains parent's global transformation matrix.

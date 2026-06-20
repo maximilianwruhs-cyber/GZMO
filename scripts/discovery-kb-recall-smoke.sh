@@ -53,7 +53,7 @@ while IFS= read -r line; do
     --argjson hit "$hit" \
     --arg preview "${search_out:0:200}" \
     '$arr + [{link_id: $link_id, recall_query: $query, hit: ($hit == 1), preview: $preview}]')"
-done < <(tail -n "$LIMIT" "$LINK_REGISTRY")
+done < <(jq -c 'select(.superseded != true)' "$LINK_REGISTRY" | tail -n "$LIMIT")
 
 pass_rate=0
 if [[ "$total" -gt 0 ]]; then

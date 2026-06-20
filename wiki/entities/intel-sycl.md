@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-research-process-steps-micro02|drive-research-research-process-steps-micro02]] (2026-06-10)
+## From [drive-research-research-process-steps-micro02](/entities/drive-research-research-process-steps-micro02.md) (2026-06-10)
 - Optimization backend for Intel Arc, Data Center Flex/Max GPUs, and Xeon processors.
 - Uses Intel OneAPI and Level-Zero driver runtimes.
 
-## From [[optimizing-nvidia-blackwell-sm120-part3-micro01|optimizing-nvidia-blackwell-sm120-part3-micro01]] (2026-06-10)
+## From [optimizing-nvidia-blackwell-sm120-part3-micro01](/entities/optimizing-nvidia-blackwell-sm120-part3-micro01.md) (2026-06-10)
 - Optimization backend for Intel Arc and Data Center GPUs.
 - Uses Intel OneAPI and Level-Zero driver runtimes.

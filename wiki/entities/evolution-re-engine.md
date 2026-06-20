@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[obolus-micro03|obolus-micro03]] (2026-06-09)
+## From [obolus-micro03](/entities/obolus-micro03.md) (2026-06-09)
 - Triggers a meta-agent when an agent terminates.
 - Analyzes failed interactions of terminated agents.
 - Calls an LLM to generate a new configuration.

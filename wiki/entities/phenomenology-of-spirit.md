@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[cybernetics-and-mythos-the-architecture-of-intell-part2|cybernetics-and-mythos-the-architecture-of-intell-part2]] (2026-06-08)
+## From [cybernetics-and-mythos-the-architecture-of-intell-part2](/entities/cybernetics-and-mythos-the-architecture-of-intell-part2.md) (2026-06-08)
 - Published by Hegel in 1807 in Bamberg and Würzburg.
 - Intended as a 'biography of Spirit', tracing consciousness from sensory immediacy to 'absolute knowing'.
 - Contains the influential Master-Slave dialectic.

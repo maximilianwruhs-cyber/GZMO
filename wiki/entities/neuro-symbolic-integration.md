@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-neuro-symbolic-prompt-engineering-research|drive-research-neuro-symbolic-prompt-engineering-research]] (2026-06-08)
+## From [drive-research-neuro-symbolic-prompt-engineering-research](/entities/drive-research-neuro-symbolic-prompt-engineering-research.md) (2026-06-08)
 - Represents a promising pathway toward mitigating the brittleness of purely neural reasoners.
 - Involves an LLM functioning as a high-dimensional semantic parser.
 - Symbolic solvers or theorem provers process formal symbolic representations.

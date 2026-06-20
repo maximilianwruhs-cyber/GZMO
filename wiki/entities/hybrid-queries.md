@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-token-efficient-bol-processing-architecture|drive-research-token-efficient-bol-processing-architecture]] (2026-06-08)
+## From [drive-research-token-efficient-bol-processing-architecture](/entities/drive-research-token-efficient-bol-processing-architecture.md) (2026-06-08)
 - Enabled by OpenSearch indexing both metadata text and embeddings.
 - Execute a simultaneous keyword and vector search over the index.
 - Used with Reciprocal Rank Fusion (RRF) to combine and re-rank results.

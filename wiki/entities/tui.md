@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-rust-tui-architecture-tech-stack1-micro06|drive-research-rust-tui-architecture-tech-stack1-micro06]] (2026-06-09)
+## From [drive-research-rust-tui-architecture-tech-stack1-micro06](/entities/drive-research-rust-tui-architecture-tech-stack1-micro06.md) (2026-06-09)
 - Terminal User Interface.
 - The focus of the document.
 - Modern TUIs are evolving with Rust.

@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-subword-tokenization-mitigates-llm-sparsity-micro03|drive-research-subword-tokenization-mitigates-llm-sparsity-micro03]] (2026-06-09)
+## From [drive-research-subword-tokenization-mitigates-llm-sparsity-micro03](/entities/drive-research-subword-tokenization-mitigates-llm-sparsity-micro03.md) (2026-06-09)
 - universal nature demonstrated by subword tokenization application to scientific modalities
 - Zipf's law is a type of power-law distribution

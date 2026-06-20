@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PLATFORM
 
-## From [[openclaw-part2|openclaw-part2]] (2026-06-08)
+## From [openclaw-part2](/entities/openclaw-part2.md) (2026-06-08)
 - A fully managed cloud-native platform.
 - Abstracts away all infrastructure management.
 - Offers a massive community library of agents that operate entirely within a vendor's walled garden.

@@ -14,8 +14,8 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[the-cascading-honeypot-theorem-of-wisdom|the-cascading-honeypot-theorem-of-wisdom]] (2026-06-08)
+## From [the-cascading-honeypot-theorem-of-wisdom](/entities/the-cascading-honeypot-theorem-of-wisdom.md) (2026-06-08)
 - Originated the concept of purposeful forgetting as unconscious suppression of painful events.
 
-## From [[drive-research-ai-wisdom-webs-honeypots-and-forgetting|drive-research-ai-wisdom-webs-honeypots-and-forgetting]] (2026-06-08)
+## From [drive-research-ai-wisdom-webs-honeypots-and-forgetting](/entities/drive-research-ai-wisdom-webs-honeypots-and-forgetting.md) (2026-06-08)
 - Originated the concept of purposeful forgetting as unconscious suppression.

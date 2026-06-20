@@ -14,6 +14,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[architectures-and-optimizations-for-speculative-de-micro06|architectures-and-optimizations-for-speculative-de-micro06]] (2026-06-09)
+## From [architectures-and-optimizations-for-speculative-de-micro06](/entities/architectures-and-optimizations-for-speculative-de-micro06.md) (2026-06-09)
 - Loading specific expert weights from system RAM to here introduces latency.
 - Required experts are already resident in it by the time target verification executes.

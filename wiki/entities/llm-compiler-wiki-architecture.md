@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[gzmo-daemon-validation-audit-and-bun-migration-rep|gzmo-daemon-validation-audit-and-bun-migration-rep]] (2026-06-08)
+## From [gzmo-daemon-validation-audit-and-bun-migration-rep](/entities/gzmo-daemon-validation-audit-and-bun-migration-rep.md) (2026-06-08)
 - Blueprint described in 'Cascading Honeypot'.
 - Includes 4-Pass Compilation, Linting, and Purposeful Forgetting.
-- Uses Plain-Text Markdown Wiki with [[wikilinks]].
+- Uses Plain-Text Markdown Wiki with CommonMark internal links (`/entities/...`).

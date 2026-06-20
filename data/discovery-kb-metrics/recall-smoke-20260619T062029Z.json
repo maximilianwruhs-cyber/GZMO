@@ -1,0 +1,38 @@
+{
+  "generated_at": "2026-06-19T06:20:29Z",
+  "total_queries": 5,
+  "passed": 5,
+  "pass_rate": 1.0,
+  "results": [
+    {
+      "link_id": "L1",
+      "recall_query": "<crystallized thoughts>",
+      "hit": true,
+      "preview": "Platform recall for '<crystallized thoughts>':\n\n## Honeypot / Vault\n\n- [1] (Score: 0.99) [BOOK:index.ts] Involved in Thought Crystallization.\n- [2] (Score: 0.99) [TOOL:Redis] Handles high-frequency ta"
+    },
+    {
+      "link_id": "L11",
+      "recall_query": "<session lifecycle>",
+      "hit": true,
+      "preview": "Platform recall for '<session lifecycle>':\n\n## Honeypot / Vault\n\n- [1] (Score: 0.09) [TOOL:ExtensionAPI interface] Exposes lifecycle hooks like session_start and session_shutdown.\n- [2] (Score: 0.06) "
+    },
+    {
+      "link_id": "L12",
+      "recall_query": "<immediate_distillation>",
+      "hit": true,
+      "preview": "Platform recall for '<immediate_distillation>':\n\n## Honeypot / Vault\n\n- [1] (Score: 0.45) [SYSTEM:Qwen3.5-9B] Used as an Expert in the 'Distillation (Wissensdestillation)' pattern.\n- [2] (Score: 0.30)"
+    },
+    {
+      "link_id": "L13",
+      "recall_query": "<slow_semantic_drift>",
+      "hit": true,
+      "preview": "Platform recall for '<slow_semantic_drift>':\n\n## Honeypot / Vault\n\n- [1] (Score: 0.99) [CONCEPT:Semantic Noise] Arises from mismatches in semantic capacities, cultural contexts, statistical expectatio"
+    },
+    {
+      "link_id": "L14",
+      "recall_query": "<contextual_drift>",
+      "hit": true,
+      "preview": "Platform recall for '<contextual_drift>':\n\n## Honeypot / Vault\n\n- [1] (Score: 1.00) [CONCEPT:Semantic Noise] Arises from mismatches in semantic capacities, cultural contexts, statistical expectations,"
+    }
+  ]
+}

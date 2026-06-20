@@ -14,9 +14,9 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[the-architecture-of-a-trading-card-game-micro03|the-architecture-of-a-trading-card-game-micro03]] (2026-06-10)
+## From [the-architecture-of-a-trading-card-game-micro03](/entities/the-architecture-of-a-trading-card-game-micro03.md) (2026-06-10)
 - A highly integrated unit comprising editors, designers, and the Rules Manager
 - Prevents systemic failure in the game's linguistic architecture
 
-## From [[the-architecture-of-a-trading-card-game-micro04|the-architecture-of-a-trading-card-game-micro04]] (2026-06-10)
+## From [the-architecture-of-a-trading-card-game-micro04](/entities/the-architecture-of-a-trading-card-game-micro04.md) (2026-06-10)
 - A regulatory body within the game's ecosystem.

@@ -14,4 +14,4 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[openclaw-personal-ai-assistant|OpenClaw — Personal AI Assistant]] (SYSTEM)
+- [OpenClaw — Personal AI Assistant](/entities/openclaw-personal-ai-assistant.md) (SYSTEM)

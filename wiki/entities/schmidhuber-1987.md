@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[ai-research-part3-micro03|ai-research-part3-micro03]] (2026-06-09)
+## From [ai-research-part3-micro03](/entities/ai-research-part3-micro03.md) (2026-06-09)
 - introduced self-referential learning mechanisms
 - Gödel machines: self-referential universal problem solvers making provably opti-mal self-improvements
 - Evolutionary principles in self-referential learning, or on learning how to learn: The meta-meta-. hook

@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[obolus-vs-codium-extension-konzept-research-part1-micro03|obolus-vs-codium-extension-konzept-research-part1-micro03]] (2026-06-10)
+## From [obolus-vs-codium-extension-konzept-research-part1-micro03](/entities/obolus-vs-codium-extension-konzept-research-part1-micro03.md) (2026-06-10)
 - Integrated into Visual Studio Code.
 - Provides 'Intelligence per Watt' benchmarks in real-time.

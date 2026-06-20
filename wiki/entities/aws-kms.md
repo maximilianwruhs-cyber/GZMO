@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[openclaw-deep-research-part8-micro04|openclaw-deep-research-part8-micro04]] (2026-06-09)
+## From [openclaw-deep-research-part8-micro04](/entities/openclaw-deep-research-part8-micro04.md) (2026-06-09)
 - A centralized key management service.
 - Used for encryption and key management.

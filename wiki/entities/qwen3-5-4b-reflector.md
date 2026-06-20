@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[architectures-and-optimizations-for-speculative-de-micro02|architectures-and-optimizations-for-speculative-de-micro02]] (2026-06-09)
+## From [architectures-and-optimizations-for-speculative-de-micro02](/entities/architectures-and-optimizations-for-speculative-de-micro02.md) (2026-06-09)
 - Used as a Reflector in the 'Deliberation (Tool-Integration)' pattern.
 - Used in the 'Sequentially (Scaled)' collaboration pattern.
 - Used as a Toolcaller in the 'Deliberation (Tool-Integration)' pattern.

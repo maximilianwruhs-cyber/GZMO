@@ -14,12 +14,12 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-llamabench|drive-research-llamabench]] (2026-06-08)
+## From [drive-research-llamabench](/entities/drive-research-llamabench.md) (2026-06-08)
 - Also called the prefill phase
 - Measures how fast hardware computes the initial KV cache
 - Heavily bound by compute performance (FLOPs) and matrix multiplication efficiency
 
-## From [[drive-research-llama-bench-performance-benchmarking-tool-micro01|drive-research-llama-bench-performance-benchmarking-tool-micro01]] (2026-06-09)
+## From [drive-research-llama-bench-performance-benchmarking-tool-micro01](/entities/drive-research-llama-bench-performance-benchmarking-tool-micro01.md) (2026-06-09)
 - Often referred to as the prefill phase.
 - Processes the initial input sequence to compute the starting Key-Value (KV) cache.
 - Dominated by dense General Matrix-Matrix Multiplications (GEMM).

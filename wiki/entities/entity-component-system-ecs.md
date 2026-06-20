@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[dynamics-of-the-unpredictable-micro06|dynamics-of-the-unpredictable-micro06]] (2026-06-09)
+## From [dynamics-of-the-unpredictable-micro06](/entities/dynamics-of-the-unpredictable-micro06.md) (2026-06-09)
 - A software architectural pattern that makes use of data-oriented design.
 - Relies on contiguous arrays for performance.
 - Contradicts the contiguous array philosophy when traditional scene graphs are used.

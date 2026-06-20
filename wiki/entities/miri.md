@@ -14,11 +14,11 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-cache-optimization-blueprint|drive-research-cache-optimization-blueprint]] (2026-06-08)
+## From [drive-research-cache-optimization-blueprint](/entities/drive-research-cache-optimization-blueprint.md) (2026-06-08)
 - Rust's experimental interpreter.
 - Tracks every allocation step.
 - Flags failures if Drop layout varies from alloc layout.
 
-## From [[drive-research-cache-optimization-with-ai-chaos-theory|drive-research-cache-optimization-with-ai-chaos-theory]] (2026-06-08)
+## From [drive-research-cache-optimization-with-ai-chaos-theory](/entities/drive-research-cache-optimization-with-ai-chaos-theory.md) (2026-06-08)
 - Rust memory interpreter.
 - Detects layout mismatches leading to heap corruption.

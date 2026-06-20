@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[cybernetics-and-mythos-the-architecture-of-intell-part2|cybernetics-and-mythos-the-architecture-of-intell-part2]] (2026-06-08)
+## From [cybernetics-and-mythos-the-architecture-of-intell-part2](/entities/cybernetics-and-mythos-the-architecture-of-intell-part2.md) (2026-06-08)
 - A prominent figure from the Frankfurt School of Critical Theory.
 - Authored the 1966 magnum opus, Negative Dialectics.
 - Turned the dialectical method against its own totalizing tendencies.
@@ -22,7 +22,7 @@ Type: PERSON
 - Adorno vehemently rejected the Hegelian drive toward a positive synthesis.
 - Adorno's primary target was "identity thinking".
 
-## From [[drive-research-dialectics-socratic-vs-hegelian-methods|drive-research-dialectics-socratic-vs-hegelian-methods]] (2026-06-08)
+## From [drive-research-dialectics-socratic-vs-hegelian-methods](/entities/drive-research-dialectics-socratic-vs-hegelian-methods.md) (2026-06-08)
 - A key figure in the Frankfurt School of Critical Theory.
 - Authored 'Negative Dialectics'.
 - Turned the dialectical method against its own totalizing tendencies.

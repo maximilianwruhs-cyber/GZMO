@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part7|ai-research-part7]] (2026-06-08)
+## From [ai-research-part7](/entities/ai-research-part7.md) (2026-06-08)
 - A schedule where communication is carefully overlapped to mitigate memory footprint.
 - Mentioned in the context of efficient infrastructure design for mHC.
 - It is a schedule adopted in large-scale training for mitigating parameter and gradient memory footprints.

@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[the-archival-truth-part1-micro05|the-archival-truth-part1-micro05]] (2026-06-09)
+## From [the-archival-truth-part1-micro05](/entities/the-archival-truth-part1-micro05.md) (2026-06-09)
 - Originated Superiority Theory around 355 BC.
 - Touched upon relief as a form of catharsis.

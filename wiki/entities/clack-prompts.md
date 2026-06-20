@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[openclaw-deep-research-part10-micro08|openclaw-deep-research-part10-micro08]] (2026-06-10)
+## From [openclaw-deep-research-part10-micro08](/entities/openclaw-deep-research-part10-micro08.md) (2026-06-10)
 - Used for CLI progress spinners

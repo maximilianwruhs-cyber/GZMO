@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[drive-research-du-hast-gesagt-part1|drive-research-du-hast-gesagt-part1]] (2026-06-08)
+## From [drive-research-du-hast-gesagt-part1](/entities/drive-research-du-hast-gesagt-part1.md) (2026-06-08)
 - Model: Qwen-2.5-Coder set to Temp 0.1.
 - Reads Git diff, breaks code, runs security scanners.
 - Merges branch and moves file to 05_Completed_PRs/ or writes Bug_Report.md and sends back to 03_Build_Queue/.

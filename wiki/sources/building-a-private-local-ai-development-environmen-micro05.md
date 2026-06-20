@@ -14,18 +14,18 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[qwen2-5-coder-1-5b-instruct|Qwen2.5-Coder-1.5B-Instruct]] (BOOK)
-- [[continue-dev|Continue.dev]] (TOOL)
-- [[vscodium|VSCodium]] (TOOL)
-- [[deepseek-r1-distill-qwen-14b|DeepSeek-R1-Distill-Qwen-14B]] (BOOK)
-- [[lm-studio|LM Studio]] (TOOL)
-- [[openai-compatible|OpenAI Compatible]] (CONCEPT)
-- [[qwen2-5-coder-3b-instruct|Qwen2.5-Coder-3B-Instruct]] (BOOK)
-- [[fast-model|Fast Model]] (CONCEPT)
-- [[qwen2-5-coder-32b-instruct|Qwen2.5-Coder-32B-Instruct]] (BOOK)
-- [[roo-code|Roo Code]] (TOOL)
-- [[smart-model|Smart Model]] (CONCEPT)
-- [[config-json|config.json]] (TOOL)
+- [Qwen2.5-Coder-1.5B-Instruct](/entities/qwen2-5-coder-1-5b-instruct.md) (BOOK)
+- [Continue.dev](/entities/continue-dev.md) (TOOL)
+- [VSCodium](/entities/vscodium.md) (TOOL)
+- [DeepSeek-R1-Distill-Qwen-14B](/entities/deepseek-r1-distill-qwen-14b.md) (BOOK)
+- [LM Studio](/entities/lm-studio.md) (TOOL)
+- [OpenAI Compatible](/entities/openai-compatible.md) (CONCEPT)
+- [Qwen2.5-Coder-3B-Instruct](/entities/qwen2-5-coder-3b-instruct.md) (BOOK)
+- [Fast Model](/entities/fast-model.md) (CONCEPT)
+- [Qwen2.5-Coder-32B-Instruct](/entities/qwen2-5-coder-32b-instruct.md) (BOOK)
+- [Roo Code](/entities/roo-code.md) (TOOL)
+- [Smart Model](/entities/smart-model.md) (CONCEPT)
+- [config.json](/entities/config-json.md) (TOOL)
 
 ## Relations
 - LM Studio → USES → Qwen2.5-Coder-1.5B-Instruct

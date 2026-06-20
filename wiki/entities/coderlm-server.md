@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SERVER
 
-## From [[ai-research-part6-micro04|ai-research-part6-micro04]] (2026-06-09)
+## From [ai-research-part6-micro04](/entities/ai-research-part6-micro04.md) (2026-06-09)
 - Must be active for precise symbol search
 - Provides spatial orientation in a repository
 - Replaces inefficient text-grepping with AST-based indexing

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-archival-truth-part2-micro02|the-archival-truth-part2-micro02]] (2026-06-09)
+## From [the-archival-truth-part2-micro02](/entities/the-archival-truth-part2-micro02.md) (2026-06-09)
 - Examines the misattribution of the phrase 'Be the change you wish to see in the world' to Gandhi.
 - Traces the historical genesis of the concept.
 - Shows how the modern phrasing originated with Arleen Lorrance.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-cache-optimization-with-ai-chaos-theory|drive-research-cache-optimization-with-ai-chaos-theory]] (2026-06-08)
+## From [drive-research-cache-optimization-with-ai-chaos-theory](/entities/drive-research-cache-optimization-with-ai-chaos-theory.md) (2026-06-08)
 - Implements tensor parallelism at the GGML graph level, distributing compute graph nodes.
 - Achieves high GPU utilization through parallelized mathematical reduction across identical models simultaneously.
 - Spreads non-quantized KV cache (f16, bf16, or f32) across devices.

@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: METRIC
 
-## From [[drive-research-free-ai-and-cs-self-study-roadmap|drive-research-free-ai-and-cs-self-study-roadmap]] (2026-06-08)
+## From [drive-research-free-ai-and-cs-self-study-roadmap](/entities/drive-research-free-ai-and-cs-self-study-roadmap.md) (2026-06-08)
 - the mathematics of continuous optimization
 - neural networks 'learn' by incrementally adjusting their internal weights to find the absolute minimum of a cost function
 - process driven entirely by calculating partial derivatives (gradients)
@@ -23,5 +23,5 @@ Type: METRIC
 - premier visual mathematics resources
 - visually demonstrate spatial transformations, eigenvectors, dot products, and the geometric meaning of derivatives
 
-## From [[drive-research-based-on-the-given-information-create-a-comprehens-micro01|drive-research-based-on-the-given-information-create-a-comprehens-micro01]] (2026-06-09)
+## From [drive-research-based-on-the-given-information-create-a-comprehens-micro01](/entities/drive-research-based-on-the-given-information-create-a-comprehens-micro01.md) (2026-06-09)
 - Part of 3Blue1Brown's visual mathematics channel

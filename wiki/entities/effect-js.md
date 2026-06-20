@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[prompt-agent-engineering-part5-micro06|prompt-agent-engineering-part5-micro06]] (2026-06-09)
+## From [prompt-agent-engineering-part5-micro06](/entities/prompt-agent-engineering-part5-micro06.md) (2026-06-09)
 - A framework used for building the agent's pipeline.
 - Supports `Effect.try`, `Effect.catchAll`, `Effect.gen`, `Effect.async`, `Effect.timeout`.
 - Used for managing asynchronous operations and error handling.

@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[prompt-agent-engineering-part2-micro04|prompt-agent-engineering-part2-micro04]] (2026-06-09)
+## From [prompt-agent-engineering-part2-micro04](/entities/prompt-agent-engineering-part2-micro04.md) (2026-06-09)
 - It can be tested on the current chat.
 - It generates save files of prompt tools.
 
-## From [[prompt-agent-engineering-part2-micro03|prompt-agent-engineering-part2-micro03]] (2026-06-10)
+## From [prompt-agent-engineering-part2-micro03](/entities/prompt-agent-engineering-part2-micro03.md) (2026-06-10)
 - Acts as a 'Save Button' for projects
 - Compresses conversations into a dense metadata file

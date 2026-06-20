@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-creating-a-comprehensive-readmemd-micro01|drive-research-creating-a-comprehensive-readmemd-micro01]] (2026-06-09)
+## From [drive-research-creating-a-comprehensive-readmemd-micro01](/entities/drive-research-creating-a-comprehensive-readmemd-micro01.md) (2026-06-09)
 - A linked index allowing users to bypass irrelevant information and jump directly to specific configurations.
 - GitHub automatically generates an interactive Table of Contents based on the file's Markdown headings.
 - This native outline is readily accessible via a dedicated menu icon located in the upper corner of the rendered page.

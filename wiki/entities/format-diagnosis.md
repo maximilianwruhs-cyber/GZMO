@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[ai-research-part3-micro07|ai-research-part3-micro07]] (2026-06-09)
+## From [ai-research-part3-micro07](/entities/ai-research-part3-micro07.md) (2026-06-09)
 - Formats diagnosis results.
 - Used in test_error_diagnosis.py.

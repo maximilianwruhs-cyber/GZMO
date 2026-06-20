@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-llamacpp-optimization-blueprint-micro04|drive-research-llamacpp-optimization-blueprint-micro04]] (2026-06-09)
+## From [drive-research-llamacpp-optimization-blueprint-micro04](/entities/drive-research-llamacpp-optimization-blueprint-micro04.md) (2026-06-09)
 - Settings matter for model performance
 - Various types include Temperature, TopK, TopP, MinP

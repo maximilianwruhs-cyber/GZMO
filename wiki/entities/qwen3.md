@@ -14,9 +14,9 @@ gzmo_synthetic: true
 
 Type: MODEL
 
-## From [[ai-research-part6-micro04|ai-research-part6-micro04]] (2026-06-09)
+## From [ai-research-part6-micro04](/entities/ai-research-part6-micro04.md) (2026-06-09)
 - Technical report published in arXiv preprint arXiv:2505.09388
 - Published in 2025
 
-## From [[prfaas-cross-datacenter-llm-serving-via-selective-micro03|prfaas-cross-datacenter-llm-serving-via-selective-micro03]] (2026-06-10)
+## From [prfaas-cross-datacenter-llm-serving-via-selective-micro03](/entities/prfaas-cross-datacenter-llm-serving-via-selective-micro03.md) (2026-06-10)
 - Requires 2.1 Tbps of egress bandwidth in a 512 H200 GPU configuration

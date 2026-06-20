@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-cache-optimization-blueprint|drive-research-cache-optimization-blueprint]] (2026-06-08)
+## From [drive-research-cache-optimization-blueprint](/entities/drive-research-cache-optimization-blueprint.md) (2026-06-08)
 - Bare-metal environment CPU.
 - Uses standard 64-byte cache lines.
 - Requires a minimum 64-byte alignment for CacheAlignedVec<T>.

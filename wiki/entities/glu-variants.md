@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part6-micro03|ai-research-part6-micro03]] (2026-06-09)
+## From [ai-research-part6-micro03](/entities/ai-research-part6-micro03.md) (2026-06-09)
 - Activation functions that evolved from GeLU.
 - Particularly SwiGLU, have become the default in modern LLMs for their superior performance.

@@ -14,16 +14,16 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[puppeteer-headless-browser|Puppeteer (Headless Browser)]] (TOOL)
-- [[react-reason-act|ReAct (Reason + Act)]] (CONCEPT)
-- [[soul-md|SOUL.md]] (CONCEPT)
-- [[agents-md|AGENTS.md]] (CONCEPT)
-- [[sqlite-vec|sqlite-vec]] (TOOL)
-- [[critic-node|Critic-Node]] (CONCEPT)
-- [[openclaw-framework|OpenClaw-Framework]] (FRAMEWORK)
-- [[bootstrap-context-files|Bootstrap Context Files]] (CONCEPT)
-- [[fact-checker-agent-v3|Fact-Checker Agent (v3)]] (SYSTEM)
-- [[sharp-taste-gate|SHARP taste gate]] (CONCEPT)
+- [Puppeteer (Headless Browser)](/entities/puppeteer-headless-browser.md) (TOOL)
+- [ReAct (Reason + Act)](/entities/react-reason-act.md) (CONCEPT)
+- [SOUL.md](/entities/soul-md.md) (CONCEPT)
+- [AGENTS.md](/entities/agents-md.md) (CONCEPT)
+- [sqlite-vec](/entities/sqlite-vec.md) (TOOL)
+- [Critic-Node](/entities/critic-node.md) (CONCEPT)
+- [OpenClaw-Framework](/entities/openclaw-framework.md) (FRAMEWORK)
+- [Bootstrap Context Files](/entities/bootstrap-context-files.md) (CONCEPT)
+- [Fact-Checker Agent (v3)](/entities/fact-checker-agent-v3.md) (SYSTEM)
+- [SHARP taste gate](/entities/sharp-taste-gate.md) (CONCEPT)
 
 ## Relations
 - Fact-Checker Agent (v3) → PART_OF → OpenClaw-Framework

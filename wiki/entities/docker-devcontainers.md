@@ -14,12 +14,12 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-advanced-local-ai-features-guide|drive-research-advanced-local-ai-features-guide]] (2026-06-08)
+## From [drive-research-advanced-local-ai-features-guide](/entities/drive-research-advanced-local-ai-features-guide.md) (2026-06-08)
 - Provides agentic sandboxing.
 - Runs commands inside an isolated Linux environment.
 - Prevents agents from affecting the host operating system.
 - Required for setting up Docker DevContainers.
 
-## From [[building-a-private-local-ai-development-environmen-micro03|building-a-private-local-ai-development-environmen-micro03]] (2026-06-09)
+## From [building-a-private-local-ai-development-environmen-micro03](/entities/building-a-private-local-ai-development-environmen-micro03.md) (2026-06-09)
 - Used for agentic sandboxing
 - Agents operate exclusively within these isolated environments

@@ -14,8 +14,8 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[prompt-agent-engineering-part4-micro02|prompt-agent-engineering-part4-micro02]] (2026-06-10)
+## From [prompt-agent-engineering-part4-micro02](/entities/prompt-agent-engineering-part4-micro02.md) (2026-06-10)
 - Used for local ASR/TTS
 
-## From [[prompt-agent-engineering-part4-micro03|prompt-agent-engineering-part4-micro03]] (2026-06-10)
+## From [prompt-agent-engineering-part4-micro03](/entities/prompt-agent-engineering-part4-micro03.md) (2026-06-10)
 - Provides ASR/TTS with <50ms latency

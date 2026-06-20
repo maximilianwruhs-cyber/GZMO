@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-optimizing-qwen36-on-blackwell-gpus|drive-research-optimizing-qwen36-on-blackwell-gpus]] (2026-06-08)
+## From [drive-research-optimizing-qwen36-on-blackwell-gpus](/entities/drive-research-optimizing-qwen36-on-blackwell-gpus.md) (2026-06-08)
 - Consumer-class Blackwell hardware is SM 12.0.
 - Enterprise nodes utilize high-speed NVLink fabrics.
 - Desktop Blackwell GPUs communicate over PCIe Gen 5 x16 slots.

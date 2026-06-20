@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SOFTWARE
 
-## From [[drive-research-ubuntu-extreme-hardware-tuning-micro01|drive-research-ubuntu-extreme-hardware-tuning-micro01]] (2026-06-09)
+## From [drive-research-ubuntu-extreme-hardware-tuning-micro01](/entities/drive-research-ubuntu-extreme-hardware-tuning-micro01.md) (2026-06-09)
 - Linux driver for NVMe SSDs.
 - Caps HMB allocation by default.
 - Can be configured with module options like `max_host_mem_size_mb`.

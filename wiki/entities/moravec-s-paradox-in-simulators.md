@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[obolus-micro02|obolus-micro02]] (2026-06-09)
+## From [obolus-micro02](/entities/obolus-micro02.md) (2026-06-09)
 - Agents in virtual worlds learn new strategies through competition
 - Example: OpenAI's Hide and Seek

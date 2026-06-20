@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[drive-research-scientific-writing-and-publication-process-micro03|drive-research-scientific-writing-and-publication-process-micro03]] (2026-06-09)
+## From [drive-research-scientific-writing-and-publication-process-micro03](/entities/drive-research-scientific-writing-and-publication-process-micro03.md) (2026-06-09)
 - Retain absolute liability for the integrity, originality, and accuracy of the final document.

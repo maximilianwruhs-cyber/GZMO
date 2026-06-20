@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: FRAMEWORK
 
-## From [[engineering-ignorance-eliminating-affirmative-bia|engineering-ignorance-eliminating-affirmative-bia]] (2026-06-08)
+## From [engineering-ignorance-eliminating-affirmative-bia](/entities/engineering-ignorance-eliminating-affirmative-bia.md) (2026-06-08)
 - Studies utilizing it highlight that predicting the final label alone is insufficient.
 - Models must identify specific cell-level rationales or text spans essential for verification.

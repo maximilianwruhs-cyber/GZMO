@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[openclaw-deep-research-part11-micro07|openclaw-deep-research-part11-micro07]] (2026-06-09)
+## From [openclaw-deep-research-part11-micro07](/entities/openclaw-deep-research-part11-micro07.md) (2026-06-09)
 - An example workflow demonstrating Lobster's capabilities.
 - Involves checking email, summarizing, drafting replies, and sending.
 - Can be executed with a single Lobster tool call.

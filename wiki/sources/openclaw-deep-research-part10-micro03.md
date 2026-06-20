@@ -14,20 +14,20 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-10).
 
 ## Entities
-- [[bright-data|Bright Data]] (ORGANIZATION)
-- [[openclaw|OpenClaw]] (SYSTEM)
-- [[mongodb-atlas|MongoDB Atlas]] (TOOL)
-- [[duckflux|duckflux]] (CONCEPT)
-- [[tom-stoffer|Tom Stoffer]] (PERSON)
-- [[sudara-fernando|Sudara Fernando]] (PERSON)
-- [[n8n|n8n]] (TOOL)
-- [[lobster|Lobster]] (TOOL)
-- [[github-copilot|GitHub Copilot]] (TOOL)
-- [[claude|Claude]] (TOOL)
-- [[clemens-bindeus|Clemens Bindeus]] (PERSON)
-- [[dev-community|DEV Community]] (ORGANIZATION)
-- [[minimax|MiniMax]] (SYSTEM)
-- [[gustavo-gondim|Gustavo Gondim]] (PERSON)
+- [Bright Data](/entities/bright-data.md) (ORGANIZATION)
+- [OpenClaw](/entities/openclaw.md) (SYSTEM)
+- [MongoDB Atlas](/entities/mongodb-atlas.md) (TOOL)
+- [duckflux](/entities/duckflux.md) (CONCEPT)
+- [Tom Stoffer](/entities/tom-stoffer.md) (PERSON)
+- [Sudara Fernando](/entities/sudara-fernando.md) (PERSON)
+- [n8n](/entities/n8n.md) (TOOL)
+- [Lobster](/entities/lobster.md) (TOOL)
+- [GitHub Copilot](/entities/github-copilot.md) (TOOL)
+- [Claude](/entities/claude.md) (TOOL)
+- [Clemens Bindeus](/entities/clemens-bindeus.md) (PERSON)
+- [DEV Community](/entities/dev-community.md) (ORGANIZATION)
+- [MiniMax](/entities/minimax.md) (SYSTEM)
+- [Gustavo Gondim](/entities/gustavo-gondim.md) (PERSON)
 
 ## Relations
 - GitHub Copilot → USES → Lobster

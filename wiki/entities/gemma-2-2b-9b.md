@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[the-architecture-of-speculative-decoding-and-infer-part2-micro03|the-architecture-of-speculative-decoding-and-infer-part2-micro03]] (2026-06-09)
+## From [the-architecture-of-speculative-decoding-and-infer-part2-micro03](/entities/the-architecture-of-speculative-decoding-and-infer-part2-micro03.md) (2026-06-09)
 - Built on the same architecture as Gemini.
 - Famously good at instruction-following and coding tasks.

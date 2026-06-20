@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-frankenmoe-merging-ai-models|drive-research-frankenmoe-merging-ai-models]] (2026-06-08)
+## From [drive-research-frankenmoe-merging-ai-models](/entities/drive-research-frankenmoe-merging-ai-models.md) (2026-06-08)
 - Enables CPU-GPU hybrid execution for environments where total VRAM is less than the model footprint.
 - The --cpu-moe flag allows KV cache, attention layers, and shared experts to be offloaded to the GPU.
 - Provides CPU-GPU hybrid execution for MoE models.

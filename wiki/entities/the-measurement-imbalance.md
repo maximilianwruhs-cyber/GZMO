@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-agentic-reverse-engineering-state-and-future-micro03|drive-research-agentic-reverse-engineering-state-and-future-micro03]] (2026-06-09)
+## From [drive-research-agentic-reverse-engineering-state-and-future-micro03](/entities/drive-research-agentic-reverse-engineering-state-and-future-micro03.md) (2026-06-09)
 - The systematic bias of privileging easily quantifiable technical metrics while neglecting dimensions critical to real-world deployment success.
 - Addressed by establishing specialized metrics.

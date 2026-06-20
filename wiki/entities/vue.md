@@ -15,11 +15,11 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[high-performance-typescript-execution-and-architec-part2|high-performance-typescript-execution-and-architec-part2]] (2026-06-08)
+## From [high-performance-typescript-execution-and-architec-part2](/entities/high-performance-typescript-execution-and-architec-part2.md) (2026-06-08)
 - The Vercel AI SDK is specifically optimized for it.
 
-## From [[obolus-vs-codium-extension-konzept-research-part1-micro08|obolus-vs-codium-extension-konzept-research-part1-micro08]] (2026-06-09)
+## From [obolus-vs-codium-extension-konzept-research-part1-micro08](/entities/obolus-vs-codium-extension-konzept-research-part1-micro08.md) (2026-06-09)
 - A tech stack that can be used with the Webview UI Toolkit.
 
-## From [[prompt-agent-engineering-part6-micro04|prompt-agent-engineering-part6-micro04]] (2026-06-10)
+## From [prompt-agent-engineering-part6-micro04](/entities/prompt-agent-engineering-part6-micro04.md) (2026-06-10)
 - Example of a modern web stack component.

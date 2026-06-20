@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[drive-research-maximilian-wruhs|drive-research-maximilian-wruhs]] (2026-06-08)
+## From [drive-research-maximilian-wruhs](/entities/drive-research-maximilian-wruhs.md) (2026-06-08)
 - Employed MAXIMILIAN WRUHS as a KFZ-Techniker & Elektriker (Lehre) from 08/2006 to 03/2010.

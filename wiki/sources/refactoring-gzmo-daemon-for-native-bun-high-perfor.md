@@ -14,20 +14,20 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-08).
 
 ## Entities
-- [[bunfig-toml|bunfig.toml]] (TOOL)
-- [[fs-promises|fs.promises]] (TOOL)
-- [[notebooklm|NotebookLM]] (TOOL)
-- [[gzmo-daemon|GZMO Daemon]] (PROJECT)
-- [[io-uring|io_uring]] (CONCEPT)
-- [[smol-true|smol = true]] (CONCEPT)
-- [[bun-peek|Bun.peek]] (TOOL)
-- [[google-takeout|Google Takeout]] (TOOL)
-- [[edge-node|Edge Node]] (SYSTEM)
-- [[bun-file|Bun.file]] (TOOL)
-- [[javascriptcore|JavaScriptCore]] (SYSTEM)
-- [[node-js|Node.js]] (SYSTEM)
-- [[mastering-bun-high-performance-typescript-execution-and-architecture|Mastering Bun: High-Performance TypeScript Execution and Architecture]] (BOOK)
-- [[bun-write|Bun.write]] (TOOL)
+- [bunfig.toml](/entities/bunfig-toml.md) (TOOL)
+- [fs.promises](/entities/fs-promises.md) (TOOL)
+- [NotebookLM](/entities/notebooklm.md) (TOOL)
+- [GZMO Daemon](/entities/gzmo-daemon.md) (PROJECT)
+- [io_uring](/entities/io-uring.md) (CONCEPT)
+- [smol = true](/entities/smol-true.md) (CONCEPT)
+- [Bun.peek](/entities/bun-peek.md) (TOOL)
+- [Google Takeout](/entities/google-takeout.md) (TOOL)
+- [Edge Node](/entities/edge-node.md) (SYSTEM)
+- [Bun.file](/entities/bun-file.md) (TOOL)
+- [JavaScriptCore](/entities/javascriptcore.md) (SYSTEM)
+- [Node.js](/entities/node-js.md) (SYSTEM)
+- [Mastering Bun: High-Performance TypeScript Execution and Architecture](/entities/mastering-bun-high-performance-typescript-execution-and-architecture.md) (BOOK)
+- [Bun.write](/entities/bun-write.md) (TOOL)
 
 ## Relations
 - GZMO Daemon → USES → Bun.peek

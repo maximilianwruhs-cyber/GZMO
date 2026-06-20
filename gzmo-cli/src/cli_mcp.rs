@@ -1,5 +1,7 @@
 //! One-shot CLI MCP lifecycle — connect on start, shutdown on exit (avoids uvx zombies).
 
+use std::sync::Arc;
+
 use anyhow::Result;
 use gzmo_core::config::GzmoConfig;
 use gzmo_core::mcp::bridge::McpServerConfig;
@@ -13,7 +15,7 @@ pub struct McpSession {
 
 impl McpSession {
     pub async fn connect(config: &GzmoConfig, tools: &mut ToolRegistry) -> Result<Self> {
-        let mut mcp = McpManager::new();
+        let mut mcp = McpManager::new().with_obolus_config(Arc::new(config.clone()));
         for server in config.active_mcp_servers() {
             match mcp
                 .connect(McpServerConfig {

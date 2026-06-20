@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-mergekit-moe-model-creation-guide|drive-research-mergekit-moe-model-creation-guide]] (2026-06-08)
+## From [drive-research-mergekit-moe-model-creation-guide](/entities/drive-research-mergekit-moe-model-creation-guide.md) (2026-06-08)
 - A target architecture for MoE output.
 - Uses fine-grained expert segmentation to divide a standard FFN layer into multiple parallel, narrow sub-experts.
 - A target architecture supported by mergekit-moe.

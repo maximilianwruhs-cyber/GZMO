@@ -14,5 +14,5 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[ai-research-part-8|AI research (part 8)]] (PROJECT)
-- [[ai-research-part8|ai-research-part8]] (PROJECT)
+- [AI research (part 8)](/entities/ai-research-part-8.md) (PROJECT)
+- [ai-research-part8](/entities/ai-research-part8.md) (PROJECT)

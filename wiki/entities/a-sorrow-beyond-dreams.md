@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[the-archival-truth-part2-micro04|the-archival-truth-part2-micro04]] (2026-06-09)
+## From [the-archival-truth-part2-micro04](/entities/the-archival-truth-part2-micro04.md) (2026-06-09)
 - A work by Peter Handke.
 - Confronts his mother's suicide.
 - Rejects sympathy, needing the feeling that what he is going through is incomprehensible and incommunicable.

@@ -16,21 +16,21 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[architectural-analysis-of-the-openclaw-ai-plugin-s|architectural-analysis-of-the-openclaw-ai-plugin-s]] (2026-06-08)
+## From [architectural-analysis-of-the-openclaw-ai-plugin-s](/entities/architectural-analysis-of-the-openclaw-ai-plugin-s.md) (2026-06-08)
 - It functions as the runtime execution module for native OpenClaw plugins.
 - It exports the default plugin definition.
 - It invokes the register(api) function to bind plugin logic to the gateway's internal subsystems.
 
-## From [[gzmo-daemon-validation-audit-and-bun-migration-rep|gzmo-daemon-validation-audit-and-bun-migration-rep]] (2026-06-08)
+## From [gzmo-daemon-validation-audit-and-bun-migration-rep](/entities/gzmo-daemon-validation-audit-and-bun-migration-rep.md) (2026-06-08)
 - Bun.write() and Bun.file().text() are implemented.
 - Modified file according to 'git status'.
 - Changes are not committed.
 
-## From [[gzmo-chaos-engine-architecture-audit-and-behaviora|gzmo-chaos-engine-architecture-audit-and-behaviora]] (2026-06-08)
+## From [gzmo-chaos-engine-architecture-audit-and-behaviora](/entities/gzmo-chaos-engine-architecture-audit-and-behaviora.md) (2026-06-08)
 - Calls selfAsk.cycle() and emits self_ask_completed event
 - Handles event types for feedback loop
 - Manages chaos-responsive scheduling for dreams and self-ask
 
-## From [[the-gzmo-daemon-high-performance-bun-refactor|the-gzmo-daemon-high-performance-bun-refactor]] (2026-06-08)
+## From [the-gzmo-daemon-high-performance-bun-refactor](/entities/the-gzmo-daemon-high-performance-bun-refactor.md) (2026-06-08)
 - Involved in Thought Crystallization.
 - Part of the GZMO Daemon refactor.

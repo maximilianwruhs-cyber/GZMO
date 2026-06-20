@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-imagine-creating-sm120-according-to-our-progress|drive-research-imagine-creating-sm120-according-to-our-progress]] (2026-06-08)
+## From [drive-research-imagine-creating-sm120-according-to-our-progress](/entities/drive-research-imagine-creating-sm120-according-to-our-progress.md) (2026-06-08)
 - Executing high-throughput narrow-precision models (FP4/FP6/FP8) on workstation-class Blackwell hardware.
 - Native FP4/FP6 implementations to eliminate vector dequantization register bottlenecks.

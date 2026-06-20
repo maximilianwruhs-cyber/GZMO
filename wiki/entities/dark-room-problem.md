@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[beyond-the-dark-room-allostatic-regulation-and-co|beyond-the-dark-room-allostatic-regulation-and-co]] (2026-06-08)
+## From [beyond-the-dark-room-allostatic-regulation-and-co](/entities/beyond-the-dark-room-allostatic-regulation-and-co.md) (2026-06-08)
 - It is a theoretical challenge within the Active Inference Framework.
 - It suggests that minimizing prediction errors leads to seeking a perfectly static environment and turning off sensory input.
 - Active inference resolves this problem by redefining the nature of the agent's internal generative models.

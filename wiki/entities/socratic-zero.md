@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[ai-research-part2|ai-research-part2]] (2026-06-08)
+## From [ai-research-part2](/entities/ai-research-part2.md) (2026-06-08)
 - Relies on external OpenAI APIs.
 - Agent0 exceeds this method by 3.7% on Qwen3-8B-Base.
 - A strong baseline.

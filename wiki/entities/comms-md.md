@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[openclaw-deep-research-part7-micro04|openclaw-deep-research-part7-micro04]] (2026-06-10)
+## From [openclaw-deep-research-part7-micro04](/entities/openclaw-deep-research-part7-micro04.md) (2026-06-10)
 - Structured, queryable document expressing communication preferences

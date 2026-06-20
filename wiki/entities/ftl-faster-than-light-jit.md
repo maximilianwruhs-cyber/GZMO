@@ -15,12 +15,12 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-advanced-typescript-execution-in-the-bun-runtime-micro02|drive-research-advanced-typescript-execution-in-the-bun-runtime-micro02]] (2026-06-09)
+## From [drive-research-advanced-typescript-execution-in-the-bun-runtime-micro02](/entities/drive-research-advanced-typescript-execution-in-the-bun-runtime-micro02.md) (2026-06-09)
 - The fourth tier of JavaScriptCore's JIT architecture.
 - Executes the highest level of C-like optimization.
 - Matches compiled language speeds for highly utilized loops and functions.
 
-## From [[high-performance-typescript-execution-and-architec-part1-micro02|high-performance-typescript-execution-and-architec-part1-micro02]] (2026-06-09)
+## From [high-performance-typescript-execution-and-architec-part1-micro02](/entities/high-performance-typescript-execution-and-architec-part1-micro02.md) (2026-06-09)
 - Part of JavaScriptCore's compilation strategy.
 - Executes the highest level of C-like optimization.
 - Matches compiled language speeds for highly utilized loops and functions.

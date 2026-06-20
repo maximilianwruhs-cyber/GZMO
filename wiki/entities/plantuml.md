@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[prompt-agent-engineering-part5-micro02|prompt-agent-engineering-part5-micro02]] (2026-06-09)
+## From [prompt-agent-engineering-part5-micro02](/entities/prompt-agent-engineering-part5-micro02.md) (2026-06-09)
 - Suggested for generating diagrams.
 - LLMs can generate code for it.
 - Can be dropped into a viewer for professional diagrams.

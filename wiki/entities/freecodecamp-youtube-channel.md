@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: PLATFORM
 
-## From [[drive-research-based-on-the-given-information-create-a-comprehens-micro01|drive-research-based-on-the-given-information-create-a-comprehens-micro01]] (2026-06-09)
+## From [drive-research-based-on-the-given-information-create-a-comprehens-micro01](/entities/drive-research-based-on-the-given-information-create-a-comprehens-micro01.md) (2026-06-09)
 - Archives CS50P: Introduction to Programming with Python
 - Recommends Scikit-Learn Tutorials
 - Hosts 3Blue1Brown content

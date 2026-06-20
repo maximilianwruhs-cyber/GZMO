@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[drive-research-enhancing-local-ai-hypervisor-architecture|drive-research-enhancing-local-ai-hypervisor-architecture]] (2026-06-08)
+## From [drive-research-enhancing-local-ai-hypervisor-architecture](/entities/drive-research-enhancing-local-ai-hypervisor-architecture.md) (2026-06-08)
 - Details Proxmox LXC Hardware Orchestration.
 - Covers Rust-Native Execution, Neuro-Symbolic Self-Distillation, and Isolated SDN Microsegmentation.
 - Focuses on local compute integration and VRAM optimization.

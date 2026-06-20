@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[openclaw-part1-micro01|openclaw-part1-micro01]] (2026-06-10)
+## From [openclaw-part1-micro01](/entities/openclaw-part1-micro01.md) (2026-06-10)
 - A state where AI is paralyzed by too many simultaneously active pieces of information
 - Related to the 'Lost in the Middle' phenomenon

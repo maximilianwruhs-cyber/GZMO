@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[prompt-agent-engineering-part4-micro04|prompt-agent-engineering-part4-micro04]] (2026-06-09)
+## From [prompt-agent-engineering-part4-micro04](/entities/prompt-agent-engineering-part4-micro04.md) (2026-06-09)
 - gRPC message type for EscalateIntent
 - Contains client_id, intent, and quantum_wrap

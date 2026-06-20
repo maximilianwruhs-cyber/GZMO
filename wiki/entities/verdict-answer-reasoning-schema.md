@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro03|the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro03]] (2026-06-09)
+## From [the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro03](/entities/the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro03.md) (2026-06-09)
 - A deterministic schema required by the v3 prompt.
 - The agent is mechanically constrained to this schema.

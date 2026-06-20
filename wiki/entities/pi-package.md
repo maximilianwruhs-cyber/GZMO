@@ -14,12 +14,12 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-building-pi-coding-agent-extensions|drive-research-building-pi-coding-agent-extensions]] (2026-06-08)
+## From [drive-research-building-pi-coding-agent-extensions](/entities/drive-research-building-pi-coding-agent-extensions.md) (2026-06-08)
 - A formal packaging format for extensions.
 - Can be distributed via npm or Git.
 - Installed universally using `pi install npm:@scope/my-extension`.
 
-## From [[high-performance-typescript-execution-and-architec-part1-micro07|high-performance-typescript-execution-and-architec-part1-micro07]] (2026-06-09)
+## From [high-performance-typescript-execution-and-architec-part1-micro07](/entities/high-performance-typescript-execution-and-architec-part1-micro07.md) (2026-06-09)
 - Formal packaging for distribution.
 - Can be distributed via npm or Git.
 - Installed using `pi install npm:@scope/my-extension`.

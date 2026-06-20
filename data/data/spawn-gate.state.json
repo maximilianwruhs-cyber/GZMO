@@ -1,0 +1,14 @@
+{
+  "executions": [
+    {
+      "at": "2026-06-17T05:34:31.067812996Z",
+      "kind": "session_triage",
+      "reason_hash": 17790403534419372043,
+      "recommendation_id": "c061947a-8caa-4d89-a561-98a950be1c67",
+      "session_id": "daemon",
+      "task_id": "24ca7b3c-8a1a-4dcd-bd4e-6e094569fec2",
+      "approved_via": "kurator autospawn"
+    }
+  ],
+  "denials": []
+}

@@ -14,16 +14,16 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[the-mitigating-mechanisms-of-subword-tokenization-on-zipfian-sparsity-in-large-language-models|The Mitigating Mechanisms of Subword Tokenization on Zipfian Sparsity in Large Language Models]] (CONCEPT)
-- [[large-language-models-llms|Large Language Models (LLMs)]] (SYSTEM)
-- [[zipf-s-law|Zipf's law]] (CONCEPT)
-- [[heaps-law|Heaps' law]] (CONCEPT)
-- [[word-level-tokenization|Word-Level Tokenization]] (CONCEPT)
-- [[data-sparsity|Data Sparsity]] (CONCEPT)
-- [[byte-pair-encoding-bpe|Byte-Pair Encoding (BPE)]] (TOOL)
-- [[character-level-tokenization|Character-Level Tokenization]] (CONCEPT)
-- [[wordpiece|WordPiece]] (TOOL)
-- [[unigram|Unigram]] (TOOL)
+- [The Mitigating Mechanisms of Subword Tokenization on Zipfian Sparsity in Large Language Models](/entities/the-mitigating-mechanisms-of-subword-tokenization-on-zipfian-sparsity-in-large-language-models.md) (CONCEPT)
+- [Large Language Models (LLMs)](/entities/large-language-models-llms.md) (SYSTEM)
+- [Zipf's law](/entities/zipf-s-law.md) (CONCEPT)
+- [Heaps' law](/entities/heaps-law.md) (CONCEPT)
+- [Word-Level Tokenization](/entities/word-level-tokenization.md) (CONCEPT)
+- [Data Sparsity](/entities/data-sparsity.md) (CONCEPT)
+- [Byte-Pair Encoding (BPE)](/entities/byte-pair-encoding-bpe.md) (TOOL)
+- [Character-Level Tokenization](/entities/character-level-tokenization.md) (CONCEPT)
+- [WordPiece](/entities/wordpiece.md) (TOOL)
+- [Unigram](/entities/unigram.md) (TOOL)
 
 ## Relations
 - The Mitigating Mechanisms of Subword Tokenization on Zipfian Sparsity in Large Language Models → RELATED_TO → Large Language Models (LLMs)

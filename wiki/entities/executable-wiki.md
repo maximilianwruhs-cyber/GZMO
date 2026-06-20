@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-honeypot-compiler-architecture-distilling-dat|the-honeypot-compiler-architecture-distilling-dat]] (2026-06-08)
+## From [the-honeypot-compiler-architecture-distilling-dat](/entities/the-honeypot-compiler-architecture-distilling-dat.md) (2026-06-08)
 - The final honeypot at the base containing purely distilled essence.
 - The system retrieves pure, compounded wisdom from it.
 - Represents the compiled Markdown rather than raw PDFs.

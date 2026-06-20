@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[openclaw-part1-micro05|openclaw-part1-micro05]] (2026-06-10)
+## From [openclaw-part1-micro05](/entities/openclaw-part1-micro05.md) (2026-06-10)
 - Refers to the memory cycle model used to design the GZMO persona.

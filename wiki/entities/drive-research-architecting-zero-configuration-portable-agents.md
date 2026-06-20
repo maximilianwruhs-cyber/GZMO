@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[drive-research-architecting-zero-configuration-portable-agents-s-micro01|drive-research-architecting-zero-configuration-portable-agents-s-micro01]] (2026-06-09)
+## From [drive-research-architecting-zero-configuration-portable-agents-s-micro01](/entities/drive-research-architecting-zero-configuration-portable-agents-s-micro01.md) (2026-06-09)
 - This is the title of the research document.
 - It is a micro-split from a larger document.
 - This is a key concept discussed in the research.

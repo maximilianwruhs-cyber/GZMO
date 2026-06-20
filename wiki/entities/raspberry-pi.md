@@ -14,8 +14,8 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[openclaw-autonomous-ai-agents-in-financial-operat|openclaw-autonomous-ai-agents-in-financial-operat]] (2026-06-08)
+## From [openclaw-autonomous-ai-agents-in-financial-operat](/entities/openclaw-autonomous-ai-agents-in-financial-operat.md) (2026-06-08)
 - Personal hardware where OpenClaw can be deployed locally.
 
-## From [[openclaw-deep-research-part5-micro02|openclaw-deep-research-part5-micro02]] (2026-06-10)
+## From [openclaw-deep-research-part5-micro02](/entities/openclaw-deep-research-part5-micro02.md) (2026-06-10)
 - Hardware used to run openclaw.

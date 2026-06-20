@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[ai-research-part2|ai-research-part2]] (2026-06-08)
+## From [ai-research-part2](/entities/ai-research-part2.md) (2026-06-08)
 - Introduces theoretical guarantees and gradient filtering for void turns to stabilize learning dynamics.
 - Authored by Xue et al., 2025.

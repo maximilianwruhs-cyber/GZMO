@@ -14,19 +14,19 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[llama-cpp|llama.cpp]] (SYSTEM)
-- [[rest-api|REST API]] (CONCEPT)
-- [[vector-databases|vector databases]] (SYSTEM)
-- [[jinja|Jinja]] (TOOL)
-- [[pydantic|Pydantic]] (TOOL)
-- [[openai|OpenAI]] (ORGANIZATION)
-- [[llama-server|llama-server]] (SYSTEM)
-- [[huggingface|HuggingFace]] (ORGANIZATION)
-- [[gguf|GGUF]] (CONCEPT)
-- [[docker|Docker]] (SYSTEM)
-- [[langchain|LangChain]] (TOOL)
-- [[get-weather|get_weather]] (TOOL)
-- [[semantic-summarization|semantic summarization]] (CONCEPT)
+- [llama.cpp](/entities/llama-cpp.md) (SYSTEM)
+- [REST API](/entities/rest-api.md) (CONCEPT)
+- [vector databases](/entities/vector-databases.md) (SYSTEM)
+- [Jinja](/entities/jinja.md) (TOOL)
+- [Pydantic](/entities/pydantic.md) (TOOL)
+- [OpenAI](/entities/openai.md) (ORGANIZATION)
+- [llama-server](/entities/llama-server.md) (SYSTEM)
+- [HuggingFace](/entities/huggingface.md) (ORGANIZATION)
+- [GGUF](/entities/gguf.md) (CONCEPT)
+- [Docker](/entities/docker.md) (SYSTEM)
+- [LangChain](/entities/langchain.md) (TOOL)
+- [get_weather](/entities/get-weather.md) (TOOL)
+- [semantic summarization](/entities/semantic-summarization.md) (CONCEPT)
 
 ## Relations
 - LangChain → USES → Pydantic

@@ -14,9 +14,9 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[ai-research-part3-micro06|ai-research-part3-micro06]] (2026-06-09)
+## From [ai-research-part3-micro06](/entities/ai-research-part3-micro06.md) (2026-06-09)
 - The main project from which this document is a micro-split.
 - It is being processed for cloud KG extraction.
 
-## From [[ai-research-part3-micro07|ai-research-part3-micro07]] (2026-06-09)
+## From [ai-research-part3-micro07](/entities/ai-research-part3-micro07.md) (2026-06-09)
 - The main project or document from which this micro-split is taken.

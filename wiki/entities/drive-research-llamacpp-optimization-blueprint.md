@@ -14,13 +14,13 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-llamacpp-optimization-blueprint-micro01|drive-research-llamacpp-optimization-blueprint-micro01]] (2026-06-09)
+## From [drive-research-llamacpp-optimization-blueprint-micro01](/entities/drive-research-llamacpp-optimization-blueprint-micro01.md) (2026-06-09)
 - The document is titled 'Drive Research Llama.cpp Optimization Blueprint'.
 - It describes a curated research corpus.
 - This is a blueprint for optimization.
 - It is a micro-split from a larger document.
 - It consolidates a curated research corpus.
 
-## From [[drive-research-llamacpp-optimization-blueprint-micro02|drive-research-llamacpp-optimization-blueprint-micro02]] (2026-06-09)
+## From [drive-research-llamacpp-optimization-blueprint-micro02](/entities/drive-research-llamacpp-optimization-blueprint-micro02.md) (2026-06-09)
 - The document title is 'drive-research-llamacpp-optimization-blueprint (micro 2/4)'.
 - Ingest micro-split from 'drive-research-llamacpp-optimization-blueprint.md' for cloud KG extraction.

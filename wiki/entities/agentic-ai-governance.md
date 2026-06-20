@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[openclaw-deep-research-part5-micro09|openclaw-deep-research-part5-micro09]] (2026-06-09)
+## From [openclaw-deep-research-part5-micro09](/entities/openclaw-deep-research-part5-micro09.md) (2026-06-09)
 - The governance and security for autonomous AI.
 - The deployment gap between AI capabilities and AI governance is widening.
 - Cannot wait for regulatory clarity.

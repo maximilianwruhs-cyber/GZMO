@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[migrating-openclaw-to-vercel-ai-sdk-for-local-llm|migrating-openclaw-to-vercel-ai-sdk-for-local-llm]] (2026-06-08)
+## From [migrating-openclaw-to-vercel-ai-sdk-for-local-llm](/entities/migrating-openclaw-to-vercel-ai-sdk-for-local-llm.md) (2026-06-08)
 - A specialized function in the Vercel AI SDK for advanced requirements.
 - Allows platform engineers to construct tools where precise input and output types cannot be predetermined at compile time.
 - Accepts a highly flexible schema interface, allowing for dynamic construction using standard JSON Schema objects.

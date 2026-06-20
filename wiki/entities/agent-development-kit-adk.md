@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[openclaw-part2|openclaw-part2]] (2026-06-08)
+## From [openclaw-part2](/entities/openclaw-part2.md) (2026-06-08)
 - A Google proprietary framework.
 - Seamlessly interoperates with Google Cloud Platform for OpenClaw deployments.
 - Provides a robust framework for building deeply integrated, backend multi-agent systems.

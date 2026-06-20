@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[openclaw-deep-research-part2|openclaw-deep-research-part2]] (2026-06-08)
+## From [openclaw-deep-research-part2](/entities/openclaw-deep-research-part2.md) (2026-06-08)
 - Trend Micro documented malicious OpenClaw skills used to distribute Atomic macOS Stealer (AMOS).
 - AMOS is an infostealer.
 - Malicious skills can trick agents and users into installing a new AMOS variant that steals extensive data at scale.

@@ -16,17 +16,17 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-advanced-inference-acceleration|drive-research-advanced-inference-acceleration]] (2026-06-08)
+## From [drive-research-advanced-inference-acceleration](/entities/drive-research-advanced-inference-acceleration.md) (2026-06-08)
 - A closed-loop control system.
 - Formalizes the Goodput metric.
 - Autonomously throttles draft length when acceptance rates decrease.
 
-## From [[architectures-and-optimizations-for-speculative-de-micro05|architectures-and-optimizations-for-speculative-de-micro05]] (2026-06-09)
+## From [architectures-and-optimizations-for-speculative-de-micro05](/entities/architectures-and-optimizations-for-speculative-de-micro05.md) (2026-06-09)
 - An advanced closed-loop control system.
 - Formalizes 'goodput' as a system metric.
 - Autonomously throttles draft length and shifts resources based on performance.
 
-## From [[the-architecture-of-speculative-decoding-and-infer-part1-micro01|the-architecture-of-speculative-decoding-and-infer-part1-micro01]] (2026-06-09)
+## From [the-architecture-of-speculative-decoding-and-infer-part1-micro01](/entities/the-architecture-of-speculative-decoding-and-infer-part1-micro01.md) (2026-06-09)
 - A closed-loop control system.
 - Formalizes the 'Goodput' metric (rate of successfully verified tokens).
 - Autonomously throttles draft length when acceptance rates decrease.

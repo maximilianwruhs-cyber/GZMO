@@ -14,11 +14,11 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-rust-tui-architecture-tech-stack1-micro05|drive-research-rust-tui-architecture-tech-stack1-micro05]] (2026-06-09)
+## From [drive-research-rust-tui-architecture-tech-stack1-micro05](/entities/drive-research-rust-tui-architecture-tech-stack1-micro05.md) (2026-06-09)
 - The entry point of the application.
 - Initializes panic hooks and the tracing logger.
 - Sets up the tokio runtime and invokes App::run().
 
-## From [[drive-research-rust-tui-architecture-tech-stack1-micro02|drive-research-rust-tui-architecture-tech-stack1-micro02]] (2026-06-10)
+## From [drive-research-rust-tui-architecture-tech-stack1-micro02](/entities/drive-research-rust-tui-architecture-tech-stack1-micro02.md) (2026-06-10)
 - The entry point of the application.
 - Initializes panic hooks, bootstrapping the tracing logger, and setting up the tokio runtime.

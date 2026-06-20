@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-inside-the-pi-coding-agent-optimization-isn|drive-research-inside-the---pi---coding-agent--optimization--isn]] (2026-06-08)
+## From [drive-research-inside-the---pi---coding-agent--optimization--isn](/entities/drive-research-inside-the-pi-coding-agent-optimization-isn.md) (2026-06-08)
 - Not a single setting in the Pi coding agent.
 - It is a meta-programming task.
 - It involves shaping Pi's edges (prompt templates, skills, extensions).

@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[prfaas-cross-datacenter-llm-serving-via-selective-micro03|prfaas-cross-datacenter-llm-serving-via-selective-micro03]] (2026-06-10)
+## From [prfaas-cross-datacenter-llm-serving-via-selective-micro03](/entities/prfaas-cross-datacenter-llm-serving-via-selective-micro03.md) (2026-06-10)
 - Used in a prefill cluster comprising 512 units for analysis

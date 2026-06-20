@@ -14,21 +14,21 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[cognitive-biases|cognitive biases]] (CONCEPT)
-- [[behavioral-addiction|behavioral addiction]] (CONCEPT)
-- [[fomo|FOMO]] (CONCEPT)
-- [[operant-conditioning|operant conditioning]] (CONCEPT)
-- [[technostress|technostress]] (CONCEPT)
-- [[humane-technology|Humane Technology]] (CONCEPT)
-- [[youth-anxiety|youth anxiety]] (CONCEPT)
-- [[behavioral-economics|behavioral economics]] (CONCEPT)
-- [[ai-driven-hyper-nudging|AI-driven hyper-nudging]] (CONCEPT)
-- [[eu|EU]] (ORGANIZATION)
-- [[new-york-s-chronological-feed-mandates|New York's chronological feed mandates]] (CONCEPT)
-- [[attention-economy|attention economy]] (CONCEPT)
-- [[variable-ratio-reward-schedules|variable-ratio reward schedules]] (CONCEPT)
-- [[digital-fairness-act|Digital Fairness Act]] (CONCEPT)
-- [[neurobiology|neurobiology]] (CONCEPT)
+- [cognitive biases](/entities/cognitive-biases.md) (CONCEPT)
+- [behavioral addiction](/entities/behavioral-addiction.md) (CONCEPT)
+- [FOMO](/entities/fomo.md) (CONCEPT)
+- [operant conditioning](/entities/operant-conditioning.md) (CONCEPT)
+- [technostress](/entities/technostress.md) (CONCEPT)
+- [Humane Technology](/entities/humane-technology.md) (CONCEPT)
+- [youth anxiety](/entities/youth-anxiety.md) (CONCEPT)
+- [behavioral economics](/entities/behavioral-economics.md) (CONCEPT)
+- [AI-driven hyper-nudging](/entities/ai-driven-hyper-nudging.md) (CONCEPT)
+- [EU](/entities/eu.md) (ORGANIZATION)
+- [New York's chronological feed mandates](/entities/new-york-s-chronological-feed-mandates.md) (CONCEPT)
+- [attention economy](/entities/attention-economy.md) (CONCEPT)
+- [variable-ratio reward schedules](/entities/variable-ratio-reward-schedules.md) (CONCEPT)
+- [Digital Fairness Act](/entities/digital-fairness-act.md) (CONCEPT)
+- [neurobiology](/entities/neurobiology.md) (CONCEPT)
 
 ## Relations
 - Digital Fairness Act → PART_OF → EU

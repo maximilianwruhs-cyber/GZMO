@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[prompt-agent-engineering-part7-micro01|prompt-agent-engineering-part7-micro01]] (2026-06-09)
+## From [prompt-agent-engineering-part7-micro01](/entities/prompt-agent-engineering-part7-micro01.md) (2026-06-09)
 - Curated research corpus

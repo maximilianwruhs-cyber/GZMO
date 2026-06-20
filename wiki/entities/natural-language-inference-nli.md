@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[engineering-ignorance-eliminating-affirmative-bia|engineering-ignorance-eliminating-affirmative-bia]] (2026-06-08)
+## From [engineering-ignorance-eliminating-affirmative-bia](/entities/engineering-ignorance-eliminating-affirmative-bia.md) (2026-06-08)
 - SLM outputs are aligned with the strict ternary logic of NLI: Supported, Contradicted, or No Information.
 - SLMs handle 'Supported' and 'Contradicted' states relatively well.
 - The 'No Information' state is uniquely challenging for SLMs.

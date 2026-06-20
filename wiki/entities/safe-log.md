@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[ai-research-part3-micro07|ai-research-part3-micro07]] (2026-06-09)
+## From [ai-research-part3-micro07](/entities/ai-research-part3-micro07.md) (2026-06-09)
 - Logs test results.
 - Logs error resolution messages.
 - Logs final summary information.

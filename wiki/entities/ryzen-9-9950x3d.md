@@ -14,9 +14,9 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-ubuntu-extreme-hardware-tuning-micro03|drive-research-ubuntu-extreme-hardware-tuning-micro03]] (2026-06-09)
+## From [drive-research-ubuntu-extreme-hardware-tuning-micro03](/entities/drive-research-ubuntu-extreme-hardware-tuning-micro03.md) (2026-06-09)
 - PBO2, Curve Optimizer, and Curve Shaper are discussed in relation to it.
 
-## From [[the-2026-linux-workstation-micro03|the-2026-linux-workstation-micro03]] (2026-06-09)
+## From [the-2026-linux-workstation-micro03](/entities/the-2026-linux-workstation-micro03.md) (2026-06-09)
 - Utilizes the AM5 socket.
 - Current Zen 5 architecture vastly exceeds processing requirements for RTX 5090.

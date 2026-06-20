@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[refactoring-gzmo-daemon-for-native-bun-high-perfor|refactoring-gzmo-daemon-for-native-bun-high-perfor]] (2026-06-08)
+## From [refactoring-gzmo-daemon-for-native-bun-high-perfor](/entities/refactoring-gzmo-daemon-for-native-bun-high-perfor.md) (2026-06-08)
 - A NotebookLM document.
 - Forms the basis for understanding Bun's strengths.

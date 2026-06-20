@@ -14,11 +14,11 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-deep-dive-google-antigravity-architecture|drive-research-deep-dive-google-antigravity-architecture]] (2026-06-08)
+## From [drive-research-deep-dive-google-antigravity-architecture](/entities/drive-research-deep-dive-google-antigravity-architecture.md) (2026-06-08)
 - The architecture of autonomous software engineering is a technical analysis of Google Antigravity.
 - Google Antigravity is an example of an autonomous software engineering platform.
 
-## From [[drive-research-deep-dive-google-antigravity-architecture1|drive-research-deep-dive-google-antigravity-architecture1]] (2026-06-08)
+## From [drive-research-deep-dive-google-antigravity-architecture1](/entities/drive-research-deep-dive-google-antigravity-architecture1.md) (2026-06-08)
 - The architecture of autonomous software engineering is analyzed.
 - Google Antigravity is a platform for autonomous software orchestration.
 - The platform empowers AI agents to scaffold, execute, and test code autonomously.

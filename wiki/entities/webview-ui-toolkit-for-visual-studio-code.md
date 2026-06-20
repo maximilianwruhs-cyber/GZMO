@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[obolus-vs-codium-extension-konzept-research-part1-micro08|obolus-vs-codium-extension-konzept-research-part1-micro08]] (2026-06-09)
+## From [obolus-vs-codium-extension-konzept-research-part1-micro08](/entities/obolus-vs-codium-extension-konzept-research-part1-micro08.md) (2026-06-09)
 - Component library for building webview-based extensions in Visual Studio Code.
 - Will be deprecated on January 1, 2025.
 - Features include VS Code design language, automatic support for color themes, support for tech stacks like React, Vue, Svelte, and immediate accessibility.

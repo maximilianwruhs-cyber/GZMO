@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[prompt-agent-engineering-part7-micro08|prompt-agent-engineering-part7-micro08]] (2026-06-09)
+## From [prompt-agent-engineering-part7-micro08](/entities/prompt-agent-engineering-part7-micro08.md) (2026-06-09)
 - A more ruthless audit prompt.
 - Analysis methodology includes Cascading Failure Analysis, The 'State' Audit, Security 'Shift-Left', Observability Depth, Efficiency & Unit Economics, Human-in-the-Loop.
 - Output includes System Fragility Score and 'Red Phone' Scenarios.

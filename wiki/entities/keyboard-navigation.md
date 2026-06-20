@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[obolus-vs-codium-extension-konzept-research-part1-micro08|obolus-vs-codium-extension-konzept-research-part1-micro08]] (2026-06-09)
+## From [obolus-vs-codium-extension-konzept-research-part1-micro08](/entities/obolus-vs-codium-extension-konzept-research-part1-micro08.md) (2026-06-09)
 - Shipped with components for immediate accessibility.
 - Web-standard compliant.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[allgemeine-informationen|allgemeine-informationen]] (2026-06-08)
+## From [allgemeine-informationen](/entities/allgemeine-informationen.md) (2026-06-08)
 - It is relied upon to minimize infrastructure bottlenecks.
 - It is part of the "Scale" Path workflow.
 - It enables developers to self-serve infrastructure and services.

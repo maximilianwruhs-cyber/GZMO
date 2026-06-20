@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[drive-research-safe-unzip-practices-for-threat-model-micro01|drive-research-safe-unzip-practices-for-threat-model-micro01]] (2026-06-10)
+## From [drive-research-safe-unzip-practices-for-threat-model-micro01](/entities/drive-research-safe-unzip-practices-for-threat-model-micro01.md) (2026-06-10)
 - Developer who implemented Python scripts to detect overlapping files in ZIP archives.

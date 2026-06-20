@@ -18,6 +18,32 @@ pub enum PageType {
     Source,
     Index,
     Log,
+    /// OKF v0.1 extended types (optional; lint warns until adopted).
+    Runbook,
+    Topic,
+    Metric,
+}
+
+/// OKF v0.1 concept type strings (superset of GZMO wiki types).
+pub fn okf_concept_type_names() -> &'static [&'static str] {
+    &[
+        "entity",
+        "concept",
+        "source",
+        "index",
+        "log",
+        "runbook",
+        "topic",
+        "metric",
+        "table",
+        "api",
+        "component",
+    ]
+}
+
+/// Reserved wiki filenames per OKF v0.1 (not concept documents).
+pub fn is_okf_reserved_stem(stem: &str) -> bool {
+    matches!(stem, "index" | "log") || stem.starts_with("_lint-")
 }
 
 /// YAML frontmatter on every wiki page (consumed by Obsidian Dataview).

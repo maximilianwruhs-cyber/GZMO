@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part3-micro01|ai-research-part3-micro01]] (2026-06-09)
+## From [ai-research-part3-micro01](/entities/ai-research-part3-micro01.md) (2026-06-09)
 - Inspired the metric (CMP) that aggregates the benchmark performances of the descendants of an agent as an indicator of its potential for self-improvement.

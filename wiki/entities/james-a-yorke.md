@@ -14,9 +14,9 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[dynamics-of-the-unpredictable-micro03|dynamics-of-the-unpredictable-micro03]] (2026-06-09)
+## From [dynamics-of-the-unpredictable-micro03](/entities/dynamics-of-the-unpredictable-micro03.md) (2026-06-09)
 - Developed the Logistic Map with computational assistance from him.
 - Was a mathematician.
 
-## From [[dynamics-of-the-unpredictable-micro02|dynamics-of-the-unpredictable-micro02]] (2026-06-10)
+## From [dynamics-of-the-unpredictable-micro02](/entities/dynamics-of-the-unpredictable-micro02.md) (2026-06-10)
 - Mathematician who helped cement the term 'chaos' into the scientific lexicon.

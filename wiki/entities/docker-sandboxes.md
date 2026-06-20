@@ -15,12 +15,12 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[obolus-micro05|obolus-micro05]] (2026-06-09)
+## From [obolus-micro05](/entities/obolus-micro05.md) (2026-06-09)
 - Used for Sandboxing.
 
-## From [[the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro03|the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro03]] (2026-06-09)
+## From [the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro03](/entities/the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro03.md) (2026-06-09)
 - Used to route execution and fortify the system.
 - Isolate processes from untrusted web data.
 
-## From [[the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro05|the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro05]] (2026-06-09)
+## From [the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro05](/entities/the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro05.md) (2026-06-09)
 - Secure AI agents can be run in them on Ubuntu 24.04.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-subword-tokenization-mitigates-llm-sparsity-micro03|drive-research-subword-tokenization-mitigates-llm-sparsity-micro03]] (2026-06-09)
+## From [drive-research-subword-tokenization-mitigates-llm-sparsity-micro03](/entities/drive-research-subword-tokenization-mitigates-llm-sparsity-micro03.md) (2026-06-09)
 - subword tokenization applied to them
 - nucleotide n-grams exhibit Zipf-like power-law frequency distributions
 - treating them at a base-pair level creates unwieldy sequence lengths

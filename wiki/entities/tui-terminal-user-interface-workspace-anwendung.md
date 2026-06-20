@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[tui-framework|tui-framework]] (2026-06-08)
+## From [tui-framework](/entities/tui-framework.md) (2026-06-08)
 - A blueprint for a workspace.
 - Aims to reclaim developer focus.
 - Can be built using Rust (Ratatui) or Go (Bubbletea).

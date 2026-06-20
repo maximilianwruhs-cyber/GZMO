@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[dynamics-of-the-unpredictable-micro06|dynamics-of-the-unpredictable-micro06]] (2026-06-09)
+## From [dynamics-of-the-unpredictable-micro06](/entities/dynamics-of-the-unpredictable-micro06.md) (2026-06-09)
 - Used to submit command buffers to the GPU for execution.
 - A Rust crate serving as the foundational layer for rendering in modern Rust game development.
 - A pure-Rust implementation of the emerging WebGPU API standard.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-cuda-memory-locking-limits-configuration|drive-research-cuda-memory-locking-limits-configuration]] (2026-06-08)
+## From [drive-research-cuda-memory-locking-limits-configuration](/entities/drive-research-cuda-memory-locking-limits-configuration.md) (2026-06-08)
 - The table details calculated minimum memlock limits in KiB for common GGUF model scales and quantization levels.
 - Model weights are stored in GGUF files.
 - Model weights stored in GGUF files are mapped into the virtual address space of the process using the mmap system call.

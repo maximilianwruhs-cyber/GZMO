@@ -14,6 +14,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-ai-agents-and-spec-driven-development1-micro03|drive-research-ai-agents-and-spec-driven-development1-micro03]] (2026-06-09)
+## From [drive-research-ai-agents-and-spec-driven-development1-micro03](/entities/drive-research-ai-agents-and-spec-driven-development1-micro03.md) (2026-06-09)
 - A systemic threat in the agentic era.
 - Underscores the reality that as software creation becomes infinitely scalable, the new constraints are human oversight and governance.

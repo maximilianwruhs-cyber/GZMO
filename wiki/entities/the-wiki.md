@@ -14,12 +14,12 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-honeypot-compiler-architecture-distilling-dat|the-honeypot-compiler-architecture-distilling-dat]] (2026-06-08)
+## From [the-honeypot-compiler-architecture-distilling-dat](/entities/the-honeypot-compiler-architecture-distilling-dat.md) (2026-06-08)
 - A structured folder of plain text Markdown files.
 - Represents progressively smaller, denser webs where concepts synthesize.
 - Knowledge compounds and its semantic weight grows exponentially.
 
-## From [[drive-research-cascading-honeypot-ai-architecture|drive-research-cascading-honeypot-ai-architecture]] (2026-06-08)
+## From [drive-research-cascading-honeypot-ai-architecture](/entities/drive-research-cascading-honeypot-ai-architecture.md) (2026-06-08)
 - The structured, interlinked folder of plain text Markdown files.
 - The central nervous system of the technical architecture.
 - Relies on graph topology rather than vector hyperspace for retrieval.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[cybernetics-and-mythos-the-architecture-of-intell-part1|cybernetics-and-mythos-the-architecture-of-intell-part1]] (2026-06-08)
+## From [cybernetics-and-mythos-the-architecture-of-intell-part1](/entities/cybernetics-and-mythos-the-architecture-of-intell-part1.md) (2026-06-08)
 - A cybernetic model that provides a transdisciplinary framework for depicting regulatory control processes within organizational networks.
 - Functions as an explanatory concept for self-criticality in complex adaptive systems.
 - Mimics biological homeostasis in corporate environments.

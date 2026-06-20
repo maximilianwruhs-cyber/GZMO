@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-synthesizing-wisdom-from-heterogeneous-data|drive-research-synthesizing-wisdom-from-heterogeneous-data]] (2026-06-08)
+## From [drive-research-synthesizing-wisdom-from-heterogeneous-data](/entities/drive-research-synthesizing-wisdom-from-heterogeneous-data.md) (2026-06-08)
 - A framework to prevent semantic drift and ensure distilled heuristics remain broad yet consistent.
 - Uses Category Theory and monadic structures.
 - Operationalized using the MetaScaffold Taxoframe Template (MSTFT).

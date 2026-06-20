@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[openclaw-part1-micro03|openclaw-part1-micro03]] (2026-06-10)
+## From [openclaw-part1-micro03](/entities/openclaw-part1-micro03.md) (2026-06-10)
 - The architecture used for memory retrieval, replacing basic keyword-matching.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-architecture-of-engagement-an-analysis-of-gam-micro07|the-architecture-of-engagement-an-analysis-of-gam-micro07]] (2026-06-09)
+## From [the-architecture-of-engagement-an-analysis-of-gam-micro07](/entities/the-architecture-of-engagement-an-analysis-of-gam-micro07.md) (2026-06-09)
 - Is the theoretical backbone of modern gamification.
 - Was formulated by Edward Deci and Richard Ryan in 1985.
 - Posits that motivation operates on a continuum from amotivation to intrinsic motivation.

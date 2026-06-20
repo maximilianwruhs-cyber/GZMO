@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-architecture-of-scientific-inquiry-and-academi|the-architecture-of-scientific-inquiry-and-academi]] (2026-06-08)
+## From [the-architecture-of-scientific-inquiry-and-academi](/entities/the-architecture-of-scientific-inquiry-and-academi.md) (2026-06-08)
 - Necessitates rigorous strategies due to cognitive load on researchers.
 - Researchers routinely work long hours and struggle to maintain boundaries.
 - Involves proactively blocking time for specific tasks and scheduling downtime.

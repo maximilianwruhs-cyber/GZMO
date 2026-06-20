@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[openclaw-deep-research-part2|openclaw-deep-research-part2]] (2026-06-08)
+## From [openclaw-deep-research-part2](/entities/openclaw-deep-research-part2.md) (2026-06-08)
 - OWASP's Top 10 for LLM Applications explicitly separates Prompt Injection and Supply Chain Vulnerabilities as major risks.
 - OWASP treats prompt injection as a top-tier LLM risk.
 - The OWASP Foundation is mentioned in relation to prompt injection and supply chain vulnerabilities.

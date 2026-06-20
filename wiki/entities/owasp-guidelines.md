@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-safe-unzip-practices-for-threat-model-micro02|drive-research-safe-unzip-practices-for-threat-model-micro02]] (2026-06-09)
+## From [drive-research-safe-unzip-practices-for-threat-model-micro02](/entities/drive-research-safe-unzip-practices-for-threat-model-micro02.md) (2026-06-09)
 - Explicitly requires limits for archive extraction.
 - Limits nested archive depth.

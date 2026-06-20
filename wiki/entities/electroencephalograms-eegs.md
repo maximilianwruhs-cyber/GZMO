@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[dynamics-of-the-unpredictable-micro04|dynamics-of-the-unpredictable-micro04]] (2026-06-09)
+## From [dynamics-of-the-unpredictable-micro04](/entities/dynamics-of-the-unpredictable-micro04.md) (2026-06-09)
 - Measurable changes in EEGs reveal that healthy cognitive states are governed by high-dimensional chaotic attractors.
 - As a subject enters slow-wave sleep or a coma, the EEG's fractal dimension shrinks significantly.

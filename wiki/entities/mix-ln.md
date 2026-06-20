@@ -14,6 +14,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[ai-research-part6-micro03|ai-research-part6-micro03]] (2026-06-09)
+## From [ai-research-part6-micro03](/entities/ai-research-part6-micro03.md) (2026-06-09)
 - A hybrid strategy that combines Pre-Norm and Post-Norm across layers to balance signal propagation.
 - A topology-modifying work.

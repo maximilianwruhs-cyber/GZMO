@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[drive-research-free-lob-data-for-chaos-research|drive-research-free-lob-data-for-chaos-research]] (2026-06-08)
+## From [drive-research-free-lob-data-for-chaos-research](/entities/drive-research-free-lob-data-for-chaos-research.md) (2026-06-08)
 - Associated with Alexander Y. Shestopaloff.

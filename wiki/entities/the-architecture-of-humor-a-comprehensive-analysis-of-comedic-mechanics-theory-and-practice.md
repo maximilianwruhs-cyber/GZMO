@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[the-archival-truth-part1-micro05|the-archival-truth-part1-micro05]] (2026-06-09)
+## From [the-archival-truth-part1-micro05](/entities/the-archival-truth-part1-micro05.md) (2026-06-09)
 - Describes humor as a structured, learnable cognitive skill.
 - Dismantles the mechanics of humor.
 - Explores theories of comedy, joke structure, and performative nuances.

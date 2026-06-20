@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[tui-framework|tui-framework]] (2026-06-08)
+## From [tui-framework](/entities/tui-framework.md) (2026-06-08)
 - A Zellij configuration file.
 - Defines split panes and UI commands.
 - Can be used for a 'Zero-Code' TUI IDE.

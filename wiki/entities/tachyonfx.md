@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-rust-tui-architecture-tech-stack1-micro05|drive-research-rust-tui-architecture-tech-stack1-micro05]] (2026-06-09)
+## From [drive-research-rust-tui-architecture-tech-stack1-micro05](/entities/drive-research-rust-tui-architecture-tech-stack1-micro05.md) (2026-06-09)
 - Introduces a shader-like paradigm to terminal manipulation.
 - Allows defining post-processing effects on the render buffer.
 - Applies mathematical effects like pulse, wave, fade_in, or slide.
 
-## From [[drive-research-rust-tui-architecture-tech-stack1-micro02|drive-research-rust-tui-architecture-tech-stack1-micro02]] (2026-06-10)
+## From [drive-research-rust-tui-architecture-tech-stack1-micro02](/entities/drive-research-rust-tui-architecture-tech-stack1-micro02.md) (2026-06-10)
 - Introduces a shader-like paradigm for terminal animations.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-ai-wisdom-webs-honeypots-and-forgetting|drive-research-ai-wisdom-webs-honeypots-and-forgetting]] (2026-06-08)
+## From [drive-research-ai-wisdom-webs-honeypots-and-forgetting](/entities/drive-research-ai-wisdom-webs-honeypots-and-forgetting.md) (2026-06-08)
 - Mechanisms are studied alongside information theory and human cognitive psychology.
 - Mathematical models are isomorphic reflections of human cognitive psychology.
 - Requires compression phases for generalization.

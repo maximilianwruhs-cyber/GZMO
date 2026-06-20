@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-pdf-text-vs-scan-detection-heuristics-micro02|drive-research-pdf-text-vs-scan-detection-heuristics-micro02]] (2026-06-09)
+## From [drive-research-pdf-text-vs-scan-detection-heuristics-micro02](/entities/drive-research-pdf-text-vs-scan-detection-heuristics-micro02.md) (2026-06-09)
 - Contains an amalgamation of raster images and digitally embedded text.
 - Requires advanced multi-layered heuristics for detection.

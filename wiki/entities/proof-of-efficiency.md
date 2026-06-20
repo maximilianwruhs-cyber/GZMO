@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[obolus-micro01|obolus-micro01]] (2026-06-09)
+## From [obolus-micro01](/entities/obolus-micro01.md) (2026-06-09)
 - A model that eliminates weak configurations algorithmically.
 - Favors agents that deliver maximum quality with minimal energy expenditure.
 - Miners that fall below the efficiency threshold ($E 

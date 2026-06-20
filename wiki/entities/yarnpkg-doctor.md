@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[high-performance-typescript-execution-and-architec-part2|high-performance-typescript-execution-and-architec-part2]] (2026-06-08)
+## From [high-performance-typescript-execution-and-architec-part2](/entities/high-performance-typescript-execution-and-architec-part2.md) (2026-06-08)
 - It is a specific tool exposed to agents.
 - It helps find issues causing PnP resolution failures.
 
-## From [[drive-research-agentic-typescript-monorepo-context-management|drive-research-agentic-typescript-monorepo-context-management]] (2026-06-08)
+## From [drive-research-agentic-typescript-monorepo-context-management](/entities/drive-research-agentic-typescript-monorepo-context-management.md) (2026-06-08)
 - A utility to find issues causing PnP resolution failures.
 - Exposed to agents operating in strict environments.

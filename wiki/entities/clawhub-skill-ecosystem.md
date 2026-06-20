@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: ECOSYSTEM
 
-## From [[ai-research-part6-micro05|ai-research-part6-micro05]] (2026-06-09)
+## From [ai-research-part6-micro05](/entities/ai-research-part6-micro05.md) (2026-06-09)
 - Fully integrated in Phase 3.
 - Enables dynamic acquisition of new capabilities.
 - The framework dynamically acquires new capabilities through it.

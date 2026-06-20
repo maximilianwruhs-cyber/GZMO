@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[drive-research-free-ai-and-cs-self-study-roadmap|drive-research-free-ai-and-cs-self-study-roadmap]] (2026-06-08)
+## From [drive-research-free-ai-and-cs-self-study-roadmap](/entities/drive-research-free-ai-and-cs-self-study-roadmap.md) (2026-06-08)
 - modernized, Python-based iteration of the most famous machine learning course in history
 - logically partitioned into three progressive courses
 - begins with basic linear regression with one variable, advances to multiple variables, introduces logistic regression for classification, and ultimately culminates in unsupervised learning techniques and recommender systems

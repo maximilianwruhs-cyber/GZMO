@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[engineering-ignorance-eliminating-affirmative-bia|engineering-ignorance-eliminating-affirmative-bia]] (2026-06-08)
+## From [engineering-ignorance-eliminating-affirmative-bia](/entities/engineering-ignorance-eliminating-affirmative-bia.md) (2026-06-08)
 - Utilizes schema-guided conflict resolution for extracting complex portfolios or tables.
 - Embeds a strict Pydantic schema directly into the prompt context for validation.
 - Merges, clusters, and validates suggestions based on Levenshtein similarity and re-extraction.

@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-pdf-text-vs-scan-detection-heuristics-micro04|drive-research-pdf-text-vs-scan-detection-heuristics-micro04]] (2026-06-10)
+## From [drive-research-pdf-text-vs-scan-detection-heuristics-micro04](/entities/drive-research-pdf-text-vs-scan-detection-heuristics-micro04.md) (2026-06-10)
 - Command-line PDF tools.

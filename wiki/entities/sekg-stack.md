@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[architectures-for-agentic-memory-virtual-context-micro07|architectures-for-agentic-memory-virtual-context-micro07]] (2026-06-09)
+## From [architectures-for-agentic-memory-virtual-context-micro07](/entities/architectures-for-agentic-memory-virtual-context-micro07.md) (2026-06-09)
 - Resolves contextual isolation entirely by replacing flat vector stores with a Knowledge Graph.
 - Memory pipeline builds a structured web of triples.
 - Employs a neurobiologically inspired mechanism known as spreading activation for data retrieval.

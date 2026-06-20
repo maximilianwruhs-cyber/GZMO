@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[prompt-agent-engineering-part2-micro04|prompt-agent-engineering-part2-micro04]] (2026-06-09)
+## From [prompt-agent-engineering-part2-micro04](/entities/prompt-agent-engineering-part2-micro04.md) (2026-06-09)
 - This is one of the 6 AI agents engineered.
 - Its focus is Scope & Rule Enforcement.
 - Core philosophy is discipline, predictable patterns, and ruthless prioritization.

@@ -14,13 +14,13 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-10).
 
 ## Entities
-- [[openclaw-schema-json|openclaw.schema.json]] (ORGANIZATION)
-- [[kaspre|Kaspre]] (PERSON)
-- [[extract-schema-mjs|extract-schema.mjs]] (TOOL)
-- [[aronchick|aronchick]] (PERSON)
-- [[zod|Zod]] (TOOL)
-- [[ajv|ajv]] (TOOL)
-- [[vs-code|VS Code]] (TOOL)
+- [openclaw.schema.json](/entities/openclaw-schema-json.md) (ORGANIZATION)
+- [Kaspre](/entities/kaspre.md) (PERSON)
+- [extract-schema.mjs](/entities/extract-schema-mjs.md) (TOOL)
+- [aronchick](/entities/aronchick.md) (PERSON)
+- [Zod](/entities/zod.md) (TOOL)
+- [ajv](/entities/ajv.md) (TOOL)
+- [VS Code](/entities/vs-code.md) (TOOL)
 
 ## Relations
 - aronchick → RELATED_TO → openclaw.schema.json

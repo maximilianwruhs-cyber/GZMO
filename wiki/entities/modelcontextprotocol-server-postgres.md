@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[ultimate-local-ai-development-stack-for-vscodium-micro02|ultimate-local-ai-development-stack-for-vscodium-micro02]] (2026-06-09)
+## From [ultimate-local-ai-development-stack-for-vscodium-micro02](/entities/ultimate-local-ai-development-stack-for-vscodium-micro02.md) (2026-06-09)
 - An MCP server that points to a local development database.
 - Allows Roo Code to query database schemas directly.

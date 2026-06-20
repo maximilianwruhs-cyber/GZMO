@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[prompt-agent-engineering-part6-micro04|prompt-agent-engineering-part6-micro04]] (2026-06-10)
+## From [prompt-agent-engineering-part6-micro04](/entities/prompt-agent-engineering-part6-micro04.md) (2026-06-10)
 - Role assigned to analyze UI input for cross-platform compatibility, accessibility, and usability friction.

@@ -14,8 +14,8 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-research-process-steps-micro03|drive-research-research-process-steps-micro03]] (2026-06-10)
+## From [drive-research-research-process-steps-micro03](/entities/drive-research-research-process-steps-micro03.md) (2026-06-10)
 - A CLI tool used to output active power consumption for AMD GPUs.
 
-## From [[optimizing-nvidia-blackwell-sm120-part3-micro02|optimizing-nvidia-blackwell-sm120-part3-micro02]] (2026-06-10)
+## From [optimizing-nvidia-blackwell-sm120-part3-micro02](/entities/optimizing-nvidia-blackwell-sm120-part3-micro02.md) (2026-06-10)
 - Used to output active power consumption on AMD GPUs

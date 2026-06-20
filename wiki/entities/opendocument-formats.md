@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-markitdown-format-parity-checklist|drive-research-markitdown-format-parity-checklist]] (2026-06-08)
+## From [drive-research-markitdown-format-parity-checklist](/entities/drive-research-markitdown-format-parity-checklist.md) (2026-06-08)
 - Supported formats include .odt, .ods, .odp.
 - No native conversion logic exists in the core repository.
 - Users rely on separate crates like markdownify or Pandoc for intermediate conversions.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[openclaw-deep-research-part11-micro02|openclaw-deep-research-part11-micro02]] (2026-06-10)
+## From [openclaw-deep-research-part11-micro02](/entities/openclaw-deep-research-part11-micro02.md) (2026-06-10)
 - Implements GodMode / Self-Orchestrating Workflows pattern
 - Features 5 predefined workflow templates
 - Has 3 stars

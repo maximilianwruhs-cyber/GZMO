@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[spec-driven-development-architecting-the-era-of-a-micro04|spec-driven-development-architecting-the-era-of-a-micro04]] (2026-06-09)
+## From [spec-driven-development-architecting-the-era-of-a-micro04](/entities/spec-driven-development-architecting-the-era-of-a-micro04.md) (2026-06-09)
 - Entry-level postings now demand candidates leverage these to produce senior-level output.
 - The age of unconstrained, prompt-based "vibe coding" exposed the inherent limitations of treating Large Language Models as autonomous developers in complex enterprise environments.

@@ -14,19 +14,19 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-10).
 
 ## Entities
-- [[gustavo-gondim|Gustavo Gondim]] (PERSON)
-- [[claude-sdk|Claude SDK]] (TOOL)
-- [[llm-task|llm-task]] (TOOL)
-- [[sub-lobsters|Sub-Lobsters]] (CONCEPT)
-- [[agenttoagent|agentToAgent]] (CONCEPT)
-- [[openclaw|OpenClaw]] (SYSTEM)
-- [[sessions-send|sessions_send]] (CONCEPT)
-- [[protoagent|Protoagent]] (TOOL)
-- [[ralph-orchestrator|Ralph Orchestrator]] (SYSTEM)
-- [[lobster|Lobster]] (SYSTEM)
-- [[github-copilot|GitHub Copilot]] (TOOL)
-- [[nats|NATS]] (TOOL)
-- [[redis-streams|Redis Streams]] (TOOL)
+- [Gustavo Gondim](/entities/gustavo-gondim.md) (PERSON)
+- [Claude SDK](/entities/claude-sdk.md) (TOOL)
+- [llm-task](/entities/llm-task.md) (TOOL)
+- [Sub-Lobsters](/entities/sub-lobsters.md) (CONCEPT)
+- [agentToAgent](/entities/agenttoagent.md) (CONCEPT)
+- [OpenClaw](/entities/openclaw.md) (SYSTEM)
+- [sessions_send](/entities/sessions-send.md) (CONCEPT)
+- [Protoagent](/entities/protoagent.md) (TOOL)
+- [Ralph Orchestrator](/entities/ralph-orchestrator.md) (SYSTEM)
+- [Lobster](/entities/lobster.md) (SYSTEM)
+- [GitHub Copilot](/entities/github-copilot.md) (TOOL)
+- [NATS](/entities/nats.md) (TOOL)
+- [Redis Streams](/entities/redis-streams.md) (TOOL)
 
 ## Relations
 - Lobster → PART_OF → OpenClaw

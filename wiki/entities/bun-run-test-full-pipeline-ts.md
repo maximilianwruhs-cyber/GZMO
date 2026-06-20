@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[the-gzmo-daemon-high-performance-bun-refactor|the-gzmo-daemon-high-performance-bun-refactor]] (2026-06-08)
+## From [the-gzmo-daemon-high-performance-bun-refactor](/entities/the-gzmo-daemon-high-performance-bun-refactor.md) (2026-06-08)
 - Successfully executed after refactor.
 - Tests the full pipeline.
 - Used for high-performance refactor.

@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-advanced-prompt-engineering-for-comprehensive-c|drive-research-advanced-prompt-engineering-for-comprehensive-c]] (2026-06-08)
+## From [drive-research-advanced-prompt-engineering-for-comprehensive-c](/entities/drive-research-advanced-prompt-engineering-for-comprehensive-c.md) (2026-06-08)
 - A characteristic of Pipeline Patterns.
 - Establishes a strict dependency flow where the context and results of previous operations guide subsequent processing.

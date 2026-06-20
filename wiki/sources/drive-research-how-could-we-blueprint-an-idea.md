@@ -14,20 +14,20 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-08).
 
 ## Entities
-- [[formal-conversational-protocol-fcop|Formal Conversational Protocol (FCoP)]] (CONCEPT)
-- [[sovereign-software-factory|Sovereign Software Factory]] (SYSTEM)
-- [[task|TASK]] (CONCEPT)
-- [[defender-agent|Defender Agent]] (CONCEPT)
-- [[prosecutor-agent|Prosecutor Agent]] (CONCEPT)
-- [[obsidian|Obsidian]] (TOOL)
-- [[prosecutor-defender-umpire|Prosecutor-Defender-Umpire]] (CONCEPT)
-- [[rust-based-tui|Rust-based TUI]] (TOOL)
-- [[issue|ISSUE]] (CONCEPT)
-- [[unbound|UNBOUND]] (CONCEPT)
-- [[umpire-agent|Umpire Agent]] (CONCEPT)
-- [[vscodium|VSCodium]] (TOOL)
-- [[active-conversation-protocol-acp|Active Conversation Protocol (ACP)]] (CONCEPT)
-- [[report|REPORT]] (CONCEPT)
+- [Formal Conversational Protocol (FCoP)](/entities/formal-conversational-protocol-fcop.md) (CONCEPT)
+- [Sovereign Software Factory](/entities/sovereign-software-factory.md) (SYSTEM)
+- [TASK](/entities/task.md) (CONCEPT)
+- [Defender Agent](/entities/defender-agent.md) (CONCEPT)
+- [Prosecutor Agent](/entities/prosecutor-agent.md) (CONCEPT)
+- [Obsidian](/entities/obsidian.md) (TOOL)
+- [Prosecutor-Defender-Umpire](/entities/prosecutor-defender-umpire.md) (CONCEPT)
+- [Rust-based TUI](/entities/rust-based-tui.md) (TOOL)
+- [ISSUE](/entities/issue.md) (CONCEPT)
+- [UNBOUND](/entities/unbound.md) (CONCEPT)
+- [Umpire Agent](/entities/umpire-agent.md) (CONCEPT)
+- [VSCodium](/entities/vscodium.md) (TOOL)
+- [Active Conversation Protocol (ACP)](/entities/active-conversation-protocol-acp.md) (CONCEPT)
+- [REPORT](/entities/report.md) (CONCEPT)
 
 ## Relations
 - Sovereign Software Factory → PART_OF → Obsidian

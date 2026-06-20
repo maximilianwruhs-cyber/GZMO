@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: ATTACK
 
-## From [[ai-research-part6-micro05|ai-research-part6-micro05]] (2026-06-09)
+## From [ai-research-part6-micro05](/entities/ai-research-part6-micro05.md) (2026-06-09)
 - Can be used to trick agents into exfiltrating sensitive information.
 - Led to Shodan exposures in January 2026.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[gzmo-soul-merged-new-part1|gzmo-soul-merged-new-part1]] (2026-06-09)
+## From [gzmo-soul-merged-new-part1](/entities/gzmo-soul-merged-new-part1.md) (2026-06-09)
 - Example is the 'Local Files Organizer'.
 - Equips a local AI agent to go far beyond checking rigid naming conventions.
 - Ist eine engmaschig definierte Schnittstelle

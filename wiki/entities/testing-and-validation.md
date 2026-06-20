@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[prompt-agent-engineering-part6-micro07|prompt-agent-engineering-part6-micro07]] (2026-06-10)
+## From [prompt-agent-engineering-part6-micro07](/entities/prompt-agent-engineering-part6-micro07.md) (2026-06-10)
 - Phase 4 of the execution protocol.
 - Involves designing test suites, executing tests, and performance benchmarking.

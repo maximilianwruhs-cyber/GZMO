@@ -1,0 +1,38 @@
+{
+  "generated_at": "2026-06-20T09:29:13Z",
+  "total_queries": 5,
+  "passed": 5,
+  "pass_rate": 1.0,
+  "results": [
+    {
+      "link_id": "R01",
+      "recall_query": "open knowledge format okf wiki",
+      "hit": true,
+      "preview": "Platform recall for 'open knowledge format okf wiki':\n\n## Honeypot / Vault\n\n- [1] (Score: 0.77) [SYSTEM:Obsidian Vault] Used for compiling synthesized knowledge.\n- [2] (Score: 0.37) [CONCEPT:Open Pack"
+    },
+    {
+      "link_id": "R02",
+      "recall_query": "agentic resource discovery obolus",
+      "hit": true,
+      "preview": "Platform recall for 'agentic resource discovery obolus':\n\n## Honeypot / Vault\n\n- [1] (Score: 0.05) [PROJECT:obolus] Native resource (token) of the system.\n- [2] (Score: 0.05) [PROJECT:obolus] Agents m"
+    },
+    {
+      "link_id": "R03",
+      "recall_query": "mcp least privilege tool discovery",
+      "hit": true,
+      "preview": "Platform recall for 'mcp least privilege tool discovery':\n\n## Honeypot / Vault\n\n- [1] (Score: 1.00) [SYSTEM:Pi] Supports custom extensions for intercepting tool discovery.\n- [2] (Score: 1.00) [TOOL:gz"
+    },
+    {
+      "link_id": "R04",
+      "recall_query": "agent reach sovereign compliance blocked",
+      "hit": true,
+      "preview": "Platform recall for 'agent reach sovereign compliance blocked':\n\n## Honeypot / Vault\n\n- [1] (Score: 0.66) [PERSON:Senior Systems Engineer und Compliance Auditor] An expert role an agent can be placed "
+    },
+    {
+      "link_id": "R05",
+      "recall_query": "okf progressive disclosure honeypot",
+      "hit": true,
+      "preview": "Platform recall for 'okf progressive disclosure honeypot':\n\n## Honeypot / Vault\n\n- [1] (Score: 0.97) [CONCEPT:Progressive Disclosure] Operates across three distinct phases: Discovery, Activation, and "
+    }
+  ]
+}

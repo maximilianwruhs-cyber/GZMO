@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-redefining-agentic-soulmd-to-dialog-micro04|drive-research-redefining-agentic-soulmd-to-dialog-micro04]] (2026-06-09)
+## From [drive-research-redefining-agentic-soulmd-to-dialog-micro04](/entities/drive-research-redefining-agentic-soulmd-to-dialog-micro04.md) (2026-06-09)
 - Modern prompt design for inter-agent communication protocols.
 - Instructions are layered by function to maximize traceability, minimize context dilution, and enhance collaborative efficacy.
 - Incorporates three distinct layers: Task, Context, and Coordination.

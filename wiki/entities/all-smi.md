@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-research-process-steps-micro03|drive-research-research-process-steps-micro03]] (2026-06-10)
+## From [drive-research-research-process-steps-micro03](/entities/drive-research-research-process-steps-micro03.md) (2026-06-10)
 - A cross-platform monitoring utility for NVIDIA, AMD, Intel Arc, and Apple Silicon.
 - Reads system temperatures directly from the System Management Controller (SMC) on macOS.
 
-## From [[optimizing-nvidia-blackwell-sm120-part3-micro02|optimizing-nvidia-blackwell-sm120-part3-micro02]] (2026-06-10)
+## From [optimizing-nvidia-blackwell-sm120-part3-micro02](/entities/optimizing-nvidia-blackwell-sm120-part3-micro02.md) (2026-06-10)
 - Cross-platform monitoring utility
 - Consolidates metrics across NVIDIA, AMD, Intel Arc, and Apple Silicon

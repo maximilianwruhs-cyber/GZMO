@@ -14,11 +14,11 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[architectural-strategy-for-stealthy-portable-cli-a|architectural-strategy-for-stealthy-portable-cli-a]] (2026-06-08)
+## From [architectural-strategy-for-stealthy-portable-cli-a](/entities/architectural-strategy-for-stealthy-portable-cli-a.md) (2026-06-08)
 - The agent should utilize an embedded, transparently encrypted database solution such as SQLCipher.
 - SQLCipher provides robust page-level encryption for SQLite databases using 256-bit AES.
 
-## From [[drive-research-architecting-zero-configuration-portable-agents-s-micro03|drive-research-architecting-zero-configuration-portable-agents-s-micro03]] (2026-06-09)
+## From [drive-research-architecting-zero-configuration-portable-agents-s-micro03](/entities/drive-research-architecting-zero-configuration-portable-agents-s-micro03.md) (2026-06-09)
 - Provides robust page-level encryption for SQLite databases using 256-bit AES.
 - An optimal approach for encrypted storage paradigm.
 - Provides page-level encryption for SQLite databases using 256-bit AES.

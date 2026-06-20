@@ -14,9 +14,9 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-the-anatomy-of-a-world-class-readme|drive-research-the-anatomy-of-a-world-class-readme]] (2026-06-08)
+## From [drive-research-the-anatomy-of-a-world-class-readme](/entities/drive-research-the-anatomy-of-a-world-class-readme.md) (2026-06-08)
 - An example of a fully managed developer portal for complex enterprise products.
 
-## From [[drive-research-creating-a-comprehensive-readmemd-micro02|drive-research-creating-a-comprehensive-readmemd-micro02]] (2026-06-09)
+## From [drive-research-creating-a-comprehensive-readmemd-micro02](/entities/drive-research-creating-a-comprehensive-readmemd-micro02.md) (2026-06-09)
 - Developer portal platform offering tiered enterprise solutions.
 - Features include dynamic API explorers, user authentication mapping, audit logs, and versioning control.

@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[openclaw-part1-micro02|openclaw-part1-micro02]] (2026-06-10)
+## From [openclaw-part1-micro02](/entities/openclaw-part1-micro02.md) (2026-06-10)
 - Released in April 2026
 - A system that acts as a persistent background process

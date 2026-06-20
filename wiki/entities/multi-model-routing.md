@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[drive-research-tinyfolder-gzmo-architecture-analysis-product|drive-research-tinyfolder-gzmo-architecture-analysis-product]] (2026-06-08)
+## From [drive-research-tinyfolder-gzmo-architecture-analysis-product](/entities/drive-research-tinyfolder-gzmo-architecture-analysis-product.md) (2026-06-08)
 - A mid-term strategic recommendation.
 - Use Ollama's multi-model loading for GZMO_FAST_MODEL, GZMO_REASON_MODEL, GZMO_JUDGE_MODEL.
 - Addresses the 'Single Model, Single Cost Function' gap.

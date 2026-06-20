@@ -15,12 +15,12 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-advanced-typescript-execution-in-the-bun-runtime-micro02|drive-research-advanced-typescript-execution-in-the-bun-runtime-micro02]] (2026-06-09)
+## From [drive-research-advanced-typescript-execution-in-the-bun-runtime-micro02](/entities/drive-research-advanced-typescript-execution-in-the-bun-runtime-micro02.md) (2026-06-09)
 - Bun natively executes TypeScript, replacing the need for tools like tsx.
 
-## From [[drive-research-bun-typescript-performance-tips-micro02|drive-research-bun-typescript-performance-tips-micro02]] (2026-06-09)
+## From [drive-research-bun-typescript-performance-tips-micro02](/entities/drive-research-bun-typescript-performance-tips-micro02.md) (2026-06-09)
 - Bun's internal transpiler replaces the need for tsx for execution.
 
-## From [[high-performance-typescript-execution-and-architec-part1-micro02|high-performance-typescript-execution-and-architec-part1-micro02]] (2026-06-09)
+## From [high-performance-typescript-execution-and-architec-part1-micro02](/entities/high-performance-typescript-execution-and-architec-part1-micro02.md) (2026-06-09)
 - An external tool for executing TypeScript.
 - Bun replaces the need for tsx.

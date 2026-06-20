@@ -14,19 +14,19 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-10).
 
 ## Entities
-- [[modul-b-prozesslandschaft-operations-und-die-analyse-von-ineffizienzen-process-mining|Modul B: Prozesslandschaft, Operations und die Analyse von Ineffizienzen (Process Mining)]] (PROJECT)
-- [[vorbereiter-managed-level-4|Vorbereiter / Managed (Level 4)]] (CONCEPT)
-- [[sap|SAP]] (SYSTEM)
-- [[modul-c-datenarchitektur-technologische-infrastruktur-und-mlops|Modul C: Datenarchitektur, Technologische Infrastruktur und MLOps]] (CONCEPT)
-- [[entdecker-defined-level-3|Entdecker / Defined (Level 3)]] (CONCEPT)
-- [[servicenow|ServiceNow]] (SYSTEM)
-- [[oracle|Oracle]] (SYSTEM)
-- [[rpa|RPA]] (CONCEPT)
-- [[celonis-pi-graph|Celonis PI Graph]] (TOOL)
-- [[data-governance|Data Governance]] (CONCEPT)
-- [[anwender-optimized-level-5|Anwender / Optimized (Level 5)]] (CONCEPT)
-- [[modul-a-strategische-ausrichtung-gesch-ftsmodell-und-marktdynamik-business-strategy-canvas|Modul A: Strategische Ausrichtung, Geschäftsmodell und Marktdynamik (Business Strategy & Canvas)]] (PROJECT)
-- [[discovery-assessment|Discovery-Assessment]] (PROJECT)
+- [Modul B: Prozesslandschaft, Operations und die Analyse von Ineffizienzen (Process Mining)](/entities/modul-b-prozesslandschaft-operations-und-die-analyse-von-ineffizienzen-process-mining.md) (PROJECT)
+- [Vorbereiter / Managed (Level 4)](/entities/vorbereiter-managed-level-4.md) (CONCEPT)
+- [SAP](/entities/sap.md) (SYSTEM)
+- [Modul C: Datenarchitektur, Technologische Infrastruktur und MLOps](/entities/modul-c-datenarchitektur-technologische-infrastruktur-und-mlops.md) (CONCEPT)
+- [Entdecker / Defined (Level 3)](/entities/entdecker-defined-level-3.md) (CONCEPT)
+- [ServiceNow](/entities/servicenow.md) (SYSTEM)
+- [Oracle](/entities/oracle.md) (SYSTEM)
+- [RPA](/entities/rpa.md) (CONCEPT)
+- [Celonis PI Graph](/entities/celonis-pi-graph.md) (TOOL)
+- [Data Governance](/entities/data-governance.md) (CONCEPT)
+- [Anwender / Optimized (Level 5)](/entities/anwender-optimized-level-5.md) (CONCEPT)
+- [Modul A: Strategische Ausrichtung, Geschäftsmodell und Marktdynamik (Business Strategy & Canvas)](/entities/modul-a-strategische-ausrichtung-gesch-ftsmodell-und-marktdynamik-business-strategy-canvas.md) (PROJECT)
+- [Discovery-Assessment](/entities/discovery-assessment.md) (PROJECT)
 
 ## Relations
 - Discovery-Assessment → PART_OF → Modul A: Strategische Ausrichtung, Geschäftsmodell und Marktdynamik (Business Strategy & Canvas)

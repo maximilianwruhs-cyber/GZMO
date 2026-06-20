@@ -14,6 +14,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-ai-agents-and-spec-driven-development1-micro02|drive-research-ai-agents-and-spec-driven-development1-micro02]] (2026-06-09)
+## From [drive-research-ai-agents-and-spec-driven-development1-micro02](/entities/drive-research-ai-agents-and-spec-driven-development1-micro02.md) (2026-06-09)
 - Structural displacement faced by junior developers due to AI tools
 - Defined by industry leaders

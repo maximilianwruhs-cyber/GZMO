@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-the-most-important-books-in-computer-science|drive-research-the-most-important-books-in-computer-science]] (2026-06-08)
+## From [drive-research-the-most-important-books-in-computer-science](/entities/drive-research-the-most-important-books-in-computer-science.md) (2026-06-08)
 - Core principle taught in SICP
 - Influenced by The C Programming Language

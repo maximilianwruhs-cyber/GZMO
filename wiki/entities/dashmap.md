@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[dynamics-of-the-unpredictable-micro05|dynamics-of-the-unpredictable-micro05]] (2026-06-10)
+## From [dynamics-of-the-unpredictable-micro05](/entities/dynamics-of-the-unpredictable-micro05.md) (2026-06-10)
 - A concurrent hash map.

@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[ai-research-part5|ai-research-part5]] (2026-06-08)
+## From [ai-research-part5](/entities/ai-research-part5.md) (2026-06-08)
 - Author of the paper.
 - Corresponding author.

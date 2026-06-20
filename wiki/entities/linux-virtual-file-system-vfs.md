@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[resilient-rust-based-mcp-client-and-llm-orchestrat-micro03|resilient-rust-based-mcp-client-and-llm-orchestrat-micro03]] (2026-06-09)
+## From [resilient-rust-based-mcp-client-and-llm-orchestrat-micro03](/entities/resilient-rust-based-mcp-client-and-llm-orchestrat-micro03.md) (2026-06-09)
 - Protection is enforced deeply within the VFS layer.
 - Intercepts all write-oriented system calls.
 - Rejects write operations, returning an EROFS error.

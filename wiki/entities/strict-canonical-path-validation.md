@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-safe-unzip-practices-for-threat-model-micro03|drive-research-safe-unzip-practices-for-threat-model-micro03]] (2026-06-09)
+## From [drive-research-safe-unzip-practices-for-threat-model-micro03](/entities/drive-research-safe-unzip-practices-for-threat-model-micro03.md) (2026-06-09)
 - Mandatory to prevent directory traversal exploits.
 - Requires functions equivalent to Java's getCanonicalPath().
 - Requires functions equivalent to Node's path.resolve().

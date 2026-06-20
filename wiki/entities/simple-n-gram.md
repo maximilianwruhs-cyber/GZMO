@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[architectures-and-optimizations-for-speculative-de-micro05|architectures-and-optimizations-for-speculative-de-micro05]] (2026-06-09)
+## From [architectures-and-optimizations-for-speculative-de-micro05](/entities/architectures-and-optimizations-for-speculative-de-micro05.md) (2026-06-09)
 - A speculation type in llama.cpp (--spec-type ngram-simple).
 - Conducts a rapid search for the last occurrence of the exact current n-gram.
 - Proposes subsequent tokens if a match is found.

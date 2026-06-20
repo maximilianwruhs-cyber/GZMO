@@ -16,7 +16,7 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[ai-research-part7|ai-research-part7]] (2026-06-08)
+## From [ai-research-part7](/entities/ai-research-part7.md) (2026-06-08)
 - It is a repository.
 - It must be integrated into the human-interface layer.
 - It transforms standard kanban boards into highly active deployment environments.
@@ -24,10 +24,10 @@ Type: PROJECT
 - It is part of the human interface layer.
 - It transforms standard kanban boards into active deployment environments.
 
-## From [[ai-research-part9|ai-research-part9]] (2026-06-08)
+## From [ai-research-part9](/entities/ai-research-part9.md) (2026-06-08)
 - Visual kanban project management tool.
 - Integrates with Git.
 - Automatically provisions isolated worktrees and dev servers for agents to execute tasks.
 
-## From [[ai-research-part8-micro08|ai-research-part8-micro08]] (2026-06-09)
+## From [ai-research-part8-micro08](/entities/ai-research-part8-micro08.md) (2026-06-09)
 - A visual kanban project management tool that integrates with Git for isolated agent workspaces.

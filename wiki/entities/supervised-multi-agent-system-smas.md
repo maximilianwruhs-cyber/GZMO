@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-architektur-token-effizienter-ki-agenten-strategi|drive-research-architektur-token-effizienter-ki-agenten-strategi]] (2026-06-08)
+## From [drive-research-architektur-token-effizienter-ki-agenten-strategi](/entities/drive-research-architektur-token-effizienter-ki-agenten-strategi.md) (2026-06-08)
 - A SupervisorAgent monitors high-risk interaction sites.
 - An LLM-free adaptive filter captures excessive or invalid observations.
 - The filter forwards observations to the SupervisorAgent for compression and cleaning.
 
-## From [[gzmo-soul-merged-new-part2-micro08|gzmo-soul-merged-new-part2-micro08]] (2026-06-10)
+## From [gzmo-soul-merged-new-part2-micro08](/entities/gzmo-soul-merged-new-part2-micro08.md) (2026-06-10)
 - Etabliert zur Steuerung der Token-Effizienz

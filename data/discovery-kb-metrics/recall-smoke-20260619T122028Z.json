@@ -1,0 +1,38 @@
+{
+  "generated_at": "2026-06-19T12:20:28Z",
+  "total_queries": 5,
+  "passed": 5,
+  "pass_rate": 1.0,
+  "results": [
+    {
+      "link_id": "L1",
+      "recall_query": "system health",
+      "hit": true,
+      "preview": "Platform recall for 'system health':\n\n## Honeypot / Vault\n\n- [1] (Score: 1.00) [SYSTEM:gzmo_health] Identifies the current state of the GZMO ecosystem\n- [2] (Score: 1.00) [SYSTEM:sys_janitor] Reported"
+    },
+    {
+      "link_id": "L1",
+      "recall_query": "system health",
+      "hit": true,
+      "preview": "Platform recall for 'system health':\n\n## Honeypot / Vault\n\n- [1] (Score: 1.00) [SYSTEM:gzmo_health] Identifies the current state of the GZMO ecosystem\n- [2] (Score: 1.00) [SYSTEM:sys_janitor] Reported"
+    },
+    {
+      "link_id": "L2",
+      "recall_query": "l7 readiness",
+      "hit": true,
+      "preview": "Platform recall for 'l7 readiness':\n\n## Honeypot / Vault\n\n- [1] (Score: 0.42) [CONCEPT:Primode] It represents the system's absolute baseline readiness or resistance to initiating drive.\n- [2] (Score: "
+    },
+    {
+      "link_id": "L05",
+      "recall_query": "network dependency",
+      "hit": true,
+      "preview": "Platform recall for 'network dependency':\n\n## Honeypot / Vault\n\n- [1] (Score: 0.99) [CONCEPT:air-gapped deployment] External network dependencies represent dead code.\n- [2] (Score: 0.99) [CONCEPT:Form"
+    },
+    {
+      "link_id": "L01",
+      "recall_query": "task lifecycle",
+      "hit": true,
+      "preview": "Platform recall for 'task lifecycle':\n\n## Honeypot / Vault\n\n- [1] (Score: 0.08) [BOOK:drive-research-architecting-a-linux-task-manager-design-principl.md] Discusses design principles, procfs interacti"
+    }
+  ]
+}

@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part1|ai-research-part1]] (2026-06-08)
+## From [ai-research-part1](/entities/ai-research-part1.md) (2026-06-08)
 - A variant of Attention Residuals designed to address memory and communication overhead.
 - Partitions layers into blocks and attends over block-level representations.
 - Reduces memory footprint and communication from O(Ld) to O(Nd).
@@ -25,7 +25,7 @@ Type: CONCEPT
 - For sources in a completed earlier block Bn, all share the block-level key/value bn.
 - Reduces cost from O(L2) to O(LN) compared to Full AttnRes.
 
-## From [[ai-research-part8-micro02|ai-research-part8-micro02]] (2026-06-09)
+## From [ai-research-part8-micro02](/entities/ai-research-part8-micro02.md) (2026-06-09)
 - A variant of Attention Residuals engineered to reconcile deep expressivity with hardware constraints.
 - Partitions layers into blocks and applies softmax attention across blocks.
 - Reduces communication and memory footprint.

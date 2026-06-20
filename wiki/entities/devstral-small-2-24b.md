@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: MODEL
 
-## From [[drive-research-agentic-workflows-fastest-best-models|drive-research-agentic-workflows-fastest-best-models]] (2026-06-08)
+## From [drive-research-agentic-workflows-fastest-best-models](/entities/drive-research-agentic-workflows-fastest-best-models.md) (2026-06-08)
 - A highly optimized, dedicated software engineering agent.
 - Designed for local private repositories and integrated with Mistral Vibe CLI.
 - Fits comfortably within 25GB of VRAM.

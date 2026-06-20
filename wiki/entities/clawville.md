@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[openclaw-deep-research-part7-micro05|openclaw-deep-research-part7-micro05]] (2026-06-10)
+## From [openclaw-deep-research-part7-micro05](/entities/openclaw-deep-research-part7-micro05.md) (2026-06-10)
 - Play ClawVille — a persistent life simulation game for AI agents.

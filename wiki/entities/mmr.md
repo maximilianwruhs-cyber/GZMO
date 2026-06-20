@@ -15,13 +15,13 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[openclaw-part2|openclaw-part2]] (2026-06-08)
+## From [openclaw-part2](/entities/openclaw-part2.md) (2026-06-08)
 - Used during the Deep Phase of the sleep cycle.
 - Applies rigorous mathematical filters to evaluate patterns based on relevance, frequency, and diversity.
 
-## From [[openclaw-part1-micro07|openclaw-part1-micro07]] (2026-06-09)
+## From [openclaw-part1-micro07](/entities/openclaw-part1-micro07.md) (2026-06-09)
 - precise mathematical diversity filtering.
 - used in the Dreaming process.
 
-## From [[openclaw-part1-micro02|openclaw-part1-micro02]] (2026-06-10)
+## From [openclaw-part1-micro02](/entities/openclaw-part1-micro02.md) (2026-06-10)
 - Maximal Marginal Relevance used to balance relevance and diversity during consolidation

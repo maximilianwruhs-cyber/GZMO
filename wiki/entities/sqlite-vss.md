@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[local-first-rag-architecting-sovereign-ai-with-li|local-first-rag-architecting-sovereign-ai-with-li]] (2026-06-08)
+## From [local-first-rag-architecting-sovereign-ai-with-li](/entities/local-first-rag-architecting-sovereign-ai-with-li.md) (2026-06-08)
 - Represents a highly efficient, monolithic alternative for local RAG engineering.
 - Integrates Facebook AI Similarity Search (FAISS) capabilities directly into a standard, single-file SQLite database.
 - Allows the entire infrastructure to condense into a single local machine architecture.

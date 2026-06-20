@@ -14,14 +14,14 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[skill-creator|skill-creator]] (TOOL)
-- [[openai|OpenAI]] (ORGANIZATION)
-- [[plugins|Plugins]] (CONCEPT)
-- [[skill-installer|skill-installer]] (TOOL)
-- [[codex|Codex]] (TOOL)
-- [[mcp|MCP]] (CONCEPT)
-- [[skill-md|SKILL.md]] (CONCEPT)
-- [[agent-skills|Agent Skills]] (CONCEPT)
+- [skill-creator](/entities/skill-creator.md) (TOOL)
+- [OpenAI](/entities/openai.md) (ORGANIZATION)
+- [Plugins](/entities/plugins.md) (CONCEPT)
+- [skill-installer](/entities/skill-installer.md) (TOOL)
+- [Codex](/entities/codex.md) (TOOL)
+- [MCP](/entities/mcp.md) (CONCEPT)
+- [SKILL.md](/entities/skill-md.md) (CONCEPT)
+- [Agent Skills](/entities/agent-skills.md) (CONCEPT)
 
 ## Relations
 - SKILL.md → PART_OF → Agent Skills

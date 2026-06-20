@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[openclaw-deep-research-part12|openclaw-deep-research-part12]] (2026-06-08)
+## From [openclaw-deep-research-part12](/entities/openclaw-deep-research-part12.md) (2026-06-08)
 - A response indicating no important changes during a heartbeat.
 - Used to avoid unnecessary LLM calls.
 - A feature of OpenClaw that allows the AI to wake up proactively and monitor situations.

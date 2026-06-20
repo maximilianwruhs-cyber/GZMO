@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-linux-gaming-and-ai-build-guide-micro02|drive-research-linux-gaming-and-ai-build-guide-micro02]] (2026-06-09)
+## From [drive-research-linux-gaming-and-ai-build-guide-micro02](/entities/drive-research-linux-gaming-and-ai-build-guide-micro02.md) (2026-06-09)
 - Proton 11 executes Windows-native games with zero translation latency.
 - Proton dynamically translates Windows DirectX 11 and 12 graphical API calls into Vulkan instructions.
 - Wine 11.0 brought massive architectural upgrades to the ecosystem, most notably fully supported WoW64 mode, which allows 32-bit and 16-bit legacy Windows applications to run effortlessly.

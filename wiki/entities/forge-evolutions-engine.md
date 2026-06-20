@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[obolus-micro01|obolus-micro01]] (2026-06-09)
+## From [obolus-micro01](/entities/obolus-micro01.md) (2026-06-09)
 - The mechanism of recombination and rebirth.
 - Performs a technical 'autopsy' on terminated miners.
 - Analyzes specific behavioral trajectories and error logs of failed agents to improve its DNA in the next generation.

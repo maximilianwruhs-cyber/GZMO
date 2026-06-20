@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[openclaw-deep-research-part4|openclaw-deep-research-part4]] (2026-06-08)
+## From [openclaw-deep-research-part4](/entities/openclaw-deep-research-part4.md) (2026-06-08)
 - Author of 'OpenClaw vs AutoGPT Comparison | Hire Overseas'.
 - Wrote about OpenClaw vs AutoGPT.

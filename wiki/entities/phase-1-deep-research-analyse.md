@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[aether-grid-micro02|aether-grid-micro02]] (2026-06-09)
+## From [aether-grid-micro02](/entities/aether-grid-micro02.md) (2026-06-09)
 - analyzes the full software stack of AETHER-GRID
 - based on official NVIDIA-Docs, Release-Notes, Forums and Best Practices (as of 2026-03-01)

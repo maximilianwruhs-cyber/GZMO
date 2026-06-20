@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[resilient-rust-based-mcp-client-and-llm-orchestrat-micro04|resilient-rust-based-mcp-client-and-llm-orchestrat-micro04]] (2026-06-10)
+## From [resilient-rust-based-mcp-client-and-llm-orchestrat-micro04](/entities/resilient-rust-based-mcp-client-and-llm-orchestrat-micro04.md) (2026-06-10)
 - A Rust framework for gRPC used as a reference for the tower-mcp extractor pattern.

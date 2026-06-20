@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[from-static-vaults-to-autonomous-knowledge-engines|from-static-vaults-to-autonomous-knowledge-engines]] (2026-06-08)
+## From [from-static-vaults-to-autonomous-knowledge-engines](/entities/from-static-vaults-to-autonomous-knowledge-engines.md) (2026-06-08)
 - It shifts the focus from explicit references to predicted relationships.
 - It uses algorithms like Jaccard similarity and co-occurrence metrics to identify semantic relationships.
 - It can surface related concepts, forgotten ideas, and potential "common nodes".

@@ -14,12 +14,12 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-rust-tui-architecture-tech-stack1-micro01|drive-research-rust-tui-architecture-tech-stack1-micro01]] (2026-06-09)
+## From [drive-research-rust-tui-architecture-tech-stack1-micro01](/entities/drive-research-rust-tui-architecture-tech-stack1-micro01.md) (2026-06-09)
 - Transitioning from text-based environments to high-fidelity, interactive rendering surfaces.
 - Rival the responsiveness, aesthetic polish, and architectural complexity of native desktop or web applications.
 - Represents a paradigm shift in operator experience for performance-critical domains.
 
-## From [[drive-research-rust-tui-architecture-tech-stack1-micro04|drive-research-rust-tui-architecture-tech-stack1-micro04]] (2026-06-09)
+## From [drive-research-rust-tui-architecture-tech-stack1-micro04](/entities/drive-research-rust-tui-architecture-tech-stack1-micro04.md) (2026-06-09)
 - Transitioning from rudimentary text-based environments to high-fidelity, interactive rendering surfaces.
 - Rivaling responsiveness, aesthetic polish, and architectural complexity of native desktop or web applications.
 - Represents a paradigm shift in operator experience for performance-critical domains.

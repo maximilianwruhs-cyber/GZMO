@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[openclaw-rust-terminal-user-interface-architecture-micro02|openclaw-rust-terminal-user-interface-architecture-micro02]] (2026-06-10)
+## From [openclaw-rust-terminal-user-interface-architecture-micro02](/entities/openclaw-rust-terminal-user-interface-architecture-micro02.md) (2026-06-10)
 - A community fork of the OpenClaw ecosystem
 - Implemented in Rust

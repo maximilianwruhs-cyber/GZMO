@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-benchmarking-llamacpp-server-prefill-tokens-micro01|drive-research-benchmarking-llamacpp-server-prefill-tokens-micro01]] (2026-06-09)
+## From [drive-research-benchmarking-llamacpp-server-prefill-tokens-micro01](/entities/drive-research-benchmarking-llamacpp-server-prefill-tokens-micro01.md) (2026-06-09)
 - Used for benchmarking prompt prefill throughput and HTTP methodologies.
 - Prefill efficiency is often superior during long-sequence ingest.
 - Has server-side configuration parameters dictating prefill speed.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-token-efficient-bol-processing-architecture|drive-research-token-efficient-bol-processing-architecture]] (2026-06-08)
+## From [drive-research-token-efficient-bol-processing-architecture](/entities/drive-research-token-efficient-bol-processing-architecture.md) (2026-06-08)
 - Determine how data flows through classifiers, NER extractors, retrieval vectors, and final decision-making LLMs.
 - Two dominant Python-centric frameworks are LangGraph and LlamaIndex Workflows.
 - Mastra is an emerging TypeScript alternative.

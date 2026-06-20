@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[prompt-agent-engineering-part2-micro02|prompt-agent-engineering-part2-micro02]] (2026-06-09)
+## From [prompt-agent-engineering-part2-micro02](/entities/prompt-agent-engineering-part2-micro02.md) (2026-06-09)
 - Extracts UI screenshots into a design system.
 - Uses raw CSS custom properties, semantic HTML, and modern CSS primitives.
 - Focuses on atomic design and zero bloat.

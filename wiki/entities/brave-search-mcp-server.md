@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-mcp-landscape-research-report|drive-research-mcp-landscape-research-report]] (2026-06-08)
+## From [drive-research-mcp-landscape-research-report](/entities/drive-research-mcp-landscape-research-report.md) (2026-06-08)
 - Direct integration with the Brave Search API, bypassing traditional search engine HTML wrappers.
 - Returns clean, synthesized, and structured JSON data.
 - Optimized for language models, providing structured data and AI-powered summarization natively.

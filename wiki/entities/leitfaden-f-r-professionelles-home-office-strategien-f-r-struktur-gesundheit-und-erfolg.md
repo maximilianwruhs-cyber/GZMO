@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[mastering-remote-work-a-comprehensive-guide-to-ho|mastering-remote-work-a-comprehensive-guide-to-ho]] (2026-06-08)
+## From [mastering-remote-work-a-comprehensive-guide-to-ho](/entities/mastering-remote-work-a-comprehensive-guide-to-ho.md) (2026-06-08)
 - Discusses the transformation to location-independent work as a permanent part of modern corporate culture.
 - Identifies critical success factors for sustainable home office work.
 - Covers topics such as ergonomics, legal compliance, technological resilience, psychological demarcation, and social connectivity.

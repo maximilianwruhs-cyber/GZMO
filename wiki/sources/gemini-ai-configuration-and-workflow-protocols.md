@@ -14,12 +14,12 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-08).
 
 ## Entities
-- [[gemini-3-deep-think|Gemini 3 Deep Think]] (SYSTEM)
-- [[gemini-ai|Gemini AI]] (SYSTEM)
-- [[google-ai|Google AI]] (SYSTEM)
-- [[privatsph-re-in-gemini-apps|Privatsphäre in Gemini Apps]] (CONCEPT)
-- [[nutzungsbedingungen|Nutzungsbedingungen]] (CONCEPT)
-- [[google-datenschutzbestimmungen|Google Datenschutzbestimmungen]] (CONCEPT)
+- [Gemini 3 Deep Think](/entities/gemini-3-deep-think.md) (SYSTEM)
+- [Gemini AI](/entities/gemini-ai.md) (SYSTEM)
+- [Google AI](/entities/google-ai.md) (SYSTEM)
+- [Privatsphäre in Gemini Apps](/entities/privatsph-re-in-gemini-apps.md) (CONCEPT)
+- [Nutzungsbedingungen](/entities/nutzungsbedingungen.md) (CONCEPT)
+- [Google Datenschutzbestimmungen](/entities/google-datenschutzbestimmungen.md) (CONCEPT)
 
 ## Relations
 - Gemini AI → RELATED_TO → Google AI

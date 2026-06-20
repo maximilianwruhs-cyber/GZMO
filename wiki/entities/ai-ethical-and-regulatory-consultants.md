@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part1-micro01|drive-research-ki-berater-fragebogen-für-kundenanalyse-part1-micro01]] (2026-06-09)
+## From [drive-research-ki-berater-fragebogen-für-kundenanalyse-part1-micro01](/entities/drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part1-micro01.md) (2026-06-09)
 - Ensure AI implementations follow ethical principles.
 - Guarantee fairness and freedom from discriminatory bias.
 - Meet high standards for transparency and data security.

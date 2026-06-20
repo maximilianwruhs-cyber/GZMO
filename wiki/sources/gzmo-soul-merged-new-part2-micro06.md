@@ -14,16 +14,16 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-10).
 
 ## Entities
-- [[claude-opus|Claude Opus]] (MODEL)
-- [[openclaw|OpenClaw]] (SYSTEM)
-- [[executable-master-index|Executable Master Index]] (SYSTEM)
-- [[model-context-protocol-mcp|Model Context Protocol (MCP)]] (PROTOCOL)
-- [[gzmo-daemon|gzmo-daemon]] (SYSTEM)
-- [[soul-md|SOUL.md]] (FILE)
-- [[agents-md|AGENTS.md]] (FILE)
-- [[firecracker|Firecracker]] (SYSTEM)
-- [[obsidian-vault|Obsidian Vault]] (SYSTEM)
-- [[gvisor|gVisor]] (SYSTEM)
+- [Claude Opus](/entities/claude-opus.md) (MODEL)
+- [OpenClaw](/entities/openclaw.md) (SYSTEM)
+- [Executable Master Index](/entities/executable-master-index.md) (SYSTEM)
+- [Model Context Protocol (MCP)](/entities/model-context-protocol-mcp.md) (PROTOCOL)
+- [gzmo-daemon](/entities/gzmo-daemon.md) (SYSTEM)
+- [SOUL.md](/entities/soul-md.md) (FILE)
+- [AGENTS.md](/entities/agents-md.md) (FILE)
+- [Firecracker](/entities/firecracker.md) (SYSTEM)
+- [Obsidian Vault](/entities/obsidian-vault.md) (SYSTEM)
+- [gVisor](/entities/gvisor.md) (SYSTEM)
 
 ## Relations
 - SOUL.md → IS_LOCATED_IN → OpenClaw Workspace

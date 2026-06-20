@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-architecting-zero-configuration-portable-agents-s-micro02|drive-research-architecting-zero-configuration-portable-agents-s-micro02]] (2026-06-10)
+## From [drive-research-architecting-zero-configuration-portable-agents-s-micro02](/entities/drive-research-architecting-zero-configuration-portable-agents-s-micro02.md) (2026-06-10)
 - Requires discovery via sysctl interface or framework path verification on macOS.
 - Avoids subprocesses like system_profiler to maintain stealth.

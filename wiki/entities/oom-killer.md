@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-cuda-memory-locking-limits-configuration|drive-research-cuda-memory-locking-limits-configuration]] (2026-06-08)
+## From [drive-research-cuda-memory-locking-limits-configuration](/entities/drive-research-cuda-memory-locking-limits-configuration.md) (2026-06-08)
 - The kernel's Out-of-Memory (OOM) subsystem is activated when physical RAM is exhausted.
 - Calculates a badness score (oom_score) for every active process.
 - Targets memory-intensive, non-privileged processes for termination to protect the host kernel from crashing.

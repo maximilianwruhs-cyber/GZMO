@@ -14,11 +14,11 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[tui-framework|tui-framework]] (2026-06-08)
+## From [tui-framework](/entities/tui-framework.md) (2026-06-08)
 - A curated research corpus consolidated from Google Takeout.
 - Involves PTY spawning, stateful ANSI escape code parsing, and asynchronous non-blocking I/O loops.
 - Can be built using custom engineering or bypassed via Zellij layouts.
 
-## From [[the-agentic-operating-environment-a-synthesis-arc-micro01|the-agentic-operating-environment-a-synthesis-arc-micro01]] (2026-06-10)
+## From [the-agentic-operating-environment-a-synthesis-arc-micro01](/entities/the-agentic-operating-environment-a-synthesis-arc-micro01.md) (2026-06-10)
 - The physical, terminal-native workspace.
 - Powered by the Zellij multiplexer.

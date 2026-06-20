@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[bun-versus-nodejs-architectural-evaluation-for-b|bun-versus-nodejs-architectural-evaluation-for-b]] (2026-06-08)
+## From [bun-versus-nodejs-architectural-evaluation-for-b](/entities/bun-versus-nodejs-architectural-evaluation-for-b.md) (2026-06-08)
 - Highly performant, general-purpose memory allocator
 - Developed by Microsoft Research
 - Used by Bun

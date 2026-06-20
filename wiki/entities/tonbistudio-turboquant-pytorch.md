@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[the-sovereign-software-factory-blueprint|the-sovereign-software-factory-blueprint]] (2026-06-08)
+## From [the-sovereign-software-factory-blueprint](/entities/the-sovereign-software-factory-blueprint.md) (2026-06-08)
 - A Pure PyTorch Implementation of TurboQuant exists.
 - Used for custom Python backends and researchers.
 - A from-scratch PyTorch implementation of the ICLR 2026 paper.

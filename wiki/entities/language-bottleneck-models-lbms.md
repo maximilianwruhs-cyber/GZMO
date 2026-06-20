@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-ai-agentic-teacher-research-report|drive-research-ai-agentic-teacher-research-report]] (2026-06-08)
+## From [drive-research-ai-agentic-teacher-research-report](/entities/drive-research-ai-agentic-teacher-research-report.md) (2026-06-08)
 - Utilized for knowledge tracing.
 - Use an encoder LLM to synthesize raw episodic memory logs into highly interpretable, qualitative semantic summaries.
 - Update the semantic Learner Profile in real time.

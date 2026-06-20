@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[openclaw-deep-research-part1-micro02|openclaw-deep-research-part1-micro02]] (2026-06-09)
+## From [openclaw-deep-research-part1-micro02](/entities/openclaw-deep-research-part1-micro02.md) (2026-06-09)
 - AnyGen AI Teammate is an enterprise SaaS.
 - Future AI agents will live natively inside enterprise SaaS platforms.

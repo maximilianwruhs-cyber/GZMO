@@ -14,12 +14,12 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[google-antigravity-the-architects-configuration-micro02|google-antigravity-the-architects-configuration-micro02]] (2026-06-09)
+## From [google-antigravity-the-architects-configuration-micro02](/entities/google-antigravity-the-architects-configuration-micro02.md) (2026-06-09)
 - Dictate localized, contextual laws of a specific repository in Antigravity.
 - Stored within the .agents/rules/ directory at the root of a Git repository.
 - Map specific architectural, stylistic, and structural mandates of a single project.
 
-## From [[google-antigravity-the-architects-configuration-micro04|google-antigravity-the-architects-configuration-micro04]] (2026-06-09)
+## From [google-antigravity-the-architects-configuration-micro04](/entities/google-antigravity-the-architects-configuration-micro04.md) (2026-06-09)
 - Tailored to the specific tech stack of your current repository.
 - Used by Antigravity to understand architectural context.
 - Enforce project-specific laws.

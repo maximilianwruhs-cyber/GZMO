@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-llm-inference-engine-audit-2026-micro02|drive-research-llm-inference-engine-audit-2026-micro02]] (2026-06-09)
+## From [drive-research-llm-inference-engine-audit-2026-micro02](/entities/drive-research-llm-inference-engine-audit-2026-micro02.md) (2026-06-09)
 - Alternative path to enterprise production.
 - Provided as a simple Python package.
 - Sidesteps heavy orchestration dependencies and immediately delivers maximum hardware efficiency out of the box.
@@ -24,6 +24,6 @@ Type: TOOL
 - TurboMind C++ backend ruthlessly eliminates Python execution overhead.
 - Premier engine for serving highly quantized models at maximum batch sizes on NVIDIA hardware.
 
-## From [[drive-research-llm-inference-engine-audit-2026-micro01|drive-research-llm-inference-engine-audit-2026-micro01]] (2026-06-10)
+## From [drive-research-llm-inference-engine-audit-2026-micro01](/entities/drive-research-llm-inference-engine-audit-2026-micro01.md) (2026-06-10)
 - Powered by TurboMind C++ backend
 - Targets orchestration and execution overhead

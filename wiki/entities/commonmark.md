@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[high-fidelity-markdown-engineering-and-ast-process|high-fidelity-markdown-engineering-and-ast-process]] (2026-06-08)
+## From [high-fidelity-markdown-engineering-and-ast-process](/entities/high-fidelity-markdown-engineering-and-ast-process.md) (2026-06-08)
 - Syntax that some authors prefer for ease of editing.
 - Strict CommonMark compliance is enforced by remark-stringify.
 - Strict CommonMark is the target format for rehype-remark and remark-stringify.

@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[optimizing-nvidia-blackwell-sm120-part2-micro05|optimizing-nvidia-blackwell-sm120-part2-micro05]] (2026-06-10)
+## From [optimizing-nvidia-blackwell-sm120-part2-micro05](/entities/optimizing-nvidia-blackwell-sm120-part2-micro05.md) (2026-06-10)
 - Enterprise-grade memory used for high-performance hardware

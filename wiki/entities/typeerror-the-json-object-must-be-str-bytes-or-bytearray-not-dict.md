@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[resilient-rust-based-mcp-client-and-llm-orchestrat-micro06|resilient-rust-based-mcp-client-and-llm-orchestrat-micro06]] (2026-06-09)
+## From [resilient-rust-based-mcp-client-and-llm-orchestrat-micro06](/entities/resilient-rust-based-mcp-client-and-llm-orchestrat-micro06.md) (2026-06-09)
 - Arguments field must be a string containing serialized JSON.
 - Payload caused failures when not a string.
 - Expected to receive a string, then parse using json.loads().

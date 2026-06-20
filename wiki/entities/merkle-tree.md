@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-agentic-typescript-monorepo-context-management|drive-research-agentic-typescript-monorepo-context-management]] (2026-06-08)
+## From [drive-research-agentic-typescript-monorepo-context-management](/entities/drive-research-agentic-typescript-monorepo-context-management.md) (2026-06-08)
 - A hierarchical system of digital cryptographic fingerprints.
 - Used to synchronize vector databases without full reindexing.
 - Represents the entire state of a repository with a single fingerprint.

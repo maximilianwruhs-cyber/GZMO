@@ -14,15 +14,15 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-10).
 
 ## Entities
-- [[rtx-pro-6000|RTX PRO 6000]] (SYSTEM)
-- [[blackwell|Blackwell]] (SYSTEM)
-- [[pipelineclcfetchasync|PipelineCLCFetchAsync]] (TOOL)
-- [[gemma-4|Gemma 4]] (CONCEPT)
-- [[marlin|Marlin]] (TOOL)
-- [[dgx-spark|DGX Spark]] (SYSTEM)
-- [[cluster-launch-control-instructions|Cluster Launch Control instructions]] (TOOL)
-- [[sm120|SM120]] (SYSTEM)
-- [[cutlass|CUTLASS]] (TOOL)
+- [RTX PRO 6000](/entities/rtx-pro-6000.md) (SYSTEM)
+- [Blackwell](/entities/blackwell.md) (SYSTEM)
+- [PipelineCLCFetchAsync](/entities/pipelineclcfetchasync.md) (TOOL)
+- [Gemma 4](/entities/gemma-4.md) (CONCEPT)
+- [Marlin](/entities/marlin.md) (TOOL)
+- [DGX Spark](/entities/dgx-spark.md) (SYSTEM)
+- [Cluster Launch Control instructions](/entities/cluster-launch-control-instructions.md) (TOOL)
+- [SM120](/entities/sm120.md) (SYSTEM)
+- [CUTLASS](/entities/cutlass.md) (TOOL)
 
 ## Relations
 - PipelineCLCFetchAsync → PART_OF → CUTLASS

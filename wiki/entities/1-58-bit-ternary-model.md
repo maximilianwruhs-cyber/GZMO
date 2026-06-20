@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: MODEL
 
-## From [[the-sovereign-software-factory-blueprint|the-sovereign-software-factory-blueprint]] (2026-06-08)
+## From [the-sovereign-software-factory-blueprint](/entities/the-sovereign-software-factory-blueprint.md) (2026-06-08)
 - Runs on the CPU via bitnet.cpp.
 - Uses only -1, 0, 1.
 - Can be run at 100+ tokens per second on CPU.

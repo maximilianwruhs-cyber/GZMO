@@ -14,9 +14,9 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-agentic-token-economy-blueprint-micro03|drive-research-agentic-token-economy-blueprint-micro03]] (2026-06-09)
+## From [drive-research-agentic-token-economy-blueprint-micro03](/entities/drive-research-agentic-token-economy-blueprint-micro03.md) (2026-06-09)
 - Learns budget-efficient thinking
 - Related to Nice Fold or Hero Call
 
-## From [[openclaw-deep-research-part7-micro03|openclaw-deep-research-part7-micro03]] (2026-06-09)
+## From [openclaw-deep-research-part7-micro03](/entities/openclaw-deep-research-part7-micro03.md) (2026-06-09)
 - Automatically assess task complexity and adjust reasoning level.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-optimizing-cuda-performance-with-fp4-fp6-micro01|drive-research-optimizing-cuda-performance-with-fp4-fp6-micro01]] (2026-06-09)
+## From [drive-research-optimizing-cuda-performance-with-fp4-fp6-micro01](/entities/drive-research-optimizing-cuda-performance-with-fp4-fp6-micro01.md) (2026-06-09)
 - Employed by CUTLASS templates to partition larger shared memory arrays into thread-specific local views.
 - Calling layout partitioning functions like partition_S() drops alignment metadata.
 - Compiler loses static alignment tracking during mathematical transformations, dropping pointer metadata to 8 bytes.

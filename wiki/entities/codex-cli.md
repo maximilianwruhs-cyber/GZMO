@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: AGENT
 
-## From [[from-static-vaults-to-autonomous-knowledge-engines|from-static-vaults-to-autonomous-knowledge-engines]] (2026-06-08)
+## From [from-static-vaults-to-autonomous-knowledge-engines](/entities/from-static-vaults-to-autonomous-knowledge-engines.md) (2026-06-08)
 - It is an AI coding agent.
 - It can execute markdown "skill files" within the claude-obsidian framework.
 - It is one of the AI execution environments for the claude-obsidian framework.
 
-## From [[openclaw-deep-research-part5-micro03|openclaw-deep-research-part5-micro03]] (2026-06-09)
+## From [openclaw-deep-research-part5-micro03](/entities/openclaw-deep-research-part5-micro03.md) (2026-06-09)
 - OpenClaw communicates with Codex CLI.

@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[prompt-agent-engineering-part2-micro02|prompt-agent-engineering-part2-micro02]] (2026-06-09)
+## From [prompt-agent-engineering-part2-micro02](/entities/prompt-agent-engineering-part2-micro02.md) (2026-06-09)
 - Core philosophy of the Visual Systems Extractor.
 - Focuses on reusable design system components.

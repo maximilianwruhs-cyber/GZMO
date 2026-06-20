@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: AUTHOR
 
-## From [[ai-research-part1|ai-research-part1]] (2026-06-08)
+## From [ai-research-part1](/entities/ai-research-part1.md) (2026-06-08)
 - Authored "HybridNorm: Towards Stable and Efficient Transformer Training via Hybrid Normalization".

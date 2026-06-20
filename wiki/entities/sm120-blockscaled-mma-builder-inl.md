@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-what-else-can-directly-be-aligned-with-our-common|drive-research-what-else-can-directly-be-aligned-with-our-common]] (2026-06-08)
+## From [drive-research-what-else-can-directly-be-aligned-with-our-common](/entities/drive-research-what-else-can-directly-be-aligned-with-our-common.md) (2026-06-08)
 - Can be manually patched to expose valid K=64 tile templates.
 
-## From [[drive-research-marlin-baseline-for-early-deployments-micro02|drive-research-marlin-baseline-for-early-deployments-micro02]] (2026-06-09)
+## From [drive-research-marlin-baseline-for-early-deployments-micro02](/entities/drive-research-marlin-baseline-for-early-deployments-micro02.md) (2026-06-09)
 - Has a 99 KiB shared memory constraint.
 - Affected by TMA configuration errors and CuTe DSL descriptor mismatches.
 - Requires specific patches for native FP4 execution.

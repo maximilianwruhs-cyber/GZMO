@@ -14,8 +14,8 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[the-evolution-of-artificial-intelligence-evaluatio-micro03|the-evolution-of-artificial-intelligence-evaluatio-micro03]] (2026-06-09)
+## From [the-evolution-of-artificial-intelligence-evaluatio-micro03](/entities/the-evolution-of-artificial-intelligence-evaluatio-micro03.md) (2026-06-09)
 - Addresses cross-lingual vulnerabilities by testing multimodal and multilingual idiom disambiguation
 
-## From [[the-evolution-of-artificial-intelligence-evaluatio-micro04|the-evolution-of-artificial-intelligence-evaluatio-micro04]] (2026-06-09)
+## From [the-evolution-of-artificial-intelligence-evaluatio-micro04](/entities/the-evolution-of-artificial-intelligence-evaluatio-micro04.md) (2026-06-09)
 - Assesses idiom disambiguation.

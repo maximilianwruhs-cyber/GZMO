@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[prompt-agent-engineering-part5-micro06|prompt-agent-engineering-part5-micro06]] (2026-06-09)
+## From [prompt-agent-engineering-part5-micro06](/entities/prompt-agent-engineering-part5-micro06.md) (2026-06-09)
 - Proposed as the next step to overcome the limitations of the terminal interface.
 - Will handle push notifications for human-in-the-loop approvals.
 - Can be built using WebSocket and Telegram Bot.

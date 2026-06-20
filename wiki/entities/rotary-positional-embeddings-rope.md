@@ -15,9 +15,9 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part6-micro03|ai-research-part6-micro03]] (2026-06-09)
+## From [ai-research-part6-micro03](/entities/ai-research-part6-micro03.md) (2026-06-09)
 - Have largely replaced absolute embeddings to enhance length extrapolation.
 - A micro-architectural design.
 
-## From [[drive-research-32gb-vram-ai-reasoning-models-micro02|drive-research-32gb-vram-ai-reasoning-models-micro02]] (2026-06-09)
+## From [drive-research-32gb-vram-ai-reasoning-models-micro02](/entities/drive-research-32gb-vram-ai-reasoning-models-micro02.md) (2026-06-09)
 - Utilized by Qwen3-32B for spatial token awareness.

@@ -20,7 +20,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[architectural-strategy-for-stealthy-portable-cli-a|architectural-strategy-for-stealthy-portable-cli-a]] (2026-06-08)
+## From [architectural-strategy-for-stealthy-portable-cli-a](/entities/architectural-strategy-for-stealthy-portable-cli-a.md) (2026-06-08)
 - Provides a robust ecosystem for cross-compilation.
 - Natively produces statically linked, standalone binaries.
 - Binaries face significant friction in highly monitored endpoint environments due to runtime structure.
@@ -28,31 +28,31 @@ Type: CONCEPT
 - Go binaries are inherently large due to the statically linked runtime and garbage collector.
 - Go's custom network dialer also sometimes bypasses native OS network stacks, triggering network behavioral flags.
 
-## From [[high-performance-typescript-execution-and-architec-part2|high-performance-typescript-execution-and-architec-part2]] (2026-06-08)
+## From [high-performance-typescript-execution-and-architec-part2](/entities/high-performance-typescript-execution-and-architec-part2.md) (2026-06-08)
 - Low-level system often used for core infrastructure layer.
 - Used for highly concurrent systems.
 - Increasingly migrated to for durable execution, session management, concurrency orchestration, and executing the decision graph.
 
-## From [[tui-framework|tui-framework]] (2026-06-08)
+## From [tui-framework](/entities/tui-framework.md) (2026-06-08)
 - A language used for TUI development.
 - Bubbletea is a framework within Go for TUI development.
 - Facilitates managing async I/O.
 
-## From [[drive-research-agentic-typescript-monorepo-context-management|drive-research-agentic-typescript-monorepo-context-management]] (2026-06-08)
+## From [drive-research-agentic-typescript-monorepo-context-management](/entities/drive-research-agentic-typescript-monorepo-context-management.md) (2026-06-08)
 - Used for highly concurrent, low-level systems.
 - Core infrastructure layer is increasingly migrated to systems written in Go.
 
-## From [[drive-research-mastering-ast-grep-a-structured-approach|drive-research-mastering-ast-grep-a-structured-approach]] (2026-06-08)
+## From [drive-research-mastering-ast-grep-a-structured-approach](/entities/drive-research-mastering-ast-grep-a-structured-approach.md) (2026-06-08)
 - Supported by Tree-sitter.
 
-## From [[drive-research-rust-tui-architecture-tech-stack1-micro06|drive-research-rust-tui-architecture-tech-stack1-micro06]] (2026-06-09)
+## From [drive-research-rust-tui-architecture-tech-stack1-micro06](/entities/drive-research-rust-tui-architecture-tech-stack1-micro06.md) (2026-06-09)
 - Mentioned as a language that can be compiled to Wasm for use within Zellij.
 
-## From [[prompt-agent-engineering-part2-micro04|prompt-agent-engineering-part2-micro04]] (2026-06-09)
+## From [prompt-agent-engineering-part2-micro04](/entities/prompt-agent-engineering-part2-micro04.md) (2026-06-09)
 - Mentioned as a highly optimized runtime.
 - Provides predictable garbage collection or compile-time optimizations.
 
-## From [[drive-research-architecting-zero-configuration-portable-agents-s-micro02|drive-research-architecting-zero-configuration-portable-agents-s-micro02]] (2026-06-10)
+## From [drive-research-architecting-zero-configuration-portable-agents-s-micro02](/entities/drive-research-architecting-zero-configuration-portable-agents-s-micro02.md) (2026-06-10)
 - Produces statically linked, standalone binaries.
 - Implements its own threading model (goroutines) and memory management.
 - Often associated with ransomware and APT groups.

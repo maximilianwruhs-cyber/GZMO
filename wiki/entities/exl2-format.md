@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[the-architecture-of-speculative-decoding-and-infer-part1-micro04|the-architecture-of-speculative-decoding-and-infer-part1-micro04]] (2026-06-09)
+## From [the-architecture-of-speculative-decoding-and-infer-part1-micro04](/entities/the-architecture-of-speculative-decoding-and-infer-part1-micro04.md) (2026-06-09)
 - Targets precisely ~4.5 to 4.65 bits per weight.
 - Provides the most mathematically efficient utilization of exact VRAM boundaries.
 - Helps to completely avoid memory fragmentation and out-of-memory errors.

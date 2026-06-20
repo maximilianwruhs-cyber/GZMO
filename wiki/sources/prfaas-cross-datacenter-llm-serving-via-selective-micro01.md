@@ -14,8 +14,8 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[prfaas-cross-datacenter-llm-serving-via-selective|PrfaaS_ Cross-Datacenter LLM Serving via Selective]] (PROJECT)
-- [[google-takeout|Google Takeout]] (TOOL)
+- [PrfaaS_ Cross-Datacenter LLM Serving via Selective](/entities/prfaas-cross-datacenter-llm-serving-via-selective.md) (PROJECT)
+- [Google Takeout](/entities/google-takeout.md) (TOOL)
 
 ## Relations
 - PrfaaS_ Cross-Datacenter LLM Serving via Selective → USES → Google Takeout

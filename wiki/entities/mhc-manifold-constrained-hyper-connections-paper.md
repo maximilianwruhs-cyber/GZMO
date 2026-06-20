@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[ai-research-part8-micro08|ai-research-part8-micro08]] (2026-06-09)
+## From [ai-research-part8-micro08](/entities/ai-research-part8-micro08.md) (2026-06-09)
 - A tool for manifold-constrained hyper-connections.
 - Part of Normalisierung & Konnektivität.
 - A paper by Xie et al. from DeepSeek.

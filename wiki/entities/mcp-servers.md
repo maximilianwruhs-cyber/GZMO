@@ -15,14 +15,14 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[the-sovereign-software-factory-blueprint|the-sovereign-software-factory-blueprint]] (2026-06-08)
+## From [the-sovereign-software-factory-blueprint](/entities/the-sovereign-software-factory-blueprint.md) (2026-06-08)
 - Run on Node.js.
 - Act as controlled 'airlocks' for the AI to manipulate files.
 
-## From [[drive-research-deep-dive-google-antigravity-architecture1|drive-research-deep-dive-google-antigravity-architecture1]] (2026-06-08)
+## From [drive-research-deep-dive-google-antigravity-architecture1](/entities/drive-research-deep-dive-google-antigravity-architecture1.md) (2026-06-08)
 - Expose 'Resources,' 'Prompts,' and actionable 'Tools' to the artificial intelligence.
 - Can be linked to the autonomous agent through the MCP Store or configuration files.
 
-## From [[ultimate-local-ai-development-stack-for-vscodium-micro03|ultimate-local-ai-development-stack-for-vscodium-micro03]] (2026-06-09)
+## From [ultimate-local-ai-development-stack-for-vscodium-micro03](/entities/ultimate-local-ai-development-stack-for-vscodium-micro03.md) (2026-06-09)
 - Local servers for Database and Web access.
 - Set up by Roo Code.

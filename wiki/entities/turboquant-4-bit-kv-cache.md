@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-sovereign-software-factory-blueprint|the-sovereign-software-factory-blueprint]] (2026-06-08)
+## From [the-sovereign-software-factory-blueprint](/entities/the-sovereign-software-factory-blueprint.md) (2026-06-08)
 - Compressed by TurboQuant.
 - KV cache types turbo3 and turbo4 are introduced in TheTom/turboquant_plus.
 - Standard KV cache used in DeepSeek-R1-32B Architect model.

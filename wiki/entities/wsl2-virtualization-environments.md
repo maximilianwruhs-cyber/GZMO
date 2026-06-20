@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-imagine-creating-sm120-according-to-our-progress|drive-research-imagine-creating-sm120-according-to-our-progress]] (2026-06-08)
+## From [drive-research-imagine-creating-sm120-according-to-our-progress](/entities/drive-research-imagine-creating-sm120-according-to-our-progress.md) (2026-06-08)
 - For execution within WSL2, upgrading to version 2.7.0 or higher is mandatory.
 - Running older graphics kernel drivers (dxgkrnl) under CUDA graph capture pressure triggers unrecoverable Kernel-Power 41 errors, resulting in immediate system reboots.

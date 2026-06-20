@@ -14,11 +14,11 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part2|drive-research-ki-berater-fragebogen-für-kundenanalyse-part2]] (2026-06-08)
+## From [drive-research-ki-berater-fragebogen-für-kundenanalyse-part2](/entities/drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part2.md) (2026-06-08)
 - kontinuierlichen Erkennung und Minderung von algorithmischem Bias (Voreingenommenheit in Trainingsdaten)
 - Wenn diese Daten menschliche Vorurteile (z. B. bei der automatisierten Bewerberauswahl oder bei der Kreditvergabe) enthalten, skaliert die KI diese Diskriminierung.
 
-## From [[drive-research-scientific-writing-and-publication-process-micro03|drive-research-scientific-writing-and-publication-process-micro03]] (2026-06-09)
+## From [drive-research-scientific-writing-and-publication-process-micro03](/entities/drive-research-scientific-writing-and-publication-process-micro03.md) (2026-06-09)
 - Risk of conscious or unconscious bias regarding author's affiliation, gender, or nationality in single-blind review.
 - Double-blind review maximizes fair evaluation by minimizing prejudice.
 - F1000Research's model aims to avoid this regarding perceived novelty.

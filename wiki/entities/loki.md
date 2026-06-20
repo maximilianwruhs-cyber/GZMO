@@ -15,12 +15,12 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[obolus-micro05|obolus-micro05]] (2026-06-09)
+## From [obolus-micro05](/entities/obolus-micro05.md) (2026-06-09)
 - Used for Monitoring-Konzept.
 
-## From [[dynamics-of-the-unpredictable-micro02|dynamics-of-the-unpredictable-micro02]] (2026-06-10)
+## From [dynamics-of-the-unpredictable-micro02](/entities/dynamics-of-the-unpredictable-micro02.md) (2026-06-10)
 - Norse trickster embodying disorder and systemic change.
 
-## From [[openclaw-deep-research-part9-micro02|openclaw-deep-research-part9-micro02]] (2026-06-10)
+## From [openclaw-deep-research-part9-micro02](/entities/openclaw-deep-research-part9-micro02.md) (2026-06-10)
 - An OpenClaw instance running on AWS Bedrock
 - Generated the document

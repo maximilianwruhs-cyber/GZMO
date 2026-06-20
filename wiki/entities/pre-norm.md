@@ -14,14 +14,14 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part6-micro02|ai-research-part6-micro02]] (2026-06-09)
+## From [ai-research-part6-micro02](/entities/ai-research-part6-micro02.md) (2026-06-09)
 - Gradient dynamics are structurally replicated in the bottom-right block of the transition matrix.
 - Gradient flow is modulated by the normalization Jacobian JLN j in the top-left block.
 - Applying LN before each residual addition.
 - Maintains training stability and consistently increases its average downstream score.
 - Operates in distinct optimum learning rate regimes.
 
-## From [[ai-research-part6-micro03|ai-research-part6-micro03]] (2026-06-09)
+## From [ai-research-part6-micro03](/entities/ai-research-part6-micro03.md) (2026-06-09)
 - Provides optimization stability.
 - Standard architecture.
 - Gradient norms consistently remain below 0.5 after warm-up phase.

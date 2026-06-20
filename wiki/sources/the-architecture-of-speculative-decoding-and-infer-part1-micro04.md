@@ -14,18 +14,18 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[autonomous-reasoning-models|autonomous reasoning models]] (CONCEPT)
-- [[kv-cache-quantization|KV cache quantization]] (CONCEPT)
-- [[4-bit-quantization|4-bit quantization]] (CONCEPT)
-- [[gemma-4-31b|Gemma 4 31B]] (SYSTEM)
-- [[awq|AWQ]] (TOOL)
-- [[vllm|vLLM]] (TOOL)
-- [[gguf-q4-k-m|GGUF Q4_K_M]] (TOOL)
-- [[tensorrt-llm|TensorRT-LLM]] (TOOL)
-- [[mistral-small-4|Mistral Small 4]] (SYSTEM)
-- [[exl2-format|EXL2 format]] (TOOL)
-- [[int4|INT4]] (CONCEPT)
-- [[int8|INT8]] (CONCEPT)
+- [autonomous reasoning models](/entities/autonomous-reasoning-models.md) (CONCEPT)
+- [KV cache quantization](/entities/kv-cache-quantization.md) (CONCEPT)
+- [4-bit quantization](/entities/4-bit-quantization.md) (CONCEPT)
+- [Gemma 4 31B](/entities/gemma-4-31b.md) (SYSTEM)
+- [AWQ](/entities/awq.md) (TOOL)
+- [vLLM](/entities/vllm.md) (TOOL)
+- [GGUF Q4_K_M](/entities/gguf-q4-k-m.md) (TOOL)
+- [TensorRT-LLM](/entities/tensorrt-llm.md) (TOOL)
+- [Mistral Small 4](/entities/mistral-small-4.md) (SYSTEM)
+- [EXL2 format](/entities/exl2-format.md) (TOOL)
+- [INT4](/entities/int4.md) (CONCEPT)
+- [INT8](/entities/int8.md) (CONCEPT)
 
 ## Relations
 - Mistral Small 4 → RELATED_TO → autonomous reasoning models

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-license-and-native-binding-analysis|drive-research-license-and-native-binding-analysis]] (2026-06-08)
+## From [drive-research-license-and-native-binding-analysis](/entities/drive-research-license-and-native-binding-analysis.md) (2026-06-08)
 - Ubuntu’s system initialization daemon.
 - The gzmo-daemon must integrate seamlessly with systemd.
 - Packages that attempt to interact with or manipulate the host’s init system via post-install scripts pose a critical stability risk.

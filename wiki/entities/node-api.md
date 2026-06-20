@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[high-performance-typescript-execution-and-architec-part1-micro03|high-performance-typescript-execution-and-architec-part1-micro03]] (2026-06-10)
+## From [high-performance-typescript-execution-and-architec-part1-micro03](/entities/high-performance-typescript-execution-and-architec-part1-micro03.md) (2026-06-10)
 - Introduces significant serialization and deserialization overhead.
 - Used by Node.js for native addons.

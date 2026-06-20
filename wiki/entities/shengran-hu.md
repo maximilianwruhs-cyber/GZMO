@@ -14,8 +14,8 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[ai-research-part3-micro03|ai-research-part3-micro03]] (2026-06-09)
+## From [ai-research-part3-micro03](/entities/ai-research-part3-micro03.md) (2026-06-09)
 - sharing their insights about DGM and their implementation experience
 
-## From [[ai-research-part3-micro04|ai-research-part3-micro04]] (2026-06-09)
+## From [ai-research-part3-micro04](/entities/ai-research-part3-micro04.md) (2026-06-09)
 - Co-authored 'Darwin godel machine: Open-ended evolution of self-improving agents'.

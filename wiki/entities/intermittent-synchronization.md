@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-algorithmic-trading-with-chaos-theory|drive-research-algorithmic-trading-with-chaos-theory]] (2026-06-08)
+## From [drive-research-algorithmic-trading-with-chaos-theory](/entities/drive-research-algorithmic-trading-with-chaos-theory.md) (2026-06-08)
 - A scheme that allows reservoir computers to achieve an arbitrarily long, practically infinite prediction horizon.
 - Achieved through a specific mathematical mechanism of 'rare updates'.
 - Involves periodic correction of the predicted trajectory using sparse, real-time measurements.

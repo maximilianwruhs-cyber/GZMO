@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-agentic-reverse-engineering-state-and-future-micro01|drive-research-agentic-reverse-engineering-state-and-future-micro01]] (2026-06-09)
+## From [drive-research-agentic-reverse-engineering-state-and-future-micro01](/entities/drive-research-agentic-reverse-engineering-state-and-future-micro01.md) (2026-06-09)
 - An example of traditional automation.
 - Relies on deterministic architecture with strict trigger-action logic.
 
-## From [[drive-research-agentic-reverse-engineering-state-and-future1-micro01|drive-research-agentic-reverse-engineering-state-and-future1-micro01]] (2026-06-09)
+## From [drive-research-agentic-reverse-engineering-state-and-future1-micro01](/entities/drive-research-agentic-reverse-engineering-state-and-future1-micro01.md) (2026-06-09)
 - An example of traditional automation.
 - Relies on deterministic architecture defined by strict trigger-action logic.

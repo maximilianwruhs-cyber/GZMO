@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[drive-research-maximilian-wruhs|drive-research-maximilian-wruhs]] (2026-06-08)
+## From [drive-research-maximilian-wruhs](/entities/drive-research-maximilian-wruhs.md) (2026-06-08)
 - Employed MAXIMILIAN WRUHS as a KFZ-Mechatroniker from 01/2017 to 04/2021.
 - Involved in Instandhaltung, Wartung und Diagnose von Kraftfahrzeugen.

@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[optimizing-nvidia-blackwell-sm120-part3-micro04|optimizing-nvidia-blackwell-sm120-part3-micro04]] (2026-06-09)
+## From [optimizing-nvidia-blackwell-sm120-part3-micro04](/entities/optimizing-nvidia-blackwell-sm120-part3-micro04.md) (2026-06-09)
 - Driver-level memory leaks can occur.
 - Disabling CUDA graphs is a workaround for memory accumulation.
 - Environment variable to disable CUDA graphs.
@@ -22,7 +22,7 @@ Type: SYSTEM
 - Accumulation of unreleased CUDA graphs can cause progressive VRAM growth.
 - Disabling via GGML_CUDA_DISABLE_GRAPHS=1 prevents memory exhaustion.
 
-## From [[optimizing-nvidia-blackwell-sm120-part3-micro05|optimizing-nvidia-blackwell-sm120-part3-micro05]] (2026-06-09)
+## From [optimizing-nvidia-blackwell-sm120-part3-micro05](/entities/optimizing-nvidia-blackwell-sm120-part3-micro05.md) (2026-06-09)
 - Environment variable to bypass graph capture.
 - Forces the backend to bypass graph capture.
 - Maintains long-term memory stability.

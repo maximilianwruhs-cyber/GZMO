@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-archival-truth-part1-micro03|the-archival-truth-part1-micro03]] (2026-06-09)
+## From [the-archival-truth-part1-micro03](/entities/the-archival-truth-part1-micro03.md) (2026-06-09)
 - Can locate the effectiveness of wise words and human connection.
 - The scientific discovery of mirror neurons is part of this field.
 - Explains how humans unconsciously empathize through observation.

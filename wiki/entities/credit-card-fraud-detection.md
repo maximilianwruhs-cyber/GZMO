@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[drive-research-free-ai-and-cs-self-study-roadmap|drive-research-free-ai-and-cs-self-study-roadmap]] (2026-06-08)
+## From [drive-research-free-ai-and-cs-self-study-roadmap](/entities/drive-research-free-ai-and-cs-self-study-roadmap.md) (2026-06-08)
 - A capstone project dealing with highly imbalanced datasets, requiring robust Ensemble Methods and complex feature engineering
 - Algorithmic Focus: Random Forests / XGBoost
 - Recommended Dataset Source: Kaggle (Fraud Detection)

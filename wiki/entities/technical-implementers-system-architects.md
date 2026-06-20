@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part1-micro01|drive-research-ki-berater-fragebogen-für-kundenanalyse-part1-micro01]] (2026-06-09)
+## From [drive-research-ki-berater-fragebogen-für-kundenanalyse-part1-micro01](/entities/drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part1-micro01.md) (2026-06-09)
 - Possess deep engineering and IT foundations.
 - Focus on technical integration.
 - Tasks include API connection, building autonomous AI agents, structuring workflows, and adapting LLMs.

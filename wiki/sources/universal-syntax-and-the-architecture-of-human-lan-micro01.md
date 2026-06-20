@@ -14,5 +14,5 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[universal-syntax-and-the-architecture-of-human-lan|Universal Syntax and the Architecture of Human Lan]] (CONCEPT)
-- [[google-takeout|Google Takeout]] (TOOL)
+- [Universal Syntax and the Architecture of Human Lan](/entities/universal-syntax-and-the-architecture-of-human-lan.md) (CONCEPT)
+- [Google Takeout](/entities/google-takeout.md) (TOOL)

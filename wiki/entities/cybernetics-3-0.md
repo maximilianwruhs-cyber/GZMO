@@ -15,7 +15,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[cybernetics-and-mythos-the-architecture-of-intell-part1|cybernetics-and-mythos-the-architecture-of-intell-part1]] (2026-06-08)
+## From [cybernetics-and-mythos-the-architecture-of-intell-part1](/entities/cybernetics-and-mythos-the-architecture-of-intell-part1.md) (2026-06-08)
 - The modern discipline of cybernetics in the 21st century.
 - Focuses on human agency, human-machine co-evolution, and the navigation of unprecedented complexity in highly interconnected socio-technical systems.
 - Driven by Artificial Intelligence.
@@ -25,12 +25,12 @@ Type: CONCEPT
 - Evolved into a vast, transdisciplinary ontological framework.
 - Models the persistence, stabilization, and growth of living organisms, social structures, and artificial intellects.
 
-## From [[drive-research-cybernetics-information-loops-between-entities-micro03|drive-research-cybernetics-information-loops-between-entities-micro03]] (2026-06-09)
+## From [drive-research-cybernetics-information-loops-between-entities-micro03](/entities/drive-research-cybernetics-information-loops-between-entities-micro03.md) (2026-06-09)
 - Focuses on human agency, human-machine co-evolution, and navigating complexity in socio-technical systems driven by AI.
 - Represents the modern discipline of cybernetics.
 - The frontier lies in the transition from stateless conversational models to stateful, autonomous multi-agent systems.
 
-## From [[drive-research-cybernetics-information-loops-between-entities-micro04|drive-research-cybernetics-information-loops-between-entities-micro04]] (2026-06-09)
+## From [drive-research-cybernetics-information-loops-between-entities-micro04](/entities/drive-research-cybernetics-information-loops-between-entities-micro04.md) (2026-06-09)
 - Humanity exists inside a state of profound cybernetic entanglement.
 - Technology is an active, co-evolutionary ecosystem characterized by high-speed feedback loops.
 - Evolved into a vast, transdisciplinary ontological framework.

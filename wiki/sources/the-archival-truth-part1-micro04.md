@@ -14,20 +14,20 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[epiktet|Epiktet]] (PERSON)
-- [[neusiedler-see|Neusiedler See]] (CONCEPT)
-- [[sturmtief-petra|Sturmtief Petra]] (CONCEPT)
-- [[platon|Platon]] (PERSON)
-- [[aristoteles|Aristoteles]] (PERSON)
-- [[logotherapie|Logotherapie]] (CONCEPT)
-- [[lostagen|Lostagen]] (CONCEPT)
-- [[stoa|Stoa]] (PHILOSOPHY)
-- [[resilienzforschung|Resilienzforschung]] (CONCEPT)
-- [[bafa-s-ckel|Bafa-Säckel]] (BOOK)
-- [[viktor-frankl|Viktor Frankl]] (PERSON)
-- [[hianznkuchl|Hianznkuchl]] (CONCEPT)
-- [[burgenland-liest|Burgenland liest]] (PROJECT)
-- [[rilke|Rilke]] (PERSON)
+- [Epiktet](/entities/epiktet.md) (PERSON)
+- [Neusiedler See](/entities/neusiedler-see.md) (CONCEPT)
+- [Sturmtief Petra](/entities/sturmtief-petra.md) (CONCEPT)
+- [Platon](/entities/platon.md) (PERSON)
+- [Aristoteles](/entities/aristoteles.md) (PERSON)
+- [Logotherapie](/entities/logotherapie.md) (CONCEPT)
+- [Lostagen](/entities/lostagen.md) (CONCEPT)
+- [Stoa](/entities/stoa.md) (PHILOSOPHY)
+- [Resilienzforschung](/entities/resilienzforschung.md) (CONCEPT)
+- [Bafa-Säckel](/entities/bafa-s-ckel.md) (BOOK)
+- [Viktor Frankl](/entities/viktor-frankl.md) (PERSON)
+- [Hianznkuchl](/entities/hianznkuchl.md) (CONCEPT)
+- [Burgenland liest](/entities/burgenland-liest.md) (PROJECT)
+- [Rilke](/entities/rilke.md) (PERSON)
 
 ## Relations
 - Bafa-Säckel → PART_OF → Burgenland liest

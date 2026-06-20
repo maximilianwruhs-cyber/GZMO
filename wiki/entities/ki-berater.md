@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part2|drive-research-ki-berater-fragebogen-für-kundenanalyse-part2]] (2026-06-08)
+## From [drive-research-ki-berater-fragebogen-für-kundenanalyse-part2](/entities/drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part2.md) (2026-06-08)
 - greift bei der Analyse eines Kundenunternehmens niemals auf einen starren, generischen Fragenkatalog zurück
 - nutzt ein dynamisches, modulares und iteratives Fragebogen-Framework
 - muss jede einzelne Frage im Rahmen des Discovery-Assessments einem kristallklaren analytischen Zweck dienen
@@ -33,7 +33,7 @@ Type: PERSON
 - Muss Unternehmen dazu zwingen, Erfolg in messbaren Metriken zu messen.
 - Wendet das Discovery-Framework konsequent und empathisch an.
 
-## From [[drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part1-micro04|drive-research-ki-berater-fragebogen-für-kundenanalyse-part1-micro04]] (2026-06-09)
+## From [drive-research-ki-berater-fragebogen-für-kundenanalyse-part1-micro04](/entities/drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part1-micro04.md) (2026-06-09)
 - modifiziert die Detailfragen aus den operativen und technologischen Modulen drastisch, abhängig von der jeweiligen Industrie des Kunden
 - sucht hier primär nach Potenzialen, die die immensen R&D-Kosten senken
 - hat sich im Laufe der letzten Jahre radikal gewandelt: Von der eines bloßen Technologie-Erklärers hin zu einem transformativen Chefarchitekten von zukunftsfähigen Unternehmensstrukturen

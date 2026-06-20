@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[the-archival-truth-part1-micro01|the-archival-truth-part1-micro01]] (2026-06-09)
+## From [the-archival-truth-part1-micro01](/entities/the-archival-truth-part1-micro01.md) (2026-06-09)
 - Ingest micro-split from the-archival-truth.md for cloud KG extraction.
 - micro 1/7

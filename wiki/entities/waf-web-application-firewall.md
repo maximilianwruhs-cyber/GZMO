@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[designing-stealthy-portable-cli-agents|designing-stealthy-portable-cli-agents]] (2026-06-08)
+## From [designing-stealthy-portable-cli-agents](/entities/designing-stealthy-portable-cli-agents.md) (2026-06-08)
 - Used for monitoring web traffic.
 - Helps in API discovery.

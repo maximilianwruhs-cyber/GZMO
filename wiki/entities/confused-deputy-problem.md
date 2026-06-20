@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-mcp-landscape-research-report|drive-research-mcp-landscape-research-report]] (2026-06-08)
+## From [drive-research-mcp-landscape-research-report](/entities/drive-research-mcp-landscape-research-report.md) (2026-06-08)
 - Systems are vulnerable to the confused deputy problem in proxy environments.
 - An attacker can hijack the authorization flow by exploiting consent cookies and dynamic registration without proper per-client consent barriers.
 - A characteristic of the context-layer attack surface.

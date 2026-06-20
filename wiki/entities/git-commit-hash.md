@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-advanced-typescript-execution-in-the-bun-runtime-micro02|drive-research-advanced-typescript-execution-in-the-bun-runtime-micro02]] (2026-06-09)
+## From [drive-research-advanced-typescript-execution-in-the-bun-runtime-micro02](/entities/drive-research-advanced-typescript-execution-in-the-bun-runtime-micro02.md) (2026-06-09)
 - Can be embedded into the production runtime via Bun.spawnSync.

@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-2026-linux-workstation-micro02|the-2026-linux-workstation-micro02]] (2026-06-10)
+## From [the-2026-linux-workstation-micro02](/entities/the-2026-linux-workstation-micro02.md) (2026-06-10)
 - AMD graphics platform

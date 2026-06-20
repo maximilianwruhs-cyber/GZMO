@@ -14,18 +14,18 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-08).
 
 ## Entities
-- [[active-inference-framework-aif|Active Inference Framework (AIF)]] (FRAMEWORK)
-- [[distributed-adaptive-control-dac|Distributed Adaptive Control (DAC)]] (ARCHITECTURE)
-- [[tension-decay|Tension Decay]] (CONCEPT)
-- [[cortisol-model|Cortisol Model]] (MODEL)
-- [[lagun-s-law|Lagun's Law]] (LAW)
-- [[cognitive-drive-architecture-cda|Cognitive Drive Architecture (CDA)]] (ARCHITECTURE)
-- [[friction-collapse|Friction Collapse]] (CONCEPT)
-- [[artificial-agents|Artificial Agents]] (CONCEPT)
-- [[dynamic-equilibrium|Dynamic Equilibrium]] (CONCEPT)
-- [[homeostatic-regulation|Homeostatic Regulation]] (CONCEPT)
-- [[allostasis-machine-am|Allostasis Machine (AM)]] (CONCEPT)
-- [[sedation-paradox|Sedation Paradox]] (CONCEPT)
+- [Active Inference Framework (AIF)](/entities/active-inference-framework-aif.md) (FRAMEWORK)
+- [Distributed Adaptive Control (DAC)](/entities/distributed-adaptive-control-dac.md) (ARCHITECTURE)
+- [Tension Decay](/entities/tension-decay.md) (CONCEPT)
+- [Cortisol Model](/entities/cortisol-model.md) (MODEL)
+- [Lagun's Law](/entities/lagun-s-law.md) (LAW)
+- [Cognitive Drive Architecture (CDA)](/entities/cognitive-drive-architecture-cda.md) (ARCHITECTURE)
+- [Friction Collapse](/entities/friction-collapse.md) (CONCEPT)
+- [Artificial Agents](/entities/artificial-agents.md) (CONCEPT)
+- [Dynamic Equilibrium](/entities/dynamic-equilibrium.md) (CONCEPT)
+- [Homeostatic Regulation](/entities/homeostatic-regulation.md) (CONCEPT)
+- [Allostasis Machine (AM)](/entities/allostasis-machine-am.md) (CONCEPT)
+- [Sedation Paradox](/entities/sedation-paradox.md) (CONCEPT)
 
 ## Relations
 - Artificial Agents → USES → Homeostatic Regulation

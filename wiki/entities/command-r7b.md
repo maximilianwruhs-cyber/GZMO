@@ -14,9 +14,9 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[resilient-rust-based-mcp-client-and-llm-orchestrat-micro06|resilient-rust-based-mcp-client-and-llm-orchestrat-micro06]] (2026-06-09)
+## From [resilient-rust-based-mcp-client-and-llm-orchestrat-micro06](/entities/resilient-rust-based-mcp-client-and-llm-orchestrat-micro06.md) (2026-06-09)
 - Model explicitly tuned for parallel execution.
 - Handles multi-tool parsing robustly.
 
-## From [[resilient-rust-based-mcp-client-and-llm-orchestrat-micro05|resilient-rust-based-mcp-client-and-llm-orchestrat-micro05]] (2026-06-10)
+## From [resilient-rust-based-mcp-client-and-llm-orchestrat-micro05](/entities/resilient-rust-based-mcp-client-and-llm-orchestrat-micro05.md) (2026-06-10)
 - A model family with advanced native handlers for reasoning traces.

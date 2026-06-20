@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[architectural-framework-for-scalable-codebase-rest|architectural-framework-for-scalable-codebase-rest]] (2026-06-08)
+## From [architectural-framework-for-scalable-codebase-rest](/entities/architectural-framework-for-scalable-codebase-rest.md) (2026-06-08)
 - It is a tool that provides chainable APIs for traversing the AST.
 - It is used in the codemod implementation process.
 - It helps in executing dry-runs before applying codemods to the entire repository.
 
-## From [[google-antigravity-the-architects-configuration-micro06|google-antigravity-the-architects-configuration-micro06]] (2026-06-09)
+## From [google-antigravity-the-architects-configuration-micro06](/entities/google-antigravity-the-architects-configuration-micro06.md) (2026-06-09)
 - Ein Beispiel für Codemods.

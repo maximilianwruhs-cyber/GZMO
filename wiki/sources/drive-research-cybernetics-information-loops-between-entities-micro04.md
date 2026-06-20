@@ -14,19 +14,19 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[sensors|Sensors]] (TOOL)
-- [[controllers|Controllers]] (SYSTEM)
-- [[multi-agent-ai-system|Multi-agent AI system]] (SYSTEM)
-- [[conversation-theory|Conversation Theory]] (CONCEPT)
-- [[centaurian-architectures|Centaurian architectures]] (SYSTEM)
-- [[cybernetics-3-0|Cybernetics 3.0]] (CONCEPT)
-- [[effectors|Effectors]] (TOOL)
-- [[feedback-loops|Feedback Loops]] (CONCEPT)
-- [[information-loops|Information Loops]] (CONCEPT)
-- [[autonomous-machine-intelligence|Autonomous machine intelligence]] (SYSTEM)
-- [[sympathico-adrenal-system|Sympathico-adrenal system]] (SYSTEM)
-- [[mechanical-thermostat|Mechanical thermostat]] (SYSTEM)
-- [[gordon-pask|Gordon Pask]] (PERSON)
+- [Sensors](/entities/sensors.md) (TOOL)
+- [Controllers](/entities/controllers.md) (SYSTEM)
+- [Multi-agent AI system](/entities/multi-agent-ai-system.md) (SYSTEM)
+- [Conversation Theory](/entities/conversation-theory.md) (CONCEPT)
+- [Centaurian architectures](/entities/centaurian-architectures.md) (SYSTEM)
+- [Cybernetics 3.0](/entities/cybernetics-3-0.md) (CONCEPT)
+- [Effectors](/entities/effectors.md) (TOOL)
+- [Feedback Loops](/entities/feedback-loops.md) (CONCEPT)
+- [Information Loops](/entities/information-loops.md) (CONCEPT)
+- [Autonomous machine intelligence](/entities/autonomous-machine-intelligence.md) (SYSTEM)
+- [Sympathico-adrenal system](/entities/sympathico-adrenal-system.md) (SYSTEM)
+- [Mechanical thermostat](/entities/mechanical-thermostat.md) (SYSTEM)
+- [Gordon Pask](/entities/gordon-pask.md) (PERSON)
 
 ## Relations
 - Feedback Loops → USES → Sensors

@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[prompt-agent-engineering-part2-micro01|prompt-agent-engineering-part2-micro01]] (2026-06-09)
+## From [prompt-agent-engineering-part2-micro01](/entities/prompt-agent-engineering-part2-micro01.md) (2026-06-09)
 - No hard px values for layout or typography.
 - Translates visual estimates into responsive, relative units (rem, em, %, vh/vw).

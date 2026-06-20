@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PROTOCOL
 
-## From [[from-static-vaults-to-autonomous-knowledge-engines|from-static-vaults-to-autonomous-knowledge-engines]] (2026-06-08)
+## From [from-static-vaults-to-autonomous-knowledge-engines](/entities/from-static-vaults-to-autonomous-knowledge-engines.md) (2026-06-08)
 - It mitigates the challenge of state management in AI automation.
 - It allows AI agents to persist context directly within the vault's markdown pages.
 - It enables the vault to function as an infrastructural intelligence layer.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-creating-a-comprehensive-readmemd-micro01|drive-research-creating-a-comprehensive-readmemd-micro01]] (2026-06-09)
+## From [drive-research-creating-a-comprehensive-readmemd-micro01](/entities/drive-research-creating-a-comprehensive-readmemd-micro01.md) (2026-06-09)
 - For projects dealing with frontend development, UI/UX frameworks, or design systems, GitHub supports the inline rendering of hexadecimal and RGB color models.
 - Wrapping a HEX code (e.g., #0969DA), an RGB value (e.g., rgb(9, 105, 218)), or an HSL value (e.g., hsl(212, 92%, 45%)) in standard Markdown backticks automatically generates a small, colored circular visualization adjacent to the code block.
 - This feature requires strict adherence to spacing rules, ensuring no leading or trailing spaces exist within the backticks.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-archival-truth-part1-micro06|the-archival-truth-part1-micro06]] (2026-06-09)
+## From [the-archival-truth-part1-micro06](/entities/the-archival-truth-part1-micro06.md) (2026-06-09)
 - Combines themes of love, relationship dynamics, and dating with comedic situations.
 - Subverts romantic tropes.
 - Notable examples include When Harry Met Sally and Clueless.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: BENCHMARK
 
-## From [[ai-research-part4|ai-research-part4]] (2026-06-08)
+## From [ai-research-part4](/entities/ai-research-part4.md) (2026-06-08)
 - MiniCPM-SALA achieves a score of 23.86 at the 128K level.
 - MiniCPM-SALA's performance is substantially higher than other models in this benchmark.
 - Stands for 'Long-context evaluation beyond literal matching'.

@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-automating-linux-hardware-detection-micro02|drive-research-automating-linux-hardware-detection-micro02]] (2026-06-10)
+## From [drive-research-automating-linux-hardware-detection-micro02](/entities/drive-research-automating-linux-hardware-detection-micro02.md) (2026-06-10)
 - Modern standard for hardware telemetry and control
 - Exposes hardware state through a RESTful API using JSON and HTTPS

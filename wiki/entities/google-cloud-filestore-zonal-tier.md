@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[openclaw-part2|openclaw-part2]] (2026-06-08)
+## From [openclaw-part2](/entities/openclaw-part2.md) (2026-06-08)
 - The OpenClaw Gateway relies on Filestore for state persistence.
 - The agent is permitted to perform write operations exclusively within the designated, isolated Filestore workspace mounts.
 - Bypasses standard cloud storage limitations by using 'Custom Performance' tier or Hyperdisk Balanced for massive IOPS.

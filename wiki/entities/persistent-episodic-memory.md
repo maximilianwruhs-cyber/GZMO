@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-mcp-landscape-research-report|drive-research-mcp-landscape-research-report]] (2026-06-08)
+## From [drive-research-mcp-landscape-research-report](/entities/drive-research-mcp-landscape-research-report.md) (2026-06-08)
 - Required for AI agents to evolve into persistent, highly capable digital operators.
 - Durable, cross-session memory is needed, as relying solely on language model context windows is unsustainable.
 - Next generation of server implementations function as sophisticated memory layers.

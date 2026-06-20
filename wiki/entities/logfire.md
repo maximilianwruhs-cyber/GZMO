@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-agentic-token-economy-blueprint-micro02|drive-research-agentic-token-economy-blueprint-micro02]] (2026-06-09)
+## From [drive-research-agentic-token-economy-blueprint-micro02](/entities/drive-research-agentic-token-economy-blueprint-micro02.md) (2026-06-09)
 - A platform providing purpose-built features for LLM applications.
 - Integrates with OpenTelemetry to trace the entire application stack.
 - Captures telemetry across system performance, resource utilization, and agent behavior.

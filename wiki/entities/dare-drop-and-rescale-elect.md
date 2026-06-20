@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[architectural-blueprints-for-sovereign-frankenmoe-part1|architectural-blueprints-for-sovereign-frankenmoe-part1]] (2026-06-08)
+## From [architectural-blueprints-for-sovereign-frankenmoe-part1](/entities/architectural-blueprints-for-sovereign-frankenmoe-part1.md) (2026-06-08)
 - Randomly drops redundant weight updates and rescales the remaining parameters.
 - Mitigates interference while preserving baseline capabilities.
 - An advanced merging technique used to preserve functional integrity of parameters in homogeneous merging.
@@ -25,7 +25,7 @@ Type: CONCEPT
 - It involves random parameter pruning combined with scaling factors.
 - It is scalable to any number of models.
 
-## From [[drive-research-frankenmoe-merging-ai-models|drive-research-frankenmoe-merging-ai-models]] (2026-06-08)
+## From [drive-research-frankenmoe-merging-ai-models](/entities/drive-research-frankenmoe-merging-ai-models.md) (2026-06-08)
 - A technique used in homogeneous merging to mitigate interference.
 - Randomly drops redundant weight updates and rescales remaining parameters.
 - A technique used in homogeneous merging.

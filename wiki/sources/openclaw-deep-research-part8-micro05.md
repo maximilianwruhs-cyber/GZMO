@@ -14,22 +14,22 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-10).
 
 ## Entities
-- [[replicate|Replicate]] (ORGANIZATION)
-- [[penclaw|Penclaw]] (SYSTEM)
-- [[openclaw|OpenClaw]] (SYSTEM)
-- [[langchain-academy|LangChain Academy]] (SYSTEM)
-- [[ibm|IBM]] (ORGANIZATION)
-- [[crewai|CrewAI]] (SYSTEM)
-- [[simplefunctions|SimpleFunctions]] (SYSTEM)
-- [[aws|AWS]] (ORGANIZATION)
-- [[claude-haiku|Claude Haiku]] (SYSTEM)
-- [[hugging-face|Hugging Face]] (ORGANIZATION)
-- [[igllama|igllama]] (SYSTEM)
-- [[ollama|Ollama]] (SYSTEM)
-- [[sparkco-inc|Sparkco INC.]] (ORGANIZATION)
-- [[klarna|Klarna]] (ORGANIZATION)
-- [[autogen|AutoGen]] (SYSTEM)
-- [[microsoft|Microsoft]] (ORGANIZATION)
+- [Replicate](/entities/replicate.md) (ORGANIZATION)
+- [Penclaw](/entities/penclaw.md) (SYSTEM)
+- [OpenClaw](/entities/openclaw.md) (SYSTEM)
+- [LangChain Academy](/entities/langchain-academy.md) (SYSTEM)
+- [IBM](/entities/ibm.md) (ORGANIZATION)
+- [CrewAI](/entities/crewai.md) (SYSTEM)
+- [SimpleFunctions](/entities/simplefunctions.md) (SYSTEM)
+- [AWS](/entities/aws.md) (ORGANIZATION)
+- [Claude Haiku](/entities/claude-haiku.md) (SYSTEM)
+- [Hugging Face](/entities/hugging-face.md) (ORGANIZATION)
+- [igllama](/entities/igllama.md) (SYSTEM)
+- [Ollama](/entities/ollama.md) (SYSTEM)
+- [Sparkco INC.](/entities/sparkco-inc.md) (ORGANIZATION)
+- [Klarna](/entities/klarna.md) (ORGANIZATION)
+- [AutoGen](/entities/autogen.md) (SYSTEM)
+- [Microsoft](/entities/microsoft.md) (ORGANIZATION)
 
 ## Relations
 - Microsoft → RELATED_TO → AutoGen

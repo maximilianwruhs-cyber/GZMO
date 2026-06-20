@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-technologischer-branchen-report-hilfsbetriebeumri-micro03|drive-research-technologischer-branchen-report-hilfsbetriebeumri-micro03]] (2026-06-09)
+## From [drive-research-technologischer-branchen-report-hilfsbetriebeumri-micro03](/entities/drive-research-technologischer-branchen-report-hilfsbetriebeumri-micro03.md) (2026-06-09)
 - High-voltage battery systems.
 - Integration into modern rail vehicles is a demanding discipline.

@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[optimizing-nvidia-blackwell-sm120-part2-micro02|optimizing-nvidia-blackwell-sm120-part2-micro02]] (2026-06-10)
+## From [optimizing-nvidia-blackwell-sm120-part2-micro02](/entities/optimizing-nvidia-blackwell-sm120-part2-micro02.md) (2026-06-10)
 - Warp Group Matrix Multiply instructions introduced in the Hopper generation.
 - Not available on SM120/SM121 hardware.

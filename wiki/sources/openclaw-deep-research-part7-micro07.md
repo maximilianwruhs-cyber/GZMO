@@ -14,17 +14,17 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-10).
 
 ## Entities
-- [[openclaw|OpenClaw]] (SYSTEM)
-- [[clinejection|Clinejection]] (CONCEPT)
-- [[cline-cli|Cline CLI]] (TOOL)
-- [[the-prompt-injection-attacks-guide|The Prompt Injection Attacks guide]] (BOOK)
-- [[moltworker|Moltworker]] (SYSTEM)
-- [[george-liu|George Liu]] (PERSON)
-- [[clawjacked-attack|ClawJacked Attack]] (CONCEPT)
-- [[cisco-ai-defense-skill-scanner|Cisco AI Defense Skill Scanner]] (SYSTEM)
-- [[hudson-rock-infostealer|Hudson Rock Infostealer]] (SYSTEM)
-- [[gateway|Gateway]] (SYSTEM)
-- [[oasis-security|Oasis Security]] (ORGANIZATION)
+- [OpenClaw](/entities/openclaw.md) (SYSTEM)
+- [Clinejection](/entities/clinejection.md) (CONCEPT)
+- [Cline CLI](/entities/cline-cli.md) (TOOL)
+- [The Prompt Injection Attacks guide](/entities/the-prompt-injection-attacks-guide.md) (BOOK)
+- [Moltworker](/entities/moltworker.md) (SYSTEM)
+- [George Liu](/entities/george-liu.md) (PERSON)
+- [ClawJacked Attack](/entities/clawjacked-attack.md) (CONCEPT)
+- [Cisco AI Defense Skill Scanner](/entities/cisco-ai-defense-skill-scanner.md) (SYSTEM)
+- [Hudson Rock Infostealer](/entities/hudson-rock-infostealer.md) (SYSTEM)
+- [Gateway](/entities/gateway.md) (SYSTEM)
+- [Oasis Security](/entities/oasis-security.md) (ORGANIZATION)
 
 ## Relations
 - Cline CLI → USES → OpenClaw

@@ -15,14 +15,14 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[the-evolution-of-artificial-intelligence-evaluatio-micro03|the-evolution-of-artificial-intelligence-evaluatio-micro03]] (2026-06-09)
+## From [the-evolution-of-artificial-intelligence-evaluatio-micro03](/entities/the-evolution-of-artificial-intelligence-evaluatio-micro03.md) (2026-06-09)
 - Used as an automated evaluation model to act as an impartial judge in JailbreakBench
 
-## From [[drive-research-research-process-steps-micro03|drive-research-research-process-steps-micro03]] (2026-06-10)
+## From [drive-research-research-process-steps-micro03](/entities/drive-research-research-process-steps-micro03.md) (2026-06-10)
 - Utilizes Grouped-Query Attention with 80 transformer layers and 64 query heads.
 - Has 8 key-value heads and a head dimension of 128.
 
-## From [[optimizing-nvidia-blackwell-sm120-part3-micro02|optimizing-nvidia-blackwell-sm120-part3-micro02]] (2026-06-10)
+## From [optimizing-nvidia-blackwell-sm120-part3-micro02](/entities/optimizing-nvidia-blackwell-sm120-part3-micro02.md) (2026-06-10)
 - Utilizes Grouped-Query Attention
 - Has 80 transformer layers
 - Has 64 query heads and 8 key-value heads

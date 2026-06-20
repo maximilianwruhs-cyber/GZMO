@@ -14,12 +14,12 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-10).
 
 ## Entities
-- [[python|Python]] (TOOL)
-- [[gemini|Gemini]] (SYSTEM)
-- [[aria|ARIA]] (CONCEPT)
-- [[hick-s-law|Hick's Law]] (CONCEPT)
-- [[sentry|Sentry]] (TOOL)
-- [[fitts-s-law|Fitts's Law]] (CONCEPT)
-- [[one-button-execution|One-Button Execution]] (CONCEPT)
-- [[google-s-rail-model|Google's RAIL model]] (CONCEPT)
-- [[javascript|JavaScript]] (TOOL)
+- [Python](/entities/python.md) (TOOL)
+- [Gemini](/entities/gemini.md) (SYSTEM)
+- [ARIA](/entities/aria.md) (CONCEPT)
+- [Hick's Law](/entities/hick-s-law.md) (CONCEPT)
+- [Sentry](/entities/sentry.md) (TOOL)
+- [Fitts's Law](/entities/fitts-s-law.md) (CONCEPT)
+- [One-Button Execution](/entities/one-button-execution.md) (CONCEPT)
+- [Google's RAIL model](/entities/google-s-rail-model.md) (CONCEPT)
+- [JavaScript](/entities/javascript.md) (TOOL)

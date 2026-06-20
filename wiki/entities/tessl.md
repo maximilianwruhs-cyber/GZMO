@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-ai-agents-and-spec-driven-development-micro04|drive-research-ai-agents-and-spec-driven-development-micro04]] (2026-06-09)
+## From [drive-research-ai-agents-and-spec-driven-development-micro04](/entities/drive-research-ai-agents-and-spec-driven-development-micro04.md) (2026-06-09)
 - launches spec-driven development tools
 - products pioneer Spec-Driven Development
 
-## From [[spec-driven-development-architecting-the-era-of-a-micro02|spec-driven-development-architecting-the-era-of-a-micro02]] (2026-06-10)
+## From [spec-driven-development-architecting-the-era-of-a-micro02](/entities/spec-driven-development-architecting-the-era-of-a-micro02.md) (2026-06-10)
 - A Spec Framework tool.
 - Uses a living, bidirectional specification model.

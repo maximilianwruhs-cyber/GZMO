@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[openclaw-part1-micro03|openclaw-part1-micro03]] (2026-06-10)
+## From [openclaw-part1-micro03](/entities/openclaw-part1-micro03.md) (2026-06-10)
 - An autonomous background system that manages the lifecycle of information from short-term to long-term memory.
 - Consists of three phases: Light, REM, and Deep.

@@ -1,0 +1,32 @@
+{
+  "generated_at": "2026-06-18T21:08:41Z",
+  "vault_db": "/home/maximilian-wruhs/Projects/_foundation-audit/survey_GZMO/data/vault.db",
+  "counts": {
+    "semantic_vault": 56888,
+    "honeypot_latest": 35120,
+    "discovery_sourced_vault": 0,
+    "distill_dedup_rows": 63,
+    "cycle_reports": 155
+  },
+  "distill": {
+    "log_attempts": 7,
+    "log_dedup_skips": 8,
+    "dedup_skip_rate_estimate": 1.1429
+  },
+  "discovery_links": {
+    "registry_total": 0,
+    "registry_entries_30d": 0
+  },
+  "spark_distill": {
+    "spark_sessions_in_tail": 0,
+    "distill_sessions_in_tail": 0,
+    "session_overlap": 0
+  },
+  "honeypot_reject_sample": [],
+  "targets": {
+    "novel_links_per_cycle": 2,
+    "dedup_skip_rate_max": 0.5,
+    "discovery_sourced_per_week": 15,
+    "recall_smoke_pass_min": 0.66
+  }
+}

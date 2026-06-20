@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[ai-research-part3-micro04|ai-research-part3-micro04]] (2026-06-09)
+## From [ai-research-part3-micro04](/entities/ai-research-part3-micro04.md) (2026-06-09)
 - Published in 2025a.
 - Available at https://arxiv.org/abs/2505.22954.

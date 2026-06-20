@@ -15,16 +15,16 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[cybernetics-and-mythos-the-architecture-of-intell-part2|cybernetics-and-mythos-the-architecture-of-intell-part2]] (2026-06-08)
+## From [cybernetics-and-mythos-the-architecture-of-intell-part2](/entities/cybernetics-and-mythos-the-architecture-of-intell-part2.md) (2026-06-08)
 - A highly influential two-volume analytical work by Karl Popper.
 - Published in 1945, with subsequent editions.
 - Identifies Plato, Hegel, and Marx as chief 'prophets' of historicism.
 
-## From [[drive-research-dialectics-socratic-vs-hegelian-methods|drive-research-dialectics-socratic-vs-hegelian-methods]] (2026-06-08)
+## From [drive-research-dialectics-socratic-vs-hegelian-methods](/entities/drive-research-dialectics-socratic-vs-hegelian-methods.md) (2026-06-08)
 - A two-volume analytical work by Karl Popper.
 - Critiques historicism and its connection to totalitarianism.
 - Contains a polemic against Hegel.
 - mentioned in relation to Popper's critique of Hegel
 
-## From [[the-archival-truth-part2-micro03|the-archival-truth-part2-micro03]] (2026-06-10)
+## From [the-archival-truth-part2-micro03](/entities/the-archival-truth-part2-micro03.md) (2026-06-10)
 - A 1945 work by Karl Popper.

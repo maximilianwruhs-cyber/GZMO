@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-create-a-tier-list-of-specialized-small-models|drive-research-create-a-tier-list-of-specialized-small-models]] (2026-06-08)
+## From [drive-research-create-a-tier-list-of-specialized-small-models](/entities/drive-research-create-a-tier-list-of-specialized-small-models.md) (2026-06-08)
 - S-Tier model.
 - Inline Edit Prediction (FIM).
 - Distilled from Claude 3.5 Sonnet.

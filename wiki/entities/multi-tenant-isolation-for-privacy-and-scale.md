@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[architectures-for-agentic-memory-virtual-context-micro05|architectures-for-agentic-memory-virtual-context-micro05]] (2026-06-09)
+## From [architectures-for-agentic-memory-virtual-context-micro05](/entities/architectures-for-agentic-memory-virtual-context-micro05.md) (2026-06-09)
 - Addresses data privacy and consistent retrieval latency in scaled memory systems.
 - Implemented via automatic graph isolation architecture.

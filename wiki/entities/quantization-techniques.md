@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-agentic-workflows-fastest-best-models|drive-research-agentic-workflows-fastest-best-models]] (2026-06-08)
+## From [drive-research-agentic-workflows-fastest-best-models](/entities/drive-research-agentic-workflows-fastest-best-models.md) (2026-06-08)
 - Weight quantization is the first step to fitting models into VRAM.
 - 8-bit quantization (INT8 or FP8) reduces weight memory footprint by 50%.
 - 4-bit quantization is mandatory for certain model classes on 32GB hardware.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part3-micro03|ai-research-part3-micro03]] (2026-06-09)
+## From [ai-research-part3-micro03](/entities/ai-research-part3-micro03.md) (2026-06-09)
 - benchmark of 300 coding tasks
 - 93 of which overlap with SWE-Verified
 - generalization results of HGM’s best-belief SWE-Verified agent on SWE-Lite benchmark

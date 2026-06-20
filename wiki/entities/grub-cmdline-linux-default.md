@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-ubuntu-extreme-hardware-tuning-micro02|drive-research-ubuntu-extreme-hardware-tuning-micro02]] (2026-06-09)
+## From [drive-research-ubuntu-extreme-hardware-tuning-micro02](/entities/drive-research-ubuntu-extreme-hardware-tuning-micro02.md) (2026-06-09)
 - Kernel boot command line parameter.
 - Used to pass system-wide performance parameters on boot.
 - Includes parameters like 'amd_iommu=on', 'iommu=pt', 'amd_pstate=active', 'nvme_core.default_ps_max_latency_us=0', 'rcutree.enable_rcu_lazy=1', 'audit=0'.

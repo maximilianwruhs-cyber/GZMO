@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[spec-driven-development-architecting-the-era-of-a-micro01|spec-driven-development-architecting-the-era-of-a-micro01]] (2026-06-09)
+## From [spec-driven-development-architecting-the-era-of-a-micro01](/entities/spec-driven-development-architecting-the-era-of-a-micro01.md) (2026-06-09)
 - Architecting the Era of A
 - Curated research corpus consolidated from Google Takeout (wave_02_notebooklm)
 - Sources: 1 documents

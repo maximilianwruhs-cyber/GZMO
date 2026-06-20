@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[obolus-micro05|obolus-micro05]] (2026-06-09)
+## From [obolus-micro05](/entities/obolus-micro05.md) (2026-06-09)
 - Feature of Prometheus 3.x.
 - Includes `info()` function for label-enrichment.
 - Includes `fill()`-operatoren for compensating missing data series.

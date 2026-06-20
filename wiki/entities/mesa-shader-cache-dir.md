@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[architecting-the-minimalist-linux-desktop-a-compa-part1|architecting-the-minimalist-linux-desktop-a-compa-part1]] (2026-06-08)
+## From [architecting-the-minimalist-linux-desktop-a-compa-part1](/entities/architecting-the-minimalist-linux-desktop-a-compa-part1.md) (2026-06-08)
 - Specifies where the on-disk cache should be stored for read-write operations.
 - In a Flatpak or AppImage, it must be redirected to a writable location within the application's sandbox.
 - Prevents permissions errors on the arbitrary host.

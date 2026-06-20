@@ -16,18 +16,18 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[architectural-analysis-of-the-openclaw-ai-plugin-s|architectural-analysis-of-the-openclaw-ai-plugin-s]] (2026-06-08)
+## From [architectural-analysis-of-the-openclaw-ai-plugin-s](/entities/architectural-analysis-of-the-openclaw-ai-plugin-s.md) (2026-06-08)
 - Plugins can bind third-party messaging platforms like Microsoft Teams to the unified multi-channel routing engine.
 - It is an example of a messaging channel.
 
-## From [[mastering-remote-work-a-comprehensive-guide-to-ho|mastering-remote-work-a-comprehensive-guide-to-ho]] (2026-06-08)
+## From [mastering-remote-work-a-comprehensive-guide-to-ho](/entities/mastering-remote-work-a-comprehensive-guide-to-ho.md) (2026-06-08)
 - Used for synchronous exchange.
 - Facilitates ad-hoc agreements, brainstorming, and video meetings.
 
-## From [[drive-research-home-office-leitfaden-struktur-gesundheit-erfol|drive-research-home-office-leitfaden-struktur-gesundheit-erfol]] (2026-06-08)
+## From [drive-research-home-office-leitfaden-struktur-gesundheit-erfol](/entities/drive-research-home-office-leitfaden-struktur-gesundheit-erfol.md) (2026-06-08)
 - Used for synchronous exchange.
 - Enables ad-hoc discussions, brainstorming, and video meetings.
 - A tool for communication.
 
-## From [[openclaw-deep-research-part9-micro05|openclaw-deep-research-part9-micro05]] (2026-06-10)
+## From [openclaw-deep-research-part9-micro05](/entities/openclaw-deep-research-part9-micro05.md) (2026-06-10)
 - A supported communication channel

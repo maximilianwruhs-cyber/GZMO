@@ -16,7 +16,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[ai-research-part7|ai-research-part7]] (2026-06-08)
+## From [ai-research-part7](/entities/ai-research-part7.md) (2026-06-08)
 - It is a visual management tool.
 - It is part of the human interface layer.
 - It provides an overarching observability layer for managing AI resources.
@@ -29,9 +29,9 @@ Type: TOOL
 - It provides a powerful, overarching observability layer.
 - It operates entirely locally via SQLite databases.
 
-## From [[ai-research-part9|ai-research-part9]] (2026-06-08)
+## From [ai-research-part9](/entities/ai-research-part9.md) (2026-06-08)
 - Local-first, pixel-art "virtual software company" interface.
 - Allows users to act as CEO to orchestrate AI coding assistants visually.
 
-## From [[ai-research-part8-micro08|ai-research-part8-micro08]] (2026-06-09)
+## From [ai-research-part8-micro08](/entities/ai-research-part8-micro08.md) (2026-06-09)
 - A local-first, pixel-art virtual software company interface for orchestrating AI assistants.

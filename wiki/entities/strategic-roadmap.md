@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: PLAN
 
-## From [[ai-research-part6-micro05|ai-research-part6-micro05]] (2026-06-09)
+## From [ai-research-part6-micro05](/entities/ai-research-part6-micro05.md) (2026-06-09)
 - Outlines phases for migration, optimization, and autonomy.
 - Covers a timeline of 0-6+ months.

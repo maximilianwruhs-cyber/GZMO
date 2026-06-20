@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part2|drive-research-ki-berater-fragebogen-für-kundenanalyse-part2]] (2026-06-08)
+## From [drive-research-ki-berater-fragebogen-für-kundenanalyse-part2](/entities/drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part2.md) (2026-06-08)
 - sichert die KI-Initiativen gegen weitreichende rechtliche, finanzielle und ethische Risiken ab
 - Compliance ist keine freiwillige Option mehr, sondern die Grundvoraussetzung für den Betrieb von KI-Systemen

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[obolus-vs-codium-extension-konzept-research-part2|obolus-vs-codium-extension-konzept-research-part2]] (2026-06-08)
+## From [obolus-vs-codium-extension-konzept-research-part2](/entities/obolus-vs-codium-extension-konzept-research-part2.md) (2026-06-08)
 - The Diagnostics Tool (benchmarks models on the precise hardware it wakes up on).
 - Use the Obolus diagnostic tool to run "Retrieval Suites" that benchmark precision against local hardware.
 - A diagnostics tool and benchmark runner that tests how well these loaded models perform on the specific local hardware.

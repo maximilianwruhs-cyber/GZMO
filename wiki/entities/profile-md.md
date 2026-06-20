@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[prompt-agent-engineering-part4-micro05|prompt-agent-engineering-part4-micro05]] (2026-06-10)
+## From [prompt-agent-engineering-part4-micro05](/entities/prompt-agent-engineering-part4-micro05.md) (2026-06-10)
 - Proposed file for tone, communication style, and user preferences

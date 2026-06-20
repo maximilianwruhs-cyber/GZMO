@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[prfaas-cross-datacenter-llm-serving-via-selective-micro01|prfaas-cross-datacenter-llm-serving-via-selective-micro01]] (2026-06-09)
+## From [prfaas-cross-datacenter-llm-serving-via-selective-micro01](/entities/prfaas-cross-datacenter-llm-serving-via-selective-micro01.md) (2026-06-09)
 - This is a micro-split document (1/5).
 - It is related to LLM serving.
 - It involves a cross-datacenter approach with a selective method.

@@ -14,12 +14,12 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[drive-research-agentic-reverse-engineering-state-and-future-micro01|drive-research-agentic-reverse-engineering-state-and-future-micro01]] (2026-06-09)
+## From [drive-research-agentic-reverse-engineering-state-and-future-micro01](/entities/drive-research-agentic-reverse-engineering-state-and-future-micro01.md) (2026-06-09)
 - A project for Ghidra operating as a specialized MCP server.
 - Focuses on a tool-driven philosophy with granular, focused tools.
 - Manages 'context rot' by restricting data flow.
 
-## From [[the-dawn-of-agentic-software-reverse-engineering-micro01|the-dawn-of-agentic-software-reverse-engineering-micro01]] (2026-06-09)
+## From [the-dawn-of-agentic-software-reverse-engineering-micro01](/entities/the-dawn-of-agentic-software-reverse-engineering-micro01.md) (2026-06-09)
 - A project for Ghidra operating as a specialized MCP server.
 - Focuses on a tool-driven philosophy with granular tools.
 - Manages 'context rot' by restricting data flow.

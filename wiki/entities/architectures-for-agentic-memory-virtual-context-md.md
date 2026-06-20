@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[architectures-for-agentic-memory-virtual-context-micro01|architectures-for-agentic-memory-virtual-context-micro01]] (2026-06-09)
+## From [architectures-for-agentic-memory-virtual-context-micro01](/entities/architectures-for-agentic-memory-virtual-context-micro01.md) (2026-06-09)
 - This is the main topic of the document.
 - It is related to agentic memory and virtual context.
 - This is the source document from which a micro-split was taken.

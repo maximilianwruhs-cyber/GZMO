@@ -11,6 +11,7 @@ use anyhow::Result;
 use async_trait::async_trait;
 use serde_json::json;
 
+use crate::config::ComplianceConfig;
 use crate::tools::{ToolDef, ToolHandler};
 
 /// Fetches a web page and extracts readable text.
@@ -19,6 +20,7 @@ pub struct WebBrowseTool {
     pub compress_config: Option<crate::config::ContextCompressConfig>,
     pub ccr: Option<crate::context_compress::CcrStore>,
     pub session_id: Option<String>,
+    pub compliance: ComplianceConfig,
 }
 
 impl Default for WebBrowseTool {
@@ -33,6 +35,7 @@ impl Default for WebBrowseTool {
             compress_config: None,
             ccr: None,
             session_id: None,
+            compliance: ComplianceConfig::default(),
         }
     }
 }
@@ -53,7 +56,13 @@ impl WebBrowseTool {
             compress_config: Some(compress_config),
             ccr: Some(ccr),
             session_id: Some(session_id),
+            compliance: ComplianceConfig::default(),
         }
+    }
+
+    pub fn with_compliance(mut self, compliance: ComplianceConfig) -> Self {
+        self.compliance = compliance;
+        self
     }
 }
 
@@ -81,6 +90,10 @@ impl ToolHandler for WebBrowseTool {
     }
 
     async fn execute(&self, args: serde_json::Value) -> Result<String> {
+        if let Some(reason) = crate::compliance::web_tool_block_reason(&self.compliance) {
+            return Ok(format!("ERROR: {reason}"));
+        }
+
         let url = args["url"]
             .as_str()
             .ok_or_else(|| anyhow::anyhow!("Missing 'url' argument"))?;

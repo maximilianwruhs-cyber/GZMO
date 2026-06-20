@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-based-on-the-given-information-create-a-comprehens-micro01|drive-research-based-on-the-given-information-create-a-comprehens-micro01]] (2026-06-09)
+## From [drive-research-based-on-the-given-information-create-a-comprehens-micro01](/entities/drive-research-based-on-the-given-information-create-a-comprehens-micro01.md) (2026-06-09)
 - Official Scikit-Learn documentation and crash courses
 - Recommended via the freeCodeCamp YouTube channel
 - Classical ML API

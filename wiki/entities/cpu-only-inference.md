@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[architecting-the-minimalist-linux-desktop-a-compa-part1|architecting-the-minimalist-linux-desktop-a-compa-part1]] (2026-06-08)
+## From [architecting-the-minimalist-linux-desktop-a-compa-part1](/entities/architecting-the-minimalist-linux-desktop-a-compa-part1.md) (2026-06-08)
 - The most reliable, globally compatible fallback strategy for unknown machines.
 - Historically viewed as unacceptably slow for Large Language Models (LLMs) and advanced neural networks.
 - Accommodates arbitrary hardware deployments and memory-constrained environments.

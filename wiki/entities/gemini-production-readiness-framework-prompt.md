@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[prompt-agent-engineering-part7-micro08|prompt-agent-engineering-part7-micro08]] (2026-06-09)
+## From [prompt-agent-engineering-part7-micro08](/entities/prompt-agent-engineering-part7-micro08.md) (2026-06-09)
 - Designed to turn an AI agent into a 'Production Readiness Specialist'.
 - Audits input against the 'Four Pillars of Production'.
 - Provides a structured gap analysis and implementation roadmap.

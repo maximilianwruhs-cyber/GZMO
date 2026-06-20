@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: ALGORITHM
 
-## From [[drive-research-financial-time-series-lyapunov-exponents|drive-research-financial-time-series-lyapunov-exponents]] (2026-06-08)
+## From [drive-research-financial-time-series-lyapunov-exponents](/entities/drive-research-financial-time-series-lyapunov-exponents.md) (2026-06-08)
 - A practical method for calculating largest Lyapunov exponents from small data sets
 - A robust method to estimate the largest Lyapunov exponent of noisy signals
 - Comparison of Kantz and Rosenstein Algorithms for Calculating Lyapunov Exponents

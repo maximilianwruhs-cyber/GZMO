@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[openclaw-deep-research-part2|openclaw-deep-research-part2]] (2026-06-08)
+## From [openclaw-deep-research-part2](/entities/openclaw-deep-research-part2.md) (2026-06-08)
 - AWS Bedrock Agents are mentioned as an alternative to OpenClaw.
 
-## From [[openclaw-deep-research-part8-micro04|openclaw-deep-research-part8-micro04]] (2026-06-09)
+## From [openclaw-deep-research-part8-micro04](/entities/openclaw-deep-research-part8-micro04.md) (2026-06-09)
 - Managed platforms like AWS Bedrock Agents offer SLAs but at higher costs.
 - Mentioned in relation to AWS IAM policy for LangChain agents.
 - Mentioned in relation to AWS Bedrock Agents.

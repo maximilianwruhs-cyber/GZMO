@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[architectures-and-optimizations-for-speculative-de-micro05|architectures-and-optimizations-for-speculative-de-micro05]] (2026-06-09)
+## From [architectures-and-optimizations-for-speculative-de-micro05](/entities/architectures-and-optimizations-for-speculative-de-micro05.md) (2026-06-09)
 - A speculation type in llama.cpp (--spec-type ngram-mod).
 - Utilizes a rolling hash computed via a Linear Congruential Generator (LCG).
 - Maintains a shared hash pool across all server slots.

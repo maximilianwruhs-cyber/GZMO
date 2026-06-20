@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-hermes-anthropic-openrouter-cache-investigation|drive-research-hermes-anthropic-openrouter-cache-investigation]] (2026-06-08)
+## From [drive-research-hermes-anthropic-openrouter-cache-investigation](/entities/drive-research-hermes-anthropic-openrouter-cache-investigation.md) (2026-06-08)
 - It is the primary algorithmic intelligence for memory management within the Hermes framework.
 - It initiates a more granular intervention based on parameters defined in config.yaml.
 - It operates with a default trigger threshold of 50% of the available context window.

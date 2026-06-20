@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[the-architecture-of-engagement-an-analysis-of-gam-micro05|the-architecture-of-engagement-an-analysis-of-gam-micro05]] (2026-06-09)
+## From [the-architecture-of-engagement-an-analysis-of-gam-micro05](/entities/the-architecture-of-engagement-an-analysis-of-gam-micro05.md) (2026-06-09)
 - Subject to strict mathematical mandates in China.
 - Has outlawed the use of unrestricted "static" probabilities for rare items.
 - Implements monetization mandates.

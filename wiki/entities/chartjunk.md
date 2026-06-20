@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-architecture-of-scientific-inquiry-and-academi|the-architecture-of-scientific-inquiry-and-academi]] (2026-06-08)
+## From [the-architecture-of-scientific-inquiry-and-academi](/entities/the-architecture-of-scientific-inquiry-and-academi.md) (2026-06-08)
 - Elements in a figure that do not contribute to the interpretation of the data.
 - Includes heavy gridlines, excessive axis ticks, and distracting background shading.
 - Must be ruthlessly excised to improve graphical integrity.

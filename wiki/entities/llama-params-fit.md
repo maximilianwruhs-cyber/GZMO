@@ -14,12 +14,12 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-llamacpp-gpu-memory-reporting-bug|drive-research-llamacpp-gpu-memory-reporting-bug]] (2026-06-08)
+## From [drive-research-llamacpp-gpu-memory-reporting-bug](/entities/drive-research-llamacpp-gpu-memory-reporting-bug.md) (2026-06-08)
 - The automatic parameter-fitting module.
 - Queries active backends to determine memory capacity.
 - Initiates a deterministic, multi-stage downscaling pipeline if memory is exceeded.
 
-## From [[optimizing-nvidia-blackwell-sm120-part3-micro03|optimizing-nvidia-blackwell-sm120-part3-micro03]] (2026-06-10)
+## From [optimizing-nvidia-blackwell-sm120-part3-micro03](/entities/optimizing-nvidia-blackwell-sm120-part3-micro03.md) (2026-06-10)
 - Acts as a pre-allocation constraint-satisfaction solver.
 - Queries active backends to determine physical and free memory capacity.
 - Initiates a multi-stage downscaling pipeline if projected memory use exceeds hardware capacity.

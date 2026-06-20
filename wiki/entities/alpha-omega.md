@@ -17,11 +17,11 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[drive-research-agentic-reverse-engineering-state-and-future-micro02|drive-research-agentic-reverse-engineering-state-and-future-micro02]] (2026-06-09)
+## From [drive-research-agentic-reverse-engineering-state-and-future-micro02](/entities/drive-research-agentic-reverse-engineering-state-and-future-micro02.md) (2026-06-09)
 - A recipient of funding from Project Glasswing for open-source security.
 
-## From [[drive-research-agentic-reverse-engineering-state-and-future1-micro02|drive-research-agentic-reverse-engineering-state-and-future1-micro02]] (2026-06-09)
+## From [drive-research-agentic-reverse-engineering-state-and-future1-micro02](/entities/drive-research-agentic-reverse-engineering-state-and-future1-micro02.md) (2026-06-09)
 - A recipient of donations to open-source security organizations from Project Glasswing.
 
-## From [[the-dawn-of-agentic-software-reverse-engineering-micro02|the-dawn-of-agentic-software-reverse-engineering-micro02]] (2026-06-10)
+## From [the-dawn-of-agentic-software-reverse-engineering-micro02](/entities/the-dawn-of-agentic-software-reverse-engineering-micro02.md) (2026-06-10)
 - Open-source security organization supported by Project Glasswing.

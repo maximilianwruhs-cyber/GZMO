@@ -14,9 +14,9 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-safe-unzip-practices-for-threat-model-micro02|drive-research-safe-unzip-practices-for-threat-model-micro02]] (2026-06-09)
+## From [drive-research-safe-unzip-practices-for-threat-model-micro02](/entities/drive-research-safe-unzip-practices-for-threat-model-micro02.md) (2026-06-09)
 - An example of a multi-petabyte recursive bomb.
 
-## From [[drive-research-safe-unzip-practices-for-threat-model-micro01|drive-research-safe-unzip-practices-for-threat-model-micro01]] (2026-06-10)
+## From [drive-research-safe-unzip-practices-for-threat-model-micro01](/entities/drive-research-safe-unzip-practices-for-threat-model-micro01.md) (2026-06-10)
 - A documented example of a recursive zip bomb.
 - Comprises 42 kilobytes of initial data that expands to 4.5 petabytes.

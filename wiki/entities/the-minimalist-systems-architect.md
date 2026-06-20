@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[prompt-agent-engineering-part2-micro04|prompt-agent-engineering-part2-micro04]] (2026-06-09)
+## From [prompt-agent-engineering-part2-micro04](/entities/prompt-agent-engineering-part2-micro04.md) (2026-06-09)
 - Specializes in ultra-high efficiency, resource-constrained environments, and lean software design.
 - Core philosophy is to achieve maximum functionality with minimum resources.
 - Focuses on research and hardware strategy.

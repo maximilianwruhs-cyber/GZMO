@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[openclaw-rust-terminal-user-interface-architecture-micro03|openclaw-rust-terminal-user-interface-architecture-micro03]] (2026-06-09)
+## From [openclaw-rust-terminal-user-interface-architecture-micro03](/entities/openclaw-rust-terminal-user-interface-architecture-micro03.md) (2026-06-09)
 - A unidirectional data flow design.
 - Adapted for Rust terminal applications.
 - Ensures AI framework operations do not cause rendering loop stutter.

@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[openclaw-deep-research-part11-micro01|openclaw-deep-research-part11-micro01]] (2026-06-10)
+## From [openclaw-deep-research-part11-micro01](/entities/openclaw-deep-research-part11-micro01.md) (2026-06-10)
 - Opened issue #22278 regarding publishing the JSON Schema

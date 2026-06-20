@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-token-efficient-bol-processing-architecture|drive-research-token-efficient-bol-processing-architecture]] (2026-06-08)
+## From [drive-research-token-efficient-bol-processing-architecture](/entities/drive-research-token-efficient-bol-processing-architecture.md) (2026-06-08)
 - A task performed by small, highly compressed local models in multi-stage extraction.
 - Extracts specific logistics entities and maps them to predefined schemas.
 - Can be performed by a local 8B parameter model loaded via a Python LlamaCpp binding.

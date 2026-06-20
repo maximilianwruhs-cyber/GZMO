@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[optimizing-nvidia-blackwell-sm120-part3-micro04|optimizing-nvidia-blackwell-sm120-part3-micro04]] (2026-06-09)
+## From [optimizing-nvidia-blackwell-sm120-part3-micro04](/entities/optimizing-nvidia-blackwell-sm120-part3-micro04.md) (2026-06-09)
 - Triggered when the number of cross-device copy operations exceeds the scheduler's compiled limit.
 - Causes the process to crash.

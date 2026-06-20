@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-creating-a-comprehensive-readmemd-micro02|drive-research-creating-a-comprehensive-readmemd-micro02]] (2026-06-09)
+## From [drive-research-creating-a-comprehensive-readmemd-micro02](/entities/drive-research-creating-a-comprehensive-readmemd-micro02.md) (2026-06-09)
 - Transitioned from for complex enterprise products and sprawling APIs when a single Markdown file becomes insufficient.
 - Offer features beyond Markdown, including dynamic API explorers, user authentication mapping, audit logs, and complex versioning control.

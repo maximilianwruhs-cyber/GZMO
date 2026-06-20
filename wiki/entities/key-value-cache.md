@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[optimizing-nvidia-blackwell-sm120-part1-micro02|optimizing-nvidia-blackwell-sm120-part1-micro02]] (2026-06-09)
+## From [optimizing-nvidia-blackwell-sm120-part1-micro02](/entities/optimizing-nvidia-blackwell-sm120-part1-micro02.md) (2026-06-09)
 - Memory usage scales linearly with context size due to its continuous materialization.
 - Flash Attention radically reduces its size by preventing N x N matrix materialization.
 - Parallel decoding inherently risks severe KV cache fragmentation.

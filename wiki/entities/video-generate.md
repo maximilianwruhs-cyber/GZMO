@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[openclaw-part1-micro04|openclaw-part1-micro04]] (2026-06-10)
+## From [openclaw-part1-micro04](/entities/openclaw-part1-micro04.md) (2026-06-10)
 - A built-in tool for creating cinematic media.
 - Supports twelve distinct provider backends.

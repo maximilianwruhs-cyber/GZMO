@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: ROLE
 
-## From [[ai-research-part6-micro04|ai-research-part6-micro04]] (2026-06-09)
+## From [ai-research-part6-micro04](/entities/ai-research-part6-micro04.md) (2026-06-09)
 - New role for developers using the OMC-Framework
 - Provides architectural guidelines and audits results

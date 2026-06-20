@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[high-fidelity-markdown-engineering-and-ast-process|high-fidelity-markdown-engineering-and-ast-process]] (2026-06-08)
+## From [high-fidelity-markdown-engineering-and-ast-process](/entities/high-fidelity-markdown-engineering-and-ast-process.md) (2026-06-08)
 - Dictates how the content of list items is padded.
 - Default is 'one' (a single space after the bullet).
 - Setting it to 'tab' or 'mixed' can prevent the stringifier from heavily modifying deeply nested, loose lists.

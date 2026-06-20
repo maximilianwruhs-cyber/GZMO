@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[openclaw-part1-micro01|openclaw-part1-micro01]] (2026-06-10)
+## From [openclaw-part1-micro01](/entities/openclaw-part1-micro01.md) (2026-06-10)
 - The core of artificial cognition
 - Consolidates fleeting daily events into permanent knowledge
 - Consists of Light Phase, REM Phase, and Deep Phase

@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[ai-research-part5|ai-research-part5]] (2026-06-08)
+## From [ai-research-part5](/entities/ai-research-part5.md) (2026-06-08)
 - Basic on-chip units for parallel execution and resource management in an NVIDIA GPU.
 - High utilization requires enough independent blocks to keep many SMs active.

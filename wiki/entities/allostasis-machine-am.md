@@ -14,12 +14,12 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[beyond-the-dark-room-allostatic-regulation-and-co|beyond-the-dark-room-allostatic-regulation-and-co]] (2026-06-08)
+## From [beyond-the-dark-room-allostatic-regulation-and-co](/entities/beyond-the-dark-room-allostatic-regulation-and-co.md) (2026-06-08)
 - It is a sophisticated framework for anticipatory regulation.
 - It proposes a radical shift in how artificial cognition is structured.
 - It represents the internal state interacting continuously with complex environments.
 
-## From [[drive-research-homeostatic-regulation-and-dynamic-equilibrium-in|drive-research-homeostatic-regulation-and-dynamic-equilibrium-in]] (2026-06-08)
+## From [drive-research-homeostatic-regulation-and-dynamic-equilibrium-in](/entities/drive-research-homeostatic-regulation-and-dynamic-equilibrium-in.md) (2026-06-08)
 - An anticipatory regulation that goes beyond reactive homeostasis.
 - Models calibrate internal setpoints proactively by predicting future system needs.
 - Requires an architectural shift from reactive control to anticipatory action.

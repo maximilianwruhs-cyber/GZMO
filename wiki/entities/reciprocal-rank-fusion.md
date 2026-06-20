@@ -14,6 +14,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[architectures-for-agentic-memory-virtual-context-micro05|architectures-for-agentic-memory-virtual-context-micro05]] (2026-06-09)
+## From [architectures-for-agentic-memory-virtual-context-micro05](/entities/architectures-for-agentic-memory-virtual-context-micro05.md) (2026-06-09)
 - Used by Zep in the re-ranking phase of retrieval.
 - Merges vector, keyword, and traversal scores.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-cuda-memory-locking-limits-configuration|drive-research-cuda-memory-locking-limits-configuration]] (2026-06-08)
+## From [drive-research-cuda-memory-locking-limits-configuration](/entities/drive-research-cuda-memory-locking-limits-configuration.md) (2026-06-08)
 - The vm.swappiness sysctl parameter determines how aggressively the Linux kernel moves anonymous memory pages to swap storage.
 - sysctl can be used to apply swappiness modifications temporarily or persistently.
 - A configuration file used to persistently apply swappiness modifications across system restarts.

@@ -14,8 +14,8 @@ gzmo_synthetic: true
 
 Type: AUTHOR
 
-## From [[ai-research-part2|ai-research-part2]] (2026-06-08)
+## From [ai-research-part2](/entities/ai-research-part2.md) (2026-06-08)
 - Demonstrate the cross-domain transferability of tool-use skills.
 
-## From [[ai-research-part6-micro03|ai-research-part6-micro03]] (2026-06-09)
+## From [ai-research-part6-micro03](/entities/ai-research-part6-micro03.md) (2026-06-09)
 - Cited for linear attention paradigms.

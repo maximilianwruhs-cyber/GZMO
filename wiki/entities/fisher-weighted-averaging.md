@@ -14,11 +14,11 @@ gzmo_synthetic: true
 
 Type: ALGORITHM
 
-## From [[architectural-blueprints-for-sovereign-frankenmoe-part1|architectural-blueprints-for-sovereign-frankenmoe-part1]] (2026-06-08)
+## From [architectural-blueprints-for-sovereign-frankenmoe-part1](/entities/architectural-blueprints-for-sovereign-frankenmoe-part1.md) (2026-06-08)
 - Weights parameter importance using quadratic Fisher information matrices.
 - W_{\text{merged}} = \frac{\sum F_i W_i}{\sum F_i}.
 - Used in transfer learning scenarios where parameter sensitivity must be preserved; computationally expensive.
 
-## From [[drive-research-hidden-mode-technical-analysis-and-configuration|drive-research-hidden-mode-technical-analysis-and-configuration]] (2026-06-08)
+## From [drive-research-hidden-mode-technical-analysis-and-configuration](/entities/drive-research-hidden-mode-technical-analysis-and-configuration.md) (2026-06-08)
 - Weights parameter importance using quadratic Fisher information matrices.
 - Transfer learning scenarios where parameter sensitivity must be preserved.

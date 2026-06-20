@@ -14,12 +14,12 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[cybernetics-and-mythos-the-architecture-of-intell-part1|cybernetics-and-mythos-the-architecture-of-intell-part1]] (2026-06-08)
+## From [cybernetics-and-mythos-the-architecture-of-intell-part1](/entities/cybernetics-and-mythos-the-architecture-of-intell-part1.md) (2026-06-08)
 - An epistemological approach developed concurrently by Ernst von Glasersfeld.
 - Aligns second-order cybernetics seamlessly.
 - States that a purely objective reality is fundamentally inaccessible, and knowledge is actively constructed through the continuous feedback loop of action and perception.
 
-## From [[drive-research-cybernetics-information-loops-between-entities-micro03|drive-research-cybernetics-information-loops-between-entities-micro03]] (2026-06-09)
+## From [drive-research-cybernetics-information-loops-between-entities-micro03](/entities/drive-research-cybernetics-information-loops-between-entities-micro03.md) (2026-06-09)
 - An epistemological approach developed concurrently by Ernst von Glasersfeld.
 - Aligns seamlessly with second-order cybernetics.
 - Posits that reality is constructed by the observer's interaction.

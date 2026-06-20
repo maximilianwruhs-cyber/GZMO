@@ -15,14 +15,14 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[aether-grid-micro01|aether-grid-micro01]] (2026-06-09)
+## From [aether-grid-micro01](/entities/aether-grid-micro01.md) (2026-06-09)
 - Used for scheduling on GH200-Cluster.
 - Must be configured to prioritize vector ingestion.
 - Can cause Kernel Panic if NVLink memory status is blocked.
 
-## From [[aether-grid-micro04|aether-grid-micro04]] (2026-06-09)
+## From [aether-grid-micro04](/entities/aether-grid-micro04.md) (2026-06-09)
 - Controls GPU scheduling in the Core K8s cluster.
 
-## From [[aether-grid-micro03|aether-grid-micro03]] (2026-06-09)
+## From [aether-grid-micro03](/entities/aether-grid-micro03.md) (2026-06-09)
 - Used for load balancing.
 - Activated for GPU scheduling in the Core cluster in Phase 3.

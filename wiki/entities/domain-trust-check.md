@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[openclaw-deep-research-part7-micro05|openclaw-deep-research-part7-micro05]] (2026-06-10)
+## From [openclaw-deep-research-part7-micro05](/entities/openclaw-deep-research-part7-micro05.md) (2026-06-10)
 - Check any URL for phishing, malware, brand abuse, and scams before visiting. Powered by the Outtake Trust API.

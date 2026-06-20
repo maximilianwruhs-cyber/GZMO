@@ -14,14 +14,14 @@ gzmo_synthetic: true
 
 Type: API
 
-## From [[drive-research-setting-up-autonomous-trading-agents-micro02|drive-research-setting-up-autonomous-trading-agents-micro02]] (2026-06-09)
+## From [drive-research-setting-up-autonomous-trading-agents-micro02](/entities/drive-research-setting-up-autonomous-trading-agents-micro02.md) (2026-06-09)
 - Trades can be executed autonomously via the Bitpanda API.
 - Operates on a modern REST architecture using standard API keys for secure authentication.
 - Explicitly designed to handle high-volume requests efficiently.
 - Transitioned its endpoints to utilize cursor-based pagination in 2024.
 - Allows for seamless, high-throughput integration with third-party automated platforms.
 
-## From [[the-architects-handbook-for-autonomous-agentic-tr-micro03|the-architects-handbook-for-autonomous-agentic-tr-micro03]] (2026-06-09)
+## From [the-architects-handbook-for-autonomous-agentic-tr-micro03](/entities/the-architects-handbook-for-autonomous-agentic-tr-micro03.md) (2026-06-09)
 - Trades can be executed autonomously via the Bitpanda API.
 - Operates on a modern REST architecture using standard API keys for secure authentication.
 - Explicitly designed to handle high-volume requests efficiently.

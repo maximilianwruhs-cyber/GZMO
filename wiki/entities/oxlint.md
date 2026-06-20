@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[openclaw-deep-research-part10-micro07|openclaw-deep-research-part10-micro07]] (2026-06-10)
+## From [openclaw-deep-research-part10-micro07](/entities/openclaw-deep-research-part10-micro07.md) (2026-06-10)
 - Used for linting

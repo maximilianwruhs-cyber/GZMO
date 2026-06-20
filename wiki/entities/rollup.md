@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[obolus-vs-codium-extension-konzept-research-part1-micro08|obolus-vs-codium-extension-konzept-research-part1-micro08]] (2026-06-09)
+## From [obolus-vs-codium-extension-konzept-research-part1-micro08](/entities/obolus-vs-codium-extension-konzept-research-part1-micro08.md) (2026-06-09)
 - Version bumped from 2.58.0 to 3.29.5.

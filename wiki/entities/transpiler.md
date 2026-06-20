@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-bun-typescript-performance-tips-micro04|drive-research-bun-typescript-performance-tips-micro04]] (2026-06-09)
+## From [drive-research-bun-typescript-performance-tips-micro04](/entities/drive-research-bun-typescript-performance-tips-micro04.md) (2026-06-09)
 - A feature of Bun.
 - Related documentation available on Bun.com and Mintlify.
 
-## From [[high-performance-typescript-execution-and-architec-part1-micro04|high-performance-typescript-execution-and-architec-part1-micro04]] (2026-06-09)
+## From [high-performance-typescript-execution-and-architec-part1-micro04](/entities/high-performance-typescript-execution-and-architec-part1-micro04.md) (2026-06-09)
 - Bun has a Transpiler feature.
 - Bun Transpiler class is mentioned in API Reference.

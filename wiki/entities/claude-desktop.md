@@ -14,5 +14,5 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-agentic-reverse-engineering-state-and-future1-micro01|drive-research-agentic-reverse-engineering-state-and-future1-micro01]] (2026-06-09)
+## From [drive-research-agentic-reverse-engineering-state-and-future1-micro01](/entities/drive-research-agentic-reverse-engineering-state-and-future1-micro01.md) (2026-06-09)
 - An LLM client that can integrate directly into local reversing environments via ida-mcp-server.

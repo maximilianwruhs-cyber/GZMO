@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-architecting-a-linux-task-manager-design-principl|drive-research-architecting-a-linux-task-manager-design-principl]] (2026-06-08)
+## From [drive-research-architecting-a-linux-task-manager-design-principl](/entities/drive-research-architecting-a-linux-task-manager-design-principl.md) (2026-06-08)
 - A modern task manager.
 - Acquires primary datasets by iterating through the /proc hierarchy.
 - Uses color pairs for immediate visual context.
@@ -22,7 +22,7 @@ Type: TOOL
 - Used the synchronous polling approach.
 - Is an example of a task manager.
 
-## From [[gzmo-soul-merged-new-part1|gzmo-soul-merged-new-part1]] (2026-06-09)
+## From [gzmo-soul-merged-new-part1](/entities/gzmo-soul-merged-new-part1.md) (2026-06-09)
 - Modern system monitoring tool.
 - Authored by Hisham Muhammad in 2004.
 - Interactive task manager that displays instantaneous CPU usage

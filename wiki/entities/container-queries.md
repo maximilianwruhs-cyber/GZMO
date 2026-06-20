@@ -14,8 +14,8 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[prompt-agent-engineering-part2-micro02|prompt-agent-engineering-part2-micro02]] (2026-06-09)
+## From [prompt-agent-engineering-part2-micro02](/entities/prompt-agent-engineering-part2-micro02.md) (2026-06-09)
 - Modern CSS feature that may be leveraged by the Visual Systems Extractor.
 
-## From [[prompt-agent-engineering-part2-micro05|prompt-agent-engineering-part2-micro05]] (2026-06-09)
+## From [prompt-agent-engineering-part2-micro05](/entities/prompt-agent-engineering-part2-micro05.md) (2026-06-09)
 - A layout primitive

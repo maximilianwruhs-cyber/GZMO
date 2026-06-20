@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[openclaw-deep-research-part1-micro03|openclaw-deep-research-part1-micro03]] (2026-06-09)
+## From [openclaw-deep-research-part1-micro03](/entities/openclaw-deep-research-part1-micro03.md) (2026-06-09)
 - Uses relay-backed push for official builds.
 - Pairs with the gateway to publish relay-backed push payloads.
 - Fetches gateway identity and registers with the relay.

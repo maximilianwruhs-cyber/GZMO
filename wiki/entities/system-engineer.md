@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[drive-research-technologischer-branchen-report-hilfsbetriebeumri-micro03|drive-research-technologischer-branchen-report-hilfsbetriebeumri-micro03]] (2026-06-09)
+## From [drive-research-technologischer-branchen-report-hilfsbetriebeumri-micro03](/entities/drive-research-technologischer-branchen-report-hilfsbetriebeumri-micro03.md) (2026-06-09)
 - Key position requiring a specialized multidisciplinary engineering profile.
 - Salaries correlate with experience, responsibility, and location.
 - Face challenges with long product lifecycles and normative frameworks.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[openclaw-part2|openclaw-part2]] (2026-06-08)
+## From [openclaw-part2](/entities/openclaw-part2.md) (2026-06-08)
 - Optimized for complex software engineering.
 - Features 'Agent Teams' for spawning isolated sub-agents for parallel tasks.
 - Includes 'Adaptive Thinking' to automatically scale logic depth based on problem difficulty.

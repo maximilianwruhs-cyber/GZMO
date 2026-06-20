@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[ai-research-part8-micro05|ai-research-part8-micro05]] (2026-06-09)
+## From [ai-research-part8-micro05](/entities/ai-research-part8-micro05.md) (2026-06-09)
 - A task queue.
 - Essential for preventing data loss during system crashes and ensuring durable execution.

@@ -14,20 +14,20 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[team-4|Team 4]] (ORGANIZATION)
-- [[actionpayload|ActionPayload]] (CONCEPT)
-- [[gzmo-watchdog-py|gzmo_watchdog.py]] (TOOL)
-- [[syncack|SyncAck]] (CONCEPT)
-- [[team-3|Team 3]] (ORGANIZATION)
-- [[spark|Spark]] (SYSTEM)
-- [[grpc|gRPC]] (CONCEPT)
-- [[gemini|Gemini]] (SYSTEM)
-- [[protocol-buffers|Protocol Buffers]] (TOOL)
-- [[intentrequest|IntentRequest]] (CONCEPT)
-- [[aether-link-proto|aether_link.proto]] (TOOL)
-- [[core|Core]] (SYSTEM)
-- [[qdrant-database|Qdrant database]] (SYSTEM)
-- [[coreorchestrator|CoreOrchestrator]] (SYSTEM)
+- [Team 4](/entities/team-4.md) (ORGANIZATION)
+- [ActionPayload](/entities/actionpayload.md) (CONCEPT)
+- [gzmo_watchdog.py](/entities/gzmo-watchdog-py.md) (TOOL)
+- [SyncAck](/entities/syncack.md) (CONCEPT)
+- [Team 3](/entities/team-3.md) (ORGANIZATION)
+- [Spark](/entities/spark.md) (SYSTEM)
+- [gRPC](/entities/grpc.md) (CONCEPT)
+- [Gemini](/entities/gemini.md) (SYSTEM)
+- [Protocol Buffers](/entities/protocol-buffers.md) (TOOL)
+- [IntentRequest](/entities/intentrequest.md) (CONCEPT)
+- [aether_link.proto](/entities/aether-link-proto.md) (TOOL)
+- [Core](/entities/core.md) (SYSTEM)
+- [Qdrant database](/entities/qdrant-database.md) (SYSTEM)
+- [CoreOrchestrator](/entities/coreorchestrator.md) (SYSTEM)
 
 ## Relations
 - Spark → USES → Core

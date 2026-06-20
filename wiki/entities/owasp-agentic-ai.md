@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[the-dawn-of-agentic-software-reverse-engineering-micro04|the-dawn-of-agentic-software-reverse-engineering-micro04]] (2026-06-09)
+## From [the-dawn-of-agentic-software-reverse-engineering-micro04](/entities/the-dawn-of-agentic-software-reverse-engineering-micro04.md) (2026-06-09)
 - A GitHub repository related to Agentic AI vulnerabilities.
 - Topic of multiple articles and discussions.
 - Related to overcoming legacy tech.

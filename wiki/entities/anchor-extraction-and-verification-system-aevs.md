@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[engineering-ignorance-eliminating-affirmative-bia|engineering-ignorance-eliminating-affirmative-bia]] (2026-06-08)
+## From [engineering-ignorance-eliminating-affirmative-bia](/entities/engineering-ignorance-eliminating-affirmative-bia.md) (2026-06-08)
 - Illustrates the Anchor-Constrained Extraction paradigm.
 - Operates in distinct stages to eliminate generative freedom.
 - Identifies 'Anchors' (semantically meaningful spans) and requires responses to use only these anchors.

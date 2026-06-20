@@ -14,18 +14,18 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-08).
 
 ## Entities
-- [[rust|Rust]] (CONCEPT)
-- [[typescript|TypeScript]] (CONCEPT)
-- [[settings-json|settings.json]] (TOOL)
-- [[skills|Skills]] (CONCEPT)
-- [[system-md|system.md]] (TOOL)
-- [[llama-cpp|llama.cpp]] (TOOL)
-- [[sub-agent-extension|sub-agent extension]] (CONCEPT)
-- [[agenticos|AgenticOS]] (CONCEPT)
-- [[agents-md|AGENTS.md]] (TOOL)
-- [[context-files|Context Files]] (CONCEPT)
-- [[ollama|OLLAMA]] (TOOL)
-- [[optimization|optimization]] (CONCEPT)
+- [Rust](/entities/rust.md) (CONCEPT)
+- [TypeScript](/entities/typescript.md) (CONCEPT)
+- [settings.json](/entities/settings-json.md) (TOOL)
+- [Skills](/entities/skills.md) (CONCEPT)
+- [system.md](/entities/system-md.md) (TOOL)
+- [llama.cpp](/entities/llama-cpp.md) (TOOL)
+- [sub-agent extension](/entities/sub-agent-extension.md) (CONCEPT)
+- [AgenticOS](/entities/agenticos.md) (CONCEPT)
+- [AGENTS.md](/entities/agents-md.md) (TOOL)
+- [Context Files](/entities/context-files.md) (CONCEPT)
+- [OLLAMA](/entities/ollama.md) (TOOL)
+- [optimization](/entities/optimization.md) (CONCEPT)
 
 ## Relations
 - sub-agent extension → RELATED_TO → AgenticOS

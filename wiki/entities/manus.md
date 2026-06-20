@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[openclaw-deep-research-part5-micro02|openclaw-deep-research-part5-micro02]] (2026-06-10)
+## From [openclaw-deep-research-part5-micro02](/entities/openclaw-deep-research-part5-micro02.md) (2026-06-10)
 - Mentioned as an agent that memory moves across.

@@ -14,9 +14,9 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-cybernetics-information-loops-between-entities-micro02|drive-research-cybernetics-information-loops-between-entities-micro02]] (2026-06-09)
+## From [drive-research-cybernetics-information-loops-between-entities-micro02](/entities/drive-research-cybernetics-information-loops-between-entities-micro02.md) (2026-06-09)
 - Primary structural component of a feedback loop.
 - Receives sensor data, compares it to a standard, and calculates variance.
 
-## From [[drive-research-cybernetics-information-loops-between-entities-micro04|drive-research-cybernetics-information-loops-between-entities-micro04]] (2026-06-09)
+## From [drive-research-cybernetics-information-loops-between-entities-micro04](/entities/drive-research-cybernetics-information-loops-between-entities-micro04.md) (2026-06-09)
 - Must compare data against desired target states.

@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: AUTHOR
 
-## From [[ai-research-part1|ai-research-part1]] (2026-06-08)
+## From [ai-research-part1](/entities/ai-research-part1.md) (2026-06-08)
 - Authored "Depth-Recurrent Attention Mixtures: Giving Latent Reasoning the Attention it Deserves" in 2026.

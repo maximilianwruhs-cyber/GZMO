@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-llm-inference-engine-audit-2026-micro01|drive-research-llm-inference-engine-audit-2026-micro01]] (2026-06-10)
+## From [drive-research-llm-inference-engine-audit-2026-micro01](/entities/drive-research-llm-inference-engine-audit-2026-micro01.md) (2026-06-10)
 - AI accelerator
 - Integrated into vLLM via dedicated plugins

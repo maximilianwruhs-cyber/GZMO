@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[openclaw-part2|openclaw-part2]] (2026-06-08)
+## From [openclaw-part2](/entities/openclaw-part2.md) (2026-06-08)
 - A GCP solution for Edge Security & Sandboxing.
 - Provides Layer 7 WAF protection and Adaptive Protection against DDoS.
 - Protects the OpenClaw Gateway from unauthorized access, brute-force pairing attempts, and malicious payloads.

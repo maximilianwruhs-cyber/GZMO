@@ -14,11 +14,11 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-archival-truth-part1-micro05|the-archival-truth-part1-micro05]] (2026-06-09)
+## From [the-archival-truth-part1-micro05](/entities/the-archival-truth-part1-micro05.md) (2026-06-09)
 - Associated with Sigmund Freud's psychoanalytic framework.
 - Frames humor as a biological and psychological pressure valve.
 - Explains laughter as a manifestation of released nervous energy or psychological distress.
 
-## From [[drive-research-the-architecture-of-humor-micro01|drive-research-the-architecture-of-humor-micro01]] (2026-06-10)
+## From [drive-research-the-architecture-of-humor-micro01](/entities/drive-research-the-architecture-of-humor-micro01.md) (2026-06-10)
 - Views humor as a biological and psychological pressure valve.
 - Laughter is the physical manifestation of releasing nervous energy or stress.

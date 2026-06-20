@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[phantom-drive-autonomous-llm-deployment-architect-micro02|phantom-drive-autonomous-llm-deployment-architect-micro02]] (2026-06-10)
+## From [phantom-drive-autonomous-llm-deployment-architect-micro02](/entities/phantom-drive-autonomous-llm-deployment-architect-micro02.md) (2026-06-10)
 - A background service/daemon used for telemetry.
 - Must be cryptographically bound to the boot.sh script to prevent becoming an orphaned process.

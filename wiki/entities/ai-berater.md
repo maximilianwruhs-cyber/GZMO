@@ -14,13 +14,13 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part2|drive-research-ki-berater-fragebogen-für-kundenanalyse-part2]] (2026-06-08)
+## From [drive-research-ki-berater-fragebogen-für-kundenanalyse-part2](/entities/drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part2.md) (2026-06-08)
 - Acts at the critical interface between technological innovation and strategic business development.
 - Advises companies on identifying, designing, implementing, and optimizing AI-based solutions.
 - Aims to increase process efficiency, improve data-driven decision-making, and unlock new innovation potential.
 - Functions as a translator and bridge-builder between technical teams and business leadership.
 
-## From [[drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part1-micro01|drive-research-ki-berater-fragebogen-für-kundenanalyse-part1-micro01]] (2026-06-09)
+## From [drive-research-ki-berater-fragebogen-für-kundenanalyse-part1-micro01](/entities/drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part1-micro01.md) (2026-06-09)
 - Acts at the interface between technological innovation and strategic business development.
 - Advises companies on identifying, designing, implementing, and optimizing AI-based solutions.
 - Aims to increase process efficiency, improve data-driven decision-making, and unlock new innovation potential.

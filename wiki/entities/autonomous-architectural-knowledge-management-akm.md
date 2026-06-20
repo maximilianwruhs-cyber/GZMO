@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-ai-agents-and-spec-driven-development1-micro02|drive-research-ai-agents-and-spec-driven-development1-micro02]] (2026-06-09)
+## From [drive-research-ai-agents-and-spec-driven-development1-micro02](/entities/drive-research-ai-agents-and-spec-driven-development1-micro02.md) (2026-06-09)
 - Requires continuous, rigorous documentation to maintain architectural integrity
 - The burden of ADR generation is entirely automated in agentic workflows
 - Decomposes the complex problem of architecture recovery into manageable sub-tasks

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[obolus-vs-codium-extension-konzept-research-part1-micro05|obolus-vs-codium-extension-konzept-research-part1-micro05]] (2026-06-09)
+## From [obolus-vs-codium-extension-konzept-research-part1-micro05](/entities/obolus-vs-codium-extension-konzept-research-part1-micro05.md) (2026-06-09)
 - Native Node 18 `fetch` API must be used for REST calls.
 - Long-running tasks must be encapsulated in `vscode.window.withProgress`.
 - Supports CancellationToken bound to an AbortController for task cancellation.

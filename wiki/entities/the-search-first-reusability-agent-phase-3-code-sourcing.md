@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[prompt-agent-engineering-part2-micro01|prompt-agent-engineering-part2-micro01]] (2026-06-09)
+## From [prompt-agent-engineering-part2-micro01](/entities/prompt-agent-engineering-part2-micro01.md) (2026-06-09)
 - Scours the internet for high-quality, lightweight, openly licensed scripts or standard-library solutions.
 - Prevents writing custom code when existing solutions are available.
 - Best for solving specific functions or problems without reinventing the wheel.

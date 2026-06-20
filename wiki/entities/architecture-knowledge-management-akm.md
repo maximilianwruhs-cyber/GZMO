@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[spec-driven-development-architecting-the-era-of-a-micro03|spec-driven-development-architecting-the-era-of-a-micro03]] (2026-06-10)
+## From [spec-driven-development-architecting-the-era-of-a-micro03](/entities/spec-driven-development-architecting-the-era-of-a-micro03.md) (2026-06-10)
 - The process of maintaining architectural integrity across autonomous agent sessions.
 - Can be automated in agentic workflows to reduce administrative burden.

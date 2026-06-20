@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-analyze-the-pdf-to-create-a-step-by-step-guide-of|drive-research-analyze-the-pdf-to-create-a-step-by-step-guide-of]] (2026-06-08)
+## From [drive-research-analyze-the-pdf-to-create-a-step-by-step-guide-of](/entities/drive-research-analyze-the-pdf-to-create-a-step-by-step-guide-of.md) (2026-06-08)
 - Register set to 128 (balance_performance).
 - Achieves optimal idle socket power draw.
 
-## From [[drive-research-ubuntu-extreme-hardware-tuning-micro01|drive-research-ubuntu-extreme-hardware-tuning-micro01]] (2026-06-09)
+## From [drive-research-ubuntu-extreme-hardware-tuning-micro01](/entities/drive-research-ubuntu-extreme-hardware-tuning-micro01.md) (2026-06-09)
 - Register governing responsiveness of CPU scaling behavior.
 - Expressed as a scale from 0 (max performance) to 255 (max efficiency).

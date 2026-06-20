@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[universal-syntax-and-the-architecture-of-human-lan-micro02|universal-syntax-and-the-architecture-of-human-lan-micro02]] (2026-06-09)
+## From [universal-syntax-and-the-architecture-of-human-lan-micro02](/entities/universal-syntax-and-the-architecture-of-human-lan-micro02.md) (2026-06-09)
 - Proposed the 'Recursion-Only Hypothesis' in 2002.
 - Argued that recursion is the only uniquely human component of the Narrow Language Faculty.

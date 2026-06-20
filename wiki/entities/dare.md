@@ -14,12 +14,12 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-hidden-mode-technical-analysis-and-configurati|drive-research-hidden-mode-technical-analysis-and-configurati]] (2026-06-08)
+## From [drive-research-hidden-mode-technical-analysis-and-configurati](/entities/drive-research-hidden-mode-technical-analysis-and-configurati.md) (2026-06-08)
 - Randomly drops redundant weight updates (pruning) and rescales the remaining parameters.
 - Mitigates interference while preserving baseline capabilities.
 - Used for large merges of highly divergent fine-tunes.
 
-## From [[drive-research-hidden-mode-technical-analysis-and-configuration|drive-research-hidden-mode-technical-analysis-and-configuration]] (2026-06-08)
+## From [drive-research-hidden-mode-technical-analysis-and-configuration](/entities/drive-research-hidden-mode-technical-analysis-and-configuration.md) (2026-06-08)
 - Randomly drops redundant weight updates (pruning) and rescales the remaining parameters.
 - Mitigates interference while preserving baseline capabilities.
 - Used for large merges of highly divergent fine-tunes.

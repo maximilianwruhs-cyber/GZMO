@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[prompt-agent-engineering-part6-micro03|prompt-agent-engineering-part6-micro03]] (2026-06-09)
+## From [prompt-agent-engineering-part6-micro03](/entities/prompt-agent-engineering-part6-micro03.md) (2026-06-09)
 - Metrics that Google and users care about for web performance.
 - Includes CLS (layout shifts), LCP (heavy assets), and main thread blocking (interaction delays).

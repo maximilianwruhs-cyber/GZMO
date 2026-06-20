@@ -14,21 +14,21 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[webview-ui-toolkit-for-visual-studio-code|Webview UI Toolkit for Visual Studio Code]] (TOOL)
-- [[tsdoc|TSDoc]] (TOOL)
-- [[fast-foundation|FAST Foundation]] (CONCEPT)
-- [[github|GitHub]] (ORGANIZATION)
-- [[aria-labels|ARIA labels]] (CONCEPT)
-- [[storybook|Storybook]] (TOOL)
-- [[react|React]] (CONCEPT)
-- [[keyboard-navigation|keyboard navigation]] (CONCEPT)
-- [[eslint|eslint]] (TOOL)
-- [[npm|npm]] (TOOL)
-- [[vue|Vue]] (CONCEPT)
-- [[rollup|Rollup]] (TOOL)
-- [[svelte|Svelte]] (CONCEPT)
-- [[esbuild|esbuild]] (TOOL)
-- [[api-extractor|API Extractor]] (TOOL)
+- [Webview UI Toolkit for Visual Studio Code](/entities/webview-ui-toolkit-for-visual-studio-code.md) (TOOL)
+- [TSDoc](/entities/tsdoc.md) (TOOL)
+- [FAST Foundation](/entities/fast-foundation.md) (CONCEPT)
+- [GitHub](/entities/github.md) (ORGANIZATION)
+- [ARIA labels](/entities/aria-labels.md) (CONCEPT)
+- [Storybook](/entities/storybook.md) (TOOL)
+- [React](/entities/react.md) (CONCEPT)
+- [keyboard navigation](/entities/keyboard-navigation.md) (CONCEPT)
+- [eslint](/entities/eslint.md) (TOOL)
+- [npm](/entities/npm.md) (TOOL)
+- [Vue](/entities/vue.md) (CONCEPT)
+- [Rollup](/entities/rollup.md) (TOOL)
+- [Svelte](/entities/svelte.md) (CONCEPT)
+- [esbuild](/entities/esbuild.md) (TOOL)
+- [API Extractor](/entities/api-extractor.md) (TOOL)
 
 ## Relations
 - Webview UI Toolkit for Visual Studio Code → USES → React

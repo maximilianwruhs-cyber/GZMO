@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-cascading-honeypot-a-blueprint-for-executable|the-cascading-honeypot-a-blueprint-for-executable]] (2026-06-08)
+## From [the-cascading-honeypot-a-blueprint-for-executable](/entities/the-cascading-honeypot-a-blueprint-for-executable.md) (2026-06-08)
 - Manifestation of the cascading architecture at the base of the structure.
 - Contains the purest, highly distilled essence of ingested data.
 - Represents a definitive, massive leap in artificial intelligence knowledge application.

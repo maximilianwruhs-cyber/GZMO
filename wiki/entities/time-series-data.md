@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-financial-time-series-lyapunov-exponents|drive-research-financial-time-series-lyapunov-exponents]] (2026-06-08)
+## From [drive-research-financial-time-series-lyapunov-exponents](/entities/drive-research-financial-time-series-lyapunov-exponents.md) (2026-06-08)
 - Scaling Exponents of Time Series Data: A Machine Learning Approach
 - Mean Reversion and Heavy Tails: Characterizing Time-Series Data Using Ornstein–Uhlenbeck Processes and Machine Learning
 - Lyapunov exponents from small data sets

@@ -14,8 +14,8 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-ultimate-linux-workstation-tuning-blueprint|drive-research-ultimate-linux-workstation-tuning-blueprint]] (2026-06-08)
+## From [drive-research-ultimate-linux-workstation-tuning-blueprint](/entities/drive-research-ultimate-linux-workstation-tuning-blueprint.md) (2026-06-08)
 - optimized with Blackwell sm_120
 
-## From [[drive-research-agentic-token-economy-blueprint-micro03|drive-research-agentic-token-economy-blueprint-micro03]] (2026-06-09)
+## From [drive-research-agentic-token-economy-blueprint-micro03](/entities/drive-research-agentic-token-economy-blueprint-micro03.md) (2026-06-09)
 - Perspective from which test-time scaling is discussed

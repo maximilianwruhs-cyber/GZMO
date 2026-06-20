@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[the-evolution-of-artificial-intelligence-evaluatio-micro03|the-evolution-of-artificial-intelligence-evaluatio-micro03]] (2026-06-09)
+## From [the-evolution-of-artificial-intelligence-evaluatio-micro03](/entities/the-evolution-of-artificial-intelligence-evaluatio-micro03.md) (2026-06-09)
 - Dynamically routes evaluation tasks between smaller, faster models and massive models based on the inherent difficulty of the task
 - Proves that high-accuracy, trace-verified automated judgment can be achieved at scale without incurring prohibitive token costs or unacceptable latency

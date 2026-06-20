@@ -14,8 +14,8 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-free-ai-and-cs-self-study-roadmap|drive-research-free-ai-and-cs-self-study-roadmap]] (2026-06-08)
+## From [drive-research-free-ai-and-cs-self-study-roadmap](/entities/drive-research-free-ai-and-cs-self-study-roadmap.md) (2026-06-08)
 - hosts comprehensive video on CS50P lecture series on YouTube channel
 
-## From [[openclaw-deep-research-part1-micro07|openclaw-deep-research-part1-micro07]] (2026-06-10)
+## From [openclaw-deep-research-part1-micro07](/entities/openclaw-deep-research-part1-micro07.md) (2026-06-10)
 - A donor-supported tax-exempt 501(c)(3) charity organization

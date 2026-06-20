@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[obolus-micro05|obolus-micro05]] (2026-06-09)
+## From [obolus-micro05](/entities/obolus-micro05.md) (2026-06-09)
 - Evolutionary agent ecosystem based on thermodynamics and economics.
 - Combines Bittensor architecture with biological evolution.
 - Agents must earn resources ($OBL) to prevent termination.

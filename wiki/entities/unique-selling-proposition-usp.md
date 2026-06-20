@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[prompt-agent-engineering-part7-micro09|prompt-agent-engineering-part7-micro09]] (2026-06-10)
+## From [prompt-agent-engineering-part7-micro09](/entities/prompt-agent-engineering-part7-micro09.md) (2026-06-10)
 - A core concept for product differentiation
 - Subject of evaluation and refinement in the prompt

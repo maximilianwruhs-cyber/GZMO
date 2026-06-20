@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: LANGUAGE
 
-## From [[dynamics-of-the-unpredictable-micro06|dynamics-of-the-unpredictable-micro06]] (2026-06-09)
+## From [dynamics-of-the-unpredictable-micro06](/entities/dynamics-of-the-unpredictable-micro06.md) (2026-06-09)
 - An embedded scripting language designed to interface with Rust.
 - Features a lean Abstract Syntax Tree (AST) and avoids deep scope chains.
 - A purely interpreted AST-walker lacking a Just-In-Time (JIT) compiler.

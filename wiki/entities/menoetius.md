@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[drive-research-prometheus-and-epimetheus-myth-exploration-micro02|drive-research-prometheus-and-epimetheus-myth-exploration-micro02]] (2026-06-09)
+## From [drive-research-prometheus-and-epimetheus-myth-exploration-micro02](/entities/drive-research-prometheus-and-epimetheus-myth-exploration-micro02.md) (2026-06-09)
 - Brother of Prometheus and Epimetheus.
 - Titan of violent anger and pride.
 - Banished to Tartarus.

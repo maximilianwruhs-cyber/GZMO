@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-creating-a-comprehensive-readmemd-micro02|drive-research-creating-a-comprehensive-readmemd-micro02]] (2026-06-09)
+## From [drive-research-creating-a-comprehensive-readmemd-micro02](/entities/drive-research-creating-a-comprehensive-readmemd-micro02.md) (2026-06-09)
 - Badges are constructed using a highly standardized API endpoint format.
 - URL structure for static badges: https://img.shields.io/badge/<LABEL>-<MESSAGE>-<COLOR>.
 - Escape sequences required for dashes and underscores: %20 or _ for space, __ for literal underscore, -- for literal dash.

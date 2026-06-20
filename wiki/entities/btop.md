@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[tui-framework|tui-framework]] (2026-06-08)
+## From [tui-framework](/entities/tui-framework.md) (2026-06-08)
 - A process monitor.
 - Can be used as a command in Zellij panes.
 - Requires installation to function.
 
-## From [[the-agentic-operating-environment-a-synthesis-arc-micro01|the-agentic-operating-environment-a-synthesis-arc-micro01]] (2026-06-10)
+## From [the-agentic-operating-environment-a-synthesis-arc-micro01](/entities/the-agentic-operating-environment-a-synthesis-arc-micro01.md) (2026-06-10)
 - A compiled tool used in the TUI Framework.

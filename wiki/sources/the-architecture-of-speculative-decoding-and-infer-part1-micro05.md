@@ -14,20 +14,20 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[speculative-decoding|Speculative Decoding]] (CONCEPT)
-- [[llama-cpp|llama.cpp]] (TOOL)
-- [[medusa|Medusa]] (SYSTEM)
-- [[polarquant|PolarQuant]] (TOOL)
-- [[large-language-models-llms|Large Language Models (LLMs)]] (CONCEPT)
-- [[kv-cache|KV cache]] (CONCEPT)
-- [[quantized-johnson-lindenstrauss-qjl|Quantized Johnson-Lindenstrauss (QJL)]] (TOOL)
-- [[ml-specqd|ML-SpecQD]] (CONCEPT)
-- [[quantspec|QuantSpec]] (CONCEPT)
-- [[eagle|EAGLE]] (SYSTEM)
-- [[qwen3-5-35b-a3b|Qwen3.5-35B-A3B]] (SYSTEM)
-- [[turboquant|TurboQuant]] (TOOL)
-- [[hugging-face|Hugging Face]] (TOOL)
-- [[vllm|vLLM]] (TOOL)
+- [Speculative Decoding](/entities/speculative-decoding.md) (CONCEPT)
+- [llama.cpp](/entities/llama-cpp.md) (TOOL)
+- [Medusa](/entities/medusa.md) (SYSTEM)
+- [PolarQuant](/entities/polarquant.md) (TOOL)
+- [Large Language Models (LLMs)](/entities/large-language-models-llms.md) (CONCEPT)
+- [KV cache](/entities/kv-cache.md) (CONCEPT)
+- [Quantized Johnson-Lindenstrauss (QJL)](/entities/quantized-johnson-lindenstrauss-qjl.md) (TOOL)
+- [ML-SpecQD](/entities/ml-specqd.md) (CONCEPT)
+- [QuantSpec](/entities/quantspec.md) (CONCEPT)
+- [EAGLE](/entities/eagle.md) (SYSTEM)
+- [Qwen3.5-35B-A3B](/entities/qwen3-5-35b-a3b.md) (SYSTEM)
+- [TurboQuant](/entities/turboquant.md) (TOOL)
+- [Hugging Face](/entities/hugging-face.md) (TOOL)
+- [vLLM](/entities/vllm.md) (TOOL)
 
 ## Relations
 - TurboQuant → RELATED_TO → Speculative Decoding

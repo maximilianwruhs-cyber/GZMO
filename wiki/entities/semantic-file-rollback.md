@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-architektur-und-implementierung-intelligenter-ki-a-micro03|drive-research-architektur-und-implementierung-intelligenter-ki-a-micro03]] (2026-06-09)
+## From [drive-research-architektur-und-implementierung-intelligenter-ki-a-micro03](/entities/drive-research-architektur-und-implementierung-intelligenter-ki-a-micro03.md) (2026-06-09)
 - Mechanism used by advanced implementations like LSFS.
 - Undoes operations planned or partially performed by an agent.
 - Restores the system to its original state.

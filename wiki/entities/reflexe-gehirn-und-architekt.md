@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[building-a-private-local-ai-development-environmen-micro02|building-a-private-local-ai-development-environmen-micro02]] (2026-06-09)
+## From [building-a-private-local-ai-development-environmen-micro02](/entities/building-a-private-local-ai-development-environmen-micro02.md) (2026-06-09)
 - A role-based architecture for the AI development environment.
 - Reflexe handle micro-tasks (autocomplete), Gehirn handles inference (LM Studio), and Architekt handles macro-tasks (agentic workflows).

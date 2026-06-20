@@ -15,15 +15,15 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part1|ai-research-part1]] (2026-06-08)
+## From [ai-research-part1](/entities/ai-research-part1.md) (2026-06-08)
 - Interleaved with Multi-Head Latent Attention (MLA) layers in Kimi Linear.
 - Part of a hybrid attention architecture.
 - Used in the Kimi Linear 1.4T-token runs [69].
 
-## From [[ai-research-part8-micro03|ai-research-part8-micro03]] (2026-06-09)
+## From [ai-research-part8-micro03](/entities/ai-research-part8-micro03.md) (2026-06-09)
 - Extends the classic Gated DeltaNet framework.
 - Introduces a highly granular channel-wise gating mechanism.
 - Forces a more rigorous and efficient utilization of the model's finite-state RNN memory.
 
-## From [[prfaas-cross-datacenter-llm-serving-via-selective-micro02|prfaas-cross-datacenter-llm-serving-via-selective-micro02]] (2026-06-10)
+## From [prfaas-cross-datacenter-llm-serving-via-selective-micro02](/entities/prfaas-cross-datacenter-llm-serving-via-selective-micro02.md) (2026-06-10)
 - A hybrid-attention mechanism.

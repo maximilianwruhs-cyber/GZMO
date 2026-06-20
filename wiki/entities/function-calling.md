@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-architektur-token-effizienter-ki-agenten-strategi|drive-research-architektur-token-effizienter-ki-agenten-strategi]] (2026-06-08)
+## From [drive-research-architektur-token-effizienter-ki-agenten-strategi](/entities/drive-research-architektur-token-effizienter-ki-agenten-strategi.md) (2026-06-08)
 - Reduces latency compared to ReAct.
 - Leads to systemic token waste by injecting the entire function definition catalog into the system prompt.
 - Includes JSON schemas.

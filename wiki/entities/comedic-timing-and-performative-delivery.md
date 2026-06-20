@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-archival-truth-part1-micro05|the-archival-truth-part1-micro05]] (2026-06-09)
+## From [the-archival-truth-part1-micro05](/entities/the-archival-truth-part1-micro05.md) (2026-06-09)
 - Encompasses performative variables like tone, pitch, body language, and pacing.
 - Timing is the practical application of the element of surprise.
 - Optimizes surprise to provoke maximum physiological laughter.

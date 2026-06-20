@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part3-micro05|ai-research-part3-micro05]] (2026-06-09)
+## From [ai-research-part3-micro05](/entities/ai-research-part3-micro05.md) (2026-06-09)
 - Scores all possible elements in the observation.
 - Is a function from observation into a function of agents.
 - Is returned when the budget b is equal to 0.

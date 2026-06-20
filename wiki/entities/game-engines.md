@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[deterministic-polyhedral-dynamics-in-rust-game-eng|deterministic-polyhedral-dynamics-in-rust-game-eng]] (2026-06-08)
+## From [deterministic-polyhedral-dynamics-in-rust-game-eng](/entities/deterministic-polyhedral-dynamics-in-rust-game-eng.md) (2026-06-08)
 - Modern digital game design increasingly integrates complex rigid-body physics simulations.
 - Requires accurate evaluation of kinematics of Platonic solids.
 - Integration paradigms of Bevy and Fyrox game engines are examined.

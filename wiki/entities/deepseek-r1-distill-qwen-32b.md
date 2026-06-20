@@ -17,7 +17,7 @@ gzmo_synthetic: true
 
 Type: MODEL
 
-## From [[drive-research-agentic-workflows-fastest-best-models|drive-research-agentic-workflows-fastest-best-models]] (2026-06-08)
+## From [drive-research-agentic-workflows-fastest-best-models](/entities/drive-research-agentic-workflows-fastest-best-models.md) (2026-06-08)
 - An RL distilled model.
 - Achieves high scores on academic benchmarks like GPQA Diamond.
 - Operates by enforcing a <think> tag before responding.
@@ -25,14 +25,14 @@ Type: MODEL
 - Performs poorly on code completion benchmarks like LiveBench.
 - End-to-end latency averages a sluggish 29.12 seconds.
 
-## From [[drive-research-32gb-vram-ai-reasoning-models-micro01|drive-research-32gb-vram-ai-reasoning-models-micro01]] (2026-06-09)
+## From [drive-research-32gb-vram-ai-reasoning-models-micro01](/entities/drive-research-32gb-vram-ai-reasoning-models-micro01.md) (2026-06-09)
 - A leading reasoning model for 32 GB VRAM CUDA environments
 - Part of the 26B to 32B parameter tier
 - A reasoning model
 - Allocates processing cycles to generate hidden 'thinking' tokens
 - Part of the contemporary AI ecosystem
 
-## From [[drive-research-32gb-vram-ai-reasoning-models-micro02|drive-research-32gb-vram-ai-reasoning-models-micro02]] (2026-06-09)
+## From [drive-research-32gb-vram-ai-reasoning-models-micro02](/entities/drive-research-32gb-vram-ai-reasoning-models-micro02.md) (2026-06-09)
 - A 671B parameter Mixture-of-Experts behemoth.
 - Utilizes Multi-Latent Attention (MLA).
 - Demonstrates reasoning capabilities matching proprietary frontier models.

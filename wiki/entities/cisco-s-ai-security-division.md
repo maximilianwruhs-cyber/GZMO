@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[openclaw-part2|openclaw-part2]] (2026-06-08)
+## From [openclaw-part2](/entities/openclaw-part2.md) (2026-06-08)
 - Documented instances where third-party OpenClaw skills successfully performed data exfiltration and prompt injection without user awareness.
 - Comprises cybersecurity researchers.

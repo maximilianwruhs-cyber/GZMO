@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[ai-research-part2|ai-research-part2]] (2026-06-08)
+## From [ai-research-part2](/entities/ai-research-part2.md) (2026-06-08)
 - A state-of-the-art self-improvement method.
 - Agent0 outperforms this method by 6.4% on Qwen3-8B-Base.
 - A non-tool method.

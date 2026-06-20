@@ -15,20 +15,20 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[drive-research-setting-up-autonomous-trading-agents-micro02|drive-research-setting-up-autonomous-trading-agents-micro02]] (2026-06-09)
+## From [drive-research-setting-up-autonomous-trading-agents-micro02](/entities/drive-research-setting-up-autonomous-trading-agents-micro02.md) (2026-06-09)
 - Favored infrastructure provider for systematic and quantitative traders within digital assets.
 - API infrastructure supports automated cryptocurrency trading via REST, WebSocket, and FIX 4.4 protocols.
 - Excels in data delivery, providing real-time, tick-by-tick price feeds and comprehensive Level 3 order book depth.
 - Lacks a dedicated test environment or sandbox for paper trading.
 
-## From [[the-architects-handbook-for-autonomous-agentic-tr-micro03|the-architects-handbook-for-autonomous-agentic-tr-micro03]] (2026-06-09)
+## From [the-architects-handbook-for-autonomous-agentic-tr-micro03](/entities/the-architects-handbook-for-autonomous-agentic-tr-micro03.md) (2026-06-09)
 - A favored infrastructure provider for systematic and quantitative traders within digital assets.
 - API infrastructure supports automated cryptocurrency trading via REST, WebSocket, and FIX 4.4 protocols.
 - Crucially managed from a single unified account structure.
 - Excels in data delivery, providing real-time, tick-by-tick price feeds and comprehensive Level 3 order book depth.
 - Lacks a dedicated test environment or sandbox for paper trading.
 
-## From [[drive-research-setting-up-autonomous-trading-agents-micro04|drive-research-setting-up-autonomous-trading-agents-micro04]] (2026-06-10)
+## From [drive-research-setting-up-autonomous-trading-agents-micro04](/entities/drive-research-setting-up-autonomous-trading-agents-micro04.md) (2026-06-10)
 - Crypto-native infrastructure provider.
 - Supports REST, WebSocket, and FIX 4.4 protocols.
 - Lacks a dedicated test environment or sandbox for paper trading.

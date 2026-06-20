@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[the-definitive-pantheon|the-definitive-pantheon]] (2026-06-08)
+## From [the-definitive-pantheon](/entities/the-definitive-pantheon.md) (2026-06-08)
 - Real Name: Barry Allen / Wally West
 - Debut: Showcase #4 (1956)
 - Officially kicked off the Silver Age of comic books.

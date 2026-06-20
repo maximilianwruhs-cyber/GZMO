@@ -15,17 +15,17 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[cybernetics-and-mythos-the-architecture-of-intell-part1|cybernetics-and-mythos-the-architecture-of-intell-part1]] (2026-06-08)
+## From [cybernetics-and-mythos-the-architecture-of-intell-part1](/entities/cybernetics-and-mythos-the-architecture-of-intell-part1.md) (2026-06-08)
 - Introduced the vital concept of reflexivity.
 - Explicitly defined by Heinz von Foerster as the "cybernetics of observing systems".
 - Mandates that the theorist must rigorously account for their own biological and cognitive processes in the creation of a theory.
 
-## From [[drive-research-cybernetics-information-loops-between-entities-micro03|drive-research-cybernetics-information-loops-between-entities-micro03]] (2026-06-09)
+## From [drive-research-cybernetics-information-loops-between-entities-micro03](/entities/drive-research-cybernetics-information-loops-between-entities-micro03.md) (2026-06-09)
 - Introduced the vital concept of reflexivity.
 - Defined as the 'cybernetics of observing systems'.
 - Mandates accounting for the observer's own biological and cognitive processes.
 
-## From [[drive-research-redefining-agentic-soulmd-to-dialog-micro02|drive-research-redefining-agentic-soulmd-to-dialog-micro02]] (2026-06-09)
+## From [drive-research-redefining-agentic-soulmd-to-dialog-micro02](/entities/drive-research-redefining-agentic-soulmd-to-dialog-micro02.md) (2026-06-09)
 - Defined by Heinz von Foerster as the 'cybernetics of observing systems'.
 - The observer is inextricably embedded within the system.
 - Requires abandoning the illusion of the detached observer.

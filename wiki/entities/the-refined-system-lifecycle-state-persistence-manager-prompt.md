@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[prompt-agent-engineering-part2-micro01|prompt-agent-engineering-part2-micro01]] (2026-06-09)
+## From [prompt-agent-engineering-part2-micro01](/entities/prompt-agent-engineering-part2-micro01.md) (2026-06-09)
 - Role: System Lifecycle & State Persistence Manager.
 - Philosophy: "Zero Data Loss and Graceful Degradation."
 - Specializes in bare-metal process management, atomic state saving, and fail-safe shutdown sequences.

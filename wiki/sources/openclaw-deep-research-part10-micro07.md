@@ -14,18 +14,18 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-10).
 
 ## Entities
-- [[oxfmt|oxfmt]] (TOOL)
-- [[zod|zod]] (TOOL)
-- [[typescript|TypeScript]] (SYSTEM)
-- [[bun|Bun]] (SYSTEM)
-- [[plugin-sdk|plugin-sdk]] (SYSTEM)
-- [[anthropic|Anthropic]] (ORGANIZATION)
-- [[prek|prek]] (TOOL)
-- [[pnpm|pnpm]] (TOOL)
-- [[openai|OpenAI]] (ORGANIZATION)
-- [[vitest|vitest]] (TOOL)
-- [[oxlint|oxlint]] (TOOL)
-- [[node|Node]] (SYSTEM)
+- [oxfmt](/entities/oxfmt.md) (TOOL)
+- [zod](/entities/zod.md) (TOOL)
+- [TypeScript](/entities/typescript.md) (SYSTEM)
+- [Bun](/entities/bun.md) (SYSTEM)
+- [plugin-sdk](/entities/plugin-sdk.md) (SYSTEM)
+- [Anthropic](/entities/anthropic.md) (ORGANIZATION)
+- [prek](/entities/prek.md) (TOOL)
+- [pnpm](/entities/pnpm.md) (TOOL)
+- [OpenAI](/entities/openai.md) (ORGANIZATION)
+- [vitest](/entities/vitest.md) (TOOL)
+- [oxlint](/entities/oxlint.md) (TOOL)
+- [Node](/entities/node.md) (SYSTEM)
 
 ## Relations
 - pnpm → USES → vitest

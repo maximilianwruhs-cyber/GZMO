@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-archival-truth-part1-micro02|the-archival-truth-part1-micro02]] (2026-06-09)
+## From [the-archival-truth-part1-micro02](/entities/the-archival-truth-part1-micro02.md) (2026-06-09)
 - A realistic, evidence-based, and fundamentally positive expectation of one's future.
 - Involves avoiding fatalistic thinking and trusting in the cyclical nature of crises.
 - Is one of the 7 pillars of resilience.

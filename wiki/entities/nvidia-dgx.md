@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[openclaw-part2|openclaw-part2]] (2026-06-08)
+## From [openclaw-part2](/entities/openclaw-part2.md) (2026-06-08)
 - Required for unassisted coding loops on frontier 70B+ open-weight models in Enterprise Sovereign deployments.
 - Provides 48GB–128GB+ VRAM.
 - It is a multi-GPU system.

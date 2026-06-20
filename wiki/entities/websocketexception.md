@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[obolus-vs-codium-extension-konzept-research-part1-micro04|obolus-vs-codium-extension-konzept-research-part1-micro04]] (2026-06-09)
+## From [obolus-vs-codium-extension-konzept-research-part1-micro04](/entities/obolus-vs-codium-extension-konzept-research-part1-micro04.md) (2026-06-09)
 - Raised instead of HTTPException for WebSockets.
 - Used for policy violations.

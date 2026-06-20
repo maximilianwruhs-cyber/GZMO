@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-cascading-honeypot-theorem-of-wisdom|the-cascading-honeypot-theorem-of-wisdom]] (2026-06-08)
+## From [the-cascading-honeypot-theorem-of-wisdom](/entities/the-cascading-honeypot-theorem-of-wisdom.md) (2026-06-08)
 - Provides a rigorous, information-theoretic explanation for how deep networks learn.
 - Is an optimization problem governed by the tension between compression and prediction.
 - Is formalized by minimizing the IB-Lagrangian.
@@ -24,7 +24,7 @@ Type: CONCEPT
 - Isomorphic reflection of human cognitive psychology.
 - Requires a compression phase to achieve generalization in neural networks.
 
-## From [[drive-research-ai-wisdom-webs-honeypots-and-forgetting|drive-research-ai-wisdom-webs-honeypots-and-forgetting]] (2026-06-08)
+## From [drive-research-ai-wisdom-webs-honeypots-and-forgetting](/entities/drive-research-ai-wisdom-webs-honeypots-and-forgetting.md) (2026-06-08)
 - Formalizes the distillation process from outer web to inner honeypots.
 - Provides a rigorous, information-theoretic explanation for how deep networks learn.
 - It is an optimization problem governed by the tension between compression and prediction.

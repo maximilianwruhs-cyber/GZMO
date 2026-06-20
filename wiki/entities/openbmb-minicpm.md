@@ -15,10 +15,10 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[ai-research-part8-micro05|ai-research-part8-micro05]] (2026-06-09)
+## From [ai-research-part8-micro05](/entities/ai-research-part8-micro05.md) (2026-06-09)
 - Demonstrates architectural shifts to bypass the 'Memory Wall'.
 - The MiniCPM-SALA model integrates sparse and linear attention.
 - Successfully processes contexts exceeding one million tokens on standard consumer GPUs.
 
-## From [[ai-research-part8-micro08|ai-research-part8-micro08]] (2026-06-09)
+## From [ai-research-part8-micro08](/entities/ai-research-part8-micro08.md) (2026-06-09)
 - The repository hosting MiniCPM-SALA, a hybrid sparse and linear attention architecture.

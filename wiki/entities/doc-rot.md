@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-architecture-of-world-class-software-documenta|the-architecture-of-world-class-software-documenta]] (2026-06-08)
+## From [the-architecture-of-world-class-software-documenta](/entities/the-architecture-of-world-class-software-documenta.md) (2026-06-08)
 - A scenario where the underlying system architecture evolves, but the documentation image remains permanently outdated.
 - Occurs because the original diagramming file was lost, or new contributors lack access to the requisite design software.

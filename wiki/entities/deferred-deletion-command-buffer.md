@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-rust-ecs-cache-optimization-research|drive-research-rust-ecs-cache-optimization-research]] (2026-06-08)
+## From [drive-research-rust-ecs-cache-optimization-research](/entities/drive-research-rust-ecs-cache-optimization-research.md) (2026-06-08)
 - A preferred synchronization pattern for real-time runtimes.
 - Agents write deletion requests to a lock-free multi-producer, single-consumer (MPSC) queue.
 - A single-threaded system sweep processes the queue sequentially.

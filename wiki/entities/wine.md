@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-linux-gaming-and-ai-build-guide-micro07|drive-research-linux-gaming-and-ai-build-guide-micro07]] (2026-06-09)
+## From [drive-research-linux-gaming-and-ai-build-guide-micro07](/entities/drive-research-linux-gaming-and-ai-build-guide-micro07.md) (2026-06-09)
 - Improvements for Linux gaming
 - Version 11 mentioned

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[resilient-rust-based-mcp-client-and-llm-orchestrat-micro03|resilient-rust-based-mcp-client-and-llm-orchestrat-micro03]] (2026-06-09)
+## From [resilient-rust-based-mcp-client-and-llm-orchestrat-micro03](/entities/resilient-rust-based-mcp-client-and-llm-orchestrat-micro03.md) (2026-06-09)
 - Kernel-enforced solution for secure data processing.
 - Enforced deeply within the Linux VFS layer.
 - Cannot be bypassed from within the container.

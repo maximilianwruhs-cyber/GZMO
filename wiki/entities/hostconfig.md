@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[resilient-rust-based-mcp-client-and-llm-orchestrat-micro03|resilient-rust-based-mcp-client-and-llm-orchestrat-micro03]] (2026-06-09)
+## From [resilient-rust-based-mcp-client-and-llm-orchestrat-micro03](/entities/resilient-rust-based-mcp-client-and-llm-orchestrat-micro03.md) (2026-06-09)
 - Contains the init field.
 - Contains the binds field.
 - Parameterizes the physical execution context.
 
-## From [[resilient-rust-based-mcp-client-and-llm-orchestrat-micro02|resilient-rust-based-mcp-client-and-llm-orchestrat-micro02]] (2026-06-10)
+## From [resilient-rust-based-mcp-client-and-llm-orchestrat-micro02](/entities/resilient-rust-based-mcp-client-and-llm-orchestrat-micro02.md) (2026-06-10)
 - Rust struct defining how a container interacts with the host system's hardware, kernel, and file system.

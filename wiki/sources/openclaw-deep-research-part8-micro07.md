@@ -14,13 +14,13 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[github|GitHub]] (ORGANIZATION)
-- [[digitalknk|digitalknk]] (AUTHOR)
-- [[discord|Discord]] (SYSTEM)
-- [[openclaw-deep-research-part8-md|openclaw-deep-research-part8.md]] (DOCUMENT)
-- [[cloud-kg-extraction|cloud KG extraction]] (CONCEPT)
-- [[reddit|Reddit]] (SYSTEM)
-- [[mohamed-elbalsha|mohamed-elbalsha]] (PERSON)
+- [GitHub](/entities/github.md) (ORGANIZATION)
+- [digitalknk](/entities/digitalknk.md) (AUTHOR)
+- [Discord](/entities/discord.md) (SYSTEM)
+- [openclaw-deep-research-part8.md](/entities/openclaw-deep-research-part8-md.md) (DOCUMENT)
+- [cloud KG extraction](/entities/cloud-kg-extraction.md) (CONCEPT)
+- [Reddit](/entities/reddit.md) (SYSTEM)
+- [mohamed-elbalsha](/entities/mohamed-elbalsha.md) (PERSON)
 
 ## Relations
 - digitalknk → RELATED_TO → mohamed-elbalsha

@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[aether-grid-micro03|aether-grid-micro03]] (2026-06-09)
+## From [aether-grid-micro03](/entities/aether-grid-micro03.md) (2026-06-09)
 - Prototyping simulation in Kubernetes ignores physical interferences.
 - Includes latencies on KNX bus, packet loss in AETHER-UDP, and thermal throttling.

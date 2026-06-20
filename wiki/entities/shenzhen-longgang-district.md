@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[openclaw-part2|openclaw-part2]] (2026-06-08)
+## From [openclaw-part2](/entities/openclaw-part2.md) (2026-06-08)
 - Introduced the 'Lobster Ten Policies' in March 2026.
 - Supports the OpenClaw ecosystem.
 - A local government entity.

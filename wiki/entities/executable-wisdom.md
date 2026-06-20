@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-cascading-honeypot-a-blueprint-for-executable|the-cascading-honeypot-a-blueprint-for-executable]] (2026-06-08)
+## From [the-cascading-honeypot-a-blueprint-for-executable](/entities/the-cascading-honeypot-a-blueprint-for-executable.md) (2026-06-08)
 - The resulting output of the Cascading Honeypot structural cascade.
 - A highly structured, densely interconnected, human-readable, and perpetually self-healing knowledge base.
 - The ultimate repository of wisdom.
@@ -22,7 +22,7 @@ Type: CONCEPT
 - Contains only the purest, highly distilled essence of everything the system has ingested.
 - A pure, incredibly dense honeypot of synthesized, file-backed knowledge.
 
-## From [[drive-research-cascading-honeypot-ai-architecture|drive-research-cascading-honeypot-ai-architecture]] (2026-06-08)
+## From [drive-research-cascading-honeypot-ai-architecture](/entities/drive-research-cascading-honeypot-ai-architecture.md) (2026-06-08)
 - The output of the Cascading Honeypot architecture.
 - A highly structured, densely interconnected, human-readable, and perpetually self-healing knowledge base.
 - The ultimate repository of wisdom.

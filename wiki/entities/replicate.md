@@ -14,8 +14,8 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[openclaw-deep-research-part7-micro02|openclaw-deep-research-part7-micro02]] (2026-06-10)
+## From [openclaw-deep-research-part7-micro02](/entities/openclaw-deep-research-part7-micro02.md) (2026-06-10)
 - Platform used by bex-nano-banana-pro
 
-## From [[openclaw-deep-research-part8-micro05|openclaw-deep-research-part8-micro05]] (2026-06-10)
+## From [openclaw-deep-research-part8-micro05](/entities/openclaw-deep-research-part8-micro05.md) (2026-06-10)
 - Provides professional services for CrewAI implementation

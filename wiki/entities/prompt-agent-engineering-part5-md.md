@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[prompt-agent-engineering-part5-micro01|prompt-agent-engineering-part5-micro01]] (2026-06-09)
+## From [prompt-agent-engineering-part5-micro01](/entities/prompt-agent-engineering-part5-micro01.md) (2026-06-09)
 - Micro-split from prompt-agent-engineering-part5.md
 - Part 5 of Prompt Agent engineering
 - Part 5 is a section of this project

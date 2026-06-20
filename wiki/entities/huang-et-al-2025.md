@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: AUTHOR
 
-## From [[ai-research-part2|ai-research-part2]] (2026-06-08)
+## From [ai-research-part2](/entities/ai-research-part2.md) (2026-06-08)
 - Authored R-Zero: Self-evolving reasoning LLM from zero data.
 - Cited in the context of agent self-evolution being a reasonable and promising direction.
 - Developed R-Zero.

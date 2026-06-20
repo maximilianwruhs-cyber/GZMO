@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[prompt-agent-engineering-part4-micro06|prompt-agent-engineering-part4-micro06]] (2026-06-10)
+## From [prompt-agent-engineering-part4-micro06](/entities/prompt-agent-engineering-part4-micro06.md) (2026-06-10)
 - Acts as a bridge script
 - Extracts JSON from LLM output
 - Feeds payloads into AetherDAGExecutor

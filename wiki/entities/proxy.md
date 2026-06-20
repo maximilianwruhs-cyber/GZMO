@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[obolus-micro05|obolus-micro05]] (2026-06-09)
+## From [obolus-micro05](/entities/obolus-micro05.md) (2026-06-09)
 - Equation: Φ_proxy = C ⋅ (1 - 1/λ).
 - C: Global Clustering Coefficient, λ: Global Efficiency / Path Length.
 - High Φ_proxy unlocks 'Advanced Reasoning' modes but increases OBL cost.

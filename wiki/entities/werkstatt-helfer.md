@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[prompt-agent-engineering-part6-micro02|prompt-agent-engineering-part6-micro02]] (2026-06-09)
+## From [prompt-agent-engineering-part6-micro02](/entities/prompt-agent-engineering-part6-micro02.md) (2026-06-09)
 - A KI-based system for workshop assistance.
 - Integrates with communication tools like WhatsApp.
 - Provides specific assistance to technicians.

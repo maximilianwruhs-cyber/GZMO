@@ -14,9 +14,9 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part2|drive-research-ki-berater-fragebogen-für-kundenanalyse-part2]] (2026-06-08)
+## From [drive-research-ki-berater-fragebogen-für-kundenanalyse-part2](/entities/drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part2.md) (2026-06-08)
 - Nutzung kreativer Problemlösungsformate wie Lego Serious Play
 - bewährte Methoden, um die Technologie auf den "betrieblichen Hallenboden" zu bringen und Berührungsängste abzubauen
 
-## From [[drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part1-micro03|drive-research-ki-berater-fragebogen-für-kundenanalyse-part1-micro03]] (2026-06-10)
+## From [drive-research-ki-berater-fragebogen-für-kundenanalyse-part1-micro03](/entities/drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part1-micro03.md) (2026-06-10)
 - Creative problem-solving format used to reduce fears of technology

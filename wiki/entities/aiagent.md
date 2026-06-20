@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-hermes-agent-prompt-builder-analysis|drive-research-hermes-agent-prompt-builder-analysis]] (2026-06-08)
+## From [drive-research-hermes-agent-prompt-builder-analysis](/entities/drive-research-hermes-agent-prompt-builder-analysis.md) (2026-06-08)
 - Core loop is in run_agent.py.
 - Initializes with logic that can cause self.load_soul_identity to evaluate to false in gateway mode.
 - Executes the run_conversation() loop to construct API payloads.

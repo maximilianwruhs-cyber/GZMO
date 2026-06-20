@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[architecting-the-minimalist-linux-desktop-a-compa-part2|architecting-the-minimalist-linux-desktop-a-compa-part2]] (2026-06-08)
+## From [architecting-the-minimalist-linux-desktop-a-compa-part2](/entities/architecting-the-minimalist-linux-desktop-a-compa-part2.md) (2026-06-08)
 - UEFI was initially developed by Intel in 1998 under the Intel Boot Initiative (IBI).
 - A modern storage acceleration technology.
 - Strictly requires the system to be configured with a GPT partition style in UEFI mode.

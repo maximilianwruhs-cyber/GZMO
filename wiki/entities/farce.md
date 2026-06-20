@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-archival-truth-part1-micro06|the-archival-truth-part1-micro06]] (2026-06-09)
+## From [the-archival-truth-part1-micro06](/entities/the-archival-truth-part1-micro06.md) (2026-06-09)
 - Theatrical style utilizing extreme situations, eccentric characters, and chaos.
 - Relies on absurd escalation and misunderstandings.
 - Notable examples include Oscar Wilde's plays and The Hangover.

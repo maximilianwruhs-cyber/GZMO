@@ -14,11 +14,11 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[flux-architectural-pattern|Flux architectural pattern]] (CONCEPT)
-- [[openclaw|OpenClaw]] (PROJECT)
-- [[catppuccin-mocha|Catppuccin Mocha]] (CONCEPT)
-- [[crossterm|crossterm]] (TOOL)
-- [[tokio|tokio]] (TOOL)
+- [Flux architectural pattern](/entities/flux-architectural-pattern.md) (CONCEPT)
+- [OpenClaw](/entities/openclaw.md) (PROJECT)
+- [Catppuccin Mocha](/entities/catppuccin-mocha.md) (CONCEPT)
+- [crossterm](/entities/crossterm.md) (TOOL)
+- [tokio](/entities/tokio.md) (TOOL)
 
 ## Relations
 - Flux architectural pattern → RELATED_TO → OpenClaw

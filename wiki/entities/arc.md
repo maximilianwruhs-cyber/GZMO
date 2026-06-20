@@ -14,9 +14,9 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part6-micro02|ai-research-part6-micro02]] (2026-06-09)
+## From [ai-research-part6-micro02](/entities/ai-research-part6-micro02.md) (2026-06-09)
 - Benchmark for commonsense reasoning.
 - Clark et al., 2018
 
-## From [[drive-research-safe-unzip-practices-for-threat-model-micro01|drive-research-safe-unzip-practices-for-threat-model-micro01]] (2026-06-10)
+## From [drive-research-safe-unzip-practices-for-threat-model-micro01](/entities/drive-research-safe-unzip-practices-for-threat-model-micro01.md) (2026-06-10)
 - An older compression format replaced by the ZIP specification.

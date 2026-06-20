@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[openclaw-deep-research-part10-micro04|openclaw-deep-research-part10-micro04]] (2026-06-09)
+## From [openclaw-deep-research-part10-micro04](/entities/openclaw-deep-research-part10-micro04.md) (2026-06-09)
 - Pseudonymous developer who created Paperclip.
 - Created Paperclip out of frustration with managing multiple Claude Code tabs without shared context or cost tracking.

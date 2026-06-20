@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-agentic-token-economy-blueprint-micro02|drive-research-agentic-token-economy-blueprint-micro02]] (2026-06-09)
+## From [drive-research-agentic-token-economy-blueprint-micro02](/entities/drive-research-agentic-token-economy-blueprint-micro02.md) (2026-06-09)
 - Addresses volatility in policy gradients when training models to obey strict token limits.
 - Utilizes a Curriculum-Aware Budget Scheduler.
 - Introduces Budget-Conditioned Advantage Estimation (BCAE).

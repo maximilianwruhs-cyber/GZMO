@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-subword-tokenization-mitigates-llm-sparsity-micro01|drive-research-subword-tokenization-mitigates-llm-sparsity-micro01]] (2026-06-09)
+## From [drive-research-subword-tokenization-mitigates-llm-sparsity-micro01](/entities/drive-research-subword-tokenization-mitigates-llm-sparsity-micro01.md) (2026-06-09)
 - A subword tokenization strategy.
 - Emerging as a ubiquitous standard.

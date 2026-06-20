@@ -15,11 +15,11 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-advanced-typescript-execution-in-the-bun-runtime-micro02|drive-research-advanced-typescript-execution-in-the-bun-runtime-micro02]] (2026-06-09)
+## From [drive-research-advanced-typescript-execution-in-the-bun-runtime-micro02](/entities/drive-research-advanced-typescript-execution-in-the-bun-runtime-micro02.md) (2026-06-09)
 - Bun supports high-performance Foreign Function Interfaces.
 - Referred to as 'bun:ffi'.
 
-## From [[drive-research-advanced-typescript-execution-in-the-bun-runtime-micro03|drive-research-advanced-typescript-execution-in-the-bun-runtime-micro03]] (2026-06-09)
+## From [drive-research-advanced-typescript-execution-in-the-bun-runtime-micro03](/entities/drive-research-advanced-typescript-execution-in-the-bun-runtime-micro03.md) (2026-06-09)
 - Bun resolves this bottleneck by implementing a highly optimized Foreign Function Interface (bun:ffi) natively within its core.
 - The JIT-Compiled FFI Advantage.
 - Benchmark data consistently demonstrates that bun:ffi executes function calls 2 to 6 times faster than standard Node.js FFI implementations operating via Node-API.
@@ -29,6 +29,6 @@ Type: CONCEPT
 - Bun's FFI system also supports JSCallback.
 - Utilizing the JIT-compiled bun:ffi for memory-safe native execution across language boundaries.
 
-## From [[high-performance-typescript-execution-and-architec-part1-micro02|high-performance-typescript-execution-and-architec-part1-micro02]] (2026-06-09)
+## From [high-performance-typescript-execution-and-architec-part1-micro02](/entities/high-performance-typescript-execution-and-architec-part1-micro02.md) (2026-06-09)
 - Advanced technique for executing TypeScript at peak efficiency.
 - Bun supports FFI via bun:ffi.

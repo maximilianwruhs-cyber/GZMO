@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-cascading-honeypot-theorem-of-wisdom|the-cascading-honeypot-theorem-of-wisdom]] (2026-06-08)
+## From [the-cascading-honeypot-theorem-of-wisdom](/entities/the-cascading-honeypot-theorem-of-wisdom.md) (2026-06-08)
 - Represents the core repository of invariant truth.
 - Is the final honeypot at the base of the architecture.
 - Contains purely distilled essence of everything the system has learned.
@@ -24,7 +24,7 @@ Type: CONCEPT
 - Aims to permanently corrupt specific coordinate regions within the model's latent space.
 - Creates insidious backdoors or 'sleeper agents'.
 
-## From [[drive-research-ai-wisdom-webs-honeypots-and-forgetting|drive-research-ai-wisdom-webs-honeypots-and-forgetting]] (2026-06-08)
+## From [drive-research-ai-wisdom-webs-honeypots-and-forgetting](/entities/drive-research-ai-wisdom-webs-honeypots-and-forgetting.md) (2026-06-08)
 - An attack where an adversary injects malicious, carefully crafted data into the training set.
 - The goal is to permanently corrupt specific coordinate regions within the model's latent space.
 - Creates insidious backdoors or 'sleeper agents'.

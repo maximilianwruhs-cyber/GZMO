@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-architecture-of-engagement-an-analysis-of-gam-micro07|the-architecture-of-engagement-an-analysis-of-gam-micro07]] (2026-06-09)
+## From [the-architecture-of-engagement-an-analysis-of-gam-micro07](/entities/the-architecture-of-engagement-an-analysis-of-gam-micro07.md) (2026-06-09)
 - Provides a granular explanation of how behavior is triggered.
 - Asserts that for a target behavior to occur, Motivation, Ability, and Prompt must converge simultaneously.
 - Was developed by Dr. BJ Fogg of Stanford University.

@@ -16,13 +16,13 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-agentic-reverse-engineering-state-and-future1-micro01|drive-research-agentic-reverse-engineering-state-and-future1-micro01]] (2026-06-09)
+## From [drive-research-agentic-reverse-engineering-state-and-future1-micro01](/entities/drive-research-agentic-reverse-engineering-state-and-future1-micro01.md) (2026-06-09)
 - Powers individual tool subagents in SentinelOne's Adversarial Consensus Engine.
 
-## From [[the-dawn-of-agentic-software-reverse-engineering-micro01|the-dawn-of-agentic-software-reverse-engineering-micro01]] (2026-06-09)
+## From [the-dawn-of-agentic-software-reverse-engineering-micro01](/entities/the-dawn-of-agentic-software-reverse-engineering-micro01.md) (2026-06-09)
 - Powers the individual tool subagents in SentinelOne's Adversarial Consensus Engine.
 
-## From [[openclaw-part1-micro04|openclaw-part1-micro04]] (2026-06-10)
+## From [openclaw-part1-micro04](/entities/openclaw-part1-micro04.md) (2026-06-10)
 - A family of models from Anthropic including Opus, Sonnet, and Haiku.
 - Features 'Adaptive Thinking' logic and 'Agent Teams' technology.
 - An efficient model used for routine background tasks.

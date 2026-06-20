@@ -14,12 +14,12 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-rust-tui-architecture-tech-stack1-micro01|drive-research-rust-tui-architecture-tech-stack1-micro01]] (2026-06-09)
+## From [drive-research-rust-tui-architecture-tech-stack1-micro01](/entities/drive-research-rust-tui-architecture-tech-stack1-micro01.md) (2026-06-09)
 - A highly advanced, stateful protocol supported by modern emulators.
 - Uploads binary image payloads directly to the terminal emulator's GPU texture memory.
 - Allows for extraordinarily performant, high-resolution drawing and arbitrary image repositioning.
 
-## From [[drive-research-rust-tui-architecture-tech-stack1-micro04|drive-research-rust-tui-architecture-tech-stack1-micro04]] (2026-06-09)
+## From [drive-research-rust-tui-architecture-tech-stack1-micro04](/entities/drive-research-rust-tui-architecture-tech-stack1-micro04.md) (2026-06-09)
 - Highly advanced, stateful terminal image protocol.
 - Uploads binary image payloads directly to the terminal emulator's GPU.
 - Allows for performant, high-resolution drawing.

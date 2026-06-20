@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[dynamics-of-the-unpredictable-micro07|dynamics-of-the-unpredictable-micro07]] (2026-06-09)
+## From [dynamics-of-the-unpredictable-micro07](/entities/dynamics-of-the-unpredictable-micro07.md) (2026-06-09)
 - Fyrox's visual scene editor is directly comparable to this industry giant.

@@ -14,8 +14,8 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[drive-research-linux-gaming-and-ai-build-guide-micro03|drive-research-linux-gaming-and-ai-build-guide-micro03]] (2026-06-09)
+## From [drive-research-linux-gaming-and-ai-build-guide-micro03](/entities/drive-research-linux-gaming-and-ai-build-guide-micro03.md) (2026-06-09)
 - Published NVIDIA RTX 5090 Connector Melting: Why It Happens
 
-## From [[drive-research-linux-gaming-and-ai-build-guide-micro07|drive-research-linux-gaming-and-ai-build-guide-micro07]] (2026-06-09)
+## From [drive-research-linux-gaming-and-ai-build-guide-micro07](/entities/drive-research-linux-gaming-and-ai-build-guide-micro07.md) (2026-06-09)
 - Published roundup on NVIDIA RTX 5090 connector melting

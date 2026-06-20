@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-pi-coding-agent-local-deployment-customization|drive-research-pi-coding-agent-local-deployment-customization]] (2026-06-08)
+## From [drive-research-pi-coding-agent-local-deployment-customization](/entities/drive-research-pi-coding-agent-local-deployment-customization.md) (2026-06-08)
 - Normalizes diverse streaming responses and streaming tool-calls across distinct LLM APIs.
 - Unified API Layer package.
 - The organization to which the Pi Coding Agent was transitioned in May 2026.

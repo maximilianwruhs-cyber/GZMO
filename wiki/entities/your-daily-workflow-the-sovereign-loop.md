@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-sovereign-software-factory-blueprint|the-sovereign-software-factory-blueprint]] (2026-06-08)
+## From [the-sovereign-software-factory-blueprint](/entities/the-sovereign-software-factory-blueprint.md) (2026-06-08)
 - Describes the daily workflow of the Sovereign Software Factory.
 - Involves Human Brain Dump, Architect Planning, Human Firewall, Builder Execution, and Night Shift.
 - Describes the step-by-step process of using the Sovereign Software Factory.

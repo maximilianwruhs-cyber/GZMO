@@ -14,13 +14,13 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-08).
 
 ## Entities
-- [[llama-bench|llama-bench]] (TOOL)
-- [[prompt-processing|Prompt Processing]] (CONCEPT)
-- [[models-mistral-7b-v0-3-q8-0-gguf|models/mistral-7b-v0.3.Q8_0.gguf]] (BOOK)
-- [[llama-cpp|llama.cpp]] (SYSTEM)
-- [[token-generation|Token Generation]] (CONCEPT)
-- [[models-llama-3-8b-q4-k-m-gguf|models/llama-3-8b.Q4_K_M.gguf]] (BOOK)
-- [[models-qwen2-5-14b-q4-k-m-gguf|models/qwen2.5-14b-q4_k_m.gguf]] (BOOK)
+- [llama-bench](/entities/llama-bench.md) (TOOL)
+- [Prompt Processing](/entities/prompt-processing.md) (CONCEPT)
+- [models/mistral-7b-v0.3.Q8_0.gguf](/entities/models-mistral-7b-v0-3-q8-0-gguf.md) (BOOK)
+- [llama.cpp](/entities/llama-cpp.md) (SYSTEM)
+- [Token Generation](/entities/token-generation.md) (CONCEPT)
+- [models/llama-3-8b.Q4_K_M.gguf](/entities/models-llama-3-8b-q4-k-m-gguf.md) (BOOK)
+- [models/qwen2.5-14b-q4_k_m.gguf](/entities/models-qwen2-5-14b-q4-k-m-gguf.md) (BOOK)
 
 ## Relations
 - llama-bench → PART_OF → llama.cpp

@@ -16,7 +16,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-advanced-typescript-execution-in-the-bun-runtime-micro02|drive-research-advanced-typescript-execution-in-the-bun-runtime-micro02]] (2026-06-09)
+## From [drive-research-advanced-typescript-execution-in-the-bun-runtime-micro02](/entities/drive-research-advanced-typescript-execution-in-the-bun-runtime-micro02.md) (2026-06-09)
 - Exposed by Bun for developers building meta-frameworks, static site generators, or custom test runners.
 - Allows programmatic transpilation of TypeScript or JSX into vanilla JavaScript.
 - Supports 'ts', 'tsx', 'js', or 'jsx' loaders.
@@ -24,7 +24,7 @@ Type: TOOL
 - Features a scanImports method for AST-level dependency analysis.
 - Requires instantiating a single instance and reusing it for performance.
 
-## From [[drive-research-bun-typescript-performance-tips-micro02|drive-research-bun-typescript-performance-tips-micro02]] (2026-06-09)
+## From [drive-research-bun-typescript-performance-tips-micro02](/entities/drive-research-bun-typescript-performance-tips-micro02.md) (2026-06-09)
 - A JavaScript and TypeScript runtime.
 - Written predominantly in Zig.
 - Distinguished by aggressive, systems-level optimizations.
@@ -45,7 +45,7 @@ Type: TOOL
 - Bypasses the event loop.
 - Can be used for high-throughput caching layers or custom HTTP routers.
 
-## From [[high-performance-typescript-execution-and-architec-part1-micro02|high-performance-typescript-execution-and-architec-part1-micro02]] (2026-06-09)
+## From [high-performance-typescript-execution-and-architec-part1-micro02](/entities/high-performance-typescript-execution-and-architec-part1-micro02.md) (2026-06-09)
 - Exposes Bun's internal transpiler.
 - Allows programmatic transpilation of TypeScript or JSX.
 - Requires specifying a loader (e.g., 'ts', 'tsx').

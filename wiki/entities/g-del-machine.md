@@ -14,12 +14,12 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[ai-research-part3-micro02|ai-research-part3-micro02]] (2026-06-09)
+## From [ai-research-part3-micro02](/entities/ai-research-part3-micro02.md) (2026-06-09)
 - Captures principal meta-learning behavior.
 - Achieves global-optimality by deciding whether to accept or reject self-modification.
 - Access to the Clade-Metaproductivity oracle is sufficient to implement it.
 
-## From [[ai-research-part3-micro04|ai-research-part3-micro04]] (2026-06-09)
+## From [ai-research-part3-micro04](/entities/ai-research-part3-micro04.md) (2026-06-09)
 - Defined in a time-aware setting.
 - Prover must establish that self-modification increases expected objectives.
 - Assumes environment and evaluation metric remain fixed in the described setup.

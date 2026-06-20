@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[allgemeine-informationen|allgemeine-informationen]] (2026-06-08)
+## From [allgemeine-informationen](/entities/allgemeine-informationen.md) (2026-06-08)
 - It is used for deployment in a modern, high-efficiency workflow.
 - It is a principle combined with Terraform for managing infrastructure.
 - It is part of the "Robust" Path workflow.

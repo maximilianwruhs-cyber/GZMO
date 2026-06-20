@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[architectural-analysis-of-the-openclaw-ai-plugin-s|architectural-analysis-of-the-openclaw-ai-plugin-s]] (2026-06-08)
+## From [architectural-analysis-of-the-openclaw-ai-plugin-s](/entities/architectural-analysis-of-the-openclaw-ai-plugin-s.md) (2026-06-08)
 - It is described as the preeminent self-hosted autonomous agent orchestration framework.
 - The 2026 release architecture transformed OpenClaw into a comprehensive operating system for AI agents.
 - It features multi-channel message routing, sandboxed tool execution, and advanced persistent memory architecture.

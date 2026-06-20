@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[dynamics-of-the-unpredictable-micro06|dynamics-of-the-unpredictable-micro06]] (2026-06-09)
+## From [dynamics-of-the-unpredictable-micro06](/entities/dynamics-of-the-unpredictable-micro06.md) (2026-06-09)
 - A tree data structure used to represent spatial hierarchies in 3D scenes.
 - Allows transformation matrices to recursively propagate down branches.
 - Inherently anti-data-oriented due to pointer indirection.

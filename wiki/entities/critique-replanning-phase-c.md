@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[drive-research-tinyfolder-gzmo-architecture-analysis-product|drive-research-tinyfolder-gzmo-architecture-analysis-product]] (2026-06-08)
+## From [drive-research-tinyfolder-gzmo-architecture-analysis-product](/entities/drive-research-tinyfolder-gzmo-architecture-analysis-product.md) (2026-06-08)
 - A short-term strategic recommendation.
 - Execute a Critique node and attempt a Replanning wave if bestPath() returns empty.
 - Addresses the Recursive Replanning gap.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-free-lob-data-for-chaos-research|drive-research-free-lob-data-for-chaos-research]] (2026-06-08)
+## From [drive-research-free-lob-data-for-chaos-research](/entities/drive-research-free-lob-data-for-chaos-research.md) (2026-06-08)
 - Open-sourced by Imbalance Labs.
 - Provides pre-processed Level-2 depth profiles across 24 liquid cryptocurrency perpetual contracts.
 - Data is mathematically aggregated into discrete 5-minute intervals.

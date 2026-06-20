@@ -14,8 +14,8 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-10).
 
 ## Entities
-- [[drive-research-technologischer-branchen-report-hilfsbetriebeumri|Drive Research Technologischer Branchen-Report_ Hilfsbetriebeumri]] (PROJECT)
-- [[google-takeout|Google Takeout]] (SYSTEM)
+- [Drive Research Technologischer Branchen-Report_ Hilfsbetriebeumri](/entities/drive-research-technologischer-branchen-report-hilfsbetriebeumri.md) (PROJECT)
+- [Google Takeout](/entities/google-takeout.md) (SYSTEM)
 
 ## Relations
 - Drive Research Technologischer Branchen-Report_ Hilfsbetriebeumri → RELATED_TO → Google Takeout

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-markitdown-format-parity-checklist|drive-research-markitdown-format-parity-checklist]] (2026-06-08)
+## From [drive-research-markitdown-format-parity-checklist](/entities/drive-research-markitdown-format-parity-checklist.md) (2026-06-08)
 - Mitigates exclusion of complex edge-case formats from the core engine.
 - Formalized a dynamic registration system for custom format parsers in version 0.1.0.
 - Ensures the core dependency tree remains clean and highly maintainable.

@@ -14,16 +14,16 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-08).
 
 ## Entities
-- [[rapier-physics-engine|Rapier physics engine]] (TOOL)
-- [[game-engines|Game Engines]] (SYSTEM)
-- [[fyrox|Fyrox]] (SYSTEM)
-- [[bevy|Bevy]] (SYSTEM)
-- [[deterministic-polyhedral-dynamics|Deterministic Polyhedral Dynamics]] (CONCEPT)
-- [[dice-mechanics|Dice Mechanics]] (CONCEPT)
-- [[rust|Rust]] (SYSTEM)
-- [[rand-crate|rand crate]] (TOOL)
-- [[quaternions|Quaternions]] (CONCEPT)
-- [[pseudo-random-number-generators-prngs|Pseudo-random Number Generators (PRNGs)]] (CONCEPT)
+- [Rapier physics engine](/entities/rapier-physics-engine.md) (TOOL)
+- [Game Engines](/entities/game-engines.md) (SYSTEM)
+- [Fyrox](/entities/fyrox.md) (SYSTEM)
+- [Bevy](/entities/bevy.md) (SYSTEM)
+- [Deterministic Polyhedral Dynamics](/entities/deterministic-polyhedral-dynamics.md) (CONCEPT)
+- [Dice Mechanics](/entities/dice-mechanics.md) (CONCEPT)
+- [Rust](/entities/rust.md) (SYSTEM)
+- [rand crate](/entities/rand-crate.md) (TOOL)
+- [Quaternions](/entities/quaternions.md) (CONCEPT)
+- [Pseudo-random Number Generators (PRNGs)](/entities/pseudo-random-number-generators-prngs.md) (CONCEPT)
 
 ## Relations
 - Deterministic Polyhedral Dynamics → USES → Rust

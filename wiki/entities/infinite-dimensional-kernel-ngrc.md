@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-nvar-financial-forecasting-parameter-search|drive-research-nvar-financial-forecasting-parameter-search]] (2026-06-08)
+## From [drive-research-nvar-financial-forecasting-parameter-search](/entities/drive-research-nvar-financial-forecasting-parameter-search.md) (2026-06-08)
 - Introduces an infinite-dimensional generalization of NGRC.
 - Encodes the polynomial feature expansion as a kernel ridge regression.
 - Learning takes place in a reproducing kernel Hilbert space.

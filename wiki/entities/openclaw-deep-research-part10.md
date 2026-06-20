@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[openclaw-deep-research-part10-micro01|openclaw-deep-research-part10-micro01]] (2026-06-09)
+## From [openclaw-deep-research-part10-micro01](/entities/openclaw-deep-research-part10-micro01.md) (2026-06-09)
 - This is a micro-split (micro 1/8) from a larger document.
 - It is a curated research corpus.

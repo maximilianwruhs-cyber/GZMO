@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[architectures-for-agentic-memory-virtual-context-micro02|architectures-for-agentic-memory-virtual-context-micro02]] (2026-06-09)
+## From [architectures-for-agentic-memory-virtual-context-micro02](/entities/architectures-for-agentic-memory-virtual-context-micro02.md) (2026-06-09)
 - Utility that dynamically translates standard JSON Schema specifications into GBNF rulesets
 - Relied upon by the llama.cpp ecosystem for automated converters
 - JavaScript Object Notation

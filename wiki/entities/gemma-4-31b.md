@@ -20,13 +20,13 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-32gb-vram-ai-reasoning-models-micro01|drive-research-32gb-vram-ai-reasoning-models-micro01]] (2026-06-09)
+## From [drive-research-32gb-vram-ai-reasoning-models-micro01](/entities/drive-research-32gb-vram-ai-reasoning-models-micro01.md) (2026-06-09)
 - A leading reasoning model for 32 GB VRAM CUDA environments
 - Can process up to ~256,000 tokens on a single RTX 5090 with KV cache quantization
 - Evaluated as a leading model for 32 GB VRAM CUDA environments
 - Part of the 26B to 32B parameter tier
 
-## From [[drive-research-32gb-vram-ai-reasoning-models-micro02|drive-research-32gb-vram-ai-reasoning-models-micro02]] (2026-06-09)
+## From [drive-research-32gb-vram-ai-reasoning-models-micro02](/entities/drive-research-32gb-vram-ai-reasoning-models-micro02.md) (2026-06-09)
 - Represents a significant architectural divergence from standard dense transformers.
 - Has 30.7 billion parameters.
 - Introduces a specialized hybrid attention mechanism.
@@ -37,10 +37,10 @@ Type: SYSTEM
 - Executes with an initial latency of roughly 7.8 seconds.
 - Generates tokens at roughly 58 tok/s.
 
-## From [[drive-research-32gb-vram-ai-reasoning-models-micro03|drive-research-32gb-vram-ai-reasoning-models-micro03]] (2026-06-09)
+## From [drive-research-32gb-vram-ai-reasoning-models-micro03](/entities/drive-research-32gb-vram-ai-reasoning-models-micro03.md) (2026-06-09)
 - Optimal architectural choice when pure execution speed, multimodal capacity, and long-context stability are prioritized.
 
-## From [[drive-research-cuda-graph-capture-failure-workarounds-micro02|drive-research-cuda-graph-capture-failure-workarounds-micro02]] (2026-06-09)
+## From [drive-research-cuda-graph-capture-failure-workarounds-micro02](/entities/drive-research-cuda-graph-capture-failure-workarounds-micro02.md) (2026-06-09)
 - Utilizes a hybrid sliding window attention (SWA) and global attention architecture.
 - Cross-device access fails when prompt length exceeds approximately 5500 tokens.
 - Issue resolved by introducing custom newline split parameters.
@@ -49,7 +49,7 @@ Type: SYSTEM
 - Features shared key-value cache references.
 - Has hybrid sliding window attention (SWA) and global attention architecture.
 
-## From [[optimizing-nvidia-blackwell-sm120-part3-micro05|optimizing-nvidia-blackwell-sm120-part3-micro05]] (2026-06-09)
+## From [optimizing-nvidia-blackwell-sm120-part3-micro05](/entities/optimizing-nvidia-blackwell-sm120-part3-micro05.md) (2026-06-09)
 - Utilizes a hybrid sliding window attention (SWA) and global attention architecture.
 - Shared KV cache split across separate physical device memories.
 - Cross-device access fails for prompts exceeding ~5500 tokens.
@@ -57,10 +57,10 @@ Type: SYSTEM
 - Utilizes a hybrid attention architecture.
 - Can cause host-side and device VRAM leaks.
 
-## From [[the-architecture-of-speculative-decoding-and-infer-part1-micro04|the-architecture-of-speculative-decoding-and-infer-part1-micro04]] (2026-06-09)
+## From [the-architecture-of-speculative-decoding-and-infer-part1-micro04](/entities/the-architecture-of-speculative-decoding-and-infer-part1-micro04.md) (2026-06-09)
 - Optimal architectural choice when pure execution speed, multimodal capacity, and long-context stability are prioritized.
 
-## From [[the-architecture-of-speculative-decoding-and-infer-part1-micro03|the-architecture-of-speculative-decoding-and-infer-part1-micro03]] (2026-06-10)
+## From [the-architecture-of-speculative-decoding-and-infer-part1-micro03](/entities/the-architecture-of-speculative-decoding-and-infer-part1-micro03.md) (2026-06-10)
 - Developed by Google DeepMind.
 - Uses a hybrid attention mechanism interleaving sliding-window and global attention.
 - Utilizes Proportional RoPE (p-RoPE).

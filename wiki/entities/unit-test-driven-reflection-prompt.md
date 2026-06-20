@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[reflexion-framework-architectures-for-mitigating|reflexion-framework-architectures-for-mitigating]] (2026-06-08)
+## From [reflexion-framework-architectures-for-mitigating](/entities/reflexion-framework-architectures-for-mitigating.md) (2026-06-08)
 - Allowed the agent to autonomously self-correct minor syntactic and logical errors in HumanEval.
 - Pushed the pass@1 accuracy from an 80% baseline to an unprecedented 91%.

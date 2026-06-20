@@ -14,9 +14,9 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part2|drive-research-ki-berater-fragebogen-für-kundenanalyse-part2]] (2026-06-08)
+## From [drive-research-ki-berater-fragebogen-für-kundenanalyse-part2](/entities/drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part2.md) (2026-06-08)
 - Moderne Process Mining Plattformen – wie beispielsweise der Celonis PI Graph
 - extrahieren nicht nur Event-Logs über Standardkonnektoren, sondern legen eine Schicht aus Machine Learning über die Daten
 
-## From [[drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part1-micro02|drive-research-ki-berater-fragebogen-für-kundenanalyse-part1-micro02]] (2026-06-10)
+## From [drive-research-ki-berater-fragebogen-für-kundenanalyse-part1-micro02](/entities/drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part1-micro02.md) (2026-06-10)
 - Eine moderne Process Mining Plattform

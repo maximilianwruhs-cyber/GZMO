@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-rust-tui-architecture-tech-stack1-micro01|drive-research-rust-tui-architecture-tech-stack1-micro01]] (2026-06-09)
+## From [drive-research-rust-tui-architecture-tech-stack1-micro01](/entities/drive-research-rust-tui-architecture-tech-stack1-micro01.md) (2026-06-09)
 - Similar in concept to Kitty Graphics Protocol.
 - Heavily utilized in the macOS ecosystem.
 
-## From [[drive-research-rust-tui-architecture-tech-stack1-micro04|drive-research-rust-tui-architecture-tech-stack1-micro04]] (2026-06-09)
+## From [drive-research-rust-tui-architecture-tech-stack1-micro04](/entities/drive-research-rust-tui-architecture-tech-stack1-micro04.md) (2026-06-09)
 - Terminal image protocol similar in concept to Kitty.
 - Heavily utilized in the macOS ecosystem.

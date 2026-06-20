@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[obolus-micro01|obolus-micro01]] (2026-06-09)
+## From [obolus-micro01](/entities/obolus-micro01.md) (2026-06-09)
 - The operative instance of the network.
 - Characterized by a specific 'genome' - a configuration of hyperparameters.
 - Their goal is the accumulation of $OBL-token through high-quality work performance.

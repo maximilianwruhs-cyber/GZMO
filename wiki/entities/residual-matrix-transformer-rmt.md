@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part7|ai-research-part7]] (2026-06-08)
+## From [ai-research-part7](/entities/ai-research-part7.md) (2026-06-08)
 - Replaced the standard residual stream with an outer-product memory matrix to facilitate feature storage.
 - An approach that compromises the inherent identity mapping property of the residual connection.
 - Incurs significant memory access overhead due to expanded feature widths.

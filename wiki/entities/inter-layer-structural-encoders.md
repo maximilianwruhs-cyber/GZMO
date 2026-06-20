@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part8-micro02|ai-research-part8-micro02]] (2026-06-09)
+## From [ai-research-part8-micro02](/entities/ai-research-part8-micro02.md) (2026-06-09)
 - Optimizes depth utilization post-training.
 - Extracts representations across all layers of a frozen LLM.
 - Utilizes expander Cayley graphs formulated over the Special Linear Group SL(2, Zn).

@@ -14,22 +14,22 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[tsx|tsx]] (TOOL)
-- [[tsc|tsc]] (TOOL)
-- [[bun-transpiler-api|Bun.Transpiler API]] (SYSTEM)
-- [[hotspot|HotSpot]] (SYSTEM)
-- [[v8-engine|V8 engine]] (SYSTEM)
-- [[macros|Macros]] (CONCEPT)
-- [[zig|Zig]] (SYSTEM)
-- [[tc39-stage-3-decorator-proposal|TC39 Stage 3 decorator proposal]] (CONCEPT)
-- [[javascriptcore-jsc|JavaScriptCore (JSC)]] (SYSTEM)
-- [[typeorm|TypeORM]] (TOOL)
-- [[ts-node|ts-node]] (TOOL)
-- [[node-js|Node.js]] (SYSTEM)
-- [[reflect-getmetadata|Reflect.getMetadata]] (TOOL)
-- [[deno|Deno]] (SYSTEM)
-- [[java-virtual-machine-jvm|Java Virtual Machine (JVM)]] (SYSTEM)
-- [[typescript|TypeScript]] (CONCEPT)
+- [tsx](/entities/tsx.md) (TOOL)
+- [tsc](/entities/tsc.md) (TOOL)
+- [Bun.Transpiler API](/entities/bun-transpiler-api.md) (SYSTEM)
+- [HotSpot](/entities/hotspot.md) (SYSTEM)
+- [V8 engine](/entities/v8-engine.md) (SYSTEM)
+- [Macros](/entities/macros.md) (CONCEPT)
+- [Zig](/entities/zig.md) (SYSTEM)
+- [TC39 Stage 3 decorator proposal](/entities/tc39-stage-3-decorator-proposal.md) (CONCEPT)
+- [JavaScriptCore (JSC)](/entities/javascriptcore-jsc.md) (SYSTEM)
+- [TypeORM](/entities/typeorm.md) (TOOL)
+- [ts-node](/entities/ts-node.md) (TOOL)
+- [Node.js](/entities/node-js.md) (SYSTEM)
+- [Reflect.getMetadata](/entities/reflect-getmetadata.md) (TOOL)
+- [Deno](/entities/deno.md) (SYSTEM)
+- [Java Virtual Machine (JVM)](/entities/java-virtual-machine-jvm.md) (SYSTEM)
+- [TypeScript](/entities/typescript.md) (CONCEPT)
 
 ## Relations
 - Bun.Transpiler API → USES → TypeScript

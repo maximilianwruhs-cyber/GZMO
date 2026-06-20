@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-hermes-agent-prompt-builder-analysis|drive-research-hermes-agent-prompt-builder-analysis]] (2026-06-08)
+## From [drive-research-hermes-agent-prompt-builder-analysis](/entities/drive-research-hermes-agent-prompt-builder-analysis.md) (2026-06-08)
 - A highly extensible, tool-augmented assistant.
 - Its cognitive baseline is established through a meticulously engineered system prompt.
 - Scales to support multi-user gateway deployments, extensive third-party skill libraries, and dynamic project environments.

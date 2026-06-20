@@ -17,18 +17,18 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[openclaw-part2|openclaw-part2]] (2026-06-08)
+## From [openclaw-part2](/entities/openclaw-part2.md) (2026-06-08)
 - An external vector database for Retrieval-Augmented Generation (RAG).
 - OpenClaw explicitly eschews dependency on such databases by default.
 
-## From [[drive-research-hermes-session-storage-migration-analysis|drive-research-hermes-session-storage-migration-analysis]] (2026-06-08)
+## From [drive-research-hermes-session-storage-migration-analysis](/entities/drive-research-hermes-session-storage-migration-analysis.md) (2026-06-08)
 - Mentioned as an example of an expensive, cloud-based vector database that Hermes's architecture avoids.
 
-## From [[openclaw-deep-research-part8-micro04|openclaw-deep-research-part8-micro04]] (2026-06-09)
+## From [openclaw-deep-research-part8-micro04](/entities/openclaw-deep-research-part8-micro04.md) (2026-06-09)
 - LangChain's tight coupling with vector stores like Pinecone can trap users in proprietary data pipelines.
 
-## From [[openclaw-deep-research-part8-micro01|openclaw-deep-research-part8-micro01]] (2026-06-10)
+## From [openclaw-deep-research-part8-micro01](/entities/openclaw-deep-research-part8-micro01.md) (2026-06-10)
 - Vector DB used for hybrid search in recommendation systems
 
-## From [[openclaw-deep-research-part8-micro02|openclaw-deep-research-part8-micro02]] (2026-06-10)
+## From [openclaw-deep-research-part8-micro02](/entities/openclaw-deep-research-part8-micro02.md) (2026-06-10)
 - Vector DB used for caching frequent retrievals

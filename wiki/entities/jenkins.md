@@ -15,13 +15,13 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[designing-stealthy-portable-cli-agents|designing-stealthy-portable-cli-agents]] (2026-06-08)
+## From [designing-stealthy-portable-cli-agents](/entities/designing-stealthy-portable-cli-agents.md) (2026-06-08)
 - A centralized scheduling tool.
 - Used in enterprise environments to trigger scans at regular intervals.
 
-## From [[drive-research-creating-a-comprehensive-readmemd-micro02|drive-research-creating-a-comprehensive-readmemd-micro02]] (2026-06-09)
+## From [drive-research-creating-a-comprehensive-readmemd-micro02](/entities/drive-research-creating-a-comprehensive-readmemd-micro02.md) (2026-06-09)
 - CI/CD environment for configuring build status and testing badges.
 
-## From [[drive-research-safe-unzip-practices-for-threat-model-micro02|drive-research-safe-unzip-practices-for-threat-model-micro02]] (2026-06-09)
+## From [drive-research-safe-unzip-practices-for-threat-model-micro02](/entities/drive-research-safe-unzip-practices-for-threat-model-micro02.md) (2026-06-09)
 - Identified with the Zip Slip vulnerability.
 - Required industry-wide patching efforts.

@@ -14,11 +14,11 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-analyze-the-pdf-to-create-a-step-by-step-guide-of|drive-research-analyze-the-pdf-to-create-a-step-by-step-guide-of]] (2026-06-08)
+## From [drive-research-analyze-the-pdf-to-create-a-step-by-step-guide-of](/entities/drive-research-analyze-the-pdf-to-create-a-step-by-step-guide-of.md) (2026-06-08)
 - Command-line utility used to configure network interfaces.
 - Used to expand ring descriptor arrays.
 
-## From [[drive-research-ubuntu-extreme-hardware-tuning-micro02|drive-research-ubuntu-extreme-hardware-tuning-micro02]] (2026-06-09)
+## From [drive-research-ubuntu-extreme-hardware-tuning-micro02](/entities/drive-research-ubuntu-extreme-hardware-tuning-micro02.md) (2026-06-09)
 - Used to manually expand RX and TX ring buffers.
 - Can configure network interface parameters.
 - Utility for configuring network interfaces.

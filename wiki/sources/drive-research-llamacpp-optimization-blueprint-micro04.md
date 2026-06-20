@@ -14,12 +14,12 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[llm-inference|LLM inference]] (CONCEPT)
-- [[llama-cpp-python|llama-cpp-python]] (PROJECT)
-- [[samplers|samplers]] (CONCEPT)
-- [[medium|Medium]] (ORGANIZATION)
-- [[speculative-decoding|speculative decoding]] (CONCEPT)
-- [[multi-gpu|multi-GPU]] (CONCEPT)
+- [LLM inference](/entities/llm-inference.md) (CONCEPT)
+- [llama-cpp-python](/entities/llama-cpp-python.md) (PROJECT)
+- [samplers](/entities/samplers.md) (CONCEPT)
+- [Medium](/entities/medium.md) (ORGANIZATION)
+- [speculative decoding](/entities/speculative-decoding.md) (CONCEPT)
+- [multi-GPU](/entities/multi-gpu.md) (CONCEPT)
 
 ## Relations
 - LLM inference → RELATED_TO → llama-cpp-python

@@ -14,18 +14,18 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[glibc|glibc]] (SYSTEM)
-- [[llama-server|llama-server]] (TOOL)
-- [[nvidia-smi|nvidia-smi]] (TOOL)
-- [[phantom-drive|Phantom Drive]] (PROJECT)
-- [[alpine-linux|Alpine Linux]] (SYSTEM)
-- [[lspci|lspci]] (TOOL)
-- [[air-gapped-deployment|air-gapped deployment]] (CONCEPT)
-- [[boot-sh|boot.sh]] (TOOL)
-- [[ggml-org-llama-cpp|ggml-org/llama.cpp]] (PROJECT)
-- [[docker|Docker]] (TOOL)
-- [[static-linking|static linking]] (CONCEPT)
-- [[musl-libc|musl libc]] (SYSTEM)
+- [glibc](/entities/glibc.md) (SYSTEM)
+- [llama-server](/entities/llama-server.md) (TOOL)
+- [nvidia-smi](/entities/nvidia-smi.md) (TOOL)
+- [Phantom Drive](/entities/phantom-drive.md) (PROJECT)
+- [Alpine Linux](/entities/alpine-linux.md) (SYSTEM)
+- [lspci](/entities/lspci.md) (TOOL)
+- [air-gapped deployment](/entities/air-gapped-deployment.md) (CONCEPT)
+- [boot.sh](/entities/boot-sh.md) (TOOL)
+- [ggml-org/llama.cpp](/entities/ggml-org-llama-cpp.md) (PROJECT)
+- [Docker](/entities/docker.md) (TOOL)
+- [static linking](/entities/static-linking.md) (CONCEPT)
+- [musl libc](/entities/musl-libc.md) (SYSTEM)
 
 ## Relations
 - Phantom Drive → USES → llama-server

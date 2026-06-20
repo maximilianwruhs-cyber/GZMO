@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[architectures-and-optimizations-for-speculative-de-micro05|architectures-and-optimizations-for-speculative-de-micro05]] (2026-06-09)
+## From [architectures-and-optimizations-for-speculative-de-micro05](/entities/architectures-and-optimizations-for-speculative-de-micro05.md) (2026-06-09)
 - An experimental extension of Key Map (--spec-type ngram-map-k4v).
 - Tracks up to four separate continuation sequences for every key.
 - Uses occurrence statistics to deploy the most probable draft.

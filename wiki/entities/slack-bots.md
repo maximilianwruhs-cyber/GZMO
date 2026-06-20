@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[architectural-framework-and-development-of-pi-codi|architectural-framework-and-development-of-pi-codi]] (2026-06-08)
+## From [architectural-framework-and-development-of-pi-codi](/entities/architectural-framework-and-development-of-pi-codi.md) (2026-06-08)
 - Specialized agents can be embedded into Slack bots using the SDK.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part8-micro03|ai-research-part8-micro03]] (2026-06-09)
+## From [ai-research-part8-micro03](/entities/ai-research-part8-micro03.md) (2026-06-09)
 - Attempt to widen the informational bottleneck of standard Transformers.
 - Establish multiple, parallel residual streams linked by learned mixing transition matrices.
 - Unconstrained dense links can lead to severe training instability.

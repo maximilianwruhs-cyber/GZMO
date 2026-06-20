@@ -16,15 +16,15 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[allgemeine-informationen|allgemeine-informationen]] (2026-06-08)
+## From [allgemeine-informationen](/entities/allgemeine-informationen.md) (2026-06-08)
 - It is used for error tracking.
 - It helps identify issues before they reach users.
 
-## From [[drive-research-mcp-landscape-research-report|drive-research-mcp-landscape-research-report]] (2026-06-08)
+## From [drive-research-mcp-landscape-research-report](/entities/drive-research-mcp-landscape-research-report.md) (2026-06-08)
 - Observability servers integrating with platforms such as Sentry allow agents to hook directly into production telemetry.
 
-## From [[openclaw-deep-research-part5-micro02|openclaw-deep-research-part5-micro02]] (2026-06-10)
+## From [openclaw-deep-research-part5-micro02](/entities/openclaw-deep-research-part5-micro02.md) (2026-06-10)
 - Used via webhook to capture errors.
 
-## From [[prompt-agent-engineering-part7-micro07|prompt-agent-engineering-part7-micro07]] (2026-06-10)
+## From [prompt-agent-engineering-part7-micro07](/entities/prompt-agent-engineering-part7-micro07.md) (2026-06-10)
 - Suggested for error logging to scale implementation

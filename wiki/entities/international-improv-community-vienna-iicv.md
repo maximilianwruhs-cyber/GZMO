@@ -14,9 +14,9 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[the-archival-truth-part1-micro07|the-archival-truth-part1-micro07]] (2026-06-09)
+## From [the-archival-truth-part1-micro07](/entities/the-archival-truth-part1-micro07.md) (2026-06-09)
 - Is an organization in Vienna that provides open improv sessions and classes.
 - Helps foster spontaneity required for crowd work and acting out scenarios.
 
-## From [[drive-research-the-architecture-of-humor-micro01|drive-research-the-architecture-of-humor-micro01]] (2026-06-10)
+## From [drive-research-the-architecture-of-humor-micro01](/entities/drive-research-the-architecture-of-humor-micro01.md) (2026-06-10)
 - Offers open improvisation sessions.

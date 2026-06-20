@@ -15,13 +15,13 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part1|ai-research-part1]] (2026-06-08)
+## From [ai-research-part1](/entities/ai-research-part1.md) (2026-06-08)
 - Relax fixed unit coefficients by introducing learned element-wise gates.
 - An instance of a weighted recurrence hl = αl · hl−1 + βl · fl−1(hl−1).
 - A residual update mechanism.
 - Uses a dynamic weight (1−gl) and gl.
 - Accesses only hl−1 as a source.
 
-## From [[ai-research-part6-micro03|ai-research-part6-micro03]] (2026-06-09)
+## From [ai-research-part6-micro03](/entities/ai-research-part6-micro03.md) (2026-06-09)
 - A foundational residual architecture.
 - Demonstrated that explicit shortcut or gating pathways substantially ease optimization and improve depth scalability.

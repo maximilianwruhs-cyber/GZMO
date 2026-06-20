@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[dynamics-of-the-unpredictable-micro01|dynamics-of-the-unpredictable-micro01]] (2026-06-09)
+## From [dynamics-of-the-unpredictable-micro01](/entities/dynamics-of-the-unpredictable-micro01.md) (2026-06-09)
 - This is a micro-split from a larger document.
 - It is part of a series (micro 1/7).

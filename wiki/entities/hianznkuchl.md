@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-archival-truth-part1-micro04|the-archival-truth-part1-micro04]] (2026-06-09)
+## From [the-archival-truth-part1-micro04](/entities/the-archival-truth-part1-micro04.md) (2026-06-09)
 - Represents the culinary identity of Burgenland.
 - Primarily based on traditional dishes.
 - Often uses animal by-products due to economic necessity.

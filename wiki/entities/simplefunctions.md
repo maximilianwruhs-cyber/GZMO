@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[openclaw-deep-research-part8-micro05|openclaw-deep-research-part8-micro05]] (2026-06-10)
+## From [openclaw-deep-research-part8-micro05](/entities/openclaw-deep-research-part8-micro05.md) (2026-06-10)
 - An agentic runtime built specifically for prediction markets
 - Provides 29 MCP-compatible tools

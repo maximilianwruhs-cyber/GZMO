@@ -14,12 +14,12 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[google-antigravity-the-architects-configuration-micro02|google-antigravity-the-architects-configuration-micro02]] (2026-06-09)
+## From [google-antigravity-the-architects-configuration-micro02](/entities/google-antigravity-the-architects-configuration-micro02.md) (2026-06-09)
 - Reside at the apex of the customization hierarchy in Antigravity.
 - Stored in the ~/.gemini/GEMINI.md file.
 - Apply uniformly across every workspace mounted within the Antigravity IDE.
 
-## From [[google-antigravity-the-architects-configuration-micro04|google-antigravity-the-architects-configuration-micro04]] (2026-06-09)
+## From [google-antigravity-the-architects-configuration-micro04](/entities/google-antigravity-the-architects-configuration-micro04.md) (2026-06-09)
 - Apply across every single workspace and project on your machine.
 - Enforce baseline behavior, security, and quality assurance.
 - Act as system instructions and permanent guardrails.

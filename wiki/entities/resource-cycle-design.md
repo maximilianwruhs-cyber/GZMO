@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[obolus-micro02|obolus-micro02]] (2026-06-09)
+## From [obolus-micro02](/entities/obolus-micro02.md) (2026-06-09)
 - Research topic for Evo-Grid
 - Mathematical modeling of agent death based on resource depletion
 - Balancing evolution pressure and learning time

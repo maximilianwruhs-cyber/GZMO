@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-synthesizing-wisdom-from-heterogeneous-data|drive-research-synthesizing-wisdom-from-heterogeneous-data]] (2026-06-08)
+## From [drive-research-synthesizing-wisdom-from-heterogeneous-data](/entities/drive-research-synthesizing-wisdom-from-heterogeneous-data.md) (2026-06-08)
 - Extends concept distillation to unstructured graph datasets.
 - Embeds a differentiable concept-distillation layer directly into the GNN pipeline.
 - Projects latent node embeddings into a concept space spanned by human-interpretable prototypes.

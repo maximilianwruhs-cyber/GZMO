@@ -14,12 +14,12 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[obolus-micro02|obolus-micro02]] (2026-06-09)
+## From [obolus-micro02](/entities/obolus-micro02.md) (2026-06-09)
 - Role in Evo-Grid: 'Agents / Gladiators'
 - Autonomous AI agents that solve tasks
 - Consume resources with each action
 
-## From [[obolus-micro03|obolus-micro03]] (2026-06-09)
+## From [obolus-micro03](/entities/obolus-micro03.md) (2026-06-09)
 - Part of the Bittensor subnet architecture.
 - Has a MinerAgent class.
 - Has an ObulusWallet.

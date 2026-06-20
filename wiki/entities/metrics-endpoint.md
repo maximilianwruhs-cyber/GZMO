@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-benchmarking-llamacpp-server-prefill-tokens-micro01|drive-research-benchmarking-llamacpp-server-prefill-tokens-micro01]] (2026-06-09)
+## From [drive-research-benchmarking-llamacpp-server-prefill-tokens-micro01](/entities/drive-research-benchmarking-llamacpp-server-prefill-tokens-micro01.md) (2026-06-09)
 - The native Prometheus exposition path hosted by llama-server.
 - Maps internal engine metrics to standard observability fields.
 - Aggregates data across all active instances when running with a --models-preset flag.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[ai-research-part7|ai-research-part7]] (2026-06-08)
+## From [ai-research-part7](/entities/ai-research-part7.md) (2026-06-08)
 - This is the title of the document.
 - It discusses enhancing the Claw-Code Framework.
 - It is a highly advanced agent harness designed to orchestrate complex software engineering workflows.

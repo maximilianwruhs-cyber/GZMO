@@ -29,12 +29,12 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[openclaw-part2|openclaw-part2]] (2026-06-08)
+## From [openclaw-part2](/entities/openclaw-part2.md) (2026-06-08)
 - A developer framework for building custom AI pipelines.
 - Requires coding.
 - Listed as an example of Developer Frameworks.
 
-## From [[openclaw-deep-research-part4|openclaw-deep-research-part4]] (2026-06-08)
+## From [openclaw-deep-research-part4](/entities/openclaw-deep-research-part4.md) (2026-06-08)
 - An AI agent framework.
 - Choice for Azure-embedded enterprise teams needing sophisticated multi-agent conversation orchestration.
 - Is MIT-licensed.
@@ -55,59 +55,59 @@ Type: TOOL
 - Production deployment planning range is $300-1,500+ per month.
 - Organizes agents around conversational message exchange.
 
-## From [[openclaw-deep-research-part6|openclaw-deep-research-part6]] (2026-06-08)
+## From [openclaw-deep-research-part6](/entities/openclaw-deep-research-part6.md) (2026-06-08)
 - A developer framework for custom AI pipelines.
 - Requires coding.
 
-## From [[drive-research-mcp-landscape-research-report|drive-research-mcp-landscape-research-report]] (2026-06-08)
+## From [drive-research-mcp-landscape-research-report](/entities/drive-research-mcp-landscape-research-report.md) (2026-06-08)
 - Relies on the McpWorkbench class to bridge multi-agent conversational patterns with external tools.
 - The workbench acts as a centralized capability registry.
 - Allows dynamically spawned, persona-driven agents to selectively invoke capabilities.
 - An orchestration framework that the Model Context Protocol enables complex multi-step workflows across.
 
-## From [[drive-research-ai-agents-and-spec-driven-development-micro02|drive-research-ai-agents-and-spec-driven-development-micro02]] (2026-06-09)
+## From [drive-research-ai-agents-and-spec-driven-development-micro02](/entities/drive-research-ai-agents-and-spec-driven-development-micro02.md) (2026-06-09)
 - A leading framework in the Execution Agents layer.
 - Specializes in goal-based multi-step workflows.
 - Splits work across agent roles.
 
-## From [[drive-research-ai-agents-and-spec-driven-development1-micro01|drive-research-ai-agents-and-spec-driven-development1-micro01]] (2026-06-09)
+## From [drive-research-ai-agents-and-spec-driven-development1-micro01](/entities/drive-research-ai-agents-and-spec-driven-development1-micro01.md) (2026-06-09)
 - A leading framework in the Execution Agents layer.
 - Specializes in goal-based multi-step workflows.
 - Splits work across agent roles.
 
-## From [[drive-research-setting-up-autonomous-trading-agents-micro02|drive-research-setting-up-autonomous-trading-agents-micro02]] (2026-06-09)
+## From [drive-research-setting-up-autonomous-trading-agents-micro02](/entities/drive-research-setting-up-autonomous-trading-agents-micro02.md) (2026-06-09)
 - SDK for engineering a custom, multi-agent LLM framework.
 - Represents the most arduous and risky path.
 
-## From [[openclaw-deep-research-part8-micro04|openclaw-deep-research-part8-micro04]] (2026-06-09)
+## From [openclaw-deep-research-part8-micro04](/entities/openclaw-deep-research-part8-micro04.md) (2026-06-09)
 - Logs interaction metadata to Microsoft endpoints in cloud modes.
 - Shines in multi-agent conversations, boosting productivity by 25% in automation tasks.
 - Struggles with deterministic outputs in high-stakes environments.
 
-## From [[resilient-rust-based-mcp-client-and-llm-orchestrat-micro06|resilient-rust-based-mcp-client-and-llm-orchestrat-micro06]] (2026-06-09)
+## From [resilient-rust-based-mcp-client-and-llm-orchestrat-micro06](/entities/resilient-rust-based-mcp-client-and-llm-orchestrat-micro06.md) (2026-06-09)
 - Major agentic framework.
 - Rendered inoperable with llama-server due to a bug.
 
-## From [[the-architects-handbook-for-autonomous-agentic-tr-micro03|the-architects-handbook-for-autonomous-agentic-tr-micro03]] (2026-06-09)
+## From [the-architects-handbook-for-autonomous-agentic-tr-micro03](/entities/the-architects-handbook-for-autonomous-agentic-tr-micro03.md) (2026-06-09)
 - An SDK for engineering custom, multi-agent LLM frameworks.
 - Represents an arduous and risky path for autonomous trading.
 
-## From [[openclaw-deep-research-part8-micro01|openclaw-deep-research-part8-micro01]] (2026-06-10)
+## From [openclaw-deep-research-part8-micro01](/entities/openclaw-deep-research-part8-micro01.md) (2026-06-10)
 - Framework for multi-agent conversation orchestration
 - Developed by Microsoft
 - Uses MIT license
 
-## From [[openclaw-deep-research-part8-micro02|openclaw-deep-research-part8-micro02]] (2026-06-10)
+## From [openclaw-deep-research-part8-micro02](/entities/openclaw-deep-research-part8-micro02.md) (2026-06-10)
 - Experimental nature can lead to unpredictable agent interactions
 - 2025 benchmarks show 15% higher resource use (CPU/GPU) than CrewAI
 - Excels in conversational multi-agent orchestration
 
-## From [[openclaw-deep-research-part8-micro05|openclaw-deep-research-part8-micro05]] (2026-06-10)
+## From [openclaw-deep-research-part8-micro05](/entities/openclaw-deep-research-part8-micro05.md) (2026-06-10)
 - Provides community support via GitHub and Microsoft-backed Discord channels
 - Offers paid support through Azure SLAs
 
-## From [[openclaw-part1-micro05|openclaw-part1-micro05]] (2026-06-10)
+## From [openclaw-part1-micro05](/entities/openclaw-part1-micro05.md) (2026-06-10)
 - A system used for building multi-agent pipelines.
 
-## From [[spec-driven-development-architecting-the-era-of-a-micro02|spec-driven-development-architecting-the-era-of-a-micro02]] (2026-06-10)
+## From [spec-driven-development-architecting-the-era-of-a-micro02](/entities/spec-driven-development-architecting-the-era-of-a-micro02.md) (2026-06-10)
 - An execution agent framework.

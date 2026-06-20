@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[drive-research-the-architecture-of-humor-micro01|drive-research-the-architecture-of-humor-micro01]] (2026-06-10)
+## From [drive-research-the-architecture-of-humor-micro01](/entities/drive-research-the-architecture-of-humor-micro01.md) (2026-06-10)
 - A research report that dismantles the mechanics of humor.
 - Explores comedic mechanics, theory, and practice.

@@ -14,9 +14,9 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[drive-research-research-project-initiation-guide|drive-research-research-project-initiation-guide]] (2026-06-08)
+## From [drive-research-research-project-initiation-guide](/entities/drive-research-research-project-initiation-guide.md) (2026-06-08)
 - Produces the EndNote reference manager.
 - Its products are tied to Web of Science.
 
-## From [[optimizing-nvidia-blackwell-sm120-part2-micro07|optimizing-nvidia-blackwell-sm120-part2-micro07]] (2026-06-10)
+## From [optimizing-nvidia-blackwell-sm120-part2-micro07](/entities/optimizing-nvidia-blackwell-sm120-part2-micro07.md) (2026-06-10)
 - Producer of EndNote

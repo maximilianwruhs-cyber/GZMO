@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[openclaw-part1-micro04|openclaw-part1-micro04]] (2026-06-10)
+## From [openclaw-part1-micro04](/entities/openclaw-part1-micro04.md) (2026-06-10)
 - A video generation provider supporting Text and Image.
 - Utilizes a queue-backed flow for long-running jobs.

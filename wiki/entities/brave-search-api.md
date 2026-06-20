@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-pi-coding-agent-ecosystem-tier-list|drive-research-pi-coding-agent-ecosystem-tier-list]] (2026-06-08)
+## From [drive-research-pi-coding-agent-ecosystem-tier-list](/entities/drive-research-pi-coding-agent-ecosystem-tier-list.md) (2026-06-08)
 - Integrates web research capabilities using the Brave Search API.
 - Adheres to the Agent Skills progressive disclosure specification.
 - Queries external document sources and ingests fresh documentation updates as Markdown blocks on-demand.
@@ -22,7 +22,7 @@ Type: TOOL
 - Allows querying external document sources.
 - Provides fresh documentation updates.
 
-## From [[drive-research-the-pi-coding-agent-s-architectural-paradigm-revol|drive-research-the-pi-coding-agent-s-architectural-paradigm-revol]] (2026-06-08)
+## From [drive-research-the-pi-coding-agent-s-architectural-paradigm-revol](/entities/drive-research-the-pi-coding-agent-s-architectural-paradigm-revol.md) (2026-06-08)
 - Web search and content extraction is done via this API.
 - Used by brave-search.
 - Web search and content extraction via Brave Search API.

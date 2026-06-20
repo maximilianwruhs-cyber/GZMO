@@ -17,23 +17,23 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[the-openclaw-architecture-and-tri-circuit-autonomo-part2|the-openclaw-architecture-and-tri-circuit-autonomo-part2]] (2026-06-08)
+## From [the-openclaw-architecture-and-tri-circuit-autonomo-part2](/entities/the-openclaw-architecture-and-tri-circuit-autonomo-part2.md) (2026-06-08)
 - A model used for local inference.
 - Achieves 150 Tokens per second.
 
-## From [[the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro02|the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro02]] (2026-06-09)
+## From [the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro02](/entities/the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro02.md) (2026-06-09)
 - Developed by Xiaomi.
 - Offers an ultra-fast Mixture of Experts (MoE) architecture.
 - Was trained explicitly for agentic and tool-calling workflows using Multi-Teacher Online Policy Distillation (MOPD).
 
-## From [[the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro06|the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro06]] (2026-06-09)
+## From [the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro06](/entities/the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro06.md) (2026-06-09)
 - Large reasoning model.
 - Advised for production environments with NPU or NVIDIA GPU.
 - Facilitates internal logical deductions and source credibility assessments.
 
-## From [[the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro08|the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro08]] (2026-06-09)
+## From [the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro08](/entities/the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro08.md) (2026-06-09)
 - An inference engine used in Circuit II.
 - Utilizes Multi-Teacher Online Policy Distillation (MOPD).
 
-## From [[prfaas-cross-datacenter-llm-serving-via-selective-micro02|prfaas-cross-datacenter-llm-serving-via-selective-micro02]] (2026-06-10)
+## From [prfaas-cross-datacenter-llm-serving-via-selective-micro02](/entities/prfaas-cross-datacenter-llm-serving-via-selective-micro02.md) (2026-06-10)
 - A hybrid model with a 5:1 SWA-to-full ratio.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part3-micro03|ai-research-part3-micro03]] (2026-06-09)
+## From [ai-research-part3-micro03](/entities/ai-research-part3-micro03.md) (2026-06-09)
 - extend LLMs with the ability to operate in conventional computing environments
 - ChatDev first illustrated this idea in the context of automated bug fixing
 - similar frameworks were later explored in SWE Yang et al. (2024), OpenHands (Wang et al., 2024), MetaGPT (Hong et al., 2024), and AgentLess (Xia et al., 2025)

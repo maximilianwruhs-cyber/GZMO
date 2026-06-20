@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[openclaw-deep-research-part1-micro03|openclaw-deep-research-part1-micro03]] (2026-06-09)
+## From [openclaw-deep-research-part1-micro03](/entities/openclaw-deep-research-part1-micro03.md) (2026-06-09)
 - Used to build the sandbox image for Docker containers.
 - Related to OpenClaw sandboxing.

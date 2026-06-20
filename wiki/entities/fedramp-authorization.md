@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-markitdown-format-parity-checklist|drive-research-markitdown-format-parity-checklist]] (2026-06-08)
+## From [drive-research-markitdown-format-parity-checklist](/entities/drive-research-markitdown-format-parity-checklist.md) (2026-06-08)
 - Authorization protocols that require precise auditing of the dependency graph.
 - Extraneous dependencies complicate vulnerability scanning and package authorization.
 - A compliance requirement where extraneous dependencies complicate vulnerability scanning.

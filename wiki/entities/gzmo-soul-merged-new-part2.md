@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[gzmo-soul-merged-new-part2-micro01|gzmo-soul-merged-new-part2-micro01]] (2026-06-09)
+## From [gzmo-soul-merged-new-part2-micro01](/entities/gzmo-soul-merged-new-part2-micro01.md) (2026-06-09)
 - Ingest micro-split from `gzmo-soul-merged-new-part2.md` for cloud KG extraction.
 - part 2 (micro 1/8)
 - Curated research corpus

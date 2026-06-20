@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[openclaw-deep-research-part1-micro06|openclaw-deep-research-part1-micro06]] (2026-06-10)
+## From [openclaw-deep-research-part1-micro06](/entities/openclaw-deep-research-part1-micro06.md) (2026-06-10)
 - Developer who published an account of using OpenClaw to negotiate a car purchase.

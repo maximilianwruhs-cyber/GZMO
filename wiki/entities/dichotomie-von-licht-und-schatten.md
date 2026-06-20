@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-archival-truth-part1-micro02|the-archival-truth-part1-micro02]] (2026-06-09)
+## From [the-archival-truth-part1-micro02](/entities/the-archival-truth-part1-micro02.md) (2026-06-09)
 - Refers to the existence of logically contradictory proverbs for almost every established life wisdom.
 - Provides a flexible, dual interpretation system.
 - Allows individuals to maintain the subjective feeling of living in a structured, explainable, and predictable world.

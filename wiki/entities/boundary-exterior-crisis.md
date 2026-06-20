@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-cache-optimization-with-ai-chaos-theory|drive-research-cache-optimization-with-ai-chaos-theory]] (2026-06-08)
+## From [drive-research-cache-optimization-with-ai-chaos-theory](/entities/drive-research-cache-optimization-with-ai-chaos-theory.md) (2026-06-08)
 - The chaotic attractor collides with an unstable periodic orbit or its stable manifold, instantly destroying the attractor.
 - Manifests as the market trajectory becoming transiently chaotic before collapsing into a new pricing level.

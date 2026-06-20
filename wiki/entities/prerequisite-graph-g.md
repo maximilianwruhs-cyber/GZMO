@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-ai-agentic-teacher-research-report|drive-research-ai-agentic-teacher-research-report]] (2026-06-08)
+## From [drive-research-ai-agentic-teacher-research-report](/entities/drive-research-ai-agentic-teacher-research-report.md) (2026-06-08)
 - A highly interconnected Knowledge Graph (KG) or Prerequisite Graph.
 - Represents a domain of knowledge as G = (V, E), where V is conceptual nodes and E are directed dependency edges.
 - Encodes known pedagogical pitfalls and common misconceptions.

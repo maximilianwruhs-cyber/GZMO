@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[refactoring-gzmo-daemon-for-native-bun-high-perfor|refactoring-gzmo-daemon-for-native-bun-high-perfor]] (2026-06-08)
+## From [refactoring-gzmo-daemon-for-native-bun-high-perfor](/entities/refactoring-gzmo-daemon-for-native-bun-high-perfor.md) (2026-06-08)
 - Currently used for non-blocking operations.
 - Will be replaced by native Bun APIs.
 - Imports will be ripped out from core engines.

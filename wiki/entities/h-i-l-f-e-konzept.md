@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[mastering-remote-work-a-comprehensive-guide-to-ho|mastering-remote-work-a-comprehensive-guide-to-ho]] (2026-06-08)
+## From [mastering-remote-work-a-comprehensive-guide-to-ho](/entities/mastering-remote-work-a-comprehensive-guide-to-ho.md) (2026-06-08)
 - A leadership concept for mental health and prevention.
 - Stands for Hinsehen, Initiative ergreifen, Leitungsfunktion wahrnehmen, Führungsverantwortung zeigen, Experten hinzuziehen.
 - Aims to prevent isolation and maintain team dynamics.

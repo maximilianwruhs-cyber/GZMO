@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-the-pi-coding-agent-s-architectural-paradigm-revol|drive-research-the-pi-coding-agent-s-architectural-paradigm-revol]] (2026-06-08)
+## From [drive-research-the-pi-coding-agent-s-architectural-paradigm-revol](/entities/drive-research-the-pi-coding-agent-s-architectural-paradigm-revol.md) (2026-06-08)
 - wgnr-pi is a lightweight web interface built with WebSockets.
 
-## From [[obolus-vs-codium-extension-konzept-research-part1-micro04|obolus-vs-codium-extension-konzept-research-part1-micro04]] (2026-06-09)
+## From [obolus-vs-codium-extension-konzept-research-part1-micro04](/entities/obolus-vs-codium-extension-konzept-research-part1-micro04.md) (2026-06-09)
 - A protocol for real-time communication.
 - Can be used with FastAPI.
 - Requires the `websockets` Python library.

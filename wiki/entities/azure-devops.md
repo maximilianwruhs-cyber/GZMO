@@ -14,8 +14,8 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-creating-a-comprehensive-readmemd-micro02|drive-research-creating-a-comprehensive-readmemd-micro02]] (2026-06-09)
+## From [drive-research-creating-a-comprehensive-readmemd-micro02](/entities/drive-research-creating-a-comprehensive-readmemd-micro02.md) (2026-06-09)
 - Service for Code Coverage badges with endpoint format /azure-devops/coverage/:organization/:project/:definitionId.
 
-## From [[openclaw-deep-research-part7-micro01|openclaw-deep-research-part7-micro01]] (2026-06-10)
+## From [openclaw-deep-research-part7-micro01](/entities/openclaw-deep-research-part7-micro01.md) (2026-06-10)
 - Skill to list Azure DevOps projects, repositories, and branches.

@@ -26,6 +26,8 @@ pub enum ObolusAction {
     SparkTick,
     DiscoveryPlan,
     OperatorChat,
+    /// MCP tool invocation (ARD: cost-gated resource discovery).
+    McpToolInvoke,
 }
 
 impl ObolusAction {
@@ -39,12 +41,14 @@ impl ObolusAction {
             Self::DreamTick => "dream_tick",
             Self::SparkTick => "spark_tick",
             Self::OperatorChat => "operator_chat",
+            Self::McpToolInvoke => "mcp_tool_invoke",
         }
     }
 
     pub fn default_tier(self) -> ObolusTier {
         match self {
             Self::OperatorChat => ObolusTier::Operator,
+            Self::McpToolInvoke => ObolusTier::SemiAutonomous,
             Self::DiscoveryCycle | Self::DiscoveryPlan => ObolusTier::SemiAutonomous,
             Self::SpawnDiscoveryFix
             | Self::SpawnSessionTriage

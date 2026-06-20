@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[openclaw-deep-research-part1-micro04|openclaw-deep-research-part1-micro04]] (2026-06-09)
+## From [openclaw-deep-research-part1-micro04](/entities/openclaw-deep-research-part1-micro04.md) (2026-06-09)
 - Used by config.patch for merging.
 - Objects merge recursively.
 - null deletes a key.

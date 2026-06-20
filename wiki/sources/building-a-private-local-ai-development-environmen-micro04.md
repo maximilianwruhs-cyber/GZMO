@@ -14,21 +14,21 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[roo-code|Roo Code]] (TOOL)
-- [[llama-3|Llama 3]] (BOOK)
-- [[openclaw|OpenClaw]] (TOOL)
-- [[qwen-2-5-coder-1-5b|Qwen-2.5-Coder-1.5B]] (BOOK)
-- [[vscodium|VSCodium]] (TOOL)
-- [[void-ide|Void IDE]] (TOOL)
-- [[lm-studio|LM Studio]] (TOOL)
-- [[model-context-protocol|Model Context Protocol]] (CONCEPT)
-- [[deepseek-coder|DeepSeek-Coder]] (BOOK)
-- [[deepseek-r1|DeepSeek-R1]] (BOOK)
-- [[continue|Continue]] (TOOL)
-- [[aider|Aider]] (TOOL)
-- [[open-vsx-registry|Open VSX Registry]] (SYSTEM)
-- [[qwen-32b|Qwen-32B]] (BOOK)
-- [[pearai|PearAI]] (TOOL)
+- [Roo Code](/entities/roo-code.md) (TOOL)
+- [Llama 3](/entities/llama-3.md) (BOOK)
+- [OpenClaw](/entities/openclaw.md) (TOOL)
+- [Qwen-2.5-Coder-1.5B](/entities/qwen-2-5-coder-1-5b.md) (BOOK)
+- [VSCodium](/entities/vscodium.md) (TOOL)
+- [Void IDE](/entities/void-ide.md) (TOOL)
+- [LM Studio](/entities/lm-studio.md) (TOOL)
+- [Model Context Protocol](/entities/model-context-protocol.md) (CONCEPT)
+- [DeepSeek-Coder](/entities/deepseek-coder.md) (BOOK)
+- [DeepSeek-R1](/entities/deepseek-r1.md) (BOOK)
+- [Continue](/entities/continue.md) (TOOL)
+- [Aider](/entities/aider.md) (TOOL)
+- [Open VSX Registry](/entities/open-vsx-registry.md) (SYSTEM)
+- [Qwen-32B](/entities/qwen-32b.md) (BOOK)
+- [PearAI](/entities/pearai.md) (TOOL)
 
 ## Relations
 - Continue → USES → LM Studio

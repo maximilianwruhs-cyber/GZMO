@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[prompt-agent-engineering-part5-micro02|prompt-agent-engineering-part5-micro02]] (2026-06-09)
+## From [prompt-agent-engineering-part5-micro02](/entities/prompt-agent-engineering-part5-micro02.md) (2026-06-09)
 - Discussed as a topic for improving prompts.
 - The prompt is described as strong and potentially improvable.
 - Focuses on persona, structured framework, and deliverables.

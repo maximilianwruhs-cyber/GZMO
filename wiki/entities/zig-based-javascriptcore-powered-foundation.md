@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-bun-typescript-performance-tips-micro03|drive-research-bun-typescript-performance-tips-micro03]] (2026-06-09)
+## From [drive-research-bun-typescript-performance-tips-micro03](/entities/drive-research-bun-typescript-performance-tips-micro03.md) (2026-06-09)
 - Runtimes utilizing JavaScriptCore can exhibit aggressive memory consumption.
 - Bun's Zig/JSC architecture is fast.
 - Garbage collection cycles are non-deterministic.

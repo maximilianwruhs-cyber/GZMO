@@ -14,13 +14,13 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-the-anatomy-of-a-world-class-readme|drive-research-the-anatomy-of-a-world-class-readme]] (2026-06-08)
+## From [drive-research-the-anatomy-of-a-world-class-readme](/entities/drive-research-the-anatomy-of-a-world-class-readme.md) (2026-06-08)
 - Automatically rendered at the pinnacle of a user's public profile page.
 - Functions as a highly dynamic, interactive developer portfolio.
 - Developers embed dynamically generated SVG metrics that securely interface with GitHub’s API to pull live statistical data.
 - Democratizes the process of creating GitHub Profile READMEs, providing user-friendly graphical interfaces to instantly generate the required complex Markdown and HTML.
 
-## From [[drive-research-creating-a-comprehensive-readmemd-micro02|drive-research-creating-a-comprehensive-readmemd-micro02]] (2026-06-09)
+## From [drive-research-creating-a-comprehensive-readmemd-micro02](/entities/drive-research-creating-a-comprehensive-readmemd-micro02.md) (2026-06-09)
 - Platform for Social and Community badges (repository stars, forks, sponsorship).
 - Allows creation of a uniquely named repository matching account username for a special Profile README.
 - Profile README is rendered at the absolute pinnacle of their public profile page.

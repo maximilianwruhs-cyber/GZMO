@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-license-and-native-binding-analysis|drive-research-license-and-native-binding-analysis]] (2026-06-08)
+## From [drive-research-license-and-native-binding-analysis](/entities/drive-research-license-and-native-binding-analysis.md) (2026-06-08)
 - A framework used for native addons.
 - Largely written utilizing APIs directly coupled to V8 internals.
 - Older versions of NAN that natively segfault within Bun’s JavaScriptCore engine are categorically Red.

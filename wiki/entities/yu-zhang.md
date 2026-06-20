@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: AUTHOR
 
-## From [[ai-research-part1|ai-research-part1]] (2026-06-08)
+## From [ai-research-part1](/entities/ai-research-part1.md) (2026-06-08)
 - Authored "Kimi Linear: An Expressive, Efficient Attention Architecture" in 2025.
 - Listed as an author with equal contribution to the "Attention Residuals TECHNICAL REPORT".

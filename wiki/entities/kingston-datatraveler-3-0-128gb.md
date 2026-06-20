@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[architecting-the-minimalist-linux-desktop-a-compa-part1|architecting-the-minimalist-linux-desktop-a-compa-part1]] (2026-06-08)
+## From [architecting-the-minimalist-linux-desktop-a-compa-part1](/entities/architecting-the-minimalist-linux-desktop-a-compa-part1.md) (2026-06-08)
 - A premium USB drive used for benchmark testing.
 - Sequential read speeds can reach 106.66 MB/s when utilizing an optimal 16KB cluster size.
 - Smaller cluster sizes (512B to 4KB) cripple the drive's controller, causing extreme performance drops.

@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[gzmo-soul-merged-new-part2-micro02|gzmo-soul-merged-new-part2-micro02]] (2026-06-09)
+## From [gzmo-soul-merged-new-part2-micro02](/entities/gzmo-soul-merged-new-part2-micro02.md) (2026-06-09)
 - A retrieval-augmented digital assistant designed to support complex health and humanitarian queries.
 - Reformulates user queries into actionable intents and routes the request to highly specific domain databases.

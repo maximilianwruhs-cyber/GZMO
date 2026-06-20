@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: REPOSITORY
 
-## From [[drive-research-du-hast-gesagt-part1|drive-research-du-hast-gesagt-part1]] (2026-06-08)
+## From [drive-research-du-hast-gesagt-part1](/entities/drive-research-du-hast-gesagt-part1.md) (2026-06-08)
 - Requires routing prompts through Google's cloud APIs.
 - Tracks user keystrokes.
 - Not suitable for a telemetry-free, local setup.

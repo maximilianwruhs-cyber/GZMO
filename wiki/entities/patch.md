@@ -14,6 +14,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-agentic-token-economy-blueprint-micro01|drive-research-agentic-token-economy-blueprint-micro01]] (2026-06-09)
+## From [drive-research-agentic-token-economy-blueprint-micro01](/entities/drive-research-agentic-token-economy-blueprint-micro01.md) (2026-06-09)
 - A command-line interface tool used to apply changes locally to the file system.
 - Utilized in conjunction with Unified Diffs for economic file manipulation.

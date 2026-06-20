@@ -14,21 +14,21 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-08).
 
 ## Entities
-- [[static-application-security-testing-sast|Static Application Security Testing (SAST)]] (TOOL)
-- [[owasp-top-10|OWASP Top 10]] (CONCEPT)
-- [[few-shot-demonstrations|Few-Shot Demonstrations]] (CONCEPT)
-- [[specific-instructions|Specific Instructions]] (CONCEPT)
-- [[large-language-models-llms|Large Language Models (LLMs)]] (SYSTEM)
-- [[pipeline-pattern|Pipeline Pattern]] (CONCEPT)
-- [[context-anchoring|Context Anchoring]] (CONCEPT)
-- [[output-formatting|Output Formatting]] (CONCEPT)
-- [[skeleton-of-thought|Skeleton-of-Thought]] (CONCEPT)
-- [[stepwise-deductive-processing|Stepwise Deductive Processing]] (CONCEPT)
-- [[clean-architecture|Clean Architecture]] (CONCEPT)
-- [[domain-driven-design|Domain-Driven Design]] (CONCEPT)
-- [[advanced-prompt-engineering-for-comprehensive-codebase-auditing-methodologies-frameworks-and-threat-models|Advanced Prompt Engineering for Comprehensive Codebase Auditing: Methodologies, Frameworks, and Threat Models]] (BOOK)
-- [[separation-of-concerns|Separation of Concerns]] (CONCEPT)
-- [[persona|Persona]] (CONCEPT)
+- [Static Application Security Testing (SAST)](/entities/static-application-security-testing-sast.md) (TOOL)
+- [OWASP Top 10](/entities/owasp-top-10.md) (CONCEPT)
+- [Few-Shot Demonstrations](/entities/few-shot-demonstrations.md) (CONCEPT)
+- [Specific Instructions](/entities/specific-instructions.md) (CONCEPT)
+- [Large Language Models (LLMs)](/entities/large-language-models-llms.md) (SYSTEM)
+- [Pipeline Pattern](/entities/pipeline-pattern.md) (CONCEPT)
+- [Context Anchoring](/entities/context-anchoring.md) (CONCEPT)
+- [Output Formatting](/entities/output-formatting.md) (CONCEPT)
+- [Skeleton-of-Thought](/entities/skeleton-of-thought.md) (CONCEPT)
+- [Stepwise Deductive Processing](/entities/stepwise-deductive-processing.md) (CONCEPT)
+- [Clean Architecture](/entities/clean-architecture.md) (CONCEPT)
+- [Domain-Driven Design](/entities/domain-driven-design.md) (CONCEPT)
+- [Advanced Prompt Engineering for Comprehensive Codebase Auditing: Methodologies, Frameworks, and Threat Models](/entities/advanced-prompt-engineering-for-comprehensive-codebase-auditing-methodologies-frameworks-and-threat-models.md) (BOOK)
+- [Separation of Concerns](/entities/separation-of-concerns.md) (CONCEPT)
+- [Persona](/entities/persona.md) (CONCEPT)
 
 ## Relations
 - Static Application Security Testing (SAST) → RELATED_TO → Advanced Prompt Engineering for Comprehensive Codebase Auditing: Methodologies, Frameworks, and Threat Models

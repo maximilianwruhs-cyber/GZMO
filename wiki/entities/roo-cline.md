@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[allgemeine-informationen|allgemeine-informationen]] (2026-06-08)
+## From [allgemeine-informationen](/entities/allgemeine-informationen.md) (2026-06-08)
 - It acts as an autonomous agent.
 - It breaks down tasks, edits files, and runs terminal commands.
 - It is part of the "Modern AI-Assisted Workflow".

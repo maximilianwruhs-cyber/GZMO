@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[bun-versus-nodejs-architectural-evaluation-for-b|bun-versus-nodejs-architectural-evaluation-for-b]] (2026-06-08)
+## From [bun-versus-nodejs-architectural-evaluation-for-b](/entities/bun-versus-nodejs-architectural-evaluation-for-b.md) (2026-06-08)
 - Powering Apple's Safari browser
 - Fundamentally engineered to minimize startup latency and reduce baseline memory consumption
 - Prioritizes rapid initial interpretation and lightweight, tiered JIT compilation

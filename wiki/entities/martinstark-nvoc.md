@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-ultimate-linux-workstation-tuning-blueprint|drive-research-ultimate-linux-workstation-tuning-blueprint]] (2026-06-08)
+## From [drive-research-ultimate-linux-workstation-tuning-blueprint](/entities/drive-research-ultimate-linux-workstation-tuning-blueprint.md) (2026-06-08)
 - GPU overclocking utility for Blackwell RTX 50-series on Linux
 - Command Line Interface (CLI) utility for NVIDIA GPUs.
 - Designed to bypass complex scripting for Blackwell RTX 50-series.

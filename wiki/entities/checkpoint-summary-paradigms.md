@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-hermes-compression-and-bol-architecture|drive-research-hermes-compression-and-bol-architecture]] (2026-06-08)
+## From [drive-research-hermes-compression-and-bol-architecture](/entities/drive-research-hermes-compression-and-bol-architecture.md) (2026-06-08)
 - Prevailing solution to context degradation in advanced autonomous architectures.
 - Intelligent synthesis of older interactions into a concise, structured checkpoint summary.
 - Serves as memory compression and auditable, cryptographically verifiable logs for sensitive trading agents.

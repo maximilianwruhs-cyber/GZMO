@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: FRAMEWORK
 
-## From [[architectures-for-agentic-memory-virtual-context-micro06|architectures-for-agentic-memory-virtual-context-micro06]] (2026-06-09)
+## From [architectures-for-agentic-memory-virtual-context-micro06](/entities/architectures-for-agentic-memory-virtual-context-micro06.md) (2026-06-09)
 - Prioritizes deterministic identity, bi-temporal event tracking, and relational spreading activation.
 - Separates memory by distinct cognitive functions.
 - Relies on out-of-band, passive extraction pipelines.

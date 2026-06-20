@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[architectural-analysis-of-the-openclaw-ai-plugin-s|architectural-analysis-of-the-openclaw-ai-plugin-s]] (2026-06-08)
+## From [architectural-analysis-of-the-openclaw-ai-plugin-s](/entities/architectural-analysis-of-the-openclaw-ai-plugin-s.md) (2026-06-08)
 - Dynamically aggregates individual plugin schemas into a master Zod validation tree.
 - Strictly validates openclaw.json against the master tree.
 - Refuses to start if validation fails, preventing unpredictable runtime behavior.

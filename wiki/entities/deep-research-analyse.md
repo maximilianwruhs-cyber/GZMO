@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[prompt-agent-engineering-part1|prompt-agent-engineering-part1]] (2026-06-08)
+## From [prompt-agent-engineering-part1](/entities/prompt-agent-engineering-part1.md) (2026-06-08)
 - Phase 1 of Prompt Agent Engineering.
 - Involves deep investigation of a topic.
 - Focuses on facts, best practices, variables, and potential pitfalls.

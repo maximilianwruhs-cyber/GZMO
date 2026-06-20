@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[engineering-ignorance-eliminating-affirmative-bia|engineering-ignorance-eliminating-affirmative-bia]] (2026-06-08)
+## From [engineering-ignorance-eliminating-affirmative-bia](/entities/engineering-ignorance-eliminating-affirmative-bia.md) (2026-06-08)
 - A technique within prompt engineering to combat affirmative bias.
 - Involves providing examples where the correct answer is 'No Information' or 'Contradicted'.
 - Intentionally overweights 'No Information' and 'Contradicted' examples to rebalance the model's probability distribution.

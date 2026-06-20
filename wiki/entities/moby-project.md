@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[resilient-rust-based-mcp-client-and-llm-orchestrat-micro02|resilient-rust-based-mcp-client-and-llm-orchestrat-micro02]] (2026-06-10)
+## From [resilient-rust-based-mcp-client-and-llm-orchestrat-micro02](/entities/resilient-rust-based-mcp-client-and-llm-orchestrat-micro02.md) (2026-06-10)
 - Upstream project that publishes OpenAPI schemas and Protocol Buffers specifications used by Bollard.

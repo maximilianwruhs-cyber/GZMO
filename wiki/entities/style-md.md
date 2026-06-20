@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[cybernetics-and-mythos-the-architecture-of-intell-part1|cybernetics-and-mythos-the-architecture-of-intell-part1]] (2026-06-08)
+## From [cybernetics-and-mythos-the-architecture-of-intell-part1](/entities/cybernetics-and-mythos-the-architecture-of-intell-part1.md) (2026-06-08)
 - A supplementary Markdown file within the Soul Spec architecture.
 - Used for dictating syntax and vocabulary.
 
-## From [[drive-research-redefining-agentic-soulmd-to-dialog-micro02|drive-research-redefining-agentic-soulmd-to-dialog-micro02]] (2026-06-09)
+## From [drive-research-redefining-agentic-soulmd-to-dialog-micro02](/entities/drive-research-redefining-agentic-soulmd-to-dialog-micro02.md) (2026-06-09)
 - A supplementary Markdown file within the Soul Spec architecture.
 - Used for dictating syntax and vocabulary.

@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[openclaw-deep-research-part1-micro06|openclaw-deep-research-part1-micro06]] (2026-06-10)
+## From [openclaw-deep-research-part1-micro06](/entities/openclaw-deep-research-part1-micro06.md) (2026-06-10)
 - A messaging platform that connects to the OpenClaw Channel Layer.

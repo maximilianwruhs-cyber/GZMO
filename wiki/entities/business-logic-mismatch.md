@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-der-aufstieg-und-die-absicht-des-bibliothekars-age|drive-research-der-aufstieg-und-die-absicht-des-bibliothekars-age]] (2026-06-08)
+## From [drive-research-der-aufstieg-und-die-absicht-des-bibliothekars-age](/entities/drive-research-der-aufstieg-und-die-absicht-des-bibliothekars-age.md) (2026-06-08)
 - Ein Problem, unter dem Codierungs- und Abruf-Agenten häufig leiden.
 - Agenten produzieren logisch fehlerhafte Ausgaben, weil sie institutionelle Regeln, Datenbankschemata oder Zugriffsberechtigungen nicht verstehen.

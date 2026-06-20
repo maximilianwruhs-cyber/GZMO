@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-archival-truth-part1-micro05|the-archival-truth-part1-micro05]] (2026-06-09)
+## From [the-archival-truth-part1-micro05](/entities/the-archival-truth-part1-micro05.md) (2026-06-09)
 - The foundational unit of all comedic writing.
 - Relies on the precise relationship between the setup and the punchline, bridged by misdirection.
 - The setup establishes expectations, misdirection subverts them, and the punchline delivers an alternative reality.

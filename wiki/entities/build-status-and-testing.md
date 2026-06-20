@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: METRIC
 
-## From [[drive-research-the-anatomy-of-a-world-class-readme|drive-research-the-anatomy-of-a-world-class-readme]] (2026-06-08)
+## From [drive-research-the-anatomy-of-a-world-class-readme](/entities/drive-research-the-anatomy-of-a-world-class-readme.md) (2026-06-08)
 - Displays workflow states from CI/CD environments (e.g., AppVeyor, Jenkins).

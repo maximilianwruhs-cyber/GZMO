@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[the-definitive-pantheon|the-definitive-pantheon]] (2026-06-08)
+## From [the-definitive-pantheon](/entities/the-definitive-pantheon.md) (2026-06-08)
 - Real Name: Bruce Wayne
 - Debut: Detective Comics #27 (1939)
 - Relies on unmatched intellect, martial arts mastery, and limitless wealth.

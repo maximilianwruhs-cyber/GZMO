@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[architecting-the-minimalist-linux-desktop-a-compa-part1|architecting-the-minimalist-linux-desktop-a-compa-part1]] (2026-06-08)
+## From [architecting-the-minimalist-linux-desktop-a-compa-part1](/entities/architecting-the-minimalist-linux-desktop-a-compa-part1.md) (2026-06-08)
 - A mechanism used to heavily compress a read-only rootfs in Live OS.
 - Typically used for the Lowerdir in OverlayFS.
 - An immutable, read-only SquashFS image is used for the base OS in OverlayFS.

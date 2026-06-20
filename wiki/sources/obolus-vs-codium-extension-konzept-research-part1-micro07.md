@@ -14,20 +14,20 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[gzmo|GZMO]] (CONCEPT)
-- [[state-management-via-getstate-setstate|State Management via getState/setState]] (CONCEPT)
-- [[vscode-webview-ui-toolkit|vscode-webview-ui-toolkit]] (TOOL)
-- [[vscode-extensioncontext|vscode.ExtensionContext]] (SYSTEM)
-- [[sidebar|Sidebar]] (SYSTEM)
-- [[fastapi|FastAPI]] (SYSTEM)
-- [[benchmark-wizard|Benchmark Wizard]] (SYSTEM)
-- [[package-json|package.json]] (TOOL)
-- [[vscode-webviewpanel|vscode.WebviewPanel]] (SYSTEM)
-- [[src-webview-wizard-ts|src/webview/wizard.ts]] (SYSTEM)
-- [[benchmarkwizardpanel|BenchmarkWizardPanel]] (SYSTEM)
-- [[vscode-uri|vscode.Uri]] (SYSTEM)
-- [[obolus|Obolus]] (CONCEPT)
-- [[src-extension-ts|src/extension.ts]] (SYSTEM)
+- [GZMO](/entities/gzmo.md) (CONCEPT)
+- [State Management via getState/setState](/entities/state-management-via-getstate-setstate.md) (CONCEPT)
+- [vscode-webview-ui-toolkit](/entities/vscode-webview-ui-toolkit.md) (TOOL)
+- [vscode.ExtensionContext](/entities/vscode-extensioncontext.md) (SYSTEM)
+- [Sidebar](/entities/sidebar.md) (SYSTEM)
+- [FastAPI](/entities/fastapi.md) (SYSTEM)
+- [Benchmark Wizard](/entities/benchmark-wizard.md) (SYSTEM)
+- [package.json](/entities/package-json.md) (TOOL)
+- [vscode.WebviewPanel](/entities/vscode-webviewpanel.md) (SYSTEM)
+- [src/webview/wizard.ts](/entities/src-webview-wizard-ts.md) (SYSTEM)
+- [BenchmarkWizardPanel](/entities/benchmarkwizardpanel.md) (SYSTEM)
+- [vscode.Uri](/entities/vscode-uri.md) (SYSTEM)
+- [Obolus](/entities/obolus.md) (CONCEPT)
+- [src/extension.ts](/entities/src-extension-ts.md) (SYSTEM)
 
 ## Relations
 - Benchmark Wizard → USES → State Management via getState/setState

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[aether-grid-micro04|aether-grid-micro04]] (2026-06-09)
+## From [aether-grid-micro04](/entities/aether-grid-micro04.md) (2026-06-09)
 - Edge-Tier (Local Inference) hardware.
 - Features 20-Core Arm-CPU, Blackwell-GPU, 128 GB LPDDR5X Unified Memory, 4 TB NVMe-Storage, ConnectX-7 NIC.
 - Has a TDP of 240 W.

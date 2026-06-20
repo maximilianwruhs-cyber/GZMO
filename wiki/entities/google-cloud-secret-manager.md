@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[openclaw-part2|openclaw-part2]] (2026-06-08)
+## From [openclaw-part2](/entities/openclaw-part2.md) (2026-06-08)
 - Provides a centralized, API-accessible cryptographic vault.
 - Features built-in versioning, fine-grained Cloud IAM-based access control, and robust encryption at rest.
 - Secrets can be dynamically fetched via authorized service accounts and injected directly into containers as ephemeral environment variables.

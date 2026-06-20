@@ -14,9 +14,9 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[drive-research-prometheus-and-epimetheus-myth-exploration|drive-research-prometheus-and-epimetheus-myth-exploration]] (CONCEPT)
-- [[google-takeout|Google Takeout]] (TOOL)
-- [[epimetheus|Epimetheus]] (CONCEPT)
+- [drive-research-prometheus-and-epimetheus-myth-exploration](/entities/drive-research-prometheus-and-epimetheus-myth-exploration.md) (CONCEPT)
+- [Google Takeout](/entities/google-takeout.md) (TOOL)
+- [Epimetheus](/entities/epimetheus.md) (CONCEPT)
 
 ## Relations
 - drive-research-prometheus-and-epimetheus-myth-exploration → RELATED_TO → Epimetheus

@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[ai-research-part1|ai-research-part1]] (2026-06-08)
+## From [ai-research-part1](/entities/ai-research-part1.md) (2026-06-08)
 - Authored the technical report on Attention Residuals.
 - Associated with the GitHub repository: https://github.com/MoonshotAI/Attention-Residuals.
 
-## From [[ai-research-part8-micro08|ai-research-part8-micro08]] (2026-06-09)
+## From [ai-research-part8-micro08](/entities/ai-research-part8-micro08.md) (2026-06-09)
 - Authored the 'Attention Residuals' paper.
 - Associated with MoonshotAI/Attention-Residuals.

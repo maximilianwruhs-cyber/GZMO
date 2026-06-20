@@ -14,12 +14,12 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-architecture-of-engagement-an-analysis-of-gam-micro03|the-architecture-of-engagement-an-analysis-of-gam-micro03]] (2026-06-09)
+## From [the-architecture-of-engagement-an-analysis-of-gam-micro03](/entities/the-architecture-of-engagement-an-analysis-of-gam-micro03.md) (2026-06-09)
 - Rewards are delivered after an unpredictable number of responses.
 - Generates the most consistent, rapid response rates and exhibits high resistance to behavioral extinction.
 - Fundamental operational basis of slot machines and infinite scroll features.
 
-## From [[the-architecture-of-engagement-an-analysis-of-gam-micro06|the-architecture-of-engagement-an-analysis-of-gam-micro06]] (2026-06-09)
+## From [the-architecture-of-engagement-an-analysis-of-gam-micro06](/entities/the-architecture-of-engagement-an-analysis-of-gam-micro06.md) (2026-06-09)
 - Derived from the operant conditioning research of B.F. Skinner.
 - Rewards are delivered after an unpredictable number of responses.
 - Fundamental operational basis of slot machines and integrated into digital economy via 'infinite scroll', randomized loot drops, and unpredictable notification systems.

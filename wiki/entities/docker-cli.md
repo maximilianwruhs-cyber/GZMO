@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[ai-research-part8-micro06|ai-research-part8-micro06]] (2026-06-10)
+## From [ai-research-part8-micro06](/entities/ai-research-part8-micro06.md) (2026-06-10)
 - Provides strict containerization standards.

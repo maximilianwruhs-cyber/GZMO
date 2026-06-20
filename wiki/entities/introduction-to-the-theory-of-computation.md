@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[drive-research-the-most-important-books-in-computer-science|drive-research-the-most-important-books-in-computer-science]] (2026-06-08)
+## From [drive-research-the-most-important-books-in-computer-science](/entities/drive-research-the-most-important-books-in-computer-science.md) (2026-06-08)
 - The standard text for learning automata, computability, and complexity theory
 - Very readable

@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[gzmo-soul-merged-new-part2-micro03|gzmo-soul-merged-new-part2-micro03]] (2026-06-10)
+## From [gzmo-soul-merged-new-part2-micro03](/entities/gzmo-soul-merged-new-part2-micro03.md) (2026-06-10)
 - Implemented an AI-powered chatbot to serve its academic community.

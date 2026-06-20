@@ -14,8 +14,8 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[drive-research-linux-gaming-and-ai-build-guide-micro03|drive-research-linux-gaming-and-ai-build-guide-micro03]] (2026-06-09)
+## From [drive-research-linux-gaming-and-ai-build-guide-micro03](/entities/drive-research-linux-gaming-and-ai-build-guide-micro03.md) (2026-06-09)
 - Published Best RAM for AMD Ryzen 9 9950X3D and 9900X3D
 
-## From [[drive-research-linux-gaming-and-ai-build-guide-micro07|drive-research-linux-gaming-and-ai-build-guide-micro07]] (2026-06-09)
+## From [drive-research-linux-gaming-and-ai-build-guide-micro07](/entities/drive-research-linux-gaming-and-ai-build-guide-micro07.md) (2026-06-09)
 - Published guide on best RAM for AMD Ryzen 9 9950X3D and 9900X3D

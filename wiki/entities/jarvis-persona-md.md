@@ -14,12 +14,12 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[aether-grid-micro01|aether-grid-micro01]] (2026-06-09)
+## From [aether-grid-micro01](/entities/aether-grid-micro01.md) (2026-06-09)
 - Extends AETHER-GRID with persona design.
 - Defines an empathic, multimodal, and proactive agent persona.
 - Focuses on autonomy and scalable, anonymized learning.
 
-## From [[aether-grid-micro03|aether-grid-micro03]] (2026-06-09)
+## From [aether-grid-micro03](/entities/aether-grid-micro03.md) (2026-06-09)
 - Associated document for Phase 1.
 - Defines how the AI thinks, decides, and speaks to the user.
 - Defines how the AI speaks to the user.

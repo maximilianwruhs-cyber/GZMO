@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[prompt-agent-engineering-part6-micro07|prompt-agent-engineering-part6-micro07]] (2026-06-10)
+## From [prompt-agent-engineering-part6-micro07](/entities/prompt-agent-engineering-part6-micro07.md) (2026-06-10)
 - A document containing a mission for analysis, debugging, and validation.
 - Contains a six-phase execution protocol.

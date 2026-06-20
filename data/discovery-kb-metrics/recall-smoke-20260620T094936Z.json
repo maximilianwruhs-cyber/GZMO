@@ -1,0 +1,56 @@
+{
+  "generated_at": "2026-06-20T09:49:36Z",
+  "total_queries": 8,
+  "passed": 8,
+  "pass_rate": 1.0,
+  "results": [
+    {
+      "link_id": "R01",
+      "recall_query": "open knowledge format okf wiki",
+      "hit": true,
+      "preview": "Platform recall for 'open knowledge format okf wiki':\n\n## Honeypot / Vault\n\n- [1] (Score: 1.00) [PROTOCOL:Open Knowledge Format (OKF)] A standardized, provider-neutral method for organizing and storin"
+    },
+    {
+      "link_id": "R02",
+      "recall_query": "agentic resource discovery obolus",
+      "hit": true,
+      "preview": "Platform recall for 'agentic resource discovery obolus':\n\n## Honeypot / Vault\n\n- [1] (Score: 0.08) [PROCESS:Agentic Resource Discovery (ARD)] Requires integration with Obolus for economic validation.\n"
+    },
+    {
+      "link_id": "R03",
+      "recall_query": "mcp least privilege tool discovery",
+      "hit": true,
+      "preview": "Platform recall for 'mcp least privilege tool discovery':\n\n## Honeypot / Vault\n\n- [1] (Score: 1.00) [PROTOCOL:MCP (Model Context Protocol)] Requires least-privilege Just-in-Time (JIT) scopes to preven"
+    },
+    {
+      "link_id": "R05",
+      "recall_query": "okf progressive disclosure honeypot",
+      "hit": true,
+      "preview": "Platform recall for 'okf progressive disclosure honeypot':\n\n## Honeypot / Vault\n\n- [1] (Score: 1.00) [TOOL:Honeypot RRF] Supplements OKF progressive disclosure.\n- [2] (Score: 1.00) [POLICY:Sovereign N"
+    },
+    {
+      "link_id": "R04",
+      "recall_query": "agent reach tier 2 network exception sovereign",
+      "hit": true,
+      "preview": "Platform recall for 'agent reach tier 2 network exception sovereign':\n\n## Honeypot / Vault\n\n- [1] (Score: 0.10) [PROTOCOL:Agent-Reach] Subject to a Tier-2 exception under the Sovereign Node Directive."
+    },
+    {
+      "link_id": "R06",
+      "recall_query": "arxiv preprint ecosystem ingestengine",
+      "hit": true,
+      "preview": "Platform recall for 'arxiv preprint ecosystem ingestengine':\n\n## Honeypot / Vault\n\n- [1] (Score: 0.97) [SYSTEM:IngestEngine] Configured with max_tokens: 24576\n- [2] (Score: 0.95) [SYSTEM:IngestEngine]"
+    },
+    {
+      "link_id": "R07",
+      "recall_query": "network exception tier skill arxiv",
+      "hit": true,
+      "preview": "Platform recall for 'network exception tier skill arxiv':\n\n## Honeypot / Vault\n\n- [1] (Score: 0.08) [PROTOCOL:Agent-Reach] Subject to a Tier-2 exception under the Sovereign Node Directive.\n- [2] (Scor"
+    },
+    {
+      "link_id": "R08",
+      "recall_query": "oai pmh librarian agent retrieval",
+      "hit": true,
+      "preview": "Platform recall for 'oai pmh librarian agent retrieval':\n\n## Honeypot / Vault\n\n- [1] (Score: 0.08) [SYSTEM:Librarian Agent] Transforms information search from a reactive retrieval process into an acti"
+    }
+  ]
+}

@@ -16,7 +16,7 @@ gzmo_synthetic: true
 
 Type: MODEL
 
-## From [[architectural-blueprints-for-sovereign-frankenmoe-part1|architectural-blueprints-for-sovereign-frankenmoe-part1]] (2026-06-08)
+## From [architectural-blueprints-for-sovereign-frankenmoe-part1](/entities/architectural-blueprints-for-sovereign-frankenmoe-part1.md) (2026-06-08)
 - A model assembled using LazyMergekit.
 - Integrates four specialized 7B models into a unified 24B parameter architecture.
 - Utilizes a top-2 routing configuration (K = 2).
@@ -29,18 +29,18 @@ Type: MODEL
 - It consolidates four specialized 7B models.
 - It is a unified 24B parameter sparse MoE using a top-2 routing configuration (K=2).
 
-## From [[drive-research-frankenmoe-blueprint-analysis|drive-research-frankenmoe-blueprint-analysis]] (2026-06-08)
+## From [drive-research-frankenmoe-blueprint-analysis](/entities/drive-research-frankenmoe-blueprint-analysis.md) (2026-06-08)
 - A community-compiled model used as a benchmark.
 - Consolidates four specialized 7B models into a unified 24B parameter sparse MoE.
 - Uses a top-2 routing configuration (K=2).
 - A community-compiled model.
 
-## From [[drive-research-hidden-mode-technical-analysis-and-configurati|drive-research-hidden-mode-technical-analysis-and-configurati]] (2026-06-08)
+## From [drive-research-hidden-mode-technical-analysis-and-configurati](/entities/drive-research-hidden-mode-technical-analysis-and-configurati.md) (2026-06-08)
 - A case study for the performance of upcycled Mixtures of Experts.
 - Integrates four specialized 7B models into a unified 24B parameter architecture.
 - Assembled using LazyMergekit.
 
-## From [[drive-research-hidden-mode-technical-analysis-and-configuration|drive-research-hidden-mode-technical-analysis-and-configuration]] (2026-06-08)
+## From [drive-research-hidden-mode-technical-analysis-and-configuration](/entities/drive-research-hidden-mode-technical-analysis-and-configuration.md) (2026-06-08)
 - A case study for the performance of upcycled Mixtures of Experts.
 - Integrates four specialized 7B models into a unified 24B parameter architecture.
 - Utilizes a top-2 routing configuration (K = 2).

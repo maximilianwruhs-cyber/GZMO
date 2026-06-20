@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-32gb-vram-ai-reasoning-models-micro03|drive-research-32gb-vram-ai-reasoning-models-micro03]] (2026-06-09)
+## From [drive-research-32gb-vram-ai-reasoning-models-micro03](/entities/drive-research-32gb-vram-ai-reasoning-models-micro03.md) (2026-06-09)
 - Includes GPTQ, AWQ, GGUF.
 - Strictly mandates a 4-bit quantization regime for specific model deployments.
 - Quantizing the KV cache to INT8 or INT4 is an absolute structural necessity for pushing context lengths toward the 128K or 256K frontier.

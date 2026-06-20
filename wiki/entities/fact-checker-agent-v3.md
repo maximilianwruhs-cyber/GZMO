@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro07|the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro07]] (2026-06-09)
+## From [the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro07](/entities/the-openclaw-architecture-and-tri-circuit-autonomo-part1-micro07.md) (2026-06-09)
 - Transforms LLM from narrative AI to a deterministic verification system.
 - Operates as an autonomous sentinel within the OpenClaw-Framework.
 - Mandates complete elimination of opinions, emotions, or ideological framing.

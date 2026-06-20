@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-subword-tokenization-mitigates-llm-sparsity-micro01|drive-research-subword-tokenization-mitigates-llm-sparsity-micro01]] (2026-06-09)
+## From [drive-research-subword-tokenization-mitigates-llm-sparsity-micro01](/entities/drive-research-subword-tokenization-mitigates-llm-sparsity-micro01.md) (2026-06-09)
 - Models the growth of vocabulary as a corpus increases in size.
 - Formulated as V = K * N^beta.

@@ -14,17 +14,17 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[clade-level-metaproductivity-cmp|Clade-level metaproductivity (CMP)]] (CONCEPT)
-- [[huxley-s-concept-of-clade|Huxley's concept of clade]] (CONCEPT)
-- [[swe-bench-lite|SWE-bench Lite]] (TOOL)
-- [[gpt-5-mini|GPT-5-mini]] (SYSTEM)
-- [[self-improving-coding-agent-sica|Self-Improving Coding Agent (SICA)]] (SYSTEM)
-- [[polyglot|Polyglot]] (TOOL)
-- [[king-abdullah-university-of-science-and-technology-kaust|King Abdullah University of Science and Technology (KAUST)]] (ORGANIZATION)
-- [[huxley-g-del-machine|HUXLEY-GÖDEL MACHINE]] (SYSTEM)
-- [[swe-bench-verified|SWE-bench Verified]] (TOOL)
-- [[darwin-g-del-machine-dgm|Darwin Gödel Machine (DGM)]] (SYSTEM)
-- [[swe-agent|SWE-agent]] (SYSTEM)
+- [Clade-level metaproductivity (CMP)](/entities/clade-level-metaproductivity-cmp.md) (CONCEPT)
+- [Huxley's concept of clade](/entities/huxley-s-concept-of-clade.md) (CONCEPT)
+- [SWE-bench Lite](/entities/swe-bench-lite.md) (TOOL)
+- [GPT-5-mini](/entities/gpt-5-mini.md) (SYSTEM)
+- [Self-Improving Coding Agent (SICA)](/entities/self-improving-coding-agent-sica.md) (SYSTEM)
+- [Polyglot](/entities/polyglot.md) (TOOL)
+- [King Abdullah University of Science and Technology (KAUST)](/entities/king-abdullah-university-of-science-and-technology-kaust.md) (ORGANIZATION)
+- [HUXLEY-GÖDEL MACHINE](/entities/huxley-g-del-machine.md) (SYSTEM)
+- [SWE-bench Verified](/entities/swe-bench-verified.md) (TOOL)
+- [Darwin Gödel Machine (DGM)](/entities/darwin-g-del-machine-dgm.md) (SYSTEM)
+- [SWE-agent](/entities/swe-agent.md) (SYSTEM)
 
 ## Relations
 - HUXLEY-GÖDEL MACHINE → RELATED_TO → Huxley's concept of clade

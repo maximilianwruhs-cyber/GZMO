@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[architecting-the-minimalist-linux-desktop-a-compa-part2|architecting-the-minimalist-linux-desktop-a-compa-part2]] (2026-06-08)
+## From [architecting-the-minimalist-linux-desktop-a-compa-part2](/entities/architecting-the-minimalist-linux-desktop-a-compa-part2.md) (2026-06-08)
 - Actively rejects UEFI boot with an MBR-partitioned disk during installation.
 - Tightly and artificially conflates UEFI boot with the presence of a GPT disk.
 - Windows 11 mandates strict adherence to UEFI and Secure Boot protocols.

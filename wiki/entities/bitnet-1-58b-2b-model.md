@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-ran-command-bash-c-cd-home-maximilian-wruhs-d|drive-research-ran-command-bash--c-cd-home-maximilian-wruhs-d]] (2026-06-08)
+## From [drive-research-ran-command-bash--c-cd-home-maximilian-wruhs-d](/entities/drive-research-ran-command-bash-c-cd-home-maximilian-wruhs-d.md) (2026-06-08)
 - Proved fully compatible with AOS benchmarking framework
 - Successfully navigated the full test suite
 - CPU-Only benchmark results logged

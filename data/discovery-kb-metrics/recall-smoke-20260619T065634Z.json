@@ -1,0 +1,38 @@
+{
+  "generated_at": "2026-06-19T06:56:34Z",
+  "total_queries": 5,
+  "passed": 5,
+  "pass_rate": 1.0,
+  "results": [
+    {
+      "link_id": "L01",
+      "recall_query": "events.jsonl",
+      "hit": true,
+      "preview": "Platform recall for 'events.jsonl':\n\n## Honeypot / Vault\n\n- [1] (Score: 0.10) [SYSTEMS:events.jsonl] An append-only telemetry log used for observability (synapse).\n- [2] (Score: 0.10) [SYSTEMS:events."
+    },
+    {
+      "link_id": "L02",
+      "recall_query": "`rho_effective`",
+      "hit": true,
+      "preview": "Platform recall for '`rho_effective`':\n\n## Honeypot / Vault\n\n- [1] (Score: 0.05) [SYSTEM:Lorenz-Attractor] Rho_effektiv is 28.0 (near standard Lorenz rho of 26.0, slightly increased), placing it in th"
+    },
+    {
+      "link_id": "L3",
+      "recall_query": "`agentic teacher stack`",
+      "hit": true,
+      "preview": "Platform recall for '`agentic teacher stack`':\n\n## Honeypot / Vault\n\n- [1] (Score: 0.10) [SYSTEMS:Agentic Teacher Stack] Drives the 'chaos pedagogy honeypot discovery' learning topic.\n- [2] (Score: 0."
+    },
+    {
+      "link_id": "L01",
+      "recall_query": "`$home`",
+      "hit": true,
+      "preview": "Platform recall for '`$home`':\n\n## Honeypot / Vault\n\n- [1] (Score: 0.33) [CONCEPT:agent-linguo] Efficient Agent Communication Protocol Language.\n- [2] (Score: 0.31) [PERSON:maximilian-wruhs] The user'"
+    },
+    {
+      "link_id": "L02",
+      "recall_query": "dynamic skill registry",
+      "hit": true,
+      "preview": "Platform recall for 'dynamic skill registry':\n\n## Honeypot / Vault\n\n- [1] (Score: 1.00) [PROJECT:awesome-openclaw-skills] It is a curated registry for skills.\n- [2] (Score: 1.00) [SYSTEM:openclaw/claw"
+    }
+  ]
+}

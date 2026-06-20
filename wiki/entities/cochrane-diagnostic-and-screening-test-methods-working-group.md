@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-architecture-of-scientific-inquiry-and-academi|the-architecture-of-scientific-inquiry-and-academi]] (2026-06-08)
+## From [the-architecture-of-scientific-inquiry-and-academi](/entities/the-architecture-of-scientific-inquiry-and-academi.md) (2026-06-08)
 - Must exhibit exhaustive detail.
 - Answers: Who, when, where, and how was the study executed?
 - Documents materials utilized, inclusion/exclusion criteria, and analytical/statistical techniques.
@@ -23,7 +23,7 @@ Type: CONCEPT
 - Focuses on methods for diagnostic test evaluations.
 - Contributes to improving reporting standards in medical research.
 
-## From [[drive-research-die-architektur-der-wissenschaftlichen-forschung|drive-research-die-architektur-der-wissenschaftlichen-forschung]] (2026-06-08)
+## From [drive-research-die-architektur-der-wissenschaftlichen-forschung](/entities/drive-research-die-architektur-der-wissenschaftlichen-forschung.md) (2026-06-08)
 - Has a Diagnostic and Screening Test Methods Working Group.
 - Focuses on evidence synthesis.
 - Promotes evidence-based healthcare.

@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-analyze-the-pdf-to-create-a-step-by-step-guide-of|drive-research-analyze-the-pdf-to-create-a-step-by-step-guide-of]] (2026-06-08)
+## From [drive-research-analyze-the-pdf-to-create-a-step-by-step-guide-of](/entities/drive-research-analyze-the-pdf-to-create-a-step-by-step-guide-of.md) (2026-06-08)
 - Manages network connections.
 - Idle power-saving features are disabled via a dispatcher script.

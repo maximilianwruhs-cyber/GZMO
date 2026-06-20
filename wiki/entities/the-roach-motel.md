@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-architecture-of-engagement-an-analysis-of-gam-micro08|the-architecture-of-engagement-an-analysis-of-gam-micro08]] (2026-06-09)
+## From [the-architecture-of-engagement-an-analysis-of-gam-micro08](/entities/the-architecture-of-engagement-an-analysis-of-gam-micro08.md) (2026-06-09)
 - Frictionless to enter a gamified subscription; intentionally labyrinthine to exit.
 - Exploits the brain's aversion to cognitive load to force financial continuity.

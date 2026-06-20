@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-bun-typescript-performance-tips-micro01|drive-research-bun-typescript-performance-tips-micro01]] (2026-06-09)
+## From [drive-research-bun-typescript-performance-tips-micro01](/entities/drive-research-bun-typescript-performance-tips-micro01.md) (2026-06-09)
 - Bun is mentioned in the context of performance tips.
 - This is a research project.
 - It focuses on Bun and TypeScript performance tips.

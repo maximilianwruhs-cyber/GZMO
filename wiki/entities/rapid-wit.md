@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-archival-truth-part1-micro07|the-archival-truth-part1-micro07]] (2026-06-09)
+## From [the-archival-truth-part1-micro07](/entities/the-archival-truth-part1-micro07.md) (2026-06-09)
 - Requires a fundamental shift in how one interacts with the world.
 - Is developed by embracing absurdity, cultivating a playful mindset, engaging in banter, and looking for linguistic coincidences.

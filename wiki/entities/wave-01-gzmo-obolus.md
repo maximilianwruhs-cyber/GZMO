@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[gzmo-soul-merged-new-part2-micro01|gzmo-soul-merged-new-part2-micro01]] (2026-06-09)
+## From [gzmo-soul-merged-new-part2-micro01](/entities/gzmo-soul-merged-new-part2-micro01.md) (2026-06-09)
 - split archive (wave_01_gzmo_obolus)

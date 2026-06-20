@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[openclaw-deep-research-part9-micro06|openclaw-deep-research-part9-micro06]] (2026-06-09)
+## From [openclaw-deep-research-part9-micro06](/entities/openclaw-deep-research-part9-micro06.md) (2026-06-09)
 - Part of a micro-split from openclaw-deep-research-part9.md
 - Related to cloud KG extraction
 - Source for micro-split

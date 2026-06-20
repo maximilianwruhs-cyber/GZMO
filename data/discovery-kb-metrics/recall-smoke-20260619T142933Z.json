@@ -1,0 +1,38 @@
+{
+  "generated_at": "2026-06-19T14:29:33Z",
+  "total_queries": 5,
+  "passed": 5,
+  "pass_rate": 1.0,
+  "results": [
+    {
+      "link_id": "L10",
+      "recall_query": "pedagogical stagnation",
+      "hit": true,
+      "preview": "Platform recall for 'pedagogical stagnation':\n\n## Honeypot / Vault\n\n- [1] (Score: 0.84) [CONCEPT:Human-in-the-Loop] Considered pedagogically insufficient and conceptually flawed.\n- [2] (Score: 0.47) ["
+    },
+    {
+      "link_id": "L1",
+      "recall_query": "socratic watcher",
+      "hit": true,
+      "preview": "Platform recall for 'socratic watcher':\n\n## Honeypot / Vault\n\n- [1] (Score: 0.61) [TOOL:Socratic philosophy] Treats AI agents like students for knowledge distillation.\n- [2] (Score: 0.59) [EXECUTION_M"
+    },
+    {
+      "link_id": "L2",
+      "recall_query": "engines",
+      "hit": true,
+      "preview": "Platform recall for 'engines':\n\n## Honeypot / Vault\n\n- [1] (Score: 0.05) [SYSTEM:GZMO Engine] An engine that supports several skills like /word, /dice, and /poem.\n- [2] (Score: 0.04) [LANGUAGE:Rust-En"
+    },
+    {
+      "link_id": "L3",
+      "recall_query": "honeypot",
+      "hit": true,
+      "preview": "Platform recall for 'honeypot':\n\n## Honeypot / Vault\n\n- [1] (Score: 0.09) [SYSTEMS:Qdrant] Collection: 'honeypot'.\n- [2] (Score: 0.07) [SYSTEM:qdrant] Status: OK (honeypot)\n- [3] (Score: 0.06) [TOOL:e"
+    },
+    {
+      "link_id": "L4",
+      "recall_query": "kg/vault",
+      "hit": true,
+      "preview": "Platform recall for 'kg/vault':\n\n## Honeypot / Vault\n\n- [1] (Score: 0.65) [TOOL:PKI-Engine] used by Vault\n- [2] (Score: 0.14) [PATH:vault_db] data/vault.db (SQLite schema v7, WAL) is the source of tru"
+    }
+  ]
+}

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[dynamics-of-the-unpredictable-micro06|dynamics-of-the-unpredictable-micro06]] (2026-06-09)
+## From [dynamics-of-the-unpredictable-micro06](/entities/dynamics-of-the-unpredictable-micro06.md) (2026-06-09)
 - A heavily generic, heavily abstracted n-dimensional mathematical framework.
 - Powerful for rigorous scientific simulations and generalized linear algebra.
 - Can occasionally impede compiler optimizations and result in slower compilation times compared to glam.

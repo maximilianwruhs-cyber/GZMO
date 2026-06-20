@@ -16,17 +16,17 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-du-hast-gesagt-part1|drive-research-du-hast-gesagt-part1]] (2026-06-08)
+## From [drive-research-du-hast-gesagt-part1](/entities/drive-research-du-hast-gesagt-part1.md) (2026-06-08)
 - An open-source fork of VS Code.
 - Privacy-first IDE.
 - Curates open-source AI tools.
 
-## From [[building-a-private-local-ai-development-environmen-micro04|building-a-private-local-ai-development-environmen-micro04]] (2026-06-09)
+## From [building-a-private-local-ai-development-environmen-micro04](/entities/building-a-private-local-ai-development-environmen-micro04.md) (2026-06-09)
 - An open-source fork of VS Code.
 - Curates open-source AI tools into a cohesive editor.
 - Beginner-friendly.
 
-## From [[ultimate-local-ai-development-stack-for-vscodium-micro01|ultimate-local-ai-development-stack-for-vscodium-micro01]] (2026-06-09)
+## From [ultimate-local-ai-development-stack-for-vscodium-micro01](/entities/ultimate-local-ai-development-stack-for-vscodium-micro01.md) (2026-06-09)
 - An open-source fork of VS Code.
 - Curates open-source AI tools into a cohesive editor.
 - Offers a fluid 'AI-native' UI.

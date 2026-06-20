@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[optimizing-nvidia-blackwell-sm120-part2-micro02|optimizing-nvidia-blackwell-sm120-part2-micro02]] (2026-06-10)
+## From [optimizing-nvidia-blackwell-sm120-part2-micro02](/entities/optimizing-nvidia-blackwell-sm120-part2-micro02.md) (2026-06-10)
 - OCP-compliant microscaling formats.
 - Supports mx_float8_t, mx_float_t, and mx_float4_t data types.

@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[high-performance-typescript-execution-and-architec-part2|high-performance-typescript-execution-and-architec-part2]] (2026-06-08)
+## From [high-performance-typescript-execution-and-architec-part2](/entities/high-performance-typescript-execution-and-architec-part2.md) (2026-06-08)
 - It is designed explicitly for complex, long-running agent workflows.
 - It provides an extensive ecosystem of pre-built document loaders, semantic text splitters, and vector store adapters.
 - Its checkpointing and stateful capabilities are unparalleled in the TypeScript ecosystem.
@@ -22,7 +22,7 @@ Type: TOOL
 - Indispensable architectural standard for autonomous, error-resilient agents.
 - Used for overhauling thousands of lines of code without human intervention.
 
-## From [[drive-research-agentic-typescript-monorepo-context-management|drive-research-agentic-typescript-monorepo-context-management]] (2026-06-08)
+## From [drive-research-agentic-typescript-monorepo-context-management](/entities/drive-research-agentic-typescript-monorepo-context-management.md) (2026-06-08)
 - A declarative, state-machine orchestration framework for AI agent workflows.
 - Provides an extensive ecosystem of pre-built document loaders, text splitters, and vector store adapters.
 - Used by approximately four hundred major companies.

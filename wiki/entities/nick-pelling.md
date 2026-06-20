@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[the-architecture-of-engagement-an-analysis-of-gam-micro07|the-architecture-of-engagement-an-analysis-of-gam-micro07]] (2026-06-09)
+## From [the-architecture-of-engagement-an-analysis-of-gam-micro07](/entities/the-architecture-of-engagement-an-analysis-of-gam-micro07.md) (2026-06-09)
 - Coined the term 'gamification' in 2002.
 - Originally envisioned gamification as a methodology to apply accelerated, game-like interface design to commercial electronic devices.
 - Noted that his vision was approximately ten years too early for widespread adoption.

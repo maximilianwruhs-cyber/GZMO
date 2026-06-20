@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: PROCESS
 
-## From [[ai-research-part6-micro05|ai-research-part6-micro05]] (2026-06-09)
+## From [ai-research-part6-micro05](/entities/ai-research-part6-micro05.md) (2026-06-09)
 - A feature visualized by Claw-Empire.
 - Part of making multi-agent collaborations transparent.

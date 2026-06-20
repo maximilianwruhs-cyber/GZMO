@@ -15,9 +15,9 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part8-micro02|ai-research-part8-micro02]] (2026-06-09)
+## From [ai-research-part8-micro02](/entities/ai-research-part8-micro02.md) (2026-06-09)
 - Addresses instability profiles associated with advanced representational routing.
 
-## From [[ai-research-part8-micro04|ai-research-part8-micro04]] (2026-06-09)
+## From [ai-research-part8-micro04](/entities/ai-research-part8-micro04.md) (2026-06-09)
 - Introduces topological constraints.
 - Guarantees that widened residual streams do not succumb to optimization collapse.

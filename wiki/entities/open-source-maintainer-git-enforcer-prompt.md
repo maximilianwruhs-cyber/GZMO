@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[prompt-agent-engineering-part2-micro02|prompt-agent-engineering-part2-micro02]] (2026-06-09)
+## From [prompt-agent-engineering-part2-micro02](/entities/prompt-agent-engineering-part2-micro02.md) (2026-06-09)
 - Manages GitHub presence and documentation.
 - Enforces standard commit conventions and writes developer-to-developer documentation.
 - Version control system managed by the Open Source Maintainer & Git Enforcer Prompt.

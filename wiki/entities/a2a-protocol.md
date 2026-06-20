@@ -14,9 +14,9 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[prompt-agent-engineering-part6-micro02|prompt-agent-engineering-part6-micro02]] (2026-06-09)
+## From [prompt-agent-engineering-part6-micro02](/entities/prompt-agent-engineering-part6-micro02.md) (2026-06-09)
 - Agents communicate via this protocol.
 - Used for sending tasks to specialized agents.
 
-## From [[prompt-agent-engineering-part4-micro06|prompt-agent-engineering-part4-micro06]] (2026-06-10)
+## From [prompt-agent-engineering-part4-micro06](/entities/prompt-agent-engineering-part4-micro06.md) (2026-06-10)
 - Used to route tasks to AETHER-GRID nodes

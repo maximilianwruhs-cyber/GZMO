@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-deep-dive-google-antigravity-architecture1|drive-research-deep-dive-google-antigravity-architecture1]] (2026-06-08)
+## From [drive-research-deep-dive-google-antigravity-architecture1](/entities/drive-research-deep-dive-google-antigravity-architecture1.md) (2026-06-08)
 - Widely referred to as the Agent Manager.
 - The absolute nerve center of the Google Antigravity ecosystem.
 - The Manager View abstracts the software development lifecycle into a high-level, declarative command interface.

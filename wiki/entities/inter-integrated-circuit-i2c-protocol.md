@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-automating-linux-hardware-detection-micro03|drive-research-automating-linux-hardware-detection-micro03]] (2026-06-09)
+## From [drive-research-automating-linux-hardware-detection-micro03](/entities/drive-research-automating-linux-hardware-detection-micro03.md) (2026-06-09)
 - A ubiquitous, asynchronous two-wire serial communication standard.
 - Heavily utilized for interfacing with onboard sensors, EEPROMs, and microcontrollers.
 - Userspace drivers can expose the entire I2C bus.

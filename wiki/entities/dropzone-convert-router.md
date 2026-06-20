@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-pdf-text-vs-scan-detection-heuristics-micro02|drive-research-pdf-text-vs-scan-detection-heuristics-micro02]] (2026-06-09)
+## From [drive-research-pdf-text-vs-scan-detection-heuristics-micro02](/entities/drive-research-pdf-text-vs-scan-detection-heuristics-micro02.md) (2026-06-09)
 - Ingestion system must evaluate multiple independent geometric and logical signals.
 - Requires a robust and highly performant design.

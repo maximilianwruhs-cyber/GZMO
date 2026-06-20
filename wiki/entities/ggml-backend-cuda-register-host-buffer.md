@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-cuda-memory-locking-limits-configuration|drive-research-cuda-memory-locking-limits-configuration]] (2026-06-08)
+## From [drive-research-cuda-memory-locking-limits-configuration](/entities/drive-research-cuda-memory-locking-limits-configuration.md) (2026-06-08)
 - Used for optimizing execution of large language models (LLMs) on local Linux workstations.
 - In llama.cpp and GGML backends, memory registration behaves as a highly configurable pipeline.
 - When llama.cpp loads a model, host memory registration is controlled by the environment variable GGML_CUDA_REGISTER_HOST and command-line execution flags such as --mlock and --no-mmap.

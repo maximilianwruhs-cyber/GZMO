@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-building-pi-coding-agent-extensions|drive-research-building-pi-coding-agent-extensions]] (2026-06-08)
+## From [drive-research-building-pi-coding-agent-extensions](/entities/drive-research-building-pi-coding-agent-extensions.md) (2026-06-08)
 - Fires immediately before the runtime tears down the current extension instance or transitions away from the actively loaded session.
 - Strictly designated for garbage collection and graceful termination.
 - The Pi coding agent is designed to run persistently as a long-lived process in the terminal—handling multiple conversational turns, branching session trees, and dynamic context reloads.

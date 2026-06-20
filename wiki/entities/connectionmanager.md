@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[obolus-vs-codium-extension-konzept-research-part1-micro04|obolus-vs-codium-extension-konzept-research-part1-micro04]] (2026-06-09)
+## From [obolus-vs-codium-extension-konzept-research-part1-micro04](/entities/obolus-vs-codium-extension-konzept-research-part1-micro04.md) (2026-06-09)
 - A class to manage active WebSocket connections.
 - Handles connecting, disconnecting, sending messages, and broadcasting.

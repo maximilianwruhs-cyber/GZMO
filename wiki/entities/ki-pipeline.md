@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[aether-grid-micro02|aether-grid-micro02]] (2026-06-09)
+## From [aether-grid-micro02](/entities/aether-grid-micro02.md) (2026-06-09)
 - Input: DeepStream (Person <1 m) + Riva ASR.
 - Spark: TensorRT-LLM Instinct-Threshold -> Level 0/1 local.
 - Core-Sync: Anonymized Intent Vector -> Qdrant Namespace -> Triton-Response.

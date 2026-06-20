@@ -14,18 +14,18 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[mintlify|Mintlify]] (ORGANIZATION)
-- [[openclaw-deep-research-part1|openclaw-deep-research-part1]] (PROJECT)
-- [[json-merge-patch|JSON merge patch]] (CONCEPT)
-- [[config-apply|config.apply]] (TOOL)
-- [[environment-variables|Environment variables]] (CONCEPT)
-- [[cloud-kg-extraction|cloud KG extraction]] (CONCEPT)
-- [[openclaw-gateway|openclaw gateway]] (TOOL)
-- [[config-patch|config.patch]] (TOOL)
-- [[secrets-management|Secrets Management]] (CONCEPT)
-- [[secretref-credential-surface|SecretRef Credential Surface]] (CONCEPT)
-- [[config-get|config.get]] (TOOL)
-- [[configuration-reference|Configuration Reference]] (BOOK)
+- [Mintlify](/entities/mintlify.md) (ORGANIZATION)
+- [openclaw-deep-research-part1](/entities/openclaw-deep-research-part1.md) (PROJECT)
+- [JSON merge patch](/entities/json-merge-patch.md) (CONCEPT)
+- [config.apply](/entities/config-apply.md) (TOOL)
+- [Environment variables](/entities/environment-variables.md) (CONCEPT)
+- [cloud KG extraction](/entities/cloud-kg-extraction.md) (CONCEPT)
+- [openclaw gateway](/entities/openclaw-gateway.md) (TOOL)
+- [config.patch](/entities/config-patch.md) (TOOL)
+- [Secrets Management](/entities/secrets-management.md) (CONCEPT)
+- [SecretRef Credential Surface](/entities/secretref-credential-surface.md) (CONCEPT)
+- [config.get](/entities/config-get.md) (TOOL)
+- [Configuration Reference](/entities/configuration-reference.md) (BOOK)
 
 ## Relations
 - openclaw-deep-research-part1 → USES → cloud KG extraction

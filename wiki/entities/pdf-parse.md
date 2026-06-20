@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-bun-file-parsing-dependency-shortlist-micro01|drive-research-bun-file-parsing-dependency-shortlist-micro01]] (2026-06-09)
+## From [drive-research-bun-file-parsing-dependency-shortlist-micro01](/entities/drive-research-bun-file-parsing-dependency-shortlist-micro01.md) (2026-06-09)
 - preeminent and most widely adopted choice for pure JavaScript PDF text extraction
 - server-side, DOM-less wrapper around Mozilla’s pdf.js library
 - unpacked bundle size is approximately 21.3 MB to 29.3 MB

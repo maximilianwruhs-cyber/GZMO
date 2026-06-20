@@ -14,21 +14,21 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[agenticsystem|AgenticSystem]] (SYSTEM)
-- [[openai-model|OPENAI_MODEL]] (SYSTEM)
-- [[ai-research-part3|ai-research-part3]] (PROJECT)
-- [[diff-versus-commit|diff_versus_commit]] (TOOL)
-- [[diagnose-errors|diagnose_errors]] (TOOL)
-- [[syntax-error-fix|syntax_error_fix]] (CONCEPT)
-- [[missing-import|missing_import]] (CONCEPT)
-- [[attempt-error-resolution|attempt_error_resolution]] (TOOL)
-- [[claude-model|CLAUDE_MODEL]] (SYSTEM)
-- [[python-module-not-found|python_module_not_found]] (CONCEPT)
-- [[apply-automated-fix|apply_automated_fix]] (TOOL)
-- [[format-diagnosis|format_diagnosis]] (TOOL)
-- [[safe-log|safe_log]] (TOOL)
-- [[python-syntax-error|python_syntax_error]] (CONCEPT)
-- [[argparse|argparse]] (TOOL)
+- [AgenticSystem](/entities/agenticsystem.md) (SYSTEM)
+- [OPENAI_MODEL](/entities/openai-model.md) (SYSTEM)
+- [ai-research-part3](/entities/ai-research-part3.md) (PROJECT)
+- [diff_versus_commit](/entities/diff-versus-commit.md) (TOOL)
+- [diagnose_errors](/entities/diagnose-errors.md) (TOOL)
+- [syntax_error_fix](/entities/syntax-error-fix.md) (CONCEPT)
+- [missing_import](/entities/missing-import.md) (CONCEPT)
+- [attempt_error_resolution](/entities/attempt-error-resolution.md) (TOOL)
+- [CLAUDE_MODEL](/entities/claude-model.md) (SYSTEM)
+- [python_module_not_found](/entities/python-module-not-found.md) (CONCEPT)
+- [apply_automated_fix](/entities/apply-automated-fix.md) (TOOL)
+- [format_diagnosis](/entities/format-diagnosis.md) (TOOL)
+- [safe_log](/entities/safe-log.md) (TOOL)
+- [python_syntax_error](/entities/python-syntax-error.md) (CONCEPT)
+- [argparse](/entities/argparse.md) (TOOL)
 
 ## Relations
 - attempt_error_resolution → USES → safe_log

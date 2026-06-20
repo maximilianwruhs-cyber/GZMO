@@ -15,14 +15,14 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[cybernetics-and-mythos-the-architecture-of-intell-part1|cybernetics-and-mythos-the-architecture-of-intell-part1]] (2026-06-08)
+## From [cybernetics-and-mythos-the-architecture-of-intell-part1](/entities/cybernetics-and-mythos-the-architecture-of-intell-part1.md) (2026-06-08)
 - An early cybernetician.
 - Established the "Law of Requisite Variety".
 - His law dictates that a system must possess sufficient variety to absorb environmental disturbances.
 
-## From [[drive-research-cybernetics-information-loops-between-entities-micro02|drive-research-cybernetics-information-loops-between-entities-micro02]] (2026-06-09)
+## From [drive-research-cybernetics-information-loops-between-entities-micro02](/entities/drive-research-cybernetics-information-loops-between-entities-micro02.md) (2026-06-09)
 - Pioneer of cybernetics.
 - Sought to establish a framework applicable to various systems.
 
-## From [[drive-research-cybernetics-information-loops-between-entities-micro03|drive-research-cybernetics-information-loops-between-entities-micro03]] (2026-06-09)
+## From [drive-research-cybernetics-information-loops-between-entities-micro03](/entities/drive-research-cybernetics-information-loops-between-entities-micro03.md) (2026-06-09)
 - Authored the 'Law of Requisite Variety'.

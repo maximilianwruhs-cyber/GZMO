@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[prompt-agent-engineering-part4-micro05|prompt-agent-engineering-part4-micro05]] (2026-06-10)
+## From [prompt-agent-engineering-part4-micro05](/entities/prompt-agent-engineering-part4-micro05.md) (2026-06-10)
 - An asynchronous Directed Acyclic Graph executor
 - Manages task dependencies and concurrent execution

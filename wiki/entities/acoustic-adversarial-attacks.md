@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[aether-grid-micro03|aether-grid-micro03]] (2026-06-09)
+## From [aether-grid-micro03](/entities/aether-grid-micro03.md) (2026-06-09)
 - Silent Commands using ultrasound attacks (>20 kHz).
 - Imperceptible to human ears but captured by DGX Spark microphone arrays.
 - AI converts noise into legitimate system prompts.

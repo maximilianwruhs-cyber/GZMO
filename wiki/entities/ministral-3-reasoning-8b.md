@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[ai-research-part4|ai-research-part4]] (2026-06-08)
+## From [ai-research-part4](/entities/ai-research-part4.md) (2026-06-08)
 - An 8B-parameter model.
 - Used as a baseline for comparison with MiniCPM-SALA.
 - Mentioned in standard and long-context evaluation tables.

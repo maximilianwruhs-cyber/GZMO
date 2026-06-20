@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[prompt-agent-engineering-part7-micro10|prompt-agent-engineering-part7-micro10]] (2026-06-09)
+## From [prompt-agent-engineering-part7-micro10](/entities/prompt-agent-engineering-part7-micro10.md) (2026-06-09)
 - A process for an agent to decrypt, process, sort, and implement documents.
 - Involves a 4-phase process: Decrypt, Process, Sort, Implement.

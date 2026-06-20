@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[drive-research-agentic-reverse-engineering-state-and-future1-micro01|drive-research-agentic-reverse-engineering-state-and-future1-micro01]] (2026-06-09)
+## From [drive-research-agentic-reverse-engineering-state-and-future1-micro01](/entities/drive-research-agentic-reverse-engineering-state-and-future1-micro01.md) (2026-06-09)
 - A specialized MCP server for Ghidra.
 - Focuses on a tool-driven philosophy with granular, focused tools.
 - Manages 'context rot' by restricting data flow.

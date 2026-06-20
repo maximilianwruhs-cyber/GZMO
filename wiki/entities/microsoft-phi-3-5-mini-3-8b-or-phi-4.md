@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-small-models|drive-research-small-models]] (2026-06-08)
+## From [drive-research-small-models](/entities/drive-research-small-models.md) (2026-06-08)
 - Built to punch above its weight class in logic and reasoning.
 - Trained heavily on high-quality "textbook" data.
 - Reliable for strictly following system prompts like "Rewrite this user query into search keywords."

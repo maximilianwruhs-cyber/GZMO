@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-neuro-symbolic-prompt-engineering-research|drive-research-neuro-symbolic-prompt-engineering-research]] (2026-06-08)
+## From [drive-research-neuro-symbolic-prompt-engineering-research](/entities/drive-research-neuro-symbolic-prompt-engineering-research.md) (2026-06-08)
 - A risk mitigated by the CORTEX.md protocol.
 - Gradual deviation of the reasoning trajectory from policy-aligned behavior.
 - Triggered by Cognitive Load Amplification, Intent-Driven Path Expansion, and Ethical Strategy Evaporation.

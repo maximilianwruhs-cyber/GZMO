@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[drive-research-du-hast-gesagt-part1|drive-research-du-hast-gesagt-part1]] (2026-06-08)
+## From [drive-research-du-hast-gesagt-part1](/entities/drive-research-du-hast-gesagt-part1.md) (2026-06-08)
 - Dedicated to evolving the system itself.
 - Runs on a Ubuntu cron schedule.
 - Performs self-updating tasks like prompt/rule updates and tech debt reduction.

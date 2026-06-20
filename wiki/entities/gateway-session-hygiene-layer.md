@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-hermes-compression-and-bol-architecture|drive-research-hermes-compression-and-bol-architecture]] (2026-06-08)
+## From [drive-research-hermes-compression-and-bol-architecture](/entities/drive-research-hermes-compression-and-bol-architecture.md) (2026-06-08)
 - First line of defense in Hermes's dual-layer compression architecture.
 - Asynchronous safety net located within the core routing process (gateway/run.py).
 - Operates entirely pre-agent, intercepting incoming message payloads before the primary agent loop initializes prompt assembly.

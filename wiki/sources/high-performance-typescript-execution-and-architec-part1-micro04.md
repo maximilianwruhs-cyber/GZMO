@@ -14,17 +14,17 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[bunfig-toml|bunfig.toml]] (TOOL)
-- [[github-issue-6326|GitHub Issue #6326]] (PROJECT)
-- [[typescript|TypeScript]] (CONCEPT)
-- [[github-issue-6088|GitHub Issue #6088]] (PROJECT)
-- [[ffi|FFI]] (CONCEPT)
-- [[bun|Bun]] (SYSTEM)
-- [[macros|Macros]] (CONCEPT)
-- [[binary-data|Binary Data]] (CONCEPT)
-- [[deno|Deno]] (SYSTEM)
-- [[node-js|Node.js]] (SYSTEM)
-- [[transpiler|Transpiler]] (CONCEPT)
+- [bunfig.toml](/entities/bunfig-toml.md) (TOOL)
+- [GitHub Issue #6326](/entities/github-issue-6326.md) (PROJECT)
+- [TypeScript](/entities/typescript.md) (CONCEPT)
+- [GitHub Issue #6088](/entities/github-issue-6088.md) (PROJECT)
+- [FFI](/entities/ffi.md) (CONCEPT)
+- [Bun](/entities/bun.md) (SYSTEM)
+- [Macros](/entities/macros.md) (CONCEPT)
+- [Binary Data](/entities/binary-data.md) (CONCEPT)
+- [Deno](/entities/deno.md) (SYSTEM)
+- [Node.js](/entities/node-js.md) (SYSTEM)
+- [Transpiler](/entities/transpiler.md) (CONCEPT)
 
 ## Relations
 - Bun → USES → TypeScript

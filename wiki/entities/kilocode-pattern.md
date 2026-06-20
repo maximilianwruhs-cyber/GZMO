@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-hermes-agent-prompt-builder-analysis|drive-research-hermes-agent-prompt-builder-analysis]] (2026-06-08)
+## From [drive-research-hermes-agent-prompt-builder-analysis](/entities/drive-research-hermes-agent-prompt-builder-analysis.md) (2026-06-08)
 - Leverages strict XML segmentation to command LLM attention.
 - Injects critical, state-specific directives into the active user message position.
 - Requires breaking down the monolithic prompt_parts string into discrete, taggable objects.

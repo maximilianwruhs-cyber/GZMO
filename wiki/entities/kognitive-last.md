@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: BURDEN
 
-## From [[ai-research-part6-micro04|ai-research-part6-micro04]] (2026-06-09)
+## From [ai-research-part6-micro04](/entities/ai-research-part6-micro04.md) (2026-06-09)
 - Minimized by functional separation and role distribution
 - Reduced by Smart Model Routing

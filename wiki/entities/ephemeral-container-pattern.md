@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[resilient-rust-based-mcp-client-and-llm-orchestrat-micro03|resilient-rust-based-mcp-client-and-llm-orchestrat-micro03]] (2026-06-09)
+## From [resilient-rust-based-mcp-client-and-llm-orchestrat-micro03](/entities/resilient-rust-based-mcp-client-and-llm-orchestrat-micro03.md) (2026-06-09)
 - Requires processing input data without risking data integrity.
 - Mounting host directory directly is efficient but exposes host file system.
 - Kernel-enforced read-only bind mount is a definitive solution.

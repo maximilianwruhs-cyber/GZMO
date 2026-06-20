@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-ai-agents-and-spec-driven-development1-micro01|drive-research-ai-agents-and-spec-driven-development1-micro01]] (2026-06-09)
+## From [drive-research-ai-agents-and-spec-driven-development1-micro01](/entities/drive-research-ai-agents-and-spec-driven-development1-micro01.md) (2026-06-09)
 - A leading framework in the Execution Agents layer.
 - An execution-first, context engineering system.
 - A tool within the Spec Framework layer.

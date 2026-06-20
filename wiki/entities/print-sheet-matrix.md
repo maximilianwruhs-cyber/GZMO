@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[the-architecture-of-a-trading-card-game-micro04|the-architecture-of-a-trading-card-game-micro04]] (2026-06-10)
+## From [the-architecture-of-a-trading-card-game-micro04](/entities/the-architecture-of-a-trading-card-game-micro04.md) (2026-06-10)
 - A proprietary, immutable industrial print sheet yielding exactly 121 cards.

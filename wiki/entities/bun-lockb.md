@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-advanced-typescript-execution-in-the-bun-runtime-micro03|drive-research-advanced-typescript-execution-in-the-bun-runtime-micro03]] (2026-06-09)
+## From [drive-research-advanced-typescript-execution-in-the-bun-runtime-micro03](/entities/drive-research-advanced-typescript-execution-in-the-bun-runtime-micro03.md) (2026-06-09)
 - The resulting dependency tree is locked using bun.lockb, a proprietary binary lockfile format.
 - This binary format parses significantly faster than traditional JSON or YAML lockfiles.
 - Implements a highly optimized Foreign Function Interface (bun:ffi) natively within its core.
@@ -31,6 +31,6 @@ Type: TOOL
 - Achieved 95% to 98% API compatibility with the Node.js ecosystem.
 - Official oven/bun Docker image is roughly 450MB.
 
-## From [[drive-research-bun-typescript-performance-tips-micro03|drive-research-bun-typescript-performance-tips-micro03]] (2026-06-09)
+## From [drive-research-bun-typescript-performance-tips-micro03](/entities/drive-research-bun-typescript-performance-tips-micro03.md) (2026-06-09)
 - Bun's proprietary binary lockfile format.
 - Parses significantly faster than traditional JSON or YAML lockfiles.

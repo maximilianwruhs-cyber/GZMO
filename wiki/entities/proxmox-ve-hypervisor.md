@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[architectural-blueprints-for-sovereign-frankenmoe-part2|architectural-blueprints-for-sovereign-frankenmoe-part2]] (2026-06-08)
+## From [architectural-blueprints-for-sovereign-frankenmoe-part2](/entities/architectural-blueprints-for-sovereign-frankenmoe-part2.md) (2026-06-08)
 - It is the hypervisor used in the Proxmox Virtualization & Hardware Topology.
 - It manages Internal GPU 0, Internal GPU 1, and External eGPU 2.
 - It hosts KVM VM 101: Core Database AI.

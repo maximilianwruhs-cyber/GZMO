@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[ultimate-local-ai-development-stack-for-vscodium-micro01|ultimate-local-ai-development-stack-for-vscodium-micro01]] (2026-06-09)
+## From [ultimate-local-ai-development-stack-for-vscodium-micro01](/entities/ultimate-local-ai-development-stack-for-vscodium-micro01.md) (2026-06-09)
 - Publishes a fork of the official community extension for OpenClaw.

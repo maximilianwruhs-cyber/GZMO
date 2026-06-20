@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-archival-truth-part1-micro07|the-archival-truth-part1-micro07]] (2026-06-09)
+## From [the-archival-truth-part1-micro07](/entities/the-archival-truth-part1-micro07.md) (2026-06-09)
 - Is highly recommended for developing quick thinking, commanding stage presence, and comfort with absurdity.
 - Forces performers to rely on active listening, immediate reactions, and the 'Yes, and...' philosophy.

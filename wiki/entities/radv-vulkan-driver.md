@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-llama-bench-performance-benchmarking-tool-micro02|drive-research-llama-bench-performance-benchmarking-tool-micro02]] (2026-06-09)
+## From [drive-research-llama-bench-performance-benchmarking-tool-micro02](/entities/drive-research-llama-bench-performance-benchmarking-tool-micro02.md) (2026-06-09)
 - Provides superior token generation performance on AMD hardware.
 - Offers lower execution latency than ROCm on AMD hardware.
 
-## From [[optimizing-nvidia-blackwell-sm120-part2-micro05|optimizing-nvidia-blackwell-sm120-part2-micro05]] (2026-06-10)
+## From [optimizing-nvidia-blackwell-sm120-part2-micro05](/entities/optimizing-nvidia-blackwell-sm120-part2-micro05.md) (2026-06-10)
 - Provides superior token generation performance on AMD hardware
 - Offers lower execution latency than ROCm for certain tasks

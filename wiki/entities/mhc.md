@@ -15,7 +15,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[ai-research-part1|ai-research-part1]] (2026-06-08)
+## From [ai-research-part1](/entities/ai-research-part1.md) (2026-06-08)
 - A prior residual generalization.
 - Has a per-layer memory access cost of 34d reads and 2m2+4m writes (Table 1).
 - Improves loss to 1.747 in ablation studies.
@@ -23,7 +23,7 @@ Type: SYSTEM
 - Its weight Mi→l = β⊤i A×i+1→lαl admits a natural attention interpretation.
 - Acts as depth-wise linear attention with matrix-valued states.
 
-## From [[ai-research-part7|ai-research-part7]] (2026-06-08)
+## From [ai-research-part7](/entities/ai-research-part7.md) (2026-06-08)
 - Stands for Manifold-Constrained Hyper-Connections.
 - A general framework that projects the residual connection space of HC onto a specific manifold to restore the identity mapping property.
 - Incorporates rigorous infrastructure optimization to ensure efficiency.
@@ -33,7 +33,7 @@ Type: SYSTEM
 - Significantly enhances propagation stability compared to HC.
 - Reduces maximum gain magnitude by three orders of magnitude compared to HC.
 
-## From [[ai-research-part6-micro04|ai-research-part6-micro04]] (2026-06-09)
+## From [ai-research-part6-micro04](/entities/ai-research-part6-micro04.md) (2026-06-09)
 - Variant of Hyper-Connections
 - Adopts a design that more closely aligns with the Pre-Norm paradigm
 - Ablation studies indicate Hres is critical for performance gains

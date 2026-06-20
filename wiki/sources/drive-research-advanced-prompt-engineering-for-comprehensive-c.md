@@ -14,21 +14,21 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-08).
 
 ## Entities
-- [[advanced-prompt-engineering-for-comprehensive-codebase-auditing-methodologies-frameworks-and-threat-models|Advanced Prompt Engineering for Comprehensive Codebase Auditing: Methodologies, Frameworks, and Threat Models]] (BOOK)
-- [[owasp-top-10-vulnerabilities|OWASP Top 10 vulnerabilities]] (CONCEPT)
-- [[large-language-models|Large Language Models]] (SYSTEM)
-- [[stepwise-deductive-processing|Stepwise Deductive Processing]] (CONCEPT)
-- [[skeleton-of-thought|Skeleton-of-Thought]] (CONCEPT)
-- [[parallel-processing|Parallel Processing]] (CONCEPT)
-- [[pipeline-patterns|Pipeline Patterns]] (CONCEPT)
-- [[output-formatting|Output Formatting]] (CONCEPT)
-- [[manual-peer-reviews|Manual Peer Reviews]] (CONCEPT)
-- [[examples-few-shot-demonstrations|Examples (Few-Shot Demonstrations)]] (CONCEPT)
-- [[static-application-security-testing|Static Application Security Testing]] (TOOL)
-- [[persona|Persona]] (CONCEPT)
-- [[context|Context]] (CONCEPT)
-- [[specific-instructions|Specific Instructions]] (CONCEPT)
-- [[sequential-dependencies|Sequential Dependencies]] (CONCEPT)
+- [Advanced Prompt Engineering for Comprehensive Codebase Auditing: Methodologies, Frameworks, and Threat Models](/entities/advanced-prompt-engineering-for-comprehensive-codebase-auditing-methodologies-frameworks-and-threat-models.md) (BOOK)
+- [OWASP Top 10 vulnerabilities](/entities/owasp-top-10-vulnerabilities.md) (CONCEPT)
+- [Large Language Models](/entities/large-language-models.md) (SYSTEM)
+- [Stepwise Deductive Processing](/entities/stepwise-deductive-processing.md) (CONCEPT)
+- [Skeleton-of-Thought](/entities/skeleton-of-thought.md) (CONCEPT)
+- [Parallel Processing](/entities/parallel-processing.md) (CONCEPT)
+- [Pipeline Patterns](/entities/pipeline-patterns.md) (CONCEPT)
+- [Output Formatting](/entities/output-formatting.md) (CONCEPT)
+- [Manual Peer Reviews](/entities/manual-peer-reviews.md) (CONCEPT)
+- [Examples (Few-Shot Demonstrations)](/entities/examples-few-shot-demonstrations.md) (CONCEPT)
+- [Static Application Security Testing](/entities/static-application-security-testing.md) (TOOL)
+- [Persona](/entities/persona.md) (CONCEPT)
+- [Context](/entities/context.md) (CONCEPT)
+- [Specific Instructions](/entities/specific-instructions.md) (CONCEPT)
+- [Sequential Dependencies](/entities/sequential-dependencies.md) (CONCEPT)
 
 ## Relations
 - Advanced Prompt Engineering for Comprehensive Codebase Auditing: Methodologies, Frameworks, and Threat Models → RELATED_TO → Large Language Models

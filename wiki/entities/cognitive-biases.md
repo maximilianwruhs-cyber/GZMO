@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-architecture-of-engagement-an-analysis-of-gam-micro02|the-architecture-of-engagement-an-analysis-of-gam-micro02]] (2026-06-09)
+## From [the-architecture-of-engagement-an-analysis-of-gam-micro02](/entities/the-architecture-of-engagement-an-analysis-of-gam-micro02.md) (2026-06-09)
 - Are exploited by digital platforms to drive engagement.
 
-## From [[the-architecture-of-engagement-an-analysis-of-gam-micro03|the-architecture-of-engagement-an-analysis-of-gam-micro03]] (2026-06-09)
+## From [the-architecture-of-engagement-an-analysis-of-gam-micro03](/entities/the-architecture-of-engagement-an-analysis-of-gam-micro03.md) (2026-06-09)
 - Principles are purposefully operationalized in digital design.
 - Used in conjunction with operant conditioning to create behavioral loops.
 - Examples include anchoring bias, social proof, loss aversion, and goal gradient effect.

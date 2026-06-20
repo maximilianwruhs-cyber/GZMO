@@ -14,22 +14,22 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-10).
 
 ## Entities
-- [[nvidia-blackwell|NVIDIA Blackwell]] (SYSTEM)
-- [[llama-cpp|llama.cpp]] (SYSTEM)
-- [[vulkan|Vulkan]] (SYSTEM)
-- [[cuda|CUDA]] (SYSTEM)
-- [[mistral-7b|Mistral-7B]] (CONCEPT)
-- [[ollama|Ollama]] (SYSTEM)
-- [[ggml|GGML]] (SYSTEM)
-- [[rocm|ROCm]] (SYSTEM)
-- [[llama-3-8b|Llama-3-8B]] (CONCEPT)
-- [[qwen2-5-14b|Qwen2.5-14b]] (CONCEPT)
-- [[apple-silicon|Apple Silicon]] (SYSTEM)
-- [[llama-bench|llama-bench]] (TOOL)
-- [[hip|HIP]] (SYSTEM)
-- [[gemma-4-e4b|Gemma 4 E4B]] (CONCEPT)
-- [[sycl|SYCL]] (SYSTEM)
-- [[llama-swap|llama-swap]] (TOOL)
+- [NVIDIA Blackwell](/entities/nvidia-blackwell.md) (SYSTEM)
+- [llama.cpp](/entities/llama-cpp.md) (SYSTEM)
+- [Vulkan](/entities/vulkan.md) (SYSTEM)
+- [CUDA](/entities/cuda.md) (SYSTEM)
+- [Mistral-7B](/entities/mistral-7b.md) (CONCEPT)
+- [Ollama](/entities/ollama.md) (SYSTEM)
+- [GGML](/entities/ggml.md) (SYSTEM)
+- [ROCm](/entities/rocm.md) (SYSTEM)
+- [Llama-3-8B](/entities/llama-3-8b.md) (CONCEPT)
+- [Qwen2.5-14b](/entities/qwen2-5-14b.md) (CONCEPT)
+- [Apple Silicon](/entities/apple-silicon.md) (SYSTEM)
+- [llama-bench](/entities/llama-bench.md) (TOOL)
+- [HIP](/entities/hip.md) (SYSTEM)
+- [Gemma 4 E4B](/entities/gemma-4-e4b.md) (CONCEPT)
+- [SYCL](/entities/sycl.md) (SYSTEM)
+- [llama-swap](/entities/llama-swap.md) (TOOL)
 
 ## Relations
 - llama-bench → PART_OF → llama.cpp

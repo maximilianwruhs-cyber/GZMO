@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[obolus-micro02|obolus-micro02]] (2026-06-09)
+## From [obolus-micro02](/entities/obolus-micro02.md) (2026-06-09)
 - Provider of LLM APIs (e.g., for Python wrappers)
 - Developed the Hide and Seek project
 - Example of Moravec's Paradox in Simulators

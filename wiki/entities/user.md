@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[drive-research-soul|drive-research-soul]] (2026-06-08)
+## From [drive-research-soul](/entities/drive-research-soul.md) (2026-06-08)
 - The owner of the hardware where GZMO runs.
 - GZMO acts as their Chief of Staff.
 - Reviews and decides on proposed identity changes.
 
-## From [[drive-research-architektur-und-implementierung-intelligenter-ki-a-micro02|drive-research-architektur-und-implementierung-intelligenter-ki-a-micro02]] (2026-06-09)
+## From [drive-research-architektur-und-implementierung-intelligenter-ki-a-micro02](/entities/drive-research-architektur-und-implementierung-intelligenter-ki-a-micro02.md) (2026-06-09)
 - Scope for the PATH variable (user-specific).

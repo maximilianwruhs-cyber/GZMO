@@ -15,11 +15,11 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-agentic-token-economy-blueprint-micro02|drive-research-agentic-token-economy-blueprint-micro02]] (2026-06-09)
+## From [drive-research-agentic-token-economy-blueprint-micro02](/entities/drive-research-agentic-token-economy-blueprint-micro02.md) (2026-06-09)
 - Embeds token awareness directly into the decoding process.
 - Solves prompt-based constraint failures by inserting special control tokens into the generation stream.
 - Allows the LLM to dynamically compress its final reasoning steps and synthesize a conclusion before the hard token limit is triggered.
 
-## From [[drive-research-agentic-token-economy-blueprint-micro03|drive-research-agentic-token-economy-blueprint-micro03]] (2026-06-09)
+## From [drive-research-agentic-token-economy-blueprint-micro03](/entities/drive-research-agentic-token-economy-blueprint-micro03.md) (2026-06-09)
 - Empowers budget-aware LLM reasoning with control tokens
 - Related to arXiv

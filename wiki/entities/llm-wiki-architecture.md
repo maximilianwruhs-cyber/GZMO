@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[the-cascading-honeypot-a-blueprint-for-executable|the-cascading-honeypot-a-blueprint-for-executable]] (2026-06-08)
+## From [the-cascading-honeypot-a-blueprint-for-executable](/entities/the-cascading-honeypot-a-blueprint-for-executable.md) (2026-06-08)
 - An emerging engineering paradigm.
 - The Cascading Honeypot maps onto this architecture.

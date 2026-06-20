@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-speicherbandbreiten-engpass-memory-wall|drive-research-speicherbandbreiten-engpass-memory-wall]] (2026-06-08)
+## From [drive-research-speicherbandbreiten-engpass-memory-wall](/entities/drive-research-speicherbandbreiten-engpass-memory-wall.md) (2026-06-08)
 - A framework providing deep integration via specialized Triton kernels for high-throughput serving.
 - Offers Asymmetric Quantization, allocating mixed precisions for Key and Value matrices.
 - Triton kernels pre-rotate the Query (Q) vector with the inverse of the PolarQuant rotation matrix.

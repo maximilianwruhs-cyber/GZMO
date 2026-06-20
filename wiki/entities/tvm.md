@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[optimizing-nvidia-blackwell-sm120-part1-micro05|optimizing-nvidia-blackwell-sm120-part1-micro05]] (2026-06-10)
+## From [optimizing-nvidia-blackwell-sm120-part1-micro05](/entities/optimizing-nvidia-blackwell-sm120-part1-micro05.md) (2026-06-10)
 - Compiler used in the deployment pipeline
 - Requires modification of FFI assertions for SM120 support

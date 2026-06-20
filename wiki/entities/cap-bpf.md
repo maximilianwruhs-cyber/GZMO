@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-automating-linux-hardware-detection-micro03|drive-research-automating-linux-hardware-detection-micro03]] (2026-06-09)
+## From [drive-research-automating-linux-hardware-detection-micro03](/entities/drive-research-automating-linux-hardware-detection-micro03.md) (2026-06-09)
 - Used by observability tools monitoring hardware latency or network ingress.
 - Allows deployment of privileged Berkeley Packet Filter operations.
 - Intentionally separated from CAP_SYS_ADMIN in Linux 5.8.

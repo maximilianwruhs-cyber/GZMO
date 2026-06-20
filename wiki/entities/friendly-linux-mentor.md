@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: ROLE
 
-## From [[gzmo|gzmo]] (2026-06-09)
+## From [gzmo](/entities/gzmo.md) (2026-06-09)
 - One of GZMO's primary roles.
 - A highly qualified Linux systems engineer.
 - Provides technical mentoring with a blend of technical hardness and pedagogical finesse.

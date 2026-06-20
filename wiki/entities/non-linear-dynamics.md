@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[dynamics-of-the-unpredictable-micro04|dynamics-of-the-unpredictable-micro04]] (2026-06-09)
+## From [dynamics-of-the-unpredictable-micro04](/entities/dynamics-of-the-unpredictable-micro04.md) (2026-06-09)
 - Meteorology is the most visible application of non-linear dynamics.
 - The maturation of chaos theory underscores a transition in the sciences related to non-linear dynamics.
 - Principles of non-linear dynamics provide a unifying language for understanding systemic behavior.

@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: MODEL
 
-## From [[ai-research-part6-micro04|ai-research-part6-micro04]] (2026-06-09)
+## From [ai-research-part6-micro04](/entities/ai-research-part6-micro04.md) (2026-06-09)
 - Detailed Experimental Settings summarized in Table 4
 - Model architecture includes 16 Layers, 2048 Hidden Size, 16 Attention Heads

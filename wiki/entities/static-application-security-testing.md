@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-advanced-prompt-engineering-for-comprehensive-c|drive-research-advanced-prompt-engineering-for-comprehensive-c]] (2026-06-08)
+## From [drive-research-advanced-prompt-engineering-for-comprehensive-c](/entities/drive-research-advanced-prompt-engineering-for-comprehensive-c.md) (2026-06-08)
 - Historically formed the bedrock of quality assurance.
 - Frequently struggles with business logic flaws, state machine inconsistencies, and complex concurrency issues.

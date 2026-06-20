@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[openclaw-deep-research-part2|openclaw-deep-research-part2]] (2026-06-08)
+## From [openclaw-deep-research-part2](/entities/openclaw-deep-research-part2.md) (2026-06-08)
 - Austin Chia authored the blog post 'Top OpenClaw Alternatives: From Local to Enterprise AI Agents'.
 - Austin Chia authored the tutorial 'OpenClaw Security: Best Practices For AI Agent Safety'.

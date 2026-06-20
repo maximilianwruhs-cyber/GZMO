@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-hermes-compression-and-bol-architecture|drive-research-hermes-compression-and-bol-architecture]] (2026-06-08)
+## From [drive-research-hermes-compression-and-bol-architecture](/entities/drive-research-hermes-compression-and-bol-architecture.md) (2026-06-08)
 - Observed in platforms such as LibreChat and on-chain trading agents.
 - Eschews blind historical truncation in favor of intelligent synthesis.
 - Automatically compresses older interactions into a concise, structured checkpoint summary when conversation breaches model's context threshold.

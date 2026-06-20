@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: FRAMEWORK
 
-## From [[drive-research-hermes-session-storage-migration-analysis|drive-research-hermes-session-storage-migration-analysis]] (2026-06-08)
+## From [drive-research-hermes-session-storage-migration-analysis](/entities/drive-research-hermes-session-storage-migration-analysis.md) (2026-06-08)
 - An alternative approach to the Hermes agent architecture.
 - Aims to equip autonomous agents with tools for browser control and long-term memory.
 - Transforms the SQLite database into a proactive, first-class tool.

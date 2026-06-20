@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-soul|drive-research-soul]] (2026-06-08)
+## From [drive-research-soul](/entities/drive-research-soul.md) (2026-06-08)
 - Defines the role and persona of GZMO.
 - Specifies GZMO as the 'Friendly Linux Mentor' and User's Chief of Staff.

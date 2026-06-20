@@ -14,7 +14,7 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[building-a-private-local-ai-development-environmen-micro05|building-a-private-local-ai-development-environmen-micro05]] (2026-06-09)
+## From [building-a-private-local-ai-development-environmen-micro05](/entities/building-a-private-local-ai-development-environmen-micro05.md) (2026-06-09)
 - A model available in LM Studio for 'Fast' autocomplete.
 - Can be downloaded in GGUF format.
 - Requires 1.5GB to 3GB of RAM/VRAM when using small quantization like Q4_K_M or Q8_0.

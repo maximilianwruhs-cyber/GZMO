@@ -14,22 +14,22 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[wasmtime|wasmtime]] (TOOL)
-- [[ropey-crate|ropey crate]] (TOOL)
-- [[data-distribution-service-dds|Data Distribution Service (DDS)]] (CONCEPT)
-- [[tokio-select|tokio::select!]] (TOOL)
-- [[rust|Rust]] (CONCEPT)
-- [[tui|TUI]] (CONCEPT)
-- [[component-based-architecture|Component-Based Architecture]] (CONCEPT)
-- [[helix|Helix]] (PROJECT)
-- [[zellij|Zellij]] (PROJECT)
-- [[go|Go]] (CONCEPT)
-- [[yazi|Yazi]] (PROJECT)
-- [[webassembly-wasm|WebAssembly (Wasm)]] (CONCEPT)
-- [[tmux|tmux]] (TOOL)
-- [[crossterm|crossterm]] (TOOL)
-- [[ratatui|ratatui]] (TOOL)
-- [[mvc-model-view-controller|MVC (Model-View-Controller)]] (CONCEPT)
+- [wasmtime](/entities/wasmtime.md) (TOOL)
+- [ropey crate](/entities/ropey-crate.md) (TOOL)
+- [Data Distribution Service (DDS)](/entities/data-distribution-service-dds.md) (CONCEPT)
+- [tokio::select!](/entities/tokio-select.md) (TOOL)
+- [Rust](/entities/rust.md) (CONCEPT)
+- [TUI](/entities/tui.md) (CONCEPT)
+- [Component-Based Architecture](/entities/component-based-architecture.md) (CONCEPT)
+- [Helix](/entities/helix.md) (PROJECT)
+- [Zellij](/entities/zellij.md) (PROJECT)
+- [Go](/entities/go.md) (CONCEPT)
+- [Yazi](/entities/yazi.md) (PROJECT)
+- [WebAssembly (Wasm)](/entities/webassembly-wasm.md) (CONCEPT)
+- [tmux](/entities/tmux.md) (TOOL)
+- [crossterm](/entities/crossterm.md) (TOOL)
+- [ratatui](/entities/ratatui.md) (TOOL)
+- [MVC (Model-View-Controller)](/entities/mvc-model-view-controller.md) (CONCEPT)
 
 ## Relations
 - Zellij → RELATED_TO → tmux

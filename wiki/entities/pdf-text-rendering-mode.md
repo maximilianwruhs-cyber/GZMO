@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-pdf-text-vs-scan-detection-heuristics-micro02|drive-research-pdf-text-vs-scan-detection-heuristics-micro02]] (2026-06-09)
+## From [drive-research-pdf-text-vs-scan-detection-heuristics-micro02](/entities/drive-research-pdf-text-vs-scan-detection-heuristics-micro02.md) (2026-06-09)
 - Dictated by the Tr operator in PostScript streams.
 - Includes modes like Fill Text, Stroke Text, and Invisible Text.

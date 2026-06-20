@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-bun-file-parsing-dependency-shortlist-micro02|drive-research-bun-file-parsing-dependency-shortlist-micro02]] (2026-06-09)
+## From [drive-research-bun-file-parsing-dependency-shortlist-micro02](/entities/drive-research-bun-file-parsing-dependency-shortlist-micro02.md) (2026-06-09)
 - Definitive secondary option if validation or complex attribute mapping is required alongside text extraction.
 - Allows users to validate XML, parse it into JS objects, and build XML payloads rapidly without relying on fragile C/C++ based libraries.
 - Ensures flawless execution within Bun.

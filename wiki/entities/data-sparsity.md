@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-subword-tokenization-mitigates-llm-sparsity-micro01|drive-research-subword-tokenization-mitigates-llm-sparsity-micro01]] (2026-06-09)
+## From [drive-research-subword-tokenization-mitigates-llm-sparsity-micro01](/entities/drive-research-subword-tokenization-mitigates-llm-sparsity-micro01.md) (2026-06-09)
 - An extreme manifestation of Zipf's law in sequence modeling.
 - A miniscule fraction of the vocabulary accounts for the vast majority of tokens.
 - The overwhelming majority of words occur very infrequently.

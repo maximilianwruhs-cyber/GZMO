@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[dynamics-of-the-unpredictable-micro03|dynamics-of-the-unpredictable-micro03]] (2026-06-09)
+## From [dynamics-of-the-unpredictable-micro03](/entities/dynamics-of-the-unpredictable-micro03.md) (2026-06-09)
 - An abstract multidimensional space where every possible state of a dynamic system corresponds to a unique geometric point.
 - Chaotic systems' evolution is analyzed by plotting their trajectories in phase space.
 - Strange attractors are geometric subspaces within phase space.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[beyond-the-dark-room-allostatic-regulation-and-co|beyond-the-dark-room-allostatic-regulation-and-co]] (2026-06-08)
+## From [beyond-the-dark-room-allostatic-regulation-and-co](/entities/beyond-the-dark-room-allostatic-regulation-and-co.md) (2026-06-08)
 - Its expression increases rapidly after a sedative phase.
 - It attempts to forcefully restore normal neural excitability and induce rapid drug tolerance.
 - Moderate, intermediate-dose exposure to benzyl alcohol produces a massive 53% change in its message abundance.

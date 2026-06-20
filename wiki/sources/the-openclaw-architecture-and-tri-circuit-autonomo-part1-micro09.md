@@ -14,21 +14,21 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[ruvector|RuVector]] (TOOL)
-- [[docker|Docker]] (SYSTEM)
-- [[ubuntu-24-04-lts|Ubuntu 24.04 LTS]] (SYSTEM)
-- [[mergekit|mergekit]] (TOOL)
-- [[z-score|Z-score]] (CONCEPT)
-- [[openhands|OpenHands]] (TOOL)
-- [[openclaw-rl|OpenClaw-RL]] (TOOL)
-- [[tri-circuit-autonomous-intelligence-architecture|tri-circuit autonomous intelligence architecture]] (CONCEPT)
-- [[python-3-12|Python 3.12]] (SYSTEM)
-- [[crawl4ai|Crawl4AI]] (TOOL)
-- [[intel-rapl|Intel RAPL]] (SYSTEM)
-- [[lm-studio|LM Studio]] (TOOL)
-- [[platypus|PLATYPUS]] (CONCEPT)
-- [[sysfsutils|sysfsutils]] (TOOL)
-- [[obolus-darwinian-loop|Obolus Darwinian loop]] (CONCEPT)
+- [RuVector](/entities/ruvector.md) (TOOL)
+- [Docker](/entities/docker.md) (SYSTEM)
+- [Ubuntu 24.04 LTS](/entities/ubuntu-24-04-lts.md) (SYSTEM)
+- [mergekit](/entities/mergekit.md) (TOOL)
+- [Z-score](/entities/z-score.md) (CONCEPT)
+- [OpenHands](/entities/openhands.md) (TOOL)
+- [OpenClaw-RL](/entities/openclaw-rl.md) (TOOL)
+- [tri-circuit autonomous intelligence architecture](/entities/tri-circuit-autonomous-intelligence-architecture.md) (CONCEPT)
+- [Python 3.12](/entities/python-3-12.md) (SYSTEM)
+- [Crawl4AI](/entities/crawl4ai.md) (TOOL)
+- [Intel RAPL](/entities/intel-rapl.md) (SYSTEM)
+- [LM Studio](/entities/lm-studio.md) (TOOL)
+- [PLATYPUS](/entities/platypus.md) (CONCEPT)
+- [sysfsutils](/entities/sysfsutils.md) (TOOL)
+- [Obolus Darwinian loop](/entities/obolus-darwinian-loop.md) (CONCEPT)
 
 ## Relations
 - tri-circuit autonomous intelligence architecture → USES → Intel RAPL

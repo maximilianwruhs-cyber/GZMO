@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-advanced-prompt-engineering-for-comprehensive-code|drive-research-advanced-prompt-engineering-for-comprehensive-code]] (2026-06-08)
+## From [drive-research-advanced-prompt-engineering-for-comprehensive-code](/entities/drive-research-advanced-prompt-engineering-for-comprehensive-code.md) (2026-06-08)
 - A fundamental pillar of audit prompts.
 - Involves explicitly defining operational environment and framework constraints, system requirements, programming language, architecture style, and application scope.
 - Ensures proposed fixes are practically actionable.

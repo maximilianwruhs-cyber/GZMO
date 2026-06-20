@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-cuda-memory-locking-limits-configuration|drive-research-cuda-memory-locking-limits-configuration]] (2026-06-08)
+## From [drive-research-cuda-memory-locking-limits-configuration](/entities/drive-research-cuda-memory-locking-limits-configuration.md) (2026-06-08)
 - NVIDIA CUDA architecture accelerates host-to-device transfers using page-locked (pinned) host memory.
 - Standard memory allocated via malloc or anonymous mmap is pageable and requires the CUDA driver to copy data into an internal, page-locked staging buffer before performing a Direct Memory Access (DMA) transfer to the GPU.
 - CUDA Runtime API call cudaHostRegister registers an existing host virtual address range as page-locked memory.

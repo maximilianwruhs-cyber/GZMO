@@ -14,16 +14,16 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-10).
 
 ## Entities
-- [[whatsapp|WhatsApp]] (SYSTEM)
-- [[slack|Slack]] (SYSTEM)
-- [[agent-browser|agent-browser]] (TOOL)
-- [[clawdbot|Clawdbot]] (SYSTEM)
-- [[tencent-cloud-lighthouse|Tencent Cloud Lighthouse]] (SYSTEM)
-- [[openclaw|OpenClaw]] (SYSTEM)
-- [[telegram|Telegram]] (SYSTEM)
-- [[lobster-farming|Lobster Farming]] (CONCEPT)
-- [[clawhub|Clawhub]] (SYSTEM)
-- [[discord|Discord]] (SYSTEM)
+- [WhatsApp](/entities/whatsapp.md) (SYSTEM)
+- [Slack](/entities/slack.md) (SYSTEM)
+- [agent-browser](/entities/agent-browser.md) (TOOL)
+- [Clawdbot](/entities/clawdbot.md) (SYSTEM)
+- [Tencent Cloud Lighthouse](/entities/tencent-cloud-lighthouse.md) (SYSTEM)
+- [OpenClaw](/entities/openclaw.md) (SYSTEM)
+- [Telegram](/entities/telegram.md) (SYSTEM)
+- [Lobster Farming](/entities/lobster-farming.md) (CONCEPT)
+- [Clawhub](/entities/clawhub.md) (SYSTEM)
+- [Discord](/entities/discord.md) (SYSTEM)
 
 ## Relations
 - Clawdbot → RELATED_TO → OpenClaw

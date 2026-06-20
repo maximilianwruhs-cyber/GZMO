@@ -14,20 +14,20 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-08).
 
 ## Entities
-- [[google-s-v8-engine|Google's V8 engine]] (SYSTEM)
-- [[obsidian-vault|Obsidian Vault]] (CONCEPT)
-- [[zig|Zig]] (TOOL)
-- [[node-js|Node.js]] (SYSTEM)
-- [[chokidar|Chokidar]] (TOOL)
-- [[typescript|TypeScript]] (CONCEPT)
-- [[libuv|libuv]] (SYSTEM)
-- [[kqueue|kqueue]] (SYSTEM)
-- [[inotify|inotify]] (SYSTEM)
-- [[mimalloc|mimalloc]] (TOOL)
-- [[apple-s-javascriptcore-engine|Apple's JavaScriptCore engine]] (SYSTEM)
-- [[swc-speedy-web-compiler|SWC (Speedy Web Compiler)]] (TOOL)
-- [[amaro-loader|Amaro loader]] (TOOL)
-- [[bun|Bun]] (SYSTEM)
+- [Google's V8 engine](/entities/google-s-v8-engine.md) (SYSTEM)
+- [Obsidian Vault](/entities/obsidian-vault.md) (CONCEPT)
+- [Zig](/entities/zig.md) (TOOL)
+- [Node.js](/entities/node-js.md) (SYSTEM)
+- [Chokidar](/entities/chokidar.md) (TOOL)
+- [TypeScript](/entities/typescript.md) (CONCEPT)
+- [libuv](/entities/libuv.md) (SYSTEM)
+- [kqueue](/entities/kqueue.md) (SYSTEM)
+- [inotify](/entities/inotify.md) (SYSTEM)
+- [mimalloc](/entities/mimalloc.md) (TOOL)
+- [Apple's JavaScriptCore engine](/entities/apple-s-javascriptcore-engine.md) (SYSTEM)
+- [SWC (Speedy Web Compiler)](/entities/swc-speedy-web-compiler.md) (TOOL)
+- [Amaro loader](/entities/amaro-loader.md) (TOOL)
+- [Bun](/entities/bun.md) (SYSTEM)
 
 ## Relations
 - Node.js → USES → Google's V8 engine

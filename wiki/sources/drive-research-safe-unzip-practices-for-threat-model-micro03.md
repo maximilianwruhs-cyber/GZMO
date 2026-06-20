@@ -14,22 +14,22 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[single-user-threat-model|single-user threat model]] (CONCEPT)
-- [[ooxml-documents|OOXML documents]] (CONCEPT)
-- [[zip-file-format|ZIP (file format)]] (CONCEPT)
-- [[node-s-path-resolve|Node's path.resolve()]] (TOOL)
-- [[zip-slip|Zip Slip]] (CONCEPT)
-- [[java-s-getcanonicalpath|Java's getCanonicalPath()]] (TOOL)
-- [[xml-entity-expansion|XML entity expansion]] (CONCEPT)
-- [[ulimit-s-u-400|ulimit -S -u 400]] (TOOL)
-- [[symlink-resolution|Symlink Resolution]] (CONCEPT)
-- [[process-boundary-enforcement|Process Boundary Enforcement]] (CONCEPT)
-- [[strict-canonical-path-validation|Strict Canonical Path Validation]] (CONCEPT)
-- [[python-s-os-path-normpath|Python's os.path.normpath()]] (TOOL)
-- [[compression-bombs|Compression bombs]] (CONCEPT)
-- [[fork-bomb|Fork Bomb]] (CONCEPT)
-- [[systemd|systemd]] (SYSTEM)
-- [[tasksmax-directives|TasksMax directives]] (TOOL)
+- [single-user threat model](/entities/single-user-threat-model.md) (CONCEPT)
+- [OOXML documents](/entities/ooxml-documents.md) (CONCEPT)
+- [ZIP (file format)](/entities/zip-file-format.md) (CONCEPT)
+- [Node's path.resolve()](/entities/node-s-path-resolve.md) (TOOL)
+- [Zip Slip](/entities/zip-slip.md) (CONCEPT)
+- [Java's getCanonicalPath()](/entities/java-s-getcanonicalpath.md) (TOOL)
+- [XML entity expansion](/entities/xml-entity-expansion.md) (CONCEPT)
+- [ulimit -S -u 400](/entities/ulimit-s-u-400.md) (TOOL)
+- [Symlink Resolution](/entities/symlink-resolution.md) (CONCEPT)
+- [Process Boundary Enforcement](/entities/process-boundary-enforcement.md) (CONCEPT)
+- [Strict Canonical Path Validation](/entities/strict-canonical-path-validation.md) (CONCEPT)
+- [Python's os.path.normpath()](/entities/python-s-os-path-normpath.md) (TOOL)
+- [Compression bombs](/entities/compression-bombs.md) (CONCEPT)
+- [Fork Bomb](/entities/fork-bomb.md) (CONCEPT)
+- [systemd](/entities/systemd.md) (SYSTEM)
+- [TasksMax directives](/entities/tasksmax-directives.md) (TOOL)
 
 ## Relations
 - Symlink Resolution → RELATED_TO → single-user threat model

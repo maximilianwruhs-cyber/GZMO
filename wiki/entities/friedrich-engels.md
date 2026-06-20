@@ -14,13 +14,13 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[cybernetics-and-mythos-the-architecture-of-intell-part2|cybernetics-and-mythos-the-architecture-of-intell-part2]] (2026-06-08)
+## From [cybernetics-and-mythos-the-architecture-of-intell-part2](/entities/cybernetics-and-mythos-the-architecture-of-intell-part2.md) (2026-06-08)
 - A lifelong admirer of Hegel.
 - Sought to make the Hegelian method more accessible.
 - Articulated three general, overarching laws of dialectics.
 - Marx and Engels anchored this mechanism in the brutal material realities of economics, labor, and class conflict.
 
-## From [[drive-research-dialectics-socratic-vs-hegelian-methods|drive-research-dialectics-socratic-vs-hegelian-methods]] (2026-06-08)
+## From [drive-research-dialectics-socratic-vs-hegelian-methods](/entities/drive-research-dialectics-socratic-vs-hegelian-methods.md) (2026-06-08)
 - Co-developed Dialectical Materialism with Karl Marx.
 - Synthesized Marx's naturalism with Hegelian philosophy and positivism.
 - Articulated three general laws of dialectics governing nature and society.

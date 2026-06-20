@@ -14,12 +14,12 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[cybernetics-and-mythos-the-architecture-of-intell-part1|cybernetics-and-mythos-the-architecture-of-intell-part1]] (2026-06-08)
+## From [cybernetics-and-mythos-the-architecture-of-intell-part1](/entities/cybernetics-and-mythos-the-architecture-of-intell-part1.md) (2026-06-08)
 - Occurs when some function of the output of a system is fed back in a manner that tends to reduce the fluctuations in the output.
 - Its primary objective is to promote stability, reduce the effects of perturbations, and facilitate a settling to a homeostatic equilibrium.
 - Examples include blood glucose regulation, HVAC thermostats, and quality assurance teams in software development.
 
-## From [[drive-research-cybernetics-information-loops-between-entities-micro02|drive-research-cybernetics-information-loops-between-entities-micro02]] (2026-06-09)
+## From [drive-research-cybernetics-information-loops-between-entities-micro02](/entities/drive-research-cybernetics-information-loops-between-entities-micro02.md) (2026-06-09)
 - Feedback that tends to reduce fluctuations in the output.
 - Primary objective is to promote stability and homeostasis.
 - Mathematical loop gain is negative.

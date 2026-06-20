@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-financial-time-series-lyapunov-exponents|drive-research-financial-time-series-lyapunov-exponents]] (2026-06-08)
+## From [drive-research-financial-time-series-lyapunov-exponents](/entities/drive-research-financial-time-series-lyapunov-exponents.md) (2026-06-08)
 - Finite-Time Lyapunov Exponents in Recurrent Neural Networks
 - Defined as the inverse of the largest positive Lyapunov exponent (τL = 1 / λ1).
 - Establishes the information horizon beyond which the system’s state becomes uncorrelated.

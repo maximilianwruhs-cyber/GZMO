@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-advanced-inference-acceleration|drive-research-advanced-inference-acceleration]] (2026-06-08)
+## From [drive-research-advanced-inference-acceleration](/entities/drive-research-advanced-inference-acceleration.md) (2026-06-08)
 - A tokenizer.
 - Used by both Qwen2.5-0.5B-Instruct and Qwen2.5-3B-Instruct models.
 - Strict compatibility is essential for speculative decoding.

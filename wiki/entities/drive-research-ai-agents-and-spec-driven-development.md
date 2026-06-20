@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PROJECT
 
-## From [[drive-research-ai-agents-and-spec-driven-development-micro01|drive-research-ai-agents-and-spec-driven-development-micro01]] (2026-06-09)
+## From [drive-research-ai-agents-and-spec-driven-development-micro01](/entities/drive-research-ai-agents-and-spec-driven-development-micro01.md) (2026-06-09)
 - Title of the document
 - File name for micro-split
 - Part of the project title

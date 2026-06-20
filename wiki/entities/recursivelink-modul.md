@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[architectures-and-optimizations-for-speculative-de-micro01|architectures-and-optimizations-for-speculative-de-micro01]] (2026-06-09)
+## From [architectures-and-optimizations-for-speculative-de-micro01](/entities/architectures-and-optimizations-for-speculative-de-micro01.md) (2026-06-09)
 - Enables continuous vector collaboration between potentially fundamentally different models.
 - Has approximately 13 million trainable parameters.
 - Underlying base models' weight matrices remain untouched during system training.

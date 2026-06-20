@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part3-micro05|ai-research-part3-micro05]] (2026-06-09)
+## From [ai-research-part3-micro05](/entities/ai-research-part3-micro05.md) (2026-06-09)
 - Gödel Machine Proof search is an optimal policy on it.
 - Operates on an extended state space including agents T, aparent, achild, and a remaining budget descriptor.
 - Observation is limited to the agents (aparent, achild) and the remaining budget b.

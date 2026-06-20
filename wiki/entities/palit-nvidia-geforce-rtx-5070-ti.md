@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: HARDWARE
 
-## From [[drive-research-ubuntu-extreme-hardware-tuning-micro01|drive-research-ubuntu-extreme-hardware-tuning-micro01]] (2026-06-09)
+## From [drive-research-ubuntu-extreme-hardware-tuning-micro01](/entities/drive-research-ubuntu-extreme-hardware-tuning-micro01.md) (2026-06-09)
 - Two graphics cards based on the Blackwell GB203 architecture.
 - Operate in a dual-GPU array.
 - Have a 300W baseline power draw.

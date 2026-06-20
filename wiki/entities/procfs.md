@@ -16,16 +16,16 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[gzmo-soul-merged-new-part1|gzmo-soul-merged-new-part1]] (2026-06-09)
+## From [gzmo-soul-merged-new-part1](/entities/gzmo-soul-merged-new-part1.md) (2026-06-09)
 - Virtual filesystem mounted at /proc.
 - Acts as a standardized interface to internal kernel data structures.
 
-## From [[drive-research-automating-linux-hardware-detection-micro01|drive-research-automating-linux-hardware-detection-micro01]] (2026-06-09)
+## From [drive-research-automating-linux-hardware-detection-micro01](/entities/drive-research-automating-linux-hardware-detection-micro01.md) (2026-06-09)
 - Primary, most direct window into the Linux kernel's internal operational state.
 - Originating in the early designs of UNIX and integrated into early Linux releases, was initially process-focused.
 - Organically expanded to include a sprawling, occasionally disorganized collection of kernel configuration parameters, subsystem states, and hardware metrics.
 
-## From [[gzmo-soul-merged-new-part2-micro05|gzmo-soul-merged-new-part2-micro05]] (2026-06-09)
+## From [gzmo-soul-merged-new-part2-micro05](/entities/gzmo-soul-merged-new-part2-micro05.md) (2026-06-09)
 - Virtual filesystem.
 - A window directly into the 'soul' of the kernel.
 - Information is generated on the fly by the kernel.

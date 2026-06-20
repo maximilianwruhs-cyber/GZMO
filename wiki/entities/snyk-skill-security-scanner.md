@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[openclaw-deep-research-part7-micro01|openclaw-deep-research-part7-micro01]] (2026-06-10)
+## From [openclaw-deep-research-part7-micro01](/entities/openclaw-deep-research-part7-micro01.md) (2026-06-10)
 - Recommended tool for reviewing agent skills.

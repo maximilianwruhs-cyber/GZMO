@@ -14,12 +14,12 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[beyond-the-dark-room-allostatic-regulation-and-co|beyond-the-dark-room-allostatic-regulation-and-co]] (2026-06-08)
+## From [beyond-the-dark-room-allostatic-regulation-and-co](/entities/beyond-the-dark-room-allostatic-regulation-and-co.md) (2026-06-08)
 - It is an architecture for anticipatory regulation.
 - The allostatic reactive control model has been successfully deployed as an augmentation of this architecture.
 - It facilitates biomimetic autonomy in artificial agents.
 
-## From [[drive-research-homeostatic-regulation-and-dynamic-equilibrium-in|drive-research-homeostatic-regulation-and-dynamic-equilibrium-in]] (2026-06-08)
+## From [drive-research-homeostatic-regulation-and-dynamic-equilibrium-in](/entities/drive-research-homeostatic-regulation-and-dynamic-equilibrium-in.md) (2026-06-08)
 - Utilizes the allostatic controller as a master orchestrator.
 - Dynamically adjusts setpoints of lower homeostatic modules.
 - Part of the transition to anticipatory action.

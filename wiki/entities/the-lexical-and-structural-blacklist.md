@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-crafting-a-creative-agent-prompt|drive-research-crafting-a-creative-agent-prompt]] (2026-06-08)
+## From [drive-research-crafting-a-creative-agent-prompt](/entities/drive-research-crafting-a-creative-agent-prompt.md) (2026-06-08)
 - Implements aggressive negative prompting.
 - Bans algorithmic tropes that destroy creative immersion.
 - Forbidden from using specific banned vocabulary, modifiers, copula dodges, and syntactic structures.

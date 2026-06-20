@@ -14,6 +14,6 @@ gzmo_synthetic: true
 
 Type: AUTHOR
 
-## From [[ai-research-part6-micro03|ai-research-part6-micro03]] (2026-06-09)
+## From [ai-research-part6-micro03](/entities/ai-research-part6-micro03.md) (2026-06-09)
 - Cited for the unnormalized residual stream increasing in magnitude with depth.
 - Cited for scale mismatch between the main path and normalized inputs to residual branches.

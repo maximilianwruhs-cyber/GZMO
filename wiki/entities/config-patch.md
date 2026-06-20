@@ -15,18 +15,18 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[openclaw-deep-research-part1-micro03|openclaw-deep-research-part1-micro03]] (2026-06-09)
+## From [openclaw-deep-research-part1-micro03](/entities/openclaw-deep-research-part1-micro03.md) (2026-06-09)
 - Control-plane write RPC for programmatic configuration updates.
 - Preferred for partial updates.
 - Used after config.schema.lookup.
 
-## From [[openclaw-deep-research-part1-micro04|openclaw-deep-research-part1-micro04]] (2026-06-09)
+## From [openclaw-deep-research-part1-micro04](/entities/openclaw-deep-research-part1-micro04.md) (2026-06-09)
 - Called by openclaw gateway.
 - Performs partial updates to configuration.
 - Uses JSON merge patch semantics.
 - Requires raw and baseHash parameters.
 
-## From [[openclaw-deep-research-part9-micro06|openclaw-deep-research-part9-micro06]] (2026-06-09)
+## From [openclaw-deep-research-part9-micro06](/entities/openclaw-deep-research-part9-micro06.md) (2026-06-09)
 - Control-plane write RPC
 - Preferred partial update path
 - Merges a partial update into the existing config

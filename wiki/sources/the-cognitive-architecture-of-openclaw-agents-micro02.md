@@ -14,22 +14,22 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[gzmo-persona|GZMO persona]] (CONCEPT)
-- [[lazy-loading-architecture|Lazy Loading architecture]] (CONCEPT)
-- [[skill-md|SKILL.md]] (SYSTEM)
-- [[heartbeat-md|HEARTBEAT.md]] (SYSTEM)
-- [[large-language-models|large language models]] (SYSTEM)
-- [[moltbook|Moltbook]] (SYSTEM)
-- [[hypothetical-document-embeddings-hyde|Hypothetical Document Embeddings (HyDE)]] (TOOL)
-- [[autodream-cycle|autoDream cycle]] (CONCEPT)
-- [[nemawashi|nemawashi]] (CONCEPT)
-- [[memory-yyyy-mm-dd-md|memory/YYYY-MM-DD.md]] (SYSTEM)
-- [[openclaw|OpenClaw]] (PROJECT)
-- [[tabula-rasa|Tabula Rasa]] (CONCEPT)
-- [[gardening-directive|Gardening directive]] (CONCEPT)
-- [[soul-md|SOUL.md]] (SYSTEM)
-- [[dreams-md|DREAMS.md]] (SYSTEM)
-- [[no-reply-protocol|NO_REPLY protocol]] (CONCEPT)
+- [GZMO persona](/entities/gzmo-persona.md) (CONCEPT)
+- [Lazy Loading architecture](/entities/lazy-loading-architecture.md) (CONCEPT)
+- [SKILL.md](/entities/skill-md.md) (SYSTEM)
+- [HEARTBEAT.md](/entities/heartbeat-md.md) (SYSTEM)
+- [large language models](/entities/large-language-models.md) (SYSTEM)
+- [Moltbook](/entities/moltbook.md) (SYSTEM)
+- [Hypothetical Document Embeddings (HyDE)](/entities/hypothetical-document-embeddings-hyde.md) (TOOL)
+- [autoDream cycle](/entities/autodream-cycle.md) (CONCEPT)
+- [nemawashi](/entities/nemawashi.md) (CONCEPT)
+- [memory/YYYY-MM-DD.md](/entities/memory-yyyy-mm-dd-md.md) (SYSTEM)
+- [OpenClaw](/entities/openclaw.md) (PROJECT)
+- [Tabula Rasa](/entities/tabula-rasa.md) (CONCEPT)
+- [Gardening directive](/entities/gardening-directive.md) (CONCEPT)
+- [SOUL.md](/entities/soul-md.md) (SYSTEM)
+- [DREAMS.md](/entities/dreams-md.md) (SYSTEM)
+- [NO_REPLY protocol](/entities/no-reply-protocol.md) (CONCEPT)
 
 ## Relations
 - SOUL.md → DEFINES → GZMO persona

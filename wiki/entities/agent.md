@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[gzmo-soul-merged-new-part1|gzmo-soul-merged-new-part1]] (2026-06-09)
+## From [gzmo-soul-merged-new-part1](/entities/gzmo-soul-merged-new-part1.md) (2026-06-09)
 - Gewährt vollen Zugriff auf das Host-System laut onPolicy
 - Sollte in vertrauenswürdigen, abgeriegelten Umgebungen eingesetzt werden
 - Kann generierten Python-Code oder Bash-Skripte lokal evaluieren

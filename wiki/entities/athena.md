@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: PERSON
 
-## From [[drive-research-prometheus-and-epimetheus-myth-exploration-micro03|drive-research-prometheus-and-epimetheus-myth-exploration-micro03]] (2026-06-09)
+## From [drive-research-prometheus-and-epimetheus-myth-exploration-micro03](/entities/drive-research-prometheus-and-epimetheus-myth-exploration-micro03.md) (2026-06-09)
 - Taught Pandora weaving and needlework.
 - Contributed to Pandora's creation.

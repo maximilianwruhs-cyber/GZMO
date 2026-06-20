@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[openclaw-deep-research-part7-micro07|openclaw-deep-research-part7-micro07]] (2026-06-10)
+## From [openclaw-deep-research-part7-micro07](/entities/openclaw-deep-research-part7-micro07.md) (2026-06-10)
 - Supply chain attack involving Cline CLI v2.3.0
 - First real-world prompt injection to supply chain compromise

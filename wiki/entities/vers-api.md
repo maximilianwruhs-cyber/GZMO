@@ -14,9 +14,9 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[architectural-framework-and-development-of-pi-codi|architectural-framework-and-development-of-pi-codi]] (2026-06-08)
+## From [architectural-framework-and-development-of-pi-codi](/entities/architectural-framework-and-development-of-pi-codi.md) (2026-06-08)
 - Called by the Vers VM extension to create and manage VMs.
 
-## From [[drive-research-developing-pi-coding-agent-ide-extensions|drive-research-developing-pi-coding-agent-ide-extensions]] (2026-06-08)
+## From [drive-research-developing-pi-coding-agent-ide-extensions](/entities/drive-research-developing-pi-coding-agent-ide-extensions.md) (2026-06-08)
 - Called by the Vers VM extension to create and manage VMs.
 - Integration is a key pattern demonstrated by the extension.

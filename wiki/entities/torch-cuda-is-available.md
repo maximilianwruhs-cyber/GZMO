@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[designing-stealthy-portable-cli-agents|designing-stealthy-portable-cli-agents]] (2026-06-08)
+## From [designing-stealthy-portable-cli-agents](/entities/designing-stealthy-portable-cli-agents.md) (2026-06-08)
 - A function used to check for NVIDIA GPUs.
 - Part of a startup routine for hardware acceleration discovery.

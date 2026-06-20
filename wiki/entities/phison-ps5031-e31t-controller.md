@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: HARDWARE
 
-## From [[drive-research-ubuntu-extreme-hardware-tuning-micro01|drive-research-ubuntu-extreme-hardware-tuning-micro01]] (2026-06-09)
+## From [drive-research-ubuntu-extreme-hardware-tuning-micro01](/entities/drive-research-ubuntu-extreme-hardware-tuning-micro01.md) (2026-06-09)
 - Controller for the KIOXIA Exceria Plus G4 SSD.
 - DRAM-less design.
 - Manages FTL mapping table.

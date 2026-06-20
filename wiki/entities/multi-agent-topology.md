@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: ARCHITECTURE_PATTERN
 
-## From [[gzmo-soul-merged-new-part2-micro08|gzmo-soul-merged-new-part2-micro08]] (2026-06-10)
+## From [gzmo-soul-merged-new-part2-micro08](/entities/gzmo-soul-merged-new-part2-micro08.md) (2026-06-10)
 - Frameworks: LangGraph, CrewAI

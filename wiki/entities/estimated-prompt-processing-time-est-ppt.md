@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-llama-bench-performance-benchmarking-tool-micro02|drive-research-llama-bench-performance-benchmarking-tool-micro02]] (2026-06-09)
+## From [drive-research-llama-bench-performance-benchmarking-tool-micro02](/entities/drive-research-llama-bench-performance-benchmarking-tool-micro02.md) (2026-06-09)
 - Calculated by subtracting estimated API routing latency from TTFR.
 - Isolates the server's actual prefill duration.

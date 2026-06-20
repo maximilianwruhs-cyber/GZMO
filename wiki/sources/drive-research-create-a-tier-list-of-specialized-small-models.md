@@ -14,21 +14,21 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-08).
 
 ## Entities
-- [[smollm3-3b|SmolLM3-3B]] (SYSTEM)
-- [[small-language-models-slms|Small Language Models (SLMs)]] (CONCEPT)
-- [[deepseek-r1-distill-qwen-7b|DeepSeek-R1-Distill-Qwen-7B]] (SYSTEM)
-- [[zeta-2-8b|Zeta 2 (8B)]] (SYSTEM)
-- [[llama-3-2-3b|Llama 3.2 (3B)]] (SYSTEM)
-- [[meta|Meta]] (ORGANIZATION)
-- [[phi-4-mini-3-8b|Phi-4-mini (3.8B)]] (SYSTEM)
-- [[qwen3-coder-next|Qwen3-Coder-Next]] (SYSTEM)
-- [[gemma-4-e4b|Gemma 4 e4B]] (SYSTEM)
-- [[qwen3-5-0-8b|Qwen3.5-0.8B]] (SYSTEM)
-- [[qwen3-5-4b|Qwen3.5-4B]] (SYSTEM)
-- [[llama-3-1-8b|Llama 3.1 (8B)]] (SYSTEM)
-- [[claude-3-5-sonnet|Claude 3.5 Sonnet]] (SYSTEM)
-- [[rag-pipelines|RAG pipelines]] (CONCEPT)
-- [[swe-bench|SWE-bench]] (TOOL)
+- [SmolLM3-3B](/entities/smollm3-3b.md) (SYSTEM)
+- [Small Language Models (SLMs)](/entities/small-language-models-slms.md) (CONCEPT)
+- [DeepSeek-R1-Distill-Qwen-7B](/entities/deepseek-r1-distill-qwen-7b.md) (SYSTEM)
+- [Zeta 2 (8B)](/entities/zeta-2-8b.md) (SYSTEM)
+- [Llama 3.2 (3B)](/entities/llama-3-2-3b.md) (SYSTEM)
+- [Meta](/entities/meta.md) (ORGANIZATION)
+- [Phi-4-mini (3.8B)](/entities/phi-4-mini-3-8b.md) (SYSTEM)
+- [Qwen3-Coder-Next](/entities/qwen3-coder-next.md) (SYSTEM)
+- [Gemma 4 e4B](/entities/gemma-4-e4b.md) (SYSTEM)
+- [Qwen3.5-0.8B](/entities/qwen3-5-0-8b.md) (SYSTEM)
+- [Qwen3.5-4B](/entities/qwen3-5-4b.md) (SYSTEM)
+- [Llama 3.1 (8B)](/entities/llama-3-1-8b.md) (SYSTEM)
+- [Claude 3.5 Sonnet](/entities/claude-3-5-sonnet.md) (SYSTEM)
+- [RAG pipelines](/entities/rag-pipelines.md) (CONCEPT)
+- [SWE-bench](/entities/swe-bench.md) (TOOL)
 
 ## Relations
 - Zeta 2 (8B) → DISTILLED_FROM → Claude 3.5 Sonnet

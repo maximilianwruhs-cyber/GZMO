@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-technologischer-branchen-report-hilfsbetriebeumri-micro03|drive-research-technologischer-branchen-report-hilfsbetriebeumri-micro03]] (2026-06-09)
+## From [drive-research-technologischer-branchen-report-hilfsbetriebeumri-micro03](/entities/drive-research-technologischer-branchen-report-hilfsbetriebeumri-micro03.md) (2026-06-09)
 - Piecewise Linear Electrical Circuit Simulation software from Plexim.
 - Industry standard for simulating the dynamic behavior of power electronics.
 - Models semiconductors as ideal switches for fast calculations.

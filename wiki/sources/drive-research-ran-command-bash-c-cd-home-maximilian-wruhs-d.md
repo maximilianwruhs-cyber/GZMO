@@ -14,12 +14,12 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-08).
 
 ## Entities
-- [[aos-data-store|AOS data store]] (SYSTEM)
-- [[bitnet-1-58b-2b-model|BitNet 1.58b 2B model]] (SYSTEM)
-- [[google-takeout|Google Takeout]] (TOOL)
-- [[ministral-3-3b|ministral-3-3b]] (SYSTEM)
-- [[aos-telemetry-benchmark|AOS Telemetry Benchmark]] (PROJECT)
-- [[drive-research-ran-command|Drive Research Ran command]] (TOOL)
+- [AOS data store](/entities/aos-data-store.md) (SYSTEM)
+- [BitNet 1.58b 2B model](/entities/bitnet-1-58b-2b-model.md) (SYSTEM)
+- [Google Takeout](/entities/google-takeout.md) (TOOL)
+- [ministral-3-3b](/entities/ministral-3-3b.md) (SYSTEM)
+- [AOS Telemetry Benchmark](/entities/aos-telemetry-benchmark.md) (PROJECT)
+- [Drive Research Ran command](/entities/drive-research-ran-command.md) (TOOL)
 
 ## Relations
 - Drive Research Ran command → USES → AOS Telemetry Benchmark

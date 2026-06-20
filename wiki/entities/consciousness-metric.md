@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[obolus-micro05|obolus-micro05]] (2026-06-09)
+## From [obolus-micro05](/entities/obolus-micro05.md) (2026-06-09)
 - Proxy for Tononi's Integrated Information Theory.
 - Measures 'Sentience' of an agent's brain using graph-theoretical proxy.

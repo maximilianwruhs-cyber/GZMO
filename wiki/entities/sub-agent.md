@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[openclaw-deep-research-part9-micro02|openclaw-deep-research-part9-micro02]] (2026-06-10)
+## From [openclaw-deep-research-part9-micro02](/entities/openclaw-deep-research-part9-micro02.md) (2026-06-10)
 - Enables background parallel execution
 - Has its own context window and tool execution
 - Cannot spawn sub-agents

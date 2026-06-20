@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[reflexion-framework-architectures-for-mitigating|reflexion-framework-architectures-for-mitigating]] (2026-06-08)
+## From [reflexion-framework-architectures-for-mitigating](/entities/reflexion-framework-architectures-for-mitigating.md) (2026-06-08)
 - Serves as the objective scoring function.
 - Computes a reward score based on external environmental feedback, exact-match answer keys, or deterministic heuristics.
 - Provides an external reality check, preventing the Actor from hallucinating success.

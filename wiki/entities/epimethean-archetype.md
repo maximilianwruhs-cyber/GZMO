@@ -13,5 +13,5 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-prometheus-and-epimetheus-myth-exploration-micro04|drive-research-prometheus-and-epimetheus-myth-exploration-micro04]] (2026-06-10)
+## From [drive-research-prometheus-and-epimetheus-myth-exploration-micro04](/entities/drive-research-prometheus-and-epimetheus-myth-exploration-micro04.md) (2026-06-10)
 - Represents hindsight and the unforeseen burdens of technological mastery.

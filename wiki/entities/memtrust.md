@@ -14,6 +14,6 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[architectures-for-agentic-memory-virtual-context-micro07|architectures-for-agentic-memory-virtual-context-micro07]] (2026-06-09)
+## From [architectures-for-agentic-memory-virtual-context-micro07](/entities/architectures-for-agentic-memory-virtual-context-micro07.md) (2026-06-09)
 - Establishes a zero-trust, hardware-backed architecture comprising five distinct layers: Storage, Extraction, Learning, Retrieval, and Governance.
 - Allows enterprises to enforce Trusted Execution Environments (TEEs) at the extraction and retrieval layers.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[beyond-the-dark-room-allostatic-regulation-and-co|beyond-the-dark-room-allostatic-regulation-and-co]] (2026-06-08)
+## From [beyond-the-dark-room-allostatic-regulation-and-co](/entities/beyond-the-dark-room-allostatic-regulation-and-co.md) (2026-06-08)
 - A devastating phenomenon that occurs exclusively within the Tension domain.
 - Leads inextricably to friction collapse.
 - Occurs as Grain overtakes the system's baseline capacity for feedback stabilization.

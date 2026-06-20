@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-welcome-to-the-master-assembly-manual-for-the-sove|drive-research-welcome-to-the-master-assembly-manual-for-the-sove]] (2026-06-08)
+## From [drive-research-welcome-to-the-master-assembly-manual-for-the-sove](/entities/drive-research-welcome-to-the-master-assembly-manual-for-the-sove.md) (2026-06-08)
 - Used for Model Context Protocol (MCP) servers.
 - Installed via nvm-sh/nvm.
 - Version 22 is installed and used.

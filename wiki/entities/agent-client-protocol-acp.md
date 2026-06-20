@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[architectural-analysis-of-the-openclaw-ai-plugin-s|architectural-analysis-of-the-openclaw-ai-plugin-s]] (2026-06-08)
+## From [architectural-analysis-of-the-openclaw-ai-plugin-s](/entities/architectural-analysis-of-the-openclaw-ai-plugin-s.md) (2026-06-08)
 - Standardizes structured communication between human interfaces and headless AI agents.
 - Formalizes the exchange of thinking processes, distinct tool executions, and multi-turn file modifications.
 - The acpx plugin evolved to communicate using ACP JSON-RPC 2.0 standards over standard I/O.

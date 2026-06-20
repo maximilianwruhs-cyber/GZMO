@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: SOFTWARE_COMPONENT
 
-## From [[drive-research-ubuntu-extreme-hardware-tuning-micro01|drive-research-ubuntu-extreme-hardware-tuning-micro01]] (2026-06-09)
+## From [drive-research-ubuntu-extreme-hardware-tuning-micro01](/entities/drive-research-ubuntu-extreme-hardware-tuning-micro01.md) (2026-06-09)
 - Located within the BIOS.
 - Allows manual definition of PBO limits.

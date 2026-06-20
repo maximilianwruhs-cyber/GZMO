@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[ai-research-part2|ai-research-part2]] (2026-06-08)
+## From [ai-research-part2](/entities/ai-research-part2.md) (2026-06-08)
 - Stands for Tool-Integrated Reasoning.
 - Achieved a MATH score of 44.2 and General score of 25.7.
 - Applying Reinforcement Learning to enhance LLM tool-use is a growing field.

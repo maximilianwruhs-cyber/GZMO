@@ -14,17 +14,17 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-08).
 
 ## Entities
-- [[amd-ryzen-9-9950x-zen-5|AMD Ryzen 9 9950X Zen 5]] (SYSTEM)
-- [[undefined-behavior-ub|Undefined Behavior (UB)]] (CONCEPT)
-- [[cache-optimized-hypervisor|cache_optimized_hypervisor]] (PROJECT)
-- [[dual-rtx-5070-ti-gpus|Dual RTX 5070 Ti GPUs]] (SYSTEM)
-- [[nightly-rust-toolchain|Nightly Rust Toolchain]] (TOOL)
-- [[cachealignedvec-t|CacheAlignedVec<T>]] (SYSTEM)
-- [[option-b-the-allocator-aware-custom-aligned-vector|Option B (The Allocator-Aware Custom Aligned Vector)]] (CONCEPT)
-- [[google-takeout|Google Takeout]] (TOOL)
-- [[zero-sized-types-zsts|Zero-Sized Types (ZSTs)]] (CONCEPT)
-- [[miri|Miri]] (TOOL)
-- [[drive-research-cache-optimization-blueprint|Drive Research Cache Optimization blueprint]] (PROJECT)
+- [AMD Ryzen 9 9950X Zen 5](/entities/amd-ryzen-9-9950x-zen-5.md) (SYSTEM)
+- [Undefined Behavior (UB)](/entities/undefined-behavior-ub.md) (CONCEPT)
+- [cache_optimized_hypervisor](/entities/cache-optimized-hypervisor.md) (PROJECT)
+- [Dual RTX 5070 Ti GPUs](/entities/dual-rtx-5070-ti-gpus.md) (SYSTEM)
+- [Nightly Rust Toolchain](/entities/nightly-rust-toolchain.md) (TOOL)
+- [CacheAlignedVec<T>](/entities/cachealignedvec-t.md) (SYSTEM)
+- [Option B (The Allocator-Aware Custom Aligned Vector)](/entities/option-b-the-allocator-aware-custom-aligned-vector.md) (CONCEPT)
+- [Google Takeout](/entities/google-takeout.md) (TOOL)
+- [Zero-Sized Types (ZSTs)](/entities/zero-sized-types-zsts.md) (CONCEPT)
+- [Miri](/entities/miri.md) (TOOL)
+- [Drive Research Cache Optimization blueprint](/entities/drive-research-cache-optimization-blueprint.md) (PROJECT)
 
 ## Relations
 - Drive Research Cache Optimization blueprint → USES → Google Takeout

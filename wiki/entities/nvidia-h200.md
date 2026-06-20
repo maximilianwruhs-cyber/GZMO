@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: HARDWARE
 
-## From [[drive-research-erbandbreite-und-latenzengp-sse|drive-research-erbandbreite-und-latenzengpässe]] (2026-06-08)
+## From [drive-research-erbandbreite-und-latenzengpässe](/entities/drive-research-erbandbreite-und-latenzengp-sse.md) (2026-06-08)
 - enterprise hardware used for empirical testing
 - Llama 3.3 70B target model achieves ~51.14 tokens/sec without speculation
 - Llama 3.3 70B with 8B draft model achieves 134.38 tokens/sec (2.6x speedup)

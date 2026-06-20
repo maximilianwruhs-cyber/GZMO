@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[high-fidelity-markdown-engineering-and-ast-process|high-fidelity-markdown-engineering-and-ast-process]] (2026-06-08)
+## From [high-fidelity-markdown-engineering-and-ast-process](/entities/high-fidelity-markdown-engineering-and-ast-process.md) (2026-06-08)
 - HTML Abstract Syntax Tree specification.
 - Security utilities like rehype-sanitize can be deployed to neutralize XSS vectors.
 - Can be chained with rehype-parse and rehype-remark for Markdown conversion.

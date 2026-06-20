@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-token-efficient-bol-processing-architecture|drive-research-token-efficient-bol-processing-architecture]] (2026-06-08)
+## From [drive-research-token-efficient-bol-processing-architecture](/entities/drive-research-token-efficient-bol-processing-architecture.md) (2026-06-08)
 - Implemented by vLLM.
 - Allows new queries to skip the expensive prefill computation phase entirely if they share identical prompt prefixes with existing queries.
 - Forces the Time to First Token (TTFT) to plummet for BoL extraction.

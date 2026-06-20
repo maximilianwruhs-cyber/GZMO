@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[high-performance-typescript-execution-and-architec-part2|high-performance-typescript-execution-and-architec-part2]] (2026-06-08)
+## From [high-performance-typescript-execution-and-architec-part2](/entities/high-performance-typescript-execution-and-architec-part2.md) (2026-06-08)
 - State-of-the-art platforms implement them to maintain accurate semantic retrieval.
 - They operate as a hierarchical system of digital cryptographic fingerprints.
 - Periodic synchronization routines compare the live filesystem's Merkle root against the stored index.

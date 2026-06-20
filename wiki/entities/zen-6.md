@@ -15,16 +15,16 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-linux-gaming-and-ai-build-guide-micro02|drive-research-linux-gaming-and-ai-build-guide-micro02]] (2026-06-09)
+## From [drive-research-linux-gaming-and-ai-build-guide-micro02](/entities/drive-research-linux-gaming-and-ai-build-guide-micro02.md) (2026-06-09)
 - AMD's highly anticipated architecture.
 - Slated for late 2026 or 2027 releases.
 - Rumors indicate an architectural leap to TSMC's 2nm process.
 
-## From [[the-2026-linux-workstation-micro03|the-2026-linux-workstation-micro03]] (2026-06-09)
+## From [the-2026-linux-workstation-micro03](/entities/the-2026-linux-workstation-micro03.md) (2026-06-09)
 - AMD's highly anticipated architecture.
 - Slated for late 2026 or 2027 releases.
 - Rumors indicate architectural leap to TSMC's 2nm process.
 
-## From [[drive-research-linux-gaming-and-ai-build-guide-micro06|drive-research-linux-gaming-and-ai-build-guide-micro06]] (2026-06-10)
+## From [drive-research-linux-gaming-and-ai-build-guide-micro06](/entities/drive-research-linux-gaming-and-ai-build-guide-micro06.md) (2026-06-10)
 - Codename 'Morpheus'
 - Slated for late 2026 or 2027

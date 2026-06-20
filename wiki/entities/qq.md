@@ -14,8 +14,8 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[openclaw-deep-research-part5-micro05|openclaw-deep-research-part5-micro05]] (2026-06-10)
+## From [openclaw-deep-research-part5-micro05](/entities/openclaw-deep-research-part5-micro05.md) (2026-06-10)
 - A messaging platform supported by OpenClaw's native integration
 
-## From [[openclaw-deep-research-part5-micro08|openclaw-deep-research-part5-micro08]] (2026-06-10)
+## From [openclaw-deep-research-part5-micro08](/entities/openclaw-deep-research-part5-micro08.md) (2026-06-10)
 - A messaging platform supported by OpenClaw.

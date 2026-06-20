@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[openclaw-deep-research-part2|openclaw-deep-research-part2]] (2026-06-08)
+## From [openclaw-deep-research-part2](/entities/openclaw-deep-research-part2.md) (2026-06-08)
 - VirusTotal's Code Insight is used for further analysis of unknown artifacts.
 - VirusTotal explicitly added native support in Code Insight for OpenClaw skill packages in February 2026.
 - Code Insight can compress triage time by highlighting suspicious patterns.

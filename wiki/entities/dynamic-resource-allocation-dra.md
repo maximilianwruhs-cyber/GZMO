@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[aether-grid-micro04|aether-grid-micro04]] (2026-06-09)
+## From [aether-grid-micro04](/entities/aether-grid-micro04.md) (2026-06-09)
 - Manages predictive thermal management.
 - Measures RAM/CPU load and temperature.
 - Shifts background syncs to slower cores when temperature rises.

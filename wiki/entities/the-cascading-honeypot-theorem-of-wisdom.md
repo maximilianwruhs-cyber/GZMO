@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-cascading-honeypot-theorem-of-wisdom|the-cascading-honeypot-theorem-of-wisdom]] (2026-06-08)
+## From [the-cascading-honeypot-theorem-of-wisdom](/entities/the-cascading-honeypot-theorem-of-wisdom.md) (2026-06-08)
 - Profoundly validated by the inquiry into AI mechanisms, information theory, and human cognitive psychology.
 - Describes the transition from raw data to true wisdom as architectural distillation and dimensional reduction.
 - Posits that memory is a descending series of interconnected webs.

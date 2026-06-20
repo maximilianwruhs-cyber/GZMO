@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: PLATFORM
 
-## From [[drive-research-autonomous-devops-ai-safety-boundaries|drive-research-autonomous-devops-ai-safety-boundaries]] (2026-06-08)
+## From [drive-research-autonomous-devops-ai-safety-boundaries](/entities/drive-research-autonomous-devops-ai-safety-boundaries.md) (2026-06-08)
 - Emerging platform leveraging declarative configuration.
 - Builds AI-native operating systems for autonomous agent hosting.
 - Provides tamper-proof audit trails and post-quantum encrypted meshes.

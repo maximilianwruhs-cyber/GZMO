@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[obolus-vs-codium-extension-konzept-research-part1-micro01|obolus-vs-codium-extension-konzept-research-part1-micro01]] (2026-06-09)
+## From [obolus-vs-codium-extension-konzept-research-part1-micro01](/entities/obolus-vs-codium-extension-konzept-research-part1-micro01.md) (2026-06-09)
 - Created using createWebviewPanel.
 - Shown in VS Code as distinct editors.
 - Useful for displaying custom UI and custom visualizations.

@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[high-performance-typescript-execution-and-architec-part1-micro06|high-performance-typescript-execution-and-architec-part1-micro06]] (2026-06-09)
+## From [high-performance-typescript-execution-and-architec-part1-micro06](/entities/high-performance-typescript-execution-and-architec-part1-micro06.md) (2026-06-09)
 - A shell command to get CPU brand string.
 - Used when targetComponent is 'cpu' and verboseOutput is false.

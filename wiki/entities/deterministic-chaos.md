@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[dynamics-of-the-unpredictable-micro03|dynamics-of-the-unpredictable-micro03]] (2026-06-09)
+## From [dynamics-of-the-unpredictable-micro03](/entities/dynamics-of-the-unpredictable-micro03.md) (2026-06-09)
 - Characterized by a positive maximal Lyapunov exponent and bounded solutions.
 - Beyond predictability horizons, deterministic systems mathematically mimic pure randomness.
 - Unpredictability is driven purely by Sensitive Dependence on Initial Conditions (SDIC) within a fixed set of governing rules.

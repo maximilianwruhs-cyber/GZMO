@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-llamacpp-optimization-blueprint-micro02|drive-research-llamacpp-optimization-blueprint-micro02]] (2026-06-09)
+## From [drive-research-llamacpp-optimization-blueprint-micro02](/entities/drive-research-llamacpp-optimization-blueprint-micro02.md) (2026-06-09)
 - A specific instruction set native to modern architectures like Ryzen 9000 series and Intel Scalable processors.
 - The -DGGML_AVX512=ON flag forces the compiler to utilize 512-bit wide registers.
 - Heavily accelerates complex dot products required for CPU-bound matrix multiplications.

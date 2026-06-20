@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-cascading-honeypot-theorem-of-wisdom|the-cascading-honeypot-theorem-of-wisdom]] (2026-06-08)
+## From [the-cascading-honeypot-theorem-of-wisdom](/entities/the-cascading-honeypot-theorem-of-wisdom.md) (2026-06-08)
 - The ultimate culmination of learning in human psychological development.
 - Linked to the ability to let go of the trivial noise of the past.
 - Considered the safest, most productive path forward when it involves purposeful forgetting of wrongs and mundane details.

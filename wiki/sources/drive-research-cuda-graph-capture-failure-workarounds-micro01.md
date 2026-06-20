@@ -14,9 +14,9 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[wave-04-drive-research|wave_04_drive_research]] (PROJECT)
-- [[drive-research-cuda-graph-capture-failure-workarounds|Drive Research CUDA Graph Capture Failure Workarounds]] (CONCEPT)
-- [[google-takeout|Google Takeout]] (TOOL)
+- [wave_04_drive_research](/entities/wave-04-drive-research.md) (PROJECT)
+- [Drive Research CUDA Graph Capture Failure Workarounds](/entities/drive-research-cuda-graph-capture-failure-workarounds.md) (CONCEPT)
+- [Google Takeout](/entities/google-takeout.md) (TOOL)
 
 ## Relations
 - Drive Research CUDA Graph Capture Failure Workarounds → USES → Google Takeout

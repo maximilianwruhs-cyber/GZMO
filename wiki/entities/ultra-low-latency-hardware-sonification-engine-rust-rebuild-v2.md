@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: LANGUAGE
 
-## From [[prompt-agent-engineering-part2-micro05|prompt-agent-engineering-part2-micro05]] (2026-06-09)
+## From [prompt-agent-engineering-part2-micro05](/entities/prompt-agent-engineering-part2-micro05.md) (2026-06-09)
 - The language for the sonification engine rebuild
 - Must compile with cargo build --release
 - A production-grade, Linux-native Rust system sonification engine

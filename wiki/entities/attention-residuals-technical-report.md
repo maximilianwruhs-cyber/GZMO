@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[ai-research-part1|ai-research-part1]] (2026-06-08)
+## From [ai-research-part1](/entities/ai-research-part1.md) (2026-06-08)
 - The document from which entities and relations are being extracted.
 - Lists authors in order of significance of contributions.
 - Proposed as AttnRes, it replaces fixed accumulation with softmax attention over preceding layer outputs.

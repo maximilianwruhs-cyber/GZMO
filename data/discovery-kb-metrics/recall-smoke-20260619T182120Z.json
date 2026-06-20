@@ -1,0 +1,38 @@
+{
+  "generated_at": "2026-06-19T18:21:20Z",
+  "total_queries": 5,
+  "passed": 5,
+  "pass_rate": 1.0,
+  "results": [
+    {
+      "link_id": "L22",
+      "recall_query": "retrieval blindness",
+      "hit": true,
+      "preview": "Platform recall for 'retrieval blindness':\n\n## Honeypot / Vault\n\n- [1] (Score: 0.05) [CONCEPT:Peer Review] Models include Single-Blind, Double-Blind, Triple-Blind, Open & Transparent, Collaborative, a"
+    },
+    {
+      "link_id": "L23",
+      "recall_query": "documentation-operationality gap",
+      "hit": true,
+      "preview": "Platform recall for 'documentation-operationality gap':\n\n## Honeypot / Vault\n\n- [1] (Score: 0.58) [CONCEPT:Tools Are Leaves] A gap identified in architectural research.\n- [2] (Score: 0.15) [CONCEPT:Tr"
+    },
+    {
+      "link_id": "L24",
+      "recall_query": "configuration visibility gap",
+      "hit": true,
+      "preview": "Platform recall for 'configuration visibility gap':\n\n## Honeypot / Vault\n\n- [1] (Score: 0.96) [SYSTEM:efivarfs filesystem] Successfully bridges the gap between proprietary, closed-source motherboard f"
+    },
+    {
+      "link_id": "L25",
+      "recall_query": "observation-of-internal-model",
+      "hit": true,
+      "preview": "Platform recall for 'observation-of-internal-model':\n\n## Honeypot / Vault\n\n- [1] (Score: 0.42) [SYSTEM:Arize AI Phoenix] A machine learning observability platform extending deep monitoring to autonomo"
+    },
+    {
+      "link_id": "L26",
+      "recall_query": "cognitive-operationality gap",
+      "hit": true,
+      "preview": "Platform recall for 'cognitive-operationality gap':\n\n## Honeypot / Vault\n\n- [1] (Score: 0.02) [PLATFORM:InfraNodus] Its built-in AI generates novel research questions to bridge identified gaps.\n- [2] "
+    }
+  ]
+}

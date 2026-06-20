@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: MODEL
 
-## From [[drive-research-agentic-workflows-fastest-best-models|drive-research-agentic-workflows-fastest-best-models]] (2026-06-08)
+## From [drive-research-agentic-workflows-fastest-best-models](/entities/drive-research-agentic-workflows-fastest-best-models.md) (2026-06-08)
 - Introduces a Sparse Mixture of Experts (MoE) architecture.
 - Physically stores 26 billion parameters but routes tokens to only 2 active experts.
 - Drastically reduces active parameter count per forward pass.

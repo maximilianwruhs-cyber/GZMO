@@ -14,16 +14,16 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-08).
 
 ## Entities
-- [[ingest|Ingest]] (CONCEPT)
-- [[the-honeypot-compiler-architecture|The Honeypot Compiler Architecture]] (CONCEPT)
-- [[the-schema|The Schema]] (CONCEPT)
-- [[the-wiki|The Wiki]] (CONCEPT)
-- [[lint-maintenance|Lint/Maintenance]] (CONCEPT)
-- [[query|Query]] (CONCEPT)
-- [[vector-database|Vector Database]] (SYSTEM)
-- [[rag|RAG]] (CONCEPT)
-- [[raw-sources|Raw Sources]] (CONCEPT)
-- [[executable-wiki|Executable Wiki]] (CONCEPT)
+- [Ingest](/entities/ingest.md) (CONCEPT)
+- [The Honeypot Compiler Architecture](/entities/the-honeypot-compiler-architecture.md) (CONCEPT)
+- [The Schema](/entities/the-schema.md) (CONCEPT)
+- [The Wiki](/entities/the-wiki.md) (CONCEPT)
+- [Lint/Maintenance](/entities/lint-maintenance.md) (CONCEPT)
+- [Query](/entities/query.md) (CONCEPT)
+- [Vector Database](/entities/vector-database.md) (SYSTEM)
+- [RAG](/entities/rag.md) (CONCEPT)
+- [Raw Sources](/entities/raw-sources.md) (CONCEPT)
+- [Executable Wiki](/entities/executable-wiki.md) (CONCEPT)
 
 ## Relations
 - The Honeypot Compiler Architecture → USES → Raw Sources

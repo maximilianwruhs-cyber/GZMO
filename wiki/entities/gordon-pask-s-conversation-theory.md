@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-redefining-agentic-soulmd-to-dialog-micro04|drive-research-redefining-agentic-soulmd-to-dialog-micro04]] (2026-06-09)
+## From [drive-research-redefining-agentic-soulmd-to-dialog-micro04](/entities/drive-research-redefining-agentic-soulmd-to-dialog-micro04.md) (2026-06-09)
 - The architecture must mandate the execution of periodic 'teachback gates'.
 - Ensures that shared meaning is actively constructed and continuously verified.

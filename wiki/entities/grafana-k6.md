@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-benchmarking-llamacpp-server-prefill-tokens-micro01|drive-research-benchmarking-llamacpp-server-prefill-tokens-micro01]] (2026-06-09)
+## From [drive-research-benchmarking-llamacpp-server-prefill-tokens-micro01](/entities/drive-research-benchmarking-llamacpp-server-prefill-tokens-micro01.md) (2026-06-09)
 - A load testing framework integrated with llama-server for production-level validation.
 - Requires a custom version with Server-Sent Events (SSE) support for streaming protocol.
 - Used to measure tail latencies, queue sizing, and slot allocation efficiency.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-hermes-compression-and-bol-architecture|drive-research-hermes-compression-and-bol-architecture]] (2026-06-08)
+## From [drive-research-hermes-compression-and-bol-architecture](/entities/drive-research-hermes-compression-and-bol-architecture.md) (2026-06-08)
 - framework launches a predictive search vectorizing the current conversational trajectory
 - accepts a slightly degraded memory experience within a single, immediate session in exchange for total stability across long-running, multi-day deployments
 - engineered with an aggressive defensive posture, optimizing for controlled execution and auditable telemetry

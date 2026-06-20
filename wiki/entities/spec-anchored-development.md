@@ -17,17 +17,17 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-ai-agents-and-spec-driven-development-micro02|drive-research-ai-agents-and-spec-driven-development-micro02]] (2026-06-09)
+## From [drive-research-ai-agents-and-spec-driven-development-micro02](/entities/drive-research-ai-agents-and-spec-driven-development-micro02.md) (2026-06-09)
 - The specification is retained as a persistent artifact alongside the codebase.
 - Optimal for the majority of production enterprise systems.
 - Continuous feedback loop mirrors principles of Behavior-Driven Development.
 
-## From [[drive-research-ai-agents-and-spec-driven-development1-micro01|drive-research-ai-agents-and-spec-driven-development1-micro01]] (2026-06-09)
+## From [drive-research-ai-agents-and-spec-driven-development1-micro01](/entities/drive-research-ai-agents-and-spec-driven-development1-micro01.md) (2026-06-09)
 - The specification is retained as a persistent artifact alongside the codebase.
 - Mirrors principles of Behavior-Driven Development (BDD).
 - Optimal for the majority of production enterprise systems.
 
-## From [[spec-driven-development-architecting-the-era-of-a-micro02|spec-driven-development-architecting-the-era-of-a-micro02]] (2026-06-10)
+## From [spec-driven-development-architecting-the-era-of-a-micro02](/entities/spec-driven-development-architecting-the-era-of-a-micro02.md) (2026-06-10)
 - The middle ground tier of SDD implementation.
 - Specification is retained as a persistent artifact alongside the codebase.
 - Optimal for production enterprise systems.

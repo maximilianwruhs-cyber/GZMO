@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[the-agentic-operating-environment-a-synthesis-arc-micro01|the-agentic-operating-environment-a-synthesis-arc-micro01]] (2026-06-10)
+## From [the-agentic-operating-environment-a-synthesis-arc-micro01](/entities/the-agentic-operating-environment-a-synthesis-arc-micro01.md) (2026-06-10)
 - A fully autonomous, spatially aware system.
 - Achieved by fusing three distinct technological pillars.

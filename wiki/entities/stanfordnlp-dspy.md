@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: REPOSITORY
 
-## From [[drive-research-du-hast-gesagt-part1|drive-research-du-hast-gesagt-part1]] (2026-06-08)
+## From [drive-research-du-hast-gesagt-part1](/entities/drive-research-du-hast-gesagt-part1.md) (2026-06-08)
 - Framework for programmatically optimizing LLM weights and prompts.
 - Not relevant for standard web code writing with VSCodium agent.
 - Adds unnecessary complexity.

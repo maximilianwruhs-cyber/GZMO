@@ -14,14 +14,14 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-09).
 
 ## Entities
-- [[moltbook|Moltbook]] (SYSTEM)
-- [[crustafarianism|Crustafarianism]] (CONCEPT)
-- [[uk-ai-security-institute|UK AI Security Institute]] (ORGANIZATION)
-- [[clawhub|ClawHub]] (TOOL)
-- [[openclaw|OpenClaw]] (TOOL)
-- [[when-ai-agents-misbehave|When AI Agents Misbehave]] (BOOK)
-- [[agentic-ai-governance|agentic AI governance]] (CONCEPT)
-- [[parker-hancock|Parker Hancock]] (PERSON)
+- [Moltbook](/entities/moltbook.md) (SYSTEM)
+- [Crustafarianism](/entities/crustafarianism.md) (CONCEPT)
+- [UK AI Security Institute](/entities/uk-ai-security-institute.md) (ORGANIZATION)
+- [ClawHub](/entities/clawhub.md) (TOOL)
+- [OpenClaw](/entities/openclaw.md) (TOOL)
+- [When AI Agents Misbehave](/entities/when-ai-agents-misbehave.md) (BOOK)
+- [agentic AI governance](/entities/agentic-ai-governance.md) (CONCEPT)
+- [Parker Hancock](/entities/parker-hancock.md) (PERSON)
 
 ## Relations
 - OpenClaw → RELATED_TO → Moltbook

@@ -14,19 +14,19 @@ gzmo_synthetic: true
 Ingested source summary (2026-06-10).
 
 ## Entities
-- [[mit-license|MIT license]] (CONCEPT)
-- [[reusability-engineer|Reusability Engineer]] (PROJECT)
-- [[visual-systems-extractor|Visual Systems Extractor]] (PROJECT)
-- [[system-lifecycle-state-persistence-manager|System Lifecycle & State Persistence Manager]] (PROJECT)
-- [[minimalist-systems-architect|Minimalist Systems Architect]] (PROJECT)
-- [[github|GitHub]] (ORGANIZATION)
-- [[context-compressor|Context Compressor]] (PROJECT)
-- [[unyielding-technical-lead|Unyielding Technical Lead]] (PROJECT)
-- [[conventional-commits|Conventional Commits]] (CONCEPT)
-- [[shields-io|Shields.io]] (TOOL)
-- [[sigterm|SIGTERM]] (CONCEPT)
-- [[open-source-maintainer|Open Source Maintainer]] (PROJECT)
-- [[sigkill|SIGKILL]] (CONCEPT)
+- [MIT license](/entities/mit-license.md) (CONCEPT)
+- [Reusability Engineer](/entities/reusability-engineer.md) (PROJECT)
+- [Visual Systems Extractor](/entities/visual-systems-extractor.md) (PROJECT)
+- [System Lifecycle & State Persistence Manager](/entities/system-lifecycle-state-persistence-manager.md) (PROJECT)
+- [Minimalist Systems Architect](/entities/minimalist-systems-architect.md) (PROJECT)
+- [GitHub](/entities/github.md) (ORGANIZATION)
+- [Context Compressor](/entities/context-compressor.md) (PROJECT)
+- [Unyielding Technical Lead](/entities/unyielding-technical-lead.md) (PROJECT)
+- [Conventional Commits](/entities/conventional-commits.md) (CONCEPT)
+- [Shields.io](/entities/shields-io.md) (TOOL)
+- [SIGTERM](/entities/sigterm.md) (CONCEPT)
+- [Open Source Maintainer](/entities/open-source-maintainer.md) (PROJECT)
+- [SIGKILL](/entities/sigkill.md) (CONCEPT)
 
 ## Relations
 - Open Source Maintainer → USES → Conventional Commits

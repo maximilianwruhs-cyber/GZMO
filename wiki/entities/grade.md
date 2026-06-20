@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-research-project-initiation-guide|drive-research-research-project-initiation-guide]] (2026-06-08)
+## From [drive-research-research-project-initiation-guide](/entities/drive-research-research-project-initiation-guide.md) (2026-06-08)
 - Grading of Recommendations Assessment, Development, and Evaluation.
 - A framework used to assess the certainty of evidence.
 - Used in systematic reviews and meta-analyses.
 
-## From [[optimizing-nvidia-blackwell-sm120-part2-micro06|optimizing-nvidia-blackwell-sm120-part2-micro06]] (2026-06-10)
+## From [optimizing-nvidia-blackwell-sm120-part2-micro06](/entities/optimizing-nvidia-blackwell-sm120-part2-micro06.md) (2026-06-10)
 - Framework used to evaluate the certainty of evidence

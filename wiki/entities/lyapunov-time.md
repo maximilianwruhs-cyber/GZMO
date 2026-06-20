@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[dynamics-of-the-unpredictable-micro04|dynamics-of-the-unpredictable-micro04]] (2026-06-09)
+## From [dynamics-of-the-unpredictable-micro04](/entities/dynamics-of-the-unpredictable-micro04.md) (2026-06-09)
 - The atmospheric Lyapunov time strictly limits precise local forecasting in meteorology to about a week.
 - Quantitative analysts can push accurate market predictions up to twelve Lyapunov times using reservoir computing.

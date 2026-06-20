@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[the-openclaw-architecture-and-tri-circuit-autonomo-part2|the-openclaw-architecture-and-tri-circuit-autonomo-part2]] (2026-06-08)
+## From [the-openclaw-architecture-and-tri-circuit-autonomo-part2](/entities/the-openclaw-architecture-and-tri-circuit-autonomo-part2.md) (2026-06-08)
 - Purpose: A Darwinian loop for autonomous model mutation and prompt optimization.
 - Stack: OpenHands, Mergekit, and the Obolus Python Fitness Scorer.
 - Evaluates agent mutations against a baseline using hardware energy monitoring.

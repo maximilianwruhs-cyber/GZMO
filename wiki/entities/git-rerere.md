@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[architectural-framework-for-scalable-codebase-rest|architectural-framework-for-scalable-codebase-rest]] (2026-06-08)
+## From [architectural-framework-for-scalable-codebase-rest](/entities/architectural-framework-for-scalable-codebase-rest.md) (2026-06-08)
 - A rigid Git strategy is required for version control during mass directory restructuring.
 - The `git mv` command should be used for relocating files.
 - The `git rerere` tool can be employed to automate the resolution of recurring conflict patterns.

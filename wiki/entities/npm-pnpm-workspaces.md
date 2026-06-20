@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[high-performance-typescript-execution-and-architec-part2|high-performance-typescript-execution-and-architec-part2]] (2026-06-08)
+## From [high-performance-typescript-execution-and-architec-part2](/entities/high-performance-typescript-execution-and-architec-part2.md) (2026-06-08)
 - They are complex structural paradigms used in large-scale enterprise monorepos.
 - They manage inter-dependent TypeScript packages.
 - They provide advantages like unified versioning and centralized tooling.

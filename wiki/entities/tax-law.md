@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-setting-up-autonomous-trading-agents-micro03|drive-research-setting-up-autonomous-trading-agents-micro03]] (2026-06-09)
+## From [drive-research-setting-up-autonomous-trading-agents-micro03](/entities/drive-research-setting-up-autonomous-trading-agents-micro03.md) (2026-06-09)
 - Autonomous trading must remain within its bounds.
 - Is a consideration for retail algorithmic traders.

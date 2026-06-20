@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-linux-gaming-and-ai-build-guide-micro01|drive-research-linux-gaming-and-ai-build-guide-micro01]] (2026-06-09)
+## From [drive-research-linux-gaming-and-ai-build-guide-micro01](/entities/drive-research-linux-gaming-and-ai-build-guide-micro01.md) (2026-06-09)
 - AMD's platform that attempts to close the gap with CUDA.
 - ROCm 7.1 expanded hardware support for consumer Radeon RX 9000 series cards.
 - Suffers from an enduring 'optimization gap' compared to CUDA.

@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-crafting-a-creative-agent-prompt|drive-research-crafting-a-creative-agent-prompt]] (2026-06-08)
+## From [drive-research-crafting-a-creative-agent-prompt](/entities/drive-research-crafting-a-creative-agent-prompt.md) (2026-06-08)
 - A theory of cognition detailing how elements from diverse scenarios are merged.
 - Operates utilizing mental spaces: generic, primary input, secondary input, and blended.
 - Involves composition, completion, and elaboration operations.

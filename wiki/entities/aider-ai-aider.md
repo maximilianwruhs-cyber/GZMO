@@ -15,7 +15,7 @@ gzmo_synthetic: true
 
 Type: REPOSITORY
 
-## From [[drive-research-du-hast-gesagt-part1|drive-research-du-hast-gesagt-part1]] (2026-06-08)
+## From [drive-research-du-hast-gesagt-part1](/entities/drive-research-du-hast-gesagt-part1.md) (2026-06-08)
 - Undisputed king of the Terminal.
 - Compresses large codebases into a 'map' for local AI models.
 - Used for large-scale refactoring without crashing GPU.
@@ -34,5 +34,5 @@ Type: REPOSITORY
 - Used for cleaning up tech debt.
 - Installed globally via pipx.
 
-## From [[ai-research-part8-micro08|ai-research-part8-micro08]] (2026-06-09)
+## From [ai-research-part8-micro08](/entities/ai-research-part8-micro08.md) (2026-06-09)
 - An AI pair programming agent utilized as a baseline for the Polyglot benchmark.

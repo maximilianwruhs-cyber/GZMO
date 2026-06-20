@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-automating-linux-hardware-detection-micro01|drive-research-automating-linux-hardware-detection-micro01]] (2026-06-09)
+## From [drive-research-automating-linux-hardware-detection-micro01](/entities/drive-research-automating-linux-hardware-detection-micro01.md) (2026-06-09)
 - Used for dispatching uevents from the kernel to userspace.
 - Belongs to the NETLINK_KOBJECT_UEVENT address family.
 - Utilized by kobject_uevent_env to transmit the payload.

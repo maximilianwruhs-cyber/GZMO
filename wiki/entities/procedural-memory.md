@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-ai-agentic-teacher-research-report|drive-research-ai-agentic-teacher-research-report]] (2026-06-08)
+## From [drive-research-ai-agentic-teacher-research-report](/entities/drive-research-ai-agentic-teacher-research-report.md) (2026-06-08)
 - Execution logic, internalized pedagogical rulesets, and workflow decision trees.
 - Preserves knowledge of how to effectively teach a specific concept to this specific student.
 - Utilizes workflow databases, embedded behavioral prompts, and external tool execution logs.

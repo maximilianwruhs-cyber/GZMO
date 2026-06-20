@@ -14,12 +14,12 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[local-first-rag-architecting-sovereign-ai-with-li|local-first-rag-architecting-sovereign-ai-with-li]] (2026-06-08)
+## From [local-first-rag-architecting-sovereign-ai-with-li](/entities/local-first-rag-architecting-sovereign-ai-with-li.md) (2026-06-08)
 - Metadata is universally managed via YAML frontmatter blocks located at the absolute top of the Markdown file in an Obsidian vault.
 - The bridging script must programmatically construct and inject a robust YAML schema.
 - Tags within the YAML array must not include the # prefix.
 
-## From [[migrating-openclaw-to-vercel-ai-sdk-for-local-llm|migrating-openclaw-to-vercel-ai-sdk-for-local-llm]] (2026-06-08)
+## From [migrating-openclaw-to-vercel-ai-sdk-for-local-llm](/entities/migrating-openclaw-to-vercel-ai-sdk-for-local-llm.md) (2026-06-08)
 - A component of the SKILL.md file.
 - Serves as the critical routing, gating, and dependency injection layer for the skill.
 - Contains metadata like 'name', 'description', 'metadata.openclaw.requires.env', 'metadata.openclaw.requires.bins', 'user-invocable', and 'context'.

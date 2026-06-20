@@ -15,13 +15,13 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part2|drive-research-ki-berater-fragebogen-für-kundenanalyse-part2]] (2026-06-08)
+## From [drive-research-ki-berater-fragebogen-für-kundenanalyse-part2](/entities/drive-research-ki-berater-fragebogen-f-r-kundenanalyse-part2.md) (2026-06-08)
 - "Chain-of-thought Reasoning"
 
-## From [[prompt-agent-engineering-part6-micro06|prompt-agent-engineering-part6-micro06]] (2026-06-10)
+## From [prompt-agent-engineering-part6-micro06](/entities/prompt-agent-engineering-part6-micro06.md) (2026-06-10)
 - Requires explicitly thinking aloud
 - Involves stating assumptions, hypothesizing causes/effects, and justifying decisions
 
-## From [[prompt-agent-engineering-part6-micro07|prompt-agent-engineering-part6-micro07]] (2026-06-10)
+## From [prompt-agent-engineering-part6-micro07](/entities/prompt-agent-engineering-part6-micro07.md) (2026-06-10)
 - Requires explicitly thinking aloud.
 - Involves stating assumptions, hypothesizing causes/effects, and evaluating evidence.

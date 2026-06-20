@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[prompt-agent-engineering-part7-micro02|prompt-agent-engineering-part7-micro02]] (2026-06-09)
+## From [prompt-agent-engineering-part7-micro02](/entities/prompt-agent-engineering-part7-micro02.md) (2026-06-09)
 - A key concept evaluated in the audit protocol.
 - Requires evaluation of technical benchmarks, peer-reviewed validation, and market dominance.
 - Can be temporary in fast-moving fields.

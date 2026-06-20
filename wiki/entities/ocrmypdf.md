@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[drive-research-pdf-text-vs-scan-detection-heuristics-micro03|drive-research-pdf-text-vs-scan-detection-heuristics-micro03]] (2026-06-09)
+## From [drive-research-pdf-text-vs-scan-detection-heuristics-micro03](/entities/drive-research-pdf-text-vs-scan-detection-heuristics-micro03.md) (2026-06-09)
 - A highly popular utility for the eventual heavy OCR step.
 - Includes built-in command-line arguments specifically engineered to prevent redundant processing.
 - Relies internally on PyMuPDF (when installed with the [fitz] extra package) to intelligently evaluate whether a page requires OCR on a strict, per-page basis.
 
-## From [[drive-research-pdf-text-vs-scan-detection-heuristics-micro04|drive-research-pdf-text-vs-scan-detection-heuristics-micro04]] (2026-06-10)
+## From [drive-research-pdf-text-vs-scan-detection-heuristics-micro04](/entities/drive-research-pdf-text-vs-scan-detection-heuristics-micro04.md) (2026-06-10)
 - Adds an OCR text layer to PDF files.

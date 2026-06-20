@@ -14,8 +14,8 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[openclaw-deep-research-part5-micro03|openclaw-deep-research-part5-micro03]] (2026-06-09)
+## From [openclaw-deep-research-part5-micro03](/entities/openclaw-deep-research-part5-micro03.md) (2026-06-09)
 - OpenClaw opened the Google Cloud Console to configure OAuth and provision a token.
 
-## From [[openclaw-deep-research-part5-micro02|openclaw-deep-research-part5-micro02]] (2026-06-10)
+## From [openclaw-deep-research-part5-micro02](/entities/openclaw-deep-research-part5-micro02.md) (2026-06-10)
 - Accessed by openclaw to provision tokens.

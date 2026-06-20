@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: COMMAND
 
-## From [[from-static-vaults-to-autonomous-knowledge-engines|from-static-vaults-to-autonomous-knowledge-engines]] (2026-06-08)
+## From [from-static-vaults-to-autonomous-knowledge-engines](/entities/from-static-vaults-to-autonomous-knowledge-engines.md) (2026-06-08)
 - It is a highly specialized command within the claude-obsidian framework.
 - It triggers a multi-round, autonomous web research loop.
 - It is explicitly designed for gap-filling.

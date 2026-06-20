@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: ARCHITECTURE
 
-## From [[drive-research-autonomous-devops-ai-safety-boundaries|drive-research-autonomous-devops-ai-safety-boundaries]] (2026-06-08)
+## From [drive-research-autonomous-devops-ai-safety-boundaries](/entities/drive-research-autonomous-devops-ai-safety-boundaries.md) (2026-06-08)
 - Details the translation into a functional DevOps agent.
 - Examines native telemetry integrations for synthetic interoception.
 - Addresses architectural boundaries of safety.

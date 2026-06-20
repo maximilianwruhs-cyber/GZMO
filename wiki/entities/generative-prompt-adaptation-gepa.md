@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: ALGORITHM
 
-## From [[engineering-ignorance-eliminating-affirmative-bia|engineering-ignorance-eliminating-affirmative-bia]] (2026-06-08)
+## From [engineering-ignorance-eliminating-affirmative-bia](/entities/engineering-ignorance-eliminating-affirmative-bia.md) (2026-06-08)
 - Treats prompts as parameters that can be iteratively refined using task-level feedback.
 - Iteratively selects candidate prompts under a fixed optimization constraint.
 - Applies reflective updates using execution traces.

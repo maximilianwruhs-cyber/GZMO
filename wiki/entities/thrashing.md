@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: CONCEPT
 
-## From [[architectures-for-agentic-memory-virtual-context-micro06|architectures-for-agentic-memory-virtual-context-micro06]] (2026-06-09)
+## From [architectures-for-agentic-memory-virtual-context-micro06](/entities/architectures-for-agentic-memory-virtual-context-micro06.md) (2026-06-09)
 - Pathology where a system spends more computational resources swapping pages than executing useful processes.
 - Occurs when an agent's working set of knowledge exceeds its Core Memory limit.
 - Leads to a recursive, highly expensive cycle.

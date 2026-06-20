@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: BOOK
 
-## From [[the-architecture-of-speculative-decoding-and-infer-part2-micro01|the-architecture-of-speculative-decoding-and-infer-part2-micro01]] (2026-06-09)
+## From [the-architecture-of-speculative-decoding-and-infer-part2-micro01](/entities/the-architecture-of-speculative-decoding-and-infer-part2-micro01.md) (2026-06-09)
 - Document title.
 - Split into micro-parts for KG extraction.

@@ -14,12 +14,12 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-hidden-mode-technical-analysis-and-configurati|drive-research-hidden-mode-technical-analysis-and-configurati]] (2026-06-08)
+## From [drive-research-hidden-mode-technical-analysis-and-configurati](/entities/drive-research-hidden-mode-technical-analysis-and-configurati.md) (2026-06-08)
 - Act as key-value databases storing factual, structural, and domain-specific knowledge.
 - Extracted and positioned side-by-side as parallel, specialized experts at each corresponding layer boundary.
 - Gating network is inserted immediately prior to the expert FFN blocks at each layer.
 
-## From [[drive-research-hidden-mode-technical-analysis-and-configuration|drive-research-hidden-mode-technical-analysis-and-configuration]] (2026-06-08)
+## From [drive-research-hidden-mode-technical-analysis-and-configuration](/entities/drive-research-hidden-mode-technical-analysis-and-configuration.md) (2026-06-08)
 - Act as key-value databases storing factual, structural, and domain-specific knowledge.
 - Extracted and positioned side-by-side as parallel, specialized experts at each corresponding layer boundary.
 - Gating network is inserted immediately prior to the expert FFN blocks at each layer.

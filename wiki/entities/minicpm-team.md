@@ -13,7 +13,7 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[ai-research-part4|ai-research-part4]] (2026-06-08)
+## From [ai-research-part4](/entities/ai-research-part4.md) (2026-06-08)
 - Developed MiniCPM-SALA.
 - Associated with the Hugging Face repository openbmb/MiniCPM-SALA.
 - Associated with the GitHub repository OpenBMB/MiniCPM.

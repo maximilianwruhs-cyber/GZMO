@@ -13,6 +13,6 @@ gzmo_synthetic: true
 
 Type: AUTHOR
 
-## From [[ai-research-part1|ai-research-part1]] (2026-06-08)
+## From [ai-research-part1](/entities/ai-research-part1.md) (2026-06-08)
 - Authored "Measuring Massive Multitask Language Understanding" in 2021.
 - Authored "Measuring Mathematical Problem Solving With the MATH Dataset" in 2021.

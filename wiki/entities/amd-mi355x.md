@@ -15,13 +15,13 @@ gzmo_synthetic: true
 
 Type: SYSTEM
 
-## From [[drive-research-linux-gaming-and-ai-build-guide-micro01|drive-research-linux-gaming-and-ai-build-guide-micro01]] (2026-06-09)
+## From [drive-research-linux-gaming-and-ai-build-guide-micro01](/entities/drive-research-linux-gaming-and-ai-build-guide-micro01.md) (2026-06-09)
 - AMD's data-center hardware.
 - Demonstrates competitive throughput against NVIDIA's enterprise accelerators.
 
-## From [[drive-research-linux-gaming-and-ai-build-guide-micro04|drive-research-linux-gaming-and-ai-build-guide-micro04]] (2026-06-09)
+## From [drive-research-linux-gaming-and-ai-build-guide-micro04](/entities/drive-research-linux-gaming-and-ai-build-guide-micro04.md) (2026-06-09)
 - AMD's data-center hardware.
 - Demonstrates competitive throughput against NVIDIA's enterprise accelerators.
 
-## From [[the-2026-linux-workstation-micro02|the-2026-linux-workstation-micro02]] (2026-06-10)
+## From [the-2026-linux-workstation-micro02](/entities/the-2026-linux-workstation-micro02.md) (2026-06-10)
 - AMD data-center hardware

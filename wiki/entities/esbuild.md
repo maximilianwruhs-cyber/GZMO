@@ -16,16 +16,16 @@ gzmo_synthetic: true
 
 Type: TOOL
 
-## From [[tui-framework|tui-framework]] (2026-06-08)
+## From [tui-framework](/entities/tui-framework.md) (2026-06-08)
 - Bundles frontend code for VSCodium extensions.
 - Used with webview.asWebviewUri() for resource loading.
 
-## From [[obolus-vs-codium-extension-konzept-research-part1-micro05|obolus-vs-codium-extension-konzept-research-part1-micro05]] (2026-06-09)
+## From [obolus-vs-codium-extension-konzept-research-part1-micro05](/entities/obolus-vs-codium-extension-konzept-research-part1-micro05.md) (2026-06-09)
 - Bundler used for minimal bundle size.
 - No external runtime dependencies except ws.
 
-## From [[obolus-vs-codium-extension-konzept-research-part1-micro08|obolus-vs-codium-extension-konzept-research-part1-micro08]] (2026-06-09)
+## From [obolus-vs-codium-extension-konzept-research-part1-micro08](/entities/obolus-vs-codium-extension-konzept-research-part1-micro08.md) (2026-06-09)
 - Configuration updated in the getting started guide.
 
-## From [[obolus-vs-codium-extension-konzept-research-part1-micro03|obolus-vs-codium-extension-konzept-research-part1-micro03]] (2026-06-10)
+## From [obolus-vs-codium-extension-konzept-research-part1-micro03](/entities/obolus-vs-codium-extension-konzept-research-part1-micro03.md) (2026-06-10)
 - Used for bundling due to minimal configuration complexity and superior speed.

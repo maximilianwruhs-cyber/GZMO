@@ -14,10 +14,10 @@ gzmo_synthetic: true
 
 Type: FRAMEWORK
 
-## From [[high-performance-typescript-execution-and-architec-part2|high-performance-typescript-execution-and-architec-part2]] (2026-06-08)
+## From [high-performance-typescript-execution-and-architec-part2](/entities/high-performance-typescript-execution-and-architec-part2.md) (2026-06-08)
 - It distinguishes itself by offering three explicit abstraction levels in one SDK.
 - It offers vanilla generation, typed pipelines, and full autonomous agents.
 
-## From [[drive-research-agentic-typescript-monorepo-context-management|drive-research-agentic-typescript-monorepo-context-management]] (2026-06-08)
+## From [drive-research-agentic-typescript-monorepo-context-management](/entities/drive-research-agentic-typescript-monorepo-context-management.md) (2026-06-08)
 - Offers three explicit abstraction levels in one SDK: vanilla generation, typed pipelines, and full autonomous agents.
 - A specialized framework.

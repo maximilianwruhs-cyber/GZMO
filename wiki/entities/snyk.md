@@ -15,7 +15,7 @@ gzmo_synthetic: true
 
 Type: ORGANIZATION
 
-## From [[openclaw-deep-research-part2|openclaw-deep-research-part2]] (2026-06-08)
+## From [openclaw-deep-research-part2](/entities/openclaw-deep-research-part2.md) (2026-06-08)
 - Snyk's ToxicSkills audit and Trend Micro's AMOS campaign analysis show the ecosystem is already being abused in the wild.
 - Snyk's ToxicSkills research scanned thousands of agent skills (including ClawHub).
 - Snyk explicitly highlights dynamic fetch-and-execute patterns as present in malicious samples.
@@ -23,9 +23,9 @@ Type: ORGANIZATION
 - Its ToxicSkills report highlights specific ecosystem patterns to treat as high-risk by default.
 - Its ToxicSkills research scanned thousands of agent skills and reported significant rates of critical issues.
 
-## From [[openclaw-deep-research-part4|openclaw-deep-research-part4]] (2026-06-08)
+## From [openclaw-deep-research-part4](/entities/openclaw-deep-research-part4.md) (2026-06-08)
 - Documented OpenClaw's security crisis.
 - Research on 'ToxicSkills' found prompt injection and credential exposure in ClawHub skills.
 
-## From [[openclaw-deep-research-part1-micro07|openclaw-deep-research-part1-micro07]] (2026-06-10)
+## From [openclaw-deep-research-part1-micro07](/entities/openclaw-deep-research-part1-micro07.md) (2026-06-10)
 - An organization that conducts security audits
