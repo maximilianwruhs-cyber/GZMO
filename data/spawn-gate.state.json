@@ -620,6 +620,15 @@
       "session_id": "discovery-plan:session-final-2026-06-21T09-03-18Z",
       "task_id": "c1cecc69-129b-4182-98b6-ba81bc7f24cc",
       "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-06-21T09:56:15.495437893Z",
+      "kind": "discovery_plan",
+      "reason_hash": 619595797633535012,
+      "recommendation_id": "2e65cbc2-bb4a-4c94-b1a4-5ec4765e0be7",
+      "session_id": "discovery-plan:session-final-2026-06-21T09-41-24Z",
+      "task_id": "d83f8467-f9d7-417c-adcf-dd4de9d26a80",
+      "approved_via": "gzmo kurator plan-from-discovery"
     }
   ],
   "denials": [
