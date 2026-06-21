@@ -629,6 +629,24 @@
       "session_id": "discovery-plan:session-final-2026-06-21T09-41-24Z",
       "task_id": "d83f8467-f9d7-417c-adcf-dd4de9d26a80",
       "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-06-21T11:10:23.747804361Z",
+      "kind": "discovery_plan",
+      "reason_hash": 619595797633535012,
+      "recommendation_id": "32fbb55a-ecda-4d9c-94d8-31db4cb59a56",
+      "session_id": "discovery-plan:session-final-2026-06-21T10-57-19Z",
+      "task_id": "ef2d7695-73e8-4a83-adca-9bf4e8ad4191",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-06-21T11:13:39.198791113Z",
+      "kind": "discovery_plan",
+      "reason_hash": 619595797633535012,
+      "recommendation_id": "dfaa93b9-2a6d-4497-97be-d417e2395730",
+      "session_id": "discovery-plan:session-final-2026-06-21T10-57-19Z",
+      "task_id": "7591a051-7dee-4c44-826f-899cd6bab2c0",
+      "approved_via": "gzmo kurator plan-from-discovery"
     }
   ],
   "denials": [
