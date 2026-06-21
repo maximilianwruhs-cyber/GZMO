@@ -626,6 +626,221 @@ pub async fn run(args: &[String], config: &GzmoConfig) -> Result<()> {
         return Ok(());
     }
 
+    if args[0] == "verify-gate" {
+        if args.len() < 2 {
+            bail!("usage: gzmo kurator verify-gate <analyze|plan|approve|execute> [options]");
+        }
+        let gate_type = &args[1];
+        match gate_type.as_str() {
+            "analyze" => {
+                let mut report_path = None;
+                let mut i = 2;
+                while i < args.len() {
+                    match args[i].as_str() {
+                        "--report" => {
+                            i += 1;
+                            if i >= args.len() {
+                                bail!("--report requires a path");
+                            }
+                            report_path = Some(PathBuf::from(&args[i]));
+                        }
+                        other => bail!("unknown arg for verify-gate analyze: {other}"),
+                    }
+                    i += 1;
+                }
+                let report_path = report_path.ok_or_else(|| anyhow::anyhow!("--report is required"))?;
+                let analysis = gzmo_core::discovery_fixer::analyze_discovery_report(&report_path)?;
+                let obolus_ok = gzmo_core::obolus::gate::preflight_allowed(
+                    config,
+                    gzmo_core::obolus::ObolusAction::DiscoveryCycle,
+                    gzmo_core::obolus::ObolusTier::SemiAutonomous,
+                    None,
+                )?;
+                let passed = analysis.has_actionable() && obolus_ok;
+                let reason = if !analysis.has_actionable() {
+                    "no actionable findings in report".to_string()
+                } else if !obolus_ok {
+                    "obolus preflight discovery_cycle denied".to_string()
+                } else {
+                    "preflight analyze gate passed".to_string()
+                };
+                let out = serde_json::json!({
+                    "gate": "ANALYZE_TO_PLAN",
+                    "passed": passed,
+                    "findings": {
+                        "fail": analysis.fail_count,
+                        "gap": analysis.gap_count,
+                        "action": analysis.action_count,
+                        "total": analysis.actionable_count(),
+                    },
+                    "obolus_ok": obolus_ok,
+                    "reason": reason,
+                });
+                println!("{}", serde_json::to_string_pretty(&out)?);
+                if !passed {
+                    std::process::exit(1);
+                }
+                return Ok(());
+            }
+            "plan" => {
+                let mut plan_path = None;
+                let mut report_path = None;
+                let mut i = 2;
+                while i < args.len() {
+                    match args[i].as_str() {
+                        "--plan-dir" => {
+                            i += 1;
+                            if i >= args.len() {
+                                bail!("--plan-dir requires a path");
+                            }
+                            plan_path = Some(PathBuf::from(&args[i]));
+                        }
+                        "--report" => {
+                            i += 1;
+                            if i >= args.len() {
+                                bail!("--report requires a path");
+                            }
+                            report_path = Some(PathBuf::from(&args[i]));
+                        }
+                        other => bail!("unknown arg for verify-gate plan: {other}"),
+                    }
+                    i += 1;
+                }
+                let plan_dir = plan_path.ok_or_else(|| anyhow::anyhow!("--plan-dir is required"))?;
+                let report_path = report_path.ok_or_else(|| anyhow::anyhow!("--report is required"))?;
+                let plan_dir = if plan_dir.is_dir() {
+                    plan_dir
+                } else {
+                    plan_dir.parent().unwrap_or(&plan_dir).to_path_buf()
+                };
+                let output = gzmo_core::discovery_plan_agent::PlanOutputPaths {
+                    plan_dir: plan_dir.to_path_buf(),
+                    plan_md: plan_dir.join("plan.md"),
+                    plan_json: plan_dir.join("plan.json"),
+                    plan_provenance: plan_dir.join("plan-provenance.json"),
+                };
+                let analysis = gzmo_core::discovery_fixer::analyze_discovery_report(&report_path)?;
+                let ver = gzmo_core::discovery_plan_agent::verify_plan_agent_outcome(&output, &[], &analysis.findings);
+                let out = serde_json::json!({
+                    "gate": "PLAN_TO_APPROVE",
+                    "passed": ver.passed,
+                    "reason": ver.notes,
+                });
+                println!("{}", serde_json::to_string_pretty(&out)?);
+                if !ver.passed {
+                    std::process::exit(2);
+                }
+                return Ok(());
+            }
+            "approve" => {
+                let mut plan_path = None;
+                let mut i = 2;
+                while i < args.len() {
+                    match args[i].as_str() {
+                        "--plan-dir" => {
+                            i += 1;
+                            if i >= args.len() {
+                                bail!("--plan-dir requires a path");
+                            }
+                            plan_path = Some(PathBuf::from(&args[i]));
+                        }
+                        other => bail!("unknown arg for verify-gate approve: {other}"),
+                    }
+                    i += 1;
+                }
+                let plan_dir = plan_path.ok_or_else(|| anyhow::anyhow!("--plan-dir is required"))?;
+                let plan_dir = if plan_dir.is_dir() {
+                    plan_dir
+                } else {
+                    plan_dir.parent().unwrap_or(&plan_dir).to_path_buf()
+                };
+                let result = gzmo_core::discovery_execute::ensure_plan_executable(&plan_dir);
+                let passed = result.is_ok();
+                let reason = match &result {
+                    Ok(_) => "plan approved and executable".to_string(),
+                    Err(e) => e.to_string(),
+                };
+                let out = serde_json::json!({
+                    "gate": "APPROVE_TO_EXECUTE",
+                    "passed": passed,
+                    "reason": reason,
+                });
+                println!("{}", serde_json::to_string_pretty(&out)?);
+                if !passed {
+                    std::process::exit(3);
+                }
+                return Ok(());
+            }
+            "execute" => {
+                let mut plan_path = None;
+                let mut workstream_id = String::new();
+                let mut i = 2;
+                while i < args.len() {
+                    match args[i].as_str() {
+                        "--plan-dir" => {
+                            i += 1;
+                            if i >= args.len() {
+                                bail!("--plan-dir requires a path");
+                            }
+                            plan_path = Some(PathBuf::from(&args[i]));
+                        }
+                        "--workstream" => {
+                            i += 1;
+                            if i >= args.len() {
+                                bail!("--workstream requires an ID");
+                            }
+                            workstream_id = args[i].clone();
+                        }
+                        other => bail!("unknown arg for verify-gate execute: {other}"),
+                    }
+                    i += 1;
+                }
+                let plan_dir = plan_path.ok_or_else(|| anyhow::anyhow!("--plan-dir is required"))?;
+                if workstream_id.is_empty() {
+                    bail!("--workstream is required");
+                }
+                let plan_dir = if plan_dir.is_dir() {
+                    plan_dir
+                } else {
+                    plan_dir.parent().unwrap_or(&plan_dir).to_path_buf()
+                };
+
+                let gzmo_root = std::env::var("GZMO_ROOT")
+                    .map(PathBuf::from)
+                    .unwrap_or_else(|_| std::env::current_dir().unwrap_or_else(|_| PathBuf::from(".")));
+                let skills_root = gzmo_core::discovery_fixer::canonical_skills_root();
+
+                let failed_cmds = gzmo_core::discovery_acceptance_gate::run_execute_acceptance(
+                    &plan_dir,
+                    &workstream_id,
+                    &gzmo_root,
+                    &skills_root,
+                    Some(&workstream_id),
+                );
+
+                let passed = failed_cmds.is_empty();
+                let reason = if passed {
+                    "all acceptance checks passed".to_string()
+                } else {
+                    format!("acceptance checks failed: {}", failed_cmds.join("; "))
+                };
+
+                let out = serde_json::json!({
+                    "gate": "EXECUTE_TO_DISTILL",
+                    "passed": passed,
+                    "failed_commands": failed_cmds,
+                    "reason": reason,
+                });
+                println!("{}", serde_json::to_string_pretty(&out)?);
+                if !passed {
+                    std::process::exit(4);
+                }
+                return Ok(());
+            }
+            other => bail!("unknown verify-gate action: {other}"),
+        }
+    }
+
     if args[0] == "approve-plan" {
         let mut plan_path = None;
         let mut i = 1;
@@ -697,7 +912,7 @@ pub async fn run(args: &[String], config: &GzmoConfig) -> Result<()> {
     }
 
     eprintln!(
-        "Usage: gzmo kurator status | gzmo kurator remediation-status [--json] | gzmo kurator approve <id> | gzmo kurator approve-plan --plan <dir> | gzmo kurator fix-from-discovery --report <path> [--session-id <id>] [--register-only] [--spawn] | gzmo kurator implement-from-discovery --report <path> [--session-id <id>] [--spawn] | gzmo kurator plan-from-discovery --report <path> [--session-id <id>] [--spawn] [--force-replan] | gzmo kurator execute-workstream --plan <dir> --workstream <id> [--spawn]"
+        "Usage: gzmo kurator status | gzmo kurator remediation-status [--json] | gzmo kurator approve <id> | gzmo kurator approve-plan --plan <dir> | gzmo kurator verify-gate <analyze|plan|approve|execute> [options] | gzmo kurator fix-from-discovery --report <path> [--session-id <id>] [--register-only] [--spawn] | gzmo kurator implement-from-discovery --report <path> [--session-id <id>] [--spawn] | gzmo kurator plan-from-discovery --report <path> [--session-id <id>] [--spawn] [--force-replan] | gzmo kurator execute-workstream --plan <dir> --workstream <id> [--spawn]"
     );
     Ok(())
 }

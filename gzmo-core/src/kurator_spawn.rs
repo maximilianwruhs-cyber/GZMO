@@ -271,9 +271,30 @@ async fn spawn_discovery_execute(
             spec = build_discovery_execute_spec(rec, config, plan_dir);
         }
 
+        let skills_root = crate::discovery_fixer::canonical_skills_root();
+        let mut active_skills_root = skills_root.clone();
+        let mut fix_id = None;
+
+        if config.fixer_worktree_isolation {
+            let fid = uuid::Uuid::new_v4().to_string();
+            match create_git_worktree(&skills_root, &fid) {
+                Ok(wt_dir) => {
+                    spec.working_dir = Some(wt_dir.to_string_lossy().into_owned());
+                    active_skills_root = wt_dir;
+                    fix_id = Some(fid);
+                }
+                Err(e) => {
+                    tracing::error!(error = %e, "Failed to create git worktree, falling back to non-isolated");
+                }
+            }
+        }
+
         let mut result = match runner.spawn(spec.clone()).await {
             Ok(r) => r,
             Err(e) => {
+                if let Some(ref fid) = fix_id {
+                    let _ = remove_git_worktree(&skills_root, fid);
+                }
                 tracing::warn!(attempt, error = %e, "Discovery execute spawn failed");
                 if attempt >= max_retries {
                     return Err(e);
@@ -291,13 +312,19 @@ async fn spawn_discovery_execute(
             plan_dir,
             workstream_id,
             project_root,
-            &crate::discovery_fixer::canonical_skills_root(),
+            &active_skills_root,
+            Some(&result.task_id),
         );
+
+        let mut active_roots = roots.clone();
+        if active_roots.len() > 1 {
+            active_roots[1] = active_skills_root.clone();
+        }
 
         let mut verification = crate::discovery_execute::verify_execute_outcome(
             &result.summary,
             result.hit_max_iterations,
-            &roots,
+            &active_roots,
             &result.written_paths,
         );
 
@@ -313,8 +340,20 @@ async fn spawn_discovery_execute(
         }
 
         if verification.passed {
+            if let Some(ref fid) = fix_id {
+                if let Err(e) = copy_written_paths_back(&skills_root, &active_skills_root, &result.written_paths) {
+                    tracing::error!(error = %e, "Failed to copy isolated worktree files back");
+                }
+            }
+            if let Some(ref fid) = fix_id {
+                let _ = remove_git_worktree(&skills_root, fid);
+            }
             last_result = Some(result);
             break;
+        }
+
+        if let Some(ref fid) = fix_id {
+            let _ = remove_git_worktree(&skills_root, fid);
         }
 
         tracing::warn!(
@@ -590,6 +629,7 @@ async fn spawn_discovery_code_implement_with_retries(
             &finding_id,
             project_root,
             &active_skills_root,
+            Some(&result.task_id),
         );
 
         let mut active_roots = roots.clone();
@@ -793,6 +833,7 @@ async fn spawn_discovery_fix_with_retries(
                     &finding,
                     project_root,
                     &active_skills_root,
+                    Some(&result.task_id),
                 );
                 acceptance_failed.extend(failed_cmds);
             }

@@ -33,6 +33,8 @@ done
 
 echo "═══ Phase 1 — Analyze (report present) ═══"
 echo "  report: $REPORT"
+echo "  Enforcing Analyze -> Plan Stage Gate..."
+"$BIN" kurator verify-gate analyze --report "$REPORT"
 
 echo "═══ Phase 2 — Plan ═══"
 PLAN_ARGS=(kurator plan-from-discovery --report "$REPORT")
@@ -46,6 +48,9 @@ PLAN_DIR="$(ls -td "$SKILLS/data/discovery-implementation/plans"/*/ 2>/dev/null 
 echo "  plan_dir: $PLAN_DIR"
 
 echo "═══ Phase 3 — Validate (ownership + verify gate) ═══"
+echo "  Enforcing Plan -> Approve Stage Gate..."
+"$BIN" kurator verify-gate plan --plan-dir "$PLAN_DIR" --report "$REPORT"
+
 if ! "$BIN" kurator plan-from-discovery --report "$REPORT" 2>&1 | grep -q "verify gate"; then
   echo "  plan verify: check plan.json manually"
 fi
@@ -55,12 +60,19 @@ fi
 
 echo "═══ Phase 4 — Approve + Dispatch ═══"
 "$BIN" kurator approve-plan --plan "$PLAN_DIR"
+
+echo "  Enforcing Approve -> Execute Stage Gate..."
+"$BIN" kurator verify-gate approve --plan-dir "$PLAN_DIR"
+
 WS_ID="$(jq -r '.workstreams[0].id // empty' "$PLAN_DIR/plan.json")"
 [[ -n "$WS_ID" ]] || { echo "No workstream in plan"; exit 1; }
 
 EXEC_ARGS=(kurator execute-workstream --plan "$PLAN_DIR" --workstream "$WS_ID")
 [[ $SPAWN -eq 1 ]] && EXEC_ARGS+=(--spawn)
 "$BIN" "${EXEC_ARGS[@]}"
+
+echo "  Enforcing Execute -> Distill Stage Gate..."
+"$BIN" kurator verify-gate execute --plan-dir "$PLAN_DIR" --workstream "$WS_ID"
 
 echo "═══ Phase 5 — Verify ═══"
 "$ROOT/scripts/query-discovery-activities.sh" summary

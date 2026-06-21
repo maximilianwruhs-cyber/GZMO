@@ -1,141 +1,6 @@
 {
   "executions": [
     {
-      "at": "2026-06-18T12:14:41.303500995Z",
-      "kind": "discovery_fix",
-      "reason_hash": 11065346780322469580,
-      "recommendation_id": "74a35c9e-20cc-4e7c-8c34-b2a02ce3dd75",
-      "session_id": "discovery-plan:session-final-2026-06-18T12-04-13Z",
-      "task_id": "6637621f-4208-47fa-8538-81cd9f1caca1",
-      "approved_via": "gzmo kurator plan-from-discovery"
-    },
-    {
-      "at": "2026-06-18T14:22:10.363943692Z",
-      "kind": "discovery_fix",
-      "reason_hash": 13983896481303605016,
-      "recommendation_id": "ce6ceddf-069a-40e6-99a2-ebee98ed95a6",
-      "session_id": "discovery-fix:closeout-deferred-2026-06-18:C1",
-      "task_id": "0c694f1b-8abb-4bdb-8ad6-0671e0400523",
-      "approved_via": "gzmo kurator execute-workstream"
-    },
-    {
-      "at": "2026-06-18T14:22:39.680277639Z",
-      "kind": "discovery_fix",
-      "reason_hash": 14523118787798902473,
-      "recommendation_id": "a3889153-3c9a-4f5c-9f87-3825812cd953",
-      "session_id": "discovery-fix:closeout-deferred-2026-06-18:C2",
-      "task_id": "95220388-c024-45af-af45-c59c8c342d38",
-      "approved_via": "gzmo kurator execute-workstream"
-    },
-    {
-      "at": "2026-06-18T14:23:01.048191459Z",
-      "kind": "discovery_fix",
-      "reason_hash": 12410441886579928483,
-      "recommendation_id": "da8c39c8-3460-4202-99be-ad9267ca1f76",
-      "session_id": "discovery-fix:closeout-deferred-2026-06-18:C3",
-      "task_id": "3ee54180-4074-412c-9c6f-6f5cea1542ed",
-      "approved_via": "gzmo kurator execute-workstream"
-    },
-    {
-      "at": "2026-06-18T14:28:19.061976677Z",
-      "kind": "discovery_fix",
-      "reason_hash": 13704788181286320241,
-      "recommendation_id": "b3f3c909-af69-4c43-88ad-0ad6b970ce71",
-      "session_id": "discovery-fix:closeout-deferred-2026-06-18:C4",
-      "task_id": "bea2a2be-a9f0-4c9f-b36a-137d776c7a7d",
-      "approved_via": "gzmo kurator execute-workstream"
-    },
-    {
-      "at": "2026-06-18T14:28:54.234199945Z",
-      "kind": "discovery_fix",
-      "reason_hash": 4141349157391203491,
-      "recommendation_id": "b48d47e3-975a-49ee-afe2-54b44c154266",
-      "session_id": "discovery-fix:closeout-deferred-2026-06-18:C5",
-      "task_id": "4e91a4f7-c234-400b-8704-dfcccbbc9318",
-      "approved_via": "gzmo kurator execute-workstream"
-    },
-    {
-      "at": "2026-06-18T14:29:25.230392853Z",
-      "kind": "discovery_fix",
-      "reason_hash": 4141349157391203491,
-      "recommendation_id": "77bd5065-ccb5-4ba2-a7e0-da77b2e39887",
-      "session_id": "discovery-fix:closeout-deferred-2026-06-18:C5",
-      "task_id": "54eec98d-807b-46a4-984b-2777467ee2ec",
-      "approved_via": "gzmo kurator execute-workstream"
-    },
-    {
-      "at": "2026-06-18T14:29:55.390548428Z",
-      "kind": "discovery_fix",
-      "reason_hash": 9193595776925231237,
-      "recommendation_id": "54eb577d-8cdc-4424-90f5-1fd39e068e59",
-      "session_id": "discovery-fix:closeout-deferred-2026-06-18:C6",
-      "task_id": "95570177-9f03-4606-a1c5-b7570e83a96b",
-      "approved_via": "gzmo kurator execute-workstream"
-    },
-    {
-      "at": "2026-06-18T14:30:13.650635724Z",
-      "kind": "discovery_fix",
-      "reason_hash": 12852727040374667786,
-      "recommendation_id": "b31427e0-b4f2-446b-99a4-7fad62da7214",
-      "session_id": "discovery-fix:closeout-deferred-2026-06-18:C7",
-      "task_id": "994b0791-6733-4e92-820f-bdd609d781b6",
-      "approved_via": "gzmo kurator execute-workstream"
-    },
-    {
-      "at": "2026-06-18T14:31:00.566841441Z",
-      "kind": "discovery_fix",
-      "reason_hash": 9646953434641251110,
-      "recommendation_id": "2ca1c5a4-0584-4d54-8b46-c24bd34d0cd9",
-      "session_id": "discovery-fix:closeout-deferred-2026-06-18:C8",
-      "task_id": "0606a7ba-b4d5-4311-bda5-b63ee7e195c2",
-      "approved_via": "gzmo kurator execute-workstream"
-    },
-    {
-      "at": "2026-06-18T15:13:44.707090469Z",
-      "kind": "discovery_fix",
-      "reason_hash": 9982079326720150861,
-      "recommendation_id": "34ef9b3b-676f-456b-bf53-3f848b868f3a",
-      "session_id": "discovery-fix:session-final-2026-06-18T12-04-13Z:W4",
-      "task_id": "de05bcfd-99c2-480c-b396-da043cd542e9",
-      "approved_via": "gzmo kurator execute-workstream"
-    },
-    {
-      "at": "2026-06-18T15:15:42.526391030Z",
-      "kind": "discovery_fix",
-      "reason_hash": 8422078099442127884,
-      "recommendation_id": "b6d315e6-d896-486f-aef1-841ec2cfebc9",
-      "session_id": "discovery-fix:session-final-2026-06-18T12-04-13Z:W1",
-      "task_id": "2086a27b-24c9-4f80-85a9-f1cd83dbf213",
-      "approved_via": "gzmo kurator execute-workstream"
-    },
-    {
-      "at": "2026-06-18T15:16:32.358627186Z",
-      "kind": "discovery_fix",
-      "reason_hash": 18045483818248524665,
-      "recommendation_id": "da9d3dab-9f98-4daa-8e96-2b7c04dafab8",
-      "session_id": "discovery-fix:session-final-2026-06-18T12-04-13Z:W2",
-      "task_id": "8c0bfbec-b145-4c07-a11d-4c6cbe80e333",
-      "approved_via": "gzmo kurator execute-workstream"
-    },
-    {
-      "at": "2026-06-18T15:17:58.701718015Z",
-      "kind": "discovery_fix",
-      "reason_hash": 12952010605679099444,
-      "recommendation_id": "be932a0a-60e5-4cff-b946-a8850af9ec25",
-      "session_id": "discovery-fix:session-final-2026-06-18T12-04-13Z:W3",
-      "task_id": "60c3a716-177a-4ee2-ad82-e123c4089d97",
-      "approved_via": "gzmo kurator execute-workstream"
-    },
-    {
-      "at": "2026-06-18T15:19:02.931541793Z",
-      "kind": "discovery_fix",
-      "reason_hash": 13817319417221970541,
-      "recommendation_id": "20541485-2aa0-40bd-ac28-21e500794fb4",
-      "session_id": "discovery-fix:session-final-2026-06-18T12-04-13Z:W5",
-      "task_id": "170feb69-d48f-478a-977e-fcae9f004eea",
-      "approved_via": "gzmo kurator execute-workstream"
-    },
-    {
       "at": "2026-06-19T06:51:24.145207990Z",
       "kind": "discovery_fix",
       "reason_hash": 14084814588624423265,
@@ -467,15 +332,505 @@
       "session_id": "discovery-fix:fix-f234-routing-fix-20260620T113151Z:session-final-2026-06-19T18-04-44Z",
       "task_id": "fefbb4df-fa86-43da-8c33-2b1c615c1f8c",
       "approved_via": "gzmo kurator fix-from-discovery"
+    },
+    {
+      "at": "2026-06-20T13:01:44.620973878Z",
+      "kind": "discovery_fix",
+      "reason_hash": 11689899582263500100,
+      "recommendation_id": "43d8efec-f65d-48ae-a33f-a2db10ec235e",
+      "session_id": "discovery-implement:mechanics-session-final-2026-06-16T14-57-29Z:session-final-2026-06-16T14-57-29Z",
+      "task_id": "2ce7a27c-07dc-4397-824c-cde2248ccb94",
+      "approved_via": "gzmo kurator implement-from-discovery"
+    },
+    {
+      "at": "2026-06-20T13:03:25.415873826Z",
+      "kind": "discovery_fix",
+      "reason_hash": 11689899582263500100,
+      "recommendation_id": "b2b5d77a-f555-4568-9baf-31b815af95fb",
+      "session_id": "discovery-implement:mechanics-session-final-2026-06-16T14-57-29Z:session-final-2026-06-16T14-57-29Z",
+      "task_id": "c908cce2-a0b6-4b37-ae41-1936e97b655d",
+      "approved_via": "gzmo kurator implement-from-discovery"
+    },
+    {
+      "at": "2026-06-20T13:04:22.290930819Z",
+      "kind": "discovery_fix",
+      "reason_hash": 3976374197824373386,
+      "recommendation_id": "02392e42-8b7b-42a8-bf2f-035fb0db95c1",
+      "session_id": "discovery-implement:mechanics-session-final-2026-06-16T16-25-43Z-new:session-final-2026-06-16T16-25-43Z",
+      "task_id": "b832f834-4f7b-4221-b263-19f029feab63",
+      "approved_via": "gzmo kurator implement-from-discovery"
+    },
+    {
+      "at": "2026-06-20T13:08:40.190722001Z",
+      "kind": "discovery_fix",
+      "reason_hash": 3976374197824373386,
+      "recommendation_id": "28d29064-4dd6-4195-b530-81cc14ac9242",
+      "session_id": "discovery-implement:mechanics-session-final-2026-06-16T16-25-43Z-130619:session-final-2026-06-16T16-25-43Z",
+      "task_id": "fa7f535f-cd70-4d55-8cc5-087d6b298f9a",
+      "approved_via": "gzmo kurator implement-from-discovery"
+    },
+    {
+      "at": "2026-06-20T14:38:57.763437885Z",
+      "kind": "discovery_fix",
+      "reason_hash": 3976374197824373386,
+      "recommendation_id": "79494738-5276-4581-b6ac-ee547f2cb3a6",
+      "session_id": "discovery-implement:mechanics-session-final-2026-06-16T16-25-43Z-143619:session-final-2026-06-16T16-25-43Z",
+      "task_id": "00de1a32-050d-48a8-9c16-b5cf30b6f2e4",
+      "approved_via": "gzmo kurator implement-from-discovery"
+    },
+    {
+      "at": "2026-06-20T14:42:47.328254157Z",
+      "kind": "discovery_fix",
+      "reason_hash": 11689899582263500100,
+      "recommendation_id": "15897f6b-c760-4e26-86eb-e78f3d905895",
+      "session_id": "discovery-implement:mechanics-session-final-2026-06-16T14-57-29Z-143857:session-final-2026-06-16T14-57-29Z",
+      "task_id": "9dafe148-1485-4f32-8ef5-979aaa9c3d24",
+      "approved_via": "gzmo kurator implement-from-discovery"
+    },
+    {
+      "at": "2026-06-20T15:44:20.057840639Z",
+      "kind": "discovery_fix",
+      "reason_hash": 14084814588624423265,
+      "recommendation_id": "a0b4eccc-ff0f-4d45-b480-e683c8aa14de",
+      "session_id": "discovery-plan:session-final-2026-06-20T14-52-21Z",
+      "task_id": "6257f0c6-ce1d-4553-9f42-06fb823dace4",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-06-20T15:45:53.206973153Z",
+      "kind": "discovery_fix",
+      "reason_hash": 14084814588624423265,
+      "recommendation_id": "208a5066-6059-4197-b0fe-940ade209648",
+      "session_id": "discovery-plan:session-final-2026-06-20T14-52-21Z",
+      "task_id": "41d623e4-7928-4847-b41d-6dc566f1284b",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-06-20T15:47:26.461929729Z",
+      "kind": "discovery_fix",
+      "reason_hash": 14084814588624423265,
+      "recommendation_id": "1b03470d-f3e9-4c8e-aa8f-c31e9854d848",
+      "session_id": "discovery-plan:session-final-2026-06-20T14-52-21Z",
+      "task_id": "a8a6a302-0213-4ba3-9655-d8fdd148777f",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-06-20T15:52:20.133156033Z",
+      "kind": "discovery_fix",
+      "reason_hash": 14084814588624423265,
+      "recommendation_id": "8b88cf11-6894-4db3-a873-7f41e2c8afc8",
+      "session_id": "discovery-plan:session-final-2026-06-20T14-52-21Z",
+      "task_id": "8f3ae8eb-21af-41bf-badb-3c31da93de53",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-06-20T15:55:52.286278578Z",
+      "kind": "discovery_fix",
+      "reason_hash": 14084814588624423265,
+      "recommendation_id": "ccd29cac-a821-4703-9f23-79c19464312b",
+      "session_id": "discovery-plan:session-final-2026-06-20T14-52-21Z",
+      "task_id": "37f28a09-c86e-44d5-9f67-1733deb08ec4",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-06-20T15:58:47.044780698Z",
+      "kind": "discovery_fix",
+      "reason_hash": 14084814588624423265,
+      "recommendation_id": "bac9c0a5-adf1-446e-9526-3df69fd7b5ae",
+      "session_id": "discovery-plan:session-final-2026-06-20T14-52-21Z",
+      "task_id": "67412d2a-2f6f-4262-a2ca-2fc77d909bd0",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-06-20T18:20:51.597470612Z",
+      "kind": "discovery_fix",
+      "reason_hash": 2735012509522641292,
+      "recommendation_id": "057e8d3f-415d-45a7-a448-36179ebbf22d",
+      "session_id": "discovery-implement:mechanics-session-final-2026-06-16T14-57-29Z-182013:session-final-2026-06-16T14-57-29Z",
+      "task_id": "7a1410b0-a0e6-4e82-af99-534549664951",
+      "approved_via": "gzmo kurator implement-from-discovery"
+    },
+    {
+      "at": "2026-06-20T20:59:56.326228758Z",
+      "kind": "discovery_fix",
+      "reason_hash": 8617337833520219127,
+      "recommendation_id": "a54a1bad-c803-472d-8f2c-a4516933d2e1",
+      "session_id": "discovery-plan:session-final-2026-06-20T20-34-55Z",
+      "task_id": "5a2b1095-44bb-4cd9-bbb2-58a2361cf4e2",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-06-20T21:04:25.643973938Z",
+      "kind": "discovery_fix",
+      "reason_hash": 8617337833520219127,
+      "recommendation_id": "ba09f153-8f99-4997-a1f9-11d333b09b62",
+      "session_id": "discovery-plan:session-final-2026-06-20T20-34-55Z",
+      "task_id": "c9035dd2-8f72-45d0-9633-55e0474b2e95",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-06-20T21:07:12.120420059Z",
+      "kind": "discovery_fix",
+      "reason_hash": 8617337833520219127,
+      "recommendation_id": "2154b63b-195a-492b-94e4-69adbdab471a",
+      "session_id": "discovery-plan:session-final-2026-06-20T20-34-55Z",
+      "task_id": "dd29d9bf-6e5b-4f31-8e09-754ac18626a1",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-06-20T21:08:28.937202007Z",
+      "kind": "discovery_fix",
+      "reason_hash": 8617337833520219127,
+      "recommendation_id": "1baadb22-c862-4f17-a3b7-f9b1b819e8f3",
+      "session_id": "discovery-plan:session-final-2026-06-20T20-34-55Z",
+      "task_id": "f9836a45-db1e-4c74-96d7-01fb3370be83",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-06-20T21:09:48.437912758Z",
+      "kind": "discovery_fix",
+      "reason_hash": 8617337833520219127,
+      "recommendation_id": "53aafc2a-0daf-4622-9d81-7db79341e2fb",
+      "session_id": "discovery-plan:session-final-2026-06-20T20-34-55Z",
+      "task_id": "59b9885a-e259-40ff-b9a5-04b70d919dd0",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-06-20T21:11:03.205123680Z",
+      "kind": "discovery_fix",
+      "reason_hash": 8617337833520219127,
+      "recommendation_id": "dc69d305-6b40-4eef-800a-6ba8d5ccb5a8",
+      "session_id": "discovery-plan:session-final-2026-06-20T20-34-55Z",
+      "task_id": "28b280c0-6929-4597-9635-8edd3caa1dbc",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-06-20T21:12:21.149628583Z",
+      "kind": "discovery_fix",
+      "reason_hash": 8617337833520219127,
+      "recommendation_id": "ccfb430a-e820-4624-96af-12835bde47c6",
+      "session_id": "discovery-plan:session-final-2026-06-20T20-34-55Z",
+      "task_id": "a8ae384f-9051-4c35-a08c-c87ee597bcaf",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-06-21T04:04:15.917327660Z",
+      "kind": "discovery_fix",
+      "reason_hash": 8617337833520219127,
+      "recommendation_id": "052d074c-0b4d-4155-a70c-372402c0ad54",
+      "session_id": "discovery-plan:session-final-2026-06-20T20-34-55Z",
+      "task_id": "78f90c64-fe98-4d44-a628-269e1f5c3a0a",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-06-21T04:05:50.014389428Z",
+      "kind": "discovery_fix",
+      "reason_hash": 8617337833520219127,
+      "recommendation_id": "4c7d655a-1e56-42f4-8810-4fd61cb5ae67",
+      "session_id": "discovery-plan:session-final-2026-06-20T20-34-55Z",
+      "task_id": "4e4d1446-8c28-4791-a91b-0f6a418f31fc",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-06-21T04:09:17.792615345Z",
+      "kind": "discovery_fix",
+      "reason_hash": 8617337833520219127,
+      "recommendation_id": "10d0aa31-30d5-4c49-9ee0-f112adb95507",
+      "session_id": "discovery-plan:session-final-2026-06-20T20-34-55Z",
+      "task_id": "bf1cba4d-a341-4ed0-9593-26786930fd31",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-06-21T04:11:20.008806637Z",
+      "kind": "discovery_fix",
+      "reason_hash": 8617337833520219127,
+      "recommendation_id": "caebccde-20cb-42da-b4ed-975b6184407b",
+      "session_id": "discovery-plan:session-final-2026-06-20T20-34-55Z",
+      "task_id": "eb3c6533-1de7-4f9d-b684-5be7e79b6a7b",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-06-21T04:12:35.563345544Z",
+      "kind": "discovery_fix",
+      "reason_hash": 8617337833520219127,
+      "recommendation_id": "4b9b1a31-a55d-42b9-b9f9-5e06661c61f7",
+      "session_id": "discovery-plan:session-final-2026-06-20T20-34-55Z",
+      "task_id": "28f22de6-4477-4450-9ceb-4b540b27479d",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-06-21T06:07:49.235629802Z",
+      "kind": "discovery_fix",
+      "reason_hash": 2735012509522641292,
+      "recommendation_id": "df47611c-14e1-421d-8210-1ccb4f99376b",
+      "session_id": "discovery-implement:mechanics-session-final-2026-06-16T16-25-43Z-060710:session-final-2026-06-16T16-25-43Z",
+      "task_id": "aac05bca-aab3-419e-8024-e3e177cf7c6a",
+      "approved_via": "gzmo kurator implement-from-discovery"
+    },
+    {
+      "at": "2026-06-21T06:09:00.319635005Z",
+      "kind": "discovery_fix",
+      "reason_hash": 10735272491787363995,
+      "recommendation_id": "8216918d-edfb-4298-ae6a-53085b863e43",
+      "session_id": "discovery-implement:mechanics-session-final-2026-06-16T14-57-29Z-060749:session-final-2026-06-16T14-57-29Z",
+      "task_id": "f01c9e85-cf25-4ae3-a7e4-d6729bfac708",
+      "approved_via": "gzmo kurator implement-from-discovery"
+    },
+    {
+      "at": "2026-06-21T06:13:28.397029322Z",
+      "kind": "discovery_fix",
+      "reason_hash": 10735272491787363995,
+      "recommendation_id": "c34ed124-36a9-4013-ac3f-57b3cb533405",
+      "session_id": "discovery-implement:mechanics-session-final-2026-06-16T16-25-43Z-061231:session-final-2026-06-16T16-25-43Z",
+      "task_id": "ba3aedbc-0bf8-4607-a392-de9bc23dcffc",
+      "approved_via": "gzmo kurator implement-from-discovery"
+    },
+    {
+      "at": "2026-06-21T06:14:20.505186489Z",
+      "kind": "discovery_fix",
+      "reason_hash": 2735012509522641292,
+      "recommendation_id": "a6e1dd07-eb1f-406e-9a96-600f78641b36",
+      "session_id": "discovery-implement:mechanics-session-final-2026-06-16T16-25-43Z-061351:session-final-2026-06-16T16-25-43Z",
+      "task_id": "c1b58c33-5e1f-470c-a044-ffb5f9ce3c5d",
+      "approved_via": "gzmo kurator implement-from-discovery"
+    },
+    {
+      "at": "2026-06-21T06:15:32.105643751Z",
+      "kind": "discovery_fix",
+      "reason_hash": 10735272491787363995,
+      "recommendation_id": "8ed0dbdf-228a-40ed-8730-97a3b74dea19",
+      "session_id": "discovery-implement:mechanics-session-final-2026-06-16T14-57-29Z-061420:session-final-2026-06-16T14-57-29Z",
+      "task_id": "90ed6666-1f54-4b21-9312-f530139dc15b",
+      "approved_via": "gzmo kurator implement-from-discovery"
+    },
+    {
+      "at": "2026-06-21T06:16:21.258252388Z",
+      "kind": "discovery_fix",
+      "reason_hash": 10202602841496960384,
+      "recommendation_id": "6662a0df-56de-4ea0-bed0-a17d0a6ec1a1",
+      "session_id": "discovery-fix:mechanics-verify-20260621T061604Z:.mechanics-verify-report",
+      "task_id": "e6d69971-c5a3-4b22-a43a-b44281d58683",
+      "approved_via": "gzmo kurator fix-from-discovery"
+    },
+    {
+      "at": "2026-06-21T06:16:50.154432500Z",
+      "kind": "discovery_fix",
+      "reason_hash": 2735012509522641292,
+      "recommendation_id": "36024b6a-bd0e-44f9-8cdd-64a098ad5da9",
+      "session_id": "discovery-implement:mechanics-session-final-2026-06-16T16-25-43Z-061621:session-final-2026-06-16T16-25-43Z",
+      "task_id": "bc9c9716-b261-4d8f-a5a2-675a773aa072",
+      "approved_via": "gzmo kurator implement-from-discovery"
+    },
+    {
+      "at": "2026-06-21T06:18:29.166601038Z",
+      "kind": "discovery_fix",
+      "reason_hash": 2735012509522641292,
+      "recommendation_id": "17e24ef0-c4f4-4ca9-b400-1c3fd5a61dd6",
+      "session_id": "discovery-implement:mechanics-session-final-2026-06-16T14-57-29Z-061747:session-final-2026-06-16T14-57-29Z",
+      "task_id": "4d18b9c7-2e51-4ef9-bcf3-96649a93b762",
+      "approved_via": "gzmo kurator implement-from-discovery"
+    },
+    {
+      "at": "2026-06-21T06:27:20.186757415Z",
+      "kind": "discovery_code_implement",
+      "reason_hash": 2735012509522641292,
+      "recommendation_id": "bcc0f1e4-adb4-4696-85db-8e40c5ef115d",
+      "session_id": "discovery-implement:mechanics-session-final-2026-06-16T16-25-43Z-062346:session-final-2026-06-16T16-25-43Z",
+      "task_id": "6c926bd8-f2a7-47d4-85c5-b540a9cf8880",
+      "approved_via": "gzmo kurator implement-from-discovery"
+    },
+    {
+      "at": "2026-06-21T06:41:15.922525291Z",
+      "kind": "discovery_code_implement",
+      "reason_hash": 10735272491787363995,
+      "recommendation_id": "4f2af0a5-9032-448a-8624-e39be2b9d2a4",
+      "session_id": "discovery-implement:mechanics-session-final-2026-06-16T16-25-43Z-063627:session-final-2026-06-16T16-25-43Z",
+      "task_id": "5198e16d-ba8e-4800-8ee4-f9848faa8708",
+      "approved_via": "gzmo kurator implement-from-discovery"
     }
   ],
   "denials": [
     {
-      "at": "2026-06-18T15:48:57.380081270Z",
+      "at": "2026-06-20T13:04:22.454306454Z",
+      "kind": "discovery_fix",
+      "reason": "max_autospawns_per_hour: hourly autospawn budget exhausted (3/3)",
+      "recommendation_id": "7d8557be-11c9-4286-9817-361a7980eb33",
+      "session_id": "discovery-fix:mechanics-session-final-2026-06-16T16-25-43Z-new-recheck:session-final-2026-06-16T16-25-43Z"
+    },
+    {
+      "at": "2026-06-20T13:08:40.322117882Z",
+      "kind": "discovery_fix",
+      "reason": "max_autospawns_per_hour: hourly autospawn budget exhausted (4/3)",
+      "recommendation_id": "d614992b-fd29-4790-a275-43dc1b04b33b",
+      "session_id": "discovery-fix:mechanics-session-final-2026-06-16T16-25-43Z-130619-recheck:session-final-2026-06-16T16-25-43Z"
+    },
+    {
+      "at": "2026-06-20T13:28:39.836603905Z",
+      "kind": "discovery_fix",
+      "reason": "max_autospawns_per_hour: hourly autospawn budget exhausted (4/3)",
+      "recommendation_id": "8a6e778b-ac29-4f53-8686-51c5aa3828c0",
+      "session_id": "discovery-fix:mechanics-session-final-2026-06-16T14-57-29Z-132704-recheck:session-final-2026-06-16T14-57-29Z"
+    },
+    {
+      "at": "2026-06-20T14:38:57.902655719Z",
+      "kind": "discovery_fix",
+      "reason": "spawn_cooldown: cooldown active (600s remaining)",
+      "recommendation_id": "d41c0c04-3bbf-485e-a858-63392ea5cefe",
+      "session_id": "discovery-fix:mechanics-session-final-2026-06-16T16-25-43Z-143619-recheck:session-final-2026-06-16T16-25-43Z"
+    },
+    {
+      "at": "2026-06-20T14:42:47.451681871Z",
+      "kind": "discovery_fix",
+      "reason": "spawn_cooldown: cooldown active (600s remaining)",
+      "recommendation_id": "07331cf5-051f-4f8c-a967-b5f8f698f181",
+      "session_id": "discovery-fix:mechanics-session-final-2026-06-16T14-57-29Z-143857-recheck:session-final-2026-06-16T14-57-29Z"
+    },
+    {
+      "at": "2026-06-20T15:58:50.808919149Z",
       "kind": "session_triage",
-      "reason": "max_autospawns_per_hour: hourly autospawn budget exhausted (5/3)",
-      "recommendation_id": "30259512-9b7f-489f-a205-824baae49da4",
+      "reason": "max_autospawns_per_hour: hourly autospawn budget exhausted (6/3)",
+      "recommendation_id": "f684ec19-6056-43eb-8849-86eb201bfd26",
       "session_id": "3ecbf228-c2a4-4c88-80e9-49744e989dc7"
+    },
+    {
+      "at": "2026-06-20T15:58:50.809047679Z",
+      "kind": "session_triage",
+      "reason": "max_autospawns_per_hour: hourly autospawn budget exhausted (6/3)",
+      "recommendation_id": "8ddeac26-46e2-49d1-978b-8986633c4943",
+      "session_id": "c6458d58-233a-4fe1-bffb-f6d62f97b3c5"
+    },
+    {
+      "at": "2026-06-20T15:58:50.809446726Z",
+      "kind": "session_triage",
+      "reason": "max_autospawns_per_hour: hourly autospawn budget exhausted (6/3)",
+      "recommendation_id": "456e445a-f788-4fde-a733-89ed7a6fa867",
+      "session_id": "bd67ba93-0ffa-4f42-96cb-dfa50e3eb491"
+    },
+    {
+      "at": "2026-06-20T18:20:51.740576119Z",
+      "kind": "discovery_fix",
+      "reason": "spawn_cooldown: cooldown active (600s remaining)",
+      "recommendation_id": "9e89887e-9700-4fcb-8162-454c7bdc58e0",
+      "session_id": "discovery-fix:mechanics-session-final-2026-06-16T14-57-29Z-182013-recheck:session-final-2026-06-16T14-57-29Z"
+    },
+    {
+      "at": "2026-06-21T06:07:49.356878356Z",
+      "kind": "discovery_fix",
+      "reason": "spawn_cooldown: cooldown active (600s remaining)",
+      "recommendation_id": "c4b094f0-e159-4656-87cf-7fb27398f93e",
+      "session_id": "discovery-fix:mechanics-session-final-2026-06-16T16-25-43Z-060710-recheck:session-final-2026-06-16T16-25-43Z"
+    },
+    {
+      "at": "2026-06-21T06:09:00.454813633Z",
+      "kind": "discovery_fix",
+      "reason": "spawn_cooldown: cooldown active (600s remaining)",
+      "recommendation_id": "a3874f60-a652-4c19-bb1b-6731045be31c",
+      "session_id": "discovery-fix:mechanics-session-final-2026-06-16T14-57-29Z-060749-recheck:session-final-2026-06-16T14-57-29Z"
+    },
+    {
+      "at": "2026-06-21T06:11:23.719858968Z",
+      "kind": "discovery_fix",
+      "reason": "spawn_cooldown: cooldown active (457s remaining)",
+      "recommendation_id": "b04d1f43-fd11-4d5a-afbf-b497f45bea1e",
+      "session_id": "discovery-fix:mechanics-session-final-2026-06-16T16-25-43Z-061122-recheck:session-final-2026-06-16T16-25-43Z"
+    },
+    {
+      "at": "2026-06-21T06:11:24.371654964Z",
+      "kind": "discovery_fix",
+      "reason": "spawn_cooldown: cooldown active (456s remaining)",
+      "recommendation_id": "8adaed68-acd4-4e6a-ba0e-6585590be3be",
+      "session_id": "discovery-fix:mechanics-session-final-2026-06-16T14-57-29Z-061123-recheck:session-final-2026-06-16T14-57-29Z"
+    },
+    {
+      "at": "2026-06-21T06:13:28.514520144Z",
+      "kind": "discovery_fix",
+      "reason": "max_autospawns_per_hour: hourly autospawn budget exhausted (3/3)",
+      "recommendation_id": "964404d6-cd04-4c33-8815-5bf04fdd1868",
+      "session_id": "discovery-fix:mechanics-session-final-2026-06-16T16-25-43Z-061231-recheck:session-final-2026-06-16T16-25-43Z"
+    },
+    {
+      "at": "2026-06-21T06:13:29.032249961Z",
+      "kind": "discovery_fix",
+      "reason": "max_autospawns_per_hour: hourly autospawn budget exhausted (3/3)",
+      "recommendation_id": "7b2bcfcf-cb99-4e2e-b7bb-fd59dd9372c8",
+      "session_id": "discovery-fix:mechanics-session-final-2026-06-16T14-57-29Z-061328-recheck:session-final-2026-06-16T14-57-29Z"
+    },
+    {
+      "at": "2026-06-21T06:14:20.640696094Z",
+      "kind": "discovery_fix",
+      "reason": "max_autospawns_per_hour: hourly autospawn budget exhausted (4/3)",
+      "recommendation_id": "fa1b300f-1498-47ad-8841-eab9e18cf69f",
+      "session_id": "discovery-fix:mechanics-session-final-2026-06-16T16-25-43Z-061351-recheck:session-final-2026-06-16T16-25-43Z"
+    },
+    {
+      "at": "2026-06-21T06:15:32.236963497Z",
+      "kind": "discovery_fix",
+      "reason": "max_autospawns_per_hour: hourly autospawn budget exhausted (5/3)",
+      "recommendation_id": "b7750483-b1e3-42b6-95b5-a5e1ef358ca8",
+      "session_id": "discovery-fix:mechanics-session-final-2026-06-16T14-57-29Z-061420-recheck:session-final-2026-06-16T14-57-29Z"
+    },
+    {
+      "at": "2026-06-21T06:16:50.289598868Z",
+      "kind": "discovery_fix",
+      "reason": "max_autospawns_per_hour: hourly autospawn budget exhausted (7/3)",
+      "recommendation_id": "e2ced8e9-4012-4ca9-a481-638d3434a7d2",
+      "session_id": "discovery-fix:mechanics-session-final-2026-06-16T16-25-43Z-061621-recheck:session-final-2026-06-16T16-25-43Z"
+    },
+    {
+      "at": "2026-06-21T06:16:50.799841528Z",
+      "kind": "discovery_fix",
+      "reason": "max_autospawns_per_hour: hourly autospawn budget exhausted (7/3)",
+      "recommendation_id": "5268335a-0f76-4ea1-b18a-cf02277dc401",
+      "session_id": "discovery-fix:mechanics-session-final-2026-06-16T14-57-29Z-061650-recheck:session-final-2026-06-16T14-57-29Z"
+    },
+    {
+      "at": "2026-06-21T06:17:47.008215688Z",
+      "kind": "discovery_fix",
+      "reason": "max_autospawns_per_hour: hourly autospawn budget exhausted (7/3)",
+      "recommendation_id": "cac3eddd-d99e-4975-9b0d-4e42aecd1687",
+      "session_id": "discovery-fix:mechanics-session-final-2026-06-16T16-25-43Z-061746-recheck:session-final-2026-06-16T16-25-43Z"
+    },
+    {
+      "at": "2026-06-21T06:18:29.289333238Z",
+      "kind": "discovery_fix",
+      "reason": "max_autospawns_per_hour: hourly autospawn budget exhausted (8/3)",
+      "recommendation_id": "fac57aab-aed5-4ec1-82a3-67106f29fa2c",
+      "session_id": "discovery-fix:mechanics-session-final-2026-06-16T14-57-29Z-061747-recheck:session-final-2026-06-16T14-57-29Z"
+    },
+    {
+      "at": "2026-06-21T06:23:30.641763128Z",
+      "kind": "discovery_plan",
+      "reason": "max_autospawns_per_hour: hourly autospawn budget exhausted (8/3)",
+      "recommendation_id": "f9cb972f-a2df-4389-b87b-34eeab13f0e3",
+      "session_id": "discovery-plan:session-final-2026-06-16T16-25-43Z"
+    },
+    {
+      "at": "2026-06-21T06:27:20.328818145Z",
+      "kind": "discovery_fix",
+      "reason": "max_autospawns_per_hour: hourly autospawn budget exhausted (9/3)",
+      "recommendation_id": "c17264f9-4429-4d74-9dd6-41c4f5030d7b",
+      "session_id": "discovery-fix:mechanics-session-final-2026-06-16T16-25-43Z-062346-recheck:session-final-2026-06-16T16-25-43Z"
+    },
+    {
+      "at": "2026-06-21T06:27:20.852998677Z",
+      "kind": "discovery_fix",
+      "reason": "max_autospawns_per_hour: hourly autospawn budget exhausted (9/3)",
+      "recommendation_id": "03c57a2d-c7ab-43fe-bdf0-69af3e050ee2",
+      "session_id": "discovery-fix:mechanics-session-final-2026-06-16T14-57-29Z-062720-recheck:session-final-2026-06-16T14-57-29Z"
+    },
+    {
+      "at": "2026-06-21T06:41:16.070496754Z",
+      "kind": "discovery_fix",
+      "reason": "max_autospawns_per_hour: hourly autospawn budget exhausted (10/3)",
+      "recommendation_id": "41b5409b-053b-4b8d-8f10-23658af01d8f",
+      "session_id": "discovery-fix:mechanics-session-final-2026-06-16T16-25-43Z-063627-recheck:session-final-2026-06-16T16-25-43Z"
+    },
+    {
+      "at": "2026-06-21T06:41:16.601493219Z",
+      "kind": "discovery_fix",
+      "reason": "max_autospawns_per_hour: hourly autospawn budget exhausted (10/3)",
+      "recommendation_id": "eacb9858-3fd9-4f1c-8aad-bb34e78213b0",
+      "session_id": "discovery-fix:mechanics-session-final-2026-06-16T14-57-29Z-064116-recheck:session-final-2026-06-16T14-57-29Z"
     }
   ]
 }

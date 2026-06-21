@@ -8,6 +8,7 @@ pub fn run_execute_acceptance(
     workstream_id: &str,
     project_root: &Path,
     skills_root: &Path,
+    log_id: Option<&str>,
 ) -> Vec<String> {
     let workstream = match crate::discovery_execute::load_workstream(plan_dir, workstream_id) {
         Ok(ws) => ws,
@@ -24,10 +25,25 @@ pub fn run_execute_acceptance(
                 cmd.env("GZMO_ROOT", project_root);
                 cmd.env("GZMO_SKILLS_ROOT", skills_root);
 
-                match cmd.status() {
-                    Ok(status) => {
+                match cmd.output() {
+                    Ok(output) => {
+                        let status = output.status;
                         if !status.success() {
-                            failed.push(format!("acceptance command `{cmd_str}` exited non-zero: {status}"));
+                            let mut msg = format!("acceptance command `{cmd_str}` exited non-zero: {status}");
+                            if let Some(lid) = log_id {
+                                let stdout_str = String::from_utf8_lossy(&output.stdout);
+                                let stderr_str = String::from_utf8_lossy(&output.stderr);
+                                let log_dir = skills_root.join("data/gate-outputs");
+                                let log_path = log_dir.join(format!("{lid}.log"));
+                                if std::fs::create_dir_all(&log_dir).is_ok() {
+                                    let log_content = format!(
+                                        "--- Command: {cmd_str} ---\nExit Status: {status}\n\nStdout:\n{stdout_str}\n\nStderr:\n{stderr_str}\n"
+                                    );
+                                    let _ = std::fs::write(&log_path, log_content);
+                                    msg.push_str(&format!(" [Logs truncated; full log saved to file: file://{}]", log_path.display()));
+                                }
+                            }
+                            failed.push(msg);
                         }
                     }
                     Err(e) => {
@@ -46,6 +62,7 @@ pub fn run_code_implement_acceptance(
     finding_id: &str,
     project_root: &Path,
     skills_root: &Path,
+    log_id: Option<&str>,
 ) -> Vec<String> {
     let mut failed = Vec::new();
     if !plan_json_path.is_file() {
@@ -76,10 +93,25 @@ pub fn run_code_implement_acceptance(
                             cmd.env("GZMO_ROOT", project_root);
                             cmd.env("GZMO_SKILLS_ROOT", skills_root);
 
-                            match cmd.status() {
-                                Ok(status) => {
+                            match cmd.output() {
+                                Ok(output) => {
+                                    let status = output.status;
                                     if !status.success() {
-                                        failed.push(format!("workstream acceptance `{cmd_str}` exited non-zero: {status}"));
+                                        let mut msg = format!("workstream acceptance `{cmd_str}` exited non-zero: {status}");
+                                        if let Some(lid) = log_id {
+                                            let stdout_str = String::from_utf8_lossy(&output.stdout);
+                                            let stderr_str = String::from_utf8_lossy(&output.stderr);
+                                            let log_dir = skills_root.join("data/gate-outputs");
+                                            let log_path = log_dir.join(format!("{lid}.log"));
+                                            if std::fs::create_dir_all(&log_dir).is_ok() {
+                                                let log_content = format!(
+                                                    "--- Command: {cmd_str} ---\nExit Status: {status}\n\nStdout:\n{stdout_str}\n\nStderr:\n{stderr_str}\n"
+                                                );
+                                                let _ = std::fs::write(&log_path, log_content);
+                                                msg.push_str(&format!(" [Logs truncated; full log saved to file: file://{}]", log_path.display()));
+                                            }
+                                        }
+                                        failed.push(msg);
                                     }
                                 }
                                 Err(e) => {
@@ -100,6 +132,7 @@ pub fn run_fixer_probe(
     finding: &crate::discovery_fixer::ActionableFinding,
     project_root: &Path,
     skills_root: &Path,
+    log_id: Option<&str>,
 ) -> Vec<String> {
     let mut failed = Vec::new();
     let action_text = format!("{} {}", finding.title, finding.excerpt);
@@ -118,10 +151,25 @@ pub fn run_fixer_probe(
     cmd.env("GZMO_ROOT", project_root);
     cmd.env("GZMO_SKILLS_ROOT", skills_root);
 
-    match cmd.status() {
-        Ok(status) => {
+    match cmd.output() {
+        Ok(output) => {
+            let status = output.status;
             if !status.success() {
-                failed.push(format!("Probe script {script_name} exited non-zero: {status}"));
+                let mut msg = format!("Probe script {script_name} exited non-zero: {status}");
+                if let Some(lid) = log_id {
+                    let stdout_str = String::from_utf8_lossy(&output.stdout);
+                    let stderr_str = String::from_utf8_lossy(&output.stderr);
+                    let log_dir = skills_root.join("data/gate-outputs");
+                    let log_path = log_dir.join(format!("{lid}.log"));
+                    if std::fs::create_dir_all(&log_dir).is_ok() {
+                        let log_content = format!(
+                            "--- Probe Script: {script_name} ---\nExit Status: {status}\n\nStdout:\n{stdout_str}\n\nStderr:\n{stderr_str}\n"
+                        );
+                        let _ = std::fs::write(&log_path, log_content);
+                        msg.push_str(&format!(" [Logs truncated; full log saved to file: file://{}]", log_path.display()));
+                    }
+                }
+                failed.push(msg);
             }
         }
         Err(e) => {

@@ -82,6 +82,19 @@ When remediation retries are exhausted (`max_retries` in tracker):
 - **Rollback** — `git checkout` skills repo to plan `git_baseline_tag` (skipped when worktree isolation is on; worktree removal handles cleanup).
 - **Escalation** — emit Synapse `remediation.escalated` with `escalation_reason: max_retries_exhausted`.
 
+## Inter-phase stage gates (Pack F)
+
+To prevent failures from cascading across phases, GZMO enforces deterministic, non-negotiable verification gates at every phase transition in the goal pipeline:
+
+| Phase Transition | Gate Controller | Assertions | Action on Failure |
+|---|---|---|---|
+| **Analyze $\to$ Plan** | `preflight_analyze_gate` | Report exists, has $\ge 1$ actionable finding, and Obolus preflight allows `discovery_cycle` | Block spawner, exit 1 |
+| **Plan $\to$ Approve** | `verify_plan_agent_outcome` | Plans exist (`plan.md`, `plan.json`, `plan-provenance.json`), correct format, no chimeras | Abort pipeline, exit 2 |
+| **Approve $\to$ Execute** | `ensure_plan_executable` | `plan.json` contains non-empty `approved_at`, Obolus allows execute budget | Block execution, exit 3 |
+| **Execute $\to$ Distill** | `run_execute_acceptance` | Artifact checks pass (`passed = true`), external `acceptance[]` scripts exit 0 | Halt pipeline, trigger rollback / escalation (Pack E), exit 4 |
+
+These gates fail fast with a structured JSON output containing the exact failure reason, preventing the orchestrator from spinning on invalid states.
+
 ## Remediation snapshot (post-spawn)
 
 After `record_spawn_outcome`, writes:

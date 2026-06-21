@@ -207,7 +207,7 @@ struct ChatRequest<'a> {
     /// Let the model decide whether to call tools
     #[serde(skip_serializing_if = "Option::is_none")]
     tool_choice: Option<&'a str>,
-    /// llama-server: disable Qwen thinking trace for JSON/tool paths
+    /// llama-server: route thinking trace to reasoning_content (interactive paths)
     #[serde(skip_serializing_if = "Option::is_none")]
     reasoning_format: Option<&'a str>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -497,7 +497,7 @@ impl LlmGateway for TurboQuantGateway {
     ) -> Result<LlmResponse> {
         let has_tools = !tools.is_empty();
 
-        let (reasoning_format, chat_template_kwargs) = no_thinking_request_fields();
+        let (reasoning_format, chat_template_kwargs) = thinking_request_fields();
         let body = ChatRequest {
             model: &self.config.model,
             messages: Self::to_chat_messages(messages),
@@ -588,7 +588,7 @@ impl LlmGateway for TurboQuantGateway {
         use reqwest_eventsource::{Event, EventSource};
 
         let has_tools = !tools.is_empty();
-        let (reasoning_format, chat_template_kwargs) = no_thinking_request_fields();
+        let (reasoning_format, chat_template_kwargs) = thinking_request_fields();
 
         // Build the same request body but with stream: true
         let body = StreamChatRequest {
@@ -986,6 +986,15 @@ pub fn assistant_visible_text(content: Option<String>, reasoning_content: Option
     reasoning_content.unwrap_or_default()
 }
 
+fn thinking_request_fields() -> (&'static str, serde_json::Value) {
+    (
+        "auto",
+        serde_json::json!({ "enable_thinking": true }),
+    )
+}
+
+/// Structured JSON schema calls keep thinking off — reasoning can exhaust the
+/// output budget and `reasoning_format` + `json_schema` can 400 on llama-server.
 fn no_thinking_request_fields() -> (&'static str, serde_json::Value) {
     (
         "none",

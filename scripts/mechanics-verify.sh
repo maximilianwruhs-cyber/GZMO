@@ -5,6 +5,7 @@
 # Optional:
 #   MECHANICS_OBOLUS_SMOKE=1  — run obolus-gate-smoke.sh (temp gzmo.toml cap)
 #   MECHANICS_LIVE_SPAWN=1    — spawn Epimetheus on synthetic FAIL/GAP report (~2–5 min)
+#   MECHANICS_LIVE_PIPELINE=1 — run Section 11 on historical session-final reports (slow)
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -317,14 +318,26 @@ fi
 
 section "11 — Discovery implementation pipeline E2E"
 if [[ -x "${SKILLS}/scripts/verify-discovery-action-pipeline.sh" ]]; then
-  for rpt in \
-    "${SKILLS}/data/pi-mentor-discovery/reports/session-final-2026-06-16T16-25-43Z.md" \
-    "${SKILLS}/data/pi-mentor-discovery/reports/session-final-2026-06-16T14-57-29Z.md"; do
+  if [[ "${MECHANICS_LIVE_PIPELINE:-0}" == "1" ]]; then
+    PIPELINE_REPORTS=(
+      "${SKILLS}/data/pi-mentor-discovery/reports/session-final-2026-06-16T16-25-43Z.md"
+      "${SKILLS}/data/pi-mentor-discovery/reports/session-final-2026-06-16T14-57-29Z.md"
+    )
+    PIPELINE_FIXER_AUTOSPAWN=1
+    echo "[INFO] Section 11 live pipeline mode (slow, environment-dependent)"
+  else
+    PIPELINE_REPORTS=(
+      "${SKILLS}/data/pi-mentor-discovery/reports/mechanics-e2e-fixture.md"
+    )
+    PIPELINE_FIXER_AUTOSPAWN=0
+  fi
+  for rpt in "${PIPELINE_REPORTS[@]}"; do
     if [[ -f "$rpt" ]]; then
       sess_id="mechanics-$(basename "$rpt" .md)-$(date -u +%H%M%S)"
       set +e
       pipe_out="$(
-        GZMO_BIN="$BIN" DISCOVERY_FIXER_AUTOSPAWN=0 \
+        GZMO_BIN="$BIN" DISCOVERY_FIXER_AUTOSPAWN="$PIPELINE_FIXER_AUTOSPAWN" \
+          MECHANICS_LIVE_PIPELINE="${MECHANICS_LIVE_PIPELINE:-0}" \
           "${SKILLS}/scripts/verify-discovery-action-pipeline.sh" "$rpt" "$sess_id" 2>&1
       )"
       pipe_rc=$?
@@ -335,6 +348,8 @@ if [[ -x "${SKILLS}/scripts/verify-discovery-action-pipeline.sh" ]]; then
         echo "$pipe_out" | tail -20
         fail "pipeline E2E $(basename "$rpt")"
       fi
+    else
+      fail "pipeline E2E report missing: $rpt"
     fi
   done
 else

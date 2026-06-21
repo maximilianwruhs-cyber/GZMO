@@ -571,6 +571,7 @@ gzmo_synthetic: true
 - [thema_004-arxiv-harvest-csAI-part03-split01](sources/thema-004-arxiv-harvest-csai-part03-split01.md) — stable — 1 source(s)
 - [thema_004-arxiv-harvest-csAI-part03-split02](sources/thema-004-arxiv-harvest-csai-part03-split02.md) — stable — 1 source(s)
 - [Lint 2026-06-20](sources/_lint-2026-06-20.md) — stable — 0 source(s)
+- [Lint 2026-06-21](sources/_lint-2026-06-21.md) — stable — 0 source(s)
 ## Entities
 
 - [Bash](entities/bash.md) — draft — 2 source(s)
@@ -12712,3 +12713,4 @@ gzmo_synthetic: true
 - [Network Exception Tier](entities/network-exception-tier.md) — draft — 1 source(s)
 - [arXiv Network Patterns](entities/arxiv-network-patterns.md) — draft — 1 source(s)
 - [arXiv Preprint Ecosystem](entities/arxiv-preprint-ecosystem.md) — draft — 1 source(s)
+- [Loop Engineering](entities/loop-engineering.md) — draft — 4 source(s)
