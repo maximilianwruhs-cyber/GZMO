@@ -35,6 +35,68 @@ cargo clippy --all-targets
 ./scripts/verify-production.sh    # needs live infra
 ```
 
+## Commands (discovery pipeline)
+
+Five-phase goal pipeline (Jules automate-github-issues analogue):
+
+```bash
+./scripts/run-discovery-goal-pipeline.sh --report <path> [--session-id <id>] [--spawn]
+```
+
+Individual phases:
+
+```bash
+gzmo kurator plan-from-discovery --report <path> [--spawn]
+gzmo kurator approve-plan --plan <plan_dir>          # required before execute (default)
+gzmo kurator execute-workstream --plan <dir> --workstream <id> [--spawn]
+./scripts/query-discovery-activities.sh summary|failed|open|snapshots
+```
+
+Environment:
+
+| Variable | Default | Effect |
+|----------|---------|--------|
+| `DISCOVERY_PLAN_REQUIRE_APPROVAL` | `1` | Block execute until `plan.json` has `approved_at` |
+| `DISCOVERY_INCLUDE_GIT_CONTEXT` | off | Append `git show` + `git log` to plan/fixer briefs |
+
+## Testing
+
+```bash
+cargo test -p gzmo-core discovery_plan_agent remediation_snapshot discovery_git_context
+./scripts/mechanics-verify.sh
+~/gzmo_skills/scripts/discovery-probes/probe-jules-patterns.sh
+```
+
+## Boundaries
+
+- **No Jules API** — no `JULES_API_KEY`, `jules.googleapis.com`, or `@google/jules-sdk` in this repo.
+- **Skills root** — discovery remediations and probes live under `$GZMO_SKILLS_ROOT` (default `~/gzmo_skills`), never `survey_GZMO/gzmo_skills/`.
+- **Parallel spawns** — `plan.json` workstreams must not overlap on `target_paths` (ownership gate in verify).
+- **Plan approval** — operator must run `gzmo kurator approve-plan` before `execute-workstream` unless gate disabled.
+
+## Local CI Verification
+
+Optional local GitHub Actions via [act](https://github.com/nektos/act) (pattern from Jules `local-action-verification`):
+
+```bash
+./scripts/act/install-act.sh          # once — requires Docker
+./scripts/act/run-act.sh "push -j ci" # background + log poll; ACT_TIMEOUT, ACT_POLL
+```
+
+Complements `cargo test` and `./scripts/mechanics-verify.sh`. No cloud CI required for sovereignty checks.
+
+### Parallel remediation reconciliation
+
+When multiple discovery spawns touch the same file:
+
+```bash
+./scripts/reconcile-discovery-changes.sh scan --json
+./scripts/reconcile-discovery-changes.sh status
+./scripts/reconcile-discovery-changes.sh merge-file --path <rel> --ours <a> --theirs <b> [--dry-run]
+```
+
+Spawn state polling (tracker flush races): `SPAWN_LOAD_POLLING=1` (default), `SPAWN_POLL_INTERVAL_MS`, `SPAWN_POLL_TIMEOUT_MS`.
+
 ## Sovereignty + Obolus
 
 - Constitution: `docs/ARCH-DIR-001-GZMO.md`, pointer `ARCH-DIR-001.md`
