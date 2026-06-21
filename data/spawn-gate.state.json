@@ -1,60 +1,6 @@
 {
   "executions": [
     {
-      "at": "2026-06-19T06:51:24.145207990Z",
-      "kind": "discovery_fix",
-      "reason_hash": 14084814588624423265,
-      "recommendation_id": "028c3cab-3037-41a7-a24c-dc9df91be8d3",
-      "session_id": "discovery-plan:session-final-auto-low_tension-2026-06-19T06-42-48Z",
-      "task_id": "f98c3cda-0835-4e6b-bb0b-fa4957bf23a7",
-      "approved_via": "gzmo kurator plan-from-discovery"
-    },
-    {
-      "at": "2026-06-19T06:54:25.408558997Z",
-      "kind": "discovery_fix",
-      "reason_hash": 14084814588624423265,
-      "recommendation_id": "bd6fc3f3-602c-44c5-b8f7-7287a8e1a5e3",
-      "session_id": "discovery-plan:session-final-auto-low_tension-2026-06-19T06-42-48Z",
-      "task_id": "73485e57-5124-4369-b305-5fe383d1d4fc",
-      "approved_via": "gzmo kurator plan-from-discovery"
-    },
-    {
-      "at": "2026-06-19T06:57:37.696162513Z",
-      "kind": "discovery_fix",
-      "reason_hash": 14084814588624423265,
-      "recommendation_id": "9682d5b4-ac08-48ac-9f09-2ed2a0ce5af0",
-      "session_id": "discovery-plan:session-final-auto-low_tension-2026-06-19T06-42-48Z",
-      "task_id": "df6aa474-da6d-40fd-b93d-fd73ffd7f5fc",
-      "approved_via": "gzmo kurator plan-from-discovery"
-    },
-    {
-      "at": "2026-06-19T06:59:27.944018954Z",
-      "kind": "discovery_fix",
-      "reason_hash": 14084814588624423265,
-      "recommendation_id": "01f367b3-50e7-4930-9f9d-865e1c82041f",
-      "session_id": "discovery-plan:session-final-auto-low_tension-2026-06-19T06-42-48Z",
-      "task_id": "eab6bc73-2608-47de-8505-fe27668f97e3",
-      "approved_via": "gzmo kurator plan-from-discovery"
-    },
-    {
-      "at": "2026-06-19T07:00:46.289981692Z",
-      "kind": "discovery_fix",
-      "reason_hash": 14084814588624423265,
-      "recommendation_id": "fa7e1f23-e4cc-49d6-acbf-5caa6c59611d",
-      "session_id": "discovery-plan:session-final-auto-low_tension-2026-06-19T06-50-11Z",
-      "task_id": "4f5e7840-e86e-419b-9be5-c71261037701",
-      "approved_via": "gzmo kurator plan-from-discovery"
-    },
-    {
-      "at": "2026-06-19T07:03:19.646888089Z",
-      "kind": "discovery_fix",
-      "reason_hash": 14084814588624423265,
-      "recommendation_id": "75120eea-23a9-4c74-9ab7-a4bed13a1d0f",
-      "session_id": "discovery-plan:session-final-auto-low_tension-2026-06-19T06-50-11Z",
-      "task_id": "4c5ab49e-7913-4493-8e9a-17016229ae08",
-      "approved_via": "gzmo kurator plan-from-discovery"
-    },
-    {
       "at": "2026-06-19T12:23:13.544559410Z",
       "kind": "discovery_fix",
       "reason_hash": 14084814588624423265,
@@ -647,6 +593,24 @@
       "session_id": "discovery-implement:mechanics-session-final-2026-06-16T16-25-43Z-063627:session-final-2026-06-16T16-25-43Z",
       "task_id": "5198e16d-ba8e-4800-8ee4-f9848faa8708",
       "approved_via": "gzmo kurator implement-from-discovery"
+    },
+    {
+      "at": "2026-06-21T08:42:11.425480660Z",
+      "kind": "discovery_plan",
+      "reason_hash": 14084814588624423265,
+      "recommendation_id": "bc1ad1d6-42fd-4e75-9509-6b1f76e6c8fd",
+      "session_id": "discovery-plan:session-final-2026-06-21T08-18-27Z",
+      "task_id": "3c41f454-3cd1-4d2d-b192-4193f24397dc",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-06-21T08:47:06.901966324Z",
+      "kind": "discovery_plan",
+      "reason_hash": 14084814588624423265,
+      "recommendation_id": "75def4af-9146-4293-997b-831ca4c5f9b8",
+      "session_id": "discovery-plan:session-final-2026-06-21T08-18-27Z",
+      "task_id": "7563d447-5dc1-4202-9345-e6add6dc3990",
+      "approved_via": "gzmo kurator plan-from-discovery"
     }
   ],
   "denials": [
