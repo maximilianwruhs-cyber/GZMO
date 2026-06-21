@@ -1,0 +1,38 @@
+{
+  "generated_at": "2026-06-21T09:09:02Z",
+  "total_queries": 5,
+  "passed": 5,
+  "pass_rate": 1.0,
+  "results": [
+    {
+      "link_id": "L16",
+      "recall_query": "<semantic expression>",
+      "hit": true,
+      "preview": "No relevant memories found for query: '<semantic expression>'"
+    },
+    {
+      "link_id": "L17",
+      "recall_query": "<log execution>",
+      "hit": true,
+      "preview": "Honeypot recall for '<log execution>':\n\n- [2026-06-21] (Score: 0.05) [SYSTEM:gzmo-daemon] Logs events such as Synapse pulls to episodic events.\n- [2026-06-21] (Score: 0.04) [SYSTEM:Synapse] Contains e"
+    },
+    {
+      "link_id": "L18",
+      "recall_query": "<log execution>",
+      "hit": true,
+      "preview": "Honeypot recall for '<log execution>':\n\n- [2026-06-21] (Score: 0.05) [SYSTEM:gzmo-daemon] Logs events such as Synapse pulls to episodic events.\n- [2026-06-21] (Score: 0.04) [SYSTEM:Synapse] Contains e"
+    },
+    {
+      "link_id": "L19",
+      "recall_query": "<semantic expression>",
+      "hit": true,
+      "preview": "No relevant memories found for query: '<semantic expression>'"
+    },
+    {
+      "link_id": "L01",
+      "recall_query": "exploration/consolidation",
+      "hit": true,
+      "preview": "Honeypot recall for 'exploration/consolidation':\n\n- [2026-06-21] (Score: 0.04) [PROJECT:infrastructure discovery agent-reach compliance] The primary learning topic for the current session."
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "generated_at": "2026-06-21T06:07:54Z",
+  "total_queries": 5,
+  "passed": 5,
+  "pass_rate": 1.0,
+  "results": [
+    {
+      "link_id": "L21",
+      "recall_query": "`distillation_phase_transition`",
+      "hit": true,
+      "preview": "Platform recall for '`distillation_phase_transition`':\n\n## Honeypot / Vault\n\n- [1] (Score: 0.13) [SYSTEMS:Pi pipeline] Subject of the distillation process.\n- [2] (Score: 0.02) [SYSTEM:Qwen3.5-9B] Used"
+    },
+    {
+      "link_id": "L1",
+      "recall_query": "intent-based authorization",
+      "hit": true,
+      "preview": "Platform recall for 'intent-based authorization':\n\n## Honeypot / Vault\n\n- [1] (Score: 0.21) [CONCEPT:Catch-Only-One] Non-Transferable Examples for Model-Specific Authorization\n- [2] (Score: 0.18) [SYS"
+    },
+    {
+      "link_id": "L2",
+      "recall_query": "data contract validation",
+      "hit": true,
+      "preview": "Platform recall for 'data contract validation':\n\n## Honeypot / Vault\n\n- [1] (Score: 0.08) [SYSTEM:Cognee] Relies on data validation models for strict schema adherence.\n- [2] (Score: 0.08) [TOOL:pydant"
+    },
+    {
+      "link_id": "L06",
+      "recall_query": "endpoint consistency",
+      "hit": true,
+      "preview": "Platform recall for 'endpoint consistency':\n\n## Honeypot / Vault\n\n- [1] (Score: 0.30) [CONCEPT:Native API First] Guarantees theme consistency.\n- [2] (Score: 0.27) [TOOL:cc-sdd] Ensures that consistenc"
+    },
+    {
+      "link_id": "L07",
+      "recall_query": "semantic availability",
+      "hit": true,
+      "preview": "Platform recall for 'semantic availability':\n\n## Honeypot / Vault\n\n- [1] (Score: 0.11) [SYSTEM:OpenSTBench] Beyond semantic evaluation for speech translation\n- [2] (Score: 0.08) [TOOL:mammoth] focuses"
+    }
+  ]
+}

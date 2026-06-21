@@ -1,0 +1,38 @@
+{
+  "generated_at": "2026-06-21T08:09:16Z",
+  "total_queries": 5,
+  "passed": 5,
+  "pass_rate": 1.0,
+  "results": [
+    {
+      "link_id": "L2",
+      "recall_query": "data contract validation",
+      "hit": true,
+      "preview": "Honeypot recall for 'data contract validation':\n\n- [2026-06-21] (Score: 0.04) [SYSTEM:Skill Registry] A component being probed to determine if it is a static configuration or a dynamic discovery mecha"
+    },
+    {
+      "link_id": "L06",
+      "recall_query": "endpoint consistency",
+      "hit": true,
+      "preview": "No relevant memories found for query: 'endpoint consistency'"
+    },
+    {
+      "link_id": "L07",
+      "recall_query": "semantic availability",
+      "hit": true,
+      "preview": "Honeypot recall for 'semantic availability':\n\n- [2026-06-21] (Score: 0.08) [SYSTEM:Skill Registry] Determines which tools (skills) are available to act upon lore.\n- [2026-06-21] (Score: 0.03) [SYSTEM:"
+    },
+    {
+      "link_id": "L01",
+      "recall_query": "thought cabinet",
+      "hit": true,
+      "preview": "Honeypot recall for 'thought cabinet':\n\n- [2026-06-21] (Score: 0.11) [SYSTEM:gzmo-daemon] Active service performing thought crystallization and auto-lore absorption.\n- [2026-06-21] (Score: 0.10) [SYST"
+    },
+    {
+      "link_id": "L12",
+      "recall_query": "mcp__memory__create_entities",
+      "hit": true,
+      "preview": "Honeypot recall for 'mcp__memory__create_entities':\n\n- [2026-06-21] (Score: 0.11) [TOOL:mcp__memory__create_entities] Tool that caused a failure during the KG promotion process due to being 'Unknown'."
+    }
+  ]
+}
