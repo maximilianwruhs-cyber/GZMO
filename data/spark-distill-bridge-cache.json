@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-21T08:56:35.095338779+00:00",
+  "updated_at": "2026-06-21T09:37:39.968635228+00:00",
   "sparks": [
     {
       "event_type": "spark_complete",
@@ -353,27 +353,13 @@
     },
     {
       "event_type": "spark_complete",
-      "id": "9fbd2cc8-b95e-458a-9b5f-3b0de17a842f",
+      "id": "2d41bcfe-6d7d-4026-8216-b20e98c2b23e",
       "source": "GzmoDaemon",
-      "timestamp": "2026-06-17T17:08:11.838598454+00:00",
+      "timestamp": "2026-06-21T09:12:55.639758335+00:00",
       "data": {
         "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
         "cognition_source": "honeypot",
-        "date": "2026-06-17",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "539e1187-4f38-4a57-b178-70a1065ef9d5",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-17T17:11:06.645552513+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-17",
+        "date": "2026-06-21",
         "kg_relations_written": 1,
         "memory_layer": "honeypot",
         "promoted": true
@@ -1179,13 +1165,13 @@
     },
     {
       "event_type": "spark_complete",
-      "id": "539e1187-4f38-4a57-b178-70a1065ef9d5",
+      "id": "2d41bcfe-6d7d-4026-8216-b20e98c2b23e",
       "source": "GzmoDaemon",
-      "timestamp": "2026-06-17T17:11:06.645552513+00:00",
+      "timestamp": "2026-06-21T09:12:55.639758335+00:00",
       "data": {
         "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
         "cognition_source": "honeypot",
-        "date": "2026-06-17",
+        "date": "2026-06-21",
         "kg_relations_written": 1,
         "memory_layer": "honeypot",
         "promoted": true
@@ -1991,13 +1977,13 @@
     },
     {
       "event_type": "spark_complete",
-      "id": "539e1187-4f38-4a57-b178-70a1065ef9d5",
+      "id": "2d41bcfe-6d7d-4026-8216-b20e98c2b23e",
       "source": "GzmoDaemon",
-      "timestamp": "2026-06-17T17:11:06.645552513+00:00",
+      "timestamp": "2026-06-21T09:12:55.639758335+00:00",
       "data": {
         "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
         "cognition_source": "honeypot",
-        "date": "2026-06-17",
+        "date": "2026-06-21",
         "kg_relations_written": 1,
         "memory_layer": "honeypot",
         "promoted": true
@@ -2794,6 +2780,20 @@
       "timestamp": "2026-06-21T08:22:52.638335170+00:00",
       "data": {
         "anchor_id": "ae01eb74-32ab-4b60-86c3-a7f788b21af1",
+        "cognition_source": "honeypot",
+        "date": "2026-06-21",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "2d41bcfe-6d7d-4026-8216-b20e98c2b23e",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-21T09:12:55.639758335+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
         "cognition_source": "honeypot",
         "date": "2026-06-21",
         "kg_relations_written": 1,

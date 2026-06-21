@@ -216,6 +216,23 @@ fn acceptance_has_chimera_path(cmd: &str) -> bool {
         || cmd.contains("GZMO_SKILLS_ROOT/survey_GZMO/")
 }
 
+fn target_path_is_gitignored_data(path: &str) -> bool {
+    let p = path.trim_start_matches("./");
+    if p.starts_with("gzmo_skills/data/") || p.contains("/gzmo_skills/data/") {
+        return true;
+    }
+    if p.starts_with("data/pi-mentor-discovery/") || p.contains("/data/pi-mentor-discovery/") {
+        return true;
+    }
+    if let Ok(skills_root) = std::env::var("GZMO_SKILLS_ROOT") {
+        let prefix = format!("{}/data/", skills_root.trim_end_matches('/'));
+        if path.starts_with(&prefix) {
+            return true;
+        }
+    }
+    false
+}
+
 fn complex_workstream_has_core_target(workstream: &serde_json::Value) -> bool {
     workstream
         .get("target_paths")
@@ -233,6 +250,68 @@ fn complex_workstream_has_core_target(workstream: &serde_json::Value) -> bool {
 fn spawn_command_valid(cmd: &str) -> bool {
     let cmd = cmd.trim();
     cmd.is_empty() || cmd.starts_with("gzmo ") || cmd.starts_with("bash ")
+}
+
+fn normalize_sidecar_path(raw: &str) -> String {
+    let mut p = raw.trim_start_matches("./").to_string();
+    if let Some(rest) = p.strip_prefix("gzmo_skills/") {
+        p = rest.to_string();
+    }
+    if let Some(rest) = p.strip_prefix("$GZMO_SKILLS_ROOT/") {
+        p = rest.to_string();
+    }
+    if let Ok(skills_root) = std::env::var("GZMO_SKILLS_ROOT") {
+        let prefix = format!("{}/", skills_root.trim_end_matches('/'));
+        if let Some(rest) = p.strip_prefix(&prefix) {
+            p = rest.to_string();
+        }
+    }
+    p
+}
+
+fn sidecar_writer_allowlisted(path: &str) -> bool {
+    path.contains("write-sidecar-remediation.sh")
+        || path.contains("ensure-loop-proof-marker.sh")
+        || path.contains("discovery-probes/")
+}
+
+fn resolve_bash_spawn_path(cmd: &str) -> Option<String> {
+    let cmd = cmd.trim();
+    if !cmd.starts_with("bash ") {
+        return None;
+    }
+    let rest = cmd.trim_start_matches("bash ").trim();
+    let token = rest.split_whitespace().next()?;
+    if token == "-c" {
+        return None;
+    }
+    let mut path = token.to_string();
+    if let Some(suffix) = path.strip_prefix("$GZMO_SKILLS_ROOT/") {
+        if let Ok(skills_root) = std::env::var("GZMO_SKILLS_ROOT") {
+            path = format!("{}/{}", skills_root.trim_end_matches('/'), suffix);
+        } else {
+            path = suffix.to_string();
+        }
+    } else if !path.starts_with('/') {
+        if let Ok(skills_root) = std::env::var("GZMO_SKILLS_ROOT") {
+            path = format!("{}/{}", skills_root.trim_end_matches('/'), path);
+        }
+    }
+    Some(path)
+}
+
+fn spawn_is_chicken_egg(workstream: &serde_json::Value, spawn_path: &str) -> bool {
+    let norm_spawn = normalize_sidecar_path(spawn_path);
+    if let Some(targets) = workstream.get("target_paths").and_then(|a| a.as_array()) {
+        for tp in targets {
+            if let Some(s) = tp.as_str() {
+                if normalize_sidecar_path(s) == norm_spawn {
+                    return true;
+                }
+            }
+        }
+    }
+    false
 }
 
 fn covered_finding_ids(plan_json: &serde_json::Value) -> std::collections::HashSet<String> {
@@ -350,6 +429,34 @@ pub fn verify_plan_agent_outcome(
                                     notes.push(format!(
                                         "{wid} spawn_command must start with 'gzmo ' or 'bash ' (or omit spawn_command)"
                                     ));
+                                } else if let Some(resolved) = resolve_bash_spawn_path(spawn_cmd) {
+                                    if spawn_is_chicken_egg(ws, &resolved) {
+                                        passed = false;
+                                        notes.push(format!(
+                                            "{wid} spawn_command chicken-egg: cannot bash a target_path — use write-sidecar-remediation.sh or omit spawn"
+                                        ));
+                                    } else if !std::path::Path::new(&resolved).is_file()
+                                        && !sidecar_writer_allowlisted(&resolved)
+                                    {
+                                        passed = false;
+                                        notes.push(format!(
+                                            "{wid} spawn_command references missing script '{resolved}' — use write-sidecar-remediation.sh or omit spawn"
+                                        ));
+                                    }
+                                }
+                            }
+                            if let Some(target_paths) =
+                                ws.get("target_paths").and_then(|a| a.as_array())
+                            {
+                                for (i, tp) in target_paths.iter().enumerate() {
+                                    if let Some(path) = tp.as_str() {
+                                        if target_path_is_gitignored_data(path) {
+                                            passed = false;
+                                            notes.push(format!(
+                                                "{wid} target_paths[{i}] '{path}' is under gitignored data/ — use gzmo_skills/scripts/discovery-remediations/<session_id>/ instead"
+                                            ));
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -697,6 +804,56 @@ mod tests {
         let v = verify_plan_agent_outcome(&output, &[], &findings);
         assert!(!v.passed);
         assert!(v.notes.contains("chimera"));
+    }
+
+    #[test]
+    fn verify_rejects_gitignored_data_target() {
+        let output = temp_plan_output("gitignored-data");
+        std::fs::write(&output.plan_md, "word ".repeat(850)).unwrap();
+        std::fs::write(
+            &output.plan_json,
+            r#"{"workstreams":[{"id":"WS1","finding_ids":["F1"],"complexity":"moderate","target_paths":["gzmo_skills/data/marker.md"],"acceptance":["test -f /tmp/x","test -f /tmp/y"]}],"deferred":[]}"#,
+        )
+        .unwrap();
+        std::fs::write(
+            &output.plan_provenance,
+            r#"{"files_read":["a","b","c"],"grep_queries":[]}"#,
+        )
+        .unwrap();
+        let findings = vec![ActionableFinding {
+            finding_id: "F1".into(),
+            title: "One".into(),
+            kind: FindingKind::Gap,
+            excerpt: String::new(),
+        }];
+        let v = verify_plan_agent_outcome(&output, &[], &findings);
+        assert!(!v.passed);
+        assert!(v.notes.contains("gitignored data"));
+    }
+
+    #[test]
+    fn verify_rejects_chicken_egg_sidecar_spawn() {
+        let output = temp_plan_output("chicken-egg");
+        std::fs::write(&output.plan_md, "word ".repeat(850)).unwrap();
+        std::fs::write(
+            &output.plan_json,
+            r#"{"workstreams":[{"id":"WS1","finding_ids":["F1"],"complexity":"moderate","target_paths":["gzmo_skills/scripts/discovery-remediations/s1/network-audit.sh"],"spawn_command":"bash $GZMO_SKILLS_ROOT/scripts/discovery-remediations/s1/network-audit.sh","acceptance":["test -f /tmp/x","test -f /tmp/y"]}],"deferred":[]}"#,
+        )
+        .unwrap();
+        std::fs::write(
+            &output.plan_provenance,
+            r#"{"files_read":["a","b","c"],"grep_queries":[]}"#,
+        )
+        .unwrap();
+        let findings = vec![ActionableFinding {
+            finding_id: "F1".into(),
+            title: "One".into(),
+            kind: FindingKind::Gap,
+            excerpt: String::new(),
+        }];
+        let v = verify_plan_agent_outcome(&output, &[], &findings);
+        assert!(!v.passed);
+        assert!(v.notes.contains("chicken-egg"));
     }
 
     #[test]
