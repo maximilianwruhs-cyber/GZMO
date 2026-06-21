@@ -566,6 +566,7 @@ default_agent_profile = "prometheus"
 approve_spawns_subagent = true
 auto_spawn_on_recommend = true
 spawn_brief_max_chars = 4000
+# Opt-in: spawn fixer/implementer in ephemeral git worktrees under $GZMO_SKILLS_ROOT/.worktrees/
 fixer_worktree_isolation = false
 
 

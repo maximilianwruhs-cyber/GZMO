@@ -23,6 +23,9 @@ const STATE_FILE: &str = "data/spawn-gate.state.json";
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SpawnKind {
     DiscoveryFix,
+    DiscoveryPlan,
+    DiscoveryCodeImplement,
+    DiscoveryExecute,
     SessionTriage,
 }
 
@@ -30,17 +33,27 @@ impl SpawnKind {
     pub fn as_str(self) -> &'static str {
         match self {
             SpawnKind::DiscoveryFix => "discovery_fix",
+            SpawnKind::DiscoveryPlan => "discovery_plan",
+            SpawnKind::DiscoveryCodeImplement => "discovery_code_implement",
+            SpawnKind::DiscoveryExecute => "discovery_execute",
             SpawnKind::SessionTriage => "session_triage",
         }
+    }
+
+    /// Discovery pipeline kinds share autospawn budget and `auto_spawn_discovery_fix`.
+    pub fn uses_discovery_autospawn(self) -> bool {
+        !matches!(self, SpawnKind::SessionTriage)
     }
 }
 
 pub fn spawn_kind(rec: &PendingRecommendation) -> SpawnKind {
-    if discovery_fixer::is_discovery_fix_recommendation(rec)
-        || discovery_code_implementer::is_discovery_code_implement_recommendation(rec)
-        || discovery_plan_agent::is_discovery_plan_recommendation(rec)
-        || discovery_execute::is_discovery_execute_recommendation(rec)
-    {
+    if discovery_execute::is_discovery_execute_recommendation(rec) {
+        SpawnKind::DiscoveryExecute
+    } else if discovery_plan_agent::is_discovery_plan_recommendation(rec) {
+        SpawnKind::DiscoveryPlan
+    } else if discovery_code_implementer::is_discovery_code_implement_recommendation(rec) {
+        SpawnKind::DiscoveryCodeImplement
+    } else if discovery_fixer::is_discovery_fix_recommendation(rec) {
         SpawnKind::DiscoveryFix
     } else {
         SpawnKind::SessionTriage
@@ -247,8 +260,8 @@ pub fn autospawn_enabled_for(
     auto_spawn_discovery_fix: bool,
 ) -> bool {
     match spawn_kind(rec) {
-        SpawnKind::DiscoveryFix => auto_spawn_discovery_fix,
         SpawnKind::SessionTriage => auto_spawn_session_triage,
+        _ => auto_spawn_discovery_fix,
     }
 }
 
@@ -438,10 +451,30 @@ mod tests {
     #[test]
     fn autospawn_kind_split() {
         let fix = rec(Some("discovery_fix"), "x");
+        let plan = rec(Some("discovery_plan"), "x");
         let triage = rec(None, "x");
         assert!(autospawn_enabled_for(&fix, false, true));
         assert!(!autospawn_enabled_for(&fix, true, false));
+        assert!(autospawn_enabled_for(&plan, false, true));
         assert!(autospawn_enabled_for(&triage, true, false));
         assert!(!autospawn_enabled_for(&triage, false, true));
+    }
+
+    #[test]
+    fn spawn_kind_labels_are_distinct() {
+        assert_eq!(spawn_kind(&rec(Some("discovery_fix"), "x")), SpawnKind::DiscoveryFix);
+        assert_eq!(
+            spawn_kind(&rec(Some("discovery_plan"), "x")),
+            SpawnKind::DiscoveryPlan
+        );
+        assert_eq!(
+            spawn_kind(&rec(Some("discovery_code_implement"), "x")),
+            SpawnKind::DiscoveryCodeImplement
+        );
+        assert_eq!(
+            spawn_kind(&rec(Some("discovery_execute"), "x")),
+            SpawnKind::DiscoveryExecute
+        );
+        assert_eq!(spawn_kind(&rec(None, "x")), SpawnKind::SessionTriage);
     }
 }
