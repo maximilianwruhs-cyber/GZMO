@@ -462,6 +462,7 @@ pub struct DreamsConfig {
     /// Matches the vault's quarantine threshold so the graph and vault agree.
     #[serde(default = "default_dream_min_confidence")]
     pub min_confidence: f64,
+    pub semantic_threshold: f64,
 
     /// Temperature for the verification pass. Kept low for near-deterministic
     /// fact-checking, independent of the engine's creative default.
@@ -591,6 +592,7 @@ pub struct IngestConfig {
 
     #[serde(default = "default_dream_min_confidence")]
     pub min_confidence: f64,
+    pub semantic_threshold: f64,
 
     #[serde(default = "default_dream_verify_temperature")]
     pub verify_temperature: f32,
@@ -1125,6 +1127,7 @@ pub struct SessionDistillConfig {
 
     #[serde(default = "default_dream_min_confidence")]
     pub min_confidence: f64,
+    pub semantic_threshold: f64,
 
     #[serde(default = "default_dream_verify_temperature")]
     pub verify_temperature: f32,
@@ -1271,6 +1274,7 @@ pub struct SparkConfig {
 
     #[serde(default = "default_dream_min_confidence")]
     pub min_confidence: f64,
+    pub semantic_threshold: f64,
 
     #[serde(default = "default_spark_hypothesis_temperature")]
     pub hypothesis_temperature: f32,

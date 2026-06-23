@@ -40,10 +40,14 @@ STATE_FILE = home / ".pi/agent/knowledge-state.json"
 TEXT_EXT = {".md", ".markdown", ".txt", ".rst", ".org", ".py", ".ts", ".tsx", ".js", ".jsx",
             ".json", ".yaml", ".yml", ".toml", ".html", ".css", ".sh", ".bash", ".rs", ".go",
             ".java", ".c", ".cpp", ".h", ".hpp", ".sql", ".cfg", ".ini", ".conf"}
-CHUNK, OVER, BATCH = 800, 100, 16
-INDEX_VERSION = 2
+CHUNK, OVER = 512, 80
+INDEX_VERSION = 3
 MAX_BYTES = 2_000_000
+MIN_SPLIT = 128
 FORCE = os.environ.get("PI_KB_REINDEX_FORCE", "false").lower() in ("1", "true", "yes")
+
+def is_context_exceeded(err):
+    return "Context size has been exceeded" in str(err)
 
 def uuid_from(s):
     h = hashlib.md5(s.encode()).hexdigest()
@@ -71,12 +75,21 @@ def http(method, url, body=None, timeout=120):
     with urllib.request.urlopen(req, timeout=timeout) as r:
         return json.load(r)
 
-def embed_at(url, texts):
-    j = http("POST", url, {"model": MODEL, "input": texts})
-    return [d["embedding"] for d in sorted(j["data"], key=lambda x: x["index"])]
+def embed_at(url, text):
+    j = http("POST", url, {"model": MODEL, "input": [text]})
+    return [d["embedding"] for d in sorted(j["data"], key=lambda x: x["index"])][0]
 
-def embed(texts):
-    return embed_at(EMBED_URL, texts)
+def embed_parts(url, text):
+    try:
+        return [(text, embed_at(url, text))]
+    except Exception as e:
+        if not is_context_exceeded(e) or len(text) <= MIN_SPLIT:
+            raise
+        mid = len(text) // 2
+        return embed_parts(url, text[:mid]) + embed_parts(url, text[mid:])
+
+def embed(text):
+    return embed_at(EMBED_URL, text)
 
 def walk(root, include_skip):
     for dirpath, dirnames, filenames in os.walk(root):
@@ -96,15 +109,14 @@ def index_file(fp):
     if not chs:
         return 0
     points = []
-    for b in range(0, len(chs), BATCH):
-        batch = chs[b : b + BATCH]
-        vecs = embed(batch)
-        for j, text in enumerate(batch):
-            idx = b + j
-            points.append({"id": uuid_from(f"{rel}#{idx}"), "vector": vecs[j],
-                           "payload": {"path": rel, "chunk": idx, "text": text}})
+    point_idx = 0
+    for text in chs:
+        for part_text, vec in embed_parts(EMBED_URL, text):
+            points.append({"id": uuid_from(f"{rel}#{point_idx}"), "vector": vec,
+                           "payload": {"path": rel, "chunk": point_idx, "text": part_text}})
+            point_idx += 1
     http("PUT", f"{QDRANT}/collections/{COLLECTION}/points?wait=true", {"points": points})
-    return len(chs)
+    return point_idx
 
 state = json.loads(STATE_FILE.read_text()) if STATE_FILE.exists() else {}
 files = list(walk(DOCS, FORCE))
