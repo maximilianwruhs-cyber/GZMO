@@ -123,6 +123,8 @@ wiki/assets/
 # SIL local index + recall smoke artifacts
 .gzmo/
 data/discovery-kb-metrics/recall-smoke-*.json
+data/eval/
+gzmo-core/data/
 
 # IDE-local rules
 .cursor/
