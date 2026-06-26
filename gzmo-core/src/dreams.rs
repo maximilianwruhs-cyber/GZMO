@@ -336,7 +336,20 @@ impl DreamEngine {
     }
 
     fn light_phase(&self, text: &str) -> String {
-        crate::context_compress::logs::compress_logs(text, 500)
+        // Route-aware compression: log-heavy episodic gets log compression,
+        // prose-heavy episodic gets budget-aware truncation.
+        use crate::context_compress::{compress_for_context, detect_route, CompressRoute};
+        match detect_route(text) {
+            CompressRoute::Logs => crate::context_compress::logs::compress_logs(text, 500),
+            CompressRoute::Json => crate::context_compress::json::compress_json(text, 200)
+                .unwrap_or_else(|_| text.to_string()),
+            _ => {
+                // Plain text or passthrough — budget-aware truncation at ~2000 tokens
+                let budget = 2000;
+                let view = compress_for_context(text, budget, &crate::config::ContextCompressConfig::default());
+                view.text
+            }
+        }
     }
 
     fn to_vault_truths(
@@ -362,7 +375,10 @@ impl DreamEngine {
                         confidence,
                         mmr_score: 0.0,
                         source_date: date,
-                        decay_class: DecayClass::CuratedVault,
+                        // Dream-extracted observations are derived from episodic logs,
+                        // not primary research — use SessionDistill (60-day half-life)
+                        // instead of CuratedVault.
+                        decay_class: DecayClass::SessionDistill,
                         source_file: source_file.clone(),
                         evidence: crate::memory::evidence_localize::localize_observation_evidence(
                             body,
@@ -585,7 +601,7 @@ Session distilled: GZMO runs on air-gapped infrastructure with real decisions.
             confidence: 1.0,
             mmr_score: 0.0,
             source_date: date,
-            decay_class: DecayClass::CuratedVault,
+            decay_class: DecayClass::SessionDistill,
             source_file: source_file.clone(),
             evidence: None,
         };

@@ -397,6 +397,10 @@ pub struct KgGateConfig {
     pub verify_temperature: f32,
     pub require_evidence: bool,
     pub strict_kg: bool,
+    /// When set, caps structured extract output tokens (dream/ingest).
+    pub max_tokens_extract: Option<u32>,
+    /// When set, caps structured verify output tokens.
+    pub max_tokens_verify: Option<u32>,
 }
 
 impl Default for KgGateConfig {
@@ -407,6 +411,8 @@ impl Default for KgGateConfig {
             verify_temperature: 0.1,
             require_evidence: true,
             strict_kg: true,
+            max_tokens_extract: None,
+            max_tokens_verify: None,
         }
     }
 }
@@ -636,10 +642,24 @@ impl KgPromoter {
             },
         ];
 
-        let raw = self
-            .gateway
-            .complete_structured(&messages, schema_name, extraction_schema())
-            .await?;
+        let raw = match self.gate.max_tokens_extract {
+            Some(max_tokens) => {
+                self.gateway
+                    .complete_structured_bounded(
+                        &messages,
+                        schema_name,
+                        extraction_schema(),
+                        None,
+                        Some(max_tokens),
+                    )
+                    .await?
+            }
+            None => {
+                self.gateway
+                    .complete_structured(&messages, schema_name, extraction_schema())
+                    .await?
+            }
+        };
 
         parse_json_lenient(&raw)
             .map_err(|e| anyhow::anyhow!("Failed to parse extraction JSON: {e}"))
@@ -698,15 +718,29 @@ impl KgPromoter {
             },
         ];
 
-        let raw = self
-            .verify_gateway()
-            .complete_structured_with_temp(
-                &messages,
-                "kg_verification",
-                verification_schema(),
-                Some(self.gate.verify_temperature),
-            )
-            .await?;
+        let raw = match self.gate.max_tokens_verify {
+            Some(max_tokens) => {
+                self.verify_gateway()
+                    .complete_structured_bounded(
+                        &messages,
+                        "kg_verification",
+                        verification_schema(),
+                        Some(self.gate.verify_temperature),
+                        Some(max_tokens),
+                    )
+                    .await?
+            }
+            None => {
+                self.verify_gateway()
+                    .complete_structured_with_temp(
+                        &messages,
+                        "kg_verification",
+                        verification_schema(),
+                        Some(self.gate.verify_temperature),
+                    )
+                    .await?
+            }
+        };
 
         parse_json_lenient(&raw)
             .map_err(|e| anyhow::anyhow!("Failed to parse verification JSON: {e}"))

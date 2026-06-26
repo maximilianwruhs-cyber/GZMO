@@ -462,6 +462,7 @@ pub struct DreamsConfig {
     /// Matches the vault's quarantine threshold so the graph and vault agree.
     #[serde(default = "default_dream_min_confidence")]
     pub min_confidence: f64,
+    #[serde(default = "default_semantic_threshold")]
     pub semantic_threshold: f64,
 
     /// Temperature for the verification pass. Kept low for near-deterministic
@@ -508,6 +509,14 @@ pub struct DreamsConfig {
     /// Similar honeypot facts retrieved per anchor (vector decay search).
     #[serde(default = "default_honeypot_rem_associate_k")]
     pub honeypot_rem_associate_k: usize,
+
+    /// Max output tokens for structured dream extract JSON (Prime can truncate mid-array without this).
+    #[serde(default = "default_dream_max_tokens_extract")]
+    pub max_tokens_extract: u32,
+
+    /// Max output tokens for structured dream verify JSON.
+    #[serde(default = "default_dream_max_tokens_verify")]
+    pub max_tokens_verify: u32,
 }
 
 fn default_dream_honeypot_rem_enabled() -> bool {
@@ -522,6 +531,13 @@ fn default_honeypot_rem_associate_k() -> usize {
     6
 }
 
+fn default_dream_max_tokens_extract() -> u32 {
+    16_384
+}
+fn default_dream_max_tokens_verify() -> u32 {
+    8_192
+}
+
 fn default_dream_exclude_episodic_substrings() -> Vec<String> {
     vec![
         "sys_janitor".to_string(),
@@ -533,6 +549,13 @@ fn default_dream_exclude_episodic_substrings() -> Vec<String> {
         "filesystem utilization".to_string(),
         "root filesystem".to_string(),
         "[hypothesis ".to_string(),
+        "extreme ssd".to_string(),
+        "94.8%".to_string(),
+        "telemetry summary".to_string(),
+        "system health".to_string(),
+        "logged to knowledge vault".to_string(),
+        "logged to episodic".to_string(),
+        "sys_metrics".to_string(),
         // "promoted=false" removed (2026-06-15) — spark summaries often contain entity info worth dreaming on
     ]
 }
@@ -549,6 +572,8 @@ impl DreamsConfig {
             verify_temperature: self.verify_temperature,
             require_evidence: self.require_evidence,
             strict_kg: self.strict_kg,
+            max_tokens_extract: Some(self.max_tokens_extract),
+            max_tokens_verify: Some(self.max_tokens_verify),
         }
     }
 }
@@ -570,6 +595,9 @@ impl Default for DreamsConfig {
             honeypot_rem_enabled: true,
             honeypot_rem_anchor_limit: default_honeypot_rem_anchor_limit(),
             honeypot_rem_associate_k: default_honeypot_rem_associate_k(),
+            semantic_threshold: default_semantic_threshold(),
+            max_tokens_extract: default_dream_max_tokens_extract(),
+            max_tokens_verify: default_dream_max_tokens_verify(),
         }
     }
 }
@@ -592,6 +620,7 @@ pub struct IngestConfig {
 
     #[serde(default = "default_dream_min_confidence")]
     pub min_confidence: f64,
+    #[serde(default = "default_semantic_threshold")]
     pub semantic_threshold: f64,
 
     #[serde(default = "default_dream_verify_temperature")]
@@ -622,6 +651,8 @@ impl IngestConfig {
             verify_temperature: self.verify_temperature,
             require_evidence: self.require_evidence,
             strict_kg: self.strict_kg,
+            max_tokens_extract: None,
+            max_tokens_verify: None,
         }
     }
 }
@@ -637,6 +668,7 @@ impl Default for IngestConfig {
             strict_kg: default_kg_strict(),
             max_source_chars: default_ingest_max_source_chars(),
             chunk_chars: default_pipeline_chunk_chars(),
+            semantic_threshold: default_semantic_threshold(),
         }
     }
 }
@@ -1127,6 +1159,7 @@ pub struct SessionDistillConfig {
 
     #[serde(default = "default_dream_min_confidence")]
     pub min_confidence: f64,
+    #[serde(default = "default_semantic_threshold")]
     pub semantic_threshold: f64,
 
     #[serde(default = "default_dream_verify_temperature")]
@@ -1223,6 +1256,8 @@ impl SessionDistillConfig {
             verify_temperature: self.verify_temperature,
             require_evidence: self.require_evidence,
             strict_kg: self.strict_kg,
+            max_tokens_extract: None,
+            max_tokens_verify: None,
         }
     }
 }
@@ -1247,6 +1282,7 @@ impl Default for SessionDistillConfig {
             cron_hour: default_session_distill_cron_hour(),
             cron_minute: default_session_distill_cron_minute(),
             content_hash_dedup: default_content_hash_dedup(),
+            semantic_threshold: default_semantic_threshold(),
         }
     }
 }
@@ -1274,6 +1310,7 @@ pub struct SparkConfig {
 
     #[serde(default = "default_dream_min_confidence")]
     pub min_confidence: f64,
+    #[serde(default = "default_semantic_threshold")]
     pub semantic_threshold: f64,
 
     #[serde(default = "default_spark_hypothesis_temperature")]
@@ -1477,6 +1514,7 @@ impl Default for SparkConfig {
             max_session_anchor_age_days: default_spark_max_session_anchor_age_days(),
             anchor_refresh_enabled: default_spark_anchor_refresh_enabled(),
             anchor_refresh_min_recent: default_spark_anchor_refresh_min_recent(),
+            semantic_threshold: default_semantic_threshold(),
         }
     }
 }
@@ -3332,6 +3370,7 @@ fn default_dream_enabled() -> bool { true }
 fn default_dream_verify() -> bool { true }
 fn default_dream_min_confidence() -> f64 { 0.85 }
 fn default_dream_verify_temperature() -> f32 { 0.1 }
+fn default_semantic_threshold() -> f64 { 0.70 }
 fn default_dream_cron_hour() -> u32 { 1 }
 fn default_dream_cron_minute() -> u32 { 0 }
 fn default_ingest_enabled() -> bool { true }

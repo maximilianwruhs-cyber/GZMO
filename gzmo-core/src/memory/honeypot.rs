@@ -15,6 +15,21 @@ use crate::types::ExtractedTruth;
 /// Tuned down from 0.85 (2026-06-15) to reduce false negatives on derived facts.
 pub const HONEYPOT_MIN_CONFIDENCE: f32 = 0.80;
 
+/// Per-decay-class confidence thresholds for honeypot promotion.
+/// Higher-stakes classes (identity, structural) require higher confidence;
+/// lower-stakes classes (episodic) accept lower confidence to reduce false negatives.
+/// Falls back to `HONEYPOT_MIN_CONFIDENCE` for unlisted classes.
+pub fn min_confidence_for(decay_class: &crate::types::DecayClass) -> f32 {
+    use crate::types::DecayClass::*;
+    match decay_class {
+        Episodic => 0.72,
+        SessionDistill => 0.75,
+        CuratedVault => 0.80,
+        FlexibleIdentity => 0.85,
+        AbsoluteIdentity | Structural => 0.90,
+    }
+}
+
 pub const HONEYPOT_REJECT_LOG: &str = "data/honeypot_reject.jsonl";
 
 #[derive(Debug, Clone, Serialize, PartialEq)]
@@ -28,10 +43,11 @@ pub enum HoneypotRejectReason {
 }
 
 pub fn honeypot_eligibility(truth: &ExtractedTruth) -> Result<(), HoneypotRejectReason> {
-    if truth.confidence < HONEYPOT_MIN_CONFIDENCE {
+    let min = min_confidence_for(&truth.decay_class);
+    if truth.confidence < min {
         return Err(HoneypotRejectReason::LowConfidence {
             got: truth.confidence,
-            min: HONEYPOT_MIN_CONFIDENCE,
+            min,
         });
     }
     let Some(sf) = &truth.source_file else {
@@ -428,7 +444,7 @@ mod tests {
             honeypot_eligibility(&truth("fact", 0.5, Some("wave.md"))).unwrap_err(),
             HoneypotRejectReason::LowConfidence {
                 got: 0.5,
-                min: HONEYPOT_MIN_CONFIDENCE,
+                min: 0.80, // CuratedVault threshold
             }
         );
         assert_eq!(
@@ -439,7 +455,7 @@ mod tests {
 
     #[test]
     fn threshold_is_080_not_085() {
-        // 0.80 qualifies (tuned down from 0.85 on 2026-06-15)
+        // CuratedVault: 0.80 qualifies (tuned down from 0.85 on 2026-06-15)
         assert!(qualifies_for_honeypot(&truth(
             "[SYSTEM:Test] threshold test",
             0.80,
@@ -451,5 +467,86 @@ mod tests {
             0.79,
             Some("wave_01_test.md"),
         )));
+    }
+
+    fn truth_with_decay(content: &str, conf: f32, source: Option<&str>, decay: DecayClass) -> ExtractedTruth {
+        ExtractedTruth {
+            id: Uuid::new_v4(),
+            content: content.to_string(),
+            confidence: conf,
+            mmr_score: 0.0,
+            source_date: NaiveDate::from_ymd_opt(2026, 6, 2).unwrap(),
+            decay_class: decay,
+            source_file: source.map(str::to_string),
+            evidence: None,
+        }
+    }
+
+    #[test]
+    fn episodic_accepts_lower_confidence() {
+        // Episodic threshold = 0.72
+        assert!(qualifies_for_honeypot(&truth_with_decay(
+            "[EPISODIC:Test] chat note",
+            0.72,
+            Some("wave_01_test.md"),
+            DecayClass::Episodic,
+        )));
+        // 0.71 rejected
+        assert!(!qualifies_for_honeypot(&truth_with_decay(
+            "[EPISODIC:Test] too low",
+            0.71,
+            Some("wave_01_test.md"),
+            DecayClass::Episodic,
+        )));
+    }
+
+    #[test]
+    fn absolute_identity_requires_higher_confidence() {
+        // AbsoluteIdentity threshold = 0.90
+        assert!(qualifies_for_honeypot(&truth_with_decay(
+            "[IDENTITY:Birthdate] 1990-01-01",
+            0.90,
+            Some("wave_01_test.md"),
+            DecayClass::AbsoluteIdentity,
+        )));
+        // 0.89 rejected — would have passed under flat 0.80 threshold
+        assert!(!qualifies_for_honeypot(&truth_with_decay(
+            "[IDENTITY:Birthdate] uncertain",
+            0.89,
+            Some("wave_01_test.md"),
+            DecayClass::AbsoluteIdentity,
+        )));
+    }
+
+    #[test]
+    fn flexible_identity_threshold_is_085() {
+        // FlexibleIdentity threshold = 0.85
+        assert!(qualifies_for_honeypot(&truth_with_decay(
+            "[IDENTITY:Job] Engineer",
+            0.85,
+            Some("wave_01_test.md"),
+            DecayClass::FlexibleIdentity,
+        )));
+        assert!(!qualifies_for_honeypot(&truth_with_decay(
+            "[IDENTITY:Job] uncertain",
+            0.84,
+            Some("wave_01_test.md"),
+            DecayClass::FlexibleIdentity,
+        )));
+    }
+
+    #[test]
+    fn per_class_thresholds_are_ordered() {
+        let thresholds = [
+            min_confidence_for(&DecayClass::Episodic),
+            min_confidence_for(&DecayClass::SessionDistill),
+            min_confidence_for(&DecayClass::CuratedVault),
+            min_confidence_for(&DecayClass::FlexibleIdentity),
+            min_confidence_for(&DecayClass::AbsoluteIdentity),
+            min_confidence_for(&DecayClass::Structural),
+        ];
+        for w in thresholds.windows(2) {
+            assert!(w[0] <= w[1], "thresholds should be non-decreasing: {} vs {}", w[0], w[1]);
+        }
     }
 }

@@ -265,8 +265,8 @@ pub async fn run_startup_probes(
 
     let mut results = Vec::new();
 
-    let prime = config.engine.active_engine_for_mode(crate::config::EngineMode::Local);
-    results.push(probe_llm_models(&prime).await);
+    let llm = config.engine.active_engine();
+    results.push(probe_llm_models(&llm).await);
 
     results.push(probe_embeddings(&config.embeddings, &config.redis).await);
     results.push(probe_qdrant(&config.qdrant).await);

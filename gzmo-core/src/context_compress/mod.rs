@@ -77,8 +77,12 @@ pub fn compress_for_context(
         CompressRoute::Logs => compress_logs(content, cfg.log_line_cap),
         CompressRoute::Plain => {
             let target_chars = (budget_tokens as f64 * 3.5) as usize;
-            if content.len() > target_chars {
-                format!("{}... [TRUNCATED TO BUDGET]", &content[..target_chars])
+            let mut char_boundary = target_chars;
+            while char_boundary > 0 && !content.is_char_boundary(char_boundary) {
+                char_boundary -= 1;
+            }
+            if content.len() > char_boundary {
+                format!("{}... [TRUNCATED TO BUDGET]", &content[..char_boundary])
             } else {
                 content.to_string()
             }
@@ -97,6 +101,15 @@ pub fn compress_for_context(
             route: CompressRoute::Passthrough,
         };
     }
+
+    let ratio = original_tokens as f64 / compressed_tokens.max(1) as f64;
+    tracing::debug!(
+        route = ?route,
+        original_tokens,
+        compressed_tokens,
+        ratio = format!("{ratio:.1}:1"),
+        "Context compressed"
+    );
 
     CompressedView {
         text: compressed_text,
@@ -149,8 +162,12 @@ pub async fn compress_for_context_with_ccr(
         CompressRoute::Logs => compress_logs(content, cfg.log_line_cap),
         CompressRoute::Plain => {
             let target_chars = (budget_tokens as f64 * 3.5) as usize;
-            if content.len() > target_chars {
-                format!("{}... [TRUNCATED TO BUDGET]", &content[..target_chars])
+            let mut char_boundary = target_chars;
+            while char_boundary > 0 && !content.is_char_boundary(char_boundary) {
+                char_boundary -= 1;
+            }
+            if content.len() > char_boundary {
+                format!("{}... [TRUNCATED TO BUDGET]", &content[..char_boundary])
             } else {
                 content.to_string()
             }
@@ -189,6 +206,16 @@ pub async fn compress_for_context_with_ccr(
     };
 
     let compressed_tokens = estimate_text_tokens(&final_text, 3.5);
+
+    let ratio = original_tokens as f64 / compressed_tokens.max(1) as f64;
+    tracing::debug!(
+        route = ?route,
+        original_tokens,
+        compressed_tokens,
+        ratio = format!("{ratio:.1}:1"),
+        ccr_stored = ccr_hash.is_some(),
+        "Context compressed (CCR)"
+    );
 
     CompressedView {
         text: final_text,

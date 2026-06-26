@@ -1,15 +1,19 @@
 //! # Spark Engine
 //!
-//! Chaos-free serendipitous recall: revisit a **stale** vault fact, connect it to
+//! Serendipitous recall: revisit a **stale** vault fact, connect it to
 //! **recent** context, verify the link, then promote only an `HYPOTHESIZED_LINK`
 //! (L3) — never new L2 facts at confidence 1.0.
+//!
+//! Chaos-aware: when a `ChaosSnapshot` is provided via `set_chaos_snapshot`,
+//! the hypothesis phase adapts its system prompt to match the engine's mood —
+//! more creative during high-energy/idle, more conservative during drop phase.
 
 use std::sync::Arc;
 
 use anyhow::Result;
 use chrono::{NaiveDate, Utc};
 use serde::Deserialize;
-use tracing::{info, warn};
+use tracing::{debug, info, warn};
 use uuid::Uuid;
 
 use crate::config::SparkConfig;
@@ -65,6 +69,9 @@ pub struct SparkEngine {
     config: SparkConfig,
     /// Optional Synapse bus for observability.
     synapse: Option<Arc<SynapseBus>>,
+    /// Latest chaos snapshot for mood-aware hypothesis generation.
+    /// Set by the daemon before each `run()` from the PulseLoop watch receiver.
+    chaos_snapshot: std::sync::Mutex<Option<gzmo_chaos::pulse::ChaosSnapshot>>,
 }
 
 impl SparkEngine {
@@ -84,6 +91,7 @@ impl SparkEngine {
             tools,
             config,
             synapse,
+            chaos_snapshot: std::sync::Mutex::new(None),
         }
     }
 
@@ -105,6 +113,7 @@ impl SparkEngine {
             tools,
             config,
             synapse,
+            chaos_snapshot: std::sync::Mutex::new(None),
         }
     }
 
@@ -119,6 +128,78 @@ impl SparkEngine {
             _ => &self.gateway,
         }
     }
+
+    /// Set the latest chaos snapshot for mood-aware hypothesis generation.
+    pub fn set_chaos_snapshot(&self, snap: gzmo_chaos::pulse::ChaosSnapshot) {
+        *self.chaos_snapshot.lock().unwrap() = Some(snap);
+    }
+
+    /// Generate a chaos context string for the hypothesis system prompt.
+    /// Returns empty string if no snapshot is available.
+    fn chaos_hypothesis_context(&self) -> String {
+        let snap = self.chaos_snapshot.lock().unwrap();
+        let Some(snap) = snap.as_ref() else {
+            return String::new();
+        };
+        let phase = match snap.phase {
+            gzmo_chaos::chaos::Phase::Drop => "drop-phase: engine is fatigued — favor conservative, well-grounded connections over speculative leaps",
+            gzmo_chaos::chaos::Phase::Build => "build-phase: balanced creativity — propose connections that are both novel and plausible",
+            gzmo_chaos::chaos::Phase::Idle => "idle-phase: engine is restless — favor bold, unexpected connections and creative analogies",
+        };
+        let energy_note = if snap.energy < 30.0 {
+            "energy is low — keep the hypothesis concise"
+        } else if snap.energy > 80.0 {
+            "energy is high — allow elaborate, multi-angle connections"
+        } else {
+            ""
+        };
+        let valence_note = if snap.llm_valence < -0.3 {
+            "valence is negative — gravitate toward cautionary or risk-related connections"
+        } else if snap.llm_valence > 0.3 {
+            "valence is positive — gravitate toward opportunity and growth-related connections"
+        } else {
+            ""
+        };
+        format!(
+            "\n\nCHAOS CONTEXT: {}; {}; {}; incubating_thoughts={}; crystallized_total={}",
+            phase, energy_note, valence_note, snap.thoughts_incubating, snap.thoughts_crystallized
+        )
+    }
+
+    /// Path to the anchor denylist file (last N anchor IDs sparked).
+    fn denylist_path(&self) -> std::path::PathBuf {
+        let dir = self.episodic.data_root();
+        dir.join("spark_anchor_denylist.json")
+    }
+
+    /// Load the set of recently-sparked anchor IDs to avoid immediate re-selection.
+    fn load_anchor_denylist(&self) -> Vec<String> {
+        let path = self.denylist_path();
+        match std::fs::read_to_string(&path) {
+            Ok(raw) => serde_json::from_str::<Vec<String>>(&raw).unwrap_or_default(),
+            Err(_) => Vec::new(),
+        }
+    }
+
+    /// Append an anchor ID to the denylist, keeping only the last `max` entries.
+    fn save_anchor_denylist(&self, anchor_id: &str, max: usize) {
+        let path = self.denylist_path();
+        let mut list = self.load_anchor_denylist();
+        // Remove if already present (move to end)
+        list.retain(|id| id != anchor_id);
+        list.push(anchor_id.to_string());
+        // Trim to last `max` entries
+        if list.len() > max {
+            list = list.split_off(list.len() - max);
+        }
+        if let Some(parent) = path.parent() {
+            let _ = std::fs::create_dir_all(parent);
+        }
+        let _ = std::fs::write(&path, serde_json::to_string_pretty(&list).unwrap_or_else(|_| "[]".into()));
+    }
+
+    /// Number of denylist entries to retain (default 5).
+    const DENYLIST_SIZE: usize = 5;
 
     fn emit_spark_complete(
         &self,
@@ -265,6 +346,9 @@ impl SparkEngine {
             Some(&selection.anchor.id.to_string()),
         );
 
+        // Record anchor in denylist to prevent immediate re-selection
+        self.save_anchor_denylist(&selection.anchor.id.to_string(), Self::DENYLIST_SIZE);
+
         Ok(SparkReport {
             date,
             promoted,
@@ -275,6 +359,7 @@ impl SparkEngine {
 
     /// Phase 1 — scored curated anchor + recent pool (no LLM).
     fn select_phase(&self) -> Result<Option<SparkSelection>> {
+        let denylist = self.load_anchor_denylist();
         let recent_fetch = self.config.recent_limit.saturating_mul(4).max(16);
         let recent_raw = self.vault.spark_recent_pool(
             &self.config.anchor_decay_classes,
@@ -305,6 +390,11 @@ impl SparkEngine {
 
         for candidate in anchors {
             if !self.is_viable_anchor(&candidate) {
+                continue;
+            }
+            // Skip recently-sparked anchors to prevent immediate re-selection
+            if denylist.contains(&candidate.id.to_string()) {
+                debug!(anchor_id = %candidate.id, "Anchor skipped — recently sparked");
                 continue;
             }
             if recent.iter().any(|r| r.id == candidate.id) {
@@ -403,7 +493,7 @@ impl SparkEngine {
                     "5. Do NOT invent facts absent from the SOURCE. If nothing connects, set connection ",
                     "to empty string and what_to_remember to []."
                 )
-                .to_string(),
+                .to_string() + &self.chaos_hypothesis_context(),
                 is_meta: false,
                 tool_calls: None,
                 tool_call_id: None,

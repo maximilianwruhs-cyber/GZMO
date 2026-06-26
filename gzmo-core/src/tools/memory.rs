@@ -70,6 +70,9 @@ pub struct MemorySearchTool {
     pub scope: Option<ScratchScope>,
     /// Orchestrator/daemon: scope updated per job step via shared cell.
     pub scope_cell: Option<Arc<std::sync::Mutex<ScratchScope>>>,
+    /// Optional wiki search layer — wiki hits are appended to recall results
+    /// so the LLM can access curated synthesis pages alongside vault facts.
+    pub wiki: Option<crate::wiki::WikiEngine>,
 }
 
 impl MemorySearchTool {
@@ -79,6 +82,7 @@ impl MemorySearchTool {
             scratch: None,
             scope: None,
             scope_cell: None,
+            wiki: None,
         }
     }
 
@@ -92,6 +96,7 @@ impl MemorySearchTool {
             scratch: Some(scratch),
             scope: Some(scope),
             scope_cell: None,
+            wiki: None,
         }
     }
 
@@ -105,7 +110,14 @@ impl MemorySearchTool {
             scratch: Some(scratch),
             scope: None,
             scope_cell: Some(scope_cell),
+            wiki: None,
         }
+    }
+
+    /// Attach a wiki engine for fused vault+wiki search.
+    pub fn with_wiki(mut self, wiki: crate::wiki::WikiEngine) -> Self {
+        self.wiki = Some(wiki);
+        self
     }
 
     fn effective_scope(&self) -> Option<ScratchScope> {
@@ -161,15 +173,38 @@ impl ToolHandler for MemorySearchTool {
         }
 
         let results = self.vault.search_recall(query, limit).await?;
-        if results.is_empty() {
+        if results.is_empty() && self.wiki.is_none() {
             return Ok(format!("No relevant memories found for query: '{}'", query));
         }
         let mut out = String::new();
         out.push_str(&format!("Honeypot recall for '{}':\n\n", query));
-        for (fact, score) in results {
+        for (fact, score) in &results {
             let dt = fact.created_at.format("%Y-%m-%d").to_string();
             out.push_str(&format!("- [{}] (Score: {:.2}) {}\n", dt, score, fact.content));
         }
+
+        // Append wiki search results as a bonus stream
+        if let Some(wiki) = &self.wiki {
+            let wiki_hits = wiki.search(query, 3);
+            if !wiki_hits.is_empty() {
+                if results.is_empty() {
+                    out.push_str(&format!("Honeypot recall for '{}':\n\n", query));
+                }
+                out.push_str("\n--- Wiki Knowledge Base ---\n");
+                for hit in wiki_hits {
+                    out.push_str(&format!(
+                        "- **{}** (wiki/{}) — {}\n",
+                        hit.title, hit.path, hit.snippet.chars().take(120).collect::<String>()
+                    ));
+                }
+            }
+        }
+
+        if results.is_empty() && self.wiki.is_some() {
+            // Only wiki results found — note that vault was empty
+            out = format!("Honeypot recall for '{}':\n\n(no vault hits — wiki only)\n{}", query, out);
+        }
+
         Ok(out)
     }
 }
