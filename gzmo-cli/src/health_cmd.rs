@@ -24,8 +24,8 @@ pub async fn run(config: &GzmoConfig, _identity: IdentityEngine) -> Result<()> {
 
     let mut results: Vec<ProbeResult> = Vec::new();
 
-    let prime = config.engine.active_engine_for_mode(gzmo_core::config::EngineMode::Local);
-    results.push(probe_llm_models(&prime).await);
+    let llm = config.engine.active_engine();
+    results.push(probe_llm_models(&llm).await);
     results.push(probe_embeddings(&config.embeddings, &config.redis).await);
     results.push(probe_qdrant(&config.qdrant).await);
     results.push(probe_rerank(&config.rerank).await);

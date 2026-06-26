@@ -288,6 +288,7 @@ Use delegate_task for focused sub-work; you receive a short summary, not full su
             scratch: Some(agent_session.scratch()),
             scope: Some(agent_session.main_scope()),
             scope_cell: None,
+            wiki: None,
         }));
     }
 

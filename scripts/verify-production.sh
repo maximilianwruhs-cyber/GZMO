@@ -81,7 +81,22 @@ echo "GZMO production E2E — $(date -Iseconds)"
 echo "Embed endpoint: ${EMBED_URL}"
 echo ""
 
-curl -sf http://127.0.0.1:8000/v1/models >/dev/null && pass "Prime :8000" || fail "Prime :8000"
+SKIP_PRIME_CHECK="${GZMO_SKIP_PRIME:-}"
+if [[ -z "${SKIP_PRIME_CHECK}" ]]; then
+  SKIP_PRIME_CHECK="$(python3 -c "
+import tomllib, pathlib
+d = tomllib.loads(pathlib.Path('${ROOT}/gzmo.toml').read_text())
+mode = d.get('engine', {}).get('active_mode', 'local')
+cloud_bg = d.get('routing', {}).get('cloud_first_background', False)
+print('1' if mode == 'cloud' or cloud_bg else '0')
+" 2>/dev/null || echo '0')"
+fi
+
+if [[ "${SKIP_PRIME_CHECK}" == "1" ]]; then
+  pass "Prime :8000 (skipped — cloud mode)"
+else
+  curl -sf http://127.0.0.1:8000/v1/models >/dev/null && pass "Prime :8000" || fail "Prime :8000"
+fi
 if [[ -n "${REDIS_URL:-}" ]]; then
   redis_host="$(python3 -c "from urllib.parse import urlparse; u=urlparse('${REDIS_URL}'); print(u.hostname or '127.0.0.1')")"
   redis_port="$(python3 -c "from urllib.parse import urlparse; u=urlparse('${REDIS_URL}'); print(u.port or 6379)")"

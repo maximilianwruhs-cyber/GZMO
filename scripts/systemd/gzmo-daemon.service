@@ -1,11 +1,10 @@
 [Unit]
 Description=GZMO background daemon (vault, dreams, watchers)
-After=network-online.target gzmo-prime.service
+After=network-online.target
 Wants=network-online.target
 
 [Service]
 Type=simple
-User=%i
 WorkingDirectory=%h/Projects/_foundation-audit/survey_GZMO
 ExecStart=%h/Projects/_foundation-audit/survey_GZMO/target/release/gzmo daemon
 Restart=on-failure

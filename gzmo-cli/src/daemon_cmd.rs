@@ -584,6 +584,7 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
         .map(|f| (f * 1_000_000.0) as u64)
         .unwrap_or(506);
     let spark_synapse_tick = Arc::clone(&spark_synapse);
+    let spark_snapshot_rx = chaos_pulse.snapshot_rx.clone();
     let spark_handle = tokio::spawn(async move {
         let mut interval = tokio::time::interval(Duration::from_secs(60));
         let mut completed_spark_slots: Vec<(u32, u32)> = Vec::new();
@@ -668,6 +669,8 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
                     tracing::warn!(error = %e, "Pre-spark anchor refresh failed (non-fatal)");
                 }
             }
+            // Inject latest chaos snapshot for mood-aware hypothesis generation
+            spark_engine_clone.set_chaos_snapshot(spark_snapshot_rx.borrow().clone());
             match spark_engine_clone.run(today).await {
                 Ok(report) => {
                     if spark_config.schedule_mode == SparkScheduleMode::Cron {
@@ -791,6 +794,9 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
     let kurator_synapse = Arc::clone(&synapse);
     let kurator_poll_cfg_move = kurator_poll_cfg.clone();
     let synapse_handle = tokio::spawn(async move {
+        // Backpressure: limit concurrent Pi distill subprocesses to prevent
+        // resource exhaustion when many session_end events arrive at once.
+        let distill_semaphore = Arc::new(tokio::sync::Semaphore::new(2));
         let mut interval = tokio::time::interval(Duration::from_secs(60));
         let mut spark_distill_bridge = gzmo_core::spark_distill_bridge::SparkDistillBridge::new(
             gzmo_core::spark_distill_bridge::SparkDistillBridgeConfig::default(),
@@ -906,7 +912,21 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
                                 let session_file = session_file.clone();
                                 let distill_state_path = distill_state_path.clone();
                                 let synapse_root = synapse_root.clone();
+                                let sem = Arc::clone(&distill_semaphore);
                                 tokio::spawn(async move {
+                                    // Acquire permit before spawning subprocess
+                                    let _permit = match sem.acquire().await {
+                                        Ok(p) => p,
+                                        Err(_) => {
+                                            error!("Pi distill semaphore closed — skipping {session_file}");
+                                            return;
+                                        }
+                                    };
+                                    info!(
+                                        path = %session_file,
+                                        active_distills = 2 - sem.available_permits(),
+                                        "Pi session distill starting (permit acquired)"
+                                    );
                                     match tokio::process::Command::new(&bin)
                                         .args(["distill", "pi", &session_file])
                                         .current_dir(&synapse_root)

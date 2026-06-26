@@ -4,7 +4,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 LLAMA="${GZMO_LLAMA_ROOT:-${HOME}/Projects/llama.cpp}"
-PRIME_START="${LLAMA}/prime-bench/start-prime-gemma4-26b-a4b-256k.sh"
+PRIME_START="${LLAMA}/prime-bench/start-prime-huihui-qwen36-27b-quality-64k.sh"
 LOG_DIR="${ROOT}/logs"
 mkdir -p "${LOG_DIR}"
 
@@ -33,12 +33,27 @@ wait_url() {
   return 1
 }
 
+SKIP_PRIME="${GZMO_SKIP_PRIME:-}"
+if [[ -z "${SKIP_PRIME}" ]]; then
+  SKIP_PRIME="$(python3 -c "
+import tomllib, pathlib
+d = tomllib.loads(pathlib.Path('${ROOT}/gzmo.toml').read_text())
+mode = d.get('engine', {}).get('active_mode', 'local')
+cloud_bg = d.get('routing', {}).get('cloud_first_background', False)
+print('1' if mode == 'cloud' or cloud_bg else '0')
+" 2>/dev/null || echo '0')"
+fi
+
+if [[ "${SKIP_PRIME}" == "1" ]]; then
+  echo "[OK] Skipping Prime (:8000) — cloud mode (active_mode=cloud or cloud_first_background)"
+else
 if ! curl -sf "http://127.0.0.1:8000/v1/models" >/dev/null 2>&1; then
   echo "[*] Starting Prime on :8000…"
   nohup "${PRIME_START}" >>"${LOG_DIR}/prime.log" 2>&1 &
   wait_url "http://127.0.0.1:8000/v1/models" "Prime"
 else
   echo "[OK] Prime already listening on :8000"
+fi
 fi
 
 # GZMO daemon embeddings (gzmo.toml — VM200 :8081)
@@ -84,7 +99,11 @@ fi
 
 echo ""
 echo "Production stack:"
-echo "  Prime   http://127.0.0.1:8000/v1  (chat / dreams / spark / distill)"
+if [[ "${SKIP_PRIME}" == "1" ]]; then
+  echo "  LLM     cloud (OpenRouter/Gemini via gzmo.toml [engine.cloud])"
+else
+  echo "  Prime   http://127.0.0.1:8000/v1  (chat / dreams / spark / distill)"
+fi
 echo "  GZMO    ${GZMO_EMBED_URL}  (daemon embed + rerank; VM200 router)"
 echo "  Pi KB   ${GZMO_EMBED_URL%/v1}/embeddings  (knowledge_search / pi-kb-reindex.sh)"
 echo "  Boot    ./scripts/install-boot-stack.sh  |  verify: ./scripts/after-boot-verify.sh"
