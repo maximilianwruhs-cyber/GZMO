@@ -28,6 +28,20 @@ pub struct PedagogySession {
     /// Daemon autopoietic triggers: low-tension Socratic dialogue, /dice follow-up loop.
     #[serde(default = "default_auto_triggers_enabled")]
     pub auto_triggers_enabled: bool,
+    /// Active persona name (from /transform). None = default GZMO voice.
+    #[serde(default)]
+    pub persona_name: Option<String>,
+    /// Turns since persona was activated. Incremented each turn while persona is active.
+    #[serde(default)]
+    pub persona_turns_active: u32,
+    /// Max turns before persona auto-expires. 0 = disabled (persist until cleared).
+    #[serde(default = "default_persona_ttl")]
+    pub persona_ttl: u32,
+}
+
+/// Default persona TTL: 10 turns before auto-expire.
+fn default_persona_ttl() -> u32 {
+    10
 }
 
 fn default_auto_triggers_enabled() -> bool {
@@ -44,6 +58,9 @@ impl Default for PedagogySession {
             turns_since_teachback: 0,
             awaiting_teachback: false,
             auto_triggers_enabled: true,
+            persona_name: None,
+            persona_turns_active: 0,
+            persona_ttl: 10,
         }
     }
 }
@@ -90,5 +107,127 @@ impl PedagogySession {
     pub fn clear_learn_prep(&mut self) {
         self.learn_prep_topic = None;
         self.learn_prep_notes = None;
+    }
+
+    /// Activate a persona, resetting the turn counter.
+    pub fn set_persona(&mut self, name: &str) {
+        self.persona_name = Some(name.to_string());
+        self.persona_turns_active = 0;
+    }
+
+    /// Clear the active persona.
+    pub fn clear_persona(&mut self) {
+        self.persona_name = None;
+        self.persona_turns_active = 0;
+    }
+
+    /// Increment persona turn counter. Returns:
+    /// - `None` if no persona is active
+    /// - `Some(true)` if persona just expired (turns >= ttl)
+    /// - `Some(false)` if persona is approaching expiry (turns == ttl - 2, warning zone)
+    /// - `Some(false)` if persona is still active and not in warning zone
+    pub fn tick_persona(&mut self) -> Option<bool> {
+        if self.persona_name.is_none() || self.persona_ttl == 0 {
+            return None;
+        }
+        self.persona_turns_active += 1;
+        if self.persona_turns_active >= self.persona_ttl {
+            let name = self.persona_name.take().unwrap_or_default();
+            self.persona_turns_active = 0;
+            tracing::info!(persona = %name, "Persona auto-expired after {} turns", self.persona_ttl);
+            return Some(true);
+        }
+        Some(self.persona_turns_active == self.persona_ttl.saturating_sub(2))
+    }
+
+    /// True if persona is in the warning zone (2 turns from expiry).
+    pub fn persona_expiry_warning(&self) -> bool {
+        self.persona_name.is_some()
+            && self.persona_ttl > 0
+            && self.persona_turns_active >= self.persona_ttl.saturating_sub(2)
+            && self.persona_turns_active < self.persona_ttl
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn persona_activates_and_ticks() {
+        let mut s = PedagogySession::default();
+        assert!(s.persona_name.is_none());
+        s.set_persona("Heaviside");
+        assert_eq!(s.persona_name.as_deref(), Some("Heaviside"));
+        assert_eq!(s.persona_turns_active, 0);
+
+        // Tick 1 — no warning, no expiry
+        assert_eq!(s.tick_persona(), Some(false));
+        assert!(s.persona_expiry_warning() == false);
+    }
+
+    #[test]
+    fn persona_warns_at_ttl_minus_2() {
+        let mut s = PedagogySession::default();
+        s.set_persona("Rick");
+        s.persona_ttl = 5;
+
+        // Ticks 1-2: normal
+        s.tick_persona(); // turn 1
+        s.tick_persona(); // turn 2
+        assert!(!s.persona_expiry_warning());
+
+        // Tick 3: turn == ttl-2 → warning
+        assert_eq!(s.tick_persona(), Some(true));  // true = warning zone
+        assert!(s.persona_expiry_warning());
+
+        // Tick 4: still in warning zone
+        assert_eq!(s.tick_persona(), Some(false));
+        assert!(s.persona_expiry_warning());
+    }
+
+    #[test]
+    fn persona_expires_at_ttl() {
+        let mut s = PedagogySession::default();
+        s.set_persona("Batman");
+        s.persona_ttl = 3;
+
+        s.tick_persona(); // turn 1
+        s.tick_persona(); // turn 2 (warning)
+        let expired = s.tick_persona(); // turn 3 = ttl → expires
+        assert_eq!(expired, Some(true));
+        assert!(s.persona_name.is_none());
+        assert_eq!(s.persona_turns_active, 0);
+    }
+
+    #[test]
+    fn persona_ttl_zero_never_expires() {
+        let mut s = PedagogySession::default();
+        s.set_persona("Grothendieck");
+        s.persona_ttl = 0;
+
+        // tick_persona returns None when ttl=0
+        assert_eq!(s.tick_persona(), None);
+        assert!(s.persona_name.is_some());
+    }
+
+    #[test]
+    fn clear_persona_resets_state() {
+        let mut s = PedagogySession::default();
+        s.set_persona("Heaviside");
+        s.tick_persona();
+        s.tick_persona();
+        assert!(s.persona_name.is_some());
+        assert!(s.persona_turns_active > 0);
+
+        s.clear_persona();
+        assert!(s.persona_name.is_none());
+        assert_eq!(s.persona_turns_active, 0);
+    }
+
+    #[test]
+    fn no_persona_tick_returns_none() {
+        let mut s = PedagogySession::default();
+        assert_eq!(s.tick_persona(), None);
     }
 }

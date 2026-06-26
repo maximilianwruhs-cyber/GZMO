@@ -11,7 +11,9 @@ use crate::pedagogy::trio::TrioMode;
 use crate::types::{Message, Role};
 use crate::tools::{python_sandbox::PythonSandboxTool, ToolHandler};
 
-const INTERNAL_AGENT_TEMPERATURE: f32 = 0.35;
+const DIAGNOSER_TEMPERATURE: f32 = 0.50;  // Higher — needs creative misconception detection
+const PLANNER_TEMPERATURE: f32 = 0.30;     // Lower — needs consistent gap analysis
+const AFFECTIVE_TEMPERATURE: f32 = 0.35;   // Moderate — emotional reading benefits from some warmth
 const MAX_LEAKAGE_RETRIES: u8 = 2;
 
 const DIAGNOSER_SYSTEM: &str = r#"You are the Diagnoser/Evaluator Agent inside GZMO's Agentic Teacher stack.
@@ -122,13 +124,14 @@ impl PedagogyOrchestrator {
         );
 
         let diag = self
-            .internal_agent_call(internal_gateway, DIAGNOSER_SYSTEM, &user_block)
+            .internal_agent_call(internal_gateway, DIAGNOSER_SYSTEM, &user_block, DIAGNOSER_TEMPERATURE)
             .await?;
         let plan = self
             .internal_agent_call(
                 internal_gateway,
                 PLANNER_SYSTEM,
                 &format!("Diagnoser output:\n{diag}\n\nStudent message:\n{}", input.user_message),
+                PLANNER_TEMPERATURE,
             )
             .await?;
         let affect = self
@@ -139,6 +142,7 @@ impl PedagogyOrchestrator {
                     "Diagnoser:\n{diag}\nPlanner:\n{plan}\n\nStudent message:\n{}",
                     input.user_message
                 ),
+                AFFECTIVE_TEMPERATURE,
             )
             .await?;
 
@@ -265,7 +269,7 @@ impl PedagogyOrchestrator {
         let system = "You are GZMO preparing a flipped-classroom session. \
             Summarize key concepts, common misconceptions, and 3 Socratic opening questions. \
             Be concise. Use bullet points.";
-        self.internal_agent_call(internal_gateway, system, &format!("Topic: {topic}"))
+        self.internal_agent_call(internal_gateway, system, &format!("Topic: {topic}"), PLANNER_TEMPERATURE)
             .await
     }
 
@@ -282,7 +286,7 @@ impl PedagogyOrchestrator {
 
         loop {
             let response = self
-                .agent_call(gateway, TUTOR_SYSTEM, &user_block, None)
+                .agent_call(gateway, TUTOR_SYSTEM, &user_block, None, None)
                 .await?;
             let leaky = enforce && detect_solution_leakage(&response, zpd, sandbox_output);
             if !leaky || retries >= MAX_LEAKAGE_RETRIES {
@@ -298,12 +302,14 @@ impl PedagogyOrchestrator {
         gateway: &dyn LlmGateway,
         system: &str,
         user: &str,
+        temperature: f32,
     ) -> Result<String> {
         self.agent_call(
             gateway,
             system,
             user,
             Some(self.config.internal_max_tokens),
+            Some(temperature),
         )
         .await
     }
@@ -314,9 +320,11 @@ impl PedagogyOrchestrator {
         system: &str,
         user: &str,
         max_tokens: Option<u32>,
+        temperature: Option<f32>,
     ) -> Result<String> {
+        let temp = temperature.unwrap_or(0.35);
         if let Some(cap) = max_tokens {
-            gateway.set_chaos_overrides(INTERNAL_AGENT_TEMPERATURE, cap);
+            gateway.set_chaos_overrides(temp, cap);
         }
 
         let result = async {
@@ -529,12 +537,55 @@ fn is_word_boundary_match(text: &str, value: &str) -> bool {
 
 fn contains_shell_solution(text: &str) -> bool {
     let lower = text.to_lowercase();
-    lower.starts_with("sudo ")
-        || lower.starts_with("chmod ")
-        || lower.starts_with("systemctl ")
-        || lower.starts_with("curl ")
-        || lower.starts_with("wget ")
-        || lower.contains("rm -rf")
+    // Package managers and destructive/system commands that should never
+    // appear in a Socratic hint — the student must discover these themselves.
+    let leak_prefixes: &[&str] = &[
+        "sudo ",
+        "chmod ",
+        "chown ",
+        "chgrp ",
+        "systemctl ",
+        "service ",
+        "curl ",
+        "wget ",
+        "apt ",
+        "apt-get ",
+        "pip install",
+        "pip3 install",
+        "docker ",
+        "podman ",
+        "kill ",
+        "killall ",
+        "pkill ",
+        "dd ",
+        "mkfs ",
+        "fdisk ",
+        "mount ",
+        "umount ",
+        "shutdown ",
+        "reboot ",
+        "bash ",
+        "sh -c",
+        "exec ",
+        "eval ",
+        "scp ",
+        "rsync ",
+        "ssh ",
+        "crontab ",
+        "tar ",
+        "unzip ",
+    ];
+    let leak_substrings: &[&str] = &[
+        "rm -rf",
+        "rm -r ",
+        "rm -f ",
+        "> /dev/sd",
+        "mkfifo",
+        "nc -l",
+        ":(){ :|:& };:",
+    ];
+    leak_prefixes.iter().any(|p| lower.starts_with(p))
+        || leak_substrings.iter().any(|s| lower.contains(s))
 }
 
 fn extract_line(block: &str, prefix: &str) -> String {
@@ -615,6 +666,54 @@ mod tests {
         // Substring boundary check: 10485764 should not match 1048576
         let text_no_leak = "Let's check 10485764.";
         assert!(!detect_solution_leakage(text_no_leak, ZpdPhase::WeDo, Some(sandbox_out)));
+    }
+
+    #[test]
+    fn detects_apt_install_as_leakage() {
+        let text = "Try this:\napt install nginx";
+        assert!(detect_solution_leakage(text, ZpdPhase::WeDo, None));
+    }
+
+    #[test]
+    fn detects_pip_install_as_leakage() {
+        let text = "pip install requests";
+        assert!(detect_solution_leakage(text, ZpdPhase::WeDo, None));
+    }
+
+    #[test]
+    fn detects_docker_run_as_leakage() {
+        let text = "docker run -it ubuntu bash";
+        assert!(detect_solution_leakage(text, ZpdPhase::WeDo, None));
+    }
+
+    #[test]
+    fn detects_kill_as_leakage() {
+        let text = "kill -9 1234";
+        assert!(detect_solution_leakage(text, ZpdPhase::YouDo, None));
+    }
+
+    #[test]
+    fn detects_dd_disk_writer_as_leakage() {
+        let text = "dd if=/dev/zero of=/dev/sda bs=1M";
+        assert!(detect_solution_leakage(text, ZpdPhase::YouDo, None));
+    }
+
+    #[test]
+    fn detects_fork_bomb_as_leakage() {
+        let text = ":(){ :|:& };:";
+        assert!(detect_solution_leakage(text, ZpdPhase::YouDo, None));
+    }
+
+    #[test]
+    fn detects_ssh_command_as_leakage() {
+        let text = "ssh user@host -L 8080:localhost:80";
+        assert!(detect_solution_leakage(text, ZpdPhase::WeDo, None));
+    }
+
+    #[test]
+    fn socratic_hint_about_apt_is_not_leakage_if_no_command() {
+        let text = "What package manager does Debian use?";
+        assert!(!detect_solution_leakage(text, ZpdPhase::WeDo, None));
     }
 
     #[test]
