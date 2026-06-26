@@ -38,6 +38,7 @@ pub fn event_type_label(event: &ChaosEvent) -> &'static str {
         ChaosEvent::QuoteSurfaced { .. } => "QuoteSurfaced",
         ChaosEvent::Stabilize { .. } => "Stabilize",
         ChaosEvent::MentorTeach { .. } => "MentorTeach",
+        ChaosEvent::MentorSessionEnd { .. } => "MentorSessionEnd",
         ChaosEvent::Custom { .. } => "Custom",
         ChaosEvent::PedagogyOscillate { .. } => "PedagogyOscillate",
     }
@@ -130,6 +131,9 @@ enum ChaosEventDto {
         response_preview: String,
         turn_count: u32,
     },
+    MentorSessionEnd {
+        turn_count: u32,
+    },
     Custom {
         tension_delta: f64,
         energy_delta: f64,
@@ -197,6 +201,11 @@ impl From<&ChaosEvent> for ChaosEventDto {
                 response_preview: response_preview.clone(),
                 turn_count: *turn_count,
             },
+            ChaosEvent::MentorSessionEnd { turn_count } => {
+                ChaosEventDto::MentorSessionEnd {
+                    turn_count: *turn_count,
+                }
+            }
             ChaosEvent::Custom {
                 tension_delta,
                 energy_delta,
@@ -245,6 +254,9 @@ impl ChaosEventDto {
                 response_preview,
                 turn_count,
             },
+            ChaosEventDto::MentorSessionEnd { turn_count } => {
+                ChaosEvent::MentorSessionEnd { turn_count }
+            }
             ChaosEventDto::Custom {
                 tension_delta,
                 energy_delta,
@@ -345,5 +357,17 @@ mod tests {
 
         assert_eq!(events.len(), 2);
         assert!(!path.exists());
+    }
+
+    #[test]
+    fn roundtrip_mentor_session_end() {
+        let event = ChaosEvent::MentorSessionEnd { turn_count: 12 };
+        let dto = ChaosEventDto::from(&event);
+        let json = serde_json::to_string(&dto).unwrap();
+        let back: ChaosEventDto = serde_json::from_str(&json).unwrap();
+        match back.into_event().unwrap() {
+            ChaosEvent::MentorSessionEnd { turn_count } => assert_eq!(turn_count, 12),
+            _ => panic!("wrong variant"),
+        }
     }
 }

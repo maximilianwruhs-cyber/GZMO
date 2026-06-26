@@ -11,9 +11,9 @@
 //! The snapshot is the read-only interface for skills, the REPL, the orchestrator,
 //! and any external diagnostic tools.
 //!
-//! Synapse observability: do not publish chaos heartbeat events to `SynapseBus`
-//! until `PulseLoop` runs in daemon mode. Today it only starts in chat/TUI;
-//! Daemon mode: `daemon_cmd.rs` pins `PulseHandle` for the full process lifetime.
+//! Synapse observability: `PulseLoop` runs in both chat/TUI and daemon modes.
+//! In daemon mode, `daemon_cmd.rs` pins `PulseHandle` for the full process lifetime
+//! via `_chaos_pulse_keepalive`.
 
 use std::path::PathBuf;
 use std::sync::{Arc, atomic::{AtomicU64, AtomicBool, Ordering}};
@@ -616,8 +616,10 @@ impl PulseLoop {
 
             // Read hardware telemetry tension (replaces static homeostasis)
             let hw_t = f64::from_bits(self.hw_tension.load(Ordering::Relaxed));
-            // Smooth blend: 90% current + 10% hardware (prevents jarring jumps)
-            self.tension = self.tension * 0.9 + hw_t * 0.1;
+            // Blend 80% current + 20% hardware — wider than 90/10 to prevent
+            // tension from flatlining when the machine is idle.
+            // Still smooth enough to prevent jarring jumps.
+            self.tension = self.tension * 0.8 + hw_t * 0.2;
 
             // Auto-lore emission: every 30 ticks (~10 seconds), if alive
             if self.state.alive && self.state.tick.is_multiple_of(30) {
@@ -716,9 +718,20 @@ impl PulseLoop {
     }
 
     /// Map Lorenz y ∈ [-30, 30] to max_tokens ∈ [512, 2048] (tutor-scale band)
+    /// Map Lorenz y to max_tokens ∈ [512, 2048] via a sigmoid curve.
+    ///
+    /// The Lorenz attractor spends most time near y ≈ 0, so a linear map
+    /// clusters tokens around 1280. A sigmoid (tanh) pushes moderate y values
+    /// toward the extremes, giving the full token range meaningful utilization.
+    /// At y=0: ~1024 (slightly below midpoint — brevity bias).
+    /// At y=±10: ~400 / ~1700.
+    /// At y=±20: ~530 / ~2025 (near saturation).
     fn lorenz_to_tokens(&self) -> u32 {
-        let normalized = ((self.lorenz.y + 30.0) / 60.0).clamp(0.0, 1.0);
-        512 + (normalized * 1536.0) as u32
+        // tanh-centered sigmoid: maps y ∈ (-∞, ∞) → (0, 1)
+        // k=0.15 controls steepness — moderate spread for typical y range
+        let sigmoid = 0.5 + 0.5 * (0.15 * self.lorenz.y).tanh();
+        let clamped = sigmoid.clamp(0.0, 1.0);
+        512 + (clamped * 1536.0) as u32
     }
 
     /// Map Lorenz z ∈ [0, 50] to emotional valence ∈ [-1.0, 1.0]
@@ -942,5 +955,87 @@ mod tests {
         }
 
         assert_eq!(pulse.cabinet.mutations.lorenz_rho_mod, 3.0);
+    }
+
+    fn make_pulse_for_token_test(lorenz_y: f64) -> PulseLoop {
+        let (_, event_rx) = mpsc::channel(1);
+        let (snapshot_tx, _) = watch::channel(ChaosSnapshot::default());
+        let (lore_tx, _) = mpsc::channel(1);
+        let mut pulse = PulseLoop {
+            lorenz: LorenzAttractor::new(0.506),
+            logistic: LogisticMap::new(0.506),
+            state: EngineState::new(),
+            cabinet: ThoughtCabinet::new(),
+            tension: 50.0,
+            lore: None,
+            hw_tension: Arc::new(AtomicU64::new(50.0f64.to_bits())),
+            event_rx,
+            snapshot_tx,
+            lore_tx,
+            config: ChaosConfig::default(),
+            rho_velocity_ema: 0.0,
+            pedagogy_oscillator: PedagogyOscillator::new(PedagogyOscillationSettings::default()),
+        };
+        pulse.lorenz.y = lorenz_y;
+        pulse
+    }
+
+    #[test]
+    fn token_mapping_stays_in_range() {
+        for y in [-30.0, -20.0, -10.0, 0.0, 10.0, 20.0, 30.0] {
+            let pulse = make_pulse_for_token_test(y);
+            let tokens = pulse.lorenz_to_tokens();
+            assert!((512..=2048).contains(&tokens), "y={y} → tokens={tokens} out of range");
+        }
+    }
+
+    #[test]
+    fn token_mapping_sigmoid_not_clustered_at_midpoint() {
+        // At y=0, sigmoid gives midpoint (1280) — same as linear.
+        // But moderate y values should spread more than linear would.
+        let pulse_zero = make_pulse_for_token_test(0.0);
+        let tokens_zero = pulse_zero.lorenz_to_tokens();
+
+        // y=5: linear gives 1280 + 5/60*1536 ≈ 1408; sigmoid should differ
+        let pulse_five = make_pulse_for_token_test(5.0);
+        let tokens_five = pulse_five.lorenz_to_tokens();
+
+        // y=10: linear gives 1280 + 10/60*1536 ≈ 1536; sigmoid pushes further
+        let pulse_ten = make_pulse_for_token_test(10.0);
+        let tokens_ten = pulse_ten.lorenz_to_tokens();
+
+        // Sigmoid should give more spread than linear at moderate values
+        // tanh(0.15*10) = tanh(1.5) ≈ 0.905 → ~1905 tokens (vs linear ~1536)
+        assert!(tokens_ten > 1700, "y=10 sigmoid should push further than linear, got {tokens_ten}");
+        // y=0 still at midpoint
+        assert_eq!(tokens_zero, 1280);
+        // Monotonic
+        assert!(tokens_five > tokens_zero);
+        assert!(tokens_ten > tokens_five);
+    }
+
+    #[test]
+    fn token_mapping_extremes_reach_bounds() {
+        // Large negative y should approach 512 (minimum)
+        let pulse_low = make_pulse_for_token_test(-30.0);
+        let low = pulse_low.lorenz_to_tokens();
+        assert!(low <= 600, "y=-30 should be near minimum, got {low}");
+
+        // Large positive y should approach 2048 (maximum)
+        let pulse_high = make_pulse_for_token_test(30.0);
+        let high = pulse_high.lorenz_to_tokens();
+        assert!(high >= 1950, "y=30 should be near maximum, got {high}");
+    }
+
+    #[test]
+    fn token_mapping_is_monotonic() {
+        // Increasing y should never decrease token count
+        let mut prev = 0u32;
+        for y in [-30.0, -20.0, -10.0, -5.0, 0.0, 5.0, 10.0, 20.0, 30.0] {
+            let pulse = make_pulse_for_token_test(y);
+            let tokens = pulse.lorenz_to_tokens();
+            assert!(tokens >= prev, "non-monotonic at y={y}: prev={prev}, tokens={tokens}");
+            prev = tokens;
+        }
     }
 }

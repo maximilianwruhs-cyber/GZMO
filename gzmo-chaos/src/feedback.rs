@@ -95,6 +95,12 @@ pub enum ChaosEvent {
         turn_count: u32,
     },
 
+    /// Mentor session ended — releases accumulated teaching tension and restores energy.
+    /// Counteracts the steady tension climb from long MentorTeach sessions.
+    MentorSessionEnd {
+        turn_count: u32,
+    },
+
     /// Custom arbitrary event for extensibility
     Custom {
         tension_delta: f64,
@@ -146,6 +152,11 @@ impl ChaosEvent {
             ChaosEvent::MentorTeach { turn_count, .. } => {
                 1.5 + (*turn_count as f64 * 0.3).min(3.0)
             }
+            ChaosEvent::MentorSessionEnd { turn_count } => {
+                // Release accumulated tension proportional to session length.
+                // A 5-turn session releases −8.0, a 20-turn session releases −15.0 (capped).
+                -(8.0 + (*turn_count as f64 * 0.35).min(7.0))
+            }
             ChaosEvent::Custom { tension_delta, .. } => *tension_delta,
             _ => 0.0,
         }
@@ -163,11 +174,22 @@ impl ChaosEvent {
                 else if *value == *max { 5.0 }
                 else { 0.0 }
             }
-            ChaosEvent::SoundFired { .. } => -1.0, // All sounds cost a bit of energy
+            ChaosEvent::SoundFired { category } => {
+                // Loud/aggressive sounds drain more energy; calm ones barely cost anything
+                match category {
+                    SoundCategory::Explosion | SoundCategory::Alarm => -3.0,
+                    SoundCategory::Thunder | SoundCategory::Roar => -2.0,
+                    SoundCategory::Drum | SoundCategory::Guitar => -1.5,
+                    SoundCategory::Bell | SoundCategory::Wave => -0.8,
+                    SoundCategory::Chime | SoundCategory::Piano => -0.5,
+                    SoundCategory::Wind | SoundCategory::Hum => -0.3,
+                }
+            }
             ChaosEvent::CardForged { .. } => -2.0,  // Forging is taxing
             ChaosEvent::PkmForged { .. } => -2.0,   // Forging is taxing
             ChaosEvent::PersonaShift { .. } => -3.0, // Identity shifts are expensive
             ChaosEvent::MentorTeach { .. } => -0.5,
+            ChaosEvent::MentorSessionEnd { .. } => 3.0, // Session over — relief and recovery
             ChaosEvent::Custom { energy_delta, .. } => *energy_delta,
             _ => 0.0,
         }
@@ -258,5 +280,95 @@ mod tests {
         let event = ChaosEvent::DiceRoll { value: 200, max: 20 };
 
         assert_eq!(event.tension_delta(), -10.0);
+    }
+
+    #[test]
+    fn sound_energy_scales_with_intensity() {
+        let explosion = ChaosEvent::SoundFired { category: SoundCategory::Explosion };
+        let alarm = ChaosEvent::SoundFired { category: SoundCategory::Alarm };
+        let thunder = ChaosEvent::SoundFired { category: SoundCategory::Thunder };
+        let drum = ChaosEvent::SoundFired { category: SoundCategory::Drum };
+        let bell = ChaosEvent::SoundFired { category: SoundCategory::Bell };
+        let chime = ChaosEvent::SoundFired { category: SoundCategory::Chime };
+        let wind = ChaosEvent::SoundFired { category: SoundCategory::Wind };
+
+        // Aggressive sounds drain most
+        assert_eq!(explosion.energy_delta(), -3.0);
+        assert_eq!(alarm.energy_delta(), -3.0);
+        assert_eq!(thunder.energy_delta(), -2.0);
+        // Moderate sounds drain moderately
+        assert_eq!(drum.energy_delta(), -1.5);
+        assert_eq!(bell.energy_delta(), -0.8);
+        // Calm sounds barely drain
+        assert!(chime.energy_delta() > -1.0);
+        assert!(wind.energy_delta() > -0.5);
+
+        // Ordering: explosion > thunder > drum > bell > chime > wind
+        let energies = [
+            explosion.energy_delta(),
+            thunder.energy_delta(),
+            drum.energy_delta(),
+            bell.energy_delta(),
+            chime.energy_delta(),
+            wind.energy_delta(),
+        ];
+        for w in energies.windows(2) {
+            assert!(w[0] <= w[1], "energy cost should decrease with intensity: {} vs {}", w[0], w[1]);
+        }
+    }
+
+    #[test]
+    fn sound_tension_and_energy_both_vary_by_category() {
+        let explosion = ChaosEvent::SoundFired { category: SoundCategory::Explosion };
+        let wind = ChaosEvent::SoundFired { category: SoundCategory::Wind };
+
+        // Explosion: high tension, high drain
+        assert!(explosion.tension_delta() > 0.0);
+        assert!(explosion.energy_delta() < -1.0);
+        // Wind: low tension, low drain
+        assert!(wind.tension_delta() < 0.0);
+        assert!(wind.energy_delta() > -1.0);
+    }
+
+    #[test]
+    fn mentor_session_end_releases_tension() {
+        let short = ChaosEvent::MentorSessionEnd { turn_count: 5 };
+        let long = ChaosEvent::MentorSessionEnd { turn_count: 20 };
+
+        // Short session: −8.0 − (5 * 0.35) = −9.75
+        assert!((short.tension_delta() - (-9.75)).abs() < f64::EPSILON);
+        // Long session: −8.0 − min(20 * 0.35, 7.0) = −8.0 − 7.0 = −15.0
+        assert!((long.tension_delta() - (-15.0)).abs() < f64::EPSILON);
+    }
+
+    #[test]
+    fn mentor_session_end_restores_energy() {
+        let event = ChaosEvent::MentorSessionEnd { turn_count: 10 };
+        assert_eq!(event.energy_delta(), 3.0);
+    }
+
+    #[test]
+    fn mentor_session_end_produces_no_thought_seed() {
+        let event = ChaosEvent::MentorSessionEnd { turn_count: 5 };
+        assert!(event.thought_seed().is_none());
+    }
+
+    #[test]
+    fn mentor_session_end_counteracts_accumulated_teach_tension() {
+        // Simulate a 10-turn teaching session: 10x MentorTeach + 1x MentorSessionEnd
+        let mut total_tension = 0.0;
+        for turn in 0..10 {
+            total_tension += ChaosEvent::MentorTeach {
+                topic_preview: "test".into(),
+                response_preview: "test".into(),
+                turn_count: turn,
+            }.tension_delta();
+        }
+        // 10 turns: 1.5 + 1.8 + 2.1 + 2.4 + 2.7 + 3.0 + 3.0 + 3.0 + 3.0 + 3.0 = 25.5
+        total_tension += ChaosEvent::MentorSessionEnd { turn_count: 10 }.tension_delta();
+        // Session end: −8.0 − min(3.5, 7.0) = −11.5
+        // Net: 25.5 − 11.5 = 14.0 (still elevated but not runaway)
+        assert!(total_tension < 25.0, "session end should meaningfully reduce accumulated tension: got {}", total_tension);
+        assert!(total_tension > 0.0, "teaching should still leave net positive tension: got {}", total_tension);
     }
 }

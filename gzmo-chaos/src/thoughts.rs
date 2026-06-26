@@ -9,7 +9,7 @@
 
 use serde::{Deserialize, Serialize};
 
-const MAX_SLOTS: usize = 5; // Expanded from 3 — more capacity for skill output thoughts
+const MAX_SLOTS: usize = 7; // Expanded from 3 — more capacity for skill output thoughts
 const ABSORB_THRESHOLD: f64 = 0.82; // ~18% chance per emission
 
 /// Incubation periods by category (in ticks at 174 BPM)
@@ -38,6 +38,14 @@ fn incubation_period(category: &str) -> u64 {
     }
 }
 
+/// Apply ±20% jitter to base incubation using a chaos roll (0.0–1.0).
+/// Minimum 3 ticks to prevent instant crystallization.
+fn incubation_with_jitter(base: u64, chaos_roll: f64) -> u64 {
+    let jitter = (chaos_roll - 0.5) * 0.4;
+    let adjusted = base as f64 * (1.0 + jitter);
+    adjusted.round().max(3.0) as u64
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct IncubatingThought {
     pub category: String,
@@ -45,6 +53,10 @@ pub struct IncubatingThought {
     pub tick_absorbed: u64,
     pub ticks_remaining: u64,
     pub total_ticks: u64,
+    /// Number of same-category thoughts fused into this one while incubating.
+    /// Fused thoughts produce amplified mutations on crystallize (1.0 + 0.5 × count).
+    #[serde(default)]
+    pub fusion_count: u32,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -92,13 +104,28 @@ impl ThoughtCabinet {
             return false;
         }
 
+        // Fusion: if a same-category thought is already incubating, boost it
+        // instead of consuming a new slot. Fused thoughts crystalize with
+        // amplified mutations and a longer incubation period.
+        if let Some(existing) = self.slots.iter_mut()
+            .filter_map(|s| s.as_mut())
+            .find(|t| t.category == category)
+        {
+            existing.fusion_count = existing.fusion_count.saturating_add(1);
+            let extension = incubation_period(category) / 3;
+            existing.ticks_remaining = existing.ticks_remaining.saturating_add(extension);
+            existing.total_ticks = existing.total_ticks.saturating_add(extension);
+            return true;
+        }
+
         // Find a free slot
         let free_slot = self.slots.iter().position(|s| s.is_none());
         let Some(idx) = free_slot else {
             return false; // Cabinet full — thought rejected
         };
 
-        let total = incubation_period(category);
+        let base = incubation_period(category);
+        let total = incubation_with_jitter(base, chaos_roll);
         let preview: String = text.chars().take(80).collect();
 
         self.slots[idx] = Some(IncubatingThought {
@@ -107,6 +134,7 @@ impl ThoughtCabinet {
             tick_absorbed: current_tick,
             ticks_remaining: total,
             total_ticks: total,
+            fusion_count: 0,
         });
 
         true
@@ -115,6 +143,8 @@ impl ThoughtCabinet {
     /// Advance all incubating thoughts by one tick.
     /// Returns any newly crystallized thoughts.
     pub fn tick(&mut self) -> Vec<CrystallizationEvent> {
+        self.decay_mutations();
+
         // First pass: decrement and collect indices of completed thoughts
         let mut completed: Vec<(usize, IncubatingThought)> = Vec::new();
 
@@ -147,189 +177,170 @@ impl ThoughtCabinet {
     /// poem +0.1, story +0.5, persona +0.8. Per-tick decay (1−k)ρ_mod runs in
     /// `pulse.rs`. See `docs/CHAOS_RHO_CONTROL_MODEL.md`.
     fn crystallize(&mut self, thought: &IncubatingThought) -> CrystallizationEvent {
-        let mutation = match thought.category.as_str() {
+        let fusion_mult = 1.0 + 0.5 * thought.fusion_count as f64;
+        let category_label = if thought.fusion_count > 0 {
+            format!("{}[fused x{}]", thought.category, thought.fusion_count + 1)
+        } else {
+            thought.category.clone()
+        };
+
+        // Compute base deltas and mutation effect per category.
+        // Deltas are applied below, amplified by fusion_mult for fused thoughts.
+        let (dg, df, dr, dt, mutation) = match thought.category.as_str() {
             "joke" => {
-                // Negative Δρ impulse (semantic counterweight to story/persona forcing)
-                self.mutations.gravity_mod -= 0.1;
-                self.mutations.lorenz_rho_mod -= 0.2;
-                MutationEffect {
+                ( -0.1, 0.0, -0.2, 0.0, MutationEffect {
                     target: "gravity+rho".to_string(),
                     delta: -0.1,
                     description: "Humor lightens gravity and cools attractor intensity".to_string(),
-                }
+                })
             }
             "quote" => {
-                // Wisdom perturbs the Lorenz attractor's shape
-                self.mutations.lorenz_rho_mod += 0.3;
-                MutationEffect {
+                ( 0.0, 0.0, 0.3, 0.0, MutationEffect {
                     target: "lorenz_rho".to_string(),
                     delta: 0.3,
                     description: "Wisdom reshapes the attractor's orbital topology".to_string(),
-                }
+                })
             }
             "fact" => {
-                // Truth reduces resistance
-                self.mutations.friction_mod -= 0.02;
-                MutationEffect {
+                ( 0.0, -0.02, 0.0, 0.0, MutationEffect {
                     target: "friction".to_string(),
                     delta: -0.02,
                     description: "Truth reduces systemic resistance".to_string(),
-                }
+                })
             }
             "poem" => {
-                // Poetry softens gravity and nudges rho
-                self.mutations.gravity_mod -= 0.05;
-                self.mutations.lorenz_rho_mod += 0.1;
-                MutationEffect {
+                ( -0.05, 0.0, 0.1, 0.0, MutationEffect {
                     target: "gravity+rho".to_string(),
                     delta: -0.05,
                     description: "Verse loosens the engine's grip on determinism".to_string(),
-                }
+                })
             }
             "story" => {
-                // Narrative shifts the attractor significantly
-                self.mutations.lorenz_rho_mod += 0.5;
-                MutationEffect {
+                ( 0.0, 0.0, 0.5, 0.0, MutationEffect {
                     target: "lorenz_rho".to_string(),
                     delta: 0.5,
                     description: "Narrative restructures phase space geometry".to_string(),
-                }
+                })
             }
             "card" => {
-                // Forged cards reduce friction (the engine gets "slicker")
-                self.mutations.friction_mod -= 0.03;
-                MutationEffect {
+                ( 0.0, -0.03, 0.0, 0.0, MutationEffect {
                     target: "friction".to_string(),
                     delta: -0.03,
                     description: "A forged card greases the gears of chaos".to_string(),
-                }
+                })
             }
             "pkm" => {
-                self.mutations.friction_mod -= 0.03;
-                MutationEffect {
+                ( 0.0, -0.03, 0.0, 0.0, MutationEffect {
                     target: "friction".to_string(),
                     delta: -0.03,
                     description: "A forged pokemon card greases the gears of chaos".to_string(),
-                }
+                })
             }
             "pkm_ex" => {
-                self.mutations.friction_mod -= 0.03;
-                MutationEffect {
+                ( 0.0, -0.03, 0.0, 0.0, MutationEffect {
                     target: "friction".to_string(),
                     delta: -0.03,
                     description: "An ex pokemon card greases the gears of chaos".to_string(),
-                }
+                })
             }
             "dice_crit" | "dice_crit_success" => {
-                self.mutations.tension_bias -= 2.0;
-                MutationEffect {
+                ( 0.0, 0.0, 0.0, -2.0, MutationEffect {
                     target: "tension_bias".to_string(),
                     delta: -2.0,
                     description: "Fortune's memory lowers the system's baseline anxiety".to_string(),
-                }
+                })
             }
             "dice_crit_fail" => {
-                self.mutations.tension_bias += 2.0;
-                MutationEffect {
+                ( 0.0, 0.0, 0.0, 2.0, MutationEffect {
                     target: "tension_bias".to_string(),
                     delta: 2.0,
                     description: "Misfortune's memory raises the system's baseline anxiety".to_string(),
-                }
+                })
             }
             "dice_catastrophe" => {
-                self.mutations.lorenz_rho_mod += 0.5;
-                self.mutations.tension_bias += 3.0;
-                MutationEffect {
+                ( 0.0, 0.0, 0.5, 3.0, MutationEffect {
                     target: "rho+tension".to_string(),
                     delta: 0.5,
                     description: "Phase collapse scars the attractor and elevates baseline dread".to_string(),
-                }
+                })
             }
             "dice_resonance" => {
-                self.mutations.lorenz_rho_mod += 0.4;
-                self.mutations.friction_mod -= 0.02;
-                MutationEffect {
+                ( 0.0, -0.02, 0.4, 0.0, MutationEffect {
                     target: "rho+friction".to_string(),
                     delta: 0.4,
                     description: "Lorenz–Logistic coupling reshapes rho and greases the field".to_string(),
-                }
+                })
             }
             "dice_oracle" => {
-                self.mutations.friction_mod -= 0.01;
-                self.mutations.lorenz_rho_mod += 0.15;
-                MutationEffect {
+                ( 0.0, -0.01, 0.15, 0.0, MutationEffect {
                     target: "friction+rho".to_string(),
                     delta: 0.15,
                     description: "Oracle insight smooths friction and nudges the attractor".to_string(),
-                }
+                })
             }
             "dice_spark" => {
-                self.mutations.lorenz_rho_mod += 0.2;
-                MutationEffect {
+                ( 0.0, 0.0, 0.2, 0.0, MutationEffect {
                     target: "lorenz_rho".to_string(),
                     delta: 0.2,
                     description: "Creative spark raises attractor intensity".to_string(),
-                }
+                })
             }
             "dice_crystallize" => {
-                self.mutations.gravity_mod -= 0.1;
-                MutationEffect {
+                ( -0.1, 0.0, 0.0, 0.0, MutationEffect {
                     target: "gravity".to_string(),
                     delta: -0.1,
                     description: "Spontaneous nucleation lightens the engine's gravity well".to_string(),
-                }
+                })
             }
             "dice_bifurcation" => {
-                self.mutations.friction_mod -= 0.02;
-                MutationEffect {
+                ( 0.0, -0.02, 0.0, 0.0, MutationEffect {
                     target: "friction".to_string(),
                     delta: -0.02,
                     description: "Period-3 window discovery smooths turbulent transitions".to_string(),
-                }
+                })
             }
             "dice_legendary" => {
-                self.mutations.lorenz_rho_mod += 1.0;
-                self.mutations.gravity_mod -= 0.05;
-                MutationEffect {
+                ( -0.05, 0.0, 1.0, 0.0, MutationEffect {
                     target: "rho+gravity".to_string(),
                     delta: 1.0,
                     description: "Legendary crystallization expands ρ and transcends parameter space".to_string(),
-                }
+                })
             }
             "dice_cascade" => {
-                self.mutations.lorenz_rho_mod += 0.25;
-                self.mutations.friction_mod -= 0.01;
-                MutationEffect {
+                ( 0.0, -0.01, 0.25, 0.0, MutationEffect {
                     target: "rho+friction".to_string(),
                     delta: 0.25,
                     description: "Wild magic imprints the pantheon echo on the attractor".to_string(),
-                }
+                })
             }
             "sound" => {
-                // Sound experiences leave a subtle friction mark
-                self.mutations.friction_mod -= 0.01;
-                MutationEffect {
+                ( 0.0, -0.01, 0.0, 0.0, MutationEffect {
                     target: "friction".to_string(),
                     delta: -0.01,
                     description: "Auditory resonance smooths turbulent transitions".to_string(),
-                }
+                })
             }
             "persona" => {
-                // Persona shifts warp gravity significantly — identity is heavy
-                self.mutations.gravity_mod += 0.2;
-                self.mutations.lorenz_rho_mod += 0.8;
-                MutationEffect {
+                ( 0.2, 0.0, 0.8, 0.0, MutationEffect {
                     target: "gravity+rho".to_string(),
                     delta: 0.2,
                     description: "Identity crystallization adds existential weight and reshapes the attractor".to_string(),
-                }
+                })
             }
-            _ => MutationEffect {
-                target: "none".to_string(),
-                delta: 0.0,
-                description: "Unknown category — no mutation".to_string(),
+            _ => {
+                ( 0.0, 0.0, 0.0, 0.0, MutationEffect {
+                    target: "none".to_string(),
+                    delta: 0.0,
+                    description: "Unknown category — no mutation".to_string(),
+                })
             },
         };
+
+        // Apply deltas amplified by fusion multiplier
+        self.mutations.gravity_mod += dg * fusion_mult;
+        self.mutations.friction_mod += df * fusion_mult;
+        self.mutations.lorenz_rho_mod += dr * fusion_mult;
+        self.mutations.tension_bias += dt * fusion_mult;
 
         self.mutations.total_crystallized += 1;
 
@@ -339,11 +350,22 @@ impl ThoughtCabinet {
         self.mutations.lorenz_rho_mod = self.mutations.lorenz_rho_mod.clamp(-10.0, 10.0);
         self.mutations.tension_bias = self.mutations.tension_bias.clamp(-30.0, 30.0);
 
+        // Amplify the MutationEffect description for fused thoughts
+        let mutation = if thought.fusion_count > 0 {
+            MutationEffect {
+                target: mutation.target,
+                delta: mutation.delta * fusion_mult,
+                description: format!("{} [fusion x{}]", mutation.description, thought.fusion_count + 1),
+            }
+        } else {
+            mutation
+        };
+
         CrystallizationEvent {
-            category: thought.category.clone(),
+            category: category_label,
             text_preview: thought.text_preview.clone(),
             mutation,
-            tick_crystallized: 0, // Caller sets this
+            tick_crystallized: 0,
         }
     }
 
@@ -357,7 +379,19 @@ impl ThoughtCabinet {
     /// Active Lorenz perturbation from incubating thoughts (cognitive noise)
     pub fn active_lorenz_noise(&self) -> f64 {
         let active_count = self.slots.iter().filter(|s| s.is_some()).count();
-        active_count as f64 * 0.5 // Each thought adds noise to sigma
+        active_count as f64 * 0.5
+    }
+
+    /// Forgetting curve: pull gravity_mod, friction_mod, tension_bias toward zero.
+    /// 0.0002 per tick ≈ 30% decay over ~10 min at 174 BPM.
+    fn decay_mutations(&mut self) {
+        const RATE: f64 = 0.0002;
+        self.mutations.gravity_mod *= 1.0 - RATE;
+        self.mutations.friction_mod *= 1.0 - RATE;
+        self.mutations.tension_bias *= 1.0 - RATE;
+        if self.mutations.gravity_mod.abs() < 0.001 { self.mutations.gravity_mod = 0.0; }
+        if self.mutations.friction_mod.abs() < 0.001 { self.mutations.friction_mod = 0.0; }
+        if self.mutations.tension_bias.abs() < 0.001 { self.mutations.tension_bias = 0.0; }
     }
 
     /// Get a snapshot of currently incubating thoughts
@@ -415,7 +449,7 @@ mod tests {
         let mut cabinet = ThoughtCabinet::new();
         cabinet.mutations.lorenz_rho_mod = 3.0;
         assert!(cabinet.try_absorb("joke", "test", 0, 0.9));
-        for _ in 0..15 {
+        while cabinet.occupied_slots() > 0 {
             cabinet.tick();
         }
         assert!((cabinet.mutations.lorenz_rho_mod - 2.8).abs() < f64::EPSILON);
@@ -523,5 +557,148 @@ mod tests {
         let m = crystallize_category("dice_oracle");
         assert!((m.lorenz_rho_mod - 0.15).abs() < f64::EPSILON);
         assert!((m.friction_mod - (-0.01)).abs() < f64::EPSILON);
+    }
+    #[test]
+    fn jitter_at_midpoint_returns_base() {
+        assert_eq!(incubation_with_jitter(30, 0.5), 30);
+        assert_eq!(incubation_with_jitter(15, 0.5), 15);
+        assert_eq!(incubation_with_jitter(60, 0.5), 60);
+    }
+
+    #[test]
+    fn jitter_below_midpoint_shortens() {
+        assert_eq!(incubation_with_jitter(30, 0.0), 24);
+    }
+
+    #[test]
+    fn jitter_above_midpoint_lengthens() {
+        assert_eq!(incubation_with_jitter(30, 1.0), 36);
+    }
+
+    #[test]
+    fn jitter_clamps_to_minimum_3_ticks() {
+        assert_eq!(incubation_with_jitter(8, 0.0), 6);
+        assert_eq!(incubation_with_jitter(2, 0.0), 3);
+    }
+
+    #[test]
+    fn jitter_produces_different_incubation_times_for_same_category() {
+        let short = incubation_with_jitter(incubation_period("joke"), 0.1);
+        let base_t = incubation_with_jitter(incubation_period("joke"), 0.5);
+        let long = incubation_with_jitter(incubation_period("joke"), 0.9);
+        assert!(short < base_t);
+        assert!(long > base_t);
+    }
+
+    #[test]
+    fn mutation_decay_pulls_toward_zero() {
+        let mut cabinet = ThoughtCabinet::new();
+        cabinet.mutations.gravity_mod = -4.0;
+        cabinet.mutations.friction_mod = -0.3;
+        cabinet.mutations.tension_bias = 10.0;
+        cabinet.tick();
+        assert!(cabinet.mutations.gravity_mod.abs() < 4.0);
+        assert!(cabinet.mutations.friction_mod.abs() < 0.3);
+        assert!(cabinet.mutations.tension_bias < 10.0);
+    }
+
+    #[test]
+    fn mutation_decay_clips_near_zero() {
+        let mut cabinet = ThoughtCabinet::new();
+        cabinet.mutations.gravity_mod = 0.0005;
+        cabinet.mutations.friction_mod = -0.0005;
+        cabinet.tick();
+        assert_eq!(cabinet.mutations.gravity_mod, 0.0);
+        assert_eq!(cabinet.mutations.friction_mod, 0.0);
+    }
+
+    #[test]
+    fn mutation_decay_does_not_affect_rho() {
+        let mut cabinet = ThoughtCabinet::new();
+        cabinet.mutations.lorenz_rho_mod = 3.0;
+        cabinet.tick();
+        assert_eq!(cabinet.mutations.lorenz_rho_mod, 3.0);
+    }
+
+    /// Absorb a category, tick to crystallize, return final Mutations
+    fn absorb_and_crystallize(cabinet: &mut ThoughtCabinet, category: &str, chaos_roll: f64) -> Mutations {
+        assert!(cabinet.try_absorb(category, "test seed", 0, chaos_roll));
+        while cabinet.occupied_slots() > 0 {
+            cabinet.tick();
+        }
+        cabinet.mutations.clone()
+    }
+
+    #[test]
+    fn fusion_same_category_boosts_instead_of_consuming_slot() {
+        let mut cabinet = ThoughtCabinet::new();
+        cabinet.try_absorb("joke", "first joke", 0, 0.9);
+        assert_eq!(cabinet.occupied_slots(), 1);
+
+        // Same category → fuses into existing thought, doesn't use second slot
+        cabinet.try_absorb("joke", "second joke", 1, 0.9);
+        assert_eq!(cabinet.occupied_slots(), 1);
+    }
+
+    #[test]
+    fn fusion_amplifies_joke_mutation() {
+        let mut cabinet = ThoughtCabinet::new();
+        // Fuse 3 jokes into one slot
+        cabinet.try_absorb("joke", "j1", 0, 0.9);
+        cabinet.try_absorb("joke", "j2", 1, 0.9);
+        cabinet.try_absorb("joke", "j3", 2, 0.9);
+
+        while cabinet.occupied_slots() > 0 {
+            cabinet.tick();
+        }
+
+        // fusion_count=2, fusion_mult = 1.0 + 0.5*2 = 2.0
+        // gravity: -0.1 * 2.0 = -0.2, rho: -0.2 * 2.0 = -0.4
+        assert!((cabinet.mutations.gravity_mod - (-0.2)).abs() < 0.01,
+            "expected gravity ≈ -0.2, got {}", cabinet.mutations.gravity_mod);
+        assert!((cabinet.mutations.lorenz_rho_mod - (-0.4)).abs() < 0.01,
+            "expected rho ≈ -0.4, got {}", cabinet.mutations.lorenz_rho_mod);
+    }
+
+    #[test]
+    fn fusion_label_includes_fusion_count() {
+        let mut cabinet = ThoughtCabinet::new();
+        cabinet.try_absorb("story", "epic tale", 0, 0.9);
+        cabinet.try_absorb("story", "epic sequel", 1, 0.9);
+
+        let mut events = Vec::new();
+        while cabinet.occupied_slots() > 0 {
+            let evts = cabinet.tick();
+            events.extend(evts);
+        }
+
+        // Should be exactly one crystallization event with fused label
+        assert_eq!(events.len(), 1);
+        assert_eq!(events[0].category, "story[fused x2]");
+    }
+
+    #[test]
+    fn fusion_extends_incubation_period() {
+        let mut cabinet = ThoughtCabinet::new();
+        // Roll=0.9 (>0.82 threshold) — jitter adds ~16% to base
+        cabinet.try_absorb("joke", "j1", 0, 0.9);
+
+        cabinet.try_absorb("joke", "j2", 1, 0.9);  // fuses, extends by 15/3 = 5 ticks
+
+        let thought = cabinet.slots.iter().find_map(|s| s.as_ref()).unwrap();
+        // After jitter: base 15 + ~16% ≈ 17-18, fusion extends by 5 → ~22-23
+        assert!(thought.ticks_remaining > 15,
+            "fusion should extend incubation beyond base: got {}", thought.ticks_remaining);
+        assert_eq!(thought.fusion_count, 1);
+    }
+
+    #[test]
+    fn different_categories_dont_fuse() {
+        let mut cabinet = ThoughtCabinet::new();
+        cabinet.try_absorb("joke", "funny", 0, 0.9);
+        cabinet.try_absorb("quote", "wise", 1, 0.9);
+
+        // Different categories → two separate slots
+        assert_eq!(cabinet.occupied_slots(), 2);
     }
 }
