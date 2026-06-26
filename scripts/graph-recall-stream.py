@@ -50,6 +50,7 @@ def main() -> None:
     load_repo_dotenv()
     query = sys.argv[1] if len(sys.argv) > 1 else ""
     limit = int(sys.argv[2]) if len(sys.argv) > 2 else 30
+    mode = os.environ.get("GRAPH_RECALL_MODE", "1hop").lower()
     hints: list[str] = []
 
     if not query.strip():
@@ -79,31 +80,58 @@ def main() -> None:
     try:
         with driver.session(database=database) as session:
             for tok in toks:
-                rows = session.run(
-                    """
-                    MATCH (e)
-                    WHERE toLower(e.name) CONTAINS toLower($tok)
-                    OPTIONAL MATCH (e)-[r]-(n)
-                    RETURN e.name AS name,
-                           coalesce(e.observations, []) AS obs,
-                           n.name AS neighbor,
-                           type(r) AS rel
-                    LIMIT $lim
-                    """,
-                    tok=tok,
-                    lim=limit,
-                )
-                for row in rows:
-                    name = row.get("name") or ""
-                    if name:
-                        hints.append(str(name))
-                    for obs in row.get("obs") or []:
-                        if obs and str(obs) not in hints:
-                            hints.append(str(obs)[:500])
-                    neighbor = row.get("neighbor")
-                    rel = row.get("rel")
-                    if neighbor:
-                        hints.append(f"{name} {rel or 'RELATED'} {neighbor}")
+                if mode in {"2hop", "twohop"}:
+                    rows = session.run(
+                        """
+                        MATCH (e)
+                        WHERE toLower(e.name) CONTAINS toLower($tok)
+                        MATCH (e)-[r1]-(mid)-[r2]-(n)
+                        WHERE mid.name IS NOT NULL AND n.name IS NOT NULL
+                          AND mid.name <> e.name AND n.name <> e.name AND n.name <> mid.name
+                        RETURN e.name AS name,
+                               type(r1) AS r1, mid.name AS mid,
+                               type(r2) AS r2, n.name AS n
+                        LIMIT $lim
+                        """,
+                        tok=tok,
+                        lim=limit,
+                    )
+                    for row in rows:
+                        name = row.get("name") or ""
+                        mid = row.get("mid") or ""
+                        n = row.get("n") or ""
+                        r1 = row.get("r1") or "RELATED"
+                        r2 = row.get("r2") or "RELATED"
+                        if name and mid and n:
+                            # verified chain hint — explicit intermediate (paper:
+                            # superposition cannot do this; CQD-style decomposition can)
+                            hints.append(f"{name} via {r1} {mid} via {r2} {n}")
+                else:
+                    rows = session.run(
+                        """
+                        MATCH (e)
+                        WHERE toLower(e.name) CONTAINS toLower($tok)
+                        OPTIONAL MATCH (e)-[r]-(n)
+                        RETURN e.name AS name,
+                               coalesce(e.observations, []) AS obs,
+                               n.name AS neighbor,
+                               type(r) AS rel
+                        LIMIT $lim
+                        """,
+                        tok=tok,
+                        lim=limit,
+                    )
+                    for row in rows:
+                        name = row.get("name") or ""
+                        if name:
+                            hints.append(str(name))
+                        for obs in row.get("obs") or []:
+                            if obs and str(obs) not in hints:
+                                hints.append(str(obs)[:500])
+                        neighbor = row.get("neighbor")
+                        rel = row.get("rel")
+                        if neighbor:
+                            hints.append(f"{name} {rel or 'RELATED'} {neighbor}")
     finally:
         driver.close()
 

@@ -17,6 +17,33 @@
       "session_id": "discovery-plan:session-final-2026-06-26T08-30-37Z",
       "task_id": "78633702-bc5a-4913-b82c-7c1bd0adb456",
       "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-06-26T12:28:34.713635475Z",
+      "kind": "discovery_plan",
+      "reason_hash": 8617337833520219127,
+      "recommendation_id": "42cd7c00-f994-418a-aaf3-ecb5fe39b14a",
+      "session_id": "discovery-plan:session-final-auto-pedagogy_oscillation-2026-06-26T12-13-59Z",
+      "task_id": "3bf09479-117b-433b-9c3b-c1d35fe204ec",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-06-26T12:44:21.053530756Z",
+      "kind": "discovery_plan",
+      "reason_hash": 12617721451335952668,
+      "recommendation_id": "61e3f88a-f72f-436e-a556-a76b69fa4a00",
+      "session_id": "discovery-plan:session-final-auto-pedagogy_oscillation-2026-06-26T12-29-42Z",
+      "task_id": "6b0de1ee-e088-45c7-b960-819daa7f9eaf",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-06-26T12:47:03.087660279Z",
+      "kind": "discovery_plan",
+      "reason_hash": 12617721451335952668,
+      "recommendation_id": "772b9eab-2fe4-49f7-95e3-2fde93364ef4",
+      "session_id": "discovery-plan:session-final-auto-pedagogy_oscillation-2026-06-26T12-29-42Z",
+      "task_id": "7b37258b-8d23-42c1-a95e-b88403f22282",
+      "approved_via": "gzmo kurator plan-from-discovery"
     }
   ],
   "denials": []

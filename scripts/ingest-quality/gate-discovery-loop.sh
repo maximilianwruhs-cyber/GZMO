@@ -67,6 +67,33 @@ if [[ -f "$RECALL_LATEST" ]]; then
   fi
 fi
 
+# --- Compositional recall (thema_009 / VCR) ---
+# Pack H extension: report atomic vs chain side-by-side. Non-blocking WARN until
+# a baseline JSON exists; STRICT=1 enforces chain_hit_rate_min only post-baseline.
+COMP_PROBE="$PROJECT_ROOT/scripts/compositional-recall-smoke.sh"
+COMP_LATEST="$PROJECT_ROOT/data/discovery-kb-metrics/compositional-recall-latest.json"
+if [[ -x "$COMP_PROBE" ]] || [[ -f "$COMP_PROBE" ]]; then
+  if [[ ! -f "$COMP_LATEST" ]]; then
+    echo "[INFO] compositional recall: no baseline yet — running probe (WARN-only)"
+    bash "$COMP_PROBE" >/dev/null 2>&1 || true
+  fi
+  if [[ -f "$COMP_LATEST" ]]; then
+    CHAIN_HIT="$(jq -r '.chain_hit_rate // 0' "$COMP_LATEST")"
+    HOP1_MRR="$(jq -r '.hop1_mrr // 0' "$COMP_LATEST")"
+    HOP2_RATIO="$(jq -r '.hop2_atomic_ratio // 0' "$COMP_LATEST")"
+    CHAIN_MIN="${COMPOSITIONAL_CHAIN_HIT_MIN:-0.0}"
+    echo "compositional: hop1_mrr=${HOP1_MRR} chain_hit_rate=${CHAIN_HIT} hop2_atomic_ratio=${HOP2_RATIO}"
+    if python3 -c "import sys; sys.exit(0 if float('${CHAIN_HIT}') >= float('${CHAIN_MIN}') else 1)"; then
+      echo "[PASS] compositional chain hit"
+    elif [[ "$STRICT" == "1" && -n "${COMPOSITIONAL_BASELINE_LOCKED:-}" ]]; then
+      echo "[FAIL] compositional chain hit below min (STRICT + baseline locked)"
+      FAIL=1
+    else
+      echo "[WARN] compositional chain hit below min (non-blocking until baseline locked)"
+    fi
+  fi
+fi
+
 if [[ "$FAIL" -eq 0 ]]; then
   echo "[PASS] discovery loop gate"
   exit 0
