@@ -119,3 +119,10 @@ wiki/assets/
 
 # GZMO skills Chimera dir
 /gzmo_skills/
+
+# SIL local index + recall smoke artifacts
+.gzmo/
+data/discovery-kb-metrics/recall-smoke-*.json
+
+# IDE-local rules
+.cursor/

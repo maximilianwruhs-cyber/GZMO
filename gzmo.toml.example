@@ -36,9 +36,11 @@ strict_kg = true
 cron_hour = 1
 cron_minute = 0
 # Max chars per REM/verify chunk for heavy daily logs.
-chunk_chars = 28000
+chunk_chars = 12000
 # Drop janitor/spark/ingest echoes from episodic before REM (research docs use ingest).
 min_consolidation_chars = 400
+max_tokens_extract = 16384
+max_tokens_verify = 8192
 # M3: REM also reads honeypot anchors + vector-associated distillates (not episodic-only).
 honeypot_rem_enabled = true
 

@@ -21,6 +21,8 @@ Sovereign Rust agent: honeypot memory pipeline + local LLM. Read `MACHINE.md` fi
 ## Conventions
 
 - **Minimize scope** — focused diffs, match existing Rust style in `gzmo-core`.
+- **Ponytail ladder** — before new code: YAGNI → reuse → stdlib → native → installed dep → one line → minimum that works. Mark intentional shortcuts with `// ponytail: <ceiling> — <upgrade trigger>`. `/ponytail-review` after fixer workstreams, `/ponytail-debt` monthly. See `.cursor/rules/ponytail.mdc` for the full ladder.
+- **ponytail: debt convention** — when taking a shortcut below a rung, tag it: `// ponytail: global Mutex — upgrade when concurrent writers appear`. These are payable debt, not hidden complexity.
 - **Secrets** — never in committed files; `.env` + `apply_mcp_env_overrides` in `config.rs`.
 - **Two skill systems** — Rust skills in `gzmo-core/src/skills/`, shell skills in `skills/` + `scripts/skill_*.sh`.
 - **Engines** — Prime at `:8000`, embeddings VM200 `:8081`, Qdrant LXC101 `:6333`.
@@ -49,6 +51,9 @@ Individual phases:
 gzmo kurator plan-from-discovery --report <path> [--spawn]
 gzmo kurator approve-plan --plan <plan_dir>          # required before execute (default)
 gzmo kurator execute-workstream --plan <dir> --workstream <id> [--spawn]
+# Post-fixer: ponytail review pass — catches over-build from autonomous agent work
+/ponytail-review   # (in Pi) — delete-list on diff: stdlib:, yagni:, delete:
+/ponytail-audit    # periodic — whole-repo over-engineering scan
 ./scripts/query-discovery-activities.sh summary|failed|open|snapshots
 ```
 

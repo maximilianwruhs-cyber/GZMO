@@ -44,6 +44,7 @@ Canonical operator and architecture docs. Session reports and milestone logs bel
 | [PI_OPERATOR_GUIDE.md](PI_OPERATOR_GUIDE.md) | Pi agent onboarding |
 | [REBOOT_STARTUP.md](REBOOT_STARTUP.md) | Cold-start after reboot |
 | [EVAL_TIERS.md](EVAL_TIERS.md) | Eval tier definitions |
+| [M3_LOCAL_BASELINE.md](M3_LOCAL_BASELINE.md) | Local Prime M3 gate baseline (dream/spark signal) |
 
 ## Pedagogy & discovery
 
