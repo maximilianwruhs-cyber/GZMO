@@ -1,15 +1,15 @@
 {
-  "updated_at": "2026-06-23T05:26:05.450896755+00:00",
+  "updated_at": "2026-06-26T08:57:59.370648156+00:00",
   "sparks": [
     {
       "event_type": "spark_complete",
-      "id": "a36af0c2-624a-4ba1-af15-768a7b6f16ae",
+      "id": "f9eb3360-6c4b-451e-a333-c65a171e32ba",
       "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T14:46:41.797087279+00:00",
+      "timestamp": "2026-06-25T22:31:05.592291081+00:00",
       "data": {
         "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
         "cognition_source": "honeypot",
-        "date": "2026-06-18",
+        "date": "2026-06-25",
         "kg_relations_written": 1,
         "memory_layer": "honeypot",
         "promoted": true
@@ -17,13 +17,13 @@
     },
     {
       "event_type": "spark_complete",
-      "id": "94648fa5-f8e8-4e5b-b16a-a9ff28dc7457",
+      "id": "441d1ac9-55c2-433e-9e9e-41cf2e6524dc",
       "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T14:54:17.952773503+00:00",
+      "timestamp": "2026-06-26T03:31:06.092869321+00:00",
       "data": {
         "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
         "cognition_source": "honeypot",
-        "date": "2026-06-18",
+        "date": "2026-06-26",
         "kg_relations_written": 1,
         "memory_layer": "honeypot",
         "promoted": true
@@ -31,13 +31,13 @@
     },
     {
       "event_type": "spark_complete",
-      "id": "f6a8c220-3fba-4560-9aac-2526029a158c",
+      "id": "ee7b0427-a4b4-4df8-8778-008c31925f9e",
       "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T14:54:28.707008249+00:00",
+      "timestamp": "2026-06-26T04:37:21.220121801+00:00",
       "data": {
         "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
         "cognition_source": "honeypot",
-        "date": "2026-06-18",
+        "date": "2026-06-26",
         "kg_relations_written": 1,
         "memory_layer": "honeypot",
         "promoted": true
@@ -45,13 +45,13 @@
     },
     {
       "event_type": "spark_complete",
-      "id": "43c074fd-ab62-40e4-8676-a78c4cf6d3e9",
+      "id": "6d3f64a7-63d7-4246-86e0-7783cdff432e",
       "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T15:05:45.836385871+00:00",
+      "timestamp": "2026-06-26T04:58:41.391610903+00:00",
       "data": {
         "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
         "cognition_source": "honeypot",
-        "date": "2026-06-18",
+        "date": "2026-06-26",
         "kg_relations_written": 1,
         "memory_layer": "honeypot",
         "promoted": true
@@ -59,1287 +59,13 @@
     },
     {
       "event_type": "spark_complete",
-      "id": "ea140388-c956-429c-a904-133feecd874d",
+      "id": "820fd9a4-e44c-4b24-8984-d0cae6d85ee0",
       "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T15:06:09.312119282+00:00",
+      "timestamp": "2026-06-26T05:13:31.508909170+00:00",
       "data": {
         "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
         "cognition_source": "honeypot",
-        "date": "2026-06-18",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "e28e56f5-b1ab-4ba0-b23e-8df661feef45",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T15:07:09.820583763+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-18",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "ad8f746e-49b1-46e7-9105-086f0e079b60",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T15:07:28.914094690+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-18",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "b0eb6107-b6d0-4b46-b429-31343542eb39",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T15:23:35.078386383+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-18",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "a0f10c78-218c-4b22-b7d2-2c89932247ff",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T15:26:51.024335232+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-18",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "3cece580-d433-46b4-aec3-b09d90e7deeb",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T15:28:49.673057149+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-18",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "bf1488dd-77fb-4e71-be26-f4fd9a8d4ced",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T15:32:41.135765414+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-18",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "78c68656-879d-40a2-a79d-34176ee0f65b",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T15:39:04.368999266+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-18",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "4f2a262b-91ce-421b-b455-5c71ea0eaa16",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T15:42:04.114761010+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-18",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "5dff57a6-a308-4a80-95cc-a9f0885495a7",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T18:04:26.707256024+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-18",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "3a2ac160-e394-4c4d-bfd0-534c1f50c1ae",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T19:29:27.574508040+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-18",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "91005bfa-e1fb-4e06-bc04-dc8b28856ccb",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T19:56:20.255143360+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-18",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "3c083a25-c146-4adb-acad-7bc630999216",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T19:56:30.513242122+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-18",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "92c2cf05-9468-46c1-a06a-990522e721c6",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T19:57:37.066134412+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-18",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "678ca957-d2fb-4143-abf7-ab09ae5d4c9b",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T19:59:21.549041997+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-18",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "5e4b907c-9fb4-4a67-9008-d7d5b0ac5f2c",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T20:00:28.567874262+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-18",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "b64f6c7d-2f98-41bd-9b18-710915e2af6f",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T20:10:27.308548787+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-18",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "a534e687-842c-4df1-b592-7c70532e520f",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T20:22:56.104697115+00:00",
-      "data": {
-        "cognition_source": "honeypot",
-        "date": "2026-06-18",
-        "kg_relations_written": 0,
-        "memory_layer": "honeypot",
-        "promoted": false,
-        "skip_reason": "Hypothesis generation failed: TurboQuant structured output returned HTTP 503: {\"error\":{\"message\":\"Loading model\",\"type\":\"unavailable_error\",\"code\":503}}"
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "67e6684b-01e1-44f2-8cc9-d87731a258e9",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T20:23:51.058215166+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-18",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "6cf661b3-13be-48c6-9420-75fc99b9c10f",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T20:36:35.864126453+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-18",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "d87c84cd-fba5-451f-9cf4-c6b72b6a195e",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T20:38:04.439573624+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-18",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "b188d9af-96a9-4f57-aa69-eeb582a2cea9",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T21:00:47.426396543+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-18",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "2d90223f-e82e-4f8f-9c5e-66d23ecf56a8",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T21:14:41.931070308+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-18",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "dc7424b5-54f5-4adf-9a91-fa238e9ab28c",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T21:20:22.240354438+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-18",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "1b73f740-eef6-4937-a2c7-c94f402facc0",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T21:22:25.271391452+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-18",
-        "kg_relations_written": 0,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "6e69a1bf-1a8d-4299-9b17-4d9d0514fc63",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T21:42:56.705733759+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-18",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "d3af862d-3103-4eac-a1c0-061535a7d1d0",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T22:30:43.441988112+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-18",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "db22491b-bfef-452c-87f7-b6f73b9c41b5",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-19T03:30:43.388873454+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-19",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "450c2987-f468-4c29-b11e-6f9b45cbce4a",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-19T05:00:49.899096450+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-19",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "a8f4c5e6-8f19-4189-9bfd-96b1d26dd804",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-19T05:05:11.131454003+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-19",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "e9b0ac68-e34b-4d21-b4cc-781d832452c1",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-19T05:10:22.345613203+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-19",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "03542c1c-9c8f-47c8-91be-181132f17606",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-19T06:25:27.443833885+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-19",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "e00c1876-d444-4895-b652-1a7612fd9c3f",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-19T06:43:56.282025298+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-19",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "699d474c-a1c1-4b11-8537-7feab7739783",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-19T06:46:47.467059343+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-19",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "90e5dc1e-a937-4597-801e-1907db668f6f",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-19T06:58:17.369861716+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-19",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "59b5e6c1-ba4d-4672-9cad-e486bdbbf4ad",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-19T07:42:22.200515888+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-19",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "71616612-9589-40aa-899a-240c4f546d46",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-19T12:04:59.833444018+00:00",
-      "data": {
-        "cognition_source": "honeypot",
-        "date": "2026-06-19",
-        "kg_relations_written": 0,
-        "memory_layer": "honeypot",
-        "promoted": false,
-        "skip_reason": "Hypothesis generation failed: TurboQuant structured output returned HTTP 503: {\"error\":{\"message\":\"Loading model\",\"type\":\"unavailable_error\",\"code\":503}}"
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "c8c429e6-1041-4e09-8e04-7b1d86580629",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-19T12:41:39.194982095+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-19",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "79a0ca02-d2b0-42be-8b07-e08f3713b36b",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-19T14:16:45.875380732+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-19",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "eed94168-5b06-48e3-885e-f2c95f5d9f70",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-19T20:20:28.653653092+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-19",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "2e22d946-18c5-42ee-923c-2a81ea7e3a73",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-20T04:24:11.348018033+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-20",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "84896fca-b12e-4715-9fb6-92c9997f5d54",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-20T15:58:50.236112926+00:00",
-      "data": {
-        "cognition_source": "honeypot",
-        "date": "2026-06-20",
-        "kg_relations_written": 0,
-        "memory_layer": "honeypot",
-        "promoted": false,
-        "skip_reason": "No curated anchor/recent pair passed smart selection (check vault ingest and [spark] gates)."
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "34a00c15-25f8-49b3-9920-a51155a8b064",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-21T04:12:41.037613016+00:00",
-      "data": {
-        "cognition_source": "honeypot",
-        "date": "2026-06-21",
-        "kg_relations_written": 0,
-        "memory_layer": "honeypot",
-        "promoted": false,
-        "skip_reason": "No curated anchor/recent pair passed smart selection (check vault ingest and [spark] gates)."
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "7346c54a-7f51-457e-b787-84efbfd80674",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-21T08:02:49.359097294+00:00",
-      "data": {
-        "anchor_id": "ae01eb74-32ab-4b60-86c3-a7f788b21af1",
-        "cognition_source": "honeypot",
-        "date": "2026-06-21",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "8094ad95-4edd-44a0-ba8c-fb854c25d43a",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-21T08:22:52.638335170+00:00",
-      "data": {
-        "anchor_id": "ae01eb74-32ab-4b60-86c3-a7f788b21af1",
-        "cognition_source": "honeypot",
-        "date": "2026-06-21",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "2d41bcfe-6d7d-4026-8216-b20e98c2b23e",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-21T09:12:55.639758335+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-21",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "c9ef5a5f-bbeb-406c-ace6-47f741fd243b",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-21T09:45:06.645064922+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-21",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "44c3b91b-fefd-4a0b-857b-ce02432aac55",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-21T10:39:46.632518313+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-21",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "1e2d5bd2-f486-471b-95cd-3315ecc78a5c",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-21T11:14:02.186752233+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-21",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "69dbcb7e-459a-40e4-bec6-12d4943debb7",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-21T11:37:59.006248747+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-21",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "0285e408-bb12-42d6-a0bc-44be7a3884a9",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-21T12:17:54.898848842+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-21",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "7d7c2b61-9bb0-4dd3-a04e-e9bbe06e91c7",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-22T04:57:59.434812610+00:00",
-      "data": {
-        "anchor_id": "c6ff4588-e725-4354-99e0-7e39e181ef2f",
-        "cognition_source": "honeypot",
-        "date": "2026-06-22",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "6a6e03c1-b067-4563-ba40-6f3c1e54b8b6",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-22T05:30:58.187965927+00:00",
-      "data": {
-        "anchor_id": "c6ff4588-e725-4354-99e0-7e39e181ef2f",
-        "cognition_source": "honeypot",
-        "date": "2026-06-22",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "6477827e-1ef1-416b-9f97-3d6ceded1aa1",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-22T12:56:55.187020965+00:00",
-      "data": {
-        "anchor_id": "c6ff4588-e725-4354-99e0-7e39e181ef2f",
-        "cognition_source": "honeypot",
-        "date": "2026-06-22",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "56e1c6a6-9935-43dd-a21e-dd18b4894f1e",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-22T13:26:47.250646263+00:00",
-      "data": {
-        "anchor_id": "c6ff4588-e725-4354-99e0-7e39e181ef2f",
-        "cognition_source": "honeypot",
-        "date": "2026-06-22",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "023fa7b6-317c-4aad-a3ef-3024f00e606b",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-22T20:57:52.262574391+00:00",
-      "data": {
-        "anchor_id": "c6ff4588-e725-4354-99e0-7e39e181ef2f",
-        "cognition_source": "honeypot",
-        "date": "2026-06-22",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "60c80b61-d913-49e4-b89b-f6277e85cf96",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-22T22:09:32.404987643+00:00",
-      "data": {
-        "anchor_id": "c6ff4588-e725-4354-99e0-7e39e181ef2f",
-        "cognition_source": "honeypot",
-        "date": "2026-06-22",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "f41f48e3-891f-4605-b2b5-e6091893148a",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-22T22:31:37.335893900+00:00",
-      "data": {
-        "anchor_id": "c6ff4588-e725-4354-99e0-7e39e181ef2f",
-        "cognition_source": "honeypot",
-        "date": "2026-06-22",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "4cd4cd08-5b77-4e46-a267-89678011ac4e",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-23T03:30:17.712269197+00:00",
-      "data": {
-        "anchor_id": "c6ff4588-e725-4354-99e0-7e39e181ef2f",
-        "cognition_source": "honeypot",
-        "date": "2026-06-23",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "33e9515c-d732-4157-a3ea-733059d28e05",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-23T04:17:52.112935874+00:00",
-      "data": {
-        "anchor_id": "c6ff4588-e725-4354-99e0-7e39e181ef2f",
-        "cognition_source": "honeypot",
-        "date": "2026-06-23",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "bf63e6de-3e9d-4748-b362-1689546b1a29",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-23T04:32:17.949931011+00:00",
-      "data": {
-        "anchor_id": "c6ff4588-e725-4354-99e0-7e39e181ef2f",
-        "cognition_source": "honeypot",
-        "date": "2026-06-23",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "94648fa5-f8e8-4e5b-b16a-a9ff28dc7457",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T14:54:17.952773503+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-18",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "f6a8c220-3fba-4560-9aac-2526029a158c",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T14:54:28.707008249+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-18",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "43c074fd-ab62-40e4-8676-a78c4cf6d3e9",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T15:05:45.836385871+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-18",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "ea140388-c956-429c-a904-133feecd874d",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T15:06:09.312119282+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-18",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "e28e56f5-b1ab-4ba0-b23e-8df661feef45",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T15:07:09.820583763+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-18",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "ad8f746e-49b1-46e7-9105-086f0e079b60",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T15:07:28.914094690+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-18",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "b0eb6107-b6d0-4b46-b429-31343542eb39",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T15:23:35.078386383+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-18",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "a0f10c78-218c-4b22-b7d2-2c89932247ff",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T15:26:51.024335232+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-18",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "3cece580-d433-46b4-aec3-b09d90e7deeb",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T15:28:49.673057149+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-18",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "bf1488dd-77fb-4e71-be26-f4fd9a8d4ced",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T15:32:41.135765414+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-18",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "78c68656-879d-40a2-a79d-34176ee0f65b",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T15:39:04.368999266+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-18",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "4f2a262b-91ce-421b-b455-5c71ea0eaa16",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T15:42:04.114761010+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-18",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "5dff57a6-a308-4a80-95cc-a9f0885495a7",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T18:04:26.707256024+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-18",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "3a2ac160-e394-4c4d-bfd0-534c1f50c1ae",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T19:29:27.574508040+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-18",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "91005bfa-e1fb-4e06-bc04-dc8b28856ccb",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T19:56:20.255143360+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-18",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "3c083a25-c146-4adb-acad-7bc630999216",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T19:56:30.513242122+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-18",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "92c2cf05-9468-46c1-a06a-990522e721c6",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T19:57:37.066134412+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-18",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "678ca957-d2fb-4143-abf7-ab09ae5d4c9b",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T19:59:21.549041997+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-18",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "5e4b907c-9fb4-4a67-9008-d7d5b0ac5f2c",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T20:00:28.567874262+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-18",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "b64f6c7d-2f98-41bd-9b18-710915e2af6f",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T20:10:27.308548787+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-18",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "a534e687-842c-4df1-b592-7c70532e520f",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T20:22:56.104697115+00:00",
-      "data": {
-        "cognition_source": "honeypot",
-        "date": "2026-06-18",
-        "kg_relations_written": 0,
-        "memory_layer": "honeypot",
-        "promoted": false,
-        "skip_reason": "Hypothesis generation failed: TurboQuant structured output returned HTTP 503: {\"error\":{\"message\":\"Loading model\",\"type\":\"unavailable_error\",\"code\":503}}"
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "67e6684b-01e1-44f2-8cc9-d87731a258e9",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T20:23:51.058215166+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-18",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "6cf661b3-13be-48c6-9420-75fc99b9c10f",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T20:36:35.864126453+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-18",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "d87c84cd-fba5-451f-9cf4-c6b72b6a195e",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T20:38:04.439573624+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-18",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "b188d9af-96a9-4f57-aa69-eeb582a2cea9",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T21:00:47.426396543+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-18",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "2d90223f-e82e-4f8f-9c5e-66d23ecf56a8",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T21:14:41.931070308+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-18",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "dc7424b5-54f5-4adf-9a91-fa238e9ab28c",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T21:20:22.240354438+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-18",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "1b73f740-eef6-4937-a2c7-c94f402facc0",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T21:22:25.271391452+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-18",
-        "kg_relations_written": 0,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "6e69a1bf-1a8d-4299-9b17-4d9d0514fc63",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T21:42:56.705733759+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-18",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "d3af862d-3103-4eac-a1c0-061535a7d1d0",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-18T22:30:43.441988112+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-18",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "db22491b-bfef-452c-87f7-b6f73b9c41b5",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-19T03:30:43.388873454+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-19",
+        "date": "2026-06-26",
         "kg_relations_written": 1,
         "memory_layer": "honeypot",
         "promoted": true
@@ -1816,6 +542,2260 @@
         "anchor_id": "c6ff4588-e725-4354-99e0-7e39e181ef2f",
         "cognition_source": "honeypot",
         "date": "2026-06-23",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "e7a5e56e-f170-48d8-9b95-d945dd973fc1",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-23T08:28:43.969727512+00:00",
+      "data": {
+        "cognition_source": "honeypot",
+        "date": "2026-06-23",
+        "kg_relations_written": 0,
+        "memory_layer": "honeypot",
+        "promoted": false,
+        "skip_reason": "Hypothesis generation failed: error sending request for url (http://localhost:8000/v1/chat/completions)"
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "f97ba541-24da-4a82-add0-3549d2ec931f",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-23T08:32:29.645035817+00:00",
+      "data": {
+        "cognition_source": "honeypot",
+        "date": "2026-06-23",
+        "kg_relations_written": 0,
+        "memory_layer": "honeypot",
+        "promoted": false,
+        "skip_reason": "Hypothesis generation failed: error sending request for url (http://localhost:8000/v1/chat/completions)"
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "1b283a81-cb44-4e54-8efe-2b5fb14e7fff",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-23T08:44:26.905234364+00:00",
+      "data": {
+        "cognition_source": "honeypot",
+        "date": "2026-06-23",
+        "kg_relations_written": 0,
+        "memory_layer": "honeypot",
+        "promoted": false,
+        "skip_reason": "Hypothesis generation failed: TurboQuant structured output returned HTTP 503: {\"error\":{\"message\":\"Loading model\",\"type\":\"unavailable_error\",\"code\":503}}"
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "21a2a6bd-8933-4f71-a3a5-4a33a6b1f20e",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-23T09:26:09.702537297+00:00",
+      "data": {
+        "anchor_id": "c6ff4588-e725-4354-99e0-7e39e181ef2f",
+        "cognition_source": "honeypot",
+        "date": "2026-06-23",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "3ba66408-f617-437e-8fed-195c57f33a63",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-23T18:42:16.730234192+00:00",
+      "data": {
+        "anchor_id": "c6ff4588-e725-4354-99e0-7e39e181ef2f",
+        "cognition_source": "honeypot",
+        "date": "2026-06-23",
+        "kg_relations_written": 0,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "ecec7849-f21e-48b4-80a9-4f9ea9f3a252",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-23T20:38:42.941806215+00:00",
+      "data": {
+        "anchor_id": "c6ff4588-e725-4354-99e0-7e39e181ef2f",
+        "cognition_source": "honeypot",
+        "date": "2026-06-23",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "86acd513-fb74-4058-a06c-58a81d370db4",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-24T00:20:07.474270919+00:00",
+      "data": {
+        "anchor_id": "c6ff4588-e725-4354-99e0-7e39e181ef2f",
+        "cognition_source": "honeypot",
+        "date": "2026-06-23",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "ec4a2c07-6458-401d-877a-122e25108ed7",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-24T04:41:44.681010639+00:00",
+      "data": {
+        "cognition_source": "honeypot",
+        "date": "2026-06-24",
+        "kg_relations_written": 0,
+        "memory_layer": "honeypot",
+        "promoted": false,
+        "skip_reason": "Hypothesis generation failed: error sending request for url (http://localhost:8000/v1/chat/completions)"
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "5cde8f19-84dc-4217-94cb-b0886c5db68b",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-24T15:07:58.280577184+00:00",
+      "data": {
+        "cognition_source": "honeypot",
+        "date": "2026-06-24",
+        "kg_relations_written": 0,
+        "memory_layer": "honeypot",
+        "promoted": false,
+        "skip_reason": "Hypothesis generation failed: Failed to parse spark hypothesis: JSON parse failed: missing field `anchor_label` at line 2 column 687\nRaw: {\n  \"internal_analysis\": \"The user is asking about the 'gzmo ecosystem' and its relation to 'Egonex-AI' and the 'Understand-Anything repository'. The anchor fact mentions 'Pi knowledge collection' used by 'platform_search' within the 'TOOL:Qdrant'. While Qdrant is a vector database, and vector databases are often used in AI/ML for search and retrieval, there's no direct link to the specific project or organization mentioned in the recent facts. The recent facts are about a specific AI project (gzmo ecosystem, Egonex-AI, Understand-Anything) and some technical details (ANCRe, llama.cpp). The connection between a general knowledge collection tool (Qdrant) and a specific AI project\nRepaired: {\n  \"internal_analysis\": \"The user is asking about the 'gzmo ecosystem' and its relation to 'Egonex-AI' and the 'Understand-Anything repository'. The anchor fact mentions 'Pi knowledge collection' used by 'platform_search' within the 'TOOL:Qdrant'. While Qdrant is a vector database, and vector databases are often used in AI/ML for search and retrieval, there's no direct link to the specific project or organization mentioned in the recent facts. The recent facts are about a specific AI project (gzmo ecosystem, Egonex-AI, Understand-Anything) and some technical details (ANCRe, llama.cpp). The connection between a general knowledge collection tool (Qdrant) and a specific AI project\"}\nRaw: {\n  \"internal_analysis\": \"The user is asking about the 'gzmo ecosystem' and its relation to 'Egonex-AI' and the 'Understand-Anything repository'. The anchor fact mentions 'Pi knowledge collection' used by 'platform_search' within the 'TOOL:Qdrant'. While Qdrant is a vector database, and vector databases are often used in AI/ML for search and retrieval, there's no direct link to the specific project or organization mentioned in the recent facts. The recent facts are about a specific AI project (gzmo ecosystem, Egonex-AI, Understand-Anything) and some technical details (ANCRe, llama.cpp). The connection between a general knowledge collection tool (Qdrant) and a specific AI project"
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "c5b37759-75e6-4ba3-829a-f842ea06e0b2",
+      "source": "GzmoCli",
+      "timestamp": "2026-06-24T15:08:08.768546362+00:00",
+      "data": {
+        "anchor_id": "4c582c98-0a7f-43a2-a540-fbdf4a479e24",
+        "cognition_source": "honeypot",
+        "date": "2026-06-24",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "82f385bb-38e2-4c1d-9c85-49e27e0b4ad8",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-24T15:12:54.779051763+00:00",
+      "data": {
+        "anchor_id": "4c582c98-0a7f-43a2-a540-fbdf4a479e24",
+        "cognition_source": "honeypot",
+        "date": "2026-06-24",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "cfa51875-693f-4c43-9b26-85026b201033",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-24T15:14:12.582599384+00:00",
+      "data": {
+        "cognition_source": "honeypot",
+        "date": "2026-06-24",
+        "kg_relations_written": 0,
+        "memory_layer": "honeypot",
+        "promoted": false,
+        "skip_reason": "Hypothesis generation failed: Failed to parse spark hypothesis: JSON parse failed: missing field `anchor_label` at line 2 column 270\nRaw: {\n  \"internal_analysis\": \"The user is asking about the 'gzmo ecosystem' (R2) and its association with 'Egonex-AI' (R3). The anchor fact mentions 'Pi knowledge collection' used by 'platform_search' (A0). While 'Pi' is a mathematical constant, it's not directly related to\nRepaired: {\n  \"internal_analysis\": \"The user is asking about the 'gzmo ecosystem' (R2) and its association with 'Egonex-AI' (R3). The anchor fact mentions 'Pi knowledge collection' used by 'platform_search' (A0). While 'Pi' is a mathematical constant, it's not directly related to\"}\nRaw: {\n  \"internal_analysis\": \"The user is asking about the 'gzmo ecosystem' (R2) and its association with 'Egonex-AI' (R3). The anchor fact mentions 'Pi knowledge collection' used by 'platform_search' (A0). While 'Pi' is a mathematical constant, it's not directly related to"
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "c25f6f36-56dc-40ac-a014-4317487803e3",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-24T15:14:54.646629023+00:00",
+      "data": {
+        "cognition_source": "honeypot",
+        "date": "2026-06-24",
+        "kg_relations_written": 0,
+        "memory_layer": "honeypot",
+        "promoted": false,
+        "skip_reason": "Hypothesis generation failed: Failed to parse spark hypothesis: JSON parse failed: expected `:` at line 2 column 14\nRaw: {\n  \"internal_\nRepaired: {\n  \"internal_\"}\nRaw: {\n  \"internal_"
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "1dc60389-4bae-4817-8188-7c977cb7b03a",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-24T15:18:06.582316187+00:00",
+      "data": {
+        "anchor_id": "4c582c98-0a7f-43a2-a540-fbdf4a479e24",
+        "cognition_source": "honeypot",
+        "date": "2026-06-24",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "aeb6ac14-2d21-43e3-aa44-49913211497b",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-24T15:48:40.016045960+00:00",
+      "data": {
+        "anchor_id": "4c582c98-0a7f-43a2-a540-fbdf4a479e24",
+        "cognition_source": "honeypot",
+        "date": "2026-06-24",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "f0b72dc5-256f-442b-9c06-7be1b2022b0d",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-24T18:39:37.984178221+00:00",
+      "data": {
+        "anchor_id": "4c582c98-0a7f-43a2-a540-fbdf4a479e24",
+        "cognition_source": "honeypot",
+        "date": "2026-06-24",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "f128cd9d-e2ce-44b0-a052-c53718989c87",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-24T19:35:14.958930810+00:00",
+      "data": {
+        "anchor_id": "4c582c98-0a7f-43a2-a540-fbdf4a479e24",
+        "cognition_source": "honeypot",
+        "date": "2026-06-24",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "5217bc05-8b4e-475d-991e-5f7b571e8a1d",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-24T21:55:41.943667975+00:00",
+      "data": {
+        "anchor_id": "4c582c98-0a7f-43a2-a540-fbdf4a479e24",
+        "cognition_source": "honeypot",
+        "date": "2026-06-24",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "b1d83aa4-3c60-4fe0-8749-c12c21dad898",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-24T22:30:47.056526195+00:00",
+      "data": {
+        "anchor_id": "4c582c98-0a7f-43a2-a540-fbdf4a479e24",
+        "cognition_source": "honeypot",
+        "date": "2026-06-24",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "f918dceb-ed26-4d5a-85de-9c7f1b17cbc7",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-25T04:28:45.226690759+00:00",
+      "data": {
+        "anchor_id": "eebbe2c5-9945-42f8-adc7-5c1009c610e8",
+        "cognition_source": "honeypot",
+        "date": "2026-06-25",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "08bd35d1-f487-4e36-922b-16fe3dc80ca2",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-25T06:24:51.854648402+00:00",
+      "data": {
+        "anchor_id": "ce7f6560-b5fe-42f3-b844-b7e349b3c7b9",
+        "cognition_source": "honeypot",
+        "date": "2026-06-25",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "846d64ea-cedc-4868-9852-a755cae5f853",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-25T13:28:36.864617156+00:00",
+      "data": {
+        "cognition_source": "honeypot",
+        "date": "2026-06-25",
+        "kg_relations_written": 0,
+        "memory_layer": "honeypot",
+        "promoted": false,
+        "skip_reason": "Hypothesis generation failed: error sending request for url (http://localhost:8000/v1/chat/completions)"
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "200132da-81ba-4a01-aa80-9d6bb624e376",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-25T16:18:01.098253834+00:00",
+      "data": {
+        "anchor_id": "ae01eb74-32ab-4b60-86c3-a7f788b21af1",
+        "cognition_source": "honeypot",
+        "date": "2026-06-25",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "a05a7b07-f5ba-48a8-ba9a-7d30c3e4c81f",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-25T18:26:25.644809566+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-25",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "c6dd3c60-86aa-476a-a330-ec27adb3aecb",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-25T20:47:51.639831689+00:00",
+      "data": {
+        "anchor_id": "eebbe2c5-9945-42f8-adc7-5c1009c610e8",
+        "cognition_source": "honeypot",
+        "date": "2026-06-25",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "9d12e290-7373-424e-a13b-99acd4f3dc58",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-25T21:03:15.628382575+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-25",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "f9eb3360-6c4b-451e-a333-c65a171e32ba",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-25T22:31:05.592291081+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-25",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "441d1ac9-55c2-433e-9e9e-41cf2e6524dc",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-26T03:31:06.092869321+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-26",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "ee7b0427-a4b4-4df8-8778-008c31925f9e",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-26T04:37:21.220121801+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-26",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "6d3f64a7-63d7-4246-86e0-7783cdff432e",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-26T04:58:41.391610903+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-26",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "820fd9a4-e44c-4b24-8984-d0cae6d85ee0",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-26T05:13:31.508909170+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-26",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "450c2987-f468-4c29-b11e-6f9b45cbce4a",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-19T05:00:49.899096450+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-19",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "a8f4c5e6-8f19-4189-9bfd-96b1d26dd804",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-19T05:05:11.131454003+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-19",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "e9b0ac68-e34b-4d21-b4cc-781d832452c1",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-19T05:10:22.345613203+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-19",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "03542c1c-9c8f-47c8-91be-181132f17606",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-19T06:25:27.443833885+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-19",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "e00c1876-d444-4895-b652-1a7612fd9c3f",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-19T06:43:56.282025298+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-19",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "699d474c-a1c1-4b11-8537-7feab7739783",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-19T06:46:47.467059343+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-19",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "90e5dc1e-a937-4597-801e-1907db668f6f",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-19T06:58:17.369861716+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-19",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "59b5e6c1-ba4d-4672-9cad-e486bdbbf4ad",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-19T07:42:22.200515888+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-19",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "71616612-9589-40aa-899a-240c4f546d46",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-19T12:04:59.833444018+00:00",
+      "data": {
+        "cognition_source": "honeypot",
+        "date": "2026-06-19",
+        "kg_relations_written": 0,
+        "memory_layer": "honeypot",
+        "promoted": false,
+        "skip_reason": "Hypothesis generation failed: TurboQuant structured output returned HTTP 503: {\"error\":{\"message\":\"Loading model\",\"type\":\"unavailable_error\",\"code\":503}}"
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "c8c429e6-1041-4e09-8e04-7b1d86580629",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-19T12:41:39.194982095+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-19",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "79a0ca02-d2b0-42be-8b07-e08f3713b36b",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-19T14:16:45.875380732+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-19",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "eed94168-5b06-48e3-885e-f2c95f5d9f70",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-19T20:20:28.653653092+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-19",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "2e22d946-18c5-42ee-923c-2a81ea7e3a73",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-20T04:24:11.348018033+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-20",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "84896fca-b12e-4715-9fb6-92c9997f5d54",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-20T15:58:50.236112926+00:00",
+      "data": {
+        "cognition_source": "honeypot",
+        "date": "2026-06-20",
+        "kg_relations_written": 0,
+        "memory_layer": "honeypot",
+        "promoted": false,
+        "skip_reason": "No curated anchor/recent pair passed smart selection (check vault ingest and [spark] gates)."
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "34a00c15-25f8-49b3-9920-a51155a8b064",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-21T04:12:41.037613016+00:00",
+      "data": {
+        "cognition_source": "honeypot",
+        "date": "2026-06-21",
+        "kg_relations_written": 0,
+        "memory_layer": "honeypot",
+        "promoted": false,
+        "skip_reason": "No curated anchor/recent pair passed smart selection (check vault ingest and [spark] gates)."
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "7346c54a-7f51-457e-b787-84efbfd80674",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-21T08:02:49.359097294+00:00",
+      "data": {
+        "anchor_id": "ae01eb74-32ab-4b60-86c3-a7f788b21af1",
+        "cognition_source": "honeypot",
+        "date": "2026-06-21",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "8094ad95-4edd-44a0-ba8c-fb854c25d43a",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-21T08:22:52.638335170+00:00",
+      "data": {
+        "anchor_id": "ae01eb74-32ab-4b60-86c3-a7f788b21af1",
+        "cognition_source": "honeypot",
+        "date": "2026-06-21",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "2d41bcfe-6d7d-4026-8216-b20e98c2b23e",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-21T09:12:55.639758335+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-21",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "c9ef5a5f-bbeb-406c-ace6-47f741fd243b",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-21T09:45:06.645064922+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-21",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "44c3b91b-fefd-4a0b-857b-ce02432aac55",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-21T10:39:46.632518313+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-21",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "1e2d5bd2-f486-471b-95cd-3315ecc78a5c",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-21T11:14:02.186752233+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-21",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "69dbcb7e-459a-40e4-bec6-12d4943debb7",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-21T11:37:59.006248747+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-21",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "0285e408-bb12-42d6-a0bc-44be7a3884a9",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-21T12:17:54.898848842+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-21",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "7d7c2b61-9bb0-4dd3-a04e-e9bbe06e91c7",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-22T04:57:59.434812610+00:00",
+      "data": {
+        "anchor_id": "c6ff4588-e725-4354-99e0-7e39e181ef2f",
+        "cognition_source": "honeypot",
+        "date": "2026-06-22",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "6a6e03c1-b067-4563-ba40-6f3c1e54b8b6",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-22T05:30:58.187965927+00:00",
+      "data": {
+        "anchor_id": "c6ff4588-e725-4354-99e0-7e39e181ef2f",
+        "cognition_source": "honeypot",
+        "date": "2026-06-22",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "6477827e-1ef1-416b-9f97-3d6ceded1aa1",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-22T12:56:55.187020965+00:00",
+      "data": {
+        "anchor_id": "c6ff4588-e725-4354-99e0-7e39e181ef2f",
+        "cognition_source": "honeypot",
+        "date": "2026-06-22",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "56e1c6a6-9935-43dd-a21e-dd18b4894f1e",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-22T13:26:47.250646263+00:00",
+      "data": {
+        "anchor_id": "c6ff4588-e725-4354-99e0-7e39e181ef2f",
+        "cognition_source": "honeypot",
+        "date": "2026-06-22",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "023fa7b6-317c-4aad-a3ef-3024f00e606b",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-22T20:57:52.262574391+00:00",
+      "data": {
+        "anchor_id": "c6ff4588-e725-4354-99e0-7e39e181ef2f",
+        "cognition_source": "honeypot",
+        "date": "2026-06-22",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "60c80b61-d913-49e4-b89b-f6277e85cf96",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-22T22:09:32.404987643+00:00",
+      "data": {
+        "anchor_id": "c6ff4588-e725-4354-99e0-7e39e181ef2f",
+        "cognition_source": "honeypot",
+        "date": "2026-06-22",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "f41f48e3-891f-4605-b2b5-e6091893148a",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-22T22:31:37.335893900+00:00",
+      "data": {
+        "anchor_id": "c6ff4588-e725-4354-99e0-7e39e181ef2f",
+        "cognition_source": "honeypot",
+        "date": "2026-06-22",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "4cd4cd08-5b77-4e46-a267-89678011ac4e",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-23T03:30:17.712269197+00:00",
+      "data": {
+        "anchor_id": "c6ff4588-e725-4354-99e0-7e39e181ef2f",
+        "cognition_source": "honeypot",
+        "date": "2026-06-23",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "33e9515c-d732-4157-a3ea-733059d28e05",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-23T04:17:52.112935874+00:00",
+      "data": {
+        "anchor_id": "c6ff4588-e725-4354-99e0-7e39e181ef2f",
+        "cognition_source": "honeypot",
+        "date": "2026-06-23",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "bf63e6de-3e9d-4748-b362-1689546b1a29",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-23T04:32:17.949931011+00:00",
+      "data": {
+        "anchor_id": "c6ff4588-e725-4354-99e0-7e39e181ef2f",
+        "cognition_source": "honeypot",
+        "date": "2026-06-23",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "5a7e6b69-a268-430d-a73f-09cf29b8443b",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-23T05:25:22.935189912+00:00",
+      "data": {
+        "anchor_id": "c6ff4588-e725-4354-99e0-7e39e181ef2f",
+        "cognition_source": "honeypot",
+        "date": "2026-06-23",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "e7a5e56e-f170-48d8-9b95-d945dd973fc1",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-23T08:28:43.969727512+00:00",
+      "data": {
+        "cognition_source": "honeypot",
+        "date": "2026-06-23",
+        "kg_relations_written": 0,
+        "memory_layer": "honeypot",
+        "promoted": false,
+        "skip_reason": "Hypothesis generation failed: error sending request for url (http://localhost:8000/v1/chat/completions)"
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "f97ba541-24da-4a82-add0-3549d2ec931f",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-23T08:32:29.645035817+00:00",
+      "data": {
+        "cognition_source": "honeypot",
+        "date": "2026-06-23",
+        "kg_relations_written": 0,
+        "memory_layer": "honeypot",
+        "promoted": false,
+        "skip_reason": "Hypothesis generation failed: error sending request for url (http://localhost:8000/v1/chat/completions)"
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "1b283a81-cb44-4e54-8efe-2b5fb14e7fff",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-23T08:44:26.905234364+00:00",
+      "data": {
+        "cognition_source": "honeypot",
+        "date": "2026-06-23",
+        "kg_relations_written": 0,
+        "memory_layer": "honeypot",
+        "promoted": false,
+        "skip_reason": "Hypothesis generation failed: TurboQuant structured output returned HTTP 503: {\"error\":{\"message\":\"Loading model\",\"type\":\"unavailable_error\",\"code\":503}}"
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "21a2a6bd-8933-4f71-a3a5-4a33a6b1f20e",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-23T09:26:09.702537297+00:00",
+      "data": {
+        "anchor_id": "c6ff4588-e725-4354-99e0-7e39e181ef2f",
+        "cognition_source": "honeypot",
+        "date": "2026-06-23",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "3ba66408-f617-437e-8fed-195c57f33a63",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-23T18:42:16.730234192+00:00",
+      "data": {
+        "anchor_id": "c6ff4588-e725-4354-99e0-7e39e181ef2f",
+        "cognition_source": "honeypot",
+        "date": "2026-06-23",
+        "kg_relations_written": 0,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "ecec7849-f21e-48b4-80a9-4f9ea9f3a252",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-23T20:38:42.941806215+00:00",
+      "data": {
+        "anchor_id": "c6ff4588-e725-4354-99e0-7e39e181ef2f",
+        "cognition_source": "honeypot",
+        "date": "2026-06-23",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "86acd513-fb74-4058-a06c-58a81d370db4",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-24T00:20:07.474270919+00:00",
+      "data": {
+        "anchor_id": "c6ff4588-e725-4354-99e0-7e39e181ef2f",
+        "cognition_source": "honeypot",
+        "date": "2026-06-23",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "ec4a2c07-6458-401d-877a-122e25108ed7",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-24T04:41:44.681010639+00:00",
+      "data": {
+        "cognition_source": "honeypot",
+        "date": "2026-06-24",
+        "kg_relations_written": 0,
+        "memory_layer": "honeypot",
+        "promoted": false,
+        "skip_reason": "Hypothesis generation failed: error sending request for url (http://localhost:8000/v1/chat/completions)"
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "5cde8f19-84dc-4217-94cb-b0886c5db68b",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-24T15:07:58.280577184+00:00",
+      "data": {
+        "cognition_source": "honeypot",
+        "date": "2026-06-24",
+        "kg_relations_written": 0,
+        "memory_layer": "honeypot",
+        "promoted": false,
+        "skip_reason": "Hypothesis generation failed: Failed to parse spark hypothesis: JSON parse failed: missing field `anchor_label` at line 2 column 687\nRaw: {\n  \"internal_analysis\": \"The user is asking about the 'gzmo ecosystem' and its relation to 'Egonex-AI' and the 'Understand-Anything repository'. The anchor fact mentions 'Pi knowledge collection' used by 'platform_search' within the 'TOOL:Qdrant'. While Qdrant is a vector database, and vector databases are often used in AI/ML for search and retrieval, there's no direct link to the specific project or organization mentioned in the recent facts. The recent facts are about a specific AI project (gzmo ecosystem, Egonex-AI, Understand-Anything) and some technical details (ANCRe, llama.cpp). The connection between a general knowledge collection tool (Qdrant) and a specific AI project\nRepaired: {\n  \"internal_analysis\": \"The user is asking about the 'gzmo ecosystem' and its relation to 'Egonex-AI' and the 'Understand-Anything repository'. The anchor fact mentions 'Pi knowledge collection' used by 'platform_search' within the 'TOOL:Qdrant'. While Qdrant is a vector database, and vector databases are often used in AI/ML for search and retrieval, there's no direct link to the specific project or organization mentioned in the recent facts. The recent facts are about a specific AI project (gzmo ecosystem, Egonex-AI, Understand-Anything) and some technical details (ANCRe, llama.cpp). The connection between a general knowledge collection tool (Qdrant) and a specific AI project\"}\nRaw: {\n  \"internal_analysis\": \"The user is asking about the 'gzmo ecosystem' and its relation to 'Egonex-AI' and the 'Understand-Anything repository'. The anchor fact mentions 'Pi knowledge collection' used by 'platform_search' within the 'TOOL:Qdrant'. While Qdrant is a vector database, and vector databases are often used in AI/ML for search and retrieval, there's no direct link to the specific project or organization mentioned in the recent facts. The recent facts are about a specific AI project (gzmo ecosystem, Egonex-AI, Understand-Anything) and some technical details (ANCRe, llama.cpp). The connection between a general knowledge collection tool (Qdrant) and a specific AI project"
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "c5b37759-75e6-4ba3-829a-f842ea06e0b2",
+      "source": "GzmoCli",
+      "timestamp": "2026-06-24T15:08:08.768546362+00:00",
+      "data": {
+        "anchor_id": "4c582c98-0a7f-43a2-a540-fbdf4a479e24",
+        "cognition_source": "honeypot",
+        "date": "2026-06-24",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "82f385bb-38e2-4c1d-9c85-49e27e0b4ad8",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-24T15:12:54.779051763+00:00",
+      "data": {
+        "anchor_id": "4c582c98-0a7f-43a2-a540-fbdf4a479e24",
+        "cognition_source": "honeypot",
+        "date": "2026-06-24",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "cfa51875-693f-4c43-9b26-85026b201033",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-24T15:14:12.582599384+00:00",
+      "data": {
+        "cognition_source": "honeypot",
+        "date": "2026-06-24",
+        "kg_relations_written": 0,
+        "memory_layer": "honeypot",
+        "promoted": false,
+        "skip_reason": "Hypothesis generation failed: Failed to parse spark hypothesis: JSON parse failed: missing field `anchor_label` at line 2 column 270\nRaw: {\n  \"internal_analysis\": \"The user is asking about the 'gzmo ecosystem' (R2) and its association with 'Egonex-AI' (R3). The anchor fact mentions 'Pi knowledge collection' used by 'platform_search' (A0). While 'Pi' is a mathematical constant, it's not directly related to\nRepaired: {\n  \"internal_analysis\": \"The user is asking about the 'gzmo ecosystem' (R2) and its association with 'Egonex-AI' (R3). The anchor fact mentions 'Pi knowledge collection' used by 'platform_search' (A0). While 'Pi' is a mathematical constant, it's not directly related to\"}\nRaw: {\n  \"internal_analysis\": \"The user is asking about the 'gzmo ecosystem' (R2) and its association with 'Egonex-AI' (R3). The anchor fact mentions 'Pi knowledge collection' used by 'platform_search' (A0). While 'Pi' is a mathematical constant, it's not directly related to"
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "c25f6f36-56dc-40ac-a014-4317487803e3",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-24T15:14:54.646629023+00:00",
+      "data": {
+        "cognition_source": "honeypot",
+        "date": "2026-06-24",
+        "kg_relations_written": 0,
+        "memory_layer": "honeypot",
+        "promoted": false,
+        "skip_reason": "Hypothesis generation failed: Failed to parse spark hypothesis: JSON parse failed: expected `:` at line 2 column 14\nRaw: {\n  \"internal_\nRepaired: {\n  \"internal_\"}\nRaw: {\n  \"internal_"
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "1dc60389-4bae-4817-8188-7c977cb7b03a",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-24T15:18:06.582316187+00:00",
+      "data": {
+        "anchor_id": "4c582c98-0a7f-43a2-a540-fbdf4a479e24",
+        "cognition_source": "honeypot",
+        "date": "2026-06-24",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "aeb6ac14-2d21-43e3-aa44-49913211497b",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-24T15:48:40.016045960+00:00",
+      "data": {
+        "anchor_id": "4c582c98-0a7f-43a2-a540-fbdf4a479e24",
+        "cognition_source": "honeypot",
+        "date": "2026-06-24",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "f0b72dc5-256f-442b-9c06-7be1b2022b0d",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-24T18:39:37.984178221+00:00",
+      "data": {
+        "anchor_id": "4c582c98-0a7f-43a2-a540-fbdf4a479e24",
+        "cognition_source": "honeypot",
+        "date": "2026-06-24",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "f128cd9d-e2ce-44b0-a052-c53718989c87",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-24T19:35:14.958930810+00:00",
+      "data": {
+        "anchor_id": "4c582c98-0a7f-43a2-a540-fbdf4a479e24",
+        "cognition_source": "honeypot",
+        "date": "2026-06-24",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "5217bc05-8b4e-475d-991e-5f7b571e8a1d",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-24T21:55:41.943667975+00:00",
+      "data": {
+        "anchor_id": "4c582c98-0a7f-43a2-a540-fbdf4a479e24",
+        "cognition_source": "honeypot",
+        "date": "2026-06-24",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "b1d83aa4-3c60-4fe0-8749-c12c21dad898",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-24T22:30:47.056526195+00:00",
+      "data": {
+        "anchor_id": "4c582c98-0a7f-43a2-a540-fbdf4a479e24",
+        "cognition_source": "honeypot",
+        "date": "2026-06-24",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "f918dceb-ed26-4d5a-85de-9c7f1b17cbc7",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-25T04:28:45.226690759+00:00",
+      "data": {
+        "anchor_id": "eebbe2c5-9945-42f8-adc7-5c1009c610e8",
+        "cognition_source": "honeypot",
+        "date": "2026-06-25",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "08bd35d1-f487-4e36-922b-16fe3dc80ca2",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-25T06:24:51.854648402+00:00",
+      "data": {
+        "anchor_id": "ce7f6560-b5fe-42f3-b844-b7e349b3c7b9",
+        "cognition_source": "honeypot",
+        "date": "2026-06-25",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "846d64ea-cedc-4868-9852-a755cae5f853",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-25T13:28:36.864617156+00:00",
+      "data": {
+        "cognition_source": "honeypot",
+        "date": "2026-06-25",
+        "kg_relations_written": 0,
+        "memory_layer": "honeypot",
+        "promoted": false,
+        "skip_reason": "Hypothesis generation failed: error sending request for url (http://localhost:8000/v1/chat/completions)"
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "200132da-81ba-4a01-aa80-9d6bb624e376",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-25T16:18:01.098253834+00:00",
+      "data": {
+        "anchor_id": "ae01eb74-32ab-4b60-86c3-a7f788b21af1",
+        "cognition_source": "honeypot",
+        "date": "2026-06-25",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "a05a7b07-f5ba-48a8-ba9a-7d30c3e4c81f",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-25T18:26:25.644809566+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-25",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "c6dd3c60-86aa-476a-a330-ec27adb3aecb",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-25T20:47:51.639831689+00:00",
+      "data": {
+        "anchor_id": "eebbe2c5-9945-42f8-adc7-5c1009c610e8",
+        "cognition_source": "honeypot",
+        "date": "2026-06-25",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "9d12e290-7373-424e-a13b-99acd4f3dc58",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-25T21:03:15.628382575+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-25",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "f9eb3360-6c4b-451e-a333-c65a171e32ba",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-25T22:31:05.592291081+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-25",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "441d1ac9-55c2-433e-9e9e-41cf2e6524dc",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-26T03:31:06.092869321+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-26",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "ee7b0427-a4b4-4df8-8778-008c31925f9e",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-26T04:37:21.220121801+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-26",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "6d3f64a7-63d7-4246-86e0-7783cdff432e",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-26T04:58:41.391610903+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-26",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "820fd9a4-e44c-4b24-8984-d0cae6d85ee0",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-26T05:13:31.508909170+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-26",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "450c2987-f468-4c29-b11e-6f9b45cbce4a",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-19T05:00:49.899096450+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-19",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "a8f4c5e6-8f19-4189-9bfd-96b1d26dd804",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-19T05:05:11.131454003+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-19",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "e9b0ac68-e34b-4d21-b4cc-781d832452c1",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-19T05:10:22.345613203+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-19",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "03542c1c-9c8f-47c8-91be-181132f17606",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-19T06:25:27.443833885+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-19",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "e00c1876-d444-4895-b652-1a7612fd9c3f",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-19T06:43:56.282025298+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-19",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "699d474c-a1c1-4b11-8537-7feab7739783",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-19T06:46:47.467059343+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-19",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "90e5dc1e-a937-4597-801e-1907db668f6f",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-19T06:58:17.369861716+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-19",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "59b5e6c1-ba4d-4672-9cad-e486bdbbf4ad",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-19T07:42:22.200515888+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-19",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "71616612-9589-40aa-899a-240c4f546d46",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-19T12:04:59.833444018+00:00",
+      "data": {
+        "cognition_source": "honeypot",
+        "date": "2026-06-19",
+        "kg_relations_written": 0,
+        "memory_layer": "honeypot",
+        "promoted": false,
+        "skip_reason": "Hypothesis generation failed: TurboQuant structured output returned HTTP 503: {\"error\":{\"message\":\"Loading model\",\"type\":\"unavailable_error\",\"code\":503}}"
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "c8c429e6-1041-4e09-8e04-7b1d86580629",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-19T12:41:39.194982095+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-19",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "79a0ca02-d2b0-42be-8b07-e08f3713b36b",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-19T14:16:45.875380732+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-19",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "eed94168-5b06-48e3-885e-f2c95f5d9f70",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-19T20:20:28.653653092+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-19",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "2e22d946-18c5-42ee-923c-2a81ea7e3a73",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-20T04:24:11.348018033+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-20",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "84896fca-b12e-4715-9fb6-92c9997f5d54",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-20T15:58:50.236112926+00:00",
+      "data": {
+        "cognition_source": "honeypot",
+        "date": "2026-06-20",
+        "kg_relations_written": 0,
+        "memory_layer": "honeypot",
+        "promoted": false,
+        "skip_reason": "No curated anchor/recent pair passed smart selection (check vault ingest and [spark] gates)."
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "34a00c15-25f8-49b3-9920-a51155a8b064",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-21T04:12:41.037613016+00:00",
+      "data": {
+        "cognition_source": "honeypot",
+        "date": "2026-06-21",
+        "kg_relations_written": 0,
+        "memory_layer": "honeypot",
+        "promoted": false,
+        "skip_reason": "No curated anchor/recent pair passed smart selection (check vault ingest and [spark] gates)."
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "7346c54a-7f51-457e-b787-84efbfd80674",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-21T08:02:49.359097294+00:00",
+      "data": {
+        "anchor_id": "ae01eb74-32ab-4b60-86c3-a7f788b21af1",
+        "cognition_source": "honeypot",
+        "date": "2026-06-21",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "8094ad95-4edd-44a0-ba8c-fb854c25d43a",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-21T08:22:52.638335170+00:00",
+      "data": {
+        "anchor_id": "ae01eb74-32ab-4b60-86c3-a7f788b21af1",
+        "cognition_source": "honeypot",
+        "date": "2026-06-21",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "2d41bcfe-6d7d-4026-8216-b20e98c2b23e",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-21T09:12:55.639758335+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-21",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "c9ef5a5f-bbeb-406c-ace6-47f741fd243b",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-21T09:45:06.645064922+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-21",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "44c3b91b-fefd-4a0b-857b-ce02432aac55",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-21T10:39:46.632518313+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-21",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "1e2d5bd2-f486-471b-95cd-3315ecc78a5c",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-21T11:14:02.186752233+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-21",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "69dbcb7e-459a-40e4-bec6-12d4943debb7",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-21T11:37:59.006248747+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-21",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "0285e408-bb12-42d6-a0bc-44be7a3884a9",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-21T12:17:54.898848842+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-21",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "7d7c2b61-9bb0-4dd3-a04e-e9bbe06e91c7",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-22T04:57:59.434812610+00:00",
+      "data": {
+        "anchor_id": "c6ff4588-e725-4354-99e0-7e39e181ef2f",
+        "cognition_source": "honeypot",
+        "date": "2026-06-22",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "6a6e03c1-b067-4563-ba40-6f3c1e54b8b6",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-22T05:30:58.187965927+00:00",
+      "data": {
+        "anchor_id": "c6ff4588-e725-4354-99e0-7e39e181ef2f",
+        "cognition_source": "honeypot",
+        "date": "2026-06-22",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "6477827e-1ef1-416b-9f97-3d6ceded1aa1",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-22T12:56:55.187020965+00:00",
+      "data": {
+        "anchor_id": "c6ff4588-e725-4354-99e0-7e39e181ef2f",
+        "cognition_source": "honeypot",
+        "date": "2026-06-22",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "56e1c6a6-9935-43dd-a21e-dd18b4894f1e",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-22T13:26:47.250646263+00:00",
+      "data": {
+        "anchor_id": "c6ff4588-e725-4354-99e0-7e39e181ef2f",
+        "cognition_source": "honeypot",
+        "date": "2026-06-22",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "023fa7b6-317c-4aad-a3ef-3024f00e606b",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-22T20:57:52.262574391+00:00",
+      "data": {
+        "anchor_id": "c6ff4588-e725-4354-99e0-7e39e181ef2f",
+        "cognition_source": "honeypot",
+        "date": "2026-06-22",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "60c80b61-d913-49e4-b89b-f6277e85cf96",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-22T22:09:32.404987643+00:00",
+      "data": {
+        "anchor_id": "c6ff4588-e725-4354-99e0-7e39e181ef2f",
+        "cognition_source": "honeypot",
+        "date": "2026-06-22",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "f41f48e3-891f-4605-b2b5-e6091893148a",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-22T22:31:37.335893900+00:00",
+      "data": {
+        "anchor_id": "c6ff4588-e725-4354-99e0-7e39e181ef2f",
+        "cognition_source": "honeypot",
+        "date": "2026-06-22",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "4cd4cd08-5b77-4e46-a267-89678011ac4e",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-23T03:30:17.712269197+00:00",
+      "data": {
+        "anchor_id": "c6ff4588-e725-4354-99e0-7e39e181ef2f",
+        "cognition_source": "honeypot",
+        "date": "2026-06-23",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "33e9515c-d732-4157-a3ea-733059d28e05",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-23T04:17:52.112935874+00:00",
+      "data": {
+        "anchor_id": "c6ff4588-e725-4354-99e0-7e39e181ef2f",
+        "cognition_source": "honeypot",
+        "date": "2026-06-23",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "bf63e6de-3e9d-4748-b362-1689546b1a29",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-23T04:32:17.949931011+00:00",
+      "data": {
+        "anchor_id": "c6ff4588-e725-4354-99e0-7e39e181ef2f",
+        "cognition_source": "honeypot",
+        "date": "2026-06-23",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "5a7e6b69-a268-430d-a73f-09cf29b8443b",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-23T05:25:22.935189912+00:00",
+      "data": {
+        "anchor_id": "c6ff4588-e725-4354-99e0-7e39e181ef2f",
+        "cognition_source": "honeypot",
+        "date": "2026-06-23",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "e7a5e56e-f170-48d8-9b95-d945dd973fc1",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-23T08:28:43.969727512+00:00",
+      "data": {
+        "cognition_source": "honeypot",
+        "date": "2026-06-23",
+        "kg_relations_written": 0,
+        "memory_layer": "honeypot",
+        "promoted": false,
+        "skip_reason": "Hypothesis generation failed: error sending request for url (http://localhost:8000/v1/chat/completions)"
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "f97ba541-24da-4a82-add0-3549d2ec931f",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-23T08:32:29.645035817+00:00",
+      "data": {
+        "cognition_source": "honeypot",
+        "date": "2026-06-23",
+        "kg_relations_written": 0,
+        "memory_layer": "honeypot",
+        "promoted": false,
+        "skip_reason": "Hypothesis generation failed: error sending request for url (http://localhost:8000/v1/chat/completions)"
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "1b283a81-cb44-4e54-8efe-2b5fb14e7fff",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-23T08:44:26.905234364+00:00",
+      "data": {
+        "cognition_source": "honeypot",
+        "date": "2026-06-23",
+        "kg_relations_written": 0,
+        "memory_layer": "honeypot",
+        "promoted": false,
+        "skip_reason": "Hypothesis generation failed: TurboQuant structured output returned HTTP 503: {\"error\":{\"message\":\"Loading model\",\"type\":\"unavailable_error\",\"code\":503}}"
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "21a2a6bd-8933-4f71-a3a5-4a33a6b1f20e",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-23T09:26:09.702537297+00:00",
+      "data": {
+        "anchor_id": "c6ff4588-e725-4354-99e0-7e39e181ef2f",
+        "cognition_source": "honeypot",
+        "date": "2026-06-23",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "3ba66408-f617-437e-8fed-195c57f33a63",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-23T18:42:16.730234192+00:00",
+      "data": {
+        "anchor_id": "c6ff4588-e725-4354-99e0-7e39e181ef2f",
+        "cognition_source": "honeypot",
+        "date": "2026-06-23",
+        "kg_relations_written": 0,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "ecec7849-f21e-48b4-80a9-4f9ea9f3a252",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-23T20:38:42.941806215+00:00",
+      "data": {
+        "anchor_id": "c6ff4588-e725-4354-99e0-7e39e181ef2f",
+        "cognition_source": "honeypot",
+        "date": "2026-06-23",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "86acd513-fb74-4058-a06c-58a81d370db4",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-24T00:20:07.474270919+00:00",
+      "data": {
+        "anchor_id": "c6ff4588-e725-4354-99e0-7e39e181ef2f",
+        "cognition_source": "honeypot",
+        "date": "2026-06-23",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "ec4a2c07-6458-401d-877a-122e25108ed7",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-24T04:41:44.681010639+00:00",
+      "data": {
+        "cognition_source": "honeypot",
+        "date": "2026-06-24",
+        "kg_relations_written": 0,
+        "memory_layer": "honeypot",
+        "promoted": false,
+        "skip_reason": "Hypothesis generation failed: error sending request for url (http://localhost:8000/v1/chat/completions)"
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "5cde8f19-84dc-4217-94cb-b0886c5db68b",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-24T15:07:58.280577184+00:00",
+      "data": {
+        "cognition_source": "honeypot",
+        "date": "2026-06-24",
+        "kg_relations_written": 0,
+        "memory_layer": "honeypot",
+        "promoted": false,
+        "skip_reason": "Hypothesis generation failed: Failed to parse spark hypothesis: JSON parse failed: missing field `anchor_label` at line 2 column 687\nRaw: {\n  \"internal_analysis\": \"The user is asking about the 'gzmo ecosystem' and its relation to 'Egonex-AI' and the 'Understand-Anything repository'. The anchor fact mentions 'Pi knowledge collection' used by 'platform_search' within the 'TOOL:Qdrant'. While Qdrant is a vector database, and vector databases are often used in AI/ML for search and retrieval, there's no direct link to the specific project or organization mentioned in the recent facts. The recent facts are about a specific AI project (gzmo ecosystem, Egonex-AI, Understand-Anything) and some technical details (ANCRe, llama.cpp). The connection between a general knowledge collection tool (Qdrant) and a specific AI project\nRepaired: {\n  \"internal_analysis\": \"The user is asking about the 'gzmo ecosystem' and its relation to 'Egonex-AI' and the 'Understand-Anything repository'. The anchor fact mentions 'Pi knowledge collection' used by 'platform_search' within the 'TOOL:Qdrant'. While Qdrant is a vector database, and vector databases are often used in AI/ML for search and retrieval, there's no direct link to the specific project or organization mentioned in the recent facts. The recent facts are about a specific AI project (gzmo ecosystem, Egonex-AI, Understand-Anything) and some technical details (ANCRe, llama.cpp). The connection between a general knowledge collection tool (Qdrant) and a specific AI project\"}\nRaw: {\n  \"internal_analysis\": \"The user is asking about the 'gzmo ecosystem' and its relation to 'Egonex-AI' and the 'Understand-Anything repository'. The anchor fact mentions 'Pi knowledge collection' used by 'platform_search' within the 'TOOL:Qdrant'. While Qdrant is a vector database, and vector databases are often used in AI/ML for search and retrieval, there's no direct link to the specific project or organization mentioned in the recent facts. The recent facts are about a specific AI project (gzmo ecosystem, Egonex-AI, Understand-Anything) and some technical details (ANCRe, llama.cpp). The connection between a general knowledge collection tool (Qdrant) and a specific AI project"
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "c5b37759-75e6-4ba3-829a-f842ea06e0b2",
+      "source": "GzmoCli",
+      "timestamp": "2026-06-24T15:08:08.768546362+00:00",
+      "data": {
+        "anchor_id": "4c582c98-0a7f-43a2-a540-fbdf4a479e24",
+        "cognition_source": "honeypot",
+        "date": "2026-06-24",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "82f385bb-38e2-4c1d-9c85-49e27e0b4ad8",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-24T15:12:54.779051763+00:00",
+      "data": {
+        "anchor_id": "4c582c98-0a7f-43a2-a540-fbdf4a479e24",
+        "cognition_source": "honeypot",
+        "date": "2026-06-24",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "cfa51875-693f-4c43-9b26-85026b201033",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-24T15:14:12.582599384+00:00",
+      "data": {
+        "cognition_source": "honeypot",
+        "date": "2026-06-24",
+        "kg_relations_written": 0,
+        "memory_layer": "honeypot",
+        "promoted": false,
+        "skip_reason": "Hypothesis generation failed: Failed to parse spark hypothesis: JSON parse failed: missing field `anchor_label` at line 2 column 270\nRaw: {\n  \"internal_analysis\": \"The user is asking about the 'gzmo ecosystem' (R2) and its association with 'Egonex-AI' (R3). The anchor fact mentions 'Pi knowledge collection' used by 'platform_search' (A0). While 'Pi' is a mathematical constant, it's not directly related to\nRepaired: {\n  \"internal_analysis\": \"The user is asking about the 'gzmo ecosystem' (R2) and its association with 'Egonex-AI' (R3). The anchor fact mentions 'Pi knowledge collection' used by 'platform_search' (A0). While 'Pi' is a mathematical constant, it's not directly related to\"}\nRaw: {\n  \"internal_analysis\": \"The user is asking about the 'gzmo ecosystem' (R2) and its association with 'Egonex-AI' (R3). The anchor fact mentions 'Pi knowledge collection' used by 'platform_search' (A0). While 'Pi' is a mathematical constant, it's not directly related to"
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "c25f6f36-56dc-40ac-a014-4317487803e3",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-24T15:14:54.646629023+00:00",
+      "data": {
+        "cognition_source": "honeypot",
+        "date": "2026-06-24",
+        "kg_relations_written": 0,
+        "memory_layer": "honeypot",
+        "promoted": false,
+        "skip_reason": "Hypothesis generation failed: Failed to parse spark hypothesis: JSON parse failed: expected `:` at line 2 column 14\nRaw: {\n  \"internal_\nRepaired: {\n  \"internal_\"}\nRaw: {\n  \"internal_"
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "1dc60389-4bae-4817-8188-7c977cb7b03a",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-24T15:18:06.582316187+00:00",
+      "data": {
+        "anchor_id": "4c582c98-0a7f-43a2-a540-fbdf4a479e24",
+        "cognition_source": "honeypot",
+        "date": "2026-06-24",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "aeb6ac14-2d21-43e3-aa44-49913211497b",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-24T15:48:40.016045960+00:00",
+      "data": {
+        "anchor_id": "4c582c98-0a7f-43a2-a540-fbdf4a479e24",
+        "cognition_source": "honeypot",
+        "date": "2026-06-24",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "f0b72dc5-256f-442b-9c06-7be1b2022b0d",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-24T18:39:37.984178221+00:00",
+      "data": {
+        "anchor_id": "4c582c98-0a7f-43a2-a540-fbdf4a479e24",
+        "cognition_source": "honeypot",
+        "date": "2026-06-24",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "f128cd9d-e2ce-44b0-a052-c53718989c87",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-24T19:35:14.958930810+00:00",
+      "data": {
+        "anchor_id": "4c582c98-0a7f-43a2-a540-fbdf4a479e24",
+        "cognition_source": "honeypot",
+        "date": "2026-06-24",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "5217bc05-8b4e-475d-991e-5f7b571e8a1d",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-24T21:55:41.943667975+00:00",
+      "data": {
+        "anchor_id": "4c582c98-0a7f-43a2-a540-fbdf4a479e24",
+        "cognition_source": "honeypot",
+        "date": "2026-06-24",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "b1d83aa4-3c60-4fe0-8749-c12c21dad898",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-24T22:30:47.056526195+00:00",
+      "data": {
+        "anchor_id": "4c582c98-0a7f-43a2-a540-fbdf4a479e24",
+        "cognition_source": "honeypot",
+        "date": "2026-06-24",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "f918dceb-ed26-4d5a-85de-9c7f1b17cbc7",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-25T04:28:45.226690759+00:00",
+      "data": {
+        "anchor_id": "eebbe2c5-9945-42f8-adc7-5c1009c610e8",
+        "cognition_source": "honeypot",
+        "date": "2026-06-25",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "08bd35d1-f487-4e36-922b-16fe3dc80ca2",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-25T06:24:51.854648402+00:00",
+      "data": {
+        "anchor_id": "ce7f6560-b5fe-42f3-b844-b7e349b3c7b9",
+        "cognition_source": "honeypot",
+        "date": "2026-06-25",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "846d64ea-cedc-4868-9852-a755cae5f853",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-25T13:28:36.864617156+00:00",
+      "data": {
+        "cognition_source": "honeypot",
+        "date": "2026-06-25",
+        "kg_relations_written": 0,
+        "memory_layer": "honeypot",
+        "promoted": false,
+        "skip_reason": "Hypothesis generation failed: error sending request for url (http://localhost:8000/v1/chat/completions)"
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "200132da-81ba-4a01-aa80-9d6bb624e376",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-25T16:18:01.098253834+00:00",
+      "data": {
+        "anchor_id": "ae01eb74-32ab-4b60-86c3-a7f788b21af1",
+        "cognition_source": "honeypot",
+        "date": "2026-06-25",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "a05a7b07-f5ba-48a8-ba9a-7d30c3e4c81f",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-25T18:26:25.644809566+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-25",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "c6dd3c60-86aa-476a-a330-ec27adb3aecb",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-25T20:47:51.639831689+00:00",
+      "data": {
+        "anchor_id": "eebbe2c5-9945-42f8-adc7-5c1009c610e8",
+        "cognition_source": "honeypot",
+        "date": "2026-06-25",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "9d12e290-7373-424e-a13b-99acd4f3dc58",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-25T21:03:15.628382575+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-25",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "f9eb3360-6c4b-451e-a333-c65a171e32ba",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-25T22:31:05.592291081+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-25",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "441d1ac9-55c2-433e-9e9e-41cf2e6524dc",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-26T03:31:06.092869321+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-26",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "ee7b0427-a4b4-4df8-8778-008c31925f9e",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-26T04:37:21.220121801+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-26",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "6d3f64a7-63d7-4246-86e0-7783cdff432e",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-26T04:58:41.391610903+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-26",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "820fd9a4-e44c-4b24-8984-d0cae6d85ee0",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-26T05:13:31.508909170+00:00",
+      "data": {
+        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
+        "cognition_source": "honeypot",
+        "date": "2026-06-26",
         "kg_relations_written": 1,
         "memory_layer": "honeypot",
         "promoted": true
