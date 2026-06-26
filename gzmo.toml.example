@@ -172,6 +172,13 @@ model = "gzmo-rerank"
 api_key = ""
 prefetch_multiplier = 4
 
+# Recall-layer tuning (thema_009 / VCR). Hub-contention penalty down-weights
+# high-degree hub facts in RRF; disabled when the query names the hub entity.
+# Cache built by `scripts/hub-contention-index.py`.
+[recall]
+hub_contention_cache = "data/hub-contention-cache.json"
+hub_contention_penalty = 0.85
+
 # IngestEngine — gated knowledge-folder ingest (replaces headless watcher loop)
 [ingest]
 enabled = true

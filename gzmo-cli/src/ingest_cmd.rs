@@ -64,6 +64,7 @@ pub async fn run(
             &config.redis,
             &config.rerank,
             &config.qdrant,
+            &config.recall,
         )
         .await?,
     );

@@ -103,6 +103,7 @@ pub async fn run(config: &GzmoConfig, subargs: Vec<String>) -> Result<()> {
                 &config.redis,
                 &config.rerank,
                 &config.qdrant,
+            &config.recall,
             )
             .await?;
             let chain = vault.get_memory_chain(fact_id)?;

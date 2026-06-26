@@ -49,6 +49,7 @@ async fn build_distill_engine(
             &config.redis,
             &config.rerank,
             &config.qdrant,
+            &config.recall,
         )
         .await?,
     );

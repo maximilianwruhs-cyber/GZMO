@@ -90,6 +90,7 @@ impl PlatformMemory {
             &config.redis,
             &config.rerank,
             &config.qdrant,
+            &config.recall,
         )
         .await?;
 

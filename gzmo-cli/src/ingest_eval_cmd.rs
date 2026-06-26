@@ -197,6 +197,7 @@ pub async fn run(config: &GzmoConfig, _identity: IdentityEngine, path: PathBuf) 
             &config.redis,
             &config.rerank,
             &config.qdrant,
+            &config.recall,
         )
         .await?,
     );

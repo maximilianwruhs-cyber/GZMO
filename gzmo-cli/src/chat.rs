@@ -68,6 +68,7 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
         &config.redis,
         &config.rerank,
         &config.qdrant,
+            &config.recall,
     )
     .await
     {

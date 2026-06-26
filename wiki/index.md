@@ -572,6 +572,7 @@ gzmo_synthetic: true
 - [thema_004-arxiv-harvest-csAI-part03-split02](sources/thema-004-arxiv-harvest-csai-part03-split02.md) — stable — 1 source(s)
 - [Lint 2026-06-20](sources/_lint-2026-06-20.md) — stable — 0 source(s)
 - [Lint 2026-06-21](sources/_lint-2026-06-21.md) — stable — 0 source(s)
+- [thema_009-compositional-recall](sources/thema-009-compositional-recall.md) — stable — 1 source(s)
 ## Entities
 
 - [Bash](entities/bash.md) — draft — 2 source(s)
@@ -12714,3 +12715,10 @@ gzmo_synthetic: true
 - [arXiv Network Patterns](entities/arxiv-network-patterns.md) — draft — 1 source(s)
 - [arXiv Preprint Ecosystem](entities/arxiv-preprint-ecosystem.md) — draft — 1 source(s)
 - [Loop Engineering](entities/loop-engineering.md) — draft — 4 source(s)
+- [Compositional Recall Capacity](entities/compositional-recall-capacity.md) — draft — 0 source(s)
+- [Continuous Query Decomposition (CQD)](entities/continuous-query-decomposition-cqd.md) — draft — 0 source(s)
+- [G12 — Eval green ≠ recall green](entities/g12-eval-green-recall-green.md) — active — 0 source(s)
+- [Holographic Reduced Representations (HRR)](entities/holographic-reduced-representations.md) — draft — 0 source(s)
+- [Hop-2 Atomic Difficulty](entities/hop-2-atomic-difficulty.md) — draft — 0 source(s)
+- [Hub Contention Index](entities/hub-contention-index.md) — active — 0 source(s)
+- [Verified Chain Recall (VCR)](entities/verified-chain-recall.md) — active — 0 source(s)

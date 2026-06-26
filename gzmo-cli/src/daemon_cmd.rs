@@ -95,6 +95,7 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
         &config.redis,
         &config.rerank,
         &config.qdrant,
+            &config.recall,
     )
     .await?;
     if let Err(e) = dream_vault.archive_stale_session_anchors(config.spark.max_session_anchor_age_days) {

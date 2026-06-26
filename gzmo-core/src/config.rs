@@ -287,6 +287,10 @@ pub struct GzmoConfig {
     #[serde(default)]
     pub rerank: RerankConfig,
 
+    /// Recall-layer tuning (thema_009 / VCR): hub-contention penalty for RRF.
+    #[serde(default)]
+    pub recall: RecallConfig,
+
     /// Obolus: static task → engine routing table.
     #[serde(default)]
     pub routing: RoutingConfig,
@@ -1369,6 +1373,13 @@ pub struct SparkConfig {
     /// Substrings that disqualify a vault fact from being a spark anchor.
     #[serde(default = "default_spark_exclude_anchor_substrings")]
     pub exclude_anchor_substrings: Vec<String>,
+
+    /// thema_009 / VCR: skip anchors whose content mentions a high-degree hub
+    /// entity (degree above this threshold in the hub-contention cache). Hub
+    /// facts have degraded atomic retrieval and make poor hypothesis anchors.
+    /// 0 disables the guard.
+    #[serde(default = "default_spark_max_anchor_hub_degree")]
+    pub max_anchor_hub_degree: u32,
 
     /// Vault `decay_class` values eligible for spark anchors (curated wisdom, not ops noise).
     #[serde(default = "default_spark_anchor_decay_classes")]
@@ -2564,6 +2575,40 @@ impl Default for RerankConfig {
             model: default_rerank_model(),
             api_key: String::new(),
             prefetch_multiplier: default_rerank_prefetch_multiplier(),
+        }
+    }
+}
+
+// ─── Recall (thema_009 / VCR hub-contention) ─────────────────────────────
+
+/// Recall-layer tuning. The hub-contention penalty down-weights high-degree hub
+/// facts in RRF (the paper shows they are intrinsically harder to retrieve even
+/// as standalone atomic queries). Disabled when the query explicitly names the
+/// hub entity (atomic operator lookup, not composition).
+#[derive(Debug, Deserialize, Clone)]
+pub struct RecallConfig {
+    /// Path to the hub-contention cache written by scripts/hub-contention-index.py.
+    #[serde(default = "default_hub_contention_cache")]
+    pub hub_contention_cache: String,
+
+    /// Score multiplier applied to high-contention facts (0.0–1.0).
+    #[serde(default = "default_hub_contention_penalty")]
+    pub hub_contention_penalty: f64,
+}
+
+fn default_hub_contention_cache() -> String {
+    "data/hub-contention-cache.json".to_string()
+}
+
+fn default_hub_contention_penalty() -> f64 {
+    0.85
+}
+
+impl Default for RecallConfig {
+    fn default() -> Self {
+        Self {
+            hub_contention_cache: default_hub_contention_cache(),
+            hub_contention_penalty: default_hub_contention_penalty(),
         }
     }
 }

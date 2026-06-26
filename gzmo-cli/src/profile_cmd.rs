@@ -52,6 +52,7 @@ pub async fn run(config: &GzmoConfig, args: &[String]) -> Result<()> {
         &config.redis,
         &config.rerank,
         &config.qdrant,
+            &config.recall,
     )
     .await?;
 

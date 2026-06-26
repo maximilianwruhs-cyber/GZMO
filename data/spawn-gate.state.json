@@ -44,6 +44,15 @@
       "session_id": "discovery-plan:session-final-auto-pedagogy_oscillation-2026-06-26T12-29-42Z",
       "task_id": "7b37258b-8d23-42c1-a95e-b88403f22282",
       "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-06-26T13:01:34.268840045Z",
+      "kind": "discovery_plan",
+      "reason_hash": 12617721451335952668,
+      "recommendation_id": "1578b479-f523-4fa6-886e-6d2540f5c64d",
+      "session_id": "discovery-plan:session-final-auto-pedagogy_oscillation-2026-06-26T12-48-30Z",
+      "task_id": "532a0bba-49f9-4121-9e7c-21fdca34d4b7",
+      "approved_via": "gzmo kurator plan-from-discovery"
     }
   ],
   "denials": []

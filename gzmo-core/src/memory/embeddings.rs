@@ -11,7 +11,7 @@ use sha2::{Digest, Sha256};
 use tokio::sync::Mutex;
 use tracing::{debug, info, warn};
 
-use crate::config::{EmbeddingsConfig, QdrantConfig, RedisConfig, RerankConfig};
+use crate::config::{EmbeddingsConfig, QdrantConfig, RecallConfig, RedisConfig, RerankConfig};
 use crate::memory::qdrant_recall::QdrantRecall;
 use crate::memory::rerank::attach_reranker;
 
@@ -223,8 +223,10 @@ pub async fn open_vault_with_embeddings(
     redis_cfg: &RedisConfig,
     rerank_cfg: &RerankConfig,
     qdrant_cfg: &QdrantConfig,
+    recall_cfg: &RecallConfig,
 ) -> Result<crate::memory::vault::SqliteVault> {
-    let vault = crate::memory::vault::SqliteVault::open(db_path)?;
+    let vault = crate::memory::vault::SqliteVault::open(db_path)?
+        .with_recall_cfg(recall_cfg.clone());
     let vault = if !embed_cfg.enabled {
         vault
     } else {

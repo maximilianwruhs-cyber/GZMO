@@ -7,6 +7,7 @@ use anyhow::{Context, Result};
 use chrono::Utc;
 use rusqlite::{params, Connection};
 use std::collections::HashMap;
+use std::collections::HashSet;
 use std::path::Path;
 use r2d2::Pool;
 use r2d2_sqlite::SqliteConnectionManager;
@@ -30,6 +31,20 @@ use crate::memory::recall_rrf::{
 use std::process::Command as StdCommand;
 use crate::memory::rerank::Reranker;
 use crate::types::{ExtractedTruth, SemanticFact};
+use serde::Deserialize;
+
+// thema_009 / VCR: hub-contention cache payload shape (subset).
+#[derive(Debug, Deserialize)]
+struct HubContentionCache {
+    entities: HashMap<String, HubContentionEntry>,
+}
+#[derive(Debug, Deserialize)]
+struct HubContentionEntry {
+    #[serde(default)]
+    degree: u32,
+    #[serde(default)]
+    tier: String,
+}
 
 /// Result of `SqliteVault::backfill_missing_embeddings`.
 #[derive(Debug, Clone, Copy)]
@@ -46,6 +61,8 @@ pub struct SqliteVault {
     embedder: Option<Arc<Embedder>>,
     reranker: Option<Arc<Reranker>>,
     qdrant: Option<Arc<QdrantRecall>>,
+    /// thema_009 / VCR: hub-contention penalty + cache path.
+    recall_cfg: crate::config::RecallConfig,
 }
 
 impl SqliteVault {
@@ -261,6 +278,7 @@ impl SqliteVault {
             embedder: None,
             reranker: None,
             qdrant: None,
+            recall_cfg: crate::config::RecallConfig::default(),
         })
     }
 
@@ -280,6 +298,30 @@ impl SqliteVault {
     pub fn with_reranker(mut self, reranker: Option<Arc<Reranker>>) -> Self {
         self.reranker = reranker;
         self
+    }
+
+    /// Attach recall-layer tuning (thema_009 / VCR hub-contention).
+    pub fn with_recall_cfg(mut self, cfg: crate::config::RecallConfig) -> Self {
+        self.recall_cfg = cfg;
+        self
+    }
+
+    /// Load high-contention entity names from the hub cache (best-effort).
+    fn load_high_contention_entities(&self) -> HashSet<String> {
+        let path = Path::new(&self.recall_cfg.hub_contention_cache);
+        let Ok(text) = std::fs::read_to_string(path) else {
+            return HashSet::new();
+        };
+        let parsed: HubContentionCache = match serde_json::from_str(&text) {
+            Ok(c) => c,
+            Err(_) => return HashSet::new(),
+        };
+        parsed
+            .entities
+            .into_iter()
+            .filter(|(_, e)| e.tier == "high")
+            .map(|(k, _)| k.to_lowercase())
+            .collect()
     }
 
     pub fn rerank_enabled(&self) -> bool {
@@ -585,18 +627,20 @@ impl SqliteVault {
         let fts_ids = self.honeypot_fts_stream(q, container_tag, PREFETCH_K)?;
         let evidence_fts_ids = self.honeypot_evidence_fts_stream(q, container_tag, PREFETCH_K)?;
         let graph_ids = self.honeypot_graph_stream(q, PREFETCH_K)?;
-        let kw_ids = if graph_ids.is_empty() {
-            self.honeypot_keyword_stream(q, PREFETCH_K)?
-        } else {
-            Vec::new()
-        };
+        // thema_009 / VCR: run the keyword (BM25) stream in parallel with the
+        // graph stream rather than only as a fallback. The paper shows aggregate
+        // metrics (MRR) mask per-fact retrieval weakness; BM25 can surface facts
+        // the graph hints miss, so suppressing it when any graph hint returns is
+        // a regression risk.
+        let kw_ids = self.honeypot_keyword_stream(q, PREFETCH_K)?;
         let mut rank_lists = vec![fts_ids.clone()];
         if !evidence_fts_ids.is_empty() {
             rank_lists.push(evidence_fts_ids);
         }
         if !graph_ids.is_empty() {
             rank_lists.push(graph_ids.clone());
-        } else if !kw_ids.is_empty() {
+        }
+        if !kw_ids.is_empty() {
             rank_lists.push(kw_ids.clone());
         }
 
@@ -645,6 +689,44 @@ impl SqliteVault {
             for (idx, id) in list.iter().take(5).enumerate() {
                 let boost = STREAM_TOP_RESCUE / (idx as f64 + 1.0);
                 *scores.entry(*id).or_insert(0.0) += boost;
+            }
+        }
+        // thema_009 / VCR: give chain-shaped 2-hop graph hints ("A via REL mid via
+        // REL n") a modest extra boost. In 2-hop mode graph-recall-stream.py emits
+        // chain hints first, so the head of graph_ids is chain-shaped. The paper
+        // shows superposition cannot compose zero-shot; explicit verified chains
+        // can, so we favor them slightly over flat neighbor hints.
+        const CHAIN_HINT_RESCUE: f64 = 0.02;
+        for (idx, id) in graph_ids.iter().take(5).enumerate() {
+            let boost = CHAIN_HINT_RESCUE / (idx as f64 + 1.0);
+            *scores.entry(*id).or_insert(0.0) += boost;
+        }
+        // thema_009 / VCR: hub-contention penalty. Down-weight facts whose content
+        // mentions a high-degree hub entity, unless the query itself names that
+        // entity (atomic operator lookup, not composition). The paper shows
+        // high-contention facts are intrinsically harder to retrieve even
+        // standalone; the penalty keeps them from dominating RRF.
+        let penalty = self.recall_cfg.hub_contention_penalty;
+        if penalty > 0.0 && penalty < 1.0 {
+            let high_hubs = self.load_high_contention_entities();
+            if !high_hubs.is_empty() {
+                let q_lower = q.to_lowercase();
+                let query_hubs: HashSet<String> = high_hubs
+                    .iter()
+                    .filter(|h| q_lower.contains(*h))
+                    .cloned()
+                    .collect();
+                let penalized_hubs: HashSet<&String> =
+                    high_hubs.iter().filter(|h| !query_hubs.contains(*h)).collect();
+                if !penalized_hubs.is_empty() {
+                    for (id, score) in scores.iter_mut() {
+                        let Some(cand) = candidates.get(id) else { continue };
+                        let blob = cand.fact.content.to_lowercase();
+                        if penalized_hubs.iter().any(|h| blob.contains(*h)) {
+                            *score *= penalty;
+                        }
+                    }
+                }
             }
         }
         let mut ranked: Vec<(RecallCandidate, f64)> = scores
@@ -896,10 +978,14 @@ impl SqliteVault {
         } else {
             "python3"
         };
+        // thema_009 / VCR: GRAPH_RECALL_MODE selects 1-hop (default, backward
+        // compatible) or 2-hop verified-chain hints ("A via REL mid via REL n").
+        let graph_mode = std::env::var("GRAPH_RECALL_MODE").unwrap_or_else(|_| "1hop".into());
         let out = StdCommand::new(python)
             .arg(script)
             .arg(query)
             .arg(limit.to_string())
+            .env("GRAPH_RECALL_MODE", graph_mode)
             .env("NEO4J_URL", std::env::var("NEO4J_URL").unwrap_or_else(|_| "bolt://192.168.31.202:7687".into()))
             .env("NEO4J_USERNAME", std::env::var("NEO4J_USERNAME").unwrap_or_else(|_| "neo4j".into()))
             .env("NEO4J_PASSWORD", std::env::var("NEO4J_PASSWORD").unwrap_or_default())
