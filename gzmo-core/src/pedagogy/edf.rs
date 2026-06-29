@@ -80,8 +80,10 @@ impl EdfStore {
             .open(&self.path)
             .await
             .with_context(|| format!("open EDF log {:?}", self.path))?;
-        f.write_all(line.as_bytes()).await?;
-        f.write_all(b"\n").await?;
+        // Write line + newline atomically in single call to prevent interleaving
+        let mut buf = line.into_bytes();
+        buf.push(b'\n');
+        f.write_all(&buf).await?;
         Ok(())
     }
 

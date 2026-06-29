@@ -4,7 +4,7 @@ use anyhow::Result;
 use async_trait::async_trait;
 
 use crate::config::{PedagogyConfig, TaskKind};
-use crate::pedagogy::orchestrator::PedagogyOrchestrator;
+use crate::pedagogy::SimplifiedOrchestrator;
 use crate::pedagogy::session::PedagogySession;
 
 use super::generative::boxed_display;
@@ -43,7 +43,7 @@ impl Skill for LearnSkill {
             });
         }
 
-        let orchestrator = PedagogyOrchestrator::new(self.pedagogy_config.clone(), None);
+        let orchestrator = SimplifiedOrchestrator::new(self.pedagogy_config.clone(), None);
         let prep = if let Some(router) = ctx.router {
             let gw = router.gateway(TaskKind::PedagogyInternal);
             orchestrator.run_learn_prep(gw.as_ref(), topic).await?

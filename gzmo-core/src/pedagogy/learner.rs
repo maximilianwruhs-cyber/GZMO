@@ -185,7 +185,10 @@ impl LearnerStore {
             tokio::fs::create_dir_all(parent).await?;
         }
         let json = serde_json::to_string_pretty(profile)?;
-        tokio::fs::write(&path, json).await?;
+        // Use atomic write to prevent corruption from concurrent access
+        let temp_path = path.with_extension("tmp");
+        tokio::fs::write(&temp_path, json).await?;
+        tokio::fs::rename(&temp_path, &path).await?;
         Ok(())
     }
 

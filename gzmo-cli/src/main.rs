@@ -33,6 +33,8 @@ mod low_tension_dialogue;
 mod mentor_cmd;
 mod mentor_compute_cmd;
 mod mentor_plot_cmd;
+mod self_improving_cmd;
+mod telemetry_cmd;
 #[allow(dead_code)]
 mod ui;
 pub mod tui;
@@ -78,6 +80,10 @@ enum Command {
     Kurator(Vec<String>),
     /// Obolus token analytics (`gzmo obolus status|report|context`).
     Obolus(Vec<String>),
+    /// Self-improving mode with repetition detection and parameter optimization.
+    SelfImproving { detect_repetition: bool, adapt_strategy: bool },
+    /// Telemetry dashboard for real-time parameter effectiveness monitoring.
+    Telemetry { watch: bool },
     Help,
 }
 
@@ -115,6 +121,8 @@ USAGE
   gzmo obolus status|report|balance  Prime token ledger (E_total, ctx_%)
   gzmo obolus preflight <action>   Gate check (discovery_cycle, spawn_*)
   gzmo obolus efficiency        Wirkungsgrad η = (Q·I)/E_total
+  gzmo self-improving [--detect] [--adapt]  Run with self-improving loop
+  gzmo telemetry [--watch]      Real-time parameter effectiveness dashboard
   gzmo init                     First-time setup
   gzmo mcp-serve                MCP stdio (memory + wiki search)
 
@@ -160,6 +168,15 @@ fn parse_args() -> (Option<String>, Command) {
         if args[1] == "mentor" { return (learner, Command::Mentor(args[2..].to_vec())); }
         if args[1] == "kurator" { return (learner, Command::Kurator(args[2..].to_vec())); }
         if args[1] == "obolus" { return (learner, Command::Obolus(args[2..].to_vec())); }
+        if args[1] == "self-improving" || args[1] == "improve" {
+            let detect_repetition = args.iter().any(|a| a == "--detect" || a == "-d");
+            let adapt_strategy = args.iter().any(|a| a == "--adapt" || a == "-a");
+            return (learner, Command::SelfImproving { detect_repetition, adapt_strategy });
+        }
+        if args[1] == "telemetry" || args[1] == "tui" {
+            let watch = args.iter().any(|a| a == "--watch" || a == "-w");
+            return (learner, Command::Telemetry { watch });
+        }
         if args[1] == "dream" {
             let date = args.get(2).and_then(|s| NaiveDate::parse_from_str(s, "%Y-%m-%d").ok());
             return (learner, Command::Dream(date));
@@ -320,6 +337,8 @@ async fn main() -> Result<()> {
         Command::Mentor(_) => "warn",
         Command::Kurator(_) => "warn",
         Command::Obolus(_) => "warn",
+        Command::SelfImproving { .. } => "info",
+        Command::Telemetry { .. } => "warn",
         Command::Help => "warn",
     };
 
@@ -354,35 +373,65 @@ async fn main() -> Result<()> {
             // OS-level singleton lock file (shared with start-production.sh / scripts)
             let pid_file = gzmo_core::daemon::daemon_pid_path();
 
-            if pid_file.exists() {
-                if let Ok(old_pid_str) = std::fs::read_to_string(&pid_file) {
-                    let old_pid = old_pid_str.trim();
-                    let proc_path = format!("/proc/{}/cmdline", old_pid);
-                    if std::path::Path::new(&proc_path).exists() {
-                        anyhow::bail!(
-                            "GZMO Daemon is already running (PID {}, lockfile {:?}).",
-                            old_pid, pid_file
-                        );
-                    }
-                    tracing::warn!(stale_pid = %old_pid, "Reclaiming stale PID lockfile");
-                    let _ = std::fs::remove_file(&pid_file);
-                }
-            }
-
+            // Try to create the PID file atomically first - this is the race-safe approach
             use std::io::Write;
-            let mut lock = std::fs::OpenOptions::new()
+            let lock_result = std::fs::OpenOptions::new()
                 .write(true)
                 .create_new(true)
-                .open(&pid_file)
-                .map_err(|e| anyhow::anyhow!(
-                    "Failed to acquire PID lockfile {:?}: {}. Another instance may have started.",
-                    pid_file, e
-                ))?;
+                .open(&pid_file);
+
+            let mut lock = match lock_result {
+                Ok(lock) => lock,
+                Err(e) if e.kind() == std::io::ErrorKind::AlreadyExists => {
+                    // File already exists - check if it's stale
+                    if let Ok(old_pid_str) = std::fs::read_to_string(&pid_file) {
+                        let old_pid = old_pid_str.trim();
+                        let proc_path = format!("/proc/{}/cmdline", old_pid);
+                        if std::path::Path::new(&proc_path).exists() {
+                            anyhow::bail!(
+                                "GZMO Daemon is already running (PID {}, lockfile {:?}).",
+                                old_pid, pid_file
+                            );
+                        }
+                        tracing::warn!(stale_pid = %old_pid, "Reclaiming stale PID lockfile");
+                        if let Err(e) = std::fs::remove_file(&pid_file) {
+                            anyhow::bail!(
+                                "Failed to remove stale PID lockfile {:?}: {}. Try manually deleting it.",
+                                pid_file, e
+                            );
+                        }
+                        // Try again after removing stale file
+                        let retry = std::fs::OpenOptions::new()
+                            .write(true)
+                            .create_new(true)
+                            .open(&pid_file)
+                            .map_err(|e| anyhow::anyhow!(
+                                "Failed to acquire PID lockfile {:?} after removing stale lock: {}.",
+                                pid_file, e
+                            ))?;
+                        retry
+                    } else {
+                        anyhow::bail!(
+                            "PID file exists but cannot be read: {:?}. Try manually deleting it.",
+                            pid_file
+                        );
+                    }
+                }
+                Err(e) => {
+                    anyhow::bail!(
+                        "Failed to acquire PID lockfile {:?}: {}. Another instance may have started.",
+                        pid_file, e
+                    );
+                }
+            };
+
             write!(lock, "{}", std::process::id())?;
             drop(lock);
 
             let res = daemon_cmd::run(&config, identity).await;
-            let _ = std::fs::remove_file(&pid_file);
+            if let Err(e) = std::fs::remove_file(&pid_file) {
+                tracing::warn!(path = %pid_file.display(), error = %e, "Failed to remove daemon PID file");
+            }
             res
         },
         Command::Dream(date) => dream_cmd::run(&config, identity, date).await,
@@ -434,6 +483,41 @@ async fn main() -> Result<()> {
         Command::Mentor(args) => mentor_cmd::run(&config, &args).await,
         Command::Kurator(args) => kurator_cmd::run(&args, &config).await,
         Command::Obolus(args) => obolus_cmd::run(&args, &config).await,
+        Command::SelfImproving { detect_repetition, adapt_strategy } => {
+            run_self_improving(&config, detect_repetition, adapt_strategy).await
+        }
+        Command::Telemetry { watch } => run_telemetry(watch).await,
         Command::Help => unreachable!(),
+    }
+}
+
+async fn run_self_improving(
+    config: &gzmo_core::config::GzmoConfig,
+    detect_repetition: bool,
+    adapt_strategy: bool,
+) -> anyhow::Result<()> {
+    self_improving_cmd::run(config, detect_repetition, adapt_strategy).await
+}
+
+async fn run_telemetry(watch: bool) -> anyhow::Result<()> {
+    let (snapshot_tx, snapshot_rx) =
+        tokio::sync::watch::channel(gzmo_chaos::pulse::ChaosSnapshot::default());
+
+    tokio::spawn(async move {
+        let mut tick = 0u64;
+        loop {
+            tokio::time::sleep(tokio::time::Duration::from_millis(500)).await;
+            tick += 1;
+            let mut snap = gzmo_chaos::pulse::ChaosSnapshot::default();
+            snap.tick = tick;
+            snap.timestamp = chrono::Local::now().format("%H:%M:%S").to_string();
+            let _ = snapshot_tx.send(snap);
+        }
+    });
+
+    if watch {
+        telemetry_cmd::run(snapshot_rx).await
+    } else {
+        telemetry_cmd::report(snapshot_rx).await
     }
 }

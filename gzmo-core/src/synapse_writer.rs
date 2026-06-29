@@ -155,7 +155,9 @@ pub fn claim_skill_invoke(
         gate_state
             .consumed_invoke_ids
             .push(event.id.to_string());
-        let _ = save_gate_state(gate_state_path, &gate_state);
+        if let Err(e) = save_gate_state(gate_state_path, &gate_state) {
+            tracing::warn!(path = %gate_state_path.display(), error = %e, "Failed to save gate state");
+        }
 
         return Ok(GateClaim {
             invoke_event_id: event.id,

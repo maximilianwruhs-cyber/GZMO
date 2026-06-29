@@ -496,7 +496,7 @@ pub fn emit_discovery_fix_closed(
         })),
     );
     let id = event.id;
-    let _ = bus.append(&event);
+    bus.append(&event);
     id
 }
 
@@ -527,7 +527,7 @@ pub fn emit_discovery_fix_failed(
         })),
     );
     let id = event.id;
-    let _ = bus.append(&event);
+    bus.append(&event);
     id
 }
 
@@ -557,7 +557,7 @@ pub fn emit_remediation_escalated(
         })),
     );
     let id = event.id;
-    let _ = bus.append(&event);
+    bus.append(&event);
     id
 }
 

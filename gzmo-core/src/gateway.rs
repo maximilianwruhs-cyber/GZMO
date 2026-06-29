@@ -347,9 +347,13 @@ struct StreamFunctionDelta {
 impl TurboQuantGateway {
     /// Create a new gateway with the given config.
     pub fn new(config: VllmConfig) -> Self {
+        let http = HttpClient::builder()
+            .timeout(std::time::Duration::from_secs(300)) // 5 min for long LLM calls
+            .build()
+            .unwrap_or_else(|_| HttpClient::new());
         Self {
             config,
-            http: HttpClient::new(),
+            http,
             chaos_temperature: std::sync::atomic::AtomicU32::new(0),
             chaos_max_tokens: std::sync::atomic::AtomicU32::new(0),
             chaos_active: std::sync::atomic::AtomicBool::new(false),
@@ -358,10 +362,16 @@ impl TurboQuantGateway {
     }
 
     fn store_usage(&self, usage: Option<&Usage>) {
-        let mut guard = self.last_usage.lock().expect("last_usage lock");
-        *guard = usage.map(|u| {
-            TokenUsage::from_openai(u.prompt_tokens, u.completion_tokens, u.total_tokens)
-        });
+        match self.last_usage.lock() {
+            Ok(mut guard) => {
+                *guard = usage.map(|u| {
+                    TokenUsage::from_openai(u.prompt_tokens, u.completion_tokens, u.total_tokens)
+                });
+            }
+            Err(e) => {
+                tracing::warn!(error = %e, "Failed to lock last_usage mutex");
+            }
+        }
     }
 
     /// Create a gateway with default Prime config (localhost:8000).
@@ -769,7 +779,13 @@ impl LlmGateway for TurboQuantGateway {
     }
 
     fn take_last_usage(&self) -> Option<TokenUsage> {
-        self.last_usage.lock().expect("last_usage lock").take()
+        match self.last_usage.lock() {
+            Ok(mut guard) => guard.take(),
+            Err(e) => {
+                tracing::warn!(error = %e, "Failed to lock last_usage mutex in take_last_usage");
+                None
+            }
+        }
     }
 }
 
@@ -1415,10 +1431,11 @@ impl GatewayRouter {
     /// Resolve the gateway for a specific task kind.
     pub fn gateway(&self, task: config::TaskKind) -> &Arc<dyn LlmGateway> {
         self.task_gateways.get(&task).unwrap_or_else(|| {
-            // Safety: the default engine leaf is always present
+            // Try default engine first, then fallback to any available leaf
             self.leaves
                 .get(&self.default_engine)
-                .expect("default gateway must exist")
+                .or_else(|| self.leaves.values().next())
+                .expect("at least one gateway leaf must exist")
         })
     }
 

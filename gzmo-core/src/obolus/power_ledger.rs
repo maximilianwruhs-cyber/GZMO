@@ -76,13 +76,27 @@ impl PowerLedger {
                 if buf.is_empty() {
                     return;
                 }
-                if let Ok(mut file) = OpenOptions::new().create(true).append(true).open(path) {
-                    for entry in buf.drain(..) {
-                        if let Ok(line) = serde_json::to_string(&entry) {
-                            let _ = writeln!(file, "{line}");
+                match OpenOptions::new().create(true).append(true).open(path) {
+                    Ok(mut file) => {
+                        for entry in buf.drain(..) {
+                            match serde_json::to_string(&entry) {
+                                Ok(line) => {
+                                    if let Err(e) = writeln!(file, "{line}") {
+                                        eprintln!("Warning: failed to write power ledger entry: {}", e);
+                                    }
+                                }
+                                Err(e) => {
+                                    eprintln!("Warning: failed to serialize power ledger entry: {}", e);
+                                }
+                            }
+                        }
+                        if let Err(e) = file.flush() {
+                            eprintln!("Warning: failed to flush power ledger: {}", e);
                         }
                     }
-                    let _ = file.flush();
+                    Err(e) => {
+                        eprintln!("Warning: failed to open power ledger for writing: {}", e);
+                    }
                 }
             };
 

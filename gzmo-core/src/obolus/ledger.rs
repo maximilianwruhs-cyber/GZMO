@@ -91,7 +91,9 @@ impl ObolusLedger {
         {
             use std::os::unix::fs::{OpenOptionsExt, PermissionsExt};
             if path.exists() {
-                let _ = fs::set_permissions(&path, fs::Permissions::from_mode(0o600));
+                if let Err(e) = fs::set_permissions(&path, fs::Permissions::from_mode(0o600)) {
+                    eprintln!("Warning: failed to set ledger permissions: {}", e);
+                }
             }
         }
 
@@ -108,13 +110,27 @@ impl ObolusLedger {
                 if buf.is_empty() {
                     return;
                 }
-                if let Ok(mut file) = OpenOptions::new().create(true).append(true).open(path) {
-                    for entry in buf.drain(..) {
-                        if let Ok(line) = serde_json::to_string(&entry) {
-                            let _ = writeln!(file, "{line}");
+                match OpenOptions::new().create(true).append(true).open(path) {
+                    Ok(mut file) => {
+                        for entry in buf.drain(..) {
+                            match serde_json::to_string(&entry) {
+                                Ok(line) => {
+                                    if let Err(e) = writeln!(file, "{line}") {
+                                        eprintln!("Warning: failed to write ledger entry: {}", e);
+                                    }
+                                }
+                                Err(e) => {
+                                    eprintln!("Warning: failed to serialize ledger entry: {}", e);
+                                }
+                            }
+                        }
+                        if let Err(e) = file.flush() {
+                            eprintln!("Warning: failed to flush ledger: {}", e);
                         }
                     }
-                    let _ = file.flush();
+                    Err(e) => {
+                        eprintln!("Warning: failed to open ledger for writing: {}", e);
+                    }
                 }
             };
 
@@ -162,11 +178,15 @@ impl ObolusLedger {
     }
 
     pub fn record(&self, entry: LedgerEntry) {
-        let _ = self.tx.send(WriterMsg::Entry(entry));
+        if let Err(e) = self.tx.send(WriterMsg::Entry(entry)) {
+            eprintln!("Warning: failed to send ledger entry to writer thread: {}", e);
+        }
     }
 
     pub fn flush(&self) {
-        let _ = self.tx.send(WriterMsg::Flush);
+        if let Err(e) = self.tx.send(WriterMsg::Flush) {
+            eprintln!("Warning: failed to send flush command to ledger writer: {}", e);
+        }
     }
 
     /// Read all entries with `ts >= since`.

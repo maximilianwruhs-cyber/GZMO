@@ -38,14 +38,18 @@ pub fn active_guard(data_dir: &Path) -> Option<CycleGuardRecord> {
     let rec: CycleGuardRecord = serde_json::from_str(&raw).ok()?;
     if let Some(started) = parse_started_at(&rec.started_at) {
         if Utc::now().signed_duration_since(started).num_seconds() > STALE_GUARD_SECS {
-            let _ = std::fs::remove_file(&path);
+            if let Err(e) = std::fs::remove_file(&path) {
+                tracing::debug!(path = %path.display(), error = %e, "Failed to remove expired cycle guard file");
+            }
             return None;
         }
     }
     if pid_alive(rec.pid) {
         Some(rec)
     } else {
-        let _ = std::fs::remove_file(&path);
+        if let Err(e) = std::fs::remove_file(&path) {
+            tracing::debug!(path = %path.display(), error = %e, "Failed to remove stale cycle guard file");
+        }
         None
     }
 }
@@ -63,18 +67,25 @@ impl CycleGuard {
             pid: std::process::id(),
             started_at: Utc::now().to_rfc3339(),
         };
-        std::fs::write(&path, serde_json::to_string(&rec).unwrap())?;
+        let json_bytes = serde_json::to_vec(&rec).map_err(|e| {
+            std::io::Error::new(std::io::ErrorKind::InvalidData, format!("JSON serialization failed: {}", e))
+        })?;
+        std::fs::write(&path, json_bytes)?;
         Ok(Self { path })
     }
 
     pub fn release(self) {
-        let _ = std::fs::remove_file(&self.path);
+        if let Err(e) = std::fs::remove_file(&self.path) {
+            tracing::debug!(path = %self.path.display(), error = %e, "Failed to remove cycle guard file");
+        }
     }
 }
 
 impl Drop for CycleGuard {
     fn drop(&mut self) {
-        let _ = std::fs::remove_file(&self.path);
+        if let Err(e) = std::fs::remove_file(&self.path) {
+            tracing::debug!(path = %self.path.display(), error = %e, "Failed to remove cycle guard file in drop");
+        }
     }
 }
 

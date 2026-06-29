@@ -8,8 +8,8 @@ use gzmo_core::config::{GzmoConfig, PedagogyDefaultMode, TaskKind};
 use gzmo_core::gateway::{GatewayRouter, LlmGateway};
 use gzmo_core::mentor_client::MentorResponse;
 use gzmo_core::pedagogy::{
-    classify_intent, InteractionIntent, LearnerProfile, LearnerStore, OrchestratorInput,
-    OrchestratorOutput, PedagogyOrchestrator, PedagogySession, PrerequisiteGraph,
+    classify_intent, InteractionIntent, LearnerProfile, LearnerStore, OrchestratorInputV2,
+    OrchestratorOutput, PedagogySession, PrerequisiteGraph, SimplifiedOrchestrator,
 };
 use gzmo_core::types::{Message, Role};
 
@@ -46,7 +46,7 @@ pub fn delegate_exec_response(
 }
 
 pub struct PedagogyRuntime {
-    pub orchestrator: PedagogyOrchestrator,
+    pub orchestrator: SimplifiedOrchestrator,
     pub learner_store: LearnerStore,
     pub learner_profile: LearnerProfile,
     pub session: PedagogySession,
@@ -69,7 +69,7 @@ impl PedagogyRuntime {
             None
         };
 
-        let orchestrator = PedagogyOrchestrator::new(pedagogy.clone(), graph);
+        let orchestrator = SimplifiedOrchestrator::new(pedagogy.clone(), graph);
 
         Ok(Self {
             orchestrator,
@@ -167,12 +167,12 @@ impl PedagogyRuntime {
 
         let tail = Self::conversation_tail(messages, 4);
         let prep_notes = self.session.learn_prep_notes.as_deref();
-        let output = self
+        let output: OrchestratorOutput = self
             .orchestrator
             .run(
                 tutor_gateway,
                 internal_gateway.as_ref(),
-                OrchestratorInput {
+                OrchestratorInputV2 {
                     user_message: input,
                     learner_profile: &self.learner_profile,
                     trio_mode: self.session.trio_mode,
@@ -185,7 +185,8 @@ impl PedagogyRuntime {
                     chaos_snapshot_rx,
                 },
             )
-            .await?;
+            .await?
+            .into();
 
         let summary = gzmo_core::text_util::truncate_chars(&output.response, 200);
         self.learner_profile

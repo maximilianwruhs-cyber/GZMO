@@ -269,7 +269,9 @@ pub async fn run_agent_loop(
                     continue;
                 }
                 if let Some(ref mem) = config.memory {
-                    let _ = mem.scratch.clear(&mem.scope).await;
+                    if let Err(e) = mem.scratch.clear(&mem.scope).await {
+                        warn!(error = %e, "Failed to clear scratch memory after agent loop completion");
+                    }
                 }
                 info!(
                     iterations = iteration + 1,
@@ -441,7 +443,9 @@ pub async fn run_agent_loop(
     };
 
     if let Some(ref mem) = config.memory {
-        let _ = mem.scratch.clear(&mem.scope).await;
+        if let Err(e) = mem.scratch.clear(&mem.scope).await {
+            warn!(error = %e, "Failed to clear scratch memory after stuck detection");
+        }
     }
 
     Ok(AgentResponse {

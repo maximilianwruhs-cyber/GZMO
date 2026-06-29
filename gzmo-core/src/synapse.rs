@@ -416,7 +416,9 @@ impl SynapseBus {
                     .append(true)
                     .open(&self.path)
                 {
-                    let _ = writeln!(file, "{}", line);
+                    if let Err(e) = writeln!(file, "{}", line) {
+                        tracing::warn!(error = %e, "SynapseBus: failed to write event without lock");
+                    }
                 }
                 return;
             }
@@ -504,7 +506,9 @@ impl SynapseBus {
                 {
                     for event in events {
                         let line = event.to_json_line();
-                        let _ = writeln!(file, "{}", line);
+                        if let Err(e) = writeln!(file, "{}", line) {
+                            tracing::warn!(error = %e, "SynapseBus: failed to write batch event without lock");
+                        }
                     }
                 }
                 return;

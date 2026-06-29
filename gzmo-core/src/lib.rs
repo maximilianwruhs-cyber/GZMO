@@ -61,6 +61,8 @@ pub mod text_util;
 pub mod subagent;
 pub mod context_compress;
 pub mod pedagogy;
+pub mod self_improving;
+pub mod strategies;
 pub mod pi_recent_discoveries;
 pub mod mentor_client;
 pub mod obolus;

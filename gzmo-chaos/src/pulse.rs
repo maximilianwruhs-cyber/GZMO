@@ -56,6 +56,14 @@ pub fn compute_llm_temperature(lorenz_x: f64, tension: f64, energy: f64) -> f32 
     (from_lorenz * 0.4 + from_state * 0.6).clamp(LLM_TEMP_MIN, LLM_TEMP_MAX)
 }
 
+/// LLM sampling parameters (used by telemetry and external observers).
+#[derive(Debug, Clone, Copy, Default, serde::Serialize, serde::Deserialize)]
+pub struct LlmParams {
+    pub temperature: f32,
+    pub max_tokens: u32,
+    pub top_p: f32,
+}
+
 /// Read-only snapshot of current chaos state, cheaply cloneable.
 /// This is the ONLY communication channel between the chaos engine and the rest of GZMO.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -119,6 +127,24 @@ pub struct ChaosSnapshot {
 
     pub incubating_previews: Vec<String>,
 
+    // Self-improving loop telemetry (populated when integrated with gzmo-core)
+    #[serde(default)]
+    pub exploration_level: f64,
+    #[serde(default)]
+    pub pattern_state: String,
+    #[serde(default)]
+    pub diversity_score: f64,
+    #[serde(default)]
+    pub avg_latency_ms: u64,
+    #[serde(default)]
+    pub generation_count: u64,
+    #[serde(default)]
+    pub stuck_count: u64,
+    #[serde(default)]
+    pub escape_count: u64,
+    #[serde(default)]
+    pub modulation_effective: Option<bool>,
+
     // Timestamp for external observers
     pub timestamp: String,
 }
@@ -157,6 +183,14 @@ impl Default for ChaosSnapshot {
             llm_valence: 0.0,
             last_crystallization: None,
             incubating_previews: Vec::new(),
+            exploration_level: 0.0,
+            pattern_state: "novel".to_string(),
+            diversity_score: 0.0,
+            avg_latency_ms: 0,
+            generation_count: 0,
+            stuck_count: 0,
+            escape_count: 0,
+            modulation_effective: None,
             timestamp: String::new(),
         }
     }
@@ -608,6 +642,14 @@ impl PulseLoop {
                     .iter()
                     .map(|t| t.text_preview.clone())
                     .collect(),
+                exploration_level: 0.0,
+                pattern_state: "novel".to_string(),
+                diversity_score: 0.0,
+                avg_latency_ms: 0,
+                generation_count: 0,
+                stuck_count: 0,
+                escape_count: 0,
+                modulation_effective: None,
                 timestamp: chrono::Local::now().format("%H:%M:%S").to_string(),
             };
 

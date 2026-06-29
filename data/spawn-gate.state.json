@@ -1,57 +1,30 @@
 {
   "executions": [
     {
-      "at": "2026-06-26T08:53:49.545473899Z",
+      "at": "2026-06-29T13:11:01.148654284Z",
       "kind": "discovery_plan",
-      "reason_hash": 11065346780322469580,
-      "recommendation_id": "3c47e06c-1ed2-4fe4-b507-2cbf6f0502e4",
-      "session_id": "discovery-plan:session-final-2026-06-26T08-30-37Z",
-      "task_id": "33995164-29d5-489f-806b-1c685ce5e2c5",
+      "reason_hash": 16269195925952795750,
+      "recommendation_id": "9c3fc74c-7639-4abf-9127-b5e558c0de35",
+      "session_id": "discovery-plan:session-final-auto-low_tension-2026-06-27T06-17-46Z",
+      "task_id": "73e3f298-fde5-4959-9160-3359923174a3",
       "approved_via": "gzmo kurator plan-from-discovery"
     },
     {
-      "at": "2026-06-26T08:57:47.495260815Z",
+      "at": "2026-06-29T13:13:19.197778864Z",
       "kind": "discovery_plan",
-      "reason_hash": 11065346780322469580,
-      "recommendation_id": "b8b342e6-4e32-4303-9510-abe52058265f",
-      "session_id": "discovery-plan:session-final-2026-06-26T08-30-37Z",
-      "task_id": "78633702-bc5a-4913-b82c-7c1bd0adb456",
+      "reason_hash": 16269195925952795750,
+      "recommendation_id": "33e63f5f-ced6-460b-85fa-c41e1e9fb16d",
+      "session_id": "discovery-plan:session-final-auto-low_tension-2026-06-27T06-17-46Z",
+      "task_id": "71404ef8-f0bb-4472-b23d-48856eaa4a5e",
       "approved_via": "gzmo kurator plan-from-discovery"
     },
     {
-      "at": "2026-06-26T12:28:34.713635475Z",
+      "at": "2026-06-29T13:15:53.363749780Z",
       "kind": "discovery_plan",
-      "reason_hash": 8617337833520219127,
-      "recommendation_id": "42cd7c00-f994-418a-aaf3-ecb5fe39b14a",
-      "session_id": "discovery-plan:session-final-auto-pedagogy_oscillation-2026-06-26T12-13-59Z",
-      "task_id": "3bf09479-117b-433b-9c3b-c1d35fe204ec",
-      "approved_via": "gzmo kurator plan-from-discovery"
-    },
-    {
-      "at": "2026-06-26T12:44:21.053530756Z",
-      "kind": "discovery_plan",
-      "reason_hash": 12617721451335952668,
-      "recommendation_id": "61e3f88a-f72f-436e-a556-a76b69fa4a00",
-      "session_id": "discovery-plan:session-final-auto-pedagogy_oscillation-2026-06-26T12-29-42Z",
-      "task_id": "6b0de1ee-e088-45c7-b960-819daa7f9eaf",
-      "approved_via": "gzmo kurator plan-from-discovery"
-    },
-    {
-      "at": "2026-06-26T12:47:03.087660279Z",
-      "kind": "discovery_plan",
-      "reason_hash": 12617721451335952668,
-      "recommendation_id": "772b9eab-2fe4-49f7-95e3-2fde93364ef4",
-      "session_id": "discovery-plan:session-final-auto-pedagogy_oscillation-2026-06-26T12-29-42Z",
-      "task_id": "7b37258b-8d23-42c1-a95e-b88403f22282",
-      "approved_via": "gzmo kurator plan-from-discovery"
-    },
-    {
-      "at": "2026-06-26T13:01:34.268840045Z",
-      "kind": "discovery_plan",
-      "reason_hash": 12617721451335952668,
-      "recommendation_id": "1578b479-f523-4fa6-886e-6d2540f5c64d",
-      "session_id": "discovery-plan:session-final-auto-pedagogy_oscillation-2026-06-26T12-48-30Z",
-      "task_id": "532a0bba-49f9-4121-9e7c-21fdca34d4b7",
+      "reason_hash": 14084814588624423265,
+      "recommendation_id": "5ae6eabd-04ef-494d-b3f4-3348af80a4ec",
+      "session_id": "discovery-plan:session-final-auto-low_tension-2026-06-29T12-37-15Z",
+      "task_id": "ac0b3d75-8d14-47a0-b8ae-f7cfd2d0c306",
       "approved_via": "gzmo kurator plan-from-discovery"
     }
   ],

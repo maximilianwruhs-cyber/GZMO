@@ -267,7 +267,7 @@ pub fn ledger_session_tokens(
 }
 
 pub fn emit_obolus_denied(bus: &SynapseBus, action: ObolusAction, reason: &str) {
-    let _ = bus.append(&SynapseEvent::with_data(
+    bus.append(&SynapseEvent::with_data(
         EventType::ObolusDenied,
         EventSource::GzmoDaemon,
         serde_json::json!({
@@ -278,7 +278,7 @@ pub fn emit_obolus_denied(bus: &SynapseBus, action: ObolusAction, reason: &str) 
 }
 
 pub fn emit_obolus_warn(bus: &SynapseBus, action: ObolusAction, reason: &str) {
-    let _ = bus.append(&SynapseEvent::with_data(
+    bus.append(&SynapseEvent::with_data(
         EventType::ObolusWarn,
         EventSource::GzmoDaemon,
         serde_json::json!({
@@ -289,7 +289,7 @@ pub fn emit_obolus_warn(bus: &SynapseBus, action: ObolusAction, reason: &str) {
 }
 
 pub fn emit_budget_tick(bus: &SynapseBus, balance: &SystemBalance) {
-    let _ = bus.append(&SynapseEvent::with_data(
+    bus.append(&SynapseEvent::with_data(
         EventType::ObolusBudgetTick,
         EventSource::GzmoDaemon,
         serde_json::json!({
@@ -299,7 +299,7 @@ pub fn emit_budget_tick(bus: &SynapseBus, balance: &SystemBalance) {
 }
 
 pub fn emit_energy_tick(bus: &SynapseBus, balance: &SystemBalance) {
-    let _ = bus.append(&SynapseEvent::with_data(
+    bus.append(&SynapseEvent::with_data(
         EventType::ObolusEnergyTick,
         EventSource::GzmoDaemon,
         serde_json::json!({

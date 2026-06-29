@@ -84,7 +84,9 @@ pub fn load_state(path: &Path) -> KuratorMonitorState {
         .and_then(|raw| serde_json::from_str(&raw).ok())
         .unwrap_or_default();
     if compact_pending_recommendations(&mut state) > 0 {
-        let _ = save_state(path, &state);
+        if let Err(e) = save_state(path, &state) {
+            tracing::warn!(path = %path.display(), error = %e, "Failed to save compacted kurator monitor state");
+        }
     }
     state
 }

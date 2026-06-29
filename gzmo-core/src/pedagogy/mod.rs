@@ -8,6 +8,7 @@ pub mod learner;
 pub mod low_tension_opening;
 pub mod low_tension_persist;
 pub mod orchestrator;
+pub mod orchestrator_v2;
 pub mod session;
 pub mod trio;
 
@@ -25,5 +26,6 @@ pub use knowledge_snapshot::{
 pub use low_tension_opening::{build_opening, LowTensionOpening};
 pub use low_tension_persist::{persist_socratic_dialogue, prior_opening_hints};
 pub use orchestrator::{OrchestratorInput, OrchestratorOutput, PedagogyOrchestrator};
+pub use orchestrator_v2::{OrchestratorInputV2, OrchestratorOutputV2, SimplifiedOrchestrator};
 pub use session::PedagogySession;
 pub use trio::{TrioMode, TrioState};

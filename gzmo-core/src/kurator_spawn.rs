@@ -956,7 +956,10 @@ async fn spawn_discovery_fix_with_retries(
         }
     }
 
-    Ok(last_result.expect("discovery fix spawn produced no result"))
+    match last_result {
+        Some(result) => Ok(result),
+        None => Err(anyhow::anyhow!("discovery fix spawn produced no result - loop completed without any iteration"))
+    }
 }
 
 async fn spawn_with_remediation_loop(

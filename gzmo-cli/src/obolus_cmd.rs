@@ -350,7 +350,7 @@ pub async fn run(args: &[String], config: &GzmoConfig) -> Result<()> {
                 bail!("energy sampler disabled — set energy_sampler_enabled = true in [obolus_analytics]");
             }
             gzmo_core::obolus::energy_reconcile::sample_and_record_energy(config).await;
-            std::thread::sleep(std::time::Duration::from_millis(400));
+            tokio::time::sleep(std::time::Duration::from_millis(400)).await;
             let entries = load_power_entries(
                 config,
                 Utc::now() - Duration::minutes(5),

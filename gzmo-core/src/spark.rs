@@ -71,7 +71,8 @@ pub struct SparkEngine {
     synapse: Option<Arc<SynapseBus>>,
     /// Latest chaos snapshot for mood-aware hypothesis generation.
     /// Set by the daemon before each `run()` from the PulseLoop watch receiver.
-    chaos_snapshot: std::sync::Mutex<Option<gzmo_chaos::pulse::ChaosSnapshot>>,
+    /// Uses tokio RwLock to avoid blocking async runtime threads.
+    chaos_snapshot: tokio::sync::RwLock<Option<gzmo_chaos::pulse::ChaosSnapshot>>,
 }
 
 impl SparkEngine {
@@ -91,7 +92,7 @@ impl SparkEngine {
             tools,
             config,
             synapse,
-            chaos_snapshot: std::sync::Mutex::new(None),
+            chaos_snapshot: tokio::sync::RwLock::new(None),
         }
     }
 
@@ -113,7 +114,7 @@ impl SparkEngine {
             tools,
             config,
             synapse,
-            chaos_snapshot: std::sync::Mutex::new(None),
+            chaos_snapshot: tokio::sync::RwLock::new(None),
         }
     }
 
@@ -130,14 +131,14 @@ impl SparkEngine {
     }
 
     /// Set the latest chaos snapshot for mood-aware hypothesis generation.
-    pub fn set_chaos_snapshot(&self, snap: gzmo_chaos::pulse::ChaosSnapshot) {
-        *self.chaos_snapshot.lock().unwrap() = Some(snap);
+    pub async fn set_chaos_snapshot(&self, snap: gzmo_chaos::pulse::ChaosSnapshot) {
+        *self.chaos_snapshot.write().await = Some(snap);
     }
 
     /// Generate a chaos context string for the hypothesis system prompt.
     /// Returns empty string if no snapshot is available.
-    fn chaos_hypothesis_context(&self) -> String {
-        let snap = self.chaos_snapshot.lock().unwrap();
+    async fn chaos_hypothesis_context(&self) -> String {
+        let snap = self.chaos_snapshot.read().await;
         let Some(snap) = snap.as_ref() else {
             return String::new();
         };
@@ -193,13 +194,27 @@ impl SparkEngine {
             list = list.split_off(list.len() - max);
         }
         if let Some(parent) = path.parent() {
-            let _ = std::fs::create_dir_all(parent);
+            if let Err(e) = std::fs::create_dir_all(parent) {
+                warn!(path = %parent.display(), error = %e, "Failed to create denylist parent directory");
+                return;
+            }
         }
-        let _ = std::fs::write(&path, serde_json::to_string_pretty(&list).unwrap_or_else(|_| "[]".into()));
+        match serde_json::to_string_pretty(&list) {
+            Ok(json) => {
+                if let Err(e) = std::fs::write(&path, json) {
+                    warn!(path = %path.display(), error = %e, "Failed to write anchor denylist");
+                }
+            }
+            Err(e) => {
+                warn!(error = %e, "Failed to serialize anchor denylist");
+            }
+        }
     }
 
-    /// Number of denylist entries to retain (default 5).
-    const DENYLIST_SIZE: usize = 5;
+    /// Number of denylist entries to retain (increased from 5 to 20).
+    /// With 2 sparks/day, this prevents anchor recycling for ~10 days,
+    /// ensuring broader coverage before re-sparking the same anchor.
+    const DENYLIST_SIZE: usize = 20;
 
     fn emit_spark_complete(
         &self,
@@ -493,7 +508,7 @@ impl SparkEngine {
                     "5. Do NOT invent facts absent from the SOURCE. If nothing connects, set connection ",
                     "to empty string and what_to_remember to []."
                 )
-                .to_string() + &self.chaos_hypothesis_context(),
+                .to_string() + &self.chaos_hypothesis_context().await,
                 is_meta: false,
                 tool_calls: None,
                 tool_call_id: None,

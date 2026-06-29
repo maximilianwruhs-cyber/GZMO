@@ -35,6 +35,7 @@ pub mod feedback;
 pub mod feedback_ipc;
 pub mod pedagogy_oscillator;
 pub mod pulse;
+pub mod telemetry;
 pub mod triggers;
 
 // Re-exports for convenience

@@ -671,7 +671,8 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
                 }
             }
             // Inject latest chaos snapshot for mood-aware hypothesis generation
-            spark_engine_clone.set_chaos_snapshot(spark_snapshot_rx.borrow().clone());
+            let snap = spark_snapshot_rx.borrow().clone();
+            spark_engine_clone.set_chaos_snapshot(snap).await;
             match spark_engine_clone.run(today).await {
                 Ok(report) => {
                     if spark_config.schedule_mode == SparkScheduleMode::Cron {

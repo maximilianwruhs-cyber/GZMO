@@ -88,11 +88,15 @@ fn spark_lineage_for_distill(project_root: Option<&Path>) -> serde_json::Value {
 }
 
 /// Stable key for deduplicating archive-worker vs nightly-cron distill of the same transcript.
+/// Uses SHA-256 for collision resistance (128-bit security) vs DefaultHasher's 64-bit.
 pub fn distill_transcript_dedup_key(session_id: &str, transcript: &str) -> String {
-    let mut h = std::collections::hash_map::DefaultHasher::new();
-    session_id.hash(&mut h);
-    transcript.trim().hash(&mut h);
-    format!("{:016x}", h.finish())
+    use sha2::{Sha256, Digest};
+    let mut hasher = Sha256::new();
+    hasher.update(session_id.as_bytes());
+    hasher.update(transcript.trim().as_bytes());
+    let result = hasher.finalize();
+    // Convert SHA-256 result to hex string (256-bit collision resistance)
+    result.iter().map(|b| format!("{:02x}", b)).collect()
 }
 
 pub struct SessionDistillEngine {

@@ -761,7 +761,7 @@ impl WikiConfig {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize, Default)]
 #[serde(rename_all = "snake_case")]
 pub enum PedagogyDefaultMode {
-    /// Socratic mentor via internal 4-agent orchestrator.
+    /// Socratic mentor via internal 2-agent orchestrator (Evaluator + Tutor).
     #[default]
     Mentor,
     /// Direct execution (legacy ops daemon behavior).
@@ -1485,6 +1485,10 @@ fn default_spark_min_citation_chars() -> usize {
     12
 }
 
+fn default_spark_max_anchor_hub_degree() -> u32 {
+    8
+}
+
 fn default_spark_anchor_refresh_enabled() -> bool {
     true
 }
@@ -1515,6 +1519,7 @@ impl Default for SparkConfig {
             max_connection_chars: default_spark_max_connection_chars(),
             min_citation_chars: default_spark_min_citation_chars(),
             exclude_anchor_substrings: default_spark_exclude_anchor_substrings(),
+            max_anchor_hub_degree: default_spark_max_anchor_hub_degree(),
             anchor_decay_classes: default_spark_anchor_decay_classes(),
             anchor_min_stale_days: default_spark_anchor_min_stale_days(),
             anchor_max_stale_days: default_spark_anchor_max_stale_days(),

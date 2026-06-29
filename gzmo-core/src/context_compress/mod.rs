@@ -71,7 +71,10 @@ pub fn compress_for_context(
         CompressRoute::Json => {
             match compress_json(content, cfg.json_array_row_cap) {
                 Ok(json_str) => json_str,
-                Err(_) => content.to_string(),
+                Err(e) => {
+                    tracing::warn!(error = %e, "JSON compression failed, using original content");
+                    content.to_string()
+                }
             }
         }
         CompressRoute::Logs => compress_logs(content, cfg.log_line_cap),
@@ -156,7 +159,10 @@ pub async fn compress_for_context_with_ccr(
         CompressRoute::Json => {
             match compress_json(content, cfg.json_array_row_cap) {
                 Ok(json_str) => json_str,
-                Err(_) => content.to_string(),
+                Err(e) => {
+                    tracing::warn!(error = %e, "JSON compression failed, using original content");
+                    content.to_string()
+                }
             }
         }
         CompressRoute::Logs => compress_logs(content, cfg.log_line_cap),
