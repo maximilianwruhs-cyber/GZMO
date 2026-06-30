@@ -155,6 +155,11 @@ pub trait LlmGateway: Send + Sync {
         None
     }
 
+    /// Wall-clock latency of the most recent successful inference (if supported).
+    fn take_last_latency_ms(&self) -> Option<u64> {
+        None
+    }
+
     /// Unstructured completion with optional per-call temperature / top_p overrides.
     async fn complete_with_persona(
         &self,
@@ -188,6 +193,7 @@ pub struct TurboQuantGateway {
     chaos_max_tokens: std::sync::atomic::AtomicU32,
     chaos_active: std::sync::atomic::AtomicBool,
     last_usage: std::sync::Mutex<Option<TokenUsage>>,
+    last_latency_ms: std::sync::Mutex<Option<u64>>,
 }
 
 // ── OpenAI-compatible request types ──────────────────────────────────
@@ -358,6 +364,14 @@ impl TurboQuantGateway {
             chaos_max_tokens: std::sync::atomic::AtomicU32::new(0),
             chaos_active: std::sync::atomic::AtomicBool::new(false),
             last_usage: std::sync::Mutex::new(None),
+            last_latency_ms: std::sync::Mutex::new(None),
+        }
+    }
+
+    fn store_latency_ms(&self, latency_ms: u64) {
+        match self.last_latency_ms.lock() {
+            Ok(mut guard) => *guard = Some(latency_ms),
+            Err(e) => tracing::warn!(error = %e, "Failed to lock last_latency_ms mutex"),
         }
     }
 
@@ -505,9 +519,10 @@ impl LlmGateway for TurboQuantGateway {
         messages: &[Message],
         tools: &[ToolDeclaration],
     ) -> Result<LlmResponse> {
+        let started = std::time::Instant::now();
         let has_tools = !tools.is_empty();
 
-        let (reasoning_format, chat_template_kwargs) = thinking_request_fields();
+        let (reasoning_format, chat_template_kwargs) = no_thinking_request_fields();
         let body = ChatRequest {
             model: &self.config.model,
             messages: Self::to_chat_messages(messages),
@@ -547,6 +562,20 @@ impl LlmGateway for TurboQuantGateway {
 
         let chat_resp: ChatResponse = resp.json().await?;
         self.store_usage(chat_resp.usage.as_ref());
+        let latency_ms = started.elapsed().as_millis() as u64;
+        self.store_latency_ms(latency_ms);
+        if let Some(ref usage) = chat_resp.usage {
+            tracing::info!(
+                target: "gzmo::gateway",
+                model = %self.config.model,
+                latency_ms,
+                input_tokens = usage.prompt_tokens,
+                output_tokens = usage.completion_tokens,
+                total_tokens = usage.total_tokens,
+                streaming = false,
+                "LLM call complete"
+            );
+        }
         let choice = chat_resp
             .choices
             .into_iter()
@@ -597,8 +626,9 @@ impl LlmGateway for TurboQuantGateway {
         use futures_util::StreamExt;
         use reqwest_eventsource::{Event, EventSource};
 
+        let started = std::time::Instant::now();
         let has_tools = !tools.is_empty();
-        let (reasoning_format, chat_template_kwargs) = thinking_request_fields();
+        let (reasoning_format, chat_template_kwargs) = no_thinking_request_fields();
 
         // Build the same request body but with stream: true
         let body = StreamChatRequest {
@@ -709,6 +739,23 @@ impl LlmGateway for TurboQuantGateway {
         }
         es.close();
 
+        let latency_ms = started.elapsed().as_millis() as u64;
+        self.store_latency_ms(latency_ms);
+        if let Ok(guard) = self.last_usage.lock() {
+            if let Some(ref usage) = *guard {
+                tracing::info!(
+                    target: "gzmo::gateway",
+                    model = %self.config.model,
+                    latency_ms,
+                    input_tokens = usage.input_tokens,
+                    output_tokens = usage.output_tokens,
+                    total_tokens = usage.total_tokens,
+                    streaming = true,
+                    "LLM call complete"
+                );
+            }
+        }
+
         // Determine response type
         let has_tool_calls = !tool_map.is_empty();
         let is_tool_finish = finish_reason.as_deref() == Some("tool_calls");
@@ -783,6 +830,16 @@ impl LlmGateway for TurboQuantGateway {
             Ok(mut guard) => guard.take(),
             Err(e) => {
                 tracing::warn!(error = %e, "Failed to lock last_usage mutex in take_last_usage");
+                None
+            }
+        }
+    }
+
+    fn take_last_latency_ms(&self) -> Option<u64> {
+        match self.last_latency_ms.lock() {
+            Ok(mut guard) => guard.take(),
+            Err(e) => {
+                tracing::warn!(error = %e, "Failed to lock last_latency_ms mutex in take_last_latency_ms");
                 None
             }
         }
@@ -1002,15 +1059,9 @@ pub fn assistant_visible_text(content: Option<String>, reasoning_content: Option
     reasoning_content.unwrap_or_default()
 }
 
-fn thinking_request_fields() -> (&'static str, serde_json::Value) {
-    (
-        "auto",
-        serde_json::json!({ "enable_thinking": true }),
-    )
-}
-
-/// Structured JSON schema calls keep thinking off — reasoning can exhaust the
-/// output budget and `reasoning_format` + `json_schema` can 400 on llama-server.
+/// All unstructured completions (chat, skills, mentor) keep thinking off.
+/// Gemma 4 with enable_thinking spends the output budget on reasoning_content
+/// and often never emits visible skill/report output.
 fn no_thinking_request_fields() -> (&'static str, serde_json::Value) {
     (
         "none",
@@ -1246,6 +1297,15 @@ impl LlmGateway for FallbackGateway {
         for (_, gw) in &self.backends {
             if let Some(u) = gw.take_last_usage() {
                 return Some(u);
+            }
+        }
+        None
+    }
+
+    fn take_last_latency_ms(&self) -> Option<u64> {
+        for (_, gw) in &self.backends {
+            if let Some(ms) = gw.take_last_latency_ms() {
+                return Some(ms);
             }
         }
         None

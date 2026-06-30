@@ -253,4 +253,8 @@ impl LlmGateway for InstrumentedGateway {
     fn take_last_usage(&self) -> Option<TokenUsage> {
         self.inner.take_last_usage()
     }
+
+    fn take_last_latency_ms(&self) -> Option<u64> {
+        self.inner.take_last_latency_ms()
+    }
 }

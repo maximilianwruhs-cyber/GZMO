@@ -45,8 +45,19 @@ impl Skill for CardSkill {
         let data_dir = data_dir_from_skills(ctx.skills_dir);
         let snap_seed = load_live_chaos_snapshot(&data_dir, ctx.chaos);
 
+        let forge_path = ctx.skills_dir.join("cardforge.toml");
         let cardforge = load_cardforge(ctx.skills_dir).ok_or_else(|| {
-            anyhow::anyhow!("cardforge.toml missing under skills/ — Card Forge cannot run")
+            if forge_path.is_file() {
+                anyhow::anyhow!(
+                    "cardforge.toml at {} exists but failed to parse — restore from git or fix TOML",
+                    forge_path.display()
+                )
+            } else {
+                anyhow::anyhow!(
+                    "cardforge.toml not found at {} — Card Forge cannot run",
+                    forge_path.display()
+                )
+            }
         })?;
 
         let card_type = match resolve_card_type(&cardforge, ctx.args, &snap_seed) {

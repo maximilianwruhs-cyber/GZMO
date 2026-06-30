@@ -26,7 +26,150 @@
       "session_id": "discovery-plan:session-final-auto-low_tension-2026-06-29T12-37-15Z",
       "task_id": "ac0b3d75-8d14-47a0-b8ae-f7cfd2d0c306",
       "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-06-29T15:01:36.396275046Z",
+      "kind": "discovery_plan",
+      "reason_hash": 619595797633535012,
+      "recommendation_id": "ec8ab40c-733e-40b2-82bf-8deab3f81290",
+      "session_id": "discovery-plan:session-final-2026-06-29T14-34-13Z",
+      "task_id": "9ba397ec-f125-45f9-aa60-eb5045a61891",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-06-29T15:02:31.224204690Z",
+      "kind": "discovery_plan",
+      "reason_hash": 619595797633535012,
+      "recommendation_id": "e54bec19-c0a8-4a75-bab4-f84cc22a062d",
+      "session_id": "discovery-plan:session-final-2026-06-29T14-34-13Z",
+      "task_id": "b33dff85-7d85-48b6-b973-0cf9794f7069",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-06-29T15:03:18.144831208Z",
+      "kind": "discovery_plan",
+      "reason_hash": 619595797633535012,
+      "recommendation_id": "759247e7-5419-4060-a15d-979b3618fc38",
+      "session_id": "discovery-plan:session-final-2026-06-29T14-34-13Z",
+      "task_id": "c9278eeb-1fb6-473c-8709-7123d50d28c8",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-06-29T15:05:27.456077325Z",
+      "kind": "discovery_plan",
+      "reason_hash": 619595797633535012,
+      "recommendation_id": "a58e75c9-ed4a-4cb0-bc20-681e6adcb515",
+      "session_id": "discovery-plan:session-final-2026-06-29T14-34-13Z",
+      "task_id": "c7dcc968-91af-4639-a2c0-0d5276dc3519",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-06-29T15:06:29.478839371Z",
+      "kind": "discovery_plan",
+      "reason_hash": 619595797633535012,
+      "recommendation_id": "ea646645-8b06-45b0-a703-6ed1f569f8cf",
+      "session_id": "discovery-plan:session-final-2026-06-29T14-34-13Z",
+      "task_id": "e743a2e2-8978-429b-ae97-0573ae710212",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-06-29T15:08:32.581406769Z",
+      "kind": "discovery_plan",
+      "reason_hash": 619595797633535012,
+      "recommendation_id": "da05f2ef-5578-47a9-a122-503bca0a80d6",
+      "session_id": "discovery-plan:session-final-2026-06-29T14-34-13Z",
+      "task_id": "8972577c-aae0-4a4f-bffb-307632703a6d",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-06-29T16:17:46.508317754Z",
+      "kind": "discovery_plan",
+      "reason_hash": 619595797633535012,
+      "recommendation_id": "dcc15082-a545-465a-9ff1-e50c510b0968",
+      "session_id": "discovery-plan:session-final-2026-06-29T14-34-13Z",
+      "task_id": "521eb65c-4f7a-4145-80b3-a2d8b21dd52a",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-06-29T16:19:24.998164266Z",
+      "kind": "discovery_plan",
+      "reason_hash": 619595797633535012,
+      "recommendation_id": "4c7764bc-767c-4708-9a60-a3405b508cbd",
+      "session_id": "discovery-plan:session-final-2026-06-29T14-34-13Z",
+      "task_id": "eccee670-0d87-42ed-8e9e-2dea5bfac48c",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-06-29T16:20:25.400391222Z",
+      "kind": "discovery_plan",
+      "reason_hash": 619595797633535012,
+      "recommendation_id": "f0703e08-80c3-45bc-8d5d-0c24a4f0b07d",
+      "session_id": "discovery-plan:session-final-2026-06-29T14-34-13Z",
+      "task_id": "d94b7b96-e77d-4026-8752-3058f399deda",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-06-29T16:22:23.205999889Z",
+      "kind": "discovery_plan",
+      "reason_hash": 619595797633535012,
+      "recommendation_id": "3bf86266-98cd-47ee-b17a-db61e0f41d3d",
+      "session_id": "discovery-plan:session-final-2026-06-29T14-34-13Z",
+      "task_id": "81a89342-f5dd-421f-ac54-2d6e9b8d0329",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-06-29T16:23:29.382802427Z",
+      "kind": "discovery_plan",
+      "reason_hash": 619595797633535012,
+      "recommendation_id": "ca2956cc-9808-4651-9872-65db4062e611",
+      "session_id": "discovery-plan:session-final-2026-06-29T14-34-13Z",
+      "task_id": "c88ceea1-4f12-414a-9038-fbaea23dd7a1",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-06-30T04:45:08.223784744Z",
+      "kind": "discovery_plan",
+      "reason_hash": 619595797633535012,
+      "recommendation_id": "47a718d6-3104-4137-b34a-9b578cd43102",
+      "session_id": "discovery-plan:session-final-2026-06-29T14-34-13Z",
+      "task_id": "471719bb-9263-415d-8666-92dce1efe781",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-06-30T04:48:39.536354876Z",
+      "kind": "discovery_plan",
+      "reason_hash": 619595797633535012,
+      "recommendation_id": "ff2423c2-df8a-49d4-af91-574d93dd4921",
+      "session_id": "discovery-plan:session-final-2026-06-29T14-34-13Z",
+      "task_id": "fb6a7c24-8651-427c-aa95-2d2fde88ed40",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-06-30T04:54:21.357250105Z",
+      "kind": "discovery_plan",
+      "reason_hash": 619595797633535012,
+      "recommendation_id": "aa4e36a8-be67-463a-87ca-5d1215d511fd",
+      "session_id": "discovery-plan:session-final-2026-06-29T14-34-13Z",
+      "task_id": "49decbe7-4069-441d-acd3-c6b9b150d455",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-06-30T04:58:46.335723678Z",
+      "kind": "discovery_plan",
+      "reason_hash": 6786400249779170477,
+      "recommendation_id": "46100538-7fb5-4425-83ed-ca0fe686e5eb",
+      "session_id": "discovery-plan:session-final-auto-low_tension-2026-06-30T04-38-33Z",
+      "task_id": "6eaaa632-c4a8-46cb-a9f3-0f9bfa0104b5",
+      "approved_via": "gzmo kurator plan-from-discovery"
     }
   ],
-  "denials": []
+  "denials": [
+    {
+      "at": "2026-06-29T17:53:49.344810324Z",
+      "kind": "session_triage",
+      "reason": "prometheus_requires_idle: session_triage blocked while discovery_fix pending or in cooldown",
+      "recommendation_id": "f8894c40-a195-4a72-87f2-a10086bddbf9",
+      "session_id": "e25de685-50d9-4390-b6c9-400d951b7791"
+    }
+  ]
 }
