@@ -260,6 +260,24 @@
       "session_id": "discovery-plan:session-final-auto-low_tension-2026-07-01T06-50-39Z",
       "task_id": "1a23342f-efba-4a1c-826c-9a8c63aa0667",
       "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-07-01T09:14:06.583663550Z",
+      "kind": "discovery_plan",
+      "reason_hash": 16269195925952795750,
+      "recommendation_id": "db0d47a8-b03f-4aaf-b205-219fcbb3cb12",
+      "session_id": "discovery-plan:session-final-2026-07-01T08-34-10Z",
+      "task_id": "718a8c67-abe4-4704-ab98-77281f5f73a7",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-07-01T09:15:15.362363355Z",
+      "kind": "discovery_plan",
+      "reason_hash": 16269195925952795750,
+      "recommendation_id": "c5c7c0e7-d149-42d9-93fa-c7c88ed455eb",
+      "session_id": "discovery-plan:session-final-2026-07-01T08-34-10Z",
+      "task_id": "39f27741-5e55-4675-a053-0e4d6b9edeb4",
+      "approved_via": "gzmo kurator plan-from-discovery"
     }
   ],
   "denials": [
@@ -311,6 +329,20 @@
       "reason": "prometheus_requires_idle: session_triage blocked while discovery_fix pending or in cooldown",
       "recommendation_id": "ada3d10c-c697-4d8e-bf8e-4cfc44fed6c5",
       "session_id": "9d7ba72e-4033-4558-80bf-e7bf7a22274f"
+    },
+    {
+      "at": "2026-07-01T12:26:55.082776298Z",
+      "kind": "session_triage",
+      "reason": "prometheus_requires_idle: session_triage blocked while discovery_fix pending or in cooldown",
+      "recommendation_id": "48afd023-8f47-437e-8770-607d7ecdbd3b",
+      "session_id": "5f7ed456-98cf-473c-8b89-fadf2e9cc11b"
+    },
+    {
+      "at": "2026-07-01T12:58:59.966993722Z",
+      "kind": "session_triage",
+      "reason": "prometheus_requires_idle: session_triage blocked while discovery_fix pending or in cooldown",
+      "recommendation_id": "3bb66330-5a29-488f-a267-38df5fee947d",
+      "session_id": "acfa8077-c41d-43e5-9de1-d6b07449cc1e"
     }
   ]
 }
