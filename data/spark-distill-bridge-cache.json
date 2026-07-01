@@ -1,50 +1,8 @@
 {
-  "updated_at": "2026-07-01T06:34:04.576691709+00:00",
+  "updated_at": "2026-07-01T09:08:53.152762300+00:00",
   "sparks": [
     {
       "event_type": "spark_complete",
-      "id": "bf63e6de-3e9d-4748-b362-1689546b1a29",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-23T04:32:17.949931011+00:00",
-      "data": {
-        "anchor_id": "c6ff4588-e725-4354-99e0-7e39e181ef2f",
-        "cognition_source": "honeypot",
-        "date": "2026-06-23",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "5a7e6b69-a268-430d-a73f-09cf29b8443b",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-23T05:25:22.935189912+00:00",
-      "data": {
-        "anchor_id": "c6ff4588-e725-4354-99e0-7e39e181ef2f",
-        "cognition_source": "honeypot",
-        "date": "2026-06-23",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "e7a5e56e-f170-48d8-9b95-d945dd973fc1",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-23T08:28:43.969727512+00:00",
-      "data": {
-        "cognition_source": "honeypot",
-        "date": "2026-06-23",
-        "kg_relations_written": 0,
-        "memory_layer": "honeypot",
-        "promoted": false,
-        "skip_reason": "Hypothesis generation failed: error sending request for url (http://localhost:8000/v1/chat/completions)"
-      }
-    },
-    {
-      "event_type": "spark_complete",
       "id": "f97ba541-24da-4a82-add0-3549d2ec931f",
       "source": "GzmoDaemon",
       "timestamp": "2026-06-23T08:32:29.645035817+00:00",
@@ -755,6 +713,20 @@
         "memory_layer": "honeypot",
         "promoted": false,
         "skip_reason": "No curated anchor/recent pair passed smart selection (check vault ingest and [spark] gates)."
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "cdd62dd2-5b1a-43f9-a8e7-75631c296b1e",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-07-01T06:53:59.601445193+00:00",
+      "data": {
+        "anchor_id": "da72f332-5deb-4cae-9364-1dabbdddc42b",
+        "cognition_source": "honeypot",
+        "date": "2026-07-01",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
       }
     },
     {
@@ -1781,6 +1753,20 @@
     },
     {
       "event_type": "spark_complete",
+      "id": "cdd62dd2-5b1a-43f9-a8e7-75631c296b1e",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-07-01T06:53:59.601445193+00:00",
+      "data": {
+        "anchor_id": "da72f332-5deb-4cae-9364-1dabbdddc42b",
+        "cognition_source": "honeypot",
+        "date": "2026-07-01",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
       "id": "84896fca-b12e-4715-9fb6-92c9997f5d54",
       "source": "GzmoDaemon",
       "timestamp": "2026-06-20T15:58:50.236112926+00:00",
@@ -2799,6 +2785,20 @@
         "memory_layer": "honeypot",
         "promoted": false,
         "skip_reason": "No curated anchor/recent pair passed smart selection (check vault ingest and [spark] gates)."
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "cdd62dd2-5b1a-43f9-a8e7-75631c296b1e",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-07-01T06:53:59.601445193+00:00",
+      "data": {
+        "anchor_id": "da72f332-5deb-4cae-9364-1dabbdddc42b",
+        "cognition_source": "honeypot",
+        "date": "2026-07-01",
+        "kg_relations_written": 1,
+        "memory_layer": "honeypot",
+        "promoted": true
       }
     }
   ]

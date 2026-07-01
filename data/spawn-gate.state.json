@@ -224,6 +224,42 @@
       "session_id": "discovery-plan:session-final-auto-low_tension-2026-06-30T09-30-10Z",
       "task_id": "7f6dad10-81b4-46d4-8d62-549bfd612b75",
       "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-07-01T09:02:55.950021971Z",
+      "kind": "discovery_plan",
+      "reason_hash": 8617337833520219127,
+      "recommendation_id": "d86c9a13-158e-4862-a7a8-604293c12195",
+      "session_id": "discovery-plan:session-final-auto-low_tension-2026-07-01T06-50-39Z",
+      "task_id": "a46d61f6-12fb-4ab6-9f98-d4261c78901e",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-07-01T09:05:13.320681761Z",
+      "kind": "discovery_plan",
+      "reason_hash": 8617337833520219127,
+      "recommendation_id": "f8e0bb9c-16a8-4545-99b5-5c8b58823afc",
+      "session_id": "discovery-plan:session-final-auto-low_tension-2026-07-01T06-50-39Z",
+      "task_id": "3412103d-bb8b-49f4-a011-0a43f86cdf07",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-07-01T09:06:19.210615854Z",
+      "kind": "discovery_plan",
+      "reason_hash": 8617337833520219127,
+      "recommendation_id": "a70e37e7-fc42-4b1c-8d42-5715b67b8ed2",
+      "session_id": "discovery-plan:session-final-auto-low_tension-2026-07-01T06-50-39Z",
+      "task_id": "f46cd1bd-e61e-4536-bdb6-f15349998861",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-07-01T09:08:45.911859713Z",
+      "kind": "discovery_plan",
+      "reason_hash": 8617337833520219127,
+      "recommendation_id": "373e3d3f-f9cb-42a9-8ff7-d62b3e81573c",
+      "session_id": "discovery-plan:session-final-auto-low_tension-2026-07-01T06-50-39Z",
+      "task_id": "1a23342f-efba-4a1c-826c-9a8c63aa0667",
+      "approved_via": "gzmo kurator plan-from-discovery"
     }
   ],
   "denials": [
@@ -247,6 +283,34 @@
       "reason": "max_autospawns_per_hour: hourly autospawn budget exhausted (5/3)",
       "recommendation_id": "a6b02b2d-7733-449a-84ac-0cbfe85d1347",
       "session_id": "37ea845d-f984-461d-8814-b270fedc5209"
+    },
+    {
+      "at": "2026-07-01T07:06:54.961053947Z",
+      "kind": "session_triage",
+      "reason": "prometheus_requires_idle: session_triage blocked while discovery_fix pending or in cooldown",
+      "recommendation_id": "6f3e8dae-ec1c-4c1f-8f19-6f8122dbb3d8",
+      "session_id": "a16b2a24-a333-4839-8da7-23e966819166"
+    },
+    {
+      "at": "2026-07-01T07:52:54.987552642Z",
+      "kind": "session_triage",
+      "reason": "prometheus_requires_idle: session_triage blocked while discovery_fix pending or in cooldown",
+      "recommendation_id": "678f6f1d-0985-4a84-b16b-5fee8cd9f505",
+      "session_id": "528dfddd-3ee9-4a57-b551-40b49765976f"
+    },
+    {
+      "at": "2026-07-01T08:39:55.018354867Z",
+      "kind": "session_triage",
+      "reason": "prometheus_requires_idle: session_triage blocked while discovery_fix pending or in cooldown",
+      "recommendation_id": "b35b56de-ead1-4101-8d8c-2fbf4270605b",
+      "session_id": "d1a820bd-c205-43a3-a308-52a25f419708"
+    },
+    {
+      "at": "2026-07-01T08:52:55.056049698Z",
+      "kind": "session_triage",
+      "reason": "prometheus_requires_idle: session_triage blocked while discovery_fix pending or in cooldown",
+      "recommendation_id": "ada3d10c-c697-4d8e-bf8e-4cfc44fed6c5",
+      "session_id": "9d7ba72e-4033-4558-80bf-e7bf7a22274f"
     }
   ]
 }

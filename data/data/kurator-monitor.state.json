@@ -6,7 +6,7 @@
       "turn_count": 0,
       "skill_errors": 0,
       "skill_invokes": 0,
-      "dice_loops_seen": 60
+      "dice_loops_seen": 63
     }
   },
   "recommendations_emitted": 2,
