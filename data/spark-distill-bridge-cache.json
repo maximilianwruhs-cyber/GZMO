@@ -1,260 +1,8 @@
 {
-  "updated_at": "2026-06-30T04:58:33.418967720+00:00",
+  "updated_at": "2026-07-01T06:32:04.571691071+00:00",
   "sparks": [
     {
       "event_type": "spark_complete",
-      "id": "34a00c15-25f8-49b3-9920-a51155a8b064",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-21T04:12:41.037613016+00:00",
-      "data": {
-        "cognition_source": "honeypot",
-        "date": "2026-06-21",
-        "kg_relations_written": 0,
-        "memory_layer": "honeypot",
-        "promoted": false,
-        "skip_reason": "No curated anchor/recent pair passed smart selection (check vault ingest and [spark] gates)."
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "7346c54a-7f51-457e-b787-84efbfd80674",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-21T08:02:49.359097294+00:00",
-      "data": {
-        "anchor_id": "ae01eb74-32ab-4b60-86c3-a7f788b21af1",
-        "cognition_source": "honeypot",
-        "date": "2026-06-21",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "8094ad95-4edd-44a0-ba8c-fb854c25d43a",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-21T08:22:52.638335170+00:00",
-      "data": {
-        "anchor_id": "ae01eb74-32ab-4b60-86c3-a7f788b21af1",
-        "cognition_source": "honeypot",
-        "date": "2026-06-21",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "2d41bcfe-6d7d-4026-8216-b20e98c2b23e",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-21T09:12:55.639758335+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-21",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "c9ef5a5f-bbeb-406c-ace6-47f741fd243b",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-21T09:45:06.645064922+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-21",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "44c3b91b-fefd-4a0b-857b-ce02432aac55",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-21T10:39:46.632518313+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-21",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "1e2d5bd2-f486-471b-95cd-3315ecc78a5c",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-21T11:14:02.186752233+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-21",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "69dbcb7e-459a-40e4-bec6-12d4943debb7",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-21T11:37:59.006248747+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-21",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "0285e408-bb12-42d6-a0bc-44be7a3884a9",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-21T12:17:54.898848842+00:00",
-      "data": {
-        "anchor_id": "f627076f-11ba-4d7d-b55f-a2b10ef23d2e",
-        "cognition_source": "honeypot",
-        "date": "2026-06-21",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "7d7c2b61-9bb0-4dd3-a04e-e9bbe06e91c7",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-22T04:57:59.434812610+00:00",
-      "data": {
-        "anchor_id": "c6ff4588-e725-4354-99e0-7e39e181ef2f",
-        "cognition_source": "honeypot",
-        "date": "2026-06-22",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "6a6e03c1-b067-4563-ba40-6f3c1e54b8b6",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-22T05:30:58.187965927+00:00",
-      "data": {
-        "anchor_id": "c6ff4588-e725-4354-99e0-7e39e181ef2f",
-        "cognition_source": "honeypot",
-        "date": "2026-06-22",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "6477827e-1ef1-416b-9f97-3d6ceded1aa1",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-22T12:56:55.187020965+00:00",
-      "data": {
-        "anchor_id": "c6ff4588-e725-4354-99e0-7e39e181ef2f",
-        "cognition_source": "honeypot",
-        "date": "2026-06-22",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "56e1c6a6-9935-43dd-a21e-dd18b4894f1e",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-22T13:26:47.250646263+00:00",
-      "data": {
-        "anchor_id": "c6ff4588-e725-4354-99e0-7e39e181ef2f",
-        "cognition_source": "honeypot",
-        "date": "2026-06-22",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "023fa7b6-317c-4aad-a3ef-3024f00e606b",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-22T20:57:52.262574391+00:00",
-      "data": {
-        "anchor_id": "c6ff4588-e725-4354-99e0-7e39e181ef2f",
-        "cognition_source": "honeypot",
-        "date": "2026-06-22",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "60c80b61-d913-49e4-b89b-f6277e85cf96",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-22T22:09:32.404987643+00:00",
-      "data": {
-        "anchor_id": "c6ff4588-e725-4354-99e0-7e39e181ef2f",
-        "cognition_source": "honeypot",
-        "date": "2026-06-22",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "f41f48e3-891f-4605-b2b5-e6091893148a",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-22T22:31:37.335893900+00:00",
-      "data": {
-        "anchor_id": "c6ff4588-e725-4354-99e0-7e39e181ef2f",
-        "cognition_source": "honeypot",
-        "date": "2026-06-22",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "4cd4cd08-5b77-4e46-a267-89678011ac4e",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-23T03:30:17.712269197+00:00",
-      "data": {
-        "anchor_id": "c6ff4588-e725-4354-99e0-7e39e181ef2f",
-        "cognition_source": "honeypot",
-        "date": "2026-06-23",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
-      "id": "33e9515c-d732-4157-a3ea-733059d28e05",
-      "source": "GzmoDaemon",
-      "timestamp": "2026-06-23T04:17:52.112935874+00:00",
-      "data": {
-        "anchor_id": "c6ff4588-e725-4354-99e0-7e39e181ef2f",
-        "cognition_source": "honeypot",
-        "date": "2026-06-23",
-        "kg_relations_written": 1,
-        "memory_layer": "honeypot",
-        "promoted": true
-      }
-    },
-    {
-      "event_type": "spark_complete",
       "id": "bf63e6de-3e9d-4748-b362-1689546b1a29",
       "source": "GzmoDaemon",
       "timestamp": "2026-06-23T04:32:17.949931011+00:00",
@@ -923,6 +671,90 @@
         "kg_relations_written": 1,
         "memory_layer": "honeypot",
         "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "3da5290c-890b-4f51-b14a-d0c431bf2c78",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-30T05:01:35.064123330+00:00",
+      "data": {
+        "anchor_id": "5bcc30d8-5b3e-46e6-9768-1c5860c487a7",
+        "cognition_source": "honeypot",
+        "date": "2026-06-30",
+        "kg_relations_written": 0,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "fdf2d53b-e09f-4b85-856a-477bbd866c98",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-30T07:39:54.616744655+00:00",
+      "data": {
+        "anchor_id": "ce7f6560-b5fe-42f3-b844-b7e349b3c7b9",
+        "cognition_source": "honeypot",
+        "date": "2026-06-30",
+        "kg_relations_written": 0,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "4dcad98f-6d5d-4ddb-a533-08ed097a10ba",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-30T08:35:23.550645471+00:00",
+      "data": {
+        "cognition_source": "honeypot",
+        "date": "2026-06-30",
+        "kg_relations_written": 0,
+        "memory_layer": "honeypot",
+        "promoted": false,
+        "skip_reason": "No curated anchor/recent pair passed smart selection (check vault ingest and [spark] gates)."
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "0e6f25bf-e0c9-4e12-abab-fdca12d7ff7d",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-30T08:38:50.119752614+00:00",
+      "data": {
+        "cognition_source": "honeypot",
+        "date": "2026-06-30",
+        "kg_relations_written": 0,
+        "memory_layer": "honeypot",
+        "promoted": false,
+        "skip_reason": "No curated anchor/recent pair passed smart selection (check vault ingest and [spark] gates)."
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "0546000c-0e69-4523-ad98-29aafff1e19e",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-30T09:51:39.437493399+00:00",
+      "data": {
+        "cognition_source": "honeypot",
+        "date": "2026-06-30",
+        "kg_relations_written": 0,
+        "memory_layer": "honeypot",
+        "promoted": false,
+        "skip_reason": "No curated anchor/recent pair passed smart selection (check vault ingest and [spark] gates)."
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "f120660a-0817-4e62-81cd-f0fe808e2265",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-07-01T06:08:06.105029471+00:00",
+      "data": {
+        "cognition_source": "honeypot",
+        "date": "2026-07-01",
+        "kg_relations_written": 0,
+        "memory_layer": "honeypot",
+        "promoted": false,
+        "skip_reason": "No curated anchor/recent pair passed smart selection (check vault ingest and [spark] gates)."
       }
     },
     {
@@ -1865,6 +1697,90 @@
     },
     {
       "event_type": "spark_complete",
+      "id": "3da5290c-890b-4f51-b14a-d0c431bf2c78",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-30T05:01:35.064123330+00:00",
+      "data": {
+        "anchor_id": "5bcc30d8-5b3e-46e6-9768-1c5860c487a7",
+        "cognition_source": "honeypot",
+        "date": "2026-06-30",
+        "kg_relations_written": 0,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "fdf2d53b-e09f-4b85-856a-477bbd866c98",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-30T07:39:54.616744655+00:00",
+      "data": {
+        "anchor_id": "ce7f6560-b5fe-42f3-b844-b7e349b3c7b9",
+        "cognition_source": "honeypot",
+        "date": "2026-06-30",
+        "kg_relations_written": 0,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "4dcad98f-6d5d-4ddb-a533-08ed097a10ba",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-30T08:35:23.550645471+00:00",
+      "data": {
+        "cognition_source": "honeypot",
+        "date": "2026-06-30",
+        "kg_relations_written": 0,
+        "memory_layer": "honeypot",
+        "promoted": false,
+        "skip_reason": "No curated anchor/recent pair passed smart selection (check vault ingest and [spark] gates)."
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "0e6f25bf-e0c9-4e12-abab-fdca12d7ff7d",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-30T08:38:50.119752614+00:00",
+      "data": {
+        "cognition_source": "honeypot",
+        "date": "2026-06-30",
+        "kg_relations_written": 0,
+        "memory_layer": "honeypot",
+        "promoted": false,
+        "skip_reason": "No curated anchor/recent pair passed smart selection (check vault ingest and [spark] gates)."
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "0546000c-0e69-4523-ad98-29aafff1e19e",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-30T09:51:39.437493399+00:00",
+      "data": {
+        "cognition_source": "honeypot",
+        "date": "2026-06-30",
+        "kg_relations_written": 0,
+        "memory_layer": "honeypot",
+        "promoted": false,
+        "skip_reason": "No curated anchor/recent pair passed smart selection (check vault ingest and [spark] gates)."
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "f120660a-0817-4e62-81cd-f0fe808e2265",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-07-01T06:08:06.105029471+00:00",
+      "data": {
+        "cognition_source": "honeypot",
+        "date": "2026-07-01",
+        "kg_relations_written": 0,
+        "memory_layer": "honeypot",
+        "promoted": false,
+        "skip_reason": "No curated anchor/recent pair passed smart selection (check vault ingest and [spark] gates)."
+      }
+    },
+    {
+      "event_type": "spark_complete",
       "id": "84896fca-b12e-4715-9fb6-92c9997f5d54",
       "source": "GzmoDaemon",
       "timestamp": "2026-06-20T15:58:50.236112926+00:00",
@@ -2799,6 +2715,90 @@
         "kg_relations_written": 1,
         "memory_layer": "honeypot",
         "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "3da5290c-890b-4f51-b14a-d0c431bf2c78",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-30T05:01:35.064123330+00:00",
+      "data": {
+        "anchor_id": "5bcc30d8-5b3e-46e6-9768-1c5860c487a7",
+        "cognition_source": "honeypot",
+        "date": "2026-06-30",
+        "kg_relations_written": 0,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "fdf2d53b-e09f-4b85-856a-477bbd866c98",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-30T07:39:54.616744655+00:00",
+      "data": {
+        "anchor_id": "ce7f6560-b5fe-42f3-b844-b7e349b3c7b9",
+        "cognition_source": "honeypot",
+        "date": "2026-06-30",
+        "kg_relations_written": 0,
+        "memory_layer": "honeypot",
+        "promoted": true
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "4dcad98f-6d5d-4ddb-a533-08ed097a10ba",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-30T08:35:23.550645471+00:00",
+      "data": {
+        "cognition_source": "honeypot",
+        "date": "2026-06-30",
+        "kg_relations_written": 0,
+        "memory_layer": "honeypot",
+        "promoted": false,
+        "skip_reason": "No curated anchor/recent pair passed smart selection (check vault ingest and [spark] gates)."
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "0e6f25bf-e0c9-4e12-abab-fdca12d7ff7d",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-30T08:38:50.119752614+00:00",
+      "data": {
+        "cognition_source": "honeypot",
+        "date": "2026-06-30",
+        "kg_relations_written": 0,
+        "memory_layer": "honeypot",
+        "promoted": false,
+        "skip_reason": "No curated anchor/recent pair passed smart selection (check vault ingest and [spark] gates)."
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "0546000c-0e69-4523-ad98-29aafff1e19e",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-06-30T09:51:39.437493399+00:00",
+      "data": {
+        "cognition_source": "honeypot",
+        "date": "2026-06-30",
+        "kg_relations_written": 0,
+        "memory_layer": "honeypot",
+        "promoted": false,
+        "skip_reason": "No curated anchor/recent pair passed smart selection (check vault ingest and [spark] gates)."
+      }
+    },
+    {
+      "event_type": "spark_complete",
+      "id": "f120660a-0817-4e62-81cd-f0fe808e2265",
+      "source": "GzmoDaemon",
+      "timestamp": "2026-07-01T06:08:06.105029471+00:00",
+      "data": {
+        "cognition_source": "honeypot",
+        "date": "2026-07-01",
+        "kg_relations_written": 0,
+        "memory_layer": "honeypot",
+        "promoted": false,
+        "skip_reason": "No curated anchor/recent pair passed smart selection (check vault ingest and [spark] gates)."
       }
     }
   ]
