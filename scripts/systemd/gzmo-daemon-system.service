@@ -1,0 +1,18 @@
+[Unit]
+Description=GZMO background daemon (vault, dreams, watchers)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=maximilian
+Group=maximilian
+WorkingDirectory=/opt/gzmo
+EnvironmentFile=-/opt/gzmo/.env
+Environment=GZMO_CONFIG=/opt/gzmo/gzmo.toml
+ExecStart=/opt/gzmo/survey_GZMO/target/release/gzmo daemon
+Restart=on-failure
+RestartSec=30
+
+[Install]
+WantedBy=multi-user.target

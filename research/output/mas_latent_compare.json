@@ -1,0 +1,587 @@
+[
+  {
+    "mode": "recursive_mas",
+    "suite": "multi_agent",
+    "endpoint": "http://localhost:8000/v1",
+    "model": "gemma-4-26b-a4b-it",
+    "runs_per_case": 5,
+    "timestamp": "2026-06-29T13:50:10.681267189Z",
+    "duration_secs": 0,
+    "test_cases": [
+      {
+        "test_case_id": "mas-001",
+        "test_case_name": "Math handoff",
+        "prompt": "A store sells apples for $2 each. If you buy 7 apples and pay with a $20 bill, how much change do you get?",
+        "mode": "recursive_mas",
+        "runs": [
+          {
+            "run_number": 0,
+            "mode": "recursive_mas",
+            "output": "[mock RecursiveMAS sequential_light r=1] Processed: A store sells apples for $2 each. If you buy 7 apples and pay with a $20 bill, how much change do you get?",
+            "total_latency_ms": 0,
+            "total_tokens": 200,
+            "calls": [
+              {
+                "agent": "recursive_mas_bridge",
+                "latency_ms": 0,
+                "input_tokens": 120,
+                "output_tokens": 80,
+                "total_tokens": 200
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 1,
+            "mode": "recursive_mas",
+            "output": "[mock RecursiveMAS sequential_light r=1] Processed: A store sells apples for $2 each. If you buy 7 apples and pay with a $20 bill, how much change do you get?",
+            "total_latency_ms": 0,
+            "total_tokens": 200,
+            "calls": [
+              {
+                "agent": "recursive_mas_bridge",
+                "latency_ms": 0,
+                "input_tokens": 120,
+                "output_tokens": 80,
+                "total_tokens": 200
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 2,
+            "mode": "recursive_mas",
+            "output": "[mock RecursiveMAS sequential_light r=1] Processed: A store sells apples for $2 each. If you buy 7 apples and pay with a $20 bill, how much change do you get?",
+            "total_latency_ms": 0,
+            "total_tokens": 200,
+            "calls": [
+              {
+                "agent": "recursive_mas_bridge",
+                "latency_ms": 0,
+                "input_tokens": 120,
+                "output_tokens": 80,
+                "total_tokens": 200
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 3,
+            "mode": "recursive_mas",
+            "output": "[mock RecursiveMAS sequential_light r=1] Processed: A store sells apples for $2 each. If you buy 7 apples and pay with a $20 bill, how much change do you get?",
+            "total_latency_ms": 0,
+            "total_tokens": 200,
+            "calls": [
+              {
+                "agent": "recursive_mas_bridge",
+                "latency_ms": 0,
+                "input_tokens": 120,
+                "output_tokens": 80,
+                "total_tokens": 200
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 4,
+            "mode": "recursive_mas",
+            "output": "[mock RecursiveMAS sequential_light r=1] Processed: A store sells apples for $2 each. If you buy 7 apples and pay with a $20 bill, how much change do you get?",
+            "total_latency_ms": 0,
+            "total_tokens": 200,
+            "calls": [
+              {
+                "agent": "recursive_mas_bridge",
+                "latency_ms": 0,
+                "input_tokens": 120,
+                "output_tokens": 80,
+                "total_tokens": 200
+              }
+            ],
+            "success": true,
+            "error": null
+          }
+        ],
+        "summary": {
+          "total_tokens": [
+            200.0,
+            0.0
+          ],
+          "latency_ms": [
+            0.0,
+            0.0
+          ],
+          "success_rate": [
+            1.0,
+            0.0
+          ]
+        }
+      },
+      {
+        "test_case_id": "mas-002",
+        "test_case_name": "Code planning",
+        "prompt": "Write a Python function that returns True if a string is a palindrome.",
+        "mode": "recursive_mas",
+        "runs": [
+          {
+            "run_number": 0,
+            "mode": "recursive_mas",
+            "output": "[mock RecursiveMAS sequential_light r=1] Processed: Write a Python function that returns True if a string is a palindrome.",
+            "total_latency_ms": 0,
+            "total_tokens": 200,
+            "calls": [
+              {
+                "agent": "recursive_mas_bridge",
+                "latency_ms": 0,
+                "input_tokens": 120,
+                "output_tokens": 80,
+                "total_tokens": 200
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 1,
+            "mode": "recursive_mas",
+            "output": "[mock RecursiveMAS sequential_light r=1] Processed: Write a Python function that returns True if a string is a palindrome.",
+            "total_latency_ms": 0,
+            "total_tokens": 200,
+            "calls": [
+              {
+                "agent": "recursive_mas_bridge",
+                "latency_ms": 0,
+                "input_tokens": 120,
+                "output_tokens": 80,
+                "total_tokens": 200
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 2,
+            "mode": "recursive_mas",
+            "output": "[mock RecursiveMAS sequential_light r=1] Processed: Write a Python function that returns True if a string is a palindrome.",
+            "total_latency_ms": 0,
+            "total_tokens": 200,
+            "calls": [
+              {
+                "agent": "recursive_mas_bridge",
+                "latency_ms": 0,
+                "input_tokens": 120,
+                "output_tokens": 80,
+                "total_tokens": 200
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 3,
+            "mode": "recursive_mas",
+            "output": "[mock RecursiveMAS sequential_light r=1] Processed: Write a Python function that returns True if a string is a palindrome.",
+            "total_latency_ms": 0,
+            "total_tokens": 200,
+            "calls": [
+              {
+                "agent": "recursive_mas_bridge",
+                "latency_ms": 0,
+                "input_tokens": 120,
+                "output_tokens": 80,
+                "total_tokens": 200
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 4,
+            "mode": "recursive_mas",
+            "output": "[mock RecursiveMAS sequential_light r=1] Processed: Write a Python function that returns True if a string is a palindrome.",
+            "total_latency_ms": 0,
+            "total_tokens": 200,
+            "calls": [
+              {
+                "agent": "recursive_mas_bridge",
+                "latency_ms": 0,
+                "input_tokens": 120,
+                "output_tokens": 80,
+                "total_tokens": 200
+              }
+            ],
+            "success": true,
+            "error": null
+          }
+        ],
+        "summary": {
+          "total_tokens": [
+            200.0,
+            0.0
+          ],
+          "latency_ms": [
+            0.0,
+            0.0
+          ],
+          "success_rate": [
+            1.0,
+            0.0
+          ]
+        }
+      },
+      {
+        "test_case_id": "mas-003",
+        "test_case_name": "Multi-step reasoning",
+        "prompt": "If all bloops are razzles and all razzles are lazzles, are all bloops definitely lazzles? Explain briefly.",
+        "mode": "recursive_mas",
+        "runs": [
+          {
+            "run_number": 0,
+            "mode": "recursive_mas",
+            "output": "[mock RecursiveMAS sequential_light r=1] Processed: If all bloops are razzles and all razzles are lazzles, are all bloops definitely lazzles? Explain briefly.",
+            "total_latency_ms": 0,
+            "total_tokens": 200,
+            "calls": [
+              {
+                "agent": "recursive_mas_bridge",
+                "latency_ms": 0,
+                "input_tokens": 120,
+                "output_tokens": 80,
+                "total_tokens": 200
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 1,
+            "mode": "recursive_mas",
+            "output": "[mock RecursiveMAS sequential_light r=1] Processed: If all bloops are razzles and all razzles are lazzles, are all bloops definitely lazzles? Explain briefly.",
+            "total_latency_ms": 0,
+            "total_tokens": 200,
+            "calls": [
+              {
+                "agent": "recursive_mas_bridge",
+                "latency_ms": 0,
+                "input_tokens": 120,
+                "output_tokens": 80,
+                "total_tokens": 200
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 2,
+            "mode": "recursive_mas",
+            "output": "[mock RecursiveMAS sequential_light r=1] Processed: If all bloops are razzles and all razzles are lazzles, are all bloops definitely lazzles? Explain briefly.",
+            "total_latency_ms": 0,
+            "total_tokens": 200,
+            "calls": [
+              {
+                "agent": "recursive_mas_bridge",
+                "latency_ms": 0,
+                "input_tokens": 120,
+                "output_tokens": 80,
+                "total_tokens": 200
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 3,
+            "mode": "recursive_mas",
+            "output": "[mock RecursiveMAS sequential_light r=1] Processed: If all bloops are razzles and all razzles are lazzles, are all bloops definitely lazzles? Explain briefly.",
+            "total_latency_ms": 0,
+            "total_tokens": 200,
+            "calls": [
+              {
+                "agent": "recursive_mas_bridge",
+                "latency_ms": 0,
+                "input_tokens": 120,
+                "output_tokens": 80,
+                "total_tokens": 200
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 4,
+            "mode": "recursive_mas",
+            "output": "[mock RecursiveMAS sequential_light r=1] Processed: If all bloops are razzles and all razzles are lazzles, are all bloops definitely lazzles? Explain briefly.",
+            "total_latency_ms": 0,
+            "total_tokens": 200,
+            "calls": [
+              {
+                "agent": "recursive_mas_bridge",
+                "latency_ms": 0,
+                "input_tokens": 120,
+                "output_tokens": 80,
+                "total_tokens": 200
+              }
+            ],
+            "success": true,
+            "error": null
+          }
+        ],
+        "summary": {
+          "latency_ms": [
+            0.0,
+            0.0
+          ],
+          "total_tokens": [
+            200.0,
+            0.0
+          ],
+          "success_rate": [
+            1.0,
+            0.0
+          ]
+        }
+      },
+      {
+        "test_case_id": "mas-004",
+        "test_case_name": "Science QA",
+        "prompt": "Why do metals conduct electricity better than wood?",
+        "mode": "recursive_mas",
+        "runs": [
+          {
+            "run_number": 0,
+            "mode": "recursive_mas",
+            "output": "[mock RecursiveMAS sequential_light r=1] Processed: Why do metals conduct electricity better than wood?",
+            "total_latency_ms": 0,
+            "total_tokens": 200,
+            "calls": [
+              {
+                "agent": "recursive_mas_bridge",
+                "latency_ms": 0,
+                "input_tokens": 120,
+                "output_tokens": 80,
+                "total_tokens": 200
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 1,
+            "mode": "recursive_mas",
+            "output": "[mock RecursiveMAS sequential_light r=1] Processed: Why do metals conduct electricity better than wood?",
+            "total_latency_ms": 0,
+            "total_tokens": 200,
+            "calls": [
+              {
+                "agent": "recursive_mas_bridge",
+                "latency_ms": 0,
+                "input_tokens": 120,
+                "output_tokens": 80,
+                "total_tokens": 200
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 2,
+            "mode": "recursive_mas",
+            "output": "[mock RecursiveMAS sequential_light r=1] Processed: Why do metals conduct electricity better than wood?",
+            "total_latency_ms": 0,
+            "total_tokens": 200,
+            "calls": [
+              {
+                "agent": "recursive_mas_bridge",
+                "latency_ms": 0,
+                "input_tokens": 120,
+                "output_tokens": 80,
+                "total_tokens": 200
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 3,
+            "mode": "recursive_mas",
+            "output": "[mock RecursiveMAS sequential_light r=1] Processed: Why do metals conduct electricity better than wood?",
+            "total_latency_ms": 0,
+            "total_tokens": 200,
+            "calls": [
+              {
+                "agent": "recursive_mas_bridge",
+                "latency_ms": 0,
+                "input_tokens": 120,
+                "output_tokens": 80,
+                "total_tokens": 200
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 4,
+            "mode": "recursive_mas",
+            "output": "[mock RecursiveMAS sequential_light r=1] Processed: Why do metals conduct electricity better than wood?",
+            "total_latency_ms": 0,
+            "total_tokens": 200,
+            "calls": [
+              {
+                "agent": "recursive_mas_bridge",
+                "latency_ms": 0,
+                "input_tokens": 120,
+                "output_tokens": 80,
+                "total_tokens": 200
+              }
+            ],
+            "success": true,
+            "error": null
+          }
+        ],
+        "summary": {
+          "success_rate": [
+            1.0,
+            0.0
+          ],
+          "total_tokens": [
+            200.0,
+            0.0
+          ],
+          "latency_ms": [
+            0.0,
+            0.0
+          ]
+        }
+      },
+      {
+        "test_case_id": "mas-005",
+        "test_case_name": "Planning task",
+        "prompt": "Outline three steps to migrate a small web app from SQLite to PostgreSQL with minimal downtime.",
+        "mode": "recursive_mas",
+        "runs": [
+          {
+            "run_number": 0,
+            "mode": "recursive_mas",
+            "output": "[mock RecursiveMAS sequential_light r=1] Processed: Outline three steps to migrate a small web app from SQLite to PostgreSQL with minimal downtime.",
+            "total_latency_ms": 0,
+            "total_tokens": 200,
+            "calls": [
+              {
+                "agent": "recursive_mas_bridge",
+                "latency_ms": 0,
+                "input_tokens": 120,
+                "output_tokens": 80,
+                "total_tokens": 200
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 1,
+            "mode": "recursive_mas",
+            "output": "[mock RecursiveMAS sequential_light r=1] Processed: Outline three steps to migrate a small web app from SQLite to PostgreSQL with minimal downtime.",
+            "total_latency_ms": 0,
+            "total_tokens": 200,
+            "calls": [
+              {
+                "agent": "recursive_mas_bridge",
+                "latency_ms": 0,
+                "input_tokens": 120,
+                "output_tokens": 80,
+                "total_tokens": 200
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 2,
+            "mode": "recursive_mas",
+            "output": "[mock RecursiveMAS sequential_light r=1] Processed: Outline three steps to migrate a small web app from SQLite to PostgreSQL with minimal downtime.",
+            "total_latency_ms": 0,
+            "total_tokens": 200,
+            "calls": [
+              {
+                "agent": "recursive_mas_bridge",
+                "latency_ms": 0,
+                "input_tokens": 120,
+                "output_tokens": 80,
+                "total_tokens": 200
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 3,
+            "mode": "recursive_mas",
+            "output": "[mock RecursiveMAS sequential_light r=1] Processed: Outline three steps to migrate a small web app from SQLite to PostgreSQL with minimal downtime.",
+            "total_latency_ms": 0,
+            "total_tokens": 200,
+            "calls": [
+              {
+                "agent": "recursive_mas_bridge",
+                "latency_ms": 0,
+                "input_tokens": 120,
+                "output_tokens": 80,
+                "total_tokens": 200
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 4,
+            "mode": "recursive_mas",
+            "output": "[mock RecursiveMAS sequential_light r=1] Processed: Outline three steps to migrate a small web app from SQLite to PostgreSQL with minimal downtime.",
+            "total_latency_ms": 0,
+            "total_tokens": 200,
+            "calls": [
+              {
+                "agent": "recursive_mas_bridge",
+                "latency_ms": 0,
+                "input_tokens": 120,
+                "output_tokens": 80,
+                "total_tokens": 200
+              }
+            ],
+            "success": true,
+            "error": null
+          }
+        ],
+        "summary": {
+          "total_tokens": [
+            200.0,
+            0.0
+          ],
+          "success_rate": [
+            1.0,
+            0.0
+          ],
+          "latency_ms": [
+            0.0,
+            0.0
+          ]
+        }
+      }
+    ],
+    "aggregate": {
+      "total_tokens": [
+        200.0,
+        0.0
+      ],
+      "success_rate": [
+        1.0,
+        0.0
+      ],
+      "latency_ms": [
+        0.0,
+        0.0
+      ]
+    }
+  }
+]

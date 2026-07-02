@@ -1,0 +1,2457 @@
+[
+  {
+    "mode": "single",
+    "suite": "multi_agent",
+    "endpoint": "http://localhost:8000/v1",
+    "model": "gemma-4-26b-a4b-it",
+    "runs_per_case": 5,
+    "timestamp": "2026-06-29T13:48:08.101450121Z",
+    "duration_secs": 41,
+    "test_cases": [
+      {
+        "test_case_id": "mas-001",
+        "test_case_name": "Math handoff",
+        "prompt": "A store sells apples for $2 each. If you buy 7 apples and pay with a $20 bill, how much change do you get?",
+        "mode": "single",
+        "runs": [
+          {
+            "run_number": 0,
+            "mode": "single",
+            "output": "To find the amount of change, follow these steps:\n\n1.  **Calculate the total cost of the apples:** 7 apples × $2 each = **$14**\n2.  **Subtract the cost from the amount paid:** $20 - $14 = **$6**\n\nYou get **$6** in change.",
+            "total_latency_ms": 267,
+            "total_tokens": 117,
+            "calls": [
+              {
+                "agent": "single",
+                "latency_ms": 267,
+                "input_tokens": 44,
+                "output_tokens": 73,
+                "total_tokens": 117
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 1,
+            "mode": "single",
+            "output": "To find the amount of change, follow these steps:\n\n1.  **Calculate the total cost of the apples:** 7 apples × $2 each = **$14**\n2.  **Subtract the total cost from the amount paid:** $20 - $14 = **$6**\n\nYou get **$6** in change.",
+            "total_latency_ms": 175,
+            "total_tokens": 118,
+            "calls": [
+              {
+                "agent": "single",
+                "latency_ms": 175,
+                "input_tokens": 44,
+                "output_tokens": 74,
+                "total_tokens": 118
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 2,
+            "mode": "single",
+            "output": "To find the amount of change, follow these steps:\n\n1.  **Calculate the total cost of the apples:** 7 apples × $2 each = **$14**\n2.  **Subtract the cost from the amount paid:** $20 - $14 = **$6**\n\nYou get **$6** in change.",
+            "total_latency_ms": 174,
+            "total_tokens": 117,
+            "calls": [
+              {
+                "agent": "single",
+                "latency_ms": 174,
+                "input_tokens": 44,
+                "output_tokens": 73,
+                "total_tokens": 117
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 3,
+            "mode": "single",
+            "output": "To find the amount of change, follow these steps:\n\n1.  **Calculate the total cost of the apples:** 7 apples × $2 each = **$14**\n2.  **Subtract the cost from the amount paid:** $20 - $14 = **$6**\n\nYou get **$6** in change.",
+            "total_latency_ms": 94,
+            "total_tokens": 117,
+            "calls": [
+              {
+                "agent": "single",
+                "latency_ms": 94,
+                "input_tokens": 44,
+                "output_tokens": 73,
+                "total_tokens": 117
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 4,
+            "mode": "single",
+            "output": "To find the amount of change, follow these steps:\n\n1.  **Calculate the total cost of the apples:** 7 apples × $2 each = **$14**\n2.  **Subtract the cost from the amount paid:** $20 - $14 = **$6**\n\nYou get **$6** in change.",
+            "total_latency_ms": 93,
+            "total_tokens": 117,
+            "calls": [
+              {
+                "agent": "single",
+                "latency_ms": 93,
+                "input_tokens": 44,
+                "output_tokens": 73,
+                "total_tokens": 117
+              }
+            ],
+            "success": true,
+            "error": null
+          }
+        ],
+        "summary": {
+          "total_tokens": [
+            117.2,
+            0.0
+          ],
+          "success_rate": [
+            1.0,
+            0.0
+          ],
+          "latency_ms": [
+            160.6,
+            0.0
+          ]
+        }
+      },
+      {
+        "test_case_id": "mas-002",
+        "test_case_name": "Code planning",
+        "prompt": "Write a Python function that returns True if a string is a palindrome.",
+        "mode": "single",
+        "runs": [
+          {
+            "run_number": 0,
+            "mode": "single",
+            "output": "Here are the two most common ways to write this function in Python.\n\n### Method 1: The Pythonic Way (Slicing)\nThe most efficient and readable way in Python is to use **string slicing**. This method creates a reversed copy of the string and compares it to the original.\n\n```python\ndef is_palindrome(string):\n    # Remove spaces and convert to lowercase to make it case-insensitive\n    clean_string = \"\".join(string.split()).lower()\n    \n    # Compare the string to its reverse [::-1]\n    return clean_string == clean_string[::-1]\n\n# Test cases\nprint(is_palindrome(\"racecar\"))  # True\nprint(is_palindrome(\"RaceCar\"))  # True (handles case)\nprint(is_palindrome(\"hello\"))    # False\nprint(is_palindrome(\"nurses run\")) # True (handles spaces)\n```\n\n### Method 2: The Algorithmic Way (Two-Pointer Approach)\nIf you are doing this for a coding interview, the interviewer might ask you to solve it **without** creating a copy of the string (to save memory). You can do this by comparing characters from both ends moving toward the center.\n\n```python\ndef is_palindrome(string):\n    # Clean the string: remove non-alphanumeric characters and lowercase it\n    # This is better for phrases like \"A man, a plan, a canal: Panama\"\n    clean_string = \"\".join(char.lower() for char in string if char.isalnum())\n    \n    left = 0\n    right = len(clean_string) - 1\n    \n    while left < right:\n        if clean_string[left] != clean_string[right]:\n            return False\n        left += 1\n        right -= 1\n        \n    return True\n\n# Test case with punctuation\nprint(is_palindrome(\"A man, a plan, a canal: Panama\")) # True\n```\n\n### Key Differences:\n| Feature | Method 1 (Slicing) | Method 2 (Two-Pointer) |\n| :--- | :--- | :--- |\n| **Complexity** | $O(n)$ time, $O(n)$ space | $O(n)$ time, $O(1)$ extra space* |\n| **Readability** | Extremely high (Pythonic) | Moderate |\n| **Best use case** | General development | Technical interviews / Memory constraints |\n\n*\\*Note: In Python, because strings are immutable, even the \"two-pointer\" method usually requires creating a \"cleaned\" version of the string first, which technically uses $O(n)$ space. To achieve true $O(1)$ space, you would have to iterate through the original string and skip non-alphanumeric characters on the fly.*",
+            "total_latency_ms": 2261,
+            "total_tokens": 637,
+            "calls": [
+              {
+                "agent": "single",
+                "latency_ms": 2261,
+                "input_tokens": 27,
+                "output_tokens": 610,
+                "total_tokens": 637
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 1,
+            "mode": "single",
+            "output": "Here are the two most common ways to write this function in Python.\n\n### 1. The Pythonic Way (Slicing)\nThe most efficient and readable way to do this in Python is using **string slicing**. The syntax `[::-1]` creates a reversed copy of the string.\n\n```python\ndef is_palindrome(s):\n    # Convert to lowercase and remove non-alphanumeric characters (optional but recommended)\n    clean_s = \"\".join(char.lower() for char in s if char.isalnum())\n    \n    # Compare the string to its reverse\n    return clean_s == clean_s[::-1]\n\n# Test cases\nprint(is_palindrome(\"racecar\"))       # True\nprint(is_palindrome(\"A man, a plan, a canal: Panama\")) # True\nprint(is_palindrome(\"hello\"))         # False\n```\n\n### 2. The Algorithmic Way (Two-Pointer Approach)\nIf you are doing this for a coding interview, the interviewer might ask you to solve it **without** creating a reversed copy of the string to save memory. This is done using two pointers (one at the start, one at the end) moving toward the center.\n\n```python\ndef is_palindrome(s):\n    # Clean the string (remove spaces/punctuation and lowercase it)\n    s = \"\".join(char.lower() for char in s if char.isalnum())\n    \n    left = 0\n    right = len(s) - 1\n    \n    while left < right:\n        if s[left] != s[right]:\n            return False\n        left += 1\n        right -= 1\n        \n    return True\n\n# Test cases\nprint(is_palindrome(\"madam\"))  # True\nprint(is_palindrome(\"python\")) # False\n```\n\n### Key Differences:\n\n| Feature | Slicing Method | Two-Pointer Method |\n| :--- | :--- | :--- |\n| **Readability** | Extremely high (one line of logic). | Moderate. |\n| **Space Complexity** | $O(n)$ (creates a new reversed string). | $O(1)$ (checks in place). |\n| **Time Complexity** | $O(n)$ | $O(n)$ |\n\n**Note on \"Cleaning\" the string:** \nIn real-world scenarios, \"Racecar\" is usually considered a palindrome even though the \"R\" is capitalized. That is why I included `.lower()` and `.isalnum()` (which removes spaces and punctuation) in both examples. If you only want to check if the exact characters match, you can simplify the function to just `return s == s[::-1]`.",
+            "total_latency_ms": 2340,
+            "total_tokens": 613,
+            "calls": [
+              {
+                "agent": "single",
+                "latency_ms": 2340,
+                "input_tokens": 27,
+                "output_tokens": 586,
+                "total_tokens": 613
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 2,
+            "mode": "single",
+            "output": "Here are the two most common ways to write this function in Python.\n\n### Method 1: The \"Pythonic\" Way (Slicing)\nThe most efficient and readable way to do this in Python is to use **string slicing**. In Python, `[::-1]` creates a reversed copy of the string.\n\n```python\ndef is_palindrome(string):\n    # Convert to lowercase to make it case-insensitive\n    # (Optional: remove spaces to handle phrases)\n    clean_string = string.lower().replace(\" \", \"\")\n    \n    # Check if the string is equal to its reverse\n    return clean_string == clean_string[::-1]\n\n# Test cases\nprint(is_palindrome(\"radar\"))      # True\nprint(is_palindrome(\"Racecar\"))    # True (case-insensitive)\nprint(is_palindrome(\"hello\"))      # False\nprint(is_palindrome(\"nurses run\")) # True (handles spaces)\n```\n\n### Method 2: The Algorithmic Way (Two Pointers)\nIf you are doing this for a coding interview, the interviewer might ask you to solve it **without** creating a copy of the string (to save memory). In this case, you use two \"pointers\" starting from both ends and move toward the middle.\n\n```python\ndef is_palindrome(string):\n    # Clean the string: lowercase and remove non-alphanumeric characters\n    clean_string = \"\".join(char.lower() for char in string if char.isalnum())\n    \n    left = 0\n    right = len(clean_string) - 1\n    \n    while left < right:\n        if clean_string[left] != clean_string[right]:\n            return False\n        left += 1\n        right -= 1\n        \n    return True\n\n# Test case\nprint(is_palindrome(\"A man, a plan, a canal: Panama\")) # True\n```\n\n### Which one should you use?\n\n1.  **Use Method 1** for everyday programming. It is faster to write, highly optimized in CPython, and very easy for other developers to read.\n2.  **Use Method 2** if you are working with extremely large strings (to save memory) or if you are in a technical interview where \"space complexity\" is being evaluated.\n\n### Key logic used:\n*   `.lower()`: Ensures that 'A' is treated the same as 'a'.\n*   `.replace(\" \", \"\")` or `.isalnum()`: Ensures that spaces and punctuation don't break the check (e.g., \"race car\" should be a palindrome).\n*   `[::-1]`: This is the Python magic that flips the string.",
+            "total_latency_ms": 2283,
+            "total_tokens": 614,
+            "calls": [
+              {
+                "agent": "single",
+                "latency_ms": 2283,
+                "input_tokens": 27,
+                "output_tokens": 587,
+                "total_tokens": 614
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 3,
+            "mode": "single",
+            "output": "Here are the two most common ways to write this function in Python.\n\n### 1. The \"Pythonic\" Way (Slicing)\nThe most efficient and readable way in Python is to use **string slicing**. This method creates a reversed copy of the string and compares it to the original.\n\n```python\ndef is_palindrome(s):\n    # Convert to lowercase and remove non-alphanumeric characters (optional but recommended)\n    # This ensures \"Racecar\" or \"A man, a plan, a canal: Panama\" returns True\n    clean_s = \"\".join(char.lower() for char in s if char.isalnum())\n    \n    # Compare the string to its reverse\n    return clean_s == clean_s[::-1]\n\n# Test cases\nprint(is_palindrome(\"racecar\"))  # True\nprint(is_palindrome(\"hello\"))    # False\nprint(is_palindrome(\"A man, a plan, a canal: Panama\")) # True\n```\n\n### 2. The Two-Pointer Way (Memory Efficient)\nIf you are working with extremely large strings and want to avoid creating a copy of the string in memory, you can use the **two-pointer approach**. This compares characters from the outside in.\n\n```python\ndef is_palindrome(s):\n    # Clean the string first\n    s = \"\".join(char.lower() for char in s if char.isalnum())\n    \n    left = 0\n    right = len(s) - 1\n    \n    while left < right:\n        if s[left] != s[right]:\n            return False\n        left += 1\n        right -= 1\n        \n    return True\n\n# Test cases\nprint(is_palindrome(\"madam\"))  # True\nprint(is_palindrome(\"python\")) # False\n```\n\n### Key Differences:\n\n| Feature | Slicing Method (`[::-1]`) | Two-Pointer Method |\n| :--- | :--- | :--- |\n| **Readability** | Extremely high (very Pythonic) | Moderate |\n| **Speed** | Very fast (implemented in C) | Fast |\n| **Memory Usage** | Higher (creates a copy of the string) | Lower (checks in place) |\n| **Best for...** | Standard everyday coding | Coding interviews / Huge datasets |\n\n**Note on `isalnum()`:** I included `.isalnum()` in both examples because, in most real-world scenarios, a palindrome is defined by its letters and numbers, ignoring spaces, commas, and punctuation.",
+            "total_latency_ms": 2156,
+            "total_tokens": 582,
+            "calls": [
+              {
+                "agent": "single",
+                "latency_ms": 2156,
+                "input_tokens": 27,
+                "output_tokens": 555,
+                "total_tokens": 582
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 4,
+            "mode": "single",
+            "output": "Here are the two most common ways to write this function in Python.\n\n### 1. The \"Pythonic\" Way (Using Slicing)\nThe most efficient and readable way in Python is to use **string slicing**. The syntax `[::-1]` creates a reversed copy of the string.\n\n```python\ndef is_palindrome(string):\n    # Remove spaces and convert to lowercase to make it case-insensitive\n    clean_string = string.replace(\" \", \"\").lower()\n    \n    # Compare the string to its reverse\n    return clean_string == clean_string[::-1]\n\n# Test cases\nprint(is_palindrome(\"radar\"))       # True\nprint(is_palindrome(\"Racecar\"))     # True (handles capitalization)\nprint(is_palindrome(\"hello\"))       # False\nprint(is_palindrome(\"nurses run\"))  # True (handles spaces)\n```\n\n### 2. The Algorithmic Way (Two-Pointer Approach)\nIf you are doing this for a coding interview, the interviewer might ask you to solve it **without** creating a reversed copy of the string to save memory. You can do this by comparing characters from both ends moving toward the middle.\n\n```python\ndef is_palindrome(string):\n    # Clean the string: lowercase and remove non-alphanumeric characters\n    clean_string = \"\".join(char.lower() for char in string if char.isalnum())\n    \n    left = 0\n    right = len(clean_string) - 1\n    \n    while left < right:\n        if clean_string[left] != clean_string[right]:\n            return False\n        left += 1\n        right -= 1\n        \n    return True\n\n# Test cases\nprint(is_palindrome(\"A man, a plan, a canal: Panama\")) # True\nprint(is_palindrome(\"race a car\"))                    # False\n```\n\n### Key Differences:\n| Feature | Slicing Method (`[::-1]`) | Two-Pointer Method |\n| :--- | :--- | :--- |\n| **Readability** | Extremely high (one line of logic). | Moderate. |\n| **Space Complexity** | $O(n)$ — creates a new reversed string in memory. | $O(1)$ — only stores two integer pointers. |\n| **Time Complexity** | $O(n)$ | $O(n)$ |\n| **Best Use Case** | General production code. | Technical interviews / Memory-constrained systems. |",
+            "total_latency_ms": 1831,
+            "total_tokens": 570,
+            "calls": [
+              {
+                "agent": "single",
+                "latency_ms": 1831,
+                "input_tokens": 27,
+                "output_tokens": 543,
+                "total_tokens": 570
+              }
+            ],
+            "success": true,
+            "error": null
+          }
+        ],
+        "summary": {
+          "latency_ms": [
+            2174.2,
+            0.0
+          ],
+          "total_tokens": [
+            603.2,
+            0.0
+          ],
+          "success_rate": [
+            1.0,
+            0.0
+          ]
+        }
+      },
+      {
+        "test_case_id": "mas-003",
+        "test_case_name": "Multi-step reasoning",
+        "prompt": "If all bloops are razzles and all razzles are lazzles, are all bloops definitely lazzles? Explain briefly.",
+        "mode": "single",
+        "runs": [
+          {
+            "run_number": 0,
+            "mode": "single",
+            "output": "**Yes**, all bloops are definitely lazzles.\n\n**Explanation:**\nThis is a classic example of a **syllogism** (a form of logical reasoning). You can follow the chain of inclusion:\n\n1.  Every **Bloop** is inside the category of **Razzles**.\n2.  Every **Razzle** is inside the category of **Lazzles**.\n3.  Therefore, because Bloops are a subset of Razzles, and Razzles are a subset of Lazzles, the Bloops must also be inside the Lazzle category.",
+            "total_latency_ms": 488,
+            "total_tokens": 165,
+            "calls": [
+              {
+                "agent": "single",
+                "latency_ms": 488,
+                "input_tokens": 39,
+                "output_tokens": 126,
+                "total_tokens": 165
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 1,
+            "mode": "single",
+            "output": "**Yes.**\n\nThis is a classic example of a **syllogism** in logic. You can break it down step-by-step:\n\n1.  **All bloops are razzles** (Bloops are a subset of razzles).\n2.  **All razzles are lazzles** (Razzles are a subset of lazzles).\n3.  Therefore, because every bloop is inside the \"razzle\" group, and the entire \"razzle\" group is inside the \"lazzle\" group, every bloop is automatically inside the \"lazzle\" group.\n\nIn formal logic, this is known as the **transitive property**.",
+            "total_latency_ms": 590,
+            "total_tokens": 180,
+            "calls": [
+              {
+                "agent": "single",
+                "latency_ms": 590,
+                "input_tokens": 39,
+                "output_tokens": 141,
+                "total_tokens": 180
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 2,
+            "mode": "single",
+            "output": "**Yes.**\n\nThis is a classic example of a **syllogism** (specifically the transitive property in logic). \n\nHere is the step-by-step breakdown:\n1.  **Premise 1:** All Bloops $\\subseteq$ Razzles (Bloops are a subset of Razzles).\n2.  **Premise 2:** All Razzles $\\subseteq$ Lazzles (Razzles are a subset of Lazzles).\n3.  **Conclusion:** Therefore, all Bloops must be inside the Lazzles category.\n\nIf every member of Group A belongs to Group B, and every member of Group B belongs to Group C, then every member of Group A must belong to Group C.",
+            "total_latency_ms": 558,
+            "total_tokens": 195,
+            "calls": [
+              {
+                "agent": "single",
+                "latency_ms": 558,
+                "input_tokens": 39,
+                "output_tokens": 156,
+                "total_tokens": 195
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 3,
+            "mode": "single",
+            "output": "**Yes**, all bloops are definitely lazzles.\n\n**Explanation:**\nThis is a classic example of a **syllogism** (specifically the transitive property). You can follow the chain of logic step-by-step:\n\n1.  Every **Bloop** is inside the category of **Razzles**.\n2.  Every **Razzle** is inside the category of **Lazzles**.\n3.  Therefore, since Bloops are a subset of Razzles, and Razzles are a subset of Lazzles, the Bloops are automatically contained within the Lazzles category.",
+            "total_latency_ms": 405,
+            "total_tokens": 169,
+            "calls": [
+              {
+                "agent": "single",
+                "latency_ms": 405,
+                "input_tokens": 39,
+                "output_tokens": 130,
+                "total_tokens": 169
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 4,
+            "mode": "single",
+            "output": "**Yes**, all bloops are definitely lazzles.\n\n**Explanation:**\nThis is a classic example of a **syllogism** (transitive logic). \n1. You have established that Bloops are a subset of Razzles.\n2. You have established that Razzles are a subset of Lazzles.\n3. Therefore, Bloops must be contained within the larger category of Lazzles.\n\nIn logical terms: If **A ⊂ B** and **B ⊂ C**, then **A ⊂ C**.",
+            "total_latency_ms": 368,
+            "total_tokens": 155,
+            "calls": [
+              {
+                "agent": "single",
+                "latency_ms": 368,
+                "input_tokens": 39,
+                "output_tokens": 116,
+                "total_tokens": 155
+              }
+            ],
+            "success": true,
+            "error": null
+          }
+        ],
+        "summary": {
+          "latency_ms": [
+            481.8,
+            0.0
+          ],
+          "total_tokens": [
+            172.8,
+            0.0
+          ],
+          "success_rate": [
+            1.0,
+            0.0
+          ]
+        }
+      },
+      {
+        "test_case_id": "mas-004",
+        "test_case_name": "Science QA",
+        "prompt": "Why do metals conduct electricity better than wood?",
+        "mode": "single",
+        "runs": [
+          {
+            "run_number": 0,
+            "mode": "single",
+            "output": "The difference in electrical conductivity between metals and wood comes down to one fundamental thing: **the presence of free electrons.**\n\nTo understand this, we have to look at how electricity works at an atomic level.\n\n### 1. How electricity flows\nElectricity is essentially the flow of electrical charge. In a material, for electricity to move, there must be \"charge carriers\"—particles that are free to move from one atom to another.\n\n### 2. Why Metals are great conductors\nMetals are held together by **metallic bonding**. In a metal lattice (the structure of atoms), the outermost electrons of the atoms are not tightly bound to any single nucleus. Instead, they detach and form a \"sea of delocalized electrons.\"\n\n*   **The \"Sea of Electrons\":** Imagine a crowded room where everyone is holding hands tightly; if one person moves, the whole group moves together. Now imagine a room where everyone is sliding around on ice; if you push one person, they can zip across the room easily.\n*   **Mobility:** Because these electrons are \"delocalized\" (not stuck to one atom), they are free to move throughout the entire structure. When you apply a voltage (like connecting a battery), these free electrons act as charge carriers and rush toward the positive terminal, creating an electric current.\n\n### 3. Why Wood is an insulator\nWood is an organic material made primarily of cellulose, hemicellulose, and lignin. These are complex molecules held together by **covalent bonds**.\n\n*   **Tightly Bound Electrons:** In covalent bonds, electrons are shared strictly between two specific atoms to hold them together. They are \"localized,\" meaning they are stuck in place.\n*   **No \"Free\" Carriers:** Because the electrons in wood are tightly locked into their chemical bonds, there are no mobile charge carriers to move when a voltage is applied. The electrons stay put, so no current flows.\n\n### Summary Comparison\n\n| Feature | Metals (Conductors) | Wood (Insulators) |\n| :--- | :--- | :--- |\n| **Electron State** | Delocalized (Free-moving \"sea\") | Localized (Tightly bound in bonds) |\n| **Atomic Structure** | Metallic bonding | Covalent bonding |\n| **Response to Voltage** | Electrons flow easily | Electrons stay fixed |\n| **Analogy** | A hallway full of marbles | A hallway where marbles are glued to the floor |\n\n***\n\n**Note on Moisture:** You may have heard that \"wet wood\" conducts electricity. This is because water (especially tap water containing minerals) contains **ions** (charged atoms). While the wood itself is still an insulator, the water flowing through the pores of the wood provides the mobile charge carriers needed for electricity to pass through.",
+            "total_latency_ms": 2522,
+            "total_tokens": 599,
+            "calls": [
+              {
+                "agent": "single",
+                "latency_ms": 2522,
+                "input_tokens": 22,
+                "output_tokens": 577,
+                "total_tokens": 599
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 1,
+            "mode": "single",
+            "output": "The difference in electrical conductivity between metals and wood comes down to one thing: **the behavior of their electrons.**\n\nTo understand this, you have to look at how electricity works at an atomic level.\n\n### 1. Metals: The \"Sea of Electrons\"\nIn a metal (like copper, gold, or aluminum), the atoms are arranged in a very tight, organized structure called a crystal lattice. \n\nThe outermost electrons of these metal atoms are held very loosely by the nucleus. Because they are so loose, they don't stay attached to a single atom. Instead, they detach and wander freely throughout the entire structure of the metal. Scientists call this a **\"sea of delocalized electrons.\"**\n\n*   **How it conducts:** When you connect a battery to a piece of metal, you create an electric field. Because those electrons are already loose and free to move, they immediately begin flowing in one direction toward the positive terminal. This flow of moving electrons is exactly what **electricity** is.\n\n### 2. Wood: The \"Locked Electrons\"\nWood is an organic material made primarily of cellulose, hemicellulose, and lignin. These are complex molecules held together by strong **covalent bonds**.\n\nIn these bonds, the electrons are \"shared\" between atoms to hold the molecules together. Unlike the \"sea\" in metals, the electrons in wood are tightly bound to specific atoms or held firmly in place within the chemical bonds. They are not free to wander.\n\n*   **Why it doesn't conduct:** When you apply an electric field to a piece of wood, the electrons are \"stuck.\" They may wiggle slightly, but they cannot break free from their bonds to flow through the material. Because there is no flow of charge, electricity cannot pass through.\n\n### Summary Comparison\n\n| Feature | Metals (Conductors) | Wood (Insulators) |\n| :--- | :--- | :--- |\n| **Electron State** | Delocalized (Free-moving \"sea\") | Localized (Tightly bound in bonds) |\n| **Atomic Structure** | Simple metallic lattice | Complex organic molecules |\n| **Response to Voltage** | Electrons flow easily | Electrons stay in place |\n| **Analogy** | A hallway full of people walking freely | A room full of people glued to their chairs |\n\n***\n\n**Note on moisture:** You may have heard that \"a wet stick can conduct electricity.\" This is because water (especially with impurities/salts) contains **ions** (charged particles). When wood gets wet, the water fills the microscopic pores in the wood, providing a path of mobile ions that can carry an electric current, even though the wood fibers themselves remain insulators.",
+            "total_latency_ms": 2396,
+            "total_tokens": 582,
+            "calls": [
+              {
+                "agent": "single",
+                "latency_ms": 2396,
+                "input_tokens": 22,
+                "output_tokens": 560,
+                "total_tokens": 582
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 2,
+            "mode": "single",
+            "output": "The difference in electrical conductivity between metals and wood comes down to one thing: **the movement of electrons.**\n\nTo conduct electricity, a material must have \"charge carriers\"—particles that are free to move through the material when a voltage is applied.\n\n### 1. Metals: The \"Sea of Electrons\"\nIn a metal (like copper or aluminum), the atoms are arranged in a very tight, organized structure called a **crystal lattice**. \n\n*   **Delocalized Electrons:** The outermost electrons of metal atoms are not tightly bound to any single nucleus. Instead, they detach from their individual atoms and form a \"sea\" or \"cloud\" of electrons that floats freely around the positive ions.\n*   **Easy Movement:** Because these electrons are not stuck to any one atom, they can move very easily throughout the entire structure. When you connect a battery to a metal wire, these free electrons act like a flowing river, carrying an electric current from one end to the other almost instantly.\n\n### 2. Wood: The \"Locked\" Electrons\nWood is an organic material made of complex molecules like cellulose, lignin, and water. Its structure is very different from a metal.\n\n*   **Tight Bonds:** In wood, the electrons are tightly held within **covalent bonds** between atoms. These electrons are \"localized,\" meaning they are stuck in place to hold the molecules together.\n*   **No Charge Carriers:** Because the electrons are busy holding the wood's molecules together, there are no \"free\" electrons to move around. If you apply a voltage to a piece of dry wood, there are no mobile particles available to carry the charge, so no current flows. This makes wood an **insulator**.\n\n### Summary Comparison\n\n| Feature | Metals (Conductors) | Wood (Insulators) |\n| :--- | :--- | :--- |\n| **Electron State** | Delocalized (Free to move) | Localized (Tightly bound) |\n| **Atomic Structure** | Simple metallic lattice | Complex organic molecules |\n| **Response to Voltage** | Electrons flow easily | Electrons stay stuck in place |\n| **Analogy** | A wide-open highway | A crowded room where everyone is bolted to their chairs |\n\n***\n\n**Note on Moisture:** You may have heard that \"wet wood\" conducts electricity. This is because water (especially with impurities/salts) contains **ions** (charged atoms). If wood is wet, the electricity doesn't flow through the wood itself, but through the layer of water sitting inside the wood's pores.",
+            "total_latency_ms": 2206,
+            "total_tokens": 556,
+            "calls": [
+              {
+                "agent": "single",
+                "latency_ms": 2206,
+                "input_tokens": 22,
+                "output_tokens": 534,
+                "total_tokens": 556
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 3,
+            "mode": "single",
+            "output": "The difference in electrical conductivity between metals and wood comes down to one thing: **the movement of electrons.**\n\nTo conduct electricity, a material must have \"charge carriers\" (usually electrons) that are free to move through the structure of the material.\n\nHere is the breakdown of why metals succeed at this and wood fails.\n\n### 1. Metals: The \"Sea of Electrons\"\nIn a metal, the atoms are arranged in a very tight, organized grid called a **crystal lattice**. \n\nMetals are made of atoms that have a few \"extra\" electrons in their outermost shell. Because metals want to reach a stable state, they don't hold onto these outer electrons very tightly. Instead of orbiting a single atom, these electrons detach and become **delocalized**.\n\nThis creates what scientists call a **\"sea of electrons.\"** Because these electrons are not tied to any specific atom, they act like a fluid. When you apply a voltage (like connecting a battery), these electrons are pushed in one direction, creating an electric current.\n\n### 2. Wood: The \"Tightly Bound\" Structure\nWood is an organic material made primarily of complex molecules like **cellulose, hemicellulose, and lignin**. \n\nUnlike the simple, organized grid of a metal, wood is a complex web of large, bulky molecules held together by strong **covalent bonds**. In these bonds, electrons are shared very strictly between specific atoms to keep the molecule stable.\n\nBecause the electrons in wood are \"locked\" into place to hold the molecules together, there are no free electrons to move around. If you apply electricity to a piece of dry wood, the electrons stay stuck to their respective molecules, and no current can flow.\n\n### Summary Comparison\n\n| Feature | Metals (Conductors) | Wood (Insulators) |\n| :--- | :--- | :--- |\n| **Electron State** | Delocalized (\"Sea of electrons\") | Tightly bound in covalent bonds |\n| **Mobility** | Electrons move easily when voltage is applied | Electrons are stuck in place |\n| **Atomic Structure** | Simple, organized crystal lattice | Complex, irregular organic molecules |\n| **Analogy** | A hallway filled with marbles that roll easily | A hallway filled with heavy furniture bolted to the floor |\n\n***\n\n**Note on moisture:** You may have heard that \"wet wood conducts electricity.\" This is because water (especially if it contains impurities like salt) contains **ions**—atoms that have gained or lost electrons. In wet wood, the electricity isn't flowing through the wood itself, but through the thin film of water sitting between the wood fibers.",
+            "total_latency_ms": 2261,
+            "total_tokens": 569,
+            "calls": [
+              {
+                "agent": "single",
+                "latency_ms": 2261,
+                "input_tokens": 22,
+                "output_tokens": 547,
+                "total_tokens": 569
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 4,
+            "mode": "single",
+            "output": "The difference in electrical conductivity between metals and wood comes down to one thing: **the behavior of their electrons.**\n\nTo understand this, you have to look at how atoms are structured in each material.\n\n### 1. Metals: The \"Sea of Electrons\"\nIn a metal (like copper, gold, or aluminum), the atoms are arranged in a very tight, organized structure called a **crystal lattice**. \n\nThe outermost electrons of these metal atoms are held very loosely by the nucleus. Because they are so loose, they don't stay attached to any single atom. Instead, they detach and move freely throughout the entire structure. This creates what scientists call a **\"sea of delocalized electrons.\"**\n\n*   **How it works:** When you connect a battery to a metal wire, you create an electric field. Because those electrons are already loose and free to move, they immediately begin flowing in one direction toward the positive terminal. This flow of electrons is exactly what **electricity** is.\n\n### 2. Wood: The \"Locked\" Electrons\nWood is an organic material made of complex molecules like cellulose, lignin, and hemicellulose. Unlike metals, the atoms in wood are held together by **covalent bonds**.\n\nIn these bonds, the electrons are tightly shared between specific atoms to hold the molecule together. They are \"localized,\" meaning they are stuck in a specific spot. They are not free to wander around the material.\n\n*   **How it works:** When you apply an electric field to a piece of dry wood, the electrons are held so tightly by their parent atoms that they cannot move from place to place. Because there is no movement of charge, no current flows, making wood an **insulator**.\n\n---\n\n### Summary Comparison\n\n| Feature | Metals (Conductors) | Wood (Insulators) |\n| :--- | :--- | :--- |\n| **Electron State** | **Delocalized:** Electrons move freely in a \"sea.\" | **Localized:** Electrons are trapped in chemical bonds. |\n| **Atomic Structure** | Simple metallic lattice. | Complex organic molecules. |\n| **Response to Voltage** | Electrons flow easily, creating current. | Electrons stay stuck; no current flows. |\n\n**A Note on Wet Wood:** You may have heard that wet wood conducts electricity. This is because water (especially with impurities/salts) contains **ions**—charged particles that *can* move. When wood gets wet, the water fills the microscopic gaps in the wood fibers, providing a path for ions to move and carry a current.",
+            "total_latency_ms": 2176,
+            "total_tokens": 555,
+            "calls": [
+              {
+                "agent": "single",
+                "latency_ms": 2176,
+                "input_tokens": 22,
+                "output_tokens": 533,
+                "total_tokens": 555
+              }
+            ],
+            "success": true,
+            "error": null
+          }
+        ],
+        "summary": {
+          "latency_ms": [
+            2312.2,
+            0.0
+          ],
+          "success_rate": [
+            1.0,
+            0.0
+          ],
+          "total_tokens": [
+            572.2,
+            0.0
+          ]
+        }
+      },
+      {
+        "test_case_id": "mas-005",
+        "test_case_name": "Planning task",
+        "prompt": "Outline three steps to migrate a small web app from SQLite to PostgreSQL with minimal downtime.",
+        "mode": "single",
+        "runs": [
+          {
+            "run_number": 0,
+            "mode": "single",
+            "output": "To migrate a small web app from SQLite to PostgreSQL with minimal downtime, the goal is to ensure data integrity while keeping the \"cutover\" period (the time the app is offline) as short as possible.\n\nHere is a three-step outline to achieve this:\n\n### 1. Preparation and Schema Mapping\nBecause SQLite is dynamically typed and PostgreSQL is strictly typed, you cannot simply copy the database file. You must prepare the target environment first.\n\n*   **Provision PostgreSQL:** Set up your PostgreSQL instance (RDS, Supabase, or a local Docker container) with the correct credentials.\n*   **Schema Extraction:** Use a tool like `pgloader` or a migration framework (like Alembic for Python or Prisma for Node.js) to generate the PostgreSQL-compatible schema. \n*   **Data Type Alignment:** Manually review the schema for discrepancies. For example, SQLite's `DATETIME` might need to be `TIMESTAMP WITH TIME ZONE` in Postgres, and you must ensure `AUTOINCREMENT` columns are correctly mapped to `SERIAL` or `IDENTITY` columns.\n*   **Test Run:** Perform a \"dry run\" migration using a recent backup of your SQLite file to ensure the migration script completes without errors.\n\n### 2. The \"Dump and Load\" Migration\nTo minimize downtime, you want to perform the actual data transfer immediately before the application switch.\n\n*   **Stop Application Writes:** Briefly stop your web application (or put it into \"Maintenance Mode\") to ensure no new data is written to the SQLite file during the transfer.\n*   **Execute Data Transfer:** Use a specialized migration tool rather than manual SQL exports. **`pgloader`** is the industry standard for this specific task; it is designed to handle the nuances of converting SQLite types to PostgreSQL types automatically.\n    *   *Command example:* `pgloader sqlite:///path/to/db.sqlite postgresql://user:pass@host/dbname`\n*   **Verify Integrity:** Run a count check on your primary tables (e.g., `SELECT COUNT(*) FROM users;`) in both SQLite and PostgreSQL to ensure the record counts match exactly.\n\n### 3. Application Reconfiguration and Cutover\nThe final step is pointing your application code to the new infrastructure.\n\n*   **Update Environment Variables:** Update your application’s `.env` file or configuration settings. Change the database driver (e.g., from `sqlite3` to `psycopg2` or `pg`) and update the connection string (URL, host, port, username, password).\n*   **Deploy and Monitor:** Restart the application with the new configuration. \n*   **Smoke Test:** Immediately perform a series of manual tests:\n    *   Can you log in? (Tests User table/Session data)\n    *   Can you create a new record? (Tests Write permissions)\n    *   Can you view existing data? (Tests Read permissions)\n*   **Final Backup:** Once confirmed, take a snapshot of the new PostgreSQL database. Keep the old SQLite file as a \"last resort\" rollback point for at least 24 hours.",
+            "total_latency_ms": 2861,
+            "total_tokens": 680,
+            "calls": [
+              {
+                "agent": "single",
+                "latency_ms": 2861,
+                "input_tokens": 30,
+                "output_tokens": 650,
+                "total_tokens": 680
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 1,
+            "mode": "single",
+            "output": "To migrate a small web app from SQLite to PostgreSQL with minimal downtime, the goal is to synchronize the data structure and the data itself before performing a \"cutover.\"\n\nHere is a three-step outline to achieve this:\n\n### 1. Schema Alignment and Environment Setup\nBefore moving data, you must prepare the destination environment to ensure the migration doesn't fail due to data type mismatches (e.g., SQLite's flexible typing vs. PostgreSQL's strict typing).\n\n*   **Provision PostgreSQL:** Set up your PostgreSQL instance (RDS, Supabase, or a local Docker container).\n*   **Generate Schema:** Use your application's ORM (like Prisma, SQLAlchemy, or Django ORM) to generate a migration script. Apply this script to the empty PostgreSQL database.\n*   **Manual Adjustments:** Review the schema for differences. For example, ensure `Boolean` fields or `JSON` columns are explicitly defined in PostgreSQL, as SQLite handles these loosely.\n*   **Dry Run:** Run the schema migration in a staging environment to ensure the application code can successfully connect to PostgreSQL without errors.\n\n### 2. Data Transfer (The \"Warm-up\" Phase)\nTo minimize downtime, you want to move the bulk of the data while the application is still running and writing to SQLite.\n\n*   **Use a Migration Tool:** Do not use manual SQL dumps. Use specialized tools like `pgloader`. `pgloader` is designed specifically for this; it can read a SQLite file and automatically handle type conversions and stream the data into PostgreSQL.\n*   **The Initial Dump:** Run the migration tool to copy all existing rows from SQLite to PostgreSQL. \n*   **Verify Integrity:** Once the transfer is complete, run a count check (e.g., `SELECT COUNT(*) FROM users`) on both databases to ensure the row counts match.\n*   **Note on \"Delta\" Data:** At this stage, your PostgreSQL database is a \"snapshot\" of the past. Any data written to SQLite during the transfer process is now out of sync.\n\n### 3. The Cutover (The \"Downtime\" Window)\nThis is the only period where the application will be offline. The goal is to make this window as short as possible.\n\n*   **Enter Maintenance Mode:** Put your web app into \"Maintenance Mode\" (returning a 503 error) to prevent any new writes to the SQLite database.\n*   **Final Delta Sync:** Since the app is now stopped, no new data is being written. Perform one final, rapid sync of any remaining data. If your dataset is small, you can simply re-run the `pgloader` command; if it is larger, you may need to export only the most recent rows.\n*   **Update Connection Strings:** Change your application’s environment variables (e.g., `DATABASE_URL`) from the SQLite file path to the PostgreSQL connection string.\n*   **Restart and Verify:** Restart the application. Perform a smoke test (log in, create a test record, delete a record) to ensure the write/read loop is functioning correctly on the new engine.\n*   **Go Live:** Disable maintenance mode.\n\n---\n\n### Summary Pro-Tip\n**The \"Atomic\" Switch:** If your application is extremely small, the fastest way is to:\n1. Stop the app.\n2. Run `pgloader`.\n3. Update environment variables.\n4. Start the app.\n\nFor a \"small\" app, this entire process should take less than 60 seconds.",
+            "total_latency_ms": 3197,
+            "total_tokens": 772,
+            "calls": [
+              {
+                "agent": "single",
+                "latency_ms": 3197,
+                "input_tokens": 30,
+                "output_tokens": 742,
+                "total_tokens": 772
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 2,
+            "mode": "single",
+            "output": "To migrate a small web app from SQLite to PostgreSQL with minimal downtime, you should follow a \"Stage, Sync, and Switch\" strategy. This approach ensures data integrity and reduces the \"cutover\" window to just a few seconds.\n\n### Step 1: Schema Migration and Environment Setup\nBefore moving data, you must prepare the destination environment to ensure the two database engines are compatible.\n\n1.  **Provision PostgreSQL:** Set up your PostgreSQL instance (local, Docker, or managed service like RDS).\n2.  **Schema Conversion:** SQLite is \"type-loose,\" while PostgreSQL is \"type-strict.\" Use a tool like **pgloader** or a migration framework (like Alembic for Python or Prisma for JS) to generate the schema.\n3.  **Data Type Mapping:** Manually verify sensitive columns. For example, ensure SQLite `TEXT` columns intended for dates are converted to `TIMESTAMP` in Postgres, and ensure Boolean logic is correctly mapped.\n4.  **Dry Run:** Run the schema migration on a staging database to ensure your application code (ORM) can successfully connect to and query the new PostgreSQL structure.\n\n### Step 2: Data Migration (The \"Bulk Load\")\nTo minimize downtime, you want to move the bulk of the data while the application is still running and writing to SQLite.\n\n1.  **Use pgloader:** Avoid manual CSV exports. Use [pgloader](https://pgloader.io/), which is designed specifically for this task. It handles type casting and can migrate entire datasets in one command.\n    *   *Command example:* `pgloader sqlite:///path/to/db.sqlite postgresql://user:pass@host/db`\n2.  **Perform a \"Base Load\":** Run the migration tool while the app is live. This creates a snapshot of your data in PostgreSQL.\n3.  **Identify the \"Delta\":** Because the app was still running during the load, the PostgreSQL data is now slightly outdated. You must prepare to capture the changes that occurred between the start of the migration and the moment you shut down the app.\n\n### Step 3: The Cutover (Minimal Downtime Window)\nThis is the only period where the application will be offline. The goal is to make this window as short as possible.\n\n1.  **Maintenance Mode:** Put your web application into \"Maintenance Mode\" (redirecting users to a static page) to stop all incoming writes to the SQLite file.\n2.  **Final Sync (The Delta):** \n    *   **Option A (Small Data):** If the database is very small, simply run the `pgloader` command one last time. Since the app is in maintenance mode, no new data is being written, so the sync will be perfect.\n    *   **Option B (Large Data):** If the database is large, you should have used a \"Logical Replication\" approach or a transaction log, but for a *small* app, a quick re-run of the migration tool is usually faster and safer.\n3.  **Update Environment Variables:** Change your application’s connection string from `DATABASE_URL=sqlite:///...` to `DATABASE_URL=postgresql://...`.\n4.  **Verification & Launch:** Run a quick smoke test to ensure the app can read/write to the new DB, then disable Maintenance Mode.\n\n---\n\n### Summary Checklist for Success\n| Phase | Goal | Key Tool |\n| :--- | :--- | :--- |\n| **Step 1** | Match Schema | `pgloader` or ORM Migrations |\n| **Step 2** | Move Bulk Data | `pgloader` |\n| **Step 3** | Final Sync & Switch | Maintenance Mode + Env Var Update |",
+            "total_latency_ms": 3425,
+            "total_tokens": 817,
+            "calls": [
+              {
+                "agent": "single",
+                "latency_ms": 3425,
+                "input_tokens": 30,
+                "output_tokens": 787,
+                "total_tokens": 817
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 3,
+            "mode": "single",
+            "output": "To migrate a small web app from SQLite to PostgreSQL with minimal downtime, the strategy focuses on **schema synchronization** followed by a **final data dump** during a brief maintenance window.\n\nHere are the three essential steps:\n\n### 1. Schema Preparation and Environment Setup\nBefore moving any data, you must prepare the destination environment to ensure the transition is seamless once the application is switched over.\n\n*   **Provision PostgreSQL:** Set up your PostgreSQL instance (RDS, Supabase, or a local Docker container) with the same credentials structure your app expects.\n*   **Schema Migration:** Do **not** manually create tables. Instead, use your application’s migration tool (e.g., Alembic for Python, Knex for JS, or ActiveRecord for Ruby) to generate the schema on the PostgreSQL instance.\n*   **Data Type Alignment:** SQLite is \"type-loose\" (you can store strings in integer columns), whereas PostgreSQL is strict. Review your models to ensure data types (like UUIDs, JSONB, or Timestamps) are explicitly defined to prevent migration errors.\n\n### 2. The \"Maintenance Window\" Data Transfer\nTo achieve \"minimal downtime,\" you must minimize the time the application is \"Read-Only.\"\n\n*   **Enter Maintenance Mode:** Put your web app into a \"Maintenance Mode\" (a simple static page) to prevent new writes from occurring in the SQLite database.\n*   **Perform the Dump & Restore:**\n    *   **Export:** Use a specialized tool to convert SQLite to PostgreSQL-compatible SQL. Standard `sqlite3 .dump` often fails due to syntax differences. Tools like **`pgloader`** are the industry standard here; they automatically handle type conversion and schema mapping.\n    *   **Import:** Pipe the output of the conversion tool directly into your PostgreSQL instance.\n    *   *Command Example:* `pgloader sqlite:///path/to/db.sqlite postgresql://user:pass@localhost/dbname`\n*   **Verify Integrity:** Run a quick count check (e.g., `SELECT COUNT(*) FROM users;`) on both databases to ensure the record counts match perfectly.\n\n### 3. Connection Update and Cutover\nThe final step is redirecting the application's \"brain\" to the new database.\n\n*   **Update Environment Variables:** Change your application's connection string (e.g., `DATABASE_URL`) from the file path (`/data/db.sqlite`) to the new PostgreSQL URI (`postgresql://user:password@host:port/dbname`).\n*   **Deploy and Test:** Restart the application server to pick up the new environment variables. Perform a \"smoke test\" by logging in and performing a write operation (like creating a test post) to ensure the app is communicating with PostgreSQL correctly.\n*   **Final Cleanup:** Once you have confirmed the app is stable, back up the original SQLite file as a safety precaution, then decommission the old storage.\n\n---\n\n### Summary Checklist for Minimal Downtime\n| Phase | Goal | Tool Recommendation |\n| :--- | :--- | :--- |\n| **Step 1** | Match Schema | App Migrations (Alembic/Knex) |\n| **Step 2** | Move Data | **`pgloader`** (Crucial for automation) |\n| **Step 3** | Switch Traffic | Environment Variables (`.env`) |",
+            "total_latency_ms": 3148,
+            "total_tokens": 736,
+            "calls": [
+              {
+                "agent": "single",
+                "latency_ms": 3148,
+                "input_tokens": 30,
+                "output_tokens": 706,
+                "total_tokens": 736
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 4,
+            "mode": "single",
+            "output": "To migrate a small web app from SQLite to PostgreSQL with minimal downtime, the goal is to ensure data integrity while reducing the \"cutover\" period (the time the app is offline) to seconds or minutes.\n\nHere is a three-step outline to achieve this:\n\n### 1. Schema Conversion and Environment Setup\nBefore moving data, you must prepare the target environment to receive it. SQLite is dynamically typed and flexible, whereas PostgreSQL is strictly typed; this is the most common point of failure.\n\n*   **Schema Mapping:** Use a tool like `pgloader` or `sql-migrate` to convert your SQLite schema into PostgreSQL-compatible DDL (Data Definition Language). \n*   **Handle Data Type Mismatches:** Manually adjust types that don't map 1:1. For example, ensure SQLite `TEXT` fields intended for dates are converted to `TIMESTAMP` in Postgres, and ensure `BOOLEAN` values are handled correctly.\n*   **Provision PostgreSQL:** Spin up your production-ready PostgreSQL instance (e.g., AWS RDS, Supabase, or a managed Docker container) and apply the new schema. At this stage, the database is empty but ready.\n\n### 2. The Data Migration (The \"Heavy Lifting\")\nTo minimize downtime, you want to perform the bulk of the data transfer while the application is still running and writing to the SQLite file.\n\n*   **Use a Migration Tool:** Avoid manual `INSERT` statements. Use **`pgloader`**; it is the industry standard for this specific task. It can connect directly to a `.sqlite` file and stream the data into a PostgreSQL instance, handling type conversions and index creation automatically.\n*   **The \"Dry Run\":** Perform the migration multiple times in a staging environment using a recent copy of your production SQLite file. This helps you time how long the transfer takes.\n*   **Final Data Sync:** Because the app is still live, the data in SQLite will change during the migration. You have two choices:\n    *   *Option A (Small Data):* Accept a few minutes of downtime to run the final migration.\n    *   *Option B (Large Data):* Set the app to \"Maintenance Mode\" (read-only), run the final `pgloader` command, and then switch.\n\n### 3. Cutover and Validation\nThis is the moment you point your application to the new database.\n\n*   **Update Connection Strings:** Update your application's environment variables (e.g., `DATABASE_URL`) to point to the new PostgreSQL URI instead of the local `.sqlite` file.\n*   **Deployment:** Restart your application servers to pick up the new configuration.\n*   **Sanity Check & Smoke Test:** Immediately run a suite of automated tests or manual checks to verify:\n    *   **Data Integrity:** Do the row counts in critical tables match?\n    *   **Functionality:** Can users still log in? Can they create new records?\n    *   **Performance:** Are queries running efficiently with the new indexing?\n*   **Rollback Plan:** Keep the original SQLite file and the old application configuration on standby. If the PostgreSQL instance fails or data is corrupted, you can revert the connection string and restart the app to restore service immediately.",
+            "total_latency_ms": 2946,
+            "total_tokens": 714,
+            "calls": [
+              {
+                "agent": "single",
+                "latency_ms": 2946,
+                "input_tokens": 30,
+                "output_tokens": 684,
+                "total_tokens": 714
+              }
+            ],
+            "success": true,
+            "error": null
+          }
+        ],
+        "summary": {
+          "latency_ms": [
+            3115.4,
+            0.0
+          ],
+          "total_tokens": [
+            743.8,
+            0.0
+          ],
+          "success_rate": [
+            1.0,
+            0.0
+          ]
+        }
+      }
+    ],
+    "aggregate": {
+      "total_tokens": [
+        441.84,
+        0.0
+      ],
+      "latency_ms": [
+        1648.8399999999997,
+        0.0
+      ],
+      "success_rate": [
+        1.0,
+        0.0
+      ]
+    }
+  },
+  {
+    "mode": "two_agent",
+    "suite": "multi_agent",
+    "endpoint": "http://localhost:8000/v1",
+    "model": "gemma-4-26b-a4b-it",
+    "runs_per_case": 5,
+    "timestamp": "2026-06-29T13:48:36.533940073Z",
+    "duration_secs": 28,
+    "test_cases": [
+      {
+        "test_case_id": "mas-001",
+        "test_case_name": "Math handoff",
+        "prompt": "A store sells apples for $2 each. If you buy 7 apples and pay with a $20 bill, how much change do you get?",
+        "mode": "two_agent",
+        "runs": [
+          {
+            "run_number": 0,
+            "mode": "two_agent",
+            "output": "1. Total cost of apples: 7 apples × $2/apple = $14\n2. Change: $20 - $14 = $6\n\n**Final Answer: $6**",
+            "total_latency_ms": 492,
+            "total_tokens": 311,
+            "calls": [
+              {
+                "agent": "evaluator",
+                "latency_ms": 271,
+                "input_tokens": 77,
+                "output_tokens": 53,
+                "total_tokens": 130
+              },
+              {
+                "agent": "tutor",
+                "latency_ms": 220,
+                "input_tokens": 138,
+                "output_tokens": 43,
+                "total_tokens": 181
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 1,
+            "mode": "two_agent",
+            "output": "1. **Total cost of apples:** 7 apples × $2/apple = $14\n2. **Calculate change:** $20 - $14 = $6\n\n**Final Answer:** You get $6 in change.",
+            "total_latency_ms": 465,
+            "total_tokens": 310,
+            "calls": [
+              {
+                "agent": "evaluator",
+                "latency_ms": 189,
+                "input_tokens": 77,
+                "output_tokens": 49,
+                "total_tokens": 126
+              },
+              {
+                "agent": "tutor",
+                "latency_ms": 276,
+                "input_tokens": 134,
+                "output_tokens": 50,
+                "total_tokens": 184
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 2,
+            "mode": "two_agent",
+            "output": "1. **Calculate the total cost:** 7 apples × $2 per apple = $14\n2. **Calculate the change:** $20 - $14 = $6\n\n**Final result:** You get $6 in change.",
+            "total_latency_ms": 467,
+            "total_tokens": 315,
+            "calls": [
+              {
+                "agent": "evaluator",
+                "latency_ms": 229,
+                "input_tokens": 77,
+                "output_tokens": 51,
+                "total_tokens": 128
+              },
+              {
+                "agent": "tutor",
+                "latency_ms": 238,
+                "input_tokens": 136,
+                "output_tokens": 51,
+                "total_tokens": 187
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 3,
+            "mode": "two_agent",
+            "output": "1. **Total cost of apples:** 7 apples × $2/apple = $14\n2. **Change calculation:** $20 - $14 = $6\n\n**Final answer:** You get $6 in change.",
+            "total_latency_ms": 417,
+            "total_tokens": 308,
+            "calls": [
+              {
+                "agent": "evaluator",
+                "latency_ms": 149,
+                "input_tokens": 77,
+                "output_tokens": 48,
+                "total_tokens": 125
+              },
+              {
+                "agent": "tutor",
+                "latency_ms": 267,
+                "input_tokens": 133,
+                "output_tokens": 50,
+                "total_tokens": 183
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 4,
+            "mode": "two_agent",
+            "output": "1. **Total cost of apples:** 7 apples × $2 = $14\n2. **Calculate change:** $20 - $14 = $6\n\n**Final Answer:** You get $6 in change.",
+            "total_latency_ms": 414,
+            "total_tokens": 318,
+            "calls": [
+              {
+                "agent": "evaluator",
+                "latency_ms": 155,
+                "input_tokens": 77,
+                "output_tokens": 54,
+                "total_tokens": 131
+              },
+              {
+                "agent": "tutor",
+                "latency_ms": 259,
+                "input_tokens": 139,
+                "output_tokens": 48,
+                "total_tokens": 187
+              }
+            ],
+            "success": true,
+            "error": null
+          }
+        ],
+        "summary": {
+          "success_rate": [
+            1.0,
+            0.0
+          ],
+          "latency_ms": [
+            451.0,
+            0.0
+          ],
+          "total_tokens": [
+            312.4,
+            0.0
+          ]
+        }
+      },
+      {
+        "test_case_id": "mas-002",
+        "test_case_name": "Code planning",
+        "prompt": "Write a Python function that returns True if a string is a palindrome.",
+        "mode": "two_agent",
+        "runs": [
+          {
+            "run_number": 0,
+            "mode": "two_agent",
+            "output": "```python\nimport re\n\ndef is_palindrome(s: str) -> bool:\n    \"\"\"\n    Returns True if a string is a palindrome, ignoring case and non-alphanumeric characters.\n    \"\"\"\n    # Normalize the input: remove non-alphanumeric characters and convert to lowercase\n    processed_string = re.sub(r'[^a-zA-Z0-9]', '', s).lower()\n    \n    # Compare the processed string with its reverse using slicing\n    return processed_string == processed_string[::-1]\n\n# Test cases\nif __name__ == \"__main__\":\n    test_cases = [\n        (\"racecar\", True),\n        (\"A man, a plan, a canal: Panama\", True),\n        (\"hello\", False),\n        (\"12321\", True),\n        (\"No 'x' in Nixon\", True),\n        (\"\", True),  # An empty string is technically a palindrome\n    ]\n\n    for text, expected in test_cases:\n        result = is_palindrome(text)\n        print(f\"'{text}' -> Expected: {expected}, Got: {result} | {'✅ Pass' if result == expected else '❌ Fail'}\")\n```",
+            "total_latency_ms": 1517,
+            "total_tokens": 621,
+            "calls": [
+              {
+                "agent": "evaluator",
+                "latency_ms": 487,
+                "input_tokens": 60,
+                "output_tokens": 113,
+                "total_tokens": 173
+              },
+              {
+                "agent": "tutor",
+                "latency_ms": 1029,
+                "input_tokens": 181,
+                "output_tokens": 267,
+                "total_tokens": 448
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 1,
+            "mode": "two_agent",
+            "output": "```python\ndef is_palindrome(s: str) -> bool:\n    \"\"\"\n    Returns True if a string is a palindrome, ignoring case and non-alphanumeric characters.\n    \"\"\"\n    # Normalize the input: keep only alphanumeric characters and convert to lowercase\n    processed_chars = [char.lower() for char in s if char.isalnum()]\n    processed_string = \"\".join(processed_chars)\n    \n    # Compare the processed string with its reverse\n    return processed_string == processed_string[::-1]\n\n# Test cases\nif __name__ == \"__main__\":\n    test_cases = [\n        (\"racecar\", True),\n        (\"A man, a plan, a canal: Panama\", True),\n        (\"hello\", False),\n        (\"No 'x' in Nixon\", True),\n        (\"12321\", True),\n        (\"12345\", False),\n    ]\n\n    for text, expected in test_cases:\n        result = is_palindrome(text)\n        print(f\"'{text}' -> {result} (Expected: {expected})\")\n        assert result == expected\n```",
+            "total_latency_ms": 1256,
+            "total_tokens": 594,
+            "calls": [
+              {
+                "agent": "evaluator",
+                "latency_ms": 494,
+                "input_tokens": 60,
+                "output_tokens": 106,
+                "total_tokens": 166
+              },
+              {
+                "agent": "tutor",
+                "latency_ms": 761,
+                "input_tokens": 174,
+                "output_tokens": 254,
+                "total_tokens": 428
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 2,
+            "mode": "two_agent",
+            "output": "```python\nimport re\n\ndef is_palindrome(s: str) -> bool:\n    \"\"\"\n    Returns True if a string is a palindrome, ignoring case and non-alphanumeric characters.\n    \"\"\"\n    # Normalize: convert to lowercase and remove non-alphanumeric characters\n    processed_string = re.sub(r'[^a-zA-Z0-9]', '', s.lower())\n    \n    # Compare the processed string with its reverse\n    return processed_string == processed_string[::-1]\n```",
+            "total_latency_ms": 874,
+            "total_tokens": 428,
+            "calls": [
+              {
+                "agent": "evaluator",
+                "latency_ms": 465,
+                "input_tokens": 60,
+                "output_tokens": 92,
+                "total_tokens": 152
+              },
+              {
+                "agent": "tutor",
+                "latency_ms": 408,
+                "input_tokens": 160,
+                "output_tokens": 116,
+                "total_tokens": 276
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 3,
+            "mode": "two_agent",
+            "output": "```python\nimport re\n\ndef is_palindrome(s):\n    # Normalize the string: convert to lowercase and remove non-alphanumeric characters\n    processed_string = re.sub(r'[^a-zA-Z0-9]', '', s).lower()\n    \n    # Compare the processed string to its reverse using slicing\n    return processed_string == processed_string[::-1]\n```",
+            "total_latency_ms": 772,
+            "total_tokens": 396,
+            "calls": [
+              {
+                "agent": "evaluator",
+                "latency_ms": 406,
+                "input_tokens": 60,
+                "output_tokens": 90,
+                "total_tokens": 150
+              },
+              {
+                "agent": "tutor",
+                "latency_ms": 365,
+                "input_tokens": 158,
+                "output_tokens": 88,
+                "total_tokens": 246
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 4,
+            "mode": "two_agent",
+            "output": "```python\nimport re\n\ndef is_palindrome(s: str) -> bool:\n    \"\"\"\n    Returns True if a string is a palindrome, ignoring case and non-alphanumeric characters.\n    \"\"\"\n    # Normalize the string: convert to lowercase and remove non-alphanumeric characters\n    cleaned_string = re.sub(r'[^a-zA-Z0-9]', '', s.lower())\n    \n    # Compare the cleaned string with its reverse\n    return cleaned_string == cleaned_string[::-1]\n\n# Test cases\nif __name__ == \"__main__\":\n    test_cases = [\n        (\"racecar\", True),\n        (\"A man, a plan, a canal: Panama\", True),\n        (\"hello\", False),\n        (\"12321\", True),\n        (\"No 'x' in Nixon\", True),\n        (\"Was it a car or a cat I saw?\", True),\n        (\"Not a palindrome\", False)\n    ]\n\n    for text, expected in test_cases:\n        result = is_palindrome(text)\n        print(f\"'{text}' -> {result} (Expected: {expected})\")\n```",
+            "total_latency_ms": 1172,
+            "total_tokens": 632,
+            "calls": [
+              {
+                "agent": "evaluator",
+                "latency_ms": 374,
+                "input_tokens": 60,
+                "output_tokens": 122,
+                "total_tokens": 182
+              },
+              {
+                "agent": "tutor",
+                "latency_ms": 797,
+                "input_tokens": 190,
+                "output_tokens": 260,
+                "total_tokens": 450
+              }
+            ],
+            "success": true,
+            "error": null
+          }
+        ],
+        "summary": {
+          "success_rate": [
+            1.0,
+            0.0
+          ],
+          "latency_ms": [
+            1118.2,
+            0.0
+          ],
+          "total_tokens": [
+            534.2,
+            0.0
+          ]
+        }
+      },
+      {
+        "test_case_id": "mas-003",
+        "test_case_name": "Multi-step reasoning",
+        "prompt": "If all bloops are razzles and all razzles are lazzles, are all bloops definitely lazzles? Explain briefly.",
+        "mode": "two_agent",
+        "runs": [
+          {
+            "run_number": 0,
+            "mode": "two_agent",
+            "output": "Yes, all bloops are definitely lazzles.\n\n**Explanation:**\nThis is a logical syllogism following the transitive property:\n1. **Premise 1:** All bloops are contained within the category of razzles ($B \\subseteq R$).\n2. **Premise 2:** All razzles are contained within the category of lazzles ($R \\subseteq L$).\n3. **Conclusion:** Therefore, all bloops must be contained within the category of lazzles ($B \\subseteq L$).",
+            "total_latency_ms": 798,
+            "total_tokens": 420,
+            "calls": [
+              {
+                "agent": "evaluator",
+                "latency_ms": 377,
+                "input_tokens": 72,
+                "output_tokens": 81,
+                "total_tokens": 153
+              },
+              {
+                "agent": "tutor",
+                "latency_ms": 420,
+                "input_tokens": 161,
+                "output_tokens": 106,
+                "total_tokens": 267
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 1,
+            "mode": "two_agent",
+            "output": "Yes, all bloops are definitely lazzles.\n\n**Explanation:**\nThis is a logical syllogism that follows the **transitive property**. \n1. All bloops are contained within the category of razzles.\n2. All razzles are contained within the category of lazzles.\n3. Therefore, by necessity, all bloops must also be contained within the category of lazzles.",
+            "total_latency_ms": 843,
+            "total_tokens": 466,
+            "calls": [
+              {
+                "agent": "evaluator",
+                "latency_ms": 486,
+                "input_tokens": 72,
+                "output_tokens": 115,
+                "total_tokens": 187
+              },
+              {
+                "agent": "tutor",
+                "latency_ms": 356,
+                "input_tokens": 195,
+                "output_tokens": 84,
+                "total_tokens": 279
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 2,
+            "mode": "two_agent",
+            "output": "Yes, all bloops are definitely lazzles.\n\n**Explanation:**\nThis is a logical syllogism following the transitive property:\n1. **Premise 1:** All bloops are razzles (Bloops $\\subseteq$ Razzles).\n2. **Premise 2:** All razzles are lazzles (Razzles $\\subseteq$ Lazzles).\n3. **Conclusion:** Since bloops are contained within the category of razzles, and razzles are contained within the category of lazzles, all bloops must necessarily be lazzles.",
+            "total_latency_ms": 866,
+            "total_tokens": 464,
+            "calls": [
+              {
+                "agent": "evaluator",
+                "latency_ms": 379,
+                "input_tokens": 72,
+                "output_tokens": 97,
+                "total_tokens": 169
+              },
+              {
+                "agent": "tutor",
+                "latency_ms": 486,
+                "input_tokens": 177,
+                "output_tokens": 118,
+                "total_tokens": 295
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 3,
+            "mode": "two_agent",
+            "output": "Yes, all bloops are definitely lazzles.\n\n**Explanation:**\nThis is a logical syllogism based on the transitive property. \n1. If all **bloops** are contained within the category of **razzles** ($B \\subseteq R$),\n2. and all **razzles** are contained within the category of **lazzles** ($R \\subseteq L$),\n3. then **bloops** must necessarily be contained within the category of **lazzles** ($B \\subseteq L$).",
+            "total_latency_ms": 893,
+            "total_tokens": 448,
+            "calls": [
+              {
+                "agent": "evaluator",
+                "latency_ms": 420,
+                "input_tokens": 72,
+                "output_tokens": 94,
+                "total_tokens": 166
+              },
+              {
+                "agent": "tutor",
+                "latency_ms": 473,
+                "input_tokens": 174,
+                "output_tokens": 108,
+                "total_tokens": 282
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 4,
+            "mode": "two_agent",
+            "output": "Yes. This is a transitive relationship in syllogistic logic: if all A (bloops) are B (razzles), and all B are C (lazzles), then all A must be C. Therefore, all bloops are definitely lazzles.",
+            "total_latency_ms": 671,
+            "total_tokens": 361,
+            "calls": [
+              {
+                "agent": "evaluator",
+                "latency_ms": 357,
+                "input_tokens": 72,
+                "output_tokens": 77,
+                "total_tokens": 149
+              },
+              {
+                "agent": "tutor",
+                "latency_ms": 314,
+                "input_tokens": 157,
+                "output_tokens": 55,
+                "total_tokens": 212
+              }
+            ],
+            "success": true,
+            "error": null
+          }
+        ],
+        "summary": {
+          "total_tokens": [
+            431.8,
+            0.0
+          ],
+          "latency_ms": [
+            814.2,
+            0.0
+          ],
+          "success_rate": [
+            1.0,
+            0.0
+          ]
+        }
+      },
+      {
+        "test_case_id": "mas-004",
+        "test_case_name": "Science QA",
+        "prompt": "Why do metals conduct electricity better than wood?",
+        "mode": "two_agent",
+        "runs": [
+          {
+            "run_number": 0,
+            "mode": "two_agent",
+            "output": "Metals conduct electricity much better than wood due to the fundamental difference in their atomic structures and the mobility of their electrons:\n\n1.  **Atomic Structure and Electron Mobility:**\n    *   **Metals:** Metals possess a crystalline lattice structure characterized by a \"sea of delocalized electrons.\" In this arrangement, the valence electrons are not tied to any specific atom but are free to move throughout the entire metal structure.\n    *   **Wood:** Wood is a complex organic polymer composed primarily of cellulose, hemicellulose, and lignin. In these organic molecules, electrons are tightly bound within covalent bonds to specific atoms, meaning they are \"localized\" and cannot move freely.\n\n2.  **Conductivity Mechanism:**\n    *   **Metals:** When a potential difference (voltage) is applied, the delocalized electrons act as mobile charge carriers, flowing easily through the lattice to create an electric current.\n    *   **Wood:** Because wood lacks these free-moving charge carriers, it offers extremely high resistance to electron flow. The electrons are stuck in their molecular bonds and cannot migrate to carry a current.\n\n**Conclusion:** Metals are excellent conductors because their structure provides a vast \"highway\" of free electrons, whereas wood acts as an insulator because its electrons are locked in place within its molecular structure.",
+            "total_latency_ms": 1751,
+            "total_tokens": 640,
+            "calls": [
+              {
+                "agent": "evaluator",
+                "latency_ms": 629,
+                "input_tokens": 55,
+                "output_tokens": 127,
+                "total_tokens": 182
+              },
+              {
+                "agent": "tutor",
+                "latency_ms": 1121,
+                "input_tokens": 190,
+                "output_tokens": 268,
+                "total_tokens": 458
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 1,
+            "mode": "two_agent",
+            "output": "Metals conduct electricity much better than wood due to the fundamental differences in their atomic structures and the availability of charge carriers.\n\n**1. Electrical Conductivity and Charge Carriers**\nElectrical conductivity is determined by the presence and mobility of charge carriers (usually electrons). For a material to conduct electricity, it must contain particles that can move freely through the structure in response to an electric field.\n\n**2. Atomic Structure of Metals (The \"Sea of Electrons\")**\nIn metals, the atoms are arranged in a regular lattice structure. The outermost (valence) electrons are not tightly bound to any single atom; instead, they are \"delocalized.\" This creates a \"sea of delocalized electrons\" that can move freely throughout the entire metal structure. When a voltage is applied, these free electrons flow easily, creating an electric current.\n\n**3. Molecular Structure of Wood (Restricted Movement)**\nWood is an organic material composed primarily of cellulose, hemicellulose, and lignin. These molecules are held together by strong **covalent bonds**, where electrons are shared tightly between specific atoms to form stable chemical structures. Because these electrons are \"locked\" into place to maintain the molecular bonds, there are no free electrons available to move through the material to carry a charge.\n\n**4. Band Theory Comparison**\nFrom the perspective of quantum mechanics (Band Theory):\n* **Metals:** The valence band (where electrons reside) and the conduction band (where electrons move freely) overlap. This means there is no energy gap, allowing electrons to move into the conduction band with minimal effort.\n* **Wood (Insulators):** There is a very large **energy gap** (band gap) between the valence band and the conduction band. The electrons in wood do not have enough thermal or electrical energy to jump this gap, meaning they remain trapped in the valence band.\n\n**Conclusion**\nMetals are excellent conductors because they possess a high density of **delocalized electrons** that move freely. Wood is an insulator because its electrons are **tightly bound** in covalent bonds, leaving no mobile charge carriers to facilitate the flow of electricity.",
+            "total_latency_ms": 2358,
+            "total_tokens": 807,
+            "calls": [
+              {
+                "agent": "evaluator",
+                "latency_ms": 649,
+                "input_tokens": 55,
+                "output_tokens": 127,
+                "total_tokens": 182
+              },
+              {
+                "agent": "tutor",
+                "latency_ms": 1708,
+                "input_tokens": 190,
+                "output_tokens": 435,
+                "total_tokens": 625
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 2,
+            "mode": "two_agent",
+            "output": "Metals conduct electricity significantly better than wood due to the difference in their atomic structures and the mobility of their electrons.\n\n1.  **Electrical Conductivity and Electron Mobility:** Electrical conductivity is the ability of a material to allow the flow of electric charge. This flow depends on the presence of \"charge carriers\"—particles like electrons that can move freely through the material when an electric potential is applied.\n\n2.  **Atomic Structure of Metals:** In metals, the atoms are arranged in a regular lattice structure. The outermost electrons of these atoms are loosely bound to their nuclei. This results in a \"sea of delocalized electrons\" that are not attached to any single atom but can move freely throughout the entire metal structure. When a voltage is applied, these mobile electrons flow easily, creating an electric current.\n\n3.  **Atomic Structure of Wood:** Wood is an organic material composed primarily of cellulose, hemicellulose, and lignin. These molecules are held together by strong **covalent bonds**, where electrons are tightly shared between specific atoms to form stable chemical structures. Because these electrons are \"locked\" into place to maintain the molecular bonds, there are virtually no free electrons available to move through the material.\n\n4.  **Comparison and Conclusion:** \n    *   **Metals** are excellent conductors because they possess a high density of mobile, delocalized electrons that act as efficient charge carriers.\n    *   **Wood** is an insulator because its electrons are tightly bound in covalent bonds, meaning there are no free charge carriers to facilitate the movement of electricity.",
+            "total_latency_ms": 1696,
+            "total_tokens": 608,
+            "calls": [
+              {
+                "agent": "evaluator",
+                "latency_ms": 422,
+                "input_tokens": 55,
+                "output_tokens": 86,
+                "total_tokens": 141
+              },
+              {
+                "agent": "tutor",
+                "latency_ms": 1274,
+                "input_tokens": 149,
+                "output_tokens": 318,
+                "total_tokens": 467
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 3,
+            "mode": "two_agent",
+            "output": "Metals conduct electricity much better than wood due to the fundamental difference in their atomic structures and how their electrons are bonded:\n\n1.  **Metallic Bonding (The \"Sea of Electrons\"):** In metals, atoms are arranged in a crystalline lattice where the outermost electrons are not tied to any specific atom. Instead, they are **delocalized**, forming a \"sea of electrons\" that can move freely throughout the entire structure. When a voltage is applied, these mobile electrons flow easily, creating an electric current.\n2.  **Organic Polymer Structure (Wood):** Wood is composed of complex organic polymers (like cellulose and lignin) held together by strong **covalent bonds**. In these bonds, electrons are tightly shared between specific atoms to maintain the molecular structure.\n3.  **Electron Mobility:** Because the electrons in wood are \"locked\" into place within their chemical bonds, they cannot move freely to carry a charge. This makes wood an **insulator**.\n\n**Conclusion:** Metals are superior conductors because they possess a high density of mobile, delocalized electrons, whereas wood lacks free charge carriers, preventing the flow of electricity.",
+            "total_latency_ms": 1420,
+            "total_tokens": 527,
+            "calls": [
+              {
+                "agent": "evaluator",
+                "latency_ms": 417,
+                "input_tokens": 55,
+                "output_tokens": 89,
+                "total_tokens": 144
+              },
+              {
+                "agent": "tutor",
+                "latency_ms": 1002,
+                "input_tokens": 152,
+                "output_tokens": 231,
+                "total_tokens": 383
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 4,
+            "mode": "two_agent",
+            "output": "Metals conduct electricity significantly better than wood due to the difference in their atomic structures and the availability of mobile charge carriers.\n\n**1. Electrical Conductivity and Charge Carriers**\nElectrical conductivity is determined by the concentration and mobility of charge carriers (such as electrons). For a material to conduct electricity, it must contain particles that can move freely through the structure when an electric field is applied.\n\n**2. Metallic Bonding: The \"Sea of Electrons\"**\nIn metals, the atoms are arranged in a regular lattice structure held together by metallic bonds. In this arrangement, the outermost (valence) electrons are not tied to any specific atom; instead, they are \"delocalized.\" This creates a \"sea of electrons\" that can move freely throughout the entire metal lattice. When a voltage is applied, these mobile electrons flow easily, creating an electric current.\n\n**3. Molecular Structure of Wood**\nWood is an organic material composed primarily of complex polymers like cellulose, hemicellulose, and lignin. These molecules are held together by strong covalent bonds. In these bonds, electrons are tightly shared between specific atoms to maintain the molecular structure. Because these electrons are \"locked\" in place to form stable chemical bonds, they are not free to move through the material.\n\n**4. Band Theory (Energy Gap)**\nFrom a quantum mechanical perspective, conductivity is explained by the energy gap between the **valence band** (where electrons reside in bonds) and the **conduction band** (where electrons move freely):\n* **Metals:** The valence and conduction bands overlap, meaning there is no energy gap. Electrons can jump into the conduction band with virtually no effort.\n* **Wood (Insulators):** There is a very large energy gap (band gap) between the valence and conduction bands. Under normal conditions, electrons lack the energy required to jump this gap, leaving the conduction band empty.\n\n**Conclusion**\nMetals are superior conductors because their unique bonding creates a vast population of highly mobile, delocalized electrons. In contrast, wood is an insulator because its electrons are tightly bound within covalent molecular structures, leaving no mobile charge carriers to facilitate the flow of electricity.",
+            "total_latency_ms": 2258,
+            "total_tokens": 779,
+            "calls": [
+              {
+                "agent": "evaluator",
+                "latency_ms": 513,
+                "input_tokens": 55,
+                "output_tokens": 110,
+                "total_tokens": 165
+              },
+              {
+                "agent": "tutor",
+                "latency_ms": 1745,
+                "input_tokens": 173,
+                "output_tokens": 441,
+                "total_tokens": 614
+              }
+            ],
+            "success": true,
+            "error": null
+          }
+        ],
+        "summary": {
+          "latency_ms": [
+            1896.6,
+            0.0
+          ],
+          "success_rate": [
+            1.0,
+            0.0
+          ],
+          "total_tokens": [
+            672.2,
+            0.0
+          ]
+        }
+      },
+      {
+        "test_case_id": "mas-005",
+        "test_case_name": "Planning task",
+        "prompt": "Outline three steps to migrate a small web app from SQLite to PostgreSQL with minimal downtime.",
+        "mode": "two_agent",
+        "runs": [
+          {
+            "run_number": 0,
+            "mode": "two_agent",
+            "output": "To migrate a small web app from SQLite to PostgreSQL with minimal downtime, follow these three steps:\n\n1.  **Schema Alignment and Setup**: Export the existing SQLite schema and modify it to ensure compatibility with PostgreSQL (e.g., adjusting data types like `BOOLEAN` or `DATETIME`). Once adjusted, initialize the empty PostgreSQL database with this schema.\n\n2.  **Data Migration**: Use a specialized migration tool (such as `pgloader`) to copy the bulk of the data from SQLite to PostgreSQL. This step should be performed while the application is still live to ensure the source database remains unchanged and the application continues to function for users.\n\n3.  **Cutover and Verification**: Briefly place the web app into maintenance mode to prevent new writes. Perform a final incremental sync to capture any data written during the bulk migration, update the application's connection string to point to the new PostgreSQL instance, and restart the service to resume live traffic.",
+            "total_latency_ms": 1462,
+            "total_tokens": 572,
+            "calls": [
+              {
+                "agent": "evaluator",
+                "latency_ms": 695,
+                "input_tokens": 63,
+                "output_tokens": 122,
+                "total_tokens": 185
+              },
+              {
+                "agent": "tutor",
+                "latency_ms": 766,
+                "input_tokens": 193,
+                "output_tokens": 194,
+                "total_tokens": 387
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 1,
+            "mode": "two_agent",
+            "output": "To migrate a small web app from SQLite to PostgreSQL with minimal downtime, follow these three steps:\n\n1.  **Prepare the Target Environment:** Provision a PostgreSQL instance and use a schema conversion tool (such as `pgloader`) to replicate the SQLite schema. Ensure that all data types, constraints, and indexes are compatible with PostgreSQL.\n\n2.  **Perform Data Migration:** Execute a two-phase data transfer to minimize downtime. First, perform an initial bulk load of the data while the application is still live. Second, perform a final \"delta sync\" or a brief maintenance window to capture any records added or modified during the initial bulk load.\n\n3.  **Cutover and Validation:** Update the application's configuration to point the connection string to the new PostgreSQL instance and restart the service. Immediately perform a smoke test to verify data integrity and core application functionality before decommissioning the original SQLite file.",
+            "total_latency_ms": 1451,
+            "total_tokens": 579,
+            "calls": [
+              {
+                "agent": "evaluator",
+                "latency_ms": 683,
+                "input_tokens": 63,
+                "output_tokens": 131,
+                "total_tokens": 194
+              },
+              {
+                "agent": "tutor",
+                "latency_ms": 767,
+                "input_tokens": 202,
+                "output_tokens": 183,
+                "total_tokens": 385
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 2,
+            "mode": "two_agent",
+            "output": "To migrate a small web app from SQLite to PostgreSQL with minimal downtime, follow these three steps:\n\n1.  **Schema and Data Export**: Use a migration tool like `pgloader` to automatically map SQLite data types to their PostgreSQL equivalents. This process migrates the entire schema and all existing table data into a live PostgreSQL instance.\n2.  **Application Configuration Update**: Prepare a new version of your application code configured to connect to the PostgreSQL database. Test this version in a staging environment to verify connectivity and ensure all existing queries are compatible with PostgreSQL syntax.\n3.  **Cutover and Verification**: Switch production traffic to the PostgreSQL-connected application instance. Perform immediate smoke tests to ensure data integrity and application stability; once confirmed, decommission the old SQLite file.",
+            "total_latency_ms": 1246,
+            "total_tokens": 526,
+            "calls": [
+              {
+                "agent": "evaluator",
+                "latency_ms": 617,
+                "input_tokens": 63,
+                "output_tokens": 118,
+                "total_tokens": 181
+              },
+              {
+                "agent": "tutor",
+                "latency_ms": 628,
+                "input_tokens": 189,
+                "output_tokens": 156,
+                "total_tokens": 345
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 3,
+            "mode": "two_agent",
+            "output": "To migrate a small web app from SQLite to PostgreSQL with minimal downtime, follow these three steps:\n\n1.  **Schema and Data Migration**: Use a specialized tool like **pgLoader** to automate the conversion of the SQLite schema and data into the PostgreSQL instance. This ensures that data types, constraints, and indexes are correctly mapped from the SQLite format to the PostgreSQL format.\n\n2.  **Synchronization (Dual-Write or Replication)**: Implement a mechanism to keep the databases in sync during the transition. This can be done by modifying the application layer to perform **dual-writes** (writing new data to both SQLite and PostgreSQL simultaneously) or by using a migration bridge to capture and replay changes, ensuring PostgreSQL remains up-to-date with the live SQLite data.\n\n3.  **Cutover and Validation**: Perform a final data integrity check to ensure the datasets match. Once verified, update the application's connection string to point to the PostgreSQL instance and deploy the change. Monitor application logs closely for errors and keep the original SQLite database available as a fallback to allow for an immediate rollback if issues arise.",
+            "total_latency_ms": 1609,
+            "total_tokens": 613,
+            "calls": [
+              {
+                "agent": "evaluator",
+                "latency_ms": 718,
+                "input_tokens": 63,
+                "output_tokens": 127,
+                "total_tokens": 190
+              },
+              {
+                "agent": "tutor",
+                "latency_ms": 891,
+                "input_tokens": 198,
+                "output_tokens": 225,
+                "total_tokens": 423
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 4,
+            "mode": "two_agent",
+            "output": "To migrate a small web app from SQLite to PostgreSQL with minimal downtime, follow these three steps:\n\n1.  **Schema Synchronization**: Export the SQLite schema and use a tool like **pgLoader** to convert it into PostgreSQL-compatible DDL. This ensures that data types, indexes, and constraints are correctly mapped to the new system.\n2.  **Data Migration**: Perform a dump of the SQLite database and import it into the PostgreSQL instance using a migration tool. This allows you to populate the new database while the application is still running on the old one.\n3.  **Cutover**: Update the application's connection strings to point to the PostgreSQL instance and redeploy. If necessary, perform a final delta sync (migrating only the data changed since the initial dump) immediately before the switch to minimize downtime.",
+            "total_latency_ms": 1254,
+            "total_tokens": 526,
+            "calls": [
+              {
+                "agent": "evaluator",
+                "latency_ms": 591,
+                "input_tokens": 63,
+                "output_tokens": 112,
+                "total_tokens": 175
+              },
+              {
+                "agent": "tutor",
+                "latency_ms": 662,
+                "input_tokens": 183,
+                "output_tokens": 168,
+                "total_tokens": 351
+              }
+            ],
+            "success": true,
+            "error": null
+          }
+        ],
+        "summary": {
+          "latency_ms": [
+            1404.4,
+            0.0
+          ],
+          "success_rate": [
+            1.0,
+            0.0
+          ],
+          "total_tokens": [
+            563.2,
+            0.0
+          ]
+        }
+      }
+    ],
+    "aggregate": {
+      "latency_ms": [
+        1136.8799999999999,
+        0.0
+      ],
+      "total_tokens": [
+        502.76000000000005,
+        0.0
+      ],
+      "success_rate": [
+        1.0,
+        0.0
+      ]
+    }
+  },
+  {
+    "mode": "four_agent",
+    "suite": "multi_agent",
+    "endpoint": "http://localhost:8000/v1",
+    "model": "gemma-4-26b-a4b-it",
+    "runs_per_case": 5,
+    "timestamp": "2026-06-29T13:49:40.438698719Z",
+    "duration_secs": 63,
+    "test_cases": [
+      {
+        "test_case_id": "mas-001",
+        "test_case_name": "Math handoff",
+        "prompt": "A store sells apples for $2 each. If you buy 7 apples and pay with a $20 bill, how much change do you get?",
+        "mode": "four_agent",
+        "runs": [
+          {
+            "run_number": 0,
+            "mode": "four_agent",
+            "output": "You get **$6** in change.",
+            "total_latency_ms": 950,
+            "total_tokens": 739,
+            "calls": [
+              {
+                "agent": "diagnoser",
+                "latency_ms": 254,
+                "input_tokens": 58,
+                "output_tokens": 36,
+                "total_tokens": 94
+              },
+              {
+                "agent": "planner",
+                "latency_ms": 311,
+                "input_tokens": 99,
+                "output_tokens": 70,
+                "total_tokens": 169
+              },
+              {
+                "agent": "affective",
+                "latency_ms": 259,
+                "input_tokens": 175,
+                "output_tokens": 57,
+                "total_tokens": 232
+              },
+              {
+                "agent": "solver",
+                "latency_ms": 124,
+                "input_tokens": 234,
+                "output_tokens": 10,
+                "total_tokens": 244
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 1,
+            "mode": "four_agent",
+            "output": "$6",
+            "total_latency_ms": 1048,
+            "total_tokens": 811,
+            "calls": [
+              {
+                "agent": "diagnoser",
+                "latency_ms": 265,
+                "input_tokens": 58,
+                "output_tokens": 38,
+                "total_tokens": 96
+              },
+              {
+                "agent": "planner",
+                "latency_ms": 374,
+                "input_tokens": 101,
+                "output_tokens": 87,
+                "total_tokens": 188
+              },
+              {
+                "agent": "affective",
+                "latency_ms": 295,
+                "input_tokens": 194,
+                "output_tokens": 67,
+                "total_tokens": 261
+              },
+              {
+                "agent": "solver",
+                "latency_ms": 113,
+                "input_tokens": 263,
+                "output_tokens": 3,
+                "total_tokens": 266
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 2,
+            "mode": "four_agent",
+            "output": "$6",
+            "total_latency_ms": 703,
+            "total_tokens": 729,
+            "calls": [
+              {
+                "agent": "diagnoser",
+                "latency_ms": 257,
+                "input_tokens": 58,
+                "output_tokens": 45,
+                "total_tokens": 103
+              },
+              {
+                "agent": "planner",
+                "latency_ms": 240,
+                "input_tokens": 108,
+                "output_tokens": 91,
+                "total_tokens": 199
+              },
+              {
+                "agent": "affective",
+                "latency_ms": 108,
+                "input_tokens": 205,
+                "output_tokens": 6,
+                "total_tokens": 211
+              },
+              {
+                "agent": "solver",
+                "latency_ms": 97,
+                "input_tokens": 213,
+                "output_tokens": 3,
+                "total_tokens": 216
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 3,
+            "mode": "four_agent",
+            "output": "You will receive $6 in change.",
+            "total_latency_ms": 914,
+            "total_tokens": 851,
+            "calls": [
+              {
+                "agent": "diagnoser",
+                "latency_ms": 170,
+                "input_tokens": 58,
+                "output_tokens": 46,
+                "total_tokens": 104
+              },
+              {
+                "agent": "planner",
+                "latency_ms": 257,
+                "input_tokens": 109,
+                "output_tokens": 83,
+                "total_tokens": 192
+              },
+              {
+                "agent": "affective",
+                "latency_ms": 362,
+                "input_tokens": 198,
+                "output_tokens": 74,
+                "total_tokens": 272
+              },
+              {
+                "agent": "solver",
+                "latency_ms": 124,
+                "input_tokens": 274,
+                "output_tokens": 9,
+                "total_tokens": 283
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 4,
+            "mode": "four_agent",
+            "output": "$6",
+            "total_latency_ms": 653,
+            "total_tokens": 725,
+            "calls": [
+              {
+                "agent": "diagnoser",
+                "latency_ms": 151,
+                "input_tokens": 58,
+                "output_tokens": 44,
+                "total_tokens": 102
+              },
+              {
+                "agent": "planner",
+                "latency_ms": 294,
+                "input_tokens": 107,
+                "output_tokens": 91,
+                "total_tokens": 198
+              },
+              {
+                "agent": "affective",
+                "latency_ms": 108,
+                "input_tokens": 204,
+                "output_tokens": 6,
+                "total_tokens": 210
+              },
+              {
+                "agent": "solver",
+                "latency_ms": 98,
+                "input_tokens": 212,
+                "output_tokens": 3,
+                "total_tokens": 215
+              }
+            ],
+            "success": true,
+            "error": null
+          }
+        ],
+        "summary": {
+          "latency_ms": [
+            853.6,
+            0.0
+          ],
+          "total_tokens": [
+            771.0,
+            0.0
+          ],
+          "success_rate": [
+            1.0,
+            0.0
+          ]
+        }
+      },
+      {
+        "test_case_id": "mas-002",
+        "test_case_name": "Code planning",
+        "prompt": "Write a Python function that returns True if a string is a palindrome.",
+        "mode": "four_agent",
+        "runs": [
+          {
+            "run_number": 0,
+            "mode": "four_agent",
+            "output": "```python\nimport re\n\ndef is_palindrome(s: str) -> bool:\n    \"\"\"\n    Checks if a string is a palindrome, ignoring case and non-alphanumeric characters.\n    \n    Args:\n        s: The input string to check.\n        \n    Returns:\n        True if the string is a palindrome, False otherwise.\n    \"\"\"\n    # 1. Normalize the input: lowercase and remove non-alphanumeric characters\n    clean_s = re.sub(r'[^a-zA-Z0-9]', '', s).lower()\n    \n    # 2. & 3. Reverse the string and compare to the original\n    return clean_s == clean_s[::-1]\n\n# Test cases\nif __name__ == \"__main__\":\n    print(is_palindrome(\"A man, a plan, a canal: Panama\"))  # True\n    print(is_palindrome(\"racecar\"))                         # True\n    print(is_palindrome(\"hello\"))                           # False\n    print(is_palindrome(\"12321\"))                           # True\n```",
+            "total_latency_ms": 1986,
+            "total_tokens": 1437,
+            "calls": [
+              {
+                "agent": "diagnoser",
+                "latency_ms": 260,
+                "input_tokens": 41,
+                "output_tokens": 44,
+                "total_tokens": 85
+              },
+              {
+                "agent": "planner",
+                "latency_ms": 471,
+                "input_tokens": 90,
+                "output_tokens": 112,
+                "total_tokens": 202
+              },
+              {
+                "agent": "affective",
+                "latency_ms": 885,
+                "input_tokens": 208,
+                "output_tokens": 246,
+                "total_tokens": 454
+              },
+              {
+                "agent": "solver",
+                "latency_ms": 367,
+                "input_tokens": 456,
+                "output_tokens": 240,
+                "total_tokens": 696
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 1,
+            "mode": "four_agent",
+            "output": "```python\nimport re\n\ndef is_palindrome(s: str) -> bool:\n    \"\"\"\n    Returns True if the input string is a palindrome, ignoring case \n    and non-alphanumeric characters.\n    \"\"\"\n    # 1. Normalize: remove non-alphanumeric characters and lowercase everything\n    cleaned_str = re.sub(r'[^a-zA-Z0-9]', '', s).lower()\n    \n    # 2. & 3. Reverse and compare\n    return cleaned_str == cleaned_str[::-1]\n\n# Test cases\nif __name__ == \"__main__\":\n    print(is_palindrome(\"A man, a plan, a canal: Panama\")) # Expected: True\n    print(is_palindrome(\"racecar\"))                       # Expected: True\n    print(is_palindrome(\"hello\"))                         # Expected: False\n```",
+            "total_latency_ms": 3262,
+            "total_tokens": 1991,
+            "calls": [
+              {
+                "agent": "diagnoser",
+                "latency_ms": 280,
+                "input_tokens": 41,
+                "output_tokens": 42,
+                "total_tokens": 83
+              },
+              {
+                "agent": "planner",
+                "latency_ms": 1084,
+                "input_tokens": 88,
+                "output_tokens": 280,
+                "total_tokens": 368
+              },
+              {
+                "agent": "affective",
+                "latency_ms": 1218,
+                "input_tokens": 374,
+                "output_tokens": 299,
+                "total_tokens": 673
+              },
+              {
+                "agent": "solver",
+                "latency_ms": 678,
+                "input_tokens": 675,
+                "output_tokens": 192,
+                "total_tokens": 867
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 2,
+            "mode": "four_agent",
+            "output": "```python\nimport re\n\ndef is_palindrome(s: str) -> bool:\n    \"\"\"\n    Returns True if the string is a palindrome, ignoring case and non-alphanumeric characters.\n    \"\"\"\n    # Step 1: Normalize the input (lowercase and remove non-alphanumeric characters)\n    clean_str = re.sub(r'[^a-zA-Z0-9]', '', s).lower()\n    \n    # Step 2 & 3: Reverse the string and compare\n    return clean_str == clean_str[::-1]\n\n# Test cases\nif __name__ == \"__main__\":\n    print(is_palindrome(\"A man, a plan, a canal: Panama\"))  # True\n    print(is_palindrome(\"race car\"))                       # True\n    print(is_palindrome(\"hello\"))                          # False\n    print(is_palindrome(\"12321\"))                          # True\n```",
+            "total_latency_ms": 1958,
+            "total_tokens": 1334,
+            "calls": [
+              {
+                "agent": "diagnoser",
+                "latency_ms": 284,
+                "input_tokens": 41,
+                "output_tokens": 34,
+                "total_tokens": 75
+              },
+              {
+                "agent": "planner",
+                "latency_ms": 519,
+                "input_tokens": 80,
+                "output_tokens": 126,
+                "total_tokens": 206
+              },
+              {
+                "agent": "affective",
+                "latency_ms": 819,
+                "input_tokens": 212,
+                "output_tokens": 211,
+                "total_tokens": 423
+              },
+              {
+                "agent": "solver",
+                "latency_ms": 335,
+                "input_tokens": 425,
+                "output_tokens": 205,
+                "total_tokens": 630
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 3,
+            "mode": "four_agent",
+            "output": "```python\nimport re\n\ndef is_palindrome(s):\n    \"\"\"\n    Returns True if the input string is a palindrome, \n    ignoring case and non-alphanumeric characters.\n    \"\"\"\n    # 1. Normalize: Remove non-alphanumeric characters and convert to lowercase\n    clean_s = re.sub(r'[^a-zA-Z0-9]', '', s).lower()\n    \n    # 2. Compare the cleaned string to its reverse using slicing\n    return clean_s == clean_s[::-1]\n\n# Example usage:\nif __name__ == \"__main__\":\n    print(is_palindrome(\"A man, a plan, a canal: Panama\"))  # True\n    print(is_palindrome(\"racecar\"))                        # True\n    print(is_palindrome(\"hello\"))                          # False\n```",
+            "total_latency_ms": 3339,
+            "total_tokens": 1925,
+            "calls": [
+              {
+                "agent": "diagnoser",
+                "latency_ms": 260,
+                "input_tokens": 41,
+                "output_tokens": 36,
+                "total_tokens": 77
+              },
+              {
+                "agent": "planner",
+                "latency_ms": 1024,
+                "input_tokens": 82,
+                "output_tokens": 269,
+                "total_tokens": 351
+              },
+              {
+                "agent": "affective",
+                "latency_ms": 1265,
+                "input_tokens": 357,
+                "output_tokens": 297,
+                "total_tokens": 654
+              },
+              {
+                "agent": "solver",
+                "latency_ms": 788,
+                "input_tokens": 656,
+                "output_tokens": 187,
+                "total_tokens": 843
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 4,
+            "mode": "four_agent",
+            "output": "```python\nimport re\n\ndef is_palindrome(s):\n    \"\"\"\n    Returns True if the input string is a palindrome, ignoring case \n    and non-alphanumeric characters.\n    \"\"\"\n    # 1. Normalize: Remove non-alphanumeric characters and convert to lowercase\n    clean_s = re.sub(r'[^a-zA-Z0-9]', '', s).lower()\n    \n    # 2. Compare the cleaned string with its reverse\n    return clean_s == clean_s[::-1]\n\n# Test cases\nif __name__ == \"__main__\":\n    print(is_palindrome(\"Race Car\"))                         # True\n    print(is_palindrome(\"A man, a plan, a canal: Panama\"))    # True\n    print(is_palindrome(\"hello\"))                            # False\n    print(is_palindrome(\"12321\"))                            # True\n```",
+            "total_latency_ms": 3252,
+            "total_tokens": 1857,
+            "calls": [
+              {
+                "agent": "diagnoser",
+                "latency_ms": 304,
+                "input_tokens": 41,
+                "output_tokens": 42,
+                "total_tokens": 83
+              },
+              {
+                "agent": "planner",
+                "latency_ms": 884,
+                "input_tokens": 88,
+                "output_tokens": 248,
+                "total_tokens": 336
+              },
+              {
+                "agent": "affective",
+                "latency_ms": 1289,
+                "input_tokens": 342,
+                "output_tokens": 276,
+                "total_tokens": 618
+              },
+              {
+                "agent": "solver",
+                "latency_ms": 774,
+                "input_tokens": 620,
+                "output_tokens": 200,
+                "total_tokens": 820
+              }
+            ],
+            "success": true,
+            "error": null
+          }
+        ],
+        "summary": {
+          "total_tokens": [
+            1708.8,
+            0.0
+          ],
+          "success_rate": [
+            1.0,
+            0.0
+          ],
+          "latency_ms": [
+            2759.4,
+            0.0
+          ]
+        }
+      },
+      {
+        "test_case_id": "mas-003",
+        "test_case_name": "Multi-step reasoning",
+        "prompt": "If all bloops are razzles and all razzles are lazzles, are all bloops definitely lazzles? Explain briefly.",
+        "mode": "four_agent",
+        "runs": [
+          {
+            "run_number": 0,
+            "mode": "four_agent",
+            "output": "Yes, all bloops are definitely lazzles. This is a classic example of a categorical syllogism that follows the **transitive property**: if every member of set A (bloops) belongs to set B (razzles), and every member of set B belongs to set C (lazzles), then every member of set A must necessarily belong to set C.",
+            "total_latency_ms": 1851,
+            "total_tokens": 1172,
+            "calls": [
+              {
+                "agent": "diagnoser",
+                "latency_ms": 320,
+                "input_tokens": 53,
+                "output_tokens": 52,
+                "total_tokens": 105
+              },
+              {
+                "agent": "planner",
+                "latency_ms": 581,
+                "input_tokens": 110,
+                "output_tokens": 132,
+                "total_tokens": 242
+              },
+              {
+                "agent": "affective",
+                "latency_ms": 574,
+                "input_tokens": 249,
+                "output_tokens": 124,
+                "total_tokens": 373
+              },
+              {
+                "agent": "solver",
+                "latency_ms": 375,
+                "input_tokens": 375,
+                "output_tokens": 77,
+                "total_tokens": 452
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 1,
+            "mode": "four_agent",
+            "output": "Yes, all bloops are definitely lazzles.\n\n**Explanation:**\nThis is a classic syllogism that follows the **transitive property** of logic. \n1. Since all bloops are contained within the category of razzles, and \n2. all razzles are contained within the category of lazzles, \nit follows logically that the bloop category is nested entirely within the lazzy category. Therefore, the conclusion is certain.",
+            "total_latency_ms": 1851,
+            "total_tokens": 1327,
+            "calls": [
+              {
+                "agent": "diagnoser",
+                "latency_ms": 281,
+                "input_tokens": 53,
+                "output_tokens": 49,
+                "total_tokens": 102
+              },
+              {
+                "agent": "planner",
+                "latency_ms": 592,
+                "input_tokens": 107,
+                "output_tokens": 134,
+                "total_tokens": 241
+              },
+              {
+                "agent": "affective",
+                "latency_ms": 451,
+                "input_tokens": 247,
+                "output_tokens": 197,
+                "total_tokens": 444
+              },
+              {
+                "agent": "solver",
+                "latency_ms": 525,
+                "input_tokens": 446,
+                "output_tokens": 94,
+                "total_tokens": 540
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 2,
+            "mode": "four_agent",
+            "output": "Yes, all bloops are definitely lazzles.\n\n**Explanation:**\nThis is a classic syllogism that follows the **transitive property**. The logical chain works as follows:\n1.  **Premise 1:** All bloops $\\rightarrow$ razzles.\n2.  **Premise 2:** All razzles $\\rightarrow$ lazzles.\n3.  **Conclusion:** Therefore, all bloops $\\rightarrow$ lazzles.\n\nBecause the category of \"bloops\" is entirely contained within \"razzles,\" and the entire category of \"razzles\" is contained within \"lazzles,\" the bloops are inherently part of the lazzle category.",
+            "total_latency_ms": 1474,
+            "total_tokens": 976,
+            "calls": [
+              {
+                "agent": "diagnoser",
+                "latency_ms": 194,
+                "input_tokens": 53,
+                "output_tokens": 53,
+                "total_tokens": 106
+              },
+              {
+                "agent": "planner",
+                "latency_ms": 555,
+                "input_tokens": 111,
+                "output_tokens": 123,
+                "total_tokens": 234
+              },
+              {
+                "agent": "affective",
+                "latency_ms": 116,
+                "input_tokens": 240,
+                "output_tokens": 6,
+                "total_tokens": 246
+              },
+              {
+                "agent": "solver",
+                "latency_ms": 608,
+                "input_tokens": 248,
+                "output_tokens": 142,
+                "total_tokens": 390
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 3,
+            "mode": "four_agent",
+            "output": "Yes, all bloops are definitely lazzles. This is a classic example of a categorical syllogism that follows the **transitive property**: if set A is a subset of set B, and set B is a subset of set C, then set A must inherently be a subset of set C.\n\n**Logical breakdown:**\n1. **All bloops are razzles** (Bloops $\\subseteq$ Razzles)\n2. **All razzles are lazzles** (Razzles $\\subseteq$ Lazzles)\n3. **Therefore, all bloops are lazzles** (Bloops $\\subseteq$ Lazzles)",
+            "total_latency_ms": 1719,
+            "total_tokens": 1122,
+            "calls": [
+              {
+                "agent": "diagnoser",
+                "latency_ms": 240,
+                "input_tokens": 53,
+                "output_tokens": 50,
+                "total_tokens": 103
+              },
+              {
+                "agent": "planner",
+                "latency_ms": 519,
+                "input_tokens": 108,
+                "output_tokens": 130,
+                "total_tokens": 238
+              },
+              {
+                "agent": "affective",
+                "latency_ms": 451,
+                "input_tokens": 244,
+                "output_tokens": 79,
+                "total_tokens": 323
+              },
+              {
+                "agent": "solver",
+                "latency_ms": 507,
+                "input_tokens": 325,
+                "output_tokens": 133,
+                "total_tokens": 458
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 4,
+            "mode": "four_agent",
+            "output": "Yes, all bloops are definitely lazzles. This is a classic example of a transitive relationship: if set A (bloops) is a subset of set B (razzles), and set B is a subset of set C (lazzles), then set A must necessarily be a subset of set C.",
+            "total_latency_ms": 1872,
+            "total_tokens": 1124,
+            "calls": [
+              {
+                "agent": "diagnoser",
+                "latency_ms": 315,
+                "input_tokens": 53,
+                "output_tokens": 47,
+                "total_tokens": 100
+              },
+              {
+                "agent": "planner",
+                "latency_ms": 548,
+                "input_tokens": 105,
+                "output_tokens": 122,
+                "total_tokens": 227
+              },
+              {
+                "agent": "affective",
+                "latency_ms": 630,
+                "input_tokens": 233,
+                "output_tokens": 132,
+                "total_tokens": 365
+              },
+              {
+                "agent": "solver",
+                "latency_ms": 377,
+                "input_tokens": 367,
+                "output_tokens": 65,
+                "total_tokens": 432
+              }
+            ],
+            "success": true,
+            "error": null
+          }
+        ],
+        "summary": {
+          "success_rate": [
+            1.0,
+            0.0
+          ],
+          "latency_ms": [
+            1753.4,
+            0.0
+          ],
+          "total_tokens": [
+            1144.2,
+            0.0
+          ]
+        }
+      },
+      {
+        "test_case_id": "mas-004",
+        "test_case_name": "Science QA",
+        "prompt": "Why do metals conduct electricity better than wood?",
+        "mode": "four_agent",
+        "runs": [
+          {
+            "run_number": 0,
+            "mode": "four_agent",
+            "output": "Metals conduct electricity better than wood because of the way their electrons are arranged and held within their atomic structures.\n\n### 1. Metals: The \"Sea of Electrons\"\nIn metals, the atoms are arranged in a rigid lattice, but their outermost (valence) electrons are not tied to any single atom. These electrons are **delocalized**, meaning they detach from their parent atoms and form a \"sea\" or \"cloud\" of mobile charge carriers that flows around the positive ions. \n\nWhen a voltage (electrical pressure) is applied, these free electrons can move easily through the metal lattice toward the positive terminal. This constant, rapid movement of electrons constitutes an **electric current**.\n\n### 2. Wood: Locked Electrons\nWood is an organic material composed of complex molecules like cellulose and lignin. Unlike metals, the electrons in wood are involved in **covalent bonds**, where they are shared tightly between specific atoms to hold the molecules together.\n\nBecause these electrons are \"locked\" in place to maintain the structural integrity of the wood, they are not free to move. In physics terms, wood has a large **band gap**, meaning it would require an enormous amount of energy to knock an electron out of its bond to allow it to move. Without mobile electrons to carry the charge, wood acts as an **insulator**.\n\n### Summary Comparison\n\n| Feature | Metals (Conductors) | Wood (Insulators) |\n| :--- | :--- | :--- |\n| **Electron State** | **Delocalized:** Free to move throughout the structure. | **Localized:** Tightly held within covalent bonds. |\n| **Charge Carriers** | High density of mobile electrons. | Extremely low to none. |\n| **Movement** | Electrons drift easily when voltage is applied. | Electrons remain stationary. |\n| **Resistance** | **Low:** Electricity flows with little opposition. | **High:** Electricity is blocked. |",
+            "total_latency_ms": 4353,
+            "total_tokens": 1985,
+            "calls": [
+              {
+                "agent": "diagnoser",
+                "latency_ms": 299,
+                "input_tokens": 36,
+                "output_tokens": 53,
+                "total_tokens": 89
+              },
+              {
+                "agent": "planner",
+                "latency_ms": 663,
+                "input_tokens": 94,
+                "output_tokens": 146,
+                "total_tokens": 240
+              },
+              {
+                "agent": "affective",
+                "latency_ms": 1606,
+                "input_tokens": 246,
+                "output_tokens": 383,
+                "total_tokens": 629
+              },
+              {
+                "agent": "solver",
+                "latency_ms": 1784,
+                "input_tokens": 631,
+                "output_tokens": 396,
+                "total_tokens": 1027
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 1,
+            "mode": "four_agent",
+            "output": "Metals conduct electricity better than wood because of the **mobility** of their electrons. The difference lies in how their atoms are structured:\n\n**1. The Atomic Structure (The \"Sea\" vs. The \"Glue\")**\n*   **Metals:** In a metal, the atoms are arranged in a lattice where the outermost electrons are not tied to any single atom. Instead, they form a \"sea\" or \"mist\" of **delocalized electrons** that move freely around the positive ions.\n*   **Wood:** Wood is made of complex organic molecules (like cellulose and lignin) held together by strong **covalent bonds**. In this structure, the electrons are \"locked in place\" to act as the glue holding the molecules together; they are not free to wander.\n\n**2. Electron Mobility (The \"Push\")**\n*   **In Metals:** When you apply voltage (an electrical \"push\"), these free-floating electrons can immediately begin drifting in one direction. This flow of electrons is what we call an electric current.\n*   **In Wood:** When voltage is applied to wood, the electrons are \"tethered\" to their specific atoms. Because they cannot break free from their bonds to travel through the material, no current can flow.\n\n**3. The Water Analogy**\nTo visualize this, imagine two different pipes:\n*   **Metal is like an open pipe filled with water:** As soon as you turn on the pump (voltage), the water flows through the pipe easily.\n*   **Wood is like a pipe filled with solid concrete:** You can turn the pump on with all your might, but because the material inside is a solid, unmoving block, nothing flows through the pipe.",
+            "total_latency_ms": 4326,
+            "total_tokens": 2006,
+            "calls": [
+              {
+                "agent": "diagnoser",
+                "latency_ms": 339,
+                "input_tokens": 36,
+                "output_tokens": 54,
+                "total_tokens": 90
+              },
+              {
+                "agent": "planner",
+                "latency_ms": 670,
+                "input_tokens": 95,
+                "output_tokens": 136,
+                "total_tokens": 231
+              },
+              {
+                "agent": "affective",
+                "latency_ms": 1837,
+                "input_tokens": 237,
+                "output_tokens": 426,
+                "total_tokens": 663
+              },
+              {
+                "agent": "solver",
+                "latency_ms": 1479,
+                "input_tokens": 665,
+                "output_tokens": 357,
+                "total_tokens": 1022
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 2,
+            "mode": "four_agent",
+            "output": "Metals conduct electricity better than wood because of the way their atoms are bonded, which determines whether electrons are free to move or are trapped in place.\n\n### 1. Metals: The \"Sea of Electrons\"\nIn metals, the atoms are arranged in a tight lattice structure held together by **metallic bonding**. In this arrangement, the outermost (valence) electrons are not attached to any single atom. Instead, they are **delocalized**, meaning they float freely around the entire structure like a \"sea of electrons.\" \n\nWhen a voltage (electrical pressure) is applied, these free-moving electrons act as charge carriers, drifting easily through the metal lattice to create an electric current.\n\n### 2. Wood: Bound Electrons\nWood is an organic material composed of complex molecules like cellulose and lignin, held together by **covalent bonds**. In covalent bonding, electrons are shared specifically between two atoms to form a stable bond. This means the electrons are **localized**—they are \"locked\" into place to maintain the chemical structure of the wood.\n\nBecause these electrons are tightly bound to their specific atoms, there are no mobile charge carriers available to move through the material. Even when a voltage is applied, the electrons remain stationary, making wood an insulator.\n\n### Summary Comparison\n\n| Feature | Metals (Conductors) | Wood (Insulators) |\n| :--- | :--- | :--- |\n| **Electron State** | **Delocalized:** Free to move throughout the material. | **Localized:** Trapped within chemical bonds. |\n| **Bonding Type** | Metallic bonding. | Covalent/Molecular bonding. |\n| **Charge Carriers** | High density of free electrons. | Virtually no free electrons. |\n| **Response to Voltage** | Electrons flow easily (High conductivity). | Electrons remain stationary (High resistance). |",
+            "total_latency_ms": 4236,
+            "total_tokens": 1903,
+            "calls": [
+              {
+                "agent": "diagnoser",
+                "latency_ms": 304,
+                "input_tokens": 36,
+                "output_tokens": 53,
+                "total_tokens": 89
+              },
+              {
+                "agent": "planner",
+                "latency_ms": 616,
+                "input_tokens": 94,
+                "output_tokens": 134,
+                "total_tokens": 228
+              },
+              {
+                "agent": "affective",
+                "latency_ms": 1634,
+                "input_tokens": 234,
+                "output_tokens": 368,
+                "total_tokens": 602
+              },
+              {
+                "agent": "solver",
+                "latency_ms": 1681,
+                "input_tokens": 604,
+                "output_tokens": 380,
+                "total_tokens": 984
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 3,
+            "mode": "four_agent",
+            "output": "Metals conduct electricity better than wood because of the way their atoms are bonded, which determines whether electrons are free to move or are stuck in place.\n\n**1. Metals: The \"Sea of Electrons\"**\nIn metals, atoms are held together by **metallic bonding**. In this structure, the outermost (valence) electrons are not tied to any single atom; instead, they are \"delocalized.\" This creates a \"sea of electrons\" that surrounds a lattice of positive metal ions. When a voltage (electrical pressure) is applied, these free-moving electrons can flow easily through the material, creating an electric current.\n\n**2. Wood: Tightly Bound Electrons**\nWood is an organic material composed of complex molecules like cellulose and lignin. These molecules are held together by **covalent bonding**, where electrons are shared strictly between specific pairs of atoms to form stable chemical bonds. Because these electrons are \"localized\" (locked in place to maintain the molecular structure), there are no free charge carriers to move when a voltage is applied.\n\n**Summary Comparison**\n* **Metals:** Have **delocalized electrons** (mobile charge carriers) $\\rightarrow$ **High Conductivity.**\n* **Wood:** Has **localized electrons** (fixed in covalent bonds) $\\rightarrow$ **Insulator.**",
+            "total_latency_ms": 2585,
+            "total_tokens": 1210,
+            "calls": [
+              {
+                "agent": "diagnoser",
+                "latency_ms": 354,
+                "input_tokens": 36,
+                "output_tokens": 53,
+                "total_tokens": 89
+              },
+              {
+                "agent": "planner",
+                "latency_ms": 617,
+                "input_tokens": 94,
+                "output_tokens": 134,
+                "total_tokens": 228
+              },
+              {
+                "agent": "affective",
+                "latency_ms": 414,
+                "input_tokens": 234,
+                "output_tokens": 79,
+                "total_tokens": 313
+              },
+              {
+                "agent": "solver",
+                "latency_ms": 1199,
+                "input_tokens": 315,
+                "output_tokens": 265,
+                "total_tokens": 580
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 4,
+            "mode": "four_agent",
+            "output": "Metals conduct electricity better than wood because of the way their electrons are arranged and held. The fundamental difference lies in **electron mobility**.\n\n### 1. Metals: The \"Sea of Electrons\"\nIn metals, the atoms are arranged in a regular lattice structure. Because metals have relatively low ionization energy, their outermost electrons are not tightly held by any single nucleus. Instead, these electrons become **delocalized**, meaning they are free to move throughout the entire structure. \n\nThis creates what scientists call a **\"sea of delocalized electrons.\"** When a voltage (electrical pressure) is applied, these free electrons act as charge carriers, flowing easily through the metal from the negative terminal to the positive terminal, creating an electric current.\n\n### 2. Wood: Tightly Bound Electrons\nWood is an organic material composed of complex polymers like cellulose and lignin. The atoms in these molecules are held together by **covalent bonds**. In a covalent bond, electrons are shared specifically between two atoms to maintain the structural integrity of the molecule.\n\nBecause these electrons are \"locked\" into place to hold the molecules together, they are **localized**. They do not have the freedom to move from atom to atom. When a voltage is applied to wood, the electrons remain stuck in their bonds; since no charge can flow through the material, it acts as an insulator.\n\n### Summary Comparison\n\n| Feature | Metals (Conductors) | Wood (Insulators) |\n| :--- | :--- | :--- |\n| **Bonding Type** | Metallic Bonding | Covalent Bonding |\n| **Electron State** | **Delocalized:** Free to move throughout the lattice. | **Localized:** Tightly bound within molecular structures. |\n| **Response to Voltage** | High mobility; electrons flow to create current. | No mobility; electrons remain stationary. |",
+            "total_latency_ms": 3828,
+            "total_tokens": 1801,
+            "calls": [
+              {
+                "agent": "diagnoser",
+                "latency_ms": 317,
+                "input_tokens": 36,
+                "output_tokens": 53,
+                "total_tokens": 89
+              },
+              {
+                "agent": "planner",
+                "latency_ms": 589,
+                "input_tokens": 94,
+                "output_tokens": 136,
+                "total_tokens": 230
+              },
+              {
+                "agent": "affective",
+                "latency_ms": 1356,
+                "input_tokens": 236,
+                "output_tokens": 314,
+                "total_tokens": 550
+              },
+              {
+                "agent": "solver",
+                "latency_ms": 1564,
+                "input_tokens": 552,
+                "output_tokens": 380,
+                "total_tokens": 932
+              }
+            ],
+            "success": true,
+            "error": null
+          }
+        ],
+        "summary": {
+          "success_rate": [
+            1.0,
+            0.0
+          ],
+          "latency_ms": [
+            3865.6,
+            0.0
+          ],
+          "total_tokens": [
+            1781.0,
+            0.0
+          ]
+        }
+      },
+      {
+        "test_case_id": "mas-005",
+        "test_case_name": "Planning task",
+        "prompt": "Outline three steps to migrate a small web app from SQLite to PostgreSQL with minimal downtime.",
+        "mode": "four_agent",
+        "runs": [
+          {
+            "run_number": 0,
+            "mode": "four_agent",
+            "output": "To migrate a small web app from SQLite to PostgreSQL with minimal downtime, follow these three steps:\n\n1.  **Schema and Data Transfer:** Use a specialized migration tool like `pgloader` to automate the mapping of SQLite data types to PostgreSQL equivalents and transfer the existing schema and data to the new PostgreSQL instance.\n2.  **Application Configuration Update:** Update your application's environment variables or configuration files with the new PostgreSQL connection string and audit your codebase for any SQLite-specific SQL syntax that may need adjustment.\n3.  **Switchover and Verification:** Briefly stop the application to perform a final data sync, update the production environment to point to the new database, restart the service, and perform a smoke test to ensure data integrity.",
+            "total_latency_ms": 2511,
+            "total_tokens": 1859,
+            "calls": [
+              {
+                "agent": "diagnoser",
+                "latency_ms": 923,
+                "input_tokens": 44,
+                "output_tokens": 187,
+                "total_tokens": 231
+              },
+              {
+                "agent": "planner",
+                "latency_ms": 665,
+                "input_tokens": 236,
+                "output_tokens": 147,
+                "total_tokens": 383
+              },
+              {
+                "agent": "affective",
+                "latency_ms": 334,
+                "input_tokens": 389,
+                "output_tokens": 157,
+                "total_tokens": 546
+              },
+              {
+                "agent": "solver",
+                "latency_ms": 587,
+                "input_tokens": 548,
+                "output_tokens": 151,
+                "total_tokens": 699
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 1,
+            "mode": "four_agent",
+            "output": "To migrate a small web app from SQLite to PostgreSQL with minimal downtime, follow these three steps:\n\n**1. Schema Translation and Environment Setup**\nUse a migration tool like `pgloader` to automate the conversion of SQLite's dynamic typing to PostgreSQL's strict typing. Manually review the generated schema to ensure specific constraints—such as `AUTOINCREMENT` transitioning to `SERIAL` or `IDENTITY` columns—are correctly mapped. Once the schema is ready, apply it to your new PostgreSQL instance to create the target structure.\n\n**2. Initial Bulk Data Load and Verification**\nPerform a full data migration (bulk load) from the SQLite file to the PostgreSQL server while the application is still live and writing to SQLite. This handles the majority of the data volume without requiring downtime. Once the transfer is complete, perform a verification step by comparing row counts and checksums for every table to ensure the PostgreSQL \"snapshot\" is accurate.\n\n**3. Final Delta Sync and Atomic Cutover**\nTo minimize downtime, stop the application to prevent new writes, then perform a final \"delta sync\" to transfer only the rows added or changed since the initial bulk load. Once the final records are synchronized, update your application's environment variables (connection strings) to point to the PostgreSQL instance and restart the service. Monitor application logs immediately to confirm successful connectivity.",
+            "total_latency_ms": 4325,
+            "total_tokens": 2036,
+            "calls": [
+              {
+                "agent": "diagnoser",
+                "latency_ms": 351,
+                "input_tokens": 44,
+                "output_tokens": 50,
+                "total_tokens": 94
+              },
+              {
+                "agent": "planner",
+                "latency_ms": 1055,
+                "input_tokens": 99,
+                "output_tokens": 232,
+                "total_tokens": 331
+              },
+              {
+                "agent": "affective",
+                "latency_ms": 1578,
+                "input_tokens": 337,
+                "output_tokens": 330,
+                "total_tokens": 667
+              },
+              {
+                "agent": "solver",
+                "latency_ms": 1340,
+                "input_tokens": 669,
+                "output_tokens": 275,
+                "total_tokens": 944
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 2,
+            "mode": "four_agent",
+            "output": "### **3-Step Migration Plan: SQLite to PostgreSQL**\n\n1.  **Schema Mapping and Initial Load**\n    Use a specialized migration tool like `pgloader` to handle the heavy lifting. This tool automatically translates SQLite's dynamic typing into PostgreSQL's strict typing and performs a bulk transfer of all existing records into a fresh PostgreSQL instance.\n\n2.  **Dual-Write Synchronization**\n    Modify your application's data access layer to implement \"dual-writes.\" For every `INSERT`, `UPDATE`, or `DELETE` operation, the application must write to both SQLite and PostgreSQL. This ensures that while the bulk load is occurring, any new data generated by users is captured in the new database in real-time.\n\n3.  **Cutover and Verification**\n    Once the PostgreSQL instance is confirmed to be in sync with SQLite, update your application's environment variables to point the connection string exclusively to PostgreSQL. Restart the service and perform a final integrity check to ensure all relational constraints (foreign keys, unique indexes) are functioning correctly in the new environment.",
+            "total_latency_ms": 3667,
+            "total_tokens": 2116,
+            "calls": [
+              {
+                "agent": "diagnoser",
+                "latency_ms": 864,
+                "input_tokens": 44,
+                "output_tokens": 168,
+                "total_tokens": 212
+              },
+              {
+                "agent": "planner",
+                "latency_ms": 691,
+                "input_tokens": 217,
+                "output_tokens": 153,
+                "total_tokens": 370
+              },
+              {
+                "agent": "affective",
+                "latency_ms": 1219,
+                "input_tokens": 376,
+                "output_tokens": 280,
+                "total_tokens": 656
+              },
+              {
+                "agent": "solver",
+                "latency_ms": 892,
+                "input_tokens": 658,
+                "output_tokens": 220,
+                "total_tokens": 878
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 3,
+            "mode": "four_agent",
+            "output": "To migrate a small web app from SQLite to PostgreSQL with minimal downtime, follow these three steps:\n\n1.  **Schema Migration & Initial Load:** Use a specialized tool like `pgloader` to automate the translation of SQLite's dynamic typing into PostgreSQL's strict typing. This step migrates your existing schema and the bulk of your dataset into a new PostgreSQL instance.\n\n2.  **Staging Validation & ORM Tuning:** Point a staging version of your application to the new PostgreSQL instance. This is critical to identify and fix issues caused by PostgreSQL's strict type enforcement (e.g., if SQLite allowed a string in an integer column) and to ensure your ORM queries function correctly.\n\n3.  **Maintenance Window & Cutover:** \n    *   **Freeze:** Put the application into \"Maintenance Mode\" to prevent new data writes.\n    *   **Final Sync:** Run a final data synchronization to capture any \"delta\" changes (data written between the initial load and the freeze).\n    *   **Switch:** Update the production environment variables (connection strings) to point to the PostgreSQL instance and restart the application.",
+            "total_latency_ms": 3826,
+            "total_tokens": 2016,
+            "calls": [
+              {
+                "agent": "diagnoser",
+                "latency_ms": 651,
+                "input_tokens": 44,
+                "output_tokens": 134,
+                "total_tokens": 178
+              },
+              {
+                "agent": "planner",
+                "latency_ms": 721,
+                "input_tokens": 183,
+                "output_tokens": 151,
+                "total_tokens": 334
+              },
+              {
+                "agent": "affective",
+                "latency_ms": 1394,
+                "input_tokens": 340,
+                "output_tokens": 294,
+                "total_tokens": 634
+              },
+              {
+                "agent": "solver",
+                "latency_ms": 1058,
+                "input_tokens": 636,
+                "output_tokens": 234,
+                "total_tokens": 870
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 4,
+            "mode": "four_agent",
+            "output": "To migrate a small web app from SQLite to PostgreSQL with minimal downtime, follow these three steps:\n\n1.  **Schema and Data Migration (The \"Warm-up\"):** Use a specialized migration tool like `pgloader` to migrate the existing SQLite schema and data into the new PostgreSQL instance. This step can be performed while the application is still running and actively writing to SQLite, as it handles the heavy lifting of converting data types and creating the necessary table structures.\n\n2.  **Configuration and Validation (The \"Staging\"):** Update your application’s configuration in a staging environment to point to the new PostgreSQL instance. Run your full test suite against this new database to ensure that all data types (specifically dates, booleans, and JSON) were mapped correctly and that your ORM or raw queries function as expected.\n\n3.  **The Cutover (The \"Switch\"):** To minimize downtime, place the application into \"Maintenance Mode\" (read-only) to prevent new writes. Perform one final incremental sync or a final `pgloader` run to capture the \"delta\" (the data written since the first migration). Update the production environment variables to point to the PostgreSQL connection string and restart the application.",
+            "total_latency_ms": 3404,
+            "total_tokens": 1667,
+            "calls": [
+              {
+                "agent": "diagnoser",
+                "latency_ms": 359,
+                "input_tokens": 44,
+                "output_tokens": 53,
+                "total_tokens": 97
+              },
+              {
+                "agent": "planner",
+                "latency_ms": 650,
+                "input_tokens": 102,
+                "output_tokens": 141,
+                "total_tokens": 243
+              },
+              {
+                "agent": "affective",
+                "latency_ms": 1334,
+                "input_tokens": 249,
+                "output_tokens": 289,
+                "total_tokens": 538
+              },
+              {
+                "agent": "solver",
+                "latency_ms": 1060,
+                "input_tokens": 540,
+                "output_tokens": 249,
+                "total_tokens": 789
+              }
+            ],
+            "success": true,
+            "error": null
+          }
+        ],
+        "summary": {
+          "latency_ms": [
+            3546.6,
+            0.0
+          ],
+          "total_tokens": [
+            1938.8,
+            0.0
+          ],
+          "success_rate": [
+            1.0,
+            0.0
+          ]
+        }
+      }
+    ],
+    "aggregate": {
+      "total_tokens": [
+        1468.76,
+        0.0
+      ],
+      "latency_ms": [
+        2555.7200000000003,
+        0.0
+      ],
+      "success_rate": [
+        1.0,
+        0.0
+      ]
+    }
+  }
+]

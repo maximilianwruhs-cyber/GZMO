@@ -1,0 +1,2457 @@
+[
+  {
+    "mode": "single",
+    "suite": "reasoning",
+    "endpoint": "http://localhost:8000/v1",
+    "model": "gemma-4-26b-a4b-it",
+    "runs_per_case": 5,
+    "timestamp": "2026-06-29T13:52:08.579194733Z",
+    "duration_secs": 31,
+    "test_cases": [
+      {
+        "test_case_id": "rea-001",
+        "test_case_name": "Syllogism",
+        "prompt": "If all mammals are animals, and all dogs are mammals, what can we conclude about dogs?",
+        "mode": "single",
+        "runs": [
+          {
+            "run_number": 0,
+            "mode": "single",
+            "output": "Based on the logic provided, you can conclude that **all dogs are animals**.\n\nThis is a classic example of a **syllogism**, a form of logical reasoning:\n1.  **Major premise:** All mammals are animals.\n2.  **Minor premise:** All dogs are mammals.\n3.  **Conclusion:** Therefore, all dogs are animals.",
+            "total_latency_ms": 338,
+            "total_tokens": 109,
+            "calls": [
+              {
+                "agent": "single",
+                "latency_ms": 338,
+                "input_tokens": 32,
+                "output_tokens": 77,
+                "total_tokens": 109
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 1,
+            "mode": "single",
+            "output": "Based on the premises provided, we can conclude that **all dogs are animals**.\n\nThis is a classic example of a **syllogism**, a form of logical reasoning:\n1.  **Major premise:** All mammals are animals.\n2.  **Minor premise:** All dogs are mammals.\n3.  **Conclusion:** Therefore, all dogs are animals.",
+            "total_latency_ms": 305,
+            "total_tokens": 109,
+            "calls": [
+              {
+                "agent": "single",
+                "latency_ms": 305,
+                "input_tokens": 32,
+                "output_tokens": 77,
+                "total_tokens": 109
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 2,
+            "mode": "single",
+            "output": "We can conclude that **all dogs are animals**.\n\nThis is a classic example of a **syllogism**, a form of logical reasoning. The logic follows this structure:\n\n1.  **Major premise:** All mammals are animals.\n2.  **Minor premise:** All dogs are mammals.\n3.  **Conclusion:** Therefore, all dogs are animals.",
+            "total_latency_ms": 309,
+            "total_tokens": 109,
+            "calls": [
+              {
+                "agent": "single",
+                "latency_ms": 309,
+                "input_tokens": 32,
+                "output_tokens": 77,
+                "total_tokens": 109
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 3,
+            "mode": "single",
+            "output": "Based on the premises provided, we can conclude that **all dogs are animals**.\n\nThis is an example of a **syllogism**, a form of logical reasoning. The logic follows this structure:\n\n1.  **Major premise:** All mammals are animals.\n2.  **Minor premise:** All dogs are mammals.\n3.  **Conclusion:** Therefore, all dogs are animals.",
+            "total_latency_ms": 303,
+            "total_tokens": 114,
+            "calls": [
+              {
+                "agent": "single",
+                "latency_ms": 303,
+                "input_tokens": 32,
+                "output_tokens": 82,
+                "total_tokens": 114
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 4,
+            "mode": "single",
+            "output": "Based on the logic provided, we can conclude that **all dogs are animals**.\n\nThis is a classic example of a **syllogism**, a form of logical reasoning where a conclusion is drawn from two given premises:\n\n1.  **Major Premise:** All mammals are animals.\n2.  **Minor Premise:** All dogs are mammals.\n3.  **Conclusion:** Therefore, all dogs are animals.",
+            "total_latency_ms": 384,
+            "total_tokens": 120,
+            "calls": [
+              {
+                "agent": "single",
+                "latency_ms": 384,
+                "input_tokens": 32,
+                "output_tokens": 88,
+                "total_tokens": 120
+              }
+            ],
+            "success": true,
+            "error": null
+          }
+        ],
+        "summary": {
+          "latency_ms": [
+            327.8,
+            0.0
+          ],
+          "total_tokens": [
+            112.2,
+            0.0
+          ],
+          "success_rate": [
+            1.0,
+            0.0
+          ]
+        }
+      },
+      {
+        "test_case_id": "rea-002",
+        "test_case_name": "Pattern Recognition",
+        "prompt": "What comes next in the sequence: 2, 4, 8, 16, ...?",
+        "mode": "single",
+        "runs": [
+          {
+            "run_number": 0,
+            "mode": "single",
+            "output": "The next number in the sequence is **32**.\n\n**Reasoning:**\nThis is a geometric sequence where each number is multiplied by 2 to get the next number:\n*   2 × 2 = 4\n*   4 × 2 = 8\n*   8 × 2 = 16\n*   **16 × 2 = 32**",
+            "total_latency_ms": 268,
+            "total_tokens": 117,
+            "calls": [
+              {
+                "agent": "single",
+                "latency_ms": 268,
+                "input_tokens": 35,
+                "output_tokens": 82,
+                "total_tokens": 117
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 1,
+            "mode": "single",
+            "output": "The next number in the sequence is **32**.\n\n**Reasoning:**\nThis is a geometric sequence where each number is multiplied by **2** to get the next term:\n*   2 × 2 = 4\n*   4 × 2 = 8\n*   8 × 2 = 16\n*   16 × 2 = **32**",
+            "total_latency_ms": 232,
+            "total_tokens": 117,
+            "calls": [
+              {
+                "agent": "single",
+                "latency_ms": 232,
+                "input_tokens": 35,
+                "output_tokens": 82,
+                "total_tokens": 117
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 2,
+            "mode": "single",
+            "output": "The next number in the sequence is **32**.\n\n**Reasoning:**\nThis is a geometric progression where each number is multiplied by **2** to get the next number:\n*   2 × 2 = 4\n*   4 × 2 = 8\n*   8 × 2 = 16\n*   16 × 2 = **32**",
+            "total_latency_ms": 239,
+            "total_tokens": 117,
+            "calls": [
+              {
+                "agent": "single",
+                "latency_ms": 239,
+                "input_tokens": 35,
+                "output_tokens": 82,
+                "total_tokens": 117
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 3,
+            "mode": "single",
+            "output": "The next number in the sequence is **32**.\n\n**Reasoning:**\nThe sequence follows a geometric pattern where each number is multiplied by **2** to get the next number:\n*   2 × 2 = 4\n*   4 × 2 = 8\n*   8 × 2 = 16\n*   16 × 2 = **32**",
+            "total_latency_ms": 267,
+            "total_tokens": 118,
+            "calls": [
+              {
+                "agent": "single",
+                "latency_ms": 267,
+                "input_tokens": 35,
+                "output_tokens": 83,
+                "total_tokens": 118
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 4,
+            "mode": "single",
+            "output": "The next number in the sequence is **32**.\n\n**Reasoning:**\nThis is a geometric progression where each number is multiplied by **2** to get the next number:\n*   2 × 2 = 4\n*   4 × 2 = 8\n*   8 × 2 = 16\n*   16 × 2 = **32**",
+            "total_latency_ms": 125,
+            "total_tokens": 117,
+            "calls": [
+              {
+                "agent": "single",
+                "latency_ms": 125,
+                "input_tokens": 35,
+                "output_tokens": 82,
+                "total_tokens": 117
+              }
+            ],
+            "success": true,
+            "error": null
+          }
+        ],
+        "summary": {
+          "latency_ms": [
+            226.2,
+            0.0
+          ],
+          "total_tokens": [
+            117.2,
+            0.0
+          ],
+          "success_rate": [
+            1.0,
+            0.0
+          ]
+        }
+      },
+      {
+        "test_case_id": "rea-003",
+        "test_case_name": "Logic Puzzle",
+        "prompt": "You have two coins totaling 30 cents. One is not a quarter. What are the coins?",
+        "mode": "single",
+        "runs": [
+          {
+            "run_number": 0,
+            "mode": "single",
+            "output": "The coins are a **quarter** and a **nickel**.\n\nThe riddle relies on the phrasing \"One is not a quarter.\" While one of the coins is not a quarter (the nickel), the **other** one is.",
+            "total_latency_ms": 214,
+            "total_tokens": 81,
+            "calls": [
+              {
+                "agent": "single",
+                "latency_ms": 214,
+                "input_tokens": 34,
+                "output_tokens": 47,
+                "total_tokens": 81
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 1,
+            "mode": "single",
+            "output": "The coins are a **quarter** and a **nickel**.\n\nThe riddle relies on the phrasing \"one is not a quarter.\" While one of them (the nickel) is not a quarter, the other one is.",
+            "total_latency_ms": 238,
+            "total_tokens": 79,
+            "calls": [
+              {
+                "agent": "single",
+                "latency_ms": 238,
+                "input_tokens": 34,
+                "output_tokens": 45,
+                "total_tokens": 79
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 2,
+            "mode": "single",
+            "output": "The coins are a **quarter and a nickel**.\n\nThe riddle relies on the phrasing \"one is not a quarter.\" While one coin is not a quarter (the nickel), the **other** one is.",
+            "total_latency_ms": 212,
+            "total_tokens": 77,
+            "calls": [
+              {
+                "agent": "single",
+                "latency_ms": 212,
+                "input_tokens": 34,
+                "output_tokens": 43,
+                "total_tokens": 77
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 3,
+            "mode": "single",
+            "output": "The coins are a **quarter** and a **nickel**.\n\nThe riddle states that *one* of them is not a quarter—and that's true, because the other one is!",
+            "total_latency_ms": 200,
+            "total_tokens": 74,
+            "calls": [
+              {
+                "agent": "single",
+                "latency_ms": 200,
+                "input_tokens": 34,
+                "output_tokens": 40,
+                "total_tokens": 74
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 4,
+            "mode": "single",
+            "output": "The coins are a **quarter** and a **nickel**.\n\nThe riddle relies on the phrasing \"one is not a quarter.\" While one of them (the nickel) is not a quarter, the other one is.",
+            "total_latency_ms": 239,
+            "total_tokens": 79,
+            "calls": [
+              {
+                "agent": "single",
+                "latency_ms": 239,
+                "input_tokens": 34,
+                "output_tokens": 45,
+                "total_tokens": 79
+              }
+            ],
+            "success": true,
+            "error": null
+          }
+        ],
+        "summary": {
+          "success_rate": [
+            1.0,
+            0.0
+          ],
+          "total_tokens": [
+            78.0,
+            0.0
+          ],
+          "latency_ms": [
+            220.6,
+            0.0
+          ]
+        }
+      },
+      {
+        "test_case_id": "rea-004",
+        "test_case_name": "Explanation",
+        "prompt": "Explain why the sky appears blue during the day.",
+        "mode": "single",
+        "runs": [
+          {
+            "run_number": 0,
+            "mode": "single",
+            "output": "The short answer is a phenomenon called **Rayleigh scattering**.\n\nTo understand why this happens, you have to look at three things: sunlight, Earth’s atmosphere, and the way light behaves.\n\n### 1. Sunlight is a \"Rainbow\"\nAlthough sunlight looks white to us, it is actually made up of all the colors of the rainbow (red, orange, yellow, green, blue, indigo, and violet). Light travels as **waves**, and each color has a different wavelength:\n*   **Red light** has long, lazy wavelengths.\n*   **Blue and violet light** have short, choppy wavelengths.\n\n### 2. The Atmosphere is an Obstacle Course\nEarth’s atmosphere is filled with gases (mostly nitrogen and oxygen). These gas molecules are much smaller than the wavelength of visible light, but they are just large enough to interfere with it.\n\n### 3. Rayleigh Scattering\nWhen sunlight hits the Earth's atmosphere, it strikes the gas molecules and scatters in all directions. \n\nBecause **blue light** travels in shorter, smaller waves, it strikes the gas molecules and gets scattered much more easily than the longer red waves. While the red and yellow light passes through the atmosphere relatively straight (which is why we see a red sunset later), the blue light is bounced around like a pinball in every direction.\n\nWhen you look up at the sky, your eyes are catching that \"scattered\" blue light coming from every part of the sky.\n\n### Why isn't the sky violet?\nViolet light has an even shorter wavelength than blue light, meaning it scatters even more. Technically, the sky *is* violet, but we see it as blue for two reasons:\n1.  **The Sun:** The Sun emits much more blue light than violet light.\n2.  **Human Biology:** Our eyes are much more sensitive to blue than to violet. Our eyes interpret the mix of scattered violet and blue light as a bright, pale blue.\n\n### Summary: The Sunset Exception\nWhen the sun is setting, the light has to travel through much more of the Earth's atmosphere to reach your eyes. By the time the light gets to you, the blue light has been scattered away completely, leaving only the long-wavelength **reds and oranges** to reach your eyes.",
+            "total_latency_ms": 1981,
+            "total_tokens": 502,
+            "calls": [
+              {
+                "agent": "single",
+                "latency_ms": 1981,
+                "input_tokens": 23,
+                "output_tokens": 479,
+                "total_tokens": 502
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 1,
+            "mode": "single",
+            "output": "The sky appears blue due to a phenomenon called **Rayleigh scattering**. To understand why this happens, you have to look at three things: sunlight, Earth's atmosphere, and the way light behaves.\n\n### 1. Sunlight is a Rainbow\nAlthough sunlight looks white, it is actually made up of all the colors of the rainbow (red, orange, yellow, green, blue, indigo, and violet). Light travels as **waves**, and each color has a different wavelength:\n*   **Red light** has long, lazy wavelengths.\n*   **Blue and violet light** have much shorter, choppier wavelengths.\n\n### 2. The Atmosphere is an Obstacle Course\nEarth’s atmosphere is filled with gases (mostly nitrogen and oxygen). These gas molecules are very small—much smaller than the wavelength of visible light. \n\nWhen sunlight hits the atmosphere, it strikes these gas molecules. Because red and yellow light have long wavelengths, they pass through the atmosphere relatively straight, without bumping into much. They \"ignore\" the small gas molecules.\n\n### 3. Scattering the Blue Light\nBecause blue light travels in shorter, smaller waves, it is much more likely to strike the gas molecules. When a blue light wave hits a nitrogen or oxygen molecule, it gets redirected (scattered) in every possible direction.\n\nAs you look up, your eyes are catching this \"scattered\" blue light coming from every part of the sky, rather than just from the direct point of the sun. This is why the entire dome of the sky looks blue.\n\n---\n\n### Common Follow-up Questions\n\n**Why isn't the sky violet?**\nViolet light has an even shorter wavelength than blue light, meaning it scatters even more intensely. Technically, the sky *is* violet, but we don't see it that way for two reasons:\n1.  The Sun emits much more blue light than violet light.\n2.  **Human biology:** Our eyes are much more sensitive to blue than to violet. Our brains interpret the mix of scattered violet and blue light simply as pale blue.\n\n**Why is the sunset red?**\nWhen the sun is setting, the light has to travel through much more of the Earth's atmosphere to reach your eyes because it is hitting the horizon at a low angle. By the time the light reaches you, the blue light has been scattered away completely, leaving only the long-wavelength reds and oranges to pass through.",
+            "total_latency_ms": 2179,
+            "total_tokens": 532,
+            "calls": [
+              {
+                "agent": "single",
+                "latency_ms": 2179,
+                "input_tokens": 23,
+                "output_tokens": 509,
+                "total_tokens": 532
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 2,
+            "mode": "single",
+            "output": "The sky appears blue due to a phenomenon called **Rayleigh scattering**. To understand why this happens, you need to look at three things: sunlight, Earth's atmosphere, and the nature of light waves.\n\nHere is the step-by-step breakdown:\n\n### 1. Sunlight is a mixture of all colors\nAlthough sunlight looks white to us, it is actually made up of all the colors of the rainbow (red, orange, yellow, green, blue, indigo, and violet). Light travels as **waves**, and each color has a different wavelength:\n*   **Red light** has long, lazy wavelengths.\n*   **Blue and violet light** have short, choppy wavelengths.\n\n### 2. The Atmosphere is an obstacle course\nEarth's atmosphere is filled with gases (mostly nitrogen and oxygen). When sunlight hits the atmosphere, it strikes the molecules of these gases. \n\nBecause gas molecules are very small, they affect the colors differently based on their wavelength:\n*   The **long wavelengths** (reds and yellows) pass through the atmosphere relatively straight, without hitting much.\n*   The **short wavelengths** (blues and violets) strike the gas molecules and get scattered in every direction.\n\n### 3. Scattering creates the blue glow\nBecause the blue light is being bounced around (scattered) by the molecules in the air, it is being sent in every direction across the sky. When you look up, your eyes are catching this \"scattered\" blue light coming from every part of the sky, rather than just from the direct point of the sun.\n\n---\n\n### Two Common Follow-up Questions:\n\n**\"If violet light has even shorter wavelengths than blue, why isn't the sky violet?\"**\nTechnically, the sky *is* violet, but we don't see it that way for two reasons:\n1.  **The Sun's Output:** The Sun emits much more blue light than violet light.\n2.  **Human Biology:** Our eyes are much more sensitive to blue than to violet. Our brains interpret the mix of scattered violet and blue light as a pale blue.\n\n**\"Why does the sky turn red at sunset?\"**\nWhen the sun is setting, the light has to travel through much more of the Earth's atmosphere to reach your eyes because it is hitting the horizon at an angle. By the time the light reaches you, the blue light has been scattered away completely, leaving only the long-wavelength **reds and oranges** to pass through.",
+            "total_latency_ms": 2061,
+            "total_tokens": 548,
+            "calls": [
+              {
+                "agent": "single",
+                "latency_ms": 2061,
+                "input_tokens": 23,
+                "output_tokens": 525,
+                "total_tokens": 548
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 3,
+            "mode": "single",
+            "output": "The short answer is a phenomenon called **Rayleigh scattering**. \n\nTo understand why this happens, you have to look at three things: sunlight, Earth's atmosphere, and how light behaves when it hits particles.\n\n### 1. Sunlight is a Rainbow\nAlthough sunlight looks white, it is actually made up of all the colors of the rainbow (red, orange, yellow, green, blue, indigo, and violet). \n\nLight travels as **waves**. Each color has a different wavelength:\n*   **Red light** has long, lazy wavelengths.\n*   **Blue and violet light** have short, choppy wavelengths.\n\n### 2. The Atmosphere is an Obstacle Course\nEarth’s atmosphere is filled with gases (mostly nitrogen and oxygen). While these gas molecules are much smaller than the wavelength of visible light, they are still large enough to affect the light as it passes through.\n\n### 3. Rayleigh Scattering\nWhen sunlight hits the Earth's atmosphere, the longer wavelengths (reds and yellows) pass through mostly straight, without hitting much. They are \"lazy\" enough to travel through the gas molecules without being diverted.\n\nHowever, the shorter wavelengths (**blue and violet**) strike the gas molecules and get scattered in every direction. Because the blue light is bouncing around everywhere in the upper atmosphere, when you look up, your eyes are catching that scattered blue light coming from every part of the sky.\n\n### Why isn't the sky violet?\nViolet light has an even shorter wavelength than blue light, meaning it scatters even more intensely. Technically, the sky *is* being hit by a massive amount of violet light. However, we see it as blue for two reasons:\n1.  **The Sun's Output:** The Sun emits much more blue light than violet light.\n2.  **Human Biology:** Our eyes are much more sensitive to blue than to violet. Our eyes interpret the mix of scattered violet and blue light simply as pale blue.\n\n---\n\n### Summary: Why is the sunset red?\nYou can use this same logic to explain sunsets. When the sun is low on the horizon, the light has to travel through much more of the Earth's atmosphere to reach your eyes. By the time the light gets to you, the blue light has been scattered away completely, leaving only the long-wavelength **reds and oranges** to pass through.",
+            "total_latency_ms": 2153,
+            "total_tokens": 517,
+            "calls": [
+              {
+                "agent": "single",
+                "latency_ms": 2152,
+                "input_tokens": 23,
+                "output_tokens": 494,
+                "total_tokens": 517
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 4,
+            "mode": "single",
+            "output": "The reason the sky appears blue is due to a phenomenon called **Rayleigh scattering**. \n\nTo understand why this happens, you have to look at three things: sunlight, Earth's atmosphere, and how light behaves when it hits gas molecules.\n\n### 1. Sunlight is a spectrum of colors\nAlthough sunlight looks white to us, it is actually made up of all the colors of the rainbow (red, orange, yellow, green, blue, indigo, and violet). Light travels as **waves**, and each color has a different wavelength:\n*   **Red light** has long, lazy wavelengths.\n*   **Blue and violet light** have much shorter, choppier wavelengths.\n\n### 2. The Atmosphere is an obstacle course\nEarth's atmosphere is filled with gases (mostly nitrogen and oxygen). These gas molecules are much smaller than the wavelength of visible light, but they are just the right size to interact with the light waves.\n\n### 3. Rayleigh Scattering\nWhen sunlight enters the atmosphere, it strikes the molecules of nitrogen and oxygen. Because blue light travels in shorter, smaller waves, it strikes these molecules and gets **scattered** in every direction. \n\nImagine throwing a handful of large basketballs (red light) and a handful of tiny marbles (blue light) through a forest of thin poles (gas molecules). The basketballs will mostly bounce straight through the gaps, but the tiny marbles will hit the poles and scatter everywhere. \n\nBecause the blue light is bouncing around in every direction, when you look up, your eyes are catching that scattered blue light coming from every part of the sky.\n\n### Why isn't the sky violet?\nTechnically, violet light has an even shorter wavelength than blue light, so it scatters even more. Theoretically, the sky should look violet. However, the sky appears blue for two reasons:\n1.  **The Sun's Output:** The Sun emits much more blue light than violet light.\n2.  **Human Biology:** Our eyes are much more sensitive to blue than to violet. Our brains interpret the mix of scattered violet and blue light as a pale blue.\n\n---\n\n### Summary: Why is the sunset red?\nYou can use this same logic to explain sunsets. When the sun is setting, the light has to travel through much more of the Earth's atmosphere to reach your eyes. By the time the light gets to you, the blue light has been scattered away completely, leaving only the long-wavelength **reds and oranges** to pass through.",
+            "total_latency_ms": 2196,
+            "total_tokens": 547,
+            "calls": [
+              {
+                "agent": "single",
+                "latency_ms": 2196,
+                "input_tokens": 23,
+                "output_tokens": 524,
+                "total_tokens": 547
+              }
+            ],
+            "success": true,
+            "error": null
+          }
+        ],
+        "summary": {
+          "success_rate": [
+            1.0,
+            0.0
+          ],
+          "total_tokens": [
+            529.2,
+            0.0
+          ],
+          "latency_ms": [
+            2114.0,
+            0.0
+          ]
+        }
+      },
+      {
+        "test_case_id": "rea-005",
+        "test_case_name": "Step-by-Step",
+        "prompt": "Explain how to determine if a number is prime, step by step.",
+        "mode": "single",
+        "runs": [
+          {
+            "run_number": 0,
+            "mode": "single",
+            "output": "To determine if a number is prime, you must check if it has any divisors other than **1** and **itself**. A prime number is a whole number greater than 1 that cannot be formed by multiplying two smaller natural numbers.\n\nHere is the step-by-step mathematical process to determine primality.\n\n---\n\n### Step 1: Check the Basics\nBefore doing any heavy math, rule out the obvious cases:\n*   **Is the number less than 2?** If yes, it is **not prime**. (0 and 1 are not prime).\n*   **Is the number 2 or 3?** If yes, it **is prime**.\n*   **Is the number even?** If the number is greater than 2 and ends in 0, 2, 4, 6, or 8, it is **not prime**.\n\n### Step 2: Find the Square Root\nYou do not need to test every number up to your target number. You only need to test up to the **square root** of the number.\n\n*   **Why?** If a number $n$ has a factor larger than $\\sqrt{n}$, it must also have a corresponding factor smaller than $\\sqrt{n}$. If you haven't found a factor by the time you reach the square root, you won't find one at all.\n*   *Example:* To check **97**, find $\\sqrt{97} \\approx 9.8$. You only need to check prime numbers up to **9**.\n\n### Step 3: Test for Divisibility by Prime Numbers\nNow, take your target number and divide it by every **prime number** starting from 2 up to the square root you calculated in Step 2.\n\nThe prime numbers you will likely need to test are: **2, 3, 5, 7, 11, 13, 17, 19...**\n\n**Quick Divisibility Shortcuts:**\n*   **Ends in 0 or 5?** Divisible by 5.\n*   **Sum of digits is divisible by 3?** Divisible by 3. (e.g., for 111, $1+1+1=3$, so it is divisible by 3).\n*   **Ends in an even number?** Divisible by 2.\n\n### Step 4: Make Your Conclusion\n*   **If any of these numbers divide into your target number perfectly** (with a remainder of zero), the number is **Composite** (not prime).\n*   **If you reach the square root without finding any divisors**, the number is **Prime**.\n\n---\n\n### Worked Example: Is 167 Prime?\n\n1.  **Check basics:** It is greater than 2 and it is odd. (Keep going).\n2.  **Find the square root:** $\\sqrt{167} \\approx 12.9$. We only need to check primes up to **12**.\n3.  **Test primes up to 12:**\n    *   **2?** No (it's odd).\n    *   **3?** No ($1 + 6 + 7 = 14$; 14 is not divisible by 3).\n    *   **5?** No (it doesn't end in 0 or 5).\n    *   **7?** $167 \\div 7 = 23.85$ (No).\n    *   **11?** $167 \\div 11 = 15.18$ (No).\n4.  **Conclusion:** We have reached our limit (the next prime is 13, which is greater than 12.9). Since no primes up to the square root divided into 167, **167 is a Prime Number.**\n\n---\n\n### Summary Checklist\n| Step | Action | Result if True |\n| :--- | :--- | :--- |\n| 1 | Is it $\\le 1$? | Not Prime |\n| 2 | Is it 2 or 3? | **Prime** |\n| 3 | Is it even? | Not Prime |\n| 4 | Find $\\sqrt{n}$ | (Set your limit) |\n| 5 | Divide by primes up to $\\sqrt{n}$ | If any divide evenly $\\rightarrow$ Not Prime |\n| 6 | No divisors found? | **Prime** |",
+            "total_latency_ms": 3465,
+            "total_tokens": 995,
+            "calls": [
+              {
+                "agent": "single",
+                "latency_ms": 3465,
+                "input_tokens": 27,
+                "output_tokens": 968,
+                "total_tokens": 995
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 1,
+            "mode": "single",
+            "output": "A prime number is a whole number greater than 1 that has exactly two factors: 1 and itself. To determine if a number is prime, you can follow this systematic step-by-step process.\n\n---\n\n### Step 1: Rule out the basics\nBefore doing any heavy math, check these three conditions:\n*   **Is the number 1 or less?** If yes, it is **not prime**. (1 is neither prime nor composite).\n*   **Is the number 2 or 3?** If yes, it **is prime**.\n*   **Is the number even?** If the number is greater than 2 and ends in 0, 2, 4, 6, or 8, it is **not prime** (it is divisible by 2).\n\n### Step 2: Find the Square Root ($\\sqrt{n}$)\nYou do not need to test every number up to your target number. You only need to test prime numbers up to the **square root** of your number.\n\n*   **Why?** If a number $n$ has a factor larger than its square root, it must also have a corresponding factor *smaller* than its square root. If you haven't found a factor by the time you reach the square root, you won't find one at all.\n*   **Example:** If you are testing **97**, the $\\sqrt{97}$ is approximately **9.8**. You only need to test prime numbers up to 9 (2, 3, 5, and 7).\n\n### Step 3: Test for Divisibility\nNow, take your number and divide it by the prime numbers you identified in Step 2. Use these shortcuts to make it faster:\n\n1.  **Test for 2:** Is the number even? (If yes, not prime).\n2.  **Test for 3:** Add up all the digits of the number. If the sum is divisible by 3, the whole number is divisible by 3. \n    *   *Example: For 111, $1+1+1 = 3$. Since 3 is divisible by 3, 111 is not prime.*\n3.  **Test for 5:** Does the number end in 0 or 5? (If yes, not prime).\n4.  **Test for 7, 11, 13, etc.:** For these, simple long division is usually the fastest method.\n\n### Step 4: Draw your conclusion\n*   **If any of these numbers divide into your target number perfectly** (with no remainder), the number is **Composite**.\n*   **If you reach the square root without finding any divisors**, the number is **Prime**.\n\n---\n\n### Worked Example: Is 167 Prime?\n\n1.  **Check basics:** It’s greater than 1, it's odd, and it's not 2 or 3. (Keep going).\n2.  **Find the square root:** $\\sqrt{167} \\approx 12.9$.\n3.  **List primes up to 12.9:** We need to test **2, 3, 5, 7, and 11**.\n4.  **Test Divisibility:**\n    *   **By 2?** No (it's odd).\n    *   **By 3?** $1 + 6 + 7 = 14$. 14 is not divisible by 3. No.\n    *   **By 5?** It doesn't end in 0 or 5. No.\n    *   **By 7?** $167 \\div 7 = 23$ with a remainder of 6. No.\n    *   **By 11?** $167 \\div 11 = 15$ with a remainder of 2. No.\n5.  **Conclusion:** We have reached the limit (12.9) without finding a divisor. **167 is Prime.**\n\n---\n\n### Summary Cheat Sheet\n| If the number ends in... | It is divisible by... |\n| :--- | :--- |\n| 0, 2, 4, 6, 8 | 2 |\n| 0 or 5 | 5 |\n| Sum of digits is div. by 3 | 3 |",
+            "total_latency_ms": 3301,
+            "total_tokens": 986,
+            "calls": [
+              {
+                "agent": "single",
+                "latency_ms": 3301,
+                "input_tokens": 27,
+                "output_tokens": 959,
+                "total_tokens": 986
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 2,
+            "mode": "single",
+            "output": "To determine if a number is prime, you are essentially checking if it has any divisors other than **1** and **itself**. \n\nHere is the step-by-step logical process used by mathematicians to test for primality.\n\n---\n\n### Step 1: Eliminate the obvious non-primes\nBefore doing any heavy math, check these three rules to save time:\n*   **Is the number 1 or less?** If yes, it is **not prime**. (1 is considered \"neither prime nor composite\").\n*   **Is the number 2 or 3?** If yes, it **is prime**.\n*   **Is the number even?** If the number is greater than 2 and ends in 0, 2, 4, 6, or 8, it is **not prime**.\n\n### Step 2: Find the Square Root Limit\nThis is the most important step for efficiency. You do **not** need to test every number up to your target number. You only need to test up to the **square root** of the number.\n\n*   **Why?** If a number $n$ has a factor larger than its square root, it must also have a corresponding factor *smaller* than its square root. If you haven't found a factor by the time you reach the square root, you won't find one at all.\n*   **Example:** To test **97**, find $\\sqrt{97} \\approx 9.8$. You only need to check prime numbers up to **9**.\n\n### Step 3: Test for Divisibility by Primes\nNow, take your target number and divide it by the prime numbers in ascending order (2, 3, 5, 7, 11, etc.) until you reach the limit you calculated in Step 2.\n\n**The \"Quick Check\" shortcuts:**\n*   **Ends in 0 or 5?** It is divisible by 5.\n*   **Sum of digits divisible by 3?** The whole number is divisible by 3. (e.g., for 111, $1+1+1=3$. Since 3 is divisible by 3, 111 is not prime).\n*   **Last two digits divisible by 4?** It is divisible by 4.\n\n### Step 4: The Verdict\n*   If any of these numbers divide into your target number perfectly (with no remainder), the number is **Composite** (not prime).\n*   If you reach your square root limit without finding a single divisor, the number is **Prime**.\n\n---\n\n### Worked Example: Is 137 Prime?\n\n1.  **Check basics:** It is greater than 1, it is not 2 or 3, and it is not even. (Proceed)\n2.  **Find the square root:** $\\sqrt{137}$ is approximately **11.7**. I only need to check primes up to **11**.\n3.  **Test the primes:**\n    *   **Divide by 2?** No (it's odd).\n    *   **Divide by 3?** $1+3+7 = 11$. 11 is not divisible by 3. No.\n    *   **Divide by 5?** No (doesn't end in 0 or 5).\n    *   **Divide by 7?** $137 \\div 7 = 19$ with a remainder of 4. No.\n    *   **Divide by 11?** $137 \\div 11 = 12$ with a remainder of 5. No.\n4.  **Conclusion:** I have reached my limit (11.7) without finding a divisor. **137 is Prime.**\n\n---\n\n### Summary Table for Quick Reference\n\n| If the number... | Then it is... |\n| :--- | :--- |\n| Is $\\le 1$ | Not Prime |\n| Is 2 or 3 | **Prime** |\n| Is even (and $>2$) | Not Prime |\n| Divisible by any prime up to $\\sqrt{n}$ | Not Prime |\n| **Has no divisors up to $\\sqrt{n}$** | **Prime** |",
+            "total_latency_ms": 3186,
+            "total_tokens": 955,
+            "calls": [
+              {
+                "agent": "single",
+                "latency_ms": 3186,
+                "input_tokens": 27,
+                "output_tokens": 928,
+                "total_tokens": 955
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 3,
+            "mode": "single",
+            "output": "To determine if a number is prime, you must check if it has any divisors other than $1$ and itself. A prime number is a whole number greater than $1$ that cannot be formed by multiplying two smaller natural numbers.\n\nHere is the step-by-step logical process to determine primality.\n\n---\n\n### Step 1: Eliminate the \"Easy\" Numbers\nBefore doing any math, check these three conditions:\n*   **If the number is $1$ or less:** It is **not prime**. (By definition, prime numbers must be greater than 1).\n*   **If the number is $2$ or $3$:** It **is prime**.\n*   **If the number is even (ends in 0, 2, 4, 6, or 8) and is greater than 2:** It is **not prime**.\n\n### Step 2: Find the Square Root Limit\nThis is the most important step for saving time. You do **not** need to test every number up to your target number. You only need to test divisors up to the **square root** of your number.\n\n*   **Why?** If a number $n$ has a factor larger than $\\sqrt{n}$, it must also have a corresponding factor smaller than $\\sqrt{n}$. If you haven't found a factor by the time you reach the square root, you won't find one at all.\n*   **Example:** To check if **$127$** is prime, find $\\sqrt{127}$. Since $11^2 = 121$ and $12^2 = 144$, the square root is roughly $11.2$. You only need to check prime numbers up to $11$.\n\n### Step 3: Test for Divisibility by Prime Numbers\nNow, divide your target number by the prime numbers in ascending order ($2, 3, 5, 7, 11, 13 \\dots$) up to the limit you found in Step 2.\n\n**Quick Shortcuts for Testing:**\n*   **Divisibility by 2:** Is the number even?\n*   **Divisibility by 3:** Add up the digits of the number. If the sum is divisible by 3, the whole number is. (e.g., for $129$: $1+2+9 = 12$. Since $12$ is divisible by 3, $129$ is not prime).\n*   **Divisibility by 5:** Does the number end in $0$ or $5$?\n\n### Step 4: Draw Your Conclusion\n*   If any of these prime numbers divide into your number perfectly (with no remainder), the number is **composite** (not prime).\n*   If you reach your square root limit without finding a single divisor, the number is **prime**.\n\n---\n\n### Worked Example: Is $197$ Prime?\n\n1.  **Check basics:** It’s greater than 1, it's not 2 or 3, and it’s odd. (Keep going).\n2.  **Find the square root limit:** $\\sqrt{197}$ is approximately $14.03$ (because $14 \\times 14 = 196$). I only need to check primes up to **14**.\n3.  **Test the primes:**\n    *   **2?** No (it's odd).\n    *   **3?** $1 + 9 + 7 = 17$. $17$ is not divisible by 3. No.\n    *   **5?** No (it doesn't end in 0 or 5).\n    *   **7?** $197 \\div 7 = 28$ with a remainder of $1$. No.\n    *   **11?** $197 \\div 11 = 17$ with a remainder of $10$. No.\n    *   **13?** $197 \\div 13 = 15$ with a remainder of $2$. No.\n4.  **Conclusion:** I have reached my limit ($14$) without finding a divisor. **$197$ is prime.**\n\n---\n\n### Summary Checklist\n| Step | Action | Result if True |\n| :--- | :--- | :--- |\n| 1 | Is it $\\le 1$? | Not Prime |\n| 2 | Is it $2$ or $3$? | **Prime** |\n| 3 | Is it even? | Not Prime |\n| 4 | Find $\\sqrt{n}$ | This is your \"Stop\" point |",
+            "total_latency_ms": 3545,
+            "total_tokens": 1051,
+            "calls": [
+              {
+                "agent": "single",
+                "latency_ms": 3545,
+                "input_tokens": 27,
+                "output_tokens": 1024,
+                "total_tokens": 1051
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 4,
+            "mode": "single",
+            "output": "To determine if a number is prime, you need to check if it has any divisors other than **1** and **itself**. \n\nHere is the logical, step-by-step mathematical process used to test a number (let's call it $n$).\n\n---\n\n### Step 1: Rule out the basics\nBefore doing any heavy math, check these three conditions:\n*   **If the number is 1:** It is **not prime**. (By definition, prime numbers must be greater than 1).\n*   **If the number is 2:** It **is prime**. (It is the only even prime number).\n*   **If the number is less than 1:** It is **not prime**.\n\n### Step 2: Check for evenness\nIf the number is greater than 2 and ends in **0, 2, 4, 6, or 8**, it is divisible by 2.\n*   **Result:** If it is even and not 2, it is **composite** (not prime).\n\n### Step 3: Find the Square Root ($\\sqrt{n}$)\nThis is the most important step for saving time. You do **not** need to test every number up to $n$. You only need to test prime numbers up to the **square root of $n$**.\n\n*   **Why?** If $n$ has a factor larger than its square root, it must also have a corresponding factor *smaller* than its square root. \n*   *Example:* To test **97**, find $\\sqrt{97} \\approx 9.8$. You only need to check prime numbers up to 9.\n\n### Step 4: Test for divisibility by small primes\nNow, divide your number $n$ by the prime numbers in order: **3, 5, 7, 11, 13...** up to the limit you found in Step 3.\n\n*   **Test 3:** Add the digits of the number together. If the sum is divisible by 3, the whole number is divisible by 3.\n*   **Test 5:** If the number ends in 0 or 5, it is divisible by 5.\n*   **Test 7, 11, etc.:** Perform long division for these.\n\n### Step 5: Draw your conclusion\n*   **If any of these numbers divide evenly** (no remainder), the number is **composite**.\n*   **If you reach the square root limit** and have found no divisors, the number is **prime**.\n\n---\n\n### Worked Example: Is 127 prime?\n\n1.  **Basic Rules:** It is greater than 1 and not 2. (Pass)\n2.  **Evenness:** It ends in 7 (odd). (Pass)\n3.  **Find the Square Root:** $\\sqrt{127}$ is approximately **11.26**. I only need to check primes up to 11.\n4.  **Trial Division:**\n    *   **Is it divisible by 3?** $1 + 2 + 7 = 10$. 10 is not divisible by 3. (No)\n    *   **Is it divisible by 5?** It doesn't end in 0 or 5. (No)\n    *   **Is it divisible by 7?** $127 \\div 7 = 18$ with a remainder of 1. (No)\n    *   **Is it divisible by 11?** $127 \\div 11 = 11$ with a remainder of 6. (No)\n5.  **Conclusion:** Since I have reached the limit (11) without finding a divisor, **127 is a prime number.**\n\n---\n\n### Summary Cheat Sheet\n| If the number... | Then it is... |\n| :--- | :--- |\n| Is 1 | Not Prime |\n| Is 2 | Prime |\n| Is even (and > 2) | Composite |\n| Ends in 5 or 0 (and > 5) | Composite |\n| Has no factors up to $\\sqrt{n}$ | **Prime** |",
+            "total_latency_ms": 3418,
+            "total_tokens": 942,
+            "calls": [
+              {
+                "agent": "single",
+                "latency_ms": 3418,
+                "input_tokens": 27,
+                "output_tokens": 915,
+                "total_tokens": 942
+              }
+            ],
+            "success": true,
+            "error": null
+          }
+        ],
+        "summary": {
+          "total_tokens": [
+            985.8,
+            0.0
+          ],
+          "latency_ms": [
+            3383.0,
+            0.0
+          ],
+          "success_rate": [
+            1.0,
+            0.0
+          ]
+        }
+      }
+    ],
+    "aggregate": {
+      "latency_ms": [
+        1254.3200000000002,
+        0.0
+      ],
+      "total_tokens": [
+        364.48,
+        0.0
+      ],
+      "success_rate": [
+        1.0,
+        0.0
+      ]
+    }
+  },
+  {
+    "mode": "two_agent",
+    "suite": "reasoning",
+    "endpoint": "http://localhost:8000/v1",
+    "model": "gemma-4-26b-a4b-it",
+    "runs_per_case": 5,
+    "timestamp": "2026-06-29T13:52:37.288814383Z",
+    "duration_secs": 28,
+    "test_cases": [
+      {
+        "test_case_id": "rea-001",
+        "test_case_name": "Syllogism",
+        "prompt": "If all mammals are animals, and all dogs are mammals, what can we conclude about dogs?",
+        "mode": "two_agent",
+        "runs": [
+          {
+            "run_number": 0,
+            "mode": "two_agent",
+            "output": "Based on the premises provided, we can use syllogistic logic to reach a conclusion:\n\n1.  **Major premise:** All mammals are animals.\n2.  **Minor premise:** All dogs are mammals.\n3.  **Transitive property:** Since dogs are a subset of mammals, and mammals are a subset of animals, then dogs must be a subset of animals.\n\n**Conclusion:** All dogs are animals.",
+            "total_latency_ms": 828,
+            "total_tokens": 384,
+            "calls": [
+              {
+                "agent": "evaluator",
+                "latency_ms": 434,
+                "input_tokens": 65,
+                "output_tokens": 79,
+                "total_tokens": 144
+              },
+              {
+                "agent": "tutor",
+                "latency_ms": 393,
+                "input_tokens": 152,
+                "output_tokens": 88,
+                "total_tokens": 240
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 1,
+            "mode": "two_agent",
+            "output": "Based on the premises provided:\n\n1.  **All dogs are mammals.**\n2.  **All mammals are animals.**\n\nBy applying the logical rule of transitivity (if A is B, and B is C, then A is C), we can conclude that **all dogs are animals**.",
+            "total_latency_ms": 550,
+            "total_tokens": 288,
+            "calls": [
+              {
+                "agent": "evaluator",
+                "latency_ms": 243,
+                "input_tokens": 65,
+                "output_tokens": 44,
+                "total_tokens": 109
+              },
+              {
+                "agent": "tutor",
+                "latency_ms": 307,
+                "input_tokens": 117,
+                "output_tokens": 62,
+                "total_tokens": 179
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 2,
+            "mode": "two_agent",
+            "output": "Based on the premises provided, we can conclude that **all dogs are animals**.\n\n**Reasoning:**\n1.  **Premise A:** All mammals are animals.\n2.  **Premise B:** All dogs are mammals.\n3.  **Logical Deduction:** Since dogs belong to the category of mammals, and all mammals belong to the category of animals, dogs must also belong to the category of animals (Transitive Property: If A $\\subset$ B and B $\\subset$ C, then A $\\subset$ C).",
+            "total_latency_ms": 917,
+            "total_tokens": 461,
+            "calls": [
+              {
+                "agent": "evaluator",
+                "latency_ms": 458,
+                "input_tokens": 65,
+                "output_tokens": 106,
+                "total_tokens": 171
+              },
+              {
+                "agent": "tutor",
+                "latency_ms": 458,
+                "input_tokens": 179,
+                "output_tokens": 111,
+                "total_tokens": 290
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 3,
+            "mode": "two_agent",
+            "output": "Based on the premises provided, we can apply the rule of transitivity:\n\n1.  **Major premise:** All mammals are animals.\n2.  **Minor premise:** All dogs are mammals.\n\nSince all dogs belong to the category of mammals, and all mammals belong to the category of animals, it follows logically that **all dogs are animals**.",
+            "total_latency_ms": 733,
+            "total_tokens": 393,
+            "calls": [
+              {
+                "agent": "evaluator",
+                "latency_ms": 392,
+                "input_tokens": 65,
+                "output_tokens": 91,
+                "total_tokens": 156
+              },
+              {
+                "agent": "tutor",
+                "latency_ms": 340,
+                "input_tokens": 164,
+                "output_tokens": 73,
+                "total_tokens": 237
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 4,
+            "mode": "two_agent",
+            "output": "Based on the premises provided:\n\n1.  **All mammals are animals.** (All $M$ are $A$)\n2.  **All dogs are mammals.** (All $D$ are $M$)\n\nBy applying the transitive property of set inclusion, if all dogs belong to the category of mammals, and all mammals belong to the category of animals, it follows logically that **all dogs are animals**.",
+            "total_latency_ms": 763,
+            "total_tokens": 395,
+            "calls": [
+              {
+                "agent": "evaluator",
+                "latency_ms": 387,
+                "input_tokens": 65,
+                "output_tokens": 86,
+                "total_tokens": 151
+              },
+              {
+                "agent": "tutor",
+                "latency_ms": 376,
+                "input_tokens": 159,
+                "output_tokens": 85,
+                "total_tokens": 244
+              }
+            ],
+            "success": true,
+            "error": null
+          }
+        ],
+        "summary": {
+          "total_tokens": [
+            384.2,
+            0.0
+          ],
+          "success_rate": [
+            1.0,
+            0.0
+          ],
+          "latency_ms": [
+            758.2,
+            0.0
+          ]
+        }
+      },
+      {
+        "test_case_id": "rea-002",
+        "test_case_name": "Pattern Recognition",
+        "prompt": "What comes next in the sequence: 2, 4, 8, 16, ...?",
+        "mode": "two_agent",
+        "runs": [
+          {
+            "run_number": 0,
+            "mode": "two_agent",
+            "output": "The sequence follows a geometric progression where each number is multiplied by 2 to get the next term:\n\n1.  **Identify the pattern:** \n    *   2 × 2 = 4\n    *   4 × 2 = 8\n    *   8 × 2 = 16\n2.  **Apply the pattern to the last term:** 16 × 2 = 32.\n\nThe next number in the sequence is **32**.",
+            "total_latency_ms": 672,
+            "total_tokens": 369,
+            "calls": [
+              {
+                "agent": "evaluator",
+                "latency_ms": 286,
+                "input_tokens": 68,
+                "output_tokens": 62,
+                "total_tokens": 130
+              },
+              {
+                "agent": "tutor",
+                "latency_ms": 385,
+                "input_tokens": 138,
+                "output_tokens": 101,
+                "total_tokens": 239
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 1,
+            "mode": "two_agent",
+            "output": "To find the next number in the sequence 2, 4, 8, 16, ..., we follow these steps:\n\n1.  **Identify the pattern:** Calculate the ratio between consecutive terms:\n    *   4 / 2 = 2\n    *   8 / 4 = 2\n    *   16 / 8 = 2\n2.  **Determine the rule:** The sequence is a geometric progression with a common ratio of 2.\n3.  **Calculate the next term:** Multiply the last term by the common ratio:\n    *   16 × 2 = 32\n\n**Final Answer:** 32",
+            "total_latency_ms": 799,
+            "total_tokens": 441,
+            "calls": [
+              {
+                "agent": "evaluator",
+                "latency_ms": 314,
+                "input_tokens": 68,
+                "output_tokens": 78,
+                "total_tokens": 146
+              },
+              {
+                "agent": "tutor",
+                "latency_ms": 484,
+                "input_tokens": 154,
+                "output_tokens": 141,
+                "total_tokens": 295
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 2,
+            "mode": "two_agent",
+            "output": "To find the next number in the sequence 2, 4, 8, 16, ..., we follow these steps:\n\n1.  **Identify the pattern:** Looking at the relationship between consecutive numbers:\n    *   2 to 4: $2 \\times 2 = 4$\n    *   4 to 8: $4 \\times 2 = 8$\n    *   8 to 16: $8 \\times 2 = 16$\n2.  **Determine the rule:** Each term is found by multiplying the previous term by 2 (a geometric sequence with a common ratio of 2).\n3.  **Apply the rule to the last term:** $16 \\times 2 = 32$.\n\nThe next number in the sequence is **32**.",
+            "total_latency_ms": 914,
+            "total_tokens": 462,
+            "calls": [
+              {
+                "agent": "evaluator",
+                "latency_ms": 337,
+                "input_tokens": 68,
+                "output_tokens": 72,
+                "total_tokens": 140
+              },
+              {
+                "agent": "tutor",
+                "latency_ms": 576,
+                "input_tokens": 148,
+                "output_tokens": 174,
+                "total_tokens": 322
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 3,
+            "mode": "two_agent",
+            "output": "To find the next number in the sequence 2, 4, 8, 16, ..., we identify the pattern:\n\n1.  **Calculate the ratio between consecutive terms:**\n    *   4 ÷ 2 = 2\n    *   8 ÷ 4 = 2\n    *   16 ÷ 8 = 2\n2.  **Identify the pattern:** Each term is multiplied by 2 to get the next term (a geometric progression with a common ratio of 2).\n3.  **Calculate the next term:** Multiply the last term (16) by 2.\n    *   16 × 2 = 32\n\nThe next number in the sequence is **32**.",
+            "total_latency_ms": 882,
+            "total_tokens": 480,
+            "calls": [
+              {
+                "agent": "evaluator",
+                "latency_ms": 372,
+                "input_tokens": 68,
+                "output_tokens": 91,
+                "total_tokens": 159
+              },
+              {
+                "agent": "tutor",
+                "latency_ms": 510,
+                "input_tokens": 167,
+                "output_tokens": 154,
+                "total_tokens": 321
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 4,
+            "mode": "two_agent",
+            "output": "1. **Identify the pattern:** Each term in the sequence is multiplied by 2 to get the next term ($2 \\times 2 = 4$, $4 \\times 2 = 8$, $8 \\times 2 = 16$).\n2. **Apply the pattern:** Multiply the last term by 2 ($16 \\times 2 = 32$).\n3. **Determine the next number:** 32.\n\n**Final Answer: 32**",
+            "total_latency_ms": 633,
+            "total_tokens": 345,
+            "calls": [
+              {
+                "agent": "evaluator",
+                "latency_ms": 240,
+                "input_tokens": 68,
+                "output_tokens": 49,
+                "total_tokens": 117
+              },
+              {
+                "agent": "tutor",
+                "latency_ms": 392,
+                "input_tokens": 125,
+                "output_tokens": 103,
+                "total_tokens": 228
+              }
+            ],
+            "success": true,
+            "error": null
+          }
+        ],
+        "summary": {
+          "success_rate": [
+            1.0,
+            0.0
+          ],
+          "total_tokens": [
+            419.4,
+            0.0
+          ],
+          "latency_ms": [
+            780.0,
+            0.0
+          ]
+        }
+      },
+      {
+        "test_case_id": "rea-003",
+        "test_case_name": "Logic Puzzle",
+        "prompt": "You have two coins totaling 30 cents. One is not a quarter. What are the coins?",
+        "mode": "two_agent",
+        "runs": [
+          {
+            "run_number": 0,
+            "mode": "two_agent",
+            "output": "The coins are a **quarter** and a **nickel**.\n\n**Reasoning:**\nThe riddle states that \"one is not a quarter.\" This is true—the nickel is not a quarter. However, the *other* coin is a quarter, which allows the two coins to total 30 cents.",
+            "total_latency_ms": 794,
+            "total_tokens": 444,
+            "calls": [
+              {
+                "agent": "evaluator",
+                "latency_ms": 484,
+                "input_tokens": 67,
+                "output_tokens": 119,
+                "total_tokens": 186
+              },
+              {
+                "agent": "tutor",
+                "latency_ms": 310,
+                "input_tokens": 194,
+                "output_tokens": 64,
+                "total_tokens": 258
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 1,
+            "mode": "two_agent",
+            "output": "The coins are a **quarter** and a **nickel**.\n\nThe riddle states that \"one\" is not a quarter, which is true (the nickel is not a quarter), but the *other* coin is.",
+            "total_latency_ms": 578,
+            "total_tokens": 327,
+            "calls": [
+              {
+                "agent": "evaluator",
+                "latency_ms": 347,
+                "input_tokens": 67,
+                "output_tokens": 70,
+                "total_tokens": 137
+              },
+              {
+                "agent": "tutor",
+                "latency_ms": 231,
+                "input_tokens": 145,
+                "output_tokens": 45,
+                "total_tokens": 190
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 2,
+            "mode": "two_agent",
+            "output": "The coins are a **quarter** and a **nickel**.\n\nThe riddle states that \"one is not a quarter,\" which is true—the nickel is not a quarter. However, the other coin is.",
+            "total_latency_ms": 647,
+            "total_tokens": 351,
+            "calls": [
+              {
+                "agent": "evaluator",
+                "latency_ms": 400,
+                "input_tokens": 67,
+                "output_tokens": 83,
+                "total_tokens": 150
+              },
+              {
+                "agent": "tutor",
+                "latency_ms": 247,
+                "input_tokens": 158,
+                "output_tokens": 43,
+                "total_tokens": 201
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 3,
+            "mode": "two_agent",
+            "output": "The coins are a **quarter** and a **nickel**. \n\n(The riddle states that *one* is not a quarter, which is true—the nickel is not a quarter. The other coin, however, is.)",
+            "total_latency_ms": 684,
+            "total_tokens": 355,
+            "calls": [
+              {
+                "agent": "evaluator",
+                "latency_ms": 399,
+                "input_tokens": 67,
+                "output_tokens": 83,
+                "total_tokens": 150
+              },
+              {
+                "agent": "tutor",
+                "latency_ms": 284,
+                "input_tokens": 158,
+                "output_tokens": 47,
+                "total_tokens": 205
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 4,
+            "mode": "two_agent",
+            "output": "The coins are a **quarter** and a **nickel**.\n\n**Reasoning:**\n1. The total value is 30 cents, and there are two coins.\n2. The constraint states that \"one is not a quarter.\" This means the *other* coin is the quarter.\n3. If one coin is a quarter (25 cents), the remaining coin must be 5 cents to reach the total of 30 cents.\n4. Therefore, the coins are a quarter and a nickel.",
+            "total_latency_ms": 768,
+            "total_tokens": 409,
+            "calls": [
+              {
+                "agent": "evaluator",
+                "latency_ms": 329,
+                "input_tokens": 67,
+                "output_tokens": 80,
+                "total_tokens": 147
+              },
+              {
+                "agent": "tutor",
+                "latency_ms": 439,
+                "input_tokens": 155,
+                "output_tokens": 107,
+                "total_tokens": 262
+              }
+            ],
+            "success": true,
+            "error": null
+          }
+        ],
+        "summary": {
+          "success_rate": [
+            1.0,
+            0.0
+          ],
+          "total_tokens": [
+            377.2,
+            0.0
+          ],
+          "latency_ms": [
+            694.2,
+            0.0
+          ]
+        }
+      },
+      {
+        "test_case_id": "rea-004",
+        "test_case_name": "Explanation",
+        "prompt": "Explain why the sky appears blue during the day.",
+        "mode": "two_agent",
+        "runs": [
+          {
+            "run_number": 0,
+            "mode": "two_agent",
+            "output": "The sky appears blue due to a phenomenon known as **Rayleigh scattering**. Here is the step-by-step explanation:\n\n1.  **Sunlight Composition:** Sunlight may look white, but it is actually composed of all the colors of the rainbow (red, orange, yellow, green, blue, indigo, and violet). Light travels as waves, and each color has a different wavelength. Red light has long, lazy waves, while blue and violet light have much shorter, choppier waves.\n\n2.  **Atmospheric Interaction:** Earth's atmosphere is filled with gases (primarily nitrogen and oxygen). As sunlight travels through the atmosphere, the light waves strike the gas molecules and are scattered in different directions.\n\n3.  **Rayleigh Scattering:** Because blue light travels in shorter, smaller waves, it strikes the gas molecules and scatters much more strongly and frequently than the longer red waves. While red light passes through the atmosphere relatively straight, the blue light is bounced around in every direction by the molecules in the air.\n\n4.  **Why Blue and not Violet?** Technically, violet light has an even shorter wavelength than blue light and scatters even more intensely. However, we see the sky as blue for two reasons:\n    *   **The Sun's Spectrum:** The Sun emits much more blue light than violet light.\n    *   **Human Eye Sensitivity:** Human eyes are much more sensitive to blue light than to violet light. Our eyes interpret the mixture of scattered violet and blue light as a pale blue.\n\n5.  **Conclusion:** When you look up during a clear day, your eyes are catching this scattered blue light coming from every part of the sky, resulting in the blue color we see.",
+            "total_latency_ms": 2101,
+            "total_tokens": 661,
+            "calls": [
+              {
+                "agent": "evaluator",
+                "latency_ms": 513,
+                "input_tokens": 56,
+                "output_tokens": 93,
+                "total_tokens": 149
+              },
+              {
+                "agent": "tutor",
+                "latency_ms": 1587,
+                "input_tokens": 157,
+                "output_tokens": 355,
+                "total_tokens": 512
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 1,
+            "mode": "two_agent",
+            "output": "The sky appears blue due to a phenomenon known as **Rayleigh scattering**. Here is the step-by-step explanation:\n\n1.  **Sunlight and the Atmosphere:** Sunlight may look white, but it is actually composed of all the colors of the rainbow (red, orange, yellow, green, blue, indigo, and violet). As this sunlight enters Earth's atmosphere, it strikes the molecules of gas (primarily nitrogen and oxygen) that make up our air.\n\n2.  **Wavelength and Scattering:** Light travels as waves, and different colors have different wavelengths. Red light has long, lazy wavelengths, while blue and violet light have much shorter, choppier wavelengths. Because gas molecules are very small, they are much more effective at scattering these shorter wavelengths. When sunlight hits the atmosphere, the shorter blue wavelengths are redirected (scattered) in every direction.\n\n3.  **Why Blue and not Violet?** Technically, violet light has an even shorter wavelength than blue light and scatters even more intensely. However, we see a blue sky for two main reasons:\n    *   **The Sun's Spectrum:** The Sun emits significantly more blue light than violet light.\n    *   **Human Eye Sensitivity:** The human eye is much more sensitive to blue than to violet. Our eyes interpret the scattered mix of colors as a pale blue.\n\n4.  **Summary:** When you look up during the day, your eyes are catching the \"scattered\" blue light that has been bounced around by the atmosphere, resulting in the blue sky we see.",
+            "total_latency_ms": 1839,
+            "total_tokens": 622,
+            "calls": [
+              {
+                "agent": "evaluator",
+                "latency_ms": 482,
+                "input_tokens": 56,
+                "output_tokens": 90,
+                "total_tokens": 146
+              },
+              {
+                "agent": "tutor",
+                "latency_ms": 1356,
+                "input_tokens": 154,
+                "output_tokens": 322,
+                "total_tokens": 476
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 2,
+            "mode": "two_agent",
+            "output": "The sky appears blue due to a phenomenon called **Rayleigh scattering**. Here is the step-by-step explanation:\n\n1.  **Sunlight Composition:** Sunlight may look white, but it is actually composed of all the colors of the visible spectrum (red, orange, yellow, green, blue, indigo, and violet), each having different wavelengths.\n2.  **Atmospheric Interaction:** As sunlight enters Earth's atmosphere, it strikes gas molecules (primarily nitrogen and oxygen) and small particles in the air.\n3.  **Wavelength Behavior:** Light travels as waves. Longer wavelengths (red and yellow) pass through the atmosphere relatively undisturbed. However, shorter wavelengths (blue and violet) are scattered much more intensely by the gas molecules in all directions.\n4.  **Visual Result:** Because the blue light is being scattered across the entire sky, our eyes perceive this redirected light coming from every part of the atmosphere, making the sky appear blue.\n\n*(Note: While violet light is scattered even more than blue light, our eyes are more sensitive to blue, and the sun emits more blue light than violet, which is why the sky looks blue rather than violet.)*",
+            "total_latency_ms": 1540,
+            "total_tokens": 590,
+            "calls": [
+              {
+                "agent": "evaluator",
+                "latency_ms": 574,
+                "input_tokens": 56,
+                "output_tokens": 114,
+                "total_tokens": 170
+              },
+              {
+                "agent": "tutor",
+                "latency_ms": 966,
+                "input_tokens": 178,
+                "output_tokens": 242,
+                "total_tokens": 420
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 3,
+            "mode": "two_agent",
+            "output": "The sky appears blue during the day due to a phenomenon known as **Rayleigh scattering**. Here is the step-by-step explanation:\n\n1.  **Sunlight and the Atmosphere:** Sunlight, which appears white, is composed of all the colors of the visible spectrum (red, orange, yellow, green, blue, indigo, and violet). When this light enters Earth's atmosphere, it interacts with gas molecules, primarily nitrogen and oxygen.\n2.  **The Process of Scattering:** Light travels as waves. Different colors have different wavelengths; red light has long, lazy wavelengths, while blue and violet light have much shorter, smaller wavelengths. Because the gas molecules in the atmosphere are very small, they are much more effective at scattering these shorter wavelengths.\n3.  **Why Blue and Not Violet?** Technically, violet light has an even shorter wavelength than blue light and scatters even more intensely. However, we see the sky as blue for two main reasons:\n    *   **Solar Spectrum:** The Sun emits much more blue light than violet light.\n    *   **Human Physiology:** Human eyes are far more sensitive to blue light than violet light. Our eyes interpret the mix of scattered violet and blue light as a pale blue.\n4.  **Conclusion:** As sunlight hits the atmosphere, the shorter blue wavelengths are scattered in every direction by the molecules in the air. When you look up, your eyes are catching this scattered blue light coming from every part of the sky, making the entire dome appear blue.",
+            "total_latency_ms": 1853,
+            "total_tokens": 640,
+            "calls": [
+              {
+                "agent": "evaluator",
+                "latency_ms": 506,
+                "input_tokens": 56,
+                "output_tokens": 104,
+                "total_tokens": 160
+              },
+              {
+                "agent": "tutor",
+                "latency_ms": 1346,
+                "input_tokens": 168,
+                "output_tokens": 312,
+                "total_tokens": 480
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 4,
+            "mode": "two_agent",
+            "output": "The sky appears blue due to a phenomenon known as **Rayleigh scattering**. Here is the step-by-step explanation:\n\n1.  **Interaction with Sunlight:** Sunlight, which looks white, is actually composed of all the colors of the rainbow. When this light enters Earth's atmosphere, it interacts with the gases and particles in the air.\n2.  **Wavelength Properties:** Light travels as waves, and different colors have different wavelengths. Red light has long, lazy wavelengths, while blue and violet light have much shorter, smaller wavelengths.\n3.  **Rayleigh Scattering:** As sunlight hits the molecules in the atmosphere (primarily nitrogen and oxygen), the shorter wavelengths are scattered much more efficiently in all directions than the longer wavelengths. Because blue light travels in shorter, smaller waves, it is scattered much more intensely than red light.\n4.  **Perception by the Eye:** Because this blue light is being scattered across the entire sky, whenever you look up, your eyes are catching this redirected blue light coming from every direction.\n\n**Note:** While violet light has even shorter wavelengths than blue light, the sky doesn't appear violet because the Sun emits more blue light than violet, and the human eye is significantly more sensitive to blue.",
+            "total_latency_ms": 1613,
+            "total_tokens": 568,
+            "calls": [
+              {
+                "agent": "evaluator",
+                "latency_ms": 458,
+                "input_tokens": 56,
+                "output_tokens": 96,
+                "total_tokens": 152
+              },
+              {
+                "agent": "tutor",
+                "latency_ms": 1155,
+                "input_tokens": 160,
+                "output_tokens": 256,
+                "total_tokens": 416
+              }
+            ],
+            "success": true,
+            "error": null
+          }
+        ],
+        "summary": {
+          "total_tokens": [
+            616.2,
+            0.0
+          ],
+          "latency_ms": [
+            1789.2,
+            0.0
+          ],
+          "success_rate": [
+            1.0,
+            0.0
+          ]
+        }
+      },
+      {
+        "test_case_id": "rea-005",
+        "test_case_name": "Step-by-Step",
+        "prompt": "Explain how to determine if a number is prime, step by step.",
+        "mode": "two_agent",
+        "runs": [
+          {
+            "run_number": 0,
+            "mode": "two_agent",
+            "output": "To determine if a number is prime, follow these steps:\n\n1.  **Check if the number is less than 2:** If the number is 0 or 1, it is not prime.\n2.  **Check for 2 and 3:** If the number is exactly 2 or 3, it is prime.\n3.  **Eliminate easy multiples:** If the number is greater than 5 and ends in 0, 2, 4, 5, 6, or 8, it is composite (not prime).\n4.  **Find the square root:** Calculate the square root of the number. You only need to test divisors up to the integer part of this square root.\n5.  **Test for divisibility:** Divide the number by every prime number starting from 3 up to the integer part of the square root found in step 4.\n6.  **Evaluate results:** \n    *   If the number is divisible by any of these primes, it is **composite**.\n    *   If you reach the square root without finding any divisors, the number is **prime**.",
+            "total_latency_ms": 1459,
+            "total_tokens": 686,
+            "calls": [
+              {
+                "agent": "evaluator",
+                "latency_ms": 576,
+                "input_tokens": 60,
+                "output_tokens": 160,
+                "total_tokens": 220
+              },
+              {
+                "agent": "tutor",
+                "latency_ms": 882,
+                "input_tokens": 228,
+                "output_tokens": 238,
+                "total_tokens": 466
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 1,
+            "mode": "two_agent",
+            "output": "To determine if a number ($n$) is prime, follow these steps:\n\n1.  **Identify the number and confirm its value:** Ensure $n > 1$. Numbers less than or equal to 1 are not prime.\n2.  **Check for small primes and obvious patterns:**\n    *   If $n$ is **2** or **3**, it is **prime**.\n    *   If $n$ is **even** (and greater than 2) or ends in **5** (and is not 5), it is **not prime** (composite).\n3.  **Calculate the square root of $n$:** Find $\\sqrt{n}$. You only need to test divisors up to this value because if $n$ has a factor larger than its square root, it must also have a corresponding factor smaller than its square root.\n4.  **List prime numbers up to $\\sqrt{n}$:** Write down all prime numbers (2, 3, 5, 7, 11, etc.) that are less than or equal to the square root you calculated.\n5.  **Perform trial division:** Divide $n$ by each prime in your list.\n6.  **Evaluate the results:**\n    *   If $n$ is **divisible** by any of these primes (the remainder is 0), then $n$ is **composite**.\n    *   If you test all primes up to $\\sqrt{n}$ and **none** divide $n$ evenly, then $n$ is **prime**.",
+            "total_latency_ms": 1827,
+            "total_tokens": 732,
+            "calls": [
+              {
+                "agent": "evaluator",
+                "latency_ms": 617,
+                "input_tokens": 60,
+                "output_tokens": 138,
+                "total_tokens": 198
+              },
+              {
+                "agent": "tutor",
+                "latency_ms": 1210,
+                "input_tokens": 206,
+                "output_tokens": 328,
+                "total_tokens": 534
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 2,
+            "mode": "two_agent",
+            "output": "To determine if a number is prime, follow these step-by-step instructions:\n\n1.  **Check if the number is less than 2:** If the number is 0 or 1, it is **not prime**.\n2.  **Check for 2 or 3:** If the number is exactly 2 or 3, it **is prime**.\n3.  **Eliminate multiples of 2 and 3:** If the number is even (ends in 0, 2, 4, 6, or 8) or is a multiple of 3 (the sum of its digits is divisible by 3), it is **not prime**.\n4.  **Calculate the square root:** Find the square root of the target number. You only need to test divisors up to this value.\n5.  **Test for divisibility using the $6k \\pm 1$ rule:** Since all primes greater than 3 follow the pattern $6k \\pm 1$, you can skip many unnecessary checks. Starting with $i = 5$, test if the number is divisible by $i$ or $i + 2$.\n6.  **Iterate through potential divisors:** Increment $i$ by 6 in each step (testing 5 and 7, then 11 and 13, then 17 and 19, etc.) until $i$ exceeds the square root calculated in step 4.\n7.  **Final Determination:**\n    *   If any of these numbers divide the target number evenly, the number is **composite**.\n    *   If you reach the square root without finding any divisors, the number **is prime**.",
+            "total_latency_ms": 1959,
+            "total_tokens": 774,
+            "calls": [
+              {
+                "agent": "evaluator",
+                "latency_ms": 630,
+                "input_tokens": 60,
+                "output_tokens": 145,
+                "total_tokens": 205
+              },
+              {
+                "agent": "tutor",
+                "latency_ms": 1328,
+                "input_tokens": 213,
+                "output_tokens": 356,
+                "total_tokens": 569
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 3,
+            "mode": "two_agent",
+            "output": "To determine if a number is prime, follow these steps:\n\n1.  **Check if the number is less than 2:** If the number is 0 or 1, it is **not prime**.\n2.  **Check for 2 or 3:** If the number is exactly 2 or 3, it is **prime**.\n3.  **Eliminate obvious composites:** Quickly check if the number ends in an even digit (0, 2, 4, 6, 8) or a 5. If it does (and it isn't 2 or 5 itself), it is **not prime**.\n4.  **Calculate the square root:** Find the square root of the number ($\\sqrt{n}$). You only need to test divisors up to this value.\n5.  **Test for divisibility:** Divide the number by every prime integer starting from 3 up to the calculated square root.\n6.  **Check the results:**\n    *   If the number is divisible by any of these primes (the remainder is 0), the number is **composite**.\n    *   If you reach the square root without finding any divisors, the number is **prime**.",
+            "total_latency_ms": 1252,
+            "total_tokens": 679,
+            "calls": [
+              {
+                "agent": "evaluator",
+                "latency_ms": 413,
+                "input_tokens": 60,
+                "output_tokens": 149,
+                "total_tokens": 209
+              },
+              {
+                "agent": "tutor",
+                "latency_ms": 838,
+                "input_tokens": 217,
+                "output_tokens": 253,
+                "total_tokens": 470
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 4,
+            "mode": "two_agent",
+            "output": "To determine if a number ($n$) is prime, follow these steps:\n\n1.  **Check if $n < 2$:** If the number is less than 2 (e.g., 0 or 1), it is **not prime**.\n2.  **Check for 2 and 3:** If the number is exactly 2 or 3, it is **prime**.\n3.  **Eliminate even numbers and multiples of 3:** If the number is divisible by 2 (ends in 0, 2, 4, 6, or 8) or divisible by 3 (the sum of its digits is divisible by 3), it is **composite** (not prime).\n4.  **Calculate the square root:** Find the square root of $n$ ($\\sqrt{n}$). You only need to test divisors up to this value.\n5.  **Test divisibility using the $6k \\pm 1$ rule:** To save time, skip all even numbers and multiples of 3. Instead, test only numbers that follow the pattern $6k \\pm 1$ (starting with 5, then 7, 11, 13, 17, 19, etc.) up to the square root of $n$.\n6.  **Check for divisibility:** Divide $n$ by each of these numbers.\n    *   If any of these numbers divide $n$ evenly (with no remainder), the number is **composite**.\n7.  **Final Conclusion:** If you have tested all potential divisors up to the square root of $n$ and none of them divide it evenly, the number is **prime**.",
+            "total_latency_ms": 2092,
+            "total_tokens": 813,
+            "calls": [
+              {
+                "agent": "evaluator",
+                "latency_ms": 697,
+                "input_tokens": 60,
+                "output_tokens": 164,
+                "total_tokens": 224
+              },
+              {
+                "agent": "tutor",
+                "latency_ms": 1394,
+                "input_tokens": 232,
+                "output_tokens": 357,
+                "total_tokens": 589
+              }
+            ],
+            "success": true,
+            "error": null
+          }
+        ],
+        "summary": {
+          "total_tokens": [
+            736.8,
+            0.0
+          ],
+          "success_rate": [
+            1.0,
+            0.0
+          ],
+          "latency_ms": [
+            1717.8,
+            0.0
+          ]
+        }
+      }
+    ],
+    "aggregate": {
+      "total_tokens": [
+        506.76000000000005,
+        0.0
+      ],
+      "latency_ms": [
+        1147.88,
+        0.0
+      ],
+      "success_rate": [
+        1.0,
+        0.0
+      ]
+    }
+  },
+  {
+    "mode": "four_agent",
+    "suite": "reasoning",
+    "endpoint": "http://localhost:8000/v1",
+    "model": "gemma-4-26b-a4b-it",
+    "runs_per_case": 5,
+    "timestamp": "2026-06-29T13:53:33.492240504Z",
+    "duration_secs": 56,
+    "test_cases": [
+      {
+        "test_case_id": "rea-001",
+        "test_case_name": "Syllogism",
+        "prompt": "If all mammals are animals, and all dogs are mammals, what can we conclude about dogs?",
+        "mode": "four_agent",
+        "runs": [
+          {
+            "run_number": 0,
+            "mode": "four_agent",
+            "output": "All dogs are animals.",
+            "total_latency_ms": 1043,
+            "total_tokens": 751,
+            "calls": [
+              {
+                "agent": "diagnoser",
+                "latency_ms": 220,
+                "input_tokens": 46,
+                "output_tokens": 31,
+                "total_tokens": 77
+              },
+              {
+                "agent": "planner",
+                "latency_ms": 605,
+                "input_tokens": 82,
+                "output_tokens": 132,
+                "total_tokens": 214
+              },
+              {
+                "agent": "affective",
+                "latency_ms": 106,
+                "input_tokens": 220,
+                "output_tokens": 6,
+                "total_tokens": 226
+              },
+              {
+                "agent": "solver",
+                "latency_ms": 110,
+                "input_tokens": 228,
+                "output_tokens": 6,
+                "total_tokens": 234
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 1,
+            "mode": "four_agent",
+            "output": "All dogs are animals.",
+            "total_latency_ms": 1393,
+            "total_tokens": 1006,
+            "calls": [
+              {
+                "agent": "diagnoser",
+                "latency_ms": 260,
+                "input_tokens": 46,
+                "output_tokens": 52,
+                "total_tokens": 98
+              },
+              {
+                "agent": "planner",
+                "latency_ms": 445,
+                "input_tokens": 103,
+                "output_tokens": 103,
+                "total_tokens": 206
+              },
+              {
+                "agent": "affective",
+                "latency_ms": 557,
+                "input_tokens": 212,
+                "output_tokens": 135,
+                "total_tokens": 347
+              },
+              {
+                "agent": "solver",
+                "latency_ms": 130,
+                "input_tokens": 349,
+                "output_tokens": 6,
+                "total_tokens": 355
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 2,
+            "mode": "four_agent",
+            "output": "All dogs are animals.",
+            "total_latency_ms": 962,
+            "total_tokens": 701,
+            "calls": [
+              {
+                "agent": "diagnoser",
+                "latency_ms": 160,
+                "input_tokens": 46,
+                "output_tokens": 27,
+                "total_tokens": 73
+              },
+              {
+                "agent": "planner",
+                "latency_ms": 473,
+                "input_tokens": 78,
+                "output_tokens": 100,
+                "total_tokens": 178
+              },
+              {
+                "agent": "affective",
+                "latency_ms": 218,
+                "input_tokens": 184,
+                "output_tokens": 37,
+                "total_tokens": 221
+              },
+              {
+                "agent": "solver",
+                "latency_ms": 110,
+                "input_tokens": 223,
+                "output_tokens": 6,
+                "total_tokens": 229
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 3,
+            "mode": "four_agent",
+            "output": "All dogs are animals.",
+            "total_latency_ms": 1014,
+            "total_tokens": 765,
+            "calls": [
+              {
+                "agent": "diagnoser",
+                "latency_ms": 178,
+                "input_tokens": 46,
+                "output_tokens": 30,
+                "total_tokens": 76
+              },
+              {
+                "agent": "planner",
+                "latency_ms": 610,
+                "input_tokens": 81,
+                "output_tokens": 138,
+                "total_tokens": 219
+              },
+              {
+                "agent": "affective",
+                "latency_ms": 114,
+                "input_tokens": 225,
+                "output_tokens": 6,
+                "total_tokens": 231
+              },
+              {
+                "agent": "solver",
+                "latency_ms": 111,
+                "input_tokens": 233,
+                "output_tokens": 6,
+                "total_tokens": 239
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 4,
+            "mode": "four_agent",
+            "output": "All dogs are animals.",
+            "total_latency_ms": 1272,
+            "total_tokens": 870,
+            "calls": [
+              {
+                "agent": "diagnoser",
+                "latency_ms": 169,
+                "input_tokens": 46,
+                "output_tokens": 30,
+                "total_tokens": 76
+              },
+              {
+                "agent": "planner",
+                "latency_ms": 445,
+                "input_tokens": 81,
+                "output_tokens": 101,
+                "total_tokens": 182
+              },
+              {
+                "agent": "affective",
+                "latency_ms": 537,
+                "input_tokens": 188,
+                "output_tokens": 114,
+                "total_tokens": 302
+              },
+              {
+                "agent": "solver",
+                "latency_ms": 120,
+                "input_tokens": 304,
+                "output_tokens": 6,
+                "total_tokens": 310
+              }
+            ],
+            "success": true,
+            "error": null
+          }
+        ],
+        "summary": {
+          "success_rate": [
+            1.0,
+            0.0
+          ],
+          "latency_ms": [
+            1136.8,
+            0.0
+          ],
+          "total_tokens": [
+            818.6,
+            0.0
+          ]
+        }
+      },
+      {
+        "test_case_id": "rea-002",
+        "test_case_name": "Pattern Recognition",
+        "prompt": "What comes next in the sequence: 2, 4, 8, 16, ...?",
+        "mode": "four_agent",
+        "runs": [
+          {
+            "run_number": 0,
+            "mode": "four_agent",
+            "output": "32",
+            "total_latency_ms": 913,
+            "total_tokens": 747,
+            "calls": [
+              {
+                "agent": "diagnoser",
+                "latency_ms": 184,
+                "input_tokens": 49,
+                "output_tokens": 33,
+                "total_tokens": 82
+              },
+              {
+                "agent": "planner",
+                "latency_ms": 488,
+                "input_tokens": 87,
+                "output_tokens": 117,
+                "total_tokens": 204
+              },
+              {
+                "agent": "affective",
+                "latency_ms": 134,
+                "input_tokens": 210,
+                "output_tokens": 18,
+                "total_tokens": 228
+              },
+              {
+                "agent": "solver",
+                "latency_ms": 106,
+                "input_tokens": 230,
+                "output_tokens": 3,
+                "total_tokens": 233
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 1,
+            "mode": "four_agent",
+            "output": "32",
+            "total_latency_ms": 1052,
+            "total_tokens": 807,
+            "calls": [
+              {
+                "agent": "diagnoser",
+                "latency_ms": 172,
+                "input_tokens": 49,
+                "output_tokens": 32,
+                "total_tokens": 81
+              },
+              {
+                "agent": "planner",
+                "latency_ms": 534,
+                "input_tokens": 86,
+                "output_tokens": 127,
+                "total_tokens": 213
+              },
+              {
+                "agent": "affective",
+                "latency_ms": 232,
+                "input_tokens": 219,
+                "output_tokens": 35,
+                "total_tokens": 254
+              },
+              {
+                "agent": "solver",
+                "latency_ms": 112,
+                "input_tokens": 256,
+                "output_tokens": 3,
+                "total_tokens": 259
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 2,
+            "mode": "four_agent",
+            "output": "32",
+            "total_latency_ms": 1234,
+            "total_tokens": 851,
+            "calls": [
+              {
+                "agent": "diagnoser",
+                "latency_ms": 173,
+                "input_tokens": 49,
+                "output_tokens": 32,
+                "total_tokens": 81
+              },
+              {
+                "agent": "planner",
+                "latency_ms": 542,
+                "input_tokens": 86,
+                "output_tokens": 119,
+                "total_tokens": 205
+              },
+              {
+                "agent": "affective",
+                "latency_ms": 409,
+                "input_tokens": 211,
+                "output_tokens": 69,
+                "total_tokens": 280
+              },
+              {
+                "agent": "solver",
+                "latency_ms": 108,
+                "input_tokens": 282,
+                "output_tokens": 3,
+                "total_tokens": 285
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 3,
+            "mode": "four_agent",
+            "output": "32",
+            "total_latency_ms": 1101,
+            "total_tokens": 805,
+            "calls": [
+              {
+                "agent": "diagnoser",
+                "latency_ms": 173,
+                "input_tokens": 49,
+                "output_tokens": 30,
+                "total_tokens": 79
+              },
+              {
+                "agent": "planner",
+                "latency_ms": 579,
+                "input_tokens": 84,
+                "output_tokens": 129,
+                "total_tokens": 213
+              },
+              {
+                "agent": "affective",
+                "latency_ms": 232,
+                "input_tokens": 219,
+                "output_tokens": 35,
+                "total_tokens": 254
+              },
+              {
+                "agent": "solver",
+                "latency_ms": 115,
+                "input_tokens": 256,
+                "output_tokens": 3,
+                "total_tokens": 259
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 4,
+            "mode": "four_agent",
+            "output": "32",
+            "total_latency_ms": 1455,
+            "total_tokens": 1054,
+            "calls": [
+              {
+                "agent": "diagnoser",
+                "latency_ms": 177,
+                "input_tokens": 49,
+                "output_tokens": 33,
+                "total_tokens": 82
+              },
+              {
+                "agent": "planner",
+                "latency_ms": 606,
+                "input_tokens": 87,
+                "output_tokens": 148,
+                "total_tokens": 235
+              },
+              {
+                "agent": "affective",
+                "latency_ms": 542,
+                "input_tokens": 241,
+                "output_tokens": 125,
+                "total_tokens": 366
+              },
+              {
+                "agent": "solver",
+                "latency_ms": 128,
+                "input_tokens": 368,
+                "output_tokens": 3,
+                "total_tokens": 371
+              }
+            ],
+            "success": true,
+            "error": null
+          }
+        ],
+        "summary": {
+          "total_tokens": [
+            852.8,
+            0.0
+          ],
+          "latency_ms": [
+            1151.0,
+            0.0
+          ],
+          "success_rate": [
+            1.0,
+            0.0
+          ]
+        }
+      },
+      {
+        "test_case_id": "rea-003",
+        "test_case_name": "Logic Puzzle",
+        "prompt": "You have two coins totaling 30 cents. One is not a quarter. What are the coins?",
+        "mode": "four_agent",
+        "runs": [
+          {
+            "run_number": 0,
+            "mode": "four_agent",
+            "output": "The coins are a **quarter** and a **nickel**.",
+            "total_latency_ms": 1082,
+            "total_tokens": 825,
+            "calls": [
+              {
+                "agent": "diagnoser",
+                "latency_ms": 245,
+                "input_tokens": 48,
+                "output_tokens": 46,
+                "total_tokens": 94
+              },
+              {
+                "agent": "planner",
+                "latency_ms": 546,
+                "input_tokens": 99,
+                "output_tokens": 123,
+                "total_tokens": 222
+              },
+              {
+                "agent": "affective",
+                "latency_ms": 151,
+                "input_tokens": 228,
+                "output_tokens": 19,
+                "total_tokens": 247
+              },
+              {
+                "agent": "solver",
+                "latency_ms": 139,
+                "input_tokens": 249,
+                "output_tokens": 13,
+                "total_tokens": 262
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 1,
+            "mode": "four_agent",
+            "output": "A quarter and a nickel.",
+            "total_latency_ms": 1085,
+            "total_tokens": 838,
+            "calls": [
+              {
+                "agent": "diagnoser",
+                "latency_ms": 272,
+                "input_tokens": 48,
+                "output_tokens": 45,
+                "total_tokens": 93
+              },
+              {
+                "agent": "planner",
+                "latency_ms": 459,
+                "input_tokens": 98,
+                "output_tokens": 114,
+                "total_tokens": 212
+              },
+              {
+                "agent": "affective",
+                "latency_ms": 230,
+                "input_tokens": 218,
+                "output_tokens": 44,
+                "total_tokens": 262
+              },
+              {
+                "agent": "solver",
+                "latency_ms": 121,
+                "input_tokens": 264,
+                "output_tokens": 7,
+                "total_tokens": 271
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 2,
+            "mode": "four_agent",
+            "output": "A quarter and a nickel.",
+            "total_latency_ms": 991,
+            "total_tokens": 827,
+            "calls": [
+              {
+                "agent": "diagnoser",
+                "latency_ms": 209,
+                "input_tokens": 48,
+                "output_tokens": 42,
+                "total_tokens": 90
+              },
+              {
+                "agent": "planner",
+                "latency_ms": 420,
+                "input_tokens": 95,
+                "output_tokens": 115,
+                "total_tokens": 210
+              },
+              {
+                "agent": "affective",
+                "latency_ms": 235,
+                "input_tokens": 216,
+                "output_tokens": 43,
+                "total_tokens": 259
+              },
+              {
+                "agent": "solver",
+                "latency_ms": 125,
+                "input_tokens": 261,
+                "output_tokens": 7,
+                "total_tokens": 268
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 3,
+            "mode": "four_agent",
+            "output": "A quarter and a nickel.",
+            "total_latency_ms": 1156,
+            "total_tokens": 886,
+            "calls": [
+              {
+                "agent": "diagnoser",
+                "latency_ms": 219,
+                "input_tokens": 48,
+                "output_tokens": 41,
+                "total_tokens": 89
+              },
+              {
+                "agent": "planner",
+                "latency_ms": 529,
+                "input_tokens": 94,
+                "output_tokens": 128,
+                "total_tokens": 222
+              },
+              {
+                "agent": "affective",
+                "latency_ms": 287,
+                "input_tokens": 228,
+                "output_tokens": 55,
+                "total_tokens": 283
+              },
+              {
+                "agent": "solver",
+                "latency_ms": 119,
+                "input_tokens": 285,
+                "output_tokens": 7,
+                "total_tokens": 292
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 4,
+            "mode": "four_agent",
+            "output": "A quarter and a nickel.",
+            "total_latency_ms": 1069,
+            "total_tokens": 828,
+            "calls": [
+              {
+                "agent": "diagnoser",
+                "latency_ms": 247,
+                "input_tokens": 48,
+                "output_tokens": 42,
+                "total_tokens": 90
+              },
+              {
+                "agent": "planner",
+                "latency_ms": 467,
+                "input_tokens": 95,
+                "output_tokens": 116,
+                "total_tokens": 211
+              },
+              {
+                "agent": "affective",
+                "latency_ms": 230,
+                "input_tokens": 217,
+                "output_tokens": 42,
+                "total_tokens": 259
+              },
+              {
+                "agent": "solver",
+                "latency_ms": 123,
+                "input_tokens": 261,
+                "output_tokens": 7,
+                "total_tokens": 268
+              }
+            ],
+            "success": true,
+            "error": null
+          }
+        ],
+        "summary": {
+          "latency_ms": [
+            1076.6,
+            0.0
+          ],
+          "total_tokens": [
+            840.8,
+            0.0
+          ],
+          "success_rate": [
+            1.0,
+            0.0
+          ]
+        }
+      },
+      {
+        "test_case_id": "rea-004",
+        "test_case_name": "Explanation",
+        "prompt": "Explain why the sky appears blue during the day.",
+        "mode": "four_agent",
+        "runs": [
+          {
+            "run_number": 0,
+            "mode": "four_agent",
+            "output": "The sky appears blue due to a phenomenon called **Rayleigh scattering**. Here is the step-by-step breakdown of why this happens:\n\n### 1. Sunlight is a Spectrum\nAlthough sunlight looks white to us, it is actually composed of all the colors of the rainbow (red, orange, yellow, green, blue, indigo, and violet). Each color travels as a wave with a different wavelength. Red light has long, lazy waves, while blue and violet light have short, choppy waves.\n\n### 2. The Atmosphere Acts as an Obstacle Course\nEarth's atmosphere is filled with gas molecules (primarily nitrogen and oxygen). When sunlight enters the atmosphere, it strikes these molecules and gets redirected in different directions. This process is known as **Rayleigh scattering**.\n\n### 3. Short Waves Scatter More Intensively\nBecause blue light travels in shorter, smaller waves, it strikes the gas molecules and scatters much more intensely and in more directions than the longer red waves. When you look up, your eyes are catching this scattered blue light coming from every part of the sky.\n\n***Why isn't the sky violet?***\nTechnically, violet light has an even shorter wavelength than blue light and scatters even more intensely. However, the sky appears blue to us for two main reasons:\n* **The Sun's Output:** The Sun emits significantly more blue light than violet light.\n* **Human Biology:** Human eyes are much more sensitive to blue light than to violet light. Our eyes interpret the mix of scattered violet and blue light as a bright, clear blue.",
+            "total_latency_ms": 3682,
+            "total_tokens": 1700,
+            "calls": [
+              {
+                "agent": "diagnoser",
+                "latency_ms": 248,
+                "input_tokens": 37,
+                "output_tokens": 43,
+                "total_tokens": 80
+              },
+              {
+                "agent": "planner",
+                "latency_ms": 521,
+                "input_tokens": 85,
+                "output_tokens": 123,
+                "total_tokens": 208
+              },
+              {
+                "agent": "affective",
+                "latency_ms": 1545,
+                "input_tokens": 214,
+                "output_tokens": 328,
+                "total_tokens": 542
+              },
+              {
+                "agent": "solver",
+                "latency_ms": 1366,
+                "input_tokens": 544,
+                "output_tokens": 326,
+                "total_tokens": 870
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 1,
+            "mode": "four_agent",
+            "output": "The sky appears blue due to a phenomenon called **Rayleigh scattering**. Here is the step-by-step breakdown of why this happens:\n\n1.  **Sunlight is a Spectrum:** Although sunlight looks white, it is actually composed of all the colors of the rainbow (red, orange, yellow, green, blue, indigo, and violet). Each color travels as a wave with a different wavelength; red light has long, lazy waves, while blue and violet light have much shorter, choppier waves.\n2.  **Atmospheric Interaction:** Earth's atmosphere is filled with gases (mostly nitrogen and oxygen). When sunlight hits these gas molecules, the light is scattered in many different directions.\n3.  **Rayleigh Scattering:** Because blue light travels in shorter, smaller waves, it strikes the gas molecules and scatters much more easily and intensely than the longer wavelengths (like red and yellow). This scattering of blue light across the entire sky is what our eyes perceive when we look up during a clear day.\n\n**Why isn't the sky violet?**\nTechnically, violet light has an even shorter wavelength than blue light and scatters even more intensely. However, the sky does not appear violet for two reasons:\n*   **The Sun's Output:** The Sun emits much more blue light than violet light.\n*   **Human Vision:** Our eyes are evolutionarily tuned to be much more sensitive to blue light than to violet light. Therefore, our brains interpret the scattered light as a bright, clear blue.",
+            "total_latency_ms": 3053,
+            "total_tokens": 1384,
+            "calls": [
+              {
+                "agent": "diagnoser",
+                "latency_ms": 316,
+                "input_tokens": 37,
+                "output_tokens": 59,
+                "total_tokens": 96
+              },
+              {
+                "agent": "planner",
+                "latency_ms": 527,
+                "input_tokens": 101,
+                "output_tokens": 104,
+                "total_tokens": 205
+              },
+              {
+                "agent": "affective",
+                "latency_ms": 849,
+                "input_tokens": 211,
+                "output_tokens": 172,
+                "total_tokens": 383
+              },
+              {
+                "agent": "solver",
+                "latency_ms": 1360,
+                "input_tokens": 385,
+                "output_tokens": 315,
+                "total_tokens": 700
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 2,
+            "mode": "four_agent",
+            "output": "The sky appears blue due to a phenomenon called **Rayleigh scattering**. Here is the step-by-step breakdown of why this happens:\n\n1.  **Sunlight is a Spectrum:** Although sunlight looks white, it is actually composed of all the colors of the rainbow (red, orange, yellow, green, blue, indigo, and violet). Each of these colors travels as a wave with a different wavelength; red light has long, lazy waves, while blue and violet light have much shorter, choppier waves.\n2.  **Atmospheric Scattering:** Earth's atmosphere is filled with gases (mostly nitrogen and oxygen) and small particles. When sunlight hits these gas molecules, the light is redirected and scattered in every direction. This process is known as Rayleigh scattering.\n3.  **Wavelength and Scattering Efficiency:** Because blue light travels in shorter, smaller waves, it strikes the gas molecules and scatters much more easily and intensely than the longer red waves. This scattered blue light is redirected from all angles across the sky, which is why the entire dome of the sky appears blue when you look up.\n\n**Why isn't the sky violet?**\nScientifically, violet light has an even shorter wavelength than blue light and scatters even more intensely. However, the sky doesn't look violet for two reasons:\n*   **The Sun's Output:** The Sun emits significantly more blue light than violet light.\n*   **Human Biology:** Our eyes are much more sensitive to blue than to violet. Our brains interpret the mixture of scattered violet and blue light as the bright, familiar shade of blue we see during the day.",
+            "total_latency_ms": 3761,
+            "total_tokens": 1641,
+            "calls": [
+              {
+                "agent": "diagnoser",
+                "latency_ms": 325,
+                "input_tokens": 37,
+                "output_tokens": 51,
+                "total_tokens": 88
+              },
+              {
+                "agent": "planner",
+                "latency_ms": 612,
+                "input_tokens": 93,
+                "output_tokens": 134,
+                "total_tokens": 227
+              },
+              {
+                "agent": "affective",
+                "latency_ms": 1333,
+                "input_tokens": 233,
+                "output_tokens": 260,
+                "total_tokens": 493
+              },
+              {
+                "agent": "solver",
+                "latency_ms": 1489,
+                "input_tokens": 495,
+                "output_tokens": 338,
+                "total_tokens": 833
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 3,
+            "mode": "four_agent",
+            "output": "The sky appears blue due to a phenomenon called **Rayleigh scattering**. Here is the breakdown of why this happens:\n\n### 1. Sunlight is a Mix of All Colors\nAlthough sunlight looks white, it is actually composed of all the colors of the rainbow (red, orange, yellow, green, blue, indigo, and violet). Each color travels as a wave with a different wavelength. Red light has long, lazy wavelengths, while blue and violet light have much shorter, choppier wavelengths.\n\n### 2. Interaction with the Atmosphere\nEarth's atmosphere is filled with gas molecules (primarily nitrogen and oxygen). These molecules are much smaller than the wavelengths of visible light. When sunlight enters the atmosphere, the light waves collide with these molecules.\n\n### 3. Rayleigh Scattering\nBecause blue light travels in shorter, smaller waves, it is much more likely to strike the gas molecules and get redirected in many different directions. This is known as **Rayleigh scattering**. \n\nWhile the longer wavelengths (reds and yellows) pass through the atmosphere relatively straight and undisturbed, the shorter blue wavelengths are scattered across the entire sky. Therefore, when you look up, your eyes are catching this \"scattered\" blue light coming from every direction.\n\n***\n\n**Why isn't the sky violet?**\nTechnically, violet light has an even shorter wavelength than blue light and scatters even more intensely. However, the sky doesn't look violet to us for two main reasons:\n* **The Sun's Output:** The Sun emits significantly more blue light than violet light.\n* **Human Biology:** The human eye is much more sensitive to blue than to violet. Our eyes interpret the mix of scattered violet and blue light as a pale blue.",
+            "total_latency_ms": 4422,
+            "total_tokens": 1927,
+            "calls": [
+              {
+                "agent": "diagnoser",
+                "latency_ms": 379,
+                "input_tokens": 37,
+                "output_tokens": 51,
+                "total_tokens": 88
+              },
+              {
+                "agent": "planner",
+                "latency_ms": 564,
+                "input_tokens": 93,
+                "output_tokens": 114,
+                "total_tokens": 207
+              },
+              {
+                "agent": "affective",
+                "latency_ms": 1859,
+                "input_tokens": 213,
+                "output_tokens": 423,
+                "total_tokens": 636
+              },
+              {
+                "agent": "solver",
+                "latency_ms": 1619,
+                "input_tokens": 638,
+                "output_tokens": 358,
+                "total_tokens": 996
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 4,
+            "mode": "four_agent",
+            "output": "The sky appears blue due to a phenomenon called **Rayleigh scattering**. Here is the step-by-step scientific explanation:\n\n1.  **The Light Source:** Although sunlight looks white, it is actually composed of all the colors of the rainbow (a spectrum of wavelengths). These colors travel as waves of different lengths: red light has long, lazy waves, while blue and violet light have much shorter, choppier waves.\n2.  **Atmospheric Interaction:** Earth's atmosphere is filled with gas molecules (mostly nitrogen and oxygen). When sunlight hits these molecules, the light waves collide with them and scatter. Because blue light travels in shorter, smaller waves, it strikes the gas molecules and scatters much more intensely and in many more directions than the longer red waves.\n3.  **Human Perception:** As you look up, your eyes are catching this \"scattered\" blue light coming from every direction in the sky. \n\n**Why isn't the sky violet?**\nTechnically, violet light has an even shorter wavelength than blue light and scatters even more intensely. However, the sky doesn't look violet for two main reasons:\n*   **The Sun's Output:** The sun emits significantly more blue light than violet light.\n*   **Eye Sensitivity:** The human eye is much more sensitive to blue than to violet. Our brains interpret the mixture of scattered violet and blue light as a bright, clear blue.",
+            "total_latency_ms": 3439,
+            "total_tokens": 1522,
+            "calls": [
+              {
+                "agent": "diagnoser",
+                "latency_ms": 326,
+                "input_tokens": 37,
+                "output_tokens": 44,
+                "total_tokens": 81
+              },
+              {
+                "agent": "planner",
+                "latency_ms": 524,
+                "input_tokens": 86,
+                "output_tokens": 118,
+                "total_tokens": 204
+              },
+              {
+                "agent": "affective",
+                "latency_ms": 1204,
+                "input_tokens": 210,
+                "output_tokens": 259,
+                "total_tokens": 469
+              },
+              {
+                "agent": "solver",
+                "latency_ms": 1384,
+                "input_tokens": 471,
+                "output_tokens": 297,
+                "total_tokens": 768
+              }
+            ],
+            "success": true,
+            "error": null
+          }
+        ],
+        "summary": {
+          "latency_ms": [
+            3671.4,
+            0.0
+          ],
+          "total_tokens": [
+            1634.8,
+            0.0
+          ],
+          "success_rate": [
+            1.0,
+            0.0
+          ]
+        }
+      },
+      {
+        "test_case_id": "rea-005",
+        "test_case_name": "Step-by-Step",
+        "prompt": "Explain how to determine if a number is prime, step by step.",
+        "mode": "four_agent",
+        "runs": [
+          {
+            "run_number": 0,
+            "mode": "four_agent",
+            "output": "To determine if a number is prime, follow this systematic process:\n\n### **Step 1: Check the Base Case**\nBefore performing any calculations, look at the number itself. \n*   If the number is **less than 2** (e.g., 0, 1, or negative numbers), it is **not prime**.\n*   If the number is exactly **2**, it is **prime** (it is the only even prime number).\n\n### **Step 2: Calculate the Limit (The Square Root Rule)**\nYou do not need to test every number up to your target number. You only need to test divisors up to the **square root** of your number.\n*   **Example:** If you are testing **97**, the square root is approximately **9.8**. You only need to test prime numbers up to **9**.\n*   **Why this works:** If a number has a factor larger than its square root, it must also have a corresponding factor smaller than its square root. If you haven't found a factor by the time you reach the square root, you won't find one at all.\n\n### **Step 3: Test for Divisibility**\nDivide your target number by every prime number starting from **2** up to the limit you calculated in Step 2.\n*   **The Test:** Divide the number by 2, 3, 5, 7, 11, etc.\n*   **The Result:**\n    *   If the number is divisible by any of these (meaning the remainder is 0), the number is **composite** (not prime).\n    *   If you reach your limit without finding any number that divides evenly, the number is **prime**.\n\n---\n\n### **Worked Example: Is 127 prime?**\n\n1.  **Base Case:** 127 is greater than 2. (Proceed)\n2.  **Calculate Limit:** $\\sqrt{127} \\approx 11.27$. I only need to test primes up to **11**.\n3.  **Test Divisibility:**\n    *   Is 127 divisible by **2**? No (it's odd).\n    *   Is 127 divisible by **3**? No ($1+2+7 = 10$; 10 is not divisible by 3).\n    *   Is 127 divisible by **5**? No (it doesn't end in 0 or 5).\n    *   Is 127 divisible by **7**? No ($127 \\div 7 = 18$ with a remainder of 1).\n    *   Is 127 divisible by **11**? No ($127 \\div 11 = 11$ with a remainder of 6).\n\n**Conclusion:** Since no primes up to 11 divided into 127 evenly, **127 is prime.**",
+            "total_latency_ms": 4048,
+            "total_tokens": 2734,
+            "calls": [
+              {
+                "agent": "diagnoser",
+                "latency_ms": 318,
+                "input_tokens": 41,
+                "output_tokens": 60,
+                "total_tokens": 101
+              },
+              {
+                "agent": "planner",
+                "latency_ms": 501,
+                "input_tokens": 106,
+                "output_tokens": 122,
+                "total_tokens": 228
+              },
+              {
+                "agent": "affective",
+                "latency_ms": 2293,
+                "input_tokens": 234,
+                "output_tokens": 647,
+                "total_tokens": 881
+              },
+              {
+                "agent": "solver",
+                "latency_ms": 935,
+                "input_tokens": 883,
+                "output_tokens": 641,
+                "total_tokens": 1524
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 1,
+            "mode": "four_agent",
+            "output": "To determine if a number is prime, you must check if it has any divisors other than 1 and itself. You can do this efficiently by following these three steps:\n\n### Step 1: Eliminate the Basics\nBefore performing calculations, rule out the special cases:\n* **If the number is less than 2:** It is **not prime** (0 and 1 are not prime numbers).\n* **If the number is exactly 2:** It is **prime** (it is the only even prime number).\n* **If the number is even and greater than 2:** It is **not prime** (it is divisible by 2).\n\n### Step 2: Find the \"Stopping Point\" (Square Root)\nYou do not need to test every number up to your target number. You only need to test up to its **square root**.\n* **Why?** If a number $n$ has a factor larger than its square root, it must also have a corresponding factor smaller than its square root (for example, in 36, the factors $4 \\times 9$ consist of one number below the square root and one above). If you haven't found a factor by the time you reach the square root, you won't find one.\n* **Example:** To check if **127** is prime, find $\\sqrt{127} \\approx 11.2$. You only need to test prime numbers up to **11**.\n\n### Step 3: Test for Divisibility\nNow, divide your number by every prime number starting from 3 up to the limit you found in Step 2.\n\n1.  **List the primes** up to your square root (e.g., 3, 5, 7, 11...).\n2.  **Divide** your number by each one.\n3.  **Check the remainder:**\n    *   If the remainder is **0** (it divides evenly), the number is **composite** (not prime).\n    *   If you reach the square root and **none** of the primes divided evenly, the number is **prime**.\n\n---\n\n### Example Walkthrough: Is 97 prime?\n\n1.  **Step 1 (Basics):** 97 is greater than 2 and it is odd. Proceed.\n2.  **Step 2 (Square Root):** $\\sqrt{97}$ is approximately **9.8**. We only need to test primes up to **9**.\n3.  **Step 3 (Testing):** The primes to test are **3, 5, and 7**.\n    *   $97 \\div 3 = 32$ with a remainder of $1$ (No)\n    *   $97 \\div 5 = 19$ with a remainder of $2$ (No)\n    *   $97 \\div 7 = 13$ with a remainder of $6$ (No)\n\n**Conclusion:** Since no primes up to the square root divided evenly into 97, **97 is a prime number.**",
+            "total_latency_ms": 4887,
+            "total_tokens": 2847,
+            "calls": [
+              {
+                "agent": "diagnoser",
+                "latency_ms": 286,
+                "input_tokens": 41,
+                "output_tokens": 55,
+                "total_tokens": 96
+              },
+              {
+                "agent": "planner",
+                "latency_ms": 571,
+                "input_tokens": 101,
+                "output_tokens": 142,
+                "total_tokens": 243
+              },
+              {
+                "agent": "affective",
+                "latency_ms": 2530,
+                "input_tokens": 249,
+                "output_tokens": 672,
+                "total_tokens": 921
+              },
+              {
+                "agent": "solver",
+                "latency_ms": 1498,
+                "input_tokens": 923,
+                "output_tokens": 664,
+                "total_tokens": 1587
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 2,
+            "mode": "four_agent",
+            "output": "To determine if a number is prime, follow these three steps:\n\n### **Step 1: Eliminate the basics**\nBefore performing heavy calculations, rule out the obvious cases:\n* **Numbers less than 2:** These are not prime (0 and 1 are neither prime nor composite).\n* **The numbers 2 and 3:** These are prime.\n* **Even numbers:** If the number is greater than 2 and ends in 0, 2, 4, 6, or 8, it is not prime.\n\n### **Step 2: Find the square root**\nCalculate the square root of your target number. You only need to test for divisors up to this value. This is because if a number has a factor larger than its square root, it must also have a corresponding factor smaller than its square root.\n* *Example: If testing 97, $\\sqrt{97} \\approx 9.8$. Your testing limit is 9.*\n\n### **Step 3: Test for divisibility**\nDivide your target number by every prime number starting from 3 up to the limit you calculated in Step 2.\n* If any of these divisions result in a whole number (no remainder), the number is **composite**.\n* If you reach your limit without finding any divisors, the number is **prime**.\n\n***\n\n### **Worked Example: Is 97 a prime number?**\n\n1.  **Eliminate the basics:** 97 is greater than 2, it is not 2 or 3, and it is not even. **Proceed.**\n2.  **Find the square root:** $\\sqrt{97} \\approx 9.8$. We only need to check primes up to **9**.\n3.  **Test for divisibility:** The prime numbers up to 9 are **3, 5, and 7**.\n    *   $97 \\div 3 = 32.33$ (No)\n    *   $97 \\div 5 = 19.4$ (No)\n    *   $97 \\div 7 = 13.85$ (No)\n\n**Conclusion:** Since 97 is not divisible by any prime up to its square root, **97 is a prime number.**",
+            "total_latency_ms": 3913,
+            "total_tokens": 1937,
+            "calls": [
+              {
+                "agent": "diagnoser",
+                "latency_ms": 287,
+                "input_tokens": 41,
+                "output_tokens": 47,
+                "total_tokens": 88
+              },
+              {
+                "agent": "planner",
+                "latency_ms": 588,
+                "input_tokens": 93,
+                "output_tokens": 148,
+                "total_tokens": 241
+              },
+              {
+                "agent": "affective",
+                "latency_ms": 1172,
+                "input_tokens": 247,
+                "output_tokens": 310,
+                "total_tokens": 557
+              },
+              {
+                "agent": "solver",
+                "latency_ms": 1864,
+                "input_tokens": 559,
+                "output_tokens": 492,
+                "total_tokens": 1051
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 3,
+            "mode": "four_agent",
+            "output": "### How to Determine if a Number is Prime\n\nA prime number is a whole number greater than 1 that has no positive divisors other than 1 and itself. Follow these three steps to test any number:\n\n#### Step 1: Eliminate the basics\n* **Is it less than 2?** If yes, it is **not prime**.\n* **Is it exactly 2?** If yes, it is **prime**.\n* **Is it even?** If the number is greater than 2 and ends in 0, 2, 4, 6, or 8, it is **not prime**.\n\n#### Step 2: Calculate the limit\nYou do not need to test every number up to your target. Instead, find the **square root** ($\\sqrt{n}$) of your number. You only need to test prime numbers up to this limit. \n* *Example: If testing 97, $\\sqrt{97} \\approx 9.8$. You only need to test primes up to 9 (2, 3, 5, 7).*\n\n#### Step 3: Test for divisibility\nDivide your target number by every prime number starting from 3 up to the limit you calculated in Step 2.\n* **If any prime divides evenly** (no remainder), the number is **composite**.\n* **If you reach the limit** without finding a divisor, the number is **prime**.\n\n---\n\n### Example Walkthrough: Is 127 prime?\n1. **Basics:** It is greater than 2 and it is odd. (Keep going)\n2. **Limit:** $\\sqrt{127} \\approx 11.2$. We only need to test primes up to 11.\n3. **Test:** \n   * 127 ÷ 3 = 42.33 (No)\n   * 127 ÷ 5 = 25.4 (No)\n   * 127 ÷ 7 = 18.14 (No)\n   * 127 ÷ 11 = 11.54 (No)\n\n**Result:** No divisors found. **127 is prime.**",
+            "total_latency_ms": 3679,
+            "total_tokens": 2444,
+            "calls": [
+              {
+                "agent": "diagnoser",
+                "latency_ms": 332,
+                "input_tokens": 41,
+                "output_tokens": 57,
+                "total_tokens": 98
+              },
+              {
+                "agent": "planner",
+                "latency_ms": 500,
+                "input_tokens": 103,
+                "output_tokens": 148,
+                "total_tokens": 251
+              },
+              {
+                "agent": "affective",
+                "latency_ms": 2196,
+                "input_tokens": 257,
+                "output_tokens": 552,
+                "total_tokens": 809
+              },
+              {
+                "agent": "solver",
+                "latency_ms": 650,
+                "input_tokens": 811,
+                "output_tokens": 475,
+                "total_tokens": 1286
+              }
+            ],
+            "success": true,
+            "error": null
+          },
+          {
+            "run_number": 4,
+            "mode": "four_agent",
+            "output": "To determine if a number is prime, follow these three steps:\n\n### 1. Eliminate the Basics\nBefore performing complex calculations, rule out the most obvious cases:\n* **Is it less than 2?** If the number is 0 or 1, it is **not prime**.\n* **Is it 2 or 3?** If yes, it **is prime**.\n* **Is it even?** If the number is greater than 2 and is even, it is **not prime**.\n* **Is it a multiple of 3?** Add the digits of the number together. If that sum is divisible by 3, the number is **not prime**.\n\n### 2. Calculate the Limit\nYou do not need to test every number up to your target. You only need to test divisors up to the **square root** of the number.\n* **Example:** If you are testing **97**, find the square root. $\\sqrt{97}$ is approximately **9.8**. You only need to check prime numbers up to **9**.\n\n### 3. Test for Divisibility\nTest the remaining prime numbers starting from 5 up to the limit you calculated in Step 2.\n* **The Sequence:** Test 5, 7, 11, 13, 17, etc. (Since you already checked 2 and 3, you can skip all even numbers and multiples of 3).\n* **The Result:** \n    * If any of these numbers divide into your target number with a remainder of zero, the number is **composite**.\n    * If you reach your limit (the square root) without finding a divisor, the number is **prime**.\n\n***\n\n**Example Walkthrough: Is 127 prime?**\n1. **Basics:** It is greater than 2, it is odd, and the sum of digits ($1+2+7=10$) is not divisible by 3. (Pass)\n2. **Limit:** $\\sqrt{127}$ is approximately **11.2**. We only need to test primes up to **11**.\n3. **Test:** \n   * **Test 5:** 127 does not end in 0 or 5. (Pass)\n   * **Test 7:** $127 \\div 7 = 18$ with a remainder of 1. (Pass)\n   * **Test 11:** $127 \\div 11 = 11$ with a remainder of 6. (Pass)\n4. **Conclusion:** We have reached our limit (11) without finding a divisor. **127 is prime.**",
+            "total_latency_ms": 4485,
+            "total_tokens": 2629,
+            "calls": [
+              {
+                "agent": "diagnoser",
+                "latency_ms": 327,
+                "input_tokens": 41,
+                "output_tokens": 66,
+                "total_tokens": 107
+              },
+              {
+                "agent": "planner",
+                "latency_ms": 605,
+                "input_tokens": 112,
+                "output_tokens": 132,
+                "total_tokens": 244
+              },
+              {
+                "agent": "affective",
+                "latency_ms": 2177,
+                "input_tokens": 250,
+                "output_tokens": 599,
+                "total_tokens": 849
+              },
+              {
+                "agent": "solver",
+                "latency_ms": 1374,
+                "input_tokens": 851,
+                "output_tokens": 578,
+                "total_tokens": 1429
+              }
+            ],
+            "success": true,
+            "error": null
+          }
+        ],
+        "summary": {
+          "success_rate": [
+            1.0,
+            0.0
+          ],
+          "total_tokens": [
+            2518.2,
+            0.0
+          ],
+          "latency_ms": [
+            4202.4,
+            0.0
+          ]
+        }
+      }
+    ],
+    "aggregate": {
+      "success_rate": [
+        1.0,
+        0.0
+      ],
+      "latency_ms": [
+        2247.6400000000003,
+        0.0
+      ],
+      "total_tokens": [
+        1333.04,
+        0.0
+      ]
+    }
+  }
+]

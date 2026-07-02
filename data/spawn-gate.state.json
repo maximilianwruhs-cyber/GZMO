@@ -1,177 +1,6 @@
 {
   "executions": [
     {
-      "at": "2026-06-29T13:11:01.148654284Z",
-      "kind": "discovery_plan",
-      "reason_hash": 16269195925952795750,
-      "recommendation_id": "9c3fc74c-7639-4abf-9127-b5e558c0de35",
-      "session_id": "discovery-plan:session-final-auto-low_tension-2026-06-27T06-17-46Z",
-      "task_id": "73e3f298-fde5-4959-9160-3359923174a3",
-      "approved_via": "gzmo kurator plan-from-discovery"
-    },
-    {
-      "at": "2026-06-29T13:13:19.197778864Z",
-      "kind": "discovery_plan",
-      "reason_hash": 16269195925952795750,
-      "recommendation_id": "33e63f5f-ced6-460b-85fa-c41e1e9fb16d",
-      "session_id": "discovery-plan:session-final-auto-low_tension-2026-06-27T06-17-46Z",
-      "task_id": "71404ef8-f0bb-4472-b23d-48856eaa4a5e",
-      "approved_via": "gzmo kurator plan-from-discovery"
-    },
-    {
-      "at": "2026-06-29T13:15:53.363749780Z",
-      "kind": "discovery_plan",
-      "reason_hash": 14084814588624423265,
-      "recommendation_id": "5ae6eabd-04ef-494d-b3f4-3348af80a4ec",
-      "session_id": "discovery-plan:session-final-auto-low_tension-2026-06-29T12-37-15Z",
-      "task_id": "ac0b3d75-8d14-47a0-b8ae-f7cfd2d0c306",
-      "approved_via": "gzmo kurator plan-from-discovery"
-    },
-    {
-      "at": "2026-06-29T15:01:36.396275046Z",
-      "kind": "discovery_plan",
-      "reason_hash": 619595797633535012,
-      "recommendation_id": "ec8ab40c-733e-40b2-82bf-8deab3f81290",
-      "session_id": "discovery-plan:session-final-2026-06-29T14-34-13Z",
-      "task_id": "9ba397ec-f125-45f9-aa60-eb5045a61891",
-      "approved_via": "gzmo kurator plan-from-discovery"
-    },
-    {
-      "at": "2026-06-29T15:02:31.224204690Z",
-      "kind": "discovery_plan",
-      "reason_hash": 619595797633535012,
-      "recommendation_id": "e54bec19-c0a8-4a75-bab4-f84cc22a062d",
-      "session_id": "discovery-plan:session-final-2026-06-29T14-34-13Z",
-      "task_id": "b33dff85-7d85-48b6-b973-0cf9794f7069",
-      "approved_via": "gzmo kurator plan-from-discovery"
-    },
-    {
-      "at": "2026-06-29T15:03:18.144831208Z",
-      "kind": "discovery_plan",
-      "reason_hash": 619595797633535012,
-      "recommendation_id": "759247e7-5419-4060-a15d-979b3618fc38",
-      "session_id": "discovery-plan:session-final-2026-06-29T14-34-13Z",
-      "task_id": "c9278eeb-1fb6-473c-8709-7123d50d28c8",
-      "approved_via": "gzmo kurator plan-from-discovery"
-    },
-    {
-      "at": "2026-06-29T15:05:27.456077325Z",
-      "kind": "discovery_plan",
-      "reason_hash": 619595797633535012,
-      "recommendation_id": "a58e75c9-ed4a-4cb0-bc20-681e6adcb515",
-      "session_id": "discovery-plan:session-final-2026-06-29T14-34-13Z",
-      "task_id": "c7dcc968-91af-4639-a2c0-0d5276dc3519",
-      "approved_via": "gzmo kurator plan-from-discovery"
-    },
-    {
-      "at": "2026-06-29T15:06:29.478839371Z",
-      "kind": "discovery_plan",
-      "reason_hash": 619595797633535012,
-      "recommendation_id": "ea646645-8b06-45b0-a703-6ed1f569f8cf",
-      "session_id": "discovery-plan:session-final-2026-06-29T14-34-13Z",
-      "task_id": "e743a2e2-8978-429b-ae97-0573ae710212",
-      "approved_via": "gzmo kurator plan-from-discovery"
-    },
-    {
-      "at": "2026-06-29T15:08:32.581406769Z",
-      "kind": "discovery_plan",
-      "reason_hash": 619595797633535012,
-      "recommendation_id": "da05f2ef-5578-47a9-a122-503bca0a80d6",
-      "session_id": "discovery-plan:session-final-2026-06-29T14-34-13Z",
-      "task_id": "8972577c-aae0-4a4f-bffb-307632703a6d",
-      "approved_via": "gzmo kurator plan-from-discovery"
-    },
-    {
-      "at": "2026-06-29T16:17:46.508317754Z",
-      "kind": "discovery_plan",
-      "reason_hash": 619595797633535012,
-      "recommendation_id": "dcc15082-a545-465a-9ff1-e50c510b0968",
-      "session_id": "discovery-plan:session-final-2026-06-29T14-34-13Z",
-      "task_id": "521eb65c-4f7a-4145-80b3-a2d8b21dd52a",
-      "approved_via": "gzmo kurator plan-from-discovery"
-    },
-    {
-      "at": "2026-06-29T16:19:24.998164266Z",
-      "kind": "discovery_plan",
-      "reason_hash": 619595797633535012,
-      "recommendation_id": "4c7764bc-767c-4708-9a60-a3405b508cbd",
-      "session_id": "discovery-plan:session-final-2026-06-29T14-34-13Z",
-      "task_id": "eccee670-0d87-42ed-8e9e-2dea5bfac48c",
-      "approved_via": "gzmo kurator plan-from-discovery"
-    },
-    {
-      "at": "2026-06-29T16:20:25.400391222Z",
-      "kind": "discovery_plan",
-      "reason_hash": 619595797633535012,
-      "recommendation_id": "f0703e08-80c3-45bc-8d5d-0c24a4f0b07d",
-      "session_id": "discovery-plan:session-final-2026-06-29T14-34-13Z",
-      "task_id": "d94b7b96-e77d-4026-8752-3058f399deda",
-      "approved_via": "gzmo kurator plan-from-discovery"
-    },
-    {
-      "at": "2026-06-29T16:22:23.205999889Z",
-      "kind": "discovery_plan",
-      "reason_hash": 619595797633535012,
-      "recommendation_id": "3bf86266-98cd-47ee-b17a-db61e0f41d3d",
-      "session_id": "discovery-plan:session-final-2026-06-29T14-34-13Z",
-      "task_id": "81a89342-f5dd-421f-ac54-2d6e9b8d0329",
-      "approved_via": "gzmo kurator plan-from-discovery"
-    },
-    {
-      "at": "2026-06-29T16:23:29.382802427Z",
-      "kind": "discovery_plan",
-      "reason_hash": 619595797633535012,
-      "recommendation_id": "ca2956cc-9808-4651-9872-65db4062e611",
-      "session_id": "discovery-plan:session-final-2026-06-29T14-34-13Z",
-      "task_id": "c88ceea1-4f12-414a-9038-fbaea23dd7a1",
-      "approved_via": "gzmo kurator plan-from-discovery"
-    },
-    {
-      "at": "2026-06-30T04:45:08.223784744Z",
-      "kind": "discovery_plan",
-      "reason_hash": 619595797633535012,
-      "recommendation_id": "47a718d6-3104-4137-b34a-9b578cd43102",
-      "session_id": "discovery-plan:session-final-2026-06-29T14-34-13Z",
-      "task_id": "471719bb-9263-415d-8666-92dce1efe781",
-      "approved_via": "gzmo kurator plan-from-discovery"
-    },
-    {
-      "at": "2026-06-30T04:48:39.536354876Z",
-      "kind": "discovery_plan",
-      "reason_hash": 619595797633535012,
-      "recommendation_id": "ff2423c2-df8a-49d4-af91-574d93dd4921",
-      "session_id": "discovery-plan:session-final-2026-06-29T14-34-13Z",
-      "task_id": "fb6a7c24-8651-427c-aa95-2d2fde88ed40",
-      "approved_via": "gzmo kurator plan-from-discovery"
-    },
-    {
-      "at": "2026-06-30T04:54:21.357250105Z",
-      "kind": "discovery_plan",
-      "reason_hash": 619595797633535012,
-      "recommendation_id": "aa4e36a8-be67-463a-87ca-5d1215d511fd",
-      "session_id": "discovery-plan:session-final-2026-06-29T14-34-13Z",
-      "task_id": "49decbe7-4069-441d-acd3-c6b9b150d455",
-      "approved_via": "gzmo kurator plan-from-discovery"
-    },
-    {
-      "at": "2026-06-30T04:58:46.335723678Z",
-      "kind": "discovery_plan",
-      "reason_hash": 6786400249779170477,
-      "recommendation_id": "46100538-7fb5-4425-83ed-ca0fe686e5eb",
-      "session_id": "discovery-plan:session-final-auto-low_tension-2026-06-30T04-38-33Z",
-      "task_id": "6eaaa632-c4a8-46cb-a9f3-0f9bfa0104b5",
-      "approved_via": "gzmo kurator plan-from-discovery"
-    },
-    {
-      "at": "2026-06-30T05:01:10.355424539Z",
-      "kind": "discovery_plan",
-      "reason_hash": 619595797633535012,
-      "recommendation_id": "69618c4f-99f4-4319-a5ae-8348fee95600",
-      "session_id": "discovery-plan:session-final-2026-06-29T14-34-13Z",
-      "task_id": "522d5251-edd7-447b-aae8-571dbcccc436",
-      "approved_via": "gzmo kurator plan-from-discovery"
-    },
-    {
       "at": "2026-06-30T08:23:46.075030327Z",
       "kind": "discovery_plan",
       "reason_hash": 4601814636436254143,
@@ -278,16 +107,315 @@
       "session_id": "discovery-plan:session-final-2026-07-01T08-34-10Z",
       "task_id": "39f27741-5e55-4675-a053-0e4d6b9edeb4",
       "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-07-01T14:59:52.542575536Z",
+      "kind": "discovery_plan",
+      "reason_hash": 16269195925952795750,
+      "recommendation_id": "ff9ec08c-f8fb-4277-a4ec-94400af861d1",
+      "session_id": "discovery-plan:session-final-auto-pedagogy_oscillation-2026-07-01T12-54-53Z",
+      "task_id": "6db91f4d-aa50-4785-b95d-78bd61befad5",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-07-01T15:02:30.911198568Z",
+      "kind": "discovery_plan",
+      "reason_hash": 16269195925952795750,
+      "recommendation_id": "80d06027-808d-4a9b-ba65-dc166517f8b1",
+      "session_id": "discovery-plan:session-final-auto-pedagogy_oscillation-2026-07-01T12-54-53Z",
+      "task_id": "786b7a80-78b6-4888-a01c-59bd00d2874a",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-07-01T15:06:19.669210824Z",
+      "kind": "discovery_plan",
+      "reason_hash": 16269195925952795750,
+      "recommendation_id": "e66224da-11dd-4856-9ab4-0ca163a5fe2d",
+      "session_id": "discovery-plan:session-final-auto-pedagogy_oscillation-2026-07-01T12-54-53Z",
+      "task_id": "1c1d4289-fa48-4074-b724-5eb6108abe74",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-07-01T15:09:59.864706005Z",
+      "kind": "discovery_plan",
+      "reason_hash": 16269195925952795750,
+      "recommendation_id": "b54c4b2c-dec8-4109-a53c-c4c49c4a225a",
+      "session_id": "discovery-plan:session-final-auto-pedagogy_oscillation-2026-07-01T12-54-53Z",
+      "task_id": "9e109e37-5089-4be4-a4de-b64128c3b8b5",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-07-01T15:13:58.986435402Z",
+      "kind": "discovery_plan",
+      "reason_hash": 16269195925952795750,
+      "recommendation_id": "4ee461ee-f01a-4649-859d-b4a23e9d565d",
+      "session_id": "discovery-plan:session-final-auto-pedagogy_oscillation-2026-07-01T12-54-53Z",
+      "task_id": "bcd68a06-3099-4d2a-9644-84c6486a03f4",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-07-01T20:13:36.687173747Z",
+      "kind": "discovery_plan",
+      "reason_hash": 11065346780322469580,
+      "recommendation_id": "1c7049fd-73aa-4c7b-9460-31f7abcddf1f",
+      "session_id": "discovery-plan:session-final-auto-pedagogy_oscillation-2026-07-01T20-01-09Z",
+      "task_id": "062d4849-bf0e-458a-8567-2ff930c19fa0",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-07-01T20:16:07.027159641Z",
+      "kind": "discovery_plan",
+      "reason_hash": 16269195925952795750,
+      "recommendation_id": "7f6c575f-7675-4897-8876-b6543a630786",
+      "session_id": "discovery-plan:session-final-auto-pedagogy_oscillation-2026-07-01T12-54-53Z",
+      "task_id": "eadf8322-aa3f-45ac-90b1-ad9ee86383fa",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-07-01T20:18:45.113991339Z",
+      "kind": "discovery_plan",
+      "reason_hash": 16269195925952795750,
+      "recommendation_id": "16b51292-3a7e-49ab-8421-80b090c111a1",
+      "session_id": "discovery-plan:session-final-auto-pedagogy_oscillation-2026-07-01T12-54-53Z",
+      "task_id": "914b8283-fa46-40ea-a554-0b27dd64e7c7",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-07-01T20:21:44.295541775Z",
+      "kind": "discovery_plan",
+      "reason_hash": 16269195925952795750,
+      "recommendation_id": "652aa1a6-c536-440f-8a22-4deb04c64bc4",
+      "session_id": "discovery-plan:session-final-auto-pedagogy_oscillation-2026-07-01T12-54-53Z",
+      "task_id": "fb4a8e9d-6f61-4e44-a0c1-0a36530ebaa4",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-07-01T20:41:20.993415248Z",
+      "kind": "discovery_plan",
+      "reason_hash": 16269195925952795750,
+      "recommendation_id": "5dc27f8b-0657-409b-ae66-bf5bba8d0953",
+      "session_id": "discovery-plan:session-final-auto-pedagogy_oscillation-2026-07-01T12-54-53Z",
+      "task_id": "01db4e5b-5a10-4ce1-9a3f-c3d3b3442888",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-07-01T20:43:08.854817744Z",
+      "kind": "discovery_plan",
+      "reason_hash": 16269195925952795750,
+      "recommendation_id": "980ad31f-d723-4479-84c9-c161ea775f97",
+      "session_id": "discovery-plan:session-final-auto-pedagogy_oscillation-2026-07-01T12-54-53Z",
+      "task_id": "70956419-74eb-48d4-a4b2-5118bfeeac0f",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-07-01T20:45:24.425553239Z",
+      "kind": "discovery_plan",
+      "reason_hash": 16269195925952795750,
+      "recommendation_id": "f62b6c9e-5e99-4951-8f26-207cb41bf5bc",
+      "session_id": "discovery-plan:session-final-auto-pedagogy_oscillation-2026-07-01T12-54-53Z",
+      "task_id": "10db5abd-a84c-41b1-a712-36b397d86b15",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-07-01T20:46:24.311793138Z",
+      "kind": "discovery_plan",
+      "reason_hash": 16269195925952795750,
+      "recommendation_id": "54c15f24-c016-41d9-b218-38d746f7a083",
+      "session_id": "discovery-plan:session-final-auto-pedagogy_oscillation-2026-07-01T12-54-53Z",
+      "task_id": "3fcc82d8-7cfb-4e93-a117-bd14de9c172b",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-07-01T20:46:56.109672103Z",
+      "kind": "discovery_plan",
+      "reason_hash": 16269195925952795750,
+      "recommendation_id": "019b1294-171d-41a3-bfa4-c80b70b22050",
+      "session_id": "discovery-plan:session-final-auto-pedagogy_oscillation-2026-07-01T12-54-53Z",
+      "task_id": "ea545cba-8957-4779-8cca-fef89e5bbe1d",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-07-01T21:03:47.043179731Z",
+      "kind": "discovery_plan",
+      "reason_hash": 16269195925952795750,
+      "recommendation_id": "cf85fa53-3eed-4455-8892-de0ddffa8729",
+      "session_id": "discovery-plan:session-final-auto-pedagogy_oscillation-2026-07-01T12-54-53Z",
+      "task_id": "f03746bb-8693-48cb-8577-fc25a4cd938f",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-07-01T21:05:55.560495653Z",
+      "kind": "discovery_plan",
+      "reason_hash": 16269195925952795750,
+      "recommendation_id": "d08c3c3e-96b6-4a61-af4b-ff718ee6e68f",
+      "session_id": "discovery-plan:session-final-auto-pedagogy_oscillation-2026-07-01T12-54-53Z",
+      "task_id": "e3829125-093a-4907-89e1-b3fb4e84f932",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-07-01T21:08:04.833930510Z",
+      "kind": "discovery_plan",
+      "reason_hash": 16269195925952795750,
+      "recommendation_id": "2c679bb5-d352-45fb-bb99-a7764626f49e",
+      "session_id": "discovery-plan:session-final-auto-pedagogy_oscillation-2026-07-01T12-54-53Z",
+      "task_id": "ae51f04f-7ff3-4edb-b562-be80d5f6f19a",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-07-01T21:11:26.294711416Z",
+      "kind": "discovery_plan",
+      "reason_hash": 16269195925952795750,
+      "recommendation_id": "1da1d512-e1ea-4c21-ba45-3c30746226a5",
+      "session_id": "discovery-plan:session-final-auto-pedagogy_oscillation-2026-07-01T12-54-53Z",
+      "task_id": "20ea3317-c5aa-42ce-8e05-4d966da16761",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-07-01T21:13:34.646298109Z",
+      "kind": "discovery_plan",
+      "reason_hash": 16269195925952795750,
+      "recommendation_id": "71c87203-c63b-4d12-b7fe-6e929c2d35f3",
+      "session_id": "discovery-plan:session-final-auto-pedagogy_oscillation-2026-07-01T12-54-53Z",
+      "task_id": "60c6b3b4-c27c-4bfe-8448-865f8372fe24",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-07-02T04:26:54.401739535Z",
+      "kind": "discovery_plan",
+      "reason_hash": 16269195925952795750,
+      "recommendation_id": "3f266f1c-0088-40f3-84ce-cc7e7d2cc660",
+      "session_id": "discovery-plan:session-final-auto-pedagogy_oscillation-2026-07-01T12-54-53Z",
+      "task_id": "52a4daae-13dd-4d04-bb69-f21b295a07c3",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-07-02T04:28:49.316740372Z",
+      "kind": "discovery_plan",
+      "reason_hash": 16269195925952795750,
+      "recommendation_id": "868f3a44-1af1-4f23-81e1-2f17aa008e59",
+      "session_id": "discovery-plan:session-final-auto-pedagogy_oscillation-2026-07-01T12-54-53Z",
+      "task_id": "6f780717-cf64-43b5-8c40-17d7210f7d73",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-07-02T04:30:59.804593779Z",
+      "kind": "discovery_plan",
+      "reason_hash": 16269195925952795750,
+      "recommendation_id": "201bfb8f-f485-4984-bd8f-6eade3f31b90",
+      "session_id": "discovery-plan:session-final-auto-pedagogy_oscillation-2026-07-01T12-54-53Z",
+      "task_id": "b2fd5222-f0b7-469a-b095-ba09bdff3f81",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-07-02T04:33:11.154647226Z",
+      "kind": "discovery_plan",
+      "reason_hash": 16269195925952795750,
+      "recommendation_id": "d5c9f702-8e64-425d-8ba8-67b24d4d14a0",
+      "session_id": "discovery-plan:session-final-auto-pedagogy_oscillation-2026-07-01T12-54-53Z",
+      "task_id": "3fc16053-667f-4231-91aa-ca9c47368946",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-07-02T04:35:31.731329906Z",
+      "kind": "discovery_plan",
+      "reason_hash": 16269195925952795750,
+      "recommendation_id": "e952f510-8382-4e58-90c7-2b87243a5f85",
+      "session_id": "discovery-plan:session-final-auto-pedagogy_oscillation-2026-07-01T12-54-53Z",
+      "task_id": "8e0cca09-4d30-4246-ae1d-4f7903d6e3e6",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-07-02T04:43:16.028160815Z",
+      "kind": "discovery_plan",
+      "reason_hash": 16269195925952795750,
+      "recommendation_id": "9ee96995-8639-4095-aa27-095d79d31d09",
+      "session_id": "discovery-plan:session-final-auto-pedagogy_oscillation-2026-07-01T12-54-53Z",
+      "task_id": "daa6d97f-aca5-44cf-a0a5-ab1812b5fb7b",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-07-02T04:45:13.327600233Z",
+      "kind": "discovery_plan",
+      "reason_hash": 16269195925952795750,
+      "recommendation_id": "86fad4b2-abbb-4837-8453-0e766f58722a",
+      "session_id": "discovery-plan:session-final-auto-pedagogy_oscillation-2026-07-01T12-54-53Z",
+      "task_id": "22c7e5c4-f4b9-4199-9034-241712054631",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-07-02T04:49:19.783603655Z",
+      "kind": "discovery_plan",
+      "reason_hash": 16269195925952795750,
+      "recommendation_id": "ff3f091f-1ed5-4a25-ae5a-11cc13746b1c",
+      "session_id": "discovery-plan:session-final-auto-pedagogy_oscillation-2026-07-01T12-54-53Z",
+      "task_id": "1309d886-d440-4100-971d-8a8f86aaed48",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-07-02T04:51:37.691039877Z",
+      "kind": "discovery_plan",
+      "reason_hash": 16269195925952795750,
+      "recommendation_id": "dcdc8e4e-5e82-45f5-b7fd-6121827a6cf9",
+      "session_id": "discovery-plan:session-final-auto-pedagogy_oscillation-2026-07-01T12-54-53Z",
+      "task_id": "6b04b022-7d0c-4002-a69d-208afa98b08c",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-07-02T04:53:59.813802126Z",
+      "kind": "discovery_plan",
+      "reason_hash": 16269195925952795750,
+      "recommendation_id": "f15d849c-21d6-4ffc-b9d7-fbbbe1bd8e56",
+      "session_id": "discovery-plan:session-final-auto-pedagogy_oscillation-2026-07-01T12-54-53Z",
+      "task_id": "f1e45dd4-9137-4b51-b6ce-65854aa16358",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-07-02T05:01:39.639110545Z",
+      "kind": "discovery_plan",
+      "reason_hash": 16269195925952795750,
+      "recommendation_id": "02590589-b848-440e-ac04-02240dc93c55",
+      "session_id": "discovery-plan:session-final-auto-pedagogy_oscillation-2026-07-01T12-54-53Z",
+      "task_id": "2962b1dd-cac5-4bff-a948-b5dc13de1c7c",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-07-02T05:05:43.418834540Z",
+      "kind": "discovery_plan",
+      "reason_hash": 16269195925952795750,
+      "recommendation_id": "ff070046-d5ac-4834-81d0-abe1e368ca1b",
+      "session_id": "discovery-plan:session-final-auto-pedagogy_oscillation-2026-07-01T12-54-53Z",
+      "task_id": "6a03130b-11c0-438f-bc9a-c7b60067ed85",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-07-02T05:08:06.316869768Z",
+      "kind": "discovery_plan",
+      "reason_hash": 16269195925952795750,
+      "recommendation_id": "6aee61a8-e4a2-49df-9fe3-5c60f0a3feba",
+      "session_id": "discovery-plan:session-final-auto-pedagogy_oscillation-2026-07-01T12-54-53Z",
+      "task_id": "077dddd6-6ed4-4ad9-b4ea-c255e63abacf",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-07-02T05:10:18.684729687Z",
+      "kind": "discovery_plan",
+      "reason_hash": 16269195925952795750,
+      "recommendation_id": "c6fb5992-0846-42dc-b40a-1d54d0861f4c",
+      "session_id": "discovery-plan:session-final-auto-pedagogy_oscillation-2026-07-01T12-54-53Z",
+      "task_id": "6b15b350-8875-4df0-996e-d274cd08b28c",
+      "approved_via": "gzmo kurator plan-from-discovery"
+    },
+    {
+      "at": "2026-07-02T05:12:30.928144003Z",
+      "kind": "discovery_plan",
+      "reason_hash": 16269195925952795750,
+      "recommendation_id": "b0930ad0-3939-415d-b198-3c1abbdc006a",
+      "session_id": "discovery-plan:session-final-auto-pedagogy_oscillation-2026-07-01T12-54-53Z",
+      "task_id": "6482cdfd-a22e-4a05-b161-f67546c3f58a",
+      "approved_via": "gzmo kurator plan-from-discovery"
     }
   ],
   "denials": [
-    {
-      "at": "2026-06-29T17:53:49.344810324Z",
-      "kind": "session_triage",
-      "reason": "prometheus_requires_idle: session_triage blocked while discovery_fix pending or in cooldown",
-      "recommendation_id": "f8894c40-a195-4a72-87f2-a10086bddbf9",
-      "session_id": "e25de685-50d9-4390-b6c9-400d951b7791"
-    },
     {
       "at": "2026-06-30T08:10:19.690390531Z",
       "kind": "session_triage",
@@ -343,6 +471,27 @@
       "reason": "prometheus_requires_idle: session_triage blocked while discovery_fix pending or in cooldown",
       "recommendation_id": "3bb66330-5a29-488f-a267-38df5fee947d",
       "session_id": "acfa8077-c41d-43e5-9de1-d6b07449cc1e"
+    },
+    {
+      "at": "2026-07-01T14:40:10.805829430Z",
+      "kind": "session_triage",
+      "reason": "prometheus_requires_idle: session_triage blocked while discovery_fix pending or in cooldown",
+      "recommendation_id": "627a3156-2bcd-4275-9539-0da51787124b",
+      "session_id": "840efa03-5683-4056-bbbb-d47534e7bd84"
+    },
+    {
+      "at": "2026-07-01T20:05:15.912392915Z",
+      "kind": "session_triage",
+      "reason": "prometheus_requires_idle: session_triage blocked while discovery_fix pending or in cooldown",
+      "recommendation_id": "922aebbd-cdf0-4c07-9ec3-69cced016c2d",
+      "session_id": "afcb0973-34ea-4bb0-8c9d-6c54e713eeb1"
+    },
+    {
+      "at": "2026-07-01T20:28:53.093815448Z",
+      "kind": "session_triage",
+      "reason": "max_autospawns_per_hour: hourly autospawn budget exhausted (4/3)",
+      "recommendation_id": "dcfc11a9-f7b7-4a9f-bdb3-0c2ef83e8afd",
+      "session_id": "12f10617-1fea-414e-9e83-6b2665575dae"
     }
   ]
 }

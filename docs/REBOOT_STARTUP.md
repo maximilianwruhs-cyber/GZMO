@@ -4,49 +4,43 @@
 
 | Tier | What | How it starts |
 |------|------|----------------|
-| **Workstation** | Prime `:8000` | `gzmo-prime.service` (user systemd) |
-| **Workstation** | GZMO daemon | `gzmo-daemon.service` |
-| **VM200** | Retrieval router `:8081` | `llama-retrieval-router.service` via `deploy-retrieval-router.sh` |
-| **LXC101** | Qdrant, Neo4j, Redis | Always-on LXC services |
+| **Cognition** | Cloud LLM (OpenRouter) | Fully online (needs outbound HTTPS) |
+| **Retrieval** | VM200 `:8081` | `llama-retrieval-router.service` via `deploy-retrieval-router.sh` |
+| **Persistence** | LXC101 | Always-on Docker services (Neo4j, Qdrant, Redis) |
+| **Orchestration** | GZMO daemon (LXC101) | `gzmo-daemon.service` (system systemd unit) |
 
-GZMO daemon and Pi KB both use VM200 `:8081` for embed + rerank (`gzmo-embed`, `gzmo-rerank` presets).  
-Session distill extract/summary → Prime `:8000`.
+GZMO daemon on LXC101 uses VM200 `:8081` for embed + rerank (`gzmo-embed`, `gzmo-rerank` presets), and OpenRouter for all LLM cognition.
 
 ## One-time setup
 
+On LXC101 (homelab homing):
 ```bash
-cd ~/Projects/_foundation-audit/survey_GZMO
-./scripts/install-boot-stack.sh              # prime + daemon
-./scripts/vm200/deploy-retrieval-router.sh   # VM200 router
+# Deployed via scripts/lxc101/deploy-gzmo-daemon.sh
+# Systemd service starts automatically on boot:
+sudo systemctl enable --now gzmo-daemon.service
 ```
 
 ## After every reboot
 
+Verify all services are up:
 ```bash
-./scripts/after-boot-verify.sh
+ssh -i ~/.ssh/id_sidecar_proxmox maximilian@192.168.31.202 \
+  'sudo systemctl is-active gzmo-daemon'
 
 ssh -i ~/.ssh/id_sidecar_proxmox maximilian@192.168.31.110 \
   'systemctl is-active llama-retrieval-router'
 ```
 
-## Service commands
+## Service commands (on LXC101)
 
 ```bash
-systemctl --user status gzmo-prime gzmo-daemon
-journalctl --user -u gzmo-prime -f
+sudo systemctl status gzmo-daemon
+sudo journalctl -u gzmo-daemon -f
 ```
 
-## Pi KB sync
+## Pi KB sync (on LXC101)
 
 ```bash
+cd /opt/gzmo/survey_GZMO
 ./scripts/pi-kb-reindex.sh
 ```
-
-## Benchmark
-
-```bash
-./scripts/vm200/retrieval-bench/runner.py \
-  --profile profiles/post-router-qwen3.json --tag smoke
-```
-
-See [VM200_RETRIEVAL_BENCH.md](./VM200_RETRIEVAL_BENCH.md).

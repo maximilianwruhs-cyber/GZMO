@@ -1,0 +1,21 @@
+# Google Scholar Labs Playwright Driver Requirements
+# Install: pip install -r requirements.txt
+
+# Browser automation
+playwright>=1.40.0
+
+# HTML parsing
+beautifulsoup4>=4.12.0
+lxml>=4.9.3
+
+# HTTP client for verification APIs
+httpx>=0.25.0
+
+# Fuzzy string matching for title verification
+rapidfuzz>=3.5.0
+
+# Progress bars and CLI output
+tqdm>=4.66.0
+
+# Type hints
+typing-extensions>=4.8.0

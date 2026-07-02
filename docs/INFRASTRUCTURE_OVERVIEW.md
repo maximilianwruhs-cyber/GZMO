@@ -18,17 +18,17 @@ scripts/ingest-quality/check-contract.sh
 
 ## 1. Executive summary
 
-GZMO is a **local-first, air-gapped agent** on a Ryzen workstation with retrieval and persistence on the homelab LAN.
+GZMO is a **cloud-mode agent** on LXC101 (sidecar) with retrieval on VM200 and persistence on LXC101, using OpenRouter for all LLM cognition. Workstation Prime is retired.
 
 | Tier | Host | Role |
 |------|------|------|
-| **Cognition** | Workstation (2× RTX 5070 Ti) | Prime **Gemma 4 26B-A4B** on `:8000` (256K ctx) — chat, dreams, spark, ingest |
+| **Cognition** | Cloud LLM (OpenRouter) | OpenRouter **deepseek/deepseek-v4-flash** + Gemini fallback — chat, dreams, spark, ingest |
 | **Retrieval** | VM200 `192.168.31.110` (GTX 1070) | Unified router `:8081` — embed (`gzmo-embed`) + rerank (`gzmo-rerank`); librarian retired |
-| **Persistence** | LXC101 `192.168.31.202` | Neo4j `:7687`, Qdrant `:6333` |
-| **Orchestration** | Workstation | Rust `gzmo` daemon — cron engines, watchers, MCP stdio |
+| **Persistence** | LXC101 `192.168.31.202` | Neo4j `:7687`, Qdrant `:6333`, Redis `:6379` (local endpoints) |
+| **Orchestration** | LXC101 `192.168.31.202` | Rust `gzmo` daemon (systemd `gzmo-daemon.service` as `maximilian`) — cron engines, watchers, MCP stdio |
 
-**Production inference path:** `[engine.local]` → `http://localhost:8000/v1`  
-**Production vectors:** Qdrant collection **`honeypot`** (682 points, synced from SQLite honeypot)  
+**Production inference path:** `[engine.cloud]` → OpenRouter (`deepseek/deepseek-v4-flash`)
+**Production vectors:** Qdrant collection **`honeypot`** (682 points, synced from SQLite honeypot)
 **Legacy vectors:** Qdrant **`knowledge`** (~3245) — **read-only** until cutover checklist + operator approval ([`M2_HONEYPOT_REPORT.md`](./M2_HONEYPOT_REPORT.md) § Cutover)
 
 **Quality sign-off (eval):** **`baseline-m4-post-sprint`** (end-gate 2026-06-03, ~18 min) — strict + layered + contract + probes PASS. Log: `scripts/ingest-quality/replay-wave-end-gate.log`. See [`BASELINE_STATUS.md`](./BASELINE_STATUS.md).
@@ -43,32 +43,28 @@ GZMO is a **local-first, air-gapped agent** on a Ryzen workstation with retrieva
 flowchart TB
   subgraph LAN["192.168.31.0/24"]
     PVE["PVE .200"]
-    WS["Workstation\n2× RTX 5070 Ti\nPrime :8000 + gzmo"]
-    VM["VM200 ollamagpu .110\nGTX 1070"]
-    LXC101["LXC101 .202\nNeo4j + Qdrant"]
-    LXC100["LXC100 .201\nSamba"]
-    LXC102["LXC102 .203\nMCP hub optional"]
+    VM["VM200 ollamagpu .110\nGTX 1070\nembed+rerank :8081"]
+    LXC101["LXC101 .202\nNeo4j + Qdrant + Redis\ngzmo daemon"]
   end
-  WS -->|HTTP :8000| WS
-  WS -->|HTTP :8081 embed+rerank| VM
-  WS -->|bolt :7687 MCP stdio| LXC101
-  WS -->|HTTP :6333| LXC101
-  PVE --> VM
-  PVE --> LXC101
+  subgraph Cloud["Internet"]
+    OR["OpenRouter API"]
+  end
+
+  LXC101 -->|HTTPS| OR
+  LXC101 -->|HTTP :8081 embed+rerank| VM
+  LXC101 -->|bolt :7687 Neo4j| LXC101
+  LXC101 -->|HTTP :6333 Qdrant| LXC101
+  LXC101 -->|redis :6379| LXC101
 ```
 
 | Node | Address | Compute | Production role |
 |------|---------|---------|-----------------|
-| Workstation | local | 2× 16 GB RTX 5070 Ti, Ryzen 9950X | Prime, GZMO daemon/CLI, knowledge-dir ingest |
-| PVE | `192.168.31.200` | i7-6770HQ | Hypervisor |
+| Workstation | local | Wiped / New OS | Retired entirely |
+| PVE | `192.168.31.200` | i7-6770HQ | Proxmox Hypervisor |
 | VM200 `ollamagpu` | `192.168.31.110` | GTX 1070 8 GB (eGPU) | Unified retrieval router `:8081` (embed + rerank) |
-| LXC101 | `192.168.31.202` | Docker | Neo4j, Qdrant, Redis (Redis not wired to GZMO) |
-| LXC100 | `192.168.31.201` | — | Samba — not on hot path |
-| LXC102 | `192.168.31.203` | — | Optional MCP hub / Pi era |
+| LXC101 | `192.168.31.202` | Docker + Systemd | Neo4j, Qdrant, Redis, and GZMO daemon (after migration) |
 
-**PCIe:** No NVLink. Prime uses **layer-split** across both workstation GPUs (`-sm layer -dev CUDA0,CUDA1`).
-
-**SSH (ops):** `ssh -i ~/.ssh/id_sidecar_proxmox maximilian@192.168.31.110`
+**SSH (ops):** `ssh -i ~/.ssh/id_sidecar_proxmox maximilian@192.168.31.202` (SSH to LXC101 sidecar)
 
 ---
 
@@ -76,16 +72,9 @@ flowchart TB
 
 > **Locked steady-state map:** [`PORTS.md`](PORTS.md). Section below is operational detail; port assignments must match that file.
 
-### 3.1 Workstation — live
+### 3.1 Workstation — Retired
 
-| Port / process | Service | Start |
-|----------------|---------|-------|
-| **:8000** | `llama-server` Prime (Gemma 4 26B-A4B-it QAT, ctx 262144) | `~/Projects/llama.cpp/prime-bench/start-prime-gemma4-26b-a4b-256k.sh` or `gzmo-prime.service` |
-| **:8002** | Local Pi KB embed (**opt-in**, `ENABLE_PI_EMBED=1`) | `scripts/start-embed.sh` or `gzmo-embed.service` |
-| **`gzmo`** | Daemon or REPL | `scripts/start-production.sh --daemon` |
-| **:8010** | Sovereign FrankenMoE | **Parked** — `start-sovereign.sh` |
-
-Prime (typical): ctx **262144**, ngram-mod speculative decoding, CUDA graphs **on** (Gemma QAT profile), dual 5070 Ti layer-split.
+The Ryzen workstation has been entirely decommissioned and wiped for a new OS. No local AI services run on it.
 
 ### 3.2 VM200 — retrieval layer
 
@@ -130,16 +119,14 @@ Deploy: `scripts/vm200/deploy-retrieval-router.sh` → `llama-retrieval-router.s
 
 | Section | Endpoint | Used for |
 |---------|----------|----------|
-| `[engine.local]` | `http://localhost:8000/v1` | Chat, dreams, spark, ingest verify |
+| `[engine.cloud]` | OpenRouter `https://openrouter.ai/api/v1` | Chat, dreams, spark, ingest verify |
 | `[embeddings]` | `http://192.168.31.110:8081/v1` (`gzmo-embed`) | Vault/honeypot vectors, similarity |
 | `[rerank]` | `http://192.168.31.110:8081/v1` (`gzmo-rerank`) | `memory_search` post-filter |
-| `[librarian]` | disabled — distill on Prime `:8000` via `[routing.mappings]` | Session distill extract/summary/verify |
-| `[qdrant]` | `http://192.168.31.202:6333`, `collection = "honeypot"` | Nightly sync from honeypot |
-| `[[mcp_servers]]` memory | stdio → Neo4j | KG writes (dream, spark, ingest) |
+| `[redis]` | `redis://localhost:6379` | Distill queue, scratch cache |
+| `[qdrant]` | `http://localhost:6333`, `collection = "honeypot"` | Nightly sync from honeypot |
+| `[[mcp_servers]]` memory | stdio → Neo4j (`bolt://localhost:7687`) | KG writes (dream, spark, ingest) |
 
-**Secrets:** Prefer `.env` for Neo4j and cloud keys; do not commit credentials. Rotate keys referenced in config.
-
-**Structured JSON on Prime:** Use `enable_thinking: false` for schema paths; do not combine `reasoning_format: "none"` with `json_schema` (HTTP 400 on current llama-server).
+**Secrets:** Environment file `/opt/gzmo/.env` contains keys (such as `GZMO_OPENROUTER_KEY`).
 
 ---
 

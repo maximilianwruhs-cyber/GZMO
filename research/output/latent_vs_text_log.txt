@@ -1,0 +1,20 @@
+=== Head-to-head: text MAS vs real RecursiveMAS (multi_agent, runs=5) ===
+2026-06-29T15:18:32.526002Z  INFO attractorbench: AttractorBench starting
+2026-06-29T15:18:32.531832Z  INFO attractorbench::mas: Running MAS mode: single
+2026-06-29T15:19:12.898073Z  INFO attractorbench::mas: Running MAS mode: two_agent
+2026-06-29T15:19:42.196607Z  INFO attractorbench::mas: Running MAS mode: recursive_mas
+2026-06-29T15:22:48.896090Z  INFO attractorbench::mas: MAS comparison saved to "/home/maximilian-wruhs/Projects/_foundation-audit/survey_GZMO/research/output/mas_latent_real_compare.json"
+
+Multi-Agent vs Single-Agent Comparison
+
++---------------+-------------+------------------+------------+--------------+
+| Mode          | Suite       | Avg Latency (ms) | Avg Tokens | Success Rate |
++============================================================================+
+| single        | multi_agent | 1614             | 432        | 100%         |
+|---------------+-------------+------------------+------------+--------------|
+| two_agent     | multi_agent | 1171             | 503        | 100%         |
+|---------------+-------------+------------------+------------+--------------|
+| recursive_mas | multi_agent | 7468             | 0          | 100%         |
++---------------+-------------+------------------+------------+--------------+
+2026-06-29T15:22:48.896623Z  INFO attractorbench: AttractorBench complete
+=== DONE ===

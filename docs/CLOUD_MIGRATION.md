@@ -69,3 +69,27 @@ Local Prime baseline for dream/spark comparison: [`M3_LOCAL_BASELINE.md`](./M3_L
 - Phase 4: SQLite vault → Qdrant primary
 - Obolus USD budget caps
 - Pi completions routing to cloud
+
+## Final Cloud + Sidecar Migration (2026-07-02)
+
+**Executed by:** Antigravity (Google DeepMind)
+**Target:** LXC101 Sidecar Homing
+
+### Changes & Configuration
+- Wrote deployment script `scripts/lxc101/deploy-gzmo-daemon.sh` and registered `gzmo-daemon.service` as a system service on LXC101 running under the newly created `maximilian` user.
+- Updated `gzmo.toml` to:
+  - Enable cloud engine (`active_mode = "cloud"`, `default_engine = "cloud"`, `cloud_first_background = true`).
+  - Route all cognition mappings (`dream_*`, `spark_*`, `ingest_*`, `distill_*`) to OpenRouter (`deepseek/deepseek-v4-flash`).
+  - Disable Obolus energy sampler (`energy_sampler_enabled = false`) since raw hardware counters do not exist inside LXC101.
+  - Rewrote absolute paths (`/home/maximilian-wruhs` -> `/home/maximilian` and `/opt/gzmo`) and redirected Neo4j, Redis, and Qdrant endpoints to `localhost`.
+- Configured EnvironmentFile `/opt/gzmo/.env` containing the `GZMO_OPENROUTER_KEY`.
+- Migrated all stateful data (`vault.db`, `data/`, `memory/`, `skills/`, `wiki/`, and sibling `gzmo_skills/` folder) to LXC101.
+- Created relative symlinks inside `/opt/gzmo/survey_GZMO/` pointing to `/opt/gzmo/` directories so that verification and evaluation scripts run identically to the workstation environment.
+
+### Validation Results
+- Stopped workstation `gzmo-prime.service` and `gzmo-daemon.service` (ready for workstation wipe).
+- Running on sidecar (LXC101):
+  - `verify-production.sh` -> **PASS** (Prime check skipped in cloud mode)
+  - `sovereignty-verify.sh` -> **PASS** (1 warning: active_mode=cloud)
+  - `eval-quick.sh` -> **PASS** (offline contract and retrieval probes)
+  - Manual `gzmo spark` -> **PASS** (Hypothesis successfully generated using OpenRouter, links quarantined, and relations committed to Neo4j graph).

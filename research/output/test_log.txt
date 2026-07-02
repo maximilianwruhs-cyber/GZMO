@@ -1,0 +1,97 @@
+=== [1/4] MAS text modes (multi_agent, runs=5) ===
+2026-06-29T13:47:26.863091Z  INFO attractorbench: AttractorBench starting
+2026-06-29T13:47:26.868900Z  INFO attractorbench::mas: Running MAS mode: single
+2026-06-29T13:48:08.101474Z  INFO attractorbench::mas: Running MAS mode: two_agent
+2026-06-29T13:48:36.533964Z  INFO attractorbench::mas: Running MAS mode: four_agent
+2026-06-29T13:49:40.439142Z  INFO attractorbench::mas: MAS comparison saved to "/home/maximilian-wruhs/Projects/_foundation-audit/survey_GZMO/research/output/mas_text_baseline.json"
+
+Multi-Agent vs Single-Agent Comparison
+
++------------+-------------+------------------+------------+--------------+
+| Mode       | Suite       | Avg Latency (ms) | Avg Tokens | Success Rate |
++=========================================================================+
+| single     | multi_agent | 1649             | 442        | 100%         |
+|------------+-------------+------------------+------------+--------------|
+| two_agent  | multi_agent | 1137             | 503        | 100%         |
+|------------+-------------+------------------+------------+--------------|
+| four_agent | multi_agent | 2556             | 1469       | 100%         |
++------------+-------------+------------------+------------+--------------+
+2026-06-29T13:49:40.439661Z  INFO attractorbench: AttractorBench complete
+=== DONE [1/4] ===
+=== [2/4] RecursiveMAS bridge (mock) ===
+2026-06-29T13:49:48.003677Z  INFO attractorbench: AttractorBench starting
+2026-06-29T13:49:48.009534Z  INFO attractorbench::mas: Running MAS mode: recursive_mas
+2026-06-29T13:49:48.009659Z  INFO attractorbench::mas: MAS comparison saved to "/home/maximilian-wruhs/Projects/_foundation-audit/survey_GZMO/research/output/mas_latent_compare.json"
+
+Multi-Agent vs Single-Agent Comparison
+
++---------------+-------------+------------------+------------+--------------+
+| Mode          | Suite       | Avg Latency (ms) | Avg Tokens | Success Rate |
++============================================================================+
+| recursive_mas | multi_agent | 0                | 0          | 0%           |
++---------------+-------------+------------------+------------+--------------+
+2026-06-29T13:49:48.009906Z  INFO attractorbench: AttractorBench complete
+=== DONE [2/4] ===
+=== [2/4 retry] RecursiveMAS bridge ===
+2026-06-29T13:50:10.673126Z  INFO attractorbench: AttractorBench starting
+2026-06-29T13:50:10.679100Z  INFO attractorbench::mas: Running MAS mode: recursive_mas
+2026-06-29T13:50:10.681443Z  INFO attractorbench::mas: MAS comparison saved to "/home/maximilian-wruhs/Projects/_foundation-audit/survey_GZMO/research/output/mas_latent_compare.json"
+
+Multi-Agent vs Single-Agent Comparison
+
++---------------+-------------+------------------+------------+--------------+
+| Mode          | Suite       | Avg Latency (ms) | Avg Tokens | Success Rate |
++============================================================================+
+| recursive_mas | multi_agent | 0                | 200        | 100%         |
++---------------+-------------+------------------+------------+--------------+
+2026-06-29T13:50:10.681707Z  INFO attractorbench: AttractorBench complete
+=== [3/4] Chaos synergy lorenz vs static ===
+2026-06-29T13:50:10.685965Z  INFO attractorbench: AttractorBench starting
+2026-06-29T13:50:10.685975Z  INFO attractorbench: Comparing strategies: lorenz,static, suite=multi_agent
+2026-06-29T13:50:10.685977Z  INFO attractorbench::bench: Running strategy: lorenz
+2026-06-29T13:50:10.691692Z  INFO attractorbench::bench: Running suite 'multi_agent' with 5 test cases
+2026-06-29T13:50:10.691699Z  INFO attractorbench::bench: Running test case: Math handoff (5 runs)
+2026-06-29T13:50:11.760123Z  INFO attractorbench::bench: Running test case: Code planning (5 runs)
+2026-06-29T13:50:21.489741Z  INFO attractorbench::bench: Running test case: Multi-step reasoning (5 runs)
+2026-06-29T13:50:23.975052Z  INFO attractorbench::bench: Running test case: Science QA (5 runs)
+2026-06-29T13:50:34.728628Z  INFO attractorbench::bench: Running test case: Planning task (5 runs)
+2026-06-29T13:50:50.564891Z  INFO attractorbench::bench: Running strategy: static
+2026-06-29T13:50:50.569443Z  INFO attractorbench::bench: Running suite 'multi_agent' with 5 test cases
+2026-06-29T13:50:50.569448Z  INFO attractorbench::bench: Running test case: Math handoff (5 runs)
+2026-06-29T13:50:51.823238Z  INFO attractorbench::bench: Running test case: Code planning (5 runs)
+2026-06-29T13:51:01.820454Z  INFO attractorbench::bench: Running test case: Multi-step reasoning (5 runs)
+2026-06-29T13:51:04.580211Z  INFO attractorbench::bench: Running test case: Science QA (5 runs)
+2026-06-29T13:51:16.357100Z  INFO attractorbench::bench: Running test case: Planning task (5 runs)
+2026-06-29T13:51:31.280602Z  INFO attractorbench::bench: Comparison results saved to "/home/maximilian-wruhs/Projects/_foundation-audit/survey_GZMO/research/output/chaos_mas_synergy.html"
+
+📊 Strategy Comparison
+
++----------+----------+------------+--------------+---------------------------------------------------+
+| Strategy | Duration | Test Cases | Success Rate | Key Metrics                                       |
++=====================================================================================================+
+| lorenz   | 39s      | 5          | 100%         | lexical_diversity: 0.282, bigram_diversity: 0.523 |
+|----------+----------+------------+--------------+---------------------------------------------------|
+| static   | 40s      | 5          | 100%         | bigram_diversity: 0.552, lexical_diversity: 0.297 |
++----------+----------+------------+--------------+---------------------------------------------------+
+2026-06-29T13:51:31.280693Z  INFO attractorbench: AttractorBench complete
+=== DONE [2-3/4] ===
+=== [4/4] MAS on reasoning suite ===
+2026-06-29T13:51:37.202802Z  INFO attractorbench: AttractorBench starting
+2026-06-29T13:51:37.208540Z  INFO attractorbench::mas: Running MAS mode: single
+2026-06-29T13:52:08.579216Z  INFO attractorbench::mas: Running MAS mode: two_agent
+2026-06-29T13:52:37.288842Z  INFO attractorbench::mas: Running MAS mode: four_agent
+2026-06-29T13:53:33.492756Z  INFO attractorbench::mas: MAS comparison saved to "/home/maximilian-wruhs/Projects/_foundation-audit/survey_GZMO/research/output/mas_reasoning_baseline.json"
+
+Multi-Agent vs Single-Agent Comparison
+
++------------+-----------+------------------+------------+--------------+
+| Mode       | Suite     | Avg Latency (ms) | Avg Tokens | Success Rate |
++=======================================================================+
+| single     | reasoning | 1254             | 364        | 100%         |
+|------------+-----------+------------------+------------+--------------|
+| two_agent  | reasoning | 1148             | 507        | 100%         |
+|------------+-----------+------------------+------------+--------------|
+| four_agent | reasoning | 2248             | 1333       | 100%         |
++------------+-----------+------------------+------------+--------------+
+2026-06-29T13:53:33.493387Z  INFO attractorbench: AttractorBench complete
+=== DONE [4/4] ===
