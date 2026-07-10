@@ -1,13 +1,13 @@
 # GZMO Platform architecture
 
-**Status:** Accepted (2026-06-04)  
-**Supersedes for operator UX:** [INFRASTRUCTURE_OVERVIEW.md](./INFRASTRUCTURE_OVERVIEW.md) §10.1 multi-UI “Hindsight target” — for Max’s stack, one daily frontend only.
+**Status:** Accepted (2026-06-04); operator frontend updated **2026-07-10** — see [OPERATOR_FRONTEND_DECISION.md](./OPERATOR_FRONTEND_DECISION.md)  
+**Supersedes for operator UX:** [INFRASTRUCTURE_OVERVIEW.md](./INFRASTRUCTURE_OVERVIEW.md) §10.1 multi-UI “Hindsight target” — one daily frontend: **`gzmo_cli`**.
 
 ---
 
 ## 1. One sentence
 
-**GZMO Platform** = `gzmo.toml` spine + hot/cold memory + daemon jobs. **One frontend** does daily work (today: **pi-rust**). `gzmo chat` / `gzmo tui` are **legacy harnesses**, not product surfaces.
+**GZMO Platform** = `gzmo.toml` spine + hot/cold memory + daemon jobs. **One frontend** does daily work (today: **`gzmo_cli`** — default `gzmo` / `gzmo chat`). Pi is optional auxiliary; see [OPERATOR_FRONTEND_DECISION.md](./OPERATOR_FRONTEND_DECISION.md).
 
 ---
 
@@ -97,23 +97,35 @@ Rust: [`platform_memory.rs`](../gzmo-core/src/platform_memory.rs) — `GzmoMemor
 
 ---
 
-## 6. Legacy clients (no product investment)
+## 6. Operator clients
 
 | Binary | Role today |
 |--------|------------|
-| `gzmo chat` | Debug/smoke harness; first integrator for `AgentSession` |
-| `gzmo tui` | Unused; `memory: None` — do not wire for parity |
-| Orchestrator | Pipeline steps — P2 hot scope + `from_memory_config` ✅ |
+| **`gzmo` / `gzmo chat`** | **Primary operator REPL** — `AgentSession`, tools, chaos skills |
+| **`gzmo assemble`** | Little Tools Lab recipe runner |
+| **`gzmo memory *`** | Platform memory API for scripts and integrations |
+| **`gzmo tui` / `--repl`** | Legacy TUI; `memory: None` — deprecate or wire in P4 |
+| **Pi** (`~/.pi/agent/`) | Optional; not product UI — [OPERATOR_FRONTEND_DECISION.md](./OPERATOR_FRONTEND_DECISION.md) |
 
 ---
 
 ## 7. Concrete frontend instance
 
-**Current operator client:** pi-rust (workstation, Prime `:8000`, shared vault/honeypot).
+**Current operator client:** **`gzmo_cli`** on the workstation (default `gzmo` → chat REPL, Prime `:8000`, shared vault/honeypot, `gzmo assemble` for lab recipes).
 
-**Pi onboarding (canonical):** [PI_OPERATOR_GUIDE.md](./PI_OPERATOR_GUIDE.md) — topology, can/can't, memory workflow.
+**Canonical:** [OPERATOR_FRONTEND_DECISION.md](./OPERATOR_FRONTEND_DECISION.md)
 
-Pi must not invent a parallel Redis protocol — use platform tools reading `gzmo.toml`.
+**Pi (auxiliary only):** [PI_OPERATOR_GUIDE.md](./PI_OPERATOR_GUIDE.md) — historical; use only via `gzmo memory` bridge, not as assembly authority.
+
+---
+
+## 8b. Little Tools Lab (GZMO-next)
+
+**CT101** runs **standalone legacy** GZMO — no per-loop lab graft. See [CT101_BOUNDARY.md](./CT101_BOUNDARY.md).
+
+**Little Tools Lab** hosts 46 puzzle pieces and builds **GZMO-next** as a full assembly on the workstation. `beat-gate.sh` uses CT101 behavior as a **reference baseline**, not a promotion trigger.
+
+**Canonical:** [LAB_TREATMENT.md](../../little-tools-lab/docs/LAB_TREATMENT.md)
 
 ---
 
@@ -125,7 +137,8 @@ Pi must not invent a parallel Redis protocol — use platform tools reading `gzm
 | **P1** ✅ | `gzmo memory *` CLI + `gzmo_memory_*` tool types |
 | **P2** ✅ | Orchestrator hot scope `orch:{job}:{step}` + `from_memory_config` |
 | **P3** ✅ | `scripts/pi-gzmo-memory.sh` + [PI_GZMO_MEMORY_INTEGRATION.md](./PI_GZMO_MEMORY_INTEGRATION.md) |
-| **P4** | Optional: hide or rename `gzmo chat` → `gzmo debug-chat` |
+| **P4** ✅ | Operator frontend = `gzmo_cli` — [OPERATOR_FRONTEND_DECISION.md](./OPERATOR_FRONTEND_DECISION.md) |
+| **P5** ✅ | Chat session_end → distill enqueue; slash → `gzmo assemble` |
 
 ---
 
@@ -138,7 +151,8 @@ Pi must not invent a parallel Redis protocol — use platform tools reading `gzm
 | [SCRATCH_TUI_GAP.md](./SCRATCH_TUI_GAP.md) | Why TUI is not wired |
 | [INFRASTRUCTURE_OVERVIEW.md](./INFRASTRUCTURE_OVERVIEW.md) | Ops canonical |
 | [PLATFORM_BASELINE_STATUS.md](./PLATFORM_BASELINE_STATUS.md) | Green gate + label |
-| [MACHINE.md](../MACHINE.md) | Identity |
+| [LAB_TREATMENT.md](../../little-tools-lab/docs/LAB_TREATMENT.md) | Lab incubator model, promotion ladder |
+| [CT101_BOUNDARY.md](./CT101_BOUNDARY.md) | CT101 standalone; no loop swap |
 
 ---
 

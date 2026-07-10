@@ -1,9 +1,9 @@
 # Pi (frontend) ↔ GZMO Platform memory
 
-**Status:** P3 (2026-06-04)  
+**Status:** P3 (2026-06-04); operator frontend **2026-07-10** — see [OPERATOR_FRONTEND_DECISION.md](./OPERATOR_FRONTEND_DECISION.md)  
 **Architecture:** [ARCHITECTURE_GZMO_PLATFORM.md](./ARCHITECTURE_GZMO_PLATFORM.md)
 
-Pi-rust is the **operator frontend**; GZMO is the **memory platform**. Pi must not talk to Redis or vault directly — use the bridge below.
+Pi may still use this bridge when run as **optional auxiliary**. The canonical operator frontend is **`gzmo_cli`** (`gzmo memory *` in-process). Pi must not talk to Redis or vault directly — use the bridge below.
 
 ---
 
@@ -81,7 +81,7 @@ When working in `survey_GZMO` and you need GZMO honeypot/vault memory:
 1. Run `./scripts/pi-gzmo-memory.sh turn-start` at the start of each new user task.
 2. Run `./scripts/pi-gzmo-memory.sh search "<topic>"` before claiming missing context.
 3. Run `./scripts/pi-gzmo-memory.sh recall` and treat the `[RECALL]` block as authoritative for this turn.
-4. Do **not** use `gzmo chat` as the product UI — it is a legacy harness only.
+4. Prefer **`gzmo chat`** for daily operator work — see [OPERATOR_FRONTEND_DECISION.md](./OPERATOR_FRONTEND_DECISION.md). If using Pi, keep using this bridge only.
 
 ---
 

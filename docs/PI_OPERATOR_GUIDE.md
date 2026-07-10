@@ -1,6 +1,6 @@
 # Pi Agent — Operator & Infrastructure Guide
 
-**Status:** 2026-06-04 (canonical for pi-rust)  
+**Status:** 2026-06-04 — **superseded for operator UX (2026-07-10):** [OPERATOR_FRONTEND_DECISION.md](./OPERATOR_FRONTEND_DECISION.md). Pi is optional auxiliary; **`gzmo_cli`** (`gzmo` / `gzmo chat`) is the canonical operator frontend.
 **Audience:** Pi agent when CWD is `survey_GZMO`  
 **Repo:** `/home/maximilian-wruhs/Projects/_foundation-audit/survey_GZMO`
 
@@ -16,7 +16,7 @@ This is the **single entry document**: where you are, what the stack is, what yo
 | **Cognition** | Completions via **Prime** `http://127.0.0.1:8000/v1` | Same Prime for extract, verify, dream, spark |
 | **Hot memory** | `./scripts/pi-gzmo-memory.sh` → `gzmo memory *` | Redis scratch, archive @ 90%, honeypot recall |
 | **Graph** | Shared **Neo4j MCP** (optional) | Daemon + tools via MCP stdio |
-| **Not your product UI** | — | `gzmo chat`, `gzmo tui` (legacy debug only) |
+| **Not your product UI** | — | **`gzmo` / `gzmo chat`** — canonical operator REPL (see [OPERATOR_FRONTEND_DECISION.md](./OPERATOR_FRONTEND_DECISION.md)) |
 
 **One sentence:** You think on **Prime**; you remember through the **platform memory bridge**, not by inventing Redis/vault clients.
 
