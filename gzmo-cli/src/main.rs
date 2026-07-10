@@ -2,6 +2,7 @@
 //!
 //! Thin binary shell. All logic lives in `gzmo-core`.
 
+mod assemble_cmd;
 mod chat;
 mod chaos_bootstrap;
 mod cli_mcp;
@@ -49,6 +50,8 @@ enum Command {
     McpServe,
     /// Knowledge Gardener ops over the wiki/ layer (sync|lint|search|file-back|status).
     Wiki(Vec<String>),
+    /// Run a Little Tools Lab assembly recipe (shells out to little-tools-lab/scripts).
+    Assemble { recipe: String, fixture: bool, apply: bool },
 }
 
 fn parse_args() -> Command {
@@ -115,6 +118,19 @@ fn parse_args() -> Command {
         if args[1] == "profile" {
             return Command::Profile(args[2..].to_vec());
         }
+        if args[1] == "assemble" {
+            let recipe = args
+                .get(2)
+                .cloned()
+                .unwrap_or_else(|| "cognition".to_string());
+            let fixture = !args.iter().any(|a| a == "--live");
+            let apply = args.iter().any(|a| a == "--apply");
+            return Command::Assemble {
+                recipe,
+                fixture,
+                apply,
+            };
+        }
     }
     Command::Chat
 }
@@ -140,6 +156,7 @@ async fn main() -> Result<()> {
         Command::Profile(_) => "warn",
         Command::McpServe => "warn",
         Command::Wiki(_) => "info",
+        Command::Assemble { .. } => "info",
     };
 
     tracing_subscriber::fmt()
@@ -216,5 +233,10 @@ async fn main() -> Result<()> {
         Command::Profile(args) => profile_cmd::run(&config, &args).await,
         Command::McpServe => mcp_serve_cmd::run(&config).await,
         Command::Wiki(args) => wiki_cmd::run(&config, args).await,
+        Command::Assemble {
+            recipe,
+            fixture,
+            apply,
+        } => assemble_cmd::run(&recipe, fixture, apply).await,
     }
 }

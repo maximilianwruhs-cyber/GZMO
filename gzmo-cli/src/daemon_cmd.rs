@@ -474,6 +474,7 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
     let synapse_cfg = config.synapse_pull.clone();
     let synapse_episodic = FileEpisodicStore::new(&config.memory.directory);
     let synapse_root = qdrant_sync::discover_project_root();
+    let synapse_scratch = Arc::clone(&scratch);
     let synapse_handle = tokio::spawn(async move {
         let mut interval = tokio::time::interval(Duration::from_secs(60));
         let mut last_pull_date: Option<NaiveDate> = None;
@@ -500,6 +501,7 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
                 &state_path,
                 &synapse_episodic,
                 synapse_cfg.max_events,
+                Some(synapse_scratch.as_ref()),
             )
             .await
             {
@@ -508,6 +510,8 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
                     info!(
                         events = summary.events_read,
                         quest = summary.quest_complete,
+                        session_end = summary.session_end,
+                        distill_enqueued = summary.distill_enqueued,
                         "Synapse pull complete"
                     );
                 }

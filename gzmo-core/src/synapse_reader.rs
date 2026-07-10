@@ -10,6 +10,7 @@ use serde::{Deserialize, Serialize};
 use tracing::info;
 
 use crate::memory::episodic::FileEpisodicStore;
+use crate::memory::scratch::{DistillJob, DistillSource, ScratchService};
 use crate::synapse::{EventSource, EventType, SynapseEvent};
 use crate::types::{EpisodicEntry, EpisodicSource};
 
@@ -22,12 +23,21 @@ pub struct SynapseReaderState {
     pub events_processed: u64,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SessionEndHandoff {
+    pub session_id: String,
+    pub reason: Option<String>,
+    pub session_file: Option<String>,
+}
+
 #[derive(Debug, Clone)]
 pub struct PiEventSummary {
     pub events_read: usize,
     pub quest_complete: usize,
     pub session_start: usize,
     pub session_end: usize,
+    pub session_end_ids: Vec<String>,
+    pub distill_enqueued: usize,
     pub summary_text: String,
 }
 
@@ -80,6 +90,76 @@ pub fn read_new_pi_events(
     Ok((events, state))
 }
 
+pub fn extract_session_end_handoffs(events: &[SynapseEvent]) -> Vec<SessionEndHandoff> {
+    let mut out = Vec::new();
+    for e in events {
+        if !matches!(e.event_type, EventType::SessionEnd) {
+            continue;
+        }
+        let session_id = e
+            .data
+            .as_ref()
+            .and_then(|d| d.get("session_id").and_then(|v| v.as_str()))
+            .map(str::to_string)
+            .unwrap_or_else(|| format!("pi-{}", e.id));
+        let reason = e
+            .data
+            .as_ref()
+            .and_then(|d| d.get("reason").and_then(|v| v.as_str()))
+            .map(str::to_string);
+        let session_file = e
+            .data
+            .as_ref()
+            .and_then(|d| {
+                d.get("sessionFile")
+                    .or_else(|| d.get("session_file"))
+                    .and_then(|v| v.as_str())
+            })
+            .map(str::to_string);
+        out.push(SessionEndHandoff {
+            session_id,
+            reason,
+            session_file,
+        });
+    }
+    out
+}
+
+/// Enqueue distill jobs for Pi `session_end` events (feeds BRPOP worker).
+pub async fn enqueue_session_end_distills(
+    scratch: &ScratchService,
+    events: &[SynapseEvent],
+    fallback_transcript: &str,
+) -> Result<usize> {
+    let handoffs = extract_session_end_handoffs(events);
+    let mut n = 0usize;
+    for h in handoffs {
+        let transcript = if let Some(path) = &h.session_file {
+            std::fs::read_to_string(path).unwrap_or_else(|_| {
+                format!(
+                    "{fallback_transcript}\nsession_id={}\nreason={:?}",
+                    h.session_id, h.reason
+                )
+            })
+        } else {
+            format!(
+                "{fallback_transcript}\nsession_id={}\nreason={:?}",
+                h.session_id, h.reason
+            )
+        };
+        scratch
+            .enqueue_distill(DistillJob {
+                session_id: h.session_id.clone(),
+                transcript,
+                source: DistillSource::MainArchive,
+            })
+            .await?;
+        n += 1;
+        info!(session_id = %h.session_id, "Enqueued Pi session_end distill job");
+    }
+    Ok(n)
+}
+
 pub fn summarize_pi_events(events: &[SynapseEvent]) -> PiEventSummary {
     let mut quest_complete = 0usize;
     let mut session_start = 0usize;
@@ -119,11 +199,16 @@ pub fn summarize_pi_events(events: &[SynapseEvent]) -> PiEventSummary {
         }
     }
 
+    let handoffs = extract_session_end_handoffs(events);
+    let session_end_ids: Vec<String> = handoffs.iter().map(|h| h.session_id.clone()).collect();
+
     PiEventSummary {
         events_read: events.len(),
         quest_complete,
         session_start,
         session_end,
+        session_end_ids,
+        distill_enqueued: 0,
         summary_text: summary,
     }
 }
@@ -134,14 +219,19 @@ pub async fn pull_and_log_episodic(
     state_path: &Path,
     episodic: &FileEpisodicStore,
     max_events: usize,
+    scratch: Option<&ScratchService>,
 ) -> Result<PiEventSummary> {
     let (events, state) = read_new_pi_events(bus_path, state_path, max_events)?;
-    let summary = summarize_pi_events(&events);
+    let mut summary = summarize_pi_events(&events);
     if summary.events_read == 0 {
         info!("Synapse pull: no new Pi events");
         return Ok(summary);
     }
 
+    if let Some(scratch) = scratch {
+        summary.distill_enqueued =
+            enqueue_session_end_distills(scratch, &events, "Pi session_end handoff").await?;
+    }
     let entry = EpisodicEntry {
         timestamp: Utc::now(),
         source: EpisodicSource::InternalMonologue,
@@ -155,9 +245,39 @@ pub async fn pull_and_log_episodic(
     info!(
         events = summary.events_read,
         quest = summary.quest_complete,
+        session_end = summary.session_end,
+        distill_enqueued = summary.distill_enqueued,
         "Synapse pull logged to episodic"
     );
     Ok(summary)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use chrono::Utc;
+    use uuid::Uuid;
+
+    fn session_end_event(session_id: &str) -> SynapseEvent {
+        SynapseEvent {
+            id: Uuid::new_v4(),
+            event_type: EventType::SessionEnd,
+            source: EventSource::PiAgent,
+            timestamp: Utc::now(),
+            data: Some(serde_json::json!({
+                "session_id": session_id,
+                "reason": "quit"
+            })),
+        }
+    }
+
+    #[test]
+    fn extract_session_end_handoffs_finds_ids() {
+        let events = vec![session_end_event("pi-sess-001")];
+        let handoffs = extract_session_end_handoffs(&events);
+        assert_eq!(handoffs.len(), 1);
+        assert_eq!(handoffs[0].session_id, "pi-sess-001");
+    }
 }
 
 fn load_state(path: &Path) -> Result<SynapseReaderState> {
