@@ -40,6 +40,15 @@ use gzmo_core::tools::sysadmin::{SysMetricsTool, SysKillTool};
 use gzmo_core::tools::web::WebSearchTool;
 use gzmo_core::tools::memory::{MemoryRecordTool, MemorySearchTool};
 
+/// Run a lab recipe off the async runtime (recipes can take minutes).
+async fn run_lab_script_blocking(script: &'static str, args: Vec<String>) -> Result<()> {
+    tokio::task::spawn_blocking(move || {
+        let arg_refs: Vec<&str> = args.iter().map(String::as_str).collect();
+        gzmo_core::assembly::run_lab_script(script, &arg_refs)
+    })
+    .await?
+}
+
 pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
     let soul = identity.snapshot().await;
 
@@ -48,6 +57,24 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
     info!("║       100% Local · Air-Gapped · Rust         ║");
     info!("╚══════════════════════════════════════════════╝");
     info!(persona = %soul.persona_name, "Identity loaded");
+
+    // Assembly backends — lab recipes only activate under GZMO_INSTANCE=next
+    // (AssemblyConfig::effective forces Inline otherwise; CT101-safe).
+    let asm = &config.assembly;
+    let distill_backend = asm.effective(asm.distill);
+    let dream_backend = asm.effective(asm.dream);
+    let spark_backend = asm.effective(asm.spark);
+    let ops_backend = asm.effective(asm.ops_health);
+    let handoff_backend = asm.effective(asm.config_handoff);
+    info!(
+        instance = %std::env::var("GZMO_INSTANCE").unwrap_or_else(|_| "legacy".into()),
+        distill = distill_backend.label(),
+        dream = dream_backend.label(),
+        spark = spark_backend.label(),
+        ops_health = ops_backend.label(),
+        config_handoff = handoff_backend.label(),
+        "Assembly backends resolved"
+    );
 
     // Set event source for this thread (daemon)
     set_event_source(gzmo_core::synapse::EventSource::GzmoDaemon);
@@ -160,7 +187,18 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
     ));
     info!("Distill worker started (archive queue)");
 
-    if let Err(e) = health::run_startup_probes(
+    if ops_backend.is_lab() {
+        // Lab recipe: endpoint-scan → synapse-health → plan-gate
+        info!(assembly_backend = "lab", "Startup health via ops-smoke.sh");
+        if let Err(e) =
+            run_lab_script_blocking("ops-smoke.sh", vec!["--live".to_string()]).await
+        {
+            error!("Ops lab recipe failed: {e}");
+            if config.health.strict_startup {
+                return Err(e);
+            }
+        }
+    } else if let Err(e) = health::run_startup_probes(
         config,
         Some(dream_tools.as_ref()),
         config.health.strict_startup,
@@ -201,6 +239,7 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
     let spark_engine_clone = Arc::clone(&spark_engine);
     let spark_config = config.spark.clone();
     let dreams_path_spark = config.skills.dreams_path.clone();
+    let spark_vault_path = config.memory.vault_db.clone();
 
     let ingest_engine = Arc::new(
         IngestEngine::new_with_verify(
@@ -295,7 +334,23 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
             if last_consolidated == Some(yesterday) {
                 continue;
             }
-            info!(date = %yesterday, "Dream consolidation starting");
+            info!(date = %yesterday, assembly_backend = dream_backend.label(), "Dream consolidation starting");
+            if dream_backend.is_lab() {
+                // Lab recipe: session-distill → neural-finesse → DREAMS.md
+                let args = vec![
+                    "--live".to_string(),
+                    "--output".to_string(),
+                    dreams_path.to_string_lossy().into_owned(),
+                ];
+                match run_lab_script_blocking("session-to-dream.sh", args).await {
+                    Ok(()) => {
+                        last_consolidated = Some(yesterday);
+                        info!("Dream cycle complete (lab recipe)");
+                    }
+                    Err(e) => error!("Dream lab recipe failed: {e}"),
+                }
+                continue;
+            }
             match dream_engine_clone.consolidate(yesterday).await {
                 Ok(report) => {
                     last_consolidated = Some(yesterday);
@@ -360,7 +415,28 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
                 continue;
             };
 
-            info!(date = %today, mode = ?spark_config.schedule_mode, hour = slot_hour, minute = slot_minute, "Spark cycle starting");
+            info!(date = %today, mode = ?spark_config.schedule_mode, hour = slot_hour, minute = slot_minute, assembly_backend = spark_backend.label(), "Spark cycle starting");
+            if spark_backend.is_lab() {
+                // Lab recipe: cognition chain (distill → gate → spark-link → recall)
+                let args = vec![
+                    "--live".to_string(),
+                    "--vault".to_string(),
+                    spark_vault_path.to_string_lossy().into_owned(),
+                    "--spark-run".to_string(),
+                ];
+                match run_lab_script_blocking("cognition-smoke.sh", args).await {
+                    Ok(()) => {
+                        if spark_config.schedule_mode == SparkScheduleMode::Cron {
+                            last_run_key = Some((slot_hour, slot_minute, today));
+                        } else {
+                            next_dice_run = None;
+                        }
+                        info!("Spark cycle complete (lab recipe)");
+                    }
+                    Err(e) => error!("Spark lab recipe failed: {e}"),
+                }
+                continue;
+            }
             match spark_engine_clone.run(today).await {
                 Ok(report) => {
                     if spark_config.schedule_mode == SparkScheduleMode::Cron {
@@ -445,8 +521,25 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
             info!(
                 hour = sd_config.cron_hour,
                 minute = sd_config.cron_minute,
+                assembly_backend = distill_backend.label(),
                 "Session distill starting"
             );
+            if distill_backend.is_lab() {
+                // Lab recipe: synapse session_end → session-distill handoff
+                match run_lab_script_blocking(
+                    "synapse-distill-handoff.sh",
+                    vec!["--live".to_string()],
+                )
+                .await
+                {
+                    Ok(()) => {
+                        last_distill_date = Some(today);
+                        info!("Session distill complete (lab recipe)");
+                    }
+                    Err(e) => error!("Session distill lab recipe failed: {e}"),
+                }
+                continue;
+            }
             match tokio::process::Command::new(&bin)
                 .arg("distill")
                 .current_dir(&distill_root)
@@ -624,6 +717,47 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
         }
     });
 
+    // Config handoff — lab-only calibration loop (bench → fuse → apply on gate pass).
+    // Inline has no equivalent (manual `gzmo assemble handoff`); daily 04:00 UTC,
+    // after dream (01:00), distill (02:15) and spark (03:30) windows.
+    const HANDOFF_CRON_HOUR: u32 = 4;
+    const HANDOFF_CRON_MINUTE: u32 = 0;
+    let handoff_handle = tokio::spawn(async move {
+        let mut interval = tokio::time::interval(Duration::from_secs(60));
+        let mut last_handoff_date: Option<NaiveDate> = None;
+        loop {
+            interval.tick().await;
+            if !handoff_backend.is_lab() {
+                continue;
+            }
+            let now = Utc::now();
+            if !cron_due_today(&now, HANDOFF_CRON_HOUR, HANDOFF_CRON_MINUTE, last_handoff_date) {
+                continue;
+            }
+            let today = now.date_naive();
+            info!(assembly_backend = "lab", "Config handoff starting (gzmo-handoff.sh)");
+            // Script only applies the fused config when the benchmark gate passes.
+            // Apply target is the sibling *-fused.toml — never the live instance
+            // config, which config-fuse output would clobber wholesale.
+            let mut args = vec!["--live".to_string(), "--apply".to_string()];
+            if let Some(target) = gzmo_core::assembly::handoff_apply_target() {
+                args.push("--gzmo-config".to_string());
+                args.push(target.to_string_lossy().into_owned());
+            }
+            match run_lab_script_blocking("gzmo-handoff.sh", args).await {
+                Ok(()) => {
+                    last_handoff_date = Some(today);
+                    info!("Config handoff complete (gate passed)");
+                }
+                Err(e) => {
+                    // Gate-fail exits non-zero by design — hold previous config.
+                    last_handoff_date = Some(today);
+                    error!("Config handoff held or failed: {e}");
+                }
+            }
+        }
+    });
+
     let _identity = identity;
     // Pin PulseLoop task — must not drop until daemon exits.
     let _chaos_pulse_keepalive = chaos_pulse;
@@ -639,6 +773,7 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
         _ = kg_handle => error!("KG reconcile loop exited"),
         _ = wiki_sync_handle => error!("Wiki sync loop exited"),
         _ = wiki_lint_handle => error!("Wiki lint loop exited"),
+        _ = handoff_handle => error!("Config handoff loop exited"),
     }
 
     Ok(())

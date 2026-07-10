@@ -237,6 +237,6 @@ async fn main() -> Result<()> {
             recipe,
             fixture,
             apply,
-        } => assemble_cmd::run(&recipe, fixture, apply).await,
+        } => assemble_cmd::run(&config, &recipe, fixture, apply).await,
     }
 }

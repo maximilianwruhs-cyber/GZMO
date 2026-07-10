@@ -299,6 +299,11 @@ pub struct GzmoConfig {
     /// Git-tracked markdown wiki layer (WikiEngine). Emit-only retrieval.
     #[serde(default)]
     pub wiki: WikiConfig,
+
+    /// Per-loop backend routing (inline engine vs Little Tools Lab recipe).
+    /// Only honored when `GZMO_INSTANCE=next`; defaults to all-Inline (CT101-safe).
+    #[serde(default)]
+    pub assembly: crate::assembly::AssemblyConfig,
 }
 
 // ─── Dreams ─────────────────────────────────────────────────────────────
@@ -1201,6 +1206,7 @@ impl LibrarianConfig {
             temperature: 0.2,
             top_p: 0.9,
             max_tokens: 4096,
+            reasoning_effort: None,
         }
     }
 }
@@ -1501,6 +1507,7 @@ impl EngineSection {
                         temperature: self.temperature.unwrap_or_else(default_temperature),
                         top_p: self.top_p.unwrap_or_else(default_top_p),
                         max_tokens: self.max_tokens.unwrap_or_else(default_max_tokens),
+                        reasoning_effort: None,
                     }
                 }
             }
@@ -1514,6 +1521,7 @@ impl EngineSection {
                         temperature: cloud.temperature,
                         top_p: cloud.top_p,
                         max_tokens: cloud.max_tokens,
+                        reasoning_effort: cloud.reasoning_effort.clone(),
                     }
                 } else {
                     // No cloud profile — fall back to local
@@ -1544,6 +1552,7 @@ impl EngineSection {
                     temperature: self.temperature.unwrap_or_else(default_temperature),
                     top_p: self.top_p.unwrap_or_else(default_top_p),
                     max_tokens: self.max_tokens.unwrap_or_else(default_max_tokens),
+                    reasoning_effort: None,
                 })
             }
             EngineMode::Cloud => {
@@ -1556,6 +1565,7 @@ impl EngineSection {
                         temperature: cloud.temperature,
                         top_p: cloud.top_p,
                         max_tokens: cloud.max_tokens,
+                        reasoning_effort: cloud.reasoning_effort.clone(),
                     }
                 } else {
                     EngineProfileConfig::default()
@@ -1584,6 +1594,7 @@ impl EngineSection {
                 temperature: c.temperature,
                 top_p: c.top_p,
                 max_tokens: c.max_tokens,
+                reasoning_effort: None,
             })
         })
     }
@@ -1606,6 +1617,9 @@ pub struct EngineProfileConfig {
     pub top_p: f32,
     #[serde(default = "default_max_tokens")]
     pub max_tokens: u32,
+    /// OpenRouter reasoning effort: minimal | low | medium | high | xhigh
+    #[serde(default)]
+    pub reasoning_effort: Option<String>,
 }
 
 impl Default for EngineProfileConfig {
@@ -1618,6 +1632,7 @@ impl Default for EngineProfileConfig {
             temperature: default_temperature(),
             top_p: default_top_p(),
             max_tokens: default_max_tokens(),
+            reasoning_effort: None,
         }
     }
 }
@@ -1639,6 +1654,9 @@ pub struct CloudEngineConfig {
     pub top_p: f32,
     #[serde(default = "default_max_tokens")]
     pub max_tokens: u32,
+    /// OpenRouter reasoning effort: minimal | low | medium | high | xhigh
+    #[serde(default)]
+    pub reasoning_effort: Option<String>,
 
     // Fallback engine (activated if primary cloud endpoint fails)
     #[serde(default)]
@@ -1748,6 +1766,7 @@ impl RoutingConfig {
                         temperature: cloud.temperature,
                         top_p: cloud.top_p,
                         max_tokens: cloud.max_tokens,
+                        reasoning_effort: cloud.reasoning_effort.clone(),
                     }
                 } else {
                     tracing::warn!("Routing to 'cloud' but no [engine.cloud] — falling back to local");
@@ -2140,6 +2159,8 @@ impl GzmoConfig {
         config.memory.vault_db = resolve(&config.memory.vault_db);
         config.skills.directory = resolve(&config.skills.directory);
         config.skills.dreams_path = resolve(&config.skills.dreams_path);
+        config.session_distill.sessions_dir = resolve(&config.session_distill.sessions_dir);
+        config.redis.distill_fallback_dir = resolve(&config.redis.distill_fallback_dir);
         apply_mcp_env_overrides(&mut config, &dotenv);
         apply_engine_key_overrides(&mut config, &dotenv);
 
@@ -2213,5 +2234,47 @@ impl GzmoConfig {
 
         tracing::info!(mode = %mode, "Persisted active_mode to gzmo.toml");
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod assembly_config_tests {
+    use super::*;
+    use crate::assembly::AssemblyBackend;
+
+    #[test]
+    fn parses_assembly_section() {
+        let toml = r#"
+            [assembly]
+            distill = "lab"
+            dream = "lab"
+            spark = "inline"
+        "#;
+        let cfg: GzmoConfig = toml::from_str(toml).unwrap();
+        assert_eq!(cfg.assembly.distill, AssemblyBackend::Lab);
+        assert_eq!(cfg.assembly.dream, AssemblyBackend::Lab);
+        assert_eq!(cfg.assembly.spark, AssemblyBackend::Inline);
+        // Unlisted loops default Inline
+        assert_eq!(cfg.assembly.ops_health, AssemblyBackend::Inline);
+    }
+
+    #[test]
+    fn absent_assembly_defaults_all_inline() {
+        let cfg: GzmoConfig = toml::from_str("").unwrap();
+        assert!(!cfg.assembly.distill.is_lab());
+        assert!(!cfg.assembly.config_handoff.is_lab());
+    }
+
+    #[test]
+    fn gzmo_next_toml_parses() {
+        let path = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("../config/gzmo-next.toml");
+        let cfg = GzmoConfig::load(&path).unwrap();
+        assert!(cfg.assembly.distill.is_lab());
+        assert!(cfg.assembly.dream.is_lab());
+        assert!(cfg.assembly.spark.is_lab());
+        assert!(cfg.assembly.ops_health.is_lab());
+        assert!(cfg.assembly.config_handoff.is_lab());
+        assert!(cfg.memory.vault_db.ends_with("data-next/vault.db"));
     }
 }

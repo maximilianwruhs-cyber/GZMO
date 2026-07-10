@@ -1,5 +1,5 @@
-//! Legacy debug harness REPL (`gzmo chat`). Hot-memory lifecycle via [`AgentSession`].
-//! Not the operator frontend — see `docs/ARCHITECTURE_GZMO_PLATFORM.md`.
+//! Operator REPL (`gzmo` / `gzmo chat`). Hot-memory lifecycle via [`AgentSession`].
+//! Canonical operator frontend — see `docs/OPERATOR_FRONTEND_DECISION.md`.
 
 use std::io::{self, BufRead, Write};
 use std::sync::Arc;
@@ -26,9 +26,10 @@ use gzmo_core::tools::sysadmin::{SysMetricsTool, SysKillTool};
 use gzmo_core::tools::web::WebSearchTool;
 use gzmo_core::tools::web_browse::WebBrowseTool;
 use gzmo_core::tools::memory::{MemoryRecordTool, MemorySearchTool};
-use gzmo_core::types::{EpisodicEntry, EpisodicSource, Message, Role};
+use gzmo_core::memory::scratch::{messages_to_transcript, DistillJob, DistillSource};
 use gzmo_core::skills::{SkillRegistry as ChaosSkillRegistry, SkillContext, SkillType};
 use gzmo_core::skills::{dice::DiceSkill, sound::SoundSkill, poker::PokerSkill, quote::QuoteSkill, calculate::CalculateSkill, help::HelpSkill, visual::VisualSkill};
+use gzmo_core::types::{EpisodicEntry, EpisodicSource, Message, Role};
 
 
 
@@ -235,7 +236,7 @@ Use delegate_task for focused sub-work; you receive a short summary, not full su
     );
 
     // ─── Session ─────────────────────────────────────────────────
-    let session_mgr = SessionManager::new("data/sessions");
+    let session_mgr = SessionManager::new(&config.session_distill.sessions_dir);
     session_mgr.ensure_dir().await?;
 
     let mut session_name: Option<String> = None;
@@ -718,6 +719,17 @@ async fn handle_slash_command(
     match input {
         "/quit" | "/exit" | "/q" => {
             if messages.len() > 1 {
+                let transcript = messages_to_transcript(messages);
+                let job = DistillJob {
+                    session_id: session_id.to_string(),
+                    transcript,
+                    source: DistillSource::MainArchive,
+                };
+                if let Err(e) = agent_session.scratch().enqueue_distill(job).await {
+                    eprintln!("  {RED}⚙ Distill enqueue failed: {e}{RESET}");
+                } else {
+                    eprintln!("  {COPPER}⚙ Session distill enqueued{RESET}");
+                }
                 if let Err(e) = session_mgr.save(session_id, session_name.as_deref(), messages, session_created_at).await {
                     eprintln!("  {RED}⚙ Save failed: {e}{RESET}");
                 } else {
@@ -872,6 +884,30 @@ async fn handle_slash_command(
                     }
                     Err(e) => eprintln!("  {RED}⚙ {e}{RESET}"),
                 }
+            }
+        }
+        "/calibrate" => {
+            eprintln!("  {DIM}⚙ Running calibration assembly (fixture)...{RESET}");
+            if let Err(e) = crate::assemble_cmd::run(config, "calibration", true, false).await {
+                eprintln!("  {RED}⚙ {e}{RESET}");
+            } else {
+                eprintln!("  {GREEN}⚙ Calibration assembly complete{RESET}");
+            }
+        }
+        "/cognition-smoke" | "/cognition" => {
+            eprintln!("  {DIM}⚙ Running cognition assembly (fixture)...{RESET}");
+            if let Err(e) = crate::assemble_cmd::run(config, "cognition", true, false).await {
+                eprintln!("  {RED}⚙ {e}{RESET}");
+            } else {
+                eprintln!("  {GREEN}⚙ Cognition assembly complete{RESET}");
+            }
+        }
+        "/ops-smoke" | "/ops" => {
+            eprintln!("  {DIM}⚙ Running ops assembly (fixture)...{RESET}");
+            if let Err(e) = crate::assemble_cmd::run(config, "ops", true, false).await {
+                eprintln!("  {RED}⚙ {e}{RESET}");
+            } else {
+                eprintln!("  {GREEN}⚙ Ops assembly complete{RESET}");
             }
         }
         "/chaos" => {

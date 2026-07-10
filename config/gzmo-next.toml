@@ -1,0 +1,155 @@
+# GZMO-next — Workstation instance (Little Tools Lab backend)
+# ─────────────────────────────────────────────────────────────────────────
+#
+# Second, standalone GZMO instance. Physically isolated from legacy paths:
+#   config  → GZMO/config/gzmo-next.toml   (this file)
+#   data    → GZMO/data-next/              (vault, sessions, queues, episodic)
+#
+# Env contract (operator + daemon):
+#   export GZMO_INSTANCE=next
+#   export GZMO_CONFIG=$GZMO_CLONE_ROOT/GZMO/config/gzmo-next.toml
+#
+# The [assembly] section routes daemon loops to Little Tools Lab recipes
+# (bash + file artifacts) instead of inline gzmo-core engines. Guardrail:
+# lab backends only activate when GZMO_INSTANCE=next — otherwise every
+# loop stays Inline (CT101-safe). See GZMO/docs/CT101_BOUNDARY.md.
+#
+# Calibration output from gzmo-handoff.sh lands in gzmo-next-fused.toml
+# (sibling file) for operator review — it never overwrites this file.
+#
+# Relative paths below are anchored to this file's directory (GZMO/config/),
+# so ../data-next/... resolves to GZMO/data-next/ wherever the clone lives.
+
+[identity]
+soul_path = "../SOUL.md"
+
+[memory]
+directory = "../data-next/memory"
+vault_db = "../data-next/vault.db"
+vault_backend = "sqlite"
+
+[skills]
+directory = "../skills"
+dreams_path = "../data-next/DREAMS.md"
+
+# ─────────────────────────────────────────────────────────────────────────
+# Assembly backends — the GZMO-next wire (parsed by gzmo-core config)
+# ─────────────────────────────────────────────────────────────────────────
+#
+# "lab"    → daemon loop shells to a Little Tools Lab recipe script
+# "inline" → daemon loop uses the legacy in-process engine (CT101 behavior)
+
+[assembly]
+distill = "lab"        # synapse-distill-handoff.sh (session_end → distill jobs)
+dream = "lab"          # session-to-dream.sh
+spark = "lab"          # cognition-smoke.sh stages 3–4 (spark-link + rrf-recall)
+ops_health = "lab"     # ops-smoke.sh
+config_handoff = "lab" # gzmo-handoff.sh (bench → fuse → apply on gate pass)
+
+# ─────────────────────────────────────────────────────────────────────────
+# Engines / loops — workstation baseline, lab recipes own the heavy lifting
+# ─────────────────────────────────────────────────────────────────────────
+
+[dreams]
+enabled = true
+verify = true
+min_confidence = 0.85
+verify_temperature = 0.1
+require_evidence = true
+strict_kg = false        # no Neo4j sidecar on the workstation instance
+cron_hour = 1
+cron_minute = 0
+chunk_chars = 28000
+min_consolidation_chars = 400
+honeypot_rem_enabled = true
+
+[session_distill]
+enabled = true
+sessions_dir = "../data-next/sessions"
+use_librarian = false    # workstation v1: heuristic fallback is acceptable
+librarian_summary = false
+daemon_scheduled = true
+cron_hour = 2
+cron_minute = 15
+
+[spark]
+enabled = true
+verify = true
+min_confidence = 0.85
+schedule_mode = "cron"
+cron_hours = [3, 22]
+cron_minute = 30
+max_tokens_hypothesis = 4096
+max_tokens_verify = 4096
+anchor_min_age_hours = 0
+
+[ingest]
+enabled = false          # workstation v1: no knowledge-folder watcher
+
+[health]
+strict_startup = false
+
+# Workstation-local only: no VM200/LXC101 sidecars for the next instance.
+[embeddings]
+enabled = false
+
+[qdrant]
+enabled = false
+sync_enabled = false
+
+[librarian]
+enabled = false
+
+[rerank]
+enabled = false
+
+# ─────────────────────────────────────────────────────────────────────────
+# Engine — workstation Prime (llama.cpp :8000)
+# ─────────────────────────────────────────────────────────────────────────
+
+[engine]
+active_mode = "local"
+
+[engine.local]
+provider = "local"
+url = "http://localhost:8000/v1"
+model = "qwen3.6-35b-mtp"
+api_key = ""
+temperature = 0.3
+top_p = 0.95
+max_tokens = 24576
+
+[agent]
+max_tool_iterations = 10
+heartbeat_interval_secs = 1800
+
+# ─────────────────────────────────────────────────────────────────────────
+# Scratch / queues — file fallback, isolated key prefix
+# ─────────────────────────────────────────────────────────────────────────
+
+[redis]
+enabled = false          # file queue below; flip on with gzmo-next:* keys if wanted
+url = "redis://192.168.31.202:6379"
+distill_queue = "gzmo-next:distill:pending"
+distill_fallback_dir = "../data-next/distill-queue"
+
+[context_memory]
+archive_threshold = 0.90
+response_reserve = 0.10
+scratch_max_tokens = 2000
+context_length = 131072
+
+# Everything on Prime — no librarian on this instance.
+[routing]
+default_engine = "local"
+
+[routing.mappings]
+dream_extract = "local"
+dream_verify = "local"
+spark_hypothesis = "local"
+spark_verify = "local"
+ingest_extract = "local"
+ingest_verify = "local"
+distill_extract = "local"
+distill_verify = "local"
+distill_summary = "local"

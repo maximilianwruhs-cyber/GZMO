@@ -3,7 +3,7 @@ use anyhow::Result;
 use chrono::Utc;
 
 use gzmo_core::config::GzmoConfig;
-use gzmo_core::gateway::{TurboQuantGateway, VllmConfig, LlmGateway};
+use gzmo_core::gateway::{TurboQuantGateway, VllmConfig};
 use gzmo_core::identity::IdentityEngine;
 use gzmo_core::memory::vault::SqliteVault;
 use gzmo_core::memory::episodic::FileEpisodicStore;
@@ -95,7 +95,13 @@ async fn boot_knowledge_graph(tools: &ToolRegistry) -> Option<String> {
 pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
     let config = config.clone();
     let config_arc = Arc::new(tokio::sync::RwLock::new(config.clone()));
-    let config_path = std::env::current_dir()?.join("gzmo.toml");
+    let config_path = std::env::var("GZMO_CONFIG")
+        .map(std::path::PathBuf::from)
+        .unwrap_or_else(|_| {
+            std::env::current_dir()
+                .unwrap_or_else(|_| std::path::PathBuf::from("."))
+                .join("gzmo.toml")
+        });
 
     // ─── Vault ───────────────────────────────────────────────────
     let vault = match SqliteVault::open(&config.memory.vault_db) {
@@ -107,7 +113,7 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
     let episodic = Arc::new(FileEpisodicStore::new(&config.memory.directory));
 
     // ─── Session Manager ─────────────────────────────────────────
-    let session_mgr = Arc::new(SessionManager::new("data/sessions"));
+    let session_mgr = Arc::new(SessionManager::new(&config.session_distill.sessions_dir));
     let _ = session_mgr.ensure_dir().await;
 
     // ─── Gateway (RwLock-wrapped for /mode hot-swap) ─────────────
