@@ -113,7 +113,7 @@ active_mode = "local"
 [engine.local]
 provider = "local"
 url = "http://localhost:8000/v1"
-model = "qwen3.6-35b-mtp"
+model = "/home/gzmo/models/ornith-35b-GGUF/ornith-35b-Q4_K_M.gguf"
 api_key = ""
 temperature = 0.3
 top_p = 0.95

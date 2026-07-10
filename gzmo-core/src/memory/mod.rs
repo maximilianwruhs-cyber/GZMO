@@ -5,6 +5,7 @@
 pub mod honeypot;
 pub mod lifecycle;
 pub mod profile;
+pub mod ripen;
 pub mod qdrant_recall;
 pub mod recall_rrf;
 pub mod vault;

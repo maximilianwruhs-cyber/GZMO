@@ -102,23 +102,34 @@ def load_core_points(core_db: Path, vault: Path) -> list[dict]:
     embeds = load_honeypot_embeddings(vault)
     conn = sqlite3.connect(core_db)
     conn.row_factory = sqlite3.Row
-    rows = conn.execute(
-        "SELECT id, entity_tag, concept_name, summary_md, provenance_ids, version FROM knowledge_core"
-    ).fetchall()
+
+    # Detect schema: concept-card style (entity_tag) vs flat-fact style (content)
+    cols = [r[1] for r in conn.execute("PRAGMA table_info(knowledge_core)").fetchall()]
+    has_concept_schema = "entity_tag" in cols
+
+    if has_concept_schema:
+        rows = conn.execute(
+            "SELECT id, entity_tag, concept_name, summary_md, provenance_ids, version FROM knowledge_core"
+        ).fetchall()
+    else:
+        rows = conn.execute(
+            "SELECT id, content, content_norm, confidence, origin, memory_type, recall_count, container_tag FROM knowledge_core"
+        ).fetchall()
+
     conn.close()
 
     points: list[dict] = []
     skipped = 0
     for r in rows:
-        prov = json.loads(r["provenance_ids"] or "[]")
-        vecs = [embeds[p] for p in prov if p in embeds]
-        vec = mean_vector(vecs)
-        if vec is None:
-            skipped += 1
-            continue
-        excerpt = (r["summary_md"] or "")[:2000]
-        points.append(
-            {
+        if has_concept_schema:
+            prov = json.loads(r["provenance_ids"] or "[]")
+            vecs = [embeds[p] for p in prov if p in embeds]
+            vec = mean_vector(vecs)
+            if vec is None:
+                skipped += 1
+                continue
+            excerpt = (r["summary_md"] or "")[:2000]
+            points.append({
                 "id": stable_point_id(r["id"]),
                 "vector": vec,
                 "payload": {
@@ -131,8 +142,26 @@ def load_core_points(core_db: Path, vault: Path) -> list[dict]:
                     "layer": "knowledge_core",
                     "source": "gzmo_knowledge_core",
                 },
-            }
-        )
+            })
+        else:
+            # Flat fact schema — no provenance_ids to derive vectors, skip true embedding
+            content = r["content"] or ""
+            content_norm = r["content_norm"] or ""
+            points.append({
+                "id": stable_point_id(r["id"]),
+                "vector": [0.0] * VECTOR_DIM,  # zero vector — real embed from ingest pipeline
+                "payload": {
+                    "core_id": r["id"],
+                    "entity_tag": content_norm[:120],
+                    "concept_name": content[:200],
+                    "summary_md": content[:2000],
+                    "confidence": r["confidence"],
+                    "origin": r["origin"],
+                    "recall_count": r["recall_count"],
+                    "layer": "knowledge_core",
+                    "source": "gzmo_knowledge_core",
+                },
+            })
     if skipped:
         print(f"[!] skipped {skipped} cards without embeddable provenance", file=sys.stderr)
     return points

@@ -3,7 +3,7 @@
 use anyhow::{bail, Result};
 use gzmo_core::config::GzmoConfig;
 use gzmo_core::memory::embeddings;
-use gzmo_core::memory::profile::{GzmoProfile, ProfileOptions};
+use gzmo_core::memory::profile::ProfileOptions;
 
 const USAGE: &str =
     "Usage:\n  \

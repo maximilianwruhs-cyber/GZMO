@@ -237,13 +237,15 @@ max_tokens = 8192
 # Fallback: Google Gemini API (direct)
 
 [engine.cloud]
-provider      = "gemini"
-url           = "https://generativelanguage.googleapis.com/v1beta/openai"
-model         = "gemini-2.5-flash"
-api_key       = ""
-temperature   = 0.4
-top_p         = 0.95
-max_tokens    = 8192
+provider         = "openrouter"
+url              = "https://openrouter.ai/api/v1"
+model            = "deepseek/deepseek-v4-flash"
+api_key          = ""
+temperature      = 0.4
+top_p            = 0.95
+max_tokens       = 8192
+# OpenRouter extended thinking: minimal | low | medium | high | xhigh
+# reasoning_effort = "xhigh"   # e.g. z-ai/glm-5.2 on CT101 daemon
 
 # Fallback engine — auto-activated if primary cloud endpoint fails
 fallback_provider  = "gemini"

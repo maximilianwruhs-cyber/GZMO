@@ -4,6 +4,9 @@
 //! Run:
 //!   cargo test -p gzmo-core --test live_cloud_probe -- --ignored --nocapture
 //!
+//! CT101 production uses `z-ai/glm-5.2` with `reasoning_effort = "xhigh"` on OpenRouter.
+//! Set `[engine.cloud]` in gzmo.toml and `GZMO_OPENROUTER_KEY` in `.env` before running.
+//!
 //! These exercise the real background routing path:
 //!   GzmoConfig::load -> GatewayRouter::new -> gateway(TaskKind::SparkHypothesis)
 //!   -> FallbackGateway(cloud -> legacy)

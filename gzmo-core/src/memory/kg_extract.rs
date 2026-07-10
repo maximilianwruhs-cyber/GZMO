@@ -241,7 +241,7 @@ pub fn dedupe_entities(entities: Vec<KgEntity>) -> (Vec<KgEntity>, HashMap<Strin
 
 /// Merge entities when one's name tokens are a subset of another (e.g. "Rivest" ⊂ "Ronald L. Rivest").
 fn merge_subset_aliases(
-    mut entities: Vec<KgEntity>,
+    entities: Vec<KgEntity>,
     mut alias_map: HashMap<String, String>,
 ) -> (Vec<KgEntity>, HashMap<String, String>) {
     fn tokens(name: &str) -> HashSet<String> {

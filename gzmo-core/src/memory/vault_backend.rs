@@ -11,7 +11,6 @@
 
 use anyhow::Result;
 use async_trait::async_trait;
-use std::path::Path;
 use uuid::Uuid;
 
 use crate::types::{ExtractedTruth, SemanticFact};

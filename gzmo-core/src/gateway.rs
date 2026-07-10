@@ -26,6 +26,12 @@ pub struct VllmConfig {
     /// API key for authenticated endpoints (Bearer token). Empty = no auth.
     #[serde(default)]
     pub api_key: String,
+    /// Engine provider label from gzmo.toml (e.g. openrouter, local).
+    #[serde(default)]
+    pub provider: String,
+    /// OpenRouter reasoning effort: minimal | low | medium | high | xhigh
+    #[serde(default)]
+    pub reasoning_effort: Option<String>,
 }
 
 impl Default for VllmConfig {
@@ -37,6 +43,8 @@ impl Default for VllmConfig {
             top_p: 0.9,
             max_tokens: 8192,
             api_key: String::new(),
+            provider: String::new(),
+            reasoning_effort: None,
         }
     }
 }
@@ -50,6 +58,8 @@ impl From<crate::config::EngineProfileConfig> for VllmConfig {
             top_p: p.top_p,
             max_tokens: p.max_tokens,
             api_key: p.api_key,
+            provider: p.provider,
+            reasoning_effort: p.reasoning_effort,
         }
     }
 }
@@ -137,7 +147,7 @@ pub trait LlmGateway: Send + Sync {
         schema_name: &str,
         json_schema: serde_json::Value,
         temperature: Option<f32>,
-        max_tokens: Option<u32>,
+        _max_tokens: Option<u32>,
     ) -> Result<String> {
         self.complete_structured_with_temp(messages, schema_name, json_schema, temperature)
             .await
@@ -175,6 +185,11 @@ pub struct TurboQuantGateway {
 // ── OpenAI-compatible request types ──────────────────────────────────
 
 #[derive(Serialize)]
+struct OpenRouterReasoning {
+    effort: String,
+}
+
+#[derive(Serialize)]
 struct ChatRequest<'a> {
     model: &'a str,
     messages: Vec<ChatMessage<'a>>,
@@ -194,6 +209,9 @@ struct ChatRequest<'a> {
     reasoning_format: Option<&'a str>,
     #[serde(skip_serializing_if = "Option::is_none")]
     chat_template_kwargs: Option<serde_json::Value>,
+    /// OpenRouter: extended thinking effort (not used on structured JSON paths)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    reasoning: Option<OpenRouterReasoning>,
 }
 
 #[derive(Serialize)]
@@ -264,6 +282,9 @@ struct StreamChatRequest<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     tool_choice: Option<&'a str>,
     stream: bool,
+    /// OpenRouter: extended thinking effort
+    #[serde(skip_serializing_if = "Option::is_none")]
+    reasoning: Option<OpenRouterReasoning>,
 }
 
 /// A single SSE chunk from the streaming response.
@@ -429,7 +450,13 @@ impl LlmGateway for TurboQuantGateway {
     ) -> Result<LlmResponse> {
         let has_tools = !tools.is_empty();
 
-        let (reasoning_format, chat_template_kwargs) = no_thinking_request_fields();
+        let openrouter_reasoning = openrouter_reasoning_for_config(&self.config);
+        let (reasoning_format, chat_template_kwargs) = if openrouter_reasoning.is_some() {
+            (None, None)
+        } else {
+            let (rf, ctk) = no_thinking_request_fields();
+            (Some(rf), Some(ctk))
+        };
         let body = ChatRequest {
             model: &self.config.model,
             messages: Self::to_chat_messages(messages),
@@ -440,8 +467,9 @@ impl LlmGateway for TurboQuantGateway {
             // Enforce sequential execution to avoid llama.cpp parallel bugs
             parallel_tool_calls: if has_tools { Some(false) } else { None },
             tool_choice: if has_tools { Some("auto") } else { None },
-            reasoning_format: Some(reasoning_format),
-            chat_template_kwargs: Some(chat_template_kwargs),
+            reasoning_format,
+            chat_template_kwargs,
+            reasoning: openrouter_reasoning,
         };
 
         debug!(
@@ -531,6 +559,7 @@ impl LlmGateway for TurboQuantGateway {
             parallel_tool_calls: if has_tools { Some(false) } else { None },
             tool_choice: if has_tools { Some("auto") } else { None },
             stream: true,
+            reasoning: openrouter_reasoning_for_config(&self.config),
         };
 
         debug!(
@@ -903,6 +932,20 @@ fn no_thinking_request_fields() -> (&'static str, serde_json::Value) {
     )
 }
 
+fn is_openrouter_endpoint(config: &VllmConfig) -> bool {
+    config.provider == "openrouter" || config.base_url.contains("openrouter.ai")
+}
+
+fn openrouter_reasoning_for_config(config: &VllmConfig) -> Option<OpenRouterReasoning> {
+    if !is_openrouter_endpoint(config) {
+        return None;
+    }
+    let effort = config.reasoning_effort.as_ref().filter(|s| !s.is_empty())?;
+    Some(OpenRouterReasoning {
+        effort: effort.clone(),
+    })
+}
+
 #[derive(Serialize)]
 struct ResponseFormatSpec<'a> {
     r#type: &'a str,
@@ -1254,6 +1297,7 @@ impl GatewayRouter {
                         temperature: cloud.temperature,
                         top_p: cloud.top_p,
                         max_tokens: cloud.max_tokens,
+                        reasoning_effort: cloud.reasoning_effort.clone(),
                     }
                 } else {
                     config.engine.active_engine()
@@ -1294,6 +1338,58 @@ impl GatewayRouter {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn chat_request_serializes_openrouter_reasoning_effort() {
+        let body = ChatRequest {
+            model: "z-ai/glm-5.2",
+            messages: vec![ChatMessage {
+                role: "user",
+                content: Some("hi"),
+                tool_call_id: None,
+                tool_calls: None,
+            }],
+            temperature: 0.3,
+            top_p: 0.95,
+            max_tokens: 1024,
+            tools: vec![],
+            parallel_tool_calls: None,
+            tool_choice: None,
+            reasoning_format: None,
+            chat_template_kwargs: None,
+            reasoning: Some(OpenRouterReasoning {
+                effort: "xhigh".to_string(),
+            }),
+        };
+        let json = serde_json::to_value(&body).expect("serialize ChatRequest");
+        assert_eq!(json["reasoning"]["effort"], "xhigh");
+        assert!(json.get("reasoning_format").is_none());
+    }
+
+    #[test]
+    fn openrouter_reasoning_omitted_for_local_llama() {
+        let config = VllmConfig {
+            base_url: "http://localhost:8000/v1".into(),
+            model: "ornith".into(),
+            provider: "local".into(),
+            reasoning_effort: Some("xhigh".into()),
+            ..Default::default()
+        };
+        assert!(openrouter_reasoning_for_config(&config).is_none());
+    }
+
+    #[test]
+    fn openrouter_reasoning_attached_when_configured() {
+        let config = VllmConfig {
+            base_url: "https://openrouter.ai/api/v1".into(),
+            model: "z-ai/glm-5.2".into(),
+            provider: "openrouter".into(),
+            reasoning_effort: Some("xhigh".into()),
+            ..Default::default()
+        };
+        let reasoning = openrouter_reasoning_for_config(&config).expect("reasoning");
+        assert_eq!(reasoning.effort, "xhigh");
+    }
 
     #[test]
     fn extracts_json_from_reasoning_trace() {
@@ -1447,6 +1543,7 @@ mod tests {
             temperature: 0.4,
             top_p: 0.95,
             max_tokens: 100,
+            reasoning_effort: None,
             fallback_provider: None,
             fallback_url: None,
             fallback_model: None,
