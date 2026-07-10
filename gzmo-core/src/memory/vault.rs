@@ -24,7 +24,7 @@ use crate::memory::lifecycle::{
 };
 use crate::memory::recall_rrf::{
     diversify_by_source_file, extract_entity_tokens, fts_match_query, fts_match_query_broad,
-    merge_interleaved_rank, rrf_fuse, RecallCandidate, PREFETCH_K, MAX_PER_SOURCE_FILE,
+    merge_interleaved_rank, rrf_fuse, RecallCandidate, PREFETCH_K,
     RERANK_PREFETCH,
 };
 use std::process::Command as StdCommand;
@@ -57,7 +57,7 @@ impl SqliteVault {
 
     /// Open or create the vault database.
     pub fn open(db_path: impl AsRef<Path>) -> Result<Self> {
-        let mut init_conn = Connection::open(db_path.as_ref())
+        let init_conn = Connection::open(db_path.as_ref())
             .with_context(|| "Failed to open semantic vault database")?;
 
         // Initialize schema
