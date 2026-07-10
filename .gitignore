@@ -37,6 +37,20 @@ data/synapse-reader.state.json
 !data/lore.toml
 !data/.gitkeep
 
+# ── GZMO-next instance runtime (config is committed; data is not) ──────────
+data-next/*
+!data-next/.gitkeep
+!data-next/memory/
+data-next/memory/*
+!data-next/memory/.gitkeep
+!data-next/sessions/
+data-next/sessions/*
+!data-next/sessions/.gitkeep
+!data-next/distill-queue/
+data-next/distill-queue/*
+!data-next/distill-queue/.gitkeep
+config/gzmo-next-fused.toml
+
 # ── Models & binaries (large / machine-specific) ───────────────────────────
 models/
 bin/
