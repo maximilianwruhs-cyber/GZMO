@@ -37,7 +37,7 @@ impl ToolHandler for DelegateTaskTool {
                     },
                     "max_iterations": {
                         "type": "integer",
-                        "description": "Max tool rounds for sub-agent (default 5, max 15)"
+                        "description": "Max tool rounds for sub-agent (default 20, max 60)"
                     }
                 },
                 "required": ["role", "brief"]
@@ -54,8 +54,8 @@ impl ToolHandler for DelegateTaskTool {
             .ok_or_else(|| anyhow!("Missing 'brief'"))?;
         let max_iterations = args["max_iterations"]
             .as_u64()
-            .unwrap_or(5)
-            .min(15) as usize;
+            .unwrap_or(20)
+            .min(60) as usize;
 
         let spec = SubagentSpec {
             role: role.to_string(),

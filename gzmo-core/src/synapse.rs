@@ -80,6 +80,9 @@ pub enum EventType {
     /// Scheduled job failed with error
     DaemonJobFail,
 
+    /// Cognition cron lifecycle (dream, spark, qdrant_sync, wiki, kg, …)
+    CognitionSchedule,
+
     // --- Health ---
     /// Health probe cycle completed
     HealthTick,
@@ -176,6 +179,31 @@ impl SynapseEvent {
             )
         })
     }
+}
+
+/// Unified cognition cron observability: `engine` + `phase` + optional fields.
+pub fn append_cognition_schedule(
+    bus: &SynapseBus,
+    engine: &str,
+    phase: &str,
+    extra: serde_json::Value,
+) {
+    let mut data = serde_json::json!({
+        "engine": engine,
+        "phase": phase,
+    });
+    if let Some(obj) = extra.as_object() {
+        if let Some(data_obj) = data.as_object_mut() {
+            for (k, v) in obj {
+                data_obj.insert(k.clone(), v.clone());
+            }
+        }
+    }
+    bus.append(&SynapseEvent::with_data(
+        EventType::CognitionSchedule,
+        resolve_event_source(EventSource::GzmoDaemon),
+        data,
+    ));
 }
 
 // ---------------------------------------------------------------------------

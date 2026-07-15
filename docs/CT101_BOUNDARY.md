@@ -1,56 +1,59 @@
 # CT101 boundary — standalone legacy
 
-**Status:** Accepted (2026-07-10)  
+**Status:** Accepted (2026-07-10); production cutover 2026-07-15  
 **Supersedes:** [CT101_PROMOTION.md](./CT101_PROMOTION.md) (per-loop promotion — **retired**)
 
 ---
 
 ## Decision
 
-**CT101 is a standalone legacy GZMO deployment.** Little Tools Lab does **not** swap individual daemon loops into CT101.
+**CT101 is a standalone legacy GZMO deployment.** **GZMO-next on the workstation is production** (since 2026-07-15). Little Tools Lab does **not** swap individual daemon loops into CT101.
 
-| | CT101 | Little Tools Lab |
+| | CT101 | GZMO-next (workstation) |
 |---|--------|------------------|
-| **What it is** | Production GZMO today (`gzmo daemon`, gzmo-core inline) | Home for 46 pieces + recipes |
-| **Lab integration** | **None** — no `[assembly]` flags, no subprocess graft | Build **GZMO-next** as full assembly |
-| **beat-gate** | Reference baseline only | Proves lab recipes match or beat legacy behavior |
-| **Cutover** | Replaced only when **entire** new stack is ready | Not loop-by-loop |
+| **What it is** | Frozen legacy (`gzmo daemon`, gzmo-core inline) | **Production** — `gzmo-scheduler` + lab recipes |
+| **Lab integration** | **None** — no `[assembly]` flags | `[assembly] = "lab"` via `GZMO_INSTANCE=next` |
+| **beat-gate** | Historical reference baseline | S2 gate before trusting production |
+| **Ops** | Leave alone unless explicitly debugging legacy | `systemctl --user` services, `data-next/` paths |
 
 ---
 
 ## What we do on CT101
 
-- Keep `gzmo-daemon` running as today
-- Ops: `systemctl`, journalctl, config hotfixes for **legacy** issues only
+- **Do not modify** for GZMO-next cutover — CT101 may run independently
+- Legacy ops only when explicitly debugging CT101 itself
 - Do **not** edit CT101 `gzmo.toml` to point loops at lab scripts
-- Do **not** restart daemon for lab recipe promotion
 
 ---
 
-## What we do on the workstation
+## What we do on the workstation (production)
 
-- Develop and test pieces in `github-clone/<tool>/`
-- Run `gzmo assemble <recipe>` and `test-all-little-tools.sh`
-- Run `beat-gate.sh` to compare lab output vs legacy expectations
-- Use `gzmo chat` as operator frontend (local distill enqueue, slash → assemble)
-- Apply `gzmo-handoff --apply` to **workstation** `GZMO/config/gzmo.toml` when calibrating locally
+- **`gzmo-scheduler`** — cron runner (`GZMO_INSTANCE=next`, `config/gzmo-next.toml`)
+- **`llama-prime`** — local cognition at `:8000`
+- **Sidecars** — local Qdrant + Redis (`database-cluster/`, user systemd)
+- **`gzmo chat` / `gzmo assemble`** — operator frontend
+- **Observatory** — `OBSERVATORY_MODE=local`, reads `data-next/`
 
 ---
 
-## GZMO-next cutover (future)
+## GZMO-next cutover (completed 2026-07-15)
 
-When the **full** lab assembly is stack-ready (S3 in [LAB_TREATMENT.md](../../little-tools-lab/docs/LAB_TREATMENT.md)):
+Cutover steps executed:
 
-1. Document the new runtime (composed recipes + any lab-native daemon)
-2. Prove live beat-gates on cognition, knowledge, ops, config as one unit
-3. Plan a **single** migration to replace CT101 — not incremental loop swaps
+1. Harden workstation systemd (linger, sleep masks, scheduler spark fix)
+2. Local sidecars (Qdrant, Redis) — fresh volumes
+3. Enable memory plane in `gzmo-next.toml` (VM200 embed/rerank, local Qdrant/Redis)
+4. S2 beat-gate: config, ops, cognition, knowledge — all PASS
+5. Observatory retargeted to local `data-next/`
 
-Until then, CT101 and lab development proceed **in parallel**.
+CT101 remains frozen legacy reference; no vault import (fresh `data-next/`).
 
 ---
 
 ## References
 
+- [CT101_INFRASTRUCTURE_REPORT.md](./CT101_INFRASTRUCTURE_REPORT.md) — live-verified ecosystem map (host, daemon, sidecars, code inventory)
+- [ct101-systems/00-CAPABILITIES_OVERVIEW.md](./ct101-systems/00-CAPABILITIES_OVERVIEW.md) — capability matrix, advancement roadmap, per-subsystem reports
 - [LAB_TREATMENT.md](../../little-tools-lab/docs/LAB_TREATMENT.md)
 - [PI_FRONTEND_SPLIT.md](./PI_FRONTEND_SPLIT.md) — topology (daemon on CT101)
 - [OPERATOR_FRONTEND_DECISION.md](./OPERATOR_FRONTEND_DECISION.md) — gzmo_cli on workstation

@@ -4,16 +4,16 @@
 //! in the agent's `ToolRegistry` and called natively by the agentic loop.
 
 use std::collections::HashMap;
-use std::sync::Arc;
 
 use anyhow::Result;
 use async_trait::async_trait;
 
 use rmcp::model::CallToolRequestParams;
 use rmcp::RoleClient;
-use rmcp::service::{Peer, RunningService};
+use rmcp::service::RunningService;
 
 use crate::tools::{ToolDef, ToolHandler};
+use crate::mcp::manager::SharedMcpPeer;
 
 /// The live MCP client type.
 /// We store a Peer<RoleClient> directly since that's the interface we call
@@ -34,8 +34,8 @@ pub struct McpToolBridge {
     /// JSON Schema for the tool's input parameters
     pub input_schema: serde_json::Value,
 
-    /// The live MCP peer handle (Arc-shared across all bridges from same server)
-    pub peer: Arc<Peer<RoleClient>>,
+    /// The live MCP peer handle (swappable on reconnect via manager watchdog)
+    pub peer: SharedMcpPeer,
 }
 
 #[async_trait]
@@ -69,7 +69,10 @@ impl ToolHandler for McpToolBridge {
         };
 
         // Execute via JSON-RPC over stdio
-        let result = self.peer.call_tool(params).await
+        let peer = self.peer.read().await;
+        let result = peer
+            .call_tool(params)
+            .await
             .map_err(|e| anyhow::anyhow!("MCP call_tool failed for '{}': {}", self.mcp_tool_name, e))?;
 
         // Extract text content from the result.

@@ -321,6 +321,13 @@ impl TriggerEngine {
         engine
     }
 
+    /// Defaults for interactive REPL/TUI — suppresses periodic internal monologue injects.
+    pub fn with_defaults_interactive() -> Self {
+        let mut engine = Self::with_defaults();
+        engine.set_enabled("autonomous_pulse", false);
+        engine
+    }
+
     /// Register a new trigger.
     pub fn add(&mut self, trigger: ChaosTrigger) {
         info!(name = %trigger.name, "Trigger registered");
@@ -482,6 +489,17 @@ mod tests {
     fn test_default_triggers_loaded() {
         let engine = TriggerEngine::with_defaults();
         assert!(engine.triggers.len() >= 7, "Should have at least 7 default triggers");
+    }
+
+    #[test]
+    fn test_interactive_defaults_disable_autonomous_pulse() {
+        let engine = TriggerEngine::with_defaults_interactive();
+        let pulse = engine
+            .triggers
+            .iter()
+            .find(|t| t.name == "autonomous_pulse")
+            .expect("autonomous_pulse trigger");
+        assert!(!pulse.enabled);
     }
 
     #[test]

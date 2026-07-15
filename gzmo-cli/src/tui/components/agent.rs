@@ -162,15 +162,8 @@ impl Component for AgentComponent {
             return Ok(None);
         }
 
-        // ─── Trigger: inject autonomous prompt ───────────────
-        if let Action::TriggerInject(prompt) = action {
-            self.messages.push(Message {
-                role: Role::System,
-                content: format!("[AUTONOMOUS MONOLOGUE] {}", prompt),
-                is_meta: true,
-                tool_calls: None,
-                tool_call_id: None,
-            });
+        // ─── Trigger: inject autonomous prompt (disabled in interactive mode) ──
+        if let Action::TriggerInject(_prompt) = action {
             return Ok(None);
         }
 

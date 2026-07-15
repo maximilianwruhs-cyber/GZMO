@@ -115,6 +115,85 @@ pub struct HealthPing {
     pub service_name: String,
 }
 
+/// POST VM200/OpenAI-compatible `/embeddings` and verify vector dimensions.
+pub struct EmbedHealthPing {
+    pub url: String,
+    pub model: String,
+    pub api_key: String,
+    pub expected_dims: usize,
+}
+
+/// Alert when cloud-primary and Prime fallback are both unreachable.
+pub struct CognitionBlackoutCheck {
+    pub cloud_models_url: String,
+    pub cloud_api_key: String,
+    pub prime_models_url: String,
+    pub prime_api_key: String,
+    pub cloud_primary: bool,
+}
+
+/// Result of one CheapCheck evaluation for HEARTBEAT.md rows.
+#[derive(Debug, Clone)]
+pub struct CheapCheckResult {
+    pub name: String,
+    pub status: &'static str,
+    pub detail: String,
+}
+
+pub const CHEAPCHECK_START: &str = "<!-- cheapcheck-start -->";
+pub const CHEAPCHECK_END: &str = "<!-- cheapcheck-end -->";
+
+/// Merge CheapCheck rows into HEARTBEAT.md (preserves chaos-written content outside markers).
+pub async fn write_cheapcheck_section(path: &std::path::Path, results: &[CheapCheckResult]) -> Result<()> {
+    let mut body = String::new();
+    if tokio::fs::try_exists(path).await.unwrap_or(false) {
+        body = tokio::fs::read_to_string(path).await.unwrap_or_default();
+    }
+
+    let section = format_cheapcheck_table(results);
+    let merged = if let (Some(start), Some(end)) = (body.find(CHEAPCHECK_START), body.find(CHEAPCHECK_END)) {
+        if end > start {
+            let mut out = String::with_capacity(body.len() + section.len());
+            out.push_str(&body[..start]);
+            out.push_str(CHEAPCHECK_START);
+            out.push('\n');
+            out.push_str(&section);
+            out.push('\n');
+            out.push_str(CHEAPCHECK_END);
+            out.push_str(&body[end + CHEAPCHECK_END.len()..]);
+            out
+        } else {
+            append_cheapcheck_block(&body, &section)
+        }
+    } else {
+        append_cheapcheck_block(&body, &section)
+    };
+
+    let tmp = path.with_extension("md.cheapcheck.tmp");
+    tokio::fs::write(&tmp, merged.as_bytes()).await?;
+    tokio::fs::rename(&tmp, path).await?;
+    Ok(())
+}
+
+fn append_cheapcheck_block(body: &str, section: &str) -> String {
+    format!(
+        "{body}\n\n{CHEAPCHECK_START}\n{section}\n{CHEAPCHECK_END}\n"
+    )
+}
+
+fn format_cheapcheck_table(results: &[CheapCheckResult]) -> String {
+    let mut out = String::from("## CheapCheck probes\n\n| Check | Status | Detail |\n|---|---|---|\n");
+    for r in results {
+        let detail = r.detail.replace('|', "/");
+        out.push_str(&format!("| {} | {} | {} |\n", r.name, r.status, detail));
+    }
+    out.push_str(&format!(
+        "\n*CheapCheck updated: {}*\n",
+        chrono::Utc::now().format("%Y-%m-%d %H:%M:%S UTC")
+    ));
+    out
+}
+
 #[async_trait]
 impl CheapCheck for HealthPing {
     fn name(&self) -> &str {
@@ -155,6 +234,89 @@ impl CheapCheck for HealthPing {
     }
 }
 
+#[async_trait]
+impl CheapCheck for EmbedHealthPing {
+    fn name(&self) -> &str {
+        "VM200 Embed"
+    }
+
+    async fn evaluate(&self) -> Result<Option<String>> {
+        let endpoint = format!("{}/embeddings", self.url.trim_end_matches('/'));
+        let client = reqwest::Client::builder()
+            .timeout(Duration::from_millis(1500))
+            .build()?;
+        let mut req = client.post(&endpoint).json(&serde_json::json!({
+            "model": self.model,
+            "input": "cheapcheck",
+        }));
+        if !self.api_key.is_empty() {
+            req = req.bearer_auth(&self.api_key);
+        }
+        match req.send().await {
+            Ok(resp) if resp.status().is_success() => {
+                let body: serde_json::Value = resp.json().await.unwrap_or_default();
+                let dims = body["data"]
+                    .as_array()
+                    .and_then(|a| a.first())
+                    .and_then(|d| d["embedding"].as_array())
+                    .map(|a| a.len())
+                    .unwrap_or(0);
+                if dims == self.expected_dims {
+                    Ok(None)
+                } else {
+                    Ok(Some(format!(
+                        "expected {} dims, got {}",
+                        self.expected_dims, dims
+                    )))
+                }
+            }
+            Ok(resp) => Ok(Some(format!("HTTP {}", resp.status()))),
+            Err(e) => Ok(Some(format!("unreachable: {e}"))),
+        }
+    }
+}
+
+#[async_trait]
+impl CheapCheck for CognitionBlackoutCheck {
+    fn name(&self) -> &str {
+        "Cognition Blackout"
+    }
+
+    async fn evaluate(&self) -> Result<Option<String>> {
+        if !self.cloud_primary {
+            return Ok(None);
+        }
+        let client = reqwest::Client::builder()
+            .timeout(Duration::from_millis(800))
+            .build()?;
+        let mut cloud_req = client.get(&self.cloud_models_url);
+        if !self.cloud_api_key.is_empty() {
+            cloud_req = cloud_req.bearer_auth(&self.cloud_api_key);
+        }
+        let cloud_ok = cloud_req
+            .send()
+            .await
+            .map(|r| r.status().is_success())
+            .unwrap_or(false);
+        let mut prime_req = client.get(&self.prime_models_url);
+        if !self.prime_api_key.is_empty() {
+            prime_req = prime_req.bearer_auth(&self.prime_api_key);
+        }
+        let prime_ok = prime_req
+            .send()
+            .await
+            .map(|r| r.status().is_success())
+            .unwrap_or(false);
+        if !cloud_ok && !prime_ok {
+            Ok(Some(
+                "cloud AND Prime fallback unreachable — cognition blackout".into(),
+            ))
+        } else {
+            Ok(None)
+        }
+    }
+}
+
 // ---------------------------------------------------------------------------
 // Heartbeat Executor
 // ---------------------------------------------------------------------------
@@ -180,24 +342,49 @@ impl HeartbeatEngine {
 
     /// Execute a single heartbeat tick. Returns detected anomalies.
     pub async fn tick(&self) -> Vec<String> {
-        let mut anomalies = Vec::new();
+        self.tick_with_results()
+            .await
+            .into_iter()
+            .filter(|r| r.status == "WARN")
+            .map(|r| format!("[{}] {}", r.name, r.detail))
+            .collect()
+    }
+
+    /// Execute checks and return structured rows for HEARTBEAT.md.
+    pub async fn tick_with_results(&self) -> Vec<CheapCheckResult> {
+        let mut results = Vec::new();
 
         for check in &self.checks {
+            let name = check.name().to_string();
             match check.evaluate().await {
                 Ok(Some(anomaly)) => {
-                    info!(check = check.name(), anomaly = %anomaly, "Anomaly detected");
-                    anomalies.push(format!("[{}] {}", check.name(), anomaly));
+                    info!(check = %name, anomaly = %anomaly, "Anomaly detected");
+                    results.push(CheapCheckResult {
+                        name,
+                        status: "WARN",
+                        detail: anomaly,
+                    });
                 }
                 Ok(None) => {
-                    debug!(check = check.name(), "Check passed");
+                    debug!(check = %name, "Check passed");
+                    results.push(CheapCheckResult {
+                        name,
+                        status: "OK",
+                        detail: String::new(),
+                    });
                 }
                 Err(e) => {
-                    warn!(check = check.name(), error = %e, "Check failed");
+                    warn!(check = %name, error = %e, "Check failed");
+                    results.push(CheapCheckResult {
+                        name,
+                        status: "ERR",
+                        detail: e.to_string(),
+                    });
                 }
             }
         }
 
-        anomalies
+        results
     }
 
     /// Run the heartbeat loop indefinitely. Calls `on_anomalies` when

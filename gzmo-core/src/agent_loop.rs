@@ -49,7 +49,7 @@ pub struct AgentMemoryContext {
 impl Default for AgentLoopConfig {
     fn default() -> Self {
         Self {
-            max_iterations: 10,
+            max_iterations: 40,
             verbose_tool_output: false,
             context: ContextConfig::default(),
             on_chunk: None,

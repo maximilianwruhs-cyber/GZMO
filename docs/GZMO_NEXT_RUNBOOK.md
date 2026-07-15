@@ -46,7 +46,7 @@ Assembly backends resolved instance=next distill="lab" dream="lab" spark="lab" o
 | Service | Endpoint | Required? |
 |---------|----------|-----------|
 | Prime LLM (llama.cpp) | `http://127.0.0.1:8000/v1` | Yes — spark run, verify-suite, calibration |
-| Librarian | `http://127.0.0.1:8083/v1` | No — distill falls back to heuristic |
+| Librarian (session extract) | `http://127.0.0.1:8000/v1` (Prime) | No — distill falls back to heuristic |
 | Embeddings / Qdrant / Redis / Neo4j | — | No — disabled in `gzmo-next.toml` for v1 |
 
 ## Canonical long-running process: `gzmo-scheduler`
@@ -111,6 +111,8 @@ daemon, or jobs would double-fire).
 
 ```bash
 gzmo assemble ops --live                 # health chain
+gzmo status                              # deterministic ecosystem snapshot (paths + probes)
+gzmo health                              # strict subsystem probes
 gzmo assemble cognition --live          # distill → gate → spark → recall (instance vault)
 gzmo assemble handoff --live --apply    # bench → fuse → gzmo-next-fused.toml on gate pass
 gzmo distill                            # distill data-next/sessions/ into the vault

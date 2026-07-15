@@ -121,3 +121,10 @@ args = ""
 type = "static"
 handler = "skill_help.sh"
 icon = "❓"
+
+[commands.status]
+description = "Grounded ecosystem snapshot (paths, systemd, probes — no LLM)"
+args = ""
+type = "static"
+handler = "skill_status.sh"
+icon = "📊"

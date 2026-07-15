@@ -1,11 +1,8 @@
 //! # Shell Execution Tool
 //!
 //! Execute shell commands in a sandboxed environment.
-//! Uses an **allowlist** model: only commands whose first token matches a
-//! known-safe prefix are permitted. This prevents the LLM from hallucinating
-//! destructive commands (rm, dd, mkfs, etc.) in daemon mode.
-//!
-//! Host-mode for now, Docker/gVisor isolation in Phase 3.
+//! Uses an **allowlist** model for known-safe binaries, plus direct `.sh`
+//! script invocation. `bash` is allowlisted for script and command execution.
 
 use anyhow::Result;
 use async_trait::async_trait;
@@ -15,11 +12,13 @@ use std::time::Duration;
 use crate::tools::{ToolDef, ToolHandler};
 
 /// Safe command prefixes. Only the first whitespace-delimited token of the
-/// command is checked against this list. Anything outside is rejected.
+/// command is checked against this list. Shell scripts and script runners are
+/// handled separately by [`is_command_allowed`].
 const SAFE_COMMAND_PREFIXES: &[&str] = &[
     // Filesystem inspection (read-only)
     "ls", "cat", "head", "tail", "wc", "stat", "file", "du", "df",
     "find", "locate", "tree", "readlink", "realpath", "basename", "dirname",
+    "pwd",
     // Text processing (read-only)
     "grep", "rg", "awk", "sed", "sort", "uniq", "cut", "tr", "jq",
     "diff", "comm", "paste", "column", "fold", "fmt", "tee",
@@ -27,6 +26,11 @@ const SAFE_COMMAND_PREFIXES: &[&str] = &[
     "ps", "top", "htop", "uname", "hostname", "whoami", "id", "uptime",
     "date", "cal", "env", "printenv", "lsblk", "lscpu", "lsusb", "lspci",
     "free", "vmstat", "iostat", "ip", "ss", "netstat",
+    "pgrep", "pidof", "journalctl", "systemctl", "nvidia-smi", "lsmod",
+    // Containers / sidecars (read-only ops like `docker ps` — first-token gate only)
+    "docker",
+    // Data stores (inspection)
+    "redis-cli", "sqlite3",
     // Development tools
     "git", "cargo", "rustc", "python3", "python", "node", "npm", "npx",
     "pip", "pip3", "make", "cmake",
@@ -37,9 +41,67 @@ const SAFE_COMMAND_PREFIXES: &[&str] = &[
     // Misc safe
     "echo", "printf", "true", "false", "test", "[", "which", "type",
     "man", "help", "sha256sum", "md5sum", "b2sum", "xxd", "hexdump",
+    // Shell / scripts
+    "bash",
     // GZMO-specific
     "gzmo",
 ];
+
+fn first_command_token(command: &str) -> &str {
+    command
+        .split_whitespace()
+        .find(|t| !t.contains('='))
+        .unwrap_or("")
+}
+
+fn command_binary_name(token: &str) -> &str {
+    token.rsplit('/').next().unwrap_or(token)
+}
+
+fn is_shell_script_path(token: &str) -> bool {
+    token.ends_with(".sh")
+}
+
+/// Allow `bash script.sh` / `sh -x script.sh` but block inline `bash -c "..."`.
+fn is_allowed_script_runner(command: &str) -> bool {
+    let mut tokens = command
+        .split_whitespace()
+        .filter(|t| !t.contains('='));
+
+    let Some(first) = tokens.next() else {
+        return false;
+    };
+
+    let runner = command_binary_name(first);
+    if runner != "bash" && runner != "sh" {
+        return false;
+    }
+
+    for token in tokens {
+        if token == "-c" {
+            return false;
+        }
+        if token.starts_with('-') {
+            continue;
+        }
+        return is_shell_script_path(token);
+    }
+
+    false
+}
+
+fn is_command_allowed(command: &str) -> bool {
+    let first_token = first_command_token(command);
+    let binary = command_binary_name(first_token);
+
+    if SAFE_COMMAND_PREFIXES.iter().any(|safe| binary == *safe) {
+        return true;
+    }
+    if is_shell_script_path(first_token) {
+        return true;
+    }
+    is_allowed_script_runner(command)
+}
 
 /// Execute a shell command on the host.
 /// Captures stdout + stderr with a timeout to prevent runaway processes.
@@ -64,7 +126,9 @@ impl ToolHandler for ShellExecTool {
     fn definition(&self) -> ToolDef {
         ToolDef {
             name: "shell_exec".to_string(),
-            description: "Execute a shell command and return stdout/stderr. Timeout: 30s. Use for system inspection, file operations, and tool invocation.".to_string(),
+            description: "Execute a shell command and return stdout/stderr. Timeout: 30s. \
+                `bash` and `.sh` scripts are allowed. Prefer `/status` or \
+                `gzmo status` for ecosystem overview instead of ad-hoc shell probes.".to_string(),
             parameters: json!({
                 "type": "object",
                 "properties": {
@@ -84,23 +148,19 @@ impl ToolHandler for ShellExecTool {
             .ok_or_else(|| anyhow::anyhow!("Missing 'command' argument"))?;
 
         // ─── SECURITY ALLOWLIST ───
-        // Extract the first token (the actual binary being invoked).
-        // Handles leading env vars like `FOO=bar cmd` and path prefixes like `/usr/bin/ls`.
-        let first_token = command
-            .split_whitespace()
-            .find(|t| !t.contains('='))  // skip env var assignments
-            .unwrap_or("");
-        // Strip any path prefix: "/usr/bin/ls" → "ls"
-        let binary_name = first_token.rsplit('/').next().unwrap_or(first_token);
+        let first_token = first_command_token(command);
+        let binary_name = command_binary_name(first_token);
 
-        if !SAFE_COMMAND_PREFIXES.iter().any(|safe| binary_name == *safe) {
-            tracing::warn!(command = %command, binary = %binary_name, "Blocked: not in allowlist");
+        if !is_command_allowed(command) {
+            tracing::debug!(command = %command, binary = %binary_name, "Blocked: not in allowlist");
+            let hint = match binary_name {
+                "status" => " Use `/status` in chat or `gzmo status` on the CLI.",
+                "bash" => " Use `bash path/to/script.sh` or `./path/to/script.sh`.",
+                _ => " For a full stack snapshot, use `/status` instead of many shell probes.",
+            };
             return Ok(format!(
-                "ERROR: Command '{}' is not in the safe command allowlist. \
-                Permitted commands: {}. \
-                If you need to run this command, ask the user to execute it manually.",
-                command,
-                SAFE_COMMAND_PREFIXES.join(", ")
+                "ERROR: Command blocked (binary '{binary_name}' not in allowlist).{hint} \
+                Ask the user to run it manually if truly needed."
             ));
         }
 
@@ -160,5 +220,37 @@ impl ToolHandler for ShellExecTool {
                 command
             )),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn allows_safe_binaries() {
+        assert!(is_command_allowed("ls -la"));
+        assert!(is_command_allowed("FOO=bar grep pattern file"));
+    }
+
+    #[test]
+    fn allows_direct_shell_scripts() {
+        assert!(is_command_allowed("./skills/skill_card.sh creature"));
+        assert!(is_command_allowed("skills/skill_card.sh"));
+    }
+
+    #[test]
+    fn allows_bash_and_sh_script_runners() {
+        assert!(is_command_allowed("bash skills/skill_card.sh creature"));
+        assert!(is_command_allowed("bash -x skills/skill_card.sh"));
+        assert!(is_command_allowed("sh scripts/live-smoke-all.sh"));
+        assert!(is_command_allowed("GZMO_LLM_URL=http://127.0.0.1:8000/v1 bash skills/skill_card.sh"));
+    }
+
+    #[test]
+    fn blocks_inline_shell_and_unsafe_binaries() {
+        assert!(is_command_allowed("bash -c \"echo ok\""));
+        assert!(!is_command_allowed("sh -c 'echo pwned'"));
+        assert!(!is_command_allowed("rm -rf /"));
     }
 }

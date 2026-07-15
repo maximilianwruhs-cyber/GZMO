@@ -583,29 +583,39 @@ impl SqliteVault {
         }
 
         if let Some(embedder) = &self.embedder {
-            let emb = embedder.embed(q).await?;
-            let mut qdrant_ids = Vec::new();
-            if let Some(qdrant) = &self.qdrant {
-                if let Ok(ids) = qdrant.search_ids(&emb, PREFETCH_K).await {
-                    qdrant_ids = ids;
+            match embedder.embed(q).await {
+                Ok(emb) if !emb.is_empty() => {
+                    let mut qdrant_ids = Vec::new();
+                    if let Some(qdrant) = &self.qdrant {
+                        if let Ok(ids) = qdrant.search_ids(&emb, PREFETCH_K).await {
+                            qdrant_ids = ids;
+                        }
+                    }
+                    let scored = self.search_with_decay(&emb, q, PREFETCH_K)?;
+                    for (fact, _) in &scored {
+                        let sf = self.honeypot_source_file(fact.id)?;
+                        candidates.entry(fact.id).or_insert(RecallCandidate {
+                            fact: fact.clone(),
+                            source_file: sf,
+                        });
+                    }
+                    let local_ids: Vec<Uuid> = scored.into_iter().map(|(f, _)| f.id).collect();
+                    let vector_ids = merge_interleaved_rank(&qdrant_ids, &local_ids, PREFETCH_K);
+                    if !vector_ids.is_empty() {
+                        rank_lists.push(vector_ids);
+                    }
+                    let evidence_vector_ids =
+                        self.honeypot_evidence_vector_stream(&emb, container_tag, PREFETCH_K)?;
+                    if !evidence_vector_ids.is_empty() {
+                        rank_lists.push(evidence_vector_ids);
+                    }
                 }
-            }
-            let scored = self.search_with_decay(&emb, q, PREFETCH_K)?;
-            for (fact, _) in &scored {
-                let sf = self.honeypot_source_file(fact.id)?;
-                candidates.entry(fact.id).or_insert(RecallCandidate {
-                    fact: fact.clone(),
-                    source_file: sf,
-                });
-            }
-            let local_ids: Vec<Uuid> = scored.into_iter().map(|(f, _)| f.id).collect();
-            let vector_ids = merge_interleaved_rank(&qdrant_ids, &local_ids, PREFETCH_K);
-            if !vector_ids.is_empty() {
-                rank_lists.push(vector_ids);
-            }
-            let evidence_vector_ids = self.honeypot_evidence_vector_stream(&emb, container_tag, PREFETCH_K)?;
-            if !evidence_vector_ids.is_empty() {
-                rank_lists.push(evidence_vector_ids);
+                Ok(_) => {
+                    tracing::warn!(query = %q, "empty embedding — FTS-only recall");
+                }
+                Err(e) => {
+                    tracing::warn!(error = %e, query = %q, "embed failed — FTS-only recall");
+                }
             }
         }
 
@@ -652,8 +662,13 @@ impl SqliteVault {
 
     async fn search_recall_legacy(&self, query: &str, limit: usize) -> Result<Vec<(SemanticFact, f64)>> {
         if let Some(embedder) = &self.embedder {
-            let emb = embedder.embed(query).await?;
-            return self.search_with_decay_reranked(&emb, query, limit).await;
+            match embedder.embed(query).await {
+                Ok(emb) if !emb.is_empty() => {
+                    return self.search_with_decay_reranked(&emb, query, limit).await;
+                }
+                Ok(_) => tracing::warn!(query = %query, "empty embedding — keyword recall"),
+                Err(e) => tracing::warn!(error = %e, query = %query, "embed failed — keyword recall"),
+            }
         }
         let prefetch = self
             .reranker

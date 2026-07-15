@@ -12,12 +12,27 @@ mod spawn;
 use anyhow::{bail, Context, Result};
 use chrono::{NaiveDate, Utc};
 use config::SchedulerConfig;
+use std::collections::HashSet;
 use std::io::Write;
 use std::path::PathBuf;
 use std::time::Duration;
 use tracing::{error, info};
 
 const PID_FILE: &str = "/tmp/gzmo-scheduler.pid";
+
+async fn run_gzmo_job(job: &'static str, script: &'static str, args: Vec<String>) -> bool {
+    info!(job, script, "job starting");
+    match spawn::run_gzmo_script(script, &args).await {
+        Ok(()) => {
+            info!(job, script, exit = 0, "job complete");
+            true
+        }
+        Err(e) => {
+            error!(job, script, "job failed: {e}");
+            false
+        }
+    }
+}
 
 async fn run_job(job: &'static str, script: &'static str, args: Vec<String>) -> bool {
     info!(job, script, "job starting");
@@ -89,8 +104,9 @@ async fn run_loop(cfg: &SchedulerConfig, config_path: &std::path::Path) -> Resul
 
     let mut last_dream: Option<NaiveDate> = None;
     let mut last_distill: Option<NaiveDate> = None;
+    let mut last_qdrant_sync: Option<NaiveDate> = None;
     let mut last_handoff: Option<NaiveDate> = None;
-    let mut last_spark: Option<(u32, u32, NaiveDate)> = None;
+    let mut last_spark: HashSet<(u32, u32, NaiveDate)> = HashSet::new();
 
     let mut interval = tokio::time::interval(Duration::from_secs(60));
     loop {
@@ -122,13 +138,27 @@ async fn run_loop(cfg: &SchedulerConfig, config_path: &std::path::Path) -> Resul
             }
         }
 
+        if cfg.qdrant.enabled
+            && cfg.qdrant.sync_enabled
+            && cron::cron_due_today(
+                &now,
+                cfg.qdrant.sync_cron_hour,
+                cfg.qdrant.sync_cron_minute,
+                last_qdrant_sync,
+            )
+        {
+            if run_gzmo_job("qdrant_sync", jobs::qdrant_sync_script(), vec![]).await {
+                last_qdrant_sync = Some(today);
+            }
+        }
+
         if cfg.spark.enabled {
             if let Some((h, m)) =
-                cron::cron_slot_due(&now, &cfg.spark.cron_hours, cfg.spark.cron_minute, last_spark)
+                cron::cron_slot_due(&now, &cfg.spark.cron_hours, cfg.spark.cron_minute, &last_spark)
             {
                 let (script, args) = jobs::spark_args(cfg);
                 if run_job("spark", script, args).await {
-                    last_spark = Some((h, m, today));
+                    last_spark.insert((h, m, today));
                 }
             }
         }

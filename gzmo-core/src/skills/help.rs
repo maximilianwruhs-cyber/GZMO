@@ -36,6 +36,8 @@ impl Skill for HelpSkill {
         // Built-in commands
         let builtins = [
             ("/quit",    "Exit GZMO (auto-saves session)"),
+            ("/status",  "Ecosystem snapshot (paths, systemd, probes — no LLM)"),
+            ("/ecosystem","Alias for /status"),
             ("/clear",   "Clear conversation history"),
             ("/chaos",   "Display chaos engine state dashboard"),
             ("/stabilize","Stabilize attractor parameter (decreases rho)"),

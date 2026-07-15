@@ -22,6 +22,7 @@ pub mod poker;
 pub mod quote;
 pub mod calculate;
 pub mod help;
+pub mod status;
 pub mod visual;
 
 /// The type of skill — affects display and feedback behavior.

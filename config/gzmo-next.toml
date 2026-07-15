@@ -21,7 +21,7 @@
 # so ../data-next/... resolves to GZMO/data-next/ wherever the clone lives.
 
 [identity]
-soul_path = "../SOUL.md"
+soul_path = "SOUL-next.md"
 
 [memory]
 directory = "../data-next/memory"
@@ -56,7 +56,7 @@ verify = true
 min_confidence = 0.85
 verify_temperature = 0.1
 require_evidence = true
-strict_kg = false        # no Neo4j sidecar on the workstation instance
+strict_kg = true        # local Neo4j sidecar via Docker
 cron_hour = 1
 cron_minute = 0
 chunk_chars = 28000
@@ -66,8 +66,8 @@ honeypot_rem_enabled = true
 [session_distill]
 enabled = true
 sessions_dir = "../data-next/sessions"
-use_librarian = false    # workstation v1: heuristic fallback is acceptable
-librarian_summary = false
+use_librarian = true
+librarian_summary = true
 daemon_scheduled = true
 cron_hour = 2
 cron_minute = 15
@@ -89,23 +89,43 @@ enabled = false          # workstation v1: no knowledge-folder watcher
 [health]
 strict_startup = false
 
-# Workstation-local only: no VM200/LXC101 sidecars for the next instance.
+# Workstation-local Qdrant/Redis/Prime; VM200 for embed/rerank only.
 [embeddings]
-enabled = false
+enabled = true
+url = "http://192.168.31.110:8081/v1"
+model = "gzmo-embed"
+api_key = ""
 
 [qdrant]
-enabled = false
-sync_enabled = false
+enabled = true
+url = "http://127.0.0.1:6333"
+collection = "honeypot"
+sync_enabled = true
+sync_cron_hour = 1
+sync_cron_minute = 45
 
 [librarian]
-enabled = false
+enabled = true
+url = "http://localhost:8000/v1"
+model = "/home/gzmo/models/ornith-35b-GGUF/ornith-35b-Q4_K_M.gguf"
+api_key = ""
 
 [rerank]
-enabled = false
+enabled = true
+url = "http://192.168.31.110:8081/v1"
+model = "gzmo-rerank"
+api_key = ""
+prefetch_multiplier = 4
 
 # ─────────────────────────────────────────────────────────────────────────
 # Engine — workstation Prime (llama.cpp :8000)
+# Calibrated 2026-07-14: merged from gzmo-next-fused.toml (gate 1.0, beat-gate PASS).
+# RAPL routing omitted (fits_budget=false). See sibling *-fused.toml for full snapshot.
 # ─────────────────────────────────────────────────────────────────────────
+
+[inference.defaults]
+temperature = 0.70
+top_p = 0.95
 
 [engine]
 active_mode = "local"
@@ -115,21 +135,28 @@ provider = "local"
 url = "http://localhost:8000/v1"
 model = "/home/gzmo/models/ornith-35b-GGUF/ornith-35b-Q4_K_M.gguf"
 api_key = ""
-temperature = 0.3
+temperature = 0.70
 top_p = 0.95
 max_tokens = 24576
 
+[chaos]
+bpm_default = 120
+dt_lorenz = 0.5
+
 [agent]
-max_tool_iterations = 10
+max_tool_iterations = 40
 heartbeat_interval_secs = 1800
+
+[subagent]
+max_concurrent = 5
 
 # ─────────────────────────────────────────────────────────────────────────
 # Scratch / queues — file fallback, isolated key prefix
 # ─────────────────────────────────────────────────────────────────────────
 
 [redis]
-enabled = false          # file queue below; flip on with gzmo-next:* keys if wanted
-url = "redis://192.168.31.202:6379"
+enabled = true
+url = "redis://127.0.0.1:6379"
 distill_queue = "gzmo-next:distill:pending"
 distill_fallback_dir = "../data-next/distill-queue"
 
@@ -139,7 +166,7 @@ response_reserve = 0.10
 scratch_max_tokens = 2000
 context_length = 131072
 
-# Everything on Prime — no librarian on this instance.
+# Cognition on Prime (:8000) — librarian extract uses the same endpoint as local engine.
 [routing]
 default_engine = "local"
 
@@ -153,3 +180,18 @@ ingest_verify = "local"
 distill_extract = "local"
 distill_verify = "local"
 distill_summary = "local"
+
+# ─────────────────────────────────────────────────────────────────────────
+# MCP — local Neo4j (Docker sidecar on workstation)
+# ─────────────────────────────────────────────────────────────────────────
+
+[[mcp_servers]]
+name = "memory"
+command = "/home/gzmo/.local/bin/uvx"
+args = ["--from", "/home/gzmo/github-clone/mcp-neo4j-memory-gzmo", "mcp-neo4j-memory"]
+
+[mcp_servers.env]
+NEO4J_URL = "bolt://127.0.0.1:7687"
+NEO4J_USERNAME = "neo4j"
+NEO4J_PASSWORD = "gzmo-next-local-0815"
+NEO4J_DATABASE = "neo4j"

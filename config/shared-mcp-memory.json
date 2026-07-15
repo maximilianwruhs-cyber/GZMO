@@ -1,8 +1,8 @@
 {
   "mcpServers": {
     "memory": {
-      "command": "/home/maximilian-wruhs/.local/bin/uvx",
-      "args": ["mcp-neo4j-memory@0.4.5"],
+      "command": "/home/gzmo/.local/bin/uvx",
+      "args": ["--from", "/home/gzmo/github-clone/mcp-neo4j-memory-gzmo", "mcp-neo4j-memory"],
       "env": {
         "NEO4J_URL": "bolt://192.168.31.202:7687",
         "NEO4J_USERNAME": "neo4j",
@@ -11,10 +11,10 @@
       }
     },
     "gzmo-memory": {
-      "command": "/home/maximilian-wruhs/Projects/_foundation-audit/survey_GZMO/target/release/gzmo",
+      "command": "/home/gzmo/github-clone/GZMO/target/release/gzmo",
       "args": ["mcp-serve"],
       "env": {
-        "GZMO_CONFIG": "/home/maximilian-wruhs/Projects/_foundation-audit/survey_GZMO/gzmo.toml"
+        "GZMO_CONFIG": "/home/gzmo/github-clone/GZMO/gzmo.toml"
       }
     }
   }

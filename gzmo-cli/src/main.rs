@@ -9,6 +9,7 @@ mod cli_mcp;
 mod daemon_cmd;
 mod dream_cmd;
 mod spark_cmd;
+mod status_cmd;
 mod ingest_cmd;
 mod ingest_dir_cmd;
 mod health_cmd;
@@ -46,6 +47,7 @@ enum Command {
     Memory(Vec<String>),
     Distill(Option<String>),
     Health,
+    Status,
     Profile(Vec<String>),
     McpServe,
     /// Knowledge Gardener ops over the wiki/ layer (sync|lint|search|file-back|status).
@@ -113,6 +115,7 @@ fn parse_args() -> Command {
             return Command::Distill(id);
         }
         if args[1] == "health" { return Command::Health; }
+        if args[1] == "status" { return Command::Status; }
         if args[1] == "wiki" { return Command::Wiki(args[2..].to_vec()); }
         if args[1] == "mcp-serve" { return Command::McpServe; }
         if args[1] == "profile" {
@@ -153,6 +156,7 @@ async fn main() -> Result<()> {
         Command::Memory(_) => "warn",
         Command::Distill(_) => "info",
         Command::Health => "warn",
+        Command::Status => "warn",
         Command::Profile(_) => "warn",
         Command::McpServe => "warn",
         Command::Wiki(_) => "info",
@@ -230,6 +234,7 @@ async fn main() -> Result<()> {
         Command::Memory(sub) => memory_cmd::run(&config, sub).await,
         Command::Distill(session_id) => distill_cmd::run(&config, &identity, session_id).await,
         Command::Health => health_cmd::run(&config, identity).await,
+        Command::Status => status_cmd::run(&config, &identity).await,
         Command::Profile(args) => profile_cmd::run(&config, &args).await,
         Command::McpServe => mcp_serve_cmd::run(&config).await,
         Command::Wiki(args) => wiki_cmd::run(&config, args).await,

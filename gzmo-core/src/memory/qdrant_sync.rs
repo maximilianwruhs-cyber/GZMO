@@ -68,6 +68,31 @@ pub async fn sync_vault_to_qdrant(project_root: &Path, cfg: &QdrantConfig, vault
         anyhow::bail!("sync-vault-to-qdrant exited with {}", output.status);
     }
 
+    let verify = project_root.join("scripts/qdrant-post-sync-verify.sh");
+    if verify.is_file() {
+        let verify_out = tokio::process::Command::new("bash")
+            .arg(&verify)
+            .arg("--gzmo-root")
+            .arg(project_root)
+            .current_dir(project_root)
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .output()
+            .await
+            .with_context(|| format!("spawn {}", verify.display()))?;
+        for line in String::from_utf8_lossy(&verify_out.stdout)
+            .lines()
+            .chain(String::from_utf8_lossy(&verify_out.stderr).lines())
+        {
+            if !line.is_empty() {
+                info!(line = %line, "qdrant-post-sync-verify");
+            }
+        }
+        if !verify_out.status.success() {
+            warn!("Qdrant post-sync sample verify failed");
+        }
+    }
+
     Ok(())
 }
 

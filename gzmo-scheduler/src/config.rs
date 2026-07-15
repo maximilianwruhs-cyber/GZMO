@@ -20,6 +20,8 @@ pub struct SchedulerConfig {
     #[serde(default)]
     pub spark: SparkSection,
     #[serde(default)]
+    pub qdrant: QdrantSection,
+    #[serde(default)]
     pub assembly: AssemblySection,
 }
 
@@ -65,6 +67,36 @@ pub struct SparkSection {
     pub cron_hours: Vec<u32>,
     #[serde(default = "default_spark_minute")]
     pub cron_minute: u32,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct QdrantSection {
+    #[serde(default = "default_true")]
+    pub enabled: bool,
+    #[serde(default = "default_true")]
+    pub sync_enabled: bool,
+    #[serde(default = "default_qdrant_sync_hour")]
+    pub sync_cron_hour: u32,
+    #[serde(default = "default_qdrant_sync_minute")]
+    pub sync_cron_minute: u32,
+}
+
+impl Default for QdrantSection {
+    fn default() -> Self {
+        Self {
+            enabled: true,
+            sync_enabled: true,
+            sync_cron_hour: default_qdrant_sync_hour(),
+            sync_cron_minute: default_qdrant_sync_minute(),
+        }
+    }
+}
+
+fn default_qdrant_sync_hour() -> u32 {
+    1
+}
+fn default_qdrant_sync_minute() -> u32 {
+    45
 }
 
 #[derive(Debug, Default, Deserialize)]

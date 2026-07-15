@@ -9,9 +9,10 @@ use tracing::{error, info};
 
 use gzmo_core::config::GzmoConfig;
 use gzmo_core::daemon::{
-    cron_due_today, cron_minutes, spark_cron_slot_due, FileChangeCheck, HeartbeatEngine,
-    HealthPing,
+    cron_due_today, cron_minutes, spark_cron_slot_due, write_cheapcheck_section, CognitionBlackoutCheck,
+    EmbedHealthPing, FileChangeCheck, HeartbeatEngine, HealthPing,
 };
+use gzmo_core::config::EngineMode;
 use gzmo_core::dreams::DreamEngine;
 use gzmo_core::dreams_md::write_dream_narrative;
 use gzmo_core::ingest::IngestEngine;
@@ -20,7 +21,7 @@ use gzmo_core::wiki::WikiEngine;
 use gzmo_core::gateway::LlmGateway;
 use gzmo_core::gateway::GatewayRouter;
 use gzmo_core::config::TaskKind;
-use gzmo_core::synapse::set_event_source;
+use gzmo_core::synapse::{append_cognition_schedule, set_event_source};
 use gzmo_core::identity::IdentityEngine;
 use gzmo_core::memory::episodic::FileEpisodicStore;
 use gzmo_core::config::SparkScheduleMode;
@@ -94,10 +95,36 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
         watch_dir: config.memory.directory.to_string_lossy().to_string(),
         since: Duration::from_secs(config.agent.heartbeat_interval_secs),
     });
+    let active = config.engine.active_engine();
     heartbeat.add_check(HealthPing {
-        url: format!("{}/models", config.engine.active_engine().url),
-        service_name: "LLM Engine".to_string(),
+        url: format!("{}/models", active.url.trim_end_matches('/')),
+        service_name: if config.engine.active_mode == EngineMode::Cloud {
+            "Cloud LLM".to_string()
+        } else {
+            "LLM Engine".to_string()
+        },
     });
+    let prime = config.engine.active_engine_for_mode(EngineMode::Local);
+    heartbeat.add_check(HealthPing {
+        url: format!("{}/models", prime.url.trim_end_matches('/')),
+        service_name: "Prime Fallback".to_string(),
+    });
+    let cloud = config.engine.active_engine_for_mode(EngineMode::Cloud);
+    heartbeat.add_check(CognitionBlackoutCheck {
+        cloud_models_url: format!("{}/models", cloud.url.trim_end_matches('/')),
+        cloud_api_key: cloud.api_key.clone(),
+        prime_models_url: format!("{}/models", prime.url.trim_end_matches('/')),
+        prime_api_key: prime.api_key.clone(),
+        cloud_primary: config.engine.active_mode == EngineMode::Cloud,
+    });
+    if config.embeddings.enabled {
+        heartbeat.add_check(EmbedHealthPing {
+            url: config.embeddings.url.clone(),
+            model: config.embeddings.model.clone(),
+            api_key: config.embeddings.api_key.clone(),
+            expected_dims: 1024,
+        });
+    }
 
     // Gateway + Tools for dream cycle — use Obolus GatewayRouter
     let router = GatewayRouter::new(config);
@@ -160,6 +187,19 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
         }
     }
     dream_mcp.register_all_tools(&mut dream_tools);
+    let mcp_manager = Arc::new(tokio::sync::Mutex::new(dream_mcp));
+    let mcp_watch = Arc::clone(&mcp_manager);
+    tokio::spawn(async move {
+        let mut interval = tokio::time::interval(Duration::from_secs(300));
+        loop {
+            interval.tick().await;
+            let mut mgr = mcp_watch.lock().await;
+            if let Err(e) = mgr.ensure_healthy().await {
+                tracing::warn!(error = %e, "MCP watchdog reconnect failed");
+            }
+        }
+    });
+    let _mcp_keepalive = mcp_manager;
     let dream_tools = Arc::new(dream_tools);
 
     // Initialize Synapse event bus (append-only observability)
@@ -263,11 +303,12 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
         chaos_pulse.snapshot_rx.clone(),
         gateway_rwlock,
         chaos_pulse.feedback_tx.clone(),
-        state_dir,
+        state_dir.clone(),
         None,
         Some(Arc::clone(&synapse)),
         gzmo_core::synapse::EventSource::GzmoDaemon,
         chaos_runtime.restore_policy.clone(),
+        false,
     );
 
     info!("All subsystems online — entering daemon loop");
@@ -308,15 +349,33 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
         error!("Watchers failed: {e}");
     }
 
-    // Heartbeat task
+    // Heartbeat task — writes CheapCheck rows into HEARTBEAT.md
+    let hb_dir = state_dir.join("HEARTBEAT.md");
     let heartbeat_handle = tokio::spawn(async move {
-        heartbeat.run(|anomalies| async move {
-            info!(count = anomalies.len(), "Heartbeat triggered");
-            for a in &anomalies { info!(anomaly = %a); }
-        }).await
+        let mut interval = tokio::time::interval(heartbeat.interval);
+        loop {
+            interval.tick().await;
+            info!("Heartbeat tick");
+            let results = heartbeat.tick_with_results().await;
+            if let Err(e) = write_cheapcheck_section(&hb_dir, &results).await {
+                error!("Failed to write HEARTBEAT CheapCheck section: {e}");
+            }
+            let anomalies: Vec<String> = results
+                .iter()
+                .filter(|r| r.status == "WARN")
+                .map(|r| format!("[{}] {}", r.name, r.detail))
+                .collect();
+            if !anomalies.is_empty() {
+                info!(count = anomalies.len(), "Heartbeat anomalies");
+                for a in &anomalies {
+                    info!(anomaly = %a);
+                }
+            }
+        }
     });
 
     // Dream cycle task (DreamEngine — replaces headless auto_dream orchestrator job)
+    let synapse_dream = Arc::clone(&synapse);
     let dream_handle = tokio::spawn(async move {
         let mut interval = tokio::time::interval(Duration::from_secs(60));
         let mut last_consolidated: Option<NaiveDate> = None;
@@ -335,6 +394,12 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
                 continue;
             }
             info!(date = %yesterday, assembly_backend = dream_backend.label(), "Dream consolidation starting");
+            append_cognition_schedule(
+                synapse_dream.as_ref(),
+                "dream",
+                "tick",
+                serde_json::json!({ "date": yesterday.to_string() }),
+            );
             if dream_backend.is_lab() {
                 // Lab recipe: session-distill → neural-finesse → DREAMS.md
                 let args = vec![
@@ -345,15 +410,38 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
                 match run_lab_script_blocking("session-to-dream.sh", args).await {
                     Ok(()) => {
                         last_consolidated = Some(yesterday);
+                        append_cognition_schedule(
+                            synapse_dream.as_ref(),
+                            "dream",
+                            "complete",
+                            serde_json::json!({ "mode": "lab" }),
+                        );
                         info!("Dream cycle complete (lab recipe)");
                     }
-                    Err(e) => error!("Dream lab recipe failed: {e}"),
+                    Err(e) => {
+                        append_cognition_schedule(
+                            synapse_dream.as_ref(),
+                            "dream",
+                            "fail",
+                            serde_json::json!({ "error": e.to_string() }),
+                        );
+                        error!("Dream lab recipe failed: {e}");
+                    }
                 }
                 continue;
             }
             match dream_engine_clone.consolidate(yesterday).await {
                 Ok(report) => {
                     last_consolidated = Some(yesterday);
+                    append_cognition_schedule(
+                        synapse_dream.as_ref(),
+                        "dream",
+                        "complete",
+                        serde_json::json!({
+                            "entities": report.entities_extracted,
+                            "kg_relations": report.kg_relations_written,
+                        }),
+                    );
                     info!(
                         entities = report.entities_extracted,
                         kg_relations = report.kg_relations_written,
@@ -363,7 +451,15 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
                         error!("Failed to write DREAMS.md: {e}");
                     }
                 }
-                Err(e) => error!("Dream failed: {e}"),
+                Err(e) => {
+                    append_cognition_schedule(
+                        synapse_dream.as_ref(),
+                        "dream",
+                        "fail",
+                        serde_json::json!({ "error": e.to_string() }),
+                    );
+                    error!("Dream failed: {e}");
+                }
             }
         }
     });
@@ -376,6 +472,7 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
         .and_then(|v| v.as_float())
         .map(|f| (f * 1_000_000.0) as u64)
         .unwrap_or(506);
+    let synapse_spark = Arc::clone(&synapse);
     let spark_handle = tokio::spawn(async move {
         let mut interval = tokio::time::interval(Duration::from_secs(60));
         let mut last_run_key: Option<(u32, u32, NaiveDate)> = None;
@@ -416,6 +513,12 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
             };
 
             info!(date = %today, mode = ?spark_config.schedule_mode, hour = slot_hour, minute = slot_minute, assembly_backend = spark_backend.label(), "Spark cycle starting");
+            append_cognition_schedule(
+                synapse_spark.as_ref(),
+                "spark",
+                "tick",
+                serde_json::json!({ "hour": slot_hour, "minute": slot_minute }),
+            );
             if spark_backend.is_lab() {
                 // Lab recipe: cognition chain (distill → gate → spark-link → recall)
                 let args = vec![
@@ -431,9 +534,23 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
                         } else {
                             next_dice_run = None;
                         }
+                        append_cognition_schedule(
+                            synapse_spark.as_ref(),
+                            "spark",
+                            "complete",
+                            serde_json::json!({ "mode": "lab" }),
+                        );
                         info!("Spark cycle complete (lab recipe)");
                     }
-                    Err(e) => error!("Spark lab recipe failed: {e}"),
+                    Err(e) => {
+                        append_cognition_schedule(
+                            synapse_spark.as_ref(),
+                            "spark",
+                            "fail",
+                            serde_json::json!({ "error": e.to_string() }),
+                        );
+                        error!("Spark lab recipe failed: {e}");
+                    }
                 }
                 continue;
             }
@@ -447,6 +564,15 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
                     if let Err(e) = append_spark_to_dreams(&dreams_path_spark, &report.section).await {
                         error!("Failed to append spark to DREAMS.md: {e}");
                     } else {
+                        append_cognition_schedule(
+                            synapse_spark.as_ref(),
+                            "spark",
+                            "complete",
+                            serde_json::json!({
+                                "promoted": report.promoted,
+                                "kg_relations": report.kg_relations_written,
+                            }),
+                        );
                         info!(
                             promoted = report.promoted,
                             kg = report.kg_relations_written,
@@ -454,7 +580,15 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
                         );
                     }
                 }
-                Err(e) => error!("Spark failed: {e}"),
+                Err(e) => {
+                    append_cognition_schedule(
+                        synapse_spark.as_ref(),
+                        "spark",
+                        "fail",
+                        serde_json::json!({ "error": e.to_string() }),
+                    );
+                    error!("Spark failed: {e}");
+                }
             }
         }
     });
@@ -463,6 +597,7 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
     let qdrant_cfg = config.qdrant.clone();
     let vault_db_path = config.memory.vault_db.clone();
     let project_root = qdrant_sync::discover_project_root();
+    let synapse_qdrant = Arc::clone(&synapse);
     let qdrant_handle = tokio::spawn(async move {
         let mut interval = tokio::time::interval(Duration::from_secs(60));
         let mut last_sync_date: Option<NaiveDate> = None;
@@ -482,10 +617,31 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
             }
             let today = now.date_naive();
             info!(hour = qdrant_cfg.sync_cron_hour, minute = qdrant_cfg.sync_cron_minute, "Qdrant vault sync starting");
+            append_cognition_schedule(
+                synapse_qdrant.as_ref(),
+                "qdrant_sync",
+                "tick",
+                serde_json::json!({
+                    "cron_hour": qdrant_cfg.sync_cron_hour,
+                    "cron_minute": qdrant_cfg.sync_cron_minute,
+                }),
+            );
             if let Err(e) = sync_vault_to_qdrant(&project_root, &qdrant_cfg, &vault_db_path).await {
+                append_cognition_schedule(
+                    synapse_qdrant.as_ref(),
+                    "qdrant_sync",
+                    "fail",
+                    serde_json::json!({ "error": e.to_string() }),
+                );
                 error!("Qdrant vault sync failed: {e}");
             } else {
                 last_sync_date = Some(today);
+                append_cognition_schedule(
+                    synapse_qdrant.as_ref(),
+                    "qdrant_sync",
+                    "complete",
+                    serde_json::Value::Null,
+                );
                 info!("Qdrant vault sync complete");
             }
         }
@@ -493,6 +649,7 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
 
     let sd_config = config.session_distill.clone();
     let distill_root = qdrant_sync::discover_project_root();
+    let synapse_distill = Arc::clone(&synapse);
     let distill_handle = tokio::spawn(async move {
         let mut interval = tokio::time::interval(Duration::from_secs(60));
         let mut last_distill_date: Option<NaiveDate> = None;
@@ -524,6 +681,15 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
                 assembly_backend = distill_backend.label(),
                 "Session distill starting"
             );
+            append_cognition_schedule(
+                synapse_distill.as_ref(),
+                "session_distill",
+                "tick",
+                serde_json::json!({
+                    "cron_hour": sd_config.cron_hour,
+                    "cron_minute": sd_config.cron_minute,
+                }),
+            );
             if distill_backend.is_lab() {
                 // Lab recipe: synapse session_end → session-distill handoff
                 match run_lab_script_blocking(
@@ -534,9 +700,23 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
                 {
                     Ok(()) => {
                         last_distill_date = Some(today);
+                        append_cognition_schedule(
+                            synapse_distill.as_ref(),
+                            "session_distill",
+                            "complete",
+                            serde_json::json!({ "mode": "lab" }),
+                        );
                         info!("Session distill complete (lab recipe)");
                     }
-                    Err(e) => error!("Session distill lab recipe failed: {e}"),
+                    Err(e) => {
+                        append_cognition_schedule(
+                            synapse_distill.as_ref(),
+                            "session_distill",
+                            "fail",
+                            serde_json::json!({ "error": e.to_string() }),
+                        );
+                        error!("Session distill lab recipe failed: {e}");
+                    }
                 }
                 continue;
             }
@@ -549,9 +729,24 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
                 Ok(out) if out.status.success() => {
                     last_distill_date = Some(today);
                     let summary = String::from_utf8_lossy(&out.stdout);
+                    append_cognition_schedule(
+                        synapse_distill.as_ref(),
+                        "session_distill",
+                        "complete",
+                        serde_json::json!({ "summary": summary.trim() }),
+                    );
                     info!(summary = %summary.trim(), "Session distill complete");
                 }
                 Ok(out) => {
+                    append_cognition_schedule(
+                        synapse_distill.as_ref(),
+                        "session_distill",
+                        "fail",
+                        serde_json::json!({
+                            "code": out.status.code(),
+                            "stderr": String::from_utf8_lossy(&out.stderr).trim(),
+                        }),
+                    );
                     error!(
                         code = ?out.status.code(),
                         stderr = %String::from_utf8_lossy(&out.stderr).trim(),
@@ -568,6 +763,7 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
     let synapse_episodic = FileEpisodicStore::new(&config.memory.directory);
     let synapse_root = qdrant_sync::discover_project_root();
     let synapse_scratch = Arc::clone(&scratch);
+    let synapse_pull_bus = Arc::clone(&synapse);
     let synapse_handle = tokio::spawn(async move {
         let mut interval = tokio::time::interval(Duration::from_secs(60));
         let mut last_pull_date: Option<NaiveDate> = None;
@@ -589,6 +785,12 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
             }
             let today = now.date_naive();
             info!("Synapse pull starting (read-only)");
+            append_cognition_schedule(
+                synapse_pull_bus.as_ref(),
+                "synapse_pull",
+                "tick",
+                serde_json::Value::Null,
+            );
             match gzmo_core::synapse_reader::pull_and_log_episodic(
                 &bus_path,
                 &state_path,
@@ -600,6 +802,17 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
             {
                 Ok(summary) => {
                     last_pull_date = Some(today);
+                    append_cognition_schedule(
+                        synapse_pull_bus.as_ref(),
+                        "synapse_pull",
+                        "complete",
+                        serde_json::json!({
+                            "events": summary.events_read,
+                            "quest": summary.quest_complete,
+                            "session_end": summary.session_end,
+                            "distill_enqueued": summary.distill_enqueued,
+                        }),
+                    );
                     info!(
                         events = summary.events_read,
                         quest = summary.quest_complete,
@@ -608,7 +821,15 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
                         "Synapse pull complete"
                     );
                 }
-                Err(e) => error!("Synapse pull failed: {e}"),
+                Err(e) => {
+                    append_cognition_schedule(
+                        synapse_pull_bus.as_ref(),
+                        "synapse_pull",
+                        "fail",
+                        serde_json::json!({ "error": e.to_string() }),
+                    );
+                    error!("Synapse pull failed: {e}");
+                }
             }
         }
     });
@@ -616,6 +837,7 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
     // KG reconcile — canonicalize shared Neo4j ontology via MCP memory
     let kg_cfg = config.kg_reconcile.clone();
     let kg_tools = Arc::clone(&dream_tools);
+    let synapse_kg = Arc::clone(&synapse);
     let kg_handle = tokio::spawn(async move {
         let mut interval = tokio::time::interval(Duration::from_secs(60));
         let mut last_run_date: Option<NaiveDate> = None;
@@ -630,9 +852,25 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
             }
             let today = now.date_naive();
             info!(dry_run = kg_cfg.dry_run, "KG reconcile starting");
+            append_cognition_schedule(
+                synapse_kg.as_ref(),
+                "kg_reconcile",
+                "tick",
+                serde_json::json!({ "dry_run": kg_cfg.dry_run }),
+            );
             match gzmo_core::kg_reconcile::run_kg_reconcile(kg_tools.as_ref(), &kg_cfg).await {
                 Ok(report) => {
                     last_run_date = Some(today);
+                    append_cognition_schedule(
+                        synapse_kg.as_ref(),
+                        "kg_reconcile",
+                        "complete",
+                        serde_json::json!({
+                            "entities": report.entities_scanned,
+                            "relations_fixed": report.relations_recanonicalized,
+                            "dry_run": report.dry_run,
+                        }),
+                    );
                     info!(
                         entities = report.entities_scanned,
                         relations_fixed = report.relations_recanonicalized,
@@ -640,13 +878,22 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
                         "KG reconcile complete"
                     );
                 }
-                Err(e) => error!("KG reconcile failed: {e}"),
+                Err(e) => {
+                    append_cognition_schedule(
+                        synapse_kg.as_ref(),
+                        "kg_reconcile",
+                        "fail",
+                        serde_json::json!({ "error": e.to_string() }),
+                    );
+                    error!("KG reconcile failed: {e}");
+                }
             }
         }
     });
 
     // Wiki "Knowledge Gardener" — daily index sync (after Qdrant sync at 01:45).
     let wiki_sync_cfg = config.wiki.clone();
+    let synapse_wiki = Arc::clone(&synapse);
     let wiki_sync_handle = tokio::spawn(async move {
         let mut interval = tokio::time::interval(Duration::from_secs(60));
         let mut last_sync_date: Option<NaiveDate> = None;
@@ -670,18 +917,42 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
                 minute = wiki_sync_cfg.sync_cron_minute,
                 "Wiki sync (Knowledge Gardener) starting"
             );
+            append_cognition_schedule(
+                synapse_wiki.as_ref(),
+                "wiki_sync",
+                "tick",
+                serde_json::json!({
+                    "cron_hour": wiki_sync_cfg.sync_cron_hour,
+                    "cron_minute": wiki_sync_cfg.sync_cron_minute,
+                }),
+            );
             match WikiEngine::new(wiki_sync_cfg.clone()).sync().await {
                 Ok(r) => {
                     last_sync_date = Some(today);
+                    append_cognition_schedule(
+                        synapse_wiki.as_ref(),
+                        "wiki_sync",
+                        "complete",
+                        serde_json::json!({ "pages": r.pages, "entries": r.index_entries }),
+                    );
                     info!(pages = r.pages, entries = r.index_entries, "Wiki sync complete");
                 }
-                Err(e) => error!("Wiki sync failed: {e}"),
+                Err(e) => {
+                    append_cognition_schedule(
+                        synapse_wiki.as_ref(),
+                        "wiki_sync",
+                        "fail",
+                        serde_json::json!({ "error": e.to_string() }),
+                    );
+                    error!("Wiki sync failed: {e}");
+                }
             }
         }
     });
 
     // Wiki lint — weekly structural health report (default Sunday 06:00 UTC).
     let wiki_lint_cfg = config.wiki.clone();
+    let synapse_wiki_lint = Arc::clone(&synapse);
     let wiki_lint_handle = tokio::spawn(async move {
         let mut interval = tokio::time::interval(Duration::from_secs(60));
         let mut last_lint_date: Option<NaiveDate> = None;
@@ -702,9 +973,28 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
                 continue;
             }
             info!(weekday = wiki_lint_cfg.lint_cron_dow, hour = wiki_lint_cfg.lint_cron_hour, "Wiki lint starting");
+            append_cognition_schedule(
+                synapse_wiki_lint.as_ref(),
+                "wiki_lint",
+                "tick",
+                serde_json::json!({
+                    "dow": wiki_lint_cfg.lint_cron_dow,
+                    "hour": wiki_lint_cfg.lint_cron_hour,
+                }),
+            );
             match WikiEngine::new(wiki_lint_cfg.clone()).lint().await {
                 Ok(r) => {
                     last_lint_date = Some(today);
+                    append_cognition_schedule(
+                        synapse_wiki_lint.as_ref(),
+                        "wiki_lint",
+                        "complete",
+                        serde_json::json!({
+                            "pages": r.pages,
+                            "orphans": r.orphans.len(),
+                            "broken": r.broken_links.len(),
+                        }),
+                    );
                     info!(
                         pages = r.pages,
                         orphans = r.orphans.len(),
@@ -712,7 +1002,15 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
                         "Wiki lint complete"
                     );
                 }
-                Err(e) => error!("Wiki lint failed: {e}"),
+                Err(e) => {
+                    append_cognition_schedule(
+                        synapse_wiki_lint.as_ref(),
+                        "wiki_lint",
+                        "fail",
+                        serde_json::json!({ "error": e.to_string() }),
+                    );
+                    error!("Wiki lint failed: {e}");
+                }
             }
         }
     });

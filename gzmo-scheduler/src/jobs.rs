@@ -46,3 +46,7 @@ pub fn handoff_args(config_path: &Path) -> (&'static str, Vec<String>) {
     }
     ("gzmo-handoff.sh", args)
 }
+
+pub fn qdrant_sync_script() -> &'static str {
+    "qdrant-vault-sync.sh"
+}

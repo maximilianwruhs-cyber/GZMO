@@ -17,6 +17,7 @@ pub mod tools;
 pub mod memory;
 pub mod identity;
 pub mod daemon;
+pub mod ecosystem_status;
 pub mod dreams;
 pub mod dreams_md;
 pub mod spark;

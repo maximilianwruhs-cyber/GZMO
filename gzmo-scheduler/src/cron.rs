@@ -3,6 +3,7 @@
 //! Copied from gzmo-core::daemon — kept local so this crate never links engines.
 
 use chrono::{DateTime, NaiveDate, Timelike, Utc};
+use std::collections::HashSet;
 
 /// UTC minutes since midnight for a wall-clock `(hour, minute)` pair.
 pub fn cron_minutes(hour: u32, minute: u32) -> u32 {
@@ -32,7 +33,7 @@ pub fn cron_slot_due(
     now: &DateTime<Utc>,
     cron_hours: &[u32],
     cron_minute: u32,
-    last_run_key: Option<(u32, u32, NaiveDate)>,
+    completed: &HashSet<(u32, u32, NaiveDate)>,
 ) -> Option<(u32, u32)> {
     let today = now.date_naive();
     let now_mins = now.hour() * 60 + now.minute();
@@ -41,7 +42,7 @@ pub fn cron_slot_due(
         .copied()
         .filter(|&h| {
             now_mins >= cron_minutes(h, cron_minute)
-                && last_run_key != Some((h, cron_minute, today))
+                && !completed.contains(&(h, cron_minute, today))
         })
         .min_by_key(|h| *h)
         .map(|h| (h, cron_minute))
@@ -62,12 +63,15 @@ mod tests {
 
     #[test]
     fn slot_picks_earliest_unrun_hour() {
+        use std::collections::HashSet;
         let now = Utc.with_ymd_and_hms(2026, 7, 10, 23, 0, 0).unwrap();
         let today = now.date_naive();
-        assert_eq!(cron_slot_due(&now, &[3, 22], 30, None), Some((3, 30)));
-        assert_eq!(
-            cron_slot_due(&now, &[3, 22], 30, Some((3, 30, today))),
-            Some((22, 30))
-        );
+        let empty: HashSet<(u32, u32, NaiveDate)> = HashSet::new();
+        assert_eq!(cron_slot_due(&now, &[3, 22], 30, &empty), Some((3, 30)));
+        let mut one = HashSet::new();
+        one.insert((3, 30, today));
+        assert_eq!(cron_slot_due(&now, &[3, 22], 30, &one), Some((22, 30)));
+        one.insert((22, 30, today));
+        assert_eq!(cron_slot_due(&now, &[3, 22], 30, &one), None);
     }
 }

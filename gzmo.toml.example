@@ -36,11 +36,14 @@ strict_kg = true
 cron_hour = 1
 cron_minute = 0
 # Max chars per REM/verify chunk for heavy daily logs.
-chunk_chars = 28000
+# Max chars per REM/verify chunk — 12k tuned for 60k+ vault on CT101.
+chunk_chars = 12000
 # Drop janitor/spark/ingest echoes from episodic before REM (research docs use ingest).
 min_consolidation_chars = 400
 # M3: REM also reads honeypot anchors + vector-associated distillates (not episodic-only).
 honeypot_rem_enabled = true
+honeypot_rem_anchor_limit = 6
+honeypot_rem_associate_k = 4
 
 # Chat sessions → SessionDistill vault facts + 📓 episodic (feeds dream).
 [session_distill]
@@ -148,7 +151,8 @@ prefetch_multiplier = 4
 [ingest]
 enabled = true
 max_source_chars = 120000
-chunk_chars = 28000
+# Max chars per REM/verify chunk — 12k tuned for 60k+ vault on CT101.
+chunk_chars = 12000
 verify = true
 min_confidence = 0.85
 verify_temperature = 0.1

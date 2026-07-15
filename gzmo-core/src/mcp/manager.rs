@@ -4,7 +4,7 @@
 
 use std::sync::Arc;
 
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use tracing::{info, warn};
 
 use rmcp::ServiceExt;
@@ -12,16 +12,19 @@ use rmcp::service::Peer;
 use rmcp::RoleClient;
 use rmcp::transport::TokioChildProcess;
 use tokio::process::Command;
+use tokio::sync::RwLock;
 
 use crate::tools::ToolRegistry;
 
 use crate::mcp::bridge::{McpClient, McpServerConfig, McpToolBridge};
 
+pub type SharedMcpPeer = Arc<RwLock<Arc<Peer<RoleClient>>>>;
+
 /// A connected MCP server with its discovered tools.
 struct ConnectedServer {
     config: McpServerConfig,
     client: McpClient,
-    peer: Arc<Peer<RoleClient>>,
+    peer_slot: SharedMcpPeer,
     bridges: Vec<McpToolBridge>,
 }
 
@@ -40,6 +43,20 @@ impl McpManager {
     /// Connect to an MCP server, discover its tools.
     /// Returns the number of tools discovered.
     pub async fn connect(&mut self, config: McpServerConfig) -> Result<usize> {
+        let (client, peer_slot, bridges) = Self::spawn_server(&config).await?;
+        let tool_count = bridges.len();
+        self.servers.push(ConnectedServer {
+            config,
+            client,
+            peer_slot,
+            bridges,
+        });
+        Ok(tool_count)
+    }
+
+    async fn spawn_server(
+        config: &McpServerConfig,
+    ) -> Result<(McpClient, SharedMcpPeer, Vec<McpToolBridge>)> {
         info!(
             server = %config.name,
             cmd = %config.command,
@@ -47,22 +64,20 @@ impl McpManager {
             "Connecting to MCP server"
         );
 
-        // Build the Command (owned, not borrowed)
         let mut cmd = Command::new(&config.command);
         cmd.args(&config.args);
         for (k, v) in &config.env {
             cmd.env(k, v);
         }
 
-        // Create the TokioChildProcess transport — takes owned Command
-        let transport = TokioChildProcess::new(cmd)
-            .map_err(|e| anyhow::anyhow!("Failed to spawn MCP server '{}': {}", config.name, e))?;
+        let transport = TokioChildProcess::new(cmd).map_err(|e| {
+            anyhow!("Failed to spawn MCP server '{}': {}", config.name, e)
+        })?;
 
-        // Perform MCP handshake
-        let client: McpClient = ().serve(transport).await
-            .map_err(|e| anyhow::anyhow!("MCP handshake failed for '{}': {}", config.name, e))?;
+        let client: McpClient = ().serve(transport).await.map_err(|e| {
+            anyhow!("MCP handshake failed for '{}': {}", config.name, e)
+        })?;
 
-        // Log server info
         if let Some(peer_info) = client.peer_info() {
             info!(
                 server = %config.name,
@@ -72,12 +87,10 @@ impl McpManager {
             );
         }
 
-        // Get the Peer handle for calling methods
         let peer: &Peer<RoleClient> = client.peer();
-
-        // Discover tools (handles pagination)
-        let tools = peer.list_all_tools().await
-            .map_err(|e| anyhow::anyhow!("Failed to list tools from '{}': {}", config.name, e))?;
+        let tools = peer.list_all_tools().await.map_err(|e| {
+            anyhow!("Failed to list tools from '{}': {}", config.name, e)
+        })?;
 
         info!(
             server = %config.name,
@@ -85,11 +98,9 @@ impl McpManager {
             "Discovered MCP tools"
         );
 
-        // We need an Arc<Peer> for the bridges, but Peer is inside RunningService.
-        // Clone the Peer into an Arc. Peer implements Clone via its inner Arc fields.
         let peer_arc = Arc::new(peer.clone());
+        let peer_slot = Arc::new(RwLock::new(peer_arc));
 
-        // Create bridges
         let bridges: Vec<McpToolBridge> = tools
             .into_iter()
             .map(|tool| {
@@ -113,21 +124,12 @@ impl McpManager {
                     mcp_tool_name: tool.name.to_string(),
                     description,
                     input_schema,
-                    peer: peer_arc.clone(),
+                    peer: peer_slot.clone(),
                 }
             })
             .collect();
 
-        let tool_count = bridges.len();
-
-        self.servers.push(ConnectedServer {
-            config,
-            client,
-            peer: peer_arc,
-            bridges,
-        });
-
-        Ok(tool_count)
+        Ok((client, peer_slot, bridges))
     }
 
     /// Register all discovered MCP tools into the agent's ToolRegistry.
@@ -147,14 +149,60 @@ impl McpManager {
         self.servers.len()
     }
 
+    /// Probe MCP servers; reconnect with exponential backoff on failure.
+    pub async fn ensure_healthy(&mut self) -> Result<()> {
+        const MAX_ATTEMPTS: u32 = 3;
+        const BACKOFF_MS: u64 = 1000;
+
+        for server in &mut self.servers {
+            let healthy = {
+                let peer = server.peer_slot.read().await;
+                peer.list_all_tools().await.is_ok()
+            };
+            if healthy {
+                continue;
+            }
+
+            warn!(server = %server.config.name, "MCP server unhealthy — reconnecting");
+            let config = server.config.clone();
+            for attempt in 1..=MAX_ATTEMPTS {
+                match Self::spawn_server(&config).await {
+                    Ok((new_client, new_slot, _bridges)) => {
+                        *server.peer_slot.write().await = new_slot.read().await.clone();
+                        let old_client = std::mem::replace(&mut server.client, new_client);
+                        if let Err(e) = old_client.cancel().await {
+                            warn!(server = %config.name, error = %e, "Error shutting down stale MCP client");
+                        }
+                        info!(server = %config.name, attempt, "MCP server reconnected");
+                        break;
+                    }
+                    Err(e) => {
+                        warn!(
+                            server = %config.name,
+                            attempt,
+                            error = %e,
+                            "MCP reconnect attempt failed"
+                        );
+                        if attempt == MAX_ATTEMPTS {
+                            return Err(e);
+                        }
+                        tokio::time::sleep(std::time::Duration::from_millis(
+                            BACKOFF_MS * attempt as u64,
+                        ))
+                        .await;
+                    }
+                }
+            }
+        }
+        Ok(())
+    }
+
     /// Gracefully shutdown all MCP connections.
     pub async fn shutdown(&mut self) -> Result<()> {
         info!(servers = self.servers.len(), "Shutting down MCP connections");
         for server in self.servers.drain(..) {
             info!(server = %server.config.name, "Shutting down");
-            // Drop the peer Arc first (bridges should already be drained)
-            drop(server.peer);
-            // Cancel the running service
+            drop(server.peer_slot);
             if let Err(e) = server.client.cancel().await {
                 warn!(server = %server.config.name, error = %e, "Error during shutdown");
             }

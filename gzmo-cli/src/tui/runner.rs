@@ -276,7 +276,7 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
         let state_dir = config.memory.vault_db.parent()
             .unwrap_or(std::path::Path::new(".")).to_path_buf();
         tokio::spawn(async move {
-            let mut triggers = TriggerEngine::with_defaults();
+            let mut triggers = TriggerEngine::with_defaults_interactive();
             loop {
                 if rx.changed().await.is_err() {
                     break;

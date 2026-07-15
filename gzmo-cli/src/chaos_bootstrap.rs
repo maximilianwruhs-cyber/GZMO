@@ -48,10 +48,15 @@ pub fn spawn_snapshot_bridge(
     synapse: Option<Arc<SynapseBus>>,
     synapse_source: EventSource,
     restore_policy: String,
+    interactive: bool,
 ) -> JoinHandle<()> {
     let mut snapshot_rx = snapshot_rx;
     tokio::spawn(async move {
-        let mut triggers = TriggerEngine::with_defaults();
+        let mut triggers = if interactive {
+            TriggerEngine::with_defaults_interactive()
+        } else {
+            TriggerEngine::with_defaults()
+        };
         loop {
             if snapshot_rx.changed().await.is_err() {
                 break; // PulseLoop dropped
@@ -75,6 +80,12 @@ pub fn spawn_snapshot_bridge(
                 }
                 
                 // HEARTBEAT.md — human-readable status (containing the Workstream C rows)
+                let cheapcheck_block = {
+                    let existing = tokio::fs::read_to_string(state_dir.join("HEARTBEAT.md"))
+                        .await
+                        .unwrap_or_default();
+                    extract_cheapcheck_block(&existing)
+                };
                 let heartbeat = format!(
                     "# GZMO Heartbeat\n\n\
                     | Field | Value |\n|---|---|\n\
@@ -102,7 +113,8 @@ pub fn spawn_snapshot_bridge(
                     | Tension bias | {:+.3} |\n\n\
                     ## LLM Parameters\n\n\
                     Temperature: {:.3}, Max tokens: {}, Valence: {:+.3}\n\n\
-                    *Updated: {}*\n",
+                    *Updated: {}*\n\
+                    {cheapcheck_block}",
                     if snap.alive { "ALIVE" } else { "DEAD" },
                     snap.tick, snap.energy, snap.phase, snap.deaths, snap.tension,
                     snap.chaos_val,
@@ -183,4 +195,23 @@ pub fn spawn_snapshot_bridge(
             }
         }
     })
+}
+
+fn extract_cheapcheck_block(body: &str) -> String {
+    let start = gzmo_core::daemon::CHEAPCHECK_START;
+    let end = gzmo_core::daemon::CHEAPCHECK_END;
+    if let (Some(s), Some(e)) = (body.find(start), body.find(end)) {
+        if e > s {
+            return format!(
+                "\n{}\n{}\n{}\n",
+                start,
+                body[s + start.len()..e].trim(),
+                end
+            );
+        }
+    }
+    format!(
+        "\n{}\n## CheapCheck probes\n\n| Check | Status | Detail |\n|---|---|---|\n| (pending) | — | awaiting first heartbeat tick |\n\n{}\n",
+        start, end
+    )
 }

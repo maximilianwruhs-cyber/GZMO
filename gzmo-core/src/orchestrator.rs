@@ -218,9 +218,10 @@ pub async fn start_orchestrator(
             Box::pin(async move {
                 // Fire: DaemonTick
                 if let Some(ref bus) = ctx.synapse {
-                    bus.append(&SynapseEvent::new(
+                    bus.append(&SynapseEvent::with_data(
                         EventType::DaemonTick,
                         resolve_event_source(EventSource::GzmoDaemon),
+                        serde_json::json!({ "job": job_name }),
                     ));
                 }
 
@@ -237,10 +238,24 @@ pub async fn start_orchestrator(
                     );
                     // Complete: DaemonJobComplete
                     if let Some(ref bus) = ctx.synapse {
+                        let step_metrics: Vec<serde_json::Value> = o
+                            .steps
+                            .iter()
+                            .map(|s| {
+                                serde_json::json!({
+                                    "name": s.name,
+                                    "status": format!("{}", s.status),
+                                    "duration_ms": s.duration_ms,
+                                    "llm_calls": s.llm_calls,
+                                    "tool_calls": s.tool_calls,
+                                })
+                            })
+                            .collect();
                         let data = serde_json::json!({
                             "job": job_name,
                             "status": format!("{}", o.overall_status),
-                            "steps": o.steps.len(),
+                            "steps": step_metrics,
+                            "step_count": o.steps.len(),
                             "duration_ms": o.total_duration_ms,
                         });
                         bus.append(&SynapseEvent::with_data(

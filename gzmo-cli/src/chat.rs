@@ -28,7 +28,7 @@ use gzmo_core::tools::web_browse::WebBrowseTool;
 use gzmo_core::tools::memory::{MemoryRecordTool, MemorySearchTool};
 use gzmo_core::memory::scratch::{messages_to_transcript, DistillJob, DistillSource};
 use gzmo_core::skills::{SkillRegistry as ChaosSkillRegistry, SkillContext, SkillType};
-use gzmo_core::skills::{dice::DiceSkill, sound::SoundSkill, poker::PokerSkill, quote::QuoteSkill, calculate::CalculateSkill, help::HelpSkill, visual::VisualSkill};
+use gzmo_core::skills::{dice::DiceSkill, sound::SoundSkill, poker::PokerSkill, quote::QuoteSkill, calculate::CalculateSkill, help::HelpSkill, status::StatusSkill, visual::VisualSkill};
 use gzmo_core::types::{EpisodicEntry, EpisodicSource, Message, Role};
 
 
@@ -133,6 +133,7 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
         None,
         gzmo_core::synapse::EventSource::GzmoCli,
         chaos_runtime.restore_policy.clone(),
+        true, // interactive REPL — no periodic autonomous monologue injects
     );
 
     // ─── Tools ───────────────────────────────────────────────────
@@ -168,6 +169,7 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
     chaos_skills.register(Arc::new(QuoteSkill));
     chaos_skills.register(Arc::new(CalculateSkill));
     chaos_skills.register(Arc::new(VisualSkill));
+    chaos_skills.register(Arc::new(StatusSkill { config: config.clone() }));
     // Build help entries from registered skills
     let help_entries: Vec<(String, String, &'static str)> = chaos_skills.all().iter().map(|s| {
         let type_label = match s.skill_type() {
@@ -545,13 +547,8 @@ Use delegate_task for focused sub-work; you receive a short summary, not full su
                                 Err(e) => eprintln!("  {RED}Auto-skill error: {e}{RESET}"),
                             }
                         }
-                    } else if let Some(prompt) = notification.strip_prefix("__TRIGGER_INJECT__:") {
-                        eprintln!("  {DIM}\x1b[35m🧠 {prompt}\x1b[0m{RESET}");
-                        messages.push(Message {
-                            role: Role::System,
-                            content: format!("[AUTONOMOUS MONOLOGUE] {prompt}"),
-                            is_meta: true, tool_calls: None, tool_call_id: None,
-                        });
+                    } else if let Some(_prompt) = notification.strip_prefix("__TRIGGER_INJECT__:") {
+                        // InjectPrompt is disabled in interactive mode; ignore if one slips through.
                     } else {
                         eprintln!("{notification}");
                     }
@@ -590,6 +587,14 @@ Use delegate_task for focused sub-work; you receive a short summary, not full su
     } // end loop
 
     Ok(())
+}
+
+fn strip_autonomous_monologue(messages: &mut Vec<Message>) {
+    messages.retain(|m| {
+        !(m.role == Role::System
+            && m.is_meta
+            && m.content.starts_with("[AUTONOMOUS MONOLOGUE]"))
+    });
 }
 
 // ─── Helpers ────────────────────────────────────────────────────────────
@@ -782,6 +787,7 @@ async fn handle_slash_command(
                     let count = session.messages.len().saturating_sub(1);
                     let display = session.name.clone().unwrap_or_else(|| session.id.clone());
                     *messages = session.messages;
+                    strip_autonomous_monologue(messages);
                     agent_session.set_session_id(session.id.clone());
                     *session_name = session.name;
                     if subagent_enabled {
@@ -910,6 +916,12 @@ async fn handle_slash_command(
                 eprintln!("  {GREEN}⚙ Ops assembly complete{RESET}");
             }
         }
+        "/status" | "/ecosystem" => {
+            let report = gzmo_core::ecosystem_status::format_ecosystem_status(config).await;
+            for line in report.lines() {
+                eprintln!("  {DIM}{line}{RESET}");
+            }
+        }
         "/chaos" => {
             let snap = chaos_snapshot_rx.borrow().clone();
             eprintln!("  {CYAN}╔══════════════════════════════════════╗{RESET}");
@@ -1014,6 +1026,7 @@ async fn handle_slash_command(
                         let count = session.messages.len().saturating_sub(1);
                         let display = session.name.clone().unwrap_or_else(|| session.id.clone());
                         *messages = session.messages;
+                        strip_autonomous_monologue(messages);
                         agent_session.set_session_id(session.id.clone());
                         *session_name = session.name;
                         if subagent_enabled {
@@ -1043,6 +1056,9 @@ async fn handle_slash_command(
             let parts: Vec<&str> = input[1..].splitn(2, ' ').collect();
             let cmd = parts[0];
             let args = if parts.len() > 1 { parts[1] } else { "" };
+
+            // ecosystem alias → status skill
+            let cmd = if cmd == "ecosystem" { "status" } else { cmd };
 
             // ─── Rust skill dispatch (priority) ───────────────
             if chaos_skills.has(cmd) {
@@ -1171,7 +1187,7 @@ fn print_splash(config: &GzmoConfig, status: &str, latency: &str, vault_count: u
     pl(&format!("Model: {} | Vault: {} records", active.model, vault_count), dim);
     pl("", "");
 
-    let cmds = format!("{copper}/quit{dim} exit{reset} · {copper}/clear{dim} reset{reset} · {copper}/mode{dim} switch{reset} · {copper}/vault{dim} memory{reset}");
+    let cmds = format!("{copper}/quit{dim} exit{reset} · {copper}/status{dim} ecosystem{reset} · {copper}/clear{dim} reset{reset} · {copper}/mode{dim} switch{reset} · {copper}/vault{dim} memory{reset}");
     let curr = side_i.get();
     let (l, r) = if curr % 2 == 0 { (&bulb_r, &bulb_g) } else { (&bulb_g, &bulb_r) };
     side_i.set(curr+1);

@@ -1,8 +1,28 @@
 # GZMO Daemon Placement Decision
 
 **Date:** 2026-07-08  
-**Status:** Accepted  
-**Decision:** **Keep Rust `gzmo-daemon` on CT101** (Proxmox sidecar); workstation remains cognition + dev node.
+**Status:** Accepted (amended 2026-07-15)  
+**Decision (2026-07-08):** Keep Rust `gzmo-daemon` on CT101.  
+**Decision (2026-07-15):** **GZMO-next production on the workstation** — `gzmo-scheduler` + `data-next/`; CT101 left untouched as parallel legacy.
+
+---
+
+## Amendment — 2026-07-15 (workstation promotion)
+
+After CT101 disk I/O failure (2026-07-14), production cognition moved to the workstation:
+
+| Component | Production host |
+|-----------|-----------------|
+| **GZMO-next scheduler** | Workstation user systemd (`gzmo-scheduler.service`) |
+| **Vault / sessions / dreams** | `github-clone/GZMO/data-next/` |
+| **Prime LLM** | Workstation `:8000` (`llama-prime.service`) |
+| **Qdrant + Redis** | Workstation user systemd (`gzmo-sidecar-*.service`) |
+| **Embeddings / rerank** | VM200 (`192.168.31.110`) |
+| **Librarian (session extract)** | Workstation Prime `:8000` (same as local engine) |
+| **Observatory** | Workstation `:7777` (`OBSERVATORY_MODE=local`) |
+| **CT101 legacy** | Unchanged — may run independently; not ops target |
+
+See [GZMO_NEXT_RUNBOOK.md](./GZMO_NEXT_RUNBOOK.md) for env contract and S2 checklist.
 
 ---
 

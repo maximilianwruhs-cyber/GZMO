@@ -192,7 +192,7 @@ struct OpenRouterReasoning {
 #[derive(Serialize)]
 struct ChatRequest<'a> {
     model: &'a str,
-    messages: Vec<ChatMessage<'a>>,
+    messages: Vec<ChatMessage>,
     temperature: f32,
     top_p: f32,
     max_tokens: u32,
@@ -215,16 +215,16 @@ struct ChatRequest<'a> {
 }
 
 #[derive(Serialize)]
-struct ChatMessage<'a> {
-    role: &'a str,
+struct ChatMessage {
+    role: String,
     #[serde(skip_serializing_if = "Option::is_none")]
-    content: Option<&'a str>,
+    content: Option<String>,
     /// For tool result messages, the ID of the tool call this responds to
     #[serde(skip_serializing_if = "Option::is_none")]
-    tool_call_id: Option<&'a str>,
+    tool_call_id: Option<String>,
     /// For assistant messages that made tool calls
     #[serde(skip_serializing_if = "Option::is_none")]
-    tool_calls: Option<&'a Vec<crate::types::MessageToolCall>>,
+    tool_calls: Option<Vec<crate::types::MessageToolCall>>,
 }
 
 // ── OpenAI-compatible response types ────────────────────────────────
@@ -271,7 +271,7 @@ struct ResponseFunction {
 #[derive(Serialize)]
 struct StreamChatRequest<'a> {
     model: &'a str,
-    messages: Vec<ChatMessage<'a>>,
+    messages: Vec<ChatMessage>,
     temperature: f32,
     top_p: f32,
     max_tokens: u32,
@@ -403,24 +403,59 @@ impl TurboQuantGateway {
         }
     }
 
+    /// Merge all system-role turns into a single leading system message.
+    /// llama.cpp Jinja templates (e.g. ornith) reject multiple system messages or
+    /// any system message after the first user turn.
+    fn consolidate_system_messages(messages: &[Message]) -> Vec<Message> {
+        if messages.is_empty() {
+            return Vec::new();
+        }
+
+        let mut system_parts: Vec<&str> = Vec::new();
+        let mut non_system: Vec<Message> = Vec::new();
+
+        for m in messages {
+            if m.role == crate::types::Role::System {
+                if !m.content.is_empty() {
+                    system_parts.push(&m.content);
+                }
+            } else {
+                non_system.push(m.clone());
+            }
+        }
+
+        let mut out = Vec::with_capacity(non_system.len() + 1);
+        if !system_parts.is_empty() {
+            out.push(Message {
+                role: crate::types::Role::System,
+                content: system_parts.join("\n\n"),
+                is_meta: true,
+                tool_calls: None,
+                tool_call_id: None,
+            });
+        }
+        out.extend(non_system);
+        out
+    }
+
     /// Convert our Message type to the OpenAI chat message format.
     /// Properly handles tool_calls on assistant messages and tool_call_id on tool results.
-    fn to_chat_messages(messages: &[Message]) -> Vec<ChatMessage<'_>> {
-        messages
+    fn to_chat_messages(messages: &[Message]) -> Vec<ChatMessage> {
+        let consolidated = Self::consolidate_system_messages(messages);
+        consolidated
             .iter()
             .map(|m| {
                 let content = if m.content.is_empty() && m.tool_calls.is_some() {
-                    // OpenAI spec: assistant tool-call messages can omit content
                     None
                 } else {
-                    Some(m.content.as_str())
+                    Some(m.content.clone())
                 };
 
                 ChatMessage {
-                    role: m.role.as_str(),
+                    role: m.role.as_str().to_string(),
                     content,
-                    tool_call_id: m.tool_call_id.as_deref(),
-                    tool_calls: m.tool_calls.as_ref(),
+                    tool_call_id: m.tool_call_id.clone(),
+                    tool_calls: m.tool_calls.clone(),
                 }
             })
             .collect()
@@ -905,7 +940,7 @@ fn repair_truncated_json_object(s: &str) -> String {
 #[derive(Serialize)]
 struct StructuredChatRequest<'a> {
     model: &'a str,
-    messages: Vec<ChatMessage<'a>>,
+    messages: Vec<ChatMessage>,
     temperature: f32,
     top_p: f32,
     max_tokens: u32,
@@ -1344,8 +1379,8 @@ mod tests {
         let body = ChatRequest {
             model: "z-ai/glm-5.2",
             messages: vec![ChatMessage {
-                role: "user",
-                content: Some("hi"),
+                role: "user".to_string(),
+                content: Some("hi".to_string()),
                 tool_call_id: None,
                 tool_calls: None,
             }],
@@ -1364,6 +1399,42 @@ mod tests {
         let json = serde_json::to_value(&body).expect("serialize ChatRequest");
         assert_eq!(json["reasoning"]["effort"], "xhigh");
         assert!(json.get("reasoning_format").is_none());
+    }
+
+    #[test]
+    fn consolidate_system_messages_merges_into_single_leading_turn() {
+        use crate::types::{Message, Role};
+
+        let messages = vec![
+            Message {
+                role: Role::System,
+                content: "You are GZMO.".into(),
+                is_meta: true,
+                tool_calls: None,
+                tool_call_id: None,
+            },
+            Message {
+                role: Role::System,
+                content: "[CHAOS_STATE] calm".into(),
+                is_meta: true,
+                tool_calls: None,
+                tool_call_id: None,
+            },
+            Message {
+                role: Role::User,
+                content: "wake up".into(),
+                is_meta: false,
+                tool_calls: None,
+                tool_call_id: None,
+            },
+        ];
+
+        let merged = TurboQuantGateway::consolidate_system_messages(&messages);
+        assert_eq!(merged.len(), 2);
+        assert!(matches!(merged[0].role, Role::System));
+        assert!(merged[0].content.contains("You are GZMO."));
+        assert!(merged[0].content.contains("[CHAOS_STATE]"));
+        assert!(matches!(merged[1].role, Role::User));
     }
 
     #[test]

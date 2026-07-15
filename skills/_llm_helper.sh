@@ -13,8 +13,8 @@ export LC_ALL=C.UTF-8
 export LANG="${LANG:-C.UTF-8}"
 
 # ─── LLM Endpoint Configuration ─────────────────────────────────
-LLM_URL="${GZMO_LLM_URL:-http://localhost:1234/v1/chat/completions}"
-LLM_MODEL="${GZMO_LLM_MODEL:-bartowski/Qwen2.5-7B-Instruct-GGUF}"
+LLM_URL="${GZMO_LLM_URL:-http://localhost:8000/v1}"
+LLM_MODEL="${GZMO_LLM_MODEL:-/home/gzmo/models/ornith-35b-GGUF/ornith-35b-Q4_K_M.gguf}"
 LLM_TEMPERATURE="${GZMO_LLM_TEMP:-0.8}"
 LLM_MAX_TOKENS="${GZMO_LLM_MAX_TOKENS:-512}"
 
@@ -56,6 +56,12 @@ get_persona_prompt() {
 # ─── Build System Prompt with Language + Persona ─────────────────
 build_system_prompt() {
     local base_prompt="$1"
+
+    if [ "${GZMO_SKILL_STRUCTURED:-0}" = "1" ]; then
+        echo -e "$base_prompt"
+        return
+    fi
+
     local lang=$(get_language)
     local persona=$(get_persona_prompt)
 
@@ -74,7 +80,21 @@ build_system_prompt() {
     echo -e "$full_prompt"
 }
 
-# ─── Call LLM ────────────────────────────────────────────────────
+# ─── Strip thinking tags from LLM output ────────────────────────
+strip_thinking_tags() {
+    local text="$1"
+    # Remove <think>...</think> blocks (with any whitespace/newlines inside)
+    text=$(printf '%s' "$text" | sed -E ':a;s/<think[^>]*>.*?<\/think>//Ig;ta' | sed -E 's/<think[^>]*>//Ig; s/<\/think>//Ig')
+    # Remove any remaining stray tags
+    text=$(printf '%s' "$text" | sed -E 's/<\/?[a-z]+>//Ig')
+    # Trim leading/trailing whitespace and blank lines
+    text=$(printf '%s' "$text" | sed -e '/./,$!d' -e :a -e '/^\s*$/{$d;N;ba' -e '}')
+    text="${text#"${text%%[![:space:]]*}"}"
+    text="${text%"${text##*[![:space:]]}"}"
+    printf '%s' "$text"
+}
+
+# ─── Call LLM (chat completions API for llama.cpp) ──────────────
 # Usage: llm_call "system_prompt" "user_prompt" [temperature] [max_tokens]
 # Returns: the raw text response, or "" on failure
 llm_call() {
@@ -89,9 +109,9 @@ llm_call() {
 
     # Escape for JSON
     local sys_escaped
-    sys_escaped=$(echo "$full_system" | jq -Rs '.')
+    sys_escaped=$(printf '%s' "$full_system" | jq -Rs '.')
     local usr_escaped
-    usr_escaped=$(echo "$user_prompt" | jq -Rs '.')
+    usr_escaped=$(printf '%s' "$user_prompt" | jq -Rs '.')
 
     local payload
     payload=$(cat <<JSONEOF
@@ -109,24 +129,32 @@ JSONEOF
 )
 
     local response
-    response=$(curl -s --connect-timeout 5 --max-time 30 \
+    response=$(curl -s --connect-timeout 5 --max-time 120 \
         -H "Content-Type: application/json" \
         -d "$payload" \
-        "$LLM_URL" 2>/dev/null)
+        "${LLM_URL%/v1}/v1/chat/completions" 2>/dev/null)
 
     if [ $? -ne 0 ] || [ -z "$response" ]; then
         echo ""
         return 1
     fi
 
-    # Extract the message content
+    # Extract content — fall back to reasoning_content if content is empty
+    # (Ornith/llama.cpp often puts output in reasoning_content)
     local content
     content=$(echo "$response" | jq -r '.choices[0].message.content // empty' 2>/dev/null)
+
+    if [ -z "$content" ]; then
+        content=$(echo "$response" | jq -r '.choices[0].message.reasoning_content // empty' 2>/dev/null)
+    fi
 
     if [ -z "$content" ]; then
         echo ""
         return 1
     fi
+
+    # Strip thinking tags and clean up
+    content=$(strip_thinking_tags "$content")
 
     echo "$content"
     return 0
@@ -135,7 +163,7 @@ JSONEOF
 # ─── Check LLM Availability ─────────────────────────────────────
 llm_available() {
     curl -s --connect-timeout 2 --max-time 3 \
-        "${LLM_URL%/chat/completions}/models" >/dev/null 2>&1
+        "${LLM_URL%/v1}/v1/models" >/dev/null 2>&1
     return $?
 }
 
@@ -212,59 +240,78 @@ quality_gate_poem() {
 
 quality_gate_joke() {
     printf '%s' "$1" | grep -qiE \
-        '(programmier|programming bug|\bcoffee\b|\bkaffee\b|artificial intelligence|\bchatgpt\b|\bki[- ]|dad joke|flachwitz|montagmorgen|\bwlan\b|\bwifi\b|\bbug\b)' \
+        '(programmier|programming bug|\bcoffee\b|\bkaffee\b|artificial intelligence|\bchatgpt\b|\bopenai\b|\bclaude\b|\bdeepseek\b)' \
         && return 1
     return 0
 }
 
-quality_gate_story() {
-    printf '%s' "$1" | grep -qiE \
-        '(once upon a time|es war einmal|happily ever after|und sie lebten|moral of the story|lehre des|m[aä]rchen)' \
-        && return 1
-    return 0
-}
-
-# ─── Accept Creative Output ──────────────────────────────────────
-# Usage: accept_creative_output TEXT MAX_CHARS quality_gate_fn
-accept_creative_output() {
-    local text="$1"
-    local max_chars="$2"
-    local gate_fn="$3"
-    local count
-
-    count=$(char_count "$text")
-    if [ "$count" -le 0 ] || [ "$count" -gt "$max_chars" ]; then
-        return 1
-    fi
-    "$gate_fn" "$text"
-}
-
-# ─── Pretty Box ──────────────────────────────────────────────────
-print_box() {
-    local title="$1"
-    local content="$2"
-    local icon="${3:-⚡}"
-    local color="${4:-$C_CYAN}"
-
-    echo -e "${C_DIM}┌─────────────────────────────────────────────────┐${C_RESET}"
-    echo -e "${C_BOLD}${color}  $icon $title${C_RESET}"
-    echo -e "${C_DIM}├─────────────────────────────────────────────────┤${C_RESET}"
-    echo -e "  $content"
-    echo -e "${C_DIM}└─────────────────────────────────────────────────┘${C_RESET}"
-}
-
-# ─── Spinner (for LLM calls) ────────────────────────────────────
+# ─── Spinner ─────────────────────────────────────────────────────
+# Usage: spin PID MESSAGE
 spin() {
     local pid=$1
-    local msg="${2:-Thinking...}"
-    local frames=("⠋" "⠙" "⠹" "⠸" "⠼" "⠴" "⠦" "⠧" "⠇" "⠏")
+    local msg="${2:-Working...}"
+    local spin_chars="⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
     local i=0
     while kill -0 "$pid" 2>/dev/null; do
-        printf "\r  ${C_DIM}${frames[$i]} $msg${C_RESET}" >&2
-        i=$(( (i + 1) % ${#frames[@]} ))
+        local char="${spin_chars:$((i % ${#spin_chars})):1}"
+        printf "\r  ${C_CYAN}%s${C_RESET} %s" "$char" "$msg" >&2
+        i=$((i + 1))
         sleep 0.1
     done
-    printf "\r%*s\r" 60 "" >&2
+    printf "\r  ${C_GREEN}✓${C_RESET} %s\n" "$msg" >&2
+}
+
+# ─── Parse structured skill output (NAME:/COST:/TYPE: blocks) ─────
+# Reads LLM text from stdin; prints shell assignments for card fields.
+parse_structured_card_fields() {
+    python3 -c "$(cat <<'PY'
+import re
+import shlex
+import sys
+
+text = sys.stdin.read()
+fields = {}
+
+anchors = list(re.finditer(r"^NAME:\s*.+$", text, re.MULTILINE | re.IGNORECASE))
+if anchors:
+    block = text[anchors[-1].start():]
+    for key in ("NAME", "COST", "TYPE", "RARITY", "RULES", "FLAVOR", "PT"):
+        match = re.search(rf"^{key}:\s*(.*)$", block, re.MULTILINE | re.IGNORECASE)
+        if match:
+            fields[key] = match.group(1).strip()
+
+if not fields.get("NAME"):
+    match = re.search(r"^\*\*(.+?)\*\*\s*$", text, re.MULTILINE)
+    if match:
+        fields["NAME"] = match.group(1).strip()
+
+if not fields.get("COST"):
+    match = re.search(r"(\{[WUBRG\d/]+\}(?:\{[WUBRG\d/]+\})*)", text)
+    if match:
+        fields["COST"] = match.group(1)
+
+if not fields.get("TYPE"):
+    match = re.search(
+        r"^((?:Legendary\s+)?(?:Creature|Instant|Sorcery|Enchantment|Artifact)(?:\s*[—–-]\s*.+)?)\s*$",
+        text,
+        re.MULTILINE | re.IGNORECASE,
+    )
+    if match:
+        fields["TYPE"] = match.group(1).strip()
+
+for key, value in fields.items():
+    shell_key = {
+        "NAME": "CARD_NAME",
+        "COST": "CARD_COST",
+        "TYPE": "CARD_TYPELINE",
+        "RARITY": "CARD_RARITY",
+        "RULES": "CARD_RULES",
+        "FLAVOR": "CARD_FLAVOR",
+        "PT": "CARD_PT",
+    }.get(key, key)
+    print(f"{shell_key}={shlex.quote(value)}")
+PY
+)"
 }
 
 # ─── LLM Call with Spinner ───────────────────────────────────────

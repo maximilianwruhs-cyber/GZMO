@@ -159,7 +159,7 @@ impl SubagentRunner {
         let session_id = spec.parent_session.clone();
         let role = spec.role.clone();
         let brief = spec.brief.clone();
-        let max_iterations = spec.max_iterations.min(15);
+        let max_iterations = spec.max_iterations.min(60);
         let summary_max = self.config.summary_max_tokens;
         let context_budget = self.config.context_budget_tokens;
         let system = self.role_system_prompt(&role, &brief);

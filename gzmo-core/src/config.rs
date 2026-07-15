@@ -47,7 +47,7 @@
 //! fallback_api_key = "AIza..."
 //!
 //! [agent]
-//! max_tool_iterations = 10
+//! max_tool_iterations = 40
 //! heartbeat_interval_secs = 1800
 //!
 //! [[mcp_servers]]
@@ -1381,7 +1381,7 @@ fn default_subagent_enabled() -> bool {
     true
 }
 fn default_subagent_max_concurrent() -> usize {
-    2
+    5
 }
 fn default_subagent_max_depth() -> u8 {
     2
@@ -1890,7 +1890,7 @@ pub struct JobStep {
     #[serde(default)]
     pub depends_on: Vec<String>,
 
-    /// Max tool-call iterations for this step (default: 5)
+    /// Max tool-call iterations for this step (default: 20)
     #[serde(default = "default_step_iterations")]
     pub max_iterations: usize,
 }
@@ -1968,9 +1968,9 @@ fn default_model_name() -> String { "gemma-4-E4B-it-Q4_K_M.gguf".to_string() }
 fn default_temperature() -> f32 { 0.3 }
 fn default_top_p() -> f32 { 0.95 }
 fn default_max_tokens() -> u32 { 8192 }
-fn default_max_iterations() -> usize { 10 }
+fn default_max_iterations() -> usize { 40 }
 fn default_heartbeat_secs() -> u64 { 1800 }
-fn default_step_iterations() -> usize { 5 }
+fn default_step_iterations() -> usize { 20 }
 fn default_dream_enabled() -> bool { true }
 fn default_dream_verify() -> bool { true }
 fn default_dream_min_confidence() -> f64 { 0.85 }

@@ -265,7 +265,7 @@ max_tokens = 4096
 # model = "ministral-8b"    # Lightning fast for heartbeat checks
 
 [agent]
-max_iterations = 10
+max_tool_iterations = 40
 heartbeat_interval_secs = 1800
 
 [memory]

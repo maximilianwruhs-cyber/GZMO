@@ -1,0 +1,31 @@
+# Sidecar SSH Config
+# Install: copy this to ~/.ssh/config
+
+Host pve
+    HostName 192.168.31.200
+    User root
+    IdentityFile ~/.ssh/id_sidecar_proxmox
+    StrictHostKeyChecking no
+
+Host vm200
+    HostName 192.168.31.110
+    User maximilian
+    IdentityFile ~/.ssh/id_sidecar_proxmox
+    StrictHostKeyChecking no
+
+Host ct101
+    HostName 192.168.31.202
+    User root
+    IdentityFile ~/.ssh/id_sidecar_proxmox
+    StrictHostKeyChecking no
+    ProxyJump pve
+
+# Usage:
+#   ssh pve                          → Proxmox hypervisor
+#   ssh vm200                        → GPU retrieval VM
+#   ssh pve "pct exec 101 -- CMD"    → Run CMD inside CT101
+#   ssh -J pve ct101                 → Direct LXC access (requires network route)
+
+# Convenience aliases:
+#   ctenv  → "ssh pve 'pct exec 101 -- bash -c \"...\"'"
+#   ctcopy → "ssh pve 'pct push 101 SRC DST'"  (copy into container)
