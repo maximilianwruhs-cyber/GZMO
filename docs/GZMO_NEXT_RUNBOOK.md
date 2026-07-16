@@ -126,7 +126,7 @@ Job results land in `data-next/scheduler-runs/{job}-{timestamp}.json` (plus
 ```bash
 gzmo instance status                     # instance, paths, skills_root, effective assembly backends
 gzmo config promote-fused --diff         # review sibling gzmo-next-fused.toml vs live
-gzmo config promote-fused --diff --apply # backup live, then copy fused → live
+gzmo config promote-fused --diff --apply # merge calibration into live (never full-clobber next)
 gzmo assemble ops --live                 # health chain (+ sidecar/queue metrics)
 gzmo status                              # deterministic ecosystem snapshot (paths + probes)
 gzmo health                              # strict subsystem probes

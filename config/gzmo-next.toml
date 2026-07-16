@@ -119,7 +119,7 @@ prefetch_multiplier = 4
 
 # ─────────────────────────────────────────────────────────────────────────
 # Engine — workstation Prime (llama.cpp :8000)
-# Calibrated 2026-07-14: merged from gzmo-next-fused.toml (gate 1.0, beat-gate PASS).
+# Calibrated 2026-07-16: merged from gzmo-next-fused.toml (gate 1.0, beat-gate PASS).
 # RAPL routing omitted (fits_budget=false). See sibling *-fused.toml for full snapshot.
 # ─────────────────────────────────────────────────────────────────────────
 
@@ -130,6 +130,8 @@ top_p = 0.95
 [engine]
 active_mode = "local"
 
+lorenz_seed = 0.506
+strategy = "lorenz"
 [engine.local]
 provider = "local"
 url = "http://localhost:8000/v1"
@@ -142,6 +144,15 @@ max_tokens = 24576
 [chaos]
 bpm_default = 120
 dt_lorenz = 0.5
+
+[benchmark.fused]
+verify_pass_rate = 0.9000
+temp_report = "temp-report.json"
+verify_report = "verify-report.json"
+
+[benchmark.gate]
+min_pass_rate = 0.85
+action_on_fail = "hold_previous"
 
 [agent]
 max_tool_iterations = 40

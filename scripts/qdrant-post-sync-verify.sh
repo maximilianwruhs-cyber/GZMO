@@ -6,7 +6,8 @@
 set -euo pipefail
 
 SAMPLE="${QDRANT_VERIFY_SAMPLE:-10}"
-GZMO_ROOT="${GZMO_ROOT:-/opt/gzmo/survey_GZMO}"
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+GZMO_ROOT="${GZMO_ROOT:-$ROOT}"
 QDRANT_URL="${QDRANT_URL:-http://127.0.0.1:6333}"
 COLLECTION="${QDRANT_COLLECTION:-honeypot}"
 
@@ -18,7 +19,27 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-VAULT="$GZMO_ROOT/data/vault.db"
+# Prefer explicit VAULT_PATH, then instance config, then GZMO-next data-next, then legacy.
+VAULT="${VAULT_PATH:-}"
+if [[ -z "$VAULT" && -n "${GZMO_CONFIG:-}" && -f "$GZMO_CONFIG" ]]; then
+  VAULT="$(python3 - <<'PY' "$GZMO_CONFIG"
+import sys, tomllib
+from pathlib import Path
+cfg = Path(sys.argv[1])
+base = cfg.parent
+data = tomllib.loads(cfg.read_text())
+p = Path(data.get("memory", {}).get("vault_db", "../data-next/vault.db"))
+print((base / p).resolve())
+PY
+)"
+fi
+if [[ -z "$VAULT" || ! -f "$VAULT" ]]; then
+  if [[ -f "$GZMO_ROOT/data-next/vault.db" ]]; then
+    VAULT="$GZMO_ROOT/data-next/vault.db"
+  else
+    VAULT="$GZMO_ROOT/data/vault.db"
+  fi
+fi
 if [[ ! -f "$VAULT" ]]; then
   echo "qdrant-post-sync-verify: vault missing at $VAULT" >&2
   exit 1

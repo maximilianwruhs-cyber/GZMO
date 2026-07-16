@@ -12,8 +12,11 @@ const USAGE: &str = "Usage:\n  \
     gzmo config promote-fused --diff --apply\n  \
     \n\
     Compares live GZMO_CONFIG to the sibling *-fused.toml produced by\n  \
-    `gzmo assemble handoff --live --apply`. --diff prints unified diff;\n  \
-    --apply copies fused → live (full file — review carefully).";
+    `gzmo assemble handoff --live --apply`. --diff prints unified diff.\n  \
+    For GZMO-next (live has [assembly] / [engine.local]), --apply MERGES\n  \
+    calibration fields via scripts/promote-fused-merge.py — it never\n  \
+    full-file-clobbers assembly/memory. Legacy configs without those\n  \
+    sections still get a backed-up full-file copy (review carefully).";
 
 pub async fn run(_config: &GzmoConfig, args: &[String]) -> Result<()> {
     if args.iter().any(|a| a == "--help" || a == "-h") || args.is_empty() {
@@ -63,11 +66,54 @@ pub async fn run(_config: &GzmoConfig, args: &[String]) -> Result<()> {
     }
 
     if want_apply {
-        promote_copy(&fused, &live)?;
-        println!("promoted {} → {}", fused.display(), live.display());
-        println!("note: full-file copy — verify [assembly]/[memory] if fuse was engine-only");
+        let live_text = std::fs::read_to_string(&live).context("read live config")?;
+        let next_shaped =
+            live_text.contains("[assembly]") || live_text.contains("[engine.local]");
+        if next_shaped {
+            promote_merge(&fused, &live)?;
+            println!(
+                "promoted (merge) {} → {}",
+                fused.display(),
+                live.display()
+            );
+        } else {
+            promote_copy(&fused, &live)?;
+            println!("promoted (full-file) {} → {}", fused.display(), live.display());
+            println!("note: full-file copy — verify sections if fuse was engine-only");
+        }
     }
 
+    Ok(())
+}
+
+fn promote_merge(fused: &Path, live: &Path) -> Result<()> {
+    let script = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../scripts/promote-fused-merge.py");
+    let script = if script.is_file() {
+        script
+    } else {
+        // Installed / cwd-relative fallback
+        PathBuf::from("scripts/promote-fused-merge.py")
+    };
+    if !script.is_file() {
+        bail!(
+            "merge helper missing at {} — refusing full-file clobber of GZMO-next config",
+            script.display()
+        );
+    }
+    let status = Command::new("python3")
+        .arg(&script)
+        .arg("--live")
+        .arg(live)
+        .arg("--fused")
+        .arg(fused)
+        .status()
+        .context("run promote-fused-merge.py")?;
+    if !status.success() {
+        bail!(
+            "promote-fused-merge.py failed (exit {})",
+            status.code().unwrap_or(-1)
+        );
+    }
     Ok(())
 }
 
