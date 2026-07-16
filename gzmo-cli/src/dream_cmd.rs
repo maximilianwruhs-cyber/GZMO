@@ -33,7 +33,7 @@ use gzmo_core::tools::ToolRegistry;
 use crate::cli_mcp::McpSession;
 
 /// Run a one-shot dream consolidation for `date` (defaults to today).
-pub async fn run(config: &GzmoConfig, _identity: IdentityEngine, date: Option<NaiveDate>) -> Result<()> {
+pub async fn run(config: &GzmoConfig, _identity: &IdentityEngine, date: Option<NaiveDate>) -> Result<()> {
     let date = date.unwrap_or_else(|| Utc::now().date_naive());
 
     info!("╔══════════════════════════════════════════════╗");

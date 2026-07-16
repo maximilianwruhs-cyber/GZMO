@@ -20,6 +20,8 @@ mod mcp_serve_cmd;
 mod profile_cmd;
 mod embed_cmd;
 mod distill_cmd;
+mod promote_cmd;
+mod serve_cmd;
 mod init_cmd;
 mod ingest_eval_cmd;
 mod wiki_cmd;
@@ -37,6 +39,8 @@ enum Command {
     Chat,
     ChatRepl,  // Legacy REPL mode via --repl flag
     Daemon,
+    /// Thin overnight metabolism runner (ADR-0003).
+    Serve,
     /// One-shot dream consolidation for an optional date (default: today).
     Dream(Option<NaiveDate>),
     /// One-shot spark (serendipitous recall) for an optional date (default: today).
@@ -47,6 +51,7 @@ enum Command {
     Init,
     MemoryDump,
     MemoryEmbed(Option<usize>),
+    MemoryPromote(Option<usize>),
     Memory(Vec<String>),
     Distill(Option<String>),
     Health,
@@ -67,6 +72,7 @@ fn parse_args() -> Command {
     let args: Vec<String> = std::env::args().collect();
     if args.len() >= 2 {
         if args[1] == "daemon" { return Command::Daemon; }
+        if args[1] == "serve" { return Command::Serve; }
         if args[1] == "init" { return Command::Init; }
         if args[1] == "--repl" { return Command::ChatRepl; }
         if args[1] == "dream" {
@@ -113,6 +119,13 @@ fn parse_args() -> Command {
             if args.get(2).map(|s| s.as_str()) == Some("embed") {
                 let limit = args.get(3).and_then(|s| s.parse().ok());
                 return Command::MemoryEmbed(limit);
+            }
+            if args.get(2).map(|s| s.as_str()) == Some("promote") {
+                let limit = args.get(3).and_then(|s| s.parse().ok());
+                return Command::MemoryPromote(limit);
+            }
+            if args.get(2).map(|s| s.as_str()) == Some("mcp") {
+                return Command::McpServe;
             }
             return Command::Memory(args[2..].to_vec());
         }
@@ -161,6 +174,7 @@ async fn main() -> Result<()> {
     let default_filter = match command {
         Command::Chat | Command::ChatRepl => "warn",
         Command::Daemon => "info",
+        Command::Serve => "info",
         Command::Dream(_) => "info",
         Command::Spark(_) => "info",
         Command::Ingest { .. } => "info",
@@ -169,6 +183,7 @@ async fn main() -> Result<()> {
         Command::Init => "warn",
         Command::MemoryDump => "info",
         Command::MemoryEmbed(_) => "info",
+        Command::MemoryPromote(_) => "info",
         Command::Memory(_) => "warn",
         Command::Distill(_) => "info",
         Command::Health => "warn",
@@ -202,6 +217,7 @@ async fn main() -> Result<()> {
     match command {
         Command::Chat => chat::run(&config, &identity).await,
         Command::ChatRepl => tui::runner::run(&config, &identity).await,
+        Command::Serve => serve_cmd::run(&config, &identity).await,
         Command::Daemon => {
             // OS-level singleton lock file
             let pid_file = std::path::PathBuf::from("/tmp/gzmo_rust.pid");
@@ -237,8 +253,8 @@ async fn main() -> Result<()> {
             let _ = std::fs::remove_file(&pid_file);
             res
         },
-        Command::Dream(date) => dream_cmd::run(&config, identity, date).await,
-        Command::Spark(date) => spark_cmd::run(&config, identity, date).await,
+        Command::Dream(date) => dream_cmd::run(&config, &identity, date).await,
+        Command::Spark(date) => spark_cmd::run(&config, &identity, date).await,
         Command::Ingest { path, dry_run } => ingest_cmd::run(&config, identity, path, dry_run).await,
         Command::IngestDir(path) => ingest_dir_cmd::run(&config, identity, path).await,
         Command::IngestEval(path) => ingest_eval_cmd::run(&config, identity, path).await,
@@ -250,6 +266,7 @@ async fn main() -> Result<()> {
             Ok(())
         }
         Command::MemoryEmbed(limit) => embed_cmd::run(&config, &identity, limit).await,
+        Command::MemoryPromote(limit) => promote_cmd::run(&config, &identity, limit).await,
         Command::Memory(sub) => memory_cmd::run(&config, sub).await,
         Command::Distill(session_id) => distill_cmd::run(&config, &identity, session_id).await,
         Command::Health => health_cmd::run(&config, identity).await,

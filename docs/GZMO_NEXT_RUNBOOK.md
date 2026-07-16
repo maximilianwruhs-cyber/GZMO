@@ -59,36 +59,41 @@ watcher stays off until promotion quality is gated.
 | Neo4j (MCP memory) | `bolt://127.0.0.1:7687` | Yes — `[[mcp_servers]]` memory in toml |
 | Ingest watcher | — | No — `[ingest] enabled = false` (workstation v1) |
 
-## Canonical long-running process: `gzmo-scheduler`
+## Canonical long-running process: `gzmo serve` (ADR-0003)
 
-The recommended way to run GZMO-next is the dedicated **`gzmo-scheduler`**
-binary (`GZMO/gzmo-scheduler/`): a thin cron runner that only spawns the lab
-recipes below. It links none of the inline engines — no DreamEngine, no
-SparkEngine, no MCP, no chaos — so it compiles in seconds and cannot regress
-into the monolith. At startup it refuses to run unless `GZMO_INSTANCE=next`
-and every `[assembly]` loop is `"lab"`.
+The living overnight runner is **`gzmo serve`**: typed Rust jobs
+(distill → promote → embed → dream/spark) + distill BRPOP worker.
+No chaos, no wiki/KG/discovery on this path. Writes
+`data-next/scheduler-runs/`. systemd: `gzmo-serve.service`.
 
 ```bash
-# Start (foreground; singleton lock at /tmp/gzmo-scheduler.pid)
+export GZMO_INSTANCE=next
+export GZMO_CONFIG=$GZMO_CLONE_ROOT/GZMO/config/gzmo.toml
 cd $GZMO_CLONE_ROOT/GZMO
-cargo build --release -p gzmo-scheduler
-./target/release/gzmo-scheduler
+cargo build --release -p gzmo-cli
+./target/release/gzmo serve
 
-# Stop
-kill "$(cat /tmp/gzmo-scheduler.pid)"
-
-# Reclaim a stale lock after a crash:
-rm -f /tmp/gzmo-scheduler.pid
+# Or: systemctl --user enable --now gzmo-serve.service
+# Stop: kill "$(cat /tmp/gzmo-serve.pid)"
 ```
 
-It reads the same `GZMO_CONFIG` (`gzmo-next.toml`) and runs the same loop →
-recipe map as the transitional path below.
+Operator proof: `gzmo status` → **Overnight metabolism** section.
+
+## Optional lab parity: `gzmo-scheduler`
+
+Thin cron that spawns Little Tools Lab recipes (beat-gate / parity). Not the
+metabolism authority. Requires `GZMO_INSTANCE=next` and lab assembly backends.
+
+```bash
+cargo build --release -p gzmo-scheduler
+./target/release/gzmo-scheduler   # lock: /tmp/gzmo-scheduler.pid
+```
 
 ## Transitional: `gzmo daemon` with lab branches
 
 The legacy daemon also honors `[assembly] = "lab"` under `GZMO_INSTANCE=next`,
 but it still boots the full inline stack (engines, MCP, chaos) before
-branching. Kept for reference/fallback; prefer `gzmo-scheduler`.
+branching. Kept for reference/fallback; prefer `gzmo serve`.
 
 ```bash
 # Start (foreground; singleton lock at /tmp/gzmo_rust.pid)

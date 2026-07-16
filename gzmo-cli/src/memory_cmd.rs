@@ -14,8 +14,12 @@ const USAGE: &str =
      gzmo memory status [--session ID] [--json]\n  \
      gzmo memory turn-start [--session ID]\n  \
      gzmo memory chain <fact-id>\n  \
+     gzmo memory embed [limit]\n  \
+     gzmo memory promote [limit]\n  \
+     gzmo memory mcp\n  \
      \n\
      Session: --session or GZMO_SESSION_ID env.\n\
+     MCP: `gzmo memory mcp` == `gzmo mcp-serve` (third surface, ADR-0003).\n\
      See docs/ARCHITECTURE_GZMO_PLATFORM.md";
 
 

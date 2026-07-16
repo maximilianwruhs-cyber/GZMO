@@ -17,6 +17,55 @@ pub struct ChaosRuntime {
     pub restore_policy: String,
 }
 
+/// ADR-0003: chaos is opt-in for chat. Default off when key absent.
+pub fn enabled_in_chat(config: &GzmoConfig) -> bool {
+    config
+        .chaos
+        .as_ref()
+        .and_then(|v| v.get("enabled_in_chat"))
+        .and_then(|x| x.as_bool())
+        .unwrap_or(false)
+}
+
+/// Chat boot: live PulseLoop when enabled, else static idle snapshot (no CPU pulse).
+pub struct ChatChaosBoot {
+    pub enabled: bool,
+    /// Kept alive so a disabled boot's watch sender is not dropped.
+    pub _snapshot_tx: Option<watch::Sender<ChaosSnapshot>>,
+    pub runtime: Option<ChaosRuntime>,
+    pub snapshot_rx: watch::Receiver<ChaosSnapshot>,
+    pub feedback_tx: mpsc::Sender<ChaosEvent>,
+    pub restore_policy: String,
+}
+
+pub fn boot_chat_chaos(config: &GzmoConfig) -> ChatChaosBoot {
+    if enabled_in_chat(config) {
+        let runtime = start_chaos_runtime(config);
+        let snapshot_rx = runtime.handle.snapshot_rx.clone();
+        let feedback_tx = runtime.feedback_tx.clone();
+        let restore_policy = runtime.restore_policy.clone();
+        ChatChaosBoot {
+            enabled: true,
+            _snapshot_tx: None,
+            runtime: Some(runtime),
+            snapshot_rx,
+            feedback_tx,
+            restore_policy,
+        }
+    } else {
+        let (snapshot_tx, snapshot_rx) = watch::channel(ChaosSnapshot::default());
+        let (feedback_tx, _feedback_rx) = mpsc::channel(8);
+        ChatChaosBoot {
+            enabled: false,
+            _snapshot_tx: Some(snapshot_tx),
+            runtime: None,
+            snapshot_rx,
+            feedback_tx,
+            restore_policy: "quarantined".into(),
+        }
+    }
+}
+
 /// Start the PulseLoop chaos engine with the config's [chaos] parameters.
 pub fn start_chaos_runtime(config: &GzmoConfig) -> ChaosRuntime {
     let chaos_config: ChaosConfig = config.chaos

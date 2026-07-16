@@ -244,6 +244,10 @@ pub struct GzmoConfig {
     #[serde(default)]
     pub session_distill: SessionDistillConfig,
 
+    /// Overnight metabolism cron slots for `gzmo serve` (ADR-0003).
+    #[serde(default)]
+    pub metabolism: MetabolismConfig,
+
     /// Local embedding server for vault vectors (`/v1/embeddings`).
     #[serde(default)]
     pub embeddings: EmbeddingsConfig,
@@ -789,6 +793,51 @@ impl Default for SessionDistillConfig {
             daemon_scheduled: default_session_distill_daemon_scheduled(),
             cron_hour: default_session_distill_cron_hour(),
             cron_minute: default_session_distill_cron_minute(),
+        }
+    }
+}
+
+// ─── Metabolism (`gzmo serve`) ──────────────────────────────────────────
+
+/// Overnight promote/embed cron slots for the thin typed runner (ADR-0003).
+#[derive(Debug, Deserialize, Clone)]
+pub struct MetabolismConfig {
+    #[serde(default = "default_metabolism_enabled")]
+    pub enabled: bool,
+    #[serde(default = "default_metabolism_promote_hour")]
+    pub promote_cron_hour: u32,
+    #[serde(default = "default_metabolism_promote_minute")]
+    pub promote_cron_minute: u32,
+    #[serde(default = "default_metabolism_embed_hour")]
+    pub embed_cron_hour: u32,
+    #[serde(default = "default_metabolism_embed_minute")]
+    pub embed_cron_minute: u32,
+}
+
+fn default_metabolism_enabled() -> bool {
+    true
+}
+fn default_metabolism_promote_hour() -> u32 {
+    2
+}
+fn default_metabolism_promote_minute() -> u32 {
+    30
+}
+fn default_metabolism_embed_hour() -> u32 {
+    2
+}
+fn default_metabolism_embed_minute() -> u32 {
+    45
+}
+
+impl Default for MetabolismConfig {
+    fn default() -> Self {
+        Self {
+            enabled: default_metabolism_enabled(),
+            promote_cron_hour: default_metabolism_promote_hour(),
+            promote_cron_minute: default_metabolism_promote_minute(),
+            embed_cron_hour: default_metabolism_embed_hour(),
+            embed_cron_minute: default_metabolism_embed_minute(),
         }
     }
 }
@@ -2272,24 +2321,31 @@ impl GzmoConfig {
         Ok(config)
     }
 
-    /// Load from `gzmo.toml` anchored to the executable directory, 
-    /// or an explicit path via the `GZMO_CONFIG` environment variable.
+    /// Load living instance config.
+    ///
+    /// Order: `GZMO_CONFIG` → `config/gzmo.toml` → `config/gzmo-next.toml` →
+    /// cwd/`gzmo.toml` → exe-dir variants. Root `gzmo.toml` remains the CT101
+    /// frozen reference (ADR-0003).
     pub fn load_auto() -> Result<Self> {
-        let path = std::env::var("GZMO_CONFIG")
-            .map(PathBuf::from)
-            .unwrap_or_else(|_| {
-                let cwd_path = std::env::current_dir()
-                    .unwrap_or_else(|_| PathBuf::from("."))
-                    .join("gzmo.toml");
-                if cwd_path.exists() {
-                    return cwd_path;
-                }
-                
-                // Portable mode fallback: anchor to the physical location of the executable
-                let mut exe = std::env::current_exe().unwrap_or_else(|_| PathBuf::from("."));
-                exe.pop(); // Remove executable name
-                exe.join("gzmo.toml")
-            });
+        let path = if let Ok(p) = std::env::var("GZMO_CONFIG") {
+            PathBuf::from(p)
+        } else {
+            let cwd = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
+            let mut exe = std::env::current_exe().unwrap_or_else(|_| PathBuf::from("."));
+            exe.pop();
+            let candidates = [
+                cwd.join("config/gzmo.toml"),
+                cwd.join("config/gzmo-next.toml"),
+                exe.join("config/gzmo.toml"),
+                exe.join("config/gzmo-next.toml"),
+                cwd.join("gzmo.toml"),
+                exe.join("gzmo.toml"),
+            ];
+            candidates
+                .into_iter()
+                .find(|p| p.exists())
+                .unwrap_or_else(|| cwd.join("gzmo.toml"))
+        };
 
         Self::load(&path)
     }

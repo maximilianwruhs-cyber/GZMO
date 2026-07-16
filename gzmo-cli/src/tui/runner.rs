@@ -122,11 +122,11 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
         VllmConfig::from(active_profile.clone()),
     ))));
 
-    // ─── Chaos Engine ────────────────────────────────────────────
-    let chaos_runtime = crate::chaos_bootstrap::start_chaos_runtime(&config);
-    let mut chaos_handle = chaos_runtime.handle;
-    let chaos_snapshot_rx = chaos_handle.snapshot_rx.clone();
-    let chaos_feedback_tx = chaos_runtime.feedback_tx.clone();
+    // ─── Chaos Engine (opt-in; ADR-0003) ─────────────────────────
+    let chaos_boot = crate::chaos_bootstrap::boot_chat_chaos(&config);
+    let chaos_handle = chaos_boot.runtime.map(|r| r.handle);
+    let chaos_snapshot_rx = chaos_boot.snapshot_rx.clone();
+    let chaos_feedback_tx = chaos_boot.feedback_tx.clone();
 
     // ─── Chaos Skills (Rust-native) ─────────────────────
     let mut chaos_skills = ChaosSkillRegistry::new();
@@ -338,12 +338,11 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
         });
     }
 
-    // ─── Background: Lore → UI ──────────────────────────────────
-    {
+    // ─── Background: Lore → UI (no-op when chaos quarantined) ───
+    if let Some(mut handle) = chaos_handle {
         let tx = action_tx.clone();
         tokio::spawn(async move {
-            // chaos_handle is moved into this task, keeping it alive
-            while let Some(lore) = chaos_handle.lore_rx.recv().await {
+            while let Some(lore) = handle.lore_rx.recv().await {
                 let author = lore.author.unwrap_or_default();
                 let _ = tx.send(Action::LoreEvent(lore.category, author, lore.text));
             }

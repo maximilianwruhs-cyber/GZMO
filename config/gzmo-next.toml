@@ -1,18 +1,19 @@
-# GZMO-next — Workstation instance (Little Tools Lab backend)
+# GZMO living instance — workstation production (ADR-0003)
 # ─────────────────────────────────────────────────────────────────────────
 #
-# Second, standalone GZMO instance. Physically isolated from legacy paths:
-#   config  → GZMO/config/gzmo-next.toml   (this file)
-#   data    → GZMO/data-next/              (vault, sessions, queues, episodic)
+# Sole living config (also linked as config/gzmo.toml). CT101 root gzmo.toml
+# is a frozen reference only.
 #
-# Env contract (operator + daemon):
+#   config  → GZMO/config/gzmo.toml (= this file via symlink)
+#   data    → GZMO/data-next/
+#
+# Env contract (operator + gzmo serve):
 #   export GZMO_INSTANCE=next
-#   export GZMO_CONFIG=$GZMO_CLONE_ROOT/GZMO/config/gzmo-next.toml
+#   export GZMO_CONFIG=$GZMO_CLONE_ROOT/GZMO/config/gzmo.toml
 #
-# The [assembly] section routes daemon loops to Little Tools Lab recipes
-# (bash + file artifacts) instead of inline gzmo-core engines. Guardrail:
-# lab backends only activate when GZMO_INSTANCE=next — otherwise every
-# loop stays Inline (CT101-safe). See GZMO/docs/CT101_BOUNDARY.md.
+# Metabolism: `gzmo serve` runs typed Rust jobs (distill/promote/embed/dream/spark).
+# Lab recipes remain beat-gate fixtures; optional gzmo-scheduler for parity.
+# See GZMO/docs/ADR-0003-one-instance-metabolism.md and CT101_BOUNDARY.md.
 #
 # Calibration output from gzmo-handoff.sh lands in gzmo-next-fused.toml
 # (sibling file) for operator review — it never overwrites this file.
@@ -182,8 +183,18 @@ top_p = 0.95
 max_tokens = 24576
 
 [chaos]
+# ADR-0003: chaos is opt-in chat ritual — off by default on living instance.
+enabled_in_chat = false
 bpm_default = 120
 dt_lorenz = 0.5
+
+# Overnight metabolism cron extras (promote/embed slots for `gzmo serve`)
+[metabolism]
+enabled = true
+promote_cron_hour = 2
+promote_cron_minute = 30
+embed_cron_hour = 2
+embed_cron_minute = 45
 
 [benchmark.fused]
 verify_pass_rate = 0.9000

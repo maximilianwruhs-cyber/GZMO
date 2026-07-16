@@ -111,30 +111,40 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
         VllmConfig::from(active_profile),
     )) as Arc<dyn LlmGateway>));
 
-    // ─── Chaos Engine ────────────────────────────────────────────
-    let chaos_runtime = crate::chaos_bootstrap::start_chaos_runtime(&config);
-    let mut chaos_handle = chaos_runtime.handle;
-    let chaos_feedback_tx = chaos_runtime.feedback_tx.clone();
-    let chaos_snapshot_rx = chaos_handle.snapshot_rx.clone();
-    eprintln!("  {COPPER}⚙ Chaos engine running — 174 BPM (HW telemetry active){RESET}");
+    // ─── Chaos Engine (opt-in; ADR-0003 quarantined by default) ──
+    let chaos_boot = crate::chaos_bootstrap::boot_chat_chaos(&config);
+    let chaos_enabled = chaos_boot.enabled;
+    let mut chaos_handle = chaos_boot.runtime.map(|r| r.handle);
+    let chaos_feedback_tx = chaos_boot.feedback_tx.clone();
+    let chaos_snapshot_rx = chaos_boot.snapshot_rx.clone();
+    // When chaos is off, lore select branch parks forever (no PulseHandle).
+    if chaos_enabled {
+        eprintln!("  {COPPER}⚙ Chaos engine running — 174 BPM (HW telemetry active){RESET}");
+    } else {
+        eprintln!("  {DIM}⚙ Chaos quarantined — set [chaos].enabled_in_chat = true to enable{RESET}");
+    }
 
     // Trigger notification channel: background → REPL
     let (trigger_notify_tx, mut trigger_notify_rx) = tokio::sync::mpsc::channel::<String>(32);
 
     // Spawn background task: chaos state → gateway + file + trigger evaluation
-    let gateway_ref = gateway.clone();
-    let state_dir = config.memory.vault_db.parent().unwrap_or(std::path::Path::new(".")).to_path_buf();
-    let _chaos_bridge = crate::chaos_bootstrap::spawn_snapshot_bridge(
-        chaos_snapshot_rx.clone(),
-        gateway_ref,
-        chaos_feedback_tx.clone(),
-        state_dir,
-        Some(trigger_notify_tx),
-        None,
-        gzmo_core::synapse::EventSource::GzmoCli,
-        chaos_runtime.restore_policy.clone(),
-        true, // interactive REPL — no periodic autonomous monologue injects
-    );
+    let _chaos_bridge = if chaos_enabled {
+        let gateway_ref = gateway.clone();
+        let state_dir = config.memory.vault_db.parent().unwrap_or(std::path::Path::new(".")).to_path_buf();
+        Some(crate::chaos_bootstrap::spawn_snapshot_bridge(
+            chaos_snapshot_rx.clone(),
+            gateway_ref,
+            chaos_feedback_tx.clone(),
+            state_dir,
+            Some(trigger_notify_tx),
+            None,
+            gzmo_core::synapse::EventSource::GzmoCli,
+            chaos_boot.restore_policy.clone(),
+            true, // interactive REPL — no periodic autonomous monologue injects
+        ))
+    } else {
+        None
+    };
 
     // ─── Tools ───────────────────────────────────────────────────
     let mut tools = ToolRegistry::new();
@@ -454,11 +464,9 @@ Use delegate_task for focused sub-work; you receive a short summary, not full su
             }
         }
 
-        // ─── Inject chaos context ────────────────────────────
-        // Remove any previous chaos context message (is_meta system with "CHAOS_STATE" marker)
+        // ─── Inject chaos context (only when pulse is live) ──
         messages.retain(|m| !(m.role == Role::System && m.is_meta && m.content.contains("[CHAOS_STATE]")));
-        // Inject current state
-        {
+        if chaos_enabled {
             let snap = chaos_snapshot_rx.borrow().clone();
             let valence_desc = if snap.llm_valence < -0.5 {
                 "intense, restless, aggressive"
@@ -484,7 +492,6 @@ Use delegate_task for focused sub-work; you receive a short summary, not full su
                 snap.energy, snap.tension, snap.x, snap.y, snap.z,
                 snap.thoughts_incubating, snap.thoughts_crystallized,
             );
-            // Insert after the main system prompt (position 1)
             let insert_pos = 1.min(messages.len());
             messages.insert(insert_pos, Message {
                 role: Role::System,
@@ -559,8 +566,13 @@ Use delegate_task for focused sub-work; you receive a short summary, not full su
                 }
             }
 
-            // ─── Lore notifications (real-time) ─────────────────
-            lore = chaos_handle.lore_rx.recv() => {
+            // ─── Lore notifications (real-time; idle when chaos off) ─
+            lore = async {
+                match chaos_handle.as_mut() {
+                    Some(h) => h.lore_rx.recv().await,
+                    None => futures::future::pending().await,
+                }
+            } => {
                 if let Some(lore_notif) = lore {
                     if prompt_dirty {
                         eprintln!(); // Newline before lore if prompt is active

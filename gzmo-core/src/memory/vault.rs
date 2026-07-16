@@ -29,7 +29,7 @@ use crate::memory::recall_rrf::{
 };
 use std::process::Command as StdCommand;
 use crate::memory::rerank::Reranker;
-use crate::types::{ExtractedTruth, SemanticFact};
+use crate::types::{DecayClass, ExtractedTruth, SemanticFact};
 
 /// Result of `SqliteVault::backfill_missing_embeddings`.
 #[derive(Debug, Clone, Copy)]
@@ -37,6 +37,25 @@ pub struct EmbedBackfillReport {
     pub attempted: usize,
     pub updated: usize,
     pub failed: usize,
+}
+
+/// Result of `SqliteVault::promote_mature_to_honeypot`.
+#[derive(Debug, Clone, Copy, Default)]
+pub struct PromoteMatureReport {
+    pub candidates: usize,
+    pub promoted: usize,
+    pub skipped: usize,
+}
+
+fn parse_decay_class(s: &str) -> DecayClass {
+    match s {
+        "CuratedVault" | "curated_vault" => DecayClass::CuratedVault,
+        "SessionDistill" | "session_distill" => DecayClass::SessionDistill,
+        "FlexibleIdentity" | "flexible_identity" => DecayClass::FlexibleIdentity,
+        "AbsoluteIdentity" | "absolute_identity" => DecayClass::AbsoluteIdentity,
+        "Structural" | "structural" => DecayClass::Structural,
+        _ => DecayClass::Episodic,
+    }
 }
 
 /// The permanent semantic vault backed by SQLite.
@@ -1800,6 +1819,78 @@ fn maybe_upsert_evidence(
             |row| row.get(0),
         )?;
         Ok(count)
+    }
+
+    /// Promote high-confidence vault facts not yet in `honeypot` (overnight metabolism job).
+    pub fn promote_mature_to_honeypot(&self, limit: Option<usize>) -> Result<PromoteMatureReport> {
+        let cap = limit.unwrap_or(500) as i64;
+        let conn = self.pool.get()?;
+        // Honeypot table is created by schema migrations in `open`.
+        let mut stmt = conn.prepare(
+            "SELECT id, content, confidence, decay_class, source_file, embedding
+             FROM semantic_vault
+             WHERE confidence >= 0.85
+               AND NOT EXISTS (SELECT 1 FROM honeypot h WHERE h.id = semantic_vault.id)
+             ORDER BY created_at DESC
+             LIMIT ?1",
+        )?;
+        let rows: Vec<(String, String, f64, String, Option<String>, Vec<u8>)> = stmt
+            .query_map([cap], |row| {
+                Ok((
+                    row.get(0)?,
+                    row.get(1)?,
+                    row.get(2)?,
+                    row.get(3)?,
+                    row.get(4)?,
+                    row.get::<_, Option<Vec<u8>>>(5)?.unwrap_or_default(),
+                ))
+            })?
+            .filter_map(|r| r.ok())
+            .collect();
+
+        let mut report = PromoteMatureReport {
+            candidates: rows.len(),
+            promoted: 0,
+            skipped: 0,
+        };
+
+        for (id, content, confidence, decay_class, source_file, embedding) in rows {
+            let source = source_file
+                .filter(|s| !s.trim().is_empty())
+                .unwrap_or_else(|| "semantic_vault".into());
+            let truth = ExtractedTruth {
+                id: Uuid::parse_str(&id).unwrap_or_else(|_| Uuid::new_v4()),
+                content: content.clone(),
+                confidence: confidence as f32,
+                mmr_score: 0.0,
+                source_date: Utc::now().date_naive(),
+                decay_class: parse_decay_class(&decay_class),
+                source_file: Some(source),
+                evidence: None,
+            };
+            if !honeypot::qualifies_for_honeypot(&truth) {
+                report.skipped += 1;
+                continue;
+            }
+            let content_norm = normalize_truth_content(&truth.content);
+            honeypot::upsert_honeypot_row(
+                &conn,
+                &id,
+                &truth,
+                &embedding,
+                &content_norm,
+                "honeypot",
+            )?;
+            report.promoted += 1;
+        }
+
+        info!(
+            candidates = report.candidates,
+            promoted = report.promoted,
+            skipped = report.skipped,
+            "Mature vault → honeypot promote complete"
+        );
+        Ok(report)
     }
 
     /// Embed and store vectors for facts missing embeddings (requires `with_embedder`).

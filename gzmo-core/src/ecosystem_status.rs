@@ -173,12 +173,16 @@ pub async fn format_ecosystem_status(config: &GzmoConfig) -> String {
         assembly_summary(&config.assembly)
     ));
 
+    out.push_str(&crate::metabolism::format_overnight_metabolism(config));
+
     out.push_str("### User systemd\n\n");
     out.push_str("| Unit | State |\n|---|---|\n");
     out.push_str(&format!("| llama-prime.service | {prime} |\n"));
+    let serve = user_systemd_unit("gzmo-serve.service").await;
+    out.push_str(&format!("| gzmo-serve.service | {serve} |\n"));
     out.push_str(&format!("| gzmo-scheduler.service | {scheduler} |\n"));
     out.push_str(&format!("| okforge.service (/observatory) | {observatory} |\n"));
-    out.push_str("\n*Foreground `gzmo chat` is not the scheduler daemon — use the table above for long-running services.*\n\n");
+    out.push_str("\n*Metabolism: `gzmo serve` (typed jobs). Lab parity: `gzmo-scheduler`. Chat is not a daemon.*\n\n");
 
     // Wiki / OKForge plane (production signal)
     let wiki_meta = config

@@ -61,6 +61,8 @@ fn write_job_result(
     }
     let latest = dir.join("latest.json");
     let _ = std::fs::copy(&path, &latest);
+    let job_latest = dir.join(format!("latest-{job}.json"));
+    let _ = std::fs::copy(&path, &job_latest);
     info!(job, path = %path.display(), ok, "job result recorded");
 }
 

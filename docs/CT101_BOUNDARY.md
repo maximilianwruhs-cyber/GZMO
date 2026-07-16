@@ -7,14 +7,14 @@
 
 ## Decision
 
-**CT101 is a standalone legacy GZMO deployment.** **GZMO-next on the workstation is production** (since 2026-07-15). Little Tools Lab does **not** swap individual daemon loops into CT101.
+**CT101 is a frozen reference machine** (not a forever dual-stack product). **The workstation is the sole living instance** (ADR-0003, since 2026-07-16). Little Tools Lab does **not** swap individual daemon loops into CT101.
 
-| | CT101 | GZMO-next (workstation) |
+| | CT101 | Workstation (living) |
 |---|--------|------------------|
-| **What it is** | Frozen legacy (`gzmo daemon`, gzmo-core inline) | **Production** — `gzmo-scheduler` + lab recipes |
-| **Lab integration** | **None** — no `[assembly]` flags | `[assembly] = "lab"` via `GZMO_INSTANCE=next` |
+| **What it is** | Frozen reference (`gzmo.toml` + `gzmo daemon`) | **Production** — `gzmo serve` metabolism + `config/gzmo.toml` → `data-next/` |
+| **Lab integration** | **None** | Lab recipes = beat-gate fixtures; optional `gzmo-scheduler` for parity |
 | **beat-gate** | Historical reference baseline | S2 gate before trusting production |
-| **Ops** | Leave alone unless explicitly debugging legacy | `systemctl --user` services, `data-next/` paths |
+| **Ops** | Leave alone unless explicitly debugging legacy | `gzmo serve`, `gzmo status`, `systemctl --user gzmo-serve` |
 
 ---
 
@@ -28,11 +28,14 @@
 
 ## What we do on the workstation (production)
 
-- **`gzmo-scheduler`** — cron runner (`GZMO_INSTANCE=next`, `config/gzmo-next.toml`)
+- **`gzmo serve`** — overnight metabolism (distill → promote → embed → dream/spark); unit `gzmo-serve.service`
+- **`gzmo` / `gzmo chat`** — operator frontend
+- **`gzmo memory mcp`** — MCP memory surface for Cursor/Pi
+- **`gzmo status`** — “did last night work?” via `data-next/scheduler-runs/`
 - **`llama-prime`** — local cognition at `:8000`
 - **Sidecars** — local Qdrant + Redis (`database-cluster/`, user systemd)
-- **`gzmo chat` / `gzmo assemble`** — operator frontend
-- **Observatory** — `OBSERVATORY_MODE=local`, reads `data-next/`
+- **Observatory** — read-only viewer over `data-next/` (not a second control plane)
+- Optional: **`gzmo-scheduler`** — lab recipe parity cron (not the metabolism authority)
 
 ---
 

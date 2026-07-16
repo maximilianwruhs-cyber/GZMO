@@ -7,7 +7,7 @@
 
 ## 1. One sentence
 
-**GZMO Platform** = `gzmo.toml` spine + hot/cold memory + daemon jobs. **One frontend** does daily work (today: **`gzmo_cli`** — default `gzmo` / `gzmo chat`). Pi is optional auxiliary; see [OPERATOR_FRONTEND_DECISION.md](./OPERATOR_FRONTEND_DECISION.md).
+**GZMO Platform** = living `config/gzmo.toml` spine + hot/cold memory + overnight metabolism. **Three surfaces:** `gzmo chat`, `gzmo serve`, `gzmo memory mcp`. Pi/Cursor attach via MCP only; see [ADR-0003-one-instance-metabolism.md](./ADR-0003-one-instance-metabolism.md) and [OPERATOR_FRONTEND_DECISION.md](./OPERATOR_FRONTEND_DECISION.md).
 
 ---
 
