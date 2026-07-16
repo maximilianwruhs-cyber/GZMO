@@ -26,6 +26,8 @@ pub mod ingest;
 pub mod ingest_prep;
 pub mod wiki;
 pub mod wiki_md;
+pub mod okforge_client;
+pub mod wiki_okf;
 pub mod session_distill;
 pub mod mcp;
 pub mod stealth;

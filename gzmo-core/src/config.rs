@@ -454,6 +454,20 @@ pub struct IngestConfig {
     #[serde(default = "default_ingest_enabled")]
     pub enabled: bool,
 
+    /// Nightly batch `gzmo ingest-dir` via gzmo-scheduler (watcher stays off).
+    #[serde(default)]
+    pub batch_enabled: bool,
+
+    /// Inbox directory for batch ingest (relative to config dir or absolute).
+    #[serde(default = "default_ingest_inbox")]
+    pub inbox_path: String,
+
+    #[serde(default = "default_ingest_batch_hour")]
+    pub cron_hour: u32,
+
+    #[serde(default)]
+    pub cron_minute: u32,
+
     #[serde(default = "default_dream_verify")]
     pub verify: bool,
 
@@ -479,6 +493,12 @@ pub struct IngestConfig {
 fn default_ingest_max_source_chars() -> usize {
     120_000
 }
+fn default_ingest_inbox() -> String {
+    "../data-next/inbox".into()
+}
+fn default_ingest_batch_hour() -> u32 {
+    2
+}
 
 impl IngestConfig {
     pub fn kg_gate(&self) -> crate::memory::kg_extract::KgGateConfig {
@@ -496,6 +516,10 @@ impl Default for IngestConfig {
     fn default() -> Self {
         Self {
             enabled: default_ingest_enabled(),
+            batch_enabled: false,
+            inbox_path: default_ingest_inbox(),
+            cron_hour: default_ingest_batch_hour(),
+            cron_minute: 0,
             verify: default_dream_verify(),
             min_confidence: default_dream_min_confidence(),
             verify_temperature: default_dream_verify_temperature(),
@@ -521,6 +545,10 @@ pub struct WikiConfig {
     #[serde(default = "default_wiki_enabled")]
     pub enabled: bool,
 
+    /// `"local"` = on-disk WikiEngine; `"okforge"` = OKCP push to forge repo.
+    #[serde(default = "default_wiki_backend")]
+    pub backend: String,
+
     #[serde(default = "default_wiki_directory")]
     pub directory: String,
 
@@ -537,6 +565,14 @@ pub struct WikiConfig {
     #[serde(default = "default_wiki_emit_on_ingest")]
     pub emit_on_ingest: bool,
 
+    /// Hook `wiki-okforge-push` after distill recipe (GZMO-next).
+    #[serde(default)]
+    pub emit_after_distill: bool,
+
+    /// Hook `wiki-okforge-push` after dream recipe (GZMO-next).
+    #[serde(default)]
+    pub emit_after_dream: bool,
+
     /// Daemon "Knowledge Gardener" sync loop (UTC hour/minute).
     #[serde(default = "default_wiki_sync_cron_hour")]
     pub sync_cron_hour: u32,
@@ -548,9 +584,38 @@ pub struct WikiConfig {
     pub lint_cron_dow: u32,
     #[serde(default = "default_wiki_lint_cron_hour")]
     pub lint_cron_hour: u32,
+
+    /// Catch-up push cron (UTC) when recipe hooks miss.
+    #[serde(default = "default_wiki_push_cron_hour")]
+    pub push_cron_hour: u32,
+    #[serde(default = "default_wiki_push_cron_minute")]
+    pub push_cron_minute: u32,
+
+    #[serde(default)]
+    pub okforge: Option<WikiOkforgeConfig>,
+}
+
+/// OKForge OKCP target for `[wiki.okforge]`.
+#[derive(Debug, Deserialize, Clone)]
+pub struct WikiOkforgeConfig {
+    #[serde(default = "default_okforge_url")]
+    pub url: String,
+    #[serde(default = "default_okforge_owner")]
+    pub owner: String,
+    #[serde(default = "default_okforge_repo")]
+    pub repo: String,
+    #[serde(default = "default_okforge_token_env")]
+    pub token_env: String,
+    #[serde(default = "default_okforge_agent_id")]
+    pub agent_id: String,
+    #[serde(default = "default_true")]
+    pub auto_commit: bool,
+    #[serde(default)]
+    pub open_pr: bool,
 }
 
 fn default_wiki_enabled() -> bool { true }
+fn default_wiki_backend() -> String { "local".to_string() }
 fn default_wiki_directory() -> String { "wiki".to_string() }
 fn default_wiki_index_path() -> String { "wiki/index.md".to_string() }
 fn default_wiki_log_path() -> String { "wiki/log.md".to_string() }
@@ -560,20 +625,47 @@ fn default_wiki_sync_cron_hour() -> u32 { 5 }
 fn default_wiki_sync_cron_minute() -> u32 { 30 }
 fn default_wiki_lint_cron_dow() -> u32 { 0 }
 fn default_wiki_lint_cron_hour() -> u32 { 6 }
+fn default_wiki_push_cron_hour() -> u32 { 5 }
+fn default_wiki_push_cron_minute() -> u32 { 30 }
+fn default_okforge_url() -> String { "http://127.0.0.1:3000".into() }
+fn default_okforge_owner() -> String { "gzmo".into() }
+fn default_okforge_repo() -> String { "gzmo-next-memory".into() }
+fn default_okforge_token_env() -> String { "OKFORGE_TOKEN".into() }
+fn default_okforge_agent_id() -> String { "gzmo-next".into() }
+
+impl Default for WikiOkforgeConfig {
+    fn default() -> Self {
+        Self {
+            url: default_okforge_url(),
+            owner: default_okforge_owner(),
+            repo: default_okforge_repo(),
+            token_env: default_okforge_token_env(),
+            agent_id: default_okforge_agent_id(),
+            auto_commit: true,
+            open_pr: false,
+        }
+    }
+}
 
 impl Default for WikiConfig {
     fn default() -> Self {
         Self {
             enabled: default_wiki_enabled(),
+            backend: default_wiki_backend(),
             directory: default_wiki_directory(),
             index_path: default_wiki_index_path(),
             log_path: default_wiki_log_path(),
             schema_path: default_wiki_schema_path(),
             emit_on_ingest: default_wiki_emit_on_ingest(),
+            emit_after_distill: false,
+            emit_after_dream: false,
             sync_cron_hour: default_wiki_sync_cron_hour(),
             sync_cron_minute: default_wiki_sync_cron_minute(),
             lint_cron_dow: default_wiki_lint_cron_dow(),
             lint_cron_hour: default_wiki_lint_cron_hour(),
+            push_cron_hour: default_wiki_push_cron_hour(),
+            push_cron_minute: default_wiki_push_cron_minute(),
+            okforge: None,
         }
     }
 }
@@ -1082,20 +1174,23 @@ pub struct KgReconcileConfig {
     #[serde(default)]
     pub enabled: bool,
 
-    /// UTC hour for weekly reconcile (default Sunday 04:00 if cron not set).
+    /// UTC hour for daily reconcile on GZMO-next (default 04:30).
     #[serde(default = "default_kg_reconcile_hour")]
     pub cron_hour: u32,
 
-    #[serde(default)]
+    #[serde(default = "default_kg_reconcile_minute")]
     pub cron_minute: u32,
 
     /// Dry-run: log planned changes without MCP writes.
-    #[serde(default)]
+    #[serde(default = "default_true")]
     pub dry_run: bool,
 }
 
 fn default_kg_reconcile_hour() -> u32 {
     4
+}
+fn default_kg_reconcile_minute() -> u32 {
+    30
 }
 
 impl Default for KgReconcileConfig {
@@ -1103,7 +1198,7 @@ impl Default for KgReconcileConfig {
         Self {
             enabled: false,
             cron_hour: default_kg_reconcile_hour(),
-            cron_minute: 0,
+            cron_minute: default_kg_reconcile_minute(),
             dry_run: true,
         }
     }

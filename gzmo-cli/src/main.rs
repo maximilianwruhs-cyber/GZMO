@@ -23,6 +23,7 @@ mod distill_cmd;
 mod init_cmd;
 mod ingest_eval_cmd;
 mod wiki_cmd;
+mod kg_reconcile_cmd;
 #[allow(dead_code)]
 mod ui;
 pub mod tui;
@@ -54,8 +55,10 @@ enum Command {
     Instance(Vec<String>),
     Config(Vec<String>),
     McpServe,
-    /// Knowledge Gardener ops over the wiki/ layer (sync|lint|search|file-back|status).
+    /// Knowledge Gardener ops over the wiki/ layer (sync|lint|search|file-back|status|push).
     Wiki(Vec<String>),
+    /// One-shot Neo4j ontology reconcile via MCP.
+    KgReconcile(Vec<String>),
     /// Run a Little Tools Lab assembly recipe (shells out to little-tools-lab/scripts).
     Assemble { recipe: String, fixture: bool, apply: bool },
 }
@@ -127,6 +130,9 @@ fn parse_args() -> Command {
             return Command::Config(args[2..].to_vec());
         }
         if args[1] == "wiki" { return Command::Wiki(args[2..].to_vec()); }
+        if args[1] == "kg-reconcile" {
+            return Command::KgReconcile(args[2..].to_vec());
+        }
         if args[1] == "mcp-serve" { return Command::McpServe; }
         if args[1] == "profile" {
             return Command::Profile(args[2..].to_vec());
@@ -172,6 +178,7 @@ async fn main() -> Result<()> {
         Command::Profile(_) => "warn",
         Command::McpServe => "warn",
         Command::Wiki(_) => "info",
+        Command::KgReconcile(_) => "info",
         Command::Assemble { .. } => "info",
     };
 
@@ -252,6 +259,7 @@ async fn main() -> Result<()> {
         Command::Profile(args) => profile_cmd::run(&config, &args).await,
         Command::McpServe => mcp_serve_cmd::run(&config).await,
         Command::Wiki(args) => wiki_cmd::run(&config, args).await,
+        Command::KgReconcile(args) => kg_reconcile_cmd::run(&config, args).await,
         Command::Assemble {
             recipe,
             fixture,

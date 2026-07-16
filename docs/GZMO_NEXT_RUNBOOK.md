@@ -111,15 +111,28 @@ daemon, or jobs would double-fire).
 
 | Loop | Schedule (UTC) | Lab recipe |
 |------|----------------|------------|
-| Session distill | 02:15 daily | `synapse-distill-handoff.sh --live` |
-| Dream | 01:00 daily | `session-to-dream.sh --live --output data-next/DREAMS.md` |
+| Dream | 01:00 daily | `session-to-dream.sh --live` → hooks `wiki-okforge-push.sh` |
+| Qdrant sync | 01:45 daily | `qdrant-vault-sync.sh` |
+| Ingest batch | 02:00 daily | `ingest-smoke.sh --live` (watcher off; batch only) |
+| Session distill | 02:15 daily | `synapse-distill-handoff.sh --live` → hooks wiki OKForge push |
 | Spark | 03:30, 22:30 | `cognition-smoke.sh --live --vault data-next/vault.db --spark-run` |
 | Ops health | startup | `ops-smoke.sh --live` |
 | Config handoff | 04:00 daily | `gzmo-handoff.sh --live --apply --gzmo-config config/gzmo-next-fused.toml` |
+| KG reconcile | 04:30 daily | `kg-reconcile-smoke.sh --live` (`[kg_reconcile] dry_run` until verified) |
+| Recall floor | Sunday 05:15 | `recall-eval-weekly.sh` → `data-next/recall-report.json` |
+| Wiki OKForge catch-up | 05:30 daily | `wiki-okforge-push.sh --live` (if recipe hooks missed) |
+| Pedagogy | Sunday 06:00 | `pedagogy-smoke.sh --live` ([ADR-0002](../../little-tools-lab/docs/adr/0002-pedagogy-chaos-scheduler-lab-only.md)) |
+| Cabinet feed | Sunday 06:30 | `cabinet-feed.sh --live` (one-shot; not PulseLoop) |
 | Discovery (optional) | **not armed by default** | `discovery-smoke.sh --live` via `beat-gate --loop discovery` or a host weekly cron. Do **not** add a DiscoveryEngine to `gzmo-scheduler`. Arm only after fixture beat-gate stays green. |
 
+**Wiki plane:** OKForge OKCP → `gzmo/gzmo-next-memory` (`gzmo wiki push`). Requires `OKFORGE_TOKEN` (`~/.config/okforge/env`, loaded by `gzmo-scheduler` drop-in) and local `okforge.service` on `:3000`. Not CT101 local WikiEngine sync.
+
+**Observatory:** in-forge at `http://127.0.0.1:3000/observatory` (`okforge.service`). The FastAPI sidecar `:7777` / `gzmo-observatory.service` is retired.
+
+**Production gate:** [`docs/OKFORGE_PRODUCTION.md`](OKFORGE_PRODUCTION.md) + `bash ~/Schreibtisch/okforge/scripts/production-smoke.sh`
+
 Job results land in `data-next/scheduler-runs/{job}-{timestamp}.json` (plus
-`latest.json`) for Observatory.
+`latest.json` and `wiki-push-latest.json`) for the Observatory Body panel.
 
 ## Operator commands
 
@@ -216,27 +229,46 @@ Manual cutover outline:
 5. Point operators at the new instance; CT101 stays frozen as reference until
    decommissioned. No flag flips on CT101, ever.
 
-## Weekly mentor hour (ADR-0002 — lab / chat only)
+## Calibration cadence
 
-Pedagogy is **never** on `gzmo-scheduler` cron. Once a week, deliberately:
+| Cadence | Action | Target |
+|---------|--------|--------|
+| **Daily 04:00 UTC** | `gzmo-handoff.sh --live --apply` (scheduler) | Sibling `config/gzmo-next-fused.toml` only — **HOLD** if benchmark gate fails |
+| **Weekly / monthly** | Human review | `gzmo config promote-fused --diff` then `--apply` (section merge into live) |
+| **Never** | Scheduler auto-merge into live `gzmo-next.toml` | — |
+
+Artifacts: `data-next/handoff/last-gzmo-handoff-meta.json`, `last-fuse-meta.json`, `last-handoff-gate.json` (`gate_passed`, `verify_pass_rate`).
+
+## Weekly graph triage
+
+After Sunday dream / when Observatory **Graph drift** shows alerts:
+
+1. Read `anomaly_count` from `data-next/dream-stats.json` (also on `gzmo status` → Graph drift).
+2. Open `data-next/graph-ledger.jsonl` (tail recent lines) and note which sessions/entities drifted.
+3. Decide action: ignore (noise), re-run dream with `--live`, or file a lab issue — do **not** auto-merge fused config as a “fix”.
+
+Sunday 05:15 UTC the scheduler also refreshes `data-next/recall-report.json` (recall floor).
+
+## Weekly mentor hour (ADR-0002 — weekly cron + manual)
+
+Pedagogy runs **Sunday 06:00 UTC** via `gzmo-scheduler` after `beat-gate --loop pedagogy` is green.
+Manual rehearsal still works:
 
 ```bash
 export GZMO_INSTANCE=next
 export GZMO_CONFIG=$GZMO_CLONE_ROOT/GZMO/config/gzmo-next.toml
 gzmo assemble pedagogy --fixture   # rehearsal
-# when ready:
-gzmo assemble pedagogy --live
+gzmo assemble pedagogy --live      # same recipe the cron uses
 ```
 
-There is **no** pedagogy/chaos/dice job in `gzmo-scheduler` (`jobs.rs`). That is
-intentional ([ADR-0002](../../little-tools-lab/docs/adr/0002-pedagogy-chaos-scheduler-lab-only.md)).
+Cabinet crystallize runs **Sunday 06:30 UTC** via `cabinet-feed.sh` (one-shot). PulseLoop,
+dice-scheduler, adaptive-tempo, and research-budget stay **off** the thin scheduler
+([ADR-0002](../../little-tools-lab/docs/adr/0002-pedagogy-chaos-scheduler-lab-only.md)).
 
-### Chat rituals (also never cron)
+### Chat rituals (not cron)
 
 | Ritual | Piece | How |
 |--------|-------|-----|
-| Thought Cabinet | `cabinet-sim feed` | Manual in chat / CLI — crystallize mutations |
 | Research budget | `research-budget check/spend` | Gate autonomous research tokens in chat |
 | Calibrate theatre | `/calibrate` → `bench-to-fuse --fixture` | Experience C rehearsal |
-
-Do not schedule PulseLoop, pedagogy, or dice-scheduler overnight without amending ADR-0002 + beat-gate.
+| PulseLoop / `/chaos` | `gzmo chat` | Continuous Lorenz — never `gzmo-scheduler` |

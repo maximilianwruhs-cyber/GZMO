@@ -84,7 +84,47 @@ max_tokens_verify = 4096
 anchor_min_age_hours = 0
 
 [ingest]
-enabled = false          # workstation v1: no knowledge-folder watcher
+enabled = false          # continuous watcher OFF
+batch_enabled = true     # nightly gzmo ingest-dir via scheduler
+inbox_path = "../data-next/inbox"
+cron_hour = 2
+cron_minute = 0
+
+[wiki]
+enabled = true
+backend = "okforge"
+emit_after_distill = true
+emit_after_dream = true
+emit_on_ingest = false
+push_cron_hour = 5
+push_cron_minute = 30
+
+[wiki.okforge]
+url = "http://127.0.0.1:3000"
+owner = "gzmo"
+repo = "gzmo-next-memory"
+token_env = "OKFORGE_TOKEN"
+agent_id = "gzmo-next"
+auto_commit = true
+open_pr = false
+
+[kg_reconcile]
+enabled = true
+cron_hour = 4
+cron_minute = 30
+dry_run = true           # flip to false after one verified live apply
+
+[pedagogy]
+enabled = true
+cron_weekday = 0         # Sunday
+cron_hour = 6
+cron_minute = 0
+
+[cabinet]
+enabled = true
+cron_weekday = 0         # Sunday
+cron_hour = 6
+cron_minute = 30
 
 [health]
 strict_startup = false
