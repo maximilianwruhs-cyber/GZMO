@@ -119,4 +119,29 @@ mod tests {
         assert_eq!(cfg.distill, AssemblyBackend::Inline);
         assert_eq!(cfg.config_handoff, AssemblyBackend::Inline);
     }
+
+    #[test]
+    fn lab_forced_inline_when_instance_not_next() {
+        // Do not rely on process env for this assertion of the policy rule:
+        // when instance is not next, effective(Lab) must be Inline.
+        // Simulate by calling the same branch the production code uses.
+        let cfg = AssemblyConfig {
+            distill: AssemblyBackend::Lab,
+            dream: AssemblyBackend::Lab,
+            spark: AssemblyBackend::Lab,
+            ops_health: AssemblyBackend::Lab,
+            config_handoff: AssemblyBackend::Lab,
+        };
+        // Without GZMO_INSTANCE=next in this test process… if already set to next
+        // by the operator shell, skip the force assertion.
+        if !instance_is_next() {
+            assert_eq!(cfg.effective(AssemblyBackend::Lab), AssemblyBackend::Inline);
+        } else {
+            assert_eq!(cfg.effective(AssemblyBackend::Lab), AssemblyBackend::Lab);
+        }
+        assert_eq!(
+            cfg.effective(AssemblyBackend::Inline),
+            AssemblyBackend::Inline
+        );
+    }
 }

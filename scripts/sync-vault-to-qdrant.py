@@ -60,19 +60,32 @@ def ensure_collection(url: str, name: str) -> None:
     print(f"[*] Created collection {name} ({VECTOR_DIM}-dim cosine)")
 
 
-def load_facts(db_path: Path, source: str) -> list[dict]:
+def load_facts(
+    db_path: Path,
+    source: str,
+    *,
+    since: str | None = None,
+    ids: set[str] | None = None,
+) -> list[dict]:
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     if source == "honeypot":
-        rows = conn.execute(
-            """
+        sql = """
             SELECT id, content, embedding, confidence, decay_class,
                    source_file, promoted_at
             FROM honeypot
             WHERE embedding IS NOT NULL AND length(embedding) >= 4
               AND is_latest = 1
             """
-        ).fetchall()
+        params: list = []
+        if since:
+            sql += " AND promoted_at >= ?"
+            params.append(since)
+        if ids:
+            placeholders = ",".join("?" for _ in ids)
+            sql += f" AND id IN ({placeholders})"
+            params.extend(ids)
+        rows = conn.execute(sql, params).fetchall()
     elif source == "vault_filtered":
         rows = conn.execute(
             """
@@ -87,15 +100,19 @@ def load_facts(db_path: Path, source: str) -> list[dict]:
             """
         ).fetchall()
     else:
-        rows = conn.execute(
-            """
+        sql = """
             SELECT id, content, embedding, half_life_days, confidence,
                    confirmation_count, decay_class, created_at, last_accessed_at,
                    source_file
             FROM semantic_vault
             WHERE embedding IS NOT NULL AND length(embedding) >= 4
             """
-        ).fetchall()
+        params = []
+        if ids:
+            placeholders = ",".join("?" for _ in ids)
+            sql += f" AND id IN ({placeholders})"
+            params.extend(ids)
+        rows = conn.execute(sql, params).fetchall()
     conn.close()
     points = []
     for r in rows:
@@ -149,6 +166,16 @@ def main() -> None:
         default="honeypot",
         help="SQLite table/query (default: honeypot M2)",
     )
+    p.add_argument(
+        "--since",
+        default=None,
+        help="ISO timestamp — only honeypot rows with promoted_at >= since (incremental)",
+    )
+    p.add_argument(
+        "--ids",
+        default=None,
+        help="Comma-separated fact UUIDs to upsert (incremental)",
+    )
     p.add_argument("--dry-run", action="store_true")
     args = p.parse_args()
     if args.collection is None:
@@ -158,9 +185,15 @@ def main() -> None:
         print(f"[!] No vault at {args.db}", file=sys.stderr)
         sys.exit(1)
 
-    points = load_facts(args.db, args.source)
+    id_set = None
+    if args.ids:
+        id_set = {x.strip() for x in args.ids.split(",") if x.strip()}
+
+    points = load_facts(args.db, args.source, since=args.since, ids=id_set)
     print(
         f"[*] {len(points)} facts ({args.source}) with {VECTOR_DIM}-dim embeddings in {args.db}"
+        + (f" since={args.since}" if args.since else "")
+        + (f" ids={len(id_set)}" if id_set else "")
     )
 
     if args.dry_run:

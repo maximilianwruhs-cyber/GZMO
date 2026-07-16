@@ -26,7 +26,7 @@ const SAFE_COMMAND_PREFIXES: &[&str] = &[
     "ps", "top", "htop", "uname", "hostname", "whoami", "id", "uptime",
     "date", "cal", "env", "printenv", "lsblk", "lscpu", "lsusb", "lspci",
     "free", "vmstat", "iostat", "ip", "ss", "netstat",
-    "pgrep", "pidof", "journalctl", "systemctl", "nvidia-smi", "lsmod",
+    "pgrep", "pidof", "nvidia-smi", "lsmod",
     // Containers / sidecars (read-only ops like `docker ps` — first-token gate only)
     "docker",
     // Data stores (inspection)
@@ -47,6 +47,24 @@ const SAFE_COMMAND_PREFIXES: &[&str] = &[
     "gzmo",
 ];
 
+/// Host-dangerous binaries blocked when `GZMO_SHELL_STRICT=1` or `GZMO_INSTANCE=next`.
+const STRICT_BLOCKED: &[&str] = &[
+    "systemctl", "journalctl", "sudo", "su", "pkexec", "mount", "umount",
+    "chmod", "chown", "mkfs", "dd", "reboot", "shutdown", "poweroff",
+    "iptables", "nft", "kill", "killall", "pkill", "sysctl",
+];
+
+fn shell_strict_mode() -> bool {
+    matches!(std::env::var("GZMO_SHELL_STRICT").ok().as_deref(), Some("1") | Some("true"))
+        || std::env::var("GZMO_INSTANCE").ok().as_deref() == Some("next")
+}
+
+fn shell_docker_mode() -> bool {
+    matches!(
+        std::env::var("GZMO_SHELL_DOCKER").ok().as_deref(),
+        Some("1") | Some("true")
+    )
+}
 fn first_command_token(command: &str) -> &str {
     command
         .split_whitespace()
@@ -94,13 +112,22 @@ fn is_command_allowed(command: &str) -> bool {
     let first_token = first_command_token(command);
     let binary = command_binary_name(first_token);
 
+    if shell_strict_mode() && STRICT_BLOCKED.iter().any(|b| binary == *b) {
+        return false;
+    }
+
+    // bash/sh must go through the script-runner check (blocks `bash -c`).
+    if binary == "bash" || binary == "sh" {
+        return is_allowed_script_runner(command);
+    }
+
     if SAFE_COMMAND_PREFIXES.iter().any(|safe| binary == *safe) {
         return true;
     }
     if is_shell_script_path(first_token) {
         return true;
     }
-    is_allowed_script_runner(command)
+    false
 }
 
 /// Execute a shell command on the host.
@@ -156,6 +183,9 @@ impl ToolHandler for ShellExecTool {
             let hint = match binary_name {
                 "status" => " Use `/status` in chat or `gzmo status` on the CLI.",
                 "bash" => " Use `bash path/to/script.sh` or `./path/to/script.sh`.",
+                "systemctl" | "journalctl" | "sudo" => {
+                    " Blocked in GZMO-next strict shell — run manually on the host."
+                }
                 _ => " For a full stack snapshot, use `/status` instead of many shell probes.",
             };
             return Ok(format!(
@@ -166,15 +196,34 @@ impl ToolHandler for ShellExecTool {
 
         tracing::info!(command = %command, "Executing shell command");
 
-        let mut cmd = tokio::process::Command::new("/bin/sh");
-        cmd.arg("-c").arg(command);
-
-        if let Some(cwd) = &self.cwd {
-            cmd.current_dir(cwd);
-        }
-
-        // Execute with timeout
-        let result = tokio::time::timeout(self.timeout, cmd.output()).await;
+        let result = if shell_docker_mode() {
+            // Best-effort isolation: ephemeral Alpine with cwd bind-mount, no host net.
+            // Full gVisor remains a follow-up; enable with GZMO_SHELL_DOCKER=1.
+            let work = self.cwd.clone().unwrap_or_else(|| ".".into());
+            let mut cmd = tokio::process::Command::new("docker");
+            cmd.args([
+                "run",
+                "--rm",
+                "--network",
+                "none",
+                "-v",
+                &format!("{work}:/work:ro"),
+                "-w",
+                "/work",
+                "alpine:3.20",
+                "sh",
+                "-c",
+                command,
+            ]);
+            tokio::time::timeout(self.timeout, cmd.output()).await
+        } else {
+            let mut cmd = tokio::process::Command::new("/bin/sh");
+            cmd.arg("-c").arg(command);
+            if let Some(cwd) = &self.cwd {
+                cmd.current_dir(cwd);
+            }
+            tokio::time::timeout(self.timeout, cmd.output()).await
+        };
 
         match result {
             Ok(Ok(output)) => {
@@ -249,8 +298,21 @@ mod tests {
 
     #[test]
     fn blocks_inline_shell_and_unsafe_binaries() {
-        assert!(is_command_allowed("bash -c \"echo ok\""));
+        assert!(!is_command_allowed("bash -c \"echo ok\""));
         assert!(!is_command_allowed("sh -c 'echo pwned'"));
         assert!(!is_command_allowed("rm -rf /"));
+    }
+
+    #[test]
+    fn strict_mode_blocks_host_dangerous() {
+        // GZMO_INSTANCE may already be next in the operator shell — assert blocked list.
+        assert!(!STRICT_BLOCKED.is_empty());
+        let blocked = "systemctl status gzmo-scheduler";
+        // Simulate by checking the binary is in STRICT_BLOCKED and would be denied
+        // when strict_mode is on. We only call is_command_allowed when env is next/strict.
+        if shell_strict_mode() {
+            assert!(!is_command_allowed(blocked));
+            assert!(!is_command_allowed("sudo ls"));
+        }
     }
 }

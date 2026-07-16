@@ -17,7 +17,7 @@ four loops (config, ops, cognition, knowledge), daemon lab dispatch green.
 | Data root | `GZMO/data/` | `GZMO/data-next/` |
 | Vault | `data/vault.db` | `data-next/vault.db` |
 | Sessions | `data/sessions/` | `data-next/sessions/` |
-| Distill queue | `gzmo:distill:pending` (Redis) | file queue `data-next/distill-queue/` |
+| Distill queue | `gzmo:distill:pending` (Redis) | Redis `gzmo-next:distill:pending` + file fallback `data-next/distill-queue/` |
 | Dreams | `DREAMS.md` | `data-next/DREAMS.md` |
 | Fused calibration | applied to config | written to `config/gzmo-next-fused.toml` (review, never clobbers live config) |
 
@@ -43,11 +43,21 @@ Assembly backends resolved instance=next distill="lab" dream="lab" spark="lab" o
 
 ## Required services
 
+Post-cutover (2026-07-15) the memory plane is **enabled** in
+[`config/gzmo-next.toml`](../config/gzmo-next.toml). See
+[CT101_BOUNDARY.md](CT101_BOUNDARY.md) for the cutover checklist. Ingest
+watcher stays off until promotion quality is gated.
+
 | Service | Endpoint | Required? |
 |---------|----------|-----------|
-| Prime LLM (llama.cpp) | `http://127.0.0.1:8000/v1` | Yes — spark run, verify-suite, calibration |
-| Librarian (session extract) | `http://127.0.0.1:8000/v1` (Prime) | No — distill falls back to heuristic |
-| Embeddings / Qdrant / Redis / Neo4j | — | No — disabled in `gzmo-next.toml` for v1 |
+| Prime LLM (llama.cpp) | `http://127.0.0.1:8000/v1` | Yes — spark run, verify-suite, calibration, librarian |
+| Librarian (session extract) | `http://127.0.0.1:8000/v1` (Prime) | Preferred — distill falls back to heuristic if unreachable |
+| Embeddings | `http://192.168.31.110:8081/v1` (VM200) | Yes — `[embeddings] enabled = true` |
+| Rerank | `http://192.168.31.110:8081/v1` (VM200) | Yes — `[rerank] enabled = true` |
+| Qdrant | `http://127.0.0.1:6333` | Yes — `[qdrant] enabled = true`, collection `honeypot` |
+| Redis | `redis://127.0.0.1:6379` | Yes — `[redis] enabled = true`, queue `gzmo-next:distill:pending` |
+| Neo4j (MCP memory) | `bolt://127.0.0.1:7687` | Yes — `[[mcp_servers]]` memory in toml |
+| Ingest watcher | — | No — `[ingest] enabled = false` (workstation v1) |
 
 ## Canonical long-running process: `gzmo-scheduler`
 
@@ -106,19 +116,37 @@ daemon, or jobs would double-fire).
 | Spark | 03:30, 22:30 | `cognition-smoke.sh --live --vault data-next/vault.db --spark-run` |
 | Ops health | startup | `ops-smoke.sh --live` |
 | Config handoff | 04:00 daily | `gzmo-handoff.sh --live --apply --gzmo-config config/gzmo-next-fused.toml` |
+| Discovery (optional) | **not armed by default** | `discovery-smoke.sh --live` via `beat-gate --loop discovery` or a host weekly cron. Do **not** add a DiscoveryEngine to `gzmo-scheduler`. Arm only after fixture beat-gate stays green. |
+
+Job results land in `data-next/scheduler-runs/{job}-{timestamp}.json` (plus
+`latest.json`) for Observatory.
 
 ## Operator commands
 
 ```bash
-gzmo assemble ops --live                 # health chain
+gzmo instance status                     # instance, paths, skills_root, effective assembly backends
+gzmo config promote-fused --diff         # review sibling gzmo-next-fused.toml vs live
+gzmo config promote-fused --diff --apply # backup live, then copy fused → live
+gzmo assemble ops --live                 # health chain (+ sidecar/queue metrics)
 gzmo status                              # deterministic ecosystem snapshot (paths + probes)
 gzmo health                              # strict subsystem probes
 gzmo assemble cognition --live          # distill → gate → spark → recall (instance vault)
 gzmo assemble handoff --live --apply    # bench → fuse → gzmo-next-fused.toml on gate pass
 gzmo distill                            # distill data-next/sessions/ into the vault
 gzmo chat                               # sessions persist to data-next/sessions/
+# Skills (next): authoritative root = GZMO/skills/ (see gzmo instance status → skills_root).
+# gzmo_skills/ remains CT101/bridge auxiliary only — see gzmo_skills/BRIDGE.md.
 ```
 
+## Sidecars (Docker only)
+
+```bash
+cd ~/database-cluster && docker compose up -d
+sudo systemctl status gzmo-sidecars
+```
+
+Do **not** enable `gzmo-sidecar-{qdrant,redis}.service` user units (legacy native
+binaries; disabled on purpose).
 ## Vault seeding (fresh instance)
 
 A brand-new instance has an empty vault, which makes spark/cognition live paths
@@ -156,14 +184,59 @@ All four must print `PASS: lab beats incumbent`. Metas conform to
 ## CT101 cutover (future, single migration)
 
 Per [CT101_BOUNDARY.md](CT101_BOUNDARY.md) there is no incremental grafting —
-cutover is one migration when GZMO-next is proven:
+cutover is one migration when GZMO-next is proven. **Fresh `data-next/` remains
+valid** without import (stretch S3 decision gate).
+
+Tooling (stretch S3):
+
+```bash
+# Read-only compare (next vs CT101 snapshot / local copy)
+python3 scripts/vault-diff.py \
+  --left data-next/vault.db \
+  --right /path/to/ct101-vault.db
+
+# Print freeze/backup/copy/sync checklist; refuses if scheduler PID lock live
+bash scripts/vault-migrate.sh --dry-run \
+  --src /opt/gzmo/data/vault.db \
+  --dest data-next/vault.db
+
+# Explicit apply only after operator decision (creates .bak-* first)
+# bash scripts/vault-migrate.sh --apply --yes --src … --dest …
+```
+
+Manual cutover outline:
 
 1. Freeze CT101 (`systemctl stop` the legacy daemon; snapshot the container).
 2. Copy the clone tree (GZMO + little-tools-lab + piece repos) to the new host;
    the env contract above is the only host-specific configuration.
-3. Migrate memory once: copy `vault.db` → `data-next/vault.db`, replay any
-   pending distill queue, re-run `gzmo distill`.
+3. Migrate memory once via `vault-migrate.sh --apply --yes` (or copy `vault.db` →
+   `data-next/vault.db`), replay any pending distill queue, re-run `gzmo distill`.
 4. Run the full S2 checklist above on the new host — all green before DNS/cron
    ownership moves.
 5. Point operators at the new instance; CT101 stays frozen as reference until
    decommissioned. No flag flips on CT101, ever.
+
+## Weekly mentor hour (ADR-0002 — lab / chat only)
+
+Pedagogy is **never** on `gzmo-scheduler` cron. Once a week, deliberately:
+
+```bash
+export GZMO_INSTANCE=next
+export GZMO_CONFIG=$GZMO_CLONE_ROOT/GZMO/config/gzmo-next.toml
+gzmo assemble pedagogy --fixture   # rehearsal
+# when ready:
+gzmo assemble pedagogy --live
+```
+
+There is **no** pedagogy/chaos/dice job in `gzmo-scheduler` (`jobs.rs`). That is
+intentional ([ADR-0002](../../little-tools-lab/docs/adr/0002-pedagogy-chaos-scheduler-lab-only.md)).
+
+### Chat rituals (also never cron)
+
+| Ritual | Piece | How |
+|--------|-------|-----|
+| Thought Cabinet | `cabinet-sim feed` | Manual in chat / CLI — crystallize mutations |
+| Research budget | `research-budget check/spend` | Gate autonomous research tokens in chat |
+| Calibrate theatre | `/calibrate` → `bench-to-fuse --fixture` | Experience C rehearsal |
+
+Do not schedule PulseLoop, pedagogy, or dice-scheduler overnight without amending ADR-0002 + beat-gate.

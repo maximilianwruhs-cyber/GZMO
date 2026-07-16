@@ -10,6 +10,17 @@ use crate::config::QdrantConfig;
 
 /// Run `scripts/sync-vault-to-qdrant.py` from `project_root`.
 pub async fn sync_vault_to_qdrant(project_root: &Path, cfg: &QdrantConfig, vault_db: &Path) -> Result<()> {
+    sync_vault_to_qdrant_filtered(project_root, cfg, vault_db, None, None).await
+}
+
+/// Incremental sync: optional `--since` ISO timestamp and/or `--ids` UUID list.
+pub async fn sync_vault_to_qdrant_filtered(
+    project_root: &Path,
+    cfg: &QdrantConfig,
+    vault_db: &Path,
+    since: Option<&str>,
+    ids: Option<&[String]>,
+) -> Result<()> {
     if !cfg.enabled || !cfg.sync_enabled {
         return Ok(());
     }
@@ -29,6 +40,8 @@ pub async fn sync_vault_to_qdrant(project_root: &Path, cfg: &QdrantConfig, vault
         url = %cfg.url,
         collection = %cfg.collection,
         vault = %vault_db.display(),
+        since = since.unwrap_or(""),
+        ids = ids.map(|i| i.len()).unwrap_or(0),
         "Qdrant vault sync starting"
     );
 
@@ -38,8 +51,8 @@ pub async fn sync_vault_to_qdrant(project_root: &Path, cfg: &QdrantConfig, vault
         "vault"
     };
 
-    let output = tokio::process::Command::new("python3")
-        .arg(&script)
+    let mut cmd = tokio::process::Command::new("python3");
+    cmd.arg(&script)
         .arg("--db")
         .arg(&vault_db)
         .arg("--url")
@@ -50,7 +63,17 @@ pub async fn sync_vault_to_qdrant(project_root: &Path, cfg: &QdrantConfig, vault
         .arg(sync_source)
         .current_dir(project_root)
         .stdout(Stdio::piped())
-        .stderr(Stdio::piped())
+        .stderr(Stdio::piped());
+    if let Some(s) = since {
+        cmd.arg("--since").arg(s);
+    }
+    if let Some(list) = ids {
+        if !list.is_empty() {
+            cmd.arg("--ids").arg(list.join(","));
+        }
+    }
+
+    let output = cmd
         .output()
         .await
         .with_context(|| format!("spawn {}", script.display()))?;
@@ -68,28 +91,31 @@ pub async fn sync_vault_to_qdrant(project_root: &Path, cfg: &QdrantConfig, vault
         anyhow::bail!("sync-vault-to-qdrant exited with {}", output.status);
     }
 
-    let verify = project_root.join("scripts/qdrant-post-sync-verify.sh");
-    if verify.is_file() {
-        let verify_out = tokio::process::Command::new("bash")
-            .arg(&verify)
-            .arg("--gzmo-root")
-            .arg(project_root)
-            .current_dir(project_root)
-            .stdout(Stdio::piped())
-            .stderr(Stdio::piped())
-            .output()
-            .await
-            .with_context(|| format!("spawn {}", verify.display()))?;
-        for line in String::from_utf8_lossy(&verify_out.stdout)
-            .lines()
-            .chain(String::from_utf8_lossy(&verify_out.stderr).lines())
-        {
-            if !line.is_empty() {
-                info!(line = %line, "qdrant-post-sync-verify");
+    // Full sync still gets verify; incremental id/since skips sample verify (cheaper).
+    if since.is_none() && ids.is_none() {
+        let verify = project_root.join("scripts/qdrant-post-sync-verify.sh");
+        if verify.is_file() {
+            let verify_out = tokio::process::Command::new("bash")
+                .arg(&verify)
+                .arg("--gzmo-root")
+                .arg(project_root)
+                .current_dir(project_root)
+                .stdout(Stdio::piped())
+                .stderr(Stdio::piped())
+                .output()
+                .await
+                .with_context(|| format!("spawn {}", verify.display()))?;
+            for line in String::from_utf8_lossy(&verify_out.stdout)
+                .lines()
+                .chain(String::from_utf8_lossy(&verify_out.stderr).lines())
+            {
+                if !line.is_empty() {
+                    info!(line = %line, "qdrant-post-sync-verify");
+                }
             }
-        }
-        if !verify_out.status.success() {
-            warn!("Qdrant post-sync sample verify failed");
+            if !verify_out.status.success() {
+                warn!("Qdrant post-sync sample verify failed");
+            }
         }
     }
 

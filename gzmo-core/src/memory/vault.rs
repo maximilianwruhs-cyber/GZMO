@@ -43,6 +43,7 @@ pub struct EmbedBackfillReport {
 #[derive(Clone)]
 pub struct SqliteVault {
     pool: Pool<SqliteConnectionManager>,
+    db_path: std::path::PathBuf,
     embedder: Option<Arc<Embedder>>,
     reranker: Option<Arc<Reranker>>,
     qdrant: Option<Arc<QdrantRecall>>,
@@ -231,7 +232,7 @@ impl SqliteVault {
         info!("Semantic vault initialized (WAL mode + r2d2 pool)");
         
         let path = db_path.as_ref().to_owned();
-        let manager = SqliteConnectionManager::file(path)
+        let manager = SqliteConnectionManager::file(&path)
             .with_init(|c| c.execute_batch("PRAGMA journal_mode=WAL; PRAGMA busy_timeout=5000;"));
         let pool = r2d2::Pool::builder()
             .max_size(5) // Enough for daemon and main loop
@@ -240,6 +241,7 @@ impl SqliteVault {
 
         Ok(Self {
             pool,
+            db_path: path,
             embedder: None,
             reranker: None,
             qdrant: None,
@@ -1454,6 +1456,7 @@ fn maybe_upsert_evidence(
             evidence_embedding_blobs.push(ev_blob);
         }
 
+        let promote_started = Utc::now();
         let conn = self.pool.get()?;
         conn.execute_batch("BEGIN IMMEDIATE")?;
 
@@ -1525,12 +1528,61 @@ fn maybe_upsert_evidence(
             Ok(()) => {
                 conn.execute_batch("COMMIT")?;
                 info!(count = truths.len(), origin, "Batch promoted truths to vault");
+                self.maybe_incremental_qdrant_sync(truths, origin, promote_started)
+                    .await;
                 Ok(())
             }
             Err(e) => {
                 let _ = conn.execute_batch("ROLLBACK");
                 Err(e)
             }
+        }
+    }
+
+    /// After honeypot-eligible promote, upsert only those points (GZMO-next).
+    async fn maybe_incremental_qdrant_sync(
+        &self,
+        truths: &[ExtractedTruth],
+        origin: &str,
+        since: chrono::DateTime<Utc>,
+    ) {
+        if self.qdrant.is_none() {
+            return;
+        }
+        if std::env::var("GZMO_INSTANCE").ok().as_deref() != Some("next") {
+            return;
+        }
+        let ids: Vec<String> = truths
+            .iter()
+            .filter(|t| qualifies_for_honeypot(t) && !is_unverified_derived(t, origin))
+            .map(|t| t.id.to_string())
+            .collect();
+        if ids.is_empty() {
+            return;
+        }
+        let root = crate::memory::qdrant_sync::discover_project_root();
+        let url = std::env::var("QDRANT_URL").unwrap_or_else(|_| "http://127.0.0.1:6333".into());
+        let collection =
+            std::env::var("QDRANT_COLLECTION").unwrap_or_else(|_| "honeypot".into());
+        let cfg = crate::config::QdrantConfig {
+            enabled: true,
+            url,
+            collection,
+            sync_enabled: true,
+            ..Default::default()
+        };
+        // Prefer --ids; also pass --since as a safety filter.
+        match crate::memory::qdrant_sync::sync_vault_to_qdrant_filtered(
+            &root,
+            &cfg,
+            &self.db_path,
+            Some(&since.to_rfc3339()),
+            Some(&ids),
+        )
+        .await
+        {
+            Ok(()) => info!(count = ids.len(), "Incremental Qdrant upsert after promote"),
+            Err(e) => tracing::warn!(error = %e, "Incremental Qdrant upsert failed (nightly sync remains)"),
         }
     }
 

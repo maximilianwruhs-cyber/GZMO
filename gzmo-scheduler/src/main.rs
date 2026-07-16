@@ -12,40 +12,100 @@ mod spawn;
 use anyhow::{bail, Context, Result};
 use chrono::{NaiveDate, Utc};
 use config::SchedulerConfig;
+use serde_json::json;
 use std::collections::HashSet;
 use std::io::Write;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::time::Duration;
 use tracing::{error, info};
 
 const PID_FILE: &str = "/tmp/gzmo-scheduler.pid";
 
-async fn run_gzmo_job(job: &'static str, script: &'static str, args: Vec<String>) -> bool {
-    info!(job, script, "job starting");
-    match spawn::run_gzmo_script(script, &args).await {
-        Ok(()) => {
-            info!(job, script, exit = 0, "job complete");
-            true
-        }
-        Err(e) => {
-            error!(job, script, "job failed: {e}");
-            false
-        }
-    }
+fn runs_dir(cfg: &SchedulerConfig) -> PathBuf {
+    cfg.memory
+        .vault_db
+        .parent()
+        .unwrap_or_else(|| Path::new("."))
+        .join("scheduler-runs")
 }
 
-async fn run_job(job: &'static str, script: &'static str, args: Vec<String>) -> bool {
+fn write_job_result(
+    cfg: &SchedulerConfig,
+    job: &str,
+    script: &str,
+    args: &[String],
+    started: chrono::DateTime<Utc>,
+    ok: bool,
+    error: Option<String>,
+) {
+    let dir = runs_dir(cfg);
+    if let Err(e) = std::fs::create_dir_all(&dir) {
+        error!(%e, "scheduler-runs mkdir failed");
+        return;
+    }
+    let finished = Utc::now();
+    let stamp = finished.format("%Y%m%dT%H%M%SZ");
+    let path = dir.join(format!("{job}-{stamp}.json"));
+    let payload = json!({
+        "job": job,
+        "script": script,
+        "args": args,
+        "started": started.to_rfc3339(),
+        "finished": finished.to_rfc3339(),
+        "ok": ok,
+        "error": error,
+    });
+    if let Err(e) = std::fs::write(&path, serde_json::to_string_pretty(&payload).unwrap_or_default() + "\n") {
+        error!(%e, path = %path.display(), "scheduler-runs write failed");
+        return;
+    }
+    let latest = dir.join("latest.json");
+    let _ = std::fs::copy(&path, &latest);
+    info!(job, path = %path.display(), ok, "job result recorded");
+}
+
+async fn run_gzmo_job(
+    cfg: &SchedulerConfig,
+    job: &'static str,
+    script: &'static str,
+    args: Vec<String>,
+) -> bool {
+    let started = Utc::now();
     info!(job, script, "job starting");
-    match spawn::run_lab_script(script, &args).await {
+    let (ok, err) = match spawn::run_gzmo_script(script, &args).await {
         Ok(()) => {
             info!(job, script, exit = 0, "job complete");
-            true
+            (true, None)
         }
         Err(e) => {
             error!(job, script, "job failed: {e}");
-            false
+            (false, Some(e.to_string()))
         }
-    }
+    };
+    write_job_result(cfg, job, script, &args, started, ok, err);
+    ok
+}
+
+async fn run_job(
+    cfg: &SchedulerConfig,
+    job: &'static str,
+    script: &'static str,
+    args: Vec<String>,
+) -> bool {
+    let started = Utc::now();
+    info!(job, script, "job starting");
+    let (ok, err) = match spawn::run_lab_script(script, &args).await {
+        Ok(()) => {
+            info!(job, script, exit = 0, "job complete");
+            (true, None)
+        }
+        Err(e) => {
+            error!(job, script, "job failed: {e}");
+            (false, Some(e.to_string()))
+        }
+    };
+    write_job_result(cfg, job, script, &args, started, ok, err);
+    ok
 }
 
 #[tokio::main]
@@ -100,7 +160,7 @@ async fn main() -> Result<()> {
 async fn run_loop(cfg: &SchedulerConfig, config_path: &std::path::Path) -> Result<()> {
     // Startup ops health — one shot, non-fatal.
     let (script, args) = jobs::ops_args();
-    run_job("ops_health", script, args).await;
+    run_job(cfg, "ops_health", script, args).await;
 
     let mut last_dream: Option<NaiveDate> = None;
     let mut last_distill: Option<NaiveDate> = None;
@@ -118,7 +178,7 @@ async fn run_loop(cfg: &SchedulerConfig, config_path: &std::path::Path) -> Resul
             && cron::cron_due_today(&now, cfg.dreams.cron_hour, cfg.dreams.cron_minute, last_dream)
         {
             let (script, args) = jobs::dream_args(cfg);
-            if run_job("dream", script, args).await {
+            if run_job(cfg, "dream", script, args).await {
                 last_dream = Some(today);
             }
         }
@@ -133,7 +193,7 @@ async fn run_loop(cfg: &SchedulerConfig, config_path: &std::path::Path) -> Resul
             )
         {
             let (script, args) = jobs::distill_args();
-            if run_job("distill", script, args).await {
+            if run_job(cfg, "distill", script, args).await {
                 last_distill = Some(today);
             }
         }
@@ -147,7 +207,7 @@ async fn run_loop(cfg: &SchedulerConfig, config_path: &std::path::Path) -> Resul
                 last_qdrant_sync,
             )
         {
-            if run_gzmo_job("qdrant_sync", jobs::qdrant_sync_script(), vec![]).await {
+            if run_gzmo_job(cfg, "qdrant_sync", jobs::qdrant_sync_script(), vec![]).await {
                 last_qdrant_sync = Some(today);
             }
         }
@@ -157,7 +217,7 @@ async fn run_loop(cfg: &SchedulerConfig, config_path: &std::path::Path) -> Resul
                 cron::cron_slot_due(&now, &cfg.spark.cron_hours, cfg.spark.cron_minute, &last_spark)
             {
                 let (script, args) = jobs::spark_args(cfg);
-                if run_job("spark", script, args).await {
+                if run_job(cfg, "spark", script, args).await {
                     last_spark.insert((h, m, today));
                 }
             }
@@ -172,7 +232,7 @@ async fn run_loop(cfg: &SchedulerConfig, config_path: &std::path::Path) -> Resul
             let (script, args) = jobs::handoff_args(config_path);
             // Gate-fail exits non-zero by design (hold previous config) — either
             // way the slot is consumed for today.
-            run_job("config_handoff", script, args).await;
+            run_job(cfg, "config_handoff", script, args).await;
             last_handoff = Some(today);
         }
     }

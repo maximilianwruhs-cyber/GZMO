@@ -33,6 +33,16 @@ Canonical operator and architecture docs. Session reports and milestone logs bel
 | [TOTO_GZMO_IMPACT_RESEARCH_BRIEF.md](TOTO_GZMO_IMPACT_RESEARCH_BRIEF.md) | Research protocol — Toto-2.0-4m impact evaluation |
 | [TOTO_GZMO_IMPACT_RESEARCH_REPORT.md](TOTO_GZMO_IMPACT_RESEARCH_REPORT.md) | **Verdict: IMPACT NO** — Toto vs ρ baselines (2026-06-08) |
 
+## GZMO-next + Little Tools Lab
+
+| Doc | Purpose |
+|-----|---------|
+| [GZMO_NEXT_RUNBOOK.md](GZMO_NEXT_RUNBOOK.md) | Workstation next instance (scheduler + lab recipes) |
+| [CT101_BOUNDARY.md](CT101_BOUNDARY.md) | Legacy vs next boundary (production cutover 2026-07-15) |
+| [SHELL_SANDBOX_AND_DISCOVERY.md](SHELL_SANDBOX_AND_DISCOVERY.md) | Strict shell / Docker isolate / discovery→honeypot path |
+| [STRETCH_ITEMS_HANDOFF.md](STRETCH_ITEMS_HANDOFF.md) | Agent brief — gVisor, discovery recipe, vault migrate, Observatory auth |
+| [../../little-tools-lab/docs/ENHANCEMENT_AUDIT_2026-07.md](../../little-tools-lab/docs/ENHANCEMENT_AUDIT_2026-07.md) | Enhancement audit — critical notes + prioritized backlog |
+
 ## Operations
 
 | Doc | Purpose |

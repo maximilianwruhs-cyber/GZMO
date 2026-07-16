@@ -1,6 +1,8 @@
 # ═══════════════════════════════════════════════════════════════════
 # GZMO Skill Registry — The Command Pantheon
 # ═══════════════════════════════════════════════════════════════════
+# Authoritative skills root for GZMO_INSTANCE=next ([skills] directory in
+# config/gzmo-next.toml). gzmo_skills/ is CT101/bridge auxiliary only.
 # Every slash command the agent can execute is defined here.
 # The dispatcher reads this file to route commands to handler scripts.
 
@@ -8,6 +10,7 @@
 version = "1.0"
 total_commands = 15
 engine = "chaos"  # All RNG seeded from Randomizer's Lorenz attractor
+authoritative_for = "GZMO_INSTANCE=next"
 
 # ─── Chaos & Games ───────────────────────────────────────────────
 

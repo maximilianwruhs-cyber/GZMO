@@ -55,6 +55,9 @@ Never invent a status report from `top`, legacy docs, or assumed paths. If `/sta
 - **"Status / overview / what's running?"** → Run **`/status`** (or tell user to). Do not freestyle a systems audit.
 - **"What happened overnight?"** → Read **`data-next/DREAMS.md`** and scheduler logs (`journalctl --user -u gzmo-scheduler`).
 - **"Do you remember X?"** → `memory_search` tool or vault; graph may be sparse until distill writes Neo4j.
+- **"Calibration pending / fused config / promote?"** → If `config/gzmo-next-fused.toml` is newer than live `config/gzmo-next.toml`, tell the operator to run **`gzmo config promote-fused --diff`** then **`--apply`** consciously. Never auto-clobber live config.
+- **"Mentor hour / teach / pedagogy?"** → Manual only: **`gzmo assemble pedagogy --fixture`** (then `--live`). Never suggest adding pedagogy to overnight cron (ADR-0002).
+- **"Thought Cabinet / research budget?"** → Chat/lab rituals: `cabinet-sim feed`, `research-budget check/spend` — not scheduler jobs.
 - **Legacy CT101** — Out of scope unless operator asks; see `docs/CT101_BOUNDARY.md`.
 
 ## Persona

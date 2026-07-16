@@ -6,9 +6,37 @@ use std::time::SystemTime;
 use chrono::{DateTime, Local, Utc};
 use rusqlite::Connection;
 
-use crate::assembly::AssemblyConfig;
+use crate::assembly::{handoff_apply_target, AssemblyConfig};
 use crate::config::GzmoConfig;
 use crate::health::{collect_health_probes, ProbeResult};
+
+/// Fused-vs-live calibration status for operator surfaces (`gzmo status` / `/status`).
+fn calibration_pending_line() -> Option<(String, String)> {
+    let fused = handoff_apply_target()?;
+    let fused_disp = fused.display().to_string();
+    if !fused.exists() {
+        return Some((fused_disp, "absent".into()));
+    }
+    let fuse_m = std::fs::metadata(&fused).and_then(|m| m.modified()).ok();
+    let live_config = std::env::var("GZMO_CONFIG")
+        .ok()
+        .map(std::path::PathBuf::from)
+        .filter(|p| p.exists());
+    let live_m = live_config
+        .as_ref()
+        .and_then(|p| std::fs::metadata(p).and_then(|m| m.modified()).ok());
+    let status = match (fuse_m, live_m) {
+        (Some(f), Some(l)) if f > l => {
+            "pending — fused newer than live; run: gzmo config promote-fused --diff".into()
+        }
+        (Some(_), Some(_)) => "present — live at/after fused (promote done or equal)".into(),
+        (Some(_), None) => {
+            "present — review + gzmo config promote-fused --diff (no live mtime)".into()
+        }
+        _ => "present".into(),
+    };
+    Some((fused_disp, status))
+}
 
 fn file_meta(path: &Path) -> (bool, Option<u64>, Option<DateTime<Utc>>) {
     match std::fs::metadata(path) {
@@ -46,6 +74,41 @@ fn vault_semantic_count(path: &Path) -> Option<usize> {
         .ok()
 }
 
+fn vault_origin_summary(path: &Path) -> Option<String> {
+    let conn = Connection::open(path).ok()?;
+    let mut parts = Vec::new();
+    if let Ok(mut stmt) = conn.prepare(
+        "SELECT origin, COUNT(*) FROM facts GROUP BY origin ORDER BY COUNT(*) DESC",
+    ) {
+        let rows = stmt
+            .query_map([], |r| Ok((r.get::<_, String>(0)?, r.get::<_, i64>(1)?)))
+            .ok()?;
+        for row in rows.flatten() {
+            parts.push(format!("{}={}", row.0, row.1));
+        }
+    }
+    let honeypot: i64 = conn
+        .query_row("SELECT COUNT(*) FROM honeypot", [], |r| r.get(0))
+        .unwrap_or(0);
+    let honeypot_origin: i64 = conn
+        .query_row(
+            "SELECT COUNT(*) FROM honeypot WHERE origin = 'honeypot'",
+            [],
+            |r| r.get(0),
+        )
+        .unwrap_or(0);
+    Some(format!(
+        "facts[{}]; honeypot={} (origin=honeypot:{})",
+        if parts.is_empty() {
+            "none".into()
+        } else {
+            parts.join(", ")
+        },
+        honeypot,
+        honeypot_origin
+    ))
+}
+
 async fn user_systemd_unit(unit: &str) -> &'static str {
     match tokio::process::Command::new("systemctl")
         .args(["--user", "is-active", unit])
@@ -61,11 +124,11 @@ async fn user_systemd_unit(unit: &str) -> &'static str {
 fn assembly_summary(asm: &AssemblyConfig) -> String {
     format!(
         "distill={} dream={} spark={} ops={} handoff={}",
-        asm.distill.label(),
-        asm.dream.label(),
-        asm.spark.label(),
-        asm.ops_health.label(),
-        asm.config_handoff.label()
+        asm.effective(asm.distill).label(),
+        asm.effective(asm.dream).label(),
+        asm.effective(asm.spark).label(),
+        asm.effective(asm.ops_health).label(),
+        asm.effective(asm.config_handoff).label()
     )
 }
 
@@ -83,6 +146,7 @@ pub async fn format_ecosystem_status(config: &GzmoConfig) -> String {
     let active = config.engine.active_engine();
     let (vault_exists, vault_bytes, vault_mtime) = file_meta(&config.memory.vault_db);
     let vault_facts = vault_semantic_count(&config.memory.vault_db);
+    let vault_origins = vault_origin_summary(&config.memory.vault_db);
     let (dreams_exists, dreams_bytes, dreams_mtime) = file_meta(&config.skills.dreams_path);
     let memory_files = count_files_with_ext(&config.memory.directory, "md");
     let session_files = count_files_with_ext(&config.session_distill.sessions_dir, "json");
@@ -121,13 +185,16 @@ pub async fn format_ecosystem_status(config: &GzmoConfig) -> String {
 
     let vault_status = if vault_exists {
         format!(
-            "{} facts, {} KB{}",
+            "{} semantic, {} KB{}{}",
             vault_facts
                 .map(|n| n.to_string())
                 .unwrap_or_else(|| "?".into()),
             vault_bytes.unwrap_or(0) / 1024,
             vault_mtime
                 .map(|t| format!(", mtime {}", t.format("%Y-%m-%d %H:%M UTC")))
+                .unwrap_or_default(),
+            vault_origins
+                .map(|s| format!(" — {s}"))
                 .unwrap_or_default()
         )
     } else {
@@ -163,7 +230,61 @@ pub async fn format_ecosystem_status(config: &GzmoConfig) -> String {
         config.session_distill.sessions_dir.display(),
         session_files
     ));
+    if let Some((path, status)) = calibration_pending_line() {
+        out.push_str(&format!("| Fused config | `{path}` | {status} |\n"));
+    }
     out.push_str("\n");
+
+    // Last spark lineage (Experience B)
+    let spark_path = config.memory.vault_db.parent().map(|p| p.join("spark/last-spark-report.json"));
+    if let Some(ref sp) = spark_path {
+        if sp.exists() {
+            if let Ok(raw) = std::fs::read_to_string(sp) {
+                if let Ok(v) = serde_json::from_str::<serde_json::Value>(&raw) {
+                    out.push_str("### Last spark\n\n");
+                    let anchor = v
+                        .pointer("/selection/anchor/content")
+                        .and_then(|x| x.as_str())
+                        .unwrap_or("(none)");
+                    let stale = v
+                        .pointer("/selection/stale_sweetness")
+                        .and_then(|x| x.as_f64());
+                    let verdict = v
+                        .pointer("/verdict/supported")
+                        .and_then(|x| x.as_bool());
+                    let dry = v.get("dry_run").and_then(|x| x.as_bool());
+                    let date = v.get("date").and_then(|x| x.as_str()).unwrap_or("?");
+                    out.push_str(&format!("- **Date:** {date}\n"));
+                    out.push_str(&format!(
+                        "- **Anchor:** {}\n",
+                        if anchor.len() > 100 {
+                            format!("{}…", &anchor[..100])
+                        } else {
+                            anchor.into()
+                        }
+                    ));
+                    if let Some(s) = stale {
+                        out.push_str(&format!("- **stale_sweetness:** {s:.2}\n"));
+                    }
+                    match verdict {
+                        Some(true) => out.push_str("- **Verdict:** supported\n"),
+                        Some(false) => out.push_str("- **Verdict:** not supported\n"),
+                        None => {
+                            if let Some(skip) = v.get("skip_reason").and_then(|x| x.as_str()) {
+                                out.push_str(&format!("- **Skip:** {skip}\n"));
+                            } else {
+                                out.push_str("- **Verdict:** (dry-run / none)\n");
+                            }
+                        }
+                    }
+                    if let Some(d) = dry {
+                        out.push_str(&format!("- **dry_run:** {d}\n"));
+                    }
+                    out.push_str(&format!("- **Path:** `{}`\n\n", sp.display()));
+                }
+            }
+        }
+    }
 
     out.push_str("### Probes\n\n");
     for r in &probes {

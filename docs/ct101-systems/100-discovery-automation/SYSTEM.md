@@ -12,6 +12,7 @@ Autonomous **infrastructure discovery** on frozen CT101: chaos low-tension trigg
 
 **Live probe (2026-07-14):** Auto-socratic cycles active; 14:18 UTC cycle **published**; 14:54 UTC cycle **unpublished** (session-final eval: template placeholder text in report).
 
+**Stretch S1 (2026-07-15):** Section-scoped placeholder leak scan + rewrite retry shipped; CT101 ignores polluted `GZMO_ROOT`; session-final `cycles_in_session` / ISREL-from-report fixes; evening report `session-final-2026-07-15T18-32-48Z.md` now eval `pass` + actionability `publish=true` (previously unpublished on warn depth/ISREL).
 ---
 
 ## Capability matrix

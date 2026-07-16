@@ -49,21 +49,27 @@ The cycle ends with `eval-pi-mentor-discovery-report.sh` (deterministic, no LLM)
 - ISREL: probe activity in logs (`gzmo_health`, `systemctl`, etc.)
 - Mentor teach: `gzmo_mentor_teach` in logs or arc JSONL
 - Pillar evidence patterns from `pillars.json`
-- **Placeholder detection** via `discovery-findings-lib.sh`:
+- **Placeholder detection** via `discovery-findings-lib.sh` — **section-scoped** (Executive summary / Mentor synthesis / Findings / Recommended next actions / Open questions), not whole-file grep (avoids false positives on metadata tables):
 
-```5:21:github-clone/gzmo_skills/scripts/lib/discovery-findings-lib.sh
-discovery_findings_placeholder_pattern='(<title>|\(3–5 sentences\)|\(2–3 sentences|\(repeat as needed\)|TODO|TBD|\(what the next)'
-discovery_findings_is_placeholder() {
-  // ...
-  [[ "$text" =~ $discovery_findings_placeholder_pattern ]] && return 0
+```7:18:github-clone/gzmo_skills/scripts/lib/discovery-findings-lib.sh
+discovery_findings_narrative_for_leak_scan() {
+  local report="$1"
+  awk '
+    /^## / {
+      sec = substr($0, 4)
+      ...
+      capture = (sec ~ /^(Executive summary|Mentor synthesis|Findings consolidated|Findings|Recommended next actions|Open questions)/)
 ```
 
-```215:216:github-clone/gzmo_skills/scripts/lib/discovery-findings-lib.sh
-  if grep -qiE "$discovery_findings_placeholder_pattern" "$report"; then
-    add_reason "report contains template placeholder text"
-```
+Narrative-only leak scan + forbidden-output prompt helper + one rewrite retry on `final_eval_failed` are in place (2026-07-15).
 
-**Live failure mode (2026-07-14):** Pi emitted report text matching template instructions → eval fail → `published=false` → auto-socratic logs `SKIP: cycle ran successfully but did not publish`.
+**Historical failure mode (2026-07-14):** Pi emitted report text matching template instructions → whole-file eval fail → `published=false`.
+
+**Additional publish blockers fixed (2026-07-15 stretch S1):**
+- CT101 ignores polluted inherited `GZMO_ROOT` unless exactly `/opt/gzmo/survey_GZMO`
+- Session-final `cycles_in_session` off-by-one (state `cycle` is next number)
+- Soft findings-count note for finals (actionability owns single-cycle exception)
+- ISREL / mentor evidence may come from the written report when session-final logs are write-only
 
 ### OBOLUS on fixer autospawn
 
@@ -109,10 +115,10 @@ kill_residual_pi() {
 > - *Enhancement:* Active ping to Pi MCP health between exchanges. [CT101-safe]
 
 > **THINKING — pi-mentor:placeholder eval**
-> - *Reviewed:* Regex gate catches template instruction text leaked into final report.
-> - *Insight:* Strong guard against "successful" cycles that publish no actionable findings.
-> - *Risk / limitation:* False positives if legitimate report mentions "TODO" in evidence quotes.
-> - *Enhancement:* Scope placeholder check to Executive summary / Findings sections only. [CT101-safe]
+> - *Reviewed:* Section-scoped narrative leak scan (not whole-file) catches template instruction text in Executive summary / Findings / etc.
+> - *Insight:* Strong guard against "successful" cycles that publish scaffolding instead of observations; avoids false positives on `| tbd |` table cells.
+> - *Risk / limitation:* False positives if legitimate prose quotes "TODO" outside tables.
+> - *Enhancement:* Done — narrative-only + forbidden-output prompt + one rewrite retry. [CT101-safe]
 
 > **THINKING — pi-mentor:session-final rewrite**
 > - *Reviewed:* On eval fail, cycle can rewrite report with feedback (`final_eval_failed` branch).

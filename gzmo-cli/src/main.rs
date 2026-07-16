@@ -6,10 +6,12 @@ mod assemble_cmd;
 mod chat;
 mod chaos_bootstrap;
 mod cli_mcp;
+mod config_cmd;
 mod daemon_cmd;
 mod dream_cmd;
 mod spark_cmd;
 mod status_cmd;
+mod instance_cmd;
 mod ingest_cmd;
 mod ingest_dir_cmd;
 mod health_cmd;
@@ -49,6 +51,8 @@ enum Command {
     Health,
     Status,
     Profile(Vec<String>),
+    Instance(Vec<String>),
+    Config(Vec<String>),
     McpServe,
     /// Knowledge Gardener ops over the wiki/ layer (sync|lint|search|file-back|status).
     Wiki(Vec<String>),
@@ -116,6 +120,12 @@ fn parse_args() -> Command {
         }
         if args[1] == "health" { return Command::Health; }
         if args[1] == "status" { return Command::Status; }
+        if args[1] == "instance" {
+            return Command::Instance(args[2..].to_vec());
+        }
+        if args[1] == "config" {
+            return Command::Config(args[2..].to_vec());
+        }
         if args[1] == "wiki" { return Command::Wiki(args[2..].to_vec()); }
         if args[1] == "mcp-serve" { return Command::McpServe; }
         if args[1] == "profile" {
@@ -157,6 +167,8 @@ async fn main() -> Result<()> {
         Command::Distill(_) => "info",
         Command::Health => "warn",
         Command::Status => "warn",
+        Command::Instance(_) => "warn",
+        Command::Config(_) => "warn",
         Command::Profile(_) => "warn",
         Command::McpServe => "warn",
         Command::Wiki(_) => "info",
@@ -235,6 +247,8 @@ async fn main() -> Result<()> {
         Command::Distill(session_id) => distill_cmd::run(&config, &identity, session_id).await,
         Command::Health => health_cmd::run(&config, identity).await,
         Command::Status => status_cmd::run(&config, &identity).await,
+        Command::Instance(args) => instance_cmd::run(&config, &args).await,
+        Command::Config(args) => config_cmd::run(&config, &args).await,
         Command::Profile(args) => profile_cmd::run(&config, &args).await,
         Command::McpServe => mcp_serve_cmd::run(&config).await,
         Command::Wiki(args) => wiki_cmd::run(&config, args).await,
