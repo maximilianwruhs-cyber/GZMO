@@ -10,8 +10,7 @@ Install a **sovereign, curated long-term memory** for coding agents — honeypot
 # Linux x86_64 — preferred
 curl -fsSL https://raw.githubusercontent.com/maximilianwruhs-cyber/GZMO/main/scripts/install-gzmo.sh | bash
 
-# Private repo: export GH_TOKEN=ghp_... first (repo scope)
-# Or from a clone with a local release build:
+# Or from a clone:
 #   cargo build --release -p gzmo-cli && ./scripts/install-gzmo.sh
 ```
 
