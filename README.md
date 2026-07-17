@@ -5,13 +5,19 @@
 Install once, point Cursor or Pi at `gzmo mcp-serve`, and get **sovereign long-term memory** with supersession chains — not another cloud notebook, not a Mem0 clone.
 
 ```bash
+# One-liner (Linux x86_64) — downloads release binary, inits ~/.gzmo, wires MCP
+curl -fsSL https://raw.githubusercontent.com/maximilianwruhs-cyber/GZMO/main/scripts/install-gzmo.sh | bash
+
+# Or from source
 cargo build --release -p gzmo-cli
-./target/release/gzmo init          # writes ~/.gzmo/ (SQLite-only, no LAN)
-./scripts/install-product-mcp.sh    # merges MCP into Cursor / Pi
-# Then call gzmo_memory_status + gzmo_memory_search in your agent
+./scripts/install-gzmo.sh          # uses target/release/gzmo if no release yet
 ```
 
+Then in Cursor/Pi call `gzmo_memory_status` and `gzmo_memory_search`.
+
 Full walkthrough: **[docs/PRODUCT_MCP.md](docs/PRODUCT_MCP.md)**.
+
+> **Private repo note:** until GZMO is public, pass `GH_TOKEN` (classic with `repo` scope) to the installer, or build from a clone.
 
 ---
 

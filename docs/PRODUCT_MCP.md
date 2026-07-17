@@ -4,44 +4,32 @@ Install a **sovereign, curated long-term memory** for coding agents — honeypot
 
 ## 5-minute install
 
-### 1. Build or download the binary
+### 1. Install binary + init + MCP
 
 ```bash
-cargo build --release -p gzmo-cli
-# binary: target/release/gzmo
-# optional: copy to ~/.local/bin/gzmo
+# Linux x86_64 — preferred
+curl -fsSL https://raw.githubusercontent.com/maximilianwruhs-cyber/GZMO/main/scripts/install-gzmo.sh | bash
+
+# Private repo: export GH_TOKEN=ghp_... first (repo scope)
+# Or from a clone with a local release build:
+#   cargo build --release -p gzmo-cli && ./scripts/install-gzmo.sh
 ```
 
-GitHub Release assets (when published): download `gzmo`, `chmod +x`, put it on your `PATH`.
+This:
 
-### 2. Initialize a laptop vault
-
-```bash
-gzmo init
-```
-
-Writes under `~/.gzmo/`:
-
-- `gzmo.toml` — SQLite vault, embeddings off (FTS-only), Redis/Qdrant/Neo4j off
-- `data/vault.db` — empty vault (lab attach allowed)
-- `mcp.json` — Cursor/Pi fragment for `gzmo-memory`
+1. Installs `gzmo` to `~/.local/bin`
+2. Runs `gzmo init` → `~/.gzmo/` (SQLite vault, embeddings off, Redis/Qdrant off)
+3. Merges `gzmo-memory` into Cursor / Pi / global `mcp.json`
 
 No LAN hosts. No remote living stack required.
 
-### 3. Attach MCP
-
-```bash
-./scripts/install-product-mcp.sh
-# or paste ~/.gzmo/mcp.json into ~/.cursor/mcp.json / ~/.pi/agent/mcp.json
-```
-
-Fragment shape:
+Manual fragment (if you skip the installer merge):
 
 ```json
 {
   "mcpServers": {
     "gzmo-memory": {
-      "command": "/path/to/gzmo",
+      "command": "/home/you/.local/bin/gzmo",
       "args": ["mcp-serve"],
       "env": {
         "GZMO_CONFIG": "/home/you/.gzmo/gzmo.toml",
@@ -53,21 +41,25 @@ Fragment shape:
 }
 ```
 
-### 4. Verify
+### 2. Verify
 
 In Cursor/Pi, call:
 
 - `gzmo_memory_status` — vault path + fact counts
 - `gzmo_memory_search` — FTS over the local vault (empty until you ingest/promote)
 
-CLI smoke (no IDE):
+CLI smoke:
 
 ```bash
-export GZMO_CONFIG="$HOME/.gzmo/gzmo.toml"
-export GZMO_ALLOW_LAB_VAULT=1
-export GZMO_PRODUCT=1
-gzmo mcp-serve   # stdio; use with an MCP client
+./scripts/verify-product-mcp.sh
+# or:
+export GZMO_CONFIG="$HOME/.gzmo/gzmo.toml" GZMO_ALLOW_LAB_VAULT=1 GZMO_PRODUCT=1
+gzmo memory status --json
 ```
+
+### Releases
+
+Tagged builds (`v*`) publish `gzmo-x86_64-unknown-linux-gnu.tar.gz` via GitHub Actions (`.github/workflows/release.yml`).
 
 ## Product tools (default)
 
