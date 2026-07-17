@@ -1,0 +1,12 @@
+[Unit]
+Description=Hourly CT101 living product smoke
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=1h
+AccuracySec=2min
+Persistent=true
+Unit=ct101-living-smoke.service
+
+[Install]
+WantedBy=timers.target

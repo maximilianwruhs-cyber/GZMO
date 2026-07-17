@@ -60,7 +60,7 @@ use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 // ─── Task Kind (Obolus routing classification) ──────────────────────────
 
@@ -91,6 +91,8 @@ pub enum TaskKind {
     DistillVerify,
     /// Distill: short narrative summary for episodic.
     DistillSummary,
+    /// Agentic Teacher internal agents (Diagnoser, Planner, Affective, learn prep).
+    PedagogyInternal,
 }
 
 impl std::fmt::Display for TaskKind {
@@ -107,6 +109,7 @@ impl std::fmt::Display for TaskKind {
             Self::DistillExtract => write!(f, "distill_extract"),
             Self::DistillVerify => write!(f, "distill_verify"),
             Self::DistillSummary => write!(f, "distill_summary"),
+            Self::PedagogyInternal => write!(f, "pedagogy_internal"),
         }
     }
 }
@@ -126,6 +129,7 @@ impl TaskKind {
             Self::DistillExtract,
             Self::DistillVerify,
             Self::DistillSummary,
+            Self::PedagogyInternal,
         ]
     }
 
@@ -143,6 +147,8 @@ impl TaskKind {
             Self::DistillExtract => "local",
             Self::DistillVerify => "local",
             Self::DistillSummary => "local",
+            // Prefer local/prime for internal pedagogy agents; cloud via routing override.
+            Self::PedagogyInternal => "local",
         }
     }
 
@@ -210,6 +216,14 @@ pub struct GzmoConfig {
     #[serde(default)]
     pub skills: SkillsConfig,
 
+    /// Progressive-disclosure engineering workflow skills (`skills/workflows/*/SKILL.md`).
+    #[serde(default)]
+    pub workflow_skills: WorkflowSkillsConfig,
+
+    /// Tool capability profiles + workspace jail.
+    #[serde(default)]
+    pub tools: ToolsConfig,
+
     #[serde(default)]
     pub engine: EngineSection,
 
@@ -243,6 +257,10 @@ pub struct GzmoConfig {
     /// Chat session → SessionDistill vault + rich episodic for dream.
     #[serde(default)]
     pub session_distill: SessionDistillConfig,
+
+    /// Overnight metabolism cron slots for `gzmo serve` (ADR-0003).
+    #[serde(default)]
+    pub metabolism: MetabolismConfig,
 
     /// Local embedding server for vault vectors (`/v1/embeddings`).
     #[serde(default)]
@@ -304,6 +322,425 @@ pub struct GzmoConfig {
     /// Only honored when `GZMO_INSTANCE=next`; defaults to all-Inline (CT101-safe).
     #[serde(default)]
     pub assembly: crate::assembly::AssemblyConfig,
+
+    /// Operator custom cron jobs (`gzmo cron`) executed by `gzmo serve`.
+    #[serde(default)]
+    pub cron: CronConfig,
+
+    /// Agentic Teacher / Unix mentor API (`gzmo daemon` socket + discovery teach).
+    #[serde(default)]
+    pub pedagogy: PedagogyConfig,
+}
+
+/// Custom / wizard-managed cron jobs (app-level, not host crontab).
+#[derive(Debug, Deserialize, Clone, Default)]
+pub struct CronConfig {
+    /// Named custom jobs: `[cron.jobs.<id>]`
+    #[serde(default)]
+    pub jobs: HashMap<String, CustomCronJob>,
+}
+
+/// Kind of custom cron job payload.
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq, Default)]
+#[serde(rename_all = "snake_case")]
+pub enum CustomCronKind {
+    #[default]
+    Shell,
+    Prompt,
+}
+
+/// One operator-defined job under `[cron.jobs.<id>]`.
+#[derive(Debug, Deserialize, Clone)]
+pub struct CustomCronJob {
+    #[serde(default = "default_true")]
+    pub enabled: bool,
+
+    /// Classic 5-field cron: `min hour dom month dow` (UTC).
+    pub schedule: String,
+
+    #[serde(default)]
+    pub kind: CustomCronKind,
+
+    /// Shell command when `kind = shell`.
+    #[serde(default)]
+    pub command: String,
+
+    /// Agent prompt when `kind = prompt`.
+    #[serde(default)]
+    pub prompt: String,
+
+    #[serde(default)]
+    pub description: String,
+}
+
+// ─── Pedagogy (Agentic Teacher) ───────────────────────────────────────────
+
+/// Default interaction mode when pedagogy orchestrator is enabled.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize, Default)]
+#[serde(rename_all = "snake_case")]
+pub enum PedagogyDefaultMode {
+    /// Socratic mentor via internal 4-agent orchestrator.
+    #[default]
+    Mentor,
+    /// Direct execution (legacy ops daemon behavior).
+    Ops,
+}
+
+/// Settings for the Agentic Teacher stack.
+#[derive(Debug, Deserialize, Clone)]
+pub struct PedagogyConfig {
+    #[serde(default = "default_pedagogy_enabled")]
+    pub enabled: bool,
+
+    #[serde(default)]
+    pub default_mode: PedagogyDefaultMode,
+
+    #[serde(default = "default_learner_data_dir")]
+    pub learner_data_dir: String,
+
+    #[serde(default = "default_prereq_graphs_dir")]
+    pub prerequisite_graphs_dir: String,
+
+    #[serde(default = "default_edf_log_path")]
+    pub edf_log_path: String,
+
+    #[serde(default = "default_max_hint_level")]
+    pub max_hint_level: u8,
+
+    #[serde(default = "default_solution_leakage_penalty")]
+    pub solution_leakage_penalty: f64,
+
+    /// Max tokens for internal agent calls (Diagnoser, Planner, etc.).
+    #[serde(default = "default_pedagogy_internal_max_tokens")]
+    pub internal_max_tokens: u32,
+
+    /// Teaching turns between teachback checkpoints (0 = disabled).
+    #[serde(default = "default_teachback_interval")]
+    pub teachback_interval: u32,
+
+    /// Active learner ID (set at CLI boot from `--learner` / `GZMO_LEARNER_ID`).
+    #[serde(skip)]
+    pub active_learner_id: Option<String>,
+
+    /// Unix-socket headless mentor API (daemon + `gzmo mentor` client).
+    #[serde(default = "default_mentor_api_enabled")]
+    pub mentor_api_enabled: bool,
+
+    #[serde(default = "default_mentor_socket")]
+    pub mentor_socket: String,
+
+    #[serde(default)]
+    pub sandbox: SandboxConfig,
+
+    /// Autonomous Socratic dialogue when tension drops below threshold.
+    #[serde(default)]
+    pub low_tension_dialogue: LowTensionDialogueConfig,
+
+    /// Path to `gzmo_skills` (pi-mentor-discovery scripts).
+    #[serde(default = "default_discovery_scripts_root")]
+    pub discovery_scripts_root: String,
+
+    /// Structured chaos_val oscillation for discovery sprints (0.9→0.5→0.9).
+    #[serde(default)]
+    pub tension_oscillation: TensionOscillationConfig,
+}
+
+/// One phase in a pedagogy tension oscillation cycle.
+#[derive(Debug, Deserialize, Clone, Serialize)]
+pub struct TensionOscillationStepConfig {
+    pub target: f64,
+    pub duration_secs: u32,
+    #[serde(default)]
+    pub label: String,
+}
+
+/// Pedagogy chaos_val setpoint controller (PulseLoop integration).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Default)]
+#[serde(rename_all = "lowercase")]
+pub enum TensionOscillationScheduleMode {
+    /// CLI / inbox trigger only (v1 default).
+    #[default]
+    Manual,
+    /// Reserved: daemon cron (not wired in v1).
+    Cron,
+}
+
+/// Pedagogy chaos_val setpoint controller (PulseLoop integration).
+#[derive(Debug, Deserialize, Clone)]
+pub struct TensionOscillationConfig {
+    #[serde(default)]
+    pub enabled: bool,
+
+    #[serde(default)]
+    pub schedule_mode: TensionOscillationScheduleMode,
+
+    /// Reserved for future daemon cron when `schedule_mode = "cron"`.
+    #[serde(default)]
+    pub cron_hours: Vec<u32>,
+
+    #[serde(default = "default_tension_oscillation_spawn_discovery")]
+    pub spawn_discovery_on_low: bool,
+
+    #[serde(default = "default_tension_oscillation_low_threshold")]
+    pub low_phase_threshold: f64,
+
+    #[serde(default = "default_tension_oscillation_cooldown_secs")]
+    pub cooldown_secs: u64,
+
+    #[serde(default = "default_tension_oscillation_blend_ticks")]
+    pub blend_ticks: u64,
+
+    #[serde(default = "default_tension_oscillation_sequence")]
+    pub sequence: Vec<TensionOscillationStepConfig>,
+}
+
+fn default_tension_oscillation_spawn_discovery() -> bool {
+    true
+}
+
+fn default_tension_oscillation_low_threshold() -> f64 {
+    0.55
+}
+
+fn default_tension_oscillation_cooldown_secs() -> u64 {
+    3600
+}
+
+fn default_tension_oscillation_blend_ticks() -> u64 {
+    8
+}
+
+fn default_tension_oscillation_sequence() -> Vec<TensionOscillationStepConfig> {
+    vec![
+        TensionOscillationStepConfig {
+            target: 0.9,
+            duration_secs: 60,
+            label: "High tension — confirmation machine".to_string(),
+        },
+        TensionOscillationStepConfig {
+            target: 0.5,
+            duration_secs: 60,
+            label: "Low tension — discovery machine".to_string(),
+        },
+        TensionOscillationStepConfig {
+            target: 0.9,
+            duration_secs: 60,
+            label: "High tension — confirmation machine".to_string(),
+        },
+    ]
+}
+
+impl Default for TensionOscillationConfig {
+    fn default() -> Self {
+        Self {
+            enabled: false,
+            schedule_mode: TensionOscillationScheduleMode::default(),
+            cron_hours: Vec::new(),
+            spawn_discovery_on_low: default_tension_oscillation_spawn_discovery(),
+            low_phase_threshold: default_tension_oscillation_low_threshold(),
+            cooldown_secs: default_tension_oscillation_cooldown_secs(),
+            blend_ticks: default_tension_oscillation_blend_ticks(),
+            sequence: default_tension_oscillation_sequence(),
+        }
+    }
+}
+
+/// Daemon-initiated mentor turn when chaos tension is very low.
+#[derive(Debug, Deserialize, Clone)]
+pub struct LowTensionDialogueConfig {
+    #[serde(default)]
+    pub enabled: bool,
+
+    /// Fire when tension crosses below this value (edge-triggered).
+    #[serde(default = "default_low_tension_threshold")]
+    pub threshold: f64,
+
+    /// Minimum seconds between autonomous dialogue turns.
+    #[serde(default = "default_low_tension_cooldown")]
+    pub cooldown_secs: u64,
+
+    /// Seed message for bare `maybe_teach` — placeholders: `{tension}`, `{tick}`, `{phase}`.
+    /// Ignored when `discovery_cycle` is true.
+    #[serde(default = "default_low_tension_opening")]
+    pub opening_template: String,
+
+    /// Run full pi-mentor-discovery cycle (pillar probe + cycle report) instead of bare mentor teach.
+    #[serde(default = "default_low_tension_discovery_cycle")]
+    pub discovery_cycle: bool,
+
+    /// Minimum ticks of low-tension plateau to fire dialogue trigger.
+    #[serde(default)]
+    pub idle_ticks_threshold: Option<u64>,
+
+    /// Discovery queue config (max pending, max concurrent, session priority).
+    #[serde(default)]
+    pub discovery_queue: DiscoveryQueueConfig,
+}
+
+/// Discovery queue configuration for AUTO Socratic cycles.
+#[derive(Debug, Deserialize, Clone, Default)]
+pub struct DiscoveryQueueConfig {
+    /// Maximum pending discovery cycles in the queue.
+    #[serde(default = "default_discovery_max_pending")]
+    pub max_pending: usize,
+
+    /// Maximum concurrent discovery cycles.
+    #[serde(default = "default_discovery_max_concurrent")]
+    pub max_concurrent: usize,
+
+    /// Prioritize session-bound cycles over AUTO cycles.
+    #[serde(default = "default_discovery_session_priority")]
+    pub session_priority: bool,
+}
+
+fn default_discovery_max_pending() -> usize { 2 }
+fn default_discovery_max_concurrent() -> usize { 1 }
+fn default_discovery_session_priority() -> bool { true }
+
+impl Default for LowTensionDialogueConfig {
+    fn default() -> Self {
+        Self {
+            enabled: false,
+            threshold: default_low_tension_threshold(),
+            cooldown_secs: default_low_tension_cooldown(),
+            opening_template: default_low_tension_opening(),
+            discovery_cycle: default_low_tension_discovery_cycle(),
+            idle_ticks_threshold: None,
+            discovery_queue: DiscoveryQueueConfig::default(),
+        }
+    }
+}
+
+fn default_low_tension_discovery_cycle() -> bool {
+    true
+}
+
+fn default_discovery_scripts_root() -> String {
+    std::env::var("GZMO_SKILLS_ROOT").unwrap_or_else(|_| {
+        let home = std::env::var("HOME").unwrap_or_else(|_| "/home/maximilian-wruhs".into());
+        format!("{home}/gzmo_skills")
+    })
+}
+
+fn default_low_tension_threshold() -> f64 {
+    15.0
+}
+
+fn default_low_tension_cooldown() -> u64 {
+    300
+}
+
+fn default_low_tension_opening() -> String {
+    "[AUTONOMOUS — low tension] System tension is very low (τ={tension}%, tick {tick}, phase {phase}). \
+     Begin a Socratic dialogue with the learner: ask one inviting question about stillness, dormancy, \
+     or what the organism should attend to when the chaos field is calm. Do not lecture; do not give the answer."
+        .to_string()
+}
+
+#[derive(Debug, Deserialize, Serialize, Clone, Default)]
+pub struct SandboxConfig {
+    #[serde(default = "default_sandbox_enabled")]
+    pub enabled: bool,
+    #[serde(default = "default_sandbox_max_code_chars")]
+    pub max_code_chars: usize,
+    #[serde(default = "default_sandbox_timeout_secs")]
+    pub timeout_secs: u64,
+    #[serde(default = "default_sandbox_max_output_chars")]
+    pub max_output_chars: usize,
+    #[serde(default = "default_sandbox_blocked_imports")]
+    pub blocked_imports: Vec<String>,
+    #[serde(default = "default_sandbox_orchestrator_offload")]
+    pub orchestrator_offload: bool,
+}
+
+fn default_sandbox_enabled() -> bool { true }
+fn default_sandbox_max_code_chars() -> usize { 2000 }
+fn default_sandbox_timeout_secs() -> u64 { 10 }
+fn default_sandbox_max_output_chars() -> usize { 4000 }
+fn default_sandbox_blocked_imports() -> Vec<String> {
+    vec![
+        "os".to_string(),
+        "subprocess".to_string(),
+        "socket".to_string(),
+        "shutil".to_string(),
+        "sys".to_string(),
+    ]
+}
+fn default_sandbox_orchestrator_offload() -> bool { false }
+
+fn default_pedagogy_enabled() -> bool { true }
+fn default_learner_data_dir() -> String { "data/learner".to_string() }
+fn default_prereq_graphs_dir() -> String { "data/pedagogy/graphs".to_string() }
+fn default_edf_log_path() -> String { "data/pedagogy/edf_log.jsonl".to_string() }
+fn default_max_hint_level() -> u8 { 5 }
+fn default_solution_leakage_penalty() -> f64 { 1.0 }
+fn default_pedagogy_internal_max_tokens() -> u32 { 512 }
+fn default_teachback_interval() -> u32 { 8 }
+fn default_mentor_api_enabled() -> bool { true }
+fn default_mentor_socket() -> String { "data/gzmo_mentor.sock".to_string() }
+
+impl Default for PedagogyConfig {
+    fn default() -> Self {
+        Self {
+            enabled: default_pedagogy_enabled(),
+            default_mode: PedagogyDefaultMode::default(),
+            learner_data_dir: default_learner_data_dir(),
+            prerequisite_graphs_dir: default_prereq_graphs_dir(),
+            edf_log_path: default_edf_log_path(),
+            max_hint_level: default_max_hint_level(),
+            solution_leakage_penalty: default_solution_leakage_penalty(),
+            internal_max_tokens: default_pedagogy_internal_max_tokens(),
+            teachback_interval: default_teachback_interval(),
+            active_learner_id: None,
+            mentor_api_enabled: default_mentor_api_enabled(),
+            mentor_socket: default_mentor_socket(),
+            sandbox: SandboxConfig::default(),
+            low_tension_dialogue: LowTensionDialogueConfig::default(),
+            discovery_scripts_root: default_discovery_scripts_root(),
+            tension_oscillation: TensionOscillationConfig::default(),
+        }
+    }
+}
+
+impl PedagogyConfig {
+    /// Resolve learner ID: `--learner` flag → `GZMO_LEARNER_ID` env → `"operator"`.
+    pub fn resolve_learner_id(cli_flag: Option<&str>) -> String {
+        if let Some(id) = cli_flag.filter(|s| !s.is_empty()) {
+            return id.to_string();
+        }
+        if let Ok(id) = std::env::var("GZMO_LEARNER_ID") {
+            if !id.is_empty() {
+                return id;
+            }
+        }
+        "operator".to_string()
+    }
+
+    pub fn learner_id(&self) -> &str {
+        self.active_learner_id
+            .as_deref()
+            .unwrap_or("operator")
+    }
+
+    pub fn learner_dir(&self) -> std::path::PathBuf {
+        std::path::PathBuf::from(&self.learner_data_dir).join(self.learner_id())
+    }
+
+    pub fn profile_path(&self) -> std::path::PathBuf {
+        self.learner_dir().join("profile.json")
+    }
+
+    pub fn session_path(&self) -> std::path::PathBuf {
+        self.learner_dir().join("session.json")
+    }
+
+    pub fn episodes_dir(&self) -> std::path::PathBuf {
+        self.learner_dir().join("episodes")
+    }
+
+    pub fn mentor_socket_path(&self) -> std::path::PathBuf {
+        std::path::PathBuf::from(&self.mentor_socket)
+    }
 }
 
 // ─── Dreams ─────────────────────────────────────────────────────────────
@@ -454,6 +891,20 @@ pub struct IngestConfig {
     #[serde(default = "default_ingest_enabled")]
     pub enabled: bool,
 
+    /// Nightly batch `gzmo ingest-dir` via gzmo-scheduler (watcher stays off).
+    #[serde(default)]
+    pub batch_enabled: bool,
+
+    /// Inbox directory for batch ingest (relative to config dir or absolute).
+    #[serde(default = "default_ingest_inbox")]
+    pub inbox_path: String,
+
+    #[serde(default = "default_ingest_batch_hour")]
+    pub cron_hour: u32,
+
+    #[serde(default)]
+    pub cron_minute: u32,
+
     #[serde(default = "default_dream_verify")]
     pub verify: bool,
 
@@ -479,6 +930,12 @@ pub struct IngestConfig {
 fn default_ingest_max_source_chars() -> usize {
     120_000
 }
+fn default_ingest_inbox() -> String {
+    "../data-next/inbox".into()
+}
+fn default_ingest_batch_hour() -> u32 {
+    2
+}
 
 impl IngestConfig {
     pub fn kg_gate(&self) -> crate::memory::kg_extract::KgGateConfig {
@@ -496,6 +953,10 @@ impl Default for IngestConfig {
     fn default() -> Self {
         Self {
             enabled: default_ingest_enabled(),
+            batch_enabled: false,
+            inbox_path: default_ingest_inbox(),
+            cron_hour: default_ingest_batch_hour(),
+            cron_minute: 0,
             verify: default_dream_verify(),
             min_confidence: default_dream_min_confidence(),
             verify_temperature: default_dream_verify_temperature(),
@@ -521,6 +982,10 @@ pub struct WikiConfig {
     #[serde(default = "default_wiki_enabled")]
     pub enabled: bool,
 
+    /// `"local"` = on-disk WikiEngine; `"okforge"` = OKCP push to forge repo.
+    #[serde(default = "default_wiki_backend")]
+    pub backend: String,
+
     #[serde(default = "default_wiki_directory")]
     pub directory: String,
 
@@ -537,6 +1002,14 @@ pub struct WikiConfig {
     #[serde(default = "default_wiki_emit_on_ingest")]
     pub emit_on_ingest: bool,
 
+    /// Hook `wiki-okforge-push` after distill recipe (GZMO-next).
+    #[serde(default)]
+    pub emit_after_distill: bool,
+
+    /// Hook `wiki-okforge-push` after dream recipe (GZMO-next).
+    #[serde(default)]
+    pub emit_after_dream: bool,
+
     /// Daemon "Knowledge Gardener" sync loop (UTC hour/minute).
     #[serde(default = "default_wiki_sync_cron_hour")]
     pub sync_cron_hour: u32,
@@ -548,9 +1021,38 @@ pub struct WikiConfig {
     pub lint_cron_dow: u32,
     #[serde(default = "default_wiki_lint_cron_hour")]
     pub lint_cron_hour: u32,
+
+    /// Catch-up push cron (UTC) when recipe hooks miss.
+    #[serde(default = "default_wiki_push_cron_hour")]
+    pub push_cron_hour: u32,
+    #[serde(default = "default_wiki_push_cron_minute")]
+    pub push_cron_minute: u32,
+
+    #[serde(default)]
+    pub okforge: Option<WikiOkforgeConfig>,
+}
+
+/// OKForge OKCP target for `[wiki.okforge]`.
+#[derive(Debug, Deserialize, Clone)]
+pub struct WikiOkforgeConfig {
+    #[serde(default = "default_okforge_url")]
+    pub url: String,
+    #[serde(default = "default_okforge_owner")]
+    pub owner: String,
+    #[serde(default = "default_okforge_repo")]
+    pub repo: String,
+    #[serde(default = "default_okforge_token_env")]
+    pub token_env: String,
+    #[serde(default = "default_okforge_agent_id")]
+    pub agent_id: String,
+    #[serde(default = "default_true")]
+    pub auto_commit: bool,
+    #[serde(default)]
+    pub open_pr: bool,
 }
 
 fn default_wiki_enabled() -> bool { true }
+fn default_wiki_backend() -> String { "local".to_string() }
 fn default_wiki_directory() -> String { "wiki".to_string() }
 fn default_wiki_index_path() -> String { "wiki/index.md".to_string() }
 fn default_wiki_log_path() -> String { "wiki/log.md".to_string() }
@@ -560,20 +1062,47 @@ fn default_wiki_sync_cron_hour() -> u32 { 5 }
 fn default_wiki_sync_cron_minute() -> u32 { 30 }
 fn default_wiki_lint_cron_dow() -> u32 { 0 }
 fn default_wiki_lint_cron_hour() -> u32 { 6 }
+fn default_wiki_push_cron_hour() -> u32 { 5 }
+fn default_wiki_push_cron_minute() -> u32 { 30 }
+fn default_okforge_url() -> String { "http://127.0.0.1:3000".into() }
+fn default_okforge_owner() -> String { "gzmo".into() }
+fn default_okforge_repo() -> String { "gzmo-next-memory".into() }
+fn default_okforge_token_env() -> String { "OKFORGE_TOKEN".into() }
+fn default_okforge_agent_id() -> String { "gzmo-next".into() }
+
+impl Default for WikiOkforgeConfig {
+    fn default() -> Self {
+        Self {
+            url: default_okforge_url(),
+            owner: default_okforge_owner(),
+            repo: default_okforge_repo(),
+            token_env: default_okforge_token_env(),
+            agent_id: default_okforge_agent_id(),
+            auto_commit: true,
+            open_pr: false,
+        }
+    }
+}
 
 impl Default for WikiConfig {
     fn default() -> Self {
         Self {
             enabled: default_wiki_enabled(),
+            backend: default_wiki_backend(),
             directory: default_wiki_directory(),
             index_path: default_wiki_index_path(),
             log_path: default_wiki_log_path(),
             schema_path: default_wiki_schema_path(),
             emit_on_ingest: default_wiki_emit_on_ingest(),
+            emit_after_distill: false,
+            emit_after_dream: false,
             sync_cron_hour: default_wiki_sync_cron_hour(),
             sync_cron_minute: default_wiki_sync_cron_minute(),
             lint_cron_dow: default_wiki_lint_cron_dow(),
             lint_cron_hour: default_wiki_lint_cron_hour(),
+            push_cron_hour: default_wiki_push_cron_hour(),
+            push_cron_minute: default_wiki_push_cron_minute(),
+            okforge: None,
         }
     }
 }
@@ -697,6 +1226,51 @@ impl Default for SessionDistillConfig {
             daemon_scheduled: default_session_distill_daemon_scheduled(),
             cron_hour: default_session_distill_cron_hour(),
             cron_minute: default_session_distill_cron_minute(),
+        }
+    }
+}
+
+// ─── Metabolism (`gzmo serve`) ──────────────────────────────────────────
+
+/// Overnight promote/embed cron slots for the thin typed runner (ADR-0003).
+#[derive(Debug, Deserialize, Clone)]
+pub struct MetabolismConfig {
+    #[serde(default = "default_metabolism_enabled")]
+    pub enabled: bool,
+    #[serde(default = "default_metabolism_promote_hour")]
+    pub promote_cron_hour: u32,
+    #[serde(default = "default_metabolism_promote_minute")]
+    pub promote_cron_minute: u32,
+    #[serde(default = "default_metabolism_embed_hour")]
+    pub embed_cron_hour: u32,
+    #[serde(default = "default_metabolism_embed_minute")]
+    pub embed_cron_minute: u32,
+}
+
+fn default_metabolism_enabled() -> bool {
+    true
+}
+fn default_metabolism_promote_hour() -> u32 {
+    2
+}
+fn default_metabolism_promote_minute() -> u32 {
+    30
+}
+fn default_metabolism_embed_hour() -> u32 {
+    2
+}
+fn default_metabolism_embed_minute() -> u32 {
+    45
+}
+
+impl Default for MetabolismConfig {
+    fn default() -> Self {
+        Self {
+            enabled: default_metabolism_enabled(),
+            promote_cron_hour: default_metabolism_promote_hour(),
+            promote_cron_minute: default_metabolism_promote_minute(),
+            embed_cron_hour: default_metabolism_embed_hour(),
+            embed_cron_minute: default_metabolism_embed_minute(),
         }
     }
 }
@@ -1082,20 +1656,23 @@ pub struct KgReconcileConfig {
     #[serde(default)]
     pub enabled: bool,
 
-    /// UTC hour for weekly reconcile (default Sunday 04:00 if cron not set).
+    /// UTC hour for daily reconcile on GZMO-next (default 04:30).
     #[serde(default = "default_kg_reconcile_hour")]
     pub cron_hour: u32,
 
-    #[serde(default)]
+    #[serde(default = "default_kg_reconcile_minute")]
     pub cron_minute: u32,
 
     /// Dry-run: log planned changes without MCP writes.
-    #[serde(default)]
+    #[serde(default = "default_true")]
     pub dry_run: bool,
 }
 
 fn default_kg_reconcile_hour() -> u32 {
     4
+}
+fn default_kg_reconcile_minute() -> u32 {
+    30
 }
 
 impl Default for KgReconcileConfig {
@@ -1103,7 +1680,7 @@ impl Default for KgReconcileConfig {
         Self {
             enabled: false,
             cron_hour: default_kg_reconcile_hour(),
-            cron_minute: 0,
+            cron_minute: default_kg_reconcile_minute(),
             dry_run: true,
         }
     }
@@ -1832,6 +2409,95 @@ pub struct SkillsConfig {
     pub dreams_path: PathBuf,
 }
 
+/// Workflow skill pack (`SKILL.md` engineering contracts).
+#[derive(Debug, Deserialize, Clone)]
+pub struct WorkflowSkillsConfig {
+    #[serde(default = "default_workflow_skills_enabled")]
+    pub enabled: bool,
+
+    #[serde(default = "default_workflow_skills_dir")]
+    pub dir: PathBuf,
+
+    #[serde(default = "default_workflow_model_can_activate")]
+    pub model_can_activate: bool,
+
+    #[serde(default = "default_workflow_max_active")]
+    pub max_active: usize,
+
+    /// Where `/handoff` artifacts are written.
+    #[serde(default = "default_workflow_handoff_dir")]
+    pub handoff_dir: PathBuf,
+
+    /// When true, handoff writes also store a one-line vault pointer.
+    #[serde(default = "default_workflow_handoff_to_vault")]
+    pub handoff_to_vault: bool,
+}
+
+fn default_workflow_skills_enabled() -> bool {
+    true
+}
+fn default_workflow_skills_dir() -> PathBuf {
+    PathBuf::from("skills/workflows")
+}
+fn default_workflow_model_can_activate() -> bool {
+    true
+}
+fn default_workflow_max_active() -> usize {
+    2
+}
+fn default_workflow_handoff_dir() -> PathBuf {
+    PathBuf::from("data-next/handoffs")
+}
+fn default_workflow_handoff_to_vault() -> bool {
+    true
+}
+
+impl Default for WorkflowSkillsConfig {
+    fn default() -> Self {
+        Self {
+            enabled: default_workflow_skills_enabled(),
+            dir: default_workflow_skills_dir(),
+            model_can_activate: default_workflow_model_can_activate(),
+            max_active: default_workflow_max_active(),
+            handoff_dir: default_workflow_handoff_dir(),
+            handoff_to_vault: default_workflow_handoff_to_vault(),
+        }
+    }
+}
+
+/// Interactive / subagent tool policy.
+#[derive(Debug, Deserialize, Clone)]
+pub struct ToolsConfig {
+    /// Default profile for chat / `--repl`: read_only | developer | reviewer | operator
+    #[serde(default = "default_tools_profile")]
+    pub profile: String,
+
+    /// Workspace roots for path jail (empty = cwd only).
+    #[serde(default)]
+    pub workspace_roots: Vec<PathBuf>,
+
+    /// Emit structured audit log lines on every tool dispatch.
+    #[serde(default = "default_tools_audit")]
+    pub audit: bool,
+}
+
+fn default_tools_profile() -> String {
+    "developer".to_string()
+}
+fn default_tools_audit() -> bool {
+    true
+}
+
+impl Default for ToolsConfig {
+    fn default() -> Self {
+        Self {
+            profile: default_tools_profile(),
+            workspace_roots: Vec::new(),
+            audit: default_tools_audit(),
+        }
+    }
+}
+
 #[derive(Debug, Deserialize, Clone)]
 pub struct AgentConfig {
     /// Max tool-call iterations before forcing a text response
@@ -2144,6 +2810,8 @@ impl GzmoConfig {
             cfg.memory.vault_db = resolve(&cfg.memory.vault_db);
             cfg.skills.directory = resolve(&cfg.skills.directory);
             cfg.skills.dreams_path = resolve(&cfg.skills.dreams_path);
+            cfg.workflow_skills.dir = resolve(&cfg.workflow_skills.dir);
+            cfg.workflow_skills.handoff_dir = resolve(&cfg.workflow_skills.handoff_dir);
             return Ok(cfg);
         }
 
@@ -2161,6 +2829,8 @@ impl GzmoConfig {
         config.skills.dreams_path = resolve(&config.skills.dreams_path);
         config.session_distill.sessions_dir = resolve(&config.session_distill.sessions_dir);
         config.redis.distill_fallback_dir = resolve(&config.redis.distill_fallback_dir);
+        config.workflow_skills.dir = resolve(&config.workflow_skills.dir);
+        config.workflow_skills.handoff_dir = resolve(&config.workflow_skills.handoff_dir);
         apply_mcp_env_overrides(&mut config, &dotenv);
         apply_engine_key_overrides(&mut config, &dotenv);
 
@@ -2177,24 +2847,36 @@ impl GzmoConfig {
         Ok(config)
     }
 
-    /// Load from `gzmo.toml` anchored to the executable directory, 
-    /// or an explicit path via the `GZMO_CONFIG` environment variable.
+    /// Load config.
+    ///
+    /// Order: `GZMO_CONFIG` → `~/.gzmo/gzmo.toml` (product) → `config/gzmo.toml` →
+    /// `config/gzmo-next.toml` → cwd/`gzmo.toml` → exe-dir variants.
     pub fn load_auto() -> Result<Self> {
-        let path = std::env::var("GZMO_CONFIG")
-            .map(PathBuf::from)
-            .unwrap_or_else(|_| {
-                let cwd_path = std::env::current_dir()
-                    .unwrap_or_else(|_| PathBuf::from("."))
-                    .join("gzmo.toml");
-                if cwd_path.exists() {
-                    return cwd_path;
-                }
-                
-                // Portable mode fallback: anchor to the physical location of the executable
-                let mut exe = std::env::current_exe().unwrap_or_else(|_| PathBuf::from("."));
-                exe.pop(); // Remove executable name
-                exe.join("gzmo.toml")
-            });
+        let path = if let Ok(p) = std::env::var("GZMO_CONFIG") {
+            PathBuf::from(p)
+        } else {
+            let cwd = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
+            let mut exe = std::env::current_exe().unwrap_or_else(|_| PathBuf::from("."));
+            exe.pop();
+            let product = std::env::var_os("HOME")
+                .map(|h| PathBuf::from(h).join(".gzmo").join("gzmo.toml"));
+            let mut candidates: Vec<PathBuf> = Vec::new();
+            if let Some(p) = product {
+                candidates.push(p);
+            }
+            candidates.extend([
+                cwd.join("config/gzmo.toml"),
+                cwd.join("config/gzmo-next.toml"),
+                exe.join("config/gzmo.toml"),
+                exe.join("config/gzmo-next.toml"),
+                cwd.join("gzmo.toml"),
+                exe.join("gzmo.toml"),
+            ]);
+            candidates
+                .into_iter()
+                .find(|p| p.exists())
+                .unwrap_or_else(|| cwd.join("gzmo.toml"))
+        };
 
         Self::load(&path)
     }

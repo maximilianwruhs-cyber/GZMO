@@ -4,10 +4,14 @@
 
 mod assemble_cmd;
 mod chat;
+mod repl_shared;
 mod chaos_bootstrap;
 mod cli_mcp;
 mod config_cmd;
 mod daemon_cmd;
+mod mentor_ipc;
+mod mentor_cmd;
+mod pedagogy_bridge;
 mod dream_cmd;
 mod spark_cmd;
 mod status_cmd;
@@ -17,12 +21,18 @@ mod ingest_dir_cmd;
 mod health_cmd;
 mod memory_cmd;
 mod mcp_serve_cmd;
+mod metabolism_cmd;
+mod observatory_cmd;
+mod cron_cmd;
 mod profile_cmd;
 mod embed_cmd;
 mod distill_cmd;
+mod promote_cmd;
+mod serve_cmd;
 mod init_cmd;
 mod ingest_eval_cmd;
 mod wiki_cmd;
+mod kg_reconcile_cmd;
 #[allow(dead_code)]
 mod ui;
 pub mod tui;
@@ -36,6 +46,8 @@ enum Command {
     Chat,
     ChatRepl,  // Legacy REPL mode via --repl flag
     Daemon,
+    /// Thin overnight metabolism runner (ADR-0003).
+    Serve,
     /// One-shot dream consolidation for an optional date (default: today).
     Dream(Option<NaiveDate>),
     /// One-shot spark (serendipitous recall) for an optional date (default: today).
@@ -46,24 +58,39 @@ enum Command {
     Init,
     MemoryDump,
     MemoryEmbed(Option<usize>),
+    MemoryPromote(Option<usize>),
     Memory(Vec<String>),
     Distill(Option<String>),
     Health,
     Status,
+    /// Ecosystem health LED board (TUI Observatory slice).
+    Observatory,
+    /// Overnight metabolism job board (TUI).
+    Metabolism,
+    /// Cron wizard — builtins + custom jobs for `gzmo serve`.
+    Cron(Vec<String>),
     Profile(Vec<String>),
     Instance(Vec<String>),
     Config(Vec<String>),
     McpServe,
-    /// Knowledge Gardener ops over the wiki/ layer (sync|lint|search|file-back|status).
+    /// Knowledge Gardener ops over the wiki/ layer (sync|lint|search|file-back|status|push).
     Wiki(Vec<String>),
+    /// One-shot Neo4j ontology reconcile via MCP.
+    KgReconcile(Vec<String>),
     /// Run a Little Tools Lab assembly recipe (shells out to little-tools-lab/scripts).
     Assemble { recipe: String, fixture: bool, apply: bool },
+    /// Headless mentor API client (`gzmo mentor ping|status|teach`).
+    Mentor(Vec<String>),
 }
 
 fn parse_args() -> Command {
     let args: Vec<String> = std::env::args().collect();
     if args.len() >= 2 {
         if args[1] == "daemon" { return Command::Daemon; }
+        if args[1] == "mentor" {
+            return Command::Mentor(args.get(2..).unwrap_or(&[]).to_vec());
+        }
+        if args[1] == "serve" { return Command::Serve; }
         if args[1] == "init" { return Command::Init; }
         if args[1] == "--repl" { return Command::ChatRepl; }
         if args[1] == "dream" {
@@ -111,6 +138,13 @@ fn parse_args() -> Command {
                 let limit = args.get(3).and_then(|s| s.parse().ok());
                 return Command::MemoryEmbed(limit);
             }
+            if args.get(2).map(|s| s.as_str()) == Some("promote") {
+                let limit = args.get(3).and_then(|s| s.parse().ok());
+                return Command::MemoryPromote(limit);
+            }
+            if args.get(2).map(|s| s.as_str()) == Some("mcp") {
+                return Command::McpServe;
+            }
             return Command::Memory(args[2..].to_vec());
         }
         if args[1] == "dump" { return Command::MemoryDump; }
@@ -120,6 +154,11 @@ fn parse_args() -> Command {
         }
         if args[1] == "health" { return Command::Health; }
         if args[1] == "status" { return Command::Status; }
+        if args[1] == "observatory" { return Command::Observatory; }
+        if args[1] == "metabolism" { return Command::Metabolism; }
+        if args[1] == "cron" {
+            return Command::Cron(args[2..].to_vec());
+        }
         if args[1] == "instance" {
             return Command::Instance(args[2..].to_vec());
         }
@@ -127,6 +166,9 @@ fn parse_args() -> Command {
             return Command::Config(args[2..].to_vec());
         }
         if args[1] == "wiki" { return Command::Wiki(args[2..].to_vec()); }
+        if args[1] == "kg-reconcile" {
+            return Command::KgReconcile(args[2..].to_vec());
+        }
         if args[1] == "mcp-serve" { return Command::McpServe; }
         if args[1] == "profile" {
             return Command::Profile(args[2..].to_vec());
@@ -155,6 +197,7 @@ async fn main() -> Result<()> {
     let default_filter = match command {
         Command::Chat | Command::ChatRepl => "warn",
         Command::Daemon => "info",
+        Command::Serve => "info",
         Command::Dream(_) => "info",
         Command::Spark(_) => "info",
         Command::Ingest { .. } => "info",
@@ -163,16 +206,22 @@ async fn main() -> Result<()> {
         Command::Init => "warn",
         Command::MemoryDump => "info",
         Command::MemoryEmbed(_) => "info",
+        Command::MemoryPromote(_) => "info",
         Command::Memory(_) => "warn",
         Command::Distill(_) => "info",
         Command::Health => "warn",
         Command::Status => "warn",
+        Command::Observatory => "warn",
+        Command::Metabolism => "warn",
+        Command::Cron(_) => "warn",
         Command::Instance(_) => "warn",
         Command::Config(_) => "warn",
         Command::Profile(_) => "warn",
         Command::McpServe => "warn",
         Command::Wiki(_) => "info",
+        Command::KgReconcile(_) => "info",
         Command::Assemble { .. } => "info",
+        Command::Mentor(_) => "warn",
     };
 
     tracing_subscriber::fmt()
@@ -190,11 +239,37 @@ async fn main() -> Result<()> {
     }
 
     let config = gzmo_core::config::GzmoConfig::load_auto()?;
-    let identity = gzmo_core::identity::IdentityEngine::boot(&config.identity.soul_path).await?;
+
+    // Memory/health/MCP/status probes must not depend on SOUL.md (wrong CWD / release path).
+    let needs_identity = !matches!(
+        command,
+        Command::Health
+            | Command::Status
+            | Command::Memory(_)
+            | Command::MemoryEmbed(_)
+            | Command::MemoryPromote(_)
+            | Command::Distill(_)
+            | Command::McpServe
+            | Command::Observatory
+            | Command::Metabolism
+            | Command::MemoryDump
+            | Command::Assemble { .. }
+            | Command::Instance(_)
+            | Command::Config(_)
+            | Command::Profile(_)
+            | Command::Mentor(_)
+    );
+
+    let identity = if needs_identity {
+        Some(gzmo_core::identity::IdentityEngine::boot(&config.identity.soul_path).await?)
+    } else {
+        None
+    };
 
     match command {
-        Command::Chat => chat::run(&config, &identity).await,
-        Command::ChatRepl => tui::runner::run(&config, &identity).await,
+        Command::Chat => chat::run(&config, identity.as_ref().unwrap()).await,
+        Command::ChatRepl => tui::runner::run(&config, identity.as_ref().unwrap()).await,
+        Command::Serve => serve_cmd::run(&config, identity.as_ref().unwrap()).await,
         Command::Daemon => {
             // OS-level singleton lock file
             let pid_file = std::path::PathBuf::from("/tmp/gzmo_rust.pid");
@@ -226,15 +301,25 @@ async fn main() -> Result<()> {
             write!(lock, "{}", std::process::id())?;
             drop(lock);
 
-            let res = daemon_cmd::run(&config, identity).await;
+            let res = daemon_cmd::run(&config, identity.expect("daemon needs identity")).await;
             let _ = std::fs::remove_file(&pid_file);
             res
         },
-        Command::Dream(date) => dream_cmd::run(&config, identity, date).await,
-        Command::Spark(date) => spark_cmd::run(&config, identity, date).await,
-        Command::Ingest { path, dry_run } => ingest_cmd::run(&config, identity, path, dry_run).await,
-        Command::IngestDir(path) => ingest_dir_cmd::run(&config, identity, path).await,
-        Command::IngestEval(path) => ingest_eval_cmd::run(&config, identity, path).await,
+        Command::Dream(date) => {
+            dream_cmd::run(&config, identity.as_ref().unwrap(), date).await
+        }
+        Command::Spark(date) => {
+            spark_cmd::run(&config, identity.as_ref().unwrap(), date).await
+        }
+        Command::Ingest { path, dry_run } => {
+            ingest_cmd::run(&config, identity.expect("ingest needs identity"), path, dry_run).await
+        }
+        Command::IngestDir(path) => {
+            ingest_dir_cmd::run(&config, identity.expect("ingest-dir needs identity"), path).await
+        }
+        Command::IngestEval(path) => {
+            ingest_eval_cmd::run(&config, identity.expect("ingest-eval needs identity"), path).await
+        }
         Command::Init => unreachable!(),
         Command::MemoryDump => {
             println!("Exporting Native Vault to Markdown...");
@@ -242,20 +327,26 @@ async fn main() -> Result<()> {
             vault.dump_to_markdown(&config.memory.directory).await?;
             Ok(())
         }
-        Command::MemoryEmbed(limit) => embed_cmd::run(&config, &identity, limit).await,
+        Command::MemoryEmbed(limit) => embed_cmd::run(&config, limit).await,
+        Command::MemoryPromote(limit) => promote_cmd::run(&config, limit).await,
         Command::Memory(sub) => memory_cmd::run(&config, sub).await,
-        Command::Distill(session_id) => distill_cmd::run(&config, &identity, session_id).await,
-        Command::Health => health_cmd::run(&config, identity).await,
-        Command::Status => status_cmd::run(&config, &identity).await,
+        Command::Distill(session_id) => distill_cmd::run(&config, session_id).await,
+        Command::Health => health_cmd::run(&config).await,
+        Command::Status => status_cmd::run(&config).await,
+        Command::Observatory => observatory_cmd::run(&config).await,
+        Command::Metabolism => metabolism_cmd::run(&config).await,
+        Command::Cron(args) => cron_cmd::run(&config, identity.as_ref().unwrap(), &args).await,
         Command::Instance(args) => instance_cmd::run(&config, &args).await,
         Command::Config(args) => config_cmd::run(&config, &args).await,
         Command::Profile(args) => profile_cmd::run(&config, &args).await,
         Command::McpServe => mcp_serve_cmd::run(&config).await,
         Command::Wiki(args) => wiki_cmd::run(&config, args).await,
+        Command::KgReconcile(args) => kg_reconcile_cmd::run(&config, args).await,
         Command::Assemble {
             recipe,
             fixture,
             apply,
         } => assemble_cmd::run(&config, &recipe, fixture, apply).await,
+        Command::Mentor(args) => mentor_cmd::run(&config, &args).await,
     }
 }

@@ -1,113 +1,88 @@
-# Pi (frontend) ↔ GZMO Platform memory
+# Pi ↔ GZMO living memory (CT101)
 
-**Status:** P3 (2026-06-04); operator frontend **2026-07-10** — see [OPERATOR_FRONTEND_DECISION.md](./OPERATOR_FRONTEND_DECISION.md)  
-**Architecture:** [ARCHITECTURE_GZMO_PLATFORM.md](./ARCHITECTURE_GZMO_PLATFORM.md)
+**Status:** Living attach (2026-07-17)  
+**Related:** [CT101_DEPLOY.md](./CT101_DEPLOY.md), [CT101_BOUNDARY.md](./CT101_BOUNDARY.md), [CT101_RESTORE_LIVING.md](./CT101_RESTORE_LIVING.md)
 
-Pi may still use this bridge when run as **optional auxiliary**. The canonical operator frontend is **`gzmo_cli`** (`gzmo memory *` in-process). Pi must not talk to Redis or vault directly — use the bridge below.
+Pi is the **fast operator hands**. CT101 holds the **living vault** (~60k facts). Do not point Pi at workstation `data-next/` or a local empty `data/vault.db`.
 
 ---
 
-## Per-turn workflow
+## Preferred path — MCP on CT101
 
 ```mermaid
 sequenceDiagram
-  participant Pi as Frontend pi-rust
-  participant Sh as pi-gzmo-memory.sh
-  participant Gz as gzmo memory CLI
-  participant Plat as PlatformMemory
+  participant Pi as Pi_or_Cursor
+  participant Wrap as pi-gzmo-mcp-serve.sh
+  participant Mcp as gzmo_mcp-serve_on_CT101
+  participant Vault as opt_gzmo_vault
 
-  Pi->>Sh: turn-start
-  Sh->>Gz: memory turn-start
-  Gz->>Plat: scratch clear
-  Pi->>Sh: search "query"
-  Sh->>Gz: memory search
-  Gz->>Plat: vault recall + scratch write
-  Note over Pi: LLM turn with Prime :8000
-  Pi->>Sh: recall
-  Sh->>Gz: memory recall
-  Gz-->>Pi: [RECALL] block
+  Pi->>Wrap: stdio MCP
+  Wrap->>Mcp: ssh ct101
+  Mcp->>Vault: PlatformMemory open
+  Pi->>Mcp: gzmo_memory_turn_start
+  Pi->>Mcp: gzmo_memory_search
+  Pi->>Mcp: gzmo_memory_recall_pull
 ```
 
-| Step | When | Command |
-|------|------|---------|
-| 1 | New user message | `./scripts/pi-gzmo-memory.sh turn-start` |
-| 2 | Need prior facts | `./scripts/pi-gzmo-memory.sh search "your query" [--limit 5]` |
-| 3 | Build LLM context | `./scripts/pi-gzmo-memory.sh recall` → paste `[RECALL]` into context |
-| 4 | New conversation | `./scripts/pi-gzmo-memory.sh session-new` |
-
-Shortcut: `./scripts/pi-gzmo-memory.sh prep "query"` = turn-start + search.
-
-**Tiered memory (Phase 3):** Append local infra context after recall when needed:
+### Install (workstation)
 
 ```bash
-./scripts/pi-gzmo-memory.sh recall --with-context
-./scripts/pi-gzmo-memory.sh prep "query" --with-context
-./scripts/pi-gzmo-memory.sh recall --with-context --with-reference
+cd /home/gzmo/github-clone/GZMO
+# NEO4J_PASSWORD from env or pulled from CT101 /opt/gzmo/.env
+bash scripts/install-shared-mcp.sh
 ```
 
-Reads `~/.pi/agent/MEMORY_CONTEXT.md` (override: `PI_MEMORY_CONTEXT`).
+This merges into `~/.pi/agent/mcp.json` and `~/.cursor/mcp.json`:
+
+| Server | Role |
+|--------|------|
+| `gzmo-memory` | `scripts/pi-gzmo-mcp-serve.sh` → CT101 `gzmo mcp-serve` with `/opt/gzmo/gzmo.toml` |
+| `memory` | Neo4j MCP (`bolt://192.168.31.202:7687`) — password not committed |
+
+### Habitual ops glance (session start / “is the stack ok?”)
+
+On CT101 Pi (`~/.pi/agent/system.md`) and whenever attach/health is in doubt:
+
+1. `gzmo_memory_status` — vault under `/opt/gzmo/`, ~60k facts  
+2. `gzmo_ops_health` — living probes (LLM, Qdrant, honeypot drift, Redis, Neo4j)  
+3. `gzmo_discovery_status` — discovery `state.json` + last cycle `bash_calls` / `probe_required_failed`  
+
+One-line summary: `OPS: vault=<facts> health=<ok|warn|fail> discovery=<…> bash_calls=<n>`.
+
+### Per-turn memory tool use
+
+1. `gzmo_memory_turn_start` — clear scratch  
+2. `gzmo_memory_search` — honeypot/vault RAG (+ scratch)  
+3. `gzmo_memory_recall_pull` — `[RECALL]` block  
+4. Optional: `gzmo_memory_chain` — provenance for a fact id  
+
+Wrong attach: MCP refuses vaults with &lt;10k facts unless `GZMO_ALLOW_LAB_VAULT=1`.
 
 ---
 
-## Session id
+## Shell bridge (optional)
 
-Stable id file: `data/pi-frontend-session.id`  
-Override: `GZMO_SESSION_FILE`  
-Env passed to gzmo: `GZMO_SESSION_ID`
+Still valid for scripts; must hit CT101:
 
 ```bash
-./scripts/pi-gzmo-memory.sh session      # show id
-./scripts/pi-gzmo-memory.sh session-new  # rotate
+ssh ct101 'cd /opt/gzmo && GZMO_CONFIG=/opt/gzmo/gzmo.toml \
+  /opt/gzmo/current/target/release/gzmo memory status'
 ```
+
+Workstation `./scripts/pi-gzmo-memory.sh` against a local clone vault is **lab only** (`GZMO_ALLOW_LAB_VAULT=1`).
 
 ---
 
 ## Prerequisites
 
-```bash
-cd ~/Projects/_foundation-audit/survey_GZMO
-cargo build --release -p gzmo-cli
-./scripts/verify-production.sh   # optional
-```
-
-`GZMO_CONFIG` defaults to repo `gzmo.toml` (`[engine]`, `[context_memory]`, `[redis]`).
+- `ssh ct101` works (ProxyJump pve; sidecar key authorized)  
+- CT101 `gzmo-daemon` living; binary at `/opt/gzmo/current/target/release/gzmo`  
+- Product gate: `bash scripts/ct101-living-smoke.sh`
 
 ---
 
-## Pi agent instructions (copy into session)
+## Anti-patterns
 
-When working in `survey_GZMO` and you need GZMO honeypot/vault memory:
-
-1. Run `./scripts/pi-gzmo-memory.sh turn-start` at the start of each new user task.
-2. Run `./scripts/pi-gzmo-memory.sh search "<topic>"` before claiming missing context.
-3. Run `./scripts/pi-gzmo-memory.sh recall` and treat the `[RECALL]` block as authoritative for this turn.
-4. Prefer **`gzmo chat`** for daily operator work — see [OPERATOR_FRONTEND_DECISION.md](./OPERATOR_FRONTEND_DECISION.md). If using Pi, keep using this bridge only.
-
----
-
-## In-process alternative
-
-Rust tools in `gzmo-core`: `GzmoMemorySearchTool`, `GzmoMemoryRecallPullTool`, `GzmoMemoryStatusTool` — for embedding in a native binary later.
-
----
-
-## Verify bridge
-
-```bash
-chmod +x ./scripts/pi-gzmo-memory.sh   # once
-./scripts/pi-gzmo-memory.sh status
-./scripts/pi-gzmo-memory.sh prep "GZMO identity" --limit 3
-./scripts/pi-gzmo-memory.sh recall   # expect [RECALL] block
-```
-
-**Smoke (2026-06-04):** `turn-start`, `search`, `recall` OK; embedding/rerank hosts may warn offline — vault still returns keyword hits.
-
----
-
-## References
-
-| Item | Path |
-|------|------|
-| CLI implementation | `gzmo-cli/src/memory_cmd.rs` |
-| Platform API | `gzmo-core/src/platform_memory.rs` |
-| Pi working memory | `.pi/WORKING_MEMORY.md` |
+- Running local `gzmo mcp-serve` with workstation `gzmo.toml` while Qdrant points at `.202` (wrong SQLite)  
+- Treating Observatory / inactive `gzmo-serve` as production health  
+- Importing `data-next/` into CT101 vault without an explicit migrate decision  

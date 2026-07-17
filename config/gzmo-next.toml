@@ -1,18 +1,20 @@
-# GZMO-next — Workstation instance (Little Tools Lab backend)
+# GZMO-next — workstation lab/dev config (NOT production after 2026-07-17)
 # ─────────────────────────────────────────────────────────────────────────
 #
-# Second, standalone GZMO instance. Physically isolated from legacy paths:
-#   config  → GZMO/config/gzmo-next.toml   (this file)
-#   data    → GZMO/data-next/              (vault, sessions, queues, episodic)
+# Production living host is CT101 (/opt/gzmo + gzmo-daemon). This file
+# (also linked as config/gzmo.toml) drives lab/dev on the workstation only.
 #
-# Env contract (operator + daemon):
+#   config  → GZMO/config/gzmo.toml (= this file via symlink)
+#   data    → GZMO/data-next/   (lab scratch — do not import into CT101)
+#
+# Env contract (operator + optional lab gzmo serve):
 #   export GZMO_INSTANCE=next
-#   export GZMO_CONFIG=$GZMO_CLONE_ROOT/GZMO/config/gzmo-next.toml
+#   export GZMO_CONFIG=$GZMO_CLONE_ROOT/GZMO/config/gzmo.toml
 #
-# The [assembly] section routes daemon loops to Little Tools Lab recipes
-# (bash + file artifacts) instead of inline gzmo-core engines. Guardrail:
-# lab backends only activate when GZMO_INSTANCE=next — otherwise every
-# loop stays Inline (CT101-safe). See GZMO/docs/CT101_BOUNDARY.md.
+# Overnight authority: CT101 gzmo-daemon only.
+# Keep workstation gzmo-serve / gzmo-scheduler DISABLED by default.
+# Never run lab serve overnight alongside CT101.
+# See GZMO/docs/CT101_RESTORE_LIVING.md, ADR-0003, CT101_BOUNDARY.md.
 #
 # Calibration output from gzmo-handoff.sh lands in gzmo-next-fused.toml
 # (sibling file) for operator review — it never overwrites this file.
@@ -84,7 +86,47 @@ max_tokens_verify = 4096
 anchor_min_age_hours = 0
 
 [ingest]
-enabled = false          # workstation v1: no knowledge-folder watcher
+enabled = false          # continuous watcher OFF
+batch_enabled = true     # nightly gzmo ingest-dir via scheduler
+inbox_path = "../data-next/inbox"
+cron_hour = 2
+cron_minute = 0
+
+[wiki]
+enabled = true
+backend = "okforge"
+emit_after_distill = true
+emit_after_dream = true
+emit_on_ingest = false
+push_cron_hour = 5
+push_cron_minute = 30
+
+[wiki.okforge]
+url = "http://127.0.0.1:3000"
+owner = "gzmo"
+repo = "gzmo-next-memory"
+token_env = "OKFORGE_TOKEN"
+agent_id = "gzmo-next"
+auto_commit = true
+open_pr = false
+
+[kg_reconcile]
+enabled = true
+cron_hour = 4
+cron_minute = 30
+dry_run = true           # flip to false after one verified live apply
+
+[pedagogy]
+enabled = true
+cron_weekday = 0         # Sunday
+cron_hour = 6
+cron_minute = 0
+
+[cabinet]
+enabled = true
+cron_weekday = 0         # Sunday
+cron_hour = 6
+cron_minute = 30
 
 [health]
 strict_startup = false
@@ -107,7 +149,7 @@ sync_cron_minute = 45
 [librarian]
 enabled = true
 url = "http://localhost:8000/v1"
-model = "/home/gzmo/models/ornith-35b-GGUF/ornith-35b-Q4_K_M.gguf"
+model = "/run/media/gzmo/Extreme SSD/swap/huggingface/llamacpp-qwen36-mtp/Qwen3.6-35B-A3B-UD-Q4_K_XL.gguf"
 api_key = ""
 
 [rerank]
@@ -135,15 +177,25 @@ strategy = "lorenz"
 [engine.local]
 provider = "local"
 url = "http://localhost:8000/v1"
-model = "/home/gzmo/models/ornith-35b-GGUF/ornith-35b-Q4_K_M.gguf"
+model = "/run/media/gzmo/Extreme SSD/swap/huggingface/llamacpp-qwen36-mtp/Qwen3.6-35B-A3B-UD-Q4_K_XL.gguf"
 api_key = ""
 temperature = 0.70
 top_p = 0.95
 max_tokens = 24576
 
 [chaos]
+# ADR-0003: chaos is opt-in chat ritual — off by default on living instance.
+enabled_in_chat = false
 bpm_default = 120
 dt_lorenz = 0.5
+
+# Overnight metabolism cron extras (promote/embed slots for `gzmo serve`)
+[metabolism]
+enabled = true
+promote_cron_hour = 2
+promote_cron_minute = 30
+embed_cron_hour = 2
+embed_cron_minute = 45
 
 [benchmark.fused]
 verify_pass_rate = 0.9000
@@ -157,6 +209,18 @@ action_on_fail = "hold_previous"
 [agent]
 max_tool_iterations = 40
 heartbeat_interval_secs = 1800
+
+[workflow_skills]
+enabled = true
+dir = "../skills/workflows"
+model_can_activate = true
+max_active = 2
+handoff_dir = "../data-next/handoffs"
+handoff_to_vault = true
+
+[tools]
+profile = "developer"
+audit = true
 
 [subagent]
 max_concurrent = 5

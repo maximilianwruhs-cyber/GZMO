@@ -11,8 +11,9 @@ target/
 gzmo.toml
 
 # ── Runtime / agent state (never commit) ───────────────────────────────────
-memory/
-!memory/.gitkeep
+# Root episodic logs only — do not ignore gzmo-core/src/memory/ (Rust sources).
+/memory/
+!/memory/.gitkeep
 data/vault.db
 data/vault.db-*
 data/vault.db.pre-*

@@ -33,7 +33,7 @@ use gzmo_core::tools::ToolRegistry;
 use crate::cli_mcp::McpSession;
 
 /// Run a one-shot dream consolidation for `date` (defaults to today).
-pub async fn run(config: &GzmoConfig, _identity: IdentityEngine, date: Option<NaiveDate>) -> Result<()> {
+pub async fn run(config: &GzmoConfig, _identity: &IdentityEngine, date: Option<NaiveDate>) -> Result<()> {
     let date = date.unwrap_or_else(|| Utc::now().date_naive());
 
     info!("╔══════════════════════════════════════════════╗");
@@ -73,10 +73,10 @@ pub async fn run(config: &GzmoConfig, _identity: IdentityEngine, date: Option<Na
     );
 
     let mut tools = ToolRegistry::new();
-    tools.register(Box::new(FileReadTool));
-    tools.register(Box::new(FileWriteTool));
-    tools.register(Box::new(DirListTool));
-    tools.register(Box::new(FileSearchTool));
+    tools.register(Box::new(FileReadTool::default()));
+    tools.register(Box::new(FileWriteTool::default()));
+    tools.register(Box::new(DirListTool::default()));
+    tools.register(Box::new(FileSearchTool::default()));
     tools.register(Box::new(ShellExecTool::default()));
     tools.register(Box::new(WebSearchTool::default()));
     tools.register(Box::new(SysMetricsTool));

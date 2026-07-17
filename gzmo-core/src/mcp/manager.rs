@@ -2,15 +2,17 @@
 //!
 //! Manages the lifecycle of MCP server connections.
 
+use std::process::Stdio;
 use std::sync::Arc;
 
 use anyhow::{anyhow, Result};
-use tracing::{info, warn};
+use tracing::{debug, info, warn};
 
 use rmcp::ServiceExt;
 use rmcp::service::Peer;
 use rmcp::RoleClient;
 use rmcp::transport::TokioChildProcess;
+use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio::process::Command;
 use tokio::sync::RwLock;
 
@@ -70,9 +72,22 @@ impl McpManager {
             cmd.env(k, v);
         }
 
-        let transport = TokioChildProcess::new(cmd).map_err(|e| {
-            anyhow!("Failed to spawn MCP server '{}': {}", config.name, e)
-        })?;
+        // Default rmcp stderr is Inherit — FastMCP banners / INFO logs smash the TUI
+        // alternate screen. Pipe and drain into tracing instead.
+        let (transport, stderr_opt) = TokioChildProcess::builder(cmd)
+            .stderr(Stdio::piped())
+            .spawn()
+            .map_err(|e| anyhow!("Failed to spawn MCP server '{}': {}", config.name, e))?;
+
+        if let Some(stderr) = stderr_opt {
+            let server = config.name.clone();
+            tokio::spawn(async move {
+                let mut lines = BufReader::new(stderr).lines();
+                while let Ok(Some(line)) = lines.next_line().await {
+                    debug!(server = %server, %line, "mcp stderr");
+                }
+            });
+        }
 
         let client: McpClient = ().serve(transport).await.map_err(|e| {
             anyhow!("MCP handshake failed for '{}': {}", config.name, e)

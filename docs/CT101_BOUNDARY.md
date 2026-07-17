@@ -1,62 +1,60 @@
-# CT101 boundary — standalone legacy
+# CT101 boundary — living production host
 
-**Status:** Accepted (2026-07-10); production cutover 2026-07-15  
-**Supersedes:** [CT101_PROMOTION.md](./CT101_PROMOTION.md) (per-loop promotion — **retired**)
+**Status:** Accepted (2026-07-10); production cutover 2026-07-15; **restored living 2026-07-17**  
+**Supersedes:** [CT101_PROMOTION.md](./CT101_PROMOTION.md) (per-loop promotion — **retired**)  
+**Restore runbook:** [CT101_RESTORE_LIVING.md](./CT101_RESTORE_LIVING.md)
 
 ---
 
 ## Decision
 
-**CT101 is a standalone legacy GZMO deployment.** **GZMO-next on the workstation is production** (since 2026-07-15). Little Tools Lab does **not** swap individual daemon loops into CT101.
+**CT101 is the sole living metabolism instance** (`gzmo daemon` + `/opt/gzmo/` vault). **The workstation is operator frontend + Prime fallback** (ADR-0003 amended 2026-07-17). Little Tools Lab does **not** swap individual daemon loops into CT101. Never run workstation `gzmo serve` overnight alongside CT101.
 
-| | CT101 | GZMO-next (workstation) |
+| | CT101 (living) | Workstation (operator / lab) |
 |---|--------|------------------|
-| **What it is** | Frozen legacy (`gzmo daemon`, gzmo-core inline) | **Production** — `gzmo-scheduler` + lab recipes |
-| **Lab integration** | **None** — no `[assembly]` flags | `[assembly] = "lab"` via `GZMO_INSTANCE=next` |
-| **beat-gate** | Historical reference baseline | S2 gate before trusting production |
-| **Ops** | Leave alone unless explicitly debugging legacy | `systemctl --user` services, `data-next/` paths |
+| **What it is** | **Production** — `gzmo.toml` + `gzmo daemon`, vault ~60k facts, Docker sidecars | Operator UI + Prime `:8000`; `config/gzmo.toml` → `data-next/` is **lab/dev scratch** |
+| **Lab integration** | **None** — no lab recipe grafts | Lab recipes = beat-gate fixtures; optional `gzmo-scheduler` / `gzmo-serve` for parity only |
+| **beat-gate** | Live baseline to beat | S2 gate on workstation stack before any future re-promotion |
+| **Ops** | `ssh ct101` or `ssh pve "pct exec 101 -- …"`; `systemctl … gzmo-daemon` | CLI/chat/MCP against local clone; **do not** enable overnight `gzmo-serve` while CT101 lives |
 
 ---
 
-## What we do on CT101
+## What we do on CT101 (production)
 
-- **Do not modify** for GZMO-next cutover — CT101 may run independently
-- Legacy ops only when explicitly debugging CT101 itself
-- Do **not** edit CT101 `gzmo.toml` to point loops at lab scripts
-
----
-
-## What we do on the workstation (production)
-
-- **`gzmo-scheduler`** — cron runner (`GZMO_INSTANCE=next`, `config/gzmo-next.toml`)
-- **`llama-prime`** — local cognition at `:8000`
-- **Sidecars** — local Qdrant + Redis (`database-cluster/`, user systemd)
-- **`gzmo chat` / `gzmo assemble`** — operator frontend
-- **Observatory** — `OBSERVATORY_MODE=local`, reads `data-next/`
+- Run and maintain `gzmo-daemon.service` + Redis/Qdrant/Neo4j sidecars
+- Edit `/opt/gzmo/gzmo.toml` only for living ops (restart daemon after)
+- Do **not** point CT101 `gzmo.toml` loops at lab scripts (`[assembly]=lab` grafts forbidden)
 
 ---
 
-## GZMO-next cutover (completed 2026-07-15)
+## What we do on the workstation (operator / lab)
 
-Cutover steps executed:
+- **`gzmo` / `gzmo chat`** — operator frontend (dev clone)
+- **`llama-prime`** — local cognition at `:8000` (CT101 cloud-first fallback)
+- **`gzmo memory mcp`** — lab MCP surface over `data-next/` (not the production vault)
+- **`gzmo-serve` / `gzmo-scheduler`** — **disabled by default** after 2026-07-17 restore; enable only for explicit lab/beat-gate sessions with CT101 overnight writers stopped
+- Local Qdrant/Redis sidecars — lab volumes only
+- Observatory over `data-next/` is a lab viewer, not production control plane
 
-1. Harden workstation systemd (linger, sleep masks, scheduler spark fix)
-2. Local sidecars (Qdrant, Redis) — fresh volumes
-3. Enable memory plane in `gzmo-next.toml` (VM200 embed/rerank, local Qdrant/Redis)
-4. S2 beat-gate: config, ops, cognition, knowledge — all PASS
-5. Observatory retargeted to local `data-next/`
+---
 
-CT101 remains frozen legacy reference; no vault import (fresh `data-next/`).
+## History
+
+### GZMO-next cutover (completed 2026-07-15, reversed 2026-07-17)
+
+Workstation briefly became sole living instance with fresh `data-next/` (no vault import from CT101). That placement was reversed on 2026-07-17 — see [CT101_RESTORE_LIVING.md](./CT101_RESTORE_LIVING.md).
 
 ---
 
 ## References
 
-- [CT101_INFRASTRUCTURE_REPORT.md](./CT101_INFRASTRUCTURE_REPORT.md) — live-verified ecosystem map (host, daemon, sidecars, code inventory)
-- [ct101-systems/00-CAPABILITIES_OVERVIEW.md](./ct101-systems/00-CAPABILITIES_OVERVIEW.md) — capability matrix, advancement roadmap, per-subsystem reports
-- [LAB_TREATMENT.md](../../little-tools-lab/docs/LAB_TREATMENT.md)
-- [PI_FRONTEND_SPLIT.md](./PI_FRONTEND_SPLIT.md) — topology (daemon on CT101)
-- [OPERATOR_FRONTEND_DECISION.md](./OPERATOR_FRONTEND_DECISION.md) — gzmo_cli on workstation
+- [CT101_RESTORE_LIVING.md](./CT101_RESTORE_LIVING.md) — restore checklist + health commands
+- [CT101_INFRASTRUCTURE_REPORT.md](./CT101_INFRASTRUCTURE_REPORT.md) — live-verified ecosystem map
+- [ct101-systems/00-CAPABILITIES_OVERVIEW.md](./ct101-systems/00-CAPABILITIES_OVERVIEW.md)
+- [ADR-0003-one-instance-metabolism.md](./ADR-0003-one-instance-metabolism.md)
+- [PLACEMENT_DECISION.md](./PLACEMENT_DECISION.md)
+- [PI_FRONTEND_SPLIT.md](./PI_FRONTEND_SPLIT.md)
+- [OPERATOR_FRONTEND_DECISION.md](./OPERATOR_FRONTEND_DECISION.md)
 
 ---
 

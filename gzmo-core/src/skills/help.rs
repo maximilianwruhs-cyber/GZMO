@@ -40,7 +40,6 @@ impl Skill for HelpSkill {
             ("/ecosystem","Alias for /status"),
             ("/clear",   "Clear conversation history"),
             ("/chaos",   "Display chaos engine state dashboard"),
-            ("/stabilize","Stabilize attractor parameter (decreases rho)"),
             ("/stats",   "Show session statistics"),
             ("/vault",   "Search semantic vault memory"),
             ("/remember","Store a fact in semantic vault"),
@@ -59,10 +58,6 @@ impl Skill for HelpSkill {
         for (name, desc, type_label) in &self.entries {
             lines.push(format!("  {BOLD}/{name:<15}{RESET} {DIM}[{type_label}]{RESET}  {desc}"));
         }
-
-        lines.push(String::new());
-        lines.push(format!("{GOLD}├─ Shell Skills (legacy) ──────────────────────────────────────────┤{RESET}"));
-        lines.push(format!("  {DIM}Remaining shell skills: /card /joke /poem /word /story /define /transform /language{RESET}"));
 
         lines.push(String::new());
         lines.push(format!("{GOLD}└─────────────────────────────────────────────────────────────────┘{RESET}"));

@@ -19,7 +19,7 @@ pub struct PaletteComponent {
 impl PaletteComponent {
     pub fn new() -> Self {
         let items = vec![
-            "/sys - System Diagnostics".to_string(),
+            "/status - Ecosystem Status".to_string(),
             "/vault - Knowledge Vault".to_string(),
             "/chaos - Entropic Status".to_string(),
             "/stabilize - Stabilize Attractor".to_string(),
@@ -75,8 +75,7 @@ impl Component for PaletteComponent {
             if key.kind == KeyEventKind::Press {
                 match key.code {
                     KeyCode::Esc => {
-                        self.is_active = false;
-                        return Ok(Some(Action::ToggleCommandPalette));
+                        return Ok(Some(Action::SetCommandPalette(false)));
                     }
                     KeyCode::Down => self.next(),
                     KeyCode::Up => self.previous(),
@@ -87,7 +86,7 @@ impl Component for PaletteComponent {
                                 .next()
                                 .unwrap_or("")
                                 .to_string();
-                            self.is_active = false;
+                            // App closes the palette when it receives SubmitInput.
                             return Ok(Some(Action::SubmitInput(cmd)));
                         }
                     }
@@ -99,11 +98,21 @@ impl Component for PaletteComponent {
     }
 
     fn update(&mut self, action: Action) -> Result<Option<Action>> {
-        if let Action::ToggleCommandPalette = action {
-            self.is_active = !self.is_active;
-            if self.is_active && self.state.selected().is_none() {
-                self.state.select(Some(0));
+        match action {
+            Action::SetCommandPalette(open) => {
+                self.is_active = open;
+                if self.is_active && self.state.selected().is_none() {
+                    self.state.select(Some(0));
+                }
             }
+            // App owns toggle → SetCommandPalette; keep Toggle as a local fallback for tests.
+            Action::ToggleCommandPalette => {
+                self.is_active = !self.is_active;
+                if self.is_active && self.state.selected().is_none() {
+                    self.state.select(Some(0));
+                }
+            }
+            _ => {}
         }
         Ok(None)
     }
@@ -146,5 +155,23 @@ impl Component for PaletteComponent {
         f.render_stateful_widget(list, palette_area, &mut self.state);
 
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn set_command_palette_is_absolute() {
+        let mut p = PaletteComponent::new();
+        assert!(!p.is_active);
+        p.update(Action::SetCommandPalette(true)).unwrap();
+        assert!(p.is_active);
+        assert_eq!(p.state.selected(), Some(0));
+        p.update(Action::SetCommandPalette(true)).unwrap();
+        assert!(p.is_active);
+        p.update(Action::SetCommandPalette(false)).unwrap();
+        assert!(!p.is_active);
     }
 }

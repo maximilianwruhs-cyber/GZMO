@@ -11,7 +11,6 @@ use gzmo_core::agent_loop::run_agent_loop;
 use gzmo_core::agent_session::AgentSession;
 use gzmo_core::config::{GzmoConfig, EngineMode, TaskKind};
 use gzmo_core::gateway::{GatewayRouter, TurboQuantGateway, VllmConfig, LlmGateway};
-use gzmo_core::memory::embeddings;
 use gzmo_core::memory::vault::SqliteVault;
 use gzmo_core::subagent::SubagentRunner;
 use gzmo_core::tools::delegate::DelegateTaskTool;
@@ -20,16 +19,12 @@ use gzmo_core::memory::episodic::FileEpisodicStore;
 use gzmo_core::mcp::{manager::McpManager, bridge::McpServerConfig};
 use gzmo_core::session::SessionManager;
 use gzmo_core::tools::ToolRegistry;
-use gzmo_core::tools::fs::{FileReadTool, FileWriteTool, DirListTool, FileSearchTool};
-use gzmo_core::tools::shell::ShellExecTool;
-use gzmo_core::tools::sysadmin::{SysMetricsTool, SysKillTool};
-use gzmo_core::tools::web::WebSearchTool;
-use gzmo_core::tools::web_browse::WebBrowseTool;
-use gzmo_core::tools::memory::{MemoryRecordTool, MemorySearchTool};
+use gzmo_core::tools::profile::{register_for_profile, CapabilityProfile, ToolRegisterOpts};
 use gzmo_core::memory::scratch::{messages_to_transcript, DistillJob, DistillSource};
-use gzmo_core::skills::{SkillRegistry as ChaosSkillRegistry, SkillContext, SkillType};
-use gzmo_core::skills::{dice::DiceSkill, sound::SoundSkill, poker::PokerSkill, quote::QuoteSkill, calculate::CalculateSkill, help::HelpSkill, status::StatusSkill, visual::VisualSkill};
+use gzmo_core::skills::{SkillRegistry as ChaosSkillRegistry, SkillContext};
+use gzmo_core::skills::register_pantheon;
 use gzmo_core::types::{EpisodicEntry, EpisodicSource, Message, Role};
+use gzmo_core::workflow_skills::{SharedWorkflowSession, WorkflowSkillIndex};
 
 
 
@@ -63,26 +58,15 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
     }
 
     // ─── Vault (embed + rerank for memory_search) ───────────────
-    let vault = match embeddings::open_vault_with_embeddings(
-        &config.memory.vault_db,
-        &config.embeddings,
-        &config.redis,
-        &config.rerank,
-        &config.qdrant,
-    )
-    .await
-    {
-        Ok(v) => {
+    let vault = match crate::repl_shared::open_semantic_vault(&config).await {
+        Some(v) => {
             let count = v.count().unwrap_or(0);
             if count > 0 {
                 eprintln!("  {COPPER}⚙ Semantic vault: {count} facts loaded{RESET}");
             }
-            Some(Arc::new(v))
+            Some(v)
         }
-        Err(e) => {
-            tracing::warn!(error = %e, "Failed to open vault — continuing without it");
-            None
-        }
+        None => None,
     };
 
     let mut agent_session = AgentSession::new_main(
@@ -111,76 +95,79 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
         VllmConfig::from(active_profile),
     )) as Arc<dyn LlmGateway>));
 
-    // ─── Chaos Engine ────────────────────────────────────────────
-    let chaos_runtime = crate::chaos_bootstrap::start_chaos_runtime(&config);
-    let mut chaos_handle = chaos_runtime.handle;
-    let chaos_feedback_tx = chaos_runtime.feedback_tx.clone();
-    let chaos_snapshot_rx = chaos_handle.snapshot_rx.clone();
-    eprintln!("  {COPPER}⚙ Chaos engine running — 174 BPM (HW telemetry active){RESET}");
+    // ─── Chaos Engine (opt-in; ADR-0003 quarantined by default) ──
+    let chaos_boot = crate::chaos_bootstrap::boot_chat_chaos(&config);
+    let chaos_enabled = chaos_boot.enabled;
+    let mut chaos_handle = chaos_boot.runtime.map(|r| r.handle);
+    let chaos_feedback_tx = chaos_boot.feedback_tx.clone();
+    let chaos_snapshot_rx = chaos_boot.snapshot_rx.clone();
+    // When chaos is off, lore select branch parks forever (no PulseHandle).
+    if chaos_enabled {
+        eprintln!("  {COPPER}⚙ Chaos engine running — 174 BPM (HW telemetry active){RESET}");
+    } else {
+        eprintln!("  {DIM}⚙ Chaos quarantined — set [chaos].enabled_in_chat = true to enable{RESET}");
+    }
 
     // Trigger notification channel: background → REPL
     let (trigger_notify_tx, mut trigger_notify_rx) = tokio::sync::mpsc::channel::<String>(32);
 
     // Spawn background task: chaos state → gateway + file + trigger evaluation
-    let gateway_ref = gateway.clone();
-    let state_dir = config.memory.vault_db.parent().unwrap_or(std::path::Path::new(".")).to_path_buf();
-    let _chaos_bridge = crate::chaos_bootstrap::spawn_snapshot_bridge(
-        chaos_snapshot_rx.clone(),
-        gateway_ref,
-        chaos_feedback_tx.clone(),
-        state_dir,
-        Some(trigger_notify_tx),
-        None,
-        gzmo_core::synapse::EventSource::GzmoCli,
-        chaos_runtime.restore_policy.clone(),
-        true, // interactive REPL — no periodic autonomous monologue injects
-    );
-
-    // ─── Tools ───────────────────────────────────────────────────
-    let mut tools = ToolRegistry::new();
-    tools.register(Box::new(FileReadTool));
-    tools.register(Box::new(FileWriteTool));
-    tools.register(Box::new(DirListTool));
-    tools.register(Box::new(FileSearchTool));
-    tools.register(Box::new(ShellExecTool::default()));
-    // Web search: use SerpAPI if key is available, DDG fallback
-    let serpapi_key = config.api_keys.serpapi_key();
-    if serpapi_key.is_empty() {
-        tools.register(Box::new(WebSearchTool::default()));
+    let _chaos_bridge = if chaos_enabled {
+        let gateway_ref = gateway.clone();
+        let state_dir = config.memory.vault_db.parent().unwrap_or(std::path::Path::new(".")).to_path_buf();
+        Some(crate::chaos_bootstrap::spawn_snapshot_bridge(
+            chaos_snapshot_rx.clone(),
+            gateway_ref,
+            chaos_feedback_tx.clone(),
+            state_dir,
+            Some(trigger_notify_tx),
+            None,
+            None,
+            gzmo_core::synapse::EventSource::GzmoCli,
+            chaos_boot.restore_policy.clone(),
+            true, // interactive REPL — no periodic autonomous monologue injects
+            crate::chaos_bootstrap::SnapshotBridgeOpts::STDIO,
+        ))
     } else {
-        tools.register(Box::new(WebSearchTool::with_serpapi_key(serpapi_key)));
+        None
+    };
+
+    // ─── Workflow skills ─────────────────────────────────────────
+    let (workflow_index, workflow_session) = crate::repl_shared::boot_workflow_skills(&config)?;
+    if !workflow_index.is_empty() {
+        eprintln!(
+            "  {COPPER}⚙ Workflow skills: {}{RESET}",
+            workflow_index.names().join(", ")
+        );
     }
-    tools.register(Box::new(WebBrowseTool::default()));
-    tools.register(Box::new(SysMetricsTool));
-    tools.register(Box::new(SysKillTool));
-    
+
+    // ─── Tools (capability profile + jail) ───────────────────────
+    let profile = CapabilityProfile::parse(&config.tools.profile).unwrap_or(CapabilityProfile::Developer);
+    let mut tools = ToolRegistry::new();
+    register_for_profile(
+        &mut tools,
+        profile,
+        &config.tools,
+        ToolRegisterOpts {
+            vault: vault.clone(),
+            scratch: None, // wired after AgentSession
+            scratch_scope: None,
+            serpapi_key: {
+                let k = config.api_keys.serpapi_key();
+                if k.is_empty() { None } else { Some(k) }
+            },
+            workflow: Some((Arc::clone(&workflow_index), Arc::clone(&workflow_session))),
+            gzmo_config: Some(config.clone()),
+        },
+    )?;
+    eprintln!("  {COPPER}⚙ Tool profile: {}{RESET}", profile.as_str());
+
     let router = GatewayRouter::new(&config);
     let chat_gateway_dyn = router.gateway(TaskKind::Chat);
 
-    if let Some(ref v) = vault {
-        tools.register(Box::new(MemoryRecordTool { vault: Arc::clone(v) }));
-    }
-
     // ─── Chaos Skills (Rust-native, priority over shell) ─────────
     let mut chaos_skills = ChaosSkillRegistry::new();
-    chaos_skills.register(Arc::new(DiceSkill));
-    chaos_skills.register(Arc::new(SoundSkill));
-    chaos_skills.register(Arc::new(PokerSkill));
-    chaos_skills.register(Arc::new(QuoteSkill));
-    chaos_skills.register(Arc::new(CalculateSkill));
-    chaos_skills.register(Arc::new(VisualSkill));
-    chaos_skills.register(Arc::new(StatusSkill { config: config.clone() }));
-    // Build help entries from registered skills
-    let help_entries: Vec<(String, String, &'static str)> = chaos_skills.all().iter().map(|s| {
-        let type_label = match s.skill_type() {
-            SkillType::Mechanical => "mechanical",
-            SkillType::Generative => "generative",
-            SkillType::Mutation => "mutation",
-            SkillType::Info => "info",
-        };
-        (s.name().to_string(), s.description().to_string(), type_label)
-    }).collect();
-    chaos_skills.register(Arc::new(HelpSkill { entries: help_entries }));
+    register_pantheon(&mut chaos_skills, &config);
 
     // ─── MCP ─────────────────────────────────────────────────────
     let mut mcp = McpManager::new();
@@ -201,16 +188,23 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
     let episodic = FileEpisodicStore::new(&config.memory.directory);
 
     // Boot persistent memory from Knowledge Graph MCP
-    let memory_context = boot_knowledge_graph(&tools).await;
+    let memory_context = crate::repl_shared::boot_knowledge_graph(&tools).await;
+    if memory_context.is_some() {
+        eprintln!("  {COPPER}⚙ Persistent memory loaded from Knowledge Graph{RESET}");
+    }
 
     let vault_context: Option<String> = if let Some(ref v) = vault {
         match v.recent(10) {
             Ok(facts) if !facts.is_empty() => {
-                let mut block = String::from("\n\n## Long-Term Memory (Vault)\n");
+                // Prefer curated honeypot when M3 cognition path is live (vault.recent already does).
+                let mut block = String::from(
+                    "\n\n## Long-Term Memory (Honeypot-first vault)\n\
+                     Prefer these curated facts over raw episodic soup.\n",
+                );
                 for fact in &facts {
                     block.push_str(&format!("- {}\n", fact));
                 }
-                eprintln!("  {COPPER}⚙ {} vault memories injected{RESET}", facts.len());
+                eprintln!("  {COPPER}⚙ {} vault memories injected (honeypot-first){RESET}", facts.len());
                 Some(block)
             }
             _ => None,
@@ -220,21 +214,23 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
     };
 
     // ─── System prompt ───────────────────────────────────────────
-    let system_prompt = format!(
-        "{}{}{}
-
----
-You are {}. Today is {}.
-Available tools: {}.
-Use memory_search when you need prior facts (results land in scratch for this turn only).
-Use delegate_task for focused sub-work; you receive a short summary, not full subagent logs.",
-        soul.raw_markdown,
-        memory_context.as_deref().unwrap_or(""),
-        vault_context.as_deref().unwrap_or(""),
-        soul.persona_name,
-        Utc::now().format("%Y-%m-%d %H:%M UTC"),
-        if tools.is_empty() { "none".to_string() }
-        else { tools.definitions().iter().map(|d| d.name.clone()).collect::<Vec<_>>().join(", ") }
+    let last_handoff = workflow_session
+        .lock()
+        .ok()
+        .and_then(|s| s.last_handoff.clone())
+        .or_else(|| workflow_index.latest_handoff());
+    let system_prompt = crate::repl_shared::build_system_prompt_with_workflows(
+        &soul,
+        memory_context.as_deref(),
+        vault_context.as_deref(),
+        &if tools.is_empty() {
+            vec![]
+        } else {
+            tools.definitions().iter().map(|d| d.name.clone()).collect()
+        },
+        &Utc::now().format("%Y-%m-%d %H:%M UTC").to_string(),
+        Some(workflow_index.as_ref()),
+        last_handoff.as_deref(),
     );
 
     // ─── Session ─────────────────────────────────────────────────
@@ -244,12 +240,14 @@ Use delegate_task for focused sub-work; you receive a short summary, not full su
     let mut session_name: Option<String> = None;
     let session_created_at = Utc::now();
 
-    let subagent_runner = Arc::new(SubagentRunner::new(
+    let subagent_runner = Arc::new(SubagentRunner::with_tools_config(
         config.subagent.clone(),
+        config.tools.clone(),
         Arc::clone(&scratch),
         Arc::clone(&chat_gateway_dyn),
         vault.clone(),
         system_prompt.clone(),
+        Some(config.clone()),
     ));
     agent_session.attach_subagent_runner(Arc::clone(&subagent_runner));
     if config.subagent.enabled {
@@ -266,7 +264,7 @@ Use delegate_task for focused sub-work; you receive a short summary, not full su
     }
 
     if let Some(ref v) = vault {
-        tools.register(Box::new(MemorySearchTool {
+        tools.register(Box::new(gzmo_core::tools::memory::MemorySearchTool {
             vault: Arc::clone(v),
             scratch: Some(agent_session.scratch()),
             scope: Some(agent_session.main_scope()),
@@ -297,7 +295,7 @@ Use delegate_task for focused sub-work; you receive a short summary, not full su
     // ─── Engine health check ─────────────────────────────────────
     let active = config.engine.active_engine();
     eprintln!("  {DIM}⚙ Pinging engine {}...{RESET}", active.url);
-    let (engine_status, engine_latency) = ping_engine(&config).await;
+    let (engine_status, engine_latency) = crate::repl_shared::ping_engine(&config).await;
 
     if engine_status == "OFFLINE" {
         eprintln!("  {RED}⚠ Engine unreachable at {}{RESET}", active.url);
@@ -358,8 +356,43 @@ Use delegate_task for focused sub-work; you receive a short summary, not full su
                 &chaos_skills, &chaos_feedback_tx,
                 &gateway, &config_path,
                 &subagent_runner, subagent_enabled,
+                &workflow_index, &workflow_session,
             ).await? {
                 break; // /quit
+            }
+
+            // Workflow inject → full agent loop (with tools)
+            if messages.len() > msg_count_before {
+                let last = &messages[messages.len() - 1];
+                if last.role == Role::System && last.is_meta && last.content.starts_with("[Workflow") {
+                    agent_session.turn_start().await;
+                    loop_config = agent_session.loop_config(config.agent.max_tool_iterations, true, None);
+                    messages.push(Message {
+                        role: Role::User,
+                        content: "Begin following the activated workflow skill now.".into(),
+                        is_meta: true,
+                        tool_calls: None,
+                        tool_call_id: None,
+                    });
+                    eprintln!("  {DIM}⚙ workflow...{RESET}");
+                    let start = std::time::Instant::now();
+                    match run_agent_loop(gateway.read().await.as_ref(), &tools, &mut messages, &loop_config).await {
+                        Ok(response) => {
+                            messages.push(Message {
+                                role: Role::Assistant,
+                                content: response.text.clone(),
+                                is_meta: false,
+                                tool_calls: None,
+                                tool_call_id: None,
+                            });
+                            eprintln!("  {DIM}⚙ {:.1}s{RESET}", start.elapsed().as_secs_f64());
+                        }
+                        Err(e) => eprintln!("  {RED}⚙ workflow turn failed: {e}{RESET}"),
+                    }
+                    eprint!("\n  {GOLD}★{RESET} {PARCHMENT}{BOLD}you ›{RESET} ");
+                    io::stderr().flush()?;
+                    continue;
+                }
             }
 
             // Auto-narration: if a skill injected a message, run one agent loop
@@ -454,11 +487,9 @@ Use delegate_task for focused sub-work; you receive a short summary, not full su
             }
         }
 
-        // ─── Inject chaos context ────────────────────────────
-        // Remove any previous chaos context message (is_meta system with "CHAOS_STATE" marker)
+        // ─── Inject chaos context (only when pulse is live) ──
         messages.retain(|m| !(m.role == Role::System && m.is_meta && m.content.contains("[CHAOS_STATE]")));
-        // Inject current state
-        {
+        if chaos_enabled {
             let snap = chaos_snapshot_rx.borrow().clone();
             let valence_desc = if snap.llm_valence < -0.5 {
                 "intense, restless, aggressive"
@@ -484,7 +515,6 @@ Use delegate_task for focused sub-work; you receive a short summary, not full su
                 snap.energy, snap.tension, snap.x, snap.y, snap.z,
                 snap.thoughts_incubating, snap.thoughts_crystallized,
             );
-            // Insert after the main system prompt (position 1)
             let insert_pos = 1.min(messages.len());
             messages.insert(insert_pos, Message {
                 role: Role::System,
@@ -559,8 +589,13 @@ Use delegate_task for focused sub-work; you receive a short summary, not full su
                 }
             }
 
-            // ─── Lore notifications (real-time) ─────────────────
-            lore = chaos_handle.lore_rx.recv() => {
+            // ─── Lore notifications (real-time; idle when chaos off) ─
+            lore = async {
+                match chaos_handle.as_mut() {
+                    Some(h) => h.lore_rx.recv().await,
+                    None => futures::future::pending().await,
+                }
+            } => {
                 if let Some(lore_notif) = lore {
                     if prompt_dirty {
                         eprintln!(); // Newline before lore if prompt is active
@@ -599,96 +634,6 @@ fn strip_autonomous_monologue(messages: &mut Vec<Message>) {
 
 // ─── Helpers ────────────────────────────────────────────────────────────
 
-async fn boot_knowledge_graph(tools: &ToolRegistry) -> Option<String> {
-    let call = gzmo_core::gateway::ToolCall {
-        id: "boot_kg_read".to_string(),
-        function_name: "mcp__memory__read_graph".to_string(),
-        arguments: serde_json::json!({}),
-    };
-    let result = tools.dispatch(&call).await;
-    if !result.success || result.output.trim().is_empty() {
-        return None;
-    }
-
-    let graph: serde_json::Value = serde_json::from_str(&result.output).ok()?;
-    let mut block = String::from("\n\n## Persistent Memory (Knowledge Graph)\n\n");
-    let mut has_content = false;
-
-    if let Some(entities) = graph.get("entities").and_then(|e| e.as_array()) {
-        for entity in entities {
-            let name = entity.get("name").and_then(|n| n.as_str()).unwrap_or("?");
-            let etype = entity.get("type")
-                .or_else(|| entity.get("entityType"))
-                .and_then(|t| t.as_str())
-                .unwrap_or("?");
-            block.push_str(&format!("- **{}** ({})", name, etype));
-            if let Some(obs) = entity.get("observations").and_then(|o| o.as_array()) {
-                let obs_strs: Vec<&str> = obs.iter().filter_map(|o| o.as_str()).collect();
-                if !obs_strs.is_empty() {
-                    block.push_str(&format!(": {}", obs_strs.join("; ")));
-                }
-            }
-            block.push('\n');
-            has_content = true;
-        }
-    }
-
-    if let Some(relations) = graph.get("relations").and_then(|r| r.as_array()) {
-        if !relations.is_empty() {
-            block.push_str("\nRelationships:\n");
-            for rel in relations {
-                let from = rel.get("source")
-                    .or_else(|| rel.get("from"))
-                    .and_then(|f| f.as_str())
-                    .unwrap_or("?");
-                let to = rel.get("target")
-                    .or_else(|| rel.get("to"))
-                    .and_then(|t| t.as_str())
-                    .unwrap_or("?");
-                let rtype = rel.get("type")
-                    .or_else(|| rel.get("relationType"))
-                    .and_then(|r| r.as_str())
-                    .unwrap_or("?");
-                block.push_str(&format!("- {} -> ({}) -> {}\n", from, rtype, to));
-                has_content = true;
-            }
-        }
-    }
-
-    if has_content {
-        eprintln!("  {COPPER}⚙ Persistent memory loaded from Knowledge Graph{RESET}");
-        Some(block)
-    } else {
-        None
-    }
-}
-
-async fn ping_engine(config: &GzmoConfig) -> (&'static str, String) {
-    let http = reqwest::Client::builder()
-        .timeout(std::time::Duration::from_secs(2))
-        .build()
-        .unwrap_or_default();
-
-    let active = config.engine.active_engine();
-    let health_url = format!("{}/models", active.url);
-    let start = std::time::Instant::now();
-
-    for _ in 0..15 {
-        let req = http.get(&health_url);
-        let req = if !active.api_key.is_empty() {
-            req.bearer_auth(&active.api_key)
-        } else { req };
-
-        match req.send().await {
-            Ok(resp) if resp.status().is_success() => {
-                return ("ONLINE", format!("{}ms", start.elapsed().as_millis()));
-            }
-            _ => tokio::time::sleep(std::time::Duration::from_secs(2)).await,
-        }
-    }
-    ("OFFLINE", String::new())
-}
-
 #[allow(clippy::too_many_arguments)]
 fn reregister_delegate_tool(
     tools: &mut ToolRegistry,
@@ -719,6 +664,8 @@ async fn handle_slash_command(
     config_path: &std::path::Path,
     subagent_runner: &Arc<SubagentRunner>,
     subagent_enabled: bool,
+    workflow_index: &WorkflowSkillIndex,
+    workflow_session: &SharedWorkflowSession,
 ) -> Result<bool> {
     let session_id = agent_session.session_id();
     match input {
@@ -921,6 +868,9 @@ async fn handle_slash_command(
             for line in report.lines() {
                 eprintln!("  {DIM}{line}{RESET}");
             }
+            for line in crate::repl_shared::workflow_status_lines(workflow_index, workflow_session) {
+                eprintln!("  {DIM}{line}{RESET}");
+            }
         }
         "/chaos" => {
             let snap = chaos_snapshot_rx.borrow().clone();
@@ -956,19 +906,6 @@ async fn handle_slash_command(
             eprintln!("  {CYAN}║{RESET}  Max tokens:  {:<6}               {CYAN}║{RESET}", snap.llm_max_tokens);
             eprintln!("  {CYAN}║{RESET}  Valence:     {:<+.3}               {CYAN}║{RESET}", snap.llm_valence);
             eprintln!("  {CYAN}╚══════════════════════════════════════╝{RESET}");
-        }
-        "/stabilize" => {
-            let chaos_config: gzmo_chaos::pulse::ChaosConfig = config.chaos
-                .as_ref()
-                .and_then(|v| v.clone().try_into().ok())
-                .unwrap_or_default();
-            let delta = chaos_config.stabilize_delta_rho;
-            let _ = chaos_feedback_tx.send(gzmo_chaos::feedback::ChaosEvent::Stabilize { delta_rho: delta }).await;
-            if delta < 0.0 {
-                eprintln!("  {GREEN}🌀 Attractor stabilized. Lorenz ρ mod decreased by {:.1}{RESET}", -delta);
-            } else {
-                eprintln!("  {GREEN}🌀 Attractor stabilized. Lorenz ρ mod increased by {:.1}{RESET}", delta);
-            }
         }
         "/sessions" => {
             match session_mgr.list().await {
@@ -1060,8 +997,55 @@ async fn handle_slash_command(
             // ecosystem alias → status skill
             let cmd = if cmd == "ecosystem" { "status" } else { cmd };
 
+            // Aliases for workflow skills
+            let wf_name = match cmd {
+                "grill-me" => "grill",
+                "debug" | "diagnosing-bugs" => "diagnose",
+                "code-review" => "review",
+                other => other,
+            };
+
+            // ─── Workflow skill dispatch ──────────────────────
+            if workflow_index.has(wf_name) {
+                match crate::repl_shared::activate_workflow_slash(
+                    workflow_index,
+                    workflow_session,
+                    wf_name,
+                    args,
+                    messages,
+                ) {
+                    Ok(true) => {
+                        eprintln!("  {COPPER}⚙ Workflow activated: /{wf_name}{RESET}");
+                        if wf_name == "handoff" {
+                            // Seed a stub handoff file; agent will flesh it out.
+                            let session_id = agent_session.session_id();
+                            let stub = format!(
+                                "# Handoff\n\n**Session:** {session_id}\n\n**Topic:** {}\n\n(Agent will complete sections.)\n",
+                                if args.is_empty() { "(unspecified)" } else { args }
+                            );
+                            match workflow_index.write_handoff(workflow_session, session_id, &stub) {
+                                Ok(path) => {
+                                    eprintln!("  {COPPER}⚙ Handoff stub: {}{RESET}", path.display());
+                                    if config.workflow_skills.handoff_to_vault {
+                                        if let Some(ref v) = vault {
+                                            let _ = v.store_text(
+                                                &format!("[Handoff] {}", path.display()),
+                                                "Episodic",
+                                                1.0,
+                                            );
+                                        }
+                                    }
+                                }
+                                Err(e) => eprintln!("  {RED}⚙ Handoff write failed: {e}{RESET}"),
+                            }
+                        }
+                    }
+                    Ok(false) => {}
+                    Err(e) => eprintln!("  {RED}⚙ Workflow error: {e}{RESET}"),
+                }
+            }
             // ─── Rust skill dispatch (priority) ───────────────
-            if chaos_skills.has(cmd) {
+            else if chaos_skills.has(cmd) {
                 let snap = chaos_snapshot_rx.borrow().clone();
                 let ctx = SkillContext {
                     chaos: &snap,

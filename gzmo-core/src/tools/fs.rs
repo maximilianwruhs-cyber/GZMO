@@ -3,16 +3,34 @@
 //! Read, write, list, and search files on the local filesystem.
 //! The agent's primary way to inspect and manipulate its environment.
 
+use std::path::Path;
+use std::sync::Arc;
+
 use anyhow::Result;
 use async_trait::async_trait;
 use serde_json::json;
-use std::path::Path;
 
+use crate::tools::jail::PathJail;
 use crate::tools::{ToolDef, ToolHandler};
+
+fn check_path(jail: &Option<Arc<PathJail>>, path: &str) -> Result<String> {
+    match jail {
+        Some(j) => Ok(j.check(path)?.to_string_lossy().into_owned()),
+        None => Ok(path.to_string()),
+    }
+}
 
 // ─── Read File ──────────────────────────────────────────────────────────
 
-pub struct FileReadTool;
+pub struct FileReadTool {
+    pub jail: Option<Arc<PathJail>>,
+}
+
+impl Default for FileReadTool {
+    fn default() -> Self {
+        Self { jail: None }
+    }
+}
 
 #[async_trait]
 impl ToolHandler for FileReadTool {
@@ -37,8 +55,9 @@ impl ToolHandler for FileReadTool {
         let path = args["path"]
             .as_str()
             .ok_or_else(|| anyhow::anyhow!("Missing 'path' argument"))?;
+        let path = check_path(&self.jail, path)?;
 
-        let content = tokio::fs::read_to_string(path).await?;
+        let content = tokio::fs::read_to_string(&path).await?;
         Ok(if content.len() > 8000 {
             format!(
                 "{}\n\n... [truncated at 8000 chars, total {} chars]",
@@ -53,7 +72,15 @@ impl ToolHandler for FileReadTool {
 
 // ─── Write File ─────────────────────────────────────────────────────────
 
-pub struct FileWriteTool;
+pub struct FileWriteTool {
+    pub jail: Option<Arc<PathJail>>,
+}
+
+impl Default for FileWriteTool {
+    fn default() -> Self {
+        Self { jail: None }
+    }
+}
 
 #[async_trait]
 impl ToolHandler for FileWriteTool {
@@ -85,20 +112,28 @@ impl ToolHandler for FileWriteTool {
         let content = args["content"]
             .as_str()
             .ok_or_else(|| anyhow::anyhow!("Missing 'content' argument"))?;
+        let path = check_path(&self.jail, path)?;
 
-        // Create parent directories
-        if let Some(parent) = Path::new(path).parent() {
+        if let Some(parent) = Path::new(&path).parent() {
             tokio::fs::create_dir_all(parent).await?;
         }
 
-        tokio::fs::write(path, content).await?;
+        tokio::fs::write(&path, content).await?;
         Ok(format!("Written {} bytes to {}", content.len(), path))
     }
 }
 
 // ─── List Directory ─────────────────────────────────────────────────────
 
-pub struct DirListTool;
+pub struct DirListTool {
+    pub jail: Option<Arc<PathJail>>,
+}
+
+impl Default for DirListTool {
+    fn default() -> Self {
+        Self { jail: None }
+    }
+}
 
 #[async_trait]
 impl ToolHandler for DirListTool {
@@ -123,8 +158,9 @@ impl ToolHandler for DirListTool {
         let path = args["path"]
             .as_str()
             .ok_or_else(|| anyhow::anyhow!("Missing 'path' argument"))?;
+        let path = check_path(&self.jail, path)?;
 
-        let mut entries = tokio::fs::read_dir(path).await?;
+        let mut entries = tokio::fs::read_dir(&path).await?;
         let mut output = Vec::new();
 
         while let Some(entry) = entries.next_entry().await? {
@@ -152,7 +188,15 @@ impl ToolHandler for DirListTool {
 
 // ─── File Search (grep) ─────────────────────────────────────────────────
 
-pub struct FileSearchTool;
+pub struct FileSearchTool {
+    pub jail: Option<Arc<PathJail>>,
+}
+
+impl Default for FileSearchTool {
+    fn default() -> Self {
+        Self { jail: None }
+    }
+}
 
 #[async_trait]
 impl ToolHandler for FileSearchTool {
@@ -184,12 +228,23 @@ impl ToolHandler for FileSearchTool {
         let pattern = args["pattern"]
             .as_str()
             .ok_or_else(|| anyhow::anyhow!("Missing 'pattern' argument"))?;
+        let path = check_path(&self.jail, path)?;
 
         let output = tokio::process::Command::new("grep")
-            .args(["-rn", "-i", "--include=*.rs", "--include=*.md",
-                   "--include=*.toml", "--include=*.json", "--include=*.yaml",
-                   "--include=*.yml", "--include=*.txt", "--include=*.sh",
-                   pattern, path])
+            .args([
+                "-rn",
+                "-i",
+                "--include=*.rs",
+                "--include=*.md",
+                "--include=*.toml",
+                "--include=*.json",
+                "--include=*.yaml",
+                "--include=*.yml",
+                "--include=*.txt",
+                "--include=*.sh",
+                pattern,
+                &path,
+            ])
             .output()
             .await?;
 

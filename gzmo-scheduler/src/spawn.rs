@@ -1,5 +1,6 @@
 //! Spawn Little Tools Lab recipe scripts as subprocesses.
 
+use crate::config::SchedulerConfig;
 use anyhow::{bail, Context, Result};
 use std::path::PathBuf;
 use tokio::process::Command;
@@ -12,7 +13,7 @@ pub fn gzmo_root() -> PathBuf {
 }
 
 /// Run `bash <gzmo>/scripts/<script> <args…>`.
-pub async fn run_gzmo_script(script: &str, args: &[String]) -> Result<()> {
+pub async fn run_gzmo_script(cfg: &SchedulerConfig, script: &str, args: &[String]) -> Result<()> {
     let path = gzmo_root().join("scripts").join(script);
     if !path.is_file() {
         bail!("gzmo script not found: {}", path.display());
@@ -20,6 +21,10 @@ pub async fn run_gzmo_script(script: &str, args: &[String]) -> Result<()> {
     let status = Command::new("bash")
         .arg(&path)
         .args(args)
+        .env("LIBRARIAN_URL", recipe_service_url(cfg.librarian_url()))
+        .env("LLM_URL", recipe_service_url(cfg.llm_url()))
+        .env("EMBED_URL", cfg.embed_url())
+        .env("EMBED_MODEL", cfg.embed_model())
         .status()
         .await
         .with_context(|| format!("spawn {}", path.display()))?;
@@ -41,9 +46,16 @@ pub fn lab_root() -> PathBuf {
         .unwrap_or_else(|_| PathBuf::from("/home/gzmo/github-clone/little-tools-lab"))
 }
 
+/// Strip trailing `/v1` so recipes that probe `${URL}/v1/models` or append
+/// `/v1/chat/completions` (session-distill) match OpenAI-base config URLs.
+fn recipe_service_url(url: &str) -> String {
+    let u = url.trim().trim_end_matches('/');
+    u.strip_suffix("/v1").unwrap_or(u).to_string()
+}
+
 /// Run `bash <lab>/scripts/<script> <args…>`, inheriting the scheduler env
-/// (GZMO_CONFIG, GZMO_INSTANCE, LLM_URL, CARGO_TARGET_DIR, …).
-pub async fn run_lab_script(script: &str, args: &[String]) -> Result<()> {
+/// and injecting librarian/LLM/embed URLs from the instance config.
+pub async fn run_lab_script(cfg: &SchedulerConfig, script: &str, args: &[String]) -> Result<()> {
     let path = lab_root().join("scripts").join(script);
     if !path.is_file() {
         bail!("lab script not found: {}", path.display());
@@ -51,6 +63,10 @@ pub async fn run_lab_script(script: &str, args: &[String]) -> Result<()> {
     let status = Command::new("bash")
         .arg(&path)
         .args(args)
+        .env("LIBRARIAN_URL", recipe_service_url(cfg.librarian_url()))
+        .env("LLM_URL", recipe_service_url(cfg.llm_url()))
+        .env("EMBED_URL", cfg.embed_url())
+        .env("EMBED_MODEL", cfg.embed_model())
         .status()
         .await
         .with_context(|| format!("spawn {}", path.display()))?;

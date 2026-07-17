@@ -2,94 +2,33 @@ use std::sync::Arc;
 use anyhow::Result;
 use chrono::Utc;
 
-use gzmo_core::config::GzmoConfig;
-use gzmo_core::gateway::{TurboQuantGateway, VllmConfig};
+use gzmo_core::agent_session::AgentSession;
+use gzmo_core::config::{GzmoConfig, TaskKind};
+use gzmo_core::gateway::{GatewayRouter, LlmGateway, TurboQuantGateway, VllmConfig};
 use gzmo_core::identity::IdentityEngine;
-use gzmo_core::memory::vault::SqliteVault;
 use gzmo_core::memory::episodic::FileEpisodicStore;
 use gzmo_core::session::SessionManager;
-use gzmo_core::mcp::{manager::McpManager, bridge::McpServerConfig};
+use gzmo_core::mcp::{bridge::McpServerConfig, manager::McpManager};
+use gzmo_core::subagent::SubagentRunner;
 use gzmo_core::tools::ToolRegistry;
-use gzmo_core::tools::fs::{FileReadTool, FileWriteTool, DirListTool, FileSearchTool};
-use gzmo_core::tools::shell::ShellExecTool;
-use gzmo_core::tools::sysadmin::{SysMetricsTool, SysKillTool};
-use gzmo_core::tools::web::WebSearchTool;
-use gzmo_core::tools::web_browse::WebBrowseTool;
-use gzmo_core::tools::memory::{MemoryRecordTool, MemorySearchTool};
-use gzmo_core::skills::{SkillRegistry as ChaosSkillRegistry, SkillType};
-use gzmo_core::skills::{dice::DiceSkill, sound::SoundSkill, poker::PokerSkill, quote::QuoteSkill, calculate::CalculateSkill, help::HelpSkill, visual::VisualSkill};
-use gzmo_chaos::triggers::{TriggerEngine, TriggerAction, NotifyLevel};
+use gzmo_core::tools::delegate::DelegateTaskTool;
+use gzmo_core::tools::memory::MemorySearchTool;
+use gzmo_core::tools::profile::{register_for_profile, CapabilityProfile, ToolRegisterOpts};
+use gzmo_core::skills::{
+    register_pantheon, SkillRegistry as ChaosSkillRegistry,
+};
 
+use crate::repl_shared::{
+    boot_knowledge_graph, boot_workflow_skills, build_system_prompt_with_workflows,
+    open_semantic_vault, ping_engine,
+};
 use crate::tui::action::Action;
 use crate::tui::app::App;
 use crate::tui::components::{
-    input::InputComponent,
+    agent::AgentComponent, chaos_canvas::ChaosCanvasComponent, input::InputComponent,
+    instruments::InstrumentsComponent, palette::PaletteComponent, status_bar::StatusBarComponent,
     transcript::TranscriptComponent,
-    status_bar::StatusBarComponent,
-    chaos_canvas::ChaosCanvasComponent,
-    agent::AgentComponent,
-    palette::PaletteComponent,
 };
-
-/// Boot the Knowledge Graph MCP and return a context string for injection.
-async fn boot_knowledge_graph(tools: &ToolRegistry) -> Option<String> {
-    let call = gzmo_core::gateway::ToolCall {
-        id: "boot_kg_read".to_string(),
-        function_name: "mcp__memory__read_graph".to_string(),
-        arguments: serde_json::json!({}),
-    };
-    let result = tools.dispatch(&call).await;
-    if !result.success || result.output.trim().is_empty() {
-        return None;
-    }
-
-    let graph: serde_json::Value = serde_json::from_str(&result.output).ok()?;
-    let mut block = String::from("\n\n## Persistent Memory (Knowledge Graph)\n\n");
-    let mut has_content = false;
-
-    if let Some(entities) = graph.get("entities").and_then(|e| e.as_array()) {
-        for entity in entities {
-            let name = entity.get("name").and_then(|n| n.as_str()).unwrap_or("?");
-            let etype = entity.get("type")
-                .or_else(|| entity.get("entityType"))
-                .and_then(|t| t.as_str())
-                .unwrap_or("?");
-            block.push_str(&format!("- **{}** ({})", name, etype));
-            if let Some(obs) = entity.get("observations").and_then(|o| o.as_array()) {
-                let obs_strs: Vec<&str> = obs.iter().filter_map(|o| o.as_str()).collect();
-                if !obs_strs.is_empty() {
-                    block.push_str(&format!(": {}", obs_strs.join("; ")));
-                }
-            }
-            block.push('\n');
-            has_content = true;
-        }
-    }
-
-    if let Some(relations) = graph.get("relations").and_then(|r| r.as_array()) {
-        if !relations.is_empty() {
-            block.push_str("\nRelationships:\n");
-            for rel in relations {
-                let from = rel.get("source")
-                    .or_else(|| rel.get("from"))
-                    .and_then(|f| f.as_str())
-                    .unwrap_or("?");
-                let to = rel.get("target")
-                    .or_else(|| rel.get("to"))
-                    .and_then(|t| t.as_str())
-                    .unwrap_or("?");
-                let rtype = rel.get("type")
-                    .or_else(|| rel.get("relationType"))
-                    .and_then(|r| r.as_str())
-                    .unwrap_or("?");
-                block.push_str(&format!("- {} -> ({}) -> {}\n", from, rtype, to));
-                has_content = true;
-            }
-        }
-    }
-
-    if has_content { Some(block) } else { None }
-}
 
 /// Boot and run the full-screen TUI interface.
 pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
@@ -103,73 +42,79 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
                 .join("gzmo.toml")
         });
 
-    // ─── Vault ───────────────────────────────────────────────────
-    let vault = match SqliteVault::open(&config.memory.vault_db) {
-        Ok(v) => Some(Arc::new(v)),
-        Err(_) => None,
-    };
+    if let Some(parent) = config.memory.vault_db.parent() {
+        tokio::fs::create_dir_all(parent).await.ok();
+    }
 
-    // ─── Episodic Memory ─────────────────────────────────────────
+    // ─── Vault (semantic, shared with stdio) ─────────────────────
+    let vault = open_semantic_vault(&config).await;
+
+    // ─── Hot memory session ──────────────────────────────────────
+    let agent_session = AgentSession::new_main(
+        &config.redis,
+        &config.context_memory,
+        SessionManager::new_session_id(),
+    )
+    .await;
+    let agent_session = Arc::new(tokio::sync::Mutex::new(agent_session));
+
+    // ─── Episodic + sessions ─────────────────────────────────────
     let episodic = Arc::new(FileEpisodicStore::new(&config.memory.directory));
-
-    // ─── Session Manager ─────────────────────────────────────────
     let session_mgr = Arc::new(SessionManager::new(&config.session_distill.sessions_dir));
     let _ = session_mgr.ensure_dir().await;
 
-    // ─── Gateway (RwLock-wrapped for /mode hot-swap) ─────────────
+    // ─── Gateway (primary still TurboQuant; delegate uses router) ─
     let active_profile = config.engine.active_engine();
-    let gateway = Arc::new(tokio::sync::RwLock::new(Arc::new(TurboQuantGateway::new(
-        VllmConfig::from(active_profile.clone()),
-    ))));
+    let gateway: Arc<tokio::sync::RwLock<Arc<dyn LlmGateway>>> = Arc::new(tokio::sync::RwLock::new(
+        Arc::new(TurboQuantGateway::new(VllmConfig::from(active_profile.clone())))
+            as Arc<dyn LlmGateway>,
+    ));
+    let router = GatewayRouter::new(&config);
+    let chat_gateway_dyn = router.gateway(TaskKind::Chat);
 
-    // ─── Chaos Engine ────────────────────────────────────────────
+    // ─── Chaos (always live in TUI — ADR-0003) ───────────────────
     let chaos_runtime = crate::chaos_bootstrap::start_chaos_runtime(&config);
-    let mut chaos_handle = chaos_runtime.handle;
-    let chaos_snapshot_rx = chaos_handle.snapshot_rx.clone();
+    let chaos_enabled_in_config = crate::chaos_bootstrap::enabled_in_chat(&config);
+    let mut chaos_handle = Some(chaos_runtime.handle);
+    let chaos_snapshot_rx = chaos_handle
+        .as_ref()
+        .expect("chaos handle")
+        .snapshot_rx
+        .clone();
     let chaos_feedback_tx = chaos_runtime.feedback_tx.clone();
+    let restore_policy = chaos_runtime.restore_policy.clone();
 
-    // ─── Chaos Skills (Rust-native) ─────────────────────
+    // ─── Chaos Skills ────────────────────────────────────────────
     let mut chaos_skills = ChaosSkillRegistry::new();
-    chaos_skills.register(Arc::new(DiceSkill));
-    chaos_skills.register(Arc::new(SoundSkill));
-    chaos_skills.register(Arc::new(PokerSkill));
-    chaos_skills.register(Arc::new(QuoteSkill));
-    chaos_skills.register(Arc::new(CalculateSkill));
-    chaos_skills.register(Arc::new(VisualSkill));
-    // Build help entries from registered skills
-    let help_entries: Vec<(String, String, &'static str)> = chaos_skills.all().iter().map(|s| {
-        let type_label = match s.skill_type() {
-            SkillType::Mechanical => "mechanical",
-            SkillType::Generative => "generative",
-            SkillType::Mutation => "mutation",
-            SkillType::Info => "info",
-        };
-        (s.name().to_string(), s.description().to_string(), type_label)
-    }).collect();
-    chaos_skills.register(Arc::new(HelpSkill { entries: help_entries }));
+    register_pantheon(&mut chaos_skills, &config);
     let chaos_skills = Arc::new(chaos_skills);
 
-    // ─── Tools ───────────────────────────────────────────────────
-    let mut tools = ToolRegistry::new();
-    tools.register(Box::new(FileReadTool));
-    tools.register(Box::new(FileWriteTool));
-    tools.register(Box::new(DirListTool));
-    tools.register(Box::new(FileSearchTool));
-    tools.register(Box::new(ShellExecTool::default()));
-    let serpapi_key = config.api_keys.serpapi_key();
-    if serpapi_key.is_empty() {
-        tools.register(Box::new(WebSearchTool::default()));
-    } else {
-        tools.register(Box::new(WebSearchTool::with_serpapi_key(serpapi_key)));
-    }
-    tools.register(Box::new(WebBrowseTool::default()));
-    tools.register(Box::new(SysMetricsTool));
-    tools.register(Box::new(SysKillTool));
+    // ─── Workflow skills ─────────────────────────────────────────
+    let (workflow_index, workflow_session) = boot_workflow_skills(&config)?;
 
-    if let Some(ref v) = vault {
-        tools.register(Box::new(MemoryRecordTool { vault: Arc::clone(v) }));
-        tools.register(Box::new(MemorySearchTool::new(Arc::clone(v))));
-    }
+    // ─── Tools (capability profile + jail) ───────────────────────
+    let profile = CapabilityProfile::parse(&config.tools.profile).unwrap_or(CapabilityProfile::Developer);
+    let mut tools = ToolRegistry::new();
+    register_for_profile(
+        &mut tools,
+        profile,
+        &config.tools,
+        ToolRegisterOpts {
+            vault: vault.clone(),
+            scratch: None,
+            scratch_scope: None,
+            serpapi_key: {
+                let k = config.api_keys.serpapi_key();
+                if k.is_empty() {
+                    None
+                } else {
+                    Some(k)
+                }
+            },
+            workflow: Some((Arc::clone(&workflow_index), Arc::clone(&workflow_session))),
+            gzmo_config: Some(config.clone()),
+        },
+    )?;
 
     // ─── MCP ─────────────────────────────────────────────────────
     let mut mcp = McpManager::new();
@@ -189,16 +134,18 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
     }
     mcp.register_all_tools(&mut tools);
 
-    let tools = Arc::new(tools);
-
-    // ─── Boot Knowledge Graph + Vault context ────────────────────
+    // ─── Memory context + system prompt (needs tool defs) ────────
+    let soul = identity.snapshot().await;
     let memory_context = boot_knowledge_graph(&tools).await;
     let vault_context: Option<String> = if let Some(ref v) = vault {
         match v.recent(10) {
             Ok(facts) if !facts.is_empty() => {
-                let mut block = String::from("\n\n## Long-Term Memory (Vault)\n");
+                let mut block = String::from(
+                    "\n\n## Long-Term Memory (Honeypot-first vault)\n\
+                     Prefer these curated facts over raw episodic soup.\n",
+                );
                 for fact in &facts {
-                    block.push_str(&format!("- {}\n", fact));
+                    block.push_str(&format!("- {fact}\n"));
                 }
                 Some(block)
             }
@@ -208,36 +155,72 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
         None
     };
 
-    // ─── System prompt ───────────────────────────────────────────
-    let soul = identity.snapshot().await;
-    let system_prompt = format!(
-        "{}{}{}\n\n---\nYou are {}. Today is {}.\nAvailable tools: {}",
-        soul.raw_markdown,
-        memory_context.as_deref().unwrap_or(""),
-        vault_context.as_deref().unwrap_or(""),
-        soul.persona_name,
-        Utc::now().format("%Y-%m-%d %H:%M UTC"),
-        if tools.is_empty() {
-            "none".to_string()
-        } else {
-            tools
-                .definitions()
-                .iter()
-                .map(|d| d.name.clone())
-                .collect::<Vec<_>>()
-                .join(", ")
-        }
+    let tool_names: Vec<String> = tools.definitions().iter().map(|d| d.name.clone()).collect();
+    let last_handoff = workflow_index.latest_handoff();
+    let system_prompt = build_system_prompt_with_workflows(
+        &soul,
+        memory_context.as_deref(),
+        vault_context.as_deref(),
+        &tool_names,
+        &Utc::now().format("%Y-%m-%d %H:%M UTC").to_string(),
+        Some(workflow_index.as_ref()),
+        last_handoff.as_deref(),
     );
 
-    // ─── Build Components ────────────────────────────────────────
+    // ─── Subagents (delegate_task uses GatewayRouter::Chat) ──────
+    let scratch = {
+        let session = agent_session.lock().await;
+        session.scratch()
+    };
+    let subagent_runner = Arc::new(SubagentRunner::with_tools_config(
+        config.subagent.clone(),
+        config.tools.clone(),
+        scratch,
+        Arc::clone(&chat_gateway_dyn),
+        vault.clone(),
+        system_prompt.clone(),
+        Some(config.clone()),
+    ));
+    {
+        let mut session = agent_session.lock().await;
+        session.attach_subagent_runner(Arc::clone(&subagent_runner));
+    }
+    let subagent_enabled = config.subagent.enabled;
+    if subagent_enabled {
+        tools.register(Box::new(DelegateTaskTool {
+            runner: Arc::clone(&subagent_runner),
+            session_id: agent_session.lock().await.session_id().to_string(),
+            depth: 0,
+        }));
+    }
+
+    if let Some(ref v) = vault {
+        let session = agent_session.lock().await;
+        tools.register(Box::new(MemorySearchTool {
+            vault: Arc::clone(v),
+            scratch: Some(session.scratch()),
+            scope: Some(session.main_scope()),
+            scope_cell: None,
+        }));
+    }
+
+    let tools = Arc::new(tools);
+
     let context_budget = active_profile.max_tokens as usize * 4;
     let max_iterations = config.agent.max_tool_iterations;
-    // Share the inner soul Arc — IdentityEngine itself isn't Clone (contains watcher)
     let soul_arc = Arc::clone(&identity.soul);
+
+    let mode_str = match config.engine.active_mode {
+        gzmo_core::config::EngineMode::Local => "LOCAL",
+        gzmo_core::config::EngineMode::Cloud => "CLOUD",
+        gzmo_core::config::EngineMode::Sovereign => "SOVEREIGN",
+    };
+    let model_name = active_profile.model.clone();
 
     let input_cmp = InputComponent::new();
     let transcript_cmp = TranscriptComponent::new();
-    let status_cmp = StatusBarComponent::new();
+    let status_cmp = StatusBarComponent::new(mode_str, model_name);
+    let instruments_cmp = InstrumentsComponent::new(vault.clone());
     let canvas_cmp = ChaosCanvasComponent::new();
     let agent_cmp = AgentComponent::new(
         Arc::clone(&gateway),
@@ -249,11 +232,16 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
         vault.clone(),
         Arc::clone(&episodic),
         Arc::clone(&session_mgr),
+        Arc::clone(&agent_session),
         chaos_snapshot_rx.clone(),
         Arc::clone(&chaos_skills),
         chaos_feedback_tx.clone(),
         Arc::clone(&config_arc),
         config_path,
+        Some(Arc::clone(&subagent_runner)),
+        subagent_enabled,
+        Arc::clone(&workflow_index),
+        Arc::clone(&workflow_session),
     );
     let palette_cmp = PaletteComponent::new();
 
@@ -261,89 +249,39 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
         input: Box::new(input_cmp),
         transcript: Box::new(transcript_cmp),
         status: Box::new(status_cmp),
+        instruments: Box::new(instruments_cmp),
         canvas: Box::new(canvas_cmp),
         agent: Box::new(agent_cmp),
-        palette: Box::new(palette_cmp),
+        palette: palette_cmp,
     };
     let (mut app, action_tx, action_rx) = App::new(comps);
 
-    // ─── Background: Chaos → UI + Gateway + Trigger Engine ─────
-    {
-        let tx = action_tx.clone();
-        let mut rx = chaos_snapshot_rx.clone();
-        let gateway_ref = Arc::clone(&gateway);
-        let feedback_tx_bg = chaos_feedback_tx.clone();
-        let state_dir = config.memory.vault_db.parent()
-            .unwrap_or(std::path::Path::new(".")).to_path_buf();
-        tokio::spawn(async move {
-            let mut triggers = TriggerEngine::with_defaults_interactive();
-            loop {
-                if rx.changed().await.is_err() {
-                    break;
-                }
-                let snap = rx.borrow_and_update().clone();
+    // ─── Unified chaos publisher (TUI adapters + HEARTBEAT.md) ───
+    let state_dir = config
+        .memory
+        .vault_db
+        .parent()
+        .unwrap_or(std::path::Path::new("."))
+        .to_path_buf();
+    let _chaos_bridge = crate::chaos_bootstrap::spawn_snapshot_bridge(
+        chaos_snapshot_rx.clone(),
+        Arc::clone(&gateway),
+        chaos_feedback_tx.clone(),
+        state_dir,
+        None,
+        Some(action_tx.clone()),
+        None,
+        gzmo_core::synapse::EventSource::GzmoCli,
+        restore_policy,
+        true,
+        crate::chaos_bootstrap::SnapshotBridgeOpts::TUI,
+    );
 
-                // Update gateway LLM parameters from Lorenz coordinates
-                let gw = gateway_ref.read().await;
-                gw.set_chaos_overrides(snap.llm_temperature, snap.llm_max_tokens);
-                drop(gw);
-
-                // Send snapshot to UI
-                let _ = tx.send(Action::ChaosSnapshot(snap.clone()));
-
-                // Write CHAOS_STATE.json (every 15 ticks for shell compat)
-                if snap.tick % 15 == 0 {
-                    let json = serde_json::to_string_pretty(&snap).unwrap_or_default();
-                    let tmp_path = state_dir.join("CHAOS_STATE.json.tmp");
-                    let target_path = state_dir.join("CHAOS_STATE.json");
-                    if tokio::fs::write(&tmp_path, json.as_bytes()).await.is_ok() {
-                        let _ = tokio::fs::rename(&tmp_path, &target_path).await;
-                    }
-                }
-
-                // Evaluate autonomous triggers
-                let fired = triggers.evaluate(&snap);
-                for f in fired {
-                    match &f.action {
-                        TriggerAction::Notify { message, level } => {
-                            let formatted = match level {
-                                NotifyLevel::Whisper  => format!("[dim] {}", message),
-                                NotifyLevel::Normal   => message.clone(),
-                                NotifyLevel::Urgent   => format!("⚠ {}", message),
-                                NotifyLevel::Critical => format!("⚠⚠ {}", message),
-                            };
-                            let _ = tx.send(Action::TriggerNotification(formatted));
-                        }
-                        TriggerAction::EmitEvent { tension_delta, energy_delta } => {
-                            let _ = feedback_tx_bg.send(
-                                gzmo_chaos::feedback::ChaosEvent::Custom {
-                                    tension_delta: *tension_delta,
-                                    energy_delta: *energy_delta,
-                                    thought_seed: None,
-                                }
-                            ).await;
-                        }
-                        TriggerAction::RunSkill { skill_name, args } => {
-                            let _ = tx.send(Action::TriggerSkill(
-                                skill_name.clone(),
-                                args.clone(),
-                            ));
-                        }
-                        TriggerAction::InjectPrompt { prompt } => {
-                            let _ = tx.send(Action::TriggerInject(prompt.clone()));
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    // ─── Background: Lore → UI ──────────────────────────────────
-    {
+    // ─── Background: Lore → UI ───────────────────────────────────
+    if let Some(mut handle) = chaos_handle.take() {
         let tx = action_tx.clone();
         tokio::spawn(async move {
-            // chaos_handle is moved into this task, keeping it alive
-            while let Some(lore) = chaos_handle.lore_rx.recv().await {
+            while let Some(lore) = handle.lore_rx.recv().await {
                 let author = lore.author.unwrap_or_default();
                 let _ = tx.send(Action::LoreEvent(lore.category, author, lore.text));
             }
@@ -373,12 +311,44 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
         });
     }
 
-    // Initial system message
-    let _ = action_tx.send(Action::AgentResponse(
-        "⚙ Systems nominal. Terminal decoupled. Lorenz attractor online.".to_string(),
+    // ─── Startup: engine health + session banner ───────────────────
+    let (engine_status, engine_latency) = ping_engine(&config).await;
+    let _ = action_tx.send(Action::EngineHealth(
+        engine_status.to_string(),
+        engine_latency,
     ));
 
-    // ─── Run the TUI mainloop ────────────────────────────────────
+    let boot_msg = if chaos_enabled_in_config {
+        format!(
+            "⚙ Systems nominal. Chaos pulse live — Lorenz instruments online. LLM {engine_status}."
+        )
+    } else {
+        format!(
+            "⚙ Systems nominal. Chaos pulse forced for TUI (config enabled_in_chat=false). LLM {engine_status}."
+        )
+    };
+    let _ = action_tx.send(Action::AgentResponse(boot_msg));
+
+    if let Ok(Some(recent)) = session_mgr.most_recent().await {
+        let age = Utc::now() - recent.last_active_at;
+        if age.num_hours() < 24 && recent.messages.len() > 1 {
+            let name_display = recent.name.as_deref().unwrap_or(&recent.id);
+            let _ = action_tx.send(Action::AgentResponse(format!(
+                "⚙ Previous session: {name_display} ({} msgs, {}). Type /resume to continue.",
+                recent.messages.len().saturating_sub(1),
+                recent.last_active_at.format("%H:%M %b %d")
+            )));
+        }
+    }
+
+    if engine_status == "OFFLINE" {
+        let active = config.engine.active_engine();
+        let _ = action_tx.send(Action::AgentResponse(format!(
+            "⚠ Engine unreachable at {}. /mode cloud may help if configured.",
+            active.url
+        )));
+    }
+
     app.run(action_tx, action_rx)
         .await
         .map_err(|e| anyhow::anyhow!(e))?;

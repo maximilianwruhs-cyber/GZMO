@@ -3,29 +3,31 @@ use tokio::sync::mpsc::UnboundedSender;
 use color_eyre::Result;
 use chrono::Utc;
 
-use gzmo_core::agent_loop::{run_agent_loop, AgentLoopConfig};
-use gzmo_core::context::ContextConfig;
-use gzmo_core::gateway::{TurboQuantGateway, VllmConfig};
+use gzmo_core::agent_loop::run_agent_loop;
+use gzmo_core::agent_session::AgentSession;
+use gzmo_core::gateway::{LlmGateway, TurboQuantGateway, VllmConfig};
 use gzmo_core::types::{SoulContext, EpisodicEntry, EpisodicSource, Message, Role};
 
 use gzmo_core::memory::episodic::FileEpisodicStore;
 use gzmo_core::memory::vault::SqliteVault;
 use gzmo_core::session::SessionManager;
+use gzmo_core::subagent::SubagentRunner;
 use gzmo_core::tools::ToolRegistry;
 use gzmo_core::skills::{SkillRegistry as ChaosSkillRegistry, SkillContext};
+use gzmo_core::workflow_skills::{SharedWorkflowSession, WorkflowSkillIndex};
 use gzmo_chaos::pulse::ChaosSnapshot;
 use gzmo_chaos::feedback::ChaosEvent;
 
+use crate::repl_shared::{activate_workflow_slash, workflow_status_lines};
 use crate::tui::action::Action;
 use crate::tui::component::Component;
 
 /// Headless agent orchestrator component — no render, pure logic.
-/// Handles chaos context injection, SOUL.md hot-reload, session management,
-/// episodic logging, and streaming token dispatch.
 pub struct AgentComponent {
     pub action_tx: Option<UnboundedSender<Action>>,
-    pub gateway: Arc<tokio::sync::RwLock<Arc<TurboQuantGateway>>>,
+    pub gateway: Arc<tokio::sync::RwLock<Arc<dyn LlmGateway>>>,
     pub tools: Arc<ToolRegistry>,
+    pub agent_session: Arc<tokio::sync::Mutex<AgentSession>>,
     pub messages: Vec<Message>,
     pub max_iterations: usize,
     pub context_budget: usize,
@@ -33,7 +35,6 @@ pub struct AgentComponent {
     pub vault: Option<Arc<SqliteVault>>,
     pub episodic: Arc<FileEpisodicStore>,
     pub session_mgr: Arc<SessionManager>,
-    pub session_id: String,
     pub session_name: Option<String>,
     pub session_created_at: chrono::DateTime<Utc>,
     pub chaos_snapshot_rx: tokio::sync::watch::Receiver<ChaosSnapshot>,
@@ -41,13 +42,15 @@ pub struct AgentComponent {
     pub chaos_feedback_tx: tokio::sync::mpsc::Sender<ChaosEvent>,
     pub config: Arc<tokio::sync::RwLock<gzmo_core::config::GzmoConfig>>,
     pub config_path: std::path::PathBuf,
-    /// Cached soul loaded_at for hot-reload detection
-    pub soul_loaded_at: Option<chrono::DateTime<Utc>>,
+    pub subagent_runner: Option<Arc<SubagentRunner>>,
+    pub subagent_enabled: bool,
+    pub workflow_index: Arc<WorkflowSkillIndex>,
+    pub workflow_session: SharedWorkflowSession,
 }
 
 impl AgentComponent {
     pub fn new(
-        gateway: Arc<tokio::sync::RwLock<Arc<TurboQuantGateway>>>,
+        gateway: Arc<tokio::sync::RwLock<Arc<dyn LlmGateway>>>,
         tools: Arc<ToolRegistry>,
         system_prompt: String,
         max_iterations: usize,
@@ -56,11 +59,16 @@ impl AgentComponent {
         vault: Option<Arc<SqliteVault>>,
         episodic: Arc<FileEpisodicStore>,
         session_mgr: Arc<SessionManager>,
+        agent_session: Arc<tokio::sync::Mutex<AgentSession>>,
         chaos_snapshot_rx: tokio::sync::watch::Receiver<ChaosSnapshot>,
         chaos_skills: Arc<ChaosSkillRegistry>,
         chaos_feedback_tx: tokio::sync::mpsc::Sender<ChaosEvent>,
         config: Arc<tokio::sync::RwLock<gzmo_core::config::GzmoConfig>>,
         config_path: std::path::PathBuf,
+        subagent_runner: Option<Arc<SubagentRunner>>,
+        subagent_enabled: bool,
+        workflow_index: Arc<WorkflowSkillIndex>,
+        workflow_session: SharedWorkflowSession,
     ) -> Self {
         let messages = vec![Message {
             role: Role::System,
@@ -74,6 +82,7 @@ impl AgentComponent {
             action_tx: None,
             gateway,
             tools,
+            agent_session,
             messages,
             max_iterations,
             context_budget,
@@ -81,7 +90,6 @@ impl AgentComponent {
             vault,
             episodic,
             session_mgr,
-            session_id: SessionManager::new_session_id(),
             session_name: None,
             session_created_at: Utc::now(),
             chaos_snapshot_rx,
@@ -89,7 +97,10 @@ impl AgentComponent {
             chaos_feedback_tx,
             config,
             config_path,
-            soul_loaded_at: None,
+            subagent_runner,
+            subagent_enabled,
+            workflow_index,
+            workflow_session,
         }
     }
 
@@ -217,7 +228,7 @@ impl Component for AgentComponent {
                 let messages = std::mem::take(&mut self.messages);
                 let session_mgr = Arc::clone(&self.session_mgr);
                 let vault = self.vault.clone();
-                let session_id = self.session_id.clone();
+                let agent_session = Arc::clone(&self.agent_session);
                 let session_name = self.session_name.clone();
                 let session_created_at = self.session_created_at;
                 let chaos_snapshot_rx = self.chaos_snapshot_rx.clone();
@@ -226,8 +237,14 @@ impl Component for AgentComponent {
                 let config = Arc::clone(&self.config);
                 let config_path = self.config_path.clone();
                 let gateway = Arc::clone(&self.gateway);
+                let subagent_runner = self.subagent_runner.clone();
+                let subagent_enabled = self.subagent_enabled;
+                let workflow_index = Arc::clone(&self.workflow_index);
+                let workflow_session = Arc::clone(&self.workflow_session);
+                let tools = Arc::clone(&self.tools);
+                let max_iterations = self.max_iterations;
+                let context_budget = self.context_budget;
 
-                // Restore messages immediately (slash commands will get a copy)
                 self.messages = messages.clone();
 
                 tokio::spawn(async move {
@@ -236,7 +253,7 @@ impl Component for AgentComponent {
                         messages,
                         session_mgr,
                         vault,
-                        session_id,
+                        agent_session,
                         session_name,
                         session_created_at,
                         chaos_snapshot_rx,
@@ -245,6 +262,13 @@ impl Component for AgentComponent {
                         config,
                         config_path,
                         gateway,
+                        tools,
+                        max_iterations,
+                        _context_budget: context_budget,
+                        _subagent_runner: subagent_runner,
+                        _subagent_enabled: subagent_enabled,
+                        workflow_index,
+                        workflow_session,
                     };
                     ctx.handle(&cmd).await;
 
@@ -292,12 +316,14 @@ impl Component for AgentComponent {
             let tools = Arc::clone(&self.tools);
             let mut msgs = self.messages.clone();
             let max_iter = self.max_iterations;
-            let ctx_budget = self.context_budget;
             let episodic = Arc::clone(&self.episodic);
             let soul = Arc::clone(&self.soul);
             let tool_defs = self.tools.definitions();
+            let agent_session = Arc::clone(&self.agent_session);
 
             tokio::spawn(async move {
+                agent_session.lock().await.turn_start().await;
+
                 // SOUL.md hot-reload check
                 {
                     let live_soul = soul.read().await.clone();
@@ -307,9 +333,10 @@ impl Component for AgentComponent {
                         } else {
                             tool_defs.iter().map(|d| d.name.clone()).collect::<Vec<_>>().join(", ")
                         };
-                        // Rebuild system prompt with current soul
                         let new_prompt = format!(
-                            "{}\n\n---\nYou are {}. Today is {}.\nAvailable tools: {}",
+                            "{}\n\n---\nYou are {}. Today is {}.\nAvailable tools: {}.\n\
+                             Use memory_search when you need prior facts (results land in scratch for this turn only).\n\
+                             Use delegate_task for focused sub-work; you receive a short summary, not full subagent logs.",
                             live_soul.raw_markdown,
                             live_soul.persona_name,
                             Utc::now().format("%Y-%m-%d %H:%M UTC"),
@@ -319,22 +346,17 @@ impl Component for AgentComponent {
                     }
                 }
 
-                // Build streaming callback
                 let stream_tx = action_tx.clone();
                 let on_chunk = Arc::new(move |token: String| {
                     let _ = stream_tx.send(Action::AgentTokenStream(token));
                 });
-
-                let config = AgentLoopConfig {
-                    max_iterations: max_iter,
-                    verbose_tool_output: false,
-                    context: ContextConfig::for_context_length(ctx_budget),
-                    on_chunk: Some(on_chunk),
-                    memory: None,
-                };
+                let loop_config = agent_session
+                    .lock()
+                    .await
+                    .loop_config(max_iter, true, Some(on_chunk));
 
                 let gw = gateway.read().await;
-                let res = run_agent_loop(gw.as_ref(), tools.as_ref(), &mut msgs, &config).await;
+                let res = run_agent_loop(gw.as_ref(), tools.as_ref(), &mut msgs, &loop_config).await;
 
                 // Sync mutated conversation history back
                 let _ = action_tx.send(Action::AgentMessagesSync(msgs));
@@ -372,7 +394,7 @@ struct SlashCommandContext {
     messages: Vec<Message>,
     session_mgr: Arc<SessionManager>,
     vault: Option<Arc<SqliteVault>>,
-    session_id: String,
+    agent_session: Arc<tokio::sync::Mutex<AgentSession>>,
     session_name: Option<String>,
     session_created_at: chrono::DateTime<Utc>,
     chaos_snapshot_rx: tokio::sync::watch::Receiver<ChaosSnapshot>,
@@ -380,7 +402,14 @@ struct SlashCommandContext {
     chaos_feedback_tx: tokio::sync::mpsc::Sender<ChaosEvent>,
     config: Arc<tokio::sync::RwLock<gzmo_core::config::GzmoConfig>>,
     config_path: std::path::PathBuf,
-    gateway: Arc<tokio::sync::RwLock<Arc<TurboQuantGateway>>>,
+    gateway: Arc<tokio::sync::RwLock<Arc<dyn LlmGateway>>>,
+    tools: Arc<ToolRegistry>,
+    max_iterations: usize,
+    _context_budget: usize,
+    _subagent_runner: Option<Arc<SubagentRunner>>,
+    _subagent_enabled: bool,
+    workflow_index: Arc<WorkflowSkillIndex>,
+    workflow_session: SharedWorkflowSession,
 }
 
 impl SlashCommandContext {
@@ -391,50 +420,89 @@ impl SlashCommandContext {
 
         match raw_cmd.as_str() {
             "/quit" | "/exit" | "/q" => {
+                let session_id = self.agent_session.lock().await.session_id().to_string();
                 if self.messages.len() > 1 {
-                    let _ = self.session_mgr
-                        .save(&self.session_id, self.session_name.as_deref(), &self.messages, self.session_created_at)
+                    let _ = self
+                        .session_mgr
+                        .save(
+                            &session_id,
+                            self.session_name.as_deref(),
+                            &self.messages,
+                            self.session_created_at,
+                        )
                         .await;
                 }
                 let _ = self.action_tx.send(Action::Quit);
             }
             "/clear" | "/reset" => {
                 self.messages.truncate(1);
-                self.session_id = SessionManager::new_session_id();
+                let new_id = SessionManager::new_session_id();
+                self.agent_session.lock().await.set_session_id(new_id.clone());
                 self.session_name = None;
                 let _ = self.action_tx.send(Action::TranscriptClear);
-                let _ = self.action_tx.send(Action::AgentResponse("⚙ Context cleared — new session.".to_string()));
+                let _ = self.action_tx.send(Action::AgentResponse(
+                    "⚙ Context cleared — new session.".to_string(),
+                ));
             }
             "/resume" => {
                 if let Ok(Some(session)) = self.session_mgr.most_recent().await {
                     let count = session.messages.len().saturating_sub(1);
                     let display = session.name.clone().unwrap_or_else(|| session.id.clone());
                     self.messages = session.messages.clone();
-                    self.session_id = session.id;
+                    self.agent_session
+                        .lock()
+                        .await
+                        .set_session_id(session.id.clone());
                     self.session_name = session.name;
-                    let _ = self.action_tx.send(Action::TranscriptRestore(self.messages.clone()));
-                    let _ = self.action_tx.send(Action::AgentResponse(format!("⚙ Resumed: {} ({} messages)", display, count)));
+                    let _ = self
+                        .action_tx
+                        .send(Action::TranscriptRestore(self.messages.clone()));
+                    let _ = self.action_tx.send(Action::AgentResponse(format!(
+                        "⚙ Resumed: {} ({} messages)",
+                        display, count
+                    )));
                 } else {
-                    let _ = self.action_tx.send(Action::AgentResponse("⚙ No previous session found.".to_string()));
+                    let _ = self
+                        .action_tx
+                        .send(Action::AgentResponse("⚙ No previous session found.".to_string()));
                 }
             }
             "/new" => {
+                let session_id = self.agent_session.lock().await.session_id().to_string();
                 if self.messages.len() > 1 {
-                    let _ = self.session_mgr.save(&self.session_id, self.session_name.as_deref(), &self.messages, self.session_created_at).await;
+                    let _ = self
+                        .session_mgr
+                        .save(
+                            &session_id,
+                            self.session_name.as_deref(),
+                            &self.messages,
+                            self.session_created_at,
+                        )
+                        .await;
                 }
                 self.messages.truncate(1);
-                self.session_id = SessionManager::new_session_id();
+                let new_id = SessionManager::new_session_id();
+                self.agent_session.lock().await.set_session_id(new_id.clone());
                 self.session_name = None;
                 self.session_created_at = Utc::now();
                 let _ = self.action_tx.send(Action::TranscriptClear);
-                let _ = self.action_tx.send(Action::AgentResponse(format!("⚙ New session: {}", self.session_id)));
+                let _ = self
+                    .action_tx
+                    .send(Action::AgentResponse(format!("⚙ New session: {new_id}")));
             }
             "/system" => {
-                let prompt = self.messages.first().map(|m| m.content.clone()).unwrap_or_default();
-                let _ = self.action_tx.send(Action::AgentResponse(format!("--- System Prompt ---\n{}\n--- End ---", prompt)));
+                let prompt = self
+                    .messages
+                    .first()
+                    .map(|m| m.content.clone())
+                    .unwrap_or_default();
+                let _ = self.action_tx.send(Action::AgentResponse(format!(
+                    "--- System Prompt ---\n{prompt}\n--- End ---"
+                )));
             }
             "/stats" => {
-                let display = self.session_name.as_deref().unwrap_or(&self.session_id);
+                let session_id = self.agent_session.lock().await.session_id().to_string();
+                let display = self.session_name.as_deref().unwrap_or(&session_id);
                 let config = self.config.read().await;
                 let active = config.engine.active_engine();
                 let mode_str = match config.engine.active_mode {
@@ -442,7 +510,29 @@ impl SlashCommandContext {
                     gzmo_core::config::EngineMode::Cloud => "CLOUD",
                     gzmo_core::config::EngineMode::Sovereign => "SOVEREIGN",
                 };
-                let _ = self.action_tx.send(Action::AgentResponse(format!("⚙ Session: {} | Messages: {} | Mode: {} | Model: {}", display, self.messages.len(), mode_str, active.model)));
+                let model_short = active
+                    .model
+                    .rsplit(['/', '\\'])
+                    .next()
+                    .unwrap_or(active.model.as_str());
+                let _ = self.action_tx.send(Action::AgentResponse(format!(
+                    "⚙ Session: {} | Messages: {} | Mode: {} | Model: {}",
+                    display,
+                    self.messages.len(),
+                    mode_str,
+                    model_short
+                )));
+            }
+            "/status" | "/ecosystem" | "/sys" => {
+                let config = self.config.read().await.clone();
+                let report =
+                    gzmo_core::ecosystem_status::format_ecosystem_status(&config).await;
+                let mut text = format!("⚙ Ecosystem status\n{report}");
+                for line in workflow_status_lines(&self.workflow_index, &self.workflow_session) {
+                    text.push('\n');
+                    text.push_str(&line);
+                }
+                let _ = self.action_tx.send(Action::AgentResponse(text));
             }
             "/chaos" => {
                 let snap = self.chaos_snapshot_rx.borrow().clone();
@@ -475,20 +565,34 @@ impl SlashCommandContext {
                     snap.llm_temperature, snap.llm_max_tokens, snap.llm_valence,
                 )));
             }
-            "/stabilize" => {
-                let config_guard = self.config.read().await;
-                let chaos_config: gzmo_chaos::pulse::ChaosConfig = config_guard.chaos
-                    .as_ref()
-                    .and_then(|v| v.clone().try_into().ok())
-                    .unwrap_or_default();
-                let delta = chaos_config.stabilize_delta_rho;
-                let _ = self.chaos_feedback_tx.send(gzmo_chaos::feedback::ChaosEvent::Stabilize { delta_rho: delta }).await;
-                let response = if delta < 0.0 {
-                    format!("🌀 Attractor stabilized. Lorenz ρ mod decreased by {:.1}", -delta)
-                } else {
-                    format!("🌀 Attractor stabilized. Lorenz ρ mod increased by {:.1}", delta)
-                };
-                let _ = self.action_tx.send(Action::AgentResponse(response));
+            "/sessions" => {
+                match self.session_mgr.list().await {
+                    Ok(sessions) if sessions.is_empty() => {
+                        let _ = self
+                            .action_tx
+                            .send(Action::AgentResponse("⚙ No saved sessions".to_string()));
+                    }
+                    Ok(sessions) => {
+                        let mut text = String::from("--- Saved Sessions ---");
+                        for s in &sessions {
+                            let name = s.name.as_deref().unwrap_or("(unnamed)");
+                            text.push_str(&format!(
+                                "\n  {} | {} | {} msgs | {}",
+                                s.id,
+                                name,
+                                s.message_count,
+                                s.last_active_at.format("%H:%M %b %d")
+                            ));
+                        }
+                        text.push_str("\n--- /load <id or name> to resume ---");
+                        let _ = self.action_tx.send(Action::AgentResponse(text));
+                    }
+                    Err(e) => {
+                        let _ = self
+                            .action_tx
+                            .send(Action::AgentResponse(format!("⚙ List failed: {e}")));
+                    }
+                }
             }
             "/vault" => {
                 if let Some(ref v) = self.vault {
@@ -504,19 +608,43 @@ impl SlashCommandContext {
                     }
                     let _ = self.action_tx.send(Action::AgentResponse(text));
                 } else {
-                    let _ = self.action_tx.send(Action::AgentResponse("⚙ Vault not available".to_string()));
+                    let _ = self
+                        .action_tx
+                        .send(Action::AgentResponse("⚙ Vault not available".to_string()));
                 }
             }
             "/save" => {
+                let session_id = self.agent_session.lock().await.session_id().to_string();
                 let name = args.trim();
-                let name_opt = if name.is_empty() { None } else { Some(name.to_string()) };
-                if name_opt.is_some() { self.session_name = name_opt.clone(); }
-                match self.session_mgr.save(&self.session_id, self.session_name.as_deref(), &self.messages, self.session_created_at).await {
+                let name_opt = if name.is_empty() {
+                    None
+                } else {
+                    Some(name.to_string())
+                };
+                if name_opt.is_some() {
+                    self.session_name = name_opt.clone();
+                }
+                match self
+                    .session_mgr
+                    .save(
+                        &session_id,
+                        self.session_name.as_deref(),
+                        &self.messages,
+                        self.session_created_at,
+                    )
+                    .await
+                {
                     Ok(()) => {
-                        let display = self.session_name.as_deref().unwrap_or(&self.session_id);
-                        let _ = self.action_tx.send(Action::AgentResponse(format!("⚙ Saved: {}", display)));
+                        let display = self.session_name.as_deref().unwrap_or(&session_id);
+                        let _ = self
+                            .action_tx
+                            .send(Action::AgentResponse(format!("⚙ Saved: {display}")));
                     }
-                    Err(e) => { let _ = self.action_tx.send(Action::AgentResponse(format!("⚙ Save failed: {}", e))); }
+                    Err(e) => {
+                        let _ = self
+                            .action_tx
+                            .send(Action::AgentResponse(format!("⚙ Save failed: {e}")));
+                    }
                 }
             }
             "/load" => {
@@ -533,7 +661,10 @@ impl SlashCommandContext {
                             let count = session.messages.len().saturating_sub(1);
                             let display = session.name.clone().unwrap_or_else(|| session.id.clone());
                             self.messages = session.messages.clone();
-                            self.session_id = session.id;
+                            self.agent_session
+                                .lock()
+                                .await
+                                .set_session_id(session.id.clone());
                             self.session_name = session.name;
                             let _ = self.action_tx.send(Action::TranscriptRestore(self.messages.clone()));
                             let _ = self.action_tx.send(Action::AgentResponse(format!("⚙ Loaded: {} ({} messages)", display, count)));
@@ -597,7 +728,8 @@ impl SlashCommandContext {
                                         profile.url
                                     )));
                                 } else {
-                                    let new_gw = Arc::new(TurboQuantGateway::new(VllmConfig::from(profile.clone())));
+                                    let new_gw: Arc<dyn LlmGateway> =
+                                        Arc::new(TurboQuantGateway::new(VllmConfig::from(profile.clone())));
                                     {
                                         let mut gw = self.gateway.write().await;
                                         *gw = new_gw;
@@ -631,13 +763,113 @@ impl SlashCommandContext {
                 }
                 let raw_skill = &raw_cmd[1..]; // remove the slash
                 let skill_cmd = match raw_skill {
-                    "card" | "cards" | "hand" => "poker",
+                    "cards" | "hand" => "poker",
                     "roll" => "dice",
                     "calc" | "math" => "calculate",
                     "vis" => "visual",
                     "sfx" | "play" => "sound",
+                    "mtg" => "card",
+                    "grill-me" => "grill",
+                    "debug" | "diagnosing-bugs" => "diagnose",
+                    "code-review" => "review",
                     other => other,
                 };
+
+                // Workflow skills (grill/tdd/…) — inject + run agent turn
+                if self.workflow_index.has(skill_cmd) {
+                    match activate_workflow_slash(
+                        &self.workflow_index,
+                        &self.workflow_session,
+                        skill_cmd,
+                        args,
+                        &mut self.messages,
+                    ) {
+                        Ok(true) => {
+                            let mut notice = format!("⚙ Workflow activated: /{skill_cmd}");
+                            if skill_cmd == "handoff" {
+                                let session_id =
+                                    self.agent_session.lock().await.session_id().to_string();
+                                let stub = format!(
+                                    "# Handoff\n\n**Session:** {session_id}\n\n**Topic:** {}\n\n(Agent will complete sections.)\n",
+                                    if args.is_empty() { "(unspecified)" } else { args }
+                                );
+                                let cfg = self.config.read().await;
+                                if let Ok(path) = self.workflow_index.write_handoff(
+                                    &self.workflow_session,
+                                    &session_id,
+                                    &stub,
+                                ) {
+                                    notice.push_str(&format!("\n⚙ Handoff stub: {}", path.display()));
+                                    if cfg.workflow_skills.handoff_to_vault {
+                                        if let Some(ref v) = self.vault {
+                                            let _ = v.store_text(
+                                                &format!("[Handoff] {}", path.display()),
+                                                "Episodic",
+                                                1.0,
+                                            );
+                                        }
+                                    }
+                                }
+                            }
+                            let _ = self.action_tx.send(Action::AgentResponse(notice));
+
+                            self.messages.push(Message {
+                                role: Role::User,
+                                content: "Begin following the activated workflow skill now.".into(),
+                                is_meta: true,
+                                tool_calls: None,
+                                tool_call_id: None,
+                            });
+                            {
+                                let session = self.agent_session.lock().await;
+                                session.turn_start().await;
+                            }
+                            let loop_config = {
+                                let session = self.agent_session.lock().await;
+                                session.loop_config(self.max_iterations, false, None)
+                            };
+                            let gateway = self.gateway.read().await.clone();
+                            let tools = Arc::clone(&self.tools);
+                            match run_agent_loop(
+                                gateway.as_ref(),
+                                tools.as_ref(),
+                                &mut self.messages,
+                                &loop_config,
+                            )
+                            .await
+                            {
+                                Ok(response) => {
+                                    self.messages.push(Message {
+                                        role: Role::Assistant,
+                                        content: response.text.clone(),
+                                        is_meta: false,
+                                        tool_calls: None,
+                                        tool_call_id: None,
+                                    });
+                                    let _ = self
+                                        .action_tx
+                                        .send(Action::AgentResponse(response.text));
+                                }
+                                Err(e) => {
+                                    let _ = self.action_tx.send(Action::AgentResponse(format!(
+                                        "⚙ Workflow turn failed: {e}"
+                                    )));
+                                }
+                            }
+                        }
+                        Ok(false) => {
+                            let _ = self.action_tx.send(Action::AgentResponse(format!(
+                                "⚙ Unknown workflow: {skill_cmd}"
+                            )));
+                        }
+                        Err(e) => {
+                            let _ = self
+                                .action_tx
+                                .send(Action::AgentResponse(format!("⚙ Workflow error: {e}")));
+                        }
+                    }
+                    return;
+                }
 
                 if self.chaos_skills.has(skill_cmd) {
                     let snap = self.chaos_snapshot_rx.borrow().clone();

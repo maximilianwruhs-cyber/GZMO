@@ -1,5 +1,6 @@
-//! GZMO platform memory MCP server (stdio) — exposes `gzmo_memory_*` tools.
+//! GZMO platform memory MCP server (stdio) — exposes `gzmo_memory_*` + ops tools.
 
+use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
 use anyhow::Result;
@@ -14,12 +15,14 @@ use rmcp::{
 use tracing::info;
 
 use crate::config::{GzmoConfig, WikiConfig};
+use crate::health::{collect_health_probes, format_report};
 use crate::platform_memory::PlatformMemory;
 use crate::wiki::WikiEngine;
 
 #[derive(Clone)]
 pub struct GzmoMemoryMcpServer {
     platform: Arc<PlatformMemory>,
+    config: Arc<GzmoConfig>,
     wiki: WikiConfig,
     tool_router: ToolRouter<Self>,
 }
@@ -29,6 +32,9 @@ struct SearchParams {
     query: String,
     #[serde(default)]
     limit: Option<u64>,
+    /// When false, search without writing session scratch (default true).
+    #[serde(default)]
+    write_scratch: Option<bool>,
 }
 
 #[derive(Debug, serde::Deserialize, schemars::JsonSchema)]
@@ -44,25 +50,112 @@ struct ProfileParams {
     dynamic_only: Option<bool>,
 }
 
+#[derive(Debug, serde::Deserialize, schemars::JsonSchema)]
+struct ChainParams {
+    fact_id: String,
+}
+
+fn discovery_data_dir() -> PathBuf {
+    std::env::var("PI_MENTOR_DISCOVERY_DATA")
+        .or_else(|_| std::env::var("DISCOVERY_DATA_DIR"))
+        .map(PathBuf::from)
+        .unwrap_or_else(|_| {
+            PathBuf::from("/home/maximilian/gzmo_skills/data/pi-mentor-discovery")
+        })
+}
+
+fn read_discovery_status_json(data_dir: &Path) -> serde_json::Value {
+    let state_path = data_dir.join("state.json");
+    let metrics_path = data_dir.join("logs/cycle-metrics.jsonl");
+    let lock_path = data_dir.join(".cycle.lock");
+
+    let state = std::fs::read_to_string(&state_path)
+        .ok()
+        .and_then(|s| serde_json::from_str::<serde_json::Value>(&s).ok())
+        .unwrap_or(serde_json::json!({"error": "state.json missing"}));
+
+    let mut last_metrics = serde_json::Value::Null;
+    if let Ok(text) = std::fs::read_to_string(&metrics_path) {
+        if let Some(line) = text.lines().rev().find(|l| !l.trim().is_empty()) {
+            last_metrics = serde_json::from_str(line).unwrap_or(serde_json::Value::Null);
+        }
+    }
+
+    let lock_held = if lock_path.exists() {
+        // Best-effort: if another process holds exclusive flock, open+flock -n fails.
+        // Without nix crate we only report file presence + recent metrics event.
+        true
+    } else {
+        false
+    };
+
+    let bash_calls = last_metrics.get("bash_calls").cloned().unwrap_or(serde_json::json!(null));
+    let probe_required_failed = last_metrics
+        .get("probe_required_failed")
+        .cloned()
+        .unwrap_or(serde_json::json!(null));
+    let last_event = last_metrics
+        .get("event")
+        .cloned()
+        .unwrap_or(serde_json::json!(null));
+
+    serde_json::json!({
+        "data_dir": data_dir.display().to_string(),
+        "session_id": state.get("session_id"),
+        "session_status": state.get("session_status"),
+        "discovery_pillar": state.get("discovery_pillar"),
+        "cycle": state.get("cycle"),
+        "session_duration_min": state.get("session_duration_min"),
+        "session_started_at": state.get("session_started_at"),
+        "last_report": state.get("last_report"),
+        "last_published_report": state.get("last_published_report"),
+        "published": state.get("published"),
+        "stale_cycle_count": state.get("stale_cycle_count"),
+        "plan_probe_index": state.get("plan_probe_index"),
+        "lock_file_present": lock_held,
+        "last_metrics": {
+            "ts": last_metrics.get("ts"),
+            "eval_status": last_metrics.get("eval_status"),
+            "bash_calls": bash_calls,
+            "mentor_calls": last_metrics.get("mentor_calls"),
+            "probe_required_failed": probe_required_failed,
+            "probe_id": last_metrics.get("probe_id"),
+            "event": last_event,
+        }
+    })
+}
+
 #[tool_router]
 impl GzmoMemoryMcpServer {
-    pub fn new(platform: Arc<PlatformMemory>, wiki: WikiConfig) -> Self {
+    pub fn new(platform: Arc<PlatformMemory>, config: Arc<GzmoConfig>) -> Self {
+        let wiki = config.wiki.clone();
         Self {
             platform,
+            config,
             wiki,
             tool_router: Self::tool_router(),
         }
     }
 
-    #[tool(description = "Search GZMO honeypot/vault memory and optional Pi knowledge collection; writes session scratch.")]
+    #[tool(description = "Clear session scratch for a new user turn (call before search/recall).")]
+    async fn gzmo_memory_turn_start(&self) -> Result<CallToolResult, McpError> {
+        self.platform.turn_start().await;
+        Ok(CallToolResult::success(vec![Content::text(format!(
+            "turn-start: scratch cleared (session {})",
+            self.platform.session_id()
+        ))]))
+    }
+
+    #[tool(description = "Search GZMO honeypot/vault memory and optional Pi knowledge collection; writes session scratch by default.")]
     async fn gzmo_memory_search(
         &self,
         Parameters(args): Parameters<SearchParams>,
     ) -> Result<CallToolResult, McpError> {
         let limit = args.limit.unwrap_or(5) as usize;
+        let write_scratch = args.write_scratch.unwrap_or(true);
         match self
             .platform
-            .memory_search(&args.query, limit, true)
+            .memory_search(&args.query, limit, write_scratch)
             .await
         {
             Ok(res) => Ok(CallToolResult::success(vec![Content::text(res.text)])),
@@ -70,7 +163,7 @@ impl GzmoMemoryMcpServer {
         }
     }
 
-    #[tool(description = "Report vault fact count, session id, and scratch backend state.")]
+    #[tool(description = "Report vault path, fact counts, session id, and scratch backend — use to verify MCP vault attach.")]
     async fn gzmo_memory_status(&self) -> Result<CallToolResult, McpError> {
         match self.platform.status().await {
             Ok(st) => match serde_json::to_string_pretty(&st) {
@@ -88,6 +181,28 @@ impl GzmoMemoryMcpServer {
             Ok(None) => Ok(CallToolResult::success(vec![Content::text(
                 "(no scratch recall for this session)".to_string(),
             )])),
+            Err(e) => Ok(CallToolResult::error(vec![Content::text(e.to_string())])),
+        }
+    }
+
+    #[tool(description = "Provenance / supersession chain for a honeypot fact id.")]
+    async fn gzmo_memory_chain(
+        &self,
+        Parameters(args): Parameters<ChainParams>,
+    ) -> Result<CallToolResult, McpError> {
+        match self.platform.memory_chain(&args.fact_id) {
+            Ok(chain) if chain.is_empty() => Ok(CallToolResult::success(vec![Content::text(
+                format!("(no honeypot chain for id {})", args.fact_id),
+            )])),
+            Ok(chain) => {
+                let mut out = String::new();
+                for (i, (content, is_latest, graph_rel)) in chain.iter().enumerate() {
+                    let tag = if *is_latest { "latest" } else { "superseded" };
+                    let rel = graph_rel.as_deref().unwrap_or("-");
+                    out.push_str(&format!("[{i}] ({tag}, rel={rel}) {content}\n"));
+                }
+                Ok(CallToolResult::success(vec![Content::text(out)]))
+            }
             Err(e) => Ok(CallToolResult::error(vec![Content::text(e.to_string())])),
         }
     }
@@ -135,16 +250,71 @@ impl GzmoMemoryMcpServer {
             Err(e) => Ok(CallToolResult::error(vec![Content::text(e.to_string())])),
         }
     }
+
+    #[tool(description = "Operator health probes (LLM, Qdrant, honeypot drift, Redis, Neo4j). Requires GZMO_OPS_MCP=1.")]
+    async fn gzmo_ops_health(&self) -> Result<CallToolResult, McpError> {
+        if let Some(deny) = ops_mcp_denied() {
+            return Ok(CallToolResult::error(vec![Content::text(deny)]));
+        }
+        let results = collect_health_probes(self.config.as_ref(), None).await;
+        let report = format_report(&results);
+        let failed: Vec<&str> = results
+            .iter()
+            .filter(|r| !r.ok && r.name != "sovereign")
+            .map(|r| r.name)
+            .collect();
+        if failed.is_empty() {
+            Ok(CallToolResult::success(vec![Content::text(report)]))
+        } else {
+            Ok(CallToolResult::error(vec![Content::text(format!(
+                "{report}\nFailed probes: {}",
+                failed.join(", ")
+            ))]))
+        }
+    }
+
+    #[tool(description = "Operator discovery session status. Requires GZMO_OPS_MCP=1.")]
+    async fn gzmo_discovery_status(&self) -> Result<CallToolResult, McpError> {
+        if let Some(deny) = ops_mcp_denied() {
+            return Ok(CallToolResult::error(vec![Content::text(deny)]));
+        }
+        let dir = discovery_data_dir();
+        let status = read_discovery_status_json(&dir);
+        match serde_json::to_string_pretty(&status) {
+            Ok(json) => Ok(CallToolResult::success(vec![Content::text(json)])),
+            Err(e) => Ok(CallToolResult::error(vec![Content::text(e.to_string())])),
+        }
+    }
+}
+
+fn ops_mcp_enabled() -> bool {
+    std::env::var("GZMO_OPS_MCP")
+        .map(|v| v == "1" || v.eq_ignore_ascii_case("true"))
+        .unwrap_or(false)
+}
+
+fn ops_mcp_denied() -> Option<String> {
+    if ops_mcp_enabled() {
+        None
+    } else {
+        Some(
+            "ops/discovery MCP tools are gated. Set GZMO_OPS_MCP=1 for operator use, \
+             or use gzmo_memory_* product tools only."
+                .to_string(),
+        )
+    }
 }
 
 #[tool_handler]
 impl ServerHandler for GzmoMemoryMcpServer {
     fn get_info(&self) -> ServerInfo {
+        let instructions = if ops_mcp_enabled() {
+            "GZMO MCP — memory tools plus ops/discovery (GZMO_OPS_MCP=1). Prefer gzmo_memory_status then search/recall."
+        } else {
+            "GZMO product memory MCP — gzmo_memory_status, search, recall, chain, profile. Ops/discovery tools require GZMO_OPS_MCP=1."
+        };
         ServerInfo {
-            instructions: Some(
-                "GZMO platform memory — honeypot RAG search/recall across vault and Pi knowledge, plus gzmo_wiki_search over the git-tracked wiki/ markdown layer."
-                    .into(),
-            ),
+            instructions: Some(instructions.into()),
             capabilities: ServerCapabilities::builder().enable_tools().build(),
             ..Default::default()
         }
@@ -152,13 +322,18 @@ impl ServerHandler for GzmoMemoryMcpServer {
 }
 
 /// Run the MCP server on stdio until the client disconnects.
+/// Honors `GZMO_SESSION_ID` for stable scratch across tool calls.
 pub async fn run_mcp_serve(config: &GzmoConfig) -> Result<()> {
-    let platform = Arc::new(PlatformMemory::open(config, None).await?);
+    let session_id = std::env::var("GZMO_SESSION_ID")
+        .ok()
+        .filter(|s| !s.is_empty());
+    let platform = Arc::new(PlatformMemory::open(config, session_id).await?);
     info!(
         session = %platform.session_id(),
+        vault = %config.memory.vault_db.display(),
         "GZMO memory MCP server starting (stdio)"
     );
-    let server = GzmoMemoryMcpServer::new(platform, config.wiki.clone());
+    let server = GzmoMemoryMcpServer::new(platform, Arc::new(config.clone()));
     let service = server.serve(stdio()).await?;
     service.waiting().await?;
     Ok(())

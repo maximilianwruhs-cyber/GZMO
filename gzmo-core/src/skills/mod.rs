@@ -16,14 +16,46 @@ use gzmo_chaos::feedback::ChaosEvent;
 use gzmo_chaos::pulse::ChaosSnapshot;
 use tokio::sync::mpsc;
 
+use crate::config::GzmoConfig;
+
+pub mod calculate;
+pub mod card;
+pub mod define;
 pub mod dice;
-pub mod sound;
+pub mod help;
+pub mod joke;
+pub mod language;
+pub mod llm;
+pub mod poem;
 pub mod poker;
 pub mod quote;
-pub mod calculate;
-pub mod help;
+pub mod sound;
 pub mod status;
+pub mod stabilize;
+pub mod story;
+pub mod transform;
 pub mod visual;
+pub mod word;
+
+pub use llm::SkillRuntime;
+
+use calculate::CalculateSkill;
+use card::CardSkill;
+use define::DefineSkill;
+use dice::DiceSkill;
+use help::HelpSkill;
+use joke::JokeSkill;
+use language::LanguageSkill;
+use poem::PoemSkill;
+use poker::PokerSkill;
+use quote::QuoteSkill;
+use sound::SoundSkill;
+use status::StatusSkill;
+use stabilize::StabilizeSkill;
+use story::StorySkill;
+use transform::TransformSkill;
+use visual::VisualSkill;
+use word::WordSkill;
 
 /// The type of skill — affects display and feedback behavior.
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -117,5 +149,180 @@ impl SkillRegistry {
 impl Default for SkillRegistry {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+/// Build shared LLM runtime from config.
+pub fn build_runtime(config: &GzmoConfig) -> Arc<SkillRuntime> {
+    Arc::new(SkillRuntime::from_config(config))
+}
+
+/// Register the full pantheon of Rust-native skills (including `/help` last).
+pub fn register_pantheon(registry: &mut SkillRegistry, config: &GzmoConfig) {
+    let rt = build_runtime(config);
+
+    registry.register(Arc::new(DiceSkill));
+    registry.register(Arc::new(SoundSkill));
+    registry.register(Arc::new(PokerSkill));
+    registry.register(Arc::new(QuoteSkill));
+    registry.register(Arc::new(CalculateSkill));
+    registry.register(Arc::new(VisualSkill));
+    registry.register(Arc::new(StatusSkill {
+        config: config.clone(),
+    }));
+    registry.register(Arc::new(StabilizeSkill {
+        rt: Arc::clone(&rt),
+    }));
+
+    registry.register(Arc::new(JokeSkill {
+        rt: Arc::clone(&rt),
+    }));
+    registry.register(Arc::new(PoemSkill {
+        rt: Arc::clone(&rt),
+    }));
+    registry.register(Arc::new(WordSkill {
+        rt: Arc::clone(&rt),
+    }));
+    registry.register(Arc::new(StorySkill {
+        rt: Arc::clone(&rt),
+    }));
+    registry.register(Arc::new(DefineSkill {
+        rt: Arc::clone(&rt),
+    }));
+    registry.register(Arc::new(CardSkill {
+        rt: Arc::clone(&rt),
+    }));
+    registry.register(Arc::new(TransformSkill {
+        rt: Arc::clone(&rt),
+    }));
+    registry.register(Arc::new(LanguageSkill {
+        rt: Arc::clone(&rt),
+    }));
+
+    let help_entries: Vec<(String, String, &'static str)> = registry
+        .all()
+        .iter()
+        .map(|s| {
+            let type_label = match s.skill_type() {
+                SkillType::Mechanical => "mechanical",
+                SkillType::Generative => "generative",
+                SkillType::Mutation => "mutation",
+                SkillType::Info => "info",
+            };
+            (s.name().to_string(), s.description().to_string(), type_label)
+        })
+        .collect();
+    registry.register(Arc::new(HelpSkill { entries: help_entries }));
+}
+
+#[cfg(test)]
+mod skill_smoke {
+    use super::*;
+    use futures_util::FutureExt;
+    use gzmo_chaos::pulse::ChaosSnapshot;
+    use std::panic::AssertUnwindSafe;
+    use std::path::PathBuf;
+
+    fn test_config() -> GzmoConfig {
+        let mut config = GzmoConfig::default();
+        // Anchor to repo skills/ regardless of cargo package cwd.
+        let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("..").join("skills");
+        config.skills.directory = root.canonicalize().unwrap_or(root);
+        config
+    }
+
+    async fn exec_catch(
+        reg: &SkillRegistry,
+        snap: &ChaosSnapshot,
+        tx: &mpsc::Sender<ChaosEvent>,
+        name: &str,
+        args: &str,
+    ) {
+        let ctx = SkillContext {
+            chaos: snap,
+            feedback_tx: tx,
+            args,
+        };
+        let fut = reg.get(name).expect(name).execute(ctx);
+        match AssertUnwindSafe(fut).catch_unwind().await {
+            Ok(Ok(_)) => {}
+            Ok(Err(e)) => panic!("skill /{name} returned Err: {e}"),
+            Err(payload) => {
+                let msg = payload
+                    .downcast_ref::<String>()
+                    .map(|s| s.as_str())
+                    .or_else(|| payload.downcast_ref::<&str>().copied())
+                    .unwrap_or("non-string panic");
+                panic!("skill /{name} PANICKED: {msg}");
+            }
+        }
+    }
+
+    #[tokio::test]
+    async fn mechanical_skills_do_not_panic() {
+        let config = test_config();
+        let mut reg = SkillRegistry::new();
+        register_pantheon(&mut reg, &config);
+        let (tx, mut rx) = mpsc::channel(64);
+        tokio::spawn(async move { while rx.recv().await.is_some() {} });
+
+        let mut snap = ChaosSnapshot::default();
+        snap.tick = 42;
+        snap.x = -12.3;
+        snap.y = 18.7;
+        snap.z = 27.1;
+        snap.chaos_val = 0.73;
+        snap.tension = 55.0;
+        snap.energy = 80.0;
+
+        for (name, args) in [
+            ("dice", ""),
+            ("dice", "d6"),
+            ("poker", ""),
+            ("quote", ""),
+            ("sound", ""),
+            ("calculate", "2+2"),
+            ("help", ""),
+            ("stabilize", ""),
+            ("language", ""),
+            ("language", "de"),
+            ("transform", ""),
+            ("status", ""),
+            ("visual", "lorenz"),
+        ] {
+            exec_catch(&reg, &snap, &tx, name, args).await;
+        }
+    }
+
+    #[tokio::test]
+    async fn generative_skills_do_not_panic() {
+        let config = test_config();
+        // Point LLM at live prime if available
+        let mut config = config;
+        if let Ok(url) = std::env::var("GZMO_LLM_URL") {
+            let _ = url;
+        }
+        // Force SkillRuntime via env
+        std::env::set_var("GZMO_LLM_URL", "http://127.0.0.1:8000/v1");
+        let mut reg = SkillRegistry::new();
+        register_pantheon(&mut reg, &config);
+        let (tx, mut rx) = mpsc::channel(64);
+        tokio::spawn(async move { while rx.recv().await.is_some() {} });
+        let mut snap = ChaosSnapshot::default();
+        snap.chaos_val = 0.42;
+        snap.x = 1.0;
+        snap.y = 2.0;
+        snap.z = 30.0;
+        for (name, args) in [
+            ("joke", ""),
+            ("poem", ""),
+            ("word", ""),
+            ("story", ""),
+            ("define", "attractor"),
+            ("card", ""),
+            ("transform", "Batman"),
+        ] {
+            exec_catch(&reg, &snap, &tx, name, args).await;
+        }
     }
 }

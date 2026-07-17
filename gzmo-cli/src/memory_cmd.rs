@@ -14,8 +14,12 @@ const USAGE: &str =
      gzmo memory status [--session ID] [--json]\n  \
      gzmo memory turn-start [--session ID]\n  \
      gzmo memory chain <fact-id>\n  \
+     gzmo memory embed [limit]\n  \
+     gzmo memory promote [limit]\n  \
+     gzmo memory mcp\n  \
      \n\
      Session: --session or GZMO_SESSION_ID env.\n\
+     MCP: `gzmo memory mcp` == `gzmo mcp-serve` (third surface, ADR-0003).\n\
      See docs/ARCHITECTURE_GZMO_PLATFORM.md";
 
 
@@ -80,8 +84,13 @@ pub async fn run(config: &GzmoConfig, subargs: Vec<String>) -> Result<()> {
                 println!("{}", serde_json::to_string_pretty(&st)?);
             } else {
                 println!(
-                    "session={} vault_facts={} scratch={} has_recall={}",
-                    st.session_id, st.vault_facts, st.scratch_backend, st.scratch_has_recall
+                    "session={} vault={} facts={} honeypot={} scratch={} has_recall={}",
+                    st.session_id,
+                    st.vault_path,
+                    st.vault_facts,
+                    st.honeypot_latest,
+                    st.scratch_backend,
+                    st.scratch_has_recall
                 );
             }
         }

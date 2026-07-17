@@ -130,6 +130,12 @@ fn is_command_allowed(command: &str) -> bool {
     false
 }
 
+/// Host mutation binaries blocked when `read_only` is set (reviewer profile).
+const READ_ONLY_BLOCKED: &[&str] = &[
+    "rm", "mv", "cp", "truncate", "dd", "chmod", "chown", "mkdir", "touch", "rmdir",
+    "kill", "killall", "pkill", "systemctl", "sudo",
+];
+
 /// Execute a shell command on the host.
 /// Captures stdout + stderr with a timeout to prevent runaway processes.
 pub struct ShellExecTool {
@@ -137,6 +143,8 @@ pub struct ShellExecTool {
     pub timeout: Duration,
     /// Working directory for commands
     pub cwd: Option<String>,
+    /// When true, block filesystem-mutating binaries (reviewer profile).
+    pub read_only: bool,
 }
 
 impl Default for ShellExecTool {
@@ -144,6 +152,7 @@ impl Default for ShellExecTool {
         Self {
             timeout: Duration::from_secs(30),
             cwd: None,
+            read_only: false,
         }
     }
 }
@@ -154,8 +163,8 @@ impl ToolHandler for ShellExecTool {
         ToolDef {
             name: "shell_exec".to_string(),
             description: "Execute a shell command and return stdout/stderr. Timeout: 30s. \
-                `bash` and `.sh` scripts are allowed. Prefer `/status` or \
-                `gzmo status` for ecosystem overview instead of ad-hoc shell probes.".to_string(),
+                `bash` and `.sh` scripts are allowed. Prefer the `ecosystem_status` tool \
+                for stack/overnight overview instead of ad-hoc shell probes.".to_string(),
             parameters: json!({
                 "type": "object",
                 "properties": {
@@ -178,15 +187,21 @@ impl ToolHandler for ShellExecTool {
         let first_token = first_command_token(command);
         let binary_name = command_binary_name(first_token);
 
+        if self.read_only && READ_ONLY_BLOCKED.contains(&binary_name) {
+            return Ok(format!(
+                "ERROR: Command blocked (binary '{binary_name}' not allowed in read_only shell profile)."
+            ));
+        }
+
         if !is_command_allowed(command) {
             tracing::debug!(command = %command, binary = %binary_name, "Blocked: not in allowlist");
             let hint = match binary_name {
-                "status" => " Use `/status` in chat or `gzmo status` on the CLI.",
+                "status" => " Use the `ecosystem_status` tool (not a shell binary).",
                 "bash" => " Use `bash path/to/script.sh` or `./path/to/script.sh`.",
                 "systemctl" | "journalctl" | "sudo" => {
                     " Blocked in GZMO-next strict shell — run manually on the host."
                 }
-                _ => " For a full stack snapshot, use `/status` instead of many shell probes.",
+                _ => " For a full stack snapshot, call the `ecosystem_status` tool.",
             };
             return Ok(format!(
                 "ERROR: Command blocked (binary '{binary_name}' not in allowlist).{hint} \

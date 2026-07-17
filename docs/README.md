@@ -6,10 +6,14 @@ Canonical operator and architecture docs. Session reports and milestone logs bel
 
 | Doc | Purpose |
 |-----|---------|
+| [PRODUCT_MCP.md](PRODUCT_MCP.md) | **Outsider product** — Cursor/Pi local memory MCP (`gzmo init`) |
+| [../README.md](../README.md) | Public product README (MCP-first) |
 | [../MACHINE.md](../MACHINE.md) | What GZMO is (two sentences) |
-| [ROADMAP_TO_M5.md](ROADMAP_TO_M5.md) | Milestone roadmap |
-| [INFRASTRUCTURE_OVERVIEW.md](INFRASTRUCTURE_OVERVIEW.md) | Stack topology, ports, runbook |
+| [ROADMAP_TO_M5.md](ROADMAP_TO_M5.md) | Milestone roadmap (operator) |
+| [INFRASTRUCTURE_OVERVIEW.md](INFRASTRUCTURE_OVERVIEW.md) | Living stack topology, ports, runbook |
 | [PRODUCTION_READINESS.md](PRODUCTION_READINESS.md) | Production gate checklist |
+
+Product non-goals (v1): multi-host living install, overnight serve as required path, SEIP scaffolding, cloud memory SaaS.
 
 ## Architecture
 

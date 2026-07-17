@@ -10,7 +10,6 @@ use gzmo_core::gateway::LlmGateway;
 use gzmo_core::gateway::GatewayRouter;
 use gzmo_core::config::TaskKind;
 use gzmo_core::synapse::set_event_source;
-use gzmo_core::identity::IdentityEngine;
 use gzmo_core::memory::episodic::FileEpisodicStore;
 use gzmo_core::memory::embeddings;
 use gzmo_core::session_distill::SessionDistillEngine;
@@ -24,7 +23,7 @@ use gzmo_core::tools::ToolRegistry;
 
 use crate::cli_mcp::McpSession;
 
-pub async fn run(config: &GzmoConfig, _identity: &IdentityEngine, session_id: Option<String>) -> Result<()> {
+pub async fn run(config: &GzmoConfig, session_id: Option<String>) -> Result<()> {
     info!("╔══════════════════════════════════════════════╗");
     info!("║       GZMO — Session Distill (→ dream)       ║");
     info!("╚══════════════════════════════════════════════╝");
@@ -59,10 +58,10 @@ pub async fn run(config: &GzmoConfig, _identity: &IdentityEngine, session_id: Op
     );
 
     let mut tools = ToolRegistry::new();
-    tools.register(Box::new(FileReadTool));
-    tools.register(Box::new(FileWriteTool));
-    tools.register(Box::new(DirListTool));
-    tools.register(Box::new(FileSearchTool));
+    tools.register(Box::new(FileReadTool::default()));
+    tools.register(Box::new(FileWriteTool::default()));
+    tools.register(Box::new(DirListTool::default()));
+    tools.register(Box::new(FileSearchTool::default()));
     tools.register(Box::new(ShellExecTool::default()));
     tools.register(Box::new(WebSearchTool::default()));
     tools.register(Box::new(SysMetricsTool));

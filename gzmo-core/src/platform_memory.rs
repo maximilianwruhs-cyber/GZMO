@@ -1,5 +1,6 @@
 //! Frontend-facing memory API (`gzmo_memory_*`) — same hot/cold path as [`AgentSession`].
 
+use std::path::Path;
 use std::sync::Arc;
 
 use anyhow::{anyhow, Result};
@@ -21,6 +22,7 @@ use crate::tools::{ToolDef, ToolHandler};
 pub struct PlatformMemory {
     pub vault: Arc<SqliteVault>,
     pub session: AgentSession,
+    vault_path: String,
     platform_search: PlatformSearchConfig,
     qdrant: QdrantConfig,
     embeddings: EmbeddingsConfig,
@@ -53,9 +55,35 @@ pub struct MemorySearchResult {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MemoryStatusReport {
     pub session_id: String,
+    pub vault_path: String,
     pub vault_facts: usize,
+    pub honeypot_latest: usize,
     pub scratch_backend: String,
     pub scratch_has_recall: bool,
+}
+
+/// Living vault floor. Lab/product/empty vaults use `GZMO_ALLOW_LAB_VAULT`,
+/// `GZMO_PRODUCT`, or a path under `~/.gzmo/`.
+pub const LIVING_VAULT_MIN_FACTS: usize = 10_000;
+
+fn env_flag_true(name: &str) -> bool {
+    std::env::var(name)
+        .map(|v| v == "1" || v.eq_ignore_ascii_case("true"))
+        .unwrap_or(false)
+}
+
+/// Product (`gzmo init` → ~/.gzmo) and explicit lab flags may attach small vaults.
+fn allow_lab_or_product_vault(vault_path: &Path) -> bool {
+    if env_flag_true("GZMO_ALLOW_LAB_VAULT") || env_flag_true("GZMO_PRODUCT") {
+        return true;
+    }
+    if let Some(home) = std::env::var_os("HOME") {
+        let product_root = Path::new(&home).join(".gzmo");
+        if vault_path.starts_with(&product_root) {
+            return true;
+        }
+    }
+    false
 }
 
 impl PlatformMemory {
@@ -64,6 +92,7 @@ impl PlatformMemory {
         Self {
             vault,
             session,
+            vault_path: "(bound)".into(),
             platform_search: PlatformSearchConfig::default(),
             qdrant: QdrantConfig::default(),
             embeddings: EmbeddingsConfig::default(),
@@ -89,12 +118,24 @@ impl PlatformMemory {
         )
         .await?;
 
+        let facts = vault.count().unwrap_or(0);
+        let allow_lab = allow_lab_or_product_vault(&config.memory.vault_db);
+        if facts < LIVING_VAULT_MIN_FACTS && !allow_lab {
+            anyhow::bail!(
+                "refusing vault attach: {} has only {facts} facts (need ≥{LIVING_VAULT_MIN_FACTS} \
+                 for living instance). Point GZMO_CONFIG at the living vault, set \
+                 GZMO_ALLOW_LAB_VAULT=1 / GZMO_PRODUCT=1, or run `gzmo init` (~/.gzmo).",
+                config.memory.vault_db.display()
+            );
+        }
+
         let session =
             AgentSession::new_main(&config.redis, &config.context_memory, sid).await;
 
         Ok(Self {
             vault: Arc::new(vault),
             session,
+            vault_path: config.memory.vault_db.display().to_string(),
             platform_search: config.platform_search.clone(),
             qdrant: config.qdrant.clone(),
             embeddings: config.embeddings.clone(),
@@ -180,6 +221,7 @@ impl PlatformMemory {
 
     pub async fn status(&self) -> Result<MemoryStatusReport> {
         let vault_facts = self.vault.count().unwrap_or(0);
+        let honeypot_latest = self.vault.count_honeypot_latest().unwrap_or(0);
         let scratch_backend = if self.session.uses_redis() {
             if self.session.scratch().redis_live().await {
                 "redis"
@@ -199,10 +241,17 @@ impl PlatformMemory {
 
         Ok(MemoryStatusReport {
             session_id: self.session.session_id().to_string(),
+            vault_path: self.vault_path.clone(),
             vault_facts,
+            honeypot_latest,
             scratch_backend: scratch_backend.to_string(),
             scratch_has_recall,
         })
+    }
+
+    /// Provenance / supersession chain for a honeypot fact id.
+    pub fn memory_chain(&self, fact_id: &str) -> Result<Vec<(String, bool, Option<String>)>> {
+        self.vault.get_memory_chain(fact_id)
     }
 }
 

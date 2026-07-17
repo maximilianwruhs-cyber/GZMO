@@ -31,6 +31,8 @@ The LLM **thinks** (extract, verify, dream). The pipeline **remembers**.
 - Not a Telegram/OpenClaw product track (historical only).
 - Not “ingest all Takeout now.”
 - Not Mem0/Zep/Supermemory reimplemented — those are patterns to borrow later.
+- Not a Foundry/Gotham (SEIP) platform — that research stays outside this repo.
+- For outsiders, the downloadable product is **local memory MCP** (`gzmo init` + `gzmo mcp-serve`), not the private living stack. See [docs/PRODUCT_MCP.md](docs/PRODUCT_MCP.md).
 
 ---
 

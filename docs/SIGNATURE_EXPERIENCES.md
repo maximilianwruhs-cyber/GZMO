@@ -72,19 +72,19 @@
 
 ---
 
-## Experience E — Mentor Hour (lab-only, ADR-0002)
+## Experience E — Mentor Hour (weekly cron + manual, ADR-0002)
 
-**One week story:** Once a week you deliberately run pedagogy. The machine tutors inside a ZPD — not overnight cron.
+**One week story:** Sunday cron (or a deliberate assemble) runs pedagogy. The machine tutors inside a ZPD.
 
 | Field | Detail |
 |-------|--------|
-| **Trigger** | Manual `gzmo assemble pedagogy --live` (or fixture first) |
+| **Trigger** | `gzmo-scheduler` Sun 06:00 UTC **or** manual `gzmo assemble pedagogy --live` (fixture first) |
 | **Pieces** | **zpd-tutor** → pedagogy-bench → skill-patch |
-| **Artifacts** | `SessionReport`, pedagogy-smoke-meta |
-| **Surface** | CLI only (by design); document as mentor ritual in SOUL-next heuristics |
-| **You know it worked when…** | Session report shows level movement inside `zpd_range`; no scheduler job exists for pedagogy |
+| **Artifacts** | `SessionReport`, `data-next/pedagogy-smoke-meta.json` |
+| **Surface** | CLI + scheduler-runs; SOUL-next heuristics |
+| **You know it worked when…** | Session report shows level movement inside `zpd_range`; Sun job in `data-next/scheduler-runs/` |
 
-**Boundary:** Do not add pedagogy to `gzmo-scheduler` without ADR amendment + beat-gate.
+**Boundary:** PulseLoop / dice-scheduler stay off thin scheduler. Cabinet is a separate Sun 06:30 one-shot (`cabinet-feed.sh`), not a continuous chaos daemon.
 
 ---
 

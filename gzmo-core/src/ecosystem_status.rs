@@ -153,7 +153,7 @@ pub async fn format_ecosystem_status(config: &GzmoConfig) -> String {
 
     let prime = user_systemd_unit("llama-prime.service").await;
     let scheduler = user_systemd_unit("gzmo-scheduler.service").await;
-    let observatory = user_systemd_unit("gzmo-observatory.service").await;
+    let observatory = user_systemd_unit("okforge.service").await;
 
     let probes = collect_health_probes(config, None).await;
 
@@ -173,12 +173,106 @@ pub async fn format_ecosystem_status(config: &GzmoConfig) -> String {
         assembly_summary(&config.assembly)
     ));
 
+    // Workflow skills + latest handoff (interactive coding power)
+    out.push_str("### Workflow skills\n\n");
+    if config.workflow_skills.enabled {
+        let wf_dir = &config.workflow_skills.dir;
+        let loaded = crate::workflow_skills::WorkflowSkillIndex::load_from_dir(
+            wf_dir,
+            config.workflow_skills.max_active,
+            config.workflow_skills.model_can_activate,
+            &config.workflow_skills.handoff_dir,
+        )
+        .ok();
+        match loaded {
+            Some(idx) if !idx.is_empty() => {
+                out.push_str(&format!(
+                    "- **Pack:** `{}` — {}\n",
+                    wf_dir.display(),
+                    idx.names().join(", ")
+                ));
+                if let Some(h) = idx.latest_handoff() {
+                    out.push_str(&format!("- **Latest handoff:** `{}`\n", h.display()));
+                } else {
+                    out.push_str(&format!(
+                        "- **Handoff dir:** `{}` (empty)\n",
+                        config.workflow_skills.handoff_dir.display()
+                    ));
+                }
+            }
+            _ => {
+                out.push_str(&format!(
+                    "- **Pack:** `{}` (enabled, no SKILL.md found)\n",
+                    wf_dir.display()
+                ));
+            }
+        }
+    } else {
+        out.push_str("- **Pack:** disabled (`[workflow_skills] enabled = false`)\n");
+    }
+    out.push_str(&format!(
+        "- **Tool profile:** `{}` (audit={})\n\n",
+        config.tools.profile, config.tools.audit
+    ));
+
+    out.push_str(&crate::metabolism::format_overnight_metabolism(config));
+
     out.push_str("### User systemd\n\n");
     out.push_str("| Unit | State |\n|---|---|\n");
     out.push_str(&format!("| llama-prime.service | {prime} |\n"));
+    let serve = user_systemd_unit("gzmo-serve.service").await;
+    out.push_str(&format!("| gzmo-serve.service | {serve} |\n"));
     out.push_str(&format!("| gzmo-scheduler.service | {scheduler} |\n"));
-    out.push_str(&format!("| gzmo-observatory.service | {observatory} |\n"));
-    out.push_str("\n*Foreground `gzmo chat` is not the scheduler daemon — use the table above for long-running services.*\n\n");
+    out.push_str(&format!("| okforge.service (/observatory) | {observatory} |\n"));
+    out.push_str("\n*Metabolism: `gzmo serve` (typed jobs). Lab parity: `gzmo-scheduler`. Chat is not a daemon.*\n\n");
+
+    // Wiki / OKForge plane (production signal)
+    let wiki_meta = config
+        .memory
+        .vault_db
+        .parent()
+        .map(|p| p.join("wiki-push-latest.json"))
+        .unwrap_or_else(|| std::path::PathBuf::from("wiki-push-latest.json"));
+    let wiki_line = match std::fs::read_to_string(&wiki_meta) {
+        Ok(raw) => match serde_json::from_str::<serde_json::Value>(&raw) {
+            Ok(v) => {
+                let healthy = v.get("healthy").and_then(|x| x.as_bool());
+                let sha = v
+                    .get("commit_sha")
+                    .and_then(|x| x.as_str())
+                    .unwrap_or("")
+                    .chars()
+                    .take(12)
+                    .collect::<String>();
+                let n = v
+                    .get("concepts_written")
+                    .and_then(|x| x.as_u64())
+                    .unwrap_or(0);
+                match healthy {
+                    Some(true) => format!("healthy · {n} concepts · sha {sha}"),
+                    Some(false) => format!(
+                        "UNHEALTHY · {}",
+                        v.get("error")
+                            .and_then(|x| x.as_str())
+                            .or_else(|| v.get("skipped_reason").and_then(|x| x.as_str()))
+                            .unwrap_or("see wiki-push-latest.json")
+                    ),
+                    None => {
+                        if sha.is_empty() {
+                            "meta present (no healthy flag)".into()
+                        } else {
+                            format!("ok · {n} concepts · sha {sha}")
+                        }
+                    }
+                }
+            }
+            Err(_) => "meta unreadable".into(),
+        },
+        Err(_) => "no wiki-push-latest.json yet".into(),
+    };
+    out.push_str("### OKForge wiki plane\n\n");
+    out.push_str(&format!("- **Observatory:** http://127.0.0.1:3000/observatory\n"));
+    out.push_str(&format!("- **Last wiki push:** {wiki_line}\n\n"));
 
     out.push_str("### Data paths (from config)\n\n");
     out.push_str("| Component | Path | Status |\n|---|---|---|\n");
@@ -286,13 +380,75 @@ pub async fn format_ecosystem_status(config: &GzmoConfig) -> String {
         }
     }
 
+    // Dream / graph drift (Experience A — dream-stats + ledger)
+    let data_dir = config.memory.vault_db.parent();
+    if let Some(dir) = data_dir {
+        let stats_path = dir.join("dream-stats.json");
+        let ledger_path = dir.join("graph-ledger.jsonl");
+        if stats_path.exists() || ledger_path.exists() {
+            out.push_str("### Graph drift\n\n");
+            if stats_path.exists() {
+                if let Ok(raw) = std::fs::read_to_string(&stats_path) {
+                    if let Ok(v) = serde_json::from_str::<serde_json::Value>(&raw) {
+                        let anomaly = v
+                            .get("anomaly_count")
+                            .and_then(|x| x.as_u64())
+                            .unwrap_or(0);
+                        let rem = v
+                            .get("rem_anchors")
+                            .and_then(|x| x.as_u64())
+                            .unwrap_or(0);
+                        let ledger_art = v
+                            .get("graph_ledger_artifact")
+                            .and_then(|x| x.as_str())
+                            .unwrap_or("-");
+                        out.push_str(&format!("- **anomaly_count:** {anomaly}\n"));
+                        out.push_str(&format!("- **rem_anchors:** {rem}\n"));
+                        out.push_str(&format!("- **dream-stats:** `{}`\n", stats_path.display()));
+                        out.push_str(&format!("- **ledger (stats):** `{ledger_art}`\n"));
+                    }
+                }
+            } else {
+                out.push_str(&format!(
+                    "- **dream-stats:** missing (`{}`)\n",
+                    stats_path.display()
+                ));
+            }
+            if ledger_path.exists() {
+                let mtime = std::fs::metadata(&ledger_path)
+                    .and_then(|m| m.modified())
+                    .ok()
+                    .map(|t| {
+                        chrono::DateTime::<chrono::Utc>::from(t)
+                            .format("%Y-%m-%d %H:%M UTC")
+                            .to_string()
+                    });
+                out.push_str(&format!(
+                    "- **ledger path:** `{}`{}\n",
+                    ledger_path.display(),
+                    mtime
+                        .map(|t| format!(" (mtime {t})"))
+                        .unwrap_or_default()
+                ));
+            } else {
+                out.push_str(&format!(
+                    "- **ledger path:** missing (`{}`)\n",
+                    ledger_path.display()
+                ));
+            }
+            out.push('\n');
+        }
+    }
+
     out.push_str("### Probes\n\n");
     for r in &probes {
         out.push_str(&probe_line(r));
         out.push('\n');
     }
 
-    out.push_str("\n*Report from `ecosystem_status` — run `/status` in chat or `gzmo status` on CLI.*\n");
+    out.push_str(
+        "\n*Report from `ecosystem_status` tool — operators can also use `/status` or `gzmo status`.*\n",
+    );
     out
 }
 

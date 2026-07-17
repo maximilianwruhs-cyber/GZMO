@@ -1,0 +1,17 @@
+[Unit]
+Description=CT101 living product smoke (local)
+After=gzmo-daemon.service docker.service
+Wants=gzmo-daemon.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/gzmo
+Environment=GZMO_CONFIG=/opt/gzmo/gzmo.toml
+Environment=CT101_GZMO_BIN=/opt/gzmo/current/target/release/gzmo
+ExecStart=/bin/bash /opt/gzmo/current/scripts/ct101-living-smoke-local.sh
+# Keep last result in journal
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

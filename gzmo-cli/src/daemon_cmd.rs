@@ -41,6 +41,8 @@ use gzmo_core::tools::sysadmin::{SysMetricsTool, SysKillTool};
 use gzmo_core::tools::web::WebSearchTool;
 use gzmo_core::tools::memory::{MemoryRecordTool, MemorySearchTool};
 
+use crate::mentor_ipc::{self, MentorServerState};
+
 /// Run a lab recipe off the async runtime (recipes can take minutes).
 async fn run_lab_script_blocking(script: &'static str, args: Vec<String>) -> Result<()> {
     tokio::task::spawn_blocking(move || {
@@ -158,10 +160,10 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
     }));
 
     let mut dream_tools = ToolRegistry::new();
-    dream_tools.register(Box::new(FileReadTool));
-    dream_tools.register(Box::new(FileWriteTool));
-    dream_tools.register(Box::new(DirListTool));
-    dream_tools.register(Box::new(FileSearchTool));
+    dream_tools.register(Box::new(FileReadTool::default()));
+    dream_tools.register(Box::new(FileWriteTool::default()));
+    dream_tools.register(Box::new(DirListTool::default()));
+    dream_tools.register(Box::new(FileSearchTool::default()));
     dream_tools.register(Box::new(ShellExecTool::default()));
     dream_tools.register(Box::new(WebSearchTool::default()));
     dream_tools.register(Box::new(SysMetricsTool));
@@ -293,23 +295,71 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
         )
         .with_wiki(config.wiki.clone()),
     );
-    // ─── Chaos Engine ────────────────────────────────────────────
-    // Keep PulseHandle alive for the full daemon lifetime — Drop aborts the loop.
-    let chaos_runtime = crate::chaos_bootstrap::start_chaos_runtime(config);
-    let chaos_pulse = chaos_runtime.handle;
-    let gateway_rwlock = Arc::new(tokio::sync::RwLock::new(orch_gateway.clone()));
-    let state_dir = config.memory.vault_db.parent().unwrap_or(std::path::Path::new("data")).to_path_buf();
-    let _chaos_bridge = crate::chaos_bootstrap::spawn_snapshot_bridge(
-        chaos_pulse.snapshot_rx.clone(),
-        gateway_rwlock,
-        chaos_pulse.feedback_tx.clone(),
-        state_dir.clone(),
-        None,
-        Some(Arc::clone(&synapse)),
-        gzmo_core::synapse::EventSource::GzmoDaemon,
-        chaos_runtime.restore_policy.clone(),
-        false,
-    );
+    // ─── Chaos quarantined on daemon path (ADR-0003) ─────────────
+    // PulseLoop is chat-opt-in only. Prefer `gzmo serve` for overnight metabolism.
+    let state_dir = config
+        .memory
+        .vault_db
+        .parent()
+        .unwrap_or(std::path::Path::new("data"))
+        .to_path_buf();
+    info!("Chaos engine skipped on daemon — use [chaos].enabled_in_chat for chat only");
+
+    // ─── Mentor Unix socket (chaos-free) ─────────────────────────
+    // Living discovery / Pi teach path. Do not wire PulseLoop here.
+    // Dedicated OS thread + runtime: CT101 often has 1 tokio worker; dream/spark
+    // sync work would otherwise starve the accept loop (connect ok, never reply).
+    let mentor_thread = if config.pedagogy.enabled && config.pedagogy.mentor_api_enabled {
+        let mut mentor_config = config.clone();
+        mentor_config.pedagogy.active_learner_id =
+            Some(gzmo_core::config::PedagogyConfig::resolve_learner_id(None));
+        match MentorServerState::boot(&mentor_config).await {
+            Ok(state) => {
+                let mentor_socket = mentor_ipc::socket_path(&mentor_config);
+                info!(
+                    path = %mentor_socket.display(),
+                    "Starting mentor API (chaos-free, dedicated thread)"
+                );
+                let state = Arc::new(state);
+                match std::thread::Builder::new()
+                    .name("gzmo-mentor".into())
+                    .spawn(move || {
+                        let rt = match tokio::runtime::Builder::new_multi_thread()
+                            .worker_threads(2)
+                            .thread_name("gzmo-mentor-rt")
+                            .enable_all()
+                            .build()
+                        {
+                            Ok(rt) => rt,
+                            Err(e) => {
+                                error!("Mentor runtime build failed: {e}");
+                                return;
+                            }
+                        };
+                        rt.block_on(async move {
+                            if let Err(e) =
+                                mentor_ipc::run_mentor_server(state, mentor_socket).await
+                            {
+                                error!("Mentor API exited: {e}");
+                            }
+                        });
+                    }) {
+                    Ok(join) => Some(join),
+                    Err(e) => {
+                        error!("Mentor thread spawn failed: {e}");
+                        None
+                    }
+                }
+            }
+            Err(e) => {
+                error!("Mentor API failed to boot: {e}");
+                None
+            }
+        }
+    } else {
+        info!("Mentor API disabled in [pedagogy] config");
+        None
+    };
 
     info!("All subsystems online — entering daemon loop");
 
@@ -323,7 +373,7 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
         ),
         vault: Some(Arc::clone(&dream_vault)),
         episodic: Some(Arc::clone(&dream_episodic)),
-        chaos_feedback_tx: Some(chaos_pulse.feedback_tx.clone()),
+        chaos_feedback_tx: None,
         ingest_engine: if config.ingest.enabled {
             Some(Arc::clone(&ingest_engine))
         } else {
@@ -1057,8 +1107,7 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
     });
 
     let _identity = identity;
-    // Pin PulseLoop task — must not drop until daemon exits.
-    let _chaos_pulse_keepalive = chaos_pulse;
+    let _mentor_thread = mentor_thread;
 
     tokio::select! {
         _ = heartbeat_handle => error!("Heartbeat exited"),

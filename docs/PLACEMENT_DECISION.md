@@ -1,28 +1,44 @@
 # GZMO Daemon Placement Decision
 
 **Date:** 2026-07-08  
-**Status:** Accepted (amended 2026-07-15)  
+**Status:** Accepted (amended 2026-07-15; **restored CT101 living 2026-07-17**)  
 **Decision (2026-07-08):** Keep Rust `gzmo-daemon` on CT101.  
-**Decision (2026-07-15):** **GZMO-next production on the workstation** — `gzmo-scheduler` + `data-next/`; CT101 left untouched as parallel legacy.
+**Decision (2026-07-15):** GZMO-next production on the workstation — **superseded 2026-07-17**.  
+**Decision (2026-07-17):** **CT101 is again the sole living metabolism host**; workstation is operator + Prime fallback.
 
 ---
 
-## Amendment — 2026-07-15 (workstation promotion)
+## Amendment — 2026-07-17 (CT101 restore living)
 
-After CT101 disk I/O failure (2026-07-14), production cognition moved to the workstation:
+Reversed the 2026-07-15 workstation promotion. See [CT101_RESTORE_LIVING.md](./CT101_RESTORE_LIVING.md).
 
 | Component | Production host |
 |-----------|-----------------|
-| **GZMO-next scheduler** | Workstation user systemd (`gzmo-scheduler.service`) |
-| **Vault / sessions / dreams** | `github-clone/GZMO/data-next/` |
-| **Prime LLM** | Workstation `:8000` (`llama-prime.service`) |
-| **Qdrant + Redis** | Workstation user systemd (`gzmo-sidecar-*.service`) |
+| **Rust `gzmo-daemon` + vault** | **CT101** (`/opt/gzmo/`) |
+| **Redis / Qdrant / Neo4j** | **CT101** Docker sidecars |
+| **Overnight metabolism** | **CT101** `gzmo-daemon.service` only |
+| **Prime LLM** | Workstation `:8000` (cloud-first fallback for CT101) |
 | **Embeddings / rerank** | VM200 (`192.168.31.110`) |
-| **Librarian (session extract)** | Workstation Prime `:8000` (same as local engine) |
-| **Observatory** | Workstation `:7777` (`OBSERVATORY_MODE=local`) |
-| **CT101 legacy** | Unchanged — may run independently; not ops target |
+| **Operator CLI / Pi / Cursor** | Workstation |
+| **Workstation `gzmo-serve` / `data-next/`** | Lab/dev scratch — **disabled** overnight |
 
-See [GZMO_NEXT_RUNBOOK.md](./GZMO_NEXT_RUNBOOK.md) for env contract and S2 checklist.
+Do **not** re-enable workstation overnight units while CT101 is living.
+
+---
+
+## Amendment — 2026-07-15 (workstation promotion) — historical
+
+After CT101 disk I/O failure (2026-07-14), production cognition temporarily moved to the workstation. That placement was reversed on 2026-07-17.
+
+| Component | Host during 2026-07-15…16 |
+|-----------|-----------------|
+| **GZMO-next scheduler / serve** | Workstation user systemd |
+| **Vault / sessions / dreams** | `github-clone/GZMO/data-next/` |
+| **Prime LLM** | Workstation `:8000` |
+| **Qdrant + Redis** | Workstation user systemd |
+| **CT101** | Parallel / not ops target |
+
+See [GZMO_NEXT_RUNBOOK.md](./GZMO_NEXT_RUNBOOK.md) for lab env contract (not production).
 
 ---
 

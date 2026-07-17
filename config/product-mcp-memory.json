@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "gzmo-memory": {
+      "command": "GZMO_BIN",
+      "args": ["mcp-serve"],
+      "env": {
+        "GZMO_CONFIG": "GZMO_HOME/gzmo.toml",
+        "GZMO_ALLOW_LAB_VAULT": "1",
+        "GZMO_PRODUCT": "1"
+      }
+    }
+  }
+}

@@ -1,8 +1,10 @@
+use crate::config::GzmoConfig;
+use crate::ecosystem_status::format_ecosystem_status;
 use crate::tools::{ToolDef, ToolHandler};
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
-use sysinfo::{System, Disks};
+use sysinfo::{Disks, System};
 use tracing::{info, warn};
 
 // ============================================================================
@@ -88,7 +90,40 @@ impl ToolHandler for SysMetricsTool {
 }
 
 // ============================================================================
-// 2. SysKillTool
+// 2. EcosystemStatusTool — agent-callable equivalent of `/status`
+// ============================================================================
+
+/// Deterministic ecosystem snapshot (same report as operator `/status`).
+pub struct EcosystemStatusTool {
+    pub config: GzmoConfig,
+}
+
+#[async_trait]
+impl ToolHandler for EcosystemStatusTool {
+    fn definition(&self) -> ToolDef {
+        ToolDef {
+            name: "ecosystem_status".into(),
+            description: "Grounded GZMO ecosystem snapshot: config paths, systemd units, \
+                health probes, metabolism/overnight status, workflow skills. \
+                Prefer this over shell probes or inventing a `/status` slash command \
+                (slash commands are operator-only)."
+                .into(),
+            parameters: json!({
+                "type": "object",
+                "properties": {},
+                "required": []
+            }),
+        }
+    }
+
+    async fn execute(&self, _args: Value) -> anyhow::Result<String> {
+        info!("Executing ecosystem_status tool");
+        Ok(format_ecosystem_status(&self.config).await)
+    }
+}
+
+// ============================================================================
+// 3. SysKillTool
 // ============================================================================
 
 pub struct SysKillTool;

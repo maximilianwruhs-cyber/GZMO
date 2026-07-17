@@ -32,7 +32,7 @@
 | 80 | **Synapse Bus** | ✅ Production | ⚠️ Partial | No JSONL rotation script, no session pull loop |
 | 90 | **Tools & Skills** | ✅ Production | ⚠️ Partial | No Skill Discovery API, no Chat-Only Delegation |
 | 100 | **Discovery Automation** | ✅ Degraded | 🔴 Missing | No Auto-socratic Pi-Cycles, no Discovery Remediation Queue |
-| 110 | **External Nodes** | ✅ Production | ✅ Implemented | Prime + Observatory reachable |
+| 110 | **External Nodes** | ✅ Production | ✅ Implemented | Prime + OKForge Observatory (`:3000/observatory`) |
 | 120 | **Two-Stack Boundary** | ✅ Policy | ✅ Implemented | `assembly`-Guard enforced |
 
 ---
@@ -41,7 +41,7 @@
 
 | # | Enhancement | Recipe | Impact |
 |---|-------------|--------|--------|
-| 1 | **Wiki-Engine** | `wiki-smoke.sh` (emit + sync + lint) | Self-written OKF wiki layer, entity/source pages from verified facts |
+| 1 | **Wiki-Engine** | `wiki-okforge-push.sh` + `gzmo wiki push` | **Done (OKForge-backed)** — concepts land in `gzmo/gzmo-next-memory` after distill/dream/catch-up |
 | 2 | **Ingest-Engine** | `ingest-smoke.sh` | Knowledge-folder watcher, verified fact extraction, source page emission |
 | 3 | **Honeypot Promotion** | `promote-all-mature.py` cron | Move facts from vault → honeypot, enable semantic recall via Qdrant |
 | 4 | **KG Reconcile** | `kg-reconcile.sh` | Sync verified entities/relations from vault to Neo4j graph |
@@ -101,7 +101,7 @@
 | Dream Consolidation | ✅ Implemented | `session-to-dream.sh` batch + vault promotion |
 | Knowledge Graph | ❌ Empty | 0 entities, 0 relations — needs KG Reconcile |
 | Honeypot | ❌ Empty | No promotion pipeline |
-| Wiki | ❌ Not implemented | Missing recipe |
+| Wiki | ✅ OKForge | `backend = "okforge"` → `gzmo/gzmo-next-memory` |
 | Ingest | ❌ Disabled | `ingest.enabled = false` in config |
 | Chaos Engine | ❌ Not implemented | No pulse recipe |
 | Discovery | ❌ Not implemented | CT101-only feature |
