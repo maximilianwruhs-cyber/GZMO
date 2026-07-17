@@ -41,6 +41,8 @@ use gzmo_core::tools::sysadmin::{SysMetricsTool, SysKillTool};
 use gzmo_core::tools::web::WebSearchTool;
 use gzmo_core::tools::memory::{MemoryRecordTool, MemorySearchTool};
 
+use crate::mentor_ipc::{self, MentorServerState};
+
 /// Run a lab recipe off the async runtime (recipes can take minutes).
 async fn run_lab_script_blocking(script: &'static str, args: Vec<String>) -> Result<()> {
     tokio::task::spawn_blocking(move || {
@@ -302,6 +304,62 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
         .unwrap_or(std::path::Path::new("data"))
         .to_path_buf();
     info!("Chaos engine skipped on daemon — use [chaos].enabled_in_chat for chat only");
+
+    // ─── Mentor Unix socket (chaos-free) ─────────────────────────
+    // Living discovery / Pi teach path. Do not wire PulseLoop here.
+    // Dedicated OS thread + runtime: CT101 often has 1 tokio worker; dream/spark
+    // sync work would otherwise starve the accept loop (connect ok, never reply).
+    let mentor_thread = if config.pedagogy.enabled && config.pedagogy.mentor_api_enabled {
+        let mut mentor_config = config.clone();
+        mentor_config.pedagogy.active_learner_id =
+            Some(gzmo_core::config::PedagogyConfig::resolve_learner_id(None));
+        match MentorServerState::boot(&mentor_config).await {
+            Ok(state) => {
+                let mentor_socket = mentor_ipc::socket_path(&mentor_config);
+                info!(
+                    path = %mentor_socket.display(),
+                    "Starting mentor API (chaos-free, dedicated thread)"
+                );
+                let state = Arc::new(state);
+                match std::thread::Builder::new()
+                    .name("gzmo-mentor".into())
+                    .spawn(move || {
+                        let rt = match tokio::runtime::Builder::new_multi_thread()
+                            .worker_threads(2)
+                            .thread_name("gzmo-mentor-rt")
+                            .enable_all()
+                            .build()
+                        {
+                            Ok(rt) => rt,
+                            Err(e) => {
+                                error!("Mentor runtime build failed: {e}");
+                                return;
+                            }
+                        };
+                        rt.block_on(async move {
+                            if let Err(e) =
+                                mentor_ipc::run_mentor_server(state, mentor_socket).await
+                            {
+                                error!("Mentor API exited: {e}");
+                            }
+                        });
+                    }) {
+                    Ok(join) => Some(join),
+                    Err(e) => {
+                        error!("Mentor thread spawn failed: {e}");
+                        None
+                    }
+                }
+            }
+            Err(e) => {
+                error!("Mentor API failed to boot: {e}");
+                None
+            }
+        }
+    } else {
+        info!("Mentor API disabled in [pedagogy] config");
+        None
+    };
 
     info!("All subsystems online — entering daemon loop");
 
@@ -1049,6 +1107,7 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
     });
 
     let _identity = identity;
+    let _mentor_thread = mentor_thread;
 
     tokio::select! {
         _ = heartbeat_handle => error!("Heartbeat exited"),

@@ -1,6 +1,7 @@
 //! Headless mentor API — Unix socket NDJSON (`teach` / `ping` / `status`).
 //!
 //! Daemon listens; `gzmo mentor` is the client. One request per connection.
+//! Chaos / PulseLoop is intentionally not wired on the living daemon path.
 
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -8,18 +9,12 @@ use std::sync::Arc;
 use anyhow::{Context, Result, bail};
 use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
 use tokio::net::{UnixListener, UnixStream};
-use tokio::sync::{watch, Mutex, mpsc};
+use tokio::sync::Mutex;
 use tracing::{error, info, warn};
 
 use gzmo_core::config::{GzmoConfig, TaskKind};
-use gzmo_core::gateway::{GatewayRouter, LlmGateway};
+use gzmo_core::gateway::GatewayRouter;
 use gzmo_core::types::{Message, Role};
-
-use gzmo_chaos::feedback::ChaosEvent;
-use gzmo_chaos::feedback_ipc;
-use gzmo_chaos::pulse::ChaosSnapshot;
-use gzmo_core::pedagogy::orchestrator::chaos_teaching_context;
-use gzmo_core::skills::dispatch::{self, data_dir};
 
 use crate::pedagogy_bridge::{delegate_exec_response, should_delegate_exec, PedagogyRuntime};
 pub use gzmo_core::mentor_client::{
@@ -30,21 +25,12 @@ pub struct MentorServerState {
     pub config: Arc<GzmoConfig>,
     pub router: Arc<GatewayRouter>,
     pub pedagogy: Arc<Mutex<PedagogyRuntime>>,
-    pub tutor_gateway: Arc<dyn LlmGateway>,
-    pub chaos_feedback_tx: Option<mpsc::Sender<ChaosEvent>>,
-    pub chaos_snapshot_rx: Option<watch::Receiver<ChaosSnapshot>>,
+    pub tutor_gateway: Arc<dyn gzmo_core::gateway::LlmGateway>,
 }
 
 impl MentorServerState {
+    /// Boot mentor stack without chaos / PulseLoop (living CT101 path).
     pub async fn boot(config: &GzmoConfig) -> Result<Self> {
-        Self::boot_with_chaos(config, None, None).await
-    }
-
-    pub async fn boot_with_chaos(
-        config: &GzmoConfig,
-        chaos_feedback_tx: Option<mpsc::Sender<ChaosEvent>>,
-        chaos_snapshot_rx: Option<watch::Receiver<ChaosSnapshot>>,
-    ) -> Result<Self> {
         let router = Arc::new(GatewayRouter::new(config));
         let tutor_gateway = Arc::clone(router.gateway(TaskKind::Chat));
         let pedagogy = Arc::new(Mutex::new(PedagogyRuntime::boot(config).await?));
@@ -53,8 +39,6 @@ impl MentorServerState {
             router,
             pedagogy,
             tutor_gateway,
-            chaos_feedback_tx,
-            chaos_snapshot_rx,
         })
     }
 }
@@ -203,12 +187,14 @@ async fn reload_response(state: &Arc<MentorServerState>) -> MentorResponse {
 
 pub fn build_discovery_context(req: &MentorRequest) -> Option<String> {
     let pillar = req.discovery_pillar.as_deref()?.trim();
-    if pillar.is_empty() { return None; }
+    if pillar.is_empty() {
+        return None;
+    }
     let topic = req.learn_topic.as_deref().unwrap_or("");
     let probe = req.probe_context.as_deref().unwrap_or("");
     Some(format!(
         "pillar={pillar}; learn_topic={topic}; probe={probe}; \
-         soul=S chaos+pedagogy+honeypot; personality=A dreams+spark+synapse+wiki+personas+ops; \
+         soul=S pedagogy+honeypot; personality=A dreams+spark+synapse+wiki+ops; \
          body=B daemon+skills+ingest+distill+routing; skeleton=C health+tools+MCP+vector+systemd"
     ))
 }
@@ -230,7 +216,6 @@ async fn teach(req: &MentorRequest, state: &Arc<MentorServerState>) -> Result<Me
     }
 
     let messages = build_messages(&req.conversation, message);
-    let chaos_context = apply_chaos_snapshot_to_tutor(state);
     let discovery_context = build_discovery_context(req);
     let mentor_turn = pedagogy
         .maybe_teach(
@@ -239,31 +224,23 @@ async fn teach(req: &MentorRequest, state: &Arc<MentorServerState>) -> Result<Me
             state.tutor_gateway.as_ref(),
             message,
             &messages,
-            chaos_context.as_deref(),
+            None, // chaos_context — living path stays chaos-free
             discovery_context.as_deref(),
-            state.chaos_snapshot_rx.as_ref(),
+            None, // chaos_snapshot_rx
         )
         .await?;
 
     match mentor_turn {
-        Some(turn) => {
-            emit_mentor_chaos_feedback_state(
-                state,
-                message,
-                &turn.response,
-                req.conversation.len() as u32 + 1,
-            );
-            Ok(MentorResponse::teach_with_pedagogy(
-                turn.response,
-                learner_id,
-                &turn.edf_record,
-            ))
-        }
+        Some(turn) => Ok(MentorResponse::teach_with_pedagogy(
+            turn.response,
+            learner_id,
+            &turn.edf_record,
+        )),
         None => Ok(delegate_exec_response(message, &pedagogy.session, &learner_id)),
     }
 }
 
-/// Headless autonomous teach (daemon low-tension watcher).
+/// Headless autonomous teach (available for future low-tension watcher; unused now).
 pub async fn teach_autonomous(
     state: &Arc<MentorServerState>,
     message: &str,
@@ -330,64 +307,15 @@ fn build_messages(conversation: &[MentorTurn], user_message: &str) -> Vec<Messag
     messages
 }
 
-
+/// True when the living daemon PID file is present and the process is alive.
 pub fn daemon_running() -> bool {
-    dispatch::daemon_running()
-}
-
-fn apply_chaos_snapshot_to_tutor(state: &MentorServerState) -> Option<String> {
-    let rx = state.chaos_snapshot_rx.as_ref()?;
-    let snap = rx.borrow().clone();
-    state
-        .tutor_gateway
-        .set_chaos_overrides(snap.llm_temperature, snap.llm_max_tokens);
-    Some(chaos_teaching_context(&snap))
-}
-
-/// Perturb chaos after a mentor turn — direct tx when in-process, inbox when daemon-only.
-pub fn emit_mentor_chaos_feedback(
-    config: &GzmoConfig,
-    user_message: &str,
-    mentor_response: &str,
-    turn_count: u32,
-    chaos_feedback_tx: Option<mpsc::Sender<ChaosEvent>>,
-) {
-    let topic_preview: String = user_message.chars().take(120).collect();
-    let response_preview: String = mentor_response.chars().take(200).collect();
-    if response_preview.trim().is_empty() {
-        return;
-    }
-    let event = ChaosEvent::MentorTeach {
-        topic_preview,
-        response_preview,
-        turn_count,
+    let path = std::path::Path::new("/tmp/gzmo_rust.pid");
+    let Ok(raw) = std::fs::read_to_string(path) else {
+        return false;
     };
-
-    if let Some(tx) = chaos_feedback_tx {
-        tokio::spawn(async move {
-            let _ = tx.send(event).await;
-        });
-        return;
+    let pid = raw.trim();
+    if pid.is_empty() {
+        return false;
     }
-
-    if !daemon_running() {
-        return;
-    }
-    let inbox = feedback_ipc::default_inbox_path(data_dir(config));
-    let _ = feedback_ipc::append_event(&inbox, &event);
-}
-
-fn emit_mentor_chaos_feedback_state(
-    state: &MentorServerState,
-    user_message: &str,
-    mentor_response: &str,
-    turn_count: u32,
-) {
-    emit_mentor_chaos_feedback(
-        state.config.as_ref(),
-        user_message,
-        mentor_response,
-        turn_count,
-        state.chaos_feedback_tx.clone(),
-    );
+    std::path::Path::new("/proc").join(pid).exists()
 }

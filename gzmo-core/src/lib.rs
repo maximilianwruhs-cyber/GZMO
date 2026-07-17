@@ -32,6 +32,8 @@ pub mod okforge_client;
 pub mod wiki_okf;
 pub mod session_distill;
 pub mod mcp;
+pub mod mentor_client;
+pub mod pedagogy;
 pub mod stealth;
 pub mod orchestrator;
 pub mod watcher;

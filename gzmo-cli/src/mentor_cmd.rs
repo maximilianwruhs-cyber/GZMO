@@ -24,13 +24,9 @@ pub async fn run(config: &GzmoConfig, args: &[String]) -> Result<()> {
             let req = parse_teach_request(&args[1..])?;
             run_teach_request(config, req).await
         }
-        "compute" => {
-            crate::mentor_compute_cmd::run(config, &args[1..]).await
-        }
-        "plot" => {
-            crate::mentor_plot_cmd::run(config, &args[1..]).await
-        }
-        _ => bail!("Usage: gzmo mentor <ping|status|reload|teach [message]|teach --json-file path|compute [expression]|plot [expression]>"),
+        _ => bail!(
+            "Usage: gzmo mentor <ping|status|reload|teach [message]|teach --json-file path>"
+        ),
     }
 }
 

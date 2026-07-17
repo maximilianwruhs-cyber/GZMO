@@ -11,8 +11,13 @@ pub mod web;
 pub mod web_browse;
 pub mod memory;
 pub mod delegate;
+pub mod python_sandbox;
+pub mod pedagogy_tools;
+pub mod learner;
+pub mod geogebra;
 
 pub use delegate::DelegateTaskTool;
+pub use python_sandbox::PythonSandboxTool;
 pub use jail::PathJail;
 pub use profile::{register_for_profile, CapabilityProfile, ToolRegisterOpts};
 

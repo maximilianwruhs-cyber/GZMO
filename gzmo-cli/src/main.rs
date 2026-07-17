@@ -9,6 +9,9 @@ mod chaos_bootstrap;
 mod cli_mcp;
 mod config_cmd;
 mod daemon_cmd;
+mod mentor_ipc;
+mod mentor_cmd;
+mod pedagogy_bridge;
 mod dream_cmd;
 mod spark_cmd;
 mod status_cmd;
@@ -76,12 +79,17 @@ enum Command {
     KgReconcile(Vec<String>),
     /// Run a Little Tools Lab assembly recipe (shells out to little-tools-lab/scripts).
     Assemble { recipe: String, fixture: bool, apply: bool },
+    /// Headless mentor API client (`gzmo mentor ping|status|teach`).
+    Mentor(Vec<String>),
 }
 
 fn parse_args() -> Command {
     let args: Vec<String> = std::env::args().collect();
     if args.len() >= 2 {
         if args[1] == "daemon" { return Command::Daemon; }
+        if args[1] == "mentor" {
+            return Command::Mentor(args.get(2..).unwrap_or(&[]).to_vec());
+        }
         if args[1] == "serve" { return Command::Serve; }
         if args[1] == "init" { return Command::Init; }
         if args[1] == "--repl" { return Command::ChatRepl; }
@@ -213,6 +221,7 @@ async fn main() -> Result<()> {
         Command::Wiki(_) => "info",
         Command::KgReconcile(_) => "info",
         Command::Assemble { .. } => "info",
+        Command::Mentor(_) => "warn",
     };
 
     tracing_subscriber::fmt()
@@ -230,12 +239,34 @@ async fn main() -> Result<()> {
     }
 
     let config = gzmo_core::config::GzmoConfig::load_auto()?;
-    let identity = gzmo_core::identity::IdentityEngine::boot(&config.identity.soul_path).await?;
+
+    // Memory/health/MCP/status probes must not depend on SOUL.md (wrong CWD / release path).
+    let needs_identity = !matches!(
+        command,
+        Command::Health
+            | Command::Status
+            | Command::Memory(_)
+            | Command::McpServe
+            | Command::Observatory
+            | Command::Metabolism
+            | Command::MemoryDump
+            | Command::Assemble { .. }
+            | Command::Instance(_)
+            | Command::Config(_)
+            | Command::Profile(_)
+            | Command::Mentor(_)
+    );
+
+    let identity = if needs_identity {
+        Some(gzmo_core::identity::IdentityEngine::boot(&config.identity.soul_path).await?)
+    } else {
+        None
+    };
 
     match command {
-        Command::Chat => chat::run(&config, &identity).await,
-        Command::ChatRepl => tui::runner::run(&config, &identity).await,
-        Command::Serve => serve_cmd::run(&config, &identity).await,
+        Command::Chat => chat::run(&config, identity.as_ref().unwrap()).await,
+        Command::ChatRepl => tui::runner::run(&config, identity.as_ref().unwrap()).await,
+        Command::Serve => serve_cmd::run(&config, identity.as_ref().unwrap()).await,
         Command::Daemon => {
             // OS-level singleton lock file
             let pid_file = std::path::PathBuf::from("/tmp/gzmo_rust.pid");
@@ -267,15 +298,25 @@ async fn main() -> Result<()> {
             write!(lock, "{}", std::process::id())?;
             drop(lock);
 
-            let res = daemon_cmd::run(&config, identity).await;
+            let res = daemon_cmd::run(&config, identity.expect("daemon needs identity")).await;
             let _ = std::fs::remove_file(&pid_file);
             res
         },
-        Command::Dream(date) => dream_cmd::run(&config, &identity, date).await,
-        Command::Spark(date) => spark_cmd::run(&config, &identity, date).await,
-        Command::Ingest { path, dry_run } => ingest_cmd::run(&config, identity, path, dry_run).await,
-        Command::IngestDir(path) => ingest_dir_cmd::run(&config, identity, path).await,
-        Command::IngestEval(path) => ingest_eval_cmd::run(&config, identity, path).await,
+        Command::Dream(date) => {
+            dream_cmd::run(&config, identity.as_ref().unwrap(), date).await
+        }
+        Command::Spark(date) => {
+            spark_cmd::run(&config, identity.as_ref().unwrap(), date).await
+        }
+        Command::Ingest { path, dry_run } => {
+            ingest_cmd::run(&config, identity.expect("ingest needs identity"), path, dry_run).await
+        }
+        Command::IngestDir(path) => {
+            ingest_dir_cmd::run(&config, identity.expect("ingest-dir needs identity"), path).await
+        }
+        Command::IngestEval(path) => {
+            ingest_eval_cmd::run(&config, identity.expect("ingest-eval needs identity"), path).await
+        }
         Command::Init => unreachable!(),
         Command::MemoryDump => {
             println!("Exporting Native Vault to Markdown...");
@@ -283,15 +324,21 @@ async fn main() -> Result<()> {
             vault.dump_to_markdown(&config.memory.directory).await?;
             Ok(())
         }
-        Command::MemoryEmbed(limit) => embed_cmd::run(&config, &identity, limit).await,
-        Command::MemoryPromote(limit) => promote_cmd::run(&config, &identity, limit).await,
+        Command::MemoryEmbed(limit) => {
+            embed_cmd::run(&config, identity.as_ref().unwrap(), limit).await
+        }
+        Command::MemoryPromote(limit) => {
+            promote_cmd::run(&config, identity.as_ref().unwrap(), limit).await
+        }
         Command::Memory(sub) => memory_cmd::run(&config, sub).await,
-        Command::Distill(session_id) => distill_cmd::run(&config, &identity, session_id).await,
-        Command::Health => health_cmd::run(&config, identity).await,
-        Command::Status => status_cmd::run(&config, &identity).await,
+        Command::Distill(session_id) => {
+            distill_cmd::run(&config, identity.as_ref().unwrap(), session_id).await
+        }
+        Command::Health => health_cmd::run(&config).await,
+        Command::Status => status_cmd::run(&config).await,
         Command::Observatory => observatory_cmd::run(&config).await,
         Command::Metabolism => metabolism_cmd::run(&config).await,
-        Command::Cron(args) => cron_cmd::run(&config, &identity, &args).await,
+        Command::Cron(args) => cron_cmd::run(&config, identity.as_ref().unwrap(), &args).await,
         Command::Instance(args) => instance_cmd::run(&config, &args).await,
         Command::Config(args) => config_cmd::run(&config, &args).await,
         Command::Profile(args) => profile_cmd::run(&config, &args).await,
@@ -303,5 +350,6 @@ async fn main() -> Result<()> {
             fixture,
             apply,
         } => assemble_cmd::run(&config, &recipe, fixture, apply).await,
+        Command::Mentor(args) => mentor_cmd::run(&config, &args).await,
     }
 }
