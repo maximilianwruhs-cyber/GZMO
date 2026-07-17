@@ -23,6 +23,8 @@ jobs:
       - name: Format
         run: cargo fmt --all -- --check
 
+      # Workspace Cargo.toml denies clippy correctness/suspicious and allows style debt,
+      # so `-D warnings` stays a real gate without failing on pre-existing pedantic noise.
       - name: Clippy
         run: cargo clippy --all-targets -- -D warnings
 
@@ -36,8 +38,9 @@ jobs:
 
       - name: Check for hardcoded Neo4j password in tracked files
         run: |
-          if git grep -E 'NEO4J_PASSWORD\s*=\s*"[^"]+"' -- '*.toml' '*.md' '*.rs' '*.sh' \
-             ':!gzmo.toml.example' ':!.env.template'; then
+          # Line-anchored TOML/env literals only (exclude shell "$(...)" expansions).
+          if git grep -E '^[[:space:]]*NEO4J_PASSWORD[[:space:]]*=[[:space:]]*"[^"$]+"' -- '*.toml' '*.md' '*.rs' '*.sh' \
+             ':!gzmo.toml.example' ':!.env.template' ':!gzmo.toml'; then
             echo "Hardcoded NEO4J_PASSWORD found in tracked files"
             exit 1
           fi
