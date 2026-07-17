@@ -123,7 +123,7 @@ bash scripts/ct101-living-smoke.sh
 | `gzmo-root.sh` rejected `/opt/gzmo/current` as “polluted” | P1 | Fixed: accept `current` \|\| `survey_GZMO` |
 | Mentor socket file present but **not listening** — living source has **no mentor module**; teach falls back to OpenRouter | **P0 architecture** | **Restored 2026-07-17** — chaos-free Unix mentor on dedicated thread; `ping`/`status`/`teach` live at `/opt/gzmo/data/gzmo_mentor.sock` |
 | Honeypot↔Qdrant drift 37976 vs 24603 (65%) | P1 | Still open (sync upserted ~24k) |
-| Selfheal HEAL-3 still probes Prime via localhost:8000 tunnels | P2 | Separate from living health |
+| Selfheal HEAL-3 probed Prime via localhost:8000 tunnels | P2 | **Fixed:** probe `/opt/gzmo/gzmo.toml` `[engine.local]` / `.184`; skip obsolete HEAL-1 tunnels on living LAN |
 
 ## Living mentor (restored 2026-07-17)
 
@@ -156,8 +156,14 @@ Discovery preflight now **requires** a living socket `ping` (not merely “daemo
 
 **Still open for a clean baseline (priority order)**
 
-1. **Honeypot↔Qdrant drift** — ~65% (`~38k` vs `~24.6k`); retrieval quality gap.
-2. **Selfheal HEAL-3** — still thinks Prime is `localhost:8000` tunnels; should use living health / `.184`.
-3. **Pi client defaults** — `mentor-client.ts` still defaults `GZMO_ROOT` to `survey_GZMO`; keep `/opt/gzmo/data/...` candidate (works) or set `GZMO_MENTOR_SOCKET`.
-4. **Cron/CI gate** — run `ct101-living-smoke.sh` + one probe-first cycle on a schedule.
-5. **Toml cleanup** — CT101 `[pedagogy].low_tension_dialogue` / `tension_oscillation` enabled but **not spawned** (intentional); either disable in toml or document as inert.
+1. **Honeypot↔Qdrant drift** — health WARN ~65% (`honeypot is_latest≈38k` vs `qdrant≈24.6k`). Sync already upserted ~24k embeddable rows; gap is mostly **~14k latest honeypot rows without embeddings**. Fix: batch `GZMO_CONFIG=/opt/gzmo/gzmo.toml gzmo memory embed` on CT101, then nightly sync (or `scripts/sync-vault-to-qdrant.py --source honeypot`). Do not treat as dead Qdrant.
+2. **Cron/CI gate** — run `ct101-living-smoke.sh` + one probe-first cycle on a schedule.
+
+**Closed this pass**
+
+| Item | Notes |
+|------|--------|
+| Selfheal HEAL-3 / HEAL-1 | Living `.184` probe; skip obsolete tunnels; no full-tree `find` hang |
+| Pi `mentor-client.ts` | Prefers `/opt/gzmo/data/gzmo_mentor.sock`; default root `/opt/gzmo/current` |
+| Pedagogy toml | `low_tension_dialogue` / `tension_oscillation` **disabled** on CT101 (match chaos-free mentor) |
+| CORE_INSIGHT | Re-authored for CT101 living paths (seed `/opt/gzmo/data/vault.db`) |
