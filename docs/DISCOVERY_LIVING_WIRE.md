@@ -145,19 +145,19 @@ Discovery preflight now **requires** a living socket `ping` (not merely “daemo
 
 | Slice | State |
 |-------|--------|
-| One living instance = CT101; workstation = operator + Prime | Done (docs + `gzmo-serve` stopped) |
+| One living instance = CT101; workstation = operator + Prime | Done — [CT101_RESTORE_LIVING.md](./CT101_RESTORE_LIVING.md) |
 | Probe-first discovery gate (`bash_calls` / `PROBE_REQUIRED`) | Done |
 | Lock wait + 600s timer (no skip storms) | Done |
 | Thin MCP: `gzmo_ops_health`, `gzmo_discovery_status` | Done |
 | Config hijack (skills cwd lab toml) | Done (quarantine + forced `GZMO_CONFIG`) |
-| Chaos-free Unix mentor on dedicated thread | Done (live `ping`/`teach`) |
+| Chaos-free Unix mentor on dedicated thread | Done (live `ping`/`teach`; wiring on git) |
 | Discovery preflight → living mentor ping | Done (skills script) |
+| Product smoke includes mentor ping | Done — `scripts/ct101-living-smoke.sh` |
 
 **Still open for a clean baseline (priority order)**
 
-1. **Land wiring on git** — `PedagogyConfig` / `daemon_cmd` / `main` / `lib` / `tools/mod` / chaos-free `mentor_ipc` are live on CT101 but still **unstaged** on `feature/okforge-wiki` (sources committed in `536d84d` alone do not compile/wire).
-2. **Honeypot↔Qdrant drift** — ~65% (`~38k` vs `~24.6k`); retrieval quality gap.
-3. **Selfheal HEAL-3** — still thinks Prime is `localhost:8000` tunnels; should use living health / `.184`.
-4. **Pi client defaults** — `mentor-client.ts` still defaults `GZMO_ROOT` to `survey_GZMO`; keep `/opt/gzmo/data/...` candidate (works) or set `GZMO_MENTOR_SOCKET`.
-5. **Product smoke as gate** — `scripts/ct101-living-smoke.sh` + mentor ping + one probe-first cycle in CI/cron.
-6. **Toml cleanup** — CT101 `[pedagogy].low_tension_dialogue` / `tension_oscillation` enabled but **not spawned** (intentional); either disable in toml or document as inert.
+1. **Honeypot↔Qdrant drift** — ~65% (`~38k` vs `~24.6k`); retrieval quality gap.
+2. **Selfheal HEAL-3** — still thinks Prime is `localhost:8000` tunnels; should use living health / `.184`.
+3. **Pi client defaults** — `mentor-client.ts` still defaults `GZMO_ROOT` to `survey_GZMO`; keep `/opt/gzmo/data/...` candidate (works) or set `GZMO_MENTOR_SOCKET`.
+4. **Cron/CI gate** — run `ct101-living-smoke.sh` + one probe-first cycle on a schedule.
+5. **Toml cleanup** — CT101 `[pedagogy].low_tension_dialogue` / `tension_oscillation` enabled but **not spawned** (intentional); either disable in toml or document as inert.
