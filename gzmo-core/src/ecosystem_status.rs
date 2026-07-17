@@ -456,7 +456,7 @@ mod tests {
     fn vault_count_on_fixture_db() {
         let path = Path::new(env!("CARGO_MANIFEST_DIR")).join("../data-next/vault.db");
         if path.exists() {
-            assert!(vault_semantic_count(&path).is_ok());
+            let _ = vault_semantic_count(&path).expect("vault count");
         }
     }
 }

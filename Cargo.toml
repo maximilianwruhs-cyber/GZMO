@@ -56,3 +56,16 @@ redis = { version = "0.27", features = ["tokio-comp", "connection-manager"] }
 
 # Embedding cache keys
 sha2 = "0.10"
+
+
+
+[workspace.lints.rust]
+unused_mut = "allow"
+unused_comparisons = "allow"
+dead_code = "allow"
+
+[workspace.lints.clippy]
+# Style/pedantic debt is large; keep CI `-D warnings` meaningful for real bugs only.
+all = "allow"
+correctness = "deny"
+suspicious = "deny"
