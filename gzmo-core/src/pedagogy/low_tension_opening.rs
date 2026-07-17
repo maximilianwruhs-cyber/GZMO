@@ -6,12 +6,12 @@
 use anyhow::Result;
 use std::path::PathBuf;
 
-use gzmo_chaos::pulse::ChaosSnapshot;
 use crate::config::GzmoConfig;
+use crate::memory::vault::SqliteVault;
 use crate::pedagogy::graph::{PrerequisiteGraph, PrerequisiteNode};
 use crate::pedagogy::learner::LearnerProfile;
-use crate::memory::vault::SqliteVault;
 use crate::tools::ToolRegistry;
+use gzmo_chaos::pulse::ChaosSnapshot;
 
 use super::low_tension_persist::prior_opening_hints;
 
@@ -101,7 +101,11 @@ pub async fn build_opening(
             let start_idx = learner_profile.episodic.entries.len().saturating_sub(5);
             for entry in &learner_profile.episodic.entries[start_idx..] {
                 let sum_lower = entry.summary.to_lowercase();
-                let struggle_lower = entry.struggle.as_ref().map(|s| s.to_lowercase()).unwrap_or_default();
+                let struggle_lower = entry
+                    .struggle
+                    .as_ref()
+                    .map(|s| s.to_lowercase())
+                    .unwrap_or_default();
                 if sum_lower.contains(&id_lower)
                     || sum_lower.contains(&title_lower)
                     || struggle_lower.contains(&id_lower)
@@ -132,7 +136,10 @@ pub async fn build_opening(
         for prereq_id in &node.prerequisites {
             if let Some(prereq_node) = graph.nodes.iter().find(|n| &n.id == prereq_id) {
                 if !is_node_mastered(prereq_node, &learner_profile.semantic.mastery_vectors) {
-                    if !unmastered_prereqs.iter().any(|n: &PrerequisiteNode| &n.id == prereq_id) {
+                    if !unmastered_prereqs
+                        .iter()
+                        .any(|n: &PrerequisiteNode| &n.id == prereq_id)
+                    {
                         unmastered_prereqs.push(prereq_node.clone());
                     }
                 }

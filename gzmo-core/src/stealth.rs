@@ -1,6 +1,6 @@
+use serde::{Deserialize, Serialize};
 use std::path::Path;
 use tracing::{debug, info};
-use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct HardwareFingerprint {
@@ -22,7 +22,7 @@ pub fn discover_hardware_stealthily() -> HardwareFingerprint {
     };
 
     // 1. NVIDIA CUDA Discovery (Linux)
-    // Passively stat() virtual folders. 
+    // Passively stat() virtual folders.
     // We strictly use path.exists() which triggers a simple `stat` syscall instead of `open`.
     if Path::new("/sys/module/nvidia").exists() || Path::new("/dev/nvidiactl").exists() {
         debug!("Discovered NVIDIA GPU ecosystem via passive sysfs/devfs stat");
@@ -44,10 +44,8 @@ pub fn discover_hardware_stealthily() -> HardwareFingerprint {
     }
 
     info!(
-        "Stealth discovery complete. CUDA: {}, ROCm: {}, AVX2: {}", 
-        fingerprint.has_nvidia_gpu, 
-        fingerprint.has_amd_gpu, 
-        fingerprint.has_avx2
+        "Stealth discovery complete. CUDA: {}, ROCm: {}, AVX2: {}",
+        fingerprint.has_nvidia_gpu, fingerprint.has_amd_gpu, fingerprint.has_avx2
     );
 
     fingerprint

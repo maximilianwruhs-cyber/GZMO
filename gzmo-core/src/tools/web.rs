@@ -23,7 +23,9 @@ impl WebSearchTool {
     pub fn with_serpapi_key(key: String) -> Self {
         Self {
             http: reqwest::Client::builder()
-                .user_agent("Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0")
+                .user_agent(
+                    "Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0",
+                )
                 .timeout(std::time::Duration::from_secs(15))
                 .build()
                 .unwrap_or_else(|_| reqwest::Client::new()),
@@ -36,7 +38,9 @@ impl Default for WebSearchTool {
     fn default() -> Self {
         Self {
             http: reqwest::Client::builder()
-                .user_agent("Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0")
+                .user_agent(
+                    "Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0",
+                )
                 .timeout(std::time::Duration::from_secs(15))
                 .build()
                 .unwrap_or_else(|_| reqwest::Client::new()),
@@ -73,10 +77,7 @@ impl ToolHandler for WebSearchTool {
             .as_str()
             .ok_or_else(|| anyhow::anyhow!("Missing 'query' argument"))?;
 
-        let max_results = args["max_results"]
-            .as_u64()
-            .unwrap_or(5)
-            .min(10) as usize;
+        let max_results = args["max_results"].as_u64().unwrap_or(5).min(10) as usize;
 
         tracing::info!(query = %query, max_results, "Executing web search");
 
@@ -266,10 +267,7 @@ impl WebSearchTool {
             if b == b'%' {
                 let hex: Vec<u8> = chars.by_ref().take(2).copied().collect();
                 if hex.len() == 2 {
-                    if let Ok(byte) = u8::from_str_radix(
-                        &String::from_utf8_lossy(&hex),
-                        16,
-                    ) {
+                    if let Ok(byte) = u8::from_str_radix(&String::from_utf8_lossy(&hex), 16) {
                         bytes.push(byte);
                         continue;
                     }
@@ -313,7 +311,8 @@ impl WebSearchTool {
 
     /// Search using SerpAPI (structured JSON, very reliable).
     async fn search_serpapi(&self, query: &str, max_results: usize) -> Result<Vec<SearchResult>> {
-        let resp = self.http
+        let resp = self
+            .http
             .get("https://serpapi.com/search")
             .query(&[
                 ("q", query),
@@ -337,7 +336,11 @@ impl WebSearchTool {
                 let url = item["link"].as_str().unwrap_or("").to_string();
                 let snippet = item["snippet"].as_str().unwrap_or("").to_string();
                 if !url.is_empty() {
-                    results.push(SearchResult { title, url, snippet });
+                    results.push(SearchResult {
+                        title,
+                        url,
+                        snippet,
+                    });
                 }
             }
         }
@@ -366,16 +369,16 @@ mod tests {
             WebSearchTool::strip_html_tags("<b>Hello</b> <i>world</i>"),
             "Hello world"
         );
-        assert_eq!(
-            WebSearchTool::strip_html_tags("plain text"),
-            "plain text"
-        );
+        assert_eq!(WebSearchTool::strip_html_tags("plain text"), "plain text");
     }
 
     #[test]
     fn test_clean_ddg_url() {
         let direct = "https://example.com/page";
-        assert_eq!(WebSearchTool::clean_ddg_url(direct), "https://example.com/page");
+        assert_eq!(
+            WebSearchTool::clean_ddg_url(direct),
+            "https://example.com/page"
+        );
 
         let redirect = "//duckduckgo.com/l/?uddg=https%3A%2F%2Fexample.com%2Fpage&rut=abc";
         assert_eq!(
@@ -388,7 +391,9 @@ mod tests {
     #[ignore = "requires live DuckDuckGo; run with --ignored"]
     async fn test_web_search_live() {
         let tool = WebSearchTool::default();
-        let result = tool.execute(json!({"query": "Rust programming language", "max_results": 3})).await;
+        let result = tool
+            .execute(json!({"query": "Rust programming language", "max_results": 3}))
+            .await;
         // This test requires internet — may fail in CI
         if let Ok(output) = result {
             assert!(output.contains("Rust"), "Should mention Rust in results");

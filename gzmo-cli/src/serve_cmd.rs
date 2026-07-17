@@ -12,8 +12,8 @@ use std::time::Duration;
 
 use anyhow::{bail, Context, Result};
 use chrono::{NaiveDate, Timelike, Utc};
-use tracing::{error, info, warn};
 use gzmo_core::cron;
+use tracing::{error, info, warn};
 
 use gzmo_core::config::{GzmoConfig, TaskKind};
 use gzmo_core::gateway::{GatewayRouter, LlmGateway};
@@ -62,9 +62,7 @@ fn spark_slot_due(
     hours
         .iter()
         .copied()
-        .filter(|&h| {
-            now_mins >= h * 60 + minute && !done.contains(&(h, minute, today))
-        })
+        .filter(|&h| now_mins >= h * 60 + minute && !done.contains(&(h, minute, today)))
         .min()
         .map(|h| (h, minute))
 }
@@ -119,7 +117,8 @@ async fn spawn_distill_worker(config: &GzmoConfig) -> Result<()> {
         )
         .await?,
     );
-    let scratch = Arc::new(ScratchService::from_config(&config.redis, &config.context_memory).await);
+    let scratch =
+        Arc::new(ScratchService::from_config(&config.redis, &config.context_memory).await);
 
     let mut tools = ToolRegistry::new();
     tools.register(Box::new(FileReadTool::default()));
@@ -243,7 +242,12 @@ async fn run_loop(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> 
         let today = now.date_naive();
 
         if config.dreams.enabled
-            && cron_due_today(&now, config.dreams.cron_hour, config.dreams.cron_minute, last_dream)
+            && cron_due_today(
+                &now,
+                config.dreams.cron_hour,
+                config.dreams.cron_minute,
+                last_dream,
+            )
         {
             if run_named_job(config, "dream", || async {
                 dream_cmd::run(config, identity, Some(today)).await

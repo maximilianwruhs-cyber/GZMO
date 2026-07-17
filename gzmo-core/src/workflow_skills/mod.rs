@@ -184,7 +184,8 @@ impl WorkflowSkillIndex {
         }
         let mut lines = vec![
             "\n\n## Workflow skills (engineering discipline)".to_string(),
-            "Activate with slash (`/grill`, `/tdd`, …) or tool `activate_workflow_skill`.".to_string(),
+            "Activate with slash (`/grill`, `/tdd`, …) or tool `activate_workflow_skill`."
+                .to_string(),
             "Available:".to_string(),
         ];
         let mut names = self.names();
@@ -377,7 +378,10 @@ Ask hard questions.
         let inject = idx.activate(&session, "grill", "ship auth").unwrap();
         assert!(inject.contains("[Workflow /grill]"));
         assert!(inject.contains("ship auth"));
-        assert_eq!(session.lock().unwrap().active_names(), &["grill".to_string()]);
+        assert_eq!(
+            session.lock().unwrap().active_names(),
+            &["grill".to_string()]
+        );
 
         let _ = idx.activate(&session, "tdd", "").unwrap();
         assert_eq!(session.lock().unwrap().active_names().len(), 2);
@@ -392,10 +396,7 @@ Ask hard questions.
             .write_handoff(&session, "sess1", "# Handoff\n\nNext: finish TDD.\n")
             .unwrap();
         assert!(path.is_file());
-        assert_eq!(
-            session.lock().unwrap().last_handoff.as_ref(),
-            Some(&path)
-        );
+        assert_eq!(session.lock().unwrap().last_handoff.as_ref(), Some(&path));
         assert_eq!(idx.latest_handoff().as_ref(), Some(&path));
     }
 

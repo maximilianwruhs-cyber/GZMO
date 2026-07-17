@@ -12,8 +12,6 @@ use tracing::{debug, warn};
 use crate::config;
 use crate::types::Message;
 
-
-
 /// Configuration for an OpenAI-compatible LLM endpoint.
 /// Works with local (llama.cpp, Ollama, LM Studio) and cloud (OpenAI, Groq, Together) endpoints.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -137,7 +135,8 @@ pub trait LlmGateway: Send + Sync {
         json_schema: serde_json::Value,
         _temperature: Option<f32>,
     ) -> Result<String> {
-        self.complete_structured(messages, schema_name, json_schema).await
+        self.complete_structured(messages, schema_name, json_schema)
+            .await
     }
 
     /// Structured completion with optional temperature and output token cap (shallow jobs).
@@ -161,7 +160,6 @@ pub trait LlmGateway: Send + Sync {
 }
 
 // ── Concrete Implementation ─────────────────────────────────────────
-
 
 #[cfg(test)]
 use crate::types::Role;
@@ -345,28 +343,27 @@ impl TurboQuantGateway {
     /// Set chaos-driven overrides for temperature and max_tokens.
     /// Called by the REPL each time the PulseLoop broadcasts a new ChaosSnapshot.
     pub fn set_chaos_overrides(&self, temperature: f32, max_tokens: u32) {
-        self.chaos_temperature.store(
-            temperature.to_bits(),
-            std::sync::atomic::Ordering::Relaxed,
-        );
-        self.chaos_max_tokens.store(
-            max_tokens,
-            std::sync::atomic::Ordering::Relaxed,
-        );
-        self.chaos_active.store(true, std::sync::atomic::Ordering::Relaxed);
+        self.chaos_temperature
+            .store(temperature.to_bits(), std::sync::atomic::Ordering::Relaxed);
+        self.chaos_max_tokens
+            .store(max_tokens, std::sync::atomic::Ordering::Relaxed);
+        self.chaos_active
+            .store(true, std::sync::atomic::Ordering::Relaxed);
     }
 
     /// Disable chaos overrides — revert to config values.
     pub fn clear_chaos_overrides(&self) {
-        self.chaos_active.store(false, std::sync::atomic::Ordering::Relaxed);
+        self.chaos_active
+            .store(false, std::sync::atomic::Ordering::Relaxed);
     }
-
-
 
     /// Get the effective temperature (chaos override or config default).
     fn effective_temperature(&self) -> f32 {
         if self.chaos_active.load(std::sync::atomic::Ordering::Relaxed) {
-            f32::from_bits(self.chaos_temperature.load(std::sync::atomic::Ordering::Relaxed))
+            f32::from_bits(
+                self.chaos_temperature
+                    .load(std::sync::atomic::Ordering::Relaxed),
+            )
         } else {
             self.config.temperature
         }
@@ -375,7 +372,9 @@ impl TurboQuantGateway {
     /// Get the effective max_tokens (chaos override or config default).
     fn effective_max_tokens(&self) -> u32 {
         if self.chaos_active.load(std::sync::atomic::Ordering::Relaxed) {
-            let chaos_val = self.chaos_max_tokens.load(std::sync::atomic::Ordering::Relaxed);
+            let chaos_val = self
+                .chaos_max_tokens
+                .load(std::sync::atomic::Ordering::Relaxed);
             // Use whichever is larger: config or chaos (don't truncate below config)
             chaos_val.max(self.config.max_tokens / 2)
         } else {
@@ -604,9 +603,7 @@ impl LlmGateway for TurboQuantGateway {
             "Sending streaming completion request"
         );
 
-        let builder = self
-            .auth_post("chat/completions")
-            .json(&body);
+        let builder = self.auth_post("chat/completions").json(&body);
 
         let mut es = EventSource::new(builder)?;
 
@@ -650,9 +647,9 @@ impl LlmGateway for TurboQuantGateway {
                         // Buffer tool call deltas silently
                         if let Some(tc_deltas) = choice.delta.tool_calls {
                             for tc in tc_deltas {
-                                let entry = tool_map
-                                    .entry(tc.index)
-                                    .or_insert_with(|| (String::new(), String::new(), String::new()));
+                                let entry = tool_map.entry(tc.index).or_insert_with(|| {
+                                    (String::new(), String::new(), String::new())
+                                });
 
                                 if let Some(id) = tc.id {
                                     entry.0 = id;
@@ -686,10 +683,12 @@ impl LlmGateway for TurboQuantGateway {
             let calls = tool_map
                 .into_values()
                 .map(|(id, name, args_str)| {
-                    let arguments = Self::parse_arguments(
-                        serde_json::Value::String(args_str),
-                    );
-                    ToolCall { id, function_name: name, arguments }
+                    let arguments = Self::parse_arguments(serde_json::Value::String(args_str));
+                    ToolCall {
+                        id,
+                        function_name: name,
+                        arguments,
+                    }
                 })
                 .collect();
             Ok(LlmResponse::ToolCalls(calls))
@@ -952,7 +951,10 @@ struct StructuredChatRequest<'a> {
 }
 
 /// Prefer normal assistant `content`, then Qwen `reasoning_content` when content is empty.
-pub fn assistant_visible_text(content: Option<String>, reasoning_content: Option<String>) -> String {
+pub fn assistant_visible_text(
+    content: Option<String>,
+    reasoning_content: Option<String>,
+) -> String {
     let c = content.unwrap_or_default();
     if !c.trim().is_empty() {
         return c;
@@ -961,10 +963,7 @@ pub fn assistant_visible_text(content: Option<String>, reasoning_content: Option
 }
 
 fn no_thinking_request_fields() -> (&'static str, serde_json::Value) {
-    (
-        "none",
-        serde_json::json!({ "enable_thinking": false }),
-    )
+    ("none", serde_json::json!({ "enable_thinking": false }))
 }
 
 fn is_openrouter_endpoint(config: &VllmConfig) -> bool {
@@ -1013,7 +1012,10 @@ pub struct FallbackGateway {
 
 impl FallbackGateway {
     /// Build a fallback chain. Requires at least one backend.
-    pub fn new(task_label: impl Into<String>, backends: Vec<(String, Arc<dyn LlmGateway>)>) -> Self {
+    pub fn new(
+        task_label: impl Into<String>,
+        backends: Vec<(String, Arc<dyn LlmGateway>)>,
+    ) -> Self {
         assert!(
             !backends.is_empty(),
             "FallbackGateway requires at least one backend"
@@ -1245,8 +1247,7 @@ impl GatewayRouter {
             gw
         };
 
-        let cloud_first =
-            config.routing.cloud_first_background && config.engine.cloud.is_some();
+        let cloud_first = config.routing.cloud_first_background && config.engine.cloud.is_some();
 
         // Build the cloud leaf once, optionally wrapping OpenRouter -> Gemini
         // when `[engine.cloud] fallback_*` (or GZMO_GEMINI_KEY) is configured.
@@ -1319,9 +1320,9 @@ impl GatewayRouter {
 
         // Fall back to standard engine sections
         match name {
-            "local" | "prime" => {
-                config.engine.active_engine_for_mode(config::EngineMode::Local)
-            }
+            "local" | "prime" => config
+                .engine
+                .active_engine_for_mode(config::EngineMode::Local),
             "cloud" => {
                 if let Some(ref cloud) = config.engine.cloud {
                     config::EngineProfileConfig {
@@ -1549,7 +1550,11 @@ mod tests {
             _ => panic!("expected text"),
         }
         assert_eq!(ca.load(Ordering::SeqCst), 1);
-        assert_eq!(cb.load(Ordering::SeqCst), 0, "fallback must not run when primary succeeds");
+        assert_eq!(
+            cb.load(Ordering::SeqCst),
+            0,
+            "fallback must not run when primary succeeds"
+        );
     }
 
     #[tokio::test]
@@ -1637,12 +1642,16 @@ mod tests {
             Message {
                 role: Role::System,
                 content: "You are a sovereign AI. Respond extremely concisely.".to_string(),
-                is_meta: false, tool_calls: None, tool_call_id: None,
+                is_meta: false,
+                tool_calls: None,
+                tool_call_id: None,
             },
             Message {
                 role: Role::User,
                 content: "What is 2+2? Reply with the number only.".to_string(),
-                is_meta: false, tool_calls: None, tool_call_id: None,
+                is_meta: false,
+                tool_calls: None,
+                tool_call_id: None,
             },
         ];
 

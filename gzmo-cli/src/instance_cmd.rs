@@ -22,9 +22,8 @@ pub async fn run(config: &GzmoConfig, args: &[String]) -> Result<()> {
     }
 
     let instance = std::env::var("GZMO_INSTANCE").unwrap_or_else(|_| "(unset)".into());
-    let config_path = std::env::var("GZMO_CONFIG").unwrap_or_else(|_| {
-        "(unset — load_auto used cwd/exe gzmo.toml)".into()
-    });
+    let config_path = std::env::var("GZMO_CONFIG")
+        .unwrap_or_else(|_| "(unset — load_auto used cwd/exe gzmo.toml)".into());
     let data_root = config
         .memory
         .vault_db
@@ -49,7 +48,9 @@ pub async fn run(config: &GzmoConfig, args: &[String]) -> Result<()> {
                 (Some(f), Some(l)) if f > l => {
                     "pending — fused newer than live; run: gzmo config promote-fused --diff".into()
                 }
-                (Some(_), Some(_)) => "present — live at/after fused (promote done or equal)".into(),
+                (Some(_), Some(_)) => {
+                    "present — live at/after fused (promote done or equal)".into()
+                }
                 (Some(_), None) => {
                     "present — review + gzmo config promote-fused --diff (no live mtime)".into()
                 }
@@ -65,10 +66,11 @@ pub async fn run(config: &GzmoConfig, args: &[String]) -> Result<()> {
     println!("data_root:    {data_root}");
     println!("vault:        {}", config.memory.vault_db.display());
     println!("lab_root:     {}", lab_root().display());
-    println!("skills_root:  {} (authoritative for GZMO_INSTANCE=next)", config.skills.directory.display());
     println!(
-        "skills_aux:   gzmo_skills/ — CT101/bridge discovery only (not next chat /skills)"
+        "skills_root:  {} (authoritative for GZMO_INSTANCE=next)",
+        config.skills.directory.display()
     );
+    println!("skills_aux:   gzmo_skills/ — CT101/bridge discovery only (not next chat /skills)");
     println!(
         "fused_toml:   {} ({})",
         fused
@@ -102,11 +104,7 @@ pub async fn run(config: &GzmoConfig, args: &[String]) -> Result<()> {
     Ok(())
 }
 
-fn print_loop(
-    name: &str,
-    configured: AssemblyBackend,
-    asm: &gzmo_core::assembly::AssemblyConfig,
-) {
+fn print_loop(name: &str, configured: AssemblyBackend, asm: &gzmo_core::assembly::AssemblyConfig) {
     let effective = asm.effective(configured);
     let note = if configured.is_lab() && !instance_is_next() {
         "  [forced inline — set GZMO_INSTANCE=next for lab]"

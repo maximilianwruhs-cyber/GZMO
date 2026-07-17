@@ -3,7 +3,6 @@
 /// Skills emit `ChaosEvent`s after execution. The PulseLoop processes them
 /// between ticks, modifying tension, energy, and injecting thought seeds.
 /// This creates the autopoietic loop: outputs modify the system that generates further outputs.
-
 use serde::Serialize;
 
 /// Sound category for typed feedback
@@ -27,60 +26,37 @@ pub enum SoundCategory {
 #[derive(Debug, Clone)]
 pub enum ChaosEvent {
     /// Dice rolled — modify tension proportional to outcome distance from mean
-    DiceRoll {
-        value: u8,
-        max: u8,
-    },
+    DiceRoll { value: u8, max: u8 },
 
     /// Sound fired — small energy pulse based on category intensity
-    SoundFired {
-        category: SoundCategory,
-    },
+    SoundFired { category: SoundCategory },
 
     /// Card forged — inject thought seed from card identity
-    CardForged {
-        name: String,
-        card_type: String,
-    },
+    CardForged { name: String, card_type: String },
 
     /// Poem generated — inject as thought for potential crystallization
-    PoemGenerated {
-        text: String,
-    },
+    PoemGenerated { text: String },
 
     /// Story generated — inject as thought
-    StoryGenerated {
-        text: String,
-    },
+    StoryGenerated { text: String },
 
     /// Joke generated — inject as thought
-    JokeGenerated {
-        text: String,
-    },
+    JokeGenerated { text: String },
 
     /// Transform activated — shift persona, heavy thought injection
-    PersonaShift {
-        persona: String,
-    },
+    PersonaShift { persona: String },
 
     /// Transform cleared — lighter inverse shift
     PersonaCleared,
 
     /// Word/definition generated — inject as fact-type thought
-    WordGenerated {
-        word: String,
-        definition: String,
-    },
+    WordGenerated { word: String, definition: String },
 
     /// Quote surfaced from lore — inject as quote thought
-    QuoteSurfaced {
-        text: String,
-    },
+    QuoteSurfaced { text: String },
 
     /// Stabilize — manual control of attractor parameter
-    Stabilize {
-        delta_rho: f64,
-    },
+    Stabilize { delta_rho: f64 },
 
     /// Custom arbitrary event for extensibility
     Custom {
@@ -119,8 +95,8 @@ impl ChaosEvent {
                     SoundCategory::Wind | SoundCategory::Hum => -3.0,
                 }
             }
-            ChaosEvent::PersonaShift { .. } => 5.0,  // Identity shifts are stressful
-            ChaosEvent::PersonaCleared => -3.0,       // Returning to self is calming
+            ChaosEvent::PersonaShift { .. } => 5.0, // Identity shifts are stressful
+            ChaosEvent::PersonaCleared => -3.0,     // Returning to self is calming
             ChaosEvent::Custom { tension_delta, .. } => *tension_delta,
             _ => 0.0,
         }
@@ -131,12 +107,16 @@ impl ChaosEvent {
         match self {
             ChaosEvent::DiceRoll { value, max } => {
                 // High rolls energize, low rolls drain
-                if *value == 1 { -5.0 }
-                else if *value == *max { 5.0 }
-                else { 0.0 }
+                if *value == 1 {
+                    -5.0
+                } else if *value == *max {
+                    5.0
+                } else {
+                    0.0
+                }
             }
             ChaosEvent::SoundFired { .. } => -1.0, // All sounds cost a bit of energy
-            ChaosEvent::CardForged { .. } => -2.0,  // Forging is taxing
+            ChaosEvent::CardForged { .. } => -2.0, // Forging is taxing
             ChaosEvent::PersonaShift { .. } => -3.0, // Identity shifts are expensive
             ChaosEvent::Custom { energy_delta, .. } => *energy_delta,
             _ => 0.0,

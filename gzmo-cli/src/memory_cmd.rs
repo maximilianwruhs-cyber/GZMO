@@ -7,8 +7,7 @@ use gzmo_core::config::GzmoConfig;
 use gzmo_core::memory::embeddings;
 use gzmo_core::platform_memory::PlatformMemory;
 
-const USAGE: &str =
-    "Usage:\n  \
+const USAGE: &str = "Usage:\n  \
      gzmo memory search <query> [--limit N] [--session ID] [--json] [--no-scratch]\n  \
      gzmo memory recall [--session ID]\n  \
      gzmo memory status [--session ID] [--json]\n  \
@@ -21,7 +20,6 @@ const USAGE: &str =
      Session: --session or GZMO_SESSION_ID env.\n\
      MCP: `gzmo memory mcp` == `gzmo mcp-serve` (third surface, ADR-0003).\n\
      See docs/ARCHITECTURE_GZMO_PLATFORM.md";
-
 
 fn parse_session_flag(args: &[String]) -> Option<String> {
     args.iter()
@@ -72,12 +70,10 @@ pub async fn run(config: &GzmoConfig, subargs: Vec<String>) -> Result<()> {
                 }
             }
         }
-        "recall" => {
-            match platform.memory_recall_pull().await? {
-                Some(block) => println!("{block}"),
-                None => println!("(no scratch recall for this session)"),
-            }
-        }
+        "recall" => match platform.memory_recall_pull().await? {
+            Some(block) => println!("{block}"),
+            None => println!("(no scratch recall for this session)"),
+        },
         "status" => {
             let st = platform.status().await?;
             if wants_json(&subargs) {

@@ -220,12 +220,19 @@ fn knowledge_core_path(vault_conn: &Connection) -> Option<PathBuf> {
 }
 
 /// Extract static profile lines from ripened concept cards (bullet lines + entity header).
-pub(crate) fn static_lines_from_summary(entity_tag: &str, summary_md: &str, max_bullets: usize) -> Vec<String> {
+pub(crate) fn static_lines_from_summary(
+    entity_tag: &str,
+    summary_md: &str,
+    max_bullets: usize,
+) -> Vec<String> {
     let mut out = Vec::new();
     for line in summary_md.lines() {
         let trimmed = line.trim();
         if trimmed.starts_with("- ") {
-            out.push(format!("{entity_tag} {}", trimmed.trim_start_matches('-').trim()));
+            out.push(format!(
+                "{entity_tag} {}",
+                trimmed.trim_start_matches('-').trim()
+            ));
             if out.len() >= max_bullets {
                 break;
             }
@@ -251,11 +258,8 @@ fn load_static_from_core(vault_conn: &Connection, limit: usize) -> Option<Vec<St
     if !core_path.is_file() {
         return None;
     }
-    let core = Connection::open_with_flags(
-        &core_path,
-        rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY,
-    )
-    .ok()?;
+    let core =
+        Connection::open_with_flags(&core_path, rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY).ok()?;
     let mut stmt = core
         .prepare(
             "SELECT entity_tag, summary_md FROM knowledge_core
@@ -297,7 +301,10 @@ impl GzmoProfile {
     pub fn to_markdown(&self) -> String {
         let mut md = String::new();
         md.push_str(&format!("# GZMO Profile — {}\n\n", self.container_tag));
-        md.push_str(&format!("_Generated: {} · ~{} tokens_\n\n", self.generated_at, self.token_estimate));
+        md.push_str(&format!(
+            "_Generated: {} · ~{} tokens_\n\n",
+            self.generated_at, self.token_estimate
+        ));
         if !self.r#static.is_empty() {
             md.push_str("## Static\n\n");
             for line in &self.r#static {

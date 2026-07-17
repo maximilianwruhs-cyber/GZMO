@@ -100,13 +100,18 @@ pub fn render_concept(draft: &OkfConceptDraft) -> String {
 }
 
 /// Load recent vault facts as concept drafts (verified semantic_vault rows).
-pub fn drafts_from_vault(vault_db: &Path, origin: &str, limit: usize) -> Result<Vec<OkfConceptDraft>> {
+pub fn drafts_from_vault(
+    vault_db: &Path,
+    origin: &str,
+    limit: usize,
+) -> Result<Vec<OkfConceptDraft>> {
     let conn = rusqlite::Connection::open(vault_db)
         .with_context(|| format!("open vault {}", vault_db.display()))?;
     let mut drafts = Vec::new();
 
     // Prefer honeypot (promoted); fall back to semantic_vault.
-    let sql_honeypot = "SELECT id, content FROM honeypot WHERE is_latest = 1 ORDER BY rowid DESC LIMIT ?1";
+    let sql_honeypot =
+        "SELECT id, content FROM honeypot WHERE is_latest = 1 ORDER BY rowid DESC LIMIT ?1";
     let sql_vault = "SELECT id, content FROM semantic_vault ORDER BY created_at DESC LIMIT ?1";
 
     let mut rows_ok = false;
@@ -156,11 +161,7 @@ fn fact_to_draft(id: &str, content: &str, origin: &str) -> OkfConceptDraft {
         slug: slug_base,
         title: title.clone(),
         body_md: format!("# {title}\n\n{content}\n\nOrigin: `{origin}` (GZMO-next).\n"),
-        tags: vec![
-            "gzmo-next".into(),
-            origin.to_string(),
-            "verified".into(),
-        ],
+        tags: vec!["gzmo-next".into(), origin.to_string(), "verified".into()],
         origin: origin.to_string(),
     }
 }
@@ -177,7 +178,11 @@ pub async fn push_concepts(
     dry_run: bool,
 ) -> Result<WikiPushReport> {
     let mut report = WikiPushReport {
-        mode: if dry_run { "dry_run".into() } else { "live".into() },
+        mode: if dry_run {
+            "dry_run".into()
+        } else {
+            "live".into()
+        },
         origin: origin.to_string(),
         ..Default::default()
     };
@@ -234,11 +239,7 @@ pub async fn push_concepts(
     }
 
     if okf_cfg.auto_commit {
-        let msg = format!(
-            "okf: gzmo-next {} push ({} concepts)",
-            origin,
-            drafts.len()
-        );
+        let msg = format!("okf: gzmo-next {} push ({} concepts)", origin, drafts.len());
         let committed = client
             .session_commit(okf_cfg, &session.session_id, &msg)
             .await?;

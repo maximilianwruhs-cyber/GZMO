@@ -268,5 +268,5 @@ args = ["--from", "/home/gzmo/github-clone/mcp-neo4j-memory-gzmo", "mcp-neo4j-me
 [mcp_servers.env]
 NEO4J_URL = "bolt://127.0.0.1:7687"
 NEO4J_USERNAME = "neo4j"
-NEO4J_PASSWORD = "gzmo-next-local-0815"
+NEO4J_PASSWORD = "${NEO4J_PASSWORD}"
 NEO4J_DATABASE = "neo4j"

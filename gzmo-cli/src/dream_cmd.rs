@@ -12,15 +12,15 @@ use chrono::{NaiveDate, Utc};
 use tracing::info;
 
 use gzmo_core::config::GzmoConfig;
+use gzmo_core::config::TaskKind;
 use gzmo_core::dreams::DreamEngine;
 use gzmo_core::dreams_md::write_dream_narrative;
-use gzmo_core::gateway::LlmGateway;
 use gzmo_core::gateway::GatewayRouter;
-use gzmo_core::config::TaskKind;
-use gzmo_core::synapse::set_event_source;
+use gzmo_core::gateway::LlmGateway;
 use gzmo_core::identity::IdentityEngine;
-use gzmo_core::memory::episodic::FileEpisodicStore;
 use gzmo_core::memory::embeddings;
+use gzmo_core::memory::episodic::FileEpisodicStore;
+use gzmo_core::synapse::set_event_source;
 
 use gzmo_core::synapse::SynapseBus;
 use gzmo_core::tools::fs::{DirListTool, FileReadTool, FileSearchTool, FileWriteTool};
@@ -33,7 +33,11 @@ use gzmo_core::tools::ToolRegistry;
 use crate::cli_mcp::McpSession;
 
 /// Run a one-shot dream consolidation for `date` (defaults to today).
-pub async fn run(config: &GzmoConfig, _identity: &IdentityEngine, date: Option<NaiveDate>) -> Result<()> {
+pub async fn run(
+    config: &GzmoConfig,
+    _identity: &IdentityEngine,
+    date: Option<NaiveDate>,
+) -> Result<()> {
     let date = date.unwrap_or_else(|| Utc::now().date_naive());
 
     info!("╔══════════════════════════════════════════════╗");
@@ -56,10 +60,8 @@ pub async fn run(config: &GzmoConfig, _identity: &IdentityEngine, date: Option<N
     }
 
     let router = GatewayRouter::new(config);
-    let gateway: Arc<dyn LlmGateway> =
-        Arc::clone(router.gateway(TaskKind::DreamExtract));
-    let verify_gateway: Arc<dyn LlmGateway> =
-        Arc::clone(router.gateway(TaskKind::DreamVerify));
+    let gateway: Arc<dyn LlmGateway> = Arc::clone(router.gateway(TaskKind::DreamExtract));
+    let verify_gateway: Arc<dyn LlmGateway> = Arc::clone(router.gateway(TaskKind::DreamVerify));
 
     let vault = Arc::new(
         embeddings::open_vault_with_embeddings(
@@ -81,7 +83,9 @@ pub async fn run(config: &GzmoConfig, _identity: &IdentityEngine, date: Option<N
     tools.register(Box::new(WebSearchTool::default()));
     tools.register(Box::new(SysMetricsTool));
     tools.register(Box::new(SysKillTool));
-    tools.register(Box::new(MemoryRecordTool { vault: Arc::clone(&vault) }));
+    tools.register(Box::new(MemoryRecordTool {
+        vault: Arc::clone(&vault),
+    }));
     tools.register(Box::new(MemorySearchTool::new(Arc::clone(&vault))));
 
     // Connect MCP servers (memory → Neo4j) so verified facts can be written.

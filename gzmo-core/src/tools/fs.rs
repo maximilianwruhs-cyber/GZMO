@@ -37,7 +37,9 @@ impl ToolHandler for FileReadTool {
     fn definition(&self) -> ToolDef {
         ToolDef {
             name: "file_read".to_string(),
-            description: "Read the contents of a file at the given path. Returns the file content as text.".to_string(),
+            description:
+                "Read the contents of a file at the given path. Returns the file content as text."
+                    .to_string(),
             parameters: json!({
                 "type": "object",
                 "properties": {

@@ -14,11 +14,11 @@ use ratatui::{
 };
 
 use crate::tui::action::Action;
+use crate::tui::component::Component;
 use crate::tui::legacy::avatar_art::{
     bulb_row, theatrical_line, MoodBand, Performance, GOLD, RUBY,
 };
 use crate::tui::legacy::avatar_pixel::{pose_from_state, render_cog_lines};
-use crate::tui::component::Component;
 
 const SPEAKING_DECAY: u32 = 30;
 const LISTENING_HOLD: u32 = u32::MAX;

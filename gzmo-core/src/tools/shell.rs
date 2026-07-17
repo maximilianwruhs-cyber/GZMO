@@ -16,31 +16,111 @@ use crate::tools::{ToolDef, ToolHandler};
 /// handled separately by [`is_command_allowed`].
 const SAFE_COMMAND_PREFIXES: &[&str] = &[
     // Filesystem inspection (read-only)
-    "ls", "cat", "head", "tail", "wc", "stat", "file", "du", "df",
-    "find", "locate", "tree", "readlink", "realpath", "basename", "dirname",
+    "ls",
+    "cat",
+    "head",
+    "tail",
+    "wc",
+    "stat",
+    "file",
+    "du",
+    "df",
+    "find",
+    "locate",
+    "tree",
+    "readlink",
+    "realpath",
+    "basename",
+    "dirname",
     "pwd",
     // Text processing (read-only)
-    "grep", "rg", "awk", "sed", "sort", "uniq", "cut", "tr", "jq",
-    "diff", "comm", "paste", "column", "fold", "fmt", "tee",
+    "grep",
+    "rg",
+    "awk",
+    "sed",
+    "sort",
+    "uniq",
+    "cut",
+    "tr",
+    "jq",
+    "diff",
+    "comm",
+    "paste",
+    "column",
+    "fold",
+    "fmt",
+    "tee",
     // System inspection
-    "ps", "top", "htop", "uname", "hostname", "whoami", "id", "uptime",
-    "date", "cal", "env", "printenv", "lsblk", "lscpu", "lsusb", "lspci",
-    "free", "vmstat", "iostat", "ip", "ss", "netstat",
-    "pgrep", "pidof", "nvidia-smi", "lsmod",
+    "ps",
+    "top",
+    "htop",
+    "uname",
+    "hostname",
+    "whoami",
+    "id",
+    "uptime",
+    "date",
+    "cal",
+    "env",
+    "printenv",
+    "lsblk",
+    "lscpu",
+    "lsusb",
+    "lspci",
+    "free",
+    "vmstat",
+    "iostat",
+    "ip",
+    "ss",
+    "netstat",
+    "pgrep",
+    "pidof",
+    "nvidia-smi",
+    "lsmod",
     // Containers / sidecars (read-only ops like `docker ps` — first-token gate only)
     "docker",
     // Data stores (inspection)
-    "redis-cli", "sqlite3",
+    "redis-cli",
+    "sqlite3",
     // Development tools
-    "git", "cargo", "rustc", "python3", "python", "node", "npm", "npx",
-    "pip", "pip3", "make", "cmake",
+    "git",
+    "cargo",
+    "rustc",
+    "python3",
+    "python",
+    "node",
+    "npm",
+    "npx",
+    "pip",
+    "pip3",
+    "make",
+    "cmake",
     // Archive / compression (read-only ops)
-    "tar", "gzip", "gunzip", "zcat", "bzip2", "xz",
+    "tar",
+    "gzip",
+    "gunzip",
+    "zcat",
+    "bzip2",
+    "xz",
     // Network (read-only, needed for cloud-mode API/web access)
-    "curl", "wget",
+    "curl",
+    "wget",
     // Misc safe
-    "echo", "printf", "true", "false", "test", "[", "which", "type",
-    "man", "help", "sha256sum", "md5sum", "b2sum", "xxd", "hexdump",
+    "echo",
+    "printf",
+    "true",
+    "false",
+    "test",
+    "[",
+    "which",
+    "type",
+    "man",
+    "help",
+    "sha256sum",
+    "md5sum",
+    "b2sum",
+    "xxd",
+    "hexdump",
     // Shell / scripts
     "bash",
     // GZMO-specific
@@ -49,14 +129,33 @@ const SAFE_COMMAND_PREFIXES: &[&str] = &[
 
 /// Host-dangerous binaries blocked when `GZMO_SHELL_STRICT=1` or `GZMO_INSTANCE=next`.
 const STRICT_BLOCKED: &[&str] = &[
-    "systemctl", "journalctl", "sudo", "su", "pkexec", "mount", "umount",
-    "chmod", "chown", "mkfs", "dd", "reboot", "shutdown", "poweroff",
-    "iptables", "nft", "kill", "killall", "pkill", "sysctl",
+    "systemctl",
+    "journalctl",
+    "sudo",
+    "su",
+    "pkexec",
+    "mount",
+    "umount",
+    "chmod",
+    "chown",
+    "mkfs",
+    "dd",
+    "reboot",
+    "shutdown",
+    "poweroff",
+    "iptables",
+    "nft",
+    "kill",
+    "killall",
+    "pkill",
+    "sysctl",
 ];
 
 fn shell_strict_mode() -> bool {
-    matches!(std::env::var("GZMO_SHELL_STRICT").ok().as_deref(), Some("1") | Some("true"))
-        || std::env::var("GZMO_INSTANCE").ok().as_deref() == Some("next")
+    matches!(
+        std::env::var("GZMO_SHELL_STRICT").ok().as_deref(),
+        Some("1") | Some("true")
+    ) || std::env::var("GZMO_INSTANCE").ok().as_deref() == Some("next")
 }
 
 fn shell_docker_mode() -> bool {
@@ -82,9 +181,7 @@ fn is_shell_script_path(token: &str) -> bool {
 
 /// Allow `bash script.sh` / `sh -x script.sh` but block inline `bash -c "..."`.
 fn is_allowed_script_runner(command: &str) -> bool {
-    let mut tokens = command
-        .split_whitespace()
-        .filter(|t| !t.contains('='));
+    let mut tokens = command.split_whitespace().filter(|t| !t.contains('='));
 
     let Some(first) = tokens.next() else {
         return false;
@@ -132,8 +229,21 @@ fn is_command_allowed(command: &str) -> bool {
 
 /// Host mutation binaries blocked when `read_only` is set (reviewer profile).
 const READ_ONLY_BLOCKED: &[&str] = &[
-    "rm", "mv", "cp", "truncate", "dd", "chmod", "chown", "mkdir", "touch", "rmdir",
-    "kill", "killall", "pkill", "systemctl", "sudo",
+    "rm",
+    "mv",
+    "cp",
+    "truncate",
+    "dd",
+    "chmod",
+    "chown",
+    "mkdir",
+    "touch",
+    "rmdir",
+    "kill",
+    "killall",
+    "pkill",
+    "systemctl",
+    "sudo",
 ];
 
 /// Execute a shell command on the host.
@@ -164,7 +274,8 @@ impl ToolHandler for ShellExecTool {
             name: "shell_exec".to_string(),
             description: "Execute a shell command and return stdout/stderr. Timeout: 30s. \
                 `bash` and `.sh` scripts are allowed. Prefer the `ecosystem_status` tool \
-                for stack/overnight overview instead of ad-hoc shell probes.".to_string(),
+                for stack/overnight overview instead of ad-hoc shell probes."
+                .to_string(),
             parameters: json!({
                 "type": "object",
                 "properties": {
@@ -308,7 +419,9 @@ mod tests {
         assert!(is_command_allowed("bash skills/skill_card.sh creature"));
         assert!(is_command_allowed("bash -x skills/skill_card.sh"));
         assert!(is_command_allowed("sh scripts/live-smoke-all.sh"));
-        assert!(is_command_allowed("GZMO_LLM_URL=http://127.0.0.1:8000/v1 bash skills/skill_card.sh"));
+        assert!(is_command_allowed(
+            "GZMO_LLM_URL=http://127.0.0.1:8000/v1 bash skills/skill_card.sh"
+        ));
     }
 
     #[test]

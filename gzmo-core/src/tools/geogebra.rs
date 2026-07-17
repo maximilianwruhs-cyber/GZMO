@@ -7,9 +7,9 @@ use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use serde_json::json;
 
+use super::{ToolDef, ToolHandler};
 use crate::config::PedagogyConfig;
 use crate::pedagogy::PedagogySession;
-use super::{ToolDef, ToolHandler};
 
 pub struct GeoGebraPlotTool {
     config: PedagogyConfig,
@@ -75,10 +75,7 @@ impl ToolHandler for GeoGebraPlotTool {
             .as_str()
             .ok_or_else(|| anyhow!("Missing 'expression' argument"))?
             .trim();
-        let mode = args["mode"]
-            .as_str()
-            .unwrap_or("2d")
-            .trim();
+        let mode = args["mode"].as_str().unwrap_or("2d").trim();
 
         if expr.is_empty() {
             return Err(anyhow!("Expression cannot be empty"));
@@ -104,15 +101,21 @@ mod tests {
     #[tokio::test]
     async fn test_geogebra_plot_tool_gates() {
         let mut config = PedagogyConfig::default();
-        let temp_dir = std::env::temp_dir().join(format!("gzmo-test-geogebra-{}", uuid::Uuid::new_v4()));
+        let temp_dir =
+            std::env::temp_dir().join(format!("gzmo-test-geogebra-{}", uuid::Uuid::new_v4()));
         config.learner_data_dir = temp_dir.to_string_lossy().to_string();
 
         let tool = GeoGebraPlotTool::new(&config);
 
         // Fails closed outside ops mode
-        let res = tool.execute(json!({ "expression": "y=x^2", "mode": "2d" })).await;
+        let res = tool
+            .execute(json!({ "expression": "y=x^2", "mode": "2d" }))
+            .await;
         assert!(res.is_err());
-        assert!(res.unwrap_err().to_string().contains("disabled outside ops mode"));
+        assert!(res
+            .unwrap_err()
+            .to_string()
+            .contains("disabled outside ops mode"));
 
         // Enable ops mode
         let mut session = PedagogySession::default();
@@ -120,13 +123,19 @@ mod tests {
         session.save(&config).await.expect("save session");
 
         // Succeeds in ops mode
-        let res = tool.execute(json!({ "expression": "y=x^2", "mode": "2d" })).await;
+        let res = tool
+            .execute(json!({ "expression": "y=x^2", "mode": "2d" }))
+            .await;
         assert!(res.is_ok());
         let output = res.unwrap();
-        assert!(output.contains("[Open GeoGebra worksheet](https://www.geogebra.org/graphing?expr=y%3Dx%5E2)"));
+        assert!(output.contains(
+            "[Open GeoGebra worksheet](https://www.geogebra.org/graphing?expr=y%3Dx%5E2)"
+        ));
 
         // 3D mode
-        let res = tool.execute(json!({ "expression": "z=x^2+y^2", "mode": "3d" })).await;
+        let res = tool
+            .execute(json!({ "expression": "z=x^2+y^2", "mode": "3d" }))
+            .await;
         assert!(res.is_ok());
         let output = res.unwrap();
         assert!(output.contains("https://www.geogebra.org/3d?expr=z%3Dx%5E2%2By%5E2"));

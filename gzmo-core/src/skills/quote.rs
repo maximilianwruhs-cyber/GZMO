@@ -32,13 +32,21 @@ struct QuoteEntry {
     author: String,
 }
 
-fn default_author() -> String { "Unknown".to_string() }
+fn default_author() -> String {
+    "Unknown".to_string()
+}
 
 #[async_trait]
 impl Skill for QuoteSkill {
-    fn name(&self) -> &str { "quote" }
-    fn description(&self) -> &str { "Serve a verified historical quote from the Lore Pool" }
-    fn skill_type(&self) -> SkillType { SkillType::Mechanical }
+    fn name(&self) -> &str {
+        "quote"
+    }
+    fn description(&self) -> &str {
+        "Serve a verified historical quote from the Lore Pool"
+    }
+    fn skill_type(&self) -> SkillType {
+        SkillType::Mechanical
+    }
 
     async fn execute(&self, ctx: SkillContext<'_>) -> Result<SkillOutput> {
         // Try multiple lore.toml locations
@@ -48,25 +56,30 @@ impl Skill for QuoteSkill {
             std::path::PathBuf::from("data/lore.toml"),
         ];
 
-        let lore_content = lore_paths.iter()
+        let lore_content = lore_paths
+            .iter()
             .find_map(|p| std::fs::read_to_string(p).ok());
 
         let content = match lore_content {
             Some(c) => c,
-            None => return Ok(SkillOutput {
-                display: format!("  {RED}✗ lore.toml not found{RESET}"),
-                feedback: vec![],
-                inject_to_conversation: false,
-            }),
+            None => {
+                return Ok(SkillOutput {
+                    display: format!("  {RED}✗ lore.toml not found{RESET}"),
+                    feedback: vec![],
+                    inject_to_conversation: false,
+                })
+            }
         };
 
         let lore: LoreFile = match toml::from_str(&content) {
             Ok(l) => l,
-            Err(e) => return Ok(SkillOutput {
-                display: format!("  {RED}✗ Failed to parse lore.toml: {e}{RESET}"),
-                feedback: vec![],
-                inject_to_conversation: false,
-            }),
+            Err(e) => {
+                return Ok(SkillOutput {
+                    display: format!("  {RED}✗ Failed to parse lore.toml: {e}{RESET}"),
+                    feedback: vec![],
+                    inject_to_conversation: false,
+                })
+            }
         };
 
         if lore.quotes.is_empty() {
@@ -92,7 +105,9 @@ impl Skill for QuoteSkill {
         );
 
         // Send feedback to chaos engine — quotes affect the autopoietic loop
-        let feedback_event = ChaosEvent::QuoteSurfaced { text: quote.text.clone() };
+        let feedback_event = ChaosEvent::QuoteSurfaced {
+            text: quote.text.clone(),
+        };
         let _ = ctx.feedback_tx.send(feedback_event.clone()).await;
 
         Ok(SkillOutput {

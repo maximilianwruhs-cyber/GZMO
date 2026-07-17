@@ -12,7 +12,7 @@ use gzmo_chaos::pulse::ChaosSnapshot;
 use serde::Deserialize;
 
 use super::llm::{
-    chaos_index, llm_chat, SkillRuntime, BOLD, BLUE, DIM, GREEN, MAGENTA, RED, RESET, WHITE,
+    chaos_index, llm_chat, SkillRuntime, BLUE, BOLD, DIM, GREEN, MAGENTA, RED, RESET, WHITE,
 };
 use super::{Skill, SkillContext, SkillOutput, SkillType};
 
@@ -102,7 +102,10 @@ fn parse_structured_card(text: &str) -> ParsedCard {
     }
 
     if card.name.is_empty() {
-        if let Some(cap) = text.lines().find(|l| l.starts_with("**") && l.ends_with("**")) {
+        if let Some(cap) = text
+            .lines()
+            .find(|l| l.starts_with("**") && l.ends_with("**"))
+        {
             card.name = cap.trim_matches('*').trim().to_string();
         }
     }
@@ -135,12 +138,7 @@ fn border_color_name(color: &str) -> &'static str {
     }
 }
 
-fn render_card(
-    color: &str,
-    color_sym: &str,
-    card: &ParsedCard,
-    rarity_icon: &str,
-) -> String {
+fn render_card(color: &str, color_sym: &str, card: &ParsedCard, rarity_icon: &str) -> String {
     let bc = border_color_name(color);
     let mut out = String::new();
     out.push_str(&format!(
@@ -174,9 +172,7 @@ fn render_card(
         ));
     }
 
-    if !card.pt.is_empty()
-        && !matches!(card.pt.to_uppercase().as_str(), "NONE" | "N/A")
-    {
+    if !card.pt.is_empty() && !matches!(card.pt.to_uppercase().as_str(), "NONE" | "N/A") {
         out.push_str(&format!(
             "{bc}  ║{RESET}{:>42} {BOLD}[{}]{RESET}\n",
             "", card.pt
@@ -231,8 +227,7 @@ impl Skill for CardSkill {
             }
         };
 
-        let (philosophy, flavor_tone) =
-            load_color_philosophy(&self.rt.cardforge_path(), color);
+        let (philosophy, flavor_tone) = load_color_philosophy(&self.rt.cardforge_path(), color);
 
         let color_title = {
             let mut chars = color.chars();
@@ -282,20 +277,14 @@ impl Skill for CardSkill {
         let mut temp = 0.9f64;
 
         for attempt in 0..3 {
-            let raw = llm_chat(
-                &self.rt,
-                &system_prompt,
-                user_prompt,
-                temp,
-                4096,
-                true,
-            )
-            .await;
+            let raw = llm_chat(&self.rt, &system_prompt, user_prompt, temp, 4096, true).await;
 
             match raw {
                 Ok(text) if !text.is_empty() => {
                     parsed = parse_structured_card(&text);
-                    if !parsed.name.is_empty() && !parsed.cost.is_empty() && !parsed.type_line.is_empty()
+                    if !parsed.name.is_empty()
+                        && !parsed.cost.is_empty()
+                        && !parsed.type_line.is_empty()
                     {
                         break;
                     }

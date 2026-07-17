@@ -13,10 +13,10 @@ use crate::config::{
     EmbeddingsConfig, EngineMode, EngineProfileConfig, GzmoConfig, LibrarianConfig, QdrantConfig,
     RedisConfig, RerankConfig,
 };
+use crate::gateway::ToolCall;
 use crate::memory::rerank::Reranker;
 use crate::synapse::{resolve_event_source, EventSource, EventType, SynapseBus, SynapseEvent};
 use crate::tools::ToolRegistry;
-use crate::gateway::ToolCall;
 
 /// Outcome of a subsystem probe.
 #[derive(Debug, Clone)]
@@ -60,10 +60,7 @@ pub async fn probe_llm_models(profile: &EngineProfileConfig) -> ProbeResult {
         Ok(r) if r.status().is_success() => {
             ProbeResult::pass("llm", format!("{} → {}", profile.model, url))
         }
-        Ok(r) => ProbeResult::fail(
-            "llm",
-            format!("{} returned HTTP {}", url, r.status()),
-        ),
+        Ok(r) => ProbeResult::fail("llm", format!("{} returned HTTP {}", url, r.status())),
         Err(e) => ProbeResult::fail("llm", format!("{} unreachable: {e}", url)),
     }
 }
@@ -197,10 +194,7 @@ pub async fn probe_honeypot_qdrant_drift(config: &GzmoConfig) -> ProbeResult {
         Ok(r) if r.status().is_success() => match r.json::<serde_json::Value>().await {
             Ok(v) => v["result"]["points_count"].as_u64().unwrap_or(0) as usize,
             Err(e) => {
-                return ProbeResult::fail(
-                    "honeypot_qdrant_drift",
-                    format!("qdrant JSON: {e}"),
-                );
+                return ProbeResult::fail("honeypot_qdrant_drift", format!("qdrant JSON: {e}"));
             }
         },
         Ok(r) => {
@@ -210,10 +204,7 @@ pub async fn probe_honeypot_qdrant_drift(config: &GzmoConfig) -> ProbeResult {
             );
         }
         Err(e) => {
-            return ProbeResult::fail(
-                "honeypot_qdrant_drift",
-                format!("{url} unreachable: {e}"),
-            );
+            return ProbeResult::fail("honeypot_qdrant_drift", format!("{url} unreachable: {e}"));
         }
     };
 
@@ -256,10 +247,7 @@ pub async fn probe_qdrant(cfg: &QdrantConfig) -> ProbeResult {
                 Ok(v) => {
                     let pts = v["result"]["points_count"].as_u64().unwrap_or(0);
                     let status = v["result"]["status"].as_str().unwrap_or("?");
-                    format!(
-                        "{} → {} points ({status})",
-                        cfg.collection, pts
-                    )
+                    format!("{} → {} points ({status})", cfg.collection, pts)
                 }
                 Err(_) => format!("{} OK", cfg.collection),
             };
@@ -272,10 +260,7 @@ pub async fn probe_qdrant(cfg: &QdrantConfig) -> ProbeResult {
                 cfg.collection, url
             ),
         ),
-        Ok(r) => ProbeResult::fail(
-            "qdrant",
-            format!("{} returned HTTP {}", url, r.status()),
-        ),
+        Ok(r) => ProbeResult::fail("qdrant", format!("{} returned HTTP {}", url, r.status())),
         Err(e) => ProbeResult::fail("qdrant", format!("{url} unreachable: {e}")),
     }
 }
@@ -339,13 +324,15 @@ pub async fn probe_mcp_memory(tools: &ToolRegistry) -> ProbeResult {
         arguments: serde_json::json!({ "sample_limit": 1 }),
     };
     match tools.dispatch(&call).await {
-        crate::tools::ToolResult { success: true, output, .. } => {
+        crate::tools::ToolResult {
+            success: true,
+            output,
+            ..
+        } => {
             let preview: String = output.chars().take(120).collect();
             ProbeResult::pass("mcp_memory", format!("read_graph OK ({preview}…)"))
         }
-        crate::tools::ToolResult { output, .. } => {
-            ProbeResult::fail("mcp_memory", output)
-        }
+        crate::tools::ToolResult { output, .. } => ProbeResult::fail("mcp_memory", output),
     }
 }
 
@@ -440,7 +427,10 @@ pub async fn probe_distill_queue(redis_cfg: &RedisConfig, fallback_dir: &Path) -
                     "redis_tail_session={}",
                     serde_json::from_str::<serde_json::Value>(&json)
                         .ok()
-                        .and_then(|v| v.get("session_id").and_then(|s| s.as_str()).map(str::to_string))
+                        .and_then(|v| v
+                            .get("session_id")
+                            .and_then(|s| s.as_str())
+                            .map(str::to_string))
                         .unwrap_or_else(|| "?".into())
                 );
             }
@@ -461,7 +451,9 @@ pub async fn probe_distill_queue(redis_cfg: &RedisConfig, fallback_dir: &Path) -
                 if let Ok(meta) = entry.metadata() {
                     if let Ok(modified) = meta.modified() {
                         if let Ok(age) = now.duration_since(modified) {
-                            oldest_age_secs = Some(oldest_age_secs.map_or(age.as_secs(), |a| a.max(age.as_secs())));
+                            oldest_age_secs = Some(
+                                oldest_age_secs.map_or(age.as_secs(), |a| a.max(age.as_secs())),
+                            );
                         }
                     }
                 }
@@ -512,10 +504,7 @@ pub async fn collect_health_probes(
     results.push(probe_rerank(&config.rerank).await);
     results.push(probe_librarian(&config.librarian).await);
     results.push(probe_redis(&config.redis).await);
-    results.push(
-        probe_distill_queue(&config.redis, &config.redis.distill_fallback_dir)
-            .await,
-    );
+    results.push(probe_distill_queue(&config.redis, &config.redis.distill_fallback_dir).await);
 
     if let Some(srv) = config.active_mcp_servers().find(|s| s.name == "memory") {
         if let Some(url) = srv.env.get("NEO4J_URL") {
@@ -530,10 +519,7 @@ pub async fn collect_health_probes(
         let mut r = probe_sovereign(sovereign).await;
         r.name = "sovereign";
         if !r.ok {
-            r.detail = format!(
-                "{} (expected until sovereign-moe GGUF is built)",
-                r.detail
-            );
+            r.detail = format!("{} (expected until sovereign-moe GGUF is built)", r.detail);
         }
         results.push(r);
     }

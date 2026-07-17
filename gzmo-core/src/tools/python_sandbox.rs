@@ -4,13 +4,13 @@
 //! Implements strict input scanning to block forbidden imports (e.g. os, subprocess, sys),
 //! and imposes limits on code length, execution timeout, and output size.
 
-use std::time::Duration;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use serde_json::json;
+use std::time::Duration;
 
-use crate::config::PedagogyConfig;
 use super::{ToolDef, ToolHandler};
+use crate::config::PedagogyConfig;
 
 /// Securely execute Python code.
 pub struct PythonSandboxTool {
@@ -76,7 +76,10 @@ fn has_blocked_word(code: &str, word: &str) -> bool {
         } else {
             None
         };
-        let char_after = code.as_bytes().get(actual_pos + word.len()).map(|&b| b as char);
+        let char_after = code
+            .as_bytes()
+            .get(actual_pos + word.len())
+            .map(|&b| b as char);
 
         let is_boundary_before = match char_before {
             Some(c) => !c.is_alphanumeric() && c != '_',
@@ -152,7 +155,7 @@ impl ToolHandler for PythonSandboxTool {
                 let exit_code = output.status.code().unwrap_or(-1);
 
                 let mut response = format!("Exit code: {}\n", exit_code);
-                
+
                 let merged = if !stdout.is_empty() && !stderr.is_empty() {
                     format!("--- stdout ---\n{}\n--- stderr ---\n{}", stdout, stderr)
                 } else if !stdout.is_empty() {
@@ -209,7 +212,7 @@ mod tests {
         // Basic block
         assert_eq!(tool.is_blocked("import os"), Some("os".to_string()));
         assert_eq!(tool.is_blocked("import sys"), Some("sys".to_string()));
-        
+
         // Bounded boundaries
         assert_eq!(tool.is_blocked("my_os_variable = 1"), None);
         assert_eq!(tool.is_blocked("clos = 3"), None);
@@ -220,7 +223,10 @@ mod tests {
 
         // Bounded punctuation
         assert_eq!(tool.is_blocked("os.path.join()"), Some("os".to_string()));
-        assert_eq!(tool.is_blocked("print(open('file'))"), Some("open".to_string()));
+        assert_eq!(
+            tool.is_blocked("print(open('file'))"),
+            Some("open".to_string())
+        );
     }
 
     #[tokio::test]
@@ -231,7 +237,10 @@ mod tests {
         let long_code = "print(1)".repeat(10);
         let res = tool.execute(json!({ "code": long_code })).await;
         assert!(res.is_err());
-        assert!(res.unwrap_err().to_string().contains("exceeds the maximum limit"));
+        assert!(res
+            .unwrap_err()
+            .to_string()
+            .contains("exceeds the maximum limit"));
 
         // Security block
         let res = tool.execute(json!({ "code": "import os" })).await;

@@ -68,7 +68,13 @@ pub fn classify_truth_pair(old_content: &str, new_content: &str) -> LifecycleKin
 
 fn has_negation_shift(old_n: &str, new_n: &str) -> bool {
     const NEG: &[&str] = &[
-        "not ", "no longer", "instead of", "replaced", "deprecated", "never ", "stopped ",
+        "not ",
+        "no longer",
+        "instead of",
+        "replaced",
+        "deprecated",
+        "never ",
+        "stopped ",
     ];
     let old_has = NEG.iter().any(|m| old_n.contains(m));
     let new_has = NEG.iter().any(|m| new_n.contains(m));
@@ -159,14 +165,10 @@ fn predicate_tail(content: &str) -> Option<String> {
 fn token_overlap(a: &str, b: &str) -> f64 {
     let a_l = a.to_lowercase();
     let b_l = b.to_lowercase();
-    let ta: std::collections::HashSet<_> = a_l
-        .split_whitespace()
-        .filter(|w| w.len() >= 4)
-        .collect();
-    let tb: std::collections::HashSet<_> = b_l
-        .split_whitespace()
-        .filter(|w| w.len() >= 4)
-        .collect();
+    let ta: std::collections::HashSet<_> =
+        a_l.split_whitespace().filter(|w| w.len() >= 4).collect();
+    let tb: std::collections::HashSet<_> =
+        b_l.split_whitespace().filter(|w| w.len() >= 4).collect();
     if ta.is_empty() || tb.is_empty() {
         return 0.0;
     }
@@ -241,10 +243,7 @@ mod tests {
     #[test]
     fn duplicate_when_normalized_equal() {
         assert_eq!(
-            classify_truth_pair(
-                "[AGENT:Foo] does X",
-                "[AGENT:Foo]  does   X"
-            ),
+            classify_truth_pair("[AGENT:Foo] does X", "[AGENT:Foo]  does   X"),
             LifecycleKind::Duplicate
         );
     }
@@ -301,18 +300,33 @@ mod tests {
     #[test]
     fn verified_dream_origin_is_covered_by_gate() {
         // Low-confidence derived fact without evidence is blocked, regardless of rename.
-        assert!(is_unverified_derived(&derived_truth(0.86, false), "verified_dream"));
+        assert!(is_unverified_derived(
+            &derived_truth(0.86, false),
+            "verified_dream"
+        ));
         assert!(is_unverified_derived(&derived_truth(0.86, false), "dream"));
-        assert!(is_unverified_derived(&derived_truth(0.86, false), "session_distill"));
+        assert!(is_unverified_derived(
+            &derived_truth(0.86, false),
+            "session_distill"
+        ));
     }
 
     #[test]
     fn grounded_or_high_conf_derived_passes() {
         // Evidence-bearing derived fact passes even below 0.92.
-        assert!(!is_unverified_derived(&derived_truth(0.86, true), "verified_dream"));
+        assert!(!is_unverified_derived(
+            &derived_truth(0.86, true),
+            "verified_dream"
+        ));
         // High-confidence derived fact passes.
-        assert!(!is_unverified_derived(&derived_truth(0.95, false), "verified_dream"));
+        assert!(!is_unverified_derived(
+            &derived_truth(0.95, false),
+            "verified_dream"
+        ));
         // Direct ingest is never treated as derived.
-        assert!(!is_unverified_derived(&derived_truth(0.50, false), "ingest"));
+        assert!(!is_unverified_derived(
+            &derived_truth(0.50, false),
+            "ingest"
+        ));
     }
 }

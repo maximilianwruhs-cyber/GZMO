@@ -13,7 +13,9 @@ use std::time::{Duration, Instant};
 
 use crate::tui::action::Action;
 use crate::tui::component::Component;
-use crate::tui::theme::{self, COPPER, CYAN, GOLD, MUTED, PARCHMENT, RITUAL, STEEL, TEXT, PULSE_STALE_SECS};
+use crate::tui::theme::{
+    self, COPPER, CYAN, GOLD, MUTED, PARCHMENT, PULSE_STALE_SECS, RITUAL, STEEL, TEXT,
+};
 
 pub struct StatusBarComponent {
     pub last_snapshot: Option<ChaosSnapshot>,
@@ -126,7 +128,10 @@ impl Component for StatusBarComponent {
             ),
             Span::styled("SOVEREIGN", Style::default().fg(COPPER)),
             Span::styled(" │ ", Style::default().fg(MUTED)),
-            Span::styled(&self.mode, Style::default().fg(CYAN).add_modifier(Modifier::BOLD)),
+            Span::styled(
+                &self.mode,
+                Style::default().fg(CYAN).add_modifier(Modifier::BOLD),
+            ),
             Span::styled(" │ ", Style::default().fg(MUTED)),
             Span::styled("τ", Style::default().fg(MUTED)),
             Span::styled(&self.cache_tension, t_style),
@@ -145,9 +150,7 @@ impl Component for StatusBarComponent {
             spans.push(Span::styled(" │ ", Style::default().fg(MUTED)));
             spans.push(Span::styled(
                 "PULSE STALE",
-                Style::default()
-                    .fg(RITUAL)
-                    .add_modifier(Modifier::BOLD),
+                Style::default().fg(RITUAL).add_modifier(Modifier::BOLD),
             ));
         }
 
@@ -190,10 +193,7 @@ impl Component for StatusBarComponent {
 
         let host = format!(" │ cpu {} mem {}", self.cache_cpu, self.cache_mem);
         if used + host.chars().count() <= budget {
-            spans.push(Span::styled(
-                host,
-                Style::default().fg(STEEL),
-            ));
+            spans.push(Span::styled(host, Style::default().fg(STEEL)));
             used = line_width(&spans);
         }
 

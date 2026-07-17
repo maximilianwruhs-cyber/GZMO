@@ -114,7 +114,12 @@ impl VaultBackend for QdrantVault {
     async fn store_text(&self, _content: &str, _decay_class: &str, _confidence: f64) -> Result<()> {
         Self::not_implemented("store_text")
     }
-    async fn search_with_decay(&self, _q_emb: &[f32], _q_text: &str, _limit: usize) -> Result<Vec<ScoredFact>> {
+    async fn search_with_decay(
+        &self,
+        _q_emb: &[f32],
+        _q_text: &str,
+        _limit: usize,
+    ) -> Result<Vec<ScoredFact>> {
         Self::not_implemented("search_with_decay")
     }
     async fn keyword_search(&self, _q_text: &str, _limit: usize) -> Result<Vec<ScoredFact>> {
@@ -149,11 +154,18 @@ use crate::memory::vault::SqliteVault;
 
 #[async_trait]
 impl VaultBackend for SqliteVault {
-    async fn store(&self, fact: &SemanticFact) -> Result<()> { SqliteVault::store(self, fact) }
+    async fn store(&self, fact: &SemanticFact) -> Result<()> {
+        SqliteVault::store(self, fact)
+    }
     async fn store_text(&self, content: &str, decay_class: &str, confidence: f64) -> Result<()> {
         SqliteVault::store_text(self, content, decay_class, confidence)
     }
-    async fn search_with_decay(&self, q_emb: &[f32], q_text: &str, limit: usize) -> Result<Vec<ScoredFact>> {
+    async fn search_with_decay(
+        &self,
+        q_emb: &[f32],
+        q_text: &str,
+        limit: usize,
+    ) -> Result<Vec<ScoredFact>> {
         if self.rerank_enabled() {
             SqliteVault::search_with_decay_reranked(self, q_emb, q_text, limit).await
         } else {
@@ -166,12 +178,18 @@ impl VaultBackend for SqliteVault {
     async fn promote_truths(&self, truths: &[ExtractedTruth]) -> Result<()> {
         SqliteVault::promote_truths(self, truths).await
     }
-    async fn reinforce(&self, fact_id: Uuid) -> Result<()> { SqliteVault::reinforce(self, fact_id) }
+    async fn reinforce(&self, fact_id: Uuid) -> Result<()> {
+        SqliteVault::reinforce(self, fact_id)
+    }
     async fn recall_failures(&self, description: &str) -> Result<Vec<String>> {
         SqliteVault::recall_failures(self, description)
     }
-    async fn recent(&self, limit: usize) -> Result<Vec<String>> { SqliteVault::recent(self, limit) }
-    async fn count(&self) -> Result<usize> { SqliteVault::count(self) }
+    async fn recent(&self, limit: usize) -> Result<Vec<String>> {
+        SqliteVault::recent(self, limit)
+    }
+    async fn count(&self) -> Result<usize> {
+        SqliteVault::count(self)
+    }
     async fn stale_candidates(&self, limit: usize) -> Result<Vec<SemanticFact>> {
         SqliteVault::stale_candidates(self, limit)
     }

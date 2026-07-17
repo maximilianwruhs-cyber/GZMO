@@ -4,9 +4,9 @@ use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use serde_json::json;
 
+use super::{ToolDef, ToolHandler};
 use crate::config::PedagogyConfig;
 use crate::pedagogy::LearnerStore;
-use super::{ToolDef, ToolHandler};
 
 pub struct LearnerRecallTool {
     store: LearnerStore,
@@ -57,7 +57,9 @@ impl ToolHandler for LearnerUpdateTool {
     fn definition(&self) -> ToolDef {
         ToolDef {
             name: "learner_update".to_string(),
-            description: "Update learner profile: mastery, misconception, interest, or teaching modality.".to_string(),
+            description:
+                "Update learner profile: mastery, misconception, interest, or teaching modality."
+                    .to_string(),
             parameters: json!({
                 "type": "object",
                 "properties": {

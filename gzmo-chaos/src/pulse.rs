@@ -14,9 +14,11 @@
 /// Synapse observability: do not publish chaos heartbeat events to `SynapseBus`
 /// until `PulseLoop` runs in daemon mode. Today it only starts in chat/TUI;
 /// Daemon mode: `daemon_cmd.rs` pins `PulseHandle` for the full process lifetime.
-
 use std::path::PathBuf;
-use std::sync::{Arc, atomic::{AtomicU64, AtomicBool, Ordering}};
+use std::sync::{
+    atomic::{AtomicBool, AtomicU64, Ordering},
+    Arc,
+};
 use std::time::Duration;
 
 use serde::Deserialize;
@@ -153,17 +155,39 @@ impl Default for EventChances {
     }
 }
 
-fn default_gravity() -> f64 { 9.8 }
-fn default_friction() -> f64 { 0.5 }
-fn default_seed() -> f64 { 0.506 }
-fn default_tension() -> f64 { 0.0 }
-fn default_joke_chance() -> f64 { 0.3 }
-fn default_quote_chance() -> f64 { 0.4 }
-fn default_fact_chance() -> f64 { 0.3 }
-fn default_rho_decay_k() -> f64 { 0.001 }
-fn default_rho_restore_beta() -> f64 { 1.0 }
-fn default_rho_ema_gamma() -> f64 { 0.2 }
-fn default_stabilize_delta_rho() -> f64 { -1.0 }
+fn default_gravity() -> f64 {
+    9.8
+}
+fn default_friction() -> f64 {
+    0.5
+}
+fn default_seed() -> f64 {
+    0.506
+}
+fn default_tension() -> f64 {
+    0.0
+}
+fn default_joke_chance() -> f64 {
+    0.3
+}
+fn default_quote_chance() -> f64 {
+    0.4
+}
+fn default_fact_chance() -> f64 {
+    0.3
+}
+fn default_rho_decay_k() -> f64 {
+    0.001
+}
+fn default_rho_restore_beta() -> f64 {
+    1.0
+}
+fn default_rho_ema_gamma() -> f64 {
+    0.2
+}
+fn default_stabilize_delta_rho() -> f64 {
+    -1.0
+}
 
 impl Default for ChaosConfig {
     fn default() -> Self {
@@ -288,7 +312,11 @@ impl PulseLoop {
         let (lore_tx, lore_rx) = mpsc::channel::<LoreNotification>(64);
 
         // Load lore pool if path configured
-        let lore = config.lore_path.as_ref().and_then(|p| LorePool::load(p)).map(Arc::new);
+        let lore = config
+            .lore_path
+            .as_ref()
+            .and_then(|p| LorePool::load(p))
+            .map(Arc::new);
 
         // Shared atomic for hardware telemetry tension
         let hw_tension = Arc::new(AtomicU64::new(config.initial_tension.to_bits()));
@@ -307,7 +335,11 @@ impl PulseLoop {
                     let cpu: f64 = sys.global_cpu_usage() as f64;
                     let total_mem = sys.total_memory() as f64;
                     let used_mem = sys.used_memory() as f64;
-                    let ram = if total_mem > 0.0 { (used_mem / total_mem) * 100.0 } else { 50.0 };
+                    let ram = if total_mem > 0.0 {
+                        (used_mem / total_mem) * 100.0
+                    } else {
+                        50.0
+                    };
                     let tension = (cpu * 0.5 + ram * 0.5).min(100.0);
                     hw_ref.store(tension.to_bits(), Ordering::Relaxed);
                     std::thread::sleep(Duration::from_millis(344)); // Match heartbeat BPM
@@ -373,21 +405,26 @@ impl PulseLoop {
             self.lorenz.update_phase(&self.state.phase);
 
             // Apply cognitive noise from incubating thoughts
-            self.lorenz.apply_cognitive_noise(self.cabinet.active_lorenz_noise());
+            self.lorenz
+                .apply_cognitive_noise(self.cabinet.active_lorenz_noise());
 
             // Apply permanent rho mutation from crystallized thoughts
-            self.lorenz.apply_rho_mutation(self.cabinet.mutations.lorenz_rho_mod);
+            self.lorenz
+                .apply_rho_mutation(self.cabinet.mutations.lorenz_rho_mod);
 
             // Couple logistic map to Lorenz every 10 ticks
-            if self.state.tick % 10 == 0 {
-                self.logistic.reseed_from_lorenz(self.lorenz.normalized_output());
+            if self.state.tick.is_multiple_of(10) {
+                self.logistic
+                    .reseed_from_lorenz(self.lorenz.normalized_output());
             }
 
             let chaos_val = self.logistic.next_val();
 
             // 3. Compute effective physics with thought mutations
-            let effective_gravity = (self.config.gravity + self.cabinet.mutations.gravity_mod).max(1.0);
-            let effective_friction = (self.config.friction + self.cabinet.mutations.friction_mod).max(0.05);
+            let effective_gravity =
+                (self.config.gravity + self.cabinet.mutations.gravity_mod).max(1.0);
+            let effective_friction =
+                (self.config.friction + self.cabinet.mutations.friction_mod).max(0.05);
 
             // 4. Tick engine state
             let rebirth = self.state.tick_heartbeat(
@@ -400,7 +437,10 @@ impl PulseLoop {
 
             if rebirth {
                 self.cabinet.mutations.lorenz_rho_mod *= 0.5;
-                info!(lorenz_rho_mod = self.cabinet.mutations.lorenz_rho_mod, "Engine rebirth: lorenz_rho_mod halved");
+                info!(
+                    lorenz_rho_mod = self.cabinet.mutations.lorenz_rho_mod,
+                    "Engine rebirth: lorenz_rho_mod halved"
+                );
             }
 
             // 5. Tick Thought Cabinet — check for crystallizations
@@ -492,12 +532,17 @@ impl PulseLoop {
             self.tension = self.tension * 0.9 + hw_t * 0.1;
 
             // Auto-lore emission: every 30 ticks (~10 seconds), if alive
-            if self.state.alive && self.state.tick % 30 == 0 {
+            if self.state.alive && self.state.tick.is_multiple_of(30) {
                 if let Some(lore) = self.lore.clone() {
                     if let Some((category, item)) = self.select_lore(&lore) {
                         // Try to absorb into Thought Cabinet
                         let absorb_roll = self.logistic.next_val();
-                        if self.cabinet.try_absorb(&category, &item.text, self.state.tick, absorb_roll) {
+                        if self.cabinet.try_absorb(
+                            &category,
+                            &item.text,
+                            self.state.tick,
+                            absorb_roll,
+                        ) {
                             info!(
                                 category = %category,
                                 text = %item.text.chars().take(40).collect::<String>(),
@@ -522,20 +567,31 @@ impl PulseLoop {
         let tension_delta = event.tension_delta();
         if tension_delta.abs() > 0.01 {
             self.tension = (self.tension + tension_delta).clamp(0.0, 100.0);
-            debug!(delta = tension_delta, tension = self.tension, "Tension shifted");
+            debug!(
+                delta = tension_delta,
+                tension = self.tension,
+                "Tension shifted"
+            );
         }
 
         // Apply energy delta
         let energy_delta = event.energy_delta();
         if energy_delta.abs() > 0.01 {
             self.state.apply_energy_delta(energy_delta);
-            debug!(delta = energy_delta, energy = self.state.energy, "Energy shifted");
+            debug!(
+                delta = energy_delta,
+                energy = self.state.energy,
+                "Energy shifted"
+            );
         }
 
         // Try to absorb thought seed into cabinet
         if let Some(seed) = event.thought_seed() {
             let chaos_roll = self.logistic.next_val();
-            if self.cabinet.try_absorb(&seed.category, &seed.text, self.state.tick, chaos_roll) {
+            if self
+                .cabinet
+                .try_absorb(&seed.category, &seed.text, self.state.tick, chaos_roll)
+            {
                 info!(
                     category = %seed.category,
                     text = %seed.text.chars().take(40).collect::<String>(),
@@ -548,7 +604,11 @@ impl PulseLoop {
         if let ChaosEvent::Stabilize { delta_rho } = event {
             self.cabinet.mutations.lorenz_rho_mod =
                 (self.cabinet.mutations.lorenz_rho_mod + delta_rho).clamp(-10.0, 10.0);
-            debug!(delta = delta_rho, lorenz_rho_mod = self.cabinet.mutations.lorenz_rho_mod, "lorenz_rho_mod stabilized");
+            debug!(
+                delta = delta_rho,
+                lorenz_rho_mod = self.cabinet.mutations.lorenz_rho_mod,
+                "lorenz_rho_mod stabilized"
+            );
         }
     }
 
@@ -560,7 +620,9 @@ impl PulseLoop {
 
     /// Select a lore item based on chaos_val probability windows (ported from original Randomizer)
     fn select_lore(&mut self, lore: &LorePool) -> Option<(String, LoreItem)> {
-        if lore.is_empty() { return None; }
+        if lore.is_empty() {
+            return None;
+        }
         let chaos_idx = self.logistic.next_val();
         let joke_end = self.config.events.joke_chance;
         let quote_end = joke_end + self.config.events.quote_chance;
@@ -612,9 +674,17 @@ mod tests {
         tokio::time::sleep(Duration::from_millis(700)).await;
 
         let snapshot = handle.snapshot_rx.borrow().clone();
-        assert!(snapshot.tick > 0, "PulseLoop should have ticked: {}", snapshot.tick);
+        assert!(
+            snapshot.tick > 0,
+            "PulseLoop should have ticked: {}",
+            snapshot.tick
+        );
         assert!(snapshot.energy > 0.0, "Energy should be positive");
-        assert!((0.3..=1.2).contains(&snapshot.llm_temperature), "Temperature out of range: {}", snapshot.llm_temperature);
+        assert!(
+            (0.3..=1.2).contains(&snapshot.llm_temperature),
+            "Temperature out of range: {}",
+            snapshot.llm_temperature
+        );
 
         // Clean up
         handle.task.abort();
@@ -630,14 +700,23 @@ mod tests {
         let tension_before = handle.snapshot_rx.borrow().tension;
 
         // Send a high-tension event (nat 1 on a D20)
-        handle.feedback_tx.send(ChaosEvent::DiceRoll { value: 1, max: 20 }).await.unwrap();
+        handle
+            .feedback_tx
+            .send(ChaosEvent::DiceRoll { value: 1, max: 20 })
+            .await
+            .unwrap();
 
         // Wait for processing
         tokio::time::sleep(Duration::from_millis(400)).await;
 
         let tension_after = handle.snapshot_rx.borrow().tension;
         // Nat 1 should increase tension (distance from midpoint is positive)
-        assert!(tension_after > tension_before - 1.0, "Tension should have increased from {} but got {}", tension_before, tension_after);
+        assert!(
+            tension_after > tension_before - 1.0,
+            "Tension should have increased from {} but got {}",
+            tension_before,
+            tension_after
+        );
 
         handle.task.abort();
     }
@@ -664,7 +743,10 @@ mod tests {
         };
 
         let temp = pulse.lorenz_to_temperature();
-        assert!((0.3..=1.2).contains(&temp), "Initial temperature out of range: {temp}");
+        assert!(
+            (0.3..=1.2).contains(&temp),
+            "Initial temperature out of range: {temp}"
+        );
     }
 
     #[tokio::test]
@@ -675,13 +757,21 @@ mod tests {
         tokio::time::sleep(Duration::from_millis(400)).await;
 
         // Send a Stabilize event
-        handle.feedback_tx.send(ChaosEvent::Stabilize { delta_rho: -5.0 }).await.unwrap();
+        handle
+            .feedback_tx
+            .send(ChaosEvent::Stabilize { delta_rho: -5.0 })
+            .await
+            .unwrap();
 
         // Wait for processing
         tokio::time::sleep(Duration::from_millis(400)).await;
 
         let snap = handle.snapshot_rx.borrow().clone();
-        assert!(snap.mutations.lorenz_rho_mod < -4.0, "lorenz_rho_mod should be reduced, got {}", snap.mutations.lorenz_rho_mod);
+        assert!(
+            snap.mutations.lorenz_rho_mod < -4.0,
+            "lorenz_rho_mod should be reduced, got {}",
+            snap.mutations.lorenz_rho_mod
+        );
 
         handle.task.abort();
     }

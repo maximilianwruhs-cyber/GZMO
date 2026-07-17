@@ -1,8 +1,8 @@
-/// Deterministic Chaos Engine — f64 Lorenz Attractor + Logistic Map
-///
-/// The Lorenz system is a set of three coupled nonlinear ODEs that produce
-/// deterministic yet unpredictable trajectories in 3D phase space.
-/// Hardware telemetry drives the attractor's control parameters.
+//! Deterministic Chaos Engine — f64 Lorenz Attractor + Logistic Map
+//!
+//! The Lorenz system is a set of three coupled nonlinear ODEs that produce
+//! deterministic yet unpredictable trajectories in 3D phase space.
+//! Hardware telemetry drives the attractor's control parameters.
 
 /// Engine phase derived from global hardware tension.
 /// Compile-time checked — impossible to misspell, exhaustive matching.

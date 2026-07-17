@@ -87,10 +87,7 @@ pub async fn run(config: &GzmoConfig, args: Vec<String>) -> Result<()> {
     if let Some(parent) = meta_path.parent() {
         std::fs::create_dir_all(parent)?;
     }
-    std::fs::write(
-        &meta_path,
-        serde_json::to_string_pretty(&meta_json)? + "\n",
-    )?;
+    std::fs::write(&meta_path, serde_json::to_string_pretty(&meta_json)? + "\n")?;
 
     println!(
         "kg-reconcile: dry_run={} entities={} relations={} notes+={} recanon={} deleted={}",

@@ -132,10 +132,9 @@ impl Component for PaletteComponent {
         // Clear underlying content for proper z-ordering
         f.render_widget(Clear, palette_area);
 
-        let items_iter = self
-            .items
-            .iter()
-            .map(|i| ListItem::new(i.as_str()).style(Style::default().fg(Color::Rgb(201, 209, 217))));
+        let items_iter = self.items.iter().map(|i| {
+            ListItem::new(i.as_str()).style(Style::default().fg(Color::Rgb(201, 209, 217)))
+        });
 
         let list = List::new(items_iter)
             .block(

@@ -39,7 +39,9 @@ pub struct SemanticFact {
     pub last_accessed_at: DateTime<Utc>,
 }
 
-fn default_confidence() -> f64 { 1.0 }
+fn default_confidence() -> f64 {
+    1.0
+}
 
 fn default_semantic_decay_class() -> String {
     "Episodic".to_string()
@@ -87,10 +89,14 @@ pub struct EpisodicEntry {
 pub enum EpisodicSource {
     UserChat,
     HeartbeatCheck,
-    ToolExecution { tool_name: String },
+    ToolExecution {
+        tool_name: String,
+    },
     InternalMonologue,
     /// Gated distill from `data/sessions/*.json` (feeds dream, not ops meta).
-    SessionDistill { session_id: String },
+    SessionDistill {
+        session_id: String,
+    },
 }
 
 // ---------------------------------------------------------------------------
@@ -99,8 +105,8 @@ pub enum EpisodicSource {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct EvidenceSpan {
-    pub evidence_text: String,      // sentence-window text stored in DB
-    pub quote_verifier: String,     // raw verifier quote
+    pub evidence_text: String,  // sentence-window text stored in DB
+    pub quote_verifier: String, // raw verifier quote
     pub char_start: Option<usize>,
     pub char_end: Option<usize>,
 }
@@ -121,7 +127,6 @@ pub struct ExtractedTruth {
     #[serde(default)]
     pub evidence: Option<EvidenceSpan>,
 }
-
 
 // ---------------------------------------------------------------------------
 // Skills

@@ -59,13 +59,12 @@ impl ToolHandler for WebBrowseTool {
             .as_str()
             .ok_or_else(|| anyhow::anyhow!("Missing 'url' argument"))?;
 
-        let max_chars = args["max_chars"]
-            .as_u64()
-            .unwrap_or(12000) as usize;
+        let max_chars = args["max_chars"].as_u64().unwrap_or(12000) as usize;
 
         tracing::info!(url = %url, "Fetching web page");
 
-        let resp = self.http
+        let resp = self
+            .http
             .get(url)
             .send()
             .await
@@ -76,13 +75,16 @@ impl ToolHandler for WebBrowseTool {
             return Ok(format!("HTTP {} — failed to fetch {}", status, url));
         }
 
-        let content_type = resp.headers()
+        let content_type = resp
+            .headers()
             .get("content-type")
             .and_then(|v| v.to_str().ok())
             .unwrap_or("")
             .to_string();
 
-        let body = resp.text().await
+        let body = resp
+            .text()
+            .await
             .map_err(|e| anyhow::anyhow!("Failed to read body: {}", e))?;
 
         // If it's not HTML, return as-is (truncated)
@@ -116,7 +118,9 @@ impl WebBrowseTool {
         let mut text = html.to_string();
 
         // Remove script and style blocks entirely
-        let remove_blocks = ["script", "style", "noscript", "nav", "header", "footer", "iframe"];
+        let remove_blocks = [
+            "script", "style", "noscript", "nav", "header", "footer", "iframe",
+        ];
         for tag in &remove_blocks {
             let pattern_open = format!("<{}", tag);
             let pattern_close = format!("</{}>", tag);
@@ -135,7 +139,10 @@ impl WebBrowseTool {
         }
 
         // Convert common block elements to newlines
-        let block_tags = ["br", "p", "div", "li", "h1", "h2", "h3", "h4", "h5", "h6", "tr", "td", "th", "article", "section"];
+        let block_tags = [
+            "br", "p", "div", "li", "h1", "h2", "h3", "h4", "h5", "h6", "tr", "td", "th",
+            "article", "section",
+        ];
         for tag in &block_tags {
             text = text.replace(&format!("<{}", tag), &format!("\n<{}", tag));
             text = text.replace(&format!("</{}>", tag), &format!("</{}>\n", tag));
@@ -166,11 +173,7 @@ impl WebBrowseTool {
         // Collapse whitespace: multiple spaces → single, multiple newlines → double
         let lines: Vec<String> = result
             .lines()
-            .map(|l| {
-                l.split_whitespace()
-                    .collect::<Vec<_>>()
-                    .join(" ")
-            })
+            .map(|l| l.split_whitespace().collect::<Vec<_>>().join(" "))
             .filter(|l| !l.is_empty())
             .collect();
 
@@ -184,7 +187,8 @@ mod tests {
 
     #[test]
     fn test_extract_text_basic() {
-        let html = "<html><head><title>Test</title></head><body><p>Hello <b>world</b></p></body></html>";
+        let html =
+            "<html><head><title>Test</title></head><body><p>Hello <b>world</b></p></body></html>";
         let text = WebBrowseTool::extract_text(html);
         assert!(text.contains("Hello world"));
         assert!(!text.contains("<p>"));

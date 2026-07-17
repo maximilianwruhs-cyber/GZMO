@@ -71,9 +71,7 @@ pub fn led_from_systemd(unit: &str, is_active: &str) -> HealthLed {
     let (state, detail) = match is_active {
         "active" => (LedState::Up, "active".to_string()),
         "inactive" | "failed" => (LedState::Down, is_active.to_string()),
-        "activating" | "deactivating" | "reloading" => {
-            (LedState::Degraded, is_active.to_string())
-        }
+        "activating" | "deactivating" | "reloading" => (LedState::Degraded, is_active.to_string()),
         other => (LedState::Unknown, other.to_string()),
     };
     HealthLed {
@@ -168,7 +166,10 @@ pub async fn collect_health_led_board(config: &GzmoConfig) -> HealthLedBoard {
                 id: "workflow_skills".into(),
                 label: "workflow_skills".into(),
                 state: LedState::Degraded,
-                detail: format!("enabled but empty dir {}", config.workflow_skills.dir.display()),
+                detail: format!(
+                    "enabled but empty dir {}",
+                    config.workflow_skills.dir.display()
+                ),
             }),
             Err(e) => probes.push(HealthLed {
                 id: "workflow_skills".into(),

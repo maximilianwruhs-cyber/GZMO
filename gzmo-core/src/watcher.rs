@@ -6,10 +6,10 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use tokio::sync::{Mutex, Semaphore};
 use tracing::{error, info, warn};
 
-use notify::{Event, EventKind, RecursiveMode, Watcher};
-use tokio::sync::mpsc;
 use crate::config::WatcherConfig;
 use crate::orchestrator::{execute_headless, OrchestratorContext};
+use notify::{Event, EventKind, RecursiveMode, Watcher};
+use tokio::sync::mpsc;
 
 /// Launch configured directory watchers using the `notify` crate.
 ///
@@ -110,15 +110,8 @@ async fn run_watcher(
 
         let handle = tokio::spawn(async move {
             tokio::time::sleep(debounce).await;
-            if let Err(e) = process_watched_file(
-                &name_c,
-                &config_c,
-                &path_for_task,
-                gate_c,
-                fp_c,
-                ctx_c,
-            )
-            .await
+            if let Err(e) =
+                process_watched_file(&name_c, &config_c, &path_for_task, gate_c, fp_c, ctx_c).await
             {
                 error!(watcher = %name_c, file = %path_for_task.display(), "Watcher ingest failed: {e}");
             }
@@ -133,7 +126,10 @@ fn path_matches_watcher(path: &Path, config: &WatcherConfig) -> bool {
     if !path.is_file() {
         return false;
     }
-    if path.components().any(|c| c.as_os_str() == ".gzmo_converted") {
+    if path
+        .components()
+        .any(|c| c.as_os_str() == ".gzmo_converted")
+    {
         return false;
     }
     // Never watch the agent-owned wiki/ layer as a raw ingest source — emitted
@@ -243,8 +239,9 @@ async fn process_watched_file(
             Err(e) => error!(watcher = %name, "Gated ingest failed: {e}"),
         }
     } else {
-        let active_prompt =
-            config.prompt.replace("{file_path}", &ingest_path.display().to_string());
+        let active_prompt = config
+            .prompt
+            .replace("{file_path}", &ingest_path.display().to_string());
         warn!(
             watcher = %name,
             "IngestEngine unavailable — falling back to headless prompt (ungated)"

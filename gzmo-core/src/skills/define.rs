@@ -7,7 +7,7 @@ use std::sync::Arc;
 use anyhow::Result;
 use async_trait::async_trait;
 
-use super::llm::{frame_box, llm_chat, SkillRuntime, BOLD, BLUE, CYAN, MAGENTA, RED, RESET, WHITE};
+use super::llm::{frame_box, llm_chat, SkillRuntime, BLUE, BOLD, CYAN, MAGENTA, RED, RESET, WHITE};
 use super::{Skill, SkillContext, SkillOutput, SkillType};
 
 const SYSTEM_PROMPT: &str = "You are a lexicographer. For the given term, provide:
@@ -34,7 +34,10 @@ fn format_define_lines(result: &str) -> String {
         if let Some(rest) = trimmed.strip_prefix("WORD:") {
             out.push_str(&format!("  {BOLD}{CYAN}WORD:{rest}{RESET}\n"));
         } else if let Some(rest) = trimmed.strip_prefix("PRONUNCIATION:") {
-            out.push_str(&format!("  {DIM}PRONUNCIATION:{rest}{RESET}\n", DIM = super::llm::DIM));
+            out.push_str(&format!(
+                "  {DIM}PRONUNCIATION:{rest}{RESET}\n",
+                DIM = super::llm::DIM
+            ));
         } else if let Some(rest) = trimmed.strip_prefix("DEFINITION:") {
             out.push_str(&format!("  {WHITE}DEFINITION:{rest}{RESET}\n"));
         } else if let Some(rest) = trimmed.strip_prefix("ETYMOLOGY:") {

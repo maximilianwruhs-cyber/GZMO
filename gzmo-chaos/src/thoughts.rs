@@ -6,7 +6,6 @@
 /// "crystallize" — permanently mutating the engine's physical constants.
 ///
 /// The engine learns from its own output. It becomes autopoietic.
-
 use serde::Serialize;
 
 const MAX_SLOTS: usize = 5; // Expanded from 3 — more capacity for skill output thoughts
@@ -15,15 +14,15 @@ const ABSORB_THRESHOLD: f64 = 0.82; // ~18% chance per emission
 /// Incubation periods by category (in ticks at 174 BPM)
 fn incubation_period(category: &str) -> u64 {
     match category {
-        "joke" => 15,       // ~5 seconds — humor is absorbed quickly
-        "quote" => 30,      // ~10 seconds — wisdom takes time to process
-        "fact" => 45,       // ~15 seconds — truth requires deep contemplation
-        "poem" => 25,       // ~8 seconds — verse resonates moderately
-        "story" => 40,      // ~14 seconds — narrative needs digestion
-        "card" => 35,       // ~12 seconds — a forged card leaves an imprint
-        "dice_crit" => 10,  // ~3 seconds — critical moments are absorbed instantly
-        "sound" => 8,       // ~3 seconds — sensory input is fast
-        "persona" => 60,    // ~20 seconds — identity shifts take time
+        "joke" => 15,      // ~5 seconds — humor is absorbed quickly
+        "quote" => 30,     // ~10 seconds — wisdom takes time to process
+        "fact" => 45,      // ~15 seconds — truth requires deep contemplation
+        "poem" => 25,      // ~8 seconds — verse resonates moderately
+        "story" => 40,     // ~14 seconds — narrative needs digestion
+        "card" => 35,      // ~12 seconds — a forged card leaves an imprint
+        "dice_crit" => 10, // ~3 seconds — critical moments are absorbed instantly
+        "sound" => 8,      // ~3 seconds — sensory input is fast
+        "persona" => 60,   // ~20 seconds — identity shifts take time
         _ => 30,
     }
 }
@@ -47,7 +46,7 @@ pub struct CrystallizationEvent {
 
 #[derive(Debug, Clone, Serialize)]
 pub struct MutationEffect {
-    pub target: String,     // "gravity", "friction", "lorenz_rho", or "tension_bias"
+    pub target: String, // "gravity", "friction", "lorenz_rho", or "tension_bias"
     pub delta: f64,
     pub description: String,
 }
@@ -55,10 +54,10 @@ pub struct MutationEffect {
 /// Accumulated permanent mutations from all crystallized thoughts
 #[derive(Debug, Clone, Default, Serialize)]
 pub struct Mutations {
-    pub gravity_mod: f64,      // Additive modifier (negative = lighter)
-    pub friction_mod: f64,     // Additive modifier (negative = smoother)
-    pub lorenz_rho_mod: f64,   // Additive modifier to Lorenz rho parameter
-    pub tension_bias: f64,     // Permanent tension offset
+    pub gravity_mod: f64,    // Additive modifier (negative = lighter)
+    pub friction_mod: f64,   // Additive modifier (negative = smoother)
+    pub lorenz_rho_mod: f64, // Additive modifier to Lorenz rho parameter
+    pub tension_bias: f64,   // Permanent tension offset
     pub total_crystallized: u32,
 }
 
@@ -77,7 +76,13 @@ impl ThoughtCabinet {
 
     /// Attempt to absorb a lore/skill item as an unprocessed thought.
     /// Returns true if absorbed (slot available and chaos roll passes threshold).
-    pub fn try_absorb(&mut self, category: &str, text: &str, current_tick: u64, chaos_roll: f64) -> bool {
+    pub fn try_absorb(
+        &mut self,
+        category: &str,
+        text: &str,
+        current_tick: u64,
+        chaos_roll: f64,
+    ) -> bool {
         if chaos_roll < ABSORB_THRESHOLD {
             return false;
         }
@@ -200,7 +205,8 @@ impl ThoughtCabinet {
                 MutationEffect {
                     target: "tension_bias".to_string(),
                     delta: -2.0,
-                    description: "Fortune's memory lowers the system's baseline anxiety".to_string(),
+                    description: "Fortune's memory lowers the system's baseline anxiety"
+                        .to_string(),
                 }
             }
             "sound" => {
@@ -334,7 +340,9 @@ mod tests {
         linear_cab.mutations.lorenz_rho_mod = 4.0;
         tanh_cab.apply_rho_restoration(0.0, 1.0, 0.001);
         linear_cab.apply_rho_decay(0.001);
-        assert!((tanh_cab.mutations.lorenz_rho_mod - linear_cab.mutations.lorenz_rho_mod).abs() < 1e-12);
+        assert!(
+            (tanh_cab.mutations.lorenz_rho_mod - linear_cab.mutations.lorenz_rho_mod).abs() < 1e-12
+        );
     }
 
     #[test]

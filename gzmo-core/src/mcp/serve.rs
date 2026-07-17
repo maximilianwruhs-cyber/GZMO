@@ -59,9 +59,7 @@ fn discovery_data_dir() -> PathBuf {
     std::env::var("PI_MENTOR_DISCOVERY_DATA")
         .or_else(|_| std::env::var("DISCOVERY_DATA_DIR"))
         .map(PathBuf::from)
-        .unwrap_or_else(|_| {
-            PathBuf::from("/home/maximilian/gzmo_skills/data/pi-mentor-discovery")
-        })
+        .unwrap_or_else(|_| PathBuf::from("/home/maximilian/gzmo_skills/data/pi-mentor-discovery"))
 }
 
 fn read_discovery_status_json(data_dir: &Path) -> serde_json::Value {
@@ -89,7 +87,10 @@ fn read_discovery_status_json(data_dir: &Path) -> serde_json::Value {
         false
     };
 
-    let bash_calls = last_metrics.get("bash_calls").cloned().unwrap_or(serde_json::json!(null));
+    let bash_calls = last_metrics
+        .get("bash_calls")
+        .cloned()
+        .unwrap_or(serde_json::json!(null));
     let probe_required_failed = last_metrics
         .get("probe_required_failed")
         .cloned()
@@ -146,7 +147,9 @@ impl GzmoMemoryMcpServer {
         ))]))
     }
 
-    #[tool(description = "Search GZMO honeypot/vault memory and optional Pi knowledge collection; writes session scratch by default.")]
+    #[tool(
+        description = "Search GZMO honeypot/vault memory and optional Pi knowledge collection; writes session scratch by default."
+    )]
     async fn gzmo_memory_search(
         &self,
         Parameters(args): Parameters<SearchParams>,
@@ -163,7 +166,9 @@ impl GzmoMemoryMcpServer {
         }
     }
 
-    #[tool(description = "Report vault path, fact counts, session id, and scratch backend — use to verify MCP vault attach.")]
+    #[tool(
+        description = "Report vault path, fact counts, session id, and scratch backend — use to verify MCP vault attach."
+    )]
     async fn gzmo_memory_status(&self) -> Result<CallToolResult, McpError> {
         match self.platform.status().await {
             Ok(st) => match serde_json::to_string_pretty(&st) {
@@ -207,7 +212,9 @@ impl GzmoMemoryMcpServer {
         }
     }
 
-    #[tool(description = "Search the git-tracked wiki/ markdown layer (entity/concept/source pages). Emit-only: reads pages directly, no honeypot writes.")]
+    #[tool(
+        description = "Search the git-tracked wiki/ markdown layer (entity/concept/source pages). Emit-only: reads pages directly, no honeypot writes."
+    )]
     async fn gzmo_wiki_search(
         &self,
         Parameters(args): Parameters<WikiSearchParams>,
@@ -228,10 +235,7 @@ impl GzmoMemoryMcpServer {
         }
         let mut out = format!("Wiki search '{}' — {} hit(s):\n", args.query, hits.len());
         for h in hits {
-            out.push_str(&format!(
-                "\n## {} ({})\n{}\n",
-                h.title, h.path, h.snippet
-            ));
+            out.push_str(&format!("\n## {} ({})\n{}\n", h.title, h.path, h.snippet));
         }
         Ok(CallToolResult::success(vec![Content::text(out)]))
     }
@@ -251,7 +255,9 @@ impl GzmoMemoryMcpServer {
         }
     }
 
-    #[tool(description = "Operator health probes (LLM, Qdrant, honeypot drift, Redis, Neo4j). Requires GZMO_OPS_MCP=1.")]
+    #[tool(
+        description = "Operator health probes (LLM, Qdrant, honeypot drift, Redis, Neo4j). Requires GZMO_OPS_MCP=1."
+    )]
     async fn gzmo_ops_health(&self) -> Result<CallToolResult, McpError> {
         if let Some(deny) = ops_mcp_denied() {
             return Ok(CallToolResult::error(vec![Content::text(deny)]));

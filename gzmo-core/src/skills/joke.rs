@@ -57,7 +57,8 @@ impl Skill for JokeSkill {
     async fn execute(&self, ctx: SkillContext<'_>) -> Result<SkillOutput> {
         let mut joke = String::new();
         for _ in 0..3 {
-            if let Ok(raw) = llm_chat(&self.rt, SYSTEM_PROMPT, USER_PROMPT, 0.9, 4096, false).await {
+            if let Ok(raw) = llm_chat(&self.rt, SYSTEM_PROMPT, USER_PROMPT, 0.9, 4096, false).await
+            {
                 if accept_creative_output(&raw, 280, quality_gate_joke) {
                     joke = raw;
                     break;
@@ -72,13 +73,21 @@ impl Skill for JokeSkill {
 
         if joke.is_empty() {
             return Ok(SkillOutput {
-                display: format!("  {RED}✗ LLM offline and no fallback jokes available.{RESET}", RED = super::llm::RED, RESET = super::llm::RESET),
+                display: format!(
+                    "  {RED}✗ LLM offline and no fallback jokes available.{RESET}",
+                    RED = super::llm::RED,
+                    RESET = super::llm::RESET
+                ),
                 feedback: vec![],
                 inject_to_conversation: false,
             });
         }
 
-        let body = format!("  {WHITE}{joke}{RESET}", WHITE = WHITE, RESET = super::llm::RESET);
+        let body = format!(
+            "  {WHITE}{joke}{RESET}",
+            WHITE = WHITE,
+            RESET = super::llm::RESET
+        );
         let display = frame_box("JOKE", &body, "😂", YELLOW);
 
         let feedback_event = ChaosEvent::JokeGenerated { text: joke.clone() };

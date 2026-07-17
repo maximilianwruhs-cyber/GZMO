@@ -2,24 +2,24 @@
 //!
 //! Pluggable tool registry. Each tool implements `ToolHandler`.
 
+pub mod delegate;
 pub mod fs;
+pub mod geogebra;
 pub mod jail;
+pub mod learner;
+pub mod memory;
+pub mod pedagogy_tools;
 pub mod profile;
+pub mod python_sandbox;
 pub mod shell;
 pub mod sysadmin;
 pub mod web;
 pub mod web_browse;
-pub mod memory;
-pub mod delegate;
-pub mod python_sandbox;
-pub mod pedagogy_tools;
-pub mod learner;
-pub mod geogebra;
 
 pub use delegate::DelegateTaskTool;
-pub use python_sandbox::PythonSandboxTool;
 pub use jail::PathJail;
 pub use profile::{register_for_profile, CapabilityProfile, ToolRegisterOpts};
+pub use python_sandbox::PythonSandboxTool;
 
 use anyhow::Result;
 use async_trait::async_trait;

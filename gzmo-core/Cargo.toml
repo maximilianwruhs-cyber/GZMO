@@ -33,3 +33,6 @@ r2d2_sqlite = "0.25.0"
 fs2 = "0.4"
 redis = { workspace = true }
 sha2 = { workspace = true }
+
+[lints]
+workspace = true

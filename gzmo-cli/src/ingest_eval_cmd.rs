@@ -116,10 +116,7 @@ fn normalize_entity_label(s: &str) -> String {
 
 /// Known LLM extract typos that should satisfy a corpus-grounded golden label.
 fn known_extract_typo_pair(a: &str, b: &str) -> bool {
-    matches!(
-        (a, b),
-        ("proxmox", "proxox") | ("proxox", "proxmox")
-    )
+    matches!((a, b), ("proxmox", "proxox") | ("proxox", "proxmox"))
 }
 
 fn entity_label_matches(must: &str, candidate: &str) -> bool {
@@ -148,7 +145,9 @@ fn entity_found_in_report(
             return true;
         }
     }
-    facts.iter().any(|fact| fact_text_satisfies_must(must, fact))
+    facts
+        .iter()
+        .any(|fact| fact_text_satisfies_must(must, fact))
 }
 
 fn fact_text_satisfies_must(must: &str, fact: &str) -> bool {
@@ -249,9 +248,10 @@ pub async fn run(config: &GzmoConfig, _identity: IdentityEngine, path: PathBuf) 
                         let mut missing_fact_substrings = Vec::new();
                         for must_fact in &rules.must_fact_substrings {
                             let must_fact_lower = must_fact.to_lowercase();
-                            let found = report.verified_facts.iter().any(|fact| {
-                                fact.to_lowercase().contains(&must_fact_lower)
-                            });
+                            let found = report
+                                .verified_facts
+                                .iter()
+                                .any(|fact| fact.to_lowercase().contains(&must_fact_lower));
                             if !found {
                                 missing_fact_substrings.push(must_fact.clone());
                             }
@@ -285,7 +285,11 @@ pub async fn run(config: &GzmoConfig, _identity: IdentityEngine, path: PathBuf) 
                         } else {
                             1.0
                         };
-                        let anti_penalty = if !found_anti_entities.is_empty() { 0.5 } else { 0.0 };
+                        let anti_penalty = if !found_anti_entities.is_empty() {
+                            0.5
+                        } else {
+                            0.0
+                        };
                         let score = (0.5 * score_e + 0.5 * score_f - anti_penalty).max(0.0);
 
                         FileEvalDetails {
@@ -331,7 +335,7 @@ pub async fn run(config: &GzmoConfig, _identity: IdentityEngine, path: PathBuf) 
     let mut relations_promoted = 0;
     let mut zero_entity_files = 0;
     let mut zero_relation_files = 0;
-    
+
     let mut sum_must_entities_total = 0;
     let mut sum_must_entities_found = 0;
     let mut sum_must_facts_total = 0;
@@ -417,7 +421,6 @@ fn collect_md(dir: &Path, out: &mut Vec<PathBuf>) -> Result<()> {
     }
     Ok(())
 }
-
 
 #[cfg(test)]
 mod eval_match_tests {

@@ -4,10 +4,10 @@
 //! permitted on computational offloading and learner history paths.
 
 use crate::config::PedagogyConfig;
-use crate::tools::ToolRegistry;
-use crate::tools::python_sandbox::PythonSandboxTool;
-use crate::tools::learner::{LearnerRecallTool, LearnerUpdateTool};
 use crate::tools::geogebra::GeoGebraPlotTool;
+use crate::tools::learner::{LearnerRecallTool, LearnerUpdateTool};
+use crate::tools::python_sandbox::PythonSandboxTool;
+use crate::tools::ToolRegistry;
 
 /// Construct a registry containing tools allowed in pedagogy execution modes.
 pub fn build_pedagogy_tool_registry(config: &PedagogyConfig) -> ToolRegistry {
@@ -27,7 +27,8 @@ mod tests {
     #[tokio::test]
     async fn test_pedagogy_tool_registry() {
         let mut config = PedagogyConfig::default();
-        let temp_dir = std::env::temp_dir().join(format!("gzmo-test-learner-{}", uuid::Uuid::new_v4()));
+        let temp_dir =
+            std::env::temp_dir().join(format!("gzmo-test-learner-{}", uuid::Uuid::new_v4()));
         config.learner_data_dir = temp_dir.to_string_lossy().to_string();
 
         let registry = build_pedagogy_tool_registry(&config);

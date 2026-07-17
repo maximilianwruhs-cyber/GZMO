@@ -1,11 +1,11 @@
 use color_eyre::Result;
 use crossterm::event::{Event, EventStream, KeyCode, KeyEventKind};
 use futures::{FutureExt, StreamExt};
+use ratatui::{backend::CrosstermBackend, Frame};
 use ratatui::{
     layout::{Constraint, Direction, Layout},
     Terminal,
 };
-use ratatui::{backend::CrosstermBackend, Frame};
 use std::io::stdout;
 use std::time::Duration;
 use tokio::sync::mpsc;
@@ -310,11 +310,7 @@ impl App {
         Ok(())
     }
 
-    fn sync_help(
-        &mut self,
-        open: bool,
-        action_tx: &mpsc::UnboundedSender<Action>,
-    ) -> Result<()> {
+    fn sync_help(&mut self, open: bool, action_tx: &mpsc::UnboundedSender<Action>) -> Result<()> {
         self.is_help_open = open;
         if open {
             self.is_palette_open = false;
@@ -331,13 +327,9 @@ impl App {
 mod tests {
     use super::*;
     use crate::tui::components::{
-        agent::AgentComponent,
-        chaos_canvas::ChaosCanvasComponent,
-        input::InputComponent,
-        instruments::InstrumentsComponent,
-        palette::PaletteComponent,
-        status_bar::StatusBarComponent,
-        transcript::TranscriptComponent,
+        agent::AgentComponent, chaos_canvas::ChaosCanvasComponent, input::InputComponent,
+        instruments::InstrumentsComponent, palette::PaletteComponent,
+        status_bar::StatusBarComponent, transcript::TranscriptComponent,
     };
     use gzmo_chaos::pulse::{ChaosConfig, PulseLoop};
     use gzmo_core::agent_session::AgentSession;
@@ -347,17 +339,20 @@ mod tests {
     use ratatui::backend::TestBackend;
     use std::sync::Arc;
 
-    async fn test_app() -> (App, mpsc::UnboundedSender<Action>, mpsc::UnboundedReceiver<Action>) {
+    async fn test_app() -> (
+        App,
+        mpsc::UnboundedSender<Action>,
+        mpsc::UnboundedReceiver<Action>,
+    ) {
         let config = GzmoConfig::default();
         let (snap_tx, snap_rx) = tokio::sync::watch::channel(Default::default());
         let _ = snap_tx;
         let active = config.engine.active_engine();
-        let gateway: Arc<tokio::sync::RwLock<Arc<dyn gzmo_core::gateway::LlmGateway>>> =
-            Arc::new(tokio::sync::RwLock::new(Arc::new(
-                gzmo_core::gateway::TurboQuantGateway::new(gzmo_core::gateway::VllmConfig::from(
-                    active,
-                )),
-            )));
+        let gateway: Arc<tokio::sync::RwLock<Arc<dyn gzmo_core::gateway::LlmGateway>>> = Arc::new(
+            tokio::sync::RwLock::new(Arc::new(gzmo_core::gateway::TurboQuantGateway::new(
+                gzmo_core::gateway::VllmConfig::from(active),
+            ))),
+        );
         let config_arc = Arc::new(tokio::sync::RwLock::new(config.clone()));
         let soul = Arc::new(tokio::sync::RwLock::new(gzmo_core::types::SoulContext {
             raw_markdown: "test".into(),
@@ -366,7 +361,9 @@ mod tests {
             ethical_guardrails: vec![],
             loaded_at: chrono::Utc::now(),
         }));
-        let episodic = Arc::new(gzmo_core::memory::episodic::FileEpisodicStore::new("memory"));
+        let episodic = Arc::new(gzmo_core::memory::episodic::FileEpisodicStore::new(
+            "memory",
+        ));
         let session_mgr = Arc::new(SessionManager::new("memory/sessions"));
         let tools = Arc::new(ToolRegistry::new());
         let chaos_skills = Arc::new(gzmo_core::skills::SkillRegistry::new());
@@ -425,15 +422,18 @@ mod tests {
         assert!(!app.is_palette_open);
         assert!(!app.components.palette.is_active);
 
-        app.handle_action(Action::ToggleCommandPalette, &tx).unwrap();
+        app.handle_action(Action::ToggleCommandPalette, &tx)
+            .unwrap();
         assert!(app.is_palette_open);
         assert!(app.components.palette.is_active);
 
-        app.handle_action(Action::SetCommandPalette(true), &tx).unwrap();
+        app.handle_action(Action::SetCommandPalette(true), &tx)
+            .unwrap();
         assert!(app.is_palette_open);
         assert!(app.components.palette.is_active);
 
-        app.handle_action(Action::SetCommandPalette(false), &tx).unwrap();
+        app.handle_action(Action::SetCommandPalette(false), &tx)
+            .unwrap();
         assert!(!app.is_palette_open);
         assert!(!app.components.palette.is_active);
     }
@@ -448,7 +448,8 @@ mod tests {
     #[tokio::test]
     async fn palette_enter_closes_before_submit() {
         let (mut app, tx, _rx) = test_app().await;
-        app.handle_action(Action::SetCommandPalette(true), &tx).unwrap();
+        app.handle_action(Action::SetCommandPalette(true), &tx)
+            .unwrap();
         app.handle_action(Action::SubmitInput("/stats".into()), &tx)
             .unwrap();
         assert!(!app.is_palette_open);
@@ -458,7 +459,8 @@ mod tests {
     #[tokio::test]
     async fn golden_palette_open() {
         let (mut app, tx, _rx) = test_app().await;
-        app.handle_action(Action::SetCommandPalette(true), &tx).unwrap();
+        app.handle_action(Action::SetCommandPalette(true), &tx)
+            .unwrap();
         let buf = render_buffer(&mut app, 100, 30);
         assert!(buf.contains("COMMAND PALETTE"));
     }
@@ -490,15 +492,15 @@ mod tests {
     #[tokio::test]
     async fn bridge_immediate_flush_reaches_canvas() {
         let handle = PulseLoop::start(ChaosConfig::default());
-        let gateway: Arc<tokio::sync::RwLock<Arc<dyn gzmo_core::gateway::LlmGateway>>> =
-            Arc::new(tokio::sync::RwLock::new(Arc::new(
-                gzmo_core::gateway::TurboQuantGateway::new(gzmo_core::gateway::VllmConfig::from(
-                    GzmoConfig::default().engine.active_engine(),
-                )),
-            )));
+        let gateway: Arc<tokio::sync::RwLock<Arc<dyn gzmo_core::gateway::LlmGateway>>> = Arc::new(
+            tokio::sync::RwLock::new(Arc::new(gzmo_core::gateway::TurboQuantGateway::new(
+                gzmo_core::gateway::VllmConfig::from(GzmoConfig::default().engine.active_engine()),
+            ))),
+        );
         let (action_tx, mut action_rx) = mpsc::unbounded_channel();
         let (feedback_tx, _feedback_rx) = tokio::sync::mpsc::channel(4);
-        let state_dir = std::env::temp_dir().join(format!("gzmo-bridge-test-{}", std::process::id()));
+        let state_dir =
+            std::env::temp_dir().join(format!("gzmo-bridge-test-{}", std::process::id()));
         let _ = std::fs::create_dir_all(&state_dir);
 
         let _bridge = crate::chaos_bootstrap::spawn_snapshot_bridge(

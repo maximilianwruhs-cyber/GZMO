@@ -273,9 +273,13 @@ impl SubagentRunner {
                     }),
                 };
 
-                let response: AgentResponse =
-                    run_agent_loop(gateway.as_ref(), tools.as_ref(), &mut messages, &loop_config)
-                        .await?;
+                let response: AgentResponse = run_agent_loop(
+                    gateway.as_ref(),
+                    tools.as_ref(),
+                    &mut messages,
+                    &loop_config,
+                )
+                .await?;
 
                 let (summary, structured) = parse_structured_reply(&response.text, summary_max);
 

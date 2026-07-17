@@ -67,18 +67,17 @@ pub async fn run(_config: &GzmoConfig, args: &[String]) -> Result<()> {
 
     if want_apply {
         let live_text = std::fs::read_to_string(&live).context("read live config")?;
-        let next_shaped =
-            live_text.contains("[assembly]") || live_text.contains("[engine.local]");
+        let next_shaped = live_text.contains("[assembly]") || live_text.contains("[engine.local]");
         if next_shaped {
             promote_merge(&fused, &live)?;
+            println!("promoted (merge) {} → {}", fused.display(), live.display());
+        } else {
+            promote_copy(&fused, &live)?;
             println!(
-                "promoted (merge) {} → {}",
+                "promoted (full-file) {} → {}",
                 fused.display(),
                 live.display()
             );
-        } else {
-            promote_copy(&fused, &live)?;
-            println!("promoted (full-file) {} → {}", fused.display(), live.display());
             println!("note: full-file copy — verify sections if fuse was engine-only");
         }
     }
@@ -87,7 +86,8 @@ pub async fn run(_config: &GzmoConfig, args: &[String]) -> Result<()> {
 }
 
 fn promote_merge(fused: &Path, live: &Path) -> Result<()> {
-    let script = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../scripts/promote-fused-merge.py");
+    let script =
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../scripts/promote-fused-merge.py");
     let script = if script.is_file() {
         script
     } else {
@@ -119,10 +119,8 @@ fn promote_merge(fused: &Path, live: &Path) -> Result<()> {
 
 fn promote_copy(fused: &Path, live: &Path) -> Result<()> {
     let backup = live.with_extension("toml.bak-promote");
-    std::fs::copy(live, &backup)
-        .with_context(|| format!("backup live → {}", backup.display()))?;
-    std::fs::copy(fused, live)
-        .with_context(|| format!("copy fused → {}", live.display()))?;
+    std::fs::copy(live, &backup).with_context(|| format!("backup live → {}", backup.display()))?;
+    std::fs::copy(fused, live).with_context(|| format!("copy fused → {}", live.display()))?;
     println!("backup: {}", backup.display());
     Ok(())
 }

@@ -18,24 +18,20 @@ pub async fn run(config: &GzmoConfig, limit: Option<usize>) -> Result<()> {
         return Ok(());
     }
 
-    let vault =
-        embeddings::open_vault_with_embeddings(
-            &config.memory.vault_db,
-            &config.embeddings,
-            &config.redis,
-            &config.rerank,
-            &config.qdrant,
-        )
-        .await?;
+    let vault = embeddings::open_vault_with_embeddings(
+        &config.memory.vault_db,
+        &config.embeddings,
+        &config.redis,
+        &config.rerank,
+        &config.qdrant,
+    )
+    .await?;
 
     let report = vault.backfill_missing_embeddings(limit).await?;
 
     println!(
         "Embedding backfill: {} updated, {} failed, {} attempted ({} still missing before run).",
-        report.updated,
-        report.failed,
-        report.attempted,
-        missing
+        report.updated, report.failed, report.attempted, missing
     );
 
     Ok(())
