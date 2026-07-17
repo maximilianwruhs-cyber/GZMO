@@ -4,9 +4,9 @@ use anyhow::Result;
 use gzmo_core::config::GzmoConfig;
 use gzmo_core::health::{collect_health_probes, format_report};
 use gzmo_core::memory::embeddings;
-use gzmo_core::tools::ToolRegistry;
 use gzmo_core::tools::fs::{DirListTool, FileReadTool, FileSearchTool, FileWriteTool};
 use gzmo_core::tools::shell::ShellExecTool;
+use gzmo_core::tools::ToolRegistry;
 
 use crate::cli_mcp::McpSession;
 
@@ -31,10 +31,7 @@ pub async fn run(config: &GzmoConfig) -> Result<()> {
 
     let report = format_report(&mcp_connected);
     print!("{report}");
-    if mcp_connected
-        .iter()
-        .any(|r| !r.ok && r.name != "sovereign")
-    {
+    if mcp_connected.iter().any(|r| !r.ok && r.name != "sovereign") {
         anyhow::bail!("one or more required probes failed");
     }
     Ok(())

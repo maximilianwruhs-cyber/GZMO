@@ -77,9 +77,9 @@ fn vault_semantic_count(path: &Path) -> Option<usize> {
 fn vault_origin_summary(path: &Path) -> Option<String> {
     let conn = Connection::open(path).ok()?;
     let mut parts = Vec::new();
-    if let Ok(mut stmt) = conn.prepare(
-        "SELECT origin, COUNT(*) FROM facts GROUP BY origin ORDER BY COUNT(*) DESC",
-    ) {
+    if let Ok(mut stmt) =
+        conn.prepare("SELECT origin, COUNT(*) FROM facts GROUP BY origin ORDER BY COUNT(*) DESC")
+    {
         let rows = stmt
             .query_map([], |r| Ok((r.get::<_, String>(0)?, r.get::<_, i64>(1)?)))
             .ok()?;
@@ -223,7 +223,9 @@ pub async fn format_ecosystem_status(config: &GzmoConfig) -> String {
     let serve = user_systemd_unit("gzmo-serve.service").await;
     out.push_str(&format!("| gzmo-serve.service | {serve} |\n"));
     out.push_str(&format!("| gzmo-scheduler.service | {scheduler} |\n"));
-    out.push_str(&format!("| okforge.service (/observatory) | {observatory} |\n"));
+    out.push_str(&format!(
+        "| okforge.service (/observatory) | {observatory} |\n"
+    ));
     out.push_str("\n*Metabolism: `gzmo serve` (typed jobs). Lab parity: `gzmo-scheduler`. Chat is not a daemon.*\n\n");
 
     // Wiki / OKForge plane (production signal)
@@ -271,7 +273,9 @@ pub async fn format_ecosystem_status(config: &GzmoConfig) -> String {
         Err(_) => "no wiki-push-latest.json yet".into(),
     };
     out.push_str("### OKForge wiki plane\n\n");
-    out.push_str(&format!("- **Observatory:** http://127.0.0.1:3000/observatory\n"));
+    out.push_str(&format!(
+        "- **Observatory:** http://127.0.0.1:3000/observatory\n"
+    ));
     out.push_str(&format!("- **Last wiki push:** {wiki_line}\n\n"));
 
     out.push_str("### Data paths (from config)\n\n");
@@ -287,9 +291,7 @@ pub async fn format_ecosystem_status(config: &GzmoConfig) -> String {
             vault_mtime
                 .map(|t| format!(", mtime {}", t.format("%Y-%m-%d %H:%M UTC")))
                 .unwrap_or_default(),
-            vault_origins
-                .map(|s| format!(" — {s}"))
-                .unwrap_or_default()
+            vault_origins.map(|s| format!(" — {s}")).unwrap_or_default()
         )
     } else {
         "missing".into()
@@ -330,7 +332,11 @@ pub async fn format_ecosystem_status(config: &GzmoConfig) -> String {
     out.push_str("\n");
 
     // Last spark lineage (Experience B)
-    let spark_path = config.memory.vault_db.parent().map(|p| p.join("spark/last-spark-report.json"));
+    let spark_path = config
+        .memory
+        .vault_db
+        .parent()
+        .map(|p| p.join("spark/last-spark-report.json"));
     if let Some(ref sp) = spark_path {
         if sp.exists() {
             if let Ok(raw) = std::fs::read_to_string(sp) {
@@ -343,9 +349,7 @@ pub async fn format_ecosystem_status(config: &GzmoConfig) -> String {
                     let stale = v
                         .pointer("/selection/stale_sweetness")
                         .and_then(|x| x.as_f64());
-                    let verdict = v
-                        .pointer("/verdict/supported")
-                        .and_then(|x| x.as_bool());
+                    let verdict = v.pointer("/verdict/supported").and_then(|x| x.as_bool());
                     let dry = v.get("dry_run").and_then(|x| x.as_bool());
                     let date = v.get("date").and_then(|x| x.as_str()).unwrap_or("?");
                     out.push_str(&format!("- **Date:** {date}\n"));
@@ -390,14 +394,8 @@ pub async fn format_ecosystem_status(config: &GzmoConfig) -> String {
             if stats_path.exists() {
                 if let Ok(raw) = std::fs::read_to_string(&stats_path) {
                     if let Ok(v) = serde_json::from_str::<serde_json::Value>(&raw) {
-                        let anomaly = v
-                            .get("anomaly_count")
-                            .and_then(|x| x.as_u64())
-                            .unwrap_or(0);
-                        let rem = v
-                            .get("rem_anchors")
-                            .and_then(|x| x.as_u64())
-                            .unwrap_or(0);
+                        let anomaly = v.get("anomaly_count").and_then(|x| x.as_u64()).unwrap_or(0);
+                        let rem = v.get("rem_anchors").and_then(|x| x.as_u64()).unwrap_or(0);
                         let ledger_art = v
                             .get("graph_ledger_artifact")
                             .and_then(|x| x.as_str())
@@ -426,9 +424,7 @@ pub async fn format_ecosystem_status(config: &GzmoConfig) -> String {
                 out.push_str(&format!(
                     "- **ledger path:** `{}`{}\n",
                     ledger_path.display(),
-                    mtime
-                        .map(|t| format!(" (mtime {t})"))
-                        .unwrap_or_default()
+                    mtime.map(|t| format!(" (mtime {t})")).unwrap_or_default()
                 ));
             } else {
                 out.push_str(&format!(
@@ -460,7 +456,7 @@ mod tests {
     fn vault_count_on_fixture_db() {
         let path = Path::new(env!("CARGO_MANIFEST_DIR")).join("../data-next/vault.db");
         if path.exists() {
-            assert!(vault_semantic_count(&path).unwrap_or(0) >= 0);
+            assert!(vault_semantic_count(&path).is_ok());
         }
     }
 }

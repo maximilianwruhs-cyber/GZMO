@@ -174,7 +174,9 @@ pub enum EngineMode {
 }
 
 impl Default for EngineMode {
-    fn default() -> Self { Self::Local }
+    fn default() -> Self {
+        Self::Local
+    }
 }
 
 impl std::fmt::Display for EngineMode {
@@ -593,9 +595,15 @@ pub struct DiscoveryQueueConfig {
     pub session_priority: bool,
 }
 
-fn default_discovery_max_pending() -> usize { 2 }
-fn default_discovery_max_concurrent() -> usize { 1 }
-fn default_discovery_session_priority() -> bool { true }
+fn default_discovery_max_pending() -> usize {
+    2
+}
+fn default_discovery_max_concurrent() -> usize {
+    1
+}
+fn default_discovery_session_priority() -> bool {
+    true
+}
 
 impl Default for LowTensionDialogueConfig {
     fn default() -> Self {
@@ -653,10 +661,18 @@ pub struct SandboxConfig {
     pub orchestrator_offload: bool,
 }
 
-fn default_sandbox_enabled() -> bool { true }
-fn default_sandbox_max_code_chars() -> usize { 2000 }
-fn default_sandbox_timeout_secs() -> u64 { 10 }
-fn default_sandbox_max_output_chars() -> usize { 4000 }
+fn default_sandbox_enabled() -> bool {
+    true
+}
+fn default_sandbox_max_code_chars() -> usize {
+    2000
+}
+fn default_sandbox_timeout_secs() -> u64 {
+    10
+}
+fn default_sandbox_max_output_chars() -> usize {
+    4000
+}
 fn default_sandbox_blocked_imports() -> Vec<String> {
     vec![
         "os".to_string(),
@@ -666,18 +682,40 @@ fn default_sandbox_blocked_imports() -> Vec<String> {
         "sys".to_string(),
     ]
 }
-fn default_sandbox_orchestrator_offload() -> bool { false }
+fn default_sandbox_orchestrator_offload() -> bool {
+    false
+}
 
-fn default_pedagogy_enabled() -> bool { true }
-fn default_learner_data_dir() -> String { "data/learner".to_string() }
-fn default_prereq_graphs_dir() -> String { "data/pedagogy/graphs".to_string() }
-fn default_edf_log_path() -> String { "data/pedagogy/edf_log.jsonl".to_string() }
-fn default_max_hint_level() -> u8 { 5 }
-fn default_solution_leakage_penalty() -> f64 { 1.0 }
-fn default_pedagogy_internal_max_tokens() -> u32 { 512 }
-fn default_teachback_interval() -> u32 { 8 }
-fn default_mentor_api_enabled() -> bool { true }
-fn default_mentor_socket() -> String { "data/gzmo_mentor.sock".to_string() }
+fn default_pedagogy_enabled() -> bool {
+    true
+}
+fn default_learner_data_dir() -> String {
+    "data/learner".to_string()
+}
+fn default_prereq_graphs_dir() -> String {
+    "data/pedagogy/graphs".to_string()
+}
+fn default_edf_log_path() -> String {
+    "data/pedagogy/edf_log.jsonl".to_string()
+}
+fn default_max_hint_level() -> u8 {
+    5
+}
+fn default_solution_leakage_penalty() -> f64 {
+    1.0
+}
+fn default_pedagogy_internal_max_tokens() -> u32 {
+    512
+}
+fn default_teachback_interval() -> u32 {
+    8
+}
+fn default_mentor_api_enabled() -> bool {
+    true
+}
+fn default_mentor_socket() -> String {
+    "data/gzmo_mentor.sock".to_string()
+}
 
 impl Default for PedagogyConfig {
     fn default() -> Self {
@@ -717,9 +755,7 @@ impl PedagogyConfig {
     }
 
     pub fn learner_id(&self) -> &str {
-        self.active_learner_id
-            .as_deref()
-            .unwrap_or("operator")
+        self.active_learner_id.as_deref().unwrap_or("operator")
     }
 
     pub fn learner_dir(&self) -> std::path::PathBuf {
@@ -1051,24 +1087,60 @@ pub struct WikiOkforgeConfig {
     pub open_pr: bool,
 }
 
-fn default_wiki_enabled() -> bool { true }
-fn default_wiki_backend() -> String { "local".to_string() }
-fn default_wiki_directory() -> String { "wiki".to_string() }
-fn default_wiki_index_path() -> String { "wiki/index.md".to_string() }
-fn default_wiki_log_path() -> String { "wiki/log.md".to_string() }
-fn default_wiki_schema_path() -> String { "WIKI.md".to_string() }
-fn default_wiki_emit_on_ingest() -> bool { true }
-fn default_wiki_sync_cron_hour() -> u32 { 5 }
-fn default_wiki_sync_cron_minute() -> u32 { 30 }
-fn default_wiki_lint_cron_dow() -> u32 { 0 }
-fn default_wiki_lint_cron_hour() -> u32 { 6 }
-fn default_wiki_push_cron_hour() -> u32 { 5 }
-fn default_wiki_push_cron_minute() -> u32 { 30 }
-fn default_okforge_url() -> String { "http://127.0.0.1:3000".into() }
-fn default_okforge_owner() -> String { "gzmo".into() }
-fn default_okforge_repo() -> String { "gzmo-next-memory".into() }
-fn default_okforge_token_env() -> String { "OKFORGE_TOKEN".into() }
-fn default_okforge_agent_id() -> String { "gzmo-next".into() }
+fn default_wiki_enabled() -> bool {
+    true
+}
+fn default_wiki_backend() -> String {
+    "local".to_string()
+}
+fn default_wiki_directory() -> String {
+    "wiki".to_string()
+}
+fn default_wiki_index_path() -> String {
+    "wiki/index.md".to_string()
+}
+fn default_wiki_log_path() -> String {
+    "wiki/log.md".to_string()
+}
+fn default_wiki_schema_path() -> String {
+    "WIKI.md".to_string()
+}
+fn default_wiki_emit_on_ingest() -> bool {
+    true
+}
+fn default_wiki_sync_cron_hour() -> u32 {
+    5
+}
+fn default_wiki_sync_cron_minute() -> u32 {
+    30
+}
+fn default_wiki_lint_cron_dow() -> u32 {
+    0
+}
+fn default_wiki_lint_cron_hour() -> u32 {
+    6
+}
+fn default_wiki_push_cron_hour() -> u32 {
+    5
+}
+fn default_wiki_push_cron_minute() -> u32 {
+    30
+}
+fn default_okforge_url() -> String {
+    "http://127.0.0.1:3000".into()
+}
+fn default_okforge_owner() -> String {
+    "gzmo".into()
+}
+fn default_okforge_repo() -> String {
+    "gzmo-next-memory".into()
+}
+fn default_okforge_token_env() -> String {
+    "OKFORGE_TOKEN".into()
+}
+fn default_okforge_agent_id() -> String {
+    "gzmo-next".into()
+}
 
 impl Default for WikiOkforgeConfig {
     fn default() -> Self {
@@ -1109,9 +1181,15 @@ impl Default for WikiConfig {
 
 impl WikiConfig {
     /// Absolute-ish paths relative to the agent working directory.
-    pub fn entities_dir(&self) -> String { format!("{}/entities", self.directory) }
-    pub fn concepts_dir(&self) -> String { format!("{}/concepts", self.directory) }
-    pub fn sources_dir(&self) -> String { format!("{}/sources", self.directory) }
+    pub fn entities_dir(&self) -> String {
+        format!("{}/entities", self.directory)
+    }
+    pub fn concepts_dir(&self) -> String {
+        format!("{}/concepts", self.directory)
+    }
+    pub fn sources_dir(&self) -> String {
+        format!("{}/sources", self.directory)
+    }
 }
 
 // ─── Session distill ──────────────────────────────────────────────────────
@@ -2120,18 +2198,16 @@ impl EngineSection {
     /// Get engine config for a specific mode (without changing active_mode).
     pub fn active_engine_for_mode(&self, mode: EngineMode) -> EngineProfileConfig {
         match mode {
-            EngineMode::Local => {
-                self.local.clone().unwrap_or_else(|| EngineProfileConfig {
-                    provider: self.provider.clone().unwrap_or_else(default_provider),
-                    url: self.url.clone().unwrap_or_else(default_engine_url),
-                    model: self.model.clone().unwrap_or_else(default_model_name),
-                    api_key: self.api_key.clone().unwrap_or_default(),
-                    temperature: self.temperature.unwrap_or_else(default_temperature),
-                    top_p: self.top_p.unwrap_or_else(default_top_p),
-                    max_tokens: self.max_tokens.unwrap_or_else(default_max_tokens),
-                    reasoning_effort: None,
-                })
-            }
+            EngineMode::Local => self.local.clone().unwrap_or_else(|| EngineProfileConfig {
+                provider: self.provider.clone().unwrap_or_else(default_provider),
+                url: self.url.clone().unwrap_or_else(default_engine_url),
+                model: self.model.clone().unwrap_or_else(default_model_name),
+                api_key: self.api_key.clone().unwrap_or_default(),
+                temperature: self.temperature.unwrap_or_else(default_temperature),
+                top_p: self.top_p.unwrap_or_else(default_top_p),
+                max_tokens: self.max_tokens.unwrap_or_else(default_max_tokens),
+                reasoning_effort: None,
+            }),
             EngineMode::Cloud => {
                 if let Some(ref cloud) = self.cloud {
                     EngineProfileConfig {
@@ -2164,7 +2240,10 @@ impl EngineSection {
             let model = c.fallback_model.as_ref().filter(|s| !s.is_empty())?;
             let key = c.fallback_api_key.as_ref().filter(|s| !s.is_empty())?;
             Some(EngineProfileConfig {
-                provider: c.fallback_provider.clone().unwrap_or_else(|| "gemini".to_string()),
+                provider: c
+                    .fallback_provider
+                    .clone()
+                    .unwrap_or_else(|| "gemini".to_string()),
                 url: url.clone(),
                 model: model.clone(),
                 api_key: key.clone(),
@@ -2346,19 +2425,18 @@ impl RoutingConfig {
                         reasoning_effort: cloud.reasoning_effort.clone(),
                     }
                 } else {
-                    tracing::warn!("Routing to 'cloud' but no [engine.cloud] — falling back to local");
+                    tracing::warn!(
+                        "Routing to 'cloud' but no [engine.cloud] — falling back to local"
+                    );
                     engine.active_engine()
                 }
             }
-            "sovereign" => {
-                engine
-                    .sovereign
-                    .clone()
-                    .unwrap_or_else(|| {
-                        tracing::warn!("Routing to 'sovereign' but no [engine.sovereign] — falling back to local");
-                        engine.active_engine()
-                    })
-            }
+            "sovereign" => engine.sovereign.clone().unwrap_or_else(|| {
+                tracing::warn!(
+                    "Routing to 'sovereign' but no [engine.sovereign] — falling back to local"
+                );
+                engine.active_engine()
+            }),
             name => {
                 tracing::warn!(
                     profile = name,
@@ -2623,44 +2701,112 @@ pub struct McpServerEntry {
 
 // ─── Defaults ───────────────────────────────────────────────────────────
 
-fn default_soul_path() -> PathBuf { PathBuf::from("SOUL.md") }
-fn default_memory_dir() -> PathBuf { PathBuf::from("memory") }
-fn default_vault_db() -> PathBuf { PathBuf::from("data/vault.db") }
-fn default_skills_dir() -> PathBuf { PathBuf::from("skills") }
-fn default_dreams_path() -> PathBuf { PathBuf::from("DREAMS.md") }
-fn default_provider() -> String { "local".to_string() }
-fn default_engine_url() -> String { "http://localhost:1234/v1".to_string() }
-fn default_model_name() -> String { "gemma-4-E4B-it-Q4_K_M.gguf".to_string() }
-fn default_temperature() -> f32 { 0.3 }
-fn default_top_p() -> f32 { 0.95 }
-fn default_max_tokens() -> u32 { 8192 }
-fn default_max_iterations() -> usize { 40 }
-fn default_heartbeat_secs() -> u64 { 1800 }
-fn default_step_iterations() -> usize { 20 }
-fn default_dream_enabled() -> bool { true }
-fn default_dream_verify() -> bool { true }
-fn default_dream_min_confidence() -> f64 { 0.85 }
-fn default_dream_verify_temperature() -> f32 { 0.1 }
-fn default_dream_cron_hour() -> u32 { 1 }
-fn default_dream_cron_minute() -> u32 { 0 }
-fn default_ingest_enabled() -> bool { true }
-fn default_kg_require_evidence() -> bool { true }
-fn default_kg_strict() -> bool { true }
-fn default_spark_enabled() -> bool { true }
-fn default_spark_hypothesis_temperature() -> f32 { 0.2 }
-fn default_spark_candidate_limit() -> usize { 5 }
-fn default_spark_recent_limit() -> usize { 2 }
-fn default_spark_quarantine_confidence() -> f64 { 0.6 }
-fn default_spark_cron_hours() -> Vec<u32> { vec![9, 14, 21] }
-fn default_spark_cron_minute() -> u32 { 17 }
+fn default_soul_path() -> PathBuf {
+    PathBuf::from("SOUL.md")
+}
+fn default_memory_dir() -> PathBuf {
+    PathBuf::from("memory")
+}
+fn default_vault_db() -> PathBuf {
+    PathBuf::from("data/vault.db")
+}
+fn default_skills_dir() -> PathBuf {
+    PathBuf::from("skills")
+}
+fn default_dreams_path() -> PathBuf {
+    PathBuf::from("DREAMS.md")
+}
+fn default_provider() -> String {
+    "local".to_string()
+}
+fn default_engine_url() -> String {
+    "http://localhost:1234/v1".to_string()
+}
+fn default_model_name() -> String {
+    "gemma-4-E4B-it-Q4_K_M.gguf".to_string()
+}
+fn default_temperature() -> f32 {
+    0.3
+}
+fn default_top_p() -> f32 {
+    0.95
+}
+fn default_max_tokens() -> u32 {
+    8192
+}
+fn default_max_iterations() -> usize {
+    40
+}
+fn default_heartbeat_secs() -> u64 {
+    1800
+}
+fn default_step_iterations() -> usize {
+    20
+}
+fn default_dream_enabled() -> bool {
+    true
+}
+fn default_dream_verify() -> bool {
+    true
+}
+fn default_dream_min_confidence() -> f64 {
+    0.85
+}
+fn default_dream_verify_temperature() -> f32 {
+    0.1
+}
+fn default_dream_cron_hour() -> u32 {
+    1
+}
+fn default_dream_cron_minute() -> u32 {
+    0
+}
+fn default_ingest_enabled() -> bool {
+    true
+}
+fn default_kg_require_evidence() -> bool {
+    true
+}
+fn default_kg_strict() -> bool {
+    true
+}
+fn default_spark_enabled() -> bool {
+    true
+}
+fn default_spark_hypothesis_temperature() -> f32 {
+    0.2
+}
+fn default_spark_candidate_limit() -> usize {
+    5
+}
+fn default_spark_recent_limit() -> usize {
+    2
+}
+fn default_spark_quarantine_confidence() -> f64 {
+    0.6
+}
+fn default_spark_cron_hours() -> Vec<u32> {
+    vec![9, 14, 21]
+}
+fn default_spark_cron_minute() -> u32 {
+    17
+}
 
-fn default_cloud_provider() -> String { "openrouter".to_string() }
-fn default_cloud_url() -> String { "https://openrouter.ai/api/v1".to_string() }
-fn default_cloud_model() -> String { "openrouter/free".to_string() }
+fn default_cloud_provider() -> String {
+    "openrouter".to_string()
+}
+fn default_cloud_url() -> String {
+    "https://openrouter.ai/api/v1".to_string()
+}
+fn default_cloud_model() -> String {
+    "openrouter/free".to_string()
+}
 
 impl Default for IdentityConfig {
     fn default() -> Self {
-        Self { soul_path: default_soul_path() }
+        Self {
+            soul_path: default_soul_path(),
+        }
     }
 }
 impl Default for MemoryConfig {
@@ -2674,7 +2820,10 @@ impl Default for MemoryConfig {
 }
 impl Default for SkillsConfig {
     fn default() -> Self {
-        Self { directory: default_skills_dir(), dreams_path: default_dreams_path() }
+        Self {
+            directory: default_skills_dir(),
+            dreams_path: default_dreams_path(),
+        }
     }
 }
 impl Default for AgentConfig {
@@ -2685,7 +2834,6 @@ impl Default for AgentConfig {
         }
     }
 }
-
 
 // ─── Loader ─────────────────────────────────────────────────────────────
 
@@ -2733,13 +2881,21 @@ fn apply_engine_key_overrides(config: &mut GzmoConfig, dotenv: &HashMap<String, 
             .filter(|k| !k.is_empty())
             .or_else(|| {
                 let k = config.api_keys.openrouter_key();
-                if k.is_empty() { None } else { Some(k) }
+                if k.is_empty() {
+                    None
+                } else {
+                    Some(k)
+                }
             }),
         "gemini" => env_or_dotenv("GZMO_GEMINI_KEY", dotenv)
             .filter(|k| !k.is_empty())
             .or_else(|| {
                 let k = config.api_keys.gemini_key();
-                if k.is_empty() { None } else { Some(k) }
+                if k.is_empty() {
+                    None
+                } else {
+                    Some(k)
+                }
             }),
         _ => None,
     };
@@ -2759,9 +2915,7 @@ fn apply_engine_key_overrides(config: &mut GzmoConfig, dotenv: &HashMap<String, 
         let fb_provider = cloud.fallback_provider.as_deref().unwrap_or("gemini");
         let fb_key = match fb_provider {
             "gemini" => env_or_dotenv("GZMO_GEMINI_KEY", dotenv).filter(|k| !k.is_empty()),
-            "openrouter" => {
-                env_or_dotenv("GZMO_OPENROUTER_KEY", dotenv).filter(|k| !k.is_empty())
-            }
+            "openrouter" => env_or_dotenv("GZMO_OPENROUTER_KEY", dotenv).filter(|k| !k.is_empty()),
             _ => None,
         };
         if let Some(fb_key) = fb_key {
@@ -2796,7 +2950,11 @@ impl GzmoConfig {
         let base_dir = path.parent().unwrap_or_else(|| Path::new("."));
         let dotenv = read_dotenv(base_dir);
         let resolve = |p: &PathBuf| -> PathBuf {
-            if p.is_absolute() { p.clone() } else { base_dir.join(p) }
+            if p.is_absolute() {
+                p.clone()
+            } else {
+                base_dir.join(p)
+            }
         };
 
         if !path.exists() {
@@ -2858,8 +3016,8 @@ impl GzmoConfig {
             let cwd = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
             let mut exe = std::env::current_exe().unwrap_or_else(|_| PathBuf::from("."));
             exe.pop();
-            let product = std::env::var_os("HOME")
-                .map(|h| PathBuf::from(h).join(".gzmo").join("gzmo.toml"));
+            let product =
+                std::env::var_os("HOME").map(|h| PathBuf::from(h).join(".gzmo").join("gzmo.toml"));
             let mut candidates: Vec<PathBuf> = Vec::new();
             if let Some(p) = product {
                 candidates.push(p);
@@ -2889,8 +3047,12 @@ impl GzmoConfig {
     /// Persist the active_mode to gzmo.toml on disk.
     /// Uses a regex replacement to update the field without clobbering the rest of the file.
     pub fn persist_active_mode(&self, config_path: &Path, mode: EngineMode) -> Result<()> {
-        let content = std::fs::read_to_string(config_path)
-            .with_context(|| format!("Failed to read {} for mode persistence", config_path.display()))?;
+        let content = std::fs::read_to_string(config_path).with_context(|| {
+            format!(
+                "Failed to read {} for mode persistence",
+                config_path.display()
+            )
+        })?;
 
         // Replace the active_mode line under [engine]
         let updated = if content.contains("active_mode") {
@@ -2949,8 +3111,8 @@ mod assembly_config_tests {
 
     #[test]
     fn gzmo_next_toml_parses() {
-        let path = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
-            .join("../config/gzmo-next.toml");
+        let path =
+            std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../config/gzmo-next.toml");
         let cfg = GzmoConfig::load(&path).unwrap();
         assert!(cfg.assembly.distill.is_lab());
         assert!(cfg.assembly.dream.is_lab());

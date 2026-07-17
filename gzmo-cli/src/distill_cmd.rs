@@ -6,13 +6,13 @@ use anyhow::Result;
 use tracing::info;
 
 use gzmo_core::config::GzmoConfig;
-use gzmo_core::gateway::LlmGateway;
-use gzmo_core::gateway::GatewayRouter;
 use gzmo_core::config::TaskKind;
-use gzmo_core::synapse::set_event_source;
-use gzmo_core::memory::episodic::FileEpisodicStore;
+use gzmo_core::gateway::GatewayRouter;
+use gzmo_core::gateway::LlmGateway;
 use gzmo_core::memory::embeddings;
+use gzmo_core::memory::episodic::FileEpisodicStore;
 use gzmo_core::session_distill::SessionDistillEngine;
+use gzmo_core::synapse::set_event_source;
 use gzmo_core::synapse::SynapseBus;
 use gzmo_core::tools::fs::{DirListTool, FileReadTool, FileSearchTool, FileWriteTool};
 use gzmo_core::tools::memory::{MemoryRecordTool, MemorySearchTool};
@@ -66,7 +66,9 @@ pub async fn run(config: &GzmoConfig, session_id: Option<String>) -> Result<()> 
     tools.register(Box::new(WebSearchTool::default()));
     tools.register(Box::new(SysMetricsTool));
     tools.register(Box::new(SysKillTool));
-    tools.register(Box::new(MemoryRecordTool { vault: Arc::clone(&vault) }));
+    tools.register(Box::new(MemoryRecordTool {
+        vault: Arc::clone(&vault),
+    }));
     tools.register(Box::new(MemorySearchTool::new(Arc::clone(&vault))));
 
     let session = McpSession::connect(config, &mut tools).await?;

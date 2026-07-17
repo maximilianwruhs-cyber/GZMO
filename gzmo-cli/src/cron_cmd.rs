@@ -31,10 +31,7 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine, args: &[String]
             let id = args
                 .get(1)
                 .ok_or_else(|| anyhow::anyhow!("Usage: gzmo cron preview <id> [n]"))?;
-            let n = args
-                .get(2)
-                .and_then(|s| s.parse().ok())
-                .unwrap_or(5);
+            let n = args.get(2).and_then(|s| s.parse().ok()).unwrap_or(5);
             cmd_preview(config, id, n)
         }
         "set" => {
@@ -336,9 +333,7 @@ pub async fn run_custom_job(
             }
             Ok(())
         }
-        CustomCronKind::Prompt => {
-            run_prompt_job(config, identity, id, &job.prompt).await
-        }
+        CustomCronKind::Prompt => run_prompt_job(config, identity, id, &job.prompt).await,
     }
 }
 
@@ -355,7 +350,8 @@ async fn run_prompt_job(
     let soul = identity.snapshot().await;
     let router = GatewayRouter::new(config);
     let gateway: Arc<dyn LlmGateway> = Arc::clone(router.gateway(TaskKind::Chat));
-    let profile = CapabilityProfile::parse(&config.tools.profile).unwrap_or(CapabilityProfile::Developer);
+    let profile =
+        CapabilityProfile::parse(&config.tools.profile).unwrap_or(CapabilityProfile::Developer);
     let mut tools = ToolRegistry::new();
     register_for_profile(
         &mut tools,
@@ -428,7 +424,10 @@ async fn cmd_wizard(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()
                 let _ = cmd_preview(&config, &id, 5);
             }
             's' | 'S' => {
-                let id = prompt_line(&mut stdin, "Builtin id (dream/distill/promote/embed/wiki_push): ")?;
+                let id = prompt_line(
+                    &mut stdin,
+                    "Builtin id (dream/distill/promote/embed/wiki_push): ",
+                )?;
                 let time = prompt_line(&mut stdin, "Time UTC HH:MM: ")?;
                 if let Err(e) = cmd_set_builtin(&config, &id, &time) {
                     eprintln!("Error: {e}");

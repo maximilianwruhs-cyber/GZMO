@@ -9,8 +9,8 @@ use async_trait::async_trait;
 use gzmo_chaos::feedback::ChaosEvent;
 
 use super::llm::{
-    accept_creative_output, fold_lines, frame_box, llm_chat, quality_gate_story, SkillRuntime, BLUE,
-    RED, RESET, WHITE,
+    accept_creative_output, fold_lines, frame_box, llm_chat, quality_gate_story, SkillRuntime,
+    BLUE, RED, RESET, WHITE,
 };
 use super::{Skill, SkillContext, SkillOutput, SkillType};
 
@@ -47,7 +47,9 @@ impl Skill for StorySkill {
 
         let mut story = String::new();
         for _ in 0..3 {
-            if let Ok(raw) = llm_chat(&self.rt, SYSTEM_PROMPT, &user_prompt, 0.85, 4096, false).await {
+            if let Ok(raw) =
+                llm_chat(&self.rt, SYSTEM_PROMPT, &user_prompt, 0.85, 4096, false).await
+            {
                 if accept_creative_output(&raw, 500, quality_gate_story) {
                     story = raw;
                     break;
@@ -68,13 +70,19 @@ impl Skill for StorySkill {
         let folded = fold_lines(&story, 50);
         let mut body = String::new();
         for line in folded.lines() {
-            body.push_str(&format!("  {WHITE}{line}{RESET}\n", WHITE = WHITE, RESET = RESET));
+            body.push_str(&format!(
+                "  {WHITE}{line}{RESET}\n",
+                WHITE = WHITE,
+                RESET = RESET
+            ));
         }
 
         let title = format!("STORY — seed: \"{keyword}\"");
         let display = frame_box(&title, body.trim_end(), "📖", BLUE);
 
-        let feedback_event = ChaosEvent::StoryGenerated { text: story.clone() };
+        let feedback_event = ChaosEvent::StoryGenerated {
+            text: story.clone(),
+        };
         let _ = ctx.feedback_tx.send(feedback_event.clone()).await;
 
         Ok(SkillOutput {

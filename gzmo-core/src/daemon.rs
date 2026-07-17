@@ -97,10 +97,7 @@ impl CheapCheck for FileChangeCheck {
             if let Ok(meta) = entry.metadata().await {
                 if let Ok(modified) = meta.modified() {
                     if modified > cutoff {
-                        return Ok(Some(format!(
-                            "File modified: {:?}",
-                            entry.file_name()
-                        )));
+                        return Ok(Some(format!("File modified: {:?}", entry.file_name())));
                     }
                 }
             }
@@ -144,14 +141,19 @@ pub const CHEAPCHECK_START: &str = "<!-- cheapcheck-start -->";
 pub const CHEAPCHECK_END: &str = "<!-- cheapcheck-end -->";
 
 /// Merge CheapCheck rows into HEARTBEAT.md (preserves chaos-written content outside markers).
-pub async fn write_cheapcheck_section(path: &std::path::Path, results: &[CheapCheckResult]) -> Result<()> {
+pub async fn write_cheapcheck_section(
+    path: &std::path::Path,
+    results: &[CheapCheckResult],
+) -> Result<()> {
     let mut body = String::new();
     if tokio::fs::try_exists(path).await.unwrap_or(false) {
         body = tokio::fs::read_to_string(path).await.unwrap_or_default();
     }
 
     let section = format_cheapcheck_table(results);
-    let merged = if let (Some(start), Some(end)) = (body.find(CHEAPCHECK_START), body.find(CHEAPCHECK_END)) {
+    let merged = if let (Some(start), Some(end)) =
+        (body.find(CHEAPCHECK_START), body.find(CHEAPCHECK_END))
+    {
         if end > start {
             let mut out = String::with_capacity(body.len() + section.len());
             out.push_str(&body[..start]);
@@ -176,13 +178,12 @@ pub async fn write_cheapcheck_section(path: &std::path::Path, results: &[CheapCh
 }
 
 fn append_cheapcheck_block(body: &str, section: &str) -> String {
-    format!(
-        "{body}\n\n{CHEAPCHECK_START}\n{section}\n{CHEAPCHECK_END}\n"
-    )
+    format!("{body}\n\n{CHEAPCHECK_START}\n{section}\n{CHEAPCHECK_END}\n")
 }
 
 fn format_cheapcheck_table(results: &[CheapCheckResult]) -> String {
-    let mut out = String::from("## CheapCheck probes\n\n| Check | Status | Detail |\n|---|---|---|\n");
+    let mut out =
+        String::from("## CheapCheck probes\n\n| Check | Status | Detail |\n|---|---|---|\n");
     for r in results {
         let detail = r.detail.replace('|', "/");
         out.push_str(&format!("| {} | {} | {} |\n", r.name, r.status, detail));

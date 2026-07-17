@@ -8,8 +8,8 @@ use crate::pedagogy::edf::{EdfRecord, EdfStore, StealthMetrics, ZpdPhase};
 use crate::pedagogy::graph::PrerequisiteGraph;
 use crate::pedagogy::learner::LearnerProfile;
 use crate::pedagogy::trio::TrioMode;
-use crate::types::{Message, Role};
 use crate::tools::{python_sandbox::PythonSandboxTool, ToolHandler};
+use crate::types::{Message, Role};
 
 const INTERNAL_AGENT_TEMPERATURE: f32 = 0.35;
 const MAX_LEAKAGE_RETRIES: u8 = 2;
@@ -72,7 +72,8 @@ pub struct OrchestratorInput<'a> {
     pub teachback_due: bool,
     /// Live chaos snapshot — re-read before the tutor call so τ/ε shifts during
     /// internal-agent latency are reflected in sampling parameters.
-    pub chaos_snapshot_rx: Option<&'a tokio::sync::watch::Receiver<gzmo_chaos::pulse::ChaosSnapshot>>,
+    pub chaos_snapshot_rx:
+        Option<&'a tokio::sync::watch::Receiver<gzmo_chaos::pulse::ChaosSnapshot>>,
 }
 
 pub struct OrchestratorOutput {
@@ -128,7 +129,10 @@ impl PedagogyOrchestrator {
             .internal_agent_call(
                 internal_gateway,
                 PLANNER_SYSTEM,
-                &format!("Diagnoser output:\n{diag}\n\nStudent message:\n{}", input.user_message),
+                &format!(
+                    "Diagnoser output:\n{diag}\n\nStudent message:\n{}",
+                    input.user_message
+                ),
             )
             .await?;
         let affect = self
@@ -152,7 +156,10 @@ impl PedagogyOrchestrator {
 
         if !compute_expr.is_empty() && compute_expr.to_lowercase() != "none" {
             if self.config.sandbox.orchestrator_offload {
-                let code = if compute_expr.contains("print") || compute_expr.contains('\n') || compute_expr.contains("import") {
+                let code = if compute_expr.contains("print")
+                    || compute_expr.contains('\n')
+                    || compute_expr.contains("import")
+                {
                     compute_expr.clone()
                 } else {
                     format!(
@@ -299,13 +306,8 @@ impl PedagogyOrchestrator {
         system: &str,
         user: &str,
     ) -> Result<String> {
-        self.agent_call(
-            gateway,
-            system,
-            user,
-            Some(self.config.internal_max_tokens),
-        )
-        .await
+        self.agent_call(gateway, system, user, Some(self.config.internal_max_tokens))
+            .await
     }
 
     async fn agent_call(
@@ -422,11 +424,7 @@ pub fn detect_solution_leakage(
     let lower = response.to_lowercase();
 
     if response.contains("```") {
-        let fence_body = lower
-            .split("```")
-            .nth(1)
-            .unwrap_or("")
-            .to_string();
+        let fence_body = lower.split("```").nth(1).unwrap_or("").to_string();
         if contains_shell_solution(&fence_body) {
             return true;
         }
@@ -479,7 +477,9 @@ fn extract_sandbox_values(sandbox_output: &str) -> Vec<String> {
             continue;
         }
         // Check if it's numeric
-        let is_numeric = trimmed.chars().all(|c| c.is_ascii_digit() || c == '.' || c == '-');
+        let is_numeric = trimmed
+            .chars()
+            .all(|c| c.is_ascii_digit() || c == '.' || c == '-');
         if is_numeric {
             values.push(trimmed.to_string());
         } else if trimmed.len() >= 3 {
@@ -504,11 +504,17 @@ fn is_word_boundary_match(text: &str, value: &str) -> bool {
     while let Some(pos) = text_lower[start..].find(&val_lower) {
         let actual_pos = start + pos;
         let char_before = if actual_pos > 0 {
-            text_lower.as_bytes().get(actual_pos - 1).map(|&b| b as char)
+            text_lower
+                .as_bytes()
+                .get(actual_pos - 1)
+                .map(|&b| b as char)
         } else {
             None
         };
-        let char_after = text_lower.as_bytes().get(actual_pos + val_len).map(|&b| b as char);
+        let char_after = text_lower
+            .as_bytes()
+            .get(actual_pos + val_len)
+            .map(|&b| b as char);
 
         let is_boundary_before = match char_before {
             Some(c) => !c.is_alphanumeric() && c != '_',
@@ -607,14 +613,26 @@ mod tests {
     fn detects_sandbox_value_leakage() {
         let text = "The result is 1048576.";
         let sandbox_out = "Exit code: 0\n1048576";
-        assert!(detect_solution_leakage(text, ZpdPhase::WeDo, Some(sandbox_out)));
+        assert!(detect_solution_leakage(
+            text,
+            ZpdPhase::WeDo,
+            Some(sandbox_out)
+        ));
 
         // Not a leak in YouDo phase
-        assert!(!detect_solution_leakage(text, ZpdPhase::YouDo, Some(sandbox_out)));
+        assert!(!detect_solution_leakage(
+            text,
+            ZpdPhase::YouDo,
+            Some(sandbox_out)
+        ));
 
         // Substring boundary check: 10485764 should not match 1048576
         let text_no_leak = "Let's check 10485764.";
-        assert!(!detect_solution_leakage(text_no_leak, ZpdPhase::WeDo, Some(sandbox_out)));
+        assert!(!detect_solution_leakage(
+            text_no_leak,
+            ZpdPhase::WeDo,
+            Some(sandbox_out)
+        ));
     }
 
     #[test]

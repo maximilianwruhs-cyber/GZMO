@@ -5,7 +5,7 @@
 //! `GZMO_INSTANCE=next` everything reads/writes gzmo-next.toml + data-next/.
 
 use anyhow::{Context, Result};
-use gzmo_core::assembly::{lab_root, instance_is_next};
+use gzmo_core::assembly::{instance_is_next, lab_root};
 use gzmo_core::config::GzmoConfig;
 use std::path::PathBuf;
 use std::process::Command;

@@ -30,9 +30,9 @@
 
 pub mod chaos;
 pub mod engine;
-pub mod thoughts;
 pub mod feedback;
 pub mod pulse;
+pub mod thoughts;
 pub mod triggers;
 
 // Re-exports for convenience

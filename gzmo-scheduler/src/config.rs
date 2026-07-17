@@ -312,19 +312,27 @@ pub enum Backend {
 
 impl Default for MemorySection {
     fn default() -> Self {
-        Self { vault_db: default_vault_db() }
+        Self {
+            vault_db: default_vault_db(),
+        }
     }
 }
 
 impl Default for SkillsSection {
     fn default() -> Self {
-        Self { dreams_path: default_dreams_path() }
+        Self {
+            dreams_path: default_dreams_path(),
+        }
     }
 }
 
 impl Default for DreamsSection {
     fn default() -> Self {
-        Self { enabled: true, cron_hour: default_dream_hour(), cron_minute: 0 }
+        Self {
+            enabled: true,
+            cron_hour: default_dream_hour(),
+            cron_minute: 0,
+        }
     }
 }
 
@@ -459,14 +467,18 @@ impl SchedulerConfig {
             std::env::var("GZMO_CONFIG")
                 .context("GZMO_CONFIG must point at the instance config (e.g. gzmo-next.toml)")?,
         );
-        let raw = std::fs::read_to_string(&path)
-            .with_context(|| format!("read {}", path.display()))?;
+        let raw =
+            std::fs::read_to_string(&path).with_context(|| format!("read {}", path.display()))?;
         let mut cfg: SchedulerConfig =
             toml::from_str(&raw).with_context(|| format!("parse {}", path.display()))?;
 
         let base = path.parent().unwrap_or_else(|| Path::new("."));
         let resolve = |p: &PathBuf| -> PathBuf {
-            if p.is_absolute() { p.clone() } else { base.join(p) }
+            if p.is_absolute() {
+                p.clone()
+            } else {
+                base.join(p)
+            }
         };
         cfg.memory.vault_db = resolve(&cfg.memory.vault_db);
         cfg.skills.dreams_path = resolve(&cfg.skills.dreams_path);
@@ -577,10 +589,8 @@ mod tests {
 
     #[test]
     fn fused_target_is_sibling() {
-        let t = SchedulerConfig::handoff_apply_target(Path::new(
-            "/x/config/gzmo-next.toml",
-        ))
-        .unwrap();
+        let t =
+            SchedulerConfig::handoff_apply_target(Path::new("/x/config/gzmo-next.toml")).unwrap();
         assert_eq!(t, PathBuf::from("/x/config/gzmo-next-fused.toml"));
     }
 }

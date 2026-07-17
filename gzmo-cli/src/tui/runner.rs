@@ -1,22 +1,20 @@
-use std::sync::Arc;
 use anyhow::Result;
 use chrono::Utc;
+use std::sync::Arc;
 
 use gzmo_core::agent_session::AgentSession;
 use gzmo_core::config::{GzmoConfig, TaskKind};
 use gzmo_core::gateway::{GatewayRouter, LlmGateway, TurboQuantGateway, VllmConfig};
 use gzmo_core::identity::IdentityEngine;
+use gzmo_core::mcp::{bridge::McpServerConfig, manager::McpManager};
 use gzmo_core::memory::episodic::FileEpisodicStore;
 use gzmo_core::session::SessionManager;
-use gzmo_core::mcp::{bridge::McpServerConfig, manager::McpManager};
+use gzmo_core::skills::{register_pantheon, SkillRegistry as ChaosSkillRegistry};
 use gzmo_core::subagent::SubagentRunner;
-use gzmo_core::tools::ToolRegistry;
 use gzmo_core::tools::delegate::DelegateTaskTool;
 use gzmo_core::tools::memory::MemorySearchTool;
 use gzmo_core::tools::profile::{register_for_profile, CapabilityProfile, ToolRegisterOpts};
-use gzmo_core::skills::{
-    register_pantheon, SkillRegistry as ChaosSkillRegistry,
-};
+use gzmo_core::tools::ToolRegistry;
 
 use crate::repl_shared::{
     boot_knowledge_graph, boot_workflow_skills, build_system_prompt_with_workflows,
@@ -65,10 +63,11 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
 
     // ─── Gateway (primary still TurboQuant; delegate uses router) ─
     let active_profile = config.engine.active_engine();
-    let gateway: Arc<tokio::sync::RwLock<Arc<dyn LlmGateway>>> = Arc::new(tokio::sync::RwLock::new(
-        Arc::new(TurboQuantGateway::new(VllmConfig::from(active_profile.clone())))
-            as Arc<dyn LlmGateway>,
-    ));
+    let gateway: Arc<tokio::sync::RwLock<Arc<dyn LlmGateway>>> = Arc::new(
+        tokio::sync::RwLock::new(Arc::new(TurboQuantGateway::new(VllmConfig::from(
+            active_profile.clone(),
+        ))) as Arc<dyn LlmGateway>),
+    );
     let router = GatewayRouter::new(&config);
     let chat_gateway_dyn = router.gateway(TaskKind::Chat);
 
@@ -93,7 +92,8 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
     let (workflow_index, workflow_session) = boot_workflow_skills(&config)?;
 
     // ─── Tools (capability profile + jail) ───────────────────────
-    let profile = CapabilityProfile::parse(&config.tools.profile).unwrap_or(CapabilityProfile::Developer);
+    let profile =
+        CapabilityProfile::parse(&config.tools.profile).unwrap_or(CapabilityProfile::Developer);
     let mut tools = ToolRegistry::new();
     register_for_profile(
         &mut tools,

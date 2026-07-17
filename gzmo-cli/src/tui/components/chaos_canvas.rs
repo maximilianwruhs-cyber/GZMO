@@ -121,9 +121,10 @@ impl Component for ChaosCanvasComponent {
                 let sy = snap.y as f64;
                 let sz = snap.z as f64;
                 let finite = sx.is_finite() && sy.is_finite() && sz.is_finite();
-                let moved = self.history.back().map(|&(x, y, z)| {
-                    (x - sx).abs() + (y - sy).abs() + (z - sz).abs() > 1e-9
-                });
+                let moved = self
+                    .history
+                    .back()
+                    .map(|&(x, y, z)| (x - sx).abs() + (y - sy).abs() + (z - sz).abs() > 1e-9);
                 let new_tick = snap.tick != self.tick;
                 if finite && (self.history.is_empty() || new_tick || moved.unwrap_or(true)) {
                     self.history.push_back((sx, sy, sz));
@@ -164,7 +165,11 @@ impl Component for ChaosCanvasComponent {
         let block = Block::default()
             .borders(Borders::ALL)
             .title(title)
-            .title_style(Style::default().fg(title_color).add_modifier(Modifier::BOLD))
+            .title_style(
+                Style::default()
+                    .fg(title_color)
+                    .add_modifier(Modifier::BOLD),
+            )
             .border_style(Style::default().fg(border));
 
         // Not enough trail yet — show status instead of an empty black box

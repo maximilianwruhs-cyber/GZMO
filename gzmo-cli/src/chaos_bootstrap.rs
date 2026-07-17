@@ -3,12 +3,12 @@ use std::sync::Arc;
 use tokio::sync::{mpsc, watch, RwLock};
 use tokio::task::JoinHandle;
 
+use gzmo_chaos::feedback::ChaosEvent;
+use gzmo_chaos::pulse::{ChaosConfig, ChaosSnapshot, PulseHandle, PulseLoop};
+use gzmo_chaos::triggers::{NotifyLevel, TriggerAction, TriggerEngine};
 use gzmo_core::config::GzmoConfig;
 use gzmo_core::gateway::LlmGateway;
 use gzmo_core::synapse::{EventSource, EventType, SynapseBus, SynapseEvent};
-use gzmo_chaos::pulse::{PulseLoop, PulseHandle, ChaosConfig, ChaosSnapshot};
-use gzmo_chaos::triggers::{TriggerEngine, TriggerAction, NotifyLevel};
-use gzmo_chaos::feedback::ChaosEvent;
 
 use crate::tui::action::Action;
 
@@ -70,12 +70,16 @@ pub fn boot_chat_chaos(config: &GzmoConfig) -> ChatChaosBoot {
 
 /// Start the PulseLoop chaos engine with the config's [chaos] parameters.
 pub fn start_chaos_runtime(config: &GzmoConfig) -> ChaosRuntime {
-    let chaos_config: ChaosConfig = config.chaos
+    let chaos_config: ChaosConfig = config
+        .chaos
         .as_ref()
         .and_then(|v| v.clone().try_into().ok())
         .unwrap_or_default();
     let restore_policy = if chaos_config.rho_restore_alpha > 0.0 {
-        format!("tanh (α={:.2}, β={:.2})", chaos_config.rho_restore_alpha, chaos_config.rho_restore_beta)
+        format!(
+            "tanh (α={:.2}, β={:.2})",
+            chaos_config.rho_restore_alpha, chaos_config.rho_restore_beta
+        )
     } else {
         format!("linear (k={:.4})", chaos_config.rho_decay_k)
     };
@@ -220,13 +224,7 @@ async fn process_snapshot(
 
     let fired = triggers.evaluate(&snap);
     for f in fired {
-        dispatch_trigger(
-            &f.action,
-            feedback_tx,
-            trigger_notify,
-            action_tx,
-        )
-        .await;
+        dispatch_trigger(&f.action, feedback_tx, trigger_notify, action_tx).await;
     }
 }
 
@@ -307,7 +305,10 @@ async fn write_chaos_artifacts(
     );
     let hb_tmp = state_dir.join("HEARTBEAT.md.tmp");
     let hb_target = state_dir.join("HEARTBEAT.md");
-    if tokio::fs::write(&hb_tmp, heartbeat.as_bytes()).await.is_ok() {
+    if tokio::fs::write(&hb_tmp, heartbeat.as_bytes())
+        .await
+        .is_ok()
+    {
         let _ = tokio::fs::rename(&hb_tmp, &hb_target).await;
     }
 
@@ -380,9 +381,7 @@ async fn dispatch_trigger(
             if let Some(tx) = action_tx {
                 let _ = tx.send(Action::TriggerInject(prompt.clone()));
             } else if let Some(notify_tx) = trigger_notify {
-                let _ = notify_tx
-                    .send(format!("__TRIGGER_INJECT__:{prompt}"))
-                    .await;
+                let _ = notify_tx.send(format!("__TRIGGER_INJECT__:{prompt}")).await;
             }
         }
     }

@@ -68,7 +68,9 @@ impl Skill for WordSkill {
             Ok(r) if !r.is_empty() => r,
             _ => {
                 return Ok(SkillOutput {
-                    display: format!("  {RED}✗ LLM offline. Cannot invent words without a brain.{RESET}"),
+                    display: format!(
+                        "  {RED}✗ LLM offline. Cannot invent words without a brain.{RESET}"
+                    ),
                     feedback: vec![],
                     inject_to_conversation: false,
                 });
@@ -84,7 +86,11 @@ impl Skill for WordSkill {
             .unwrap_or_else(|| "unknown".to_string());
         let definition = result
             .lines()
-            .find_map(|l| l.trim().strip_prefix("DEFINITION:").map(|s| s.trim().to_string()))
+            .find_map(|l| {
+                l.trim()
+                    .strip_prefix("DEFINITION:")
+                    .map(|s| s.trim().to_string())
+            })
             .unwrap_or_default();
 
         let feedback_event = ChaosEvent::WordGenerated { word, definition };

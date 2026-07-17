@@ -266,13 +266,17 @@ impl SynapseBus {
 
         let lock_path = self.path.with_file_name(format!(
             "{}.lock",
-            self.path.file_name().map(|s| s.to_string_lossy()).unwrap_or_default()
+            self.path
+                .file_name()
+                .map(|s| s.to_string_lossy())
+                .unwrap_or_default()
         ));
 
         // Acquire advisory lock before writing
         let lock_file = match fs::OpenOptions::new()
             .create(true)
             .write(true)
+            .truncate(false)
             .open(&lock_path)
         {
             Ok(f) => f,
@@ -352,13 +356,17 @@ impl SynapseBus {
 
         let lock_path = self.path.with_file_name(format!(
             "{}.lock",
-            self.path.file_name().map(|s| s.to_string_lossy()).unwrap_or_default()
+            self.path
+                .file_name()
+                .map(|s| s.to_string_lossy())
+                .unwrap_or_default()
         ));
 
         // Acquire advisory lock before writing
         let lock_file = match fs::OpenOptions::new()
             .create(true)
             .write(true)
+            .truncate(false)
             .open(&lock_path)
         {
             Ok(f) => f,

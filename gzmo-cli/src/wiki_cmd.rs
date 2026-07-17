@@ -203,10 +203,7 @@ fn count_md(dir: &str) -> usize {
                 .flatten()
                 .filter(|e| {
                     e.path().extension().and_then(|x| x.to_str()) == Some("md")
-                        && !e
-                            .file_name()
-                            .to_string_lossy()
-                            .starts_with("_lint-")
+                        && !e.file_name().to_string_lossy().starts_with("_lint-")
                 })
                 .count()
         })

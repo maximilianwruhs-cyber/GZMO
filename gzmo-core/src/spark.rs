@@ -18,8 +18,8 @@ use crate::memory::episodic::FileEpisodicStore;
 use crate::memory::kg_promotion::{entity_label_from_fact, HYPOTHESIZED_LINK};
 use crate::memory::vault::{embedding_cosine_similarity, SqliteVault};
 use crate::synapse::{resolve_event_source, EventSource, EventType, SynapseBus, SynapseEvent};
-use crate::types::SemanticFact;
 use crate::tools::{ToolRegistry, ToolResult};
+use crate::types::SemanticFact;
 use crate::types::{EpisodicEntry, EpisodicSource, Message, Role};
 
 // ---------------------------------------------------------------------------
@@ -111,11 +111,7 @@ impl SparkEngine {
     /// Resolve the gateway to use for a given phase.
     fn resolve_gateway(&self, phase: &str) -> &Arc<dyn LlmGateway> {
         match phase {
-            "verify" => {
-                self.verify_gateway
-                    .as_ref()
-                    .unwrap_or(&self.gateway)
-            }
+            "verify" => self.verify_gateway.as_ref().unwrap_or(&self.gateway),
             _ => &self.gateway,
         }
     }
@@ -188,9 +184,8 @@ impl SparkEngine {
                     let min_c = self.config.min_citation_chars;
                     repair_citations_from_facts(&selection, &mut v, min_c);
                     let citations_ok = citations_valid(&selection, &v, min_c);
-                    let strict_ok = v.supported
-                        && v.confidence >= self.config.min_confidence
-                        && citations_ok;
+                    let strict_ok =
+                        v.supported && v.confidence >= self.config.min_confidence && citations_ok;
                     let quarantine_ok = !strict_ok && citations_ok;
                     let ok = if strict_ok {
                         true
@@ -276,10 +271,7 @@ impl SparkEngine {
             recent_fetch,
         )?;
         let recent = dedupe_recent_facts(recent_raw, self.config.recent_dedupe_similarity);
-        let recent: Vec<_> = recent
-            .into_iter()
-            .take(self.config.recent_limit)
-            .collect();
+        let recent: Vec<_> = recent.into_iter().take(self.config.recent_limit).collect();
 
         if recent.is_empty() {
             return Ok(None);
@@ -305,9 +297,9 @@ impl SparkEngine {
                 continue;
             }
             let max_sim = max_embedding_similarity(&candidate, &recent);
-            let tag_bridge = recent.iter().any(|r| {
-                shares_spark_concept_tag(&candidate.content, &r.content)
-            });
+            let tag_bridge = recent
+                .iter()
+                .any(|r| shares_spark_concept_tag(&candidate.content, &r.content));
             if !anchor_passes_prefilter(&candidate, &recent, min_sim, tag_bridge, max_sim) {
                 continue;
             }
@@ -319,10 +311,7 @@ impl SparkEngine {
                 min_sim,
                 tag_bridge,
             );
-            let replace = best
-                .as_ref()
-                .map(|(_, s, _)| score > *s)
-                .unwrap_or(true);
+            let replace = best.as_ref().map(|(_, s, _)| score > *s).unwrap_or(true);
             if replace {
                 best = Some((candidate, score, max_sim));
             }
@@ -369,7 +358,10 @@ impl SparkEngine {
         for sub in &self.config.exclude_anchor_substrings {
             if c.contains(sub) {
                 if let Some(session_date) = parse_session_date(c) {
-                    let age = Utc::now().date_naive().signed_duration_since(session_date).num_days();
+                    let age = Utc::now()
+                        .date_naive()
+                        .signed_duration_since(session_date)
+                        .num_days();
                     if age > self.config.max_session_anchor_age_days as i64 {
                         return false;
                     }
@@ -507,12 +499,14 @@ impl SparkEngine {
             hypothesis.recent_label.clone()
         };
 
-        let evidence = verdict.map(|v| {
-            format!(
-                "anchor: \"{}\" | recent: \"{}\"",
-                v.evidence_anchor, v.evidence_recent
-            )
-        }).unwrap_or_default();
+        let evidence = verdict
+            .map(|v| {
+                format!(
+                    "anchor: \"{}\" | recent: \"{}\"",
+                    v.evidence_anchor, v.evidence_recent
+                )
+            })
+            .unwrap_or_default();
 
         let call = crate::gateway::ToolCall {
             id: format!("spark_kg_{}", Uuid::new_v4()),
@@ -533,11 +527,10 @@ impl SparkEngine {
                     "[HYPOTHESIS {date}] {from} --({HYPOTHESIZED_LINK})--> {to}: {} | {evidence}",
                     hypothesis.connection
                 );
-                if let Err(e) = self.vault.store_text(
-                    &audit,
-                    "Episodic",
-                    self.config.quarantine_confidence,
-                ) {
+                if let Err(e) =
+                    self.vault
+                        .store_text(&audit, "Episodic", self.config.quarantine_confidence)
+                {
                     warn!("Spark audit quarantine write failed: {e}");
                 }
                 1
@@ -621,11 +614,7 @@ fn format_selection_bundle(selection: &SparkSelection) -> String {
 }
 
 /// Require quotable spans from anchor and at least one recent fact (LDR / dream firewall).
-fn citations_valid(
-    selection: &SparkSelection,
-    verdict: &SparkVerdict,
-    min_chars: usize,
-) -> bool {
+fn citations_valid(selection: &SparkSelection, verdict: &SparkVerdict, min_chars: usize) -> bool {
     let a = verdict.evidence_anchor.trim();
     let r = verdict.evidence_recent.trim();
     if a.len() < min_chars || r.len() < min_chars {
@@ -645,8 +634,11 @@ fn repair_citations_from_facts(
     verdict: &mut SparkVerdict,
     min_chars: usize,
 ) {
-    if !anchor_citation_valid(&selection.anchor.content, verdict.evidence_anchor.trim(), min_chars)
-    {
+    if !anchor_citation_valid(
+        &selection.anchor.content,
+        verdict.evidence_anchor.trim(),
+        min_chars,
+    ) {
         if let Some(q) = first_quotable_span(&selection.anchor.content, min_chars) {
             verdict.evidence_anchor = q;
         }
@@ -742,10 +734,7 @@ fn max_embedding_similarity(anchor: &SemanticFact, recent: &[SemanticFact]) -> f
         .iter()
         .filter_map(|r| {
             if embeddings_usable(&anchor.embedding, &r.embedding) {
-                Some(embedding_cosine_similarity(
-                    &anchor.embedding,
-                    &r.embedding,
-                ))
+                Some(embedding_cosine_similarity(&anchor.embedding, &r.embedding))
             } else {
                 None
             }
@@ -803,9 +792,9 @@ fn anchor_passes_prefilter(
     if tag_bridge || max_sim >= min_sim {
         return true;
     }
-    recent.iter().any(|r| {
-        lexical_overlap_score(&anchor.content, &r.content) >= 0.12
-    })
+    recent
+        .iter()
+        .any(|r| lexical_overlap_score(&anchor.content, &r.content) >= 0.12)
 }
 
 fn shares_spark_concept_tag(a: &str, b: &str) -> bool {
@@ -826,11 +815,7 @@ fn score_spark_anchor(
     tag_bridge: bool,
 ) -> f64 {
     let days = days_since_created(anchor);
-    let stale = stale_sweetness(
-        days,
-        min_stale_days as f64,
-        max_stale_days as f64,
-    );
+    let stale = stale_sweetness(days, min_stale_days as f64, max_stale_days as f64);
     let imp = anchor_importance(anchor);
     let max_sim = max_embedding_similarity(anchor, recent);
     let sim_factor = if tag_bridge && max_sim < min_sim {
@@ -844,9 +829,9 @@ fn score_spark_anchor(
 fn dedupe_recent_facts(facts: Vec<SemanticFact>, max_similarity: f64) -> Vec<SemanticFact> {
     let mut kept: Vec<SemanticFact> = Vec::new();
     for fact in facts {
-        let duplicate = kept.iter().any(|k| {
-            embedding_cosine_similarity(&fact.embedding, &k.embedding) >= max_similarity
-        });
+        let duplicate = kept
+            .iter()
+            .any(|k| embedding_cosine_similarity(&fact.embedding, &k.embedding) >= max_similarity);
         if !duplicate {
             kept.push(fact);
         }
@@ -997,9 +982,10 @@ mod citation_tests {
         let v = SparkVerdict {
             supported: false,
             confidence: 0.0,
-            evidence_anchor: "Kommunikation präziser Hardware-Statusmeldungen an den Strategy-Analyst"
+            evidence_anchor:
+                "Kommunikation präziser Hardware-Statusmeldungen an den Strategy-Analyst".into(),
+            evidence_recent: "Runs under Uvicorn and provides native WebSocket implementation."
                 .into(),
-            evidence_recent: "Runs under Uvicorn and provides native WebSocket implementation.".into(),
         };
         assert!(citations_valid(&selection, &v, 12));
     }
@@ -1054,9 +1040,7 @@ impl SparkReport {
             date,
             promoted: false,
             kg_relations_written: 0,
-            section: format!(
-                "\n## Spark — {date}\n\nSkipped: {reason}\n"
-            ),
+            section: format!("\n## Spark — {date}\n\nSkipped: {reason}\n"),
         }
     }
 }

@@ -33,9 +33,7 @@ pub fn render_help(f: &mut Frame<'_>, area: Rect) {
     let mut lines = vec![
         Line::from(Span::styled(
             " KEYBOARD ",
-            Style::default()
-                .fg(GOLD)
-                .add_modifier(Modifier::BOLD),
+            Style::default().fg(GOLD).add_modifier(Modifier::BOLD),
         )),
         Line::from(""),
     ];

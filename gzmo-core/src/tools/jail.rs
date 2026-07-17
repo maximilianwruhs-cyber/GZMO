@@ -46,7 +46,9 @@ impl PathJail {
         let normalized = normalize_path(&absolute);
 
         if absolute.exists() {
-            let canon = absolute.canonicalize().unwrap_or_else(|_| normalized.clone());
+            let canon = absolute
+                .canonicalize()
+                .unwrap_or_else(|_| normalized.clone());
             if !self.is_under_any(&canon) {
                 bail!(
                     "Path '{}' escapes workspace jail (roots: {})",

@@ -102,14 +102,12 @@ impl Component for InputComponent {
                 Style::default().fg(MUTED),
             )
         } else {
-            (
-                self.input.value().to_string(),
-                Style::default().fg(TEXT),
-            )
+            (self.input.value().to_string(), Style::default().fg(TEXT))
         };
 
         let a11y = AccessibilityFlags::from_env();
-        let mut border = theme::chrome_border_with_flags(self.tension, self.speaking, self.drop, &a11y);
+        let mut border =
+            theme::chrome_border_with_flags(self.tension, self.speaking, self.drop, &a11y);
         if self.speaking && self.speak_pulse.is_multiple_of(2) && !a11y.reduced_motion {
             border = GOLD;
         }

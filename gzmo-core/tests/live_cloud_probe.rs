@@ -62,7 +62,11 @@ async fn live_background_uses_cloud_first() {
         cfg.routing.cloud_first_background,
         "cloud_first_background must be true for cloud-first background routing"
     );
-    let cloud = cfg.engine.cloud.as_ref().expect("[engine.cloud] configured");
+    let cloud = cfg
+        .engine
+        .cloud
+        .as_ref()
+        .expect("[engine.cloud] configured");
     assert!(
         !cloud.api_key.is_empty(),
         "cloud api_key must be injected from GZMO_OPENROUTER_KEY (.env)"
@@ -120,5 +124,8 @@ async fn live_background_falls_back_to_prime_on_bad_cloud_key() {
         .complete(&ping_messages(), &[])
         .await
         .expect("must fail over to Prime and succeed despite broken cloud key");
-    eprintln!("[probe] FALLBACK reply (served by Prime): {}", text_of(resp));
+    eprintln!(
+        "[probe] FALLBACK reply (served by Prime): {}",
+        text_of(resp)
+    );
 }

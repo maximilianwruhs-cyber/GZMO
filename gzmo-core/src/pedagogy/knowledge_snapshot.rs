@@ -46,10 +46,9 @@ pub fn empty_knowledge_state() -> KnowledgeStateSnapshot {
 /// Read vault/honeypot counts from SQLite (sync, for oscillation metrics).
 pub fn vault_metrics_from_path(vault_db: &Path) -> VaultKnowledgeMetrics {
     let mut metrics = VaultKnowledgeMetrics::default();
-    let Ok(conn) = rusqlite::Connection::open_with_flags(
-        vault_db,
-        rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY,
-    ) else {
+    let Ok(conn) =
+        rusqlite::Connection::open_with_flags(vault_db, rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY)
+    else {
         return metrics;
     };
 
@@ -125,10 +124,9 @@ pub fn compute_knowledge_delta(
             ));
         }
         if a.honeypot_count > b.honeypot_count {
-            delta.changed.push(format!(
-                "honeypot:+{}",
-                a.honeypot_count - b.honeypot_count
-            ));
+            delta
+                .changed
+                .push(format!("honeypot:+{}", a.honeypot_count - b.honeypot_count));
         }
         if a.discovery_sourced_count > b.discovery_sourced_count {
             delta.changed.push(format!(
@@ -155,7 +153,10 @@ pub fn knowledge_state_from_handoff_path(path: &Path) -> KnowledgeStateSnapshot 
 }
 
 pub fn knowledge_state_from_handoff_env() -> KnowledgeStateSnapshot {
-    let Some(path) = std::env::var("GZMO_HANDOFF_PATH").ok().filter(|s| !s.is_empty()) else {
+    let Some(path) = std::env::var("GZMO_HANDOFF_PATH")
+        .ok()
+        .filter(|s| !s.is_empty())
+    else {
         return empty_knowledge_state();
     };
     knowledge_state_from_handoff_path(Path::new(&path))
@@ -247,7 +248,13 @@ mod tests {
             }),
         };
         let delta = compute_knowledge_delta(&before, &after);
-        assert!(delta.changed.iter().any(|c| c.contains("semantic_vault:+2")));
-        assert!(delta.changed.iter().any(|c| c.contains("discovery_sourced:+1")));
+        assert!(delta
+            .changed
+            .iter()
+            .any(|c| c.contains("semantic_vault:+2")));
+        assert!(delta
+            .changed
+            .iter()
+            .any(|c| c.contains("discovery_sourced:+1")));
     }
 }

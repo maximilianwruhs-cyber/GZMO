@@ -31,9 +31,15 @@ pub struct DiceSkill;
 
 #[async_trait]
 impl Skill for DiceSkill {
-    fn name(&self) -> &str { "dice" }
-    fn description(&self) -> &str { "Roll chaos-driven dice (D6 or D20)" }
-    fn skill_type(&self) -> SkillType { SkillType::Mechanical }
+    fn name(&self) -> &str {
+        "dice"
+    }
+    fn description(&self) -> &str {
+        "Roll chaos-driven dice (D6 or D20)"
+    }
+    fn skill_type(&self) -> SkillType {
+        SkillType::Mechanical
+    }
 
     async fn execute(&self, ctx: SkillContext<'_>) -> Result<SkillOutput> {
         // Parse dice type from args
@@ -81,21 +87,16 @@ impl Skill for DiceSkill {
 
 /// Derive a dice roll from the chaos snapshot.
 fn chaos_roll(snap: &ChaosSnapshot, max: u8) -> u8 {
-    let combined = (snap.chaos_val * 10000.0
-        + snap.x.abs() * 100.0
-        + snap.y.abs() * 10.0
-        + snap.z.abs())
-        .fract();
+    let combined =
+        (snap.chaos_val * 10000.0 + snap.x.abs() * 100.0 + snap.y.abs() * 10.0 + snap.z.abs())
+            .fract();
     let roll = (combined * max as f64).floor() as u8 + 1;
     roll.clamp(1, max)
 }
 
 /// Pick an event variant (0-4) based on Lorenz position.
 fn pick_variant(snap: &ChaosSnapshot) -> usize {
-    let hash = ((snap.x.abs() * 1000.0) as u64
-        ^ (snap.y.abs() * 1000.0) as u64
-        ^ snap.tick)
-        % 5;
+    let hash = ((snap.x.abs() * 1000.0) as u64 ^ (snap.y.abs() * 1000.0) as u64 ^ snap.tick) % 5;
     hash as usize
 }
 
@@ -150,7 +151,8 @@ fn tier_mechanical_effect(roll: u8) -> Option<ChaosEvent> {
             energy_delta: 0.0,
             thought_seed: Some(ThoughtSeed {
                 category: "dice_crystallize".to_string(),
-                text: "A new thought seed crystallizes spontaneously. Gravity mod shifts -0.1.".to_string(),
+                text: "A new thought seed crystallizes spontaneously. Gravity mod shifts -0.1."
+                    .to_string(),
             }),
         }),
         // Bifurcation: friction mutation seed
@@ -174,7 +176,8 @@ fn tier_mechanical_effect(roll: u8) -> Option<ChaosEvent> {
             energy_delta: 15.0,
             thought_seed: Some(ThoughtSeed {
                 category: "dice_legendary".to_string(),
-                text: "CRITICAL SUCCESS — A perfect crystallization! Thought Cabinet gains ρ +1.0.".to_string(),
+                text: "CRITICAL SUCCESS — A perfect crystallization! Thought Cabinet gains ρ +1.0."
+                    .to_string(),
             }),
         }),
         _ => None,

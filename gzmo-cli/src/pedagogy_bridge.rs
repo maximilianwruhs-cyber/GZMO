@@ -16,7 +16,8 @@ use gzmo_core::types::{Message, Role};
 const DELEGATE_HINT_OPS_MODE: &str = "Ops mode active. Run the request with bash/shell tools; \
     do not call gzmo_mentor_teach until /ops toggles mentor back.";
 
-const DELEGATE_HINT_OPS_INTENT: &str = "Ops intent detected. Run the request with bash/shell tools, \
+const DELEGATE_HINT_OPS_INTENT: &str =
+    "Ops intent detected. Run the request with bash/shell tools, \
     or toggle /ops for sustained execution mode.";
 
 /// True when the client should execute locally instead of running the Socratic orchestrator.
@@ -117,9 +118,7 @@ impl PedagogyRuntime {
         messages: &[Message],
         chaos_context: Option<&str>,
         discovery_context: Option<&str>,
-        chaos_snapshot_rx: Option<
-            &tokio::sync::watch::Receiver<gzmo_chaos::pulse::ChaosSnapshot>,
-        >,
+        chaos_snapshot_rx: Option<&tokio::sync::watch::Receiver<gzmo_chaos::pulse::ChaosSnapshot>>,
     ) -> Result<Option<OrchestratorOutput>> {
         let internal_gateway = router.gateway(TaskKind::PedagogyInternal);
         if !config.pedagogy.enabled {
@@ -188,12 +187,8 @@ impl PedagogyRuntime {
             .await?;
 
         let summary = gzmo_core::text_util::truncate_chars(&output.response, 200);
-        self.learner_profile
-            .record_episode(&summary, None, None);
-        let _ = self
-            .learner_store
-            .append_episode_markdown(&summary)
-            .await;
+        self.learner_profile.record_episode(&summary, None, None);
+        let _ = self.learner_store.append_episode_markdown(&summary).await;
         self.learner_store.save(&self.learner_profile).await?;
 
         if teachback_due {

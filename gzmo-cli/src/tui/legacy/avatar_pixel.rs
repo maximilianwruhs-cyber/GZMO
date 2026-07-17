@@ -66,38 +66,37 @@ fn palette_for(mood: MoodBand, tension: f64, performance: Performance) -> Palett
         };
     }
 
-    let (metal, accent, mouth) = if tension > 80.0
-        || matches!(performance, Performance::Alert | Performance::Rebirth)
-    {
-        (
-            Rgb::new(180, 40, 45),
-            Rgb::new(255, 200, 60),
-            Rgb::new(120, 20, 30),
-        )
-    } else {
-        match mood {
-            MoodBand::Intense => (
-                Rgb::new(170, 45, 50),
-                Rgb::new(255, 120, 40),
-                Rgb::new(100, 25, 35),
-            ),
-            MoodBand::Tense => (
-                Rgb::new(190, 120, 55),
-                Rgb::new(0, 200, 210),
-                Rgb::new(140, 70, 40),
-            ),
-            MoodBand::Calm => (
-                Rgb::new(200, 165, 70),
-                Rgb::new(80, 180, 190),
-                Rgb::new(150, 90, 50),
-            ),
-            MoodBand::Serene => (
-                Rgb::new(220, 195, 110),
-                Rgb::new(100, 200, 160),
-                Rgb::new(170, 110, 70),
-            ),
-        }
-    };
+    let (metal, accent, mouth) =
+        if tension > 80.0 || matches!(performance, Performance::Alert | Performance::Rebirth) {
+            (
+                Rgb::new(180, 40, 45),
+                Rgb::new(255, 200, 60),
+                Rgb::new(120, 20, 30),
+            )
+        } else {
+            match mood {
+                MoodBand::Intense => (
+                    Rgb::new(170, 45, 50),
+                    Rgb::new(255, 120, 40),
+                    Rgb::new(100, 25, 35),
+                ),
+                MoodBand::Tense => (
+                    Rgb::new(190, 120, 55),
+                    Rgb::new(0, 200, 210),
+                    Rgb::new(140, 70, 40),
+                ),
+                MoodBand::Calm => (
+                    Rgb::new(200, 165, 70),
+                    Rgb::new(80, 180, 190),
+                    Rgb::new(150, 90, 50),
+                ),
+                MoodBand::Serene => (
+                    Rgb::new(220, 195, 110),
+                    Rgb::new(100, 200, 160),
+                    Rgb::new(170, 110, 70),
+                ),
+            }
+        };
 
     Palette {
         metal,
@@ -313,10 +312,8 @@ fn draw_cog(pose: &CogPose) -> Buf {
     }
 
     // Brows for tense / build / alert
-    if matches!(
-        pose.performance,
-        Performance::Alert | Performance::Working
-    ) || pose.mood == MoodBand::Tense
+    if matches!(pose.performance, Performance::Alert | Performance::Working)
+        || pose.mood == MoodBand::Tense
         || pose.mood == MoodBand::Intense
     {
         buf.fill_rect(cx - 5, eye_y - 3, cx - 2, eye_y - 3, pal.metal_dark);
@@ -455,7 +452,10 @@ pub fn pose_from_state(
     let spin = if tension > 70.0
         || matches!(
             performance,
-            Performance::Speaking | Performance::Working | Performance::Alert | Performance::Rebirth
+            Performance::Speaking
+                | Performance::Working
+                | Performance::Alert
+                | Performance::Rebirth
         ) {
         anim_frame.wrapping_mul(2)
     } else if tension > 40.0 {

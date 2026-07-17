@@ -44,9 +44,7 @@ pub struct TransformSkill {
 
 fn find_character<'a>(entries: &'a [CharacterEntry], query: &str) -> Option<&'a CharacterEntry> {
     let q = query.to_lowercase();
-    entries
-        .iter()
-        .find(|c| c.name.to_lowercase().contains(&q))
+    entries.iter().find(|c| c.name.to_lowercase().contains(&q))
 }
 
 fn write_transform_state(rt: &SkillRuntime, ch: &CharacterEntry) -> Result<()> {
@@ -109,9 +107,8 @@ impl Skill for TransformSkill {
             }
 
             let content = std::fs::read_to_string(&chars_path)?;
-            let file: CharactersFile = toml::from_str(&content).unwrap_or(CharactersFile {
-                characters: vec![],
-            });
+            let file: CharactersFile =
+                toml::from_str(&content).unwrap_or(CharactersFile { characters: vec![] });
 
             let mut body = String::new();
             for ch in &file.characters {
@@ -147,9 +144,8 @@ impl Skill for TransformSkill {
         }
 
         let content = std::fs::read_to_string(&chars_path)?;
-        let file: CharactersFile = toml::from_str(&content).unwrap_or(CharactersFile {
-            characters: vec![],
-        });
+        let file: CharactersFile =
+            toml::from_str(&content).unwrap_or(CharactersFile { characters: vec![] });
 
         let mut ch = find_character(&file.characters, character).cloned();
 

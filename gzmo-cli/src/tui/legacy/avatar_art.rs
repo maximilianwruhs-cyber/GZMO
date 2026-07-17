@@ -306,12 +306,7 @@ pub fn face_lines(kind: FaceKind) -> &'static [&'static str] {
     }
 }
 
-pub fn resolve_face(
-    performance: Performance,
-    phase: Phase,
-    mood: MoodBand,
-    anim: u8,
-) -> FaceKind {
+pub fn resolve_face(performance: Performance, phase: Phase, mood: MoodBand, anim: u8) -> FaceKind {
     match performance {
         Performance::Dead => FaceKind::Dead,
         Performance::Rebirth => {
@@ -351,11 +346,7 @@ pub fn resolve_face(
 
 // ─── Nameplate ───────────────────────────────────────────────────
 
-pub const NAMEPLATE: [&str; 3] = [
-    "╔═╗╔═╗╔╦╗╔═╗",
-    "║ ╦╠═╝║║║║ ║",
-    "╚═╝╩  ╩ ╩╚═╝",
-];
+pub const NAMEPLATE: [&str; 3] = ["╔═╗╔═╗╔╦╗╔═╗", "║ ╦╠═╝║║║║ ║", "╚═╝╩  ╩ ╩╚═╝"];
 
 pub const FIGLET_GZMO: [&str; 6] = [
     " ██████╗ ███████╗███╗   ███╗ ██████╗ ",
@@ -393,7 +384,11 @@ pub fn bulb_row(width: usize, frame: u8, hot: bool) -> String {
         .map(|i| {
             let on = (i + frame as usize).is_multiple_of(2);
             if hot {
-                if on { "●" } else { "○" }
+                if on {
+                    "●"
+                } else {
+                    "○"
+                }
             } else if on {
                 "○"
             } else {
@@ -431,7 +426,8 @@ pub fn gaze_from_lorenz_x(x: f64) -> i8 {
 
 /// Nudge eye glyphs left/right for gaze. Operates on a single face line.
 pub fn apply_gaze(line: &str, gaze: i8) -> String {
-    if gaze == 0 || !line.contains('◉') && !line.contains('◎') && !line.contains('●') && !line.contains('○')
+    if gaze == 0
+        || !line.contains('◉') && !line.contains('◎') && !line.contains('●') && !line.contains('○')
     {
         return line.to_string();
     }

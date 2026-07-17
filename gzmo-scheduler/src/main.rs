@@ -55,7 +55,10 @@ fn write_job_result(
         "ok": ok,
         "error": error,
     });
-    if let Err(e) = std::fs::write(&path, serde_json::to_string_pretty(&payload).unwrap_or_default() + "\n") {
+    if let Err(e) = std::fs::write(
+        &path,
+        serde_json::to_string_pretty(&payload).unwrap_or_default() + "\n",
+    ) {
         error!(%e, path = %path.display(), "scheduler-runs write failed");
         return;
     }
@@ -183,7 +186,12 @@ async fn run_loop(cfg: &SchedulerConfig, config_path: &std::path::Path) -> Resul
         let today = now.date_naive();
 
         if cfg.dreams.enabled
-            && cron::cron_due_today(&now, cfg.dreams.cron_hour, cfg.dreams.cron_minute, last_dream)
+            && cron::cron_due_today(
+                &now,
+                cfg.dreams.cron_hour,
+                cfg.dreams.cron_minute,
+                last_dream,
+            )
         {
             let (script, args) = jobs::dream_args(cfg);
             if run_job(cfg, "dream", script, args).await {
@@ -199,10 +207,9 @@ async fn run_loop(cfg: &SchedulerConfig, config_path: &std::path::Path) -> Resul
                 cfg.qdrant.sync_cron_minute,
                 last_qdrant_sync,
             )
+            && run_gzmo_job(cfg, "qdrant_sync", jobs::qdrant_sync_script(), vec![]).await
         {
-            if run_gzmo_job(cfg, "qdrant_sync", jobs::qdrant_sync_script(), vec![]).await {
-                last_qdrant_sync = Some(today);
-            }
+            last_qdrant_sync = Some(today);
         }
 
         // Batch ingest before distill so new inbox files can enter tonight's distill.
@@ -236,9 +243,12 @@ async fn run_loop(cfg: &SchedulerConfig, config_path: &std::path::Path) -> Resul
         }
 
         if cfg.spark.enabled {
-            if let Some((h, m)) =
-                cron::cron_slot_due(&now, &cfg.spark.cron_hours, cfg.spark.cron_minute, &last_spark)
-            {
+            if let Some((h, m)) = cron::cron_slot_due(
+                &now,
+                &cfg.spark.cron_hours,
+                cfg.spark.cron_minute,
+                &last_spark,
+            ) {
                 let (script, args) = jobs::spark_args(cfg);
                 if run_job(cfg, "spark", script, args).await {
                     last_spark.insert((h, m, today));

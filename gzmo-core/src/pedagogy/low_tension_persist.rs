@@ -44,7 +44,11 @@ pub async fn persist_socratic_dialogue(
             r.chars().take(500).collect::<String>()
         ));
     }
-    for (id, title) in opening.concept_ids.iter().zip(opening.concept_titles.iter()) {
+    for (id, title) in opening
+        .concept_ids
+        .iter()
+        .zip(opening.concept_titles.iter())
+    {
         observations.push(format!("[concept] {title} ({id})"));
     }
 
@@ -94,7 +98,11 @@ pub async fn persist_socratic_dialogue(
             "relationType": "DIALOGUE_WITH",
         }));
     }
-    for (id, title) in opening.concept_ids.iter().zip(opening.concept_titles.iter()) {
+    for (id, title) in opening
+        .concept_ids
+        .iter()
+        .zip(opening.concept_titles.iter())
+    {
         let concept_name = if title.len() >= 2 {
             title.clone()
         } else {
@@ -131,7 +139,12 @@ pub async fn persist_socratic_dialogue(
         function_name: "mcp__memory__create_relations".to_string(),
         arguments: serde_json::json!({ "relations": relations }),
     };
-    if let ToolResult { success: false, output, .. } = tools.dispatch(&rel_call).await {
+    if let ToolResult {
+        success: false,
+        output,
+        ..
+    } = tools.dispatch(&rel_call).await
+    {
         warn!("SOCRATIC_DIALOGUE relations write failed: {output}");
     }
     Ok(())
@@ -142,16 +155,18 @@ pub async fn prior_opening_hints(tools: &ToolRegistry, concept_ids: &[String]) -
     if !tools.has_tool("mcp__memory__search_memories") || concept_ids.is_empty() {
         return vec![];
     }
-    let query = format!(
-        "SOCRATIC_DIALOGUE low_tension {}",
-        concept_ids.join(" ")
-    );
+    let query = format!("SOCRATIC_DIALOGUE low_tension {}", concept_ids.join(" "));
     let call = ToolCall {
         id: format!("ltd_search_{}", Uuid::new_v4()),
         function_name: "mcp__memory__search_memories".to_string(),
         arguments: serde_json::json!({ "query": query, "limit": 5 }),
     };
-    let ToolResult { success: true, output, .. } = tools.dispatch(&call).await else {
+    let ToolResult {
+        success: true,
+        output,
+        ..
+    } = tools.dispatch(&call).await
+    else {
         return vec![];
     };
     parse_opening_hints(&output)

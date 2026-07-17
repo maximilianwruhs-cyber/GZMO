@@ -119,7 +119,10 @@ async fn run_product(args: InitArgs) -> Result<()> {
             "  {YELLOW}{config} already exists. Re-run with --force to overwrite.{RESET}",
             config = config_path.display()
         );
-        eprintln!("  {DIM}Existing home kept. MCP fragment:{RESET} {}", mcp_path.display());
+        eprintln!(
+            "  {DIM}Existing home kept. MCP fragment:{RESET} {}",
+            mcp_path.display()
+        );
         if !mcp_path.exists() {
             write_mcp_fragment(&mcp_path, &bin, &config_path)?;
             eprintln!("  {GREEN}✔{RESET} Wrote {}", mcp_path.display());
@@ -143,8 +146,13 @@ async fn run_product(args: InitArgs) -> Result<()> {
         // Create minimal empty DB via config load smoke + sqlite open through memory API.
         let _ = gzmo_core::config::GzmoConfig::load(&config_path)?;
         match SqliteVaultTouch::touch(&vault_db) {
-            Ok(()) => eprintln!("  {GREEN}✔{RESET} {} {DIM}(empty lab vault){RESET}", vault_db.display()),
-            Err(e) => eprintln!("  {YELLOW}⚠{RESET} vault not pre-created ({e}); mcp-serve will create it"),
+            Ok(()) => eprintln!(
+                "  {GREEN}✔{RESET} {} {DIM}(empty lab vault){RESET}",
+                vault_db.display()
+            ),
+            Err(e) => eprintln!(
+                "  {YELLOW}⚠{RESET} vault not pre-created ({e}); mcp-serve will create it"
+            ),
         }
     }
 
@@ -255,8 +263,7 @@ fn write_mcp_fragment(mcp_path: &Path, bin: &Path, config_path: &Path) -> Result
         }
     });
     let text = serde_json::to_string_pretty(&json)? + "\n";
-    std::fs::write(mcp_path, text)
-        .with_context(|| format!("write {}", mcp_path.display()))?;
+    std::fs::write(mcp_path, text).with_context(|| format!("write {}", mcp_path.display()))?;
     Ok(())
 }
 
@@ -313,7 +320,10 @@ fn prompt_select(label: &str, options: &[String]) -> usize {
         eprintln!("    {DIM}{}{RESET}  {opt}", i + 1);
     }
     loop {
-        eprint!("  {CYAN}▸{RESET} Select {DIM}[1-{}]{RESET}: ", options.len());
+        eprint!(
+            "  {CYAN}▸{RESET} Select {DIM}[1-{}]{RESET}: ",
+            options.len()
+        );
         let _ = std::io::stderr().flush();
         let mut input = String::new();
         std::io::stdin().read_line(&mut input).unwrap_or_default();
@@ -350,7 +360,9 @@ async fn run_wizard(force: bool) -> Result<()> {
     eprintln!("  {DIM}Tip: for Cursor/Pi memory MCP use `gzmo init` (no --wizard).{RESET}");
     eprintln!();
 
-    if Path::new("gzmo.toml").exists() && !force && !prompt_confirm("gzmo.toml already exists. Overwrite?", false)
+    if Path::new("gzmo.toml").exists()
+        && !force
+        && !prompt_confirm("gzmo.toml already exists. Overwrite?", false)
     {
         eprintln!("  {YELLOW}Aborted.{RESET}");
         return Ok(());
@@ -363,7 +375,9 @@ async fn run_wizard(force: bool) -> Result<()> {
 
     let (selected_url, selected_model) = if endpoints.is_empty() {
         eprintln!("  {YELLOW}No running LLM endpoints detected on localhost.{RESET}");
-        eprintln!("  {DIM}Start LM Studio, Ollama, or vLLM, then re-run 'gzmo init --wizard'.{RESET}");
+        eprintln!(
+            "  {DIM}Start LM Studio, Ollama, or vLLM, then re-run 'gzmo init --wizard'.{RESET}"
+        );
         eprintln!();
 
         let url = prompt_text("Enter your LLM endpoint URL", "http://localhost:1234/v1");

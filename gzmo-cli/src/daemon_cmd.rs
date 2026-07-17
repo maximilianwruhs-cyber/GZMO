@@ -7,39 +7,39 @@ use anyhow::Result;
 use chrono::{Datelike, NaiveDate, Timelike, Utc};
 use tracing::{error, info};
 
-use gzmo_core::config::GzmoConfig;
-use gzmo_core::daemon::{
-    cron_due_today, cron_minutes, spark_cron_slot_due, write_cheapcheck_section, CognitionBlackoutCheck,
-    EmbedHealthPing, FileChangeCheck, HeartbeatEngine, HealthPing,
-};
 use gzmo_core::config::EngineMode;
+use gzmo_core::config::GzmoConfig;
+use gzmo_core::config::SparkScheduleMode;
+use gzmo_core::config::TaskKind;
+use gzmo_core::daemon::{
+    cron_due_today, cron_minutes, spark_cron_slot_due, write_cheapcheck_section,
+    CognitionBlackoutCheck, EmbedHealthPing, FileChangeCheck, HealthPing, HeartbeatEngine,
+};
 use gzmo_core::dreams::DreamEngine;
 use gzmo_core::dreams_md::write_dream_narrative;
-use gzmo_core::ingest::IngestEngine;
-use gzmo_core::spark::{append_spark_to_dreams, SparkEngine};
-use gzmo_core::wiki::WikiEngine;
-use gzmo_core::gateway::LlmGateway;
 use gzmo_core::gateway::GatewayRouter;
-use gzmo_core::config::TaskKind;
-use gzmo_core::synapse::{append_cognition_schedule, set_event_source};
-use gzmo_core::identity::IdentityEngine;
-use gzmo_core::memory::episodic::FileEpisodicStore;
-use gzmo_core::config::SparkScheduleMode;
+use gzmo_core::gateway::LlmGateway;
 use gzmo_core::health;
+use gzmo_core::identity::IdentityEngine;
+use gzmo_core::ingest::IngestEngine;
 use gzmo_core::memory::embeddings;
+use gzmo_core::memory::episodic::FileEpisodicStore;
+use gzmo_core::memory::qdrant_sync::{self, sync_vault_to_qdrant};
 use gzmo_core::memory::scratch::{ScratchScope, ScratchService};
 use gzmo_core::session_distill::{run_distill_worker, SessionDistillEngine};
+use gzmo_core::spark::{append_spark_to_dreams, SparkEngine};
 use gzmo_core::synapse::SynapseBus;
-use gzmo_core::memory::qdrant_sync::{self, sync_vault_to_qdrant};
+use gzmo_core::synapse::{append_cognition_schedule, set_event_source};
+use gzmo_core::wiki::WikiEngine;
 
+use gzmo_core::mcp::{bridge::McpServerConfig, manager::McpManager};
 use gzmo_core::spark_schedule;
-use gzmo_core::mcp::{manager::McpManager, bridge::McpServerConfig};
-use gzmo_core::tools::ToolRegistry;
-use gzmo_core::tools::fs::{FileReadTool, FileWriteTool, DirListTool, FileSearchTool};
-use gzmo_core::tools::shell::ShellExecTool;
-use gzmo_core::tools::sysadmin::{SysMetricsTool, SysKillTool};
-use gzmo_core::tools::web::WebSearchTool;
+use gzmo_core::tools::fs::{DirListTool, FileReadTool, FileSearchTool, FileWriteTool};
 use gzmo_core::tools::memory::{MemoryRecordTool, MemorySearchTool};
+use gzmo_core::tools::shell::ShellExecTool;
+use gzmo_core::tools::sysadmin::{SysKillTool, SysMetricsTool};
+use gzmo_core::tools::web::WebSearchTool;
+use gzmo_core::tools::ToolRegistry;
 
 use crate::mentor_ipc::{self, MentorServerState};
 
@@ -131,11 +131,13 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
     // Gateway + Tools for dream cycle — use Obolus GatewayRouter
     let router = GatewayRouter::new(config);
     let dream_gateway: Arc<dyn LlmGateway> = Arc::clone(router.gateway(TaskKind::DreamExtract));
-    let dream_verify_gateway: Arc<dyn LlmGateway> = Arc::clone(router.gateway(TaskKind::DreamVerify));
+    let dream_verify_gateway: Arc<dyn LlmGateway> =
+        Arc::clone(router.gateway(TaskKind::DreamVerify));
     let ingest_verify_gateway: Arc<dyn LlmGateway> =
         Arc::clone(router.gateway(TaskKind::IngestVerify));
     let spark_gateway: Arc<dyn LlmGateway> = Arc::clone(router.gateway(TaskKind::SparkHypothesis));
-    let spark_verify_gateway: Arc<dyn LlmGateway> = Arc::clone(router.gateway(TaskKind::SparkVerify));
+    let spark_verify_gateway: Arc<dyn LlmGateway> =
+        Arc::clone(router.gateway(TaskKind::SparkVerify));
     let ingest_gateway: Arc<dyn LlmGateway> = Arc::clone(router.gateway(TaskKind::IngestExtract));
 
     let dream_vault = embeddings::open_vault_with_embeddings(
@@ -146,14 +148,15 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
         &config.qdrant,
     )
     .await?;
-    if let Err(e) = dream_vault.archive_stale_session_anchors(config.spark.max_session_anchor_age_days) {
+    if let Err(e) =
+        dream_vault.archive_stale_session_anchors(config.spark.max_session_anchor_age_days)
+    {
         error!("Vault session-anchor cleanup failed: {e}");
     }
     let dream_vault = Arc::new(dream_vault);
 
-    let scratch = Arc::new(
-        ScratchService::from_config(&config.redis, &config.context_memory).await,
-    );
+    let scratch =
+        Arc::new(ScratchService::from_config(&config.redis, &config.context_memory).await);
     let memory_search_scope = Arc::new(std::sync::Mutex::new(ScratchScope::Orch {
         job: "init".to_string(),
         step: "init".to_string(),
@@ -168,7 +171,9 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
     dream_tools.register(Box::new(WebSearchTool::default()));
     dream_tools.register(Box::new(SysMetricsTool));
     dream_tools.register(Box::new(SysKillTool));
-    dream_tools.register(Box::new(MemoryRecordTool { vault: Arc::clone(&dream_vault) }));
+    dream_tools.register(Box::new(MemoryRecordTool {
+        vault: Arc::clone(&dream_vault),
+    }));
     dream_tools.register(Box::new(MemorySearchTool::with_orchestrator_scratch(
         Arc::clone(&dream_vault),
         Arc::clone(&scratch),
@@ -178,12 +183,15 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
     // MCP for dreams
     let mut dream_mcp = McpManager::new();
     for server in config.active_mcp_servers() {
-        match dream_mcp.connect(McpServerConfig {
-            name: server.name.clone(),
-            command: server.command.clone(),
-            args: server.args.clone(),
-            env: server.env.clone(),
-        }).await {
+        match dream_mcp
+            .connect(McpServerConfig {
+                name: server.name.clone(),
+                command: server.command.clone(),
+                args: server.args.clone(),
+                env: server.env.clone(),
+            })
+            .await
+        {
             Ok(count) => info!(server = %server.name, tools = count, "Dream MCP connected"),
             Err(e) => error!(server = %server.name, "Dream MCP failed: {}", e),
         }
@@ -232,9 +240,7 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
     if ops_backend.is_lab() {
         // Lab recipe: endpoint-scan → synapse-health → plan-gate
         info!(assembly_backend = "lab", "Startup health via ops-smoke.sh");
-        if let Err(e) =
-            run_lab_script_blocking("ops-smoke.sh", vec!["--live".to_string()]).await
-        {
+        if let Err(e) = run_lab_script_blocking("ops-smoke.sh", vec!["--live".to_string()]).await {
             error!("Ops lab recipe failed: {e}");
             if config.health.strict_startup {
                 return Err(e);
@@ -388,10 +394,17 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
     let mut orch_jobs = config.orchestration.jobs.clone();
     orch_jobs.remove("spark");
     orch_jobs.remove("auto_dream");
-    let _scheduler = match gzmo_core::orchestrator::start_orchestrator(orch_jobs, Arc::clone(&orch_ctx)).await {
-        Ok(s) => { info!("Orchestrator online"); Some(s) }
-        Err(e) => { error!("Orchestrator failed: {e}"); None }
-    };
+    let _scheduler =
+        match gzmo_core::orchestrator::start_orchestrator(orch_jobs, Arc::clone(&orch_ctx)).await {
+            Ok(s) => {
+                info!("Orchestrator online");
+                Some(s)
+            }
+            Err(e) => {
+                error!("Orchestrator failed: {e}");
+                None
+            }
+        };
 
     // Watchers
     let orch_watchers = config.orchestration.watchers.clone();
@@ -436,7 +449,8 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
             }
             let now = Utc::now();
             let yesterday = now.date_naive() - chrono::Duration::days(1);
-            if now.hour() * 60 + now.minute() < cron_minutes(dream_config.cron_hour, dream_config.cron_minute)
+            if now.hour() * 60 + now.minute()
+                < cron_minutes(dream_config.cron_hour, dream_config.cron_minute)
             {
                 continue;
             }
@@ -611,7 +625,9 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
                     } else {
                         next_dice_run = None;
                     }
-                    if let Err(e) = append_spark_to_dreams(&dreams_path_spark, &report.section).await {
+                    if let Err(e) =
+                        append_spark_to_dreams(&dreams_path_spark, &report.section).await
+                    {
                         error!("Failed to append spark to DREAMS.md: {e}");
                     } else {
                         append_cognition_schedule(
@@ -666,7 +682,11 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
                 continue;
             }
             let today = now.date_naive();
-            info!(hour = qdrant_cfg.sync_cron_hour, minute = qdrant_cfg.sync_cron_minute, "Qdrant vault sync starting");
+            info!(
+                hour = qdrant_cfg.sync_cron_hour,
+                minute = qdrant_cfg.sync_cron_minute,
+                "Qdrant vault sync starting"
+            );
             append_cognition_schedule(
                 synapse_qdrant.as_ref(),
                 "qdrant_sync",
@@ -985,7 +1005,11 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
                         "complete",
                         serde_json::json!({ "pages": r.pages, "entries": r.index_entries }),
                     );
-                    info!(pages = r.pages, entries = r.index_entries, "Wiki sync complete");
+                    info!(
+                        pages = r.pages,
+                        entries = r.index_entries,
+                        "Wiki sync complete"
+                    );
                 }
                 Err(e) => {
                     append_cognition_schedule(
@@ -1022,7 +1046,11 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
             if now.hour() < wiki_lint_cfg.lint_cron_hour {
                 continue;
             }
-            info!(weekday = wiki_lint_cfg.lint_cron_dow, hour = wiki_lint_cfg.lint_cron_hour, "Wiki lint starting");
+            info!(
+                weekday = wiki_lint_cfg.lint_cron_dow,
+                hour = wiki_lint_cfg.lint_cron_hour,
+                "Wiki lint starting"
+            );
             append_cognition_schedule(
                 synapse_wiki_lint.as_ref(),
                 "wiki_lint",
@@ -1079,11 +1107,19 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
                 continue;
             }
             let now = Utc::now();
-            if !cron_due_today(&now, HANDOFF_CRON_HOUR, HANDOFF_CRON_MINUTE, last_handoff_date) {
+            if !cron_due_today(
+                &now,
+                HANDOFF_CRON_HOUR,
+                HANDOFF_CRON_MINUTE,
+                last_handoff_date,
+            ) {
                 continue;
             }
             let today = now.date_naive();
-            info!(assembly_backend = "lab", "Config handoff starting (gzmo-handoff.sh)");
+            info!(
+                assembly_backend = "lab",
+                "Config handoff starting (gzmo-handoff.sh)"
+            );
             // Script only applies the fused config when the benchmark gate passes.
             // Apply target is the sibling *-fused.toml — never the live instance
             // config, which config-fuse output would clobber wholesale.

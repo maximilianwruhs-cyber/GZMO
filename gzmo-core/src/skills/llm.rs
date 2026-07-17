@@ -37,8 +37,7 @@ impl SkillRuntime {
         let active = config.engine.active_engine();
         let llm_url = std::env::var("GZMO_LLM_URL")
             .unwrap_or_else(|_| active.url.trim_end_matches('/').to_string());
-        let llm_model = std::env::var("GZMO_LLM_MODEL")
-            .unwrap_or_else(|_| active.model.clone());
+        let llm_model = std::env::var("GZMO_LLM_MODEL").unwrap_or_else(|_| active.model.clone());
 
         let stabilize_delta_rho = config
             .chaos
@@ -278,8 +277,20 @@ pub fn char_count(s: &str) -> usize {
 pub fn quality_gate_poem(text: &str) -> bool {
     let lower = text.to_lowercase();
     if [
-        "seele", "schicksal", "ewigkeit", "tränen", "tranen", "schatten", "flüstern",
-        "flustern", " soul ", " fate ", " eternity ", " whisper ", " shadows ", " tears ",
+        "seele",
+        "schicksal",
+        "ewigkeit",
+        "tränen",
+        "tranen",
+        "schatten",
+        "flüstern",
+        "flustern",
+        " soul ",
+        " fate ",
+        " eternity ",
+        " whisper ",
+        " shadows ",
+        " tears ",
         " dance ",
     ]
     .iter()
@@ -293,8 +304,15 @@ pub fn quality_gate_poem(text: &str) -> bool {
 pub fn quality_gate_joke(text: &str) -> bool {
     let lower = text.to_lowercase();
     ![
-        "programmier", "programming bug", " coffee ", " kaffee ", "artificial intelligence",
-        " chatgpt ", " openai ", " claude ", " deepseek ",
+        "programmier",
+        "programming bug",
+        " coffee ",
+        " kaffee ",
+        "artificial intelligence",
+        " chatgpt ",
+        " openai ",
+        " claude ",
+        " deepseek ",
     ]
     .iter()
     .any(|p| lower.contains(p))
@@ -303,8 +321,12 @@ pub fn quality_gate_joke(text: &str) -> bool {
 pub fn quality_gate_story(text: &str) -> bool {
     let lower = text.to_lowercase();
     ![
-        "once upon a time", "happily ever after", "fairy tale", "and they lived",
-        "es war einmal", "leben lang glücklich",
+        "once upon a time",
+        "happily ever after",
+        "fairy tale",
+        "and they lived",
+        "es war einmal",
+        "leben lang glücklich",
     ]
     .iter()
     .any(|p| lower.contains(p))
@@ -352,7 +374,8 @@ mod tests {
 
     #[test]
     fn clean_llm_output_with_german_joke_does_not_panic() {
-        let raw = "<think>planning</think>Der Optiker fragte, ob ich die Brille zum Überleben brauche.";
+        let raw =
+            "<think>planning</think>Der Optiker fragte, ob ich die Brille zum Überleben brauche.";
         let cleaned = clean_llm_output(raw);
         assert!(cleaned.contains("Überleben"));
         assert!(!cleaned.contains("<think"));

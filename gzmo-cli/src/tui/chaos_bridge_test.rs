@@ -21,9 +21,7 @@ async fn pulse_loop_feeds_canvas_history() {
     for _ in 0..40 {
         let _ = tokio::time::timeout(Duration::from_millis(500), rx.changed()).await;
         let snap = rx.borrow_and_update().clone();
-        canvas
-            .update(Action::ChaosSnapshot(snap.clone()))
-            .unwrap();
+        canvas.update(Action::ChaosSnapshot(snap.clone())).unwrap();
         if snap.tick > 5 && canvas.history.len() > 5 {
             // Coordinates should have left the near-zero default seed
             let (x, y, z) = canvas.last_xyz;

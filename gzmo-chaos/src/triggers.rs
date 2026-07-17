@@ -26,31 +26,19 @@ use crate::pulse::ChaosSnapshot;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum TriggerCondition {
     /// Fire when a metric exceeds a threshold
-    Above {
-        metric: ChaosMetric,
-        threshold: f64,
-    },
+    Above { metric: ChaosMetric, threshold: f64 },
     /// Fire when a metric drops below a threshold
-    Below {
-        metric: ChaosMetric,
-        threshold: f64,
-    },
+    Below { metric: ChaosMetric, threshold: f64 },
     /// Fire on phase transition
-    PhaseEnter {
-        phase: Phase,
-    },
+    PhaseEnter { phase: Phase },
     /// Fire on rho breath phase transition (Inhale=1, Exhale=-1, Flat=0)
-    RhoBreathEnter {
-        phase: i8,
-    },
+    RhoBreathEnter { phase: i8 },
     /// Fire when a thought crystallizes
     Crystallization,
     /// Fire on engine death/rebirth
     Death,
     /// Fire every N ticks
-    Periodic {
-        interval_ticks: u64,
-    },
+    Periodic { interval_ticks: u64 },
 }
 
 /// Metrics that can be monitored by triggers.
@@ -90,10 +78,7 @@ impl ChaosMetric {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum TriggerAction {
     /// Execute a Rust skill by name (e.g., "sound", "dice")
-    RunSkill {
-        skill_name: String,
-        args: String,
-    },
+    RunSkill { skill_name: String, args: String },
     /// Inject a message into the REPL output (displayed to user)
     Notify {
         message: String,
@@ -102,9 +87,7 @@ pub enum TriggerAction {
     },
     /// Inject an autonomous prompt into the agent loop
     /// This makes the agent "think" something without user input
-    InjectPrompt {
-        prompt: String,
-    },
+    InjectPrompt { prompt: String },
     /// Emit a custom ChaosEvent back into the engine (meta-feedback)
     EmitEvent {
         tension_delta: f64,
@@ -134,7 +117,12 @@ pub struct ChaosTrigger {
 }
 
 impl ChaosTrigger {
-    pub fn new(name: impl Into<String>, condition: TriggerCondition, action: TriggerAction, cooldown_ticks: u64) -> Self {
+    pub fn new(
+        name: impl Into<String>,
+        condition: TriggerCondition,
+        action: TriggerAction,
+        cooldown_ticks: u64,
+    ) -> Self {
         Self {
             name: name.into(),
             condition,
@@ -147,8 +135,12 @@ impl ChaosTrigger {
 
     /// Check if this trigger should fire given the current and previous snapshots.
     fn should_fire(&self, snap: &ChaosSnapshot, prev: &ChaosSnapshot) -> bool {
-        if !self.enabled { return false; }
-        if snap.tick.saturating_sub(self.last_fired) < self.cooldown_ticks { return false; }
+        if !self.enabled {
+            return false;
+        }
+        if snap.tick.saturating_sub(self.last_fired) < self.cooldown_ticks {
+            return false;
+        }
 
         match &self.condition {
             TriggerCondition::Above { metric, threshold } => {
@@ -162,20 +154,14 @@ impl ChaosTrigger {
                 let prev_val = metric.extract(prev);
                 val < *threshold && prev_val >= *threshold
             }
-            TriggerCondition::PhaseEnter { phase } => {
-                snap.phase == *phase && prev.phase != *phase
-            }
+            TriggerCondition::PhaseEnter { phase } => snap.phase == *phase && prev.phase != *phase,
             TriggerCondition::RhoBreathEnter { phase } => {
                 snap.rho_breath_phase == *phase && prev.rho_breath_phase != *phase
             }
-            TriggerCondition::Crystallization => {
-                snap.last_crystallization.is_some()
-            }
-            TriggerCondition::Death => {
-                snap.deaths > prev.deaths
-            }
+            TriggerCondition::Crystallization => snap.last_crystallization.is_some(),
+            TriggerCondition::Death => snap.deaths > prev.deaths,
             TriggerCondition::Periodic { interval_ticks } => {
-                snap.tick % interval_ticks == 0
+                snap.tick.is_multiple_of(*interval_ticks)
             }
         }
     }
@@ -252,7 +238,8 @@ impl TriggerEngine {
             "phase_drop",
             TriggerCondition::PhaseEnter { phase: Phase::Drop },
             TriggerAction::Notify {
-                message: "📉 Phase transition: DROP — energy collapsing, brace for impact.".to_string(),
+                message: "📉 Phase transition: DROP — energy collapsing, brace for impact."
+                    .to_string(),
                 level: NotifyLevel::Urgent,
             },
             30, // ~10s cooldown
@@ -283,13 +270,16 @@ impl TriggerEngine {
         // ─── Periodic Autonomous Heartbeat ──────────────────────
         engine.add(ChaosTrigger::new(
             "autonomous_pulse",
-            TriggerCondition::Periodic { interval_ticks: 520 }, // ~3 minutes
+            TriggerCondition::Periodic {
+                interval_ticks: 520,
+            }, // ~3 minutes
             TriggerAction::InjectPrompt {
                 prompt: "[AUTONOMOUS] Your chaos engine has been running for 3 minutes. \
                          Reflect briefly on your current internal state. \
                          If tension is high, consider what's causing it. \
                          If energy is low, conserve effort. \
-                         This is an internal monologue — respond in 1-2 sentences.".to_string(),
+                         This is an internal monologue — respond in 1-2 sentences."
+                    .to_string(),
             },
             520,
         ));
@@ -299,7 +289,8 @@ impl TriggerEngine {
             "rho_exhale_alert",
             TriggerCondition::RhoBreathEnter { phase: -1 },
             TriggerAction::Notify {
-                message: "🌬️ Attractor exhale phase initiated — relaxation mode engaged.".to_string(),
+                message: "🌬️ Attractor exhale phase initiated — relaxation mode engaged."
+                    .to_string(),
                 level: NotifyLevel::Whisper,
             },
             180, // ~1 min cooldown
@@ -312,7 +303,8 @@ impl TriggerEngine {
                 threshold: 6.0,
             },
             TriggerAction::Notify {
-                message: "⚠ Lorenz ρ mod critically elevated — system dynamics highly unstable.".to_string(),
+                message: "⚠ Lorenz ρ mod critically elevated — system dynamics highly unstable."
+                    .to_string(),
                 level: NotifyLevel::Urgent,
             },
             90, // ~30s cooldown
@@ -366,17 +358,20 @@ impl TriggerEngine {
 
     /// Get a diagnostic summary of all triggers.
     pub fn status_summary(&self, current_tick: u64) -> Vec<TriggerStatus> {
-        self.triggers.iter().map(|t| {
-            let ticks_since = current_tick.saturating_sub(t.last_fired);
-            let cooldown_remaining = if ticks_since >= t.cooldown_ticks { 0 } else { t.cooldown_ticks - ticks_since };
-            TriggerStatus {
-                name: t.name.clone(),
-                enabled: t.enabled,
-                last_fired: t.last_fired,
-                cooldown_remaining,
-                condition_summary: format!("{:?}", t.condition),
-            }
-        }).collect()
+        self.triggers
+            .iter()
+            .map(|t| {
+                let ticks_since = current_tick.saturating_sub(t.last_fired);
+                let cooldown_remaining = t.cooldown_ticks.saturating_sub(ticks_since);
+                TriggerStatus {
+                    name: t.name.clone(),
+                    enabled: t.enabled,
+                    last_fired: t.last_fired,
+                    cooldown_remaining,
+                    condition_summary: format!("{:?}", t.condition),
+                }
+            })
+            .collect()
     }
 }
 
@@ -403,13 +398,30 @@ mod tests {
     use super::*;
 
     fn snap_with_tension(tick: u64, tension: f64) -> ChaosSnapshot {
-        ChaosSnapshot { tick, tension, ..Default::default() }
+        ChaosSnapshot {
+            tick,
+            tension,
+            ..Default::default()
+        }
     }
 
-    fn snap_with_phase(tick: u64, phase: Phase, prev_phase: Phase) -> (ChaosSnapshot, ChaosSnapshot) {
+    #[allow(dead_code)]
+    fn snap_with_phase(
+        tick: u64,
+        phase: Phase,
+        prev_phase: Phase,
+    ) -> (ChaosSnapshot, ChaosSnapshot) {
         (
-            ChaosSnapshot { tick, phase, ..Default::default() },
-            ChaosSnapshot { tick: tick.saturating_sub(1), phase: prev_phase, ..Default::default() },
+            ChaosSnapshot {
+                tick,
+                phase,
+                ..Default::default()
+            },
+            ChaosSnapshot {
+                tick: tick.saturating_sub(1),
+                phase: prev_phase,
+                ..Default::default()
+            },
         )
     }
 
@@ -418,8 +430,14 @@ mod tests {
         let mut engine = TriggerEngine::new();
         engine.add(ChaosTrigger::new(
             "high_tension",
-            TriggerCondition::Above { metric: ChaosMetric::Tension, threshold: 80.0 },
-            TriggerAction::Notify { message: "Alert!".into(), level: NotifyLevel::Urgent },
+            TriggerCondition::Above {
+                metric: ChaosMetric::Tension,
+                threshold: 80.0,
+            },
+            TriggerAction::Notify {
+                message: "Alert!".into(),
+                level: NotifyLevel::Urgent,
+            },
             1,
         ));
 
@@ -449,17 +467,26 @@ mod tests {
         engine.add(ChaosTrigger::new(
             "periodic",
             TriggerCondition::Periodic { interval_ticks: 10 },
-            TriggerAction::Notify { message: "tick".into(), level: NotifyLevel::Normal },
+            TriggerAction::Notify {
+                message: "tick".into(),
+                level: NotifyLevel::Normal,
+            },
             10, // cooldown = 10 ticks
         ));
 
         // Tick 10 — fire
-        let fired = engine.evaluate(&ChaosSnapshot { tick: 10, ..Default::default() });
+        let fired = engine.evaluate(&ChaosSnapshot {
+            tick: 10,
+            ..Default::default()
+        });
         assert_eq!(fired.len(), 1);
 
         // Tick 20 — fire again (cooldown expired)
         engine.prev_snapshot.tick = 19;
-        let fired = engine.evaluate(&ChaosSnapshot { tick: 20, ..Default::default() });
+        let fired = engine.evaluate(&ChaosSnapshot {
+            tick: 20,
+            ..Default::default()
+        });
         assert_eq!(fired.len(), 1);
     }
 
@@ -469,26 +496,44 @@ mod tests {
         engine.add(ChaosTrigger::new(
             "drop_alert",
             TriggerCondition::PhaseEnter { phase: Phase::Drop },
-            TriggerAction::Notify { message: "DROP!".into(), level: NotifyLevel::Urgent },
+            TriggerAction::Notify {
+                message: "DROP!".into(),
+                level: NotifyLevel::Urgent,
+            },
             1,
         ));
 
         // Start in Build
-        engine.prev_snapshot = ChaosSnapshot { tick: 0, phase: Phase::Build, ..Default::default() };
+        engine.prev_snapshot = ChaosSnapshot {
+            tick: 0,
+            phase: Phase::Build,
+            ..Default::default()
+        };
 
         // Transition to Drop — fire
-        let fired = engine.evaluate(&ChaosSnapshot { tick: 1, phase: Phase::Drop, ..Default::default() });
+        let fired = engine.evaluate(&ChaosSnapshot {
+            tick: 1,
+            phase: Phase::Drop,
+            ..Default::default()
+        });
         assert_eq!(fired.len(), 1);
 
         // Stay in Drop — no re-fire
-        let fired = engine.evaluate(&ChaosSnapshot { tick: 2, phase: Phase::Drop, ..Default::default() });
+        let fired = engine.evaluate(&ChaosSnapshot {
+            tick: 2,
+            phase: Phase::Drop,
+            ..Default::default()
+        });
         assert!(fired.is_empty());
     }
 
     #[test]
     fn test_default_triggers_loaded() {
         let engine = TriggerEngine::with_defaults();
-        assert!(engine.triggers.len() >= 7, "Should have at least 7 default triggers");
+        assert!(
+            engine.triggers.len() >= 7,
+            "Should have at least 7 default triggers"
+        );
     }
 
     #[test]
@@ -508,12 +553,18 @@ mod tests {
         engine.add(ChaosTrigger::new(
             "test",
             TriggerCondition::Periodic { interval_ticks: 1 },
-            TriggerAction::Notify { message: "x".into(), level: NotifyLevel::Normal },
+            TriggerAction::Notify {
+                message: "x".into(),
+                level: NotifyLevel::Normal,
+            },
             0,
         ));
         engine.set_enabled("test", false);
 
-        let fired = engine.evaluate(&ChaosSnapshot { tick: 1, ..Default::default() });
+        let fired = engine.evaluate(&ChaosSnapshot {
+            tick: 1,
+            ..Default::default()
+        });
         assert!(fired.is_empty());
     }
 
@@ -523,19 +574,34 @@ mod tests {
         engine.add(ChaosTrigger::new(
             "breath_exhale",
             TriggerCondition::RhoBreathEnter { phase: -1 },
-            TriggerAction::Notify { message: "Exhale".into(), level: NotifyLevel::Whisper },
+            TriggerAction::Notify {
+                message: "Exhale".into(),
+                level: NotifyLevel::Whisper,
+            },
             1,
         ));
 
         // Start with phase 0
-        engine.prev_snapshot = ChaosSnapshot { tick: 0, rho_breath_phase: 0, ..Default::default() };
+        engine.prev_snapshot = ChaosSnapshot {
+            tick: 0,
+            rho_breath_phase: 0,
+            ..Default::default()
+        };
 
         // Enter phase 1 (inhale) — no fire
-        let fired = engine.evaluate(&ChaosSnapshot { tick: 1, rho_breath_phase: 1, ..Default::default() });
+        let fired = engine.evaluate(&ChaosSnapshot {
+            tick: 1,
+            rho_breath_phase: 1,
+            ..Default::default()
+        });
         assert!(fired.is_empty());
 
         // Enter phase -1 (exhale) — fire
-        let fired = engine.evaluate(&ChaosSnapshot { tick: 2, rho_breath_phase: -1, ..Default::default() });
+        let fired = engine.evaluate(&ChaosSnapshot {
+            tick: 2,
+            rho_breath_phase: -1,
+            ..Default::default()
+        });
         assert_eq!(fired.len(), 1);
         assert_eq!(fired[0].trigger_name, "breath_exhale");
     }

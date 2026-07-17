@@ -89,7 +89,9 @@ impl PrerequisiteGraph {
         let mut adj: HashMap<&str, Vec<&str>> = HashMap::new();
         for node in &self.nodes {
             for prereq in &node.prerequisites {
-                adj.entry(prereq.as_str()).or_default().push(node.id.as_str());
+                adj.entry(prereq.as_str())
+                    .or_default()
+                    .push(node.id.as_str());
             }
         }
         let mut visiting: HashSet<&str> = HashSet::new();
@@ -151,7 +153,10 @@ impl PrerequisiteGraph {
         let mut ctx = format!("Domain: {}\nNodes:\n", self.domain);
         for node in &self.nodes {
             if topic_hint.is_empty()
-                || node.title.to_lowercase().contains(&topic_hint.to_lowercase())
+                || node
+                    .title
+                    .to_lowercase()
+                    .contains(&topic_hint.to_lowercase())
                 || node.id.to_lowercase().contains(&topic_hint.to_lowercase())
             {
                 ctx.push_str(&format!(

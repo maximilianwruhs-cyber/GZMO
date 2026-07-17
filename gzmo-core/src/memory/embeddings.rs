@@ -61,17 +61,21 @@ impl EmbeddingCache {
         if let Some(c) = self.conn.lock().await.as_ref() {
             return Ok(c.clone());
         }
-        let conn = tokio::time::timeout(REDIS_CONNECT_TIMEOUT, self.client.get_connection_manager())
-            .await
-            .context("Embedding cache Redis connect timed out")?
-            .context("Embedding cache Redis connect failed")?;
+        let conn =
+            tokio::time::timeout(REDIS_CONNECT_TIMEOUT, self.client.get_connection_manager())
+                .await
+                .context("Embedding cache Redis connect timed out")?
+                .context("Embedding cache Redis connect failed")?;
         *self.conn.lock().await = Some(conn.clone());
         Ok(conn)
     }
 
     fn cache_key(&self, text: &str) -> String {
         let digest = Sha256::digest(text.as_bytes());
-        let hash_hex = digest.iter().map(|b| format!("{b:02x}")).collect::<String>();
+        let hash_hex = digest
+            .iter()
+            .map(|b| format!("{b:02x}"))
+            .collect::<String>();
         let model_key = self.model.replace(':', "_");
         format!("{EMBED_CACHE_PREFIX}{model_key}:{hash_hex}")
     }
@@ -199,10 +203,7 @@ impl Embedder {
 }
 
 fn encode_embedding(embedding: &[f32]) -> Vec<u8> {
-    embedding
-        .iter()
-        .flat_map(|f| f.to_le_bytes())
-        .collect()
+    embedding.iter().flat_map(|f| f.to_le_bytes()).collect()
 }
 
 fn decode_embedding(blob: &[u8]) -> Option<Vec<f32>> {

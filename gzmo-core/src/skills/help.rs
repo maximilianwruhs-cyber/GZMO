@@ -21,9 +21,15 @@ pub struct HelpSkill {
 
 #[async_trait]
 impl Skill for HelpSkill {
-    fn name(&self) -> &str { "help" }
-    fn description(&self) -> &str { "Display all available slash commands" }
-    fn skill_type(&self) -> SkillType { SkillType::Info }
+    fn name(&self) -> &str {
+        "help"
+    }
+    fn description(&self) -> &str {
+        "Display all available slash commands"
+    }
+    fn skill_type(&self) -> SkillType {
+        SkillType::Info
+    }
 
     async fn execute(&self, _ctx: SkillContext<'_>) -> Result<SkillOutput> {
         let mut lines = vec![
@@ -35,16 +41,19 @@ impl Skill for HelpSkill {
 
         // Built-in commands
         let builtins = [
-            ("/quit",    "Exit GZMO (auto-saves session)"),
-            ("/status",  "Ecosystem snapshot (paths, systemd, probes — no LLM)"),
-            ("/ecosystem","Alias for /status"),
-            ("/clear",   "Clear conversation history"),
-            ("/chaos",   "Display chaos engine state dashboard"),
-            ("/stats",   "Show session statistics"),
-            ("/vault",   "Search semantic vault memory"),
-            ("/remember","Store a fact in semantic vault"),
-            ("/sessions","List saved sessions"),
-            ("/resume",  "Resume most recent session"),
+            ("/quit", "Exit GZMO (auto-saves session)"),
+            (
+                "/status",
+                "Ecosystem snapshot (paths, systemd, probes — no LLM)",
+            ),
+            ("/ecosystem", "Alias for /status"),
+            ("/clear", "Clear conversation history"),
+            ("/chaos", "Display chaos engine state dashboard"),
+            ("/stats", "Show session statistics"),
+            ("/vault", "Search semantic vault memory"),
+            ("/remember", "Store a fact in semantic vault"),
+            ("/sessions", "List saved sessions"),
+            ("/resume", "Resume most recent session"),
         ];
 
         for (cmd, desc) in &builtins {
@@ -52,15 +61,21 @@ impl Skill for HelpSkill {
         }
 
         lines.push(String::new());
-        lines.push(format!("{GOLD}├─ Chaos Skills (Rust) ────────────────────────────────────────────┤{RESET}"));
+        lines.push(format!(
+            "{GOLD}├─ Chaos Skills (Rust) ────────────────────────────────────────────┤{RESET}"
+        ));
         lines.push(String::new());
 
         for (name, desc, type_label) in &self.entries {
-            lines.push(format!("  {BOLD}/{name:<15}{RESET} {DIM}[{type_label}]{RESET}  {desc}"));
+            lines.push(format!(
+                "  {BOLD}/{name:<15}{RESET} {DIM}[{type_label}]{RESET}  {desc}"
+            ));
         }
 
         lines.push(String::new());
-        lines.push(format!("{GOLD}└─────────────────────────────────────────────────────────────────┘{RESET}"));
+        lines.push(format!(
+            "{GOLD}└─────────────────────────────────────────────────────────────────┘{RESET}"
+        ));
 
         let display = lines.join("\n");
 

@@ -312,9 +312,7 @@ impl WikiEngine {
             // Broken links: [[target]] with no matching page slug.
             for target in extract_wikilinks(content) {
                 if !page_slugs.contains(&target) {
-                    report
-                        .broken_links
-                        .push(format!("{name} -> [[{target}]]"));
+                    report.broken_links.push(format!("{name} -> [[{target}]]"));
                 }
             }
         }
@@ -367,7 +365,11 @@ impl WikiEngine {
             "filed-back query answer",
         );
         write_string(&self.index_path(), &updated).await?;
-        append_log(&self.log_path(), &format!("## [{date_str}] query | {title}")).await?;
+        append_log(
+            &self.log_path(),
+            &format!("## [{date_str}] query | {title}"),
+        )
+        .await?;
         Ok(path.display().to_string())
     }
 }
@@ -508,7 +510,11 @@ mod tests {
         let engine = engine_in(&dir);
         let date = NaiveDate::from_ymd_opt(2026, 6, 7).unwrap();
 
-        let entities = vec![ve("GZMO", "System", &["Sovereign daemon", "Runs on llama.cpp"])];
+        let entities = vec![ve(
+            "GZMO",
+            "System",
+            &["Sovereign daemon", "Runs on llama.cpp"],
+        )];
         let relations = vec![VerifiedRelation {
             relation: KgRelation {
                 from: "GZMO".to_string(),
@@ -540,7 +546,10 @@ mod tests {
             .await
             .unwrap();
         let ent = std::fs::read_to_string(dir.join("entities/gzmo.md")).unwrap();
-        assert_eq!(ent.matches("## From [[architecture|Architecture]]").count(), 1);
+        assert_eq!(
+            ent.matches("## From [[architecture|Architecture]]").count(),
+            1
+        );
 
         std::fs::remove_dir_all(&dir).ok();
     }

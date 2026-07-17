@@ -193,8 +193,13 @@ mod tests {
     fn read_only_excludes_write_and_shell() {
         let mut reg = ToolRegistry::new();
         let cfg = ToolsConfig::default();
-        register_for_profile(&mut reg, CapabilityProfile::ReadOnly, &cfg, ToolRegisterOpts::default())
-            .unwrap();
+        register_for_profile(
+            &mut reg,
+            CapabilityProfile::ReadOnly,
+            &cfg,
+            ToolRegisterOpts::default(),
+        )
+        .unwrap();
         assert!(reg.has_tool("file_read"));
         assert!(!reg.has_tool("file_write"));
         assert!(!reg.has_tool("shell_exec"));

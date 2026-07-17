@@ -110,7 +110,9 @@ pub fn build_system_prompt_with_workflows(
     workflows: Option<&WorkflowSkillIndex>,
     last_handoff: Option<&std::path::Path>,
 ) -> String {
-    let wf_block = workflows.map(|w| w.prompt_index_block()).unwrap_or_default();
+    let wf_block = workflows
+        .map(|w| w.prompt_index_block())
+        .unwrap_or_default();
     let handoff_block = last_handoff
         .map(|p| {
             format!(

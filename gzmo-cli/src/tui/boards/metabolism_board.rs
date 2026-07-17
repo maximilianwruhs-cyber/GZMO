@@ -5,7 +5,9 @@ use std::time::Duration;
 
 use anyhow::Result;
 use crossterm::event::{self, Event, KeyCode, KeyEventKind};
-use crossterm::terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen};
+use crossterm::terminal::{
+    disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen,
+};
 use crossterm::ExecutableCommand;
 use gzmo_core::config::GzmoConfig;
 use gzmo_core::metabolism::{collect_metabolism_board, JobRowStatus, MetabolismBoard};
@@ -92,16 +94,15 @@ fn render_board(f: &mut ratatui::Frame<'_>, board: &MetabolismBoard, status: &st
             format!("{:<8}", "RESULT"),
             Style::default().fg(MUTED).add_modifier(Modifier::BOLD),
         ),
-        Span::styled("DETAIL", Style::default().fg(MUTED).add_modifier(Modifier::BOLD)),
+        Span::styled(
+            "DETAIL",
+            Style::default().fg(MUTED).add_modifier(Modifier::BOLD),
+        ),
     ])];
 
     for job in &board.jobs {
         let finished = job.finished.as_deref().unwrap_or("—");
-        let detail = job
-            .error
-            .as_deref()
-            .or(job.runner.as_deref())
-            .unwrap_or("");
+        let detail = job.error.as_deref().or(job.runner.as_deref()).unwrap_or("");
         rows.push(Line::from(vec![
             Span::styled(
                 format!("{:<10}", job.job),

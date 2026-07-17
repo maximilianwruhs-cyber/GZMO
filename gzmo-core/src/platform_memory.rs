@@ -9,12 +9,14 @@ use serde::{Deserialize, Serialize};
 use serde_json::json;
 
 use crate::agent_session::AgentSession;
-use crate::config::{EmbeddingsConfig, GzmoConfig, PlatformSearchConfig, QdrantConfig, RedisConfig, RerankConfig};
+use crate::config::{
+    EmbeddingsConfig, GzmoConfig, PlatformSearchConfig, QdrantConfig, RedisConfig, RerankConfig,
+};
 use crate::memory::embeddings;
-use crate::platform_search::platform_cross_search;
 use crate::memory::profile::{GzmoProfile, ProfileOptions};
 use crate::memory::scratch::{RecallSnippet, ScratchScope, ScratchService};
 use crate::memory::vault::SqliteVault;
+use crate::platform_search::platform_cross_search;
 use crate::session::SessionManager;
 use crate::tools::{ToolDef, ToolHandler};
 
@@ -129,8 +131,7 @@ impl PlatformMemory {
             );
         }
 
-        let session =
-            AgentSession::new_main(&config.redis, &config.context_memory, sid).await;
+        let session = AgentSession::new_main(&config.redis, &config.context_memory, sid).await;
 
         Ok(Self {
             vault: Arc::new(vault),
@@ -191,7 +192,10 @@ impl PlatformMemory {
                         .or_else(|| hit.evidence_text.clone()),
                 })
                 .collect();
-            self.session.scratch().write(&self.scratch_scope(), snippets).await?;
+            self.session
+                .scratch()
+                .write(&self.scratch_scope(), snippets)
+                .await?;
         }
 
         Ok(MemorySearchResult {
@@ -358,7 +362,8 @@ impl ToolHandler for GzmoMemoryStatusTool {
     fn definition(&self) -> ToolDef {
         ToolDef {
             name: "gzmo_memory_status".to_string(),
-            description: "Report vault fact count, session id, and scratch backend state.".to_string(),
+            description: "Report vault fact count, session id, and scratch backend state."
+                .to_string(),
             parameters: json!({
                 "type": "object",
                 "properties": {},
@@ -420,7 +425,8 @@ impl ToolHandler for GzmoMemoryProfileTool {
     fn definition(&self) -> ToolDef {
         ToolDef {
             name: "gzmo_memory_profile".to_string(),
-            description: "Return cached static+dynamic GZMO operator profile from honeypot.".to_string(),
+            description: "Return cached static+dynamic GZMO operator profile from honeypot."
+                .to_string(),
             parameters: json!({
                 "type": "object",
                 "properties": {

@@ -261,7 +261,11 @@ mod tests {
             0.9,
             Some("wave_01_foo.md"),
         )));
-        assert!(!qualifies_for_honeypot(&truth("fact", 0.5, Some("wave_01_foo.md"))));
+        assert!(!qualifies_for_honeypot(&truth(
+            "fact",
+            0.5,
+            Some("wave_01_foo.md")
+        )));
         assert!(!qualifies_for_honeypot(&truth("fact", 0.9, None)));
     }
 }

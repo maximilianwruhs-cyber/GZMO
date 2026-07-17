@@ -18,7 +18,11 @@ pub enum Field {
     /// Exact values
     List(Vec<u32>),
     /// */step from lo..=hi
-    Step { lo: u32, hi: u32, step: u32 },
+    Step {
+        lo: u32,
+        hi: u32,
+        step: u32,
+    },
 }
 
 /// Parse classic 5-field cron: `min hour dom month dow`.
@@ -87,9 +91,7 @@ fn field_matches(field: &Field, value: u32) -> bool {
     match field {
         Field::Any => true,
         Field::List(vals) => vals.contains(&value),
-        Field::Step { lo, hi, step } => {
-            value >= *lo && value <= *hi && (value - lo) % step == 0
-        }
+        Field::Step { lo, hi, step } => value >= *lo && value <= *hi && (value - lo) % step == 0,
     }
 }
 

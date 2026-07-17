@@ -27,10 +27,7 @@ pub struct InstrumentsComponent {
 
 impl InstrumentsComponent {
     pub fn new(vault: Option<Arc<SqliteVault>>) -> Self {
-        let vault_count = vault
-            .as_ref()
-            .and_then(|v| v.count().ok())
-            .unwrap_or(0) as u64;
+        let vault_count = vault.as_ref().and_then(|v| v.count().ok()).unwrap_or(0) as u64;
         Self {
             snap: None,
             vault,
@@ -131,7 +128,10 @@ impl Component for InstrumentsComponent {
         let alive_span = if alive {
             Span::styled("PULSE OK", Style::default().fg(CYAN))
         } else {
-            Span::styled("FALLEN", Style::default().fg(RITUAL).add_modifier(Modifier::BOLD))
+            Span::styled(
+                "FALLEN",
+                Style::default().fg(RITUAL).add_modifier(Modifier::BOLD),
+            )
         };
 
         let lines = vec![
@@ -171,10 +171,7 @@ impl Component for InstrumentsComponent {
                     format!("{valence:+.2}"),
                     Style::default().fg(theme::tension_color(((1.0 - valence) * 50.0) as f64)),
                 ),
-                Span::styled(
-                    format!("  ε{energy:.0}%"),
-                    Style::default().fg(STEEL),
-                ),
+                Span::styled(format!("  ε{energy:.0}%"), Style::default().fg(STEEL)),
             ]),
         ];
 

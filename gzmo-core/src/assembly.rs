@@ -74,9 +74,7 @@ impl AssemblyConfig {
 /// Resolve little-tools-lab root (same precedence as `gzmo assemble`).
 pub fn lab_root() -> PathBuf {
     std::env::var("LITTLE_TOOLS_LAB_ROOT")
-        .or_else(|_| {
-            std::env::var("GZMO_CLONE_ROOT").map(|r| format!("{r}/little-tools-lab"))
-        })
+        .or_else(|_| std::env::var("GZMO_CLONE_ROOT").map(|r| format!("{r}/little-tools-lab")))
         .map(PathBuf::from)
         .unwrap_or_else(|_| PathBuf::from("/home/gzmo/github-clone/little-tools-lab"))
 }

@@ -5,7 +5,9 @@ use std::time::Duration;
 
 use anyhow::Result;
 use crossterm::event::{self, Event, KeyCode, KeyEventKind};
-use crossterm::terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen};
+use crossterm::terminal::{
+    disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen,
+};
 use crossterm::ExecutableCommand;
 use gzmo_core::config::GzmoConfig;
 use gzmo_core::observatory_board::{collect_health_led_board, HealthLed, HealthLedBoard, LedState};
@@ -50,10 +52,7 @@ fn led_line(led: &HealthLed) -> Line<'static> {
             format!("{:<8}", led.state.label()),
             Style::default().fg(led_color(led.state)),
         ),
-        Span::styled(
-            truncate(&led.detail, 48),
-            Style::default().fg(MUTED),
-        ),
+        Span::styled(truncate(&led.detail, 48), Style::default().fg(MUTED)),
     ])
 }
 

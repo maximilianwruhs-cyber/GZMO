@@ -44,7 +44,11 @@ impl Skill for StabilizeSkill {
             )
         };
 
-        let body = format!("  {WHITE}{message}{RESET}", WHITE = WHITE, RESET = super::llm::RESET);
+        let body = format!(
+            "  {WHITE}{message}{RESET}",
+            WHITE = WHITE,
+            RESET = super::llm::RESET
+        );
         let display = frame_box("STABILIZE", &body, "🌀", GREEN);
 
         Ok(SkillOutput {

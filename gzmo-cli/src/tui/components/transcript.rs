@@ -340,10 +340,7 @@ mod tests {
         let s = sanitize_tui_text("⚙ Context cleared — new session.");
         assert_eq!(s, "* Context cleared - new session.");
         assert!(!s.contains("Conxt"));
-        assert_eq!(
-            strip_redundant_bullet(s),
-            "Context cleared - new session."
-        );
+        assert_eq!(strip_redundant_bullet(s), "Context cleared - new session.");
     }
 
     #[test]
@@ -384,7 +381,10 @@ mod tests {
         assert_eq!(wrapped_line_count(&[line], 20), 2);
         // Using outer width 22 (20+2 borders) would under-count — that's the bug.
         assert_eq!(
-            wrapped_line_count(&[Line::from("abcdefghijklmnopqrstuvwxyz0123456789abcd")], 22),
+            wrapped_line_count(
+                &[Line::from("abcdefghijklmnopqrstuvwxyz0123456789abcd")],
+                22
+            ),
             2
         );
     }

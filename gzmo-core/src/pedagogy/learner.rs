@@ -109,7 +109,12 @@ impl LearnerProfile {
         self.updated_at = Some(Utc::now());
     }
 
-    pub fn record_episode(&mut self, summary: &str, struggle: Option<&str>, breakthrough: Option<&str>) {
+    pub fn record_episode(
+        &mut self,
+        summary: &str,
+        struggle: Option<&str>,
+        breakthrough: Option<&str>,
+    ) {
         self.episodic.entries.push(EpisodicLearnerEntry {
             timestamp: Utc::now(),
             summary: summary.to_string(),
@@ -193,11 +198,7 @@ impl LearnerStore {
         let dir = self.config.episodes_dir();
         tokio::fs::create_dir_all(&dir).await?;
         let file = dir.join(format!("{}.md", Utc::now().format("%Y-%m-%d")));
-        let line = format!(
-            "- {} — {}\n",
-            Utc::now().format("%H:%M UTC"),
-            summary
-        );
+        let line = format!("- {} — {}\n", Utc::now().format("%H:%M UTC"), summary);
         use tokio::io::AsyncWriteExt;
         let mut f = tokio::fs::OpenOptions::new()
             .create(true)

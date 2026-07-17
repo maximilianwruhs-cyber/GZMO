@@ -1,8 +1,8 @@
 //! `gzmo mentor` — headless mentor client (daemon socket or local fallback).
 
+use anyhow::{bail, Context, Result};
 use std::fs;
 use std::io::{self, IsTerminal, Read};
-use anyhow::{Context, Result, bail};
 
 use gzmo_core::config::{GzmoConfig, TaskKind};
 use gzmo_core::gateway::GatewayRouter;
@@ -10,9 +10,7 @@ use gzmo_core::mentor_client::MentorResponse;
 use gzmo_core::types::{Message, Role};
 
 use crate::mentor_ipc::{self, MentorRequest, MentorTurn};
-use crate::pedagogy_bridge::{
-    delegate_exec_response, should_delegate_exec, PedagogyRuntime,
-};
+use crate::pedagogy_bridge::{delegate_exec_response, should_delegate_exec, PedagogyRuntime};
 
 pub async fn run(config: &GzmoConfig, args: &[String]) -> Result<()> {
     let sub = args.first().map(|s| s.as_str()).unwrap_or("teach");
@@ -24,9 +22,9 @@ pub async fn run(config: &GzmoConfig, args: &[String]) -> Result<()> {
             let req = parse_teach_request(&args[1..])?;
             run_teach_request(config, req).await
         }
-        _ => bail!(
-            "Usage: gzmo mentor <ping|status|reload|teach [message]|teach --json-file path>"
-        ),
+        _ => {
+            bail!("Usage: gzmo mentor <ping|status|reload|teach [message]|teach --json-file path>")
+        }
     }
 }
 
@@ -39,7 +37,10 @@ fn parse_teach_request(args: &[String]) -> Result<MentorRequest> {
         return serde_json::from_str(&raw).context("parse mentor JSON request file");
     }
 
-    if let Some(msg) = args.first().filter(|s| !s.is_empty() && !s.starts_with('-')) {
+    if let Some(msg) = args
+        .first()
+        .filter(|s| !s.is_empty() && !s.starts_with('-'))
+    {
         return Ok(MentorRequest {
             method: "teach".into(),
             message: msg.to_string(),
@@ -113,8 +114,12 @@ async fn run_status(config: &GzmoConfig) -> Result<()> {
     println!(
         "learner={} mentor={} ops_mode={} auto_triggers={}",
         resp.learner_id.unwrap_or_default(),
-        resp.mentor.map(|m| m.to_string()).unwrap_or_else(|| "?".into()),
-        resp.ops_mode.map(|m| m.to_string()).unwrap_or_else(|| "?".into()),
+        resp.mentor
+            .map(|m| m.to_string())
+            .unwrap_or_else(|| "?".into()),
+        resp.ops_mode
+            .map(|m| m.to_string())
+            .unwrap_or_else(|| "?".into()),
         resp.auto_triggers
             .map(|m| m.to_string())
             .unwrap_or_else(|| "?".into()),
@@ -228,7 +233,11 @@ async fn local_teach(config: &GzmoConfig, req: &MentorRequest) -> Result<MentorR
     runtime.reload_from_disk().await?;
     let learner_id = config.pedagogy.learner_id().to_string();
     if should_delegate_exec(&runtime.session, message) {
-        return Ok(delegate_exec_response(message, &runtime.session, &learner_id));
+        return Ok(delegate_exec_response(
+            message,
+            &runtime.session,
+            &learner_id,
+        ));
     }
     let messages = build_messages(&req.conversation, message);
     let discovery_context = mentor_ipc::build_discovery_context(req);
@@ -250,7 +259,11 @@ async fn local_teach(config: &GzmoConfig, req: &MentorRequest) -> Result<MentorR
             learner_id,
             &turn.edf_record,
         )),
-        None => Ok(delegate_exec_response(message, &runtime.session, &learner_id)),
+        None => Ok(delegate_exec_response(
+            message,
+            &runtime.session,
+            &learner_id,
+        )),
     }
 }
 

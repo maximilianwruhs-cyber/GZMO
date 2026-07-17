@@ -98,7 +98,10 @@ pub fn ripen_honeypot(vault: &SqliteVault, config: &RipenConfig) -> Result<Vec<C
     // Phase 3: Export to knowledge_core table
     if config.export && !resolved.is_empty() {
         export_cards(&conn, &resolved)?;
-        info!(exported = resolved.len(), "Phase 3: exported to knowledge_core");
+        info!(
+            exported = resolved.len(),
+            "Phase 3: exported to knowledge_core"
+        );
     }
 
     Ok(resolved)
@@ -163,7 +166,9 @@ fn resolve_contradictions(
         entries.sort_by(|a, b| {
             let score_a = a.confidence * (1.0 + a.recall_count as f64);
             let score_b = b.confidence * (1.0 + b.recall_count as f64);
-            score_b.partial_cmp(&score_a).unwrap_or(std::cmp::Ordering::Equal)
+            score_b
+                .partial_cmp(&score_a)
+                .unwrap_or(std::cmp::Ordering::Equal)
         });
 
         // Check for contradictions (superseded entries)
@@ -315,10 +320,7 @@ mod tests {
 
     #[test]
     fn extracts_label_from_bracket_format() {
-        assert_eq!(
-            extract_entity_label("[SYSTEM:GZMO] runs locally"),
-            "gzmo"
-        );
+        assert_eq!(extract_entity_label("[SYSTEM:GZMO] runs locally"), "gzmo");
         assert_eq!(
             extract_entity_label("[PROJECT:Obolus] token economy"),
             "obolus"

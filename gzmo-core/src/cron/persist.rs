@@ -79,9 +79,7 @@ pub fn persist_builtin_enabled(config_path: &Path, job_id: &str, enabled: bool) 
             "[session_distill]",
             &[("enabled", flag), ("daemon_scheduled", flag)],
         )?,
-        "promote" | "embed" => {
-            patch_section_keys(&content, "[metabolism]", &[("enabled", flag)])?
-        }
+        "promote" | "embed" => patch_section_keys(&content, "[metabolism]", &[("enabled", flag)])?,
         "spark" => patch_section_keys(&content, "[spark]", &[("enabled", flag)])?,
         "wiki_push" => {
             // Enabling wiki_push requires wiki.enabled; backend stays as configured.
@@ -277,7 +275,11 @@ mod tests {
         std::fs::create_dir_all(&dir).unwrap();
         let path = dir.join("gzmo.toml");
         let mut f = std::fs::File::create(&path).unwrap();
-        writeln!(f, "[dreams]\nenabled = true\ncron_hour = 1\ncron_minute = 0\n").unwrap();
+        writeln!(
+            f,
+            "[dreams]\nenabled = true\ncron_hour = 1\ncron_minute = 0\n"
+        )
+        .unwrap();
 
         let job = CustomCronJob {
             enabled: true,

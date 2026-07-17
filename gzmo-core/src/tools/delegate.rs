@@ -6,8 +6,8 @@ use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use serde_json::json;
 
-use crate::subagent::{SubagentRunner, SubagentSpec};
 use super::{ToolDef, ToolHandler};
+use crate::subagent::{SubagentRunner, SubagentSpec};
 
 pub struct DelegateTaskTool {
     pub runner: Arc<SubagentRunner>,
@@ -52,10 +52,7 @@ impl ToolHandler for DelegateTaskTool {
         let brief = args["brief"]
             .as_str()
             .ok_or_else(|| anyhow!("Missing 'brief'"))?;
-        let max_iterations = args["max_iterations"]
-            .as_u64()
-            .unwrap_or(20)
-            .min(60) as usize;
+        let max_iterations = args["max_iterations"].as_u64().unwrap_or(20).min(60) as usize;
 
         let spec = SubagentSpec {
             role: role.to_string(),

@@ -50,7 +50,8 @@ impl Skill for PoemSkill {
     async fn execute(&self, ctx: SkillContext<'_>) -> Result<SkillOutput> {
         let mut poem = String::new();
         for _ in 0..3 {
-            if let Ok(raw) = llm_chat(&self.rt, SYSTEM_PROMPT, USER_PROMPT, 0.85, 4096, false).await {
+            if let Ok(raw) = llm_chat(&self.rt, SYSTEM_PROMPT, USER_PROMPT, 0.85, 4096, false).await
+            {
                 if accept_creative_output(&raw, 180, quality_gate_poem) {
                     poem = raw;
                     break;
@@ -63,7 +64,11 @@ impl Skill for PoemSkill {
             poem = FALLBACKS[idx].to_string();
         }
 
-        let body = format!("  {WHITE}{poem}{RESET}", WHITE = WHITE, RESET = super::llm::RESET);
+        let body = format!(
+            "  {WHITE}{poem}{RESET}",
+            WHITE = WHITE,
+            RESET = super::llm::RESET
+        );
         let display = frame_box("POEM", &body, "🖋️ ", MAGENTA);
 
         let feedback_event = ChaosEvent::PoemGenerated { text: poem.clone() };

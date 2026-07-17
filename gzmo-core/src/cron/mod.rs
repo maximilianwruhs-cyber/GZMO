@@ -2,8 +2,8 @@
 //!
 //! Host crontab is out of scope (ADR-0003: `gzmo serve` owns overnight jobs).
 
-mod schedule;
 mod persist;
+mod schedule;
 
 pub use persist::{
     persist_builtin_enabled, persist_builtin_schedule, persist_custom_job, remove_custom_job,
@@ -17,14 +17,7 @@ use chrono::{DateTime, Timelike, Utc};
 use crate::config::{CronConfig, CustomCronJob, CustomCronKind, GzmoConfig};
 
 /// Built-in job ids owned by `gzmo serve`.
-pub const BUILTIN_IDS: &[&str] = &[
-    "dream",
-    "distill",
-    "promote",
-    "embed",
-    "spark",
-    "wiki_push",
-];
+pub const BUILTIN_IDS: &[&str] = &["dream", "distill", "promote", "embed", "spark", "wiki_push"];
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CronJobSource {
@@ -210,8 +203,7 @@ fn preview_spark(config: &GzmoConfig, n: usize, from: DateTime<Utc>) -> Vec<Date
         .and_then(|x| x.with_nanosecond(0))
         .unwrap_or(t);
     let minute = config.spark.cron_minute;
-    let hours: std::collections::HashSet<u32> =
-        config.spark.cron_hours.iter().copied().collect();
+    let hours: std::collections::HashSet<u32> = config.spark.cron_hours.iter().copied().collect();
     for _ in 0..14 * 24 * 60 {
         if out.len() >= n {
             break;
@@ -346,11 +338,7 @@ mod tests {
             .unwrap()
             .with_timezone(&Utc);
         assert!(custom_due(&job, now, None));
-        assert!(!custom_due(
-            &job,
-            now,
-            Some((now.date_naive(), 3, 30))
-        ));
+        assert!(!custom_due(&job, now, Some((now.date_naive(), 3, 30))));
         let mut off = job.clone();
         off.enabled = false;
         assert!(!custom_due(&off, now, None));

@@ -1,8 +1,8 @@
 //! Distill `data/sessions/*.json` into `SessionDistill` vault facts and rich episodic.
 
+use std::hash::{Hash, Hasher};
 use std::path::Path;
 use std::sync::Arc;
-use std::hash::{Hash, Hasher};
 
 use anyhow::Result;
 use chrono::Utc;
@@ -13,11 +13,11 @@ use crate::config::SessionDistillConfig;
 use crate::gateway::{LlmGateway, LlmResponse};
 use crate::memory::episodic::FileEpisodicStore;
 use crate::memory::kg_extract::{chunk_text_for_llm, merge_pipeline_chunks, KgPromoter};
+use crate::memory::scratch::DistillSource;
 use crate::memory::vault::SqliteVault;
 use crate::session::{Session, SessionManager};
 use crate::synapse::{resolve_event_source, EventSource, EventType, SynapseBus, SynapseEvent};
 use crate::tools::ToolRegistry;
-use crate::memory::scratch::DistillSource;
 use crate::types::{DecayClass, EpisodicEntry, EpisodicSource, ExtractedTruth, Message, Role};
 
 const SESSION_DISTILL_SYSTEM: &str = concat!(
@@ -37,7 +37,13 @@ const SESSION_DISTILL_SYSTEM: &str = concat!(
 pub fn session_distill_source(session_id: &str) -> String {
     let safe: String = session_id
         .chars()
-        .map(|c| if c.is_alphanumeric() || c == '-' || c == '_' { c } else { '_' })
+        .map(|c| {
+            if c.is_alphanumeric() || c == '-' || c == '_' {
+                c
+            } else {
+                '_'
+            }
+        })
         .collect();
     format!("sessions/{safe}.md")
 }
@@ -209,24 +215,24 @@ impl SessionDistillEngine {
             .flat_map(|ve| {
                 let obs_count = ve.entity.observations.len();
                 let session_source = session_source.clone();
-                ve.entity.observations.iter().map(move |obs| ExtractedTruth {
-                    id: Uuid::new_v4(),
-                    content: format!(
-                        "[{}:{}] {}",
-                        ve.entity.entity_type, ve.entity.name, obs
-                    ),
-                    confidence: ve.confidence as f32,
-                    mmr_score: 0.0,
-                    source_date: date,
-                    decay_class: DecayClass::SessionDistill,
-                    source_file: Some(session_source.clone()),
-                    evidence: crate::memory::evidence_localize::localize_observation_evidence(
-                        transcript,
-                        obs,
-                        &ve.evidence,
-                        obs_count,
-                    ),
-                })
+                ve.entity
+                    .observations
+                    .iter()
+                    .map(move |obs| ExtractedTruth {
+                        id: Uuid::new_v4(),
+                        content: format!("[{}:{}] {}", ve.entity.entity_type, ve.entity.name, obs),
+                        confidence: ve.confidence as f32,
+                        mmr_score: 0.0,
+                        source_date: date,
+                        decay_class: DecayClass::SessionDistill,
+                        source_file: Some(session_source.clone()),
+                        evidence: crate::memory::evidence_localize::localize_observation_evidence(
+                            transcript,
+                            obs,
+                            &ve.evidence,
+                            obs_count,
+                        ),
+                    })
             })
             .collect();
 
@@ -287,7 +293,11 @@ impl SessionDistillEngine {
         })
     }
 
-    async fn librarian_episodic_summary(&self, session_id: &str, transcript: &str) -> Option<String> {
+    async fn librarian_episodic_summary(
+        &self,
+        session_id: &str,
+        transcript: &str,
+    ) -> Option<String> {
         let gw = self.summary_gateway.as_ref()?;
         let excerpt: String = transcript.chars().take(6_000).collect();
         let messages = vec![

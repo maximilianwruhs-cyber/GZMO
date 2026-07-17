@@ -9,25 +9,22 @@ use chrono::Utc;
 
 use gzmo_core::agent_loop::run_agent_loop;
 use gzmo_core::agent_session::AgentSession;
-use gzmo_core::config::{GzmoConfig, EngineMode, TaskKind};
-use gzmo_core::gateway::{GatewayRouter, TurboQuantGateway, VllmConfig, LlmGateway};
+use gzmo_core::config::{EngineMode, GzmoConfig, TaskKind};
+use gzmo_core::gateway::{GatewayRouter, LlmGateway, TurboQuantGateway, VllmConfig};
+use gzmo_core::identity::IdentityEngine;
+use gzmo_core::mcp::{bridge::McpServerConfig, manager::McpManager};
+use gzmo_core::memory::episodic::FileEpisodicStore;
+use gzmo_core::memory::scratch::{messages_to_transcript, DistillJob, DistillSource};
 use gzmo_core::memory::vault::SqliteVault;
+use gzmo_core::session::SessionManager;
+use gzmo_core::skills::register_pantheon;
+use gzmo_core::skills::{SkillContext, SkillRegistry as ChaosSkillRegistry};
 use gzmo_core::subagent::SubagentRunner;
 use gzmo_core::tools::delegate::DelegateTaskTool;
-use gzmo_core::identity::IdentityEngine;
-use gzmo_core::memory::episodic::FileEpisodicStore;
-use gzmo_core::mcp::{manager::McpManager, bridge::McpServerConfig};
-use gzmo_core::session::SessionManager;
-use gzmo_core::tools::ToolRegistry;
 use gzmo_core::tools::profile::{register_for_profile, CapabilityProfile, ToolRegisterOpts};
-use gzmo_core::memory::scratch::{messages_to_transcript, DistillJob, DistillSource};
-use gzmo_core::skills::{SkillRegistry as ChaosSkillRegistry, SkillContext};
-use gzmo_core::skills::register_pantheon;
+use gzmo_core::tools::ToolRegistry;
 use gzmo_core::types::{EpisodicEntry, EpisodicSource, Message, Role};
 use gzmo_core::workflow_skills::{SharedWorkflowSession, WorkflowSkillIndex};
-
-
-
 
 // ─── ANSI escape helpers ─────────────────────────────────────────────
 const GOLD: &str = "\x1b[38;2;212;175;55m";
@@ -91,9 +88,11 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
 
     // ─── Gateway ─────────────────────────────────────────────────
     let active_profile = config.engine.active_engine();
-    let gateway: Arc<tokio::sync::RwLock<Arc<dyn LlmGateway>>> = Arc::new(tokio::sync::RwLock::new(Arc::new(TurboQuantGateway::new(
-        VllmConfig::from(active_profile),
-    )) as Arc<dyn LlmGateway>));
+    let gateway: Arc<tokio::sync::RwLock<Arc<dyn LlmGateway>>> =
+        Arc::new(tokio::sync::RwLock::new(
+            Arc::new(TurboQuantGateway::new(VllmConfig::from(active_profile)))
+                as Arc<dyn LlmGateway>,
+        ));
 
     // ─── Chaos Engine (opt-in; ADR-0003 quarantined by default) ──
     let chaos_boot = crate::chaos_bootstrap::boot_chat_chaos(&config);
@@ -105,7 +104,9 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
     if chaos_enabled {
         eprintln!("  {COPPER}⚙ Chaos engine running — 174 BPM (HW telemetry active){RESET}");
     } else {
-        eprintln!("  {DIM}⚙ Chaos quarantined — set [chaos].enabled_in_chat = true to enable{RESET}");
+        eprintln!(
+            "  {DIM}⚙ Chaos quarantined — set [chaos].enabled_in_chat = true to enable{RESET}"
+        );
     }
 
     // Trigger notification channel: background → REPL
@@ -114,7 +115,12 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
     // Spawn background task: chaos state → gateway + file + trigger evaluation
     let _chaos_bridge = if chaos_enabled {
         let gateway_ref = gateway.clone();
-        let state_dir = config.memory.vault_db.parent().unwrap_or(std::path::Path::new(".")).to_path_buf();
+        let state_dir = config
+            .memory
+            .vault_db
+            .parent()
+            .unwrap_or(std::path::Path::new("."))
+            .to_path_buf();
         Some(crate::chaos_bootstrap::spawn_snapshot_bridge(
             chaos_snapshot_rx.clone(),
             gateway_ref,
@@ -142,7 +148,8 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
     }
 
     // ─── Tools (capability profile + jail) ───────────────────────
-    let profile = CapabilityProfile::parse(&config.tools.profile).unwrap_or(CapabilityProfile::Developer);
+    let profile =
+        CapabilityProfile::parse(&config.tools.profile).unwrap_or(CapabilityProfile::Developer);
     let mut tools = ToolRegistry::new();
     register_for_profile(
         &mut tools,
@@ -154,7 +161,11 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
             scratch_scope: None,
             serpapi_key: {
                 let k = config.api_keys.serpapi_key();
-                if k.is_empty() { None } else { Some(k) }
+                if k.is_empty() {
+                    None
+                } else {
+                    Some(k)
+                }
             },
             workflow: Some((Arc::clone(&workflow_index), Arc::clone(&workflow_session))),
             gzmo_config: Some(config.clone()),
@@ -172,12 +183,15 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
     // ─── MCP ─────────────────────────────────────────────────────
     let mut mcp = McpManager::new();
     for server in config.active_mcp_servers() {
-        match mcp.connect(McpServerConfig {
-            name: server.name.clone(),
-            command: server.command.clone(),
-            args: server.args.clone(),
-            env: server.env.clone(),
-        }).await {
+        match mcp
+            .connect(McpServerConfig {
+                name: server.name.clone(),
+                command: server.command.clone(),
+                args: server.args.clone(),
+                env: server.env.clone(),
+            })
+            .await
+        {
             Ok(count) => tracing::info!(server = %server.name, tools = count, "MCP connected"),
             Err(e) => tracing::error!(server = %server.name, "MCP failed: {}", e),
         }
@@ -204,7 +218,10 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
                 for fact in &facts {
                     block.push_str(&format!("- {}\n", fact));
                 }
-                eprintln!("  {COPPER}⚙ {} vault memories injected (honeypot-first){RESET}", facts.len());
+                eprintln!(
+                    "  {COPPER}⚙ {} vault memories injected (honeypot-first){RESET}",
+                    facts.len()
+                );
                 Some(block)
             }
             _ => None,
@@ -275,7 +292,9 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
     let mut messages: Vec<Message> = vec![Message {
         role: Role::System,
         content: system_prompt,
-        is_meta: true, tool_calls: None, tool_call_id: None,
+        is_meta: true,
+        tool_calls: None,
+        tool_call_id: None,
     }];
 
     // Offer resume
@@ -283,9 +302,12 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
         let age = Utc::now() - recent.last_active_at;
         if age.num_hours() < 24 && recent.messages.len() > 1 {
             let name_display = recent.name.as_deref().unwrap_or(&recent.id);
-            eprintln!("  {DIM}⚙ Previous session: {} ({} msgs, {}){RESET}",
-                name_display, recent.messages.len() - 1,
-                recent.last_active_at.format("%H:%M %b %d"));
+            eprintln!(
+                "  {DIM}⚙ Previous session: {} ({} msgs, {}){RESET}",
+                name_display,
+                recent.messages.len() - 1,
+                recent.last_active_at.format("%H:%M %b %d")
+            );
             eprintln!("  {DIM}  Type /resume to continue, or just start typing ›{RESET}");
         }
     }
@@ -319,7 +341,11 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
         let reader = stdin.lock();
         for line in reader.lines() {
             match line {
-                Ok(l) => { if stdin_tx.blocking_send(l).is_err() { break; } }
+                Ok(l) => {
+                    if stdin_tx.blocking_send(l).is_err() {
+                        break;
+                    }
+                }
                 Err(_) => break,
             }
         }
@@ -401,7 +427,7 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
                 let last = &messages[messages.len() - 1];
                 if last.role == Role::System && last.is_meta && last.content.starts_with("[Skill") {
                     // Remove stale chaos/narration context
-                    messages.retain(|m| !(m.role == Role::System && m.is_meta && 
+                    messages.retain(|m| !(m.role == Role::System && m.is_meta &&
                         (m.content.contains("[CHAOS_STATE]") || m.content.contains("[NARRATION]"))));
                     // Append narration instruction at the END (right after skill output)
                     // so the LLM sees it immediately before generating its response
@@ -626,9 +652,7 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
 
 fn strip_autonomous_monologue(messages: &mut Vec<Message>) {
     messages.retain(|m| {
-        !(m.role == Role::System
-            && m.is_meta
-            && m.content.starts_with("[AUTONOMOUS MONOLOGUE]"))
+        !(m.role == Role::System && m.is_meta && m.content.starts_with("[AUTONOMOUS MONOLOGUE]"))
     });
 }
 
@@ -682,7 +706,15 @@ async fn handle_slash_command(
                 } else {
                     eprintln!("  {COPPER}⚙ Session distill enqueued{RESET}");
                 }
-                if let Err(e) = session_mgr.save(session_id, session_name.as_deref(), messages, session_created_at).await {
+                if let Err(e) = session_mgr
+                    .save(
+                        session_id,
+                        session_name.as_deref(),
+                        messages,
+                        session_created_at,
+                    )
+                    .await
+                {
                     eprintln!("  {RED}⚙ Save failed: {e}{RESET}");
                 } else {
                     let display = session_name.as_deref().unwrap_or(session_id);
@@ -690,13 +722,18 @@ async fn handle_slash_command(
                 }
                 // Store session summary in vault
                 if let Some(ref v) = vault {
-                    let topics: Vec<String> = messages.iter()
+                    let topics: Vec<String> = messages
+                        .iter()
                         .filter(|m| m.role == Role::User && !m.content.is_empty())
                         .take(20)
                         .map(|m| gzmo_core::text_util::truncate_chars(&m.content, 150))
                         .collect();
                     if !topics.is_empty() {
-                        let fact = format!("[Session {}] Topics: {}", Utc::now().format("%Y-%m-%d %H:%M"), topics.join(" | "));
+                        let fact = format!(
+                            "[Session {}] Topics: {}",
+                            Utc::now().format("%Y-%m-%d %H:%M"),
+                            topics.join(" | ")
+                        );
                         let _ = v.store_text(&fact, "Episodic", 1.0);
                         eprintln!("  {COPPER}⚙ Session summary stored in vault{RESET}");
                     }
@@ -717,7 +754,14 @@ async fn handle_slash_command(
         }
         "/new" => {
             if messages.len() > 1 {
-                let _ = session_mgr.save(session_id, session_name.as_deref(), messages, session_created_at).await;
+                let _ = session_mgr
+                    .save(
+                        session_id,
+                        session_name.as_deref(),
+                        messages,
+                        session_created_at,
+                    )
+                    .await;
             }
             messages.truncate(1);
             let new_id = SessionManager::new_session_id();
@@ -728,23 +772,21 @@ async fn handle_slash_command(
             }
             eprintln!("  {DIM}⚙ New session: {new_id}{RESET}");
         }
-        "/resume" => {
-            match session_mgr.most_recent().await {
-                Ok(Some(session)) => {
-                    let count = session.messages.len().saturating_sub(1);
-                    let display = session.name.clone().unwrap_or_else(|| session.id.clone());
-                    *messages = session.messages;
-                    strip_autonomous_monologue(messages);
-                    agent_session.set_session_id(session.id.clone());
-                    *session_name = session.name;
-                    if subagent_enabled {
-                        reregister_delegate_tool(tools, subagent_runner, agent_session.session_id());
-                    }
-                    eprintln!("  {DIM}⚙ Resumed: {display} ({count} messages){RESET}");
+        "/resume" => match session_mgr.most_recent().await {
+            Ok(Some(session)) => {
+                let count = session.messages.len().saturating_sub(1);
+                let display = session.name.clone().unwrap_or_else(|| session.id.clone());
+                *messages = session.messages;
+                strip_autonomous_monologue(messages);
+                agent_session.set_session_id(session.id.clone());
+                *session_name = session.name;
+                if subagent_enabled {
+                    reregister_delegate_tool(tools, subagent_runner, agent_session.session_id());
                 }
-                _ => eprintln!("  {DIM}⚙ No previous session found{RESET}"),
+                eprintln!("  {DIM}⚙ Resumed: {display} ({count} messages){RESET}");
             }
-        }
+            _ => eprintln!("  {DIM}⚙ No previous session found{RESET}"),
+        },
         "/system" => {
             eprintln!("  {DIM}--- System Prompt ---{RESET}");
             for line in messages[0].content.lines() {
@@ -760,8 +802,12 @@ async fn handle_slash_command(
                 EngineMode::Cloud => format!("\x1b[38;2;100;200;255mCLOUD{RESET}"),
                 EngineMode::Sovereign => format!("\x1b[38;2;180;140;255mSOVEREIGN{RESET}"),
             };
-            eprintln!("  {DIM}⚙ Session: {display} | Messages: {} | Mode: {} | Model: {}{RESET}",
-                messages.len(), mode_str, active.model);
+            eprintln!(
+                "  {DIM}⚙ Session: {display} | Messages: {} | Mode: {} | Model: {}{RESET}",
+                messages.len(),
+                mode_str,
+                active.model
+            );
         }
         _ if input.starts_with("/mode") => {
             let arg = input.strip_prefix("/mode").unwrap_or("").trim();
@@ -793,7 +839,9 @@ async fn handle_slash_command(
                                 .send()
                                 .await
                             {
-                                Ok(r) if r.status().is_success() || r.status().as_u16() == 401 => true,
+                                Ok(r) if r.status().is_success() || r.status().as_u16() == 401 => {
+                                    true
+                                }
                                 _ => false,
                             };
 
@@ -811,7 +859,9 @@ async fn handle_slash_command(
                             } else {
                                 eprintln!(" ✓");
                                 // Build new gateway
-                                let new_gw: Arc<dyn LlmGateway> = Arc::new(TurboQuantGateway::new(VllmConfig::from(profile.clone())));
+                                let new_gw: Arc<dyn LlmGateway> = Arc::new(TurboQuantGateway::new(
+                                    VllmConfig::from(profile.clone()),
+                                ));
                                 // Swap gateway
                                 {
                                     let mut gw = gateway.write().await;
@@ -825,13 +875,18 @@ async fn handle_slash_command(
                                 }
                                 let mode_str = match new_mode {
                                     EngineMode::Local => format!("{COPPER}⚙ LOCAL{RESET}"),
-                                    EngineMode::Cloud => format!("\x1b[38;2;100;200;255m☁ CLOUD{RESET}"),
+                                    EngineMode::Cloud => {
+                                        format!("\x1b[38;2;100;200;255m☁ CLOUD{RESET}")
+                                    }
                                     EngineMode::Sovereign => {
                                         format!("\x1b[38;2;180;140;255m⚡ SOVEREIGN{RESET}")
                                     }
                                 };
                                 eprintln!("  Switched to: {mode_str}");
-                                eprintln!("  {DIM}Model: {} → {}{RESET}", profile.model, profile.url);
+                                eprintln!(
+                                    "  {DIM}Model: {} → {}{RESET}",
+                                    profile.model, profile.url
+                                );
                             }
                         }
                     }
@@ -868,7 +923,8 @@ async fn handle_slash_command(
             for line in report.lines() {
                 eprintln!("  {DIM}{line}{RESET}");
             }
-            for line in crate::repl_shared::workflow_status_lines(workflow_index, workflow_session) {
+            for line in crate::repl_shared::workflow_status_lines(workflow_index, workflow_session)
+            {
                 eprintln!("  {DIM}{line}{RESET}");
             }
         }
@@ -877,51 +933,96 @@ async fn handle_slash_command(
             eprintln!("  {CYAN}╔══════════════════════════════════════╗{RESET}");
             eprintln!("  {CYAN}║  ⚡ Chaos Engine State               ║{RESET}");
             eprintln!("  {CYAN}╠══════════════════════════════════════╣{RESET}");
-            eprintln!("  {CYAN}║{RESET}  Tick: {:<8}  Phase: {:<12}{CYAN}║{RESET}", snap.tick, format!("{}", snap.phase));
-            eprintln!("  {CYAN}║{RESET}  Energy: {:<6.1}  Tension: {:<8.1}{CYAN}║{RESET}", snap.energy, snap.tension);
-            eprintln!("  {CYAN}║{RESET}  Lorenz: ({:.2}, {:.2}, {:.2})    {CYAN}║{RESET}", snap.x, snap.y, snap.z);
-            eprintln!("  {CYAN}║{RESET}  Alive: {:<7}  Deaths: {:<8}{CYAN}║{RESET}", snap.alive, snap.deaths);
+            eprintln!(
+                "  {CYAN}║{RESET}  Tick: {:<8}  Phase: {:<12}{CYAN}║{RESET}",
+                snap.tick,
+                format!("{}", snap.phase)
+            );
+            eprintln!(
+                "  {CYAN}║{RESET}  Energy: {:<6.1}  Tension: {:<8.1}{CYAN}║{RESET}",
+                snap.energy, snap.tension
+            );
+            eprintln!(
+                "  {CYAN}║{RESET}  Lorenz: ({:.2}, {:.2}, {:.2})    {CYAN}║{RESET}",
+                snap.x, snap.y, snap.z
+            );
+            eprintln!(
+                "  {CYAN}║{RESET}  Alive: {:<7}  Deaths: {:<8}{CYAN}║{RESET}",
+                snap.alive, snap.deaths
+            );
             eprintln!("  {CYAN}╠══════════════════════════════════════╣{RESET}");
             eprintln!("  {CYAN}║  🧠 Thought Cabinet                  ║{RESET}");
-            eprintln!("  {CYAN}║{RESET}  Incubating: {}  Crystallized: {:<5}{CYAN}║{RESET}", snap.thoughts_incubating, snap.thoughts_crystallized);
-            eprintln!("  {CYAN}║{RESET}  Gravity mod:  {:<+8.2}           {CYAN}║{RESET}", snap.mutations.gravity_mod);
-            eprintln!("  {CYAN}║{RESET}  Friction mod: {:<+8.2}           {CYAN}║{RESET}", snap.mutations.friction_mod);
-            eprintln!("  {CYAN}║{RESET}  Lorenz ρ mod: {:<+8.2}  Δ{:+.3}     {CYAN}║{RESET}",
-                snap.mutations.lorenz_rho_mod, snap.rho_mod_delta);
-            eprintln!("  {CYAN}║{RESET}  ρ_eff: {:.2}  forcing: {:+}  breath: {:<2} {CYAN}║{RESET}",
-                snap.rho_effective, snap.rho_forcing_sign, snap.rho_breath_phase);
-            let chaos_config: gzmo_chaos::pulse::ChaosConfig = config.chaos
+            eprintln!(
+                "  {CYAN}║{RESET}  Incubating: {}  Crystallized: {:<5}{CYAN}║{RESET}",
+                snap.thoughts_incubating, snap.thoughts_crystallized
+            );
+            eprintln!(
+                "  {CYAN}║{RESET}  Gravity mod:  {:<+8.2}           {CYAN}║{RESET}",
+                snap.mutations.gravity_mod
+            );
+            eprintln!(
+                "  {CYAN}║{RESET}  Friction mod: {:<+8.2}           {CYAN}║{RESET}",
+                snap.mutations.friction_mod
+            );
+            eprintln!(
+                "  {CYAN}║{RESET}  Lorenz ρ mod: {:<+8.2}  Δ{:+.3}     {CYAN}║{RESET}",
+                snap.mutations.lorenz_rho_mod, snap.rho_mod_delta
+            );
+            eprintln!(
+                "  {CYAN}║{RESET}  ρ_eff: {:.2}  forcing: {:+}  breath: {:<2} {CYAN}║{RESET}",
+                snap.rho_effective, snap.rho_forcing_sign, snap.rho_breath_phase
+            );
+            let chaos_config: gzmo_chaos::pulse::ChaosConfig = config
+                .chaos
                 .as_ref()
                 .and_then(|v| v.clone().try_into().ok())
                 .unwrap_or_default();
             let policy_str = if chaos_config.rho_restore_alpha > 0.0 {
-                format!("tanh (α={:.2}, β={:.2})", chaos_config.rho_restore_alpha, chaos_config.rho_restore_beta)
+                format!(
+                    "tanh (α={:.2}, β={:.2})",
+                    chaos_config.rho_restore_alpha, chaos_config.rho_restore_beta
+                )
             } else {
                 format!("linear (k={:.4})", chaos_config.rho_decay_k)
             };
-            eprintln!("  {CYAN}║{RESET}  Restore policy: {:<21}{CYAN}║{RESET}", policy_str);
+            eprintln!(
+                "  {CYAN}║{RESET}  Restore policy: {:<21}{CYAN}║{RESET}",
+                policy_str
+            );
             eprintln!("  {CYAN}╠══════════════════════════════════════╣{RESET}");
             eprintln!("  {CYAN}║  🌡  LLM Parameters (Lorenz-derived) ║{RESET}");
-            eprintln!("  {CYAN}║{RESET}  Temperature: {:.3}                {CYAN}║{RESET}", snap.llm_temperature);
-            eprintln!("  {CYAN}║{RESET}  Max tokens:  {:<6}               {CYAN}║{RESET}", snap.llm_max_tokens);
-            eprintln!("  {CYAN}║{RESET}  Valence:     {:<+.3}               {CYAN}║{RESET}", snap.llm_valence);
+            eprintln!(
+                "  {CYAN}║{RESET}  Temperature: {:.3}                {CYAN}║{RESET}",
+                snap.llm_temperature
+            );
+            eprintln!(
+                "  {CYAN}║{RESET}  Max tokens:  {:<6}               {CYAN}║{RESET}",
+                snap.llm_max_tokens
+            );
+            eprintln!(
+                "  {CYAN}║{RESET}  Valence:     {:<+.3}               {CYAN}║{RESET}",
+                snap.llm_valence
+            );
             eprintln!("  {CYAN}╚══════════════════════════════════════╝{RESET}");
         }
-        "/sessions" => {
-            match session_mgr.list().await {
-                Ok(sessions) if sessions.is_empty() => eprintln!("  {DIM}⚙ No saved sessions{RESET}"),
-                Ok(sessions) => {
-                    eprintln!("  {DIM}--- Saved Sessions ---{RESET}");
-                    for s in &sessions {
-                        let name = s.name.as_deref().unwrap_or("(unnamed)");
-                        eprintln!("  {DIM}  {} | {} | {} msgs | {}{RESET}",
-                            s.id, name, s.message_count, s.last_active_at.format("%H:%M %b %d"));
-                    }
-                    eprintln!("  {DIM}--- /load <id or name> to resume ---{RESET}");
+        "/sessions" => match session_mgr.list().await {
+            Ok(sessions) if sessions.is_empty() => eprintln!("  {DIM}⚙ No saved sessions{RESET}"),
+            Ok(sessions) => {
+                eprintln!("  {DIM}--- Saved Sessions ---{RESET}");
+                for s in &sessions {
+                    let name = s.name.as_deref().unwrap_or("(unnamed)");
+                    eprintln!(
+                        "  {DIM}  {} | {} | {} msgs | {}{RESET}",
+                        s.id,
+                        name,
+                        s.message_count,
+                        s.last_active_at.format("%H:%M %b %d")
+                    );
                 }
-                Err(e) => eprintln!("  {RED}⚙ List failed: {e}{RESET}"),
+                eprintln!("  {DIM}--- /load <id or name> to resume ---{RESET}");
             }
-        }
+            Err(e) => eprintln!("  {RED}⚙ List failed: {e}{RESET}"),
+        },
         "/vault" => {
             if let Some(ref v) = vault {
                 let count = v.count().unwrap_or(0);
@@ -939,9 +1040,22 @@ async fn handle_slash_command(
             }
         }
         _ if input.starts_with("/save") => {
-            let name = input.strip_prefix("/save").map(|s| s.trim()).filter(|s| !s.is_empty());
-            if let Some(n) = name { *session_name = Some(n.to_string()); }
-            match session_mgr.save(session_id, session_name.as_deref(), messages, session_created_at).await {
+            let name = input
+                .strip_prefix("/save")
+                .map(|s| s.trim())
+                .filter(|s| !s.is_empty());
+            if let Some(n) = name {
+                *session_name = Some(n.to_string());
+            }
+            match session_mgr
+                .save(
+                    session_id,
+                    session_name.as_deref(),
+                    messages,
+                    session_created_at,
+                )
+                .await
+            {
                 Ok(()) => {
                     let display = session_name.as_deref().unwrap_or(session_id);
                     eprintln!("  {DIM}⚙ Saved: {display}{RESET}");
@@ -967,7 +1081,11 @@ async fn handle_slash_command(
                         agent_session.set_session_id(session.id.clone());
                         *session_name = session.name;
                         if subagent_enabled {
-                            reregister_delegate_tool(tools, subagent_runner, agent_session.session_id());
+                            reregister_delegate_tool(
+                                tools,
+                                subagent_runner,
+                                agent_session.session_id(),
+                            );
                         }
                         eprintln!("  {DIM}⚙ Loaded: {display} ({count} messages){RESET}");
                     }
@@ -1023,9 +1141,13 @@ async fn handle_slash_command(
                                 "# Handoff\n\n**Session:** {session_id}\n\n**Topic:** {}\n\n(Agent will complete sections.)\n",
                                 if args.is_empty() { "(unspecified)" } else { args }
                             );
-                            match workflow_index.write_handoff(workflow_session, session_id, &stub) {
+                            match workflow_index.write_handoff(workflow_session, session_id, &stub)
+                            {
                                 Ok(path) => {
-                                    eprintln!("  {COPPER}⚙ Handoff stub: {}{RESET}", path.display());
+                                    eprintln!(
+                                        "  {COPPER}⚙ Handoff stub: {}{RESET}",
+                                        path.display()
+                                    );
                                     if config.workflow_skills.handoff_to_vault {
                                         if let Some(ref v) = vault {
                                             let _ = v.store_text(
@@ -1058,10 +1180,33 @@ async fn handle_slash_command(
                         if output.inject_to_conversation {
                             // Strip ANSI escapes, box-drawing chars, and excessive whitespace
                             // to give the LLM clean semantic text, not garbled ASCII art
-                            let clean: String = output.display
+                            let clean: String = output
+                                .display
                                 .replace('\x1b', "")
                                 .chars()
-                                .filter(|c| !matches!(c, '┌'|'┐'|'└'|'┘'|'├'|'┤'|'─'|'│'|'╔'|'╗'|'╚'|'╝'|'║'|'═'|'╠'|'╣'|'/'|'\\'|'_'))
+                                .filter(|c| {
+                                    !matches!(
+                                        c,
+                                        '┌' | '┐'
+                                            | '└'
+                                            | '┘'
+                                            | '├'
+                                            | '┤'
+                                            | '─'
+                                            | '│'
+                                            | '╔'
+                                            | '╗'
+                                            | '╚'
+                                            | '╝'
+                                            | '║'
+                                            | '═'
+                                            | '╠'
+                                            | '╣'
+                                            | '/'
+                                            | '\\'
+                                            | '_'
+                                    )
+                                })
                                 .collect::<String>()
                                 .split_whitespace()
                                 .collect::<Vec<_>>()
@@ -1070,7 +1215,9 @@ async fn handle_slash_command(
                             messages.push(Message {
                                 role: Role::System,
                                 content: format!("[Skill /{}] {}", cmd, clean),
-                                is_meta: true, tool_calls: None, tool_call_id: None,
+                                is_meta: true,
+                                tool_calls: None,
+                                tool_call_id: None,
                             });
                         }
                     }
@@ -1087,7 +1234,7 @@ async fn handle_slash_command(
                         let ok_starts_with = std::fs::canonicalize(&config.skills.directory)
                             .map(|base_canon| dispatch_canon.starts_with(&base_canon))
                             .unwrap_or(false);
-                            
+
                         if ok_starts_with {
                             let mut child_args = vec![cmd.to_string()];
                             if !args.is_empty() {
@@ -1108,7 +1255,9 @@ async fn handle_slash_command(
                                 Err(e) => eprintln!("  {RED}Skill dispatch error: {e}{RESET}"),
                             }
                         } else {
-                            eprintln!("  {RED}Security alert: skill script outside base directory{RESET}");
+                            eprintln!(
+                                "  {RED}Security alert: skill script outside base directory{RESET}"
+                            );
                         }
                     }
                 } else {
@@ -1132,19 +1281,40 @@ fn print_splash(config: &GzmoConfig, status: &str, latency: &str, vault_count: u
     let bulb_g = format!("{gold}○{reset}");
     let bulb_r = format!("{ruby}●{reset}");
 
-    let top: String = (0..26).map(|i| if i%2==0 { &bulb_g } else { &bulb_r }).cloned().collect::<Vec<_>>().join(" ");
-    let bot: String = (0..26).map(|i| if i%2!=0 { &bulb_g } else { &bulb_r }).cloned().collect::<Vec<_>>().join(" ");
+    let top: String = (0..26)
+        .map(|i| if i % 2 == 0 { &bulb_g } else { &bulb_r })
+        .cloned()
+        .collect::<Vec<_>>()
+        .join(" ");
+    let bot: String = (0..26)
+        .map(|i| if i % 2 != 0 { &bulb_g } else { &bulb_r })
+        .cloned()
+        .collect::<Vec<_>>()
+        .join(" ");
 
     let side_i = std::cell::Cell::new(0usize);
     let pl = |text: &str, color: &str| {
         let curr = side_i.get();
-        let (l, r) = if curr % 2 == 0 { (&bulb_r, &bulb_g) } else { (&bulb_g, &bulb_r) };
-        side_i.set(curr+1);
+        let (l, r) = if curr % 2 == 0 {
+            (&bulb_r, &bulb_g)
+        } else {
+            (&bulb_g, &bulb_r)
+        };
+        side_i.set(curr + 1);
         let w: usize = 47;
         let c = text.chars().count();
-        let pl = w.saturating_sub(c)/2;
+        let pl = w.saturating_sub(c) / 2;
         let pr = w.saturating_sub(c).saturating_sub(pl);
-        eprintln!("  {} {}{}{}{}{} {}", l, " ".repeat(pl), color, text, reset, " ".repeat(pr), r);
+        eprintln!(
+            "  {} {}{}{}{}{} {}",
+            l,
+            " ".repeat(pl),
+            color,
+            text,
+            reset,
+            " ".repeat(pr),
+            r
+        );
     };
 
     eprintln!();
@@ -1152,12 +1322,30 @@ fn print_splash(config: &GzmoConfig, status: &str, latency: &str, vault_count: u
     pl("", "");
     pl("★  S T E P   R I G H T   U P  ★", &format!("{ruby}{bold}"));
     pl("", "");
-    pl("  ██████╗ ███████╗███╗   ███╗ ██████╗ ", &format!("{parchment}{bold}"));
-    pl(" ██╔════╝ ╚══███╔╝████╗ ████║██╔═══██╗", &format!("{parchment}{bold}"));
-    pl(" ██║  ███╗  ███╔╝ ██╔████╔██║██║   ██║", &format!("{parchment}{bold}"));
-    pl(" ██║   ██║ ███╔╝  ██║╚██╔╝██║██║   ██║", &format!("{parchment}{bold}"));
-    pl(" ╚██████╔╝███████╗██║ ╚═╝ ██║╚██████╔╝", &format!("{parchment}{bold}"));
-    pl("  ╚═════╝ ╚══════╝╚═╝     ╚═╝ ╚═════╝ ", &format!("{parchment}{bold}"));
+    pl(
+        "  ██████╗ ███████╗███╗   ███╗ ██████╗ ",
+        &format!("{parchment}{bold}"),
+    );
+    pl(
+        " ██╔════╝ ╚══███╔╝████╗ ████║██╔═══██╗",
+        &format!("{parchment}{bold}"),
+    );
+    pl(
+        " ██║  ███╗  ███╔╝ ██╔████╔██║██║   ██║",
+        &format!("{parchment}{bold}"),
+    );
+    pl(
+        " ██║   ██║ ███╔╝  ██║╚██╔╝██║██║   ██║",
+        &format!("{parchment}{bold}"),
+    );
+    pl(
+        " ╚██████╔╝███████╗██║ ╚═╝ ██║╚██████╔╝",
+        &format!("{parchment}{bold}"),
+    );
+    pl(
+        "  ╚═════╝ ╚══════╝╚═╝     ╚═╝ ╚═════╝ ",
+        &format!("{parchment}{bold}"),
+    );
     pl("", "");
     let active = config.engine.active_engine();
     let mode_tag = match config.engine.active_mode {
@@ -1168,13 +1356,20 @@ fn print_splash(config: &GzmoConfig, status: &str, latency: &str, vault_count: u
     pl("⚙  The Incredible Mechanical Marvel  ⚙", copper);
     pl(&format!("Mode: {} · Rust · Sovereign", mode_tag), dim);
     pl(&format!("Engine: {} ({})", status, latency), dim);
-    pl(&format!("Model: {} | Vault: {} records", active.model, vault_count), dim);
+    pl(
+        &format!("Model: {} | Vault: {} records", active.model, vault_count),
+        dim,
+    );
     pl("", "");
 
     let cmds = format!("{copper}/quit{dim} exit{reset} · {copper}/status{dim} ecosystem{reset} · {copper}/clear{dim} reset{reset} · {copper}/mode{dim} switch{reset} · {copper}/vault{dim} memory{reset}");
     let curr = side_i.get();
-    let (l, r) = if curr % 2 == 0 { (&bulb_r, &bulb_g) } else { (&bulb_g, &bulb_r) };
-    side_i.set(curr+1);
+    let (l, r) = if curr % 2 == 0 {
+        (&bulb_r, &bulb_g)
+    } else {
+        (&bulb_g, &bulb_r)
+    };
+    side_i.set(curr + 1);
     eprintln!("  {}   {}   {}", l, cmds, r);
 
     pl("", "");

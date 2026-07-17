@@ -30,8 +30,8 @@ pub mod poem;
 pub mod poker;
 pub mod quote;
 pub mod sound;
-pub mod status;
 pub mod stabilize;
+pub mod status;
 pub mod story;
 pub mod transform;
 pub mod visual;
@@ -50,8 +50,8 @@ use poem::PoemSkill;
 use poker::PokerSkill;
 use quote::QuoteSkill;
 use sound::SoundSkill;
-use status::StatusSkill;
 use stabilize::StabilizeSkill;
+use status::StatusSkill;
 use story::StorySkill;
 use transform::TransformSkill;
 use visual::VisualSkill;
@@ -209,10 +209,16 @@ pub fn register_pantheon(registry: &mut SkillRegistry, config: &GzmoConfig) {
                 SkillType::Mutation => "mutation",
                 SkillType::Info => "info",
             };
-            (s.name().to_string(), s.description().to_string(), type_label)
+            (
+                s.name().to_string(),
+                s.description().to_string(),
+                type_label,
+            )
         })
         .collect();
-    registry.register(Arc::new(HelpSkill { entries: help_entries }));
+    registry.register(Arc::new(HelpSkill {
+        entries: help_entries,
+    }));
 }
 
 #[cfg(test)]
@@ -226,7 +232,9 @@ mod skill_smoke {
     fn test_config() -> GzmoConfig {
         let mut config = GzmoConfig::default();
         // Anchor to repo skills/ regardless of cargo package cwd.
-        let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("..").join("skills");
+        let root = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("..")
+            .join("skills");
         config.skills.directory = root.canonicalize().unwrap_or(root);
         config
     }

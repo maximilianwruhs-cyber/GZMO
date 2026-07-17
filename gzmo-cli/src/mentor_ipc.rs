@@ -6,7 +6,7 @@
 use std::path::PathBuf;
 use std::sync::Arc;
 
-use anyhow::{Context, Result, bail};
+use anyhow::{bail, Context, Result};
 use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
 use tokio::net::{UnixListener, UnixStream};
 use tokio::sync::Mutex;
@@ -212,7 +212,11 @@ async fn teach(req: &MentorRequest, state: &Arc<MentorServerState>) -> Result<Me
     pedagogy.reload_from_disk().await?;
     let learner_id = state.config.pedagogy.learner_id().to_string();
     if should_delegate_exec(&pedagogy.session, message) {
-        return Ok(delegate_exec_response(message, &pedagogy.session, &learner_id));
+        return Ok(delegate_exec_response(
+            message,
+            &pedagogy.session,
+            &learner_id,
+        ));
     }
 
     let messages = build_messages(&req.conversation, message);
@@ -236,7 +240,11 @@ async fn teach(req: &MentorRequest, state: &Arc<MentorServerState>) -> Result<Me
             learner_id,
             &turn.edf_record,
         )),
-        None => Ok(delegate_exec_response(message, &pedagogy.session, &learner_id)),
+        None => Ok(delegate_exec_response(
+            message,
+            &pedagogy.session,
+            &learner_id,
+        )),
     }
 }
 
