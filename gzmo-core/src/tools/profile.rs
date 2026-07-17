@@ -4,14 +4,14 @@ use std::sync::Arc;
 
 use anyhow::{bail, Result};
 
-use crate::config::ToolsConfig;
+use crate::config::{GzmoConfig, ToolsConfig};
 use crate::memory::scratch::{ScratchScope, ScratchService};
 use crate::memory::vault::SqliteVault;
 use crate::tools::fs::{DirListTool, FileReadTool, FileSearchTool, FileWriteTool};
 use crate::tools::jail::PathJail;
 use crate::tools::memory::{MemoryRecordTool, MemorySearchTool};
 use crate::tools::shell::ShellExecTool;
-use crate::tools::sysadmin::{SysKillTool, SysMetricsTool};
+use crate::tools::sysadmin::{EcosystemStatusTool, SysKillTool, SysMetricsTool};
 use crate::tools::web::WebSearchTool;
 use crate::tools::web_browse::WebBrowseTool;
 use crate::tools::ToolRegistry;
@@ -91,6 +91,8 @@ pub struct ToolRegisterOpts {
         Arc<crate::workflow_skills::WorkflowSkillIndex>,
         crate::workflow_skills::SharedWorkflowSession,
     )>,
+    /// When set, register `ecosystem_status` (agent-callable `/status`).
+    pub gzmo_config: Option<GzmoConfig>,
 }
 
 impl Default for ToolRegisterOpts {
@@ -101,6 +103,7 @@ impl Default for ToolRegisterOpts {
             scratch_scope: None,
             serpapi_key: None,
             workflow: None,
+            gzmo_config: None,
         }
     }
 }
@@ -148,6 +151,9 @@ pub fn register_for_profile(
     }
 
     registry.register(Box::new(SysMetricsTool));
+    if let Some(cfg) = opts.gzmo_config {
+        registry.register(Box::new(EcosystemStatusTool { config: cfg }));
+    }
     if profile.allows_sys_kill() {
         registry.register(Box::new(SysKillTool));
     }
@@ -209,6 +215,25 @@ mod tests {
         assert!(reg.has_tool("file_write"));
         assert!(reg.has_tool("shell_exec"));
         assert!(!reg.has_tool("sys_kill"));
+        assert!(!reg.has_tool("ecosystem_status"));
+    }
+
+    #[test]
+    fn ecosystem_status_when_config_provided() {
+        let mut reg = ToolRegistry::new();
+        let cfg = ToolsConfig::default();
+        register_for_profile(
+            &mut reg,
+            CapabilityProfile::ReadOnly,
+            &cfg,
+            ToolRegisterOpts {
+                gzmo_config: Some(GzmoConfig::default()),
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        assert!(reg.has_tool("ecosystem_status"));
+        assert!(reg.has_tool("sys_metrics"));
     }
 
     #[test]

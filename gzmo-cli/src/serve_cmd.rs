@@ -4,7 +4,7 @@
 //! Soft-fail satellite: OKForge wiki push (`[wiki]` cron) — not on GREEN verdict.
 //! No chaos / KG on this path. Writes `scheduler-runs/`.
 
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 use std::io::Write;
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -13,6 +13,7 @@ use std::time::Duration;
 use anyhow::{bail, Context, Result};
 use chrono::{NaiveDate, Timelike, Utc};
 use tracing::{error, info, warn};
+use gzmo_core::cron;
 
 use gzmo_core::config::{GzmoConfig, TaskKind};
 use gzmo_core::gateway::{GatewayRouter, LlmGateway};
@@ -32,7 +33,7 @@ use gzmo_core::tools::web::WebSearchTool;
 use gzmo_core::tools::ToolRegistry;
 use gzmo_core::wiki_okf;
 
-use crate::{distill_cmd, dream_cmd, embed_cmd, promote_cmd, spark_cmd};
+use crate::{cron_cmd, distill_cmd, dream_cmd, embed_cmd, promote_cmd, spark_cmd};
 
 const PID_FILE: &str = "/tmp/gzmo-serve.pid";
 
@@ -232,6 +233,8 @@ async fn run_loop(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> 
     let mut last_embed: Option<NaiveDate> = None;
     let mut last_wiki: Option<NaiveDate> = None;
     let mut last_spark: HashSet<(u32, u32, NaiveDate)> = HashSet::new();
+    // Last fire slot per custom job: (date, hour, minute)
+    let mut last_custom: HashMap<String, (NaiveDate, u32, u32)> = HashMap::new();
 
     let mut interval = tokio::time::interval(Duration::from_secs(60));
     loop {
@@ -345,6 +348,31 @@ async fn run_loop(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> 
             }
             // Always consume the slot so a flaky forge does not retry every minute.
             last_wiki = Some(today);
+        }
+
+        // Operator custom jobs (`[cron.jobs.*]`) — shell or prompt.
+        let custom: Vec<_> = config
+            .cron
+            .jobs
+            .iter()
+            .map(|(id, job)| (id.clone(), job.clone()))
+            .collect();
+        for (id, job) in custom {
+            let prev = last_custom.get(&id).copied();
+            if !cron::custom_due(&job, now, prev) {
+                continue;
+            }
+            let job_name = format!("custom/{id}");
+            let ok = run_named_job(config, &job_name, || async {
+                cron_cmd::run_custom_job(config, identity, &id, &job).await
+            })
+            .await;
+            if ok {
+                last_custom.insert(id, (today, now.hour(), now.minute()));
+            } else {
+                // Consume slot on failure to avoid retry storm every minute.
+                last_custom.insert(id, (today, now.hour(), now.minute()));
+            }
         }
     }
 }

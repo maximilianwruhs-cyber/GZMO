@@ -38,6 +38,7 @@ pub mod watcher;
 pub mod scanner;
 pub mod skills;
 pub mod workflow_skills;
+pub mod cron;
 pub mod health;
 pub mod synapse;
 pub mod synapse_reader;

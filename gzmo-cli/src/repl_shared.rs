@@ -126,6 +126,7 @@ pub fn build_system_prompt_with_workflows(
 ---
 You are {}. Today is {}.
 Available tools: {}.
+Use ecosystem_status for a grounded stack/overnight snapshot (slash /status is operator-only).
 Use memory_search when you need prior facts (results land in scratch for this turn only).
 Use delegate_task for focused sub-work; you receive a short summary, not full subagent logs.
 Use activate_workflow_skill (or slash /grill /tdd /diagnose /review /handoff) for engineering discipline.",

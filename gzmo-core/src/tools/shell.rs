@@ -163,8 +163,8 @@ impl ToolHandler for ShellExecTool {
         ToolDef {
             name: "shell_exec".to_string(),
             description: "Execute a shell command and return stdout/stderr. Timeout: 30s. \
-                `bash` and `.sh` scripts are allowed. Prefer `/status` or \
-                `gzmo status` for ecosystem overview instead of ad-hoc shell probes.".to_string(),
+                `bash` and `.sh` scripts are allowed. Prefer the `ecosystem_status` tool \
+                for stack/overnight overview instead of ad-hoc shell probes.".to_string(),
             parameters: json!({
                 "type": "object",
                 "properties": {
@@ -196,12 +196,12 @@ impl ToolHandler for ShellExecTool {
         if !is_command_allowed(command) {
             tracing::debug!(command = %command, binary = %binary_name, "Blocked: not in allowlist");
             let hint = match binary_name {
-                "status" => " Use `/status` in chat or `gzmo status` on the CLI.",
+                "status" => " Use the `ecosystem_status` tool (not a shell binary).",
                 "bash" => " Use `bash path/to/script.sh` or `./path/to/script.sh`.",
                 "systemctl" | "journalctl" | "sudo" => {
                     " Blocked in GZMO-next strict shell — run manually on the host."
                 }
-                _ => " For a full stack snapshot, use `/status` instead of many shell probes.",
+                _ => " For a full stack snapshot, call the `ecosystem_status` tool.",
             };
             return Ok(format!(
                 "ERROR: Command blocked (binary '{binary_name}' not in allowlist).{hint} \

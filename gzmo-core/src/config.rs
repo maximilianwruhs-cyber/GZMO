@@ -316,6 +316,51 @@ pub struct GzmoConfig {
     /// Only honored when `GZMO_INSTANCE=next`; defaults to all-Inline (CT101-safe).
     #[serde(default)]
     pub assembly: crate::assembly::AssemblyConfig,
+
+    /// Operator custom cron jobs (`gzmo cron`) executed by `gzmo serve`.
+    #[serde(default)]
+    pub cron: CronConfig,
+}
+
+/// Custom / wizard-managed cron jobs (app-level, not host crontab).
+#[derive(Debug, Deserialize, Clone, Default)]
+pub struct CronConfig {
+    /// Named custom jobs: `[cron.jobs.<id>]`
+    #[serde(default)]
+    pub jobs: HashMap<String, CustomCronJob>,
+}
+
+/// Kind of custom cron job payload.
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq, Default)]
+#[serde(rename_all = "snake_case")]
+pub enum CustomCronKind {
+    #[default]
+    Shell,
+    Prompt,
+}
+
+/// One operator-defined job under `[cron.jobs.<id>]`.
+#[derive(Debug, Deserialize, Clone)]
+pub struct CustomCronJob {
+    #[serde(default = "default_true")]
+    pub enabled: bool,
+
+    /// Classic 5-field cron: `min hour dom month dow` (UTC).
+    pub schedule: String,
+
+    #[serde(default)]
+    pub kind: CustomCronKind,
+
+    /// Shell command when `kind = shell`.
+    #[serde(default)]
+    pub command: String,
+
+    /// Agent prompt when `kind = prompt`.
+    #[serde(default)]
+    pub prompt: String,
+
+    #[serde(default)]
+    pub description: String,
 }
 
 // ─── Dreams ─────────────────────────────────────────────────────────────

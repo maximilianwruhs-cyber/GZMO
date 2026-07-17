@@ -446,7 +446,9 @@ pub async fn format_ecosystem_status(config: &GzmoConfig) -> String {
         out.push('\n');
     }
 
-    out.push_str("\n*Report from `ecosystem_status` — run `/status` in chat or `gzmo status` on CLI.*\n");
+    out.push_str(
+        "\n*Report from `ecosystem_status` tool — operators can also use `/status` or `gzmo status`.*\n",
+    );
     out
 }
 

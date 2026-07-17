@@ -157,6 +157,7 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
                 if k.is_empty() { None } else { Some(k) }
             },
             workflow: Some((Arc::clone(&workflow_index), Arc::clone(&workflow_session))),
+            gzmo_config: Some(config.clone()),
         },
     )?;
     eprintln!("  {COPPER}⚙ Tool profile: {}{RESET}", profile.as_str());
@@ -246,6 +247,7 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
         Arc::clone(&chat_gateway_dyn),
         vault.clone(),
         system_prompt.clone(),
+        Some(config.clone()),
     ));
     agent_session.attach_subagent_runner(Arc::clone(&subagent_runner));
     if config.subagent.enabled {

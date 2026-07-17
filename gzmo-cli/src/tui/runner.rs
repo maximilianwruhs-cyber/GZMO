@@ -112,6 +112,7 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
                 }
             },
             workflow: Some((Arc::clone(&workflow_index), Arc::clone(&workflow_session))),
+            gzmo_config: Some(config.clone()),
         },
     )?;
 
@@ -178,6 +179,7 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
         Arc::clone(&chat_gateway_dyn),
         vault.clone(),
         system_prompt.clone(),
+        Some(config.clone()),
     ));
     {
         let mut session = agent_session.lock().await;

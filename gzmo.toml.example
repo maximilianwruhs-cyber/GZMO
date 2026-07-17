@@ -34,6 +34,26 @@ profile = "developer"
 audit = true
 # workspace_roots = ["."]
 
+# ─────────────────────────────────────────────────────────────────────────
+# Custom cron jobs — managed by `gzmo cron` / `gzmo cron wizard`
+# Runs inside `gzmo serve` (UTC). Not host crontab.
+# schedule = classic 5-field: min hour dom month dow
+# ─────────────────────────────────────────────────────────────────────────
+#
+# [cron.jobs.morning_status]
+# enabled = true
+# schedule = "0 6 * * *"
+# kind = "shell"
+# command = "gzmo status"
+# description = "Morning ecosystem snapshot"
+#
+# [cron.jobs.weekly_review]
+# enabled = false
+# schedule = "0 9 * * 0"
+# kind = "prompt"
+# prompt = "Summarize this week's vault activity in five bullets."
+# description = "Sunday review"
+
 # autoDream consolidation. The verifier is the front line against hallucinated
 # dreams becoming hallucinated wisdom: every extracted entity/relation is
 # fact-checked against the source log and must be backed by a quotable span

@@ -11,7 +11,7 @@ use tracing::info;
 use uuid::Uuid;
 
 use crate::agent_loop::{run_agent_loop, AgentLoopConfig, AgentMemoryContext, AgentResponse};
-use crate::config::{SubagentConfig, ToolsConfig};
+use crate::config::{GzmoConfig, SubagentConfig, ToolsConfig};
 use crate::context::ContextConfig;
 use crate::gateway::LlmGateway;
 use crate::memory::scratch::{ScratchScope, ScratchService};
@@ -70,6 +70,7 @@ struct RunningSub {
 pub struct SubagentRunner {
     config: SubagentConfig,
     tools_cfg: ToolsConfig,
+    gzmo_config: Option<GzmoConfig>,
     scratch: Arc<ScratchService>,
     gateway: Arc<dyn LlmGateway>,
     vault: Option<Arc<SqliteVault>>,
@@ -93,6 +94,7 @@ impl SubagentRunner {
             gateway,
             vault,
             system_prompt_base,
+            None,
         )
     }
 
@@ -103,10 +105,12 @@ impl SubagentRunner {
         gateway: Arc<dyn LlmGateway>,
         vault: Option<Arc<SqliteVault>>,
         system_prompt_base: String,
+        gzmo_config: Option<GzmoConfig>,
     ) -> Self {
         Self {
             config,
             tools_cfg,
+            gzmo_config,
             scratch,
             gateway,
             vault,
@@ -165,6 +169,7 @@ impl SubagentRunner {
                 scratch_scope: None,
                 serpapi_key: None,
                 workflow: None,
+                gzmo_config: self.gzmo_config.clone(),
             },
         )?;
         Ok((profile, Arc::new(tools)))
