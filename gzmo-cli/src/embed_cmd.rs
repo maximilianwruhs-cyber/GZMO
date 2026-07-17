@@ -2,11 +2,10 @@
 
 use anyhow::Result;
 use gzmo_core::config::GzmoConfig;
-use gzmo_core::identity::IdentityEngine;
 use gzmo_core::memory::embeddings;
 use tracing::info;
 
-pub async fn run(config: &GzmoConfig, _identity: &IdentityEngine, limit: Option<usize>) -> Result<()> {
+pub async fn run(config: &GzmoConfig, limit: Option<usize>) -> Result<()> {
     let missing = {
         let vault = gzmo_core::memory::vault::SqliteVault::open(&config.memory.vault_db)?;
         vault.count_missing_embeddings()?

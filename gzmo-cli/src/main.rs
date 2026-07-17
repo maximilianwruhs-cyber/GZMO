@@ -246,6 +246,8 @@ async fn main() -> Result<()> {
         Command::Health
             | Command::Status
             | Command::Memory(_)
+            | Command::MemoryEmbed(_)
+            | Command::MemoryPromote(_)
             | Command::McpServe
             | Command::Observatory
             | Command::Metabolism
@@ -324,12 +326,8 @@ async fn main() -> Result<()> {
             vault.dump_to_markdown(&config.memory.directory).await?;
             Ok(())
         }
-        Command::MemoryEmbed(limit) => {
-            embed_cmd::run(&config, identity.as_ref().unwrap(), limit).await
-        }
-        Command::MemoryPromote(limit) => {
-            promote_cmd::run(&config, identity.as_ref().unwrap(), limit).await
-        }
+        Command::MemoryEmbed(limit) => embed_cmd::run(&config, limit).await,
+        Command::MemoryPromote(limit) => promote_cmd::run(&config, limit).await,
         Command::Memory(sub) => memory_cmd::run(&config, sub).await,
         Command::Distill(session_id) => {
             distill_cmd::run(&config, identity.as_ref().unwrap(), session_id).await

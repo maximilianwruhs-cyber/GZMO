@@ -20,6 +20,8 @@ directory = "skills"
 dreams_path = "DREAMS.md"
 
 # Progressive-disclosure engineering workflows (grill/tdd/diagnose/review/handoff)
+# Paths are relative to this config file (repo-root example → skills/workflows).
+# Living instance under config/*.toml should use ../skills/workflows.
 [workflow_skills]
 enabled = true
 dir = "skills/workflows"

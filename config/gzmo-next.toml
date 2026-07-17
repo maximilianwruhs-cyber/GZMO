@@ -1,19 +1,20 @@
-# GZMO living instance — workstation production (ADR-0003)
+# GZMO-next — workstation lab/dev config (NOT production after 2026-07-17)
 # ─────────────────────────────────────────────────────────────────────────
 #
-# Sole living config (also linked as config/gzmo.toml). CT101 root gzmo.toml
-# is a frozen reference only.
+# Production living host is CT101 (/opt/gzmo + gzmo-daemon). This file
+# (also linked as config/gzmo.toml) drives lab/dev on the workstation only.
 #
 #   config  → GZMO/config/gzmo.toml (= this file via symlink)
-#   data    → GZMO/data-next/
+#   data    → GZMO/data-next/   (lab scratch — do not import into CT101)
 #
-# Env contract (operator + gzmo serve):
+# Env contract (operator + optional lab gzmo serve):
 #   export GZMO_INSTANCE=next
 #   export GZMO_CONFIG=$GZMO_CLONE_ROOT/GZMO/config/gzmo.toml
 #
-# Metabolism: `gzmo serve` runs typed Rust jobs (distill/promote/embed/dream/spark).
-# Lab recipes remain beat-gate fixtures; optional gzmo-scheduler for parity.
-# See GZMO/docs/ADR-0003-one-instance-metabolism.md and CT101_BOUNDARY.md.
+# Overnight authority: CT101 gzmo-daemon only.
+# Keep workstation gzmo-serve / gzmo-scheduler DISABLED by default.
+# Never run lab serve overnight alongside CT101.
+# See GZMO/docs/CT101_RESTORE_LIVING.md, ADR-0003, CT101_BOUNDARY.md.
 #
 # Calibration output from gzmo-handoff.sh lands in gzmo-next-fused.toml
 # (sibling file) for operator review — it never overwrites this file.
@@ -148,7 +149,7 @@ sync_cron_minute = 45
 [librarian]
 enabled = true
 url = "http://localhost:8000/v1"
-model = "/home/gzmo/models/ornith-35b-GGUF/ornith-35b-Q4_K_M.gguf"
+model = "/run/media/gzmo/Extreme SSD/swap/huggingface/llamacpp-qwen36-mtp/Qwen3.6-35B-A3B-UD-Q4_K_XL.gguf"
 api_key = ""
 
 [rerank]
@@ -176,7 +177,7 @@ strategy = "lorenz"
 [engine.local]
 provider = "local"
 url = "http://localhost:8000/v1"
-model = "/home/gzmo/models/ornith-35b-GGUF/ornith-35b-Q4_K_M.gguf"
+model = "/run/media/gzmo/Extreme SSD/swap/huggingface/llamacpp-qwen36-mtp/Qwen3.6-35B-A3B-UD-Q4_K_XL.gguf"
 api_key = ""
 temperature = 0.70
 top_p = 0.95
@@ -208,6 +209,18 @@ action_on_fail = "hold_previous"
 [agent]
 max_tool_iterations = 40
 heartbeat_interval_secs = 1800
+
+[workflow_skills]
+enabled = true
+dir = "../skills/workflows"
+model_can_activate = true
+max_active = 2
+handoff_dir = "../data-next/handoffs"
+handoff_to_vault = true
+
+[tools]
+profile = "developer"
+audit = true
 
 [subagent]
 max_concurrent = 5

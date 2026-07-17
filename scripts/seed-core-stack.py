@@ -1,17 +1,20 @@
 #!/usr/bin/env python3
 """Seed curated core-stack facts into vault + honeypot (manual origin).
 
-Source of truth: docs/CORE_STACK_KNOWLEDGE.md. This script parses the
-"Injected facts:" bullet lines from that document (every bullet whose text
-starts with a [TYPE:Name] tag) and injects them directly into the vault +
-honeypot as Structural, high-confidence, operator-curated facts.
+Default source of truth: docs/CORE_INSIGHT.md (living-instance prefill).
+Legacy clean-slate cards remain in docs/CORE_STACK_KNOWLEDGE.md if needed
+via --doc. This script parses Injected-facts bullets whose text starts with
+a [TYPE:Name] tag and injects them into vault + honeypot as Structural,
+high-confidence, operator-curated facts.
 
-This is the seed-cognition-stack.py pattern extended to the whole machine:
-no LLM extraction, no migration-pile data — just authoritative self-knowledge.
+No LLM extraction, no migration-pile data — authoritative self-knowledge only.
 
-After seeding, run:
-  ./target/release/gzmo memory embed
-  scripts/sync-vault-to-qdrant.py --source honeypot
+After seeding CT101 living vault:
+  GZMO_CONFIG=/opt/gzmo/gzmo.toml ./target/release/gzmo memory embed
+  python3 scripts/seed-core-stack.py --db /opt/gzmo/data/vault.db --mirror-embeddings
+  python3 scripts/sync-vault-to-qdrant.py --db /opt/gzmo/data/vault.db --source honeypot
+
+Lab (workstation data-next/) only with GZMO_ALLOW_LAB_VAULT=1 — never merge into CT101.
 """
 
 from __future__ import annotations
@@ -25,9 +28,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_DB = ROOT / "data" / "vault.db"
-DEFAULT_DOC = ROOT / "docs" / "CORE_STACK_KNOWLEDGE.md"
-SOURCE_FILE = "manual/core_stack_20260607.md"
+DEFAULT_DB = ROOT / "data-next" / "vault.db"
+DEFAULT_DOC = ROOT / "docs" / "CORE_INSIGHT.md"
+DEFAULT_SOURCE_FILE = "manual/core_insight_20260717.md"
 ORIGIN = "manual"
 CONTAINER = "obolus"
 MIN_CONF = 0.95
@@ -69,7 +72,7 @@ def extract_facts(doc: Path) -> list[str]:
     return facts
 
 
-def mirror_embeddings(db: Path, source_file: str = SOURCE_FILE) -> int:
+def mirror_embeddings(db: Path, source_file: str = DEFAULT_SOURCE_FILE) -> int:
     """Copy semantic_vault embeddings into matching honeypot rows (post gzmo memory embed)."""
     conn = sqlite3.connect(db)
     n = conn.execute(
@@ -90,7 +93,7 @@ def mirror_embeddings(db: Path, source_file: str = SOURCE_FILE) -> int:
     return 0
 
 
-def seed(db: Path, facts: list[str], dry_run: bool) -> int:
+def seed(db: Path, facts: list[str], dry_run: bool, source_file: str = DEFAULT_SOURCE_FILE) -> int:
     conn = sqlite3.connect(db)
     conn.row_factory = sqlite3.Row
     tables = {r[0] for r in conn.execute("SELECT name FROM sqlite_master WHERE type='table'")}
@@ -123,7 +126,7 @@ def seed(db: Path, facts: list[str], dry_run: bool) -> int:
                  decay_class, created_at, last_accessed_at, source_file, content_norm)
             VALUES (?, ?, ?, 365.0, ?, 1, 'Structural', ?, ?, ?, ?)
             """,
-            (vid, content, b"", MIN_CONF, now, now, SOURCE_FILE, cn),
+            (vid, content, b"", MIN_CONF, now, now, source_file, cn),
         )
         conn.execute(
             """
@@ -141,7 +144,7 @@ def seed(db: Path, facts: list[str], dry_run: bool) -> int:
                 b"",
                 ORIGIN,
                 MIN_CONF,
-                SOURCE_FILE,
+                source_file,
                 CONTAINER,
                 now,
             ),
@@ -163,7 +166,7 @@ def seed(db: Path, facts: list[str], dry_run: bool) -> int:
                 SELECT id FROM semantic_vault WHERE source_file = ?
             )
             """,
-            (SOURCE_FILE, SOURCE_FILE),
+            (source_file, source_file),
         ).rowcount
         conn.commit()
         conn.close()
@@ -174,14 +177,15 @@ def seed(db: Path, facts: list[str], dry_run: bool) -> int:
 
     print(
         f"[*] core-stack seed: +{inserted_vault} vault, +{inserted_hp} honeypot, "
-        f"={skipped} already present (source={SOURCE_FILE})"
+        f"={skipped} already present (source={source_file})"
     )
     if dry_run:
         print("[i] dry-run — no writes")
     elif inserted_hp:
         print(
             "[i] next: ./target/release/gzmo memory embed && "
-            "scripts/seed-core-stack.py --mirror-embeddings && "
+            "scripts/seed-core-stack.py --db <vault> --source-file "
+            f"{source_file} --mirror-embeddings && "
             "scripts/sync-vault-to-qdrant.py --source honeypot"
         )
     return 0
@@ -191,6 +195,12 @@ def main() -> int:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--db", type=Path, default=DEFAULT_DB)
     p.add_argument("--doc", type=Path, default=DEFAULT_DOC, help="core knowledge markdown")
+    p.add_argument(
+        "--source-file",
+        type=str,
+        default=DEFAULT_SOURCE_FILE,
+        help="provenance source_file written into vault/honeypot rows",
+    )
     p.add_argument("--dry-run", action="store_true")
     p.add_argument("--list", action="store_true", help="print parsed facts and exit")
     p.add_argument(
@@ -204,7 +214,7 @@ def main() -> int:
         if not args.db.exists():
             print(f"[!] No vault at {args.db}", file=sys.stderr)
             return 1
-        return mirror_embeddings(args.db)
+        return mirror_embeddings(args.db, args.source_file)
 
     if not args.doc.exists():
         print(f"[!] No core knowledge doc at {args.doc}", file=sys.stderr)
@@ -226,7 +236,7 @@ def main() -> int:
     if not args.db.exists():
         print(f"[!] No vault at {args.db}", file=sys.stderr)
         return 1
-    return seed(args.db, facts, args.dry_run)
+    return seed(args.db, facts, args.dry_run, args.source_file)
 
 
 if __name__ == "__main__":

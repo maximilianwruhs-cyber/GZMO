@@ -84,8 +84,13 @@ pub async fn run(config: &GzmoConfig, subargs: Vec<String>) -> Result<()> {
                 println!("{}", serde_json::to_string_pretty(&st)?);
             } else {
                 println!(
-                    "session={} vault_facts={} scratch={} has_recall={}",
-                    st.session_id, st.vault_facts, st.scratch_backend, st.scratch_has_recall
+                    "session={} vault={} facts={} honeypot={} scratch={} has_recall={}",
+                    st.session_id,
+                    st.vault_path,
+                    st.vault_facts,
+                    st.honeypot_latest,
+                    st.scratch_backend,
+                    st.scratch_has_recall
                 );
             }
         }

@@ -7,7 +7,7 @@ set -euo pipefail
 
 MIN_RATIO="${KNOWLEDGE_SMOKE_MIN_RATIO:-0.55}"
 WARN_RATIO="${KNOWLEDGE_SMOKE_WARN_RATIO:-0.70}"
-GZMO_ROOT="${GZMO_ROOT:-/opt/gzmo/survey_GZMO}"
+GZMO_ROOT="${GZMO_ROOT:-/opt/gzmo}"
 QDRANT_URL="${QDRANT_URL:-http://127.0.0.1:6333}"
 COLLECTION="${QDRANT_COLLECTION:-honeypot}"
 
@@ -20,7 +20,14 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-VAULT="$GZMO_ROOT/data/vault.db"
+# Prefer runtime vault at /opt/gzmo/data; fall back to clone-relative data/.
+if [[ -f "$GZMO_ROOT/data/vault.db" ]]; then
+  VAULT="$GZMO_ROOT/data/vault.db"
+elif [[ -f /opt/gzmo/data/vault.db ]]; then
+  VAULT=/opt/gzmo/data/vault.db
+else
+  VAULT="$GZMO_ROOT/data/vault.db"
+fi
 if [[ ! -f "$VAULT" ]]; then
   echo "knowledge-smoke: vault missing at $VAULT" >&2
   exit 1

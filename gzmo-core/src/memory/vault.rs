@@ -1965,6 +1965,25 @@ fn maybe_upsert_evidence(
         Ok(count)
     }
 
+    /// Curated honeypot rows with `is_latest=1` (RAG mirror source of truth).
+    pub fn count_honeypot_latest(&self) -> Result<usize> {
+        let conn = self.pool.get()?;
+        let exists: i64 = conn.query_row(
+            "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='honeypot'",
+            [],
+            |row| row.get(0),
+        )?;
+        if exists == 0 {
+            return Ok(0);
+        }
+        let count: usize = conn.query_row(
+            "SELECT COUNT(*) FROM honeypot WHERE is_latest = 1",
+            [],
+            |row| row.get(0),
+        )?;
+        Ok(count)
+    }
+
     /// Get the most recent N facts (for context injection).
     pub fn recent(&self, limit: usize) -> Result<Vec<String>> {
         Ok(self

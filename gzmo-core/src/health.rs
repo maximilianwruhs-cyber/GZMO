@@ -134,6 +134,111 @@ pub async fn probe_sovereign(profile: &EngineProfileConfig) -> ProbeResult {
     probe_llm_models(profile).await
 }
 
+/// Compare honeypot `is_latest=1` count vs Qdrant points (knowledge-smoke thresholds).
+/// Critical fail if ratio < 0.55; warn (still ok) if ratio < 0.70.
+pub async fn probe_honeypot_qdrant_drift(config: &GzmoConfig) -> ProbeResult {
+    const MIN_RATIO: f64 = 0.55;
+    const WARN_RATIO: f64 = 0.70;
+
+    if !config.qdrant.enabled {
+        return ProbeResult::pass("honeypot_qdrant_drift", "qdrant disabled — skipped");
+    }
+
+    let vault_path = &config.memory.vault_db;
+    let honeypot = match rusqlite::Connection::open_with_flags(
+        vault_path,
+        rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY,
+    ) {
+        Ok(conn) => {
+            let exists: i64 = conn
+                .query_row(
+                    "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='honeypot'",
+                    [],
+                    |row| row.get(0),
+                )
+                .unwrap_or(0);
+            if exists == 0 {
+                0usize
+            } else {
+                conn.query_row(
+                    "SELECT COUNT(*) FROM honeypot WHERE is_latest = 1",
+                    [],
+                    |row| row.get::<_, i64>(0),
+                )
+                .map(|n| n as usize)
+                .unwrap_or(0)
+            }
+        }
+        Err(e) => {
+            return ProbeResult::fail(
+                "honeypot_qdrant_drift",
+                format!("vault unreadable at {}: {e}", vault_path.display()),
+            );
+        }
+    };
+
+    if honeypot == 0 {
+        return ProbeResult::pass(
+            "honeypot_qdrant_drift",
+            "honeypot empty — nothing to compare",
+        );
+    }
+
+    let base = config.qdrant.url.trim_end_matches('/');
+    let url = format!("{base}/collections/{}", config.qdrant.collection);
+    let client = match Client::builder().timeout(Duration::from_secs(8)).build() {
+        Ok(c) => c,
+        Err(e) => {
+            return ProbeResult::fail("honeypot_qdrant_drift", format!("HTTP client: {e}"));
+        }
+    };
+
+    let qdrant_pts = match client.get(&url).send().await {
+        Ok(r) if r.status().is_success() => match r.json::<serde_json::Value>().await {
+            Ok(v) => v["result"]["points_count"].as_u64().unwrap_or(0) as usize,
+            Err(e) => {
+                return ProbeResult::fail(
+                    "honeypot_qdrant_drift",
+                    format!("qdrant JSON: {e}"),
+                );
+            }
+        },
+        Ok(r) => {
+            return ProbeResult::fail(
+                "honeypot_qdrant_drift",
+                format!("{url} HTTP {}", r.status()),
+            );
+        }
+        Err(e) => {
+            return ProbeResult::fail(
+                "honeypot_qdrant_drift",
+                format!("{url} unreachable: {e}"),
+            );
+        }
+    };
+
+    let ratio = qdrant_pts as f64 / honeypot as f64;
+    let delta = honeypot.saturating_sub(qdrant_pts);
+    let detail = format!(
+        "honeypot={honeypot} qdrant={qdrant_pts} delta={delta} ratio={:.0}%",
+        ratio * 100.0
+    );
+
+    if ratio < MIN_RATIO {
+        ProbeResult::fail(
+            "honeypot_qdrant_drift",
+            format!("CRITICAL — {detail} (min {:.0}%)", MIN_RATIO * 100.0),
+        )
+    } else if ratio < WARN_RATIO {
+        ProbeResult::pass(
+            "honeypot_qdrant_drift",
+            format!("WARN — {detail} (warn below {:.0}%)", WARN_RATIO * 100.0),
+        )
+    } else {
+        ProbeResult::pass("honeypot_qdrant_drift", detail)
+    }
+}
+
 /// GET Qdrant collection info when `[qdrant].enabled`.
 pub async fn probe_qdrant(cfg: &QdrantConfig) -> ProbeResult {
     if !cfg.enabled {
@@ -403,6 +508,7 @@ pub async fn collect_health_probes(
 
     results.push(probe_embeddings(&config.embeddings, &config.redis).await);
     results.push(probe_qdrant(&config.qdrant).await);
+    results.push(probe_honeypot_qdrant_drift(config).await);
     results.push(probe_rerank(&config.rerank).await);
     results.push(probe_librarian(&config.librarian).await);
     results.push(probe_redis(&config.redis).await);

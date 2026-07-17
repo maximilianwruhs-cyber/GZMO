@@ -3,7 +3,6 @@
 use anyhow::Result;
 use gzmo_core::config::GzmoConfig;
 use gzmo_core::health::{collect_health_probes, format_report};
-use gzmo_core::identity::IdentityEngine;
 use gzmo_core::memory::embeddings;
 use gzmo_core::tools::ToolRegistry;
 use gzmo_core::tools::fs::{DirListTool, FileReadTool, FileSearchTool, FileWriteTool};
@@ -11,7 +10,7 @@ use gzmo_core::tools::shell::ShellExecTool;
 
 use crate::cli_mcp::McpSession;
 
-pub async fn run(config: &GzmoConfig, _identity: IdentityEngine) -> Result<()> {
+pub async fn run(config: &GzmoConfig) -> Result<()> {
     embeddings::assert_vault_backend(&config.memory.vault_backend)?;
 
     let mut tools = ToolRegistry::new();
