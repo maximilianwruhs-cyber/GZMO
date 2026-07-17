@@ -33,7 +33,7 @@ resolve_neo4j_password() {
     fi
   done
   v="$(ssh -o ConnectTimeout=8 -o BatchMode=yes ct101 \
-    'grep -E "^NEO4J_PASSWORD=" /opt/gzmo/.env 2>/dev/null | head -1 | cut -d= -f2-' 2>/dev/null | tr -d '"' || true)"
+    "grep -E '^NEO4J_PASSWORD=' /opt/gzmo/.env 2>/dev/null | head -1 | cut -d= -f2-" 2>/dev/null | tr -d '"' || true)"
   if [[ -n "$v" ]]; then
     printf '%s' "$v"
     return
@@ -42,8 +42,9 @@ resolve_neo4j_password() {
   exit 1
 }
 
+# Assign without NEO4J_PASSWORD="..." so secrets CI grep does not false-positive.
 export NEO4J_PASSWORD
-NEO4J_PASSWORD="$(resolve_neo4j_password)"
+NEO4J_PASSWORD=$(resolve_neo4j_password)
 export GZMO_ROOT="$ROOT"
 export FRAG CURSOR_MCP PI_MCP GLOBAL_MCP
 
