@@ -248,6 +248,7 @@ async fn main() -> Result<()> {
             | Command::Memory(_)
             | Command::MemoryEmbed(_)
             | Command::MemoryPromote(_)
+            | Command::Distill(_)
             | Command::McpServe
             | Command::Observatory
             | Command::Metabolism
@@ -329,9 +330,7 @@ async fn main() -> Result<()> {
         Command::MemoryEmbed(limit) => embed_cmd::run(&config, limit).await,
         Command::MemoryPromote(limit) => promote_cmd::run(&config, limit).await,
         Command::Memory(sub) => memory_cmd::run(&config, sub).await,
-        Command::Distill(session_id) => {
-            distill_cmd::run(&config, identity.as_ref().unwrap(), session_id).await
-        }
+        Command::Distill(session_id) => distill_cmd::run(&config, session_id).await,
         Command::Health => health_cmd::run(&config).await,
         Command::Status => status_cmd::run(&config).await,
         Command::Observatory => observatory_cmd::run(&config).await,

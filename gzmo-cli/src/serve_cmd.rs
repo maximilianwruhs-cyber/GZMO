@@ -264,7 +264,7 @@ async fn run_loop(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> 
             )
         {
             if run_named_job(config, "distill", || async {
-                distill_cmd::run(config, identity, None).await
+                distill_cmd::run(config, None).await
             })
             .await
             {
