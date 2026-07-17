@@ -1932,6 +1932,13 @@ fn maybe_upsert_evidence(
                     )?;
                     if n == 1 {
                         report.updated += 1;
+                        // Keep honeypot RAG mirror in sync when the same fact id exists.
+                        let _ = conn.execute(
+                            "UPDATE honeypot SET embedding = ?1
+                             WHERE id = ?2
+                               AND (embedding IS NULL OR length(embedding) = 0)",
+                            params![blob, id],
+                        );
                     }
                 }
                 Ok(_) => {
