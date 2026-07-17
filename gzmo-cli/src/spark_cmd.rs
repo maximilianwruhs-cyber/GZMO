@@ -65,10 +65,10 @@ pub async fn run(config: &GzmoConfig, _identity: &IdentityEngine, date: Option<N
     );
 
     let mut tools = ToolRegistry::new();
-    tools.register(Box::new(FileReadTool));
-    tools.register(Box::new(FileWriteTool));
-    tools.register(Box::new(DirListTool));
-    tools.register(Box::new(FileSearchTool));
+    tools.register(Box::new(FileReadTool::default()));
+    tools.register(Box::new(FileWriteTool::default()));
+    tools.register(Box::new(DirListTool::default()));
+    tools.register(Box::new(FileSearchTool::default()));
     tools.register(Box::new(ShellExecTool::default()));
     tools.register(Box::new(WebSearchTool::default()));
     tools.register(Box::new(SysMetricsTool));

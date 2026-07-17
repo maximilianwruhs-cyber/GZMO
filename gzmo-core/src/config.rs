@@ -210,6 +210,14 @@ pub struct GzmoConfig {
     #[serde(default)]
     pub skills: SkillsConfig,
 
+    /// Progressive-disclosure engineering workflow skills (`skills/workflows/*/SKILL.md`).
+    #[serde(default)]
+    pub workflow_skills: WorkflowSkillsConfig,
+
+    /// Tool capability profiles + workspace jail.
+    #[serde(default)]
+    pub tools: ToolsConfig,
+
     #[serde(default)]
     pub engine: EngineSection,
 
@@ -1974,6 +1982,95 @@ pub struct SkillsConfig {
     /// Path to the dreams configuration
     #[serde(default = "default_dreams_path")]
     pub dreams_path: PathBuf,
+}
+
+/// Workflow skill pack (`SKILL.md` engineering contracts).
+#[derive(Debug, Deserialize, Clone)]
+pub struct WorkflowSkillsConfig {
+    #[serde(default = "default_workflow_skills_enabled")]
+    pub enabled: bool,
+
+    #[serde(default = "default_workflow_skills_dir")]
+    pub dir: PathBuf,
+
+    #[serde(default = "default_workflow_model_can_activate")]
+    pub model_can_activate: bool,
+
+    #[serde(default = "default_workflow_max_active")]
+    pub max_active: usize,
+
+    /// Where `/handoff` artifacts are written.
+    #[serde(default = "default_workflow_handoff_dir")]
+    pub handoff_dir: PathBuf,
+
+    /// When true, handoff writes also store a one-line vault pointer.
+    #[serde(default = "default_workflow_handoff_to_vault")]
+    pub handoff_to_vault: bool,
+}
+
+fn default_workflow_skills_enabled() -> bool {
+    true
+}
+fn default_workflow_skills_dir() -> PathBuf {
+    PathBuf::from("skills/workflows")
+}
+fn default_workflow_model_can_activate() -> bool {
+    true
+}
+fn default_workflow_max_active() -> usize {
+    2
+}
+fn default_workflow_handoff_dir() -> PathBuf {
+    PathBuf::from("data-next/handoffs")
+}
+fn default_workflow_handoff_to_vault() -> bool {
+    true
+}
+
+impl Default for WorkflowSkillsConfig {
+    fn default() -> Self {
+        Self {
+            enabled: default_workflow_skills_enabled(),
+            dir: default_workflow_skills_dir(),
+            model_can_activate: default_workflow_model_can_activate(),
+            max_active: default_workflow_max_active(),
+            handoff_dir: default_workflow_handoff_dir(),
+            handoff_to_vault: default_workflow_handoff_to_vault(),
+        }
+    }
+}
+
+/// Interactive / subagent tool policy.
+#[derive(Debug, Deserialize, Clone)]
+pub struct ToolsConfig {
+    /// Default profile for chat / `--repl`: read_only | developer | reviewer | operator
+    #[serde(default = "default_tools_profile")]
+    pub profile: String,
+
+    /// Workspace roots for path jail (empty = cwd only).
+    #[serde(default)]
+    pub workspace_roots: Vec<PathBuf>,
+
+    /// Emit structured audit log lines on every tool dispatch.
+    #[serde(default = "default_tools_audit")]
+    pub audit: bool,
+}
+
+fn default_tools_profile() -> String {
+    "developer".to_string()
+}
+fn default_tools_audit() -> bool {
+    true
+}
+
+impl Default for ToolsConfig {
+    fn default() -> Self {
+        Self {
+            profile: default_tools_profile(),
+            workspace_roots: Vec::new(),
+            audit: default_tools_audit(),
+        }
+    }
 }
 
 #[derive(Debug, Deserialize, Clone)]

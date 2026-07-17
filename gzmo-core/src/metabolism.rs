@@ -71,78 +71,245 @@ pub fn write_job_run(
     path
 }
 
+pub const METABOLISM_JOBS: &[&str] = &["distill", "promote", "embed", "dream", "spark"];
+
 fn read_job_latest(dir: &Path, job: &str) -> Option<JobRunRecord> {
     let path = dir.join(format!("latest-{job}.json"));
     let raw = std::fs::read_to_string(path).ok()?;
     serde_json::from_str(&raw).ok()
 }
 
-/// Markdown section: did last night's metabolism work?
-pub fn format_overnight_metabolism(config: &GzmoConfig) -> String {
-    let dir = runs_dir(config);
-    let mut out = String::from("### Overnight metabolism\n\n");
-    out.push_str(&format!("- **Runs dir:** `{}`\n", dir.display()));
-
-    if let Ok(raw) = std::fs::read_to_string(dir.join("latest.json")) {
-        if let Ok(v) = serde_json::from_str::<JobRunRecord>(&raw) {
-            let mark = if v.ok { "OK" } else { "FAIL" };
-            out.push_str(&format!(
-                "- **Latest job:** `{mark}` `{}` at {} ({})\n",
-                v.job,
-                v.finished,
-                v.runner.as_deref().unwrap_or(v.script.as_str())
-            ));
-            if let Some(err) = &v.error {
-                out.push_str(&format!("  - error: {err}\n"));
-            }
+/// Newest metabolism job only — ignores lab wiki/handoff noise in `latest.json`.
+pub fn newest_metabolism_job(dir: &Path) -> Option<JobRunRecord> {
+    let mut best: Option<JobRunRecord> = None;
+    for job in METABOLISM_JOBS {
+        let Some(r) = read_job_latest(dir, job) else {
+            continue;
+        };
+        match &best {
+            None => best = Some(r),
+            Some(prev) if r.finished > prev.finished => best = Some(r),
+            _ => {}
         }
-    } else {
-        out.push_str("- **Latest job:** none yet — start `gzmo serve`\n");
     }
+    best
+}
 
-    let jobs = ["distill", "promote", "embed", "dream", "spark"];
-    out.push_str("\n| Job | Last run | Result |\n|---|---|---|\n");
+/// Per-job row for the metabolism TUI / status table.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum JobRowStatus {
+    Ok,
+    Fail,
+    Missing,
+}
+
+impl JobRowStatus {
+    pub fn label(self) -> &'static str {
+        match self {
+            Self::Ok => "OK",
+            Self::Fail => "FAIL",
+            Self::Missing => "missing",
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct MetabolismJobRow {
+    pub job: String,
+    pub finished: Option<String>,
+    pub status: JobRowStatus,
+    pub error: Option<String>,
+    pub runner: Option<String>,
+}
+
+/// Wiki / OKForge plane summary from `wiki-push-latest.json`.
+#[derive(Debug, Clone)]
+pub struct WikiPlaneSummary {
+    pub healthy: Option<bool>,
+    pub concepts_written: u64,
+    pub commit_sha: String,
+    pub detail: String,
+}
+
+/// Overnight metabolism board for `gzmo metabolism`.
+#[derive(Debug, Clone)]
+pub struct MetabolismBoard {
+    pub runs_dir: PathBuf,
+    pub jobs: Vec<MetabolismJobRow>,
+    pub newest: Option<JobRunRecord>,
+    pub honeypot_rows: Option<usize>,
+    pub missing_embeddings: Option<usize>,
+    pub verdict: String,
+    pub wiki: WikiPlaneSummary,
+}
+
+/// Collect structured overnight metabolism + wiki plane snapshot.
+pub fn collect_metabolism_board(config: &GzmoConfig) -> MetabolismBoard {
+    let dir = runs_dir(config);
+    let mut jobs = Vec::with_capacity(METABOLISM_JOBS.len());
     let mut ok_count = 0usize;
     let mut seen = 0usize;
-    for job in jobs {
+
+    for job in METABOLISM_JOBS {
         match read_job_latest(&dir, job) {
             Some(r) => {
                 seen += 1;
                 if r.ok {
                     ok_count += 1;
                 }
-                let mark = if r.ok { "OK" } else { "FAIL" };
-                out.push_str(&format!("| {job} | {} | {mark} |\n", r.finished));
+                jobs.push(MetabolismJobRow {
+                    job: (*job).to_string(),
+                    finished: Some(r.finished.clone()),
+                    status: if r.ok {
+                        JobRowStatus::Ok
+                    } else {
+                        JobRowStatus::Fail
+                    },
+                    error: r.error.clone(),
+                    runner: r.runner.clone().or(Some(r.script.clone())),
+                });
             }
             None => {
-                out.push_str(&format!("| {job} | — | missing |\n"));
+                jobs.push(MetabolismJobRow {
+                    job: (*job).to_string(),
+                    finished: None,
+                    status: JobRowStatus::Missing,
+                    error: None,
+                    runner: None,
+                });
             }
         }
     }
 
-    // Vault / honeypot felt-artifact signal
-    let vault = &config.memory.vault_db;
-    let (honeypot_n, missing_embed) = vault_metabolism_counts(vault);
+    let (honeypot_n, missing_embed) = vault_metabolism_counts(&config.memory.vault_db);
+    let verdict = if seen == 0 {
+        "RED — no metabolism runs recorded".into()
+    } else if ok_count >= 3 && honeypot_n.unwrap_or(0) > 0 {
+        "GREEN — core jobs ok and honeypot non-empty".into()
+    } else if ok_count > 0 {
+        "YELLOW — some jobs ran; check honeypot / embed seam".into()
+    } else {
+        "RED — recent jobs failed".into()
+    };
+
+    MetabolismBoard {
+        runs_dir: dir.clone(),
+        jobs,
+        newest: newest_metabolism_job(&dir),
+        honeypot_rows: honeypot_n,
+        missing_embeddings: missing_embed,
+        verdict,
+        wiki: read_wiki_plane_summary(config),
+    }
+}
+
+fn read_wiki_plane_summary(config: &GzmoConfig) -> WikiPlaneSummary {
+    let wiki_meta = config
+        .memory
+        .vault_db
+        .parent()
+        .map(|p| p.join("wiki-push-latest.json"))
+        .unwrap_or_else(|| PathBuf::from("wiki-push-latest.json"));
+
+    match std::fs::read_to_string(&wiki_meta) {
+        Ok(raw) => match serde_json::from_str::<serde_json::Value>(&raw) {
+            Ok(v) => {
+                let healthy = v.get("healthy").and_then(|x| x.as_bool());
+                let sha = v
+                    .get("commit_sha")
+                    .and_then(|x| x.as_str())
+                    .unwrap_or("")
+                    .chars()
+                    .take(12)
+                    .collect::<String>();
+                let n = v
+                    .get("concepts_written")
+                    .and_then(|x| x.as_u64())
+                    .unwrap_or(0);
+                let detail = match healthy {
+                    Some(true) => format!("healthy · {n} concepts · sha {sha}"),
+                    Some(false) => format!(
+                        "UNHEALTHY · {}",
+                        v.get("error")
+                            .and_then(|x| x.as_str())
+                            .or_else(|| v.get("skipped_reason").and_then(|x| x.as_str()))
+                            .unwrap_or("see wiki-push-latest.json")
+                    ),
+                    None => {
+                        if sha.is_empty() {
+                            "meta present (no healthy flag)".into()
+                        } else {
+                            format!("ok · {n} concepts · sha {sha}")
+                        }
+                    }
+                };
+                WikiPlaneSummary {
+                    healthy,
+                    concepts_written: n,
+                    commit_sha: sha,
+                    detail,
+                }
+            }
+            Err(_) => WikiPlaneSummary {
+                healthy: None,
+                concepts_written: 0,
+                commit_sha: String::new(),
+                detail: "meta unreadable".into(),
+            },
+        },
+        Err(_) => WikiPlaneSummary {
+            healthy: None,
+            concepts_written: 0,
+            commit_sha: String::new(),
+            detail: "no wiki-push-latest.json yet".into(),
+        },
+    }
+}
+
+/// Markdown section: did last night's metabolism work?
+pub fn format_overnight_metabolism(config: &GzmoConfig) -> String {
+    let board = collect_metabolism_board(config);
+    let mut out = String::from("### Overnight metabolism\n\n");
+    out.push_str(&format!("- **Runs dir:** `{}`\n", board.runs_dir.display()));
+
+    if let Some(v) = &board.newest {
+        let mark = if v.ok { "OK" } else { "FAIL" };
+        out.push_str(&format!(
+            "- **Latest metabolism job:** `{mark}` `{}` at {} ({})\n",
+            v.job,
+            v.finished,
+            v.runner.as_deref().unwrap_or(v.script.as_str())
+        ));
+        if let Some(err) = &v.error {
+            out.push_str(&format!("  - error: {err}\n"));
+        }
+    } else {
+        out.push_str("- **Latest metabolism job:** none yet — start `gzmo serve`\n");
+    }
+
+    out.push_str("\n| Job | Last run | Result |\n|---|---|---|\n");
+    for row in &board.jobs {
+        let finished = row.finished.as_deref().unwrap_or("—");
+        out.push_str(&format!(
+            "| {} | {finished} | {} |\n",
+            row.job,
+            row.status.label()
+        ));
+    }
+
     out.push_str(&format!(
         "\n- **Honeypot rows:** {}\n- **Vault facts missing embeddings:** {}\n",
-        honeypot_n
+        board
+            .honeypot_rows
             .map(|n| n.to_string())
             .unwrap_or_else(|| "?".into()),
-        missing_embed
+        board
+            .missing_embeddings
             .map(|n| n.to_string())
             .unwrap_or_else(|| "?".into())
     ));
 
-    let verdict = if seen == 0 {
-        "RED — no metabolism runs recorded"
-    } else if ok_count >= 3 && honeypot_n.unwrap_or(0) > 0 {
-        "GREEN — core jobs ok and honeypot non-empty"
-    } else if ok_count > 0 {
-        "YELLOW — some jobs ran; check honeypot / embed seam"
-    } else {
-        "RED — recent jobs failed"
-    };
-    out.push_str(&format!("\n**Verdict:** {verdict}\n\n"));
+    out.push_str(&format!("\n**Verdict:** {}\n\n", board.verdict));
     out
 }
 
@@ -167,4 +334,52 @@ fn vault_metabolism_counts(path: &Path) -> (Option<usize>, Option<usize>) {
         .ok()
         .map(|n| n as usize);
     (honeypot, missing)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::fs;
+
+    #[test]
+    fn metabolism_board_reads_job_fixtures() {
+        let root = std::env::temp_dir().join(format!(
+            "gzmo-metab-board-{}-{}",
+            std::process::id(),
+            Utc::now().timestamp_nanos_opt().unwrap_or(0)
+        ));
+        let _ = fs::remove_dir_all(&root);
+        let runs = root.join("scheduler-runs");
+        fs::create_dir_all(&runs).unwrap();
+        let vault = root.join("vault.db");
+
+        let record = JobRunRecord {
+            job: "distill".into(),
+            script: "rust".into(),
+            args: vec![],
+            started: "2026-07-16T00:00:00Z".into(),
+            finished: "2026-07-16T00:01:00Z".into(),
+            ok: true,
+            error: None,
+            runner: Some("rust".into()),
+        };
+        fs::write(
+            runs.join("latest-distill.json"),
+            serde_json::to_string(&record).unwrap(),
+        )
+        .unwrap();
+
+        let mut config = GzmoConfig::default();
+        config.memory.vault_db = vault;
+        assert_eq!(runs_dir(&config), runs);
+
+        let board = collect_metabolism_board(&config);
+        let distill = board.jobs.iter().find(|j| j.job == "distill").unwrap();
+        assert_eq!(distill.status, JobRowStatus::Ok);
+        let promote = board.jobs.iter().find(|j| j.job == "promote").unwrap();
+        assert_eq!(promote.status, JobRowStatus::Missing);
+        assert!(board.newest.is_some());
+
+        let _ = fs::remove_dir_all(&root);
+    }
 }

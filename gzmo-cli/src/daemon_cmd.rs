@@ -158,10 +158,10 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
     }));
 
     let mut dream_tools = ToolRegistry::new();
-    dream_tools.register(Box::new(FileReadTool));
-    dream_tools.register(Box::new(FileWriteTool));
-    dream_tools.register(Box::new(DirListTool));
-    dream_tools.register(Box::new(FileSearchTool));
+    dream_tools.register(Box::new(FileReadTool::default()));
+    dream_tools.register(Box::new(FileWriteTool::default()));
+    dream_tools.register(Box::new(DirListTool::default()));
+    dream_tools.register(Box::new(FileSearchTool::default()));
     dream_tools.register(Box::new(ShellExecTool::default()));
     dream_tools.register(Box::new(WebSearchTool::default()));
     dream_tools.register(Box::new(SysMetricsTool));

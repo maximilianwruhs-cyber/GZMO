@@ -130,6 +130,12 @@ fn is_command_allowed(command: &str) -> bool {
     false
 }
 
+/// Host mutation binaries blocked when `read_only` is set (reviewer profile).
+const READ_ONLY_BLOCKED: &[&str] = &[
+    "rm", "mv", "cp", "truncate", "dd", "chmod", "chown", "mkdir", "touch", "rmdir",
+    "kill", "killall", "pkill", "systemctl", "sudo",
+];
+
 /// Execute a shell command on the host.
 /// Captures stdout + stderr with a timeout to prevent runaway processes.
 pub struct ShellExecTool {
@@ -137,6 +143,8 @@ pub struct ShellExecTool {
     pub timeout: Duration,
     /// Working directory for commands
     pub cwd: Option<String>,
+    /// When true, block filesystem-mutating binaries (reviewer profile).
+    pub read_only: bool,
 }
 
 impl Default for ShellExecTool {
@@ -144,6 +152,7 @@ impl Default for ShellExecTool {
         Self {
             timeout: Duration::from_secs(30),
             cwd: None,
+            read_only: false,
         }
     }
 }
@@ -177,6 +186,12 @@ impl ToolHandler for ShellExecTool {
         // ─── SECURITY ALLOWLIST ───
         let first_token = first_command_token(command);
         let binary_name = command_binary_name(first_token);
+
+        if self.read_only && READ_ONLY_BLOCKED.contains(&binary_name) {
+            return Ok(format!(
+                "ERROR: Command blocked (binary '{binary_name}' not allowed in read_only shell profile)."
+            ));
+        }
 
         if !is_command_allowed(command) {
             tracing::debug!(command = %command, binary = %binary_name, "Blocked: not in allowlist");

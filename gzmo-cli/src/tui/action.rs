@@ -20,6 +20,12 @@ pub enum Action {
     SubmitInput(String),
     /// Toggles the floating Command Palette overlay
     ToggleCommandPalette,
+    /// Absolute open/closed state for the command palette (single source of truth)
+    SetCommandPalette(bool),
+    /// Toggle the keyboard help overlay
+    ToggleHelp,
+    /// Absolute open/closed state for the help overlay
+    SetHelp(bool),
 
     // --- Background Agent Actions ---
     /// New chunk of stream text from the LLM
@@ -36,6 +42,8 @@ pub enum Action {
     LoreEvent(String, String, String), // (category, author, text)
     /// Hardware load telemetry
     Telemetry(f32, f32), // (CPU Usage %, MEM Usage %)
+    /// LLM engine reachability (status label, latency or empty)
+    EngineHealth(String, String),
 
     // --- Trigger Engine Actions ---
     /// Autonomous trigger notification from the chaos engine

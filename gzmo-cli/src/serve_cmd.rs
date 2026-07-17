@@ -1,7 +1,8 @@
 //! `gzmo serve` — thin overnight metabolism runner (ADR-0003).
 //!
-//! Typed Rust jobs only: distill → promote → embed → dream/spark.
-//! No chat loop, no chaos, no wiki/KG/discovery. Writes `scheduler-runs/`.
+//! Core jobs (GREEN gate): distill → promote → embed → dream/spark.
+//! Soft-fail satellite: OKForge wiki push (`[wiki]` cron) — not on GREEN verdict.
+//! No chaos / KG on this path. Writes `scheduler-runs/`.
 
 use std::collections::HashSet;
 use std::io::Write;
@@ -29,6 +30,7 @@ use gzmo_core::tools::shell::ShellExecTool;
 use gzmo_core::tools::sysadmin::{SysKillTool, SysMetricsTool};
 use gzmo_core::tools::web::WebSearchTool;
 use gzmo_core::tools::ToolRegistry;
+use gzmo_core::wiki_okf;
 
 use crate::{distill_cmd, dream_cmd, embed_cmd, promote_cmd, spark_cmd};
 
@@ -119,10 +121,10 @@ async fn spawn_distill_worker(config: &GzmoConfig) -> Result<()> {
     let scratch = Arc::new(ScratchService::from_config(&config.redis, &config.context_memory).await);
 
     let mut tools = ToolRegistry::new();
-    tools.register(Box::new(FileReadTool));
-    tools.register(Box::new(FileWriteTool));
-    tools.register(Box::new(DirListTool));
-    tools.register(Box::new(FileSearchTool));
+    tools.register(Box::new(FileReadTool::default()));
+    tools.register(Box::new(FileWriteTool::default()));
+    tools.register(Box::new(DirListTool::default()));
+    tools.register(Box::new(FileSearchTool::default()));
     tools.register(Box::new(ShellExecTool::default()));
     tools.register(Box::new(WebSearchTool::default()));
     tools.register(Box::new(SysMetricsTool));
@@ -190,11 +192,45 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
     result
 }
 
+async fn run_wiki_push_satellite(config: &GzmoConfig) -> Result<()> {
+    let report = wiki_okf::push_from_vault(
+        &config.wiki,
+        &config.memory.vault_db,
+        "serve-catchup",
+        40,
+        false,
+    )
+    .await?;
+    let meta_path = config
+        .memory
+        .vault_db
+        .parent()
+        .unwrap_or_else(|| std::path::Path::new("."))
+        .join("wiki-push-latest.json");
+    wiki_okf::write_push_report(&meta_path, &report)?;
+    info!(
+        concepts = report.concepts_written,
+        sha = %report.commit_sha,
+        healthy = report.healthy,
+        skipped = %report.skipped_reason,
+        "OKForge wiki satellite push"
+    );
+    if !report.healthy {
+        bail!(
+            "wiki push unhealthy: skipped={} sha={}",
+            report.skipped_reason,
+            report.commit_sha
+        );
+    }
+    Ok(())
+}
+
 async fn run_loop(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
     let mut last_dream: Option<NaiveDate> = None;
     let mut last_distill: Option<NaiveDate> = None;
     let mut last_promote: Option<NaiveDate> = None;
     let mut last_embed: Option<NaiveDate> = None;
+    let mut last_wiki: Option<NaiveDate> = None;
     let mut last_spark: HashSet<(u32, u32, NaiveDate)> = HashSet::new();
 
     let mut interval = tokio::time::interval(Duration::from_secs(60));
@@ -288,6 +324,27 @@ async fn run_loop(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> 
                     last_spark.insert((h, m, today));
                 }
             }
+        }
+
+        // Soft-fail satellite: OKForge wiki feed (not on GREEN metabolism verdict).
+        if config.wiki.enabled
+            && config.wiki.backend == "okforge"
+            && cron_due_today(
+                &now,
+                config.wiki.push_cron_hour,
+                config.wiki.push_cron_minute,
+                last_wiki,
+            )
+        {
+            let ok = run_named_job(config, "wiki", || async {
+                run_wiki_push_satellite(config).await
+            })
+            .await;
+            if !ok {
+                warn!("OKForge wiki satellite failed — metabolism GREEN unaffected");
+            }
+            // Always consume the slot so a flaky forge does not retry every minute.
+            last_wiki = Some(today);
         }
     }
 }

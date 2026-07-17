@@ -15,10 +15,10 @@ pub async fn run(config: &GzmoConfig, _identity: IdentityEngine) -> Result<()> {
     embeddings::assert_vault_backend(&config.memory.vault_backend)?;
 
     let mut tools = ToolRegistry::new();
-    tools.register(Box::new(FileReadTool));
-    tools.register(Box::new(FileWriteTool));
-    tools.register(Box::new(DirListTool));
-    tools.register(Box::new(FileSearchTool));
+    tools.register(Box::new(FileReadTool::default()));
+    tools.register(Box::new(FileWriteTool::default()));
+    tools.register(Box::new(DirListTool::default()));
+    tools.register(Box::new(FileSearchTool::default()));
     tools.register(Box::new(ShellExecTool::default()));
 
     let mcp_connected = if config.active_mcp_servers().any(|s| s.name == "memory") {

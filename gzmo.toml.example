@@ -19,6 +19,21 @@ vault_backend = "sqlite"
 directory = "skills"
 dreams_path = "DREAMS.md"
 
+# Progressive-disclosure engineering workflows (grill/tdd/diagnose/review/handoff)
+[workflow_skills]
+enabled = true
+dir = "skills/workflows"
+model_can_activate = true
+max_active = 2
+handoff_dir = "data-next/handoffs"
+handoff_to_vault = true
+
+# Tool capability profile: read_only | developer | reviewer | operator
+[tools]
+profile = "developer"
+audit = true
+# workspace_roots = ["."]
+
 # autoDream consolidation. The verifier is the front line against hallucinated
 # dreams becoming hallucinated wisdom: every extracted entity/relation is
 # fact-checked against the source log and must be backed by a quotable span

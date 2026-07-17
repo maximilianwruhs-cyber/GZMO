@@ -173,6 +173,48 @@ pub async fn format_ecosystem_status(config: &GzmoConfig) -> String {
         assembly_summary(&config.assembly)
     ));
 
+    // Workflow skills + latest handoff (interactive coding power)
+    out.push_str("### Workflow skills\n\n");
+    if config.workflow_skills.enabled {
+        let wf_dir = &config.workflow_skills.dir;
+        let loaded = crate::workflow_skills::WorkflowSkillIndex::load_from_dir(
+            wf_dir,
+            config.workflow_skills.max_active,
+            config.workflow_skills.model_can_activate,
+            &config.workflow_skills.handoff_dir,
+        )
+        .ok();
+        match loaded {
+            Some(idx) if !idx.is_empty() => {
+                out.push_str(&format!(
+                    "- **Pack:** `{}` — {}\n",
+                    wf_dir.display(),
+                    idx.names().join(", ")
+                ));
+                if let Some(h) = idx.latest_handoff() {
+                    out.push_str(&format!("- **Latest handoff:** `{}`\n", h.display()));
+                } else {
+                    out.push_str(&format!(
+                        "- **Handoff dir:** `{}` (empty)\n",
+                        config.workflow_skills.handoff_dir.display()
+                    ));
+                }
+            }
+            _ => {
+                out.push_str(&format!(
+                    "- **Pack:** `{}` (enabled, no SKILL.md found)\n",
+                    wf_dir.display()
+                ));
+            }
+        }
+    } else {
+        out.push_str("- **Pack:** disabled (`[workflow_skills] enabled = false`)\n");
+    }
+    out.push_str(&format!(
+        "- **Tool profile:** `{}` (audit={})\n\n",
+        config.tools.profile, config.tools.audit
+    ));
+
     out.push_str(&crate::metabolism::format_overnight_metabolism(config));
 
     out.push_str("### User systemd\n\n");
