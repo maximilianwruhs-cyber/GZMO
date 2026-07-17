@@ -42,7 +42,6 @@ resolve_neo4j_password() {
   exit 1
 }
 
-# Assign without NEO4J_PASSWORD="..." so secrets CI grep does not false-positive.
 export NEO4J_PASSWORD
 NEO4J_PASSWORD=$(resolve_neo4j_password)
 export GZMO_ROOT="$ROOT"
