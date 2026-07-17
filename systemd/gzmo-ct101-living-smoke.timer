@@ -1,0 +1,12 @@
+[Unit]
+Description=Hourly CT101 living smoke from workstation
+
+[Timer]
+OnBootSec=10min
+OnUnitActiveSec=1h
+AccuracySec=2min
+Persistent=true
+Unit=gzmo-ct101-living-smoke.service
+
+[Install]
+WantedBy=timers.target

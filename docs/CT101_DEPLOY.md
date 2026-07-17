@@ -50,8 +50,40 @@ ssh ct101 'bash -lc "
 
 ## Product gate
 
-From workstation:
+From workstation (SSH):
 
 ```bash
 bash scripts/ct101-living-smoke.sh
+```
+
+On CT101 (local, no SSH):
+
+```bash
+bash /opt/gzmo/current/scripts/ct101-living-smoke-local.sh
+```
+
+### Hourly timers
+
+**On CT101** (preferred living gate):
+
+```bash
+sudo cp /opt/gzmo/current/systemd/ct101-living-smoke.{service,timer} /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now ct101-living-smoke.timer
+systemctl list-timers ct101-living-smoke.timer
+```
+
+**On workstation** (operator mirror):
+
+```bash
+mkdir -p ~/.config/systemd/user
+cp systemd/gzmo-ct101-living-smoke.{service,timer} ~/.config/systemd/user/
+systemctl --user daemon-reload
+systemctl --user enable --now gzmo-ct101-living-smoke.timer
+```
+
+### Embed backfill (drift)
+
+```bash
+ssh ct101 'bash /opt/gzmo/current/scripts/ct101-embed-backfill-loop.sh'
 ```

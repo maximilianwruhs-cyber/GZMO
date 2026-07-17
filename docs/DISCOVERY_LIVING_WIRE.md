@@ -156,8 +156,8 @@ Discovery preflight now **requires** a living socket `ping` (not merely “daemo
 
 **Still open for a clean baseline (priority order)**
 
-1. **Honeypot↔Qdrant drift** — improved 2026-07-17 to **~81%** (`qdrant≈30.6k` / `honeypot≈38k`) via vault→honeypot embedding mirror + sync (was WARN 65%). Remaining ~7–8k latest honeypot rows need **new** embeds (`gzmo memory embed` batches + sync). Backfill now also mirrors into honeypot by id.
-2. **Cron/CI gate** — run `ct101-living-smoke.sh` + one probe-first cycle on a schedule.
+1. **Honeypot↔Qdrant drift** — closing via `scripts/ct101-embed-backfill-loop.sh` (mirror + sync). Target ≥70% (warn clear); prefer ≥90%.
+2. *(done)* **Hourly smoke timers** — CT101 `ct101-living-smoke.timer` + workstation `gzmo-ct101-living-smoke.timer`.
 
 **Closed this pass**
 
