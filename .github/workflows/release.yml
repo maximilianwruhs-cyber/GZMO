@@ -1,0 +1,58 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  linux-gnu:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Build release binary
+        run: cargo build --release -p gzmo-cli
+
+      - name: Package
+        run: |
+          STAGE=gzmo-x86_64-unknown-linux-gnu
+          mkdir -p dist/"$STAGE"
+          cp target/release/gzmo dist/"$STAGE"/gzmo
+          chmod +x dist/"$STAGE"/gzmo
+          tar -C dist -czf "dist/${STAGE}.tar.gz" "$STAGE"
+          (cd dist && sha256sum "${STAGE}.tar.gz" > "${STAGE}.tar.gz.sha256")
+          ./dist/"$STAGE"/gzmo --help >/dev/null 2>&1 || true
+          ./dist/"$STAGE"/gzmo init --help
+
+      - name: Upload release assets
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/gzmo-x86_64-unknown-linux-gnu.tar.gz
+            dist/gzmo-x86_64-unknown-linux-gnu.tar.gz.sha256
+          generate_release_notes: true
+          body: |
+            ## GZMO memory MCP
+
+            Local curated memory for Cursor / Pi.
+
+            ```bash
+            curl -fsSL https://raw.githubusercontent.com/maximilianwruhs-cyber/GZMO/main/scripts/install-gzmo.sh | bash
+            ```
+
+            Or: download `gzmo-x86_64-unknown-linux-gnu.tar.gz`, put `gzmo` on your PATH, run `gzmo init`, then `./scripts/install-product-mcp.sh`.
+
+            Verify with `gzmo_memory_status` + `gzmo_memory_search`.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
