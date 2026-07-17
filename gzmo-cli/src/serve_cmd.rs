@@ -279,7 +279,7 @@ async fn run_loop(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> 
             last_promote,
         ) {
             if run_named_job(config, "promote", || async {
-                promote_cmd::run(config, identity, None).await
+                promote_cmd::run(config, None).await
             })
             .await
             {
@@ -295,7 +295,7 @@ async fn run_loop(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> 
         ) {
             let root = project_root();
             if run_named_job(config, "embed", || async {
-                embed_cmd::run(config, identity, None).await?;
+                embed_cmd::run(config, None).await?;
                 if config.qdrant.enabled && config.qdrant.sync_enabled {
                     qdrant_sync::sync_vault_to_qdrant(
                         &root,

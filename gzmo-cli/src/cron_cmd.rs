@@ -279,8 +279,8 @@ async fn cmd_run(config: &GzmoConfig, identity: &IdentityEngine, id: &str) -> Re
     match id {
         "dream" => dream_cmd::run(config, identity, None).await?,
         "distill" => distill_cmd::run(config, identity, None).await?,
-        "promote" => promote_cmd::run(config, identity, None).await?,
-        "embed" => embed_cmd::run(config, identity, None).await?,
+        "promote" => promote_cmd::run(config, None).await?,
+        "embed" => embed_cmd::run(config, None).await?,
         "spark" => spark_cmd::run(config, identity, None).await?,
         "wiki_push" => {
             // Soft satellite — reuse serve helper via wiki push CLI if present
