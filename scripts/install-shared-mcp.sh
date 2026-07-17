@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Align Cursor, global MCP, and Pi with GZMO shared MCP servers (Neo4j + gzmo-memory on CT101).
+# Operator path: Neo4j + living gzmo-memory (LAN topology).
+# Outsiders / laptop product MCP: use scripts/install-product-mcp.sh instead.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"

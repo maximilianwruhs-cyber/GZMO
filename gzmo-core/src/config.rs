@@ -2847,11 +2847,10 @@ impl GzmoConfig {
         Ok(config)
     }
 
-    /// Load living instance config.
+    /// Load config.
     ///
-    /// Order: `GZMO_CONFIG` → `config/gzmo.toml` → `config/gzmo-next.toml` →
-    /// cwd/`gzmo.toml` → exe-dir variants. Root `gzmo.toml` remains the CT101
-    /// frozen reference (ADR-0003).
+    /// Order: `GZMO_CONFIG` → `~/.gzmo/gzmo.toml` (product) → `config/gzmo.toml` →
+    /// `config/gzmo-next.toml` → cwd/`gzmo.toml` → exe-dir variants.
     pub fn load_auto() -> Result<Self> {
         let path = if let Ok(p) = std::env::var("GZMO_CONFIG") {
             PathBuf::from(p)
@@ -2859,14 +2858,20 @@ impl GzmoConfig {
             let cwd = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
             let mut exe = std::env::current_exe().unwrap_or_else(|_| PathBuf::from("."));
             exe.pop();
-            let candidates = [
+            let product = std::env::var_os("HOME")
+                .map(|h| PathBuf::from(h).join(".gzmo").join("gzmo.toml"));
+            let mut candidates: Vec<PathBuf> = Vec::new();
+            if let Some(p) = product {
+                candidates.push(p);
+            }
+            candidates.extend([
                 cwd.join("config/gzmo.toml"),
                 cwd.join("config/gzmo-next.toml"),
                 exe.join("config/gzmo.toml"),
                 exe.join("config/gzmo-next.toml"),
                 cwd.join("gzmo.toml"),
                 exe.join("gzmo.toml"),
-            ];
+            ]);
             candidates
                 .into_iter()
                 .find(|p| p.exists())

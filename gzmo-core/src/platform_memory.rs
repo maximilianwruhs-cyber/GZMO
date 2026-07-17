@@ -1,5 +1,6 @@
 //! Frontend-facing memory API (`gzmo_memory_*`) — same hot/cold path as [`AgentSession`].
 
+use std::path::Path;
 use std::sync::Arc;
 
 use anyhow::{anyhow, Result};
@@ -61,8 +62,29 @@ pub struct MemoryStatusReport {
     pub scratch_has_recall: bool,
 }
 
-/// Living CT101 vault floor. Lab/empty vaults must set `GZMO_ALLOW_LAB_VAULT=1`.
+/// Living vault floor. Lab/product/empty vaults use `GZMO_ALLOW_LAB_VAULT`,
+/// `GZMO_PRODUCT`, or a path under `~/.gzmo/`.
 pub const LIVING_VAULT_MIN_FACTS: usize = 10_000;
+
+fn env_flag_true(name: &str) -> bool {
+    std::env::var(name)
+        .map(|v| v == "1" || v.eq_ignore_ascii_case("true"))
+        .unwrap_or(false)
+}
+
+/// Product (`gzmo init` → ~/.gzmo) and explicit lab flags may attach small vaults.
+fn allow_lab_or_product_vault(vault_path: &Path) -> bool {
+    if env_flag_true("GZMO_ALLOW_LAB_VAULT") || env_flag_true("GZMO_PRODUCT") {
+        return true;
+    }
+    if let Some(home) = std::env::var_os("HOME") {
+        let product_root = Path::new(&home).join(".gzmo");
+        if vault_path.starts_with(&product_root) {
+            return true;
+        }
+    }
+    false
+}
 
 impl PlatformMemory {
     /// Bind an already-open vault and session (e.g. legacy `gzmo chat` harness).
@@ -97,14 +119,12 @@ impl PlatformMemory {
         .await?;
 
         let facts = vault.count().unwrap_or(0);
-        let allow_lab = std::env::var("GZMO_ALLOW_LAB_VAULT")
-            .map(|v| v == "1" || v.eq_ignore_ascii_case("true"))
-            .unwrap_or(false);
+        let allow_lab = allow_lab_or_product_vault(&config.memory.vault_db);
         if facts < LIVING_VAULT_MIN_FACTS && !allow_lab {
             anyhow::bail!(
                 "refusing vault attach: {} has only {facts} facts (need ≥{LIVING_VAULT_MIN_FACTS} \
-                 for living CT101). Point GZMO_CONFIG at /opt/gzmo/gzmo.toml on CT101, or set \
-                 GZMO_ALLOW_LAB_VAULT=1 for lab/dev.",
+                 for living instance). Point GZMO_CONFIG at the living vault, set \
+                 GZMO_ALLOW_LAB_VAULT=1 / GZMO_PRODUCT=1, or run `gzmo init` (~/.gzmo).",
                 config.memory.vault_db.display()
             );
         }

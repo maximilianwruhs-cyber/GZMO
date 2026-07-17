@@ -163,7 +163,7 @@ impl GzmoMemoryMcpServer {
         }
     }
 
-    #[tool(description = "Report vault path, fact counts, session id, and scratch backend — use to verify living CT101 attach.")]
+    #[tool(description = "Report vault path, fact counts, session id, and scratch backend — use to verify MCP vault attach.")]
     async fn gzmo_memory_status(&self) -> Result<CallToolResult, McpError> {
         match self.platform.status().await {
             Ok(st) => match serde_json::to_string_pretty(&st) {
@@ -251,8 +251,11 @@ impl GzmoMemoryMcpServer {
         }
     }
 
-    #[tool(description = "Living-instance health probes (LLM, Qdrant, honeypot drift, Redis, Neo4j). Read-only ops gate.")]
+    #[tool(description = "Operator health probes (LLM, Qdrant, honeypot drift, Redis, Neo4j). Requires GZMO_OPS_MCP=1.")]
     async fn gzmo_ops_health(&self) -> Result<CallToolResult, McpError> {
+        if let Some(deny) = ops_mcp_denied() {
+            return Ok(CallToolResult::error(vec![Content::text(deny)]));
+        }
         let results = collect_health_probes(self.config.as_ref(), None).await;
         let report = format_report(&results);
         let failed: Vec<&str> = results
@@ -270,8 +273,11 @@ impl GzmoMemoryMcpServer {
         }
     }
 
-    #[tool(description = "Pi mentor discovery session status (state.json + last cycle metrics: bash_calls, publish). Read-only.")]
+    #[tool(description = "Operator discovery session status. Requires GZMO_OPS_MCP=1.")]
     async fn gzmo_discovery_status(&self) -> Result<CallToolResult, McpError> {
+        if let Some(deny) = ops_mcp_denied() {
+            return Ok(CallToolResult::error(vec![Content::text(deny)]));
+        }
         let dir = discovery_data_dir();
         let status = read_discovery_status_json(&dir);
         match serde_json::to_string_pretty(&status) {
@@ -281,14 +287,34 @@ impl GzmoMemoryMcpServer {
     }
 }
 
+fn ops_mcp_enabled() -> bool {
+    std::env::var("GZMO_OPS_MCP")
+        .map(|v| v == "1" || v.eq_ignore_ascii_case("true"))
+        .unwrap_or(false)
+}
+
+fn ops_mcp_denied() -> Option<String> {
+    if ops_mcp_enabled() {
+        None
+    } else {
+        Some(
+            "ops/discovery MCP tools are gated. Set GZMO_OPS_MCP=1 for operator use, \
+             or use gzmo_memory_* product tools only."
+                .to_string(),
+        )
+    }
+}
+
 #[tool_handler]
 impl ServerHandler for GzmoMemoryMcpServer {
     fn get_info(&self) -> ServerInfo {
+        let instructions = if ops_mcp_enabled() {
+            "GZMO MCP — memory tools plus ops/discovery (GZMO_OPS_MCP=1). Prefer gzmo_memory_status then search/recall."
+        } else {
+            "GZMO product memory MCP — gzmo_memory_status, search, recall, chain, profile. Ops/discovery tools require GZMO_OPS_MCP=1."
+        };
         ServerInfo {
-            instructions: Some(
-                "GZMO living stack MCP — memory (turn_start/search/recall), gzmo_ops_health, gzmo_discovery_status. Verify vault_facts ~60k and discovery bash_calls > 0."
-                    .into(),
-            ),
+            instructions: Some(instructions.into()),
             capabilities: ServerCapabilities::builder().enable_tools().build(),
             ..Default::default()
         }
