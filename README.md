@@ -14,6 +14,15 @@ curl -fsSL https://raw.githubusercontent.com/maximilianwruhs-cyber/GZMO/main/scr
 
 That downloads the [latest release](https://github.com/maximilianwruhs-cyber/GZMO/releases/latest), writes `~/.gzmo/` (SQLite-only, no LAN), and wires `gzmo-memory` into Cursor / Pi.
 
+### Pi (official package)
+
+```bash
+pi install npm:gzmo-pi   # or: pi install git:github.com/maximilianwruhs-cyber/gzmo-pi
+```
+
+In Pi: `/gzmo setup` → `/reload` → `gzmo_memory_status`.  
+Package: [gzmo-pi](https://github.com/maximilianwruhs-cyber/gzmo-pi) (extension + MCP via `pi-mcp-adapter`). Living stack (Redis / Neo4j / Qdrant) is documented there and in operator docs — not required for the laptop install.
+
 Then in your agent call:
 
 1. `gzmo_memory_status` — vault path + fact counts  

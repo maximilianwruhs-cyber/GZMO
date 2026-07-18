@@ -4,6 +4,21 @@ Install a **sovereign, curated long-term memory** for coding agents — honeypot
 
 ## 5-minute install
 
+### 0. Pi users (recommended)
+
+Install the Pi package ([gzmo-pi](https://github.com/maximilianwruhs-cyber/gzmo-pi)) which bundles `pi-mcp-adapter` and wires product MCP:
+
+```bash
+# Binary + ~/.gzmo (if not already)
+curl -fsSL https://raw.githubusercontent.com/maximilianwruhs-cyber/GZMO/main/scripts/install-gzmo.sh | bash
+
+pi install npm:gzmo-pi
+# until published: pi install git:github.com/maximilianwruhs-cyber/gzmo-pi
+```
+
+In Pi: `/gzmo setup` → `/reload` → `gzmo_memory_status`.  
+For Redis / Neo4j / Qdrant living topology see [gzmo-pi README — Living stack](https://github.com/maximilianwruhs-cyber/gzmo-pi#living-stack-redis--neo4j--qdrant) and operator docs in this repo.
+
 ### 1. Install binary + init + MCP
 
 ```bash
@@ -102,11 +117,15 @@ Still no LAN topology required.
 - SEIP / Foundry-class ingestion platforms (separate research)
 - Competing with Mem0 cloud “connect in minutes” — if you need that, use Mem0 MCP
 
-## Advanced (Phase 2 — deferred)
+## Advanced / living stack (optional)
 
-Documented only; not required for MCP attach:
+Not required for product MCP attach. Operator hosts that want the full topology:
 
-- `docker compose` for Redis + Qdrant when you want vector recall sidecars
-- `gzmo serve` / daemon overnight metabolism as an **optional** advanced path
+| Service | Role |
+|---------|------|
+| SQLite | Vault + FTS (always) |
+| Redis | Hot session / cache |
+| Neo4j | Graph memory MCP (`scripts/install-shared-mcp.sh`) |
+| Qdrant | Vectors when embeddings are enabled |
 
-See operator docs under `docs/` for the private living stack. Those paths are not the outsider install funnel.
+See [gzmo-pi Living stack](https://github.com/maximilianwruhs-cyber/gzmo-pi#living-stack-redis--neo4j--qdrant), `docs/CT101_DEPLOY.md`, and `docs/PI_GZMO_MEMORY_INTEGRATION.md`. Laptop product install stays SQLite-only.
