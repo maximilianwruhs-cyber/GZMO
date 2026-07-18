@@ -32,6 +32,7 @@ run concept-gate bash scripts/concept-review-gate.sh
 run serendipity bash scripts/serendipity-digest.sh
 run hsp-sonify bash scripts/hsp-metabolism-sonify.sh
 run euro-night bash scripts/euro-night-aggregate.sh
+run price-window bash scripts/price-window-suggest.sh
 run scoreboard bash scripts/nightburst-scoreboard.sh
 run aos-feed bash scripts/aos-status-feed.sh
 
@@ -43,5 +44,6 @@ echo "Concept gate: $ROOT/data-next/concept-gate/latest.md"
 echo "Serendipity: $ROOT/data-next/serendipity/latest.md"
 echo "HSP motif: $ROOT/data-next/hsp-metabolism/latest.md"
 echo "€/night: $ROOT/data-next/arena/euro-night.json"
+echo "Price window: $ROOT/data-next/price-window/latest.md"
 echo "AOS feed: $ROOT/data-next/aos-status/latest.json"
 exit "$fail"

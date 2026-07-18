@@ -112,13 +112,13 @@ Publish last-night cost: Awattar price × RAPL joules × job durations.
 - **Why special:** European energy reality as a first-class agent metric.
 - **Ship shape:** Each Arena run archives to `data-next/arena/history/`; aggregate → `euro-night.json` (Arena € sum + metabolism duration×W estimate); scoreboard pills show €/night.
 
-#### Price-aware overnight shift — `later` · differentiated · research
+#### Price-aware overnight shift — `later` · differentiated · spike (suggest)
 
 Slide distill/dream windows into cheapest Awattar hours when backlog allows.
 
-- **Builds on:** Obolus · dice/adaptive-tempo · serve cron
+- **Builds on:** `scripts/price-window-suggest.sh` · Awattar AT · serve nominal UTC anchors
 - **Why special:** Agents that respect the grid — rare and storyable.
-- **Ship shape:** Soft window ±2h around configured cron; metabolism still wins.
+- **Ship shape:** Sibling suggestion under `data-next/price-window/` (±2h around distill/dream); never auto-mutates cron.
 
 #### Intelligence-per-Watt router — `later` · singular · research
 
@@ -356,7 +356,7 @@ Those become interesting only after Arena + felt recall make the stack demable t
 | s1 | herdr + metabolism | near | singular | spike (plugin) |
 | s2 | HSP metabolism sonification | near | singular | spike (motif) |
 | r4 | Faithfulness CI | near | differentiated | exists |
-| e3 | Price-aware overnight shift | later | differentiated | research |
+| e3 | Price-aware overnight shift | later | differentiated | spike (suggest) |
 | e4 | Intelligence-per-Watt router | later | singular | research |
 | e5 | Obolus Forge mutations | later | differentiated | spike |
 | f2 | OKCP memory marketplace | later | singular | product |
