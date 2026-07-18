@@ -89,25 +89,33 @@ raise SystemExit(1)
 '
   )" || return 1
 
-  local tmp dl
+  local tmp dl found
   tmp="$(mktemp -d)"
-  trap 'rm -rf "$tmp"' RETURN
-
+  # Explicit cleanup — RETURN traps + set -u re-fire after main() and trip on unset tmp.
   dl="$browser_url"
   if [[ -n "${GH_TOKEN:-${GITHUB_TOKEN:-}}" && -n "$api_url" ]]; then
     dl="$api_url"
   fi
-  [[ -n "$dl" ]] || return 1
+  if [[ -z "$dl" ]]; then
+    rm -rf "$tmp"
+    return 1
+  fi
 
   log "${BOLD}Downloading${RESET} ${name} (${tag:-$VERSION})..."
-  download_asset "$dl" "${tmp}/asset" || return 1
+  if ! download_asset "$dl" "${tmp}/asset"; then
+    rm -rf "$tmp"
+    return 1
+  fi
 
   mkdir -p "$INSTALL_DIR"
   tar -xzf "${tmp}/asset" -C "$tmp"
-  local found
   found="$(find "$tmp" -type f -name gzmo | head -1)"
-  [[ -n "$found" ]] || return 1
+  if [[ -z "$found" ]]; then
+    rm -rf "$tmp"
+    return 1
+  fi
   install -m 755 "$found" "${INSTALL_DIR}/gzmo"
+  rm -rf "$tmp"
   ok "Installed ${INSTALL_DIR}/gzmo"
   return 0
 }
