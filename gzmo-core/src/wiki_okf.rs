@@ -284,7 +284,77 @@ pub fn write_push_report(path: &Path, report: &WikiPushReport) -> Result<()> {
     Ok(())
 }
 
+/// Path to nightburst concept-gate artifact next to the vault DB.
+pub fn concept_gate_path(vault_db: &Path) -> std::path::PathBuf {
+    vault_db
+        .parent()
+        .unwrap_or_else(|| Path::new("."))
+        .join("concept-gate")
+        .join("latest.json")
+}
+
+/// Whether concept-gate soft hold is enabled (`GZMO_CONCEPT_GATE`, default on).
+pub fn concept_gate_enforced() -> bool {
+    match std::env::var("GZMO_CONCEPT_GATE") {
+        Ok(v) => {
+            let t = v.trim().to_ascii_lowercase();
+            !(t.is_empty() || t == "0" || t == "false" || t == "off" || t == "no")
+        }
+        Err(_) => true,
+    }
+}
+
+/// If the latest concept-gate verdict is HOLD, return a short reason.
+/// Missing gate file → no hold (gate is advisory until first nightburst run).
+pub fn concept_gate_hold_reason(vault_db: &Path) -> Option<String> {
+    if !concept_gate_enforced() {
+        return None;
+    }
+    let path = concept_gate_path(vault_db);
+    let raw = std::fs::read_to_string(&path).ok()?;
+    let v: serde_json::Value = serde_json::from_str(&raw).ok()?;
+    let verdict = v.get("verdict")?.as_str()?;
+    if !verdict.eq_ignore_ascii_case("HOLD") {
+        return None;
+    }
+    let hold = v.get("hold").and_then(|x| x.as_u64()).unwrap_or(0);
+    let checked = v.get("checked").and_then(|x| x.as_u64()).unwrap_or(0);
+    Some(format!(
+        "concept-gate HOLD ({hold}/{checked} concepts lack vault evidence); see {}",
+        path.display()
+    ))
+}
+
 #[allow(dead_code)]
 pub fn okforge_cfg(wiki: &WikiConfig) -> Option<&WikiOkforgeConfig> {
     wiki.okforge.as_ref()
+}
+
+#[cfg(test)]
+mod concept_gate_tests {
+    use super::*;
+    use std::io::Write;
+
+    #[test]
+    fn hold_reason_reads_verdict() {
+        let dir = std::env::temp_dir().join(format!(
+            "gzmo-concept-gate-test-{}",
+            std::process::id()
+        ));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).unwrap();
+        let vault = dir.join("vault.db");
+        std::fs::write(&vault, b"").unwrap();
+        let gate_dir = dir.join("concept-gate");
+        std::fs::create_dir_all(&gate_dir).unwrap();
+        let mut f = std::fs::File::create(gate_dir.join("latest.json")).unwrap();
+        write!(f, r#"{{"verdict":"HOLD","hold":2,"checked":3}}"#).unwrap();
+        std::env::set_var("GZMO_CONCEPT_GATE", "1");
+        let reason = concept_gate_hold_reason(&vault).expect("hold");
+        assert!(reason.contains("HOLD"));
+        std::env::set_var("GZMO_CONCEPT_GATE", "0");
+        assert!(concept_gate_hold_reason(&vault).is_none());
+        std::env::remove_var("GZMO_CONCEPT_GATE");
+        let _ = std::fs::remove_dir_all(&dir);
+    }
 }

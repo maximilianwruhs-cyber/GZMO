@@ -193,6 +193,32 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
 }
 
 async fn run_wiki_push_satellite(config: &GzmoConfig) -> Result<()> {
+    let meta_path = config
+        .memory
+        .vault_db
+        .parent()
+        .unwrap_or_else(|| std::path::Path::new("."))
+        .join("wiki-push-latest.json");
+
+    // Soft hold: concept-gate HOLD skips OKForge push (does not trip GREEN).
+    if let Some(reason) = wiki_okf::concept_gate_hold_reason(&config.memory.vault_db) {
+        let report = wiki_okf::WikiPushReport {
+            mode: "gated".into(),
+            origin: "serve-catchup".into(),
+            concepts_written: 0,
+            commit_sha: String::new(),
+            branch: String::new(),
+            skipped_reason: reason.clone(),
+            paths: vec![],
+            healthy: true, // soft-fail satellite — hold is intentional, not unhealthy
+            timestamp: chrono::Utc::now().to_rfc3339(),
+            error: String::new(),
+        };
+        wiki_okf::write_push_report(&meta_path, &report)?;
+        warn!(%reason, "OKForge wiki satellite held by concept-gate");
+        return Ok(());
+    }
+
     let report = wiki_okf::push_from_vault(
         &config.wiki,
         &config.memory.vault_db,
@@ -201,12 +227,6 @@ async fn run_wiki_push_satellite(config: &GzmoConfig) -> Result<()> {
         false,
     )
     .await?;
-    let meta_path = config
-        .memory
-        .vault_db
-        .parent()
-        .unwrap_or_else(|| std::path::Path::new("."))
-        .join("wiki-push-latest.json");
     wiki_okf::write_push_report(&meta_path, &report)?;
     info!(
         concepts = report.concepts_written,

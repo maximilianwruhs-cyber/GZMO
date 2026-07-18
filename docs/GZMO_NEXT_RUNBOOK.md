@@ -196,6 +196,7 @@ bash scripts/serendipity-digest.sh      # spark → data-next/serendipity/digest
 bash scripts/faithfulness-ci.sh         # claims vs vault (FAITHFULNESS_MODE=fixture for offline)
 bash scripts/organ-trace.sh             # living tool zoo from scheduler-runs
 bash scripts/concept-review-gate.sh     # HOLD wiki concepts lacking vault evidence
+bash scripts/wiki-push-gated.sh […]     # gate then `gzmo wiki push --require-gate`
 bash scripts/nightburst-bundle.sh       # organ + faithfulness + concept-gate + digest + scoreboard
 bash scripts/nightburst-scoreboard.sh   # refresh local scoreboard HTML
 bash scripts/herdr-metabolism-link.sh   # link herdr plugin gzmo.metabolism (MCP + close ritual)

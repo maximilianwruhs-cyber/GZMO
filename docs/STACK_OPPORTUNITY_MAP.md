@@ -146,13 +146,13 @@ Productize OKForge + nightly concept push as “agent-writable Wikipedia for one
 - **Why special:** Git forge + agent REST + observatory is a rare bundle.
 - **Ship shape:** Compose install + sample OKCP client + one demo repo.
 
-#### Concept PR review bot — `near` · differentiated · spike
+#### Concept PR review bot — `near` · differentiated · spike (gated push)
 
 Inbound OKCP writes open PRs; honeypot-gate + wiki-lint decide merge vs hold.
 
-- **Builds on:** wiki-push-latest.json · vault search · concept-review-gate
+- **Builds on:** concept-review-gate · `wiki-push-gated.sh` · serve satellite soft-hold
 - **Why special:** Knowledge CI — missing from most agent wikis.
-- **Ship shape:** `scripts/concept-review-gate.sh` → PASS/HOLD on recent concept paths vs vault; OKForge webhook merge later.
+- **Ship shape:** Gate PASS/HOLD vs vault; `gzmo serve` skips OKForge push on HOLD (`GZMO_CONCEPT_GATE=0` bypass); `bash scripts/wiki-push-gated.sh` for operator path. OKForge webhook merge later.
 
 #### Observatory as public mind — `near` · differentiated · spike (enriched)
 
@@ -348,7 +348,7 @@ Those become interesting only after Arena + felt recall make the stack demable t
 | e1 | Obolus Arena | near | singular | spike (nightburst done) |
 | e2 | €/night dashboard | near | differentiated | spike (aggregate) |
 | f1 | Living wiki appliance | near | singular | exists |
-| f3 | Concept PR review bot | near | differentiated | spike (local gate) |
+| f3 | Concept PR review bot | near | differentiated | spike (gated push) |
 | f4 | Observatory as public mind | near | differentiated | spike (enriched) |
 | o1 | Living tool zoo | near | singular | spike (organ-trace) |
 | o3 | Calibration pack | near | differentiated | exists |

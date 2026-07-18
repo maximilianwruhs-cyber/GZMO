@@ -113,6 +113,17 @@ euro_pub = {
     "arena_runs": euro_raw.get("arena_runs"),
 }
 
+pw_raw = load_json(data / "price-window" / "latest.json") or {}
+pw_sug = pw_raw.get("suggestions") or {}
+price_pub = {
+    "live": pw_raw.get("live"),
+    "cheapest_24h_c_kwh": (pw_raw.get("cheapest_24h") or {}).get("c_kwh"),
+    "distill_suggest": (pw_sug.get("distill") or {}).get("suggested_start_utc"),
+    "dream_suggest": (pw_sug.get("dream") or {}).get("suggested_start_utc"),
+    "distill_shift_h": (pw_sug.get("distill") or {}).get("shift_hours"),
+    "dream_shift_h": (pw_sug.get("dream") or {}).get("shift_hours"),
+}
+
 board = {
     "schema": "gzmo.nightburst.scoreboard/v1",
     "generated_at": datetime.now(timezone.utc).isoformat(),
@@ -125,6 +136,7 @@ board = {
     "concept_gate": gate_pub,
     "hsp": hsp_pub,
     "euro_night": euro_pub,
+    "price_window": price_pub,
     "links": {
         "okforge_observatory": "http://127.0.0.1:3000/observatory",
         "scoreboard_html": str(out_dir / "scoreboard.html"),
@@ -173,6 +185,7 @@ html = f"""<!DOCTYPE html>
     <span class="pill">€/night={euro_night if euro_night is not None else "—"}</span>
     <span class="pill">gate {gate_v}</span>
     <span class="pill">hsp events={hsp_n if hsp_n is not None else "—"}</span>
+    <span class="pill">price {"live" if price_pub.get("live") else "—"} cheap={price_pub.get("cheapest_24h_c_kwh")}</span>
   </p>
   <h2>Metabolism</h2>
   <table>
@@ -193,6 +206,8 @@ html = f"""<!DOCTYPE html>
   <p>ok={faith_pub.get("ok")} · {faith_pub.get("supported")}/{faith_pub.get("total")} ({faith_pub.get("mode")})</p>
   <h2>HSP motif</h2>
   <p>events={hsp_n} · ts={hsp_pub.get("ts") or "—"}</p>
+  <h2>Price window</h2>
+  <p>live={price_pub.get("live")} · cheapest_24h={price_pub.get("cheapest_24h_c_kwh")} ¢/kWh · distill→{price_pub.get("distill_suggest")} (Δ{price_pub.get("distill_shift_h")}h) · dream→{price_pub.get("dream_suggest")} (Δ{price_pub.get("dream_shift_h")}h)</p>
   <p><a href="http://127.0.0.1:3000/observatory">OKForge Observatory</a> · AOS feed: <code>data-next/aos-status/latest.json</code></p>
 </body>
 </html>

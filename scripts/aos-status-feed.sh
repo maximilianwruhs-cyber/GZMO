@@ -41,9 +41,12 @@ faith = load(data / "faithfulness" / "latest.json") or {}
 gate = load(data / "concept-gate" / "latest.json") or {}
 hsp = load(data / "hsp-metabolism" / "latest.json") or {}
 board = load(data / "arena" / "scoreboard.json") or {}
+pw = load(data / "price-window" / "latest.json") or {}
+pw_sug = pw.get("suggestions") or {}
 
 stale = bool(wd.get("stale"))
 status = "error" if stale else "online"
+cheap = (pw.get("cheapest_24h") or {}).get("c_kwh")
 
 # AOS TelemetryPayload-compatible core + GZMO extensions under `gzmo`.
 payload = {
@@ -54,12 +57,13 @@ payload = {
     "energy_avg": arena.get("watts_avg") or arena.get("joules"),
     "z_score": arena.get("z"),
     "quality": arena.get("quality"),
-    "price_ct_kwh": arena.get("electricity_c_kwh"),
+    "price_ct_kwh": arena.get("electricity_c_kwh") or cheap,
     "message": (
         f"€/night={euro.get('euro_night_total')} · "
         f"watchdog={'STALE' if stale else 'fresh'} · "
         f"faith={faith.get('supported')}/{faith.get('total')} · "
-        f"gate={gate.get('verdict')}"
+        f"gate={gate.get('verdict')} · "
+        f"cheap_24h={cheap}"
     ),
     "gzmo": {
         "schema": "gzmo.aos.status/v1",
@@ -70,6 +74,10 @@ payload = {
         "concept_gate": gate.get("verdict"),
         "faithfulness_ok": faith.get("ok"),
         "hsp_events": len(hsp.get("events") or []),
+        "price_window_live": pw.get("live"),
+        "cheapest_24h_c_kwh": cheap,
+        "distill_suggest_utc": (pw_sug.get("distill") or {}).get("suggested_start_utc"),
+        "dream_suggest_utc": (pw_sug.get("dream") or {}).get("suggested_start_utc"),
         "scoreboard_html": str(data / "arena" / "scoreboard.html"),
         "scoreboard_generated": board.get("generated_at"),
     },

@@ -6,8 +6,9 @@
 //!   gzmo wiki search <query> [--limit N]
 //!   gzmo wiki file-back <title>    (body read from stdin)
 //!   gzmo wiki status               config + page counts
-//!   gzmo wiki push [--origin NAME] [--limit N] [--dry-run] [--meta PATH]
+//!   gzmo wiki push [--origin NAME] [--limit N] [--dry-run] [--meta PATH] [--require-gate]
 //!                                  push vault facts to OKForge via OKCP
+//!                                  (`--require-gate` / GZMO_CONCEPT_GATE: HOLD soft-blocks push)
 
 use anyhow::Result;
 use std::path::PathBuf;
@@ -111,6 +112,7 @@ async fn push(config: &GzmoConfig, args: &[String]) -> Result<()> {
     let mut limit = 40usize;
     let mut dry_run = false;
     let mut meta: Option<PathBuf> = None;
+    let mut require_gate = false;
     let mut i = 0;
     while i < args.len() {
         match args[i].as_str() {
@@ -140,10 +142,45 @@ async fn push(config: &GzmoConfig, args: &[String]) -> Result<()> {
                     i += 1;
                 }
             }
+            "--require-gate" => {
+                require_gate = true;
+                i += 1;
+            }
             other => {
                 eprintln!("Unknown wiki push flag: {other}");
                 i += 1;
             }
+        }
+    }
+
+    // Hard hold only with --require-gate (serve satellite soft-holds via GZMO_CONCEPT_GATE).
+    if require_gate {
+        if let Some(reason) = wiki_okf::concept_gate_hold_reason(&config.memory.vault_db) {
+            let meta_path = meta.clone().unwrap_or_else(|| {
+                config
+                    .memory
+                    .vault_db
+                    .parent()
+                    .unwrap_or_else(|| std::path::Path::new("."))
+                    .join("wiki-push-latest.json")
+            });
+            let report = wiki_okf::WikiPushReport {
+                mode: "gated".into(),
+                origin: origin.clone(),
+                concepts_written: 0,
+                commit_sha: String::new(),
+                branch: String::new(),
+                skipped_reason: reason.clone(),
+                paths: vec![],
+                healthy: true,
+                timestamp: chrono::Utc::now().to_rfc3339(),
+                error: String::new(),
+            };
+            wiki_okf::write_push_report(&meta_path, &report)?;
+            eprintln!("wiki push held: {reason}");
+            eprintln!("meta: {}", meta_path.display());
+            eprintln!("Bypass: GZMO_CONCEPT_GATE=0 bash scripts/wiki-push-gated.sh …");
+            anyhow::bail!("concept-gate HOLD — wiki push skipped");
         }
     }
 
