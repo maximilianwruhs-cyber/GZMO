@@ -29,6 +29,7 @@ trap cleanup EXIT
 echo "[*] Binary: $BIN"
 echo "[*] Init → $VERIFY_DIR"
 "$BIN" init --force --dir "$VERIFY_DIR" --bin "$BIN" >/dev/null 2>&1
+echo "[OK] product appliance: init → ~/.gzmo-style dir (third surface: gzmo memory mcp ≡ mcp-serve)"
 
 if rg -n '192\.168|CT101|neo4j' "$VERIFY_DIR/gzmo.toml" "$VERIFY_DIR/mcp.json" >/dev/null 2>&1; then
   echo "[FAIL] LAN / CT101 / neo4j found in product config" >&2

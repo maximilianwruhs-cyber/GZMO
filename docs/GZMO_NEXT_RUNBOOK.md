@@ -195,6 +195,8 @@ gzmo dream compact [--max-chars N] [--archive-sessions-days 30] [--dry-run]
 bash scripts/serendipity-digest.sh      # spark → data-next/serendipity/digest-YYYY-MM-DD.md
 bash scripts/faithfulness-ci.sh         # claims vs vault (FAITHFULNESS_MODE=fixture for offline)
 bash scripts/organ-trace.sh             # living tool zoo from scheduler-runs
+bash scripts/concept-review-gate.sh     # HOLD wiki concepts lacking vault evidence
+bash scripts/nightburst-bundle.sh       # organ + faithfulness + concept-gate + digest + scoreboard
 bash scripts/nightburst-scoreboard.sh   # refresh local scoreboard HTML
 gzmo chat                               # sessions persist to data-next/sessions/
 # Skills (next): authoritative root = GZMO/skills/ (see gzmo instance status → skills_root).

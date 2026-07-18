@@ -70,13 +70,13 @@ Lightweight autonomy: alert if distill/dream missed >26h using `latest-*.json`.
 - **Why special:** Boring reliability that protects the singular product.
 - **Ship shape:** Soft-fail in `gzmo status` / serve poll → `latest-watchdog.json` + YELLOW; never flips core GREEN math to RED.
 
-#### Memory MCP appliance — `near` · differentiated · spike
+#### Memory MCP appliance — `near` · differentiated · exists
 
 Ship `gzmo memory mcp` as a drop-in MCP server other agents attach to for durable recall.
 
-- **Builds on:** gzmo memory mcp · vault · Qdrant
+- **Builds on:** `gzmo init` · `scripts/install-gzmo.sh` · `scripts/verify-product-mcp.sh` · PRODUCT_MCP.md
 - **Why special:** MCP memories are usually toys; yours is metabolized overnight.
-- **Ship shape:** Docker/one-binary + sample Cursor/Claude Desktop config.
+- **Ship shape:** Product path `~/.gzmo` + `gzmo memory mcp` / `mcp-serve`; verify with `./scripts/verify-product-mcp.sh`. Living `data-next` stays operator-only.
 
 #### Session takeaway ritual — `near` · differentiated · exists
 
@@ -146,13 +146,13 @@ Productize OKForge + nightly concept push as “agent-writable Wikipedia for one
 - **Why special:** Git forge + agent REST + observatory is a rare bundle.
 - **Ship shape:** Compose install + sample OKCP client + one demo repo.
 
-#### Concept PR review bot — `near` · differentiated · product
+#### Concept PR review bot — `near` · differentiated · spike
 
 Inbound OKCP writes open PRs; honeypot-gate + wiki-lint decide merge vs hold.
 
-- **Builds on:** okforge · honeypot-gate · wiki-lint · faithfulness-judge
+- **Builds on:** wiki-push-latest.json · vault search · concept-review-gate
 - **Why special:** Knowledge CI — missing from most agent wikis.
-- **Ship shape:** Webhook → gate → merge; soft-fail alerts.
+- **Ship shape:** `scripts/concept-review-gate.sh` → PASS/HOLD on recent concept paths vs vault; OKForge webhook merge later.
 
 #### Observatory as public mind — `near` · differentiated · spike
 
@@ -342,13 +342,13 @@ Those become interesting only after Arena + felt recall make the stack demable t
 |----|------|---------|------------|--------|
 | m1 | Felt-recall product | now | singular | exists |
 | r5 | Missed-run watchdog | now | commodity | exists |
-| m2 | Memory MCP appliance | near | differentiated | spike |
+| m2 | Memory MCP appliance | near | differentiated | exists |
 | m3 | Session takeaway ritual | near | differentiated | exists |
 | m4 | Dream compaction service | near | commodity | exists |
 | e1 | Obolus Arena | near | singular | spike (nightburst done) |
 | e2 | €/night dashboard | near | differentiated | spike (Arena €) |
 | f1 | Living wiki appliance | near | singular | exists |
-| f3 | Concept PR review bot | near | differentiated | product |
+| f3 | Concept PR review bot | near | differentiated | spike (local gate) |
 | f4 | Observatory as public mind | near | differentiated | spike (scoreboard HTML) |
 | o1 | Living tool zoo | near | singular | spike (organ-trace) |
 | o3 | Calibration pack | near | differentiated | exists |

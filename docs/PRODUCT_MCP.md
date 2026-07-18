@@ -68,7 +68,13 @@ CLI smoke:
 # or:
 export GZMO_CONFIG="$HOME/.gzmo/gzmo.toml" GZMO_ALLOW_LAB_VAULT=1 GZMO_PRODUCT=1
 gzmo memory status --json
+# Third surface alias (same as mcp-serve):
+gzmo memory mcp
 ```
+
+**Appliance note:** product install is the Memory MCP appliance (map m2). Living
+workstation vault (`data-next/`) is separate — use `GZMO_CONFIG` pointing at
+`~/.gzmo/gzmo.toml` for the portable product, not the nightburst living root.
 
 ### Releases
 
