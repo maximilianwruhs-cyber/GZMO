@@ -230,6 +230,13 @@ def main() -> None:
     }
 
     (out_dir / "latest.json").write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    # Append-only history for €/night aggregate (never overwrite siblings).
+    hist = out_dir / "history"
+    hist.mkdir(parents=True, exist_ok=True)
+    stamp = finished.replace(":", "").replace("-", "")[:15]
+    (hist / f"arena-{stamp}.json").write_text(
+        json.dumps(payload, indent=2) + "\n", encoding="utf-8"
+    )
     euro_line = f"euro_cost = {euro}\n" if euro is not None else "euro_cost = # n/a\n"
     joules_line = f"joules = {joules}\n" if joules is not None else "joules = # n/a\n"
     (out_dir / "champion-suggestion.toml").write_text(

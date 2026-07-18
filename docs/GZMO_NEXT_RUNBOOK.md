@@ -202,6 +202,8 @@ bash scripts/herdr-metabolism-link.sh   # link herdr plugin gzmo.metabolism (MCP
 #   herdr plugin action invoke gzmo.metabolism.ensure-mcp
 #   takeaway via overlay close-ritual, selection, or $(herdr plugin config-dir gzmo.metabolism)/takeaway.txt
 bash scripts/hsp-metabolism-sonify.sh [--play]  # metabolism artifacts → MIDI/WAV motif
+bash scripts/euro-night-aggregate.sh    # Arena history + metabolism €/night
+bash scripts/aos-status-feed.sh [--serve]  # AOS TelemetryPayload JSON (:8765 optional)
 gzmo chat                               # sessions persist to data-next/sessions/
 # Skills (next): authoritative root = GZMO/skills/ (see gzmo instance status → skills_root).
 # gzmo_skills/ remains CT101/bridge auxiliary only — see gzmo_skills/BRIDGE.md.

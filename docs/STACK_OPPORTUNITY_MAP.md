@@ -104,13 +104,13 @@ Models compete for the right to run overnight jobs; scored on joules × faithful
 - **Why special:** Ground truth is your wall meter + your living memory — not LMSYS vibes.
 - **Ship shape:** `scripts/arena-night.sh` → `data-next/arena/latest.json` + sibling `champion-suggestion.toml` (human promote only). Nightburst spike 2026-07-18: quality=1.0 z≈0.94 (duration proxy until RAPL wired).
 
-#### €/night dashboard — `near` · differentiated · spike
+#### €/night dashboard — `near` · differentiated · spike (aggregate)
 
 Publish last-night cost: Awattar price × RAPL joules × job durations.
 
-- **Builds on:** Obolus awattar · serve scheduler-runs · Arena nightburst · scoreboard HTML
+- **Builds on:** Arena history · `scripts/euro-night-aggregate.sh` · scoreboard · Awattar
 - **Why special:** European energy reality as a first-class agent metric.
-- **Ship shape:** `scripts/arena-night.sh` records `joules` (RAPL or estimate), live Awattar ¢/kWh, `euro_cost`; scoreboard pills show €. Full overnight € aggregate can come later.
+- **Ship shape:** Each Arena run archives to `data-next/arena/history/`; aggregate → `euro-night.json` (Arena € sum + metabolism duration×W estimate); scoreboard pills show €/night.
 
 #### Price-aware overnight shift — `later` · differentiated · research
 
@@ -154,13 +154,13 @@ Inbound OKCP writes open PRs; honeypot-gate + wiki-lint decide merge vs hold.
 - **Why special:** Knowledge CI — missing from most agent wikis.
 - **Ship shape:** `scripts/concept-review-gate.sh` → PASS/HOLD on recent concept paths vs vault; OKForge webhook merge later.
 
-#### Observatory as public mind — `near` · differentiated · spike
+#### Observatory as public mind — `near` · differentiated · spike (enriched)
 
 Read-only public mind showing metabolism pulse + wiki commits (no secrets).
 
-- **Builds on:** scheduler-runs · wiki meta · Arena JSON · OKForge `/observatory` (agent discovery)
+- **Builds on:** nightburst-scoreboard · concept-gate · HSP motif · €/night · OKForge `/observatory`
 - **Why special:** Makes the system demable without giving shell access.
-- **Ship shape:** `scripts/nightburst-scoreboard.sh` → sanitized `data-next/arena/scoreboard.{json,html}`; open HTML locally. OKForge Observatory remains agent-discovery, not metabolism board.
+- **Ship shape:** Sanitized HTML/JSON with metabolism, Arena, gate, faithfulness, HSP, €/night; Observatory stays agent-discovery.
 
 #### OKCP memory marketplace — `later` · singular · product
 
@@ -230,13 +230,13 @@ Hear distill/dream/embed as MIDI motifs; idle vs metabolism night as music.
 - **Why special:** Unforgettable demo; zero competitors take this seriously.
 - **Ship shape:** Artifact → MIDI/WAV motif under `data-next/hsp-metabolism/`; `--play` uses aplay/hsp ping; live HSP event-bus later.
 
-#### AOS Intelligence Dashboard v2 — `later` · differentiated · product
+#### AOS Intelligence Dashboard v2 — `later` · differentiated · spike (feed)
 
 Editor sidebar: live energy, Arena champion, last-night €, recall health.
 
-- **Builds on:** AOS-Intelligence-Dashboard · Obolus · status JSON
+- **Builds on:** `scripts/aos-status-feed.sh` · AOS TelemetryPayload · nightburst artifacts
 - **Why special:** Brings the stack into the coding surface without another web app.
-- **Ship shape:** VSCodium extension reading local status endpoints.
+- **Ship shape:** `data-next/aos-status/latest.json` (+ optional `--serve :8765/telemetry.json`); wire VSCodium poll later.
 
 #### tinyFolder daemon product — `later` · commodity · spike
 
@@ -346,10 +346,10 @@ Those become interesting only after Arena + felt recall make the stack demable t
 | m3 | Session takeaway ritual | near | differentiated | exists |
 | m4 | Dream compaction service | near | commodity | exists |
 | e1 | Obolus Arena | near | singular | spike (nightburst done) |
-| e2 | €/night dashboard | near | differentiated | spike (Arena €) |
+| e2 | €/night dashboard | near | differentiated | spike (aggregate) |
 | f1 | Living wiki appliance | near | singular | exists |
 | f3 | Concept PR review bot | near | differentiated | spike (local gate) |
-| f4 | Observatory as public mind | near | differentiated | spike (scoreboard HTML) |
+| f4 | Observatory as public mind | near | differentiated | spike (enriched) |
 | o1 | Living tool zoo | near | singular | spike (organ-trace) |
 | o3 | Calibration pack | near | differentiated | exists |
 | o5 | Serendipity engine | near | differentiated | spike (digest script) |
@@ -362,7 +362,7 @@ Those become interesting only after Arena + felt recall make the stack demable t
 | f2 | OKCP memory marketplace | later | singular | product |
 | o2 | Beat-gate open eval kit | later | differentiated | product |
 | o4 | Cognition pack | later | differentiated | spike |
-| s3 | AOS Intelligence Dashboard v2 | later | differentiated | product |
+| s3 | AOS Intelligence Dashboard v2 | later | differentiated | spike (feed) |
 | s4 | tinyFolder daemon | later | commodity | spike |
 | s5 | Pi / operator split polish | later | commodity | research |
 | p1 | AOS Customer Edition | later | differentiated | product |

@@ -31,7 +31,9 @@ run faithfulness bash scripts/faithfulness-ci.sh
 run concept-gate bash scripts/concept-review-gate.sh
 run serendipity bash scripts/serendipity-digest.sh
 run hsp-sonify bash scripts/hsp-metabolism-sonify.sh
+run euro-night bash scripts/euro-night-aggregate.sh
 run scoreboard bash scripts/nightburst-scoreboard.sh
+run aos-feed bash scripts/aos-status-feed.sh
 
 echo "=== nightburst bundle done ==="
 echo "Scoreboard: $ROOT/data-next/arena/scoreboard.html"
@@ -40,4 +42,6 @@ echo "Faithfulness: $ROOT/data-next/faithfulness/latest.json"
 echo "Concept gate: $ROOT/data-next/concept-gate/latest.md"
 echo "Serendipity: $ROOT/data-next/serendipity/latest.md"
 echo "HSP motif: $ROOT/data-next/hsp-metabolism/latest.md"
+echo "€/night: $ROOT/data-next/arena/euro-night.json"
+echo "AOS feed: $ROOT/data-next/aos-status/latest.json"
 exit "$fail"

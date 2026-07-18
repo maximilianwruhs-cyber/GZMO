@@ -91,6 +91,28 @@ faith_pub = {
     "mode": faith_raw.get("mode"),
 }
 
+gate_raw = load_json(data / "concept-gate" / "latest.json") or {}
+gate_pub = {
+    "verdict": gate_raw.get("verdict"),
+    "pass": gate_raw.get("pass"),
+    "hold": gate_raw.get("hold"),
+    "checked": gate_raw.get("checked"),
+}
+
+hsp_raw = load_json(data / "hsp-metabolism" / "latest.json") or {}
+hsp_pub = {
+    "events": len(hsp_raw.get("events") or []),
+    "ts": hsp_raw.get("ts"),
+}
+
+euro_raw = load_json(out_dir / "euro-night.json") or {}
+euro_pub = {
+    "euro_night_total": euro_raw.get("euro_night_total"),
+    "arena_euro_sum": euro_raw.get("arena_euro_sum"),
+    "metabolism_euro_est": euro_raw.get("metabolism_euro_est"),
+    "arena_runs": euro_raw.get("arena_runs"),
+}
+
 board = {
     "schema": "gzmo.nightburst.scoreboard/v1",
     "generated_at": datetime.now(timezone.utc).isoformat(),
@@ -100,9 +122,13 @@ board = {
     "arena": arena_pub,
     "organs": organs_pub,
     "faithfulness": faith_pub,
+    "concept_gate": gate_pub,
+    "hsp": hsp_pub,
+    "euro_night": euro_pub,
     "links": {
         "okforge_observatory": "http://127.0.0.1:3000/observatory",
         "scoreboard_html": str(out_dir / "scoreboard.html"),
+        "aos_status": str(data / "aos-status" / "latest.json"),
     },
 }
 
@@ -115,9 +141,12 @@ rows = "".join(
 arena_z = arena_pub.get("z")
 wiki_sha = wiki_pub.get("commit_sha") or "—"
 euro = arena_pub.get("euro_cost")
+euro_night = euro_pub.get("euro_night_total")
 joules = arena_pub.get("joules")
 price = arena_pub.get("electricity_c_kwh")
 live = "live" if arena_pub.get("electricity_live") else "fallback"
+gate_v = gate_pub.get("verdict") or "—"
+hsp_n = hsp_pub.get("events")
 html = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -140,7 +169,10 @@ html = f"""<!DOCTYPE html>
     <span class="pill">watchdog: {"STALE" if watch_pub.get("stale") else "fresh"}</span>
     <span class="pill">wiki sha {wiki_sha}</span>
     <span class="pill">arena z={arena_z}</span>
-    <span class="pill">€={euro if euro is not None else "—"}</span>
+    <span class="pill">€ burst={euro if euro is not None else "—"}</span>
+    <span class="pill">€/night={euro_night if euro_night is not None else "—"}</span>
+    <span class="pill">gate {gate_v}</span>
+    <span class="pill">hsp events={hsp_n if hsp_n is not None else "—"}</span>
   </p>
   <h2>Metabolism</h2>
   <table>
@@ -149,13 +181,19 @@ html = f"""<!DOCTYPE html>
   </table>
   <h2>Arena champion</h2>
   <p>{arena_pub.get("champion") or "—"} · quality={arena_pub.get("quality")} · elapsed_ms={arena_pub.get("elapsed_ms")} · joules={joules} ({arena_pub.get("energy_source")}) · {price} ¢/kWh ({live}) · €={euro}</p>
+  <h2>€/night</h2>
+  <p>total={euro_night} · arena_sum={euro_pub.get("arena_euro_sum")} ({euro_pub.get("arena_runs")} runs) · metabolism_est={euro_pub.get("metabolism_euro_est")}</p>
   <h2>Wiki plane</h2>
   <p>healthy={wiki_pub.get("healthy")} · concepts={wiki_pub.get("concepts_written")} · sha={wiki_sha}</p>
+  <h2>Concept gate</h2>
+  <p>verdict={gate_v} · pass={gate_pub.get("pass")} · hold={gate_pub.get("hold")} · checked={gate_pub.get("checked")}</p>
   <h2>Living tool zoo</h2>
   <p>organs_fired={organs_pub.get("organs_fired")} · ok={organs_pub.get("ok_count")}</p>
   <h2>Faithfulness CI</h2>
   <p>ok={faith_pub.get("ok")} · {faith_pub.get("supported")}/{faith_pub.get("total")} ({faith_pub.get("mode")})</p>
-  <p><a href="http://127.0.0.1:3000/observatory">OKForge Observatory</a> (agent discovery) · this page is the metabolism/Arena board</p>
+  <h2>HSP motif</h2>
+  <p>events={hsp_n} · ts={hsp_pub.get("ts") or "—"}</p>
+  <p><a href="http://127.0.0.1:3000/observatory">OKForge Observatory</a> · AOS feed: <code>data-next/aos-status/latest.json</code></p>
 </body>
 </html>
 """
