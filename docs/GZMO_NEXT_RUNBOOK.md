@@ -190,6 +190,7 @@ gzmo health                              # strict subsystem probes
 gzmo assemble cognition --live          # distill → gate → spark → recall (instance vault)
 gzmo assemble handoff --live --apply    # bench → fuse → gzmo-next-fused.toml on gate pass
 gzmo distill                            # distill data-next/sessions/ into the vault
+gzmo session close --takeaway "…"       # append durable takeaways → distill queue (`--now` runs distill)
 gzmo chat                               # sessions persist to data-next/sessions/
 # Skills (next): authoritative root = GZMO/skills/ (see gzmo instance status → skills_root).
 # gzmo_skills/ remains CT101/bridge auxiliary only — see gzmo_skills/BRIDGE.md.

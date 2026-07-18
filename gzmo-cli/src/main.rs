@@ -10,6 +10,7 @@ mod config_cmd;
 mod cron_cmd;
 mod daemon_cmd;
 mod distill_cmd;
+mod session_cmd;
 mod dream_cmd;
 mod embed_cmd;
 mod health_cmd;
@@ -64,6 +65,8 @@ enum Command {
     MemoryPromote(Option<usize>),
     Memory(Vec<String>),
     Distill(Option<String>),
+    /// Session ops (`close` takeaway ritual → distill queue).
+    Session(Vec<String>),
     Health,
     Status,
     /// Ecosystem health LED board (TUI Observatory slice).
@@ -173,6 +176,9 @@ fn parse_args() -> Command {
             let id = args.get(2).cloned();
             return Command::Distill(id);
         }
+        if args[1] == "session" {
+            return Command::Session(args[2..].to_vec());
+        }
         if args[1] == "health" {
             return Command::Health;
         }
@@ -242,6 +248,7 @@ async fn main() -> Result<()> {
         Command::MemoryPromote(_) => "info",
         Command::Memory(_) => "warn",
         Command::Distill(_) => "info",
+        Command::Session(_) => "info",
         Command::Health => "warn",
         Command::Status => "warn",
         Command::Observatory => "warn",
@@ -368,6 +375,7 @@ async fn main() -> Result<()> {
         Command::MemoryPromote(limit) => promote_cmd::run(&config, limit).await,
         Command::Memory(sub) => memory_cmd::run(&config, sub).await,
         Command::Distill(session_id) => distill_cmd::run(&config, session_id).await,
+        Command::Session(args) => session_cmd::run(&config, &args).await,
         Command::Health => health_cmd::run(&config).await,
         Command::Status => status_cmd::run(&config).await,
         Command::Observatory => observatory_cmd::run(&config).await,

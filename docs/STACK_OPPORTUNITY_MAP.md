@@ -78,13 +78,13 @@ Ship `gzmo memory mcp` as a drop-in MCP server other agents attach to for durabl
 - **Why special:** MCP memories are usually toys; yours is metabolized overnight.
 - **Ship shape:** Docker/one-binary + sample Cursor/Claude Desktop config.
 
-#### Session takeaway ritual — `near` · differentiated · product
+#### Session takeaway ritual — `near` · differentiated · exists
 
 End-of-session UX that forces durable takeaways into distill queue (CLI + herdr hook).
 
-- **Builds on:** session-distill · synapse handoff · herdr
+- **Builds on:** session-distill · scratch distill queue · SessionManager
 - **Why special:** Closes the human loop that makes metabolism work.
-- **Ship shape:** `gzmo session close` + herdr pane exit hook.
+- **Ship shape:** `gzmo session close [id] --takeaway "…" [--now]` appends `[TAKEAWAY]` turns and enqueues distill (or runs immediately with `--now`). Herdr pane exit hook later.
 
 #### Dream compaction service — `near` · commodity · product
 
@@ -104,13 +104,13 @@ Models compete for the right to run overnight jobs; scored on joules × faithful
 - **Why special:** Ground truth is your wall meter + your living memory — not LMSYS vibes.
 - **Ship shape:** `scripts/arena-night.sh` → `data-next/arena/latest.json` + sibling `champion-suggestion.toml` (human promote only). Nightburst spike 2026-07-18: quality=1.0 z≈0.94 (duration proxy until RAPL wired).
 
-#### €/night dashboard — `near` · differentiated · product
+#### €/night dashboard — `near` · differentiated · spike
 
 Publish last-night cost: Awattar price × RAPL joules × job durations.
 
-- **Builds on:** Obolus awattar · serve scheduler-runs · Observatory
+- **Builds on:** Obolus awattar · serve scheduler-runs · Arena nightburst · scoreboard HTML
 - **Why special:** European energy reality as a first-class agent metric.
-- **Ship shape:** One Observatory panel + `gzmo status` line.
+- **Ship shape:** `scripts/arena-night.sh` records `joules` (RAPL or estimate), live Awattar ¢/kWh, `euro_cost`; scoreboard pills show €. Full overnight € aggregate can come later.
 
 #### Price-aware overnight shift — `later` · differentiated · research
 
@@ -343,10 +343,10 @@ Those become interesting only after Arena + felt recall make the stack demable t
 | m1 | Felt-recall product | now | singular | exists |
 | r5 | Missed-run watchdog | now | commodity | exists |
 | m2 | Memory MCP appliance | near | differentiated | spike |
-| m3 | Session takeaway ritual | near | differentiated | product |
+| m3 | Session takeaway ritual | near | differentiated | exists |
 | m4 | Dream compaction service | near | commodity | product |
 | e1 | Obolus Arena | near | singular | spike (nightburst done) |
-| e2 | €/night dashboard | near | differentiated | product |
+| e2 | €/night dashboard | near | differentiated | spike (Arena €) |
 | f1 | Living wiki appliance | near | singular | exists |
 | f3 | Concept PR review bot | near | differentiated | product |
 | f4 | Observatory as public mind | near | differentiated | spike (scoreboard HTML) |

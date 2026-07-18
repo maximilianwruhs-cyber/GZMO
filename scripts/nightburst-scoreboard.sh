@@ -59,6 +59,10 @@ arena_pub = {
     "efficiency": arena_raw.get("efficiency"),
     "elapsed_ms": arena_raw.get("elapsed_ms"),
     "joules": arena_raw.get("joules"),
+    "euro_cost": arena_raw.get("euro_cost"),
+    "electricity_c_kwh": arena_raw.get("electricity_c_kwh"),
+    "electricity_live": arena_raw.get("electricity_live"),
+    "energy_source": arena_raw.get("energy_source"),
     "finished": arena_raw.get("finished"),
 }
 
@@ -90,6 +94,10 @@ rows = "".join(
 )
 arena_z = arena_pub.get("z")
 wiki_sha = wiki_pub.get("commit_sha") or "—"
+euro = arena_pub.get("euro_cost")
+joules = arena_pub.get("joules")
+price = arena_pub.get("electricity_c_kwh")
+live = "live" if arena_pub.get("electricity_live") else "fallback"
 html = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -112,6 +120,7 @@ html = f"""<!DOCTYPE html>
     <span class="pill">watchdog: {"STALE" if watch_pub.get("stale") else "fresh"}</span>
     <span class="pill">wiki sha {wiki_sha}</span>
     <span class="pill">arena z={arena_z}</span>
+    <span class="pill">€={euro if euro is not None else "—"}</span>
   </p>
   <h2>Metabolism</h2>
   <table>
@@ -119,7 +128,7 @@ html = f"""<!DOCTYPE html>
     <tbody>{rows}</tbody>
   </table>
   <h2>Arena champion</h2>
-  <p>{arena_pub.get("champion") or "—"} · quality={arena_pub.get("quality")} · elapsed_ms={arena_pub.get("elapsed_ms")}</p>
+  <p>{arena_pub.get("champion") or "—"} · quality={arena_pub.get("quality")} · elapsed_ms={arena_pub.get("elapsed_ms")} · joules={joules} ({arena_pub.get("energy_source")}) · {price} ¢/kWh ({live}) · €={euro}</p>
   <h2>Wiki plane</h2>
   <p>healthy={wiki_pub.get("healthy")} · concepts={wiki_pub.get("concepts_written")} · sha={wiki_sha}</p>
   <p><a href="http://127.0.0.1:3000/observatory">OKForge Observatory</a> (agent discovery) · this page is the metabolism/Arena board</p>
