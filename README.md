@@ -75,4 +75,4 @@ After MCP works you can enable `[embeddings]` against any OpenAI-compatible loca
 
 ## License
 
-See repository license file.
+[MIT](LICENSE)
