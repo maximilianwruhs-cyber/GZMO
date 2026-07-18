@@ -9,7 +9,7 @@ if ! command -v herdr >/dev/null 2>&1; then
   exit 1
 fi
 
-chmod +x "${PLUGIN}/bin/"*.sh
+chmod +x "${PLUGIN}/scripts/"*.sh
 # Unlink quietly if already linked, then link.
 herdr plugin unlink gzmo.metabolism >/dev/null 2>&1 || true
 herdr plugin link "$PLUGIN"

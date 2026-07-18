@@ -9,26 +9,26 @@ platforms = ["linux", "macos"]
 id = "ensure-mcp"
 title = "Ensure gzmo-memory MCP"
 contexts = ["workspace"]
-command = ["bash", "bin/ensure-mcp.sh"]
+command = ["bash", "scripts/ensure-mcp.sh"]
 
 [[actions]]
 id = "session-close"
 title = "Close with takeaway → distill"
 contexts = ["pane", "workspace"]
-command = ["bash", "bin/session-close.sh"]
+command = ["bash", "scripts/session-close.sh"]
 
 [[actions]]
 id = "status"
 title = "GZMO metabolism status"
 contexts = ["workspace"]
-command = ["bash", "bin/status.sh"]
+command = ["bash", "scripts/status.sh"]
 
 [[events]]
 on = "pane.closed"
-command = ["bash", "bin/on-pane-closed.sh"]
+command = ["bash", "scripts/on-pane-closed.sh"]
 
 [[panes]]
 id = "close-ritual"
 title = "GZMO session close"
 placement = "overlay"
-command = ["bash", "bin/session-close.sh", "--interactive"]
+command = ["bash", "scripts/session-close.sh", "--interactive"]
