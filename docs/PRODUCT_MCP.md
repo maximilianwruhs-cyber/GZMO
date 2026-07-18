@@ -13,7 +13,6 @@ Install the Pi package ([gzmo-pi](https://github.com/maximilianwruhs-cyber/gzmo-
 curl -fsSL https://raw.githubusercontent.com/maximilianwruhs-cyber/GZMO/main/scripts/install-gzmo.sh | bash
 
 pi install npm:gzmo-pi
-# until published: pi install git:github.com/maximilianwruhs-cyber/gzmo-pi
 ```
 
 In Pi: `/gzmo setup` → `/reload` → `gzmo_memory_status`.  
