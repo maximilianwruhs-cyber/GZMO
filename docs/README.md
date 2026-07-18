@@ -25,6 +25,7 @@ Product non-goals (v1): multi-host living install, overnight serve as required p
 | [WIKI_LAYER.md](WIKI_LAYER.md) | Git-tracked markdown wiki layer (see also `../WIKI.md`) |
 | [CORE_MECHANICS_AUDIT_20260605.md](CORE_MECHANICS_AUDIT_20260605.md) | Core mechanics audit |
 | [CEILING_ROADMAP.md](CEILING_ROADMAP.md) | Long-term ceiling |
+| [STACK_OPPORTUNITY_MAP.md](STACK_OPPORTUNITY_MAP.md) | Portfolio opportunities from the lived stack (Arena, wiki, organs, surfaces) |
 
 ## Chaos engine (ρ homeostasis)
 
