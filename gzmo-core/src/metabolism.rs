@@ -73,6 +73,34 @@ pub fn write_job_run(
 
 pub const METABOLISM_JOBS: &[&str] = &["distill", "promote", "embed", "dream", "spark"];
 
+/// Jobs that gate the missed-run watchdog (soft-fail; not the GREEN count alone).
+const WATCHDOG_JOBS: &[&str] = &["distill", "dream"];
+
+/// Default: 26h — one missed overnight window with slack.
+pub const DEFAULT_METABOLISM_STALE_SECS: u64 = 26 * 3600;
+
+/// Override with `GZMO_METABOLISM_STALE_SECS` (seconds) for burst tests.
+pub fn metabolism_stale_threshold_secs() -> u64 {
+    std::env::var("GZMO_METABOLISM_STALE_SECS")
+        .ok()
+        .and_then(|s| s.parse().ok())
+        .filter(|&n| n > 0)
+        .unwrap_or(DEFAULT_METABOLISM_STALE_SECS)
+}
+
+/// Soft-fail missed-run / stale metabolism signal.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct WatchdogRecord {
+    pub job: String,
+    pub ok: bool,
+    pub stale: bool,
+    pub threshold_secs: u64,
+    pub checked_at: String,
+    pub detail: String,
+    #[serde(default)]
+    pub ages_secs: serde_json::Map<String, serde_json::Value>,
+}
+
 fn read_job_latest(dir: &Path, job: &str) -> Option<JobRunRecord> {
     let path = dir.join(format!("latest-{job}.json"));
     let raw = std::fs::read_to_string(path).ok()?;
@@ -141,6 +169,71 @@ pub struct MetabolismBoard {
     pub missing_embeddings: Option<usize>,
     pub verdict: String,
     pub wiki: WikiPlaneSummary,
+    /// Soft-fail stale signal (does not flip GREEN core-job math into RED).
+    pub watchdog: WatchdogRecord,
+}
+
+/// Evaluate distill/dream age against stale threshold; write `latest-watchdog.json`.
+pub fn evaluate_and_write_watchdog(config: &GzmoConfig) -> WatchdogRecord {
+    let record = evaluate_missed_run_watchdog(config);
+    let dir = runs_dir(config);
+    let _ = std::fs::create_dir_all(&dir);
+    let path = dir.join("latest-watchdog.json");
+    let _ = std::fs::write(
+        &path,
+        serde_json::to_string_pretty(&record).unwrap_or_default() + "\n",
+    );
+    record
+}
+
+/// Soft-fail: distill or dream missing / older than threshold → stale.
+pub fn evaluate_missed_run_watchdog(config: &GzmoConfig) -> WatchdogRecord {
+    let dir = runs_dir(config);
+    let threshold = metabolism_stale_threshold_secs();
+    let now = Utc::now();
+    let mut ages = serde_json::Map::new();
+    let mut stale_reasons: Vec<String> = Vec::new();
+
+    for job in WATCHDOG_JOBS {
+        match read_job_latest(&dir, job) {
+            None => {
+                ages.insert((*job).into(), serde_json::Value::Null);
+                stale_reasons.push(format!("{job}: missing latest-{job}.json"));
+            }
+            Some(r) => match DateTime::parse_from_rfc3339(&r.finished) {
+                Ok(finished) => {
+                    let age = (now - finished.with_timezone(&Utc))
+                        .num_seconds()
+                        .max(0) as u64;
+                    ages.insert((*job).into(), serde_json::json!(age));
+                    if age > threshold {
+                        stale_reasons.push(format!(
+                            "{job}: {age}s old (threshold {threshold}s)"
+                        ));
+                    }
+                }
+                Err(_) => {
+                    ages.insert((*job).into(), serde_json::Value::Null);
+                    stale_reasons.push(format!("{job}: unparseable finished timestamp"));
+                }
+            },
+        }
+    }
+
+    let stale = !stale_reasons.is_empty();
+    WatchdogRecord {
+        job: "watchdog".into(),
+        ok: !stale,
+        stale,
+        threshold_secs: threshold,
+        checked_at: now.to_rfc3339(),
+        detail: if stale {
+            format!("metabolism stale — {}", stale_reasons.join("; "))
+        } else {
+            "metabolism fresh within threshold".into()
+        },
+        ages_secs: ages,
+    }
 }
 
 /// Collect structured overnight metabolism + wiki plane snapshot.
@@ -182,7 +275,10 @@ pub fn collect_metabolism_board(config: &GzmoConfig) -> MetabolismBoard {
     }
 
     let (honeypot_n, missing_embed) = vault_metabolism_counts(&config.memory.vault_db);
-    let verdict = if seen == 0 {
+    let watchdog = evaluate_and_write_watchdog(config);
+
+    // Core GREEN math ignores watchdog; stale only demotes display verdict to YELLOW.
+    let mut verdict: String = if seen == 0 {
         "RED — no metabolism runs recorded".into()
     } else if ok_count >= 3 && honeypot_n.unwrap_or(0) > 0 {
         "GREEN — core jobs ok and honeypot non-empty".into()
@@ -192,6 +288,10 @@ pub fn collect_metabolism_board(config: &GzmoConfig) -> MetabolismBoard {
         "RED — recent jobs failed".into()
     };
 
+    if watchdog.stale && !verdict.starts_with("RED") {
+        verdict = format!("YELLOW — {}", watchdog.detail);
+    }
+
     MetabolismBoard {
         runs_dir: dir.clone(),
         jobs,
@@ -200,6 +300,7 @@ pub fn collect_metabolism_board(config: &GzmoConfig) -> MetabolismBoard {
         missing_embeddings: missing_embed,
         verdict,
         wiki: read_wiki_plane_summary(config),
+        watchdog,
     }
 }
 
@@ -309,6 +410,16 @@ pub fn format_overnight_metabolism(config: &GzmoConfig) -> String {
             .unwrap_or_else(|| "?".into())
     ));
 
+    out.push_str(&format!(
+        "- **Missed-run watchdog:** {} (threshold {}s)\n",
+        if board.watchdog.stale {
+            format!("STALE — {}", board.watchdog.detail)
+        } else {
+            "fresh".into()
+        },
+        board.watchdog.threshold_secs
+    ));
+
     out.push_str(&format!("\n**Verdict:** {}\n\n", board.verdict));
     out
 }
@@ -379,6 +490,51 @@ mod tests {
         let promote = board.jobs.iter().find(|j| j.job == "promote").unwrap();
         assert_eq!(promote.status, JobRowStatus::Missing);
         assert!(board.newest.is_some());
+        // dream missing → watchdog stale (soft-fail YELLOW, not RED from watchdog alone)
+        assert!(board.watchdog.stale);
+        assert!(board.verdict.starts_with("YELLOW"));
+
+        let _ = fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn watchdog_stale_with_short_threshold() {
+        let root = std::env::temp_dir().join(format!(
+            "gzmo-metab-watch-{}-{}",
+            std::process::id(),
+            Utc::now().timestamp_nanos_opt().unwrap_or(0)
+        ));
+        let _ = fs::remove_dir_all(&root);
+        let runs = root.join("scheduler-runs");
+        fs::create_dir_all(&runs).unwrap();
+
+        let old = "2020-01-01T00:00:00+00:00";
+        for job in ["distill", "dream", "promote", "embed", "spark"] {
+            let record = JobRunRecord {
+                job: job.into(),
+                script: "rust".into(),
+                args: vec![],
+                started: old.into(),
+                finished: old.into(),
+                ok: true,
+                error: None,
+                runner: Some("rust".into()),
+            };
+            fs::write(
+                runs.join(format!("latest-{job}.json")),
+                serde_json::to_string(&record).unwrap(),
+            )
+            .unwrap();
+        }
+
+        let mut config = GzmoConfig::default();
+        config.memory.vault_db = root.join("vault.db");
+
+        std::env::set_var("GZMO_METABOLISM_STALE_SECS", "60");
+        let wd = evaluate_missed_run_watchdog(&config);
+        std::env::remove_var("GZMO_METABOLISM_STALE_SECS");
+        assert!(wd.stale);
+        assert!(wd.detail.contains("distill"));
 
         let _ = fs::remove_dir_all(&root);
     }

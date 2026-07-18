@@ -155,7 +155,28 @@ Lab recipe map below applies only when `gzmo-scheduler` is explicitly re-enabled
 **Production gate:** [`docs/OKFORGE_PRODUCTION.md`](OKFORGE_PRODUCTION.md) + `bash ~/Schreibtisch/okforge/scripts/production-smoke.sh`
 
 Job results land in `data-next/scheduler-runs/{job}-{timestamp}.json` (plus
-`latest.json` and `wiki-push-latest.json`) for the Observatory Body panel.
+`latest.json` and `wiki-push-latest.json`).
+
+**Missed-run watchdog (soft-fail):** `gzmo status` / `gzmo serve` poll write
+`scheduler-runs/latest-watchdog.json`. If `latest-distill` or `latest-dream` is
+missing or older than 26h (override: `GZMO_METABOLISM_STALE_SECS`), verdict shows
+**YELLOW — metabolism stale** without flipping core GREEN job math to RED.
+
+**Nightburst (compressed proof / Arena):** when the machine cannot stay up for
+calendar nights, use burst cycles instead:
+
+```bash
+# Seed distinctive session JSON under data-next/sessions/, then:
+gzmo distill <session-id> && gzmo memory promote && gzmo memory embed && gzmo dream
+gzmo memory search '<seeded fact>'
+# Arena + sanitized scoreboard (local HTML; OKForge /observatory stays agent-discovery):
+bash scripts/arena-night.sh
+bash scripts/nightburst-scoreboard.sh
+# open data-next/arena/scoreboard.html
+systemctl --user stop gzmo-serve   # free the machine when the sitting ends
+```
+
+See [`STACK_OPPORTUNITY_MAP.md`](STACK_OPPORTUNITY_MAP.md) and `data-next/recall-proof.md`.
 
 ## Operator commands
 

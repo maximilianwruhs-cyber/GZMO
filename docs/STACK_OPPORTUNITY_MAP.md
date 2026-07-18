@@ -1,6 +1,6 @@
 # Stack opportunity map
 
-**Status:** Working map (promoted from Cursor canvas, 2026-07-16; checked into repo 2026-07-18)  
+**Status:** Working map (promoted from Cursor canvas, 2026-07-16; checked into repo 2026-07-18; compressed proof executed 2026-07-18)  
 **Audience:** Operator / product direction for the maximilianwruhs-cyber stack  
 **Scope:** Projects and products that can be created from lived GZMO + adjacent repos — not a generic idea dump.
 
@@ -10,9 +10,11 @@ The singular asset is a **living overnight memory metabolism** on one workstatio
 
 ## Recommended next three
 
-1. **Felt-recall proof** (7 green nights) + **missed-run watchdog**
-2. **Obolus Arena** spike scored on real overnight tasks
-3. **Living wiki / Observatory** scoreboard (public mind)
+1. **Compressed felt-recall** (2 burst metabolism+recall cycles, ≥80% seeded hits) + **missed-run watchdog** — *done 2026-07-18* (`data-next/recall-proof.md`)
+2. **Obolus Arena** nightburst spike — *done 2026-07-18* (`scripts/arena-night.sh` → `data-next/arena/latest.json`)
+3. **Nightburst scoreboard** (sanitized metabolism + wiki + Arena) — *done 2026-07-18* (`scripts/nightburst-scoreboard.sh` → `data-next/arena/scoreboard.html`; OKForge `/observatory` stays agent-discovery)
+
+Calendar soak when the machine is parked is an optional bonus, not a gate.
 
 ## Composition spine
 
@@ -58,15 +60,15 @@ Package overnight metabolism as the product: chat today, search tomorrow, prove 
 
 - **Builds on:** GZMO serve · honeypot · rrf-recall · status
 - **Why special:** Almost nobody ships a living overnight memory compiler you can feel.
-- **Ship shape:** 7 green nights + weekly recall demos; no new features.
+- **Ship shape:** 2 burst metabolism+recall cycles (≥80% seeded hits); calendar soak optional when machine is parked. Proof log: `data-next/recall-proof.md` (2026-07-18: 9/9 HIT).
 
-#### Missed-run watchdog — `now` · commodity · product
+#### Missed-run watchdog — `now` · commodity · exists
 
 Lightweight autonomy: alert if distill/dream missed >26h using `latest-*.json`.
 
-- **Builds on:** serve scheduler-runs · status · ops_health idea
+- **Builds on:** serve scheduler-runs · status · `GZMO_METABOLISM_STALE_SECS` override for burst tests
 - **Why special:** Boring reliability that protects the singular product.
-- **Ship shape:** Soft-fail serve job or systemd timer; journal + status YELLOW.
+- **Ship shape:** Soft-fail in `gzmo status` / serve poll → `latest-watchdog.json` + YELLOW; never flips core GREEN math to RED.
 
 #### Memory MCP appliance — `near` · differentiated · spike
 
@@ -100,7 +102,7 @@ Models compete for the right to run overnight jobs; scored on joules × faithful
 
 - **Builds on:** Obolus evolve · verify-suite · faithfulness-judge · RAPL · serve jobs
 - **Why special:** Ground truth is your wall meter + your living memory — not LMSYS vibes.
-- **Ship shape:** CLI tournament → champion writes engine map; OKForge scoreboard page.
+- **Ship shape:** `scripts/arena-night.sh` → `data-next/arena/latest.json` + sibling `champion-suggestion.toml` (human promote only). Nightburst spike 2026-07-18: quality=1.0 z≈0.94 (duration proxy until RAPL wired).
 
 #### €/night dashboard — `near` · differentiated · product
 
@@ -154,11 +156,11 @@ Inbound OKCP writes open PRs; honeypot-gate + wiki-lint decide merge vs hold.
 
 #### Observatory as public mind — `near` · differentiated · spike
 
-Read-only public Observatory showing metabolism pulse + wiki commits (no secrets).
+Read-only public mind showing metabolism pulse + wiki commits (no secrets).
 
-- **Builds on:** Observatory · scheduler-runs · wiki meta
+- **Builds on:** scheduler-runs · wiki meta · Arena JSON · OKForge `/observatory` (agent discovery)
 - **Why special:** Makes the system demable without giving shell access.
-- **Ship shape:** Sanitized export + static/host page.
+- **Ship shape:** `scripts/nightburst-scoreboard.sh` → sanitized `data-next/arena/scoreboard.{json,html}`; open HTML locally. OKForge Observatory remains agent-discovery, not metabolism board.
 
 #### OKCP memory marketplace — `later` · singular · product
 
@@ -339,15 +341,15 @@ Those become interesting only after Arena + felt recall make the stack demable t
 | ID | Idea | Horizon | Uniqueness | Status |
 |----|------|---------|------------|--------|
 | m1 | Felt-recall product | now | singular | exists |
-| r5 | Missed-run watchdog | now | commodity | product |
+| r5 | Missed-run watchdog | now | commodity | exists |
 | m2 | Memory MCP appliance | near | differentiated | spike |
 | m3 | Session takeaway ritual | near | differentiated | product |
 | m4 | Dream compaction service | near | commodity | product |
-| e1 | Obolus Arena | near | singular | spike |
+| e1 | Obolus Arena | near | singular | spike (nightburst done) |
 | e2 | €/night dashboard | near | differentiated | product |
 | f1 | Living wiki appliance | near | singular | exists |
 | f3 | Concept PR review bot | near | differentiated | product |
-| f4 | Observatory as public mind | near | differentiated | spike |
+| f4 | Observatory as public mind | near | differentiated | spike (scoreboard HTML) |
 | o1 | Living tool zoo | near | singular | product |
 | o3 | Calibration pack | near | differentiated | exists |
 | o5 | Serendipity engine | near | differentiated | spike |

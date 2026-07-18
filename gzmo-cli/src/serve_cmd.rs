@@ -241,6 +241,12 @@ async fn run_loop(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> 
         let now = Utc::now();
         let today = now.date_naive();
 
+        // Soft-fail missed-run watchdog (YELLOW in status; never on GREEN job math).
+        let wd = metabolism::evaluate_and_write_watchdog(config);
+        if wd.stale {
+            warn!(detail = %wd.detail, threshold_secs = wd.threshold_secs, "metabolism watchdog stale");
+        }
+
         if config.dreams.enabled
             && cron_due_today(
                 &now,
