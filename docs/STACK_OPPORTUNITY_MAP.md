@@ -86,13 +86,13 @@ End-of-session UX that forces durable takeaways into distill queue (CLI + herdr 
 - **Why special:** Closes the human loop that makes metabolism work.
 - **Ship shape:** `gzmo session close [id] --takeaway "…" [--now]` appends `[TAKEAWAY]` turns and enqueues distill (or runs immediately with `--now`). Herdr pane exit hook later.
 
-#### Dream compaction service — `near` · commodity · product
+#### Dream compaction service — `near` · commodity · exists
 
 Weekly GC that merges/compacts DREAMS.md and archives cold sessions without losing honeypot.
 
-- **Builds on:** serve · garbage_collect idea · vault
+- **Builds on:** `dreams_md::compact_dreams_md` · serve soft-fail · sessions-archive
 - **Why special:** Necessary plumbing; not the brand.
-- **Ship shape:** Soft-fail Sunday job on serve; never on GREEN gate day-one.
+- **Ship shape:** `gzmo dream compact [--max-chars N] [--archive-sessions-days 30] [--dry-run]`; serve soft-fail Sunday 03:00 UTC (`dream-compact` run record); never on GREEN gate.
 
 ### Energy / Arena
 
@@ -192,9 +192,9 @@ One command: temp/top-p/RAPL/verify → fused toml recommendations for any local
 
 Productize spark-link: stale anchors + recent facts → verified surprising links.
 
-- **Builds on:** spark-link · vault · dream
+- **Builds on:** spark reports · DREAMS spark sections · wiki push
 - **Why special:** Most RAG is similarity; this is deliberate serendipity.
-- **Ship shape:** Weekly digest markdown + forge concepts.
+- **Ship shape:** `scripts/serendipity-digest.sh` → `data-next/serendipity/digest-YYYY-MM-DD.md` (+ `latest.md`); promote manually.
 
 #### Beat-gate open eval kit — `later` · differentiated · product
 
@@ -344,7 +344,7 @@ Those become interesting only after Arena + felt recall make the stack demable t
 | r5 | Missed-run watchdog | now | commodity | exists |
 | m2 | Memory MCP appliance | near | differentiated | spike |
 | m3 | Session takeaway ritual | near | differentiated | exists |
-| m4 | Dream compaction service | near | commodity | product |
+| m4 | Dream compaction service | near | commodity | exists |
 | e1 | Obolus Arena | near | singular | spike (nightburst done) |
 | e2 | €/night dashboard | near | differentiated | spike (Arena €) |
 | f1 | Living wiki appliance | near | singular | exists |
@@ -352,7 +352,7 @@ Those become interesting only after Arena + felt recall make the stack demable t
 | f4 | Observatory as public mind | near | differentiated | spike (scoreboard HTML) |
 | o1 | Living tool zoo | near | singular | product |
 | o3 | Calibration pack | near | differentiated | exists |
-| o5 | Serendipity engine | near | differentiated | spike |
+| o5 | Serendipity engine | near | differentiated | spike (digest script) |
 | s1 | herdr + metabolism | near | singular | spike |
 | s2 | HSP metabolism sonification | near | singular | spike |
 | r4 | Faithfulness CI | near | differentiated | product |

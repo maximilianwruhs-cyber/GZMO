@@ -11,7 +11,7 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use anyhow::{bail, Context, Result};
-use chrono::{NaiveDate, Timelike, Utc};
+use chrono::{Datelike, NaiveDate, Timelike, Utc, Weekday};
 use gzmo_core::cron;
 use tracing::{error, info, warn};
 
@@ -231,6 +231,7 @@ async fn run_loop(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> 
     let mut last_promote: Option<NaiveDate> = None;
     let mut last_embed: Option<NaiveDate> = None;
     let mut last_wiki: Option<NaiveDate> = None;
+    let mut last_dream_compact: Option<NaiveDate> = None;
     let mut last_spark: HashSet<(u32, u32, NaiveDate)> = HashSet::new();
     // Last fire slot per custom job: (date, hour, minute)
     let mut last_custom: HashMap<String, (NaiveDate, u32, u32)> = HashMap::new();
@@ -337,6 +338,20 @@ async fn run_loop(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> 
                     last_spark.insert((h, m, today));
                 }
             }
+        }
+
+        // Soft-fail: Sunday dream compaction (not on GREEN metabolism gate).
+        if now.weekday() == Weekday::Sun
+            && cron_due_today(&now, 3, 0, last_dream_compact)
+        {
+            let ok = run_named_job(config, "dream-compact", || async {
+                dream_cmd::run_compact(config, None, Some(30), false).await
+            })
+            .await;
+            if !ok {
+                warn!("dream-compact soft-fail — metabolism GREEN unaffected");
+            }
+            last_dream_compact = Some(today);
         }
 
         // Soft-fail satellite: OKForge wiki feed (not on GREEN metabolism verdict).

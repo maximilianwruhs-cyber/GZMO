@@ -191,6 +191,8 @@ gzmo assemble cognition --live          # distill → gate → spark → recall 
 gzmo assemble handoff --live --apply    # bench → fuse → gzmo-next-fused.toml on gate pass
 gzmo distill                            # distill data-next/sessions/ into the vault
 gzmo session close --takeaway "…"       # append durable takeaways → distill queue (`--now` runs distill)
+gzmo dream compact [--max-chars N] [--archive-sessions-days 30] [--dry-run]
+bash scripts/serendipity-digest.sh      # spark → data-next/serendipity/digest-YYYY-MM-DD.md
 gzmo chat                               # sessions persist to data-next/sessions/
 # Skills (next): authoritative root = GZMO/skills/ (see gzmo instance status → skills_root).
 # gzmo_skills/ remains CT101/bridge auxiliary only — see gzmo_skills/BRIDGE.md.

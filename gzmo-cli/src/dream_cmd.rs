@@ -32,6 +32,61 @@ use gzmo_core::tools::ToolRegistry;
 
 use crate::cli_mcp::McpSession;
 
+/// Compact oversized `DREAMS.md` and optionally archive cold sessions.
+pub async fn run_compact(
+    config: &GzmoConfig,
+    max_chars: Option<usize>,
+    archive_sessions_days: Option<i64>,
+    dry_run: bool,
+) -> Result<()> {
+    use gzmo_core::dreams_md::{
+        archive_cold_sessions, compact_dreams_md, DEFAULT_DREAMS_COMPACT_MAX_CHARS,
+    };
+
+    let max_chars = max_chars.unwrap_or_else(|| {
+        std::env::var("GZMO_DREAMS_MAX_CHARS")
+            .ok()
+            .and_then(|s| s.parse().ok())
+            .unwrap_or(DEFAULT_DREAMS_COMPACT_MAX_CHARS)
+    });
+    let mut report = compact_dreams_md(&config.skills.dreams_path, max_chars, dry_run)?;
+    if let Some(days) = archive_sessions_days {
+        report.sessions_archived =
+            archive_cold_sessions(&config.session_distill.sessions_dir, days, dry_run)?;
+    }
+
+    if !report.compacted && report.sessions_archived == 0 {
+        println!(
+            "Dream compact: nothing to do ({} chars ≤ max {})",
+            report.before_chars, max_chars
+        );
+        return Ok(());
+    }
+
+    println!(
+        "Dream compact{}: DREAMS {} → {} chars{}",
+        if dry_run { " (dry-run)" } else { "" },
+        report.before_chars,
+        report.after_chars,
+        if report.compacted {
+            ""
+        } else {
+            " (under budget)"
+        }
+    );
+    if let Some(p) = &report.archived_dreams {
+        println!("  archive: {}", p.display());
+    }
+    if report.sessions_archived > 0 {
+        println!(
+            "  sessions archived: {} (older than {}d)",
+            report.sessions_archived,
+            archive_sessions_days.unwrap_or(0)
+        );
+    }
+    Ok(())
+}
+
 /// Run a one-shot dream consolidation for `date` (defaults to today).
 pub async fn run(
     config: &GzmoConfig,

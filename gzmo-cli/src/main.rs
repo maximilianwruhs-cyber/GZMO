@@ -51,6 +51,12 @@ enum Command {
     Serve,
     /// One-shot dream consolidation for an optional date (default: today).
     Dream(Option<NaiveDate>),
+    /// Compact oversized DREAMS.md (+ optional cold session archive).
+    DreamCompact {
+        max_chars: Option<usize>,
+        archive_sessions_days: Option<i64>,
+        dry_run: bool,
+    },
     /// One-shot spark (serendipitous recall) for an optional date (default: today).
     Spark(Option<NaiveDate>),
     Ingest {
@@ -112,6 +118,37 @@ fn parse_args() -> Command {
             return Command::ChatRepl;
         }
         if args[1] == "dream" {
+            if args.get(2).map(|s| s.as_str()) == Some("compact") {
+                let mut max_chars = None;
+                let mut archive_sessions_days = None;
+                let mut dry_run = false;
+                let mut i = 3;
+                while i < args.len() {
+                    match args[i].as_str() {
+                        "--dry-run" => {
+                            dry_run = true;
+                            i += 1;
+                        }
+                        "--max-chars" => {
+                            max_chars = args.get(i + 1).and_then(|s| s.parse().ok());
+                            i += 2;
+                        }
+                        "--archive-sessions-days" => {
+                            archive_sessions_days = args.get(i + 1).and_then(|s| s.parse().ok());
+                            i += 2;
+                        }
+                        other => {
+                            eprintln!("Unknown dream compact arg: {other}");
+                            std::process::exit(2);
+                        }
+                    }
+                }
+                return Command::DreamCompact {
+                    max_chars,
+                    archive_sessions_days,
+                    dry_run,
+                };
+            }
             let date = args
                 .get(2)
                 .and_then(|s| NaiveDate::parse_from_str(s, "%Y-%m-%d").ok());
@@ -238,6 +275,7 @@ async fn main() -> Result<()> {
         Command::Daemon => "info",
         Command::Serve => "info",
         Command::Dream(_) => "info",
+        Command::DreamCompact { .. } => "info",
         Command::Spark(_) => "info",
         Command::Ingest { .. } => "info",
         Command::IngestDir(_) => "info",
@@ -297,6 +335,8 @@ async fn main() -> Result<()> {
             | Command::Config(_)
             | Command::Profile(_)
             | Command::Mentor(_)
+            | Command::DreamCompact { .. }
+            | Command::Session(_)
     );
 
     let identity = if needs_identity {
@@ -348,6 +388,11 @@ async fn main() -> Result<()> {
             res
         }
         Command::Dream(date) => dream_cmd::run(&config, identity.as_ref().unwrap(), date).await,
+        Command::DreamCompact {
+            max_chars,
+            archive_sessions_days,
+            dry_run,
+        } => dream_cmd::run_compact(&config, max_chars, archive_sessions_days, dry_run).await,
         Command::Spark(date) => spark_cmd::run(&config, identity.as_ref().unwrap(), date).await,
         Command::Ingest { path, dry_run } => {
             ingest_cmd::run(
