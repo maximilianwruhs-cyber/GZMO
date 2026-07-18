@@ -214,13 +214,13 @@ Distill → honeypot → spark-link → recall as a portable assembly for other 
 
 ### Surfaces / UX
 
-#### herdr + metabolism — `near` · singular · spike
+#### herdr + metabolism — `near` · singular · spike (plugin)
 
 Terminal agent mux that remembers across panes via memory MCP.
 
-- **Builds on:** herdr · gzmo memory mcp · session close
+- **Builds on:** `integrations/herdr-gzmo-metabolism` · `gzmo memory mcp` · `gzmo session close`
 - **Why special:** Muxers forget; yours metabolizes.
-- **Ship shape:** herdr plugin/MCP attach + close ritual.
+- **Ship shape:** `bash scripts/herdr-metabolism-link.sh` → actions `ensure-mcp` / `session-close` + popup close-ritual; `pane.closed` soft-logs missed ritual (no auto-distill).
 
 #### HSP metabolism sonification — `near` · singular · spike
 
@@ -353,7 +353,7 @@ Those become interesting only after Arena + felt recall make the stack demable t
 | o1 | Living tool zoo | near | singular | spike (organ-trace) |
 | o3 | Calibration pack | near | differentiated | exists |
 | o5 | Serendipity engine | near | differentiated | spike (digest script) |
-| s1 | herdr + metabolism | near | singular | spike |
+| s1 | herdr + metabolism | near | singular | spike (plugin) |
 | s2 | HSP metabolism sonification | near | singular | spike |
 | r4 | Faithfulness CI | near | differentiated | exists |
 | e3 | Price-aware overnight shift | later | differentiated | research |

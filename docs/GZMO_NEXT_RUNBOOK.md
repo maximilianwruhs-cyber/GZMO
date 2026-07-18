@@ -198,6 +198,9 @@ bash scripts/organ-trace.sh             # living tool zoo from scheduler-runs
 bash scripts/concept-review-gate.sh     # HOLD wiki concepts lacking vault evidence
 bash scripts/nightburst-bundle.sh       # organ + faithfulness + concept-gate + digest + scoreboard
 bash scripts/nightburst-scoreboard.sh   # refresh local scoreboard HTML
+bash scripts/herdr-metabolism-link.sh   # link herdr plugin gzmo.metabolism (MCP + close ritual)
+#   herdr plugin action invoke gzmo.metabolism.ensure-mcp
+#   TAKEAWAY='…' herdr plugin action invoke gzmo.metabolism.session-close
 gzmo chat                               # sessions persist to data-next/sessions/
 # Skills (next): authoritative root = GZMO/skills/ (see gzmo instance status → skills_root).
 # gzmo_skills/ remains CT101/bridge auxiliary only — see gzmo_skills/BRIDGE.md.
