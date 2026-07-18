@@ -172,13 +172,13 @@ Other agents pull/push concept bundles; GZMO is slow compiler, forge is the API.
 
 ### Organs / Little Tools Lab
 
-#### Living tool zoo — `near` · singular · product
+#### Living tool zoo — `near` · singular · spike
 
 Dashboard of which of the 46 pieces fired overnight and what they changed in the vault.
 
-- **Builds on:** little-tools-lab · organ-audit · serve runs · Observatory
+- **Builds on:** scheduler-runs · organ-trace · nightburst scoreboard
 - **Why special:** Catalogs are common; proof of overnight organ use is not.
-- **Ship shape:** Per-job organ trace in scheduler-runs + UI.
+- **Ship shape:** `scripts/organ-trace.sh` → `data-next/organ-trace/latest.{json,md}`; scoreboard “Living tool zoo” section.
 
 #### Calibration pack SaaS-less — `near` · differentiated · exists
 
@@ -282,13 +282,13 @@ gzmo-core-clean / sovereign-agent as extractable brain without theatrical CT101 
 
 ### Research brands
 
-#### Faithfulness CI for agents — `near` · differentiated · product
+#### Faithfulness CI for agents — `near` · differentiated · exists
 
 CI action: claim set vs session/vault evidence → pass/fail for PRs and wiki concepts.
 
-- **Builds on:** faithfulness-judge · evidence-locate · verify-suite
+- **Builds on:** `gzmo memory search` · `scripts/fixtures/faithfulness-claims.json`
 - **Why special:** Agent output CI is still rare in the wild.
-- **Ship shape:** GitHub Action + OKForge merge gate.
+- **Ship shape:** `scripts/faithfulness-ci.sh` (vault mode locally); CI job `faithfulness-fixture` offline; report `data-next/faithfulness/latest.json`.
 
 #### ZPD tutor product — `later` · differentiated · spike
 
@@ -350,12 +350,12 @@ Those become interesting only after Arena + felt recall make the stack demable t
 | f1 | Living wiki appliance | near | singular | exists |
 | f3 | Concept PR review bot | near | differentiated | product |
 | f4 | Observatory as public mind | near | differentiated | spike (scoreboard HTML) |
-| o1 | Living tool zoo | near | singular | product |
+| o1 | Living tool zoo | near | singular | spike (organ-trace) |
 | o3 | Calibration pack | near | differentiated | exists |
 | o5 | Serendipity engine | near | differentiated | spike (digest script) |
 | s1 | herdr + metabolism | near | singular | spike |
 | s2 | HSP metabolism sonification | near | singular | spike |
-| r4 | Faithfulness CI | near | differentiated | product |
+| r4 | Faithfulness CI | near | differentiated | exists |
 | e3 | Price-aware overnight shift | later | differentiated | research |
 | e4 | Intelligence-per-Watt router | later | singular | research |
 | e5 | Obolus Forge mutations | later | differentiated | spike |

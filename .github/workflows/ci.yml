@@ -44,3 +44,52 @@ jobs:
             echo "Hardcoded NEO4J_PASSWORD found in tracked files"
             exit 1
           fi
+
+  faithfulness-fixture:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Faithfulness CI (fixture mode — no vault)
+        env:
+          FAITHFULNESS_MODE: fixture
+          GZMO_CLONE_ROOT: ${{ github.workspace }}/..
+        run: |
+          # Repo is checked out as workspace/GZMO when nested; here workspace IS the repo.
+          export ROOT="${GITHUB_WORKSPACE}"
+          mkdir -p "$ROOT/data-next/faithfulness"
+          FAITHFULNESS_CLAIMS="$ROOT/scripts/fixtures/faithfulness-claims.json" \
+            FAITHFULNESS_MODE=fixture \
+            ROOT="$ROOT" \
+            OUT_DIR="$ROOT/data-next/faithfulness" \
+            python3 - <<'PY'
+          import json, os, sys
+          from datetime import datetime, timezone
+          from pathlib import Path
+          root = Path(os.environ["ROOT"])
+          spec = json.loads(Path(os.environ["FAITHFULNESS_CLAIMS"]).read_text())
+          claims = spec["claims"]
+          corpus = "\n".join(c["claim"] for c in claims)
+          misses = 0
+          results = []
+          for c in claims:
+              needle = c.get("needle") or c["query"]
+              hit = needle.lower() in corpus.lower()
+              if not hit:
+                  misses += 1
+              results.append({"id": c["id"], "supported": hit})
+          report = {
+              "schema": "gzmo.faithfulness.ci/v1",
+              "generated_at": datetime.now(timezone.utc).isoformat(),
+              "mode": "fixture",
+              "ok": misses == 0,
+              "supported": len(results) - misses,
+              "total": len(results),
+              "results": results,
+          }
+          out = root / "data-next" / "faithfulness" / "latest.json"
+          out.parent.mkdir(parents=True, exist_ok=True)
+          out.write_text(json.dumps(report, indent=2) + "\n")
+          print(json.dumps({"ok": report["ok"], "supported": report["supported"], "total": report["total"]}))
+          sys.exit(0 if report["ok"] else 1)
+          PY

@@ -73,6 +73,24 @@ watch_pub = {
     "threshold_secs": wd.get("threshold_secs"),
 }
 
+organs_raw = load_json(data / "organ-trace" / "latest.json") or {}
+organs_pub = {
+    "organs_fired": organs_raw.get("organs_fired"),
+    "ok_count": organs_raw.get("ok_count"),
+    "jobs": [
+        {"job": j.get("job"), "organ": j.get("organ"), "ok": j.get("ok")}
+        for j in (organs_raw.get("jobs") or [])[:12]
+    ],
+}
+
+faith_raw = load_json(data / "faithfulness" / "latest.json") or {}
+faith_pub = {
+    "ok": faith_raw.get("ok"),
+    "supported": faith_raw.get("supported"),
+    "total": faith_raw.get("total"),
+    "mode": faith_raw.get("mode"),
+}
+
 board = {
     "schema": "gzmo.nightburst.scoreboard/v1",
     "generated_at": datetime.now(timezone.utc).isoformat(),
@@ -80,6 +98,8 @@ board = {
     "watchdog": watch_pub,
     "wiki": wiki_pub,
     "arena": arena_pub,
+    "organs": organs_pub,
+    "faithfulness": faith_pub,
     "links": {
         "okforge_observatory": "http://127.0.0.1:3000/observatory",
         "scoreboard_html": str(out_dir / "scoreboard.html"),
@@ -131,6 +151,10 @@ html = f"""<!DOCTYPE html>
   <p>{arena_pub.get("champion") or "—"} · quality={arena_pub.get("quality")} · elapsed_ms={arena_pub.get("elapsed_ms")} · joules={joules} ({arena_pub.get("energy_source")}) · {price} ¢/kWh ({live}) · €={euro}</p>
   <h2>Wiki plane</h2>
   <p>healthy={wiki_pub.get("healthy")} · concepts={wiki_pub.get("concepts_written")} · sha={wiki_sha}</p>
+  <h2>Living tool zoo</h2>
+  <p>organs_fired={organs_pub.get("organs_fired")} · ok={organs_pub.get("ok_count")}</p>
+  <h2>Faithfulness CI</h2>
+  <p>ok={faith_pub.get("ok")} · {faith_pub.get("supported")}/{faith_pub.get("total")} ({faith_pub.get("mode")})</p>
   <p><a href="http://127.0.0.1:3000/observatory">OKForge Observatory</a> (agent discovery) · this page is the metabolism/Arena board</p>
 </body>
 </html>

@@ -1,0 +1,36 @@
+{
+  "schema": "gzmo.faithfulness.claims/v1",
+  "description": "Nightburst claims — vault evidence via gzmo memory search (needles).",
+  "claims": [
+    {
+      "id": "quillhorn",
+      "claim": "Quillhorn Cascade operates using nightburst metabolism",
+      "query": "Quillhorn Cascade",
+      "needle": "Quillhorn"
+    },
+    {
+      "id": "meridian",
+      "claim": "Meridian-Vesper is the primary operator callsign for Quillhorn Cascade",
+      "query": "Meridian-Vesper",
+      "needle": "Meridian-Vesper"
+    },
+    {
+      "id": "obsidian",
+      "claim": "Obsidian-Pip guards the Quillhorn Cascade recall gate",
+      "query": "Obsidian-Pip",
+      "needle": "Obsidian-Pip"
+    },
+    {
+      "id": "amberglass",
+      "claim": "Amberglass Ticket-9 is the ferry token",
+      "query": "Amberglass Ticket-9",
+      "needle": "Amberglass"
+    },
+    {
+      "id": "lumen",
+      "claim": "Lumen-Attic is the workshop room for arena score reviews",
+      "query": "Lumen-Attic",
+      "needle": "Lumen-Attic"
+    }
+  ]
+}
