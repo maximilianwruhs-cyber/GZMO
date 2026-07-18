@@ -222,13 +222,13 @@ Terminal agent mux that remembers across panes via memory MCP.
 - **Why special:** Muxers forget; yours metabolizes.
 - **Ship shape:** `bash scripts/herdr-metabolism-link.sh` → actions `ensure-mcp` / `session-close` + popup close-ritual; `pane.closed` soft-logs missed ritual (no auto-distill).
 
-#### HSP metabolism sonification — `near` · singular · spike
+#### HSP metabolism sonification — `near` · singular · spike (motif)
 
 Hear distill/dream/embed as MIDI motifs; idle vs metabolism night as music.
 
-- **Builds on:** HSP · serve job events · RAPL
+- **Builds on:** `scripts/hsp-metabolism-sonify.sh` · scheduler-runs · organ-trace · Arena · HSP ping optional
 - **Why special:** Unforgettable demo; zero competitors take this seriously.
-- **Ship shape:** Event bus → HSP MIDI map; 60s demo video.
+- **Ship shape:** Artifact → MIDI/WAV motif under `data-next/hsp-metabolism/`; `--play` uses aplay/hsp ping; live HSP event-bus later.
 
 #### AOS Intelligence Dashboard v2 — `later` · differentiated · product
 
@@ -354,7 +354,7 @@ Those become interesting only after Arena + felt recall make the stack demable t
 | o3 | Calibration pack | near | differentiated | exists |
 | o5 | Serendipity engine | near | differentiated | spike (digest script) |
 | s1 | herdr + metabolism | near | singular | spike (plugin) |
-| s2 | HSP metabolism sonification | near | singular | spike |
+| s2 | HSP metabolism sonification | near | singular | spike (motif) |
 | r4 | Faithfulness CI | near | differentiated | exists |
 | e3 | Price-aware overnight shift | later | differentiated | research |
 | e4 | Intelligence-per-Watt router | later | singular | research |

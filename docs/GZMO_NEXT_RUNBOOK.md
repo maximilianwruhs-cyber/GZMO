@@ -200,7 +200,8 @@ bash scripts/nightburst-bundle.sh       # organ + faithfulness + concept-gate + 
 bash scripts/nightburst-scoreboard.sh   # refresh local scoreboard HTML
 bash scripts/herdr-metabolism-link.sh   # link herdr plugin gzmo.metabolism (MCP + close ritual)
 #   herdr plugin action invoke gzmo.metabolism.ensure-mcp
-#   TAKEAWAY='…' herdr plugin action invoke gzmo.metabolism.session-close
+#   takeaway via overlay close-ritual, selection, or $(herdr plugin config-dir gzmo.metabolism)/takeaway.txt
+bash scripts/hsp-metabolism-sonify.sh [--play]  # metabolism artifacts → MIDI/WAV motif
 gzmo chat                               # sessions persist to data-next/sessions/
 # Skills (next): authoritative root = GZMO/skills/ (see gzmo instance status → skills_root).
 # gzmo_skills/ remains CT101/bridge auxiliary only — see gzmo_skills/BRIDGE.md.

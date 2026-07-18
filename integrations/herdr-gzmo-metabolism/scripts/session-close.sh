@@ -31,6 +31,11 @@ PY
 )"
 fi
 
+# Herdr action invoke may not forward caller env; allow file drop.
+if [[ -z "$TAKEAWAY" && -f "${CONFIG_DIR}/takeaway.txt" ]]; then
+  TAKEAWAY="$(tr -d '\r' <"${CONFIG_DIR}/takeaway.txt" | sed '/^$/d' | head -n 1)"
+fi
+
 if [[ -z "$TAKEAWAY" && "$INTERACTIVE" -eq 1 ]]; then
   echo "GZMO metabolism — durable takeaway for distill"
   echo "(pane=${HERDR_PANE_ID:-none} workspace=${HERDR_WORKSPACE_ID:-none})"

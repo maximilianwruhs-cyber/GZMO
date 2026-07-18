@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # One-shot nightburst operator bundle (no always-on serve required).
-# Runs organ-trace → faithfulness → concept-gate → serendipity → scoreboard.
+# Runs organ-trace → faithfulness → concept-gate → serendipity → hsp-sonify → scoreboard.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -30,6 +30,7 @@ run organ-trace bash scripts/organ-trace.sh
 run faithfulness bash scripts/faithfulness-ci.sh
 run concept-gate bash scripts/concept-review-gate.sh
 run serendipity bash scripts/serendipity-digest.sh
+run hsp-sonify bash scripts/hsp-metabolism-sonify.sh
 run scoreboard bash scripts/nightburst-scoreboard.sh
 
 echo "=== nightburst bundle done ==="
@@ -38,4 +39,5 @@ echo "Organ trace: $ROOT/data-next/organ-trace/latest.md"
 echo "Faithfulness: $ROOT/data-next/faithfulness/latest.json"
 echo "Concept gate: $ROOT/data-next/concept-gate/latest.md"
 echo "Serendipity: $ROOT/data-next/serendipity/latest.md"
+echo "HSP motif: $ROOT/data-next/hsp-metabolism/latest.md"
 exit "$fail"
