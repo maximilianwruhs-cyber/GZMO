@@ -1,9 +1,10 @@
 # Spine focus — two goals (A + C)
 
-**Status:** Active (2026-07-19) — operator lock  
+**Status:** Production-ready (2026-07-19) — `v0.1.2` · both gates GREEN  
 **Supersedes for product direction:** expanding the opportunity-map zoo  
 **Futures research:** [research/CT101_STACK_FUTURE_2026-07.md](research/CT101_STACK_FUTURE_2026-07.md)  
-**Audience:** Operator deciding what to strengthen next
+**Audience:** Operator deciding what to strengthen next  
+**Combined gate:** `bash scripts/production-readiness-gate.sh` → `data-next/production-readiness/`
 
 ## Verdict
 

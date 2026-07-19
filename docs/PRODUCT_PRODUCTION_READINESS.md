@@ -37,6 +37,10 @@ After Keep lands on `main`, cut a new `v*` tag so stranger `install-gzmo.sh` shi
 ## Operator commands
 
 ```bash
+# Co-primary A+C
+bash scripts/production-readiness-gate.sh
+# → data-next/production-readiness/latest.{json,md}
+
 # Full product gate
 bash scripts/product-readiness-gate.sh
 # → data-next/product-readiness/latest.{json,md}

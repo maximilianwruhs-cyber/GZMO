@@ -40,6 +40,10 @@ Historical workstation-centric checklist: [PRODUCTION_READINESS.md](PRODUCTION_R
 ## Operator commands
 
 ```bash
+# Co-primary A+C
+bash scripts/production-readiness-gate.sh
+# → data-next/production-readiness/latest.{json,md}
+
 # Full living gate
 bash scripts/living-readiness-gate.sh
 # → data-next/living-readiness/latest.{json,md}
