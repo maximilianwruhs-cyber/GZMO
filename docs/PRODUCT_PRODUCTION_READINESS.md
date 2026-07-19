@@ -29,8 +29,10 @@ Without requiring Redis, Qdrant, Neo4j, or overnight `gzmo serve`.
 | `product-hello` | Attach + first-fact loop (HOLD if no engine) |
 | `prefer-prime-tests` | Unit: scanner prefers `:8000` |
 | `ct101-living-owner` | Optional; `PRODUCT_GATE_REQUIRE_CT101=1` to require |
+| `release-freshness` | Soft: tip within `RELEASE_FRESH_MAX` (default 5) of latest `v*` tag |
 
-**FAIL** fails the gate. **HOLD** does not (optional engine / CT101).
+**FAIL** fails the gate. **HOLD** does not (optional engine / CT101 / stale release tag).  
+After Keep lands on `main`, cut a new `v*` tag so stranger `install-gzmo.sh` ships tip features.
 
 ## Operator commands
 

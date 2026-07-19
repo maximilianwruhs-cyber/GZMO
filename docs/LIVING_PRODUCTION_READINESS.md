@@ -30,7 +30,12 @@ Historical workstation-centric checklist: [PRODUCTION_READINESS.md](PRODUCTION_R
 | `takeaway-recall` | FAIL (skip with `LIVING_GATE_SKIP_TAKEAWAY=1`) |
 | `workstation-prime` | HOLD if local `:8000` down but CT101 `prime_llm` OK |
 | `living-appliance-pin` | FAIL if compose/toml pin invalid |
+| `living-appliance-smoke` | HOLD on workstation without pin `.env` (throwaway Neo4j OK) |
+| `living-appliance-health` | HOLD if no binary/sidecars; PASS via lab `GZMO_CONFIG` (never `~/.gzmo`) |
+| `living-appliance-pin-ct101` | HOLD on expected pre-promote drift (Qdrant tag / live inline auth) |
 | `living-mcp-attach` | HOLD if no `gzmo-living` yet; FAIL if living mislabeled as `gzmo-memory` |
+
+**Intentional HOLDs (do not block GREEN):** workstation protocol smoke without pin `.env`; CT101 pin-vs-live drift until operator promote; optional `mcp_memory` uvx.
 
 ## Operator commands
 
@@ -45,8 +50,13 @@ bash scripts/ct101-living-probe.sh
 bash scripts/faithfulness-living.sh
 bash scripts/ct101-takeaway-recall.sh
 bash scripts/living-appliance-gate.sh
+bash scripts/living-appliance-smoke.sh
+bash scripts/living-appliance-health-smoke.sh
 bash scripts/living-mcp-attach-check.sh
 bash scripts/ct101-sync-living-appliance.sh   # stage pin on CT101
+bash scripts/ct101-living-appliance-pin-check.sh
+# Living MCP label (does not overwrite product gzmo-memory):
+bash scripts/install-shared-mcp.sh
 
 # Dual-writer hygiene (workstation)
 systemctl --user stop gzmo-serve.service
