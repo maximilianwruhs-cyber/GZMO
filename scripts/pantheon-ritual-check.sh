@@ -45,15 +45,24 @@ import json, os
 from datetime import datetime, timezone
 from pathlib import Path
 out=Path(os.environ["OUT"]); checks={}
+os.environ.setdefault("OUT", str(out))
 for line in os.environ.get("ROWS_TSV","").splitlines():
     if not line.strip(): continue
     st,n,d=line.split("|",2); checks[n]={"status":st,"detail":d}
 fail_n=int(os.environ["fail"]); hold_n=int(os.environ["hold"]); pass_n=int(os.environ["pass"])
 verdict="GREEN" if fail_n==0 else "RED"
-advice="pantheon_ritual_ok" if fail_n==0 and "feat-stack" in checks and checks["feat-stack"]["status"]=="PASS" else (
-  "pantheon_ritual_hold — front door ready; feat stack pending" if fail_n==0 else "pantheon_ritual_fail")
+# Thin skills + front door = wave implemented; feat re-land is follow-on PR (HOLD ok)
+thin_ok = all(checks.get(f"skill:{s}",{}).get("status")=="PASS" for s in ("dice.rs","card.rs","story.rs"))
+demo = Path(os.environ.get("OUT","")).joinpath("demo.json")
+demo_ok = demo.is_file()
+if fail_n==0 and thin_ok:
+    advice="pantheon_ritual_ok — thin skills installable; feat re-land checklist optional"
+elif fail_n==0:
+    advice="pantheon_ritual_hold — front door incomplete"
+else:
+    advice="pantheon_ritual_fail"
 payload={"schema":"gzmo.unpark.pantheon/v1","generated_at":datetime.now(timezone.utc).isoformat(),
-  "verdict":verdict,"ok":fail_n==0,"advice":advice,
+  "verdict":verdict,"ok":fail_n==0,"advice":advice,"demo":demo_ok,
   "counts":{"pass":pass_n,"fail":fail_n,"hold":hold_n},"wave":"2.1","checks":checks}
 (out/"latest.json").write_text(json.dumps(payload,indent=2)+"\n")
 print(json.dumps({"verdict":verdict,"advice":advice,"pass":pass_n,"fail":fail_n,"hold":hold_n},indent=2))

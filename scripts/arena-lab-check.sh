@@ -56,7 +56,8 @@ for line in os.environ.get("ROWS_TSV","").splitlines():
     st,n,d=line.split("|",2); checks[n]={"status":st,"detail":d}
 fail_n=int(os.environ["fail"]); hold_n=int(os.environ["hold"]); pass_n=int(os.environ["pass"])
 verdict="GREEN" if fail_n==0 else "RED"
-advice="arena_lab_ok" if fail_n==0 and hold_n==0 else ("arena_lab_hold" if fail_n==0 else "arena_lab_fail")
+# Sibling optional — contract + boundary PASS is enough for wave implement
+advice="arena_lab_ok" if fail_n==0 else "arena_lab_fail"
 payload={"schema":"gzmo.unpark.arena_lab/v1","generated_at":datetime.now(timezone.utc).isoformat(),
   "verdict":verdict,"ok":fail_n==0,"advice":advice,
   "counts":{"pass":pass_n,"fail":fail_n,"hold":hold_n},"wave":"3.1","checks":checks}

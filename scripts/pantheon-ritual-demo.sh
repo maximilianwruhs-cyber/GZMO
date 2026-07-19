@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+# Unpark Wave 2.1 demable: inventory thin pantheon skills + archive + re-land checklist.
+# Does not merge feat attractor stack; never invents DICE_MASTER_*.
+#
+#   bash scripts/pantheon-ritual-demo.sh
+set -euo pipefail
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+DATA="${GZMO_DATA_NEXT:-$ROOT/data-next}"
+OUT="$DATA/pantheon-ritual"
+mkdir -p "$OUT"
+
+export ROOT OUT
+python3 - <<'PY'
+import json
+from datetime import datetime, timezone
+from pathlib import Path
+
+root = Path(__import__("os").environ["ROOT"])
+out = Path(__import__("os").environ["OUT"])
+skills = root / "gzmo-core" / "src" / "skills"
+archive = root / "docs" / "research" / "pantheon"
+
+thin = {}
+for name in ("dice.rs", "card.rs", "story.rs"):
+    p = skills / name
+    thin[name] = {"present": p.is_file(), "bytes": p.stat().st_size if p.is_file() else 0}
+
+archives = sorted([p.name for p in archive.glob("*.md")]) if archive.is_dir() else []
+feat_hits = []
+for pat in ("dice_loop.rs", "attractor_common.rs", "card_forge.rs", "dice_corpus.rs"):
+    hits = list(skills.rglob(pat))
+    if hits:
+        feat_hits.append(str(hits[0].relative_to(root)))
+
+reland = out / "RELAND_CHECKLIST.md"
+reland.write_text(
+    """# Pantheon feat re-land checklist (Unpark Wave 2)
+
+Separate ritual PR only — do not invent ghost `DICE_MASTER_*`.
+
+1. [ ] Cherry-pick or re-implement `dice_loop` / cascade / `card_forge*` from feat branch
+2. [ ] Keep chaos off CT101 living KPI ([CHAOS_LIVING_VS_RITUAL.md](../../docs/CHAOS_LIVING_VS_RITUAL.md))
+3. [ ] `bash scripts/pantheon-ritual-check.sh` → prefer feat-stack PASS
+4. [ ] Living faithfulness + takeaway-recall still PASS
+5. [ ] Skills bridge docs updated
+
+Thin main stubs (`dice`/`card`/`story`) remain the installable ritual surface until then.
+""",
+    encoding="utf-8",
+)
+
+payload = {
+    "schema": "gzmo.unpark.pantheon.demo/v1",
+    "generated_at": datetime.now(timezone.utc).isoformat(),
+    "wave": "2.1",
+    "ok": True,
+    "thin_skills": thin,
+    "archives": archives,
+    "feat_hits_on_main": feat_hits,
+    "reland_checklist": str(reland),
+    "advice": "pantheon_ritual_demo_ok — thin skills + archive inventory; feat re-land checklist written",
+}
+(out / "demo.json").write_text(json.dumps(payload, indent=2) + "\n")
+print(json.dumps(payload, indent=2))
+PY
+
+bash "$ROOT/scripts/pantheon-ritual-check.sh"
+echo "[OK] pantheon ritual demo → $OUT"

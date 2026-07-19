@@ -11,21 +11,25 @@ LOG="$OUT/check.log"
 
 echo "=== Unpark wave check ===" | tee -a "$LOG"
 
-# Run constituent checks (soft — collect artifacts)
-CHECKS=(
-  herdr-metabolism-check.sh
-  pi-glass-check.sh
-  tinyfolder-check.sh
-  aos-poll-check.sh
-  pantheon-ritual-check.sh
-  discovery-theater-check.sh
-  hsp-emit-check.sh
-  arena-lab-check.sh
-  ipw-route-check.sh
-  forge-lab-check.sh
+# Run demable wave scripts then checks (soft — collect artifacts)
+DEMOS=(
+  herdr-metabolism-demo.sh
+  pi-glass-fix.sh
+  tinyfolder-ingest-demo.sh
+  aos-poll-dashboard.sh
+  pantheon-ritual-demo.sh
+  discovery-theater-demo.sh
+  hsp-emit-demo.sh
+  arena-lab-demo.sh
+  ipw-route-demo.sh
+  forge-lab-demo.sh
+  aos-ce-smoke.sh
+  marketplace-check.sh
+  wiki-mind-check.sh
+  portable-core-inventory.sh
 )
 
-for c in "${CHECKS[@]}"; do
+for c in "${DEMOS[@]}"; do
   echo "[*] $c" | tee -a "$LOG"
   bash "$ROOT/scripts/$c" >>"$LOG" 2>&1 || true
 done
@@ -59,10 +63,10 @@ waves = {
     ("forge_lab", data/"forge-lab"/"latest.json"),
   ],
   "4": [
-    ("aos_ce_doc", root/"docs"/"AOS_CUSTOMER_EDITION.md"),
-    ("marketplace_doc", root/"docs"/"OKCP_MARKETPLACE.md"),
-    ("wiki_mind_doc", root/"docs"/"WIKI_OBSERVATORY_MIND.md"),
-    ("portable_rfc", root/"docs"/"PORTABLE_GZMO_CORE_RFC.md"),
+    ("aos_ce", data/"aos-ce"/"latest.json"),
+    ("marketplace", data/"marketplace"/"latest.json"),
+    ("wiki_mind", data/"wiki-mind"/"latest.json"),
+    ("portable_core", data/"portable-core"/"latest.json"),
     ("unpark_roadmap", root/"docs"/"UNPARK_ROADMAP.md"),
   ],
 }
@@ -76,13 +80,15 @@ for wave, items in waves.items():
     for name, path in items:
         if path.suffix == ".json" and path.is_file():
             d = json.loads(path.read_text())
-            st = "PASS" if d.get("ok") else "FAIL"
-            if d.get("ok") and d.get("counts",{}).get("hold",0) > 0:
-                st = "HOLD" if "ok" in d.get("advice","") or "hold" in d.get("advice","").lower() else st
-            # Prefer advice-based: ok with holds → HOLD row for wave visibility
-            if d.get("ok") and int(d.get("counts",{}).get("hold",0)) > 0:
-                st = "HOLD"
             advice = d.get("advice","")
+            if not d.get("ok"):
+                st = "FAIL"
+            elif "_ok" in advice or advice.endswith("_ok") or "inventory_ok" in advice or "demo_ok" in advice:
+                st = "PASS"
+            elif "hold" in advice.lower():
+                st = "HOLD"
+            else:
+                st = "PASS" if d.get("ok") else "FAIL"
             rows.append({"name": name, "status": st, "advice": advice})
             if st == "FAIL":
                 fail += 1

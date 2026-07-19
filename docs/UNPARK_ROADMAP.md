@@ -33,29 +33,29 @@ A+C production readiness unlocked the former **Park freeze**. Satellites move in
 
 ### Wave 1 — Operator surfaces
 
-1. `herdr-metabolism-check.sh` — demable link/status/ritual probe  
-2. `pi-glass-check.sh` — path/attach hygiene (CLI canonical)  
-3. `tinyfolder-check.sh` — inbox → ingest spike readiness  
-4. `aos-poll-check.sh` — read-only living status poll (no Arena required)
+1. `herdr-metabolism-demo.sh` / `herdr-metabolism-check.sh`  
+2. `pi-glass-fix.sh` / `pi-glass-check.sh`  
+3. `tinyfolder-ingest-demo.sh` / `tinyfolder-check.sh`  
+4. `aos-poll-dashboard.sh` / `aos-poll-check.sh`
 
 ### Wave 2 — Ritual / theater
 
-1. Pantheon ritual front door + feat-stack inventory (no ghost `DICE_MASTER_*`)  
-2. Mutual-discovery theater scout≠KPI  
-3. HSP Synapse emit hooks (not on GREEN overnight gate)
+1. `pantheon-ritual-demo.sh` — thin skills + re-land checklist (no ghost `DICE_MASTER_*`)  
+2. `discovery-theater-demo.sh` — scout≠KPI session prep  
+3. `hsp-emit-demo.sh` — motif event files (not on GREEN overnight gate)
 
 ### Wave 3 — Arena lab
 
-1. Arena / RAPL / €/night observability wrappers  
-2. IpW router demable advice  
-3. Forge recommend path — never auto-block distill
+1. `arena-lab-demo.sh` — RAPL/€ observability; sibling Arena  
+2. `ipw-route-demo.sh` — advice for chat/heavy_bench  
+3. `forge-lab-demo.sh` — recommend.json stub (never auto-block distill)
 
 ### Wave 4 — Later
 
-1. AOS Customer Edition sketch (on top of C only)  
-2. OKCP marketplace + multi-node forge notes  
-3. Wiki / Observatory demable mind  
-4. Portable GZMO core RFC (inventory-first; no big-bang rewrite)
+1. `aos-ce-smoke.sh` + [AOS_CUSTOMER_EDITION.md](./AOS_CUSTOMER_EDITION.md)  
+2. `marketplace-check.sh` + [OKCP_MARKETPLACE.md](./OKCP_MARKETPLACE.md)  
+3. `wiki-mind-check.sh` + [WIKI_OBSERVATORY_MIND.md](./WIKI_OBSERVATORY_MIND.md)  
+4. `portable-core-inventory.sh` + [PORTABLE_GZMO_CORE_RFC.md](./PORTABLE_GZMO_CORE_RFC.md)
 
 ## Never-as-brain / infra-parked
 
