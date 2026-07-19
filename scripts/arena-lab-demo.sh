@@ -71,10 +71,10 @@ payload = {
     "rapl": {"path": str(power) if power else None, "lines": lines, "last": last},
     "rapl_probe": {
         "path": str(rapl_path) if rapl_path else None,
-        "readable": bool(rapl and rapl.get("readable")),
+        "readable": bool(rapl and (rapl.get("readable_paths") or [])),
         "summary": {
             k: rapl.get(k)
-            for k in ("ok", "readable", "readable_count", "advice", "note")
+            for k in ("ok", "readable_paths", "sample_delta_j_0_2s", "advice", "note")
             if rapl and k in rapl
         }
         if rapl
