@@ -22,9 +22,11 @@ Today that runs on **CT101** (`/opt/gzmo/` + `/opt/database-cluster`). Goal C ma
 | [`deploy/living-appliance/.env.example`](../deploy/living-appliance/.env.example) | `NEO4J_AUTH=neo4j/…` (copy to `.env`, gitignored) |
 | [`config/living-appliance.gzmo.toml.example`](../config/living-appliance.gzmo.toml.example) | Daemon `[redis]` / `[qdrant]` / Neo4j MCP fragment |
 | [`scripts/living-appliance-gate.sh`](../scripts/living-appliance-gate.sh) | Pin validity gate → `data-next/living-appliance/` |
-| [`scripts/living-appliance-smoke.sh`](../scripts/living-appliance-smoke.sh) | Protocol smoke (Redis PING / Qdrant ready / Neo4j auth) → `data-next/living-appliance-smoke/` |
+| [`scripts/ct101-living-appliance-smoke.sh`](../scripts/ct101-living-appliance-smoke.sh) | CT101 protocol smoke → `data-next/living-appliance-smoke/` |
+| [`scripts/living-appliance-smoke.sh`](../scripts/living-appliance-smoke.sh) | Local pin protocol smoke (lab / pin up) |
 | [`scripts/living-appliance-health-smoke.sh`](../scripts/living-appliance-health-smoke.sh) | Daemon health via lab `GZMO_CONFIG` (never `~/.gzmo`) → `data-next/living-appliance-health/` |
 | [`scripts/ct101-living-appliance-pin-check.sh`](../scripts/ct101-living-appliance-pin-check.sh) | Staged pin vs live `/opt/database-cluster` shape → `data-next/living-appliance-pin-ct101/` |
+| [`scripts/ct101-promote-living-appliance-auth.sh`](../scripts/ct101-promote-living-appliance-auth.sh) | Move live inline `NEO4J_AUTH` → `.env` + pin Qdrant tag |
 
 ```bash
 # One-shot sidecar bring-up + gate + smoke
@@ -69,26 +71,27 @@ Two shapes, one secret:
 | Compose / Neo4j image | `NEO4J_AUTH` | `neo4j/<password>` in pin `.env` (gitignored) |
 | GZMO daemon / MCP | `NEO4J_PASSWORD` | password only (`/opt/gzmo/.env` on CT101) |
 
-**Operator lock (2026-07-19):** workstation Neo4j (`~/database-cluster` or any local `sidecar-neo4j`) is **throwaway**. Do not copy its password into the in-repo pin. Do not treat bolt-open on the laptop as goal-C auth proof. Real auth SoT stays CT101 (`/opt/gzmo/.env` + live/staged compose) until the living appliance pin is promoted.
+**Operator lock (2026-07-19):** workstation Neo4j (`~/database-cluster` or any local `sidecar-neo4j`) is **throwaway**. Do not copy its password into the in-repo pin. Do not treat bolt-open on the laptop as goal-C auth proof. Auth SoT is CT101: `/opt/database-cluster/.env` (`NEO4J_AUTH`) + `/opt/gzmo/.env` (`NEO4J_PASSWORD`).
 
-Protocol smoke HOLDs `neo4j-auth` without pin `.env` — expected on workstation. Create pin `.env` only when deliberately bringing up `deploy/living-appliance/` (lab pin or CT101 promote).
+Living readiness protocol smoke targets **CT101** (`scripts/ct101-living-appliance-smoke.sh`), not the workstation throwaway stack.
 
 ## Ports
 
-See [PORTS.md](./PORTS.md). Qdrant image is pinned (`v1.13.2`) for reproducible bring-up; CT101 may still run `qdrant/qdrant:latest` until operators migrate.
+See [PORTS.md](./PORTS.md). Qdrant image is pinned to the living host version (`v1.18.1` as of 2026-07-19) for reproducible bring-up without downgrade.
 
 ## Ops scar (CT101)
 
-Live `/opt/database-cluster/docker-compose.yml` historically embedded Neo4j auth in plaintext. Prefer migrating that host to this pin + `.env`, and **rotate** any password that ever lived in compose or agent homes ([AGENT_HOME_SECRETS.md](./AGENT_HOME_SECRETS.md)).
+Live `/opt/database-cluster/docker-compose.yml` historically embedded Neo4j auth in plaintext. Migrated via `scripts/ct101-promote-living-appliance-auth.sh` → `.env` + `${NEO4J_AUTH}`. Prefer rotating any password that ever lived in compose or agent homes ([AGENT_HOME_SECRETS.md](./AGENT_HOME_SECRETS.md)).
 
 ## Verify / sync
 
 ```bash
 bash scripts/living-appliance-gate.sh
-bash scripts/living-appliance-smoke.sh        # HOLD off-host; PASS after up
+bash scripts/ct101-living-appliance-smoke.sh  # CT101 Redis/Qdrant/Neo4j protocol
 bash scripts/living-appliance-health-smoke.sh # lab GZMO_CONFIG → redis/qdrant/neo4j
 bash scripts/living-mcp-attach-check.sh
 bash scripts/ct101-sync-living-appliance.sh   # stage pin under /opt/gzmo/current/…
-bash scripts/ct101-living-appliance-pin-check.sh  # staged vs live shape (HOLD on pre-promote drift)
-bash scripts/living-readiness-gate.sh         # includes pin + smoke + health + ct101 pin + living-mcp
+bash scripts/ct101-living-appliance-pin-check.sh  # staged vs live shape
+bash scripts/ct101-promote-living-appliance-auth.sh  # one-shot: live compose → .env auth
+bash scripts/living-readiness-gate.sh
 ```

@@ -61,10 +61,7 @@ payload = {
             "advice": live.get("advice"),
             "counts": live.get("counts"),
             "exit": int(os.environ["live_rc"]),
-            "intentional_holds": [
-                "living-appliance-smoke (workstation throwaway Neo4j / no pin .env)",
-                "living-appliance-pin-ct101 (pre-promote drift vs /opt/database-cluster)",
-            ],
+            "intentional_holds": [],
         },
     },
     "artifacts": {

@@ -142,19 +142,18 @@ else
   row FAIL "living-appliance-pin" "compose pin invalid — see docs/LIVING_APPLIANCE.md"
 fi
 
-# 9b) Goal C — protocol smoke (soft HOLD when sidecars down)
-bash "$ROOT/scripts/living-appliance-smoke.sh" >>"$LOG" 2>&1 || true
+# 9b) Goal C — protocol smoke on CT101 (workstation Neo4j is throwaway)
+bash "$ROOT/scripts/ct101-living-appliance-smoke.sh" >>"$LOG" 2>&1 || true
 if [[ -f "$DATA/living-appliance-smoke/latest.json" ]] \
   && python3 -c "import json;d=json.load(open('$DATA/living-appliance-smoke/latest.json')); raise SystemExit(0 if d.get('ok') else 1)"; then
   advice="$(python3 -c "import json;print(json.load(open('$DATA/living-appliance-smoke/latest.json')).get('advice',''))")"
-  hold_n="$(python3 -c "import json;print(json.load(open('$DATA/living-appliance-smoke/latest.json')).get('counts',{}).get('hold',0))")"
-  if [[ "$hold_n" != "0" ]]; then
-    row HOLD "living-appliance-smoke" "$advice"
-  else
+  if [[ "$advice" == *smoke_ok* ]]; then
     row PASS "living-appliance-smoke" "$advice"
+  else
+    row HOLD "living-appliance-smoke" "$advice"
   fi
 else
-  row FAIL "living-appliance-smoke" "protocol smoke failed — see docs/LIVING_APPLIANCE.md"
+  row FAIL "living-appliance-smoke" "CT101 protocol smoke failed — see docs/LIVING_APPLIANCE.md"
 fi
 
 # 9c) Goal C — daemon health via lab GZMO_CONFIG (never ~/.gzmo)

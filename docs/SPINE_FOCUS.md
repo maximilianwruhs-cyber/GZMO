@@ -39,7 +39,7 @@ Never point product MCP at the living vault. Never require C’s sidecars for A�
 
 This is already ADR-0003 / [CT101_BOUNDARY.md](CT101_BOUNDARY.md). Nightburst artifacts under `data-next/` prove compressed recipes; they do **not** replace CT101 as the living brain.
 
-**Workstation Neo4j is throwaway** until the living pin is the final product path — see [LIVING_APPLIANCE.md](LIVING_APPLIANCE.md#auth-neo4j). Do not align pin `.env` to `~/database-cluster`.
+**Workstation Neo4j is throwaway** — living smoke/auth SoT is CT101 (`/opt/database-cluster/.env`). See [LIVING_APPLIANCE.md](LIVING_APPLIANCE.md#auth-neo4j).
 
 ## Keep / Park / Later
 
