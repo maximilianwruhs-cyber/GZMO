@@ -25,8 +25,8 @@ This document is the **complete handoff** for four deferred items. Each section 
 | Definitive Dozen `/transform` | Shipped | `skills/characters.toml`, `skills/persona.rs`, `transform.rs` |
 | `/ops`, `/learn` Rust skills | Shipped | `skills/ops.rs`, `skills/learn.rs`, `registry.rs` |
 
-**Integration surfaces today:** `gzmo chat` (Wave 2b `maybe_teach`) and `gzmo mentor` / mentor IPC.
-TUI still does **not** call `maybe_teach()` (Wave 2b.1).
+**Integration surfaces today:** `gzmo chat` (Wave 2b), `gzmo tui` (Wave 2b.1), and
+`gzmo mentor` / mentor IPC. Daemon still has no conversational `maybe_teach`.
 
 ---
 
@@ -34,14 +34,14 @@ TUI still does **not** call `maybe_teach()` (Wave 2b.1).
 
 ### Problem
 
-Pedagogy is mentor-first in `gzmo chat` and headless `gzmo mentor`, but TUI goes straight to
-`run_agent_loop()` — full tool agent, no Diagnoser→Planner→Affective→Tutor chain.
+TUI mentor parity (Wave 2b.1) is landed. Remaining gap is daemon conversational pedagogy
+(document-only by default — use chat/TUI/`gzmo mentor`).
 
 | Surface | Pedagogy orchestrator | `/ops` `/learn` skills | Learner tools | Learner suffix in system prompt |
 |---------|----------------------|------------------------|---------------|--------------------------------|
 | `gzmo chat` (`chat.rs`) | ✅ `maybe_teach` (Wave 2b) | ✅ + session sync | ✅ | ✅ |
 | `gzmo mentor` / IPC | ✅ `maybe_teach` | N/A (headless) | N/A | N/A |
-| `gzmo tui` (`tui/runner.rs` → `agent.rs`) | ❌ Wave 2b.1 | ✅ slash only | ❌ | ❌ |
+| `gzmo tui` (`tui/runner.rs` → `agent.rs`) | ✅ `maybe_teach` (Wave 2b.1) | ✅ + session sync | ✅ | ✅ |
 | `gzmo daemon` (`daemon_cmd.rs`) | ❌ | N/A (no chat loop) | ❌ | N/A |
 
 ### Current behavior (verified)

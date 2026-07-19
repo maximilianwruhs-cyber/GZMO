@@ -34,7 +34,7 @@
 |---------|----------------------------------------|
 | `gzmo mentor` / mentor IPC | Yes — headless client + optional daemon socket |
 | `gzmo chat` | Yes — Wave 2b mentor path before `run_agent_loop` |
-| `gzmo tui` | No (slash skills only; Wave 2b.1) |
+| `gzmo tui` | Yes — Wave 2b.1 mentor path before `run_agent_loop` |
 | `gzmo daemon` | No chat loop — mentor via Unix socket when wired |
 
 Demable smoke: `bash scripts/verify-mentor.sh`. Chaos `pedagogy_oscillator` (Slice C.1)

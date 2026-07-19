@@ -65,7 +65,7 @@ A+C production readiness unlocked the former **Park freeze**. Satellites move in
 | Escape-loop / attractor brand | Research kit |
 | ZPD tutor | Lab; never GREEN overnight |
 | Sovereign `:8010` / VM200 `:8080` | Infra-parked (broken/retired) |
-| Pedagogy deferred backlog | Wave 2b chat `maybe_teach` landed; Wave 2b.1 = TUI parity. Chaos Slice C.1 oscillator stays lab-only — never daemon PulseLoop / living overnight ([PANTHEON_FEAT_RELAND.md](./PANTHEON_FEAT_RELAND.md); `bash scripts/verify-mentor.sh`) |
+| Pedagogy deferred backlog | Wave 2b chat + Wave 2b.1 TUI `maybe_teach` landed. Chaos Slice C.1 oscillator stays lab-only — never daemon PulseLoop / living overnight ([PANTHEON_FEAT_RELAND.md](./PANTHEON_FEAT_RELAND.md); `bash scripts/verify-mentor.sh`) |
 
 ## Guardrails
 

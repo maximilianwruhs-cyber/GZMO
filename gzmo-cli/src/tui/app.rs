@@ -376,6 +376,12 @@ mod tests {
             )
             .await,
         ));
+        let pedagogy = Arc::new(tokio::sync::Mutex::new(
+            crate::pedagogy_bridge::PedagogyRuntime::boot(&config)
+                .await
+                .expect("pedagogy boot"),
+        ));
+        let router = Arc::new(gzmo_core::gateway::GatewayRouter::new(&config));
 
         let comps = AppComponents {
             input: Box::new(InputComponent::new()),
@@ -405,6 +411,8 @@ mod tests {
                 Arc::new(std::sync::Mutex::new(
                     gzmo_core::workflow_skills::WorkflowSessionState::default(),
                 )),
+                pedagogy,
+                router,
             )),
             palette: PaletteComponent::new(),
         };

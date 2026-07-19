@@ -5,7 +5,8 @@ use tokio::sync::mpsc::UnboundedSender;
 
 use gzmo_core::agent_loop::run_agent_loop;
 use gzmo_core::agent_session::AgentSession;
-use gzmo_core::gateway::{LlmGateway, TurboQuantGateway, VllmConfig};
+use gzmo_core::config::TaskKind;
+use gzmo_core::gateway::{GatewayRouter, LlmGateway, TurboQuantGateway, VllmConfig};
 use gzmo_core::types::{EpisodicEntry, EpisodicSource, Message, Role, SoulContext};
 
 use gzmo_chaos::feedback::ChaosEvent;
@@ -19,6 +20,7 @@ use gzmo_core::subagent::SubagentRunner;
 use gzmo_core::tools::ToolRegistry;
 use gzmo_core::workflow_skills::{SharedWorkflowSession, WorkflowSkillIndex};
 
+use crate::pedagogy_bridge::{should_delegate_exec, PedagogyRuntime};
 use crate::repl_shared::{activate_workflow_slash, workflow_status_lines};
 use crate::tui::action::Action;
 use crate::tui::component::Component;
@@ -47,6 +49,8 @@ pub struct AgentComponent {
     pub subagent_enabled: bool,
     pub workflow_index: Arc<WorkflowSkillIndex>,
     pub workflow_session: SharedWorkflowSession,
+    pub pedagogy: Arc<tokio::sync::Mutex<PedagogyRuntime>>,
+    pub router: Arc<GatewayRouter>,
 }
 
 impl AgentComponent {
@@ -70,6 +74,8 @@ impl AgentComponent {
         subagent_enabled: bool,
         workflow_index: Arc<WorkflowSkillIndex>,
         workflow_session: SharedWorkflowSession,
+        pedagogy: Arc<tokio::sync::Mutex<PedagogyRuntime>>,
+        router: Arc<GatewayRouter>,
     ) -> Self {
         let messages = vec![Message {
             role: Role::System,
@@ -102,6 +108,8 @@ impl AgentComponent {
             subagent_enabled,
             workflow_index,
             workflow_session,
+            pedagogy,
+            router,
         }
     }
 
@@ -285,6 +293,7 @@ impl Component for AgentComponent {
                 let tools = Arc::clone(&self.tools);
                 let max_iterations = self.max_iterations;
                 let context_budget = self.context_budget;
+                let pedagogy = Arc::clone(&self.pedagogy);
 
                 self.messages = messages.clone();
 
@@ -312,6 +321,12 @@ impl Component for AgentComponent {
                         workflow_session,
                     };
                     ctx.handle(&cmd).await;
+
+                    // Keep pedagogy session in sync after /ops, /learn, etc.
+                    if let Err(e) = pedagogy.lock().await.reload_from_disk().await {
+                        let _ = action_tx
+                            .send(Action::AgentResponse(format!("⚙ pedagogy reload: {e}")));
+                    }
 
                     // Sync messages back
                     let _ = action_tx.send(Action::AgentMessagesSync(ctx.messages));
@@ -351,7 +366,7 @@ impl Component for AgentComponent {
             let snap = self.chaos_snapshot_rx.borrow().clone();
             Self::inject_chaos_context(&mut self.messages, &snap);
 
-            // ─── Spawn agent loop ──────────────────────────────
+            // ─── Spawn mentor path or agent loop ───────────────
             let action_tx = self.action_tx.as_ref().unwrap().clone();
             let gateway = Arc::clone(&self.gateway);
             let tools = Arc::clone(&self.tools);
@@ -361,6 +376,11 @@ impl Component for AgentComponent {
             let soul = Arc::clone(&self.soul);
             let tool_defs = self.tools.definitions();
             let agent_session = Arc::clone(&self.agent_session);
+            let config = Arc::clone(&self.config);
+            let pedagogy = Arc::clone(&self.pedagogy);
+            let router = Arc::clone(&self.router);
+            let chaos_rx = self.chaos_snapshot_rx.clone();
+            let user_input = text.clone();
 
             tokio::spawn(async move {
                 agent_session.lock().await.turn_start().await;
@@ -378,7 +398,7 @@ impl Component for AgentComponent {
                                 .collect::<Vec<_>>()
                                 .join(", ")
                         };
-                        let new_prompt = format!(
+                        let mut new_prompt = format!(
                             "{}\n\n---\nYou are {}. Today is {}.\nAvailable tools: {}.\n\
                              Use memory_search when you need prior facts (results land in scratch for this turn only).\n\
                              Use delegate_task for focused sub-work; you receive a short summary, not full subagent logs.",
@@ -387,7 +407,78 @@ impl Component for AgentComponent {
                             Utc::now().format("%Y-%m-%d %H:%M UTC"),
                             tool_names,
                         );
+                        let cfg = config.read().await;
+                        if cfg.pedagogy.enabled {
+                            let ped = pedagogy.lock().await;
+                            let suffix = ped.learner_prompt_suffix();
+                            if !suffix.is_empty() {
+                                new_prompt.push_str(&suffix);
+                            }
+                        }
                         msgs[0].content = new_prompt;
+                    }
+                }
+
+                // Wave 2b.1: Socratic turns skip the tool agent loop.
+                {
+                    let cfg = config.read().await.clone();
+                    if cfg.pedagogy.enabled {
+                        let mut ped = pedagogy.lock().await;
+                        if !should_delegate_exec(&ped.session, &user_input) {
+                            let snap = chaos_rx.borrow().clone();
+                            let chaos_context = Some(format!(
+                                "valence={:.2} energy={:.0} tension={:.0}",
+                                snap.llm_valence, snap.energy, snap.tension
+                            ));
+                            let tutor = router.gateway(TaskKind::Chat);
+                            match ped
+                                .maybe_teach(
+                                    &cfg,
+                                    router.as_ref(),
+                                    tutor.as_ref(),
+                                    &user_input,
+                                    &msgs,
+                                    chaos_context.as_deref(),
+                                    None,
+                                    Some(&chaos_rx),
+                                )
+                                .await
+                            {
+                                Ok(Some(turn)) => {
+                                    msgs.push(Message {
+                                        role: Role::Assistant,
+                                        content: turn.response.clone(),
+                                        is_meta: false,
+                                        tool_calls: None,
+                                        tool_call_id: None,
+                                    });
+                                    let _ = action_tx.send(Action::AgentMessagesSync(msgs));
+                                    let resp_text = turn.response.clone();
+                                    let ep = episodic.clone();
+                                    tokio::spawn(async move {
+                                        let _ = ep
+                                            .append(&EpisodicEntry {
+                                                timestamp: Utc::now(),
+                                                source: EpisodicSource::InternalMonologue,
+                                                content: resp_text,
+                                                is_silent: false,
+                                            })
+                                            .await;
+                                    });
+                                    let _ = action_tx.send(Action::AgentResponse(format!(
+                                        "⚙ pedagogy orchestrator | mentor mode\n{}",
+                                        turn.response
+                                    )));
+                                    return;
+                                }
+                                Ok(None) => {}
+                                Err(e) => {
+                                    let _ = action_tx.send(Action::AgentResponse(format!(
+                                        "⚙ pedagogy failed ({e}); falling through to agent loop"
+                                    )));
+                                }
+                            }
+                        }
                     }
                 }
 
