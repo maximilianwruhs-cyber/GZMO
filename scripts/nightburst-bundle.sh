@@ -46,6 +46,9 @@ run pi-glass bash scripts/pi-operator-glass.sh
 run rapl-probe bash scripts/rapl-probe.sh
 run aos-ce-pin bash scripts/aos-ce-pin.sh
 run escape-loop bash scripts/escape-loop-kit.sh
+run portable-core bash scripts/portable-core-inventory.sh
+run cognis-stub bash scripts/cognis-dialect-stub.sh
+run edge-fleet bash scripts/edge-fleet-sketch.sh
 run scoreboard bash scripts/nightburst-scoreboard.sh
 run aos-poll bash scripts/aos-gzmo-poll.sh
 
@@ -71,5 +74,8 @@ echo "Pi glass: $ROOT/data-next/pi-glass/latest.json"
 echo "RAPL probe: $ROOT/data-next/rapl/latest.json"
 echo "AOS CE pin: $ROOT/data-next/aos-ce/latest.json"
 echo "Escape-loop: $ROOT/data-next/escape-loop/latest.json"
+echo "Portable core: $ROOT/data-next/portable-core/latest.json"
+echo "Cognis stub: $ROOT/data-next/cognis-dialect/latest.json"
+echo "Edge fleet: $ROOT/data-next/edge-fleet/latest.json"
 echo "AOS feed: $ROOT/data-next/aos-status/latest.json"
 exit "$fail"

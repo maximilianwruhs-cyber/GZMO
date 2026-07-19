@@ -264,21 +264,21 @@ One-curl Ubuntu appliance: Prime + GZMO serve + OKForge + Obolus recommend.
 - **Why special:** Sovereign stack install is the go-to-market for everything else.
 - **Ship shape:** `data-next/aos-ce/` golden-path pin from living SHAs; human promotes into CE bootstrap.
 
-#### Edge fleet with shared forge — `later` · differentiated · research
+#### Edge fleet with shared forge — `later` · differentiated · spike (sketch)
 
 Multiple edge-nodes; one OKForge hub; local metabolism stays on-box.
 
-- **Builds on:** edge-node · okforge · GZMO portable
+- **Builds on:** `scripts/edge-fleet-sketch.sh` · edge-node · aos-ce-pin · wiki-push
 - **Why special:** Privacy-preserving multi-node knowledge sync.
-- **Ship shape:** After single-node AOS is boring.
+- **Ship shape:** Topology sketch → `data-next/edge-fleet/`; hold until AOS CE single-node is boring.
 
-#### Portable GZMO core — `later` · commodity · research
+#### Portable GZMO core — `later` · commodity · spike (inventory)
 
 gzmo-core-clean / sovereign-agent as extractable brain without theatrical CT101 baggage.
 
-- **Builds on:** gzmo-core-clean · sovereign-agent · ADR-0003
+- **Builds on:** `scripts/portable-core-inventory.sh` · gzmo-core-clean · ADR-0003
 - **Why special:** Useful cleanup; risk of rewrite distraction.
-- **Ship shape:** Only if living binary blocks packaging.
+- **Ship shape:** Inventory → `data-next/portable-core/`; default advice `hold_rewrite`.
 
 ### Research brands
 
@@ -306,13 +306,13 @@ Research brand: dynamical-systems view of agent loops (lorenz-map, escape-loop-b
 - **Why special:** Intellectual moat; not a day-job product.
 - **Ship shape:** Soft kit → `data-next/escape-loop/`; never on GREEN; chaos/lorenz stay off serve.
 
-#### Cognis dialect experiment — `later` · singular · research
+#### Cognis dialect experiment — `later` · singular · spike (stub)
 
 Probabilistic typed prompts / confidence gates as a small language over GZMO tools.
 
-- **Builds on:** Schreibtisch Cognis notes · plan-gate · verify-suite
+- **Builds on:** `scripts/cognis-dialect-stub.sh` · plan-gate fixtures · confidence forms
 - **Why special:** Could define a new interface layer — high risk, high novelty.
-- **Ship shape:** Weekend prototype only; no production coupling.
+- **Ship shape:** Soft stub → `data-next/cognis-dialect/`; never production brain / never on GREEN.
 
 ---
 
@@ -366,8 +366,8 @@ Those become interesting only after Arena + felt recall make the stack demable t
 | s4 | tinyFolder daemon | later | commodity | spike (drop) |
 | s5 | Pi / operator split polish | later | commodity | spike (glass) |
 | p1 | AOS Customer Edition | later | differentiated | spike (pin) |
-| p2 | Edge fleet + shared forge | later | differentiated | research |
-| p3 | Portable GZMO core | later | commodity | research |
+| p2 | Edge fleet + shared forge | later | differentiated | spike (sketch) |
+| p3 | Portable GZMO core | later | commodity | spike (inventory) |
 | r1 | ZPD tutor | later | differentiated | spike (lab) |
 | r2 | Attractor / escape-loop brand | later | singular | spike (kit) |
-| r3 | Cognis dialect experiment | later | singular | research |
+| r3 | Cognis dialect experiment | later | singular | spike (stub) |

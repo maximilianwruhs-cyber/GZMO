@@ -221,6 +221,9 @@ bash scripts/pi-operator-glass.sh       # Pi-facing status glass (CLI remains ca
 bash scripts/rapl-probe.sh              # why Arena is estimate vs RAPL (root-only energy_uj)
 bash scripts/aos-ce-pin.sh              # golden-path SHA pin for AOS Customer Edition
 bash scripts/escape-loop-kit.sh         # soft escape-loop dry-run (research; not on GREEN)
+bash scripts/portable-core-inventory.sh # living vs gzmo-core-clean; default hold_rewrite
+bash scripts/cognis-dialect-stub.sh     # weekend dialect over plan-gate (not production brain)
+bash scripts/edge-fleet-sketch.sh       # hub/edge topology sketch (no sync)
 gzmo chat                               # sessions persist to data-next/sessions/
 # Skills (next): authoritative root = GZMO/skills/ (see gzmo instance status → skills_root).
 # gzmo_skills/ remains CT101/bridge auxiliary only — see gzmo_skills/BRIDGE.md.
