@@ -204,13 +204,13 @@ Open-source the fixture→meta→gate ladder as a framework for agent organ prom
 - **Why special:** Promotion science for agent tools, not just unit tests.
 - **Ship shape:** `ltl` CLI publish + docs; GZMO as reference assembly.
 
-#### Cognition pack — `later` · differentiated · spike
+#### Cognition pack — `later` · differentiated · spike (contract)
 
 Distill → honeypot → spark-link → recall as a portable assembly for other agents.
 
-- **Builds on:** cognition-smoke · session-distill · spark-link
+- **Builds on:** `scripts/cognition-pack.sh` · scheduler-runs · memory search smoke
 - **Why special:** The memory loop without the full GZMO binary.
-- **Ship shape:** Rust crates or container with JSON contract.
+- **Ship shape:** `data-next/cognition-pack/{contract,latest}.json` stage map + living status; `--smoke` recall probe.
 
 ### Surfaces / UX
 
@@ -238,13 +238,13 @@ Editor sidebar: live energy, Arena champion, last-night €, recall health.
 - **Why special:** Brings the stack into the coding surface without another web app.
 - **Ship shape:** File/HTTP poll of `data-next/aos-status/latest.json` (or `:8765/telemetry.json`); status bar shows GZMO z/gate when AOS gateway is down.
 
-#### tinyFolder daemon product — `later` · commodity · spike
+#### tinyFolder daemon product — `later` · commodity · spike (drop)
 
 Filesystem-driven inbox → ingest → metabolism for non-CLI users.
 
-- **Builds on:** tinyFolder · ingest · GZMO
+- **Builds on:** `scripts/tinyfolder-drop.sh` · `data-next/inbox` · distill-queue advice
 - **Why special:** Accessible on-ramp; less unique alone.
-- **Ship shape:** Drop folder → overnight facts.
+- **Ship shape:** Drop/demo → pending markdown in inbox + queue JSONL; watcher stays off by default.
 
 #### Pi / operator split polish — `later` · commodity · research
 
@@ -361,9 +361,9 @@ Those become interesting only after Arena + felt recall make the stack demable t
 | e5 | Obolus Forge mutations | later | differentiated | spike (sibling) |
 | f2 | OKCP memory marketplace | later | singular | product |
 | o2 | Beat-gate open eval kit | later | differentiated | product |
-| o4 | Cognition pack | later | differentiated | spike |
+| o4 | Cognition pack | later | differentiated | spike (contract) |
 | s3 | AOS Intelligence Dashboard v2 | later | differentiated | spike (poll) |
-| s4 | tinyFolder daemon | later | commodity | spike |
+| s4 | tinyFolder daemon | later | commodity | spike (drop) |
 | s5 | Pi / operator split polish | later | commodity | research |
 | p1 | AOS Customer Edition | later | differentiated | product |
 | p2 | Edge fleet + shared forge | later | differentiated | research |
