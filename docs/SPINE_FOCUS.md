@@ -34,6 +34,8 @@ bash scripts/product-stranger-path.sh
 # → data-next/product-stranger/latest.{json,md}
 bash scripts/mcp-attach-check.sh
 # → data-next/mcp-attach/latest.{json,md}
+bash scripts/product-first-fact.sh
+# → data-next/product-first-fact/ (needs local engine; sibling overlay only)
 
 # Soft CT101 living probe (SSH smoke + dual-writer check)
 bash scripts/ct101-living-probe.sh

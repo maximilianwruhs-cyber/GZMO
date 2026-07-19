@@ -81,6 +81,16 @@ gzmo memory mcp
 
 **Attach rule:** `GZMO_CONFIG` must be `~/.gzmo/gzmo.toml` with `GZMO_PRODUCT=1`. Never point the laptop product MCP at CT101 `/opt/gzmo` or workstation `data-next/`.
 
+### 3. Feel it (optional first fact)
+
+Needs a live OpenAI-compatible engine (Prime `:8000` by default). Uses a **sibling** overlay `~/.gzmo/gzmo-product-engine.toml` — does not permanently rewrite product `gzmo.toml`.
+
+```bash
+bash scripts/product-first-fact.sh
+# → data-next/product-first-fact/latest.md
+# PRODUCT_ENGINE_URL=http://127.0.0.1:8000/v1  # override if needed
+```
+
 **Appliance note:** product install is the Memory MCP appliance (map m2). Living
 workstation vault (`data-next/`) is separate — use `GZMO_CONFIG` pointing at
 `~/.gzmo/gzmo.toml` for the portable product, not the nightburst living root.
