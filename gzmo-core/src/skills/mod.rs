@@ -36,6 +36,10 @@ pub mod joke;
 pub mod language;
 pub mod llm;
 pub mod persona;
+pub mod pkm;
+pub mod pkm_corpus;
+pub mod pkm_forge;
+pub mod pkm_forge_brief;
 pub mod poem;
 pub mod poker;
 pub mod quote;
@@ -58,6 +62,7 @@ use dice::DiceSkill;
 use help::HelpSkill;
 use joke::JokeSkill;
 use language::LanguageSkill;
+use pkm::PkmSkill;
 use poem::PoemSkill;
 use poker::PokerSkill;
 use quote::QuoteSkill;
@@ -237,6 +242,7 @@ pub fn register_pantheon(registry: &mut SkillRegistry, config: &GzmoConfig) {
         rt: Arc::clone(&rt),
     }));
     registry.register(Arc::new(CardSkill));
+    registry.register(Arc::new(PkmSkill));
     registry.register(Arc::new(TransformSkill {
         rt: Arc::clone(&rt),
     }));

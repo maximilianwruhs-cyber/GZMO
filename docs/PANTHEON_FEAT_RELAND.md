@@ -14,8 +14,9 @@
 6. [x] `bash scripts/pantheon-ritual-check.sh` → feat-stack PASS
 7. [x] Living faithfulness + takeaway-recall still PASS (post Slice A full merge)
 8. [x] Skills bridge docs updated for A full
+9. [x] **PKM Forge** — `/pkm` Rust skill, corpus, feedback, and cascade dispatch
 
-**Still deferred:** `pkm_forge`, daemon `dice_loop`, poem/joke briefs, Slice C (`feedback_ipc` / chaos engine).
+**Still deferred:** daemon `dice_loop`, poem/joke briefs, Slice C (`feedback_ipc` / chaos engine).
 
 Thin `/card` `/story` remain main stubs until full Slice A. `/dice` narratives + wild-magic **plan** come from TOML.  
 Demos: `bash scripts/verify-dice-corpus.sh` · `bash scripts/verify-dice-cascade.sh` · `bash scripts/pantheon-ritual-demo.sh`.
@@ -33,7 +34,7 @@ Demos: `bash scripts/verify-dice-corpus.sh` · `bash scripts/verify-dice-cascade
 | `gzmo-core/src/skills/card.rs` + `card_corpus.rs` | Card skill |
 | `gzmo-core/src/skills/card_forge.rs` + `card_forge_brief.rs` | Forge (large) |
 | `gzmo-core/src/skills/story.rs` + `story_brief.rs` | Story v2 |
-| `gzmo-core/src/skills/pkm_forge.rs` + `pkm_forge_brief.rs` | PKM forge |
+| `gzmo-core/src/skills/pkm.rs` + `pkm_corpus.rs` + `pkm_forge.rs` + `pkm_forge_brief.rs` | Landed PKM forge |
 | `data/dice_cascade.toml` | Cascade config |
 | `data/dice_events.toml` | Events tier |
 | `skills/skill_{dice,card,story}.sh` + `skills/{cardforge,pkmforge}.toml` | Shell bridges |

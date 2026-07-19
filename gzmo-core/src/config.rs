@@ -370,8 +370,7 @@ impl Default for DiceCascadeConfig {
     fn default() -> Self {
         Self {
             enabled: true,
-            // Slice A has no Rust `/pkm` implementation yet.
-            exclude: vec!["pkm".to_string()],
+            exclude: Vec::new(),
         }
     }
 }
