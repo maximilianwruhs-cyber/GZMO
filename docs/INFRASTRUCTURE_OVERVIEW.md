@@ -64,7 +64,7 @@ flowchart TB
 | Workstation | local | 2× 16 GB RTX 5070 Ti, Ryzen 9950X | Prime, GZMO daemon/CLI, knowledge-dir ingest |
 | PVE | `192.168.31.200` | i7-6770HQ | Hypervisor |
 | VM200 `ollamagpu` | `192.168.31.110` | GTX 1070 8 GB (eGPU) | Embed, rerank, librarian |
-| LXC101 | `192.168.31.202` | Docker | Neo4j, Qdrant, Redis (Redis not wired to GZMO) |
+| LXC101 | `192.168.31.202` | Docker | Neo4j, Qdrant, Redis (scratch + distill queue + spawn budget — see [PORTS.md](./PORTS.md)) |
 | LXC100 | `192.168.31.201` | — | Samba — not on hot path |
 | LXC102 | `192.168.31.203` | — | Optional MCP hub / Pi era |
 
@@ -104,7 +104,7 @@ Deploy: `scripts/vm200/deploy-retrieval-layer.sh`, `deploy-rerank.sh`, `deploy-l
 |------|---------|------------|
 | **:7687** | Neo4j | KG via MCP `mcp-neo4j-memory` (stdio from workstation) |
 | **:6333** | Qdrant | Collection **`honeypot`** (production RAG); **`knowledge`** (legacy mirror) |
-| **:6379** | Redis | Running; **not wired** to GZMO |
+| **:6379** | Redis | **Wired** — scratch (`gzmo:scratch:*`), distill queue (`gzmo:distill:pending`), spawn Prime budget; optional CCR on branch (`gzmo:ccr:*`) |
 
 ---
 
@@ -112,7 +112,7 @@ Deploy: `scripts/vm200/deploy-retrieval-layer.sh`, `deploy-rerank.sh`, `deploy-l
 
 | Component | Path / binary | Role |
 |-----------|---------------|------|
-| Root | `~/Projects/_foundation-audit/survey_GZMO` | Production tree |
+| Root | `/opt/gzmo/current` (living) · this git clone (dev) | Prefer [CT101_PATH_AUTHORITY.md](./CT101_PATH_AUTHORITY.md); old `survey_GZMO` home is stale |
 | Config | `gzmo.toml` | Single source of runtime config |
 | CLI | `target/release/gzmo` | `chat`, `daemon`, `dream`, `spark`, `distill`, `health`, `ingest`, `ingest-eval`, … |
 | Core | `gzmo-core/` | Engines, gateway, vault, honeypot, ingest, qdrant_sync |

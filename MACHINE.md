@@ -39,12 +39,17 @@ The LLM **thinks** (extract, verify, dream). The pipeline **remembers**.
 ## Ops (daily)
 
 ```bash
-cd ~/Projects/_foundation-audit/survey_GZMO
+# Dev clone (workstation)
+cd /home/gzmo/github-clone/GZMO
 ./scripts/verify-production.sh    # after reboot or infra change
 ./scripts/memory-status.sh        # vault / honeypot / qdrant counts
+
+# Living (CT101)
+# GZMO_CONFIG=/opt/gzmo/gzmo.toml /opt/gzmo/current/target/release/gzmo health
 ```
 
 Roadmap to **local production-ready** (M3–M4): [`docs/ROADMAP_TO_M5.md`](docs/ROADMAP_TO_M5.md).
 
 Operator model (one frontend, GZMO Platform spine): [`docs/ARCHITECTURE_GZMO_PLATFORM.md`](docs/ARCHITECTURE_GZMO_PLATFORM.md).  
-**Pi living stack (recovered):** [`docs/PI_LIVING_STACK.md`](docs/PI_LIVING_STACK.md) · upgrade: [`docs/PI_UPGRADE_RUNBOOK.md`](docs/PI_UPGRADE_RUNBOOK.md) · Headroom/CCR: [`docs/HEADROOM_CCR.md`](docs/HEADROOM_CCR.md).
+**Pi living stack (recovered):** [`docs/PI_LIVING_STACK.md`](docs/PI_LIVING_STACK.md) · upgrade: [`docs/PI_UPGRADE_RUNBOOK.md`](docs/PI_UPGRADE_RUNBOOK.md) · Headroom/CCR: [`docs/HEADROOM_CCR.md`](docs/HEADROOM_CCR.md).  
+**Lost-knowledge inventory:** [`docs/LOST_KNOWLEDGE_INVENTORY.md`](docs/LOST_KNOWLEDGE_INVENTORY.md) · paths: [`docs/CT101_PATH_AUTHORITY.md`](docs/CT101_PATH_AUTHORITY.md).

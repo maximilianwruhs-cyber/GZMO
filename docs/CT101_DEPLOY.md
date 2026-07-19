@@ -1,7 +1,7 @@
 # CT101 deploy layout
 
 **Living host:** LXC 101 (`192.168.31.202`)  
-**Related:** [CT101_RESTORE_LIVING.md](./CT101_RESTORE_LIVING.md), [CT101_BOUNDARY.md](./CT101_BOUNDARY.md)
+**Related:** [CT101_PATH_AUTHORITY.md](./CT101_PATH_AUTHORITY.md), [CT101_RESTORE_LIVING.md](./CT101_RESTORE_LIVING.md), [CT101_BOUNDARY.md](./CT101_BOUNDARY.md)
 
 ## Canonical paths
 

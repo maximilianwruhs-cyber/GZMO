@@ -14,6 +14,9 @@ Canonical operator and architecture docs. Session reports and milestone logs bel
 | [../MACHINE.md](../MACHINE.md) | What GZMO is (two sentences) |
 | [ROADMAP_TO_M5.md](ROADMAP_TO_M5.md) | Milestone roadmap (operator) |
 | [INFRASTRUCTURE_OVERVIEW.md](INFRASTRUCTURE_OVERVIEW.md) | Living stack topology, ports, runbook |
+| [PORTS.md](PORTS.md) | **Locked** port map (Redis wired; librarian retired) |
+| [CT101_PATH_AUTHORITY.md](CT101_PATH_AUTHORITY.md) | Canonical `/opt/gzmo/*` paths (kill `survey_GZMO` drift) |
+| [LOST_KNOWLEDGE_INVENTORY.md](LOST_KNOWLEDGE_INVENTORY.md) | Archaeology index — branch/plan scars recovered |
 | [PRODUCTION_READINESS.md](PRODUCTION_READINESS.md) | Production gate checklist |
 
 Product non-goals (v1): multi-host living install, overnight serve as required path, SEIP scaffolding, cloud memory SaaS.
@@ -59,6 +62,15 @@ Product non-goals (v1): multi-host living install, overnight serve as required p
 | [PI_LIVING_STACK.md](PI_LIVING_STACK.md) | **Recovered** Pi × Redis × Headroom/CCR living topology |
 | [PI_UPGRADE_RUNBOOK.md](PI_UPGRADE_RUNBOOK.md) | Pi upgrade checklist (stop attach breakages) |
 | [HEADROOM_CCR.md](HEADROOM_CCR.md) | Headroom-inspired CCR on Redis (branch-only today) |
+| [SYNAPSE_EVENT_OWNERSHIP.md](SYNAPSE_EVENT_OWNERSHIP.md) | Pi vs daemon bus ownership (dedupe rules) |
+| [DISTILL_COLD_CHAIN.md](DISTILL_COLD_CHAIN.md) | Distill ingress + SubArchive episodic skip |
+| [SPAWN_GATE.md](SPAWN_GATE.md) | Autospawn + Redis Prime budget |
+| [OBOLUS_GOVERNANCE.md](OBOLUS_GOVERNANCE.md) | T0–T2 energy gates |
+| [DISCOVERY_KB_FEEDBACK_LOOP.md](DISCOVERY_KB_FEEDBACK_LOOP.md) | Discovery ↔ vault/honeypot loop |
+| [CT101_CLOUD_ROUTING.md](CT101_CLOUD_ROUTING.md) | OpenRouter / active_mode vs background |
+| [AGENT_HOME_SECRETS.md](AGENT_HOME_SECRETS.md) | Never store passwords in `~/.pi/agent/` |
+| [CHAOS_LIVING_VS_RITUAL.md](CHAOS_LIVING_VS_RITUAL.md) | Living chaos-free vs chat/TUI ritual |
+| [SKILLS_BRIDGE.md](SKILLS_BRIDGE.md) | Rust vs shell vs `gzmo_skills` |
 | [PI_OPERATOR_GUIDE.md](PI_OPERATOR_GUIDE.md) | Pi onboarding (historical; see living stack + upgrade runbook) |
 | [PI_GZMO_MEMORY_INTEGRATION.md](PI_GZMO_MEMORY_INTEGRATION.md) | Living MCP attach (CT101) |
 | [REBOOT_STARTUP.md](REBOOT_STARTUP.md) | Cold-start after reboot |

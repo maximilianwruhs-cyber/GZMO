@@ -1,0 +1,43 @@
+# Skills Bridge — Rust, Shell, gzmo_skills
+
+**Status:** Operator guide (2026-07-19)  
+**Sibling detail:** `/home/gzmo/github-clone/gzmo_skills/BRIDGE.md` (may still cite `survey_GZMO` paths)  
+**Quality bar:** [SKILL_GOLDEN_STANDARD.md](./SKILL_GOLDEN_STANDARD.md)  
+**Backlog:** [DEFERRED_WORK_HANDOFF.md](./DEFERRED_WORK_HANDOFF.md) (TUI/daemon pedagogy parity)
+
+## Three trees
+
+| Tree | Role | Used by |
+|------|------|---------|
+| **Rust registry** | Authoritative slash skills | `gzmo-core/src/skills/` → `dispatch_skill` |
+| **Repo `skills/`** | Shell pantheon / next instance | `[skills] directory` in `config/gzmo-next.toml` |
+| **`gzmo_skills/` sibling** | CT101 discovery cycles, Pi mentor bridge, timers | Auxiliary — do **not** dual-load the same script from both shell trees |
+
+```
+/slash → dispatch_skill()
+           ├─ Rust Skill trait → ChaosEvent → PulseLoop → Thought Cabinet (when chaos on)
+           └─ shell_bridge (legacy fallback only)
+```
+
+**Golden rule:** Rust registry wins. Shell scripts that still exist should delegate to `gzmo chaos skill <cmd>` or the Rust path.
+
+## Living vs next
+
+| Instance | Skills root | Notes |
+|----------|-------------|-------|
+| CT101 living | Release tree under `/opt/gzmo/current` + discovery scripts | Paths: [CT101_PATH_AUTHORITY.md](./CT101_PATH_AUTHORITY.md) |
+| Workstation next | `GZMO/skills/` via `gzmo-next.toml` | Resolve with `gzmo instance status` → `skills_root` |
+
+## Pedagogy surface gap
+
+| Surface | `maybe_teach` / pedagogy orchestrator |
+|---------|----------------------------------------|
+| `gzmo chat` | Yes |
+| `gzmo tui` | No (slash skills only) |
+| `gzmo daemon` | No chat loop — mentor via Unix socket |
+
+Do not assume TUI/daemon teach parity until deferred work lands.
+
+## Legendary / parked pantheon
+
+Dice, card forge, Würfel, CCL-4 hexad docs mostly lived on `feat/context-compress-headroom`. Opportunity map parks polish. If reopening: pull branch handoffs + `SKILL_GOLDEN_STANDARD.md`; do not reinvent under a new tree.
