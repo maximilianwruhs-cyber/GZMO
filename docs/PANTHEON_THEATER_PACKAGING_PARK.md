@@ -1,8 +1,8 @@
 # Pantheon + Mutual-discovery packaging (Done)
 
-**Status:** Done / unparked 2026-07-19 — docs packaged; feat skill code still Park  
+**Status:** Docs done; feat skill code → Unpark Wave 2 ritual  
 **Cursor plan:** `~/.cursor/plans/pantheon_theater_packaging_321b0440.plan.md`  
-**Inventory:** [LOST_KNOWLEDGE_INVENTORY.md](./LOST_KNOWLEDGE_INVENTORY.md)
+**Inventory:** [LOST_KNOWLEDGE_INVENTORY.md](./LOST_KNOWLEDGE_INVENTORY.md) · [UNPARK_ROADMAP.md](./UNPARK_ROADMAP.md)
 
 ## Front doors (use these)
 
@@ -15,10 +15,10 @@ Archive: [research/pantheon/](./research/pantheon/), [research/mutual-discovery/
 
 Living SoT unchanged: [DISCOVERY_LIFECYCLE.md](./DISCOVERY_LIFECYCLE.md) + [CHAOS_LIVING_VS_RITUAL.md](./CHAOS_LIVING_VS_RITUAL.md).
 
-## Code still Park until ritual PR
+## Code Unpark Wave 2 (ritual PR)
 
-Do **not** merge `feat/context-compress-headroom` skill stack (`attractor_common`, `card_forge*`, `dice_corpus`, `dice_loop`, cascade TOML, `data/dice_events.toml`). Main keeps thin `/dice` `/card` `/story`. Würfel ops spike + session-prep scars stay on branch.
+Re-land feat skill stack via dedicated ritual path (`scripts/pantheon-ritual-check.sh`). Do **not** invent ghost `DICE_MASTER_*`. Main keeps thin `/dice` `/card` `/story` until ritual verify PASS. Never redefine living publish/timer KPI.
 
 ## What was packaged
 
-Same recovery pattern as Synapse/Obolus: thin front doors + selected research archives with recovery banners; no CT101 chaos re-enable; no Park zoo unpark.
+Same recovery pattern as Synapse/Obolus: thin front doors + selected research archives with recovery banners; no CT101 chaos re-enable.

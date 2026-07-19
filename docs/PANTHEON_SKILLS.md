@@ -45,11 +45,13 @@ See [CHAOS_LIVING_VS_RITUAL.md](./CHAOS_LIVING_VS_RITUAL.md).
 | [research/pantheon/STORY_SKILL_V2_SPEC.md](./research/pantheon/STORY_SKILL_V2_SPEC.md) | CCL-4 story acceptance |
 | [research/pantheon/PANTHEON_FINAL_PACK.md](./research/pantheon/PANTHEON_FINAL_PACK.md) | Definitive Dozen personas |
 
-## Still Park (ops spikes / ghosts)
+## Unpark Wave 2 (ritual)
 
-| Item | Why |
-|------|-----|
-| Würfel dice loop (`WUERFEL_DICE_LOOP.md`, `dice_loop.rs`, cascade TOML) | Ops spike tied to unmerged feat code — mention only; do not promote as doctrine |
-| Ghost BRIDGE masters (`DICE_MASTER_HANDOFF`, cascade/loop masters) | Never existed as files; sibling `gzmo_skills/BRIDGE.md` retargets to this front door + real archives |
+| Item | Status |
+|------|--------|
+| Front door + archive | Ready — `bash scripts/pantheon-ritual-check.sh` |
+| Thin `/dice` `/card` `/story` on main | Present |
+| Feat attractor / Würfel / cascade stack | HOLD until dedicated ritual PR re-lands code |
+| Ghost `DICE_MASTER_*` | Never existed — do not invent |
 
-Legendary packs = **research until code re-land**.
+Legendary packs = research archive + ritual check; living KPI unchanged.

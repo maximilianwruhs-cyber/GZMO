@@ -44,4 +44,4 @@ Front door: [PANTHEON_SKILLS.md](./PANTHEON_SKILLS.md) — ritual/lab only; not 
 
 Archive: [research/pantheon/](./research/pantheon/) (standardization handoff, Card Forge, dice tiers, story V2, Final Pack). Quality bar stays [SKILL_GOLDEN_STANDARD.md](./SKILL_GOLDEN_STANDARD.md).
 
-Würfel loop / cascade / feat attractor stack remain **Park** until a separate ritual PR. Ghost `DICE_MASTER_*` masters never existed — do not invent them.
+Würfel loop / cascade / feat attractor stack are **Unpark Wave 2** — re-land via ritual PR (`scripts/pantheon-ritual-check.sh`). Ghost `DICE_MASTER_*` masters never existed — do not invent them.

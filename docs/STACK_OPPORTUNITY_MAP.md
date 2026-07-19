@@ -1,15 +1,15 @@
 # Stack opportunity map
 
-**Status:** Spine focus active (2026-07-19). Nightburst zoo spiked; product direction concentrates on two pillars.  
+**Status:** Unpark active (2026-07-19). A+C GREEN; satellites sequenced in waves.  
 **Audience:** Operator / product direction for the maximilianwruhs-cyber stack  
 **Scope:** Projects and products that can be created from lived GZMO + adjacent repos — not a generic idea dump.  
-**Doctrine:** [SPINE_FOCUS.md](SPINE_FOCUS.md)
+**Doctrine:** [SPINE_FOCUS.md](SPINE_FOCUS.md) · [UNPARK_ROADMAP.md](UNPARK_ROADMAP.md)
 
 ## North star
 
 The singular asset is a **living overnight memory metabolism** with a **product memory MCP** attach surface. Living production vault owner is **CT101** (`/opt/gzmo/`); workstation `data-next/` is lab scratch only. Arena / energy / surfaces are satellites — useful, not the brand.
 
-## Keep / Park / Later (spine)
+## Keep / Unpark / Later (spine)
 
 Operator lock: co-primary **A** (product MCP) + **C** (living Redis/Qdrant/Neo4j appliance). See [SPINE_FOCUS.md](SPINE_FOCUS.md), [research/CT101_STACK_FUTURE_2026-07.md](research/CT101_STACK_FUTURE_2026-07.md).
 
@@ -17,16 +17,17 @@ Operator lock: co-primary **A** (product MCP) + **C** (living Redis/Qdrant/Neo4j
 |------|------|--------|
 | **Keep (A)** | Product Memory MCP · stranger install · release freshness · faithfulness fixture | `product-readiness-gate.sh` |
 | **Keep (C)** | Living metabolism · Redis/Qdrant/Neo4j appliance compose · takeaway/watchdog · living faithfulness | `living-readiness-gate.sh` + **in-repo compose pin** |
-| **Park** | Arena/€/RAPL · HSP · AOS poll · herdr/Pi polish · OKCP marketplace · IpW/Forge · Cognis · escape-loop · edge · portable rewrite · pantheon theater | Do not expand until A+C stay demable |
-| **Later** | AOS CE golden path (Prime+OKForge on top of C) · public marketplace · multi-node forge | Only after A+C stay boring |
+| **Unpark queue** | Arena/€/RAPL · HSP · AOS poll · herdr/Pi polish · OKCP marketplace · IpW/Forge · pantheon ritual · tinyFolder | Sequenced waves — [UNPARK_ROADMAP.md](UNPARK_ROADMAP.md) |
+| **Later (Wave 4)** | AOS CE golden path (Prime+OKForge on top of C) · public marketplace · multi-node forge · portable-core RFC | After Waves 1–3 stay demable |
+| **Never-as-brain** | Cognis · escape-loop · ZPD on GREEN overnight | Lab/research only |
 
 ## Recommended next three
 
-1. **Keep A GREEN** — `bash scripts/product-readiness-gate.sh`
-2. **Keep C GREEN** — `bash scripts/living-readiness-gate.sh` ([LIVING_PRODUCTION_READINESS.md](LIVING_PRODUCTION_READINESS.md))
-3. **Living appliance compose (C)** — pin at `deploy/living-appliance/`; gate `scripts/living-appliance-gate.sh`; never required for A’s `install-gzmo.sh`
+1. **Keep A+C GREEN** — `bash scripts/production-readiness-gate.sh`
+2. **Unpark Wave 1** — herdr / Pi glass / tinyFolder / AOS poll checks
+3. **Wave gate** — `bash scripts/unpark-wave-check.sh`
 
-Park stays parked (Arena/€/HSP zoo; pantheon: [PANTHEON_THEATER_PACKAGING_PARK.md](PANTHEON_THEATER_PACKAGING_PARK.md)). Doctrine: [SPINE_FOCUS.md](SPINE_FOCUS.md).
+Unpark open after A+C GREEN (2026-07-19). Pantheon: [PANTHEON_THEATER_PACKAGING_PARK.md](PANTHEON_THEATER_PACKAGING_PARK.md). Doctrine: [SPINE_FOCUS.md](SPINE_FOCUS.md).
 
 ## Composition spine
 
@@ -37,12 +38,12 @@ KEEP pillars
     → vault + honeypot + Qdrant · GREEN · watchdog
     → gzmo memory mcp  (product appliance)
 
-PARK satellites (spiked, do not expand)
-  Arena · €/night · RAPL · price-shift · IpW · Forge
-  HSP · herdr · Pi glass · tinyFolder · AOS poll
-  OKCP marketplace · beat-gate · ZPD · Cognis · escape-loop · edge sketch
+UNPARK queue (sequenced — see UNPARK_ROADMAP.md)
+  W1: herdr · Pi glass · tinyFolder · AOS poll
+  W2: pantheon ritual · discovery theater · HSP emit
+  W3: Arena · €/night · RAPL · IpW · Forge (outside living daemon)
+  W4: AOS CE · marketplace · wiki mind · portable-core RFC
 ```
-
 ## Stack atlas
 
 | Layer | What you already have |

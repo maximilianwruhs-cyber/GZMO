@@ -1,9 +1,10 @@
 # herdr ↔ GZMO Metabolism
 
-**Status:** Park spike with a durable runbook (2026-07-19)  
+**Status:** Unpark Wave 1.1 (2026-07-19)  
 **Plugin:** `integrations/herdr-gzmo-metabolism/`  
 **Link script:** `scripts/herdr-metabolism-link.sh`  
-**Related:** [DISTILL_COLD_CHAIN.md](./DISTILL_COLD_CHAIN.md), [SYNAPSE_EVENT_OWNERSHIP.md](./SYNAPSE_EVENT_OWNERSHIP.md), [STACK_OPPORTUNITY_MAP.md](./STACK_OPPORTUNITY_MAP.md) (Park)
+**Check:** `scripts/herdr-metabolism-check.sh` → `data-next/herdr-metabolism/`  
+**Related:** [DISTILL_COLD_CHAIN.md](./DISTILL_COLD_CHAIN.md), [SYNAPSE_EVENT_OWNERSHIP.md](./SYNAPSE_EVENT_OWNERSHIP.md), [UNPARK_ROADMAP.md](./UNPARK_ROADMAP.md)
 
 ## What it does
 
@@ -57,6 +58,6 @@ Under the hood: `gzmo session close [--session ID] --takeaway '…' [--now]`.
 
 Do not invent a fourth close path. Product MCP attach vs living CT101 attach: [PI_LIVING_STACK.md](./PI_LIVING_STACK.md).
 
-## Park policy
+## Unpark policy
 
-Opportunity map keeps herdr polish in **Park**. This doc exists so the spike is not re-invented; unpark only after Keep (stranger product + living GREEN) stays demable.
+Wave 1.1 — demable via `bash scripts/herdr-metabolism-check.sh`. Soft living-readiness row when herdr is absent (HOLD), PASS when link+plugin ready.

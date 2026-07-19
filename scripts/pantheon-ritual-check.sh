@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+# Unpark Wave 2.1: pantheon ritual front-door readiness (no ghost DICE_MASTER_*).
+#   bash scripts/pantheon-ritual-check.sh
+set -euo pipefail
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+DATA="${GZMO_DATA_NEXT:-$ROOT/data-next}"
+OUT="$DATA/pantheon-ritual"
+mkdir -p "$OUT"
+pass=0; fail=0; hold=0
+declare -a ROWS=()
+row() { local s="$1" n="$2" d="$3"; ROWS+=("$s|$n|$d"); case "$s" in PASS) pass=$((pass+1));; FAIL) fail=$((fail+1));; HOLD) hold=$((hold+1));; esac; echo "[$s] $n — $d"; }
+
+echo "=== Pantheon ritual check (Unpark W2.1) ==="
+[[ -f "$ROOT/docs/PANTHEON_SKILLS.md" ]] && row PASS "front-door" "PANTHEON_SKILLS.md" || row FAIL "front-door" "missing"
+[[ -d "$ROOT/docs/research/pantheon" ]] && row PASS "archive" "docs/research/pantheon/" || row HOLD "archive" "archive dir missing"
+
+for sk in dice.rs card.rs story.rs; do
+  if [[ -f "$ROOT/gzmo-core/src/skills/$sk" ]]; then
+    row PASS "skill:$sk" "thin main stub present"
+  else
+    row HOLD "skill:$sk" "missing on main"
+  fi
+done
+
+# Ghost masters must not exist / must not be invented
+if rg -n 'DICE_MASTER_HANDOFF|DICE_MASTER_' "$ROOT/docs" "$ROOT/skills" 2>/dev/null | grep -v 'never existed\|Ghost\|do not invent' >/dev/null; then
+  row HOLD "ghost-masters" "DICE_MASTER_* mentions found — verify not invented as files"
+else
+  row PASS "ghost-masters" "no invented DICE_MASTER_* files"
+fi
+
+# Feat stack not required for check PASS — HOLD if absent (ritual PR pending)
+if [[ -f "$ROOT/gzmo-core/src/skills/dice_loop.rs" ]] || [[ -d "$ROOT/data/dice_events.toml" ]] || [[ -f "$ROOT/data/dice_events.toml" ]]; then
+  row PASS "feat-stack" "feat-adjacent files present"
+else
+  row HOLD "feat-stack" "feat attractor stack not on main — ritual PR pending"
+fi
+
+[[ -f "$ROOT/docs/CHAOS_LIVING_VS_RITUAL.md" ]] && row PASS "chaos-boundary" "ritual ≠ living KPI" || row FAIL "chaos-boundary" "missing"
+
+ROWS_TSV="$(printf '%s\n' "${ROWS[@]}")"
+export OUT pass fail hold ROWS_TSV
+python3 - <<'PY'
+import json, os
+from datetime import datetime, timezone
+from pathlib import Path
+out=Path(os.environ["OUT"]); checks={}
+for line in os.environ.get("ROWS_TSV","").splitlines():
+    if not line.strip(): continue
+    st,n,d=line.split("|",2); checks[n]={"status":st,"detail":d}
+fail_n=int(os.environ["fail"]); hold_n=int(os.environ["hold"]); pass_n=int(os.environ["pass"])
+verdict="GREEN" if fail_n==0 else "RED"
+advice="pantheon_ritual_ok" if fail_n==0 and "feat-stack" in checks and checks["feat-stack"]["status"]=="PASS" else (
+  "pantheon_ritual_hold — front door ready; feat stack pending" if fail_n==0 else "pantheon_ritual_fail")
+payload={"schema":"gzmo.unpark.pantheon/v1","generated_at":datetime.now(timezone.utc).isoformat(),
+  "verdict":verdict,"ok":fail_n==0,"advice":advice,
+  "counts":{"pass":pass_n,"fail":fail_n,"hold":hold_n},"wave":"2.1","checks":checks}
+(out/"latest.json").write_text(json.dumps(payload,indent=2)+"\n")
+print(json.dumps({"verdict":verdict,"advice":advice,"pass":pass_n,"fail":fail_n,"hold":hold_n},indent=2))
+raise SystemExit(0 if fail_n==0 else 1)
+PY

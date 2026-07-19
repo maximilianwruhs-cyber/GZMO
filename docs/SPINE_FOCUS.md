@@ -1,14 +1,15 @@
 # Spine focus — two goals (A + C)
 
-**Status:** Production-ready (2026-07-19) — `v0.1.2` · both gates GREEN  
-**Supersedes for product direction:** expanding the opportunity-map zoo  
+**Status:** Unpark active (2026-07-19) — A+C GREEN · satellites sequenced  
+**Supersedes freeze:** “Park stays parked / do not expand”  
 **Futures research:** [research/CT101_STACK_FUTURE_2026-07.md](research/CT101_STACK_FUTURE_2026-07.md)  
+**Unpark roadmap:** [UNPARK_ROADMAP.md](UNPARK_ROADMAP.md)  
 **Audience:** Operator deciding what to strengthen next  
 **Combined gate:** `bash scripts/production-readiness-gate.sh` → `data-next/production-readiness/`
 
 ## Verdict
 
-Stop expanding Arena / HSP / € / AOS / research stubs. Concentrate on **two co-primary goals**:
+**Co-primary brand stays A + C.** Former Park satellites are an **Unpark queue** (sequenced waves) — useful, not the stranger install.
 
 | Goal | Name | What ships |
 |------|------|------------|
@@ -17,7 +18,7 @@ Stop expanding Arena / HSP / € / AOS / research stubs. Concentrate on **two co
 
 Metabolism (chat → distill → honeypot → felt recall) is the living asset **inside C**. MCP attach to that vault is the operator/living profile — never confuse it with A’s stranger home.
 
-**Still refused as primary:** Pi-as-UX (B), Park zoo (D). Pi stays optional glass.
+**Not primary brand (may still ship as satellites):** Pi-as-UX (B stays optional glass), Park zoo (D = Unpark queue, not the product identity).
 
 ## Hard boundary (do not blur)
 
@@ -41,9 +42,9 @@ This is already ADR-0003 / [CT101_BOUNDARY.md](CT101_BOUNDARY.md). Nightburst ar
 
 **Workstation Neo4j is throwaway** — living smoke/auth SoT is CT101 (`/opt/database-cluster/.env`). See [LIVING_APPLIANCE.md](LIVING_APPLIANCE.md#auth-neo4j).
 
-## Keep / Park / Later
+## Keep / Unpark queue / Later
 
-See the top of [STACK_OPPORTUNITY_MAP.md](STACK_OPPORTUNITY_MAP.md).
+See [STACK_OPPORTUNITY_MAP.md](STACK_OPPORTUNITY_MAP.md) and [UNPARK_ROADMAP.md](UNPARK_ROADMAP.md).
 
 ## Production readiness
 

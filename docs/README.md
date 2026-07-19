@@ -35,8 +35,13 @@ Product non-goals (v1): multi-host living install, overnight serve as required p
 | [WIKI_LAYER.md](WIKI_LAYER.md) | Git-tracked markdown wiki layer (see also `../WIKI.md`) |
 | [CORE_MECHANICS_AUDIT_20260605.md](CORE_MECHANICS_AUDIT_20260605.md) | Core mechanics audit |
 | [CEILING_ROADMAP.md](CEILING_ROADMAP.md) | Long-term ceiling |
-| [SPINE_FOCUS.md](SPINE_FOCUS.md) | **Active product focus** — two pillars, Keep/Park, vault owner |
-| [STACK_OPPORTUNITY_MAP.md](STACK_OPPORTUNITY_MAP.md) | Portfolio map (Keep/Park/Later + nightburst spike inventory) |
+| [SPINE_FOCUS.md](SPINE_FOCUS.md) | **Active product focus** — two pillars, Unpark queue, vault owner |
+| [UNPARK_ROADMAP.md](UNPARK_ROADMAP.md) | Sequenced Unpark waves after A+C GREEN |
+| [AOS_CUSTOMER_EDITION.md](AOS_CUSTOMER_EDITION.md) | Wave 4.1 CE sketch (on top of C only) |
+| [OKCP_MARKETPLACE.md](OKCP_MARKETPLACE.md) | Wave 4.2 marketplace notes |
+| [WIKI_OBSERVATORY_MIND.md](WIKI_OBSERVATORY_MIND.md) | Wave 4.3 demable mind notes |
+| [PORTABLE_GZMO_CORE_RFC.md](PORTABLE_GZMO_CORE_RFC.md) | Wave 4.4 portable-core RFC |
+| [STACK_OPPORTUNITY_MAP.md](STACK_OPPORTUNITY_MAP.md) | Portfolio map (Keep/Unpark/Later + nightburst spike inventory) |
 
 ## Chaos engine (ρ homeostasis)
 

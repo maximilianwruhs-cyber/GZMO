@@ -34,6 +34,7 @@ Historical workstation-centric checklist: [PRODUCTION_READINESS.md](PRODUCTION_R
 | `living-appliance-health` | HOLD if no binary/sidecars; PASS via lab `GZMO_CONFIG` (never `~/.gzmo`) |
 | `living-appliance-pin-ct101` | FAIL if staged pin missing; PASS when staged matches live shape |
 | `living-mcp-attach` | HOLD if no `gzmo-living` yet; FAIL if living mislabeled as `gzmo-memory` |
+| `herdr-metabolism` | HOLD if herdr absent/unlinked (Unpark W1.1); FAIL if plugin tree broken |
 
 ## Operator commands
 

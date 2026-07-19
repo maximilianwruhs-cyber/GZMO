@@ -16,7 +16,7 @@
 | **A** | Memory MCP as the stranger product surface (`~/.gzmo`, sidecars off) |
 | **C** | Full living appliance: `gzmo` + Redis + Qdrant + Neo4j — preconfigured, demable, one overnight writer |
 
-**B (Pi primary UX)** and **D (Park zoo)** stay refused. Pi remains optional glass.
+**B (Pi primary UX)** stays non-primary (optional glass). **D (Park zoo)** is no longer a freeze — it is the **Unpark queue** after A+C GREEN ([`UNPARK_ROADMAP.md`](../UNPARK_ROADMAP.md)); satellites must not replace A+C as the brand.
 
 Boundary that makes A+C compatible: **A never requires C’s sidecars; C never becomes the stranger default install.** Product MCP and living appliance are two ship shapes, not one blurred home. Doctrine: [`docs/SPINE_FOCUS.md`](../SPINE_FOCUS.md).
 
@@ -88,9 +88,9 @@ Opportunity map items that sound like appliances:
 | Living wiki appliance (f1) | `near` · exists | Ship *shape* includes “Compose install” — **aspiration**, not a GZMO-root compose product |
 | AOS Customer Edition (p1) | `later` · spike | Explicitly deferred until Keep pillars stay boring ([`STACK_OPPORTUNITY_MAP.md`](../STACK_OPPORTUNITY_MAP.md)) |
 
-### Park stays parked
+### Unpark after A+C GREEN (2026-07-19)
 
-Arena / HSP / portable rewrite / AOS zoo — strengthen Keep only; do not unpark as the future ([`SPINE_FOCUS.md`](../SPINE_FOCUS.md), [`STACK_OPPORTUNITY_MAP.md`](../STACK_OPPORTUNITY_MAP.md), [`PANTHEON_THEATER_PACKAGING_PARK.md`](../PANTHEON_THEATER_PACKAGING_PARK.md)). Discovery stays scout-vs-implement, not maximal inline implement ([`DISCOVERY_LIFECYCLE.md`](../DISCOVERY_LIFECYCLE.md)).
+Arena / HSP / portable rewrite / AOS zoo move into the sequenced **Unpark queue** — strengthen Keep first, then ship satellites without making them the brand ([`UNPARK_ROADMAP.md`](../UNPARK_ROADMAP.md), [`SPINE_FOCUS.md`](../SPINE_FOCUS.md), [`STACK_OPPORTUNITY_MAP.md`](../STACK_OPPORTUNITY_MAP.md), [`PANTHEON_THEATER_PACKAGING_PARK.md`](../PANTHEON_THEATER_PACKAGING_PARK.md)). Discovery stays scout-vs-implement, not maximal inline implement ([`DISCOVERY_LIFECYCLE.md`](../DISCOVERY_LIFECYCLE.md)).
 
 ### Failure modes already seen
 
