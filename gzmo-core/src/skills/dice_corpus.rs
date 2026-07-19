@@ -57,7 +57,9 @@ impl DiceCorpus {
 
     pub fn tier_name(&self, max: u8, roll: u8) -> Option<&str> {
         let map = if max == 6 { &self.d6 } else { &self.d20 };
-        map.get(&roll.to_string()).map(|t| t.tier.as_str()).filter(|s| !s.is_empty())
+        map.get(&roll.to_string())
+            .map(|t| t.tier.as_str())
+            .filter(|s| !s.is_empty())
     }
 
     pub fn event(&self, max: u8, roll: u8, variant: usize) -> String {
@@ -67,11 +69,13 @@ impl DiceCorpus {
                 let idx = variant.min(entry.variants.len() - 1);
                 entry.variants[idx].clone()
             }
-            _ => if max == 6 {
-                "🎲 A roll.".to_string()
-            } else {
-                "🎲 A roll beyond comprehension.".to_string()
-            },
+            _ => {
+                if max == 6 {
+                    "🎲 A roll.".to_string()
+                } else {
+                    "🎲 A roll beyond comprehension.".to_string()
+                }
+            }
         }
     }
 }
@@ -80,9 +84,8 @@ static CORPUS: OnceLock<DiceCorpus> = OnceLock::new();
 
 pub fn corpus() -> &'static DiceCorpus {
     CORPUS.get_or_init(|| {
-        DiceCorpus::parse(EMBEDDED_TOML).unwrap_or_else(|e| {
-            panic!("invalid embedded data/dice_events.toml: {e}")
-        })
+        DiceCorpus::parse(EMBEDDED_TOML)
+            .unwrap_or_else(|e| panic!("invalid embedded data/dice_events.toml: {e}"))
     })
 }
 

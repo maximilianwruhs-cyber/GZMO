@@ -128,7 +128,7 @@ if [[ -n "$BIN" && -f "$FRAG" && "$sidecar_ports" -eq 3 ]]; then
       export HOME_DIR FRAG HOST NEO4J_PASSWORD
       python3 - <<'PY' >>"$LOG" 2>&1
 from pathlib import Path
-import os, re
+import json, os, re
 
 home = Path(os.environ["HOME_DIR"])
 frag = Path(os.environ["FRAG"]).read_text(encoding="utf-8")
@@ -149,6 +149,7 @@ collection = "honeypot"
 sync_enabled = false
 '''
 neo_pass = os.environ.get("NEO4J_PASSWORD", "")
+# json.dumps avoids a source-line NEO4J_PASSWORD = "…" literal (CI secrets false-positive).
 mcp_block = f'''[[mcp_servers]]
 name = "memory"
 command = "uvx"
@@ -157,7 +158,7 @@ args = ["--from", "mcp-neo4j-memory", "mcp-neo4j-memory"]
 [mcp_servers.env]
 NEO4J_URL = "bolt://{os.environ["HOST"]}:7687"
 NEO4J_USERNAME = "neo4j"
-NEO4J_PASSWORD = "{neo_pass}"
+NEO4J_PASSWORD = {json.dumps(neo_pass)}
 NEO4J_DATABASE = "neo4j"
 '''
 

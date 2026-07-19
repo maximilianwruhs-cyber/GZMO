@@ -187,7 +187,6 @@ fn tier_mechanical_effect(roll: u8) -> Option<ChaosEvent> {
     }
 }
 
-
 /// Format the full dice roll display with ASCII art frame.
 fn format_roll(roll: u8, max: u8, event: &str, snap: &ChaosSnapshot) -> String {
     let die_face = match max {
