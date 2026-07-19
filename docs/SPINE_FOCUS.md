@@ -1,17 +1,33 @@
-# Spine focus — two pillars
+# Spine focus — two goals (A + C)
 
-**Status:** Active (2026-07-19)  
+**Status:** Active (2026-07-19) — operator lock  
 **Supersedes for product direction:** expanding the opportunity-map zoo  
+**Futures research:** [research/CT101_STACK_FUTURE_2026-07.md](research/CT101_STACK_FUTURE_2026-07.md)  
 **Audience:** Operator deciding what to strengthen next
 
 ## Verdict
 
-Stop expanding Arena / HSP / € / AOS / research stubs. Concentrate on two pillars:
+Stop expanding Arena / HSP / € / AOS / research stubs. Concentrate on **two co-primary goals**:
 
-1. **Living overnight metabolism** — chat → distill → vault/honeypot → recall you can feel  
-2. **Product memory MCP** — `gzmo memory mcp` / `mcp-serve` as the attach surface for other agents
+| Goal | Name | What ships |
+|------|------|------------|
+| **A** | **Product Memory MCP** | Stranger laptop: `install-gzmo.sh` → `~/.gzmo` → `gzmo mcp-serve` / `gzmo memory mcp`. Redis/Qdrant/Neo4j **off**. |
+| **C** | **Living sidecar appliance** | One-writer host (today CT101): `gzmo-daemon` + Redis + Qdrant + Neo4j as a **preconfigured living stack** (in-repo compose pin → demable install). |
 
-Everything else stays parked as nightburst spikes unless it directly protects or demos those pillars.
+Metabolism (chat → distill → honeypot → felt recall) is the living asset **inside C**. MCP attach to that vault is the operator/living profile — never confuse it with A’s stranger home.
+
+**Still refused as primary:** Pi-as-UX (B), Park zoo (D). Pi stays optional glass.
+
+## Hard boundary (do not blur)
+
+| | A — Product MCP | C — Living appliance |
+|--|-----------------|----------------------|
+| Vault | `~/.gzmo` | `/opt/gzmo` (CT101) or future appliance data dir |
+| Sidecars | Off | Redis + Qdrant + Neo4j **required** |
+| Overnight writer | No (attach-only) | Yes — sole writer ([ADR-0003](ADR-0003-one-instance-metabolism.md)) |
+| Stranger install | Yes | No — operator / sovereign host |
+
+Never point product MCP at the living vault. Never require C’s sidecars for A’s install.
 
 ## Living vault owner
 

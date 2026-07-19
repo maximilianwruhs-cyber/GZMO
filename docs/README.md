@@ -9,6 +9,7 @@ Canonical operator and architecture docs. Session reports and milestone logs bel
 | [PRODUCT_MCP.md](PRODUCT_MCP.md) | **Outsider product** — Cursor/Pi local memory MCP (`gzmo init`) |
 | [PRODUCT_PRODUCTION_READINESS.md](PRODUCT_PRODUCTION_READINESS.md) | **Product GREEN gate** — laptop Memory MCP readiness |
 | [LIVING_PRODUCTION_READINESS.md](LIVING_PRODUCTION_READINESS.md) | **Living GREEN gate** — CT101 metabolism readiness |
+| [LIVING_APPLIANCE.md](LIVING_APPLIANCE.md) | **Goal C** — Redis/Qdrant/Neo4j living appliance (paired with product MCP) |
 | [PRODUCTION_READINESS.md](PRODUCTION_READINESS.md) | Index — living vs product gates |
 | [../README.md](../README.md) | Public product README (MCP-first) |
 | [../MACHINE.md](../MACHINE.md) | What GZMO is (two sentences) |
@@ -88,6 +89,10 @@ Product non-goals (v1): multi-host living install, overnight serve as required p
 ## Research (non-canonical)
 
 Ad-hoc research notes live in `docs/research/` and may be archived over time.
+
+| Doc | Purpose |
+|-----|---------|
+| [research/CT101_STACK_FUTURE_2026-07.md](research/CT101_STACK_FUTURE_2026-07.md) | **Futures** — MCP vs Pi vs compose appliance vs other (2026-07) |
 
 | Path | Topic |
 |------|-------|

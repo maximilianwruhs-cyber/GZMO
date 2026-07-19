@@ -11,19 +11,22 @@ The singular asset is a **living overnight memory metabolism** with a **product 
 
 ## Keep / Park / Later (spine)
 
+Operator lock: co-primary **A** (product MCP) + **C** (living Redis/Qdrant/Neo4j appliance). See [SPINE_FOCUS.md](SPINE_FOCUS.md), [research/CT101_STACK_FUTURE_2026-07.md](research/CT101_STACK_FUTURE_2026-07.md).
+
 | Lane | What | Action |
 |------|------|--------|
-| **Keep** | Felt-recall · watchdog · session takeaway · dream compact · product MCP · faithfulness CI · gated wiki / concept-gate | Strengthen; demo with `scripts/spine-demo.sh` |
-| **Park** | Arena/€/RAPL deepen · HSP event bus · AOS poll/CE packaging · herdr/Pi/tinyFolder polish · OKCP marketplace · IpW/Forge · price-shift · beat-gate kit · ZPD · Cognis · escape-loop · edge fleet · portable rewrite | Spikes exist under `data-next/`; do not expand until Keep is demable to a stranger |
-| **Later** | AOS Customer Edition golden path · public marketplace auth · multi-node forge | Only after both Keep pillars stay boring |
+| **Keep (A)** | Product Memory MCP · stranger install · release freshness · faithfulness fixture | `product-readiness-gate.sh` |
+| **Keep (C)** | Living metabolism · Redis/Qdrant/Neo4j appliance compose · takeaway/watchdog · living faithfulness | `living-readiness-gate.sh` + **in-repo compose pin** |
+| **Park** | Arena/€/RAPL · HSP · AOS poll · herdr/Pi polish · OKCP marketplace · IpW/Forge · Cognis · escape-loop · edge · portable rewrite · pantheon theater | Do not expand until A+C stay demable |
+| **Later** | AOS CE golden path (Prime+OKForge on top of C) · public marketplace · multi-node forge | Only after A+C stay boring |
 
 ## Recommended next three
 
-1. **Keep PRODUCT GREEN** — `bash scripts/product-readiness-gate.sh`
-2. **Keep LIVING GREEN** — `bash scripts/living-readiness-gate.sh` ([LIVING_PRODUCTION_READINESS.md](LIVING_PRODUCTION_READINESS.md))
-3. **Ship/release hygiene** — tagged `gzmo` release stays installable via `install-gzmo.sh`; soft gate: `scripts/release-freshness-check.sh`
+1. **Keep A GREEN** — `bash scripts/product-readiness-gate.sh`
+2. **Keep C GREEN** — `bash scripts/living-readiness-gate.sh` ([LIVING_PRODUCTION_READINESS.md](LIVING_PRODUCTION_READINESS.md))
+3. **Ship living appliance compose (C)** — in-repo Redis/Qdrant/Neo4j pin matching CT101; never required for A’s `install-gzmo.sh`
 
-Park stays parked (Arena/€/HSP/AOS zoo; pantheon/theater packaging: [PANTHEON_THEATER_PACKAGING_PARK.md](PANTHEON_THEATER_PACKAGING_PARK.md)). Doctrine: [SPINE_FOCUS.md](SPINE_FOCUS.md).
+Park stays parked (Arena/€/HSP zoo; pantheon: [PANTHEON_THEATER_PACKAGING_PARK.md](PANTHEON_THEATER_PACKAGING_PARK.md)). Doctrine: [SPINE_FOCUS.md](SPINE_FOCUS.md).
 
 ## Composition spine
 
