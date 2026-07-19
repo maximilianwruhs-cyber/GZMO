@@ -127,7 +127,15 @@ else
   fi
 fi
 
-# Verdict: product GREEN if no FAIL. HOLD is ok for optional engine/CT101.
+# 9) Published release freshness (soft — stranger curl|bash appliance)
+bash "$ROOT/scripts/release-freshness-check.sh" >>"$LOG" 2>&1 || true
+if python3 -c "import json;d=json.load(open('$DATA/release-freshness/latest.json')); raise SystemExit(0 if d.get('ok') else 1)"; then
+  row PASS "release-freshness" "$(python3 -c "import json;print(json.load(open('$DATA/release-freshness/latest.json')).get('advice',''))")"
+else
+  row HOLD "release-freshness" "$(python3 -c "import json;print(json.load(open('$DATA/release-freshness/latest.json')).get('advice','stale'))")"
+fi
+
+# Verdict: product GREEN if no FAIL. HOLD is ok for optional engine/CT101/release lag.
 export OUT pass fail hold CT_OK
 set +e
 python3 - <<'PY'

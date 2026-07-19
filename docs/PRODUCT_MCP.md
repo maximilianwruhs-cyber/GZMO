@@ -108,7 +108,8 @@ workstation vault (`data-next/`) is separate — use `GZMO_CONFIG` pointing at
 
 ### Releases
 
-Tagged builds (`v*`) publish `gzmo-x86_64-unknown-linux-gnu.tar.gz` via GitHub Actions (`.github/workflows/release.yml`).
+Tagged builds (`v*`) publish `gzmo-x86_64-unknown-linux-gnu.tar.gz` via GitHub Actions (`.github/workflows/release.yml`).  
+Keep the published tag at tip after Keep features land — `bash scripts/release-freshness-check.sh` (also soft-checked by `product-readiness-gate.sh`). Stranger `curl|bash` installs GitHub **latest**, not your local tip binary.
 
 ## Product tools (default)
 

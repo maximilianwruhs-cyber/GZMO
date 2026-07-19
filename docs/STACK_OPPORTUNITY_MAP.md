@@ -21,7 +21,7 @@ The singular asset is a **living overnight memory metabolism** with a **product 
 
 1. **Keep PRODUCT GREEN** — `bash scripts/product-readiness-gate.sh`
 2. **Keep LIVING GREEN** — `bash scripts/living-readiness-gate.sh` ([LIVING_PRODUCTION_READINESS.md](LIVING_PRODUCTION_READINESS.md))
-3. **Ship/release hygiene** — tagged `gzmo` release stays installable via `install-gzmo.sh`
+3. **Ship/release hygiene** — tagged `gzmo` release stays installable via `install-gzmo.sh`; soft gate: `scripts/release-freshness-check.sh`
 
 Park stays parked (Arena/€/HSP/AOS zoo; pantheon/theater packaging: [PANTHEON_THEATER_PACKAGING_PARK.md](PANTHEON_THEATER_PACKAGING_PARK.md)). Doctrine: [SPINE_FOCUS.md](SPINE_FOCUS.md).
 
