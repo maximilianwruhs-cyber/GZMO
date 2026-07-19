@@ -3,7 +3,7 @@
 **Status:** Operator guide (2026-07-19)  
 **Sibling detail:** `/home/gzmo/github-clone/gzmo_skills/BRIDGE.md` (may still cite `survey_GZMO` paths)  
 **Quality bar:** [SKILL_GOLDEN_STANDARD.md](./SKILL_GOLDEN_STANDARD.md)  
-**Backlog:** [DEFERRED_WORK_HANDOFF.md](./DEFERRED_WORK_HANDOFF.md) (TUI/daemon pedagogy parity)
+**Backlog:** [DEFERRED_WORK_HANDOFF.md](./DEFERRED_WORK_HANDOFF.md) (Wave 2b — chat/TUI `maybe_teach` parity)
 
 ## Three trees
 
@@ -28,20 +28,25 @@
 | CT101 living | Release tree under `/opt/gzmo/current` + discovery scripts | Paths: [CT101_PATH_AUTHORITY.md](./CT101_PATH_AUTHORITY.md) |
 | Workstation next | `GZMO/skills/` via `gzmo-next.toml` | Resolve with `gzmo instance status` → `skills_root` |
 
-## Pedagogy surface gap
+## Pedagogy surface gap (Wave 2b)
 
 | Surface | `maybe_teach` / pedagogy orchestrator |
 |---------|----------------------------------------|
-| `gzmo chat` | Yes |
+| `gzmo mentor` / mentor IPC | Yes — headless client + optional daemon socket |
+| `gzmo chat` | No inline `maybe_teach` today (slash skills only) |
 | `gzmo tui` | No (slash skills only) |
-| `gzmo daemon` | No chat loop — mentor via Unix socket |
+| `gzmo daemon` | No chat loop — mentor via Unix socket when wired |
 
-Do not assume TUI/daemon teach parity until deferred work lands.
+Demable smoke: `bash scripts/verify-mentor.sh`. Do not assume chat/TUI teach parity
+until Wave 2b lands. Chaos `pedagogy_oscillator` (Slice C.1) stays lab-only — never
+living overnight / PulseLoop on CT101.
 
-## Legendary packs (research until code re-land)
+## Legendary packs
 
 Front door: [PANTHEON_SKILLS.md](./PANTHEON_SKILLS.md) — ritual/lab only; not CT101 chaos-free mentor KPI.
 
 Archive: [research/pantheon/](./research/pantheon/) (standardization handoff, Card Forge, dice tiers, story V2, Final Pack). Quality bar stays [SKILL_GOLDEN_STANDARD.md](./SKILL_GOLDEN_STANDARD.md).
 
-Würfel / cascade / feat attractor stack are **Unpark Wave 2** — see [PANTHEON_FEAT_RELAND.md](./PANTHEON_FEAT_RELAND.md). On this feature branch: **Slice A full + PKM Forge** — TOML dice corpus, nested wild-magic cascade via `dispatch`, Card Forge, story, and Rust-native `/pkm` (`attractor_common` / `generative`). `/pkm` now participates in cascade dispatch; its shell script is only a thin Rust delegate. Still deferred: daemon `dice_loop`, Slice C chaos IPC. Ghost `DICE_MASTER_*` masters never existed — do not invent them.
+**On main:** Slice A full + C.0/C.0.1 — see [PANTHEON_FEAT_RELAND.md](./PANTHEON_FEAT_RELAND.md).
+Still deferred: daemon `dice_loop` fire, Slice C.1 pedagogy oscillator. Ghost
+`DICE_MASTER_*` masters never existed — do not invent them.
