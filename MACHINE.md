@@ -47,4 +47,4 @@ cd ~/Projects/_foundation-audit/survey_GZMO
 Roadmap to **local production-ready** (M3–M4): [`docs/ROADMAP_TO_M5.md`](docs/ROADMAP_TO_M5.md).
 
 Operator model (one frontend, GZMO Platform spine): [`docs/ARCHITECTURE_GZMO_PLATFORM.md`](docs/ARCHITECTURE_GZMO_PLATFORM.md).  
-**Pi agent onboarding:** [`docs/PI_OPERATOR_GUIDE.md`](docs/PI_OPERATOR_GUIDE.md).
+**Pi living stack (recovered):** [`docs/PI_LIVING_STACK.md`](docs/PI_LIVING_STACK.md) · upgrade: [`docs/PI_UPGRADE_RUNBOOK.md`](docs/PI_UPGRADE_RUNBOOK.md) · Headroom/CCR: [`docs/HEADROOM_CCR.md`](docs/HEADROOM_CCR.md).

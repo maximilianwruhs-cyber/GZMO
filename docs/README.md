@@ -56,7 +56,11 @@ Product non-goals (v1): multi-host living install, overnight serve as required p
 
 | Doc | Purpose |
 |-----|---------|
-| [PI_OPERATOR_GUIDE.md](PI_OPERATOR_GUIDE.md) | Pi agent onboarding |
+| [PI_LIVING_STACK.md](PI_LIVING_STACK.md) | **Recovered** Pi × Redis × Headroom/CCR living topology |
+| [PI_UPGRADE_RUNBOOK.md](PI_UPGRADE_RUNBOOK.md) | Pi upgrade checklist (stop attach breakages) |
+| [HEADROOM_CCR.md](HEADROOM_CCR.md) | Headroom-inspired CCR on Redis (branch-only today) |
+| [PI_OPERATOR_GUIDE.md](PI_OPERATOR_GUIDE.md) | Pi onboarding (historical; see living stack + upgrade runbook) |
+| [PI_GZMO_MEMORY_INTEGRATION.md](PI_GZMO_MEMORY_INTEGRATION.md) | Living MCP attach (CT101) |
 | [REBOOT_STARTUP.md](REBOOT_STARTUP.md) | Cold-start after reboot |
 | [EVAL_TIERS.md](EVAL_TIERS.md) | Eval tier definitions |
 

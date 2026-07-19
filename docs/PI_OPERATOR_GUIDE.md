@@ -1,5 +1,7 @@
 # Pi Agent — Operator & Infrastructure Guide
 
+> **Recovered index (2026-07-19):** living topology + Redis/Headroom + upgrade fragility → [PI_LIVING_STACK.md](./PI_LIVING_STACK.md) · [PI_UPGRADE_RUNBOOK.md](./PI_UPGRADE_RUNBOOK.md) · [HEADROOM_CCR.md](./HEADROOM_CCR.md).
+
 **Status:** 2026-06-04 — **superseded for operator UX (2026-07-10):** [OPERATOR_FRONTEND_DECISION.md](./OPERATOR_FRONTEND_DECISION.md). Pi is optional auxiliary; **`gzmo_cli`** (`gzmo` / `gzmo chat`) is the canonical operator frontend.
 **Audience:** Pi agent when CWD is `survey_GZMO`  
 **Repo:** `/home/maximilian-wruhs/Projects/_foundation-audit/survey_GZMO`
