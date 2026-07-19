@@ -47,6 +47,7 @@ pub mod poem_brief;
 pub mod poker;
 pub mod quote;
 pub mod shell_bridge;
+pub mod skill_ccl;
 pub mod sound;
 pub mod stabilize;
 pub mod status;

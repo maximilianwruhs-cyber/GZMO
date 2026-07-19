@@ -1,0 +1,13 @@
+{
+  "test_date": "2026-06-13T17:32:00+02:00",
+  "duplicate_rate_lighthouse_10_runs": 0.0,
+  "identical_stories_on_repeat_notes": "Currently, running `/story lighthouse` 10 times consecutively with a running local LLM produces 10 unique hashes. This is because the default LLM temperature (0.8 or overridden by chaos to ~0.89) is non-zero, ensuring probabilistic variance. However, because the prompts are identical, caching at the provider or model layer would result in 100% duplicate rate. Adding the Lorenz attractor parameters (tick, nonce, cabinet echoes) to the prompt will mathematically guarantee prompt uniqueness and break any caching layers.",
+  "engine_state_snapshot": {
+    "tick": 9660,
+    "phase": "Idle",
+    "llm_temperature": 0.8973855,
+    "llm_valence": -0.45685077,
+    "rho_effective": 28.46921252554679,
+    "thoughts_incubating": 2
+  }
+}
