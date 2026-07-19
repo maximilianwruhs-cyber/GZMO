@@ -37,6 +37,9 @@ bash "$ROOT/scripts/ct101-living-probe.sh" >/dev/null 2>&1 || true
 # Keep human loop: takeaway → distill enqueue (no --now).
 bash "$ROOT/scripts/takeaway-ritual-lab.sh" >/dev/null 2>&1 || true
 
+# Soft missed-run watchdog (short threshold + old fixtures; never flips core GREEN→RED).
+bash "$ROOT/scripts/watchdog-lab.sh" >/dev/null 2>&1 || true
+
 # Soft faithfulness (fixture mode — offline, no vault dependency).
 FAITH_LOG="$OUT/faithfulness-fixture.log"
 if FAITHFULNESS_MODE=fixture bash "$ROOT/scripts/faithfulness-ci.sh" >"$FAITH_LOG" 2>&1; then
@@ -99,6 +102,12 @@ try:
 except Exception:
     pass
 
+watchdog_lab = {}
+try:
+    watchdog_lab = json.loads((data / "watchdog-lab" / "latest.json").read_text(encoding="utf-8"))
+except Exception:
+    pass
+
 faith_ok = os.environ.get("FAITH_OK") == "1"
 faith = {}
 try:
@@ -152,6 +161,11 @@ supports = {
         "ok": bool(takeaway.get("ritual_ok")),
         "advice": takeaway.get("advice"),
         "session_id": takeaway.get("session_id"),
+    },
+    "watchdog_lab": {
+        "ok": bool(watchdog_lab.get("ok")),
+        "stale": watchdog_lab.get("stale"),
+        "advice": watchdog_lab.get("advice"),
     },
     "faithfulness_fixture": {
         "ok": faith_ok,

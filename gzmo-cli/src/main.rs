@@ -77,8 +77,8 @@ enum Command {
     Status,
     /// Ecosystem health LED board (TUI Observatory slice).
     Observatory,
-    /// Overnight metabolism job board (TUI).
-    Metabolism,
+    /// Overnight metabolism job board (TUI) or `watchdog` JSON probe.
+    Metabolism(Vec<String>),
     /// Cron wizard — builtins + custom jobs for `gzmo serve`.
     Cron(Vec<String>),
     Profile(Vec<String>),
@@ -226,7 +226,7 @@ fn parse_args() -> Command {
             return Command::Observatory;
         }
         if args[1] == "metabolism" {
-            return Command::Metabolism;
+            return Command::Metabolism(args[2..].to_vec());
         }
         if args[1] == "cron" {
             return Command::Cron(args[2..].to_vec());
@@ -290,7 +290,7 @@ async fn main() -> Result<()> {
         Command::Health => "warn",
         Command::Status => "warn",
         Command::Observatory => "warn",
-        Command::Metabolism => "warn",
+        Command::Metabolism(_) => "warn",
         Command::Cron(_) => "warn",
         Command::Instance(_) => "warn",
         Command::Config(_) => "warn",
@@ -328,7 +328,7 @@ async fn main() -> Result<()> {
             | Command::Distill(_)
             | Command::McpServe
             | Command::Observatory
-            | Command::Metabolism
+            | Command::Metabolism(_)
             | Command::MemoryDump
             | Command::Assemble { .. }
             | Command::Instance(_)
@@ -424,7 +424,7 @@ async fn main() -> Result<()> {
         Command::Health => health_cmd::run(&config).await,
         Command::Status => status_cmd::run(&config).await,
         Command::Observatory => observatory_cmd::run(&config).await,
-        Command::Metabolism => metabolism_cmd::run(&config).await,
+        Command::Metabolism(args) => metabolism_cmd::run(&config, &args).await,
         Command::Cron(args) => cron_cmd::run(&config, identity.as_ref().unwrap(), &args).await,
         Command::Instance(args) => instance_cmd::run(&config, &args).await,
         Command::Config(args) => config_cmd::run(&config, &args).await,

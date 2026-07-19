@@ -65,6 +65,7 @@ bash scripts/faithfulness-living.sh
 
 # Lab supports (workstation data-next only)
 bash scripts/takeaway-ritual-lab.sh   # enqueue only
+bash scripts/watchdog-lab.sh          # soft STALE under short threshold
 bash scripts/dream-compact-lab.sh     # dry-run
 bash scripts/spine-demo.sh
 ```

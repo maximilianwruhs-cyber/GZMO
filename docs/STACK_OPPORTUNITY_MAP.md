@@ -79,7 +79,7 @@ Lightweight autonomy: alert if distill/dream missed >26h using `latest-*.json`.
 
 - **Builds on:** serve scheduler-runs · status · `GZMO_METABOLISM_STALE_SECS` override for burst tests
 - **Why special:** Boring reliability that protects the singular product.
-- **Ship shape:** Soft-fail in `gzmo status` / serve poll → `latest-watchdog.json` + YELLOW; never flips core GREEN math to RED.
+- **Ship shape:** Soft-fail in serve poll + `gzmo metabolism watchdog` → `latest-watchdog.json` + YELLOW; never flips core GREEN math to RED. Lab: `scripts/watchdog-lab.sh` → `data-next/watchdog-lab/`.
 
 #### Memory MCP appliance — `near` · differentiated · exists
 
