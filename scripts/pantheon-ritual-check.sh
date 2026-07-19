@@ -33,13 +33,23 @@ else
   row PASS "ghost-masters" "no invented DICE_MASTER_* files"
 fi
 
-# Feat stack: Slice A.0 = dice_events.toml + dice_corpus; full cascade/forge still optional
-if [[ -f "$ROOT/data/dice_events.toml" && -f "$ROOT/gzmo-core/src/skills/dice_corpus.rs" ]]; then
+# Feat stack: A.0 corpus + A.1 plan-only cascade; nested execute / forge still optional
+if [[ -f "$ROOT/data/dice_events.toml" && -f "$ROOT/gzmo-core/src/skills/dice_corpus.rs" \
+   && -f "$ROOT/gzmo-core/src/skills/dice_cascade.rs" && -f "$ROOT/data/dice_cascade.toml" ]]; then
+  row PASS "feat-stack" "Slice A.0+A.1 corpus + plan-only cascade"
+elif [[ -f "$ROOT/data/dice_events.toml" && -f "$ROOT/gzmo-core/src/skills/dice_corpus.rs" ]]; then
   row PASS "feat-stack" "Slice A.0 dice_corpus + dice_events.toml"
 elif [[ -f "$ROOT/gzmo-core/src/skills/dice_loop.rs" ]] || [[ -f "$ROOT/data/dice_events.toml" ]]; then
   row PASS "feat-stack" "feat-adjacent files present"
 else
   row HOLD "feat-stack" "feat attractor stack not on main — ritual PR pending"
+fi
+
+if [[ -x "$ROOT/scripts/verify-dice-cascade.sh" ]] \
+  && bash "$ROOT/scripts/verify-dice-cascade.sh" >/tmp/pantheon-cascade-verify.log 2>&1; then
+  row PASS "cascade-verify" "verify-dice-cascade.sh ok (plan-only)"
+else
+  row HOLD "cascade-verify" "verify-dice-cascade not green — see /tmp/pantheon-cascade-verify.log"
 fi
 
 [[ -f "$ROOT/docs/CHAOS_LIVING_VS_RITUAL.md" ]] && row PASS "chaos-boundary" "ritual ≠ living KPI" || row FAIL "chaos-boundary" "missing"
