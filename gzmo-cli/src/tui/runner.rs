@@ -12,10 +12,12 @@ use gzmo_core::session::SessionManager;
 use gzmo_core::skills::{register_pantheon, SkillRegistry as ChaosSkillRegistry};
 use gzmo_core::subagent::SubagentRunner;
 use gzmo_core::tools::delegate::DelegateTaskTool;
+use gzmo_core::tools::learner::{LearnerRecallTool, LearnerUpdateTool};
 use gzmo_core::tools::memory::MemorySearchTool;
 use gzmo_core::tools::profile::{register_for_profile, CapabilityProfile, ToolRegisterOpts};
 use gzmo_core::tools::ToolRegistry;
 
+use crate::pedagogy_bridge::PedagogyRuntime;
 use crate::repl_shared::{
     boot_knowledge_graph, boot_workflow_skills, build_system_prompt_with_workflows,
     open_semantic_vault, ping_engine,
@@ -68,8 +70,12 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
             active_profile.clone(),
         ))) as Arc<dyn LlmGateway>),
     );
-    let router = GatewayRouter::new(&config);
+    let router = Arc::new(GatewayRouter::new(&config));
     let chat_gateway_dyn = router.gateway(TaskKind::Chat);
+
+    // ─── Pedagogy (Wave 2b.1 — mentor path before agent loop) ────
+    let pedagogy_runtime = PedagogyRuntime::boot(&config).await?;
+    let pedagogy = Arc::new(tokio::sync::Mutex::new(pedagogy_runtime));
 
     // ─── Chaos (always live in TUI — ADR-0003) ───────────────────
     let chaos_runtime = crate::chaos_bootstrap::start_chaos_runtime(&config);
@@ -155,9 +161,14 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
         None
     };
 
+    if config.pedagogy.enabled {
+        tools.register(Box::new(LearnerRecallTool::new(&config.pedagogy)));
+        tools.register(Box::new(LearnerUpdateTool::new(&config.pedagogy)));
+    }
+
     let tool_names: Vec<String> = tools.definitions().iter().map(|d| d.name.clone()).collect();
     let last_handoff = workflow_index.latest_handoff();
-    let system_prompt = build_system_prompt_with_workflows(
+    let mut system_prompt = build_system_prompt_with_workflows(
         &soul,
         memory_context.as_deref(),
         vault_context.as_deref(),
@@ -166,6 +177,13 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
         Some(workflow_index.as_ref()),
         last_handoff.as_deref(),
     );
+    if config.pedagogy.enabled {
+        let ped = pedagogy.lock().await;
+        let suffix = ped.learner_prompt_suffix();
+        if !suffix.is_empty() {
+            system_prompt.push_str(&suffix);
+        }
+    }
 
     // ─── Subagents (delegate_task uses GatewayRouter::Chat) ──────
     let scratch = {
@@ -242,6 +260,8 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
         subagent_enabled,
         Arc::clone(&workflow_index),
         Arc::clone(&workflow_session),
+        Arc::clone(&pedagogy),
+        Arc::clone(&router),
     );
     let palette_cmp = PaletteComponent::new();
 

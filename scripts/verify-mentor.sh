@@ -23,8 +23,11 @@ rg -q 'maybe_teach' gzmo-cli/src/chat.rs && ok "chat.rs wires maybe_teach (Wave 
   || bad "chat.rs missing maybe_teach"
 rg -q 'should_delegate_exec' gzmo-cli/src/chat.rs && ok "chat.rs ops-delegates before mentor" \
   || bad "chat.rs missing should_delegate_exec"
-rg -q 'maybe_teach' gzmo-cli/src/tui -g '*.rs' && bad "tui unexpectedly calls maybe_teach (still deferred)" \
-  || ok "tui has no maybe_teach (Wave 2b.1 still deferred)"
+rg -q 'maybe_teach' gzmo-cli/src/tui -g '*.rs' && ok "tui wires maybe_teach (Wave 2b.1)" \
+  || bad "tui missing maybe_teach"
+rg -q 'should_delegate_exec' gzmo-cli/src/tui/components/agent.rs \
+  && ok "tui ops-delegates before mentor" \
+  || bad "tui missing should_delegate_exec"
 
 TARGET_DIR="${CARGO_TARGET_DIR:-$HOME/github-clone/temp-bench/target}"
 GZMO_BIN="${GZMO_BIN:-}"
