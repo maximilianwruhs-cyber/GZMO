@@ -20,6 +20,7 @@
     saved snapshot, and appends feedback to the C.0 inbox
 
 **Landed:** attractor-style `/poem`, `/joke`, `/word`, and `/define` briefs.
+**CCL registry:** `gzmo-core/src/skills/skill_ccl.rs` is on main; `/help` renders its badges.
 
 **Still deferred:** daemon `dice_loop` fire wiring; the rest of Slice C (pedagogy oscillator
 and any living daemon wiring). C.0.1 is a slim external CLI, not a PulseLoop or daemon path;
