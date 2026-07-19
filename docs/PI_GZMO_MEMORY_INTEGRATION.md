@@ -36,8 +36,10 @@ This merges into `~/.pi/agent/mcp.json` and `~/.cursor/mcp.json`:
 
 | Server | Role |
 |--------|------|
-| `gzmo-memory` | `scripts/pi-gzmo-mcp-serve.sh` → CT101 `gzmo mcp-serve` with `/opt/gzmo/gzmo.toml` |
+| `gzmo-living` | `scripts/pi-gzmo-mcp-serve.sh` → CT101 `gzmo mcp-serve` with `/opt/gzmo/gzmo.toml` |
 | `memory` | Neo4j MCP (`bolt://192.168.31.202:7687`) — password not committed |
+
+Product laptop attach stays on **`gzmo-memory`** (`~/.gzmo`) — do not overwrite it with the living bridge.
 
 ### Habitual ops glance (session start / “is the stack ok?”)
 

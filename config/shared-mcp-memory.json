@@ -10,10 +10,12 @@
         "NEO4J_DATABASE": "neo4j"
       }
     },
-    "gzmo-memory": {
+    "gzmo-living": {
       "command": "/home/gzmo/github-clone/GZMO/scripts/pi-gzmo-mcp-serve.sh",
       "args": [],
-      "env": {}
+      "env": {
+        "GZMO_LIVING": "1"
+      }
     }
   }
 }

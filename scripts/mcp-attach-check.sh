@@ -61,10 +61,13 @@ for label, path in targets:
     }
     if gm:
         cmd = Path(gm.get("command") or "")
+        cmd_s = str(cmd).replace("\\", "/")
         cfg = (gm.get("env") or {}).get("GZMO_CONFIG") or ""
         problems = []
         if not cmd.is_file() and not shutil.which(str(cmd)):
             problems.append("command_missing")
+        if "pi-gzmo-mcp-serve" in cmd_s or "/opt/gzmo" in cmd_s:
+            problems.append("gzmo-memory_is_living_mislabel")
         if "/opt/gzmo" in cfg or "ct101" in cfg.lower():
             problems.append("points_at_ct101")
         if "data-next" in cfg:
@@ -88,12 +91,20 @@ for label, path in targets:
             "points_at_ct101",
             "points_at_lab_data-next",
             "config_not_product_home",
+            "gzmo-memory_is_living_mislabel",
         )
         entry["ok"] = status == "ok" and not any(p in problems for p in hard)
         if problems:
             issues.extend(f"{label}:{p}" for p in problems)
     elif label in ("Cursor", "Pi", "Fragment"):
         issues.append(f"{label}:{status}")
+    # Living profile (goal C) — informational, does not fail product attach
+    try:
+        data = json.loads(path.read_text(encoding="utf-8")) if path.is_file() else {}
+        living = (data.get("mcpServers") or {}).get("gzmo-living")
+        entry["gzmo_living"] = bool(living)
+    except Exception:
+        entry["gzmo_living"] = False
     checks.append(entry)
 
 # Prefer Cursor+Pi+Fragment green for attach_ok
@@ -103,15 +114,15 @@ attach_ok = all(c.get("ok") for c in core if c["label"] != "Pi" or c["present"])
 if not any(c["label"] == "Pi" and c["present"] for c in checks):
     attach_ok = all(c.get("ok") for c in checks if c["label"] in ("Cursor", "Fragment"))
 
-advice = (
-    "attach_ok — Cursor/Pi product MCP points at ~/.gzmo"
-    if attach_ok and not any("prefer_local_bin" in i for i in issues)
-    else (
-        "attach_ok_with_hints — wired; consider ~/.local/bin/gzmo instead of temp-bench"
-        if attach_ok
-        else "hold — fix MCP wiring (see problems); run scripts/install-product-mcp.sh"
+if not attach_ok:
+    advice = (
+        "hold — fix MCP wiring; product: install-product-mcp.sh; "
+        "living mislabel: install-shared-mcp.sh → gzmo-living"
     )
-)
+elif any("prefer_local_bin" in i for i in issues):
+    advice = "attach_ok_with_hints — wired; consider ~/.local/bin/gzmo instead of temp-bench"
+else:
+    advice = "attach_ok — Cursor/Pi product MCP points at ~/.gzmo"
 
 payload = {
     "schema": "gzmo.mcp.attach-check/v1",

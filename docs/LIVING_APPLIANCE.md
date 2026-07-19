@@ -23,15 +23,26 @@ Today that runs on **CT101** (`/opt/gzmo/` + `/opt/database-cluster`). Goal C ma
 | [`scripts/living-appliance-gate.sh`](../scripts/living-appliance-gate.sh) | Pin validity gate → `data-next/living-appliance/` |
 
 ```bash
+# One-shot sidecar bring-up + gate
+bash scripts/living-appliance-up.sh
+
+# Or manually:
 cd deploy/living-appliance
-cp .env.example .env   # set a strong NEO4J_AUTH
+cp .env.example .env   # set NEO4J_AUTH
 docker compose up -d
 bash ../../scripts/living-appliance-gate.sh
-# On the living host, optional hard live probes:
-# LIVING_APPLIANCE_REQUIRE_LIVE=1 bash ../../scripts/living-appliance-gate.sh
 ```
 
 This compose starts **sidecars only**. Pair with `gzmo-daemon` + `/opt/gzmo/gzmo.toml` (see [CT101_DEPLOY.md](./CT101_DEPLOY.md)).
+
+## Labeled MCP attach (A vs C)
+
+| Server name | Goal | Install |
+|-------------|------|---------|
+| `gzmo-memory` | **A** product `~/.gzmo` | `scripts/install-product-mcp.sh` / `install-gzmo.sh` |
+| `gzmo-living` | **C** CT101 vault via SSH | `scripts/install-shared-mcp.sh` |
+
+`install-shared-mcp.sh` migrates a mislabeled living entry off `gzmo-memory` → `gzmo-living` and restores product `gzmo-memory` from `~/.gzmo/mcp.json` when present.
 
 ## What this is not
 

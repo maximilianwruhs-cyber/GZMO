@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Stdio MCP bridge: run living gzmo mcp-serve on CT101 (correct vault).
-# Used by Pi/Cursor via config/shared-mcp-memory.json.
+# Wired as MCP server name **gzmo-living** (goal C). Product uses **gzmo-memory**.
 set -euo pipefail
 
 HOST="${CT101_SSH_HOST:-ct101}"

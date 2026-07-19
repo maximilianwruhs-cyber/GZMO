@@ -54,8 +54,10 @@ bash scripts/living-readiness-gate.sh
 # → data-next/living-readiness/latest.json
 
 # Goal C compose pin (sidecars; no daemon)
+bash scripts/living-appliance-up.sh
 bash scripts/living-appliance-gate.sh
 # → data-next/living-appliance/latest.json
+# Living MCP label: bash scripts/install-shared-mcp.sh  →  gzmo-living
 ```
 
 See [PRODUCT_PRODUCTION_READINESS.md](PRODUCT_PRODUCTION_READINESS.md) and [LIVING_PRODUCTION_READINESS.md](LIVING_PRODUCTION_READINESS.md).

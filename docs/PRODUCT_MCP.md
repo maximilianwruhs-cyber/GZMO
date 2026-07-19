@@ -161,7 +161,7 @@ Not required for product MCP attach. Operator hosts that want the full topology:
 |---------|------|
 | SQLite | Vault + FTS (always) |
 | Redis | Hot session / cache |
-| Neo4j | Graph memory MCP (`scripts/install-shared-mcp.sh`) |
+| Neo4j / living vault | Operator only — `gzmo-living` via `scripts/install-shared-mcp.sh` (never product `gzmo-memory`) |
 | Qdrant | Vectors when embeddings are enabled |
 
 See [gzmo-pi Living stack](https://github.com/maximilianwruhs-cyber/gzmo-pi#living-stack-redis--neo4j--qdrant), `docs/CT101_DEPLOY.md`, and `docs/PI_GZMO_MEMORY_INTEGRATION.md`. Laptop product install stays SQLite-only.
