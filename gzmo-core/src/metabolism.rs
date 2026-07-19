@@ -202,14 +202,10 @@ pub fn evaluate_missed_run_watchdog(config: &GzmoConfig) -> WatchdogRecord {
             }
             Some(r) => match DateTime::parse_from_rfc3339(&r.finished) {
                 Ok(finished) => {
-                    let age = (now - finished.with_timezone(&Utc))
-                        .num_seconds()
-                        .max(0) as u64;
+                    let age = (now - finished.with_timezone(&Utc)).num_seconds().max(0) as u64;
                     ages.insert((*job).into(), serde_json::json!(age));
                     if age > threshold {
-                        stale_reasons.push(format!(
-                            "{job}: {age}s old (threshold {threshold}s)"
-                        ));
+                        stale_reasons.push(format!("{job}: {age}s old (threshold {threshold}s)"));
                     }
                 }
                 Err(_) => {
@@ -470,7 +466,11 @@ fn price_shift_opt_in() -> bool {
 
 /// Read `price-window/latest.json`, write `scheduler-runs/latest-price-shift.json`,
 /// and return whether `job` should be soft-delayed (only when `GZMO_PRICE_SHIFT=1`).
-pub fn evaluate_price_shift(config: &GzmoConfig, job: &str, now: DateTime<Utc>) -> PriceShiftAdvice {
+pub fn evaluate_price_shift(
+    config: &GzmoConfig,
+    job: &str,
+    now: DateTime<Utc>,
+) -> PriceShiftAdvice {
     let parent = config
         .memory
         .vault_db

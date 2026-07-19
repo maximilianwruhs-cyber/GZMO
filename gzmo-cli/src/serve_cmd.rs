@@ -375,9 +375,7 @@ async fn run_loop(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> 
         }
 
         // Soft-fail: Sunday dream compaction (not on GREEN metabolism gate).
-        if now.weekday() == Weekday::Sun
-            && cron_due_today(&now, 3, 0, last_dream_compact)
-        {
+        if now.weekday() == Weekday::Sun && cron_due_today(&now, 3, 0, last_dream_compact) {
             let ok = run_named_job(config, "dream-compact", || async {
                 dream_cmd::run_compact(config, None, Some(30), false).await
             })

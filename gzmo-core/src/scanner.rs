@@ -45,9 +45,9 @@ pub fn prefer_product_engine(endpoints: &[DiscoveredEndpoint]) -> Option<&Discov
     if endpoints.is_empty() {
         return None;
     }
-    let prime = endpoints.iter().find(|e| {
-        e.url.contains(":8000/") || e.url.ends_with(":8000") || e.url.contains(":8000?")
-    });
+    let prime = endpoints
+        .iter()
+        .find(|e| e.url.contains(":8000/") || e.url.ends_with(":8000") || e.url.contains(":8000?"));
     if let Some(ep) = prime {
         return Some(ep);
     }

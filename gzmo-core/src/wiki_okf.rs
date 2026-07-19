@@ -337,10 +337,8 @@ mod concept_gate_tests {
 
     #[test]
     fn hold_reason_reads_verdict() {
-        let dir = std::env::temp_dir().join(format!(
-            "gzmo-concept-gate-test-{}",
-            std::process::id()
-        ));
+        let dir =
+            std::env::temp_dir().join(format!("gzmo-concept-gate-test-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&dir);
         std::fs::create_dir_all(&dir).unwrap();
         let vault = dir.join("vault.db");

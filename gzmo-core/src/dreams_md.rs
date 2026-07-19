@@ -128,10 +128,7 @@ pub fn compact_dreams_md(
         .parent()
         .unwrap_or_else(|| Path::new("."))
         .join("dreams-archive")
-        .join(format!(
-            "DREAMS-{}.md",
-            Utc::now().format("%Y%m%dT%H%M%SZ")
-        ));
+        .join(format!("DREAMS-{}.md", Utc::now().format("%Y%m%dT%H%M%SZ")));
 
     if dry_run {
         return Ok(CompactReport {
@@ -150,7 +147,8 @@ pub fn compact_dreams_md(
     }
     std::fs::write(&archive_path, &content)
         .with_context(|| format!("archive {}", archive_path.display()))?;
-    std::fs::write(dreams_path, &out).with_context(|| format!("write {}", dreams_path.display()))?;
+    std::fs::write(dreams_path, &out)
+        .with_context(|| format!("write {}", dreams_path.display()))?;
 
     Ok(CompactReport {
         dreams_path: dreams_path.to_path_buf(),
@@ -175,11 +173,7 @@ fn truncate_dream_body(body: &str, budget: usize) -> String {
     let marker = "\n\n… [compacted — middle archived] …\n\n";
     let marker_len = marker.chars().count();
     if budget <= marker_len + 64 {
-        return chars
-            .into_iter()
-            .take(budget)
-            .collect::<String>()
-            + "\n";
+        return chars.into_iter().take(budget).collect::<String>() + "\n";
     }
     let keep = budget - marker_len;
     let head_n = keep / 2;

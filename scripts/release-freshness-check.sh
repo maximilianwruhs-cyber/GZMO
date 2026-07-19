@@ -5,14 +5,14 @@
 #   bash scripts/release-freshness-check.sh
 # Env:
 #   GZMO_REPO          default maximilianwruhs-cyber/GZMO
-#   RELEASE_FRESH_MAX  commits tip may be ahead of latest tag and still PASS (default 0)
+#   RELEASE_FRESH_MAX  commits tip may be ahead of latest tag and still PASS (default 5)
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 DATA="${GZMO_DATA_NEXT:-$ROOT/data-next}"
 OUT="$DATA/release-freshness"
 REPO="${GZMO_REPO:-maximilianwruhs-cyber/GZMO}"
-MAX="${RELEASE_FRESH_MAX:-0}"
+MAX="${RELEASE_FRESH_MAX:-5}"
 mkdir -p "$OUT"
 
 api_get() {

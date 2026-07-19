@@ -136,10 +136,7 @@ async fn run_refresh_engine(args: InitArgs) -> Result<()> {
     let raw = tokio::fs::read_to_string(&config_path).await?;
     let updated = patch_engine_block(&raw, &ep.url, &model)?;
     if updated == raw {
-        eprintln!(
-            "  {GREEN}✔{RESET} Already on {} ({})",
-            ep.url, model
-        );
+        eprintln!("  {GREEN}✔{RESET} Already on {} ({})", ep.url, model);
         return Ok(());
     }
 
@@ -260,37 +257,40 @@ async fn run_product(args: InitArgs) -> Result<()> {
 
     eprintln!("  {DIM}Scanning localhost for OpenAI-compatible engines…{RESET}");
     let endpoints = scanner::scan_endpoints().await;
-    let (engine_url, engine_model, engine_note) =
-        if let Some(ep) = scanner::prefer_product_engine(&endpoints) {
-            let model = ep
-                .models
-                .first()
-                .cloned()
-                .unwrap_or_else(|| "default".to_string());
-            eprintln!(
-                "  {GREEN}✔{RESET} Engine {BOLD}{}{RESET} — {} {DIM}({}ms){RESET}",
-                ep.name, ep.url, ep.latency_ms
-            );
-            (
-                ep.url.clone(),
-                model,
-                format!("auto-detected {}", ep.name),
-            )
-        } else {
-            eprintln!(
+    let (engine_url, engine_model, engine_note) = if let Some(ep) =
+        scanner::prefer_product_engine(&endpoints)
+    {
+        let model = ep
+            .models
+            .first()
+            .cloned()
+            .unwrap_or_else(|| "default".to_string());
+        eprintln!(
+            "  {GREEN}✔{RESET} Engine {BOLD}{}{RESET} — {} {DIM}({}ms){RESET}",
+            ep.name, ep.url, ep.latency_ms
+        );
+        (ep.url.clone(), model, format!("auto-detected {}", ep.name))
+    } else {
+        eprintln!(
                 "  {DIM}No local engine up — defaulting to http://127.0.0.1:1234/v1 (LM Studio).{RESET}"
             );
-            eprintln!(
+        eprintln!(
                 "  {DIM}Start Prime on :8000 (or any OpenAI-compatible server) and re-init with --force to pick it up.{RESET}"
             );
-            (
-                "http://127.0.0.1:1234/v1".to_string(),
-                "default".to_string(),
-                "placeholder until a local engine is detected".to_string(),
-            )
-        };
+        (
+            "http://127.0.0.1:1234/v1".to_string(),
+            "default".to_string(),
+            "placeholder until a local engine is detected".to_string(),
+        )
+    };
 
-    let toml = generate_product_toml(&vault_db, &memory_dir, &engine_url, &engine_model, &engine_note);
+    let toml = generate_product_toml(
+        &vault_db,
+        &memory_dir,
+        &engine_url,
+        &engine_model,
+        &engine_note,
+    );
     tokio::fs::write(&config_path, &toml).await?;
     eprintln!("  {GREEN}✔{RESET} {}", config_path.display());
 
