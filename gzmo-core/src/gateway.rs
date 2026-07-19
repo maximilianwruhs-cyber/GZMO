@@ -104,6 +104,17 @@ pub trait LlmGateway: Send + Sync {
         tools: &[ToolDeclaration],
     ) -> Result<LlmResponse>;
 
+    /// Unstructured completion with optional persona sampling overrides.
+    async fn complete_with_persona(
+        &self,
+        messages: &[Message],
+        tools: &[ToolDeclaration],
+        _temperature: Option<f32>,
+        _top_p: Option<f32>,
+    ) -> Result<LlmResponse> {
+        self.complete(messages, tools).await
+    }
+
     /// Stream tokens from the LLM. Each chunk is yielded as it arrives.
     async fn complete_streaming(
         &self,
@@ -477,6 +488,28 @@ impl TurboQuantGateway {
 
 #[async_trait]
 impl LlmGateway for TurboQuantGateway {
+    async fn complete_with_persona(
+        &self,
+        messages: &[Message],
+        tools: &[ToolDeclaration],
+        temperature: Option<f32>,
+        top_p: Option<f32>,
+    ) -> Result<LlmResponse> {
+        if temperature.is_none() && top_p.is_none() {
+            return self.complete(messages, tools).await;
+        }
+        let mut config = self.config.clone();
+        if let Some(temperature) = temperature {
+            config.temperature = temperature;
+        }
+        if let Some(top_p) = top_p {
+            config.top_p = top_p;
+        }
+        TurboQuantGateway::new(config)
+            .complete(messages, tools)
+            .await
+    }
+
     async fn complete(
         &self,
         messages: &[Message],

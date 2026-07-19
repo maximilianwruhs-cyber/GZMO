@@ -36,6 +36,7 @@ impl Skill for CalculateSkill {
                 display: format!("  {RED}✗ Usage: /calculate <expression>{RESET}\n  Examples: /calculate 2^10\n           /calculate \"sqrt(144)\""),
                 feedback: vec![],
                 inject_to_conversation: false,
+                            evidence: None,
             });
         }
 
@@ -81,6 +82,7 @@ impl Skill for CalculateSkill {
                     display: format!("  {RED}✗ Invalid expression: {expr}{RESET}"),
                     feedback: vec![],
                     inject_to_conversation: false,
+                    evidence: None,
                 });
             }
         };
@@ -98,6 +100,7 @@ impl Skill for CalculateSkill {
             display,
             feedback: vec![],
             inject_to_conversation: true,
+            evidence: None,
         })
     }
 }

@@ -91,6 +91,7 @@ impl Skill for TransformSkill {
                     display,
                     feedback: vec![feedback],
                     inject_to_conversation: true,
+                    evidence: None,
                 });
             }
 
@@ -103,6 +104,7 @@ impl Skill for TransformSkill {
                     ),
                     feedback: vec![],
                     inject_to_conversation: false,
+                    evidence: None,
                 });
             }
 
@@ -128,6 +130,7 @@ impl Skill for TransformSkill {
                 display,
                 feedback: vec![],
                 inject_to_conversation: false,
+                evidence: None,
             });
         }
 
@@ -140,6 +143,7 @@ impl Skill for TransformSkill {
                 ),
                 feedback: vec![],
                 inject_to_conversation: false,
+                evidence: None,
             });
         }
 
@@ -199,6 +203,7 @@ SYSTEM_PROMPT: [A 2-sentence instruction for an AI to roleplay as this character
                 ),
                 feedback: vec![],
                 inject_to_conversation: false,
+                            evidence: None,
             });
         };
 
@@ -253,6 +258,7 @@ SYSTEM_PROMPT: [A 2-sentence instruction for an AI to roleplay as this character
             display,
             feedback: vec![feedback],
             inject_to_conversation: true,
+            evidence: None,
         })
     }
 }

@@ -69,6 +69,7 @@ impl Skill for LanguageSkill {
                 display,
                 feedback: vec![],
                 inject_to_conversation: false,
+                evidence: None,
             });
         }
 
@@ -79,6 +80,7 @@ impl Skill for LanguageSkill {
                 ),
                 feedback: vec![],
                 inject_to_conversation: false,
+                            evidence: None,
             });
         }
 
@@ -102,6 +104,7 @@ impl Skill for LanguageSkill {
             display,
             feedback: vec![],
             inject_to_conversation: true,
+            evidence: None,
         })
     }
 }

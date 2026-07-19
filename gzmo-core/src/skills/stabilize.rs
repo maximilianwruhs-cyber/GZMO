@@ -55,6 +55,7 @@ impl Skill for StabilizeSkill {
             display,
             feedback: vec![feedback],
             inject_to_conversation: true,
+            evidence: None,
         })
     }
 }

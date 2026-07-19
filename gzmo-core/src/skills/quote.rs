@@ -67,6 +67,7 @@ impl Skill for QuoteSkill {
                     display: format!("  {RED}✗ lore.toml not found{RESET}"),
                     feedback: vec![],
                     inject_to_conversation: false,
+                    evidence: None,
                 })
             }
         };
@@ -78,6 +79,7 @@ impl Skill for QuoteSkill {
                     display: format!("  {RED}✗ Failed to parse lore.toml: {e}{RESET}"),
                     feedback: vec![],
                     inject_to_conversation: false,
+                    evidence: None,
                 })
             }
         };
@@ -87,6 +89,7 @@ impl Skill for QuoteSkill {
                 display: format!("  {RED}✗ No quotes found in lore.toml{RESET}"),
                 feedback: vec![],
                 inject_to_conversation: false,
+                evidence: None,
             });
         }
 
@@ -114,6 +117,7 @@ impl Skill for QuoteSkill {
             display,
             feedback: vec![feedback_event],
             inject_to_conversation: true,
+            evidence: None,
         })
     }
 }

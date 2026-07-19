@@ -97,6 +97,7 @@ impl Skill for DefineSkill {
                 display: format!("  {RED}✗ Usage: /define <term>{RESET}"),
                 feedback: vec![],
                 inject_to_conversation: false,
+                evidence: None,
             });
         }
 
@@ -115,6 +116,7 @@ impl Skill for DefineSkill {
                     display: format!("  {RED}✗ Term not found and LLM offline.{RESET}"),
                     feedback: vec![],
                     inject_to_conversation: false,
+                    evidence: None,
                 });
             }
         }
@@ -134,6 +136,7 @@ impl Skill for DefineSkill {
             display,
             feedback: vec![],
             inject_to_conversation: true,
+            evidence: None,
         })
     }
 }

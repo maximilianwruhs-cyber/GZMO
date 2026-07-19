@@ -332,6 +332,77 @@ pub struct GzmoConfig {
     /// Agentic Teacher / Unix mentor API (`gzmo daemon` socket + discovery teach).
     #[serde(default)]
     pub pedagogy: PedagogyConfig,
+
+    /// `/dice` skill — cascade (+ optional loop, default off).
+    #[serde(default)]
+    pub dice: DiceConfig,
+}
+
+/// `/dice` runtime configuration.
+#[derive(Debug, Deserialize, Clone)]
+pub struct DiceConfig {
+    #[serde(default)]
+    pub r#loop: DiceLoopConfig,
+    #[serde(default)]
+    pub cascade: DiceCascadeConfig,
+}
+
+impl Default for DiceConfig {
+    fn default() -> Self {
+        Self {
+            r#loop: DiceLoopConfig::default(),
+            cascade: DiceCascadeConfig::default(),
+        }
+    }
+}
+
+/// Wild-magic cascade settings.
+#[derive(Debug, Deserialize, Clone)]
+pub struct DiceCascadeConfig {
+    #[serde(default = "default_true")]
+    pub enabled: bool,
+    /// Extra skills excluded beyond the embedded table exclusions.
+    #[serde(default)]
+    pub exclude: Vec<String>,
+}
+
+impl Default for DiceCascadeConfig {
+    fn default() -> Self {
+        Self {
+            enabled: true,
+            // Slice A has no Rust `/pkm` implementation yet.
+            exclude: vec!["pkm".to_string()],
+        }
+    }
+}
+
+/// Optional daemon dice-loop settings. Wiring is intentionally deferred.
+#[derive(Debug, Deserialize, Clone)]
+pub struct DiceLoopConfig {
+    #[serde(default)]
+    pub enabled: bool,
+    #[serde(default = "default_dice_loop_min")]
+    pub min_minutes: u32,
+    #[serde(default = "default_dice_loop_max")]
+    pub max_minutes: u32,
+}
+
+fn default_dice_loop_min() -> u32 {
+    5
+}
+
+fn default_dice_loop_max() -> u32 {
+    60
+}
+
+impl Default for DiceLoopConfig {
+    fn default() -> Self {
+        Self {
+            enabled: false,
+            min_minutes: default_dice_loop_min(),
+            max_minutes: default_dice_loop_max(),
+        }
+    }
 }
 
 /// Custom / wizard-managed cron jobs (app-level, not host crontab).

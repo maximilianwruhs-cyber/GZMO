@@ -78,6 +78,7 @@ impl Skill for PoemSkill {
             display,
             feedback: vec![feedback_event],
             inject_to_conversation: true,
+            evidence: None,
         })
     }
 }

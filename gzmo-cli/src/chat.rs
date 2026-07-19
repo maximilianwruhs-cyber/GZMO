@@ -17,8 +17,9 @@ use gzmo_core::memory::episodic::FileEpisodicStore;
 use gzmo_core::memory::scratch::{messages_to_transcript, DistillJob, DistillSource};
 use gzmo_core::memory::vault::SqliteVault;
 use gzmo_core::session::SessionManager;
+use gzmo_core::skills::dispatch;
 use gzmo_core::skills::register_pantheon;
-use gzmo_core::skills::{SkillContext, SkillRegistry as ChaosSkillRegistry};
+use gzmo_core::skills::{NestedDispatch, SkillRegistry as ChaosSkillRegistry};
 use gzmo_core::subagent::SubagentRunner;
 use gzmo_core::tools::delegate::DelegateTaskTool;
 use gzmo_core::tools::profile::{register_for_profile, CapabilityProfile, ToolRegisterOpts};
@@ -593,11 +594,21 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
                         if chaos_skills.has(cmd) {
                             eprintln!("  {GOLD}⚡ AUTO: /{cmd} triggered by chaos engine{RESET}");
                             let snap = chaos_snapshot_rx.borrow().clone();
-                            let ctx = SkillContext {
-                                chaos: &snap,
-                                feedback_tx: &chaos_feedback_tx,
+                            let profile = config.engine.active_engine();
+                            let gw = gateway.read().await;
+                            let ctx = dispatch::skill_context(
+                                &snap,
+                                &chaos_feedback_tx,
                                 args,
-                            };
+                                Some(gw.as_ref()),
+                                Some(&router),
+                                &config,
+                                NestedDispatch {
+                                    registry: Some(&chaos_skills),
+                                    profile: Some(&profile),
+                                    depth: 0,
+                                },
+                            );
                             match chaos_skills.get(cmd).unwrap().execute(ctx).await {
                                 Ok(output) => eprint!("{}", output.display),
                                 Err(e) => eprintln!("  {RED}Auto-skill error: {e}{RESET}"),
@@ -1169,11 +1180,21 @@ async fn handle_slash_command(
             // ─── Rust skill dispatch (priority) ───────────────
             else if chaos_skills.has(cmd) {
                 let snap = chaos_snapshot_rx.borrow().clone();
-                let ctx = SkillContext {
-                    chaos: &snap,
-                    feedback_tx: chaos_feedback_tx,
+                let profile = config.engine.active_engine();
+                let gw = gateway.read().await;
+                let ctx = dispatch::skill_context(
+                    &snap,
+                    chaos_feedback_tx,
                     args,
-                };
+                    Some(gw.as_ref()),
+                    None,
+                    &config,
+                    NestedDispatch {
+                        registry: Some(&chaos_skills),
+                        profile: Some(&profile),
+                        depth: 0,
+                    },
+                );
                 match chaos_skills.get(cmd).unwrap().execute(ctx).await {
                     Ok(output) => {
                         eprint!("{}", output.display);
