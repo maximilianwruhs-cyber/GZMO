@@ -1,0 +1,78 @@
+# /dice Wild Magic — tier → pantheon skill pools
+# Loaded at compile time via dice_cascade.rs (include_str!)
+# Roll tier picks pool; Lorenz state + inv picks skill + chaos-derived args.
+
+[meta]
+version = 1
+
+# Never cascade into meta / recursive skills
+exclude = ["dice", "help", "ops", "learn", "discover", "language"]
+
+# Skill -> prerequisite graph node id (readiness gate; fallback to full pool when filtered empty)
+[skill_prereqs]
+card = "shell_navigation"
+pkm = "shell_navigation"
+define = "file_permissions"
+story = "journal_debugging"
+poem = "pipes_redirection"
+transform = "systemd_units"
+
+[[d20]]
+label = "catastrophe"
+rolls = [1]
+skills = ["sound", "stabilize"]
+
+[[d20]]
+label = "shadow"
+rolls = [2, 3, 4]
+skills = ["quote", "sound", "calculate"]
+
+[[d20]]
+label = "mist"
+rolls = [5, 6, 7]
+skills = ["quote", "calculate", "define"]
+
+[[d20]]
+label = "oracle"
+rolls = [8, 9, 10]
+skills = ["define", "word", "joke"]
+
+[[d20]]
+label = "charge"
+rolls = [11, 12, 13]
+skills = ["joke", "poem", "word"]
+
+[[d20]]
+label = "spark"
+rolls = [14, 15, 16]
+skills = ["card", "pkm", "joke", "transform"]
+
+[[d20]]
+label = "crystallize"
+rolls = [17, 18]
+skills = ["card", "pkm", "story", "poem"]
+
+[[d20]]
+label = "legendary"
+rolls = [19, 20]
+skills = ["story", "card", "pkm", "poem", "joke"]
+
+[[d6]]
+label = "snake_eyes"
+rolls = [1]
+skills = ["sound", "stabilize"]
+
+[[d6]]
+label = "low"
+rolls = [2, 3]
+skills = ["quote", "calculate"]
+
+[[d6]]
+label = "mid"
+rolls = [4, 5]
+skills = ["define", "word", "joke"]
+
+[[d6]]
+label = "perfect"
+rolls = [6]
+skills = ["story", "card", "pkm", "poem"]

@@ -22,6 +22,7 @@ pub mod calculate;
 pub mod card;
 pub mod define;
 pub mod dice;
+pub mod dice_corpus;
 pub mod help;
 pub mod joke;
 pub mod language;
