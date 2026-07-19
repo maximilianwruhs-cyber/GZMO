@@ -209,6 +209,14 @@ async fn process_snapshot(
     trigger_notify: Option<&mpsc::Sender<String>>,
     action_tx: Option<&mpsc::UnboundedSender<Action>>,
 ) {
+    // Ritual/lab IPC only: snapshot processing drains externally appended skill
+    // feedback. The living daemon does not start this bridge or PulseLoop.
+    let inbox = gzmo_chaos::feedback_ipc::default_inbox_path(state_dir);
+    for event in gzmo_chaos::feedback_ipc::drain_inbox(&inbox) {
+        let _ = gzmo_chaos::feedback_ipc::append_audit(state_dir, &event, "drained");
+        let _ = feedback_tx.send(event).await;
+    }
+
     {
         let gw = gateway.read().await;
         gw.set_chaos_overrides(snap.llm_temperature, snap.llm_max_tokens);

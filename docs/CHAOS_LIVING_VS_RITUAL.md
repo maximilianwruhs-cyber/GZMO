@@ -12,6 +12,12 @@
 
 Deep ρ math and Thought Cabinet law remain valid engineering docs. Living CT101 deliberately runs **without** making chaos the overnight brain.
 
+### C.0 feedback IPC boundary
+
+The lab `chaos_feedback_inbox.jsonl` is drained only by the chat/TUI snapshot bridge into its
+existing ritual `feedback_tx`. It is not daemon wiring: `daemon_cmd.rs` remains PulseLoop-free and
+CT101 living KPI stays chaos-off.
+
 ## Critical scar: `CHAOS_STATE.json` is write-only
 
 Nothing loads `CHAOS_STATE.json` into `PulseLoop` on boot. Boot uses `ChaosSnapshot::default()`. The file is **telemetry** rewritten every N ticks.

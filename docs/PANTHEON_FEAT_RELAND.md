@@ -15,10 +15,12 @@
 7. [x] Living faithfulness + takeaway-recall still PASS (post Slice A full merge)
 8. [x] Skills bridge docs updated for A full
 9. [x] **PKM Forge** — `/pkm` Rust skill, corpus, feedback, and cascade dispatch
+10. [x] **Slice C.0** — lab `feedback_ipc` append/audit + snapshot-bridge ritual drain only
 
 **Landed:** attractor-style `/poem`, `/joke`, `/word`, and `/define` briefs.
 
-**Still deferred:** daemon `dice_loop` fire wiring; Slice C (`feedback_ipc` / chaos engine).
+**Still deferred:** daemon `dice_loop` fire wiring; the rest of Slice C (pedagogy oscillator,
+chaos skill command, and any living daemon wiring). C.0 drains the lab inbox only.
 
 Thin `/card` `/story` remain main stubs until full Slice A. `/dice` narratives + wild-magic **plan** come from TOML.  
 Demos: `bash scripts/verify-dice-corpus.sh` · `bash scripts/verify-dice-cascade.sh` · `bash scripts/pantheon-ritual-demo.sh`.
@@ -54,6 +56,13 @@ Demos: `bash scripts/verify-dice-corpus.sh` · `bash scripts/verify-dice-cascade
 - `gzmo-cli/src/chaos_{bootstrap,skill_cmd}.rs`
 - `gzmo-core/src/chaos/lib.rs`
 - `scripts/pi/chaos_skill.sh`, `skills/visuals/chaos_art.py`
+
+### Slice C.0 — feedback IPC (landed, ritual drain only)
+
+`feedback_ipc` serializes the main `ChaosEvent` set to
+`state_dir/chaos_feedback_inbox.jsonl`; the chat/TUI snapshot bridge drains it into its existing
+`feedback_tx`. It does not alter `daemon_cmd.rs`, start a daemon PulseLoop, or make CT101 living
+chaos-active.
 
 ## Out of scope
 
