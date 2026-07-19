@@ -162,13 +162,13 @@ Read-only public mind showing metabolism pulse + wiki commits (no secrets).
 - **Why special:** Makes the system demable without giving shell access.
 - **Ship shape:** Sanitized HTML/JSON with metabolism, Arena, gate, faithfulness, HSP, €/night; Observatory stays agent-discovery.
 
-#### OKCP memory marketplace — `later` · singular · product
+#### OKCP memory marketplace — `later` · singular · spike (bundle)
 
 Other agents pull/push concept bundles; GZMO is slow compiler, forge is the API.
 
-- **Builds on:** OKCP · OKF bundles · wiki-lint · export-knowledge
+- **Builds on:** `scripts/okcp-marketplace.sh` · concept-gate · wiki-push · OKCP scopes
 - **Why special:** Turns private metabolism into a multi-agent knowledge bus.
-- **Ship shape:** Auth scopes + PR/review for external writers.
+- **Ship shape:** `data-next/okcp-marketplace/` export bundle + `--intent write` gate; no public auth server yet.
 
 ### Organs / Little Tools Lab
 
@@ -246,13 +246,13 @@ Filesystem-driven inbox → ingest → metabolism for non-CLI users.
 - **Why special:** Accessible on-ramp; less unique alone.
 - **Ship shape:** Drop/demo → pending markdown in inbox + queue JSONL; watcher stays off by default.
 
-#### Pi / operator split polish — `later` · commodity · research
+#### Pi / operator split polish — `later` · commodity · spike (glass)
 
 Keep CLI canonical; Pi as optional glass for status + Arena + wiki.
 
-- **Builds on:** PI_* docs · Observatory
-- **Why special:** UX polish, not a new product category.
-- **Ship shape:** Only after Arena + felt recall are solid.
+- **Builds on:** `scripts/pi-operator-glass.sh` · aos-status · Arena · concept-gate · PI_* docs
+- **Why special:** Coding-surface glass without another web app; CLI stays canonical.
+- **Ship shape:** `data-next/pi-glass/{latest.json,latest.md}`; deepen after Arena + felt recall stay solid.
 
 ### Platform / AOS
 
@@ -359,12 +359,12 @@ Those become interesting only after Arena + felt recall make the stack demable t
 | e3 | Price-aware overnight shift | later | differentiated | spike (soft) |
 | e4 | Intelligence-per-Watt router | later | singular | spike (policy) |
 | e5 | Obolus Forge mutations | later | differentiated | spike (sibling) |
-| f2 | OKCP memory marketplace | later | singular | product |
+| f2 | OKCP memory marketplace | later | singular | spike (bundle) |
 | o2 | Beat-gate open eval kit | later | differentiated | spike (kit) |
 | o4 | Cognition pack | later | differentiated | spike (contract) |
 | s3 | AOS Intelligence Dashboard v2 | later | differentiated | spike (poll) |
 | s4 | tinyFolder daemon | later | commodity | spike (drop) |
-| s5 | Pi / operator split polish | later | commodity | research |
+| s5 | Pi / operator split polish | later | commodity | spike (glass) |
 | p1 | AOS Customer Edition | later | differentiated | product |
 | p2 | Edge fleet + shared forge | later | differentiated | research |
 | p3 | Portable GZMO core | later | commodity | research |
