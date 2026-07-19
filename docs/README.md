@@ -18,6 +18,7 @@ Canonical operator and architecture docs. Session reports and milestone logs bel
 | [CT101_PATH_AUTHORITY.md](CT101_PATH_AUTHORITY.md) | Canonical `/opt/gzmo/*` paths (kill `survey_GZMO` drift) |
 | [CT101_QDRANT_EMBED_OPS.md](CT101_QDRANT_EMBED_OPS.md) | Embed backfill + Qdrant orphan prune |
 | [LOST_KNOWLEDGE_INVENTORY.md](LOST_KNOWLEDGE_INVENTORY.md) | Archaeology index — branch/plan scars recovered |
+| [PANTHEON_THEATER_PACKAGING_PARK.md](PANTHEON_THEATER_PACKAGING_PARK.md) | **Parked** — dice/card/pantheon + mutual-discovery packaging plan |
 | [PRODUCTION_READINESS.md](PRODUCTION_READINESS.md) | Production gate checklist |
 
 Product non-goals (v1): multi-host living install, overnight serve as required path, SEIP scaffolding, cloud memory SaaS.

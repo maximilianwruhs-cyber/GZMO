@@ -51,8 +51,8 @@ Cherry-pick or promote when needed; do not invent:
 
 | Item | Where | Suggested action |
 |------|-------|------------------|
-| Card forge / dice / Würfel / pantheon packs | Branch `CARD_*`, `DICE_*`, `PANTHEON_*`, `WUERFEL_*` | Park — pointer in opportunity map |
-| Pi mutual-discovery session packs | Branch `PI_MUTUAL_*`, `PI_GUIDED_*` | Research archive if reopening pedagogy theater |
+| Card forge / dice / Würfel / pantheon packs | Branch `CARD_*`, `DICE_*`, `PANTHEON_*`, `WUERFEL_*` | **Parked packaging plan:** [PANTHEON_THEATER_PACKAGING_PARK.md](./PANTHEON_THEATER_PACKAGING_PARK.md) |
+| Pi mutual-discovery session packs | Branch `PI_MUTUAL_*`, `PI_GUIDED_*` | Same park doc — promote only when unparked |
 | ARCH-DIR-001 / zero-bloat reviews | Branch | Promote if sovereignty debate reopens |
 | Cutover scar detail | Plans `*cutover*` | Covered enough by CT101_BOUNDARY / ADR-0003 |
 | HSP redesign | Sibling HSP + plans | Leave in HSP repo |
