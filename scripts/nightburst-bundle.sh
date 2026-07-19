@@ -49,6 +49,7 @@ run escape-loop bash scripts/escape-loop-kit.sh
 run portable-core bash scripts/portable-core-inventory.sh
 run cognis-stub bash scripts/cognis-dialect-stub.sh
 run edge-fleet bash scripts/edge-fleet-sketch.sh
+run spine-demo bash scripts/spine-demo.sh
 run scoreboard bash scripts/nightburst-scoreboard.sh
 run aos-poll bash scripts/aos-gzmo-poll.sh
 
@@ -77,5 +78,6 @@ echo "Escape-loop: $ROOT/data-next/escape-loop/latest.json"
 echo "Portable core: $ROOT/data-next/portable-core/latest.json"
 echo "Cognis stub: $ROOT/data-next/cognis-dialect/latest.json"
 echo "Edge fleet: $ROOT/data-next/edge-fleet/latest.json"
+echo "Spine demo: $ROOT/data-next/spine-demo/latest.json"
 echo "AOS feed: $ROOT/data-next/aos-status/latest.json"
 exit "$fail"

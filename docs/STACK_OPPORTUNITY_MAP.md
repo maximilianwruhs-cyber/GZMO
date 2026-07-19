@@ -1,32 +1,43 @@
 # Stack opportunity map
 
-**Status:** Working map (promoted from Cursor canvas, 2026-07-16; checked into repo 2026-07-18; compressed proof executed 2026-07-18)  
+**Status:** Spine focus active (2026-07-19). Nightburst zoo spiked; product direction concentrates on two pillars.  
 **Audience:** Operator / product direction for the maximilianwruhs-cyber stack  
-**Scope:** Projects and products that can be created from lived GZMO + adjacent repos — not a generic idea dump.
+**Scope:** Projects and products that can be created from lived GZMO + adjacent repos — not a generic idea dump.  
+**Doctrine:** [SPINE_FOCUS.md](SPINE_FOCUS.md)
 
 ## North star
 
-The singular asset is a **living overnight memory metabolism** on one workstation. Everything below either protects that loop, scores models against it (Obolus Arena), or publishes its knowledge (OKForge). Rewrite labs and cron zoos are distractions until nights stay boring.
+The singular asset is a **living overnight memory metabolism** with a **product memory MCP** attach surface. Living production vault owner is **CT101** (`/opt/gzmo/`); workstation `data-next/` is lab scratch only. Arena / energy / surfaces are satellites — useful, not the brand.
+
+## Keep / Park / Later (spine)
+
+| Lane | What | Action |
+|------|------|--------|
+| **Keep** | Felt-recall · watchdog · session takeaway · dream compact · product MCP · faithfulness CI · gated wiki / concept-gate | Strengthen; demo with `scripts/spine-demo.sh` |
+| **Park** | Arena/€/RAPL deepen · HSP event bus · AOS poll/CE packaging · herdr/Pi/tinyFolder polish · OKCP marketplace · IpW/Forge · price-shift · beat-gate kit · ZPD · Cognis · escape-loop · edge fleet · portable rewrite | Spikes exist under `data-next/`; do not expand until Keep is demable to a stranger |
+| **Later** | AOS Customer Edition golden path · public marketplace auth · multi-node forge | Only after both Keep pillars stay boring |
 
 ## Recommended next three
 
-1. **Compressed felt-recall** (2 burst metabolism+recall cycles, ≥80% seeded hits) + **missed-run watchdog** — *done 2026-07-18* (`data-next/recall-proof.md`)
-2. **Obolus Arena** nightburst spike — *done 2026-07-18* (`scripts/arena-night.sh` → `data-next/arena/latest.json`)
-3. **Nightburst scoreboard** (sanitized metabolism + wiki + Arena) — *done 2026-07-18* (`scripts/nightburst-scoreboard.sh` → `data-next/arena/scoreboard.html`; OKForge `/observatory` stays agent-discovery)
+1. **Spine demo** — product MCP cold path + lab recall-proof — `bash scripts/spine-demo.sh` → `data-next/spine-demo/`
+2. **Protect CT101 nights** — sole overnight writer; workstation serve stays off by default ([CT101_BOUNDARY.md](CT101_BOUNDARY.md))
+3. **Session takeaway → distill** — keep the human loop that feeds metabolism (`gzmo session close --takeaway`)
 
-Calendar soak when the machine is parked is an optional bonus, not a gate.
+Nightburst scoreboard / Arena / € remain available as satellites; they are **Park**, not the next product bet.
 
 ## Composition spine
 
 ```
-chat / herdr
-  → sessions
-  → GZMO serve (distill · promote · embed · dream/spark)
-  → vault + honeypot + Qdrant · status GREEN · optional GC / watchdog
-  → Obolus Arena ← RAPL / Awattar / faithfulness / recall from real jobs
-  → champion engine map · €/night · optional price-aware shift
-  → OKForge / OKCP ← wiki concepts · Observatory · optional PR gates
-  → public mind · marketplace later · AOS curl-install packaging
+KEEP pillars
+  chat / session close --takeaway
+    → distill · promote · embed · dream/spark  (CT101 living; data-next lab)
+    → vault + honeypot + Qdrant · GREEN · watchdog
+    → gzmo memory mcp  (product appliance)
+
+PARK satellites (spiked, do not expand)
+  Arena · €/night · RAPL · price-shift · IpW · Forge
+  HSP · herdr · Pi glass · tinyFolder · AOS poll
+  OKCP marketplace · beat-gate · ZPD · Cognis · escape-loop · edge sketch
 ```
 
 ## Stack atlas
