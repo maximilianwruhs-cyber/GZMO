@@ -18,6 +18,12 @@ The lab `chaos_feedback_inbox.jsonl` is drained only by the chat/TUI snapshot br
 existing ritual `feedback_tx`. It is not daemon wiring: `daemon_cmd.rs` remains PulseLoop-free and
 CT101 living KPI stays chaos-off.
 
+### C.0.1 ritual skill CLI
+
+`gzmo chaos skill <command> [args...]` is a one-shot lab/Pi surface: it reads the saved chaos
+snapshot, runs the registered pantheon skill, and appends emitted feedback to the C.0 inbox. It
+does not start a living `PulseLoop`, inspect daemon state, or change the CT101 policy.
+
 ## Critical scar: `CHAOS_STATE.json` is write-only
 
 Nothing loads `CHAOS_STATE.json` into `PulseLoop` on boot. Boot uses `ChaosSnapshot::default()`. The file is **telemetry** rewritten every N ticks.

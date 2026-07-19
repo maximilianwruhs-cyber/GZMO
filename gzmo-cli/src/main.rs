@@ -4,6 +4,7 @@
 
 mod assemble_cmd;
 mod chaos_bootstrap;
+mod chaos_skill_cmd;
 mod chat;
 mod cli_mcp;
 mod config_cmd;
@@ -97,6 +98,8 @@ enum Command {
     },
     /// Headless mentor API client (`gzmo mentor ping|status|teach`).
     Mentor(Vec<String>),
+    /// One-shot ritual/lab pantheon skill (`gzmo chaos skill <command>`).
+    ChaosSkill(Vec<String>),
 }
 
 fn parse_args() -> Command {
@@ -107,6 +110,9 @@ fn parse_args() -> Command {
         }
         if args[1] == "mentor" {
             return Command::Mentor(args.get(2..).unwrap_or(&[]).to_vec());
+        }
+        if args[1] == "chaos" && args.get(2).map(String::as_str) == Some("skill") {
+            return Command::ChaosSkill(args.get(3..).unwrap_or(&[]).to_vec());
         }
         if args[1] == "serve" {
             return Command::Serve;
@@ -300,6 +306,7 @@ async fn main() -> Result<()> {
         Command::KgReconcile(_) => "info",
         Command::Assemble { .. } => "info",
         Command::Mentor(_) => "warn",
+        Command::ChaosSkill(_) => "warn",
     };
 
     tracing_subscriber::fmt()
@@ -335,6 +342,7 @@ async fn main() -> Result<()> {
             | Command::Config(_)
             | Command::Profile(_)
             | Command::Mentor(_)
+            | Command::ChaosSkill(_)
             | Command::DreamCompact { .. }
             | Command::Session(_)
     );
@@ -438,5 +446,6 @@ async fn main() -> Result<()> {
             apply,
         } => assemble_cmd::run(&config, &recipe, fixture, apply).await,
         Command::Mentor(args) => mentor_cmd::run(&config, &args).await,
+        Command::ChaosSkill(args) => chaos_skill_cmd::run(&config, &args).await,
     }
 }
