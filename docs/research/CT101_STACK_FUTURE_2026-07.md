@@ -227,8 +227,8 @@ flowchart TB
   LivingAttach -->|"read/write via GZMO MCP\nnot direct Redis"| Daemon
   Vault -.->|"metabolized facts\nfelt recall"| LivingAttach
 
-  Park["PARK: Arena / HSP / portable rewrite zoo"]
-  Park -.->|"do not unpark as future"| Daemon
+  Unpark["UNPARK queue: Arena / HSP / portable rewrite"]
+  Unpark -.->|"satellites — never replace A+C brand"| Daemon
 ```
 
 ---
