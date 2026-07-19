@@ -16,6 +16,7 @@ Canonical operator and architecture docs. Session reports and milestone logs bel
 | [INFRASTRUCTURE_OVERVIEW.md](INFRASTRUCTURE_OVERVIEW.md) | Living stack topology, ports, runbook |
 | [PORTS.md](PORTS.md) | **Locked** port map (Redis wired; librarian retired) |
 | [CT101_PATH_AUTHORITY.md](CT101_PATH_AUTHORITY.md) | Canonical `/opt/gzmo/*` paths (kill `survey_GZMO` drift) |
+| [CT101_QDRANT_EMBED_OPS.md](CT101_QDRANT_EMBED_OPS.md) | Embed backfill + Qdrant orphan prune |
 | [LOST_KNOWLEDGE_INVENTORY.md](LOST_KNOWLEDGE_INVENTORY.md) | Archaeology index — branch/plan scars recovered |
 | [PRODUCTION_READINESS.md](PRODUCTION_READINESS.md) | Production gate checklist |
 
@@ -71,6 +72,9 @@ Product non-goals (v1): multi-host living install, overnight serve as required p
 | [AGENT_HOME_SECRETS.md](AGENT_HOME_SECRETS.md) | Never store passwords in `~/.pi/agent/` |
 | [CHAOS_LIVING_VS_RITUAL.md](CHAOS_LIVING_VS_RITUAL.md) | Living chaos-free vs chat/TUI ritual |
 | [SKILLS_BRIDGE.md](SKILLS_BRIDGE.md) | Rust vs shell vs `gzmo_skills` |
+| [HERDR_METABOLISM.md](HERDR_METABOLISM.md) | herdr takeaway → distill ritual (Park) |
+| [OBOLUS_ARENA_BOUNDARY.md](OBOLUS_ARENA_BOUNDARY.md) | Daemon gate vs Obolus product vs Arena lab |
+| [VM200_RETRIEVAL_BENCH.md](VM200_RETRIEVAL_BENCH.md) | Embed/rerank latency gates on VM200 |
 | [PI_OPERATOR_GUIDE.md](PI_OPERATOR_GUIDE.md) | Pi onboarding (historical; see living stack + upgrade runbook) |
 | [PI_GZMO_MEMORY_INTEGRATION.md](PI_GZMO_MEMORY_INTEGRATION.md) | Living MCP attach (CT101) |
 | [REBOOT_STARTUP.md](REBOOT_STARTUP.md) | Cold-start after reboot |

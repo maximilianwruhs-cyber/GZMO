@@ -84,14 +84,17 @@ systemctl --user enable --now gzmo-ct101-living-smoke.timer
 
 ### Embed backfill (drift)
 
+Full ops scar book: [CT101_QDRANT_EMBED_OPS.md](./CT101_QDRANT_EMBED_OPS.md).
+
 ```bash
 ssh ct101 'bash /opt/gzmo/current/scripts/ct101-embed-backfill-loop.sh'
 ```
 
 ### Qdrant orphan prune
 
-After large syncs, remove points not in `honeypot is_latest=1`:
+After large syncs, remove points not in `honeypot is_latest=1` (**`--dry-run` first**):
 
 ```bash
+ssh ct101 'python3 /opt/gzmo/current/scripts/ct101-qdrant-prune-orphans.py --dry-run'
 ssh ct101 'python3 /opt/gzmo/current/scripts/ct101-qdrant-prune-orphans.py'
 ```

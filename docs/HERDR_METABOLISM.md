@@ -1,0 +1,62 @@
+# herdr ↔ GZMO Metabolism
+
+**Status:** Park spike with a durable runbook (2026-07-19)  
+**Plugin:** `integrations/herdr-gzmo-metabolism/`  
+**Link script:** `scripts/herdr-metabolism-link.sh`  
+**Related:** [DISTILL_COLD_CHAIN.md](./DISTILL_COLD_CHAIN.md), [SYNAPSE_EVENT_OWNERSHIP.md](./SYNAPSE_EVENT_OWNERSHIP.md), [STACK_OPPORTUNITY_MAP.md](./STACK_OPPORTUNITY_MAP.md) (Park)
+
+## What it does
+
+herdr is an optional operator shell. The plugin attaches **product/living memory MCP** and forces a **takeaway → `gzmo session close` → distill enqueue** ritual when you intentionally close a session.
+
+It does **not** auto-distill on every pane close.
+
+## Install / link
+
+```bash
+# herdr must be on PATH
+bash scripts/herdr-metabolism-link.sh
+```
+
+Actions:
+
+| Action | Purpose |
+|--------|---------|
+| `ensure-mcp` | Wire `gzmo-memory` MCP into the workspace |
+| `session-close` | Takeaway → `gzmo session close --takeaway …` |
+| `status` | Plugin / GZMO metabolism status |
+| pane `close-ritual` | Interactive overlay for the takeaway |
+
+Optional env drop: `$(herdr plugin config-dir gzmo.metabolism)/env`  
+Takeaway file: `…/takeaway.txt` (one durable line)
+
+## Close ritual (canonical)
+
+```bash
+# Interactive
+herdr plugin pane open --plugin gzmo.metabolism --entrypoint close-ritual
+
+# Non-interactive
+TAKEAWAY='durable fact for the vault' \
+  herdr plugin action invoke gzmo.metabolism.session-close
+```
+
+Under the hood: `gzmo session close [--session ID] --takeaway '…' [--now]`.
+
+## `pane.closed` is soft-miss only
+
+`on-pane-closed.sh` appends a row to the plugin state `missed-close.jsonl` and exits 0. It **never** enqueues distill. If sessions never metabolize, operators skipped the ritual — check that log, do not “fix” by auto-distilling every close.
+
+## Relation to Synapse / Pi
+
+| Path | Distill trigger |
+|------|-----------------|
+| herdr session-close | `gzmo session close` → distill queue |
+| Pi `session_end` | synapse-notifier + daemon poll — [SYNAPSE_EVENT_OWNERSHIP.md](./SYNAPSE_EVENT_OWNERSHIP.md) |
+| CLI takeaway | same close ritual without herdr |
+
+Do not invent a fourth close path. Product MCP attach vs living CT101 attach: [PI_LIVING_STACK.md](./PI_LIVING_STACK.md).
+
+## Park policy
+
+Opportunity map keeps herdr polish in **Park**. This doc exists so the spike is not re-invented; unpark only after Keep (stranger product + living GREEN) stays demable.

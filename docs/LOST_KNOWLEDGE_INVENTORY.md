@@ -37,10 +37,14 @@ Almost all deep operator contracts were written on **`origin/feat/context-compre
 | [CHAOS_LIVING_VS_RITUAL.md](./CHAOS_LIVING_VS_RITUAL.md) | **New** — living park vs chat/TUI ritual |
 | [SKILLS_BRIDGE.md](./SKILLS_BRIDGE.md) | **New** — Rust vs shell vs `gzmo_skills` |
 | [CT101_CLOUD_ROUTING.md](./CT101_CLOUD_ROUTING.md) | **New** — OpenRouter / GLM / 402 ops |
+| [HERDR_METABOLISM.md](./HERDR_METABOLISM.md) | **New** — herdr takeaway ritual (Park spike) |
+| [CT101_QDRANT_EMBED_OPS.md](./CT101_QDRANT_EMBED_OPS.md) | **New** — embed backfill + orphan prune |
+| [OBOLUS_ARENA_BOUNDARY.md](./OBOLUS_ARENA_BOUNDARY.md) | **New** — core gate vs product vs Arena lab |
+| [VM200_RETRIEVAL_BENCH.md](./VM200_RETRIEVAL_BENCH.md) | Branch (paths updated) |
 
 Also fixed: Redis “not wired” lie in [INFRASTRUCTURE_OVERVIEW.md](./INFRASTRUCTURE_OVERVIEW.md).
 
-## Still branch-only / plan-only (P1–P2)
+## Still branch-only / plan-only (P2)
 
 Cherry-pick or promote when needed; do not invent:
 
@@ -49,13 +53,10 @@ Cherry-pick or promote when needed; do not invent:
 | Card forge / dice / Würfel / pantheon packs | Branch `CARD_*`, `DICE_*`, `PANTHEON_*`, `WUERFEL_*` | Park — pointer in opportunity map |
 | Pi mutual-discovery session packs | Branch `PI_MUTUAL_*`, `PI_GUIDED_*` | Archive under research if reopening discovery redesign |
 | ARCH-DIR-001 / zero-bloat reviews | Branch | Promote if sovereignty debate reopens |
-| VM200 retrieval bench | Branch `VM200_RETRIEVAL_BENCH.md` | Promote with PORTS deploy refs |
-| Arena / IpW / Forge / DNA→QLoRA | Sibling repos + plans `obolus_10x_*`, `dna_arena_*` | Boundary only — [STACK_OPPORTUNITY_MAP.md](./STACK_OPPORTUNITY_MAP.md) |
-| herdr metabolism plugin | `integrations/herdr-gzmo-metabolism/` | Write `HERDR_METABOLISM.md` when unparking |
-| Embed/Qdrant orphan ops scars | Scripts + deploy crumbs | `CT101_QDRANT_EMBED_OPS.md` when next backfill fails |
 | Cutover scar detail | Plans `*cutover*` | Covered enough by CT101_BOUNDARY / ADR-0003 |
 | HSP redesign | Sibling HSP + plans | Leave in HSP repo |
 | Little Tools Lab pieces | `little-tools-lab/docs/` | Index pointer only |
+| IpW / Forge overnight spikes | scripts + plans | Stay Park — see [OBOLUS_ARENA_BOUNDARY.md](./OBOLUS_ARENA_BOUNDARY.md) |
 
 Full branch-only list (49 files):  
 `git diff --diff-filter=A --name-only main...origin/feat/context-compress-headroom -- docs/`
