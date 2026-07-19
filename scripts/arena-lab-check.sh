@@ -21,6 +21,26 @@ else
   row HOLD "rapl-log" "no power.jsonl yet — RAPL optional"
 fi
 
+[[ -x "$ROOT/scripts/rapl-probe.sh" ]] \
+  && row PASS "rapl-probe-script" "rapl-probe.sh executable" \
+  || row FAIL "rapl-probe-script" "missing"
+
+if [[ -f "$DATA/rapl/latest.json" ]]; then
+  row PASS "rapl-probe-artifact" "$DATA/rapl/latest.json"
+else
+  row HOLD "rapl-probe-artifact" "run arena-lab-demo.sh / rapl-probe.sh"
+fi
+
+[[ -x "$ROOT/scripts/euro-night-aggregate.sh" ]] \
+  && row PASS "euro-night-script" "euro-night-aggregate.sh executable" \
+  || row FAIL "euro-night-script" "missing"
+
+if [[ -f "$DATA/arena/euro-night.json" ]]; then
+  row PASS "euro-night" "$DATA/arena/euro-night.json"
+else
+  row HOLD "euro-night" "no euro-night.json yet — estimate OK until Arena history exists"
+fi
+
 ARENA="${OBOLUS_ARENA_ROOT:-$HOME/github-clone/obolus-arena}"
 if [[ -d "$ARENA" ]]; then
   row PASS "arena-sibling" "$ARENA"
@@ -40,6 +60,7 @@ cat >"$OUT/lab-contract.md" <<'EOF'
 
 - Run overnight z-loops in sibling `obolus-arena/`.
 - GZMO RAPL / € artifacts are observability only.
+- `arena-lab-demo.sh` chains `rapl-probe.sh` + `euro-night-aggregate.sh` (soft).
 - Never add Arena jobs to `gzmo-daemon` by default.
 EOF
 row PASS "lab-contract" "$OUT/lab-contract.md"
