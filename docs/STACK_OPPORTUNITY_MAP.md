@@ -19,9 +19,9 @@ The singular asset is a **living overnight memory metabolism** with a **product 
 
 ## Recommended next three
 
-1. **Keep PRODUCT GREEN** — `bash scripts/product-readiness-gate.sh` ([PRODUCT_PRODUCTION_READINESS.md](PRODUCT_PRODUCTION_READINESS.md))
-2. **Ship/release hygiene** — tagged `gzmo` release stays installable via `install-gzmo.sh`
-3. **Operator living lane** — CT101 nights stay sole writer (`ct101-living-probe` / takeaway→recall)
+1. **Keep PRODUCT GREEN** — `bash scripts/product-readiness-gate.sh`
+2. **Keep LIVING GREEN** — `bash scripts/living-readiness-gate.sh` ([LIVING_PRODUCTION_READINESS.md](LIVING_PRODUCTION_READINESS.md))
+3. **Ship/release hygiene** — tagged `gzmo` release stays installable via `install-gzmo.sh`
 
 Park stays parked (Arena/€/HSP/AOS zoo). Doctrine: [SPINE_FOCUS.md](SPINE_FOCUS.md).
 

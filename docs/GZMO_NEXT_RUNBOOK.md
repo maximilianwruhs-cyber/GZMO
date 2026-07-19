@@ -230,6 +230,7 @@ gzmo init --refresh-engine              # non-destructive [engine] rescan (prefe
 bash scripts/product-first-fact.sh      # ~/.gzmo takeaway→distill→search (Prime :8000 overlay)
 bash scripts/product-hello-memory.sh    # attach + first-fact combined hello
 bash scripts/product-readiness-gate.sh  # PRODUCT GREEN gate (see PRODUCT_PRODUCTION_READINESS.md)
+bash scripts/living-readiness-gate.sh   # LIVING GREEN gate (CT101; see LIVING_PRODUCTION_READINESS.md)
 bash scripts/ct101-living-probe.sh      # soft CT101 smoke + dual-writer check (Keep)
 bash scripts/ct101-takeaway-recall.sh   # living takeaway → distill → recall HIT
 bash scripts/faithfulness-living.sh     # CORE_INSIGHT claims vs CT101 vault

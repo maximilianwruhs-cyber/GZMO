@@ -26,14 +26,19 @@ This is already ADR-0003 / [CT101_BOUNDARY.md](CT101_BOUNDARY.md). Nightburst ar
 
 See the top of [STACK_OPPORTUNITY_MAP.md](STACK_OPPORTUNITY_MAP.md).
 
-## Production readiness (product)
+## Production readiness
 
 ```bash
+# Laptop Memory MCP
 bash scripts/product-readiness-gate.sh
-# GREEN → data-next/product-readiness/latest.json
+# → data-next/product-readiness/latest.json
+
+# Living CT101 metabolism
+bash scripts/living-readiness-gate.sh
+# → data-next/living-readiness/latest.json
 ```
 
-See [PRODUCT_PRODUCTION_READINESS.md](PRODUCT_PRODUCTION_READINESS.md).
+See [PRODUCT_PRODUCTION_READINESS.md](PRODUCT_PRODUCTION_READINESS.md) and [LIVING_PRODUCTION_READINESS.md](LIVING_PRODUCTION_READINESS.md).
 
 ## Demable check (≈5 minutes)
 

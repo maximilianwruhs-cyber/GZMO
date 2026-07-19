@@ -54,6 +54,7 @@ run mcp-attach bash scripts/mcp-attach-check.sh
 run product-first-fact bash scripts/product-first-fact.sh
 run product-hello bash scripts/product-hello-memory.sh
 run product-readiness bash scripts/product-readiness-gate.sh
+run living-readiness bash scripts/living-readiness-gate.sh
 run takeaway-ritual bash scripts/takeaway-ritual-lab.sh
 run dream-compact bash scripts/dream-compact-lab.sh
 run ct101-probe bash scripts/ct101-living-probe.sh
@@ -93,6 +94,7 @@ echo "MCP attach: $ROOT/data-next/mcp-attach/latest.json"
 echo "Product first fact: $ROOT/data-next/product-first-fact/latest.json"
 echo "Product hello: $ROOT/data-next/product-hello/latest.json"
 echo "Product readiness: $ROOT/data-next/product-readiness/latest.json"
+echo "Living readiness: $ROOT/data-next/living-readiness/latest.json"
 echo "Takeaway ritual: $ROOT/data-next/takeaway-ritual/latest.json"
 echo "Dream compact: $ROOT/data-next/dream-compact/latest.json"
 echo "CT101 living: $ROOT/data-next/ct101-living/latest.json"
