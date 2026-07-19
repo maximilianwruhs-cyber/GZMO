@@ -62,9 +62,11 @@ See [PORTS.md](./PORTS.md). Qdrant image is pinned (`v1.13.2`) for reproducible 
 
 Live `/opt/database-cluster/docker-compose.yml` historically embedded Neo4j auth in plaintext. Prefer migrating that host to this pin + `.env`, and **rotate** any password that ever lived in compose or agent homes ([AGENT_HOME_SECRETS.md](./AGENT_HOME_SECRETS.md)).
 
-## Verify
+## Verify / sync
 
 ```bash
 bash scripts/living-appliance-gate.sh
-bash scripts/living-readiness-gate.sh   # includes soft appliance-pin row
+bash scripts/living-mcp-attach-check.sh
+bash scripts/ct101-sync-living-appliance.sh   # stage pin under /opt/gzmo/current/…
+bash scripts/living-readiness-gate.sh         # includes appliance-pin + living-mcp rows
 ```

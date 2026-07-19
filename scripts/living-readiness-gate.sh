@@ -142,6 +142,19 @@ else
   row FAIL "living-appliance-pin" "compose pin invalid — see docs/LIVING_APPLIANCE.md"
 fi
 
+# 10) Goal C — labeled gzmo-living attach (soft if not installed yet)
+bash "$ROOT/scripts/living-mcp-attach-check.sh" >>"$LOG" 2>&1 || true
+if python3 -c "import json;d=json.load(open('$DATA/living-mcp-attach/latest.json')); raise SystemExit(0 if d.get('ok') else 1)"; then
+  advice="$(python3 -c "import json;print(json.load(open('$DATA/living-mcp-attach/latest.json')).get('advice',''))")"
+  if python3 -c "import json;d=json.load(open('$DATA/living-mcp-attach/latest.json')); raise SystemExit(0 if d.get('found_living',0)>0 else 1)"; then
+    row PASS "living-mcp-attach" "$advice"
+  else
+    row HOLD "living-mcp-attach" "$advice"
+  fi
+else
+  row FAIL "living-mcp-attach" "living mislabeled as gzmo-memory — install-shared-mcp.sh"
+fi
+
 # Verdict
 export OUT pass fail hold
 set +e

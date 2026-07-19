@@ -70,7 +70,8 @@ Pi on the workstation reaches CT101 services over LAN:
 | Pi MCP server | Target |
 |---------------|--------|
 | `memory` | Neo4j `bolt://192.168.31.202:7687` |
-| `gzmo-memory` | Local `gzmo mcp-serve` → reads workstation `gzmo.toml`, vault/Qdrant on CT101 |
+| `gzmo-living` | `pi-gzmo-mcp-serve.sh` → CT101 `/opt/gzmo` mcp-serve (goal C) |
+| `gzmo-memory` | Product only → `~/.gzmo` (goal A) |
 
 Config: `~/.pi/agent/settings.json`
 

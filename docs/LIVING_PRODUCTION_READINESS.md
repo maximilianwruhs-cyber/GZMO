@@ -15,6 +15,7 @@ Historical workstation-centric checklist: [PRODUCTION_READINESS.md](PRODUCTION_R
 4. **No dual overnight writers** — workstation `gzmo-serve` inactive  
 5. **Living faithfulness** — CORE_INSIGHT / ADR claims supported on CT101 vault  
 6. **Takeaway → distill → recall** — same-sitting HIT on living vault  
+7. **Goal C pin** — in-repo `deploy/living-appliance` + toml fragment valid (`living-appliance-pin`)  
 
 ## Gate checks
 
@@ -28,6 +29,8 @@ Historical workstation-centric checklist: [PRODUCTION_READINESS.md](PRODUCTION_R
 | `faithfulness-living` | FAIL |
 | `takeaway-recall` | FAIL (skip with `LIVING_GATE_SKIP_TAKEAWAY=1`) |
 | `workstation-prime` | HOLD if local `:8000` down but CT101 `prime_llm` OK |
+| `living-appliance-pin` | FAIL if compose/toml pin invalid |
+| `living-mcp-attach` | HOLD if no `gzmo-living` yet; FAIL if living mislabeled as `gzmo-memory` |
 
 ## Operator commands
 
@@ -41,6 +44,9 @@ bash scripts/ct101-living-smoke.sh
 bash scripts/ct101-living-probe.sh
 bash scripts/faithfulness-living.sh
 bash scripts/ct101-takeaway-recall.sh
+bash scripts/living-appliance-gate.sh
+bash scripts/living-mcp-attach-check.sh
+bash scripts/ct101-sync-living-appliance.sh   # stage pin on CT101
 
 # Dual-writer hygiene (workstation)
 systemctl --user stop gzmo-serve.service
