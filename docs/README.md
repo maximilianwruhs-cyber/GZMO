@@ -68,6 +68,7 @@ Product non-goals (v1): multi-host living install, overnight serve as required p
 | [SPAWN_GATE.md](SPAWN_GATE.md) | Autospawn + Redis Prime budget |
 | [OBOLUS_GOVERNANCE.md](OBOLUS_GOVERNANCE.md) | T0–T2 energy gates |
 | [DISCOVERY_KB_FEEDBACK_LOOP.md](DISCOVERY_KB_FEEDBACK_LOOP.md) | Discovery ↔ vault/honeypot loop |
+| [DISCOVERY_LIFECYCLE.md](DISCOVERY_LIFECYCLE.md) | Scout vs implement (discover-only default) |
 | [CT101_CLOUD_ROUTING.md](CT101_CLOUD_ROUTING.md) | OpenRouter / active_mode vs background |
 | [AGENT_HOME_SECRETS.md](AGENT_HOME_SECRETS.md) | Never store passwords in `~/.pi/agent/` |
 | [CHAOS_LIVING_VS_RITUAL.md](CHAOS_LIVING_VS_RITUAL.md) | Living chaos-free vs chat/TUI ritual |

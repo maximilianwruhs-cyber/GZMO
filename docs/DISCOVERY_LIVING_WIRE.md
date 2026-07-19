@@ -1,7 +1,7 @@
 # Discovery living wire (CT101)
 
 **Purpose:** Keep Pi discovery attached to the living stack and **probe-first**.  
-**Related:** [CT101_DEPLOY.md](./CT101_DEPLOY.md), [CT101_RESTORE_LIVING.md](./CT101_RESTORE_LIVING.md)
+**Related:** [DISCOVERY_LIFECYCLE.md](./DISCOVERY_LIFECYCLE.md) (scout vs implement), [CT101_DEPLOY.md](./CT101_DEPLOY.md), [CT101_RESTORE_LIVING.md](./CT101_RESTORE_LIVING.md), [CT101_PATH_AUTHORITY.md](./CT101_PATH_AUTHORITY.md)
 
 ## What’s living
 

@@ -41,6 +41,7 @@ Almost all deep operator contracts were written on **`origin/feat/context-compre
 | [CT101_QDRANT_EMBED_OPS.md](./CT101_QDRANT_EMBED_OPS.md) | **New** — embed backfill + orphan prune |
 | [OBOLUS_ARENA_BOUNDARY.md](./OBOLUS_ARENA_BOUNDARY.md) | **New** — core gate vs product vs Arena lab |
 | [VM200_RETRIEVAL_BENCH.md](./VM200_RETRIEVAL_BENCH.md) | Branch (paths updated) |
+| [DISCOVERY_LIFECYCLE.md](./DISCOVERY_LIFECYCLE.md) | **New** — scout vs implement (from Cursor plan) |
 
 Also fixed: Redis “not wired” lie in [INFRASTRUCTURE_OVERVIEW.md](./INFRASTRUCTURE_OVERVIEW.md).
 
@@ -51,7 +52,7 @@ Cherry-pick or promote when needed; do not invent:
 | Item | Where | Suggested action |
 |------|-------|------------------|
 | Card forge / dice / Würfel / pantheon packs | Branch `CARD_*`, `DICE_*`, `PANTHEON_*`, `WUERFEL_*` | Park — pointer in opportunity map |
-| Pi mutual-discovery session packs | Branch `PI_MUTUAL_*`, `PI_GUIDED_*` | Archive under research if reopening discovery redesign |
+| Pi mutual-discovery session packs | Branch `PI_MUTUAL_*`, `PI_GUIDED_*` | Research archive if reopening pedagogy theater |
 | ARCH-DIR-001 / zero-bloat reviews | Branch | Promote if sovereignty debate reopens |
 | Cutover scar detail | Plans `*cutover*` | Covered enough by CT101_BOUNDARY / ADR-0003 |
 | HSP redesign | Sibling HSP + plans | Leave in HSP repo |
