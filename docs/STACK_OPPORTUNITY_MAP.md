@@ -24,7 +24,7 @@ Operator lock: co-primary **A** (product MCP) + **C** (living Redis/Qdrant/Neo4j
 
 1. **Keep A GREEN** — `bash scripts/product-readiness-gate.sh`
 2. **Keep C GREEN** — `bash scripts/living-readiness-gate.sh` ([LIVING_PRODUCTION_READINESS.md](LIVING_PRODUCTION_READINESS.md))
-3. **Ship living appliance compose (C)** — in-repo Redis/Qdrant/Neo4j pin matching CT101; never required for A’s `install-gzmo.sh`
+3. **Living appliance compose (C)** — pin at `deploy/living-appliance/`; gate `scripts/living-appliance-gate.sh`; never required for A’s `install-gzmo.sh`
 
 Park stays parked (Arena/€/HSP zoo; pantheon: [PANTHEON_THEATER_PACKAGING_PARK.md](PANTHEON_THEATER_PACKAGING_PARK.md)). Doctrine: [SPINE_FOCUS.md](SPINE_FOCUS.md).
 

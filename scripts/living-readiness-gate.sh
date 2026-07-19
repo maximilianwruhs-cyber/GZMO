@@ -134,6 +134,14 @@ else
   fi
 fi
 
+# 9) Goal C — in-repo living appliance compose pin (soft live probes)
+bash "$ROOT/scripts/living-appliance-gate.sh" >>"$LOG" 2>&1 || true
+if python3 -c "import json;d=json.load(open('$DATA/living-appliance/latest.json')); raise SystemExit(0 if d.get('ok') else 1)"; then
+  row PASS "living-appliance-pin" "$(python3 -c "import json;print(json.load(open('$DATA/living-appliance/latest.json')).get('advice',''))")"
+else
+  row FAIL "living-appliance-pin" "compose pin invalid — see docs/LIVING_APPLIANCE.md"
+fi
+
 # Verdict
 export OUT pass fail hold
 set +e

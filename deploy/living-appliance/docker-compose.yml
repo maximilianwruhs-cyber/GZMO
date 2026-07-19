@@ -1,0 +1,74 @@
+# GZMO living appliance sidecars (goal C)
+# Pin of CT101 /opt/database-cluster topology — secrets via .env, never committed.
+#
+#   cp .env.example .env   # set NEO4J_AUTH
+#   docker compose up -d
+#
+# Does NOT start gzmo-daemon. Pair with /opt/gzmo (or local living config).
+# Product MCP (goal A) must NOT require this stack.
+
+name: gzmo-living-appliance
+
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: sidecar-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    command: redis-server --maxmemory 1gb --maxmemory-policy allkeys-lru --save ""
+    sysctls:
+      - net.core.somaxconn=1024
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  qdrant:
+    image: qdrant/qdrant:v1.13.2
+    container_name: sidecar-qdrant
+    restart: always
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    environment:
+      - QDRANT__SERVICE__GRPC_PORT=6334
+    volumes:
+      - qdrant_data:/qdrant/storage
+
+  neo4j:
+    image: neo4j:5-community
+    container_name: sidecar-neo4j
+    restart: always
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    environment:
+      - NEO4J_AUTH=${NEO4J_AUTH:?set NEO4J_AUTH in .env — see .env.example}
+      - NEO4J_server_memory_heap_initial__size=${NEO4J_HEAP_INIT:-1500m}
+      - NEO4J_server_memory_heap_max__size=${NEO4J_HEAP_MAX:-1500m}
+      - NEO4J_server_memory_pagecache_size=${NEO4J_PAGECACHE:-1500m}
+      - NEO4J_dbms_security_procedures_unrestricted=apoc.*,gds.*
+      - NEO4J_dbms_security_procedures_allowlist=apoc.*,gds.*
+    volumes:
+      - neo4j_data:/data
+      - neo4j_logs:/logs
+      - neo4j_import:/var/lib/neo4j/import
+      - neo4j_plugins:/plugins
+
+volumes:
+  redis_data:
+    driver: local
+  qdrant_data:
+    driver: local
+  neo4j_data:
+    driver: local
+  neo4j_logs:
+    driver: local
+  neo4j_import:
+    driver: local
+  neo4j_plugins:
+    driver: local
