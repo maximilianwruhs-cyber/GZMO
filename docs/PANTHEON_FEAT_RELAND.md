@@ -22,14 +22,17 @@
 **Landed:** attractor-style `/poem`, `/joke`, `/word`, and `/define` briefs.
 **CCL registry:** `gzmo-core/src/skills/skill_ccl.rs` is on main; `/help` renders its badges.
 
-**Still deferred:** daemon `dice_loop` fire wiring; the rest of Slice C (pedagogy oscillator
-and any living daemon wiring). C.0.1 is a slim external CLI, not a PulseLoop or daemon path;
-C.0 drains its lab inbox only.
+**Still deferred:** daemon `dice_loop` fire wiring; Slice C.1 (pedagogy oscillator / pulse /
+thoughts rework) and any living daemon chaos wiring. C.0.1 is a slim external CLI, not a
+PulseLoop or daemon path; C.0 drains its lab inbox only.
 
-Thin `/card` `/story` remain main stubs until full Slice A. `/dice` narratives + wild-magic **plan** come from TOML.  
-Demos: `bash scripts/verify-dice-corpus.sh` · `bash scripts/verify-dice-cascade.sh` · `bash scripts/pantheon-ritual-demo.sh`.
+**On main now:** Slice A full — `/dice` (corpus + nested cascade), `/card` forge, `/story`,
+`/pkm`, generative briefs, CCL badges. Ritual demos:
+`bash scripts/verify-dice-corpus.sh` · `bash scripts/verify-dice-cascade.sh` ·
+`bash scripts/verify-chaos-skill.sh` · `bash scripts/pantheon-ritual-demo.sh`.
 
-**Blocker note:** feat nested cascade / `card.rs` import `attractor_common`, `dispatch`, `feedback_ipc`, pedagogy auto-triggers — not present on main. Do not blind-checkout those skill files.
+**Blocker note (Slice C.1 only):** do not blind-checkout feat `pedagogy_oscillator` /
+auto-triggers into `daemon_cmd` or living overnight. Lab/TUI-only if landed.
 
 ## Slice A — ritual skills (preferred first PR)
 

@@ -16,7 +16,7 @@ echo "=== Pantheon ritual check (Unpark W2.1) ==="
 
 for sk in dice.rs card.rs story.rs; do
   if [[ -f "$ROOT/gzmo-core/src/skills/$sk" ]]; then
-    row PASS "skill:$sk" "thin main stub present"
+    row PASS "skill:$sk" "Slice A skill present on main"
   else
     row HOLD "skill:$sk" "missing on main"
   fi
@@ -62,6 +62,13 @@ fi
 
 [[ -f "$ROOT/docs/CHAOS_LIVING_VS_RITUAL.md" ]] && row PASS "chaos-boundary" "ritual ≠ living KPI" || row FAIL "chaos-boundary" "missing"
 
+if [[ -x "$ROOT/scripts/verify-chaos-skill.sh" ]] \
+  && bash "$ROOT/scripts/verify-chaos-skill.sh" >/tmp/pantheon-chaos-skill-verify.log 2>&1; then
+  row PASS "chaos-skill-verify" "verify-chaos-skill.sh ok (C.0.1)"
+else
+  row HOLD "chaos-skill-verify" "verify-chaos-skill not green — see /tmp/pantheon-chaos-skill-verify.log"
+fi
+
 ROWS_TSV="$(printf '%s\n' "${ROWS[@]}")"
 export OUT pass fail hold ROWS_TSV
 python3 - <<'PY'
@@ -75,12 +82,12 @@ for line in os.environ.get("ROWS_TSV","").splitlines():
     st,n,d=line.split("|",2); checks[n]={"status":st,"detail":d}
 fail_n=int(os.environ["fail"]); hold_n=int(os.environ["hold"]); pass_n=int(os.environ["pass"])
 verdict="GREEN" if fail_n==0 else "RED"
-# Thin skills + front door = wave implemented; feat re-land is follow-on PR (HOLD ok)
-thin_ok = all(checks.get(f"skill:{s}",{}).get("status")=="PASS" for s in ("dice.rs","card.rs","story.rs"))
+# Pantheon skills + front door = wave implemented; C.1 / daemon fire may still HOLD
+skills_ok = all(checks.get(f"skill:{s}",{}).get("status")=="PASS" for s in ("dice.rs","card.rs","story.rs"))
 demo = Path(os.environ.get("OUT","")).joinpath("demo.json")
 demo_ok = demo.is_file()
-if fail_n==0 and thin_ok:
-    advice="pantheon_ritual_ok — thin skills installable; feat re-land checklist optional"
+if fail_n==0 and skills_ok:
+    advice="pantheon_ritual_ok — Slice A skills on main; C.1 pedagogy still deferred"
 elif fail_n==0:
     advice="pantheon_ritual_hold — front door incomplete"
 else:
