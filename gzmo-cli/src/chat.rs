@@ -183,9 +183,7 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
     // ─── Pedagogy (Wave 2b — mentor path before agent loop) ──────
     let mut pedagogy_runtime = PedagogyRuntime::boot(&config).await?;
     if config.pedagogy.enabled {
-        eprintln!(
-            "  {COPPER}⚙ Pedagogy: mentor path on (maybe_teach before agent loop){RESET}"
-        );
+        eprintln!("  {COPPER}⚙ Pedagogy: mentor path on (maybe_teach before agent loop){RESET}");
     }
 
     // ─── Chaos Skills (Rust-native, priority over shell) ─────────
