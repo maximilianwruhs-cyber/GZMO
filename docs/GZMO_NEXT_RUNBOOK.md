@@ -226,6 +226,7 @@ bash scripts/cognis-dialect-stub.sh     # weekend dialect over plan-gate (not pr
 bash scripts/edge-fleet-sketch.sh       # hub/edge topology sketch (no sync)
 bash scripts/ct101-living-probe.sh      # soft CT101 smoke + dual-writer check (Keep)
 bash scripts/takeaway-ritual-lab.sh     # session close --takeaway → distill enqueue (no --now)
+bash scripts/dream-compact-lab.sh       # dream compact --dry-run (Keep plumbing; not on GREEN)
 bash scripts/spine-demo.sh              # Keep pillars: product MCP + recall-proof (see SPINE_FOCUS.md)
 gzmo chat                               # sessions persist to data-next/sessions/
 # Skills (next): authoritative root = GZMO/skills/ (see gzmo instance status → skills_root).

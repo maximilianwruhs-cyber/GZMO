@@ -40,6 +40,10 @@ bash scripts/ct101-living-probe.sh
 bash scripts/takeaway-ritual-lab.sh
 # → data-next/takeaway-ritual/latest.{json,md}
 
+# DREAMS.md GC dry-run (not on GREEN)
+bash scripts/dream-compact-lab.sh
+# → data-next/dream-compact/latest.{json,md}
+
 # Spine demo: product MCP + lab recall-proof + Keep supports
 bash scripts/spine-demo.sh
 # → data-next/spine-demo/latest.{json,md}

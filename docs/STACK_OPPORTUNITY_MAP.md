@@ -103,7 +103,7 @@ Weekly GC that merges/compacts DREAMS.md and archives cold sessions without losi
 
 - **Builds on:** `dreams_md::compact_dreams_md` · serve soft-fail · sessions-archive
 - **Why special:** Necessary plumbing; not the brand.
-- **Ship shape:** `gzmo dream compact [--max-chars N] [--archive-sessions-days 30] [--dry-run]`; serve soft-fail Sunday 03:00 UTC (`dream-compact` run record); never on GREEN gate.
+- **Ship shape:** `gzmo dream compact [--max-chars N] [--archive-sessions-days 30] [--dry-run]`; lab: `scripts/dream-compact-lab.sh` → `data-next/dream-compact/`; serve soft-fail Sunday 03:00 UTC; never on GREEN gate.
 
 ### Energy / Arena
 
