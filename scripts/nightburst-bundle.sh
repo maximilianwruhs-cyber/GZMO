@@ -52,6 +52,7 @@ run edge-fleet bash scripts/edge-fleet-sketch.sh
 run product-stranger bash scripts/product-stranger-path.sh
 run mcp-attach bash scripts/mcp-attach-check.sh
 run product-first-fact bash scripts/product-first-fact.sh
+run product-hello bash scripts/product-hello-memory.sh
 run takeaway-ritual bash scripts/takeaway-ritual-lab.sh
 run dream-compact bash scripts/dream-compact-lab.sh
 run ct101-probe bash scripts/ct101-living-probe.sh
@@ -89,6 +90,7 @@ echo "Edge fleet: $ROOT/data-next/edge-fleet/latest.json"
 echo "Product stranger: $ROOT/data-next/product-stranger/latest.json"
 echo "MCP attach: $ROOT/data-next/mcp-attach/latest.json"
 echo "Product first fact: $ROOT/data-next/product-first-fact/latest.json"
+echo "Product hello: $ROOT/data-next/product-hello/latest.json"
 echo "Takeaway ritual: $ROOT/data-next/takeaway-ritual/latest.json"
 echo "Dream compact: $ROOT/data-next/dream-compact/latest.json"
 echo "CT101 living: $ROOT/data-next/ct101-living/latest.json"

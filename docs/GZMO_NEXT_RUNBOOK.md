@@ -227,6 +227,7 @@ bash scripts/edge-fleet-sketch.sh       # hub/edge topology sketch (no sync)
 bash scripts/product-stranger-path.sh   # stranger MCP install checklist (laptop product)
 bash scripts/mcp-attach-check.sh        # Cursor/Pi mcp.json → ~/.gzmo (MCP_ATTACH_FIX=1 to rewire)
 bash scripts/product-first-fact.sh      # ~/.gzmo takeaway→distill→search (Prime :8000 overlay)
+bash scripts/product-hello-memory.sh    # attach + first-fact combined hello
 bash scripts/ct101-living-probe.sh      # soft CT101 smoke + dual-writer check (Keep)
 bash scripts/ct101-takeaway-recall.sh   # living takeaway → distill → recall HIT
 bash scripts/faithfulness-living.sh     # CORE_INSIGHT claims vs CT101 vault

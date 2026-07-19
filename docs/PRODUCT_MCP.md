@@ -34,7 +34,7 @@ This:
 2. Runs `gzmo init` → `~/.gzmo/` (SQLite vault, embeddings off, Redis/Qdrant off)
 3. Merges `gzmo-memory` into Cursor / Pi / global `mcp.json`
 
-No LAN hosts. No remote living stack required.
+`gzmo init` scans localhost and **prefers Prime / llama.cpp on `:8000`** when up; otherwise falls back to LM Studio `:1234`. No LAN hosts. No remote living stack required.
 
 Manual fragment (if you skip the installer merge):
 
@@ -89,6 +89,9 @@ Needs a live OpenAI-compatible engine (Prime `:8000` by default). Uses a **sibli
 bash scripts/product-first-fact.sh
 # → data-next/product-first-fact/latest.md
 # PRODUCT_ENGINE_URL=http://127.0.0.1:8000/v1  # override if needed
+
+bash scripts/product-hello-memory.sh
+# → data-next/product-hello/ — attach + first-fact combined stranger feel
 ```
 
 **Appliance note:** product install is the Memory MCP appliance (map m2). Living

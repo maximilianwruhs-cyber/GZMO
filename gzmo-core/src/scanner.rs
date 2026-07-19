@@ -25,7 +25,11 @@ pub struct DiscoveredEndpoint {
 }
 
 /// Known local LLM endpoint patterns to probe.
+/// Prime / llama.cpp on `:8000` is listed first — product `gzmo init` prefers it when up.
 const KNOWN_ENDPOINTS: &[(&str, &str, &str)] = &[
+    ("Prime / llama.cpp", "http://127.0.0.1:8000/v1", "/models"),
+    ("Prime / llama.cpp", "http://localhost:8000/v1", "/models"),
+    ("LM Studio", "http://127.0.0.1:1234/v1", "/models"),
     ("LM Studio", "http://localhost:1234/v1", "/models"),
     ("Ollama", "http://localhost:11434/v1", "/models"),
     ("vLLM", "http://localhost:8000/v1", "/models"),
@@ -34,6 +38,21 @@ const KNOWN_ENDPOINTS: &[(&str, &str, &str)] = &[
     ("Jan", "http://localhost:1337/v1", "/models"),
     ("LiteLLM", "http://localhost:4000/v1", "/models"),
 ];
+
+/// Prefer product-friendly engines: Prime `:8000`, then lowest-latency remaining.
+/// Dedupes by host:port so `127.0.0.1` and `localhost` do not both win.
+pub fn prefer_product_engine(endpoints: &[DiscoveredEndpoint]) -> Option<&DiscoveredEndpoint> {
+    if endpoints.is_empty() {
+        return None;
+    }
+    let prime = endpoints.iter().find(|e| {
+        e.url.contains(":8000/") || e.url.ends_with(":8000") || e.url.contains(":8000?")
+    });
+    if let Some(ep) = prime {
+        return Some(ep);
+    }
+    endpoints.iter().min_by_key(|e| e.latency_ms)
+}
 
 /// OpenAI-compatible models list response.
 #[derive(Debug, Deserialize)]
@@ -84,7 +103,15 @@ pub async fn scan_endpoints() -> Vec<DiscoveredEndpoint> {
         }
     }
 
-    results
+    // Dedupe identical URLs (e.g. vLLM alias after Prime on :8000).
+    let mut deduped: Vec<DiscoveredEndpoint> = Vec::new();
+    for ep in results {
+        if deduped.iter().any(|d| d.url == ep.url) {
+            continue;
+        }
+        deduped.push(ep);
+    }
+    deduped
 }
 
 /// Probe a single custom endpoint URL.
@@ -113,4 +140,43 @@ pub async fn probe_endpoint(base_url: &str) -> Result<DiscoveredEndpoint> {
         latency_ms: latency,
         models,
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn ep(name: &str, url: &str, latency_ms: u64) -> DiscoveredEndpoint {
+        DiscoveredEndpoint {
+            name: name.to_string(),
+            url: url.to_string(),
+            latency_ms,
+            models: vec!["m".into()],
+        }
+    }
+
+    #[test]
+    fn prefer_product_engine_picks_prime_8000_over_faster_lmstudio() {
+        let eps = vec![
+            ep("LM Studio", "http://127.0.0.1:1234/v1", 5),
+            ep("Prime / llama.cpp", "http://127.0.0.1:8000/v1", 40),
+        ];
+        let picked = prefer_product_engine(&eps).expect("pick");
+        assert!(picked.url.contains(":8000"));
+    }
+
+    #[test]
+    fn prefer_product_engine_falls_back_to_lowest_latency() {
+        let eps = vec![
+            ep("Ollama", "http://localhost:11434/v1", 30),
+            ep("LM Studio", "http://127.0.0.1:1234/v1", 8),
+        ];
+        let picked = prefer_product_engine(&eps).expect("pick");
+        assert!(picked.url.contains(":1234"));
+    }
+
+    #[test]
+    fn prefer_product_engine_empty() {
+        assert!(prefer_product_engine(&[]).is_none());
+    }
 }
