@@ -31,6 +31,9 @@ else
   PRODUCT_NOTE="SKIP_PRODUCT_MCP=1"
 fi
 
+# Soft CT101 owner probe (SSH may HOLD; still records dual-writer risk).
+bash "$ROOT/scripts/ct101-living-probe.sh" >/dev/null 2>&1 || true
+
 export ROOT DATA OUT BIN PRODUCT_OK PRODUCT_NOTE
 python3 - <<'PY'
 import json, os, re
@@ -65,11 +68,20 @@ try:
 except Exception:
     pass
 
+ct101 = {}
+try:
+    ct101 = json.loads((data / "ct101-living" / "latest.json").read_text(encoding="utf-8"))
+except Exception:
+    pass
+
 owner = {
     "living_production": "CT101 (/opt/gzmo/, gzmo-daemon)",
     "lab_scratch": "workstation data-next/",
     "rule": "Never overnight gzmo serve on workstation while CT101 lives",
     "doc": "docs/CT101_BOUNDARY.md",
+    "probe_advice": ct101.get("advice"),
+    "living_proof": ct101.get("living_proof"),
+    "dual_writer_risk": (ct101.get("workstation") or {}).get("dual_writer_risk"),
 }
 
 pillars = {
@@ -136,6 +148,9 @@ md = [
     f"- Production: {owner['living_production']}",
     f"- Lab: {owner['lab_scratch']}",
     f"- Rule: {owner['rule']}",
+    f"- Probe: {owner.get('probe_advice') or 'n/a'}",
+    f"- Living proof: {owner.get('living_proof')}",
+    f"- Dual-writer risk: {owner.get('dual_writer_risk')}",
     "",
     "## Pillars",
     "",

@@ -32,12 +32,16 @@ See the top of [STACK_OPPORTUNITY_MAP.md](STACK_OPPORTUNITY_MAP.md).
 # Product MCP cold path (no CT101 / LAN required)
 ./scripts/verify-product-mcp.sh
 
+# Soft CT101 living probe (SSH smoke + dual-writer check)
+bash scripts/ct101-living-probe.sh
+# → data-next/ct101-living/latest.{json,md}
+
 # Spine demo: product MCP + lab recall-proof + owner doctrine
 bash scripts/spine-demo.sh
 # → data-next/spine-demo/latest.{json,md}
 ```
 
-Stranger test: can you show (1) MCP search/status works on a fresh `gzmo init` dir, and (2) a recall-proof log where seeded facts stuck after metabolism?
+Stranger test: can you show (1) MCP search/status works on a fresh `gzmo init` dir, and (2) a recall-proof log where seeded facts stuck after metabolism? Operator test: CT101 smoke green and workstation `gzmo-serve` inactive.
 
 ## Related
 
