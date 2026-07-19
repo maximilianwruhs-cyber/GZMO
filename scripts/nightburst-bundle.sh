@@ -35,6 +35,8 @@ run euro-night bash scripts/euro-night-aggregate.sh
 run price-window bash scripts/price-window-suggest.sh
 run price-shift bash scripts/price-shift-soft.sh
 run concept-webhook bash scripts/concept-gate-webhook.sh
+run forge-mutate bash scripts/obolus-forge-mutate.sh
+run ipw-route bash scripts/ipw-route.sh --task overnight
 run scoreboard bash scripts/nightburst-scoreboard.sh
 run aos-poll bash scripts/aos-gzmo-poll.sh
 
@@ -49,5 +51,7 @@ echo "€/night: $ROOT/data-next/arena/euro-night.json"
 echo "Price window: $ROOT/data-next/price-window/latest.md"
 echo "Price shift: $ROOT/data-next/scheduler-runs/latest-price-shift.json"
 echo "Concept webhook: $ROOT/data-next/concept-gate/webhook-latest.json"
+echo "Forge: $ROOT/data-next/arena/forge/latest.json"
+echo "IpW route: $ROOT/data-next/ipw-router/latest.json"
 echo "AOS feed: $ROOT/data-next/aos-status/latest.json"
 exit "$fail"

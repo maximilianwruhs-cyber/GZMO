@@ -1,0 +1,31 @@
+# Intelligence-per-Watt router policy (sibling — chat/serve may read; not auto-applied).
+# Spike for opportunity map e4. Override path with GZMO_IPW_POLICY.
+
+schema = "gzmo.ipw.router/v1"
+
+[thresholds]
+# Below this Arena z → prefer overnight / smaller path for heavy jobs.
+z_floor = 0.75
+# Above this watts estimate → treat as ceiling breach (cloud only if allowed).
+watts_ceiling = 120.0
+# Joules budget for a single interactive turn (estimate).
+interactive_joule_budget = 50.0
+
+[routes]
+# task_class → preferred route
+chat = "local_prime"
+coding = "local_prime"
+overnight = "local_metabolism"
+recall = "local_prime"
+heavy_bench = "local_overnight"
+failover = "cloud_openrouter"
+
+[failover]
+# Cloud only when local ceiling breached AND operator enabled.
+cloud_enabled = false
+# Env override: GZMO_IPW_CLOUD=1
+reason_required = true
+
+[notes]
+metabolism_wins = "Distill/dream/promote never blocked by IpW soft advice."
+sibling_only = "Writes data-next/ipw-router/latest.json; does not rewrite engine URLs."

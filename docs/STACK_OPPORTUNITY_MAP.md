@@ -120,21 +120,21 @@ Slide distill/dream windows into cheapest Awattar hours when backlog allows.
 - **Why special:** Agents that respect the grid — rare and storyable.
 - **Ship shape:** Suggestions + `latest-price-shift.json`; serve logs “would shift”; `GZMO_PRICE_SHIFT=1` soft-delays distill/dream until suggested UTC (cron not overwritten).
 
-#### Intelligence-per-Watt router — `later` · singular · research
+#### Intelligence-per-Watt router — `later` · singular · spike (policy)
 
 Live route chat vs overnight vs cloud failover using Obolus z-scores + task class.
 
-- **Builds on:** AOS · Obolus · rapl-route · GZMO engine map
+- **Builds on:** `config/ipw-router.policy.toml` · `scripts/ipw-route.sh` · Arena/AOS signals
 - **Why special:** AOS thesis made real on the living instance.
-- **Ship shape:** Policy file + serve/chat share router; cloud only on ceiling breach.
+- **Ship shape:** Policy + `data-next/ipw-router/latest.json` route advice; cloud only if `GZMO_IPW_CLOUD=1`; metabolism never blocked.
 
-#### Obolus Forge mutations — `later` · differentiated · spike
+#### Obolus Forge mutations — `later` · differentiated · spike (sibling)
 
 Losers get mutated (prompt + size) until efficiency converges; winners pinned.
 
-- **Builds on:** Obolus evolve · temp-bench · config-fuse
+- **Builds on:** Arena history · `scripts/obolus-forge-mutate.sh` · champion-suggestion pattern
 - **Why special:** Evolutionary pressure tied to hardware, not leaderboard chasing.
-- **Ship shape:** Arena mode after static tournaments are trusted.
+- **Ship shape:** Pin winners / propose mutations under `data-next/arena/forge/` (JSON + TOML sibling); human promote only.
 
 ### OKForge / knowledge
 
@@ -357,8 +357,8 @@ Those become interesting only after Arena + felt recall make the stack demable t
 | s2 | HSP metabolism sonification | near | singular | spike (motif) |
 | r4 | Faithfulness CI | near | differentiated | exists |
 | e3 | Price-aware overnight shift | later | differentiated | spike (soft) |
-| e4 | Intelligence-per-Watt router | later | singular | research |
-| e5 | Obolus Forge mutations | later | differentiated | spike |
+| e4 | Intelligence-per-Watt router | later | singular | spike (policy) |
+| e5 | Obolus Forge mutations | later | differentiated | spike (sibling) |
 | f2 | OKCP memory marketplace | later | singular | product |
 | o2 | Beat-gate open eval kit | later | differentiated | product |
 | o4 | Cognition pack | later | differentiated | spike |

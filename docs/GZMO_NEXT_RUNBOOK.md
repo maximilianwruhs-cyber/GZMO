@@ -210,6 +210,8 @@ bash scripts/price-shift-soft.sh        # soft shift note → scheduler-runs/lat
 bash scripts/aos-status-feed.sh [--serve]  # AOS TelemetryPayload JSON (:8765 optional)
 bash scripts/aos-gzmo-poll.sh [--check-http]  # refresh + verify AOS file/HTTP poll
 bash scripts/concept-gate-webhook.sh [--serve]  # gate merge advice (:8766 POST /gate)
+bash scripts/obolus-forge-mutate.sh     # pin Arena winners / sibling mutation proposals
+bash scripts/ipw-route.sh [--task chat] # Intelligence-per-Watt route advice
 gzmo chat                               # sessions persist to data-next/sessions/
 # Skills (next): authoritative root = GZMO/skills/ (see gzmo instance status → skills_root).
 # gzmo_skills/ remains CT101/bridge auxiliary only — see gzmo_skills/BRIDGE.md.
