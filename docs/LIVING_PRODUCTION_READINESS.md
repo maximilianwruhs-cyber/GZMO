@@ -53,3 +53,8 @@ systemctl --user disable gzmo-serve.service
 - [CT101_RESTORE_LIVING.md](CT101_RESTORE_LIVING.md) — restore checklist  
 - [ADR-0003-one-instance-metabolism.md](ADR-0003-one-instance-metabolism.md)  
 - [SPINE_FOCUS.md](SPINE_FOCUS.md) — Keep pillars vs Park zoo  
+# Living readiness note
+
+## Re-verify
+
+After daemon or sidecar changes: `bash scripts/living-readiness-gate.sh`.
