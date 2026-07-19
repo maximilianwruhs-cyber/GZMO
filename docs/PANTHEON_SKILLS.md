@@ -33,7 +33,7 @@ See [CHAOS_LIVING_VS_RITUAL.md](./CHAOS_LIVING_VS_RITUAL.md).
 
 **On `main`:** thin / current stubs in `gzmo-core/src/skills/{dice,card,story}.rs`.
 
-**On feat (not merged):** full attractor/forge/corpus stack (`attractor_common`, `card_forge*`, `dice_corpus`, `data/dice_events.toml`, …). Re-land only via a **separate ritual PR** — not this packaging pass.
+**On feat (not merged):** full attractor/forge/corpus stack (`attractor_common`, `card_forge*`, `dice_corpus`, `data/dice_events.toml`, …). Re-land only via a **separate ritual PR** — inventory + checklist: [PANTHEON_FEAT_RELAND.md](./PANTHEON_FEAT_RELAND.md).
 
 ## Research archive
 

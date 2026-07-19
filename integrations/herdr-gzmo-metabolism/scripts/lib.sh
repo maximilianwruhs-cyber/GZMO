@@ -30,10 +30,12 @@ resolve_gzmo_bin() {
     return
   fi
   for cand in \
+    /home/gzmo/github-clone/temp-bench/target/release/gzmo \
     "${CARGO_TARGET_DIR:-}/release/gzmo" \
-    "${REPO_ROOT}/target/release/gzmo" \
-    /home/gzmo/github-clone/temp-bench/target/release/gzmo; do
-    if [[ -n "$cand" && -x "$cand" ]]; then
+    "${REPO_ROOT}/target/release/gzmo"; do
+    [[ -n "$cand" && -x "$cand" ]] || continue
+    # clap --help exits 2; ignore under pipefail and require takeaway text
+    if help="$("$cand" session close --help 2>&1 || true)"; grep -qi 'takeaway' <<<"$help"; then
       printf '%s' "$cand"
       return
     fi

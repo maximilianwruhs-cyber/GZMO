@@ -60,4 +60,11 @@ Do not invent a fourth close path. Product MCP attach vs living CT101 attach: [P
 
 ## Unpark policy
 
-Wave 1.1 — demable via `bash scripts/herdr-metabolism-check.sh`. Soft living-readiness row when herdr is absent (HOLD), PASS when link+plugin ready.
+Wave 1.1 — demable via:
+
+```bash
+bash scripts/herdr-metabolism-demo.sh   # link + takeaway → enqueue (lab, no --now)
+bash scripts/herdr-metabolism-check.sh  # includes close-ritual evidence row
+```
+
+Soft living-readiness row when herdr is absent (HOLD), PASS when link + close-ritual ok.

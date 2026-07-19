@@ -94,4 +94,6 @@ bash scripts/ct101-sync-living-appliance.sh   # stage pin under /opt/gzmo/curren
 bash scripts/ct101-living-appliance-pin-check.sh  # staged vs live shape
 bash scripts/ct101-promote-living-appliance-auth.sh  # one-shot: live compose → .env auth
 bash scripts/living-readiness-gate.sh
+# Lab only (ADR-0003): same-sitting vault→Qdrant after promote; does not start a second overnight writer
+bash scripts/qdrant-catchup-lab.sh            # → data-next/qdrant-catchup/latest.json
 ```

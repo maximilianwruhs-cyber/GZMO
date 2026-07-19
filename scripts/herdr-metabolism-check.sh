@@ -14,6 +14,7 @@ row() { local s="$1" n="$2" d="$3"; ROWS+=("$s|$n|$d"); case "$s" in PASS) pass=
 echo "=== herdr metabolism check (Unpark W1.1) ==="
 [[ -f "$PLUGIN/herdr-plugin.toml" ]] && row PASS "plugin-tree" "$PLUGIN" || row FAIL "plugin-tree" "missing plugin"
 [[ -x "$ROOT/scripts/herdr-metabolism-link.sh" ]] && row PASS "link-script" "herdr-metabolism-link.sh" || row FAIL "link-script" "missing"
+[[ -x "$PLUGIN/scripts/session-close.sh" ]] && row PASS "close-script" "session-close.sh" || row FAIL "close-script" "missing"
 
 if command -v herdr >/dev/null 2>&1; then
   row PASS "herdr-bin" "$(command -v herdr)"
@@ -33,6 +34,17 @@ else
   row HOLD "herdr-bin" "herdr not on PATH — optional operator shell"
 fi
 
+# Close-ritual evidence from demo (lab enqueue, no --now)
+if [[ -f "$OUT/close-ritual.json" ]]; then
+  if python3 -c "import json;d=json.load(open('$OUT/close-ritual.json')); raise SystemExit(0 if d.get('ok') and d.get('now_flag') is False else 1)"; then
+    row PASS "close-ritual" "$(python3 -c "import json;print(json.load(open('$OUT/close-ritual.json')).get('advice',''))")"
+  else
+    row FAIL "close-ritual" "close-ritual.json not ok — rerun herdr-metabolism-demo.sh"
+  fi
+else
+  row HOLD "close-ritual" "no close-ritual.json yet — bash scripts/herdr-metabolism-demo.sh"
+fi
+
 ROWS_TSV="$(printf '%s\n' "${ROWS[@]}")"
 export OUT pass fail hold ROWS_TSV
 python3 - <<'PY'
@@ -46,8 +58,8 @@ for line in os.environ.get("ROWS_TSV","").splitlines():
     st,n,d = line.split("|",2); checks[n]={"status":st,"detail":d}
 fail_n=int(os.environ["fail"]); hold_n=int(os.environ["hold"]); pass_n=int(os.environ["pass"])
 verdict="GREEN" if fail_n==0 else "RED"
-advice = "herdr_metabolism_ok" if fail_n==0 and hold_n==0 else (
-    "herdr_metabolism_hold — herdr optional or not linked" if fail_n==0 else "herdr_metabolism_fail")
+advice = "herdr_metabolism_ok" if fail_n==0 and checks.get("close-ritual",{}).get("status")=="PASS" else (
+    "herdr_metabolism_hold — link or run close-ritual demo" if fail_n==0 else "herdr_metabolism_fail")
 payload={"schema":"gzmo.unpark.herdr/v1","generated_at":datetime.now(timezone.utc).isoformat(),
   "verdict":verdict,"ok":fail_n==0,"advice":advice,
   "counts":{"pass":pass_n,"fail":fail_n,"hold":hold_n},"wave":"1.1","checks":checks}
