@@ -375,7 +375,7 @@ impl Default for DiceCascadeConfig {
     }
 }
 
-/// Optional daemon dice-loop settings. Wiring is intentionally deferred.
+/// Optional lab dice-loop scheduling settings. Daemon firing is intentionally deferred.
 #[derive(Debug, Deserialize, Clone)]
 pub struct DiceLoopConfig {
     #[serde(default)]
@@ -384,6 +384,12 @@ pub struct DiceLoopConfig {
     pub min_minutes: u32,
     #[serde(default = "default_dice_loop_max")]
     pub max_minutes: u32,
+    /// Maximum automatic follow-up depth; 0 permits unlimited chaining.
+    #[serde(default)]
+    pub max_chain_depth: u32,
+    /// Cancel the pending loop when a natural 1 is rolled.
+    #[serde(default = "default_true")]
+    pub cancel_on_nat_1: bool,
 }
 
 fn default_dice_loop_min() -> u32 {
@@ -400,6 +406,8 @@ impl Default for DiceLoopConfig {
             enabled: false,
             min_minutes: default_dice_loop_min(),
             max_minutes: default_dice_loop_max(),
+            max_chain_depth: 0,
+            cancel_on_nat_1: default_true(),
         }
     }
 }

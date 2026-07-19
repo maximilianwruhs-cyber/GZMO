@@ -11,6 +11,7 @@ pub mod config;
 pub mod context;
 pub mod cron;
 pub mod daemon;
+pub mod dice_loop;
 pub mod dreams;
 pub mod dreams_md;
 pub mod ecosystem_status;

@@ -1,35 +1,19 @@
-# Würfel (Dice Loop) — FIFO and Isolation
+# Würfel (Dice Loop) — Lab Scheduling
 
-Autopoietic `/dice` follow-up rolls scheduled by `gzmo-core/src/dice_loop.rs` and
-fired from `daemon_cmd.rs` every 5 seconds when due.
+`gzmo-core/src/dice_loop.rs` persists the next autopoietic `/dice` follow-up
+after an enabled `/dice` roll. The loop is opt-in: `[dice.loop].enabled` defaults
+to `false`.
 
-## FIFO semantics
+## Scheduling semantics
 
-- One roll at a time: `mark_processing` sets in-flight state before skill dispatch.
-- `schedule_from_roll` (inside `/dice --loop`) writes the next `fire_at` after completion.
-- `max_chain_depth = 0` means unlimited chaining (see `DiceLoopConfig` docs).
-- `PedagogySession.auto_triggers_enabled` and `[dice.loop].enabled` gate all fires.
+- `/dice d6 --loop` and `/dice d20 --json` parse the die while ignoring mode tokens.
+- A roll maps to a delay between `min_minutes` and `max_minutes`, then writes
+  `data/dice_loop_state.json`.
+- A natural 1 cancels the pending state by default (`cancel_on_nat_1 = true`).
+- `max_chain_depth = 0` permits unlimited chaining; any positive value is a cap.
 
-## Synapse tagging
+## Intentional boundary
 
-Each headless roll appends `chaos.dice_loop` with:
-
-```json
-{ "source": "wuerfel-cron", "headless": true, ... }
-```
-
-## Honeypot isolation
-
-Facts from origins containing `wuerfel`, `dice_cascade`, or `wuerfel-cron` use
-`container_tag = wuerfel-sandbox` (not default `obolus`).
-
-## Kurator coordination
-
-`kurator_monitor::record_dice_loop_fire` increments `dice_loops_seen` for session
-`daemon`. When `dice_loops_seen >= [kurator].max_dice_loops_per_hour`, emits
-`spawn.recommended` triggers daemon autospawn when `[kurator] auto_spawn_on_recommend = true` (default); manual `gzmo kurator approve` remains available.
-
-## Bibliothek gate
-
-Vault/KG promotion from dreams requires `[bibliothek].min_dream_cycles` successful
-dream cycles (default 50). Würfel sandbox tags do not bypass this gate.
+Only scheduling lands in core. Main deliberately has no daemon fire path:
+`daemon_cmd.rs` does not inspect due state or dispatch headless `/dice` ticks.
+This remains a lab/opt-in future step so CT101 living KPIs stay chaos-free.
