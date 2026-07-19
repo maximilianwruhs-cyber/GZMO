@@ -95,7 +95,7 @@ End-of-session UX that forces durable takeaways into distill queue (CLI + herdr 
 
 - **Builds on:** session-distill · scratch distill queue · SessionManager
 - **Why special:** Closes the human loop that makes metabolism work.
-- **Ship shape:** `gzmo session close [id] --takeaway "…" [--now]` appends `[TAKEAWAY]` turns and enqueues distill (or runs immediately with `--now`). Herdr pane exit hook later.
+- **Ship shape:** `gzmo session close [id] --takeaway "…" [--now]` appends `[TAKEAWAY]` turns and enqueues distill (or runs immediately with `--now`). Lab proof: `scripts/takeaway-ritual-lab.sh` → `data-next/takeaway-ritual/` (enqueue only; no workstation `--now`). Herdr pane exit hook later.
 
 #### Dream compaction service — `near` · commodity · exists
 

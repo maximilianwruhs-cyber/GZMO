@@ -34,7 +34,18 @@ fi
 # Soft CT101 owner probe (SSH may HOLD; still records dual-writer risk).
 bash "$ROOT/scripts/ct101-living-probe.sh" >/dev/null 2>&1 || true
 
-export ROOT DATA OUT BIN PRODUCT_OK PRODUCT_NOTE
+# Keep human loop: takeaway → distill enqueue (no --now).
+bash "$ROOT/scripts/takeaway-ritual-lab.sh" >/dev/null 2>&1 || true
+
+# Soft faithfulness (fixture mode — offline, no vault dependency).
+FAITH_LOG="$OUT/faithfulness-fixture.log"
+if FAITHFULNESS_MODE=fixture bash "$ROOT/scripts/faithfulness-ci.sh" >"$FAITH_LOG" 2>&1; then
+  FAITH_OK=1
+else
+  FAITH_OK=0
+fi
+
+export ROOT DATA OUT BIN PRODUCT_OK PRODUCT_NOTE FAITH_OK
 python3 - <<'PY'
 import json, os, re
 from datetime import datetime, timezone
@@ -74,6 +85,19 @@ try:
 except Exception:
     pass
 
+takeaway = {}
+try:
+    takeaway = json.loads((data / "takeaway-ritual" / "latest.json").read_text(encoding="utf-8"))
+except Exception:
+    pass
+
+faith_ok = os.environ.get("FAITH_OK") == "1"
+faith = {}
+try:
+    faith = json.loads((data / "faithfulness" / "latest.json").read_text(encoding="utf-8"))
+except Exception:
+    pass
+
 owner = {
     "living_production": "CT101 (/opt/gzmo/, gzmo-daemon)",
     "lab_scratch": "workstation data-next/",
@@ -99,14 +123,32 @@ pillars = {
     },
 }
 
+supports = {
+    "takeaway_ritual": {
+        "ok": bool(takeaway.get("ritual_ok")),
+        "advice": takeaway.get("advice"),
+        "session_id": takeaway.get("session_id"),
+    },
+    "faithfulness_fixture": {
+        "ok": faith_ok,
+        "verdict": faith.get("verdict") or faith.get("ok"),
+        "mode": faith.get("mode") or "fixture",
+    },
+}
+
 demo_ok = pillars["metabolism"]["ok"] and pillars["product_mcp"]["ok"]
+support_ok = supports["takeaway_ritual"]["ok"] and supports["faithfulness_fixture"]["ok"]
 advice = (
     "demable — both pillars green on this host"
-    if demo_ok
+    if demo_ok and support_ok
     else (
-        "partial — strengthen failing pillar before packaging AOS/CE"
-        if pillars["metabolism"]["ok"] or pillars["product_mcp"]["ok"]
-        else "hold — neither pillar demable yet"
+        "demable_pillars — Keep supports partial (takeaway/faithfulness)"
+        if demo_ok
+        else (
+            "partial — strengthen failing pillar before packaging AOS/CE"
+            if pillars["metabolism"]["ok"] or pillars["product_mcp"]["ok"]
+            else "hold — neither pillar demable yet"
+        )
     )
 )
 
@@ -117,6 +159,7 @@ payload = {
     "advice": advice,
     "owner": owner,
     "pillars": pillars,
+    "supports": supports,
     "parked": [
         "Arena / € / RAPL deepen",
         "HSP event bus",
@@ -162,6 +205,11 @@ md = [
     ),
     f"- Product MCP: **{yn(pillars['product_mcp']['ok'])}** — {product_note}",
     "",
+    "## Keep supports",
+    "",
+    f"- Takeaway ritual: **{yn(supports['takeaway_ritual']['ok'])}** — {supports['takeaway_ritual'].get('advice')}",
+    f"- Faithfulness (fixture): **{yn(supports['faithfulness_fixture']['ok'])}**",
+    "",
     "## Keep (strengthen)",
     "",
 ]
@@ -172,10 +220,18 @@ for k in payload["parked"]:
     md.append(f"- {k}")
 md += ["", payload["note"], ""]
 (out / "latest.md").write_text("\n".join(md), encoding="utf-8")
-print(json.dumps({"ok": demo_ok, "advice": advice, "pillars": {
-    "metabolism": pillars["metabolism"]["ok"],
-    "product_mcp": pillars["product_mcp"]["ok"],
-}}, indent=2))
+print(json.dumps({
+    "ok": demo_ok,
+    "advice": advice,
+    "pillars": {
+        "metabolism": pillars["metabolism"]["ok"],
+        "product_mcp": pillars["product_mcp"]["ok"],
+    },
+    "supports": {
+        "takeaway_ritual": supports["takeaway_ritual"]["ok"],
+        "faithfulness_fixture": supports["faithfulness_fixture"]["ok"],
+    },
+}, indent=2))
 PY
 
 # Soft exit 0 for nightburst; ok flag is in JSON.

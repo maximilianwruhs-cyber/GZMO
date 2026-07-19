@@ -36,12 +36,16 @@ See the top of [STACK_OPPORTUNITY_MAP.md](STACK_OPPORTUNITY_MAP.md).
 bash scripts/ct101-living-probe.sh
 # → data-next/ct101-living/latest.{json,md}
 
-# Spine demo: product MCP + lab recall-proof + owner doctrine
+# Human loop: session close --takeaway → distill enqueue (no --now)
+bash scripts/takeaway-ritual-lab.sh
+# → data-next/takeaway-ritual/latest.{json,md}
+
+# Spine demo: product MCP + lab recall-proof + Keep supports
 bash scripts/spine-demo.sh
 # → data-next/spine-demo/latest.{json,md}
 ```
 
-Stranger test: can you show (1) MCP search/status works on a fresh `gzmo init` dir, and (2) a recall-proof log where seeded facts stuck after metabolism? Operator test: CT101 smoke green and workstation `gzmo-serve` inactive.
+Stranger test: (1) MCP search/status on fresh `gzmo init`, (2) recall-proof hits after metabolism, (3) takeaway ritual enqueues distill. Operator test: CT101 smoke green and workstation `gzmo-serve` inactive.
 
 ## Related
 
