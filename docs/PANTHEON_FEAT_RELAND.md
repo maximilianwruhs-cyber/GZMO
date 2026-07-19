@@ -16,11 +16,14 @@
 8. [x] Skills bridge docs updated for A full
 9. [x] **PKM Forge** — `/pkm` Rust skill, corpus, feedback, and cascade dispatch
 10. [x] **Slice C.0** — lab `feedback_ipc` append/audit + snapshot-bridge ritual drain only
+11. [x] **Slice C.0.1** — `gzmo chaos skill` runs a one-shot ritual/lab skill, reads the
+    saved snapshot, and appends feedback to the C.0 inbox
 
 **Landed:** attractor-style `/poem`, `/joke`, `/word`, and `/define` briefs.
 
-**Still deferred:** daemon `dice_loop` fire wiring; the rest of Slice C (pedagogy oscillator,
-chaos skill command, and any living daemon wiring). C.0 drains the lab inbox only.
+**Still deferred:** daemon `dice_loop` fire wiring; the rest of Slice C (pedagogy oscillator
+and any living daemon wiring). C.0.1 is a slim external CLI, not a PulseLoop or daemon path;
+C.0 drains its lab inbox only.
 
 Thin `/card` `/story` remain main stubs until full Slice A. `/dice` narratives + wild-magic **plan** come from TOML.  
 Demos: `bash scripts/verify-dice-corpus.sh` · `bash scripts/verify-dice-cascade.sh` · `bash scripts/pantheon-ritual-demo.sh`.
