@@ -12,7 +12,7 @@
 4. [ ] Slice A full — nested execute + `dice_loop` / `card_forge*` / story — needs co-land of `attractor_common` + `dispatch` + `generative` from feat (**no** Slice C in same PR)
 5. [x] Keep chaos off CT101 living KPI (plan-only cascade does not change daemon brain)
 6. [x] `bash scripts/pantheon-ritual-check.sh` → feat-stack PASS (A.0)
-7. [ ] Living faithfulness + takeaway-recall still PASS (post A.1 — run on next readiness gate)
+7. [x] Living faithfulness + takeaway-recall still PASS (2026-07-19 living gate GREEN post A.1)
 8. [x] Skills bridge docs updated (A.0/A.1 status)
 
 Thin `/card` `/story` remain main stubs until full Slice A. `/dice` narratives + wild-magic **plan** come from TOML.  
