@@ -241,7 +241,7 @@ Do **not**:
 2. Run **two overnight writers** (workstation `gzmo serve` + CT101 daemon) ([`ADR-0003`](../ADR-0003-one-instance-metabolism.md)).
 3. Point **product MCP** at CT101 `/opt/gzmo` or `data-next/` ([`PRODUCT_MCP.md`](../PRODUCT_MCP.md)).
 4. Require **Redis / Qdrant / Neo4j / overnight distill** for stranger product install ([`PRODUCT_MCP.md`](../PRODUCT_MCP.md) non-goals).
-5. Claim GZMO already ships a **full compose one-box appliance** before the in-repo pin lands — C is a Keep *goal*, not yet a shipped artifact ([`LIVING_APPLIANCE.md`](../LIVING_APPLIANCE.md)).
+5. Blur **A stranger install** with the living compose pin — pin shipped under [`LIVING_APPLIANCE.md`](../LIVING_APPLIANCE.md); strangers still must not require Redis/Qdrant/Neo4j.
 6. Unpark **Arena / HSP / portable rewrite / AOS zoo / pantheon feat code** as the CT101 future ([`SPINE_FOCUS.md`](../SPINE_FOCUS.md), [`PANTHEON_THEATER_PACKAGING_PARK.md`](../PANTHEON_THEATER_PACKAGING_PARK.md)).
 7. Compete on Mem0’s “connect in minutes” cloud story ([`PRODUCT_MCP.md`](../PRODUCT_MCP.md), [Mem0 State of Memory 2026](https://mem0.ai/blog/state-of-ai-agent-memory-2026)).
 8. Revive **inline discovery implement** as the health KPI ([`DISCOVERY_LIFECYCLE.md`](../DISCOVERY_LIFECYCLE.md)).
