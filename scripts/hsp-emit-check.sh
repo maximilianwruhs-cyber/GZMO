@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
-# Unpark Wave 2.3: HSP / Synapse emit hooks readiness (not on GREEN overnight gate).
+# Unpark Wave 2.3: HSP / Synapse emit + sonify readiness (not on GREEN overnight gate).
 #   bash scripts/hsp-emit-check.sh
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 DATA="${GZMO_DATA_NEXT:-$ROOT/data-next}"
 OUT="$DATA/hsp-emit"
+SONIFY_OUT="$DATA/hsp-metabolism"
 mkdir -p "$OUT"
 pass=0; fail=0; hold=0
 declare -a ROWS=()
@@ -29,8 +30,27 @@ GZMO may append Synapse events for distill/dream/embed. Sibling HSP consumes mot
 - Not required for `living-readiness-gate` GREEN.
 - Do not block overnight metabolism on MIDI/WAV availability.
 - Preferred bus: Synapse on living host; lab may use file drops under `data-next/hsp-emit/`.
+- Sonify front door: `bash scripts/hsp-metabolism-sonify.sh` (also chained from `hsp-emit-demo.sh`)
+  writes `data-next/hsp-metabolism/{latest.mid,latest.wav,latest.json}` from metabolism
+  artifacts + the latest `hsp-emit` motif. Optional `--play` uses aplay/paplay / `hsp ping`.
 EOF
 row PASS "emit-contract" "$OUT/emit-contract.md"
+
+[[ -x "$ROOT/scripts/hsp-metabolism-sonify.sh" ]] \
+  && row PASS "sonify-script" "hsp-metabolism-sonify.sh executable" \
+  || row FAIL "sonify-script" "missing or not executable"
+
+if [[ -f "$OUT/latest-event.json" ]]; then
+  row PASS "emit-event" "$OUT/latest-event.json"
+else
+  row HOLD "emit-event" "run hsp-emit-demo.sh to drop latest-event.json"
+fi
+
+if [[ -f "$SONIFY_OUT/latest.mid" && -f "$SONIFY_OUT/latest.wav" ]]; then
+  row PASS "sonify-artifacts" "$SONIFY_OUT/latest.{mid,wav}"
+else
+  row HOLD "sonify-artifacts" "no MIDI/WAV yet — run hsp-emit-demo.sh or hsp-metabolism-sonify.sh"
+fi
 
 # Soft: sibling HSP path if present
 HSP_ROOT="${HSP_ROOT:-$HOME/github-clone/HSP}"
@@ -41,7 +61,7 @@ else
 fi
 
 ROWS_TSV="$(printf '%s\n' "${ROWS[@]}")"
-export OUT pass fail hold ROWS_TSV
+export OUT pass fail hold ROWS_TSV SONIFY_OUT
 python3 - <<'PY'
 import json, os
 from datetime import datetime, timezone
@@ -52,10 +72,14 @@ for line in os.environ.get("ROWS_TSV","").splitlines():
     st,n,d=line.split("|",2); checks[n]={"status":st,"detail":d}
 fail_n=int(os.environ["fail"]); hold_n=int(os.environ["hold"]); pass_n=int(os.environ["pass"])
 verdict="GREEN" if fail_n==0 else "RED"
-advice="hsp_emit_ok" if fail_n==0 and hold_n==0 else ("hsp_emit_hold" if fail_n==0 else "hsp_emit_fail")
+# HOLD (missing sibling / artifacts before first demo) is OK for wave presence
+advice="hsp_emit_ok" if fail_n==0 else "hsp_emit_fail"
+if fail_n==0 and hold_n>0:
+    advice="hsp_emit_ok_with_hold"
 payload={"schema":"gzmo.unpark.hsp_emit/v1","generated_at":datetime.now(timezone.utc).isoformat(),
   "verdict":verdict,"ok":fail_n==0,"advice":advice,
   "counts":{"pass":pass_n,"fail":fail_n,"hold":hold_n},"wave":"2.3","checks":checks,
+  "sonify_dir":os.environ.get("SONIFY_OUT"),
   "note":"Not on living GREEN overnight gate."}
 (out/"latest.json").write_text(json.dumps(payload,indent=2)+"\n")
 print(json.dumps({"verdict":verdict,"advice":advice,"pass":pass_n,"fail":fail_n,"hold":hold_n},indent=2))

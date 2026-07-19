@@ -42,7 +42,7 @@ A+C production readiness unlocked the former **Park freeze**. Satellites move in
 
 1. `pantheon-ritual-demo.sh` — thin skills + re-land checklist (no ghost `DICE_MASTER_*`)  
 2. `discovery-theater-demo.sh` — scout≠KPI session prep  
-3. `hsp-emit-demo.sh` — motif event files (not on GREEN overnight gate)
+3. `hsp-emit-demo.sh` — motif event files + `hsp-metabolism-sonify.sh` MIDI/WAV (not on GREEN overnight gate)
 
 ### Wave 3 — Arena lab
 
