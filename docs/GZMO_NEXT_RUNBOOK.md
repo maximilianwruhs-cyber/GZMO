@@ -214,6 +214,8 @@ bash scripts/obolus-forge-mutate.sh     # pin Arena winners / sibling mutation p
 bash scripts/ipw-route.sh [--task chat] # Intelligence-per-Watt route advice
 bash scripts/cognition-pack.sh [--smoke]  # portable distill→recall contract + status
 bash scripts/tinyfolder-drop.sh --demo  # drop markdown into data-next/inbox
+bash scripts/beat-gate-kit.sh           # fixture→meta→gate organ promotion kit
+bash scripts/zpd-tutor-lab.sh [--topic T]  # soft-fail ZPD tutor lab (not on GREEN)
 gzmo chat                               # sessions persist to data-next/sessions/
 # Skills (next): authoritative root = GZMO/skills/ (see gzmo instance status → skills_root).
 # gzmo_skills/ remains CT101/bridge auxiliary only — see gzmo_skills/BRIDGE.md.

@@ -39,6 +39,8 @@ run forge-mutate bash scripts/obolus-forge-mutate.sh
 run ipw-route bash scripts/ipw-route.sh --task overnight
 run cognition-pack bash scripts/cognition-pack.sh
 run tinyfolder bash scripts/tinyfolder-drop.sh --demo
+run beat-gate bash scripts/beat-gate-kit.sh
+run zpd-lab bash scripts/zpd-tutor-lab.sh
 run scoreboard bash scripts/nightburst-scoreboard.sh
 run aos-poll bash scripts/aos-gzmo-poll.sh
 
@@ -57,5 +59,7 @@ echo "Forge: $ROOT/data-next/arena/forge/latest.json"
 echo "IpW route: $ROOT/data-next/ipw-router/latest.json"
 echo "Cognition pack: $ROOT/data-next/cognition-pack/latest.json"
 echo "tinyFolder: $ROOT/data-next/tinyfolder/latest.json"
+echo "Beat-gate: $ROOT/data-next/beat-gate/latest.json"
+echo "ZPD lab: $ROOT/data-next/zpd-tutor/latest.json"
 echo "AOS feed: $ROOT/data-next/aos-status/latest.json"
 exit "$fail"

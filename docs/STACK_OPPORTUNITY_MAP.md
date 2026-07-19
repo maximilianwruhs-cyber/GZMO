@@ -196,13 +196,13 @@ Productize spark-link: stale anchors + recent facts → verified surprising link
 - **Why special:** Most RAG is similarity; this is deliberate serendipity.
 - **Ship shape:** `scripts/serendipity-digest.sh` → `data-next/serendipity/digest-YYYY-MM-DD.md` (+ `latest.md`); promote manually.
 
-#### Beat-gate open eval kit — `later` · differentiated · product
+#### Beat-gate open eval kit — `later` · differentiated · spike (kit)
 
 Open-source the fixture→meta→gate ladder as a framework for agent organ promotion.
 
-- **Builds on:** LTL schemas · assemblies · CI templates
+- **Builds on:** `scripts/beat-gate-kit.sh` · little-tools-lab `beat-gate.sh` · beat-meta schema
 - **Why special:** Promotion science for agent tools, not just unit tests.
-- **Ship shape:** `ltl` CLI publish + docs; GZMO as reference assembly.
+- **Ship shape:** Fixture loops → `data-next/beat-gate/{contract,latest}.json`; human S0→S3 only.
 
 #### Cognition pack — `later` · differentiated · spike (contract)
 
@@ -290,13 +290,13 @@ CI action: claim set vs session/vault evidence → pass/fail for PRs and wiki co
 - **Why special:** Agent output CI is still rare in the wild.
 - **Ship shape:** `scripts/faithfulness-ci.sh` (vault mode locally); CI job `faithfulness-fixture` offline; report `data-next/faithfulness/latest.json`.
 
-#### ZPD tutor product — `later` · differentiated · spike
+#### ZPD tutor product — `later` · differentiated · spike (lab)
 
 Pedagogy assembly as a personal tutor that writes skill patches from real work.
 
-- **Builds on:** zpd-tutor · pedagogy-bench · skill-patch
+- **Builds on:** `scripts/zpd-tutor-lab.sh` · zpd-tutor dry-run · vault topic hint
 - **Why special:** Tutor grounded in your vault, not generic courses.
-- **Ship shape:** Weekly lab job; never on GREEN overnight gate.
+- **Ship shape:** Soft-fail lab → `data-next/zpd-tutor/`; never on GREEN overnight gate.
 
 #### Attractor / escape-loop brand — `later` · singular · research
 
@@ -360,7 +360,7 @@ Those become interesting only after Arena + felt recall make the stack demable t
 | e4 | Intelligence-per-Watt router | later | singular | spike (policy) |
 | e5 | Obolus Forge mutations | later | differentiated | spike (sibling) |
 | f2 | OKCP memory marketplace | later | singular | product |
-| o2 | Beat-gate open eval kit | later | differentiated | product |
+| o2 | Beat-gate open eval kit | later | differentiated | spike (kit) |
 | o4 | Cognition pack | later | differentiated | spike (contract) |
 | s3 | AOS Intelligence Dashboard v2 | later | differentiated | spike (poll) |
 | s4 | tinyFolder daemon | later | commodity | spike (drop) |
@@ -368,6 +368,6 @@ Those become interesting only after Arena + felt recall make the stack demable t
 | p1 | AOS Customer Edition | later | differentiated | product |
 | p2 | Edge fleet + shared forge | later | differentiated | research |
 | p3 | Portable GZMO core | later | commodity | research |
-| r1 | ZPD tutor | later | differentiated | spike |
+| r1 | ZPD tutor | later | differentiated | spike (lab) |
 | r2 | Attractor / escape-loop brand | later | singular | research |
 | r3 | Cognis dialect experiment | later | singular | research |
