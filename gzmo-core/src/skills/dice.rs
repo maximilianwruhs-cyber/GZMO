@@ -16,6 +16,7 @@ use async_trait::async_trait;
 use gzmo_chaos::feedback::{ChaosEvent, ThoughtSeed};
 use gzmo_chaos::pulse::ChaosSnapshot;
 
+use super::dice_cascade::{cascade_feedback_event, format_cascade_plan, plan_cascade};
 use super::dice_corpus::dice_event;
 use super::{Skill, SkillContext, SkillOutput, SkillType};
 
@@ -61,9 +62,11 @@ impl Skill for DiceSkill {
         let pool_size = if max == 6 { 3 } else { 5 };
         let variant = pick_variant(ctx.chaos, pool_size);
         let event = dice_event(max, roll, variant);
+        let inv = ctx.chaos.tick;
 
-        // Build display
-        let display = format_roll(roll, max, &event, ctx.chaos);
+        // Build display (+ Slice A.1 wild-magic plan, no nested execute)
+        let mut display = format_roll(roll, max, &event, ctx.chaos);
+        let cascade = plan_cascade(max, roll, variant, inv, ctx.chaos);
 
         // Send base feedback to chaos engine
         let feedback_event = ChaosEvent::DiceRoll { value: roll, max };
@@ -77,6 +80,13 @@ impl Skill for DiceSkill {
                 let _ = ctx.feedback_tx.send(tier_event.clone()).await;
                 feedback.push(tier_event);
             }
+        }
+
+        if let Some(plan) = cascade {
+            display.push_str(&format_cascade_plan(&plan, roll, max));
+            let cascade_fb = cascade_feedback_event(&plan, roll);
+            let _ = ctx.feedback_tx.send(cascade_fb.clone()).await;
+            feedback.push(cascade_fb);
         }
 
         Ok(SkillOutput {
