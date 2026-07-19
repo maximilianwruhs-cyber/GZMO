@@ -73,6 +73,7 @@ impl Skill for WordSkill {
                     ),
                     feedback: vec![],
                     inject_to_conversation: false,
+                    evidence: None,
                 });
             }
         };
@@ -100,6 +101,7 @@ impl Skill for WordSkill {
             display,
             feedback: vec![feedback_event],
             inject_to_conversation: true,
+            evidence: None,
         })
     }
 }

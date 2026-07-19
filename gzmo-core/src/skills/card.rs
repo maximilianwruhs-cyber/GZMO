@@ -1,188 +1,31 @@
-//! # Card Skill — `/card [type]`
-//!
-//! Forge a random Magic: The Gathering card via LLM + cardforge.toml color pie.
-
-use std::collections::HashMap;
-use std::sync::Arc;
+use std::time::{SystemTime, UNIX_EPOCH};
 
 use anyhow::Result;
 use async_trait::async_trait;
-use gzmo_chaos::feedback::ChaosEvent;
-use gzmo_chaos::pulse::ChaosSnapshot;
-use serde::Deserialize;
 
-use super::llm::{
-    chaos_index, llm_chat, SkillRuntime, BLUE, BOLD, DIM, GREEN, MAGENTA, RED, RESET, WHITE,
+use gzmo_chaos::feedback::{ChaosEvent, ThoughtSeed};
+
+use super::attractor_common::{
+    body_hash, fingerprint_too_similar, load_recent_hashes, next_call_serial,
+    normalize_fingerprint, record_fingerprint, save_recent_hashes, themes_from_fingerprints,
+    AttractorMeta, AttractorPromptInput,
+};
+use super::card_corpus::{append_forge, ForgeCorpusEntry};
+use super::card_forge::{
+    build_card_evidence, build_selection, build_system_prompt, build_user_prompt, is_mythic,
+    load_cardforge, parse_card, render_forge_display, resolve_card_type, validate_forged_card,
+    ChaosEventRef,
+};
+use super::dispatch::{data_dir_from_skills, load_live_chaos_snapshot};
+use super::generative::{
+    clean_llm_output, line_value, llm_complete, persona_constraint_gate, require_gateway,
 };
 use super::{Skill, SkillContext, SkillOutput, SkillType};
 
-const CARD_TYPES: [&str; 5] = ["Creature", "Instant", "Sorcery", "Enchantment", "Artifact"];
-const COLORS: [&str; 5] = ["white", "blue", "black", "red", "green"];
-const COLOR_SYMBOLS: [&str; 5] = ["☀️", "💧", "💀", "🔥", "🌿"];
-const COLOR_LETTERS: [&str; 5] = ["W", "U", "B", "R", "G"];
-const RARITY_NAMES: [&str; 4] = ["Common", "Uncommon", "Rare", "Mythic Rare"];
-const RARITY_ICONS: [&str; 4] = ["⚪", "🔵", "🟡", "🟠"];
+pub struct CardSkill;
 
-#[derive(Debug, Deserialize)]
-struct CardForgeFile {
-    #[serde(default)]
-    colors: HashMap<String, ColorSection>,
-}
-
-#[derive(Debug, Deserialize)]
-struct ColorSection {
-    #[serde(default)]
-    philosophy: String,
-    #[serde(default)]
-    flavor_tone: String,
-}
-
-#[derive(Debug, Default)]
-struct ParsedCard {
-    name: String,
-    cost: String,
-    type_line: String,
-    rarity: String,
-    rules: String,
-    flavor: String,
-    pt: String,
-}
-
-pub struct CardSkill {
-    pub rt: Arc<SkillRuntime>,
-}
-
-fn chaos_int(snap: &ChaosSnapshot, min: i32, max: i32) -> i32 {
-    let range = (max - min + 1) as f64;
-    min + (snap.chaos_val.fract() * range).floor() as i32
-}
-
-fn pick_rarity(snap: &ChaosSnapshot) -> usize {
-    let roll = chaos_int(snap, 1, 100);
-    if roll <= 45 {
-        0
-    } else if roll <= 75 {
-        1
-    } else if roll <= 93 {
-        2
-    } else {
-        3
-    }
-}
-
-fn parse_structured_card(text: &str) -> ParsedCard {
-    let mut card = ParsedCard::default();
-    let anchors: Vec<_> = text
-        .match_indices("\nNAME:")
-        .chain(text.match_indices("NAME:").filter(|(i, _)| *i == 0))
-        .collect();
-    let block = if let Some((start, _)) = anchors.last() {
-        &text[*start..]
-    } else {
-        text
-    };
-
-    for line in block.lines() {
-        let line = line.trim();
-        if let Some(v) = line.strip_prefix("NAME:") {
-            card.name = v.trim().to_string();
-        } else if let Some(v) = line.strip_prefix("COST:") {
-            card.cost = v.trim().to_string();
-        } else if let Some(v) = line.strip_prefix("TYPE:") {
-            card.type_line = v.trim().to_string();
-        } else if let Some(v) = line.strip_prefix("RARITY:") {
-            card.rarity = v.trim().to_string();
-        } else if let Some(v) = line.strip_prefix("RULES:") {
-            card.rules = v.trim().to_string();
-        } else if let Some(v) = line.strip_prefix("FLAVOR:") {
-            card.flavor = v.trim().to_string();
-        } else if let Some(v) = line.strip_prefix("PT:") {
-            card.pt = v.trim().to_string();
-        }
-    }
-
-    if card.name.is_empty() {
-        if let Some(cap) = text
-            .lines()
-            .find(|l| l.starts_with("**") && l.ends_with("**"))
-        {
-            card.name = cap.trim_matches('*').trim().to_string();
-        }
-    }
-    card
-}
-
-fn load_color_philosophy(path: &std::path::Path, color: &str) -> (String, String) {
-    let content = std::fs::read_to_string(path).ok();
-    let Some(content) = content else {
-        return (String::new(), String::new());
-    };
-    let cfg: CardForgeFile = toml::from_str(&content).unwrap_or(CardForgeFile {
-        colors: HashMap::new(),
-    });
-    let section = cfg.colors.get(color);
-    (
-        section.map(|s| s.philosophy.clone()).unwrap_or_default(),
-        section.map(|s| s.flavor_tone.clone()).unwrap_or_default(),
-    )
-}
-
-fn border_color_name(color: &str) -> &'static str {
-    match color {
-        "white" => WHITE,
-        "blue" => BLUE,
-        "black" => DIM,
-        "red" => RED,
-        "green" => GREEN,
-        _ => WHITE,
-    }
-}
-
-fn render_card(color: &str, color_sym: &str, card: &ParsedCard, rarity_icon: &str) -> String {
-    let bc = border_color_name(color);
-    let mut out = String::new();
-    out.push_str(&format!(
-        "\n{bc}  ╔═══════════════════════════════════════════╗{RESET}\n\
-         {bc}  ║{RESET} {BOLD}{}{RESET}\n",
-        card.name
-    ));
-    out.push_str(&format!("{bc}  ║{RESET} {:>45}\n", card.cost));
-    out.push_str(&format!(
-        "{bc}  ╠═══════════════════════════════════════════╣{RESET}\n\
-         {bc}  ║{RESET}\n\
-         {bc}  ║{RESET}  {color_sym} {DIM}{}{RESET}\n\
-         {bc}  ║{RESET}  {rarity_icon} {DIM}{}{RESET}\n\
-         {bc}  ║{RESET}\n\
-         {bc}  ╠═══════════════════════════════════════════╣{RESET}\n",
-        card.type_line, card.rarity
-    ));
-
-    for rline in card.rules.split('|') {
-        let rline = rline.trim();
-        if !rline.is_empty() {
-            out.push_str(&format!("{bc}  ║{RESET}  {WHITE}{rline}{RESET}\n"));
-        }
-    }
-
-    out.push_str(&format!("{bc}  ║{RESET}\n"));
-    if !card.flavor.is_empty() {
-        out.push_str(&format!(
-            "{bc}  ║{RESET}  {DIM}{MAGENTA}{}{RESET}\n{bc}  ║{RESET}\n",
-            card.flavor
-        ));
-    }
-
-    if !card.pt.is_empty() && !matches!(card.pt.to_uppercase().as_str(), "NONE" | "N/A") {
-        out.push_str(&format!(
-            "{bc}  ║{RESET}{:>42} {BOLD}[{}]{RESET}\n",
-            "", card.pt
-        ));
-    }
-
-    out.push_str(&format!(
-        "{bc}  ╚═══════════════════════════════════════════╝{RESET}\n"
-    ));
-    out
+fn card_quality_gate(text: &str, requires_pt: bool) -> bool {
+    validate_forged_card(text, requires_pt)
 }
 
 #[async_trait]
@@ -191,156 +34,211 @@ impl Skill for CardSkill {
         "card"
     }
     fn description(&self) -> &str {
-        "Forge a random Magic: The Gathering card"
+        "Legendary Attractor Forge — MTG cards via Color Pie, phase lens, forge sparks, ASCII frame + corpus"
     }
     fn skill_type(&self) -> SkillType {
         SkillType::Generative
     }
 
     async fn execute(&self, ctx: SkillContext<'_>) -> Result<SkillOutput> {
-        let c_idx = chaos_index(ctx.chaos, COLORS.len());
-        let color = COLORS[c_idx];
-        let color_sym = COLOR_SYMBOLS[c_idx];
-        let color_letter = COLOR_LETTERS[c_idx];
+        let data_dir = data_dir_from_skills(ctx.skills_dir);
+        let snap_seed = load_live_chaos_snapshot(&data_dir, ctx.chaos);
 
-        let r_idx = pick_rarity(ctx.chaos);
-        let rarity = RARITY_NAMES[r_idx];
-        let rarity_icon = RARITY_ICONS[r_idx];
+        let cardforge = load_cardforge(ctx.skills_dir).ok_or_else(|| {
+            anyhow::anyhow!("cardforge.toml missing under skills/ — Card Forge cannot run")
+        })?;
 
-        let card_type = if ctx.args.trim().is_empty() {
-            let t_idx = chaos_index(ctx.chaos, CARD_TYPES.len());
-            CARD_TYPES[t_idx].to_string()
-        } else {
-            let arg = ctx.args.trim().to_lowercase();
-            match CARD_TYPES.iter().find(|t| t.to_lowercase() == arg) {
-                Some(t) => (*t).to_string(),
-                None => {
-                    return Ok(SkillOutput {
-                        display: format!(
-                            "  {RED}✗ Unknown card type: {}{RESET}\n  Valid types: creature, instant, sorcery, enchantment, artifact",
-                            ctx.args.trim()
-                        ),
-                        feedback: vec![],
-                        inject_to_conversation: false,
-                    });
+        let card_type = match resolve_card_type(&cardforge, ctx.args, &snap_seed) {
+            Ok(t) => t,
+            Err(msg) => {
+                return Ok(SkillOutput {
+                    display: msg,
+                    feedback: vec![],
+                    inject_to_conversation: false,
+                    evidence: None,
+                });
+            }
+        };
+
+        let gw = require_gateway(&ctx)?;
+        let skills_data = data_dir.join("skills");
+        let ledger_path = skills_data.join(".card_recent_hashes");
+        let names_path = skills_data.join(".card_recent_names");
+        let serial_path = skills_data.join(".card_call_serial");
+
+        let call_serial = next_call_serial(&serial_path)?;
+        let mut recent_hashes = load_recent_hashes(&ledger_path);
+        let mut recent_names = load_recent_hashes(&names_path);
+        let mut forged = None;
+        let mut recent_name_hints = themes_from_fingerprints(&recent_names, "the card named");
+        let persona_gate = persona_constraint_gate(ctx.skills_dir);
+
+        for attempt in 1..=3 {
+            let snap = load_live_chaos_snapshot(&data_dir, ctx.chaos);
+            gw.set_chaos_overrides(snap.llm_temperature, snap.llm_max_tokens);
+
+            let sel = build_selection(&cardforge, &snap, &card_type, call_serial);
+            let instant_nanos = SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .map(|d| d.as_nanos() as u64)
+                .unwrap_or(0);
+
+            let attractor = AttractorMeta::from_input(AttractorPromptInput {
+                seed_label: "forge",
+                seed: &format!(
+                    "{}-{}-{}-{}",
+                    sel.color,
+                    sel.rarity,
+                    sel.card_type,
+                    sel.forge_mode.label()
+                ),
+                snap: &snap,
+                recent_themes: &recent_name_hints,
+                call_serial,
+                attempt,
+                instant_nanos,
+                max_chars: 900,
+                extra_rules: &[],
+            });
+
+            let system = build_system_prompt(&cardforge, &sel);
+            let user = build_user_prompt(&attractor, &sel);
+
+            let raw = match llm_complete(gw, ctx.skills_dir, &system, &user).await {
+                Ok(r) => r,
+                Err(_) => continue,
+            };
+            let cleaned = clean_llm_output(&raw);
+
+            if {
+                let ok_gate = card_quality_gate(&cleaned, sel.requires_pt);
+                ok_gate && persona_gate(&cleaned) && {
+                    let count = cleaned.chars().count();
+                    count > 0 && count <= 900
                 }
-            }
-        };
-
-        let (philosophy, flavor_tone) = load_color_philosophy(&self.rt.cardforge_path(), color);
-
-        let color_title = {
-            let mut chars = color.chars();
-            match chars.next() {
-                None => String::new(),
-                Some(first) => first.to_uppercase().collect::<String>() + chars.as_str(),
-            }
-        };
-
-        let mut system_prompt = format!(
-            "You are a Magic: The Gathering card designer following the Vision Design → Set Design → Play Design methodology.\n\n\
-             COLOR IDENTITY: {color_title} ({color_letter})\n\
-             PHILOSOPHY: {}\n\
-             CARD TYPE: {card_type}\n\
-             RARITY: {rarity}\n\n\
-             DESIGN RULES:\n\
-             - Follow the Color Pie strictly. This {color} card must only use abilities appropriate to {color}.\n\
-             - Rarity determines complexity: Common=simple, Uncommon=moderate, Rare=complex, Mythic=splashy and game-warping.\n\
-             - Use strict MTG templating for rules text (identical effects = identical phrasing).\n\
-             - Flavor text must perform heavy narrative lifting — convey vast philosophical tenets concisely.\n\
-             - Flavor tone for {color}: {}\n\
-             - If Creature: assign a relevant creature type, and Power/Toughness balanced for the mana cost.\n\
-             - Mana cost must be balanced: higher cost = more powerful effect.\n\
-             - Do NOT overcrowd — max 2 abilities for Common/Uncommon, max 3 for Rare/Mythic.\n\n\
-             OUTPUT FORMAT (exactly this, no other text — do NOT wrap in code blocks, do NOT explain your reasoning):\n\
-             NAME: [card name]\n\
-             COST: [mana cost like {{2}}{{W}} or {{3}}{{R}}{{R}}]\n\
-             TYPE: [full type line like 'Creature — Human Wizard' or 'Instant']\n\
-             RARITY: {rarity}\n\
-             RULES: [rules text, use | for line breaks between abilities]\n\
-             FLAVOR: [italic flavor text, max 2 sentences]\n\
-             PT: [Power/Toughness like 3/4, or NONE if not a creature]",
-            if philosophy.is_empty() {
-                "Color Pie default"
-            } else {
-                philosophy.as_str()
-            },
-            if flavor_tone.is_empty() {
-                "balanced"
-            } else {
-                flavor_tone.as_str()
-            },
-        );
-
-        let user_prompt = "Design one original Magic: The Gathering card. Make it memorable.";
-        let mut parsed = ParsedCard::default();
-        let mut temp = 0.9f64;
-
-        for attempt in 0..3 {
-            let raw = llm_chat(&self.rt, &system_prompt, user_prompt, temp, 4096, true).await;
-
-            match raw {
-                Ok(text) if !text.is_empty() => {
-                    parsed = parse_structured_card(&text);
-                    if !parsed.name.is_empty()
-                        && !parsed.cost.is_empty()
-                        && !parsed.type_line.is_empty()
-                    {
-                        break;
+            } {
+                if let Some(name) = line_value(&cleaned, "NAME:") {
+                    if fingerprint_too_similar(name, &recent_names) {
+                        recent_name_hints
+                            .push(format!("the card named '{name}' or similar titles"));
+                        continue;
                     }
                 }
-                _ if attempt == 0 => {
-                    return Ok(SkillOutput {
-                        display: format!(
-                            "  {RED}✗ LLM call failed. The Card Forge lies cold.{RESET}"
-                        ),
-                        feedback: vec![],
-                        inject_to_conversation: false,
-                    });
+
+                let h = body_hash(&cleaned);
+                if recent_hashes.contains(&h) {
+                    if let Some(name) = line_value(&cleaned, "NAME:") {
+                        recent_name_hints.push(format!("the card named '{name}'"));
+                    }
+                    continue;
                 }
-                _ => {}
+                recent_hashes.push(h.clone());
+                if recent_hashes.len() > 20 {
+                    recent_hashes.remove(0);
+                }
+                let _ = save_recent_hashes(&ledger_path, &recent_hashes);
+                if let Some(name) = line_value(&cleaned, "NAME:") {
+                    record_fingerprint(
+                        &mut recent_names,
+                        &names_path,
+                        normalize_fingerprint(name),
+                        30,
+                    );
+                }
+                let parsed = parse_card(&cleaned, &card_type);
+                forged = Some((parsed, sel, attractor, h));
+                break;
             }
-
-            temp = 0.5;
-            system_prompt = format!(
-                "You are a Magic: The Gathering card designer.\n\n\
-                 COLOR: {color_title} ({color_letter})\n\
-                 TYPE: {card_type}\n\
-                 RARITY: {rarity}\n\n\
-                 Follow the Color Pie. Balance mana cost with power. Use strict MTG templating.\n\n\
-                 Output exactly:\n\
-                 NAME: [name]\n\
-                 COST: [mana cost]\n\
-                 TYPE: [type line]\n\
-                 RARITY: {rarity}\n\
-                 RULES: [rules text, use | for line breaks]\n\
-                 FLAVOR: [flavor text]\n\
-                 PT: [Power/Toughness or NONE]"
-            );
         }
 
-        if parsed.name.is_empty() {
-            return Ok(SkillOutput {
-                display: format!(
-                    "  {RED}✗ LLM output did not match expected format after 3 attempts.{RESET}"
-                ),
-                feedback: vec![],
-                inject_to_conversation: false,
-            });
-        }
+        let (parsed, sel, attractor, hash) = forged.ok_or_else(|| {
+            anyhow::anyhow!("LLM offline, card failed quality gate, or duplicate forge")
+        })?;
 
-        let display = render_card(color, color_sym, &parsed, rarity_icon);
-
-        let feedback_event = ChaosEvent::CardForged {
+        let event = ChaosEvent::CardForged {
             name: parsed.name.clone(),
             card_type: parsed.type_line.clone(),
         };
-        let _ = ctx.feedback_tx.send(feedback_event.clone()).await;
+        let mut feedback = vec![event.clone()];
+        if is_mythic(&sel) {
+            feedback.push(ChaosEvent::Custom {
+                tension_delta: 3.0,
+                energy_delta: -4.0,
+                thought_seed: Some(ThoughtSeed {
+                    category: "card_mythic".to_string(),
+                    text: format!("MYTHIC FORGE: {} — the attractor shivers", parsed.name),
+                }),
+            });
+        }
+        for ev in &feedback {
+            let _ = ctx.feedback_tx.send(ev.clone()).await;
+        }
+
+        let display = render_forge_display(&attractor, &sel, &parsed);
+
+        let _ = append_forge(
+            &data_dir,
+            &ForgeCorpusEntry {
+                inv: attractor.call_serial,
+                tick: attractor.tick,
+                name: parsed.name.clone(),
+                cost: parsed.cost.clone(),
+                type_line: parsed.type_line.clone(),
+                rarity: sel.rarity.clone(),
+                color: sel.color.to_string(),
+                card_type: sel.card_type.clone(),
+                forge_mode: sel.forge_mode.label().to_string(),
+                keyword_spark: sel.sparks.keyword.clone(),
+                subtype_hint: sel.sparks.subtype.clone(),
+                name_seed: sel.sparks.name_seed.clone(),
+                set_code: sel.set_code.clone(),
+                body_hash: hash.clone(),
+            },
+        );
+
+        let feedback_refs: Vec<ChaosEventRef<'_>> = feedback
+            .iter()
+            .map(|ev| match ev {
+                ChaosEvent::CardForged { name, card_type } => ChaosEventRef {
+                    kind: "CardForged",
+                    detail: format!("{name} ({card_type})"),
+                },
+                ChaosEvent::Custom { thought_seed, .. } => ChaosEventRef {
+                    kind: "Custom",
+                    detail: thought_seed
+                        .as_ref()
+                        .map(|t| t.text.clone())
+                        .unwrap_or_else(|| "mythic resonance".into()),
+                },
+                other => ChaosEventRef {
+                    kind: "Other",
+                    detail: format!("{other:?}"),
+                },
+            })
+            .collect();
+
+        let evidence =
+            build_card_evidence(&parsed, &sel, &attractor, &display, &hash, &feedback_refs);
 
         Ok(SkillOutput {
             display,
-            feedback: vec![feedback_event],
+            feedback,
             inject_to_conversation: true,
+            evidence: Some(evidence),
         })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::card_quality_gate;
+
+    #[test]
+    fn card_quality_gate_rejects_placeholder() {
+        assert!(!card_quality_gate("NAME: [card name]\nCOST: {1}", false));
+        assert!(card_quality_gate(
+            "NAME: Iron Golem\nCOST: {4}\nTYPE: Creature — Golem\nRARITY: Rare\nRULES: Trample.\nFLAVOR: Heavy.\nPT: 5/5",
+            true
+        ));
     }
 }

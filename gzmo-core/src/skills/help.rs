@@ -83,6 +83,7 @@ impl Skill for HelpSkill {
             display,
             feedback: vec![],
             inject_to_conversation: false,
+            evidence: None,
         })
     }
 }

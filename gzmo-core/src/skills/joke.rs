@@ -80,6 +80,7 @@ impl Skill for JokeSkill {
                 ),
                 feedback: vec![],
                 inject_to_conversation: false,
+                evidence: None,
             });
         }
 
@@ -97,6 +98,7 @@ impl Skill for JokeSkill {
             display,
             feedback: vec![feedback_event],
             inject_to_conversation: true,
+            evidence: None,
         })
     }
 }

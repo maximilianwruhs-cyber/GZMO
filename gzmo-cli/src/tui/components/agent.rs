@@ -13,7 +13,8 @@ use gzmo_chaos::pulse::ChaosSnapshot;
 use gzmo_core::memory::episodic::FileEpisodicStore;
 use gzmo_core::memory::vault::SqliteVault;
 use gzmo_core::session::SessionManager;
-use gzmo_core::skills::{SkillContext, SkillRegistry as ChaosSkillRegistry};
+use gzmo_core::skills::dispatch;
+use gzmo_core::skills::{NestedDispatch, SkillRegistry as ChaosSkillRegistry};
 use gzmo_core::subagent::SubagentRunner;
 use gzmo_core::tools::ToolRegistry;
 use gzmo_core::workflow_skills::{SharedWorkflowSession, WorkflowSkillIndex};
@@ -182,14 +183,33 @@ impl Component for AgentComponent {
             let snap = self.chaos_snapshot_rx.borrow().clone();
             let feedback_tx = self.chaos_feedback_tx.clone();
             let action_tx = self.action_tx.as_ref().unwrap().clone();
+            let config = self
+                .config
+                .try_read()
+                .expect("config lock unavailable")
+                .clone();
+            let gateway = self
+                .gateway
+                .try_read()
+                .expect("gateway lock unavailable")
+                .clone();
 
             tokio::spawn(async move {
                 if skills.has(&skill_name) {
-                    let ctx = SkillContext {
-                        chaos: &snap,
-                        feedback_tx: &feedback_tx,
-                        args: &args,
-                    };
+                    let profile = config.engine.active_engine();
+                    let ctx = dispatch::skill_context(
+                        &snap,
+                        &feedback_tx,
+                        &args,
+                        Some(gateway.as_ref()),
+                        None,
+                        &config,
+                        NestedDispatch {
+                            registry: Some(&skills),
+                            profile: Some(&profile),
+                            depth: 0,
+                        },
+                    );
                     match skills.get(&skill_name).unwrap().execute(ctx).await {
                         Ok(output) => {
                             // Strip ANSI for transcript display
@@ -967,11 +987,22 @@ impl SlashCommandContext {
 
                 if self.chaos_skills.has(skill_cmd) {
                     let snap = self.chaos_snapshot_rx.borrow().clone();
-                    let ctx = SkillContext {
-                        chaos: &snap,
-                        feedback_tx: &self.chaos_feedback_tx,
+                    let config = self.config.read().await.clone();
+                    let gateway = self.gateway.read().await.clone();
+                    let profile = config.engine.active_engine();
+                    let ctx = dispatch::skill_context(
+                        &snap,
+                        &self.chaos_feedback_tx,
                         args,
-                    };
+                        Some(gateway.as_ref()),
+                        None,
+                        &config,
+                        NestedDispatch {
+                            registry: Some(&self.chaos_skills),
+                            profile: Some(&profile),
+                            depth: 0,
+                        },
+                    );
                     match self.chaos_skills.get(skill_cmd).unwrap().execute(ctx).await {
                         Ok(output) => {
                             // 1. Clean for TUI display (strip ANSI but keep ASCII formatting)

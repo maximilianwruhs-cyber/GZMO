@@ -16,7 +16,10 @@ use async_trait::async_trait;
 use gzmo_chaos::feedback::{ChaosEvent, ThoughtSeed};
 use gzmo_chaos::pulse::ChaosSnapshot;
 
-use super::dice_cascade::{cascade_feedback_event, format_cascade_plan, plan_cascade};
+use super::dice_cascade::{
+    cascade_evidence_json, cascade_feedback_event, execute_cascade, format_cascade_failure,
+    format_cascade_header, format_cascade_plan, plan_cascade,
+};
 use super::dice_corpus::dice_event;
 use super::{Skill, SkillContext, SkillOutput, SkillType};
 
@@ -53,6 +56,7 @@ impl Skill for DiceSkill {
                     display: format!("  {RED}Unknown die: {other}. Use d6 or d20.{RESET}"),
                     feedback: vec![],
                     inject_to_conversation: false,
+                    evidence: None,
                 });
             }
         };
@@ -64,9 +68,17 @@ impl Skill for DiceSkill {
         let event = dice_event(max, roll, variant);
         let inv = ctx.chaos.tick;
 
-        // Build display (+ Slice A.1 wild-magic plan, no nested execute)
+        // Build display and select a configuration-aware wild-magic cascade.
         let mut display = format_roll(roll, max, &event, ctx.chaos);
-        let cascade = plan_cascade(max, roll, variant, inv, ctx.chaos);
+        let cascade = plan_cascade(
+            &ctx.config.dice.cascade,
+            max,
+            roll,
+            variant,
+            inv,
+            ctx.chaos,
+            ctx.skills_dir,
+        );
 
         // Send base feedback to chaos engine
         let feedback_event = ChaosEvent::DiceRoll { value: roll, max };
@@ -82,17 +94,32 @@ impl Skill for DiceSkill {
             }
         }
 
+        let mut evidence = None;
         if let Some(plan) = cascade {
-            display.push_str(&format_cascade_plan(&plan, roll, max));
             let cascade_fb = cascade_feedback_event(&plan, roll);
             let _ = ctx.feedback_tx.send(cascade_fb.clone()).await;
             feedback.push(cascade_fb);
+            if ctx.nested.registry.is_some() && ctx.nested.profile.is_some() && ctx.nested.depth < 2
+            {
+                display.push_str(&format_cascade_header(&plan, roll, max));
+                match execute_cascade(&ctx, &plan).await {
+                    Ok((nested, meta)) => {
+                        display.push_str(&nested.display);
+                        feedback.extend(nested.feedback.clone());
+                        evidence = Some(cascade_evidence_json(&plan, &meta, &nested, true, None));
+                    }
+                    Err(err) => display.push_str(&format_cascade_failure(&plan, &err.to_string())),
+                }
+            } else {
+                display.push_str(&format_cascade_plan(&plan, roll, max));
+            }
         }
 
         Ok(SkillOutput {
             display,
             feedback,
             inject_to_conversation: true,
+            evidence,
         })
     }
 }

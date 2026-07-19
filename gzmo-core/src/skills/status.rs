@@ -34,6 +34,7 @@ impl Skill for StatusSkill {
             display,
             feedback: vec![],
             inject_to_conversation: false,
+            evidence: None,
         })
     }
 }
