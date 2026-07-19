@@ -22,6 +22,7 @@ use super::dice_cascade::{
 };
 use super::dice_corpus::dice_event;
 use super::{Skill, SkillContext, SkillOutput, SkillType};
+use crate::dice_loop;
 
 /// ANSI color codes
 const GOLD: &str = "\x1b[38;2;212;175;55m";
@@ -48,10 +49,9 @@ impl Skill for DiceSkill {
 
     async fn execute(&self, ctx: SkillContext<'_>) -> Result<SkillOutput> {
         // Parse dice type from args
-        let max: u8 = match ctx.args.trim().to_lowercase().as_str() {
-            "d6" | "6" => 6,
-            "d20" | "20" | "" => 20, // Default to D20
-            other => {
+        let max = match parse_die_max(ctx.args) {
+            Ok(max) => max,
+            Err(other) => {
                 return Ok(SkillOutput {
                     display: format!("  {RED}Unknown die: {other}. Use d6 or d20.{RESET}"),
                     feedback: vec![],
@@ -70,6 +70,38 @@ impl Skill for DiceSkill {
 
         // Build display and select a configuration-aware wild-magic cascade.
         let mut display = format_roll(roll, max, &event, ctx.chaos);
+        let loop_status = if ctx.config.dice.r#loop.enabled {
+            let chain_depth = if is_loop_roll(ctx.args) {
+                dice_loop::load_state(ctx.data_dir)
+                    .map(|state| state.chain_depth.saturating_add(1))
+                    .unwrap_or(1)
+            } else {
+                0
+            };
+            Some(dice_loop::schedule_from_roll(
+                ctx.data_dir,
+                &ctx.config.dice.r#loop,
+                roll,
+                max,
+                inv,
+                chain_depth,
+            ))
+        } else {
+            None
+        };
+        if let Some(status) = &loop_status {
+            if status.scheduled {
+                if let (Some(minutes), Some(fire_at)) =
+                    (status.delay_minutes, status.fire_at_utc.as_deref())
+                {
+                    display.push_str(&format!(
+                        "  {DIM}⏱ Next /dice in {minutes}m — {fire_at}{RESET}\n"
+                    ));
+                }
+            } else if status.cancelled {
+                display.push_str(&format!("  {DIM}⏱ Dice loop cancelled (nat 1){RESET}\n"));
+            }
+        }
         let cascade = plan_cascade(
             &ctx.config.dice.cascade,
             max,
@@ -121,6 +153,24 @@ impl Skill for DiceSkill {
             inject_to_conversation: true,
             evidence,
         })
+    }
+}
+
+/// True when this invocation is an automatic follow-up roll from the dice loop.
+fn is_loop_roll(args: &str) -> bool {
+    args.split_whitespace().any(|token| token == "--loop")
+}
+
+/// Parse die type from skill args, ignoring loop and JSON mode tokens.
+fn parse_die_max(args: &str) -> std::result::Result<u8, String> {
+    let token = args
+        .split_whitespace()
+        .find(|token| *token != "--json" && *token != "--loop")
+        .unwrap_or("");
+    match token.to_lowercase().as_str() {
+        "d6" | "6" => Ok(6),
+        "d20" | "20" | "" => Ok(20),
+        other => Err(other.to_string()),
     }
 }
 

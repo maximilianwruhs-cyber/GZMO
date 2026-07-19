@@ -10,7 +10,7 @@
 2. [x] **Slice A.0** — `data/dice_events.toml` + `dice_corpus` on main skill trait (no attractor/dispatch stack)
 3. [x] **Slice A.1** — `dice_cascade` plan-only (TOML → suggested `/skill`; no nested execute)
 4. [x] **Slice A full (PR #34)** — `dispatch` + nested `execute_cascade` + `attractor_common` / `generative` + `card_forge*` / story (**no** Slice C)
-5. [x] Keep chaos off CT101 living KPI (`dice.loop` default off; no daemon dice-loop wiring)
+5. [x] **Dice-loop scheduling** — core schedules opt-in follow-up state; `dice.loop` remains default off
 6. [x] `bash scripts/pantheon-ritual-check.sh` → feat-stack PASS
 7. [x] Living faithfulness + takeaway-recall still PASS (post Slice A full merge)
 8. [x] Skills bridge docs updated for A full
@@ -18,7 +18,7 @@
 
 **Landed:** attractor-style `/poem`, `/joke`, `/word`, and `/define` briefs.
 
-**Still deferred:** daemon `dice_loop`, Slice C (`feedback_ipc` / chaos engine).
+**Still deferred:** daemon `dice_loop` fire wiring; Slice C (`feedback_ipc` / chaos engine).
 
 Thin `/card` `/story` remain main stubs until full Slice A. `/dice` narratives + wild-magic **plan** come from TOML.  
 Demos: `bash scripts/verify-dice-corpus.sh` · `bash scripts/verify-dice-cascade.sh` · `bash scripts/pantheon-ritual-demo.sh`.
