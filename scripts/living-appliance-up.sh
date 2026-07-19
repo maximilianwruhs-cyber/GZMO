@@ -53,6 +53,9 @@ echo "[*] protocol smoke (Redis PING / Qdrant ready / Neo4j auth)…"
 # Soft by default: HOLD if not fully live; FAIL only on protocol mismatch.
 LIVING_APPLIANCE_REQUIRE_SMOKE="${LIVING_APPLIANCE_REQUIRE_SMOKE:-0}" \
   bash "$ROOT/scripts/living-appliance-smoke.sh" || true
+echo "[*] daemon health smoke (lab GZMO_CONFIG → redis/qdrant/neo4j)…"
+LIVING_APPLIANCE_REQUIRE_HEALTH="${LIVING_APPLIANCE_REQUIRE_HEALTH:-0}" \
+  bash "$ROOT/scripts/living-appliance-health-smoke.sh" || true
 
 echo ""
 echo "Next (daemon is separate):"

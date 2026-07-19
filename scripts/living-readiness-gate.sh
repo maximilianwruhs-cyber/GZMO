@@ -157,6 +157,20 @@ else
   row FAIL "living-appliance-smoke" "protocol smoke failed — see docs/LIVING_APPLIANCE.md"
 fi
 
+# 9c) Goal C — daemon health via lab GZMO_CONFIG (never ~/.gzmo)
+bash "$ROOT/scripts/living-appliance-health-smoke.sh" >>"$LOG" 2>&1 || true
+if [[ -f "$DATA/living-appliance-health/latest.json" ]] \
+  && python3 -c "import json;d=json.load(open('$DATA/living-appliance-health/latest.json')); raise SystemExit(0 if d.get('ok') else 1)"; then
+  advice="$(python3 -c "import json;print(json.load(open('$DATA/living-appliance-health/latest.json')).get('advice',''))")"
+  if [[ "$advice" == *health_ok* ]]; then
+    row PASS "living-appliance-health" "$advice"
+  else
+    row HOLD "living-appliance-health" "$advice"
+  fi
+else
+  row FAIL "living-appliance-health" "daemon health smoke failed — see docs/LIVING_APPLIANCE.md"
+fi
+
 # 10) Goal C — labeled gzmo-living attach (soft if not installed yet)
 bash "$ROOT/scripts/living-mcp-attach-check.sh" >>"$LOG" 2>&1 || true
 if python3 -c "import json;d=json.load(open('$DATA/living-mcp-attach/latest.json')); raise SystemExit(0 if d.get('ok') else 1)"; then
