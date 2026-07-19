@@ -61,11 +61,16 @@ In Cursor/Pi, call:
 - `gzmo_memory_status` — vault path + fact counts
 - `gzmo_memory_search` — FTS over the local vault (empty until you ingest/promote)
 
-CLI smoke (stranger checklist artifact):
+CLI smoke (stranger checklist + attach gate):
 
 ```bash
 bash scripts/product-stranger-path.sh
 # → data-next/product-stranger/latest.md  (or ./scripts/verify-product-mcp.sh alone)
+
+bash scripts/mcp-attach-check.sh
+# → data-next/mcp-attach/latest.md
+# If Cursor still points at a temp-bench binary:
+#   MCP_ATTACH_FIX=1 bash scripts/mcp-attach-check.sh
 
 # or manually:
 export GZMO_CONFIG="$HOME/.gzmo/gzmo.toml" GZMO_ALLOW_LAB_VAULT=1 GZMO_PRODUCT=1
@@ -73,6 +78,8 @@ gzmo memory status --json
 # Third surface alias (same as mcp-serve):
 gzmo memory mcp
 ```
+
+**Attach rule:** `GZMO_CONFIG` must be `~/.gzmo/gzmo.toml` with `GZMO_PRODUCT=1`. Never point the laptop product MCP at CT101 `/opt/gzmo` or workstation `data-next/`.
 
 **Appliance note:** product install is the Memory MCP appliance (map m2). Living
 workstation vault (`data-next/`) is separate — use `GZMO_CONFIG` pointing at

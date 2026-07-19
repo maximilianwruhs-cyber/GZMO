@@ -4,37 +4,47 @@
 
 Not another cloud notebook. Not Mem0.
 
-## Install (5 minutes)
+## Install (under 10 minutes)
 
-Linux x86_64:
+### 1. Install binary + `~/.gzmo` + wire MCP
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/maximilianwruhs-cyber/GZMO/main/scripts/install-gzmo.sh | bash
 ```
 
-That downloads the [latest release](https://github.com/maximilianwruhs-cyber/GZMO/releases/latest), writes `~/.gzmo/` (SQLite-only, no LAN), and wires `gzmo-memory` into Cursor / Pi.
+Writes SQLite-only `~/.gzmo/` (no LAN) and merges `gzmo-memory` into Cursor / Pi mcp.json.
 
-### Pi (official package)
+### 2. Verify on the machine
+
+```bash
+# From a clone (or after install):
+./scripts/product-stranger-path.sh   # cold product verify checklist
+./scripts/mcp-attach-check.sh        # Cursor/Pi point at ~/.gzmo (not CT101)
+```
+
+### 3. Attach in the agent
+
+In Cursor or Pi, call:
+
+1. `gzmo_memory_status` — vault path should be under `~/.gzmo/`  
+2. `gzmo_memory_search` — search your local vault  
+
+Full guide: **[docs/PRODUCT_MCP.md](docs/PRODUCT_MCP.md)**.
+
+### Pi package (optional UX)
 
 ```bash
 pi install npm:gzmo-pi   # or: pi install git:github.com/maximilianwruhs-cyber/gzmo-pi
 ```
 
 In Pi: `/gzmo setup` → `/reload` → `gzmo_memory_status`.  
-Package: [gzmo-pi](https://github.com/maximilianwruhs-cyber/gzmo-pi) (extension + MCP via `pi-mcp-adapter`). Living stack (Redis / Neo4j / Qdrant) is documented there and in operator docs — not required for the laptop install.
-
-Then in your agent call:
-
-1. `gzmo_memory_status` — vault path + fact counts  
-2. `gzmo_memory_search` — search your local vault  
-
-Full guide: **[docs/PRODUCT_MCP.md](docs/PRODUCT_MCP.md)**.
+Package: [gzmo-pi](https://github.com/maximilianwruhs-cyber/gzmo-pi). Living Redis/Neo4j/Qdrant is **not** required for laptop product.
 
 ### From source
 
 ```bash
 cargo build --release -p gzmo-cli
-./scripts/install-gzmo.sh
+GZMO_BIN=./target/release/gzmo ./scripts/install-gzmo.sh
 ```
 
 ## What you get

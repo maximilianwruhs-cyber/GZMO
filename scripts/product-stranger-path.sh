@@ -34,6 +34,9 @@ else
   VERIFY_NOTE="no release/dev gzmo binary for cold verify"
 fi
 
+# Soft attach gate (Cursor/Pi → ~/.gzmo).
+bash "$ROOT/scripts/mcp-attach-check.sh" >/dev/null 2>&1 || true
+
 # Optional: status against real ~/.gzmo if present (does not fail stranger path).
 HOME_STATUS=""
 if [[ "$HAS_HOME_GZMO" == "1" && -n "${PATH_BIN:-$LOCAL_BIN}" ]]; then
@@ -44,7 +47,7 @@ if [[ "$HAS_HOME_GZMO" == "1" && -n "${PATH_BIN:-$LOCAL_BIN}" ]]; then
   )"
 fi
 
-export OUT BIN PATH_BIN LOCAL_BIN HAS_HOME_GZMO VERIFY_OK VERIFY_NOTE HOME_STATUS HOME_GZMO ROOT
+export OUT BIN PATH_BIN LOCAL_BIN HAS_HOME_GZMO VERIFY_OK VERIFY_NOTE HOME_STATUS HOME_GZMO ROOT DATA
 python3 - <<'PY'
 import json, os
 from datetime import datetime, timezone
@@ -83,17 +86,30 @@ checklist = [
     {
         "step": 3,
         "title": "Attach in Cursor / Pi",
-        "cmd": "call gzmo_memory_status then gzmo_memory_search",
+        "cmd": "bash scripts/mcp-attach-check.sh && call gzmo_memory_status",
         "ok_hint": "agent sees vault_path under ~/.gzmo (product) not CT101",
         "docs": "docs/PRODUCT_MCP.md",
     },
 ]
 
-stranger_ok = verify_ok
+attach = {}
+try:
+    attach = json.loads((Path(os.environ["DATA"]) / "mcp-attach" / "latest.json").read_text())
+except Exception:
+    pass
+attach_ok = bool(attach.get("ok"))
+checklist[2]["observed_ok"] = attach_ok
+checklist[2]["attach_advice"] = attach.get("advice")
+
+stranger_ok = verify_ok and attach_ok
 advice = (
-    "stranger_ready — cold verify PASS; next attach MCP in Cursor/Pi"
+    "stranger_ready — cold verify + MCP attach PASS; call gzmo_memory_status in Cursor/Pi"
     if stranger_ok
-    else "hold — fix verify-product-mcp before claiming install UX"
+    else (
+        "partial — verify PASS; fix MCP attach (MCP_ATTACH_FIX=1 bash scripts/mcp-attach-check.sh)"
+        if verify_ok
+        else "hold — fix verify-product-mcp before claiming install UX"
+    )
 )
 
 payload = {
@@ -102,6 +118,7 @@ payload = {
     "ok": stranger_ok,
     "advice": advice,
     "checklist": checklist,
+    "mcp_attach": attach.get("advice"),
     "home_gzmo": {
         "present": has_home,
         "path": os.environ.get("HOME_GZMO"),
@@ -124,16 +141,22 @@ lines = [
     "",
 ]
 for c in checklist:
-    mark = "PASS" if c.get("observed_ok") or c.get("observed_home_gzmo") else "…"
-    if c["step"] == 3:
-        mark = "manual"
+    mark = "PASS" if c.get("observed_ok") else "…"
     if c["step"] == 1:
         mark = "PASS" if has_home or os.environ.get("PATH_BIN") or os.environ.get("LOCAL_BIN") else "…"
     lines.append(f"{c['step']}. **{c['title']}** [{mark}]")
     lines.append(f"   `{c['cmd']}`")
+    if c.get("attach_advice"):
+        lines.append(f"   _{c['attach_advice']}_")
     lines.append("")
 lines += [payload["note"], ""]
 (out / "latest.md").write_text("\n".join(lines), encoding="utf-8")
-print(json.dumps({"ok": stranger_ok, "advice": advice, "verify_ok": verify_ok, "home_gzmo": has_home}, indent=2))
+print(json.dumps({
+    "ok": stranger_ok,
+    "advice": advice,
+    "verify_ok": verify_ok,
+    "attach_ok": attach_ok,
+    "home_gzmo": has_home,
+}, indent=2))
 PY
 exit 0

@@ -32,6 +32,8 @@ See the top of [STACK_OPPORTUNITY_MAP.md](STACK_OPPORTUNITY_MAP.md).
 # Stranger / laptop product path (no CT101 required)
 bash scripts/product-stranger-path.sh
 # → data-next/product-stranger/latest.{json,md}
+bash scripts/mcp-attach-check.sh
+# → data-next/mcp-attach/latest.{json,md}
 
 # Soft CT101 living probe (SSH smoke + dual-writer check)
 bash scripts/ct101-living-probe.sh

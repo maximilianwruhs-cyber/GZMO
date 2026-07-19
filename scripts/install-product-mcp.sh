@@ -15,12 +15,21 @@ resolve_bin() {
     printf '%s' "$GZMO_BIN"
     return
   fi
+  # Product attach prefers the installer path over a temp-bench / clone build.
+  if [[ -x "${HOME}/.local/bin/gzmo" ]]; then
+    printf '%s' "${HOME}/.local/bin/gzmo"
+    return
+  fi
   if command -v gzmo >/dev/null 2>&1; then
     command -v gzmo
     return
   fi
   if [[ -x "${ROOT}/target/release/gzmo" ]]; then
     printf '%s' "${ROOT}/target/release/gzmo"
+    return
+  fi
+  if [[ -x "${CARGO_TARGET_DIR:-}/release/gzmo" ]]; then
+    printf '%s' "${CARGO_TARGET_DIR}/release/gzmo"
     return
   fi
   if [[ -x "${ROOT}/target/debug/gzmo" ]]; then
