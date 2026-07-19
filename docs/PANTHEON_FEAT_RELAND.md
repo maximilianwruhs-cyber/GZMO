@@ -8,15 +8,17 @@
 
 1. [x] Inventory Slice A/B/C vs thin main stubs
 2. [x] **Slice A.0** — `data/dice_events.toml` + `dice_corpus` on main skill trait (no attractor/dispatch stack)
-3. [ ] Slice A full — `dice_loop` / cascade / `card_forge*` / story — needs co-land of `attractor_common` + `dispatch` + `generative` from feat (**no** Slice C in same PR)
-4. [ ] Keep chaos off CT101 living KPI
-5. [ ] `bash scripts/pantheon-ritual-check.sh` → prefer feat-stack PASS
-6. [ ] Living faithfulness + takeaway-recall still PASS
-7. [ ] Skills bridge docs updated
+3. [x] **Slice A.1** — `dice_cascade` plan-only (TOML → suggested `/skill`; no nested execute)
+4. [ ] Slice A full — nested execute + `dice_loop` / `card_forge*` / story — needs co-land of `attractor_common` + `dispatch` + `generative` from feat (**no** Slice C in same PR)
+5. [x] Keep chaos off CT101 living KPI (plan-only cascade does not change daemon brain)
+6. [x] `bash scripts/pantheon-ritual-check.sh` → feat-stack PASS (A.0)
+7. [ ] Living faithfulness + takeaway-recall still PASS (after merge)
+8. [ ] Skills bridge docs updated
 
-Thin `/card` `/story` remain main stubs until full Slice A. `/dice` narratives now come from TOML. Demo: `bash scripts/pantheon-ritual-demo.sh` · `bash scripts/verify-dice-corpus.sh`.
+Thin `/card` `/story` remain main stubs until full Slice A. `/dice` narratives + wild-magic **plan** come from TOML.  
+Demos: `bash scripts/verify-dice-corpus.sh` · `bash scripts/verify-dice-cascade.sh` · `bash scripts/pantheon-ritual-demo.sh`.
 
-**Blocker note:** feat `dice.rs` / `card.rs` import `attractor_common`, `dispatch`, `feedback_ipc`, pedagogy auto-triggers — not present on main. Do not blind-checkout those skill files.
+**Blocker note:** feat nested cascade / `card.rs` import `attractor_common`, `dispatch`, `feedback_ipc`, pedagogy auto-triggers — not present on main. Do not blind-checkout those skill files.
 
 ## Slice A — ritual skills (preferred first PR)
 
