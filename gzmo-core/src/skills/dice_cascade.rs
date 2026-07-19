@@ -18,22 +18,22 @@ use crate::config::DiceCascadeConfig;
 use super::dice_corpus::corpus;
 use super::dispatch::{self, load_live_chaos_snapshot};
 use super::persona::load_characters;
-use super::{SkillContext, SkillOutput, SkillRegistry};
+use super::{SkillContext, SkillOutput};
 
 const EMBEDDED_TOML: &str = include_str!("../../../data/dice_cascade.toml");
 
 #[derive(Debug, Clone, Deserialize)]
-struct CascadeMeta {
-    version: u32,
+pub struct CascadeMeta {
+    pub version: u32,
     #[serde(default)]
-    exclude: Vec<String>,
+    pub exclude: Vec<String>,
 }
 
 #[derive(Debug, Clone, Deserialize)]
-struct CascadeBand {
-    label: String,
-    rolls: Vec<u8>,
-    skills: Vec<String>,
+pub struct CascadeBand {
+    pub label: String,
+    pub rolls: Vec<u8>,
+    pub skills: Vec<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -206,7 +206,7 @@ fn pick_from<'a>(list: &'a [&str], snap: &ChaosSnapshot, roll: u8, inv: u64) -> 
 pub fn build_cascade_args(
     skill: &str,
     roll: u8,
-    max: u8,
+    _max: u8,
     variant: usize,
     inv: u64,
     snap: &ChaosSnapshot,

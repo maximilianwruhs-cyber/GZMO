@@ -18,8 +18,7 @@ use super::card_forge::{
 };
 use super::dispatch::{data_dir_from_skills, load_live_chaos_snapshot};
 use super::generative::{
-    accept_creative, clean_llm_output, line_value, llm_complete, persona_constraint_gate,
-    require_gateway,
+    clean_llm_output, line_value, llm_complete, persona_constraint_gate, require_gateway,
 };
 use super::{Skill, SkillContext, SkillOutput, SkillType};
 

@@ -23,7 +23,7 @@ const BOLD: &str = "\x1b[1m";
 const RESET: &str = "\x1b[0m";
 
 #[derive(Debug, Clone, Deserialize)]
-pub(crate) struct ColorEntry {
+pub struct ColorEntry {
     symbol: String,
     mana: String,
     philosophy: String,
@@ -88,7 +88,7 @@ struct CardforgeMeta {
 }
 
 #[derive(Debug, Clone, Deserialize)]
-pub(crate) struct CardforgeFile {
+pub struct CardforgeFile {
     meta: Option<CardforgeMeta>,
     colors: ColorsSection,
     #[serde(default)]
