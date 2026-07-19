@@ -22,15 +22,21 @@ for sk in dice.rs card.rs story.rs; do
   fi
 done
 
-# Ghost masters must not exist / must not be invented
-if rg -n 'DICE_MASTER_HANDOFF|DICE_MASTER_' "$ROOT/docs" "$ROOT/skills" 2>/dev/null | grep -v 'never existed\|Ghost\|do not invent' >/dev/null; then
+# Ghost masters must not exist as files; docs may warn against inventing them
+if compgen -G "$ROOT/docs/DICE_MASTER*" >/dev/null \
+  || compgen -G "$ROOT/skills/DICE_MASTER*" >/dev/null; then
+  row FAIL "ghost-masters" "DICE_MASTER_* file invented — remove it"
+elif rg -n 'DICE_MASTER_HANDOFF|DICE_MASTER_' "$ROOT/docs" "$ROOT/skills" 2>/dev/null \
+  | grep -Eiv 'never existed|ghost|do not invent|don'\''t invent' >/dev/null; then
   row HOLD "ghost-masters" "DICE_MASTER_* mentions found — verify not invented as files"
 else
   row PASS "ghost-masters" "no invented DICE_MASTER_* files"
 fi
 
-# Feat stack not required for check PASS — HOLD if absent (ritual PR pending)
-if [[ -f "$ROOT/gzmo-core/src/skills/dice_loop.rs" ]] || [[ -d "$ROOT/data/dice_events.toml" ]] || [[ -f "$ROOT/data/dice_events.toml" ]]; then
+# Feat stack: Slice A.0 = dice_events.toml + dice_corpus; full cascade/forge still optional
+if [[ -f "$ROOT/data/dice_events.toml" && -f "$ROOT/gzmo-core/src/skills/dice_corpus.rs" ]]; then
+  row PASS "feat-stack" "Slice A.0 dice_corpus + dice_events.toml"
+elif [[ -f "$ROOT/gzmo-core/src/skills/dice_loop.rs" ]] || [[ -f "$ROOT/data/dice_events.toml" ]]; then
   row PASS "feat-stack" "feat-adjacent files present"
 else
   row HOLD "feat-stack" "feat attractor stack not on main — ritual PR pending"
