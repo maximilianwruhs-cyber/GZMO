@@ -16,6 +16,24 @@
 
 Do not treat `survey_GZMO` as the public name — use `/opt/gzmo/current`.
 
+## Sidecars (goal C)
+
+Living Redis / Qdrant / Neo4j are the **living appliance**. In-repo pin (matches CT101 `/opt/database-cluster` topology):
+
+| Path | Role |
+|------|------|
+| [`deploy/living-appliance/`](../deploy/living-appliance/) | Compose pin |
+| [`config/living-appliance.gzmo.toml.example`](../config/living-appliance.gzmo.toml.example) | Daemon sidecar fragment |
+| [`scripts/living-appliance-up.sh`](../scripts/living-appliance-up.sh) | `docker compose up -d` + gate |
+| [`docs/LIVING_APPLIANCE.md`](./LIVING_APPLIANCE.md) | Goal C doctrine |
+
+```bash
+bash scripts/living-appliance-up.sh
+bash scripts/living-appliance-gate.sh
+```
+
+Production CT101 may keep sidecars under `/opt/database-cluster`; prefer aligning that host with the in-repo pin over time. Daemon config: `/opt/gzmo/gzmo.toml` (not product `~/.gzmo`).
+
 ## Systemd
 
 ```ini

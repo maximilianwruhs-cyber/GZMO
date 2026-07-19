@@ -46,21 +46,21 @@ Subagents snippet: [pi-settings-subagents.snippet.json](pi-settings-subagents.sn
 
 ```bash
 bash scripts/install-shared-mcp.sh
-# Expect gzmo-memory → scripts/pi-gzmo-mcp-serve.sh → CT101
+# Expect gzmo-living → scripts/pi-gzmo-mcp-serve.sh → CT101
 ```
 
 **Product:**
 
 ```bash
 bash scripts/install-product-mcp.sh
-# Expect GZMO_CONFIG=~/.gzmo/gzmo.toml GZMO_PRODUCT=1
+# Expect gzmo-memory → GZMO_CONFIG=~/.gzmo/gzmo.toml GZMO_PRODUCT=1
 ```
 
 Verify:
 
 ```bash
-bash scripts/mcp-attach-check.sh          # product hygiene
-# Living: in Pi call gzmo_memory_status → path /opt/gzmo/… , facts ~60k
+bash scripts/mcp-attach-check.sh          # product hygiene (gzmo-memory)
+# Living: in Pi/Cursor call tools on gzmo-living → path /opt/gzmo/… , facts ~60k
 ```
 
 ### 3. Discovery / automation scripts

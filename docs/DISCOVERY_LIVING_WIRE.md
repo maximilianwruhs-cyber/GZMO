@@ -24,7 +24,7 @@
 
 `~/.pi/agent/mcp.json` (living attach — independent of model):
 
-- `gzmo-memory` → `/opt/gzmo/current/target/release/gzmo mcp-serve`
+- `gzmo-living` → `/opt/gzmo/current/target/release/gzmo mcp-serve` (product uses `gzmo-memory` on `~/.gzmo`)
 - `GZMO_CONFIG=/opt/gzmo/gzmo.toml`
 - Package: `npm:pi-mcp-adapter`
 

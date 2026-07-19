@@ -20,6 +20,7 @@ Today that runs on **CT101** (`/opt/gzmo/` + `/opt/database-cluster`). Goal C ma
 |------|------|
 | [`deploy/living-appliance/docker-compose.yml`](../deploy/living-appliance/docker-compose.yml) | Redis `:6379`, Qdrant `:6333`/`:6334`, Neo4j `:7474`/`:7687` |
 | [`deploy/living-appliance/.env.example`](../deploy/living-appliance/.env.example) | `NEO4J_AUTH=neo4j/…` (copy to `.env`, gitignored) |
+| [`config/living-appliance.gzmo.toml.example`](../config/living-appliance.gzmo.toml.example) | Daemon `[redis]` / `[qdrant]` / Neo4j MCP fragment |
 | [`scripts/living-appliance-gate.sh`](../scripts/living-appliance-gate.sh) | Pin validity gate → `data-next/living-appliance/` |
 
 ```bash

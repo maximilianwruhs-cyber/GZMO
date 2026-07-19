@@ -1,0 +1,36 @@
+# Living appliance daemon fragment (goal C) — NOT product ~/.gzmo
+#
+# Pair with: deploy/living-appliance/docker-compose.yml
+#   bash scripts/living-appliance-up.sh
+#
+# On CT101 production, /opt/gzmo/gzmo.toml already enables these sidecars
+# (often via localhost). This fragment is the demable config sketch for a
+# clean host or lab bring-up beside the compose pin.
+#
+# Secrets: set NEO4J_PASSWORD in the process env or adjacent .env — never commit.
+# Distill queue name: use gzmo:distill:pending on living; gzmo-next:* is lab-only.
+
+[redis]
+enabled = true
+url = "redis://127.0.0.1:6379"
+distill_queue = "gzmo:distill:pending"
+
+[qdrant]
+enabled = true
+url = "http://127.0.0.1:6333"
+collection = "honeypot"
+sync_enabled = true
+sync_cron_hour = 1
+sync_cron_minute = 45
+
+# Neo4j graph MCP (stdio) — bolt to local sidecar from compose pin
+[[mcp_servers]]
+name = "memory"
+command = "uvx"
+args = ["--from", "mcp-neo4j-memory", "mcp-neo4j-memory"]
+
+[mcp_servers.env]
+NEO4J_URL = "bolt://127.0.0.1:7687"
+NEO4J_USERNAME = "neo4j"
+NEO4J_PASSWORD = ""
+NEO4J_DATABASE = "neo4j"

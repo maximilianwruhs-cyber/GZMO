@@ -10,8 +10,8 @@
 
 | Mode | Vault | Redis / Qdrant / Neo4j | Pi attach |
 |------|-------|------------------------|-----------|
-| **Living** | CT101 `/opt/gzmo/` (~60k facts) | **On** (CT101 sidecars) | `scripts/pi-gzmo-mcp-serve.sh` + `install-shared-mcp.sh` |
-| **Product** | Laptop `~/.gzmo/` | **Off** | `gzmo-pi` / `install-product-mcp.sh` |
+| **Living** | CT101 `/opt/gzmo/` (~60k facts) | **On** (CT101 sidecars) | MCP server **`gzmo-living`** via `install-shared-mcp.sh` |
+| **Product** | Laptop `~/.gzmo/` | **Off** | MCP server **`gzmo-memory`** via `install-product-mcp.sh` |
 
 Pi is an **optional auxiliary frontend**. Canonical operator UI is `gzmo` / `gzmo chat` ([OPERATOR_FRONTEND_DECISION.md](OPERATOR_FRONTEND_DECISION.md)). Pi must **not** invent a parallel Redis client — it talks memory only through GZMO MCP / `pi-gzmo-memory.sh`.
 
@@ -27,7 +27,8 @@ Pi is an **optional auxiliary frontend**. Canonical operator UI is `gzmo` / `gzm
         │       stable GZMO_SESSION_ID → Redis scratch survives turns
         │
         ├─ L2 MCP (stdio) ── ~/.pi/agent/mcp.json   ← adapter reads THIS
-        │       gzmo-memory → living CT101 mcp-serve  OR  product ~/.gzmo
+        │       gzmo-living → CT101 mcp-serve (goal C)
+        │       gzmo-memory → product ~/.gzmo (goal A) — separate name
         │       memory      → Neo4j MCP (living graph; password from .env)
         │
         └─ Cognition ── OpenRouter / Prime (Pi models list)
@@ -136,7 +137,7 @@ Customization lived in **agent home + shell wrappers + discovery flags**, not be
 | Fragility | Failure mode |
 |-----------|--------------|
 | Dual config | Packages in `settings.json`, servers in `mcp.json` — update one, forget the other |
-| Product vs living collision | Same Pi home; easy to point `gzmo-memory` at empty `~/.gzmo` while believing CT101 |
+| Product vs living collision | Same Pi home; living must be **`gzmo-living`**, product **`gzmo-memory`** — never one name for both |
 | CLI flags | Discovery scripts with `--no-extensions` / bad `--extension` |
 | Path drift | Scripts baked to old usernames / clone roots |
 | Package double-list | Both `npm:gzmo-pi` and git gzmo-pi → version fights |
@@ -165,7 +166,7 @@ bash scripts/install-product-mcp.sh   # or install-gzmo.sh
 bash scripts/product-readiness-gate.sh
 ```
 
-Do **not** keep both living and product `gzmo-memory` entries pointed at different vaults without labeling which Pi profile you are using.
+Do **not** put living CT101 under the product name `gzmo-memory`. Use **`gzmo-living`** + **`gzmo-memory`** side by side when both attaches are needed.
 
 ---
 

@@ -57,6 +57,14 @@ else
   row FAIL "env-example" "missing .env.example"
 fi
 
+# 3b) Daemon config fragment present
+FRAG="${LIVING_APPLIANCE_TOML:-$ROOT/config/living-appliance.gzmo.toml.example}"
+if [[ -f "$FRAG" ]] && rg -q '\[redis\]' "$FRAG" && rg -q '\[qdrant\]' "$FRAG"; then
+  row PASS "toml-fragment" "$FRAG"
+else
+  row FAIL "toml-fragment" "missing redis/qdrant fragment at $FRAG"
+fi
+
 # 4) docker compose config (needs a throwaway .env if none)
 if [[ -f "$COMPOSE" ]] && command -v docker >/dev/null 2>&1; then
   tmpenv="$(mktemp)"
