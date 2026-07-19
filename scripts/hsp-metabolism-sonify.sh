@@ -90,6 +90,25 @@ def events_from_artifacts():
         for i in range(min(fired, 8)):
             ev.append({"kind": "organ", "ok": True, "note": n + (i % 3), "vel": v, "dur_ms": d})
 
+    # Unpark Wave 2.3 file-drop motifs (hsp-emit-demo) → short phrase
+    emit = load(data / "hsp-emit" / "latest-event.json")
+    if emit and emit.get("motif"):
+        intensity = float(emit.get("intensity") or 0.35)
+        n, v, d = MOTIFS.get("distill", MOTIFS["idle"])
+        if emit.get("motif") == "distill_tick":
+            n, v, d = MOTIFS["distill"]
+        v = max(40, min(127, int(v * (0.7 + 0.6 * intensity))))
+        ev.append(
+            {
+                "kind": f"hsp_emit:{emit.get('motif')}",
+                "ok": True,
+                "note": n,
+                "vel": v,
+                "dur_ms": d,
+                "source": "hsp-emit",
+            }
+        )
+
     if not ev:
         n, v, d = MOTIFS["idle"]
         ev.append({"kind": "idle", "ok": True, "note": n, "vel": v, "dur_ms": d})
