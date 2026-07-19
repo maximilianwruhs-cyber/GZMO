@@ -18,7 +18,8 @@ Canonical operator and architecture docs. Session reports and milestone logs bel
 | [CT101_PATH_AUTHORITY.md](CT101_PATH_AUTHORITY.md) | Canonical `/opt/gzmo/*` paths (kill `survey_GZMO` drift) |
 | [CT101_QDRANT_EMBED_OPS.md](CT101_QDRANT_EMBED_OPS.md) | Embed backfill + Qdrant orphan prune |
 | [LOST_KNOWLEDGE_INVENTORY.md](LOST_KNOWLEDGE_INVENTORY.md) | Archaeology index — branch/plan scars recovered |
-| [PANTHEON_THEATER_PACKAGING_PARK.md](PANTHEON_THEATER_PACKAGING_PARK.md) | **Parked** — dice/card/pantheon + mutual-discovery packaging plan |
+| [PANTHEON_SKILLS.md](PANTHEON_SKILLS.md) | Ritual/lab pantheon front door (dice/card/story research) |
+| [MUTUAL_DISCOVERY_THEATER.md](MUTUAL_DISCOVERY_THEATER.md) | Pedagogy theater front door (not scout KPI) |
 | [PRODUCTION_READINESS.md](PRODUCTION_READINESS.md) | Production gate checklist |
 
 Product non-goals (v1): multi-host living install, overnight serve as required path, SEIP scaffolding, cloud memory SaaS.
@@ -73,6 +74,8 @@ Product non-goals (v1): multi-host living install, overnight serve as required p
 | [CT101_CLOUD_ROUTING.md](CT101_CLOUD_ROUTING.md) | OpenRouter / active_mode vs background |
 | [AGENT_HOME_SECRETS.md](AGENT_HOME_SECRETS.md) | Never store passwords in `~/.pi/agent/` |
 | [CHAOS_LIVING_VS_RITUAL.md](CHAOS_LIVING_VS_RITUAL.md) | Living chaos-free vs chat/TUI ritual |
+| [PANTHEON_SKILLS.md](PANTHEON_SKILLS.md) | Pantheon packs — ritual/lab only |
+| [MUTUAL_DISCOVERY_THEATER.md](MUTUAL_DISCOVERY_THEATER.md) | Mutual-discovery theater vs Forum-1 scout |
 | [SKILLS_BRIDGE.md](SKILLS_BRIDGE.md) | Rust vs shell vs `gzmo_skills` |
 | [HERDR_METABOLISM.md](HERDR_METABOLISM.md) | herdr takeaway → distill ritual (Park) |
 | [OBOLUS_ARENA_BOUNDARY.md](OBOLUS_ARENA_BOUNDARY.md) | Daemon gate vs Obolus product vs Arena lab |
@@ -85,6 +88,11 @@ Product non-goals (v1): multi-host living install, overnight serve as required p
 ## Research (non-canonical)
 
 Ad-hoc research notes live in `docs/research/` and may be archived over time.
+
+| Path | Topic |
+|------|-------|
+| [research/pantheon/](research/pantheon/) | Dice / card / story / Dozen — archive contracts (front door: [PANTHEON_SKILLS.md](PANTHEON_SKILLS.md)) |
+| [research/mutual-discovery/](research/mutual-discovery/) | Verified LINKs + Socratic modes (front door: [MUTUAL_DISCOVERY_THEATER.md](MUTUAL_DISCOVERY_THEATER.md)) |
 
 ## Archive
 

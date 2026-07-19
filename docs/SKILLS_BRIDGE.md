@@ -38,6 +38,10 @@
 
 Do not assume TUI/daemon teach parity until deferred work lands.
 
-## Legendary / parked pantheon
+## Legendary packs (research until code re-land)
 
-Dice, card forge, Würfel, CCL-4 hexad docs mostly lived on `feat/context-compress-headroom`. Opportunity map parks polish. If reopening: pull branch handoffs + `SKILL_GOLDEN_STANDARD.md`; do not reinvent under a new tree.
+Front door: [PANTHEON_SKILLS.md](./PANTHEON_SKILLS.md) — ritual/lab only; not CT101 chaos-free mentor KPI.
+
+Archive: [research/pantheon/](./research/pantheon/) (standardization handoff, Card Forge, dice tiers, story V2, Final Pack). Quality bar stays [SKILL_GOLDEN_STANDARD.md](./SKILL_GOLDEN_STANDARD.md).
+
+Würfel loop / cascade / feat attractor stack remain **Park** until a separate ritual PR. Ghost `DICE_MASTER_*` masters never existed — do not invent them.

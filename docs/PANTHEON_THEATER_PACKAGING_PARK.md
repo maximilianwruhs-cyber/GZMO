@@ -1,52 +1,24 @@
-# Pantheon + Mutual-discovery packaging (Park)
+# Pantheon + Mutual-discovery packaging (Done)
 
-**Status:** Parked plan — saved 2026-07-19, not executed  
-**Cursor plan:** `~/.cursor/plans/pantheon_theater_packaging_186d6858.plan.md`  
+**Status:** Done / unparked 2026-07-19 — docs packaged; feat skill code still Park  
+**Cursor plan:** `~/.cursor/plans/pantheon_theater_packaging_321b0440.plan.md`  
 **Inventory:** [LOST_KNOWLEDGE_INVENTORY.md](./LOST_KNOWLEDGE_INVENTORY.md)
 
-Do **not** expand this while Keep spine (living metabolism + product Memory MCP) is the active focus. Unpark only with an explicit operator decision.
-
-## How it would be turned into doctrine
-
-Same recovery pattern as Synapse/Obolus, with one extra rule (these packs fight living chaos-free policy):
-
-1. **Front doors** — thin `PANTHEON_SKILLS.md` + `MUTUAL_DISCOVERY_THEATER.md`  
-2. **Research archive** — selected branch docs under `docs/research/pantheon/` and `docs/research/mutual-discovery/`  
-3. **No feat skill merge** — main keeps thin `/dice` `/card` `/story` until a separate ritual PR  
-
-Living SoT stays [DISCOVERY_LIFECYCLE.md](./DISCOVERY_LIFECYCLE.md) + [CHAOS_LIVING_VS_RITUAL.md](./CHAOS_LIVING_VS_RITUAL.md).
-
-## Part A — Dice / card / pantheon (when unparked)
-
-**Promote from** `origin/feat/context-compress-headroom`:
+## Front doors (use these)
 
 | Doc | Role |
 |-----|------|
-| `SKILL_PANTHEON_STANDARDIZATION_HANDOFF.md` | Inventory + verify map |
-| `CARD_FORGE_MASTER_HANDOFF.md` | Legendary `/card` |
-| `DICE_EVENTS_TIER_HANDOFF.md` | `/dice` tier math |
-| `STORY_SKILL_V2_SPEC.md` | CCL-4 story acceptance |
-| `PANTHEON_FINAL_PACK.md` | Definitive Dozen personas |
+| [PANTHEON_SKILLS.md](./PANTHEON_SKILLS.md) | Ritual/lab pantheon packs |
+| [MUTUAL_DISCOVERY_THEATER.md](./MUTUAL_DISCOVERY_THEATER.md) | Human pedagogy theater (not scout KPI) |
 
-**Stay Park:** Würfel loop, cascade, ghost BRIDGE masters (`DICE_MASTER_*`).  
-**Out of scope until ritual PR:** port `attractor_common`, `card_forge*`, `dice_corpus`, `data/dice_events.toml`.
+Archive: [research/pantheon/](./research/pantheon/), [research/mutual-discovery/](./research/mutual-discovery/).
 
-Already on main: [SKILL_GOLDEN_STANDARD.md](./SKILL_GOLDEN_STANDARD.md).
+Living SoT unchanged: [DISCOVERY_LIFECYCLE.md](./DISCOVERY_LIFECYCLE.md) + [CHAOS_LIVING_VS_RITUAL.md](./CHAOS_LIVING_VS_RITUAL.md).
 
-## Part B — Pi mutual-discovery theater (when unparked)
+## Code still Park until ritual PR
 
-**Promote:**
+Do **not** merge `feat/context-compress-headroom` skill stack (`attractor_common`, `card_forge*`, `dice_corpus`, `dice_loop`, cascade TOML, `data/dice_events.toml`). Main keeps thin `/dice` `/card` `/story`. Würfel ops spike + session-prep scars stay on branch.
 
-| Doc | Role |
-|-----|------|
-| `PI_MUTUAL_DISCOVERY_VERIFIED_FINDINGS.md` | L1–L10 audited graph |
-| `PI_GZMO_SOCRATIC_KNOWLEDGE_DIALOGUE.md` | Method + prompt |
-| `SOCRATIC_FORUM_THREE_MODES.md` | Banner: Mode A ≠ scout KPI |
+## What was packaged
 
-**Ignore (leave on branch):** session prep/guided theater, superseded mentor dialog, personality session scars.
-
-**Fix when promoting:** dangling Related links in [DISCOVERY_KB_FEEDBACK_LOOP.md](./DISCOVERY_KB_FEEDBACK_LOOP.md).
-
-## Delivery shape (when unparked)
-
-Docs-only commit series on `main`; no Park zoo unpark; no CT101 chaos re-enable.
+Same recovery pattern as Synapse/Obolus: thin front doors + selected research archives with recovery banners; no CT101 chaos re-enable; no Park zoo unpark.

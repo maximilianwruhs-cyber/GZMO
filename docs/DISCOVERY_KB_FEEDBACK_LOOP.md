@@ -13,8 +13,10 @@
 | [DISTILL_COLD_CHAIN.md](./DISTILL_COLD_CHAIN.md) | Distill ingress paths |
 | [SYNAPSE_EVENT_OWNERSHIP.md](./SYNAPSE_EVENT_OWNERSHIP.md) | Pi vs daemon event writers |
 | [INFRASTRUCTURE_OVERVIEW.md](./INFRASTRUCTURE_OVERVIEW.md) §6 | Nightly daemon loop |
-| [SOCRATIC_FORUM_THREE_MODES.md](./SOCRATIC_FORUM_THREE_MODES.md) | Modus A discovery |
-| [PI_GZMO_SOCRATIC_KNOWLEDGE_DIALOGUE.md](./PI_GZMO_SOCRATIC_KNOWLEDGE_DIALOGUE.md) | Emergent mutual discovery |
+| [DISCOVERY_LIFECYCLE.md](./DISCOVERY_LIFECYCLE.md) | Scout vs implement (INLINE/drain overrides older maximal-session narration) |
+| [MUTUAL_DISCOVERY_THEATER.md](./MUTUAL_DISCOVERY_THEATER.md) | Human pedagogy theater front door (not scout KPI) |
+| [research/mutual-discovery/SOCRATIC_FORUM_THREE_MODES.md](./research/mutual-discovery/SOCRATIC_FORUM_THREE_MODES.md) | Modes A/B/C research (Mode A ≠ scout KPI) |
+| [research/mutual-discovery/PI_GZMO_SOCRATIC_KNOWLEDGE_DIALOGUE.md](./research/mutual-discovery/PI_GZMO_SOCRATIC_KNOWLEDGE_DIALOGUE.md) | Emergent mutual-discovery method |
 
 ---
 

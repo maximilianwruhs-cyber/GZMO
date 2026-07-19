@@ -42,8 +42,21 @@ Almost all deep operator contracts were written on **`origin/feat/context-compre
 | [OBOLUS_ARENA_BOUNDARY.md](./OBOLUS_ARENA_BOUNDARY.md) | **New** — core gate vs product vs Arena lab |
 | [VM200_RETRIEVAL_BENCH.md](./VM200_RETRIEVAL_BENCH.md) | Branch (paths updated) |
 | [DISCOVERY_LIFECYCLE.md](./DISCOVERY_LIFECYCLE.md) | **New** — scout vs implement (from Cursor plan) |
+| [PANTHEON_SKILLS.md](./PANTHEON_SKILLS.md) | **New** — ritual/lab pantheon front door |
+| [MUTUAL_DISCOVERY_THEATER.md](./MUTUAL_DISCOVERY_THEATER.md) | **New** — pedagogy theater front door |
+| [research/pantheon/](./research/pantheon/) | Branch — Card Forge, dice tiers, story V2, Final Pack, standardization handoff |
+| [research/mutual-discovery/](./research/mutual-discovery/) | Branch — verified L1–L10, Socratic dialogue, three modes |
 
 Also fixed: Redis “not wired” lie in [INFRASTRUCTURE_OVERVIEW.md](./INFRASTRUCTURE_OVERVIEW.md).
+
+## Packaged (docs-only; code still Park)
+
+| Pack | Front door | Archive |
+|------|------------|---------|
+| Dice / card / pantheon research | [PANTHEON_SKILLS.md](./PANTHEON_SKILLS.md) | [research/pantheon/](./research/pantheon/) |
+| Pi mutual-discovery theater | [MUTUAL_DISCOVERY_THEATER.md](./MUTUAL_DISCOVERY_THEATER.md) | [research/mutual-discovery/](./research/mutual-discovery/) |
+
+Session prep / guided theater scars and Würfel ops spikes stay on branch. Packaging record: [PANTHEON_THEATER_PACKAGING_PARK.md](./PANTHEON_THEATER_PACKAGING_PARK.md).
 
 ## Still branch-only / plan-only (P2)
 
@@ -51,8 +64,7 @@ Cherry-pick or promote when needed; do not invent:
 
 | Item | Where | Suggested action |
 |------|-------|------------------|
-| Card forge / dice / Würfel / pantheon packs | Branch `CARD_*`, `DICE_*`, `PANTHEON_*`, `WUERFEL_*` | **Parked packaging plan:** [PANTHEON_THEATER_PACKAGING_PARK.md](./PANTHEON_THEATER_PACKAGING_PARK.md) |
-| Pi mutual-discovery session packs | Branch `PI_MUTUAL_*`, `PI_GUIDED_*` | Same park doc — promote only when unparked |
+| Würfel loop / cascade / feat attractor skill code | Branch `WUERFEL_*`, `dice_loop`, `dice_cascade`, `card_forge*` | Stay Park until separate ritual PR — see [PANTHEON_SKILLS.md](./PANTHEON_SKILLS.md) |
 | ARCH-DIR-001 / zero-bloat reviews | Branch | Promote if sovereignty debate reopens |
 | Cutover scar detail | Plans `*cutover*` | Covered enough by CT101_BOUNDARY / ADR-0003 |
 | HSP redesign | Sibling HSP + plans | Leave in HSP repo |
