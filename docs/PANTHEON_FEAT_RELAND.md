@@ -16,7 +16,9 @@
 8. [x] Skills bridge docs updated for A full
 9. [x] **PKM Forge** — `/pkm` Rust skill, corpus, feedback, and cascade dispatch
 
-**Still deferred:** daemon `dice_loop`, poem/joke briefs, Slice C (`feedback_ipc` / chaos engine).
+**Landed:** attractor-style `/poem`, `/joke`, `/word`, and `/define` briefs.
+
+**Still deferred:** daemon `dice_loop`, Slice C (`feedback_ipc` / chaos engine).
 
 Thin `/card` `/story` remain main stubs until full Slice A. `/dice` narratives + wild-magic **plan** come from TOML.  
 Demos: `bash scripts/verify-dice-corpus.sh` · `bash scripts/verify-dice-cascade.sh` · `bash scripts/pantheon-ritual-demo.sh`.

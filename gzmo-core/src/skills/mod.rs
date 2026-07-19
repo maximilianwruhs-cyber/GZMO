@@ -26,6 +26,7 @@ pub mod card_corpus;
 pub mod card_forge;
 pub mod card_forge_brief;
 pub mod define;
+pub mod define_brief;
 pub mod dice;
 pub mod dice_cascade;
 pub mod dice_corpus;
@@ -33,6 +34,7 @@ pub mod dispatch;
 pub mod generative;
 pub mod help;
 pub mod joke;
+pub mod joke_brief;
 pub mod language;
 pub mod llm;
 pub mod persona;
@@ -41,6 +43,7 @@ pub mod pkm_corpus;
 pub mod pkm_forge;
 pub mod pkm_forge_brief;
 pub mod poem;
+pub mod poem_brief;
 pub mod poker;
 pub mod quote;
 pub mod shell_bridge;
@@ -52,6 +55,7 @@ pub mod story_brief;
 pub mod transform;
 pub mod visual;
 pub mod word;
+pub mod word_brief;
 
 pub use llm::SkillRuntime;
 
@@ -228,19 +232,11 @@ pub fn register_pantheon(registry: &mut SkillRegistry, config: &GzmoConfig) {
         rt: Arc::clone(&rt),
     }));
 
-    registry.register(Arc::new(JokeSkill {
-        rt: Arc::clone(&rt),
-    }));
-    registry.register(Arc::new(PoemSkill {
-        rt: Arc::clone(&rt),
-    }));
-    registry.register(Arc::new(WordSkill {
-        rt: Arc::clone(&rt),
-    }));
+    registry.register(Arc::new(JokeSkill));
+    registry.register(Arc::new(PoemSkill));
+    registry.register(Arc::new(WordSkill));
     registry.register(Arc::new(StorySkill));
-    registry.register(Arc::new(DefineSkill {
-        rt: Arc::clone(&rt),
-    }));
+    registry.register(Arc::new(DefineSkill));
     registry.register(Arc::new(CardSkill));
     registry.register(Arc::new(PkmSkill));
     registry.register(Arc::new(TransformSkill {

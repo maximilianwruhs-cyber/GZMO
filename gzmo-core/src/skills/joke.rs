@@ -1,46 +1,24 @@
-//! # Joke Skill — `/joke`
-//!
-//! Structurally engineered joke via LLM (Benign Violation Theory).
-
-use std::sync::Arc;
+use std::time::{SystemTime, UNIX_EPOCH};
 
 use anyhow::Result;
 use async_trait::async_trait;
+
 use gzmo_chaos::feedback::ChaosEvent;
 
-use super::llm::{
-    accept_creative_output, chaos_index, frame_box, llm_chat, quality_gate_joke, SkillRuntime,
-    WHITE, YELLOW,
+use super::attractor_common::{
+    body_hash, fingerprint_too_similar, format_attractor_display, load_recent_hashes,
+    next_call_serial, opening_fingerprint, record_fingerprint, resolve_chaos_seed,
+    save_recent_hashes, themes_from_fingerprints,
 };
+use super::dispatch::{data_dir_from_skills, load_live_chaos_snapshot};
+use super::generative::{
+    accept_creative, clean_llm_output, llm_complete, persona_constraint_gate, quality_gate_joke,
+    require_gateway,
+};
+use super::joke_brief::{JokeBrief, JokeBriefInput};
 use super::{Skill, SkillContext, SkillOutput, SkillType};
 
-const SYSTEM_PROMPT: &str = "You are a comedy engine grounded in the Benign Violation Theory (BVT).
-A joke triggers laughter if and only if three conditions occur simultaneously:
-1. A VIOLATION — something threatens how the world ought to be (social norms, physical laws, logic).
-2. A BENIGN CONTEXT — the threat is completely harmless or reframed safely.
-3. SIMULTANEOUS PROCESSING — both must be processed at the same neurological millisecond.
-
-Structure your joke using:
-- SETUP: Establish a false, highly logical reality. Must be entirely devoid of comedy.
-- MISDIRECTION: The invisible cognitive pivot point.
-- PUNCHLINE: Violently subverts the expectation while technically complying with the setup's logic.
-
-CRITICAL CONSTRAINTS:
-- STRICTLY FORBIDDEN clichés: programming bugs, coffee, bad weather, typical artificial intelligence jokes, or simple 'dad jokes' (Flachwitze).
-- Focus on clever, situational irony or absurdist framing.
-- Max 280 characters total. Output ONLY the joke text. No labels, no explanation.";
-
-const USER_PROMPT: &str = "Tell me one original, clever joke. Make me laugh.";
-
-const FALLBACKS: [&str; 3] = [
-    "Der Optiker fragte, ob ich die Brille zum Lesen oder zum Sehen brauche. Ich sagte: zum Überleben des Kleingedruckten.",
-    "Mein Nachbar betet jeden Abend. Nicht aus Glauben — er will, dass der Kühlschrank endlich aufhört zu summen.",
-    "Sie nannten mich optimistisch, weil ich bei jeder Absage nach dem Parkplatz gefragt habe.",
-];
-
-pub struct JokeSkill {
-    pub rt: Arc<SkillRuntime>,
-}
+pub struct JokeSkill;
 
 #[async_trait]
 impl Skill for JokeSkill {
@@ -48,55 +26,115 @@ impl Skill for JokeSkill {
         "joke"
     }
     fn description(&self) -> &str {
-        "Structurally engineered joke via LLM (BVT)"
+        "Tell chaos-coupled Attractor Comedy (BVT, live Lorenz coordinates)"
     }
     fn skill_type(&self) -> SkillType {
         SkillType::Generative
     }
 
     async fn execute(&self, ctx: SkillContext<'_>) -> Result<SkillOutput> {
-        let mut joke = String::new();
-        for _ in 0..3 {
-            if let Ok(raw) = llm_chat(&self.rt, SYSTEM_PROMPT, USER_PROMPT, 0.9, 4096, false).await
+        let gw = require_gateway(&ctx)?;
+        let data_dir = data_dir_from_skills(ctx.skills_dir);
+        let skills_data = data_dir.join("skills");
+        let ledger_path = skills_data.join(".joke_recent_hashes");
+        let openings_path = skills_data.join(".joke_recent_openings");
+        let serial_path = skills_data.join(".joke_call_serial");
+
+        let call_serial = next_call_serial(&serial_path)?;
+        let mut recent_hashes = load_recent_hashes(&ledger_path);
+        let mut recent_openings = load_recent_hashes(&openings_path);
+        let mut joke = None;
+        let mut recent_themes = themes_from_fingerprints(&recent_openings, "joke openings");
+        let persona_gate = persona_constraint_gate(ctx.skills_dir);
+        let arg_seed = ctx.args.trim().to_string();
+
+        for attempt in 1..=3 {
+            let snap = load_live_chaos_snapshot(&data_dir, ctx.chaos);
+            gw.set_chaos_overrides(snap.llm_temperature, snap.llm_max_tokens);
+
+            let seed = resolve_chaos_seed(&arg_seed, &snap, call_serial);
+
+            let instant_nanos = SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .map(|d| d.as_nanos() as u64)
+                .unwrap_or(0);
+
+            let brief = JokeBrief::new(JokeBriefInput {
+                seed: &seed,
+                snap: &snap,
+                recent_themes: &recent_themes,
+                call_serial,
+                attempt,
+                instant_nanos,
+            });
+
+            let raw = match llm_complete(
+                gw,
+                ctx.skills_dir,
+                brief.system_prompt(),
+                &brief.user_prompt(),
+            )
+            .await
             {
-                if accept_creative_output(&raw, 280, quality_gate_joke) {
-                    joke = raw;
-                    break;
+                Ok(r) => r,
+                Err(_) => continue,
+            };
+            let cleaned = clean_llm_output(&raw);
+
+            if accept_creative(&cleaned, 280, quality_gate_joke) && persona_gate(&cleaned) {
+                let opening = opening_fingerprint(&cleaned);
+                if fingerprint_too_similar(&opening, &recent_openings) {
+                    recent_themes.push(format!(
+                        "joke openings like '{}'",
+                        cleaned
+                            .lines()
+                            .next()
+                            .unwrap_or(&cleaned)
+                            .chars()
+                            .take(40)
+                            .collect::<String>()
+                    ));
+                    continue;
                 }
+
+                let h = body_hash(&cleaned);
+                if recent_hashes.contains(&h) {
+                    let words: Vec<&str> = cleaned.split_whitespace().take(3).collect();
+                    recent_themes.push(format!("openings like '{}'", words.join(" ")));
+                    continue;
+                }
+                recent_hashes.push(h);
+                if recent_hashes.len() > 20 {
+                    recent_hashes.remove(0);
+                }
+                let _ = save_recent_hashes(&ledger_path, &recent_hashes);
+                record_fingerprint(&mut recent_openings, &openings_path, opening, 30);
+                joke = Some((cleaned, brief));
+                break;
             }
         }
 
-        if joke.is_empty() {
-            let idx = chaos_index(ctx.chaos, FALLBACKS.len());
-            joke = FALLBACKS[idx].to_string();
-        }
+        let (joke_text, brief) = joke.ok_or_else(|| {
+            anyhow::anyhow!("LLM offline, joke exceeded quality limits, or repeated too many times")
+        })?;
 
-        if joke.is_empty() {
-            return Ok(SkillOutput {
-                display: format!(
-                    "  {RED}✗ LLM offline and no fallback jokes available.{RESET}",
-                    RED = super::llm::RED,
-                    RESET = super::llm::RESET
-                ),
-                feedback: vec![],
-                inject_to_conversation: false,
-                evidence: None,
-            });
-        }
+        let event = ChaosEvent::JokeGenerated {
+            text: joke_text.clone(),
+        };
+        let _ = ctx.feedback_tx.send(event.clone()).await;
 
-        let body = format!(
-            "  {WHITE}{joke}{RESET}",
-            WHITE = WHITE,
-            RESET = super::llm::RESET
+        let display = format_attractor_display(
+            "😂 ATTRACTOR COMEDY",
+            &brief.meta,
+            "topic",
+            &joke_text,
+            15,
+            "−0.2",
         );
-        let display = frame_box("JOKE", &body, "😂", YELLOW);
-
-        let feedback_event = ChaosEvent::JokeGenerated { text: joke.clone() };
-        let _ = ctx.feedback_tx.send(feedback_event.clone()).await;
 
         Ok(SkillOutput {
             display,
-            feedback: vec![feedback_event],
+            feedback: vec![event],
             inject_to_conversation: true,
             evidence: None,
         })
