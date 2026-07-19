@@ -20,14 +20,17 @@ rsync -az --delete \
   "$SRC" "${HOST}:${DEST}"
 
 echo "[OK] pin synced (remote .env excluded)"
+echo "[*] pin-vs-live shape check (no .env reads)…"
+bash "$ROOT/scripts/ct101-living-appliance-pin-check.sh" || true
 echo ""
 echo "On CT101 (when you choose to activate this pin):"
 echo "  ssh $HOST"
 echo "  cd $DEST"
-echo "  # keep existing secrets: copy .env from /opt/database-cluster if needed"
+echo "  # secrets: set NEO4J_AUTH in pin .env from /opt/gzmo/.env — do not copy workstation throwaway Neo4j"
 echo "  docker compose config && docker compose up -d"
 echo "  # daemon still uses /opt/gzmo/gzmo.toml — see config/living-appliance.gzmo.toml.example"
 echo ""
 echo "Verify from workstation:"
+echo "  bash scripts/ct101-living-appliance-pin-check.sh"
 echo "  bash scripts/living-appliance-gate.sh"
 echo "  bash scripts/ct101-living-smoke.sh"

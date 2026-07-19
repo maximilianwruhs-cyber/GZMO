@@ -24,6 +24,7 @@ Today that runs on **CT101** (`/opt/gzmo/` + `/opt/database-cluster`). Goal C ma
 | [`scripts/living-appliance-gate.sh`](../scripts/living-appliance-gate.sh) | Pin validity gate → `data-next/living-appliance/` |
 | [`scripts/living-appliance-smoke.sh`](../scripts/living-appliance-smoke.sh) | Protocol smoke (Redis PING / Qdrant ready / Neo4j auth) → `data-next/living-appliance-smoke/` |
 | [`scripts/living-appliance-health-smoke.sh`](../scripts/living-appliance-health-smoke.sh) | Daemon health via lab `GZMO_CONFIG` (never `~/.gzmo`) → `data-next/living-appliance-health/` |
+| [`scripts/ct101-living-appliance-pin-check.sh`](../scripts/ct101-living-appliance-pin-check.sh) | Staged pin vs live `/opt/database-cluster` shape → `data-next/living-appliance-pin-ct101/` |
 
 ```bash
 # One-shot sidecar bring-up + gate + smoke
@@ -88,5 +89,6 @@ bash scripts/living-appliance-smoke.sh        # HOLD off-host; PASS after up
 bash scripts/living-appliance-health-smoke.sh # lab GZMO_CONFIG → redis/qdrant/neo4j
 bash scripts/living-mcp-attach-check.sh
 bash scripts/ct101-sync-living-appliance.sh   # stage pin under /opt/gzmo/current/…
-bash scripts/living-readiness-gate.sh         # includes appliance-pin + smoke + health + living-mcp
+bash scripts/ct101-living-appliance-pin-check.sh  # staged vs live shape (HOLD on pre-promote drift)
+bash scripts/living-readiness-gate.sh         # includes pin + smoke + health + ct101 pin + living-mcp
 ```

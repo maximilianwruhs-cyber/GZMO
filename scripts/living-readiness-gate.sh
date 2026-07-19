@@ -171,6 +171,20 @@ else
   row FAIL "living-appliance-health" "daemon health smoke failed — see docs/LIVING_APPLIANCE.md"
 fi
 
+# 9d) Goal C — CT101 staged pin vs live cluster shape (soft pre-promote drift)
+bash "$ROOT/scripts/ct101-living-appliance-pin-check.sh" >>"$LOG" 2>&1 || true
+if [[ -f "$DATA/living-appliance-pin-ct101/latest.json" ]] \
+  && python3 -c "import json;d=json.load(open('$DATA/living-appliance-pin-ct101/latest.json')); raise SystemExit(0 if d.get('ok') else 1)"; then
+  advice="$(python3 -c "import json;print(json.load(open('$DATA/living-appliance-pin-ct101/latest.json')).get('advice',''))")"
+  if [[ "$advice" == *pin_ct101_ok* ]]; then
+    row PASS "living-appliance-pin-ct101" "$advice"
+  else
+    row HOLD "living-appliance-pin-ct101" "$advice"
+  fi
+else
+  row FAIL "living-appliance-pin-ct101" "staged pin check failed — ct101-sync-living-appliance.sh"
+fi
+
 # 10) Goal C — labeled gzmo-living attach (soft if not installed yet)
 bash "$ROOT/scripts/living-mcp-attach-check.sh" >>"$LOG" 2>&1 || true
 if python3 -c "import json;d=json.load(open('$DATA/living-mcp-attach/latest.json')); raise SystemExit(0 if d.get('ok') else 1)"; then
