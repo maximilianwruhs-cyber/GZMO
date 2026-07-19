@@ -276,7 +276,14 @@ async fn run_loop(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> 
                 last_dream,
             )
         {
-            if run_named_job(config, "dream", || async {
+            let shift = metabolism::evaluate_price_shift(config, "dream", now);
+            info!(note = %shift.note, delay = shift.delay_now, "price-shift soft advice (dream)");
+            if shift.delay_now {
+                warn!(
+                    suggested = ?shift.suggested_start_utc,
+                    "GZMO_PRICE_SHIFT=1 — delaying dream until suggested UTC"
+                );
+            } else if run_named_job(config, "dream", || async {
                 dream_cmd::run(config, identity, Some(today)).await
             })
             .await
@@ -294,7 +301,14 @@ async fn run_loop(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> 
                 last_distill,
             )
         {
-            if run_named_job(config, "distill", || async {
+            let shift = metabolism::evaluate_price_shift(config, "distill", now);
+            info!(note = %shift.note, delay = shift.delay_now, "price-shift soft advice (distill)");
+            if shift.delay_now {
+                warn!(
+                    suggested = ?shift.suggested_start_utc,
+                    "GZMO_PRICE_SHIFT=1 — delaying distill until suggested UTC"
+                );
+            } else if run_named_job(config, "distill", || async {
                 distill_cmd::run(config, None).await
             })
             .await

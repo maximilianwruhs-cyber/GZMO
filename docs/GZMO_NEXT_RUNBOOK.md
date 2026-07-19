@@ -205,7 +205,11 @@ bash scripts/herdr-metabolism-link.sh   # link herdr plugin gzmo.metabolism (MCP
 bash scripts/hsp-metabolism-sonify.sh [--play]  # metabolism artifacts → MIDI/WAV motif
 bash scripts/euro-night-aggregate.sh    # Arena history + metabolism €/night
 bash scripts/price-window-suggest.sh    # Awattar ±2h distill/dream suggestion (no cron mutate)
+bash scripts/price-shift-soft.sh        # soft shift note → scheduler-runs/latest-price-shift.json
+#   GZMO_PRICE_SHIFT=1 on serve → delay distill/dream until suggested UTC
 bash scripts/aos-status-feed.sh [--serve]  # AOS TelemetryPayload JSON (:8765 optional)
+bash scripts/aos-gzmo-poll.sh [--check-http]  # refresh + verify AOS file/HTTP poll
+bash scripts/concept-gate-webhook.sh [--serve]  # gate merge advice (:8766 POST /gate)
 gzmo chat                               # sessions persist to data-next/sessions/
 # Skills (next): authoritative root = GZMO/skills/ (see gzmo instance status → skills_root).
 # gzmo_skills/ remains CT101/bridge auxiliary only — see gzmo_skills/BRIDGE.md.

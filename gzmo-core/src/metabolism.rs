@@ -447,6 +447,123 @@ fn vault_metabolism_counts(path: &Path) -> (Option<usize>, Option<usize>) {
     (honeypot, missing)
 }
 
+/// Soft Awattar shift advice for distill/dream (sibling note; cron not overwritten).
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PriceShiftAdvice {
+    pub job: String,
+    pub note: String,
+    pub suggested_start_utc: Option<String>,
+    pub shift_hours: Option<f64>,
+    /// When true and advice says delay, serve should skip firing this minute.
+    pub delay_now: bool,
+}
+
+fn price_shift_opt_in() -> bool {
+    match std::env::var("GZMO_PRICE_SHIFT") {
+        Ok(v) => {
+            let t = v.trim().to_ascii_lowercase();
+            t == "1" || t == "true" || t == "yes" || t == "on"
+        }
+        Err(_) => false,
+    }
+}
+
+/// Read `price-window/latest.json`, write `scheduler-runs/latest-price-shift.json`,
+/// and return whether `job` should be soft-delayed (only when `GZMO_PRICE_SHIFT=1`).
+pub fn evaluate_price_shift(config: &GzmoConfig, job: &str, now: DateTime<Utc>) -> PriceShiftAdvice {
+    let parent = config
+        .memory
+        .vault_db
+        .parent()
+        .unwrap_or_else(|| Path::new("."));
+    let pw_path = parent.join("price-window").join("latest.json");
+    let runs = runs_dir(config);
+    let _ = std::fs::create_dir_all(&runs);
+    let opt_in = price_shift_opt_in();
+
+    let mut advice = PriceShiftAdvice {
+        job: job.to_string(),
+        note: "no price-window/latest.json".into(),
+        suggested_start_utc: None,
+        shift_hours: None,
+        delay_now: false,
+    };
+
+    let Ok(raw) = std::fs::read_to_string(&pw_path) else {
+        let payload = serde_json::json!({
+            "schema": "gzmo.price.shift/v1",
+            "generated_at": now.to_rfc3339(),
+            "ok": false,
+            "opt_in": opt_in,
+            "detail": advice.note,
+            "job": job,
+        });
+        let _ = std::fs::write(
+            runs.join("latest-price-shift.json"),
+            payload.to_string() + "\n",
+        );
+        return advice;
+    };
+
+    let Ok(v) = serde_json::from_str::<serde_json::Value>(&raw) else {
+        advice.note = "price-window JSON unreadable".into();
+        return advice;
+    };
+
+    let sug = v
+        .pointer(&format!("/suggestions/{job}"))
+        .cloned()
+        .unwrap_or(serde_json::Value::Null);
+
+    let suggested = sug
+        .get("suggested_start_utc")
+        .and_then(|x| x.as_str())
+        .map(|s| s.to_string());
+    let nominal = sug
+        .get("nominal_utc")
+        .and_then(|x| x.as_str())
+        .unwrap_or("?");
+    let shift_h = sug.get("shift_hours").and_then(|x| x.as_f64());
+    let savings = sug.get("savings_c_kwh").and_then(|x| x.as_f64());
+
+    let mut delay_now = false;
+    if let Some(ref start) = suggested {
+        if let Ok(suggested_dt) = DateTime::parse_from_rfc3339(start) {
+            let suggested_utc = suggested_dt.with_timezone(&Utc);
+            if opt_in && now < suggested_utc {
+                delay_now = true;
+            }
+        }
+        advice.note = format!(
+            "would shift {job} from {nominal} → {start} (Δ{shift_h:?}h, save {savings:?} ¢/kWh); metabolism still wins"
+        );
+    } else {
+        advice.note = format!("no suggested_start_utc for {job}");
+    }
+
+    advice.suggested_start_utc = suggested.clone();
+    advice.shift_hours = shift_h;
+    advice.delay_now = delay_now;
+
+    let payload = serde_json::json!({
+        "schema": "gzmo.price.shift/v1",
+        "generated_at": now.to_rfc3339(),
+        "ok": true,
+        "opt_in": opt_in,
+        "job": job,
+        "delay_now": delay_now,
+        "suggested_start_utc": suggested,
+        "shift_hours": shift_h,
+        "note": advice.note,
+        "apply": if opt_in { "delay_until_suggested" } else { "log_only" },
+    });
+    let _ = std::fs::write(
+        runs.join("latest-price-shift.json"),
+        serde_json::to_string_pretty(&payload).unwrap_or_default() + "\n",
+    );
+    advice
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

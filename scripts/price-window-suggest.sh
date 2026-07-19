@@ -71,6 +71,10 @@ for job, hhmm in nominal.items():
     lo = cand - timedelta(hours=window_h)
     hi = cand + timedelta(hours=window_h)
     in_win = [s for s in norm if s["end"] > lo and s["start"] < hi]
+    # Awattar often only publishes ~24h — fall back to cheapest upcoming slot.
+    if not in_win:
+        horizon = now + timedelta(hours=36)
+        in_win = [s for s in norm if now <= s["start"] <= horizon]
     if in_win:
         best = min(in_win, key=lambda s: s["c_kwh"])
         nominal_slot = min(

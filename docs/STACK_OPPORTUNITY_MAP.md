@@ -112,13 +112,13 @@ Publish last-night cost: Awattar price × RAPL joules × job durations.
 - **Why special:** European energy reality as a first-class agent metric.
 - **Ship shape:** Each Arena run archives to `data-next/arena/history/`; aggregate → `euro-night.json` (Arena € sum + metabolism duration×W estimate); scoreboard pills show €/night.
 
-#### Price-aware overnight shift — `later` · differentiated · spike (suggest)
+#### Price-aware overnight shift — `later` · differentiated · spike (soft)
 
 Slide distill/dream windows into cheapest Awattar hours when backlog allows.
 
-- **Builds on:** `scripts/price-window-suggest.sh` · Awattar AT · serve nominal UTC anchors
+- **Builds on:** price-window-suggest · `scripts/price-shift-soft.sh` · serve soft advice
 - **Why special:** Agents that respect the grid — rare and storyable.
-- **Ship shape:** Sibling suggestion under `data-next/price-window/` (±2h around distill/dream); never auto-mutates cron.
+- **Ship shape:** Suggestions + `latest-price-shift.json`; serve logs “would shift”; `GZMO_PRICE_SHIFT=1` soft-delays distill/dream until suggested UTC (cron not overwritten).
 
 #### Intelligence-per-Watt router — `later` · singular · research
 
@@ -146,13 +146,13 @@ Productize OKForge + nightly concept push as “agent-writable Wikipedia for one
 - **Why special:** Git forge + agent REST + observatory is a rare bundle.
 - **Ship shape:** Compose install + sample OKCP client + one demo repo.
 
-#### Concept PR review bot — `near` · differentiated · spike (gated push)
+#### Concept PR review bot — `near` · differentiated · spike (webhook stub)
 
 Inbound OKCP writes open PRs; honeypot-gate + wiki-lint decide merge vs hold.
 
-- **Builds on:** concept-review-gate · `wiki-push-gated.sh` · serve satellite soft-hold
+- **Builds on:** concept-review-gate · `wiki-push-gated.sh` · `concept-gate-webhook.sh`
 - **Why special:** Knowledge CI — missing from most agent wikis.
-- **Ship shape:** Gate PASS/HOLD vs vault; `gzmo serve` skips OKForge push on HOLD (`GZMO_CONCEPT_GATE=0` bypass); `bash scripts/wiki-push-gated.sh` for operator path. OKForge webhook merge later.
+- **Ship shape:** Gate PASS/HOLD; serve soft-hold on HOLD; `bash scripts/concept-gate-webhook.sh [--serve :8766]` returns merge advice JSON; full OKForge PR merge later.
 
 #### Observatory as public mind — `near` · differentiated · spike (enriched)
 
@@ -230,13 +230,13 @@ Hear distill/dream/embed as MIDI motifs; idle vs metabolism night as music.
 - **Why special:** Unforgettable demo; zero competitors take this seriously.
 - **Ship shape:** Artifact → MIDI/WAV motif under `data-next/hsp-metabolism/`; `--play` uses aplay/hsp ping; live HSP event-bus later.
 
-#### AOS Intelligence Dashboard v2 — `later` · differentiated · spike (feed)
+#### AOS Intelligence Dashboard v2 — `later` · differentiated · spike (poll)
 
 Editor sidebar: live energy, Arena champion, last-night €, recall health.
 
-- **Builds on:** `scripts/aos-status-feed.sh` · AOS TelemetryPayload · nightburst artifacts
+- **Builds on:** `scripts/aos-gzmo-poll.sh` · aos-status-feed · AOS-Intelligence-Dashboard GzmoStatusPoller
 - **Why special:** Brings the stack into the coding surface without another web app.
-- **Ship shape:** `data-next/aos-status/latest.json` (+ optional `--serve :8765/telemetry.json`); wire VSCodium poll later.
+- **Ship shape:** File/HTTP poll of `data-next/aos-status/latest.json` (or `:8765/telemetry.json`); status bar shows GZMO z/gate when AOS gateway is down.
 
 #### tinyFolder daemon product — `later` · commodity · spike
 
@@ -348,7 +348,7 @@ Those become interesting only after Arena + felt recall make the stack demable t
 | e1 | Obolus Arena | near | singular | spike (nightburst done) |
 | e2 | €/night dashboard | near | differentiated | spike (aggregate) |
 | f1 | Living wiki appliance | near | singular | exists |
-| f3 | Concept PR review bot | near | differentiated | spike (gated push) |
+| f3 | Concept PR review bot | near | differentiated | spike (webhook stub) |
 | f4 | Observatory as public mind | near | differentiated | spike (enriched) |
 | o1 | Living tool zoo | near | singular | spike (organ-trace) |
 | o3 | Calibration pack | near | differentiated | exists |
@@ -356,13 +356,13 @@ Those become interesting only after Arena + felt recall make the stack demable t
 | s1 | herdr + metabolism | near | singular | spike (plugin) |
 | s2 | HSP metabolism sonification | near | singular | spike (motif) |
 | r4 | Faithfulness CI | near | differentiated | exists |
-| e3 | Price-aware overnight shift | later | differentiated | spike (suggest) |
+| e3 | Price-aware overnight shift | later | differentiated | spike (soft) |
 | e4 | Intelligence-per-Watt router | later | singular | research |
 | e5 | Obolus Forge mutations | later | differentiated | spike |
 | f2 | OKCP memory marketplace | later | singular | product |
 | o2 | Beat-gate open eval kit | later | differentiated | product |
 | o4 | Cognition pack | later | differentiated | spike |
-| s3 | AOS Intelligence Dashboard v2 | later | differentiated | spike (feed) |
+| s3 | AOS Intelligence Dashboard v2 | later | differentiated | spike (poll) |
 | s4 | tinyFolder daemon | later | commodity | spike |
 | s5 | Pi / operator split polish | later | commodity | research |
 | p1 | AOS Customer Edition | later | differentiated | product |
