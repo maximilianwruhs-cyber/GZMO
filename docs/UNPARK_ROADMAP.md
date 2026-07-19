@@ -65,7 +65,7 @@ A+C production readiness unlocked the former **Park freeze**. Satellites move in
 | Escape-loop / attractor brand | Research kit |
 | ZPD tutor | Lab; never GREEN overnight |
 | Sovereign `:8010` / VM200 `:8080` | Infra-parked (broken/retired) |
-| Pedagogy deferred backlog | Wave 2b after pantheon ritual |
+| Pedagogy deferred backlog | Wave 2b after pantheon ritual — lab/TUI only; never daemon PulseLoop / living overnight (see [PANTHEON_FEAT_RELAND.md](./PANTHEON_FEAT_RELAND.md) Slice C.1) |
 
 ## Guardrails
 

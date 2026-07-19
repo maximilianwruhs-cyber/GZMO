@@ -1,39 +1,49 @@
-# Pantheon Skills — Ritual / Lab Front Door
+# Pantheon skills (front door)
 
 **Status:** Operator front door (2026-07-19)  
 **Living SoT (chaos policy):** [CHAOS_LIVING_VS_RITUAL.md](./CHAOS_LIVING_VS_RITUAL.md)  
 **Quality bar:** [SKILL_GOLDEN_STANDARD.md](./SKILL_GOLDEN_STANDARD.md)  
 **Bridge:** [SKILLS_BRIDGE.md](./SKILLS_BRIDGE.md)
 
-## What this is
+Ritual / chat pantheon surface — **not** CT101 living KPI. Skills are bounded
+registry actions (`dispatch_skill` → `Skill` trait), not chat macros.
 
-GZMO skills are bounded operator actions through the Rust registry (`dispatch_skill` → `Skill` trait), not chat macros. Full definition: [SKILL_GOLDEN_STANDARD.md](./SKILL_GOLDEN_STANDARD.md).
+## Slash skills (Slice A on main)
 
-This front door covers the **legendary pantheon packs** recovered from `feat/context-compress-headroom` as **research archive** — not CT101 living success criteria.
+| Skill | Role |
+|-------|------|
+| `/dice` | Corpus narratives + Wild Magic cascade (nested dispatch) |
+| `/card` | Card forge (legendary pack path) |
+| `/story` | Story skill (CCL-aware) |
+| `/pkm` | PKM forge |
+| `/poem` `/joke` `/word` `/define` | Generative attractor briefs |
+| `/transform` | Definitive Dozen personas (archive decision) |
 
-## Where it runs
+CCL badges render in `/help` via `gzmo-core/src/skills/skill_ccl.rs`.
 
-| Surface | Role |
-|---------|------|
-| **Ritual / lab** | Workstation chat/TUI + PulseLoop (chaos on) — where pantheon skills belong |
-| **CT101 living** | Chaos-free mentor / discover-only scout — do **not** treat pantheon polish as living KPI |
+## Ritual CLI (Slice C.0.1)
 
-See [CHAOS_LIVING_VS_RITUAL.md](./CHAOS_LIVING_VS_RITUAL.md).
+```bash
+gzmo chaos skill help
+gzmo chaos skill dice d20 --json
+bash scripts/pi/chaos_skill.sh dice d20 --json
+bash scripts/verify-chaos-skill.sh
+```
 
-## Legendary surfaces
+One-shot lab runner: reads latest chaos snapshot, queues feedback for chat/TUI drain.
+**Never** starts PulseLoop or the living daemon.
 
-| Surface | Kind | Notes |
-|---------|------|-------|
-| `/dice` | Mechanical | Tier math + event tables (archive) |
-| `/card` | Generative structured | Card Forge contract (archive); main has thinner Color Pie path |
-| `/story` | Generative CCL-4 | V2 acceptance criteria (archive-spec) |
-| `/transform` | Mutation | Definitive Dozen personas (archive decision) |
+## Main today vs deferred
 
-## Main today vs feat stack
+| Layer | Status |
+|-------|--------|
+| Slice A full (dispatch, cascade, forge, generative, CCL) | **On main** |
+| Dice-loop **schedule** (`dice_loop.rs`) | On main; `dice.loop` default **off** |
+| Slice C.0 feedback IPC + C.0.1 `chaos skill` | **On main** (ritual drain only) |
+| Daemon `dice_loop` fire | Deferred (living risk) |
+| Slice C.1 pedagogy oscillator | Deferred — Wave 2b after pantheon ritual |
 
-**On `main`:** thin / current stubs in `gzmo-core/src/skills/{dice,card,story}.rs`.
-
-**On feat (not merged):** full attractor/forge/corpus stack (`attractor_common`, `card_forge*`, `dice_corpus`, `data/dice_events.toml`, …). Re-land only via a **separate ritual PR** — inventory + checklist: [PANTHEON_FEAT_RELAND.md](./PANTHEON_FEAT_RELAND.md).
+Re-land inventory (historical + remaining C): [PANTHEON_FEAT_RELAND.md](./PANTHEON_FEAT_RELAND.md).
 
 ## Research archive
 
@@ -50,8 +60,8 @@ See [CHAOS_LIVING_VS_RITUAL.md](./CHAOS_LIVING_VS_RITUAL.md).
 | Item | Status |
 |------|--------|
 | Front door + archive | Ready — `bash scripts/pantheon-ritual-check.sh` |
-| Thin `/dice` `/card` `/story` on main | Present |
-| Feat attractor / Würfel / cascade stack | HOLD until dedicated ritual PR re-lands code |
+| Slice A full + C.0/C.0.1 | Landed on main |
+| Daemon dice fire / C.1 pedagogy | HOLD — lab only; never overnight brain |
 | Ghost `DICE_MASTER_*` | Never existed — do not invent |
 
 Legendary packs = research archive + ritual check; living KPI unchanged.
