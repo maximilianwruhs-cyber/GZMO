@@ -106,10 +106,52 @@ pub fn data_dir_from_skills(skills_dir: &Path) -> PathBuf {
 }
 
 pub fn load_live_chaos_snapshot(data_dir: &Path, fallback: &ChaosSnapshot) -> ChaosSnapshot {
-    // ChaosSnapshot is intentionally not deserializable in the core crate.
-    // Keep this API so callers do not couple to storage details.
-    let _ = data_dir;
-    fallback.clone()
+    let Ok(raw) = std::fs::read_to_string(data_dir.join("CHAOS_STATE.json")) else {
+        return fallback.clone();
+    };
+    let Ok(value) = serde_json::from_str::<serde_json::Value>(&raw) else {
+        return fallback.clone();
+    };
+    let Some(tick) = value.get("tick").and_then(serde_json::Value::as_u64) else {
+        return fallback.clone();
+    };
+    if tick < fallback.tick {
+        return fallback.clone();
+    }
+
+    let mut snapshot = fallback.clone();
+    snapshot.tick = tick;
+    if let Some(value) = value.get("x").and_then(serde_json::Value::as_f64) {
+        snapshot.x = value;
+    }
+    if let Some(value) = value.get("y").and_then(serde_json::Value::as_f64) {
+        snapshot.y = value;
+    }
+    if let Some(value) = value.get("z").and_then(serde_json::Value::as_f64) {
+        snapshot.z = value;
+    }
+    if let Some(value) = value.get("tension").and_then(serde_json::Value::as_f64) {
+        snapshot.tension = value;
+    }
+    if let Some(value) = value.get("energy").and_then(serde_json::Value::as_f64) {
+        snapshot.energy = value;
+    }
+    if let Some(value) = value.get("chaos_val").and_then(serde_json::Value::as_f64) {
+        snapshot.chaos_val = value;
+    }
+    if let Some(value) = value
+        .get("llm_temperature")
+        .and_then(serde_json::Value::as_f64)
+    {
+        snapshot.llm_temperature = value as f32;
+    }
+    if let Some(value) = value
+        .get("llm_max_tokens")
+        .and_then(serde_json::Value::as_u64)
+    {
+        snapshot.llm_max_tokens = value as u32;
+    }
+    snapshot
 }
 
 /// Forward feedback only through this process's chaos channel.
