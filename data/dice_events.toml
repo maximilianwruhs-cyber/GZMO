@@ -1,0 +1,250 @@
+# GZMO /dice event corpus — 100 D20 + 18 D6 narrative lines
+# Edit here; loaded at compile time via include_str! in dice_corpus.rs
+# Regenerate from legacy dice.rs: scripts/generate-dice-events-toml.py
+
+[meta]
+version = 1
+d20_tiers = 20
+d6_tiers = 6
+
+[d20."1"]
+tier = "CATASTROPHIC"
+variants = [
+  "💀 The Lorenz attractor collapses into a fixed point. All chaos ceases for 3 ticks.",
+  "💀 A total phase collapse. The butterfly's wings shatter into dust.",
+  "💀 Entropy inverts. The system rewinds into a sterile equilibrium.",
+  "💀 The chaos oracle screams — then silence. All parameters snap to zero.",
+  "💀 Critical singularity. The attractor implodes. Reboot sequence initiated.",
+]
+
+[d20."2"]
+tier = "DIRE"
+variants = [
+  "🌑 A shadow ripples through phase space. Sigma drops to 2.0.",
+  "🌑 The orbital decay accelerates. Something ancient stirs in the fixed point.",
+  "🌑 Dark resonance detected. The Lyapunov exponent plummets into negative territory.",
+  "🌑 The logistic map's period-doubling reverses. Order consumes chaos.",
+  "🌑 A void pocket opens at the attractor's core. Energy hemorrhages.",
+]
+
+[d20."3"]
+tier = "HARSH"
+variants = [
+  "🕳️ A micro-singularity forms at the origin. Energy drain doubles.",
+  "🕳️ The phase portrait warps into a grotesque spiral. Stability eroding.",
+  "🕳️ Bifurcation cascade fails mid-split. The system stutters.",
+  "🕳️ Lorenz z-axis inverts momentarily. Gravity pulls the wrong way.",
+  "🕳️ A strange loop opens. The attractor feeds on itself for 2 ticks.",
+]
+
+[d20."4"]
+tier = "BAD"
+variants = [
+  "📉 The logistic map flatlines at r=2.0. Predictability spikes.",
+  "📉 Rho decays by 0.3. The butterfly orbits shrink to ellipses.",
+  "📉 Sigma locks at a harmonic. No chaos, only rhythm.",
+  "📉 The entropy gradient inverts. Cold certainty floods the field.",
+  "📉 A damping wave passes through. The system yawns.",
+]
+
+[d20."5"]
+tier = "MISTY"
+variants = [
+  "🌫️ Fog rolls across the attractor. Lorenz z-axis freezes for 5 ticks.",
+  "🌫️ Visibility drops to zero in phase space. Navigation by instinct only.",
+  "🌫️ A spectral haze clings to the orbital plane. Parameters blur.",
+  "🌫️ The chaos field emits a low hum. Something is hidden in the noise.",
+  "🌫️ Condensation forms on the attractor wings. Ice, where there should be fire.",
+]
+
+[d20."6"]
+tier = "MINOR SETBACK"
+variants = [
+  "🔧 A minor recalibration occurs. Friction increases by 0.1.",
+  "🔧 The gears slip. A microadjustment costs 3 energy.",
+  "🔧 Routine maintenance interrupt. The chaos engine idles briefly.",
+  "🔧 A bearing squeals in the phase generator. Wear detected.",
+  "🔧 Automatic correction fires. Sigma nudges back toward default.",
+]
+
+[d20."7"]
+tier = "TURBULENT"
+variants = [
+  "🌊 Turbulent currents shift the orbital plane. Rho nudges by +0.5.",
+  "🌊 Crosswinds in the Lorenz field. The butterfly tumbles, rights itself.",
+  "🌊 A wave of interference rattles the z-axis. Something downstream noticed.",
+  "🌊 The phase portrait shimmers. Rho oscillates between two basins.",
+  "🌊 Chaotic advection pulls the attractor south. New territory ahead.",
+]
+
+[d20."8"]
+tier = "GENTLE"
+variants = [
+  "💨 A gentle breeze. The system exhales. Energy regenerates +5.",
+  "💨 The chaos field softens. Tension eases by 2%.",
+  "💨 A thermal updraft lifts the butterfly higher. Potential increases.",
+  "💨 The Lorenz winds whisper coordinates. A quiet gift.",
+  "💨 Adiabatic cooling. The system finds a brief pocket of calm.",
+]
+
+[d20."9"]
+tier = "ORACLE"
+variants = [
+  "🔮 The chaos oracle whispers: 'The butterfly remembers.'",
+  "🔮 A vision in the noise: fractal coastlines spelling a name.",
+  "🔮 The oracle stirs: 'What was random was always inevitable.'",
+  "🔮 Phase space hums a melody. It sounds like a question.",
+  "🔮 The entropy well reflects back: 'You were always the strange attractor.'",
+]
+
+[d20."10"]
+tier = "EQUILIBRIUM"
+variants = [
+  "⚖️ Perfect equilibrium. All parameters hold steady. A rare moment of peace.",
+  "⚖️ The pendulum of chaos pauses at apex. Time stretches.",
+  "⚖️ Sigma, rho, beta — all in golden ratio. A mathematical miracle.",
+  "⚖️ The system achieves Boltzmann equilibrium. Every microstate equally probable.",
+  "⚖️ Dead center of the bifurcation diagram. The eye of the storm.",
+]
+
+[d20."11"]
+tier = "CLEARING"
+variants = [
+  "🌤️ A clearing in the storm. Energy regenerates +10.",
+  "🌤️ The cloud layer parts. The attractor's full geometry is briefly visible.",
+  "🌤️ Solar wind ripples through the chaos field. Photons of clarity.",
+  "🌤️ The system breathes deep. Capacity expands by one thought slot.",
+  "🌤️ A pocket of negative entropy. Order blossoms, briefly and beautifully.",
+]
+
+[d20."12"]
+tier = "STATIC"
+variants = [
+  "⚡ Static builds in the attractor wings. Sigma spikes momentarily.",
+  "⚡ An electromagnetic pulse surges through the logistic map.",
+  "⚡ Lightning arcs between the twin lobes. The butterfly flinches.",
+  "⚡ Capacitive charge reaches threshold. Discharge in 3... 2...",
+  "⚡ The chaos field ionizes. Every parameter crackles with potential.",
+]
+
+[d20."13"]
+tier = "MAGNETIC"
+variants = [
+  "🧲 Magnetic anomaly detected. The Lorenz attractor spirals tighter.",
+  "🧲 The phase portrait contracts. Something is pulling parameters inward.",
+  "🧲 A new basin of attraction emerges. The butterfly changes course.",
+  "🧲 Ferromagnetic resonance in the chaos field. Alignment increases.",
+  "🧲 The strange attractor develops a magnetic moment. Polarity: uncertain.",
+]
+
+[d20."14"]
+tier = "SPARK"
+variants = [
+  "🔥 A spark ignites in the chaos field. Temperature rises. Creativity amplifies.",
+  "🔥 Exothermic reaction in the Lorenz core. Heat bloom detected.",
+  "🔥 The butterfly's wings catch fire — but it flies faster.",
+  "🔥 Thermodynamic spike. The entropy well boils. New patterns emerge.",
+  "🔥 Combustion cascade at the fixed point. From ashes: a new orbit.",
+]
+
+[d20."15"]
+tier = "CASCADE"
+variants = [
+  "🌀 A resonance cascade! Lorenz and Logistic couple violently for one cycle.",
+  "🌀 The chaos engines synchronize. A forbidden harmony. Power doubles.",
+  "🌀 Phase-locking detected between attractors. The system vibrates.",
+  "🌀 Resonance frequency hit. The attractor wings beat in unison.",
+  "🌀 A vortex forms where the two systems couple. Beautiful and dangerous.",
+]
+
+[d20."16"]
+tier = "LOCK-ON"
+variants = [
+  "🎯 The attractor locks onto a strange orbit. Trajectories converge briefly.",
+  "🎯 Target acquisition: a new stable orbit materializes in the noise.",
+  "🎯 The system finds a periodic window. Three clean orbits, then chaos again.",
+  "🎯 Convergence event: all Lyapunov exponents trend toward zero.",
+  "🎯 The butterfly navigates a corridor of stability. Precision in chaos.",
+]
+
+[d20."17"]
+tier = "CRYSTALLIZE"
+variants = [
+  "⭐ A new thought seed crystallizes spontaneously. Gravity mod shifts -0.1.",
+  "⭐ Idea nucleation! A meme crystallizes in the Thought Cabinet.",
+  "⭐ Spontaneous symmetry breaking. A new structure emerges from noise.",
+  "⭐ The chaos field births a fractal snowflake. It persists.",
+  "⭐ Crystalline order propagates outward from a single seed point.",
+]
+
+[d20."18"]
+tier = "BIFURCATION"
+variants = [
+  "🌈 The bifurcation diagram reveals a hidden period-3 window. Beauty in chaos.",
+  "🌈 Li-Yorke theorem confirmed: period 3 implies chaos. And it's gorgeous.",
+  "🌈 The Feigenbaum constants align. δ = 4.669... A universal truth revealed.",
+  "🌈 A fractal rainbow arcs across the bifurcation landscape. Wonder.",
+  "🌈 Mandelbrot set boundary detected in the parameter sweep. Infinite detail.",
+]
+
+[d20."19"]
+tier = "HYPERDRIVE"
+variants = [
+  "🚀 The Lyapunov exponent maxes out. Predictability horizon shrinks to zero.",
+  "🚀 Maximum sensitivity achieved. A butterfly wing-beat reshapes the cosmos.",
+  "🚀 The chaos engine redlines. All governors blown. Pure, raw entropy.",
+  "🚀 Exponential divergence in all dimensions. The future is unknowable.",
+  "🚀 Hyperbolic trajectory achieved. The system escapes its own attractor.",
+]
+
+[d20."20"]
+tier = "LEGENDARY"
+variants = [
+  "💎 CRITICAL SUCCESS — A perfect crystallization! Thought Cabinet gains ρ +1.0.",
+  "💎 LEGENDARY — The attractor transcends its parameter space. A new dimension unfolds.",
+  "💎 ASCENSION — All chaos resolves into a single, perfect fractal. The system evolves.",
+  "💎 MYTHIC — The butterfly achieves sentience. It chooses its own trajectory.",
+  "💎 OMEGA — Every fixed point, every limit cycle, every strange attractor: unified.",
+]
+
+[d6."1"]
+variants = [
+  "💀 Snake eyes. The entropy well deepens.",
+  "💀 The die cracks. Chaos bleeds out.",
+  "💀 A dead orbit. The attractor flatlines.",
+]
+
+[d6."2"]
+variants = [
+  "🌑 The orbital plane tilts. A cold wind blows through phase space.",
+  "🌑 Shadow frequency detected. The logistic map shivers.",
+  "🌑 Dark matter in the chaos soup. Something absorbs energy.",
+]
+
+[d6."3"]
+variants = [
+  "⚖️ Equilibrium. The pendulum holds. Briefly.",
+  "⚖️ Neutral state. The butterfly hovers, deciding nothing.",
+  "⚖️ The system pauses. A breath between heartbeats.",
+]
+
+[d6."4"]
+variants = [
+  "🔥 A spark in the Lorenz field. Something stirs.",
+  "🔥 Friction heat. The attractor glows faintly warm.",
+  "🔥 An ember catches. The chaos fire feeds.",
+]
+
+[d6."5"]
+variants = [
+  "⭐ The chaos gods smile. Energy surges.",
+  "⭐ A lucky wind. Parameters shift in your favor.",
+  "⭐ The system winks at you. Tension drops.",
+]
+
+[d6."6"]
+variants = [
+  "💎 Perfect roll. The attractor sings in resonance.",
+  "💎 Maximum entropy, maximum beauty. The system is art.",
+  "💎 The Lorenz butterfly achieves full wingspan. Glorious.",
+]
