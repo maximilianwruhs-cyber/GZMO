@@ -12,8 +12,8 @@
 4. [x] **Slice A full (PR #34)** — `dispatch` + nested `execute_cascade` + `attractor_common` / `generative` + `card_forge*` / story (**no** Slice C)
 5. [x] Keep chaos off CT101 living KPI (`dice.loop` default off; no daemon dice-loop wiring)
 6. [x] `bash scripts/pantheon-ritual-check.sh` → feat-stack PASS
-7. [ ] Living faithfulness + takeaway-recall still PASS (re-run after merge)
-8. [ ] Skills bridge docs updated for A full
+7. [ ] Living faithfulness + takeaway-recall still PASS (re-run after merge / v0.1.5)
+8. [x] Skills bridge docs updated for A full
 
 **Still deferred:** `pkm_forge`, daemon `dice_loop`, poem/joke briefs, Slice C (`feedback_ipc` / chaos engine).
 
