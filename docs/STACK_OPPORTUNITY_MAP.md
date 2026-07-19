@@ -19,11 +19,11 @@ The singular asset is a **living overnight memory metabolism** with a **product 
 
 ## Recommended next three
 
-1. **Spine demo** — product MCP cold path + lab recall-proof — `bash scripts/spine-demo.sh` → `data-next/spine-demo/`
-2. **Protect CT101 nights** — sole overnight writer; workstation serve stays off by default ([CT101_BOUNDARY.md](CT101_BOUNDARY.md))
-3. **Session takeaway → distill** — keep the human loop that feeds metabolism (`gzmo session close --takeaway`)
+1. **Product stranger path** — `bash scripts/product-stranger-path.sh` → attach MCP in Cursor/Pi ([PRODUCT_MCP.md](PRODUCT_MCP.md))
+2. **Living takeaway→recall** — `bash scripts/ct101-takeaway-recall.sh` (same-sitting HIT on CT101)
+3. **Living faithfulness** — `bash scripts/faithfulness-living.sh` (CORE_INSIGHT / ADR claims)
 
-Nightburst scoreboard / Arena / € remain available as satellites; they are **Park**, not the next product bet.
+Park stays parked (Arena/€/HSP/AOS zoo). Doctrine: [SPINE_FOCUS.md](SPINE_FOCUS.md).
 
 ## Composition spine
 

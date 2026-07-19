@@ -1,0 +1,36 @@
+{
+  "schema": "gzmo.faithfulness.claims/v1",
+  "description": "Living CT101 vault claims (CORE_INSIGHT / ADR-0003). Run via FAITHFULNESS_MODE=vault against CT101.",
+  "claims": [
+    {
+      "id": "adr0003-living",
+      "claim": "ADR-0003: CT101 gzmo-daemon is the sole living metabolism instance",
+      "query": "ADR-0003",
+      "needle": "CT101 gzmo-daemon"
+    },
+    {
+      "id": "ct101-node",
+      "claim": "CT101 is the living GZMO brain with /opt/gzmo vault",
+      "query": "CT101 living GZMO brain",
+      "needle": "living GZMO brain"
+    },
+    {
+      "id": "sovereignty-local",
+      "claim": "Primary inference stays local; secrets stay in .env",
+      "query": "Primary inference is local Prime",
+      "needle": "local Prime"
+    },
+    {
+      "id": "honeypot-shape",
+      "claim": "Honeypot + verify + promote is the GZMO product shape",
+      "query": "Honeypot + verify + promote",
+      "needle": "Honeypot + verify + promote"
+    },
+    {
+      "id": "no-dual-writer",
+      "claim": "Never enable workstation gzmo-serve overnight while CT101 lives",
+      "query": "Never enable workstation gzmo-serve overnight",
+      "needle": "gzmo-serve overnight"
+    }
+  ]
+}

@@ -45,6 +45,14 @@ else
   FAITH_OK=0
 fi
 
+# Soft prime-product living signals (may HOLD if SSH down).
+bash "$ROOT/scripts/product-stranger-path.sh" >/dev/null 2>&1 || true
+# Skip heavy living distill inside spine-demo by default (run ct101-takeaway-recall.sh alone).
+if [[ "${SPINE_LIVING_HEAVY:-0}" == "1" ]]; then
+  bash "$ROOT/scripts/ct101-takeaway-recall.sh" >/dev/null 2>&1 || true
+fi
+bash "$ROOT/scripts/faithfulness-living.sh" >/dev/null 2>&1 || true
+
 export ROOT DATA OUT BIN PRODUCT_OK PRODUCT_NOTE FAITH_OK
 python3 - <<'PY'
 import json, os, re
@@ -98,6 +106,22 @@ try:
 except Exception:
     pass
 
+stranger = {}
+try:
+    stranger = json.loads((data / "product-stranger" / "latest.json").read_text(encoding="utf-8"))
+except Exception:
+    pass
+living_takeaway = {}
+try:
+    living_takeaway = json.loads((data / "ct101-takeaway-recall" / "latest.json").read_text(encoding="utf-8"))
+except Exception:
+    pass
+living_faith = {}
+try:
+    living_faith = json.loads((data / "faithfulness-living" / "latest.json").read_text(encoding="utf-8"))
+except Exception:
+    pass
+
 owner = {
     "living_production": "CT101 (/opt/gzmo/, gzmo-daemon)",
     "lab_scratch": "workstation data-next/",
@@ -133,6 +157,20 @@ supports = {
         "ok": faith_ok,
         "verdict": faith.get("verdict") or faith.get("ok"),
         "mode": faith.get("mode") or "fixture",
+    },
+    "product_stranger": {
+        "ok": bool(stranger.get("ok")),
+        "advice": stranger.get("advice"),
+    },
+    "ct101_takeaway_recall": {
+        "ok": bool(living_takeaway.get("living_proof")),
+        "advice": living_takeaway.get("advice"),
+    },
+    "faithfulness_living": {
+        "ok": bool(living_faith.get("living_ok")),
+        "advice": living_faith.get("advice"),
+        "supported": living_faith.get("supported"),
+        "total": living_faith.get("total"),
     },
 }
 
@@ -209,6 +247,9 @@ md = [
     "",
     f"- Takeaway ritual: **{yn(supports['takeaway_ritual']['ok'])}** — {supports['takeaway_ritual'].get('advice')}",
     f"- Faithfulness (fixture): **{yn(supports['faithfulness_fixture']['ok'])}**",
+    f"- Product stranger: **{yn(supports['product_stranger']['ok'])}** — {supports['product_stranger'].get('advice')}",
+    f"- CT101 takeaway→recall: **{yn(supports['ct101_takeaway_recall']['ok'])}** — {supports['ct101_takeaway_recall'].get('advice')}",
+    f"- Faithfulness living: **{yn(supports['faithfulness_living']['ok'])}** — {supports['faithfulness_living'].get('advice')}",
     "",
     "## Keep (strengthen)",
     "",

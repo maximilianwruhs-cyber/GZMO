@@ -224,7 +224,10 @@ bash scripts/escape-loop-kit.sh         # soft escape-loop dry-run (research; no
 bash scripts/portable-core-inventory.sh # living vs gzmo-core-clean; default hold_rewrite
 bash scripts/cognis-dialect-stub.sh     # weekend dialect over plan-gate (not production brain)
 bash scripts/edge-fleet-sketch.sh       # hub/edge topology sketch (no sync)
+bash scripts/product-stranger-path.sh   # stranger MCP install checklist (laptop product)
 bash scripts/ct101-living-probe.sh      # soft CT101 smoke + dual-writer check (Keep)
+bash scripts/ct101-takeaway-recall.sh   # living takeaway → distill → recall HIT
+bash scripts/faithfulness-living.sh     # CORE_INSIGHT claims vs CT101 vault
 bash scripts/takeaway-ritual-lab.sh     # session close --takeaway → distill enqueue (no --now)
 bash scripts/dream-compact-lab.sh       # dream compact --dry-run (Keep plumbing; not on GREEN)
 bash scripts/spine-demo.sh              # Keep pillars: product MCP + recall-proof (see SPINE_FOCUS.md)

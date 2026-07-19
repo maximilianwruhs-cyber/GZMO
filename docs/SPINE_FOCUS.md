@@ -29,27 +29,30 @@ See the top of [STACK_OPPORTUNITY_MAP.md](STACK_OPPORTUNITY_MAP.md).
 ## Demable check (≈5 minutes)
 
 ```bash
-# Product MCP cold path (no CT101 / LAN required)
-./scripts/verify-product-mcp.sh
+# Stranger / laptop product path (no CT101 required)
+bash scripts/product-stranger-path.sh
+# → data-next/product-stranger/latest.{json,md}
 
 # Soft CT101 living probe (SSH smoke + dual-writer check)
 bash scripts/ct101-living-probe.sh
 # → data-next/ct101-living/latest.{json,md}
 
-# Human loop: session close --takeaway → distill enqueue (no --now)
-bash scripts/takeaway-ritual-lab.sh
-# → data-next/takeaway-ritual/latest.{json,md}
+# Living takeaway → distill → recall (CT101 same sitting)
+bash scripts/ct101-takeaway-recall.sh
+# → data-next/ct101-takeaway-recall/latest.{json,md}
 
-# DREAMS.md GC dry-run (not on GREEN)
-bash scripts/dream-compact-lab.sh
-# → data-next/dream-compact/latest.{json,md}
+# Faithfulness on living vault (CORE_INSIGHT / ADR claims)
+bash scripts/faithfulness-living.sh
+# → data-next/faithfulness-living/latest.{json,md}
 
-# Spine demo: product MCP + lab recall-proof + Keep supports
+# Lab supports (workstation data-next only)
+bash scripts/takeaway-ritual-lab.sh   # enqueue only
+bash scripts/dream-compact-lab.sh     # dry-run
 bash scripts/spine-demo.sh
-# → data-next/spine-demo/latest.{json,md}
 ```
 
-Stranger test: (1) MCP search/status on fresh `gzmo init`, (2) recall-proof hits after metabolism, (3) takeaway ritual enqueues distill. Operator test: CT101 smoke green and workstation `gzmo-serve` inactive.
+Stranger test: install → `product-stranger-path` → attach MCP in Cursor/Pi.  
+Operator test: CT101 takeaway→recall HIT + living faithfulness + serve inactive.
 
 ## Related
 

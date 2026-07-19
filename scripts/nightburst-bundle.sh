@@ -49,9 +49,12 @@ run escape-loop bash scripts/escape-loop-kit.sh
 run portable-core bash scripts/portable-core-inventory.sh
 run cognis-stub bash scripts/cognis-dialect-stub.sh
 run edge-fleet bash scripts/edge-fleet-sketch.sh
+run product-stranger bash scripts/product-stranger-path.sh
 run takeaway-ritual bash scripts/takeaway-ritual-lab.sh
 run dream-compact bash scripts/dream-compact-lab.sh
 run ct101-probe bash scripts/ct101-living-probe.sh
+run ct101-takeaway bash scripts/ct101-takeaway-recall.sh
+run faithfulness-living bash scripts/faithfulness-living.sh
 run spine-demo bash scripts/spine-demo.sh
 run scoreboard bash scripts/nightburst-scoreboard.sh
 run aos-poll bash scripts/aos-gzmo-poll.sh
@@ -81,9 +84,12 @@ echo "Escape-loop: $ROOT/data-next/escape-loop/latest.json"
 echo "Portable core: $ROOT/data-next/portable-core/latest.json"
 echo "Cognis stub: $ROOT/data-next/cognis-dialect/latest.json"
 echo "Edge fleet: $ROOT/data-next/edge-fleet/latest.json"
+echo "Product stranger: $ROOT/data-next/product-stranger/latest.json"
 echo "Takeaway ritual: $ROOT/data-next/takeaway-ritual/latest.json"
 echo "Dream compact: $ROOT/data-next/dream-compact/latest.json"
 echo "CT101 living: $ROOT/data-next/ct101-living/latest.json"
+echo "CT101 takeaway→recall: $ROOT/data-next/ct101-takeaway-recall/latest.json"
+echo "Faithfulness living: $ROOT/data-next/faithfulness-living/latest.json"
 echo "Spine demo: $ROOT/data-next/spine-demo/latest.json"
 echo "AOS feed: $ROOT/data-next/aos-status/latest.json"
 exit "$fail"

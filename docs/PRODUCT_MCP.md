@@ -61,11 +61,13 @@ In Cursor/Pi, call:
 - `gzmo_memory_status` — vault path + fact counts
 - `gzmo_memory_search` — FTS over the local vault (empty until you ingest/promote)
 
-CLI smoke:
+CLI smoke (stranger checklist artifact):
 
 ```bash
-./scripts/verify-product-mcp.sh
-# or:
+bash scripts/product-stranger-path.sh
+# → data-next/product-stranger/latest.md  (or ./scripts/verify-product-mcp.sh alone)
+
+# or manually:
 export GZMO_CONFIG="$HOME/.gzmo/gzmo.toml" GZMO_ALLOW_LAB_VAULT=1 GZMO_PRODUCT=1
 gzmo memory status --json
 # Third surface alias (same as mcp-serve):
