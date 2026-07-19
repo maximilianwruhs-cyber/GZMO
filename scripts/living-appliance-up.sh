@@ -16,7 +16,8 @@ command -v docker >/dev/null 2>&1 || { echo "[!] docker required" >&2; exit 1; }
 if [[ ! -f "$DIR/.env" ]]; then
   if [[ -f "$DIR/.env.example" ]]; then
     cp "$DIR/.env.example" "$DIR/.env"
-    echo "[*] Created $DIR/.env from .env.example — edit NEO4J_AUTH before production use"
+    echo "[*] Created $DIR/.env from .env.example — set NEO4J_AUTH for this pin only"
+    echo "[*] Workstation ~/database-cluster Neo4j is throwaway; do not copy its password into the pin"
   else
     echo "[!] missing $DIR/.env and .env.example" >&2
     exit 1

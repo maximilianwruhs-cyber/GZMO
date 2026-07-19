@@ -57,6 +57,20 @@ This compose starts **sidecars only**. Pair with `gzmo-daemon` + `/opt/gzmo/gzmo
 | Pi-first UX | Optional glass only |
 | Two overnight writers | [ADR-0003](./ADR-0003-one-instance-metabolism.md) |
 | Secrets in git | `NEO4J_AUTH` only via `.env` |
+| Workstation Neo4j as living SoT | Throwaway until pin/product finalize (see Auth below) |
+
+## Auth (Neo4j)
+
+Two shapes, one secret:
+
+| Surface | Variable | Format |
+|---------|----------|--------|
+| Compose / Neo4j image | `NEO4J_AUTH` | `neo4j/<password>` in pin `.env` (gitignored) |
+| GZMO daemon / MCP | `NEO4J_PASSWORD` | password only (`/opt/gzmo/.env` on CT101) |
+
+**Operator lock (2026-07-19):** workstation Neo4j (`~/database-cluster` or any local `sidecar-neo4j`) is **throwaway**. Do not copy its password into the in-repo pin. Do not treat bolt-open on the laptop as goal-C auth proof. Real auth SoT stays CT101 (`/opt/gzmo/.env` + live/staged compose) until the living appliance pin is promoted.
+
+Protocol smoke HOLDs `neo4j-auth` without pin `.env` — expected on workstation. Create pin `.env` only when deliberately bringing up `deploy/living-appliance/` (lab pin or CT101 promote).
 
 ## Ports
 

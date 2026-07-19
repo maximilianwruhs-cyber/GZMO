@@ -114,7 +114,7 @@ if probe_tcp 7687; then
     if [[ "$REQUIRE" == "1" ]]; then
       row FAIL "neo4j-auth" "NEO4J_AUTH missing in $DIR/.env (required)"
     else
-      row HOLD "neo4j-auth" "NEO4J_AUTH missing in $DIR/.env — copy from .env.example"
+      row HOLD "neo4j-auth" "no pin .env — OK on workstation (throwaway Neo4j); set NEO4J_AUTH only for pin up / CT101"
     fi
   elif command -v docker >/dev/null 2>&1 \
     && docker ps --format '{{.Names}}' 2>/dev/null | grep -qx 'sidecar-neo4j'; then
