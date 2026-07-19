@@ -102,7 +102,7 @@ Models compete for the right to run overnight jobs; scored on joules × faithful
 
 - **Builds on:** Obolus evolve · verify-suite · faithfulness-judge · RAPL · serve jobs
 - **Why special:** Ground truth is your wall meter + your living memory — not LMSYS vibes.
-- **Ship shape:** `scripts/arena-night.sh` → `data-next/arena/latest.json` + sibling `champion-suggestion.toml` (human promote only). Nightburst spike 2026-07-18: quality=1.0 z≈0.94 (duration proxy until RAPL wired).
+- **Ship shape:** `scripts/arena-night.sh` → `data-next/arena/latest.json` + sibling `champion-suggestion.toml` (human promote only). Nightburst spike 2026-07-18: quality=1.0 z≈0.94. RAPL probe (`scripts/rapl-probe.sh`) shows `energy_uj` root-only here → Arena stays `energy_source=estimate` until caps/ACL.
 
 #### €/night dashboard — `near` · differentiated · spike (aggregate)
 
@@ -256,13 +256,13 @@ Keep CLI canonical; Pi as optional glass for status + Arena + wiki.
 
 ### Platform / AOS
 
-#### AOS Customer Edition spike — `later` · differentiated · product
+#### AOS Customer Edition spike — `later` · differentiated · spike (pin)
 
 One-curl Ubuntu appliance: Prime + GZMO serve + OKForge + Obolus recommend.
 
-- **Builds on:** AOS · AOS-Customer-Edition · okforge · GZMO
+- **Builds on:** `scripts/aos-ce-pin.sh` · AOS-Customer-Edition · Obolus · GZMO
 - **Why special:** Sovereign stack install is the go-to-market for everything else.
-- **Ship shape:** Golden path on clean VM; pin versions from living workstation.
+- **Ship shape:** `data-next/aos-ce/` golden-path pin from living SHAs; human promotes into CE bootstrap.
 
 #### Edge fleet with shared forge — `later` · differentiated · research
 
@@ -298,13 +298,13 @@ Pedagogy assembly as a personal tutor that writes skill patches from real work.
 - **Why special:** Tutor grounded in your vault, not generic courses.
 - **Ship shape:** Soft-fail lab → `data-next/zpd-tutor/`; never on GREEN overnight gate.
 
-#### Attractor / escape-loop brand — `later` · singular · research
+#### Attractor / escape-loop brand — `later` · singular · spike (kit)
 
 Research brand: dynamical-systems view of agent loops (lorenz-map, escape-loop-bench).
 
-- **Builds on:** lorenz-map · escape-loop-bench · AttractorBench · chaos lab
+- **Builds on:** `scripts/escape-loop-kit.sh` · escape-loop-bench dry-run · AttractorBench
 - **Why special:** Intellectual moat; not a day-job product.
-- **Ship shape:** Papers + benches; keep chaos off production path.
+- **Ship shape:** Soft kit → `data-next/escape-loop/`; never on GREEN; chaos/lorenz stay off serve.
 
 #### Cognis dialect experiment — `later` · singular · research
 
@@ -365,9 +365,9 @@ Those become interesting only after Arena + felt recall make the stack demable t
 | s3 | AOS Intelligence Dashboard v2 | later | differentiated | spike (poll) |
 | s4 | tinyFolder daemon | later | commodity | spike (drop) |
 | s5 | Pi / operator split polish | later | commodity | spike (glass) |
-| p1 | AOS Customer Edition | later | differentiated | product |
+| p1 | AOS Customer Edition | later | differentiated | spike (pin) |
 | p2 | Edge fleet + shared forge | later | differentiated | research |
 | p3 | Portable GZMO core | later | commodity | research |
 | r1 | ZPD tutor | later | differentiated | spike (lab) |
-| r2 | Attractor / escape-loop brand | later | singular | research |
+| r2 | Attractor / escape-loop brand | later | singular | spike (kit) |
 | r3 | Cognis dialect experiment | later | singular | research |

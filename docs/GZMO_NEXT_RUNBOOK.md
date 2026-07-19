@@ -218,6 +218,9 @@ bash scripts/beat-gate-kit.sh           # fixture→meta→gate organ promotion 
 bash scripts/zpd-tutor-lab.sh [--topic T]  # soft-fail ZPD tutor lab (not on GREEN)
 bash scripts/okcp-marketplace.sh [--intent write]  # concept bundle export + gated write intent
 bash scripts/pi-operator-glass.sh       # Pi-facing status glass (CLI remains canonical)
+bash scripts/rapl-probe.sh              # why Arena is estimate vs RAPL (root-only energy_uj)
+bash scripts/aos-ce-pin.sh              # golden-path SHA pin for AOS Customer Edition
+bash scripts/escape-loop-kit.sh         # soft escape-loop dry-run (research; not on GREEN)
 gzmo chat                               # sessions persist to data-next/sessions/
 # Skills (next): authoritative root = GZMO/skills/ (see gzmo instance status → skills_root).
 # gzmo_skills/ remains CT101/bridge auxiliary only — see gzmo_skills/BRIDGE.md.
