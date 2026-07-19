@@ -24,6 +24,7 @@ const RESET: &str = "\x1b[0m";
 struct InitArgs {
     wizard: bool,
     force: bool,
+    refresh_engine: bool,
     dir: Option<PathBuf>,
     bin: Option<PathBuf>,
 }
@@ -35,6 +36,7 @@ fn parse_args() -> Result<InitArgs> {
         match a.as_str() {
             "--wizard" => out.wizard = true,
             "--force" | "-f" => out.force = true,
+            "--refresh-engine" => out.refresh_engine = true,
             "--dir" => {
                 let p = args
                     .next()
@@ -62,13 +64,15 @@ fn print_help() {
         "\
 Usage:
   gzmo init [--force] [--dir PATH] [--bin PATH]   Product MCP home (~/.gzmo)
+  gzmo init --refresh-engine [--dir PATH]          Update [engine] only (non-destructive)
   gzmo init --wizard [--force]                     Interactive agent setup (cwd)
 
 Options:
-  --force, -f    Overwrite existing gzmo.toml
-  --dir PATH     Product home (default: ~/.gzmo)
-  --bin PATH     Absolute path to gzmo binary for mcp.json (default: this executable)
-  --wizard       Legacy interactive onboarding in the current directory
+  --force, -f         Overwrite existing gzmo.toml
+  --refresh-engine    Rescan localhost; rewrite only [engine] url/model (keep vault/MCP)
+  --dir PATH          Product home (default: ~/.gzmo)
+  --bin PATH          Absolute path to gzmo binary for mcp.json (default: this executable)
+  --wizard            Legacy interactive onboarding in the current directory
 "
     );
 }
@@ -91,11 +95,130 @@ fn resolve_bin(override_bin: Option<PathBuf>) -> PathBuf {
 /// Entry point for `gzmo init`.
 pub async fn run() -> Result<()> {
     let args = parse_args()?;
-    if args.wizard {
+    if args.wizard && args.refresh_engine {
+        bail!("--refresh-engine cannot be combined with --wizard");
+    }
+    if args.refresh_engine {
+        run_refresh_engine(args).await
+    } else if args.wizard {
         run_wizard(args.force).await
     } else {
         run_product(args).await
     }
+}
+
+/// Non-destructive: rewrite only `[engine] url` / `model` from a localhost scan.
+async fn run_refresh_engine(args: InitArgs) -> Result<()> {
+    let home = product_home(args.dir)?;
+    let config_path = home.join("gzmo.toml");
+    if !config_path.exists() {
+        bail!(
+            "{} missing — run `gzmo init` first (or pass --dir)",
+            config_path.display()
+        );
+    }
+
+    eprintln!();
+    eprintln!("  {BOLD}GZMO — refresh product engine{RESET}");
+    eprintln!("  {DIM}Non-destructive: only [engine] url/model change{RESET}");
+    eprintln!();
+
+    let endpoints = scanner::scan_endpoints().await;
+    let Some(ep) = scanner::prefer_product_engine(&endpoints) else {
+        bail!("No local OpenAI-compatible engine responding — start Prime on :8000 and retry");
+    };
+    let model = ep
+        .models
+        .first()
+        .cloned()
+        .unwrap_or_else(|| "default".to_string());
+
+    let raw = tokio::fs::read_to_string(&config_path).await?;
+    let updated = patch_engine_block(&raw, &ep.url, &model)?;
+    if updated == raw {
+        eprintln!(
+            "  {GREEN}✔{RESET} Already on {} ({})",
+            ep.url, model
+        );
+        return Ok(());
+    }
+
+    let backup = home.join("gzmo.toml.bak-refresh-engine");
+    tokio::fs::write(&backup, &raw).await?;
+    tokio::fs::write(&config_path, &updated).await?;
+    // Drop stale sibling overlay so product-first-fact rebuilds from fresh toml.
+    let overlay = home.join("gzmo-product-engine.toml");
+    if overlay.exists() {
+        let _ = tokio::fs::remove_file(&overlay).await;
+    }
+
+    eprintln!(
+        "  {GREEN}✔{RESET} Engine → {BOLD}{}{RESET} — {}",
+        ep.name, ep.url
+    );
+    eprintln!("  {DIM}model={model}{RESET}");
+    eprintln!("  {DIM}backup={}{RESET}", backup.display());
+    eprintln!();
+    Ok(())
+}
+
+fn patch_engine_block(toml: &str, url: &str, model: &str) -> Result<String> {
+    let mut out = String::with_capacity(toml.len() + 64);
+    let mut in_engine = false;
+    let mut saw_url = false;
+    let mut saw_model = false;
+    let mut engine_present = false;
+
+    for line in toml.lines() {
+        let trimmed = line.trim();
+        if trimmed.starts_with('[') && trimmed.ends_with(']') {
+            if in_engine {
+                if !saw_url {
+                    out.push_str(&format!("url = \"{url}\"\n"));
+                }
+                if !saw_model {
+                    out.push_str(&format!("model = \"{model}\"\n"));
+                }
+            }
+            in_engine = trimmed == "[engine]";
+            if in_engine {
+                engine_present = true;
+                saw_url = false;
+                saw_model = false;
+            }
+            out.push_str(line);
+            out.push('\n');
+            continue;
+        }
+        if in_engine {
+            if trimmed.starts_with("url") && trimmed.contains('=') {
+                out.push_str(&format!("url = \"{url}\"\n"));
+                saw_url = true;
+                continue;
+            }
+            if trimmed.starts_with("model") && trimmed.contains('=') {
+                out.push_str(&format!("model = \"{model}\"\n"));
+                saw_model = true;
+                continue;
+            }
+        }
+        out.push_str(line);
+        out.push('\n');
+    }
+    if in_engine {
+        if !saw_url {
+            out.push_str(&format!("url = \"{url}\"\n"));
+        }
+        if !saw_model {
+            out.push_str(&format!("model = \"{model}\"\n"));
+        }
+    }
+    if !engine_present {
+        out.push_str(&format!(
+            "\n[engine]\nprovider = \"local\"\nurl = \"{url}\"\nmodel = \"{model}\"\n"
+        ));
+    }
+    Ok(out)
 }
 
 // ─── Product path (default) ─────────────────────────────────────────────
@@ -627,4 +750,32 @@ You have no cloud dependencies. You are air-gapped by design.
 Direct, competent, low-ego. Like a senior engineer who respects your time.
 "#
     )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::patch_engine_block;
+
+    #[test]
+    fn patch_engine_rewrites_url_and_model_only() {
+        let raw = r#"# header
+[identity]
+persona_name = "GZMO"
+
+[engine]
+provider = "local"
+url = "http://127.0.0.1:1234/v1"
+model = "default"
+temperature = 0.3
+
+[memory]
+vault_db = "/tmp/v.db"
+"#;
+        let out = patch_engine_block(raw, "http://127.0.0.1:8000/v1", "ornith").unwrap();
+        assert!(out.contains("url = \"http://127.0.0.1:8000/v1\""));
+        assert!(out.contains("model = \"ornith\""));
+        assert!(out.contains("temperature = 0.3"));
+        assert!(out.contains("vault_db = \"/tmp/v.db\""));
+        assert!(!out.contains(":1234"));
+    }
 }

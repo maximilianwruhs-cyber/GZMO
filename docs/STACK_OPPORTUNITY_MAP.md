@@ -19,9 +19,9 @@ The singular asset is a **living overnight memory metabolism** with a **product 
 
 ## Recommended next three
 
-1. **Product stranger path** — `bash scripts/product-stranger-path.sh` → attach MCP in Cursor/Pi ([PRODUCT_MCP.md](PRODUCT_MCP.md))
-2. **Living takeaway→recall** — `bash scripts/ct101-takeaway-recall.sh` (same-sitting HIT on CT101)
-3. **Living faithfulness** — `bash scripts/faithfulness-living.sh` (CORE_INSIGHT / ADR claims)
+1. **Keep PRODUCT GREEN** — `bash scripts/product-readiness-gate.sh` ([PRODUCT_PRODUCTION_READINESS.md](PRODUCT_PRODUCTION_READINESS.md))
+2. **Ship/release hygiene** — tagged `gzmo` release stays installable via `install-gzmo.sh`
+3. **Operator living lane** — CT101 nights stay sole writer (`ct101-living-probe` / takeaway→recall)
 
 Park stays parked (Arena/€/HSP/AOS zoo). Doctrine: [SPINE_FOCUS.md](SPINE_FOCUS.md).
 

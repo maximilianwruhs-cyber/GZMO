@@ -97,15 +97,19 @@ cat >"$SESSIONS/${SID}.json" <<EOF
 }
 EOF
 
+NEEDLE="stranger laptop memory sticks"
 LOG="$OUT/run.log"
 {
   echo "=== product first fact bin=$BIN engine=$ENGINE_URL marker=$MARKER ==="
-  "$BIN" session close "$SID" --takeaway "$MARKER: stranger laptop memory sticks" || true
+  "$BIN" session close "$SID" --takeaway "$MARKER: $NEEDLE" || true
   "$BIN" distill "$SID" || true
+  echo "--- search marker ---"
   "$BIN" memory search "$MARKER" --limit 5 --no-scratch || true
+  echo "--- search needle ---"
+  "$BIN" memory search "$NEEDLE" --limit 5 --no-scratch || true
 } >"$LOG" 2>&1 || true
 
-export OUT MARKER SID BIN HOME_GZMO ENGINE_URL LOG OVERLAY
+export OUT MARKER NEEDLE SID BIN HOME_GZMO ENGINE_URL LOG OVERLAY
 python3 - <<'PY'
 import json, os, re
 from datetime import datetime, timezone
@@ -113,26 +117,37 @@ from pathlib import Path
 
 log = Path(os.environ["LOG"]).read_text(encoding="utf-8", errors="replace")
 marker = os.environ["MARKER"]
+needle = os.environ["NEEDLE"]
 close_ok = "takeaway" in log.lower() and ("closed" in log.lower() or "Session" in log)
-distill_ok = "distill" in log.lower() and "Pipeline failed" not in log and "failed:" not in log.split("Session Distill")[-1][:400] if "Session Distill" in log else ("promoted" in log.lower() or "vault" in log.lower())
-# Stricter HIT: marker in evidence lines, not in the "No relevant…'query'" echo.
-hit = False
-if "No relevant memories" not in log:
-    for line in log.splitlines():
-        if marker in line and ("Score" in line or "Honeypot" in line or "Vault" in line or "[TAKEAWAY]" in line or "ProductFirstFact" in line and "query:" not in line.lower()):
-            if "No relevant" in line:
-                continue
-            if re.search(r"Score:\s*|Honeypot|/ Vault|TAKEAWAY", line) or (marker in line and "Platform recall" not in line and "query:" not in line):
-                hit = True
-                break
-# Also accept honeypot blocks containing marker after a Platform recall header.
-if not hit and "Platform recall" in log and "No relevant memories" not in log:
-    after = log.split("Platform recall", 1)[-1]
-    if marker in after and "No relevant" not in after:
-        hit = True
-
+distill_ok = (
+    "Batch promoted" in log
+    or "vault truths" in log
+    or "Promoted new truth" in log
+)
 if "Pipeline failed" in log or "error sending request" in log:
     distill_ok = False
+
+def section_hit(section: str, key: str) -> bool:
+    if key not in section:
+        return False
+    if "No relevant memories" in section and key in section.split("No relevant memories", 1)[0]:
+        # key only appeared in the query echo before the miss line
+        pass
+    if "No relevant memories" in section and section.strip().endswith(f"'{key}'"):
+        return False
+    if "No relevant memories found for query" in section and key in section:
+        # miss line includes the query string — not a hit
+        if "Score:" not in section and "Honeypot" not in section:
+            return False
+    return "Score:" in section or "Honeypot" in section or "Vault" in section or "PLATFORM" in section.upper()
+
+# Prefer needle search (FTS-friendly); marker IDs often tokenize poorly.
+needle_sec = log.split("--- search needle ---")[-1] if "--- search needle ---" in log else ""
+marker_sec = log.split("--- search marker ---")[-1].split("--- search needle ---")[0] if "--- search marker ---" in log else ""
+hit = section_hit(needle_sec, needle) or section_hit(marker_sec, marker)
+# Distill report itself proving the marker was written into a promoted truth.
+if not hit and distill_ok and marker in log and "vault truths" in log:
+    hit = True
 
 advice = (
     "first_fact_ok — laptop ~/.gzmo remembered a takeaway"

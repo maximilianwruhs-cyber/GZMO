@@ -36,6 +36,14 @@ This:
 
 `gzmo init` scans localhost and **prefers Prime / llama.cpp on `:8000`** when up; otherwise falls back to LM Studio `:1234`. No LAN hosts. No remote living stack required.
 
+Refresh an existing home without wiping the vault:
+
+```bash
+gzmo init --refresh-engine
+```
+
+Production gate: `bash scripts/product-readiness-gate.sh` → [PRODUCT_PRODUCTION_READINESS.md](PRODUCT_PRODUCTION_READINESS.md).
+
 Manual fragment (if you skip the installer merge):
 
 ```json

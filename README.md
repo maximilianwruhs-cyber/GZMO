@@ -22,6 +22,8 @@ Writes SQLite-only `~/.gzmo/` (no LAN) and merges `gzmo-memory` into Cursor / Pi
 ./scripts/mcp-attach-check.sh        # Cursor/Pi point at ~/.gzmo (not CT101)
 # Optional feel-it (needs local LLM, e.g. Prime :8000):
 ./scripts/product-first-fact.sh
+# Production gate (exit 0 = PRODUCT GREEN):
+./scripts/product-readiness-gate.sh
 ```
 
 ### 3. Attach in the agent

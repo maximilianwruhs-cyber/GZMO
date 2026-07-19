@@ -26,6 +26,15 @@ This is already ADR-0003 / [CT101_BOUNDARY.md](CT101_BOUNDARY.md). Nightburst ar
 
 See the top of [STACK_OPPORTUNITY_MAP.md](STACK_OPPORTUNITY_MAP.md).
 
+## Production readiness (product)
+
+```bash
+bash scripts/product-readiness-gate.sh
+# GREEN → data-next/product-readiness/latest.json
+```
+
+See [PRODUCT_PRODUCTION_READINESS.md](PRODUCT_PRODUCTION_READINESS.md).
+
 ## Demable check (≈5 minutes)
 
 ```bash

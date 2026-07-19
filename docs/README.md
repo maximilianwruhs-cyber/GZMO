@@ -7,6 +7,7 @@ Canonical operator and architecture docs. Session reports and milestone logs bel
 | Doc | Purpose |
 |-----|---------|
 | [PRODUCT_MCP.md](PRODUCT_MCP.md) | **Outsider product** — Cursor/Pi local memory MCP (`gzmo init`) |
+| [PRODUCT_PRODUCTION_READINESS.md](PRODUCT_PRODUCTION_READINESS.md) | **Product GREEN gate** — laptop Memory MCP readiness |
 | [../README.md](../README.md) | Public product README (MCP-first) |
 | [../MACHINE.md](../MACHINE.md) | What GZMO is (two sentences) |
 | [ROADMAP_TO_M5.md](ROADMAP_TO_M5.md) | Milestone roadmap (operator) |
