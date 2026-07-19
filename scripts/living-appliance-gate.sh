@@ -96,11 +96,13 @@ probe_tcp() {
 
 REQUIRE_LIVE="${LIVING_APPLIANCE_REQUIRE_LIVE:-0}"
 PROBE_HOST="${LIVING_APPLIANCE_HOST:-127.0.0.1}"
+live_open=0
 for pair in "redis:6379" "qdrant:6333" "neo4j:7687"; do
   name="${pair%%:*}"
   port="${pair##*:}"
   if probe_tcp "$PROBE_HOST" "$port"; then
     row PASS "live:${name}" "${PROBE_HOST}:${port} open"
+    live_open=$((live_open + 1))
   else
     if [[ "$REQUIRE_LIVE" == "1" ]]; then
       row FAIL "live:${name}" "${PROBE_HOST}:${port} closed (required)"
@@ -109,6 +111,34 @@ for pair in "redis:6379" "qdrant:6333" "neo4j:7687"; do
     fi
   fi
 done
+
+# When all TCP ports are open (or live required), also require protocol smoke.
+if [[ "$live_open" -eq 3 || "$REQUIRE_LIVE" == "1" ]]; then
+  set +e
+  bash "$ROOT/scripts/living-appliance-smoke.sh" >>"$LOG" 2>&1
+  smoke_rc=$?
+  set -e
+  smoke_json="$DATA/living-appliance-smoke/latest.json"
+  advice="$(python3 -c "import json;print(json.load(open('$smoke_json')).get('advice',''))" 2>/dev/null || echo smoke_ran)"
+  smoke_hold="$(python3 -c "import json;print(json.load(open('$smoke_json')).get('counts',{}).get('hold',0))" 2>/dev/null || echo 0)"
+  if [[ "$smoke_rc" -ne 0 ]]; then
+    if [[ "$REQUIRE_LIVE" == "1" ]] || [[ "${LIVING_APPLIANCE_REQUIRE_SMOKE:-0}" == "1" ]]; then
+      row FAIL "protocol-smoke" "see data-next/living-appliance-smoke/"
+    else
+      row FAIL "protocol-smoke" "ports open but protocol smoke failed — see living-appliance-smoke/"
+    fi
+  elif [[ "$smoke_hold" != "0" ]]; then
+    if [[ "$REQUIRE_LIVE" == "1" ]] || [[ "${LIVING_APPLIANCE_REQUIRE_SMOKE:-0}" == "1" ]]; then
+      row FAIL "protocol-smoke" "$advice"
+    else
+      row HOLD "protocol-smoke" "$advice"
+    fi
+  else
+    row PASS "protocol-smoke" "$advice"
+  fi
+else
+  row HOLD "protocol-smoke" "skipped — not all sidecar ports open"
+fi
 
 export OUT pass fail hold COMPOSE
 python3 - <<'PY'

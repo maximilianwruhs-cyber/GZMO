@@ -142,6 +142,21 @@ else
   row FAIL "living-appliance-pin" "compose pin invalid — see docs/LIVING_APPLIANCE.md"
 fi
 
+# 9b) Goal C — protocol smoke (soft HOLD when sidecars down)
+bash "$ROOT/scripts/living-appliance-smoke.sh" >>"$LOG" 2>&1 || true
+if [[ -f "$DATA/living-appliance-smoke/latest.json" ]] \
+  && python3 -c "import json;d=json.load(open('$DATA/living-appliance-smoke/latest.json')); raise SystemExit(0 if d.get('ok') else 1)"; then
+  advice="$(python3 -c "import json;print(json.load(open('$DATA/living-appliance-smoke/latest.json')).get('advice',''))")"
+  hold_n="$(python3 -c "import json;print(json.load(open('$DATA/living-appliance-smoke/latest.json')).get('counts',{}).get('hold',0))")"
+  if [[ "$hold_n" != "0" ]]; then
+    row HOLD "living-appliance-smoke" "$advice"
+  else
+    row PASS "living-appliance-smoke" "$advice"
+  fi
+else
+  row FAIL "living-appliance-smoke" "protocol smoke failed — see docs/LIVING_APPLIANCE.md"
+fi
+
 # 10) Goal C — labeled gzmo-living attach (soft if not installed yet)
 bash "$ROOT/scripts/living-mcp-attach-check.sh" >>"$LOG" 2>&1 || true
 if python3 -c "import json;d=json.load(open('$DATA/living-mcp-attach/latest.json')); raise SystemExit(0 if d.get('ok') else 1)"; then

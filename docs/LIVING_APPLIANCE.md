@@ -22,9 +22,10 @@ Today that runs on **CT101** (`/opt/gzmo/` + `/opt/database-cluster`). Goal C ma
 | [`deploy/living-appliance/.env.example`](../deploy/living-appliance/.env.example) | `NEO4J_AUTH=neo4j/…` (copy to `.env`, gitignored) |
 | [`config/living-appliance.gzmo.toml.example`](../config/living-appliance.gzmo.toml.example) | Daemon `[redis]` / `[qdrant]` / Neo4j MCP fragment |
 | [`scripts/living-appliance-gate.sh`](../scripts/living-appliance-gate.sh) | Pin validity gate → `data-next/living-appliance/` |
+| [`scripts/living-appliance-smoke.sh`](../scripts/living-appliance-smoke.sh) | Protocol smoke (Redis PING / Qdrant ready / Neo4j auth) → `data-next/living-appliance-smoke/` |
 
 ```bash
-# One-shot sidecar bring-up + gate
+# One-shot sidecar bring-up + gate + smoke
 bash scripts/living-appliance-up.sh
 
 # Or manually:
@@ -32,6 +33,7 @@ cd deploy/living-appliance
 cp .env.example .env   # set NEO4J_AUTH
 docker compose up -d
 bash ../../scripts/living-appliance-gate.sh
+bash ../../scripts/living-appliance-smoke.sh
 ```
 
 This compose starts **sidecars only**. Pair with `gzmo-daemon` + `/opt/gzmo/gzmo.toml` (see [CT101_DEPLOY.md](./CT101_DEPLOY.md)).
@@ -66,7 +68,8 @@ Live `/opt/database-cluster/docker-compose.yml` historically embedded Neo4j auth
 
 ```bash
 bash scripts/living-appliance-gate.sh
+bash scripts/living-appliance-smoke.sh        # HOLD off-host; PASS after up
 bash scripts/living-mcp-attach-check.sh
 bash scripts/ct101-sync-living-appliance.sh   # stage pin under /opt/gzmo/current/…
-bash scripts/living-readiness-gate.sh         # includes appliance-pin + living-mcp rows
+bash scripts/living-readiness-gate.sh         # includes appliance-pin + smoke + living-mcp rows
 ```

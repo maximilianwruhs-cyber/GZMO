@@ -49,6 +49,10 @@ else
 fi
 
 bash "$ROOT/scripts/living-appliance-gate.sh" || true
+echo "[*] protocol smoke (Redis PING / Qdrant ready / Neo4j auth)…"
+# Soft by default: HOLD if not fully live; FAIL only on protocol mismatch.
+LIVING_APPLIANCE_REQUIRE_SMOKE="${LIVING_APPLIANCE_REQUIRE_SMOKE:-0}" \
+  bash "$ROOT/scripts/living-appliance-smoke.sh" || true
 
 echo ""
 echo "Next (daemon is separate):"
