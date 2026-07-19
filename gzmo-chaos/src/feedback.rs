@@ -34,6 +34,9 @@ pub enum ChaosEvent {
     /// Card forged — inject thought seed from card identity
     CardForged { name: String, card_type: String },
 
+    /// Pokemon card forged — inject thought seed
+    PkmForged { name: String, element: String },
+
     /// Poem generated — inject as thought for potential crystallization
     PoemGenerated { text: String },
 
@@ -117,6 +120,7 @@ impl ChaosEvent {
             }
             ChaosEvent::SoundFired { .. } => -1.0, // All sounds cost a bit of energy
             ChaosEvent::CardForged { .. } => -2.0, // Forging is taxing
+            ChaosEvent::PkmForged { .. } => -2.0,  // Forging is taxing
             ChaosEvent::PersonaShift { .. } => -3.0, // Identity shifts are expensive
             ChaosEvent::Custom { energy_delta, .. } => *energy_delta,
             _ => 0.0,
@@ -141,6 +145,10 @@ impl ChaosEvent {
             ChaosEvent::CardForged { name, card_type } => Some(ThoughtSeed {
                 category: "card".to_string(),
                 text: format!("{} ({})", name, card_type),
+            }),
+            ChaosEvent::PkmForged { name, element } => Some(ThoughtSeed {
+                category: "pkm".to_string(),
+                text: format!("{} ({})", name, element),
             }),
             ChaosEvent::PersonaShift { persona } => Some(ThoughtSeed {
                 category: "persona".to_string(),
