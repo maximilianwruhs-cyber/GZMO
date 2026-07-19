@@ -19,10 +19,12 @@ echo "=== mentor verify (headless pedagogy client) ==="
 rg -q 'mod mentor_cmd' gzmo-cli/src/main.rs && ok "main wires mentor_cmd" || bad "main missing mentor_cmd"
 rg -q 'Command::Mentor' gzmo-cli/src/main.rs && ok "Command::Mentor present" || bad "Mentor command missing"
 rg -q 'maybe_teach' gzmo-cli/src/pedagogy_bridge.rs && ok "PedagogyRuntime::maybe_teach present" || bad "maybe_teach missing"
-rg -q 'maybe_teach' gzmo-cli/src/chat.rs && bad "chat.rs unexpectedly calls maybe_teach (update docs)" \
-  || ok "chat.rs has no maybe_teach (Wave 2b gap documented)"
-rg -q 'maybe_teach' gzmo-cli/src/tui -g '*.rs' && bad "tui unexpectedly calls maybe_teach (update docs)" \
-  || ok "tui has no maybe_teach (Wave 2b gap documented)"
+rg -q 'maybe_teach' gzmo-cli/src/chat.rs && ok "chat.rs wires maybe_teach (Wave 2b)" \
+  || bad "chat.rs missing maybe_teach"
+rg -q 'should_delegate_exec' gzmo-cli/src/chat.rs && ok "chat.rs ops-delegates before mentor" \
+  || bad "chat.rs missing should_delegate_exec"
+rg -q 'maybe_teach' gzmo-cli/src/tui -g '*.rs' && bad "tui unexpectedly calls maybe_teach (still deferred)" \
+  || ok "tui has no maybe_teach (Wave 2b.1 still deferred)"
 
 TARGET_DIR="${CARGO_TARGET_DIR:-$HOME/github-clone/temp-bench/target}"
 GZMO_BIN="${GZMO_BIN:-}"

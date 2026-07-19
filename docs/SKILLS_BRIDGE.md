@@ -33,13 +33,12 @@
 | Surface | `maybe_teach` / pedagogy orchestrator |
 |---------|----------------------------------------|
 | `gzmo mentor` / mentor IPC | Yes — headless client + optional daemon socket |
-| `gzmo chat` | No inline `maybe_teach` today (slash skills only) |
-| `gzmo tui` | No (slash skills only) |
+| `gzmo chat` | Yes — Wave 2b mentor path before `run_agent_loop` |
+| `gzmo tui` | No (slash skills only; Wave 2b.1) |
 | `gzmo daemon` | No chat loop — mentor via Unix socket when wired |
 
-Demable smoke: `bash scripts/verify-mentor.sh`. Do not assume chat/TUI teach parity
-until Wave 2b lands. Chaos `pedagogy_oscillator` (Slice C.1) stays lab-only — never
-living overnight / PulseLoop on CT101.
+Demable smoke: `bash scripts/verify-mentor.sh`. Chaos `pedagogy_oscillator` (Slice C.1)
+stays lab-only — never living overnight / PulseLoop on CT101.
 
 ## Legendary packs
 

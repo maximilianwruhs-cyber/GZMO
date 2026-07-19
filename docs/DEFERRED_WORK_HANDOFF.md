@@ -17,14 +17,16 @@ This document is the **complete handoff** for four deferred items. Each section 
 | Area | Status | Key files |
 |------|--------|-----------|
 | Agentic Teacher stack | Shipped | `gzmo-core/src/pedagogy/*` |
-| Chat REPL mentor path | Shipped | `gzmo-cli/src/chat.rs`, `pedagogy_bridge.rs` |
+| Chat REPL mentor path | Shipped (Wave 2b) | `gzmo-cli/src/chat.rs` → `maybe_teach`; `pedagogy_bridge.rs` |
+| Headless mentor client | Shipped | `gzmo mentor` / `mentor_ipc.rs` |
 | Cheaper internal routing | Shipped | `TaskKind::PedagogyInternal`, `orchestrator.rs` |
 | Solution leakage retry | Shipped | `orchestrator.rs`, `edf.rs` |
 | Teachback (v1) | Shipped | `session.rs`, `learner.rs`, `config.teachback_interval` |
 | Definitive Dozen `/transform` | Shipped | `skills/characters.toml`, `skills/persona.rs`, `transform.rs` |
 | `/ops`, `/learn` Rust skills | Shipped | `skills/ops.rs`, `skills/learn.rs`, `registry.rs` |
 
-**Single integration surface today:** `gzmo chat` (stderr REPL). TUI and daemon do **not** call `maybe_teach()`.
+**Integration surfaces today:** `gzmo chat` (Wave 2b `maybe_teach`) and `gzmo mentor` / mentor IPC.
+TUI still does **not** call `maybe_teach()` (Wave 2b.1).
 
 ---
 
@@ -32,12 +34,14 @@ This document is the **complete handoff** for four deferred items. Each section 
 
 ### Problem
 
-Pedagogy is mentor-first in `gzmo chat`, but **every other interactive path** goes straight to `run_agent_loop()` — full tool agent, no Diagnoser→Planner→Affective→Tutor chain.
+Pedagogy is mentor-first in `gzmo chat` and headless `gzmo mentor`, but TUI goes straight to
+`run_agent_loop()` — full tool agent, no Diagnoser→Planner→Affective→Tutor chain.
 
 | Surface | Pedagogy orchestrator | `/ops` `/learn` skills | Learner tools | Learner suffix in system prompt |
 |---------|----------------------|------------------------|---------------|--------------------------------|
-| `gzmo chat` (`chat.rs`) | ✅ `maybe_teach` | ✅ + session sync | ✅ | ✅ |
-| `gzmo tui` (`tui/runner.rs` → `agent.rs`) | ❌ | ✅ slash only | ❌ | ❌ |
+| `gzmo chat` (`chat.rs`) | ✅ `maybe_teach` (Wave 2b) | ✅ + session sync | ✅ | ✅ |
+| `gzmo mentor` / IPC | ✅ `maybe_teach` | N/A (headless) | N/A | N/A |
+| `gzmo tui` (`tui/runner.rs` → `agent.rs`) | ❌ Wave 2b.1 | ✅ slash only | ❌ | ❌ |
 | `gzmo daemon` (`daemon_cmd.rs`) | ❌ | N/A (no chat loop) | ❌ | N/A |
 
 ### Current behavior (verified)

@@ -22,10 +22,13 @@ use gzmo_core::skills::register_pantheon;
 use gzmo_core::skills::{NestedDispatch, SkillRegistry as ChaosSkillRegistry};
 use gzmo_core::subagent::SubagentRunner;
 use gzmo_core::tools::delegate::DelegateTaskTool;
+use gzmo_core::tools::learner::{LearnerRecallTool, LearnerUpdateTool};
 use gzmo_core::tools::profile::{register_for_profile, CapabilityProfile, ToolRegisterOpts};
 use gzmo_core::tools::ToolRegistry;
 use gzmo_core::types::{EpisodicEntry, EpisodicSource, Message, Role};
 use gzmo_core::workflow_skills::{SharedWorkflowSession, WorkflowSkillIndex};
+
+use crate::pedagogy_bridge::{should_delegate_exec, PedagogyRuntime};
 
 // ─── ANSI escape helpers ─────────────────────────────────────────────
 const GOLD: &str = "\x1b[38;2;212;175;55m";
@@ -177,6 +180,12 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
     let router = GatewayRouter::new(&config);
     let chat_gateway_dyn = router.gateway(TaskKind::Chat);
 
+    // ─── Pedagogy (Wave 2b — mentor path before agent loop) ──────
+    let mut pedagogy_runtime = PedagogyRuntime::boot(&config).await?;
+    if config.pedagogy.enabled {
+        eprintln!("  {COPPER}⚙ Pedagogy: mentor path on (maybe_teach before agent loop){RESET}");
+    }
+
     // ─── Chaos Skills (Rust-native, priority over shell) ─────────
     let mut chaos_skills = ChaosSkillRegistry::new();
     register_pantheon(&mut chaos_skills, &config);
@@ -237,7 +246,7 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
         .ok()
         .and_then(|s| s.last_handoff.clone())
         .or_else(|| workflow_index.latest_handoff());
-    let system_prompt = crate::repl_shared::build_system_prompt_with_workflows(
+    let mut system_prompt = crate::repl_shared::build_system_prompt_with_workflows(
         &soul,
         memory_context.as_deref(),
         vault_context.as_deref(),
@@ -250,6 +259,12 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
         Some(workflow_index.as_ref()),
         last_handoff.as_deref(),
     );
+    if config.pedagogy.enabled {
+        let suffix = pedagogy_runtime.learner_prompt_suffix();
+        if !suffix.is_empty() {
+            system_prompt.push_str(&suffix);
+        }
+    }
 
     // ─── Session ─────────────────────────────────────────────────
     let session_mgr = SessionManager::new(&config.session_distill.sessions_dir);
@@ -288,6 +303,11 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
             scope: Some(agent_session.main_scope()),
             scope_cell: None,
         }));
+    }
+
+    if config.pedagogy.enabled {
+        tools.register(Box::new(LearnerRecallTool::new(&config.pedagogy)));
+        tools.register(Box::new(LearnerUpdateTool::new(&config.pedagogy)));
     }
 
     let mut messages: Vec<Message> = vec![Message {
@@ -473,6 +493,12 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
                     }
                 }
             }
+            // Keep pedagogy session in sync after /ops, /learn, etc.
+            if config.pedagogy.enabled {
+                if let Err(e) = pedagogy_runtime.reload_from_disk().await {
+                    eprintln!("  {DIM}⚙ pedagogy reload: {e}{RESET}");
+                }
+            }
             // Reprint prompt after slash command
             eprint!("\n  {GOLD}★{RESET} {PARCHMENT}{BOLD}you ›{RESET} ");
             io::stderr().flush()?;
@@ -500,7 +526,7 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
             let live_soul = identity.snapshot().await;
             if live_soul.loaded_at != soul.loaded_at {
                 eprintln!("  {COPPER}⚙ SOUL.md hot-reloaded — persona: {}{RESET}", live_soul.persona_name);
-                let new_prompt = format!(
+                let mut new_prompt = format!(
                     "{}\n\n---\nYou are {}. Today is {}.\nAvailable tools: {}",
                     live_soul.raw_markdown,
                     live_soul.persona_name,
@@ -508,6 +534,12 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
                     if tools.is_empty() { "none".to_string() }
                     else { tools.definitions().iter().map(|d| d.name.clone()).collect::<Vec<_>>().join(", ") }
                 );
+                if config.pedagogy.enabled {
+                    let suffix = pedagogy_runtime.learner_prompt_suffix();
+                    if !suffix.is_empty() {
+                        new_prompt.push_str(&suffix);
+                    }
+                }
                 if !messages.is_empty() {
                     messages[0].content = new_prompt;
                 }
@@ -548,6 +580,74 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
                 content: chaos_ctx,
                 is_meta: true, tool_calls: None, tool_call_id: None,
             });
+        }
+
+        // ─── Pedagogy mentor path (Wave 2b) ──────────────────
+        // Socratic turns skip the tool agent loop; ops intent falls through.
+        if config.pedagogy.enabled && !should_delegate_exec(&pedagogy_runtime.session, &input)
+        {
+            let chaos_context = if chaos_enabled {
+                let snap = chaos_snapshot_rx.borrow().clone();
+                Some(format!(
+                    "valence={:.2} energy={:.0} tension={:.0}",
+                    snap.llm_valence, snap.energy, snap.tension
+                ))
+            } else {
+                None
+            };
+            let tutor = router.gateway(TaskKind::Chat);
+            let start = std::time::Instant::now();
+            match pedagogy_runtime
+                .maybe_teach(
+                    &config,
+                    &router,
+                    tutor.as_ref(),
+                    &input,
+                    &messages,
+                    chaos_context.as_deref(),
+                    None,
+                    if chaos_enabled {
+                        Some(&chaos_snapshot_rx)
+                    } else {
+                        None
+                    },
+                )
+                .await
+            {
+                Ok(Some(turn)) => {
+                    eprintln!("  {DIM}⚙ pedagogy orchestrator | mentor mode{RESET}");
+                    eprint!("{}", turn.response);
+                    eprintln!();
+                    messages.push(Message {
+                        role: Role::Assistant,
+                        content: turn.response.clone(),
+                        is_meta: false,
+                        tool_calls: None,
+                        tool_call_id: None,
+                    });
+                    eprintln!(
+                        "  {DIM}⚙ {:.1}s | mentor (no agent loop){RESET}",
+                        start.elapsed().as_secs_f64()
+                    );
+                    let _ = episodic
+                        .append(&EpisodicEntry {
+                            timestamp: Utc::now(),
+                            source: EpisodicSource::InternalMonologue,
+                            content: turn.response,
+                            is_silent: false,
+                        })
+                        .await;
+                    eprint!("\n  {GOLD}★{RESET} {PARCHMENT}{BOLD}you ›{RESET} ");
+                    io::stderr().flush()?;
+                    continue;
+                }
+                Ok(None) => {}
+                Err(e) => {
+                    eprintln!(
+                        "  {DIM}⚙ pedagogy failed ({e}); falling through to agent loop{RESET}"
+                    );
+                }
+            }
         }
 
         // ─── Agent loop ─────────────────────────────────────
