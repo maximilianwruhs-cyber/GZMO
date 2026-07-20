@@ -70,6 +70,18 @@ bash scripts/opportunity-discovery-check.sh
 Mutual-discovery / auto-Socratic is **pedagogy theater** — demoted for living KPI ([MUTUAL_DISCOVERY_THEATER.md](./MUTUAL_DISCOVERY_THEATER.md)).  
 This cycle may *borrow* a Socratic grill for one bet’s stress-test; it must not spawn mentor cycles as health.
 
+## What is automated (and what is not)
+
+| Layer | Automated? | How |
+|-------|------------|-----|
+| Sense / Rank / cadence scripts | Yes | `opportunity-sense.sh`, `rank`, `serendipity-cadence.sh` (cron or local) |
+| Bet log + mission card emit | Yes | `opportunity-next-mission.sh` → `data-next/opportunity-discovery/next-mission.md` |
+| PR CI babysit | Yes (if enabled) | Cursor Automation **GZMO PR ship babysitter** — runs **after** a PR exists |
+| Starting a new Cloud/IDE agent on the active bet | **No** (unless you add a cron Automation that pastes the mission card) | Still needs one kickoff **or** a scheduled Automation you turn on |
+| Human “continue” in chat | Reduced | User rule **Finish through without babysitting** |
+
+So: the *process* is scripted and PR-babysittable; **mission start** is either you saying go once, or a Cursor cron Automation wired to `opportunity-next-mission.sh` + agent prompt.
+
 ## Success
 
 - Bet log has ≥1 `active` or recently `soaked` bet aligned to USP  
