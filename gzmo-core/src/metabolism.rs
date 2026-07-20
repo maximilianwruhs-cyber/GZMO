@@ -25,6 +25,71 @@ pub struct JobRunRecord {
     /// Typed runner marker (`rust` vs lab script name).
     #[serde(default)]
     pub runner: Option<String>,
+    /// UTC calendar night key tying dream (01:00) + spark (03:30).
+    #[serde(default)]
+    pub night_id: Option<String>,
+}
+
+/// UTC date (`YYYY-MM-DD`) used as the learning-loop night identity.
+pub fn night_id_for(now: DateTime<Utc>) -> String {
+    now.format("%Y-%m-%d").to_string()
+}
+
+/// Jobs that close the Phase A dream→spark operator ring.
+pub const LEARNING_LOOP_JOBS: &[&str] = &["dream", "spark"];
+
+/// Upsert `learning-loop-{night_id}.json` + `latest-learning-loop.json`.
+pub fn upsert_learning_loop_night(
+    dir: &Path,
+    night_id: &str,
+    job: &str,
+    ok: bool,
+    artifact: Option<&str>,
+) {
+    if !LEARNING_LOOP_JOBS.contains(&job) {
+        return;
+    }
+    let _ = std::fs::create_dir_all(dir);
+    let path = dir.join(format!("learning-loop-{night_id}.json"));
+    let mut surface: serde_json::Value = std::fs::read_to_string(&path)
+        .ok()
+        .and_then(|raw| serde_json::from_str(&raw).ok())
+        .unwrap_or_else(|| {
+            serde_json::json!({
+                "schema": "gzmo.learning_loop.night/v1",
+                "night_id": night_id,
+                "jobs": {},
+                "ring_slots": LEARNING_LOOP_JOBS,
+                "complete": false,
+            })
+        });
+    surface["schema"] = serde_json::json!("gzmo.learning_loop.night/v1");
+    surface["night_id"] = serde_json::json!(night_id);
+    surface["ring_slots"] = serde_json::json!(LEARNING_LOOP_JOBS);
+    let mut entry = serde_json::json!({
+        "job": job,
+        "ok": ok,
+        "updated_at": Utc::now().to_rfc3339(),
+    });
+    if let Some(a) = artifact {
+        entry["artifact"] = serde_json::json!(a);
+    }
+    if surface.get("jobs").and_then(|j| j.as_object()).is_none() {
+        surface["jobs"] = serde_json::json!({});
+    }
+    surface["jobs"][job] = entry;
+    let complete = LEARNING_LOOP_JOBS.iter().all(|slot| {
+        surface["jobs"]
+            .get(*slot)
+            .and_then(|v| v.get("ok"))
+            .and_then(|v| v.as_bool())
+            == Some(true)
+    });
+    surface["complete"] = serde_json::json!(complete);
+    surface["updated_at"] = serde_json::json!(Utc::now().to_rfc3339());
+    let text = serde_json::to_string_pretty(&surface).unwrap_or_default() + "\n";
+    let _ = std::fs::write(&path, &text);
+    let _ = std::fs::write(dir.join("latest-learning-loop.json"), text);
 }
 
 pub fn runs_dir(config: &GzmoConfig) -> PathBuf {
@@ -49,6 +114,7 @@ pub fn write_job_run(
     let finished = Utc::now();
     let stamp = finished.format("%Y%m%dT%H%M%SZ");
     let path = dir.join(format!("{job}-{stamp}.json"));
+    let night_id = night_id_for(finished);
     let payload = JobRunRecord {
         job: job.to_string(),
         script: runner.to_string(),
@@ -58,6 +124,7 @@ pub fn write_job_run(
         ok,
         error,
         runner: Some(runner.to_string()),
+        night_id: Some(night_id.clone()),
     };
     let _ = std::fs::write(
         &path,
@@ -68,6 +135,13 @@ pub fn write_job_run(
     // Also maintain per-job latest for status aggregation.
     let job_latest = dir.join(format!("latest-{job}.json"));
     let _ = std::fs::copy(&path, &job_latest);
+    upsert_learning_loop_night(
+        &dir,
+        &night_id,
+        job,
+        ok,
+        Some(path.to_string_lossy().as_ref()),
+    );
     path
 }
 
@@ -590,6 +664,7 @@ mod tests {
             ok: true,
             error: None,
             runner: Some("rust".into()),
+            night_id: Some("2026-07-16".into()),
         };
         fs::write(
             runs.join("latest-distill.json"),
@@ -636,6 +711,7 @@ mod tests {
                 ok: true,
                 error: None,
                 runner: Some("rust".into()),
+                night_id: Some("2020-01-01".into()),
             };
             fs::write(
                 runs.join(format!("latest-{job}.json")),
@@ -652,6 +728,38 @@ mod tests {
         std::env::remove_var("GZMO_METABOLISM_STALE_SECS");
         assert!(wd.stale);
         assert!(wd.detail.contains("distill"));
+
+        let _ = fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn learning_loop_night_ties_dream_and_spark() {
+        let root = std::env::temp_dir().join(format!(
+            "gzmo-ll-night-{}-{}",
+            std::process::id(),
+            Utc::now().timestamp_nanos_opt().unwrap_or(0)
+        ));
+        let _ = fs::remove_dir_all(&root);
+        let runs = root.join("scheduler-runs");
+        fs::create_dir_all(&runs).unwrap();
+
+        let night = "2026-07-20";
+        upsert_learning_loop_night(&runs, night, "dream", true, Some("dream.json"));
+        let mid: serde_json::Value = serde_json::from_str(
+            &fs::read_to_string(runs.join("latest-learning-loop.json")).unwrap(),
+        )
+        .unwrap();
+        assert_eq!(mid["night_id"], night);
+        assert_eq!(mid["complete"], false);
+
+        upsert_learning_loop_night(&runs, night, "spark", true, Some("spark.json"));
+        let done: serde_json::Value = serde_json::from_str(
+            &fs::read_to_string(runs.join(format!("learning-loop-{night}.json"))).unwrap(),
+        )
+        .unwrap();
+        assert_eq!(done["complete"], true);
+        assert_eq!(done["jobs"]["dream"]["ok"], true);
+        assert_eq!(done["jobs"]["spark"]["ok"], true);
 
         let _ = fs::remove_dir_all(&root);
     }
