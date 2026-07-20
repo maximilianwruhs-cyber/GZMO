@@ -345,11 +345,13 @@ pub async fn format_ecosystem_status(config: &GzmoConfig) -> String {
                     let anchor = v
                         .pointer("/selection/anchor/content")
                         .and_then(|x| x.as_str())
+                        .or_else(|| v.get("anchor_preview").and_then(|x| x.as_str()))
                         .unwrap_or("(none)");
                     let stale = v
                         .pointer("/selection/stale_sweetness")
                         .and_then(|x| x.as_f64());
                     let verdict = v.pointer("/verdict/supported").and_then(|x| x.as_bool());
+                    let promoted = v.get("promoted").and_then(|x| x.as_bool());
                     let dry = v.get("dry_run").and_then(|x| x.as_bool());
                     let date = v.get("date").and_then(|x| x.as_str()).unwrap_or("?");
                     out.push_str(&format!("- **Date:** {date}\n"));
@@ -364,13 +366,16 @@ pub async fn format_ecosystem_status(config: &GzmoConfig) -> String {
                     if let Some(s) = stale {
                         out.push_str(&format!("- **stale_sweetness:** {s:.2}\n"));
                     }
+                    if let Some(p) = promoted {
+                        out.push_str(&format!("- **promoted:** {p}\n"));
+                    }
                     match verdict {
                         Some(true) => out.push_str("- **Verdict:** supported\n"),
                         Some(false) => out.push_str("- **Verdict:** not supported\n"),
                         None => {
                             if let Some(skip) = v.get("skip_reason").and_then(|x| x.as_str()) {
                                 out.push_str(&format!("- **Skip:** {skip}\n"));
-                            } else {
+                            } else if promoted.is_none() {
                                 out.push_str("- **Verdict:** (dry-run / none)\n");
                             }
                         }
@@ -379,6 +384,37 @@ pub async fn format_ecosystem_status(config: &GzmoConfig) -> String {
                         out.push_str(&format!("- **dry_run:** {d}\n"));
                     }
                     out.push_str(&format!("- **Path:** `{}`\n\n", sp.display()));
+                }
+            }
+        }
+    }
+
+    // Night lymph — compact overnight filtrate
+    if let Some(dir) = config.memory.vault_db.parent() {
+        let lymph_path = dir.join("night-lymph/latest.json");
+        if lymph_path.exists() {
+            if let Ok(raw) = std::fs::read_to_string(&lymph_path) {
+                if let Ok(v) = serde_json::from_str::<serde_json::Value>(&raw) {
+                    out.push_str("### Night lymph\n\n");
+                    let night = v.get("night_id").and_then(|x| x.as_str()).unwrap_or("?");
+                    out.push_str(&format!("- **Night:** {night}\n"));
+                    if let Some(d) = v.get("dream") {
+                        let truths = d.get("truths_promoted").and_then(|x| x.as_u64()).unwrap_or(0);
+                        let ents = d.get("entities").and_then(|x| x.as_u64()).unwrap_or(0);
+                        out.push_str(&format!("- **Dream:** entities={ents} truths={truths}\n"));
+                    }
+                    let sparks = v
+                        .get("sparks")
+                        .and_then(|x| x.as_array())
+                        .map(|a| a.len())
+                        .unwrap_or(0);
+                    out.push_str(&format!("- **Sparks logged:** {sparks}\n"));
+                    let immune_n = v
+                        .get("immune_candidates")
+                        .and_then(|x| x.as_u64())
+                        .unwrap_or(0);
+                    out.push_str(&format!("- **Immune candidates:** {immune_n}\n"));
+                    out.push_str(&format!("- **Path:** `{}`\n\n", lymph_path.display()));
                 }
             }
         }

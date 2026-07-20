@@ -13,6 +13,7 @@ use crate::config::{
     EmbeddingsConfig, GzmoConfig, PlatformSearchConfig, QdrantConfig, RedisConfig, RerankConfig,
 };
 use crate::memory::embeddings;
+use crate::memory::felt_use::{self, FeltUseKind};
 use crate::memory::profile::{GzmoProfile, ProfileOptions};
 use crate::memory::scratch::{RecallSnippet, ScratchScope, ScratchService};
 use crate::memory::vault::SqliteVault;
@@ -198,6 +199,18 @@ impl PlatformMemory {
                 .await?;
         }
 
+        // Felt Use: Cited when scratch written, else Glance for ranked hits.
+        let kind = if scratch_written {
+            FeltUseKind::Cited
+        } else {
+            FeltUseKind::Glance
+        };
+        felt_use::touch_hits(
+            &self.vault,
+            items.iter().map(|h| h.fact_id.as_ref()),
+            kind,
+        );
+
         Ok(MemorySearchResult {
             query: query.to_string(),
             hits,
@@ -304,6 +317,11 @@ pub async fn memory_search_into_scratch(
             })
             .collect();
         scratch.write(scope, snippets).await?;
+        felt_use::touch_hits(
+            vault,
+            results.iter().map(|(f, _)| Some(&f.id)),
+            FeltUseKind::Cited,
+        );
     }
     Ok(text)
 }

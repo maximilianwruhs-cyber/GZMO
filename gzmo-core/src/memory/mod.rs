@@ -5,6 +5,7 @@
 pub mod embeddings;
 pub mod episodic;
 pub mod evidence_localize;
+pub mod felt_use;
 pub mod filter;
 pub mod honeypot;
 pub mod kg_extract;

@@ -1543,6 +1543,26 @@ pub struct SparkConfig {
     /// Session anchors older than this many days are skipped (parsed from `[Session YYYY-MM-DD …]`).
     #[serde(default = "default_spark_max_session_anchor_age_days")]
     pub max_session_anchor_age_days: u32,
+
+    /// How many recent spark anchors the refractory field retains.
+    #[serde(default = "default_spark_refractory_slots")]
+    pub refractory_slots: usize,
+
+    /// Exponential half-life (hours) for refractory suppression.
+    #[serde(default = "default_spark_refractory_half_life_hours")]
+    pub refractory_half_life_hours: f64,
+
+    /// Strength of refractory penalty in `[0, 1]` (1 = full suppress).
+    #[serde(default = "default_spark_refractory_strength")]
+    pub refractory_strength: f64,
+
+    /// Soft-pick among this many top-scored anchors (1 = greedy).
+    #[serde(default = "default_spark_soft_pick_top_k")]
+    pub soft_pick_top_k: usize,
+
+    /// Softmax temperature for soft-pick (0 = always take top score).
+    #[serde(default = "default_spark_soft_pick_temperature")]
+    pub soft_pick_temperature: f64,
 }
 
 fn default_spark_anchor_decay_classes() -> Vec<String> {
@@ -1587,6 +1607,26 @@ fn default_spark_exclude_anchor_substrings() -> Vec<String> {
 
 fn default_spark_max_session_anchor_age_days() -> u32 {
     14
+}
+
+fn default_spark_refractory_slots() -> usize {
+    48
+}
+
+fn default_spark_refractory_half_life_hours() -> f64 {
+    72.0
+}
+
+fn default_spark_refractory_strength() -> f64 {
+    0.85
+}
+
+fn default_spark_soft_pick_top_k() -> usize {
+    8
+}
+
+fn default_spark_soft_pick_temperature() -> f64 {
+    0.35
 }
 
 fn default_spark_dice_min() -> u32 {
@@ -1638,6 +1678,11 @@ impl Default for SparkConfig {
             min_anchor_recent_similarity: default_spark_min_anchor_recent_similarity(),
             recent_dedupe_similarity: default_spark_recent_dedupe_similarity(),
             max_session_anchor_age_days: default_spark_max_session_anchor_age_days(),
+            refractory_slots: default_spark_refractory_slots(),
+            refractory_half_life_hours: default_spark_refractory_half_life_hours(),
+            refractory_strength: default_spark_refractory_strength(),
+            soft_pick_top_k: default_spark_soft_pick_top_k(),
+            soft_pick_temperature: default_spark_soft_pick_temperature(),
         }
     }
 }
