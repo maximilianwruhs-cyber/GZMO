@@ -59,9 +59,11 @@ Build **on CT101** (workstation glibc is newer — scp’d binaries fail with `G
 ```bash
 rsync -az --exclude target --exclude .git \
   /home/gzmo/github-clone/GZMO/ ct101:/opt/gzmo/current/
+# Force-sync Rust sources when partial trees lag (memory/*.rs especially):
+rsync -az gzmo-core/src/ ct101:/opt/gzmo/current/gzmo-core/src/
 ssh ct101 'bash -lc "
   cd /opt/gzmo/current && cargo build --release -p gzmo-cli
-  chmod +x scripts/ingest-quality/gate-pre-deploy.sh
+  chmod +x scripts/ingest-quality/gate-pre-deploy.sh   # required — rsync drops +x
   systemctl restart gzmo-daemon
 "'
 ```

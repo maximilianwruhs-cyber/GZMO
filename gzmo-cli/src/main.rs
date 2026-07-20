@@ -14,6 +14,7 @@ mod distill_cmd;
 mod dream_cmd;
 mod embed_cmd;
 mod health_cmd;
+mod immune_cmd;
 mod ingest_cmd;
 mod ingest_dir_cmd;
 mod ingest_eval_cmd;
@@ -60,6 +61,8 @@ enum Command {
     },
     /// One-shot spark (serendipitous recall) for an optional date (default: today).
     Spark(Option<NaiveDate>),
+    /// Plan-only immune patrol (`gzmo immune plan`) — never mutates vault.
+    ImmunePlan,
     Ingest {
         path: std::path::PathBuf,
         dry_run: bool,
@@ -165,6 +168,13 @@ fn parse_args() -> Command {
                 .get(2)
                 .and_then(|s| NaiveDate::parse_from_str(s, "%Y-%m-%d").ok());
             return Command::Spark(date);
+        }
+        if args[1] == "immune" {
+            if args.get(2).map(String::as_str) == Some("plan") {
+                return Command::ImmunePlan;
+            }
+            eprintln!("Usage: gzmo immune plan");
+            std::process::exit(2);
         }
         if args[1] == "ingest" {
             let mut dry_run = false;
@@ -283,6 +293,7 @@ async fn main() -> Result<()> {
         Command::Dream(_) => "info",
         Command::DreamCompact { .. } => "info",
         Command::Spark(_) => "info",
+        Command::ImmunePlan => "info",
         Command::Ingest { .. } => "info",
         Command::IngestDir(_) => "info",
         Command::IngestEval(_) => "info",
@@ -402,6 +413,7 @@ async fn main() -> Result<()> {
             dry_run,
         } => dream_cmd::run_compact(&config, max_chars, archive_sessions_days, dry_run).await,
         Command::Spark(date) => spark_cmd::run(&config, identity.as_ref().unwrap(), date).await,
+        Command::ImmunePlan => immune_cmd::run_plan(&config).await,
         Command::Ingest { path, dry_run } => {
             ingest_cmd::run(
                 &config,

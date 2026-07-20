@@ -1,6 +1,6 @@
 {
   "schema": "gzmo.faithfulness.claims/v1",
-  "description": "Living CT101 vault claims (CORE_INSIGHT / ADR-0003). Run via FAITHFULNESS_MODE=vault against CT101.",
+  "description": "Living CT101 vault claims (CORE_INSIGHT / ADR / metabolism). Soft gate via faithfulness-living.sh.",
   "claims": [
     {
       "id": "adr0003-living",
@@ -31,6 +31,48 @@
       "claim": "Never enable workstation gzmo-serve overnight while CT101 lives",
       "query": "Never enable workstation gzmo-serve overnight",
       "needle": "gzmo-serve overnight"
+    },
+    {
+      "id": "pipeline-sentence",
+      "claim": "GZMO is a distillation pipeline, not a chatbot with memory bolted on",
+      "query": "distillation pipeline not a chatbot",
+      "needle": "distillation"
+    },
+    {
+      "id": "spark-serendipity",
+      "claim": "Spark revisits stale curated anchors for serendipitous links",
+      "query": "spark stale anchor serendipity",
+      "needle": "spark"
+    },
+    {
+      "id": "dream-consolidate",
+      "claim": "Dream consolidates episodic logs into verified_dream vault truths",
+      "query": "dream consolidation verified_dream",
+      "needle": "dream"
+    },
+    {
+      "id": "qdrant-honeypot",
+      "claim": "Qdrant mirrors the honeypot collection for recall",
+      "query": "Qdrant honeypot collection",
+      "needle": "honeypot"
+    },
+    {
+      "id": "product-mcp-boundary",
+      "claim": "Product gzmo-memory MCP must not point at the living CT101 vault",
+      "query": "product MCP living vault boundary",
+      "needle": "vault"
+    },
+    {
+      "id": "four-layers",
+      "claim": "GZMO memory has four layers including honeypot and vault",
+      "query": "four memory layers GZMO",
+      "needle": "memory"
+    },
+    {
+      "id": "session-distill",
+      "claim": "SessionDistill promotes takeaways into curated memory",
+      "query": "SessionDistill takeaway",
+      "needle": "SessionDistill"
     }
   ]
 }
