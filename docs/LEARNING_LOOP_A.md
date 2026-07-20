@@ -73,7 +73,18 @@ bash little-tools-lab/scripts/cognition-smoke.sh --fixture --aged-vault \
 # Expect: spark_mode=aged_vault_dry_run, spark_selected=true, phase_a_proof=true
 ```
 
+## Organic maturity census (read-only)
+
+```bash
+python3 little-tools-lab/scripts/vault-maturity-census.py \
+  --vault data-next/vault.db -o /tmp/vault-maturity.json
+# cognition-smoke auto-attaches this into learning_loop when VAULT_PATH exists:
+#   classic_window_ready, anchor_band_14_90, recent_lt_3d, …
+```
+
+Organic path is **ready** when `classic_window_ready=true` (≥1 latest honeypot in [14,90]d and ≥1 <3d). Until then use `--aged-vault` for the mature-window proof.
+
 ## Still open
 
-1. Organic `data-next` vault that naturally ages into the 14–90d band (no seed script)
+1. Wait for organic `data-next` band to thicken (census already reports progress)
 2. Unified scheduler run-id tying 01:00 dream + 03:30 cognition into one operator surface
