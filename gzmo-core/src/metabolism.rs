@@ -135,7 +135,13 @@ pub fn write_job_run(
     // Also maintain per-job latest for status aggregation.
     let job_latest = dir.join(format!("latest-{job}.json"));
     let _ = std::fs::copy(&path, &job_latest);
-    upsert_learning_loop_night(&dir, &night_id, job, ok, Some(path.to_string_lossy().as_ref()));
+    upsert_learning_loop_night(
+        &dir,
+        &night_id,
+        job,
+        ok,
+        Some(path.to_string_lossy().as_ref()),
+    );
     path
 }
 
@@ -739,16 +745,18 @@ mod tests {
 
         let night = "2026-07-20";
         upsert_learning_loop_night(&runs, night, "dream", true, Some("dream.json"));
-        let mid: serde_json::Value =
-            serde_json::from_str(&fs::read_to_string(runs.join("latest-learning-loop.json")).unwrap())
-                .unwrap();
+        let mid: serde_json::Value = serde_json::from_str(
+            &fs::read_to_string(runs.join("latest-learning-loop.json")).unwrap(),
+        )
+        .unwrap();
         assert_eq!(mid["night_id"], night);
         assert_eq!(mid["complete"], false);
 
         upsert_learning_loop_night(&runs, night, "spark", true, Some("spark.json"));
-        let done: serde_json::Value =
-            serde_json::from_str(&fs::read_to_string(runs.join(format!("learning-loop-{night}.json"))).unwrap())
-                .unwrap();
+        let done: serde_json::Value = serde_json::from_str(
+            &fs::read_to_string(runs.join(format!("learning-loop-{night}.json"))).unwrap(),
+        )
+        .unwrap();
         assert_eq!(done["complete"], true);
         assert_eq!(done["jobs"]["dream"]["ok"], true);
         assert_eq!(done["jobs"]["spark"]["ok"], true);

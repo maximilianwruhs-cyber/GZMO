@@ -112,13 +112,7 @@ fn write_job_result(
     let _ = std::fs::copy(&path, &latest);
     let job_latest = dir.join(format!("latest-{job}.json"));
     let _ = std::fs::copy(&path, &job_latest);
-    upsert_learning_loop_night(
-        &dir,
-        &night_id,
-        job,
-        ok,
-        &path.display().to_string(),
-    );
+    upsert_learning_loop_night(&dir, &night_id, job, ok, &path.display().to_string());
     info!(job, night_id, path = %path.display(), ok, "job result recorded");
 }
 
