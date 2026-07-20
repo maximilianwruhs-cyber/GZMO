@@ -29,6 +29,50 @@ fn runs_dir(cfg: &SchedulerConfig) -> PathBuf {
         .join("scheduler-runs")
 }
 
+/// Upsert Phase A learning-loop night surface (dream 01:00 + spark 03:30).
+fn upsert_learning_loop_night(dir: &Path, night_id: &str, job: &str, ok: bool, artifact: &str) {
+    if job != "dream" && job != "spark" {
+        return;
+    }
+    let path = dir.join(format!("learning-loop-{night_id}.json"));
+    let mut surface = std::fs::read_to_string(&path)
+        .ok()
+        .and_then(|raw| serde_json::from_str::<serde_json::Value>(&raw).ok())
+        .unwrap_or_else(|| {
+            json!({
+                "schema": "gzmo.learning_loop.night/v1",
+                "night_id": night_id,
+                "jobs": {},
+                "ring_slots": ["dream", "spark"],
+                "complete": false,
+            })
+        });
+    surface["schema"] = json!("gzmo.learning_loop.night/v1");
+    surface["night_id"] = json!(night_id);
+    surface["ring_slots"] = json!(["dream", "spark"]);
+    if surface.get("jobs").and_then(|j| j.as_object()).is_none() {
+        surface["jobs"] = json!({});
+    }
+    surface["jobs"][job] = json!({
+        "job": job,
+        "ok": ok,
+        "artifact": artifact,
+        "updated_at": Utc::now().to_rfc3339(),
+    });
+    let complete = ["dream", "spark"].iter().all(|slot| {
+        surface["jobs"]
+            .get(*slot)
+            .and_then(|v| v.get("ok"))
+            .and_then(|v| v.as_bool())
+            == Some(true)
+    });
+    surface["complete"] = json!(complete);
+    surface["updated_at"] = json!(Utc::now().to_rfc3339());
+    let text = serde_json::to_string_pretty(&surface).unwrap_or_default() + "\n";
+    let _ = std::fs::write(&path, &text);
+    let _ = std::fs::write(dir.join("latest-learning-loop.json"), text);
+}
+
 fn write_job_result(
     cfg: &SchedulerConfig,
     job: &str,
@@ -45,6 +89,7 @@ fn write_job_result(
     }
     let finished = Utc::now();
     let stamp = finished.format("%Y%m%dT%H%M%SZ");
+    let night_id = finished.format("%Y-%m-%d").to_string();
     let path = dir.join(format!("{job}-{stamp}.json"));
     let payload = json!({
         "job": job,
@@ -54,6 +99,7 @@ fn write_job_result(
         "finished": finished.to_rfc3339(),
         "ok": ok,
         "error": error,
+        "night_id": night_id,
     });
     if let Err(e) = std::fs::write(
         &path,
@@ -66,7 +112,14 @@ fn write_job_result(
     let _ = std::fs::copy(&path, &latest);
     let job_latest = dir.join(format!("latest-{job}.json"));
     let _ = std::fs::copy(&path, &job_latest);
-    info!(job, path = %path.display(), ok, "job result recorded");
+    upsert_learning_loop_night(
+        &dir,
+        &night_id,
+        job,
+        ok,
+        &path.display().to_string(),
+    );
+    info!(job, night_id, path = %path.display(), ok, "job result recorded");
 }
 
 async fn run_gzmo_job(

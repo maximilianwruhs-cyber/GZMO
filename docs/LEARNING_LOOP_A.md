@@ -1,6 +1,6 @@
 # Phase A learning loop — closure criteria (lab / GZMO-next)
 
-**Status:** deepen dream/spark **wiring**, not a new little-tool organ.  
+**Status:** **CLOSED** (2026-07-20) — dream/spark wiring + measurement complete; not a new little-tool organ.  
 **Archaeology:** pick #6 (`75eb5004`, `6eaf665f`) — highest impact / lowest risk.  
 **Boundary:** `data-next/` + LTL recipes only. Never CT101 vault import; no daemon `dice_loop`.
 
@@ -21,6 +21,8 @@ session-distill → honeypot-gate / promote → dream (01:00 recipe)
 | Spark can select | `data-next/spark/last-spark-report.json` has non-null `selection` (not perpetual “No viable anchor”) |
 | Young vaults | cognition-smoke vault path uses `--anchor-window 0,30` by default (`SPARK_ANCHOR_WINDOW` override) |
 | Fixture still green | `bash little-tools-lab/scripts/cognition-smoke.sh --fixture` passes |
+| Mid-band thick | census `midband_thick=true` (mid-band ≥24); thicken via `thicken-midband.py --apply` |
+| Unified night | `scheduler-runs/latest-learning-loop.json` ties dream + spark under one `night_id` |
 
 ## Not Phase A closure
 
@@ -37,6 +39,14 @@ bash little-tools-lab/scripts/cognition-smoke.sh --live --vault "$PWD/data-next/
 
 # Classic stale window (mature vaults)
 export SPARK_ANCHOR_WINDOW=14,90
+
+# Thicken organic mid-band (lab vault only; refuses /opt/gzmo)
+python3 little-tools-lab/scripts/thicken-midband.py \
+  --vault data-next/vault.db --target 48 --apply
+
+# Night surface (dream 01:00 + cognition 03:30)
+python3 little-tools-lab/scripts/learning-loop-night.py \
+  --runs-dir data-next/scheduler-runs show --latest
 ```
 
 ## Shipped deepens (2026-07-20)
@@ -47,6 +57,10 @@ export SPARK_ANCHOR_WINDOW=14,90
 4. **Fixture Phase A proof** — `spark-link/fixtures/phase-a-facts.json` (stale + ≤72h recent); dry-run `--allow-selection` writes selection audit; meta `learning_loop.phase_a_proof=true`
 5. **`learning_loop` block** on `cognition-smoke-meta.json` (`spark_selected`, `vault_spark_promoted`, `phase_a_proof`)
 6. **dream-stats cross-link** — cognition-smoke auto-loads `data-next/dream-stats.json` (or `--dream-stats`); meta adds `dream_metabolized` + `phase_a_ring` (spark proof ∧ dream honeypot_promoted > 0)
+7. **`--aged-vault`** — reproducible classic `14,90` selection without waiting on vault age
+8. **Vault maturity census** — read-only `vault-maturity-census.py` → `classic_window_ready` / `midband_thick`
+9. **Organic mid-band thicken** — `thicken-midband.py` accelerates oldest young `[3,14)d` rows into `[14,90]` (lab only)
+10. **Unified night run-id** — `night_id` (UTC `YYYY-MM-DD`) on scheduler job records + `learning-loop-{night_id}.json` / `latest-learning-loop.json`; recipes export `GZMO_NIGHT_ID`
 
 ## Live LLM proof
 
@@ -79,12 +93,11 @@ bash little-tools-lab/scripts/cognition-smoke.sh --fixture --aged-vault \
 python3 little-tools-lab/scripts/vault-maturity-census.py \
   --vault data-next/vault.db -o /tmp/vault-maturity.json
 # cognition-smoke auto-attaches this into learning_loop when VAULT_PATH exists:
-#   classic_window_ready, anchor_band_14_90, recent_lt_3d, …
+#   classic_window_ready, anchor_band_14_90, midband_thick, recent_lt_3d, …
 ```
 
-Organic path is **ready** when `classic_window_ready=true` (≥1 latest honeypot in [14,90]d and ≥1 <3d). Lab `data-next` already reports ready (census mid-band > 0); `spark-link dry-run --vault data-next/vault.db --anchor-window 14,90` can select. Keep `--aged-vault` for reproducible CI without relying on vault age.
+Organic path is **ready** when `classic_window_ready=true` (≥1 latest honeypot in [14,90]d and ≥1 <3d). **Thick** when `midband_thick=true` (mid ≥24). Keep `--aged-vault` for reproducible CI without relying on vault age.
 
 ## Still open
 
-1. Thicken organic mid-band beyond the current thin count (census watches it)
-2. Unified scheduler run-id tying 01:00 dream + 03:30 cognition into one operator surface
+None for Phase A. Next work is archaeology leftovers / other ladders — invent Phase B only if a new formal learning-loop ladder is needed.

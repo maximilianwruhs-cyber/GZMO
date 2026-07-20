@@ -2,6 +2,7 @@
 
 use crate::config::SchedulerConfig;
 use anyhow::{bail, Context, Result};
+use chrono::Utc;
 use std::path::PathBuf;
 use tokio::process::Command;
 
@@ -18,6 +19,7 @@ pub async fn run_gzmo_script(cfg: &SchedulerConfig, script: &str, args: &[String
     if !path.is_file() {
         bail!("gzmo script not found: {}", path.display());
     }
+    let night_id = Utc::now().format("%Y-%m-%d").to_string();
     let status = Command::new("bash")
         .arg(&path)
         .args(args)
@@ -25,6 +27,7 @@ pub async fn run_gzmo_script(cfg: &SchedulerConfig, script: &str, args: &[String
         .env("LLM_URL", recipe_service_url(cfg.llm_url()))
         .env("EMBED_URL", cfg.embed_url())
         .env("EMBED_MODEL", cfg.embed_model())
+        .env("GZMO_NIGHT_ID", &night_id)
         .status()
         .await
         .with_context(|| format!("spawn {}", path.display()))?;
@@ -60,6 +63,7 @@ pub async fn run_lab_script(cfg: &SchedulerConfig, script: &str, args: &[String]
     if !path.is_file() {
         bail!("lab script not found: {}", path.display());
     }
+    let night_id = Utc::now().format("%Y-%m-%d").to_string();
     let status = Command::new("bash")
         .arg(&path)
         .args(args)
@@ -67,6 +71,7 @@ pub async fn run_lab_script(cfg: &SchedulerConfig, script: &str, args: &[String]
         .env("LLM_URL", recipe_service_url(cfg.llm_url()))
         .env("EMBED_URL", cfg.embed_url())
         .env("EMBED_MODEL", cfg.embed_model())
+        .env("GZMO_NIGHT_ID", &night_id)
         .status()
         .await
         .with_context(|| format!("spawn {}", path.display()))?;
