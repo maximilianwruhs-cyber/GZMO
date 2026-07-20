@@ -164,20 +164,23 @@ forget-lint apply --vault data-next/vault.db --plan plan.json [--dry-run] [--har
 | `acb8905d` | Enforces citations; blocks unsafe path claims |
 | `2102986b` | `[CONCEPT:Tools Are Leaves]` architectural gap (adjacent) |
 
-**Gap vs catalog:** `etl-cli` / in-tree `KgPipeline::verify` / `faithfulness-judge` / `evidence-locate` cover extract→verify→promote and quote windows — **not** staged mid-pipeline node contracts.
+**Gap vs catalog:** `etl-cli` / in-tree `KgPromoter::verify` / `faithfulness-judge` / `evidence-locate` cover extract→verify→promote and quote windows — **not** staged mid-pipeline node contracts.
+
+**Caveat (clone vs vault):** CT101 fact `663533a6` claims partial gate stubs disabled by default (`GZMO_ENABLE_GATES`, …). Grep of this GZMO clone finds **no** those symbols — today’s verify is end-of-pipeline `KgPromoter` only. Detail: [verify-gates-research-brief-2026-07-20.md](./verify-gates-research-brief-2026-07-20.md).
 
 ### 2.2 Primary-source inventory
 
 | Path | Symbols / facts |
 |------|-----------------|
-| `gzmo-core/src/memory/kg_extract.rs` | `KgPipeline`, `gate.verify`, `verify()`, `merge_extractions_pre_verify`, extract→prepare→verify→promote |
-| `gzmo-core/src/ingest.rs` | End-of-ingest verify wiring (pipeline consumer) |
+| `gzmo-core/src/memory/kg_extract.rs` | `KgPromoter`, `KgGateConfig`, `run_pipeline` / `run_merged_pipeline`, `verify()`, `verdict_passes`, extract→prepare→verify→promote |
+| `gzmo-core/src/memory/kg_promotion.rs` | `MIN_EVIDENCE_CHARS` (= 12) |
+| `gzmo-core/src/ingest.rs` | `IngestEngine` / `new_with_verify` — verify once after merge |
 | `gzmo-core/src/memory/evidence_localize.rs` (ported) | Quote window logic → piece `evidence-locate` |
 | `evidence-locate/` | CLI `batch --fixture`; no LLM; LCS fallback |
 | `faithfulness-judge/` | Probes YAML; modes; Quality tier wave 1 |
 | `config/gzmo-next.toml` | `max_tokens_verify = 4096`; `*_verify` routing maps → `local` |
 
-Today verify is **one** LLM (or deterministic) gate near the end of extract, not three named stages.
+Today verify is **one** LLM gate near the end of extract (and similarly in dream/spark/distill), not three named stages.
 
 ### 2.3 Stage contracts
 
@@ -219,7 +222,7 @@ packet ──analyze (rules)──► packet'
 
 - **Retrieve** calls `evidence-locate` as a leaf (Tools Are Leaves — `2102986b`): follow refs by running the piece, do not embed a vector RAG inside verify-gates.  
 - **Reason** calls `faithfulness-judge` leaf; do not reimplement probe math.  
-- In-tree `KgPipeline::verify` remains the **production** LLM verify; verify-gates is the **assembly-visible** staged contract for GZMO-next recipes and lab cognition-smoke.
+- In-tree `KgPromoter::verify` remains the **production** LLM verify; verify-gates is the **assembly-visible** staged contract for GZMO-next recipes and lab cognition-smoke. Retrieve judges caller-supplied recall bundles — it does **not** embed/RRF.
 
 ### 2.5 Assembly insertion
 
@@ -239,7 +242,7 @@ Living CT101 daemon path stays unchanged until an explicit promote recipe opts i
 
 ### 2.7 Non-goals
 
-- Replacing `KgPipeline` overnight on CT101  
+- Replacing `KgPromoter::verify` overnight on CT101  
 - Building a new embed/RAG stack  
 - Wiring into `living-readiness-gate` GREEN math  
 - Auto-blocking distill from Arena/IpW/Forge advice (separate boundary)
@@ -249,7 +252,7 @@ Living CT101 daemon path stays unchanged until an explicit promote recipe opts i
 - [ ] Packet schema frozen  
 - [ ] Leaf CLIs invoked via subprocess + JSON paths only  
 - [ ] Fixture packets + expected verdicts  
-- [ ] Doc: relationship to `kg_extract::KgPipeline::verify`  
+- [ ] Doc: relationship to `kg_extract::KgPromoter::verify`  
 - [ ] Manifest stub (Quality tier)
 
 ---
@@ -395,7 +398,8 @@ Vocabulary: each new repo is a **piece**; JSON outputs are **artifacts**; commit
 | Lifecycle / supersession | `gzmo-core/src/memory/lifecycle.rs` |
 | Decay | `gzmo-core/src/types.rs` `DecayClass::half_life_days` |
 | Quarantine | `gzmo-core/src/memory/vault.rs` |
-| End verify | `gzmo-core/src/memory/kg_extract.rs` `KgPipeline` |
+| End verify | `gzmo-core/src/memory/kg_extract.rs` `KgPromoter` |
 | Routing / tokens | `config/gzmo-next.toml`, `gzmo-core/src/context.rs`, `gateway.rs` |
 | Tier-1 pieces | `honeypot-gate/CONTEXT.md`, `evidence-locate/`, `faithfulness-judge/` |
 | Lab language | `little-tools-lab/CONTEXT.md` |
+| Deep briefs | [verify-gates-research-brief-2026-07-20.md](./verify-gates-research-brief-2026-07-20.md) · [token-economy-primary-sources-2026-07-20.md](./token-economy-primary-sources-2026-07-20.md) |
