@@ -16,13 +16,18 @@ Operator research bets for GZMO upgrades. Doctrine: [docs/OPPORTUNITY_DISCOVERY.
 
 | Id | Score | Status | Title |
 |----|-------|--------|-------|
+| [felt-use-ripen-floor](felt-use-ripen-floor.md) | 23 | **active** | Felt Use depth floor for honest ripen (recall≥3 share) |
+| [herdr-living-enqueue-proof](herdr-living-enqueue-proof.md) | 21 | candidate | herdr pane-close → living takeaway enqueue proof |
+| [airgap-living-install-smoke](airgap-living-install-smoke.md) | 20 | candidate | Airgap living install smoke (stranger / one-box path) |
+| [serendipity-apply-proof](serendipity-apply-proof.md) | 20 | candidate | Serendipity apply proof (close the 0-apply remind) |
+| [living-organ-trace](living-organ-trace.md) | 20 | candidate | Living organ-trace (CT101 scheduler-runs) |
+| [ct101-brain-feed-sync](ct101-brain-feed-sync.md) | 19 | candidate | One-command Brain Feed script sync to CT101 |
+| [soak-night-honest-timer](soak-night-honest-timer.md) | 19 | candidate | Honest soak timer (min sample spacing) |
 | [tinyfolder-living-one-shot](tinyfolder-living-one-shot.md) | 20 | soaked | One-command tinyFolder → living takeaway enqueue |
 | [takeaway-side-effect](takeaway-side-effect.md) | 20 | soaked | Takeaways only as side-effect of real work |
 | [serendipity-apply-cadence](serendipity-apply-cadence.md) | 21 | soaked | Cheap serendipity promote cadence (no chat tourism) |
 | [opportunity-discovery-cycle](opportunity-discovery-cycle.md) | 22 | soaked | This cycle (Sense→Rank→Bet→Ship) |
 | [local-intel-32gb-128k](local-intel-32gb-128k.md) | — | horizon | Local strong model + long context on 32GB VRAM |
-
-No active ship bet — run Sense/Rank when ready for the next upgrade. Local intel stays horizon.
 
 ## Schema (YAML frontmatter)
 
