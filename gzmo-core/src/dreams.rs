@@ -264,6 +264,39 @@ impl DreamEngine {
             "Deep Phase complete"
         );
 
+        // Immune Patrol (plan-only) — hunt stale contradictions against tonight's truths.
+        let (immune_plan_path, immune_candidates) =
+            match crate::immune::run_patrol(&self.vault, date, &truths) {
+                Ok(path) => {
+                    let n = std::fs::read_to_string(&path)
+                        .ok()
+                        .and_then(|raw| {
+                            serde_json::from_str::<crate::immune::ImmunePlan>(&raw).ok()
+                        })
+                        .map(|p| p.candidates.len())
+                        .unwrap_or(0);
+                    (Some(path), n)
+                }
+                Err(e) => {
+                    warn!("Immune patrol failed (non-fatal): {e}");
+                    (None, 0)
+                }
+            };
+
+        let _ = crate::night_lymph::record_dream(
+            self.vault.db_path(),
+            date,
+            crate::night_lymph::LymphDream {
+                entities: pipeline.raw_entities,
+                relations: pipeline.raw_relations,
+                truths_promoted: truths.len(),
+                kg_entities,
+                kg_relations,
+            },
+            immune_plan_path.as_deref(),
+            immune_candidates,
+        );
+
         let narrative = self.generate_narrative(
             &pipeline.verified_entities,
             &pipeline.verified_relations,
@@ -283,6 +316,8 @@ impl DreamEngine {
                 "kg_entities_written": kg_entities,
                 "kg_relations_written": kg_relations,
                 "truths_promoted": truths.len(),
+                "immune_candidates": immune_candidates,
+                "immune_plan": immune_plan_path.as_ref().map(|p| p.display().to_string()),
                 "memory_layer": self.vault.cognition_memory_layer(),
                 "cognition_source": self.vault.cognition_memory_layer(),
                 "honeypot_rem_chars": honeypot_rem_chars,

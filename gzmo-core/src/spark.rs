@@ -15,8 +15,11 @@ use uuid::Uuid;
 use crate::config::SparkConfig;
 use crate::gateway::LlmGateway;
 use crate::memory::episodic::FileEpisodicStore;
+use crate::memory::felt_use::{self, FeltUseKind};
 use crate::memory::kg_promotion::{entity_label_from_fact, HYPOTHESIZED_LINK};
 use crate::memory::vault::{embedding_cosine_similarity, SqliteVault};
+use crate::night_lymph::{self, LymphSpark};
+use crate::spark_field;
 use crate::synapse::{resolve_event_source, EventSource, EventType, SynapseBus, SynapseEvent};
 use crate::tools::{ToolRegistry, ToolResult};
 use crate::types::SemanticFact;
@@ -238,6 +241,39 @@ impl SparkEngine {
             0
         };
 
+        if promoted {
+            let _ = felt_use::touch(&self.vault, selection.anchor.id, FeltUseKind::Bonded);
+            for r in &selection.recent {
+                let _ = felt_use::touch(&self.vault, r.id, FeltUseKind::Bonded);
+            }
+        }
+
+        spark_field::record_selection(
+            self.vault.db_path(),
+            &selection.anchor,
+            self.config.refractory_slots,
+        );
+        spark_field::write_last_spark_report(
+            self.vault.db_path(),
+            &date.to_string(),
+            promoted,
+            kg_written,
+            Some(selection.anchor.id),
+            Some(&selection.anchor.content),
+            None,
+        );
+        let _ = night_lymph::record_spark(
+            self.vault.db_path(),
+            date,
+            LymphSpark {
+                date: date.to_string(),
+                promoted,
+                kg_relations: kg_written,
+                anchor_id: Some(selection.anchor.id.to_string()),
+                anchor_preview: Some(selection.anchor.content.chars().take(120).collect()),
+            },
+        );
+
         let section =
             self.format_spark_section(date, &selection, &hypothesis, promoted, verdict.as_ref());
         self.log_episodic(date, &section).await?;
@@ -287,7 +323,8 @@ impl SparkEngine {
         )?;
 
         let min_sim = self.config.min_anchor_recent_similarity;
-        let mut best: Option<(SemanticFact, f64, f64)> = None;
+        let field = spark_field::load_field(self.vault.db_path());
+        let mut scored: Vec<(SemanticFact, f64, f64)> = Vec::new();
 
         for candidate in anchors {
             if !self.is_viable_anchor(&candidate) {
@@ -303,7 +340,7 @@ impl SparkEngine {
             if !anchor_passes_prefilter(&candidate, &recent, min_sim, tag_bridge, max_sim) {
                 continue;
             }
-            let score = score_spark_anchor(
+            let base = score_spark_anchor(
                 &candidate,
                 &recent,
                 self.config.anchor_min_stale_days,
@@ -311,15 +348,38 @@ impl SparkEngine {
                 min_sim,
                 tag_bridge,
             );
-            let replace = best.as_ref().map(|(_, s, _)| score > *s).unwrap_or(true);
-            if replace {
-                best = Some((candidate, score, max_sim));
-            }
+            let refractory = spark_field::refractory_multiplier(
+                &candidate,
+                &field,
+                self.config.refractory_half_life_hours,
+                self.config.refractory_strength,
+            );
+            let score = base * refractory;
+            scored.push((candidate, score, max_sim));
         }
 
-        let Some((anchor, score, max_sim)) = best else {
+        if scored.is_empty() {
+            return Ok(None);
+        }
+
+        let roll = spark_field::selection_roll(
+            &Utc::now().date_naive().to_string(),
+            self.config.dice_seed.unwrap_or(0x5a_51_4b),
+        );
+        let ranked: Vec<(usize, f64)> = scored
+            .iter()
+            .enumerate()
+            .map(|(i, (_, s, _))| (i, *s))
+            .collect();
+        let Some((idx, score)) = spark_field::soft_pick(
+            ranked,
+            self.config.soft_pick_top_k,
+            self.config.soft_pick_temperature,
+            roll,
+        ) else {
             return Ok(None);
         };
+        let (anchor, _, max_sim) = scored.swap_remove(idx);
 
         let recent: Vec<_> = recent
             .into_iter()
@@ -337,6 +397,7 @@ impl SparkEngine {
             anchor_score = score,
             max_recent_sim = max_sim,
             recent_count = recent.len(),
+            refractory_entries = field.entries.len(),
             "Spark smart selection complete"
         );
 

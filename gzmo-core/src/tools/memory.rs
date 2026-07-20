@@ -163,6 +163,11 @@ impl ToolHandler for MemorySearchTool {
         if results.is_empty() {
             return Ok(format!("No relevant memories found for query: '{}'", query));
         }
+        crate::memory::felt_use::touch_hits(
+            &self.vault,
+            results.iter().map(|(f, _)| Some(&f.id)),
+            crate::memory::felt_use::FeltUseKind::Glance,
+        );
         let mut out = String::new();
         out.push_str(&format!("Honeypot recall for '{}':\n\n", query));
         for (fact, score) in results {

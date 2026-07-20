@@ -126,6 +126,12 @@ anchor_min_age_hours = 0
 recent_max_age_hours = 72
 min_anchor_recent_similarity = 0.35
 recent_dedupe_similarity = 0.92
+# Refractory field — anti-monoculture (decaying suppress + soft-pick from top-K).
+refractory_slots = 48
+refractory_half_life_hours = 72.0
+refractory_strength = 0.85
+soft_pick_top_k = 8
+soft_pick_temperature = 0.35
 
 [health]
 strict_startup = false
