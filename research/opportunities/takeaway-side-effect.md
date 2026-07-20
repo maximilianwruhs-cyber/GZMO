@@ -1,7 +1,7 @@
 ---
 id: takeaway-side-effect
 title: Takeaways only as side-effect of real work
-status: candidate
+status: active
 score: 20
 uniqueness: 3
 brain_profit: 5

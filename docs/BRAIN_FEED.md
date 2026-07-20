@@ -52,9 +52,23 @@ bash scripts/tinyfolder-check.sh
 
 ### Serendipity promote-back (P0)
 
+**Weekly cadence** (cron-friendly; never auto-applies):
+
+```bash
+bash scripts/serendipity-cadence.sh
+# → data-next/serendipity/cadence-latest.{json,md} + cadence-log.jsonl
+```
+
+Checklist after a spark night:
+
+1. `bash scripts/serendipity-cadence.sh` (digest + dry-run + reminder)  
+2. Review `data-next/serendipity/promote-latest.json` (≤3 takeaways)  
+3. If clear: `SERENDIPITY_PROMOTE_APPLY=1 bash scripts/serendipity-promote.sh`  
+4. `bash scripts/brain-feed-check.sh` stays GREEN  
+
 ```bash
 bash scripts/serendipity-digest.sh
-bash scripts/serendipity-promote.sh          # dry-run default
+bash scripts/serendipity-promote.sh          # dry-run only
 # SERENDIPITY_PROMOTE_APPLY=1 bash scripts/serendipity-promote.sh   # human-gated
 ```
 

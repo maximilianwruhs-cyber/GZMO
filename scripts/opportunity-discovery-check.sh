@@ -75,13 +75,21 @@ else
 fi
 
 # Scripts executable / present
-for s in opportunity-sense.sh opportunity-rank.sh opportunity-bet.sh opportunity_lib.py; do
+for s in opportunity-sense.sh opportunity-rank.sh opportunity-bet.sh opportunity-next-mission.sh opportunity_lib.py; do
   if [[ -f "$ROOT/scripts/$s" ]]; then
     row PASS "script:$s" "present"
   else
     row FAIL "script:$s" "missing"
   fi
 done
+
+bash "$ROOT/scripts/opportunity-next-mission.sh" >>"$LOG" 2>&1 || true
+if [[ -f "$OUT/next-mission.json" ]] \
+  && python3 -c "import json;d=json.load(open('$OUT/next-mission.json')); raise SystemExit(0 if d.get('ok') else 1)"; then
+  row PASS "next-mission" "$(python3 -c "import json;print(json.load(open('$OUT/next-mission.json')).get('bet_id',''))")"
+else
+  row HOLD "next-mission" "no next-mission — need one active bet"
+fi
 
 export OUT pass fail hold
 set +e

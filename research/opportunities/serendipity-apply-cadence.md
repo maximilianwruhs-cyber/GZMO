@@ -1,12 +1,12 @@
 ---
 id: serendipity-apply-cadence
 title: Cheap serendipity promote cadence (no chat tourism)
-status: active
+status: soaked
 score: 21
 uniqueness: 4
 brain_profit: 5
 credit_cost: 5
-attention_cost: 3
+attention_cost: 4
 usp_fit: 4
 stack_ids: [o5]
 created: 2026-07-20
@@ -25,18 +25,20 @@ Dry-run candidates → occasional `SERENDIPITY_PROMOTE_APPLY=1` → living takea
 
 ## Credit honesty
 
-Sense/rank/dry-run need no Cursor chat. Apply is a 2-minute human gate after overnight spark — not a superior-model session.
+Sense/rank/dry-run/`serendipity-cadence.sh` need no Cursor chat. Apply is a 2-minute human gate after overnight spark.
 
 ## Done when
 
-1. Weekly operator checklist in BRAIN_FEED or this bet: after spark night → `serendipity-promote.sh` → apply ≤3 if clear.  
-2. Artifact shows ≥1 applied promote in soak window **or** honest HOLD with zero junk applies.  
-3. `brain-feed-check.sh` stays GREEN.
+1. Weekly checklist in [BRAIN_FEED.md](../../docs/BRAIN_FEED.md) + `scripts/serendipity-cadence.sh`  
+2. Artifact `data-next/serendipity/cadence-latest.json` (remind / ok / honest hold; **auto_apply=false**)  
+3. `brain-feed-check.sh` includes cadence row and stays GREEN  
 
-## Mission card
+**Soaked 2026-07-20** — cadence script + checklist shipped. Human apply remains gated.
 
-See [docs/templates/MISSION_CARD.md](../../docs/templates/MISSION_CARD.md) — bet id `serendipity-apply-cadence`.
+## Operator
 
-## Next ship slice
-
-Automate the *checklist + artifact* (cron-friendly script that only reminds / records apply count); do not auto-apply without human flag.
+```bash
+bash scripts/serendipity-cadence.sh
+# when candidates clear:
+SERENDIPITY_PROMOTE_APPLY=1 bash scripts/serendipity-promote.sh
+```

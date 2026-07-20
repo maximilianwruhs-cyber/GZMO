@@ -87,8 +87,14 @@ else
   row FAIL "felt-use" "could not query living honeypot"
 fi
 
-# Serendipity promote dry-run
-bash "$ROOT/scripts/serendipity-promote.sh" >>"$LOG" 2>&1 || true
+# Serendipity cadence (digest + promote dry-run + checklist artifact)
+bash "$ROOT/scripts/serendipity-cadence.sh" >>"$LOG" 2>&1 || true
+if [[ -f "$DATA/serendipity/cadence-latest.json" ]] \
+  && python3 -c "import json;d=json.load(open('$DATA/serendipity/cadence-latest.json')); raise SystemExit(0 if d.get('ok') else 1)"; then
+  row PASS "serendipity-cadence" "$(python3 -c "import json;print(json.load(open('$DATA/serendipity/cadence-latest.json')).get('advice',''))")"
+else
+  row FAIL "serendipity-cadence" "cadence failed — scripts/serendipity-cadence.sh"
+fi
 if [[ -f "$DATA/serendipity/promote-latest.json" ]] \
   && python3 -c "import json;d=json.load(open('$DATA/serendipity/promote-latest.json')); raise SystemExit(0 if d.get('ok') and d.get('dry_run') else 1)"; then
   n="$(python3 -c "import json;print(json.load(open('$DATA/serendipity/promote-latest.json')).get('candidate_count',0))")"
