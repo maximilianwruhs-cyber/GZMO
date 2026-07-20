@@ -47,14 +47,14 @@ A+C production readiness unlocked the former **Park freeze**. Satellites move in
 ### Wave 3 — Arena lab
 
 1. `arena-lab-demo.sh` — RAPL probe + €/night aggregate observability; sibling Arena  
-2. `ipw-route-demo.sh` — advice for chat/heavy_bench  
+2. `ipw-route-demo.sh` — chat vs heavy_bench route matrix (must diverge; never auto-block distill)  
 3. `forge-lab-demo.sh` — recommend.json from Arena forge/champion winners (never auto-block distill)
 
 ### Wave 4 — Later
 
 1. `aos-ce-smoke.sh` + [AOS_CUSTOMER_EDITION.md](./AOS_CUSTOMER_EDITION.md)  
-2. `marketplace-check.sh` + [OKCP_MARKETPLACE.md](./OKCP_MARKETPLACE.md)  
-3. `wiki-mind-check.sh` + [WIKI_OBSERVATORY_MIND.md](./WIKI_OBSERVATORY_MIND.md)  
+2. `marketplace-check.sh` + [OKCP_MARKETPLACE.md](./OKCP_MARKETPLACE.md) — read-only `data/okcp/concept-bundle.fixture.json`  
+3. `wiki-mind-check.sh` + [WIKI_OBSERVATORY_MIND.md](./WIKI_OBSERVATORY_MIND.md) — seeded search must hit  
 4. `portable-core-inventory.sh` + [PORTABLE_GZMO_CORE_RFC.md](./PORTABLE_GZMO_CORE_RFC.md)
 
 ## Never-as-brain / infra-parked

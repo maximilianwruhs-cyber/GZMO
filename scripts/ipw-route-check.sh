@@ -15,14 +15,69 @@ echo "=== IpW route check (Unpark W3.2) ==="
 [[ -f "$ROOT/config/ipw-router.policy.toml" ]] && row PASS "policy" "ipw-router.policy.toml" || row HOLD "policy" "policy missing"
 [[ -f "$ROOT/docs/OBOLUS_ARENA_BOUNDARY.md" ]] && row PASS "boundary" "outside living metabolism" || row FAIL "boundary" "missing"
 
+if rg -n 'ipw-route|ipw-router' "$ROOT/scripts/living-readiness-gate.sh" >/dev/null 2>&1; then
+  row FAIL "not-living-required" "IpW wired into living-readiness — remove"
+else
+  row PASS "not-living-required" "living gate independent of IpW"
+fi
+
 set +e
-bash "$ROOT/scripts/ipw-route.sh" --help >/dev/null 2>&1 || bash "$ROOT/scripts/ipw-route.sh" 2>/dev/null | head -5 >/dev/null
+bash "$ROOT/scripts/ipw-route.sh" --help >/dev/null 2>&1 || bash "$ROOT/scripts/ipw-route.sh" --task chat >/dev/null 2>&1
 rc=$?
 set -e
 if [[ "$rc" -eq 0 ]]; then
   row PASS "invoke" "ipw-route.sh runnable"
 else
   row HOLD "invoke" "ipw-route.sh exited $rc (advice-only soft)"
+fi
+
+CHAT="$OUT/route-chat.json"
+HEAVY="$OUT/route-heavy.json"
+DEMO="$OUT/demo.json"
+if [[ -f "$CHAT" && -f "$HEAVY" ]]; then
+  if python3 - <<PY
+import json, sys
+from pathlib import Path
+chat = json.loads(Path("$CHAT").read_text())
+heavy = json.loads(Path("$HEAVY").read_text())
+if chat.get("route") == heavy.get("route"):
+    sys.exit(2)
+if chat.get("task_class") != "chat" or heavy.get("task_class") != "heavy_bench":
+    sys.exit(3)
+# Never auto-block distill
+for p in (chat, heavy):
+    if p.get("blocks_distill") is True:
+        sys.exit(4)
+    note = (p.get("note") or "").lower()
+    if "never blocked" not in note and "never" not in note:
+        pass  # note wording optional if blocks_distill absent
+sys.exit(0)
+PY
+  then
+    row PASS "route-matrix" "chat vs heavy_bench routes diverge"
+  else
+    row FAIL "route-matrix" "chat/heavy routes must diverge (run ipw-route-demo.sh)"
+  fi
+else
+  row HOLD "route-matrix" "missing route-*.json — run ipw-route-demo.sh"
+fi
+
+if [[ -f "$DEMO" ]]; then
+  if python3 - <<PY
+import json, sys
+from pathlib import Path
+d = json.loads(Path("$DEMO").read_text())
+if d.get("blocks_distill") is True:
+    sys.exit(2)
+sys.exit(0)
+PY
+  then
+    row PASS "non-blocking" "demo blocks_distill=false"
+  else
+    row FAIL "non-blocking" "demo must not set blocks_distill"
+  fi
+else
+  row HOLD "non-blocking" "no demo.json yet"
 fi
 
 ROWS_TSV="$(printf '%s\n' "${ROWS[@]}")"

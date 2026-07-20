@@ -16,3 +16,7 @@ Multi-agent concept pull/push marketplace built on OKCP / knowledge plane — **
 ## Near-term spike
 
 Document concept bundle format + read-only browse against Observatory / wiki export. Write path stays operator-gated.
+
+Demable: `bash scripts/marketplace-check.sh` browses tracked fixture
+[`data/okcp/concept-bundle.fixture.json`](../data/okcp/concept-bundle.fixture.json)
+(`write_gated: true`, non-empty concepts). Not product install; not living SoT.
