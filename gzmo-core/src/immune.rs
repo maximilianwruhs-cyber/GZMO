@@ -9,6 +9,7 @@ use std::path::{Path, PathBuf};
 use anyhow::Result;
 use chrono::{NaiveDate, Utc};
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
 use crate::memory::vault::SqliteVault;
 use crate::types::ExtractedTruth;
@@ -34,49 +35,120 @@ pub struct ImmunePlan {
     pub candidates: Vec<ImmuneCandidate>,
 }
 
-/// True stale DreamEngine lore: claims the engine itself is off / clean-slate.
-/// Excludes accurate notes that only the *legacy auto_dream job* is disabled.
-fn is_stale_dreamengine_disabled_lore(content: &str) -> bool {
+/// Accurate ops notes that must not be treated as stale engine lore.
+fn is_exempt_ops_note(content: &str) -> bool {
     let c = content.to_lowercase();
-    if c.contains("legacy auto_dream") || c.contains("legacy auto-dream") {
+    c.contains("legacy auto_dream")
+        || c.contains("legacy auto-dream")
+        || c.contains("[state:enginesenabled]")
+        || c.contains("enabled on ct101 living stack")
+        || c.contains("clean-slate rebuild complete")
+        || c.contains("prior clean-slate")
+        || c.contains("operator apply 2026-07-20")
+}
+
+fn mentions_clean_slate_disabled(content: &str) -> bool {
+    let c = content.to_lowercase();
+    let disabled = c.contains("currently disabled")
+        || c.contains("noted as 'currently disabled")
+        || c.contains("noted as \"currently disabled")
+        || c.contains("enabled=false");
+    let clean = c.contains("clean-slate") || c.contains("clean slate");
+    disabled && clean
+}
+
+/// Stale DreamEngine / Dream schedule lore claiming the engine is off.
+fn is_stale_dreamengine_disabled_lore(content: &str) -> bool {
+    if is_exempt_ops_note(content) {
         return false;
     }
+    let c = content.to_lowercase();
     let mentions_engine = c.contains("dreamengine") || c.contains("[system:dream]");
-    let stale =
-        c.contains("currently disabled") || c.contains("clean-slate") || c.contains("clean slate");
-    mentions_engine && stale
+    mentions_engine && mentions_clean_slate_disabled(content)
+}
+
+/// Stale SparkEngine / Spark schedule lore.
+fn is_stale_spark_disabled_lore(content: &str) -> bool {
+    if is_exempt_ops_note(content) {
+        return false;
+    }
+    let c = content.to_lowercase();
+    let mentions =
+        c.contains("sparkengine") || c.contains("[system:spark]") || c.contains("[systems:spark");
+    mentions && mentions_clean_slate_disabled(content)
+}
+
+/// Stale SessionDistill lore (any casing).
+fn is_stale_session_distill_disabled_lore(content: &str) -> bool {
+    if is_exempt_ops_note(content) {
+        return false;
+    }
+    let c = content.to_lowercase();
+    let mentions = c.contains("sessiondistill") || c.contains("session_distill");
+    mentions && mentions_clean_slate_disabled(content)
+}
+
+/// Meta claim that dreams/spark/session_distill are enabled=false for clean-slate.
+fn is_stale_engines_disabled_state(content: &str) -> bool {
+    if is_exempt_ops_note(content) {
+        return false;
+    }
+    let c = content.to_lowercase();
+    c.contains("[state:enginesdisabled]")
+        || (c.contains("enabled=false")
+            && (c.contains("[dreams]") || c.contains("[spark]") || c.contains("[session_distill]"))
+            && (c.contains("clean-slate") || c.contains("clean slate")))
+}
+
+/// Global clean-slate disabled class (any of the engine families).
+fn is_stale_clean_slate_engine_lore(content: &str) -> Option<&'static str> {
+    if is_stale_engines_disabled_state(content) {
+        return Some("global_engines_disabled_state");
+    }
+    if is_stale_dreamengine_disabled_lore(content) {
+        return Some("global_dreamengine_disabled_lore");
+    }
+    if is_stale_spark_disabled_lore(content) {
+        return Some("global_spark_disabled_lore");
+    }
+    if is_stale_session_distill_disabled_lore(content) {
+        return Some("global_session_distill_disabled_lore");
+    }
+    None
 }
 
 /// Polarity / status tokens that often co-occur with superseded lore.
 fn contradiction_reason(truth: &str, candidate: &str) -> Option<&'static str> {
     let t = truth.to_lowercase();
-    let c = candidate.to_lowercase();
-    if is_stale_dreamengine_disabled_lore(candidate)
-        && (t.contains("dream") || t.contains("consolidat") || t.contains("verified_dream"))
-    {
-        return Some("stale_dreamengine_disabled_while_dream_promotes");
+    if let Some(reason) = is_stale_clean_slate_engine_lore(candidate) {
+        if t.contains("dream")
+            || t.contains("consolidat")
+            || t.contains("verified_dream")
+            || t.contains("spark")
+            || t.contains("session")
+            || t.contains("distill")
+            || t.contains("enabled")
+        {
+            return Some(reason);
+        }
+        // Still surface against empty/generic night truth via currently_disabled
+        if !t.contains("disabled") {
+            return Some(reason);
+        }
     }
+    let c = candidate.to_lowercase();
     if (c.contains("disabled") || c.contains("turned off") || c.contains("not running"))
         && (t.contains("enabled") || t.contains("running") || t.contains("active"))
+        && !is_exempt_ops_note(candidate)
         && !c.contains("legacy auto_dream")
     {
         return Some("status_polarity_disabled_vs_active");
-    }
-    if (c.contains("disabled") || c.contains("not enabled"))
-        && (t.contains("promoted") || t.contains("consolidate") || t.contains("spark"))
-        && is_stale_dreamengine_disabled_lore(candidate)
-    {
-        return Some("status_disabled_vs_overnight_activity");
-    }
-    if is_stale_dreamengine_disabled_lore(candidate) && !t.contains("disabled") {
-        return Some("currently_disabled_claim");
     }
     None
 }
 
 fn entity_needles(content: &str) -> Vec<String> {
     let mut needles = Vec::new();
-    // Bracket tags: [SYSTEM:GZMO], [TOOL:…], [PEOPLE:…]
     let mut rest = content;
     while let Some(start) = rest.find('[') {
         let after = &rest[start + 1..];
@@ -93,7 +165,6 @@ fn entity_needles(content: &str) -> Vec<String> {
             break;
         }
     }
-    // Capitalized tokens (cheap entity hint)
     for w in content.split(|c: char| !c.is_alphanumeric() && c != '_') {
         if w.len() >= 4
             && w.chars().next().is_some_and(|c| c.is_uppercase())
@@ -105,6 +176,54 @@ fn entity_needles(content: &str) -> Vec<String> {
     needles.sort();
     needles.dedup();
     needles.into_iter().take(8).collect()
+}
+
+fn push_candidate(
+    candidates: &mut Vec<ImmuneCandidate>,
+    seen: &mut std::collections::HashSet<Uuid>,
+    id: Uuid,
+    content: String,
+    reason: &str,
+    against: String,
+) {
+    if !seen.insert(id) {
+        return;
+    }
+    candidates.push(ImmuneCandidate {
+        fact_id: id.to_string(),
+        content: content.chars().take(400).collect(),
+        reason: reason.to_string(),
+        against_truth: against.chars().take(240).collect(),
+        action: "tombstone_or_supersede".into(),
+    });
+}
+
+fn global_clean_slate_patrol(
+    vault: &SqliteVault,
+    night: NaiveDate,
+    candidates: &mut Vec<ImmuneCandidate>,
+    seen: &mut std::collections::HashSet<Uuid>,
+) {
+    let patterns = [
+        "%DreamEngine%",
+        "%SparkEngine%",
+        "%SessionDistill%",
+        "%session_distill%",
+        "%EnginesDisabled%",
+        "%[SYSTEM:Spark]%",
+        "%[SYSTEM:Dream]%",
+    ];
+    let against = format!("living metabolism active night={night}");
+    for pat in patterns {
+        let Ok(rows) = vault.honeypot_latest_matching(pat, 64) else {
+            continue;
+        };
+        for (id, content, _) in rows {
+            if let Some(reason) = is_stale_clean_slate_engine_lore(&content) {
+                push_candidate(candidates, seen, id, content, reason, against.clone());
+            }
+        }
+    }
 }
 
 /// Scan latest honeypot for facts that contradict tonight's dream truths.
@@ -120,24 +239,6 @@ pub fn run_patrol(
     for truth in truths {
         let needles = entity_needles(&truth.content);
         if needles.is_empty() {
-            // Still check global dream-engine stale class against any dream night
-            if let Ok(rows) = vault.honeypot_latest_matching("%DreamEngine%", 12) {
-                for (id, content, _) in rows {
-                    if seen.contains(&id) {
-                        continue;
-                    }
-                    if let Some(reason) = contradiction_reason(&truth.content, &content) {
-                        seen.insert(id);
-                        candidates.push(ImmuneCandidate {
-                            fact_id: id.to_string(),
-                            content: content.chars().take(400).collect(),
-                            reason: reason.to_string(),
-                            against_truth: truth.content.chars().take(240).collect(),
-                            action: "tombstone_or_supersede".into(),
-                        });
-                    }
-                }
-            }
             continue;
         }
         for needle in needles {
@@ -151,36 +252,20 @@ pub fn run_patrol(
                     continue;
                 }
                 if let Some(reason) = contradiction_reason(&truth.content, &content) {
-                    seen.insert(id);
-                    candidates.push(ImmuneCandidate {
-                        fact_id: id.to_string(),
-                        content: content.chars().take(400).collect(),
-                        reason: reason.to_string(),
-                        against_truth: truth.content.chars().take(240).collect(),
-                        action: "tombstone_or_supersede".into(),
-                    });
+                    push_candidate(
+                        &mut candidates,
+                        &mut seen,
+                        id,
+                        content,
+                        reason,
+                        truth.content.clone(),
+                    );
                 }
             }
         }
     }
 
-    // Global stale DreamEngine lore patrol (even if truths lack the name).
-    // Broad LIKE then filter — avoids pulling "Legacy auto_dream … disabled" ops notes.
-    if let Ok(rows) = vault.honeypot_latest_matching("%DreamEngine%", 48) {
-        for (id, content, _) in rows {
-            if seen.contains(&id) || !is_stale_dreamengine_disabled_lore(&content) {
-                continue;
-            }
-            seen.insert(id);
-            candidates.push(ImmuneCandidate {
-                fact_id: id.to_string(),
-                content: content.chars().take(400).collect(),
-                reason: "global_dreamengine_disabled_lore".into(),
-                against_truth: format!("dream consolidate night={night}"),
-                action: "tombstone_or_supersede".into(),
-            });
-        }
-    }
+    global_clean_slate_patrol(vault, night, &mut candidates, &mut seen);
 
     let plan = ImmunePlan {
         schema: SCHEMA.into(),
@@ -223,10 +308,7 @@ mod tests {
             "Dream consolidation promoted verified_dream truths tonight",
             "[SYSTEM:DreamEngine] DreamEngine currently disabled during clean-slate rebuild",
         );
-        assert_eq!(
-            reason,
-            Some("stale_dreamengine_disabled_while_dream_promotes")
-        );
+        assert_eq!(reason, Some("global_dreamengine_disabled_lore"));
     }
 
     #[test]
@@ -247,8 +329,26 @@ mod tests {
         assert!(is_stale_dreamengine_disabled_lore(
             "[SYSTEM:DreamEngine] Currently disabled during clean-slate rebuild."
         ));
-        assert!(is_stale_dreamengine_disabled_lore(
-            "[SYSTEM:Dream] DreamEngine consolidates logs. Currently disabled during clean-slate rebuild."
+        assert!(is_stale_spark_disabled_lore(
+            "[SYSTEM:Spark] Currently disabled during clean-slate rebuild"
         ));
+        assert!(is_stale_session_distill_disabled_lore(
+            "[SYSTEM:SessionDistill] Currently disabled during clean-slate rebuild."
+        ));
+        assert!(is_stale_engines_disabled_state(
+            "[STATE:EnginesDisabled] During the clean-slate rebuild, [dreams]/[spark]/[session_distill] are enabled=false"
+        ));
+    }
+
+    #[test]
+    fn enabled_replacement_is_exempt() {
+        assert!(is_stale_clean_slate_engine_lore(
+            "[SYSTEM:DreamEngine] Enabled on CT101 living stack — Prior clean-slate \"disabled\" lore is superseded (operator apply 2026-07-20)."
+        )
+        .is_none());
+        assert!(is_stale_clean_slate_engine_lore(
+            "[STATE:EnginesEnabled] Clean-slate rebuild complete on CT101 living stack — [dreams] enabled"
+        )
+        .is_none());
     }
 }
