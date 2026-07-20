@@ -42,7 +42,7 @@ ingest / session_distill / dream / spark
 **Tier-1 (do not re-ship):** `honeypot-gate`, `spark-link`, `rem-substrate`, `rrf-recall`, `synapse-tail`, `evidence-locate`, `faithfulness-judge`.
 
 **Lab hot path today:** `cognition-smoke` = session-distill → honeypot-gate → promote → spark-link → rrf-recall → evidence-locate (fixture) → meta.  
-**Optional frontier:** `cognition-smoke --frontier` (LTL) soft-runs token-economy estimate → forget-lint plan/dry-run apply (lab vault; refuses `/opt/gzmo`) → verify-gates retrieve → tool-chain expand — writes `*-frontier.json`; does not change required meta schema.
+**Optional frontier:** `cognition-smoke --frontier` (LTL) soft-runs token-economy estimate → forget-lint plan/dry-run apply (lab vault; refuses `/opt/gzmo`) → verify-gates retrieve → tool-chain expand → trace-memory recall — writes `*-frontier.json`; does not change required meta schema.
 
 ---
 
@@ -111,9 +111,10 @@ session-distill
        forget-lint plan + dry-run apply   # lab vault only
        verify-gates retrieve
        tool-chain expand                  # Tools Are Leaves; fixture/lab facts
+       trace-memory recall                # strategy inject; blocks_distill=false
 ```
 
-Wired in little-tools-lab (`--frontier` / `COGNITION_FRONTIER=1`). Wave-2 siblings: [`forget-lint`](../../forget-lint/) · [`verify-gates`](../../verify-gates/) · [`token-economy`](../../token-economy/) · [`tool-chain`](../../tool-chain/).
+Wired in little-tools-lab (`--frontier` / `COGNITION_FRONTIER=1`). Wave-2 siblings: [`forget-lint`](../../forget-lint/) · [`verify-gates`](../../verify-gates/) · [`token-economy`](../../token-economy/) · [`tool-chain`](../../tool-chain/) · [`trace-memory`](../../trace-memory/).
 
 ---
 
