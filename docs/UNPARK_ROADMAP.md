@@ -35,8 +35,8 @@ A+C production readiness unlocked the former **Park freeze**. Satellites move in
 
 1. `herdr-metabolism-demo.sh` / `herdr-metabolism-check.sh`  
 2. `pi-glass-fix.sh` / `pi-glass-check.sh`  
-3. `tinyfolder-ingest-demo.sh` / `tinyfolder-check.sh`  
-4. `aos-poll-dashboard.sh` / `aos-poll-check.sh`
+3. `tinyfolder-ingest-demo.sh` / `tinyfolder-check.sh` — require `demo.json` sample + dry-run log  
+4. `aos-poll-dashboard.sh` / `aos-poll-check.sh` — require `dashboard.json` (Arena not required)
 
 ### Wave 2 — Ritual / theater
 

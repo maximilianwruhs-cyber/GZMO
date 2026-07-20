@@ -49,6 +49,28 @@ Path("$OUT/snapshot.json").write_text(json.dumps(snap, indent=2) + "\n")
 PY
 row PASS "snapshot" "$OUT/snapshot.json"
 
+# Dashboard evidence (from aos-poll-dashboard.sh) — read-only; Arena not required
+if [[ -f "$OUT/dashboard.json" ]]; then
+  if python3 -c "
+import json
+d=json.load(open('$OUT/dashboard.json'))
+ok=(
+  d.get('schema')=='gzmo.unpark.aos_dashboard/v1'
+  and d.get('arena_required') is False
+  and isinstance(d.get('living'), dict)
+  and isinstance(d.get('product'), dict)
+  and d.get('ok') is True
+)
+raise SystemExit(0 if ok else 1)
+"; then
+    row PASS "dashboard" "schema + living/product + arena_required=false"
+  else
+    row FAIL "dashboard" "dashboard.json incomplete — rerun aos-poll-dashboard.sh"
+  fi
+else
+  row HOLD "dashboard" "no dashboard.json yet — bash scripts/aos-poll-dashboard.sh"
+fi
+
 ROWS_TSV="$(printf '%s\n' "${ROWS[@]}")"
 export OUT pass fail hold ROWS_TSV
 python3 - <<'PY'
@@ -61,7 +83,8 @@ for line in os.environ.get("ROWS_TSV","").splitlines():
     st,n,d=line.split("|",2); checks[n]={"status":st,"detail":d}
 fail_n=int(os.environ["fail"]); hold_n=int(os.environ["hold"]); pass_n=int(os.environ["pass"])
 verdict="GREEN" if fail_n==0 else "RED"
-advice="aos_poll_ok" if fail_n==0 and hold_n==0 else ("aos_poll_hold" if fail_n==0 else "aos_poll_fail")
+advice = "aos_poll_ok" if fail_n==0 and checks.get("dashboard",{}).get("status")=="PASS" else (
+    "aos_poll_hold" if fail_n==0 else "aos_poll_fail")
 payload={"schema":"gzmo.unpark.aos_poll/v1","generated_at":datetime.now(timezone.utc).isoformat(),
   "verdict":verdict,"ok":fail_n==0,"advice":advice,
   "counts":{"pass":pass_n,"fail":fail_n,"hold":hold_n},"wave":"1.4","checks":checks}
