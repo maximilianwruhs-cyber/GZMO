@@ -63,7 +63,17 @@ bash little-tools-lab/scripts/cognition-smoke.sh --fixture --spark-run \
   --meta /tmp/cognition-smoke-meta.json
 ```
 
+## Mature 14,90 vault proof (lab seed)
+
+```bash
+bash little-tools-lab/scripts/cognition-smoke.sh --fixture --aged-vault \
+  --meta /tmp/cognition-smoke-meta.json
+# Seeds WORK/aged-spark-vault.db (honeypot rows at ~30–70d + ≤72h recent),
+# runs spark dry-run with SPARK_ANCHOR_WINDOW=14,90 (default for this path).
+# Expect: spark_mode=aged_vault_dry_run, spark_selected=true, phase_a_proof=true
+```
+
 ## Still open
 
-1. Mature `data-next` vault path that selects under `SPARK_ANCHOR_WINDOW=14,90` without fixture
+1. Organic `data-next` vault that naturally ages into the 14–90d band (no seed script)
 2. Unified scheduler run-id tying 01:00 dream + 03:30 cognition into one operator surface
