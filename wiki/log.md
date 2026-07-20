@@ -10,3 +10,4 @@ missing frontmatter
 ## [2026-06-08] sync | 1 index entries over 1 pages
 ## [2026-07-10] sync | 1 index entries over 1 pages
 ## [2026-07-10] sync | 1 index entries over 1 pages
+## [2026-07-20] sync | 2 index entries over 2 pages
