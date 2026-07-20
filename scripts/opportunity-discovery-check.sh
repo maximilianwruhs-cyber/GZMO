@@ -38,6 +38,12 @@ bash "$ROOT/scripts/opportunity-rank.sh" >>"$LOG" 2>&1 || true
 
 if [[ -f "$OUT/sense-latest.json" ]] && python3 -c "import json;d=json.load(open('$OUT/sense-latest.json')); raise SystemExit(0 if d.get('ok') else 1)"; then
   row PASS "sense" "$(python3 -c "import json;d=json.load(open('$OUT/sense-latest.json')); print(d.get('advice',''))")"
+  # Sense v2 depth fields (soft HOLD if old artifact)
+  if python3 -c "import json;d=json.load(open('$OUT/sense-latest.json')); raise SystemExit(0 if 'felt_use_depth' in d and 'stack_gaps' in d else 1)"; then
+    row PASS "sense-depth" "felt_use_depth + stack_gaps present (sense v2)"
+  else
+    row HOLD "sense-depth" "rerun opportunity-sense.sh for v2 depth scars"
+  fi
 else
   row FAIL "sense" "sense-latest.json missing/not ok"
 fi

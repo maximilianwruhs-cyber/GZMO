@@ -48,6 +48,19 @@ Sense  →  Rank  →  Bet  →  Ship mission  →  Soak
 
 Weekly is enough. Daily Sense is optional if gates already ran.
 
+### Sense v2 — find *new* upgrades (not empty-log theater)
+
+After nutrient bets soak, Rank goes empty unless Sense mines **depth scars**. `opportunity-sense.sh` now also emits:
+
+| Signal | Why |
+|--------|-----|
+| Felt Use depth census (`recall≥1` / `recall≥3` on living vault) | Ripen honesty — nonzero recall alone is a shallow win |
+| Serendipity apply staleness | Cadence without apply ≠ vault mass |
+| Soak sample spacing | Same-hour GREEN ≠ N nights |
+| STACK nutrient gaps (`m1`,`s1`,`o1`,`m4`,`r5`,`o5`) | Map near/singular ids not covered by bet `stack_ids` |
+
+If Sense says `bet_log_starved` or lists depth scars, **write new candidate bets** — do not re-ship soaked plumbing.
+
 ## Artifacts
 
 | Path | Role |
