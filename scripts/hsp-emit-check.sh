@@ -41,13 +41,35 @@ row PASS "emit-contract" "$OUT/emit-contract.md"
   || row FAIL "sonify-script" "missing or not executable"
 
 if [[ -f "$OUT/latest-event.json" ]]; then
-  row PASS "emit-event" "$OUT/latest-event.json"
+  if python3 -c "
+import json
+d=json.load(open('$OUT/latest-event.json'))
+notes=(d.get('notes') or '').lower()
+ok=(
+  d.get('schema')=='gzmo.hsp.motif/v1'
+  and bool(d.get('motif'))
+  and ('lab' in notes or ('not' in notes and 'green' in notes))
+)
+raise SystemExit(0 if ok else 1)
+"; then
+    row PASS "emit-event" "motif schema + lab/not-GREEN notes"
+  else
+    row FAIL "emit-event" "latest-event.json incomplete — rerun hsp-emit-demo.sh"
+  fi
 else
   row HOLD "emit-event" "run hsp-emit-demo.sh to drop latest-event.json"
 fi
 
 if [[ -f "$SONIFY_OUT/latest.mid" && -f "$SONIFY_OUT/latest.wav" ]]; then
-  row PASS "sonify-artifacts" "$SONIFY_OUT/latest.{mid,wav}"
+  if python3 -c "
+from pathlib import Path
+mid=Path('$SONIFY_OUT/latest.mid'); wav=Path('$SONIFY_OUT/latest.wav')
+raise SystemExit(0 if mid.is_file() and wav.is_file() and mid.stat().st_size>0 and wav.stat().st_size>0 else 1)
+"; then
+    row PASS "sonify-artifacts" "$SONIFY_OUT/latest.{mid,wav} non-empty"
+  else
+    row FAIL "sonify-artifacts" "MIDI/WAV empty — rerun hsp-emit-demo.sh"
+  fi
 else
   row HOLD "sonify-artifacts" "no MIDI/WAV yet — run hsp-emit-demo.sh or hsp-metabolism-sonify.sh"
 fi
@@ -72,14 +94,19 @@ for line in os.environ.get("ROWS_TSV","").splitlines():
     st,n,d=line.split("|",2); checks[n]={"status":st,"detail":d}
 fail_n=int(os.environ["fail"]); hold_n=int(os.environ["hold"]); pass_n=int(os.environ["pass"])
 verdict="GREEN" if fail_n==0 else "RED"
-# HOLD (missing sibling / artifacts before first demo) is OK for wave presence
-advice="hsp_emit_ok" if fail_n==0 else "hsp_emit_fail"
-if fail_n==0 and hold_n>0:
-    advice="hsp_emit_ok_with_hold"
+emit_ok = checks.get("emit-event",{}).get("status")=="PASS"
+sonify_ok = checks.get("sonify-artifacts",{}).get("status")=="PASS"
+if fail_n==0 and emit_ok and sonify_ok:
+    advice="hsp_emit_ok — motif emit + MIDI/WAV (not living GREEN gate)"
+elif fail_n==0:
+    advice="hsp_emit_hold — run hsp-emit-demo.sh for emit+sonify evidence"
+else:
+    advice="hsp_emit_fail"
 payload={"schema":"gzmo.unpark.hsp_emit/v1","generated_at":datetime.now(timezone.utc).isoformat(),
   "verdict":verdict,"ok":fail_n==0,"advice":advice,
   "counts":{"pass":pass_n,"fail":fail_n,"hold":hold_n},"wave":"2.3","checks":checks,
   "sonify_dir":os.environ.get("SONIFY_OUT"),
+  "emit_ok": emit_ok, "sonify_ok": sonify_ok,
   "note":"Not on living GREEN overnight gate."}
 (out/"latest.json").write_text(json.dumps(payload,indent=2)+"\n")
 print(json.dumps({"verdict":verdict,"advice":advice,"pass":pass_n,"fail":fail_n,"hold":hold_n},indent=2))

@@ -42,7 +42,7 @@ A+C production readiness unlocked the former **Park freeze**. Satellites move in
 
 1. `pantheon-ritual-demo.sh` — thin skills + re-land checklist (no ghost `DICE_MASTER_*`)  
 2. `discovery-theater-demo.sh` — session prep + Socratic LINK dry-run score (≠ living KPI)  
-3. `hsp-emit-demo.sh` — motif event files + `hsp-metabolism-sonify.sh` MIDI/WAV (not on GREEN overnight gate)
+3. `hsp-emit-demo.sh` — motif schema + non-empty MIDI/WAV (not on GREEN overnight gate)
 
 ### Wave 3 — Arena lab
 
@@ -52,7 +52,7 @@ A+C production readiness unlocked the former **Park freeze**. Satellites move in
 
 ### Wave 4 — Later
 
-1. `aos-ce-smoke.sh` + [AOS_CUSTOMER_EDITION.md](./AOS_CUSTOMER_EDITION.md)  
+1. `aos-ce-smoke.sh` + [AOS_CUSTOMER_EDITION.md](./AOS_CUSTOMER_EDITION.md) — `golden-path.json` pin; never overwrites `~/.gzmo`  
 2. `marketplace-check.sh` + [OKCP_MARKETPLACE.md](./OKCP_MARKETPLACE.md) — read-only `data/okcp/concept-bundle.fixture.json`  
 3. `wiki-mind-check.sh` + [WIKI_OBSERVATORY_MIND.md](./WIKI_OBSERVATORY_MIND.md) — seeded search must hit  
 4. `portable-core-inventory.sh` + [PORTABLE_GZMO_CORE_RFC.md](./PORTABLE_GZMO_CORE_RFC.md) — `lib.rs` seam table, `hold_rewrite`
