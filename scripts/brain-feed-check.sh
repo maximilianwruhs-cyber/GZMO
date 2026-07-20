@@ -78,22 +78,38 @@ else
   row FAIL "tinyfolder-living" "living-enqueue missing/not ok"
 fi
 
-# Felt Use census on living vault
-felt_raw="$(ssh -o ConnectTimeout=12 -o BatchMode=yes "$HOST" "sqlite3 '$VAULT_DB' \"
+# Felt Use census on living vault (nonzero + depth for ripen honesty)
+bash "$ROOT/scripts/felt-use-depth.sh" >>"$LOG" 2>&1 || true
+if [[ -f "$DATA/felt-use-depth/latest.json" ]] \
+  && python3 -c "import json;d=json.load(open('$DATA/felt-use-depth/latest.json')); raise SystemExit(0 if d.get('ok') else 1)"; then
+  advice="$(python3 -c "import json;print(json.load(open('$DATA/felt-use-depth/latest.json')).get('advice',''))")"
+  depth_ok="$(python3 -c "import json;print(json.load(open('$DATA/felt-use-depth/latest.json')).get('depth_ok'))")"
+  if [[ "$depth_ok" == "True" ]]; then
+    row PASS "felt-use" "$advice"
+    row PASS "felt-use-depth" "$advice"
+  else
+    # Nonzero still required for Brain Feed P0; depth thin is HOLD not RED
+    felt_raw="$(ssh -o ConnectTimeout=12 -o BatchMode=yes "$HOST" "sqlite3 '$VAULT_DB' \"
 SELECT
   (SELECT COUNT(*) FROM honeypot WHERE is_latest=1),
   (SELECT COUNT(*) FROM honeypot WHERE is_latest=1 AND recall_count>0);
 \"" 2>/dev/null || echo "")"
-if [[ "$felt_raw" =~ ^([0-9]+)\|([0-9]+)$ ]]; then
-  latest="${BASH_REMATCH[1]}"
-  nonzero="${BASH_REMATCH[2]}"
-  if (( nonzero >= MIN_NONZERO_RECALL )); then
-    row PASS "felt-use" "latest=$latest nonzero_recall=$nonzero"
-  else
-    row FAIL "felt-use" "nonzero_recall=$nonzero < min $MIN_NONZERO_RECALL"
+    if [[ "$felt_raw" =~ ^([0-9]+)\|([0-9]+)$ ]]; then
+      latest="${BASH_REMATCH[1]}"
+      nonzero="${BASH_REMATCH[2]}"
+      if (( nonzero >= MIN_NONZERO_RECALL )); then
+        row PASS "felt-use" "latest=$latest nonzero_recall=$nonzero"
+      else
+        row FAIL "felt-use" "nonzero_recall=$nonzero < min $MIN_NONZERO_RECALL"
+      fi
+    else
+      row FAIL "felt-use" "could not query living honeypot"
+    fi
+    row HOLD "felt-use-depth" "$advice"
   fi
 else
-  row FAIL "felt-use" "could not query living honeypot"
+  row FAIL "felt-use" "felt-use-depth census failed — scripts/felt-use-depth.sh"
+  row FAIL "felt-use-depth" "unreachable or not ok"
 fi
 
 # Serendipity cadence (digest + promote dry-run + checklist artifact)

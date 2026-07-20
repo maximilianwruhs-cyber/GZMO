@@ -16,8 +16,8 @@ Operator research bets for GZMO upgrades. Doctrine: [docs/OPPORTUNITY_DISCOVERY.
 
 | Id | Score | Status | Title |
 |----|-------|--------|-------|
-| [felt-use-ripen-floor](felt-use-ripen-floor.md) | 23 | **active** | Felt Use depth floor for honest ripen (recall≥3 share) |
-| [herdr-living-enqueue-proof](herdr-living-enqueue-proof.md) | 21 | candidate | herdr pane-close → living takeaway enqueue proof |
+| [herdr-living-enqueue-proof](herdr-living-enqueue-proof.md) | 21 | **active** | herdr pane-close → living takeaway enqueue proof |
+| [felt-use-ripen-floor](felt-use-ripen-floor.md) | 23 | soaked | Felt Use depth floor for honest ripen (recall≥3 share) |
 | [airgap-living-install-smoke](airgap-living-install-smoke.md) | 20 | candidate | Airgap living install smoke (stranger / one-box path) |
 | [serendipity-apply-proof](serendipity-apply-proof.md) | 20 | candidate | Serendipity apply proof (close the 0-apply remind) |
 | [living-organ-trace](living-organ-trace.md) | 20 | candidate | Living organ-trace (CT101 scheduler-runs) |

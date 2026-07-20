@@ -15,6 +15,7 @@ Only these Unpark satellites claim to **improve** the living vault/honeypot. The
 | **P0** | herdr + takeaway ritual | Pane close → `[TAKEAWAY]` → distill → honeypot |
 | **P0** | tinyFolder | Drop → inbox → ingest / takeaway enqueue toward **living** queue |
 | **P0** | Memory MCP Felt Use | Real search → `recall_count` → ripen can fire |
+| **P0** | Felt Use depth floor | Census `recall≥3` share — ripen dual-gate honesty (HOLD if thin) |
 | **P0** | Serendipity promote-back | Spark digest → verified links → takeaway/promote (dry-run default) |
 | **P0** | Dream compaction | Hygiene — less DREAMS noise (soft; off GREEN math) |
 | **P1** | Calibration → living pin | Fused decode suggestion → **human** merges into living toml |
@@ -52,6 +53,16 @@ bash scripts/ct101-takeaway-recall.sh   # living same-sitting HIT
 ```
 
 See [HERDR_METABOLISM.md](./HERDR_METABOLISM.md).
+
+### Felt Use depth (P0)
+
+Nonzero recall is necessary but shallow. Ripen dual-gate needs `recall≥3`. Measure only — never open a memory-gym chat to inflate counts.
+
+```bash
+bash scripts/felt-use-depth.sh
+# → data-next/felt-use-depth/latest.{json,md}
+# depth thin ⇒ HOLD advice; census fail ⇒ RED; brain-feed / keep-quality wire the row
+```
 
 ### tinyFolder → living (P0)
 

@@ -91,6 +91,7 @@ rsync -az scripts/brain-feed-check.sh scripts/brain-intel-promote.sh \
   scripts/serendipity-promote.sh scripts/keep-quality-gate.sh \
   scripts/keep-quality-soak.sh scripts/install-living-airgap.sh \
   scripts/tinyfolder-drop.sh scripts/tinyfolder-check.sh \
+  scripts/felt-use-depth.sh \
   ct101:/opt/gzmo/current/scripts/
 rsync -az docs/BRAIN_FEED.md docs/ADR-0004-airgap-living-usp.md \
   docs/AIRGAP_LIVING.md docs/KEEP_QUALITY.md docs/MCP_LOCAL_ATTACH.md \
@@ -99,7 +100,8 @@ rsync -az docs/BRAIN_FEED.md docs/ADR-0004-airgap-living-usp.md \
 ssh ct101 'bash -lc "cd /opt/gzmo/current && chmod +x scripts/brain-feed-check.sh \
   scripts/brain-intel-promote.sh scripts/serendipity-promote.sh \
   scripts/keep-quality-gate.sh scripts/keep-quality-soak.sh \
-  scripts/install-living-airgap.sh scripts/tinyfolder-*.sh"'
+  scripts/install-living-airgap.sh scripts/tinyfolder-*.sh \
+  scripts/felt-use-depth.sh"'
 ```
 
 Do **not** restart `gzmo-daemon` for script-only syncs.

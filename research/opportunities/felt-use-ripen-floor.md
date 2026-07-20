@@ -1,7 +1,7 @@
 ---
 id: felt-use-ripen-floor
 title: Felt Use depth floor for honest ripen (recall≥3 share)
-status: active
+status: soaked
 score: 23
 uniqueness: 5
 brain_profit: 5
@@ -30,3 +30,13 @@ Measure and grow the share of latest honeypot with `recall_count≥3` from **rea
 3. Optional: ripen status delta when floor improves — still no second overnight writer  
 
 Baseline (2026-07-20 CT101): latest≈38743, recall≥1≈107, recall≥3≈60.
+
+**Soaked 2026-07-20** — `scripts/felt-use-depth.sh` + brain-feed / keep-quality `felt-use-depth` row (thin = HOLD).
+
+## Operator
+
+```bash
+bash scripts/felt-use-depth.sh
+bash scripts/brain-feed-check.sh
+# LIVING_GATE_SKIP_TAKEAWAY=1 bash scripts/keep-quality-gate.sh
+```
