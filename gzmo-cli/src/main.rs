@@ -31,6 +31,7 @@ mod pedagogy_bridge;
 mod profile_cmd;
 mod promote_cmd;
 mod repl_shared;
+mod ripen_cmd;
 mod serve_cmd;
 mod session_cmd;
 mod spark_cmd;
@@ -63,6 +64,8 @@ enum Command {
     Spark(Option<NaiveDate>),
     /// Plan-only immune patrol (`gzmo immune plan`) — never mutates vault.
     ImmunePlan,
+    /// M5 ripen gate honesty (`gzmo ripen status`).
+    Ripen(Vec<String>),
     Ingest {
         path: std::path::PathBuf,
         dry_run: bool,
@@ -175,6 +178,9 @@ fn parse_args() -> Command {
             }
             eprintln!("Usage: gzmo immune plan");
             std::process::exit(2);
+        }
+        if args[1] == "ripen" {
+            return Command::Ripen(args.get(2..).unwrap_or(&[]).to_vec());
         }
         if args[1] == "ingest" {
             let mut dry_run = false;
@@ -294,6 +300,7 @@ async fn main() -> Result<()> {
         Command::DreamCompact { .. } => "info",
         Command::Spark(_) => "info",
         Command::ImmunePlan => "info",
+        Command::Ripen(_) => "warn",
         Command::Ingest { .. } => "info",
         Command::IngestDir(_) => "info",
         Command::IngestEval(_) => "info",
@@ -414,6 +421,7 @@ async fn main() -> Result<()> {
         } => dream_cmd::run_compact(&config, max_chars, archive_sessions_days, dry_run).await,
         Command::Spark(date) => spark_cmd::run(&config, identity.as_ref().unwrap(), date).await,
         Command::ImmunePlan => immune_cmd::run_plan(&config).await,
+        Command::Ripen(args) => ripen_cmd::run(&config, &args).await,
         Command::Ingest { path, dry_run } => {
             ingest_cmd::run(
                 &config,

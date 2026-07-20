@@ -52,6 +52,15 @@ pub struct SupportingFact {
     pub recall_count: i64,
 }
 
+/// Living export gate census (matches `scripts/export-knowledge-core.py`).
+#[derive(Debug, Clone, Copy)]
+pub struct RipenGateCensus {
+    pub latest: i64,
+    pub nonzero_recall: i64,
+    pub dual: i64,
+    pub dual_origin: i64,
+}
+
 /// Configuration for the ripen job.
 #[derive(Debug, Clone)]
 pub struct RipenConfig {

@@ -385,6 +385,67 @@ impl SqliteVault {
         Ok(())
     }
 
+    /// Census for M5 export gates (`gzmo ripen status` / overnight honesty).
+    pub fn ripen_gate_census(
+        &self,
+        min_confidence: f64,
+        min_recall: i64,
+    ) -> Result<crate::memory::ripen::RipenGateCensus> {
+        let conn = self.pool.get()?;
+        let exists: i64 = conn.query_row(
+            "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='honeypot'",
+            [],
+            |row| row.get(0),
+        )?;
+        if exists == 0 {
+            return Ok(crate::memory::ripen::RipenGateCensus {
+                latest: 0,
+                nonzero_recall: 0,
+                dual: 0,
+                dual_origin: 0,
+            });
+        }
+        let latest: i64 = conn.query_row(
+            "SELECT COUNT(*) FROM honeypot WHERE is_latest = 1",
+            [],
+            |r| r.get(0),
+        )?;
+        let nonzero_recall: i64 = conn.query_row(
+            "SELECT COUNT(*) FROM honeypot WHERE is_latest = 1 AND recall_count > 0",
+            [],
+            |r| r.get(0),
+        )?;
+        let dual: i64 = conn.query_row(
+            "SELECT COUNT(*) FROM honeypot
+             WHERE is_latest = 1 AND confidence >= ?1 AND recall_count >= ?2",
+            params![min_confidence, min_recall],
+            |r| r.get(0),
+        )?;
+        let dual_origin: i64 = conn.query_row(
+            "SELECT COUNT(*) FROM honeypot
+             WHERE is_latest = 1 AND confidence >= ?1 AND recall_count >= ?2
+               AND origin IN ('ingest','verified_dream','session_distill')",
+            params![min_confidence, min_recall],
+            |r| r.get(0),
+        )?;
+        Ok(crate::memory::ripen::RipenGateCensus {
+            latest,
+            nonzero_recall,
+            dual,
+            dual_origin,
+        })
+    }
+
+    /// Row count in a sibling `knowledge_core.db` (separate file).
+    pub fn knowledge_core_row_count(&self, core_path: &Path) -> Result<i64> {
+        if !core_path.exists() {
+            anyhow::bail!("knowledge_core missing: {}", core_path.display());
+        }
+        let conn = Connection::open(core_path)?;
+        let n: i64 = conn.query_row("SELECT COUNT(*) FROM knowledge_core", [], |r| r.get(0))?;
+        Ok(n)
+    }
+
     /// Latest honeypot rows matching SQL LIKE pattern (immune patrol / ops).
     pub fn honeypot_latest_matching(
         &self,

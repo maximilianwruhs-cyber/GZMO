@@ -107,7 +107,7 @@ Rubric: **supported** · **thin** · **stale-loop** · **junk**.
 3. ~~**Contradiction hygiene (plan-first)**~~ → **Immune Patrol** dry_run plans shipped; human review before any apply.
 4. ~~**Overnight operator brief**~~ → **Night Lymph** + status surface shipped.
 5. **Living faithfulness widen** — grow claims beyond 5 CORE_INSIGHT needles; optional weekly recall-eval against curated living set.
-6. **Ripen / knowledge_core honesty** — diagnose 0-row M5 export; either fix gate or document as intentionally idle.
+6. ~~**Ripen / knowledge_core honesty**~~ → diagnosed + fixed: starved recall, not empty core; see [ripen-honesty-2026-07-20.md](ripen-honesty-2026-07-20.md).
 7. **Only then Unpark W1 item** — after Felt Use + Refractory show metric movement on CT101.
 
 ---
