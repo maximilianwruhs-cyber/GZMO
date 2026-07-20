@@ -58,7 +58,7 @@ ingest / session_distill / dream / spark
 | **Must remember** | Prefer age + supersession + Extends siblings; protect Structural; refuse `/opt/gzmo` |
 | **Non-goals** | CT101 import; hard-delete default; living GREEN gate; growing gate into a mutator |
 
-**Ready:** lab path guard · plan schema · fixture vault · ripen score parity test · LTL manifest stub.
+**Ready:** sibling piece [`forget-lint`](../../forget-lint/) (plan/apply + fixture smoke) · LTL manifest `partial`.
 
 ---
 
