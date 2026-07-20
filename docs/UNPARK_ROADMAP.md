@@ -34,7 +34,7 @@ A+C production readiness unlocked the former **Park freeze**. Satellites move in
 ### Wave 1 — Operator surfaces
 
 1. `herdr-metabolism-demo.sh` / `herdr-metabolism-check.sh`  
-2. `pi-glass-fix.sh` / `pi-glass-check.sh`  
+2. `pi-glass-fix.sh` / `pi-glass-check.sh` — doctrine phrases + `surface.json` (CLI canonical)  
 3. `tinyfolder-ingest-demo.sh` / `tinyfolder-check.sh` — require `demo.json` sample + dry-run log  
 4. `aos-poll-dashboard.sh` / `aos-poll-check.sh` — require `dashboard.json` (Arena not required)
 
