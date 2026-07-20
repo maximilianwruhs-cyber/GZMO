@@ -1,0 +1,27 @@
+{
+  "schema": "gzmo.okcp.concept_bundle/v0",
+  "name": "unpark-wave42-fixture",
+  "version": "0.1.0",
+  "write_gated": true,
+  "concepts": [
+    {
+      "id": "felt-recall",
+      "title": "Felt recall",
+      "summary": "Overnight metabolism that sticks facts you can search tomorrow.",
+      "tags": ["memory", "metabolism", "honeypot"]
+    },
+    {
+      "id": "product-mcp",
+      "title": "Product Memory MCP",
+      "summary": "Stranger laptop attach via ~/.gzmo — sidecars off.",
+      "tags": ["mcp", "product", "sidecar-free"]
+    },
+    {
+      "id": "living-appliance",
+      "title": "Living sidecar appliance",
+      "summary": "CT101 one-writer Redis/Qdrant/Neo4j stack — never product SoT.",
+      "tags": ["living", "ct101", "adr-0003"]
+    }
+  ],
+  "note": "Read-only browse fixture for Unpark Wave 4.2. Writes stay operator-gated. Not product install; not living vault SoT."
+}

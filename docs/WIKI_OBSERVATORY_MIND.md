@@ -16,5 +16,5 @@ Public or demable “mind” surface over git-tracked `wiki/` + Observatory enri
 
 1. `wiki/` remains git-tracked SoT for browsable pages  
 2. Observatory enrich stays optional operator tooling  
-3. Demable check: wiki search + sample entity page render  
-4. Never require overnight dream/spark for stranger A
+3. Demable check: `bash scripts/wiki-mind-check.sh` — seeded `gzmo wiki search` must return ≥1 hit (default query `Lint`)  
+4. Never require overnight dream/spark for stranger A; not on living GREEN gate
