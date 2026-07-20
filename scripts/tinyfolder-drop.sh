@@ -1,27 +1,37 @@
 #!/usr/bin/env bash
 # tinyFolder-style drop → inbox → metabolism on-ramp (Brain Feed P0).
 # Non-CLI users drop markdown into data-next/inbox; this stages + records.
-# --living: also write living-enqueue.json aimed at CT101 distill (never starts
+# --living: write living-enqueue.json aimed at CT101 distill (never starts
 # a workstation overnight writer; refuses if gzmo-serve is active).
+# --apply-takeaway: with --living, SSH session close --takeaway on living host
+# (enqueue only, no --now). Also: TINYFOLDER_APPLY_TAKEAWAY=1
 #
 #   bash scripts/tinyfolder-drop.sh --demo
 #   bash scripts/tinyfolder-drop.sh --demo --living
-#   bash scripts/tinyfolder-drop.sh /path/to/note.md
-#   bash scripts/tinyfolder-drop.sh --scan   # process pending drops already in inbox
+#   bash scripts/tinyfolder-drop.sh --demo --living --apply-takeaway
+#   bash scripts/tinyfolder-drop.sh /path/to/note.md --living --apply-takeaway
+#   bash scripts/tinyfolder-drop.sh --scan
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 DATA="${GZMO_DATA_NEXT:-$ROOT/data-next}"
 INBOX="${GZMO_INBOX:-${TINYFOLDER_INBOX:-$DATA/inbox}}"
 OUT="$DATA/tinyfolder"
+HOST="${CT101_SSH_HOST:-ct101}"
+GZMO_BIN="${CT101_GZMO_BIN:-/opt/gzmo/current/target/release/gzmo}"
 MODE="file"
 FILE=""
 LIVING=0
+APPLY=0
+if [[ "${TINYFOLDER_APPLY_TAKEAWAY:-0}" == "1" ]]; then
+  APPLY=1
+fi
 for a in "$@"; do
   case "$a" in
     --demo) MODE="demo" ;;
     --scan) MODE="scan" ;;
     --living) LIVING=1 ;;
+    --apply-takeaway) APPLY=1; LIVING=1 ;;
     *)
       if [[ -f "$a" ]]; then FILE="$a"; MODE="file"; fi
       ;;
@@ -32,10 +42,10 @@ mkdir -p "$INBOX" "$OUT" "$INBOX/processed"
 if [[ -z "${TINYFOLDER_INBOX:-}" ]]; then
   mkdir -p "$DATA/tinyfolder-inbox"
 fi
-export DATA INBOX OUT ROOT MODE FILE LIVING
+export DATA INBOX OUT ROOT MODE FILE LIVING APPLY HOST GZMO_BIN
 
 python3 - <<'PY'
-import json, os, shutil, uuid
+import json, os, shutil, subprocess, uuid
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -43,6 +53,10 @@ inbox = Path(os.environ["INBOX"])
 out = Path(os.environ["OUT"])
 mode = os.environ.get("MODE", "file")
 src = os.environ.get("FILE") or ""
+living = os.environ.get("LIVING", "0") == "1"
+apply = os.environ.get("APPLY", "0") == "1"
+host = os.environ.get("HOST", "ct101")
+gzmo_bin = os.environ.get("GZMO_BIN", "/opt/gzmo/current/target/release/gzmo")
 now = datetime.now(timezone.utc)
 stamp = now.strftime("%Y%m%dT%H%M%SZ")
 day = now.strftime("%Y-%m-%d")
@@ -82,17 +96,17 @@ elif mode == "file" and src:
         shutil.copy2(src_p, p)
     staged.append(str(p))
 elif mode == "scan":
-    for p in sorted(inbox.glob("*.md")):
-        if p.name.startswith("_"):
+    for path in sorted(inbox.glob("*.md")):
+        if path.name.startswith("_") or path.name == "README.md":
             continue
-        text = p.read_text(encoding="utf-8")
+        text = path.read_text(encoding="utf-8", errors="replace")
         if "status: pending" in text or "status:pending" in text.replace(" ", ""):
-            staged.append(str(p))
+            staged.append(str(path))
 else:
-    raise SystemExit("usage: tinyfolder-drop.sh --demo | --scan | <file.md>")
-
-# Soft metabolism hook + optional Brain Feed living-enqueue artifact.
-import subprocess
+    raise SystemExit(
+        "usage: tinyfolder-drop.sh --demo | --scan | <file.md> "
+        "[--living] [--apply-takeaway]"
+    )
 
 queue = Path(os.environ["DATA"]) / "distill-queue"
 queue.mkdir(parents=True, exist_ok=True)
@@ -108,7 +122,6 @@ for path in staged:
     with qfile.open("a", encoding="utf-8") as fh:
         fh.write(json.dumps(row) + "\n")
 
-living = os.environ.get("LIVING", "0") == "1"
 dual_writer = False
 try:
     r = subprocess.run(
@@ -120,36 +133,92 @@ try:
 except Exception:
     pass
 
+takeaway_lines = []
+for path in staged:
+    try:
+        body = Path(path).read_text(encoding="utf-8", errors="replace")
+        if body.lstrip().startswith("---"):
+            parts = body.split("---", 2)
+            body = parts[2] if len(parts) > 2 else body
+        line = " ".join(body.strip().split())[:280]
+        if line:
+            takeaway_lines.append(f"TinyFolderDrop: {line}")
+    except Exception:
+        pass
+
+applied = []
+apply_error = None
+if apply and living and takeaway_lines and not dual_writer:
+    sid = f"tinyfolder-apply-{uuid.uuid4().hex[:8]}"
+    remote_sess = f"/opt/gzmo/data/sessions/{sid}.json"
+    now_iso = now.strftime("%Y-%m-%dT%H:%M:%SZ")
+    sess = {
+        "id": sid,
+        "name": "tinyfolder_living_apply",
+        "created_at": now_iso,
+        "last_active_at": now_iso,
+        "messages": [
+            {"role": "user", "content": "TinyFolder living takeaway enqueue.", "is_meta": False},
+            {"role": "assistant", "content": "Recording drop-folder note as takeaway.", "is_meta": False},
+        ],
+    }
+    p = subprocess.run(
+        ["ssh", "-o", "ConnectTimeout=12", "-o", "BatchMode=yes", host, f"cat > {remote_sess}"],
+        input=json.dumps(sess),
+        text=True,
+        capture_output=True,
+    )
+    if p.returncode != 0:
+        apply_error = f"seed_session:{(p.stderr or p.stdout or '')[:200]}"
+    else:
+        combined = " | ".join(takeaway_lines[:3])
+        cmd = (
+            f"bash -lc 'cd /opt/gzmo && GZMO_CONFIG=/opt/gzmo/gzmo.toml "
+            f"{gzmo_bin} session close {sid} --takeaway {json.dumps(combined)}'"
+        )
+        p2 = subprocess.run(
+            ["ssh", "-o", "ConnectTimeout=12", "-o", "BatchMode=yes", host, cmd],
+            capture_output=True,
+            text=True,
+        )
+        if p2.returncode == 0:
+            applied.append({"session_id": sid, "takeaway": combined, "distill": "enqueue_only"})
+        else:
+            apply_error = f"session_close:{(p2.stderr or p2.stdout or '')[:300]}"
+elif apply and dual_writer:
+    apply_error = "refused_dual_writer — stop gzmo-serve before applying to living host"
+elif apply and not takeaway_lines:
+    apply_error = "no_takeaways"
+elif apply and not living:
+    apply_error = "apply_requires_living"
+
 living_path = out / "living-enqueue.json"
 if living:
-    takeaway_lines = []
-    for path in staged:
-        try:
-            body = Path(path).read_text(encoding="utf-8", errors="replace")
-            if body.lstrip().startswith("---"):
-                parts = body.split("---", 2)
-                body = parts[2] if len(parts) > 2 else body
-            line = " ".join(body.strip().split())[:280]
-            if line:
-                takeaway_lines.append(f"TinyFolderDrop: {line}")
-        except Exception:
-            pass
+    if dual_writer:
+        advice = "tinyfolder_living_refused_dual_writer"
+    elif apply and applied:
+        advice = "tinyfolder_living_takeaway_applied — enqueued on living host (no --now)"
+    elif apply and apply_error:
+        advice = f"tinyfolder_living_apply_failed — {apply_error}"
+    else:
+        advice = "tinyfolder_living_enqueue_ready — takeaway/ingest on living host only"
+    living_ok = (not dual_writer) and bool(staged) and (apply_error is None if apply else True)
     living_payload = {
         "schema": "gzmo.brain_feed.tinyfolder_living/v1",
         "generated_at": now.isoformat(),
-        "ok": (not dual_writer) and bool(staged),
+        "ok": living_ok,
         "dual_writer": dual_writer,
         "staged": staged,
         "living_distill_queue": "gzmo:distill:pending",
         "proposed_takeaways": takeaway_lines,
-        "advice": (
-            "tinyfolder_living_refused_dual_writer"
-            if dual_writer
-            else "tinyfolder_living_enqueue_ready — takeaway/ingest on living host only"
-        ),
+        "apply_takeaway": apply,
+        "applied": applied,
+        "apply_error": apply_error,
+        "advice": advice,
         "operator": [
-            "Copy staged markdown to living host inbox OR",
-            "ssh living: gzmo session close <sid> --takeaway 'TinyFolderDrop: …'",
+            "Dry-run: bash scripts/tinyfolder-drop.sh --demo --living",
+            "Apply: bash scripts/tinyfolder-drop.sh --demo --living --apply-takeaway",
+            "Or: TINYFOLDER_APPLY_TAKEAWAY=1 bash scripts/tinyfolder-drop.sh --living <file.md>",
             "Never start workstation gzmo serve while CT101 lives",
         ],
         "blocks_overnight_on_workstation": True,
@@ -166,22 +235,30 @@ if living:
             except Exception:
                 pass
 
+ok = False if (living and dual_writer) else True
+if apply and apply_error:
+    ok = False
+
 payload = {
     "schema": "gzmo.tinyfolder.drop/v1",
     "generated_at": now.isoformat(),
-    "ok": False if (living and dual_writer) else True,
+    "ok": ok,
     "inbox": str(inbox),
     "staged": staged,
     "count": len(staged),
     "queue": str(qfile),
     "living": living,
+    "apply_takeaway": apply,
+    "applied": applied,
+    "apply_error": apply_error,
     "living_enqueue": str(living_path) if living else None,
     "dual_writer": dual_writer,
     "next": [
         "bash scripts/tinyfolder-drop.sh --demo --living",
+        "bash scripts/tinyfolder-drop.sh --demo --living --apply-takeaway",
         "bash scripts/brain-feed-check.sh",
     ],
-    "note": "Filesystem on-ramp — --living never starts overnight writer here.",
+    "note": "Filesystem on-ramp — --living/--apply-takeaway never starts overnight writer here.",
 }
 (out / "latest.json").write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
 (out / "latest.md").write_text(
@@ -193,6 +270,8 @@ payload = {
             *[f"- `{p}`" for p in staged],
             "",
             f"Living enqueue: {'yes' if living else 'no'}",
+            f"Apply takeaway: {'yes' if apply else 'no'}",
+            f"Applied: {len(applied)}",
             payload["note"],
             "",
         ]
@@ -204,6 +283,9 @@ print(json.dumps({
     "staged": staged,
     "queue": str(qfile),
     "living": living,
+    "apply_takeaway": apply,
+    "applied": applied,
+    "apply_error": apply_error,
     "living_enqueue": payload.get("living_enqueue"),
 }, indent=2))
 raise SystemExit(0 if payload["ok"] else 1)

@@ -30,8 +30,16 @@ Drop markdown/text here for operator ingest experiments.
 Does **not** start workstation overnight metabolism.
 Brain Feed path: \`bash scripts/tinyfolder-drop.sh --demo --living\` → living-enqueue.json
 aimed at CT101 / living host distill (\`gzmo:distill:pending\`).
+Apply: \`bash scripts/tinyfolder-drop.sh --demo --living --apply-takeaway\`
 EOF
 row PASS "inbox-readme" "operator drop instructions"
+
+# Apply flag present in drop script (one-shot living takeaway)
+if grep -q -- '--apply-takeaway' "$ROOT/scripts/tinyfolder-drop.sh"; then
+  row PASS "apply-takeaway-flag" "tinyfolder-drop.sh --living --apply-takeaway"
+else
+  row FAIL "apply-takeaway-flag" "missing --apply-takeaway on tinyfolder-drop.sh"
+fi
 
 # Brain Feed: living-enqueue artifact (dual-writer safe)
 if [[ -f "$OUT/living-enqueue.json" ]]; then

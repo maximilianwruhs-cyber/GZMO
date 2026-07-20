@@ -56,9 +56,14 @@ See [HERDR_METABOLISM.md](./HERDR_METABOLISM.md).
 ### tinyFolder → living (P0)
 
 ```bash
+# Dry-run artifact (no SSH apply):
 bash scripts/tinyfolder-drop.sh --demo --living
+# One-shot enqueue on living host (session close --takeaway, no --now):
+bash scripts/tinyfolder-drop.sh --demo --living --apply-takeaway
+# Or: TINYFOLDER_APPLY_TAKEAWAY=1 bash scripts/tinyfolder-drop.sh --living note.md
 bash scripts/tinyfolder-check.sh
-# living-enqueue.json advises CT101 ingest/takeaway; never dual-writer
+# living-enqueue.json: proposed takeaways + applied[] when --apply-takeaway;
+# refuses if workstation gzmo-serve is active (dual-writer)
 ```
 
 ### Serendipity promote-back (P0)
