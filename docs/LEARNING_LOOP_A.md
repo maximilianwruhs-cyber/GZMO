@@ -44,8 +44,10 @@ export SPARK_ANCHOR_WINDOW=14,90
 1. **spark → vault** — `ltl-common` `vault-promote-spark` after cognition-smoke stage 4 (eligible when `promoted` / verdict supported; refuses `/opt/gzmo`)
 2. **distill handoff promote** — `synapse-distill-handoff.sh --promote` runs `vault-promote-distill` into lab vault
 3. Young-vault spark window — `SPARK_ANCHOR_WINDOW` / vault default `0,30`
+4. **Fixture Phase A proof** — `spark-link/fixtures/phase-a-facts.json` (stale + ≤72h recent); dry-run `--allow-selection` writes selection audit; meta `learning_loop.phase_a_proof=true`
+5. **`learning_loop` block** on `cognition-smoke-meta.json` (`spark_selected`, `vault_spark_promoted`, `phase_a_proof`)
 
 ## Still open
 
-1. Unified `learning_loop` block across dream-stats + cognition-smoke-meta
-2. Live spark `--spark-run` green path that actually sets `promoted: true` on lab vault
+1. Live spark `--spark-run` green path that sets `spark_report_promoted: true` (LLM verify) on lab vault
+2. Cross-link `dream-stats.json` into the same `learning_loop` block
