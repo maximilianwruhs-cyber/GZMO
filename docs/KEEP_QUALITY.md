@@ -14,6 +14,7 @@ Not “binary installs.” That the **living box** still compounds honeypot-qual
 | Ops | Living readiness GREEN (or local living smoke) |
 | Felt recall | Faithfulness living floor |
 | Felt Use | Nonzero `recall_count` share on latest honeypot |
+| Felt Use depth | Soft: `recall≥3` count/share for honest ripen (`felt-use-depth.sh`) — thin = HOLD, not RED |
 | Spark | Refractory last-N unique anchors ≫ 1 |
 | Immune | Plan artifact present; closed-class candidate count reported |
 | Ripen | Honest status (Ready / starved_recall — never empty-core lie) |
@@ -26,6 +27,7 @@ Not “binary installs.” That the **living box** still compounds honeypot-qual
 ```bash
 # Against CT101 reference (default SSH host ct101):
 bash scripts/keep-quality-gate.sh
+bash scripts/felt-use-depth.sh          # depth census alone (recall≥1 / ≥3 + ripen dual)
 
 # Skip heavy takeaway during soak loops:
 LIVING_GATE_SKIP_TAKEAWAY=1 bash scripts/keep-quality-gate.sh

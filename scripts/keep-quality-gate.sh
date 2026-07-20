@@ -61,22 +61,43 @@ else
   fi
 fi
 
-# ── 2) Felt Use census (nonzero recall_count on latest honeypot) ─────────────
-felt_raw="$(ssh_ct "sqlite3 '$VAULT_DB' \"
+# ── 2) Felt Use census (nonzero + depth for honest ripen) ───────────────────
+bash "$ROOT/scripts/felt-use-depth.sh" >>"$LOG" 2>&1 || true
+FU_JSON="${GZMO_DATA_NEXT:-$ROOT/data-next}/felt-use-depth/latest.json"
+if [[ -f "$FU_JSON" ]] \
+  && python3 -c "import json;d=json.load(open('$FU_JSON')); raise SystemExit(0 if d.get('ok') else 1)"; then
+  fu_advice="$(python3 -c "import json;print(json.load(open('$FU_JSON')).get('advice',''))")"
+  fu_depth="$(python3 -c "import json;print(json.load(open('$FU_JSON')).get('depth_ok'))")"
+  fu_latest="$(python3 -c "import json;print(json.load(open('$FU_JSON')).get('census',{}).get('latest',0))")"
+  fu_nz="$(python3 -c "import json;print(json.load(open('$FU_JSON')).get('census',{}).get('recall_ge1',0))")"
+  if (( fu_nz >= MIN_NONZERO_RECALL )); then
+    row PASS "felt-use" "latest=$fu_latest nonzero_recall=$fu_nz (min $MIN_NONZERO_RECALL)"
+  else
+    row FAIL "felt-use" "latest=$fu_latest nonzero_recall=$fu_nz < min $MIN_NONZERO_RECALL — living search starved"
+  fi
+  if [[ "$fu_depth" == "True" ]]; then
+    row PASS "felt-use-depth" "$fu_advice"
+  else
+    row HOLD "felt-use-depth" "$fu_advice"
+  fi
+else
+  felt_raw="$(ssh_ct "sqlite3 '$VAULT_DB' \"
 SELECT
   (SELECT COUNT(*) FROM honeypot WHERE is_latest=1),
   (SELECT COUNT(*) FROM honeypot WHERE is_latest=1 AND recall_count>0);
 \"" 2>/dev/null || echo "")"
-if [[ "$felt_raw" =~ ^([0-9]+)\|([0-9]+)$ ]]; then
-  latest="${BASH_REMATCH[1]}"
-  nonzero="${BASH_REMATCH[2]}"
-  if (( nonzero >= MIN_NONZERO_RECALL )); then
-    row PASS "felt-use" "latest=$latest nonzero_recall=$nonzero (min $MIN_NONZERO_RECALL)"
+  if [[ "$felt_raw" =~ ^([0-9]+)\|([0-9]+)$ ]]; then
+    latest="${BASH_REMATCH[1]}"
+    nonzero="${BASH_REMATCH[2]}"
+    if (( nonzero >= MIN_NONZERO_RECALL )); then
+      row PASS "felt-use" "latest=$latest nonzero_recall=$nonzero (min $MIN_NONZERO_RECALL)"
+    else
+      row FAIL "felt-use" "latest=$latest nonzero_recall=$nonzero < min $MIN_NONZERO_RECALL — living search starved"
+    fi
   else
-    row FAIL "felt-use" "latest=$latest nonzero_recall=$nonzero < min $MIN_NONZERO_RECALL — living search starved"
+    row FAIL "felt-use" "could not query honeypot on $HOST:$VAULT_DB"
   fi
-else
-  row FAIL "felt-use" "could not query honeypot on $HOST:$VAULT_DB"
+  row HOLD "felt-use-depth" "felt-use-depth.sh artifact missing — rerun scripts/felt-use-depth.sh"
 fi
 
 # ── 3) Spark refractory — unique anchors in last N ───────────────────────────

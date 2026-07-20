@@ -1,7 +1,7 @@
 ---
 id: herdr-living-enqueue-proof
 title: herdr pane-close → living takeaway enqueue proof
-status: candidate
+status: active
 score: 21
 uniqueness: 4
 brain_profit: 4
