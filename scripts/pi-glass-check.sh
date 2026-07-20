@@ -13,7 +13,17 @@ row() { local s="$1" n="$2" d="$3"; ROWS+=("$s|$n|$d"); case "$s" in PASS) pass=
 echo "=== Pi glass check (Unpark W1.2) ==="
 PI_MCP="${HOME}/.pi/agent/mcp.json"
 CURSOR_MCP="${HOME}/.cursor/mcp.json"
-[[ -f "$ROOT/docs/OPERATOR_FRONTEND_DECISION.md" ]] && row PASS "doctrine" "CLI canonical; Pi optional glass" || row FAIL "doctrine" "missing"
+DOCTRINE="$ROOT/docs/OPERATOR_FRONTEND_DECISION.md"
+if [[ -f "$DOCTRINE" ]] && python3 -c "
+from pathlib import Path
+t=Path('$DOCTRINE').read_text(encoding='utf-8').lower()
+need=['gzmo_cli','canonical','optional auxiliary']
+raise SystemExit(0 if all(x in t for x in need) else 1)
+"; then
+  row PASS "doctrine" "CLI canonical; Pi optional glass"
+else
+  row FAIL "doctrine" "OPERATOR_FRONTEND_DECISION.md missing CLI-canonical phrases"
+fi
 [[ -f "$ROOT/docs/PI_LIVING_STACK.md" ]] && row PASS "pi-living-docs" "PI_LIVING_STACK.md" || row HOLD "pi-living-docs" "missing"
 
 # Product must not be hijacked; living may use gzmo-living
@@ -66,12 +76,36 @@ for line in os.environ.get("ROWS_TSV","").splitlines():
     st,n,d=line.split("|",2); checks[n]={"status":st,"detail":d}
 fail_n=int(os.environ["fail"]); hold_n=int(os.environ["hold"]); pass_n=int(os.environ["pass"])
 verdict="GREEN" if fail_n==0 else "RED"
+# Missing boundary row = Pi not installed (ok). Only FAIL is a hard boundary break.
+bnd = checks.get("pi-product-boundary",{}).get("status")
+boundary_ok = bnd != "FAIL"
+cli_ok = checks.get("doctrine",{}).get("status")=="PASS"
+attach_ok = checks.get("product-attach",{}).get("status")=="PASS"
 advice="pi_glass_ok" if fail_n==0 and hold_n==0 else ("pi_glass_hold — Pi optional" if fail_n==0 else "pi_glass_fail")
 payload={"schema":"gzmo.unpark.pi_glass/v1","generated_at":datetime.now(timezone.utc).isoformat(),
   "verdict":verdict,"ok":fail_n==0,"advice":advice,
   "counts":{"pass":pass_n,"fail":fail_n,"hold":hold_n},"wave":"1.2","checks":checks,
-  "note":"CLI remains canonical operator UI."}
+  "note":"CLI remains canonical operator UI.",
+  "cli_canonical": cli_ok,
+  "product_attach_ok": attach_ok,
+  "product_boundary_ok": boundary_ok}
 (out/"latest.json").write_text(json.dumps(payload,indent=2)+"\n")
-print(json.dumps({"verdict":verdict,"advice":advice,"pass":pass_n,"fail":fail_n,"hold":hold_n},indent=2))
+surface={
+  "schema":"gzmo.unpark.pi_glass.surface/v1",
+  "generated_at":payload["generated_at"],
+  "wave":"1.2",
+  "cli_canonical": cli_ok,
+  "product_attach_ok": attach_ok,
+  "product_boundary_ok": boundary_ok,
+  "pi_optional": True,
+  "ok": fail_n==0 and cli_ok and attach_ok and boundary_ok,
+  "advice": "pi_surface_ok — CLI canonical; Pi optional glass" if fail_n==0 and cli_ok and attach_ok else advice,
+}
+(out/"surface.json").write_text(json.dumps(surface,indent=2)+"\n")
+if not surface["ok"] and fail_n==0:
+    # surface incomplete without FAIL rows → HOLD advice already set
+    pass
+print(json.dumps({"verdict":verdict,"advice":advice,"pass":pass_n,"fail":fail_n,"hold":hold_n,
+                  "surface":str(out/"surface.json")},indent=2))
 raise SystemExit(0 if fail_n==0 else 1)
 PY
