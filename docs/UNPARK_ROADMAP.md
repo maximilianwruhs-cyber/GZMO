@@ -48,7 +48,7 @@ A+C production readiness unlocked the former **Park freeze**. Satellites move in
 
 1. `arena-lab-demo.sh` — RAPL probe + €/night aggregate observability; sibling Arena  
 2. `ipw-route-demo.sh` — advice for chat/heavy_bench  
-3. `forge-lab-demo.sh` — recommend.json stub (never auto-block distill)
+3. `forge-lab-demo.sh` — recommend.json from Arena forge/champion winners (never auto-block distill)
 
 ### Wave 4 — Later
 
