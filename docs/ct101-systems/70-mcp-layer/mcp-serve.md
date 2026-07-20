@@ -9,6 +9,8 @@
 
 `gzmo mcp-serve` runs a **stdio MCP server** exposing GZMO platform memory to external clients (Pi agent, Cursor on workstation): honeypot RRF search, session scratch recall, operator profile, wiki search, and vault status. Uses `PlatformMemory` — same recall path as the daemon against **60k vault / 37k honeypot** on CT101 when pointed at production data dir.
 
+**Brand contract (ADR-0004):** stdio / localhost attach only. Public HTTP MCP is not the product SKU. See [MCP_LOCAL_ATTACH.md](../../MCP_LOCAL_ATTACH.md).
+
 ---
 
 ## How it works
@@ -87,7 +89,7 @@ Search writes recall snippets to Redis scratch when `write_scratch=true`.
 ## Advancement
 
 - **CT101:** Run `mcp-serve` only when needed; primary ops stay in daemon.
-- **GZMO-next:** HTTP/SSE transport option for MCP beyond stdio (lab).
+- **GZMO-next:** HTTP/SSE transport option for MCP beyond stdio (**lab only** — not brand USP; airgap living stays stdio/local).
 
 ---
 

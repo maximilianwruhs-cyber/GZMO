@@ -160,8 +160,9 @@ PY
 
 main() {
   log ""
-  log "${BOLD}GZMO — local memory MCP installer${RESET}"
-  log "${DIM}SQLite vault · Cursor/Pi · no LAN required${RESET}"
+  log "${BOLD}GZMO — lite Memory MCP (bootstrap)${RESET}"
+  log "${DIM}SQLite vault · Cursor/Pi · stdio MCP · no sidecars / no overnight writer${RESET}"
+  log "${DIM}USP (full living on one airgapped box): bash scripts/install-living-airgap.sh${RESET}"
   log ""
 
   local bin=""
@@ -203,8 +204,8 @@ main() {
   fi
 
   log ""
-  log "${GREEN}${BOLD}Done.${RESET} In Cursor/Pi call ${BOLD}gzmo_memory_status${RESET}, then ${BOLD}gzmo_memory_search${RESET}."
-  log "${DIM}Docs: https://github.com/${REPO}/blob/main/docs/PRODUCT_MCP.md${RESET}"
+  log "${GREEN}${BOLD}Done.${RESET} Lite attach ready — Cursor/Pi: ${BOLD}gzmo_memory_status${RESET}, then ${BOLD}gzmo_memory_search${RESET}."
+  log "${DIM}Lite docs: docs/PRODUCT_MCP.md · USP living: docs/AIRGAP_LIVING.md · MCP: docs/MCP_LOCAL_ATTACH.md${RESET}"
   log ""
 }
 

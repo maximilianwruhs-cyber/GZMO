@@ -1,39 +1,48 @@
 # GZMO
 
-**Sovereign, curated long-term memory for coding agents** — honeypot quality gate, supersession chains, local SQLite — exposed as MCP for Cursor and Pi.
+**Sovereign overnight memory metabolism for coding agents** — honeypot quality gate, supersession chains, local vault — airgap-capable on one box. Agents attach via **local stdio MCP**.
 
-Not another cloud notebook. Not Mem0.
+**USP:** full living Keep on one airgapped machine (local engines + Redis/Qdrant/Neo4j + daemon). Not a cloud notebook. Not Mem0. Not a public webserver.
 
-## Install (under 10 minutes)
+Doctrine: [docs/ADR-0004-airgap-living-usp.md](docs/ADR-0004-airgap-living-usp.md) · path: [docs/AIRGAP_LIVING.md](docs/AIRGAP_LIVING.md).
 
-### 1. Install binary + `~/.gzmo` + wire MCP
+## Install
+
+### Hero — airgap living (this machine)
+
+From a clone (needs Docker for sidecars):
+
+```bash
+cargo build --release -p gzmo-cli
+GZMO_BIN=./target/release/gzmo ./scripts/install-living-airgap.sh
+```
+
+Then point engines at `127.0.0.1`, enable **one** overnight daemon on this box, merge the printed `gzmo-living` MCP fragment. Quality: `./scripts/keep-quality-gate.sh`.
+
+### Bootstrap — lite Memory MCP (no overnight)
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/maximilianwruhs-cyber/GZMO/main/scripts/install-gzmo.sh | bash
 ```
 
-Writes SQLite-only `~/.gzmo/` (no LAN) and merges `gzmo-memory` into Cursor / Pi mcp.json.
+Writes SQLite-only `~/.gzmo/` and merges `gzmo-memory` into Cursor / Pi mcp.json. No sidecars; no overnight writer.
 
-### 2. Verify on the machine
+### Verify
 
 ```bash
-# From a clone (or after install):
-./scripts/product-stranger-path.sh   # cold product verify checklist
-./scripts/mcp-attach-check.sh        # Cursor/Pi point at ~/.gzmo (not CT101)
-# Optional feel-it (needs local LLM, e.g. Prime :8000):
-./scripts/product-first-fact.sh
-# Production gate (exit 0 = PRODUCT GREEN):
+# Living USP quality (reference host / airgap box):
+./scripts/keep-quality-gate.sh
+
+# Lite bootstrap:
+./scripts/product-stranger-path.sh
+./scripts/mcp-attach-check.sh
 ./scripts/product-readiness-gate.sh
 ```
 
-### 3. Attach in the agent
+### Attach in the agent
 
-In Cursor or Pi, call:
-
-1. `gzmo_memory_status` — vault path should be under `~/.gzmo/`  
-2. `gzmo_memory_search` — search your local vault  
-
-Full guide: **[docs/PRODUCT_MCP.md](docs/PRODUCT_MCP.md)**.
+- **Living:** `gzmo-living` → `gzmo_memory_status` / `gzmo_memory_search` ([docs/MCP_LOCAL_ATTACH.md](docs/MCP_LOCAL_ATTACH.md))
+- **Lite:** `gzmo-memory` → vault under `~/.gzmo/` ([docs/PRODUCT_MCP.md](docs/PRODUCT_MCP.md))
 
 ### Pi package (optional UX)
 

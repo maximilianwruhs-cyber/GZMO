@@ -1,20 +1,22 @@
-# Unpark roadmap (post A+C GREEN)
+# Unpark roadmap (post keep-quality soak)
 
-**Status:** Active (2026-07-19)  
-**Prerequisite:** `bash scripts/production-readiness-gate.sh` → A+C GREEN (0 HOLD)  
-**Doctrine:** [SPINE_FOCUS.md](./SPINE_FOCUS.md) · [STACK_OPPORTUNITY_MAP.md](./STACK_OPPORTUNITY_MAP.md)
+**Status:** Active (2026-07-20) — USP = airgap living ([ADR-0004](./ADR-0004-airgap-living-usp.md))  
+**Prerequisite:** `bash scripts/keep-quality-soak.sh --summary` → `soak_ready_unpark_ok` (default 3 trailing GREEN)  
+**Also useful:** `bash scripts/production-readiness-gate.sh` (lite + living ops)  
+**Doctrine:** [SPINE_FOCUS.md](./SPINE_FOCUS.md) · [KEEP_QUALITY.md](./KEEP_QUALITY.md) · [STACK_OPPORTUNITY_MAP.md](./STACK_OPPORTUNITY_MAP.md)
 
 ## What changed
 
-A+C production readiness unlocked the former **Park freeze**. Satellites move into a sequenced **Unpark queue**. Keep pillars A+C remain co-primary brand; satellites are useful, not the stranger install.
+Keep-quality on the living box unlocked sequenced **Unpark**. Living is first-class USP; lite is bootstrap only. Satellites are local MCP clients — not a second metabolism.
 
 ## Hard boundaries (never reverse)
 
 | Boundary | Why |
 |----------|-----|
-| ADR-0003 one overnight writer | CT101 sole living brain |
-| A never requires C sidecars | Stranger `~/.gzmo` stays Redis/Qdrant/Neo4j off |
-| Never point `gzmo-memory` at living vault | Product ≠ living attach |
+| ADR-0003 one overnight writer | One living brain per vault |
+| Lite never requires living sidecars | Bootstrap `~/.gzmo` stays Redis/Qdrant/Neo4j off |
+| Never point `gzmo-memory` at living vault as stranger default | Lite ≠ living attach labels |
+| No public MCP webserver SKU | ADR-0004 |
 | Arena / IpW / Forge outside `gzmo-daemon` by default | [OBOLUS_ARENA_BOUNDARY.md](./OBOLUS_ARENA_BOUNDARY.md) |
 | Cognis / escape-loop / ZPD never production brain | Lab/research only; not GREEN overnight gate |
 | Pi optional glass, not primary UX | [OPERATOR_FRONTEND_DECISION.md](./OPERATOR_FRONTEND_DECISION.md) |
@@ -23,11 +25,11 @@ A+C production readiness unlocked the former **Park freeze**. Satellites move in
 
 | Wave | Focus | Exit |
 |------|-------|------|
-| **0** | Doctrine flip (this doc + spine/map) | Docs agree Unpark open; production gate GREEN |
-| **1** | Operator surfaces: herdr · Pi glass · tinyFolder · AOS poll | Script/gate artifacts; A+C 0 FAIL |
+| **0** | Doctrine flip (ADR-0004 + spine + keep-quality) | Docs agree; first keep-quality GREEN |
+| **1** | Operator surfaces: herdr · Pi glass · tinyFolder · AOS poll | Script/gate artifacts; soak summary ready |
 | **2** | Ritual/theater: pantheon feat skills · discovery theater · HSP emit | Skills installable; faithfulness + takeaway-recall PASS |
 | **3** | Arena economics lab (sibling-first) | Arena overnight without changing daemon job set |
-| **4** | Later packaging: AOS CE · marketplace · wiki mind · portable-core RFC | Separate install docs; A still sidecar-free |
+| **4** | Later packaging: AOS CE · marketplace · wiki mind · portable-core RFC | Separate install docs; lite still sidecar-free |
 
 ## Wave detail
 

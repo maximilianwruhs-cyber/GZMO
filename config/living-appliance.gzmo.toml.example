@@ -1,11 +1,12 @@
-# Living appliance daemon fragment (goal C) — NOT product ~/.gzmo
+# Living appliance daemon fragment (USP airgap living) — NOT lite ~/.gzmo
 #
 # Pair with: deploy/living-appliance/docker-compose.yml
+#   bash scripts/install-living-airgap.sh
 #   bash scripts/living-appliance-up.sh
 #
 # On CT101 production, /opt/gzmo/gzmo.toml already enables these sidecars
 # (often via localhost). This fragment is the demable config sketch for a
-# clean host or lab bring-up beside the compose pin.
+# clean airgapped host beside the compose pin. Engines should be 127.0.0.1.
 #
 # Secrets: set NEO4J_PASSWORD in the process env or adjacent .env — never commit.
 # Distill queue name: use gzmo:distill:pending on living; gzmo-next:* is lab-only.

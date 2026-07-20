@@ -1,18 +1,19 @@
-# Living appliance (goal C)
+# Living appliance (sidecars for airgap living)
 
-**Status:** Keep goal — compose pin shipped (2026-07-19)  
-**Paired with:** [PRODUCT_MCP.md](./PRODUCT_MCP.md) (goal A)  
-**Doctrine:** [SPINE_FOCUS.md](./SPINE_FOCUS.md) · [research/CT101_STACK_FUTURE_2026-07.md](./research/CT101_STACK_FUTURE_2026-07.md)
+**Status:** USP substrate — compose pin shipped (2026-07-19); brand lock 2026-07-20  
+**USP path:** [AIRGAP_LIVING.md](./AIRGAP_LIVING.md) · [ADR-0004-airgap-living-usp.md](./ADR-0004-airgap-living-usp.md)  
+**Lite bootstrap (not peer product):** [PRODUCT_MCP.md](./PRODUCT_MCP.md)  
+**Doctrine:** [SPINE_FOCUS.md](./SPINE_FOCUS.md)
 
 ## What this is
 
-A **preconfigured one-writer stack**:
+Sidecar pin for the **living profile** (full Keep on one airgapped box):
 
 ```text
 gzmo-daemon + SQLite vault/honeypot + Redis + Qdrant + Neo4j
 ```
 
-Today that runs on **CT101** (`/opt/gzmo/` + `/opt/database-cluster`). Goal C makes the sidecar shape **reproducible in-repo**.
+**CT101** (`/opt/gzmo/` + `/opt/database-cluster`) is the reference deployment. The USP is any single box that runs this shape airgap-capable.
 
 ## In-repo pin
 
@@ -43,24 +44,27 @@ bash ../../scripts/living-appliance-health-smoke.sh
 
 This compose starts **sidecars only**. Pair with `gzmo-daemon` + `/opt/gzmo/gzmo.toml` (see [CT101_DEPLOY.md](./CT101_DEPLOY.md)).
 
-## Labeled MCP attach (A vs C)
+## Labeled MCP attach (lite vs living)
 
-| Server name | Goal | Install |
-|-------------|------|---------|
-| `gzmo-memory` | **A** product `~/.gzmo` | `scripts/install-product-mcp.sh` / `install-gzmo.sh` |
-| `gzmo-living` | **C** CT101 vault via SSH | `scripts/install-shared-mcp.sh` |
+| Server name | Profile | Install |
+|-------------|---------|---------|
+| `gzmo-memory` | **Lite** bootstrap `~/.gzmo` | `scripts/install-product-mcp.sh` / `install-gzmo.sh` |
+| `gzmo-living` | **Living** local stdio (hero) or ops SSH wrap | On-box: [MCP_LOCAL_ATTACH.md](./MCP_LOCAL_ATTACH.md); ops: `scripts/install-shared-mcp.sh` |
 
-`install-shared-mcp.sh` migrates a mislabeled living entry off `gzmo-memory` → `gzmo-living` and restores product `gzmo-memory` from `~/.gzmo/mcp.json` when present.
+Brand attach is **stdio / localhost** — not a public webserver. See [MCP_LOCAL_ATTACH.md](./MCP_LOCAL_ATTACH.md).
+
+`install-shared-mcp.sh` migrates a mislabeled living entry off `gzmo-memory` → `gzmo-living` and restores lite `gzmo-memory` from `~/.gzmo/mcp.json` when present.
 
 ## What this is not
 
 | Not | Why |
 |-----|-----|
-| Stranger laptop product | That is **A** — `~/.gzmo`, sidecars off |
+| Lite-only bootstrap | That is `~/.gzmo`, sidecars off — not the USP |
+| Public MCP webserver | Rejected by ADR-0004 |
 | Pi-first UX | Optional glass only |
 | Two overnight writers | [ADR-0003](./ADR-0003-one-instance-metabolism.md) |
 | Secrets in git | `NEO4J_AUTH` only via `.env` |
-| Workstation Neo4j as living SoT | Throwaway until pin/product finalize (see Auth below) |
+| Workstation Neo4j as living SoT | Throwaway (see Auth below) |
 
 ## Auth (Neo4j)
 
@@ -71,7 +75,7 @@ Two shapes, one secret:
 | Compose / Neo4j image | `NEO4J_AUTH` | `neo4j/<password>` in pin `.env` (gitignored) |
 | GZMO daemon / MCP | `NEO4J_PASSWORD` | password only (`/opt/gzmo/.env` on CT101) |
 
-**Operator lock (2026-07-19):** workstation Neo4j (`~/database-cluster` or any local `sidecar-neo4j`) is **throwaway**. Do not copy its password into the in-repo pin. Do not treat bolt-open on the laptop as goal-C auth proof. Auth SoT is CT101: `/opt/database-cluster/.env` (`NEO4J_AUTH`) + `/opt/gzmo/.env` (`NEO4J_PASSWORD`).
+**Operator lock (2026-07-19):** workstation Neo4j (`~/database-cluster` or any local `sidecar-neo4j`) is **throwaway**. Do not copy its password into the in-repo pin. Do not treat bolt-open on the laptop as living auth proof. Reference auth SoT is CT101: `/opt/database-cluster/.env` (`NEO4J_AUTH`) + `/opt/gzmo/.env` (`NEO4J_PASSWORD`). On a new airgap box, auth SoT is **that box’s** compose `.env` + daemon env.
 
 Living readiness protocol smoke targets **CT101** (`scripts/ct101-living-appliance-smoke.sh`), not the workstation throwaway stack.
 

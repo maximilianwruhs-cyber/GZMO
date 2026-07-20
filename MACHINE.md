@@ -35,7 +35,8 @@ The LLM **thinks** (extract, verify, dream). The pipeline **remembers**.
 - Not “ingest all Takeout now.”
 - Not Mem0/Zep/Supermemory reimplemented — those are patterns to borrow later.
 - Not a Foundry/Gotham (SEIP) platform — that research stays outside this repo.
-- For outsiders, the downloadable product is **local memory MCP** (`gzmo init` + `gzmo mcp-serve`), not the private living stack. See [docs/PRODUCT_MCP.md](docs/PRODUCT_MCP.md).
+- **USP dream:** full living Keep on one airgapped box (local engines + sidecars + overnight + local MCP). See [docs/ADR-0004-airgap-living-usp.md](docs/ADR-0004-airgap-living-usp.md) and [docs/AIRGAP_LIVING.md](docs/AIRGAP_LIVING.md).
+- **Lite bootstrap:** day-zero Memory MCP (`gzmo init` + `gzmo mcp-serve`) without overnight writer. See [docs/PRODUCT_MCP.md](docs/PRODUCT_MCP.md). Not a peer product roadmap.
 
 ---
 
