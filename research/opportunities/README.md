@@ -16,11 +16,13 @@ Operator research bets for GZMO upgrades. Doctrine: [docs/OPPORTUNITY_DISCOVERY.
 
 | Id | Score | Status | Title |
 |----|-------|--------|-------|
-| [tinyfolder-living-one-shot](tinyfolder-living-one-shot.md) | 20 | **active** | One-command tinyFolder → living takeaway enqueue |
+| [tinyfolder-living-one-shot](tinyfolder-living-one-shot.md) | 20 | soaked | One-command tinyFolder → living takeaway enqueue |
 | [takeaway-side-effect](takeaway-side-effect.md) | 20 | soaked | Takeaways only as side-effect of real work |
 | [serendipity-apply-cadence](serendipity-apply-cadence.md) | 21 | soaked | Cheap serendipity promote cadence (no chat tourism) |
 | [opportunity-discovery-cycle](opportunity-discovery-cycle.md) | 22 | soaked | This cycle (Sense→Rank→Bet→Ship) |
 | [local-intel-32gb-128k](local-intel-32gb-128k.md) | — | horizon | Local strong model + long context on 32GB VRAM |
+
+No active ship bet — run Sense/Rank when ready for the next upgrade. Local intel stays horizon.
 
 ## Schema (YAML frontmatter)
 
