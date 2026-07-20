@@ -51,6 +51,9 @@ payload = {
   "dry_run_log": str(out / "ingest-dry-run.log"),
   "ok": True,
   "wave": "1.3",
+  "blocks_overnight": False,
+  "product_vault": False,
+  "advice": "tinyfolder_drop_ok — lab inbox only",
 }
 (out / "demo.json").write_text(json.dumps(payload, indent=2) + "\n")
 print(json.dumps(payload, indent=2))
