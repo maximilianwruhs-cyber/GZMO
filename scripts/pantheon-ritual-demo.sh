@@ -38,13 +38,15 @@ reland.write_text(
 
 Separate ritual PR only — do not invent ghost `DICE_MASTER_*`.
 
-1. [ ] Cherry-pick or re-implement `dice_loop` / cascade / `card_forge*` from feat branch
+1. [x] Slice A full on main (dispatch / nested cascade / card_forge) — verify with pantheon-ritual-check
 2. [ ] Keep chaos off CT101 living KPI ([CHAOS_LIVING_VS_RITUAL.md](../../docs/CHAOS_LIVING_VS_RITUAL.md))
 3. [ ] `bash scripts/pantheon-ritual-check.sh` → prefer feat-stack PASS
 4. [ ] Living faithfulness + takeaway-recall still PASS
 5. [ ] Skills bridge docs updated
+6. [ ] **Hold:** Slice C.1 pedagogy oscillator — lab-only; never `daemon_cmd` / living PulseLoop
 
-Thin main stubs (`dice`/`card`/`story`) remain the installable ritual surface until then.
+Thin main stubs (`dice`/`card`/`story`) remain the installable ritual surface.
+Daemon `dice_loop` fire stays unwired by design.
 """,
     encoding="utf-8",
 )
@@ -58,7 +60,9 @@ payload = {
     "archives": archives,
     "feat_hits_on_main": feat_hits,
     "reland_checklist": str(reland),
-    "advice": "pantheon_ritual_demo_ok — thin skills + archive inventory; feat re-land checklist written",
+    "c1_deferred": True,
+    "daemon_dice_loop_fire": False,
+    "advice": "pantheon_ritual_demo_ok — Slice A inventory; C.1 + daemon dice_loop fire deferred",
 }
 (out / "demo.json").write_text(json.dumps(payload, indent=2) + "\n")
 print(json.dumps(payload, indent=2))

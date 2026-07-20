@@ -69,6 +69,27 @@ else
   row HOLD "chaos-skill-verify" "verify-chaos-skill not green — see /tmp/pantheon-chaos-skill-verify.log"
 fi
 
+# Demo inventory evidence (C.1 + daemon fire stay deferred)
+if [[ -f "$OUT/demo.json" ]]; then
+  if python3 -c "
+import json
+d=json.load(open('$OUT/demo.json'))
+ok=(
+  d.get('schema')=='gzmo.unpark.pantheon.demo/v1'
+  and d.get('ok') is True
+  and d.get('c1_deferred') is True
+  and d.get('daemon_dice_loop_fire') is False
+)
+raise SystemExit(0 if ok else 1)
+"; then
+    row PASS "demo-inventory" "demo.json — C.1 deferred; no daemon dice_loop fire"
+  else
+    row FAIL "demo-inventory" "demo.json incomplete — rerun pantheon-ritual-demo.sh"
+  fi
+else
+  row HOLD "demo-inventory" "no demo.json yet — bash scripts/pantheon-ritual-demo.sh"
+fi
+
 ROWS_TSV="$(printf '%s\n' "${ROWS[@]}")"
 export OUT pass fail hold ROWS_TSV
 python3 - <<'PY'
@@ -84,12 +105,11 @@ fail_n=int(os.environ["fail"]); hold_n=int(os.environ["hold"]); pass_n=int(os.en
 verdict="GREEN" if fail_n==0 else "RED"
 # Pantheon skills + front door = wave implemented; C.1 / daemon fire may still HOLD
 skills_ok = all(checks.get(f"skill:{s}",{}).get("status")=="PASS" for s in ("dice.rs","card.rs","story.rs"))
-demo = Path(os.environ.get("OUT","")).joinpath("demo.json")
-demo_ok = demo.is_file()
-if fail_n==0 and skills_ok:
-    advice="pantheon_ritual_ok — Slice A skills on main; C.1 pedagogy still deferred"
+demo_ok = checks.get("demo-inventory",{}).get("status")=="PASS"
+if fail_n==0 and skills_ok and demo_ok:
+    advice="pantheon_ritual_ok — Slice A skills + demo; C.1 pedagogy still deferred"
 elif fail_n==0:
-    advice="pantheon_ritual_hold — front door incomplete"
+    advice="pantheon_ritual_hold — run pantheon-ritual-demo.sh or complete front door"
 else:
     advice="pantheon_ritual_fail"
 payload={"schema":"gzmo.unpark.pantheon/v1","generated_at":datetime.now(timezone.utc).isoformat(),
