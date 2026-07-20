@@ -24,7 +24,7 @@ Operator lock: co-primary **A** (product MCP) + **C** (living Redis/Qdrant/Neo4j
 ## Recommended next three
 
 1. **Keep A+C GREEN** — `bash scripts/production-readiness-gate.sh`
-2. **Deepen thin demos** — tinyFolder drop evidence · AOS dashboard fields · (C.1 oscillator stays lab-only)
+2. **Scaffold archaeology exec picks** — build-spec: [tool-dev-amp-forget-verify-token-2026-07-20.md](../research/tool-dev-amp-forget-verify-token-2026-07-20.md) (`forget-lint` → `verify-gates` → `token-economy`; lab vault only)
 3. **Wave gate** — `bash scripts/unpark-wave-check.sh` · tag `v*` when tip ahead of release ≥5
 
 Unpark open after A+C GREEN (2026-07-19). Pantheon: [PANTHEON_THEATER_PACKAGING_PARK.md](PANTHEON_THEATER_PACKAGING_PARK.md). Doctrine: [SPINE_FOCUS.md](SPINE_FOCUS.md).
