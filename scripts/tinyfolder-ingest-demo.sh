@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Unpark Wave 1.3 demable: drop a sample note into tinyFolder inbox + dry-run ingest.
-# Does not enqueue overnight metabolism. Never touches ~/.gzmo product vault by default.
+# Brain Feed P0 demable: drop sample + living-enqueue + dry-run ingest.
+# Does not start workstation overnight metabolism. Never touches ~/.gzmo by default.
 #
 #   bash scripts/tinyfolder-ingest-demo.sh
 set -euo pipefail
@@ -10,12 +10,15 @@ OUT="$DATA/tinyfolder"
 INBOX="${TINYFOLDER_INBOX:-$DATA/tinyfolder-inbox}"
 mkdir -p "$OUT" "$INBOX"
 
+# Prefer Brain Feed living drop path (writes living-enqueue.json)
+bash "$ROOT/scripts/tinyfolder-drop.sh" --demo --living || true
+
 SAMPLE="$INBOX/unpark-wave13-$(date -u +%Y%m%dT%H%M%SZ).md"
 cat >"$SAMPLE" <<EOF
-# tinyFolder Unpark Wave 1.3 sample
+# tinyFolder Brain Feed sample
 
-Operator drop for ingest experiments. Generated $(date -u +%Y-%m-%dT%H:%M:%SZ).
-Not a living overnight fact unless an operator runs gated ingest intentionally.
+Operator drop for living ingest experiments. Generated $(date -u +%Y-%m-%dT%H:%M:%SZ).
+Not a living overnight fact until operator takeaway/ingest on the living host.
 EOF
 
 BIN="${GZMO_BIN:-}"
@@ -53,7 +56,8 @@ payload = {
   "wave": "1.3",
   "blocks_overnight": False,
   "product_vault": False,
-  "advice": "tinyfolder_drop_ok — lab inbox only",
+  "advice": "tinyfolder_drop_ok — lab inbox + living-enqueue when --living ran",
+  "living_enqueue": str(out / "living-enqueue.json"),
 }
 (out / "demo.json").write_text(json.dumps(payload, indent=2) + "\n")
 print(json.dumps(payload, indent=2))

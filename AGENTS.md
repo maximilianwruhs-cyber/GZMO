@@ -2,6 +2,8 @@
 
 Sovereign Rust agent: honeypot memory pipeline + local LLM. Read `MACHINE.md` first.
 
+**USP:** full living Keep on one airgapped box — [docs/ADR-0004-airgap-living-usp.md](docs/ADR-0004-airgap-living-usp.md). Quality: `bash scripts/keep-quality-gate.sh`. Lite MCP (`~/.gzmo`) is bootstrap only. Active Unpark nutrients: [docs/BRAIN_FEED.md](docs/BRAIN_FEED.md) (`bash scripts/brain-feed-check.sh`).
+
 ## Repo layout
 
 | Path | Role |

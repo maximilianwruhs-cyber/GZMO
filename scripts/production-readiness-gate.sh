@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# Co-primary production readiness: Goal A (product MCP) + Goal C (living CT101).
-# Exit 0 when both gates GREEN (HOLD rows allowed). Writes combined artifact.
+# Combined readiness: lite bootstrap (ex-A) + living ops (ex-C / CT101 reference).
+# Prefer scripts/keep-quality-gate.sh for the USP living quality bar (ADR-0004).
+# Exit 0 when both sub-gates GREEN (HOLD rows allowed). Writes combined artifact.
 #
 #   bash scripts/production-readiness-gate.sh
 set -euo pipefail
@@ -12,7 +13,7 @@ mkdir -p "$OUT"
 LOG="$OUT/gate.log"
 : >"$LOG"
 
-echo "=== Production readiness (A + C) ===" | tee -a "$LOG"
+echo "=== Production readiness (lite + living ops) ===" | tee -a "$LOG"
 
 set +e
 bash "$ROOT/scripts/product-readiness-gate.sh" >>"$LOG" 2>&1
@@ -37,9 +38,9 @@ prod_ok = prod.get("verdict") == "GREEN" and int(os.environ["prod_rc"]) == 0
 live_ok = live.get("verdict") == "GREEN" and int(os.environ["live_rc"]) == 0
 verdict = "GREEN" if prod_ok and live_ok else "RED"
 advice = (
-    "production_ready — product (A) + living (C) gates GREEN"
+    "production_ready — lite bootstrap + living ops gates GREEN"
     if verdict == "GREEN"
-    else "production_not_ready — see product-readiness/ and living-readiness/"
+    else "production_not_ready — see product-readiness/ and living-readiness/; USP bar is keep-quality-gate.sh"
 )
 payload = {
     "schema": "gzmo.production.readiness/v1",
@@ -47,6 +48,25 @@ payload = {
     "verdict": verdict,
     "ok": verdict == "GREEN",
     "advice": advice,
+    "profiles": {
+        "lite": {
+            "name": "memory_mcp_bootstrap",
+            "legacy_goal": "A",
+            "verdict": prod.get("verdict"),
+            "advice": prod.get("advice"),
+            "counts": prod.get("counts"),
+            "exit": int(os.environ["prod_rc"]),
+        },
+        "living": {
+            "name": "living_ops",
+            "legacy_goal": "C",
+            "verdict": live.get("verdict"),
+            "advice": live.get("advice"),
+            "counts": live.get("counts"),
+            "exit": int(os.environ["live_rc"]),
+            "intentional_holds": [],
+        },
+    },
     "goals": {
         "A": {
             "name": "product_mcp",
@@ -64,6 +84,7 @@ payload = {
             "intentional_holds": [],
         },
     },
+    "usp_gate": "scripts/keep-quality-gate.sh",
     "artifacts": {
         "product": str(prod_path),
         "living": str(live_path),
@@ -71,13 +92,14 @@ payload = {
 }
 (out / "latest.json").write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
 md = [
-    "# Production readiness (A + C)",
+    "# Production readiness (lite + living ops)",
     "",
     f"Verdict: **{verdict}**",
     "",
-    f"- **A product:** {prod.get('verdict')} — {prod.get('advice')}",
-    f"- **C living:** {live.get('verdict')} — {live.get('advice')}",
+    f"- **Lite bootstrap:** {prod.get('verdict')} — {prod.get('advice')}",
+    f"- **Living ops:** {live.get('verdict')} — {live.get('advice')}",
     "",
+    "USP quality bar: `bash scripts/keep-quality-gate.sh` (docs/KEEP_QUALITY.md).",
     "See docs/PRODUCT_PRODUCTION_READINESS.md and docs/LIVING_PRODUCTION_READINESS.md",
 ]
 (out / "latest.md").write_text("\n".join(md) + "\n", encoding="utf-8")

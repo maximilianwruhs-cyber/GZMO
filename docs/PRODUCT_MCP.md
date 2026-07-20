@@ -1,6 +1,8 @@
-# GZMO product: local memory MCP for Cursor / Pi
+# GZMO lite: local memory MCP for Cursor / Pi (bootstrap)
 
-Install a **sovereign, curated long-term memory** for coding agents — honeypot quality gate, supersession chains, and local SQLite — exposed as MCP. Not a cloud notebook; not Mem0.
+**Profile:** lite bootstrap — not the USP. Full product dream is **airgap living** on one box: [AIRGAP_LIVING.md](./AIRGAP_LIVING.md) · [ADR-0004-airgap-living-usp.md](./ADR-0004-airgap-living-usp.md).
+
+Install a **sovereign, curated long-term memory** for coding agents — honeypot quality gate, supersession chains, and local SQLite — exposed as **stdio MCP**. Not a cloud notebook; not Mem0; not a public webserver.
 
 ## 5-minute install
 
@@ -42,9 +44,17 @@ Refresh an existing home without wiping the vault:
 gzmo init --refresh-engine
 ```
 
-Production gate: `bash scripts/product-readiness-gate.sh` → [PRODUCT_PRODUCTION_READINESS.md](PRODUCT_PRODUCTION_READINESS.md).
+Lite gate: `bash scripts/product-readiness-gate.sh` → [PRODUCT_PRODUCTION_READINESS.md](PRODUCT_PRODUCTION_READINESS.md).  
+Living USP gate: `bash scripts/keep-quality-gate.sh` → [KEEP_QUALITY.md](KEEP_QUALITY.md).  
+Local attach contract: [MCP_LOCAL_ATTACH.md](MCP_LOCAL_ATTACH.md).
 
-Manual fragment (if you skip the installer merge):
+Hero path (sidecars + overnight on this machine):
+
+```bash
+bash scripts/install-living-airgap.sh
+```
+
+Manual lite fragment (if you skip the installer merge):
 
 ```json
 {

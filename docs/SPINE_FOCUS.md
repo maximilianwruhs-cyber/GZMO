@@ -1,107 +1,108 @@
-# Spine focus — two goals (A + C)
+# Spine focus — airgap living USP
 
-**Status:** Unpark active (2026-07-19) — A+C GREEN · satellites sequenced  
-**Supersedes freeze:** “Park stays parked / do not expand”  
-**Futures research:** [research/CT101_STACK_FUTURE_2026-07.md](research/CT101_STACK_FUTURE_2026-07.md)  
+**Status:** Active (2026-07-20) — USP = full living on one airgapped box  
+**Doctrine:** [ADR-0004-airgap-living-usp.md](ADR-0004-airgap-living-usp.md) · one-writer [ADR-0003](ADR-0003-one-instance-metabolism.md)  
+**Supersedes:** co-primary “A + C” brand forever (kept below as migration vocabulary only)  
 **Unpark roadmap:** [UNPARK_ROADMAP.md](UNPARK_ROADMAP.md)  
 **Audience:** Operator deciding what to strengthen next  
-**Combined gate:** `bash scripts/production-readiness-gate.sh` → `data-next/production-readiness/`
+**Quality gate:** `bash scripts/keep-quality-gate.sh` → `data-next/keep-quality/`
 
 ## Verdict
 
-**Co-primary brand stays A + C.** Former Park satellites are an **Unpark queue** (sequenced waves) — useful, not the stranger install.
+**Develop living. Ship one local GZMO.** Former Park satellites are an **Unpark queue** — clients of local living MCP after keep-quality soaks GREEN, not the stranger brand.
 
-| Goal | Name | What ships |
-|------|------|------------|
-| **A** | **Product Memory MCP** | Stranger laptop: `install-gzmo.sh` → `~/.gzmo` → `gzmo mcp-serve` / `gzmo memory mcp`. Redis/Qdrant/Neo4j **off**. |
-| **C** | **Living sidecar appliance** | One-writer host (today CT101): `gzmo-daemon` + Redis + Qdrant + Neo4j as a **preconfigured living stack** (in-repo compose pin → demable install). |
+| Profile | Name | What ships |
+|---------|------|------------|
+| **Living** (first-class) | **Airgap living Keep** | One box: `gzmo-daemon` + vault/honeypot + Redis + Qdrant + Neo4j + local Prime/embed + overnight metabolism. MCP via stdio/localhost. |
+| **Lite** (bootstrap only) | **Attach Memory MCP** | `install-gzmo.sh` → `~/.gzmo` → `gzmo mcp-serve`. Sidecars **off**. No overnight writer. |
 
-Metabolism (chat → distill → honeypot → felt recall) is the living asset **inside C**. MCP attach to that vault is the operator/living profile — never confuse it with A’s stranger home.
+Metabolism (chat → distill → honeypot → felt recall → dream/spark/immune/lymph) lives **only** on the living profile. Lite must never become a second overnight brain.
 
-**Not primary brand (may still ship as satellites):** Pi-as-UX (B stays optional glass), Park zoo (D = Unpark queue, not the product identity).
+**Not primary brand:** Pi-as-UX (optional glass), Park zoo (Unpark queue), public webserver MCP.
 
 ## Hard boundary (do not blur)
 
-| | A — Product MCP | C — Living appliance |
-|--|-----------------|----------------------|
-| Vault | `~/.gzmo` | `/opt/gzmo` (CT101) or future appliance data dir |
-| Sidecars | Off | Redis + Qdrant + Neo4j **required** |
-| Overnight writer | No (attach-only) | Yes — sole writer ([ADR-0003](ADR-0003-one-instance-metabolism.md)) |
-| Stranger install | Yes | No — operator / sovereign host |
+| | Lite (bootstrap) | Living (USP) |
+|--|------------------|--------------|
+| Vault | `~/.gzmo` | `/opt/gzmo` (CT101 today) or any single-box appliance data dir |
+| Sidecars | Off | Redis + Qdrant + Neo4j **on the same box** (or honest degrade) |
+| Overnight writer | No | Yes — sole writer ([ADR-0003](ADR-0003-one-instance-metabolism.md)) |
+| MCP attach | stdio → local `mcp-serve` | stdio → local `mcp-serve` (SSH wrap is ops, not brand) |
+| Roadmap weight | Maintenance | **First-class** |
 
-Never point product MCP at the living vault. Never require C’s sidecars for A’s install.
+Never point lite product MCP at the living vault as the stranger default. Never require living sidecars for lite bootstrap. Never dual overnight writers.
 
 ## Living vault owner
 
 | Role | Host | Path | Overnight writer |
 |------|------|------|------------------|
-| **Living production** | **CT101** | `/opt/gzmo/` + `gzmo-daemon` | Yes — sole writer |
-| **Operator / lab** | Workstation | `GZMO/data-next/` | No overnight `gzmo serve` while CT101 lives |
+| **Living production (reference)** | **CT101** | `/opt/gzmo/` + `gzmo-daemon` | Yes — sole writer today |
+| **USP target** | Any one airgapped box | local data dir + compose pin | Yes — sole writer on that box |
+| **Operator / lab** | Workstation | `GZMO/data-next/` | No overnight `gzmo serve` while another living host writes |
 
-This is already ADR-0003 / [CT101_BOUNDARY.md](CT101_BOUNDARY.md). Nightburst artifacts under `data-next/` prove compressed recipes; they do **not** replace CT101 as the living brain.
+See [CT101_BOUNDARY.md](CT101_BOUNDARY.md), [AIRGAP_LIVING.md](AIRGAP_LIVING.md), [LIVING_APPLIANCE.md](LIVING_APPLIANCE.md).
 
-**Workstation Neo4j is throwaway** — living smoke/auth SoT is CT101 (`/opt/database-cluster/.env`). See [LIVING_APPLIANCE.md](LIVING_APPLIANCE.md#auth-neo4j).
+**Workstation Neo4j is throwaway** — living smoke/auth SoT is the living host (CT101: `/opt/database-cluster/.env`).
 
-## Keep / Unpark queue / Later
+## Migration vocabulary (A / C)
 
-See [STACK_OPPORTUNITY_MAP.md](STACK_OPPORTUNITY_MAP.md) and [UNPARK_ROADMAP.md](UNPARK_ROADMAP.md).
+Older docs said **A** = product MCP and **C** = living appliance. Map:
 
-## Production readiness
+- **A → lite profile** (bootstrap)
+- **C → living profile** (USP)
+
+Do not invent new co-primary brands. Prefer “lite / living.”
+
+## Keep / Unpark / Later
+
+See [STACK_OPPORTUNITY_MAP.md](STACK_OPPORTUNITY_MAP.md) and [UNPARK_ROADMAP.md](UNPARK_ROADMAP.md). Unpark only after keep-quality soaks GREEN.
+
+**Active Unpark focus:** [BRAIN_FEED.md](BRAIN_FEED.md) — the only Unpark lane that claims to **nourish** the living vault (takeaway, tinyFolder, Felt Use, serendipity promote, calibration/Arena human-pin). Theater satellites stay sequenced but demoted.
+
+## Production / quality readiness
 
 ```bash
-# Laptop Memory MCP
-bash scripts/product-readiness-gate.sh
-# → data-next/product-readiness/latest.json
+# USP quality bar (living box — preferred)
+bash scripts/keep-quality-gate.sh
+# → data-next/keep-quality/latest.json
 
-# Living CT101 metabolism
+# Living ops readiness (CT101 reference)
 bash scripts/living-readiness-gate.sh
 # → data-next/living-readiness/latest.json
 
-# Goal C compose pin (sidecars; no daemon)
+# Lite bootstrap (optional / stranger day-zero)
+bash scripts/product-readiness-gate.sh
+# → data-next/product-readiness/latest.json
+
+# Sidecar compose pin
 bash scripts/living-appliance-up.sh
 bash scripts/living-appliance-gate.sh
-# → data-next/living-appliance/latest.json
-# Living MCP label: bash scripts/install-shared-mcp.sh  →  gzmo-living
 ```
 
-See [PRODUCT_PRODUCTION_READINESS.md](PRODUCT_PRODUCTION_READINESS.md) and [LIVING_PRODUCTION_READINESS.md](LIVING_PRODUCTION_READINESS.md).
+See [KEEP_QUALITY.md](KEEP_QUALITY.md), [LIVING_PRODUCTION_READINESS.md](LIVING_PRODUCTION_READINESS.md), [PRODUCT_PRODUCTION_READINESS.md](PRODUCT_PRODUCTION_READINESS.md).
 
 ## Demable check (≈5 minutes)
 
 ```bash
-# Stranger / laptop product path (no CT101 required)
+# Lite bootstrap (no living host required)
 bash scripts/product-stranger-path.sh
-# → data-next/product-stranger/latest.{json,md}
 bash scripts/mcp-attach-check.sh
-# → data-next/mcp-attach/latest.{json,md}
-bash scripts/product-first-fact.sh
-# → data-next/product-first-fact/ (needs local engine; sibling overlay only)
 
-# Soft CT101 living probe (SSH smoke + dual-writer check)
+# Living reference (CT101) + USP quality
 bash scripts/ct101-living-probe.sh
-# → data-next/ct101-living/latest.{json,md}
-
-# Living takeaway → distill → recall (CT101 same sitting)
-bash scripts/ct101-takeaway-recall.sh
-# → data-next/ct101-takeaway-recall/latest.{json,md}
-
-# Faithfulness on living vault (CORE_INSIGHT / ADR claims)
 bash scripts/faithfulness-living.sh
-# → data-next/faithfulness-living/latest.{json,md}
-
-# Lab supports (workstation data-next only)
-bash scripts/takeaway-ritual-lab.sh   # enqueue only
-bash scripts/watchdog-lab.sh          # soft STALE under short threshold
-bash scripts/dream-compact-lab.sh     # dry-run
-bash scripts/spine-demo.sh
+bash scripts/keep-quality-gate.sh
 ```
 
-Stranger test: install → `product-stranger-path` → attach MCP in Cursor/Pi.  
-Operator test: CT101 takeaway→recall HIT + living faithfulness + serve inactive.
+Lite test: install → attach MCP in Cursor/Pi.  
+Living test: keep-quality GREEN + one-writer + local MCP attach.
 
 ## Related
 
-- [PRODUCT_MCP.md](PRODUCT_MCP.md)
-- [GZMO_NEXT_RUNBOOK.md](GZMO_NEXT_RUNBOOK.md)
+- [ADR-0004-airgap-living-usp.md](ADR-0004-airgap-living-usp.md)
+- [AIRGAP_LIVING.md](AIRGAP_LIVING.md)
+- [MCP_LOCAL_ATTACH.md](MCP_LOCAL_ATTACH.md)
+- [PRODUCT_MCP.md](PRODUCT_MCP.md) (lite bootstrap)
+- [LIVING_APPLIANCE.md](LIVING_APPLIANCE.md)
 - [CORE_INSIGHT.md](CORE_INSIGHT.md)
 - [ADR-0003-one-instance-metabolism.md](ADR-0003-one-instance-metabolism.md)

@@ -6,12 +6,18 @@ Canonical operator and architecture docs. Session reports and milestone logs bel
 
 | Doc | Purpose |
 |-----|---------|
-| [PRODUCT_MCP.md](PRODUCT_MCP.md) | **Outsider product** — Cursor/Pi local memory MCP (`gzmo init`) |
-| [PRODUCT_PRODUCTION_READINESS.md](PRODUCT_PRODUCTION_READINESS.md) | **Product GREEN gate** — laptop Memory MCP readiness |
-| [LIVING_PRODUCTION_READINESS.md](LIVING_PRODUCTION_READINESS.md) | **Living GREEN gate** — CT101 metabolism readiness |
-| [LIVING_APPLIANCE.md](LIVING_APPLIANCE.md) | **Goal C** — Redis/Qdrant/Neo4j living appliance (paired with product MCP) |
-| [PRODUCTION_READINESS.md](PRODUCTION_READINESS.md) | Index — living vs product gates |
-| [../README.md](../README.md) | Public product README (MCP-first) |
+| [ADR-0004-airgap-living-usp.md](ADR-0004-airgap-living-usp.md) | **USP doctrine** — full living on one airgapped box |
+| [AIRGAP_LIVING.md](AIRGAP_LIVING.md) | **Hero path** — single-box airgap living bring-up |
+| [KEEP_QUALITY.md](KEEP_QUALITY.md) | **USP quality gate** — `keep-quality-gate.sh` |
+| [BRAIN_FEED.md](BRAIN_FEED.md) | **Active Unpark** — satellites that nourish the living vault |
+| [MCP_LOCAL_ATTACH.md](MCP_LOCAL_ATTACH.md) | **Brand MCP** — stdio / localhost only |
+| [SPINE_FOCUS.md](SPINE_FOCUS.md) | Active focus — living first-class; lite bootstrap |
+| [PRODUCT_MCP.md](PRODUCT_MCP.md) | **Lite bootstrap** — Cursor/Pi Memory MCP (`gzmo init`) |
+| [PRODUCT_PRODUCTION_READINESS.md](PRODUCT_PRODUCTION_READINESS.md) | Lite GREEN gate |
+| [LIVING_PRODUCTION_READINESS.md](LIVING_PRODUCTION_READINESS.md) | Living ops GREEN gate (CT101 reference) |
+| [LIVING_APPLIANCE.md](LIVING_APPLIANCE.md) | Redis/Qdrant/Neo4j compose pin for living |
+| [PRODUCTION_READINESS.md](PRODUCTION_READINESS.md) | Index — living vs lite gates |
+| [../README.md](../README.md) | Public README |
 | [../MACHINE.md](../MACHINE.md) | What GZMO is (two sentences) |
 | [ROADMAP_TO_M5.md](ROADMAP_TO_M5.md) | Milestone roadmap (operator) |
 | [INFRASTRUCTURE_OVERVIEW.md](INFRASTRUCTURE_OVERVIEW.md) | Living stack topology, ports, runbook |
@@ -23,7 +29,7 @@ Canonical operator and architecture docs. Session reports and milestone logs bel
 | [MUTUAL_DISCOVERY_THEATER.md](MUTUAL_DISCOVERY_THEATER.md) | Pedagogy theater front door (not scout KPI) |
 | [PRODUCTION_READINESS.md](PRODUCTION_READINESS.md) | Production gate checklist |
 
-Product non-goals (v1): multi-host living install, overnight serve as required path, SEIP scaffolding, cloud memory SaaS.
+Product non-goals: public multi-tenant MCP webserver, dual overnight writers, SEIP scaffolding, cloud memory SaaS. Lite without overnight is bootstrap only — not a peer roadmap ([ADR-0004](ADR-0004-airgap-living-usp.md)).
 
 ## Architecture
 
@@ -35,8 +41,8 @@ Product non-goals (v1): multi-host living install, overnight serve as required p
 | [WIKI_LAYER.md](WIKI_LAYER.md) | Git-tracked markdown wiki layer (see also `../WIKI.md`) |
 | [CORE_MECHANICS_AUDIT_20260605.md](CORE_MECHANICS_AUDIT_20260605.md) | Core mechanics audit |
 | [CEILING_ROADMAP.md](CEILING_ROADMAP.md) | Long-term ceiling |
-| [SPINE_FOCUS.md](SPINE_FOCUS.md) | **Active product focus** — two pillars, Unpark queue, vault owner |
-| [UNPARK_ROADMAP.md](UNPARK_ROADMAP.md) | Sequenced Unpark waves after A+C GREEN |
+| [SPINE_FOCUS.md](SPINE_FOCUS.md) | **Active product focus** — airgap living USP, Unpark queue |
+| [UNPARK_ROADMAP.md](UNPARK_ROADMAP.md) | Sequenced Unpark waves after keep-quality soak GREEN |
 | [AOS_CUSTOMER_EDITION.md](AOS_CUSTOMER_EDITION.md) | Wave 4.1 CE sketch (on top of C only) |
 | [OKCP_MARKETPLACE.md](OKCP_MARKETPLACE.md) | Wave 4.2 marketplace notes |
 | [WIKI_OBSERVATORY_MIND.md](WIKI_OBSERVATORY_MIND.md) | Wave 4.3 demable mind notes |
