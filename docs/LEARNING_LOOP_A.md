@@ -46,6 +46,7 @@ export SPARK_ANCHOR_WINDOW=14,90
 3. Young-vault spark window — `SPARK_ANCHOR_WINDOW` / vault default `0,30`
 4. **Fixture Phase A proof** — `spark-link/fixtures/phase-a-facts.json` (stale + ≤72h recent); dry-run `--allow-selection` writes selection audit; meta `learning_loop.phase_a_proof=true`
 5. **`learning_loop` block** on `cognition-smoke-meta.json` (`spark_selected`, `vault_spark_promoted`, `phase_a_proof`)
+6. **dream-stats cross-link** — cognition-smoke auto-loads `data-next/dream-stats.json` (or `--dream-stats`); meta adds `dream_metabolized` + `phase_a_ring` (spark proof ∧ dream honeypot_promoted > 0)
 
 ## Live LLM proof
 
@@ -55,6 +56,7 @@ export LLM_URL=http://127.0.0.1:8000
 bash little-tools-lab/scripts/cognition-smoke.sh --fixture --spark-run --spark-no-verify \
   --meta /tmp/cognition-smoke-meta.json
 # Expect: spark_report_promoted=true, phase_a_proof=true, spark_promote_kind=hypothesis
+# If data-next/dream-stats.json exists with honeypot_promoted>0 → phase_a_ring=true
 
 # Full verify (may abstain on citations; hypothesis still vault-audited via --allow-hypothesis):
 bash little-tools-lab/scripts/cognition-smoke.sh --fixture --spark-run \
@@ -63,5 +65,5 @@ bash little-tools-lab/scripts/cognition-smoke.sh --fixture --spark-run \
 
 ## Still open
 
-1. Cross-link `dream-stats.json` into the same `learning_loop` block
-2. Mature `data-next` vault path that selects under `SPARK_ANCHOR_WINDOW=14,90` without fixture
+1. Mature `data-next` vault path that selects under `SPARK_ANCHOR_WINDOW=14,90` without fixture
+2. Unified scheduler run-id tying 01:00 dream + 03:30 cognition into one operator surface
