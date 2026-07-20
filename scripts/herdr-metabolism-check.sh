@@ -16,6 +16,18 @@ echo "=== herdr metabolism check (Unpark W1.1) ==="
 [[ -x "$ROOT/scripts/herdr-metabolism-link.sh" ]] && row PASS "link-script" "herdr-metabolism-link.sh" || row FAIL "link-script" "missing"
 [[ -x "$PLUGIN/scripts/session-close.sh" ]] && row PASS "close-script" "session-close.sh" || row FAIL "close-script" "missing"
 
+# Plugin contract: session-close action + pane.closed event (takeaway ritual surface)
+if [[ -f "$PLUGIN/herdr-plugin.toml" ]] && python3 -c "
+from pathlib import Path
+t=Path('$PLUGIN/herdr-plugin.toml').read_text(encoding='utf-8')
+ok = 'gzmo.metabolism' in t and 'session-close' in t and 'pane.closed' in t and 'ensure-mcp' in t
+raise SystemExit(0 if ok else 1)
+"; then
+  row PASS "plugin-contract" "gzmo.metabolism + session-close + pane.closed"
+else
+  row FAIL "plugin-contract" "herdr-plugin.toml missing metabolism close-ritual actions"
+fi
+
 if command -v herdr >/dev/null 2>&1; then
   row PASS "herdr-bin" "$(command -v herdr)"
   if herdr plugin list 2>/dev/null | grep -qi 'gzmo.metabolism'; then
@@ -36,10 +48,20 @@ fi
 
 # Close-ritual evidence from demo (lab enqueue, no --now)
 if [[ -f "$OUT/close-ritual.json" ]]; then
-  if python3 -c "import json;d=json.load(open('$OUT/close-ritual.json')); raise SystemExit(0 if d.get('ok') and d.get('now_flag') is False else 1)"; then
+  if python3 -c "
+import json
+d=json.load(open('$OUT/close-ritual.json'))
+ok=(
+  d.get('schema')=='gzmo.unpark.herdr.close_ritual/v1'
+  and d.get('ok') is True
+  and d.get('now_flag') is False
+  and d.get('session_has_takeaway') is True
+)
+raise SystemExit(0 if ok else 1)
+"; then
     row PASS "close-ritual" "$(python3 -c "import json;print(json.load(open('$OUT/close-ritual.json')).get('advice',''))")"
   else
-    row FAIL "close-ritual" "close-ritual.json not ok — rerun herdr-metabolism-demo.sh"
+    row FAIL "close-ritual" "close-ritual.json incomplete — rerun herdr-metabolism-demo.sh"
   fi
 else
   row HOLD "close-ritual" "no close-ritual.json yet — bash scripts/herdr-metabolism-demo.sh"
@@ -58,7 +80,9 @@ for line in os.environ.get("ROWS_TSV","").splitlines():
     st,n,d = line.split("|",2); checks[n]={"status":st,"detail":d}
 fail_n=int(os.environ["fail"]); hold_n=int(os.environ["hold"]); pass_n=int(os.environ["pass"])
 verdict="GREEN" if fail_n==0 else "RED"
-advice = "herdr_metabolism_ok" if fail_n==0 and checks.get("close-ritual",{}).get("status")=="PASS" else (
+contract_ok = checks.get("plugin-contract",{}).get("status")=="PASS"
+ritual_ok = checks.get("close-ritual",{}).get("status")=="PASS"
+advice = "herdr_metabolism_ok" if fail_n==0 and contract_ok and ritual_ok else (
     "herdr_metabolism_hold — link or run close-ritual demo" if fail_n==0 else "herdr_metabolism_fail")
 payload={"schema":"gzmo.unpark.herdr/v1","generated_at":datetime.now(timezone.utc).isoformat(),
   "verdict":verdict,"ok":fail_n==0,"advice":advice,

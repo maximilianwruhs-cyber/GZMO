@@ -33,14 +33,14 @@ A+C production readiness unlocked the former **Park freeze**. Satellites move in
 
 ### Wave 1 — Operator surfaces
 
-1. `herdr-metabolism-demo.sh` / `herdr-metabolism-check.sh`  
+1. `herdr-metabolism-demo.sh` / `herdr-metabolism-check.sh` — plugin contract + close-ritual (`now_flag=false`)  
 2. `pi-glass-fix.sh` / `pi-glass-check.sh` — doctrine phrases + `surface.json` (CLI canonical)  
 3. `tinyfolder-ingest-demo.sh` / `tinyfolder-check.sh` — require `demo.json` sample + dry-run log  
 4. `aos-poll-dashboard.sh` / `aos-poll-check.sh` — require `dashboard.json` (Arena not required)
 
 ### Wave 2 — Ritual / theater
 
-1. `pantheon-ritual-demo.sh` — thin skills + re-land checklist (no ghost `DICE_MASTER_*`)  
+1. `pantheon-ritual-demo.sh` — demo inventory; C.1 + daemon `dice_loop` fire deferred (no ghost `DICE_MASTER_*`)  
 2. `discovery-theater-demo.sh` — session prep + Socratic LINK dry-run score (≠ living KPI)  
 3. `hsp-emit-demo.sh` — motif schema + non-empty MIDI/WAV (not on GREEN overnight gate)
 
