@@ -21,6 +21,30 @@ else
 fi
 [[ -d "$ROOT/docs/research/mutual-discovery" ]] && row PASS "archive" "research/mutual-discovery/" || row HOLD "archive" "archive optional"
 
+DRY="$OUT/link-dry-run.json"
+if [[ -f "$DRY" ]]; then
+  if python3 - <<PY
+import json, sys
+from pathlib import Path
+d = json.loads(Path("$DRY").read_text())
+if not d.get("ok"):
+    sys.exit(2)
+if int(d.get("score") or 0) < int(d.get("total") or 1):
+    sys.exit(3)
+items = d.get("items") or []
+if not items:
+    sys.exit(4)
+sys.exit(0)
+PY
+  then
+    row PASS "link-dry-run" "Socratic LINK pack scored complete"
+  else
+    row FAIL "link-dry-run" "incomplete — run discovery-theater-demo.sh"
+  fi
+else
+  row HOLD "link-dry-run" "missing link-dry-run.json — run discovery-theater-demo.sh"
+fi
+
 ROWS_TSV="$(printf '%s\n' "${ROWS[@]}")"
 export OUT pass fail hold ROWS_TSV
 python3 - <<'PY'

@@ -16,15 +16,15 @@ CT101 living stack carries theatrical/ops baggage. A portable core would extract
 
 ## Approach
 
-1. **Inventory** modules that are product-A pure (`mcp-serve`, vault FTS, session close)  
-2. **Inventory** modules that are living-C only (daemon jobs, Redis distill, Qdrant sync)  
-3. **Define** a `gzmo-core` feature matrix (`product`, `living`) before any extract  
+1. **Inventory** top-level `gzmo-core` mods from `lib.rs` into product / living / theater_or_ops seams  
+2. Demable: `bash scripts/portable-core-inventory.sh` → `data-next/portable-core/{latest.json,inventory.md}`  
+3. **Define** a `gzmo-core` feature matrix (`product`, `living`) before any extract (sketched when Cargo has no `[features]` yet)  
 4. **Prove** with existing gates: product-readiness without living features; living-readiness with them  
 
 ## Acceptance
 
-- Written inventory table merged  
-- Feature flags sketched (no mandatory extract)  
+- Written inventory table merged (`module_seams` in latest.json)  
+- Feature flags sketched (no mandatory extract); **`hold_rewrite` default**  
 - A+C gates still GREEN  
 
 ## Rejected for now
