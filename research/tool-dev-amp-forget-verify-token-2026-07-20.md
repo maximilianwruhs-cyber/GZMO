@@ -75,7 +75,7 @@ ingest / session_distill / dream / spark
 | **Must remember** | Retrieve **judges** recall bundles — does not embed/RRF; Evidence-First cites `[E#]` |
 | **Non-goals** | Qdrant inside piece; replace overnight `KgPromoter`; CT101 vault import; tool-chaining product |
 
-**Ready:** packet/verdict schemas · fixture pass/fail triad · leaf subprocess only · catalog justification (47th piece).
+**Ready:** sibling piece [`verify-gates`](../../verify-gates/) (analyze/retrieve/reason fixture smoke) · LTL manifest `partial`.
 
 ---
 
