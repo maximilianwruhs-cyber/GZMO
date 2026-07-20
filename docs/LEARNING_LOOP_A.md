@@ -47,7 +47,21 @@ export SPARK_ANCHOR_WINDOW=14,90
 4. **Fixture Phase A proof** — `spark-link/fixtures/phase-a-facts.json` (stale + ≤72h recent); dry-run `--allow-selection` writes selection audit; meta `learning_loop.phase_a_proof=true`
 5. **`learning_loop` block** on `cognition-smoke-meta.json` (`spark_selected`, `vault_spark_promoted`, `phase_a_proof`)
 
+## Live LLM proof
+
+```bash
+export LLM_URL=http://127.0.0.1:8000
+# Reproducible promoted=true (skip flaky citation verify gate):
+bash little-tools-lab/scripts/cognition-smoke.sh --fixture --spark-run --spark-no-verify \
+  --meta /tmp/cognition-smoke-meta.json
+# Expect: spark_report_promoted=true, phase_a_proof=true, spark_promote_kind=hypothesis
+
+# Full verify (may abstain on citations; hypothesis still vault-audited via --allow-hypothesis):
+bash little-tools-lab/scripts/cognition-smoke.sh --fixture --spark-run \
+  --meta /tmp/cognition-smoke-meta.json
+```
+
 ## Still open
 
-1. Live spark `--spark-run` green path that sets `spark_report_promoted: true` (LLM verify) on lab vault
-2. Cross-link `dream-stats.json` into the same `learning_loop` block
+1. Cross-link `dream-stats.json` into the same `learning_loop` block
+2. Mature `data-next` vault path that selects under `SPARK_ANCHOR_WINDOW=14,90` without fixture

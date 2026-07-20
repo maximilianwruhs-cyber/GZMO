@@ -33,7 +33,7 @@
 Three candidates that are **new relative to the Little Tools catalog**, with strong CT101 evidence and a clear little-tool or product shape. Already-extracted Tier-1 IP (spark-link, honeypot-gate, rem-substrate, …) is listed under *Already cataloged* below — do not re-ship.
 
 > **Shipped lab siblings (2026-07-20):** `forget-lint` · `verify-gates` · `token-economy` · `tool-chain` · `trace-memory` (LTL `--frontier`).  
-> **learning-loop-A (#6):** deepen recipes — see [LEARNING_LOOP_A.md](../docs/LEARNING_LOOP_A.md); cognition-smoke vault spark defaults to `--anchor-window 0,30` for young `data-next`.
+> **learning-loop-A (#6):** deepen recipes — see [LEARNING_LOOP_A.md](../docs/LEARNING_LOOP_A.md); fixture + live `--spark-run` Phase A proof landed (`phase_a_proof`).
 
 ### 1. `forget-lint` — Purposeful forgetting / intermediate-honeypot clearer
 
@@ -86,7 +86,7 @@ Scores: Value / Feasibility / Novelty (1–10). Novelty vs Little Tools catalog 
 | 3 | `token-economy` | Reactive budget/route/compress/cache | `06c23921`, `5d774056`, `9c827e76`; agentic-token-economy micros | **new** | 8 | 5 | 8 | little-tool CLI |
 | 4 | `tool-chain` | Close “Tools Are Leaves” — follow refs → auto-read | `2102986b`, `bdd0be5b`, `af0999bb`; tinyfolder product | **scaffolded** — sibling + LTL `--frontier` | 7 | 6 | 7 | little-tool CLI `expand` |
 | 5 | `trace-memory` | Cross-task trace retrieve → inject strategies | `9a3763c7`; tinyfolder product | **scaffolded** — sibling + LTL `--frontier` | 7 | 6 | 7 | little-tool CLI `recall`/`record` |
-| 6 | `learning-loop-A` | Close Phase A learning loop (highest impact / lowest risk per research) | `75eb5004`, `6eaf665f`; tinyfolder product | **deepening** — fixture `phase_a_proof` + `learning_loop` meta; live LLM `promoted:true` still open | 9 | 5 | 6 | deepen dream/spark wiring (not new organ) |
+| 6 | `learning-loop-A` | Close Phase A learning loop (highest impact / lowest risk per research) | `75eb5004`, `6eaf665f`; tinyfolder product | **deepening** — fixture + live `--spark-run`/`--spark-no-verify` → `spark_report_promoted`; dream-stats cross-link still open | 9 | 5 | 6 | deepen dream/spark wiring (not new organ) |
 | 7 | `pdu-reflect` | Prosecutor–Defender–Umpire Hegelian reflection | `190d23e6`, `c59bdcd9`, `f13f17b9`; how-could-we-blueprint-an-idea | **new** (zpd-tutor is pedagogy, not PDU) | 6 | 5 | 8 | little-tool / lab session |
 | 8 | `stigmergy-queue` | Ideas→Architecture→Build→QA folder pipeline | `a4949023`, `54aec32d`, `d1473f8e`, `a5e885a4`; du-hast-gesagt + sovereign factory | **new as product** | 6 | 4 | 6 | research / optional Obsidian skill — not CT101 import |
 | 9 | `ipw-dashboard` | Intelligence-per-Watt IDE status + hot-swap | `d2446b2a`, `2d7b181e`, `afe212a4`; Obolus VS Codium research | **partial** — Obolus shipped; IDE extension not | 7 | 4 | 6 | VSCodium extension (separate from little-tools) |
