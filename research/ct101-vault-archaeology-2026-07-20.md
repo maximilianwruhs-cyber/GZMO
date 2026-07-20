@@ -32,6 +32,8 @@
 
 Three candidates that are **new relative to the Little Tools catalog**, with strong CT101 evidence and a clear little-tool or product shape. Already-extracted Tier-1 IP (spark-link, honeypot-gate, rem-substrate, …) is listed under *Already cataloged* below — do not re-ship.
 
+> **Shipped lab siblings (2026-07-20):** `forget-lint` · `verify-gates` · `token-economy` · `tool-chain` (LTL `--frontier`). Next archaeology picks: `trace-memory` (#5), `learning-loop-A` (#6).
+
 ### 1. `forget-lint` — Purposeful forgetting / intermediate-honeypot clearer
 
 **One-liner:** Active decay CLI that clears intermediate / superseded honeypot layers (and optional quarantine promote/demote), treating forgetting as a first-class product feature rather than passive half-life.
@@ -81,7 +83,7 @@ Scores: Value / Feasibility / Novelty (1–10). Novelty vs Little Tools catalog 
 | 1 | `forget-lint` | Purposeful forgetting of intermediate honeypots | `690cb295`, `26ad76d0`, `20811f83`; cascading/wisdom + honeypot-compiler | **new** | 9 | 7 | 9 | little-tool CLI |
 | 2 | `verify-gates` | Mid-pipeline Analyze/Retrieve/Reason gates | `ffd73b42`, `11d7748d`, `b960e95c`; tinyfolder product analysis | **new** | 8 | 6 | 8 | little-tool / assembly piece |
 | 3 | `token-economy` | Reactive budget/route/compress/cache | `06c23921`, `5d774056`, `9c827e76`; agentic-token-economy micros | **new** | 8 | 5 | 8 | little-tool CLI |
-| 4 | `tool-chain` | Close “Tools Are Leaves” — follow refs → auto-read | `2102986b`, `bdd0be5b`, `af0999bb`; tinyfolder product | **new** | 7 | 6 | 7 | little-tool or daemon feature |
+| 4 | `tool-chain` | Close “Tools Are Leaves” — follow refs → auto-read | `2102986b`, `bdd0be5b`, `af0999bb`; tinyfolder product | **scaffolded** — sibling + LTL `--frontier` | 7 | 6 | 7 | little-tool CLI `expand` |
 | 5 | `trace-memory` | Cross-task trace retrieve → inject strategies | `9a3763c7`; tinyfolder product | **new** | 7 | 6 | 7 | little-tool + vault schema |
 | 6 | `learning-loop-A` | Close Phase A learning loop (highest impact / lowest risk per research) | `75eb5004`, `6eaf665f`; tinyfolder product | **partial** — session-distill/dream exist; loop *closure* still thin on next | 9 | 5 | 6 | deepen dream/spark wiring (not new organ) |
 | 7 | `pdu-reflect` | Prosecutor–Defender–Umpire Hegelian reflection | `190d23e6`, `c59bdcd9`, `f13f17b9`; how-could-we-blueprint-an-idea | **new** (zpd-tutor is pedagogy, not PDU) | 6 | 5 | 8 | little-tool / lab session |
