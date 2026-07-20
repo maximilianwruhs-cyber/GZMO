@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# takeaway-side-effect — non-blocking post-commit remind (local optional hook).
+# Installed via: bash scripts/takeaway-side-effect-remind.sh --install-hook
+# Never runs session close, never opens Cursor, never fails the commit.
+set -euo pipefail
+
+# Always succeed for git
+trap 'exit 0' EXIT
+
+ROOT="$(git rev-parse --show-toplevel 2>/dev/null || true)"
+[[ -n "$ROOT" ]] || exit 0
+
+# Skip merge/cherry-pick/rebase noise
+if [[ -f "$ROOT/.git/MERGE_HEAD" || -d "$ROOT/.git/rebase-merge" || -d "$ROOT/.git/rebase-apply" ]]; then
+  exit 0
+fi
+
+# Quiet one-liner on stderr so commit output stays readable
+echo >&2 "[takeaway-side-effect] If this was real work: one living takeaway on close — not a second memory chat."
+echo >&2 "  gzmo session close --takeaway '…'   # or herdr close-ritual"
+echo >&2 "  docs: BRAIN_FEED.md · HERDR_METABOLISM.md"
