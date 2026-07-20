@@ -57,6 +57,8 @@ Do not invent new co-primary brands. Prefer “lite / living.”
 
 See [STACK_OPPORTUNITY_MAP.md](STACK_OPPORTUNITY_MAP.md) and [UNPARK_ROADMAP.md](UNPARK_ROADMAP.md). Unpark only after keep-quality soaks GREEN.
 
+**Active Unpark focus:** [BRAIN_FEED.md](BRAIN_FEED.md) — the only Unpark lane that claims to **nourish** the living vault (takeaway, tinyFolder, Felt Use, serendipity promote, calibration/Arena human-pin). Theater satellites stay sequenced but demoted.
+
 ## Production / quality readiness
 
 ```bash

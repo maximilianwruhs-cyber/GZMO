@@ -3,11 +3,13 @@
 **Status:** Active (2026-07-20) — USP = airgap living ([ADR-0004](./ADR-0004-airgap-living-usp.md))  
 **Prerequisite:** `bash scripts/keep-quality-soak.sh --summary` → `soak_ready_unpark_ok` (default 3 trailing GREEN)  
 **Also useful:** `bash scripts/production-readiness-gate.sh` (lite + living ops)  
-**Doctrine:** [SPINE_FOCUS.md](./SPINE_FOCUS.md) · [KEEP_QUALITY.md](./KEEP_QUALITY.md) · [STACK_OPPORTUNITY_MAP.md](./STACK_OPPORTUNITY_MAP.md)
+**Doctrine:** [SPINE_FOCUS.md](./SPINE_FOCUS.md) · [KEEP_QUALITY.md](./KEEP_QUALITY.md) · [BRAIN_FEED.md](./BRAIN_FEED.md) · [STACK_OPPORTUNITY_MAP.md](./STACK_OPPORTUNITY_MAP.md)
 
 ## What changed
 
 Keep-quality on the living box unlocked sequenced **Unpark**. Living is first-class USP; lite is bootstrap only. Satellites are local MCP clients — not a second metabolism.
+
+**Active strengthen lane:** [BRAIN_FEED.md](./BRAIN_FEED.md) (`brain-feed-check.sh`) — takeaway, tinyFolder→living, Felt Use, serendipity promote, calibration/Arena **human** pin. Theater waves below stay demable but demoted.
 
 ## Hard boundaries (never reverse)
 
@@ -26,9 +28,10 @@ Keep-quality on the living box unlocked sequenced **Unpark**. Living is first-cl
 | Wave | Focus | Exit |
 |------|-------|------|
 | **0** | Doctrine flip (ADR-0004 + spine + keep-quality) | Docs agree; first keep-quality GREEN |
-| **1** | Operator surfaces: herdr · Pi glass · tinyFolder · AOS poll | Script/gate artifacts; soak summary ready |
-| **2** | Ritual/theater: pantheon feat skills · discovery theater · HSP emit | Skills installable; faithfulness + takeaway-recall PASS |
-| **3** | Arena economics lab (sibling-first) | Arena overnight without changing daemon job set |
+| **BF** | **Brain Feed** (active): herdr/takeaway · tinyFolder→living · Felt Use · serendipity promote · intel human-pin | `brain-feed-check.sh` GREEN |
+| **1** | Operator surfaces (theater demoted): Pi glass · AOS poll · herdr polish | Script/gate artifacts |
+| **2** | Ritual/theater: pantheon feat skills · discovery theater · HSP emit | Skills installable; demable only |
+| **3** | Arena economics lab — **promote-only** feeds Brain Feed P1 | Arena overnight without changing daemon job set |
 | **4** | Later packaging: AOS CE · marketplace · wiki mind · portable-core RFC | Separate install docs; lite still sidecar-free |
 
 ## Wave detail

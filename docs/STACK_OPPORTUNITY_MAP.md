@@ -1,48 +1,52 @@
 # Stack opportunity map
 
-**Status:** Unpark active (2026-07-19). A+C GREEN; satellites sequenced in waves.  
+**Status:** Brain Feed focus (2026-07-20). USP = airgap living; Unpark nutrients first.  
 **Audience:** Operator / product direction for the maximilianwruhs-cyber stack  
 **Scope:** Projects and products that can be created from lived GZMO + adjacent repos — not a generic idea dump.  
-**Doctrine:** [SPINE_FOCUS.md](SPINE_FOCUS.md) · [UNPARK_ROADMAP.md](UNPARK_ROADMAP.md)
+**Doctrine:** [SPINE_FOCUS.md](SPINE_FOCUS.md) · [BRAIN_FEED.md](BRAIN_FEED.md) · [UNPARK_ROADMAP.md](UNPARK_ROADMAP.md) · [ADR-0004-airgap-living-usp.md](ADR-0004-airgap-living-usp.md)
 
 ## North star
 
-The singular asset is a **living overnight memory metabolism** with a **product memory MCP** attach surface. Living production vault owner is **CT101** (`/opt/gzmo/`); workstation `data-next/` is lab scratch only. Arena / energy / surfaces are satellites — useful, not the brand.
+The singular asset is a **living overnight memory metabolism** (airgap-capable) with local MCP attach. Living production vault owner is **CT101** (`/opt/gzmo/`) as reference; USP is any one airgapped box. Theater satellites are useful — **Brain Feed** is the only Unpark lane that claims to nourish the vault.
 
 ## Keep / Unpark / Later (spine)
 
-Operator lock: co-primary **A** (product MCP) + **C** (living Redis/Qdrant/Neo4j appliance). See [SPINE_FOCUS.md](SPINE_FOCUS.md), [research/CT101_STACK_FUTURE_2026-07.md](research/CT101_STACK_FUTURE_2026-07.md).
-
 | Lane | What | Action |
 |------|------|--------|
-| **Keep (A)** | Product Memory MCP · stranger install · release freshness · faithfulness fixture | `product-readiness-gate.sh` |
-| **Keep (C)** | Living metabolism · Redis/Qdrant/Neo4j appliance compose · takeaway/watchdog · living faithfulness | `living-readiness-gate.sh` + **in-repo compose pin** |
-| **Unpark queue** | Arena/€/RAPL · HSP · AOS poll · herdr/Pi polish · OKCP marketplace · IpW/Forge · pantheon ritual · tinyFolder | Sequenced waves — [UNPARK_ROADMAP.md](UNPARK_ROADMAP.md) |
-| **Later (Wave 4)** | AOS CE golden path (Prime+OKForge on top of C) · public marketplace · multi-node forge · portable-core RFC | After Waves 1–3 stay demable |
+| **Keep (living)** | Airgap living metabolism · compose pin · keep-quality | `keep-quality-gate.sh` + living readiness |
+| **Keep (lite)** | Bootstrap Memory MCP · stranger install | `product-readiness-gate.sh` (not peer roadmap) |
+| **Brain Feed (active Unpark)** | takeaway/herdr · tinyFolder→living · Felt Use · serendipity promote · calibration/Arena human-pin | `brain-feed-check.sh` — [BRAIN_FEED.md](BRAIN_FEED.md) |
+| **Unpark theater (demoted)** | HSP · pantheon · discovery theater · Pi glass · €/night display · AOS poll | Sequenced demos — not next strengthen |
+| **Later (Wave 4)** | AOS CE · marketplace · wiki mind · portable-core RFC | After Brain Feed + keep-quality stay GREEN |
 | **Never-as-brain** | Cognis · escape-loop · ZPD on GREEN overnight | Lab/research only |
 
 ## Recommended next three
 
-1. **Keep A+C GREEN** — `bash scripts/production-readiness-gate.sh`
-2. **Scaffold archaeology exec picks** — build-spec: [tool-dev-amp-forget-verify-token-2026-07-20.md](../research/tool-dev-amp-forget-verify-token-2026-07-20.md) (`forget-lint` → `verify-gates` → `token-economy`; lab vault only)
-3. **Wave gate** — `bash scripts/unpark-wave-check.sh` · tag `v*` when tip ahead of release ≥5
+1. **keep-quality soak** — `bash scripts/keep-quality-soak.sh --summary`
+2. **Brain Feed GREEN** — `bash scripts/brain-feed-check.sh`
+3. **Intelligence promote (human only)** — `bash scripts/brain-intel-promote.sh`
 
-Unpark open after A+C GREEN (2026-07-19). Pantheon: [PANTHEON_THEATER_PACKAGING_PARK.md](PANTHEON_THEATER_PACKAGING_PARK.md). Doctrine: [SPINE_FOCUS.md](SPINE_FOCUS.md).
+Pantheon theater stays parked as packaging: [PANTHEON_THEATER_PACKAGING_PARK.md](PANTHEON_THEATER_PACKAGING_PARK.md).
 
 ## Composition spine
 
 ```
-KEEP pillars
+KEEP (USP)
   chat / session close --takeaway
-    → distill · promote · embed · dream/spark  (CT101 living; data-next lab)
-    → vault + honeypot + Qdrant · GREEN · watchdog
-    → gzmo memory mcp  (product appliance)
+    → distill · promote · embed · dream/spark  (living host)
+    → vault + honeypot + Qdrant · keep-quality
+    → gzmo mcp-serve (local attach)
 
-UNPARK queue (sequenced — see UNPARK_ROADMAP.md)
-  W1: herdr · Pi glass · tinyFolder · AOS poll
-  W2: pantheon ritual · discovery theater · HSP emit
-  W3: Arena · €/night · RAPL · IpW · Forge (outside living daemon)
-  W4: AOS CE · marketplace · wiki mind · portable-core RFC
+BRAIN FEED (active Unpark — vault nutrients)
+  herdr takeaway · tinyFolder→living · MCP Felt Use
+  serendipity promote-back · dream compact (hygiene)
+  calibration/Arena suggestion → human pin on living engine
+
+UNPARK theater (demoted — see UNPARK_ROADMAP.md)
+  W1 glass: Pi · AOS poll
+  W2: pantheon · discovery · HSP
+  W3 display: €/night (Arena nutrient = human promote only)
+  W4: AOS CE · marketplace · wiki mind · portable-core
 ```
 ## Stack atlas
 
