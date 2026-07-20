@@ -4,35 +4,45 @@
 
 | Tier | What | How it starts |
 |------|------|----------------|
-| **Workstation** | Prime `:8000` | `gzmo-prime.service` (user systemd) |
-| **Workstation** | Pi KB embed `:8002` | `gzmo-embed.service` (CPU, `GZMO_EMBED_NGL=0`) |
-| **Workstation** | GZMO daemon | `gzmo-daemon.service` |
+| **Workstation** | Prime `:8000` | **`llama-prime.service`** (user systemd; enabled + linger) |
+| **Workstation** | Pi KB embed `:8002` | Optional `gzmo-embed.service` (CPU, `GZMO_EMBED_NGL=0`) — soft |
+| **Workstation** | Local lab daemon | Optional `gzmo-daemon.service` / manual `gzmo daemon` — **not** CT101 living |
 | **VM200** | Embed `:8081`, rerank `:8082`, librarian `:8083` | `deploy-retrieval-layer.sh` (systemd on VM) |
-| **LXC101** | Qdrant, Neo4j | Always-on LXC services |
+| **LXC101 / CT101** | Qdrant, Neo4j, **living `gzmo-daemon`** | Always-on — **do not reboot with the workstation** |
 
-Pi `knowledge_search` → local `:8002` (fallback VM200 `:8081`).  
-GZMO daemon → VM200 `:8081` per `gzmo.toml`.
+Pi `knowledge_search` → local `:8002` when up (fallback VM200 `:8081`).  
+Product MCP → `~/.gzmo` only. Living MCP → CT101 / `gzmo-living` label — never mix.
 
-## One-time setup (already run if you used install-boot-stack)
+## One-time setup
 
 ```bash
-cd ~/Projects/_foundation-audit/survey_GZMO
-./scripts/install-boot-stack.sh
+cd ~/github-clone/GZMO
+# Prime (current workstation path)
+# unit lives at ~/.config/systemd/user/llama-prime.service — already enabled if linger=yes
+
+# Optional full stack units from repo templates:
+./scripts/install-boot-stack.sh   # installs gzmo-embed / gzmo-prime / gzmo-daemon
 ```
 
-This installs units, enables linger, enables `gzmo-embed`, `gzmo-prime`, `gzmo-daemon`.
+`install-boot-stack` enables linger and optional `gzmo-*` units. This host’s **canonical Prime** unit is still **`llama-prime`**.
 
 ## After every reboot
 
 ```bash
+# 0. Product MCP attach (often drifts after reboot)
+MCP_ATTACH_FIX=1 bash scripts/mcp-attach-check.sh
+
 # 1. Workstation verify
 ./scripts/after-boot-verify.sh
 
 # 2. VM200 (if retrieval down)
-ssh -i ~/.ssh/id_sidecar_proxmox maximilian@192.168.31.110 \
+ssh maximilian@192.168.31.110 \
   'systemctl is-active llama-embed llama-rerank llama-librarian'
 
-# 3. Pi KB catch-up (changed files only)
+# 3. Keep gates
+bash scripts/production-readiness-gate.sh
+
+# 4. Pi KB catch-up (changed files only)
 ./scripts/pi-kb-reindex.sh
 ```
 
@@ -40,20 +50,21 @@ ssh -i ~/.ssh/id_sidecar_proxmox maximilian@192.168.31.110 \
 
 ```bash
 ./scripts/start-production.sh --daemon
-# Also starts local :8002 when gzmo.toml points at localhost; Pi always needs :8002:
-systemctl --user start gzmo-embed.service
+# Pi KB local embed if needed:
+systemctl --user start gzmo-embed.service   # only if installed
 ```
 
 ## Service commands
 
 ```bash
+systemctl --user status llama-prime.service
+journalctl --user -u llama-prime -f
+
+# Optional units (if install-boot-stack was run):
 systemctl --user status gzmo-embed gzmo-prime gzmo-daemon
-journalctl --user -u gzmo-embed -f
-journalctl --user -u gzmo-prime -f
-journalctl --user -u gzmo-daemon -f
 ```
 
-If `gzmo-prime` restart-loops while an old manual `llama-server :8000` is running, stop the stray process or run `systemctl --user restart gzmo-prime` after `start-prime.sh` path fix (uses `llama.cpp/build/bin/llama-server`).
+If Prime restart-loops while a stray manual `llama-server :8000` is running, stop the stray process, then `systemctl --user restart llama-prime`.
 
 ## Optional: HSP
 
@@ -64,4 +75,6 @@ systemctl --user enable --now hsp-synth.service hsp-pipeline.service
 ## Config references
 
 - Pi KB: `~/.pi/agent/knowledge-base.json`, `~/.pi/agent/docs/KNOWLEDGE_BASE.md`
-- GZMO: `gzmo.toml`, `docs/INFRASTRUCTURE_REVIEW.md`
+- GZMO lab: `gzmo.toml` / `config/gzmo-next.toml`
+- Product: `~/.gzmo/gzmo.toml`
+- Reboot card (runtime): `data-next/reboot-prep/latest.md`
