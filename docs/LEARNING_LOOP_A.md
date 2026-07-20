@@ -82,9 +82,9 @@ python3 little-tools-lab/scripts/vault-maturity-census.py \
 #   classic_window_ready, anchor_band_14_90, recent_lt_3d, …
 ```
 
-Organic path is **ready** when `classic_window_ready=true` (≥1 latest honeypot in [14,90]d and ≥1 <3d). Until then use `--aged-vault` for the mature-window proof.
+Organic path is **ready** when `classic_window_ready=true` (≥1 latest honeypot in [14,90]d and ≥1 <3d). Lab `data-next` already reports ready (census mid-band > 0); `spark-link dry-run --vault data-next/vault.db --anchor-window 14,90` can select. Keep `--aged-vault` for reproducible CI without relying on vault age.
 
 ## Still open
 
-1. Wait for organic `data-next` band to thicken (census already reports progress)
+1. Thicken organic mid-band beyond the current thin count (census watches it)
 2. Unified scheduler run-id tying 01:00 dream + 03:30 cognition into one operator surface
