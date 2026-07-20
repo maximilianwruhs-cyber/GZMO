@@ -21,6 +21,9 @@ Any input → prep → extract (:8000) → verify → promote → vault → qual
 - **Vault** — everything that passed verify (ops history, purge, decay).
 - **Honeypot** — curated distillate; default for recall, Qdrant, Dream/Spark.
 - **Core (M5)** — exportable dense knowledge; ripen pipeline at `scripts/ripen-knowledge-core.py` (charter gates apply; v0 preview with relaxed flags).
+- **Wiki emit** — optional Knowledge Gardener / source pages (`WikiEngine::emit_source_page`); the cascade’s publish toehold.
+
+Positioning names for the same path (not new binaries): [docs/CASCADING_COMPILER.md](docs/CASCADING_COMPILER.md) (Executable Wisdom), [docs/KOS_POSITIONING.md](docs/KOS_POSITIONING.md) (Knowledge OS).
 
 The LLM **thinks** (extract, verify, dream). The pipeline **remembers**.
 
