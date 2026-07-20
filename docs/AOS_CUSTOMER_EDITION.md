@@ -36,4 +36,4 @@ Stranger Memory MCP (`~/.gzmo`, sidecars off) remains a **separate** install via
 
 - Separate install doc (this file) linked from [STACK_OPPORTUNITY_MAP.md](./STACK_OPPORTUNITY_MAP.md)  
 - A stranger path still passes `product-readiness-gate.sh` without Redis/Qdrant/Neo4j  
-- Demable CE smoke: `bash scripts/aos-ce-smoke.sh` → `data-next/aos-ce/` (does not overwrite `~/.gzmo`)
+- Demable CE smoke: `bash scripts/aos-ce-smoke.sh` → `data-next/aos-ce/{latest,golden-path}.json` (does not overwrite `~/.gzmo`)
