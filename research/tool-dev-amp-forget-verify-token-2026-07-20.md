@@ -42,7 +42,7 @@ ingest / session_distill / dream / spark
 **Tier-1 (do not re-ship):** `honeypot-gate`, `spark-link`, `rem-substrate`, `rrf-recall`, `synapse-tail`, `evidence-locate`, `faithfulness-judge`.
 
 **Lab hot path today:** `cognition-smoke` = session-distill → honeypot-gate → promote → spark-link → rrf-recall → evidence-locate (fixture) → meta.  
-**Optional frontier:** `cognition-smoke --frontier` (LTL) soft-runs token-economy estimate → forget-lint plan/dry-run apply (lab vault; refuses `/opt/gzmo`) → verify-gates retrieve → tool-chain expand → trace-memory recall — writes `*-frontier.json`; does not change required meta schema.
+**Optional frontier:** `cognition-smoke --frontier` (LTL) soft-runs token-economy estimate+`recommend --emit-toml` → forget-lint plan+**real apply on vault copy** → verify-gates **analyze+retrieve+reason** → tool-chain expand (CLI leaf only; daemon auto-chain won’t) → trace-memory durable recall+record → pdu-reflect (heuristic; `PDU_LLM=1` for llm) → stigmergy ingest+advance — writes `*-frontier.json`; does not change required meta schema.
 
 ---
 
@@ -59,7 +59,7 @@ ingest / session_distill / dream / spark
 | **Must remember** | Prefer age + supersession + Extends siblings; protect Structural; refuse `/opt/gzmo` |
 | **Non-goals** | CT101 import; hard-delete default; living GREEN gate; growing gate into a mutator |
 
-**Ready:** sibling piece [`forget-lint`](../../forget-lint/) (plan/apply + fixture smoke) · LTL manifest `partial`.
+**Ready:** sibling piece [`forget-lint`](../../forget-lint/) (plan/apply + fixture smoke) · frontier proves real apply on disposable vault copy · LTL manifest `partial`.
 
 ---
 
@@ -93,7 +93,7 @@ ingest / session_distill / dream / spark
 | **Must remember** | CT101 cloud routing table is **not** next defaults; dream `max_tokens_*` TOML keys may be unwired |
 | **Non-goals** | Graft CT101 cloud routes; re-ship Obolus; auto-edit living/`~/.gzmo` config |
 
-**Ready:** sibling piece [`token-economy`](../../token-economy/) (estimate smoke; `blocks_distill=false`) · LTL manifest `partial`.
+**Ready:** sibling piece [`token-economy`](../../token-economy/) (`estimate` + `recommend --emit-toml`; `blocks_distill=false`) · LTL manifest `partial`.
 
 ---
 
@@ -101,20 +101,21 @@ ingest / session_distill / dream / spark
 
 ```text
 session-distill
-  → [verify-gates analyze]          # optional (not in --frontier yet)
   → honeypot-gate
   → promote
   → spark-link → rrf-recall
   → evidence-locate batch → meta
   → [--frontier soft]
-       token-economy estimate
-       forget-lint plan + dry-run apply   # lab vault only
-       verify-gates retrieve
-       tool-chain expand                  # Tools Are Leaves; fixture/lab facts
-       trace-memory recall                # strategy inject; blocks_distill=false
+       token-economy estimate + recommend --emit-toml
+       forget-lint plan + real apply on vault copy
+       verify-gates analyze + retrieve + reason
+       tool-chain expand                  # CLI leaf only; no daemon auto-chain
+       trace-memory recall + record       # durable data-next JSONL
+       pdu-reflect (heuristic; PDU_LLM=1 → llm)
+       stigmergy-queue ingest + advance
 ```
 
-Wired in little-tools-lab (`--frontier` / `COGNITION_FRONTIER=1`). Wave-2 siblings: [`forget-lint`](../../forget-lint/) · [`verify-gates`](../../verify-gates/) · [`token-economy`](../../token-economy/) · [`tool-chain`](../../tool-chain/) · [`trace-memory`](../../trace-memory/).
+Wired in little-tools-lab (`--frontier` / `COGNITION_FRONTIER=1`). Wave-2 siblings: [`forget-lint`](../../forget-lint/) · [`verify-gates`](../../verify-gates/) · [`token-economy`](../../token-economy/) · [`tool-chain`](../../tool-chain/) · [`trace-memory`](../../trace-memory/) · [`pdu-reflect`](../../pdu-reflect/) · [`stigmergy-queue`](../../stigmergy-queue/).
 
 ---
 
