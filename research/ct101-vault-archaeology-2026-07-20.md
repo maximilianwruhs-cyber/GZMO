@@ -32,7 +32,7 @@
 
 Three candidates that are **new relative to the Little Tools catalog**, with strong CT101 evidence and a clear little-tool or product shape. Already-extracted Tier-1 IP (spark-link, honeypot-gate, rem-substrate, …) is listed under *Already cataloged* below — do not re-ship.
 
-> **Shipped lab siblings (2026-07-20):** `forget-lint` · `verify-gates` · `token-economy` · `tool-chain` · `trace-memory` · `pdu-reflect` (LTL `--frontier`).  
+> **Shipped lab siblings (2026-07-20):** `forget-lint` · `verify-gates` · `token-economy` · `tool-chain` · `trace-memory` · `pdu-reflect` · `stigmergy-queue` (LTL `--frontier`).  
 > **learning-loop-A (#6):** deepen recipes — see [LEARNING_LOOP_A.md](../docs/LEARNING_LOOP_A.md); `phase_a_proof` + `phase_a_ring` (dream-stats) landed.
 
 ### 1. `forget-lint` — Purposeful forgetting / intermediate-honeypot clearer
@@ -88,7 +88,7 @@ Scores: Value / Feasibility / Novelty (1–10). Novelty vs Little Tools catalog 
 | 5 | `trace-memory` | Cross-task trace retrieve → inject strategies | `9a3763c7`; tinyfolder product | **scaffolded** — sibling + LTL `--frontier` | 7 | 6 | 7 | little-tool CLI `recall`/`record` |
 | 6 | `learning-loop-A` | Close Phase A learning loop (highest impact / lowest risk per research) | `75eb5004`, `6eaf665f`; tinyfolder product | **deepening** — `phase_a_proof` + `phase_a_ring` (dream-stats cross-link); mature 14,90 vault path still open | 9 | 5 | 6 | deepen dream/spark wiring (not new organ) |
 | 7 | `pdu-reflect` | Prosecutor–Defender–Umpire Hegelian reflection | `190d23e6`, `c59bdcd9`, `f13f17b9`; how-could-we-blueprint-an-idea | **scaffolded** — sibling + LTL `--frontier` | 6 | 5 | 8 | little-tool CLI `reflect` |
-| 8 | `stigmergy-queue` | Ideas→Architecture→Build→QA folder pipeline | `a4949023`, `54aec32d`, `d1473f8e`, `a5e885a4`; du-hast-gesagt + sovereign factory | **new as product** | 6 | 4 | 6 | research / optional Obsidian skill — not CT101 import |
+| 8 | `stigmergy-queue` | Ideas→Architecture→Build→QA folder pipeline | `a4949023`, `54aec32d`, `d1473f8e`, `a5e885a4`; du-hast-gesagt + sovereign factory | **scaffolded** — sibling + LTL `--frontier` status | 6 | 4 | 6 | little-tool CLI `status`/`ingest`/`advance` |
 | 9 | `ipw-dashboard` | Intelligence-per-Watt IDE status + hot-swap | `d2446b2a`, `2d7b181e`, `afe212a4`; Obolus VS Codium research | **partial** — Obolus shipped; IDE extension not | 7 | 4 | 6 | VSCodium extension (separate from little-tools) |
 | 10 | `phantom-drive` | Air-gapped USB sterile LLM + mountpoint watchdog | `4ccab818`, `62bed1b2`, `9ddb4fa0`; phantom-drive micros | **new** | 5 | 3 | 9 | research / hardware product — out of little-tools scope |
 | 11 | `cascading-compiler` | LLM-Compiler → Executable Wisdom wiki cascade | `f36d8361`, `21eab4a8`, `da4ee01f`; cascading honeypot sources + wiki entities | **identity adjacent** — wiki emit exists; full cascade undersold | 8 | 4 | 7 | positioning + deepen wiki emit (not vault import) |
