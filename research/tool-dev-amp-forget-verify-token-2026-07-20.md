@@ -41,7 +41,8 @@ ingest / session_distill / dream / spark
 
 **Tier-1 (do not re-ship):** `honeypot-gate`, `spark-link`, `rem-substrate`, `rrf-recall`, `synapse-tail`, `evidence-locate`, `faithfulness-judge`.
 
-**Lab hot path today:** `cognition-smoke` = session-distill → honeypot-gate → promote → spark-link → rrf-recall → evidence-locate (fixture) → meta.
+**Lab hot path today:** `cognition-smoke` = session-distill → honeypot-gate → promote → spark-link → rrf-recall → evidence-locate (fixture) → meta.  
+**Optional frontier:** `cognition-smoke --frontier` (LTL) soft-runs token-economy estimate → forget-lint plan/dry-run apply (lab vault; refuses `/opt/gzmo`) → verify-gates retrieve — writes `*-frontier.json`; does not change required meta schema.
 
 ---
 
@@ -96,21 +97,22 @@ ingest / session_distill / dream / spark
 
 ---
 
-## Assembly sketch (future)
+## Assembly sketch
 
 ```text
 session-distill
-  → [verify-gates analyze]          # optional
+  → [verify-gates analyze]          # optional (not in --frontier yet)
   → honeypot-gate
-  → [forget-lint plan|apply]        # lab vault hygiene
   → promote
-  → [token-economy estimate]        # advisory before LLM-heavy
   → spark-link → rrf-recall
-  → [verify-gates retrieve|reason]  # optional
   → evidence-locate batch → meta
+  → [--frontier soft]
+       token-economy estimate
+       forget-lint plan + dry-run apply   # lab vault only
+       verify-gates retrieve
 ```
 
-Adding pieces needs an explicit little-tools catalog PR (closed set of 46 today).
+Wired in little-tools-lab (`--frontier` / `COGNITION_FRONTIER=1`). Catalog still closed; new pieces need an explicit LTL manifest PR.
 
 ---
 
