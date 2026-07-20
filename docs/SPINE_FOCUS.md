@@ -59,6 +59,8 @@ See [STACK_OPPORTUNITY_MAP.md](STACK_OPPORTUNITY_MAP.md) and [UNPARK_ROADMAP.md]
 
 **Active Unpark focus:** [BRAIN_FEED.md](BRAIN_FEED.md) — the only Unpark lane that claims to **nourish** the living vault (takeaway, tinyFolder, Felt Use, serendipity promote, calibration/Arena human-pin). Theater satellites stay sequenced but demoted.
 
+**What to build next:** [OPPORTUNITY_DISCOVERY.md](OPPORTUNITY_DISCOVERY.md) — Sense→Rank→Bet→Ship→Soak (bet log under `research/opportunities/`).
+
 ## Production / quality readiness
 
 ```bash

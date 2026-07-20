@@ -22,9 +22,9 @@ The singular asset is a **living overnight memory metabolism** (airgap-capable) 
 
 ## Recommended next three
 
-1. **keep-quality soak** — `bash scripts/keep-quality-soak.sh --summary`
+1. **Opportunity discovery** — `bash scripts/opportunity-discovery-check.sh` · active bet in [research/opportunities/](../research/opportunities/) · [OPPORTUNITY_DISCOVERY.md](OPPORTUNITY_DISCOVERY.md)
 2. **Brain Feed GREEN** — `bash scripts/brain-feed-check.sh`
-3. **Intelligence promote (human only)** — `bash scripts/brain-intel-promote.sh`
+3. **keep-quality soak** — `bash scripts/keep-quality-soak.sh --summary`
 
 Pantheon theater stays parked as packaging: [PANTHEON_THEATER_PACKAGING_PARK.md](PANTHEON_THEATER_PACKAGING_PARK.md).
 
