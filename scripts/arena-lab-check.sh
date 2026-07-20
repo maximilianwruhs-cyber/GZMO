@@ -65,6 +65,28 @@ cat >"$OUT/lab-contract.md" <<'EOF'
 EOF
 row PASS "lab-contract" "$OUT/lab-contract.md"
 
+# Demo evidence: RAPL+€ chain ran; daemon jobs untouched
+if [[ -f "$OUT/demo.json" ]]; then
+  if python3 -c "
+import json
+d=json.load(open('$OUT/demo.json'))
+ok=(
+  d.get('schema')=='gzmo.unpark.arena_lab.demo/v1'
+  and d.get('ok') is True
+  and d.get('daemon_jobs_touched') is False
+  and 'rapl_probe' in d
+  and isinstance(d.get('euro_night'), dict)
+)
+raise SystemExit(0 if ok else 1)
+"; then
+    row PASS "demo-chain" "demo.json — RAPL/€ chained; daemon untouched"
+  else
+    row FAIL "demo-chain" "demo.json incomplete — rerun arena-lab-demo.sh"
+  fi
+else
+  row HOLD "demo-chain" "no demo.json yet — bash scripts/arena-lab-demo.sh"
+fi
+
 ROWS_TSV="$(printf '%s\n' "${ROWS[@]}")"
 export OUT pass fail hold ROWS_TSV
 python3 - <<'PY'
@@ -77,8 +99,13 @@ for line in os.environ.get("ROWS_TSV","").splitlines():
     st,n,d=line.split("|",2); checks[n]={"status":st,"detail":d}
 fail_n=int(os.environ["fail"]); hold_n=int(os.environ["hold"]); pass_n=int(os.environ["pass"])
 verdict="GREEN" if fail_n==0 else "RED"
-# Sibling optional — contract + boundary PASS is enough for wave implement
-advice="arena_lab_ok" if fail_n==0 else "arena_lab_fail"
+demo_ok = checks.get("demo-chain",{}).get("status")=="PASS"
+if fail_n==0 and demo_ok:
+    advice="arena_lab_ok — RAPL/€ demo chain; daemon untouched"
+elif fail_n==0:
+    advice="arena_lab_hold — run arena-lab-demo.sh"
+else:
+    advice="arena_lab_fail"
 payload={"schema":"gzmo.unpark.arena_lab/v1","generated_at":datetime.now(timezone.utc).isoformat(),
   "verdict":verdict,"ok":fail_n==0,"advice":advice,
   "counts":{"pass":pass_n,"fail":fail_n,"hold":hold_n},"wave":"3.1","checks":checks}
