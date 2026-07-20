@@ -39,8 +39,13 @@ bash little-tools-lab/scripts/cognition-smoke.sh --live --vault "$PWD/data-next/
 export SPARK_ANCHOR_WINDOW=14,90
 ```
 
-## Still open (next deepens)
+## Shipped deepens (2026-07-20)
 
-1. spark-link verified hypotheses → vault/`graph_rel` write (lab promote bin)
-2. scheduled `synapse-distill-handoff` promote tail when dream skipped
-3. Unified `learning_loop` block across dream-stats + cognition-smoke-meta
+1. **spark → vault** — `ltl-common` `vault-promote-spark` after cognition-smoke stage 4 (eligible when `promoted` / verdict supported; refuses `/opt/gzmo`)
+2. **distill handoff promote** — `synapse-distill-handoff.sh --promote` runs `vault-promote-distill` into lab vault
+3. Young-vault spark window — `SPARK_ANCHOR_WINDOW` / vault default `0,30`
+
+## Still open
+
+1. Unified `learning_loop` block across dream-stats + cognition-smoke-meta
+2. Live spark `--spark-run` green path that actually sets `promoted: true` on lab vault
