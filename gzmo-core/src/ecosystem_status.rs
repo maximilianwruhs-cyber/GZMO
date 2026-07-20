@@ -399,7 +399,10 @@ pub async fn format_ecosystem_status(config: &GzmoConfig) -> String {
                     let night = v.get("night_id").and_then(|x| x.as_str()).unwrap_or("?");
                     out.push_str(&format!("- **Night:** {night}\n"));
                     if let Some(d) = v.get("dream") {
-                        let truths = d.get("truths_promoted").and_then(|x| x.as_u64()).unwrap_or(0);
+                        let truths = d
+                            .get("truths_promoted")
+                            .and_then(|x| x.as_u64())
+                            .unwrap_or(0);
                         let ents = d.get("entities").and_then(|x| x.as_u64()).unwrap_or(0);
                         out.push_str(&format!("- **Dream:** entities={ents} truths={truths}\n"));
                     }

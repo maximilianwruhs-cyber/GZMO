@@ -205,11 +205,7 @@ impl PlatformMemory {
         } else {
             FeltUseKind::Glance
         };
-        felt_use::touch_hits(
-            &self.vault,
-            items.iter().map(|h| h.fact_id.as_ref()),
-            kind,
-        );
+        felt_use::touch_hits(&self.vault, items.iter().map(|h| h.fact_id.as_ref()), kind);
 
         Ok(MemorySearchResult {
             query: query.to_string(),

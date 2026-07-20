@@ -95,7 +95,11 @@ fn entity_needles(content: &str) -> Vec<String> {
 
 /// Scan latest honeypot for facts that contradict tonight's dream truths.
 /// Writes `{vault_parent}/immune/plan-{night}.json` + `latest.json`. Never applies.
-pub fn run_patrol(vault: &SqliteVault, night: NaiveDate, truths: &[ExtractedTruth]) -> Result<PathBuf> {
+pub fn run_patrol(
+    vault: &SqliteVault,
+    night: NaiveDate,
+    truths: &[ExtractedTruth],
+) -> Result<PathBuf> {
     let mut candidates: Vec<ImmuneCandidate> = Vec::new();
     let mut seen = std::collections::HashSet::new();
 
@@ -204,7 +208,10 @@ mod tests {
             "Dream consolidation promoted verified_dream truths tonight",
             "[SYSTEM:DreamEngine] DreamEngine currently disabled during clean-slate rebuild",
         );
-        assert_eq!(reason, Some("stale_dreamengine_disabled_while_dream_promotes"));
+        assert_eq!(
+            reason,
+            Some("stale_dreamengine_disabled_while_dream_promotes")
+        );
     }
 
     #[test]

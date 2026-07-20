@@ -122,11 +122,7 @@ pub fn record_dream(
 }
 
 /// Append one spark cycle summary (keeps last 8).
-pub fn record_spark(
-    vault_db: &Path,
-    night: NaiveDate,
-    spark: LymphSpark,
-) -> Result<PathBuf> {
+pub fn record_spark(vault_db: &Path, night: NaiveDate, spark: LymphSpark) -> Result<PathBuf> {
     let dir = lymph_dir(vault_db);
     let night_id = night.to_string();
     let mut lymph = load_or_new(&dir, &night_id);
@@ -155,7 +151,10 @@ pub fn format_brief(lymph: &NightLymph) -> String {
     } else {
         out.push_str("- **Dream:** (not yet)\n");
     }
-    out.push_str(&format!("- **Sparks this night:** {}\n", lymph.sparks.len()));
+    out.push_str(&format!(
+        "- **Sparks this night:** {}\n",
+        lymph.sparks.len()
+    ));
     for s in lymph.sparks.iter().rev().take(3) {
         let preview = s
             .anchor_preview
@@ -186,10 +185,7 @@ mod tests {
 
     #[test]
     fn dream_then_spark_merge_same_night() {
-        let dir = std::env::temp_dir().join(format!(
-            "gzmo-lymph-test-{}",
-            std::process::id()
-        ));
+        let dir = std::env::temp_dir().join(format!("gzmo-lymph-test-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&dir);
         std::fs::create_dir_all(&dir).unwrap();
         let vault = dir.join("vault.db");

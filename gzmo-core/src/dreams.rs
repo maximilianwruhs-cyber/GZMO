@@ -265,24 +265,23 @@ impl DreamEngine {
         );
 
         // Immune Patrol (plan-only) — hunt stale contradictions against tonight's truths.
-        let (immune_plan_path, immune_candidates) = match crate::immune::run_patrol(
-            &self.vault,
-            date,
-            &truths,
-        ) {
-            Ok(path) => {
-                let n = std::fs::read_to_string(&path)
-                    .ok()
-                    .and_then(|raw| serde_json::from_str::<crate::immune::ImmunePlan>(&raw).ok())
-                    .map(|p| p.candidates.len())
-                    .unwrap_or(0);
-                (Some(path), n)
-            }
-            Err(e) => {
-                warn!("Immune patrol failed (non-fatal): {e}");
-                (None, 0)
-            }
-        };
+        let (immune_plan_path, immune_candidates) =
+            match crate::immune::run_patrol(&self.vault, date, &truths) {
+                Ok(path) => {
+                    let n = std::fs::read_to_string(&path)
+                        .ok()
+                        .and_then(|raw| {
+                            serde_json::from_str::<crate::immune::ImmunePlan>(&raw).ok()
+                        })
+                        .map(|p| p.candidates.len())
+                        .unwrap_or(0);
+                    (Some(path), n)
+                }
+                Err(e) => {
+                    warn!("Immune patrol failed (non-fatal): {e}");
+                    (None, 0)
+                }
+            };
 
         let _ = crate::night_lymph::record_dream(
             self.vault.db_path(),

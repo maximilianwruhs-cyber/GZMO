@@ -351,9 +351,7 @@ impl SqliteVault {
 
     /// Parent of the vault DB (`/opt/gzmo/data`, `data-next`, `~/.gzmo`, …).
     pub fn data_dir(&self) -> &Path {
-        self.db_path
-            .parent()
-            .unwrap_or_else(|| Path::new("."))
+        self.db_path.parent().unwrap_or_else(|| Path::new("."))
     }
 
     /// Reinforce a fact: increment confirmation_count and reset decay clock.
