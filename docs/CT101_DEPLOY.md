@@ -68,6 +68,19 @@ ssh ct101 'bash -lc "
 "'
 ```
 
+## M5 ripen honesty
+
+Living job `honeypot_ripen` shells `scripts/export-knowledge-core.py` (dual gate: confidence≥0.90 ∧ recall≥3 ∧ allowed origins). **0 rows overnight** usually means starved `recall_count`, not an empty `knowledge_core.db` (often already tens of thousands of rows). After Felt Use / living search:
+
+```bash
+GZMO_CONFIG=/opt/gzmo/gzmo.toml gzmo ripen status
+python3 /opt/gzmo/current/scripts/export-knowledge-core.py \
+  --db /opt/gzmo/data/vault.db --output /opt/gzmo/data/knowledge_core.db
+# advice + gates → /opt/gzmo/data/ripen/latest.json
+```
+
+Prefer job prompt path `/opt/gzmo/current/scripts/…` (not a stale `survey_GZMO` string).
+
 ## Product gate
 
 From workstation (SSH):

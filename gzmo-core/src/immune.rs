@@ -34,27 +34,41 @@ pub struct ImmunePlan {
     pub candidates: Vec<ImmuneCandidate>,
 }
 
+/// True stale DreamEngine lore: claims the engine itself is off / clean-slate.
+/// Excludes accurate notes that only the *legacy auto_dream job* is disabled.
+fn is_stale_dreamengine_disabled_lore(content: &str) -> bool {
+    let c = content.to_lowercase();
+    if c.contains("legacy auto_dream") || c.contains("legacy auto-dream") {
+        return false;
+    }
+    let mentions_engine = c.contains("dreamengine") || c.contains("[system:dream]");
+    let stale =
+        c.contains("currently disabled") || c.contains("clean-slate") || c.contains("clean slate");
+    mentions_engine && stale
+}
+
 /// Polarity / status tokens that often co-occur with superseded lore.
 fn contradiction_reason(truth: &str, candidate: &str) -> Option<&'static str> {
     let t = truth.to_lowercase();
     let c = candidate.to_lowercase();
-    if c.contains("dreamengine")
-        && (c.contains("disabled") || c.contains("clean-slate") || c.contains("clean slate"))
+    if is_stale_dreamengine_disabled_lore(candidate)
         && (t.contains("dream") || t.contains("consolidat") || t.contains("verified_dream"))
     {
         return Some("stale_dreamengine_disabled_while_dream_promotes");
     }
     if (c.contains("disabled") || c.contains("turned off") || c.contains("not running"))
         && (t.contains("enabled") || t.contains("running") || t.contains("active"))
+        && !c.contains("legacy auto_dream")
     {
         return Some("status_polarity_disabled_vs_active");
     }
     if (c.contains("disabled") || c.contains("not enabled"))
         && (t.contains("promoted") || t.contains("consolidate") || t.contains("spark"))
+        && is_stale_dreamengine_disabled_lore(candidate)
     {
         return Some("status_disabled_vs_overnight_activity");
     }
-    if c.contains("currently disabled") && !t.contains("disabled") {
+    if is_stale_dreamengine_disabled_lore(candidate) && !t.contains("disabled") {
         return Some("currently_disabled_claim");
     }
     None
@@ -150,10 +164,11 @@ pub fn run_patrol(
         }
     }
 
-    // Global stale DreamEngine lore patrol (even if truths lack the name)
-    if let Ok(rows) = vault.honeypot_latest_matching("%DreamEngine%disabled%", 24) {
+    // Global stale DreamEngine lore patrol (even if truths lack the name).
+    // Broad LIKE then filter — avoids pulling "Legacy auto_dream … disabled" ops notes.
+    if let Ok(rows) = vault.honeypot_latest_matching("%DreamEngine%", 48) {
         for (id, content, _) in rows {
-            if seen.contains(&id) {
+            if seen.contains(&id) || !is_stale_dreamengine_disabled_lore(&content) {
                 continue;
             }
             seen.insert(id);
@@ -218,5 +233,22 @@ mod tests {
     fn entity_needles_extract_bracket_tags() {
         let n = entity_needles("[SYSTEM:GZMO] four memory layers");
         assert!(n.iter().any(|x| x == "GZMO"));
+    }
+
+    #[test]
+    fn legacy_auto_dream_disabled_is_not_stale_engine_lore() {
+        assert!(!is_stale_dreamengine_disabled_lore(
+            "[SYSTEMS:DreamEngine] Legacy auto_dream orchestration job is disabled (was at 03:00)"
+        ));
+    }
+
+    #[test]
+    fn clean_slate_disabled_is_stale_engine_lore() {
+        assert!(is_stale_dreamengine_disabled_lore(
+            "[SYSTEM:DreamEngine] Currently disabled during clean-slate rebuild."
+        ));
+        assert!(is_stale_dreamengine_disabled_lore(
+            "[SYSTEM:Dream] DreamEngine consolidates logs. Currently disabled during clean-slate rebuild."
+        ));
     }
 }

@@ -380,6 +380,11 @@ summary_max_tokens = 800
 # cron = "0 0 6 * * *"
 # prompt = "Search the web for the latest tech and finance headlines. Write a concise morning briefing."
 
+# M5 fact export (living). Dual gate needs Felt Use recall_count; writes data/ripen/latest.json.
+# [orchestration.jobs.honeypot_ripen]
+# cron = "0 0 0 * * *"
+# prompt = "Run M5 ripen export: python3 /opt/gzmo/current/scripts/export-knowledge-core.py --db /opt/gzmo/data/vault.db --output /opt/gzmo/data/knowledge_core.db --min-confidence 0.90 --min-recall 3; then print advice from /opt/gzmo/data/ripen/latest.json"
+
 [orchestration.jobs.sys_janitor]
 cron = "0 */30 * * * *"
 prompt = "Use the sys_metrics tool to examine my local machine's disk, ram, and cpu. If you detect critical anomalies or see a dangerous unassociated process eating CPU, you are authorized to use sys_kill to terminate it. Keep a concise log of your findings in the knowledge vault."
