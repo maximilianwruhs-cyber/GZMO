@@ -16,16 +16,16 @@
 
 Do not treat `survey_GZMO` as the public name — use `/opt/gzmo/current`.
 
-## Sidecars (goal C)
+## Sidecars (living appliance)
 
-Living Redis / Qdrant / Neo4j are the **living appliance**. In-repo pin (matches CT101 `/opt/database-cluster` topology):
+Living Redis / Qdrant / Neo4j are the **living appliance** (airgap USP substrate). In-repo pin (matches CT101 `/opt/database-cluster` topology):
 
 | Path | Role |
 |------|------|
 | [`deploy/living-appliance/`](../deploy/living-appliance/) | Compose pin |
 | [`config/living-appliance.gzmo.toml.example`](../config/living-appliance.gzmo.toml.example) | Daemon sidecar fragment |
 | [`scripts/living-appliance-up.sh`](../scripts/living-appliance-up.sh) | `docker compose up -d` + gate |
-| [`docs/LIVING_APPLIANCE.md`](./LIVING_APPLIANCE.md) | Goal C doctrine |
+| [`docs/LIVING_APPLIANCE.md`](./LIVING_APPLIANCE.md) · [`AIRGAP_LIVING.md`](./AIRGAP_LIVING.md) | Living doctrine |
 
 ```bash
 bash scripts/living-appliance-up.sh
@@ -80,6 +80,40 @@ python3 /opt/gzmo/current/scripts/export-knowledge-core.py \
 ```
 
 Prefer job prompt path `/opt/gzmo/current/scripts/…` (not a stale `survey_GZMO` string).
+
+## Sync docs/scripts only (no rebuild)
+
+When USP / Brain Feed shell gates land on `main` but the binary is unchanged, sync scripts + docs and restore `+x` (rsync drops execute bits):
+
+```bash
+# From workstation clone on main:
+rsync -az scripts/brain-feed-check.sh scripts/brain-intel-promote.sh \
+  scripts/serendipity-promote.sh scripts/keep-quality-gate.sh \
+  scripts/keep-quality-soak.sh scripts/install-living-airgap.sh \
+  scripts/tinyfolder-drop.sh scripts/tinyfolder-check.sh \
+  ct101:/opt/gzmo/current/scripts/
+rsync -az docs/BRAIN_FEED.md docs/ADR-0004-airgap-living-usp.md \
+  docs/AIRGAP_LIVING.md docs/KEEP_QUALITY.md docs/MCP_LOCAL_ATTACH.md \
+  docs/SPINE_FOCUS.md docs/STACK_OPPORTUNITY_MAP.md docs/UNPARK_ROADMAP.md \
+  ct101:/opt/gzmo/current/docs/
+ssh ct101 'bash -lc "cd /opt/gzmo/current && chmod +x scripts/brain-feed-check.sh \
+  scripts/brain-intel-promote.sh scripts/serendipity-promote.sh \
+  scripts/keep-quality-gate.sh scripts/keep-quality-soak.sh \
+  scripts/install-living-airgap.sh scripts/tinyfolder-*.sh"'
+```
+
+Do **not** restart `gzmo-daemon` for script-only syncs.
+
+## Quality / Brain Feed gates (workstation → CT101)
+
+```bash
+bash scripts/keep-quality-gate.sh          # USP living quality bar
+bash scripts/keep-quality-soak.sh --summary
+bash scripts/brain-feed-check.sh           # vault-nourishing Unpark nutrients
+bash scripts/brain-intel-promote.sh        # calibration/Arena suggestion only (no auto)
+```
+
+See [KEEP_QUALITY.md](./KEEP_QUALITY.md) · [BRAIN_FEED.md](./BRAIN_FEED.md).
 
 ## Product gate
 
