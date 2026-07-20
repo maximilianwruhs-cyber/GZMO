@@ -42,14 +42,18 @@ if [[ -f "$REC" ]]; then
 import json, sys
 from pathlib import Path
 rec = json.loads(Path("$REC").read_text())
-if rec.get("blocks_distill") is True:
+if rec.get("schema") != "gzmo.unpark.forge.recommend/v1":
+    sys.exit(1)
+if rec.get("blocks_distill") is not False:
     sys.exit(2)
 if not isinstance(rec.get("pins"), list) or not rec["pins"]:
     sys.exit(3)
+if rec.get("action") != "recommend":
+    sys.exit(4)
 sys.exit(0)
 PY
   then
-    row PASS "recommend-json" "$REC (blocks_distill=false, pins present)"
+    row PASS "recommend-json" "$REC (schema + blocks_distill=false + pins)"
   else
     row FAIL "recommend-json" "invalid recommend.json (must not block distill)"
   fi
@@ -75,7 +79,13 @@ for line in os.environ.get("ROWS_TSV","").splitlines():
     st,n,d=line.split("|",2); checks[n]={"status":st,"detail":d}
 fail_n=int(os.environ["fail"]); hold_n=int(os.environ["hold"]); pass_n=int(os.environ["pass"])
 verdict="GREEN" if fail_n==0 else "RED"
-advice="forge_lab_ok" if fail_n==0 else "forge_lab_fail"
+rec_ok = checks.get("recommend-json",{}).get("status")=="PASS"
+if fail_n==0 and rec_ok:
+    advice="forge_lab_ok — recommend pins; blocks_distill=false"
+elif fail_n==0:
+    advice="forge_lab_hold — run forge-lab-demo.sh"
+else:
+    advice="forge_lab_fail"
 payload={"schema":"gzmo.unpark.forge_lab/v1","generated_at":datetime.now(timezone.utc).isoformat(),
   "verdict":verdict,"ok":fail_n==0,"advice":advice,
   "counts":{"pass":pass_n,"fail":fail_n,"hold":hold_n},"wave":"3.3","checks":checks}
