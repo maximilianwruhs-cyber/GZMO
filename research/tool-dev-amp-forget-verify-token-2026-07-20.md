@@ -92,7 +92,7 @@ ingest / session_distill / dream / spark
 | **Must remember** | CT101 cloud routing table is **not** next defaults; dream `max_tokens_*` TOML keys may be unwired |
 | **Non-goals** | Graft CT101 cloud routes; re-ship Obolus; auto-edit living/`~/.gzmo` config |
 
-**Ready:** estimator table · budget schema · chat-vs-heavy fixture divergence · `blocks_distill=false` assert.
+**Ready:** sibling piece [`token-economy`](../../token-economy/) (estimate smoke; `blocks_distill=false`) · LTL manifest `partial`.
 
 ---
 
