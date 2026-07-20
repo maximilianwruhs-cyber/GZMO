@@ -1,13 +1,13 @@
 ---
 id: tinyfolder-living-one-shot
 title: One-command tinyFolder → living takeaway enqueue
-status: candidate
-score: 19
+status: active
+score: 20
 uniqueness: 3
 brain_profit: 4
 credit_cost: 5
 attention_cost: 4
-usp_fit: 3
+usp_fit: 4
 stack_ids: [s4]
 created: 2026-07-20
 updated: 2026-07-20

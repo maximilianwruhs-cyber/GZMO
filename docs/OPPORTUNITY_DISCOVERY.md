@@ -76,11 +76,12 @@ This cycle may *borrow* a Socratic grill for one bet’s stress-test; it must no
 |-------|------------|-----|
 | Sense / Rank / cadence scripts | Yes | `opportunity-sense.sh`, `rank`, `serendipity-cadence.sh` (cron or local) |
 | Bet log + mission card emit | Yes | `opportunity-next-mission.sh` → `data-next/opportunity-discovery/next-mission.md` |
+| Weekly digest cadence | Yes (if enabled) | Cursor Automation **GZMO weekly opportunity + serendipity cadence** (cron) — digest only; **never** auto-applies serendipity |
 | PR CI babysit | Yes (if enabled) | Cursor Automation **GZMO PR ship babysitter** — runs **after** a PR exists |
-| Starting a new Cloud/IDE agent on the active bet | **No** (unless you add a cron Automation that pastes the mission card) | Still needs one kickoff **or** a scheduled Automation you turn on |
+| Starting a new Cloud/IDE agent on the active bet | **No** by default | Needs one kickoff (“go” / paste mission card) **or** a separate Automation that pastes `next-mission.md` into a ship agent |
 | Human “continue” in chat | Reduced | User rule **Finish through without babysitting** |
 
-So: the *process* is scripted and PR-babysittable; **mission start** is either you saying go once, or a Cursor cron Automation wired to `opportunity-next-mission.sh` + agent prompt.
+So: scripts + weekly digest + PR babysitter are automated **after** you enable them; **shipping a bet still needs one kickoff** unless you wire a cron ship agent to the mission card. That is intentional — kids / attention budget, not a missing feature.
 
 ## Success
 

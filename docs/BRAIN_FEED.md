@@ -32,9 +32,20 @@ Only these Unpark satellites claim to **improve** the living vault/honeypot. The
 
 ### Takeaway / herdr (P0)
 
+**Side-effect only** — takeaways piggyback on work you already paid for (Cursor credits / real sessions). Do **not** open a second agent chat whose only job is “feed the vault.”
+
+| Do | Don't |
+|----|-------|
+| End a real coding/ops session with one `gzmo session close --takeaway` (or herdr close-ritual) aimed at the **living** host | Start a memory-gym Cursor session |
+| Use PR template + optional git hook as *reminders* | Treat reminders as a second overnight writer |
+| Leave `--now` alone while CT101 owns metabolism | Burn superior-model credits to practice takeaways |
+
 ```bash
 # Close ritual enqueues distill (no --now on workstation while CT101 lives)
 bash scripts/herdr-metabolism-link.sh
+# Remind surfaces (PR template + optional local hook):
+bash scripts/takeaway-side-effect-remind.sh
+# bash scripts/takeaway-side-effect-remind.sh --install-hook
 # Proof:
 bash scripts/herdr-metabolism-check.sh
 bash scripts/ct101-takeaway-recall.sh   # living same-sitting HIT

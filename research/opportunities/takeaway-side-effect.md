@@ -1,7 +1,7 @@
 ---
 id: takeaway-side-effect
 title: Takeaways only as side-effect of real work
-status: active
+status: soaked
 score: 20
 uniqueness: 3
 brain_profit: 5
@@ -26,3 +26,14 @@ Every real coding session that already burns credits leaves one durable `[TAKEAW
 ## Done when
 
 Herdr/close-ritual docs + optional git hook / PR template remind “one living takeaway” without starting a second agent chat for memory.
+
+**Soaked 2026-07-20** — PR template, `takeaway-side-effect-remind.sh`, optional post-commit hook, Brain Feed / herdr doctrine, gate row.
+
+## Operator
+
+```bash
+bash scripts/takeaway-side-effect-remind.sh
+# optional local remind:
+bash scripts/takeaway-side-effect-remind.sh --install-hook
+gzmo session close --takeaway '…one durable fact…'
+```

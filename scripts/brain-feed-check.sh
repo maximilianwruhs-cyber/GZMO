@@ -59,6 +59,15 @@ else
   row HOLD "takeaway-recall" "no living_proof yet — bash scripts/ct101-takeaway-recall.sh"
 fi
 
+# Takeaway as side-effect (remind surfaces — never memory-gym)
+bash "$ROOT/scripts/takeaway-side-effect-remind.sh" >>"$LOG" 2>&1 || true
+if [[ -f "$DATA/takeaway-side-effect/latest.json" ]] \
+  && python3 -c "import json;d=json.load(open('$DATA/takeaway-side-effect/latest.json')); raise SystemExit(0 if d.get('ok') else 1)"; then
+  row PASS "takeaway-side-effect" "$(python3 -c "import json;print(json.load(open('$DATA/takeaway-side-effect/latest.json')).get('advice',''))")"
+else
+  row FAIL "takeaway-side-effect" "remind surfaces missing — scripts/takeaway-side-effect-remind.sh"
+fi
+
 # tinyFolder living enqueue
 bash "$ROOT/scripts/tinyfolder-drop.sh" --demo --living >>"$LOG" 2>&1 || true
 bash "$ROOT/scripts/tinyfolder-check.sh" >>"$LOG" 2>&1 || true

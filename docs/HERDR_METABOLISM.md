@@ -33,6 +33,8 @@ Takeaway file: `…/takeaway.txt` (one durable line)
 
 ## Close ritual (canonical)
 
+**Piggyback doctrine (takeaway side-effect):** run this at the end of work you were doing anyway. It is not a reason to open Cursor for memory practice. Reminders live in `.github/pull_request_template.md` and optional `scripts/takeaway-side-effect-remind.sh --install-hook` — they never auto-distill.
+
 ```bash
 # Interactive
 herdr plugin pane open --plugin gzmo.metabolism --entrypoint close-ritual
@@ -40,9 +42,12 @@ herdr plugin pane open --plugin gzmo.metabolism --entrypoint close-ritual
 # Non-interactive
 TAKEAWAY='durable fact for the vault' \
   herdr plugin action invoke gzmo.metabolism.session-close
+
+# CLI without herdr (same ritual)
+gzmo session close --takeaway 'durable fact for the vault'
 ```
 
-Under the hood: `gzmo session close [--session ID] --takeaway '…' [--now]`.
+Under the hood: `gzmo session close [--session ID] --takeaway '…' [--now]`. Prefer living-host enqueue; avoid `--now` on the workstation while CT101 owns overnight.
 
 ## `pane.closed` is soft-miss only
 
