@@ -10,6 +10,7 @@ Canonical operator and architecture docs. Session reports and milestone logs bel
 | [AIRGAP_LIVING.md](AIRGAP_LIVING.md) | **Hero path** — single-box airgap living bring-up |
 | [KEEP_QUALITY.md](KEEP_QUALITY.md) | **USP quality gate** — `keep-quality-gate.sh` |
 | [BRAIN_FEED.md](BRAIN_FEED.md) | **Active Unpark** — satellites that nourish the living vault |
+| [OPPORTUNITY_DISCOVERY.md](OPPORTUNITY_DISCOVERY.md) | **What to build next** — Sense→Rank→Bet→Ship→Soak |
 | [MCP_LOCAL_ATTACH.md](MCP_LOCAL_ATTACH.md) | **Brand MCP** — stdio / localhost only |
 | [SPINE_FOCUS.md](SPINE_FOCUS.md) | Active focus — living first-class; lite bootstrap |
 | [PRODUCT_MCP.md](PRODUCT_MCP.md) | **Lite bootstrap** — Cursor/Pi Memory MCP (`gzmo init`) |

@@ -3,7 +3,8 @@
 **Status:** Active Unpark focus (2026-07-20)  
 **USP:** [ADR-0004-airgap-living-usp.md](./ADR-0004-airgap-living-usp.md)  
 **Gate:** `bash scripts/brain-feed-check.sh` → `data-next/brain-feed/`  
-**Quality bar (still required):** [KEEP_QUALITY.md](./KEEP_QUALITY.md)
+**Quality bar (still required):** [KEEP_QUALITY.md](./KEEP_QUALITY.md)  
+**What to build next:** [OPPORTUNITY_DISCOVERY.md](./OPPORTUNITY_DISCOVERY.md)
 
 ## Lock
 
