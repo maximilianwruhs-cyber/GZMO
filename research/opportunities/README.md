@@ -16,6 +16,7 @@ Operator research bets for GZMO upgrades. Doctrine: [docs/OPPORTUNITY_DISCOVERY.
 
 | Id | Score | Status | Title |
 |----|-------|--------|-------|
+| [lymph-night-tinyfolder-timer](lymph-night-tinyfolder-timer.md) | 18 | soaked | Lymph night_id bridge + TinyFolder overnight timer |
 | [overnight-metabolism-triad](overnight-metabolism-triad.md) | 22 | soaked | TinyFolder glue + daemon ledger + spark dampening |
 | [soak-night-honest-timer](soak-night-honest-timer.md) | 19 | soaked | Honest soak timer (min sample spacing) |
 | [ct101-brain-feed-sync](ct101-brain-feed-sync.md) | 19 | soaked | One-command Brain Feed script sync to CT101 |
