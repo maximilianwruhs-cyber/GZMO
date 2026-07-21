@@ -32,6 +32,7 @@ Operator research bets for GZMO upgrades. Doctrine: [docs/OPPORTUNITY_DISCOVERY.
 | [beat-gate-versioned-baselines](beat-gate-versioned-baselines.md) | 21 | soaked | Beat-gate versioned baselines + honest gate_passed |
 | [felt-use-mass-growth](felt-use-mass-growth.md) | 22 | active | Felt Use mass growth (share_ge3_of_latest) |
 | [soak-honest-nights](soak-honest-nights.md) | 19 | candidate | Honest soak nights (≥18h spacing) |
+| [promote-loop-living-apply](promote-loop-living-apply.md) | 21 | candidate | Promote-loop living apply (gated handoff recipe) |
 | [promote-by-loop-first](promote-by-loop-first.md) | 22 | soaked | First promote-by-loop (narrow cognition or knowledge) |
 | [local-intel-32gb-128k](local-intel-32gb-128k.md) | — | horizon | Local strong model + long context on 32GB VRAM |
 
