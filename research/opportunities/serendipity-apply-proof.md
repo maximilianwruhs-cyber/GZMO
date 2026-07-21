@@ -1,7 +1,7 @@
 ---
 id: serendipity-apply-proof
 title: Serendipity apply proof (close the 0-apply remind)
-status: active
+status: soaked
 score: 20
 uniqueness: 3
 brain_profit: 5
@@ -25,4 +25,13 @@ Cadence + dry-run shipped; vault still barely gets spark links back because **hu
 
 ## Done when
 
-At least one successful apply logged in `cadence-log.jsonl` / promote artifact `applied[]`; brain-feed-check still GREEN; no auto-apply default.
+At least one successful apply logged in `cadence-log.jsonl` / promote artifact `applied[]`; brain-feed-check stays GREEN; no auto-apply default.
+
+**Soaked 2026-07-21** — `scripts/serendipity-apply-proof.sh --apply` logged apply; cadence `applies_logged≥1`; `auto_apply=false`.
+
+## Operator
+
+```bash
+bash scripts/serendipity-apply-proof.sh           # dry
+bash scripts/serendipity-apply-proof.sh --apply   # human-gated ≤3
+```

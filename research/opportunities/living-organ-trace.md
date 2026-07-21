@@ -1,7 +1,7 @@
 ---
 id: living-organ-trace
 title: Living organ-trace (CT101 scheduler-runs, not workstation zoo)
-status: candidate
+status: active
 score: 20
 uniqueness: 4
 brain_profit: 3
@@ -10,7 +10,7 @@ attention_cost: 4
 usp_fit: 4
 stack_ids: [o1]
 created: 2026-07-20
-updated: 2026-07-20
+updated: 2026-07-21
 ---
 
 # Living organ-trace
