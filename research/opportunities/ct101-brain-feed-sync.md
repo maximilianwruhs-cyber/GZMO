@@ -1,7 +1,7 @@
 ---
 id: ct101-brain-feed-sync
 title: One-command Brain Feed script sync to CT101
-status: active
+status: soaked
 score: 19
 uniqueness: 2
 brain_profit: 3
@@ -26,3 +26,11 @@ New Brain Feed / keep-quality scripts on `main` actually run on the living box w
 ## Done when
 
 `scripts/ct101-brain-feed-sync.sh` (or sibling) rsyncs the CT101_DEPLOY script/doc set, restores `+x`, dual-writer-safe (no daemon restart); documented one-liner; discovery/brain-feed still GREEN.
+
+**Soaked 2026-07-21** — one-liner sync + `+x` restore; asserts daemon `ActiveEnterTimestamp` unchanged.
+
+## Operator
+
+```bash
+bash scripts/ct101-brain-feed-sync.sh
+```

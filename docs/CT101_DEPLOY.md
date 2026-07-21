@@ -86,25 +86,12 @@ Prefer job prompt path `/opt/gzmo/current/scripts/…` (not a stale `survey_GZMO
 When USP / Brain Feed shell gates land on `main` but the binary is unchanged, sync scripts + docs and restore `+x` (rsync drops execute bits):
 
 ```bash
-# From workstation clone on main:
-rsync -az scripts/brain-feed-check.sh scripts/brain-intel-promote.sh \
-  scripts/serendipity-promote.sh scripts/keep-quality-gate.sh \
-  scripts/keep-quality-soak.sh scripts/install-living-airgap.sh \
-  scripts/tinyfolder-drop.sh scripts/tinyfolder-check.sh \
-  scripts/felt-use-depth.sh \
-  ct101:/opt/gzmo/current/scripts/
-rsync -az docs/BRAIN_FEED.md docs/ADR-0004-airgap-living-usp.md \
-  docs/AIRGAP_LIVING.md docs/KEEP_QUALITY.md docs/MCP_LOCAL_ATTACH.md \
-  docs/SPINE_FOCUS.md docs/STACK_OPPORTUNITY_MAP.md docs/UNPARK_ROADMAP.md \
-  ct101:/opt/gzmo/current/docs/
-ssh ct101 'bash -lc "cd /opt/gzmo/current && chmod +x scripts/brain-feed-check.sh \
-  scripts/brain-intel-promote.sh scripts/serendipity-promote.sh \
-  scripts/keep-quality-gate.sh scripts/keep-quality-soak.sh \
-  scripts/install-living-airgap.sh scripts/tinyfolder-*.sh \
-  scripts/felt-use-depth.sh"'
+# From workstation clone on main (dual-writer safe — never restarts gzmo-daemon):
+bash scripts/ct101-brain-feed-sync.sh
+# HOST override: CT101_SSH_HOST=ct101 bash scripts/ct101-brain-feed-sync.sh
 ```
 
-Do **not** restart `gzmo-daemon` for script-only syncs.
+Do **not** restart `gzmo-daemon` for script-only syncs. The sync script asserts `ActiveEnterTimestamp` unchanged.
 
 ## Quality / Brain Feed gates (workstation → CT101)
 

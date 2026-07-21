@@ -125,6 +125,16 @@ bash scripts/brain-feed-check.sh
 # → data-next/brain-feed/latest.{json,md}
 ```
 
+## After merge → living host (script-only)
+
+When Brain Feed / keep-quality scripts land on `main` and the binary is unchanged:
+
+```bash
+bash scripts/ct101-brain-feed-sync.sh   # rsync + restore +x; never restarts gzmo-daemon
+```
+
+See [CT101_DEPLOY.md](./CT101_DEPLOY.md) §“Sync docs/scripts only”.
+
 ## Out / demoted (not Brain Feed)
 
 HSP sonification · pantheon / discovery theater · Observatory public mind · €/night display · AOS CE packaging · marketplace read-only · Cognis / ZPD / escape-loop (never-as-brain).
