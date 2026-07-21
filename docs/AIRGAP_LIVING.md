@@ -88,7 +88,12 @@ Degrade messaging must say **lite / incomplete**, never “living GREEN.”
 ## Verify
 
 ```bash
+# Install / stranger path (never claims living GREEN for lite):
+bash scripts/airgap-living-install-smoke.sh
+# → data-next/airgap-living-install/latest.json  (living_green_claimed=false)
+
 bash scripts/living-appliance-gate.sh
+# Full living proof only on the sole overnight writer box:
 bash scripts/keep-quality-gate.sh
 # Optional soak (N nights):
 bash scripts/keep-quality-soak.sh

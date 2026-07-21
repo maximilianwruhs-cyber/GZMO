@@ -16,10 +16,10 @@ Operator research bets for GZMO upgrades. Doctrine: [docs/OPPORTUNITY_DISCOVERY.
 
 | Id | Score | Status | Title |
 |----|-------|--------|-------|
-| [airgap-living-install-smoke](airgap-living-install-smoke.md) | 20 | **active** | Airgap living install smoke (stranger / one-box path) |
+| [serendipity-apply-proof](serendipity-apply-proof.md) | 20 | **active** | Serendipity apply proof (close the 0-apply remind) |
+| [airgap-living-install-smoke](airgap-living-install-smoke.md) | 20 | soaked | Airgap living install smoke (stranger / one-box path) |
 | [herdr-living-enqueue-proof](herdr-living-enqueue-proof.md) | 21 | soaked | herdr pane-close → living takeaway enqueue proof |
 | [felt-use-ripen-floor](felt-use-ripen-floor.md) | 23 | soaked | Felt Use depth floor for honest ripen (recall≥3 share) |
-| [serendipity-apply-proof](serendipity-apply-proof.md) | 20 | candidate | Serendipity apply proof (close the 0-apply remind) |
 | [living-organ-trace](living-organ-trace.md) | 20 | candidate | Living organ-trace (CT101 scheduler-runs) |
 | [ct101-brain-feed-sync](ct101-brain-feed-sync.md) | 19 | candidate | One-command Brain Feed script sync to CT101 |
 | [soak-night-honest-timer](soak-night-honest-timer.md) | 19 | candidate | Honest soak timer (min sample spacing) |

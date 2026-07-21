@@ -1,7 +1,7 @@
 ---
 id: airgap-living-install-smoke
 title: Airgap living install smoke (stranger / one-box path)
-status: active
+status: soaked
 score: 20
 uniqueness: 4
 brain_profit: 3
@@ -26,3 +26,12 @@ Stranger/operator can demable “is this box living-capable?” without claiming
 ## Done when
 
 Smoke/check wraps `install-living-airgap` / living-appliance compose + airgap honesty checklist; FAIL/HOLD never says living GREEN for lite; ADR-0003 refuse if another overnight writer exists.
+
+**Soaked 2026-07-21** — `scripts/airgap-living-install-smoke.sh`; `living_green_claimed=false` always.
+
+## Operator
+
+```bash
+bash scripts/airgap-living-install-smoke.sh
+# AIRGAP_SMOKE_REQUIRE_LIVE=1  # optional hard sidecar requirement
+```
