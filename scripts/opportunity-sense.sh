@@ -90,18 +90,21 @@ try:
     lines = [ln.strip() for ln in (raw.stdout or "").splitlines() if ln.strip().isdigit()]
     if len(lines) >= 3:
         latest, ge1, ge3 = int(lines[0]), int(lines[1]), int(lines[2])
-        share3 = (ge3 / latest) if latest else 0.0
+        share3_felt = (ge3 / ge1) if ge1 else 0.0
+        share3_latest = (ge3 / latest) if latest else 0.0
         felt = {
             "ok": True,
             "latest": latest,
             "recall_ge1": ge1,
             "recall_ge3": ge3,
-            "share_ge3": round(share3, 6),
+            "share_ge3": round(share3_felt, 6),
+            "share_ge3_of_latest": round(share3_latest, 6),
+            "share_denominator": "recall_ge1",
         }
-        # Soft scar: depth thin vs mass (ripen needs ≥3)
-        if ge3 < 100 or share3 < 0.01:
+        # Soft scar: depth among felt facts (ripen needs ≥3)
+        if ge3 < 100 or share3_felt < 0.40:
             scars.append(
-                f"felt_use_depth_thin — recall≥3={ge3}/{latest} "
+                f"felt_use_depth_thin — recall≥3={ge3}/{ge1} felt "
                 "(ripen dual-gate needs deeper Felt Use; not memory-gym)"
             )
 except Exception as e:

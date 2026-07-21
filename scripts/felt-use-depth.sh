@@ -8,7 +8,9 @@
 # Env:
 #   CT101_SSH_HOST / KEEP_QUALITY_VAULT_DB
 #   FELT_USE_MIN_GE3          soft floor for recall≥3 count (default 100)
-#   FELT_USE_MIN_SHARE_GE3    soft floor for share (default 0.01 = 1%)
+#   FELT_USE_MIN_SHARE_GE3    soft floor for deep share among felt facts
+#                             (ge3/ge1; default 0.40). Not ge3/latest — that
+#                             share shrinks as the vault grows and is unreachable.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -18,7 +20,7 @@ HOST="${CT101_SSH_HOST:-ct101}"
 VAULT_DB="${KEEP_QUALITY_VAULT_DB:-/opt/gzmo/data/vault.db}"
 GZMO_BIN="${CT101_GZMO_BIN:-/opt/gzmo/current/target/release/gzmo}"
 MIN_GE3="${FELT_USE_MIN_GE3:-100}"
-MIN_SHARE="${FELT_USE_MIN_SHARE_GE3:-0.01}"
+MIN_SHARE="${FELT_USE_MIN_SHARE_GE3:-0.40}"
 mkdir -p "$OUT"
 
 export OUT HOST VAULT_DB GZMO_BIN MIN_GE3 MIN_SHARE ROOT
@@ -63,14 +65,19 @@ elif len(nums) >= 3:
 if rc == 0 and len(nums) >= 3:
     latest, ge1, ge3 = nums[0], nums[1], nums[2]
     share1 = (ge1 / latest) if latest else 0.0
-    share3 = (ge3 / latest) if latest else 0.0
+    # Depth among felt facts (honest nutrient signal). Vault-wide ge3/latest
+    # is retained as share_ge3_of_latest for trend only — not the floor.
+    share3_felt = (ge3 / ge1) if ge1 else 0.0
+    share3_latest = (ge3 / latest) if latest else 0.0
     census = {
         "ok": True,
         "latest": latest,
         "recall_ge1": ge1,
         "recall_ge3": ge3,
         "share_ge1": round(share1, 6),
-        "share_ge3": round(share3, 6),
+        "share_ge3": round(share3_felt, 6),
+        "share_ge3_of_latest": round(share3_latest, 6),
+        "share_denominator": "recall_ge1",
     }
 else:
     census = {
@@ -134,15 +141,16 @@ if not census.get("ok"):
     ok = False
 elif depth_ok:
     advice = (
-        f"felt_use_depth_ok — recall≥3={census['recall_ge3']}/{census['latest']} "
-        f"(share={census['share_ge3']}) ripen_dual={ripen.get('dual_gate')}"
+        f"felt_use_depth_ok — recall≥3={census['recall_ge3']}/{census['recall_ge1']} felt "
+        f"(share_ge3={census['share_ge3']}; of_latest={census.get('share_ge3_of_latest')}) "
+        f"ripen_dual={ripen.get('dual_gate')}"
     )
     verdict = "GREEN"
     ok = True
 else:
     advice = (
-        f"felt_use_depth_thin — recall≥3={census['recall_ge3']}/{census['latest']} "
-        f"(share={census['share_ge3']}; floor ge3>={min_ge3} share>={min_share}). "
+        f"felt_use_depth_thin — recall≥3={census['recall_ge3']}/{census['recall_ge1']} felt "
+        f"(share_ge3={census['share_ge3']}; floor ge3>={min_ge3} share>={min_share}). "
         "Grow via real living MCP search side-effects — no memory-gym."
     )
     verdict = "HOLD"
