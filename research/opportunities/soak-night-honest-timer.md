@@ -1,7 +1,7 @@
 ---
 id: soak-night-honest-timer
 title: Honest soak timer (min spacing between GREEN samples)
-status: active
+status: soaked
 score: 19
 uniqueness: 2
 brain_profit: 3
@@ -26,3 +26,12 @@ Indirect: stops false confidence that living quality is soaked when samples are 
 ## Done when
 
 `keep-quality-soak.sh --summary` requires min inter-sample spacing (e.g. ≥18h) or CT101 appends one sample/night; same-hour streaks → HOLD not `soak_ready_unpark_ok`.
+
+**Soaked 2026-07-21** — `KEEP_QUALITY_SOAK_MIN_HOURS` (default 18); same-hour trail → `soak_spacing_hold`.
+
+## Operator
+
+```bash
+bash scripts/keep-quality-soak.sh --summary
+# KEEP_QUALITY_SOAK_MIN_HOURS=18 KEEP_QUALITY_SOAK_NIGHTS=3
+```
