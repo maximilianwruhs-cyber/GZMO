@@ -1614,11 +1614,11 @@ fn default_spark_refractory_slots() -> usize {
 }
 
 fn default_spark_refractory_half_life_hours() -> f64 {
-    72.0
+    120.0
 }
 
 fn default_spark_refractory_strength() -> f64 {
-    0.85
+    0.95
 }
 
 fn default_spark_soft_pick_top_k() -> usize {

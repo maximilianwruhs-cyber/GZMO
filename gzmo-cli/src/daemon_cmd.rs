@@ -26,6 +26,7 @@ use gzmo_core::memory::embeddings;
 use gzmo_core::memory::episodic::FileEpisodicStore;
 use gzmo_core::memory::qdrant_sync::{self, sync_vault_to_qdrant};
 use gzmo_core::memory::scratch::{ScratchScope, ScratchService};
+use gzmo_core::metabolism;
 use gzmo_core::session_distill::{run_distill_worker, SessionDistillEngine};
 use gzmo_core::spark::{append_spark_to_dreams, SparkEngine};
 use gzmo_core::synapse::SynapseBus;
@@ -274,6 +275,7 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
     let dream_engine_clone = Arc::clone(&dream_engine);
     let dreams_path = config.skills.dreams_path.clone();
     let dream_config = config.dreams.clone();
+    let meta_config_dream = config.clone();
 
     let spark_engine = Arc::new(SparkEngine::new_with_verify(
         (*dream_vault).clone(),
@@ -288,6 +290,9 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
     let spark_config = config.spark.clone();
     let dreams_path_spark = config.skills.dreams_path.clone();
     let spark_vault_path = config.memory.vault_db.clone();
+    let meta_config_spark = config.clone();
+    let meta_config_distill = config.clone();
+    let meta_config_watchdog = config.clone();
 
     let ingest_engine = Arc::new(
         IngestEngine::new_with_verify(
@@ -458,6 +463,7 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
                 continue;
             }
             info!(date = %yesterday, assembly_backend = dream_backend.label(), "Dream consolidation starting");
+            let dream_started = Utc::now();
             append_cognition_schedule(
                 synapse_dream.as_ref(),
                 "dream",
@@ -474,6 +480,14 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
                 match run_lab_script_blocking("session-to-dream.sh", args).await {
                     Ok(()) => {
                         last_consolidated = Some(yesterday);
+                        metabolism::write_job_run(
+                            &meta_config_dream,
+                            "dream",
+                            "lab",
+                            dream_started,
+                            true,
+                            None,
+                        );
                         append_cognition_schedule(
                             synapse_dream.as_ref(),
                             "dream",
@@ -483,6 +497,14 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
                         info!("Dream cycle complete (lab recipe)");
                     }
                     Err(e) => {
+                        metabolism::write_job_run(
+                            &meta_config_dream,
+                            "dream",
+                            "lab",
+                            dream_started,
+                            false,
+                            Some(e.to_string()),
+                        );
                         append_cognition_schedule(
                             synapse_dream.as_ref(),
                             "dream",
@@ -497,6 +519,14 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
             match dream_engine_clone.consolidate(yesterday).await {
                 Ok(report) => {
                     last_consolidated = Some(yesterday);
+                    metabolism::write_job_run(
+                        &meta_config_dream,
+                        "dream",
+                        "rust",
+                        dream_started,
+                        true,
+                        None,
+                    );
                     append_cognition_schedule(
                         synapse_dream.as_ref(),
                         "dream",
@@ -516,6 +546,14 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
                     }
                 }
                 Err(e) => {
+                    metabolism::write_job_run(
+                        &meta_config_dream,
+                        "dream",
+                        "rust",
+                        dream_started,
+                        false,
+                        Some(e.to_string()),
+                    );
                     append_cognition_schedule(
                         synapse_dream.as_ref(),
                         "dream",
@@ -577,6 +615,7 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
             };
 
             info!(date = %today, mode = ?spark_config.schedule_mode, hour = slot_hour, minute = slot_minute, assembly_backend = spark_backend.label(), "Spark cycle starting");
+            let spark_started = Utc::now();
             append_cognition_schedule(
                 synapse_spark.as_ref(),
                 "spark",
@@ -598,6 +637,14 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
                         } else {
                             next_dice_run = None;
                         }
+                        metabolism::write_job_run(
+                            &meta_config_spark,
+                            "spark",
+                            "lab",
+                            spark_started,
+                            true,
+                            None,
+                        );
                         append_cognition_schedule(
                             synapse_spark.as_ref(),
                             "spark",
@@ -607,6 +654,20 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
                         info!("Spark cycle complete (lab recipe)");
                     }
                     Err(e) => {
+                        // Advance slot so Err does not retry every 60s in the same cron window.
+                        if spark_config.schedule_mode == SparkScheduleMode::Cron {
+                            last_run_key = Some((slot_hour, slot_minute, today));
+                        } else {
+                            next_dice_run = None;
+                        }
+                        metabolism::write_job_run(
+                            &meta_config_spark,
+                            "spark",
+                            "lab",
+                            spark_started,
+                            false,
+                            Some(e.to_string()),
+                        );
                         append_cognition_schedule(
                             synapse_spark.as_ref(),
                             "spark",
@@ -625,6 +686,14 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
                     } else {
                         next_dice_run = None;
                     }
+                    metabolism::write_job_run(
+                        &meta_config_spark,
+                        "spark",
+                        "rust",
+                        spark_started,
+                        true,
+                        None,
+                    );
                     if let Err(e) =
                         append_spark_to_dreams(&dreams_path_spark, &report.section).await
                     {
@@ -647,6 +716,20 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
                     }
                 }
                 Err(e) => {
+                    // Advance slot / re-roll dice so hard errors do not spin every minute.
+                    if spark_config.schedule_mode == SparkScheduleMode::Cron {
+                        last_run_key = Some((slot_hour, slot_minute, today));
+                    } else {
+                        next_dice_run = None;
+                    }
+                    metabolism::write_job_run(
+                        &meta_config_spark,
+                        "spark",
+                        "rust",
+                        spark_started,
+                        false,
+                        Some(e.to_string()),
+                    );
                     append_cognition_schedule(
                         synapse_spark.as_ref(),
                         "spark",
@@ -751,6 +834,7 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
                 assembly_backend = distill_backend.label(),
                 "Session distill starting"
             );
+            let distill_started = Utc::now();
             append_cognition_schedule(
                 synapse_distill.as_ref(),
                 "session_distill",
@@ -770,6 +854,14 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
                 {
                     Ok(()) => {
                         last_distill_date = Some(today);
+                        metabolism::write_job_run(
+                            &meta_config_distill,
+                            "distill",
+                            "lab",
+                            distill_started,
+                            true,
+                            None,
+                        );
                         append_cognition_schedule(
                             synapse_distill.as_ref(),
                             "session_distill",
@@ -779,6 +871,14 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
                         info!("Session distill complete (lab recipe)");
                     }
                     Err(e) => {
+                        metabolism::write_job_run(
+                            &meta_config_distill,
+                            "distill",
+                            "lab",
+                            distill_started,
+                            false,
+                            Some(e.to_string()),
+                        );
                         append_cognition_schedule(
                             synapse_distill.as_ref(),
                             "session_distill",
@@ -798,6 +898,14 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
             {
                 Ok(out) if out.status.success() => {
                     last_distill_date = Some(today);
+                    metabolism::write_job_run(
+                        &meta_config_distill,
+                        "distill",
+                        "rust",
+                        distill_started,
+                        true,
+                        None,
+                    );
                     let summary = String::from_utf8_lossy(&out.stdout);
                     append_cognition_schedule(
                         synapse_distill.as_ref(),
@@ -808,6 +916,18 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
                     info!(summary = %summary.trim(), "Session distill complete");
                 }
                 Ok(out) => {
+                    metabolism::write_job_run(
+                        &meta_config_distill,
+                        "distill",
+                        "rust",
+                        distill_started,
+                        false,
+                        Some(format!(
+                            "exit {:?} {}",
+                            out.status.code(),
+                            String::from_utf8_lossy(&out.stderr).trim()
+                        )),
+                    );
                     append_cognition_schedule(
                         synapse_distill.as_ref(),
                         "session_distill",
@@ -823,7 +943,17 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
                         "Session distill failed"
                     );
                 }
-                Err(e) => error!("Session distill spawn failed: {e}"),
+                Err(e) => {
+                    metabolism::write_job_run(
+                        &meta_config_distill,
+                        "distill",
+                        "rust",
+                        distill_started,
+                        false,
+                        Some(e.to_string()),
+                    );
+                    error!("Session distill spawn failed: {e}");
+                }
             }
         }
     });
@@ -1142,6 +1272,21 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
         }
     });
 
+    // Missed-run watchdog — same ledger path as `gzmo serve` / `gzmo metabolism watchdog`.
+    let watchdog_handle = tokio::spawn(async move {
+        let mut interval = tokio::time::interval(Duration::from_secs(300));
+        loop {
+            interval.tick().await;
+            let record = metabolism::evaluate_and_write_watchdog(&meta_config_watchdog);
+            if record.stale {
+                info!(
+                    detail = %record.detail,
+                    "Metabolism watchdog stale (daemon ledger path)"
+                );
+            }
+        }
+    });
+
     let _identity = identity;
     let _mentor_thread = mentor_thread;
 
@@ -1157,6 +1302,7 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
         _ = wiki_sync_handle => error!("Wiki sync loop exited"),
         _ = wiki_lint_handle => error!("Wiki lint loop exited"),
         _ = handoff_handle => error!("Config handoff loop exited"),
+        _ = watchdog_handle => error!("Metabolism watchdog loop exited"),
     }
 
     Ok(())

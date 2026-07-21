@@ -74,6 +74,9 @@ bash scripts/tinyfolder-drop.sh --demo --living
 # One-shot enqueue on living host (session close --takeaway, no --now):
 bash scripts/tinyfolder-drop.sh --demo --living --apply-takeaway
 # Or: TINYFOLDER_APPLY_TAKEAWAY=1 bash scripts/tinyfolder-drop.sh --living note.md
+# Overnight organ (pending drops → living enqueue, no CLI):
+bash scripts/tinyfolder-overnight.sh --dry-run
+# On CT101: bash scripts/tinyfolder-overnight.sh --on-host
 bash scripts/tinyfolder-check.sh
 # living-enqueue.json: proposed takeaways + applied[] when --apply-takeaway;
 # refuses if workstation gzmo-serve is active (dual-writer)

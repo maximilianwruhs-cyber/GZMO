@@ -16,6 +16,7 @@ Operator research bets for GZMO upgrades. Doctrine: [docs/OPPORTUNITY_DISCOVERY.
 
 | Id | Score | Status | Title |
 |----|-------|--------|-------|
+| [overnight-metabolism-triad](overnight-metabolism-triad.md) | 22 | soaked | TinyFolder glue + daemon ledger + spark dampening |
 | [soak-night-honest-timer](soak-night-honest-timer.md) | 19 | soaked | Honest soak timer (min sample spacing) |
 | [ct101-brain-feed-sync](ct101-brain-feed-sync.md) | 19 | soaked | One-command Brain Feed script sync to CT101 |
 | [living-organ-trace](living-organ-trace.md) | 20 | soaked | Living organ-trace (CT101 scheduler-runs) |
@@ -36,24 +37,14 @@ Operator research bets for GZMO upgrades. Doctrine: [docs/OPPORTUNITY_DISCOVERY.
 id: kebab-id
 title: Short title
 status: candidate|active|soaked|killed|horizon
-score: 0-25          # omit for horizon
+score: 0-25
 uniqueness: 0-5
 brain_profit: 0-5
-credit_cost: 0-5     # higher = cheaper
-attention_cost: 0-5  # higher = less babysitting
+credit_cost: 0-5
+attention_cost: 0-5
 usp_fit: 0-5
-stack_ids: [o5, m3]  # optional STACK_OPPORTUNITY_MAP ids
+stack_ids: [o5, m3]
 created: YYYY-MM-DD
 updated: YYYY-MM-DD
 ---
-```
-
-## Next active
-
-No candidate queued after soak-night-honest-timer. Run Sense→Rank when ready:
-
-```bash
-bash scripts/opportunity-sense.sh
-bash scripts/opportunity-rank.sh
-bash scripts/opportunity-next-mission.sh
 ```
