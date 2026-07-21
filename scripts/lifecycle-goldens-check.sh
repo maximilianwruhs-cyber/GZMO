@@ -7,10 +7,18 @@ CLONE="${GZMO_CLONE_ROOT:-$(dirname "$ROOT")}"
 GATE="${CLONE}/honeypot-gate"
 export CARGO_TARGET_DIR="${CARGO_TARGET_DIR:-$CLONE/temp-bench/target}"
 GOLDENS="$GATE/fixtures/lifecycle-goldens.json"
+LAB_GOLDENS="${LITTLE_TOOLS_LAB_ROOT:-$CLONE/little-tools-lab}/fixtures/honeypot-lifecycle/lifecycle-goldens.json"
 OUT="${GZMO_DATA_NEXT:-$ROOT/data-next}/lifecycle-goldens"
 mkdir -p "$OUT"
 
 [[ -f "$GOLDENS" ]] || { echo "missing $GOLDENS" >&2; exit 2; }
+if [[ -f "$LAB_GOLDENS" ]]; then
+  if ! cmp -s "$GOLDENS" "$LAB_GOLDENS"; then
+    echo "error: LTL lifecycle goldens drift — sync honeypot-gate ↔ little-tools-lab fixtures" >&2
+    exit 1
+  fi
+  echo "=== LTL lifecycle goldens sync ok ==="
+fi
 
 run_one() {
   local label="$1"
