@@ -30,9 +30,9 @@ Operator research bets for GZMO upgrades. Doctrine: [docs/OPPORTUNITY_DISCOVERY.
 | [serendipity-apply-cadence](serendipity-apply-cadence.md) | 21 | soaked | Cheap serendipity promote cadence (no chat tourism) |
 | [opportunity-discovery-cycle](opportunity-discovery-cycle.md) | 22 | soaked | This cycle (Sense→Rank→Bet→Ship) |
 | [beat-gate-versioned-baselines](beat-gate-versioned-baselines.md) | 21 | soaked | Beat-gate versioned baselines + honest gate_passed |
-| [felt-use-mass-growth](felt-use-mass-growth.md) | 22 | candidate | Felt Use mass growth (share_ge3_of_latest) |
+| [felt-use-mass-growth](felt-use-mass-growth.md) | 22 | active | Felt Use mass growth (share_ge3_of_latest) |
 | [soak-honest-nights](soak-honest-nights.md) | 19 | candidate | Honest soak nights (≥18h spacing) |
-| [promote-by-loop-first](promote-by-loop-first.md) | 22 | active | First promote-by-loop (narrow cognition or knowledge) |
+| [promote-by-loop-first](promote-by-loop-first.md) | 22 | soaked | First promote-by-loop (narrow cognition or knowledge) |
 | [local-intel-32gb-128k](local-intel-32gb-128k.md) | — | horizon | Local strong model + long context on 32GB VRAM |
 
 ## Schema (YAML frontmatter)

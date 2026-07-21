@@ -1,7 +1,7 @@
 ---
 id: felt-use-mass-growth
 title: Felt Use mass growth (share_ge3_of_latest)
-status: candidate
+status: active
 score: 22
 uniqueness: 4
 brain_profit: 5
@@ -41,3 +41,4 @@ bash scripts/brain-feed-check.sh
 
 - [stack-future-opportunities-2026-07-21.md](../stack-future-opportunities-2026-07-21.md) O3
 - [felt-use-ripen-floor.md](felt-use-ripen-floor.md) (measurement soaked)
+**Progress 2026-07-21** — after living MCP searches: recall≥3=158/205 felt (share_ge3=0.77; of_latest=0.004066); ripen_dual=144. Still thin vault-wide; keep searching during real work.
