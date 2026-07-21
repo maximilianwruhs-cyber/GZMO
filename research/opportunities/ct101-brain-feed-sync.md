@@ -1,7 +1,7 @@
 ---
 id: ct101-brain-feed-sync
 title: One-command Brain Feed script sync to CT101
-status: candidate
+status: active
 score: 19
 uniqueness: 2
 brain_profit: 3
@@ -10,7 +10,7 @@ attention_cost: 5
 usp_fit: 4
 stack_ids: []
 created: 2026-07-20
-updated: 2026-07-20
+updated: 2026-07-21
 ---
 
 # CT101 Brain Feed sync
