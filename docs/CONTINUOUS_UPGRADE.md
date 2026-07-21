@@ -135,8 +135,9 @@ bash scripts/beat-gate-kit.sh --all
 | P0 ✓ | `spark_field` refractory soft-pick | Done — ADR-0005 PR #97 (metrics + report) |
 | P0 ✓ | honeypot `classify_truth_pair` | Done — goldens + strong supersession + knowledge beat PASS |
 | P0 ✓ | herdr living enqueue | Done — `herdr-metabolism-check` GREEN living_ok |
+| P0 ✓ | beat-gate kit (5 loops) | Done — fixture cognition+ops honesty; kit `ok=true` 5/5 |
 | P1 | HSP dialect MIDI | Keep demable theater; optional motif schema only |
-| P1 | Obolus `beats_with_mad` | Feed Arena suggestion quality — still human pin |
+| P1 → | Obolus `beats_with_mad` | DNA/dogfood + Forge pin near-ties; still human pin |
 | P1 | Thought Cabinet crystallize | Lab chaos only unless beat-gate cognition demands |
 
 ---
