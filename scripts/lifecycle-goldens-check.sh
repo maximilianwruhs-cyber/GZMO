@@ -41,6 +41,12 @@ run_one "lifecycle goldens (honeypot-gate)" \
 run_one "lifecycle goldens (gzmo-core mirror)" \
   bash -c "cd \"$ROOT\" && cargo test -p gzmo-core memory::lifecycle::tests::lifecycle_goldens_mirror_honeypot_gate_fixture -- --exact"
 
+CRAFT="${LITTLE_TOOLS_LAB_ROOT:-$CLONE/little-tools-lab}/scripts/craft-goldens-check.sh"
+if [[ -f "$CRAFT" ]]; then
+  echo "=== LTL craft-goldens-check ==="
+  bash "$CRAFT"
+fi
+
 python3 - "$GOLDENS" "$OUT" <<'PY'
 import json, sys
 from datetime import datetime, timezone
