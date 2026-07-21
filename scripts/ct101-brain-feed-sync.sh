@@ -20,6 +20,7 @@ SCRIPTS=(
   install-living-airgap.sh
   tinyfolder-drop.sh
   tinyfolder-check.sh
+  tinyfolder-overnight.sh
   felt-use-depth.sh
   organ-trace.sh
   ct101-brain-feed-sync.sh

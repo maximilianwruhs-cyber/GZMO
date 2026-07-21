@@ -91,6 +91,26 @@ pub fn is_systemish(content: &str) -> bool {
         || upper.contains("SESSIONDISTILL")
 }
 
+/// Lexical theme tokens from preview/content (lowercased alnum runs ≥5 chars).
+fn theme_tokens(text: &str) -> std::collections::HashSet<String> {
+    text.to_lowercase()
+        .split(|c: char| !c.is_ascii_alphanumeric())
+        .filter(|t| t.len() >= 5)
+        .map(str::to_string)
+        .collect()
+}
+
+fn theme_preview_overlap(a: &str, b: &str) -> bool {
+    let ta = theme_tokens(a);
+    let tb = theme_tokens(b);
+    if ta.is_empty() || tb.is_empty() {
+        return false;
+    }
+    let inter = ta.intersection(&tb).count();
+    let union = ta.union(&tb).count().max(1);
+    (inter as f64 / union as f64) >= 0.35
+}
+
 fn hours_since(iso: &str) -> f64 {
     DateTime::parse_from_rfc3339(iso)
         .ok()
@@ -132,7 +152,11 @@ pub fn refractory_multiplier(
         }
         let overlap = entry.tags.iter().any(|t| tags.iter().any(|u| u == t));
         if overlap {
-            pen = pen.max(decay * 0.65);
+            // Strong theme/tag refractory — overnight monoculture (same PROJECT/TOOL)
+            // must not soft-pick every minute.
+            pen = pen.max(decay * 0.9);
+        } else if theme_preview_overlap(&entry.preview, &fact.content) {
+            pen = pen.max(decay * 0.75);
         }
     }
 
@@ -303,5 +327,36 @@ mod tests {
         };
         let m = refractory_multiplier(&fact, &field, 72.0, 0.85);
         assert!(m < 0.5, "system saturation should suppress, got {m}");
+    }
+
+    #[test]
+    fn theme_overlap_suppresses_similar_preview() {
+        let fact = SemanticFact {
+            id: Uuid::new_v4(),
+            content: "[PROJECT:TinyFolderDrop] notes should reach distill overnight without CLI"
+                .into(),
+            embedding: vec![],
+            half_life_days: 60.0,
+            confidence: 1.0,
+            confirmation_count: 1,
+            decay_class: "CuratedVault".into(),
+            created_at: Utc::now(),
+            last_accessed_at: Utc::now(),
+        };
+        let field = RefractoryField {
+            schema: SCHEMA.into(),
+            entries: vec![RefractoryEntry {
+                id: Uuid::new_v4().to_string(),
+                tags: vec!["TOOL:llama-server".into()],
+                systemish: false,
+                selected_at: Utc::now().to_rfc3339(),
+                preview: "TinyFolderDrop notes reach distill overnight without CLI chat".into(),
+            }],
+        };
+        let m = refractory_multiplier(&fact, &field, 120.0, 0.95);
+        assert!(
+            m < 0.55,
+            "theme overlap should suppress monoculture, got {m}"
+        );
     }
 }

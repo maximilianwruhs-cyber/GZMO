@@ -150,6 +150,34 @@ impl SparkEngine {
         ));
     }
 
+    /// Lymph + refractory for skipped cycles so overnight filtrate matches DREAMS.md growth.
+    fn record_skipped_spark(
+        &self,
+        date: NaiveDate,
+        reason: &str,
+        anchor: Option<&crate::types::SemanticFact>,
+    ) {
+        if let Some(a) = anchor {
+            spark_field::record_selection(self.vault.db_path(), a, self.config.refractory_slots);
+        }
+        let preview = anchor
+            .map(|a| a.content.chars().take(120).collect::<String>())
+            .unwrap_or_else(|| reason.chars().take(120).collect());
+        if let Err(e) = night_lymph::record_spark(
+            self.vault.db_path(),
+            date,
+            LymphSpark {
+                date: date.to_string(),
+                promoted: false,
+                kg_relations: 0,
+                anchor_id: anchor.map(|a| a.id.to_string()),
+                anchor_preview: Some(preview),
+            },
+        ) {
+            warn!(error = %e, "night_lymph record_spark failed (skip path)");
+        }
+    }
+
     /// Run one spark cycle for `date` (used in logs and DREAMS.md headings).
     pub async fn run(&self, date: NaiveDate) -> Result<SparkReport> {
         if !self.config.enabled {
@@ -167,6 +195,7 @@ impl SparkEngine {
                 info!("Spark selection found no anchor/recent pair — skipped");
                 let reason = "No curated anchor/recent pair passed smart selection (check vault ingest and [spark] gates).";
                 self.emit_spark_complete(date, false, 0, Some(reason), None);
+                self.record_skipped_spark(date, reason, None);
                 return Ok(SparkReport::skipped(date, reason));
             }
         };
@@ -177,6 +206,7 @@ impl SparkEngine {
                 warn!("Spark hypothesis phase failed: {e}");
                 let reason = format!("Hypothesis generation failed: {e}");
                 self.emit_spark_complete(date, false, 0, Some(&reason), None);
+                self.record_skipped_spark(date, &reason, Some(&selection.anchor));
                 return Ok(SparkReport::skipped(date, &reason));
             }
         };
@@ -227,6 +257,7 @@ impl SparkEngine {
                         Some(&reason),
                         Some(&selection.anchor.id.to_string()),
                     );
+                    self.record_skipped_spark(date, &reason, Some(&selection.anchor));
                     return Ok(SparkReport::skipped(date, &reason));
                 }
             }
@@ -262,7 +293,7 @@ impl SparkEngine {
             Some(&selection.anchor.content),
             None,
         );
-        let _ = night_lymph::record_spark(
+        if let Err(e) = night_lymph::record_spark(
             self.vault.db_path(),
             date,
             LymphSpark {
@@ -272,7 +303,9 @@ impl SparkEngine {
                 anchor_id: Some(selection.anchor.id.to_string()),
                 anchor_preview: Some(selection.anchor.content.chars().take(120).collect()),
             },
-        );
+        ) {
+            warn!(error = %e, "night_lymph record_spark failed");
+        }
 
         let section =
             self.format_spark_section(date, &selection, &hypothesis, promoted, verdict.as_ref());
