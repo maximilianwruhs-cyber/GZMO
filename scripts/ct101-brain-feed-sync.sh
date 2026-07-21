@@ -21,6 +21,7 @@ SCRIPTS=(
   tinyfolder-drop.sh
   tinyfolder-check.sh
   tinyfolder-overnight.sh
+  install-tinyfolder-overnight-timer.sh
   felt-use-depth.sh
   organ-trace.sh
   ct101-brain-feed-sync.sh
@@ -85,6 +86,12 @@ rsync -az "${script_srcs[@]}" "${HOST}:${REMOTE_ROOT}/scripts/"
 if [[ ${#doc_srcs[@]} -gt 0 ]]; then
   echo "[*] rsync docs → ${HOST}:${REMOTE_ROOT}/docs/"
   rsync -az "${doc_srcs[@]}" "${HOST}:${REMOTE_ROOT}/docs/"
+fi
+
+if [[ -d "$ROOT/systemd" ]]; then
+  echo "[*] rsync systemd units → ${HOST}:${REMOTE_ROOT}/systemd/"
+  ssh_ok "mkdir -p $(printf '%q' "$REMOTE_ROOT/systemd")"
+  rsync -az "$ROOT/systemd/" "${HOST}:${REMOTE_ROOT}/systemd/"
 fi
 
 echo "[*] restore +x on remote scripts"

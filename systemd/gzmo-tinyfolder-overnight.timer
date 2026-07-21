@@ -1,0 +1,12 @@
+[Unit]
+Description=Daily TinyFolder overnight enqueue on CT101 (~02:45 UTC)
+
+[Timer]
+# After typical session-distill cron (~02:15); before spark dice thrash window.
+OnCalendar=*-*-* 02:45:00 UTC
+Persistent=true
+AccuracySec=5min
+Unit=gzmo-tinyfolder-overnight.service
+
+[Install]
+WantedBy=timers.target

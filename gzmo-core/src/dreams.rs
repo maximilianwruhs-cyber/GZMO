@@ -285,7 +285,7 @@ impl DreamEngine {
 
         let _ = crate::night_lymph::record_dream(
             self.vault.db_path(),
-            date,
+            crate::night_lymph::lymph_night_id(Utc::now()),
             crate::night_lymph::LymphDream {
                 entities: pipeline.raw_entities,
                 relations: pipeline.raw_relations,

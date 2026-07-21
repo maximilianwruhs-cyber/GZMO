@@ -2,11 +2,15 @@
 //!
 //! Full spark/dream journals stay append-only elsewhere; this is what `gzmo status`
 //! / Observatory should surface.
+//!
+//! **Night id:** evening sparks (≥18:00 UTC) and the next morning's dream share one
+//! `night_id` (the morning calendar date). Passing consolidate-`yesterday` into lymph
+//! used to blank overnight sparks when dream wrote `latest.json` for a different key.
 
 use std::path::{Path, PathBuf};
 
 use anyhow::Result;
-use chrono::{NaiveDate, Utc};
+use chrono::{DateTime, Duration, NaiveDate, Timelike, Utc};
 use serde::{Deserialize, Serialize};
 const SCHEMA: &str = "gzmo.night_lymph/v1";
 
@@ -43,6 +47,18 @@ pub struct NightLymph {
     pub immune_candidates: usize,
     #[serde(default)]
     pub note: String,
+}
+
+/// Overnight filtrate key: 18:00 UTC → next calendar morning.
+///
+/// Example: spark at 2026-07-20 22:30 and dream at 2026-07-21 01:09 both map to
+/// `2026-07-21`, so `latest.json` keeps dream + sparks together.
+pub fn lymph_night_id(now: DateTime<Utc>) -> NaiveDate {
+    if now.hour() >= 18 {
+        now.date_naive() + Duration::days(1)
+    } else {
+        now.date_naive()
+    }
 }
 
 fn lymph_dir(vault_db: &Path) -> PathBuf {
@@ -222,5 +238,25 @@ mod tests {
         assert_eq!(lymph.sparks.len(), 1);
         assert_eq!(lymph.immune_candidates, 3);
         let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn lymph_night_id_bridges_evening_and_morning() {
+        use chrono::TimeZone;
+        let evening = Utc.with_ymd_and_hms(2026, 7, 20, 22, 30, 0).unwrap();
+        let morning = Utc.with_ymd_and_hms(2026, 7, 21, 1, 9, 0).unwrap();
+        let afternoon = Utc.with_ymd_and_hms(2026, 7, 20, 15, 3, 0).unwrap();
+        assert_eq!(
+            lymph_night_id(evening),
+            NaiveDate::from_ymd_opt(2026, 7, 21).unwrap()
+        );
+        assert_eq!(
+            lymph_night_id(morning),
+            NaiveDate::from_ymd_opt(2026, 7, 21).unwrap()
+        );
+        assert_eq!(
+            lymph_night_id(afternoon),
+            NaiveDate::from_ymd_opt(2026, 7, 20).unwrap()
+        );
     }
 }
