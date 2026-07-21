@@ -121,18 +121,20 @@ fn contradicts_heuristic(old: &str, new: &str) -> bool {
     }
 
     let new_l = new.to_lowercase();
-    const NEG: &[&str] = &[
-        "not ",
+    // Strong lifecycle verbs: same entity is enough (overlap often collapses on rewrite).
+    const STRONG_NEG: &[&str] = &[
         "no longer",
         "instead of",
         "replaced",
         "deprecated",
-        "stopped ",
-        "never ",
         "removed ",
         "disabled ",
     ];
-    if NEG.iter().any(|m| new_l.contains(m)) {
+    if STRONG_NEG.iter().any(|m| new_l.contains(m)) {
+        return true;
+    }
+    const SOFT_NEG: &[&str] = &["not ", "stopped ", "never "];
+    if SOFT_NEG.iter().any(|m| new_l.contains(m)) {
         return token_overlap(old, new) >= 0.25;
     }
 
@@ -268,6 +270,89 @@ mod tests {
             ),
             LifecycleKind::Contradicts
         );
+    }
+
+    #[test]
+    fn contradicts_on_deprecated_and_predicate_shift() {
+        assert_eq!(
+            classify_truth_pair(
+                "[TOOL:Librarian] serves embeddings on port 8083",
+                "[TOOL:Librarian] is deprecated and replaced by local embed"
+            ),
+            LifecycleKind::Contradicts
+        );
+        assert_eq!(
+            classify_truth_pair(
+                "[SERVICE:Prime] is the overnight chat model on CT101",
+                "[SERVICE:Prime] is the workstation fallback model only"
+            ),
+            LifecycleKind::Contradicts
+        );
+    }
+
+    #[test]
+    fn unrelated_when_entities_differ() {
+        assert_eq!(
+            classify_truth_pair(
+                "[AGENT:Firewall] manages rules on LXC101",
+                "[TOOL:temp-bench] sweeps temperatures per suite"
+            ),
+            LifecycleKind::Unrelated
+        );
+    }
+
+    #[test]
+    fn lifecycle_goldens_mirror_honeypot_gate_fixture() {
+        // Keep in sync with honeypot-gate/fixtures/lifecycle-goldens.json
+        let cases: &[(&str, &str, LifecycleKind)] = &[
+            (
+                "[AGENT:Foo] does X",
+                "[AGENT:Foo]  does   X",
+                LifecycleKind::Duplicate,
+            ),
+            (
+                "[AGENT:Foo] runs backups",
+                "[AGENT:Foo] runs nightly backups with ZFS",
+                LifecycleKind::Extends,
+            ),
+            (
+                "[AGENT:Firewall] manages rules on LXC101",
+                "[AGENT:Firewall] no longer manages rules on LXC101",
+                LifecycleKind::Contradicts,
+            ),
+            (
+                "[TOOL:Librarian] serves embeddings on port 8083",
+                "[TOOL:Librarian] is deprecated and replaced by local embed",
+                LifecycleKind::Contradicts,
+            ),
+            (
+                "[SERVICE:Prime] is the overnight chat model on CT101",
+                "[SERVICE:Prime] is the workstation fallback model only",
+                LifecycleKind::Contradicts,
+            ),
+            (
+                "[AGENT:Firewall] manages rules on LXC101",
+                "[TOOL:temp-bench] sweeps temperatures per suite",
+                LifecycleKind::Unrelated,
+            ),
+            (
+                "[CONCEPT:Obolus] scores quality per joule",
+                "[CONCEPT:Obolus] scores quality per joule with variance penalty",
+                LifecycleKind::Extends,
+            ),
+            (
+                "[HOST:CT101] owns overnight metabolism for the vault",
+                "[HOST:CT101] is replaced by workstation living claim during mutex windows",
+                LifecycleKind::Contradicts,
+            ),
+        ];
+        for (old, new, expect) in cases {
+            assert_eq!(
+                classify_truth_pair(old, new),
+                *expect,
+                "golden mismatch: {old:?} vs {new:?}"
+            );
+        }
     }
 
     #[test]
