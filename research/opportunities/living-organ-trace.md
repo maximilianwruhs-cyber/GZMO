@@ -1,7 +1,7 @@
 ---
 id: living-organ-trace
 title: Living organ-trace (CT101 scheduler-runs, not workstation zoo)
-status: active
+status: soaked
 score: 20
 uniqueness: 4
 brain_profit: 3
@@ -26,3 +26,12 @@ Operator sees real living metabolism (distill/dream/spark/…) without starting 
 ## Done when
 
 `organ-trace` (or flag) pulls `/opt/gzmo/data/scheduler-runs` via SSH; `latest.json` lists living jobs; soft note if distill/dream missed — never dual-writer.
+
+**Soaked 2026-07-21** — `organ-trace.sh --living` mirrors CT101 runs + satellite census; honest soft-miss when `gzmo serve` has not written core latest-*.
+
+## Operator
+
+```bash
+bash scripts/organ-trace.sh --living
+# → data-next/organ-trace/latest.json + living-latest.json
+```

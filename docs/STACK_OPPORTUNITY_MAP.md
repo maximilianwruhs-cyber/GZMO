@@ -197,7 +197,7 @@ Dashboard of which of the 46 pieces fired overnight and what they changed in the
 
 - **Builds on:** scheduler-runs · organ-trace · nightburst scoreboard
 - **Why special:** Catalogs are common; proof of overnight organ use is not.
-- **Ship shape:** `scripts/organ-trace.sh` → `data-next/organ-trace/latest.{json,md}`; scoreboard “Living tool zoo” section.
+- **Ship shape:** `bash scripts/organ-trace.sh` (lab) · `bash scripts/organ-trace.sh --living` (CT101 scheduler-runs + spark/lymph/immune/ripen/DREAMS satellites) → `data-next/organ-trace/latest.{json,md}`; soft miss when core `latest-distill`/`latest-dream` absent; never dual-writer.
 
 #### Calibration pack SaaS-less — `near` · differentiated · exists
 

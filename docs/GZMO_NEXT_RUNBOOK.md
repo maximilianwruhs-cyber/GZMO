@@ -195,6 +195,8 @@ gzmo dream compact [--max-chars N] [--archive-sessions-days 30] [--dry-run]
 bash scripts/serendipity-digest.sh      # spark → data-next/serendipity/digest-YYYY-MM-DD.md
 bash scripts/faithfulness-ci.sh         # claims vs vault (FAITHFULNESS_MODE=fixture for offline)
 bash scripts/organ-trace.sh             # living tool zoo from scheduler-runs
+bash scripts/organ-trace.sh --living    # CT101 /opt/gzmo/data/scheduler-runs + satellites
+# → data-next/organ-trace/latest.json (soft miss if distill/dream latest-* absent)
 bash scripts/concept-review-gate.sh     # HOLD wiki concepts lacking vault evidence
 bash scripts/wiki-push-gated.sh […]     # gate then `gzmo wiki push --require-gate`
 bash scripts/nightburst-bundle.sh       # organ + faithfulness + concept-gate + digest + scoreboard
