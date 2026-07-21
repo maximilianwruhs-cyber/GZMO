@@ -67,6 +67,32 @@ else
   row HOLD "close-ritual" "no close-ritual.json yet — bash scripts/herdr-metabolism-demo.sh"
 fi
 
+# Living enqueue proof (CT101 / living host — Brain Feed)
+if [[ -x "$ROOT/scripts/herdr-living-enqueue.sh" ]]; then
+  row PASS "living-enqueue-script" "scripts/herdr-living-enqueue.sh"
+else
+  row FAIL "living-enqueue-script" "missing herdr-living-enqueue.sh"
+fi
+if [[ -f "$OUT/living-enqueue.json" ]]; then
+  if python3 -c "
+import json
+d=json.load(open('$OUT/living-enqueue.json'))
+ok=(
+  d.get('ok') is True
+  and d.get('now_flag') is False
+  and d.get('dual_writer') is False
+  and bool(d.get('applied'))
+)
+raise SystemExit(0 if ok else 1)
+"; then
+    row PASS "living-enqueue" "$(python3 -c "import json;print(json.load(open('$OUT/living-enqueue.json')).get('advice',''))")"
+  else
+    row FAIL "living-enqueue" "living-enqueue.json not ok — bash scripts/herdr-living-enqueue.sh"
+  fi
+else
+  row HOLD "living-enqueue" "no living-enqueue.json — bash scripts/herdr-living-enqueue.sh"
+fi
+
 ROWS_TSV="$(printf '%s\n' "${ROWS[@]}")"
 export OUT pass fail hold ROWS_TSV
 python3 - <<'PY'
@@ -82,8 +108,11 @@ fail_n=int(os.environ["fail"]); hold_n=int(os.environ["hold"]); pass_n=int(os.en
 verdict="GREEN" if fail_n==0 else "RED"
 contract_ok = checks.get("plugin-contract",{}).get("status")=="PASS"
 ritual_ok = checks.get("close-ritual",{}).get("status")=="PASS"
+living_ok = checks.get("living-enqueue",{}).get("status")=="PASS"
 advice = "herdr_metabolism_ok" if fail_n==0 and contract_ok and ritual_ok else (
     "herdr_metabolism_hold — link or run close-ritual demo" if fail_n==0 else "herdr_metabolism_fail")
+if fail_n==0 and living_ok:
+    advice = "herdr_metabolism_living_ok"
 payload={"schema":"gzmo.unpark.herdr/v1","generated_at":datetime.now(timezone.utc).isoformat(),
   "verdict":verdict,"ok":fail_n==0,"advice":advice,
   "counts":{"pass":pass_n,"fail":fail_n,"hold":hold_n},"wave":"1.1","checks":checks}

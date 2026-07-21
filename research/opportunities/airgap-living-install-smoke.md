@@ -1,7 +1,7 @@
 ---
 id: airgap-living-install-smoke
 title: Airgap living install smoke (stranger / one-box path)
-status: candidate
+status: active
 score: 20
 uniqueness: 4
 brain_profit: 3
@@ -10,7 +10,7 @@ attention_cost: 3
 usp_fit: 5
 stack_ids: []
 created: 2026-07-20
-updated: 2026-07-20
+updated: 2026-07-21
 ---
 
 # Airgap living install smoke

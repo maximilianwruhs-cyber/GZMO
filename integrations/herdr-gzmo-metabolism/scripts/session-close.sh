@@ -1,24 +1,34 @@
 #!/usr/bin/env bash
 # Close ritual: durable takeaway → gzmo session close → distill enqueue.
+# --living / HERDR_METABOLISM_LIVING=1 → SSH enqueue on living host (no --now).
 set -euo pipefail
 # shellcheck disable=SC1091
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib.sh"
-export_gzmo_env
 
 INTERACTIVE=0
+LIVING=0
 NOW_FLAG=()
 TAKEAWAY="${TAKEAWAY:-}"
 SESSION_ID="${GZMO_SESSION_ID:-}"
+if [[ "${HERDR_METABOLISM_LIVING:-0}" == "1" ]]; then
+  LIVING=1
+fi
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --interactive) INTERACTIVE=1; shift ;;
+    --living) LIVING=1; shift ;;
     --now) NOW_FLAG=(--now); shift ;;
     --takeaway) TAKEAWAY="${2:-}"; shift 2 ;;
     --session) SESSION_ID="${2:-}"; shift 2 ;;
     *) shift ;;
   esac
 done
+
+if [[ "$LIVING" -eq 1 && ${#NOW_FLAG[@]} -gt 0 ]]; then
+  echo "[!] --living refuses --now (CT101 / living host owns overnight)" >&2
+  exit 1
+fi
 
 if [[ -z "$TAKEAWAY" && -n "${HERDR_PLUGIN_CONTEXT_JSON:-}" ]]; then
   TAKEAWAY="$(python3 - <<'PY'
@@ -48,6 +58,20 @@ if [[ -z "$TAKEAWAY" ]]; then
   echo "    Example: TAKEAWAY='felt recall needs session close' herdr plugin action invoke gzmo.metabolism.session-close" >&2
   exit 1
 fi
+
+# Living path: demable SSH enqueue (Brain Feed herdr living proof)
+if [[ "$LIVING" -eq 1 ]]; then
+  REPO_ROOT="$(cd "${PLUGIN_ROOT}/../.." && pwd)"
+  SCRIPT="${REPO_ROOT}/scripts/herdr-living-enqueue.sh"
+  if [[ ! -x "$SCRIPT" ]]; then
+    echo "[!] missing $SCRIPT" >&2
+    exit 1
+  fi
+  export TAKEAWAY
+  exec bash "$SCRIPT"
+fi
+
+export_gzmo_env
 
 ARGS=(session close)
 if [[ -n "$SESSION_ID" ]]; then
