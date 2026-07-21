@@ -354,6 +354,9 @@ mod tests {
             }],
         };
         let m = refractory_multiplier(&fact, &field, 120.0, 0.95);
-        assert!(m < 0.55, "theme overlap should suppress monoculture, got {m}");
+        assert!(
+            m < 0.55,
+            "theme overlap should suppress monoculture, got {m}"
+        );
     }
 }
