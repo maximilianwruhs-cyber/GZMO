@@ -26,16 +26,20 @@ Moves honest lab craft into the *current* living host without dual-writer chaos 
 ## Done when
 
 1. Versioned beat-gate baselines green for the chosen loop (depends on `beat-gate-versioned-baselines`)
-2. `living-host-mutex.sh claim` → promote script with ack → `release`
-3. One loop (knowledge or cognition) handed off; dual_writer_risk=false throughout
+2. `PROMOTE_LOOP=<name> PROMOTE_ACK=1 bash scripts/promote-loop.sh` writes a PASS record
+3. `living-host-mutex.sh claim` around any living prove; dual_writer_risk≠true throughout
 4. Documented promote decision under `data-next/beat-gate/promotions/`
+5. Living **apply** still gated (PROMOTE_APPLY refused until handoff recipe reviewed)
+
+**Progress 2026-07-21** — `scripts/promote-loop.sh` record-only path green for `knowledge` (gate_passed + knowledge.v1).
 
 ## Operator
 
 ```bash
 bash scripts/living-host-mutex.sh status
 bash scripts/beat-gate-kit.sh --loops cognition,knowledge
-# PROMOTE_LOOP=knowledge … after PASS + explicit ack
+PROMOTE_LOOP=knowledge PROMOTE_ACK=1 bash scripts/promote-loop.sh
+# living apply still refused — review data-next/beat-gate/promotions/latest.md
 bash scripts/living-host-mutex.sh release
 ```
 
