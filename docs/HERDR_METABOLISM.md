@@ -39,15 +39,21 @@ Takeaway file: `…/takeaway.txt` (one durable line)
 # Interactive
 herdr plugin pane open --plugin gzmo.metabolism --entrypoint close-ritual
 
-# Non-interactive
+# Non-interactive (lab / local next)
 TAKEAWAY='durable fact for the vault' \
   herdr plugin action invoke gzmo.metabolism.session-close
+
+# Living host enqueue (CT101) — same ritual, SSH session close, no --now
+bash scripts/herdr-living-enqueue.sh
+# or:
+TAKEAWAY='durable fact' \
+  bash integrations/herdr-gzmo-metabolism/scripts/session-close.sh --living --takeaway 'durable fact'
 
 # CLI without herdr (same ritual)
 gzmo session close --takeaway 'durable fact for the vault'
 ```
 
-Under the hood: `gzmo session close [--session ID] --takeaway '…' [--now]`. Prefer living-host enqueue; avoid `--now` on the workstation while CT101 owns overnight.
+Under the hood: `gzmo session close [--session ID] --takeaway '…' [--now]`. Prefer living-host enqueue; avoid `--now` on the workstation while CT101 owns overnight. `--living` refuses `--now` and dual-writer (`gzmo-serve` active).
 
 ## `pane.closed` is soft-miss only
 

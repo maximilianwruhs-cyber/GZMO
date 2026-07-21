@@ -44,6 +44,8 @@ Only these Unpark satellites claim to **improve** the living vault/honeypot. The
 ```bash
 # Close ritual enqueues distill (no --now on workstation while CT101 lives)
 bash scripts/herdr-metabolism-link.sh
+# Living proof (SSH session close on CT101 — pane-close contract without memory gym):
+bash scripts/herdr-living-enqueue.sh
 # Remind surfaces (PR template + optional local hook):
 bash scripts/takeaway-side-effect-remind.sh
 # bash scripts/takeaway-side-effect-remind.sh --install-hook

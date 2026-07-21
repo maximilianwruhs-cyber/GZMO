@@ -1,7 +1,7 @@
 ---
 id: herdr-living-enqueue-proof
 title: herdr pane-close → living takeaway enqueue proof
-status: active
+status: soaked
 score: 21
 uniqueness: 4
 brain_profit: 4
@@ -10,7 +10,7 @@ attention_cost: 3
 usp_fit: 5
 stack_ids: [s1]
 created: 2026-07-20
-updated: 2026-07-20
+updated: 2026-07-21
 ---
 
 # herdr living enqueue proof
@@ -26,3 +26,13 @@ Operator shell work metabolizes into vault mass on the living host — distinct 
 ## Done when
 
 One real (or demable SSH-mirrored) herdr session-close path enqueues living takeaway with `now_flag=false`; artifact proves living session/queue; herdr + brain-feed checks GREEN.
+
+**Soaked 2026-07-21** — `scripts/herdr-living-enqueue.sh` + plugin `session-close.sh --living`; check row `living-enqueue`.
+
+## Operator
+
+```bash
+bash scripts/herdr-living-enqueue.sh
+# or: bash integrations/herdr-gzmo-metabolism/scripts/session-close.sh --living --takeaway '…'
+bash scripts/herdr-metabolism-check.sh
+```
