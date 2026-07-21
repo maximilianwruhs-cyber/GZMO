@@ -478,7 +478,11 @@ mod tests {
         };
         let expl = explain_refractory(&fact, &field, 72.0, 0.9);
         assert_eq!(expl.reason, RefractoryReason::TagOverlap);
-        assert!(expl.multiplier < 0.4, "tag overlap should bite, got {}", expl.multiplier);
+        assert!(
+            expl.multiplier < 0.4,
+            "tag overlap should bite, got {}",
+            expl.multiplier
+        );
     }
 
     #[test]
@@ -550,7 +554,8 @@ mod tests {
                 candidates_scored: Some(11),
             },
         );
-        let raw = std::fs::read_to_string(spark_dir(&vault).join("last-spark-report.json")).unwrap();
+        let raw =
+            std::fs::read_to_string(spark_dir(&vault).join("last-spark-report.json")).unwrap();
         let v: serde_json::Value = serde_json::from_str(&raw).unwrap();
         assert_eq!(v["schema"], "gzmo.spark.report/v1");
         assert_eq!(v["refractory"]["reason"], "tag_overlap");
