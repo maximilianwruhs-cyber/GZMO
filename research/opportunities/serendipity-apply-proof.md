@@ -1,7 +1,7 @@
 ---
 id: serendipity-apply-proof
 title: Serendipity apply proof (close the 0-apply remind)
-status: candidate
+status: active
 score: 20
 uniqueness: 3
 brain_profit: 5
@@ -10,7 +10,7 @@ attention_cost: 3
 usp_fit: 4
 stack_ids: [o5]
 created: 2026-07-20
-updated: 2026-07-20
+updated: 2026-07-21
 ---
 
 # Serendipity apply proof
