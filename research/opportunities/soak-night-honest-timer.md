@@ -1,7 +1,7 @@
 ---
 id: soak-night-honest-timer
 title: Honest soak timer (min spacing between GREEN samples)
-status: candidate
+status: active
 score: 19
 uniqueness: 2
 brain_profit: 3
@@ -10,7 +10,7 @@ attention_cost: 4
 usp_fit: 5
 stack_ids: []
 created: 2026-07-20
-updated: 2026-07-20
+updated: 2026-07-21
 ---
 
 # Soak night honest timer
