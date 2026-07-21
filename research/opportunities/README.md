@@ -16,7 +16,7 @@ Operator research bets for GZMO upgrades. Doctrine: [docs/OPPORTUNITY_DISCOVERY.
 
 | Id | Score | Status | Title |
 |----|-------|--------|-------|
-| [soak-night-honest-timer](soak-night-honest-timer.md) | 19 | **active** | Honest soak timer (min sample spacing) |
+| [soak-night-honest-timer](soak-night-honest-timer.md) | 19 | soaked | Honest soak timer (min sample spacing) |
 | [ct101-brain-feed-sync](ct101-brain-feed-sync.md) | 19 | soaked | One-command Brain Feed script sync to CT101 |
 | [living-organ-trace](living-organ-trace.md) | 20 | soaked | Living organ-trace (CT101 scheduler-runs) |
 | [serendipity-apply-proof](serendipity-apply-proof.md) | 20 | soaked | Serendipity apply proof (close the 0-apply remind) |
@@ -46,4 +46,14 @@ stack_ids: [o5, m3]  # optional STACK_OPPORTUNITY_MAP ids
 created: YYYY-MM-DD
 updated: YYYY-MM-DD
 ---
+```
+
+## Next active
+
+No candidate queued after soak-night-honest-timer. Run Sense→Rank when ready:
+
+```bash
+bash scripts/opportunity-sense.sh
+bash scripts/opportunity-rank.sh
+bash scripts/opportunity-next-mission.sh
 ```

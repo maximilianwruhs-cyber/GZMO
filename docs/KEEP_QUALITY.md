@@ -43,4 +43,10 @@ Artifacts:
 
 ## Unpark gate
 
-Do **not** expand Unpark Wave 1 as brand work until soak history shows GREEN for the agreed N nights (default **3** — see `KEEP_QUALITY_SOAK_NIGHTS`). Surfaces are local MCP clients of this living brain.
+Do **not** expand Unpark Wave 1 as brand work until soak history shows **honest** GREEN nights (default **3** — `KEEP_QUALITY_SOAK_NIGHTS`) with ≥**18h** between counted samples (`KEEP_QUALITY_SOAK_MIN_HOURS`). Same-hour GREEN streaks → HOLD (`soak_spacing_hold`), not `soak_ready_unpark_ok`. Surfaces are local MCP clients of this living brain.
+
+```bash
+bash scripts/keep-quality-soak.sh --summary
+# → honest_nights / min_hours / advice
+```
+
