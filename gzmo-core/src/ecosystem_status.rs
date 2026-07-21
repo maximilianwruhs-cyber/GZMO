@@ -384,26 +384,20 @@ pub async fn format_ecosystem_status(config: &GzmoConfig) -> String {
                         out.push_str(&format!("- **dry_run:** {d}\n"));
                     }
                     // gzmo.spark.report/v1 refractory / soft-pick telemetry
-                    if let Some(mult) = v
-                        .pointer("/refractory/multiplier")
-                        .and_then(|x| x.as_f64())
+                    if let Some(mult) = v.pointer("/refractory/multiplier").and_then(|x| x.as_f64())
                     {
                         let reason = v
                             .pointer("/refractory/reason")
                             .and_then(|x| x.as_str())
                             .unwrap_or("—");
-                        out.push_str(&format!(
-                            "- **refractory:** ×{mult:.3} ({reason})\n"
-                        ));
+                        out.push_str(&format!("- **refractory:** ×{mult:.3} ({reason})\n"));
                     }
                     if let Some(k) = v.pointer("/soft_pick/top_k").and_then(|x| x.as_u64()) {
                         let scored = v
                             .pointer("/soft_pick/candidates_scored")
                             .and_then(|x| x.as_u64())
                             .unwrap_or(0);
-                        out.push_str(&format!(
-                            "- **soft_pick:** top_k={k} candidates={scored}\n"
-                        ));
+                        out.push_str(&format!("- **soft_pick:** top_k={k} candidates={scored}\n"));
                     }
                     if let Some(score) = v.get("selection_score").and_then(|x| x.as_f64()) {
                         out.push_str(&format!("- **selection_score:** {score:.4}\n"));
