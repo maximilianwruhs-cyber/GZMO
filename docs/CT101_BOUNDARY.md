@@ -10,11 +10,13 @@
 
 **CT101 is the sole living metabolism instance** (`gzmo daemon` + `/opt/gzmo/` vault). **The workstation is operator frontend + Prime fallback** (ADR-0003 amended 2026-07-17). Little Tools Lab does **not** swap individual daemon loops into CT101. Never run workstation `gzmo serve` overnight alongside CT101.
 
+**Lab-dev posture (2026-07-21):** Keep developing **GZMO-next** on the workstation (`data-next/`, beat-gates, recipes) **without promoting** it. Re-promotion is allowed only when next **beats CT101 at all scales** (full beat-gate kit GREEN across fixture + live loops — see [CONTINUOUS_UPGRADE.md](./CONTINUOUS_UPGRADE.md) Ring 3 / S2→S4). Green single-loop metas do not authorize cutover.
+
 | | CT101 (living) | Workstation (operator / lab) |
 |---|--------|------------------|
 | **What it is** | **Production** — `gzmo.toml` + `gzmo daemon`, vault ~60k facts, Docker sidecars | Operator UI + Prime `:8000`; `config/gzmo.toml` → `data-next/` is **lab/dev scratch** |
 | **Lab integration** | **None** — no lab recipe grafts | Lab recipes = beat-gate fixtures; optional `gzmo-scheduler` / `gzmo-serve` for parity only |
-| **beat-gate** | Live baseline to beat | S2 gate on workstation stack before any future re-promotion |
+| **beat-gate** | Live baseline to beat | S2 gate on workstation stack; **all-scales GREEN** required before any re-promotion |
 | **Ops** | `ssh ct101` or `ssh pve "pct exec 101 -- …"`; `systemctl … gzmo-daemon` | CLI/chat/MCP against local clone; **do not** enable overnight `gzmo-serve` while CT101 lives |
 
 ---

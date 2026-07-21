@@ -14,6 +14,11 @@ workstation; Prime `:8000` is CT101's local fallback.
 by default. Never enable overnight `gzmo serve` while CT101 `gzmo-daemon` is
 the living writer.
 
+**Lab-dev (not promote):** Develop next against `data-next/` + beat-gates with
+CT101 remaining sole living writer. Re-promote only when next beats CT101 at
+**all scales** (full kit GREEN — fixture and live). See
+[CT101_BOUNDARY.md](CT101_BOUNDARY.md).
+
 ## Instance layout
 
 | Asset | Legacy (CT101 semantics) | GZMO-next |
