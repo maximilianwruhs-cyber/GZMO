@@ -1,26 +1,28 @@
 # ADR-0003 — One living instance, overnight metabolism first
 
-**Status:** Accepted (2026-07-16); **host placement amended 2026-07-17**  
-**Supersedes for operator roadmap:** CT101↔next dual-stack as a permanent product shape  
-**Related:** [CT101_BOUNDARY.md](./CT101_BOUNDARY.md), [CT101_RESTORE_LIVING.md](./CT101_RESTORE_LIVING.md), [ARCHITECTURE_GZMO_PLATFORM.md](./ARCHITECTURE_GZMO_PLATFORM.md)
+**Status:** Accepted (2026-07-16); host placement amended 2026-07-17; **process/topology superseded in part by [ADR-0005](./ADR-0005-flywheel-over-frozen-topology.md) (2026-07-21)**  
+**Related:** [ADR-0005](./ADR-0005-flywheel-over-frozen-topology.md), [ADR-0004](./ADR-0004-airgap-living-usp.md), [CT101_BOUNDARY.md](./CT101_BOUNDARY.md), [CONTINUOUS_UPGRADE.md](./CONTINUOUS_UPGRADE.md)
 
 ## Context
 
-GZMO grew a dual stack (CT101 legacy + GZMO-next), many named engines, and a lab recipe zoo. The product claim — overnight memory that compounds — was outrun by parity organs (wiki, KG, chaos daemon path, discovery).
+GZMO grew a dual stack (CT101 legacy + GZMO-next), many named engines, and a lab recipe zoo. The product claim — overnight memory that compounds — was outrun by parity organs. Dual overnight writers corrupted the vault story.
 
-On 2026-07-15/16 production briefly moved to the workstation (`gzmo serve` + `data-next/`). On **2026-07-17** that cutover was reversed: CT101 resumed as the sole living metabolism brain (see [CT101_RESTORE_LIVING.md](./CT101_RESTORE_LIVING.md)).
+## Decision (invariants — still binding)
 
-## Decision
+1. **One living instance only** — never two overnight writers on the same vault.
+2. **Product gate is living-host health** — systemd/journal/vault/honeypot/sidecars on whichever host currently holds the living claim — not Observatory as a second control plane.
 
-1. **One living instance only** — never two overnight writers. Dual-stack forever is not the product shape.
-2. **Living host (amended 2026-07-17): CT101** — Rust `gzmo daemon` / `gzmo-daemon.service` under `/opt/gzmo/`, vault + Docker sidecars colocated. `active_mode=cloud` with Prime fallback on the workstation.
-3. **Workstation is operator + Prime fallback** — `gzmo` / `gzmo chat`, Prime `:8000`, Cursor/Pi. Workstation `gzmo serve` / `data-next/` are **lab/dev scratch**, not production metabolism. Keep `gzmo-serve.service` **disabled** unless an explicit lab session requires it (and then stop CT101 daemon writers first — never both).
-4. **Do not graft lab loops into CT101** — Little Tools Lab remains beat-gate fixtures; no `[assembly]=lab` pointing CT101 at lab scripts.
-5. **Chaos is opt-in for chat** on lab/workstation configs. CT101 daemon path keeps its own chaos policy.
-6. **Product gate:** CT101 daemon health (systemd + journal + vault/honeypot counts + Docker sidecars) — not Observatory as a second control plane. Workstation `gzmo status` over `data-next/` is lab-only.
+## Amended (see ADR-0005)
+
+| Was (2026-07-17) | Now (ADR-0005) |
+|------------------|----------------|
+| CT101 is permanently the only living host | CT101 is the **default reference**; living host is a **mutex claim** (`CT101` \| `workstation` \| `appliance`) |
+| Workstation `gzmo serve` is never production metabolism | Workstation **may** be living during an explicit claim (CT101 writers stopped) |
+| Do not graft lab loops into CT101 | **Promote-by-loop** allowed after beat-gate + operator ack into the *current* living host |
+| Dual-stack forever is not the product | Still true — one writer; stacks are promote stages, not forever peers |
 
 ## Consequences
 
-- Lab recipes remain beat-gate fixtures, not the long-term production brain.
-- `gzmo-scheduler` and `gzmo-serve` on the workstation stay offline by default after the 2026-07-17 restore.
-- Graph/wiki/chaos enhancements land on CT101 only with explicit ops approval; no silent dual-writer reintroduction.
+- Use `scripts/living-host-mutex.sh claim|release` when moving the overnight writer.
+- Lab recipes feed the continuous upgrade flywheel; they are not banned from living after beat-gate.
+- Chaos remains opt-in for chat unless a beat-gated cognition/config promote says otherwise.

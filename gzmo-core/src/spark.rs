@@ -33,6 +33,12 @@ use crate::types::{EpisodicEntry, EpisodicSource, Message, Role};
 struct SparkSelection {
     anchor: crate::types::SemanticFact,
     recent: Vec<crate::types::SemanticFact>,
+    selection_score: f64,
+    refractory_multiplier: f64,
+    refractory_reason: &'static str,
+    refractory_entries: usize,
+    soft_pick_roll: f64,
+    candidates_scored: usize,
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -291,7 +297,16 @@ impl SparkEngine {
             kg_written,
             Some(selection.anchor.id),
             Some(&selection.anchor.content),
-            None,
+            spark_field::SparkSelectionMetrics {
+                selection_score: Some(selection.selection_score),
+                refractory_multiplier: Some(selection.refractory_multiplier),
+                refractory_reason: Some(selection.refractory_reason),
+                refractory_entries: Some(selection.refractory_entries),
+                soft_pick_roll: Some(selection.soft_pick_roll),
+                soft_pick_top_k: Some(self.config.soft_pick_top_k),
+                soft_pick_temperature: Some(self.config.soft_pick_temperature),
+                candidates_scored: Some(selection.candidates_scored),
+            },
         );
         if let Err(e) = night_lymph::record_spark(
             self.vault.db_path(),
@@ -357,7 +372,7 @@ impl SparkEngine {
 
         let min_sim = self.config.min_anchor_recent_similarity;
         let field = spark_field::load_field(self.vault.db_path());
-        let mut scored: Vec<(SemanticFact, f64, f64)> = Vec::new();
+        let mut scored: Vec<(SemanticFact, f64, f64, spark_field::RefractoryExplain)> = Vec::new();
 
         for candidate in anchors {
             if !self.is_viable_anchor(&candidate) {
@@ -381,20 +396,21 @@ impl SparkEngine {
                 min_sim,
                 tag_bridge,
             );
-            let refractory = spark_field::refractory_multiplier(
+            let expl = spark_field::explain_refractory(
                 &candidate,
                 &field,
                 self.config.refractory_half_life_hours,
                 self.config.refractory_strength,
             );
-            let score = base * refractory;
-            scored.push((candidate, score, max_sim));
+            let score = base * expl.multiplier;
+            scored.push((candidate, score, max_sim, expl));
         }
 
         if scored.is_empty() {
             return Ok(None);
         }
 
+        let candidates_scored = scored.len();
         let roll = spark_field::selection_roll(
             &Utc::now().date_naive().to_string(),
             self.config.dice_seed.unwrap_or(0x5a_51_4b),
@@ -402,7 +418,7 @@ impl SparkEngine {
         let ranked: Vec<(usize, f64)> = scored
             .iter()
             .enumerate()
-            .map(|(i, (_, s, _))| (i, *s))
+            .map(|(i, (_, s, _, _))| (i, *s))
             .collect();
         let Some((idx, score)) = spark_field::soft_pick(
             ranked,
@@ -412,7 +428,7 @@ impl SparkEngine {
         ) else {
             return Ok(None);
         };
-        let (anchor, _, max_sim) = scored.swap_remove(idx);
+        let (anchor, _, max_sim, expl) = scored.swap_remove(idx);
 
         let recent: Vec<_> = recent
             .into_iter()
@@ -431,10 +447,22 @@ impl SparkEngine {
             max_recent_sim = max_sim,
             recent_count = recent.len(),
             refractory_entries = field.entries.len(),
+            refractory_mul = expl.multiplier,
+            refractory_reason = expl.reason.as_str(),
+            soft_pick_roll = roll,
             "Spark smart selection complete"
         );
 
-        Ok(Some(SparkSelection { anchor, recent }))
+        Ok(Some(SparkSelection {
+            anchor,
+            recent,
+            selection_score: score,
+            refractory_multiplier: expl.multiplier,
+            refractory_reason: expl.reason.as_str(),
+            refractory_entries: field.entries.len(),
+            soft_pick_roll: roll,
+            candidates_scored,
+        }))
     }
 
     /// Skip session stubs, ops noise, and non-curated decay classes.
@@ -1029,6 +1057,12 @@ mod citation_tests {
                 created_at: Utc::now(),
                 last_accessed_at: Utc::now(),
             }],
+            selection_score: 1.0,
+            refractory_multiplier: 1.0,
+            refractory_reason: "none",
+            refractory_entries: 0,
+            soft_pick_roll: 0.0,
+            candidates_scored: 1,
         };
         let ok = SparkVerdict {
             supported: true,
@@ -1072,6 +1106,12 @@ mod citation_tests {
                 created_at: Utc::now(),
                 last_accessed_at: Utc::now(),
             }],
+            selection_score: 1.0,
+            refractory_multiplier: 1.0,
+            refractory_reason: "none",
+            refractory_entries: 0,
+            soft_pick_roll: 0.0,
+            candidates_scored: 1,
         };
         let v = SparkVerdict {
             supported: false,

@@ -1,63 +1,43 @@
-# CT101 boundary — living production host
+# CT101 boundary — reference living host
 
-**Status:** Accepted (2026-07-10); production cutover 2026-07-15; **restored living 2026-07-17**  
-**Supersedes:** [CT101_PROMOTION.md](./CT101_PROMOTION.md) (per-loop promotion — **retired**)  
-**Restore runbook:** [CT101_RESTORE_LIVING.md](./CT101_RESTORE_LIVING.md)
+**Status:** Accepted (2026-07-10); restored living 2026-07-17; **amended by [ADR-0005](./ADR-0005-flywheel-over-frozen-topology.md) (2026-07-21)**  
+**Restore runbook:** [CT101_RESTORE_LIVING.md](./CT101_RESTORE_LIVING.md)  
+**Flywheel:** [CONTINUOUS_UPGRADE.md](./CONTINUOUS_UPGRADE.md)
 
 ---
 
 ## Decision
 
-**CT101 is the sole living metabolism instance** (`gzmo daemon` + `/opt/gzmo/` vault). **The workstation is operator frontend + Prime fallback** (ADR-0003 amended 2026-07-17). Little Tools Lab does **not** swap individual daemon loops into CT101. Never run workstation `gzmo serve` overnight alongside CT101.
+**CT101 is the default reference living host** (`gzmo daemon` + `/opt/gzmo/` vault) when `living-host-mutex` claim is `ct101` or unset in production ops.
 
-**Lab-dev posture (2026-07-21):** Keep developing **GZMO-next** on the workstation (`data-next/`, beat-gates, recipes) **without promoting** it. Re-promotion is allowed only when next **beats CT101 at all scales** (full beat-gate kit GREEN across fixture + live loops — see [CONTINUOUS_UPGRADE.md](./CONTINUOUS_UPGRADE.md) Ring 3 / S2→S4). Green single-loop metas do not authorize cutover.
+**Workstation may claim living** for development (`claim --host workstation`) after CT101 overnight writers are stopped. Never two overnight writers at once ([ADR-0005](./ADR-0005-flywheel-over-frozen-topology.md)).
 
-| | CT101 (living) | Workstation (operator / lab) |
+**Promote-by-loop is allowed** — beat-gate PASS for a single loop + operator ack may hand off that loop into the *current* living host ([LTL ADR-0003](../../little-tools-lab/docs/adr/0003-promote-by-loop.md)). Whole-host cutover still requires `CUTOVER_APPROVED=1`.
+
+| | CT101 (reference living) | Workstation |
 |---|--------|------------------|
-| **What it is** | **Production** — `gzmo.toml` + `gzmo daemon`, vault ~60k facts, Docker sidecars | Operator UI + Prime `:8000`; `config/gzmo.toml` → `data-next/` is **lab/dev scratch** |
-| **Lab integration** | **None** — no lab recipe grafts | Lab recipes = beat-gate fixtures; optional `gzmo-scheduler` / `gzmo-serve` for parity only |
-| **beat-gate** | Live baseline to beat | S2 gate on workstation stack; **all-scales GREEN** required before any re-promotion |
-| **Ops** | `ssh ct101` or `ssh pve "pct exec 101 -- …"`; `systemctl … gzmo-daemon` | CLI/chat/MCP against local clone; **do not** enable overnight `gzmo-serve` while CT101 lives |
+| **Default role** | Production living when claimed | Operator UI + Prime; **dev living** when claimed |
+| **Lab integration** | Narrow promote-by-loop after beat-gate + ack | Lab recipes, beat-gate kit, uniqueness craft |
+| **beat-gate** | Live baseline / optional live smoke | Fixture (+ live) prove before promote |
+| **Ops** | `ssh ct101` / `systemctl … gzmo-daemon` | `living-host-mutex.sh`; stop serve while CT101 claimed |
 
 ---
 
-## What we do on CT101 (production)
+## What we do on CT101 (when it holds the claim)
 
-- Run and maintain `gzmo-daemon.service` + Redis/Qdrant/Neo4j sidecars
-- Edit `/opt/gzmo/gzmo.toml` only for living ops (restart daemon after)
-- Do **not** point CT101 `gzmo.toml` loops at lab scripts (`[assembly]=lab` grafts forbidden)
+- Overnight metabolism (distill, dream, spark, immune, …) per living toml.
+- Accept **narrow** promote-by-loop diffs after beat-gate + ack — not silent CI grafts.
+- Refuse dual-writer: workstation `gzmo-serve` / scheduler must be inactive while CT101 writes.
 
----
+## What we do on workstation
 
-## What we do on the workstation (operator / lab)
+- Operator frontend, Prime fallback, lab/dev, beat-gates.
+- **Dev living window:** `bash scripts/living-host-mutex.sh claim --host workstation` → stop CT101 writers → run prove/promote → `release` → restore CT101 if desired.
+- Brain Feed side-effects target whichever host currently holds the living claim.
 
-- **`gzmo` / `gzmo chat`** — operator frontend (dev clone)
-- **`llama-prime`** — local cognition at `:8000` (CT101 cloud-first fallback)
-- **`gzmo memory mcp`** — lab MCP surface over `data-next/` (not the production vault)
-- **`gzmo-serve` / `gzmo-scheduler`** — **disabled by default** after 2026-07-17 restore; enable only for explicit lab/beat-gate sessions with CT101 overnight writers stopped
-- Local Qdrant/Redis sidecars — lab volumes only
-- Observatory over `data-next/` is a lab viewer, not production control plane
+## Related
 
----
-
-## History
-
-### GZMO-next cutover (completed 2026-07-15, reversed 2026-07-17)
-
-Workstation briefly became sole living instance with fresh `data-next/` (no vault import from CT101). That placement was reversed on 2026-07-17 — see [CT101_RESTORE_LIVING.md](./CT101_RESTORE_LIVING.md).
-
----
-
-## References
-
-- [CT101_RESTORE_LIVING.md](./CT101_RESTORE_LIVING.md) — restore checklist + health commands
-- [CT101_INFRASTRUCTURE_REPORT.md](./CT101_INFRASTRUCTURE_REPORT.md) — live-verified ecosystem map
-- [ct101-systems/00-CAPABILITIES_OVERVIEW.md](./ct101-systems/00-CAPABILITIES_OVERVIEW.md)
+- [ADR-0005-flywheel-over-frozen-topology.md](./ADR-0005-flywheel-over-frozen-topology.md)
 - [ADR-0003-one-instance-metabolism.md](./ADR-0003-one-instance-metabolism.md)
-- [PLACEMENT_DECISION.md](./PLACEMENT_DECISION.md)
-- [PI_FRONTEND_SPLIT.md](./PI_FRONTEND_SPLIT.md)
-- [OPERATOR_FRONTEND_DECISION.md](./OPERATOR_FRONTEND_DECISION.md)
-
----
-
-*End.*
+- [CONTINUOUS_UPGRADE.md](./CONTINUOUS_UPGRADE.md)
+- [BRAIN_FEED.md](./BRAIN_FEED.md)

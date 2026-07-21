@@ -1,16 +1,16 @@
 # Continuous Upgrade Process
 
 **Status:** Active plan (2026-07-21)  
-**USP:** [ADR-0004-airgap-living-usp.md](./ADR-0004-airgap-living-usp.md)  
+**Doctrine:** [ADR-0005](./ADR-0005-flywheel-over-frozen-topology.md) (flywheel) · [ADR-0004](./ADR-0004-airgap-living-usp.md) (USP invariants)  
 **Active strengthen lane:** [BRAIN_FEED.md](./BRAIN_FEED.md)  
 **Quality bar:** [KEEP_QUALITY.md](./KEEP_QUALITY.md)  
 **Unpark sequencing:** [UNPARK_ROADMAP.md](./UNPARK_ROADMAP.md)  
-**Lab parity:** [ct101-systems/120-two-stack-boundary/beat-gates.md](./ct101-systems/120-two-stack-boundary/beat-gates.md)  
+**Lab parity:** [ct101-systems/120-two-stack-boundary/beat-gates.md](./ct101-systems/120-two-stack-boundary/beat-gates.md) · [LTL promote-by-loop](../../little-tools-lab/docs/adr/0003-promote-by-loop.md)  
 **Craft backlog:** uniqueness tier list (Cursor canvas) · S/A kernels first
 
 ## Goal
 
-Run a **repeatable flywheel** that upgrades nutrient density of the living vault and the craft of unique kernels — without dual-writers, without auto engine swaps, and without promoting theater into the overnight brain.
+Run a **repeatable flywheel** that upgrades nutrient density of the living vault and the craft of unique kernels. ADRs **serve** this flywheel ([ADR-0005](./ADR-0005-flywheel-over-frozen-topology.md)) — they must not freeze topology or block promote-by-loop.
 
 ## North-star metrics
 
@@ -22,14 +22,23 @@ Run a **repeatable flywheel** that upgrades nutrient density of the living vault
 | Arena suggestion | `arena-night.sh` → `data-next/arena/` | Overnight | Suggestion only (human pin) |
 | Uniqueness craft | Tier list re-score | Monthly | S/A kernels improved or promoted |
 
-## Hard boundaries (never reverse)
+## Boundaries
 
-1. **One overnight writer** ([ADR-0003](./ADR-0003-one-instance-metabolism.md)) — workstation never runs living metabolism while CT101 owns the vault.
-2. **No auto engine swap** — Arena / Forge / IpW / calibration emit **suggestions**; human pin only.
-3. **Beat-gate ≠ cutover** — green `beat-meta.json` does not authorize CT101 grafts; require explicit `CUTOVER_APPROVED=1` for any migration tooling. **GZMO-next re-promotion** only after next beats CT101 at **all scales** (full kit GREEN, fixture + live) — see [CT101_BOUNDARY.md](./CT101_BOUNDARY.md).
-4. **Brain Feed is the only strengthen claim** — HSP / pantheon / Observatory stay demable theater.
-5. **Cognis / escape-loop / ZPD / attractor brand** — lab only; never GREEN overnight gate.
-6. **Prefer nutrient / Brain Feed / airgap-living USP** — do not burn sessions on ecosystem tourism.
+### Invariants (Layer A — keep)
+
+1. **One overnight writer per vault** — never two concurrent metabolisms ([ADR-0003](./ADR-0003-one-instance-metabolism.md) / [ADR-0005](./ADR-0005-flywheel-over-frozen-topology.md)).
+2. **Airgap honesty** — core path does not require public net ([ADR-0004](./ADR-0004-airgap-living-usp.md)).
+3. **No public multi-tenant MCP SKU.**
+4. **Lite is bootstrap**, not a peer overnight brain.
+
+### Process (Layer B/C — flywheel; amendable)
+
+1. **Living host is a mutex claim** — `bash scripts/living-host-mutex.sh claim --host ct101|workstation|appliance` (stop the other writers first).
+2. **Promote-by-loop** — beat-gate green for one loop + operator ack → handoff into the *current* living host ([LTL ADR-0003](../../little-tools-lab/docs/adr/0003-promote-by-loop.md)). Whole-host cutover still needs `CUTOVER_APPROVED=1`.
+3. **Arena / calibration suggest-by-default** — explicit promote scripts for fast-pin; no silent overnight toml clobber.
+4. **Soak gates Unpark theater**, not S/A kernel craft or beat-gate work.
+5. **Brain Feed** is the strengthen claim for nutrient satellites; theater stays demable.
+6. **Prefer nutrient / uniqueness craft / airgap-living USP** — no ecosystem tourism.
 
 ---
 
@@ -93,19 +102,21 @@ Run a **repeatable flywheel** that upgrades nutrient density of the living vault
 | S1 Mature | Real algorithm + golden fixtures | LTL maturity = mature |
 | S2 Beat | Lab recipe ≥ legacy baseline | `beat-gate.sh --loop … --fixture` |
 | S2b Live smoke | Optional live vault | `--live` + `VAULT_PATH` to data-next / living probe |
-| S3 Handoff | Config/recipe into GZMO path | `gzmo-handoff.sh` / promote-fused — **human** |
-| S4 Cutover | Only with `CUTOVER_APPROVED=1` | Explicit; rare |
+| S3 Handoff | **Promote-by-loop** into *current* living host | beat-gate PASS + operator ack (`PROMOTE_LOOP=…`) |
+| S4 Cutover | Whole-host migration | `CUTOVER_APPROVED=1` only |
 
 Loops: `config | ops | cognition | knowledge | discovery` (+ kit extras: pedagogy, ingest, kg).
 
 ```bash
 # Weekly kit (writes data-next/beat-gate/)
 bash scripts/beat-gate-kit.sh --loops config,cognition,knowledge,discovery
-# Or full:
+# Claim living host before overnight prove / promote (ADR-0005)
+bash scripts/living-host-mutex.sh claim --host workstation --note "cognition prove"
+# Or full kit:
 bash scripts/beat-gate-kit.sh --all
 ```
 
-**Exit:** all target loops PASS fixture; any FAIL opens a fix PR before promote.
+**Exit:** target loops PASS fixture; PASS + ack ⇒ promote that loop (no full-assembly wait). FAIL ⇒ fix PR first.
 
 ### Ring 4 — Portfolio craft (monthly)
 
@@ -135,7 +146,7 @@ bash scripts/beat-gate-kit.sh --all
 | When | Ritual | Fail action |
 |------|--------|-------------|
 | **Daily** | Real work → takeaway; `brain-feed-check.sh` | Fix P0 satellite; no new theater |
-| **Nightly** | Living soak + Arena suggestion (if scheduled) | HOLD unpark; do not auto-pin |
+| **Nightly** | Living soak + Arena suggestion (if scheduled) | HOLD *theater* Unpark; craft/beat-gate continue |
 | **Weekly** | `beat-gate-kit.sh` + review FAIL loops | Fix PR before any handoff |
 | **Weekly** | Promote-fused / serendipity review hour | Accept ≤3; defer rest |
 | **Monthly** | Uniqueness re-tier + 1–2 craft upgrades | Ship PR; update canvas |
@@ -146,21 +157,20 @@ bash scripts/beat-gate-kit.sh --all
 ## Decision tree — “should this upgrade land?”
 
 ```text
-Is it Brain Feed P0/P1 or beat-gate honesty?
-  NO → demable theater or lab only; do not claim strengthen
+Is it uniqueness craft, Brain Feed, or beat-gate honesty?
+  NO → demable theater; do not claim strengthen
   YES ↓
-Does it require a second overnight writer?
-  YES → redesign as side-effect / suggestion; stop
+Would it start a second overnight writer without mutex?
+  YES → claim/release living-host-mutex first (or redesign)
   NO ↓
-Does it auto-swap model/toml/daemon jobs?
-  YES → convert to suggestion + human pin; stop
+Silent auto-swap of living toml/model overnight?
+  YES → suggestion path or explicit promote script; stop
   NO ↓
 Fixture beat-gate green for affected loop?
   NO → fix lab first
   YES ↓
-Human reviewed artifact + dual-writer check?
-  NO → wait
-  YES → promote (narrow diff; never full-clobber living)
+Operator ack + dual_writer_risk=false?
+  YES → promote-by-loop (narrow). Whole-host still needs CUTOVER_APPROVED=1
 ```
 
 ---
@@ -195,40 +205,43 @@ Human reviewed artifact + dual-writer check?
 
 ## Anti-goals
 
-- Mass-publicize private repos as a substitute for local craft.
-- Auto-promote Arena champions into living overnight.
-- Expanding Unpark theater waves while Brain Feed is red.
-- “Upgrade everything” sprints that skip beat-gate and soak.
-- Dual-writer “just this once” daemon starts on workstation.
+- Freezing topology so craft cannot reach living (superseded by ADR-0005).
+- Waiting for “full assembly cutover” before any loop promote.
+- Auto-promote Arena champions without operator action.
+- Expanding Unpark theater while Brain Feed is red.
+- Dual-writer without mutex claim.
 
 ---
 
 ## Operator cheat sheet
 
 ```bash
+# Mutex (ADR-0005)
+bash scripts/living-host-mutex.sh status
+bash scripts/living-host-mutex.sh claim --host workstation --note "dev living"
+bash scripts/living-host-mutex.sh release
+
 # Ring 1
 bash scripts/brain-feed-check.sh
 bash scripts/keep-quality-soak.sh --summary
 
 # Ring 2
-bash scripts/arena-night.sh                    # if scheduled
-bash scripts/brain-intel-promote.sh            # suggestion review
+bash scripts/brain-intel-promote.sh
 gzmo config promote-fused --diff               # then --apply if accepted
 
 # Ring 3
 bash scripts/beat-gate-kit.sh --loops config,cognition,knowledge,discovery
-# META under data-next/beat-gate/
+# PROMOTE_LOOP=cognition … after PASS + ack
 
-# Ring 4
-# Re-open uniqueness canvas; pick 1 S/A kernel; PR; re-score
+# Ring 4 — uniqueness S/A craft; re-score canvas
 
 # Always after merge
 bash scripts/production-readiness-gate.sh
-bash scripts/ct101-living-probe.sh             # soft; dual-writer check
 ```
 
 ## Related
 
+- [ADR-0005-flywheel-over-frozen-topology.md](./ADR-0005-flywheel-over-frozen-topology.md)
 - [STACK_OPPORTUNITY_MAP.md](./STACK_OPPORTUNITY_MAP.md)
 - [OBOLUS_ARENA_BOUNDARY.md](./OBOLUS_ARENA_BOUNDARY.md)
 - [CT101_BOUNDARY.md](./CT101_BOUNDARY.md)

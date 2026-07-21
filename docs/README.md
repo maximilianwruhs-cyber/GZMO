@@ -6,7 +6,9 @@ Canonical operator and architecture docs. Session reports and milestone logs bel
 
 | Doc | Purpose |
 |-----|---------|
-| [ADR-0004-airgap-living-usp.md](ADR-0004-airgap-living-usp.md) | **USP doctrine** — full living on one airgapped box |
+| [ADR-0005-flywheel-over-frozen-topology.md](ADR-0005-flywheel-over-frozen-topology.md) | **Flywheel doctrine** — continuous upgrade outranks frozen topology |
+| [CONTINUOUS_UPGRADE.md](CONTINUOUS_UPGRADE.md) | **Upgrade process** — four rings, promote-by-loop, craft backlog |
+| [ADR-0004-airgap-living-usp.md](ADR-0004-airgap-living-usp.md) | **USP invariants** — airgap living on one box |
 | [AIRGAP_LIVING.md](AIRGAP_LIVING.md) | **Hero path** — single-box airgap living bring-up |
 | [KEEP_QUALITY.md](KEEP_QUALITY.md) | **USP quality gate** — `keep-quality-gate.sh` |
 | [BRAIN_FEED.md](BRAIN_FEED.md) | **Active Unpark** — satellites that nourish the living vault |
