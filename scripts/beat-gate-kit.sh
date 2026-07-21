@@ -76,24 +76,51 @@ for part in (os.environ.get("RESULTS_CSV") or "").split(","):
             meta = json.loads(meta_path.read_text(encoding="utf-8"))
         except Exception:
             meta = {}
+    metrics = meta.get("metrics") or {}
+    gate_passed = metrics.get("gate_passed")
+    if gate_passed is None:
+        gate_passed = meta.get("beats_incumbent")
     rows.append({
         "loop": loop,
         "status": status,
         "meta": str(meta_path) if meta_path.is_file() else None,
         "beats_incumbent": meta.get("beats_incumbent"),
-        "gate_passed": (meta.get("metrics") or {}).get("gate_passed"),
+        "gate_passed": gate_passed,
+        "baseline_id": meta.get("baseline_id"),
     })
 
+# Honesty: core loops must emit boolean gate_passed (not null) when they PASS.
+core = {"config", "cognition", "knowledge", "discovery", "ops"}
+honesty_fail = [
+    r["loop"]
+    for r in rows
+    if r["loop"] in core
+    and r["status"] == "PASS"
+    and not isinstance(r.get("gate_passed"), bool)
+]
+baseline_missing = [
+    r["loop"]
+    for r in rows
+    if r["loop"] in core
+    and r["status"] == "PASS"
+    and not r.get("baseline_id")
+]
+
+kit_ok = fail_n == 0 and pass_n > 0 and not honesty_fail and not baseline_missing
 kit = {
     "schema": "gzmo.beat-gate.kit/v1",
     "generated_at": datetime.now(timezone.utc).isoformat(),
-    "ok": fail_n == 0 and pass_n > 0,
+    "ok": kit_ok,
     "pass": pass_n,
     "fail": fail_n,
     "loops": rows,
+    "honesty": {
+        "null_gate_passed": honesty_fail,
+        "missing_baseline_id": baseline_missing,
+    },
     "ladder": ["fixture", "meta", "gate", "promote(S0→S3 human)"],
     "reference": "little-tools-lab/scripts/beat-gate.sh",
-    "note": "Open eval kit spike — GZMO is the reference assembly; no CT101 writes.",
+    "note": "Open eval kit — versioned baselines under little-tools-lab/fixtures/beat-baselines/; no CT101 writes.",
 }
 (out / "latest.json").write_text(json.dumps(kit, indent=2) + "\n", encoding="utf-8")
 (out / "contract.json").write_text(
@@ -119,15 +146,25 @@ lines = [
     "",
     f"PASS {pass_n} · FAIL {fail_n}",
     "",
-    "| loop | status | gate_passed |",
-    "|------|--------|-------------|",
+    "| loop | status | gate_passed | baseline_id |",
+    "|------|--------|-------------|-------------|",
 ]
 for r in rows:
-    lines.append(f"| {r['loop']} | {r['status']} | {r.get('gate_passed')} |")
+    lines.append(
+        f"| {r['loop']} | {r['status']} | {r.get('gate_passed')} | {r.get('baseline_id') or '—'} |"
+    )
 lines += ["", kit["note"], ""]
+if honesty_fail:
+    lines.append(f"HONESTY FAIL null gate_passed: {', '.join(honesty_fail)}")
+if baseline_missing:
+    lines.append(f"HONESTY FAIL missing baseline_id: {', '.join(baseline_missing)}")
 (out / "latest.md").write_text("\n".join(lines), encoding="utf-8")
-print(json.dumps({"ok": kit["ok"], "pass": pass_n, "fail": fail_n, "path": str(out / "latest.json")}, indent=2))
+print(json.dumps({
+    "ok": kit["ok"],
+    "pass": pass_n,
+    "fail": fail_n,
+    "honesty": kit["honesty"],
+    "path": str(out / "latest.json"),
+}, indent=2))
+raise SystemExit(0 if kit_ok else 1)
 PY
-
-# Soft kit: always succeed if we produced a report (organ may lose to incumbent).
-exit 0
