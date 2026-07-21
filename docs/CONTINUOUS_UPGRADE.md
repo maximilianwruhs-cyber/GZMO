@@ -137,7 +137,7 @@ bash scripts/beat-gate-kit.sh --all
 | P0 ✓ | herdr living enqueue | Done — `herdr-metabolism-check` GREEN living_ok |
 | P0 ✓ | beat-gate kit (5 loops) | Done — fixture cognition+ops honesty; kit `ok=true` 5/5 |
 | P1 | HSP dialect MIDI | Keep demable theater; optional motif schema only |
-| P1 → | Obolus `beats_with_mad` | DNA/dogfood + Forge pin near-ties; still human pin |
+| P1 ✓ | Obolus `beats_with_mad` | Done — Arena DNA/dogfood MAD + Forge near-tie pins (human pin) |
 | P1 | Thought Cabinet crystallize | Lab chaos only unless beat-gate cognition demands |
 
 ---
