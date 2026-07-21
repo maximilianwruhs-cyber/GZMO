@@ -14,10 +14,11 @@ workstation; Prime `:8000` is CT101's local fallback.
 by default. Never enable overnight `gzmo serve` while CT101 `gzmo-daemon` is
 the living writer.
 
-**Lab-dev (not promote):** Develop next against `data-next/` + beat-gates with
-CT101 remaining sole living writer. Re-promote only when next beats CT101 at
-**all scales** (full kit GREEN — fixture and live). See
-[CT101_BOUNDARY.md](CT101_BOUNDARY.md).
+**Lab-dev under [ADR-0005](ADR-0005-flywheel-over-frozen-topology.md):** Develop
+against `data-next/` + beat-gates. One overnight writer at a time (living-host
+mutex). **Promote-by-loop** after fixture beat-gate PASS + operator ack; whole-host
+cutover still needs `CUTOVER_APPROVED=1`. Soak gates theater Unpark, not craft.
+See [CT101_BOUNDARY.md](CT101_BOUNDARY.md) and [CONTINUOUS_UPGRADE.md](CONTINUOUS_UPGRADE.md).
 
 ## Instance layout
 
