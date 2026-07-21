@@ -102,21 +102,25 @@ Run a **repeatable flywheel** that upgrades nutrient density of the living vault
 | S1 Mature | Real algorithm + golden fixtures | LTL maturity = mature |
 | S2 Beat | Lab recipe ≥ legacy baseline | `beat-gate.sh --loop … --fixture` |
 | S2b Live smoke | Optional live vault | `--live` + `VAULT_PATH` to data-next / living probe |
-| S3 Handoff | **Promote-by-loop** into *current* living host | beat-gate PASS + operator ack (`PROMOTE_LOOP=…`) |
+| S3 Handoff | **Promote-by-loop** into *current* living host | beat-gate PASS + `PROMOTE_ACK=1` via `promote-loop.sh` |
 | S4 Cutover | Whole-host migration | `CUTOVER_APPROVED=1` only |
 
-Loops: `config | ops | cognition | knowledge | discovery` (+ kit extras: pedagogy, ingest, kg).
+Loops: `config | ops | cognition | knowledge | discovery` (+ kit extras: pedagogy, ingest, kg).  
+Baselines: versioned JSON under `little-tools-lab/fixtures/beat-baselines/<loop>.v1.json` — kit requires `gate_passed` + `baseline_id`.
 
 ```bash
 # Weekly kit (writes data-next/beat-gate/)
-bash scripts/beat-gate-kit.sh --loops config,cognition,knowledge,discovery
+bash scripts/beat-gate-kit.sh --loops config,cognition,knowledge,discovery,ops
+# Ring 3 honesty (lifecycle + spark refractory goldens)
+bash scripts/lifecycle-goldens-check.sh
 # Claim living host before overnight prove / promote (ADR-0005)
 bash scripts/living-host-mutex.sh claim --host workstation --note "cognition prove"
-# Or full kit:
-bash scripts/beat-gate-kit.sh --all
+# Record-only promote ritual (living apply still gated — see promote-loop-living-apply bet)
+PROMOTE_LOOP=knowledge PROMOTE_ACK=1 bash scripts/promote-loop.sh
+bash scripts/living-host-mutex.sh release
 ```
 
-**Exit:** target loops PASS fixture; PASS + ack ⇒ promote that loop (no full-assembly wait). FAIL ⇒ fix PR first.
+**Exit:** target loops PASS fixture with boolean `gate_passed`; PASS + ack ⇒ promote record (living apply is a separate bet). FAIL ⇒ fix PR first.
 
 ### Ring 4 — Portfolio craft (monthly)
 
@@ -136,6 +140,8 @@ bash scripts/beat-gate-kit.sh --all
 | P0 ✓ | honeypot `classify_truth_pair` | Done — goldens + strong supersession + knowledge beat PASS |
 | P0 ✓ | herdr living enqueue | Done — `herdr-metabolism-check` GREEN living_ok |
 | P0 ✓ | beat-gate kit (5 loops) | Done — fixture cognition+ops honesty; kit `ok=true` 5/5 |
+| P0 ✓ | versioned beat baselines | Done — LTL #20 + kit honesty (`gate_passed` + `baseline_id`) |
+| P0 ✓ | promote-loop record ritual | Done — `scripts/promote-loop.sh` (living apply parked) |
 | P1 | HSP dialect MIDI | Keep demable theater; optional motif schema only |
 | P1 ✓ | Obolus `beats_with_mad` | Done — Arena DNA/dogfood MAD + Forge near-tie pins (human pin) |
 | P1 ✓ | Thought Cabinet crystallize | Done — cabinet-sim recipe goldens + soft saturation (lab) |
@@ -231,8 +237,9 @@ bash scripts/brain-intel-promote.sh
 gzmo config promote-fused --diff               # then --apply if accepted
 
 # Ring 3
-bash scripts/beat-gate-kit.sh --loops config,cognition,knowledge,discovery
-# PROMOTE_LOOP=cognition … after PASS + ack
+bash scripts/beat-gate-kit.sh --loops config,cognition,knowledge,discovery,ops
+bash scripts/lifecycle-goldens-check.sh
+PROMOTE_LOOP=knowledge PROMOTE_ACK=1 bash scripts/promote-loop.sh
 
 # Ring 4 — uniqueness S/A craft; re-score canvas
 
