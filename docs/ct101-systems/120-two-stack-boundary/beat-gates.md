@@ -115,13 +115,16 @@ Builds `beat-gate-meta` from `little-tools-lab/common` if missing.
 
 ---
 
-## Advancement
+## Advancement (ADR-0005)
 
-| Today | Cutover target |
-|-------|----------------|
-| Manual `beat-gate.sh --live` on workstation | CI nightly all-four-loops green |
-| CT101 as moving reference (frozen) | Lock baseline at cutover commit |
-| beat-meta.json local | Central beat history for S3 sign-off |
+| Today | Target |
+|-------|--------|
+| Manual `beat-gate.sh --fixture/--live` | CI nightly loops green |
+| Single-loop PASS + operator ack | **Promote-by-loop** into current living host |
+| Whole-host migration | Still `CUTOVER_APPROVED=1` only |
+| beat-meta.json local | Central beat history for promote decisions |
+
+Silent CI green still does **not** auto-deploy. Promote-by-loop replaces “full assembly or nothing.”
 
 ---
 

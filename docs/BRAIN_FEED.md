@@ -24,7 +24,7 @@ Only these Unpark satellites claim to **improve** the living vault/honeypot. The
 
 ## Hard rules
 
-1. **One overnight writer** ([ADR-0003](./ADR-0003-one-instance-metabolism.md)) — Brain Feed never starts `gzmo serve` / daemon on the workstation while CT101 (or another living host) owns metabolism.
+1. **One overnight writer** ([ADR-0003](./ADR-0003-one-instance-metabolism.md) / [ADR-0005](./ADR-0005-flywheel-over-frozen-topology.md)) — Brain Feed never races a second host. If the workstation holds the living claim (`living-host-mutex.sh`), feed *that* host; otherwise do not start `gzmo serve` while CT101 owns metabolism.
 2. **No auto engine swap** — Arena / Forge / IpW / calibration emit **suggestions** only.
 3. **Living vault target** — nutrient paths aim at the living host (`/opt/gzmo` today), not `~/.gzmo` lite and not silent `data-next` overnight writers.
 4. **keep-quality stays the USP bar** — Brain Feed GREEN does not replace soak readiness.

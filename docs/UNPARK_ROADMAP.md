@@ -1,9 +1,10 @@
 # Unpark roadmap (post keep-quality soak)
 
-**Status:** Active (2026-07-20) — USP = airgap living ([ADR-0004](./ADR-0004-airgap-living-usp.md))  
-**Prerequisite:** `bash scripts/keep-quality-soak.sh --summary` → `soak_ready_unpark_ok` (default 3 trailing honest GREEN nights, ≥18h spacing)  
+**Status:** Active (2026-07-20) — USP = airgap living ([ADR-0004](./ADR-0004-airgap-living-usp.md)); flywheel = [ADR-0005](./ADR-0005-flywheel-over-frozen-topology.md)  
+**Prerequisite (theater waves):** `bash scripts/keep-quality-soak.sh --summary` → `soak_ready_unpark_ok` (default 3 trailing honest GREEN nights, ≥18h spacing)  
+**Not blocked by soak:** uniqueness craft, beat-gate, promote-by-loop ([CONTINUOUS_UPGRADE.md](./CONTINUOUS_UPGRADE.md))  
 **Also useful:** `bash scripts/production-readiness-gate.sh` (lite + living ops)  
-**Doctrine:** [SPINE_FOCUS.md](./SPINE_FOCUS.md) · [KEEP_QUALITY.md](./KEEP_QUALITY.md) · [BRAIN_FEED.md](./BRAIN_FEED.md) · [STACK_OPPORTUNITY_MAP.md](./STACK_OPPORTUNITY_MAP.md)
+**Doctrine:** [ADR-0005](./ADR-0005-flywheel-over-frozen-topology.md) · [SPINE_FOCUS.md](./SPINE_FOCUS.md) · [KEEP_QUALITY.md](./KEEP_QUALITY.md) · [BRAIN_FEED.md](./BRAIN_FEED.md)
 
 ## What changed
 
@@ -11,17 +12,19 @@ Keep-quality on the living box unlocked sequenced **Unpark**. Living is first-cl
 
 **Active strengthen lane:** [BRAIN_FEED.md](./BRAIN_FEED.md) (`brain-feed-check.sh`) — takeaway, tinyFolder→living, Felt Use, serendipity promote, calibration/Arena **human** pin. Theater waves below stay demable but demoted.
 
-## Hard boundaries (never reverse)
+## Boundaries
 
-| Boundary | Why |
-|----------|-----|
-| ADR-0003 one overnight writer | One living brain per vault |
-| Lite never requires living sidecars | Bootstrap `~/.gzmo` stays Redis/Qdrant/Neo4j off |
-| Never point `gzmo-memory` at living vault as stranger default | Lite ≠ living attach labels |
-| No public MCP webserver SKU | ADR-0004 |
-| Arena / IpW / Forge outside `gzmo-daemon` by default | [OBOLUS_ARENA_BOUNDARY.md](./OBOLUS_ARENA_BOUNDARY.md) |
-| Cognis / escape-loop / ZPD never production brain | Lab/research only; not GREEN overnight gate |
-| Pi optional glass, not primary UX | [OPERATOR_FRONTEND_DECISION.md](./OPERATOR_FRONTEND_DECISION.md) |
+| Boundary | Kind | Why |
+|----------|------|-----|
+| One overnight writer per vault | **Invariant** | ADR-0003 / ADR-0005 Layer A |
+| Living host mutex (CT101 \| workstation \| appliance) | **Process** | ADR-0005 — host may move; never dual-write |
+| Lite never requires living sidecars | **Invariant** | Bootstrap stays sidecar-off |
+| Never point stranger lite MCP at living vault by default | **Invariant** | Lite ≠ living attach labels |
+| No public MCP webserver SKU | **Invariant** | ADR-0004 |
+| Promote-by-loop after beat-gate + ack | **Process** | LTL ADR-0003 — flywheel over full-cutover freeze |
+| Arena / IpW / Forge outside daemon by default | **Process** | Suggest-by-default; explicit pin OK |
+| Cognis / escape-loop / ZPD never GREEN overnight | **Process** | Lab/research; craft still allowed |
+| Pi optional glass | **Process** | Not primary UX |
 
 ## Waves
 

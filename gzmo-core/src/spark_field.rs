@@ -121,6 +121,36 @@ fn hours_since(iso: &str) -> f64 {
         .unwrap_or(1.0e9)
 }
 
+/// Why a candidate was suppressed (for reports / beat-gate honesty).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RefractoryReason {
+    None,
+    SameId,
+    TagOverlap,
+    ThemeOverlap,
+    SystemHomophily,
+}
+
+impl RefractoryReason {
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::None => "none",
+            Self::SameId => "same_id",
+            Self::TagOverlap => "tag_overlap",
+            Self::ThemeOverlap => "theme_overlap",
+            Self::SystemHomophily => "system_homophily",
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct RefractoryExplain {
+    pub multiplier: f64,
+    pub reason: RefractoryReason,
+    pub penalty: f64,
+    pub system_share: f64,
+}
+
 /// Multiplier in (0, 1]: lower = more suppressed by recent spark history.
 pub fn refractory_multiplier(
     fact: &SemanticFact,
@@ -128,13 +158,29 @@ pub fn refractory_multiplier(
     half_life_hours: f64,
     strength: f64,
 ) -> f64 {
+    explain_refractory(fact, field, half_life_hours, strength).multiplier
+}
+
+/// Same as [`refractory_multiplier`] plus the dominant suppression reason.
+pub fn explain_refractory(
+    fact: &SemanticFact,
+    field: &RefractoryField,
+    half_life_hours: f64,
+    strength: f64,
+) -> RefractoryExplain {
     if field.entries.is_empty() || half_life_hours <= 0.0 {
-        return 1.0;
+        return RefractoryExplain {
+            multiplier: 1.0,
+            reason: RefractoryReason::None,
+            penalty: 0.0,
+            system_share: 0.0,
+        };
     }
     let tags = extract_tags(&fact.content);
     let systemish = is_systemish(&fact.content);
     let id = fact.id.to_string();
     let mut pen = 0.0_f64;
+    let mut reason = RefractoryReason::None;
 
     let mut system_weight = 0.0;
     let mut total_weight = 0.0;
@@ -147,16 +193,27 @@ pub fn refractory_multiplier(
             system_weight += decay;
         }
         if entry.id == id {
-            pen = pen.max(decay);
+            if decay >= pen {
+                pen = decay;
+                reason = RefractoryReason::SameId;
+            }
             continue;
         }
         let overlap = entry.tags.iter().any(|t| tags.iter().any(|u| u == t));
         if overlap {
             // Strong theme/tag refractory — overnight monoculture (same PROJECT/TOOL)
             // must not soft-pick every minute.
-            pen = pen.max(decay * 0.9);
+            let p = decay * 0.9;
+            if p >= pen {
+                pen = p;
+                reason = RefractoryReason::TagOverlap;
+            }
         } else if theme_preview_overlap(&entry.preview, &fact.content) {
-            pen = pen.max(decay * 0.75);
+            let p = decay * 0.75;
+            if p >= pen {
+                pen = p;
+                reason = RefractoryReason::ThemeOverlap;
+            }
         }
     }
 
@@ -166,11 +223,21 @@ pub fn refractory_multiplier(
         0.0
     };
     if systemish && system_share > 0.35 {
-        pen = pen.max(system_share * 0.9);
+        let p = system_share * 0.9;
+        if p >= pen {
+            pen = p;
+            reason = RefractoryReason::SystemHomophily;
+        }
     }
 
     let strength = strength.clamp(0.0, 1.0);
-    (1.0 - pen * strength).clamp(0.05, 1.0)
+    let multiplier = (1.0 - pen * strength).clamp(0.05, 1.0);
+    RefractoryExplain {
+        multiplier,
+        reason,
+        penalty: pen,
+        system_share,
+    }
 }
 
 /// Softmax sample among top-K scored candidates. `roll` in [0, 1).
@@ -234,6 +301,19 @@ pub fn record_selection(vault_db: &Path, fact: &SemanticFact, max_slots: usize) 
     let _ = save_field(vault_db, &field);
 }
 
+/// Optional selection telemetry for `last-spark-report.json` (cognition beat honesty).
+#[derive(Debug, Clone, Default)]
+pub struct SparkSelectionMetrics {
+    pub selection_score: Option<f64>,
+    pub refractory_multiplier: Option<f64>,
+    pub refractory_reason: Option<&'static str>,
+    pub refractory_entries: Option<usize>,
+    pub soft_pick_roll: Option<f64>,
+    pub soft_pick_top_k: Option<usize>,
+    pub soft_pick_temperature: Option<f64>,
+    pub candidates_scored: Option<usize>,
+}
+
 pub fn write_last_spark_report(
     vault_db: &Path,
     date: &str,
@@ -241,7 +321,7 @@ pub fn write_last_spark_report(
     kg: usize,
     anchor_id: Option<Uuid>,
     anchor_preview: Option<&str>,
-    score: Option<f64>,
+    metrics: SparkSelectionMetrics,
 ) {
     let dir = spark_dir(vault_db);
     let _ = std::fs::create_dir_all(&dir);
@@ -252,7 +332,18 @@ pub fn write_last_spark_report(
         "kg_relations_written": kg,
         "anchor_id": anchor_id.map(|id| id.to_string()),
         "anchor_preview": anchor_preview,
-        "selection_score": score,
+        "selection_score": metrics.selection_score,
+        "refractory": {
+            "multiplier": metrics.refractory_multiplier,
+            "reason": metrics.refractory_reason,
+            "entries": metrics.refractory_entries,
+        },
+        "soft_pick": {
+            "roll": metrics.soft_pick_roll,
+            "top_k": metrics.soft_pick_top_k,
+            "temperature": metrics.soft_pick_temperature,
+            "candidates_scored": metrics.candidates_scored,
+        },
         "updated_at": Utc::now().to_rfc3339(),
     });
     if let Ok(text) = serde_json::to_string_pretty(&payload) {
@@ -353,10 +444,124 @@ mod tests {
                 preview: "TinyFolderDrop notes reach distill overnight without CLI chat".into(),
             }],
         };
-        let m = refractory_multiplier(&fact, &field, 120.0, 0.95);
+        let expl = explain_refractory(&fact, &field, 120.0, 0.95);
         assert!(
-            m < 0.55,
-            "theme overlap should suppress monoculture, got {m}"
+            expl.multiplier < 0.55,
+            "theme overlap should suppress monoculture, got {}",
+            expl.multiplier
         );
+        assert_eq!(expl.reason, RefractoryReason::ThemeOverlap);
+    }
+
+    #[test]
+    fn tag_overlap_reason_dominates_theme() {
+        let fact = SemanticFact {
+            id: Uuid::new_v4(),
+            content: "[PROJECT:Alpha] shared project tag with different wording".into(),
+            embedding: vec![],
+            half_life_days: 60.0,
+            confidence: 1.0,
+            confirmation_count: 1,
+            decay_class: "CuratedVault".into(),
+            created_at: Utc::now(),
+            last_accessed_at: Utc::now(),
+        };
+        let field = RefractoryField {
+            schema: SCHEMA.into(),
+            entries: vec![RefractoryEntry {
+                id: Uuid::new_v4().to_string(),
+                tags: vec!["PROJECT:Alpha".into()],
+                systemish: false,
+                selected_at: Utc::now().to_rfc3339(),
+                preview: "totally unrelated preview tokens here".into(),
+            }],
+        };
+        let expl = explain_refractory(&fact, &field, 72.0, 0.9);
+        assert_eq!(expl.reason, RefractoryReason::TagOverlap);
+        assert!(
+            expl.multiplier < 0.4,
+            "tag overlap should bite, got {}",
+            expl.multiplier
+        );
+    }
+
+    #[test]
+    fn soft_pick_can_select_mid_band_with_high_temperature() {
+        // With high temperature and a roll near the end of the mass, mid-band wins.
+        let picked = soft_pick(
+            vec![("top", 10.0), ("mid", 9.5), ("low", 9.0)],
+            3,
+            2.0,
+            0.85,
+        );
+        let name = picked.unwrap().0;
+        assert!(
+            name == "mid" || name == "low",
+            "expected mid-band under soft pick, got {name}"
+        );
+    }
+
+    #[test]
+    fn selection_roll_is_deterministic() {
+        let a = selection_roll("2026-07-21", 0x5a_51_4b);
+        let b = selection_roll("2026-07-21", 0x5a_51_4b);
+        let c = selection_roll("2026-07-21", 0x5a_51_4c);
+        assert!((a - b).abs() < 1e-15);
+        assert!((a - c).abs() > 1e-9, "salt must change the roll");
+        assert!((0.0..1.0).contains(&a));
+    }
+
+    #[test]
+    fn empty_field_explains_none() {
+        let fact = SemanticFact {
+            id: Uuid::new_v4(),
+            content: "[TOOL:x] hello".into(),
+            embedding: vec![],
+            half_life_days: 60.0,
+            confidence: 1.0,
+            confirmation_count: 1,
+            decay_class: "CuratedVault".into(),
+            created_at: Utc::now(),
+            last_accessed_at: Utc::now(),
+        };
+        let expl = explain_refractory(&fact, &RefractoryField::default(), 72.0, 0.9);
+        assert_eq!(expl.multiplier, 1.0);
+        assert_eq!(expl.reason, RefractoryReason::None);
+    }
+
+    #[test]
+    fn last_spark_report_includes_refractory_block() {
+        let dir = std::env::temp_dir().join(format!("gzmo-spark-report-{}", Uuid::new_v4()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let vault = dir.join("vault.db");
+        std::fs::write(&vault, []).unwrap();
+        let id = Uuid::new_v4();
+        write_last_spark_report(
+            &vault,
+            "2026-07-21",
+            true,
+            2,
+            Some(id),
+            Some("[PROJECT:X] preview"),
+            SparkSelectionMetrics {
+                selection_score: Some(0.42),
+                refractory_multiplier: Some(0.55),
+                refractory_reason: Some("tag_overlap"),
+                refractory_entries: Some(3),
+                soft_pick_roll: Some(0.12),
+                soft_pick_top_k: Some(8),
+                soft_pick_temperature: Some(0.35),
+                candidates_scored: Some(11),
+            },
+        );
+        let raw =
+            std::fs::read_to_string(spark_dir(&vault).join("last-spark-report.json")).unwrap();
+        let v: serde_json::Value = serde_json::from_str(&raw).unwrap();
+        assert_eq!(v["schema"], "gzmo.spark.report/v1");
+        assert_eq!(v["refractory"]["reason"], "tag_overlap");
+        assert_eq!(v["refractory"]["entries"], 3);
+        assert!((v["soft_pick"]["temperature"].as_f64().unwrap() - 0.35).abs() < 1e-9);
+        assert_eq!(v["soft_pick"]["candidates_scored"], 11);
+        let _ = std::fs::remove_dir_all(&dir);
     }
 }

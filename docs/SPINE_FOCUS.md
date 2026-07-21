@@ -1,7 +1,7 @@
 # Spine focus — airgap living USP
 
 **Status:** Active (2026-07-20) — USP = full living on one airgapped box  
-**Doctrine:** [ADR-0004-airgap-living-usp.md](ADR-0004-airgap-living-usp.md) · one-writer [ADR-0003](ADR-0003-one-instance-metabolism.md)  
+**Doctrine:** [ADR-0005](ADR-0005-flywheel-over-frozen-topology.md) (flywheel) · [ADR-0004](ADR-0004-airgap-living-usp.md) (USP) · one-writer [ADR-0003](ADR-0003-one-instance-metabolism.md)  
 **Supersedes:** co-primary “A + C” brand forever (kept below as migration vocabulary only)  
 **Unpark roadmap:** [UNPARK_ROADMAP.md](UNPARK_ROADMAP.md)  
 **Audience:** Operator deciding what to strengthen next  
@@ -36,9 +36,9 @@ Never point lite product MCP at the living vault as the stranger default. Never 
 
 | Role | Host | Path | Overnight writer |
 |------|------|------|------------------|
-| **Living production (reference)** | **CT101** | `/opt/gzmo/` + `gzmo-daemon` | Yes — sole writer today |
-| **USP target** | Any one airgapped box | local data dir + compose pin | Yes — sole writer on that box |
-| **Operator / lab** | Workstation | `GZMO/data-next/` | No overnight `gzmo serve` while another living host writes |
+| **Living production (reference)** | **CT101** | `/opt/gzmo/` + `gzmo-daemon` | Yes when claim=`ct101` |
+| **USP target** | Any one airgapped box | local data dir + compose pin | Yes when claim=`appliance` |
+| **Dev living (allowed)** | Workstation | `GZMO/data-next/` or local vault | Yes when claim=`workstation` and CT101 writers stopped (`living-host-mutex.sh`) |
 
 See [CT101_BOUNDARY.md](CT101_BOUNDARY.md), [AIRGAP_LIVING.md](AIRGAP_LIVING.md), [LIVING_APPLIANCE.md](LIVING_APPLIANCE.md).
 
