@@ -16,11 +16,11 @@ Operator research bets for GZMO upgrades. Doctrine: [docs/OPPORTUNITY_DISCOVERY.
 
 | Id | Score | Status | Title |
 |----|-------|--------|-------|
-| [serendipity-apply-proof](serendipity-apply-proof.md) | 20 | **active** | Serendipity apply proof (close the 0-apply remind) |
+| [living-organ-trace](living-organ-trace.md) | 20 | **active** | Living organ-trace (CT101 scheduler-runs) |
+| [serendipity-apply-proof](serendipity-apply-proof.md) | 20 | soaked | Serendipity apply proof (close the 0-apply remind) |
 | [airgap-living-install-smoke](airgap-living-install-smoke.md) | 20 | soaked | Airgap living install smoke (stranger / one-box path) |
 | [herdr-living-enqueue-proof](herdr-living-enqueue-proof.md) | 21 | soaked | herdr pane-close → living takeaway enqueue proof |
 | [felt-use-ripen-floor](felt-use-ripen-floor.md) | 23 | soaked | Felt Use depth floor for honest ripen (recall≥3 share) |
-| [living-organ-trace](living-organ-trace.md) | 20 | candidate | Living organ-trace (CT101 scheduler-runs) |
 | [ct101-brain-feed-sync](ct101-brain-feed-sync.md) | 19 | candidate | One-command Brain Feed script sync to CT101 |
 | [soak-night-honest-timer](soak-night-honest-timer.md) | 19 | candidate | Honest soak timer (min sample spacing) |
 | [tinyfolder-living-one-shot](tinyfolder-living-one-shot.md) | 20 | soaked | One-command tinyFolder → living takeaway enqueue |

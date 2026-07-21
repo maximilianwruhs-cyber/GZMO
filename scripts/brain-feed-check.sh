@@ -121,15 +121,42 @@ else
   row FAIL "serendipity-cadence" "cadence failed — scripts/serendipity-cadence.sh"
 fi
 if [[ -f "$DATA/serendipity/promote-latest.json" ]] \
-  && python3 -c "import json;d=json.load(open('$DATA/serendipity/promote-latest.json')); raise SystemExit(0 if d.get('ok') and d.get('dry_run') else 1)"; then
+  && python3 -c "
+import json
+d=json.load(open('$DATA/serendipity/promote-latest.json'))
+ok=bool(d.get('ok')) and (bool(d.get('dry_run')) or bool(d.get('applied')))
+raise SystemExit(0 if ok else 1)
+"; then
   n="$(python3 -c "import json;print(json.load(open('$DATA/serendipity/promote-latest.json')).get('candidate_count',0))")"
-  if [[ "$n" == "0" ]]; then
-    row HOLD "serendipity-promote" "dry-run ok but 0 candidates — run spark on living host"
+  dry="$(python3 -c "import json;print(json.load(open('$DATA/serendipity/promote-latest.json')).get('dry_run'))")"
+  applied_n="$(python3 -c "import json;print(len(json.load(open('$DATA/serendipity/promote-latest.json')).get('applied') or []))")"
+  if [[ "$dry" == "True" ]]; then
+    if [[ "$n" == "0" ]]; then
+      row HOLD "serendipity-promote" "dry-run ok but 0 candidates — run spark on living host"
+    else
+      row PASS "serendipity-promote" "dry-run ok candidates=$n"
+    fi
   else
-    row PASS "serendipity-promote" "dry-run ok candidates=$n"
+    row PASS "serendipity-promote" "applied=$applied_n candidates=$n (human-gated; auto_apply=false)"
   fi
 else
-  row FAIL "serendipity-promote" "promote dry-run failed — see data-next/serendipity/"
+  row FAIL "serendipity-promote" "promote dry-run/apply failed — see data-next/serendipity/"
+fi
+
+# Apply proof / recent human apply (closes 0-apply remind without auto-apply)
+if [[ -f "$DATA/serendipity/apply-proof-latest.json" ]] \
+  && python3 -c "import json;d=json.load(open('$DATA/serendipity/apply-proof-latest.json')); raise SystemExit(0 if d.get('ok') and d.get('apply_ok') else 1)"; then
+  row PASS "serendipity-apply-proof" "$(python3 -c "import json;print(json.load(open('$DATA/serendipity/apply-proof-latest.json')).get('advice',''))")"
+elif [[ -f "$DATA/serendipity/cadence-latest.json" ]] \
+  && python3 -c "
+import json
+d=json.load(open('$DATA/serendipity/cadence-latest.json'))
+ok=int(d.get('applied_total') or 0)>0 and not d.get('stale_apply', True)
+raise SystemExit(0 if ok else 1)
+"; then
+  row PASS "serendipity-apply-proof" "$(python3 -c "import json;d=json.load(open('$DATA/serendipity/cadence-latest.json')); print(f\\\"applies_logged={d.get('applied_total')} last={d.get('last_apply_at')}\\\")")"
+else
+  row HOLD "serendipity-apply-proof" "no recent apply — bash scripts/serendipity-apply-proof.sh --apply"
 fi
 
 # Dream compact lab presence (hygiene — soft)

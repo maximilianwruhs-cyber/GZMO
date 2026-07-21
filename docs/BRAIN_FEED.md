@@ -92,13 +92,15 @@ Checklist after a spark night:
 
 1. `bash scripts/serendipity-cadence.sh` (digest + dry-run + reminder)  
 2. Review `data-next/serendipity/promote-latest.json` (≤3 takeaways)  
-3. If clear: `SERENDIPITY_PROMOTE_APPLY=1 bash scripts/serendipity-promote.sh`  
+3. If clear: `bash scripts/serendipity-apply-proof.sh --apply`  
+   (or `SERENDIPITY_PROMOTE_APPLY=1 bash scripts/serendipity-promote.sh`)  
 4. `bash scripts/brain-feed-check.sh` stays GREEN  
 
 ```bash
 bash scripts/serendipity-digest.sh
 bash scripts/serendipity-promote.sh          # dry-run only
-# SERENDIPITY_PROMOTE_APPLY=1 bash scripts/serendipity-promote.sh   # human-gated
+bash scripts/serendipity-apply-proof.sh      # dry report
+# bash scripts/serendipity-apply-proof.sh --apply   # human-gated ≤3
 ```
 
 ### Intelligence promote (P1) — no auto
