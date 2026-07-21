@@ -32,7 +32,9 @@ REPORT="$OUT_DIR/overnight-$STAMP.json"
 
 if [[ "$ON_HOST" == "1" ]]; then
   INBOX="${TINYFOLDER_INBOX:-/opt/gzmo/data/inbox}"
-  mkdir -p "$INBOX/processed"
+  OUT_DIR="${GZMO_DATA_NEXT:-/opt/gzmo/data}/tinyfolder"
+  mkdir -p "$INBOX/processed" "$OUT_DIR"
+  REPORT="$OUT_DIR/overnight-$STAMP.json"
   mapfile -t PENDING < <(find "$INBOX" -maxdepth 1 -type f -name '*.md' ! -name 'README.md' ! -name '_*' 2>/dev/null | sort || true)
   N="${#PENDING[@]}"
   if [[ "$N" -eq 0 ]]; then

@@ -165,7 +165,7 @@ impl SparkEngine {
             .unwrap_or_else(|| reason.chars().take(120).collect());
         if let Err(e) = night_lymph::record_spark(
             self.vault.db_path(),
-            date,
+            night_lymph::lymph_night_id(Utc::now()),
             LymphSpark {
                 date: date.to_string(),
                 promoted: false,
@@ -295,7 +295,7 @@ impl SparkEngine {
         );
         if let Err(e) = night_lymph::record_spark(
             self.vault.db_path(),
-            date,
+            night_lymph::lymph_night_id(Utc::now()),
             LymphSpark {
                 date: date.to_string(),
                 promoted,

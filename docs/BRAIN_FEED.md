@@ -77,6 +77,8 @@ bash scripts/tinyfolder-drop.sh --demo --living --apply-takeaway
 # Overnight organ (pending drops → living enqueue, no CLI):
 bash scripts/tinyfolder-overnight.sh --dry-run
 # On CT101: bash scripts/tinyfolder-overnight.sh --on-host
+# Install daily timer (~02:45 UTC) on living host:
+#   ssh ct101 'bash /opt/gzmo/current/scripts/install-tinyfolder-overnight-timer.sh'
 bash scripts/tinyfolder-check.sh
 # living-enqueue.json: proposed takeaways + applied[] when --apply-takeaway;
 # refuses if workstation gzmo-serve is active (dual-writer)

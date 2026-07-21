@@ -93,6 +93,14 @@ bash scripts/ct101-brain-feed-sync.sh
 
 Do **not** restart `gzmo-daemon` for script-only syncs. The sync script asserts `ActiveEnterTimestamp` unchanged.
 
+## TinyFolder overnight timer (living host)
+
+```bash
+# After script sync (or binary deploy):
+ssh ct101 'bash /opt/gzmo/current/scripts/install-tinyfolder-overnight-timer.sh'
+# Drop notes into /opt/gzmo/data/inbox/ — timer fires ~02:45 UTC
+```
+
 ## Quality / Brain Feed gates (workstation → CT101)
 
 ```bash

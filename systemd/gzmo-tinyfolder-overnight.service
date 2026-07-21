@@ -1,0 +1,20 @@
+[Unit]
+Description=GZMO TinyFolder overnight enqueue on CT101 (no CLI)
+Documentation=file:///opt/gzmo/current/docs/BRAIN_FEED.md
+After=network-online.target gzmo-daemon.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=maximilian
+Group=maximilian
+WorkingDirectory=/opt/gzmo
+Environment=GZMO_CONFIG=/opt/gzmo/gzmo.toml
+Environment=TINYFOLDER_INBOX=/opt/gzmo/data/inbox
+Environment=GZMO_DATA_NEXT=/opt/gzmo/data
+Environment=CT101_GZMO_BIN=/opt/gzmo/current/target/release/gzmo
+ExecStart=/opt/gzmo/current/scripts/tinyfolder-overnight.sh --on-host
+Nice=10
+
+[Install]
+WantedBy=multi-user.target
