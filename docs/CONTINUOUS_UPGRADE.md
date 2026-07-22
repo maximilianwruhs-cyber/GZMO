@@ -144,7 +144,7 @@ bash scripts/living-host-mutex.sh release
 | P0 ✓ | beat-gate kit (5 loops) | Done — fixture cognition+ops honesty; kit `ok=true` 5/5 |
 | P0 ✓ | versioned beat baselines | Done — LTL #20 + kit honesty (`gate_passed` + `baseline_id`) |
 | P0 ✓ | promote-loop record ritual | Done — `scripts/promote-loop.sh` record-only |
-| P0 | promote-loop living apply (knowledge) | Active — `PROMOTE_APPLY=1` + mutex; soak after overnight |
+| P0 | promote-loop living apply (knowledge\|cognition) | Active — pins on CT101; soak after overnight |
 | P1 | HSP dialect MIDI | Keep demable theater; optional motif schema only |
 | P1 ✓ | Obolus `beats_with_mad` | Done — Arena DNA/dogfood MAD + Forge near-tie pins (human pin) |
 | P1 ✓ | Thought Cabinet crystallize | Done — cabinet-sim recipe goldens + soft saturation (lab) |
