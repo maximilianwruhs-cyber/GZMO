@@ -35,6 +35,14 @@ Operator research bets for GZMO upgrades. Doctrine: [docs/OPPORTUNITY_DISCOVERY.
 | [soak-honest-nights](soak-honest-nights.md) | 19 | candidate | Honest soak nights (≥18h spacing) |
 | [promote-loop-living-apply](promote-loop-living-apply.md) | 21 | candidate | Promote-loop living apply (gated handoff recipe) |
 | [promote-by-loop-first](promote-by-loop-first.md) | 22 | soaked | First promote-by-loop (narrow cognition or knowledge) |
+| [rem-dream-substrate](rem-dream-substrate.md) | 22 | soaked | REM substrate in dream recipe (Experience A) |
+| [arena-night-reliable](arena-night-reliable.md) | 20 | soaked | Arena night suggest-only reliability |
+| [calibration-pin-ritual](calibration-pin-ritual.md) | 21 | soaked | Calibration / Arena human pin ritual |
+| [serendipity-weekly-apply](serendipity-weekly-apply.md) | 20 | candidate | Serendipity capped weekly apply habit |
+| [honeypot-lifecycle-surface](honeypot-lifecycle-surface.md) | 22 | soaked | Honeypot lifecycle / ripen visibility |
+| [organ-watchdog-habit](organ-watchdog-habit.md) | 19 | soaked | Organ-trace + missed-run watchdog habit |
+| [evidence-faithfulness-floor](evidence-faithfulness-floor.md) | 18 | soaked | Evidence-locate faithfulness floor |
+| [stale-sweetness-craft](stale-sweetness-craft.md) | 21 | soaked | Stale-sweetness craft deepen (A→S) |
 | [local-intel-32gb-128k](local-intel-32gb-128k.md) | — | horizon | Local strong model + long context on 32GB VRAM |
 
 ## Schema (YAML frontmatter)

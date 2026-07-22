@@ -331,6 +331,36 @@ pub async fn format_ecosystem_status(config: &GzmoConfig) -> String {
     }
     out.push_str("\n");
 
+    // Experience F — honeypot / ripen visibility (prefer census artifact, else live SQL)
+    let life_path = config
+        .memory
+        .vault_db
+        .parent()
+        .map(|p| p.join("honeypot-lifecycle/latest.json"));
+    if let Some(ref lp) = life_path {
+        if let Ok(raw) = std::fs::read_to_string(lp) {
+            if let Ok(v) = serde_json::from_str::<serde_json::Value>(&raw) {
+                out.push_str("### Honeypot lifecycle\n\n");
+                out.push_str(&format!(
+                    "- **latest:** {}\n",
+                    v.get("latest").and_then(|x| x.as_u64()).unwrap_or(0)
+                ));
+                out.push_str(&format!(
+                    "- **recall≥1 / ≥3:** {} / {}\n",
+                    v.get("recall_ge1").and_then(|x| x.as_u64()).unwrap_or(0),
+                    v.get("recall_ge3").and_then(|x| x.as_u64()).unwrap_or(0)
+                ));
+                out.push_str(&format!(
+                    "- **ripen dual≈:** {}\n",
+                    v.get("ripen_dual_approx")
+                        .and_then(|x| x.as_u64())
+                        .unwrap_or(0)
+                ));
+                out.push_str(&format!("- **Path:** `{}`\n\n", lp.display()));
+            }
+        }
+    }
+
     // Last spark lineage (Experience B)
     if let Some(card) = crate::spark_lineage::load_spark_lineage(&config.memory.vault_db) {
         let md = card.format_markdown();

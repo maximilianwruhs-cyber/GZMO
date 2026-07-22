@@ -161,7 +161,7 @@ Rank axes (as requested): (1) Brain Feed / nutrient / airgap-living USP · (2) u
 
 ---
 
-### O7 — REM substrate into dream recipe — P1 · 2–4 weeks
+### O7 — REM substrate into dream recipe — ✅ SOAKED 2026-07-22
 
 **Thrust:** Wire `rem-substrate` into `session-to-dream.sh` when anchors exist (ADR-0002-safe; fixture first).
 
@@ -178,7 +178,7 @@ Rank axes (as requested): (1) Brain Feed / nutrient / airgap-living USP · (2) u
 
 ---
 
-### O8 — Arena night boringly reliable — P1 · weeks
+### O8 — Arena night boringly reliable — ✅ SOAKED 2026-07-22 (artifact check; force-run optional)
 
 **Thrust:** Overnight Arena → `data-next/arena/latest.json` + champion suggestion on a schedule operators trust — still suggest-only.
 
@@ -196,7 +196,7 @@ Rank axes (as requested): (1) Brain Feed / nutrient / airgap-living USP · (2) u
 
 ---
 
-### O9 — Calibration / Arena human pin ritual — P1 · weeks
+### O9 — Calibration / Arena human pin ritual — ✅ SOAKED 2026-07-22
 
 **Thrust:** Real pins: ≥1 accepted + ≥1 rejected-with-reason via `promote-fused` / `brain-intel-promote.sh`.
 
@@ -213,7 +213,7 @@ Rank axes (as requested): (1) Brain Feed / nutrient / airgap-living USP · (2) u
 
 ---
 
-### O10 — Serendipity capped weekly apply → vault mass — P1 · ongoing
+### O10 — Serendipity capped weekly apply → vault mass — OPEN habit (candidate bet)
 
 **Thrust:** Keep cadence → review ≤3 → human apply as the nutrient pump (plumbing soaked; mass still thin).
 
@@ -230,7 +230,7 @@ Rank axes (as requested): (1) Brain Feed / nutrient / airgap-living USP · (2) u
 
 ---
 
-### O11 — Honeypot lifecycle / ripen visibility — P1 · 3–6 weeks
+### O11 — Honeypot lifecycle / ripen visibility — ✅ SOAKED 2026-07-22
 
 **Thrust:** Make Experience F undeniable: vault/honeypot/pending counts + lifecycle stages on operator surface.
 
@@ -248,7 +248,7 @@ Rank axes (as requested): (1) Brain Feed / nutrient / airgap-living USP · (2) u
 
 ---
 
-### O12 — LTL goldens for spark refractory + lifecycle — P1 · 3–6 weeks
+### O12 — LTL goldens for spark refractory + lifecycle — ✅ SOAKED 2026-07-21 (excluded from O7–O15 *queue* because already done)
 
 **Thrust:** Port/deepen spark refractory + honeypot lifecycle tests into LTL golden fixtures (Ring 3 honesty).
 
@@ -265,7 +265,7 @@ Rank axes (as requested): (1) Brain Feed / nutrient / airgap-living USP · (2) u
 
 ---
 
-### O13 — Living organ-trace habit + missed-run watchdog — P2 · weeks
+### O13 — Living organ-trace habit + missed-run watchdog — ✅ SOAKED 2026-07-22
 
 **Thrust:** Prove which organs fired overnight; alert if distill/dream missed >26h.
 
@@ -282,7 +282,7 @@ Rank axes (as requested): (1) Brain Feed / nutrient / airgap-living USP · (2) u
 
 ---
 
-### O14 — Evidence-locate / faithfulness CI floor — P2 · 4–8 weeks
+### O14 — Evidence-locate / faithfulness floor — ✅ SOAKED 2026-07-22 (local fixture; not GH Actions)
 
 **Thrust:** Attach evidence spans to promote/verify; faithfulness fixture green in CI.
 
@@ -296,7 +296,7 @@ Rank axes (as requested): (1) Brain Feed / nutrient / airgap-living USP · (2) u
 
 ---
 
-### O15 — Stale-sweetness craft deepen (A→S) — P2 · monthly Ring 4
+### O15 — Stale-sweetness craft deepen — ✅ SOAKED 2026-07-22 (via O6; monthly Ring 4 deepen remains)
 
 **Thrust:** One monthly uniqueness craft PR: deepen spark-link scoring / refractory interaction; re-score canvas.
 
