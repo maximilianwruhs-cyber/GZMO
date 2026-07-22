@@ -135,11 +135,18 @@ for line in os.environ.get("FELT_ROWS_TSV", "").splitlines():
         entry.update(
             {
                 "skill": d.get("skill"),
+                "invoked": d.get("invoked") or d.get("skill"),
+                "cascade_skill": d.get("cascade_skill")
+                or ((d.get("cascade") or {}).get("skill") if isinstance(d.get("cascade"), dict) else None),
+                "roll": d.get("roll"),
+                "max": d.get("max"),
                 "ok": d.get("ok"),
-                "tier": d.get("tier"),
-                "band": d.get("band"),
+                "tier": d.get("tier")
+                or ((d.get("cascade") or {}).get("tier") if isinstance(d.get("cascade"), dict) else None),
+                "band": d.get("band")
+                or ((d.get("cascade") or {}).get("band") if isinstance(d.get("cascade"), dict) else None),
                 "display_chars": d.get("display_chars") or len(plain),
-                "preview": plain.strip()[:900],
+                "preview": plain.strip()[:1200],
             }
         )
     rows.append(entry)
@@ -164,11 +171,20 @@ lines = [
     "",
 ]
 for r in rows:
-    lines.append(f"## {r['name']} (`{r.get('skill') or '?'}`)")
+    title = r["name"]
+    skill = r.get("skill") or "?"
+    casc = r.get("cascade_skill")
+    if casc and casc != skill:
+        heading = f"## {title} (`{skill}` → `{casc}`)"
+    else:
+        heading = f"## {title} (`{skill}`)"
+    lines.append(heading)
     lines.append("")
     lines.append(f"- status: {r['status']}")
+    if r.get("roll") is not None and r.get("max") is not None:
+        lines.append(f"- roll: {r['roll']}/{r['max']}")
     if r.get("tier"):
-        lines.append(f"- tier/band: {r.get('tier')} / {r.get('band')}")
+        lines.append(f"- wild-magic tier/band: {r.get('tier')} / {r.get('band')}")
     lines.append(f"- chars: {r.get('display_chars', 0)}")
     lines.append("")
     preview = r.get("preview") or "(no display)"
