@@ -247,6 +247,10 @@ PROMOTE_LOOP=knowledge PROMOTE_ACK=1 bash scripts/promote-loop.sh
 bash scripts/production-readiness-gate.sh
 ```
 
+## Actions-minute budget
+
+Prefer local checks (`*-check.sh`) over PR spam. CI: docs path-ignore, cancel-in-progress, LTL beat-gates weekly/manual only.
+
 ## Related
 
 - [ADR-0005-flywheel-over-frozen-topology.md](./ADR-0005-flywheel-over-frozen-topology.md)
