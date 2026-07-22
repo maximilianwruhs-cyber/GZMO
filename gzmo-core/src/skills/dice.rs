@@ -126,7 +126,8 @@ impl Skill for DiceSkill {
             }
         }
 
-        let mut evidence = None;
+        let mut cascade_evidence = None;
+        let mut cascade_skill: Option<String> = None;
         if let Some(plan) = cascade {
             let cascade_fb = cascade_feedback_event(&plan, roll);
             let _ = ctx.feedback_tx.send(cascade_fb.clone()).await;
@@ -138,20 +139,41 @@ impl Skill for DiceSkill {
                     Ok((nested, meta)) => {
                         display.push_str(&nested.display);
                         feedback.extend(nested.feedback.clone());
-                        evidence = Some(cascade_evidence_json(&plan, &meta, &nested, true, None));
+                        cascade_skill = Some(plan.skill.clone());
+                        cascade_evidence =
+                            Some(cascade_evidence_json(&plan, &meta, &nested, true, None));
                     }
                     Err(err) => display.push_str(&format_cascade_failure(&plan, &err.to_string())),
                 }
             } else {
                 display.push_str(&format_cascade_plan(&plan, roll, max));
+                cascade_skill = Some(plan.skill.clone());
             }
+        }
+
+        // Honest --json envelope: always skill=dice; Wild Magic child lives under cascade.
+        let mut evidence = serde_json::json!({
+            "skill": "dice",
+            "roll": roll,
+            "max": max,
+            "variant": variant,
+            "ok": true,
+            "display_chars": display.len(),
+            "feedback_count": feedback.len(),
+            "display_plain": crate::text_util::pi_skill_display(&display),
+        });
+        if let Some(child) = cascade_skill {
+            evidence["cascade_skill"] = serde_json::Value::String(child);
+        }
+        if let Some(casc) = cascade_evidence {
+            evidence["cascade"] = casc;
         }
 
         Ok(SkillOutput {
             display,
             feedback,
             inject_to_conversation: true,
-            evidence,
+            evidence: Some(evidence),
         })
     }
 }

@@ -6,25 +6,33 @@
 
 ## What you feel
 
-One-shot ritual skills (`dice` / `card` / `story`) via `gzmo chaos skill` — Wild Magic cascade, card forge, story brief. Feedback queues for chat/TUI drain. **Never** starts PulseLoop or the living daemon.
+One-shot ritual skills (`dice` / `card` / `story`) via `gzmo chaos skill`. Feedback queues for chat/TUI drain. **Never** starts PulseLoop or the living daemon.
 
 ```bash
 bash scripts/pantheon-ritual-demo.sh
-bash scripts/pantheon-ritual-check.sh
+# → data-next/pantheon-ritual/felt-latest.md   (human-readable)
+# → bash scripts/pantheon-ritual-check.sh      (expect GREEN)
+
 bash scripts/pi/chaos_skill.sh dice d20 --json
 bash scripts/pi/chaos_skill.sh card --json
 bash scripts/pi/chaos_skill.sh story --json
 ```
 
-Use `scripts/pi/chaos_skill.sh` (prefers the temp-bench release binary). A stale `target/release/gzmo` may open interactive chat instead of the one-shot skill path — rebuild or point `GZMO_BIN` / `CARGO_TARGET_DIR` at a binary that knows `chaos skill`.
+`scripts/pi/chaos_skill.sh` **probes** binaries and refuses a stale `gzmo` that opens interactive chat instead of the one-shot path. Rebuild if it complains:
+
+```bash
+CARGO_TARGET_DIR=$HOME/github-clone/temp-bench/target cargo build -p gzmo-cli --release
+```
 
 ## Skills
 
 | Skill | Feel |
 |-------|------|
-| `dice` | Corpus narrative + nested cascade (may land on define/poem/…) |
+| `dice` | Chaos roll + event text; often **Wild Magic** cascading into another skill (`define` / `poem` / …). `--json` reports `skill: "dice"` with `cascade_skill` / `cascade` for the child. |
 | `card` | Card forge (legendary pack path) |
 | `story` | CCL-aware story brief |
+
+Wild Magic is intentional theater — not a bug and not a living KPI failure. Tier labels like `MINOR SETBACK` come from the dice event table.
 
 ## Hard rules
 

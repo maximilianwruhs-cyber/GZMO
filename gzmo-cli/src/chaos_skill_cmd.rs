@@ -62,13 +62,44 @@ pub async fn run(config: &GzmoConfig, args: &[String]) -> Result<()> {
     }
 
     if json {
-        let payload = output.evidence.unwrap_or_else(|| {
+        // Always stamp the invoked skill. Nested Wild Magic (e.g. dice → define)
+        // must not overwrite the top-level skill name in --json output.
+        let mut payload = output.evidence.unwrap_or_else(|| {
             serde_json::json!({
                 "skill": cmd,
                 "display": output.display,
                 "feedback_count": output.feedback.len(),
             })
         });
+        if let Some(obj) = payload.as_object_mut() {
+            let claimed = obj.get("skill").and_then(|v| v.as_str()).unwrap_or("");
+            if claimed != cmd.as_str() {
+                // Legacy / nested evidence: wrap so callers see the real invocation.
+                let nested = serde_json::Value::Object(obj.clone());
+                *obj = serde_json::Map::new();
+                obj.insert("skill".into(), serde_json::json!(cmd));
+                obj.insert("invoked".into(), serde_json::json!(cmd));
+                obj.insert("nested_evidence".into(), nested);
+                obj.insert(
+                    "feedback_count".into(),
+                    serde_json::json!(output.feedback.len()),
+                );
+            } else {
+                obj.insert("invoked".into(), serde_json::json!(cmd));
+            }
+            if !obj.contains_key("display_plain") && !output.display.is_empty() {
+                obj.insert(
+                    "display_plain".into(),
+                    serde_json::json!(output.display.clone()),
+                );
+            }
+            if !obj.contains_key("display_chars") && !output.display.is_empty() {
+                obj.insert(
+                    "display_chars".into(),
+                    serde_json::json!(output.display.len()),
+                );
+            }
+        }
         println!("{}", serde_json::to_string_pretty(&payload)?);
     } else if !output.display.is_empty() {
         print!("{}", output.display);
