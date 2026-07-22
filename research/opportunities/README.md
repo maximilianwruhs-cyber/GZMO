@@ -38,7 +38,7 @@ Operator research bets for GZMO upgrades. Doctrine: [docs/OPPORTUNITY_DISCOVERY.
 | [rem-dream-substrate](rem-dream-substrate.md) | 22 | soaked | REM substrate in dream recipe (Experience A) |
 | [arena-night-reliable](arena-night-reliable.md) | 20 | soaked | Arena night suggest-only reliability |
 | [calibration-pin-ritual](calibration-pin-ritual.md) | 21 | soaked | Calibration / Arena human pin ritual |
-| [serendipity-weekly-apply](serendipity-weekly-apply.md) | 20 | candidate | Serendipity capped weekly apply habit |
+| [serendipity-weekly-apply](serendipity-weekly-apply.md) | 20 | soaked | Serendipity capped weekly apply habit |
 | [honeypot-lifecycle-surface](honeypot-lifecycle-surface.md) | 22 | soaked | Honeypot lifecycle / ripen visibility |
 | [organ-watchdog-habit](organ-watchdog-habit.md) | 19 | soaked | Organ-trace + missed-run watchdog habit |
 | [evidence-faithfulness-floor](evidence-faithfulness-floor.md) | 18 | soaked | Evidence-locate faithfulness floor |
