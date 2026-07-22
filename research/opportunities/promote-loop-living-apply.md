@@ -59,3 +59,5 @@ bash scripts/ct101-living-probe.sh
 - Serendipity week **2026-W30 = 3/3** capped applies done
 - Nutrient transfer: 6 curated takeaways enqueued (no vault merge)
 - **Soak remaining (Done when #4):** BF + keep-quality GREEN **after one overnight** calendar night
+- Soak verifier: `bash scripts/promote-loop-soak-check.sh` → `data-next/beat-gate/promotions/soak-latest.{json,md}`
+  (HOLD until min pin age ≥12h by default; then mark this bet `soaked`)

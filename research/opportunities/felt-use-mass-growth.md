@@ -2,6 +2,7 @@
 id: felt-use-mass-growth
 title: Felt Use mass growth (share_ge3_of_latest)
 status: candidate
+parked: true
 score: 22
 uniqueness: 4
 brain_profit: 5

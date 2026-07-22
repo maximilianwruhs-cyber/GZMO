@@ -31,14 +31,16 @@ Protects USP bar so Unpark cannot claim strengthen while soak is theatrical.
 
 ## Progress 2026-07-22
 
-- Scar still live: `soak_spacing_hold` — trailing_GREEN=3 but honest_nights=1 (rejected_close=2)
-- Keep-quality gate GREEN today (counts as one honest sample only after ≥18h from prior)
-- **Blocked on wall-clock** — cannot finish this bet in one session
+- Scar still live: `soak_spacing_hold`
+- **honest_nights=2** after sample appended ~45h after prior GREEN (need 3)
+- Keep-quality gate GREEN; rejected_close=2 remain from 2026-07-20 same-hour streak
+- **Blocked on wall-clock** for night #3 (≥18h after this sample)
 
 ## Operator
 
 ```bash
 # Once per calendar night for 3 nights:
+bash scripts/keep-quality-soak.sh
 bash scripts/keep-quality-soak.sh --summary
 ```
 
