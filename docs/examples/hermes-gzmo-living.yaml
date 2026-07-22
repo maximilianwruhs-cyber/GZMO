@@ -1,0 +1,11 @@
+# Hermes / generic YAML — paste under mcp_servers (label MUST be gzmo-living).
+# Do NOT put this under gzmo-memory. Do NOT set GZMO_PRODUCT or GZMO_ALLOW_LAB_VAULT.
+# Prove with: bash scripts/living-attach-check.sh
+# Repo example only — does not rewrite ~/.hermes.
+# Generate a machine-absolute stanza: bash scripts/emit-living-mcp-fragment.sh --format hermes
+mcp_servers:
+  gzmo-living:
+    command: "/ABS/PATH/TO/GZMO/scripts/pi-gzmo-mcp-serve.sh"
+    args: []
+    env:
+      GZMO_LIVING: "1"

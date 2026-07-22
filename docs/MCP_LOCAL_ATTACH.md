@@ -63,12 +63,17 @@ bash scripts/mcp-attach-check.sh
 # Living label present / not mislabeled as gzmo-memory
 bash scripts/living-mcp-attach-check.sh
 
+# Fail-closed living vault proof (external agents / Hermes)
+bash scripts/living-attach-check.sh
+bash scripts/emit-living-mcp-fragment.sh --format hermes
+
 # On the living box itself (preferred USP):
 GZMO_CONFIG=/path/to/living.toml gzmo mcp-serve   # client-spawned; do not leave listening on 0.0.0.0
 ```
 
 ## Related
 
+- [EXTERNAL_LIVING_ATTACH.md](./EXTERNAL_LIVING_ATTACH.md) — agent DO/NEVER + emit/check kit  
 - [PRODUCT_MCP.md](./PRODUCT_MCP.md) — lite stranger install  
 - [AIRGAP_LIVING.md](./AIRGAP_LIVING.md) — living hero path  
 - [PI_GZMO_MEMORY_INTEGRATION.md](./PI_GZMO_MEMORY_INTEGRATION.md) — ops SSH living attach  
