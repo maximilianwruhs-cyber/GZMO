@@ -114,13 +114,15 @@ bash scripts/beat-gate-kit.sh --loops config,cognition,knowledge,discovery,ops
 # Ring 3 honesty (lifecycle + spark refractory goldens)
 bash scripts/lifecycle-goldens-check.sh
 # Claim living host before overnight prove / promote (ADR-0005)
-bash scripts/living-host-mutex.sh claim --host workstation --note "cognition prove"
-# Record-only promote ritual (living apply still gated — see promote-loop-living-apply bet)
+bash scripts/living-host-mutex.sh claim --host ct101 --note "promote-apply knowledge"
+# Record-only:
 PROMOTE_LOOP=knowledge PROMOTE_ACK=1 bash scripts/promote-loop.sh
+# Living apply (knowledge only; disposable-vault doctrine):
+# PROMOTE_LOOP=knowledge PROMOTE_ACK=1 PROMOTE_APPLY=1 bash scripts/promote-loop.sh
 bash scripts/living-host-mutex.sh release
 ```
 
-**Exit:** target loops PASS fixture with boolean `gate_passed`; PASS + ack ⇒ promote record (living apply is a separate bet). FAIL ⇒ fix PR first.
+**Exit:** target loops PASS fixture with boolean `gate_passed`; PASS + ack ⇒ promote record; PASS + ack + `PROMOTE_APPLY=1` + mutex ⇒ knowledge pin on living host (`/opt/gzmo/data/beat-gate/promotions/`). FAIL ⇒ fix PR first. Whole-host still needs `CUTOVER_APPROVED=1`.
 
 ### Ring 4 — Portfolio craft (monthly)
 
@@ -141,7 +143,8 @@ bash scripts/living-host-mutex.sh release
 | P0 ✓ | herdr living enqueue | Done — `herdr-metabolism-check` GREEN living_ok |
 | P0 ✓ | beat-gate kit (5 loops) | Done — fixture cognition+ops honesty; kit `ok=true` 5/5 |
 | P0 ✓ | versioned beat baselines | Done — LTL #20 + kit honesty (`gate_passed` + `baseline_id`) |
-| P0 ✓ | promote-loop record ritual | Done — `scripts/promote-loop.sh` (living apply parked) |
+| P0 ✓ | promote-loop record ritual | Done — `scripts/promote-loop.sh` record-only |
+| P0 | promote-loop living apply (knowledge) | Active — `PROMOTE_APPLY=1` + mutex; soak after overnight |
 | P1 | HSP dialect MIDI | Keep demable theater; optional motif schema only |
 | P1 ✓ | Obolus `beats_with_mad` | Done — Arena DNA/dogfood MAD + Forge near-tie pins (human pin) |
 | P1 ✓ | Thought Cabinet crystallize | Done — cabinet-sim recipe goldens + soft saturation (lab) |

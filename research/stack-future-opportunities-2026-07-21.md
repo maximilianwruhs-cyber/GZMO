@@ -36,7 +36,7 @@ Rank axes (as requested): (1) Brain Feed / nutrient / airgap-living USP · (2) u
 | 2 | O2 | Honest soak nights (≥18h spacing → `soak_ready_unpark_ok`) | P0 | days–2w | ★★★★★ | ★ | ★★★★ | none |
 | 3 | O3 | Grow Felt Use mass (`share_ge3_of_latest`) via real MCP work | P0 | weeks | ★★★★★ | ★★★ | ★★★ | low (side-effect) |
 | 4 | O4 | Beat-gate versioned baselines + non-null `gate_passed` | P0 | 1–2w | ★★★★ | ★★★ | ★★★★★ | none (fixture) |
-| 5 | O5 | First promote-by-loop (narrow cognition/knowledge) | P0 | 1–2w | ★★★★★ | ★★★ | ★★★★★ | **mutex required** |
+| 5 | O5 | First promote-by-loop (narrow cognition/knowledge) | ✅ | apply landed · overnight soak | ★★★★★ | ★★★ | ★★★★★ | **mutex required** |
 | 6 | O6 | Spark lineage operator surface | ✅ | soaked | ★★★★ | ★★★★★ | ★★★ | none |
 | 7 | O7 | REM substrate into dream recipe (fixture→beat) | P1 | 2–4w | ★★★★★ | ★★★★ | ★★★★ | low (lab first) |
 | 8 | O8 | Arena night boringly reliable (suggest-only) | P1 | weeks | ★★★★ | ★★★ | ★★ | low (outside daemon) |
@@ -125,21 +125,21 @@ Rank axes (as requested): (1) Brain Feed / nutrient / airgap-living USP · (2) u
 
 ---
 
-### O5 — First promote-by-loop (narrow) — P0 · 1–2 weeks
+### O5 — First promote-by-loop (narrow) — ✅ LIVING APPLY LANDED 2026-07-22 (overnight soak pending)
 
 **Thrust:** Exercise ADR-0005 / LTL-0003 once: beat-gate PASS + mutex + operator ack → hand off **one** loop into current living host.
 
-**Why rare / USP:** Flywheel over frozen topology is the process USP ([ADR-0005](../docs/ADR-0005-flywheel-over-frozen-topology.md); [CT101_BOUNDARY.md](../docs/CT101_BOUNDARY.md)). Doctrine exists; product ritual is still unproven.
+**Why rare / USP:** Flywheel over frozen topology is the process USP ([ADR-0005](../docs/ADR-0005-flywheel-over-frozen-topology.md); [CT101_BOUNDARY.md](../docs/CT101_BOUNDARY.md)).
 
 **Evidence:**
-- Promote-by-loop allowed — [LTL ADR-0003](../../little-tools-lab/docs/adr/0003-promote-by-loop.md); [CONTINUOUS_UPGRADE.md](../docs/CONTINUOUS_UPGRADE.md) Ring 3 S3
-- Living host mutex script present — `scripts/living-host-mutex.sh` (cheat sheet in CONTINUOUS_UPGRADE)
-- Kit green is input to promote decisions, not a museum badge — LTL ADR-0003 Consequences
-- Decision tree requires `dual_writer_risk=false` + ack — [CONTINUOUS_UPGRADE.md](../docs/CONTINUOUS_UPGRADE.md) §Decision tree
+- Record ritual soaked — [promote-by-loop-first.md](opportunities/promote-by-loop-first.md)
+- Living apply active — [promote-loop-living-apply.md](opportunities/promote-loop-living-apply.md): `PROMOTE_APPLY=1` knowledge-only; CT101 pin `knowledge.v1` + `session-to-dream.sh` handoff; rollback under `/opt/gzmo/data/beat-gate/promotions/rollback`
+- Post-apply Brain Feed GREEN + living probe OK (2026-07-22)
+- Disposable-vault doctrine: protect writer+recipe; felt-use mass parked as candidate
 
-**Next ship slice:** Pick **knowledge** or **cognition** after O4 baselines; `living-host-mutex.sh claim`; `PROMOTE_LOOP=<name>` handoff script path documented; release mutex; no `CUTOVER_APPROVED=1`.
+**Soak remaining:** BF + living probe GREEN after one overnight, then soak the bet.
 
-**Risk:** Dual-writer if mutex skipped; silent graft if ack skipped. **Soak:** craft allowed while soak HOLD — [ADR-0005](../docs/ADR-0005-flywheel-over-frozen-topology.md) §C.4.
+**Risk:** Dual-writer if mutex skipped; silent graft if ack skipped. Multi-loop / cutover still refused.
 
 ---
 
