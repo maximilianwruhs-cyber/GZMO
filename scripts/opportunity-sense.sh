@@ -121,37 +121,55 @@ if cad:
         else:
             scars.append("serendipity_apply_stale — candidate/active bet exists; still needs apply proof")
 
-# Soak honesty: trailing samples too close
+# Soak honesty: prefer newest GREEN pair; ignore ancient same-hour streaks once
+# a later honest sample exists (≥12h from previous counted night).
 soak_path = data / "keep-quality" / "soak-log.jsonl"
 soak_gap_hours = None
 if soak_path.is_file():
     try:
-        rows = []
+        from datetime import datetime as dt
+
+        def parse(t):
+            return dt.fromisoformat(str(t).replace("Z", "+00:00"))
+
+        greens = []
         for line in soak_path.read_text(encoding="utf-8").splitlines():
             if not line.strip():
                 continue
-            rows.append(json.loads(line))
-        # last 3 GREEN-ish timestamps if present
-        ts = []
-        for r in rows[-6:]:
+            r = json.loads(line)
+            if r.get("verdict") != "GREEN":
+                continue
             t = r.get("generated_at") or r.get("ts") or r.get("timestamp")
             if t:
-                ts.append(t)
-        if len(ts) >= 2:
-            from datetime import datetime as dt
-            def parse(t):
-                return dt.fromisoformat(str(t).replace("Z", "+00:00"))
-            gaps = []
-            parsed = [parse(t) for t in ts[-3:]]
-            for a, b in zip(parsed, parsed[1:]):
-                gaps.append(abs((b - a).total_seconds()) / 3600.0)
-            if gaps:
-                soak_gap_hours = round(min(gaps), 2)
-                if soak_gap_hours < 12:
-                    scars.append(
-                        f"soak_samples_too_close — min_gap_h={soak_gap_hours} "
-                        "(nights claim needs honest spacing)"
-                    )
+                greens.append(parse(t))
+        greens.sort()
+        # Honest nights: walk newest→oldest with ≥18h spacing (same as keep-quality-soak --summary)
+        honest = 0
+        anchor = None
+        for ts in reversed(greens):
+            if anchor is None:
+                honest = 1
+                anchor = ts
+                continue
+            gap_h = (anchor - ts).total_seconds() / 3600.0
+            if gap_h >= 18.0:
+                honest += 1
+                anchor = ts
+        if len(greens) >= 2:
+            soak_gap_hours = round(
+                abs((greens[-1] - greens[-2]).total_seconds()) / 3600.0, 2
+            )
+        # Scar only while honest nights incomplete AND the newest pair is too close
+        if honest < 3 and soak_gap_hours is not None and soak_gap_hours < 12:
+            scars.append(
+                f"soak_samples_too_close — min_gap_h={soak_gap_hours} "
+                f"(honest_nights={honest}/3; nights claim needs ≥18h spacing)"
+            )
+        elif honest < 3:
+            scars.append(
+                f"soak_nights_incomplete — honest_nights={honest}/3 "
+                "(need ≥18h-spaced GREEN samples)"
+            )
     except Exception:
         pass
 
