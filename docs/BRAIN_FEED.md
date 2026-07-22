@@ -112,6 +112,8 @@ bash scripts/serendipity-weekly-check.sh     # weekly cap honesty
 
 ```bash
 bash scripts/brain-intel-promote.sh
+# Theater front door (suggest→pin-log, no living apply):
+#   bash scripts/arena-pin-demo.sh   # docs/ARENA_PIN_DEMO.md
 # → data-next/brain-intel/latest.json
 # Review calibration suggestion + Arena champion-suggestion.toml; merge by hand on living host
 ```
