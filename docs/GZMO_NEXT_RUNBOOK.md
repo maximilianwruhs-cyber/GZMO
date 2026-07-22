@@ -213,6 +213,7 @@ bash scripts/herdr-metabolism-link.sh   # link herdr plugin gzmo.metabolism (MCP
 bash scripts/hsp-metabolism-sonify.sh [--play]  # metabolism artifacts → MIDI/WAV motif
 bash scripts/hsp-emit-demo.sh [--play] [--motif spark_flare]  # theater front door — docs/HSP_DEMO.md
 bash scripts/pantheon-ritual-demo.sh    # pantheon felt dice/card/story — docs/PANTHEON_DEMO.md
+bash scripts/arena-pin-demo.sh          # Arena→Pin theater — docs/ARENA_PIN_DEMO.md
 
 bash scripts/euro-night-aggregate.sh    # Arena history + metabolism €/night
 bash scripts/price-window-suggest.sh    # Awattar ±2h distill/dream suggestion (no cron mutate)

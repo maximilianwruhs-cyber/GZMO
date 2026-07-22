@@ -36,6 +36,8 @@ Product roadmap: `Obolus/ROADMAP.md`
 |-------|-----------|
 | IpW router | `scripts/ipw-route.sh`, `config/ipw-router.policy.toml`, `scripts/ipw-route-check.sh` |
 | Arena night | `scripts/arena-lab-check.sh` → `data-next/arena-lab/` |
+| **Arena → Pin theater** | `bash scripts/arena-pin-demo.sh` — [ARENA_PIN_DEMO.md](./ARENA_PIN_DEMO.md) |
 | Opportunity inventory | [STACK_OPPORTUNITY_MAP.md](./STACK_OPPORTUNITY_MAP.md) |
 
 A+C GREEN unlocked Wave 3. Arena still must not become `gzmo-daemon` metabolism.
+Human pin only — never auto-merge champion into living toml from the theater path.
