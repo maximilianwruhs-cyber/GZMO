@@ -212,6 +212,7 @@ bash scripts/herdr-metabolism-link.sh   # link herdr plugin gzmo.metabolism (MCP
 #   takeaway via overlay close-ritual, selection, or $(herdr plugin config-dir gzmo.metabolism)/takeaway.txt
 bash scripts/hsp-metabolism-sonify.sh [--play]  # metabolism artifacts → MIDI/WAV motif
 bash scripts/hsp-emit-demo.sh [--play] [--motif spark_flare]  # theater front door — docs/HSP_DEMO.md
+bash scripts/pantheon-ritual-demo.sh    # pantheon felt dice/card/story — docs/PANTHEON_DEMO.md
 
 bash scripts/euro-night-aggregate.sh    # Arena history + metabolism €/night
 bash scripts/price-window-suggest.sh    # Awattar ±2h distill/dream suggestion (no cron mutate)
