@@ -19,7 +19,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 sys.path.insert(0, str(Path(os.environ["ROOT"]) / "scripts"))
-from opportunity_lib import load_bets, compute_score, ship_bar
+from opportunity_lib import load_bets, compute_score, ship_bar, shipable_priority
 
 out = Path(os.environ["OUT"])
 opp = Path(os.environ["OPP"])
@@ -32,13 +32,17 @@ for b in bets:
         "id": b.get("id"),
         "title": b.get("title"),
         "status": b.get("status"),
+        "parked": bool(
+            b.get("parked") is True
+            or (isinstance(b.get("parked"), str) and str(b.get("parked")).lower() in ("true", "yes", "1"))
+        ),
         "score": score,
         "uniqueness": b.get("uniqueness"),
         "brain_profit": b.get("brain_profit"),
         "credit_cost": b.get("credit_cost"),
         "attention_cost": b.get("attention_cost"),
         "usp_fit": b.get("usp_fit"),
-        "ship_bar": ship_bar(b) if b.get("status") != "horizon" else False,
+        "ship_bar": ship_bar(b),
         "path": b.get("path"),
     })
 
@@ -47,7 +51,10 @@ ranked = sorted(
     key=lambda r: (-int(r["score"]), r["id"]),
 )
 horizon = [r for r in rows if r["status"] == "horizon"]
-shipable = [r for r in ranked if r["ship_bar"] and r["status"] in ("candidate", "active")]
+shipable = sorted(
+    [r for r in ranked if r["ship_bar"] and r["status"] in ("candidate", "active")],
+    key=shipable_priority,
+)
 
 payload = {
     "schema": "gzmo.opportunity.rank/v1",
@@ -68,8 +75,9 @@ payload = {
 
 md = ["# Opportunity rank", "", f"Generated: {payload['generated_at']}", "", "| Rank | Id | Score | Status | Ship bar | Title |", "|------|----|-------|--------|----------|-------|"]
 for i, r in enumerate(ranked, 1):
+    ship = "yes" if r["ship_bar"] else ("parked" if r.get("parked") else "no")
     md.append(
-        f"| {i} | `{r['id']}` | {r['score']} | {r['status']} | {'yes' if r['ship_bar'] else 'no'} | {r['title']} |"
+        f"| {i} | `{r['id']}` | {r['score']} | {r['status']} | {ship} | {r['title']} |"
     )
 if horizon:
     md += ["", "## Horizon (not scored)", ""]

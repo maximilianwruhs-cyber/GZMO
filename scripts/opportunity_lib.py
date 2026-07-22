@@ -27,6 +27,8 @@ def parse_frontmatter(text: str) -> dict[str, Any]:
             data[key] = [x.strip().strip("'\"") for x in inner.split(",") if x.strip()] if inner else []
         elif val.isdigit():
             data[key] = int(val)
+        elif val.lower() in ("true", "false", "yes", "no"):
+            data[key] = val.lower() in ("true", "yes")
         else:
             data[key] = val
     return data
@@ -59,6 +61,12 @@ def compute_score(bet: dict[str, Any]) -> int | None:
 
 
 def ship_bar(bet: dict[str, Any]) -> bool:
+    """True when a bet is eligible to recommend as next craft (not parked/horizon)."""
+    if bet.get("status") == "horizon":
+        return False
+    parked = bet.get("parked")
+    if parked is True or (isinstance(parked, str) and parked.lower() in ("true", "yes", "1")):
+        return False
     score = compute_score(bet)
     if score is None:
         return False
@@ -67,3 +75,12 @@ def ship_bar(bet: dict[str, Any]) -> bool:
         and int(bet.get("brain_profit") or 0) >= 3
         and int(bet.get("usp_fit") or 0) >= 4
     )
+
+
+def shipable_priority(bet_row: dict[str, Any]) -> tuple:
+    """Prefer active soak/mission bets over candidates when ranking shipable."""
+    status = bet_row.get("status") or ""
+    # active first (0), then candidate (1), else last
+    status_rank = 0 if status == "active" else (1 if status == "candidate" else 2)
+    score = int(bet_row.get("score") or 0)
+    return (status_rank, -score, bet_row.get("id") or "")

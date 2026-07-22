@@ -30,10 +30,11 @@ Operator research bets for GZMO upgrades. Doctrine: [docs/OPPORTUNITY_DISCOVERY.
 | [serendipity-apply-cadence](serendipity-apply-cadence.md) | 21 | soaked | Cheap serendipity promote cadence (no chat tourism) |
 | [opportunity-discovery-cycle](opportunity-discovery-cycle.md) | 22 | soaked | This cycle (Sense→Rank→Bet→Ship) |
 | [beat-gate-versioned-baselines](beat-gate-versioned-baselines.md) | 21 | soaked | Beat-gate versioned baselines + honest gate_passed |
-| [felt-use-mass-growth](felt-use-mass-growth.md) | 22 | candidate | Felt Use mass growth (share_ge3_of_latest) — parked under disposable-vault |
+| [felt-use-mass-growth](felt-use-mass-growth.md) | 22 | candidate (parked) | Felt Use mass growth (share_ge3_of_latest) — parked under disposable-vault |
 | [spark-lineage-surface](spark-lineage-surface.md) | 22 | soaked | Spark lineage operator surface (Experience B) |
-| [soak-honest-nights](soak-honest-nights.md) | 19 | candidate | Honest soak nights (≥18h spacing) |
+| [soak-honest-nights](soak-honest-nights.md) | 19 | candidate | Honest soak nights (≥18h spacing) — honest_nights=2/3 |
 | [promote-loop-living-apply](promote-loop-living-apply.md) | 21 | active | Promote-loop living apply (gated handoff recipe) |
+| [promote-loop-ops-discovery](promote-loop-ops-discovery.md) | 20 | candidate | Promote-loop living apply for ops + discovery (after cognition soak) |
 | [promote-by-loop-first](promote-by-loop-first.md) | 22 | soaked | First promote-by-loop (narrow cognition or knowledge) |
 | [rem-dream-substrate](rem-dream-substrate.md) | 22 | soaked | REM substrate in dream recipe (Experience A) |
 | [arena-night-reliable](arena-night-reliable.md) | 20 | soaked | Arena night suggest-only reliability |
