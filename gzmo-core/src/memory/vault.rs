@@ -273,6 +273,37 @@ impl SqliteVault {
             )?;
             init_conn.execute_batch("PRAGMA user_version = 8")?;
         }
+        let user_version: u32 = init_conn.query_row("PRAGMA user_version", [], |row| row.get(0))?;
+        if user_version < 9 {
+            // Repair: some living DBs reached user_version=8 without utility_score.
+            let has_utility: bool = {
+                let mut stmt = init_conn.prepare("PRAGMA table_info(honeypot)")?;
+                let cols: Vec<String> = stmt
+                    .query_map([], |row| row.get::<_, String>(1))?
+                    .filter_map(|r| r.ok())
+                    .collect();
+                cols.iter().any(|c| c == "utility_score")
+            };
+            if !has_utility {
+                init_conn.execute(
+                    "ALTER TABLE honeypot ADD COLUMN utility_score REAL NOT NULL DEFAULT 0.0",
+                    [],
+                )?;
+                let _ = init_conn.execute_batch(
+                    "UPDATE honeypot
+                     SET utility_score = CAST(recall_count AS REAL)
+                     WHERE utility_score = 0.0 AND recall_count > 0;",
+                );
+                init_conn.execute_batch(
+                    "CREATE INDEX IF NOT EXISTS idx_honeypot_utility
+                     ON honeypot(is_latest, utility_score DESC);",
+                )?;
+                info!("Applied schema migration v9: repair honeypot.utility_score");
+            } else {
+                info!("Schema migration v9: utility_score already present");
+            }
+            init_conn.execute_batch("PRAGMA user_version = 9")?;
+        }
 
         info!("Semantic vault initialized (WAL mode + r2d2 pool)");
 

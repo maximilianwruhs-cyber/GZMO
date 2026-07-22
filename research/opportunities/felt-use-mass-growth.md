@@ -18,7 +18,7 @@ updated: 2026-07-22
 
 ## Unparked (ten-leap G4 — 2026-07-22)
 
-Vault vanity (`share_ge3_of_latest`) stays secondary under disposable-vault. **Activate after** [`promote-loop-living-apply`](promote-loop-living-apply.md) soaks: ship MemRL-inspired `utility_score` on honeypot (schema v8), reinforce bumps utility, retrieval orders by utility then recall.
+Vault vanity (`share_ge3_of_latest`) stays secondary under disposable-vault. **Activate after** [`promote-loop-living-apply`](promote-loop-living-apply.md) soaks: ship MemRL-inspired `utility_score` on honeypot (schema v8; **v9 repairs** living DBs that bumped `user_version` without the column), reinforce bumps utility, retrieval orders by utility then recall.
 
 ## Why rare
 
@@ -30,7 +30,7 @@ Honeypot that gets *useful* becomes the body — ripen honesty + search quality 
 
 ## Done when
 
-1. Living vault schema has `honeypot.utility_score` (migration v8) and MCP/search orders by it
+1. Living vault schema has `honeypot.utility_score` (migration v8/v9) and MCP/search orders by it
 2. Weekly `felt-use-depth.sh` + utility census show rising dual-gate / utility mass from real sessions
 3. Brain Feed stays GREEN; no memory-gym
 
