@@ -12,6 +12,7 @@ row() { local s="$1" n="$2" d="$3"; ROWS+=("$s|$n|$d"); case "$s" in PASS) pass=
 
 echo "=== Pantheon ritual check (Unpark W2.1) ==="
 [[ -f "$ROOT/docs/PANTHEON_SKILLS.md" ]] && row PASS "front-door" "PANTHEON_SKILLS.md" || row FAIL "front-door" "missing"
+[[ -f "$ROOT/docs/PANTHEON_DEMO.md" ]] && row PASS "demo-door" "PANTHEON_DEMO.md" || row HOLD "demo-door" "missing theater front door"
 [[ -d "$ROOT/docs/research/pantheon" ]] && row PASS "archive" "docs/research/pantheon/" || row HOLD "archive" "archive dir missing"
 
 for sk in dice.rs card.rs story.rs; do
@@ -88,6 +89,27 @@ raise SystemExit(0 if ok else 1)
   fi
 else
   row HOLD "demo-inventory" "no demo.json yet — bash scripts/pantheon-ritual-demo.sh"
+fi
+
+# Felt one-shots (dice/card/story) — theater only; missing is HOLD not RED
+if [[ -f "$OUT/felt-latest.json" ]]; then
+  if python3 -c "
+import json
+d=json.load(open('$OUT/felt-latest.json'))
+names={s.get('name') for s in d.get('samples') or []}
+ok=(
+  d.get('schema')=='gzmo.unpark.pantheon.felt/v1'
+  and d.get('ok') is True
+  and {'dice','card','story'} <= names
+)
+raise SystemExit(0 if ok else 1)
+"; then
+    row PASS "felt-sample" "felt-latest.json — dice/card/story one-shots"
+  else
+    row HOLD "felt-sample" "felt-latest incomplete — rerun pantheon-ritual-demo.sh (check GZMO_BIN)"
+  fi
+else
+  row HOLD "felt-sample" "no felt-latest yet — bash scripts/pantheon-ritual-demo.sh"
 fi
 
 ROWS_TSV="$(printf '%s\n' "${ROWS[@]}")"

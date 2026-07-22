@@ -1,12 +1,14 @@
 # Pantheon skills (front door)
 
-**Status:** Operator front door (2026-07-19)  
+**Status:** Operator front door (2026-07-19) · theater demo: [PANTHEON_DEMO.md](./PANTHEON_DEMO.md)  
 **Living SoT (chaos policy):** [CHAOS_LIVING_VS_RITUAL.md](./CHAOS_LIVING_VS_RITUAL.md)  
 **Quality bar:** [SKILL_GOLDEN_STANDARD.md](./SKILL_GOLDEN_STANDARD.md)  
 **Bridge:** [SKILLS_BRIDGE.md](./SKILLS_BRIDGE.md)
 
 Ritual / chat pantheon surface — **not** CT101 living KPI. Skills are bounded
 registry actions (`dispatch_skill` → `Skill` trait), not chat macros.
+
+**Demable:** `bash scripts/pantheon-ritual-demo.sh` → inventory + felt dice/card/story.
 
 ## Slash skills (Slice A on main)
 
