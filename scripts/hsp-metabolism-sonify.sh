@@ -39,6 +39,11 @@ MOTIFS = {
     "watchdog_ok": (64, 50, 100),
     "watchdog_stale": (41, 110, 500),  # F2 warning
     "idle": (48, 30, 80),
+    "distill_tick": (60, 90, 180),
+    "spark_flare": (79, 110, 160),   # G5
+    "dream_deep": (45, 75, 520),     # A2
+    "promote_pin": (69, 100, 240),   # A4
+    "serendipity": (71, 88, 200),    # B4
 }
 
 
@@ -70,7 +75,6 @@ def events_from_artifacts():
     arena = load(data / "arena" / "latest.json")
     if arena:
         n, v, d = MOTIFS["arena"]
-        # Scale duration by z if present
         z = float(arena.get("z") or 0.5)
         d = int(d * (0.6 + 0.8 * max(0.0, min(1.0, z))))
         ev.append({"kind": "arena", "ok": True, "note": n, "vel": v, "dur_ms": d, "z": z})
@@ -90,22 +94,39 @@ def events_from_artifacts():
         for i in range(min(fired, 8)):
             ev.append({"kind": "organ", "ok": True, "note": n + (i % 3), "vel": v, "dur_ms": d})
 
+    # Living promote pins (theater mirror of craft — does not claim Brain Feed)
+    promo = data / "beat-gate" / "promotions"
+    for loop_name, motif_key in (("knowledge", "promote_pin"), ("cognition", "spark_flare")):
+        pin = load(promo / f"living-applied-{loop_name}.json")
+        if not pin or pin.get("loop") != loop_name:
+            continue
+        n, v, d = MOTIFS[motif_key]
+        ev.append({"kind": f"promote_pin:{loop_name}", "ok": True, "note": n, "vel": v, "dur_ms": d})
+
+    ser = load(data / "serendipity" / "weekly-check-latest.json") or {}
+    if ser.get("ok"):
+        n, v, d = MOTIFS["serendipity"]
+        week = int(ser.get("week_applies") or 0)
+        v = max(40, min(127, v + week * 8))
+        ev.append({"kind": "serendipity", "ok": True, "note": n, "vel": v, "dur_ms": d, "week_applies": week})
+
     # Unpark Wave 2.3 file-drop motifs (hsp-emit-demo) → short phrase
     emit = load(data / "hsp-emit" / "latest-event.json")
     if emit and emit.get("motif"):
         intensity = float(emit.get("intensity") or 0.35)
-        n, v, d = MOTIFS.get("distill", MOTIFS["idle"])
-        if emit.get("motif") == "distill_tick":
-            n, v, d = MOTIFS["distill"]
+        motif = str(emit.get("motif"))
+        n, v, d = MOTIFS.get(motif, MOTIFS["distill"])
         v = max(40, min(127, int(v * (0.7 + 0.6 * intensity))))
+        d = int(d * (0.8 + 0.5 * intensity))
         ev.append(
             {
-                "kind": f"hsp_emit:{emit.get('motif')}",
+                "kind": f"hsp_emit:{motif}",
                 "ok": True,
                 "note": n,
                 "vel": v,
                 "dur_ms": d,
                 "source": "hsp-emit",
+                "intensity": intensity,
             }
         )
 
@@ -147,21 +168,21 @@ def write_midi(path: Path, events):
 
 
 def write_preview_wav(path: Path, events, sr=22050):
-    # Tiny square-ish preview so --play works without FluidSynth.
+    # Soft sine preview so --play is listenable without FluidSynth.
+    import math
     samples = []
     for ev in events:
         freq = 440.0 * (2 ** ((ev["note"] - 69) / 12.0))
         n = max(1, int(sr * ev["dur_ms"] / 1000.0))
-        amp = 0.15 * (ev["vel"] / 127.0)
+        amp = 0.22 * (ev["vel"] / 127.0)
         for i in range(n):
             t = i / sr
-            # soft square
-            s = amp if (int(t * freq * 2) % 2 == 0) else -amp
-            # short attack/release
-            env = min(1.0, i / (0.01 * sr), (n - i) / (0.02 * sr))
+            s = amp * math.sin(2 * math.pi * freq * t)
+            # light 2nd harmonic
+            s += 0.08 * amp * math.sin(4 * math.pi * freq * t)
+            env = min(1.0, i / (0.012 * sr), (n - i) / (0.03 * sr + 1))
             samples.append(int(max(-1, min(1, s * env)) * 32767))
-        # gap
-        samples.extend([0] * int(sr * 0.04))
+        samples.extend([0] * int(sr * 0.045))
     with wave.open(str(path), "w") as w:
         w.setnchannels(1)
         w.setsampwidth(2)

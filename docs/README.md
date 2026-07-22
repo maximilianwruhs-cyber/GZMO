@@ -30,6 +30,7 @@ Canonical operator and architecture docs. Session reports and milestone logs bel
 | [LOST_KNOWLEDGE_INVENTORY.md](LOST_KNOWLEDGE_INVENTORY.md) | Archaeology index — branch/plan scars recovered |
 | [PANTHEON_SKILLS.md](PANTHEON_SKILLS.md) | Ritual/lab pantheon front door (dice/card/story research) |
 | [PANTHEON_DEMO.md](PANTHEON_DEMO.md) | Pantheon ritual theater (dice/card/story felt; not Brain Feed) |
+| [HSP_DEMO.md](HSP_DEMO.md) | HSP metabolism sonification theater (MIDI/WAV; not Brain Feed) |
 | [MUTUAL_DISCOVERY_THEATER.md](MUTUAL_DISCOVERY_THEATER.md) | Pedagogy theater front door (not scout KPI) |
 | [PRODUCTION_READINESS.md](PRODUCTION_READINESS.md) | Production gate checklist |
 
