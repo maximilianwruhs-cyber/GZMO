@@ -1,7 +1,7 @@
 ---
 id: felt-use-mass-growth
 title: Felt Use mass growth (share_ge3_of_latest)
-status: active
+status: candidate
 score: 22
 uniqueness: 4
 brain_profit: 5
@@ -10,18 +10,24 @@ attention_cost: 3
 usp_fit: 5
 stack_ids: [m1]
 created: 2026-07-21
-updated: 2026-07-21
+updated: 2026-07-22
 ---
 
 # Felt Use mass growth
 
+## Parked (disposable-vault doctrine 2026-07-22)
+
+Living vault contents are regenerable (empty on a fresh machine). Growing `share_ge3_of_latest` is no longer P0 — protect the **writer and the recipe**, regenerate the vault. Active mission moved to [`promote-loop-living-apply`](promote-loop-living-apply.md).
+
+Re-activate only if vault mass becomes a demability / ripen-product claim again (not a vanity floor).
+
 ## Why rare
 
-Depth among *felt* facts is already GREEN (~0.75). Vault-wide mass is still thin (`share_ge3_of_latest≈0.0037` on ~38k). Ripen dual-gate honesty at scale needs more facts with `recall≥3` from real living MCP work — not another meter, not memory-gym.
+Depth among *felt* facts is already GREEN. Vault-wide mass was thin; under disposable-vault that metric is secondary to craft handoff.
 
 ## Brain profit
 
-More honeypot rows eligible for overnight ripen → denser airgap living brain.
+More honeypot rows eligible for overnight ripen → denser airgap living brain (when vault mass is valued).
 
 ## Done when
 

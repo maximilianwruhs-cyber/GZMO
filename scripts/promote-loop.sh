@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # Promote-by-loop ritual (ADR-0005 / LTL ADR-0003) — never silent.
 #
-#   # Dry-run after kit PASS (writes promotion record only):
+#   # Record-only after kit PASS:
 #   PROMOTE_LOOP=knowledge PROMOTE_ACK=1 bash scripts/promote-loop.sh
 #
-#   # Require living-host mutex claim when writing toward a living host:
-#   bash scripts/living-host-mutex.sh claim --host workstation --note "promote knowledge"
-#   PROMOTE_LOOP=knowledge PROMOTE_ACK=1 PROMOTE_APPLY=0 bash scripts/promote-loop.sh
+#   # Living apply (knowledge only — disposable-vault doctrine: protect writer+recipe):
+#   bash scripts/living-host-mutex.sh claim --host ct101 --note "promote-apply knowledge"
+#   PROMOTE_LOOP=knowledge PROMOTE_ACK=1 PROMOTE_APPLY=1 bash scripts/promote-loop.sh
 #   bash scripts/living-host-mutex.sh release
 #
 # Whole-host cutover still needs CUTOVER_APPROVED=1 — this script refuses that path.
@@ -20,11 +20,13 @@ OUT="$DATA/beat-gate/promotions"
 LOOP="${PROMOTE_LOOP:-}"
 ACK="${PROMOTE_ACK:-}"
 APPLY="${PROMOTE_APPLY:-0}"
+LIVING_HOST="${PROMOTE_LIVING_HOST:-ct101}"
+LIVING_PROMOTIONS="${PROMOTE_LIVING_PROMOTIONS:-/opt/gzmo/data/beat-gate/promotions}"
 export CARGO_TARGET_DIR="${CARGO_TARGET_DIR:-$CLONE/temp-bench/target}"
 
 usage() {
   echo "Usage: PROMOTE_LOOP=<config|ops|cognition|knowledge|discovery> PROMOTE_ACK=1 bash $0" >&2
-  echo "  PROMOTE_APPLY=1 reserved (currently refused — record-only first ship)" >&2
+  echo "  PROMOTE_APPLY=1 — knowledge only; requires mutex claim + dual_writer_risk=false" >&2
   exit 2
 }
 
@@ -41,8 +43,8 @@ if [[ "${CUTOVER_APPROVED:-}" == "1" ]]; then
   echo "error: CUTOVER_APPROVED=1 is whole-host cutover — use cutover tooling, not promote-loop" >&2
   exit 2
 fi
-if [[ "$APPLY" == "1" ]]; then
-  echo "error: PROMOTE_APPLY=1 not enabled yet — first ship is record-only (ADR-0005)" >&2
+if [[ "$APPLY" == "1" && "$LOOP" != "knowledge" ]]; then
+  echo "error: PROMOTE_APPLY=1 enabled for knowledge only (narrow blast radius)" >&2
   exit 2
 fi
 
@@ -54,9 +56,9 @@ META="$OUT/pre-${LOOP}-meta.json"
 bash "$LAB/scripts/beat-gate.sh" --loop "$LOOP" --fixture --meta "$META"
 
 echo "=== promote-loop: mutex / dual-writer ==="
-export MUTEX_JSON OUT LOOP META ROOT
+export MUTEX_JSON OUT LOOP META ROOT LAB APPLY LIVING_HOST LIVING_PROMOTIONS
 python3 - <<'PY'
-import json, os, subprocess
+import json, os, shutil, subprocess
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -64,6 +66,11 @@ out = Path(os.environ["OUT"])
 loop = os.environ["LOOP"]
 meta_path = Path(os.environ["META"])
 root = Path(os.environ["ROOT"])
+lab = Path(os.environ["LAB"])
+apply = os.environ.get("APPLY", "0") == "1"
+living_host = os.environ.get("LIVING_HOST") or "ct101"
+living_promotions = os.environ.get("LIVING_PROMOTIONS") or "/opt/gzmo/data/beat-gate/promotions"
+
 meta = json.loads(meta_path.read_text(encoding="utf-8"))
 mutex = {}
 try:
@@ -74,57 +81,249 @@ except Exception:
 gate = (meta.get("metrics") or {}).get("gate_passed")
 beats = meta.get("beats_incumbent")
 baseline_id = meta.get("baseline_id")
+baseline_path = meta.get("baseline_path")
 dual = mutex.get("dual_writer_risk")
 claim = mutex.get("claim") or {}
+claim_host = claim.get("host")
 
 ok = bool(gate) and bool(beats) and bool(baseline_id) and dual is not True
+apply_error = None
+applied = None
+rollback = None
+mode = "record_only"
+
+if apply:
+    mode = "living_apply"
+    if not claim_host:
+        ok = False
+        apply_error = "mutex_claim_required — bash scripts/living-host-mutex.sh claim --host ct101 --note 'promote-apply knowledge'"
+    elif dual is True:
+        ok = False
+        apply_error = "refused_dual_writer — stop workstation gzmo-serve/scheduler before living apply"
+    elif loop != "knowledge":
+        ok = False
+        apply_error = "apply_loop_not_enabled — knowledge only"
+    elif not ok:
+        apply_error = "beat_gate_blocked — need gate_passed+baseline_id before apply"
+    else:
+        stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+        baseline_src = Path(baseline_path) if baseline_path else (lab / "fixtures/beat-baselines/knowledge.v1.json")
+        if not baseline_src.is_file():
+            ok = False
+            apply_error = f"baseline_missing:{baseline_src}"
+        else:
+            # Local rollback + handoff package
+            pkg = out / f"handoff-{loop}-{stamp}"
+            pkg.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(baseline_src, pkg / baseline_src.name)
+            recipe = {
+                "schema": "gzmo.promote_loop.handoff_recipe/v1",
+                "loop": loop,
+                "recipe": "session-to-dream.sh",
+                "baseline_id": baseline_id,
+                "baseline_file": baseline_src.name,
+                "living_host": living_host,
+                "living_promotions": living_promotions,
+                "doctrine": "protect_writer_and_recipe_regenerate_vault",
+                "rollback": [
+                    f"On {living_host}: restore {living_promotions}/rollback/ from this apply stamp",
+                    f"Or delete {living_promotions}/living-applied.json to clear the promote pin",
+                    "Do not wipe vault unless intentionally regenerating (disposable-vault doctrine)",
+                ],
+                "non_goals": [
+                    "whole-host cutover (needs CUTOVER_APPROVED=1)",
+                    "silent toml/model overnight swap",
+                    "multi-loop apply",
+                ],
+            }
+            (pkg / "handoff-recipe.json").write_text(json.dumps(recipe, indent=2) + "\n", encoding="utf-8")
+            (pkg / "handoff-recipe.md").write_text(
+                "\n".join([
+                    f"# Knowledge living handoff — {stamp}",
+                    "",
+                    f"- loop: `{loop}`",
+                    f"- baseline: `{baseline_id}`",
+                    f"- recipe: `session-to-dream.sh` (lab knowledge beat)",
+                    f"- host: `{living_host}:{living_promotions}`",
+                    "",
+                    "## Rollback",
+                    "",
+                    f"1. SSH `{living_host}`",
+                    f"2. `rm -rf {living_promotions}/current && mv {living_promotions}/rollback {living_promotions}/current` (if rollback/ present)",
+                    f"3. Or remove `{living_promotions}/living-applied.json`",
+                    "",
+                    "Vault wipe is acceptable under disposable-vault doctrine; restore **recipe pin**, not facts.",
+                    "",
+                ]) + "\n",
+                encoding="utf-8",
+            )
+
+            # Snapshot remote promotions into rollback/, then install current/
+            remote_prep = (
+                f"bash -lc 'set -euo pipefail; "
+                f"mkdir -p {living_promotions}; "
+                f"if [ -d {living_promotions}/current ] || [ -f {living_promotions}/living-applied.json ]; then "
+                f"  rm -rf {living_promotions}/rollback; "
+                f"  mkdir -p {living_promotions}/rollback; "
+                f"  if [ -d {living_promotions}/current ]; then cp -a {living_promotions}/current/. {living_promotions}/rollback/; fi; "
+                f"  if [ -f {living_promotions}/living-applied.json ]; then cp -a {living_promotions}/living-applied.json {living_promotions}/rollback/; fi; "
+                f"fi; "
+                f"rm -rf {living_promotions}/current; mkdir -p {living_promotions}/current'"
+            )
+            p = subprocess.run(
+                ["ssh", "-o", "ConnectTimeout=12", "-o", "BatchMode=yes", living_host, remote_prep],
+                capture_output=True, text=True,
+            )
+            if p.returncode != 0:
+                ok = False
+                apply_error = f"remote_prep:{(p.stderr or p.stdout)[:300]}"
+            else:
+                scp = subprocess.run(
+                    [
+                        "scp", "-o", "ConnectTimeout=12", "-o", "BatchMode=yes", "-q",
+                        str(pkg / baseline_src.name),
+                        str(pkg / "handoff-recipe.json"),
+                        str(pkg / "handoff-recipe.md"),
+                        f"{living_host}:{living_promotions}/current/",
+                    ],
+                    capture_output=True, text=True,
+                )
+                if scp.returncode != 0:
+                    ok = False
+                    apply_error = f"scp_handoff:{(scp.stderr or scp.stdout)[:300]}"
+                else:
+                    living_applied = {
+                        "schema": "gzmo.promote_loop.living_applied/v1",
+                        "applied_at": datetime.now(timezone.utc).isoformat(),
+                        "loop": loop,
+                        "baseline_id": baseline_id,
+                        "recipe": "session-to-dream.sh",
+                        "handoff_package": str(pkg),
+                        "claim_host": claim_host,
+                        "claim_note": claim.get("note"),
+                        "rollback_dir": f"{living_promotions}/rollback",
+                        "soak_next": "brain-feed-check.sh + living probe GREEN after one overnight",
+                    }
+                    local_applied = pkg / "living-applied.json"
+                    local_applied.write_text(json.dumps(living_applied, indent=2) + "\n", encoding="utf-8")
+                    scp2 = subprocess.run(
+                        [
+                            "scp", "-o", "ConnectTimeout=12", "-o", "BatchMode=yes", "-q",
+                            str(local_applied),
+                            f"{living_host}:{living_promotions}/living-applied.json",
+                        ],
+                        capture_output=True, text=True,
+                    )
+                    if scp2.returncode != 0:
+                        ok = False
+                        apply_error = f"scp_living_applied:{(scp2.stderr or scp2.stdout)[:300]}"
+                    else:
+                        # Soft living prove: binary + promotions pin present (no daemon restart)
+                        prove = subprocess.run(
+                            [
+                                "ssh", "-o", "ConnectTimeout=12", "-o", "BatchMode=yes", living_host,
+                                f"bash -lc 'test -x /opt/gzmo/current/target/release/gzmo && "
+                                f"test -f {living_promotions}/living-applied.json && "
+                                f"test -f {living_promotions}/current/{baseline_src.name} && "
+                                f"echo living_apply_prove_ok'",
+                            ],
+                            capture_output=True, text=True,
+                        )
+                        if prove.returncode != 0 or "living_apply_prove_ok" not in (prove.stdout or ""):
+                            ok = False
+                            apply_error = f"living_prove:{(prove.stderr or prove.stdout)[:300]}"
+                        else:
+                            applied = living_applied
+                            rollback = {
+                                "local_package": str(pkg),
+                                "remote_rollback": f"{living_promotions}/rollback",
+                                "clear_pin": f"rm {living_promotions}/living-applied.json",
+                            }
+
 stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+if apply and applied and ok:
+    advice = (
+        f"promote_loop_living_applied — {loop} pinned on {living_host} "
+        f"(baseline={baseline_id}); soak after overnight BF GREEN"
+    )
+    next_steps = [
+        "bash scripts/living-host-mutex.sh release",
+        "bash scripts/brain-feed-check.sh",
+        "bash scripts/ct101-living-probe.sh",
+        "After overnight: re-run BF + living probe; then soak promote-loop-living-apply bet",
+    ]
+elif apply and apply_error:
+    advice = f"promote_loop_apply_failed — {apply_error}"
+    next_steps = [
+        "Fix mutex/dual-writer/beat-gate, then retry PROMOTE_APPLY=1",
+        "Whole-host still needs CUTOVER_APPROVED=1",
+    ]
+elif ok:
+    advice = "promote_loop_record_ok — review artifact; set PROMOTE_APPLY=1 for knowledge living handoff"
+    next_steps = [
+        "bash scripts/living-host-mutex.sh claim --host ct101 --note 'promote-apply knowledge'",
+        "PROMOTE_LOOP=knowledge PROMOTE_ACK=1 PROMOTE_APPLY=1 bash scripts/promote-loop.sh",
+        "bash scripts/living-host-mutex.sh release",
+    ]
+else:
+    advice = "promote_loop_blocked — need gate_passed+baseline_id and dual_writer_risk!=true"
+    next_steps = [
+        "Fix beat-gate fixture for loop",
+        "bash scripts/living-host-mutex.sh status",
+    ]
+
 payload = {
     "schema": "gzmo.promote_loop/v1",
     "generated_at": datetime.now(timezone.utc).isoformat(),
     "ok": ok,
     "loop": loop,
-    "mode": "record_only",
+    "mode": mode,
     "ack": True,
-    "apply": False,
+    "apply": apply,
     "beats_incumbent": beats,
     "gate_passed": gate,
     "baseline_id": baseline_id,
-    "baseline_path": meta.get("baseline_path"),
+    "baseline_path": baseline_path,
     "mutex": {
         "dual_writer_risk": dual,
-        "claim_host": claim.get("host"),
+        "claim_host": claim_host,
         "claim_note": claim.get("note"),
     },
     "meta": str(meta_path),
-    "advice": (
-        "promote_loop_record_ok — review artifact; living apply not yet enabled"
-        if ok
-        else "promote_loop_blocked — need gate_passed+baseline_id and dual_writer_risk!=true"
-    ),
-    "next": [
-        "Keep PROMOTE_APPLY off until living handoff recipe is reviewed",
-        "bash scripts/living-host-mutex.sh claim|release around any living prove",
-        "Whole-host still needs CUTOVER_APPROVED=1",
-    ],
+    "applied": applied,
+    "rollback": rollback,
+    "apply_error": apply_error,
+    "advice": advice,
+    "next": next_steps,
 }
 path = out / f"promote-{loop}-{stamp}.json"
 path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
 (out / "latest.json").write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
 md = [
-    f"# Promote-loop record — {loop}",
+    f"# Promote-loop — {loop}",
     "",
     f"Verdict: **{'OK' if ok else 'BLOCKED'}**",
     "",
     f"- gate_passed: `{gate}`",
     f"- baseline_id: `{baseline_id}`",
     f"- dual_writer_risk: `{dual}`",
-    f"- mode: record_only (PROMOTE_APPLY refused)",
-    "",
-    payload["advice"],
+    f"- claim_host: `{claim_host}`",
+    f"- mode: `{mode}`",
     "",
 ]
+if applied:
+    md += [
+        "## Living apply",
+        "",
+        f"- host pin: `{living_host}:{living_promotions}/living-applied.json`",
+        f"- recipe: `{applied.get('recipe')}`",
+        f"- rollback: `{rollback}`",
+        "",
+    ]
+if apply_error:
+    md += [f"**Apply error:** {apply_error}", ""]
+md += [advice, ""]
 (out / "latest.md").write_text("\n".join(md) + "\n", encoding="utf-8")
-print(json.dumps({"ok": ok, "path": str(path), "advice": payload["advice"]}, indent=2))
+print(json.dumps({"ok": ok, "path": str(path), "advice": advice, "mode": mode}, indent=2))
 raise SystemExit(0 if ok else 1)
 PY
