@@ -15,6 +15,10 @@ updated: 2026-07-22
 
 # Promote-loop ops + discovery living apply
 
+## Weekly habit (G8)
+
+After cognition soak: one ops **or** discovery loop per week under mutex — Ring 3 flywheel, not heroics.
+
 ## Why rare
 
 Knowledge + cognition living apply is pinned and waiting overnight soak. Ops/discovery stay **record-only** by design until that soak clears — then the same gated recipe can hand off the next narrow blast-radius loops.
@@ -33,6 +37,7 @@ Living host runs lab-beaten ops/discovery recipes overnight without expanding th
 2. Explicit handoff recipe reviewed for `ops` and/or `discovery`
 3. `PROMOTE_APPLY=1` lands at least one of those loops with per-loop pin + rollback
 4. Brain Feed + keep-quality stay GREEN after one overnight post-apply
+5. Cadence: document weekly apply in this file (date + loop id)
 
 ## Depends on
 
@@ -49,7 +54,9 @@ bash scripts/living-host-mutex.sh release
 bash scripts/brain-feed-check.sh
 ```
 
-## Sources
+## Weekly checklist
 
-- [stack-future-opportunities-2026-07-21.md](../stack-future-opportunities-2026-07-21.md) O5 hard blocks
-- Disposable-vault doctrine (flywheel end-of-craft 2026-07-22)
+- [ ] Soak GREEN
+- [ ] Mutex claim
+- [ ] One loop apply + pin artifact
+- [ ] BF + keep-quality GREEN next morning

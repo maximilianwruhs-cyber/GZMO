@@ -1,13 +1,14 @@
-//! Immune Patrol — plan-only contradiction hunt after dream promote.
+//! Immune Patrol — contradiction hunt after dream promote.
 //!
-//! Never mutates the living vault. Emits a supersession *plan* operators (or
-//! forget-lint apply) can review. Self-development: the night that writes also
-//! hunts its own stale dogma.
+//! Default path is plan-only (dry_run). Bounded apply requires explicit confirm
+//! (`IMMUNE_APPLY=1`) and writes an apply receipt for rollback.
+//! Value-forgetting plans use SCM-style low-utility candidates.
 
 use std::path::{Path, PathBuf};
 
 use anyhow::Result;
 use chrono::{NaiveDate, Utc};
+use rusqlite::params;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -287,6 +288,122 @@ pub fn run_patrol(
         candidates = plan.candidates.len(),
         "Immune patrol plan written (dry_run)"
     );
+    Ok(path)
+}
+
+/// SCM-inspired value forgetting: low utility + never felt → tombstone candidates (plan only).
+pub fn run_value_forgetting_plan(
+    vault: &SqliteVault,
+    night: NaiveDate,
+    max_candidates: usize,
+) -> Result<PathBuf> {
+    let conn = vault.db_conn()?;
+    let limit = max_candidates.max(1) as i64;
+    let mut stmt = conn.prepare(
+        "SELECT id, content, utility_score, recall_count, confidence
+         FROM honeypot
+         WHERE is_latest = 1
+           AND utility_score < 1.0
+           AND recall_count = 0
+           AND confidence < 0.92
+         ORDER BY utility_score ASC, confidence ASC
+         LIMIT ?1",
+    )?;
+    let mut candidates = Vec::new();
+    let mut seen = std::collections::HashSet::new();
+    for row in stmt.query_map(params![limit], |row| {
+        Ok((
+            row.get::<_, String>(0)?,
+            row.get::<_, String>(1)?,
+            row.get::<_, f64>(2)?,
+            row.get::<_, i64>(3)?,
+            row.get::<_, f64>(4)?,
+        ))
+    })? {
+        let Ok((id_str, content, util, recall, conf)) = row else {
+            continue;
+        };
+        let Ok(id) = Uuid::parse_str(&id_str) else {
+            continue;
+        };
+        push_candidate(
+            &mut candidates,
+            &mut seen,
+            id,
+            content,
+            "value_forgetting_low_utility",
+            format!("utility={util:.3} recall={recall} conf={conf:.3}"),
+        );
+    }
+    let plan = ImmunePlan {
+        schema: SCHEMA.into(),
+        night_id: night.to_string(),
+        generated_at: Utc::now().to_rfc3339(),
+        dry_run: true,
+        truths_scanned: 0,
+        candidates,
+    };
+    let dir = vault.data_dir().join("immune");
+    std::fs::create_dir_all(&dir)?;
+    let path = dir.join(format!("forget-{night}.json"));
+    let text = serde_json::to_string_pretty(&plan)? + "\n";
+    std::fs::write(&path, &text)?;
+    std::fs::write(dir.join("latest-forget.json"), &text)?;
+    Ok(path)
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ImmuneApplyReport {
+    pub schema: String,
+    pub night_id: String,
+    pub applied_at: String,
+    pub dry_run: bool,
+    pub applied: usize,
+    pub capped: usize,
+    pub fact_ids: Vec<String>,
+    pub rollback_note: String,
+}
+
+const APPLY_SCHEMA: &str = "gzmo.immune.apply/v1";
+
+/// Bounded apply: supersede plan candidates (raw plan kept; curated apply receipt written).
+/// Never runs unless `confirm_apply` is true. Caps at `max_apply`.
+pub fn apply_plan(
+    vault: &SqliteVault,
+    plan: &ImmunePlan,
+    max_apply: usize,
+    confirm_apply: bool,
+) -> Result<PathBuf> {
+    if !confirm_apply {
+        anyhow::bail!("immune apply refused — pass confirm_apply / IMMUNE_APPLY=1");
+    }
+    let cap = max_apply.clamp(1, 50);
+    let conn = vault.db_conn()?;
+    let mut applied_ids = Vec::new();
+    for c in plan.candidates.iter().take(cap) {
+        crate::memory::lifecycle::supersede_honeypot(&conn, &c.fact_id)?;
+        applied_ids.push(c.fact_id.clone());
+    }
+    let report = ImmuneApplyReport {
+        schema: APPLY_SCHEMA.into(),
+        night_id: plan.night_id.clone(),
+        applied_at: Utc::now().to_rfc3339(),
+        dry_run: false,
+        applied: applied_ids.len(),
+        capped: cap,
+        fact_ids: applied_ids.clone(),
+        rollback_note: format!(
+            "Re-set is_latest=1 for fact_ids in this receipt if Keep-quality goes RED. count={}",
+            applied_ids.len()
+        ),
+    };
+    let dir = vault.data_dir().join("immune");
+    std::fs::create_dir_all(&dir)?;
+    let stamp = Utc::now().format("%Y%m%dT%H%M%SZ");
+    let path = dir.join(format!("applied-{stamp}.json"));
+    let text = serde_json::to_string_pretty(&report)? + "\n";
+    std::fs::write(&path, &text)?;
+    std::fs::write(dir.join("latest-apply.json"), text)?;
     Ok(path)
 }
 
