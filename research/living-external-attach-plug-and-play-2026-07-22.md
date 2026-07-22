@@ -250,14 +250,15 @@ Stop before: multi-tenant gateway, second writer, Mem0-compatible cloud SKU, rew
 ## 9. Operator next (if acting)
 
 ```bash
-# Prove living (ops):
-ssh ct101 'cd /opt/gzmo && GZMO_CONFIG=/opt/gzmo/gzmo.toml \
-  /opt/gzmo/current/target/release/gzmo memory status --json'
+# Prove living (ops) — fail-closed agent kit (P0/P1 landed):
+bash scripts/living-attach-check.sh
+bash scripts/emit-living-mcp-fragment.sh --format hermes
+# Docs: docs/EXTERNAL_LIVING_ATTACH.md · docs/examples/
 
 # Cursor path already:
 bash scripts/install-shared-mcp.sh
 bash scripts/living-mcp-attach-check.sh
 
-# Hermes (manual until P3): duplicate gzmo-living stanza from Cursor mcp.json
-# into ~/.hermes/config.yaml under mcp_servers.gzmo-living — do not keep only gzmo-memory.
+# Hermes: paste emitted gzmo-living stanza (do not keep only gzmo-memory).
+# Do not thrash ~/.hermes from scripts — emit to stdout / docs/examples only.
 ```

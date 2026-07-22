@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "gzmo-living": {
+      "command": "/ABS/PATH/TO/GZMO/scripts/pi-gzmo-mcp-serve.sh",
+      "args": [],
+      "env": {
+        "GZMO_LIVING": "1"
+      }
+    }
+  }
+}
