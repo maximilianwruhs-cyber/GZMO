@@ -332,79 +332,14 @@ pub async fn format_ecosystem_status(config: &GzmoConfig) -> String {
     out.push_str("\n");
 
     // Last spark lineage (Experience B)
-    let spark_path = config
-        .memory
-        .vault_db
-        .parent()
-        .map(|p| p.join("spark/last-spark-report.json"));
-    if let Some(ref sp) = spark_path {
-        if sp.exists() {
-            if let Ok(raw) = std::fs::read_to_string(sp) {
-                if let Ok(v) = serde_json::from_str::<serde_json::Value>(&raw) {
-                    out.push_str("### Last spark\n\n");
-                    let anchor = v
-                        .pointer("/selection/anchor/content")
-                        .and_then(|x| x.as_str())
-                        .or_else(|| v.get("anchor_preview").and_then(|x| x.as_str()))
-                        .unwrap_or("(none)");
-                    let stale = v
-                        .pointer("/selection/stale_sweetness")
-                        .and_then(|x| x.as_f64());
-                    let verdict = v.pointer("/verdict/supported").and_then(|x| x.as_bool());
-                    let promoted = v.get("promoted").and_then(|x| x.as_bool());
-                    let dry = v.get("dry_run").and_then(|x| x.as_bool());
-                    let date = v.get("date").and_then(|x| x.as_str()).unwrap_or("?");
-                    out.push_str(&format!("- **Date:** {date}\n"));
-                    out.push_str(&format!(
-                        "- **Anchor:** {}\n",
-                        if anchor.len() > 100 {
-                            format!("{}…", &anchor[..100])
-                        } else {
-                            anchor.into()
-                        }
-                    ));
-                    if let Some(s) = stale {
-                        out.push_str(&format!("- **stale_sweetness:** {s:.2}\n"));
-                    }
-                    if let Some(p) = promoted {
-                        out.push_str(&format!("- **promoted:** {p}\n"));
-                    }
-                    match verdict {
-                        Some(true) => out.push_str("- **Verdict:** supported\n"),
-                        Some(false) => out.push_str("- **Verdict:** not supported\n"),
-                        None => {
-                            if let Some(skip) = v.get("skip_reason").and_then(|x| x.as_str()) {
-                                out.push_str(&format!("- **Skip:** {skip}\n"));
-                            } else if promoted.is_none() {
-                                out.push_str("- **Verdict:** (dry-run / none)\n");
-                            }
-                        }
-                    }
-                    if let Some(d) = dry {
-                        out.push_str(&format!("- **dry_run:** {d}\n"));
-                    }
-                    // gzmo.spark.report/v1 refractory / soft-pick telemetry
-                    if let Some(mult) = v.pointer("/refractory/multiplier").and_then(|x| x.as_f64())
-                    {
-                        let reason = v
-                            .pointer("/refractory/reason")
-                            .and_then(|x| x.as_str())
-                            .unwrap_or("—");
-                        out.push_str(&format!("- **refractory:** ×{mult:.3} ({reason})\n"));
-                    }
-                    if let Some(k) = v.pointer("/soft_pick/top_k").and_then(|x| x.as_u64()) {
-                        let scored = v
-                            .pointer("/soft_pick/candidates_scored")
-                            .and_then(|x| x.as_u64())
-                            .unwrap_or(0);
-                        out.push_str(&format!("- **soft_pick:** top_k={k} candidates={scored}\n"));
-                    }
-                    if let Some(score) = v.get("selection_score").and_then(|x| x.as_f64()) {
-                        out.push_str(&format!("- **selection_score:** {score:.4}\n"));
-                    }
-                    out.push_str(&format!("- **Path:** `{}`\n\n", sp.display()));
-                }
-            }
+    if let Some(card) = crate::spark_lineage::load_spark_lineage(&config.memory.vault_db) {
+        let md = card.format_markdown();
+        // format_markdown uses "# Last spark"; status section uses ###
+        out.push_str(&md.replacen("# Last spark", "### Last spark", 1));
+        if card.experience_b_ok() {
+            out.push_str("- **Experience B:** felt (anchor + stale_sweetness > 0)\n\n");
+        } else {
+            out.push_str("- **Experience B:** thin (need selected mid-window anchor)\n\n");
         }
     }
 

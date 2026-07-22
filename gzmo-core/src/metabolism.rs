@@ -233,6 +233,13 @@ pub struct WikiPlaneSummary {
     pub detail: String,
 }
 
+/// Last spark lineage row for the metabolism TUI (Experience B).
+#[derive(Debug, Clone)]
+pub struct SparkLineageSummary {
+    pub experience_b_ok: bool,
+    pub detail: String,
+}
+
 /// Overnight metabolism board for `gzmo metabolism`.
 #[derive(Debug, Clone)]
 pub struct MetabolismBoard {
@@ -245,6 +252,7 @@ pub struct MetabolismBoard {
     pub wiki: WikiPlaneSummary,
     /// Soft-fail stale signal (does not flip GREEN core-job math into RED).
     pub watchdog: WatchdogRecord,
+    pub spark_lineage: Option<SparkLineageSummary>,
 }
 
 /// Evaluate distill/dream age against stale threshold; write `latest-watchdog.json`.
@@ -362,6 +370,14 @@ pub fn collect_metabolism_board(config: &GzmoConfig) -> MetabolismBoard {
         verdict = format!("YELLOW — {}", watchdog.detail);
     }
 
+    let spark_lineage =
+        crate::spark_lineage::load_spark_lineage(&config.memory.vault_db).map(|card| {
+            SparkLineageSummary {
+                experience_b_ok: card.experience_b_ok(),
+                detail: card.observatory_detail(),
+            }
+        });
+
     MetabolismBoard {
         runs_dir: dir.clone(),
         jobs,
@@ -371,6 +387,7 @@ pub fn collect_metabolism_board(config: &GzmoConfig) -> MetabolismBoard {
         verdict,
         wiki: read_wiki_plane_summary(config),
         watchdog,
+        spark_lineage,
     }
 }
 

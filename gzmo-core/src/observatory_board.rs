@@ -142,6 +142,28 @@ pub async fn collect_health_led_board(config: &GzmoConfig) -> HealthLedBoard {
     let probes_raw = collect_health_probes(config, None).await;
     let mut probes: Vec<HealthLed> = probes_raw.iter().map(led_from_probe).collect();
 
+    // Spark lineage (Experience B) — operator LED, not a network probe
+    match crate::spark_lineage::load_spark_lineage(&config.memory.vault_db) {
+        Some(card) if card.experience_b_ok() => probes.push(HealthLed {
+            id: "spark_lineage".into(),
+            label: "spark_lineage".into(),
+            state: LedState::Up,
+            detail: card.observatory_detail(),
+        }),
+        Some(card) => probes.push(HealthLed {
+            id: "spark_lineage".into(),
+            label: "spark_lineage".into(),
+            state: LedState::Degraded,
+            detail: card.observatory_detail(),
+        }),
+        None => probes.push(HealthLed {
+            id: "spark_lineage".into(),
+            label: "spark_lineage".into(),
+            state: LedState::Down,
+            detail: "no last-spark-report.json under vault/spark/".into(),
+        }),
+    }
+
     // Workflow pack + handoff pointer (operator LED, not a network probe)
     if config.workflow_skills.enabled {
         match crate::workflow_skills::WorkflowSkillIndex::load_from_dir(

@@ -133,7 +133,7 @@ fn render_board(f: &mut ratatui::Frame<'_>, board: &MetabolismBoard, status: &st
         Some(false) => RITUAL,
         None => STEEL,
     };
-    let cargo = vec![
+    let mut cargo = vec![
         Line::from(vec![
             Span::styled("honeypot  ", Style::default().fg(MUTED)),
             Span::styled(
@@ -159,16 +159,28 @@ fn render_board(f: &mut ratatui::Frame<'_>, board: &MetabolismBoard, status: &st
                 Style::default().fg(wiki_color).add_modifier(Modifier::BOLD),
             ),
         ]),
-        Line::from(Span::styled(
-            "Observatory web: http://127.0.0.1:3000/observatory",
-            Style::default().fg(STEEL),
-        )),
     ];
+    if let Some(ref spark) = board.spark_lineage {
+        let spark_color = if spark.experience_b_ok { CYAN } else { GOLD };
+        cargo.push(Line::from(vec![
+            Span::styled("spark     ", Style::default().fg(MUTED)),
+            Span::styled(
+                spark.detail.clone(),
+                Style::default()
+                    .fg(spark_color)
+                    .add_modifier(Modifier::BOLD),
+            ),
+        ]));
+    }
+    cargo.push(Line::from(Span::styled(
+        "Observatory: gzmo observatory · http://127.0.0.1:3000/observatory",
+        Style::default().fg(STEEL),
+    )));
     f.render_widget(
         Paragraph::new(cargo).wrap(Wrap { trim: false }).block(
             Block::default()
                 .borders(Borders::ALL)
-                .title(" CARGO / WIKI ")
+                .title(" CARGO / WIKI / SPARK ")
                 .title_style(Style::default().fg(COPPER).add_modifier(Modifier::BOLD))
                 .border_style(Style::default().fg(theme::DIM)),
         ),

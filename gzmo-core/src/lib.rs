@@ -39,6 +39,7 @@ pub mod session_distill;
 pub mod skills;
 pub mod spark;
 pub mod spark_field;
+pub mod spark_lineage;
 pub mod spark_schedule;
 pub mod stealth;
 pub mod subagent;
