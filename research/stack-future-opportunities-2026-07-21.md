@@ -133,13 +133,13 @@ Rank axes (as requested): (1) Brain Feed / nutrient / airgap-living USP · (2) u
 
 **Evidence:**
 - Record ritual soaked — [promote-by-loop-first.md](opportunities/promote-by-loop-first.md)
-- Living apply active — [promote-loop-living-apply.md](opportunities/promote-loop-living-apply.md): `PROMOTE_APPLY=1` knowledge-only; CT101 pin `knowledge.v1` + `session-to-dream.sh` handoff; rollback under `/opt/gzmo/data/beat-gate/promotions/rollback`
-- Post-apply Brain Feed GREEN + living probe OK (2026-07-22)
+- Living apply active — [promote-loop-living-apply.md](opportunities/promote-loop-living-apply.md): knowledge **and** cognition pinned on CT101 (`living-applied-*.json`); soak after overnight
+- Serendipity week 2026-W30 **3/3**; nutrient transfer enqueued; keep-quality + living-readiness + Brain Feed GREEN same day
 - Disposable-vault doctrine: protect writer+recipe; felt-use mass parked as candidate
 
-**Soak remaining:** BF + living probe GREEN after one overnight, then soak the bet.
+**Soak remaining:** BF + keep-quality GREEN after one overnight calendar night, then soak the bet.
 
-**Risk:** Dual-writer if mutex skipped; silent graft if ack skipped. Multi-loop / cutover still refused.
+**Hard blocks beyond this slice:** honest soak nights (≥18h×3), whole-host cutover, config/ops/discovery living apply.
 
 ---
 

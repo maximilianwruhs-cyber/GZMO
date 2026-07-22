@@ -42,8 +42,8 @@ Moves a proven loop into the current living host so overnight metabolism runs la
 ## Operator
 
 ```bash
-bash scripts/living-host-mutex.sh claim --host ct101 --note "promote-apply knowledge"
-PROMOTE_LOOP=knowledge PROMOTE_ACK=1 PROMOTE_APPLY=1 bash scripts/promote-loop.sh
+bash scripts/living-host-mutex.sh claim --host ct101 --note "promote-apply cognition"
+PROMOTE_LOOP=cognition PROMOTE_ACK=1 PROMOTE_APPLY=1 bash scripts/promote-loop.sh
 bash scripts/living-host-mutex.sh release
 bash scripts/brain-feed-check.sh
 bash scripts/ct101-living-probe.sh
@@ -51,11 +51,11 @@ bash scripts/ct101-living-probe.sh
 
 ## Progress 2026-07-22
 
-- Knowledge-only `PROMOTE_APPLY` enabled (other loops still refused)
-- Handoff installs baseline + receipt on CT101 `/opt/gzmo/data/beat-gate/promotions/` with rollback snapshot
-- **Applied** `2026-07-22T09:09:33Z` — `knowledge.v1` pinned; recipe `session-to-dream.sh`; mutex claim ct101; dual_writer_risk=false
-- Post-apply: Brain Feed **GREEN**; `ct101-living-probe` living_ok
-- **Soak remaining (Done when #4):** re-check BF + living probe **after one overnight**; then mark this bet soaked
-
-Local artifact: `data-next/beat-gate/promotions/latest.md`  
-Remote pin: `/opt/gzmo/data/beat-gate/promotions/living-applied.json`
+- `PROMOTE_APPLY` allowed for **knowledge + cognition** (`PROMOTE_APPLY_LOOPS`)
+- Knowledge pinned `knowledge.v1` / `session-to-dream.sh` (09:09Z)
+- Cognition pinned `cognition.v1` / `cognition-smoke.sh` (10:04Z)
+- Per-loop pins: `living-applied-knowledge.json` + `living-applied-cognition.json` on CT101
+- Post-apply: keep-quality GREEN, living-readiness GREEN, Brain Feed GREEN
+- Serendipity week **2026-W30 = 3/3** capped applies done
+- Nutrient transfer: 6 curated takeaways enqueued (no vault merge)
+- **Soak remaining (Done when #4):** BF + keep-quality GREEN **after one overnight** calendar night
