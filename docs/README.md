@@ -32,6 +32,7 @@ Canonical operator and architecture docs. Session reports and milestone logs bel
 | [PANTHEON_DEMO.md](PANTHEON_DEMO.md) | Pantheon ritual theater (dice/card/story felt; not Brain Feed) |
 | [HSP_DEMO.md](HSP_DEMO.md) | HSP metabolism sonification theater (MIDI/WAV; not Brain Feed) |
 | [ARENA_PIN_DEMO.md](ARENA_PIN_DEMO.md) | Arena → Pin theater (suggest/recommend/pin-log; not living apply) |
+| [WIKI_OBSERVATORY_DEMO.md](WIKI_OBSERVATORY_DEMO.md) | Wiki search + sanitized scoreboard theater (not living GREEN) |
 | [MUTUAL_DISCOVERY_THEATER.md](MUTUAL_DISCOVERY_THEATER.md) | Pedagogy theater front door (not scout KPI) |
 | [PRODUCTION_READINESS.md](PRODUCTION_READINESS.md) | Production gate checklist |
 
@@ -51,7 +52,7 @@ Product non-goals: public multi-tenant MCP webserver, dual overnight writers, SE
 | [UNPARK_ROADMAP.md](UNPARK_ROADMAP.md) | Sequenced Unpark waves after keep-quality soak GREEN |
 | [AOS_CUSTOMER_EDITION.md](AOS_CUSTOMER_EDITION.md) | Wave 4.1 CE sketch (on top of C only) |
 | [OKCP_MARKETPLACE.md](OKCP_MARKETPLACE.md) | Wave 4.2 marketplace notes |
-| [WIKI_OBSERVATORY_MIND.md](WIKI_OBSERVATORY_MIND.md) | Wave 4.3 demable mind notes |
+| [WIKI_OBSERVATORY_MIND.md](WIKI_OBSERVATORY_MIND.md) | Wave 4.3 demable mind notes (front door: [WIKI_OBSERVATORY_DEMO.md](WIKI_OBSERVATORY_DEMO.md)) |
 | [PORTABLE_GZMO_CORE_RFC.md](PORTABLE_GZMO_CORE_RFC.md) | Wave 4.4 portable-core RFC |
 | [STACK_OPPORTUNITY_MAP.md](STACK_OPPORTUNITY_MAP.md) | Portfolio map (Keep/Unpark/Later + nightburst spike inventory) |
 
