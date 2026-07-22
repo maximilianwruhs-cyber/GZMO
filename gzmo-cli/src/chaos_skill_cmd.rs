@@ -72,10 +72,7 @@ pub async fn run(config: &GzmoConfig, args: &[String]) -> Result<()> {
             })
         });
         if let Some(obj) = payload.as_object_mut() {
-            let claimed = obj
-                .get("skill")
-                .and_then(|v| v.as_str())
-                .unwrap_or("");
+            let claimed = obj.get("skill").and_then(|v| v.as_str()).unwrap_or("");
             if claimed != cmd.as_str() {
                 // Legacy / nested evidence: wrap so callers see the real invocation.
                 let nested = serde_json::Value::Object(obj.clone());
