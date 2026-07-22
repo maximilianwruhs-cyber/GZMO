@@ -202,7 +202,7 @@ bash "$ROOT/scripts/herdr-metabolism-check.sh" >>"$LOG" 2>&1 || true
 if [[ -f "$DATA/herdr-metabolism/latest.json" ]] \
   && python3 -c "import json;d=json.load(open('$DATA/herdr-metabolism/latest.json')); raise SystemExit(0 if d.get('ok') else 1)"; then
   advice="$(python3 -c "import json;print(json.load(open('$DATA/herdr-metabolism/latest.json')).get('advice',''))")"
-  if [[ "$advice" == *herdr_metabolism_ok* ]]; then
+  if [[ "$advice" == *herdr_metabolism_ok* || "$advice" == *herdr_metabolism_living_ok* ]]; then
     row PASS "herdr-metabolism" "$advice"
   else
     row HOLD "herdr-metabolism" "$advice"

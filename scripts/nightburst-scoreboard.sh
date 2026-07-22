@@ -1,14 +1,32 @@
 #!/usr/bin/env bash
 # Thin nightburst scoreboard: metabolism + wiki + Arena → sanitized JSON/HTML.
 # Local stranger-demo surface (OKForge /observatory remains agent-discovery).
+#
+# By default prefers CT101 living scheduler-runs (avoids lab 2020 stubs in
+# workstation data-next/). Override: SCOREBOARD_SOURCE=lab
 set -euo pipefail
 
 ROOT="${GZMO_CLONE_ROOT:-$HOME/github-clone}/GZMO"
 DATA="$ROOT/data-next"
 OUT_DIR="$DATA/arena"
+HOST="${CT101_SSH_HOST:-ct101}"
+SOURCE="${SCOREBOARD_SOURCE:-living}"
 mkdir -p "$OUT_DIR"
 
-exec python3 - "$DATA" "$OUT_DIR" <<'PY'
+RUNS_DIR="$DATA/scheduler-runs"
+if [[ "$SOURCE" == "living" ]]; then
+  LIVING_RUNS="$DATA/scheduler-runs-living"
+  mkdir -p "$LIVING_RUNS"
+  if scp -o ConnectTimeout=10 -o BatchMode=yes \
+    "$HOST:/opt/gzmo/data/scheduler-runs/latest-"*.json \
+    "$LIVING_RUNS/" >/tmp/scoreboard-scp.log 2>&1; then
+    RUNS_DIR="$LIVING_RUNS"
+  else
+    echo "[warn] living scheduler-runs scp failed — falling back to $RUNS_DIR (see /tmp/scoreboard-scp.log)" >&2
+  fi
+fi
+
+exec python3 - "$DATA" "$OUT_DIR" "$RUNS_DIR" <<'PY'
 import json
 import sys
 from datetime import datetime, timezone
@@ -16,7 +34,7 @@ from pathlib import Path
 
 data = Path(sys.argv[1])
 out_dir = Path(sys.argv[2])
-runs = data / "scheduler-runs"
+runs = Path(sys.argv[3])
 wiki_meta = data / "wiki-push-latest.json"
 arena = out_dir / "latest.json"
 watchdog = runs / "latest-watchdog.json"
@@ -127,6 +145,7 @@ price_pub = {
 board = {
     "schema": "gzmo.nightburst.scoreboard/v1",
     "generated_at": datetime.now(timezone.utc).isoformat(),
+    "scheduler_runs_dir": str(runs),
     "metabolism": jobs,
     "watchdog": watch_pub,
     "wiki": wiki_pub,
