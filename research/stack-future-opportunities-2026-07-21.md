@@ -41,7 +41,7 @@ Rank axes (as requested): (1) Brain Feed / nutrient / airgap-living USP · (2) u
 | 7 | O7 | REM substrate into dream recipe (fixture→beat) | P1 | 2–4w | ★★★★★ | ★★★★ | ★★★★ | low (lab first) |
 | 8 | O8 | Arena night boringly reliable (suggest-only) | P1 | weeks | ★★★★ | ★★★ | ★★ | low (outside daemon) |
 | 9 | O9 | Calibration / Arena human pin ritual (≥1 accept, ≥1 reject) | P1 | weeks | ★★★★ | ★★★★ | ★★ | low (explicit promote) |
-| 10 | O10 | Serendipity capped weekly apply → vault mass | P1 | ongoing | ★★★★★ | ★★★ | ★★ | low (human apply) |
+| 10 | O10 | Serendipity capped weekly apply → vault mass | ✅ | soaked | ★★★★★ | ★★★ | ★★ | low (human apply) |
 | 11 | O11 | Honeypot lifecycle / ripen visibility (Experience F) | P1 | 3–6w | ★★★★★ | ★★★★ | ★★★ | low |
 | 12 | O12 | Port spark refractory + lifecycle goldens into LTL | P1 | 3–6w | ★★★ | ★★★★★ | ★★★★★ | none |
 | 13 | O13 | Living organ-trace habit + missed-run watchdog | P2 | weeks | ★★★ | ★★ | ★★★ | none |
@@ -213,18 +213,18 @@ Rank axes (as requested): (1) Brain Feed / nutrient / airgap-living USP · (2) u
 
 ---
 
-### O10 — Serendipity capped weekly apply → vault mass — OPEN habit (candidate bet)
+### O10 — Serendipity capped weekly apply → vault mass — ✅ SOAKED 2026-07-22
 
-**Thrust:** Keep cadence → review ≤3 → human apply as the nutrient pump (plumbing soaked; mass still thin).
+**Thrust:** Keep cadence → USP filter → review ≤3 → human apply ≤3/ISO-week as the nutrient pump.
 
-**Why rare / USP:** Deliberate serendipity ≠ similarity RAG ([STACK_OPPORTUNITY_MAP.md](../docs/STACK_OPPORTUNITY_MAP.md) o5; BRAIN_FEED serendipity).
+**Why rare / USP:** Deliberate serendipity ≠ similarity RAG ([STACK_OPPORTUNITY_MAP.md](../docs/STACK_OPPORTUNITY_MAP.md) o5; BRAIN_FEED serendipity). Horizon/local-intel theater never enters living takeaways.
 
 **Evidence:**
-- Cadence OK: `applies_logged=1`, dry-run candidates=4 — `data-next/serendipity/cadence-latest.md`
-- Apply proof soaked — [serendipity-apply-proof.md](opportunities/serendipity-apply-proof.md)
-- Brain Feed still lists promote-back as P0 nutrient — [BRAIN_FEED.md](../docs/BRAIN_FEED.md)
+- Cap + filter: `scripts/serendipity-promote.sh` (`SERENDIPITY_WEEKLY_CAP`, horizon regex) + `scripts/serendipity-weekly-check.sh`
+- Apply 2026-07-22: week **2026-W30 applies=1/3**; filtered TurboQuant ×2; USP takeaways Zellij / pi-telegram / GZMO enqueued on CT101
+- Weekly check OK; Brain Feed GREEN — [serendipity-weekly-apply.md](opportunities/serendipity-weekly-apply.md)
 
-**Next ship slice:** Weekly habit bet (not new scripts): apply when candidates clear; refuse memory-gym; confirm BF GREEN.
+**Habit next:** Re-run weekly when spark candidates clear; stay ≤3 applies/week; feel-use mass remains active P0.
 
 **Risk:** Auto-apply (forbidden). **Dual-writer:** refuse if serve active (existing checks).
 
