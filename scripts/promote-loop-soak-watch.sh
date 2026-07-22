@@ -13,9 +13,10 @@ OPP="$ROOT/research/opportunities/promote-loop-living-apply.md"
 HONEST="$ROOT/research/opportunities/soak-honest-nights.md"
 
 echo "=== promote-loop soak watch (max ${MAX_H}h, poll ${SLEEP_S}s) ==="
+SOAK_JSON="${GZMO_DATA_NEXT:-$ROOT/data-next}/beat-gate/promotions/soak-latest.json"
 while true; do
-  bash "$ROOT/scripts/promote-loop-soak-check.sh" >/tmp/promote-soak-watch.json 2>/tmp/promote-soak-watch.err || true
-  VERDICT="$(python3 -c "import json; print(json.load(open('/tmp/promote-soak-watch.json')).get('verdict','?'))" 2>/dev/null || echo '?')"
+  bash "$ROOT/scripts/promote-loop-soak-check.sh" >/tmp/promote-soak-watch.out 2>/tmp/promote-soak-watch.err || true
+  VERDICT="$(python3 -c "import json; print(json.load(open('$SOAK_JSON')).get('verdict','?'))" 2>/dev/null || echo '?')"
   echo "[$(date -u +%H:%M:%SZ)] verdict=$VERDICT"
   if [[ "$VERDICT" == "GREEN" ]]; then
     python3 - <<PY
