@@ -22,6 +22,16 @@
 
 ## After upgrading Pi
 
+After `pi update`, run the thin diet check, then re-attach living MCP:
+
+```bash
+bash scripts/pi-thin-diet.sh --check
+bash scripts/install-shared-mcp.sh
+bash scripts/living-attach-check.sh
+```
+
+Allowlist / deny doctrine: [PI_PACKAGE_ALLOWLIST.md](PI_PACKAGE_ALLOWLIST.md).
+
 ### 1. Packages still listed
 
 `~/.pi/agent/settings.json` should still include (merge, don’t replace blindly):
@@ -34,7 +44,7 @@
 ]
 ```
 
-Optional: `npm:hsp-pi` (audio). Prefer **one** of `npm:gzmo-pi` *or* git gzmo-pi, not both fighting.
+Optional: `npm:hsp-pi` (audio). Prefer **one** of `npm:gzmo-pi` *or* git gzmo-pi, not both fighting. If check reports a duplicate, `bash scripts/pi-thin-diet.sh --apply-core --dry-run` then `--apply-core`.
 
 Subagents snippet: [pi-settings-subagents.snippet.json](pi-settings-subagents.snippet.json).
 

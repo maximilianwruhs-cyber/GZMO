@@ -2,7 +2,7 @@
 
 **Status:** Recovered 2026-07-19 from docs, live `~/.pi/agent/`, CT101 handoff, and branch `feat/context-compress-headroom`  
 **Problem this solves:** The “supreme” Pi wiring was never written as one durable runbook; custom attach broke on every official Pi upgrade.  
-**Related:** [PI_GZMO_MEMORY_INTEGRATION.md](PI_GZMO_MEMORY_INTEGRATION.md) · [PI_UPGRADE_RUNBOOK.md](PI_UPGRADE_RUNBOOK.md) · [HEADROOM_CCR.md](HEADROOM_CCR.md) · [OPERATOR_FRONTEND_DECISION.md](OPERATOR_FRONTEND_DECISION.md)
+**Related:** [PI_GZMO_MEMORY_INTEGRATION.md](PI_GZMO_MEMORY_INTEGRATION.md) · [PI_UPGRADE_RUNBOOK.md](PI_UPGRADE_RUNBOOK.md) · [PI_PACKAGE_ALLOWLIST.md](PI_PACKAGE_ALLOWLIST.md) · [HEADROOM_CCR.md](HEADROOM_CCR.md) · [OPERATOR_FRONTEND_DECISION.md](OPERATOR_FRONTEND_DECISION.md)
 
 ---
 
