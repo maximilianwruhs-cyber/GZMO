@@ -173,6 +173,30 @@ if soak_path.is_file():
     except Exception:
         pass
 
+# Living organ-trace + promote soak (organism pulse)
+organ = load_json(data / "organ-trace" / "latest.json") or load_json(data / "organ-trace" / "living-latest.json")
+if organ:
+    missed = organ.get("missed_core") or []
+    if missed:
+        scars.append(f"organ_missed_core — {','.join(missed)}")
+    signals["organ_trace_ok"] = organ.get("ok")
+else:
+    scars.append("organ_trace_missing — run organ-trace.sh --living")
+
+promo_soak = load_json(data / "beat-gate" / "promotions" / "soak-latest.json")
+if promo_soak:
+    signals["promote_soak_verdict"] = promo_soak.get("verdict")
+    if promo_soak.get("verdict") == "HOLD":
+        scars.append("promote_loop_soak_hold — wait pin age / overnight GREEN")
+    elif promo_soak.get("verdict") == "RED":
+        scars.append("promote_loop_soak_RED — fix FAIL before ops-discovery promote")
+
+sleep_b = load_json(data / "sleep-time" / "latest.json")
+if sleep_b:
+    signals["sleep_budget"] = sleep_b.get("budget")
+    if sleep_b.get("budget") == "deep":
+        scars.append("sleep_budget_deep — nutrient backlog high; prefer dream over tourism")
+
 # STACK near/singular coverage gaps (nutrient-relevant ids only — no theater)
 priority_stack = [
     ("m1", "Felt-recall / Felt Use depth"),

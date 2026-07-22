@@ -64,6 +64,15 @@ enum Command {
     Spark(Option<NaiveDate>),
     /// Plan-only immune patrol (`gzmo immune plan`) — never mutates vault.
     ImmunePlan,
+    /// Value-forgetting plan (`gzmo immune forget`) — dry_run.
+    ImmuneForget {
+        max: usize,
+    },
+    /// Bounded immune apply (`IMMUNE_APPLY=1 gzmo immune apply`).
+    ImmuneApply {
+        plan: Option<std::path::PathBuf>,
+        max: usize,
+    },
     /// M5 ripen gate honesty (`gzmo ripen status`).
     Ripen(Vec<String>),
     Ingest {
@@ -176,7 +185,34 @@ fn parse_args() -> Command {
             if args.get(2).map(String::as_str) == Some("plan") {
                 return Command::ImmunePlan;
             }
-            eprintln!("Usage: gzmo immune plan");
+            if args.get(2).map(String::as_str) == Some("forget") {
+                let max = args.get(3).and_then(|s| s.parse().ok()).unwrap_or(25);
+                return Command::ImmuneForget { max };
+            }
+            if args.get(2).map(String::as_str) == Some("apply") {
+                let mut plan = None;
+                let mut max = 10usize;
+                let mut i = 3;
+                while i < args.len() {
+                    match args[i].as_str() {
+                        "--plan" => {
+                            plan = args.get(i + 1).map(std::path::PathBuf::from);
+                            i += 2;
+                        }
+                        "--max" => {
+                            max = args.get(i + 1).and_then(|s| s.parse().ok()).unwrap_or(10);
+                            i += 2;
+                        }
+                        other => {
+                            eprintln!("Unknown immune apply arg: {other}");
+                            std::process::exit(2);
+                        }
+                    }
+                }
+                return Command::ImmuneApply { plan, max };
+            }
+            eprintln!("Usage: gzmo immune plan|forget [N]|apply [--plan PATH] [--max N]");
+            eprintln!("  apply requires IMMUNE_APPLY=1");
             std::process::exit(2);
         }
         if args[1] == "ripen" {
@@ -300,6 +336,8 @@ async fn main() -> Result<()> {
         Command::DreamCompact { .. } => "info",
         Command::Spark(_) => "info",
         Command::ImmunePlan => "info",
+        Command::ImmuneForget { .. } => "info",
+        Command::ImmuneApply { .. } => "info",
         Command::Ripen(_) => "warn",
         Command::Ingest { .. } => "info",
         Command::IngestDir(_) => "info",
@@ -421,6 +459,8 @@ async fn main() -> Result<()> {
         } => dream_cmd::run_compact(&config, max_chars, archive_sessions_days, dry_run).await,
         Command::Spark(date) => spark_cmd::run(&config, identity.as_ref().unwrap(), date).await,
         Command::ImmunePlan => immune_cmd::run_plan(&config).await,
+        Command::ImmuneForget { max } => immune_cmd::run_forget(&config, max).await,
+        Command::ImmuneApply { plan, max } => immune_cmd::run_apply(&config, plan, max).await,
         Command::Ripen(args) => ripen_cmd::run(&config, &args).await,
         Command::Ingest { path, dry_run } => {
             ingest_cmd::run(

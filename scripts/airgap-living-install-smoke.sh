@@ -43,6 +43,20 @@ echo "=== Airgap living install smoke ===" | tee -a "$LOG"
 [[ -f "$ROOT/docs/AIRGAP_LIVING.md" ]] && row PASS "doc-airgap" "docs/AIRGAP_LIVING.md" || row FAIL "doc-airgap" "missing"
 [[ -f "$ROOT/docs/ADR-0004-airgap-living-usp.md" ]] && row PASS "doc-adr" "ADR-0004" || row FAIL "doc-adr" "missing ADR-0004"
 [[ -x "$ROOT/scripts/install-living-airgap.sh" ]] && row PASS "installer" "install-living-airgap.sh" || row FAIL "installer" "missing installer"
+[[ -x "$ROOT/scripts/living-host-mutex.sh" ]] && row PASS "living-mutex" "living-host-mutex.sh claim|release|status" || row FAIL "living-mutex" "missing mutex"
+# Appliance claim path documented
+if [[ -x "$ROOT/scripts/living-host-mutex.sh" ]]; then
+  if bash "$ROOT/scripts/living-host-mutex.sh" status >/tmp/mutex-status.txt 2>&1; then
+    row PASS "mutex-status" "mutex status runnable"
+  else
+    row HOLD "mutex-status" "mutex status non-zero (ok if no claim yet)"
+  fi
+  if rg -n 'appliance|workstation|ct101' "$ROOT/scripts/living-host-mutex.sh" >/dev/null 2>&1; then
+    row PASS "mutex-hosts" "ct101|workstation|appliance hosts"
+  else
+    row FAIL "mutex-hosts" "host enum missing appliance"
+  fi
+fi
 [[ -x "$ROOT/scripts/living-appliance-gate.sh" ]] && row PASS "appliance-gate" "living-appliance-gate.sh" || row FAIL "appliance-gate" "missing"
 [[ -f "$COMPOSE_DIR/docker-compose.yml" ]] && row PASS "compose-pin" "$COMPOSE_DIR/docker-compose.yml" || row FAIL "compose-pin" "missing compose"
 [[ -f "$COMPOSE_DIR/.env.example" ]] && row PASS "env-example" ".env.example (no committed secrets)" || row FAIL "env-example" "missing"

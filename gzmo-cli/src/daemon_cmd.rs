@@ -1287,6 +1287,110 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
         }
     });
 
+    // Promote + embed (metabolism triad) — same receipts as `gzmo serve` / oneshot.
+    // Living CT101 runs daemon; without these jobs organ-trace soft-missed promote/embed.
+    // Use spawn_blocking + thread runtime: embed/promote touch rusqlite (not Send for spawn).
+    let meta_config_promote = config.clone();
+    let meta_config_embed = config.clone();
+    let vault_db_embed = config.memory.vault_db.clone();
+    let qdrant_for_embed = config.qdrant.clone();
+    let project_root_embed = qdrant_sync::discover_project_root();
+    let promote_handle = tokio::spawn(async move {
+        let mut interval = tokio::time::interval(Duration::from_secs(60));
+        let mut last_promote: Option<NaiveDate> = None;
+        loop {
+            interval.tick().await;
+            if !meta_config_promote.metabolism.enabled {
+                continue;
+            }
+            let now = Utc::now();
+            if !cron_due_today(
+                &now,
+                meta_config_promote.metabolism.promote_cron_hour,
+                meta_config_promote.metabolism.promote_cron_minute,
+                last_promote,
+            ) {
+                continue;
+            }
+            let cfg = meta_config_promote.clone();
+            info!("Daemon metabolism promote starting");
+            let result = tokio::task::spawn_blocking(move || {
+                let rt = tokio::runtime::Builder::new_current_thread()
+                    .enable_all()
+                    .build()
+                    .expect("promote runtime");
+                rt.block_on(crate::promote_cmd::run(&cfg, None))
+            })
+            .await;
+            match result {
+                Ok(Ok(())) => {
+                    last_promote = Some(now.date_naive());
+                    info!("Daemon metabolism promote complete");
+                }
+                Ok(Err(e)) => {
+                    last_promote = Some(now.date_naive());
+                    error!("Daemon promote failed: {e}");
+                }
+                Err(e) => {
+                    last_promote = Some(now.date_naive());
+                    error!("Daemon promote join failed: {e}");
+                }
+            }
+        }
+    });
+    let embed_handle = tokio::spawn(async move {
+        let mut interval = tokio::time::interval(Duration::from_secs(60));
+        let mut last_embed: Option<NaiveDate> = None;
+        loop {
+            interval.tick().await;
+            if !meta_config_embed.metabolism.enabled {
+                continue;
+            }
+            let now = Utc::now();
+            if !cron_due_today(
+                &now,
+                meta_config_embed.metabolism.embed_cron_hour,
+                meta_config_embed.metabolism.embed_cron_minute,
+                last_embed,
+            ) {
+                continue;
+            }
+            let cfg = meta_config_embed.clone();
+            let qcfg = qdrant_for_embed.clone();
+            let vdb = vault_db_embed.clone();
+            let root = project_root_embed.clone();
+            info!("Daemon metabolism embed starting");
+            let result = tokio::task::spawn_blocking(move || {
+                let rt = tokio::runtime::Builder::new_current_thread()
+                    .enable_all()
+                    .build()
+                    .expect("embed runtime");
+                rt.block_on(async {
+                    crate::embed_cmd::run(&cfg, None).await?;
+                    if qcfg.enabled && qcfg.sync_enabled {
+                        sync_vault_to_qdrant(&root, &qcfg, &vdb).await?;
+                    }
+                    anyhow::Ok(())
+                })
+            })
+            .await;
+            match result {
+                Ok(Ok(())) => {
+                    last_embed = Some(now.date_naive());
+                    info!("Daemon metabolism embed complete");
+                }
+                Ok(Err(e)) => {
+                    last_embed = Some(now.date_naive());
+                    error!("Daemon embed failed: {e}");
+                }
+                Err(e) => {
+                    last_embed = Some(now.date_naive());
+                    error!("Daemon embed join failed: {e}");
+                }
+            }
+        }
+    });
+
     let _identity = identity;
     let _mentor_thread = mentor_thread;
 
@@ -1302,6 +1406,8 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
         _ = wiki_sync_handle => error!("Wiki sync loop exited"),
         _ = wiki_lint_handle => error!("Wiki lint loop exited"),
         _ = handoff_handle => error!("Config handoff loop exited"),
+        _ = promote_handle => error!("Metabolism promote loop exited"),
+        _ = embed_handle => error!("Metabolism embed loop exited"),
         _ = watchdog_handle => error!("Metabolism watchdog loop exited"),
     }
 

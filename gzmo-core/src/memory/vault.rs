@@ -247,6 +247,32 @@ impl SqliteVault {
             init_conn.execute_batch("PRAGMA user_version = 7")?;
             info!("Applied schema migration v7: ingest_dedup");
         }
+        let user_version: u32 = init_conn.query_row("PRAGMA user_version", [], |row| row.get(0))?;
+        if user_version < 8 {
+            // MemRL-inspired utility for two-phase retrieval (semantic then value).
+            match init_conn.execute(
+                "ALTER TABLE honeypot ADD COLUMN utility_score REAL NOT NULL DEFAULT 0.0",
+                [],
+            ) {
+                Ok(_) => info!("Applied schema migration v8: honeypot.utility_score"),
+                Err(e) if e.to_string().contains("duplicate column") => {}
+                Err(e) => {
+                    tracing::error!(error = %e, "Schema migration v8 failed");
+                    return Err(e.into());
+                }
+            }
+            // Seed utility from existing Felt Use so ripen/search aren't cold-start zero.
+            let _ = init_conn.execute_batch(
+                "UPDATE honeypot
+                 SET utility_score = CAST(recall_count AS REAL)
+                 WHERE utility_score = 0.0 AND recall_count > 0;",
+            );
+            init_conn.execute_batch(
+                "CREATE INDEX IF NOT EXISTS idx_honeypot_utility
+                 ON honeypot(is_latest, utility_score DESC);",
+            )?;
+            init_conn.execute_batch("PRAGMA user_version = 8")?;
+        }
 
         info!("Semantic vault initialized (WAL mode + r2d2 pool)");
 
@@ -377,11 +403,12 @@ impl SqliteVault {
         let _ = conn.execute(
             "UPDATE honeypot
              SET recall_count = recall_count + ?1,
-                 last_recalled_at = ?2
+                 last_recalled_at = ?2,
+                 utility_score = utility_score + CAST(?1 AS REAL)
              WHERE id = ?3",
             params![delta, now, id],
         );
-        info!(fact_id = %fact_id, delta, "Reinforced semantic fact (felt use)");
+        info!(fact_id = %fact_id, delta, "Reinforced semantic fact (felt use + utility)");
         Ok(())
     }
 
@@ -1115,7 +1142,7 @@ impl SqliteVault {
             let mut stmt = conn.prepare(
                 "SELECT id FROM honeypot
                  WHERE is_latest = 1 AND (content LIKE ?1 OR content_norm LIKE ?1)
-                 ORDER BY confidence DESC, recall_count DESC
+                 ORDER BY utility_score DESC, confidence DESC, recall_count DESC
                  LIMIT 3",
             )?;
             for id_str in stmt
