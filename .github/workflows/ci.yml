@@ -3,7 +3,23 @@ name: CI
 on:
   push:
     branches: [main, master]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - 'research/**'
+      - 'data-next/**'
+      - '.cursor/**'
   pull_request:
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - 'research/**'
+      - 'data-next/**'
+      - '.cursor/**'
+
+concurrency:
+  group: gzmo-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
   CARGO_TERM_COLOR: always
