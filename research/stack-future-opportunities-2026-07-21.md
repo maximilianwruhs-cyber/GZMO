@@ -37,7 +37,7 @@ Rank axes (as requested): (1) Brain Feed / nutrient / airgap-living USP · (2) u
 | 3 | O3 | Grow Felt Use mass (`share_ge3_of_latest`) via real MCP work | P0 | weeks | ★★★★★ | ★★★ | ★★★ | low (side-effect) |
 | 4 | O4 | Beat-gate versioned baselines + non-null `gate_passed` | P0 | 1–2w | ★★★★ | ★★★ | ★★★★★ | none (fixture) |
 | 5 | O5 | First promote-by-loop (narrow cognition/knowledge) | P0 | 1–2w | ★★★★★ | ★★★ | ★★★★★ | **mutex required** |
-| 6 | O6 | Spark lineage operator surface | P1 | 2–4w | ★★★★ | ★★★★★ | ★★★ | none |
+| 6 | O6 | Spark lineage operator surface | ✅ | soaked | ★★★★ | ★★★★★ | ★★★ | none |
 | 7 | O7 | REM substrate into dream recipe (fixture→beat) | P1 | 2–4w | ★★★★★ | ★★★★ | ★★★★ | low (lab first) |
 | 8 | O8 | Arena night boringly reliable (suggest-only) | P1 | weeks | ★★★★ | ★★★ | ★★ | low (outside daemon) |
 | 9 | O9 | Calibration / Arena human pin ritual (≥1 accept, ≥1 reject) | P1 | weeks | ★★★★ | ★★★★ | ★★ | low (explicit promote) |
@@ -143,7 +143,7 @@ Rank axes (as requested): (1) Brain Feed / nutrient / airgap-living USP · (2) u
 
 ---
 
-### O6 — Spark lineage operator surface — P1 · 2–4 weeks
+### O6 — Spark lineage operator surface — ✅ SOAKED 2026-07-22
 
 **Thrust:** Last successful SparkReport visible on `gzmo status` / Observatory — Experience B felt.
 

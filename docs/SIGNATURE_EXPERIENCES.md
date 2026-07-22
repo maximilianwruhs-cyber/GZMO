@@ -33,8 +33,8 @@
 | **Trigger** | Spark cron 03:30 / 22:30 → `cognition-smoke.sh --live --spark-run` |
 | **Pieces** | `session-distill` → `honeypot-gate` → **spark-link** → `rrf-recall` |
 | **Artifacts** | `SparkReport` JSON (`selection`, `hypothesis`, `verdict`, `promoted`); cognition-smoke-meta |
-| **Surface** | Today: meta under lab temp dirs / recipe output. Elevate: last spark card in Observatory + `gzmo status` overnight brief |
-| **You know it worked when…** | A spark report shows non-zero `stale_sweetness` mid-window anchor and a verify verdict — not a random recent fact |
+| **Surface** | `data-next/spark/latest-card.md` + `lineage-latest.json`; `gzmo status` Last spark; `gzmo observatory` `spark_lineage` LED; metabolism board spark row |
+| **You know it worked when…** | `bash scripts/spark-lineage-check.sh` GREEN — non-zero `stale_sweetness` mid-window anchor on the card (verify optional for dry-run fixture) |
 
 **Code:** [`spark-link/src/scoring.rs`](../../spark-link/src/scoring.rs) `stale_sweetness`.
 

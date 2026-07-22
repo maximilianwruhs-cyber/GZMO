@@ -31,6 +31,7 @@ Operator research bets for GZMO upgrades. Doctrine: [docs/OPPORTUNITY_DISCOVERY.
 | [opportunity-discovery-cycle](opportunity-discovery-cycle.md) | 22 | soaked | This cycle (Sense→Rank→Bet→Ship) |
 | [beat-gate-versioned-baselines](beat-gate-versioned-baselines.md) | 21 | soaked | Beat-gate versioned baselines + honest gate_passed |
 | [felt-use-mass-growth](felt-use-mass-growth.md) | 22 | active | Felt Use mass growth (share_ge3_of_latest) |
+| [spark-lineage-surface](spark-lineage-surface.md) | 22 | soaked | Spark lineage operator surface (Experience B) |
 | [soak-honest-nights](soak-honest-nights.md) | 19 | candidate | Honest soak nights (≥18h spacing) |
 | [promote-loop-living-apply](promote-loop-living-apply.md) | 21 | candidate | Promote-loop living apply (gated handoff recipe) |
 | [promote-by-loop-first](promote-by-loop-first.md) | 22 | soaked | First promote-by-loop (narrow cognition or knowledge) |
