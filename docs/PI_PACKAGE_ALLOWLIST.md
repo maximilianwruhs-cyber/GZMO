@@ -29,12 +29,14 @@ Install with `bash scripts/pi-thin-diet.sh --apply-core` (or manually).
 
 | Spec | Why |
 |------|-----|
-| `npm:pi-mcp-adapter` | Reads `~/.pi/agent/mcp.json` — living/product MCP attach |
+| `npm:pi-mcp-adapter` **or** the adapter bundled inside `gzmo-pi` — **not both** | Reads `~/.pi/agent/mcp.json`. Git `gzmo-pi` already registers `node_modules/pi-mcp-adapter` as an extension; a second top-level `npm:pi-mcp-adapter` hard-fails Pi with tool/flag conflicts. |
 | **One** of `npm:gzmo-pi` **or** `git:github.com/maximilianwruhs-cyber/gzmo-pi` | GZMO Pi surface — **not both** |
 | `npm:hsp-pi` *(optional)* | Audio / HSP bridge when you use it |
 | `npm:pi-subagents` | **Keep one** subagent stack only |
 
-Default when both gzmo-pi sources are present: **prefer git**, remove npm (`--prefer-gzmo-pi git|npm` to override).
+Default when both gzmo-pi sources are present: **prefer git**, remove npm (`--prefer-gzmo-pi git|npm` to override).  
+With **git gzmo-pi**, omit standalone `npm:pi-mcp-adapter` (adapter comes from the package). With **npm gzmo-pi** that does not bundle the adapter extension, keep standalone `npm:pi-mcp-adapter`.  
+Also avoid `npm:pi-spark` together with `npm:pi-mega-compact` (compaction conflict).
 
 ---
 
