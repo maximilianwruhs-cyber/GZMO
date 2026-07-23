@@ -1,0 +1,16 @@
+[Unit]
+Description=GZMO research-scan (local inbox gaps; no dual-writer)
+After=network-online.target llama-prime.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=%h/github-clone/GZMO
+Environment=CT101_SSH_HOST=ct101
+Environment=RESEARCH_SCAN_APPLY_TINYFOLDER=0
+ExecStart=/bin/bash %h/github-clone/GZMO/scripts/research-scan.sh
+Nice=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,11 @@
+[Unit]
+Description=GZMO research-scan daily 08:00 UTC
+
+[Timer]
+OnCalendar=*-*-* 08:00:00 UTC
+Persistent=true
+AccuracySec=5min
+Unit=gzmo-research-scan.service
+
+[Install]
+WantedBy=timers.target

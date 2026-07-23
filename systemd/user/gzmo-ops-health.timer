@@ -1,0 +1,11 @@
+[Unit]
+Description=GZMO ops health every 6h (UTC)
+
+[Timer]
+OnCalendar=*-*-* 00,06,12,18:00:00 UTC
+Persistent=true
+AccuracySec=5min
+Unit=gzmo-ops-health.service
+
+[Install]
+WantedBy=timers.target

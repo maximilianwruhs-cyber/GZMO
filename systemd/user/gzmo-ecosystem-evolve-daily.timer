@@ -1,0 +1,11 @@
+[Unit]
+Description=GZMO ecosystem evolve daily 07:15 UTC
+
+[Timer]
+OnCalendar=*-*-* 07:15:00 UTC
+Persistent=true
+AccuracySec=5min
+Unit=gzmo-ecosystem-evolve-daily.service
+
+[Install]
+WantedBy=timers.target

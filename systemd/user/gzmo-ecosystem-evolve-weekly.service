@@ -1,0 +1,15 @@
+[Unit]
+Description=GZMO ecosystem evolve weekly (opportunity + serendipity)
+After=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=%h/github-clone/GZMO
+Environment=CT101_SSH_HOST=ct101
+ExecStart=/bin/bash %h/github-clone/GZMO/scripts/ecosystem-evolve-weekly.sh
+Nice=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=default.target

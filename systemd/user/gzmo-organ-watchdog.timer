@@ -1,0 +1,12 @@
+[Unit]
+Description=GZMO organ watchdog hourly
+
+[Timer]
+OnBootSec=15min
+OnUnitActiveSec=1h
+AccuracySec=2min
+Persistent=true
+Unit=gzmo-organ-watchdog.service
+
+[Install]
+WantedBy=timers.target
