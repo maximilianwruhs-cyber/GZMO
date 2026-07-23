@@ -83,6 +83,7 @@ Product non-goals: public multi-tenant MCP webserver, dual overnight writers, SE
 |-----|---------|
 | [PI_LIVING_STACK.md](PI_LIVING_STACK.md) | **Recovered** Pi × Redis × Headroom/CCR living topology |
 | [PI_UPGRADE_RUNBOOK.md](PI_UPGRADE_RUNBOOK.md) | Pi upgrade checklist (stop attach breakages) |
+| [WORKSTATION_WIPE_RESTORE.md](WORKSTATION_WIPE_RESTORE.md) | After local wipe: reattach to CT101 living (vault stays) |
 | [HEADROOM_CCR.md](HEADROOM_CCR.md) | Headroom-inspired CCR on Redis (branch-only today) |
 | [SYNAPSE_EVENT_OWNERSHIP.md](SYNAPSE_EVENT_OWNERSHIP.md) | Pi vs daemon bus ownership (dedupe rules) |
 | [DISTILL_COLD_CHAIN.md](DISTILL_COLD_CHAIN.md) | Distill ingress + SubArchive episodic skip |
