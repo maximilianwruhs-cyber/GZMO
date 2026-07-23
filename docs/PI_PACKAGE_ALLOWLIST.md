@@ -63,6 +63,18 @@ bash scripts/pi-thin-diet.sh --apply-recommended --with lens,fff,plannotator,com
 
 ---
 
+## Opt-in methodology (not default)
+
+| Spec | Status |
+|------|--------|
+| `git:github.com/obra/superpowers` | **Opt-in only** — operator must explicitly request. Not core. Not recommended default. |
+
+Superpowers is a strong gated build methodology (brainstorm → plan → TDD → subagent exec) with a first-class Pi package and session bootstrap. It conflicts with this kit’s defaults: thin remote, no auto-Socratic theater, ship-until-done. Matt process skills already cover grill/TDD/debug/review without bootstrap injection.
+
+If you deliberately opt in: install the package, hide Matt process twins so two methodologies do not fight, set `SUPERPOWERS_DISABLE_TELEMETRY=1`, and put a ship-mode override in `system.md` (user ship/build instructions win). Treat that as a doctrine fork — not a casual add.
+
+---
+
 ## Deny list (do not install; purge if present)
 
 Competing memory, mega harnesses, duplicate subagent stacks, and toys. Living memory is MCP — not another Pi memory package.
