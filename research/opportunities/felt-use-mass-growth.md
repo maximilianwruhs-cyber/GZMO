@@ -1,7 +1,7 @@
 ---
 id: felt-use-mass-growth
 title: Felt Use mass + MemRL-style utility (organism not warehouse)
-status: candidate
+status: active
 parked: false
 score: 23
 uniqueness: 5
@@ -11,7 +11,7 @@ attention_cost: 2
 usp_fit: 5
 stack_ids: [m1]
 created: 2026-07-21
-updated: 2026-07-22
+updated: 2026-07-23
 ---
 
 # Felt Use mass + utility
@@ -51,3 +51,7 @@ bash scripts/organism-memory-bench-spike.sh
 
 - MemRL https://arxiv.org/html/2601.03192v2
 - research/sleep-consolidation-sota-2026-07-22.md
+
+## Activated 2026-07-23
+
+Locked via `opportunity-bet.sh --from felt-use-mass-growth` after [`promote-loop-living-apply`](promote-loop-living-apply.md) soaked (`soak-latest` GREEN, min pin age ~18.5h). Exactly one active bet.

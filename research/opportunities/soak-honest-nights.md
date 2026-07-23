@@ -10,7 +10,7 @@ attention_cost: 4
 usp_fit: 5
 stack_ids: [r5]
 created: 2026-07-21
-updated: 2026-07-22
+updated: 2026-07-23
 ---
 
 # Honest soak nights
@@ -29,12 +29,12 @@ Protects USP bar so Unpark cannot claim strengthen while soak is theatrical.
 2. No same-hour triple-GREEN gaming
 3. Timer already soaked (`soak-night-honest-timer`) — this bet is operator nights only
 
-## Progress 2026-07-22
+## Progress 2026-07-23
 
-- Scar still live: `soak_spacing_hold`
-- **honest_nights=2** after sample appended ~45h after prior GREEN (need 3)
-- Keep-quality gate GREEN; rejected_close=2 remain from 2026-07-20 same-hour streak
-- **Blocked on wall-clock** for night #3 (≥18h after this sample)
+- Scar still live: `need_3_trailing_honest_GREEN_have_1`
+- **honest_nights=1/3** (`keep-quality-soak.sh --summary`); do not claim multi-night soak
+- Keep-quality gate GREEN; promote-loop overnight soak is independent (GREEN, pin age ~18.5h)
+- Night watch: `bash scripts/honest-soak-night-watch.sh` for nights 2–3 (wall-clock ≥18h spacing)
 
 ## Operator
 
