@@ -59,7 +59,8 @@ Cursor/Pi operators can still run `bash scripts/install-shared-mcp.sh` (merges k
 
 ## Related
 
-- [WORKSTATION_WIPE_RESTORE.md](./WORKSTATION_WIPE_RESTORE.md) — after local wipe: backup list + ordered reattach (CT101 vault stays)  
+- Workstation wipe restore runbook is private/local only (see `~/.gzmo/private/…`)  
+
 - [PI_GZMO_MEMORY_INTEGRATION.md](./PI_GZMO_MEMORY_INTEGRATION.md) — ops SSH living  
 - [AIRGAP_LIVING.md](./AIRGAP_LIVING.md) — on-box USP  
 - [PRODUCT_MCP.md](./PRODUCT_MCP.md) — lite `gzmo-memory` stranger path (separate)  
