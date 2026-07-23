@@ -1,7 +1,7 @@
 ---
 id: promote-loop-living-apply
 title: Promote-loop living apply (gated handoff recipe)
-status: active
+status: soaked
 score: 21
 uniqueness: 5
 brain_profit: 4
@@ -10,7 +10,7 @@ attention_cost: 2
 usp_fit: 5
 stack_ids: [o2]
 created: 2026-07-21
-updated: 2026-07-22
+updated: 2026-07-23
 ---
 
 # Promote-loop living apply
@@ -58,6 +58,12 @@ bash scripts/ct101-living-probe.sh
 - Post-apply: keep-quality GREEN, living-readiness GREEN, Brain Feed GREEN
 - Serendipity week **2026-W30 = 3/3** capped applies done
 - Nutrient transfer: 6 curated takeaways enqueued (no vault merge)
-- **Soak remaining (Done when #4):** BF + keep-quality GREEN **after one overnight** calendar night
 - Soak verifier: `bash scripts/promote-loop-soak-check.sh` → `data-next/beat-gate/promotions/soak-latest.{json,md}`
-  (HOLD until min pin age ≥12h by default; then mark this bet `soaked`)
+
+## Soak evidence (2026-07-23)
+
+- `soak-latest` verdict **GREEN** (`generated_at` 2026-07-23T04:31:54Z)
+- Advice: `promote_loop_soak_ok` — Done when #4 met
+- Min pin age: **18.456h** (≥12h); knowledge pin ~19.37h, cognition pin ~18.46h
+- Brain Feed GREEN; keep-quality GREEN; dual-writer PASS (`serve=inactive`, ADR-0003)
+- Honest soak nights remain **1/3** (separate bet; do not claim multi-night Unpark soak)
