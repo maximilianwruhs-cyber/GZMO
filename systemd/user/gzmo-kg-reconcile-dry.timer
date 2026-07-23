@@ -1,0 +1,11 @@
+[Unit]
+Description=GZMO kg-reconcile dry-run daily 04:30 UTC
+
+[Timer]
+OnCalendar=*-*-* 04:30:00 UTC
+Persistent=true
+AccuracySec=5min
+Unit=gzmo-kg-reconcile-dry.service
+
+[Install]
+WantedBy=timers.target

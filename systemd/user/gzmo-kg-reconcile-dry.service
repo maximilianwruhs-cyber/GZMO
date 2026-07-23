@@ -1,0 +1,15 @@
+[Unit]
+Description=GZMO kg-reconcile dry-run (never apply)
+After=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=%h/github-clone/GZMO
+Environment=CT101_SSH_HOST=ct101
+ExecStart=/bin/bash %h/github-clone/GZMO/scripts/kg-reconcile-dry.sh
+Nice=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=default.target

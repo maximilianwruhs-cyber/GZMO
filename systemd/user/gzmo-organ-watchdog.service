@@ -1,0 +1,16 @@
+[Unit]
+Description=GZMO organ watchdog (living CT101 soft)
+After=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=%h/github-clone/GZMO
+Environment=CT101_SSH_HOST=ct101
+Environment=ORGAN_LIVING=1
+ExecStart=/bin/bash %h/github-clone/GZMO/scripts/organ-watchdog-check.sh
+Nice=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=default.target

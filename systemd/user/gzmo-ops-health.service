@@ -1,0 +1,15 @@
+[Unit]
+Description=GZMO ops health (workstation + CT101 probes)
+After=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=%h/github-clone/GZMO
+Environment=CT101_SSH_HOST=ct101
+ExecStart=/bin/bash %h/github-clone/GZMO/scripts/ops-health.sh
+Nice=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=default.target
