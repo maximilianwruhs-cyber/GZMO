@@ -15,8 +15,8 @@ use uuid::Uuid;
 
 use std::sync::Arc;
 
-use crate::memory::embeddings::Embedder;
 use crate::memory::core_pin;
+use crate::memory::embeddings::Embedder;
 use crate::memory::felt_use::{self, FeltUseKind};
 use crate::memory::honeypot::{self, qualifies_for_honeypot};
 use crate::memory::lifecycle::{
