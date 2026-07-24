@@ -151,6 +151,8 @@ PY
 
 echo
 echo "[OK] OpenClaw living attach installed"
+echo "     syncing workspace contract…"
+bash "$ROOT/scripts/sync-openclaw-workspace.sh" || true
 echo "     openclaw mcp show gzmo-living"
 echo "     takeaway: bash $TAKEAWAY 'fact text'"
 openclaw mcp show gzmo-living 2>&1 | head -30 || true

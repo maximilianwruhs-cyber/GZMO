@@ -28,20 +28,30 @@ rc_ops=0; run_soft ops-health bash "$ROOT/scripts/ops-health.sh" || rc_ops=$?
 rc_wd=0; run_soft organ-watchdog env ORGAN_LIVING=1 bash "$ROOT/scripts/organ-watchdog-check.sh" || rc_wd=$?
 rc_rs=0; run_soft research-scan bash "$ROOT/scripts/research-scan.sh" || rc_rs=$?
 rc_bf=0; run_soft brain-feed bash "$ROOT/scripts/brain-feed-check.sh" || rc_bf=$?
+rc_sync=0
+if [[ -x "$ROOT/scripts/sync-openclaw-workspace.sh" ]]; then
+  run_soft openclaw-workspace-sync bash "$ROOT/scripts/sync-openclaw-workspace.sh" || rc_sync=$?
+fi
 
-python3 - "$OUT" "$rc_ops" "$rc_wd" "$rc_rs" "$rc_bf" <<'PY'
+python3 - "$OUT" "$rc_ops" "$rc_wd" "$rc_rs" "$rc_bf" "$rc_sync" <<'PY'
 import json, sys
 from datetime import datetime, timezone
 from pathlib import Path
 out = Path(sys.argv[1])
-ops, wd, rs, bf = (int(x) for x in sys.argv[2:6])
+ops, wd, rs, bf, sync = (int(x) for x in sys.argv[2:7])
 # ops-health RED fails the day; others soft
 ok = ops == 0
 payload = {
     "schema": "gzmo.ecosystem_evolve.daily/v1",
     "generated_at": datetime.now(timezone.utc).isoformat(),
     "ok": ok,
-    "rcs": {"ops_health": ops, "organ_watchdog": wd, "research_scan": rs, "brain_feed": bf},
+    "rcs": {
+        "ops_health": ops,
+        "organ_watchdog": wd,
+        "research_scan": rs,
+        "brain_feed": bf,
+        "openclaw_workspace_sync": sync,
+    },
     "advice": (
         "daily_evolve_GREEN — review research inbox + living smoke"
         if ok
