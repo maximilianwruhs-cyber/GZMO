@@ -77,8 +77,20 @@ bash scripts/openclaw-choose-character.sh --list
 bash scripts/openclaw-choose-character.sh glados
 ```
 
-**Telegram:** `/character list` · `/character search duck` · `/character glados` · `/character who`  
-(skill: workspace `skills/character`; requires `commands.nativeSkills: true`)
+**Telegram:** `/character list` · `/character search duck` · `/character glados` · `/character who`
+
+Install once:
+
+```bash
+bash scripts/install-openclaw-character.sh
+```
+
+That wires:
+1. Workspace skill with `command-dispatch: tool` → plugin tool `character` (bypasses the lean local model — no more `Exec failed: read …/SKILL.md`)
+2. Plugin `config/openclaw-plugins/gzmo-character` (runs `openclaw-choose-character.sh`)
+3. `agents.defaults.skills: ["character"]` so Telegram stays under the Bot API command limit
+
+Do **not** add Telegram `customCommands` for `/character` (conflicts with the native skill command).
 
 Upstream `./install.sh` overwrites `AGENTS.md` and would erase the GZMO contract — the wrapper installs `SOUL.md` + `IDENTITY.md` only, saves pack `AGENTS.md` as `CHARACTER.md`, then re-runs `sync-openclaw-workspace.sh`.
 

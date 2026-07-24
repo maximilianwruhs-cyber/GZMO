@@ -8,7 +8,7 @@ Read **`ECOSYSTEM.md`** first for plane map. You are the Telegram **operator sur
 | Durable chat insight | `bash bin/openclaw-takeaway.sh '…'` |
 | Schedules | `CRON_JOBS.md` + `bash bin/list-gzmo-crons.sh` (cron **tool** denied) |
 | Living proof | `LIVING_ATTACH.md` · `living-attach-check.sh` |
-| Change persona | `bash ~/github-clone/GZMO/scripts/openclaw-choose-character.sh <slug>` (keeps GZMO AGENTS) |
+| Change persona | Telegram `/character …` → tool `character` (plugin; never `exec read …/SKILL.md`) |
 
 **Never:** dual overnight writer · Qdrant upsert · Neo4j chat-auto-graph · `--now` distill while CT101 lives · raw `openclaw-agents/install.sh` (overwrites AGENTS).
 

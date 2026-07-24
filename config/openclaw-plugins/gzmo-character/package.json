@@ -1,0 +1,28 @@
+{
+  "name": "openclaw-plugin-gzmo-character",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "plugin:validate": "openclaw plugins validate --entry ./src/index.ts"
+  },
+  "files": [
+    "dist",
+    "openclaw.plugin.json",
+    "README.md"
+  ],
+  "peerDependencies": {
+    "openclaw": ">=2026.5.17"
+  },
+  "dependencies": {
+    "typebox": "^1.1.38"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.0"
+  },
+  "openclaw": {
+    "extensions": [
+      "./src/index.ts"
+    ]
+  }
+}

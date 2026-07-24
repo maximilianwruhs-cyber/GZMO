@@ -91,3 +91,7 @@ wiki/assets/
 *.swp
 *.swo
 *~
+
+# Node (OpenClaw plugins)
+node_modules/
+

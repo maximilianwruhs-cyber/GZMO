@@ -1,44 +1,25 @@
 ---
 name: character
-description: Choose/list OpenClaw personas from openclaw-agents without wiping GZMO AGENTS.md. Telegram /character.
+description: Choose/list OpenClaw personas from openclaw-agents without wiping GZMO AGENTS.md. Telegram /character or /skill character.
 user-invocable: true
+command-dispatch: tool
+command-tool: character
+command-arg-mode: raw
 metadata:
   openclaw:
     requires:
       bins: ["bash"]
 ---
 
-# Character chooser (GZMO-safe)
+# character
 
-You are handling a **Telegram `/character`** (or `/skill character`) request.
+Slash `/character` is dispatched **directly** to the `character` tool (no model).
 
-## What to run
+If you are invoked without slash dispatch, call the **character** tool once:
 
-Always use **exec** with this script (never upstream `openclaw-agents/install.sh`):
+- `command`: user args (`who` | `list` | `search …` | `<slug>`). Empty → `who`.
 
-```bash
-export OPENCLAW_CHARACTER_FORCE=1
-CHOOSER="$HOME/github-clone/GZMO/scripts/openclaw-choose-character.sh"
-```
+Do **not** `exec read …/SKILL.md`. Do **not** invent other tool ids.
+Never run upstream `openclaw-agents/install.sh`.
 
-| User args | Command |
-|-----------|---------|
-| empty / `help` | Print short help + `bash "$CHOOSER" who` |
-| `who` / `status` | `bash "$CHOOSER" who` |
-| `list` | `bash "$CHOOSER" list` (truncate to ~40 lines if huge) |
-| `search <q>` | `bash "$CHOOSER" search <q>` |
-| `<slug>` (e.g. `glados`) | `bash "$CHOOSER" <slug>` |
-
-## Reply rules
-
-1. Run the command; paste the useful output (persona name/emoji, OK/REFUSE).
-2. After a successful install, tell Max to send **`/new`** so the new SOUL/IDENTITY load.
-3. Never claim the GZMO ecosystem was removed — the chooser re-syncs markers.
-4. Never Qdrant upsert / start `gzmo-serve` / overwrite AGENTS by hand.
-
-## Examples
-
-- `/character who`
-- `/character search duck`
-- `/character rubber-duck`
-- `/character glados`
+After a successful persona install, tell Max to send `/new`.
