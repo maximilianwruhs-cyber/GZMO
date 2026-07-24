@@ -41,8 +41,9 @@ OpenClaw talks to Max on Telegram; **CT101 metabolizes**; the workstation **evol
 | `TOOLS.md` | hybrid | ecosystem block **synced** | Host/SSH/MCP facts |
 | `TOOLS.local.md` | OpenClaw | never overwrite | Cameras, TTS, personal nicknames |
 | `AGENTS.md` | hybrid | ecosystem block **synced** | Rules; OpenClaw boilerplate kept |
-| `SOUL.md` | hybrid | thin ecosystem boundaries synced | Persona stays human-shaped |
-| `IDENTITY.md` | hybrid | name/role synced | Operator-surface identity |
+| `SOUL.md` / `IDENTITY.md` | hybrid | thin ecosystem boundaries synced | **Persona** from [openclaw-agents](https://github.com/will-assistant/openclaw-agents) via `scripts/openclaw-choose-character.sh` |
+| `CHARACTER.md` | persona pack | never by sync | Optional overlay (pack’s AGENTS.md); do not replace workspace `AGENTS.md` |
+| `CHARACTER.active.json` | chooser | never by sync | Last selected pack slug |
 | `USER.md` | hybrid | operator prefs synced | Max + GZMO working style |
 | `HEARTBEAT.md` | OpenClaw | leave comments-only unless Max opts in | Empty = no heartbeat API spam |
 | `memory/*.md` | OpenClaw | never | Daily scratch |
@@ -66,6 +67,17 @@ Hand-edits **inside** markers are overwritten on next `sync-openclaw-workspace.s
 3. `session close --now` while CT101 owns metabolism  
 4. Claim “no cron jobs” without `bin/list-gzmo-crons.sh` / `CRON_JOBS.md`  
 5. Treat OpenClaw as the GZMO product brain ([MACHINE.md](../MACHINE.md))
+
+## Character packs (persona)
+
+Use [will-assistant/openclaw-agents](https://github.com/will-assistant/openclaw-agents) **only through**:
+
+```bash
+bash scripts/openclaw-choose-character.sh --list
+bash scripts/openclaw-choose-character.sh glados
+```
+
+Upstream `./install.sh` overwrites `AGENTS.md` and would erase the GZMO contract — the wrapper installs `SOUL.md` + `IDENTITY.md` only, saves pack `AGENTS.md` as `CHARACTER.md`, then re-runs `sync-openclaw-workspace.sh`.
 
 ## Sync command
 
