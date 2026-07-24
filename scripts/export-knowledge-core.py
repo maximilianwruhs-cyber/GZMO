@@ -2,6 +2,9 @@
 """
 export-knowledge-core.py  —  M5: Export mature knowledge from honeypot.
 
+THIS is the living overnight CORE path (CT101 honeypot_ripen job).
+Do not confuse with scripts/ripen-knowledge-core.py (charter concept cards).
+
 Exports honeypot rows that meet maturity criteria into a standalone
 knowledge_core.db. Only rows that are:
   - is_latest=1 (not superseded)
