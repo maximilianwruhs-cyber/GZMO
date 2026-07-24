@@ -1,10 +1,23 @@
 # Distillation failure — implementation handoff
 
-**Status:** planning / ready to ship in slices  
+**Status:** implemented (2026-07-24) — goal ≥10 CoreCrystallize export-eligible **reached on CT101 (15)**  
 **Date:** 2026-07-24  
 **Authority scars:** `research/ripen-honesty-2026-07-20.md`, `research/opportunities/felt-use-ripen-floor.md`  
 **Living path:** CT101 `gzmo-daemon` only — never workstation `gzmo-serve` overnight  
 **Do not:** lower `--min-recall` to fake Brain Feed green
+
+### Shipped in this arc
+
+| Piece | Path | Notes |
+|-------|------|-------|
+| Claims | `config/core-crystallize/CORE_CLAIMS.toml` | 15 insight claims |
+| Crystallize | `scripts/core-crystallize.sh` | enqueue + ensure_land (verbatim `CoreCrystallize:`) + Bonded recall=5 |
+| Bonded pin | `gzmo-core/src/memory/core_pin.rs` + vault promote hook | living binary may lag; SQL ensure_land covers until deploy |
+| Ingress | `honeypot.rs` reject notebooklm/drive_clean/takeout | path honesty |
+| Ripen honesty | banners on `export-knowledge-core.py` / `ripen-knowledge-core.py` | two ripen meanings |
+
+**Operator apply:** `CORE_CRYSTALLIZE_APPLY=1 bash scripts/core-crystallize.sh`  
+**Artifact:** `data-next/core-crystallize/latest.{json,md}`
 
 ---
 
@@ -206,10 +219,10 @@ else they never enter the ripen candidate set.
 
 ### 2.6 Acceptance
 
-- [ ] ≥10 CORE claims present as `is_latest=1` honeypot with allowed origin.
-- [ ] ≥10 with `recall_count≥3` and `confidence≥0.90`.
-- [ ] Dry-run export lists them; overnight job advice ≠ `starved_recall` solely due to these.
-- [ ] Operator profile / search returns them for “Knowledge OS” / “cascading honeypot” queries.
+- [x] ≥10 CORE claims present as `is_latest=1` honeypot with allowed origin.
+- [x] ≥10 with `recall_count≥3` and `confidence≥0.90`.
+- [x] Dry-run export SQL lists them (15 CoreCrystallize dual+origin on CT101 2026-07-24).
+- [ ] Operator profile / search returns them for “Knowledge OS” / “cascading honeypot” queries (needs living binary + embeddings; ensure_land leaves embedding NULL until search/embed backfill).
 
 ---
 

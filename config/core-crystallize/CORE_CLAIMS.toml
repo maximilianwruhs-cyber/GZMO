@@ -1,0 +1,65 @@
+# CORE crystallize claims — insight-grade honey (not ADR spam alone).
+# Enqueued as takeaways with prefix `CoreCrystallize:` then SessionDistill → honeypot.
+# Felt Use / core_pin Bonded earns recall≥3 for export gates.
+#
+# Edit carefully; keep one sentence per claim; confidence target ≥0.92 via distill verify.
+
+[[claims]]
+id = "knowledge-os"
+text = "[CONCEPT:Knowledge Operating System] GZMO is a Knowledge OS for one machine: LLMs generate, deterministic code verifies — not a chatbot wrapper."
+
+[[claims]]
+id = "cascading-honeypot"
+text = "[CONCEPT:Cascading Honeypot] Memory cascades sprawling raw web → distilled drops → executable wisdom; purposeful forgetting clears intermediate pots."
+
+[[claims]]
+id = "adr-0003"
+text = "[POLICY:ADR0003] One living overnight instance: CT101 gzmo-daemon is production metabolism; workstation is never a second overnight brain."
+
+[[claims]]
+id = "disposable-vault"
+text = "[DECISION:Disposable-vault] Protect the overnight writer and the recipe; regenerate vault rows — felt-use mass growth is not P0."
+
+[[claims]]
+id = "nutrient-path"
+text = "[DECISION:NutrientPath] External agents write via takeaway enqueue / living attach — never raw Qdrant upsert or dual-brain invent."
+
+[[claims]]
+id = "pipeline"
+text = "[SYSTEM:Honeypot Memory Pipeline] Flow is extract → verify → promote → vault → honeypot → ripen → knowledge_core."
+
+[[claims]]
+id = "ripen-gates"
+text = "[SYSTEM:honeypot_ripen] Export needs confidence≥0.90 AND recall_count≥3 AND origin in ingest|verified_dream|session_distill."
+
+[[claims]]
+id = "felt-use"
+text = "[SYSTEM:FeltUse] Glance=+1 Cited=+3 Bonded=+5 drive honeypot recall_count; promote always starts recall at 0."
+
+[[claims]]
+id = "lorenz-chaos"
+text = "[SYSTEM:Chaos] Lorenz modulates temperature/valence affect; chaos does not own overnight writer authority."
+
+[[claims]]
+id = "spark-honesty"
+text = "[SYSTEM:Spark] Spark produces serendipity and rare knowledge-graph growth — that rarity is expected, not overnight failure."
+
+[[claims]]
+id = "session-distill-nutrient"
+text = "[SYSTEM:SessionDistill] Session close / TinyFolder / Herdr takeaways feed CT101 distill→honeypot without requiring CLI chat surface."
+
+[[claims]]
+id = "dual-stack-trap"
+text = "[LESSON:DualStackTrap] Never freestyle ecosystem status from idle workstation serve LEDs — check CT101 gzmo-daemon and vault counts."
+
+[[claims]]
+id = "brain-feed-gate"
+text = "[SYSTEM:Brain Feed] Brain Feed GREEN after human apply of Serendipity living apply is a real product gate, not a vanity LED."
+
+[[claims]]
+id = "linc-gates"
+text = "[CONCEPT:LINC] Neurosymbolic / L.I.N.C.-style gates belong before honeypot promote: generators propose, verifiers decide truth."
+
+[[claims]]
+id = "qdrant-mirror"
+text = "[SYSTEM:Qdrant] Qdrant mirrors honeypot for search; it is not the OpenClaw nutrient write path."

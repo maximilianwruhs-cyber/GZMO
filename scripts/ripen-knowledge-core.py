@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Ripen honeypot facts into the M5 knowledge_core.
+"""Ripen honeypot facts into the M5 knowledge_core (CHARTER CONCEPT CARDS).
+
+NOT the living overnight emit path. CT101 `honeypot_ripen` runs
+`scripts/export-knowledge-core.py` (fact rows). This script writes a different
+charter schema — do not confuse the two when debugging “ripen idle”.
 
 Implements docs/archive/M5_KNOWLEDGE_CORE_CHARTER.md:
 

@@ -2,6 +2,7 @@
 //!
 //! Semantic vault (SQLite), episodic daily logs, and shell blacklist filter.
 
+pub mod core_pin;
 pub mod embeddings;
 pub mod episodic;
 pub mod evidence_localize;

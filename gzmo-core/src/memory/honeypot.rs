@@ -24,6 +24,11 @@ pub fn qualifies_for_honeypot(truth: &ExtractedTruth) -> bool {
         || sf_lower.contains("chat_session")
         || sf_lower.contains("quelltext")
         || sf_lower.contains("sources")
+        // Research library paths belong in Pi knowledge, not honeypot honey.
+        || sf_lower.contains("notebooklm")
+        || sf_lower.contains("drive_clean")
+        || sf_lower.contains("/takeout/")
+        || sf_lower.contains("takeout_curated")
     {
         return false;
     }
@@ -38,6 +43,7 @@ fn is_boilerplate(lower: &str) -> bool {
     lower.contains("sources do not contain")
         || lower.contains("migration_id")
         || lower.contains("takeout drive")
+        || lower.contains("curated research corpus consolidated")
 }
 
 /// Insert a new honeypot row with lifecycle metadata (new vault id — no upsert overwrite).
@@ -267,5 +273,24 @@ mod tests {
             Some("wave_01_foo.md")
         )));
         assert!(!qualifies_for_honeypot(&truth("fact", 0.9, None)));
+    }
+
+    #[test]
+    fn rejects_notebooklm_drive_and_corpus_boilerplate() {
+        assert!(!qualifies_for_honeypot(&truth(
+            "useful claim",
+            0.95,
+            Some("notebooklm/export.md"),
+        )));
+        assert!(!qualifies_for_honeypot(&truth(
+            "useful claim",
+            0.95,
+            Some("drive_clean/notes.md"),
+        )));
+        assert!(!qualifies_for_honeypot(&truth(
+            "This is a curated research corpus consolidated from Takeout.",
+            0.95,
+            Some("wave_01_foo.md"),
+        )));
     }
 }

@@ -16,6 +16,8 @@ use uuid::Uuid;
 use std::sync::Arc;
 
 use crate::memory::embeddings::Embedder;
+use crate::memory::core_pin;
+use crate::memory::felt_use::{self, FeltUseKind};
 use crate::memory::honeypot::{self, qualifies_for_honeypot};
 use crate::memory::lifecycle::{
     classify_truth_pair, extract_primary_entity, find_latest_honeypot_by_entity,
@@ -1785,6 +1787,7 @@ impl SqliteVault {
                     count = truths.len(),
                     origin, "Batch promoted truths to vault"
                 );
+                self.seed_core_pin_bonded(truths, origin);
                 self.maybe_incremental_qdrant_sync(truths, origin, promote_started)
                     .await;
                 Ok(())
@@ -1792,6 +1795,54 @@ impl SqliteVault {
             Err(e) => {
                 let _ = conn.execute_batch("ROLLBACK");
                 Err(e)
+            }
+        }
+    }
+
+    /// One-shot Bonded Felt Use for CORE crystallize / `[CORE]` pins (recall starts at 0).
+    fn seed_core_pin_bonded(&self, truths: &[ExtractedTruth], origin: &str) {
+        for truth in truths {
+            if !core_pin::should_seed_bonded(&truth.content, origin) {
+                continue;
+            }
+            if !qualifies_for_honeypot(truth) || is_unverified_derived(truth, origin) {
+                continue;
+            }
+            let Ok(conn) = self.pool.get() else {
+                continue;
+            };
+            // Prefer honeypot row id (may be corroboration existing_id).
+            let hp_id: Option<String> = conn
+                .query_row(
+                    "SELECT id FROM honeypot
+                     WHERE is_latest = 1 AND (id = ?1 OR content = ?2)
+                     ORDER BY CASE WHEN id = ?1 THEN 0 ELSE 1 END
+                     LIMIT 1",
+                    params![truth.id.to_string(), truth.content],
+                    |row| row.get(0),
+                )
+                .ok();
+            let Some(id_str) = hp_id else {
+                continue;
+            };
+            let recall: i64 = conn
+                .query_row(
+                    "SELECT recall_count FROM honeypot WHERE id = ?1",
+                    params![id_str],
+                    |row| row.get(0),
+                )
+                .unwrap_or(0);
+            // Only seed virgin rows — don't re-Bonded every corroboration.
+            if recall > 0 {
+                continue;
+            }
+            let Ok(uuid) = Uuid::parse_str(&id_str) else {
+                continue;
+            };
+            if let Err(e) = felt_use::touch(self, uuid, FeltUseKind::Bonded) {
+                tracing::debug!(error = %e, id = %id_str, "core_pin Bonded seed skipped");
+            } else {
+                info!(id = %id_str, "core_pin Bonded seed (+5 recall)");
             }
         }
     }
