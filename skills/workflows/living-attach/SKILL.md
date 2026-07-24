@@ -16,6 +16,7 @@ requires_evidence: true
 1. `bash scripts/living-attach-check.sh` — must exit 0 (vault under living path, facts ≥10k, dual-writer false).
 2. `bash scripts/emit-living-mcp-fragment.sh --format hermes` — paste **`gzmo-living`** only.
 3. Call living tools (`gzmo_memory_status` / search). Prefer nutrient / Brain Feed / airgap USP over ecosystem tourism.
+4. OpenClaw: `bash scripts/install-openclaw-living-attach.sh` then search via MCP; write with `bash scripts/openclaw-takeaway.sh '…'` (never Qdrant upsert).
 
 ## NEVER
 
