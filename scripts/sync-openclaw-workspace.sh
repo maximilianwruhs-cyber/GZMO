@@ -48,6 +48,22 @@ cp "$SRC/ECOSYSTEM.md" "$WS/ECOSYSTEM.md"
 cp "$SRC/LIVING_ATTACH.md" "$WS/LIVING_ATTACH.md"
 cp "$SRC/GZMO_ECOSYSTEM_CRON.md" "$WS/GZMO_ECOSYSTEM_CRON.md"
 
+# Workspace skills (Telegram slash commands)
+if [[ -d "$SRC/skills" ]]; then
+  mkdir -p "$WS/skills"
+  cp -a "$SRC/skills/." "$WS/skills/"
+  # Ensure skill helpers are executable (cp -a may preserve mode; force for run.sh)
+  find "$WS/skills" -type f -name 'run.sh' -exec chmod +x {} +
+fi
+
+# PATH-friendly alias for lean models / shell: gzmo-character <args>
+mkdir -p "$HOME/.local/bin"
+ln -sfn "$ROOT/scripts/openclaw-choose-character.sh" "$HOME/.local/bin/gzmo-character"
+ln -sfn "$WS/skills/character/run.sh" "$WS/bin/character" 2>/dev/null || true
+if [[ -f "$WS/bin/character" ]]; then
+  chmod +x "$WS/bin/character"
+fi
+
 # Ensure hybrid files exist
 [[ -f "$WS/AGENTS.md" ]] || cp "$HOME/.openclaw/workspace/AGENTS.md" "$WS/AGENTS.md" 2>/dev/null || touch "$WS/AGENTS.md"
 for f in SOUL.md IDENTITY.md USER.md TOOLS.md; do
