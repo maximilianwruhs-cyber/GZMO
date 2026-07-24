@@ -27,6 +27,16 @@ bash scripts/emit-living-mcp-fragment.sh --format json
 
 Cursor/Pi operators can still run `bash scripts/install-shared-mcp.sh` (merges known JSON homes). External hosts: **emit + paste**; do not thrash foreign configs blindly.
 
+### OpenClaw (workstation Telegram agent)
+
+```bash
+bash scripts/install-openclaw-living-attach.sh
+# Search: MCP server gzmo-living → gzmo_memory_search / gzmo_memory_status
+# Nutrient write (enqueue only): bash scripts/openclaw-takeaway.sh 'durable fact'
+```
+
+OpenClaw must **not** curl-upsert into Qdrant or auto-graph Neo4j from chat. Takeaways use the existing herdr living enqueue path (`session close --takeaway`, no `--now`).
+
 ### Attach truth (not folklore)
 
 | Proof | Pass |
