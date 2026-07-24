@@ -1,18 +1,12 @@
 #!/usr/bin/env bash
 # Choose an OpenClaw persona from will-assistant/openclaw-agents WITHOUT wiping GZMO contract.
 #
-# Upstream install.sh copies SOUL.md + IDENTITY.md + AGENTS.md (destructive to AGENTS).
-# This wrapper:
-#   1) installs SOUL.md + IDENTITY.md only
-#   2) saves pack AGENTS.md as CHARACTER.md (persona overlay, optional read)
-#   3) re-runs sync-openclaw-workspace.sh (restores GZMO:ECOSYSTEM markers)
-#   4) openclaw agents set-identity --from-identity
-#
 #   bash scripts/openclaw-choose-character.sh --list
 #   bash scripts/openclaw-choose-character.sh --search pirate
-#   bash scripts/openclaw-choose-character.sh glados
-#   bash scripts/openclaw-choose-character.sh bob-ross --force
+#   bash scripts/openclaw-choose-character.sh glados --force
+#   bash scripts/openclaw-choose-character.sh who
 #
+# Telegram skill /character forwards args here (always --force).
 # Docs: docs/OPENCLAW_WORKSPACE_CONTRACT.md
 set -euo pipefail
 
@@ -20,35 +14,48 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 WS="${OPENCLAW_WORKSPACE:-$HOME/.openclaw/workspace}"
 PACK_DIR="${OPENCLAW_AGENTS_DIR:-$HOME/github-clone/openclaw-agents}"
 PACK_REPO="${OPENCLAW_AGENTS_REPO:-https://github.com/will-assistant/openclaw-agents.git}"
-FORCE=0
+FORCE="${OPENCLAW_CHARACTER_FORCE:-0}"
 QUERY=""
 SEARCH_Q=""
+MODE=install
 
 usage() {
   cat <<'EOF'
-Usage: bash scripts/openclaw-choose-character.sh [options] <agent>
+Usage: bash scripts/openclaw-choose-character.sh [options] <agent|who|list|search …>
 
 Options:
-  --list, -l           List pack agents
-  --search, -s QUERY   Search pack
-  --force, -f          Skip confirm
-  --pack-dir DIR       Override clone path
+  --list, -l | list
+  --search, -s Q | search Q
+  --force, -f
+  who | status
   -h, --help
 
-Examples:
-  bash scripts/openclaw-choose-character.sh --list
-  bash scripts/openclaw-choose-character.sh glados
-  bash scripts/openclaw-choose-character.sh bob-ross --force
+Telegram:
+  /character list
+  /character search pirate
+  /character glados
+  /character who
 EOF
 }
 
-MODE=install
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --list|-l) MODE=list; shift ;;
-    --search|-s) MODE=search; SEARCH_Q="${2:-}"; shift 2 ;;
+    --list|-l|list) MODE=list; shift ;;
+    --search|-s)
+      MODE=search
+      SEARCH_Q="${2:-}"
+      shift
+      [[ $# -gt 0 ]] && shift
+      ;;
+    search)
+      MODE=search
+      SEARCH_Q="${2:-}"
+      shift
+      [[ $# -gt 0 ]] && shift
+      ;;
     --force|-f) FORCE=1; shift ;;
     --pack-dir) PACK_DIR="${2:-}"; shift 2 ;;
+    who|status) MODE=who; shift ;;
     -h|--help) usage; exit 0 ;;
     --) shift; break ;;
     -*)
@@ -69,6 +76,26 @@ ensure_pack() {
   [[ -x "$PACK_DIR/install.sh" ]] || chmod +x "$PACK_DIR/install.sh"
 }
 
+if [[ "$MODE" == "who" ]]; then
+  echo "=== Active persona ==="
+  if [[ -f "$WS/CHARACTER.active.json" ]]; then
+    python3 - "$WS/CHARACTER.active.json" <<'PY'
+import json, sys
+d = json.load(open(sys.argv[1]))
+print(f"{d.get('emoji', '')} {d.get('name')}  ({d.get('category')}/{d.get('slug')})")
+print(f"set_at: {d.get('generated_at')}")
+PY
+  else
+    echo "(no CHARACTER.active.json yet)"
+  fi
+  if [[ -f "$WS/IDENTITY.md" ]]; then
+    echo
+    echo "=== IDENTITY.md (head) ==="
+    head -12 "$WS/IDENTITY.md"
+  fi
+  exit 0
+fi
+
 ensure_pack
 
 if [[ "$MODE" == "list" ]]; then
@@ -81,7 +108,11 @@ if [[ "$MODE" == "search" ]]; then
 fi
 [[ -n "$QUERY" ]] || { usage >&2; exit 2; }
 
-# Resolve agent dir (non-interactive fuzzy)
+# Non-interactive when Telegram / OPENCLAW_CHARACTER_FORCE
+if [[ "${OPENCLAW_CHARACTER_FORCE:-0}" == "1" ]]; then
+  FORCE=1
+fi
+
 AGENT_DIR="$(python3 - "$PACK_DIR/agents" "$QUERY" <<'PY'
 import sys
 from pathlib import Path
@@ -91,7 +122,10 @@ dirs = sorted([p for p in agents.glob("*/*") if p.is_dir()])
 exact = [p for p in dirs if p.name.lower() == q]
 if exact:
     print(exact[0]); raise SystemExit(0)
-partial = [p for p in dirs if q in p.name.lower() or q in f"{p.parent.name}/{p.name}".lower()]
+partial = [
+    p for p in dirs
+    if q in p.name.lower() or q in f"{p.parent.name}/{p.name}".lower()
+]
 if len(partial) == 1:
     print(partial[0]); raise SystemExit(0)
 if not partial:
@@ -132,7 +166,6 @@ if [[ "$FORCE" -ne 1 ]]; then
 fi
 
 mkdir -p "$WS"
-# Backup previous persona
 stamp="$(date -u +%Y%m%dT%H%M%SZ)"
 bak="$WS/.persona-bak/$stamp"
 mkdir -p "$bak"
@@ -142,13 +175,11 @@ done
 
 [[ -f "$AGENT_DIR/SOUL.md" ]] && cp "$AGENT_DIR/SOUL.md" "$WS/SOUL.md" && echo "OK SOUL.md"
 [[ -f "$AGENT_DIR/IDENTITY.md" ]] && cp "$AGENT_DIR/IDENTITY.md" "$WS/IDENTITY.md" && echo "OK IDENTITY.md"
-# Do NOT overwrite AGENTS.md — store pack agent file as CHARACTER.md overlay
 if [[ -f "$AGENT_DIR/AGENTS.md" ]]; then
   cp "$AGENT_DIR/AGENTS.md" "$WS/CHARACTER.md"
   echo "OK CHARACTER.md (pack AGENTS.md saved; workspace AGENTS.md kept)"
 fi
 
-# Record selection
 python3 - "$WS" "$slug" "$cat_name" "$name" "$emoji" "$AGENT_DIR" <<'PY'
 import json, sys
 from datetime import datetime, timezone
@@ -168,16 +199,13 @@ payload = {
 (ws / "CHARACTER.active.json").write_text(json.dumps(payload, indent=2) + "\n")
 PY
 
-# Re-inject GZMO ecosystem contract
 bash "$ROOT/scripts/sync-openclaw-workspace.sh"
 
-# Push identity into OpenClaw agent config
 if command -v openclaw >/dev/null; then
   openclaw agents set-identity --workspace "$WS" --from-identity --json 2>&1 | tail -20 || true
 fi
 
 echo
 echo "[OK] Persona $emoji $name installed with GZMO ecosystem intact."
-echo "     Start a new OpenClaw session (/new) to load SOUL/IDENTITY."
-echo "     Ecosystem: ECOSYSTEM.md · living attach unchanged."
+echo "     Send /new in Telegram to load SOUL/IDENTITY."
 echo "     Previous persona backup: $bak"

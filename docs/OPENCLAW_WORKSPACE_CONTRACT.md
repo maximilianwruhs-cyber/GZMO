@@ -77,6 +77,9 @@ bash scripts/openclaw-choose-character.sh --list
 bash scripts/openclaw-choose-character.sh glados
 ```
 
+**Telegram:** `/character list` · `/character search duck` · `/character glados` · `/character who`  
+(skill: workspace `skills/character`; requires `commands.nativeSkills: true`)
+
 Upstream `./install.sh` overwrites `AGENTS.md` and would erase the GZMO contract — the wrapper installs `SOUL.md` + `IDENTITY.md` only, saves pack `AGENTS.md` as `CHARACTER.md`, then re-runs `sync-openclaw-workspace.sh`.
 
 ## Sync command

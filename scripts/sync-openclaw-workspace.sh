@@ -48,6 +48,12 @@ cp "$SRC/ECOSYSTEM.md" "$WS/ECOSYSTEM.md"
 cp "$SRC/LIVING_ATTACH.md" "$WS/LIVING_ATTACH.md"
 cp "$SRC/GZMO_ECOSYSTEM_CRON.md" "$WS/GZMO_ECOSYSTEM_CRON.md"
 
+# Workspace skills (Telegram slash commands)
+if [[ -d "$SRC/skills" ]]; then
+  mkdir -p "$WS/skills"
+  cp -a "$SRC/skills/." "$WS/skills/"
+fi
+
 # Ensure hybrid files exist
 [[ -f "$WS/AGENTS.md" ]] || cp "$HOME/.openclaw/workspace/AGENTS.md" "$WS/AGENTS.md" 2>/dev/null || touch "$WS/AGENTS.md"
 for f in SOUL.md IDENTITY.md USER.md TOOLS.md; do
