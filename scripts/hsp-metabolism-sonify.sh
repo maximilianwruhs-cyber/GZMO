@@ -225,17 +225,40 @@ print(json.dumps({"ok": True, "events": len(events), "midi": str(mid), "wav": st
 PY
 
 if [[ "$PLAY" -eq 1 ]]; then
+  # Preflight: silent "success" is usually a near-zero PipeWire sink, not WAV/ALSA format.
+  if command -v wpctl >/dev/null 2>&1; then
+    sink_line="$(wpctl status 2>/dev/null | awk '/Sinks:/{s=1;next} /Sources:/{s=0} s && /\*/ {print; exit}')"
+    vol_raw="$(wpctl get-volume @DEFAULT_AUDIO_SINK@ 2>/dev/null | awk '{print $2}')"
+    vol="${vol_raw:-0}"
+    echo "[*] PipeWire default sink: ${sink_line:-unknown} (volume ${vol})"
+    if awk -v v="$vol" 'BEGIN{exit !(v+0 < 0.15)}'; then
+      echo "[!] default sink volume < 0.15 — bumping to 0.40 so motif is audible"
+      wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.40 || true
+    fi
+  else
+    echo "[*] wpctl not found — cannot verify sink volume before play"
+  fi
+
   if command -v hsp >/dev/null 2>&1; then
     echo "[*] hsp ping (speaker check between motif and HSP finish-phrase world)"
-    hsp ping 2>/dev/null || true
+    hsp ping 2>/dev/null || echo "[!] hsp ping failed (non-fatal)"
   elif [[ -x "$ROOT/../HSP/run_hsp.sh" ]]; then
-    (cd "$ROOT/../HSP" && ./run_hsp.sh ping) 2>/dev/null || true
+    (cd "$ROOT/../HSP" && ./run_hsp.sh ping) 2>/dev/null || echo "[!] HSP run_hsp.sh ping failed (non-fatal)"
   fi
-  if command -v aplay >/dev/null 2>&1; then
-    aplay -q "$OUT_DIR/latest.wav" || true
+
+  # Prefer PipeWire-facing players; bare aplay already uses ALSA default → PipeWire here.
+  played=0
+  if command -v pw-play >/dev/null 2>&1; then
+    echo "[*] pw-play $OUT_DIR/latest.wav"
+    pw-play "$OUT_DIR/latest.wav" && played=1 || echo "[!] pw-play failed"
   elif command -v paplay >/dev/null 2>&1; then
-    paplay "$OUT_DIR/latest.wav" || true
-  else
-    echo "[*] preview WAV at $OUT_DIR/latest.wav (no aplay/paplay)"
+    echo "[*] paplay $OUT_DIR/latest.wav"
+    paplay "$OUT_DIR/latest.wav" && played=1 || echo "[!] paplay failed"
+  elif command -v aplay >/dev/null 2>&1; then
+    echo "[*] aplay -D default $OUT_DIR/latest.wav (PipeWire ALSA plugin)"
+    aplay -D default -q "$OUT_DIR/latest.wav" && played=1 || echo "[!] aplay failed"
+  fi
+  if [[ "$played" -eq 0 ]]; then
+    echo "[!] no audible play — WAV at $OUT_DIR/latest.wav (install pipewire-pulse / alsa-utils)"
   fi
 fi

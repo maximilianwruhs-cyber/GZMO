@@ -32,7 +32,8 @@ GZMO may append Synapse events for distill/dream/embed. Sibling HSP consumes mot
 - Preferred bus: Synapse on living host; lab may use file drops under `data-next/hsp-emit/`.
 - Sonify front door: `bash scripts/hsp-metabolism-sonify.sh` (also chained from `hsp-emit-demo.sh`)
   writes `data-next/hsp-metabolism/{latest.mid,latest.wav,latest.json}` from metabolism
-  artifacts + the latest `hsp-emit` motif. Optional `--play` uses aplay/paplay / `hsp ping`.
+  artifacts + the latest `hsp-emit` motif. Optional `--play` preflights sink
+  volume, then pw-play/paplay/aplay / `hsp ping`.
 EOF
 row PASS "emit-contract" "$OUT/emit-contract.md"
 
@@ -80,6 +81,21 @@ if [[ -d "$HSP_ROOT" ]]; then
   row PASS "hsp-sibling" "$HSP_ROOT"
 else
   row HOLD "hsp-sibling" "HSP repo not at HSP_ROOT — contract only"
+fi
+
+# Soft: playback path readiness (agents often misblame WAV format when sink is muted/low)
+if command -v wpctl >/dev/null 2>&1 && wpctl status >/dev/null 2>&1; then
+  vol="$(wpctl get-volume @DEFAULT_AUDIO_SINK@ 2>/dev/null | awk '{print $2}')"
+  sink="$(wpctl status 2>/dev/null | awk '/Sinks:/{s=1;next} /Sources:/{s=0} s && /\*/ {gsub(/^[[:space:]]+/,""); print; exit}')"
+  if awk -v v="${vol:-0}" 'BEGIN{exit !(v+0 < 0.15)}'; then
+    row HOLD "audio-play" "PipeWire up but default sink vol=${vol:-?} (<0.15) — --play may be inaudible; wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.4"
+  else
+    row PASS "audio-play" "PipeWire default sink ready (vol=${vol}; ${sink:-sink})"
+  fi
+elif command -v aplay >/dev/null 2>&1 || command -v pw-play >/dev/null 2>&1; then
+  row HOLD "audio-play" "player present but wpctl missing — cannot verify sink volume"
+else
+  row HOLD "audio-play" "no aplay/pw-play — generate-only; --play will skip"
 fi
 
 ROWS_TSV="$(printf '%s\n' "${ROWS[@]}")"

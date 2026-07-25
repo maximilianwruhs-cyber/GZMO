@@ -14,6 +14,8 @@ bash scripts/hsp-emit-demo.sh --motif spark_flare --intensity 0.85 --play
 bash scripts/hsp-emit-check.sh
 ```
 
+`--play` preflights PipeWire default-sink volume (bumps if below 0.15) and prefers `pw-play`/`paplay`/`aplay -D default`. If you hear nothing, check `wpctl get-volume @DEFAULT_AUDIO_SINK@` before blaming WAV format.
+
 ## Motifs
 
 | Motif | Feel |
