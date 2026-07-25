@@ -19,6 +19,8 @@ BIN="${CT101_GZMO_BIN:-/opt/gzmo/current/target/release/gzmo}"
 
 # Remote living config only — do not inherit workstation lab paths
 REMOTE_CMD="cd /opt/gzmo && export GZMO_CONFIG=/opt/gzmo/gzmo.toml"
+# Fresh CT101 vault may be <10k facts; living mcp-serve needs lab allow until filled.
+REMOTE_CMD+=" && export GZMO_ALLOW_LAB_VAULT=1 GZMO_PRODUCT=1"
 if [[ -n "${GZMO_SESSION_ID:-}" ]]; then
   REMOTE_CMD+=" && export GZMO_SESSION_ID=$(printf '%q' "$GZMO_SESSION_ID")"
 fi
