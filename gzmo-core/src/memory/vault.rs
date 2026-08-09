@@ -70,9 +70,10 @@ pub struct SqliteVault {
 }
 
 impl SqliteVault {
-    pub(crate) fn db_conn(&self) -> Result<r2d2::PooledConnection<SqliteConnectionManager>> {
+    pub fn db_conn(&self) -> Result<r2d2::PooledConnection<SqliteConnectionManager>> {
         self.pool.get().map_err(Into::into)
     }
+
 
     /// Open or create the vault database.
     pub fn open(db_path: impl AsRef<Path>) -> Result<Self> {
@@ -306,8 +307,30 @@ impl SqliteVault {
             }
             init_conn.execute_batch("PRAGMA user_version = 9")?;
         }
+        let user_version: u32 = init_conn.query_row("PRAGMA user_version", [], |row| row.get(0))?;
+        if user_version < 10 {
+            match init_conn.execute(
+                "ALTER TABLE honeypot ADD COLUMN domain_tag TEXT DEFAULT 'general'",
+                [],
+            ) {
+                Ok(_) => info!("Applied schema migration v10: added domain_tag column"),
+                Err(e) if e.to_string().contains("duplicate column") => {}
+                Err(e) => {
+                    tracing::error!(error = %e, "Schema migration v10 failed on domain_tag");
+                    return Err(e.into());
+                }
+            }
+            init_conn.execute_batch(
+                "CREATE INDEX IF NOT EXISTS idx_honeypot_domain ON honeypot(domain_tag);",
+            )?;
+            crate::memory::provenance_merkle::init_merkle_schema(&init_conn)?;
+            init_conn.execute_batch("PRAGMA user_version = 10")?;
+            info!("Applied schema migration v10: domain_tag + merkle_ledger");
+        }
+
 
         info!("Semantic vault initialized (WAL mode + r2d2 pool)");
+
 
         let path = db_path.as_ref().to_owned();
         let manager = SqliteConnectionManager::file(&path)
@@ -444,6 +467,37 @@ impl SqliteVault {
         info!(fact_id = %fact_id, delta, "Reinforced semantic fact (felt use + utility)");
         Ok(())
     }
+
+    /// Record explicit utilization feedback (boost if used in response, decay if ignored).
+    pub fn record_memory_utilization(&self, vault_id: &str, utilized: bool) -> Result<()> {
+        let conn = self.pool.get()?;
+        honeypot::record_memory_utilization(&conn, vault_id, utilized)
+    }
+
+    /// Record domain-contextual utilization feedback for the IEU Matrix.
+    pub fn record_contextual_utility(
+        &self,
+        vault_id: &str,
+        task_domain: &str,
+        utilized: bool,
+    ) -> Result<()> {
+        let conn = self.pool.get()?;
+        honeypot::record_contextual_utility(&conn, vault_id, task_domain, utilized)
+    }
+
+    /// Audit zero-trust Merkle cryptographic provenance ledger integrity.
+    pub fn verify_merkle_ledger(&self) -> Result<bool> {
+        let conn = self.pool.get()?;
+        crate::memory::provenance_merkle::verify_merkle_integrity(&conn)
+    }
+
+    /// Evict low-utility stale facts (`is_latest = 0`) from active honeypot retrieval space.
+    pub fn evict_low_utility_honeypot(&self) -> Result<usize> {
+        let conn = self.pool.get()?;
+        honeypot::evict_low_utility_honeypot_facts(&conn)
+    }
+
+
 
     /// Census for M5 export gates (`gzmo ripen status` / overnight honesty).
     pub fn ripen_gate_census(

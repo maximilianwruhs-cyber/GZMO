@@ -83,6 +83,7 @@ pub fn insert_honeypot_lifecycle(
         ],
     )?;
     sync_honeypot_fts_row(conn, vault_id, &truth.content, content_norm)?;
+    let _ = crate::memory::provenance_merkle::append_merkle_block(conn, vault_id, &truth.content);
     crate::memory::profile::invalidate_profile_cache(Some("obolus"));
     Ok(())
 }
@@ -130,9 +131,11 @@ pub fn upsert_honeypot_row(
         ],
     )?;
     sync_honeypot_fts_row(conn, vault_id, &truth.content, content_norm)?;
+    let _ = crate::memory::provenance_merkle::append_merkle_block(conn, vault_id, &truth.content);
     crate::memory::profile::invalidate_profile_cache(Some("obolus"));
     Ok(())
 }
+
 
 /// Keep FTS5 index aligned with honeypot rows (triggers removed in schema v4).
 pub fn sync_honeypot_fts_row(
@@ -153,6 +156,93 @@ pub fn sync_honeypot_fts_row(
     )?;
     Ok(())
 }
+
+/// Record feedback on memory utilization: boost utility_score if utilized, decay if ignored.
+pub fn record_memory_utilization(
+    conn: &Connection,
+    vault_id: &str,
+    utilized: bool,
+) -> Result<()> {
+    let now = Utc::now().to_rfc3339();
+    if utilized {
+        conn.execute(
+            "UPDATE honeypot
+             SET recall_count = recall_count + 1,
+                 utility_score = MIN(2.0, utility_score + 0.1),
+                 last_recalled_at = ?1
+             WHERE id = ?2 OR vault_id = ?2",
+            params![now, vault_id],
+        )?;
+    } else {
+        conn.execute(
+            "UPDATE honeypot
+             SET recall_count = recall_count + 1,
+                 utility_score = MAX(0.0, utility_score * 0.85),
+                 last_recalled_at = ?1
+             WHERE id = ?2 OR vault_id = ?2",
+            params![now, vault_id],
+        )?;
+    }
+
+    Ok(())
+}
+
+/// Record domain-contextual feedback on memory utilization for the IEU Matrix.
+pub fn record_contextual_utility(
+    conn: &Connection,
+    vault_id: &str,
+    task_domain: &str,
+    utilized: bool,
+) -> Result<()> {
+    let now = Utc::now().to_rfc3339();
+    let domain = if task_domain.trim().is_empty() {
+        "general"
+    } else {
+        task_domain.trim()
+    };
+
+    if utilized {
+        conn.execute(
+            "UPDATE honeypot
+             SET recall_count = recall_count + 1,
+                 utility_score = MIN(2.0, utility_score + 0.15),
+                 domain_tag = ?1,
+                 last_recalled_at = ?2
+             WHERE id = ?3 OR vault_id = ?3",
+            params![domain, now, vault_id],
+        )?;
+    } else {
+        conn.execute(
+            "UPDATE honeypot
+             SET recall_count = recall_count + 1,
+                 utility_score = MAX(0.0, utility_score * 0.88),
+                 domain_tag = ?1,
+                 last_recalled_at = ?2
+             WHERE id = ?3 OR vault_id = ?3",
+            params![domain, now, vault_id],
+        )?;
+    }
+    Ok(())
+}
+
+
+/// Evict facts from active honeypot search (`is_latest = 0`) if recall count >= 5 and utility_score < 0.2.
+pub fn evict_low_utility_honeypot_facts(conn: &Connection) -> Result<usize> {
+    let count = conn.execute(
+        "UPDATE honeypot
+         SET is_latest = 0
+         WHERE is_latest = 1
+           AND recall_count >= 5
+           AND utility_score < 0.2
+           AND decay_class NOT IN ('Structural', 'FlexibleIdentity')",
+        [],
+    )?;
+    if count > 0 {
+        crate::memory::profile::invalidate_profile_cache(Some("obolus"));
+    }
+    Ok(count)
+}
+
 
 /// Upsert one evidence row inside an open vault transaction.
 pub fn upsert_evidence_row(

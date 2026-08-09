@@ -8,11 +8,13 @@ pub mod episodic;
 pub mod evidence_localize;
 pub mod felt_use;
 pub mod filter;
+pub mod graph_rag;
 pub mod honeypot;
 pub mod kg_extract;
 pub mod kg_promotion;
 pub mod lifecycle;
 pub mod profile;
+pub mod provenance_merkle;
 pub mod qdrant_recall;
 pub mod qdrant_sync;
 pub mod recall_rrf;
@@ -21,6 +23,7 @@ pub mod ripen;
 pub mod scratch;
 pub mod vault;
 pub mod vault_backend;
+
 
 pub use scratch::{
     DistillJob, DistillSource, RecallSnippet, ScratchPayload, ScratchScope, ScratchService,
