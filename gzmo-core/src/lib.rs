@@ -33,6 +33,7 @@ pub mod orchestrator;
 pub mod pedagogy;
 pub mod platform_memory;
 pub mod platform_search;
+pub mod sandbox;
 pub mod scanner;
 pub mod session;
 pub mod session_distill;

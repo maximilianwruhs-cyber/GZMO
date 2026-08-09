@@ -327,6 +327,21 @@ impl SqliteVault {
             init_conn.execute_batch("PRAGMA user_version = 10")?;
             info!("Applied schema migration v10: domain_tag + merkle_ledger");
         }
+        let user_version: u32 = init_conn.query_row("PRAGMA user_version", [], |row| row.get(0))?;
+        if user_version < 11 {
+            init_conn.execute_batch(
+                "CREATE TABLE IF NOT EXISTS honeypot_vectors (
+                    fact_id TEXT PRIMARY KEY,
+                    embedding_dim INTEGER NOT NULL DEFAULT 384,
+                    vector_blob BLOB,
+                    created_at TEXT NOT NULL,
+                    FOREIGN KEY (fact_id) REFERENCES honeypot(id)
+                );
+                CREATE INDEX IF NOT EXISTS idx_honeypot_vectors_fact ON honeypot_vectors(fact_id);",
+            )?;
+            init_conn.execute_batch("PRAGMA user_version = 11")?;
+            info!("Applied schema migration v11: honeypot_vectors for sqlite-vec readiness");
+        }
 
 
         info!("Semantic vault initialized (WAL mode + r2d2 pool)");

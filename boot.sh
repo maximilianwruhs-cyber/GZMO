@@ -137,7 +137,16 @@ if command -v nvidia-smi >/dev/null; then
 fi
 
 # Deterministic Hardware-Adaptive Model Selection Ladder
-if [ "$FREE_VRAM_MB" -gt 22000 ]; then
+HAS_VLLM=0
+if command -v vllm >/dev/null 2>&1 || python3 -c "import vllm" >/dev/null 2>&1; then
+    HAS_VLLM=1
+fi
+
+if [ "$FREE_VRAM_MB" -gt 22000 ] && [ "$HAS_VLLM" -eq 1 ]; then
+    PHANTOM_NGL=99
+    TARGET_MODEL="./models/qwen3.5-35b-a3b.Q4_K_M.gguf"
+    ok "Enthusiast GPU (${FREE_VRAM_MB}MB free) + vLLM detected. Engine mode: vLLM PagedAttention."
+elif [ "$FREE_VRAM_MB" -gt 22000 ]; then
     PHANTOM_NGL=99
     TARGET_MODEL="./models/qwen3.5-35b-a3b.Q4_K_M.gguf"
     ok "Enthusiast GPU detected (${FREE_VRAM_MB}MB free). Targeting Qwen 35B Multi-Node."
