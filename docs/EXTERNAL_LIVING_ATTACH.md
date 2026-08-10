@@ -3,7 +3,8 @@
 **Status:** Agent-facing safe attach kit (2026-07-22)  
 **USP:** nutrient · Brain Feed · airgap living — not ecosystem tourism  
 **Doctrine:** [ADR-0003](./ADR-0003-one-instance-metabolism.md) · [ADR-0004](./ADR-0004-airgap-living-usp.md) · [MCP_LOCAL_ATTACH.md](./MCP_LOCAL_ATTACH.md)  
-**Research:** [living-external-attach-plug-and-play-2026-07-22.md](../research/living-external-attach-plug-and-play-2026-07-22.md)
+**Research:** [living-external-attach-plug-and-play-2026-07-22.md](../research/living-external-attach-plug-and-play-2026-07-22.md)  
+**Config homes / order / refuse / GREEN:** [LIVING_ATTACH_CONFIG_SPEC.md](./LIVING_ATTACH_CONFIG_SPEC.md)
 
 Living attach is **not** “any stdio `gzmo mcp-serve`.” It is a labeled contract: server name `gzmo-living` + living `GZMO_CONFIG` (or the official SSH wrapper) + vault proof.
 
