@@ -8,6 +8,8 @@
 
 Written 2026-08-15 after the public zoo was taken private and archived. The storefront is gone. The animal is not.
 
+**Why this file is the anchor (not a mood):** it is the operational constitution for a durable tool. Two rooms, one animal — the telescope is a *model* of the Keep (Ashby), never a second writer. Thought notes are constraints: Feynman forbids fake progress; Bateson forbids furniture rows; Beer (POSIWID) judges the morning vault; James makes the gate the organ of forgetting; Pasteur forbids unverified spark. Promote-by-loop is surgery, not a textbook rewrite. Fail-closed: no SSH → `INCONCLUSIVE` / RED, never a synthetic green. §8 is the lock on costumes.
+
 ---
 
 > The first principle is that you must not fool yourself — and you are the easiest person to fool.  
@@ -368,10 +370,12 @@ That is special. It is also small. Small is the point.
 
 ## 11. How to use this file
 
-1. Read §0–§2 when you want to remember why.
-2. Read §5–§6 when you pick a graft.
-3. Read §7 when you only have this telescope.
-4. Read §8 when an agent offers to “finish the pipeline.”
+Operating cadence for every agent or human on this telescope:
+
+1. **§§0–2** — identity (`honeypot + verify + promote = GZMO`); two rooms, one animal.
+2. **§§5–6** — pick **one** loop and graft it; no whole-pipeline rewrites.
+3. **§7** — ship falsifiable telescope wins when CT101 is out of reach.
+4. **§8** — refuse costumes and scope creep on sight.
 5. Update the active ship line when opportunity-discovery changes the bet.
 6. Do not add a workshop repo to §3 without saying which loop it serves.
 
