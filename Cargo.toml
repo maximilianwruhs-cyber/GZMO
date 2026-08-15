@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["gzmo-core", "gzmo-cli", "gzmo-chaos", "gzmo-scheduler"]
+members = ["gzmo-core", "gzmo-cli", "gzmo-chaos", "gzmo-scheduler", "crates/eml-core"]
 
 [workspace.package]
 version = "0.1.0"

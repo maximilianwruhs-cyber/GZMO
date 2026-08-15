@@ -8,7 +8,11 @@
 # Artifact: data-next/openclaw-attach/takeaway-latest.json (+ herdr living-enqueue.json)
 set -euo pipefail
 
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SCRIPT_PATH="$(readlink -f "${BASH_SOURCE[0]}")"
+ROOT="$(cd "$(dirname "$SCRIPT_PATH")/.." && pwd)"
+if [[ ! -f "$ROOT/scripts/herdr-living-enqueue.sh" ]]; then
+  ROOT="${GZMO_ROOT:-$HOME/github-clone/GZMO}"
+fi
 DATA="${GZMO_DATA_NEXT:-$ROOT/data-next}"
 OUT="$DATA/openclaw-attach"
 mkdir -p "$OUT"

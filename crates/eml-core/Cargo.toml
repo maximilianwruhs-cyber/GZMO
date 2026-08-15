@@ -1,0 +1,23 @@
+[package]
+name = "eml-core"
+version = "0.1.0"
+edition = "2021"
+description = "Exp-Minus-Log symbolic computation engine — ComplexBall arithmetic, RPN emit, zero-copy execution"
+
+[dependencies]
+num-complex = "0.4"
+thiserror = "1"
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+rand = "0.8"
+
+[[bench]]
+name = "system_benchmarks"
+harness = false
+
+[profile.bench]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+debug = true

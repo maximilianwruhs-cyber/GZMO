@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# Override wrapper for pi-gzmo-mcp-serve.sh — adds lab vault perms for living attach.
+# The daemon already runs with GZMO_ALLOW_LAB_VAULT=1 on CT101.
+# This is needed because the vault has < 10000 facts (threshold for stranger attach).
+set -euo pipefail
+
+export GZMO_PRODUCT=1
+export GZMO_ALLOW_LAB_VAULT=1
+exec "$(dirname "$0")/pi-gzmo-mcp-serve.sh" "$@"

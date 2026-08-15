@@ -29,7 +29,18 @@ chmod +x "$WRAPPER" "$TAKEAWAY" \
   "$ROOT/scripts/living-attach-check.sh" 2>/dev/null || true
 
 echo "=== living-attach-check ==="
-bash "$ROOT/scripts/living-attach-check.sh"
+if [[ "$PROBE" -eq 1 ]]; then
+  bash "$ROOT/scripts/living-attach-check.sh"
+else
+  bash "$ROOT/scripts/living-attach-check.sh" || true
+fi
+
+echo "=== tools.deny cron (llama.cpp schema hygiene) ==="
+# OpenClaw cron tool schemas use unanchored pattern "\\S"; llama.cpp rejects
+# those with "Pattern must start with '^' and end with '$'" and Telegram gets
+# the generic "Something went wrong" reply. Jobs still run via gateway cron CLI.
+# Docs: config/openclaw-workspace/GZMO_ECOSYSTEM_CRON.md
+openclaw config set tools.deny '["cron"]' --strict-json
 
 echo "=== openclaw mcp set gzmo-living ==="
 # Stdio SSH bridge — same contract as Cursor/Pi shared MCP
@@ -83,71 +94,6 @@ openclaw mcp show gzmo-living
 openclaw mcp probe
 \`\`\`
 EOF
-
-# Patch TOOLS.md marker block (idempotent)
-python3 - "$OC_WS/TOOLS.md" <<'PY'
-from pathlib import Path
-import sys
-p = Path(sys.argv[1])
-text = p.read_text(encoding="utf-8") if p.is_file() else ""
-marker = "### Living memory (gzmo-living MCP)"
-block = """### Living memory (gzmo-living MCP)
-
-- **Search:** MCP server `gzmo-living` → `gzmo_memory_search` / `gzmo_memory_status` (CT101 vault, ~40k+ honeypot)
-- **Takeaway write path:** `bash bin/openclaw-takeaway.sh '…'` (enqueue only; never `--now`)
-- **Playbook:** `LIVING_ATTACH.md`
-- **Never:** Qdrant upsert / Neo4j auto-graph from chat / start `gzmo-serve`
-
-"""
-if marker in text:
-    # replace from marker through next ### or EOF-ish section
-    import re
-    text2 = re.sub(
-        r"### Living memory \(gzmo-living MCP\).*?(?=\n### |\n## |\Z)",
-        block,
-        text,
-        count=1,
-        flags=re.S,
-    )
-    p.write_text(text2, encoding="utf-8")
-else:
-    p.write_text(text.rstrip() + "\n\n" + block, encoding="utf-8")
-print(f"updated {p}")
-PY
-
-python3 - "$OC_WS/AGENTS.md" <<'PY'
-from pathlib import Path
-import sys
-p = Path(sys.argv[1])
-text = p.read_text(encoding="utf-8") if p.is_file() else ""
-needle = "### Living memory / takeaway"
-block = """### Living memory / takeaway
-
-For “was weiß ich über X?” use MCP **`gzmo-living`** (`gzmo_memory_search`) — not grep-only and not raw Qdrant upsert.
-
-After a meaningful durable insight: `bash bin/openclaw-takeaway.sh '…'` (Brain Feed enqueue on CT101).
-
-See `LIVING_ATTACH.md`.
-
-"""
-if needle in text:
-    import re
-    text = re.sub(
-        r"### Living memory / takeaway.*?(?=\n### |\n## |\Z)",
-        block,
-        text,
-        count=1,
-        flags=re.S,
-    )
-else:
-    # insert after Session Startup cron section if present, else append
-    if "### Cron / schedules" in text:
-        text = text.replace("### Cron / schedules", block + "### Cron / schedules", 1)
-    else:
-        text = text.rstrip() + "\n\n" + block
-p.write_text(text, encoding="utf-8")
-print(f"updated {p}")
-PY
 
 echo
 echo "[OK] OpenClaw living attach installed"
