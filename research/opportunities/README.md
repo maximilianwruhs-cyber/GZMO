@@ -1,6 +1,6 @@
 # Opportunity bet log
 
-Operator research bets for GZMO upgrades. Doctrine: [docs/OPPORTUNITY_DISCOVERY.md](../../docs/OPPORTUNITY_DISCOVERY.md).
+Operator research bets for GZMO upgrades. Doctrine: [docs/OPPORTUNITY_DISCOVERY.md](../../docs/OPPORTUNITY_DISCOVERY.md). Field SOTA (not a second bet): [../lineage-watch/](../lineage-watch/README.md).
 
 ## Status values
 

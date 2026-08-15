@@ -159,6 +159,8 @@ Schema v8/v9 `honeypot.utility_score`, `reinforce_by`, and `ORDER BY utility_sco
 
 **Telescope half of that bet:** tests that utility order is real; MCP search touches felt-use; no path that green-passes empty recall; docs that say census is RED when SSH fails — not “0 facts, all good.”
 
+**Field watch (does not start a second bet):** [research/lineage-watch/](../research/lineage-watch/README.md) — monthly SOTA in utility retrieve, offline consolidation, forgetting, verified spark, local-first cousins. Latest: [sota-2026-08-15.md](../research/lineage-watch/sota-2026-08-15.md). Steal algorithms; do not grow organs from FOMO.
+
 ---
 
 ## 5. Loop book — how to evolve each organ
@@ -378,5 +380,6 @@ Operating cadence for every agent or human on this telescope:
 4. **§8** — refuse costumes and scope creep on sight.
 5. Update the active ship line when opportunity-discovery changes the bet.
 6. Do not add a workshop repo to §3 without saying which loop it serves.
+7. Refresh [lineage-watch](../research/lineage-watch/README.md) monthly (or when a paper moves a field). A watch item is not a ship bet.
 
-Related: [MACHINE.md](../MACHINE.md) · [ADR-0004](ADR-0004-airgap-living-usp.md) · [ADR-0005](ADR-0005-flywheel-over-frozen-topology.md) · [BRAIN_FEED.md](BRAIN_FEED.md) · [OPPORTUNITY_DISCOVERY.md](OPPORTUNITY_DISCOVERY.md) · [CONTINUOUS_UPGRADE.md](CONTINUOUS_UPGRADE.md) · [UNIQUENESS_THESIS.md](UNIQUENESS_THESIS.md) · [SPINE_FOCUS.md](SPINE_FOCUS.md)
+Related: [MACHINE.md](../MACHINE.md) · [ADR-0004](ADR-0004-airgap-living-usp.md) · [ADR-0005](ADR-0005-flywheel-over-frozen-topology.md) · [BRAIN_FEED.md](BRAIN_FEED.md) · [OPPORTUNITY_DISCOVERY.md](OPPORTUNITY_DISCOVERY.md) · [CONTINUOUS_UPGRADE.md](CONTINUOUS_UPGRADE.md) · [UNIQUENESS_THESIS.md](UNIQUENESS_THESIS.md) · [SPINE_FOCUS.md](SPINE_FOCUS.md) · [lineage-watch](../research/lineage-watch/README.md)

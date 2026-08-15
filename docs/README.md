@@ -14,6 +14,7 @@ Canonical operator and architecture docs. Session reports and milestone logs bel
 | [BRAIN_FEED.md](BRAIN_FEED.md) | **Active Unpark** — satellites that nourish the living vault |
 | [OPPORTUNITY_DISCOVERY.md](OPPORTUNITY_DISCOVERY.md) | **What to build next** — Sense→Rank→Bet→Ship→Soak |
 | [TELESCOPE_LINEAGE.md](TELESCOPE_LINEAGE.md) | **Telescope guide** — evolve the Keep from a non-living host; workshop as dojo |
+| [../research/lineage-watch/README.md](../research/lineage-watch/README.md) | **Field watch** — SOTA in utility / dream / forget / local-first (informs the active bet; not a second ship) |
 | [MCP_LOCAL_ATTACH.md](MCP_LOCAL_ATTACH.md) | **Brand MCP** — stdio / localhost only |
 | [SPINE_FOCUS.md](SPINE_FOCUS.md) | Active focus — living first-class; lite bootstrap |
 | [PRODUCT_MCP.md](PRODUCT_MCP.md) | **Lite bootstrap** — Cursor/Pi Memory MCP (`gzmo init`) |
