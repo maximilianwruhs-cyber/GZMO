@@ -159,7 +159,7 @@ Schema v8/v9 `honeypot.utility_score`, `reinforce_by`, and `ORDER BY utility_sco
 
 **Telescope half of that bet:** tests that utility order is real; MCP search touches felt-use; no path that green-passes empty recall; docs that say census is RED when SSH fails — not “0 facts, all good.”
 
-**Field watch (does not start a second bet):** [research/lineage-watch/](../research/lineage-watch/README.md) — monthly SOTA. Four candidate steals map onto existing organs (`felt-use`, dream, night labels, `honeypot-gate`). None become a ship until CT101 census confirms felt-use mass. Latest: [sota-2026-08-15.md](../research/lineage-watch/sota-2026-08-15.md).
+**Field watch (does not start a second bet):** [research/lineage-watch/](../research/lineage-watch/README.md) — local agentic memory is the field; harvest every *rule*, reject their *SKU*. Graft queue is four organ-mapped steals after CT101 census. Latest: [sota-2026-08-15.md](../research/lineage-watch/sota-2026-08-15.md).
 
 ---
 

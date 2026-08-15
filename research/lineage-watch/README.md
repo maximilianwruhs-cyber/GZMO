@@ -1,14 +1,43 @@
-# Lineage watch — stay ahead without tourism
+# Lineage watch — harvest the field, graft one organ
 
 **Started:** 2026-08-15 (telescope)  
 **Doctrine:** [docs/TELESCOPE_LINEAGE.md](../../docs/TELESCOPE_LINEAGE.md) · [docs/OPPORTUNITY_DISCOVERY.md](../../docs/OPPORTUNITY_DISCOVERY.md)  
-**Does not:** start a second ship bet, clone Mem* SaaS, or require CT101.
+**Field:** local agentic memory — this *is* the Keep. Read everyone. Reimplement the rules in `gzmo-core`.  
+**Does not:** start a second ship bet, clone a Mem* *product*, or require CT101 to *read*.
 
-This is a **reading program** for the fields the Keep actually competes in. New papers go into dated SOTA notes. Steal algorithms; do not grow organs from FOMO. `felt-use-mass-growth` stays the singular active ship.
+Nobody is asking you to acquire a company. The constraint is narrower: do not import their **SKU** (multi-tenant HTTP, cloud-default, overnight weight updates, second writer). Every **algorithm** in local agentic memory is in-bounds if it lands on an organ you already have.
 
-## Four candidate steals (map to organs — do not add organs)
+`felt-use-mass-growth` stays the singular *graft*. Harvest is not a graft. Notes can list twenty steals; the living host applies one loop at a time.
 
-None of these become an active bet until CT101 living census shows felt-use mass on real sessions.
+## In-field harvest (steal the rule, not the repo)
+
+July 22 already named most of these. Keep taking them. Attribution in the July note.
+
+| Rule | From | Lands on | Status |
+|------|------|----------|--------|
+| Two-phase retrieve (semantic → utility) | MemRL | `rrf-recall` / vault `ORDER BY utility_score` | In-tree (G4); outcome-hook still open |
+| Intent–Experience–Utility triplet | MemRL | `felt-use` | Partial — glance/cited/bonded ≠ task return |
+| Store failures as cases | Memento | honeypot / distill | Open |
+| Extract → consolidate → retrieve | Mem0 (pattern) | distill → gate → vault | In-tree wiring |
+| STM → heat → long promote | MemoryOS | honeypot lifecycle | In-tree cousin |
+| Tier paging / eviction | MemGPT / Letta | immune / vault tiers | Partial |
+| NREM/REM + value forget | SCM | dream / immune | REM soaked; forget apply is lab |
+| When-to-dream budget | Sleep-time Compute | scheduler | G6 scripts exist |
+| Immutable raw → curated store | Anthropic Dreams lineage | honeypot-origin | Identity gap if origin is all SessionDistill |
+| Reflection → semantic | Generative Agents | distill | In-tree takeaway |
+| Memory kinds + action taxonomy | CoALA | skills / vault kinds | Partial |
+| Region rewrite supersession | Auto-Dreamer | dream / distill | Queued (#2) |
+| TRIAGE → CONSOLIDATE → AUDIT | Memory as Metabolism | night labels | Queued (#3) |
+| Blind-verify + rollback | SuperLocalMemory | `honeypot-gate` | Queued (#4) |
+| Conflict-aware supersede tag | SleepGate | `honeypot-gate` | Queued (#4) |
+| Bi-temporal / as-of recall | SuperLocalMemory | vault | Open — steal the *dates*, not GDPR |
+| LoCoMo / LongMemEval | benches | soak satellite | Borrow-eval only |
+
+**Not the field (product shapes):** public multi-tenant memory, provider-assisted as default, overnight LoRA/PEFT, second writer, compliance-OS as USP.
+
+## Next grafts (after census — still not new organs)
+
+None of these become an active bet until CT101 living census shows felt-use mass on real sessions. The table above is the harvest; this is the queue.
 
 | # | Steal | Source → organ | Filter |
 |---|-------|----------------|--------|
@@ -46,4 +75,8 @@ None of these become an active bet until CT101 living census shows felt-use mass
 
 ## Rule of steal
 
-If it does not move honeypot quality, felt utility, verified spark, or airgap-honest overnight — it is not a steal. It is tourism.
+If it is a **local-memory rule** (retrieve, forget, supersede, consolidate, verify, time) and it can live in one writer on disk you own — take it.
+
+If it is a **company shape** (SaaS SKU, multi-tenant HTTP, cloud-required core, weight-update sleep) — leave it.
+
+If it does not move honeypot quality, felt utility, verified spark, or airgap-honest overnight — it is not even a memory rule. It is tourism.
