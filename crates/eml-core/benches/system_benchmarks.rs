@@ -62,5 +62,43 @@ fn bench_compile(c: &mut Criterion) {
     });
 }
 
-criterion_group!(benches, bench_eml_primitives, bench_deep_trees, bench_compile);
+fn bench_vs_f64(c: &mut Criterion) {
+    let mut group = c.benchmark_group("vs_f64");
+    let exp_prog = synth::exp(EmlExpr::v(0)).compile();
+    let ln_prog = synth::ln(EmlExpr::v(0)).compile();
+    let mul_prog = synth::mul(EmlExpr::v(0), EmlExpr::v(1)).compile();
+    let x = ComplexBall::from_real(2.0);
+    let y = ComplexBall::from_real(3.0);
+
+    group.bench_function("eml_exp(2)", |b| {
+        b.iter(|| execute(&exp_prog, black_box(&[x])).unwrap())
+    });
+    group.bench_function("f64_exp(2)", |b| {
+        b.iter(|| black_box(black_box(2.0f64).exp()))
+    });
+    group.bench_function("eml_ln(5)", |b| {
+        let five = ComplexBall::from_real(5.0);
+        b.iter(|| execute(&ln_prog, black_box(&[five])).unwrap())
+    });
+    group.bench_function("f64_ln(5)", |b| {
+        b.iter(|| black_box(black_box(5.0f64).ln()))
+    });
+    group.bench_function("eml_mul(2,3)", |b| {
+        b.iter(|| execute(&mul_prog, black_box(&[x, y])).unwrap())
+    });
+    group.bench_function("f64_mul(2,3)", |b| {
+        let a = black_box(2.0f64);
+        let c = black_box(3.0f64);
+        b.iter(|| black_box(a * c))
+    });
+    group.finish();
+}
+
+criterion_group!(
+    benches,
+    bench_eml_primitives,
+    bench_deep_trees,
+    bench_compile,
+    bench_vs_f64
+);
 criterion_main!(benches);

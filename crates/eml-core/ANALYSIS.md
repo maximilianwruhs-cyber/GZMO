@@ -1,7 +1,7 @@
 # EML Core — Technische Analyse
 
 **Datum:** 2026-08-15  
-**Tests:** 12/12 grün · Clippy sauber
+**Tests:** crate unit suite (lib + pipeline_hooks) · Clippy `-D warnings` standalone
 
 ---
 
@@ -37,58 +37,61 @@ analog zu NAND in der booleschen Logik.
 
 4. **`synth`-Modul:** Sämtliche elementaren Funktionen (exp, ln, +, −, ×, ÷, sqrt, pow, inv) sind aus _einem_ Operator synthetisiert und getestet.
 
-5. **12 Tests + Criterion-Benchmarks** — solide Abdeckung.
+5. **Unit tests + Criterion** — arity (`v(0)` → 1, constants → 0, sparse), empty args, NaN, final overflow, `synth::neg`, constant-fold of closed terms, `Display`/parse. `vs_f64` bench group exists; run it before claiming speed.
 
 ---
 
 ## Schwächen / TODO
 
-1. **`complex_ball.rs` — NaN-Check zu spartanisch:**
-   `ln(0.0)` gibt `-inf` (IEEE 754 valide), wird durchgelassen. Aber `exp(-inf)` = 0,
-   dann `0 - (-inf)` = `+inf` — das crasht nicht, aber `center.re.is_nan()` fängt
-   `inf - inf` nicht. Ein `is_finite()`-Check auf dem finalen Center wäre robuster.
+1. **`ln(0)` is IEEE continuation, not a refuse.** `synth::neg` / `add` pass
+   `ln(0) = -inf` as the left operand. `ComplexBall::eml` may return an infinite
+   center. `execute` refuses a non-finite *final* result as `EmlError::Overflow`.
+   Real-fast-path `exp(1000)` now overflows instead of dying as complex `NaN`.
 
-2. **Kein `synth::neg`:** Für `neg(y)` wird inline `sub(c(0.0), y)` in `add` verwendet.
-   Ein eigenes `pub fn neg` würde Redundanz vermeiden.
+2. **Radius is not rigorous.** `RADIUS_IS_RIGOROUS == false`. First-order plus
+   `1e-15`. Do not treat a small radius as enclosure.
 
-3. **`EmlExpr.compile()` linearisiert nur — keine Optimierung:**
-   Constant Folding, Dead Code Elimination oder `eml(x, 1)` → `exp(x)` als pattern match
-   fehlen. Für tiefe Bäume (>50 Knoten) wäre Constant Folding ein Gewinn.
+3. **Fold is closed-term evaluation, not a CAS.** No `eml(ln(x), exp(y)) → x-y`
+   rewrite. Partial trees with variables are only recursively folded in children.
 
-4. **Fehlerarten:** `EmlError::Overflow` ist deklariert aber nie gethrowed —
-   `exp(1000.0)` gibt `inf` ohne Fehler.
+4. **`USE_CASES.md` is not a roadmap.** 44 rows are speculative. No `gzmo-core`
+   callers. Do not wire honeypot/RRF/orchestrator from that table.
 
-5. **Benchmarks:** Die Criterion-Benchmarks sind da, aber es gibt keine Comparative
-   Benchmarks gegen naive `f64::exp` / `f64::ln` Implementierungen — genau das wäre
-   spannend für die Softmax-Hypothese.
+5. **`vs_f64` kill condition fired (2026-08-15, this host, Criterion medians,
+   `black_box` on live inputs — first run was invalid: `f64` was const-folded
+   to ~1.55 ns for exp/ln/mul).**
+
+   | Op | EML | `f64` | Multiplier |
+   |----|-----|-------|------------|
+   | `exp(2)` | 237 ns | 17.0 ns | **14×** |
+   | `ln(5)` | 560 ns | 19.2 ns | **29×** |
+   | `mul(2,3)` | 2.90 µs | 2.38 ns | **1200×** |
+
+   EML is not a faster float. Do not replace honeypot/RRF/`f64` scores with it.
 
 ---
 
-## Performance-Profil (geschätzt)
+## Performance-Profil (exakte RPN-Instruktionen)
 
-| Operation | RPN-Länge | Relative Kosten |
-|-----------|-----------|-----------------|
-| `exp(x)`  | 2         | ~1×             |
-| `ln(x)`   | 5         | ~2.5×           |
-| `x + y`   | ~11       | ~5.5×           |
-| `x × y`   | ~13       | ~7×             |
-| `x / y`   | ~17       | ~9×             |
-| `pow(x,y)`| ~19       | ~10×            |
+| Operation    | RPN-Länge (Instruktionen) | Relative Kosten (Basis `exp`) |
+|--------------|---------------------------|-------------------------------|
+| `exp(x)`     | 3                         | 1.0×                          |
+| `ln(x)`      | 7                         | ~2.3×                         |
+| `sub(x, y)`  | 11                        | ~3.7×                         |
+| `add(x, y)`  | 21                        | ~7.0×                         |
+| `div(x, y)`  | 25                        | ~8.3×                         |
+| `inv(x)`     | 25                        | ~8.3×                         |
+| `mul(x, y)`  | 35                        | ~11.7×                        |
+| `square(x)`  | 35                        | ~11.7×                        |
+| `pow(x, y)`  | 43                        | ~14.3×                        |
+| `sqrt(x)`    | 67                        | ~22.3×                        |
 
 ---
 
 ## Einschätzung
 
-Das Crate ist ein **Proof-of-Concept auf Master-Niveau** — compiler-korrekter
-AST→RPN→VM-Stack, präzise Fehlerfortpflanzung.
+Workspace R&D math crate: AST→RPN→stack is real. It is **not** a Keep organ.
 
-Für den produktiven Einsatz fehlen:
-
-- NaN/inf-Robustheit in `ComplexBall::eml`
-- Constant Folding
-- Softmax-Benchmark gegen naive Implementierung
-- Makro-DSL (`eml!(x, 1)` → `EmlExpr::eml(EmlExpr::v(0), EmlExpr::c(1.0))`)
-
-Der USP bleibt die Idee: _Ein_ Operator der genügt, um alle Analysis zu bauen.
-Der Overhead ist bei reellen Zahlen unter Double-Epsilon (~1e-15), bei komplexen
-Zahlen aber noch ungemessen.
+Next only if a measured win exists: algebraic rewrite that beats `f64`, or one
+serialized formula-IR call site that can refuse a wide radius. Otherwise extract
+as a paper crate and stop growing it inside GZMO.

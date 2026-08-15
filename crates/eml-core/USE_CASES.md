@@ -1,7 +1,11 @@
-# EML Core — 44 Use Cases im GZMO-Kontext
+# EML Core — speculative notes (not a roadmap)
 
 **EML = Exp-Minus-Log:** `eml(x, y) = exp(x) - ln(y)` — universelles Primitiv,
 aus dem alle elementaren Funktionen synthetisiert werden können.
+
+This table is **not** scheduled work. Nothing in `gzmo-core` calls this crate.
+Do not implement rows from this file. Crate evolution is: honest calculator →
+algebra that pays rent → one formula-IR call site only if a bench or radius wins.
 
 ---
 

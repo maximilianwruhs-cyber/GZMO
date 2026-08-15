@@ -6,18 +6,25 @@
 //! from which all elementary functions can be synthesised (analogous to NAND
 //! in boolean logic).  This crate provides:
 //!
-//! - [`ComplexBall`] with precision-drift tracking
-//! - [`EmlExpr`] tree for building expressions symbolically
+//! - [`ComplexBall`] with a first-order (non-rigorous) error radius
+//! - [`EmlExpr`] tree, constant-fold, and `Display`/parse
 //! - RPN compiler + zero-copy executor
+//!
+//! Workspace R&D: nothing in `gzmo-core` calls this crate. [`pipeline_hooks`]
+//! are local demos, not living memory organs.
 
 pub mod complex_ball;
 pub mod emitter;
 pub mod executor;
+pub mod pipeline_hooks;
 pub mod rpn;
 
-pub use complex_ball::ComplexBall;
-pub use emitter::EmlExpr;
-pub use executor::execute;
+pub use complex_ball::{ComplexBall, EmlError, RADIUS_IS_RIGOROUS};
+pub use emitter::{EmlExpr, ParseError};
+pub use executor::{execute, ExecError};
+pub use pipeline_hooks::{
+    eval_honeypot_confidence, eval_memory_decay, honeypot_confidence_expr, memory_decay_expr,
+};
 pub use rpn::{RpnInstruction, RpnProgram};
 
 // ---------------------------------------------------------------------------
@@ -44,11 +51,14 @@ pub mod synth {
         EmlExpr::eml(ln(x), exp(y))
     }
 
+    /// `-x = 0 - x`
+    pub fn neg(x: EmlExpr) -> EmlExpr {
+        sub(EmlExpr::c(0.0), x)
+    }
+
     /// `x + y = eml(ln(x), exp(-y))`
-    /// with `-y = sub(EmlExpr::c(0.0), y)`
     pub fn add(x: EmlExpr, y: EmlExpr) -> EmlExpr {
-        let neg_y = sub(EmlExpr::c(0.0), y);
-        EmlExpr::eml(ln(x), exp(neg_y))
+        EmlExpr::eml(ln(x), exp(neg(y)))
     }
 
     /// `x * y = exp(ln(x) + ln(y))`
@@ -169,5 +179,105 @@ mod tests {
         let expr = synth::add(EmlExpr::v(0), EmlExpr::v(1));
         let prog = expr.compile();
         assert_eq!(prog.arity, 2);
+    }
+
+    #[test]
+    fn test_compile_arity_v0() {
+        let expr = synth::exp(EmlExpr::v(0));
+        let prog = expr.compile();
+        assert_eq!(prog.arity, 1);
+    }
+
+    #[test]
+    fn test_compile_arity_const() {
+        let expr = EmlExpr::c(42.0);
+        let prog = expr.compile();
+        assert_eq!(prog.arity, 0);
+    }
+
+    #[test]
+    fn test_compile_arity_sparse() {
+        let expr = synth::add(EmlExpr::v(0), EmlExpr::v(3));
+        let prog = expr.compile();
+        assert_eq!(prog.arity, 4);
+    }
+
+    #[test]
+    fn test_execute_empty_args_error() {
+        let prog = synth::exp(EmlExpr::v(0)).compile();
+        let err = execute(&prog, &[]).unwrap_err();
+        assert!(matches!(err, crate::executor::ExecError::MissingArguments { expected: 1, got: 0 }));
+    }
+
+    #[test]
+    fn test_execute_const_empty_args_success() {
+        let prog = EmlExpr::c(42.0).compile();
+        let r = execute(&prog, &[]).unwrap();
+        assert!((r.center.re - 42.0).abs() < 1e-12);
+    }
+
+    #[test]
+    fn test_exp_overflow_nan_handled() {
+        let prog = synth::exp(EmlExpr::v(0)).compile();
+        let ball = ComplexBall::from_real(1000.0);
+        let err = execute(&prog, &[ball]).unwrap_err();
+        assert!(matches!(
+            err,
+            crate::ExecError::Eml(crate::EmlError::Overflow)
+        ));
+    }
+
+    #[test]
+    fn test_nan_propagation_error() {
+        let nan_ball = ComplexBall::from_real(f64::NAN);
+        let one = ComplexBall::from_real(1.0);
+        assert_eq!(ComplexBall::eml(nan_ball, one), Err(crate::EmlError::NanResult));
+    }
+
+    #[test]
+    fn test_ln_zero_is_ieee_continuation() {
+        let zero = ComplexBall::from_real(0.0);
+        let one = ComplexBall::from_real(1.0);
+        let ball = ComplexBall::eml(one, zero).unwrap();
+        assert!(!ball.is_finite());
+        let err = execute(&EmlExpr::eml(EmlExpr::c(1.0), EmlExpr::c(0.0)).compile(), &[])
+            .unwrap_err();
+        assert!(matches!(err, crate::ExecError::Eml(crate::EmlError::Overflow)));
+    }
+
+    #[test]
+    fn test_neg() {
+        let r = eval(synth::neg(EmlExpr::v(0)), &[5.0]);
+        assert!((r.center.re + 5.0).abs() < 1e-10);
+    }
+
+    #[test]
+    fn test_fold_const_add() {
+        let expr = synth::add(EmlExpr::c(1.0), EmlExpr::c(2.0));
+        let folded = expr.fold();
+        match folded {
+            EmlExpr::Const(v) => assert!((v - 3.0).abs() < 1e-9, "folded {v}"),
+            other => panic!("expected Const, got {other}"),
+        }
+        let prog = expr.compile();
+        assert_eq!(prog.arity, 0);
+        assert_eq!(prog.instructions.len(), 1);
+    }
+
+    #[test]
+    fn test_parse_roundtrip() {
+        let expr = synth::exp(EmlExpr::v(0));
+        let parsed = EmlExpr::parse(&expr.to_string()).unwrap();
+        assert_eq!(parsed, expr);
+        let nested = EmlExpr::parse("eml(eml(1, x0), 1)").unwrap();
+        assert_eq!(
+            nested,
+            EmlExpr::eml(EmlExpr::eml(EmlExpr::c(1.0), EmlExpr::v(0)), EmlExpr::c(1.0))
+        );
+    }
+
+    #[test]
+    fn test_radius_is_not_rigorous() {
+        const { assert!(!crate::RADIUS_IS_RIGOROUS) };
     }
 }
