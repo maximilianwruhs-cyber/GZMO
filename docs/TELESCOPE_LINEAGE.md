@@ -159,7 +159,7 @@ Schema v8/v9 `honeypot.utility_score`, `reinforce_by`, and `ORDER BY utility_sco
 
 **Telescope half of that bet:** tests that utility order is real; MCP search touches felt-use; no path that green-passes empty recall; docs that say census is RED when SSH fails — not “0 facts, all good.”
 
-**Field watch (does not start a second bet):** [research/lineage-watch/](../research/lineage-watch/README.md) — monthly SOTA in utility retrieve, offline consolidation, forgetting, verified spark, local-first cousins. Latest: [sota-2026-08-15.md](../research/lineage-watch/sota-2026-08-15.md). Steal algorithms; do not grow organs from FOMO.
+**Field watch (does not start a second bet):** [research/lineage-watch/](../research/lineage-watch/README.md) — monthly SOTA. Four candidate steals map onto existing organs (`felt-use`, dream, night labels, `honeypot-gate`). None become a ship until CT101 census confirms felt-use mass. Latest: [sota-2026-08-15.md](../research/lineage-watch/sota-2026-08-15.md).
 
 ---
 

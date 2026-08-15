@@ -4,7 +4,18 @@
 **Doctrine:** [docs/TELESCOPE_LINEAGE.md](../../docs/TELESCOPE_LINEAGE.md) · [docs/OPPORTUNITY_DISCOVERY.md](../../docs/OPPORTUNITY_DISCOVERY.md)  
 **Does not:** start a second ship bet, clone Mem* SaaS, or require CT101.
 
-This is a **reading program** for the fields the Keep actually competes in. New papers go into dated SOTA notes. Steal algorithms; do not grow organs from FOMO.
+This is a **reading program** for the fields the Keep actually competes in. New papers go into dated SOTA notes. Steal algorithms; do not grow organs from FOMO. `felt-use-mass-growth` stays the singular active ship.
+
+## Four candidate steals (map to organs — do not add organs)
+
+None of these become an active bet until CT101 living census shows felt-use mass on real sessions.
+
+| # | Steal | Source → organ | Filter |
+|---|-------|----------------|--------|
+| 1 | **Outcome-linked utility** — bump Q only when a later takeaway cites or bonds the recalled fact | MemRL → `felt-use` / `rrf-recall` | No gym / synthetic reward. Operator work only. |
+| 2 | **Dream as region rewrite** — offline compaction emits a replacement set that *supersedes* the working region, provenance kept | Auto-Dreamer → `session-distill` / dream | No RL consolidator gym. No second local model. |
+| 3 | **Named night procedure** — `TRIAGE → CONSOLIDATE → AUDIT` as labels on distill / gate / soak | Memory as Metabolism → night runbook | Docs and scheduler names only. No crate. No Observatory glass. |
+| 4 | **Verify rollback + typed supersession** — quarantine, rollback on failed promote, typed supersede/refuse | SuperLocalMemory + SleepGate → `honeypot-gate` | No multi-tenant, RBAC product, or provider-assisted default. |
 
 ## Fields we watch
 
