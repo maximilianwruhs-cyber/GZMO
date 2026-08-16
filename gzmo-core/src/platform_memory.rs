@@ -68,9 +68,10 @@ pub struct MemoryStatusReport {
     pub control_plane: Option<String>,
 }
 
-/// Living vault floor. Lab/product/empty vaults use `GZMO_ALLOW_LAB_VAULT`,
-/// `GZMO_PRODUCT`, or a path under `~/.gzmo/`.
-pub const LIVING_VAULT_MIN_FACTS: usize = 10_000;
+/// Living vault floor: refuse empty/bootstrap trees, not the old warehouse Keep (~60k).
+/// Living proof is `vault_path` under `/opt/gzmo` (or airgap living home) plus this
+/// not-empty floor. Lab/product/`~/.gzmo` still bypass via `allow_lab_or_product_vault`.
+pub const LIVING_VAULT_MIN_FACTS: usize = 100;
 
 fn env_flag_true(name: &str) -> bool {
     std::env::var(name)

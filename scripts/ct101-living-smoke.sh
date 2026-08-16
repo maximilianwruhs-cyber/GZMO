@@ -6,7 +6,7 @@ set -euo pipefail
 
 HOST="${CT101_SSH_HOST:-ct101}"
 GZMO_BIN="${CT101_GZMO_BIN:-/opt/gzmo/current/target/release/gzmo}"
-MIN_FACTS="${CT101_MIN_VAULT_FACTS:-10000}"
+MIN_FACTS="${CT101_MIN_VAULT_FACTS:-100}"
 
 ssh_ct() {
   ssh -o ConnectTimeout=10 -o BatchMode=yes "$HOST" "$@"

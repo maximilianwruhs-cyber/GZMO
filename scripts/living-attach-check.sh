@@ -12,8 +12,8 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 HOST="${CT101_SSH_HOST:-ct101}"
 BIN="${CT101_GZMO_BIN:-/opt/gzmo/current/target/release/gzmo}"
-MIN_FACTS="${LIVING_ATTACH_MIN_FACTS:-10000}"
-REF_FACTS_HINT="${LIVING_ATTACH_REF_FACTS:-60000}"
+MIN_FACTS="${LIVING_ATTACH_MIN_FACTS:-100}"
+REF_FACTS_HINT="${LIVING_ATTACH_REF_FACTS:-800}"
 MODE="${GZMO_ATTACH_MODE:-ssh}" # ssh | local
 LOCAL_ONLY=0
 
@@ -158,8 +158,8 @@ if not isinstance(facts, int):
     fail(f"vault_facts not an int: {facts!r}")
 if facts < min_facts:
     fail(
-        f"vault_facts={facts} < min {min_facts} — lab-sized vault or wrong instance "
-        f"(CT101 reference ~{ref_hint}; do not set GZMO_ALLOW_LAB_VAULT=1)"
+        f"vault_facts={facts} < min {min_facts} — empty/bootstrap vault or wrong instance "
+        f"(CT101 denser Keep ~{ref_hint}; do not set GZMO_ALLOW_LAB_VAULT=1)"
     )
 
 print(f"OK: vault_path={vault}")
