@@ -7,6 +7,7 @@ Canonical operator and architecture docs. Session reports and milestone logs bel
 | Doc | Purpose |
 |-----|---------|
 | [ADR-0005-flywheel-over-frozen-topology.md](ADR-0005-flywheel-over-frozen-topology.md) | **Flywheel doctrine** — continuous upgrade outranks frozen topology |
+| [ADR-0007-one-product-living.md](ADR-0007-one-product-living.md) | **One product** — living Keep; no lite SKU |
 | [CONTINUOUS_UPGRADE.md](CONTINUOUS_UPGRADE.md) | **Upgrade process** — four rings, promote-by-loop, craft backlog |
 | [ADR-0004-airgap-living-usp.md](ADR-0004-airgap-living-usp.md) | **USP invariants** — airgap living on one box |
 | [AIRGAP_LIVING.md](AIRGAP_LIVING.md) | **Hero path** — single-box airgap living bring-up |
@@ -15,13 +16,14 @@ Canonical operator and architecture docs. Session reports and milestone logs bel
 | [OPPORTUNITY_DISCOVERY.md](OPPORTUNITY_DISCOVERY.md) | **What to build next** — Sense→Rank→Bet→Ship→Soak |
 | [TELESCOPE_LINEAGE.md](TELESCOPE_LINEAGE.md) | **Telescope guide** — evolve the Keep from a non-living host; workshop as dojo |
 | [../research/lineage-watch/README.md](../research/lineage-watch/README.md) | **Field watch** — SOTA in utility / dream / forget / local-first (informs the active bet; not a second ship) |
-| [MCP_LOCAL_ATTACH.md](MCP_LOCAL_ATTACH.md) | **Brand MCP** — stdio / localhost only |
-| [SPINE_FOCUS.md](SPINE_FOCUS.md) | Active focus — living first-class; lite bootstrap |
-| [PRODUCT_MCP.md](PRODUCT_MCP.md) | **Lite bootstrap** — Cursor/Pi Memory MCP (`gzmo init`) |
-| [PRODUCT_PRODUCTION_READINESS.md](PRODUCT_PRODUCTION_READINESS.md) | Lite GREEN gate |
+| [LIVING_ATTACH_CONFIG_SPEC.md](LIVING_ATTACH_CONFIG_SPEC.md) | **Attach contract** — homes, order, refuse, GREEN |
+| [MCP_LOCAL_ATTACH.md](MCP_LOCAL_ATTACH.md) | **Brand MCP** — stdio / localhost only (`gzmo-living`) |
+| [SPINE_FOCUS.md](SPINE_FOCUS.md) | Active focus — one living Keep |
+| [PRODUCT_MCP.md](PRODUCT_MCP.md) | Historical `~/.gzmo` installer (not a product) |
+| [PRODUCT_PRODUCTION_READINESS.md](PRODUCT_PRODUCTION_READINESS.md) | Client-attach smoke (not product GREEN) |
 | [LIVING_PRODUCTION_READINESS.md](LIVING_PRODUCTION_READINESS.md) | Living ops GREEN gate (CT101 reference) |
 | [LIVING_APPLIANCE.md](LIVING_APPLIANCE.md) | Redis/Qdrant/Neo4j compose pin for living |
-| [PRODUCTION_READINESS.md](PRODUCTION_READINESS.md) | Index — living vs lite gates |
+| [PRODUCTION_READINESS.md](PRODUCTION_READINESS.md) | Index — living product bar |
 | [../README.md](../README.md) | Public README |
 | [../MACHINE.md](../MACHINE.md) | What GZMO is (two sentences) |
 | [ROADMAP_TO_M5.md](ROADMAP_TO_M5.md) | Milestone roadmap (operator) |
@@ -38,7 +40,7 @@ Canonical operator and architecture docs. Session reports and milestone logs bel
 | [MUTUAL_DISCOVERY_THEATER.md](MUTUAL_DISCOVERY_THEATER.md) | Pedagogy theater front door (not scout KPI) |
 | [PRODUCTION_READINESS.md](PRODUCTION_READINESS.md) | Production gate checklist |
 
-Product non-goals: public multi-tenant MCP webserver, dual overnight writers, SEIP scaffolding, cloud memory SaaS. Lite without overnight is bootstrap only — not a peer roadmap ([ADR-0004](ADR-0004-airgap-living-usp.md)).
+Product non-goals: public multi-tenant MCP webserver, dual overnight writers, SEIP scaffolding, cloud memory SaaS, a lite SKU. One product: living Keep ([ADR-0007](ADR-0007-one-product-living.md)).
 
 ## Architecture
 

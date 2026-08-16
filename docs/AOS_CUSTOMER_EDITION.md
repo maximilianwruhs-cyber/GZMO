@@ -2,7 +2,7 @@
 
 **Status:** Sketch / Later packaging (2026-07-19)  
 **Wave:** 4.1 — [UNPARK_ROADMAP.md](./UNPARK_ROADMAP.md)  
-**On top of:** Goal **C** living appliance — never stranger Goal **A**
+**On top of:** living appliance — the only product ([ADR-0007](./ADR-0007-one-product-living.md))
 
 ## Intent
 
@@ -12,13 +12,13 @@ One-curl (or near one-curl) Ubuntu path that stands up:
 Prime (local LLM) + gzmo-daemon + Redis + Qdrant + Neo4j + OKForge attach
 ```
 
-Stranger Memory MCP (`~/.gzmo`, sidecars off) remains a **separate** install via `install-gzmo.sh`.
+Clients attach via `gzmo-living`. `install-gzmo.sh` → `~/.gzmo` is not a complete GZMO ([ADR-0007](./ADR-0007-one-product-living.md)).
 
 ## Non-goals
 
 | Not | Why |
 |-----|-----|
-| Default stranger install | A must stay sidecar-free |
+| Default incomplete `~/.gzmo` | Not the product (ADR-0007) |
 | Two overnight writers | ADR-0003 |
 | Arena as required CE component | Wave 3 lab only |
 | Pi as primary UX | Optional glass |

@@ -2,7 +2,7 @@
 
 **Status:** Agent-facing safe attach kit (2026-07-22)  
 **USP:** nutrient · Brain Feed · airgap living — not ecosystem tourism  
-**Doctrine:** [ADR-0003](./ADR-0003-one-instance-metabolism.md) · [ADR-0004](./ADR-0004-airgap-living-usp.md) · [MCP_LOCAL_ATTACH.md](./MCP_LOCAL_ATTACH.md)  
+**Doctrine:** [ADR-0003](./ADR-0003-one-instance-metabolism.md) · [ADR-0004](./ADR-0004-airgap-living-usp.md) · [ADR-0007](./ADR-0007-one-product-living.md) · [MCP_LOCAL_ATTACH.md](./MCP_LOCAL_ATTACH.md)  
 **Research:** [living-external-attach-plug-and-play-2026-07-22.md](../research/living-external-attach-plug-and-play-2026-07-22.md)  
 **Config homes / order / refuse / GREEN:** [LIVING_ATTACH_CONFIG_SPEC.md](./LIVING_ATTACH_CONFIG_SPEC.md)
 
@@ -53,9 +53,9 @@ OpenClaw must **not** curl-upsert into Qdrant or auto-graph Neo4j from chat. Tak
 
 | Action | Why |
 |--------|-----|
-| Keep only `gzmo-memory` while claiming living | Lite/lab path (`~/.gzmo`, often ~hundreds of facts) |
+| Keep only `gzmo-memory` while claiming living | Incomplete `~/.gzmo` scratch, not the living Keep ([ADR-0007](./ADR-0007-one-product-living.md)) |
 | Set `GZMO_ALLOW_LAB_VAULT=1` “to make living work” | Silences the not-empty floor; Hermes false-positive on `~/.gzmo` |
-| Set `GZMO_PRODUCT=1` on living | Product/lite marker; attach-check FAILs |
+| Set `GZMO_PRODUCT=1` on living | Incomplete-install / lab marker; attach-check FAILs |
 | Hand-roll `ssh … gzmo mcp-serve` without `GZMO_CONFIG=/opt/gzmo/gzmo.toml` | Wrong HOME/config scars on CT101 |
 | Enable workstation `gzmo-serve` / second overnight writer | Violates ADR-0003 single writer |
 | Rewrite CT101 code via the attach path | Attach is read/search; metabolism stays on CT101 daemon |

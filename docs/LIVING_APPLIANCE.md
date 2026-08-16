@@ -1,13 +1,13 @@
 # Living appliance (sidecars for airgap living)
 
 **Status:** USP substrate — compose pin shipped (2026-07-19); brand lock 2026-07-20  
-**USP path:** [AIRGAP_LIVING.md](./AIRGAP_LIVING.md) · [ADR-0004-airgap-living-usp.md](./ADR-0004-airgap-living-usp.md)  
-**Lite bootstrap (not peer product):** [PRODUCT_MCP.md](./PRODUCT_MCP.md)  
+**USP path:** [AIRGAP_LIVING.md](./AIRGAP_LIVING.md) · [ADR-0004-airgap-living-usp.md](./ADR-0004-airgap-living-usp.md) · [ADR-0007](./ADR-0007-one-product-living.md)  
+**Client attach (not a SKU):** [PRODUCT_MCP.md](./PRODUCT_MCP.md)  
 **Doctrine:** [SPINE_FOCUS.md](./SPINE_FOCUS.md)
 
 ## What this is
 
-Sidecar pin for the **living profile** (full Keep on one airgapped box):
+Sidecar pin for the **living Keep** (the only product):
 
 ```text
 gzmo-daemon + SQLite vault/honeypot + Redis + Qdrant + Neo4j
@@ -44,22 +44,22 @@ bash ../../scripts/living-appliance-health-smoke.sh
 
 This compose starts **sidecars only**. Pair with `gzmo-daemon` + `/opt/gzmo/gzmo.toml` (see [CT101_DEPLOY.md](./CT101_DEPLOY.md)).
 
-## Labeled MCP attach (lite vs living)
+## Labeled MCP attach
 
-| Server name | Profile | Install |
+| Server name | Role | Install |
 |-------------|---------|---------|
-| `gzmo-memory` | **Lite** bootstrap `~/.gzmo` | `scripts/install-product-mcp.sh` / `install-gzmo.sh` |
-| `gzmo-living` | **Living** local stdio (hero) or ops SSH wrap | On-box: [MCP_LOCAL_ATTACH.md](./MCP_LOCAL_ATTACH.md); ops: `scripts/install-shared-mcp.sh` |
+| `gzmo-living` | **Brand** — living writer (hero) or ops SSH wrap | On-box: [MCP_LOCAL_ATTACH.md](./MCP_LOCAL_ATTACH.md); ops: `scripts/install-shared-mcp.sh` |
+| `gzmo-memory` | **Legacy** `~/.gzmo` scratch — not a product ([ADR-0007](./ADR-0007-one-product-living.md)) | `scripts/install-product-mcp.sh` / `install-gzmo.sh` |
 
 Brand attach is **stdio / localhost** — not a public webserver. See [MCP_LOCAL_ATTACH.md](./MCP_LOCAL_ATTACH.md).
 
-`install-shared-mcp.sh` migrates a mislabeled living entry off `gzmo-memory` → `gzmo-living` and restores lite `gzmo-memory` from `~/.gzmo/mcp.json` when present.
+`install-shared-mcp.sh` migrates a mislabeled living entry off `gzmo-memory` → `gzmo-living`.
 
 ## What this is not
 
 | Not | Why |
 |-----|-----|
-| Lite-only bootstrap | That is `~/.gzmo`, sidecars off — not the USP |
+| A lite SKU | [ADR-0007](./ADR-0007-one-product-living.md) — incomplete `~/.gzmo` is not GZMO |
 | Public MCP webserver | Rejected by ADR-0004 |
 | Pi-first UX | Optional glass only |
 | Two overnight writers | [ADR-0003](./ADR-0003-one-instance-metabolism.md) |
