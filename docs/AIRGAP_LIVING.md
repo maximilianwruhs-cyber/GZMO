@@ -1,7 +1,7 @@
 # Airgap living — one box, full Keep
 
 **Status:** USP path (2026-07-20)  
-**Doctrine:** [ADR-0004-airgap-living-usp.md](./ADR-0004-airgap-living-usp.md) · [SPINE_FOCUS.md](./SPINE_FOCUS.md)  
+**Doctrine:** [ADR-0007](./ADR-0007-one-product-living.md) (one product) · [ADR-0004](./ADR-0004-airgap-living-usp.md) · [SPINE_FOCUS.md](./SPINE_FOCUS.md)  
 **Compose pin:** [LIVING_APPLIANCE.md](./LIVING_APPLIANCE.md) · `deploy/living-appliance/`  
 **MCP:** [MCP_LOCAL_ATTACH.md](./MCP_LOCAL_ATTACH.md)
 
@@ -13,7 +13,7 @@ Pull the ethernet. One machine still:
 2. Runs overnight dream / spark / distill / immune / night lymph  
 3. Serves agents via **local** `gzmo mcp-serve` (stdio or localhost subprocess)
 
-No OpenRouter. No public webserver. No second overnight writer on a laptop.
+No OpenRouter. No public webserver. No second overnight writer. The laptop is a client, not a lite GZMO ([ADR-0007](./ADR-0007-one-product-living.md)).
 
 ## Single-box topology
 

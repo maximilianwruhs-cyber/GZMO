@@ -3,7 +3,7 @@
 **Status:** Accepted (2026-07-21)  
 **Supersedes for process / topology / promotion:** conflicting bits of [ADR-0003](./ADR-0003-one-instance-metabolism.md), [ADR-0004](./ADR-0004-airgap-living-usp.md) (invariants retained), and [LTL ADR-0001](../../little-tools-lab/docs/adr/0001-two-stack-lab-not-ct101-graft.md)  
 **Implements:** [CONTINUOUS_UPGRADE.md](./CONTINUOUS_UPGRADE.md)  
-**Related:** uniqueness craft backlog · Brain Feed · beat-gate kit
+**Related:** uniqueness craft backlog · Brain Feed · beat-gate kit · [ADR-0007](./ADR-0007-one-product-living.md) (one product)
 
 ## Context
 
@@ -26,7 +26,7 @@ These are physics. Do not “rethink” them away:
 1. **One overnight writer per vault** — never two concurrent metabolisms on the same vault.
 2. **Airgap honesty** — core recall/distill/dream must not require the public internet; cloud LLM is opt-in.
 3. **No public multi-tenant MCP webserver SKU** — brand attach is stdio / localhost.
-4. **Lite is bootstrap** — `~/.gzmo` without overnight is not a peer product roadmap.
+4. **~~Lite is bootstrap~~** — **superseded by [ADR-0007](./ADR-0007-one-product-living.md):** no lite SKU. `~/.gzmo` without overnight is not the product (and still must not become a second overnight writer).
 
 ### Layer B — Topology (mutex, not destiny)
 

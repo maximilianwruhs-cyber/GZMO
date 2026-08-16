@@ -21,11 +21,11 @@ closed-set little-tools assembly, felt artifacts under `data-next/` / CT101 livi
 
 ## Product seams
 
-1. **Living appliance (C)** — CT101 `gzmo-daemon`, sole overnight writer  
-2. **Lab next (B)** — workstation `data-next` + LTL recipes + `gzmo-scheduler` beat-gates  
-3. **Product MCP (A)** — `gzmo mcp-serve` / stranger path on `~/.gzmo` — never pointed at living vault  
+1. **Living Keep** — one overnight writer (CT101 reference or appliance)  
+2. **Lab next** — workstation `data-next` + LTL recipes + beat-gates (telescope; not a second product)  
+3. **Client attach** — `gzmo-living` MCP / OpenClaw / Pi — never a second vault ([ADR-0007](./ADR-0007-one-product-living.md))
 
-Co-primary lock: A ≠ C. See [PRODUCT_MCP.md](PRODUCT_MCP.md), [CT101_BOUNDARY.md](CT101_BOUNDARY.md).
+Do not teach A ≠ C as two products. See [SPINE_FOCUS.md](SPINE_FOCUS.md), [CT101_BOUNDARY.md](CT101_BOUNDARY.md).
 
 ## Thesis links
 
@@ -35,5 +35,4 @@ Co-primary lock: A ≠ C. See [PRODUCT_MCP.md](PRODUCT_MCP.md), [CT101_BOUNDARY.
 
 ## Done when
 
-Operators and strangers can read this page and MACHINE’s two sentences and know what to install
-(product MCP) vs what stays private (CT101 living) — without a new organ in the little-tools catalog.
+Operators can read this page and MACHINE’s two sentences and know GZMO is the living Keep — attach is a hand, not a second install.

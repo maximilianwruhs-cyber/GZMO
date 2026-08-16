@@ -1,10 +1,13 @@
-# GZMO lite: local memory MCP for Cursor / Pi (bootstrap)
+# Client attach notes (historical `~/.gzmo` installer)
 
-**Profile:** lite bootstrap — not the USP. Full product dream is **airgap living** on one box: [AIRGAP_LIVING.md](./AIRGAP_LIVING.md) · [ADR-0004-airgap-living-usp.md](./ADR-0004-airgap-living-usp.md).
+**Not a product.** GZMO is one SKU: the living Keep — [ADR-0007](./ADR-0007-one-product-living.md) · [AIRGAP_LIVING.md](./AIRGAP_LIVING.md) · [ADR-0004](./ADR-0004-airgap-living-usp.md).
 
-Install a **sovereign, curated long-term memory** for coding agents — honeypot quality gate, supersession chains, and local SQLite — exposed as **stdio MCP**. Not a cloud notebook; not Mem0; not a public webserver.
+This page documents the old `gzmo init` → `~/.gzmo` + `gzmo-memory` MCP path. That is an **incomplete install** (or telescope scratch), not day-zero GZMO. Hero: `scripts/install-living-airgap.sh`. Brand MCP label: **`gzmo-living`**.
+
+The commands below still work for attach experiments. Do not demo them as the product.
 
 ## 5-minute install
+
 
 ### 0. Pi users (recommended)
 
@@ -143,9 +146,9 @@ GZMO_OPS_MCP=1
 
 Without that env var they return a clear error and are not part of the product story.
 
-## Optional embeddings
+## Optional embeddings (scratch path only)
 
-Default product config uses **FTS-only** (offline). To enable vectors later, set in `~/.gzmo/gzmo.toml`:
+Incomplete `~/.gzmo` defaults to **FTS-only**. The living product enables local embeddings when the embedder is up ([ADR-0007](./ADR-0007-one-product-living.md)). To turn vectors on this scratch toml:
 
 ```toml
 [embeddings]
@@ -154,24 +157,23 @@ url = "http://127.0.0.1:8002/v1"   # any OpenAI-compatible embeddings API
 model = "your-embedding-model"
 ```
 
-Still no LAN topology required.
+## Non-goals (this page)
 
-## Non-goals (v1 product)
-
-- Multi-host living topology and operator discovery timers
-- Overnight dream/spark/distill as a required install step
+- Treating `~/.gzmo` as a complete GZMO
+- Multi-host living topology and operator discovery timers as install requirements
 - SEIP / Foundry-class ingestion platforms (separate research)
-- Competing with Mem0 cloud “connect in minutes” — if you need that, use Mem0 MCP
+- Hosted Mem0 / public MCP — leak, not parity
 
-## Advanced / living stack (optional)
+## Living stack (the product)
 
-Not required for product MCP attach. Operator hosts that want the full topology:
+Sidecars and overnight are **required** for GZMO, not advanced DLC. See [AIRGAP_LIVING.md](./AIRGAP_LIVING.md) and [LIVING_APPLIANCE.md](./LIVING_APPLIANCE.md).
 
 | Service | Role |
 |---------|------|
-| SQLite | Vault + FTS (always) |
+| SQLite | Vault + FTS |
 | Redis | Hot session / cache |
-| Neo4j / living vault | Operator only — `gzmo-living` via `scripts/install-shared-mcp.sh` (never product `gzmo-memory`) |
+| Neo4j | Graph on the living box |
 | Qdrant | Vectors when embeddings are enabled |
+| `gzmo-living` MCP | Client attach — [MCP_LOCAL_ATTACH.md](./MCP_LOCAL_ATTACH.md) |
 
-See [gzmo-pi Living stack](https://github.com/maximilianwruhs-cyber/gzmo-pi#living-stack-redis--neo4j--qdrant), `docs/CT101_DEPLOY.md`, and `docs/PI_GZMO_MEMORY_INTEGRATION.md`. Laptop product install stays SQLite-only.
+See [gzmo-pi Living stack](https://github.com/maximilianwruhs-cyber/gzmo-pi#living-stack-redis--neo4j--qdrant), `docs/CT101_DEPLOY.md`, and `docs/PI_GZMO_MEMORY_INTEGRATION.md`.

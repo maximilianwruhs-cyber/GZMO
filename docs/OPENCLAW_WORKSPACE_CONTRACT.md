@@ -2,7 +2,7 @@
 
 **Status:** Active (2026-07-24)  
 **USP:** nutrient · Brain Feed · airgap living — OpenClaw is an **operator surface**, not a second overnight brain  
-**Doctrine:** [ADR-0003](./ADR-0003-one-instance-metabolism.md) · [ADR-0005](./ADR-0005-flywheel-over-frozen-topology.md) · [BRAIN_FEED.md](./BRAIN_FEED.md) · [EXTERNAL_LIVING_ATTACH.md](./EXTERNAL_LIVING_ATTACH.md) · [MACHINE.md](../MACHINE.md)
+**Doctrine:** [ADR-0005](./ADR-0005-flywheel-over-frozen-topology.md) · [ADR-0004](./ADR-0004-airgap-living-usp.md) · [ADR-0007](./ADR-0007-one-product-living.md) · [BRAIN_FEED.md](./BRAIN_FEED.md) · [EXTERNAL_LIVING_ATTACH.md](./EXTERNAL_LIVING_ATTACH.md) · [MACHINE.md](../MACHINE.md)
 
 ## One sentence
 

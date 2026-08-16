@@ -1,21 +1,21 @@
-# Product production readiness (Memory MCP)
+# Client-attach smoke (`~/.gzmo`)
 
-**Audience:** Shipping the laptop Memory MCP product (not CT101 living stack)  
+**Audience:** Regression for the historical `install-gzmo.sh` / `gzmo-memory` path  
 **Gate command:** `bash scripts/product-readiness-gate.sh`  
 **GREEN:** exit `0` + `data-next/product-readiness/latest.json` → `"verdict": "GREEN"`
 
-Living-stack readiness remains [PRODUCTION_READINESS.md](PRODUCTION_READINESS.md) / CT101. This doc is the **prime product** gate.
+**Not the product bar.** GZMO GREEN is [KEEP_QUALITY.md](KEEP_QUALITY.md) / [LIVING_PRODUCTION_READINESS.md](LIVING_PRODUCTION_READINESS.md) on the living host ([ADR-0007](ADR-0007-one-product-living.md)). This gate only proves the incomplete `~/.gzmo` installer still attaches.
 
-## Definition of GREEN
+## What GREEN means here
 
-A stranger on Ubuntu can:
+A machine can still:
 
-1. Install (`install-gzmo.sh` / `gzmo init`)
+1. Run `install-gzmo.sh` / `gzmo init`
 2. Attach Cursor/Pi MCP to `~/.gzmo` (not CT101 / not `data-next`)
 3. Call `gzmo_memory_status` / `gzmo_memory_search`
-4. Optionally metabolize a takeaway when Prime `:8000` (or any OpenAI-compatible engine) is up
+4. Optionally metabolize a takeaway when Prime `:8000` is up
 
-Without requiring Redis, Qdrant, Neo4j, or overnight `gzmo serve`.
+That is **client scratch**, not a complete Keep. Passing this without sidecars/overnight does not ship GZMO.
 
 ## Gate checks
 
@@ -37,11 +37,11 @@ After Keep lands on `main`, cut a new `v*` tag so stranger `install-gzmo.sh` shi
 ## Operator commands
 
 ```bash
-# Co-primary A+C
-bash scripts/production-readiness-gate.sh
-# → data-next/production-readiness/latest.{json,md}
+# Product bar (living host)
+bash scripts/keep-quality-gate.sh
+bash scripts/living-readiness-gate.sh
 
-# Full product gate
+# This page's smoke only
 bash scripts/product-readiness-gate.sh
 # → data-next/product-readiness/latest.{json,md}
 
@@ -57,6 +57,7 @@ bash scripts/product-hello-memory.sh
 
 ## Related
 
-- [PRODUCT_MCP.md](PRODUCT_MCP.md) — install + tools
-- [SPINE_FOCUS.md](SPINE_FOCUS.md) — Keep / Park doctrine
-- [CT101_BOUNDARY.md](CT101_BOUNDARY.md) — living vault owner (separate lane)
+- [PRODUCT_MCP.md](PRODUCT_MCP.md) — historical installer (not a product)
+- [ADR-0007-one-product-living.md](ADR-0007-one-product-living.md) — one SKU
+- [SPINE_FOCUS.md](SPINE_FOCUS.md) — living Keep
+- [CT101_BOUNDARY.md](CT101_BOUNDARY.md) — living vault owner
