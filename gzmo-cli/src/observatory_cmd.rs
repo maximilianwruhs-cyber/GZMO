@@ -7,7 +7,10 @@ use gzmo_core::observatory_board::collect_health_led_board;
 use crate::tui::boards::health_board;
 
 pub async fn run(config: &GzmoConfig, args: &[String]) -> Result<()> {
-    if args.iter().any(|a| a == "-h" || a == "--help" || a == "help") {
+    if args
+        .iter()
+        .any(|a| a == "-h" || a == "--help" || a == "help")
+    {
         print_help();
         return Ok(());
     }
