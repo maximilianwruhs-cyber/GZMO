@@ -11,7 +11,7 @@ The atlas already exists. This sitting **grafts one loop** or writes one candida
 
 **Read first (do not rewrite):** [`research/agentic-memory-harness-local-llm-2026-08-16.md`](../../research/agentic-memory-harness-local-llm-2026-08-16.md)
 
-**Active ship (exactly one):** [`felt-use-mass-growth`](../../research/opportunities/felt-use-mass-growth.md). Rank 0 in the atlas is living mass + soak nights. Open after M3/H1/M7/L1: immune apply on living (lab until soak).
+**Active ship (exactly one):** [`felt-use-mass-growth`](../../research/opportunities/felt-use-mass-growth.md). Rank 0 in the atlas is living mass + soak nights. Open after M3/H1/M7/L1/T1: immune apply on living (lab until soak).
 
 **Not the product:** Observatory, OKForge, HSP, pantheon, AOS CE, `eml-core`, Mem0/Letta SKU, public MCP HTTP.
 

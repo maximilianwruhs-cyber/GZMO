@@ -33,7 +33,7 @@ July 22 already named most of these. Keep taking them. Attribution in the July n
 | Bi-temporal / as-of recall | SuperLocalMemory | vault | In-tree (`honeypot_as_of`) |
 | Incremental playbook deltas | ACE | workflow skills / SOUL | In-tree on workflow `SKILL.md` (`workflow_skills::ace`, `ACE_PIN_APPLY=1`). SOUL/toml still human-only. |
 | Pin skill text against prune | HumanLayer | `context.rs` | In-tree (workflow `SKILL.md`) |
-| Assertable retrieve before rank | GPM 2608.12476 · Temporal Validity 2606.26511 | `filter_assertable_honeypot_ids` + Qdrant orphan prune | In-tree (this sitting) |
+| Assertable retrieve before rank | GPM 2608.12476 · Temporal Validity 2606.26511 | `take_assertable_prefetch` (overfetch + SQLite `is_latest`) + Qdrant orphan prune; payload stamp only | In-tree |
 | LoCoMo / LongMemEval | benches | soak satellite | Borrow-eval only |
 
 **Not the field (product shapes):** public multi-tenant memory, provider-assisted as default, overnight LoRA/PEFT, second writer, compliance-OS as USP.

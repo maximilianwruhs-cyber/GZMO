@@ -27,7 +27,7 @@ use crate::memory::qdrant_recall::QdrantRecall;
 use crate::memory::recall_rrf::{
     apply_utility_boost, diversify_by_source_file, extract_entity_tokens, fts_match_query,
     fts_match_query_broad, merge_interleaved_rank, rrf_fuse, RecallCandidate, PREFETCH_K,
-    RERANK_PREFETCH,
+    QDRANT_PREFETCH_K, RERANK_PREFETCH,
 };
 use crate::memory::rerank::Reranker;
 use crate::types::{DecayClass, ExtractedTruth, SemanticFact};
@@ -1024,8 +1024,8 @@ impl SqliteVault {
                 Ok(emb) if !emb.is_empty() => {
                     let mut qdrant_ids = Vec::new();
                     if let Some(qdrant) = &self.qdrant {
-                        if let Ok(ids) = qdrant.search_ids(&emb, PREFETCH_K).await {
-                            qdrant_ids = self.filter_assertable_honeypot_ids(&ids)?;
+                        if let Ok(ids) = qdrant.search_ids(&emb, QDRANT_PREFETCH_K).await {
+                            qdrant_ids = self.take_assertable_prefetch(&ids, PREFETCH_K)?;
                         }
                     }
                     let scored = self.search_with_decay(&emb, q, PREFETCH_K)?;
@@ -1593,6 +1593,13 @@ impl SqliteVault {
             .copied()
             .filter(|id| latest.contains(&id.to_string()))
             .collect())
+    }
+
+    /// Drop superseded Qdrant hits then cap. Callers overfetch (`QDRANT_PREFETCH_K`)
+    /// so stale points do not shrink the vector list below `cap`.
+    pub fn take_assertable_prefetch(&self, ids: &[Uuid], cap: usize) -> Result<Vec<Uuid>> {
+        let filtered = self.filter_assertable_honeypot_ids(ids)?;
+        Ok(filtered.into_iter().take(cap).collect())
     }
 
     fn load_honeypot_candidate(&self, id: Uuid) -> Result<Option<RecallCandidate>> {
@@ -3368,6 +3375,34 @@ mod utility_recall_tests {
             .expect("filter");
         let _ = std::fs::remove_file(&path);
         assert_eq!(filtered, vec![new]);
+    }
+
+    #[test]
+    fn take_assertable_prefetch_refills_cap_after_dropping_stale() {
+        let path = tempfile_db();
+        let vault = SqliteVault::open(&path).expect("open");
+        let stale_a = insert_fact(&vault, "[AGENT:Overfetch] stale a", "a.md", 1.0);
+        let latest_a = insert_fact(&vault, "[AGENT:Overfetch] current a", "a2.md", 1.0);
+        let stale_b = insert_fact(&vault, "[AGENT:Overfetch] stale b", "b.md", 1.0);
+        let latest_b = insert_fact(&vault, "[AGENT:Overfetch] current b", "b2.md", 1.0);
+        let latest_c = insert_fact(&vault, "[AGENT:Overfetch] current c", "c.md", 1.0);
+        let conn = vault.db_conn().expect("conn");
+        crate::memory::lifecycle::supersede_honeypot(&conn, &stale_a.to_string())
+            .expect("supersede a");
+        crate::memory::lifecycle::supersede_honeypot(&conn, &stale_b.to_string())
+            .expect("supersede b");
+        drop(conn);
+        // Without overfetch, the first two hits would be stale_a + latest_a → cap 2
+        // after filter would be only latest_a. Overfetch keeps later latest ids.
+        let filled = vault
+            .take_assertable_prefetch(&[stale_a, latest_a, stale_b, latest_b, latest_c], 2)
+            .expect("prefetch");
+        let starved = vault
+            .take_assertable_prefetch(&[stale_a, latest_a], 2)
+            .expect("starved");
+        let _ = std::fs::remove_file(&path);
+        assert_eq!(filled, vec![latest_a, latest_b]);
+        assert_eq!(starved, vec![latest_a]);
     }
 
     #[test]

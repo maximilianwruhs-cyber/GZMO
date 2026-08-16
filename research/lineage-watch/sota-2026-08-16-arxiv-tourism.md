@@ -41,6 +41,8 @@ SQLite hybrid recall already hydrates with `is_latest = 1`. Qdrant did **not**:
 
 **Graft (not a new crate):** `filter_assertable_honeypot_ids` before RRF; `sync-vault-to-qdrant.py` prunes orphans after honeypot upsert.
 
+**T1 follow-up (this sitting):** filtering Qdrant ids *after* a `PREFETCH_K` search starved the vector list whenever stale points occupied slots. Recall now overfetches `QDRANT_PREFETCH_K` (`PREFETCH_K * 2`), drops superseded ids, then truncates. Honeypot upsert stamps `is_latest: true` on payload. Search still has **no** Qdrant payload filter — enabling it before a living re-sync would drop every old point that lacks the field.
+
 ---
 
 ## Watch items (still not active)

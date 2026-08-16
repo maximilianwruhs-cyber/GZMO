@@ -129,6 +129,9 @@ def load_facts(
         if source == "honeypot":
             payload["source_file"] = r["source_file"]
             payload["promoted_at"] = r["promoted_at"]
+            # Stamp only. Search must not filter on this until living re-sync —
+            # older points lack the field and would all drop.
+            payload["is_latest"] = True
         else:
             payload["half_life_days"] = r["half_life_days"]
             payload["confirmation_count"] = r["confirmation_count"]
