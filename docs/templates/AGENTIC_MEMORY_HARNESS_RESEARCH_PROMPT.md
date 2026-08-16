@@ -11,14 +11,14 @@ The atlas already exists. This sitting **grafts one loop** or writes one candida
 
 **Read first (do not rewrite):** [`research/agentic-memory-harness-local-llm-2026-08-16.md`](../../research/agentic-memory-harness-local-llm-2026-08-16.md)
 
-**Active ship (exactly one):** [`felt-use-mass-growth`](../../research/opportunities/felt-use-mass-growth.md). Rank 0 in the atlas is living mass + soak nights. Open loops after M3 retrieve: H1 skill-pin, M7 night labels, L1 ACE pin.
+**Active ship (exactly one):** [`felt-use-mass-growth`](../../research/opportunities/felt-use-mass-growth.md). Rank 0 in the atlas is living mass + soak nights. Open loops after M3/H1: M7 night labels, L1 ACE pin.
 
 **Not the product:** Observatory, OKForge, HSP, pantheon, AOS CE, `eml-core`, Mem0/Letta SKU, public MCP HTTP.
 
 **Done when (falsifiable):**
 
 1. CT101 census attempted: `bash scripts/felt-use-depth.sh` (SSH fail → `INCONCLUSIVE`/`RED`, never synthetic 0=GREEN).
-2. Either (a) one PR that moves felt-use/utility **or** lands exactly one atlas loop (H1 skill-pin / M7 labels / L1 ACE pin) on an existing organ, or (b) a candidate bet file with score ≥18, `brain_profit≥3`, `usp_fit≥4`, status `candidate`.
+2. Either (a) one PR that moves felt-use/utility **or** lands exactly one atlas loop (M7 labels / L1 ACE pin) on an existing organ, or (b) a candidate bet file with score ≥18, `brain_profit≥3`, `usp_fit≥4`, status `candidate`.
 3. Explicit park list in the closer (glass, SKU, LoRA, second writer).
 
 ---
@@ -43,7 +43,7 @@ The atlas already exists. This sitting **grafts one loop** or writes one candida
 | Distill / gate / honeypot | 1 | Failure-case retrieve in-tree; typed refuse already written |
 | Recall / felt-use | 1 | Living Q mass from real sessions |
 | Dream / immune / spark | 1 | Region rewrite in-tree; forget apply still lab; spark stays verify-then-promote |
-| `agent_loop` / `context.rs` | 2 | Pin workflow skill bodies against prune |
+| `agent_loop` / `context.rs` | 2 | Workflow skill pin in-tree |
 | `workflow_skills` | 2+3 | ACE deltas on one `SKILL.md`, human-pinned |
 | MCP / daemon | 2 | Attach HOLD; one writer |
 | Arena / calibration | 3 | Suggestion → human pin only |

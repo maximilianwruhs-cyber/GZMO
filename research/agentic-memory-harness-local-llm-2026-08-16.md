@@ -70,8 +70,9 @@ Schema on living path: `PRAGMA user_version=10` (utility, `gate_event`, `failure
 | Outcome Q when a later takeaway cites a recalled entity (`reinforce_outcome_from_new_truths`) | Do not mint Q from glance/search |
 | `maybe_region_rewrite` + `gate_event` (`promote` / `supersede` / `region_rewrite`) | Immune **apply** on living still lab |
 | `failure_cases` on `verify_fail` / `gate_refuse` / `promote_rollback`; bounded retrieve on token/related-id | MCP attach HOLD (`gzmo-living` on the box) |
-| `honeypot_as_of` bi-temporal | Pin workflow skill bodies against prune |
+| `honeypot_as_of` bi-temporal | — |
 | Spark: stale × importance × cosine, then verify | — |
+| Workflow `SKILL.md` pinned against prune | — |
 
 **A-Mem vs Spark:** they evolve *links on write*. We verify *links before promote*. Keep Pasteur. Do not let an LLM rewrite neighbor attributes without the gate.
 
@@ -186,7 +187,7 @@ Status: **steal** = take the rule onto an existing organ. **in-tree** = do not r
 | M7 | Named night TRIAGE/CONSOLIDATE/AUDIT | Memory as Metabolism | scheduler docs | **open** (labels only) |
 | M8 | Zettelkasten neighbor evolve | A-Mem | spark-link | **park as write-mutate**; keep verify-then-promote |
 | M9 | Graph associative retrieve | HippoRAG | Neo4j + RRF | **cousin in-tree**; no new graph SKU |
-| H1 | Pin skill text against prune | HumanLayer | `context.rs` | **open** |
+| H1 | Pin skill text against prune | HumanLayer | `context.rs` | **in-tree** (workflow `SKILL.md` system-adjacent) |
 | H2 | Progressive SKILL.md | Agent Skills | `workflow_skills` | **in-tree** |
 | H3 | Subagent context isolation | HumanLayer / SWE-agent | `subagent.rs` | **in-tree** |
 | H4 | MCP descriptions as prompt | MCP spec | `gzmo mcp-serve` | **in-tree**; no public HTTP |
@@ -207,12 +208,11 @@ Status: **steal** = take the rule onto an existing organ. **in-tree** = do not r
 | Rank | Loop | Why | Filter |
 |------|------|-----|--------|
 | 0 | **Soak nights 2–3** + felt-use mass on CT101 | Done-when of the active bet | No memory gym |
-| 1 | **Pin workflow skill bodies** in `context.rs` | Local models forget the harness first | Do not pin pantheon theater skills |
-| 2 | **Named night labels** | Cheap vocabulary; zero new crates | Docs/scheduler only |
-| 3 | **ACE curator deltas** on one workflow skill, human-pinned | Frozen-model lift without LoRA | Reflector may use Prime; Curator merge is deterministic; living SOUL still gated |
-| 4 | Immune apply on living | Forget as signal | Still lab until soak |
+| 1 | **Named night labels** | Cheap vocabulary; zero new crates | Docs/scheduler only |
+| 2 | **ACE curator deltas** on one workflow skill, human-pinned | Frozen-model lift without LoRA | Reflector may use Prime; Curator merge is deterministic; living SOUL still gated |
+| 3 | Immune apply on living | Forget as signal | Still lab until soak |
 
-`failure_cases` retrieve (former rank 1) is in-tree: token overlap or related honeypot id, cap 3, no dump on stopword queries.
+`failure_cases` retrieve (M3) and workflow skill pinning (H1) are **in-tree**.
 
 ---
 
