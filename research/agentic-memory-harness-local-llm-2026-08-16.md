@@ -129,7 +129,7 @@ Telescope skills (grill, tdd, handoff) make **you** a better operator. They do n
 |-------|-----------|--------------|--------|
 | **Better retrieve** | Two-phase: semantic then utility; rerank | RRF + `apply_utility_boost` + VM200 | In-tree; needs living mass |
 | **Better evidence** | Verify-on-merged; refuse; quarantine | Honeypot gate | In-tree |
-| **Better instructions** | Evolving playbook, incremental deltas (not rewrite) | Workflow `SKILL.md`, `SOUL.md`, living toml | Partial — human pin only for engine swap |
+| **Better instructions** | Evolving playbook, incremental deltas (not rewrite) | Workflow `SKILL.md` curator in-tree; `SOUL.md` / living toml still human-only | Partial — no auto engine swap |
 | **Better routing** | Right model for extract vs chat vs embed | Prime `:8000` think; VM200 retrieve; Arena **suggest** | P1 nutrient; no auto swap |
 | **Better loop** | Subagents, prune, tool jail | `subagent` + `context` + path jail | In-tree |
 | **Serving ops** | Quantization, speculative decode, vLLM | Private ops (`vllm-blackwell-backend`) | Ops, not USP |
@@ -146,7 +146,7 @@ Stanford / SambaNova / Berkeley: context as an **evolving playbook**. Generator 
 | Grow-and-refine with helpful/harmful counters | Gym rollouts as soak GREEN |
 | Natural execution feedback (test fail, gate refuse) | Labeled AppWorld as the Keep’s eval |
 
-**Map onto GZMO:** Curator deltas belong in (a) workflow skill bodies after a **human pin**, or (b) honeypot supersession (already a gated mutate). Distill already *extracts*; ACE’s warning is: **do not compact playbooks into slogans**. Dream compaction that drops provenance is context collapse. Region rewrite with origin kept is ACE-legal. Observatory summaries are ACE-illegal (brevity bias as product).
+**Map onto GZMO:** Curator deltas land in `workflow_skills::ace` after `ACE_PIN_APPLY=1` (CLI: `gzmo workflow-skill curate`). Honeypot supersession is already a gated mutate. Distill already *extracts*; ACE’s warning is: **do not compact playbooks into slogans**. Dream compaction that drops provenance is context collapse. Region rewrite with origin kept is ACE-legal. Observatory summaries are ACE-illegal (brevity bias as product). Living `SOUL.md` / engine toml stay human-pinned — the curator refuses them.
 
 DSPy / MIPRO / GEPA are the same family (optimize prompts/programs). Steal the *eval-then-delta* idea. Do not add a Python optimizer crate to `gzmo-core`.
 
@@ -191,7 +191,7 @@ Status: **steal** = take the rule onto an existing organ. **in-tree** = do not r
 | H2 | Progressive SKILL.md | Agent Skills | `workflow_skills` | **in-tree** |
 | H3 | Subagent context isolation | HumanLayer / SWE-agent | `subagent.rs` | **in-tree** |
 | H4 | MCP descriptions as prompt | MCP spec | `gzmo mcp-serve` | **in-tree**; no public HTTP |
-| L1 | Incremental playbook deltas | ACE | skills / SOUL / toml | **open** — human pin + gate; no auto rewrite |
+| L1 | Incremental playbook deltas | ACE | `workflow_skills::ace` | **in-tree** (deterministic curator; `ACE_PIN_APPLY=1`; workflow `SKILL.md` only) |
 | L2 | Champion model pin | Arena | living toml | **P1 nutrient**; suggest only |
 | L3 | 128k–256k local strong model | horizon | Prime | **parked** (`local-intel-32gb-128k`) |
 | L4 | Overnight LoRA | — | — | **park forever** (living path) |
@@ -208,10 +208,9 @@ Status: **steal** = take the rule onto an existing organ. **in-tree** = do not r
 | Rank | Loop | Why | Filter |
 |------|------|-----|--------|
 | 0 | **Soak nights 2–3** + felt-use mass on CT101 | Done-when of the active bet | No memory gym |
-| 1 | **ACE curator deltas** on one workflow skill, human-pinned | Frozen-model lift without LoRA | Reflector may use Prime; Curator merge is deterministic; living SOUL still gated |
-| 2 | Immune apply on living | Forget as signal | Still lab until soak |
+| 1 | Immune apply on living | Forget as signal | Still lab until soak |
 
-`failure_cases` retrieve (M3), workflow skill pinning (H1), and named night labels (M7) are **in-tree**.
+`failure_cases` retrieve (M3), workflow skill pinning (H1), named night labels (M7), and ACE playbook curation (L1) are **in-tree**.
 
 ---
 

@@ -3,8 +3,13 @@
 //! Separate from Chaos pantheon slash skills (`crate::skills`). These are
 //! model-invoked / operator-invoked discipline packs (grill, tdd, …).
 
+pub mod ace;
 mod activate;
 
+pub use ace::{
+    apply_ace_deltas, curate_workflow_skill, pin_apply_from_env, validate_skill_name,
+    AceCurateResult, AceDelta, AceDeltaBatch,
+};
 pub use activate::ActivateWorkflowSkillTool;
 
 use std::collections::HashMap;

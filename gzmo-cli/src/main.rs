@@ -40,6 +40,7 @@ pub mod tui;
 #[allow(dead_code)]
 mod ui;
 mod wiki_cmd;
+mod workflow_skill_cmd;
 
 use anyhow::Result;
 use chrono::NaiveDate;
@@ -115,6 +116,8 @@ enum Command {
     Mentor(Vec<String>),
     /// One-shot ritual/lab pantheon skill (`gzmo chaos skill <command>`).
     ChaosSkill(Vec<String>),
+    /// ACE playbook curator (`gzmo workflow-skill curate`). Writes require ACE_PIN_APPLY=1.
+    WorkflowSkill(Vec<String>),
 }
 
 fn parse_args() -> Command {
@@ -298,6 +301,9 @@ fn parse_args() -> Command {
         if args[1] == "wiki" {
             return Command::Wiki(args[2..].to_vec());
         }
+        if args[1] == "workflow-skill" {
+            return Command::WorkflowSkill(args.get(2..).unwrap_or(&[]).to_vec());
+        }
         if args[1] == "kg-reconcile" {
             return Command::KgReconcile(args[2..].to_vec());
         }
@@ -363,6 +369,7 @@ async fn main() -> Result<()> {
         Command::Assemble { .. } => "info",
         Command::Mentor(_) => "warn",
         Command::ChaosSkill(_) => "warn",
+        Command::WorkflowSkill(_) => "warn",
     };
 
     tracing_subscriber::fmt()
@@ -401,6 +408,7 @@ async fn main() -> Result<()> {
             | Command::ChaosSkill(_)
             | Command::DreamCompact { .. }
             | Command::Session(_)
+            | Command::WorkflowSkill(_)
     );
 
     let identity = if needs_identity {
@@ -507,5 +515,6 @@ async fn main() -> Result<()> {
         } => assemble_cmd::run(&config, &recipe, fixture, apply).await,
         Command::Mentor(args) => mentor_cmd::run(&config, &args).await,
         Command::ChaosSkill(args) => chaos_skill_cmd::run(&config, &args).await,
+        Command::WorkflowSkill(args) => workflow_skill_cmd::run(&config, &args).await,
     }
 }

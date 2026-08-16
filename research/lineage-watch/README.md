@@ -31,7 +31,7 @@ July 22 already named most of these. Keep taking them. Attribution in the July n
 | Blind-verify + rollback | SuperLocalMemory | `honeypot-gate` | In-tree write (`gate_event`, quarantine) |
 | Conflict-aware supersede tag | SleepGate | `honeypot-gate` | In-tree (`gate_event`) |
 | Bi-temporal / as-of recall | SuperLocalMemory | vault | In-tree (`honeypot_as_of`) |
-| Incremental playbook deltas | ACE | workflow skills / SOUL | Open — human pin; no auto rewrite |
+| Incremental playbook deltas | ACE | workflow skills / SOUL | In-tree on workflow `SKILL.md` (`workflow_skills::ace`, `ACE_PIN_APPLY=1`). SOUL/toml still human-only. |
 | Pin skill text against prune | HumanLayer | `context.rs` | In-tree (workflow `SKILL.md`) |
 | LoCoMo / LongMemEval | benches | soak satellite | Borrow-eval only |
 
@@ -48,7 +48,7 @@ None of these become an active bet until CT101 living census shows felt-use mass
 | 3 | **Named night procedure** — `TRIAGE → CONSOLIDATE → AUDIT` as labels on distill / gate / soak | Memory as Metabolism → night runbook | **In-tree** (`OVERNIGHT_METABOLISM.md`). Labels only; wall-clock is not TRIAGE→CONSOLIDATE→AUDIT. No crate. No Observatory glass. |
 | 4 | **Verify rollback + typed supersession** — quarantine, rollback on failed promote, typed supersede/refuse | SuperLocalMemory + SleepGate → `honeypot-gate` | **In-tree write** (`gate_event`, `failure_cases`). Bounded retrieve on token/related-id. |
 | 5 | **Pin workflow skill bodies** against context prune | HumanLayer → `context.rs` | **In-tree.** Do not pin pantheon theater skills. |
-| 6 | **ACE curator deltas** on one `SKILL.md`, human-pinned | ACE 2510.04618 → `workflow_skills` | No unsupervised SOUL rewrite. |
+| 6 | **ACE curator deltas** on one `SKILL.md`, human-pinned | ACE 2510.04618 → `workflow_skills` | **In-tree.** `ACE_PIN_APPLY=1` to write. No unsupervised SOUL rewrite. |
 
 ## Fields we watch
 

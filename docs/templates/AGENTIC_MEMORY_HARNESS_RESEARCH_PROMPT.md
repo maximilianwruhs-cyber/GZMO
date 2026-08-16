@@ -11,14 +11,14 @@ The atlas already exists. This sitting **grafts one loop** or writes one candida
 
 **Read first (do not rewrite):** [`research/agentic-memory-harness-local-llm-2026-08-16.md`](../../research/agentic-memory-harness-local-llm-2026-08-16.md)
 
-**Active ship (exactly one):** [`felt-use-mass-growth`](../../research/opportunities/felt-use-mass-growth.md). Rank 0 in the atlas is living mass + soak nights. Open loop after M3/H1/M7: L1 ACE pin.
+**Active ship (exactly one):** [`felt-use-mass-growth`](../../research/opportunities/felt-use-mass-growth.md). Rank 0 in the atlas is living mass + soak nights. Open after M3/H1/M7/L1: immune apply on living (lab until soak).
 
 **Not the product:** Observatory, OKForge, HSP, pantheon, AOS CE, `eml-core`, Mem0/Letta SKU, public MCP HTTP.
 
 **Done when (falsifiable):**
 
 1. CT101 census attempted: `bash scripts/felt-use-depth.sh` (SSH fail → `INCONCLUSIVE`/`RED`, never synthetic 0=GREEN).
-2. Either (a) one PR that moves felt-use/utility **or** lands exactly one atlas loop (L1 ACE pin) on an existing organ, or (b) a candidate bet file with score ≥18, `brain_profit≥3`, `usp_fit≥4`, status `candidate`.
+2. Either (a) one PR that moves felt-use/utility **or** lands immune apply on living after soak, or (b) a candidate bet file with score ≥18, `brain_profit≥3`, `usp_fit≥4`, status `candidate`.
 3. Explicit park list in the closer (glass, SKU, LoRA, second writer).
 
 ---
