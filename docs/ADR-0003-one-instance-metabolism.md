@@ -9,7 +9,7 @@ GZMO grew a dual stack (CT101 legacy + GZMO-next), many named engines, and a lab
 
 ## Decision (invariants — still binding)
 
-1. **One living instance only** — never two overnight writers on the same vault.
+1. **One living instance only** — never two overnight writers on the same vault. Process lock: [ADR-0006](./ADR-0006-owner-control-plane.md) (`{vault_db}.write.lock` + owner socket).
 2. **Product gate is living-host health** — systemd/journal/vault/honeypot/sidecars on whichever host currently holds the living claim — not Observatory as a second control plane.
 
 ## Amended (see ADR-0005)

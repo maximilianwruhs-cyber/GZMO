@@ -63,6 +63,9 @@ pub struct MemoryStatusReport {
     pub honeypot_latest: usize,
     pub scratch_backend: String,
     pub scratch_has_recall: bool,
+    /// `owner` when served over the control-plane socket; `in-process` otherwise.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub control_plane: Option<String>,
 }
 
 /// Living vault floor. Lab/product/empty vaults use `GZMO_ALLOW_LAB_VAULT`,
@@ -105,6 +108,19 @@ impl PlatformMemory {
     }
 
     pub async fn open(config: &GzmoConfig, session_id: Option<String>) -> Result<Self> {
+        Self::open_inner(config, session_id, false).await
+    }
+
+    /// Owner process may open a small/bootstrap vault. Clients still hit the living floor.
+    pub async fn open_as_owner(config: &GzmoConfig, session_id: Option<String>) -> Result<Self> {
+        Self::open_inner(config, session_id, true).await
+    }
+
+    async fn open_inner(
+        config: &GzmoConfig,
+        session_id: Option<String>,
+        as_owner: bool,
+    ) -> Result<Self> {
         let sid = session_id.unwrap_or_else(|| {
             std::env::var("GZMO_SESSION_ID")
                 .ok()
@@ -122,7 +138,7 @@ impl PlatformMemory {
         .await?;
 
         let facts = vault.count().unwrap_or(0);
-        let allow_lab = allow_lab_or_product_vault(&config.memory.vault_db);
+        let allow_lab = as_owner || allow_lab_or_product_vault(&config.memory.vault_db);
         if facts < LIVING_VAULT_MIN_FACTS && !allow_lab {
             anyhow::bail!(
                 "refusing vault attach: {} has only {facts} facts (need ≥{LIVING_VAULT_MIN_FACTS} \
@@ -146,6 +162,25 @@ impl PlatformMemory {
         })
     }
 
+    pub fn vault_path(&self) -> &str {
+        &self.vault_path
+    }
+
+    fn scope_for(&self, session_id: Option<&str>) -> ScratchScope {
+        ScratchScope::Main {
+            session_id: session_id
+                .filter(|s| !s.is_empty())
+                .unwrap_or_else(|| self.session_id())
+                .to_string(),
+        }
+    }
+
+    fn session_label<'a>(&'a self, session_id: Option<&'a str>) -> &'a str {
+        session_id
+            .filter(|s| !s.is_empty())
+            .unwrap_or_else(|| self.session_id())
+    }
+
     pub fn session_id(&self) -> &str {
         self.session.session_id()
     }
@@ -155,12 +190,30 @@ impl PlatformMemory {
     }
 
     pub async fn turn_start(&self) {
-        self.session.turn_start().await;
+        self.turn_start_scoped(None).await;
+    }
+
+    /// Clear scratch for `session_id` (or the bound session). Returns the session label.
+    pub async fn turn_start_scoped(&self, session_id: Option<&str>) -> String {
+        let scope = self.scope_for(session_id);
+        let _ = self.session.scratch().clear(&scope).await;
+        self.session_label(session_id).to_string()
     }
 
     /// `gzmo_memory_search` — recall into honeypot/vault and write scratch for this session.
     pub async fn memory_search(
         &self,
+        query: &str,
+        limit: usize,
+        write_scratch: bool,
+    ) -> Result<MemorySearchResult> {
+        self.memory_search_scoped(None, query, limit, write_scratch)
+            .await
+    }
+
+    pub async fn memory_search_scoped(
+        &self,
+        session_id: Option<&str>,
         query: &str,
         limit: usize,
         write_scratch: bool,
@@ -195,7 +248,7 @@ impl PlatformMemory {
                 .collect();
             self.session
                 .scratch()
-                .write(&self.scratch_scope(), snippets)
+                .write(&self.scope_for(session_id), snippets)
                 .await?;
         }
 
@@ -218,9 +271,16 @@ impl PlatformMemory {
 
     /// `gzmo_memory_recall_pull` — formatted `[RECALL]` block for the next model turn.
     pub async fn memory_recall_pull(&self) -> Result<Option<String>> {
+        self.memory_recall_pull_scoped(None).await
+    }
+
+    pub async fn memory_recall_pull_scoped(
+        &self,
+        session_id: Option<&str>,
+    ) -> Result<Option<String>> {
         self.session
             .scratch()
-            .format_for_inject(&self.scratch_scope())
+            .format_for_inject(&self.scope_for(session_id))
             .await
     }
 
@@ -233,6 +293,10 @@ impl PlatformMemory {
     }
 
     pub async fn status(&self) -> Result<MemoryStatusReport> {
+        self.status_scoped(None).await
+    }
+
+    pub async fn status_scoped(&self, session_id: Option<&str>) -> Result<MemoryStatusReport> {
         let vault_facts = self.vault.count().unwrap_or(0);
         let honeypot_latest = self.vault.count_honeypot_latest().unwrap_or(0);
         let scratch_backend = if self.session.uses_redis() {
@@ -247,18 +311,19 @@ impl PlatformMemory {
         let scratch_has_recall = self
             .session
             .scratch()
-            .read(&self.scratch_scope())
+            .read(&self.scope_for(session_id))
             .await?
             .map(|p| !p.snippets.is_empty())
             .unwrap_or(false);
 
         Ok(MemoryStatusReport {
-            session_id: self.session.session_id().to_string(),
+            session_id: self.session_label(session_id).to_string(),
             vault_path: self.vault_path.clone(),
             vault_facts,
             honeypot_latest,
             scratch_backend: scratch_backend.to_string(),
             scratch_has_recall,
+            control_plane: Some(crate::control_plane::VIA_IN_PROCESS.to_string()),
         })
     }
 

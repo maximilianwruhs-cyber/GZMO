@@ -91,6 +91,8 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
 
     embeddings::assert_vault_backend(&config.memory.vault_backend)?;
 
+    let _owner = gzmo_core::control_plane::claim_owner(config).await?;
+
     // Heartbeat
     let heartbeat_interval = Duration::from_secs(config.agent.heartbeat_interval_secs);
     let mut heartbeat = HeartbeatEngine::new(heartbeat_interval);

@@ -22,7 +22,9 @@ pub fn execute(program: &RpnProgram, inputs: &[ComplexBall]) -> Result<ComplexBa
                 stack.push(ComplexBall::from_real(v));
             }
             RpnInstruction::LoadVariable(i) => {
-                let v = inputs.get(i).ok_or(ExecError::VariableIndexOutOfBounds(i))?;
+                let v = inputs
+                    .get(i)
+                    .ok_or(ExecError::VariableIndexOutOfBounds(i))?;
                 stack.push(*v);
             }
             RpnInstruction::EvalEml => {

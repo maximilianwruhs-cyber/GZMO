@@ -15,6 +15,11 @@ directory = "memory"
 vault_db = "data/vault.db"
 vault_backend = "sqlite"
 
+# Owner socket for CLI/MCP attach (ADR-0006). Empty → `{vault_db.parent()}/gzmo.sock`.
+# `gzmo serve` / `gzmo daemon` flock `{vault_db}.write.lock` and listen here.
+# [control_plane]
+# socket_path = "data/gzmo.sock"
+
 [skills]
 directory = "skills"
 dreams_path = "DREAMS.md"

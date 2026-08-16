@@ -15,13 +15,20 @@ use rmcp::{
 use tracing::info;
 
 use crate::config::{GzmoConfig, WikiConfig};
+use crate::control_plane::{attach_memory, ControlPlaneClient, MemoryAttach};
 use crate::health::{collect_health_probes, format_report};
 use crate::platform_memory::PlatformMemory;
 use crate::wiki::WikiEngine;
 
 #[derive(Clone)]
+enum MemoryFront {
+    Local(Arc<PlatformMemory>),
+    Owner(ControlPlaneClient),
+}
+
+#[derive(Clone)]
 pub struct GzmoMemoryMcpServer {
-    platform: Arc<PlatformMemory>,
+    front: MemoryFront,
     config: Arc<GzmoConfig>,
     wiki: WikiConfig,
     tool_router: ToolRouter<Self>,
@@ -129,9 +136,13 @@ fn read_discovery_status_json(data_dir: &Path) -> serde_json::Value {
 #[tool_router]
 impl GzmoMemoryMcpServer {
     pub fn new(platform: Arc<PlatformMemory>, config: Arc<GzmoConfig>) -> Self {
+        Self::from_front(MemoryFront::Local(platform), config)
+    }
+
+    fn from_front(front: MemoryFront, config: Arc<GzmoConfig>) -> Self {
         let wiki = config.wiki.clone();
         Self {
-            platform,
+            front,
             config,
             wiki,
             tool_router: Self::tool_router(),
@@ -140,11 +151,17 @@ impl GzmoMemoryMcpServer {
 
     #[tool(description = "Clear session scratch for a new user turn (call before search/recall).")]
     async fn gzmo_memory_turn_start(&self) -> Result<CallToolResult, McpError> {
-        self.platform.turn_start().await;
-        Ok(CallToolResult::success(vec![Content::text(format!(
-            "turn-start: scratch cleared (session {})",
-            self.platform.session_id()
-        ))]))
+        let text = match &self.front {
+            MemoryFront::Local(p) => {
+                p.turn_start().await;
+                format!("turn-start: scratch cleared (session {})", p.session_id())
+            }
+            MemoryFront::Owner(c) => match c.turn_start().await {
+                Ok(t) => t,
+                Err(e) => return Ok(CallToolResult::error(vec![Content::text(e.to_string())])),
+            },
+        };
+        Ok(CallToolResult::success(vec![Content::text(text)]))
     }
 
     #[tool(
@@ -156,11 +173,11 @@ impl GzmoMemoryMcpServer {
     ) -> Result<CallToolResult, McpError> {
         let limit = args.limit.unwrap_or(5) as usize;
         let write_scratch = args.write_scratch.unwrap_or(true);
-        match self
-            .platform
-            .memory_search(&args.query, limit, write_scratch)
-            .await
-        {
+        let result = match &self.front {
+            MemoryFront::Local(p) => p.memory_search(&args.query, limit, write_scratch).await,
+            MemoryFront::Owner(c) => c.search(&args.query, limit, write_scratch).await,
+        };
+        match result {
             Ok(res) => Ok(CallToolResult::success(vec![Content::text(res.text)])),
             Err(e) => Ok(CallToolResult::error(vec![Content::text(e.to_string())])),
         }
@@ -170,7 +187,11 @@ impl GzmoMemoryMcpServer {
         description = "Report vault path, fact counts, session id, and scratch backend — use to verify MCP vault attach."
     )]
     async fn gzmo_memory_status(&self) -> Result<CallToolResult, McpError> {
-        match self.platform.status().await {
+        let result = match &self.front {
+            MemoryFront::Local(p) => p.status().await,
+            MemoryFront::Owner(c) => c.status().await,
+        };
+        match result {
             Ok(st) => match serde_json::to_string_pretty(&st) {
                 Ok(json) => Ok(CallToolResult::success(vec![Content::text(json)])),
                 Err(e) => Ok(CallToolResult::error(vec![Content::text(e.to_string())])),
@@ -181,7 +202,11 @@ impl GzmoMemoryMcpServer {
 
     #[tool(description = "Return the [RECALL] scratch block for this session.")]
     async fn gzmo_memory_recall_pull(&self) -> Result<CallToolResult, McpError> {
-        match self.platform.memory_recall_pull().await {
+        let result = match &self.front {
+            MemoryFront::Local(p) => p.memory_recall_pull().await,
+            MemoryFront::Owner(c) => c.recall().await,
+        };
+        match result {
             Ok(Some(block)) => Ok(CallToolResult::success(vec![Content::text(block)])),
             Ok(None) => Ok(CallToolResult::success(vec![Content::text(
                 "(no scratch recall for this session)".to_string(),
@@ -195,7 +220,11 @@ impl GzmoMemoryMcpServer {
         &self,
         Parameters(args): Parameters<ChainParams>,
     ) -> Result<CallToolResult, McpError> {
-        match self.platform.memory_chain(&args.fact_id) {
+        let result = match &self.front {
+            MemoryFront::Local(p) => p.memory_chain(&args.fact_id),
+            MemoryFront::Owner(c) => c.chain(&args.fact_id).await,
+        };
+        match result {
             Ok(chain) if chain.is_empty() => Ok(CallToolResult::success(vec![Content::text(
                 format!("(no honeypot chain for id {})", args.fact_id),
             )])),
@@ -246,7 +275,11 @@ impl GzmoMemoryMcpServer {
         Parameters(args): Parameters<ProfileParams>,
     ) -> Result<CallToolResult, McpError> {
         let dynamic_only = args.dynamic_only.unwrap_or(false);
-        match self.platform.memory_profile(dynamic_only) {
+        let result = match &self.front {
+            MemoryFront::Local(p) => p.memory_profile(dynamic_only),
+            MemoryFront::Owner(c) => c.profile(dynamic_only).await,
+        };
+        match result {
             Ok(profile) => match serde_json::to_string_pretty(&profile) {
                 Ok(json) => Ok(CallToolResult::success(vec![Content::text(json)])),
                 Err(e) => Ok(CallToolResult::error(vec![Content::text(e.to_string())])),
@@ -333,13 +366,26 @@ pub async fn run_mcp_serve(config: &GzmoConfig) -> Result<()> {
     let session_id = std::env::var("GZMO_SESSION_ID")
         .ok()
         .filter(|s| !s.is_empty());
-    let platform = Arc::new(PlatformMemory::open(config, session_id).await?);
-    info!(
-        session = %platform.session_id(),
-        vault = %config.memory.vault_db.display(),
-        "GZMO memory MCP server starting (stdio)"
-    );
-    let server = GzmoMemoryMcpServer::new(platform, Arc::new(config.clone()));
+    let cfg = Arc::new(config.clone());
+    let server = match attach_memory(config, session_id.clone(), false).await? {
+        MemoryAttach::Owner(client) => {
+            info!(
+                socket = %client.socket_path.display(),
+                vault = %config.memory.vault_db.display(),
+                "GZMO memory MCP attaching to owner socket (stdio)"
+            );
+            GzmoMemoryMcpServer::from_front(MemoryFront::Owner(client), cfg)
+        }
+        MemoryAttach::Local => {
+            let platform = Arc::new(PlatformMemory::open(config, session_id).await?);
+            info!(
+                session = %platform.session_id(),
+                vault = %config.memory.vault_db.display(),
+                "GZMO memory MCP server starting in-process (stdio)"
+            );
+            GzmoMemoryMcpServer::new(platform, cfg)
+        }
+    };
     let service = server.serve(stdio()).await?;
     service.waiting().await?;
     Ok(())

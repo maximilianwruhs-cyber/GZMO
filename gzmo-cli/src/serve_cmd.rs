@@ -158,6 +158,8 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
         bail!("[metabolism].enabled = false — refusing to start gzmo serve");
     }
 
+    let _owner = gzmo_core::control_plane::claim_owner(config).await?;
+
     let pid_file = PathBuf::from(PID_FILE);
     if pid_file.exists() {
         if let Ok(old) = std::fs::read_to_string(&pid_file) {

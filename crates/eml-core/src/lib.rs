@@ -34,8 +34,8 @@ pub mod synth {
 
     /// `ln(x) = eml(1, eml(eml(1, x), 1))`
     pub fn ln(x: EmlExpr) -> EmlExpr {
-        let a = EmlExpr::eml(EmlExpr::c(1.0), x);       // eml(1, x)  = e - ln(x)
-        let b = EmlExpr::eml(a, EmlExpr::c(1.0));        // eml(a, 1) = exp(a) = e^e / x
+        let a = EmlExpr::eml(EmlExpr::c(1.0), x); // eml(1, x)  = e - ln(x)
+        let b = EmlExpr::eml(a, EmlExpr::c(1.0)); // eml(a, 1) = exp(a) = e^e / x
         EmlExpr::eml(EmlExpr::c(1.0), b) // eml(1, b)  = ln(x)
     }
 
@@ -65,9 +65,9 @@ pub mod synth {
 
     /// `sqrt(x) = exp(ln(x) / 2)`
     pub fn sqrt(x: EmlExpr) -> EmlExpr {
-        let half = div(EmlExpr::c(1.0), EmlExpr::c(2.0));  // 0.5
-        let ln_half = mul(ln(x), half);                     // ln(x) * 0.5
-        EmlExpr::eml(ln_half, EmlExpr::c(1.0))               // exp(ln(x)/2)
+        let half = div(EmlExpr::c(1.0), EmlExpr::c(2.0)); // 0.5
+        let ln_half = mul(ln(x), half); // ln(x) * 0.5
+        EmlExpr::eml(ln_half, EmlExpr::c(1.0)) // exp(ln(x)/2)
     }
 
     /// `square(x) = x * x`
