@@ -87,6 +87,46 @@ pub fn diversify_by_source_file(
     out
 }
 
+/// Pool-relative utility weight. RRF adjacent ranks differ by ~3e-4; 0.05 lets
+/// max-Q in the pool outrank min-Q without inventing hits. Cross-encoder gaps
+/// (~0.2–0.9) still dominate, so relevance is not discarded.
+pub const UTILITY_POOL_LAMBDA: f64 = 0.05;
+
+/// MemRL phase B: boost relevance scores by in-pool `utility_score` (Q), then
+/// re-sort. Does not add hits. Equal utility leaves relative relevance order.
+pub fn apply_utility_boost(scored: &mut Vec<(SemanticFact, f64)>, utility: &HashMap<Uuid, f64>) {
+    if scored.len() <= 1 {
+        return;
+    }
+    let us: Vec<f64> = scored
+        .iter()
+        .map(|(f, _)| utility.get(&f.id).copied().unwrap_or(0.0).max(0.0))
+        .collect();
+    let u_min = us.iter().copied().fold(f64::INFINITY, f64::min);
+    let u_max = us.iter().copied().fold(f64::NEG_INFINITY, f64::max);
+    let span = u_max - u_min;
+    let orig: Vec<f64> = scored.iter().map(|(_, s)| *s).collect();
+    if span > 1e-12 {
+        for (i, (_, score)) in scored.iter_mut().enumerate() {
+            *score += UTILITY_POOL_LAMBDA * ((us[i] - u_min) / span);
+        }
+    }
+    let mut order: Vec<usize> = (0..scored.len()).collect();
+    order.sort_by(|&i, &j| {
+        scored[j]
+            .1
+            .partial_cmp(&scored[i].1)
+            .unwrap_or(std::cmp::Ordering::Equal)
+            .then_with(|| {
+                orig[j]
+                    .partial_cmp(&orig[i])
+                    .unwrap_or(std::cmp::Ordering::Equal)
+            })
+            .then_with(|| i.cmp(&j))
+    });
+    *scored = order.into_iter().map(|i| scored[i].clone()).collect();
+}
+
 /// Tokens for graph / entity-aligned honeypot matching.
 pub fn extract_entity_tokens(query: &str) -> Vec<String> {
     let mut out = Vec::new();
@@ -162,6 +202,7 @@ fn fts_match_query_mode(query: &str, broad: bool) -> String {
 mod tests {
     use super::*;
     use chrono::Utc;
+    use std::collections::HashMap;
 
     fn dummy_fact(id: Uuid, content: &str) -> RecallCandidate {
         let now = Utc::now();
@@ -222,5 +263,51 @@ mod tests {
             .collect();
         let out = diversify_by_source_file(ranked, 10, 3);
         assert_eq!(out.len(), 3);
+    }
+
+    #[test]
+    fn utility_boost_promotes_high_q_inside_pool() {
+        let low = Uuid::new_v4();
+        let high = Uuid::new_v4();
+        let mut scored = vec![
+            (dummy_fact(low, "low q").fact, 0.0164),
+            (dummy_fact(high, "high q").fact, 0.0161),
+        ];
+        let mut utility = HashMap::new();
+        utility.insert(low, 0.0);
+        utility.insert(high, 12.0);
+        apply_utility_boost(&mut scored, &utility);
+        assert_eq!(scored[0].0.id, high, "phase B must prefer higher utility");
+        assert_eq!(scored.len(), 2, "must not invent or drop hits");
+    }
+
+    #[test]
+    fn utility_boost_equal_q_keeps_relevance_order() {
+        let a = Uuid::new_v4();
+        let b = Uuid::new_v4();
+        let mut scored = vec![
+            (dummy_fact(a, "first").fact, 0.9),
+            (dummy_fact(b, "second").fact, 0.2),
+        ];
+        let mut utility = HashMap::new();
+        utility.insert(a, 3.0);
+        utility.insert(b, 3.0);
+        apply_utility_boost(&mut scored, &utility);
+        assert_eq!(scored[0].0.id, a);
+        assert_eq!(scored[1].0.id, b);
+    }
+
+    #[test]
+    fn utility_boost_empty_and_singleton_are_nops() {
+        let mut empty: Vec<(SemanticFact, f64)> = Vec::new();
+        apply_utility_boost(&mut empty, &HashMap::new());
+        assert!(empty.is_empty());
+
+        let id = Uuid::new_v4();
+        let mut one = vec![(dummy_fact(id, "only").fact, 0.5)];
+        apply_utility_boost(&mut one, &HashMap::new());
+        assert_eq!(one.len(), 1);
+        assert_eq!(one[0].0.id, id);
+        assert!((one[0].1 - 0.5).abs() < 1e-12);
     }
 }

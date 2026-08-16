@@ -50,20 +50,27 @@ sql = (
     "SELECT "
     "(SELECT COUNT(*) FROM honeypot WHERE is_latest=1), "
     "(SELECT COUNT(*) FROM honeypot WHERE is_latest=1 AND recall_count>=1), "
-    "(SELECT COUNT(*) FROM honeypot WHERE is_latest=1 AND recall_count>=3);\""
+    "(SELECT COUNT(*) FROM honeypot WHERE is_latest=1 AND recall_count>=3), "
+    "(SELECT COUNT(*) FROM honeypot WHERE is_latest=1 AND utility_score>0), "
+    "(SELECT COALESCE(AVG(utility_score),0) FROM honeypot WHERE is_latest=1), "
+    "(SELECT COALESCE(MAX(utility_score),0) FROM honeypot WHERE is_latest=1);\""
 )
 rc, stdout, stderr = ssh(sql)
-nums = [int(x) for x in re.findall(r"\d+", stdout.replace("|", "\n")) if x.isdigit()]
-# Prefer pipe-separated single line
+nums = [float(x) for x in re.findall(r"[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?", stdout.replace("|", " "))]
+# Prefer pipe-separated single line (counts are ints; avg/max may be real)
 if "|" in stdout:
-    parts = [p.strip() for p in stdout.strip().split("|") if p.strip().isdigit()]
-    if len(parts) >= 3:
-        nums = [int(parts[0]), int(parts[1]), int(parts[2])]
-elif len(nums) >= 3:
-    nums = nums[:3]
+    parts = [p.strip() for p in stdout.strip().split("|") if p.strip()]
+    if len(parts) >= 6:
+        try:
+            nums = [float(parts[i]) for i in range(6)]
+        except ValueError:
+            pass
+elif len(nums) >= 6:
+    nums = nums[:6]
 
-if rc == 0 and len(nums) >= 3:
-    latest, ge1, ge3 = nums[0], nums[1], nums[2]
+if rc == 0 and len(nums) >= 6:
+    latest, ge1, ge3 = int(nums[0]), int(nums[1]), int(nums[2])
+    util_pos, util_avg, util_max = int(nums[3]), float(nums[4]), float(nums[5])
     share1 = (ge1 / latest) if latest else 0.0
     # Depth among felt facts (honest nutrient signal). Vault-wide ge3/latest
     # is retained as share_ge3_of_latest for trend only — not the floor.
@@ -78,6 +85,9 @@ if rc == 0 and len(nums) >= 3:
         "share_ge3": round(share3_felt, 6),
         "share_ge3_of_latest": round(share3_latest, 6),
         "share_denominator": "recall_ge1",
+        "utility_positive": util_pos,
+        "utility_avg": round(util_avg, 6),
+        "utility_max": round(util_max, 6),
     }
 else:
     census = {
@@ -143,6 +153,7 @@ elif depth_ok:
     advice = (
         f"felt_use_depth_ok — recall≥3={census['recall_ge3']}/{census['recall_ge1']} felt "
         f"(share_ge3={census['share_ge3']}; of_latest={census.get('share_ge3_of_latest')}) "
+        f"utility_pos={census.get('utility_positive')} avg={census.get('utility_avg')} "
         f"ripen_dual={ripen.get('dual_gate')}"
     )
     verdict = "GREEN"
@@ -196,6 +207,7 @@ print(json.dumps({
     "advice": advice,
     "census": census,
     "ripen_dual": ripen.get("dual_gate"),
+    "utility_positive": (census or {}).get("utility_positive"),
 }, indent=2))
 raise SystemExit(0 if ok else 1)
 PY
