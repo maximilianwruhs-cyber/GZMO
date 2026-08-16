@@ -2896,7 +2896,8 @@ mod utility_recall_tests {
             hits.len()
         );
         assert_eq!(
-            hits[0].0.id, high,
+            hits[0].0.id,
+            high,
             "high utility_score must rank first, got {:?}",
             hits.iter().map(|(f, s)| (f.id, s)).collect::<Vec<_>>()
         );
