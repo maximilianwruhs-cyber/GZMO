@@ -336,6 +336,11 @@ pub struct GzmoConfig {
     /// `/dice` skill — cascade (+ optional loop, default off).
     #[serde(default)]
     pub dice: DiceConfig,
+
+    /// Unix-socket owner plane (`gzmo serve` / `gzmo daemon`). Default socket is
+    /// `{vault_db.parent()}/gzmo.sock`.
+    #[serde(default)]
+    pub control_plane: ControlPlaneConfig,
 }
 
 /// `/dice` runtime configuration.
@@ -2595,6 +2600,26 @@ pub struct MemoryConfig {
     pub vault_backend: String,
 }
 
+/// Owner socket for CLI/MCP attach. Empty `socket_path` → sibling of `vault_db`.
+#[derive(Debug, Deserialize, Clone, Default)]
+pub struct ControlPlaneConfig {
+    #[serde(default)]
+    pub socket_path: PathBuf,
+}
+
+impl ControlPlaneConfig {
+    pub fn resolved_socket(&self, vault_db: &Path) -> PathBuf {
+        if self.socket_path.as_os_str().is_empty() {
+            vault_db
+                .parent()
+                .unwrap_or_else(|| Path::new("."))
+                .join("gzmo.sock")
+        } else {
+            self.socket_path.clone()
+        }
+    }
+}
+
 fn default_vault_backend() -> String {
     "sqlite".to_string()
 }
@@ -3093,6 +3118,9 @@ impl GzmoConfig {
             cfg.skills.dreams_path = resolve(&cfg.skills.dreams_path);
             cfg.workflow_skills.dir = resolve(&cfg.workflow_skills.dir);
             cfg.workflow_skills.handoff_dir = resolve(&cfg.workflow_skills.handoff_dir);
+            if !cfg.control_plane.socket_path.as_os_str().is_empty() {
+                cfg.control_plane.socket_path = resolve(&cfg.control_plane.socket_path);
+            }
             return Ok(cfg);
         }
 
@@ -3112,6 +3140,9 @@ impl GzmoConfig {
         config.redis.distill_fallback_dir = resolve(&config.redis.distill_fallback_dir);
         config.workflow_skills.dir = resolve(&config.workflow_skills.dir);
         config.workflow_skills.handoff_dir = resolve(&config.workflow_skills.handoff_dir);
+        if !config.control_plane.socket_path.as_os_str().is_empty() {
+            config.control_plane.socket_path = resolve(&config.control_plane.socket_path);
+        }
         apply_mcp_env_overrides(&mut config, &dotenv);
         apply_engine_key_overrides(&mut config, &dotenv);
 

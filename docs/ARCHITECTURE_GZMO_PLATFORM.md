@@ -7,7 +7,7 @@
 
 ## 1. One sentence
 
-**GZMO Platform** = living `config/gzmo.toml` spine + hot/cold memory + overnight metabolism. **Three surfaces:** `gzmo chat`, `gzmo serve`, `gzmo memory mcp`. Pi/Cursor attach via MCP only; see [ADR-0003-one-instance-metabolism.md](./ADR-0003-one-instance-metabolism.md) and [OPERATOR_FRONTEND_DECISION.md](./OPERATOR_FRONTEND_DECISION.md).
+**GZMO Platform** = living `config/gzmo.toml` spine + hot/cold memory + overnight metabolism. **One owner, two clients:** `gzmo serve`/`daemon` own the vault (flock + Unix socket); `gzmo memory *` and `gzmo mcp-serve` attach when the owner is up ([ADR-0006](./ADR-0006-owner-control-plane.md)). Interactive REPL remains `gzmo chat`. See [ADR-0003-one-instance-metabolism.md](./ADR-0003-one-instance-metabolism.md) and [OPERATOR_FRONTEND_DECISION.md](./OPERATOR_FRONTEND_DECISION.md).
 
 ---
 
