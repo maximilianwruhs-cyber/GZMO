@@ -231,8 +231,12 @@ pub fn find_latest_honeypot_by_entity(
 pub fn supersede_honeypot(conn: &Connection, old_id: &str) -> anyhow::Result<()> {
     let now = Utc::now().to_rfc3339();
     conn.execute(
-        "UPDATE honeypot SET is_latest = 0 WHERE (id = ?1 OR vault_id = ?1) AND is_latest = 1",
-        params![old_id],
+        "UPDATE honeypot
+         SET is_latest = 0,
+             valid_to = COALESCE(valid_to, ?1),
+             gate_event = 'supersede'
+         WHERE (id = ?2 OR vault_id = ?2) AND is_latest = 1",
+        params![now, old_id],
     )?;
     tracing::info!(old_id, superseded_at = %now, "Honeypot fact superseded (lifecycle update)");
     Ok(())

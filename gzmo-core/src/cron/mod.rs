@@ -36,6 +36,8 @@ pub struct CronJobView {
     /// 5-field cron when available (custom jobs + synthesized for builtins).
     pub cron5: Option<String>,
     pub kind_label: String,
+    /// Memory-as-metabolism night stage (builtins only).
+    pub night_stage: Option<String>,
 }
 
 /// Snapshot of all manageable jobs from config.
@@ -66,79 +68,97 @@ pub fn list_jobs(config: &GzmoConfig) -> Vec<CronJobView> {
                 CustomCronKind::Shell => "shell".into(),
                 CustomCronKind::Prompt => "prompt".into(),
             },
+            night_stage: None,
         });
     }
     out
 }
 
+/// Memory as Metabolism: TRIAGE → CONSOLIDATE → AUDIT (labels only).
+pub fn night_stage_for(id: &str) -> Option<&'static str> {
+    match id {
+        "distill" => Some("TRIAGE"),
+        "dream" | "promote" | "embed" => Some("CONSOLIDATE"),
+        "spark" | "wiki_push" => Some("AUDIT"),
+        _ => None,
+    }
+}
+
 fn builtin_views(config: &GzmoConfig) -> Vec<CronJobView> {
-    vec![
+    let mk = |id: &str,
+              enabled: bool,
+              description: &str,
+              schedule_label: String,
+              cron5: Option<String>| {
         CronJobView {
-            id: "dream".into(),
+            id: id.into(),
             source: CronJobSource::Builtin,
-            enabled: config.dreams.enabled,
-            description: "Nightly dream consolidation".into(),
-            schedule_label: format!(
+            enabled,
+            description: description.into(),
+            schedule_label,
+            cron5,
+            kind_label: "builtin".into(),
+            night_stage: night_stage_for(id).map(|s| s.to_string()),
+        }
+    };
+    vec![
+        mk(
+            "dream",
+            config.dreams.enabled,
+            "CONSOLIDATE — nightly dream consolidation",
+            format!(
                 "daily {:02}:{:02} UTC",
                 config.dreams.cron_hour, config.dreams.cron_minute
             ),
-            cron5: Some(format!(
+            Some(format!(
                 "{} {} * * *",
                 config.dreams.cron_minute, config.dreams.cron_hour
             )),
-            kind_label: "builtin".into(),
-        },
-        CronJobView {
-            id: "distill".into(),
-            source: CronJobSource::Builtin,
-            enabled: config.session_distill.enabled && config.session_distill.daemon_scheduled,
-            description: "Session distill → vault".into(),
-            schedule_label: format!(
+        ),
+        mk(
+            "distill",
+            config.session_distill.enabled && config.session_distill.daemon_scheduled,
+            "TRIAGE — session distill → vault",
+            format!(
                 "daily {:02}:{:02} UTC",
                 config.session_distill.cron_hour, config.session_distill.cron_minute
             ),
-            cron5: Some(format!(
+            Some(format!(
                 "{} {} * * *",
                 config.session_distill.cron_minute, config.session_distill.cron_hour
             )),
-            kind_label: "builtin".into(),
-        },
-        CronJobView {
-            id: "promote".into(),
-            source: CronJobSource::Builtin,
-            enabled: config.metabolism.enabled,
-            description: "Promote mature facts → honeypot".into(),
-            schedule_label: format!(
+        ),
+        mk(
+            "promote",
+            config.metabolism.enabled,
+            "CONSOLIDATE — promote mature facts → honeypot",
+            format!(
                 "daily {:02}:{:02} UTC",
                 config.metabolism.promote_cron_hour, config.metabolism.promote_cron_minute
             ),
-            cron5: Some(format!(
+            Some(format!(
                 "{} {} * * *",
                 config.metabolism.promote_cron_minute, config.metabolism.promote_cron_hour
             )),
-            kind_label: "builtin".into(),
-        },
-        CronJobView {
-            id: "embed".into(),
-            source: CronJobSource::Builtin,
-            enabled: config.metabolism.enabled,
-            description: "Embed vault (+ Qdrant sync when enabled)".into(),
-            schedule_label: format!(
+        ),
+        mk(
+            "embed",
+            config.metabolism.enabled,
+            "CONSOLIDATE — embed vault (+ Qdrant sync when enabled)",
+            format!(
                 "daily {:02}:{:02} UTC",
                 config.metabolism.embed_cron_hour, config.metabolism.embed_cron_minute
             ),
-            cron5: Some(format!(
+            Some(format!(
                 "{} {} * * *",
                 config.metabolism.embed_cron_minute, config.metabolism.embed_cron_hour
             )),
-            kind_label: "builtin".into(),
-        },
-        CronJobView {
-            id: "spark".into(),
-            source: CronJobSource::Builtin,
-            enabled: config.spark.enabled,
-            description: "Serendipitous spark recall".into(),
-            schedule_label: {
+        ),
+        mk(
+            "spark",
+            config.spark.enabled,
+            "AUDIT — serendipitous spark recall",
+            {
                 let hours: Vec<String> = config
                     .spark
                     .cron_hours
@@ -147,24 +167,21 @@ fn builtin_views(config: &GzmoConfig) -> Vec<CronJobView> {
                     .collect();
                 format!("slots {} UTC", hours.join(", "))
             },
-            cron5: None,
-            kind_label: "builtin".into(),
-        },
-        CronJobView {
-            id: "wiki_push".into(),
-            source: CronJobSource::Builtin,
-            enabled: config.wiki.enabled && config.wiki.backend == "okforge",
-            description: "OKForge wiki push (soft-fail satellite)".into(),
-            schedule_label: format!(
+            None,
+        ),
+        mk(
+            "wiki_push",
+            config.wiki.enabled && config.wiki.backend == "okforge",
+            "AUDIT — OKForge wiki push (soft-fail satellite)",
+            format!(
                 "daily {:02}:{:02} UTC",
                 config.wiki.push_cron_hour, config.wiki.push_cron_minute
             ),
-            cron5: Some(format!(
+            Some(format!(
                 "{} {} * * *",
                 config.wiki.push_cron_minute, config.wiki.push_cron_hour
             )),
-            kind_label: "builtin".into(),
-        },
+        ),
     ]
 }
 
@@ -259,23 +276,25 @@ pub fn validate_custom(job: &CustomCronJob) -> anyhow::Result<()> {
 /// Format a table for CLI listing.
 pub fn format_job_table(jobs: &[CronJobView]) -> String {
     let mut lines = vec![format!(
-        "{:<14} {:<8} {:<8} {:<28} {}",
-        "ID", "SOURCE", "ON", "SCHEDULE", "DESCRIPTION"
+        "{:<14} {:<8} {:<12} {:<8} {:<24} {}",
+        "ID", "SOURCE", "STAGE", "ON", "SCHEDULE", "DESCRIPTION"
     )];
-    lines.push("-".repeat(90));
+    lines.push("-".repeat(96));
     for j in jobs {
         let src = match j.source {
             CronJobSource::Builtin => "builtin",
             CronJobSource::Custom => "custom",
         };
         let on = if j.enabled { "yes" } else { "no" };
+        let stage = j.night_stage.as_deref().unwrap_or("-");
         lines.push(format!(
-            "{:<14} {:<8} {:<8} {:<28} {}",
+            "{:<14} {:<8} {:<12} {:<8} {:<24} {}",
             j.id,
             src,
+            truncate(stage, 12),
             on,
-            truncate(&j.schedule_label, 28),
-            truncate(&j.description, 40)
+            truncate(&j.schedule_label, 24),
+            truncate(&j.description, 36)
         ));
     }
     lines.join("\n")
@@ -322,6 +341,12 @@ mod tests {
         let jobs = list_jobs(&cfg);
         assert!(jobs.iter().any(|j| j.id == "dream"));
         assert!(jobs.iter().any(|j| j.id == "distill"));
+        let distill = jobs.iter().find(|j| j.id == "distill").unwrap();
+        assert_eq!(distill.night_stage.as_deref(), Some("TRIAGE"));
+        let dream = jobs.iter().find(|j| j.id == "dream").unwrap();
+        assert_eq!(dream.night_stage.as_deref(), Some("CONSOLIDATE"));
+        let spark = jobs.iter().find(|j| j.id == "spark").unwrap();
+        assert_eq!(spark.night_stage.as_deref(), Some("AUDIT"));
     }
 
     #[test]
