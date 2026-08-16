@@ -4,7 +4,7 @@
 set -euo pipefail
 
 GZMO_BIN="${CT101_GZMO_BIN:-/opt/gzmo/current/target/release/gzmo}"
-MIN_FACTS="${CT101_MIN_VAULT_FACTS:-10000}"
+MIN_FACTS="${CT101_MIN_VAULT_FACTS:-100}"
 GZMO_CONFIG="${GZMO_CONFIG:-/opt/gzmo/gzmo.toml}"
 
 fail() { echo "FAIL: $*" >&2; exit 1; }

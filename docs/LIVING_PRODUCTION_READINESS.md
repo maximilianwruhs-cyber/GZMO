@@ -10,7 +10,7 @@ Historical workstation-centric checklist: [PRODUCTION_READINESS.md](PRODUCTION_R
 ## Definition of GREEN
 
 1. **CT101** `gzmo-daemon` active with Redis / Qdrant / Neo4j sidecars Up  
-2. **Vault** ≥ 10k facts; health probes OK (LLM, embed, qdrant, redis, neo4j, MCP memory, drift, distill queue)  
+2. **Vault** not empty (`vault_facts` ≥ 100; CT101 denser Keep ~800); health probes OK (LLM, embed, qdrant, redis, neo4j, MCP memory, drift, distill queue)  
 3. **Mentor** socket answers `pong`  
 4. **No dual overnight writers** — workstation `gzmo-serve` inactive  
 5. **Living faithfulness** — CORE_INSIGHT / ADR claims supported on CT101 vault  
@@ -25,7 +25,7 @@ Historical workstation-centric checklist: [PRODUCTION_READINESS.md](PRODUCTION_R
 | `ct101-living-smoke` | FAIL |
 | `health:*` (cloud_llm, prime_llm, embeddings, qdrant, redis, neo4j, mcp_memory, drift, distill_queue) | FAIL if missing OK |
 | `health:rerank` | HOLD if not OK |
-| `vault-floor` | FAIL if &lt; 10k |
+| `vault-floor` | FAIL if &lt; 100 (empty/bootstrap; not the old warehouse 10k) |
 | `faithfulness-living` | FAIL |
 | `takeaway-recall` | FAIL (skip with `LIVING_GATE_SKIP_TAKEAWAY=1`) |
 | `workstation-prime` | HOLD if local `:8000` down but CT101 `prime_llm` OK |

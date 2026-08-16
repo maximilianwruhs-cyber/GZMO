@@ -111,7 +111,7 @@ Guardrails already baked into scripts: `living-attach-check.sh`, `emit-living-mc
 Claim living attach success only when **all** of the following pass:
 
 1. `bash scripts/living-attach-check.sh` exits 0  
-2. `gzmo_memory_status` / CLI `memory status --json`: `vault_path` under living data (CT101 reference: `/opt/gzmo/data/vault.db`) and fact floor (`vault_facts` ≥ 10k; CT101 ~60k)  
+2. `gzmo_memory_status` / CLI `memory status --json`: `vault_path` under living data (CT101 reference: `/opt/gzmo/data/vault.db`) and not-empty floor (`vault_facts` ≥ 100; CT101 denser Keep census ~800 vault / ~600 latest honeypot — **not** the old warehouse 10k/60k)  
 3. Dual-writer inactive: workstation `gzmo-serve` **inactive** while CT101 owns overnight  
 4. MCP server name **`gzmo-living`** present in each **configured** client (OpenClaw MCP registration; Cursor/Pi/global JSON homes that this host uses; Hermes `config.yaml` **if** Hermes chapter applies)
 
