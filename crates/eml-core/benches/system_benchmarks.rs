@@ -24,7 +24,12 @@ fn bench_eml_primitives(c: &mut Criterion) {
     });
 
     group.bench_function("pow(2.0, 10.0)", |b| {
-        b.iter(|| eval(synth::pow(EmlExpr::v(0), EmlExpr::v(1)), black_box(&[2.0, 10.0])))
+        b.iter(|| {
+            eval(
+                synth::pow(EmlExpr::v(0), EmlExpr::v(1)),
+                black_box(&[2.0, 10.0]),
+            )
+        })
     });
 
     group.finish();
@@ -62,5 +67,10 @@ fn bench_compile(c: &mut Criterion) {
     });
 }
 
-criterion_group!(benches, bench_eml_primitives, bench_deep_trees, bench_compile);
+criterion_group!(
+    benches,
+    bench_eml_primitives,
+    bench_deep_trees,
+    bench_compile
+);
 criterion_main!(benches);

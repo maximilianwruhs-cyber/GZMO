@@ -42,10 +42,7 @@ impl ControlPlaneClient {
     }
 
     /// Connect + ping. `None` if the socket is missing or dead (stale file).
-    pub async fn connect_if_live(
-        config: &GzmoConfig,
-        session_id: Option<String>,
-    ) -> Option<Self> {
+    pub async fn connect_if_live(config: &GzmoConfig, session_id: Option<String>) -> Option<Self> {
         if !clients_enabled() {
             return None;
         }

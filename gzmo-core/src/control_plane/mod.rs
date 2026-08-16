@@ -98,7 +98,11 @@ mod tests {
         std::fs::create_dir_all(&cfg.memory.directory).unwrap();
         let vault = SqliteVault::open(&cfg.memory.vault_db).unwrap();
         vault
-            .store_text("honeypot recall fixture about the owner socket", "Semantic", 0.9)
+            .store_text(
+                "honeypot recall fixture about the owner socket",
+                "Semantic",
+                0.9,
+            )
             .unwrap();
         drop(vault);
 
@@ -130,7 +134,9 @@ mod tests {
         drop(claim);
         tokio::time::sleep(Duration::from_millis(20)).await;
         assert!(
-            ControlPlaneClient::connect_if_live(&cfg, None).await.is_none(),
+            ControlPlaneClient::connect_if_live(&cfg, None)
+                .await
+                .is_none(),
             "socket must die with the owner"
         );
     }
@@ -139,7 +145,9 @@ mod tests {
     async fn connect_if_live_none_without_server() {
         let dir = tempfile_dir();
         let cfg = lab_config(&dir);
-        assert!(ControlPlaneClient::connect_if_live(&cfg, None).await.is_none());
+        assert!(ControlPlaneClient::connect_if_live(&cfg, None)
+            .await
+            .is_none());
     }
 
     fn tempfile_dir() -> std::path::PathBuf {

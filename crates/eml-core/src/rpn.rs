@@ -35,13 +35,21 @@ pub struct RpnProgram {
 
 impl RpnProgram {
     pub fn new(instructions: Vec<RpnInstruction>, arity: usize) -> Self {
-        Self { instructions, arity }
+        Self {
+            instructions,
+            arity,
+        }
     }
 }
 
 impl fmt::Display for RpnProgram {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        writeln!(f, "RPN  (arity={}, {} instr):", self.arity, self.instructions.len())?;
+        writeln!(
+            f,
+            "RPN  (arity={}, {} instr):",
+            self.arity,
+            self.instructions.len()
+        )?;
         for (i, instr) in self.instructions.iter().enumerate() {
             writeln!(f, "  {i:03}:  {instr}")?;
         }

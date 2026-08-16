@@ -98,7 +98,8 @@ pub async fn run(config: &GzmoConfig, subargs: Vec<String>) -> Result<()> {
 
     let session_id = parse_session_flag(&subargs);
     if !wants_offline(&subargs) {
-        if let Some(client) = ControlPlaneClient::connect_if_live(config, session_id.clone()).await {
+        if let Some(client) = ControlPlaneClient::connect_if_live(config, session_id.clone()).await
+        {
             return run_via_owner(&client, sub, &subargs).await;
         }
     }

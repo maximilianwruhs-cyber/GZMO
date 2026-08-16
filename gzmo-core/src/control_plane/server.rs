@@ -183,16 +183,14 @@ async fn dispatch(
                 Err(e) => ControlResponse::err(method, e.to_string()),
             }
         }
-        "memory.profile" => {
-            match platform.memory_profile(req.dynamic_only.unwrap_or(false)) {
-                Ok(profile) => {
-                    let mut resp = ControlResponse::ok_method(method);
-                    resp.profile = Some(profile);
-                    resp
-                }
-                Err(e) => ControlResponse::err(method, e.to_string()),
+        "memory.profile" => match platform.memory_profile(req.dynamic_only.unwrap_or(false)) {
+            Ok(profile) => {
+                let mut resp = ControlResponse::ok_method(method);
+                resp.profile = Some(profile);
+                resp
             }
-        }
+            Err(e) => ControlResponse::err(method, e.to_string()),
+        },
         other => ControlResponse::err(other, "unknown method"),
     }
 }
