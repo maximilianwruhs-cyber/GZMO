@@ -154,11 +154,11 @@ Lab recipe map below applies only when `gzmo-scheduler` is explicitly re-enabled
 | Cabinet feed | Sunday 06:30 | `cabinet-feed.sh --live` (one-shot; not PulseLoop) |
 | Discovery (optional) | **not armed by default** | `discovery-smoke.sh --live` via `beat-gate --loop discovery` or a host weekly cron. Do **not** add a DiscoveryEngine to `gzmo-scheduler`. Arm only after fixture beat-gate stays green. |
 
-**Wiki plane:** OKForge OKCP → `gzmo/gzmo-next-memory` via `gzmo serve` satellite (or `gzmo wiki push`). Requires `OKFORGE_TOKEN` (`~/.config/okforge/env`, loaded by `gzmo-serve.service.d/okforge.conf`) and local `okforge.service` on `:3000`.
+**Wiki plane:** OKForge OKCP → `gzmo/gzmo-next-memory` via `bash scripts/wiki-okforge-living-push.sh` (or `gzmo wiki push`). Requires `OKFORGE_TOKEN` and local `okforge.service` on `:3000`. Do **not** start `gzmo-serve` on the telescope.
 
-**Observatory:** in-forge at `http://127.0.0.1:3000/observatory` (`okforge.service`). The FastAPI sidecar `:7777` / `gzmo-observatory.service` is retired.
+**Observatory:** `gzmo observatory` / `--json` plus in-forge UI at `http://127.0.0.1:3000/observatory`. The FastAPI sidecar `:7777` / `gzmo-observatory.service` is retired.
 
-**Production gate:** [`docs/OKFORGE_PRODUCTION.md`](OKFORGE_PRODUCTION.md) + `bash ~/Schreibtisch/okforge/scripts/production-smoke.sh`
+**Production gate:** [`docs/OKFORGE_PRODUCTION.md`](OKFORGE_PRODUCTION.md) + `bash scripts/okforge-observatory-check.sh`
 
 Job results land in `data-next/scheduler-runs/{job}-{timestamp}.json` (plus
 `latest.json` and `wiki-push-latest.json`).

@@ -1,0 +1,15 @@
+[Unit]
+Description=GZMO OKForge / Observatory knowledge-plane check
+After=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=%h/gzmo_full
+Environment=CT101_SSH_HOST=ct101
+ExecStart=/bin/bash %h/gzmo_full/scripts/okforge-observatory-check.sh
+Nice=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=default.target

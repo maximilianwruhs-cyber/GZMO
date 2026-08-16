@@ -6,8 +6,8 @@
 //!   gzmo wiki search <query> [--limit N]
 //!   gzmo wiki file-back <title>    (body read from stdin)
 //!   gzmo wiki status               config + page counts
-//!   gzmo wiki push [--origin NAME] [--limit N] [--dry-run] [--meta PATH] [--require-gate]
-//!                                  push vault facts to OKForge via OKCP
+//!   gzmo wiki push [--origin NAME] [--limit N] [--dry-run] [--meta PATH] [--require-gate] [--from-json PATH]
+//!                                  push vault facts (or JSON drafts) to OKForge via OKCP
 //!                                  (`--require-gate` / GZMO_CONCEPT_GATE: HOLD soft-blocks push)
 
 use anyhow::Result;
@@ -100,7 +100,7 @@ pub async fn run(config: &GzmoConfig, args: Vec<String>) -> Result<()> {
         }
         other => {
             eprintln!(
-                "Unknown wiki subcommand '{other}'. Use: sync | lint | search | file-back | status | push"
+                "Unknown wiki subcommand '{other}'. Use: sync | lint | search | file-back | status | push [--from-json PATH]"
             );
         }
     }
@@ -113,6 +113,7 @@ async fn push(config: &GzmoConfig, args: &[String]) -> Result<()> {
     let mut dry_run = false;
     let mut meta: Option<PathBuf> = None;
     let mut require_gate = false;
+    let mut from_json: Option<PathBuf> = None;
     let mut i = 0;
     while i < args.len() {
         match args[i].as_str() {
@@ -146,6 +147,14 @@ async fn push(config: &GzmoConfig, args: &[String]) -> Result<()> {
                 require_gate = true;
                 i += 1;
             }
+            "--from-json" => {
+                if let Some(v) = args.get(i + 1) {
+                    from_json = Some(PathBuf::from(v));
+                    i += 2;
+                } else {
+                    i += 1;
+                }
+            }
             other => {
                 eprintln!("Unknown wiki push flag: {other}");
                 i += 1;
@@ -153,17 +162,18 @@ async fn push(config: &GzmoConfig, args: &[String]) -> Result<()> {
         }
     }
 
+    let meta_path = meta.unwrap_or_else(|| {
+        config
+            .memory
+            .vault_db
+            .parent()
+            .unwrap_or_else(|| std::path::Path::new("."))
+            .join("wiki-push-latest.json")
+    });
+
     // Hard hold only with --require-gate (serve satellite soft-holds via GZMO_CONCEPT_GATE).
     if require_gate {
         if let Some(reason) = wiki_okf::concept_gate_hold_reason(&config.memory.vault_db) {
-            let meta_path = meta.clone().unwrap_or_else(|| {
-                config
-                    .memory
-                    .vault_db
-                    .parent()
-                    .unwrap_or_else(|| std::path::Path::new("."))
-                    .join("wiki-push-latest.json")
-            });
             let report = wiki_okf::WikiPushReport {
                 mode: "gated".into(),
                 origin: origin.clone(),
@@ -184,24 +194,22 @@ async fn push(config: &GzmoConfig, args: &[String]) -> Result<()> {
         }
     }
 
-    let report = wiki_okf::push_from_vault(
-        &config.wiki,
-        &config.memory.vault_db,
-        &origin,
-        limit,
-        dry_run,
-    )
-    .await?;
-
-    let meta_path = meta.unwrap_or_else(|| {
-        config
-            .memory
-            .vault_db
-            .parent()
-            .unwrap_or_else(|| std::path::Path::new("."))
-            .join("wiki-push-latest.json")
-    });
-    wiki_okf::write_push_report(&meta_path, &report)?;
+    let push = if let Some(json_path) = from_json {
+        let raw = tokio::fs::read_to_string(&json_path).await?;
+        let drafts = wiki_okf::drafts_from_json(&raw, &origin)?;
+        let capped: Vec<_> = drafts.into_iter().take(limit).collect();
+        wiki_okf::push_concepts(&config.wiki, &capped, &origin, dry_run).await
+    } else {
+        wiki_okf::push_from_vault(
+            &config.wiki,
+            &config.memory.vault_db,
+            &origin,
+            limit,
+            dry_run,
+        )
+        .await
+    };
+    let report = wiki_okf::record_push_result(&meta_path, &origin, push)?;
 
     println!(
         "wiki push: mode={} origin={} concepts={} sha={} skipped={}",

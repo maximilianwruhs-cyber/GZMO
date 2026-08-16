@@ -22,6 +22,7 @@ Canonical operator and architecture docs. Session reports and milestone logs bel
 | [PRODUCT_MCP.md](PRODUCT_MCP.md) | Historical `~/.gzmo` installer (not a product) |
 | [PRODUCT_PRODUCTION_READINESS.md](PRODUCT_PRODUCTION_READINESS.md) | Client-attach smoke (not product GREEN) |
 | [LIVING_PRODUCTION_READINESS.md](LIVING_PRODUCTION_READINESS.md) | Living ops GREEN gate (CT101 reference) |
+| [OKFORGE_PRODUCTION.md](OKFORGE_PRODUCTION.md) | Knowledge plane (OKForge + Observatory) — not living GREEN |
 | [LIVING_APPLIANCE.md](LIVING_APPLIANCE.md) | Redis/Qdrant/Neo4j compose pin for living |
 | [PRODUCTION_READINESS.md](PRODUCTION_READINESS.md) | Index — living product bar |
 | [../README.md](../README.md) | Public README |

@@ -53,6 +53,20 @@ else
   row WARN "okforge" "unreachable $OKFORGE_URL (soft)"
 fi
 
+wiki_meta=""
+for cand in "$DATA/wiki-push-latest.json" "$ROOT/data-next/wiki-push-latest.json"; do
+  [[ -f "$cand" ]] && wiki_meta="$cand" && break
+done
+if [[ -n "$wiki_meta" ]]; then
+  if python3 -c "import json; d=json.load(open('$wiki_meta')); raise SystemExit(0 if d.get('healthy') is not False else 1)"; then
+    row PASS "wiki-push-meta" "$wiki_meta"
+  else
+    row WARN "wiki-push-meta" "$wiki_meta healthy=false (soft satellite)"
+  fi
+else
+  row WARN "wiki-push-meta" "no wiki-push-latest.json yet (soft)"
+fi
+
 # CT101 living probes (SSH)
 if ssh -o ConnectTimeout=8 -o BatchMode=yes "$HOST" 'true' 2>/dev/null; then
   row PASS "ct101-ssh" "$HOST"

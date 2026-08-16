@@ -1,6 +1,6 @@
 //! GZMO vault / wiki facts → OKF Concept markdown for OKForge OKCP.
 
-use anyhow::{Context, Result};
+use anyhow::{bail, Context, Result};
 use chrono::Utc;
 use serde::{Deserialize, Serialize};
 use std::path::Path;
@@ -274,6 +274,86 @@ pub async fn push_from_vault(
     push_concepts(wiki, &drafts, origin, dry_run).await
 }
 
+/// Load concept drafts from a JSON array (`[{id, content}]` or full draft objects).
+pub fn drafts_from_json(raw: &str, origin: &str) -> Result<Vec<OkfConceptDraft>> {
+    let v: serde_json::Value = serde_json::from_str(raw).context("parse wiki draft JSON")?;
+    let arr = v
+        .as_array()
+        .or_else(|| v.get("facts").and_then(|x| x.as_array()))
+        .or_else(|| v.get("drafts").and_then(|x| x.as_array()))
+        .context("wiki draft JSON must be an array or {facts:[]} / {drafts:[]}")?;
+    let mut drafts = Vec::with_capacity(arr.len());
+    for (i, item) in arr.iter().enumerate() {
+        if let Some(content) = item.get("content").and_then(|x| x.as_str()) {
+            let id = item
+                .get("id")
+                .and_then(|x| x.as_str())
+                .unwrap_or("json")
+                .to_string();
+            drafts.push(fact_to_draft(&id, content, origin));
+            continue;
+        }
+        if let Some(body) = item.get("body_md").and_then(|x| x.as_str()) {
+            let title = item
+                .get("title")
+                .and_then(|x| x.as_str())
+                .unwrap_or("untitled")
+                .to_string();
+            let slug = item
+                .get("slug")
+                .and_then(|x| x.as_str())
+                .map(|s| s.to_string())
+                .unwrap_or_else(|| wiki_md::slugify(&title));
+            let tags = item
+                .get("tags")
+                .and_then(|x| x.as_array())
+                .map(|a| {
+                    a.iter()
+                        .filter_map(|t| t.as_str().map(|s| s.to_string()))
+                        .collect()
+                })
+                .unwrap_or_else(|| vec!["gzmo-next".into(), origin.to_string()]);
+            drafts.push(OkfConceptDraft {
+                slug,
+                title,
+                body_md: body.to_string(),
+                tags,
+                origin: origin.to_string(),
+            });
+            continue;
+        }
+        bail!("draft[{i}] needs content or body_md");
+    }
+    Ok(drafts)
+}
+
+/// Write `wiki-push-latest.json` even when the live push fails (Observatory honesty).
+pub fn record_push_result(
+    path: &Path,
+    origin: &str,
+    result: Result<WikiPushReport>,
+) -> Result<WikiPushReport> {
+    match result {
+        Ok(report) => {
+            write_push_report(path, &report)?;
+            Ok(report)
+        }
+        Err(e) => {
+            let mut report = WikiPushReport {
+                mode: "live".into(),
+                origin: origin.to_string(),
+                error: e.to_string(),
+                skipped_reason: e.to_string(),
+                healthy: false,
+                ..Default::default()
+            };
+            stamp(&mut report);
+            write_push_report(path, &report)?;
+            Err(e)
+        }
+    }
+}
+
 /// Write push report JSON for Observatory Body / scheduler meta.
 pub fn write_push_report(path: &Path, report: &WikiPushReport) -> Result<()> {
     if let Some(parent) = path.parent() {
@@ -353,6 +433,38 @@ mod concept_gate_tests {
         std::env::set_var("GZMO_CONCEPT_GATE", "0");
         assert!(concept_gate_hold_reason(&vault).is_none());
         std::env::remove_var("GZMO_CONCEPT_GATE");
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn convert_wikilinks_to_okf_paths() {
+        let out = convert_wikilinks("see [[Foo Bar|Title]] and [[baz]]");
+        assert!(out.contains("[Title](/concepts/foo-bar.md)"));
+        assert!(out.contains("[baz](/concepts/baz.md)"));
+    }
+
+    #[test]
+    fn drafts_from_json_facts() {
+        let raw = r#"[{"id":"abc12345deadbeef","content":"Honeypot fact about Lint"}]"#;
+        let drafts = drafts_from_json(raw, "living").unwrap();
+        assert_eq!(drafts.len(), 1);
+        assert_eq!(drafts[0].origin, "living");
+        assert!(drafts[0].body_md.contains("Honeypot fact"));
+    }
+
+    #[test]
+    fn record_push_writes_unhealthy_on_err() {
+        let dir = std::env::temp_dir().join(format!("gzmo-wiki-push-err-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).unwrap();
+        let meta = dir.join("wiki-push-latest.json");
+        let err = anyhow::anyhow!("OKCP session.start failed (503): down");
+        let r = record_push_result(&meta, "manual", Err(err));
+        assert!(r.is_err());
+        let v: serde_json::Value =
+            serde_json::from_str(&std::fs::read_to_string(&meta).unwrap()).unwrap();
+        assert_eq!(v["healthy"], false);
+        assert!(v["error"].as_str().unwrap().contains("503"));
         let _ = std::fs::remove_dir_all(&dir);
     }
 }

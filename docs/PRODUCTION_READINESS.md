@@ -5,6 +5,7 @@ GZMO has **one** product bar: living Keep health ([ADR-0007](ADR-0007-one-produc
 | Lane | Doc | Gate |
 |------|-----|------|
 | **Living Keep** (the product) | [LIVING_PRODUCTION_READINESS.md](LIVING_PRODUCTION_READINESS.md) · [KEEP_QUALITY.md](KEEP_QUALITY.md) | `bash scripts/keep-quality-gate.sh` · `bash scripts/living-readiness-gate.sh` |
+| **Knowledge plane** (OKForge + Observatory, not living GREEN) | [OKFORGE_PRODUCTION.md](OKFORGE_PRODUCTION.md) · [ct101-systems/110-external-nodes/observatory.md](ct101-systems/110-external-nodes/observatory.md) | `bash scripts/okforge-observatory-check.sh` |
 | **Client attach smoke** (not a product GREEN) | [PRODUCT_PRODUCTION_READINESS.md](PRODUCT_PRODUCTION_READINESS.md) | `bash scripts/product-readiness-gate.sh` |
 
 ## Living stack (canonical)
