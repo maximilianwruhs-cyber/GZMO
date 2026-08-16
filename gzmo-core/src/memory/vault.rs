@@ -307,6 +307,38 @@ impl SqliteVault {
             }
             init_conn.execute_batch("PRAGMA user_version = 9")?;
         }
+        let user_version: u32 = init_conn.query_row("PRAGMA user_version", [], |row| row.get(0))?;
+        if user_version < 10 {
+            for sql in [
+                "ALTER TABLE honeypot ADD COLUMN valid_from TEXT",
+                "ALTER TABLE honeypot ADD COLUMN valid_to TEXT",
+                "ALTER TABLE honeypot ADD COLUMN gate_event TEXT NOT NULL DEFAULT 'promote'",
+            ] {
+                match init_conn.execute(sql, []) {
+                    Ok(_) => info!(migration = sql, "Applied schema migration v10"),
+                    Err(e) if e.to_string().contains("duplicate column") => {}
+                    Err(e) => {
+                        tracing::error!(error = %e, migration = sql, "Schema migration v10 failed");
+                        return Err(e.into());
+                    }
+                }
+            }
+            let _ = init_conn.execute_batch(
+                "UPDATE honeypot SET valid_from = COALESCE(valid_from, promoted_at);
+                 UPDATE honeypot SET valid_to = promoted_at WHERE is_latest = 0 AND valid_to IS NULL;
+                 CREATE TABLE IF NOT EXISTS failure_cases (
+                    id TEXT PRIMARY KEY,
+                    kind TEXT NOT NULL,
+                    content TEXT NOT NULL,
+                    related_fact_id TEXT,
+                    created_at TEXT NOT NULL
+                 );
+                 CREATE INDEX IF NOT EXISTS idx_honeypot_valid
+                    ON honeypot(valid_from, valid_to);",
+            );
+            init_conn.execute_batch("PRAGMA user_version = 10")?;
+            info!("Applied schema migration v10: bi-temporal + failure_cases + gate_event");
+        }
 
         info!("Semantic vault initialized (WAL mode + r2d2 pool)");
 
@@ -420,30 +452,148 @@ impl SqliteVault {
     }
 
     /// Graded Felt Use: bump vault confirmation + honeypot `recall_count` by `delta`.
+    /// Utility is bumped by the same delta (Bonded-style). Prefer `reinforce_felt` for Glance.
     pub fn reinforce_by(&self, fact_id: Uuid, delta: i64) -> Result<()> {
-        if delta <= 0 {
+        self.reinforce_felt(fact_id, delta, delta)
+    }
+
+    /// Split Felt Use: recall (ripen) vs utility (MemRL Q). Either delta may be 0.
+    pub fn reinforce_felt(
+        &self,
+        fact_id: Uuid,
+        recall_delta: i64,
+        utility_delta: i64,
+    ) -> Result<()> {
+        if recall_delta <= 0 && utility_delta <= 0 {
             return Ok(());
         }
         let conn = self.pool.get()?;
         let now = Utc::now().to_rfc3339();
         let id = fact_id.to_string();
-        conn.execute(
-            "UPDATE semantic_vault
-             SET confirmation_count = confirmation_count + ?1,
-                 last_accessed_at = ?2
-             WHERE id = ?3",
-            params![delta, now, id],
-        )?;
+        if recall_delta > 0 {
+            conn.execute(
+                "UPDATE semantic_vault
+                 SET confirmation_count = confirmation_count + ?1,
+                     last_accessed_at = ?2
+                 WHERE id = ?3",
+                params![recall_delta, now, id],
+            )?;
+        }
         let _ = conn.execute(
             "UPDATE honeypot
              SET recall_count = recall_count + ?1,
-                 last_recalled_at = ?2,
-                 utility_score = utility_score + CAST(?1 AS REAL)
-             WHERE id = ?3",
-            params![delta, now, id],
+                 last_recalled_at = CASE WHEN ?1 > 0 THEN ?2 ELSE last_recalled_at END,
+                 utility_score = utility_score + CAST(?3 AS REAL)
+             WHERE id = ?4",
+            params![recall_delta.max(0), now, utility_delta.max(0), id],
         );
-        info!(fact_id = %fact_id, delta, "Reinforced semantic fact (felt use + utility)");
+        info!(
+            fact_id = %fact_id,
+            recall_delta,
+            utility_delta,
+            "Reinforced semantic fact (felt use + utility)"
+        );
         Ok(())
+    }
+
+    /// Memento: persist a verify/gate failure without polluting honeypot recall.
+    pub fn record_failure_case(
+        &self,
+        kind: &str,
+        content: &str,
+        related_fact_id: Option<&str>,
+    ) -> Result<()> {
+        let conn = self.pool.get()?;
+        Self::record_failure_case_conn(&conn, kind, content, related_fact_id)
+    }
+
+    fn record_failure_case_conn(
+        conn: &Connection,
+        kind: &str,
+        content: &str,
+        related_fact_id: Option<&str>,
+    ) -> Result<()> {
+        let id = Uuid::new_v4().to_string();
+        let now = Utc::now().to_rfc3339();
+        conn.execute(
+            "INSERT INTO failure_cases (id, kind, content, related_fact_id, created_at)
+             VALUES (?1, ?2, ?3, ?4, ?5)",
+            params![id, kind, content, related_fact_id, now],
+        )?;
+        Ok(())
+    }
+
+    /// SuperLocalMemory steal: facts valid at `as_of` (RFC3339), including superseded.
+    pub fn honeypot_as_of(&self, as_of: &str, limit: usize) -> Result<Vec<(String, String, bool)>> {
+        let conn = self.pool.get()?;
+        let mut stmt = conn.prepare(
+            "SELECT id, content, is_latest FROM honeypot
+             WHERE datetime(COALESCE(valid_from, promoted_at)) <= datetime(?1)
+               AND (valid_to IS NULL OR datetime(valid_to) > datetime(?1))
+             ORDER BY COALESCE(valid_from, promoted_at) DESC
+             LIMIT ?2",
+        )?;
+        let rows = stmt.query_map(params![as_of, limit as i64], |row| {
+            Ok((
+                row.get::<_, String>(0)?,
+                row.get::<_, String>(1)?,
+                row.get::<_, i32>(2)? != 0,
+            ))
+        })?;
+        Ok(rows.filter_map(|r| r.ok()).collect())
+    }
+
+    /// MemRL outcome: bump Q on previously recalled facts whose entity the new takeaway cites.
+    pub fn reinforce_outcome_from_new_truths(
+        &self,
+        truths: &[crate::types::ExtractedTruth],
+    ) -> Result<usize> {
+        let mut n = 0usize;
+        let conn = self.pool.get()?;
+        for truth in truths {
+            let Some(entity) = extract_primary_entity(&truth.content) else {
+                continue;
+            };
+            let pattern = format!("%{}%", entity.replace('%', ""));
+            let mut stmt = conn.prepare(
+                "SELECT id FROM honeypot
+                 WHERE is_latest = 1
+                   AND last_recalled_at IS NOT NULL
+                   AND id != ?1
+                   AND content LIKE ?2
+                 LIMIT 8",
+            )?;
+            let ids: Vec<String> = stmt
+                .query_map(params![truth.id.to_string(), pattern], |row| row.get(0))?
+                .filter_map(|r| r.ok())
+                .collect();
+            drop(stmt);
+            for id_str in ids {
+                let Ok(uuid) = Uuid::parse_str(&id_str) else {
+                    continue;
+                };
+                felt_use::touch(self, uuid, FeltUseKind::Outcome)?;
+                n += 1;
+            }
+        }
+        Ok(n)
+    }
+
+    /// Auto-Dreamer: compact replacement supersedes other latest rows for the same entity.
+    fn region_rewrite_entity(conn: &Connection, entity: &str, keep_id: &str) -> Result<usize> {
+        let now = Utc::now().to_rfc3339();
+        let pattern = format!("%{}%", entity.replace('%', ""));
+        let n = conn.execute(
+            "UPDATE honeypot
+             SET is_latest = 0,
+                 valid_to = COALESCE(valid_to, ?1),
+                 gate_event = 'region_rewrite'
+             WHERE is_latest = 1
+               AND id != ?2
+               AND content LIKE ?3",
+            params![now, keep_id, pattern],
+        )?;
+        Ok(n)
     }
 
     /// Census for M5 export gates (`gzmo ripen status` / overnight honesty).
@@ -1576,6 +1726,7 @@ impl SqliteVault {
                                 truth,
                                 evidence_embedding,
                             )?;
+                            Self::maybe_region_rewrite(conn, origin, truth);
                         }
                         info!(
                             id = %truth.id,
@@ -1622,6 +1773,7 @@ impl SqliteVault {
                                 truth,
                                 evidence_embedding,
                             )?;
+                            Self::maybe_region_rewrite(conn, origin, truth);
                         }
                         info!(id = %truth.id, extends = %old_hp_id, "Promoted extending truth");
                         return Ok(());
@@ -1664,8 +1816,21 @@ impl SqliteVault {
                 None,
             )?;
             Self::maybe_upsert_evidence(conn, &truth.id.to_string(), truth, evidence_embedding)?;
+            Self::maybe_region_rewrite(conn, origin, truth);
         }
         Ok(())
+    }
+
+    fn maybe_region_rewrite(conn: &Connection, origin: &str, truth: &ExtractedTruth) {
+        if origin != "verified_dream" {
+            return;
+        }
+        let Some(entity) = extract_primary_entity(&truth.content) else {
+            return;
+        };
+        if let Err(e) = Self::region_rewrite_entity(conn, &entity, &truth.id.to_string()) {
+            tracing::debug!(error = %e, "region rewrite skipped");
+        }
     }
 
     /// Chain of facts for one honeypot id (latest first, includes superseded).
@@ -1750,63 +1915,96 @@ impl SqliteVault {
 
         let result = (|| -> Result<()> {
             for (i, truth) in truths.iter().enumerate() {
-                let content_norm = normalize_truth_content(&truth.content);
-                let confidence = truth.confidence as f64;
+                conn.execute_batch("SAVEPOINT promote_one")?;
+                let one = (|| -> Result<()> {
+                    let content_norm = normalize_truth_content(&truth.content);
+                    let confidence = truth.confidence as f64;
 
-                if confidence < 0.85 {
-                    let now = Utc::now();
-                    conn.execute(
-                        "INSERT OR REPLACE INTO quarantine_vault
+                    if confidence < 0.85 {
+                        let now = Utc::now();
+                        conn.execute(
+                            "INSERT OR REPLACE INTO quarantine_vault
                             (id, content, embedding, half_life_days, confidence, created_at)
                         VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
-                        params![
-                            truth.id.to_string(),
-                            truth.content,
-                            embedding_blobs[i].clone(),
-                            truth.decay_class.half_life_days(),
+                            params![
+                                truth.id.to_string(),
+                                truth.content,
+                                embedding_blobs[i].clone(),
+                                truth.decay_class.half_life_days(),
+                                confidence,
+                                now.to_rfc3339(),
+                            ],
+                        )?;
+                        Self::record_failure_case_conn(
+                            &conn,
+                            "verify_fail",
+                            &truth.content,
+                            Some(&truth.id.to_string()),
+                        )?;
+                        tracing::warn!(
+                            id = %truth.id,
                             confidence,
-                            now.to_rfc3339(),
-                        ],
-                    )?;
-                    tracing::warn!(
-                        id = %truth.id,
-                        confidence,
-                        "Ingest truth quarantined due to low confidence"
-                    );
-                    continue;
-                }
+                            "Ingest truth quarantined due to low confidence"
+                        );
+                        return Ok(());
+                    }
 
-                let existing: Option<String> = conn
-                    .query_row(
-                        "SELECT id FROM semantic_vault
+                    if is_unverified_derived(truth, origin) && qualifies_for_honeypot(truth) {
+                        Self::record_failure_case_conn(
+                            &conn,
+                            "gate_refuse",
+                            &truth.content,
+                            Some(&truth.id.to_string()),
+                        )?;
+                    }
+
+                    let existing: Option<String> = conn
+                        .query_row(
+                            "SELECT id FROM semantic_vault
                          WHERE content_norm = ?1
                             OR (content_norm IS NULL AND content = ?2)",
-                        params![content_norm, truth.content],
-                        |row| row.get(0),
-                    )
-                    .ok();
+                            params![content_norm, truth.content],
+                            |row| row.get(0),
+                        )
+                        .ok();
 
-                if let Some(existing_id) = existing {
-                    self.promote_corroborate_vault(
-                        &conn,
-                        &existing_id,
-                        truth,
-                        &embedding_blobs[i],
-                        &content_norm,
-                        confidence,
-                        origin,
-                        &evidence_embedding_blobs[i],
-                    )?;
-                } else {
-                    self.promote_new_vault_truth(
-                        &conn,
-                        truth,
-                        &embedding_blobs[i],
-                        &content_norm,
-                        confidence,
-                        origin,
-                        &evidence_embedding_blobs[i],
-                    )?;
+                    if let Some(existing_id) = existing {
+                        self.promote_corroborate_vault(
+                            &conn,
+                            &existing_id,
+                            truth,
+                            &embedding_blobs[i],
+                            &content_norm,
+                            confidence,
+                            origin,
+                            &evidence_embedding_blobs[i],
+                        )?;
+                    } else {
+                        self.promote_new_vault_truth(
+                            &conn,
+                            truth,
+                            &embedding_blobs[i],
+                            &content_norm,
+                            confidence,
+                            origin,
+                            &evidence_embedding_blobs[i],
+                        )?;
+                    }
+                    Ok(())
+                })();
+                match one {
+                    Ok(()) => conn.execute_batch("RELEASE promote_one")?,
+                    Err(e) => {
+                        let _ = conn.execute_batch("ROLLBACK TO promote_one");
+                        let _ = conn.execute_batch("RELEASE promote_one");
+                        Self::record_failure_case_conn(
+                            &conn,
+                            "promote_rollback",
+                            &format!("{e}; {}", truth.content),
+                            Some(&truth.id.to_string()),
+                        )?;
+                        tracing::warn!(id = %truth.id, error = %e, "Promote rolled back (savepoint)");
+                    }
                 }
             }
             Ok(())
@@ -1820,6 +2018,11 @@ impl SqliteVault {
                     origin, "Batch promoted truths to vault"
                 );
                 self.seed_core_pin_bonded(truths, origin);
+                if origin == "session_distill" {
+                    if let Err(e) = self.reinforce_outcome_from_new_truths(truths) {
+                        tracing::debug!(error = %e, "outcome-link skipped");
+                    }
+                }
                 self.maybe_incremental_qdrant_sync(truths, origin, promote_started)
                     .await;
                 Ok(())
@@ -2931,6 +3134,166 @@ mod utility_recall_tests {
         let _ = std::fs::remove_file(&path);
         assert_eq!(recall, 5);
         assert!((utility - 6.0).abs() < 1e-9, "utility was {utility}");
+    }
+
+    fn read_ru(vault: &SqliteVault, id: Uuid) -> (i64, f64) {
+        let conn = vault.db_conn().expect("conn");
+        conn.query_row(
+            "SELECT recall_count, utility_score FROM honeypot WHERE id = ?1",
+            params![id.to_string()],
+            |row| Ok((row.get(0)?, row.get(1)?)),
+        )
+        .expect("read")
+    }
+
+    #[test]
+    fn glance_bumps_recall_not_utility() {
+        let path = tempfile_db();
+        let vault = SqliteVault::open(&path).expect("open");
+        let id = insert_fact(&vault, "[AGENT:Foo] sits in the drawer", "g.md", 4.0);
+        felt_use::touch(&vault, id, FeltUseKind::Glance).expect("glance");
+        let (recall, utility) = read_ru(&vault, id);
+        let _ = std::fs::remove_file(&path);
+        assert_eq!(recall, 1);
+        assert!(
+            (utility - 4.0).abs() < 1e-9,
+            "glance must not mint Q, got {utility}"
+        );
+    }
+
+    #[test]
+    fn outcome_bumps_q_on_previously_recalled_entity() {
+        let path = tempfile_db();
+        let vault = SqliteVault::open(&path).expect("open");
+        let recalled = insert_fact(&vault, "[AGENT:Foo] was recalled in session", "r.md", 1.0);
+        felt_use::touch(&vault, recalled, FeltUseKind::Glance).expect("recall");
+        let takeaway = ExtractedTruth {
+            id: Uuid::new_v4(),
+            content: "[AGENT:Foo] later takeaway cites the scar".into(),
+            confidence: 0.95,
+            mmr_score: 0.0,
+            source_date: Utc::now().date_naive(),
+            decay_class: DecayClass::SessionDistill,
+            source_file: Some("session.md".into()),
+            evidence: None,
+        };
+        let n = vault
+            .reinforce_outcome_from_new_truths(&[takeaway])
+            .expect("outcome");
+        let (_, utility) = read_ru(&vault, recalled);
+        let _ = std::fs::remove_file(&path);
+        assert_eq!(n, 1);
+        assert!(
+            (utility - 9.0).abs() < 1e-9,
+            "outcome +8 on base 1, got {utility}"
+        );
+    }
+
+    #[test]
+    fn failure_case_is_stored_not_recalled() {
+        let path = tempfile_db();
+        let vault = SqliteVault::open(&path).expect("open");
+        vault
+            .record_failure_case("verify_fail", "bad quote", None)
+            .expect("fail");
+        let conn = vault.db_conn().expect("conn");
+        let n: i64 = conn
+            .query_row("SELECT COUNT(*) FROM failure_cases", [], |r| r.get(0))
+            .expect("count");
+        let _ = std::fs::remove_file(&path);
+        assert_eq!(n, 1);
+    }
+
+    #[test]
+    fn as_of_includes_superseded_before_valid_to() {
+        let path = tempfile_db();
+        let vault = SqliteVault::open(&path).expect("open");
+        let old = insert_fact(&vault, "[AGENT:Bar] old value", "old.md", 1.0);
+        let conn = vault.db_conn().expect("conn");
+        conn.execute(
+            "UPDATE honeypot SET valid_from = '2020-01-01T00:00:00+00:00' WHERE id = ?1",
+            params![old.to_string()],
+        )
+        .expect("valid_from");
+        crate::memory::lifecycle::supersede_honeypot(&conn, &old.to_string()).expect("supersede");
+        drop(conn);
+        let historic = vault
+            .honeypot_as_of("2021-06-01T00:00:00+00:00", 10)
+            .expect("as_of historic");
+        let future = vault
+            .honeypot_as_of("2099-01-01T00:00:00+00:00", 10)
+            .expect("as_of future");
+        let _ = std::fs::remove_file(&path);
+        assert!(
+            historic.iter().any(|(id, _, _)| id == &old.to_string()),
+            "as_of 2021 must still see the 2020–now fact"
+        );
+        assert!(
+            future.iter().all(|(id, _, _)| id != &old.to_string()),
+            "as_of after valid_to must not see the superseded fact"
+        );
+    }
+
+    #[test]
+    fn region_rewrite_supersedes_other_latest_for_entity() {
+        let path = tempfile_db();
+        let vault = SqliteVault::open(&path).expect("open");
+        let a = insert_fact(&vault, "[AGENT:Baz] first working set", "a.md", 1.0);
+        let b = insert_fact(&vault, "[AGENT:Baz] compact replacement", "b.md", 1.0);
+        let conn = vault.db_conn().expect("conn");
+        let n = SqliteVault::region_rewrite_entity(&conn, "Baz", &b.to_string()).expect("rewrite");
+        let a_latest: i32 = conn
+            .query_row(
+                "SELECT is_latest FROM honeypot WHERE id = ?1",
+                params![a.to_string()],
+                |r| r.get(0),
+            )
+            .expect("a");
+        let event: String = conn
+            .query_row(
+                "SELECT gate_event FROM honeypot WHERE id = ?1",
+                params![a.to_string()],
+                |r| r.get(0),
+            )
+            .expect("event");
+        let _ = std::fs::remove_file(&path);
+        assert!(n >= 1);
+        assert_eq!(a_latest, 0);
+        assert_eq!(event, "region_rewrite");
+    }
+
+    #[tokio::test]
+    async fn low_confidence_promote_records_failure_and_quarantine() {
+        let path = tempfile_db();
+        let vault = SqliteVault::open(&path).expect("open");
+        let truth = ExtractedTruth {
+            id: Uuid::new_v4(),
+            content: "[AGENT:Q] weak unverified guess".into(),
+            confidence: 0.4,
+            mmr_score: 0.0,
+            source_date: Utc::now().date_naive(),
+            decay_class: DecayClass::CuratedVault,
+            source_file: Some("weak.md".into()),
+            evidence: None,
+        };
+        vault
+            .promote_truths_with_origin(&[truth], "ingest")
+            .await
+            .expect("promote");
+        let conn = vault.db_conn().expect("conn");
+        let fails: i64 = conn
+            .query_row(
+                "SELECT COUNT(*) FROM failure_cases WHERE kind = 'verify_fail'",
+                [],
+                |r| r.get(0),
+            )
+            .expect("fails");
+        let q: i64 = conn
+            .query_row("SELECT COUNT(*) FROM quarantine_vault", [], |r| r.get(0))
+            .expect("q");
+        let _ = std::fs::remove_file(&path);
+        assert_eq!(fails, 1);
+        assert_eq!(q, 1);
     }
 }
 

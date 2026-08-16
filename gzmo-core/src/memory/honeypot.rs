@@ -83,6 +83,10 @@ pub fn insert_honeypot_lifecycle(
         ],
     )?;
     sync_honeypot_fts_row(conn, vault_id, &truth.content, content_norm)?;
+    let _ = conn.execute(
+        "UPDATE honeypot SET valid_from = COALESCE(valid_from, promoted_at) WHERE id = ?1",
+        params![vault_id],
+    );
     crate::memory::profile::invalidate_profile_cache(Some("obolus"));
     Ok(())
 }
@@ -130,6 +134,10 @@ pub fn upsert_honeypot_row(
         ],
     )?;
     sync_honeypot_fts_row(conn, vault_id, &truth.content, content_norm)?;
+    let _ = conn.execute(
+        "UPDATE honeypot SET valid_from = COALESCE(valid_from, promoted_at) WHERE id = ?1",
+        params![vault_id],
+    );
     crate::memory::profile::invalidate_profile_cache(Some("obolus"));
     Ok(())
 }

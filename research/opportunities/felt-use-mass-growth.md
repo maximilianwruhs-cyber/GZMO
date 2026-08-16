@@ -58,4 +58,4 @@ Locked via `opportunity-bet.sh --from felt-use-mass-growth` after [`promote-loop
 
 ## Telescope 2026-08-16
 
-Honeypot recall now Q-selects inside the relevance pool (`apply_utility_boost` after RRF/rerank). `felt-use-depth.sh` reports `utility_positive` / avg / max. Living mass (done-when 2–3) remains CT101-only.
+Honeypot recall now Q-selects inside the relevance pool (`apply_utility_boost` after RRF/rerank). Glance no longer mints `utility_score`; later distill takeaways that cite a recalled entity bump Outcome Q. `felt-use-depth.sh` reports `utility_positive` / avg / max. Living mass (done-when 2–3) remains CT101-only until `#166`/`harvest-organs` binaries are on `/opt/gzmo/current`.
