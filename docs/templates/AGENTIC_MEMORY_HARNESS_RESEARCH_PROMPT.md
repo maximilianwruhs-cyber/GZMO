@@ -11,14 +11,14 @@ The atlas already exists. This sitting **grafts one loop** or writes one candida
 
 **Read first (do not rewrite):** [`research/agentic-memory-harness-local-llm-2026-08-16.md`](../../research/agentic-memory-harness-local-llm-2026-08-16.md)
 
-**Active ship (exactly one):** [`felt-use-mass-growth`](../../research/opportunities/felt-use-mass-growth.md). Rank 0 in the atlas is living mass + soak nights. Ranks 1–4 (failure-case retrieve, pin workflow skills, night labels, ACE deltas) are **candidates** until that bet soaks or is blocked `INCONCLUSIVE`.
+**Active ship (exactly one):** [`felt-use-mass-growth`](../../research/opportunities/felt-use-mass-growth.md). Rank 0 in the atlas is living mass + soak nights. Open loops after M3 retrieve: H1 skill-pin, M7 night labels, L1 ACE pin.
 
 **Not the product:** Observatory, OKForge, HSP, pantheon, AOS CE, `eml-core`, Mem0/Letta SKU, public MCP HTTP.
 
 **Done when (falsifiable):**
 
 1. CT101 census attempted: `bash scripts/felt-use-depth.sh` (SSH fail → `INCONCLUSIVE`/`RED`, never synthetic 0=GREEN).
-2. Either (a) one PR that moves felt-use/utility **or** lands exactly one atlas loop (M3 retrieve / H1 skill-pin / M7 labels / L1 ACE pin) on an existing organ, or (b) a candidate bet file with score ≥18, `brain_profit≥3`, `usp_fit≥4`, status `candidate`.
+2. Either (a) one PR that moves felt-use/utility **or** lands exactly one atlas loop (H1 skill-pin / M7 labels / L1 ACE pin) on an existing organ, or (b) a candidate bet file with score ≥18, `brain_profit≥3`, `usp_fit≥4`, status `candidate`.
 3. Explicit park list in the closer (glass, SKU, LoRA, second writer).
 
 ---
@@ -29,7 +29,7 @@ The atlas already exists. This sitting **grafts one loop** or writes one candida
 |----------|---------|
 | Three planes, one animal | Memory / harness / frozen-model lift. All grafts land on organs in `gzmo-core`. |
 | One writer | ADR-0003 / mutex. Telescope never overnight. |
-| #166/#167 shipped | Q-select, Outcome Q, region rewrite, `gate_event`, `failure_cases` **write**, bi-temporal. Do not re-ship. |
+| #166/#167 shipped | Q-select, Outcome Q, region rewrite, `gate_event`, `failure_cases` write+bounded retrieve. Do not re-ship. |
 | ACE is curator deltas | Incremental ADD/UPDATE/REMOVE under the gate or a **human pin**. No unsupervised SOUL rewrite. |
 | Skills ≠ vault | Cursor grill/tdd/handoff help the operator. Vault mass requires takeaway / MCP felt-use. |
 | Harvest ≠ SKU | Steal retrieve/forget/supersede/consolidate/verify/time/prune/pin. Reject SaaS, multi-tenant HTTP, overnight LoRA. |
@@ -40,7 +40,7 @@ The atlas already exists. This sitting **grafts one loop** or writes one candida
 
 | Organ | Plane | Honest evolve-toward |
 |-------|-------|----------------------|
-| Distill / gate / honeypot | 1 | Failure-case **retrieve**; typed refuse already written |
+| Distill / gate / honeypot | 1 | Failure-case retrieve in-tree; typed refuse already written |
 | Recall / felt-use | 1 | Living Q mass from real sessions |
 | Dream / immune / spark | 1 | Region rewrite in-tree; forget apply still lab; spark stays verify-then-promote |
 | `agent_loop` / `context.rs` | 2 | Pin workflow skill bodies against prune |

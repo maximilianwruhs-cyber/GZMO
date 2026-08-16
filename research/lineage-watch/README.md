@@ -17,7 +17,7 @@ July 22 already named most of these. Keep taking them. Attribution in the July n
 |------|------|----------|--------|
 | Two-phase retrieve (semantic → utility) | MemRL | `rrf-recall` / vault `ORDER BY utility_score` | In-tree (#166) |
 | Intent–Experience–Utility triplet | MemRL | `felt-use` | Partial — Glance Q=0; Outcome from later cite in-tree |
-| Store failures as cases | Memento | `failure_cases` | Write in-tree; retrieve still open |
+| Store failures as cases | Memento | `failure_cases` | In-tree write + bounded retrieve |
 | Extract → consolidate → retrieve | Mem0 (pattern) | distill → gate → vault | In-tree wiring |
 | STM → heat → long promote | MemoryOS | honeypot lifecycle | In-tree cousin |
 | Tier paging / eviction | MemGPT / Letta | immune / vault tiers | Partial |
@@ -46,7 +46,7 @@ None of these become an active bet until CT101 living census shows felt-use mass
 | 1 | **Outcome-linked utility** — bump Q only when a later takeaway cites or bonds the recalled fact | MemRL → `felt-use` / `rrf-recall` | **In-tree** (#167). Living mass still the bet. |
 | 2 | **Dream as region rewrite** — offline compaction emits a replacement set that *supersedes* the working region, provenance kept | Auto-Dreamer → `session-distill` / dream | **In-tree** (`maybe_region_rewrite`). |
 | 3 | **Named night procedure** — `TRIAGE → CONSOLIDATE → AUDIT` as labels on distill / gate / soak | Memory as Metabolism → night runbook | Docs and scheduler names only. No crate. No Observatory glass. |
-| 4 | **Verify rollback + typed supersession** — quarantine, rollback on failed promote, typed supersede/refuse | SuperLocalMemory + SleepGate → `honeypot-gate` | **In-tree write** (`gate_event`, `failure_cases`). Retrieve failures still open. |
+| 4 | **Verify rollback + typed supersession** — quarantine, rollback on failed promote, typed supersede/refuse | SuperLocalMemory + SleepGate → `honeypot-gate` | **In-tree write** (`gate_event`, `failure_cases`). Bounded retrieve on token/related-id. |
 | 5 | **Pin workflow skill bodies** against context prune | HumanLayer → `context.rs` | Do not pin pantheon theater skills. |
 | 6 | **ACE curator deltas** on one `SKILL.md`, human-pinned | ACE 2510.04618 → `workflow_skills` | No unsupervised SOUL rewrite. |
 

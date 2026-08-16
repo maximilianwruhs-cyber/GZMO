@@ -160,25 +160,14 @@ impl ToolHandler for MemorySearchTool {
             .await;
         }
 
-        let results = self.vault.search_recall(query, limit).await?;
-        if results.is_empty() {
-            return Ok(format!("No relevant memories found for query: '{}'", query));
-        }
+        let (text, results) =
+            crate::platform_memory::memory_search_core(&self.vault, query, limit).await?;
         crate::memory::felt_use::touch_hits(
             &self.vault,
             results.iter().map(|(f, _)| Some(&f.id)),
             crate::memory::felt_use::FeltUseKind::Glance,
         );
-        let mut out = String::new();
-        out.push_str(&format!("Honeypot recall for '{}':\n\n", query));
-        for (fact, score) in results {
-            let dt = fact.created_at.format("%Y-%m-%d").to_string();
-            out.push_str(&format!(
-                "- [{}] (Score: {:.2}) {}\n",
-                dt, score, fact.content
-            ));
-        }
-        Ok(out)
+        Ok(text)
     }
 }
 

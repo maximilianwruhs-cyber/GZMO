@@ -34,9 +34,9 @@ Verified 2026-08-16 against Proxmox + `gzmo-core` (not a brochure):
 | **VM200** `ollama-gpu` | Retrieval GPU (embed / rerank). Satellite, not a second brain. |
 | **CT100** | Samba only. Not on the hot path. |
 | **Telescope** | Prime LLM `:8000` (extract / verify / dream think) + Cursor. Must not `gzmo serve` while CT101 holds the mutex. |
-| **Binary organs** | Session distill, honeypot gate, RRF + `utility_score` Q-select, felt-use (Glance Q=0; Outcome=8), region rewrite, `gate_event`, `failure_cases` **write**, bi-temporal `as_of`, immune plan, spark verify, workflow skills, MCP stdio, subagent isolation, context prune→archive→distill. |
+| **Binary organs** | Session distill, honeypot gate, RRF + `utility_score` Q-select, felt-use (Glance Q=0; Outcome=8), region rewrite, `gate_event`, `failure_cases` write+bounded retrieve, bi-temporal `as_of`, immune plan, spark verify, workflow skills, MCP stdio, subagent isolation, context prune→archive→distill. |
 
-Schema on living path: `PRAGMA user_version=10` (utility, `gate_event`, `failure_cases`, valid_from/to) — in-tree as of harvest PRs **#166 / #167**. Lineage-watch “queued grafts 1, 2, 4” are **code-complete**; remaining is living mass + retrieve-side use of failures + named night labels.
+Schema on living path: `PRAGMA user_version=10` (utility, `gate_event`, `failure_cases`, valid_from/to) — in-tree as of harvest PRs **#166 / #167**. Lineage-watch “queued grafts 1, 2, 4” are **code-complete**; remaining is living mass + named night labels + pin workflow skills.
 
 ---
 
@@ -65,12 +65,12 @@ Schema on living path: `PRAGMA user_version=10` (utility, `gate_event`, `failure
 
 | Already in-tree | Still open (not a new crate) |
 |-----------------|------------------------------|
-| Distill → verify → promote → honeypot | **Retrieve** `failure_cases` into recall (table is write-only except tests) |
-| `utility_score` + Q-select after RRF ([#166](https://github.com/maximilianwruhs-cyber/GZMO/pull/166)) | Living census: rising `utility_positive` / `recall≥3` from **real** sessions |
+| Distill → verify → promote → honeypot | Named night labels on scheduler (docs only) |
+| `utility_score` + Q-select after RRF ([#166](https://github.com/maximilianwruhs-cyber/GZMO/pull/166)) | Living census: **rising** dual-gate / utility mass (soak nights 2–3) |
 | Outcome Q when a later takeaway cites a recalled entity (`reinforce_outcome_from_new_truths`) | Do not mint Q from glance/search |
-| `maybe_region_rewrite` + `gate_event` (`promote` / `supersede` / `region_rewrite`) | Named night labels on scheduler (docs only) |
-| `failure_cases` on `verify_fail` / `gate_refuse` | Immune **apply** on living still lab |
-| `honeypot_as_of` bi-temporal | MCP attach HOLD (`gzmo-living` on the box) |
+| `maybe_region_rewrite` + `gate_event` (`promote` / `supersede` / `region_rewrite`) | Immune **apply** on living still lab |
+| `failure_cases` on `verify_fail` / `gate_refuse` / `promote_rollback`; bounded retrieve on token/related-id | MCP attach HOLD (`gzmo-living` on the box) |
+| `honeypot_as_of` bi-temporal | Pin workflow skill bodies against prune |
 | Spark: stale × importance × cosine, then verify | — |
 
 **A-Mem vs Spark:** they evolve *links on write*. We verify *links before promote*. Keep Pasteur. Do not let an LLM rewrite neighbor attributes without the gate.
@@ -179,7 +179,7 @@ Status: **steal** = take the rule onto an existing organ. **in-tree** = do not r
 |----|-------|--------|-------|--------|
 | M1 | Two-phase retrieve + Q | MemRL | `rrf-recall` / `utility_score` | **in-tree** (#166) |
 | M2 | Outcome Q from later cite | MemRL | `felt_use::Outcome` | **in-tree** (#167) |
-| M3 | Store failures | Memento | `failure_cases` insert | **in-tree write**; **open retrieve** |
+| M3 | Store / retrieve failures | Memento | `failure_cases` | **in-tree** (write + bounded retrieve) |
 | M4 | Region rewrite supersession | Auto-Dreamer | `maybe_region_rewrite` | **in-tree** |
 | M5 | Typed gate event | SleepGate / SLM | `gate_event` | **in-tree** |
 | M6 | Bi-temporal as-of | SuperLocalMemory | `honeypot_as_of` | **in-tree** |
@@ -207,13 +207,12 @@ Status: **steal** = take the rule onto an existing organ. **in-tree** = do not r
 | Rank | Loop | Why | Filter |
 |------|------|-----|--------|
 | 0 | **Soak nights 2–3** + felt-use mass on CT101 | Done-when of the active bet | No memory gym |
-| 1 | **Retrieve `failure_cases`** in recall (bounded, Q-gated) | M3 is write-only; Memento’s actual steal | No dump into every prompt |
-| 2 | **Pin workflow skill bodies** in `context.rs` | Local models forget the harness first | Do not pin pantheon theater skills |
-| 3 | **Named night labels** | Cheap vocabulary; zero new crates | Docs/scheduler only |
-| 4 | **ACE curator deltas** on one workflow skill, human-pinned | Frozen-model lift without LoRA | Reflector may use Prime; Curator merge is deterministic; living SOUL still gated |
-| 5 | Immune apply on living | Forget as signal | Still lab until soak |
+| 1 | **Pin workflow skill bodies** in `context.rs` | Local models forget the harness first | Do not pin pantheon theater skills |
+| 2 | **Named night labels** | Cheap vocabulary; zero new crates | Docs/scheduler only |
+| 3 | **ACE curator deltas** on one workflow skill, human-pinned | Frozen-model lift without LoRA | Reflector may use Prime; Curator merge is deterministic; living SOUL still gated |
+| 4 | Immune apply on living | Forget as signal | Still lab until soak |
 
-Do not start 1–5 until rank 0 is moving or blocked with `INCONCLUSIVE` (SSH), never a synthetic GREEN.
+`failure_cases` retrieve (former rank 1) is in-tree: token overlap or related honeypot id, cap 3, no dump on stopword queries.
 
 ---
 

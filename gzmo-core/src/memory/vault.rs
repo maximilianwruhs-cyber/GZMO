@@ -8,7 +8,7 @@ use chrono::Utc;
 use r2d2::Pool;
 use r2d2_sqlite::SqliteConnectionManager;
 use rusqlite::{params, Connection};
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::path::Path;
 use tracing::info;
 use uuid::Uuid;
@@ -32,6 +32,17 @@ use crate::memory::recall_rrf::{
 use crate::memory::rerank::Reranker;
 use crate::types::{DecayClass, ExtractedTruth, SemanticFact};
 use std::process::Command as StdCommand;
+
+/// Cap on Memento failure-case retrieve (never dump the table into a prompt).
+pub const FAILURE_CASE_RECALL_LIMIT: usize = 3;
+
+/// A verify/gate refusal recalled beside honeypot hits — not a promoted fact.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FailureCaseHit {
+    pub kind: String,
+    pub content: String,
+    pub related_fact_id: Option<String>,
+}
 
 /// Result of `SqliteVault::backfill_missing_embeddings`.
 #[derive(Debug, Clone, Copy)]
@@ -521,6 +532,71 @@ impl SqliteVault {
             params![id, kind, content, related_fact_id, now],
         )?;
         Ok(())
+    }
+
+    /// Memento retrieve: bounded `failure_cases` matching query tokens and/or
+    /// related honeypot ids. Empty/short queries return nothing.
+    pub fn search_failure_cases(
+        &self,
+        query: &str,
+        related_fact_ids: &[Uuid],
+        limit: usize,
+    ) -> Result<Vec<FailureCaseHit>> {
+        let cap = limit.min(FAILURE_CASE_RECALL_LIMIT);
+        if cap == 0 {
+            return Ok(Vec::new());
+        }
+        let tokens: Vec<String> = extract_entity_tokens(query)
+            .into_iter()
+            .map(|t| t.to_lowercase())
+            .collect();
+        let related: HashSet<String> = related_fact_ids.iter().map(|id| id.to_string()).collect();
+        if tokens.is_empty() && related.is_empty() {
+            return Ok(Vec::new());
+        }
+        let conn = self.pool.get()?;
+        let mut stmt = conn.prepare(
+            "SELECT kind, content, related_fact_id FROM failure_cases
+             ORDER BY created_at DESC LIMIT 64",
+        )?;
+        let rows = stmt.query_map([], |row| {
+            Ok((
+                row.get::<_, String>(0)?,
+                row.get::<_, String>(1)?,
+                row.get::<_, Option<String>>(2)?,
+            ))
+        })?;
+        let mut out = Vec::new();
+        for row in rows.filter_map(|r| r.ok()) {
+            let (kind, content, related_id) = row;
+            let content_l = content.to_lowercase();
+            let token_hit = tokens.iter().any(|t| content_l.contains(t.as_str()));
+            let related_hit = related_id.as_ref().is_some_and(|id| related.contains(id));
+            if token_hit || related_hit {
+                out.push(FailureCaseHit {
+                    kind,
+                    content,
+                    related_fact_id: related_id,
+                });
+                if out.len() >= cap {
+                    break;
+                }
+            }
+        }
+        Ok(out)
+    }
+
+    /// Format a recall appendix (empty string when nothing matches).
+    pub fn format_failure_recall(&self, query: &str, related_fact_ids: &[Uuid]) -> Result<String> {
+        let hits = self.search_failure_cases(query, related_fact_ids, FAILURE_CASE_RECALL_LIMIT)?;
+        if hits.is_empty() {
+            return Ok(String::new());
+        }
+        let mut out = String::from("\nPrior refusals (not promoted):\n");
+        for h in &hits {
+            out.push_str(&format!("- [{}] {}\n", h.kind, h.content));
+        }
+        Ok(out)
     }
 
     /// SuperLocalMemory steal: facts valid at `as_of` (RFC3339), including superseded.
@@ -2130,30 +2206,13 @@ impl SqliteVault {
         }
     }
 
-    /// Metacognitive guard: recall past failures for a given command/context.
+    /// Metacognitive guard: recall past `failure_cases` for a command/context.
     pub fn recall_failures(&self, description: &str) -> Result<Vec<String>> {
-        let conn = self.pool.get()?;
-        let search_pattern = format!("%{}%", description.to_lowercase().replace(' ', "%"));
-        let mut stmt = conn.prepare(
-            "SELECT content FROM semantic_vault
-             WHERE (content LIKE '%error%' OR content LIKE '%failed%' OR content LIKE '%warning%')
-               AND lower(content) LIKE ?1
-             ORDER BY last_accessed_at DESC LIMIT 5",
-        )?;
-
-        let results: Vec<String> = stmt
-            .query_map([search_pattern], |row| row.get(0))?
-            .filter_map(|r| r.ok())
-            .filter(|content: &String| {
-                let desc_lower = description.to_lowercase();
-                let content_lower = content.to_lowercase();
-                desc_lower
-                    .split_whitespace()
-                    .any(|w| content_lower.contains(w))
-            })
-            .collect();
-
-        Ok(results)
+        Ok(self
+            .search_failure_cases(description, &[], FAILURE_CASE_RECALL_LIMIT)?
+            .into_iter()
+            .map(|h| format!("[{}] {}", h.kind, h.content))
+            .collect())
     }
 
     /// Keyword-only search (no embeddings required). Uses honeypot when populated (M3).
@@ -3190,18 +3249,54 @@ mod utility_recall_tests {
     }
 
     #[test]
-    fn failure_case_is_stored_not_recalled() {
+    fn failure_case_is_stored_and_recalled_when_query_matches() {
         let path = tempfile_db();
         let vault = SqliteVault::open(&path).expect("open");
         vault
-            .record_failure_case("verify_fail", "bad quote", None)
+            .record_failure_case("verify_fail", "bad quote about CT101 vault lock", None)
             .expect("fail");
-        let conn = vault.db_conn().expect("conn");
-        let n: i64 = conn
-            .query_row("SELECT COUNT(*) FROM failure_cases", [], |r| r.get(0))
-            .expect("count");
+        let hit = vault
+            .search_failure_cases("CT101 vault lock", &[], 3)
+            .expect("search");
+        let miss = vault.search_failure_cases("the", &[], 3).expect("short");
+        let unrelated = vault
+            .search_failure_cases("alpha beta gamma delta", &[], 3)
+            .expect("unrelated");
+        let via_guard = vault.recall_failures("CT101 vault lock").expect("guard");
         let _ = std::fs::remove_file(&path);
-        assert_eq!(n, 1);
+        assert_eq!(hit.len(), 1);
+        assert_eq!(hit[0].kind, "verify_fail");
+        assert!(miss.is_empty(), "stopword query must not dump failures");
+        assert!(
+            unrelated.is_empty(),
+            "unrelated tokens must not dump failures"
+        );
+        assert_eq!(via_guard.len(), 1);
+        assert!(via_guard[0].contains("verify_fail"));
+    }
+
+    #[test]
+    fn failure_case_recalls_when_related_fact_in_pool() {
+        let path = tempfile_db();
+        let vault = SqliteVault::open(&path).expect("open");
+        let fact = insert_fact(&vault, "[AGENT:Qux] living mutex is ct101", "q.md", 1.0);
+        vault
+            .record_failure_case(
+                "gate_refuse",
+                "unverified derived Qux note",
+                Some(&fact.to_string()),
+            )
+            .expect("fail");
+        let hit = vault
+            .search_failure_cases("zzzz", &[fact], 3)
+            .expect("related");
+        let miss = vault
+            .search_failure_cases("zzzz", &[], 3)
+            .expect("no related");
+        let _ = std::fs::remove_file(&path);
+        assert_eq!(hit.len(), 1);
+        assert_eq!(hit[0].kind, "gate_refuse");
+        assert!(miss.is_empty());
     }
 
     #[test]
