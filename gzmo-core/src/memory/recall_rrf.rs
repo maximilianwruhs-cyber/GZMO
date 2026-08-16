@@ -8,6 +8,9 @@ use crate::types::SemanticFact;
 
 const RRF_K: f64 = 60.0;
 pub const PREFETCH_K: usize = 50;
+/// Overfetch Qdrant so `filter_assertable_honeypot_ids` can still fill `PREFETCH_K`
+/// after dropping superseded points (GPM / Temporal Validity).
+pub const QDRANT_PREFETCH_K: usize = PREFETCH_K * 2;
 pub const MAX_PER_SOURCE_FILE: usize = 5;
 pub const RERANK_PREFETCH: usize = 40;
 
@@ -220,6 +223,12 @@ mod tests {
             },
             source_file: Some("wave_01_same.md".to_string()),
         }
+    }
+
+    #[test]
+    fn qdrant_prefetch_overfetches_assertable_filter() {
+        assert_eq!(QDRANT_PREFETCH_K, PREFETCH_K * 2);
+        assert!(QDRANT_PREFETCH_K > PREFETCH_K);
     }
 
     #[test]

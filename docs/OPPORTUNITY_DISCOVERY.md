@@ -67,7 +67,9 @@ If Sense says `bet_log_starved` or lists depth scars, **write new candidate bets
 |------|------|
 | [`research/opportunities/`](../research/opportunities/) | Bet log (git-tracked) |
 | [`research/lineage-watch/`](../research/lineage-watch/README.md) | Field SOTA — informs candidates; does **not** flip the active bet |
+| [`research/agentic-memory-harness-local-llm-2026-08-16.md`](../research/agentic-memory-harness-local-llm-2026-08-16.md) | Three-plane atlas (memory / harness / frozen-model lift) |
 | [`docs/templates/MISSION_CARD.md`](./templates/MISSION_CARD.md) | Paste into agent kickoff |
+| [`docs/templates/AGENTIC_MEMORY_HARNESS_RESEARCH_PROMPT.md`](./templates/AGENTIC_MEMORY_HARNESS_RESEARCH_PROMPT.md) | Atlas kickoff — graft one loop, do not re-tour the field |
 | `data-next/opportunity-discovery/` | Sense / rank / check JSON (gitignored lab) |
 
 ## Operator commands

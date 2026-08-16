@@ -35,6 +35,7 @@ SCRIPTS=(
 
 DOCS=(
   BRAIN_FEED.md
+  OVERNIGHT_METABOLISM.md
   ADR-0004-airgap-living-usp.md
   AIRGAP_LIVING.md
   KEEP_QUALITY.md

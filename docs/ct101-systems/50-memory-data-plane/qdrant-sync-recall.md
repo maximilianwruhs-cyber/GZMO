@@ -49,7 +49,7 @@ pub fn merge_interleaved_rank(a: &[Uuid], b: &[Uuid], cap: usize) -> Vec<Uuid> {
 pub fn diversify_by_source_file(/* max 5 per source_file default */) -> Vec<(RecallCandidate, f64)>
 ```
 
-Constants: `PREFETCH_K=50`, `RERANK_PREFETCH=40`, `MAX_PER_SOURCE_FILE=5`.
+Constants: `PREFETCH_K=50`, `QDRANT_PREFETCH_K=100` (overfetch before SQLite `is_latest` filter), `RERANK_PREFETCH=40`, `MAX_PER_SOURCE_FILE=5`.
 
 ---
 
@@ -74,10 +74,10 @@ Constants: `PREFETCH_K=50`, `RERANK_PREFETCH=40`, `MAX_PER_SOURCE_FILE=5`.
 > - *Enhancement:* Synapse `health.fail` event on sync exit non-zero [CT101-safe].
 
 > **THINKING — qdrant_recall.rs:search_hits**
-> - *Reviewed:* HTTP JSON API, 30s timeout, empty vector early return.
-> - *Insight:* Sidecar HTTP avoids gRPC dependency in core crate.
-> - *Risk / limitation:* No payload filter for `is_latest` — relies on sync script correctness.
-> - *Enhancement:* Qdrant payload filter `is_latest=1` at search time [CT101-safe].
+> - *Reviewed:* HTTP JSON API, 30s timeout, empty vector early return. Recall overfetches then SQLite-filters `is_latest`.
+> - *Insight:* Sidecar HTTP avoids gRPC dependency in core crate. Payload may stamp `is_latest: true` on new upserts.
+> - *Risk / limitation:* Living Qdrant points predate the stamp. A payload filter `is_latest=true` **now** would empty the vector stream.
+> - *Enhancement:* Enable Qdrant payload filter only after a full living re-sync that stamps every remaining point [CT101-safe, gated].
 
 > **THINKING — recall_rrf.rs:merge_interleaved_rank**
 > - *Reviewed:* Interleaves Qdrant vs local IDs before single RRF list.

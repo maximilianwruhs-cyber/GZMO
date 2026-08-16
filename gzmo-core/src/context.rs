@@ -7,10 +7,12 @@
 //! ## Strategy
 //!
 //! 1. System prompt is always retained (index 0).
-//! 2. Messages are kept from most-recent backward until the token budget is reached.
-//! 3. Tool chain integrity: if a `Tool` result message is kept, the preceding
-//!    `Assistant` tool-call message that triggered it is also kept.
-//! 4. Token estimation uses a rough heuristic (chars / 3.5) which is conservative
+//! 2. Active workflow `SKILL.md` payloads (`[Workflow /…]`) are pinned
+//!    system-adjacent (HumanLayer). Pantheon slash skills are not.
+//! 3. Remaining budget fills from most-recent backward.
+//! 4. Tool chain integrity: if a `Tool` result is kept, its parent
+//!    `Assistant` tool-call message is also kept.
+//! 5. Token estimation uses a rough heuristic (chars / 3.5) which is conservative
 //!    enough for most tokenizers (GPT, Llama, Qwen all average ~3.5-4.0 chars/token).
 
 use crate::types::Message;
@@ -90,6 +92,26 @@ pub fn estimate_total_tokens(messages: &[Message], chars_per_token: f64) -> usiz
         .sum()
 }
 
+/// Walk back from a Tool result to its parent Assistant tool-call.
+fn parent_assistant_index(conversation: &[Message], tool_idx: usize) -> Option<usize> {
+    let mut j = tool_idx;
+    while j > 0 {
+        j -= 1;
+        if conversation[j].role == Role::Assistant {
+            return Some(j);
+        }
+    }
+    None
+}
+
+/// True when this turn is an active workflow `SKILL.md` payload (`[Workflow /…]`).
+///
+/// Protects grill/tdd/diagnose/review/handoff contracts from prune compaction.
+/// Pantheon chaos slash skills (`/dice`, `/story`, …) are not pinned.
+pub fn is_pinned_workflow_skill(msg: &Message) -> bool {
+    msg.content.starts_with("[Workflow /")
+}
+
 /// Prune with archival: messages dropped from the hot window go to `archived`
 /// when total tokens exceed `archive_trigger_tokens` (90%) or `max_tokens`.
 pub fn prune_with_archive(messages: &[Message], config: &ContextConfig) -> PruneResult {
@@ -119,8 +141,7 @@ pub fn prune_with_archive(messages: &[Message], config: &ContextConfig) -> Prune
 
     let mut trim_cfg = config.clone();
     trim_cfg.max_tokens = target_budget;
-    let windowed = prune_to_budget_inner(messages, &trim_cfg);
-    let archived = messages_not_in_window(messages, &windowed);
+    let (windowed, archived) = prune_to_budget_with_archive(messages, &trim_cfg);
     let estimated_after = estimate_total_tokens(&windowed, config.chars_per_token);
 
     if !archived.is_empty() {
@@ -141,41 +162,32 @@ pub fn prune_with_archive(messages: &[Message], config: &ContextConfig) -> Prune
     }
 }
 
-fn messages_not_in_window(original: &[Message], windowed: &[Message]) -> Vec<Message> {
-    if original.len() <= 1 {
-        return Vec::new();
-    }
-    let keep_from = original
-        .len()
-        .saturating_sub(windowed.len().saturating_sub(1));
-    if keep_from <= 1 {
-        return Vec::new();
-    }
-    original[1..keep_from].to_vec()
-}
-
 /// Prune messages to fit within the token budget.
 ///
 /// Returns a new `Vec<Message>` containing:
 /// 1. The system prompt (always first)
-/// 2. As many recent messages as fit within the budget
-/// 3. Tool chain integrity preserved (tool results keep their parent tool-call message)
+/// 2. Pinned workflow skill contracts (system-adjacent, never dropped unless total budget is smaller than system + skill)
+/// 3. As many recent messages as fit within the remaining budget
+/// 4. Tool chain integrity preserved (tool results keep their parent tool-call message)
 ///
 /// The input `messages` is NOT mutated.
 pub fn prune_to_budget(messages: &[Message], config: &ContextConfig) -> Vec<Message> {
     prune_with_archive(messages, config).windowed
 }
 
-fn prune_to_budget_inner(messages: &[Message], config: &ContextConfig) -> Vec<Message> {
+fn prune_to_budget_with_archive(
+    messages: &[Message],
+    config: &ContextConfig,
+) -> (Vec<Message>, Vec<Message>) {
     if messages.is_empty() {
-        return Vec::new();
+        return (Vec::new(), Vec::new());
     }
 
     let total = estimate_total_tokens(messages, config.chars_per_token);
 
     // If we're under budget, return everything as-is
     if total <= config.max_tokens {
-        return messages.to_vec();
+        return (messages.to_vec(), Vec::new());
     }
 
     // Always keep the system prompt
@@ -190,67 +202,109 @@ fn prune_to_budget_inner(messages: &[Message], config: &ContextConfig) -> Vec<Me
             budget = config.max_tokens,
             "System prompt alone exceeds token budget"
         );
-        return vec![system_msg.clone()];
+        let archived = messages[1..].to_vec();
+        return (vec![system_msg.clone()], archived);
     }
 
-    let remaining_budget = config.max_tokens - system_tokens;
-
-    // Walk backwards from the most recent message, accumulating tokens
     let conversation = &messages[1..]; // everything after system prompt
-    let mut keep_indices: Vec<usize> = Vec::new();
+    let max_conv_budget = config.max_tokens - system_tokens;
+
+    // 1. Identify pinned workflow skill messages (system-adjacent)
+    let mut pinned_indices = Vec::new();
+    for (i, msg) in conversation.iter().enumerate() {
+        if is_pinned_workflow_skill(msg) {
+            if msg.role == Role::Tool {
+                if let Some(parent) = parent_assistant_index(conversation, i) {
+                    if !pinned_indices.contains(&parent) {
+                        pinned_indices.push(parent);
+                    }
+                }
+            }
+            if !pinned_indices.contains(&i) {
+                pinned_indices.push(i);
+            }
+        }
+    }
+
+    let mut keep_set = HashSet::new();
     let mut used_tokens = 0usize;
 
-    for (i, msg) in conversation.iter().enumerate().rev() {
-        let msg_tokens = estimate_tokens(&msg.content, config.chars_per_token);
+    // Reserve tokens for pinned workflow skills first (most recent pinned preferred if tight)
+    let mut pinned_rev = pinned_indices.clone();
+    pinned_rev.sort_unstable();
+    pinned_rev.reverse();
 
-        if used_tokens + msg_tokens > remaining_budget {
+    for &idx in &pinned_rev {
+        let msg_tokens = estimate_tokens(&conversation[idx].content, config.chars_per_token);
+        if used_tokens + msg_tokens <= max_conv_budget {
+            keep_set.insert(idx);
+            used_tokens += msg_tokens;
+        } else {
+            tracing::warn!(
+                index = idx,
+                "Pinned workflow skill exceeds available context budget"
+            );
+        }
+    }
+
+    // 2. Walk backwards from the most recent non-pinned messages in conversation
+    for (i, msg) in conversation.iter().enumerate().rev() {
+        if keep_set.contains(&i) {
+            continue;
+        }
+        let msg_tokens = estimate_tokens(&msg.content, config.chars_per_token);
+        if used_tokens + msg_tokens > max_conv_budget {
             break;
         }
-
-        keep_indices.push(i);
+        keep_set.insert(i);
         used_tokens += msg_tokens;
     }
 
-    // Reverse to maintain chronological order
-    keep_indices.reverse();
-
-    // Tool chain integrity: ensure that if we have a Tool message,
+    // 3. Tool chain integrity: ensure that if we have a Tool message,
     // we also have the preceding Assistant message that requested it.
-    // Use HashSet for O(1) lookups instead of O(N²) Vec::contains.
-    let keep_set: HashSet<usize> = keep_indices.iter().copied().collect();
     let mut final_indices: Vec<usize> = Vec::new();
+    let mut sorted_indices: Vec<usize> = keep_set.into_iter().collect();
+    sorted_indices.sort_unstable();
 
-    for &idx in &keep_indices {
+    let check_set: HashSet<usize> = sorted_indices.iter().copied().collect();
+    for &idx in &sorted_indices {
         let msg = &conversation[idx];
-
-        if msg.role == Role::Tool && idx > 0 {
-            // Check if the previous message (the tool-call request) is already included
-            let prev_idx = idx - 1;
-            if !keep_set.contains(&prev_idx) {
-                // The parent tool-call message was pruned — we need to drop this
-                // orphaned tool result too, as it makes no sense without context
-                tracing::debug!(
-                    index = idx,
-                    "Dropping orphaned tool result (parent tool-call was pruned)"
-                );
-                continue;
+        if msg.role == Role::Tool {
+            match parent_assistant_index(conversation, idx) {
+                Some(parent) if check_set.contains(&parent) => {}
+                None if is_pinned_workflow_skill(msg) => {}
+                Some(_) | None => {
+                    tracing::debug!(
+                        index = idx,
+                        "Dropping orphaned tool result (parent tool-call was pruned)"
+                    );
+                    continue;
+                }
             }
         }
-
         final_indices.push(idx);
     }
 
-    // Build the pruned message list
-    let mut pruned = Vec::with_capacity(final_indices.len() + 1);
-    pruned.push(system_msg.clone());
+    let final_set: HashSet<usize> = final_indices.iter().copied().collect();
 
-    for idx in final_indices {
-        pruned.push(conversation[idx].clone());
+    // Build windowed messages
+    let mut windowed = Vec::with_capacity(final_indices.len() + 1);
+    windowed.push(system_msg.clone());
+    for &idx in &final_indices {
+        windowed.push(conversation[idx].clone());
     }
 
-    let pruned_total = estimate_total_tokens(&pruned, config.chars_per_token);
+    // Build archived messages: all conversation messages dropped from hot window
+    let mut archived = Vec::new();
+    for (i, msg) in conversation.iter().enumerate() {
+        if !final_set.contains(&i) {
+            archived.push(msg.clone());
+        }
+    }
+
+    let pruned_total = estimate_total_tokens(&windowed, config.chars_per_token);
     let original_count = messages.len();
-    let pruned_count = pruned.len();
+    let pruned_count = windowed.len();
 
     if pruned_count < original_count {
         tracing::info!(
@@ -259,11 +313,12 @@ fn prune_to_budget_inner(messages: &[Message], config: &ContextConfig) -> Vec<Me
             dropped = original_count - pruned_count,
             estimated_tokens = pruned_total,
             budget = config.max_tokens,
-            "Context window pruned"
+            pinned_skills = pinned_indices.len(),
+            "Context window pruned (workflow skills protected)"
         );
     }
 
-    pruned
+    (windowed, archived)
 }
 
 #[cfg(test)]
@@ -408,5 +463,167 @@ mod tests {
         // Empty string → 0 + 4 overhead = 4 tokens
         let tokens = estimate_tokens("", 3.5);
         assert_eq!(tokens, 4);
+    }
+
+    #[test]
+    fn test_pinned_workflow_skill_survives_pruning() {
+        let mut messages = vec![
+            make_msg(Role::System, "System prompt for GZMO."),
+            make_msg(
+                Role::Tool,
+                "[Workflow /grill]\n# grill\n\nAsk clarifying questions before coding.",
+            ),
+        ];
+
+        // Add 30 user/assistant turns that would easily exceed budget
+        for i in 0..30 {
+            messages.push(make_msg(
+                Role::User,
+                &format!("User message {i} with conversational filler text"),
+            ));
+            messages.push(make_msg(
+                Role::Assistant,
+                &format!("Assistant message {i} with conversational filler text"),
+            ));
+        }
+
+        let config = ContextConfig::with_hot_budget(250);
+        let result = prune_with_archive(&messages, &config);
+
+        // System prompt must be kept (index 0)
+        assert_eq!(result.windowed[0].role, Role::System);
+
+        // Pinned workflow skill must survive in windowed messages
+        let has_workflow_skill = result
+            .windowed
+            .iter()
+            .any(|m| m.content.contains("[Workflow /grill]"));
+        assert!(
+            has_workflow_skill,
+            "Workflow skill contract must survive pruning"
+        );
+
+        // Archived slice must contain dropped non-pinned turns
+        assert!(
+            !result.archived.is_empty(),
+            "Non-pinned turns should be archived"
+        );
+        let archived_has_skill = result
+            .archived
+            .iter()
+            .any(|m| m.content.contains("[Workflow /grill]"));
+        assert!(
+            !archived_has_skill,
+            "Pinned workflow skill must not be archived"
+        );
+    }
+
+    #[test]
+    fn test_pinned_workflow_tool_call_chain_integrity() {
+        let mut messages = vec![
+            make_msg(Role::System, "System prompt."),
+            make_msg(Role::Assistant, "[Tool call: activate_workflow_skill(tdd)]"),
+            make_msg(
+                Role::Tool,
+                "[Workflow /tdd]\n# tdd\n\nWrite tests first, then write implementation.",
+            ),
+        ];
+
+        for i in 0..25 {
+            messages.push(make_msg(
+                Role::User,
+                &format!("Chat turn {i} consuming tokens"),
+            ));
+            messages.push(make_msg(
+                Role::Assistant,
+                &format!("Chat response {i} consuming tokens"),
+            ));
+        }
+
+        let config = ContextConfig::with_hot_budget(220);
+        let windowed = prune_to_budget(&messages, &config);
+
+        // Both tool result and its preceding tool call must survive
+        let tool_idx = windowed
+            .iter()
+            .position(|m| m.content.contains("[Workflow /tdd]"));
+        assert!(tool_idx.is_some(), "Pinned Tool result must survive");
+        let tool_idx = tool_idx.unwrap();
+        assert!(tool_idx > 0);
+        assert_eq!(
+            windowed[tool_idx - 1].role,
+            Role::Assistant,
+            "Preceding Assistant tool-call must be preserved for pinned Tool message"
+        );
+    }
+
+    #[test]
+    fn test_pinned_workflow_survives_sibling_tool_result() {
+        let dump = format!("SHELL DUMP: {}", "x".repeat(400));
+        let mut messages = vec![
+            make_msg(Role::System, "System prompt."),
+            make_msg(
+                Role::Assistant,
+                "[Tool calls: shell_exec, activate_workflow_skill]",
+            ),
+            make_msg(Role::Tool, &dump),
+            make_msg(
+                Role::Tool,
+                "[Workflow /review]\n# review\n\nCite evidence before claiming done.",
+            ),
+        ];
+        for i in 0..20 {
+            messages.push(make_msg(
+                Role::User,
+                &format!("Later user {i} filling tokens"),
+            ));
+            messages.push(make_msg(
+                Role::Assistant,
+                &format!("Later assistant {i} filling tokens"),
+            ));
+        }
+        let config = ContextConfig::with_hot_budget(280);
+        let windowed = prune_to_budget(&messages, &config);
+        assert!(
+            windowed
+                .iter()
+                .any(|m| m.content.contains("[Workflow /review]")),
+            "Workflow skill after a sibling tool result must survive"
+        );
+        let skill_idx = windowed
+            .iter()
+            .position(|m| m.content.contains("[Workflow /review]"))
+            .unwrap();
+        assert!(windowed[..skill_idx]
+            .iter()
+            .any(|m| m.role == Role::Assistant));
+    }
+
+    #[test]
+    fn test_unpinned_pantheon_slash_skill_prunes() {
+        let mut messages = vec![
+            make_msg(Role::System, "System prompt."),
+            make_msg(Role::Tool, "/dice\nYou rolled a 6 on 1d6."),
+        ];
+
+        for i in 0..30 {
+            messages.push(make_msg(
+                Role::User,
+                &format!("User {i} filling the token buffer"),
+            ));
+            messages.push(make_msg(
+                Role::Assistant,
+                &format!("Assistant {i} filling the token buffer"),
+            ));
+        }
+
+        let config = ContextConfig::with_hot_budget(150);
+        let windowed = prune_to_budget(&messages, &config);
+
+        let has_dice = windowed.iter().any(|m| m.content.contains("/dice"));
+        assert!(
+            !has_dice,
+            "Pantheon chaos slash skill must NOT be pinned against pruning"
+        );
     }
 }

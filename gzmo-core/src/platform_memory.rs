@@ -341,9 +341,17 @@ pub async fn memory_search_core(
     limit: usize,
 ) -> Result<(String, Vec<(crate::types::SemanticFact, f64)>)> {
     let results = vault.search_recall(query, limit).await?;
+    let related: Vec<uuid::Uuid> = results.iter().map(|(f, _)| f.id).collect();
+    let refusals = vault.format_failure_recall(query, &related)?;
     if results.is_empty() {
+        if refusals.is_empty() {
+            return Ok((
+                format!("No relevant memories found for query: '{query}'"),
+                Vec::new(),
+            ));
+        }
         return Ok((
-            format!("No relevant memories found for query: '{query}'"),
+            format!("No honeypot hits for query: '{query}'.{refusals}"),
             Vec::new(),
         ));
     }
@@ -356,6 +364,7 @@ pub async fn memory_search_core(
             dt, score, fact.content
         ));
     }
+    out.push_str(&refusals);
     Ok((out, results))
 }
 

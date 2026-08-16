@@ -94,6 +94,9 @@ impl QdrantRecall {
             "{}/collections/{}/points/search",
             self.base_url, self.collection
         );
+        // Do not add a Qdrant payload filter on `is_latest` here. Living points
+        // predate the stamp; filtering now would empty the vector stream until a
+        // full re-sync. SQLite `take_assertable_prefetch` is the current-time gate.
         let body = serde_json::json!({
             "vector": vector,
             "limit": limit,

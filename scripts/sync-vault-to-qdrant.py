@@ -129,6 +129,9 @@ def load_facts(
         if source == "honeypot":
             payload["source_file"] = r["source_file"]
             payload["promoted_at"] = r["promoted_at"]
+            # Stamp only. Search must not filter on this until living re-sync —
+            # older points lack the field and would all drop.
+            payload["is_latest"] = True
         else:
             payload["half_life_days"] = r["half_life_days"]
             payload["confirmation_count"] = r["confirmation_count"]
@@ -155,6 +158,50 @@ def upsert_batch(url: str, collection: str, batch: list[dict]) -> None:
     )
 
 
+def prune_honeypot_orphans(url: str, collection: str, db_path: Path, *, dry_run: bool) -> int:
+    """Delete Qdrant points whose id is not a current (`is_latest=1`) honeypot row.
+
+    Temporal Validity / GPM: upserting latest does not remove superseded vectors.
+    """
+    conn = sqlite3.connect(db_path)
+    keep = {str(uuid.UUID(r[0])) for r in conn.execute("SELECT id FROM honeypot WHERE is_latest = 1")}
+    conn.close()
+
+    orphans: list[str] = []
+    offset = None
+    while True:
+        body: dict = {"limit": 256, "with_payload": False, "with_vector": False}
+        if offset is not None:
+            body["offset"] = offset
+        res = qdrant_request(url, "POST", f"/collections/{collection}/points/scroll", body)[
+            "result"
+        ]
+        pts = res.get("points") or []
+        if not pts:
+            break
+        for pt in pts:
+            pid = str(pt["id"])
+            if pid not in keep:
+                orphans.append(pid)
+        offset = res.get("next_page_offset")
+        if offset is None:
+            break
+
+    print(f"[*] qdrant orphans (not is_latest=1): {len(orphans)}")
+    if dry_run or not orphans:
+        return len(orphans)
+    for i in range(0, len(orphans), BATCH):
+        batch = orphans[i : i + BATCH]
+        qdrant_request(
+            url,
+            "POST",
+            f"/collections/{collection}/points/delete?wait=true",
+            {"points": batch},
+        )
+        print(f"  pruned {i + len(batch)}/{len(orphans)}")
+    return len(orphans)
+
+
 def main() -> None:
     p = argparse.ArgumentParser(description="Sync GZMO vault embeddings to Qdrant")
     p.add_argument("--db", type=Path, default=DEFAULT_DB)
@@ -177,6 +224,11 @@ def main() -> None:
         help="Comma-separated fact UUIDs to upsert (incremental)",
     )
     p.add_argument("--dry-run", action="store_true")
+    p.add_argument(
+        "--no-prune",
+        action="store_true",
+        help="Skip deleting Qdrant points that are no longer is_latest=1 (honeypot only)",
+    )
     args = p.parse_args()
     if args.collection is None:
         args.collection = "honeypot" if args.source == "honeypot" else DEFAULT_COLLECTION
@@ -197,6 +249,11 @@ def main() -> None:
     )
 
     if args.dry_run:
+        if args.source == "honeypot" and not args.no_prune:
+            try:
+                prune_honeypot_orphans(args.url, args.collection, args.db, dry_run=True)
+            except Exception as e:
+                print(f"[!] prune dry-run skipped: {e}", file=sys.stderr)
         return
 
     ensure_collection(args.url, args.collection)
@@ -206,6 +263,9 @@ def main() -> None:
         upsert_batch(args.url, args.collection, batch)
         synced += len(batch)
         print(f"  upserted {synced}/{len(points)}")
+
+    if args.source == "honeypot" and not args.no_prune:
+        prune_honeypot_orphans(args.url, args.collection, args.db, dry_run=False)
 
     info = qdrant_request(args.url, "GET", f"/collections/{args.collection}")
     print(

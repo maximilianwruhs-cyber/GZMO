@@ -204,6 +204,8 @@ User → gzmo chat → Prime :8000 → tools (fs, shell, web, memory_*, mcp__mem
 
 ### 6.2 Nightly loop (UTC, daemon)
 
+Operator names for these ticks (TRIAGE / CONSOLIDATE / AUDIT) live in [OVERNIGHT_METABOLISM.md](./OVERNIGHT_METABOLISM.md). Labels do not change the times below.
+
 | Time | Job | Output |
 |------|-----|--------|
 | **01:00** | DreamEngine | Episodic → vault + Neo4j |

@@ -60,7 +60,9 @@ pub async fn platform_cross_search(
     }
 
     items.extend(knowledge_hits);
-    let text = format_combined_output(query, &items, limit);
+    let related: Vec<uuid::Uuid> = items.iter().filter_map(|h| h.fact_id).collect();
+    let mut text = format_combined_output(query, &items, limit);
+    text.push_str(&vault.format_failure_recall(query, &related)?);
     Ok((text, items))
 }
 

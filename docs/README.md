@@ -13,9 +13,12 @@ Canonical operator and architecture docs. Session reports and milestone logs bel
 | [AIRGAP_LIVING.md](AIRGAP_LIVING.md) | **Hero path** — single-box airgap living bring-up |
 | [KEEP_QUALITY.md](KEEP_QUALITY.md) | **USP quality gate** — `keep-quality-gate.sh` |
 | [BRAIN_FEED.md](BRAIN_FEED.md) | **Active Unpark** — satellites that nourish the living vault |
+| [OVERNIGHT_METABOLISM.md](OVERNIGHT_METABOLISM.md) | **Named night labels** — TRIAGE / CONSOLIDATE / AUDIT on existing daemon ticks |
 | [OPPORTUNITY_DISCOVERY.md](OPPORTUNITY_DISCOVERY.md) | **What to build next** — Sense→Rank→Bet→Ship→Soak |
 | [TELESCOPE_LINEAGE.md](TELESCOPE_LINEAGE.md) | **Telescope guide** — evolve the Keep from a non-living host; workshop as dojo |
-| [../research/lineage-watch/README.md](../research/lineage-watch/README.md) | **Field watch** — SOTA in utility / dream / forget / local-first (informs the active bet; not a second ship) |
+| [templates/AGENTIC_MEMORY_HARNESS_RESEARCH_PROMPT.md](templates/AGENTIC_MEMORY_HARNESS_RESEARCH_PROMPT.md) | **Memory + harness + local-LLM kickoff** — graft one loop from the atlas |
+| [../research/agentic-memory-harness-local-llm-2026-08-16.md](../research/agentic-memory-harness-local-llm-2026-08-16.md) | **Three-plane atlas** — agentic memory, harnesses, frozen-model lift |
+| [../research/lineage-watch/README.md](../research/lineage-watch/README.md) | **Field watch** — SOTA in utility / dream / forget / harness / ACE (informs the active bet; not a second ship) |
 | [LIVING_ATTACH_CONFIG_SPEC.md](LIVING_ATTACH_CONFIG_SPEC.md) | **Attach contract** — homes, order, refuse, GREEN |
 | [MCP_LOCAL_ATTACH.md](MCP_LOCAL_ATTACH.md) | **Brand MCP** — stdio / localhost only (`gzmo-living`) |
 | [SPINE_FOCUS.md](SPINE_FOCUS.md) | Active focus — one living Keep |

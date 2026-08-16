@@ -28,6 +28,7 @@ Only these Unpark satellites claim to **improve** the living vault/honeypot. The
 2. **No auto engine swap** — Arena / Forge / IpW / calibration emit **suggestions** only.
 3. **Living vault target** — nutrient paths aim at the living host (`/opt/gzmo` today), not `~/.gzmo` lite and not silent `data-next` overnight writers.
 4. **keep-quality stays the USP bar** — Brain Feed GREEN does not replace soak readiness.
+5. **Named night labels** — TRIAGE / CONSOLIDATE / AUDIT name existing daemon jobs ([OVERNIGHT_METABOLISM.md](./OVERNIGHT_METABOLISM.md)). They do not rewrite cron into three contiguous windows, and they do not make telescope census scripts overnight daemon jobs.
 
 ## Operator loops
 
