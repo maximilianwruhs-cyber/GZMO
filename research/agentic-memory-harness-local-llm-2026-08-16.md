@@ -65,8 +65,8 @@ Schema on living path: `PRAGMA user_version=10` (utility, `gate_event`, `failure
 
 | Already in-tree | Still open (not a new crate) |
 |-----------------|------------------------------|
-| Distill → verify → promote → honeypot | Named night labels on scheduler (docs only) |
-| `utility_score` + Q-select after RRF ([#166](https://github.com/maximilianwruhs-cyber/GZMO/pull/166)) | Living census: **rising** dual-gate / utility mass (soak nights 2–3) |
+| Distill → verify → promote → honeypot; named night labels on those ticks | Living census: **rising** dual-gate / utility mass (soak nights 2–3) |
+| `utility_score` + Q-select after RRF ([#166](https://github.com/maximilianwruhs-cyber/GZMO/pull/166)) | — |
 | Outcome Q when a later takeaway cites a recalled entity (`reinforce_outcome_from_new_truths`) | Do not mint Q from glance/search |
 | `maybe_region_rewrite` + `gate_event` (`promote` / `supersede` / `region_rewrite`) | Immune **apply** on living still lab |
 | `failure_cases` on `verify_fail` / `gate_refuse` / `promote_rollback`; bounded retrieve on token/related-id | MCP attach HOLD (`gzmo-living` on the box) |
@@ -184,7 +184,7 @@ Status: **steal** = take the rule onto an existing organ. **in-tree** = do not r
 | M4 | Region rewrite supersession | Auto-Dreamer | `maybe_region_rewrite` | **in-tree** |
 | M5 | Typed gate event | SleepGate / SLM | `gate_event` | **in-tree** |
 | M6 | Bi-temporal as-of | SuperLocalMemory | `honeypot_as_of` | **in-tree** |
-| M7 | Named night TRIAGE/CONSOLIDATE/AUDIT | Memory as Metabolism | scheduler docs | **open** (labels only) |
+| M7 | Named night TRIAGE/CONSOLIDATE/AUDIT | Memory as Metabolism | `OVERNIGHT_METABOLISM.md` | **in-tree** (docs labels on existing ticks; no new cron) |
 | M8 | Zettelkasten neighbor evolve | A-Mem | spark-link | **park as write-mutate**; keep verify-then-promote |
 | M9 | Graph associative retrieve | HippoRAG | Neo4j + RRF | **cousin in-tree**; no new graph SKU |
 | H1 | Pin skill text against prune | HumanLayer | `context.rs` | **in-tree** (workflow `SKILL.md` system-adjacent) |
@@ -208,11 +208,10 @@ Status: **steal** = take the rule onto an existing organ. **in-tree** = do not r
 | Rank | Loop | Why | Filter |
 |------|------|-----|--------|
 | 0 | **Soak nights 2–3** + felt-use mass on CT101 | Done-when of the active bet | No memory gym |
-| 1 | **Named night labels** | Cheap vocabulary; zero new crates | Docs/scheduler only |
-| 2 | **ACE curator deltas** on one workflow skill, human-pinned | Frozen-model lift without LoRA | Reflector may use Prime; Curator merge is deterministic; living SOUL still gated |
-| 3 | Immune apply on living | Forget as signal | Still lab until soak |
+| 1 | **ACE curator deltas** on one workflow skill, human-pinned | Frozen-model lift without LoRA | Reflector may use Prime; Curator merge is deterministic; living SOUL still gated |
+| 2 | Immune apply on living | Forget as signal | Still lab until soak |
 
-`failure_cases` retrieve (M3) and workflow skill pinning (H1) are **in-tree**.
+`failure_cases` retrieve (M3), workflow skill pinning (H1), and named night labels (M7) are **in-tree**.
 
 ---
 

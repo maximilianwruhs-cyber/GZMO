@@ -27,12 +27,12 @@ July 22 already named most of these. Keep taking them. Attribution in the July n
 | Reflection → semantic | Generative Agents | distill | In-tree takeaway |
 | Memory kinds + action taxonomy | CoALA | skills / vault kinds | Partial |
 | Region rewrite supersession | Auto-Dreamer | dream / distill | In-tree (`maybe_region_rewrite`) |
-| TRIAGE → CONSOLIDATE → AUDIT | Memory as Metabolism | night labels | Queued (docs/scheduler only) |
+| TRIAGE → CONSOLIDATE → AUDIT | Memory as Metabolism | night labels | In-tree (`docs/OVERNIGHT_METABOLISM.md` — labels on existing ticks) |
 | Blind-verify + rollback | SuperLocalMemory | `honeypot-gate` | In-tree write (`gate_event`, quarantine) |
 | Conflict-aware supersede tag | SleepGate | `honeypot-gate` | In-tree (`gate_event`) |
 | Bi-temporal / as-of recall | SuperLocalMemory | vault | In-tree (`honeypot_as_of`) |
 | Incremental playbook deltas | ACE | workflow skills / SOUL | Open — human pin; no auto rewrite |
-| Pin skill text against prune | HumanLayer | `context.rs` | Open |
+| Pin skill text against prune | HumanLayer | `context.rs` | In-tree (workflow `SKILL.md`) |
 | LoCoMo / LongMemEval | benches | soak satellite | Borrow-eval only |
 
 **Not the field (product shapes):** public multi-tenant memory, provider-assisted as default, overnight LoRA/PEFT, second writer, compliance-OS as USP.
@@ -45,7 +45,7 @@ None of these become an active bet until CT101 living census shows felt-use mass
 |---|-------|----------------|--------|
 | 1 | **Outcome-linked utility** — bump Q only when a later takeaway cites or bonds the recalled fact | MemRL → `felt-use` / `rrf-recall` | **In-tree** (#167). Living mass still the bet. |
 | 2 | **Dream as region rewrite** — offline compaction emits a replacement set that *supersedes* the working region, provenance kept | Auto-Dreamer → `session-distill` / dream | **In-tree** (`maybe_region_rewrite`). |
-| 3 | **Named night procedure** — `TRIAGE → CONSOLIDATE → AUDIT` as labels on distill / gate / soak | Memory as Metabolism → night runbook | Docs and scheduler names only. No crate. No Observatory glass. |
+| 3 | **Named night procedure** — `TRIAGE → CONSOLIDATE → AUDIT` as labels on distill / gate / soak | Memory as Metabolism → night runbook | **In-tree** (`OVERNIGHT_METABOLISM.md`). Labels only; wall-clock is not TRIAGE→CONSOLIDATE→AUDIT. No crate. No Observatory glass. |
 | 4 | **Verify rollback + typed supersession** — quarantine, rollback on failed promote, typed supersede/refuse | SuperLocalMemory + SleepGate → `honeypot-gate` | **In-tree write** (`gate_event`, `failure_cases`). Bounded retrieve on token/related-id. |
 | 5 | **Pin workflow skill bodies** against context prune | HumanLayer → `context.rs` | **In-tree.** Do not pin pantheon theater skills. |
 | 6 | **ACE curator deltas** on one `SKILL.md`, human-pinned | ACE 2510.04618 → `workflow_skills` | No unsupervised SOUL rewrite. |

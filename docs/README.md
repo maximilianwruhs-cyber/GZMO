@@ -13,6 +13,7 @@ Canonical operator and architecture docs. Session reports and milestone logs bel
 | [AIRGAP_LIVING.md](AIRGAP_LIVING.md) | **Hero path** — single-box airgap living bring-up |
 | [KEEP_QUALITY.md](KEEP_QUALITY.md) | **USP quality gate** — `keep-quality-gate.sh` |
 | [BRAIN_FEED.md](BRAIN_FEED.md) | **Active Unpark** — satellites that nourish the living vault |
+| [OVERNIGHT_METABOLISM.md](OVERNIGHT_METABOLISM.md) | **Named night labels** — TRIAGE / CONSOLIDATE / AUDIT on existing daemon ticks |
 | [OPPORTUNITY_DISCOVERY.md](OPPORTUNITY_DISCOVERY.md) | **What to build next** — Sense→Rank→Bet→Ship→Soak |
 | [TELESCOPE_LINEAGE.md](TELESCOPE_LINEAGE.md) | **Telescope guide** — evolve the Keep from a non-living host; workshop as dojo |
 | [templates/AGENTIC_MEMORY_HARNESS_RESEARCH_PROMPT.md](templates/AGENTIC_MEMORY_HARNESS_RESEARCH_PROMPT.md) | **Memory + harness + local-LLM kickoff** — graft one loop from the atlas |
