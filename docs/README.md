@@ -15,6 +15,7 @@ Canonical operator and architecture docs. Session reports and milestone logs bel
 | [BRAIN_FEED.md](BRAIN_FEED.md) | **Active Unpark** — satellites that nourish the living vault |
 | [OPPORTUNITY_DISCOVERY.md](OPPORTUNITY_DISCOVERY.md) | **What to build next** — Sense→Rank→Bet→Ship→Soak |
 | [TELESCOPE_LINEAGE.md](TELESCOPE_LINEAGE.md) | **Telescope guide** — evolve the Keep from a non-living host; workshop as dojo |
+| [templates/KEEP_DEVELOPMENT_RESEARCH_PROMPT.md](templates/KEEP_DEVELOPMENT_RESEARCH_PROMPT.md) | **Keep research kickoff** — harvest organs, not Observatory/OKForge glass |
 | [../research/lineage-watch/README.md](../research/lineage-watch/README.md) | **Field watch** — SOTA in utility / dream / forget / local-first (informs the active bet; not a second ship) |
 | [LIVING_ATTACH_CONFIG_SPEC.md](LIVING_ATTACH_CONFIG_SPEC.md) | **Attach contract** — homes, order, refuse, GREEN |
 | [MCP_LOCAL_ATTACH.md](MCP_LOCAL_ATTACH.md) | **Brand MCP** — stdio / localhost only (`gzmo-living`) |

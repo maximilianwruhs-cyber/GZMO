@@ -262,7 +262,8 @@ Telescope:  tests + fail-closed gates when SSH missing; no gzmo serve
 Lab:        felt-use-depth.sh, soak, takeaway from real work
 ```
 
-Full template: [templates/MISSION_CARD.md](templates/MISSION_CARD.md).
+Full template: [templates/MISSION_CARD.md](templates/MISSION_CARD.md).  
+Keep-development research kickoff (not glass): [templates/KEEP_DEVELOPMENT_RESEARCH_PROMPT.md](templates/KEEP_DEVELOPMENT_RESEARCH_PROMPT.md).
 
 ---
 
