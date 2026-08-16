@@ -11,7 +11,7 @@ attention_cost: 2
 usp_fit: 5
 stack_ids: [m1]
 created: 2026-07-21
-updated: 2026-07-23
+updated: 2026-08-16
 ---
 
 # Felt Use mass + utility
@@ -55,3 +55,7 @@ bash scripts/organism-memory-bench-spike.sh
 ## Activated 2026-07-23
 
 Locked via `opportunity-bet.sh --from felt-use-mass-growth` after [`promote-loop-living-apply`](promote-loop-living-apply.md) soaked (`soak-latest` GREEN, min pin age ~18.5h). Exactly one active bet.
+
+## Telescope 2026-08-16
+
+Honeypot recall now Q-selects inside the relevance pool (`apply_utility_boost` after RRF/rerank). `felt-use-depth.sh` reports `utility_positive` / avg / max. Living mass (done-when 2–3) remains CT101-only.

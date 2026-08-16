@@ -25,8 +25,9 @@ use crate::memory::lifecycle::{
 };
 use crate::memory::qdrant_recall::QdrantRecall;
 use crate::memory::recall_rrf::{
-    diversify_by_source_file, extract_entity_tokens, fts_match_query, fts_match_query_broad,
-    merge_interleaved_rank, rrf_fuse, RecallCandidate, PREFETCH_K, RERANK_PREFETCH,
+    apply_utility_boost, diversify_by_source_file, extract_entity_tokens, fts_match_query,
+    fts_match_query_broad, merge_interleaved_rank, rrf_fuse, RecallCandidate, PREFETCH_K,
+    RERANK_PREFETCH,
 };
 use crate::memory::rerank::Reranker;
 use crate::types::{DecayClass, ExtractedTruth, SemanticFact};
@@ -864,8 +865,39 @@ impl SqliteVault {
         let mut scored: Vec<(SemanticFact, f64)> =
             diversified.into_iter().map(|(c, s)| (c.fact, s)).collect();
 
-        self.apply_rerank(q, limit, &mut scored).await;
+        // Phase A: relevance pool (RRF + optional cross-encoder). Keep prefetch
+        // so phase B can still promote a high-Q fact that sat below `limit`.
+        self.apply_rerank(q, RERANK_PREFETCH.max(limit), &mut scored)
+            .await;
+        self.apply_utility_select(&mut scored)?;
+        scored.truncate(limit);
         Ok(scored)
+    }
+
+    /// MemRL phase B: Q-select inside the relevance pool (honeypot `utility_score`).
+    fn apply_utility_select(&self, scored: &mut Vec<(SemanticFact, f64)>) -> Result<()> {
+        if scored.len() <= 1 {
+            return Ok(());
+        }
+        let ids: Vec<Uuid> = scored.iter().map(|(f, _)| f.id).collect();
+        let utility = self.honeypot_utility_scores(&ids)?;
+        apply_utility_boost(scored, &utility);
+        Ok(())
+    }
+
+    fn honeypot_utility_scores(&self, ids: &[Uuid]) -> Result<HashMap<Uuid, f64>> {
+        let mut out = HashMap::new();
+        if ids.is_empty() {
+            return Ok(out);
+        }
+        let conn = self.pool.get()?;
+        let mut stmt = conn.prepare("SELECT utility_score FROM honeypot WHERE id = ?1")?;
+        for id in ids {
+            if let Ok(u) = stmt.query_row(params![id.to_string()], |row| row.get::<_, f64>(0)) {
+                out.insert(*id, u.max(0.0));
+            }
+        }
+        Ok(out)
     }
 
     async fn search_recall_legacy(
@@ -2765,6 +2797,140 @@ mod spark_pool_tests {
             return;
         }
         assert!(!recent.is_empty());
+    }
+}
+
+#[cfg(test)]
+mod utility_recall_tests {
+    use super::*;
+    use crate::memory::honeypot::insert_honeypot_lifecycle;
+    use crate::types::{DecayClass, ExtractedTruth};
+    use rusqlite::params;
+    use std::env;
+
+    fn tempfile_db() -> std::path::PathBuf {
+        let mut p = env::temp_dir();
+        p.push(format!(
+            "gzmo_utility_recall_{}.db",
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        p
+    }
+
+    fn insert_fact(vault: &SqliteVault, content: &str, source: &str, utility: f64) -> Uuid {
+        let id = Uuid::new_v4();
+        let now = Utc::now().to_rfc3339();
+        let truth = ExtractedTruth {
+            id,
+            content: content.to_string(),
+            confidence: 0.95,
+            mmr_score: 0.0,
+            source_date: Utc::now().date_naive(),
+            decay_class: DecayClass::CuratedVault,
+            source_file: Some(source.to_string()),
+            evidence: None,
+        };
+        let conn = vault.db_conn().expect("conn");
+        conn.execute(
+            "INSERT INTO semantic_vault
+                (id, content, embedding, half_life_days, confidence, confirmation_count,
+                 decay_class, created_at, last_accessed_at, source_file, content_norm)
+             VALUES (?1, ?2, ?3, 60.0, 0.95, 1, 'CuratedVault', ?4, ?4, ?5, ?6)",
+            params![
+                id.to_string(),
+                content,
+                Vec::<u8>::new(),
+                now,
+                source,
+                normalize_truth_content(content),
+            ],
+        )
+        .expect("insert vault");
+        insert_honeypot_lifecycle(
+            &conn,
+            &id.to_string(),
+            &truth,
+            &[],
+            &normalize_truth_content(content),
+            "honeypot",
+            None,
+            None,
+        )
+        .expect("insert honeypot");
+        conn.execute(
+            "UPDATE honeypot SET utility_score = ?1 WHERE id = ?2",
+            params![utility, id.to_string()],
+        )
+        .expect("set utility");
+        id
+    }
+
+    #[tokio::test]
+    async fn search_recall_orders_by_utility_inside_fts_pool() {
+        let path = tempfile_db();
+        let vault = SqliteVault::open(&path).expect("open");
+        let low = insert_fact(
+            &vault,
+            "alpha widget sits in the low-utility drawer",
+            "a.md",
+            0.0,
+        );
+        let high = insert_fact(
+            &vault,
+            "alpha gadget sits in the high-utility drawer",
+            "b.md",
+            20.0,
+        );
+
+        let hits = vault.search_recall("alpha", 5).await.expect("search");
+        let _ = std::fs::remove_file(&path);
+        let _ = std::fs::remove_file(format!("{}-wal", path.display()));
+        let _ = std::fs::remove_file(format!("{}-shm", path.display()));
+
+        assert!(
+            hits.len() >= 2,
+            "both fixture facts must be in the FTS pool, got {}",
+            hits.len()
+        );
+        assert_eq!(
+            hits[0].0.id,
+            high,
+            "high utility_score must rank first, got {:?}",
+            hits.iter().map(|(f, s)| (f.id, s)).collect::<Vec<_>>()
+        );
+        assert!(hits.iter().any(|(f, _)| f.id == low));
+    }
+
+    #[tokio::test]
+    async fn empty_query_returns_no_hits() {
+        let path = tempfile_db();
+        let vault = SqliteVault::open(&path).expect("open");
+        insert_fact(&vault, "alpha widget", "a.md", 9.0);
+        let hits = vault.search_recall("   ", 5).await.expect("search");
+        let _ = std::fs::remove_file(&path);
+        assert!(hits.is_empty(), "empty query must not invent recall");
+    }
+
+    #[test]
+    fn reinforce_by_bumps_utility_score() {
+        let path = tempfile_db();
+        let vault = SqliteVault::open(&path).expect("open");
+        let id = insert_fact(&vault, "bonded scar about felt use", "c.md", 1.0);
+        vault.reinforce_by(id, 5).expect("reinforce");
+        let conn = vault.db_conn().expect("conn");
+        let (recall, utility): (i64, f64) = conn
+            .query_row(
+                "SELECT recall_count, utility_score FROM honeypot WHERE id = ?1",
+                params![id.to_string()],
+                |row| Ok((row.get(0)?, row.get(1)?)),
+            )
+            .expect("read");
+        let _ = std::fs::remove_file(&path);
+        assert_eq!(recall, 5);
+        assert!((utility - 6.0).abs() < 1e-9, "utility was {utility}");
     }
 }
 
