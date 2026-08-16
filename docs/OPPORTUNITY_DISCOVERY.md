@@ -66,6 +66,7 @@ If Sense says `bet_log_starved` or lists depth scars, **write new candidate bets
 | Path | Role |
 |------|------|
 | [`research/opportunities/`](../research/opportunities/) | Bet log (git-tracked) |
+| [`research/lineage-watch/`](../research/lineage-watch/README.md) | Field SOTA — informs candidates; does **not** flip the active bet |
 | [`docs/templates/MISSION_CARD.md`](./templates/MISSION_CARD.md) | Paste into agent kickoff |
 | `data-next/opportunity-discovery/` | Sense / rank / check JSON (gitignored lab) |
 
