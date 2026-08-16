@@ -1,14 +1,16 @@
 //! Owner control plane: exclusive vault flock + Unix-socket memory API.
 //!
 //! `gzmo serve` / `gzmo daemon` claim the lock and listen. CLI and MCP attach
-//! when the socket is live; otherwise they open `PlatformMemory` in-process
-//! (lite / telescope fallback). Living hard-fail without a socket is a later graft.
+//! when the socket is live. Living vaults hard-fail without a socket unless
+//! `--offline` (inspect only, refused while the owner is up) or `GZMO_CONTROL_PLANE=0`.
 
+mod attach;
 mod client;
 mod lock;
 mod protocol;
 mod server;
 
+pub use attach::{attach_memory, is_lite_vault, is_living_vault, MemoryAttach};
 pub use client::{clients_enabled, ControlPlaneClient};
 pub use lock::{vault_write_lock_path, VaultWriteLock};
 pub use protocol::{ControlRequest, ControlResponse, PingBody, VIA_IN_PROCESS, VIA_OWNER};
@@ -148,6 +150,55 @@ mod tests {
         assert!(ControlPlaneClient::connect_if_live(&cfg, None)
             .await
             .is_none());
+    }
+
+    #[tokio::test]
+    async fn living_without_socket_hard_fails() {
+        let mut cfg = GzmoConfig::default();
+        cfg.memory.vault_db = std::path::PathBuf::from("/opt/gzmo/nonexistent-test-vault/vault.db");
+        cfg.control_plane.socket_path =
+            std::path::PathBuf::from("/opt/gzmo/nonexistent-test-vault/gzmo.sock");
+        let err = attach_memory(&cfg, None, false).await.unwrap_err();
+        assert!(
+            err.to_string().contains("has no owner"),
+            "unexpected: {err}"
+        );
+    }
+
+    #[tokio::test]
+    async fn telescope_lab_vault_stays_local() {
+        let dir = tempfile_dir();
+        let cfg = lab_config(&dir);
+        match attach_memory(&cfg, None, false).await.unwrap() {
+            MemoryAttach::Local => {}
+            MemoryAttach::Owner(_) => panic!("lab vault must not require owner"),
+        }
+    }
+
+    #[tokio::test]
+    async fn offline_allowed_when_owner_down() {
+        let dir = tempfile_dir();
+        let cfg = lab_config(&dir);
+        match attach_memory(&cfg, None, true).await.unwrap() {
+            MemoryAttach::Local => {}
+            MemoryAttach::Owner(_) => panic!("offline must not attach owner"),
+        }
+    }
+
+    #[tokio::test]
+    async fn offline_refused_when_owner_up() {
+        let dir = tempfile_dir();
+        let cfg = lab_config(&dir);
+        std::fs::create_dir_all(&cfg.memory.directory).unwrap();
+        let _ = SqliteVault::open(&cfg.memory.vault_db).unwrap();
+        let claim = claim_owner(&cfg).await.expect("claim");
+        tokio::time::sleep(Duration::from_millis(30)).await;
+        let err = attach_memory(&cfg, None, true).await.unwrap_err();
+        assert!(
+            err.to_string().contains("refuse --offline"),
+            "unexpected: {err}"
+        );
+        drop(claim);
     }
 
     fn tempfile_dir() -> std::path::PathBuf {

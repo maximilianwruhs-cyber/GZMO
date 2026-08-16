@@ -12,7 +12,7 @@ Daemon, CLI, and `mcp-serve` were peer consumers of `gzmo-core` / `PlatformMemor
 1. **`gzmo serve` and `gzmo daemon` are owners.** They take an exclusive flock on `{vault_db}.write.lock` and listen on a Unix socket (default `{vault_db.parent()}/gzmo.sock`, `0600`).
 2. **CLI (`gzmo memory *`) and MCP are clients.** They prefer the socket when it is live. `--offline` or `GZMO_CONTROL_PLANE=0` forces in-process `PlatformMemory` (lite / telescope).
 3. **No HTTP.** No MCP-as-control-plane. Protocol is one NDJSON request per connection (`ping`, `memory.search|recall|status|turn_start|chain|profile`).
-4. **No auto-fallback that opens a living vault when the socket is down and the profile is living.** That hard-fail is a later graft. This change still allows in-process open so CT101/`~/.gzmo` keep working during rollout.
+4. **Living hard-fail.** Vault under `/opt/gzmo` with a dead socket refuses in-process open unless `--offline` (inspect only; refused while the owner is up) or `GZMO_CONTROL_PLANE=0`. `~/.gzmo` and telescope lab vaults stay in-process.
 5. **Host mutex stays host placement** (`ct101` vs `workstation`). Process ownership is the flock.
 
 ## Consequences

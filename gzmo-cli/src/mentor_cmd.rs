@@ -5,6 +5,7 @@ use std::fs;
 use std::io::{self, IsTerminal, Read};
 
 use gzmo_core::config::{GzmoConfig, TaskKind};
+use gzmo_core::control_plane::{clients_enabled, is_living_vault, ControlPlaneClient};
 use gzmo_core::gateway::GatewayRouter;
 use gzmo_core::mentor_client::MentorResponse;
 use gzmo_core::types::{Message, Role};
@@ -172,11 +173,39 @@ async fn run_teach_request(config: &GzmoConfig, req: MentorRequest) -> Result<()
 }
 
 async fn call_or_local(config: &GzmoConfig, req: MentorRequest) -> Result<MentorResponse> {
+    if let Some(owner) = ControlPlaneClient::connect_if_live(config, None).await {
+        if req.method == "ping" {
+            let ping = owner.ping().await.context("owner ping")?;
+            return Ok(MentorResponse {
+                ok: true,
+                response: Some(format!("pong (owner pid {})", ping.pid)),
+                learner_id: Some(config.pedagogy.learner_id().to_string()),
+                ..MentorResponse::base()
+            });
+        }
+        let socket = mentor_ipc::socket_path(config);
+        if socket.exists() {
+            return mentor_ipc::client_request(&socket, &req)
+                .await
+                .context("daemon mentor API");
+        }
+        bail!(
+            "owner is up at {} but mentor sock {} is missing — refuse local teach on living vault",
+            owner.socket_path.display(),
+            socket.display()
+        );
+    }
     let socket = mentor_ipc::socket_path(config);
     if config.pedagogy.mentor_api_enabled && mentor_ipc::daemon_running() && socket.exists() {
         return mentor_ipc::client_request(&socket, &req)
             .await
             .context("daemon mentor API");
+    }
+    if clients_enabled() && is_living_vault(&config.memory.vault_db) {
+        bail!(
+            "living vault {} has no owner — refuse local mentor; start gzmo daemon or GZMO_CONTROL_PLANE=0",
+            config.memory.vault_db.display()
+        );
     }
     local_dispatch(config, req).await
 }

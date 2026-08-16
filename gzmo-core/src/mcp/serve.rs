@@ -15,7 +15,7 @@ use rmcp::{
 use tracing::info;
 
 use crate::config::{GzmoConfig, WikiConfig};
-use crate::control_plane::ControlPlaneClient;
+use crate::control_plane::{attach_memory, ControlPlaneClient, MemoryAttach};
 use crate::health::{collect_health_probes, format_report};
 use crate::platform_memory::PlatformMemory;
 use crate::wiki::WikiEngine;
@@ -367,23 +367,24 @@ pub async fn run_mcp_serve(config: &GzmoConfig) -> Result<()> {
         .ok()
         .filter(|s| !s.is_empty());
     let cfg = Arc::new(config.clone());
-    let server = if let Some(client) =
-        ControlPlaneClient::connect_if_live(config, session_id.clone()).await
-    {
-        info!(
-            socket = %client.socket_path.display(),
-            vault = %config.memory.vault_db.display(),
-            "GZMO memory MCP attaching to owner socket (stdio)"
-        );
-        GzmoMemoryMcpServer::from_front(MemoryFront::Owner(client), cfg)
-    } else {
-        let platform = Arc::new(PlatformMemory::open(config, session_id).await?);
-        info!(
-            session = %platform.session_id(),
-            vault = %config.memory.vault_db.display(),
-            "GZMO memory MCP server starting in-process (stdio)"
-        );
-        GzmoMemoryMcpServer::new(platform, cfg)
+    let server = match attach_memory(config, session_id.clone(), false).await? {
+        MemoryAttach::Owner(client) => {
+            info!(
+                socket = %client.socket_path.display(),
+                vault = %config.memory.vault_db.display(),
+                "GZMO memory MCP attaching to owner socket (stdio)"
+            );
+            GzmoMemoryMcpServer::from_front(MemoryFront::Owner(client), cfg)
+        }
+        MemoryAttach::Local => {
+            let platform = Arc::new(PlatformMemory::open(config, session_id).await?);
+            info!(
+                session = %platform.session_id(),
+                vault = %config.memory.vault_db.display(),
+                "GZMO memory MCP server starting in-process (stdio)"
+            );
+            GzmoMemoryMcpServer::new(platform, cfg)
+        }
     };
     let service = server.serve(stdio()).await?;
     service.waiting().await?;

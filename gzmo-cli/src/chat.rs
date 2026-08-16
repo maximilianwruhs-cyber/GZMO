@@ -10,6 +10,7 @@ use chrono::Utc;
 use gzmo_core::agent_loop::run_agent_loop;
 use gzmo_core::agent_session::AgentSession;
 use gzmo_core::config::{EngineMode, GzmoConfig, TaskKind};
+use gzmo_core::control_plane::{attach_memory, MemoryAttach};
 use gzmo_core::gateway::{GatewayRouter, LlmGateway, TurboQuantGateway, VllmConfig};
 use gzmo_core::identity::IdentityEngine;
 use gzmo_core::mcp::{bridge::McpServerConfig, manager::McpManager};
@@ -23,6 +24,7 @@ use gzmo_core::skills::{NestedDispatch, SkillRegistry as ChaosSkillRegistry};
 use gzmo_core::subagent::SubagentRunner;
 use gzmo_core::tools::delegate::DelegateTaskTool;
 use gzmo_core::tools::learner::{LearnerRecallTool, LearnerUpdateTool};
+use gzmo_core::tools::memory::OwnerMemorySearchTool;
 use gzmo_core::tools::profile::{register_for_profile, CapabilityProfile, ToolRegisterOpts};
 use gzmo_core::tools::ToolRegistry;
 use gzmo_core::types::{EpisodicEntry, EpisodicSource, Message, Role};
@@ -58,16 +60,28 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
         tokio::fs::create_dir_all(parent).await?;
     }
 
-    // ─── Vault (embed + rerank for memory_search) ───────────────
-    let vault = match crate::repl_shared::open_semantic_vault(&config).await {
-        Some(v) => {
-            let count = v.count().unwrap_or(0);
-            if count > 0 {
-                eprintln!("  {COPPER}⚙ Semantic vault: {count} facts loaded{RESET}");
-            }
-            Some(v)
+    // ─── Vault: owner socket, or in-process only for lite / explicit escape ─
+    let owner_client = match attach_memory(&config, None, false).await? {
+        MemoryAttach::Owner(c) => {
+            eprintln!("  {COPPER}⚙ Memory via owner socket (no local vault handle){RESET}");
+            Some(c)
         }
-        None => None,
+        MemoryAttach::Local => None,
+    };
+
+    let vault = if owner_client.is_some() {
+        None
+    } else {
+        match crate::repl_shared::open_semantic_vault(&config).await {
+            Some(v) => {
+                let count = v.count().unwrap_or(0);
+                if count > 0 {
+                    eprintln!("  {COPPER}⚙ Semantic vault: {count} facts loaded{RESET}");
+                }
+                Some(v)
+            }
+            None => None,
+        }
     };
 
     let mut agent_session = AgentSession::new_main(
@@ -303,6 +317,8 @@ pub async fn run(config: &GzmoConfig, identity: &IdentityEngine) -> Result<()> {
             scope: Some(agent_session.main_scope()),
             scope_cell: None,
         }));
+    } else if let Some(client) = owner_client.clone() {
+        tools.register(Box::new(OwnerMemorySearchTool { client }));
     }
 
     if config.pedagogy.enabled {

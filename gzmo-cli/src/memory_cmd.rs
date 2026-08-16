@@ -4,7 +4,7 @@ use std::sync::Arc;
 
 use anyhow::{bail, Result};
 use gzmo_core::config::GzmoConfig;
-use gzmo_core::control_plane::ControlPlaneClient;
+use gzmo_core::control_plane::{attach_memory, ControlPlaneClient, MemoryAttach};
 use gzmo_core::memory::embeddings;
 use gzmo_core::platform_memory::{MemorySearchResult, MemoryStatusReport, PlatformMemory};
 
@@ -97,15 +97,13 @@ pub async fn run(config: &GzmoConfig, subargs: Vec<String>) -> Result<()> {
     };
 
     let session_id = parse_session_flag(&subargs);
-    if !wants_offline(&subargs) {
-        if let Some(client) = ControlPlaneClient::connect_if_live(config, session_id.clone()).await
-        {
-            return run_via_owner(&client, sub, &subargs).await;
+    match attach_memory(config, session_id.clone(), wants_offline(&subargs)).await? {
+        MemoryAttach::Owner(client) => run_via_owner(&client, sub, &subargs).await,
+        MemoryAttach::Local => {
+            let platform = Arc::new(PlatformMemory::open(config, session_id).await?);
+            run_in_process(config, &platform, sub, &subargs).await
         }
     }
-
-    let platform = Arc::new(PlatformMemory::open(config, session_id).await?);
-    run_in_process(config, &platform, sub, &subargs).await
 }
 
 async fn run_via_owner(client: &ControlPlaneClient, sub: &str, subargs: &[String]) -> Result<()> {

@@ -4,6 +4,7 @@ use serde_json::json;
 use std::sync::Arc;
 
 use super::{ToolDef, ToolHandler};
+use crate::control_plane::ControlPlaneClient;
 use crate::memory::scratch::{ScratchScope, ScratchService};
 use crate::memory::vault::SqliteVault;
 
@@ -178,6 +179,44 @@ impl ToolHandler for MemorySearchTool {
             ));
         }
         Ok(out)
+    }
+}
+
+/// `memory_search` via the owner socket — chat/REPL must not open the living vault.
+pub struct OwnerMemorySearchTool {
+    pub client: ControlPlaneClient,
+}
+
+#[async_trait]
+impl ToolHandler for OwnerMemorySearchTool {
+    fn definition(&self) -> ToolDef {
+        ToolDef {
+            name: "memory_search".to_string(),
+            description: "Recall relevant context from the curated honeypot memory layer (high-confidence facts) using keywords.".to_string(),
+            parameters: json!({
+                "type": "object",
+                "properties": {
+                    "query": {
+                        "type": "string",
+                        "description": "The keyword string to search for historically."
+                    },
+                    "limit": {
+                        "type": "integer",
+                        "description": "Max number of results to return (default 5, max 20)"
+                    }
+                },
+                "required": ["query"]
+            }),
+        }
+    }
+
+    async fn execute(&self, args: serde_json::Value) -> Result<String> {
+        let query = args["query"]
+            .as_str()
+            .ok_or_else(|| anyhow!("Missing 'query' parameter"))?;
+        let limit = args["limit"].as_u64().unwrap_or(5).min(20) as usize;
+        let res = self.client.search(query, limit, true).await?;
+        Ok(res.text)
     }
 }
 
