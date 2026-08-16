@@ -7,7 +7,7 @@ use anyhow::{Context, Result};
 use chrono::Utc;
 use r2d2::Pool;
 use r2d2_sqlite::SqliteConnectionManager;
-use rusqlite::{params, Connection};
+use rusqlite::{params, params_from_iter, Connection};
 use std::collections::{HashMap, HashSet};
 use std::path::Path;
 use tracing::info;
@@ -1025,7 +1025,7 @@ impl SqliteVault {
                     let mut qdrant_ids = Vec::new();
                     if let Some(qdrant) = &self.qdrant {
                         if let Ok(ids) = qdrant.search_ids(&emb, PREFETCH_K).await {
-                            qdrant_ids = ids;
+                            qdrant_ids = self.filter_assertable_honeypot_ids(&ids)?;
                         }
                     }
                     let scored = self.search_with_decay(&emb, q, PREFETCH_K)?;
@@ -1568,6 +1568,31 @@ impl SqliteVault {
             params![content_hash, source_path, now],
         )?;
         Ok(())
+    }
+
+    /// GPM / Temporal Validity: current-time rank lists may only contain
+    /// `is_latest = 1` ids. Superseded Qdrant hits must not occupy prefetch.
+    pub fn filter_assertable_honeypot_ids(&self, ids: &[Uuid]) -> Result<Vec<Uuid>> {
+        if ids.is_empty() {
+            return Ok(Vec::new());
+        }
+        let conn = self.pool.get()?;
+        let id_strs: Vec<String> = ids.iter().map(|id| id.to_string()).collect();
+        let placeholders = id_strs.iter().map(|_| "?").collect::<Vec<_>>().join(",");
+        let sql = format!("SELECT id FROM honeypot WHERE is_latest = 1 AND id IN ({placeholders})");
+        let mut stmt = conn.prepare(&sql)?;
+        let rows = stmt.query_map(params_from_iter(id_strs.iter()), |row| {
+            row.get::<_, String>(0)
+        })?;
+        let mut latest = HashSet::new();
+        for id in rows.flatten() {
+            latest.insert(id);
+        }
+        Ok(ids
+            .iter()
+            .copied()
+            .filter(|id| latest.contains(&id.to_string()))
+            .collect())
     }
 
     fn load_honeypot_candidate(&self, id: Uuid) -> Result<Option<RecallCandidate>> {
@@ -3327,6 +3352,22 @@ mod utility_recall_tests {
             future.iter().all(|(id, _, _)| id != &old.to_string()),
             "as_of after valid_to must not see the superseded fact"
         );
+    }
+
+    #[test]
+    fn filter_assertable_drops_superseded_preserves_latest_order() {
+        let path = tempfile_db();
+        let vault = SqliteVault::open(&path).expect("open");
+        let old = insert_fact(&vault, "[AGENT:Gpm] stale city", "old.md", 1.0);
+        let new = insert_fact(&vault, "[AGENT:Gpm] current city", "new.md", 1.0);
+        let conn = vault.db_conn().expect("conn");
+        crate::memory::lifecycle::supersede_honeypot(&conn, &old.to_string()).expect("supersede");
+        drop(conn);
+        let filtered = vault
+            .filter_assertable_honeypot_ids(&[old, new, old])
+            .expect("filter");
+        let _ = std::fs::remove_file(&path);
+        assert_eq!(filtered, vec![new]);
     }
 
     #[test]

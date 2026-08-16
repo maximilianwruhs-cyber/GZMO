@@ -33,6 +33,7 @@ July 22 already named most of these. Keep taking them. Attribution in the July n
 | Bi-temporal / as-of recall | SuperLocalMemory | vault | In-tree (`honeypot_as_of`) |
 | Incremental playbook deltas | ACE | workflow skills / SOUL | In-tree on workflow `SKILL.md` (`workflow_skills::ace`, `ACE_PIN_APPLY=1`). SOUL/toml still human-only. |
 | Pin skill text against prune | HumanLayer | `context.rs` | In-tree (workflow `SKILL.md`) |
+| Assertable retrieve before rank | GPM 2608.12476 · Temporal Validity 2606.26511 | `filter_assertable_honeypot_ids` + Qdrant orphan prune | In-tree (this sitting) |
 | LoCoMo / LongMemEval | benches | soak satellite | Borrow-eval only |
 
 **Not the field (product shapes):** public multi-tenant memory, provider-assisted as default, overnight LoRA/PEFT, second writer, compliance-OS as USP.
@@ -75,6 +76,7 @@ None of these become an active bet until CT101 living census shows felt-use mass
 
 | Path | Role |
 |------|------|
+| [sota-2026-08-16-arxiv-tourism.md](sota-2026-08-16-arxiv-tourism.md) | Same-day arXiv harvest; GPM assertable retrieve + stale-vector prune |
 | [sota-2026-08-16.md](sota-2026-08-16.md) | Harness + ACE (frozen-model lift); corrects grafts 1/2/4 as in-tree |
 | [sota-2026-08-15.md](sota-2026-08-15.md) | First refresh after July 22 sleep-consolidation note |
 | [../agentic-memory-harness-local-llm-2026-08-16.md](../agentic-memory-harness-local-llm-2026-08-16.md) | Three-plane atlas (memory / harness / local-LLM lift) |

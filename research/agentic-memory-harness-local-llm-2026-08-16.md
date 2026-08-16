@@ -185,6 +185,7 @@ Status: **steal** = take the rule onto an existing organ. **in-tree** = do not r
 | M5 | Typed gate event | SleepGate / SLM | `gate_event` | **in-tree** |
 | M6 | Bi-temporal as-of | SuperLocalMemory | `honeypot_as_of` | **in-tree** |
 | M7 | Named night TRIAGE/CONSOLIDATE/AUDIT | Memory as Metabolism | `OVERNIGHT_METABOLISM.md` | **in-tree** (docs labels on existing ticks; no new cron) |
+| T1 | Assertable retrieve before rank; prune superseded vectors | GPM / Temporal Validity | `filter_assertable_honeypot_ids` / `sync-vault-to-qdrant.py` | **in-tree** (this sitting) |
 | M8 | Zettelkasten neighbor evolve | A-Mem | spark-link | **park as write-mutate**; keep verify-then-promote |
 | M9 | Graph associative retrieve | HippoRAG | Neo4j + RRF | **cousin in-tree**; no new graph SKU |
 | H1 | Pin skill text against prune | HumanLayer | `context.rs` | **in-tree** (workflow `SKILL.md` system-adjacent) |
@@ -210,7 +211,7 @@ Status: **steal** = take the rule onto an existing organ. **in-tree** = do not r
 | 0 | **Soak nights 2–3** + felt-use mass on CT101 | Done-when of the active bet | No memory gym |
 | 1 | Immune apply on living | Forget as signal | Still lab until soak |
 
-`failure_cases` retrieve (M3), workflow skill pinning (H1), named night labels (M7), and ACE playbook curation (L1) are **in-tree**.
+`failure_cases` retrieve (M3), workflow skill pinning (H1), named night labels (M7), ACE playbook curation (L1), and assertable retrieve (T1) are **in-tree**.
 
 ---
 

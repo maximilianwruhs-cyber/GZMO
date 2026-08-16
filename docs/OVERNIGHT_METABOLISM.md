@@ -60,7 +60,7 @@ If toml is missing `[spark].cron_hours`, compiled default is `[9, 14, 21]` at mi
 
 ## AUDIT — index + operator census
 
-**Daemon (living):** Qdrant sync at **01:45 UTC** (`[qdrant] sync_cron_*`) writes promoted vectors to the `honeypot` collection on **CT101** (`:6333`). Embeddings still come from **VM200** (`:8081`). This is index maintenance, not a 03:30–05:15 block.
+**Daemon (living):** Qdrant sync at **01:45 UTC** (`[qdrant] sync_cron_*`) writes promoted vectors to the `honeypot` collection on **CT101** (`:6333`) and **prunes** points that are no longer `is_latest = 1`. Embeddings still come from **VM200** (`:8081`). This is index maintenance, not a 03:30–05:15 block.
 
 **Not daemon on living CT101:**
 
