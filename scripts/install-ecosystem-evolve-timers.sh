@@ -15,6 +15,8 @@ units=(
   gzmo-ops-health.timer
   gzmo-research-scan.service
   gzmo-research-scan.timer
+  gzmo-research-intel.service
+  gzmo-research-intel.timer
   gzmo-kg-reconcile-dry.service
   gzmo-kg-reconcile-dry.timer
   gzmo-organ-watchdog.service
@@ -33,6 +35,7 @@ done
 chmod +x \
   "$ROOT/scripts/ops-health.sh" \
   "$ROOT/scripts/research-scan.sh" \
+  "$ROOT/scripts/research-intel.sh" \
   "$ROOT/scripts/kg-reconcile-dry.sh" \
   "$ROOT/scripts/ecosystem-evolve-daily.sh" \
   "$ROOT/scripts/ecosystem-evolve-weekly.sh" \
@@ -43,6 +46,7 @@ systemctl --user daemon-reload
 systemctl --user enable --now \
   gzmo-ops-health.timer \
   gzmo-research-scan.timer \
+  gzmo-research-intel.timer \
   gzmo-kg-reconcile-dry.timer \
   gzmo-organ-watchdog.timer \
   gzmo-ecosystem-evolve-daily.timer \

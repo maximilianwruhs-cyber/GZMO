@@ -1,0 +1,15 @@
+[Unit]
+Description=GZMO research-intel (stack-derived research: arXiv/GitHub/HF → benefit eval)
+After=network-online.target llama-prime.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=%h/github-clone/GZMO
+Environment=CT101_SSH_HOST=ct101
+ExecStart=/bin/bash %h/github-clone/GZMO/scripts/research-intel.sh
+Nice=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=default.target
