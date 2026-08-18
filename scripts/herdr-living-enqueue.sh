@@ -77,9 +77,13 @@ else:
     if p.returncode != 0:
         apply_error = f"seed_session:{(p.stderr or p.stdout or '')[:200]}"
     else:
+        # Shell-safe takeaway passing: base64 has no shell metacharacters, so the
+        # remote command can never break on quotes/apostrophes/backticks in the text.
+        import base64
+        b64 = base64.b64encode(takeaway.encode("utf-8")).decode("ascii")
         cmd = (
             f"bash -lc 'cd /opt/gzmo && GZMO_CONFIG=/opt/gzmo/gzmo.toml "
-            f"{gzmo_bin} session close {sid} --takeaway {json.dumps(takeaway)}'"
+            f"{gzmo_bin} session close {sid} --takeaway \"$(echo {b64} | base64 -d)\"'"
         )
         p2 = subprocess.run(
             ["ssh", "-o", "ConnectTimeout=12", "-o", "BatchMode=yes", host, cmd],
