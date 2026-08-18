@@ -892,6 +892,11 @@ pub struct DreamsConfig {
     #[serde(default = "default_dream_verify_temperature")]
     pub verify_temperature: f32,
 
+    /// Near-deterministic decoding for the extraction pass (mirrors
+    /// `verify_temperature`): keeps KG extract independent of engine/chaos temp.
+    #[serde(default = "default_dream_verify_temperature")]
+    pub extract_temperature: f32,
+
     /// Hour (UTC) when the daemon runs consolidation for **yesterday's** episodic log.
     #[serde(default = "default_dream_cron_hour")]
     pub cron_hour: u32,
@@ -970,6 +975,7 @@ impl DreamsConfig {
             verify: self.verify,
             min_confidence: self.min_confidence,
             verify_temperature: self.verify_temperature,
+            extract_temperature: self.extract_temperature,
             require_evidence: self.require_evidence,
             strict_kg: self.strict_kg,
         }
@@ -983,6 +989,7 @@ impl Default for DreamsConfig {
             verify: default_dream_verify(),
             min_confidence: default_dream_min_confidence(),
             verify_temperature: default_dream_verify_temperature(),
+            extract_temperature: default_dream_verify_temperature(),
             cron_hour: default_dream_cron_hour(),
             cron_minute: default_dream_cron_minute(),
             require_evidence: default_kg_require_evidence(),
@@ -1033,6 +1040,11 @@ pub struct IngestConfig {
     #[serde(default = "default_dream_verify_temperature")]
     pub verify_temperature: f32,
 
+    /// Near-deterministic decoding for the extraction pass (mirrors
+    /// `verify_temperature`): keeps KG extract independent of engine/chaos temp.
+    #[serde(default = "default_dream_verify_temperature")]
+    pub extract_temperature: f32,
+
     #[serde(default = "default_kg_require_evidence")]
     pub require_evidence: bool,
 
@@ -1062,6 +1074,7 @@ impl IngestConfig {
             verify: self.verify,
             min_confidence: self.min_confidence,
             verify_temperature: self.verify_temperature,
+            extract_temperature: self.extract_temperature,
             require_evidence: self.require_evidence,
             strict_kg: self.strict_kg,
         }
@@ -1079,6 +1092,7 @@ impl Default for IngestConfig {
             verify: default_dream_verify(),
             min_confidence: default_dream_min_confidence(),
             verify_temperature: default_dream_verify_temperature(),
+            extract_temperature: default_dream_verify_temperature(),
             require_evidence: default_kg_require_evidence(),
             strict_kg: default_kg_strict(),
             max_source_chars: default_ingest_max_source_chars(),
@@ -1295,6 +1309,11 @@ pub struct SessionDistillConfig {
     #[serde(default = "default_dream_verify_temperature")]
     pub verify_temperature: f32,
 
+    /// Near-deterministic decoding for the extraction pass (mirrors
+    /// `verify_temperature`): keeps KG extract independent of engine/chaos temp.
+    #[serde(default = "default_dream_verify_temperature")]
+    pub extract_temperature: f32,
+
     #[serde(default = "default_kg_require_evidence")]
     pub require_evidence: bool,
 
@@ -1364,6 +1383,7 @@ impl SessionDistillConfig {
             verify: self.verify,
             min_confidence: self.min_confidence,
             verify_temperature: self.verify_temperature,
+            extract_temperature: self.extract_temperature,
             require_evidence: self.require_evidence,
             strict_kg: self.strict_kg,
         }
@@ -1378,6 +1398,7 @@ impl Default for SessionDistillConfig {
             verify: default_dream_verify(),
             min_confidence: default_dream_min_confidence(),
             verify_temperature: default_dream_verify_temperature(),
+            extract_temperature: default_dream_verify_temperature(),
             require_evidence: default_kg_require_evidence(),
             strict_kg: default_kg_strict(),
             chunk_chars: default_pipeline_chunk_chars(),
@@ -1990,6 +2011,7 @@ impl LibrarianConfig {
             top_p: 0.9,
             max_tokens: 4096,
             reasoning_effort: None,
+            seed: None,
         }
     }
 }
@@ -2291,6 +2313,7 @@ impl EngineSection {
                         top_p: self.top_p.unwrap_or_else(default_top_p),
                         max_tokens: self.max_tokens.unwrap_or_else(default_max_tokens),
                         reasoning_effort: None,
+                        seed: None,
                     }
                 }
             }
@@ -2305,6 +2328,7 @@ impl EngineSection {
                         top_p: cloud.top_p,
                         max_tokens: cloud.max_tokens,
                         reasoning_effort: cloud.reasoning_effort.clone(),
+                        seed: None,
                     }
                 } else {
                     // No cloud profile — fall back to local
@@ -2335,6 +2359,7 @@ impl EngineSection {
                 top_p: self.top_p.unwrap_or_else(default_top_p),
                 max_tokens: self.max_tokens.unwrap_or_else(default_max_tokens),
                 reasoning_effort: None,
+                seed: None,
             }),
             EngineMode::Cloud => {
                 if let Some(ref cloud) = self.cloud {
@@ -2347,6 +2372,7 @@ impl EngineSection {
                         top_p: cloud.top_p,
                         max_tokens: cloud.max_tokens,
                         reasoning_effort: cloud.reasoning_effort.clone(),
+                        seed: None,
                     }
                 } else {
                     EngineProfileConfig::default()
@@ -2379,6 +2405,7 @@ impl EngineSection {
                 top_p: c.top_p,
                 max_tokens: c.max_tokens,
                 reasoning_effort: None,
+                seed: None,
             })
         })
     }
@@ -2404,6 +2431,11 @@ pub struct EngineProfileConfig {
     /// OpenRouter reasoning effort: minimal | low | medium | high | xhigh
     #[serde(default)]
     pub reasoning_effort: Option<String>,
+    /// Optional sampler seed for reproducible sampling (effective only with
+    /// temp > 0). Set on a routing profile (e.g. local_deterministic) to make
+    /// eval runs replayable.
+    #[serde(default)]
+    pub seed: Option<u64>,
 }
 
 impl Default for EngineProfileConfig {
@@ -2417,6 +2449,7 @@ impl Default for EngineProfileConfig {
             top_p: default_top_p(),
             max_tokens: default_max_tokens(),
             reasoning_effort: None,
+            seed: None,
         }
     }
 }
@@ -2551,6 +2584,7 @@ impl RoutingConfig {
                         top_p: cloud.top_p,
                         max_tokens: cloud.max_tokens,
                         reasoning_effort: cloud.reasoning_effort.clone(),
+                        seed: None,
                     }
                 } else {
                     tracing::warn!(

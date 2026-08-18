@@ -72,6 +72,8 @@ verify = true
 min_confidence = 0.85
 # Near-deterministic decoding for the fact-checker, regardless of engine temp.
 verify_temperature = 0.1
+# Near-deterministic decoding for the extractor, regardless of engine temp.
+extract_temperature = 0.1
 require_evidence = true
 strict_kg = true
 # UTC: consolidate yesterday's episodic log once per day (was hardcoded 01:00 in daemon).
@@ -91,6 +93,9 @@ honeypot_rem_associate_k = 4
 [session_distill]
 enabled = true
 sessions_dir = "data/sessions"
+verify_temperature = 0.1
+# Near-deterministic decoding for the extractor, regardless of engine temp.
+extract_temperature = 0.1
 # Extract on VM200 librarian; fact-check on Prime.
 use_librarian = true
 librarian_summary = true
@@ -208,6 +213,8 @@ chunk_chars = 12000
 verify = true
 min_confidence = 0.85
 verify_temperature = 0.1
+# Near-deterministic decoding for the extractor, regardless of engine temp.
+extract_temperature = 0.1
 require_evidence = true
 strict_kg = true
 
@@ -552,3 +559,5 @@ api_key     = ""
 temperature = 0.1
 top_p       = 0.95
 max_tokens  = 24576
+# Fixed sampler seed — reproducible eval runs (effective only with temp > 0).
+seed = 42
