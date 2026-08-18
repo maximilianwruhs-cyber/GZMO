@@ -15,14 +15,23 @@ else
 fi
 
 python3 - "$DATA" "$OUT" <<'PY'
-import json, sys
+import json, os, sys
 from datetime import datetime, timezone
 from pathlib import Path
 data, out = Path(sys.argv[1]), Path(sys.argv[2])
-wd = data / "scheduler-runs" / "latest-watchdog.json"
+living = os.environ.get("ORGAN_LIVING", "0") == "1"
+# Living mode: trust ONLY the fresh CT101 mirror written by organ-trace --living;
+# the lab data-next/scheduler-runs copy can be days stale (last-run residue), so
+# a missing mirror means "no fresh evidence", not "use the stale lab copy".
+mirror = data / "organ-trace" / "living-scheduler-runs" / "latest-watchdog.json"
+lab = data / "scheduler-runs" / "latest-watchdog.json"
+wd = mirror if living else lab
 watch = {}
 if wd.is_file():
-    watch = json.loads(wd.read_text())
+    try:
+        watch = json.loads(wd.read_text())
+    except Exception:
+        watch = {}  # truncated scp must not abort the soft watchdog
 stale = bool(watch.get("stale"))
 payload = {
     "schema": "gzmo.organ_watchdog.check/v1",
@@ -30,7 +39,8 @@ payload = {
     "ok": True,
     "watchdog_stale": stale,
     "watchdog_detail": watch.get("detail"),
-    "living": False,
+    "watchdog_source": str(wd) if wd.is_file() else "missing",
+    "living": living,
     "advice": (
         "organ_watchdog_yellow — distill/dream stale (soft; does not flip GREEN math)"
         if stale
