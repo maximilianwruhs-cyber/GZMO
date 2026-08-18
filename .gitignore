@@ -95,3 +95,6 @@ wiki/assets/
 # Node (OpenClaw plugins)
 node_modules/
 
+
+# Agent scratch (local, never commit)
+.scratch/

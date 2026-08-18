@@ -49,7 +49,7 @@ Use as a preflight checklist; re-run probes before apply.
 | Probe | Expected healthy | Last known |
 | ----- | ---------------- | ---------- |
 | `openclaw mcp show gzmo-living` | Server present | **Empty** `mcp.servers` |
-| `bash scripts/living-attach-check.sh` | All OK | **FAIL** — vault ~508 facts (&lt; 10k floor); daemon may still be active |
+| `bash scripts/living-attach-check.sh` | All OK | **FAIL** — vault ~508 facts (&lt; 10k floor at the time; floor now 500 post 2026-07-24 data migration); daemon may still be active |
 | `systemctl --user is-active gzmo-serve` (workstation) | `inactive` | OK |
 | `ssh ct101` + living `gzmo-daemon` | Reachable / active | Reachable / active |
 | Workspace `bin/openclaw-takeaway.sh` | Present | Present |
@@ -58,7 +58,7 @@ Use as a preflight checklist; re-run probes before apply.
 | `agents.defaults.memorySearch` | Explicit safe posture | Unset → defaults toward openai (tighten on apply) |
 | Dreaming | Off | Off |
 
-**Hard gate before claiming “living attach works”:** vault fact floor ≥ 10k (or raise/adjust the floor only via explicit living-ops decision — out of scope for OpenClaw wiring alone). Until then, install may soft-fail probe; do not fake attach with lab/`PRODUCT` flags.
+**Hard gate before claiming “living attach works”:** vault fact floor ≥ 500 (curated-vault floor since the 2026-07-24 data migration; adjust only via explicit living-ops decision — out of scope for OpenClaw wiring alone). Do not fake attach with lab/`PRODUCT` flags.
 
 ---
 
@@ -328,7 +328,7 @@ Always: `openclaw config patch --dry-run` before apply. After upgrades, re-read 
 
 | Symptom | Likely cause | Fix |
 | ------- | ------------ | --- |
-| `living-attach-check` FAIL, vault facts &lt; 10k | Living vault not populated / wrong vault | Living ops restore; do not lower floor casually |
+| `living-attach-check` FAIL, vault facts &lt; 500 | Living vault not populated / wrong vault | Living ops restore; do not lower floor casually |
 | `mcp set` probe fail | SSH / CT101 mcp-serve / vault refuse | Fix living; use `--no-probe` only to stage, then re-probe |
 | Takeaway `Read-only file system` on sessions | CT101 data mounts | Fix CT101 permissions/mounts |
 | Agent “can’t find memory” | MCP not in `mcp.servers` or tools filtered | Re-run install; `mcp tools` filters; Gateway reload |
@@ -357,7 +357,7 @@ These are **product improvements**, not required for destination:
 
 1. **CI/cron canary:** nightly `living-attach-check` + `openclaw mcp probe` → alert on fail.  
 2. **Agent skill:** thin OpenClaw skill wrapping takeaway + “living vs local” decision tree.  
-3. **Vault floor UX:** clearer operator message when attach refuses &lt;10k facts.  
+3. **Vault floor UX:** clearer operator message when attach refuses &lt;500 facts.  
 4. **Session takeaway from Telegram:** slash command → `openclaw-takeaway.sh` without raw shell.  
 5. **Read-only export mirrors:** if fog graduates, define a **generated** snapshot dir (not live honeypot) and a separate grilling ticket before any `extraPaths`.
 

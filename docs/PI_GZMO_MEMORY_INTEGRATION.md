@@ -58,7 +58,7 @@ One-line summary: `OPS: vault=<facts> health=<ok|warn|fail> discovery=<…> bash
 3. `gzmo_memory_recall_pull` — `[RECALL]` block  
 4. Optional: `gzmo_memory_chain` — provenance for a fact id  
 
-Wrong attach: MCP refuses vaults with &lt;10k facts unless `GZMO_ALLOW_LAB_VAULT=1`.
+Wrong attach: MCP refuses vaults below the living floor (≥500 curated facts, post 2026-07-24 data migration) unless `GZMO_ALLOW_LAB_VAULT=1`.
 
 ---
 
