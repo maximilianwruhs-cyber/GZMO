@@ -101,12 +101,32 @@ fi
 
 # Research inbox
 inbox=("$DATA/inbox/research/"*.md)
-if ls "$DATA/inbox/research/"*.md &>/dev/null 2>&1; then
+if (( ${#inbox[@]} > 0 )); then
+    sorted_inbox=("${inbox[@]}")
+    for ((i = 0; i < ${#sorted_inbox[@]}; i++)); do
+        for ((j = i + 1; j < ${#sorted_inbox[@]}; j++)); do
+            if [[ "${sorted_inbox[$j]}" -nt "${sorted_inbox[$i]}" ]]; then
+                tmp="${sorted_inbox[$i]}"
+                sorted_inbox[$i]="${sorted_inbox[$j]}"
+                sorted_inbox[$j]="$tmp"
+            fi
+        done
+    done
+
     echo "### 📥 Research Inbox"
-    for f in "$DATA/inbox/research/"*.md; do
+    inbox_limit=${#sorted_inbox[@]}
+    if (( inbox_limit > 10 )); then
+        inbox_limit=10
+    fi
+    for ((i = 0; i < inbox_limit; i++)); do
+        f="${sorted_inbox[$i]}"
         title=$(head -1 "$f" 2>/dev/null | sed 's/^# //')
         echo "- $title"
     done
+    omitted=$((${#sorted_inbox[@]} - inbox_limit))
+    if (( omitted > 0 )); then
+        echo "… and $omitted more omitted"
+    fi
 fi
 echo ""
 
