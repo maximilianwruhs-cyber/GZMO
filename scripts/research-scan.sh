@@ -14,7 +14,21 @@ INBOX="$DATA/inbox/research"
 HOST="${CT101_SSH_HOST:-ct101}"
 TOP_N="${RESEARCH_SCAN_TOP_N:-3}"
 PRIME_URL="${PRIME_CHAT_URL:-http://127.0.0.1:8000/v1/chat/completions}"
-PRIME_MODEL="${PRIME_MODEL:-qwen3.6-35b-mtp}"
+# Base URL for /v1/models (works whether PRIME_URL is .../v1 or .../v1/chat/completions)
+PRIME_BASE_URL="${PRIME_URL%/chat/completions}"
+# Auto-detect loaded Prime model (survives model swaps); explicit PRIME_MODEL wins
+if [[ -z "${PRIME_MODEL:-}" ]]; then
+  PRIME_MODEL="$(curl -sfL --max-time 5 "${PRIME_BASE_URL}/models" 2>/dev/null \
+    | python3 -c 'import json,sys
+try:
+    d=json.load(sys.stdin)
+    m=d["data"][0]["id"]
+    # llama.cpp may return the GGUF path; keep the basename as model id
+    print(m.rsplit("/", 1)[-1] if ".gguf" in m else m)
+except Exception:
+    print("")' 2>/dev/null || true)"
+fi
+[[ -n "$PRIME_MODEL" ]] || PRIME_MODEL="qwen3.6-35b-mtp" # last-resort legacy default
 APPLY="${RESEARCH_SCAN_APPLY_TINYFOLDER:-0}"
 mkdir -p "$OUT" "$INBOX"
 
@@ -103,8 +117,11 @@ prompt = (
 payload = {
     "model": model,
     "messages": [{"role": "user", "content": prompt}],
-    "max_tokens": 600,
+    "max_tokens": 1024,
     "temperature": 0.2,
+    # Qwen3.x reasoning mode burns the token budget on hidden thinking → empty content;
+    # disable per-request (llama-server ignores unknown fields on non-reasoning models)
+    "chat_template_kwargs": {"enable_thinking": False},
 }
 try:
     req = urllib.request.Request(
