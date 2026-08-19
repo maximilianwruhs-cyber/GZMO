@@ -30,7 +30,7 @@ except Exception:
 fi
 [[ -n "$PRIME_MODEL" ]] || PRIME_MODEL="qwen3.6-35b-mtp" # last-resort legacy default
 APPLY="${RESEARCH_SCAN_APPLY_TINYFOLDER:-0}"
-mkdir -p "$OUT" "$INBOX"
+mkdir -p "$OUT" "$INBOX" "$INBOX/archive"
 
 serve="$(systemctl --user is-active gzmo-serve.service 2>/dev/null || true)"
 serve="$(printf '%s\n' "$serve" | head -1)"
@@ -155,16 +155,41 @@ Path(gaps_path).write_text(
 print(json.dumps({"gap_count": len(gaps), "llm_error": gaps_meta_err}, indent=2))
 PY
 
-# Emit inbox notes (local)
-mapfile -t NOTES < <(python3 - "$gaps_file" "$INBOX" "$stamp" <<'PY'
+# Emit inbox notes (local); skip when an existing top-level note shares the same H1
+skipped_file="$OUT/skipped-$stamp.txt"
+mapfile -t NOTES < <(python3 - "$gaps_file" "$INBOX" "$stamp" "$skipped_file" <<'PY'
 import json, sys
 from pathlib import Path
+
 gaps = json.loads(Path(sys.argv[1]).read_text())["gaps"]
 inbox = Path(sys.argv[2])
 stamp = sys.argv[3]
+skipped_file = Path(sys.argv[4])
+(inbox / "archive").mkdir(parents=True, exist_ok=True)
+
+def existing_h1_keys(inbox_dir: Path) -> set:
+    seen = set()
+    for p in inbox_dir.glob("*.md"):
+        if not p.is_file():
+            continue
+        try:
+            first = p.read_text(encoding="utf-8", errors="replace").splitlines()[0].strip().casefold()
+        except Exception:
+            continue
+        if first:
+            seen.add(first)
+    return seen
+
+existing = existing_h1_keys(inbox)
 paths = []
+skipped = []
 for i, g in enumerate(gaps, 1):
     topic = str(g.get("topic") or f"gap-{i}").strip()
+    h1 = f"# Research gap: {topic}"
+    h1_key = h1.strip().casefold()
+    if h1_key in existing:
+        skipped.append(topic)
+        continue
     safe = "".join(c if c.isalnum() or c in "-_" else "-" for c in topic)[:48].strip("-") or f"gap-{i}"
     p = inbox / f"{stamp}-{i}-{safe}.md"
     body = (
@@ -178,9 +203,18 @@ for i, g in enumerate(gaps, 1):
     )
     p.write_text(body, encoding="utf-8")
     paths.append(str(p))
+    existing.add(h1_key)
+skipped_file.write_text(str(len(skipped)), encoding="utf-8")
+if skipped:
+    print(f"[research-scan] skipped {len(skipped)} duplicate note(s)", file=sys.stderr)
 print("\n".join(paths))
 PY
 )
+skipped_duplicates=0
+if [[ -f "$skipped_file" ]]; then
+  skipped_duplicates="$(tr -dc '0-9' <"$skipped_file" || true)"
+  skipped_duplicates="${skipped_duplicates:-0}"
+fi
 
 applied_file="$OUT/applied-$stamp.txt"
 : >"$applied_file"
@@ -198,7 +232,7 @@ fi
 notes_file="$OUT/notes-$stamp.txt"
 printf '%s\n' "${NOTES[@]}" >"$notes_file"
 
-python3 - "$OUT" "$gaps_file" "$APPLY" "$notes_file" "$applied_file" <<'PY'
+python3 - "$OUT" "$gaps_file" "$APPLY" "$notes_file" "$applied_file" "$skipped_duplicates" <<'PY'
 import json, sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -207,12 +241,14 @@ gaps_file = Path(sys.argv[2])
 apply = sys.argv[3] == "1"
 notes = [ln for ln in Path(sys.argv[4]).read_text(encoding="utf-8").splitlines() if ln.strip()]
 applied = [ln for ln in Path(sys.argv[5]).read_text(encoding="utf-8").splitlines() if ln.strip()]
+skipped_duplicates = int(sys.argv[6] or "0")
 gaps = json.loads(gaps_file.read_text())
 payload = {
     "schema": "gzmo.research_scan/v1",
     "generated_at": datetime.now(timezone.utc).isoformat(),
     "ok": True,
     "gap_count": len(gaps.get("gaps") or []),
+    "skipped_duplicates": skipped_duplicates,
     "notes": notes,
     "apply_tinyfolder": apply,
     "applied": applied,

@@ -5,7 +5,45 @@ set -euo pipefail
 ROOT="${GZMO_CLONE_ROOT:-$HOME/github-clone}/GZMO"
 DATA="$ROOT/data-next"
 OUT_DIR="$DATA/serendipity"
-mkdir -p "$OUT_DIR"
+HOST="${CT101_SSH_HOST:-ct101}"
+SPARK_LOCAL="$DATA/spark/last-spark-report.json"
+mkdir -p "$OUT_DIR" "$(dirname "$SPARK_LOCAL")"
+
+# S1: heal local spark from CT101 if fresher (silent on any failure)
+{
+  tmp="$(mktemp)"
+  if ssh -o ConnectTimeout=8 -o BatchMode=yes "$HOST" 'cat /opt/gzmo/data/spark/last-spark-report.json' >"$tmp" 2>/dev/null; then
+    python3 - "$tmp" "$SPARK_LOCAL" <<'PY' 2>/dev/null || true
+import json, sys
+from pathlib import Path
+
+remote_path = Path(sys.argv[1])
+local_path = Path(sys.argv[2])
+
+try:
+    remote_raw = remote_path.read_bytes()
+    remote = json.loads(remote_raw.decode("utf-8"))
+except Exception:
+    sys.exit(0)
+if not isinstance(remote, dict) or "date" not in remote:
+    sys.exit(0)
+
+local_date = ""
+if local_path.is_file():
+    try:
+        local = json.loads(local_path.read_text(encoding="utf-8"))
+        local_date = str(local.get("date") or "")
+    except Exception:
+        local_date = ""
+
+remote_date = str(remote.get("date") or "")
+if remote_date >= local_date:
+    local_path.parent.mkdir(parents=True, exist_ok=True)
+    local_path.write_bytes(remote_raw)
+PY
+  fi
+  rm -f "$tmp"
+} || true
 
 exec python3 - "$DATA" "$OUT_DIR" <<'PY'
 import json
