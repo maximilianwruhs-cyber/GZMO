@@ -254,10 +254,11 @@ if (( ${#queue[@]} > 0 )); then
         echo "- $(basename "$f"): $lines entries"
     done
 
-    # F4 — drain signal from archive
-    archive_files=("$DATA/distill-queue/archive"/*.json)
-    if (( ${#archive_files[@]} == 0 )); then
-        echo "consumer: no drain detected (jsonl accumulates)"
+    # F4 — drain signal: warn if no archive entry fresher than 3 days
+    archive_root="$DATA/distill-queue/archive"
+    fresh_count="$(find "$archive_root" -maxdepth 2 -type f -mtime -3 2>/dev/null | wc -l | tr -d ' ')"
+    if (( fresh_count == 0 )); then
+        echo "consumer: no recent drain (no archive entry in last 3d; queue accumulates)"
     fi
 fi
 echo ""
