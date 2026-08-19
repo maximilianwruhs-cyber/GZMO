@@ -307,6 +307,7 @@ pub async fn probe_librarian(cfg: &LibrarianConfig) -> ProbeResult {
         top_p: 1.0,
         max_tokens: 256,
         reasoning_effort: None,
+        seed: None,
     };
     let mut r = probe_llm_models(&profile).await;
     r.name = "librarian";

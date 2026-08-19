@@ -154,6 +154,7 @@ def chat_verdicts(
     timeout_s: int,
     max_tokens: int = 2048,
     retries: int = 3,
+    seed: int | None = None,
 ) -> list[dict[str, Any]]:
     """Call the chat endpoint and return parsed `verdicts`.
 
@@ -193,8 +194,9 @@ def chat_verdicts(
             "messages": messages,
             "temperature": temperature,
             "max_tokens": max_tokens,
-            "response_format": response_format,
         }
+        if seed is not None:
+            body["seed"] = seed
         try:
             payload = _http_post_json(url, body, timeout_s)
             content = payload["choices"][0]["message"]["content"]
@@ -204,3 +206,8 @@ def chat_verdicts(
             last_err = e
             continue
     raise last_err if last_err else RuntimeError("chat_verdicts failed")
+
+def judge_seed() -> int | None:
+    """Fixed sampler seed for reproducible judge runs (JUDGE_SEED env)."""
+    v = os.environ.get("JUDGE_SEED")
+    return int(v) if v and v.isdigit() else None

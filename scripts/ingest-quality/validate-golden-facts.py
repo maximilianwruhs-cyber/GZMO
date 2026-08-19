@@ -27,6 +27,7 @@ sys.path.insert(0, str(HARNESS))
 from eval_llm import (  # noqa: E402
     VERIFY_RULES,
     chat_verdicts,
+    judge_seed,
     evidence_in_source,
     extract_snippet,
     normalize_quote,
@@ -136,7 +137,7 @@ def llm_validate_group(
         snippet = extract_snippet(archive, batch[0].get("probe_query", ""), batch[0]["fact"], 6000)
         user = f"SOURCE:\n---\n{snippet}\n---\n\nCLAIMS:\n{listing}"
         try:
-            verdicts = chat_verdicts(url, model, system, user, 0.1, timeout_s)
+            verdicts = chat_verdicts(url, model, system, user, 0.1, timeout_s, seed=judge_seed())
         except Exception as e:  # noqa: BLE001 — record, do not abort the run
             for it in batch:
                 it["llm_valid"] = False

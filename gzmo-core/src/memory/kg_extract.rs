@@ -396,16 +396,19 @@ pub struct KgGateConfig {
     pub verify: bool,
     pub min_confidence: f64,
     pub verify_temperature: f32,
+    /// Near-deterministic decoding for the extraction pass (mirrors
+    /// `verify_temperature`): keeps KG extract independent of engine/chaos temp.
+    pub extract_temperature: f32,
     pub require_evidence: bool,
     pub strict_kg: bool,
 }
-
 impl Default for KgGateConfig {
     fn default() -> Self {
         Self {
             verify: true,
             min_confidence: 0.85,
             verify_temperature: 0.1,
+            extract_temperature: 0.1,
             require_evidence: true,
             strict_kg: true,
         }
@@ -594,7 +597,12 @@ impl KgPromoter {
 
         let raw = self
             .gateway
-            .complete_structured(&messages, schema_name, extraction_schema())
+            .complete_structured_with_temp(
+                &messages,
+                schema_name,
+                extraction_schema(),
+                Some(self.gate.extract_temperature),
+            )
             .await?;
 
         serde_json::from_str(&raw)

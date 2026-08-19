@@ -30,6 +30,9 @@ pub struct VllmConfig {
     /// OpenRouter reasoning effort: minimal | low | medium | high | xhigh
     #[serde(default)]
     pub reasoning_effort: Option<String>,
+    /// Optional sampler seed (from engine profile; replayable evals).
+    #[serde(default)]
+    pub seed: Option<u64>,
 }
 
 impl Default for VllmConfig {
@@ -43,6 +46,7 @@ impl Default for VllmConfig {
             api_key: String::new(),
             provider: String::new(),
             reasoning_effort: None,
+            seed: None,
         }
     }
 }
@@ -58,6 +62,7 @@ impl From<crate::config::EngineProfileConfig> for VllmConfig {
             api_key: p.api_key,
             provider: p.provider,
             reasoning_effort: p.reasoning_effort,
+            seed: p.seed,
         }
     }
 }
@@ -221,6 +226,9 @@ struct ChatRequest<'a> {
     /// OpenRouter: extended thinking effort (not used on structured JSON paths)
     #[serde(skip_serializing_if = "Option::is_none")]
     reasoning: Option<OpenRouterReasoning>,
+    /// Sampler seed — replayable sampling (ignored by engines at temp=0).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    seed: Option<u64>,
 }
 
 #[derive(Serialize)]
@@ -294,6 +302,9 @@ struct StreamChatRequest<'a> {
     /// OpenRouter: extended thinking effort
     #[serde(skip_serializing_if = "Option::is_none")]
     reasoning: Option<OpenRouterReasoning>,
+    /// Sampler seed — replayable sampling (ignored by engines at temp=0).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    seed: Option<u64>,
 }
 
 /// A single SSE chunk from the streaming response.
@@ -537,6 +548,7 @@ impl LlmGateway for TurboQuantGateway {
             reasoning_format,
             chat_template_kwargs,
             reasoning: openrouter_reasoning,
+            seed: self.config.seed,
         };
 
         debug!(
@@ -627,6 +639,7 @@ impl LlmGateway for TurboQuantGateway {
             tool_choice: if has_tools { Some("auto") } else { None },
             stream: true,
             reasoning: openrouter_reasoning_for_config(&self.config),
+            seed: self.config.seed,
         };
 
         debug!(
@@ -813,6 +826,7 @@ impl TurboQuantGateway {
             },
             reasoning_format: None,
             chat_template_kwargs: Some(chat_template_kwargs),
+            seed: self.config.seed,
         };
 
         debug!(
@@ -981,6 +995,9 @@ struct StructuredChatRequest<'a> {
     reasoning_format: Option<&'a str>,
     #[serde(skip_serializing_if = "Option::is_none")]
     chat_template_kwargs: Option<serde_json::Value>,
+    /// Sampler seed — replayable sampling (ignored by engines at temp=0).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    seed: Option<u64>,
 }
 
 /// Prefer normal assistant `content`, then Qwen `reasoning_content` when content is empty.
@@ -1367,6 +1384,7 @@ impl GatewayRouter {
                         top_p: cloud.top_p,
                         max_tokens: cloud.max_tokens,
                         reasoning_effort: cloud.reasoning_effort.clone(),
+                        seed: None,
                     }
                 } else {
                     config.engine.active_engine()
@@ -1429,6 +1447,7 @@ mod tests {
             reasoning: Some(OpenRouterReasoning {
                 effort: "xhigh".to_string(),
             }),
+            seed: None,
         };
         let json = serde_json::to_value(&body).expect("serialize ChatRequest");
         assert_eq!(json["reasoning"]["effort"], "xhigh");
