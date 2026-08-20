@@ -132,6 +132,16 @@ mod tests {
             "expected a fixture hit, got: {}",
             search.text
         );
+        // MemoryHit's kind/retrieval_channels labels must survive the
+        // control-plane NDJSON socket round trip, not just in-process calls.
+        assert!(
+            search
+                .items
+                .iter()
+                .any(|hit| hit.kind == crate::platform_memory::MemoryHitKind::PromotedFact
+                    && hit.fact_id.is_some()),
+            "expected a promoted_fact hit with a fact_id over the owner socket"
+        );
 
         drop(claim);
         tokio::time::sleep(Duration::from_millis(20)).await;

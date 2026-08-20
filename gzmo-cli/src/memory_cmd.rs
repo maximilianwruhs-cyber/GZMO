@@ -96,6 +96,15 @@ pub async fn run(config: &GzmoConfig, subargs: Vec<String>) -> Result<()> {
         bail!("missing memory subcommand");
     };
 
+    // `--help`/`-h` anywhere in the subargs prints usage and returns cleanly
+    // *before* touching config/vault/control-plane state, so it works in any
+    // environment (fresh checkout, no gzmo.toml/vault) — required for
+    // `scripts/release-contract-check.sh`'s `memory search --help` probe.
+    if subargs.iter().any(|a| a == "--help" || a == "-h") {
+        println!("{USAGE}");
+        return Ok(());
+    }
+
     let session_id = parse_session_flag(&subargs);
     match attach_memory(config, session_id.clone(), wants_offline(&subargs)).await? {
         MemoryAttach::Owner(client) => run_via_owner(&client, sub, &subargs).await,
@@ -208,5 +217,29 @@ async fn run_in_process(
             eprintln!("{USAGE}");
             bail!("unknown memory subcommand: {sub}");
         }
+    }
+}
+
+#[cfg(test)]
+mod help_tests {
+    use super::*;
+
+    /// `--help` must short-circuit before any config/vault/control-plane
+    /// access so it is safe to run in any environment (fresh checkout, no
+    /// `gzmo.toml`/vault) — this is exactly what
+    /// `scripts/release-contract-check.sh` relies on for its
+    /// `memory search --help` probe.
+    #[tokio::test]
+    async fn search_help_prints_usage_without_touching_vault_or_config() {
+        let cfg = GzmoConfig::default();
+        let result = run(&cfg, vec!["search".to_string(), "--help".to_string()]).await;
+        assert!(result.is_ok(), "expected Ok(()) for --help, got {result:?}");
+    }
+
+    #[tokio::test]
+    async fn short_help_flag_also_short_circuits() {
+        let cfg = GzmoConfig::default();
+        let result = run(&cfg, vec!["status".to_string(), "-h".to_string()]).await;
+        assert!(result.is_ok(), "expected Ok(()) for -h, got {result:?}");
     }
 }

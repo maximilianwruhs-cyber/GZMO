@@ -344,6 +344,76 @@ fn ops_mcp_denied() -> Option<String> {
     }
 }
 
+#[cfg(test)]
+mod memory_search_label_tests {
+    use super::*;
+    use crate::memory::vault::SqliteVault;
+    use crate::platform_memory::MemoryHitKind;
+
+    fn lab_config(dir: &Path) -> GzmoConfig {
+        let mut cfg = GzmoConfig::default();
+        cfg.memory.vault_db = dir.join("vault.db");
+        cfg.memory.directory = dir.join("memory");
+        cfg.redis.enabled = false;
+        cfg.embeddings.enabled = false;
+        cfg.qdrant.enabled = false;
+        cfg.rerank.enabled = false;
+        cfg
+    }
+
+    /// The MCP `gzmo_memory_search` tool is a thin wrapper over
+    /// `PlatformMemory::memory_search` (via `MemoryFront::Local`) — assert
+    /// the labeled `MemoryHit` fields it produces (kind + fact_id) survive
+    /// into the object graph the tool actually calls, and that the tool
+    /// call itself succeeds end-to-end on top of that labeled data.
+    #[tokio::test]
+    async fn gzmo_memory_search_tool_is_backed_by_labeled_promoted_fact_hits() {
+        let dir = std::env::temp_dir().join(format!(
+            "gzmo-mcp-label-test-{}",
+            uuid::Uuid::new_v4()
+        ));
+        let cfg = lab_config(&dir);
+        std::fs::create_dir_all(&cfg.memory.directory).unwrap();
+        let vault = SqliteVault::open(&cfg.memory.vault_db).unwrap();
+        vault
+            .store_text("mcp label fixture about cobalt finch", "Semantic", 0.9)
+            .unwrap();
+        drop(vault);
+
+        let platform = Arc::new(
+            PlatformMemory::open_as_owner(&cfg, Some("mcp-label-test".into()))
+                .await
+                .expect("open platform memory"),
+        );
+
+        let res = platform
+            .memory_search("cobalt finch", 5, false)
+            .await
+            .expect("memory_search");
+        assert!(res.hits >= 1, "expected fixture hit, got: {}", res.text);
+        assert!(
+            res.items
+                .iter()
+                .any(|h| h.kind == MemoryHitKind::PromotedFact && h.fact_id.is_some()),
+            "expected a promoted_fact hit with a fact_id backing the MCP tool"
+        );
+
+        let server = GzmoMemoryMcpServer::new(platform, Arc::new(cfg));
+        let result = server
+            .gzmo_memory_search(Parameters(SearchParams {
+                query: "cobalt finch".into(),
+                limit: Some(5),
+                write_scratch: Some(false),
+            }))
+            .await
+            .expect("tool call succeeds");
+        assert!(!result.is_error.unwrap_or(false), "tool call must not error");
+        assert!(!result.content.is_empty());
+
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+}
+
 #[tool_handler]
 impl ServerHandler for GzmoMemoryMcpServer {
     fn get_info(&self) -> ServerInfo {

@@ -24,6 +24,9 @@ jobs:
       - name: Build release binary
         run: cargo build --release -p gzmo-cli
 
+      - name: Release contract check
+        run: bash scripts/release-contract-check.sh
+
       - name: Package
         run: |
           STAGE=gzmo-x86_64-unknown-linux-gnu
@@ -43,9 +46,15 @@ jobs:
             dist/gzmo-x86_64-unknown-linux-gnu.tar.gz.sha256
           generate_release_notes: true
           body: |
-            ## GZMO memory MCP
+            ## GZMO — the living Keep, on one box
 
-            Local curated memory for Cursor / Pi.
+            One product, no lite SKU (ADR-0007): local Prime/embed, Redis/Qdrant/Neo4j,
+            hybrid search, folder corpus searchable this sitting, overnight
+            distill/verify/promote, local MCP.
+
+            Recall is labeled: every hit is a `corpus_passage` (fused from FTS +
+            vector retrieval channels, ranked via reciprocal rank fusion) or a
+            `promoted_fact` (vault-verified), never blurred together.
 
             ```bash
             curl -fsSL https://raw.githubusercontent.com/maximilianwruhs-cyber/GZMO/main/scripts/install-gzmo.sh | bash

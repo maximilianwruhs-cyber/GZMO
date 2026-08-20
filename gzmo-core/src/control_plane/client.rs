@@ -72,6 +72,11 @@ impl ControlPlaneClient {
         Self::new(path.to_path_buf(), None).ping().await
     }
 
+    /// Owner-socket recall. Returned hits carry `MemoryHit::kind`
+    /// (`corpus_passage`/`promoted_fact`) and `retrieval_channels`
+    /// (`fts`/`vector`) exactly as the in-process `PlatformMemory::memory_search`
+    /// path does — the NDJSON `ControlResponse` wraps `MemorySearchResult`
+    /// verbatim, so labels survive the socket hop unchanged.
     pub async fn search(
         &self,
         query: &str,

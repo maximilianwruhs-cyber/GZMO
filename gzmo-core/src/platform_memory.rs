@@ -33,8 +33,34 @@ pub struct PlatformMemory {
     rerank: RerankConfig,
 }
 
+/// Where a [`MemoryHit`] came from: a native corpus passage (FTS/vector) or a
+/// promoted honeypot/vault fact. Kept as a stable, `snake_case`-serialized tag
+/// so corpus passages can never masquerade as promoted facts (or vice versa)
+/// on any public surface (control-plane socket, MCP, CLI `--json`).
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+pub enum MemoryHitKind {
+    CorpusPassage,
+    PromotedFact,
+}
+
+/// Which recall channel(s) produced a corpus passage hit. A passage found by
+/// both channels carries both, always serialized in this enum's declaration
+/// order (`[fts, vector]`) for deterministic JSON.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+pub enum RetrievalChannel {
+    Fts,
+    Vector,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MemoryHit {
+    pub kind: MemoryHitKind,
+    /// Corpus-only: which recall channel(s) matched this passage_id. Always
+    /// empty for `promoted_fact` hits, which use the vault's own hybrid path.
+    #[serde(default)]
+    pub retrieval_channels: Vec<RetrievalChannel>,
     pub content: String,
     pub score: f32,
     /// Source archive file the recalled fact was promoted from (honeypot provenance).
@@ -529,5 +555,49 @@ impl ToolHandler for GzmoMemoryProfileTool {
         let dynamic_only = args["dynamic_only"].as_bool().unwrap_or(false);
         let profile = self.platform.memory_profile(dynamic_only)?;
         Ok(serde_json::to_string_pretty(&profile)?)
+    }
+}
+
+#[cfg(test)]
+mod memory_hit_label_tests {
+    use super::*;
+
+    #[test]
+    fn corpus_passage_hit_serializes_with_kind_and_ordered_channels() {
+        let hit = MemoryHit {
+            kind: MemoryHitKind::CorpusPassage,
+            retrieval_channels: vec![RetrievalChannel::Fts, RetrievalChannel::Vector],
+            content: "[corpus:orion-lantern.md#chunk0] cobalt finch 731".into(),
+            score: 1.5,
+            source_file: Some("orion-lantern.md".into()),
+            fact_id: None,
+            evidence_text: None,
+        };
+        let json = serde_json::to_value(&hit).expect("serialize MemoryHit");
+        assert_eq!(json["kind"], "corpus_passage");
+        assert_eq!(json["retrieval_channels"], serde_json::json!(["fts", "vector"]));
+        assert!(json.get("fact_id").is_none());
+    }
+
+    #[test]
+    fn promoted_fact_hit_carries_fact_id_and_never_masquerades_as_corpus_passage() {
+        let fact_id = uuid::Uuid::new_v4();
+        let hit = MemoryHit {
+            kind: MemoryHitKind::PromotedFact,
+            retrieval_channels: Vec::new(),
+            content: "operator prefers dark roast".into(),
+            score: 0.9,
+            source_file: None,
+            fact_id: Some(fact_id),
+            evidence_text: Some("evidence transcript excerpt".into()),
+        };
+        let json = serde_json::to_value(&hit).expect("serialize MemoryHit");
+        assert_eq!(json["kind"], "promoted_fact");
+        assert_ne!(json["kind"], "corpus_passage");
+        assert_eq!(json["fact_id"], fact_id.to_string());
+        // Round-trips back into the same typed kind — no coercion into corpus_passage.
+        let round_tripped: MemoryHit = serde_json::from_value(json).expect("deserialize MemoryHit");
+        assert_eq!(round_tripped.kind, MemoryHitKind::PromotedFact);
+        assert_eq!(round_tripped.fact_id, Some(fact_id));
     }
 }
