@@ -100,16 +100,31 @@ async fn execute(config: &GzmoConfig, args: &IngestDirArgs) -> Result<CorpusInge
 }
 
 pub async fn run(config: &GzmoConfig, subargs: Vec<String>) -> Result<()> {
+    // Usage errors (missing/unknown subcommand, missing path, unknown flag)
+    // exit 2, matching `session_cmd.rs`'s explicit `std::process::exit(2)`
+    // convention and the brief's "Unknown flags exit 2" requirement. This
+    // must be a real process exit, not a `bail!`-propagated `Err` — under
+    // `#[tokio::main] async fn main() -> Result<()>`, an `Err` return only
+    // yields exit code 1.
     let Some(sub) = subargs.first().map(|s| s.as_str()) else {
         eprintln!("{USAGE}");
-        bail!("missing corpus subcommand");
+        eprintln!("error: missing corpus subcommand");
+        std::process::exit(2);
     };
     if sub != "ingest-dir" {
         eprintln!("{USAGE}");
-        bail!("unknown corpus subcommand: {sub}");
+        eprintln!("error: unknown corpus subcommand: {sub}");
+        std::process::exit(2);
     }
     let rest = &subargs[1..];
-    let args = parse_ingest_dir_args(rest).inspect_err(|_| eprintln!("{USAGE}"))?;
+    let args = match parse_ingest_dir_args(rest) {
+        Ok(args) => args,
+        Err(err) => {
+            eprintln!("{USAGE}");
+            eprintln!("error: {err}");
+            std::process::exit(2);
+        }
+    };
     // A failure here (unreachable embedder/Qdrant, vector-index mismatch,
     // etc.) propagates as `Err` — `main()` returns `Result<()>` under
     // `#[tokio::main]`, so this naturally produces a nonzero exit status
@@ -198,5 +213,50 @@ mod tests {
         receipt.distill_enqueued = false;
         let rendered = render_receipt(&receipt, false).unwrap();
         assert!(rendered.contains("distill deferred"));
+    }
+
+    /// Behavioral proof (not just a parser message) that a real runtime/index
+    /// failure (unreachable embedder + Qdrant) surfaces from `run()` as `Err`,
+    /// which is what causes a nonzero process exit under `#[tokio::main]
+    /// async fn main() -> Result<()>` — no explicit `std::process::exit` call
+    /// is needed or wanted for this path.
+    #[tokio::test]
+    async fn run_propagates_index_failure_as_err_for_nonzero_exit() {
+        use gzmo_core::config::{EmbeddingsConfig, GzmoConfig, QdrantConfig};
+
+        let tmp = std::env::temp_dir().join(format!(
+            "gzmo-corpus-cmd-run-fail-{}",
+            std::process::id()
+        ));
+        let corpus_dir = tmp.join("corpus");
+        std::fs::create_dir_all(&corpus_dir).expect("create corpus dir");
+        std::fs::write(corpus_dir.join("note.md"), "# Note\n\nSome corpus content.")
+            .expect("write corpus file");
+
+        let mut config = GzmoConfig::default();
+        config.memory.vault_db = tmp.join("vault.db");
+        config.session_distill.sessions_dir = tmp.join("sessions");
+        config.embeddings = EmbeddingsConfig {
+            enabled: true,
+            url: "http://127.0.0.1:1".to_string(),
+            ..Default::default()
+        };
+        config.qdrant = QdrantConfig {
+            url: "http://127.0.0.1:1".to_string(),
+            ..Default::default()
+        };
+
+        let result = run(
+            &config,
+            vec!["ingest-dir".to_string(), corpus_dir.to_string_lossy().to_string()],
+        )
+        .await;
+
+        assert!(
+            result.is_err(),
+            "expected unreachable embedder/Qdrant to surface as Err from run()"
+        );
+
+        let _ = std::fs::remove_dir_all(&tmp);
     }
 }
