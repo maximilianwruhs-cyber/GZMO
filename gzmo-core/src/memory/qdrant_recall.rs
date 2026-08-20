@@ -120,6 +120,37 @@ impl QdrantRecall {
         );
         Ok(parsed.result)
     }
+
+    /// Upsert a single point (vector + payload) into the configured
+    /// collection. Idempotent: calling this again with the same `id`
+    /// replaces the vector/payload rather than duplicating the point.
+    pub async fn upsert_point(
+        &self,
+        id: Uuid,
+        vector: &[f32],
+        payload: serde_json::Value,
+    ) -> Result<()> {
+        let url = format!(
+            "{}/collections/{}/points?wait=true",
+            self.base_url, self.collection
+        );
+        let body = serde_json::json!({
+            "points": [{
+                "id": id.to_string(),
+                "vector": vector,
+                "payload": payload,
+            }]
+        });
+        self.http
+            .put(&url)
+            .json(&body)
+            .send()
+            .await
+            .with_context(|| format!("Qdrant upsert failed: {url}"))?
+            .error_for_status()
+            .context("Qdrant upsert HTTP error")?;
+        Ok(())
+    }
 }
 
 fn parse_point_id(value: &serde_json::Value) -> Option<Uuid> {

@@ -10,6 +10,7 @@ pub mod assembly;
 pub mod config;
 pub mod context;
 pub mod control_plane;
+pub mod corpus;
 pub mod cron;
 pub mod daemon;
 pub mod dice_loop;

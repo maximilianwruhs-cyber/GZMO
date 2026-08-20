@@ -8,6 +8,7 @@ mod chaos_skill_cmd;
 mod chat;
 mod cli_mcp;
 mod config_cmd;
+mod corpus_cmd;
 mod cron_cmd;
 mod daemon_cmd;
 mod distill_cmd;
@@ -90,6 +91,9 @@ enum Command {
     Distill(Option<String>),
     /// Session ops (`close` takeaway ritual → distill queue).
     Session(Vec<String>),
+    /// Native corpus ingest (`ingest-dir`) into the separately indexed
+    /// FTS5 + Qdrant knowledge-collection store.
+    Corpus(Vec<String>),
     Health,
     Status,
     /// Ecosystem health LED board (TUI Observatory slice).
@@ -277,6 +281,9 @@ fn parse_args() -> Command {
         if args[1] == "session" {
             return Command::Session(args[2..].to_vec());
         }
+        if args[1] == "corpus" {
+            return Command::Corpus(args[2..].to_vec());
+        }
         if args[1] == "health" {
             return Command::Health;
         }
@@ -355,6 +362,7 @@ async fn main() -> Result<()> {
         Command::Memory(_) => "warn",
         Command::Distill(_) => "info",
         Command::Session(_) => "info",
+        Command::Corpus(_) => "info",
         Command::Health => "warn",
         Command::Status => "warn",
         Command::Observatory => "warn",
@@ -408,6 +416,7 @@ async fn main() -> Result<()> {
             | Command::ChaosSkill(_)
             | Command::DreamCompact { .. }
             | Command::Session(_)
+            | Command::Corpus(_)
             | Command::WorkflowSkill(_)
     );
 
@@ -497,6 +506,7 @@ async fn main() -> Result<()> {
         Command::Memory(sub) => memory_cmd::run(&config, sub).await,
         Command::Distill(session_id) => distill_cmd::run(&config, session_id).await,
         Command::Session(args) => session_cmd::run(&config, &args).await,
+        Command::Corpus(args) => corpus_cmd::run(&config, args).await,
         Command::Health => health_cmd::run(&config).await,
         Command::Status => status_cmd::run(&config).await,
         Command::Observatory => observatory_cmd::run(&config).await,
