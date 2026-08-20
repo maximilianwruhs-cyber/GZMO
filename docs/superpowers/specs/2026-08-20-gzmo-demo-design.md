@@ -1,7 +1,7 @@
 # GZMO Demo: Minimum Bare-Metal Living Lab
 
-**Status:** Approved design  
-**Date:** 2026-08-20  
+**Status:** Approved design
+**Date:** 2026-08-20
 **Target repository:** `maximilianwruhs-cyber/gzmo-demo` (private initially)
 
 ## Purpose
