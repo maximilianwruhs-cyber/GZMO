@@ -63,6 +63,44 @@ It does not own:
 - production fleet management;
 - model binaries, secrets, or generated USB bundles in Git.
 
+## Upstream GZMO Prerequisite
+
+The current GZMO `ingest-dir` command extracts and verifies directly into the
+vault. It does not preserve raw folder passages as a separately labeled,
+same-sitting corpus. The existing Pi KB indexer is an auxiliary legacy path and
+must not be copied into `gzmo-demo`.
+
+Before the first demo bundle is locked, the main GZMO repository must release a
+stable corpus contract:
+
+```text
+gzmo corpus ingest-dir <path> --json [--defer-distill]
+```
+
+The command must:
+
+- chunk supported source files deterministically;
+- store corpus passages in a local SQLite FTS index separate from promoted
+  semantic facts;
+- embed and upsert the same passage IDs into the configured Qdrant knowledge
+  collection;
+- preserve source path and chunk provenance;
+- create a distill session for the normal verify/promote path, enqueueing it by
+  default; `--defer-distill` leaves it unqueued for an explicit sole-writer
+  one-shot run;
+- return a JSON receipt containing passage counts, FTS and vector counts, source
+  paths, the distill session ID, and whether it was enqueued.
+
+`gzmo memory search --json` must label every result as either
+`corpus_passage` or `promoted_fact` and report the retrieval channels that
+contributed to its rank. A corpus result satisfies the demo contract only when
+both `fts` and `vector` contributed. A promoted result must carry a fact ID and
+evidence provenance.
+
+The command, result schema, and tests belong in GZMO. `gzmo-demo` consumes the
+first tagged GZMO release containing that contract; it does not implement or
+patch the memory pipeline itself.
+
 ## Packaging Approach
 
 The repository uses a pinned offline release bundle rather than a Git submodule,
@@ -193,20 +231,22 @@ guidance is defense in depth, not a substitute for loopback binding.
 
 1. checks full living health and bundle identity;
 2. creates an isolated demo session and fixture namespace;
-3. ingests the bundled fixture corpus;
+3. ingests the bundled fixture corpus through
+   `gzmo corpus ingest-dir --json --defer-distill`;
 4. queries for a fixture-specific claim;
-5. requires a cited corpus passage and evidence that both FTS and vector paths
-   participated;
-6. enqueues the session through the normal distill pipeline;
+5. requires a `corpus_passage` result and evidence that both FTS and vector
+   channels participated;
+6. uses the returned distill session through the normal distill pipeline;
 7. waits for verify and promote with a bounded timeout;
 8. queries again and requires a promoted fact;
 9. confirms that the corpus passage and promoted fact have distinct labels;
 10. writes text and JSON reports without corpus content or secrets.
 
 The script does not bypass production logic by inserting directly into the
-vault, honeypot, or Qdrant. If the normal pipeline lacks a deterministic
-one-shot trigger, that capability must be added to the main GZMO repository and
-released before `gzmo-demo` consumes it.
+corpus index, vault, honeypot, or Qdrant. It may stop the daemon temporarily,
+run existing one-shot distill/promote/embed commands as the sole writer, and
+restart the daemon under a cleanup trap. Any missing product contract must be
+added to the main GZMO repository and released before `gzmo-demo` consumes it.
 
 ## Failure Semantics
 
@@ -277,8 +317,10 @@ The first release of `gzmo-demo` is complete when:
 3. all runtime endpoints are local-only;
 4. reboot restores the full stack without manual ordering;
 5. a second writer is refused;
-6. the demo proves cited hybrid recall, normal-path verified promotion, and
-   promoted-fact recall;
-7. tampered or incomplete bundles are rejected before host changes;
-8. a failed upgrade preserves the previous active release;
-9. the hardware acceptance command produces passing text and JSON reports.
+6. the pinned GZMO release exposes the corpus-ingest and labeled-search
+   contracts;
+7. the demo proves cited hybrid corpus recall, normal-path verified promotion,
+   and promoted-fact recall;
+8. tampered or incomplete bundles are rejected before host changes;
+9. a failed upgrade preserves the previous active release;
+10. the hardware acceptance command produces passing text and JSON reports.
