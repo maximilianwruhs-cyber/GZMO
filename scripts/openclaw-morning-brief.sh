@@ -32,10 +32,19 @@ freshness() {
 }
 
 # Emit a freshness annotation line for a section source file (no-op if file missing).
+# When the source is older than 24h, also print a STALE warning (hours).
 emit_freshness() {
-    local delta
-    delta="$(freshness "$1")"
-    [[ -n "$delta" ]] && printf '_(freshness: %s)_\n\n' "$delta" || true
+    local f="$1" delta now mt age hours
+    delta="$(freshness "$f")"
+    [[ -n "$delta" ]] || return 0
+    printf '_(freshness: %s)_\n\n' "$delta"
+    now=$(date +%s)
+    mt=$(stat -c %Y "$f" 2>/dev/null || printf '%s' "$now")
+    age=$(( now - mt ))
+    if (( age >= 86400 )); then
+        hours=$(( age / 3600 ))
+        printf '⚠️ STALE: source is %sh old\n\n' "$hours"
+    fi
 }
 
 echo "🌅 GZMO Morning Brief — $(date '+%Y-%m-%d %H:%M %Z')"
@@ -46,6 +55,42 @@ if [[ -f "$DATA/ops-health/latest.md" ]]; then
     echo "## 🏥 Ops Health"
     emit_freshness "$DATA/ops-health/latest.md"
     cat "$DATA/ops-health/latest.md"
+    echo ""
+fi
+
+# Brain Feed (after Ops Health)
+if [[ -f "$DATA/brain-feed/latest.md" ]]; then
+    echo "## 🧠 Brain Feed"
+    emit_freshness "$DATA/brain-feed/latest.md"
+    if [[ -f "$DATA/brain-feed/latest.json" ]]; then
+        python3 - "$DATA/brain-feed/latest.json" <<'PY' 2>/dev/null || true
+import json
+import sys
+
+try:
+    with open(sys.argv[1]) as f:
+        payload = json.load(f)
+except (OSError, json.JSONDecodeError, TypeError):
+    raise SystemExit(0)
+
+if not isinstance(payload, dict):
+    raise SystemExit(0)
+
+verdict = payload.get("verdict")
+counts = payload.get("counts")
+if verdict is None or not isinstance(counts, dict):
+    raise SystemExit(0)
+
+try:
+    pass_n = int(counts.get("pass", 0) or 0)
+    fail_n = int(counts.get("fail", 0) or 0)
+except (TypeError, ValueError):
+    raise SystemExit(0)
+
+print(f"verdict: {verdict}, pass {pass_n} / fail {fail_n}")
+PY
+    fi
+    cat "$DATA/brain-feed/latest.md"
     echo ""
 fi
 

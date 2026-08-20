@@ -48,6 +48,13 @@ if [[ -f "$REPO_ROOT/data-next/research-intel/latest.md" ]]; then
   fi
 fi
 
+# conditional: 🧠 Brain Feed only if source exists
+if [[ -f "$REPO_ROOT/data-next/brain-feed/latest.md" ]]; then
+  if ! grep -qF "🧠 Brain Feed" "$TMPOUT"; then
+    echo "[brief-golden] FAIL: missing '🧠 Brain Feed' (latest.md exists)"; exit 1
+  fi
+fi
+
 # negative: gap parse failed must NOT appear
 if grep -qF "gap parse failed" "$TMPOUT"; then
   echo "[brief-golden] FAIL: 'gap parse failed' found in output"; exit 1

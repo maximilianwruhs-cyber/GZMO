@@ -2,7 +2,7 @@
 Description=GZMO research-intel daily 07:30 UTC (before research-scan 08:00)
 
 [Timer]
-OnCalendar=*-*-* 07:30:00 UTC
+OnCalendar=*-*-* 03:45:00 UTC
 Persistent=true
 AccuracySec=5min
 Unit=gzmo-research-intel.service
