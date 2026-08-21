@@ -1,0 +1,11 @@
+[Unit]
+Description=GZMO research-sota daily 04:15 UTC (after research-intel 03:45, before brief 05:30)
+
+[Timer]
+OnCalendar=*-*-* 04:15:00 UTC
+Persistent=true
+AccuracySec=5min
+Unit=gzmo-research-sota.service
+
+[Install]
+WantedBy=timers.target

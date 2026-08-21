@@ -256,6 +256,20 @@ if [[ -f "$DATA/research-intel/latest.md" ]]; then
     echo ""
 fi
 
+# 🔭 SOTA (Deep Research)
+if [[ -f "$DATA/research-sota/latest.md" ]]; then
+    echo "## 🔭 SOTA (Deep Research)"
+    emit_freshness "$DATA/research-sota/latest.md"
+    rs_lines="$(wc -l < "$DATA/research-sota/latest.md" 2>/dev/null || printf '0')"
+    if [[ "${rs_lines:-0}" -gt 120 ]]; then
+        head -60 "$DATA/research-sota/latest.md" 2>/dev/null || true
+        echo "… (truncated, ${rs_lines} lines total)"
+    else
+        cat "$DATA/research-sota/latest.md"
+    fi
+    echo ""
+fi
+
 # Tinyfolder (latest drop)
 drop_files=("$DATA/tinyfolder-inbox"/drop-*.md)
 if (( ${#drop_files[@]} > 0 )); then
