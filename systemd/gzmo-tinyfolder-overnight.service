@@ -6,8 +6,6 @@ Wants=network-online.target
 
 [Service]
 Type=oneshot
-User=maximilian
-Group=maximilian
 WorkingDirectory=/opt/gzmo
 Environment=GZMO_CONFIG=/opt/gzmo/gzmo.toml
 Environment=TINYFOLDER_INBOX=/opt/gzmo/data/inbox

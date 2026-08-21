@@ -62,8 +62,11 @@ stamp = now.strftime("%Y%m%dT%H%M%SZ")
 day = now.strftime("%Y-%m-%d")
 
 
-def write_drop(body: str, title: str) -> Path:
-    name = f"drop-{stamp}-{uuid.uuid4().hex[:6]}.md"
+def write_drop(body: str, title: str, stable_name: str = None) -> Path:
+    if stable_name:
+        name = stable_name  # idempotent: overwrite in place, never accumulate
+    else:
+        name = f"drop-{stamp}-{uuid.uuid4().hex[:6]}.md"
     path = inbox / name
     fm = (
         "---\n"
@@ -80,10 +83,14 @@ def write_drop(body: str, title: str) -> Path:
 
 staged = []
 if mode == "demo":
+    # Stable name: the Brain Feed gate calls this every 30 min — a fresh
+    # timestamped file per run is how 571 identical demo drops accumulated
+    # in 30 days. One file, overwritten in place.
     p = write_drop(
         "TinyFolder demo drop: remember that drop-folder notes should reach "
         "distill/ingest overnight without requiring the CLI chat surface.",
         "tinyfolder-demo",
+        stable_name="drop-tinyfolder-demo.md",
     )
     staged.append(str(p))
 elif mode == "file" and src:
@@ -235,6 +242,39 @@ if living:
             except Exception:
                 pass
 
+# Living on-ramp: copy staged real drops to CT101 inbox (idempotent), then move
+# the local copy to processed/ — CT101 owns metabolism from there. Demo mode skips.
+sync_living = os.environ.get("TINYFOLDER_SYNC_LIVING", "1") == "1"
+living_inbox = os.environ.get("CT101_TINYFOLDER_INBOX", "/opt/gzmo/data/inbox")
+synced, sync_errors = [], []
+if sync_living and mode in ("file", "scan"):
+    for path in staged:
+        p = Path(path)
+        try:
+            body_text = p.read_text(encoding="utf-8")
+        except Exception as e:
+            sync_errors.append(f"{p.name}:read:{e}")
+            continue
+        if "title: tinyfolder-demo" in body_text:
+            continue  # gate warm-up spam never feeds the living host
+        cmd = f"test -e {living_inbox}/{p.name} || cat > {living_inbox}/{p.name}"
+        try:
+            r = subprocess.run(
+                ["ssh", "-o", "ConnectTimeout=12", "-o", "BatchMode=yes", host, cmd],
+                input=body_text,
+                text=True,
+                capture_output=True,
+                timeout=30,
+            )
+            if r.returncode == 0:
+                (inbox / "processed" / p.name).parent.mkdir(parents=True, exist_ok=True)
+                p.rename(inbox / "processed" / p.name)
+                synced.append(str(p))
+            else:
+                sync_errors.append(f"{p.name}:{(r.stderr or r.stdout or '')[:120]}")
+        except Exception as e:  # keep the local pending file for retry
+            sync_errors.append(f"{p.name}:{e}")
+
 ok = False if (living and dual_writer) else True
 if apply and apply_error:
     ok = False
@@ -246,6 +286,8 @@ payload = {
     "inbox": str(inbox),
     "staged": staged,
     "count": len(staged),
+    "synced_to_living": synced,
+    "sync_errors": sync_errors,
     "queue": str(qfile),
     "living": living,
     "apply_takeaway": apply,
