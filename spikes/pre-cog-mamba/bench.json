@@ -1,0 +1,28 @@
+{
+  "model": "mamba-130m-q8_0",
+  "model_path": "/home/gzmo/models/pre-cog-mamba/mamba-130m/mamba-130m-q8_0.gguf",
+  "corpus_tokens": 16898,
+  "corpus_files": "docs/ADR-0003-one-instance-metabolism.md docs/ADR-0004-airgap-living-usp.md docs/ADR-0005-flywheel-over-frozen-topology.md docs/ADR-0006-owner-control-plane.md docs/ADR-0007-one-product-living.md docs/ADR-0008-edge-ssm-memory.md docs/GZMO_NEXT_RUNBOOK.md docs/PI_UPGRADE_RUNBOOK.md",
+  "state_size_bytes": 2869892,
+  "full_prefill": {
+    "ttft_ms_median": 276.241,
+    "tok_per_s": 1172.03,
+    "ttft_ms_runs": [312.088,276.557,276.241,275.717,276.084],
+    "answers": ["\nADR-0004 describes the airgapped living system.\n\nA:\n\nA:\n\nA:\n\nA:\n\nA:\n\nA:\n\nA:\n\nA:\n\nA:\n\nA:\n\nA:\n\nA:", "\n  - The flywheel approach is a good one for the flywheel approach.\n  - It is a good one for the flywheel approach.\n  - It is a good one for the flywheel approach.\n  - It is a good one for the flywhee", " The ADR-0006 is a process lock.\nQ: What is the ADR-0006\u2019s process lock?\n\nA: The ADR-0006\u2019s process lock is a process lock.\n\nQ: How do I get the ADR-0006\u2019s process lock", "\n\nQ: What does ADR-0007 say about the lite SKU?\nA: The lite SKU is the same as the lite version of the ADR-0007.\nQ: What does the lite version of the ADR-0007 say?\nA:", " The ADR-0008 is a new feature in the ADR-0008. It is a new feature\n  that allows for the ADR-0008 to be used in the same way as the ADR-0008\n  (as a single-threaded SSM) in the same way"]
+  },
+  "injection": {
+    "ttft_ms_median": 4.14,
+    "ttft_ms_runs": [4.442,4.14,4.22,3.976,4.013],
+    "answers": [" The key USP of the airgapped living system is the ability to detect and track the presence of airgapped living systems.\n\nA:\n\nThe ADR-0004 is a very good example of a system that is not a \"real\" airga", " The flywheel approach is a very simple approach to the problem. It is a simple method to get the desired output.\n\nA:\n\nI think the answer is that the flywheel approach is a very simple method to get t", " The living writer is a process that is responsible for writing the live text.\n\nA:\n\nThe living writer is a process that is responsible for writing the live text.\n\nA:\n\nThe living writer is a process th", " It is a generic ADR-0007, which is a generic ADR-0007.\nQ: What is the difference between ADR-0007 and ADR-000?\nA: ADR-000 is a generic ADR-0007, which is a generic ADR-0007", " ADR-0008 is a new feature in the ADR-000 series of memory controllers. It is a new feature that allows the use of ADR-0008 memory controllers to support the use of SSM memory.\n\nA:\n\nADR-0008 is a new "]
+  },
+  "speedup_ratio": 66.72,
+  "runs": 5,
+  "caveats": [
+    "mamba-130m-q8_0 is a small general model — quality is INDICATIVE only; the claim under test is the LATENCY mechanism, quality at 7B-class is a separate gate",
+    "full-prefill TTFT = prompt eval time (time to first token after processing the full corpus)",
+    "injection TTFT = prompt eval time after restoring saved mamba state (corpus not in prompt)",
+    "n_predict=64 for answer generation; TTFT measures prefill only",
+    "GPU: 2x RTX 5070 Ti, production :8000 server (qwen3.8-27b) running concurrently",
+    "temperature=0.0 for determinism"
+  ]
+}

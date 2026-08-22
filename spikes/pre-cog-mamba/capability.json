@@ -1,0 +1,19 @@
+{
+  "inference": "supported",
+  "state_save": "supported",
+  "state_load": "supported",
+  "mechanism": "llama.cpp llama_state_seq_save_file/llama_state_seq_load_file serialize the mamba SSM recurrent state (R and S tensors per layer) via llama_memory_recurrent::state_write_data/state_read_data. Server API: POST /slots/:id?action=save (serializes slot recurrent state + prompt tokens to file), POST /slots/:id?action=restore (loads saved state into slot, populating recurrent memory). CLI: --prompt-cache uses llama_state_save_file/llama_state_load_file (same path). Empirical: 16912-token corpus state saved to 2.87 MB file, restored into fresh slot, query with only 26 prompt tokens (5.5ms prefill) vs 16912 tokens (275ms) full prefill.",
+  "evidence": [
+    "/home/gzmo/llama.cpp/src/llama-arch.cpp (LLM_ARCH_MAMBA registered)",
+    "/home/gzmo/llama.cpp/src/llama-model.cpp:159-162 (llama_model_mamba/mamba2)",
+    "/home/gzmo/llama.cpp/src/llama-memory-recurrent.cpp:866-948 (state_write_data serializes R and S tensors per layer)",
+    "/home/gzmo/llama.cpp/src/llama-memory-recurrent.cpp:964+ (state_read_data restores R and S tensors)",
+    "/home/gzmo/llama.cpp/src/llama-context.cpp:3078-3093 (state_save_file calls state_write_data)",
+    "/home/gzmo/llama.cpp/src/llama-context.cpp:3035-3077 (state_load_file calls state_read_data)",
+    "/home/gzmo/llama.cpp/include/llama.h:845-855 (llama_state_save_file/llama_state_load_file API)",
+    "/home/gzmo/llama.cpp/tools/server/server-context.cpp:2602 (slot save: llama_state_seq_save_file)",
+    "/home/gzmo/llama.cpp/tools/server/server-context.cpp:2640 (slot restore: llama_state_seq_load_file)",
+    "/home/gzmo/llama.cpp/tools/server/README.md:1081 (POST /slots/:id?action=save documented)",
+    "empirical: 16912-token mamba state saved (2.87 MB), restored, injection query prefill=26 tokens vs full=16912"
+  ]
+}
