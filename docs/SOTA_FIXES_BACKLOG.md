@@ -117,6 +117,14 @@
 - **Warum nicht jetzt:** 478 Vektoren → kein HNSW-Scale-Gewinn; Migration `rusqlite→sqlx` + Sidecar-Wechsel = invasiv.
 - **Gate-Kriterien:** G1 recall@10 ≥ 95 % des aktuellen RRF-Pfads, G2 p50 ≤ 1.5×, G3 lossless import (1870/1774/1747, dim 1024), G4 clean teardown.
 - **Aktion:** ADR-0009 Proposed → Spike `spikes/pgvector` → danach Phase-2/3 als eigene ADRs.
+- **Spike-Verdict (2026-08-22):** **GO** — recall@10 8/12 (Parität), in-SQL p50 5,2 ms, lossless import, clean teardown. ADR-0009 Phase 2/3 durch ADR-0010 ersetzt (Clean-Sheet-Prototyp vor In-Place-Migration).
+
+### CSB — Clean-Sheet One-Box Living Memory Prototype
+- **Quelle:** Operator-Session 2026-08-22 (Backup der 1881 Fakten gefroren: `ct101:/opt/gzmo/backup/facts-20260822T2010/`); SOTA-Analyse (Mem0/Zep/Letta: 1 Store statt 3); Beweise aus ADR-0008/0009-Spikes.
+- **Warum:** 3 State-Stores + 4 Sidecars bei ~1,9k Fakten = Overengineering; Drift-Failure-Mode (45 Punkte) nur lösbar durch 1 Store. Konzept ist SOTA, Architektur 3× zu schwer.
+- **ADR:** [ADR-0010-clean-sheet-onebox.md](ADR-0010-clean-sheet-onebox.md) — Proposed, gated. Workstation `/home/gzmo/gzmo-prototype/`, Port `:5433`, null Produktion-Kontakt.
+- **Gate-Kriterien:** P1 box steht + minimaler Kreis (enqueue→distill→facts→MCP search); P2 atomares Supersede + Energy-Ledger; P3 ≥8/12 auf `memoryarena-12q` + 24h-Soak. Cutover = eigenes ADR (Phase 4).
+- **Status:** ADR drafted 2026-08-22, wartet auf Max GO für Phase 1 (scaffold + minimal circle, manuell getriggert, kein Timer).
 
 ---
 
