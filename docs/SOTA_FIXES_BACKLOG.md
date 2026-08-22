@@ -112,6 +112,12 @@
   3. Migration path that keeps ADR-0003 single-writer + ADR-0004 airgap intact
 - **Spike-Verdict:** HOLD (baseline demonstrates real weakness: 14% on multi-session interdependent tasks; pending migration path verification)
 
+### PGV — pgvector-Vault-Konsolidierung (SQLite SoT + Qdrant-Mirror → Postgres16+pgvector)
+- **Quelle:** ADR-0009, this PR; research-sota NeuronDB 2026-08-21 as rejected alternative
+- **Warum nicht jetzt:** 478 Vektoren → kein HNSW-Scale-Gewinn; Migration `rusqlite→sqlx` + Sidecar-Wechsel = invasiv.
+- **Gate-Kriterien:** G1 recall@10 ≥ 95 % des aktuellen RRF-Pfads, G2 p50 ≤ 1.5×, G3 lossless import (1870/1774/1747, dim 1024), G4 clean teardown.
+- **Aktion:** ADR-0009 Proposed → Spike `spikes/pgvector` → danach Phase-2/3 als eigene ADRs.
+
 ---
 
 ## REJECTED (Doktrin-Konflikt / Hype — nur dokumentiert, nicht umgesetzt)
