@@ -271,7 +271,15 @@ if [[ -f "$DATA/research-sota/latest.md" ]]; then
 fi
 
 # Tinyfolder (latest drop)
-drop_files=("$DATA/tinyfolder-inbox"/drop-*.md)
+drop_files=()
+for f in "$DATA/tinyfolder-inbox"/drop-*.md; do
+    [[ -f "$f" ]] || continue
+    # drop-tinyfolder-demo.md is a synthetic self-test artifact (re-staged by
+    # the Brain Feed gate every 30 min); exclude it so it never surfaces as
+    # the "latest drop" in the operator brief.
+    [[ "$(basename "$f")" == "drop-tinyfolder-demo.md" ]] && continue
+    drop_files+=("$f")
+done
 if (( ${#drop_files[@]} > 0 )); then
     latest_drop="$(newest_file "${drop_files[@]}")"
     echo "## 📦 TinyFolder (latest drop)"

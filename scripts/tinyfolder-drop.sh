@@ -118,7 +118,21 @@ else:
 queue = Path(os.environ["DATA"]) / "distill-queue"
 queue.mkdir(parents=True, exist_ok=True)
 qfile = queue / f"tinyfolder-{day}.jsonl"
+# Dedup: a day's queue file may already contain a row for this path (the
+# Brain Feed gate re-stages the demo drop every 30 min; scan-mode re-scans
+# the same pending file). Skip the append in that case — the FIRST append
+# per path per day wins and its `ts` is preserved. File-mode drops use
+# timestamped/unique names so they are never affected.
+seen_paths = set()
+if qfile.exists():
+    for line in qfile.read_text(encoding="utf-8").splitlines():
+        try:
+            seen_paths.add(json.loads(line).get("path"))
+        except Exception:
+            pass
 for path in staged:
+    if path in seen_paths:
+        continue
     row = {
         "ts": now.isoformat(),
         "source": "tinyfolder",
