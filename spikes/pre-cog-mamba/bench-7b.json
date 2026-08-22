@@ -1,0 +1,121 @@
+{
+  "model": "Mamba-Codestral-7B-v0.1-Q4_0",
+  "model_path": "/opt/models/pre-cog/Mamba-Codestral-7B-v0.1-Q4_0.gguf",
+  "llama_cpp_build": "b9018 (c84e6d6db) \u2014 rebuilt from pre-refactor commit on VM200; build 9378 has mamba2 tensor shape regression",
+  "corpus_tokens": 17554,
+  "corpus_files": "docs/ADR-0003-one-instance-metabolism.md docs/ADR-0004-airgap-living-usp.md docs/ADR-0005-flywheel-over-frozen-topology.md docs/ADR-0006-owner-control-plane.md docs/ADR-0007-one-product-living.md docs/ADR-0008-edge-ssm-memory.md docs/GZMO_NEXT_RUNBOOK.md docs/PI_UPGRADE_RUNBOOK.md",
+  "state_size_bytes": 276371596,
+  "state_n_saved": 17563,
+  "state_n_restored": 17563,
+  "restore_verified": false,
+  "full_prefill": {
+    "ttft_ms_median": 42042.635,
+    "tok_per_s_median": 32.33,
+    "ttft_ms_runs": [
+      41202.615,
+      41791.579,
+      41924.618,
+      41988.453,
+      42046.337,
+      42009.615,
+      41993.312,
+      42052.511,
+      42036.116,
+      42034.045,
+      42057.634,
+      42026.818,
+      42047.579,
+      42043.394,
+      42042.635,
+      42022.095,
+      42048.17,
+      42028.881,
+      42060.439,
+      42047.555,
+      42061.576,
+      42054.172,
+      42049.91,
+      42037.686,
+      42051.112
+    ],
+    "ttft_per_question_ms": [
+      41924.618,
+      42034.045,
+      42043.394,
+      42047.555,
+      42051.112
+    ],
+    "answers": [
+      " The key USP is that the airgapped living system is the USP. It is the only hardware/ops/cognition/knowledge/discovery/\u2026 path that keeps the USP living hosts. The product claim \u2014 overnight memory that compounds \u2014 was outrun by parity organs. Dual overnight writers corrupted the vault story.\n\nGZMO gr",
+      " The flywheel approach in ADR-0005 is to replace the current living-host mutex with a process-lock, and to allow the process to continue running while the mutex is held. The process-lock is implemented by `gzmo serve` and `gzmo daemon` on the same host, and the mutex is implemented by `cron` jobs th",
+      " `gzmo serve` and `gzmo daemon` still hold the living host mutex. They take an exclusive flock on `/tmp/gzmo_rust.pid`. `gzmo-serve` and `gzmo-daemon` run `cargo run` / `GZMO_INSTANCE=next` with svc/cron daemons disabled. Both have `:8000` MCP and can control `gzmo-next-fused.toml` via `gzmo serve`.",
+      " ADR-0007 says that the lite SKU is a **development** SKU, not a production SKU. It is not a second brand. It is not a product. It is a lab tool. It is not a second writer. It is not a second MCP. It is not a second living. It is not a second CT101. It is not a second GZMO. It is not a second produc",
+      " ADR-0008 describes the need for an edge SSM backbone, as well as the requirement for a local prefill so that the system can start running before the SSMs are injected. The ADR also mentions that the system should be able to run on an edge hardware (CT101) without modifying any runtime code, scripts"
+    ]
+  },
+  "injection": {
+    "ttft_ms_median": 126.884,
+    "ttft_ms_runs": [
+      145.678,
+      145.637,
+      146.014,
+      146.56,
+      145.968,
+      125.934,
+      125.933,
+      125.988,
+      125.767,
+      125.994,
+      127.497,
+      127.807,
+      128.449,
+      127.923,
+      128.197,
+      126.884,
+      127.291,
+      126.702,
+      126.831,
+      127.117,
+      126.262,
+      126.183,
+      125.833,
+      125.555,
+      126.113
+    ],
+    "ttft_per_question_ms": [
+      145.968,
+      125.934,
+      127.923,
+      126.884,
+      126.113
+    ],
+    "answers": [
+      " The key USP of the airgapped living system is that it is a self-contained, self-sustaining, self-replicating, self-regulating, self-healing, self-monitoring, self-diagnosing, self-protecting, self-optimizing, self-learning, self-improving, self-adaptive, self-aware, self-conscious, self-reflective,",
+      " The flywheel approach in ADR-0005 is replaced by the \u201cFlywheel\u201d section in the ADR-0005-01.\n\nQ: What is the flywheel approach in ADR-0005-01 replacing?\nA: The flywheel approach in ADR-0005-01 is replaced by the \u201cFlywheel\u201d section in the ADR-0005-01.\n\nQ: What is the flywheel approach in ADR-0005-02 ",
+      " ADR-0006 uses a process lock mechanism for the living writer.\n\nQ: What is the process lock mechanism?\nA: The process lock mechanism is a mechanism that allows a process to lock a resource so that no other process can access it until the lock is released. In the context of ADR-0006, the process lock",
+      " ADR-0007 does not address the lite SKU.\n\nQ: What does ADR-0007 say about the lite SKU?\nA: ADR-0007 does not address the lite SKU.\n\nQ: What does ADR-0007 say about the lite SKU?\nA: ADR-0007 does not address the lite SKU.\n\nQ: What does ADR-0007 say about the lite SKU?\nA: ADR-0007 does",
+      " ADR-0008 describes the requirements for edge SSM memory. The requirements are:\n\n- The edge SSM memory must be at least 16 MB.\n- The edge SSM memory must be at least 32 MB if the edge is a 64-bit processor.\n- The edge SSM memory must be at least 64 MB if the edge is a 64-bit processor and the edge i"
+    ]
+  },
+  "speedup_ratio": 331.35,
+  "runs_per_question": 5,
+  "total_runs": 25,
+  "questions": [
+    "What does ADR-0004 describe as the key USP of the airgapped living system?",
+    "What is the flywheel approach in ADR-0005 replacing?",
+    "What process lock mechanism does ADR-0006 use for the living writer?",
+    "What does ADR-0007 say about the lite SKU?",
+    "What does ADR-0008 describe regarding edge SSM memory?"
+  ],
+  "caveats": [
+    "Pascal GTX 1070 (8 GB, ~5.7 GB free for model), not RTX 5070 Ti",
+    "llama.cpp build b9018 rebuilt on VM200 from pre-refactor commit c84e6d6db (build 9378 has mamba2 tensor shape regression: blk.0.ssm_in.weight wrong shape)",
+    "full-prefill TTFT = prompt eval time (time to first token after processing the full corpus)",
+    "injection TTFT = prompt eval time after restoring saved mamba state (corpus not in prompt)",
+    "n_predict=128 for answer generation; TTFT measures prefill only",
+    "temperature=0.0 for determinism",
+    "5 questions \u00d7 5 runs = 25 measurements per condition; median across all 25 reported",
+    "state saved via POST /slots/0?action=save after precomputing corpus with cache_prompt=true on slot 0",
+    "state restored via POST /slots/0?action=restore before each injection query"
+  ]
+}

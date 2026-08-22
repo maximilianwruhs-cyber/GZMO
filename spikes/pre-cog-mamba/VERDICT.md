@@ -48,3 +48,58 @@ The latency mechanism is proven and compelling (66.72× TTFT reduction). However
 2. Does state injection preserve answer quality equivalently to full-prefill (no quality degradation from the state save/load round-trip)?
 
 Only if quality parity holds at 7B should Option A proceed to GO. If quality degrades under injection, the mechanism is latency-valid but quality-invalid, requiring a different architecture (e.g., hybrid mamba-attention with KV-cache-aware state serialization).
+
+---
+
+## 7B-class probe (VM200, 2026-08-22) — **NEGATIVE: restore is a content no-op**
+
+**Model:** Mamba-Codestral-7B-v0.1-Q4_0 (Jamba hybrid) on VM200 GTX 1070 (`:8123`,
+llama.cpp build b9018 rebuilt from pre-refactor commit c84e6d6db). Corpus 17,554 tokens.
+
+### Latency numbers (bench-7b.json)
+
+| Metric | Full-Prefill | Injection | "Speedup" |
+|---|---|---|---|
+| TTFT (median of 25 runs, ms) | 42,042.6 | 126.9 | 331.35× |
+| State file | — | 276,371,596 B (276 MB) | save 450 ms / restore 210 ms |
+
+### But `restore_verified: false` — the decisive control test
+
+Question answerable ONLY from the corpus (Prime port = **8000**):
+
+| Condition | Answer (start) |
+|---|---|
+| Full-prefill | `8000 (`gzmo serve`)…` ✅ corpus fact retrieved |
+| Injection (save→restore→query) | `8080 B: 8081 C: 8082 D: 8083 — correct answer B: 80…` ❌ |
+| Zero-context | **byte-identical to injection** ❌ |
+
+Save/restore report byte-level success (n_saved = n_restored = 17563), but the restored
+state does **not** contribute to inference on this build. The 331× figure is a
+prompt-length artifact (prefill 17,554 tokens vs prefill ~20 tokens with NO corpus),
+NOT working O(1) state injection. See `decisive-control.md`.
+
+### Correction to the earlier "mechanism proven" claim (Run C, 130m)
+
+The 66.7× TTFT gap from the 130m run was the same prompt-length artifact. With garbage
+answers in both conditions, no content test was possible at 130m — attributing "mechanism
+proven" to that run was premature. Withdrawn.
+
+### Verdict: **NO-GO** for ADR-0008 Option A (Mamba route) on the current llama.cpp build
+
+1. Slot save/restore is a content no-op on build b9018 for the Jamba hybrid — the
+   state-injection mechanism does NOT reproduce on GZMO's llama.cpp.
+2. Quality at 7B: full-prefill answers were superficially on-topic but shallow
+   (see bench-7b.json answers); no parity claim is possible while restore is a no-op.
+3. The 276 MB state file (vs 2.87 MB at 130m) also undercuts the "192 KB hidden state"
+   selling point for this model class — Jamba serializes attention + mamba state per layer.
+
+### Re-open conditions (any of)
+- A llama.cpp build where `/slots/:id?action=restore` demonstrably changes subsequent
+  inference (verify with a corpus-only-fact question, as in `decisive-control.md`),
+  OR a dedicated state-injection API that wires restored state into the active slot.
+- A non-hybrid SSM (pure mamba-780m-class) where state save/load is the ONLY recurrent
+  memory — re-run the decisive control there before any latency claim.
+
+*Probe by operator (bench-7b.py executed after delegated worker timed out at 90 min;
+worker had produced BASELINE-EMBED.md + scripts). VM200 :8123 stopped, router :8081 healthy,
+workstation :8000 untouched throughout.*

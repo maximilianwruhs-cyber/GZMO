@@ -1,0 +1,76 @@
+Server health: {'status': 'ok'}
+Corpus tokens: 17554
+
+=== (a) FULL-PREFILL (5 questions × 5 runs) ===
+  Q1 run 1: TTFT=41202.615ms tok/s=32.4
+  Q1 run 2: TTFT=41791.579ms tok/s=32.36
+  Q1 run 3: TTFT=41924.618ms tok/s=32.4
+  Q1 run 4: TTFT=41988.453ms tok/s=32.32
+  Q1 run 5: TTFT=42046.337ms tok/s=32.47
+  Q2 run 1: TTFT=42009.615ms tok/s=32.33
+  Q2 run 2: TTFT=41993.312ms tok/s=32.29
+  Q2 run 3: TTFT=42052.511ms tok/s=32.29
+  Q2 run 4: TTFT=42036.116ms tok/s=32.32
+  Q2 run 5: TTFT=42034.045ms tok/s=32.33
+  Q3 run 1: TTFT=42057.634ms tok/s=32.38
+  Q3 run 2: TTFT=42026.818ms tok/s=32.45
+  Q3 run 3: TTFT=42047.579ms tok/s=32.31
+  Q3 run 4: TTFT=42043.394ms tok/s=32.29
+  Q3 run 5: TTFT=42042.635ms tok/s=32.31
+  Q4 run 1: TTFT=42022.095ms tok/s=32.31
+  Q4 run 2: TTFT=42048.17ms tok/s=32.37
+  Q4 run 3: TTFT=42028.881ms tok/s=32.39
+  Q4 run 4: TTFT=42060.439ms tok/s=32.28
+  Q4 run 5: TTFT=42047.555ms tok/s=32.36
+  Q5 run 1: TTFT=42061.576ms tok/s=32.29
+  Q5 run 2: TTFT=42054.172ms tok/s=32.31
+  Q5 run 3: TTFT=42049.91ms tok/s=32.35
+  Q5 run 4: TTFT=42037.686ms tok/s=32.32
+  Q5 run 5: TTFT=42051.112ms tok/s=32.38
+FULL-PREFILL median TTFT: 42042.635ms, median tok/s: 32.33
+
+=== (b) PRECOMPUTE corpus into slot 0 ===
+precompute done
+save: {'id_slot': 0, 'filename': 'bench-7b-state.bin', 'n_saved': 17563, 'n_written': 276371596, 'timings': {'save_ms': 450.178}}
+
+=== Restore verification ===
+restore: {'id_slot': 0, 'filename': 'bench-7b-state.bin', 'n_restored': 17563, 'n_read': 276371596, 'timings': {'restore_ms': 210.416}}
+injection test answer:  The key USP of the airgapped living system is that it is a self-contained, self-sustaining, self-replicating, self-regulating, self-healing, self-monitoring, self-diagnosing, self-protecting, self-op
+zero-context test answer:  The key USP of the airgapped living system is that it is a self-contained, self-sustaining, self-replicating, self-regulating, self-healing, self-monitoring, self-diagnosing, self-protecting, self-op
+full-prefill test answer:  The key USP is that the airgapped living system is the USP. It is the only hardware/ops/cognition/knowledge/discovery/… path that keeps the USP living hosts. The product claim — overnight memory that
+RESTORE NOT VERIFIED: injection answer same as zero-context (restore may be no-op or model ignores injected state)
+
+=== (c) INJECTION (5 questions × 5 runs) ===
+  Q1 run 1: TTFT=145.678ms
+  Q1 run 2: TTFT=145.637ms
+  Q1 run 3: TTFT=146.014ms
+  Q1 run 4: TTFT=146.56ms
+  Q1 run 5: TTFT=145.968ms
+  Q2 run 1: TTFT=125.934ms
+  Q2 run 2: TTFT=125.933ms
+  Q2 run 3: TTFT=125.988ms
+  Q2 run 4: TTFT=125.767ms
+  Q2 run 5: TTFT=125.994ms
+  Q3 run 1: TTFT=127.497ms
+  Q3 run 2: TTFT=127.807ms
+  Q3 run 3: TTFT=128.449ms
+  Q3 run 4: TTFT=127.923ms
+  Q3 run 5: TTFT=128.197ms
+  Q4 run 1: TTFT=126.884ms
+  Q4 run 2: TTFT=127.291ms
+  Q4 run 3: TTFT=126.702ms
+  Q4 run 4: TTFT=126.831ms
+  Q4 run 5: TTFT=127.117ms
+  Q5 run 1: TTFT=126.262ms
+  Q5 run 2: TTFT=126.183ms
+  Q5 run 3: TTFT=125.833ms
+  Q5 run 4: TTFT=125.555ms
+  Q5 run 5: TTFT=126.113ms
+INJECTION median TTFT: 126.884ms
+SPEEDUP RATIO: 331.35x
+
+=== bench-7b.json written to /home/gzmo/github-clone/GZMO/spikes/pre-cog-mamba/bench-7b.json ===
+Full-prefill median: 42042.635ms
+Injection median: 126.884ms
+Speedup: 331.35x
+Restore verified: False

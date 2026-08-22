@@ -1,0 +1,439 @@
+{
+  "date": "2026-08-22",
+  "method": "embed-path (router http://192.168.31.110:8081/v1/embeddings \u2192 Qdrant 127.0.0.1:6333 honeypot)",
+  "embed_model": "gzmo-embed (Qwen3-Embedding-0.6B-Q8_0.gguf, 1024-dim)",
+  "qdrant_collection": "honeypot",
+  "qdrant_points": 685,
+  "qdrant_reachable": true,
+  "embed_reachable": true,
+  "score_top1": "8/12",
+  "score_top5": "9/12",
+  "results": [
+    {
+      "id": "Q1",
+      "question": "What is CT101's role in the GZMO architecture?",
+      "category": "single-fact",
+      "expected_keywords": [
+        "CT101",
+        "frozen reference",
+        "living host",
+        "reference living"
+      ],
+      "method": "embed",
+      "top_hit": "[SYSTEM:Session] GZMO is a daemon-based AI ecosystem with a distillation pipeline (prep \u2192 extract \u2192 verify \u2192 promote \u2192 honeypot \u2192 ripen) for memory consolidation.",
+      "top_score": 0.70571303,
+      "hit_yes": false,
+      "found_keywords": [],
+      "top5_any_hit": false,
+      "top5_hits": [],
+      "notes": "Found keywords: none; score=0.7057; top5_any_hit=False"
+    },
+    {
+      "id": "Q2",
+      "question": "What is the dual-writer rule? Can two overnight writers run on the same vault?",
+      "category": "single-fact",
+      "expected_keywords": [
+        "dual-writer",
+        "two overnight writers",
+        "never two",
+        "single writer"
+      ],
+      "method": "embed",
+      "top_hit": "[PATH:vault_db] Living SQLite authority is data-next/vault.db (semantic_vault + honeypot + evidence); stop writers before destructive maintenance.",
+      "top_score": 0.45825535,
+      "hit_yes": false,
+      "found_keywords": [],
+      "top5_any_hit": false,
+      "top5_hits": [],
+      "notes": "Found keywords: none; score=0.4583; top5_any_hit=False"
+    },
+    {
+      "id": "Q3",
+      "question": "What is the Prime inference server and what port does it run on?",
+      "category": "single-fact",
+      "expected_keywords": [
+        "Prime",
+        "8000",
+        "127.0.0.1:8000",
+        "OpenAI-compatible"
+      ],
+      "method": "embed",
+      "top_hit": "[SERVICE:Prime] Production cognition for the living instance is the OpenAI-compatible server at http://127.0.0.1:8000/v1 (chat, ingest extract/verify, dream, spark).",
+      "top_score": 0.75808936,
+      "hit_yes": true,
+      "found_keywords": [
+        "Prime",
+        "8000",
+        "127.0.0.1:8000",
+        "OpenAI-compatible"
+      ],
+      "top5_any_hit": true,
+      "top5_hits": [
+        {
+          "score": 0.75808936,
+          "found": [
+            "Prime",
+            "8000",
+            "127.0.0.1:8000",
+            "OpenAI-compatible"
+          ],
+          "content": "[SERVICE:Prime] Production cognition for the living instance is the OpenAI-compatible server at http://127.0.0.1:8000/v1 (chat, ingest extract/verify, dream, spark)."
+        },
+        {
+          "score": 0.6975772,
+          "found": [
+            "Prime",
+            "8000"
+          ],
+          "content": "[SERVICE:Prime] systemd unit llama-prime.service may be inactive while a manual llama-server still answers on :8000 \u2014 judge LLM health by /v1/models, not unit LED alone."
+        }
+      ],
+      "notes": "Found keywords: Prime, 8000, 127.0.0.1:8000, OpenAI-compatible; score=0.7581; top5_any_hit=True"
+    },
+    {
+      "id": "Q4",
+      "question": "What does Obolus do in the AOS energy routing chain?",
+      "category": "single-fact",
+      "expected_keywords": [
+        "Obolus",
+        "IPW",
+        "inverse-propensity",
+        "propensity scores"
+      ],
+      "method": "embed",
+      "top_hit": "[CONCEPT:Obolus] Obolus/task routing and metering lessons from CT101 inform GatewayRouter task kinds; living chat still centers the active engine profile for primary turns.",
+      "top_score": 0.73053604,
+      "hit_yes": true,
+      "found_keywords": [
+        "Obolus"
+      ],
+      "top5_any_hit": true,
+      "top5_hits": [
+        {
+          "score": 0.73053604,
+          "found": [
+            "Obolus"
+          ],
+          "content": "[CONCEPT:Obolus] Obolus/task routing and metering lessons from CT101 inform GatewayRouter task kinds; living chat still centers the active engine profile for primary turns."
+        },
+        {
+          "score": 0.7024145,
+          "found": [
+            "Obolus"
+          ],
+          "content": "[SYSTEM:Obolus] Task routing and metering lessons from CT101 inform GatewayRouter task kinds"
+        }
+      ],
+      "notes": "Found keywords: Obolus; score=0.7305; top5_any_hit=True"
+    },
+    {
+      "id": "Q5",
+      "question": "What are the stages of the GZMO distillation pipeline?",
+      "category": "single-fact",
+      "expected_keywords": [
+        "extract",
+        "verify",
+        "promote",
+        "vault",
+        "honeypot"
+      ],
+      "method": "embed",
+      "top_hit": "[DECISION:Session] GZMO uses a distillation pipeline with stages: prep \u2192 extract \u2192 verify \u2192 promote \u2192 honeypot \u2192 ripen.",
+      "top_score": 0.9114679,
+      "hit_yes": true,
+      "found_keywords": [
+        "extract",
+        "verify",
+        "promote",
+        "honeypot"
+      ],
+      "top5_any_hit": true,
+      "top5_hits": [
+        {
+          "score": 0.9114679,
+          "found": [
+            "extract",
+            "verify",
+            "promote",
+            "honeypot"
+          ],
+          "content": "[DECISION:Session] GZMO uses a distillation pipeline with stages: prep \u2192 extract \u2192 verify \u2192 promote \u2192 honeypot \u2192 ripen."
+        },
+        {
+          "score": 0.8330247,
+          "found": [
+            "extract",
+            "verify",
+            "promote",
+            "honeypot"
+          ],
+          "content": "[SYSTEM:Session] GZMO has a full distillation pipeline (prep \u2192 extract \u2192 verify \u2192 promote \u2192 honeypot \u2192 ripen) in gzmo-core but has never been fed data."
+        }
+      ],
+      "notes": "Found keywords: extract, verify, promote, honeypot; score=0.9115; top5_any_hit=True"
+    },
+    {
+      "id": "Q6",
+      "question": "ADR-0003 originally said CT101 is frozen reference, then ADR-0005 amended this. What is the current state of CT101 vs workstation living-host placement?",
+      "category": "multi-session",
+      "expected_keywords": [
+        "mutex",
+        "claim",
+        "living host",
+        "CT101",
+        "workstation",
+        "promote-by-loop"
+      ],
+      "method": "embed",
+      "top_hit": "[POLICY:ADR0003] ADR-0003 (2026-07-16): the workstation is the sole living instance; CT101 is a frozen reference machine, not a permanent dual-stack product.",
+      "top_score": 0.746071,
+      "hit_yes": true,
+      "found_keywords": [
+        "CT101",
+        "workstation"
+      ],
+      "top5_any_hit": true,
+      "top5_hits": [
+        {
+          "score": 0.746071,
+          "found": [
+            "CT101",
+            "workstation"
+          ],
+          "content": "[POLICY:ADR0003] ADR-0003 (2026-07-16): the workstation is the sole living instance; CT101 is a frozen reference machine, not a permanent dual-stack product."
+        },
+        {
+          "score": 0.58592284,
+          "found": [
+            "CT101"
+          ],
+          "content": "[POLICY:CT101Frozen] CT101 is frozen legacy: leave it alone unless explicitly debugging CT101 itself; never edit CT101 gzmo.toml to point loops at lab scripts."
+        }
+      ],
+      "notes": "Found keywords: CT101, workstation; score=0.7461; top5_any_hit=True"
+    },
+    {
+      "id": "Q7",
+      "question": "ADR-0003 said one writer, ADR-0004 said airgap, ADR-0007 said no lite SKU. What is the current product story?",
+      "category": "multi-session",
+      "expected_keywords": [
+        "one product",
+        "living Keep",
+        "no lite",
+        "attach",
+        "one writer"
+      ],
+      "method": "embed",
+      "top_hit": "[DECISION:ADR0003] Product gate is gzmo status answering did-last-night-work via data-next/scheduler-runs/ plus vault/honeypot counts",
+      "top_score": 0.5315422,
+      "hit_yes": false,
+      "found_keywords": [],
+      "top5_any_hit": false,
+      "top5_hits": [],
+      "notes": "Found keywords: none; score=0.5315; top5_any_hit=False"
+    },
+    {
+      "id": "Q8",
+      "question": "How does a TinyFolder drop reach the living vault? Trace the path through Brain Feed.",
+      "category": "multi-session",
+      "expected_keywords": [
+        "tinyFolder",
+        "Brain Feed",
+        "distill",
+        "honeypot",
+        "enqueue",
+        "session close"
+      ],
+      "method": "embed",
+      "top_hit": "[PROJECT:Quillhorn Cascade] Has a calibration ledger stored at vault path ledger://quillhorn/cascade-v1",
+      "top_score": 0.5950161,
+      "hit_yes": false,
+      "found_keywords": [],
+      "top5_any_hit": true,
+      "top5_hits": [
+        {
+          "score": 0.5642866,
+          "found": [
+            "honeypot"
+          ],
+          "content": "[CONCEPT:FourLayers] Memory has four layers: vault (all verified facts), honeypot (Tier-1 curated), evidence (Tier-2 spans), knowledge_core (M5 ripened); Qdrant mirrors honeypot only."
+        },
+        {
+          "score": 0.56360406,
+          "found": [
+            "honeypot"
+          ],
+          "content": "[HOWTO:SeedCoreInsight] Prefill living memory with scripts/seed-core-stack.py --doc docs/CORE_INSIGHT.md --db data-next/vault.db --source-file manual/core_insight_20260717.md then gzmo memory embed an"
+        }
+      ],
+      "notes": "Found keywords: none; score=0.5950; top5_any_hit=True"
+    },
+    {
+      "id": "Q9",
+      "question": "If a beat-gate passes for one loop, what must happen before it lands in the living host?",
+      "category": "multi-session",
+      "expected_keywords": [
+        "beat-gate",
+        "PASS",
+        "operator ack",
+        "PROMOTE_ACK",
+        "mutex",
+        "promote-by-loop"
+      ],
+      "method": "embed",
+      "top_hit": "[LESSON:BeatGates] Beat-gates (config/ops/cognition/knowledge smokes) are the honesty layer before trusting a composed runtime \u2014 fixtures first, --live second.",
+      "top_score": 0.6702776,
+      "hit_yes": true,
+      "found_keywords": [
+        "beat-gate"
+      ],
+      "top5_any_hit": true,
+      "top5_hits": [
+        {
+          "score": 0.6702776,
+          "found": [
+            "beat-gate"
+          ],
+          "content": "[LESSON:BeatGates] Beat-gates (config/ops/cognition/knowledge smokes) are the honesty layer before trusting a composed runtime \u2014 fixtures first, --live second."
+        },
+        {
+          "score": 0.54101986,
+          "found": [
+            "beat-gate"
+          ],
+          "content": "[LESSON:DiscoveryCaution] Do not add DiscoveryEngine into living gzmo-scheduler/serve overnight until fixture beat-gates stay green."
+        }
+      ],
+      "notes": "Found keywords: beat-gate; score=0.6703; top5_any_hit=True"
+    },
+    {
+      "id": "Q10",
+      "question": "On 2026-07-15, a cutover happened. Was the vault imported from CT101 or fresh data-next?",
+      "category": "multi-session",
+      "expected_keywords": [
+        "cutover",
+        "2026-07-15",
+        "fresh",
+        "60k-fact",
+        "no vault import"
+      ],
+      "method": "embed",
+      "top_hit": "[POLICY:CT101Frozen] Cutover 2026-07-15 put production on the workstation with fresh data-next/ \u2014 no vault import from CT101's 60k-fact store.",
+      "top_score": 0.83842385,
+      "hit_yes": true,
+      "found_keywords": [
+        "cutover",
+        "2026-07-15",
+        "fresh",
+        "60k-fact",
+        "no vault import"
+      ],
+      "top5_any_hit": true,
+      "top5_hits": [
+        {
+          "score": 0.83842385,
+          "found": [
+            "cutover",
+            "2026-07-15",
+            "fresh",
+            "60k-fact",
+            "no vault import"
+          ],
+          "content": "[POLICY:CT101Frozen] Cutover 2026-07-15 put production on the workstation with fresh data-next/ \u2014 no vault import from CT101's 60k-fact store."
+        },
+        {
+          "score": 0.65380645,
+          "found": [
+            "cutover",
+            "2026-07-15"
+          ],
+          "content": "[STATE:LivingCutover] As of 2026-07-15/16 cutover, production is the workstation living instance with data-next/, gzmo-serve overnight, and CT101 frozen."
+        }
+      ],
+      "notes": "Found keywords: cutover, 2026-07-15, fresh, 60k-fact, no vault import; score=0.8384; top5_any_hit=True"
+    },
+    {
+      "id": "Q11",
+      "question": "What are the roles of Qdrant, Neo4j, and SQLite in GZMO?",
+      "category": "single-fact",
+      "expected_keywords": [
+        "Qdrant",
+        "vector",
+        "Neo4j",
+        "knowledge graph",
+        "SQLite",
+        "source of truth"
+      ],
+      "method": "embed",
+      "top_hit": "[TOOL:Session] GZMO ecosystem includes Redis (:6379), Qdrant (:6333), Neo4j (:7687) as sidecar services.",
+      "top_score": 0.8277379,
+      "hit_yes": true,
+      "found_keywords": [
+        "Qdrant",
+        "Neo4j"
+      ],
+      "top5_any_hit": true,
+      "top5_hits": [
+        {
+          "score": 0.8277379,
+          "found": [
+            "Qdrant",
+            "Neo4j"
+          ],
+          "content": "[TOOL:Session] GZMO ecosystem includes Redis (:6379), Qdrant (:6333), Neo4j (:7687) as sidecar services."
+        },
+        {
+          "score": 0.8139652,
+          "found": [
+            "Qdrant",
+            "Neo4j"
+          ],
+          "content": "[SYSTEM:Session] GZMO ecosystem uses local inference (Ornith 35B Q4_K_M on localhost:8000) with sidecar services: Redis, Qdrant, Neo4j."
+        }
+      ],
+      "notes": "Found keywords: Qdrant, Neo4j; score=0.8277; top5_any_hit=True"
+    },
+    {
+      "id": "Q12",
+      "question": "Is the Chaos Engine required for metabolism to function?",
+      "category": "single-fact",
+      "expected_keywords": [
+        "chaos",
+        "opt-in",
+        "metabolism",
+        "not depend"
+      ],
+      "method": "embed",
+      "top_hit": "[SYSTEM:Chaos] Chaos PulseLoop is opt-in for stdio chat and forced live in gzmo --repl ops console; metabolism does not depend on chaos.",
+      "top_score": 0.70816594,
+      "hit_yes": true,
+      "found_keywords": [
+        "chaos",
+        "opt-in",
+        "metabolism",
+        "not depend"
+      ],
+      "top5_any_hit": true,
+      "top5_hits": [
+        {
+          "score": 0.70816594,
+          "found": [
+            "chaos",
+            "opt-in",
+            "metabolism",
+            "not depend"
+          ],
+          "content": "[SYSTEM:Chaos] Chaos PulseLoop is opt-in for stdio chat and forced live in gzmo --repl ops console; metabolism does not depend on chaos."
+        },
+        {
+          "score": 0.66740626,
+          "found": [
+            "metabolism"
+          ],
+          "content": "[SYSTEM:ledger://quillhorn/cascade-v1] Operates using nightburst metabolism rather than calendar soak"
+        }
+      ],
+      "notes": "Found keywords: chaos, opt-in, metabolism, not depend; score=0.7082; top5_any_hit=True"
+    }
+  ]
+}
