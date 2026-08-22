@@ -92,13 +92,13 @@
 - **Integration-hebel:** Replace the local LLM backbone in the 'extract lane' or 'Brain Feed' with an SSM (TENNs-LLM 1.2B, 192 KB hidden state, O(1) prefill).
 - **Status:** in-progress (ADR-0008 proposed; spikes in `spikes/`)
 - **ADR:** [ADR-0008-edge-ssm-memory.md](ADR-0008-edge-ssm-memory.md) — Option A
-- **Spike:** [`spikes/pre-cog/`](../spikes/pre-cog/) — availability probe + latency bench
+- **Spike:** [`spikes/pre-cog/`](../spikes/pre-cog/) — availability probe + latency bench · [`spikes/pre-cog-mamba/`](../spikes/pre-cog-mamba/) — 7B Jamba decisive control + quality parity (VM200)
 - **Gate-Kriterien:**
   1. TENNs-LLM weights license + availability offline (CC-BY-NC-4.0 = **GATED**)
   2. llama.cpp (or alternative) SSM inference support for TENNs-LLM (custom_code = **PARTIAL**)
   3. Quality parity with Qwen3.6-35B-MTP on GZMO's actual extract/distill prompts
   4. Energy (RAPL) comparison on edge hardware
-- **Spike-Verdict:** NO-GO for TENNs-LLM (license + inference blocked); HOLD for alternative Mamba-class SSMs
+- **Spike-Verdict (updated 2026-08-22):** TENNs-LLM still NO-GO (license + inference blocked). Alternative Mamba-class 7B (Jamba): **O(1) state-injection mechanism REPRODUCES on llama.cpp b9018** — 88.1× TTFT reduction at 17.5K tokens, airtight by C2/C3 + cold-control (v1 "content no-op" was a test error, withdrawn). **Quality gate HOLD:** 4/5 parity, 1/5 factual error under injection (lossy fixed-size SSM state); re-measure on real extract/distill prompts before GO. → Option A stays **HOLD**.
 
 ### MemoryLake — Structured Multi-Track Memory Backend (arXiv:2608.13883)
 - **Quelle:** research-sota 20260822T041632Z · TRL 4 · benefit=True

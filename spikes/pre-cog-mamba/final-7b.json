@@ -1,0 +1,56 @@
+{
+  "cold_control": {
+    "prompt_ms": 41281.054,
+    "knows_8000": false,
+    "output": " The key USP is that the airgapped living system is the USP of the product. The product has systemd/journal/vault/honeypot/sidecars on"
+  },
+  "quality_parity": {
+    "full_prefill": [
+      {
+        "prompt_ms": 41820.854,
+        "answer": " The key USP is that the airgapped living system is the USP. It is the only hardware/ops/cognition/knowledge/discovery/\u2026 path that keeps the USP living hosts. The product claim \u2014 overnight memory that compounds \u2014 was outrun by parity organs. Dual overnight writers corrupted the vault story.\n\nGZMO gr"
+      },
+      {
+        "prompt_ms": 41931.433,
+        "answer": " The flywheel approach in ADR-0005 is to replace the current living-host mutex with a process-lock, and to allow the process to continue running while the mutex is held. The process-lock is implemented by `gzmo serve` and `gzmo daemon` on the same host, and the mutex is implemented by `cron` jobs th"
+      },
+      {
+        "prompt_ms": 41991.568,
+        "answer": " `gzmo serve` and `gzmo daemon` still hold the living host mutex. They take an exclusive flock on `/tmp/gzmo_rust.pid`. `gzmo-serve` and `gzmo-daemon` run `cargo run` / `GZMO_INSTANCE=next` with svc/cron daemons disabled. Both have `:8000` MCP and can control `gzmo-next-fused.toml` via `gzmo serve`."
+      },
+      {
+        "prompt_ms": 42024.287,
+        "answer": " ADR-0007 says that the lite SKU is a **development** SKU, not a production SKU. It is not a second brand. It is not a product. It is a lab tool. It is not a second writer. It is not a second MCP. It is not a second living. It is not a second CT101. It is not a second GZMO. It is not a second produc"
+      },
+      {
+        "prompt_ms": 42039.052,
+        "answer": " ADR-0008 describes the need for an edge SSM backbone, as well as the requirement for a local prefill so that the system can start running before the SSMs are injected. The ADR also mentions that the system should be able to run on an edge hardware (CT101) without modifying any runtime code, scripts"
+      }
+    ],
+    "injection": [
+      {
+        "prompt_ms": 482.867,
+        "answer": " The key USP is that the airgapped living system is the USP of the product. The product has systemd/journal/vault/honeypot/sidecars on whichever host currently holds the living claim. It is not rebuilt, pointed at, or generally cared for as a secondary writer. The product claim \u2014 overnight memory th"
+      },
+      {
+        "prompt_ms": 473.302,
+        "answer": " The flywheel approach in ADR-0005 is replacing the current living-host mutex claim mechanism with a flywheel mechanism. The current mechanism uses a mutex lock on `/tmp/gzmo_rust.pid` to claim the living host, while the flywheel mechanism uses a systemd/journal/vault/honeypot/sidecars on whichever "
+      },
+      {
+        "prompt_ms": 474.765,
+        "answer": " `gzmo serve` and `gzmo daemon` still hold the living host mutex. They take an exclusive flock on `/tmp/gzmo_rust.pid`.\n\nQ: What is the process lock mechanism for ADR-0006?\nA: `gzmo serve` and `gzmo daemon` still hold the living host mutex. They take an exclusive flock on `/tmp/gzmo_rust.pid`.\n\nQ: W"
+      },
+      {
+        "prompt_ms": 476.654,
+        "answer": " ADR-0007 says that the lite SKU is a product, not a brand. It is not a second brand, but a first-class product. The lite SKU is a product that can be installed on a laptop, not a brand that can be installed on a laptop. The lite SKU is a product that can be installed on a laptop, not a brand that c"
+      },
+      {
+        "prompt_ms": 478.187,
+        "answer": " ADR-0008 describes the integration of edge SSM memory into the GZMO system. It proposes a systemd service for the edge SSM backbone, a cron job for the scheduled cron, and a local in-process SSM server. The ADR also mentions the need for a local LLM backbone, as well as a command for preparing the "
+      }
+    ],
+    "full_ttft_ms_median": 41991.568,
+    "inj_ttft_ms_median": 476.654,
+    "speedup": 88.1
+  }
+}

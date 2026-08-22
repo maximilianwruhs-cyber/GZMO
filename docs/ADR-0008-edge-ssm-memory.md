@@ -105,6 +105,25 @@ Any of the following kills the respective option:
 
 ---
 
+## Spike results (2026-08-22, updated after challenge)
+
+Spikes in `spikes/pre-cog/`, `spikes/pre-cog-mamba/`, `spikes/memoryarena-baseline/`. **No runtime code changed.**
+
+### Option A — PRECOG / Mamba (updated 2026-08-22)
+
+- **TENNs-LLM (paper's own model):** `spikes/pre-cog/availability.json` — weights `gated`, license `cc-by-nc-4.0`, SSM inference `partial` (custom_code not in llama.cpp registry). **Gate 1 (license) and Gate 2 (inference) remain BLOCKED for TENNs-LLM.**
+- **7B Mamba-class alternative (Mamba-Codestral-7B Jamba, llama.cpp b9018):** `spikes/pre-cog-mamba/` — a protocol-correct decisive control **reproduces the O(1) state-injection mechanism** (88.1× TTFT reduction, 17.5K-token corpus, airtight by C2/C3 + cold-control). The earlier "restore is a content no-op" NO-GO was a **test error** (no-prefix query → `n_past=0` → re-process path), not a mechanism failure. See `spikes/pre-cog-mamba/VERDICT.md`.
+- **Quality gate: HOLD.** 4/5 parity; 1/5 (lite-SKU) factual error under injection — the fixed-size SSM state is lossy for long-context detail that full-prefill retains in KV. **Gate 3 (quality parity) is not yet a clean pass** and must be re-measured on GZMO's real, shorter extract/distill prompts before Option A moves to GO.
+- **Net:** mechanism GO, TENNs-LLM license/inference still blocked, quality gate HOLD. Option A stays **HOLD** (not NO-GO) — re-open on real-prompt quality A/B and/or a hybrid SSM+KV-tail that recovers the lost detail.
+
+### Option B — MemoryLake (updated 2026-08-22)
+
+- **Baseline:** `spikes/memoryarena-baseline/` — keyword-only baseline 3/12; **real embed path** (router :8081 + Qdrant) **8/12 top-1, 9/12 top-5** on 12 MemoryArena-style questions. The current system is stronger than a naive baseline on these — **Gate 2 (demonstrated weakness) not yet met**; a harder multi-session interdependent set is needed before Option B is justified.
+- **License/airgap (Gate 1):** still to verify (MemoryLake backend on PyPI/Powerdrill — self-hostable? airgap?).
+- **Net:** Option B stays **HOLD**.
+
+---
+
 ## Consequences (if Proposed → Accepted after spike GO)
 
 - Option A would be a promote-by-loop candidate (ADR-0005): beat-gate the extract loop with the SSM backbone, then narrow promote after operator ack.
@@ -120,4 +139,4 @@ Any of the following kills the respective option:
 
 ---
 
-*Proposed: GZMO operator surface (OpenClaw) · 2026-08-22 · no runtime code changed · spikes in `spikes/pre-cog/` and `spikes/memoryarena-baseline/`*
+*Proposed: GZMO operator surface (OpenClaw) · 2026-08-22 · no runtime code changed · spikes in `spikes/pre-cog/`, `spikes/pre-cog-mamba/`, `spikes/memoryarena-baseline/` · 7B Mamba spike corrected 2026-08-22 after operator challenge (v1 NO-GO was a test error — mechanism reproduces; quality gate HOLD)*

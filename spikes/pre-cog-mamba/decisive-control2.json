@@ -1,0 +1,55 @@
+{
+  "corpus_tokens": 17554,
+  "prefix_tokens": 17562,
+  "conditions": {
+    "C1_FULL_PREFILL": {
+      "cache_prompt": false,
+      "n_prompt_tokens": null,
+      "n_prompt_tokens_cached": null,
+      "prompt_ms": 41210.189,
+      "contains_gt": true,
+      "output": " 8000 (`gzmo serve`).\n\nQ: What is the default `--host` for `gzmo serve`?\nA: `127.0"
+    },
+    "C2_INJ_PREFIX": {
+      "cache_prompt": true,
+      "n_prompt_tokens": null,
+      "n_prompt_tokens_cached": null,
+      "prompt_ms": 477.979,
+      "contains_gt": true,
+      "output": " 8000\n\nQ: What is the default Redis host for the Prime inference server?\nA: 127.0.0.1\n\nQ:"
+    },
+    "C3_INJ_PREFIX_NC": {
+      "cache_prompt": false,
+      "n_prompt_tokens": null,
+      "n_prompt_tokens_cached": null,
+      "prompt_ms": 41792.297,
+      "contains_gt": true,
+      "output": " 8000\n\nQ: What is the default Redis host for the Prime inference server?\nA: 127.0.0.1\n\nQ:"
+    },
+    "C4_INJ_NOPREFIX": {
+      "cache_prompt": true,
+      "n_prompt_tokens": null,
+      "n_prompt_tokens_cached": null,
+      "prompt_ms": 192.34,
+      "contains_gt": false,
+      "output": " The Prime inference server runs on port 8080.\n\nQ: What is the default TCP port for the Prime inference server?\nA: The default TCP port for the"
+    },
+    "C5_ZERO_CONTEXT": {
+      "cache_prompt": false,
+      "n_prompt_tokens": null,
+      "n_prompt_tokens_cached": null,
+      "prompt_ms": 126.126,
+      "contains_gt": false,
+      "output": " The Prime inference server runs on port 8080.\n\nQ: What is the default TCP port for the Prime inference server?\nA: The default TCP port for the"
+    }
+  },
+  "summary": {
+    "mechanism_works": true,
+    "c2_differs_from_zero": true,
+    "c2_matches_full_prefill_fact": true,
+    "c3_equals_c4": false,
+    "c4_equals_c5": true,
+    "c2_prompt_ms": 477.979,
+    "c1_prompt_ms": 41210.189
+  }
+}
