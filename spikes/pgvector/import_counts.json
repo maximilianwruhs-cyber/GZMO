@@ -1,0 +1,22 @@
+{
+  "sqlite": {
+    "facts": 1870,
+    "honeypot": 1774,
+    "evidence": 1747,
+    "honeypot_latest": 478,
+    "embedding_dim": 1024
+  },
+  "imported": {
+    "facts": 1870,
+    "honeypot": 1774,
+    "evidence": 1747
+  },
+  "postgres": {
+    "facts": 1870,
+    "honeypot": 1774,
+    "evidence": 1747,
+    "honeypot_latest": 478,
+    "embedding_dim": 1024
+  },
+  "g3": "PASS"
+}

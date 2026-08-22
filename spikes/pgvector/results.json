@@ -1,0 +1,657 @@
+{
+  "date": "2026-08-22",
+  "n_questions": 12,
+  "rrf_k": 60.0,
+  "top_arm": 20,
+  "top_final": 10,
+  "embed": {
+    "url": "http://192.168.31.110:8081/v1/embeddings",
+    "model": "gzmo-embed",
+    "dim": 1024
+  },
+  "per_question": [
+    {
+      "id": "Q1",
+      "question": "What is CT101's role in the GZMO architecture?",
+      "category": "single-fact",
+      "expected_keywords": [
+        "CT101",
+        "frozen reference",
+        "living host",
+        "reference living"
+      ],
+      "ground_truth_ids": [
+        "c68fdcf5-4535-4017-b1c0-94ccbefd98b7",
+        "6a7dba28-4dd9-4686-a0c5-3cbd77359eb8",
+        "dec34912-3000-4489-96b3-77fa4bfea2af"
+      ],
+      "current": {
+        "top10_ids": [
+          "9c333af9-e68a-45f6-a8ca-afac97fc7785",
+          "0633a849-08c3-4193-874e-33f5c827e2e2",
+          "09cc7dc6-b385-42c6-a29a-26afa26c0915",
+          "12e73a94-6054-443f-a6aa-2407e6c17fa4",
+          "4fc73c58-5189-432f-9a7e-b5e225c6d885",
+          "ef899624-dca3-4112-9fb7-5c7b83bb3e95",
+          "08c3215f-d2f0-455c-ac19-74c1841d9be0",
+          "5364d9d1-6339-4448-b817-e35cbd20245e",
+          "72357d8d-5c6e-4111-b21d-7a114f5fd76e",
+          "a4be0cc1-1a9a-45b6-8f4a-2cba695b8968"
+        ],
+        "hit_at_10": false,
+        "wall_ms": 5.007
+      },
+      "pgvector": {
+        "top10_ids": [
+          "9c333af9-e68a-45f6-a8ca-afac97fc7785",
+          "0633a849-08c3-4193-874e-33f5c827e2e2",
+          "5364d9d1-6339-4448-b817-e35cbd20245e",
+          "09cc7dc6-b385-42c6-a29a-26afa26c0915",
+          "f1cdb3db-f865-4ae1-a1f0-39eb05f1bd3b",
+          "99cfbd6f-3482-4441-9c8d-2dd4a16f8811",
+          "90d72ea7-b867-4ed9-a6a4-fb90f394f4c1",
+          "1822a28d-0e4d-4997-a8b3-51f52a149fa0",
+          "ef899624-dca3-4112-9fb7-5c7b83bb3e95",
+          "4fc73c58-5189-432f-9a7e-b5e225c6d885"
+        ],
+        "hit_at_10": false,
+        "wall_ms": 13.538,
+        "server_ms": 4.192
+      }
+    },
+    {
+      "id": "Q2",
+      "question": "What is the dual-writer rule? Can two overnight writers run on the same vault?",
+      "category": "single-fact",
+      "expected_keywords": [
+        "dual-writer",
+        "two overnight writers",
+        "never two",
+        "single writer"
+      ],
+      "ground_truth_ids": [
+        "2657b289-5785-4738-9491-e56e5a869ce4"
+      ],
+      "current": {
+        "top10_ids": [
+          "684d4fac-9b61-43ea-8d4a-b659bb476538",
+          "4926c4f1-e10e-43ee-91e3-8fac2034c3bb",
+          "aefefb25-c2e9-4909-abb2-8cebef19bbc4",
+          "afe79773-5ef7-470a-86d2-f09098737ec5",
+          "9260734e-2da6-4bc0-9f76-fbabb6d3c404",
+          "2657b289-5785-4738-9491-e56e5a869ce4",
+          "4cf7243d-038e-4e70-bca4-21a7ca4b9f5f",
+          "36dcd4dc-a312-4121-ba25-2602afe84678",
+          "4fc73c58-5189-432f-9a7e-b5e225c6d885",
+          "27b1a7f8-efdc-4d1d-8f47-ec5964b7aa29"
+        ],
+        "hit_at_10": true,
+        "wall_ms": 3.802
+      },
+      "pgvector": {
+        "top10_ids": [
+          "4cf7243d-038e-4e70-bca4-21a7ca4b9f5f",
+          "36dcd4dc-a312-4121-ba25-2602afe84678",
+          "4fc73c58-5189-432f-9a7e-b5e225c6d885",
+          "2657b289-5785-4738-9491-e56e5a869ce4",
+          "4926c4f1-e10e-43ee-91e3-8fac2034c3bb",
+          "684d4fac-9b61-43ea-8d4a-b659bb476538",
+          "a64ab633-64cd-49a3-a18d-30d692eb0fa9",
+          "50272f23-7dc5-4ea7-a32a-f603bf11108e",
+          "afe79773-5ef7-470a-86d2-f09098737ec5",
+          "aefefb25-c2e9-4909-abb2-8cebef19bbc4"
+        ],
+        "hit_at_10": true,
+        "wall_ms": 12.119,
+        "server_ms": 7.058
+      }
+    },
+    {
+      "id": "Q3",
+      "question": "What is the Prime inference server and what port does it run on?",
+      "category": "single-fact",
+      "expected_keywords": [
+        "Prime",
+        "8000",
+        "127.0.0.1:8000",
+        "OpenAI-compatible"
+      ],
+      "ground_truth_ids": [
+        "ac4bce5b-8142-4ee9-b03d-1063ff7e1269",
+        "41bfed50-92e5-4037-b07a-a78441a43ce9",
+        "4d8146db-0d02-4e17-9040-31c5b9bc531f",
+        "a6d41b9c-45f8-4a27-97f3-eb01c8e0509b",
+        "ac7292a8-0970-49e2-847c-74ca58ba8754"
+      ],
+      "current": {
+        "top10_ids": [
+          "ac4bce5b-8142-4ee9-b03d-1063ff7e1269",
+          "e27631bf-19e6-42d9-998d-779ac37321ff",
+          "e2e65d00-3462-4707-8d9e-598f0d9cffce",
+          "f1261aa0-3fa7-42c2-9c93-72248f7f443f",
+          "4fc73c58-5189-432f-9a7e-b5e225c6d885",
+          "08c3215f-d2f0-455c-ac19-74c1841d9be0",
+          "69f3a02e-d770-4286-a223-0f9dce4d8a03",
+          "c658f908-e652-4c34-94af-b71821b43f6b",
+          "f72ba4a5-ba60-4178-b9d6-a56e586dafea",
+          "27629bf5-1da8-41b5-8fcd-0a617afeeba1"
+        ],
+        "hit_at_10": true,
+        "wall_ms": 3.713
+      },
+      "pgvector": {
+        "top10_ids": [
+          "69f3a02e-d770-4286-a223-0f9dce4d8a03",
+          "f1261aa0-3fa7-42c2-9c93-72248f7f443f",
+          "c1d9465c-4519-4cdc-9b79-130c3767f3f3",
+          "ac4bce5b-8142-4ee9-b03d-1063ff7e1269",
+          "266a4af9-669e-4815-a3a5-736358691177",
+          "4fc73c58-5189-432f-9a7e-b5e225c6d885",
+          "08c3215f-d2f0-455c-ac19-74c1841d9be0",
+          "e27631bf-19e6-42d9-998d-779ac37321ff",
+          "1bcfc849-72b0-4ace-9ac5-779aa5827872",
+          "f72ba4a5-ba60-4178-b9d6-a56e586dafea"
+        ],
+        "hit_at_10": true,
+        "wall_ms": 9.74,
+        "server_ms": 4.55
+      }
+    },
+    {
+      "id": "Q4",
+      "question": "What does Obolus do in the AOS energy routing chain?",
+      "category": "single-fact",
+      "expected_keywords": [
+        "Obolus",
+        "IPW",
+        "inverse-propensity",
+        "propensity scores"
+      ],
+      "ground_truth_ids": [
+        "0ff8ede2-584e-48ae-bf74-64720186c97e",
+        "c74ecabf-2146-4c8e-8705-44e4dd458dbc",
+        "0eaecfaf-4671-477c-9da3-07485c1e7288",
+        "4059ae8e-6891-43e1-b978-be5d6728f373",
+        "8da66cff-9090-4aef-83e4-351bcbabf6cf"
+      ],
+      "current": {
+        "top10_ids": [
+          "c74ecabf-2146-4c8e-8705-44e4dd458dbc",
+          "d8ea0479-8e5d-4190-a82d-f6691ad829e1",
+          "99cfbd6f-3482-4441-9c8d-2dd4a16f8811",
+          "8da66cff-9090-4aef-83e4-351bcbabf6cf",
+          "b752be20-3ce7-40c1-9363-5e3d6d08e23b",
+          "02a07578-69b0-46b6-a39b-39accafc5716",
+          "0ff8ede2-584e-48ae-bf74-64720186c97e",
+          "20c0dee3-58cc-4151-978e-f0e2402b61a3",
+          "f1cdb3db-f865-4ae1-a1f0-39eb05f1bd3b",
+          "ac78e633-22fb-4e03-8983-37518562239a"
+        ],
+        "hit_at_10": true,
+        "wall_ms": 3.456
+      },
+      "pgvector": {
+        "top10_ids": [
+          "8da66cff-9090-4aef-83e4-351bcbabf6cf",
+          "b752be20-3ce7-40c1-9363-5e3d6d08e23b",
+          "0ff8ede2-584e-48ae-bf74-64720186c97e",
+          "c74ecabf-2146-4c8e-8705-44e4dd458dbc",
+          "4fc73c58-5189-432f-9a7e-b5e225c6d885",
+          "99cfbd6f-3482-4441-9c8d-2dd4a16f8811",
+          "02a07578-69b0-46b6-a39b-39accafc5716",
+          "e2e65d00-3462-4707-8d9e-598f0d9cffce",
+          "08c3215f-d2f0-455c-ac19-74c1841d9be0",
+          "d8ea0479-8e5d-4190-a82d-f6691ad829e1"
+        ],
+        "hit_at_10": true,
+        "wall_ms": 11.003,
+        "server_ms": 5.928
+      }
+    },
+    {
+      "id": "Q5",
+      "question": "What are the stages of the GZMO distillation pipeline?",
+      "category": "single-fact",
+      "expected_keywords": [
+        "extract",
+        "verify",
+        "promote",
+        "vault",
+        "honeypot"
+      ],
+      "ground_truth_ids": [
+        "3d3956f3-64ac-4d62-8103-da09ba9e6218",
+        "51eeea6f-6fc8-4800-981a-884bf8f05779",
+        "8975804f-3b79-4552-bf0d-391b046fe801",
+        "8f9484ee-e196-4057-84ae-aa9b62684858",
+        "9e3b050f-f8cc-4435-888b-4b44c4bf9213"
+      ],
+      "current": {
+        "top10_ids": [
+          "d0066c78-8f0c-4004-a527-fd6a650bd3f3",
+          "04e1a78e-84df-4de6-a8cd-cb3511e7af97",
+          "9abce9b5-09c3-4b54-8086-2358eb1b9426",
+          "48169f77-4765-471b-adb9-18eb556a6382",
+          "07747cd9-cd80-45e6-bdab-707d69d99275",
+          "272abbf7-de89-4ca5-8b40-228032f5cd88",
+          "b144fc56-6f1e-430c-ab42-f91b4609d4b0",
+          "4fc73c58-5189-432f-9a7e-b5e225c6d885",
+          "9c333af9-e68a-45f6-a8ca-afac97fc7785",
+          "08c3215f-d2f0-455c-ac19-74c1841d9be0"
+        ],
+        "hit_at_10": false,
+        "wall_ms": 3.259
+      },
+      "pgvector": {
+        "top10_ids": [
+          "9c333af9-e68a-45f6-a8ca-afac97fc7785",
+          "98ab8468-01b0-4412-835f-c4e692499a5e",
+          "04e1a78e-84df-4de6-a8cd-cb3511e7af97",
+          "1688612a-0d96-4b17-a65c-2155081d3ee8",
+          "0633a849-08c3-4193-874e-33f5c827e2e2",
+          "ef899624-dca3-4112-9fb7-5c7b83bb3e95",
+          "e9b95802-5291-43b5-9444-6e77ec5cd322",
+          "5b15618c-1485-4ded-ab72-a18920b9647e",
+          "09cc7dc6-b385-42c6-a29a-26afa26c0915",
+          "5364d9d1-6339-4448-b817-e35cbd20245e"
+        ],
+        "hit_at_10": false,
+        "wall_ms": 9.675,
+        "server_ms": 5.229
+      }
+    },
+    {
+      "id": "Q6",
+      "question": "ADR-0003 originally said CT101 is frozen reference, then ADR-0005 amended this. What is the current state of CT101 vs workstation living-host placement?",
+      "category": "multi-session",
+      "expected_keywords": [
+        "mutex",
+        "claim",
+        "living host",
+        "CT101",
+        "workstation",
+        "promote-by-loop"
+      ],
+      "ground_truth_ids": [
+        "474f4ed9-18d6-4dc4-aaf3-32d080029187",
+        "c5188c3d-9f44-48df-a621-db891f800348",
+        "c68fdcf5-4535-4017-b1c0-94ccbefd98b7",
+        "0f71fe5a-e8d5-4e66-8d2a-f6a9e75edd45",
+        "1d2182db-d5fe-4a77-ae17-7e85074e6ea1"
+      ],
+      "current": {
+        "top10_ids": [
+          "4cf7243d-038e-4e70-bca4-21a7ca4b9f5f",
+          "c68fdcf5-4535-4017-b1c0-94ccbefd98b7",
+          "c5188c3d-9f44-48df-a621-db891f800348",
+          "474f4ed9-18d6-4dc4-aaf3-32d080029187",
+          "b1aff861-7cf8-49ed-bb13-25931349e439",
+          "aefefb25-c2e9-4909-abb2-8cebef19bbc4",
+          "53ea7e0c-2935-415c-86a9-c8771d9f4fd8",
+          "36dcd4dc-a312-4121-ba25-2602afe84678",
+          "8f523360-f1d6-43c2-9ee1-44bd5a06b3d4",
+          "fec9937e-d8de-4d76-8d73-75d6839a800b"
+        ],
+        "hit_at_10": true,
+        "wall_ms": 4.49
+      },
+      "pgvector": {
+        "top10_ids": [
+          "b1aff861-7cf8-49ed-bb13-25931349e439",
+          "4cf7243d-038e-4e70-bca4-21a7ca4b9f5f",
+          "36dcd4dc-a312-4121-ba25-2602afe84678",
+          "c68fdcf5-4535-4017-b1c0-94ccbefd98b7",
+          "53ea7e0c-2935-415c-86a9-c8771d9f4fd8",
+          "db1bfa12-b44e-4a77-b0a6-221b50d1dab3",
+          "4316d114-dca9-463c-9705-8a6e4c25817a",
+          "8f523360-f1d6-43c2-9ee1-44bd5a06b3d4",
+          "fec9937e-d8de-4d76-8d73-75d6839a800b",
+          "12ad0862-68d4-43bc-b09a-e61b2456f0e5"
+        ],
+        "hit_at_10": true,
+        "wall_ms": 9.821,
+        "server_ms": 5.448
+      }
+    },
+    {
+      "id": "Q7",
+      "question": "ADR-0003 said one writer, ADR-0004 said airgap, ADR-0007 said no lite SKU. What is the current product story?",
+      "category": "multi-session",
+      "expected_keywords": [
+        "one product",
+        "living Keep",
+        "no lite",
+        "attach",
+        "one writer"
+      ],
+      "ground_truth_ids": [
+        "2776f790-e292-415c-9889-f20fa10eed38"
+      ],
+      "current": {
+        "top10_ids": [
+          "4cf7243d-038e-4e70-bca4-21a7ca4b9f5f",
+          "2cb99436-99e8-456e-a203-2fd5c6618b08",
+          "b1aff861-7cf8-49ed-bb13-25931349e439",
+          "08c3215f-d2f0-455c-ac19-74c1841d9be0",
+          "684d4fac-9b61-43ea-8d4a-b659bb476538",
+          "9260734e-2da6-4bc0-9f76-fbabb6d3c404",
+          "f7157600-d7a4-4a66-b31e-b474ed91ea56",
+          "466ed598-0e13-453b-adb4-bf5682d053a5",
+          "36dcd4dc-a312-4121-ba25-2602afe84678",
+          "45641446-6950-4acd-ab04-60e3eee3c12b"
+        ],
+        "hit_at_10": false,
+        "wall_ms": 3.652
+      },
+      "pgvector": {
+        "top10_ids": [
+          "b1aff861-7cf8-49ed-bb13-25931349e439",
+          "4cf7243d-038e-4e70-bca4-21a7ca4b9f5f",
+          "684d4fac-9b61-43ea-8d4a-b659bb476538",
+          "9260734e-2da6-4bc0-9f76-fbabb6d3c404",
+          "36dcd4dc-a312-4121-ba25-2602afe84678",
+          "2cb99436-99e8-456e-a203-2fd5c6618b08",
+          "45641446-6950-4acd-ab04-60e3eee3c12b",
+          "2657b289-5785-4738-9491-e56e5a869ce4",
+          "27b1a7f8-efdc-4d1d-8f47-ec5964b7aa29",
+          "55e06c8a-0773-4f1b-afc4-51e298b08386"
+        ],
+        "hit_at_10": false,
+        "wall_ms": 11.933,
+        "server_ms": 6.889
+      }
+    },
+    {
+      "id": "Q8",
+      "question": "How does a TinyFolder drop reach the living vault? Trace the path through Brain Feed.",
+      "category": "multi-session",
+      "expected_keywords": [
+        "tinyFolder",
+        "Brain Feed",
+        "distill",
+        "honeypot",
+        "enqueue",
+        "session close"
+      ],
+      "ground_truth_ids": [
+        "db5111ab-7553-4db3-b1ac-406ccfdda18e",
+        "3aeb32a0-41eb-4df2-a66c-aaa29a46e779",
+        "985039a0-03b7-4097-bfbb-cecc65475b00",
+        "3fac3aab-29f7-4c7b-add3-aabce0f561b9",
+        "e4149288-43c4-4be4-816d-de8e2a33e6ad"
+      ],
+      "current": {
+        "top10_ids": [
+          "f52c476d-d880-4711-9410-35961b7eedee",
+          "69b260de-3b45-40b0-a60c-ac628958299a",
+          "8c55d43e-b43b-4916-bbff-d3e95f48a57d",
+          "ee25edc6-ba4d-4c43-a113-810d52933745",
+          "9abce9b5-09c3-4b54-8086-2358eb1b9426",
+          "131787fb-5755-4d00-a6a2-5373bda86ad6",
+          "067bdbb5-e4d2-429d-98b3-39c8af4be072",
+          "a4be0cc1-1a9a-45b6-8f4a-2cba695b8968",
+          "df19240c-9efc-4e96-b3c7-25c19fb99502",
+          "79a718ba-8b3a-475a-b18e-76f684fbfa8a"
+        ],
+        "hit_at_10": false,
+        "wall_ms": 3.627
+      },
+      "pgvector": {
+        "top10_ids": [
+          "7f73c462-9e7a-4b71-adab-97710b07bac0",
+          "e2e65d00-3462-4707-8d9e-598f0d9cffce",
+          "f52c476d-d880-4711-9410-35961b7eedee",
+          "3fac3aab-29f7-4c7b-add3-aabce0f561b9",
+          "69b260de-3b45-40b0-a60c-ac628958299a",
+          "36dcd4dc-a312-4121-ba25-2602afe84678",
+          "8c55d43e-b43b-4916-bbff-d3e95f48a57d",
+          "df19240c-9efc-4e96-b3c7-25c19fb99502",
+          "e4149288-43c4-4be4-816d-de8e2a33e6ad",
+          "46f8f296-213e-4f1b-981a-77657f739683"
+        ],
+        "hit_at_10": true,
+        "wall_ms": 8.057,
+        "server_ms": 2.76
+      }
+    },
+    {
+      "id": "Q9",
+      "question": "If a beat-gate passes for one loop, what must happen before it lands in the living host?",
+      "category": "multi-session",
+      "expected_keywords": [
+        "beat-gate",
+        "PASS",
+        "operator ack",
+        "PROMOTE_ACK",
+        "mutex",
+        "promote-by-loop"
+      ],
+      "ground_truth_ids": [
+        "285df6ea-1eed-4097-a037-6e30b720a5d3",
+        "73b2d7ed-1700-4a66-bff0-cad289240d1e",
+        "91809b0f-f13d-4cfa-bcff-4a41a5d34293"
+      ],
+      "current": {
+        "top10_ids": [
+          "285df6ea-1eed-4097-a037-6e30b720a5d3",
+          "c68fdcf5-4535-4017-b1c0-94ccbefd98b7",
+          "12e73a94-6054-443f-a6aa-2407e6c17fa4",
+          "efb4d8d0-adb7-4cb8-b254-b80caa5197d4",
+          "5daecca9-74b7-431b-8b95-6dbacd24137b",
+          "4fc73c58-5189-432f-9a7e-b5e225c6d885",
+          "8b9e831c-5062-46b1-8e48-c48cc56288d8",
+          "fed1a4c3-e795-4cc7-a719-0884e9e0fc78",
+          "91809b0f-f13d-4cfa-bcff-4a41a5d34293",
+          "45e33824-6136-4094-8103-5440d81520f6"
+        ],
+        "hit_at_10": true,
+        "wall_ms": 3.879
+      },
+      "pgvector": {
+        "top10_ids": [
+          "285df6ea-1eed-4097-a037-6e30b720a5d3",
+          "91809b0f-f13d-4cfa-bcff-4a41a5d34293",
+          "6bf93185-9afa-4523-9baf-cf99d461bc7f",
+          "fed1a4c3-e795-4cc7-a719-0884e9e0fc78",
+          "73b2d7ed-1700-4a66-bff0-cad289240d1e",
+          "12e73a94-6054-443f-a6aa-2407e6c17fa4",
+          "4fc73c58-5189-432f-9a7e-b5e225c6d885",
+          "08c3215f-d2f0-455c-ac19-74c1841d9be0",
+          "4701fadf-2bf5-4955-a450-d3cf0dfaa6a2",
+          "50d3efad-8b1d-4964-9237-290238280852"
+        ],
+        "hit_at_10": true,
+        "wall_ms": 9.625,
+        "server_ms": 5.429
+      }
+    },
+    {
+      "id": "Q10",
+      "question": "On 2026-07-15, a cutover happened. Was the vault imported from CT101 or fresh data-next?",
+      "category": "multi-session",
+      "expected_keywords": [
+        "cutover",
+        "2026-07-15",
+        "fresh",
+        "60k-fact",
+        "no vault import"
+      ],
+      "ground_truth_ids": [
+        "20a73e8e-2fbc-47fa-b277-1b3bdcea6bd3"
+      ],
+      "current": {
+        "top10_ids": [
+          "4316d114-dca9-463c-9705-8a6e4c25817a",
+          "c5188c3d-9f44-48df-a621-db891f800348",
+          "aefefb25-c2e9-4909-abb2-8cebef19bbc4",
+          "71ca0e28-6519-43b0-b6e5-c93d8544b38d",
+          "36d4a09d-6e6a-46fb-92c8-a47e8acb2df3",
+          "d0066c78-8f0c-4004-a527-fd6a650bd3f3",
+          "272abbf7-de89-4ca5-8b40-228032f5cd88",
+          "7bd2dc4e-d5bf-4399-8327-cf686082e803",
+          "46f8f296-213e-4f1b-981a-77657f739683",
+          "8d660f4b-01ea-417e-af11-a9bcdeb67d09"
+        ],
+        "hit_at_10": false,
+        "wall_ms": 3.574
+      },
+      "pgvector": {
+        "top10_ids": [
+          "152b1fa7-442c-40e4-801c-94a7f239688c",
+          "7f73c462-9e7a-4b71-adab-97710b07bac0",
+          "36d4a09d-6e6a-46fb-92c8-a47e8acb2df3",
+          "b1aff861-7cf8-49ed-bb13-25931349e439",
+          "46f8f296-213e-4f1b-981a-77657f739683",
+          "aefefb25-c2e9-4909-abb2-8cebef19bbc4",
+          "4316d114-dca9-463c-9705-8a6e4c25817a",
+          "fb2af22f-3b8a-4742-8607-b269831b70dc",
+          "0bf222f4-8cd4-43b6-8b61-ea815f49efa4",
+          "12ad0862-68d4-43bc-b09a-e61b2456f0e5"
+        ],
+        "hit_at_10": false,
+        "wall_ms": 7.327,
+        "server_ms": 3.196
+      }
+    },
+    {
+      "id": "Q11",
+      "question": "What are the roles of Qdrant, Neo4j, and SQLite in GZMO?",
+      "category": "single-fact",
+      "expected_keywords": [
+        "Qdrant",
+        "vector",
+        "Neo4j",
+        "knowledge graph",
+        "SQLite",
+        "source of truth"
+      ],
+      "ground_truth_ids": [
+        "71ca0e28-6519-43b0-b6e5-c93d8544b38d",
+        "92c73f27-e90f-4901-b4cb-447bd94fd6f0",
+        "be5380af-0c47-4510-a36a-4862b095e118",
+        "cac1a8af-6219-4575-9b0e-e386bc8511d8",
+        "d72818ed-a645-4979-beea-1b9f5ffab3b0"
+      ],
+      "current": {
+        "top10_ids": [
+          "d72818ed-a645-4979-beea-1b9f5ffab3b0",
+          "6242e236-856a-42da-9aa3-56307fa4c15b",
+          "ca359243-a4b2-48a0-b75e-64076c23d98d",
+          "cac1a8af-6219-4575-9b0e-e386bc8511d8",
+          "be5380af-0c47-4510-a36a-4862b095e118",
+          "92c73f27-e90f-4901-b4cb-447bd94fd6f0",
+          "9c333af9-e68a-45f6-a8ca-afac97fc7785",
+          "4fc73c58-5189-432f-9a7e-b5e225c6d885",
+          "0633a849-08c3-4193-874e-33f5c827e2e2",
+          "90d72ea7-b867-4ed9-a6a4-fb90f394f4c1"
+        ],
+        "hit_at_10": true,
+        "wall_ms": 3.432
+      },
+      "pgvector": {
+        "top10_ids": [
+          "d72818ed-a645-4979-beea-1b9f5ffab3b0",
+          "9c333af9-e68a-45f6-a8ca-afac97fc7785",
+          "0633a849-08c3-4193-874e-33f5c827e2e2",
+          "92c73f27-e90f-4901-b4cb-447bd94fd6f0",
+          "ca359243-a4b2-48a0-b75e-64076c23d98d",
+          "ef899624-dca3-4112-9fb7-5c7b83bb3e95",
+          "09cc7dc6-b385-42c6-a29a-26afa26c0915",
+          "71ca0e28-6519-43b0-b6e5-c93d8544b38d",
+          "6242e236-856a-42da-9aa3-56307fa4c15b",
+          "5b15618c-1485-4ded-ab72-a18920b9647e"
+        ],
+        "hit_at_10": true,
+        "wall_ms": 10.381,
+        "server_ms": 5.928
+      }
+    },
+    {
+      "id": "Q12",
+      "question": "Is the Chaos Engine required for metabolism to function?",
+      "category": "single-fact",
+      "expected_keywords": [
+        "chaos",
+        "opt-in",
+        "metabolism",
+        "not depend"
+      ],
+      "ground_truth_ids": [
+        "4d3a43aa-5d1a-4680-afff-9e00ab2b072b"
+      ],
+      "current": {
+        "top10_ids": [
+          "9d35b398-9f43-4c2d-9eb8-4eb8803fa4f6",
+          "4d3a43aa-5d1a-4680-afff-9e00ab2b072b",
+          "568ee8f0-a1fd-4dc0-87bb-74236e8fd48a",
+          "888f1a71-f4db-4aae-be7f-a9674581a6fd",
+          "e2e65d00-3462-4707-8d9e-598f0d9cffce",
+          "c658f908-e652-4c34-94af-b71821b43f6b",
+          "c68fdcf5-4535-4017-b1c0-94ccbefd98b7",
+          "1688612a-0d96-4b17-a65c-2155081d3ee8",
+          "20c0dee3-58cc-4151-978e-f0e2402b61a3",
+          "d47d1611-369d-4ca7-b42c-43b4b520f8de"
+        ],
+        "hit_at_10": true,
+        "wall_ms": 3.295
+      },
+      "pgvector": {
+        "top10_ids": [
+          "9d35b398-9f43-4c2d-9eb8-4eb8803fa4f6",
+          "4d3a43aa-5d1a-4680-afff-9e00ab2b072b",
+          "568ee8f0-a1fd-4dc0-87bb-74236e8fd48a",
+          "d7460935-c05f-4a10-804e-3cf89048c528",
+          "c658f908-e652-4c34-94af-b71821b43f6b",
+          "c68fdcf5-4535-4017-b1c0-94ccbefd98b7",
+          "1688612a-0d96-4b17-a65c-2155081d3ee8",
+          "d47d1611-369d-4ca7-b42c-43b4b520f8de",
+          "20c0dee3-58cc-4151-978e-f0e2402b61a3",
+          "9260734e-2da6-4bc0-9f76-fbabb6d3c404"
+        ],
+        "hit_at_10": true,
+        "wall_ms": 9.17,
+        "server_ms": 5.06
+      }
+    }
+  ],
+  "recall_at_10": {
+    "current": 0.5833333333333334,
+    "pgvector": 0.6666666666666666,
+    "current_hits": 7,
+    "pgvector_hits": 8
+  },
+  "p50_ms": {
+    "current": 3.627,
+    "pgvector": 5.229,
+    "pgvector_client_wall": 9.74
+  },
+  "p95_ms": {
+    "current": 5.007,
+    "pgvector": 7.058,
+    "pgvector_client_wall": 13.538
+  },
+  "latency_note": "p50_ms.pgvector / p95_ms.pgvector are in-SQL clock_timestamp() ms. Client wall (docker exec -i psql) is higher because host TCP to 127.0.0.1:5432 times out on this CT101 docker-proxy setup; no pip/psycopg.",
+  "import_counts": {
+    "sqlite": {
+      "facts": 1870,
+      "honeypot": 1774,
+      "evidence": 1747,
+      "honeypot_latest": 478,
+      "embedding_dim": 1024
+    },
+    "imported": {
+      "facts": 1870,
+      "honeypot": 1774,
+      "evidence": 1747
+    },
+    "postgres": {
+      "facts": 1870,
+      "honeypot": 1774,
+      "evidence": 1747,
+      "honeypot_latest": 478,
+      "embedding_dim": 1024
+    },
+    "g3": "PASS"
+  },
+  "note": "478 latest vectors \u2014 no HNSW scale benefit expected; measures atomicity + parity."
+}
