@@ -1,0 +1,14 @@
+{
+  "weights": "gated",
+  "weights_url": "https://huggingface.co/NickMarkovsky/tenns-llm-1b",
+  "weights_license": "license:cc-by-nc-4.0",
+  "ssm_inference": "partial",
+  "ssm_evidence": "llama.cpp supports Mamba/Mamba2/RWKV6/RWKV7 SSM architectures natively, but TENNs-LLM uses custom_code transformers (model_type: tenns_llm) not in llama.cpp architecture registry. State injection requires custom inference path.",
+  "evidence": [
+    "https://huggingface.co/NickMarkovsky/tenns-llm-1b",
+    "https://huggingface.co/api/models?search=tenns-llm",
+    "https://deepwiki.com/ggml-org/llama.cpp/3.11-supported-model-architectures",
+    "https://arxiv.org/abs/2608.02560"
+  ],
+  "probed_at": "2026-08-22"
+}

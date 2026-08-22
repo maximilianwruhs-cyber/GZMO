@@ -87,6 +87,31 @@
   Attack-Surface-Papers als **Security-Backlog**. Kein sofortiger Code-Bruch — Migration planen.
 - **Gate-Kriterien:** SDK/Client-Kompatibilitätscheck, bevor eine Breaking-Change übernommen wird.
 
+### PRECOG — Edge-SSM Backbone (arXiv:2608.02560)
+- **Quelle:** research-sota 20260822T041632Z · TRL 5 · benefit=True
+- **Integration-hebel:** Replace the local LLM backbone in the 'extract lane' or 'Brain Feed' with an SSM (TENNs-LLM 1.2B, 192 KB hidden state, O(1) prefill).
+- **Status:** in-progress (ADR-0008 proposed; spikes in `spikes/`)
+- **ADR:** [ADR-0008-edge-ssm-memory.md](ADR-0008-edge-ssm-memory.md) — Option A
+- **Spike:** [`spikes/pre-cog/`](../spikes/pre-cog/) — availability probe + latency bench
+- **Gate-Kriterien:**
+  1. TENNs-LLM weights license + availability offline (CC-BY-NC-4.0 = **GATED**)
+  2. llama.cpp (or alternative) SSM inference support for TENNs-LLM (custom_code = **PARTIAL**)
+  3. Quality parity with Qwen3.6-35B-MTP on GZMO's actual extract/distill prompts
+  4. Energy (RAPL) comparison on edge hardware
+- **Spike-Verdict:** NO-GO for TENNs-LLM (license + inference blocked); HOLD for alternative Mamba-class SSMs
+
+### MemoryLake — Structured Multi-Track Memory Backend (arXiv:2608.13883)
+- **Quelle:** research-sota 20260822T041632Z · TRL 4 · benefit=True
+- **Integration-hebel:** Adopt MemoryLake's structured multi-track backend for the 'living vault' on CT101.
+- **Status:** in-progress (ADR-0008 proposed; spikes in `spikes/`)
+- **ADR:** [ADR-0008-edge-ssm-memory.md](ADR-0008-edge-ssm-memory.md) — Option B
+- **Spike:** [`spikes/memoryarena-baseline/`](../spikes/memoryarena-baseline/) — baseline harness against current system
+- **Gate-Kriterien:**
+  1. MemoryLake code availability + license (benchmark: Apache-2.0; backend: TBD)
+  2. Baseline from spike showing current system's weaknesses on multi-session interdependent tasks (3/12 = 25%)
+  3. Migration path that keeps ADR-0003 single-writer + ADR-0004 airgap intact
+- **Spike-Verdict:** HOLD (baseline demonstrates real weakness: 14% on multi-session interdependent tasks; pending migration path verification)
+
 ---
 
 ## REJECTED (Doktrin-Konflikt / Hype — nur dokumentiert, nicht umgesetzt)

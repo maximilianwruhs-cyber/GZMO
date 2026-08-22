@@ -1,0 +1,119 @@
+{
+  "qdrant_reachable": true,
+  "qdrant_collection": "honeypot",
+  "method_primary": "sqlite_fts (honeypot collection backed by data-next/vault.db)",
+  "method_fallback": "keyword grep over data-next/ + docs/",
+  "results": [
+    {
+      "id": "Q1",
+      "question": "What is CT101's role in the GZMO architecture?",
+      "category": "single-fact",
+      "method": "qdrant",
+      "top_hit": "[DECISION:Session] ## GZMO Ecosystem Status \u2014 2026-07-15 05:30 UTC\n\n### Hardware\n| Resource | Status |\n|---|---|\n| CPU | 1.",
+      "hit_yes": false,
+      "notes": "No expected keywords found in top hit. Top hit: [DECISION:Session] ## GZMO Ecosystem Status \u2014 2026-07-15 05:30 UTC\n\n### Hardware\n| Resource | Status..."
+    },
+    {
+      "id": "Q2",
+      "question": "What is the dual-writer rule? Can two overnight writers run on the same vault?",
+      "category": "single-fact",
+      "method": "qdrant",
+      "top_hit": "[DECISION:Session] No dream cycle has run yet \u2014 `DREAMS.",
+      "hit_yes": false,
+      "notes": "No expected keywords found in top hit. Top hit: [DECISION:Session] No dream cycle has run yet \u2014 `DREAMS...."
+    },
+    {
+      "id": "Q3",
+      "question": "What is the Prime inference server and what port does it run on?",
+      "category": "single-fact",
+      "method": "qdrant",
+      "top_hit": "[DECISION:Session] No dream cycle has run yet \u2014 `DREAMS.",
+      "hit_yes": false,
+      "notes": "No expected keywords found in top hit. Top hit: [DECISION:Session] No dream cycle has run yet \u2014 `DREAMS...."
+    },
+    {
+      "id": "Q4",
+      "question": "What does Obolus do in the AOS energy routing chain?",
+      "category": "single-fact",
+      "method": "qdrant",
+      "top_hit": "[SYSTEM:Obolus] Applies IPW (inverse-propensity weighting) when routing librarian vs local calls",
+      "hit_yes": true,
+      "notes": "Found keywords: Obolus, IPW, inverse-propensity"
+    },
+    {
+      "id": "Q5",
+      "question": "What are the stages of the GZMO distillation pipeline?",
+      "category": "single-fact",
+      "method": "qdrant",
+      "top_hit": "[SYSTEM:SessionDistill] Uses synthetic sessions/{id}.md paths for distilled session facts",
+      "hit_yes": false,
+      "notes": "No expected keywords found in top hit. Top hit: [SYSTEM:SessionDistill] Uses synthetic sessions/{id}.md paths for distilled session facts..."
+    },
+    {
+      "id": "Q6",
+      "question": "ADR-0003 originally said CT101 is frozen reference, then ADR-0005 amended this. What is the current state of CT101 vs workstation living-host placement?",
+      "category": "multi-session",
+      "method": "qdrant",
+      "top_hit": "[DECISION:Session] State: drifting, low-tension.",
+      "hit_yes": false,
+      "notes": "No expected keywords found in top hit. Top hit: [DECISION:Session] State: drifting, low-tension...."
+    },
+    {
+      "id": "Q7",
+      "question": "ADR-0003 said one writer, ADR-0004 said airgap, ADR-0007 said no lite SKU. What is the current product story?",
+      "category": "multi-session",
+      "method": "qdrant",
+      "top_hit": "[task:deployment smoke test] User requested a deployment smoke test in chat session 8f0096d4 on 2026-07-10 21:21 UTC",
+      "hit_yes": false,
+      "notes": "No expected keywords found in top hit. Top hit: [task:deployment smoke test] User requested a deployment smoke test in chat session 8f0096d4 on 2026..."
+    },
+    {
+      "id": "Q8",
+      "question": "How does a TinyFolder drop reach the living vault? Trace the path through Brain Feed.",
+      "category": "multi-session",
+      "method": "qdrant",
+      "top_hit": "[SYSTEM:SessionDistill] Uses synthetic sessions/{id}.md paths for distilled session facts",
+      "hit_yes": true,
+      "notes": "Found keywords: distill"
+    },
+    {
+      "id": "Q9",
+      "question": "If a beat-gate passes for one loop, what must happen before it lands in the living host?",
+      "category": "multi-session",
+      "method": "qdrant",
+      "top_hit": "[task:deployment smoke test] User requested a deployment smoke test in chat session 8f0096d4 on 2026-07-10 21:21 UTC",
+      "hit_yes": false,
+      "notes": "No expected keywords found in top hit. Top hit: [task:deployment smoke test] User requested a deployment smoke test in chat session 8f0096d4 on 2026..."
+    },
+    {
+      "id": "Q10",
+      "question": "On 2026-07-15, a cutover happened. Was the vault imported from CT101 or fresh data-next?",
+      "category": "multi-session",
+      "method": "qdrant",
+      "top_hit": "[DECISION:Session] 9% |\n| Phase | Idle |\n| Crystallized thoughts | 603 |\n| Deaths | 0 |\n\n### Memory & Knowledge\n| Component | Status |\n|---|---|\n| Vault DB | Exists (152 KB) |\n| Knowledge Graph | **Em",
+      "hit_yes": false,
+      "notes": "No expected keywords found in top hit. Top hit: [DECISION:Session] 9% |\n| Phase | Idle |\n| Crystallized thoughts | 603 |\n| Deaths | 0 |\n\n### Memory ..."
+    },
+    {
+      "id": "Q11",
+      "question": "What are the roles of Qdrant, Neo4j, and SQLite in GZMO?",
+      "category": "single-fact",
+      "method": "qdrant",
+      "top_hit": "[DECISION:Session] ## GZMO Ecosystem Status \u2014 2026-07-15 05:30 UTC\n\n### Hardware\n| Resource | Status |\n|---|---|\n| CPU | 1.",
+      "hit_yes": false,
+      "notes": "No expected keywords found in top hit. Top hit: [DECISION:Session] ## GZMO Ecosystem Status \u2014 2026-07-15 05:30 UTC\n\n### Hardware\n| Resource | Status..."
+    },
+    {
+      "id": "Q12",
+      "question": "Is the Chaos Engine required for metabolism to function?",
+      "category": "single-fact",
+      "method": "qdrant",
+      "top_hit": "[DECISION:Session] md` | **Missing** \u2014 no dream cycle has executed |\n| Synapse events | Directory exists |\n| Obolus routing | Directory exists |\n\n### Codebase\n| Crate | Purpose |\n|---|---|\n| `gzmo-cor",
+      "hit_yes": true,
+      "notes": "Found keywords: chaos"
+    }
+  ],
+  "total_questions": 12,
+  "hits_yes": 3,
+  "hits_no": 9
+}
