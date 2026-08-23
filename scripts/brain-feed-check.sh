@@ -31,6 +31,8 @@ row() {
 }
 
 echo "=== Brain Feed check ===" | tee -a "$LOG"
+# Auto-drain aged queue files (older than 7 days → archive/) — non-destructive
+bash "$ROOT/scripts/distill-queue-drain.sh" --apply --older-than 7 >>"$LOG" 2>&1 || true
 
 # Dual-writer guard
 SERVE="$(systemctl --user is-active gzmo-serve.service 2>/dev/null || true)"
@@ -68,11 +70,9 @@ else
   row FAIL "takeaway-side-effect" "remind surfaces missing — scripts/takeaway-side-effect-remind.sh"
 fi
 
-# tinyFolder living enqueue (idempotent warm-up: only stage a demo if no fresh drop in 12h)
-NEWEST_DROP="$(ls -t "$DATA/inbox"/drop-*.md "$DATA/inbox"/processed/*.md "$DATA/inbox"/processed/*/*.md 2>/dev/null | head -1 || true)"
-if [[ -z "$NEWEST_DROP" ]] || (( $(date +%s) - $(stat -c %Y "$NEWEST_DROP") > 43200 )); then
-  bash "$ROOT/scripts/tinyfolder-drop.sh" --demo --living >>"$LOG" 2>&1 || true
-fi
+# Demo enqueue removed 2026-08-23: synthetic self-test artifact was polluting the
+# distill queue (440+ entries). Real drops come via tinyfolder-drop.sh --scan or
+# manual file drops. See ADR-0010 Phase 1 for the prototype that replaces this.
 bash "$ROOT/scripts/tinyfolder-check.sh" >>"$LOG" 2>&1 || true
 if [[ -f "$DATA/tinyfolder/living-enqueue.json" ]] \
   && python3 -c "import json;d=json.load(open('$DATA/tinyfolder/living-enqueue.json')); raise SystemExit(0 if d.get('ok') else 1)"; then

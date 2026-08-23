@@ -98,3 +98,7 @@ node_modules/
 
 # Agent scratch (local, never commit)
 .scratch/
+
+# runtime state (never track — lab scratch, regenerated at runtime)
+/gzmo-core/data/
+/reconcile-report.json

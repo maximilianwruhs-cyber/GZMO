@@ -38,7 +38,6 @@ run concept-webhook bash scripts/concept-gate-webhook.sh
 run forge-mutate bash scripts/obolus-forge-mutate.sh
 run ipw-route bash scripts/ipw-route.sh --task overnight
 run cognition-pack bash scripts/cognition-pack.sh
-run tinyfolder bash scripts/tinyfolder-drop.sh --demo
 run beat-gate bash scripts/beat-gate-kit.sh
 run zpd-lab bash scripts/zpd-tutor-lab.sh
 run okcp-marketplace bash scripts/okcp-marketplace.sh
