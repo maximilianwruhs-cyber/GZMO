@@ -11,7 +11,9 @@ INBOX="${TINYFOLDER_INBOX:-$DATA/tinyfolder-inbox}"
 mkdir -p "$OUT" "$INBOX"
 
 # Prefer Brain Feed living drop path (writes living-enqueue.json)
-bash "$ROOT/scripts/tinyfolder-drop.sh" --demo --living || true
+# Demo drop disabled 2026-08-23: synthetic self-test artifact polluted the distill
+# queue. Real drops come via tinyfolder-drop.sh --scan or manual file drops.
+# bash "$ROOT/scripts/tinyfolder-drop.sh" --demo --living || true
 
 SAMPLE="$INBOX/unpark-wave13-$(date -u +%Y%m%dT%H%M%SZ).md"
 cat >"$SAMPLE" <<EOF
