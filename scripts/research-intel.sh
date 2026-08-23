@@ -333,11 +333,17 @@ for f in items:
                 "fetch_errors": fetch.get("errors"), "eval_error": eval_err,
                 "seen_total": fetch.get("seen_total")}, indent=2) + "\n")
 (out / f"research-intel-{stamp}.md").write_text("\n".join(md), encoding="utf-8")
-(out / "latest.json").write_text((out / f"research-intel-{stamp}.json").read_text())
-(out / "latest.md").write_text("\n".join(md), encoding="utf-8")
 print(json.dumps({"findings": len(items), "benefit": sum(1 for i in items if i["benefit"]),
                   "top": [t["title"] for t in top], "eval_error": eval_err}, indent=2))
 PY
+
+# ── Cross-day URL dedup: latest.{json,md} with NEW/REPEAT split ──
+# shellcheck source=scripts/lib-research-dedup.sh
+source "$ROOT/scripts/lib-research-dedup.sh"
+cp "$OUT/research-intel-$stamp.json" "$OUT/latest.json"
+dedup_findings "$OUT/latest.json" "$OUT/seen.jsonl"
+dedup_render_latest "$OUT/latest.json" "$OUT/latest.md" intel "$stamp" "$TOP_N"
+dedup_seen_update "$OUT/latest.json" "$OUT/seen.jsonl" "$(date -u +%Y-%m-%d)"
 
 # ── Top findings → Brain Feed (takeaway; CT101 metabolizes overnight) ──
 if [[ -x "$TAKEAWAY_BIN" && -f "$OUT/latest.json" ]]; then
