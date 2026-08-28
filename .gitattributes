@@ -1,0 +1,26 @@
+# Normalise to LF in the repository regardless of contributor platform.
+# CI executes the shell scripts on Linux; a CRLF shebang fails with
+# "bad interpreter: No such file or directory".
+* text=auto eol=lf
+
+*.sh      text eol=lf
+*.rs      text eol=lf
+*.toml    text eol=lf
+*.md      text eol=lf
+*.yml     text eol=lf
+*.yaml    text eol=lf
+*.json    text eol=lf
+*.service text eol=lf
+*.timer   text eol=lf
+
+Cargo.lock text eol=lf -diff
+
+# Binary / opaque payloads.
+*.png     binary
+*.jpg     binary
+*.gif     binary
+*.ico     binary
+*.db      binary
+*.sqlite  binary
+*.wav     binary
+*.mp3     binary

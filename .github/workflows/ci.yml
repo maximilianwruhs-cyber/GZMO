@@ -4,14 +4,15 @@ on:
   push:
     branches: [main, master]
     paths-ignore:
-      - '**.md'
+      # NOTE: '**.md' is deliberately absent. Root-level docs (README, BASELINE,
+      # AGENTS, SOUL, ...) are load-bearing and must stay CI-gated; the bulk
+      # markdown under docs/ and research/ is still exempt.
       - 'docs/**'
       - 'research/**'
       - 'data-next/**'
       - '.cursor/**'
   pull_request:
     paths-ignore:
-      - '**.md'
       - 'docs/**'
       - 'research/**'
       - 'data-next/**'
@@ -45,7 +46,14 @@ jobs:
         run: cargo clippy --all-targets -- -D warnings
 
       - name: Test
-        run: cargo test --all
+        run: |
+          set -o pipefail
+          cargo test --all 2>&1 | tee /tmp/cargo-test.log
+
+      # BASELINE.md carries generated counts. Without this gate it silently
+      # rotted for 45 days and claimed 133 tests against an actual 384.
+      - name: Baseline is current
+        run: ./scripts/baseline-refresh.sh --check --test-log /tmp/cargo-test.log
 
   secrets:
     runs-on: ubuntu-latest
