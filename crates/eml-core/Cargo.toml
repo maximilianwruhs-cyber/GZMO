@@ -6,7 +6,7 @@ description = "Exp-Minus-Log symbolic computation engine — ComplexBall arithme
 
 [dependencies]
 num-complex = "0.4"
-thiserror = "1"
+thiserror = { workspace = true }
 
 [dev-dependencies]
 criterion = { version = "0.5", features = ["html_reports"] }
@@ -16,8 +16,5 @@ rand = "0.8"
 name = "system_benchmarks"
 harness = false
 
-[profile.bench]
-opt-level = 3
-lto = "fat"
-codegen-units = 1
-debug = true
+# NOTE: `[profile.*]` is only honoured at the workspace root; it lives in the
+# root Cargo.toml so cargo stops warning that this section is ignored.

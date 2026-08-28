@@ -30,7 +30,6 @@ schemars = "0.8"
 gzmo-chaos = { path = "../gzmo-chaos" }
 r2d2 = "0.8.10"
 r2d2_sqlite = "0.25.0"
-fs2 = "0.4"
 redis = { workspace = true }
 sha2 = { workspace = true }
 

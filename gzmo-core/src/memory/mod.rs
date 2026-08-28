@@ -20,7 +20,6 @@ pub mod rerank;
 pub mod ripen;
 pub mod scratch;
 pub mod vault;
-pub mod vault_backend;
 
 pub use scratch::{
     DistillJob, DistillSource, RecallSnippet, ScratchPayload, ScratchScope, ScratchService,

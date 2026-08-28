@@ -14,15 +14,14 @@
 //! for all `append()` calls on the current thread. Callers (daemon, CLI commands)
 //! should set it once before using the bus so events carry the correct `source`.
 //!
-//! **Advisory file locking:** Uses `fs2` on Unix to prevent concurrent writes
-//! from interleaving JSONL lines when daemon, CLI, and Pi write simultaneously.
+//! **Advisory file locking:** Uses std file locking on Unix to prevent concurrent
+//! writes from interleaving JSONL lines when daemon, CLI, and Pi write simultaneously.
 
 use std::fs;
 use std::io::Write;
 use std::path::PathBuf;
 
 use chrono::{DateTime, Utc};
-use fs2::FileExt;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -216,7 +215,7 @@ pub fn append_cognition_schedule(
 /// **Event source:** Thread-local — set via `set_event_source()` before
 /// using the bus, or pass `EventSource` directly when constructing events.
 ///
-/// **Cross-process safety:** Uses `fs2` advisory file locking on the
+/// **Cross-process safety:** Uses std advisory file locking on the
 /// `.lock` file alongside the JSONL log to prevent interleaving when
 /// daemon, CLI, and Pi write concurrently.
 #[derive(Debug, Clone)]
@@ -240,7 +239,7 @@ impl SynapseBus {
 
     /// Append a single event to the bus.
     ///
-    /// Acquires an advisory file lock (fs2) before writing to prevent
+    /// Acquires an advisory file lock before writing to prevent
     /// interleaving with concurrent writers (daemon, CLI, Pi).
     ///
     /// Errors are logged via tracing but never propagated —
@@ -299,7 +298,7 @@ impl SynapseBus {
         };
 
         // Exclusive lock blocks until available
-        if lock_file.lock_exclusive().is_err() {
+        if lock_file.lock().is_err() {
             tracing::warn!(
                 synapse_lock = %lock_path.display(),
                 "SynapseBus: failed to acquire exclusive lock, writing without lock"
@@ -391,7 +390,7 @@ impl SynapseBus {
             }
         };
 
-        if lock_file.lock_exclusive().is_err() {
+        if lock_file.lock().is_err() {
             tracing::warn!(
                 synapse_lock = %lock_path.display(),
                 "SynapseBus: failed to acquire exclusive lock for batch, writing without lock"

@@ -6,7 +6,6 @@ use std::io::Write;
 use std::path::{Path, PathBuf};
 
 use anyhow::{bail, Context, Result};
-use fs2::FileExt;
 
 /// `{vault_db}.write.lock` — presence is not the lock; the flock is.
 pub fn vault_write_lock_path(vault_db: &Path) -> PathBuf {
@@ -35,7 +34,7 @@ impl VaultWriteLock {
             .truncate(false)
             .open(&path)
             .with_context(|| format!("open vault write lock {}", path.display()))?;
-        if let Err(e) = file.try_lock_exclusive() {
+        if let Err(e) = file.try_lock() {
             bail!(
                 "vault write lock held — another gzmo serve/daemon owns {} ({e})",
                 vault_db.display()
