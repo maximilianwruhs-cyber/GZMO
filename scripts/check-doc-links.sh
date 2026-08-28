@@ -34,7 +34,9 @@ EXTERNAL_FILE="docs/link-external-roots.txt"
 # live install. Links through them are correct in situ, so they are not rot.
 external_segs=""
 if [ -f "$EXTERNAL_FILE" ]; then
-  external_segs="$(grep -v '^#' "$EXTERNAL_FILE" | grep . | tr -d '/' | tr '\n' ' ')"
+  # tr -d '\r' guards a CRLF checkout: a trailing CR would make every
+  # segment comparison fail silently and the allowlist become a no-op.
+  external_segs="$(grep -v '^#' "$EXTERNAL_FILE" | grep . | tr -d '/\r' | tr '\n' ' ')"
 fi
 
 broken=0
@@ -108,7 +110,9 @@ fi
 
 known="$(mktemp)"; current="$(mktemp)"
 trap 'rm -f "$known" "$current"' EXIT
-grep -v '^#' "$BASELINE_FILE" 2>/dev/null | grep . | sort -u >"$known" || true
+# tr -d '\r': on a CRLF checkout every baseline entry would fail to match the
+# freshly-computed list, and CI would report the whole baseline as new breakage.
+grep -v '^#' "$BASELINE_FILE" 2>/dev/null | grep . | tr -d '\r' | sort -u >"$known" || true
 printf '%s\n' "$report" | grep . | sort -u >"$current" || true
 
 new="$(comm -13 "$known" "$current")"

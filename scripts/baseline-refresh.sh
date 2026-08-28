@@ -31,8 +31,20 @@ while [ $# -gt 0 ]; do
 done
 
 # ── workspace shape ────────────────────────────────────────────────────────
-members=$(sed -n 's/^members = \[\(.*\)\]/\1/p' Cargo.toml | tr -d '" ' | tr ',' ' ')
+# `tr -d '\r'` is load-bearing. On a CRLF checkout the trailing carriage return
+# lands on the LAST member, so `git ls-files -- crates/eml-core<CR>` matches
+# nothing and a whole crate silently vanishes from every metric below.
+members=$(sed -n 's/^members = \[\(.*\)\]/\1/p' Cargo.toml | tr -d '"\r ' | tr ',' ' ')
 [ -n "$members" ] || { echo "baseline-refresh: could not parse workspace members" >&2; exit 1; }
+
+# Fail loudly rather than under-report: every declared member must resolve to
+# at least one tracked file.
+for m in $members; do
+  if [ -z "$(git ls-files -- "$m" | head -1)" ]; then
+    echo "baseline-refresh: workspace member '$m' matches no tracked files" >&2
+    exit 1
+  fi
+done
 
 rs_files=$(git ls-files -- $members | grep '\.rs$' || true)
 rs_count=$(printf '%s\n' "$rs_files" | grep -c . || true)

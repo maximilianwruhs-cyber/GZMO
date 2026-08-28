@@ -11,9 +11,9 @@ descriptive, and never put counts in it.
 | Metric | Value |
 |---|---|
 | Workspace crates | 5 |
-| Rust source files | 244 |
-| Rust lines | 67114 |
-| Tracked files | 995 |
+| Rust source files | 250 |
+| Rust lines | 67619 |
+| Tracked files | 996 |
 | Resolved dependencies | 392 |
 | Tests passed | 384 |
 | Tests failed | 0 |
