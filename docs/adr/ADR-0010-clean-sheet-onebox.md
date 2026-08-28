@@ -1,7 +1,7 @@
 # ADR-0010 — Clean-Sheet One-Box Living Memory Prototype
 
 **Status:** Proposed (2026-08-22, gated)
-**Related:** [ADR-0003](./ADR-0003-one-instance-metabolism.md), [ADR-0004](./ADR-0004-airgap-living-usp.md), [ADR-0007](./ADR-0007-one-product-living.md), [ADR-0008](./ADR-0008-edge-ssm-memory.md), [ADR-0009](./ADR-0009-pgvector-vault.md), [SOTA_FIXES_BACKLOG.md](./SOTA_FIXES_BACKLOG.md)
+**Related:** [ADR-0003](./ADR-0003-one-instance-metabolism.md), [ADR-0004](./ADR-0004-airgap-living-usp.md), [ADR-0007](./ADR-0007-one-product-living.md), [ADR-0008](./ADR-0008-edge-ssm-memory.md), [ADR-0009](./ADR-0009-pgvector-vault.md), [SOTA_FIXES_BACKLOG.md](../SOTA_FIXES_BACKLOG.md)
 **Decision date / owner:** Max, per phase (Phase 1 kickoff requires explicit GO)
 
 ---

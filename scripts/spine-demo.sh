@@ -135,7 +135,7 @@ owner = {
     "living_production": "CT101 (/opt/gzmo/, gzmo-daemon)",
     "lab_scratch": "workstation data-next/",
     "rule": "Never overnight gzmo serve on workstation while CT101 lives",
-    "doc": "docs/CT101_BOUNDARY.md",
+    "doc": "docs/ops/CT101_BOUNDARY.md",
     "probe_advice": ct101.get("advice"),
     "living_proof": ct101.get("living_proof"),
     "dual_writer_risk": (ct101.get("workstation") or {}).get("dual_writer_risk"),

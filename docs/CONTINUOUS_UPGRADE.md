@@ -1,7 +1,7 @@
 # Continuous Upgrade Process
 
 **Status:** Active plan (2026-07-21)  
-**Doctrine:** [ADR-0005](./ADR-0005-flywheel-over-frozen-topology.md) (flywheel) · [ADR-0004](./ADR-0004-airgap-living-usp.md) (USP invariants)  
+**Doctrine:** [ADR-0005](./adr/ADR-0005-flywheel-over-frozen-topology.md) (flywheel) · [ADR-0004](./adr/ADR-0004-airgap-living-usp.md) (USP invariants)  
 **Active strengthen lane:** [BRAIN_FEED.md](./BRAIN_FEED.md)  
 **Quality bar:** [KEEP_QUALITY.md](./KEEP_QUALITY.md)  
 **Unpark sequencing:** [UNPARK_ROADMAP.md](./UNPARK_ROADMAP.md)  
@@ -10,7 +10,7 @@
 
 ## Goal
 
-Run a **repeatable flywheel** that upgrades nutrient density of the living vault and the craft of unique kernels. ADRs **serve** this flywheel ([ADR-0005](./ADR-0005-flywheel-over-frozen-topology.md)) — they must not freeze topology or block promote-by-loop.
+Run a **repeatable flywheel** that upgrades nutrient density of the living vault and the craft of unique kernels. ADRs **serve** this flywheel ([ADR-0005](./adr/ADR-0005-flywheel-over-frozen-topology.md)) — they must not freeze topology or block promote-by-loop.
 
 ## North-star metrics
 
@@ -26,8 +26,8 @@ Run a **repeatable flywheel** that upgrades nutrient density of the living vault
 
 ### Invariants (Layer A — keep)
 
-1. **One overnight writer per vault** — never two concurrent metabolisms ([ADR-0003](./ADR-0003-one-instance-metabolism.md) / [ADR-0005](./ADR-0005-flywheel-over-frozen-topology.md)).
-2. **Airgap honesty** — core path does not require public net ([ADR-0004](./ADR-0004-airgap-living-usp.md)).
+1. **One overnight writer per vault** — never two concurrent metabolisms ([ADR-0003](./adr/ADR-0003-one-instance-metabolism.md) / [ADR-0005](./adr/ADR-0005-flywheel-over-frozen-topology.md)).
+2. **Airgap honesty** — core path does not require public net ([ADR-0004](./adr/ADR-0004-airgap-living-usp.md)).
 3. **No public multi-tenant MCP SKU.**
 4. **Lite is bootstrap**, not a peer overnight brain.
 
@@ -256,8 +256,8 @@ Prefer local checks (`*-check.sh`) over PR spam. CI: docs path-ignore, cancel-in
 
 ## Related
 
-- [ADR-0005-flywheel-over-frozen-topology.md](./ADR-0005-flywheel-over-frozen-topology.md)
+- [ADR-0005-flywheel-over-frozen-topology.md](./adr/ADR-0005-flywheel-over-frozen-topology.md)
 - [STACK_OPPORTUNITY_MAP.md](./STACK_OPPORTUNITY_MAP.md)
 - [OBOLUS_ARENA_BOUNDARY.md](./OBOLUS_ARENA_BOUNDARY.md)
-- [CT101_BOUNDARY.md](./CT101_BOUNDARY.md)
+- [CT101_BOUNDARY.md](./ops/CT101_BOUNDARY.md)
 - [SPINE_FOCUS.md](./SPINE_FOCUS.md)

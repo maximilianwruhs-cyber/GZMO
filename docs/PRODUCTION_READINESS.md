@@ -1,6 +1,6 @@
 # Production readiness (index)
 
-GZMO has **one** product bar: living Keep health ([ADR-0007](ADR-0007-one-product-living.md)). Client-attach scripts are smoke, not a second SKU.
+GZMO has **one** product bar: living Keep health ([ADR-0007](./adr/ADR-0007-one-product-living.md)). Client-attach scripts are smoke, not a second SKU.
 
 | Lane | Doc | Gate |
 |------|-----|------|
@@ -15,7 +15,7 @@ bash scripts/living-readiness-gate.sh
 # GREEN → data-next/keep-quality/ and data-next/living-readiness/latest.json
 ```
 
-Owner: the host that holds `living-host-mutex` (CT101 reference: `gzmo-daemon` + `/opt/gzmo/`). Telescope workstation does not run a second writer — see [CT101_BOUNDARY.md](CT101_BOUNDARY.md).
+Owner: the host that holds `living-host-mutex` (CT101 reference: `gzmo-daemon` + `/opt/gzmo/`). Telescope workstation does not run a second writer — see [CT101_BOUNDARY.md](./ops/CT101_BOUNDARY.md).
 
 ## Client attach smoke
 

@@ -1,6 +1,6 @@
 # Beat Gates — Lab vs Legacy Parity Proof
 
-**Source:** `little-tools-lab/scripts/beat-gate.sh`, [CT101_BOUNDARY.md](../../CT101_BOUNDARY.md)  
+**Source:** `little-tools-lab/scripts/beat-gate.sh`, [CT101_BOUNDARY.md](../../ops/CT101_BOUNDARY.md)  
 **Parent:** [120-two-stack-boundary/SYSTEM.md](./SYSTEM.md)
 
 ---
@@ -9,7 +9,7 @@
 
 Compares Little Tools Lab **recipe output** against CT101 legacy expectations per cognition loop. Emits `beat-meta.json` (S2 stage) with pass/fail and metrics. Explicitly **does not authorize** changes to CT101 — reference baseline only until full-stack cutover.
 
-From [CT101_BOUNDARY.md](../../CT101_BOUNDARY.md):
+From [CT101_BOUNDARY.md](../../ops/CT101_BOUNDARY.md):
 
 > **beat-gate** — Reference baseline only | Proves lab recipes match or beat legacy behavior
 

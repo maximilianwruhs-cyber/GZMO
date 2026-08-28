@@ -3,7 +3,7 @@
   "model_path": "/opt/models/pre-cog/Mamba-Codestral-7B-v0.1-Q4_0.gguf",
   "llama_cpp_build": "b9018 (c84e6d6db) \u2014 rebuilt from pre-refactor commit on VM200; build 9378 has mamba2 tensor shape regression",
   "corpus_tokens": 17554,
-  "corpus_files": "docs/ADR-0003-one-instance-metabolism.md docs/ADR-0004-airgap-living-usp.md docs/ADR-0005-flywheel-over-frozen-topology.md docs/ADR-0006-owner-control-plane.md docs/ADR-0007-one-product-living.md docs/ADR-0008-edge-ssm-memory.md docs/GZMO_NEXT_RUNBOOK.md docs/PI_UPGRADE_RUNBOOK.md",
+  "corpus_files": "docs/adr/ADR-0003-one-instance-metabolism.md docs/adr/ADR-0004-airgap-living-usp.md docs/adr/ADR-0005-flywheel-over-frozen-topology.md docs/adr/ADR-0006-owner-control-plane.md docs/adr/ADR-0007-one-product-living.md docs/adr/ADR-0008-edge-ssm-memory.md docs/GZMO_NEXT_RUNBOOK.md docs/ops/PI_UPGRADE_RUNBOOK.md",
   "state_size_bytes": 276371596,
   "state_n_saved": 17563,
   "state_n_restored": 17563,

@@ -2,7 +2,7 @@
 
 **Status:** Canonical capability map  
 **Generated:** 2026-07-14  
-**Parent infrastructure report:** [CT101_INFRASTRUCTURE_REPORT.md](../CT101_INFRASTRUCTURE_REPORT.md)  
+**Parent infrastructure report:** [CT101_INFRASTRUCTURE_REPORT.md](../reports/CT101_INFRASTRUCTURE_REPORT.md)  
 **Report tree index:** [INDEX.md](./INDEX.md)
 
 This document answers three questions for the CT101 production stack:
@@ -82,7 +82,7 @@ flowchart TB
 
 ## 2. How to advance the stack
 
-Advancement respects [CT101_BOUNDARY.md](../CT101_BOUNDARY.md): **no loop-by-loop graft onto CT101**. Progress happens in three horizons.
+Advancement respects [CT101_BOUNDARY.md](../ops/CT101_BOUNDARY.md): **no loop-by-loop graft onto CT101**. Progress happens in three horizons.
 
 ### Horizon A — CT101-safe hotfixes (now)
 
@@ -244,7 +244,7 @@ Subsystem-specific backlogs with THINKING nodes: see each leaf report under [IND
 
 | If you want to… | Start here |
 |-----------------|------------|
-| Understand what runs where | [CT101_INFRASTRUCTURE_REPORT.md](../CT101_INFRASTRUCTURE_REPORT.md) |
+| Understand what runs where | [CT101_INFRASTRUCTURE_REPORT.md](../reports/CT101_INFRASTRUCTURE_REPORT.md) |
 | See what the stack *can do* | This document, §1 capability matrix |
 | Fix production issues on CT101 | §2 Horizon A + subsystem [CT101-safe] backlogs |
 | Build the replacement | §2 Horizon B + [120-two-stack-boundary/](./120-two-stack-boundary/SYSTEM.md) |

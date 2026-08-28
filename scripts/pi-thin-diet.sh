@@ -7,7 +7,7 @@
 #   bash scripts/pi-thin-diet.sh --apply-recommended --with spark,ask,web --dry-run
 #   bash scripts/pi-thin-diet.sh --purge-denied --dry-run
 #
-# Docs: docs/PI_PACKAGE_ALLOWLIST.md
+# Docs: docs/ops/PI_PACKAGE_ALLOWLIST.md
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"

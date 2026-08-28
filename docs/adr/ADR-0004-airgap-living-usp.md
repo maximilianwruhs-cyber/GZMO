@@ -1,7 +1,7 @@
 # ADR-0004 — Airgap living is the USP (one box, full metabolism)
 
 **Status:** Accepted (2026-07-20); process amended by [ADR-0005](./ADR-0005-flywheel-over-frozen-topology.md) (2026-07-21); **lite-as-bootstrap brand superseded by [ADR-0007](./ADR-0007-one-product-living.md) (2026-08-16)**  
-**Related:** [ADR-0005](./ADR-0005-flywheel-over-frozen-topology.md), [ADR-0003](./ADR-0003-one-instance-metabolism.md), [ADR-0007](./ADR-0007-one-product-living.md), [AIRGAP_LIVING.md](./AIRGAP_LIVING.md), [CONTINUOUS_UPGRADE.md](./CONTINUOUS_UPGRADE.md)
+**Related:** [ADR-0005](./ADR-0005-flywheel-over-frozen-topology.md), [ADR-0003](./ADR-0003-one-instance-metabolism.md), [ADR-0007](./ADR-0007-one-product-living.md), [AIRGAP_LIVING.md](../AIRGAP_LIVING.md), [CONTINUOUS_UPGRADE.md](../CONTINUOUS_UPGRADE.md)
 
 ## Context
 
@@ -10,7 +10,7 @@ Spine packaging treated laptop Memory MCP and living appliance as co-primary bra
 ## Decision (invariants — still binding)
 
 1. **USP dream:** full living Keep on **one airgapped box** — local Prime/embed, local Redis/Qdrant/Neo4j, overnight writer, agents attach via **local MCP** (stdio / `127.0.0.1`).
-2. **Living is first-class development** — roadmap and quality gates aim at airgap living ([CONTINUOUS_UPGRADE.md](./CONTINUOUS_UPGRADE.md)).
+2. **Living is first-class development** — roadmap and quality gates aim at airgap living ([CONTINUOUS_UPGRADE.md](../CONTINUOUS_UPGRADE.md)).
 3. **~~Lite is bootstrap / attach-only~~** — **superseded by [ADR-0007](./ADR-0007-one-product-living.md):** there is no lite SKU. Clients attach to the living writer; `~/.gzmo` is incomplete install / telescope scratch, not a product.
 4. **Reject public multi-tenant webserver SKU** — native MCP-over-HTTP for strangers is out of brand scope.
 5. **One writer absolute** — never two overnight writers at once (host may move under ADR-0005 mutex).

@@ -1,7 +1,7 @@
 # Keep quality gate
 
 **Status:** Continuous living quality bar (2026-07-20)  
-**USP:** [ADR-0004-airgap-living-usp.md](./ADR-0004-airgap-living-usp.md)  
+**USP:** [ADR-0004-airgap-living-usp.md](./adr/ADR-0004-airgap-living-usp.md)  
 **Script:** `bash scripts/keep-quality-gate.sh` → `data-next/keep-quality/`  
 **Soak:** `bash scripts/keep-quality-soak.sh`
 

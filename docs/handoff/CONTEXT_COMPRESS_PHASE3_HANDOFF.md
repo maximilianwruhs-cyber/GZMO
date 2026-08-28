@@ -1,12 +1,12 @@
 # Phase 3 Handoff — Smarter Log Routing & Scored Context Prune
 
 > **ARCHIVAL (recovered 2026-07-19).** Copied from `origin/feat/context-compress-headroom`.  
-> Living `main` does **not** include `gzmo-core/src/context_compress/`. See [HEADROOM_CCR.md](HEADROOM_CCR.md) and [PI_LIVING_STACK.md](PI_LIVING_STACK.md).
+> Living `main` does **not** include `gzmo-core/src/context_compress/`. See [HEADROOM_CCR.md](../HEADROOM_CCR.md) and [PI_LIVING_STACK.md](../ops/PI_LIVING_STACK.md).
 
 **Status:** Optional — not started  
 **Branch:** `feat/context-compress-headroom` (Phase 0–2 merged locally; commits `a373d33` → `c909277`)  
 **Prerequisite:** Phase 2 live (`[context_compress] enabled = true`, CCR on Redis, MCP + tools wired)  
-**Authority:** [INFRASTRUCTURE_MAP.md](./INFRASTRUCTURE_MAP.md) · [PI_OPERATOR_GUIDE.md](./PI_OPERATOR_GUIDE.md) §4.1a · [headroom plan](file:///home/maximilian-wruhs/.cursor/plans/headroom_ideas_for_gzmo_b349ab4c.plan.md)
+**Authority:** [INFRASTRUCTURE_MAP.md](../INFRASTRUCTURE_MAP.md) · [PI_OPERATOR_GUIDE.md](../ops/PI_OPERATOR_GUIDE.md) §4.1a · headroom plan (author-local plan; not in this repo)
 
 ---
 
@@ -63,8 +63,8 @@ flowchart TB
 |------|------|
 | [`gzmo-core/src/context_compress/mod.rs`](../gzmo-core/src/context_compress/mod.rs) | `detect_route`, `compress_for_context`, `compress_for_context_with_ccr` |
 | [`gzmo-core/src/context_compress/logs.rs`](../gzmo-core/src/context_compress/logs.rs) | ANSI strip, dedup, base64/HTML, per-line cap |
-| [`gzmo-core/src/context.rs`](../gzmo-core/src/context.rs) | `prune_with_archive`, `prune_to_budget_inner`, tool-chain integrity |
-| [`gzmo-core/src/agent_loop.rs`](../gzmo-core/src/agent_loop.rs) | `build_windowed_messages` — archive **then** window; distill safety |
+| [`gzmo-core/src/context.rs`](../../gzmo-core/src/context.rs) | `prune_with_archive`, `prune_to_budget_inner`, tool-chain integrity |
+| [`gzmo-core/src/agent_loop.rs`](../../gzmo-core/src/agent_loop.rs) | `build_windowed_messages` — archive **then** window; distill safety |
 | [`gzmo-core/src/config.rs`](../gzmo-core/src/config.rs) | `ContextCompressConfig`, `ContextMemoryConfig` |
 
 **Benchmark baseline (Rust, `enabled = true`):**
@@ -251,8 +251,8 @@ scored_prune_enabled = false  # ship behind flag; default false until validated
 
 | File | Change |
 |------|--------|
-| [`context.rs`](../gzmo-core/src/context.rs) | `prune_with_archive` calls scored path when `scored_prune_enabled` |
-| [`agent_loop.rs`](../gzmo-core/src/agent_loop.rs) | Pass `compress_cfg` + `ccr` + `session_id` into prune (extend `ContextConfig` or new `PruneContext` struct) |
+| [`context.rs`](../../gzmo-core/src/context.rs) | `prune_with_archive` calls scored path when `scored_prune_enabled` |
+| [`agent_loop.rs`](../../gzmo-core/src/agent_loop.rs) | Pass `compress_cfg` + `ccr` + `session_id` into prune (extend `ContextConfig` or new `PruneContext` struct) |
 | [`config.rs`](../gzmo-core/src/config.rs) | `scored_prune_enabled`, `prune_compress_budget` |
 
 **`ContextConfig` today has no compress settings.** Prefer a small struct to avoid coupling:
@@ -302,7 +302,7 @@ scored_prune_enabled = false      # flip after gates
 prune_compress_budget = 800
 ```
 
-Update [`gzmo.toml.example`](../gzmo.toml.example) and [`PI_OPERATOR_GUIDE.md`](./PI_OPERATOR_GUIDE.md) when shipped.
+Update [`gzmo.toml.example`](../../gzmo.toml.example) and [`PI_OPERATOR_GUIDE.md`](../ops/PI_OPERATOR_GUIDE.md) when shipped.
 
 ---
 

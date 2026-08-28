@@ -35,7 +35,7 @@ The LLM **thinks** (extract, verify, dream). The pipeline **remembers**.
 - Not “ingest all Takeout now.”
 - Not Mem0/Zep/Supermemory reimplemented — those are patterns to borrow later.
 - Not a Foundry/Gotham (SEIP) platform — that research stays outside this repo.
-- **USP:** full living Keep on one airgapped box (local engines + sidecars + overnight + local MCP). See [docs/ADR-0004-airgap-living-usp.md](docs/ADR-0004-airgap-living-usp.md), [docs/ADR-0007-one-product-living.md](docs/ADR-0007-one-product-living.md), and [docs/AIRGAP_LIVING.md](docs/AIRGAP_LIVING.md). There is no lite SKU — clients attach; `~/.gzmo` is not the product.
+- **USP:** full living Keep on one airgapped box (local engines + sidecars + overnight + local MCP). See [docs/ADR-0004-airgap-living-usp.md](./docs/adr/ADR-0004-airgap-living-usp.md), [docs/ADR-0007-one-product-living.md](./docs/adr/ADR-0007-one-product-living.md), and [docs/AIRGAP_LIVING.md](docs/AIRGAP_LIVING.md). There is no lite SKU — clients attach; `~/.gzmo` is not the product.
 
 ---
 
@@ -54,5 +54,5 @@ cd /home/gzmo/github-clone/GZMO
 Roadmap to **local production-ready** (M3–M4): [`docs/ROADMAP_TO_M5.md`](docs/ROADMAP_TO_M5.md).
 
 Operator model (one frontend, GZMO Platform spine): [`docs/ARCHITECTURE_GZMO_PLATFORM.md`](docs/ARCHITECTURE_GZMO_PLATFORM.md).  
-**Pi living stack (recovered):** [`docs/PI_LIVING_STACK.md`](docs/PI_LIVING_STACK.md) · upgrade: [`docs/PI_UPGRADE_RUNBOOK.md`](docs/PI_UPGRADE_RUNBOOK.md) · Headroom/CCR: [`docs/HEADROOM_CCR.md`](docs/HEADROOM_CCR.md).  
-**Lost-knowledge inventory:** [`docs/LOST_KNOWLEDGE_INVENTORY.md`](docs/LOST_KNOWLEDGE_INVENTORY.md) · paths: [`docs/CT101_PATH_AUTHORITY.md`](docs/CT101_PATH_AUTHORITY.md).
+**Pi living stack (recovered):** [`docs/PI_LIVING_STACK.md`](./docs/ops/PI_LIVING_STACK.md) · upgrade: [`docs/PI_UPGRADE_RUNBOOK.md`](./docs/ops/PI_UPGRADE_RUNBOOK.md) · Headroom/CCR: [`docs/HEADROOM_CCR.md`](docs/HEADROOM_CCR.md).  
+**Lost-knowledge inventory:** [`docs/LOST_KNOWLEDGE_INVENTORY.md`](docs/LOST_KNOWLEDGE_INVENTORY.md) · paths: [`docs/CT101_PATH_AUTHORITY.md`](./docs/ops/CT101_PATH_AUTHORITY.md).

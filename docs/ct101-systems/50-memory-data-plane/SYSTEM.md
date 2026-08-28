@@ -1,6 +1,6 @@
 # System 50 — Memory Data Plane
 
-**Parent:** [INDEX.md](../INDEX.md) · [CT101_INFRASTRUCTURE_REPORT.md](../../CT101_INFRASTRUCTURE_REPORT.md)
+**Parent:** [INDEX.md](../INDEX.md) · [CT101_INFRASTRUCTURE_REPORT.md](../../reports/CT101_INFRASTRUCTURE_REPORT.md)
 
 The memory data plane is GZMO's authoritative storage and recall stack on CT101: SQLite vault as source of truth, honeypot as curated recall layer, Qdrant as vector mirror, Redis for scratch/embed cache, and VM200 for embeddings/rerank.
 

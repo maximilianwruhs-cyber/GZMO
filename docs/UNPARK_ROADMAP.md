@@ -1,10 +1,10 @@
 # Unpark roadmap (post keep-quality soak)
 
-**Status:** Active (2026-07-20) — USP = airgap living ([ADR-0004](./ADR-0004-airgap-living-usp.md)); flywheel = [ADR-0005](./ADR-0005-flywheel-over-frozen-topology.md)  
+**Status:** Active (2026-07-20) — USP = airgap living ([ADR-0004](./adr/ADR-0004-airgap-living-usp.md)); flywheel = [ADR-0005](./adr/ADR-0005-flywheel-over-frozen-topology.md)  
 **Prerequisite (theater waves):** `bash scripts/keep-quality-soak.sh --summary` → `soak_ready_unpark_ok` (default 3 trailing honest GREEN nights, ≥18h spacing)  
 **Not blocked by soak:** uniqueness craft, beat-gate, promote-by-loop ([CONTINUOUS_UPGRADE.md](./CONTINUOUS_UPGRADE.md))  
 **Also useful:** `bash scripts/production-readiness-gate.sh` (lite + living ops)  
-**Doctrine:** [ADR-0005](./ADR-0005-flywheel-over-frozen-topology.md) · [SPINE_FOCUS.md](./SPINE_FOCUS.md) · [KEEP_QUALITY.md](./KEEP_QUALITY.md) · [BRAIN_FEED.md](./BRAIN_FEED.md)
+**Doctrine:** [ADR-0005](./adr/ADR-0005-flywheel-over-frozen-topology.md) · [SPINE_FOCUS.md](./SPINE_FOCUS.md) · [KEEP_QUALITY.md](./KEEP_QUALITY.md) · [BRAIN_FEED.md](./BRAIN_FEED.md)
 
 ## What changed
 

@@ -12,7 +12,7 @@ STATE_DIR=/opt/models/pre-cog
 SSH="ssh -i ~/.ssh/id_sidecar_proxmox maximilian@192.168.31.110"
 
 # Corpus + questions (UNCHANGED from bench.sh)
-CORPUS_FILES="docs/ADR-0003-one-instance-metabolism.md docs/ADR-0004-airgap-living-usp.md docs/ADR-0005-flywheel-over-frozen-topology.md docs/ADR-0006-owner-control-plane.md docs/ADR-0007-one-product-living.md docs/ADR-0008-edge-ssm-memory.md docs/GZMO_NEXT_RUNBOOK.md docs/PI_UPGRADE_RUNBOOK.md"
+CORPUS_FILES="docs/adr/ADR-0003-one-instance-metabolism.md docs/adr/ADR-0004-airgap-living-usp.md docs/adr/ADR-0005-flywheel-over-frozen-topology.md docs/adr/ADR-0006-owner-control-plane.md docs/adr/ADR-0007-one-product-living.md docs/adr/ADR-0008-edge-ssm-memory.md docs/GZMO_NEXT_RUNBOOK.md docs/ops/PI_UPGRADE_RUNBOOK.md"
 
 QUESTIONS=(
   "What does ADR-0004 describe as the key USP of the airgapped living system?"

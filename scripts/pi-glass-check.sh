@@ -24,7 +24,7 @@ raise SystemExit(0 if all(x in t for x in need) else 1)
 else
   row FAIL "doctrine" "OPERATOR_FRONTEND_DECISION.md missing CLI-canonical phrases"
 fi
-[[ -f "$ROOT/docs/PI_LIVING_STACK.md" ]] && row PASS "pi-living-docs" "PI_LIVING_STACK.md" || row HOLD "pi-living-docs" "missing"
+[[ -f "$ROOT/docs/ops/PI_LIVING_STACK.md" ]] && row PASS "pi-living-docs" "PI_LIVING_STACK.md" || row HOLD "pi-living-docs" "missing"
 
 # Product must not be hijacked; living may use gzmo-living
 bash "$ROOT/scripts/mcp-attach-check.sh" >/dev/null 2>&1 || true

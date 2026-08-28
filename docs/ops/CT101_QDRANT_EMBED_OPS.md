@@ -1,7 +1,7 @@
 # CT101 Qdrant / Embed Ops
 
 **Status:** Living ops scar book (2026-07-19)  
-**Related:** [CT101_DEPLOY.md](./CT101_DEPLOY.md), [PORTS.md](./PORTS.md), [ct101-systems/50-memory-data-plane/qdrant-sync-recall.md](./ct101-systems/50-memory-data-plane/qdrant-sync-recall.md)
+**Related:** [CT101_DEPLOY.md](./CT101_DEPLOY.md), [PORTS.md](../PORTS.md), [ct101-systems/50-memory-data-plane/qdrant-sync-recall.md](../ct101-systems/50-memory-data-plane/qdrant-sync-recall.md)
 
 ## Collections
 
@@ -60,4 +60,4 @@ Deletes only from collection `honeypot` (default). Never point this at `knowledg
 - Delete collection `knowledge` without the M2 cutover checklist  
 - Run prune without `--dry-run` first on a strange count  
 - Treat workstation `data-next/` Qdrant as living  
-- Expect Redis to hold vectors — Redis is scratch/queue only ([PORTS.md](./PORTS.md))
+- Expect Redis to hold vectors — Redis is scratch/queue only ([PORTS.md](../PORTS.md))

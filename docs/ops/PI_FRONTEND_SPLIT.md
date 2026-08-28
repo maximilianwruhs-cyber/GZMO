@@ -1,7 +1,7 @@
 # Pi Frontend Split — Workstation vs CT101
 
 **Date:** 2026-07-08  
-**Status:** Topology current; **operator frontend superseded 2026-07-10** — see [OPERATOR_FRONTEND_DECISION.md](./OPERATOR_FRONTEND_DECISION.md) (`gzmo_cli` canonical, Pi optional).
+**Status:** Topology current; **operator frontend superseded 2026-07-10** — see [OPERATOR_FRONTEND_DECISION.md](../OPERATOR_FRONTEND_DECISION.md) (`gzmo_cli` canonical, Pi optional).
 
 ---
 
@@ -59,7 +59,7 @@ cloud_first_background = true  # dream/spark/ingest try cloud first, then Prime
 
 **Do not** set `active_mode = "local"` on CT101 unless you explicitly want the headless daemon to stop using cloud as its primary engine profile.
 
-See [`CLOUD_MODE_DIAGNOSIS_2026-06-07.md`](./CLOUD_MODE_DIAGNOSIS_2026-06-07.md) for the two-mechanism model (`active_mode` vs `cloud_first_background`).
+See [`CLOUD_MODE_DIAGNOSIS_2026-06-07.md`](../reports/CLOUD_MODE_DIAGNOSIS_2026-06-07.md) for the two-mechanism model (`active_mode` vs `cloud_first_background`).
 
 ---
 

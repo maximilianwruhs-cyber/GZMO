@@ -1,7 +1,7 @@
 # Opportunity discovery cycle
 
 **Status:** Active (2026-07-20) — first product automation for *what to build next*  
-**USP lock:** [ADR-0004-airgap-living-usp.md](./ADR-0004-airgap-living-usp.md)  
+**USP lock:** [ADR-0004-airgap-living-usp.md](./adr/ADR-0004-airgap-living-usp.md)  
 **Nutrient lock:** [BRAIN_FEED.md](./BRAIN_FEED.md)  
 **Atlas:** [STACK_OPPORTUNITY_MAP.md](./STACK_OPPORTUNITY_MAP.md)  
 **Gate:** `bash scripts/opportunity-discovery-check.sh` → `data-next/opportunity-discovery/`
@@ -20,7 +20,7 @@ Sense  →  Rank  →  Bet  →  Ship mission  →  Soak
 1. **USP filter** — bets must strengthen airgap living and/or Brain Feed nutrients. Theater (HSP, pantheon, Observatory glass) is out unless it *feeds* the vault.
 2. **Local intel parked** — do not bet on “run a smarter local 256k model on 32GB” until that world exists. Document as *horizon later*, not active ship.
 3. **Credit honesty** — prefer upgrades that work as side-effects of real work or overnight metabolism. Do not require Cursor credit burn to stay healthy.
-4. **One writer** — never propose a second overnight brain ([ADR-0003](./ADR-0003-one-instance-metabolism.md)).
+4. **One writer** — never propose a second overnight brain ([ADR-0003](./adr/ADR-0003-one-instance-metabolism.md)).
 5. **One active bet** — at most one `status: active` ship mission at a time (kids / attention budget).
 6. **Not living KPI** — this cycle is operator research automation. It does not redefine keep-quality GREEN math.
 

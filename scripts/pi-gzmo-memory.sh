@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Frontend bridge: pi-rust (or any operator client) → GZMO Platform hot memory.
-# Wraps `gzmo memory *` with stable session id. See docs/PI_GZMO_MEMORY_INTEGRATION.md
+# Wraps `gzmo memory *` with stable session id. See docs/ops/PI_GZMO_MEMORY_INTEGRATION.md
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"

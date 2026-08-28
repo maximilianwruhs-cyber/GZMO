@@ -3,7 +3,7 @@
 **Status:** Brain Feed focus (2026-07-20). USP = airgap living; Unpark nutrients first.  
 **Audience:** Operator / product direction for the maximilianwruhs-cyber stack  
 **Scope:** Projects and products that can be created from lived GZMO + adjacent repos — not a generic idea dump.  
-**Doctrine:** [SPINE_FOCUS.md](SPINE_FOCUS.md) · [BRAIN_FEED.md](BRAIN_FEED.md) · [UNPARK_ROADMAP.md](UNPARK_ROADMAP.md) · [ADR-0004-airgap-living-usp.md](ADR-0004-airgap-living-usp.md)
+**Doctrine:** [SPINE_FOCUS.md](SPINE_FOCUS.md) · [BRAIN_FEED.md](BRAIN_FEED.md) · [UNPARK_ROADMAP.md](UNPARK_ROADMAP.md) · [ADR-0004-airgap-living-usp.md](./adr/ADR-0004-airgap-living-usp.md)
 
 ## North star
 
@@ -349,7 +349,7 @@ Those become interesting only after Arena + felt recall make the stack demable t
 
 ## Related docs
 
-- [ADR-0003-one-instance-metabolism.md](ADR-0003-one-instance-metabolism.md) — living-instance doctrine
+- [ADR-0003-one-instance-metabolism.md](./adr/ADR-0003-one-instance-metabolism.md) — living-instance doctrine
 - [GZMO_NEXT_RUNBOOK.md](GZMO_NEXT_RUNBOOK.md) — serve + soft-fail satellites
 - [OKFORGE_PRODUCTION.md](OKFORGE_PRODUCTION.md) — wiki / Observatory ops
 - [CEILING_ROADMAP.md](CEILING_ROADMAP.md) — long-term ceiling

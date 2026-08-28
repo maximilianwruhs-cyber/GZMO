@@ -1,8 +1,8 @@
 # CT101 boundary — reference living host
 
-**Status:** Accepted (2026-07-10); restored living 2026-07-17; **amended by [ADR-0005](./ADR-0005-flywheel-over-frozen-topology.md) (2026-07-21)**  
+**Status:** Accepted (2026-07-10); restored living 2026-07-17; **amended by [ADR-0005](../adr/ADR-0005-flywheel-over-frozen-topology.md) (2026-07-21)**  
 **Restore runbook:** [CT101_RESTORE_LIVING.md](./CT101_RESTORE_LIVING.md)  
-**Flywheel:** [CONTINUOUS_UPGRADE.md](./CONTINUOUS_UPGRADE.md)
+**Flywheel:** [CONTINUOUS_UPGRADE.md](../CONTINUOUS_UPGRADE.md)
 
 ---
 
@@ -10,7 +10,7 @@
 
 **CT101 is the default reference living host** (`gzmo daemon` + `/opt/gzmo/` vault) when `living-host-mutex` claim is `ct101` or unset in production ops.
 
-**Workstation may claim living** for development (`claim --host workstation`) after CT101 overnight writers are stopped. Never two overnight writers at once ([ADR-0005](./ADR-0005-flywheel-over-frozen-topology.md)).
+**Workstation may claim living** for development (`claim --host workstation`) after CT101 overnight writers are stopped. Never two overnight writers at once ([ADR-0005](../adr/ADR-0005-flywheel-over-frozen-topology.md)).
 
 **Promote-by-loop is allowed** — beat-gate PASS for a single loop + operator ack may hand off that loop into the *current* living host ([LTL ADR-0003](../../little-tools-lab/docs/adr/0003-promote-by-loop.md)). Whole-host cutover still requires `CUTOVER_APPROVED=1`.
 
@@ -37,7 +37,7 @@
 
 ## Related
 
-- [ADR-0005-flywheel-over-frozen-topology.md](./ADR-0005-flywheel-over-frozen-topology.md)
-- [ADR-0003-one-instance-metabolism.md](./ADR-0003-one-instance-metabolism.md)
-- [CONTINUOUS_UPGRADE.md](./CONTINUOUS_UPGRADE.md)
-- [BRAIN_FEED.md](./BRAIN_FEED.md)
+- [ADR-0005-flywheel-over-frozen-topology.md](../adr/ADR-0005-flywheel-over-frozen-topology.md)
+- [ADR-0003-one-instance-metabolism.md](../adr/ADR-0003-one-instance-metabolism.md)
+- [CONTINUOUS_UPGRADE.md](../CONTINUOUS_UPGRADE.md)
+- [BRAIN_FEED.md](../BRAIN_FEED.md)

@@ -1,7 +1,7 @@
 # MemoryArena Baseline — VERDICT
 
 **Date:** 2026-08-22
-**ADR:** [ADR-0008](../../docs/ADR-0008-edge-ssm-memory.md) — Option B
+**ADR:** [ADR-0008](../../docs/adr/ADR-0008-edge-ssm-memory.md) — Option B
 **Paper:** arXiv:2608.13883 (MemoryLake on MemoryArena)
 
 ---

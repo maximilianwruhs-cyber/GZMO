@@ -14,7 +14,7 @@
 # Overnight authority: CT101 gzmo-daemon only.
 # Keep workstation gzmo-serve / gzmo-scheduler DISABLED by default.
 # Never run lab serve overnight alongside CT101.
-# See GZMO/docs/CT101_RESTORE_LIVING.md, ADR-0003, CT101_BOUNDARY.md.
+# See GZMO/docs/ops/CT101_RESTORE_LIVING.md, ADR-0003, CT101_BOUNDARY.md.
 #
 # Calibration output from gzmo-handoff.sh lands in gzmo-next-fused.toml
 # (sibling file) for operator review — it never overwrites this file.

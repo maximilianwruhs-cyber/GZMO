@@ -1,6 +1,6 @@
 # Keep-quality soak — 2026-07-20
 
-**USP:** full living on one airgapped box ([ADR-0004](../docs/ADR-0004-airgap-living-usp.md))  
+**USP:** full living on one airgapped box ([ADR-0004](../docs/adr/ADR-0004-airgap-living-usp.md))  
 **Gate:** `bash scripts/keep-quality-gate.sh` · soak: `bash scripts/keep-quality-soak.sh`
 
 ## Soak summary

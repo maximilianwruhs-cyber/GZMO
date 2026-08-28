@@ -91,7 +91,7 @@
 - **Quelle:** research-sota 20260822T041632Z · TRL 5 · benefit=True
 - **Integration-hebel:** Replace the local LLM backbone in the 'extract lane' or 'Brain Feed' with an SSM (TENNs-LLM 1.2B, 192 KB hidden state, O(1) prefill).
 - **Status:** in-progress (ADR-0008 proposed; spikes in `spikes/`)
-- **ADR:** [ADR-0008-edge-ssm-memory.md](ADR-0008-edge-ssm-memory.md) — Option A
+- **ADR:** [ADR-0008-edge-ssm-memory.md](./adr/ADR-0008-edge-ssm-memory.md) — Option A
 - **Spike:** [`spikes/pre-cog/`](../spikes/pre-cog/) — availability probe + latency bench · [`spikes/pre-cog-mamba/`](../spikes/pre-cog-mamba/) — 7B Jamba decisive control + quality parity (VM200)
 - **Gate-Kriterien:**
   1. TENNs-LLM weights license + availability offline (CC-BY-NC-4.0 = **GATED**)
@@ -104,7 +104,7 @@
 - **Quelle:** research-sota 20260822T041632Z · TRL 4 · benefit=True
 - **Integration-hebel:** Adopt MemoryLake's structured multi-track backend for the 'living vault' on CT101.
 - **Status:** in-progress (ADR-0008 proposed; spikes in `spikes/`)
-- **ADR:** [ADR-0008-edge-ssm-memory.md](ADR-0008-edge-ssm-memory.md) — Option B
+- **ADR:** [ADR-0008-edge-ssm-memory.md](./adr/ADR-0008-edge-ssm-memory.md) — Option B
 - **Spike:** [`spikes/memoryarena-baseline/`](../spikes/memoryarena-baseline/) — baseline harness against current system
 - **Gate-Kriterien:**
   1. MemoryLake code availability + license (benchmark: Apache-2.0; backend: TBD)
@@ -122,7 +122,7 @@
 ### CSB — Clean-Sheet One-Box Living Memory Prototype
 - **Quelle:** Operator-Session 2026-08-22 (Backup der 1881 Fakten gefroren: `ct101:/opt/gzmo/backup/facts-20260822T2010/`); SOTA-Analyse (Mem0/Zep/Letta: 1 Store statt 3); Beweise aus ADR-0008/0009-Spikes.
 - **Warum:** 3 State-Stores + 4 Sidecars bei ~1,9k Fakten = Overengineering; Drift-Failure-Mode (45 Punkte) nur lösbar durch 1 Store. Konzept ist SOTA, Architektur 3× zu schwer.
-- **ADR:** [ADR-0010-clean-sheet-onebox.md](ADR-0010-clean-sheet-onebox.md) — Proposed, gated. Workstation `/home/gzmo/gzmo-prototype/`, Port `:5433`, null Produktion-Kontakt.
+- **ADR:** [ADR-0010-clean-sheet-onebox.md](./adr/ADR-0010-clean-sheet-onebox.md) — Proposed, gated. Workstation `/home/gzmo/gzmo-prototype/`, Port `:5433`, null Produktion-Kontakt.
 - **Gate-Kriterien:** P1 box steht + minimaler Kreis (enqueue→distill→facts→MCP search); P2 atomares Supersede + Energy-Ledger; P3 ≥8/12 auf `memoryarena-12q` + 24h-Soak. Cutover = eigenes ADR (Phase 4).
 - **Status:** ADR drafted 2026-08-22, wartet auf Max GO für Phase 1 (scaffold + minimal circle, manuell getriggert, kein Timer).
 

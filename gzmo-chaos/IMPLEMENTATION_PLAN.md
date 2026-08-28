@@ -2,7 +2,7 @@
 
 > **Authority:** [`docs/CHAOS_RHO_CONTROL_MODEL.md`](../docs/CHAOS_RHO_CONTROL_MODEL.md)  
 > **Equations + lab verdicts:** [`docs/LIMIT_CYCLE_SPECS_MATH_MAP.md`](../docs/LIMIT_CYCLE_SPECS_MATH_MAP.md)  
-> **Verify / daemon:** [`docs/CHAOS_RHO_IMPLEMENTATION_HANDOFF.md`](../docs/CHAOS_RHO_IMPLEMENTATION_HANDOFF.md)
+> **Verify / daemon:** [`docs/CHAOS_RHO_IMPLEMENTATION_HANDOFF.md`](../docs/handoff/CHAOS_RHO_IMPLEMENTATION_HANDOFF.md)
 
 Mythological limit-cycle drafts (`LIMIT_CYCLE_BLUEPRINT.md`, `LIMIT_CYCLE_SPEC_V2.md`, `LIMIT_CYCLE_MASTER_SPEC.md`) were **removed** — content distilled into `docs/`. This file tracks **code status only**.
 

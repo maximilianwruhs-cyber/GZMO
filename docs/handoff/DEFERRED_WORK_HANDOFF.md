@@ -1,4 +1,4 @@
-> **Recovered 2026-07-19** from `origin/feat/context-compress-headroom`. See [LOST_KNOWLEDGE_INVENTORY.md](./LOST_KNOWLEDGE_INVENTORY.md).
+> **Recovered 2026-07-19** from `origin/feat/context-compress-headroom`. See [LOST_KNOWLEDGE_INVENTORY.md](../LOST_KNOWLEDGE_INVENTORY.md).
 
 # Deferred Work Handoff — Pedagogy & Tooling Expansion
 
@@ -452,7 +452,7 @@ Alternatively update `skills.toml`:
 |-----|------|
 | [`DEFERRED_WORK_HANDOFF.md`](./DEFERRED_WORK_HANDOFF.md) | **This file** — deferred backlog |
 | [`OPEN_WORK_IMPLEMENTATION_PLAN.md`](./OPEN_WORK_IMPLEMENTATION_PLAN.md) | Shipped Phases A–C |
-| [`PANTHEON_FINAL_PACK.md`](./PANTHEON_FINAL_PACK.md) | Locked 12-persona `/transform` set |
+| [`PANTHEON_FINAL_PACK.md`](../PANTHEON_FINAL_PACK.md) | Locked 12-persona `/transform` set |
 | [`PEDAGOGY_PERSONALITY_ALIGNMENT_HANDOFF.md`](./PEDAGOGY_PERSONALITY_ALIGNMENT_HANDOFF.md) | Phases 1–5 implementation detail |
 | [`SESSION_HANDOFF_TRANSFORM_PERSONALITY_PEDAGOGY.md`](./SESSION_HANDOFF_TRANSFORM_PERSONALITY_PEDAGOGY.md) | Full session arc + notebooks |
 | [`~/gzmo_skills/BRIDGE.md`](../../../gzmo_skills/BRIDGE.md) | Slash-command routing bridge |

@@ -1,7 +1,7 @@
 # System 100 — Discovery Automation
 
 **Parent:** [CT101 Capability Index](../INDEX.md)  
-**Infrastructure:** [CT101_INFRASTRUCTURE_REPORT.md](../../CT101_INFRASTRUCTURE_REPORT.md) §9  
+**Infrastructure:** [CT101_INFRASTRUCTURE_REPORT.md](../../reports/CT101_INFRASTRUCTURE_REPORT.md) §9  
 **Live path:** `/home/maximilian/gzmo_skills/` (repo mirror: `github-clone/gzmo_skills/`)
 
 ---

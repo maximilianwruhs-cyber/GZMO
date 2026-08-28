@@ -2,9 +2,9 @@
 
 **Sovereign overnight memory metabolism** — honeypot quality gate, supersession chains, local vault — airgap-capable on one box. Agents attach via **local stdio MCP**.
 
-**USP:** full living Keep on one airgapped machine (local engines + Redis/Qdrant/Neo4j + daemon). Not a cloud notebook. Not Mem0. Not a public webserver. **One product** — [docs/ADR-0007-one-product-living.md](docs/ADR-0007-one-product-living.md). There is no lite SKU.
+**USP:** full living Keep on one airgapped machine (local engines + Redis/Qdrant/Neo4j + daemon). Not a cloud notebook. Not Mem0. Not a public webserver. **One product** — [docs/ADR-0007-one-product-living.md](./docs/adr/ADR-0007-one-product-living.md). There is no lite SKU.
 
-Doctrine: [docs/ADR-0004-airgap-living-usp.md](docs/ADR-0004-airgap-living-usp.md) · path: [docs/AIRGAP_LIVING.md](docs/AIRGAP_LIVING.md).
+Doctrine: [docs/ADR-0004-airgap-living-usp.md](./docs/adr/ADR-0004-airgap-living-usp.md) · path: [docs/AIRGAP_LIVING.md](docs/AIRGAP_LIVING.md).
 
 ## Install
 
@@ -75,7 +75,7 @@ Operator-only probes (`gzmo_ops_health`, `gzmo_discovery_status`) require `GZMO_
 
 ## Non-goals
 
-- A second “lite” GZMO on the laptop ([ADR-0007](docs/ADR-0007-one-product-living.md))
+- A second “lite” GZMO on the laptop ([ADR-0007](./docs/adr/ADR-0007-one-product-living.md))
 - Multi-host living topologies and discovery / mentor pedagogy as install steps
 - Cloud-hosted memory SaaS / public MCP (leak, not parity)
 - Two overnight writers
@@ -86,7 +86,7 @@ Operator-only probes (`gzmo_ops_health`, `gzmo_discovery_status`) require `GZMO_
 | Doc | Audience |
 |-----|----------|
 | [docs/AIRGAP_LIVING.md](docs/AIRGAP_LIVING.md) | Hero install |
-| [docs/ADR-0007-one-product-living.md](docs/ADR-0007-one-product-living.md) | One product doctrine |
+| [docs/ADR-0007-one-product-living.md](./docs/adr/ADR-0007-one-product-living.md) | One product doctrine |
 | [docs/README.md](docs/README.md) | Operator / architecture index |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Dev setup |
 

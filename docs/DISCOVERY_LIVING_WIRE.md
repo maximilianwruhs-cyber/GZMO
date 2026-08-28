@@ -1,7 +1,7 @@
 # Discovery living wire (CT101)
 
 **Purpose:** Keep Pi discovery attached to the living stack and **probe-first**.  
-**Related:** [DISCOVERY_LIFECYCLE.md](./DISCOVERY_LIFECYCLE.md) (scout vs implement), [CT101_DEPLOY.md](./CT101_DEPLOY.md), [CT101_RESTORE_LIVING.md](./CT101_RESTORE_LIVING.md), [CT101_PATH_AUTHORITY.md](./CT101_PATH_AUTHORITY.md)
+**Related:** [DISCOVERY_LIFECYCLE.md](./DISCOVERY_LIFECYCLE.md) (scout vs implement), [CT101_DEPLOY.md](./ops/CT101_DEPLOY.md), [CT101_RESTORE_LIVING.md](./ops/CT101_RESTORE_LIVING.md), [CT101_PATH_AUTHORITY.md](./ops/CT101_PATH_AUTHORITY.md)
 
 ## What’s living
 
@@ -145,7 +145,7 @@ Discovery preflight now **requires** a living socket `ping` (not merely “daemo
 
 | Slice | State |
 |-------|--------|
-| One living instance = CT101; workstation = operator + Prime | Done — [CT101_RESTORE_LIVING.md](./CT101_RESTORE_LIVING.md) |
+| One living instance = CT101; workstation = operator + Prime | Done — [CT101_RESTORE_LIVING.md](./ops/CT101_RESTORE_LIVING.md) |
 | Probe-first discovery gate (`bash_calls` / `PROBE_REQUIRED`) | Done |
 | Lock wait + 600s timer (no skip storms) | Done |
 | Thin MCP: `gzmo_ops_health`, `gzmo_discovery_status` | Done |

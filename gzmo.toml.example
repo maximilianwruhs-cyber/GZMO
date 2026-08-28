@@ -105,7 +105,7 @@ cron_hour = 2
 cron_minute = 15
 
 # CORE pin — Bonded (+5) Felt Use on promote for CoreCrystallize:/[CORE] prefixes only.
-# Kill-switch: GZMO_CORE_PIN=0. See docs/DISTILLATION_FAILURE_IMPLEMENTATION_HANDOFF.md
+# Kill-switch: GZMO_CORE_PIN=0. See docs/handoff/DISTILLATION_FAILURE_IMPLEMENTATION_HANDOFF.md
 # [core_pin]  # reserved; prefixes currently compiled defaults in memory/core_pin.rs
 
 # SparkEngine — gated serendipitous recall (replaces headless orchestrator spark job)

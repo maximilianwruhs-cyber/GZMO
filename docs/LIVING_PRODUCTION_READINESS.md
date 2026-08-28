@@ -68,9 +68,9 @@ systemctl --user disable gzmo-serve.service
 
 ## Related
 
-- [CT101_BOUNDARY.md](CT101_BOUNDARY.md) — sole living instance  
-- [CT101_RESTORE_LIVING.md](CT101_RESTORE_LIVING.md) — restore checklist  
-- [ADR-0003-one-instance-metabolism.md](ADR-0003-one-instance-metabolism.md)  
+- [CT101_BOUNDARY.md](./ops/CT101_BOUNDARY.md) — sole living instance  
+- [CT101_RESTORE_LIVING.md](./ops/CT101_RESTORE_LIVING.md) — restore checklist  
+- [ADR-0003-one-instance-metabolism.md](./adr/ADR-0003-one-instance-metabolism.md)  
 - [SPINE_FOCUS.md](SPINE_FOCUS.md) — Keep pillars vs Park zoo  
 # Living readiness note
 

@@ -1,6 +1,6 @@
 # Pi Agent — Optional Frontend Node
 
-**Source:** `~/.pi/agent/`, [PI_FRONTEND_SPLIT.md](../../PI_FRONTEND_SPLIT.md), [OPERATOR_FRONTEND_DECISION.md](../../OPERATOR_FRONTEND_DECISION.md)  
+**Source:** `~/.pi/agent/`, [PI_FRONTEND_SPLIT.md](../../ops/PI_FRONTEND_SPLIT.md), [OPERATOR_FRONTEND_DECISION.md](../../OPERATOR_FRONTEND_DECISION.md)  
 **Parent:** [110-external-nodes/SYSTEM.md](./SYSTEM.md)
 
 ---
@@ -24,7 +24,7 @@ Discovery automation also drives Pi heavily via `pi-mentor-discovery-cycle.sh` o
 | Synapse bus | CT101 `/opt/gzmo/data/Synapse/events.jsonl` | Append-only event log |
 | Synapse pull | CT101 daemon `synapse_reader.rs` | Polls `session_end` → distill queue |
 
-From [PI_FRONTEND_SPLIT.md](../../PI_FRONTEND_SPLIT.md):
+From [PI_FRONTEND_SPLIT.md](../../ops/PI_FRONTEND_SPLIT.md):
 
 > Session distillation: CT101 `[synapse_pull]` polls `data/Synapse/events.jsonl` and runs `gzmo distill` on Pi `session_end` — Pi events must reach the Synapse bus (workstation → CT101 path).
 

@@ -1,8 +1,8 @@
 # System 120 — Two-Stack Boundary
 
 **Parent:** [CT101 Capability Index](../INDEX.md)  
-**Authority:** [CT101_BOUNDARY.md](../../CT101_BOUNDARY.md)  
-**Infrastructure:** [CT101_INFRASTRUCTURE_REPORT.md](../../CT101_INFRASTRUCTURE_REPORT.md) §12
+**Authority:** [CT101_BOUNDARY.md](../../ops/CT101_BOUNDARY.md)  
+**Infrastructure:** [CT101_INFRASTRUCTURE_REPORT.md](../../reports/CT101_INFRASTRUCTURE_REPORT.md) §12
 
 ---
 

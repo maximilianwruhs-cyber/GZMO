@@ -14,11 +14,11 @@
 | Run verification today | §5 |
 | Wire chaos into daemon | §7.1 (Workstream B) |
 | Implement MASTER spec phases | §7.2–7.4 |
-| Proposal lineage → math | [`LIMIT_CYCLE_SPECS_MATH_MAP.md`](LIMIT_CYCLE_SPECS_MATH_MAP.md) |
-| Shipped equations only | [`CHAOS_RHO_CONTROL_MODEL.md`](CHAOS_RHO_CONTROL_MODEL.md) |
+| Proposal lineage → math | [`LIMIT_CYCLE_SPECS_MATH_MAP.md`](../LIMIT_CYCLE_SPECS_MATH_MAP.md) |
+| Shipped equations only | [`CHAOS_RHO_CONTROL_MODEL.md`](../CHAOS_RHO_CONTROL_MODEL.md) |
 | Lab results | `~/Projects/chaos-breathing-lab/RESULTS.md` |
 
-**Rule:** Code and [`CHAOS_RHO_CONTROL_MODEL.md`](CHAOS_RHO_CONTROL_MODEL.md) are **authority**. Mythological drafts were removed from `gzmo-chaos/`.
+**Rule:** Code and [`CHAOS_RHO_CONTROL_MODEL.md`](../CHAOS_RHO_CONTROL_MODEL.md) are **authority**. Mythological drafts were removed from `gzmo-chaos/`.
 
 ---
 
@@ -114,7 +114,7 @@ Set `rho_decay_k = 0.0` to restore legacy (no decay).
 
 ### 2.6 Remaining Homeostasis Tasks (implemented 2026-06-08/09)
 
-All remaining tasks (R1–R9) including Tanh governor default, TUI parity, breath-aware triggers, stabilize config, rebirth ρ halving, and edge node verification are documented and implemented. See [gzmo-chaos/IMPLEMENTATION_PLAN.md](../gzmo-chaos/IMPLEMENTATION_PLAN.md).
+All remaining tasks (R1–R9) including Tanh governor default, TUI parity, breath-aware triggers, stabilize config, rebirth ρ halving, and edge node verification are documented and implemented. See [gzmo-chaos/IMPLEMENTATION_PLAN.md](../../gzmo-chaos/IMPLEMENTATION_PLAN.md).
 
 ---
 
@@ -182,8 +182,8 @@ lore_path = "data/lore.toml"
 
 ### 4.3 Read order (30 minutes)
 
-1. [`CHAOS_RHO_CONTROL_MODEL.md`](CHAOS_RHO_CONTROL_MODEL.md) — 10 min  
-2. [`LIMIT_CYCLE_SPECS_MATH_MAP.md`](LIMIT_CYCLE_SPECS_MATH_MAP.md) — 15 min  
+1. [`CHAOS_RHO_CONTROL_MODEL.md`](../CHAOS_RHO_CONTROL_MODEL.md) — 10 min  
+2. [`LIMIT_CYCLE_SPECS_MATH_MAP.md`](../LIMIT_CYCLE_SPECS_MATH_MAP.md) — 15 min  
 3. `chaos-breathing-lab/output/matrix/matrix_summary.tsv` — 5 min  
 
 ---
@@ -266,7 +266,7 @@ npm test   # if tests exist
 
 ## 6. Workstream A — Documentation ✅
 
-**Done:** Math map, control model, handoff on `main`. Lore drafts removed; equations preserved in [`LIMIT_CYCLE_SPECS_MATH_MAP.md`](LIMIT_CYCLE_SPECS_MATH_MAP.md).
+**Done:** Math map, control model, handoff on `main`. Lore drafts removed; equations preserved in [`LIMIT_CYCLE_SPECS_MATH_MAP.md`](../LIMIT_CYCLE_SPECS_MATH_MAP.md).
 
 ---
 

@@ -7,8 +7,8 @@ Already recovered earlier this session (do not re-litigate):
 
 | Doc | Topic |
 |-----|-------|
-| [PI_LIVING_STACK.md](./PI_LIVING_STACK.md) | Pi × Redis scratch × distill × Headroom/CCR |
-| [PI_UPGRADE_RUNBOOK.md](./PI_UPGRADE_RUNBOOK.md) | Stop upgrade-break attach |
+| [PI_LIVING_STACK.md](./ops/PI_LIVING_STACK.md) | Pi × Redis scratch × distill × Headroom/CCR |
+| [PI_UPGRADE_RUNBOOK.md](./ops/PI_UPGRADE_RUNBOOK.md) | Stop upgrade-break attach |
 | [HEADROOM_CCR.md](./HEADROOM_CCR.md) | CCR on Redis (`feat/context-compress-headroom`) |
 
 ## Root cause
@@ -31,16 +31,16 @@ Almost all deep operator contracts were written on **`origin/feat/context-compre
 | [FORUM_ROMANUM_SCHEMA.md](./FORUM_ROMANUM_SCHEMA.md) | Branch |
 | [PEDAGOGY_LEARNING_BUS_SCHEMA.md](./PEDAGOGY_LEARNING_BUS_SCHEMA.md) | Branch |
 | [SKILL_GOLDEN_STANDARD.md](./SKILL_GOLDEN_STANDARD.md) | Branch (path notes may still say `survey_GZMO`) |
-| [DEFERRED_WORK_HANDOFF.md](./DEFERRED_WORK_HANDOFF.md) | Branch (TUI/daemon pedagogy parity backlog) |
-| [CT101_PATH_AUTHORITY.md](./CT101_PATH_AUTHORITY.md) | **New** — single path table |
+| [DEFERRED_WORK_HANDOFF.md](./handoff/DEFERRED_WORK_HANDOFF.md) | Branch (TUI/daemon pedagogy parity backlog) |
+| [CT101_PATH_AUTHORITY.md](./ops/CT101_PATH_AUTHORITY.md) | **New** — single path table |
 | [AGENT_HOME_SECRETS.md](./AGENT_HOME_SECRETS.md) | **New** — never store passwords in agent homes |
 | [CHAOS_LIVING_VS_RITUAL.md](./CHAOS_LIVING_VS_RITUAL.md) | **New** — living park vs chat/TUI ritual |
 | [SKILLS_BRIDGE.md](./SKILLS_BRIDGE.md) | **New** — Rust vs shell vs `gzmo_skills` |
-| [CT101_CLOUD_ROUTING.md](./CT101_CLOUD_ROUTING.md) | **New** — OpenRouter / GLM / 402 ops |
+| [CT101_CLOUD_ROUTING.md](./ops/CT101_CLOUD_ROUTING.md) | **New** — OpenRouter / GLM / 402 ops |
 | [HERDR_METABOLISM.md](./HERDR_METABOLISM.md) | **New** — herdr takeaway ritual (Park spike) |
-| [CT101_QDRANT_EMBED_OPS.md](./CT101_QDRANT_EMBED_OPS.md) | **New** — embed backfill + orphan prune |
+| [CT101_QDRANT_EMBED_OPS.md](./ops/CT101_QDRANT_EMBED_OPS.md) | **New** — embed backfill + orphan prune |
 | [OBOLUS_ARENA_BOUNDARY.md](./OBOLUS_ARENA_BOUNDARY.md) | **New** — core gate vs product vs Arena lab |
-| [VM200_RETRIEVAL_BENCH.md](./VM200_RETRIEVAL_BENCH.md) | Branch (paths updated) |
+| [VM200_RETRIEVAL_BENCH.md](./reports/VM200_RETRIEVAL_BENCH.md) | Branch (paths updated) |
 | [DISCOVERY_LIFECYCLE.md](./DISCOVERY_LIFECYCLE.md) | **New** — scout vs implement (from Cursor plan) |
 | [PANTHEON_SKILLS.md](./PANTHEON_SKILLS.md) | **New** — ritual/lab pantheon front door |
 | [MUTUAL_DISCOVERY_THEATER.md](./MUTUAL_DISCOVERY_THEATER.md) | **New** — pedagogy theater front door |

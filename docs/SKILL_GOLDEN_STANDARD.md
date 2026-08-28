@@ -3,7 +3,7 @@
 # GZMO Skill Golden Standard
 
 **Status:** Canonical quality bar for the Rust skill pantheon (19 slash commands)  
-**Repo:** ritual/lab GZMO clone (path era was `survey_GZMO`; living paths: [CT101_PATH_AUTHORITY.md](./CT101_PATH_AUTHORITY.md))  
+**Repo:** ritual/lab GZMO clone (path era was `survey_GZMO`; living paths: [CT101_PATH_AUTHORITY.md](./ops/CT101_PATH_AUTHORITY.md))  
 **Reference implementations:** `/story` (Generative V2), `/dice` (Mechanical), `/card` (Generative structured), `/transform` (Mutation)  
 **Front door:** [PANTHEON_SKILLS.md](./PANTHEON_SKILLS.md)  
 **Handoff (archive):** [`research/pantheon/SKILL_PANTHEON_STANDARDIZATION_HANDOFF.md`](./research/pantheon/SKILL_PANTHEON_STANDARDIZATION_HANDOFF.md) — shipped inventory, verification, remaining work

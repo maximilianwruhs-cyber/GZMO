@@ -41,15 +41,15 @@ Recorded 2026-07-19 after futures research.
 
 | Pillar | Owner | Evidence |
 |--------|-------|----------|
-| Living overnight metabolism | CT101 `/opt/gzmo/` + `gzmo-daemon` | [`SPINE_FOCUS.md`](../SPINE_FOCUS.md), [`CT101_BOUNDARY.md`](../CT101_BOUNDARY.md), [`ADR-0003`](../ADR-0003-one-instance-metabolism.md) |
+| Living overnight metabolism | CT101 `/opt/gzmo/` + `gzmo-daemon` | [`SPINE_FOCUS.md`](../SPINE_FOCUS.md), [`CT101_BOUNDARY.md`](../ops/CT101_BOUNDARY.md), [`ADR-0003`](../adr/ADR-0003-one-instance-metabolism.md) |
 | Product Memory MCP | Laptop `~/.gzmo` + `gzmo mcp-serve` / `gzmo memory mcp` | [`PRODUCT_MCP.md`](../PRODUCT_MCP.md), [`STACK_OPPORTUNITY_MAP.md`](../STACK_OPPORTUNITY_MAP.md) m2 |
 
 Identity sentence: honeypot + verify + promote — a distillation pipeline, not a chatbot with a vector attachment ([`CORE_INSIGHT.md`](../CORE_INSIGHT.md), [`UNIQUENESS_THESIS.md`](../UNIQUENESS_THESIS.md)).
 
 ### ADR-0003 / CT101 boundary
 
-1. **One living instance only** — never two overnight writers ([`ADR-0003`](../ADR-0003-one-instance-metabolism.md)).
-2. **Living host = CT101** (`gzmo-daemon` under `/opt/gzmo/`); workstation `data-next/` is lab scratch ([`CT101_BOUNDARY.md`](../CT101_BOUNDARY.md), [`CT101_DEPLOY.md`](../CT101_DEPLOY.md)).
+1. **One living instance only** — never two overnight writers ([`ADR-0003`](../adr/ADR-0003-one-instance-metabolism.md)).
+2. **Living host = CT101** (`gzmo-daemon` under `/opt/gzmo/`); workstation `data-next/` is lab scratch ([`CT101_BOUNDARY.md`](../ops/CT101_BOUNDARY.md), [`CT101_DEPLOY.md`](../ops/CT101_DEPLOY.md)).
 3. **Product ≠ living vault** — attach rule: `GZMO_CONFIG=~/.gzmo/gzmo.toml` + `GZMO_PRODUCT=1`; never point laptop product MCP at CT101 `/opt/gzmo` or `data-next/` ([`PRODUCT_MCP.md`](../PRODUCT_MCP.md)).
 
 ### Product v1 non-goals (must stay non-goals)
@@ -64,7 +64,7 @@ Default product home: SQLite + FTS; Redis / Qdrant / Neo4j **off** ([`PRODUCT_MC
 
 ### Pi is optional frontend
 
-[`OPERATOR_FRONTEND_DECISION.md`](../OPERATOR_FRONTEND_DECISION.md): canonical operator UI is `gzmo` / `gzmo chat`. Pi may call `gzmo memory *` / MCP but must not own distill authority or invent parallel Redis/vault clients. [`PI_LIVING_STACK.md`](../PI_LIVING_STACK.md) recovers why “supreme Pi” broke: dual config (`settings.json` vs `mcp.json`), product-vs-living collision, path drift, upgrade fragility.
+[`OPERATOR_FRONTEND_DECISION.md`](../OPERATOR_FRONTEND_DECISION.md): canonical operator UI is `gzmo` / `gzmo chat`. Pi may call `gzmo memory *` / MCP but must not own distill authority or invent parallel Redis/vault clients. [`PI_LIVING_STACK.md`](../ops/PI_LIVING_STACK.md) recovers why “supreme Pi” broke: dual config (`settings.json` vs `mcp.json`), product-vs-living collision, path drift, upgrade fragility.
 
 ### Living topology (ops reality, not product packaging)
 
@@ -78,7 +78,7 @@ Steady-state ports ([`PORTS.md`](../PORTS.md)):
 | Neo4j `:7687` | Graph MCP (stdio), not required for product attach |
 | Prime / retrieval | Cognition + embed/rerank (homelab split) |
 
-**Evidence: GZMO does not ship a full `docker-compose` appliance in-tree.** Repo root has no compose file (verified 2026-07-19). Sidecar compose is an **ops template** referenced from CT101 systems docs (`swap/templates/database-cluster-compose.yml` → live `/opt/database-cluster/docker-compose.yml` on LXC101 — see [`CT101_INFRASTRUCTURE_REPORT.md`](../CT101_INFRASTRUCTURE_REPORT.md), [`ct101-systems/10-host-runtime/`](../ct101-systems/10-host-runtime/SYSTEM.md)). That is host ops, not a stranger one-curl product.
+**Evidence: GZMO does not ship a full `docker-compose` appliance in-tree.** Repo root has no compose file (verified 2026-07-19). Sidecar compose is an **ops template** referenced from CT101 systems docs (`swap/templates/database-cluster-compose.yml` → live `/opt/database-cluster/docker-compose.yml` on LXC101 — see [`CT101_INFRASTRUCTURE_REPORT.md`](../reports/CT101_INFRASTRUCTURE_REPORT.md), [`ct101-systems/10-host-runtime/`](../ct101-systems/10-host-runtime/SYSTEM.md)). That is host ops, not a stranger one-curl product.
 
 Opportunity map items that sound like appliances:
 
@@ -96,10 +96,10 @@ Arena / HSP / portable rewrite / AOS zoo move into the sequenced **Unpark queue*
 
 | Scar | What happened | Source |
 |------|---------------|--------|
-| Dual-writer cutover | Workstation briefly became living (2026-07-15); restored CT101 2026-07-17 | [`ADR-0003`](../ADR-0003-one-instance-metabolism.md), [`CT101_BOUNDARY.md`](../CT101_BOUNDARY.md) |
-| Path drift | Hardcoded homes / `survey_GZMO` vs `/opt/gzmo/current` | [`PI_LIVING_STACK.md`](../PI_LIVING_STACK.md), [`CT101_DEPLOY.md`](../CT101_DEPLOY.md), [`PORTABILITY_REFACTORING.md`](../PORTABILITY_REFACTORING.md) |
-| Pi upgrade break | Custom attach in agent home + wrappers, not stable API | [`PI_LIVING_STACK.md`](../PI_LIVING_STACK.md) |
-| Product vs living collision | Same Pi home pointing at empty `~/.gzmo` while believing CT101 | [`PI_LIVING_STACK.md`](../PI_LIVING_STACK.md) |
+| Dual-writer cutover | Workstation briefly became living (2026-07-15); restored CT101 2026-07-17 | [`ADR-0003`](../adr/ADR-0003-one-instance-metabolism.md), [`CT101_BOUNDARY.md`](../ops/CT101_BOUNDARY.md) |
+| Path drift | Hardcoded homes / `survey_GZMO` vs `/opt/gzmo/current` | [`PI_LIVING_STACK.md`](../ops/PI_LIVING_STACK.md), [`CT101_DEPLOY.md`](../ops/CT101_DEPLOY.md), [`PORTABILITY_REFACTORING.md`](../PORTABILITY_REFACTORING.md) |
+| Pi upgrade break | Custom attach in agent home + wrappers, not stable API | [`PI_LIVING_STACK.md`](../ops/PI_LIVING_STACK.md) |
+| Product vs living collision | Same Pi home pointing at empty `~/.gzmo` while believing CT101 | [`PI_LIVING_STACK.md`](../ops/PI_LIVING_STACK.md) |
 | Redis “not wired” lie | Docs claimed Redis unwired while living path used it | [`LOST_KNOWLEDGE_INVENTORY.md`](../LOST_KNOWLEDGE_INVENTORY.md), [`PORTS.md`](../PORTS.md) |
 
 ---
@@ -129,9 +129,9 @@ Scoring axes: stranger demability · ops burden · uniqueness (metabolism vs com
 | Axis | Score | Notes |
 |------|-------|-------|
 | Demability | **High** | `install-gzmo.sh` → `product-stranger-path` / `mcp-attach-check` ([`SPINE_FOCUS.md`](../SPINE_FOCUS.md), [`PRODUCT_MCP.md`](../PRODUCT_MCP.md)) |
-| Ops burden | **Low** (product) / **medium** (living attach scripts) | Product is SQLite-only; living uses `install-shared-mcp.sh` ([`PI_LIVING_STACK.md`](../PI_LIVING_STACK.md)) |
+| Ops burden | **Low** (product) / **medium** (living attach scripts) | Product is SQLite-only; living uses `install-shared-mcp.sh` ([`PI_LIVING_STACK.md`](../ops/PI_LIVING_STACK.md)) |
 | Uniqueness | **High if metabolism behind it** | MCP alone is commodity; metabolized vault is not ([`UNIQUENESS_THESIS.md`](../UNIQUENESS_THESIS.md)) |
-| Scar risk | **Medium** | Product↔living collision if attach labels blur ([`PI_LIVING_STACK.md`](../PI_LIVING_STACK.md)) |
+| Scar risk | **Medium** | Product↔living collision if attach labels blur ([`PI_LIVING_STACK.md`](../ops/PI_LIVING_STACK.md)) |
 
 **Verdict:** **Primary product thesis.** Matches Keep pillars and v1 non-goals.
 
@@ -139,7 +139,7 @@ Scoring axes: stranger demability · ops burden · uniqueness (metabolism vs com
 
 | Axis | Score | Notes |
 |------|-------|-------|
-| Demability | Medium for Pi users; **low for strangers** | Pi package path exists ([`PRODUCT_MCP.md`](../PRODUCT_MCP.md)) but Pi upgrades break custom attach ([`PI_LIVING_STACK.md`](../PI_LIVING_STACK.md)) |
+| Demability | Medium for Pi users; **low for strangers** | Pi package path exists ([`PRODUCT_MCP.md`](../PRODUCT_MCP.md)) but Pi upgrades break custom attach ([`PI_LIVING_STACK.md`](../ops/PI_LIVING_STACK.md)) |
 | Ops burden | **High** | Dual config, path drift, package double-list |
 | Uniqueness | Low | Frontend theater, not metabolism |
 | Scar risk | **Very high** | Explicitly demoted by [`OPERATOR_FRONTEND_DECISION.md`](../OPERATOR_FRONTEND_DECISION.md) |
@@ -238,7 +238,7 @@ flowchart TB
 Do **not**:
 
 1. Make **Pi the primary UX** or invest in Pi MCP parity as a product gate ([`OPERATOR_FRONTEND_DECISION.md`](../OPERATOR_FRONTEND_DECISION.md)).
-2. Run **two overnight writers** (workstation `gzmo serve` + CT101 daemon) ([`ADR-0003`](../ADR-0003-one-instance-metabolism.md)).
+2. Run **two overnight writers** (workstation `gzmo serve` + CT101 daemon) ([`ADR-0003`](../adr/ADR-0003-one-instance-metabolism.md)).
 3. Point **product MCP** at CT101 `/opt/gzmo` or `data-next/` ([`PRODUCT_MCP.md`](../PRODUCT_MCP.md)).
 4. Require **Redis / Qdrant / Neo4j / overnight distill** for stranger product install ([`PRODUCT_MCP.md`](../PRODUCT_MCP.md) non-goals).
 5. Blur **A stranger install** with the living compose pin — pin shipped under [`LIVING_APPLIANCE.md`](../LIVING_APPLIANCE.md); strangers still must not require Redis/Qdrant/Neo4j.
@@ -262,12 +262,12 @@ Do **not**:
 
 - [`docs/SPINE_FOCUS.md`](../SPINE_FOCUS.md)
 - [`docs/STACK_OPPORTUNITY_MAP.md`](../STACK_OPPORTUNITY_MAP.md)
-- [`docs/ADR-0003-one-instance-metabolism.md`](../ADR-0003-one-instance-metabolism.md)
-- [`docs/CT101_BOUNDARY.md`](../CT101_BOUNDARY.md)
-- [`docs/CT101_DEPLOY.md`](../CT101_DEPLOY.md)
+- [`docs/ADR-0003-one-instance-metabolism.md`](../adr/ADR-0003-one-instance-metabolism.md)
+- [`docs/CT101_BOUNDARY.md`](../ops/CT101_BOUNDARY.md)
+- [`docs/CT101_DEPLOY.md`](../ops/CT101_DEPLOY.md)
 - [`docs/PRODUCT_MCP.md`](../PRODUCT_MCP.md)
 - [`docs/OPERATOR_FRONTEND_DECISION.md`](../OPERATOR_FRONTEND_DECISION.md)
-- [`docs/PI_LIVING_STACK.md`](../PI_LIVING_STACK.md)
+- [`docs/PI_LIVING_STACK.md`](../ops/PI_LIVING_STACK.md)
 - [`docs/PORTS.md`](../PORTS.md)
 - [`docs/DISCOVERY_LIFECYCLE.md`](../DISCOVERY_LIFECYCLE.md)
 - [`docs/CORE_INSIGHT.md`](../CORE_INSIGHT.md)

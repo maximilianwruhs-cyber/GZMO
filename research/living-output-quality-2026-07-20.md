@@ -82,7 +82,7 @@ Rubric: **supported** · **thin** · **stale-loop** · **junk**.
 2. **Spark anchor monoculture** — four-layer GZMO / engine SYSTEM facts crowd out mid-band CuratedVault diversity despite 37k mid-band rows.
 3. **Contradictory stale facts remain latest** — e.g. DreamEngine “disabled / clean-slate” while overnight dream promotes.
 4. **knowledge_core ripen idle** — 0-row export; cascading-compiler story is positioning ahead of living emit.
-5. **Historical faithfulness_context 0.806** ([CORE_MECHANICS_AUDIT_20260605.md](../docs/CORE_MECHANICS_AUDIT_20260605.md)) — not re-run as full suite this pass; spot CORE_INSIGHT gate is not a substitute.
+5. **Historical faithfulness_context 0.806** ([CORE_MECHANICS_AUDIT_20260605.md](../docs/reports/CORE_MECHANICS_AUDIT_20260605.md)) — not re-run as full suite this pass; spot CORE_INSIGHT gate is not a substitute.
 6. **Lab ≠ living** — Phase A / `--frontier` proofs on `data-next` do not grade CT101 content quality (this research exists because that gap was real).
 
 ---
@@ -131,4 +131,4 @@ Rubric: **supported** · **thin** · **stale-loop** · **junk**.
 | Takeaway | `data-next/ct101-takeaway-recall/latest.json` |
 | Census / panel / grades | `data-next/living-quality/*.json` (from CT101 SSH 2026-07-20) |
 | Journal | `journalctl -u gzmo-daemon` on CT101 (dream 01:02Z, spark 00:00/03:30Z) |
-| Doctrine | [SPINE_FOCUS.md](../docs/SPINE_FOCUS.md), [LIVING_PRODUCTION_READINESS.md](../docs/LIVING_PRODUCTION_READINESS.md), [ADR-0003](../docs/ADR-0003-one-instance-metabolism.md) |
+| Doctrine | [SPINE_FOCUS.md](../docs/SPINE_FOCUS.md), [LIVING_PRODUCTION_READINESS.md](../docs/LIVING_PRODUCTION_READINESS.md), [ADR-0003](../docs/adr/ADR-0003-one-instance-metabolism.md) |

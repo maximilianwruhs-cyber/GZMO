@@ -1,6 +1,6 @@
 # System 70 — MCP Layer
 
-**Parent:** [INDEX.md](../INDEX.md) · [CT101_INFRASTRUCTURE_REPORT.md](../../CT101_INFRASTRUCTURE_REPORT.md)
+**Parent:** [INDEX.md](../INDEX.md) · [CT101_INFRASTRUCTURE_REPORT.md](../../reports/CT101_INFRASTRUCTURE_REPORT.md)
 
 The MCP layer connects GZMO to external tool servers via **Model Context Protocol** (stdio JSON-RPC): inbound **client** connections (`McpManager` + tool bridges for Neo4j memory) and outbound **server** mode (`gzmo mcp-serve` for Pi/workstation memory access).
 

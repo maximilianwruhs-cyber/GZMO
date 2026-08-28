@@ -2,7 +2,7 @@
   "model": "mamba-130m-q8_0",
   "model_path": "/home/gzmo/models/pre-cog-mamba/mamba-130m/mamba-130m-q8_0.gguf",
   "corpus_tokens": 16898,
-  "corpus_files": "docs/ADR-0003-one-instance-metabolism.md docs/ADR-0004-airgap-living-usp.md docs/ADR-0005-flywheel-over-frozen-topology.md docs/ADR-0006-owner-control-plane.md docs/ADR-0007-one-product-living.md docs/ADR-0008-edge-ssm-memory.md docs/GZMO_NEXT_RUNBOOK.md docs/PI_UPGRADE_RUNBOOK.md",
+  "corpus_files": "docs/adr/ADR-0003-one-instance-metabolism.md docs/adr/ADR-0004-airgap-living-usp.md docs/adr/ADR-0005-flywheel-over-frozen-topology.md docs/adr/ADR-0006-owner-control-plane.md docs/adr/ADR-0007-one-product-living.md docs/adr/ADR-0008-edge-ssm-memory.md docs/GZMO_NEXT_RUNBOOK.md docs/ops/PI_UPGRADE_RUNBOOK.md",
   "state_size_bytes": 2869892,
   "full_prefill": {
     "ttft_ms_median": 276.241,

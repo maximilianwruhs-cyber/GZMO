@@ -1,15 +1,31 @@
 # GZMO Documentation Index
 
-Canonical operator and architecture docs. Session reports and milestone logs belong in `docs/archive/` (gitignored).
+Canonical operator and architecture docs.
+
+## Layout
+
+| Directory | Holds |
+|---|---|
+| `docs/adr/` | Architecture Decision Records (`ADR-NNNN-*.md`) |
+| `docs/ops/` | Deployment-target operations — CT101, Pi, sidecar |
+| `docs/handoff/` | Agent/session handoff briefs (`*_HANDOFF*.md`) |
+| `docs/reports/` | Point-in-time audits, benchmarks, and status snapshots |
+| `docs/ct101-systems/` | CT101 system inventory |
+| `docs/research/` | Non-canonical research notes |
+| `docs/` (root) | Living architecture, product, and process docs |
+
+Anything dated or run-specific belongs in `docs/reports/`, not the root.
+`docs/link-baseline.txt` records inherited broken links; CI fails on new ones
+via `scripts/check-doc-links.sh`. Shrink that file, never grow it.
 
 ## Start here
 
 | Doc | Purpose |
 |-----|---------|
-| [ADR-0005-flywheel-over-frozen-topology.md](ADR-0005-flywheel-over-frozen-topology.md) | **Flywheel doctrine** — continuous upgrade outranks frozen topology |
-| [ADR-0007-one-product-living.md](ADR-0007-one-product-living.md) | **One product** — living Keep; no lite SKU |
+| [ADR-0005-flywheel-over-frozen-topology.md](./adr/ADR-0005-flywheel-over-frozen-topology.md) | **Flywheel doctrine** — continuous upgrade outranks frozen topology |
+| [ADR-0007-one-product-living.md](./adr/ADR-0007-one-product-living.md) | **One product** — living Keep; no lite SKU |
 | [CONTINUOUS_UPGRADE.md](CONTINUOUS_UPGRADE.md) | **Upgrade process** — four rings, promote-by-loop, craft backlog |
-| [ADR-0004-airgap-living-usp.md](ADR-0004-airgap-living-usp.md) | **USP invariants** — airgap living on one box |
+| [ADR-0004-airgap-living-usp.md](./adr/ADR-0004-airgap-living-usp.md) | **USP invariants** — airgap living on one box |
 | [AIRGAP_LIVING.md](AIRGAP_LIVING.md) | **Hero path** — single-box airgap living bring-up |
 | [KEEP_QUALITY.md](KEEP_QUALITY.md) | **USP quality gate** — `keep-quality-gate.sh` |
 | [BRAIN_FEED.md](BRAIN_FEED.md) | **Active Unpark** — satellites that nourish the living vault |
@@ -32,8 +48,8 @@ Canonical operator and architecture docs. Session reports and milestone logs bel
 | [ROADMAP_TO_M5.md](ROADMAP_TO_M5.md) | Milestone roadmap (operator) |
 | [INFRASTRUCTURE_OVERVIEW.md](INFRASTRUCTURE_OVERVIEW.md) | Living stack topology, ports, runbook |
 | [PORTS.md](PORTS.md) | **Locked** port map (Redis wired; librarian retired) |
-| [CT101_PATH_AUTHORITY.md](CT101_PATH_AUTHORITY.md) | Canonical `/opt/gzmo/*` paths (kill `survey_GZMO` drift) |
-| [CT101_QDRANT_EMBED_OPS.md](CT101_QDRANT_EMBED_OPS.md) | Embed backfill + Qdrant orphan prune |
+| [CT101_PATH_AUTHORITY.md](./ops/CT101_PATH_AUTHORITY.md) | Canonical `/opt/gzmo/*` paths (kill `survey_GZMO` drift) |
+| [CT101_QDRANT_EMBED_OPS.md](./ops/CT101_QDRANT_EMBED_OPS.md) | Embed backfill + Qdrant orphan prune |
 | [LOST_KNOWLEDGE_INVENTORY.md](LOST_KNOWLEDGE_INVENTORY.md) | Archaeology index — branch/plan scars recovered |
 | [PANTHEON_SKILLS.md](PANTHEON_SKILLS.md) | Ritual/lab pantheon front door (dice/card/story research) |
 | [PANTHEON_DEMO.md](PANTHEON_DEMO.md) | Pantheon ritual theater (dice/card/story felt; not Brain Feed) |
@@ -43,7 +59,7 @@ Canonical operator and architecture docs. Session reports and milestone logs bel
 | [MUTUAL_DISCOVERY_THEATER.md](MUTUAL_DISCOVERY_THEATER.md) | Pedagogy theater front door (not scout KPI) |
 | [PRODUCTION_READINESS.md](PRODUCTION_READINESS.md) | Production gate checklist |
 
-Product non-goals: public multi-tenant MCP webserver, dual overnight writers, SEIP scaffolding, cloud memory SaaS, a lite SKU. One product: living Keep ([ADR-0007](ADR-0007-one-product-living.md)).
+Product non-goals: public multi-tenant MCP webserver, dual overnight writers, SEIP scaffolding, cloud memory SaaS, a lite SKU. One product: living Keep ([ADR-0007](./adr/ADR-0007-one-product-living.md)).
 
 ## Architecture
 
@@ -53,7 +69,7 @@ Product non-goals: public multi-tenant MCP webserver, dual overnight writers, SE
 | [MEMORY_ARCHITECTURE_SPEC.md](MEMORY_ARCHITECTURE_SPEC.md) | Vault, honeypot, recall tiers |
 | [GZMO_SYSTEM_ARCHITECTURE_INGEST.md](GZMO_SYSTEM_ARCHITECTURE_INGEST.md) | IngestEngine pipeline |
 | [WIKI_LAYER.md](WIKI_LAYER.md) | Git-tracked markdown wiki layer (see also `../WIKI.md`) |
-| [CORE_MECHANICS_AUDIT_20260605.md](CORE_MECHANICS_AUDIT_20260605.md) | Core mechanics audit |
+| [CORE_MECHANICS_AUDIT_20260605.md](./reports/CORE_MECHANICS_AUDIT_20260605.md) | Core mechanics audit |
 | [CEILING_ROADMAP.md](CEILING_ROADMAP.md) | Long-term ceiling |
 | [SPINE_FOCUS.md](SPINE_FOCUS.md) | **Active product focus** — airgap living USP, Unpark queue |
 | [UNPARK_ROADMAP.md](UNPARK_ROADMAP.md) | Sequenced Unpark waves after keep-quality soak GREEN |
@@ -68,28 +84,28 @@ Product non-goals: public multi-tenant MCP webserver, dual overnight writers, SE
 | Doc | Purpose |
 |-----|---------|
 | [CHAOS_RHO_CONTROL_MODEL.md](CHAOS_RHO_CONTROL_MODEL.md) | **Canonical** engineering spec (shipped law) |
-| [CHAOS_RHO_IMPLEMENTATION_HANDOFF.md](CHAOS_RHO_IMPLEMENTATION_HANDOFF.md) | Completed work inventory + verify tiers |
-| [CHAOS_RHO_REMAINING_IMPLEMENTATION_HANDOFF.md](CHAOS_RHO_REMAINING_IMPLEMENTATION_HANDOFF.md) | **Agent brief** — remaining tasks (start here for new work) |
+| [CHAOS_RHO_IMPLEMENTATION_HANDOFF.md](./handoff/CHAOS_RHO_IMPLEMENTATION_HANDOFF.md) | Completed work inventory + verify tiers |
+| [CHAOS_RHO_REMAINING_IMPLEMENTATION_HANDOFF.md](./handoff/CHAOS_RHO_REMAINING_IMPLEMENTATION_HANDOFF.md) | **Agent brief** — remaining tasks (start here for new work) |
 | [LIMIT_CYCLE_SPECS_MATH_MAP.md](LIMIT_CYCLE_SPECS_MATH_MAP.md) | Proposal lineage → equations + lab verdicts |
 | [TOTO_GZMO_IMPACT_RESEARCH_BRIEF.md](TOTO_GZMO_IMPACT_RESEARCH_BRIEF.md) | Research protocol — Toto-2.0-4m impact evaluation |
-| [TOTO_GZMO_IMPACT_RESEARCH_REPORT.md](TOTO_GZMO_IMPACT_RESEARCH_REPORT.md) | **Verdict: IMPACT NO** — Toto vs ρ baselines (2026-06-08) |
+| [TOTO_GZMO_IMPACT_RESEARCH_REPORT.md](./reports/TOTO_GZMO_IMPACT_RESEARCH_REPORT.md) | **Verdict: IMPACT NO** — Toto vs ρ baselines (2026-06-08) |
 
 ## GZMO-next + Little Tools Lab
 
 | Doc | Purpose |
 |-----|---------|
 | [GZMO_NEXT_RUNBOOK.md](GZMO_NEXT_RUNBOOK.md) | Workstation next instance (scheduler + lab recipes) |
-| [CT101_BOUNDARY.md](CT101_BOUNDARY.md) | Legacy vs next boundary (production cutover 2026-07-15) |
+| [CT101_BOUNDARY.md](./ops/CT101_BOUNDARY.md) | Legacy vs next boundary (production cutover 2026-07-15) |
 | [SHELL_SANDBOX_AND_DISCOVERY.md](SHELL_SANDBOX_AND_DISCOVERY.md) | Strict shell / Docker isolate / discovery→honeypot path |
-| [STRETCH_ITEMS_HANDOFF.md](STRETCH_ITEMS_HANDOFF.md) | Agent brief — gVisor, discovery recipe, vault migrate, Observatory auth |
+| [STRETCH_ITEMS_HANDOFF.md](./handoff/STRETCH_ITEMS_HANDOFF.md) | Agent brief — gVisor, discovery recipe, vault migrate, Observatory auth |
 | [../../little-tools-lab/docs/ENHANCEMENT_AUDIT_2026-07.md](../../little-tools-lab/docs/ENHANCEMENT_AUDIT_2026-07.md) | Enhancement audit — critical notes + prioritized backlog |
 
 ## Operations
 
 | Doc | Purpose |
 |-----|---------|
-| [PI_LIVING_STACK.md](PI_LIVING_STACK.md) | **Recovered** Pi × Redis × Headroom/CCR living topology |
-| [PI_UPGRADE_RUNBOOK.md](PI_UPGRADE_RUNBOOK.md) | Pi upgrade checklist (stop attach breakages) |
+| [PI_LIVING_STACK.md](./ops/PI_LIVING_STACK.md) | **Recovered** Pi × Redis × Headroom/CCR living topology |
+| [PI_UPGRADE_RUNBOOK.md](./ops/PI_UPGRADE_RUNBOOK.md) | Pi upgrade checklist (stop attach breakages) |
 | Workstation wipe restore (private/local) | Private/local only — see `~/.gzmo/private/…` (not in public git) |
 | [HEADROOM_CCR.md](HEADROOM_CCR.md) | Headroom-inspired CCR on Redis (branch-only today) |
 | [SYNAPSE_EVENT_OWNERSHIP.md](SYNAPSE_EVENT_OWNERSHIP.md) | Pi vs daemon bus ownership (dedupe rules) |
@@ -98,7 +114,7 @@ Product non-goals: public multi-tenant MCP webserver, dual overnight writers, SE
 | [OBOLUS_GOVERNANCE.md](OBOLUS_GOVERNANCE.md) | T0–T2 energy gates |
 | [DISCOVERY_KB_FEEDBACK_LOOP.md](DISCOVERY_KB_FEEDBACK_LOOP.md) | Discovery ↔ vault/honeypot loop |
 | [DISCOVERY_LIFECYCLE.md](DISCOVERY_LIFECYCLE.md) | Scout vs implement (discover-only default) |
-| [CT101_CLOUD_ROUTING.md](CT101_CLOUD_ROUTING.md) | OpenRouter / active_mode vs background |
+| [CT101_CLOUD_ROUTING.md](./ops/CT101_CLOUD_ROUTING.md) | OpenRouter / active_mode vs background |
 | [AGENT_HOME_SECRETS.md](AGENT_HOME_SECRETS.md) | Never store passwords in `~/.pi/agent/` |
 | [CHAOS_LIVING_VS_RITUAL.md](CHAOS_LIVING_VS_RITUAL.md) | Living chaos-free vs chat/TUI ritual |
 | [PANTHEON_SKILLS.md](PANTHEON_SKILLS.md) | Pantheon packs — ritual/lab only |
@@ -106,9 +122,9 @@ Product non-goals: public multi-tenant MCP webserver, dual overnight writers, SE
 | [SKILLS_BRIDGE.md](SKILLS_BRIDGE.md) | Rust vs shell vs `gzmo_skills` |
 | [HERDR_METABOLISM.md](HERDR_METABOLISM.md) | herdr takeaway → distill ritual (Park) |
 | [OBOLUS_ARENA_BOUNDARY.md](OBOLUS_ARENA_BOUNDARY.md) | Daemon gate vs Obolus product vs Arena lab |
-| [VM200_RETRIEVAL_BENCH.md](VM200_RETRIEVAL_BENCH.md) | Embed/rerank latency gates on VM200 |
-| [PI_OPERATOR_GUIDE.md](PI_OPERATOR_GUIDE.md) | Pi onboarding (historical; see living stack + upgrade runbook) |
-| [PI_GZMO_MEMORY_INTEGRATION.md](PI_GZMO_MEMORY_INTEGRATION.md) | Living MCP attach (CT101) |
+| [VM200_RETRIEVAL_BENCH.md](./reports/VM200_RETRIEVAL_BENCH.md) | Embed/rerank latency gates on VM200 |
+| [PI_OPERATOR_GUIDE.md](./ops/PI_OPERATOR_GUIDE.md) | Pi onboarding (historical; see living stack + upgrade runbook) |
+| [PI_GZMO_MEMORY_INTEGRATION.md](./ops/PI_GZMO_MEMORY_INTEGRATION.md) | Living MCP attach (CT101) |
 | [REBOOT_STARTUP.md](REBOOT_STARTUP.md) | Cold-start after reboot |
 | [EVAL_TIERS.md](EVAL_TIERS.md) | Eval tier definitions |
 

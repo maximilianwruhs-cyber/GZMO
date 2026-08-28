@@ -67,15 +67,14 @@ largest=$(printf '%s\n' "$rs_files" | tr '\n' '\0' | xargs -0 wc -l \
           | grep -v ' total$' | sort -rn | head -10 \
           | awk '{printf "| `%s` | %s |\n", $2, $1}')
 
-commit=$(git rev-parse --short HEAD)
-commit_date=$(git log -1 --format=%cs)
+# NOTE: deliberately no commit hash or timestamp here. A commit cannot contain
+# its own hash, so embedding one would make BASELINE.md stale the instant it is
+# committed and the CI gate would fail on every push. Use `git log` for dates.
 
 # ── render ─────────────────────────────────────────────────────────────────
 block=$(cat <<EOF
 $BEGIN_MARK
 <!-- Do not edit by hand. Run: scripts/baseline-refresh.sh -->
-
-**Commit:** \`$commit\` ($commit_date)
 
 | Metric | Value |
 |---|---|

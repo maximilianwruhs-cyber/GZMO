@@ -10,8 +10,8 @@
 | `~/gzmo_skills` | `BRIDGE.md` bridge + discovery cron (uses `gzmo_chaos`) |
 | `~/.pi/agent/skills/gzmo-integration` | Pi `gzmo_chaos` tool + `SKILL.md` |
 
-**Canonical spec:** [`SKILL_GOLDEN_STANDARD.md`](SKILL_GOLDEN_STANDARD.md)  
-**Related:** [`GZMO_CHAOS_AGENT_GUIDE.md`](GZMO_CHAOS_AGENT_GUIDE.md), [`CHAOS_RHO_CONTROL_MODEL.md`](CHAOS_RHO_CONTROL_MODEL.md), [`../gzmo_skills/BRIDGE.md`](../../gzmo_skills/BRIDGE.md)
+**Canonical spec:** [`SKILL_GOLDEN_STANDARD.md`](../SKILL_GOLDEN_STANDARD.md)  
+**Related:** [`GZMO_CHAOS_AGENT_GUIDE.md`](../GZMO_CHAOS_AGENT_GUIDE.md), [`CHAOS_RHO_CONTROL_MODEL.md`](../CHAOS_RHO_CONTROL_MODEL.md), [`../gzmo_skills/BRIDGE.md`](../../gzmo_skills/BRIDGE.md)
 
 ---
 
@@ -219,7 +219,7 @@ gzmo_chaos({ command: "card", args: "creature" })
 
 ## 8. Remaining work (next agent)
 
-Priority order from [`SKILL_GOLDEN_STANDARD.md` §11](SKILL_GOLDEN_STANDARD.md):
+Priority order from [`SKILL_GOLDEN_STANDARD.md` §11](../SKILL_GOLDEN_STANDARD.md):
 
 | P | Task | Effort |
 |---|------|--------|

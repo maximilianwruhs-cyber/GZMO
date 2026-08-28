@@ -3,7 +3,7 @@
 **Status:** Operator guide (2026-07-19)  
 **Sibling detail:** `/home/gzmo/github-clone/gzmo_skills/BRIDGE.md` (may still cite `survey_GZMO` paths)  
 **Quality bar:** [SKILL_GOLDEN_STANDARD.md](./SKILL_GOLDEN_STANDARD.md)  
-**Backlog:** [DEFERRED_WORK_HANDOFF.md](./DEFERRED_WORK_HANDOFF.md) (Wave 2b — chat/TUI `maybe_teach` parity)
+**Backlog:** [DEFERRED_WORK_HANDOFF.md](./handoff/DEFERRED_WORK_HANDOFF.md) (Wave 2b — chat/TUI `maybe_teach` parity)
 
 ## Three trees
 
@@ -25,7 +25,7 @@
 
 | Instance | Skills root | Notes |
 |----------|-------------|-------|
-| CT101 living | Release tree under `/opt/gzmo/current` + discovery scripts | Paths: [CT101_PATH_AUTHORITY.md](./CT101_PATH_AUTHORITY.md) |
+| CT101 living | Release tree under `/opt/gzmo/current` + discovery scripts | Paths: [CT101_PATH_AUTHORITY.md](./ops/CT101_PATH_AUTHORITY.md) |
 | Workstation next | `GZMO/skills/` via `gzmo-next.toml` | Resolve with `gzmo instance status` → `skills_root` |
 
 ## Pedagogy surface gap (Wave 2b)

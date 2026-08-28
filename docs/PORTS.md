@@ -1,9 +1,9 @@
 # GZMO Port Layout (Locked)
 
 > **Recovered 2026-07-19** from `origin/feat/context-compress-headroom` (never merged).  
-> Living paths: [CT101_PATH_AUTHORITY.md](./CT101_PATH_AUTHORITY.md). Inventory: [LOST_KNOWLEDGE_INVENTORY.md](./LOST_KNOWLEDGE_INVENTORY.md).
+> Living paths: [CT101_PATH_AUTHORITY.md](./ops/CT101_PATH_AUTHORITY.md). Inventory: [LOST_KNOWLEDGE_INVENTORY.md](./LOST_KNOWLEDGE_INVENTORY.md).
 
-**Status:** Locked steady-state topology — 2026-06-09 (living errata: Redis **is** wired; `:8083` librarian retired; CT101 may use OpenRouter for cognition — [CT101_CLOUD_ROUTING.md](./CT101_CLOUD_ROUTING.md))  
+**Status:** Locked steady-state topology — 2026-06-09 (living errata: Redis **is** wired; `:8083` librarian retired; CT101 may use OpenRouter for cognition — [CT101_CLOUD_ROUTING.md](./ops/CT101_CLOUD_ROUTING.md))  
 **Config authority:** living `/opt/gzmo/gzmo.toml` (URLs must match this map)  
 **Health check:** `./scripts/auto-health-check.sh` / `gzmo health`
 

@@ -4,7 +4,7 @@
 **Date:** 2026-07-15  
 **Audience:** Implementation agent (or human) picking up **after** enhancement audit P0–P2  
 **Parent:** [`../../little-tools-lab/docs/ENHANCEMENT_AUDIT_2026-07.md`](../../little-tools-lab/docs/ENHANCEMENT_AUDIT_2026-07.md)  
-**Policy:** [`CT101_BOUNDARY.md`](CT101_BOUNDARY.md), [`LAB_TREATMENT.md`](../../little-tools-lab/docs/LAB_TREATMENT.md), [ADR-0001](../../little-tools-lab/docs/adr/0001-two-stack-lab-not-ct101-graft.md), [ADR-0002](../../little-tools-lab/docs/adr/0002-pedagogy-chaos-scheduler-lab-only.md)
+**Policy:** [`CT101_BOUNDARY.md`](../ops/CT101_BOUNDARY.md), [`LAB_TREATMENT.md`](../../little-tools-lab/docs/LAB_TREATMENT.md), [ADR-0001](../../little-tools-lab/docs/adr/0001-two-stack-lab-not-ct101-graft.md), [ADR-0002](../../little-tools-lab/docs/adr/0002-pedagogy-chaos-scheduler-lab-only.md)
 
 ---
 

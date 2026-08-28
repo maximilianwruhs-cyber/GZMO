@@ -1,6 +1,6 @@
 # CT101 Capability Report Tree — Index
 
-**Parent:** [CT101_INFRASTRUCTURE_REPORT.md](../CT101_INFRASTRUCTURE_REPORT.md)  
+**Parent:** [CT101_INFRASTRUCTURE_REPORT.md](../reports/CT101_INFRASTRUCTURE_REPORT.md)  
 **Master overview:** [00-CAPABILITIES_OVERVIEW.md](./00-CAPABILITIES_OVERVIEW.md)
 
 Capability-focused documentation: what each system/subsystem can do, how to advance it, how to enhance it. Every report includes **THINKING** nodes on reviewed code sections.

@@ -7,7 +7,7 @@
 
 ## 1. One sentence
 
-**GZMO Platform** = living `config/gzmo.toml` spine + hot/cold memory + overnight metabolism. **One owner, two clients:** `gzmo serve`/`daemon` own the vault (flock + Unix socket); `gzmo memory *` and `gzmo mcp-serve` attach when the owner is up ([ADR-0006](./ADR-0006-owner-control-plane.md)). Interactive REPL remains `gzmo chat`. See [ADR-0003-one-instance-metabolism.md](./ADR-0003-one-instance-metabolism.md) and [OPERATOR_FRONTEND_DECISION.md](./OPERATOR_FRONTEND_DECISION.md).
+**GZMO Platform** = living `config/gzmo.toml` spine + hot/cold memory + overnight metabolism. **One owner, two clients:** `gzmo serve`/`daemon` own the vault (flock + Unix socket); `gzmo memory *` and `gzmo mcp-serve` attach when the owner is up ([ADR-0006](./adr/ADR-0006-owner-control-plane.md)). Interactive REPL remains `gzmo chat`. See [ADR-0003-one-instance-metabolism.md](./adr/ADR-0003-one-instance-metabolism.md) and [OPERATOR_FRONTEND_DECISION.md](./OPERATOR_FRONTEND_DECISION.md).
 
 ---
 
@@ -115,13 +115,13 @@ Rust: [`platform_memory.rs`](../gzmo-core/src/platform_memory.rs) — `GzmoMemor
 
 **Canonical:** [OPERATOR_FRONTEND_DECISION.md](./OPERATOR_FRONTEND_DECISION.md)
 
-**Pi (auxiliary only):** [PI_OPERATOR_GUIDE.md](./PI_OPERATOR_GUIDE.md) — historical; use only via `gzmo memory` bridge, not as assembly authority.
+**Pi (auxiliary only):** [PI_OPERATOR_GUIDE.md](./ops/PI_OPERATOR_GUIDE.md) — historical; use only via `gzmo memory` bridge, not as assembly authority.
 
 ---
 
 ## 8b. Little Tools Lab (GZMO-next)
 
-**CT101** runs **standalone legacy** GZMO — no per-loop lab graft. See [CT101_BOUNDARY.md](./CT101_BOUNDARY.md).
+**CT101** runs **standalone legacy** GZMO — no per-loop lab graft. See [CT101_BOUNDARY.md](./ops/CT101_BOUNDARY.md).
 
 **Little Tools Lab** hosts 46 puzzle pieces and builds **GZMO-next** as a full assembly on the workstation. `beat-gate.sh` uses CT101 behavior as a **reference baseline**, not a promotion trigger.
 
@@ -136,7 +136,7 @@ Rust: [`platform_memory.rs`](../gzmo-core/src/platform_memory.rs) — `GzmoMemor
 | **P0** ✅ | `AgentSession` + arch doc (this file) |
 | **P1** ✅ | `gzmo memory *` CLI + `gzmo_memory_*` tool types |
 | **P2** ✅ | Orchestrator hot scope `orch:{job}:{step}` + `from_memory_config` |
-| **P3** ✅ | `scripts/pi-gzmo-memory.sh` + [PI_GZMO_MEMORY_INTEGRATION.md](./PI_GZMO_MEMORY_INTEGRATION.md) |
+| **P3** ✅ | `scripts/pi-gzmo-memory.sh` + [PI_GZMO_MEMORY_INTEGRATION.md](./ops/PI_GZMO_MEMORY_INTEGRATION.md) |
 | **P4** ✅ | Operator frontend = `gzmo_cli` — [OPERATOR_FRONTEND_DECISION.md](./OPERATOR_FRONTEND_DECISION.md) |
 | **P5** ✅ | Chat session_end → distill enqueue; slash → `gzmo assemble` |
 
@@ -152,7 +152,7 @@ Rust: [`platform_memory.rs`](../gzmo-core/src/platform_memory.rs) — `GzmoMemor
 | [INFRASTRUCTURE_OVERVIEW.md](./INFRASTRUCTURE_OVERVIEW.md) | Ops canonical |
 | [PLATFORM_BASELINE_STATUS.md](./PLATFORM_BASELINE_STATUS.md) | Green gate + label |
 | [LAB_TREATMENT.md](../../little-tools-lab/docs/LAB_TREATMENT.md) | Lab incubator model, promotion ladder |
-| [CT101_BOUNDARY.md](./CT101_BOUNDARY.md) | CT101 standalone; no loop swap |
+| [CT101_BOUNDARY.md](./ops/CT101_BOUNDARY.md) | CT101 standalone; no loop swap |
 
 ---
 

@@ -2,7 +2,7 @@
 
 **Status:** Operator labels (2026-08-16) — names on existing `gzmo-daemon` ticks. Not a new crate. Not a rewrite of cron.  
 **Literature vocabulary:** *Memory as Metabolism* (arXiv:2604.12034) · region rewrite cousin *Auto-Dreamer* (arXiv:2605.20616)  
-**Invariants:** [ADR-0003](./ADR-0003-one-instance-metabolism.md) · [ADR-0004](./ADR-0004-airgap-living-usp.md) · [ADR-0007](./ADR-0007-one-product-living.md)  
+**Invariants:** [ADR-0003](./adr/ADR-0003-one-instance-metabolism.md) · [ADR-0004](./adr/ADR-0004-airgap-living-usp.md) · [ADR-0007](./adr/ADR-0007-one-product-living.md)  
 **Clock SoT:** product template [`gzmo.toml.example`](../gzmo.toml.example) and living overview [INFRASTRUCTURE_OVERVIEW.md](./INFRASTRUCTURE_OVERVIEW.md) §6.2. Compiled defaults in `config.rs` apply only when toml omits the key (spark hours differ).  
 **Gate:** `bash scripts/brain-feed-check.sh` is an **operator** check, not a nightly daemon job.
 
@@ -77,7 +77,7 @@ Morning attach still means: one writer, vault/Qdrant in sync, operator census wh
 
 ## Single living writer
 
-Per [ADR-0003](./ADR-0003-one-instance-metabolism.md) and [ADR-0006](./ADR-0006-owner-control-plane.md):
+Per [ADR-0003](./adr/ADR-0003-one-instance-metabolism.md) and [ADR-0006](./adr/ADR-0006-owner-control-plane.md):
 
 - All daemon ticks above run only on the host holding the living mutex (**CT101** LXC `.202` today).
 - Telescope `gzmo_full` does not start `gzmo serve` while that claim holds.

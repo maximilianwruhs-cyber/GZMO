@@ -3,7 +3,7 @@
 **Status:** Implementation handbook for doctrine-preserving attach  
 **USP:** nutrient · Brain Feed · airgap living — OpenClaw is the **operator surface**, not a second overnight brain  
 **Wayfinder map:** [`.scratch/openclaw-gzmo-memory/map.md`](../.scratch/openclaw-gzmo-memory/map.md)  
-**Contract:** [OPENCLAW_WORKSPACE_CONTRACT.md](./OPENCLAW_WORKSPACE_CONTRACT.md) · [EXTERNAL_LIVING_ATTACH.md](./EXTERNAL_LIVING_ATTACH.md) · [ADR-0003](./ADR-0003-one-instance-metabolism.md) · [ADR-0005](./ADR-0005-flywheel-over-frozen-topology.md)  
+**Contract:** [OPENCLAW_WORKSPACE_CONTRACT.md](./OPENCLAW_WORKSPACE_CONTRACT.md) · [EXTERNAL_LIVING_ATTACH.md](./EXTERNAL_LIVING_ATTACH.md) · [ADR-0003](./adr/ADR-0003-one-instance-metabolism.md) · [ADR-0005](./adr/ADR-0005-flywheel-over-frozen-topology.md)  
 **Research:** [01 living-attach surface](../.scratch/openclaw-gzmo-memory/research/01-living-attach-surface.md) · [02 memorySearch dual-writer risk](../.scratch/openclaw-gzmo-memory/research/02-memorysearch-dual-writer-risk.md)  
 **Sibling (Gateway only):** `~/.openclaw/workspace/.scratch/openclaw-sota/` — do not merge efforts  
 

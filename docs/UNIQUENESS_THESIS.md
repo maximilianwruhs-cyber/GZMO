@@ -53,7 +53,7 @@ Chaos is not a production PulseLoop cron (ADR-0002). It *is* a signature when Lo
 
 CT101 stays frozen; lab backends cannot activate without `GZMO_INSTANCE=next`. Beat-gate compares behavior; it does not authorize CT101 grafts.
 
-- ADR-0001 / [`CT101_BOUNDARY.md`](CT101_BOUNDARY.md)  
+- ADR-0001 / [`CT101_BOUNDARY.md`](./ops/CT101_BOUNDARY.md)  
 - [`assembly.rs:62-71`](../gzmo-core/src/assembly.rs)  
 - [`gzmo-scheduler` refuses non-next](../gzmo-scheduler/src/main.rs)
 

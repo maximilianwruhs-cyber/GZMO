@@ -1,9 +1,9 @@
 # GZMO-next lab runbook — Workstation (not production)
 
 **Production living host is CT101** (restored 2026-07-17). See
-[CT101_BOUNDARY.md](CT101_BOUNDARY.md),
-[CT101_RESTORE_LIVING.md](CT101_RESTORE_LIVING.md), and
-[ADR-0003-one-instance-metabolism.md](ADR-0003-one-instance-metabolism.md).
+[CT101_BOUNDARY.md](./ops/CT101_BOUNDARY.md),
+[CT101_RESTORE_LIVING.md](./ops/CT101_RESTORE_LIVING.md), and
+[ADR-0003-one-instance-metabolism.md](./adr/ADR-0003-one-instance-metabolism.md).
 
 This runbook covers the **workstation lab/dev stack** only:
 `config/gzmo.toml` → `data-next/`, optional `gzmo serve` / `gzmo-scheduler`
@@ -14,11 +14,11 @@ workstation; Prime `:8000` is CT101's local fallback.
 by default. Never enable overnight `gzmo serve` while CT101 `gzmo-daemon` is
 the living writer.
 
-**Lab-dev under [ADR-0005](ADR-0005-flywheel-over-frozen-topology.md):** Develop
+**Lab-dev under [ADR-0005](./adr/ADR-0005-flywheel-over-frozen-topology.md):** Develop
 against `data-next/` + beat-gates. One overnight writer at a time (living-host
 mutex). **Promote-by-loop** after fixture beat-gate PASS + operator ack; whole-host
 cutover still needs `CUTOVER_APPROVED=1`. Soak gates theater Unpark, not craft.
-See [CT101_BOUNDARY.md](CT101_BOUNDARY.md) and [CONTINUOUS_UPGRADE.md](CONTINUOUS_UPGRADE.md).
+See [CT101_BOUNDARY.md](./ops/CT101_BOUNDARY.md) and [CONTINUOUS_UPGRADE.md](CONTINUOUS_UPGRADE.md).
 
 ## Instance layout
 
@@ -51,7 +51,7 @@ export CARGO_TARGET_DIR=$GZMO_CLONE_ROOT/temp-bench/target
 
 Post-cutover (2026-07-15) the memory plane is **enabled** in
 [`config/gzmo-next.toml`](../config/gzmo-next.toml). See
-[CT101_BOUNDARY.md](CT101_BOUNDARY.md) for the cutover checklist. Ingest
+[CT101_BOUNDARY.md](./ops/CT101_BOUNDARY.md) for the cutover checklist. Ingest
 watcher stays off until promotion quality is gated.
 
 | Service | Endpoint | Required? |
@@ -305,7 +305,7 @@ All four must print `PASS: lab beats incumbent`. Metas conform to
 or freeze CT101 for a “next” promotion unless a new ADR says so. Historical
 notes below are lab-only.
 
-Per [CT101_BOUNDARY.md](CT101_BOUNDARY.md) there is no incremental grafting —
+Per [CT101_BOUNDARY.md](./ops/CT101_BOUNDARY.md) there is no incremental grafting —
 cutover would be one migration if GZMO-next were ever re-promoted. **Fresh `data-next/` remains
 valid** without import (stretch S3 decision gate).
 

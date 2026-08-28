@@ -4,7 +4,7 @@
 
 **Audience:** Implementation agent picking up after 2026-06-08 Path A completion.  
 **Repos:** `_foundation-audit/survey_GZMO` (Rust), `_foundation-audit/survey_edge-node` (TS), `chaos-breathing-lab` (sim only)  
-**Canonical shipped law:** [`CHAOS_RHO_CONTROL_MODEL.md`](CHAOS_RHO_CONTROL_MODEL.md)  
+**Canonical shipped law:** [`CHAOS_RHO_CONTROL_MODEL.md`](../CHAOS_RHO_CONTROL_MODEL.md)  
 **Completed work inventory:** [`CHAOS_RHO_IMPLEMENTATION_HANDOFF.md`](CHAOS_RHO_IMPLEMENTATION_HANDOFF.md) §2 + §17 checklist (all checked)
 
 ---
@@ -434,10 +434,10 @@ Start
 
 | Doc | Use |
 |-----|-----|
-| [`CHAOS_RHO_CONTROL_MODEL.md`](CHAOS_RHO_CONTROL_MODEL.md) | Shipped equations |
-| [`LIMIT_CYCLE_SPECS_MATH_MAP.md`](LIMIT_CYCLE_SPECS_MATH_MAP.md) | Lab verdicts, ρ₀=28 correction |
-| [`gzmo-chaos/IMPLEMENTATION_PLAN.md`](../gzmo-chaos/IMPLEMENTATION_PLAN.md) | Crate-local status |
-| [`TOTO_GZMO_IMPACT_RESEARCH_REPORT.md`](TOTO_GZMO_IMPACT_RESEARCH_REPORT.md) | Why no ML forecaster |
+| [`CHAOS_RHO_CONTROL_MODEL.md`](../CHAOS_RHO_CONTROL_MODEL.md) | Shipped equations |
+| [`LIMIT_CYCLE_SPECS_MATH_MAP.md`](../LIMIT_CYCLE_SPECS_MATH_MAP.md) | Lab verdicts, ρ₀=28 correction |
+| [`gzmo-chaos/IMPLEMENTATION_PLAN.md`](../../gzmo-chaos/IMPLEMENTATION_PLAN.md) | Crate-local status |
+| [`TOTO_GZMO_IMPACT_RESEARCH_REPORT.md`](../reports/TOTO_GZMO_IMPACT_RESEARCH_REPORT.md) | Why no ML forecaster |
 | `chaos-breathing-lab/output/matrix/matrix_summary.tsv` | Ground truth numbers |
 
 ---

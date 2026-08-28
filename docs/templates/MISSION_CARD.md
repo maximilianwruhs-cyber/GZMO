@@ -14,8 +14,8 @@ Copy below into a new agent chat. Do not babysit with “continue.”
 
 ## Constraints
 
-- USP: airgap living ([ADR-0004](../ADR-0004-airgap-living-usp.md)); Brain Feed nutrients preferred ([BRAIN_FEED.md](../BRAIN_FEED.md))
-- One overnight writer ([ADR-0003](../ADR-0003-one-instance-metabolism.md))
+- USP: airgap living ([ADR-0004](../adr/ADR-0004-airgap-living-usp.md)); Brain Feed nutrients preferred ([BRAIN_FEED.md](../BRAIN_FEED.md))
+- One overnight writer ([ADR-0003](../adr/ADR-0003-one-instance-metabolism.md))
 - No local-intel quests; no Socratic tourism; no public webserver SKU
 - Finish-through: implement → verify → commit → push → PR → CI green → stop with PR URL or blocker
 

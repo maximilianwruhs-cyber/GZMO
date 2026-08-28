@@ -1,7 +1,7 @@
 # Airgap living — one box, full Keep
 
 **Status:** USP path (2026-07-20)  
-**Doctrine:** [ADR-0007](./ADR-0007-one-product-living.md) (one product) · [ADR-0004](./ADR-0004-airgap-living-usp.md) · [SPINE_FOCUS.md](./SPINE_FOCUS.md)  
+**Doctrine:** [ADR-0007](./adr/ADR-0007-one-product-living.md) (one product) · [ADR-0004](./adr/ADR-0004-airgap-living-usp.md) · [SPINE_FOCUS.md](./SPINE_FOCUS.md)  
 **Compose pin:** [LIVING_APPLIANCE.md](./LIVING_APPLIANCE.md) · `deploy/living-appliance/`  
 **MCP:** [MCP_LOCAL_ATTACH.md](./MCP_LOCAL_ATTACH.md)
 
@@ -13,7 +13,7 @@ Pull the ethernet. One machine still:
 2. Runs overnight dream / spark / distill / immune / night lymph  
 3. Serves agents via **local** `gzmo mcp-serve` (stdio or localhost subprocess)
 
-No OpenRouter. No public webserver. No second overnight writer. The laptop is a client, not a lite GZMO ([ADR-0007](./ADR-0007-one-product-living.md)).
+No OpenRouter. No public webserver. No second overnight writer. The laptop is a client, not a lite GZMO ([ADR-0007](./adr/ADR-0007-one-product-living.md)).
 
 ## Single-box topology
 
@@ -54,7 +54,7 @@ Local engines (typical):
 | Qdrant | `http://127.0.0.1:6333` | vector recall |
 | Neo4j | `bolt://127.0.0.1:7687` | graph MCP |
 
-See [PORTS.md](./PORTS.md), [CT101_DEPLOY.md](./CT101_DEPLOY.md) for production scars on the reference host.
+See [PORTS.md](./PORTS.md), [CT101_DEPLOY.md](./ops/CT101_DEPLOY.md) for production scars on the reference host.
 
 ## Honest degraded modes
 

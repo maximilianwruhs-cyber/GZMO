@@ -1,7 +1,7 @@
 # Operator frontend decision — `gzmo_cli` (canonical)
 
 **Status:** Accepted (2026-07-10)  
-**Supersedes for operator UX:** [ARCHITECTURE_GZMO_PLATFORM.md](./ARCHITECTURE_GZMO_PLATFORM.md) §1 / §7 (pi-rust as daily frontend), [PI_OPERATOR_GUIDE.md](./PI_OPERATOR_GUIDE.md) “canonical for pi-rust” claim.
+**Supersedes for operator UX:** [ARCHITECTURE_GZMO_PLATFORM.md](./ARCHITECTURE_GZMO_PLATFORM.md) §1 / §7 (pi-rust as daily frontend), [PI_OPERATOR_GUIDE.md](./ops/PI_OPERATOR_GUIDE.md) “canonical for pi-rust” claim.
 
 ---
 
@@ -113,8 +113,8 @@ Lab recipes are the **incubator**; chat is the **runner**. CT101 is **not** graf
 | [ARCHITECTURE_GZMO_PLATFORM.md](./ARCHITECTURE_GZMO_PLATFORM.md) | Platform layers (update §7 to point here) |
 | [catalog/ASSEMBLIES.md](../../little-tools-lab/catalog/ASSEMBLIES.md) | Recipe catalog |
 | [LAB_TREATMENT.md](../../little-tools-lab/docs/LAB_TREATMENT.md) | Lab builds GZMO-next; CT101 boundary |
-| [CT101_BOUNDARY.md](./CT101_BOUNDARY.md) | No per-loop CT101 swap |
-| [PI_FRONTEND_SPLIT.md](./PI_FRONTEND_SPLIT.md) | Topology (daemon CT101); operator row superseded |
+| [CT101_BOUNDARY.md](./ops/CT101_BOUNDARY.md) | No per-loop CT101 swap |
+| [PI_FRONTEND_SPLIT.md](./ops/PI_FRONTEND_SPLIT.md) | Topology (daemon CT101); operator row superseded |
 
 ---
 

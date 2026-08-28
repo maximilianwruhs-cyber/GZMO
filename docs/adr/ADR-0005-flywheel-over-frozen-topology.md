@@ -2,7 +2,7 @@
 
 **Status:** Accepted (2026-07-21)  
 **Supersedes for process / topology / promotion:** conflicting bits of [ADR-0003](./ADR-0003-one-instance-metabolism.md), [ADR-0004](./ADR-0004-airgap-living-usp.md) (invariants retained), and [LTL ADR-0001](../../little-tools-lab/docs/adr/0001-two-stack-lab-not-ct101-graft.md)  
-**Implements:** [CONTINUOUS_UPGRADE.md](./CONTINUOUS_UPGRADE.md)  
+**Implements:** [CONTINUOUS_UPGRADE.md](../CONTINUOUS_UPGRADE.md)  
 **Related:** uniqueness craft backlog · Brain Feed · beat-gate kit · [ADR-0007](./ADR-0007-one-product-living.md) (one product)
 
 ## Context
@@ -12,7 +12,7 @@ ADR-0003/0004 and LTL-0001 were written to stop dual-writers and brand drift. Th
 We now have:
 
 1. A ranked uniqueness backlog (S/A kernels worth deepening).
-2. A four-ring continuous upgrade flywheel ([CONTINUOUS_UPGRADE.md](./CONTINUOUS_UPGRADE.md)).
+2. A four-ring continuous upgrade flywheel ([CONTINUOUS_UPGRADE.md](../CONTINUOUS_UPGRADE.md)).
 3. Working beat-gate / Brain Feed / soak machinery.
 
 ADRs that block that flywheel are **wrong for the product**, not “more careful.”

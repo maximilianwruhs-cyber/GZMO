@@ -1,7 +1,7 @@
 # ADR-0008 — Edge SSM backbone (PRECOG) + structured memory backend (MemoryLake)
 
 **Status:** Proposed (2026-08-22)
-**Related:** [ADR-0003](./ADR-0003-one-instance-metabolism.md), [ADR-0004](./ADR-0004-airgap-living-usp.md), [ADR-0005](./ADR-0005-flywheel-over-frozen-topology.md), [ADR-0007](./ADR-0007-one-product-living.md), [CT101_BOUNDARY.md](./CT101_BOUNDARY.md), [SOTA_FIXES_BACKLOG.md](./SOTA_FIXES_BACKLOG.md)
+**Related:** [ADR-0003](./ADR-0003-one-instance-metabolism.md), [ADR-0004](./ADR-0004-airgap-living-usp.md), [ADR-0005](./ADR-0005-flywheel-over-frozen-topology.md), [ADR-0007](./ADR-0007-one-product-living.md), [CT101_BOUNDARY.md](../ops/CT101_BOUNDARY.md), [SOTA_FIXES_BACKLOG.md](../SOTA_FIXES_BACKLOG.md)
 **Decision date / owner:** Max, after spike results (spikes in `spikes/pre-cog/` and `spikes/memoryarena-baseline/`)
 
 ---

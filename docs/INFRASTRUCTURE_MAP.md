@@ -252,7 +252,7 @@ flowchart TB
 | `memory` | stdio → `uvx mcp-neo4j-memory@0.4.5` | `create_entities`, `create_relations`, `search_memories`, `read_graph` | Neo4j KG writes |
 | `gzmo-memory` | stdio → `gzmo mcp-serve` | `gzmo_memory_search`, `gzmo_memory_recall_pull`, `gzmo_memory_status`, `gzmo_wiki_search` | Honeypot RAG + Pi cross-search + wiki grep |
 
-**Cross-search:** `[platform_search]` merges honeypot vault recall with the Pi `knowledge` Qdrant collection ([`gzmo-core/src/platform_search.rs`](../gzmo-core/src/platform_search.rs)). Pi never touches Redis or vault SQL directly — it goes through `scripts/pi-gzmo-memory.sh` (see [`PI_GZMO_MEMORY_INTEGRATION.md`](./PI_GZMO_MEMORY_INTEGRATION.md)).
+**Cross-search:** `[platform_search]` merges honeypot vault recall with the Pi `knowledge` Qdrant collection ([`gzmo-core/src/platform_search.rs`](../gzmo-core/src/platform_search.rs)). Pi never touches Redis or vault SQL directly — it goes through `scripts/pi-gzmo-memory.sh` (see [`PI_GZMO_MEMORY_INTEGRATION.md`](./ops/PI_GZMO_MEMORY_INTEGRATION.md)).
 
 ---
 

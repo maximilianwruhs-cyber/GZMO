@@ -1,7 +1,7 @@
 # Brain Feed — satellites that nourish the living vault
 
 **Status:** Active Unpark focus (2026-07-20)  
-**USP:** [ADR-0004-airgap-living-usp.md](./ADR-0004-airgap-living-usp.md)  
+**USP:** [ADR-0004-airgap-living-usp.md](./adr/ADR-0004-airgap-living-usp.md)  
 **Gate:** `bash scripts/brain-feed-check.sh` → `data-next/brain-feed/`  
 **Quality bar (still required):** [KEEP_QUALITY.md](./KEEP_QUALITY.md)  
 **What to build next:** [OPPORTUNITY_DISCOVERY.md](./OPPORTUNITY_DISCOVERY.md)
@@ -24,7 +24,7 @@ Only these Unpark satellites claim to **improve** the living vault/honeypot. The
 
 ## Hard rules
 
-1. **One overnight writer** ([ADR-0003](./ADR-0003-one-instance-metabolism.md) / [ADR-0005](./ADR-0005-flywheel-over-frozen-topology.md)) — Brain Feed never races a second host. If the workstation holds the living claim (`living-host-mutex.sh`), feed *that* host; otherwise do not start `gzmo serve` while CT101 owns metabolism.
+1. **One overnight writer** ([ADR-0003](./adr/ADR-0003-one-instance-metabolism.md) / [ADR-0005](./adr/ADR-0005-flywheel-over-frozen-topology.md)) — Brain Feed never races a second host. If the workstation holds the living claim (`living-host-mutex.sh`), feed *that* host; otherwise do not start `gzmo serve` while CT101 owns metabolism.
 2. **No auto engine swap** — Arena / Forge / IpW / calibration emit **suggestions** only.
 3. **Living vault target** — nutrient paths aim at the living host (`/opt/gzmo` today), not `~/.gzmo` lite and not silent `data-next` overnight writers.
 4. **keep-quality stays the USP bar** — Brain Feed GREEN does not replace soak readiness.
@@ -141,7 +141,7 @@ When Brain Feed / keep-quality scripts land on `main` and the binary is unchange
 bash scripts/ct101-brain-feed-sync.sh   # rsync + restore +x; never restarts gzmo-daemon
 ```
 
-See [CT101_DEPLOY.md](./CT101_DEPLOY.md) §“Sync docs/scripts only”.
+See [CT101_DEPLOY.md](./ops/CT101_DEPLOY.md) §“Sync docs/scripts only”.
 
 ## Out / demoted (not Brain Feed)
 

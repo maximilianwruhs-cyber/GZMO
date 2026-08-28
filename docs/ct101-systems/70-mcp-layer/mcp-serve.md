@@ -60,7 +60,7 @@ Search writes recall snippets to Redis scratch when `write_scratch=true`.
 | Tools | `gzmo_memory_search`, `gzmo_memory_status`, `gzmo_memory_recall_pull`, `gzmo_memory_profile`, `gzmo_wiki_search` |
 | Config | Full `GzmoConfig` — `[memory]`, `[embeddings]`, `[rerank]`, `[qdrant]`, `[redis]`, `[wiki]` |
 | Deploy | Typically workstation Pi bridge; can run on CT101 with production `gzmo.toml` |
-| Docs | [PI_GZMO_MEMORY_INTEGRATION.md](../../PI_GZMO_MEMORY_INTEGRATION.md) |
+| Docs | [PI_GZMO_MEMORY_INTEGRATION.md](../../ops/PI_GZMO_MEMORY_INTEGRATION.md) |
 
 ---
 

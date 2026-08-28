@@ -2,7 +2,7 @@
 
 **Status:** living document (2026-06-03)  
 **Scope:** architecture north star after ingest-quality overhaul  
-**Companion plan:** [Ingest Quality Overhaul](file:///home/maximilian-wruhs/.cursor/plans/ingest_quality_overhaul_7b70358e.plan.md) (execution gate for M0→M1)  
+**Companion plan:** Ingest Quality Overhaul (author-local plan; not in this repo) (execution gate for M0→M1)  
 **Design spec (Supermemory + agentmemory → GZMO):** [MEMORY_ARCHITECTURE_SPEC.md](./MEMORY_ARCHITECTURE_SPEC.md)  
 **Stable M1 eval scaffold:** [EVAL_SCAFFOLD.md](./EVAL_SCAFFOLD.md)
 

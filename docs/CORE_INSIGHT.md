@@ -2,7 +2,7 @@
 
 **Status:** 2026-07-17 (header corrected for CT101 restore)  
 **Role:** Operator-curated, high-density self-knowledge for the **living stack**.  
-**Living brain:** CT101 (`/opt/gzmo/`). Workstation `data-next/` is lab scratch only — see [CT101_RESTORE_LIVING.md](./CT101_RESTORE_LIVING.md).  
+**Living brain:** CT101 (`/opt/gzmo/`). Workstation `data-next/` is lab scratch only — see [CT101_RESTORE_LIVING.md](./ops/CT101_RESTORE_LIVING.md).  
 **Consumers:** Humans (read), `scripts/seed-core-stack.py` (inject `[TYPE:Name]` bullets into vault + honeypot), then embed + Qdrant sync — **target CT101** unless explicitly seeding a lab vault (`GZMO_ALLOW_LAB_VAULT=1`).  
 **Supersedes for living ops:** Stale claims in `docs/CORE_STACK_KNOWLEDGE.md` (2026-06-07 clean-slate era) and outdated SOUL heuristics that still name `gzmo-scheduler` as overnight authority.
 

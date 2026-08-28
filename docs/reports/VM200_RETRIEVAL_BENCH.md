@@ -1,7 +1,7 @@
 # VM200 retrieval benchmark
 
 > **Recovered 2026-07-19** from `origin/feat/context-compress-headroom` (paths updated).  
-> Ports: [PORTS.md](./PORTS.md). Living embed target: VM200 `:8081`.
+> Ports: [PORTS.md](../PORTS.md). Living embed target: VM200 `:8081`.
 
 HTTP benchmark for embed + rerank on VM200 (and E2E `gzmo memory search`).
 
@@ -55,4 +55,4 @@ scripts/ingest-quality/eval-quick.sh
 python3 scripts/ingest-quality/run-recall-eval.py --batch all --backend gzmo --match strict --track rrf
 ```
 
-SSH: `ssh -i ~/.ssh/id_sidecar_proxmox maximilian@192.168.31.110` (see [PORTS.md](./PORTS.md)).
+SSH: `ssh -i ~/.ssh/id_sidecar_proxmox maximilian@192.168.31.110` (see [PORTS.md](../PORTS.md)).

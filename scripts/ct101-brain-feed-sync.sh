@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Sync Brain Feed / keep-quality scripts+docs to CT101 without rebuild or daemon restart.
-# Encodes docs/CT101_DEPLOY.md §"Sync docs/scripts only". Restores +x (rsync drops it).
+# Encodes docs/ops/CT101_DEPLOY.md §"Sync docs/scripts only". Restores +x (rsync drops it).
 #
 #   bash scripts/ct101-brain-feed-sync.sh
 #

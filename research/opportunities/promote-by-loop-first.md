@@ -46,6 +46,6 @@ bash scripts/living-host-mutex.sh release
 ## Sources
 
 - [stack-future-opportunities-2026-07-21.md](../stack-future-opportunities-2026-07-21.md) O5
-- [ADR-0005-flywheel-over-frozen-topology.md](../../docs/ADR-0005-flywheel-over-frozen-topology.md)
+- [ADR-0005-flywheel-over-frozen-topology.md](../../docs/adr/ADR-0005-flywheel-over-frozen-topology.md)
 
 **Soaked 2026-07-21** — record-only ritual green (`promote-loop.sh` knowledge + knowledge.v1). Living `PROMOTE_APPLY` deferred to a follow-up bet.

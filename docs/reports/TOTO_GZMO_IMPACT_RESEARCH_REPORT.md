@@ -2,7 +2,7 @@
 
 **Date:** 2026-06-08  
 **Model:** [Datadog/Toto-2.0-4m](https://huggingface.co/Datadog/Toto-2.0-4m) (zero-shot)  
-**Protocol:** [`TOTO_GZMO_IMPACT_RESEARCH_BRIEF.md`](TOTO_GZMO_IMPACT_RESEARCH_BRIEF.md)  
+**Protocol:** [`TOTO_GZMO_IMPACT_RESEARCH_BRIEF.md`](../TOTO_GZMO_IMPACT_RESEARCH_BRIEF.md)  
 **Artifacts:** `experiments/toto-spike/` (`evaluate.py`, `results/*.tsv`)
 
 ---
@@ -146,5 +146,5 @@ Max ~10 lines; **do not wire** until Phase-5 gate passes on **real** saturation-
 
 - [Toto-2.0-4m model card](https://huggingface.co/Datadog/Toto-2.0-4m)
 - [Toto 2.0 paper](https://arxiv.org/abs/2605.20119)
-- [`CHAOS_RHO_CONTROL_MODEL.md`](CHAOS_RHO_CONTROL_MODEL.md) — observability fields, EMA \(\gamma=0.2\)
-- Research brief: [`TOTO_GZMO_IMPACT_RESEARCH_BRIEF.md`](TOTO_GZMO_IMPACT_RESEARCH_BRIEF.md)
+- [`CHAOS_RHO_CONTROL_MODEL.md`](../CHAOS_RHO_CONTROL_MODEL.md) — observability fields, EMA \(\gamma=0.2\)
+- Research brief: [`TOTO_GZMO_IMPACT_RESEARCH_BRIEF.md`](../TOTO_GZMO_IMPACT_RESEARCH_BRIEF.md)

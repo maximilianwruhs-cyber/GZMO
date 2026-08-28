@@ -2,7 +2,7 @@
 
 **Canonical engineering spec** for ρ homeostasis (replaces removed lore drafts).  
 **Equation Rosetta:** [`LIMIT_CYCLE_SPECS_MATH_MAP.md`](LIMIT_CYCLE_SPECS_MATH_MAP.md)  
-**Implementation handoff:** [`CHAOS_RHO_IMPLEMENTATION_HANDOFF.md`](CHAOS_RHO_IMPLEMENTATION_HANDOFF.md)
+**Implementation handoff:** [`CHAOS_RHO_IMPLEMENTATION_HANDOFF.md`](./handoff/CHAOS_RHO_IMPLEMENTATION_HANDOFF.md)
 
 ---
 

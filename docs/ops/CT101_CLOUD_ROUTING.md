@@ -1,8 +1,8 @@
 # CT101 Cloud Routing (OpenRouter)
 
 **Status:** Operator runbook (2026-07-19)  
-**Mechanics (historical detail):** [CLOUD_MODE_DIAGNOSIS_2026-06-07.md](./CLOUD_MODE_DIAGNOSIS_2026-06-07.md)  
-**Metering:** [ct101-systems/40-llm-gateway/obolus-metering.md](./ct101-systems/40-llm-gateway/obolus-metering.md)  
+**Mechanics (historical detail):** [CLOUD_MODE_DIAGNOSIS_2026-06-07.md](../reports/CLOUD_MODE_DIAGNOSIS_2026-06-07.md)  
+**Metering:** [ct101-systems/40-llm-gateway/obolus-metering.md](../ct101-systems/40-llm-gateway/obolus-metering.md)  
 **Plans (scars):** `~/.cursor/plans/ct101_glm_5.2_cloud_*.plan.md`, `ct101_openrouter_verify_*.plan.md`
 
 ## Two switches (do not confuse)
@@ -43,4 +43,4 @@ Pinned aliases change (Nemotron → GLM 5.2 + `reasoning_effort`, etc.). Trust *
 
 ## Relation to Obolus
 
-Token spend and context pressure gates: [OBOLUS_GOVERNANCE.md](./OBOLUS_GOVERNANCE.md). Joules/RAPL are observability until calibrated: [OBOLUS_ENERGY.md](./OBOLUS_ENERGY.md).
+Token spend and context pressure gates: [OBOLUS_GOVERNANCE.md](../OBOLUS_GOVERNANCE.md). Joules/RAPL are observability until calibrated: [OBOLUS_ENERGY.md](../OBOLUS_ENERGY.md).

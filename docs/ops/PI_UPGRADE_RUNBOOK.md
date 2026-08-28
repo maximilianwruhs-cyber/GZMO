@@ -46,7 +46,7 @@ Allowlist / deny doctrine: [PI_PACKAGE_ALLOWLIST.md](PI_PACKAGE_ALLOWLIST.md).
 
 Optional: `npm:hsp-pi` (audio). Prefer **one** of `npm:gzmo-pi` *or* git gzmo-pi, not both fighting. If check reports a duplicate, `bash scripts/pi-thin-diet.sh --apply-core --dry-run` then `--apply-core`.
 
-Subagents snippet: [pi-settings-subagents.snippet.json](pi-settings-subagents.snippet.json).
+Subagents snippet: [pi-settings-subagents.snippet.json](../pi-settings-subagents.snippet.json).
 
 ### 2. MCP servers in `mcp.json` (required)
 
@@ -102,7 +102,7 @@ For living operator work:
 | Living gate | `bash scripts/living-readiness-gate.sh` |
 | Product gate | `bash scripts/product-readiness-gate.sh` |
 | Pi MCP | `gzmo_memory_status` then `gzmo_memory_search` |
-| Optional CCR | only if Headroom branch re-landed — see [HEADROOM_CCR.md](HEADROOM_CCR.md) |
+| Optional CCR | only if Headroom branch re-landed — see [HEADROOM_CCR.md](../HEADROOM_CCR.md) |
 
 ---
 

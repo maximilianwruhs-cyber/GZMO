@@ -1,7 +1,7 @@
 # Spine focus — airgap living USP
 
-**Status:** Active (2026-08-16) — **one product: living Keep** ([ADR-0007](ADR-0007-one-product-living.md))  
-**Doctrine:** [ADR-0007](ADR-0007-one-product-living.md) (one SKU) · [ADR-0005](ADR-0005-flywheel-over-frozen-topology.md) (flywheel) · [ADR-0004](ADR-0004-airgap-living-usp.md) (airgap USP) · [ADR-0003](ADR-0003-one-instance-metabolism.md) (one writer)  
+**Status:** Active (2026-08-16) — **one product: living Keep** ([ADR-0007](./adr/ADR-0007-one-product-living.md))  
+**Doctrine:** [ADR-0007](./adr/ADR-0007-one-product-living.md) (one SKU) · [ADR-0005](./adr/ADR-0005-flywheel-over-frozen-topology.md) (flywheel) · [ADR-0004](./adr/ADR-0004-airgap-living-usp.md) (airgap USP) · [ADR-0003](./adr/ADR-0003-one-instance-metabolism.md) (one writer)  
 **Supersedes:** lite-as-bootstrap brand; co-primary “A + C”  
 **Unpark roadmap:** [UNPARK_ROADMAP.md](UNPARK_ROADMAP.md)  
 **Audience:** Operator deciding what to strengthen next  
@@ -23,14 +23,14 @@ There is no lite product. `~/.gzmo` FTS MCP is an incomplete install or telescop
 
 ## Hard boundary (do not blur)
 
-Writer vs client is ops, not two products ([ADR-0007](ADR-0007-one-product-living.md)).
+Writer vs client is ops, not two products ([ADR-0007](./adr/ADR-0007-one-product-living.md)).
 
 | | Client (hand) | Living writer (Keep) |
 |--|--|--|
 | Vault | None of its own (or telescope scratch) | `/opt/gzmo` (CT101 today) or appliance data dir |
 | Sidecars | N/A | Redis + Qdrant + Neo4j **on the same box** (or honest degrade) |
-| Overnight writer | No | Yes — sole writer ([ADR-0003](ADR-0003-one-instance-metabolism.md)) |
-| MCP | stdio → living `mcp-serve` / owner socket | Owns the vault ([ADR-0006](ADR-0006-owner-control-plane.md)) |
+| Overnight writer | No | Yes — sole writer ([ADR-0003](./adr/ADR-0003-one-instance-metabolism.md)) |
+| MCP | stdio → living `mcp-serve` / owner socket | Owns the vault ([ADR-0006](./adr/ADR-0006-owner-control-plane.md)) |
 
 Never a second overnight writer. Never market `gzmo-memory` on `~/.gzmo` as GZMO.
 
@@ -42,7 +42,7 @@ Never a second overnight writer. Never market `gzmo-memory` on `~/.gzmo` as GZMO
 | **USP target** | Any one airgapped box | local data dir + compose pin | Yes when claim=`appliance` |
 | **Dev living (allowed)** | Workstation | `GZMO/data-next/` or local vault | Yes when claim=`workstation` and CT101 writers stopped (`living-host-mutex.sh`) |
 
-See [CT101_BOUNDARY.md](CT101_BOUNDARY.md), [AIRGAP_LIVING.md](AIRGAP_LIVING.md), [LIVING_APPLIANCE.md](LIVING_APPLIANCE.md).
+See [CT101_BOUNDARY.md](./ops/CT101_BOUNDARY.md), [AIRGAP_LIVING.md](AIRGAP_LIVING.md), [LIVING_APPLIANCE.md](LIVING_APPLIANCE.md).
 
 **Workstation Neo4j is throwaway** — living smoke/auth SoT is the living host (CT101: `/opt/database-cluster/.env`).
 
@@ -98,11 +98,11 @@ Living test: keep-quality GREEN + one-writer + local MCP attach (`gzmo-living`).
 
 ## Related
 
-- [ADR-0007-one-product-living.md](ADR-0007-one-product-living.md)
-- [ADR-0004-airgap-living-usp.md](ADR-0004-airgap-living-usp.md)
+- [ADR-0007-one-product-living.md](./adr/ADR-0007-one-product-living.md)
+- [ADR-0004-airgap-living-usp.md](./adr/ADR-0004-airgap-living-usp.md)
 - [AIRGAP_LIVING.md](AIRGAP_LIVING.md)
 - [MCP_LOCAL_ATTACH.md](MCP_LOCAL_ATTACH.md)
 - [PRODUCT_MCP.md](PRODUCT_MCP.md) (client attach / historical installer)
 - [LIVING_APPLIANCE.md](LIVING_APPLIANCE.md)
 - [CORE_INSIGHT.md](CORE_INSIGHT.md)
-- [ADR-0003-one-instance-metabolism.md](ADR-0003-one-instance-metabolism.md)
+- [ADR-0003-one-instance-metabolism.md](./adr/ADR-0003-one-instance-metabolism.md)

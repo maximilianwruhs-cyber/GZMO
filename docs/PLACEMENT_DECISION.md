@@ -10,7 +10,7 @@
 
 ## Amendment — 2026-07-17 (CT101 restore living)
 
-Reversed the 2026-07-15 workstation promotion. See [CT101_RESTORE_LIVING.md](./CT101_RESTORE_LIVING.md).
+Reversed the 2026-07-15 workstation promotion. See [CT101_RESTORE_LIVING.md](./ops/CT101_RESTORE_LIVING.md).
 
 | Component | Production host |
 |-----------|-----------------|
@@ -91,7 +91,7 @@ This is what is running today and what we commit to.
 
 2. **Cloud cognition on daemon:** CT101 `active_mode=cloud` is **by design** — headless daemon uses OpenRouter for scheduled cognition. `cloud_first_background=true` routes dream/spark/ingest cloud-first with Prime fallback at `http://192.168.31.184:8000/v1`.
 
-3. **Pi frontend on workstation:** Interactive Pi REPL lives at `~/.pi/agent/` on the workstation, not on CT101. See [`PI_FRONTEND_SPLIT.md`](./PI_FRONTEND_SPLIT.md).
+3. **Pi frontend on workstation:** Interactive Pi REPL lives at `~/.pi/agent/` on the workstation, not on CT101. See [`PI_FRONTEND_SPLIT.md`](./ops/PI_FRONTEND_SPLIT.md).
 
 4. **Data locality:** `vault.db`, Neo4j MCP (stdio on CT101), and Qdrant sync all run on the same LXC.
 
@@ -124,6 +124,6 @@ Optional: enable `gzmo-prime.service` on workstation for boot persistence of Pri
 
 ## Related docs
 
-- [`SIDECAR_SSH_STATUS.md`](./SIDECAR_SSH_STATUS.md) — SSH access matrix
-- [`SIDECAR_HEALTH_REPORT.md`](./SIDECAR_HEALTH_REPORT.md) — live health snapshot
-- [`PI_FRONTEND_SPLIT.md`](./PI_FRONTEND_SPLIT.md) — Pi on workstation, daemon headless on CT101
+- [`SIDECAR_SSH_STATUS.md`](./reports/SIDECAR_SSH_STATUS.md) — SSH access matrix
+- [`SIDECAR_HEALTH_REPORT.md`](./reports/SIDECAR_HEALTH_REPORT.md) — live health snapshot
+- [`PI_FRONTEND_SPLIT.md`](./ops/PI_FRONTEND_SPLIT.md) — Pi on workstation, daemon headless on CT101

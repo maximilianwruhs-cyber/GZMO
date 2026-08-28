@@ -1,5 +1,5 @@
 //! Little Tools Lab recipe runner — for `gzmo assemble` and future GZMO-next runtime.
-//! Not wired into CT101 legacy daemon (see docs/CT101_BOUNDARY.md).
+//! Not wired into CT101 legacy daemon (see docs/ops/CT101_BOUNDARY.md).
 
 use anyhow::{Context, Result};
 use std::path::PathBuf;

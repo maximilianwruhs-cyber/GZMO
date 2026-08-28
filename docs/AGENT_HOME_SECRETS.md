@@ -1,7 +1,7 @@
 # Agent Home Secrets Policy
 
 **Status:** Operator policy (2026-07-19)  
-**Related:** [CREDENTIAL_ROTATION_CHECKLIST.md](./CREDENTIAL_ROTATION_CHECKLIST.md), [CT101_PATH_AUTHORITY.md](./CT101_PATH_AUTHORITY.md), `.env.template`
+**Related:** [CREDENTIAL_ROTATION_CHECKLIST.md](./CREDENTIAL_ROTATION_CHECKLIST.md), [CT101_PATH_AUTHORITY.md](./ops/CT101_PATH_AUTHORITY.md), `.env.template`
 
 ## Rule
 

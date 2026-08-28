@@ -239,7 +239,7 @@ payload = {
     "owner": {
         "living": "CT101 gzmo-daemon /opt/gzmo/",
         "lab": "workstation data-next/",
-        "doc": "docs/CT101_BOUNDARY.md",
+        "doc": "docs/ops/CT101_BOUNDARY.md",
     },
     "note": "Living GREEN = sole overnight writer healthy + recall/faithfulness. Laptop product is scripts/product-readiness-gate.sh.",
 }

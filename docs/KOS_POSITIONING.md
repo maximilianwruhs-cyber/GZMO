@@ -23,9 +23,9 @@ closed-set little-tools assembly, felt artifacts under `data-next/` / CT101 livi
 
 1. **Living Keep** — one overnight writer (CT101 reference or appliance)  
 2. **Lab next** — workstation `data-next` + LTL recipes + beat-gates (telescope; not a second product)  
-3. **Client attach** — `gzmo-living` MCP / OpenClaw / Pi — never a second vault ([ADR-0007](./ADR-0007-one-product-living.md))
+3. **Client attach** — `gzmo-living` MCP / OpenClaw / Pi — never a second vault ([ADR-0007](./adr/ADR-0007-one-product-living.md))
 
-Do not teach A ≠ C as two products. See [SPINE_FOCUS.md](SPINE_FOCUS.md), [CT101_BOUNDARY.md](CT101_BOUNDARY.md).
+Do not teach A ≠ C as two products. See [SPINE_FOCUS.md](SPINE_FOCUS.md), [CT101_BOUNDARY.md](./ops/CT101_BOUNDARY.md).
 
 ## Thesis links
 

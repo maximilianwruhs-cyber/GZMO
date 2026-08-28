@@ -1,0 +1,36 @@
+name: Docs
+
+# The Rust workflow deliberately ignores docs/** and research/**, so bulk
+# markdown edits never pay for a toolchain build. This workflow covers that
+# gap: it is toolchain-free and runs in seconds.
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - '**.md'
+      - 'docs/**'
+      - 'research/**'
+      - 'scripts/check-doc-links.sh'
+      - '.github/workflows/docs.yml'
+  pull_request:
+    paths:
+      - '**.md'
+      - 'docs/**'
+      - 'research/**'
+      - 'scripts/check-doc-links.sh'
+      - '.github/workflows/docs.yml'
+
+concurrency:
+  group: gzmo-docs-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  links:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Fails only on links that are newly broken. The inherited breakage is
+      # recorded in docs/link-baseline.txt and should only ever shrink.
+      - name: Relative markdown links resolve
+        run: ./scripts/check-doc-links.sh

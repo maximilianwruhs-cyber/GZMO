@@ -1,7 +1,7 @@
 # PRECOG Spike — VERDICT
 
 **Date:** 2026-08-22
-**ADR:** [ADR-0008](../../docs/ADR-0008-edge-ssm-memory.md) — Option A
+**ADR:** [ADR-0008](../../docs/adr/ADR-0008-edge-ssm-memory.md) — Option A
 **Paper:** arXiv:2608.02560 (PRECOG — Pre-Computed Context Injection)
 
 ---

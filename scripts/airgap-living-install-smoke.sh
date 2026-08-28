@@ -41,7 +41,7 @@ echo "=== Airgap living install smoke ===" | tee -a "$LOG"
 
 # Doctrine / installer surfaces
 [[ -f "$ROOT/docs/AIRGAP_LIVING.md" ]] && row PASS "doc-airgap" "docs/AIRGAP_LIVING.md" || row FAIL "doc-airgap" "missing"
-[[ -f "$ROOT/docs/ADR-0004-airgap-living-usp.md" ]] && row PASS "doc-adr" "ADR-0004" || row FAIL "doc-adr" "missing ADR-0004"
+[[ -f "$ROOT/docs/adr/ADR-0004-airgap-living-usp.md" ]] && row PASS "doc-adr" "ADR-0004" || row FAIL "doc-adr" "missing ADR-0004"
 [[ -x "$ROOT/scripts/install-living-airgap.sh" ]] && row PASS "installer" "install-living-airgap.sh" || row FAIL "installer" "missing installer"
 [[ -x "$ROOT/scripts/living-host-mutex.sh" ]] && row PASS "living-mutex" "living-host-mutex.sh claim|release|status" || row FAIL "living-mutex" "missing mutex"
 # Appliance claim path documented

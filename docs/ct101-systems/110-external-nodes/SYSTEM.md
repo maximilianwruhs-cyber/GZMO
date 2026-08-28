@@ -1,7 +1,7 @@
 # System 110 — External Nodes
 
 **Parent:** [CT101 Capability Index](../INDEX.md)  
-**Infrastructure:** [CT101_INFRASTRUCTURE_REPORT.md](../../CT101_INFRASTRUCTURE_REPORT.md) §10  
+**Infrastructure:** [CT101_INFRASTRUCTURE_REPORT.md](../../reports/CT101_INFRASTRUCTURE_REPORT.md) §10  
 **LAN:** `192.168.31.0/24`
 
 ---

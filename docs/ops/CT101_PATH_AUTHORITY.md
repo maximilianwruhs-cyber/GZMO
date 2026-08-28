@@ -1,7 +1,7 @@
 # CT101 Path Authority
 
 **Status:** Canonical living paths (2026-07-19)  
-**Related:** [CT101_DEPLOY.md](./CT101_DEPLOY.md), [CT101_BOUNDARY.md](./CT101_BOUNDARY.md), [DISCOVERY_LIVING_WIRE.md](./DISCOVERY_LIVING_WIRE.md), [LOST_KNOWLEDGE_INVENTORY.md](./LOST_KNOWLEDGE_INVENTORY.md)
+**Related:** [CT101_DEPLOY.md](./CT101_DEPLOY.md), [CT101_BOUNDARY.md](./CT101_BOUNDARY.md), [DISCOVERY_LIVING_WIRE.md](../DISCOVERY_LIVING_WIRE.md), [LOST_KNOWLEDGE_INVENTORY.md](../LOST_KNOWLEDGE_INVENTORY.md)
 
 Three eras still appear in docs, Pi handoffs, and scripts. Only one is public living authority.
 
@@ -18,7 +18,7 @@ Three eras still appear in docs, Pi handoffs, and scripts. Only one is public li
 | Binary | `/opt/gzmo/current/target/release/gzmo` | Build **on CT101** (glibc) |
 | Scripts | `/opt/gzmo/current/scripts/` | Prefer this over hardcoded `survey_GZMO` |
 | Skills (product/next) | repo `skills/` via config | Workstation next uses `GZMO/skills/` |
-| Skills (discovery/Pi bridge) | `gzmo_skills/` sibling or CT101 copy | See [SKILLS_BRIDGE.md](./SKILLS_BRIDGE.md) |
+| Skills (discovery/Pi bridge) | `gzmo_skills/` sibling or CT101 copy | See [SKILLS_BRIDGE.md](../SKILLS_BRIDGE.md) |
 
 **Public name rule:** always say `/opt/gzmo/current`. The symlink target may be a directory literally named `survey_GZMO` — that is an implementation detail, not the SoT name.
 
@@ -41,7 +41,7 @@ export GZMO_ROOT=/opt/gzmo/current
 /opt/gzmo/current/target/release/gzmo health
 ```
 
-Discovery entry scripts on CT101 must **hardcode** `GZMO_ROOT=/opt/gzmo/current` (or accept `current` \| legacy symlink) — never inherit a workstation path. See [DISCOVERY_LIVING_WIRE.md](./DISCOVERY_LIVING_WIRE.md).
+Discovery entry scripts on CT101 must **hardcode** `GZMO_ROOT=/opt/gzmo/current` (or accept `current` \| legacy symlink) — never inherit a workstation path. See [DISCOVERY_LIVING_WIRE.md](../DISCOVERY_LIVING_WIRE.md).
 
 ## Workstation clone (this repo)
 

@@ -11,7 +11,7 @@
 | **Strict (GZMO-next)** | automatic when `GZMO_INSTANCE=next` (or `GZMO_SHELL_STRICT=1`) | Blocks `systemctl`, `sudo`, `kill`, … |
 | **Docker isolate** | `GZMO_SHELL_DOCKER=1` | `docker run --rm --network none -v $cwd:/work:ro alpine sh -c …` |
 
-gVisor / dedicated sandbox image, discovery lab recipe, and CT101 vault migrate tooling are tracked in [`STRETCH_ITEMS_HANDOFF.md`](./STRETCH_ITEMS_HANDOFF.md).
+gVisor / dedicated sandbox image, discovery lab recipe, and CT101 vault migrate tooling are tracked in [`STRETCH_ITEMS_HANDOFF.md`](./handoff/STRETCH_ITEMS_HANDOFF.md).
 
 ## Discovery → honeypot
 

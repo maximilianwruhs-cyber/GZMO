@@ -1,7 +1,7 @@
 # ADR-0007 — One product: living Keep (no lite SKU)
 
 **Status:** Accepted (2026-08-16)  
-**Related:** [ADR-0003](./ADR-0003-one-instance-metabolism.md), [ADR-0004](./ADR-0004-airgap-living-usp.md), [ADR-0005](./ADR-0005-flywheel-over-frozen-topology.md), [ADR-0006](./ADR-0006-owner-control-plane.md), [AIRGAP_LIVING.md](./AIRGAP_LIVING.md)
+**Related:** [ADR-0003](./ADR-0003-one-instance-metabolism.md), [ADR-0004](./ADR-0004-airgap-living-usp.md), [ADR-0005](./ADR-0005-flywheel-over-frozen-topology.md), [ADR-0006](./ADR-0006-owner-control-plane.md), [AIRGAP_LIVING.md](../AIRGAP_LIVING.md)
 
 ## Context
 
@@ -32,7 +32,7 @@ Writer vs client still matters. Two *products* does not.
 | ADR-0004 §3 “Lite is bootstrap / attach-only” as brand | Lite is not a product. Attach is a **client** of living. |
 | ADR-0005 Layer A §4 “Lite is bootstrap” | Dropped from Layer A. Incomplete `~/.gzmo` is not a peer roadmap *and* not the stranger hero. |
 | Spine “A = product MCP, C = living” as co-primary | One SKU: living. A/C is migration vocabulary only. |
-| README / `PRODUCT_MCP.md` as stranger product | Hero is [AIRGAP_LIVING.md](./AIRGAP_LIVING.md). `PRODUCT_MCP.md` is client-attach / historical installer notes. |
+| README / `PRODUCT_MCP.md` as stranger product | Hero is [AIRGAP_LIVING.md](../AIRGAP_LIVING.md). `PRODUCT_MCP.md` is client-attach / historical installer notes. |
 
 ## Consequences
 

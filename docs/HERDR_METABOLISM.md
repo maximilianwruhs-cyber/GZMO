@@ -67,7 +67,7 @@ Under the hood: `gzmo session close [--session ID] --takeaway '…' [--now]`. Pr
 | Pi `session_end` | synapse-notifier + daemon poll — [SYNAPSE_EVENT_OWNERSHIP.md](./SYNAPSE_EVENT_OWNERSHIP.md) |
 | CLI takeaway | same close ritual without herdr |
 
-Do not invent a fourth close path. Product MCP attach vs living CT101 attach: [PI_LIVING_STACK.md](./PI_LIVING_STACK.md).
+Do not invent a fourth close path. Product MCP attach vs living CT101 attach: [PI_LIVING_STACK.md](./ops/PI_LIVING_STACK.md).
 
 ## Unpark policy
 

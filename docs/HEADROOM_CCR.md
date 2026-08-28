@@ -67,7 +67,7 @@ Re-land checklist (when you choose to):
 2. Resolve conflicts with current `scratch.rs` / MCP serve / config  
 3. Enable only behind `[context_compress]` default **off** until living gate stays GREEN  
 4. Add MCP tool smoke for `gzmo_retrieve_context` to `living-readiness-gate` as HOLD/optional  
-5. Update [PI_LIVING_STACK.md](PI_LIVING_STACK.md) “LOST on living HEAD” section  
+5. Update [PI_LIVING_STACK.md](./ops/PI_LIVING_STACK.md) “LOST on living HEAD” section  
 
 ---
 

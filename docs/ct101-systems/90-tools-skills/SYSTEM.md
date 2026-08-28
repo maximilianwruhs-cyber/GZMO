@@ -1,7 +1,7 @@
 # System 90 — Tools & Skills
 
 **Parent:** [CT101 Capability Index](../INDEX.md)  
-**Infrastructure:** [CT101_INFRASTRUCTURE_REPORT.md](../../CT101_INFRASTRUCTURE_REPORT.md) §5  
+**Infrastructure:** [CT101_INFRASTRUCTURE_REPORT.md](../../reports/CT101_INFRASTRUCTURE_REPORT.md) §5  
 **Live probe (2026-07-14):** CT101 daemon active (~487 MiB), `active_mode=cloud`, cognition via OpenRouter GLM 5.2
 
 ---

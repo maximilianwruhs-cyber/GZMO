@@ -3,7 +3,7 @@
 **Status:** Doctrine recovered from Cursor plan `discovery_redesign_approach_*` (2026-07-19)  
 **Living wire (timers/paths):** [DISCOVERY_LIVING_WIRE.md](./DISCOVERY_LIVING_WIRE.md)  
 **KB loop:** [DISCOVERY_KB_FEEDBACK_LOOP.md](./DISCOVERY_KB_FEEDBACK_LOOP.md)  
-**Paths:** [CT101_PATH_AUTHORITY.md](./CT101_PATH_AUTHORITY.md)
+**Paths:** [CT101_PATH_AUTHORITY.md](./ops/CT101_PATH_AUTHORITY.md)
 
 ## Default product shape
 

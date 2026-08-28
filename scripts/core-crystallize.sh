@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # CORE crystallize — enqueue insight claims → living SessionDistill → Felt Use / Bonded.
-# Never --now dual-writer. Never lowers ripen gates. Docs: docs/DISTILLATION_FAILURE_IMPLEMENTATION_HANDOFF.md
+# Never --now dual-writer. Never lowers ripen gates. Docs: docs/handoff/DISTILLATION_FAILURE_IMPLEMENTATION_HANDOFF.md
 #
 #   bash scripts/core-crystallize.sh              # dry-run (list claims)
 #   CORE_CRYSTALLIZE_APPLY=1 bash scripts/core-crystallize.sh

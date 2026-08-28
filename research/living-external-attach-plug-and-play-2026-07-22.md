@@ -3,7 +3,7 @@
 **Date:** 2026-07-22  
 **Status:** Research / recommend (no implementation in this note)  
 **USP lens:** nutrient · Brain Feed · airgap living — not ecosystem tourism  
-**Doctrine:** [ADR-0003](../docs/ADR-0003-one-instance-metabolism.md) · [ADR-0004](../docs/ADR-0004-airgap-living-usp.md) · [ADR-0005](../docs/ADR-0005-flywheel-over-frozen-topology.md)
+**Doctrine:** [ADR-0003](../docs/adr/ADR-0003-one-instance-metabolism.md) · [ADR-0004](../docs/adr/ADR-0004-airgap-living-usp.md) · [ADR-0005](../docs/adr/ADR-0005-flywheel-over-frozen-topology.md)
 
 ---
 
@@ -36,9 +36,9 @@ Hermes skill text also taught a false positive: `timeout 5 … mcp-serve` ending
 | Label | Profile | Config | Installer | Overnight writer |
 |-------|---------|--------|-----------|------------------|
 | `gzmo-memory` | Lite bootstrap | `~/.gzmo/gzmo.toml` + `GZMO_PRODUCT=1` (+ usually `GZMO_ALLOW_LAB_VAULT=1`) | `scripts/install-product-mcp.sh` / `install-gzmo.sh` | **No** |
-| `gzmo-living` | Living USP / ops | Living `GZMO_CONFIG` (CT101: `/opt/gzmo/gzmo.toml`) | On-box: fragment from `install-living-airgap.sh`; ops: `install-shared-mcp.sh` | Sole writer on claimed host ([ADR-0003](../docs/ADR-0003-one-instance-metabolism.md)) |
+| `gzmo-living` | Living USP / ops | Living `GZMO_CONFIG` (CT101: `/opt/gzmo/gzmo.toml`) | On-box: fragment from `install-living-airgap.sh`; ops: `install-shared-mcp.sh` | Sole writer on claimed host ([ADR-0003](../docs/adr/ADR-0003-one-instance-metabolism.md)) |
 
-Brand contract: **stdio MCP** only — public HTTP MCP out ([MCP_LOCAL_ATTACH.md](../docs/MCP_LOCAL_ATTACH.md), [ADR-0004](../docs/ADR-0004-airgap-living-usp.md)).
+Brand contract: **stdio MCP** only — public HTTP MCP out ([MCP_LOCAL_ATTACH.md](../docs/MCP_LOCAL_ATTACH.md), [ADR-0004](../docs/adr/ADR-0004-airgap-living-usp.md)).
 
 ### 2.2 Official paths today
 

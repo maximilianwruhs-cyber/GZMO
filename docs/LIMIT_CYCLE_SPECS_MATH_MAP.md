@@ -1,7 +1,7 @@
 # Limit-Cycle Specs — Mathematical Map (Engineering Canon)
 
 **Authority:** [`CHAOS_RHO_CONTROL_MODEL.md`](CHAOS_RHO_CONTROL_MODEL.md)  
-**Handoff (step-by-step):** [`CHAOS_RHO_IMPLEMENTATION_HANDOFF.md`](CHAOS_RHO_IMPLEMENTATION_HANDOFF.md)
+**Handoff (step-by-step):** [`CHAOS_RHO_IMPLEMENTATION_HANDOFF.md`](./handoff/CHAOS_RHO_IMPLEMENTATION_HANDOFF.md)
 
 Distilled Rosetta for the **2026-06-08 limit-cycle design proposals** (mythological drafts removed from `gzmo-chaos/`). Use this for review, implementation, and lab design — not narrative lore.
 

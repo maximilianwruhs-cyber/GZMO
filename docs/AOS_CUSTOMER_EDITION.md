@@ -2,7 +2,7 @@
 
 **Status:** Sketch / Later packaging (2026-07-19)  
 **Wave:** 4.1 — [UNPARK_ROADMAP.md](./UNPARK_ROADMAP.md)  
-**On top of:** living appliance — the only product ([ADR-0007](./ADR-0007-one-product-living.md))
+**On top of:** living appliance — the only product ([ADR-0007](./adr/ADR-0007-one-product-living.md))
 
 ## Intent
 
@@ -12,7 +12,7 @@ One-curl (or near one-curl) Ubuntu path that stands up:
 Prime (local LLM) + gzmo-daemon + Redis + Qdrant + Neo4j + OKForge attach
 ```
 
-Clients attach via `gzmo-living`. `install-gzmo.sh` → `~/.gzmo` is not a complete GZMO ([ADR-0007](./ADR-0007-one-product-living.md)).
+Clients attach via `gzmo-living`. `install-gzmo.sh` → `~/.gzmo` is not a complete GZMO ([ADR-0007](./adr/ADR-0007-one-product-living.md)).
 
 ## Non-goals
 

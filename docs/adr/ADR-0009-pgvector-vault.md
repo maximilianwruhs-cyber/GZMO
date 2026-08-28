@@ -1,21 +1,21 @@
 # ADR-0009 — pgvector Vault Consolidation (SQLite SoT + Qdrant Mirror → PostgreSQL+pgvector)
 
 **Status:** Proposed (2026-08-22, gated)  
-**Related:** [ADR-0003](./ADR-0003-one-instance-metabolism.md), [ADR-0004](./ADR-0004-airgap-living-usp.md), [ADR-0005](./ADR-0005-flywheel-over-frozen-topology.md), [ADR-0007](./ADR-0007-one-product-living.md), [ADR-0008](./ADR-0008-edge-ssm-memory.md), [CT101_BOUNDARY.md](./CT101_BOUNDARY.md), [INFRASTRUCTURE_MAP.md](./INFRASTRUCTURE_MAP.md), [SOTA_FIXES_BACKLOG.md](./SOTA_FIXES_BACKLOG.md)  
+**Related:** [ADR-0003](./ADR-0003-one-instance-metabolism.md), [ADR-0004](./ADR-0004-airgap-living-usp.md), [ADR-0005](./ADR-0005-flywheel-over-frozen-topology.md), [ADR-0007](./ADR-0007-one-product-living.md), [ADR-0008](./ADR-0008-edge-ssm-memory.md), [CT101_BOUNDARY.md](../ops/CT101_BOUNDARY.md), [INFRASTRUCTURE_MAP.md](../INFRASTRUCTURE_MAP.md), [SOTA_FIXES_BACKLOG.md](../SOTA_FIXES_BACKLOG.md)  
 **Decision date / owner:** Max, after spike results (spike in `spikes/pgvector/`)
 
 ---
 
 ## Context
 
-GZMO's memory architecture ([INFRASTRUCTURE_MAP.md](./INFRASTRUCTURE_MAP.md) §3) currently operates with split persistence:
+GZMO's memory architecture ([INFRASTRUCTURE_MAP.md](../INFRASTRUCTURE_MAP.md) §3) currently operates with split persistence:
 - **Relational / Full-Text SoT:** Local SQLite database (`data/vault.db`, schema v7, 37 MB) storing 1870 verified facts (`semantic_vault`), 1774 honeypot rows (478 active with `is_latest=1`), and 1747 grounding evidence rows (`evidence`), indexed via SQLite FTS5 (`honeypot_fts`, `evidence_fts`).
 - **Vector Mirror:** Qdrant instance running as a sidecar on CT101 (LXC container `192.168.31.202:6333`, collection `honeypot`), populated via a nightly batch mirror script (`sync-vault-to-qdrant.sh` triggered at 01:45 UTC).
 - **Graph Tier:** Neo4j on CT101 (`192.168.31.202:7687`) queried via MCP for entity/relation triplets.
 
 ### The Problem: Documented Drift Failure Mode (Measured Live)
 
-The split architecture introduces a fundamental distributed state vulnerability documented in [INFRASTRUCTURE_MAP.md](./INFRASTRUCTURE_MAP.md) §9 (Line 308):
+The split architecture introduces a fundamental distributed state vulnerability documented in [INFRASTRUCTURE_MAP.md](../INFRASTRUCTURE_MAP.md) §9 (Line 308):
 > *"Qdrant upsert without supersede delete → stale `is_latest=0` points linger"*
 
 Because SQLite updates and Qdrant upserts occur asynchronously across separate systems without distributed transactions:

@@ -22,10 +22,10 @@ Living Redis / Qdrant / Neo4j are the **living appliance** (airgap USP substrate
 
 | Path | Role |
 |------|------|
-| [`deploy/living-appliance/`](../deploy/living-appliance/) | Compose pin |
-| [`config/living-appliance.gzmo.toml.example`](../config/living-appliance.gzmo.toml.example) | Daemon sidecar fragment |
-| [`scripts/living-appliance-up.sh`](../scripts/living-appliance-up.sh) | `docker compose up -d` + gate |
-| [`docs/LIVING_APPLIANCE.md`](./LIVING_APPLIANCE.md) · [`AIRGAP_LIVING.md`](./AIRGAP_LIVING.md) | Living doctrine |
+| [`deploy/living-appliance/`](../../deploy/living-appliance/) | Compose pin |
+| [`config/living-appliance.gzmo.toml.example`](../../config/living-appliance.gzmo.toml.example) | Daemon sidecar fragment |
+| [`scripts/living-appliance-up.sh`](../../scripts/living-appliance-up.sh) | `docker compose up -d` + gate |
+| [`docs/LIVING_APPLIANCE.md`](../LIVING_APPLIANCE.md) · [`AIRGAP_LIVING.md`](../AIRGAP_LIVING.md) | Living doctrine |
 
 ```bash
 bash scripts/living-appliance-up.sh
@@ -110,7 +110,7 @@ bash scripts/brain-feed-check.sh           # vault-nourishing Unpark nutrients
 bash scripts/brain-intel-promote.sh        # calibration/Arena suggestion only (no auto)
 ```
 
-See [KEEP_QUALITY.md](./KEEP_QUALITY.md) · [BRAIN_FEED.md](./BRAIN_FEED.md).
+See [KEEP_QUALITY.md](../KEEP_QUALITY.md) · [BRAIN_FEED.md](../BRAIN_FEED.md).
 
 ## Product gate
 

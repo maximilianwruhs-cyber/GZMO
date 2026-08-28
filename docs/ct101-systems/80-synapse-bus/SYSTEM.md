@@ -1,6 +1,6 @@
 # System 80 — Synapse Bus
 
-**Parent:** [INDEX.md](../INDEX.md) · [CT101_INFRASTRUCTURE_REPORT.md](../../CT101_INFRASTRUCTURE_REPORT.md)
+**Parent:** [INDEX.md](../INDEX.md) · [CT101_INFRASTRUCTURE_REPORT.md](../../reports/CT101_INFRASTRUCTURE_REPORT.md)
 
 The Synapse bus is GZMO's **append-only observability log**: JSONL events at `data/Synapse/events.jsonl` with advisory file locking. **~488k events** live on CT101. It follows the Prime Directive — **write only, never consume for automated state transitions** — except the dedicated read-only `synapse_reader` for Pi handoff.
 

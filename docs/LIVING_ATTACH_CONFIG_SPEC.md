@@ -3,7 +3,7 @@
 **Status:** Implementable config contract (map [#151](https://github.com/maximilianwruhs-cyber/GZMO/issues/151), 2026-08-10)  
 **USP:** nutrient · Brain Feed · airgap living — not ecosystem tourism  
 **Operator pamphlet:** [EXTERNAL_LIVING_ATTACH.md](./EXTERNAL_LIVING_ATTACH.md) (happy path + never-do)  
-**Doctrine:** [ADR-0003](./ADR-0003-one-instance-metabolism.md) · [ADR-0004](./ADR-0004-airgap-living-usp.md) · [ADR-0007](./ADR-0007-one-product-living.md)
+**Doctrine:** [ADR-0003](./adr/ADR-0003-one-instance-metabolism.md) · [ADR-0004](./adr/ADR-0004-airgap-living-usp.md) · [ADR-0007](./adr/ADR-0007-one-product-living.md)
 
 This document is the **source of truth for homes, install order, refuse conditions, and GREEN proofs**. Agents must not invent alternate trees (especially under `~/tmp/`) or treat `~/.hermes.toml` as Hermes config.
 
@@ -84,7 +84,7 @@ bash scripts/install-living-airgap.sh
 # Prefer local living-attach-check mode / local GZMO_CONFIG as documented in AIRGAP_LIVING.md
 ```
 
-Do **not** treat ops SSH OpenClaw/shared MCP as the same attach topology stacked on top of airgap. See [AIRGAP_LIVING.md](./AIRGAP_LIVING.md) and [ADR-0004](./ADR-0004-airgap-living-usp.md).
+Do **not** treat ops SSH OpenClaw/shared MCP as the same attach topology stacked on top of airgap. See [AIRGAP_LIVING.md](./AIRGAP_LIVING.md) and [ADR-0004](./adr/ADR-0004-airgap-living-usp.md).
 
 ---
 
@@ -96,7 +96,7 @@ Do **not** treat ops SSH OpenClaw/shared MCP as the same attach topology stacked
 | Hermes TOML scar | Writing living stanza to `~/.hermes.toml` |
 | Wrong MCP label | Claiming living with only `gzmo-memory` |
 | PRODUCT / LAB-ALLOW | `GZMO_PRODUCT=1` or `GZMO_ALLOW_LAB_VAULT=1` on living path |
-| Dual-writer | Workstation `gzmo-serve` active while CT101 owns overnight ([ADR-0003](./ADR-0003-one-instance-metabolism.md)) |
+| Dual-writer | Workstation `gzmo-serve` active while CT101 owns overnight ([ADR-0003](./adr/ADR-0003-one-instance-metabolism.md)) |
 | Missing vault proof | `living-attach-check.sh` fail / vault not living / fact floor |
 | Hand-rolled SSH | `ssh … mcp-serve` without official wrapper / living `GZMO_CONFIG` |
 
@@ -152,7 +152,7 @@ On ops boxes, **both** labels may appear in Cursor/global JSON homes (inventory 
 |------|--------|
 | Allowed | `gzmo-living` present and GREEN proves living vault |
 | Refuse | Claiming living attach while only `gzmo-memory` is configured / used |
-| Legacy label | `gzmo-memory` on `~/.gzmo` is incomplete install / telescope scratch — not a second product ([ADR-0007](./ADR-0007-one-product-living.md), [PRODUCT_MCP.md](./PRODUCT_MCP.md)) |
+| Legacy label | `gzmo-memory` on `~/.gzmo` is incomplete install / telescope scratch — not a second product ([ADR-0007](./adr/ADR-0007-one-product-living.md), [PRODUCT_MCP.md](./PRODUCT_MCP.md)) |
 
 Pi may have living-only; absence of `gzmo-memory` there is fine.
 
@@ -175,5 +175,5 @@ Wayfinder map: [#151 Living attach config — single-home fail-closed spec](http
 - [EXTERNAL_LIVING_ATTACH.md](./EXTERNAL_LIVING_ATTACH.md) — operator pamphlet  
 - [OPENCLAW_WORKSPACE_CONTRACT.md](./OPENCLAW_WORKSPACE_CONTRACT.md) — OpenClaw plane map  
 - [AIRGAP_LIVING.md](./AIRGAP_LIVING.md) — on-box USP  
-- [PI_GZMO_MEMORY_INTEGRATION.md](./PI_GZMO_MEMORY_INTEGRATION.md) — ops SSH living  
+- [PI_GZMO_MEMORY_INTEGRATION.md](./ops/PI_GZMO_MEMORY_INTEGRATION.md) — ops SSH living  
 - Skill: `skills/workflows/living-attach/SKILL.md`

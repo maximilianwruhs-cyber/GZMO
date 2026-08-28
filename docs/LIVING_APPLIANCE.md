@@ -1,7 +1,7 @@
 # Living appliance (sidecars for airgap living)
 
 **Status:** USP substrate — compose pin shipped (2026-07-19); brand lock 2026-07-20  
-**USP path:** [AIRGAP_LIVING.md](./AIRGAP_LIVING.md) · [ADR-0004-airgap-living-usp.md](./ADR-0004-airgap-living-usp.md) · [ADR-0007](./ADR-0007-one-product-living.md)  
+**USP path:** [AIRGAP_LIVING.md](./AIRGAP_LIVING.md) · [ADR-0004-airgap-living-usp.md](./adr/ADR-0004-airgap-living-usp.md) · [ADR-0007](./adr/ADR-0007-one-product-living.md)  
 **Client attach (not a SKU):** [PRODUCT_MCP.md](./PRODUCT_MCP.md)  
 **Doctrine:** [SPINE_FOCUS.md](./SPINE_FOCUS.md)
 
@@ -42,14 +42,14 @@ bash ../../scripts/living-appliance-smoke.sh
 bash ../../scripts/living-appliance-health-smoke.sh
 ```
 
-This compose starts **sidecars only**. Pair with `gzmo-daemon` + `/opt/gzmo/gzmo.toml` (see [CT101_DEPLOY.md](./CT101_DEPLOY.md)).
+This compose starts **sidecars only**. Pair with `gzmo-daemon` + `/opt/gzmo/gzmo.toml` (see [CT101_DEPLOY.md](./ops/CT101_DEPLOY.md)).
 
 ## Labeled MCP attach
 
 | Server name | Role | Install |
 |-------------|---------|---------|
 | `gzmo-living` | **Brand** — living writer (hero) or ops SSH wrap | On-box: [MCP_LOCAL_ATTACH.md](./MCP_LOCAL_ATTACH.md); ops: `scripts/install-shared-mcp.sh` |
-| `gzmo-memory` | **Legacy** `~/.gzmo` scratch — not a product ([ADR-0007](./ADR-0007-one-product-living.md)) | `scripts/install-product-mcp.sh` / `install-gzmo.sh` |
+| `gzmo-memory` | **Legacy** `~/.gzmo` scratch — not a product ([ADR-0007](./adr/ADR-0007-one-product-living.md)) | `scripts/install-product-mcp.sh` / `install-gzmo.sh` |
 
 Brand attach is **stdio / localhost** — not a public webserver. See [MCP_LOCAL_ATTACH.md](./MCP_LOCAL_ATTACH.md).
 
@@ -59,10 +59,10 @@ Brand attach is **stdio / localhost** — not a public webserver. See [MCP_LOCAL
 
 | Not | Why |
 |-----|-----|
-| A lite SKU | [ADR-0007](./ADR-0007-one-product-living.md) — incomplete `~/.gzmo` is not GZMO |
+| A lite SKU | [ADR-0007](./adr/ADR-0007-one-product-living.md) — incomplete `~/.gzmo` is not GZMO |
 | Public MCP webserver | Rejected by ADR-0004 |
 | Pi-first UX | Optional glass only |
-| Two overnight writers | [ADR-0003](./ADR-0003-one-instance-metabolism.md) |
+| Two overnight writers | [ADR-0003](./adr/ADR-0003-one-instance-metabolism.md) |
 | Secrets in git | `NEO4J_AUTH` only via `.env` |
 | Workstation Neo4j as living SoT | Throwaway (see Auth below) |
 

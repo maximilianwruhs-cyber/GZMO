@@ -3,7 +3,7 @@
 **Status:** Active (2026-07-22)  
 **USP:** nutrient · Brain Feed · airgap living — not ecosystem tourism  
 **Doctrine:** Pi = **thin remote**; living memory/work via **MCP** (`gzmo-living`); upgrades = [PI_UPGRADE_RUNBOOK.md](PI_UPGRADE_RUNBOOK.md) smoke  
-**Related:** [PI_LIVING_STACK.md](PI_LIVING_STACK.md) · [EXTERNAL_LIVING_ATTACH.md](EXTERNAL_LIVING_ATTACH.md) · ADR-0003 (no dual-writer)
+**Related:** [PI_LIVING_STACK.md](PI_LIVING_STACK.md) · [EXTERNAL_LIVING_ATTACH.md](../EXTERNAL_LIVING_ATTACH.md) · ADR-0003 (no dual-writer)
 
 Pi’s store rewards collecting packages. Every package loads in-process. Fat → slow → weird breaks → “upgrade to fix” → fatter → dies.
 

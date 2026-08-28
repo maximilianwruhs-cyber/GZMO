@@ -1,6 +1,6 @@
 # Discovery ↔ Knowledge Base Feedback Loop
 
-> **Recovered 2026-07-19** from `origin/feat/context-compress-headroom`. Living paths: [CT101_PATH_AUTHORITY.md](./CT101_PATH_AUTHORITY.md).
+> **Recovered 2026-07-19** from `origin/feat/context-compress-headroom`. Living paths: [CT101_PATH_AUTHORITY.md](./ops/CT101_PATH_AUTHORITY.md).
 
 **Status:** Normative reference (2026-06-18)  
 **Scope:** How pi-mentor-discovery cycles read from and write back to GZMO memory — and how `gzmo_daemon` orchestrates the loop.

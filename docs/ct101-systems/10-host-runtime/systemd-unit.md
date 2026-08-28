@@ -34,7 +34,7 @@ RestartSec=30
 WantedBy=default.target
 ```
 
-On CT101 production, paths resolve to `/opt/gzmo/survey_GZMO` and user `maximilian` (see [CT101_INFRASTRUCTURE_REPORT.md](../../CT101_INFRASTRUCTURE_REPORT.md)).
+On CT101 production, paths resolve to `/opt/gzmo/survey_GZMO` and user `maximilian` (see [CT101_INFRASTRUCTURE_REPORT.md](../../reports/CT101_INFRASTRUCTURE_REPORT.md)).
 
 ### CLI daemon entry
 

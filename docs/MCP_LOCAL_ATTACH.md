@@ -1,7 +1,7 @@
 # MCP local attach (brand path)
 
 **Status:** Brand attach contract (2026-07-20)  
-**Doctrine:** [ADR-0004](./ADR-0004-airgap-living-usp.md) · [ADR-0007](./ADR-0007-one-product-living.md)  
+**Doctrine:** [ADR-0004](./adr/ADR-0004-airgap-living-usp.md) · [ADR-0007](./adr/ADR-0007-one-product-living.md)  
 **Deep dive:** [ct101-systems/70-mcp-layer/mcp-serve.md](./ct101-systems/70-mcp-layer/mcp-serve.md)
 
 ## Contract
@@ -17,7 +17,7 @@ Cursor / Pi  →  stdio  →  gzmo mcp-serve  →  living vault (`gzmo-living`)
 | Server label | Role | Config | Installer |
 |--------------|---------|--------|-----------|
 | `gzmo-living` | **Brand** — living writer | living `GZMO_CONFIG` | On-box: local `mcp-serve`; ops: `install-shared-mcp.sh` → SSH bridge |
-| `gzmo-memory` | **Legacy** scratch | `~/.gzmo/gzmo.toml` | `scripts/install-gzmo.sh` — not a product ([ADR-0007](./ADR-0007-one-product-living.md)) |
+| `gzmo-memory` | **Legacy** scratch | `~/.gzmo/gzmo.toml` | `scripts/install-gzmo.sh` — not a product ([ADR-0007](./adr/ADR-0007-one-product-living.md)) |
 
 Living brand path on the airgap box:
 
@@ -73,4 +73,4 @@ GZMO_CONFIG=/path/to/living.toml gzmo mcp-serve   # client-spawned; do not leave
 - [EXTERNAL_LIVING_ATTACH.md](./EXTERNAL_LIVING_ATTACH.md) — agent DO/NEVER + emit/check kit  
 - [PRODUCT_MCP.md](./PRODUCT_MCP.md) — historical `~/.gzmo` installer (not a product)  
 - [AIRGAP_LIVING.md](./AIRGAP_LIVING.md) — living hero path  
-- [PI_GZMO_MEMORY_INTEGRATION.md](./PI_GZMO_MEMORY_INTEGRATION.md) — ops SSH living attach  
+- [PI_GZMO_MEMORY_INTEGRATION.md](./ops/PI_GZMO_MEMORY_INTEGRATION.md) — ops SSH living attach  

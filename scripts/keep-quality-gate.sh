@@ -275,7 +275,7 @@ payload = {
     "counts": {"pass": pass_n, "fail": fail_n, "hold": hold_n},
     "usp": "full living on one airgapped box",
     "doc": "docs/KEEP_QUALITY.md",
-    "doctrine": "docs/ADR-0004-airgap-living-usp.md",
+    "doctrine": "docs/adr/ADR-0004-airgap-living-usp.md",
 }
 (out / "latest.json").write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
 print(json.dumps({"verdict": verdict, "advice": advice, "pass": pass_n, "fail": fail_n, "hold": hold_n}, indent=2))
@@ -297,7 +297,7 @@ set -e
     echo "| $st | $name | $detail |"
   done
   echo
-  echo "See: docs/KEEP_QUALITY.md · docs/ADR-0004-airgap-living-usp.md"
+  echo "See: docs/KEEP_QUALITY.md · docs/adr/ADR-0004-airgap-living-usp.md"
   echo
 } >"$OUT/latest.md"
 

@@ -74,4 +74,4 @@ flowchart TB
 
 ---
 
-*Parent:* [INDEX.md](../INDEX.md) · *Authority:* [CT101_INFRASTRUCTURE_REPORT.md](../../CT101_INFRASTRUCTURE_REPORT.md)
+*Parent:* [INDEX.md](../INDEX.md) · *Authority:* [CT101_INFRASTRUCTURE_REPORT.md](../../reports/CT101_INFRASTRUCTURE_REPORT.md)

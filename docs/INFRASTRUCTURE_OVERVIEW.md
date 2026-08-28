@@ -5,7 +5,7 @@
 **Authority:** Live `gzmo.toml` → this document → `./scripts/verify-production.sh`  
 **Supersedes:** [`gzmo_placement_architecture.md`](./gzmo_placement_architecture.md), [`INFRASTRUCTURE_REVIEW.md`](./INFRASTRUCTURE_REVIEW.md) as **entry points** (those files remain as historical detail).
 
-> **Placement update (2026-07-08):** Production `gzmo-daemon` and `vault.db` run on **CT101** (`192.168.31.202`), not the workstation. For the current CT101 ecosystem map (live-verified), see [`CT101_INFRASTRUCTURE_REPORT.md`](./CT101_INFRASTRUCTURE_REPORT.md) and [`PLACEMENT_DECISION.md`](./PLACEMENT_DECISION.md).
+> **Placement update (2026-07-08):** Production `gzmo-daemon` and `vault.db` run on **CT101** (`192.168.31.202`), not the workstation. For the current CT101 ecosystem map (live-verified), see [`CT101_INFRASTRUCTURE_REPORT.md`](./reports/CT101_INFRASTRUCTURE_REPORT.md) and [`PLACEMENT_DECISION.md`](./PLACEMENT_DECISION.md).
 
 **Refresh after any infra change:**
 
@@ -112,7 +112,7 @@ Deploy: `scripts/vm200/deploy-retrieval-layer.sh`, `deploy-rerank.sh`, `deploy-l
 
 | Component | Path / binary | Role |
 |-----------|---------------|------|
-| Root | `/opt/gzmo/current` (living) · this git clone (dev) | Prefer [CT101_PATH_AUTHORITY.md](./CT101_PATH_AUTHORITY.md); old `survey_GZMO` home is stale |
+| Root | `/opt/gzmo/current` (living) · this git clone (dev) | Prefer [CT101_PATH_AUTHORITY.md](./ops/CT101_PATH_AUTHORITY.md); old `survey_GZMO` home is stale |
 | Config | `gzmo.toml` | Single source of runtime config |
 | CLI | `target/release/gzmo` | `chat`, `daemon`, `dream`, `spark`, `distill`, `health`, `ingest`, `ingest-eval`, … |
 | Core | `gzmo-core/` | Engines, gateway, vault, honeypot, ingest, qdrant_sync |
@@ -405,7 +405,7 @@ Daemon PID: `/tmp/gzmo_daemon.pid`
 
 | Topic | Document |
 |-------|----------|
-| **CT101 ecosystem (live map)** | [`CT101_INFRASTRUCTURE_REPORT.md`](./CT101_INFRASTRUCTURE_REPORT.md) |
+| **CT101 ecosystem (live map)** | [`CT101_INFRASTRUCTURE_REPORT.md`](./reports/CT101_INFRASTRUCTURE_REPORT.md) |
 | **Architecture ingest reference** | [`GZMO_SYSTEM_ARCHITECTURE_INGEST.md`](./GZMO_SYSTEM_ARCHITECTURE_INGEST.md) |
 | **Wave-1 migration runbook** | [`MIGRATION_INGEST_RUNBOOK.md`](./MIGRATION_INGEST_RUNBOOK.md) |
 | **GZMO identity** | [`MACHINE.md`](../MACHINE.md) |

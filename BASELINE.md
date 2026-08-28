@@ -8,14 +8,12 @@ descriptive, and never put counts in it.
 <!-- BEGIN GENERATED: scripts/baseline-refresh.sh -->
 <!-- Do not edit by hand. Run: scripts/baseline-refresh.sh -->
 
-**Commit:** `70bfb03` (2026-08-28)
-
 | Metric | Value |
 |---|---|
 | Workspace crates | 5 |
 | Rust source files | 244 |
 | Rust lines | 67121 |
-| Tracked files | 990 |
+| Tracked files | 995 |
 | Resolved dependencies | 392 |
 | Tests passed | 384 |
 | Tests failed | 0 |

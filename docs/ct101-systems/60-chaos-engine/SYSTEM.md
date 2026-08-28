@@ -1,6 +1,6 @@
 # System 60 — Chaos Engine
 
-**Parent:** [INDEX.md](../INDEX.md) · [CT101_INFRASTRUCTURE_REPORT.md](../../CT101_INFRASTRUCTURE_REPORT.md)
+**Parent:** [INDEX.md](../INDEX.md) · [CT101_INFRASTRUCTURE_REPORT.md](../../reports/CT101_INFRASTRUCTURE_REPORT.md)
 
 The chaos engine is GZMO's **internal physiology**: a 174 BPM pulse loop driving Lorenz/logistic dynamics, a Thought Cabinet for incubation/crystallization, skill feedback, autonomous triggers, and derived LLM parameters (temperature, max_tokens, valence). It runs in chat/TUI today; daemon pins `PulseHandle` for full process lifetime.
 

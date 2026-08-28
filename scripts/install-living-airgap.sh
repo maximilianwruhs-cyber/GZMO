@@ -9,7 +9,7 @@
 # Lite bootstrap (no sidecars / no overnight) remains:
 #   bash scripts/install-gzmo.sh
 #
-# Docs: docs/AIRGAP_LIVING.md · docs/ADR-0004-airgap-living-usp.md
+# Docs: docs/AIRGAP_LIVING.md · docs/adr/ADR-0004-airgap-living-usp.md
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"

@@ -5,9 +5,9 @@
 **Method:** Primary sources only — repo docs, ADRs, scripts, artifacts, opportunity bets, uniqueness canvas. No blog summaries. Every claim cites a path (+ section where useful).
 
 **Doctrine lock (living):**
-- One overnight writer per vault ([ADR-0005](../docs/ADR-0005-flywheel-over-frozen-topology.md) Layer A; [ADR-0004](../docs/ADR-0004-airgap-living-usp.md))
+- One overnight writer per vault ([ADR-0005](../docs/adr/ADR-0005-flywheel-over-frozen-topology.md) Layer A; [ADR-0004](../docs/adr/ADR-0004-airgap-living-usp.md))
 - Promote-by-loop after beat-gate + operator ack ([LTL ADR-0003](../../little-tools-lab/docs/adr/0003-promote-by-loop.md); [CONTINUOUS_UPGRADE.md](../docs/CONTINUOUS_UPGRADE.md) Ring 3)
-- Arena / calibration suggest-by-default — no silent overnight toml clobber ([ADR-0005](../docs/ADR-0005-flywheel-over-frozen-topology.md) §Layer C.5; [BRAIN_FEED.md](../docs/BRAIN_FEED.md) Hard rules)
+- Arena / calibration suggest-by-default — no silent overnight toml clobber ([ADR-0005](../docs/adr/ADR-0005-flywheel-over-frozen-topology.md) §Layer C.5; [BRAIN_FEED.md](../docs/BRAIN_FEED.md) Hard rules)
 
 ---
 
@@ -73,13 +73,13 @@ Rank axes (as requested): (1) Brain Feed / nutrient / airgap-living USP · (2) u
 
 **Thrust:** Earn `soak_ready_unpark_ok` with ≥3 GREEN samples spaced ≥18h — gates **theater Unpark**, not craft.
 
-**Why rare / USP:** Keep-quality is the living USP bar ([KEEP_QUALITY.md](../docs/KEEP_QUALITY.md); [ADR-0004](../docs/ADR-0004-airgap-living-usp.md)). Same-hour GREEN streaks are explicitly dishonest.
+**Why rare / USP:** Keep-quality is the living USP bar ([KEEP_QUALITY.md](../docs/KEEP_QUALITY.md); [ADR-0004](../docs/adr/ADR-0004-airgap-living-usp.md)). Same-hour GREEN streaks are explicitly dishonest.
 
 **Evidence:**
 - `bash scripts/keep-quality-soak.sh --summary` → `soak_spacing_hold` · `honest_nights=1` · `spacing_rejects=2` · `need_nights=3` (2026-07-21 run)
 - Soak log three GREENS within minutes on 2026-07-20 — `data-next/keep-quality/soak-log.jsonl`
 - Sense scar `soak_samples_too_close` — `data-next/opportunity-discovery/sense-latest.md`
-- Doctrine: soak gates theater only ([ADR-0005](../docs/ADR-0005-flywheel-over-frozen-topology.md) §Layer C.4; [UNPARK_ROADMAP.md](../docs/UNPARK_ROADMAP.md) prerequisite)
+- Doctrine: soak gates theater only ([ADR-0005](../docs/adr/ADR-0005-flywheel-over-frozen-topology.md) §Layer C.4; [UNPARK_ROADMAP.md](../docs/UNPARK_ROADMAP.md) prerequisite)
 
 **Next ship slice:** Operator ritual only (no code): one soak sample per calendar night for 3 nights; optional timer already soaked (`soak-night-honest-timer`). Document advice in bet log.
 
@@ -129,7 +129,7 @@ Rank axes (as requested): (1) Brain Feed / nutrient / airgap-living USP · (2) u
 
 **Thrust:** Exercise ADR-0005 / LTL-0003 once: beat-gate PASS + mutex + operator ack → hand off **one** loop into current living host.
 
-**Why rare / USP:** Flywheel over frozen topology is the process USP ([ADR-0005](../docs/ADR-0005-flywheel-over-frozen-topology.md); [CT101_BOUNDARY.md](../docs/CT101_BOUNDARY.md)).
+**Why rare / USP:** Flywheel over frozen topology is the process USP ([ADR-0005](../docs/adr/ADR-0005-flywheel-over-frozen-topology.md); [CT101_BOUNDARY.md](../docs/ops/CT101_BOUNDARY.md)).
 
 **Evidence:**
 - Record ritual soaked — [promote-by-loop-first.md](opportunities/promote-by-loop-first.md)
@@ -252,7 +252,7 @@ Rank axes (as requested): (1) Brain Feed / nutrient / airgap-living USP · (2) u
 
 **Thrust:** Port/deepen spark refractory + honeypot lifecycle tests into LTL golden fixtures (Ring 3 honesty).
 
-**Why rare / USP:** S-tier spark refractory + A-tier lifecycle are craft kernels ([code-uniqueness-tier-list.canvas.tsx](file:///home/gzmo/.cursor/projects/empty-window/canvases/code-uniqueness-tier-list.canvas.tsx); CONTINUOUS_UPGRADE W3).
+**Why rare / USP:** S-tier spark refractory + A-tier lifecycle are craft kernels (code-uniqueness-tier-list.canvas.tsx (author-local plan; not in this repo); CONTINUOUS_UPGRADE W3).
 
 **Evidence:**
 - CONTINUOUS_UPGRADE W3: “Port or deepen honeypot lifecycle / spark refractory tests into LTL goldens”
@@ -300,7 +300,7 @@ Rank axes (as requested): (1) Brain Feed / nutrient / airgap-living USP · (2) u
 
 **Thrust:** One monthly uniqueness craft PR: deepen spark-link scoring / refractory interaction; re-score canvas.
 
-**Why rare / USP:** Ring 4 doctrine — unique kernels first-class ([ADR-0005](../docs/ADR-0005-flywheel-over-frozen-topology.md) §C.6; CONTINUOUS_UPGRADE Ring 4).
+**Why rare / USP:** Ring 4 doctrine — unique kernels first-class ([ADR-0005](../docs/adr/ADR-0005-flywheel-over-frozen-topology.md) §C.6; CONTINUOUS_UPGRADE Ring 4).
 
 **Evidence:** Canvas A-tier stale-sweetness craft 4; CONTINUOUS_UPGRADE “prefer upgrades that increase Brain Feed nutrient or beat-gate honesty.”
 
@@ -361,7 +361,7 @@ Days 42–90 (W4 suggestions + craft + O6/O8/O9/O11)
   Defer IpW/Forge until O8+O9 routine
 ```
 
-**Mutex note:** Any living prove/promote uses `scripts/living-host-mutex.sh claim|release` ([CT101_BOUNDARY.md](../docs/CT101_BOUNDARY.md); CONTINUOUS_UPGRADE cheat sheet). Workstation living is allowed only under claim ([ADR-0005](../docs/ADR-0005-flywheel-over-frozen-topology.md) Layer B).
+**Mutex note:** Any living prove/promote uses `scripts/living-host-mutex.sh claim|release` ([CT101_BOUNDARY.md](../docs/ops/CT101_BOUNDARY.md); CONTINUOUS_UPGRADE cheat sheet). Workstation living is allowed only under claim ([ADR-0005](../docs/adr/ADR-0005-flywheel-over-frozen-topology.md) Layer B).
 
 ---
 
@@ -370,8 +370,8 @@ Days 42–90 (W4 suggestions + craft + O6/O8/O9/O11)
 | Path | Role |
 |------|------|
 | [docs/CONTINUOUS_UPGRADE.md](../docs/CONTINUOUS_UPGRADE.md) | Four rings, 90-day workstreams, Ring 4 Done queue, anti-goals |
-| [docs/ADR-0005-flywheel-over-frozen-topology.md](../docs/ADR-0005-flywheel-over-frozen-topology.md) | Flywheel > frozen topology; mutex; promote-by-loop; suggest-by-default |
-| [docs/ADR-0004-airgap-living-usp.md](../docs/ADR-0004-airgap-living-usp.md) | Airgap living USP invariants |
+| [docs/ADR-0005-flywheel-over-frozen-topology.md](../docs/adr/ADR-0005-flywheel-over-frozen-topology.md) | Flywheel > frozen topology; mutex; promote-by-loop; suggest-by-default |
+| [docs/ADR-0004-airgap-living-usp.md](../docs/adr/ADR-0004-airgap-living-usp.md) | Airgap living USP invariants |
 | [docs/BRAIN_FEED.md](../docs/BRAIN_FEED.md) | Nutrient satellites; hard rules; demoted theater |
 | [docs/STACK_OPPORTUNITY_MAP.md](../docs/STACK_OPPORTUNITY_MAP.md) | Atlas of stack opportunities + keep/unpark lanes |
 | [docs/UNIQUENESS_THESIS.md](../docs/UNIQUENESS_THESIS.md) | Signature claims + non-claims |
@@ -379,7 +379,7 @@ Days 42–90 (W4 suggestions + craft + O6/O8/O9/O11)
 | [docs/SIGNATURE_EXPERIENCES.md](../docs/SIGNATURE_EXPERIENCES.md) | Experiences A–F (spark/dream/fuse/honeypot) |
 | [docs/OPPORTUNITY_DISCOVERY.md](../docs/OPPORTUNITY_DISCOVERY.md) | Sense→Rank→Bet; Sense v2 scars |
 | [docs/OBOLUS_ARENA_BOUNDARY.md](../docs/OBOLUS_ARENA_BOUNDARY.md) | Arena outside daemon; suggest-only |
-| [docs/CT101_BOUNDARY.md](../docs/CT101_BOUNDARY.md) | Reference living host + mutex + promote-by-loop |
+| [docs/CT101_BOUNDARY.md](../docs/ops/CT101_BOUNDARY.md) | Reference living host + mutex + promote-by-loop |
 | [docs/KEEP_QUALITY.md](../docs/KEEP_QUALITY.md) | USP quality bar + soak Unpark gate |
 | [docs/UNPARK_ROADMAP.md](../docs/UNPARK_ROADMAP.md) | Theater waves vs Brain Feed; never-as-brain |
 | [research/opportunities/README.md](opportunities/README.md) | Bet log (all nutrient bets soaked; local-intel horizon) |

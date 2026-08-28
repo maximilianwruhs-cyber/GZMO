@@ -2,7 +2,7 @@
 
 **Date:** 2026-08-16  
 **Host:** telescope (`/home/mw/gzmo_full`). Living writer is CT101 — this note does not start `gzmo serve`.  
-**Product:** honeypot + verify + promote on one airgapped box ([MACHINE.md](../MACHINE.md), [ADR-0004](../docs/ADR-0004-airgap-living-usp.md), [ADR-0007](../docs/ADR-0007-one-product-living.md)).  
+**Product:** honeypot + verify + promote on one airgapped box ([MACHINE.md](../MACHINE.md), [ADR-0004](../docs/adr/ADR-0004-airgap-living-usp.md), [ADR-0007](../docs/adr/ADR-0007-one-product-living.md)).  
 **Active ship (unchanged):** [`felt-use-mass-growth`](opportunities/felt-use-mass-growth.md). This research does not flip that bet.  
 **Sister notes:** [lineage-watch](lineage-watch/README.md) (memory harvest) · [this sitting’s kickoff](../docs/templates/AGENTIC_MEMORY_HARNESS_RESEARCH_PROMPT.md).
 

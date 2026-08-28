@@ -2,7 +2,7 @@
 
 **Status:** Recovered 2026-07-19 from docs, live `~/.pi/agent/`, CT101 handoff, and branch `feat/context-compress-headroom`  
 **Problem this solves:** The “supreme” Pi wiring was never written as one durable runbook; custom attach broke on every official Pi upgrade.  
-**Related:** [PI_GZMO_MEMORY_INTEGRATION.md](PI_GZMO_MEMORY_INTEGRATION.md) · [PI_UPGRADE_RUNBOOK.md](PI_UPGRADE_RUNBOOK.md) · [PI_PACKAGE_ALLOWLIST.md](PI_PACKAGE_ALLOWLIST.md) · [HEADROOM_CCR.md](HEADROOM_CCR.md) · [OPERATOR_FRONTEND_DECISION.md](OPERATOR_FRONTEND_DECISION.md)
+**Related:** [PI_GZMO_MEMORY_INTEGRATION.md](PI_GZMO_MEMORY_INTEGRATION.md) · [PI_UPGRADE_RUNBOOK.md](PI_UPGRADE_RUNBOOK.md) · [PI_PACKAGE_ALLOWLIST.md](PI_PACKAGE_ALLOWLIST.md) · [HEADROOM_CCR.md](../HEADROOM_CCR.md) · [OPERATOR_FRONTEND_DECISION.md](../OPERATOR_FRONTEND_DECISION.md)
 
 ---
 
@@ -13,7 +13,7 @@
 | **Living** | CT101 `/opt/gzmo/` (~60k facts) | **On** (CT101 sidecars) | MCP server **`gzmo-living`** via `install-shared-mcp.sh` |
 | **Product** | Laptop `~/.gzmo/` | **Off** | MCP server **`gzmo-memory`** via `install-product-mcp.sh` |
 
-Pi is an **optional auxiliary frontend**. Canonical operator UI is `gzmo` / `gzmo chat` ([OPERATOR_FRONTEND_DECISION.md](OPERATOR_FRONTEND_DECISION.md)). Pi must **not** invent a parallel Redis client — it talks memory only through GZMO MCP / `pi-gzmo-memory.sh`.
+Pi is an **optional auxiliary frontend**. Canonical operator UI is `gzmo` / `gzmo chat` ([OPERATOR_FRONTEND_DECISION.md](../OPERATOR_FRONTEND_DECISION.md)). Pi must **not** invent a parallel Redis client — it talks memory only through GZMO MCP / `pi-gzmo-memory.sh`.
 
 ---
 
@@ -54,7 +54,7 @@ Pi is an **optional auxiliary frontend**. Canonical operator UI is `gzmo` / `gzm
 
 ### GZMO-core (the real Redis cache)
 
-Source: `gzmo-core/src/memory/scratch.rs`, [scratch-redis.md](ct101-systems/50-memory-data-plane/scratch-redis.md).
+Source: `gzmo-core/src/memory/scratch.rs`, [scratch-redis.md](../ct101-systems/50-memory-data-plane/scratch-redis.md).
 
 | Scope | Redis key shape | Who writes |
 |-------|-----------------|------------|
@@ -104,7 +104,7 @@ origin/feat/context-compress-headroom
 | MCP | `gzmo_retrieve_context` to expand a hash |
 | Bench | `scripts/compression-bench/benchmark_headroom.py` (Python Headroom for comparison only) |
 
-**Not on living HEAD today** — `context_compress/` is absent from `main`. Re-land details: [HEADROOM_CCR.md](HEADROOM_CCR.md).
+**Not on living HEAD today** — `context_compress/` is absent from `main`. Re-land details: [HEADROOM_CCR.md](../HEADROOM_CCR.md).
 
 **Explicit non-goals (from Phase 3 handoff):** no permanent `headroom proxy` in production; no compressing vault/honeypot writes; no replacing Qdrant/RRF.
 
@@ -119,7 +119,7 @@ Typical `~/.pi/agent/settings.json` packages (workstation, recovered 2026-07-19)
 - `npm:gzmo-pi` and/or `git:github.com/maximilianwruhs-cyber/gzmo-pi` — product UX  
 - `npm:hsp-pi` — audio sidecar (unrelated to Redis memory)
 
-Merge snippet for subagents: [pi-settings-subagents.snippet.json](pi-settings-subagents.snippet.json).
+Merge snippet for subagents: [pi-settings-subagents.snippet.json](../pi-settings-subagents.snippet.json).
 
 CT101 Pi install lessons (`~/.pi/agent/HANDOFF_CT101_PI.md`):
 

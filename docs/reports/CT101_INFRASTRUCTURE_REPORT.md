@@ -4,18 +4,18 @@
 **Generated:** 2026-07-14  
 **Live probe timestamp:** 2026-07-14 15:11 UTC (via `ssh pve "pct exec 101 -- …"`)  
 **Authority order (legacy CT101):** live CT101 state → `/opt/gzmo/gzmo.toml` → this document  
-**Authority order (production):** [GZMO_NEXT_RUNBOOK.md](./GZMO_NEXT_RUNBOOK.md) → `config/gzmo-next.toml` → `data-next/`
+**Authority order (production):** [GZMO_NEXT_RUNBOOK.md](../GZMO_NEXT_RUNBOOK.md) → `config/gzmo-next.toml` → `data-next/`
 
 > **NOTE — Production ops moved to workstation (2026-07-15)**
 > - *Purpose:* This report remains the CT101 legacy map for reference and comparison.
-> - *Production:* GZMO-next on `192.168.31.184` — see [PLACEMENT_DECISION.md](./PLACEMENT_DECISION.md) amendment.
+> - *Production:* GZMO-next on `192.168.31.184` — see [PLACEMENT_DECISION.md](../PLACEMENT_DECISION.md) amendment.
 > - *CT101:* Leave untouched; not the ops target for new work.
 
-**Capability tree:** [ct101-systems/00-CAPABILITIES_OVERVIEW.md](./ct101-systems/00-CAPABILITIES_OVERVIEW.md) — per-system and per-subsystem reports with advancement/enhancement guidance and THINKING nodes on reviewed code.
+**Capability tree:** [ct101-systems/00-CAPABILITIES_OVERVIEW.md](../ct101-systems/00-CAPABILITIES_OVERVIEW.md) — per-system and per-subsystem reports with advancement/enhancement guidance and THINKING nodes on reviewed code.
 
 > **NOTE — Document scope**
 > - *Purpose:* Single map of every layer, subsystem, and source file in the CT101 production ecosystem.
-> - *Boundary:* CT101 is **frozen legacy** ([CT101_BOUNDARY.md](./CT101_BOUNDARY.md)). GZMO-next on the workstation is the replacement target — not a parallel edit surface for CT101 loops.
+> - *Boundary:* CT101 is **frozen legacy** ([CT101_BOUNDARY.md](../ops/CT101_BOUNDARY.md)). GZMO-next on the workstation is the replacement target — not a parallel edit surface for CT101 loops.
 > - *Failure mode:* Treating the workstation clone config as production truth will mis-route cognition and memory endpoints.
 > - *Code home:* This doc; enforcement in `gzmo-core/src/assembly.rs`.
 
@@ -23,7 +23,7 @@
 
 ## Table of contents
 
-0. [Capability report tree](./ct101-systems/00-CAPABILITIES_OVERVIEW.md) — what the stack can do, how to advance/enhance it (58 reports)
+0. [Capability report tree](../ct101-systems/00-CAPABILITIES_OVERVIEW.md) — what the stack can do, how to advance/enhance it (58 reports)
 1. [Executive summary](#1-executive-summary)
 2. [Homelab ecosystem map](#2-homelab-ecosystem-map)
 3. [CT101 host layer (LXC 101)](#3-ct101-host-layer-lxc-101)
@@ -65,7 +65,7 @@
 > - *Purpose:* 24/7 autonomous pipelines (dream, spark, ingest, Qdrant sync, discovery) without depending on workstation uptime.
 > - *Boundary:* Do not migrate individual lab loops onto CT101; full cutover only when GZMO-next is stack-ready.
 > - *Failure mode:* Moving the daemon to the workstation stops nightly cognition when the machine sleeps; split-brain if vault and Prime diverge without ops discipline.
-> - *Code home:* [PLACEMENT_DECISION.md](./PLACEMENT_DECISION.md), [PI_FRONTEND_SPLIT.md](./PI_FRONTEND_SPLIT.md).
+> - *Code home:* [PLACEMENT_DECISION.md](../PLACEMENT_DECISION.md), [PI_FRONTEND_SPLIT.md](../ops/PI_FRONTEND_SPLIT.md).
 
 ---
 
@@ -104,7 +104,7 @@ flowchart TB
 
 > **NOTE — Document lineage**
 > - *Purpose:* Clarify which docs describe **current** CT101 placement vs historical workstation-centric layout.
-> - *Boundary:* [INFRASTRUCTURE_OVERVIEW.md](./INFRASTRUCTURE_OVERVIEW.md) (2026-06-05) places the daemon on the workstation — **superseded** by [PLACEMENT_DECISION.md](./PLACEMENT_DECISION.md) (2026-07-08).
+> - *Boundary:* [INFRASTRUCTURE_OVERVIEW.md](../INFRASTRUCTURE_OVERVIEW.md) (2026-06-05) places the daemon on the workstation — **superseded** by [PLACEMENT_DECISION.md](../PLACEMENT_DECISION.md) (2026-07-08).
 > - *Failure mode:* Following the June overview for ops will look for `vault.db` and daemon on the wrong host.
 > - *Code home:* N/A (documentation only).
 
@@ -163,7 +163,7 @@ ssh -J pve ct101                           # → 192.168.31.202 (if configured)
 ssh pve "pct exec 101 -- <cmd>"            # Preferred ops path
 ```
 
-Key: `~/.ssh/id_sidecar_proxmox`. See [SIDECAR_SSH_SETUP.md](./SIDECAR_SSH_SETUP.md).
+Key: `~/.ssh/id_sidecar_proxmox`. See [SIDECAR_SSH_SETUP.md](../ops/SIDECAR_SSH_SETUP.md).
 
 > **NOTE — Host layer**
 > - *Purpose:* Stable, always-on LXC isolated from workstation reboots; colocate daemon with databases.
@@ -212,7 +212,7 @@ WantedBy=multi-user.target
 
 **Entry point:** `gzmo-cli/src/main.rs` → `Command::Daemon` → `gzmo-cli/src/daemon_cmd.rs::run()`.
 
-Repo template (historical paths): [`scripts/systemd/gzmo-daemon.service`](../scripts/systemd/gzmo-daemon.service).
+Repo template (historical paths): [`scripts/systemd/gzmo-daemon.service`](../../scripts/systemd/gzmo-daemon.service).
 
 > **NOTE — Daemon is not an HTTP server**
 > - *Purpose:* Background cron engines, watchers, MCP stdio, chaos pulse — no inbound API.
@@ -436,7 +436,7 @@ Secrets live in `/opt/gzmo/.env`. **Never document raw credentials.**
 
 ## 7. Memory and data plane
 
-North star: **vault = ops soup**, **honeypot = curated crystal**, **Qdrant honeypot = association field**, **Neo4j = provenance graph**. Deep design: [MEMORY_ARCHITECTURE_SPEC.md](./MEMORY_ARCHITECTURE_SPEC.md).
+North star: **vault = ops soup**, **honeypot = curated crystal**, **Qdrant honeypot = association field**, **Neo4j = provenance graph**. Deep design: [MEMORY_ARCHITECTURE_SPEC.md](../MEMORY_ARCHITECTURE_SPEC.md).
 
 ```mermaid
 flowchart LR
@@ -588,9 +588,9 @@ flowchart TD
 
 > **NOTE — Split frontend**
 > - *Purpose:* CT101 = headless spine; workstation = human operator + visualization.
-> - *Boundary:* Pi REPL is optional auxiliary; canonical operator UI is `gzmo chat` on workstation ([OPERATOR_FRONTEND_DECISION.md](./OPERATOR_FRONTEND_DECISION.md)).
+> - *Boundary:* Pi REPL is optional auxiliary; canonical operator UI is `gzmo chat` on workstation ([OPERATOR_FRONTEND_DECISION.md](../OPERATOR_FRONTEND_DECISION.md)).
 > - *Failure mode:* Observatory SSH failure → stale dashboard; does not affect daemon.
-> - *Code home:* [PI_FRONTEND_SPLIT.md](./PI_FRONTEND_SPLIT.md), `gzmo-observatory/`.
+> - *Code home:* [PI_FRONTEND_SPLIT.md](../ops/PI_FRONTEND_SPLIT.md), `gzmo-observatory/`.
 
 ---
 
@@ -623,7 +623,7 @@ flowchart TD
 | Change policy | Frozen — legacy hotfixes only | Active development |
 | Replacement | Single cutover when S3 stack-ready | Target of lab + beat-gates |
 
-See [CT101_BOUNDARY.md](./CT101_BOUNDARY.md), [GZMO_NEXT_RUNBOOK.md](./GZMO_NEXT_RUNBOOK.md), [little-tools-lab/docs/adr/0001-two-stack-lab-not-ct101-graft.md](../../little-tools-lab/docs/adr/0001-two-stack-lab-not-ct101-graft.md).
+See [CT101_BOUNDARY.md](../ops/CT101_BOUNDARY.md), [GZMO_NEXT_RUNBOOK.md](../GZMO_NEXT_RUNBOOK.md), [little-tools-lab/docs/adr/0001-two-stack-lab-not-ct101-graft.md](../../little-tools-lab/docs/adr/0001-two-stack-lab-not-ct101-graft.md).
 
 > **NOTE — Cutover model**
 > - *Purpose:* Avoid loop-by-loop graft that destabilizes production reference baseline.
@@ -667,7 +667,7 @@ ssh pve "pct exec 101 -- tail -f /home/maximilian/gzmo_skills/data/pi-mentor-dis
 
 - `[assembly]=lab` on CT101
 - Full vault purge or Qdrant collection delete
-- Loop-by-loop Little Tools Lab graft ([CT101_BOUNDARY.md](./CT101_BOUNDARY.md))
+- Loop-by-loop Little Tools Lab graft ([CT101_BOUNDARY.md](../ops/CT101_BOUNDARY.md))
 
 ---
 
@@ -840,12 +840,12 @@ Prime :8000/models — ornith-35b-Q4_K_M.gguf (131072 ctx)
 | Document | Status relative to this report |
 |----------|-------------------------------|
 | **CT101_INFRASTRUCTURE_REPORT.md** (this file) | **Canonical** for CT101 ecosystem map |
-| [PLACEMENT_DECISION.md](./PLACEMENT_DECISION.md) | Authoritative for daemon placement |
-| [PI_FRONTEND_SPLIT.md](./PI_FRONTEND_SPLIT.md) | Authoritative for frontend split |
-| [CT101_BOUNDARY.md](./CT101_BOUNDARY.md) | Authoritative for change policy |
-| [INFRASTRUCTURE_OVERVIEW.md](./INFRASTRUCTURE_OVERVIEW.md) | **Partially superseded** — daemon-on-workstation model outdated |
-| [CT101_PROMOTION.md](./CT101_PROMOTION.md) | **Retired** — per-loop promotion rejected |
-| [ENABLE_TRUE_POTENTIAL.md](./ENABLE_TRUE_POTENTIAL.md) | Historical probe (Jul 8); use Appendix A for latest |
+| [PLACEMENT_DECISION.md](../PLACEMENT_DECISION.md) | Authoritative for daemon placement |
+| [PI_FRONTEND_SPLIT.md](../ops/PI_FRONTEND_SPLIT.md) | Authoritative for frontend split |
+| [CT101_BOUNDARY.md](../ops/CT101_BOUNDARY.md) | Authoritative for change policy |
+| [INFRASTRUCTURE_OVERVIEW.md](../INFRASTRUCTURE_OVERVIEW.md) | **Partially superseded** — daemon-on-workstation model outdated |
+| [CT101_PROMOTION.md](../ops/CT101_PROMOTION.md) | **Retired** — per-loop promotion rejected |
+| [ENABLE_TRUE_POTENTIAL.md](../ENABLE_TRUE_POTENTIAL.md) | Historical probe (Jul 8); use Appendix A for latest |
 
 ---
 

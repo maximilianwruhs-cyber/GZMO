@@ -2,7 +2,7 @@
 
 Research capture of [topoteretes/cognee](https://github.com/topoteretes/cognee) (v1.4.0 tree, Apache-2.0) against GZMO airgap / Brain Feed / nutrient USP. **Borrow algorithms and UX patterns; do not adopt Cognee as a second overnight writer or cloud-default memory SKU.**
 
-**Doctrine:** [ADR-0003](../docs/ADR-0003-one-instance-metabolism.md) · [ADR-0004](../docs/ADR-0004-airgap-living-usp.md) · [ADR-0005](../docs/ADR-0005-flywheel-over-frozen-topology.md)  
+**Doctrine:** [ADR-0003](../docs/adr/ADR-0003-one-instance-metabolism.md) · [ADR-0004](../docs/adr/ADR-0004-airgap-living-usp.md) · [ADR-0005](../docs/adr/ADR-0005-flywheel-over-frozen-topology.md)  
 **Sibling field notes:** [sleep-consolidation-sota-2026-07-22.md](./sleep-consolidation-sota-2026-07-22.md) · [living-external-attach-plug-and-play-2026-07-22.md](./living-external-attach-plug-and-play-2026-07-22.md)
 
 ---

@@ -4,7 +4,7 @@
 **Gate command:** `bash scripts/product-readiness-gate.sh`  
 **GREEN:** exit `0` + `data-next/product-readiness/latest.json` → `"verdict": "GREEN"`
 
-**Not the product bar.** GZMO GREEN is [KEEP_QUALITY.md](KEEP_QUALITY.md) / [LIVING_PRODUCTION_READINESS.md](LIVING_PRODUCTION_READINESS.md) on the living host ([ADR-0007](ADR-0007-one-product-living.md)). This gate only proves the incomplete `~/.gzmo` installer still attaches.
+**Not the product bar.** GZMO GREEN is [KEEP_QUALITY.md](KEEP_QUALITY.md) / [LIVING_PRODUCTION_READINESS.md](LIVING_PRODUCTION_READINESS.md) on the living host ([ADR-0007](./adr/ADR-0007-one-product-living.md)). This gate only proves the incomplete `~/.gzmo` installer still attaches.
 
 ## What GREEN means here
 
@@ -58,6 +58,6 @@ bash scripts/product-hello-memory.sh
 ## Related
 
 - [PRODUCT_MCP.md](PRODUCT_MCP.md) — historical installer (not a product)
-- [ADR-0007-one-product-living.md](ADR-0007-one-product-living.md) — one SKU
+- [ADR-0007-one-product-living.md](./adr/ADR-0007-one-product-living.md) — one SKU
 - [SPINE_FOCUS.md](SPINE_FOCUS.md) — living Keep
-- [CT101_BOUNDARY.md](CT101_BOUNDARY.md) — living vault owner
+- [CT101_BOUNDARY.md](./ops/CT101_BOUNDARY.md) — living vault owner

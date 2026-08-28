@@ -15,7 +15,7 @@
 | neo4j | OK | bolt `192.168.31.202:7687` |
 | mcp_memory | OK | 13,169 entities, 62,193 relations |
 | gzmo-daemon.service | active | headless — **no Pi frontend on CT101** |
-| Pi frontend | N/A | Runs on workstation — see [`PI_FRONTEND_SPLIT.md`](./PI_FRONTEND_SPLIT.md) |
+| Pi frontend | N/A | Runs on workstation — see [`PI_FRONTEND_SPLIT.md`](../ops/PI_FRONTEND_SPLIT.md) |
 
 ## Workstation (`after-boot-verify.sh`)
 

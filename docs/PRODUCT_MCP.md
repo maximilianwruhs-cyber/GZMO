@@ -1,6 +1,6 @@
 # Client attach notes (historical `~/.gzmo` installer)
 
-**Not a product.** GZMO is one SKU: the living Keep — [ADR-0007](./ADR-0007-one-product-living.md) · [AIRGAP_LIVING.md](./AIRGAP_LIVING.md) · [ADR-0004](./ADR-0004-airgap-living-usp.md).
+**Not a product.** GZMO is one SKU: the living Keep — [ADR-0007](./adr/ADR-0007-one-product-living.md) · [AIRGAP_LIVING.md](./AIRGAP_LIVING.md) · [ADR-0004](./adr/ADR-0004-airgap-living-usp.md).
 
 This page documents the old `gzmo init` → `~/.gzmo` + `gzmo-memory` MCP path. That is an **incomplete install** (or telescope scratch), not day-zero GZMO. Hero: `scripts/install-living-airgap.sh`. Brand MCP label: **`gzmo-living`**.
 
@@ -148,7 +148,7 @@ Without that env var they return a clear error and are not part of the product s
 
 ## Optional embeddings (scratch path only)
 
-Incomplete `~/.gzmo` defaults to **FTS-only**. The living product enables local embeddings when the embedder is up ([ADR-0007](./ADR-0007-one-product-living.md)). To turn vectors on this scratch toml:
+Incomplete `~/.gzmo` defaults to **FTS-only**. The living product enables local embeddings when the embedder is up ([ADR-0007](./adr/ADR-0007-one-product-living.md)). To turn vectors on this scratch toml:
 
 ```toml
 [embeddings]
