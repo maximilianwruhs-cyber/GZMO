@@ -27,7 +27,11 @@ data/backups/
 data/distill-queue/
 data/Synapse/
 logs/
+# Bare directory name: matches `reports/` at ANY depth, including generated
+# run output. docs/reports/ is curated, committed documentation, so it is
+# explicitly re-included below.
 reports/
+!docs/reports/
 DREAMS.md
 CHAOS_STATE.json
 data/HEARTBEAT.md
