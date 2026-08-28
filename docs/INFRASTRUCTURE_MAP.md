@@ -150,7 +150,7 @@ flowchart LR
 | Tier | Store | Schema / code | Recall role |
 |------|-------|---------------|-------------|
 | Hot | Redis scratch | `[redis]` + `[context_memory]` | Per-turn `[RECALL]` block |
-| Vault (ops) | `semantic_vault`, `quarantine_vault` | [`gzmo-core/src/memory/vault.rs`](../gzmo-core/src/memory/vault.rs) | All verified facts; keyword fallback in RRF |
+| Vault (ops) | `semantic_vault`, `quarantine_vault` | [`gzmo-core/src/memory/vault.rs`](../gzmo-core/src/memory/vault/) | All verified facts; keyword fallback in RRF |
 | Honeypot (Tier-1) | `honeypot`, `honeypot_fts` | `memory/vault.rs`, `honeypot.rs` | Primary RAG; Qdrant mirror source |
 | Evidence (Tier-2) | `evidence`, `evidence_fts` | `memory/vault.rs` | Strict grounding; char spans 1:1 with honeypot |
 | Graph | Neo4j via MCP | `gzmo-core/src/memory/kg_extract.rs` | Entity/relation stream in RRF |

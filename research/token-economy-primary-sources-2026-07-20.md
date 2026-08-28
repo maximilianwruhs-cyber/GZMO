@@ -50,7 +50,7 @@ Source: [research/ct101-vault-archaeology-2026-07-20.md](./ct101-vault-archaeolo
 | `[routing.mappings]` | dream/spark → `local`; ingest_extract → `local_deterministic`; distill_extract/summary → `librarian`; distill_verify → `local` | L393–406 |
 | `[routing.profiles.local_deterministic]` | temp `0.1`, `max_tokens = 24576`, Prime `:8000` | L408–415 |
 
-No `[routing.profiles.librarian]` inline block in this file — `librarian` resolves via `[librarian]` / engine sections (`RoutingConfig::resolve_profile` in [gzmo-core/src/config.rs](../gzmo-core/src/config.rs) L2482–2526).
+No `[routing.profiles.librarian]` inline block in this file — `librarian` resolves via `[librarian]` / engine sections (`RoutingConfig::resolve_profile` in [gzmo-core/src/config.rs](../gzmo-core/src/config/task_kind.rs) L2482–2526).
 
 ### 2.2 GZMO-next — `/home/gzmo/github-clone/GZMO/config/gzmo-next.toml`
 
@@ -248,7 +248,7 @@ Merge policy: lab / `data-next` only; CT101 remains frozen ([ADR-0001](../../lit
 
 | Input | Source today | How estimator should use it |
 |-------|--------------|-----------------------------|
-| **Task class** | `TaskKind` snake_case (`dream_extract`, `spark_hypothesis`, `chat`, …) — [config.rs](../gzmo-core/src/config.rs) TaskKind; IpW also uses coarser `chat`/`overnight`/`heavy_bench` | Map to prior caps (spark 4k, dream→profile 24k, pedagogy 512, chaos 128–512) and Co-Saving shortcut eligibility (multi-stage pipelines only) |
+| **Task class** | `TaskKind` snake_case (`dream_extract`, `spark_hypothesis`, `chat`, …) — [config.rs](../gzmo-core/src/config/task_kind.rs) TaskKind; IpW also uses coarser `chat`/`overnight`/`heavy_bench` | Map to prior caps (spark 4k, dream→profile 24k, pedagogy 512, chaos 128–512) and Co-Saving shortcut eligibility (multi-stage pipelines only) |
 | **Message size** | Raw char length of system+user (+ tool payloads); `context::estimate_text_tokens(content, chars_per_token)` ([context.rs](../gzmo-core/src/context.rs) L73+) | `estimated_input_tokens`; drive compress hints when approaching `context_length * (1 - response_reserve) * archive_threshold` |
 | **Profile** | Resolved name from `[routing.mappings]` + inline profile `max_tokens` / temp | Soft ceiling: recommended_max ≤ profile.max_tokens; never invent CT101 cloud URLs |
 | Optional: scratch pressure | Current scratch used vs `scratch_max_tokens` | Lower inject budget / force distill enqueue |

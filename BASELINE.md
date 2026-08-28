@@ -12,7 +12,7 @@ descriptive, and never put counts in it.
 |---|---|
 | Workspace crates | 5 |
 | Rust source files | 244 |
-| Rust lines | 67121 |
+| Rust lines | 67114 |
 | Tracked files | 995 |
 | Resolved dependencies | 392 |
 | Tests passed | 384 |
@@ -33,8 +33,8 @@ so a warning is a build failure rather than a number worth tracking.
 | `gzmo-core/src/spark.rs` | 1196 |
 | `gzmo-cli/src/tui/components/agent.rs` | 1172 |
 | `gzmo-core/src/orchestrator.rs` | 1070 |
-| `gzmo-core/src/skills/pkm_forge.rs` | 920 |
-| `gzmo-core/src/skills/card_forge.rs` | 898 |
+| `gzmo-core/src/skills/pkm_forge.rs` | 926 |
+| `gzmo-core/src/skills/card_forge.rs` | 902 |
 | `gzmo-chaos/src/pulse.rs` | 876 |
 <!-- END GENERATED -->
 

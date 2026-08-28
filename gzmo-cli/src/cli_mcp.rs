@@ -38,15 +38,3 @@ impl McpSession {
         }
     }
 }
-
-/// Run `f`, then always shut down MCP (even when `f` returns Err).
-pub async fn with_mcp<R>(
-    config: &GzmoConfig,
-    tools: &mut ToolRegistry,
-    f: impl std::future::Future<Output = Result<R>>,
-) -> Result<R> {
-    let session = McpSession::connect(config, tools).await?;
-    let result = f.await;
-    session.close().await;
-    result
-}

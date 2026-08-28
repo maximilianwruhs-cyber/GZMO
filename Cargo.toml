@@ -68,7 +68,7 @@ debug = true
 [workspace.lints.rust]
 unused_mut = "allow"
 unused_comparisons = "allow"
-dead_code = "allow"
+dead_code = "warn"
 
 [workspace.lints.clippy]
 # Style/pedantic debt is large; keep CI `-D warnings` meaningful for real bugs only.

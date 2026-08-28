@@ -15,8 +15,13 @@ Canonical operator and architecture docs.
 | `docs/` (root) | Living architecture, product, and process docs |
 
 Anything dated or run-specific belongs in `docs/reports/`, not the root.
-`docs/link-baseline.txt` records inherited broken links; CI fails on new ones
-via `scripts/check-doc-links.sh`. Shrink that file, never grow it.
+
+`scripts/check-doc-links.sh` gates relative links in CI. Two files steer it:
+
+| File | Meaning |
+|---|---|
+| `docs/link-external-roots.txt` | Path segments that legitimately resolve outside a bare clone — sibling repos in the author's workspace, plus gitignored runtime files like `gzmo.toml`. Unverifiable by CI, so skipped. Keep tight. |
+| `docs/link-baseline.txt` | Genuine debt: links that *should* resolve in this repo but don't. CI fails on anything not listed. Shrink it, never grow it. |
 
 ## Start here
 

@@ -95,7 +95,7 @@ All four also exist in `semantic_vault` (count=4); none in `quarantine_vault` (c
 
 ### 3.1 How intermediate layers are created today
 
-From `SqliteVault::promote_new_vault_truth` ([vault.rs](../gzmo-core/src/memory/vault.rs)):
+From `SqliteVault::promote_new_vault_truth` ([vault.rs](../gzmo-core/src/memory/vault/promote.rs)):
 
 | `LifecycleKind` | Storage effect | Intermediate residue |
 |-----------------|----------------|----------------------|
@@ -125,7 +125,7 @@ Recall/FTS/Qdrant streams default to `is_latest = 1` (`search_with_decay`, FTS j
 | AbsoluteIdentity | 693 |
 | Structural | ∞ |
 
-Vault runtime map `half_life_from_decay_class` ([vault.rs](../gzmo-core/src/memory/vault.rs)) **extends** the enum with string labels seen in live DB: `Core`→36500, `Semantic`→365, `Procedural`→90, default 60. Score:
+Vault runtime map `half_life_from_decay_class` ([vault.rs](../gzmo-core/src/memory/vault/mod.rs)) **extends** the enum with string labels seen in live DB: `Core`→36500, `Semantic`→365, `Procedural`→90, default 60. Score:
 
 ```text
 effective_days = max(0, days_since_access - confirmation_or_recall_count * 5)
@@ -155,7 +155,7 @@ Default `RipenConfig`: `dedup_threshold=0.95`, `min_entries_for_card=5`, `min_co
 
 ### 3.5 FTS / Qdrant residue
 
-- `ensure_honeypot_fts_synced`: if any FTS row joins `is_latest=0`, full rebuild: `DELETE FROM honeypot_fts` then insert only `is_latest=1` ([vault.rs](../gzmo-core/src/memory/vault.rs)). So FTS dirtiness is transient; **SQLite honeypot table still holds 9 487 non-latest rows**.
+- `ensure_honeypot_fts_synced`: if any FTS row joins `is_latest=0`, full rebuild: `DELETE FROM honeypot_fts` then insert only `is_latest=1` ([vault.rs](../gzmo-core/src/memory/vault/)). So FTS dirtiness is transient; **SQLite honeypot table still holds 9 487 non-latest rows**.
 - Qdrant: documented silent failure — upsert without supersede delete ([INFRASTRUCTURE_MAP.md](../docs/INFRASTRUCTURE_MAP.md)). forget-lint apply on lab vault should optionally emit qdrant-delete advice; living sync is out of scope for v1.
 
 ### 3.6 Proposed candidate classes (union, scored)

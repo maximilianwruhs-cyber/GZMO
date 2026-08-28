@@ -55,6 +55,9 @@ struct CardTypeEntry {
 }
 
 #[derive(Debug, Clone, Deserialize)]
+// Mirrors the on-disk `skills/cardforge.toml` schema. Unread fields are the
+// parse contract: requiring them is how a malformed corpus is rejected.
+#[expect(dead_code, reason = "TOML schema contract; parse-time validation")]
 struct RarityEntry {
     name: String,
     icon: String,
@@ -70,6 +73,7 @@ struct KeywordsSection {
 }
 
 #[derive(Debug, Clone, Deserialize)]
+#[expect(dead_code, reason = "TOML schema contract; parse-time validation")]
 struct NameFragments {
     #[serde(default)]
     prefixes: Vec<String>,

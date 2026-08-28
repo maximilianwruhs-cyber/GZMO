@@ -65,7 +65,7 @@ flowchart TB
 | [`gzmo-core/src/context_compress/logs.rs`](../gzmo-core/src/context_compress/logs.rs) | ANSI strip, dedup, base64/HTML, per-line cap |
 | [`gzmo-core/src/context.rs`](../../gzmo-core/src/context.rs) | `prune_with_archive`, `prune_to_budget_inner`, tool-chain integrity |
 | [`gzmo-core/src/agent_loop.rs`](../../gzmo-core/src/agent_loop.rs) | `build_windowed_messages` — archive **then** window; distill safety |
-| [`gzmo-core/src/config.rs`](../gzmo-core/src/config.rs) | `ContextCompressConfig`, `ContextMemoryConfig` |
+| [`gzmo-core/src/config.rs`](../gzmo-core/src/config/) | `ContextCompressConfig`, `ContextMemoryConfig` |
 
 **Benchmark baseline (Rust, `enabled = true`):**
 
@@ -253,7 +253,7 @@ scored_prune_enabled = false  # ship behind flag; default false until validated
 |------|--------|
 | [`context.rs`](../../gzmo-core/src/context.rs) | `prune_with_archive` calls scored path when `scored_prune_enabled` |
 | [`agent_loop.rs`](../../gzmo-core/src/agent_loop.rs) | Pass `compress_cfg` + `ccr` + `session_id` into prune (extend `ContextConfig` or new `PruneContext` struct) |
-| [`config.rs`](../gzmo-core/src/config.rs) | `scored_prune_enabled`, `prune_compress_budget` |
+| [`config.rs`](../gzmo-core/src/config/) | `scored_prune_enabled`, `prune_compress_budget` |
 
 **`ContextConfig` today has no compress settings.** Prefer a small struct to avoid coupling:
 

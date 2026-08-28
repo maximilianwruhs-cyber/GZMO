@@ -57,12 +57,16 @@ struct ElementsSection {
 }
 
 #[derive(Debug, Clone, Deserialize)]
+// Mirrors the on-disk `skills/pkmforge.toml` schema. Unread fields are the
+// parse contract: requiring them is how a malformed corpus is rejected.
+#[expect(dead_code, reason = "TOML schema contract; parse-time validation")]
 struct CategoryEntry {
     name: String,
     required: Vec<String>,
 }
 
 #[derive(Debug, Clone, Deserialize)]
+#[expect(dead_code, reason = "TOML schema contract; parse-time validation")]
 struct RarityEntry {
     name: String,
     symbol: String,
@@ -71,6 +75,7 @@ struct RarityEntry {
 }
 
 #[derive(Debug, Clone, Deserialize)]
+#[expect(dead_code, reason = "TOML schema contract; parse-time validation")]
 struct NameFragments {
     #[serde(default)]
     prefixes: Vec<String>,
@@ -88,6 +93,7 @@ struct AbilitiesSection {
 }
 
 #[derive(Debug, Clone, Deserialize)]
+#[expect(dead_code, reason = "TOML schema contract; parse-time validation")]
 struct PkmforgeMeta {
     design_method: Option<String>,
     flavor_rule: Option<String>,

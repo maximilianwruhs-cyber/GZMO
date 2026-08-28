@@ -46,7 +46,7 @@ pub struct AssemblyConfig {
 }
 ```
 
-Default: all `Inline` ([test confirms](github-clone/GZMO/gzmo-core/src/assembly.rs)).
+Default: all `Inline` ([test confirms](../../../gzmo-core/src/assembly.rs)).
 
 ### Daemon boot resolution
 

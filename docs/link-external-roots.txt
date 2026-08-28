@@ -1,0 +1,41 @@
+# Path segments that a documentation link may legitimately route through even
+# though they are absent from a bare clone of this repository.
+#
+# Two kinds live here:
+#
+#   1. Sibling repositories. Many docs were written inside a multi-repo
+#      workspace where these sit next to GZMO, so `../../little-tools-lab/...`
+#      resolves correctly in situ. Those links are not rot; they simply cannot
+#      be verified from this repository alone.
+#
+#   2. Gitignored runtime artifacts. `gzmo.toml` and `DREAMS.md` exist on a
+#      live install but are deliberately untracked.
+#
+# A link is skipped if ANY of its path segments matches an entry below.
+# Keep this list tight: everything here is unverifiable by CI. Anything that
+# should exist in this repo belongs in docs/link-baseline.txt instead, where
+# it is tracked as debt.
+
+# --- sibling repositories -------------------------------------------------
+little-tools-lab
+gzmo_skills
+gzmo-rebuild
+spark-link
+honeypot-gate
+lorenz-map
+config-fuse
+forget-lint
+token-economy
+verify-gates
+trace-memory
+stigmergy-queue
+pdu-reflect
+tool-chain
+frankenstein
+swap
+
+# --- gitignored runtime artifacts ----------------------------------------
+gzmo.toml
+DREAMS.md
+.scratch
+.cursor

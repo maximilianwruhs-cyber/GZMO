@@ -11,6 +11,9 @@ use serde::Deserialize;
 const EMBEDDED_TOML: &str = include_str!("../../../data/dice_events.toml");
 
 #[derive(Debug, Clone, Deserialize)]
+// Mirrors the `[meta]` table of `data/dice_events.toml`. The fields are the
+// parse contract: requiring them is how a malformed corpus is rejected.
+#[expect(dead_code, reason = "TOML schema contract; parse-time validation")]
 struct Meta {
     version: u32,
     d20_tiers: u32,
@@ -34,6 +37,11 @@ struct DiceCorpusFile {
 }
 
 #[derive(Debug, Clone)]
+// Read by the corpus tests below, dead in a normal build.
+#[cfg_attr(
+    not(test),
+    expect(dead_code, reason = "carries the parsed [meta] table; see Meta")
+)]
 pub struct DiceCorpus {
     meta: Meta,
     d20: HashMap<String, TierEntry>,

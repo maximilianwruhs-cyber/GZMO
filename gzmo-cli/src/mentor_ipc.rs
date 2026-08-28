@@ -248,19 +248,6 @@ async fn teach(req: &MentorRequest, state: &Arc<MentorServerState>) -> Result<Me
     }
 }
 
-/// Headless autonomous teach (available for future low-tension watcher; unused now).
-pub async fn teach_autonomous(
-    state: &Arc<MentorServerState>,
-    message: &str,
-) -> Result<MentorResponse> {
-    let req = MentorRequest {
-        method: "teach".to_string(),
-        message: message.to_string(),
-        ..Default::default()
-    };
-    teach(&req, state).await
-}
-
 async fn compute(req: &MentorRequest, state: &Arc<MentorServerState>) -> Result<MentorResponse> {
     if !state.config.pedagogy.enabled {
         bail!("pedagogy disabled");

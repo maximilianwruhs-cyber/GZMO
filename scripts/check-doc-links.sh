@@ -28,6 +28,15 @@ case "${1:-}" in
   *) echo "check-doc-links: unknown argument '$1'" >&2; exit 2 ;;
 esac
 
+EXTERNAL_FILE="docs/link-external-roots.txt"
+# Path segments that intentionally live outside this repository (the author's
+# sibling-repo workspace) or are gitignored runtime files present only on a
+# live install. Links through them are correct in situ, so they are not rot.
+external_segs=""
+if [ -f "$EXTERNAL_FILE" ]; then
+  external_segs="$(grep -v '^#' "$EXTERNAL_FILE" | grep . | tr -d '/' | tr '\n' ' ')"
+fi
+
 broken=0
 report=""
 
@@ -49,6 +58,18 @@ while IFS= read -r file; do
       path="${target%%#*}"
       path="${path%%\?*}"
       [ -n "$path" ] || continue
+      # Skip links that route through a declared external/runtime root.
+      # `case` is used rather than a test chain: it always succeeds, so it
+      # cannot trip `set -e` on a non-match.
+      skip=0
+      for ext in $external_segs; do
+        case "/$path/" in
+          */"$ext"/*) skip=1; break ;;
+        esac
+      done
+      if [ "$skip" -eq 1 ]; then
+        continue
+      fi
       # Resolve relative to the containing directory.
       if [ "${path#/}" != "$path" ]; then
         resolved=".${path}"
