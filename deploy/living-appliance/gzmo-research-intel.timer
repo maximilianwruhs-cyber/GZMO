@@ -1,0 +1,10 @@
+[Unit]
+Description=Nightly GZMO living research-intel (04:17 UTC)
+
+[Timer]
+OnCalendar=*-*-* 04:17:00
+Persistent=true
+RandomizedDelaySec=120
+
+[Install]
+WantedBy=timers.target

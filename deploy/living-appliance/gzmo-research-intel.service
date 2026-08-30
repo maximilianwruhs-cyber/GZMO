@@ -1,0 +1,15 @@
+[Unit]
+Description=GZMO living research-intel (drafts only, no vault writes)
+After=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/home/gzmo/Projects/GZMO
+Environment=GZMO_LIVING_HOME=/home/gzmo/.gzmo-living
+Environment=GZMO_CONFIG=/home/gzmo/.gzmo-living/gzmo.toml
+EnvironmentFile=-/home/gzmo/.gzmo-living/.env
+ExecStart=/home/gzmo/Projects/GZMO/scripts/living-research-intel.sh
+Nice=10
+
+[Install]
+WantedBy=default.target
