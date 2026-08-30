@@ -113,7 +113,10 @@ mod tests {
             (id, FeltUseKind::Outcome),
             (id, FeltUseKind::Glance),
         ];
-        assert_eq!(utility_delta(&events), FeltUseKind::Outcome.utility_weight());
+        assert_eq!(
+            utility_delta(&events),
+            FeltUseKind::Outcome.utility_weight()
+        );
         assert_eq!(q_changing(&events), vec![(id, FeltUseKind::Outcome)]);
     }
 }
