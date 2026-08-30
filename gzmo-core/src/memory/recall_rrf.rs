@@ -209,21 +209,30 @@ pub fn fts_match_query_broad(query: &str) -> String {
     fts_match_query_mode(query, true)
 }
 
-fn fts_match_query_mode(query: &str, broad: bool) -> String {
-    let words: Vec<String> = query
-        .split_whitespace()
-        .filter(|w| w.len() >= 2)
-        .map(|w| format!("\"{}\"", w.replace('"', "")))
-        .collect();
-    if words.is_empty() {
-        return String::new();
+fn fts_match_query_mode(query: &str, _broad: bool) -> String {
+    // Porter stems `Use`→`us` and hyphenates `token` out of junk queries.
+    // Drop those query tokens so MATCH cannot form the 407-row `us` pool.
+    const STOP: &[&str] = &[
+        "what", "which", "does", "the", "and", "for", "how", "when", "where", "that", "this",
+        "with", "from", "into", "about", "use", "used", "using", "user", "useful", "usage",
+        "token", "tokens",
+    ];
+    let mut words: Vec<String> = Vec::new();
+    let mut seen = std::collections::HashSet::new();
+    for w in query.split(|c: char| !c.is_alphanumeric()) {
+        if w.len() < 2 {
+            continue;
+        }
+        let lower = w.to_lowercase();
+        if STOP.contains(&lower.as_str()) {
+            continue;
+        }
+        if !seen.insert(lower) {
+            continue;
+        }
+        words.push(format!("\"{}\"", w.replace('"', "")));
     }
-    if broad || words.len() <= 2 {
-        words.join(" OR ")
-    } else {
-        // Top terms OR + remaining as optional OR (still one FTS clause)
-        words.join(" OR ")
-    }
+    words.join(" OR ")
 }
 
 #[cfg(test)]
@@ -248,6 +257,36 @@ mod tests {
             },
             source_file: Some("wave_01_same.md".to_string()),
         }
+    }
+
+    #[test]
+    fn fts_drops_use_so_felt_use_is_not_or_use() {
+        let q = fts_match_query("Felt Use");
+        assert!(q.contains("Felt"), "{q}");
+        assert!(!q.to_lowercase().contains("use"), "{q}");
+    }
+
+    #[test]
+    fn fts_drops_token_in_hyphenated_abstention() {
+        let q = fts_match_query("zzzz-nonexistent-token-9f3a2");
+        assert!(!q.to_lowercase().contains("token"), "{q}");
+        assert!(
+            q.is_empty() || q.contains("zzzz") || q.contains("nonexistent"),
+            "{q}"
+        );
+    }
+
+    #[test]
+    fn fts_use_alone_is_empty() {
+        assert_eq!(fts_match_query("use"), "");
+        assert_eq!(fts_match_query("token"), "");
+    }
+
+    #[test]
+    fn fts_keeps_prometheus_promql() {
+        let q = fts_match_query("Prometheus PromQL");
+        assert!(q.contains("Prometheus"), "{q}");
+        assert!(q.contains("PromQL"), "{q}");
     }
 
     #[test]
