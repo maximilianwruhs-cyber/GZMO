@@ -63,6 +63,20 @@ where
     }
 }
 
+/// Total MemRL Q delta. Glance is 0, so search traffic cannot mint utility.
+pub fn utility_delta(events: &[(Uuid, FeltUseKind)]) -> i64 {
+    events.iter().map(|(_, k)| k.utility_weight()).sum()
+}
+
+/// Events whose kind would change Q (non-Glance).
+pub fn q_changing(events: &[(Uuid, FeltUseKind)]) -> Vec<(Uuid, FeltUseKind)> {
+    events
+        .iter()
+        .copied()
+        .filter(|(_, k)| k.utility_weight() != 0)
+        .collect()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -74,5 +88,32 @@ mod tests {
         assert_eq!(FeltUseKind::Glance.utility_weight(), 0);
         assert!(FeltUseKind::Cited.utility_weight() < FeltUseKind::Bonded.utility_weight());
         assert!(FeltUseKind::Bonded.utility_weight() < FeltUseKind::Outcome.utility_weight());
+    }
+
+    #[test]
+    fn utility_delta_empty_list_is_zero() {
+        let events: &[(Uuid, FeltUseKind)] = &[];
+        assert_eq!(utility_delta(events), 0);
+        assert!(q_changing(events).is_empty());
+    }
+
+    #[test]
+    fn utility_delta_all_glance_is_zero() {
+        let id = Uuid::nil();
+        let events = [(id, FeltUseKind::Glance), (id, FeltUseKind::Glance)];
+        assert_eq!(utility_delta(&events), 0);
+        assert!(q_changing(&events).is_empty());
+    }
+
+    #[test]
+    fn utility_delta_mixed_outcome_and_glance() {
+        let id = Uuid::nil();
+        let events = [
+            (id, FeltUseKind::Glance),
+            (id, FeltUseKind::Outcome),
+            (id, FeltUseKind::Glance),
+        ];
+        assert_eq!(utility_delta(&events), FeltUseKind::Outcome.utility_weight());
+        assert_eq!(q_changing(&events), vec![(id, FeltUseKind::Outcome)]);
     }
 }
