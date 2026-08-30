@@ -32,7 +32,10 @@ struct RerankHit {
 
 impl Reranker {
     pub fn from_config(cfg: &RerankConfig) -> Result<Arc<Self>> {
-        let url = cfg.url.trim_end_matches('/').to_string();
+        let url = cfg.url.trim().trim_end_matches('/').to_string();
+        if url.is_empty() {
+            anyhow::bail!("rerank url is empty");
+        }
         Ok(Arc::new(Self {
             http: Client::builder()
                 .timeout(std::time::Duration::from_secs(120))
@@ -52,7 +55,7 @@ impl Reranker {
         documents: &[String],
         top_n: Option<usize>,
     ) -> Result<Vec<(usize, f64)>> {
-        if documents.is_empty() {
+        if documents.is_empty() || query.trim().is_empty() {
             return Ok(Vec::new());
         }
 
@@ -120,5 +123,35 @@ pub async fn attach_reranker(
             warn!("Rerank disabled — init failed: {e}");
             vault
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::config::RerankConfig;
+
+    fn cfg(url: &str) -> RerankConfig {
+        RerankConfig {
+            enabled: true,
+            url: url.into(),
+            model: "x".into(),
+            api_key: String::new(),
+            prefetch_multiplier: 1,
+        }
+    }
+
+    #[test]
+    fn from_config_rejects_empty_url() {
+        assert!(Reranker::from_config(&cfg("   ")).is_err());
+    }
+
+    #[tokio::test]
+    async fn empty_query_or_docs_does_not_invent_scores() {
+        let r = Reranker::from_config(&cfg("http://127.0.0.1:9")).unwrap();
+        let empty_docs = r.rerank("q", &[], Some(3)).await.unwrap();
+        assert!(empty_docs.is_empty());
+        let empty_q = r.rerank("  \n", &["doc".into()], Some(3)).await.unwrap();
+        assert!(empty_q.is_empty(), "blank query must not call the server");
     }
 }
