@@ -225,6 +225,9 @@ pub(crate) fn static_lines_from_summary(
     summary_md: &str,
     max_bullets: usize,
 ) -> Vec<String> {
+    if entity_tag.trim().is_empty() {
+        return Vec::new();
+    }
     let mut out = Vec::new();
     for line in summary_md.lines() {
         let trimmed = line.trim();
@@ -298,6 +301,28 @@ pub fn invalidate_profile_cache(container_tag: Option<&str>) {
 }
 
 impl GzmoProfile {
+    /// True when no section carries a fact (empty snapshot).
+    pub fn is_empty(&self) -> bool {
+        self.r#static.is_empty()
+            && self.dynamic.is_empty()
+            && self.preferences.is_empty()
+            && self.procedures.is_empty()
+    }
+
+    /// Fail-closed: empty profile or missing identity keys are not usable.
+    pub fn require_usable(&self) -> Result<()> {
+        if self.container_tag.trim().is_empty() {
+            anyhow::bail!("profile missing container_tag");
+        }
+        if self.generated_at.trim().is_empty() {
+            anyhow::bail!("profile missing generated_at");
+        }
+        if self.is_empty() {
+            anyhow::bail!("empty profile");
+        }
+        Ok(())
+    }
+
     pub fn to_markdown(&self) -> String {
         let mut md = String::new();
         md.push_str(&format!("# GZMO Profile — {}\n\n", self.container_tag));
@@ -365,5 +390,70 @@ mod tests {
             .sum::<usize>();
         assert!(est >= 10);
         let _ = p;
+    }
+
+    fn empty_profile() -> GzmoProfile {
+        GzmoProfile {
+            container_tag: "obolus".into(),
+            generated_at: "2026-01-01T00:00:00Z".into(),
+            r#static: vec![],
+            dynamic: vec![],
+            preferences: vec![],
+            procedures: vec![],
+            token_estimate: 0,
+        }
+    }
+
+    #[test]
+    fn empty_profile_fails_closed() {
+        let p = empty_profile();
+        assert!(p.is_empty(), "all-empty sections must count as empty");
+        assert!(
+            p.require_usable().is_err(),
+            "empty profile must fail closed — do not treat as usable"
+        );
+    }
+
+    #[test]
+    fn missing_container_tag_fails_closed() {
+        let mut p = empty_profile();
+        p.container_tag.clear();
+        p.r#static.push("a fact".into());
+        assert!(
+            p.require_usable().is_err(),
+            "missing container_tag must fail closed"
+        );
+    }
+
+    #[test]
+    fn missing_generated_at_fails_closed() {
+        let mut p = empty_profile();
+        p.generated_at.clear();
+        p.r#static.push("a fact".into());
+        assert!(
+            p.require_usable().is_err(),
+            "missing generated_at must fail closed"
+        );
+    }
+
+    #[test]
+    fn populated_profile_is_usable() {
+        let mut p = empty_profile();
+        p.r#static.push("Runs on :8000".into());
+        assert!(!p.is_empty());
+        assert!(p.require_usable().is_ok());
+    }
+
+    #[test]
+    fn empty_summary_and_missing_entity_tag_yield_no_lines() {
+        assert!(
+            static_lines_from_summary("SYSTEM:Prime", "", 2).is_empty(),
+            "empty summary must not invent profile lines"
+        );
+        assert!(static_lines_from_summary("SYSTEM:Prime", "   \n", 2).is_empty());
+        assert!(
+            static_lines_from_summary("", "- Runs on :8000", 2).is_empty(),
+            "missing entity_tag must fail closed — no unkeyed lines"
+        );
     }
 }
