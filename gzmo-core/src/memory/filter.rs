@@ -16,6 +16,16 @@ pub enum FilterResult {
     Suppressed,
 }
 
+/// Fail-closed: empty/whitespace is never user-forwardable.
+fn is_forwardable_chunk(chunk: &str) -> bool {
+    !chunk.trim().is_empty()
+}
+
+/// Token scan. Empty input is a no-match (do not invent a silent turn).
+fn has_no_reply_token(chunk: &str) -> bool {
+    chunk.contains("<NO_REPLY>") || chunk.contains("[NO_REPLY]")
+}
+
 /// The fail-closed NO_REPLY filter. Ensures internal cognitive processes
 /// never accidentally stream to external user replies.
 pub struct NoReplyFilter {
@@ -31,7 +41,10 @@ impl NoReplyFilter {
     /// If it contains <NO_REPLY>, dump to episodic log and suppress.
     /// Otherwise, forward to user.
     pub async fn process(&self, chunk: &str) -> FilterResult {
-        if chunk.contains("<NO_REPLY>") || chunk.contains("[NO_REPLY]") {
+        if !is_forwardable_chunk(chunk) {
+            return FilterResult::Suppressed;
+        }
+        if has_no_reply_token(chunk) {
             // Strip the NO_REPLY tokens before logging
             let cleaned = chunk
                 .replace("<NO_REPLY>", "")
@@ -58,5 +71,37 @@ impl NoReplyFilter {
         } else {
             FilterResult::Forward(chunk.to_string())
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn empty_input_is_not_forwardable() {
+        assert!(
+            !is_forwardable_chunk(""),
+            "empty input must fail closed — never Forward"
+        );
+        assert!(!is_forwardable_chunk("   \n\t  "));
+    }
+
+    #[test]
+    fn no_match_plain_text_is_forwardable() {
+        assert!(
+            is_forwardable_chunk("hello from the model"),
+            "real content with no NO_REPLY token must still forward"
+        );
+        assert!(!has_no_reply_token("hello from the model"));
+        assert!(!has_no_reply_token(""));
+        assert!(!has_no_reply_token("   "));
+    }
+
+    #[test]
+    fn no_reply_tokens_match() {
+        assert!(has_no_reply_token("<NO_REPLY> think silently"));
+        assert!(has_no_reply_token("[NO_REPLY]"));
+        assert!(!has_no_reply_token("NO_REPLY without brackets"));
     }
 }
