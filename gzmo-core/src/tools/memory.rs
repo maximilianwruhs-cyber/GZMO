@@ -8,6 +8,18 @@ use crate::control_plane::ControlPlaneClient;
 use crate::memory::scratch::{ScratchScope, ScratchService};
 use crate::memory::vault::SqliteVault;
 
+/// Fail closed: blank query or no vault → error, never invented facts.
+fn require_searchable(query: &str, vault_present: bool) -> Result<&str> {
+    let q = query.trim();
+    if q.is_empty() {
+        return Err(anyhow!("empty query"));
+    }
+    if !vault_present {
+        return Err(anyhow!("missing vault"));
+    }
+    Ok(q)
+}
+
 /// Tool to record a new fact into the Sovereign Native Memory (SqliteVault).
 pub struct MemoryRecordTool {
     pub vault: Arc<SqliteVault>,
@@ -146,6 +158,7 @@ impl ToolHandler for MemorySearchTool {
         let query = args["query"]
             .as_str()
             .ok_or_else(|| anyhow!("Missing 'query' parameter"))?;
+        let query = require_searchable(query, true)?;
 
         let limit = args["limit"].as_u64().unwrap_or(5).min(20) as usize;
 
@@ -203,6 +216,7 @@ impl ToolHandler for OwnerMemorySearchTool {
         let query = args["query"]
             .as_str()
             .ok_or_else(|| anyhow!("Missing 'query' parameter"))?;
+        let query = require_searchable(query, true)?;
         let limit = args["limit"].as_u64().unwrap_or(5).min(20) as usize;
         let res = self.client.search(query, limit, true).await?;
         Ok(res.text)
@@ -254,6 +268,62 @@ mod tests {
 
         assert!(search_res.contains("The user appreciates blunt feedback."));
 
+        let empty = search_tool
+            .execute(json!({ "query": "" }))
+            .await
+            .expect_err("empty query must fail closed");
+        assert!(
+            !empty
+                .to_string()
+                .contains("The user appreciates blunt feedback."),
+            "empty query must not invent recall: {empty}"
+        );
+
+        let ws = search_tool
+            .execute(json!({ "query": "   \n\t  " }))
+            .await
+            .expect_err("whitespace query must fail closed");
+        assert!(!ws
+            .to_string()
+            .contains("The user appreciates blunt feedback."));
+
+        let missing_q = search_tool
+            .execute(json!({}))
+            .await
+            .expect_err("missing query must fail closed");
+        assert!(!missing_q
+            .to_string()
+            .contains("The user appreciates blunt feedback."));
+
         let _ = std::fs::remove_file(tmp_dir);
+    }
+
+    #[test]
+    fn empty_query_and_missing_vault_fail_closed() {
+        assert!(
+            require_searchable("", true).is_err(),
+            "empty query must fail closed — do not invent recall"
+        );
+        assert!(require_searchable("   \n", true).is_err());
+        assert!(
+            require_searchable("blunt", false).is_err(),
+            "missing vault must fail closed — no fake facts"
+        );
+        assert_eq!(require_searchable("blunt", true).unwrap(), "blunt");
+    }
+
+    #[tokio::test]
+    async fn owner_empty_query_fails_closed_before_socket() {
+        let tool = OwnerMemorySearchTool {
+            client: ControlPlaneClient::new(std::path::PathBuf::from("/no/such/gzmo.sock"), None),
+        };
+        let err = tool
+            .execute(json!({ "query": "" }))
+            .await
+            .expect_err("empty query must not hit a missing socket as live recall");
+        assert!(
+            err.to_string().contains("empty query"),
+            "must fail on query, not socket: {err}"
+        );
     }
 }
