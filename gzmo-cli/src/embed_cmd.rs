@@ -9,6 +9,11 @@ use tracing::info;
 
 pub async fn run(config: &GzmoConfig, limit: Option<usize>) -> Result<()> {
     let started = Utc::now();
+    if !metabolism::metabolism_needs_work(config) {
+        info!("embed skip — vault empty or missing");
+        metabolism::write_job_run(config, "embed", "rust", started, true, None);
+        return Ok(());
+    }
     let missing = {
         let vault = gzmo_core::memory::vault::SqliteVault::open(&config.memory.vault_db)?;
         vault.count_missing_embeddings()?
