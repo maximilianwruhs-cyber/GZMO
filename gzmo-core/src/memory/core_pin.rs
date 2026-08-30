@@ -30,10 +30,19 @@ pub fn should_seed_bonded(content: &str, origin: &str) -> bool {
     if !origin_ok {
         return false;
     }
-    let trimmed = content.trim_start();
-    DEFAULT_PREFIXES
-        .iter()
-        .any(|p| trimmed.starts_with(p) || content.contains(p))
+
+    let trimmed = content.trim();
+    for &p in DEFAULT_PREFIXES {
+        if let Some(idx) = trimmed.find(p) {
+            let before = &trimmed[..idx];
+            let after = &trimmed[idx + p.len()..];
+            // Must have substantive content, not just be a bare prefix stub
+            if !before.trim().is_empty() || !after.trim().is_empty() {
+                return true;
+            }
+        }
+    }
+    false
 }
 
 #[cfg(test)]
@@ -49,5 +58,21 @@ mod tests {
         assert!(should_seed_bonded("[CORE] pinned", "ingest"));
         assert!(!should_seed_bonded("random fact", "session_distill"));
         assert!(!should_seed_bonded("CoreCrystallize: x", "spark"));
+    }
+
+    #[test]
+    fn test_empty_and_bounds() {
+        assert!(!should_seed_bonded("", "ingest"));
+        assert!(!should_seed_bonded("   ", "ingest"));
+
+        // Stub facts (empty payload) are refused
+        assert!(!should_seed_bonded("[CORE]", "ingest"));
+        assert!(!should_seed_bonded("  [CORE]  ", "ingest"));
+        assert!(!should_seed_bonded("CoreCrystallize:", "ingest"));
+
+        // Substantive bounds
+        assert!(should_seed_bonded("[CORE] x", "ingest"));
+        assert!(should_seed_bonded("x [CORE]", "ingest"));
+        assert!(should_seed_bonded("CoreCrystallize: data", "ingest"));
     }
 }
