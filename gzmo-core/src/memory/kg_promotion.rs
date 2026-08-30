@@ -107,7 +107,11 @@ pub fn promotable_relations<'a>(
             if !is_valid_relation_endpoints(from, to, &relation_type) {
                 None
             } else {
-                Some((from.trim().to_string(), to.trim().to_string(), relation_type))
+                Some((
+                    from.trim().to_string(),
+                    to.trim().to_string(),
+                    relation_type,
+                ))
             }
         })
         .collect()
@@ -178,6 +182,9 @@ mod tests {
     fn valid_candidates_survive() {
         assert_eq!(promotable_entities(["  Alice  ", "x"]), vec!["Alice"]);
         let rels = promotable_relations([("Alice", "Book", "WROTE")]);
-        assert_eq!(rels, vec![("Alice".into(), "Book".into(), "AUTHORED_BY".into())]);
+        assert_eq!(
+            rels,
+            vec![("Alice".into(), "Book".into(), "AUTHORED_BY".into())]
+        );
     }
 }
