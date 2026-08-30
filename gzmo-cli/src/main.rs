@@ -14,6 +14,7 @@ mod distill_cmd;
 mod dream_cmd;
 mod embed_cmd;
 mod health_cmd;
+mod idle_evolve;
 mod immune_cmd;
 mod ingest_cmd;
 mod ingest_dir_cmd;
