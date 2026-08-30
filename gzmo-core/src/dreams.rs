@@ -167,7 +167,7 @@ impl DreamEngine {
             }
         }
 
-        let compressed = self.light_phase(&rem_input);
+        let compressed = Self::light_phase(&rem_input);
         info!(
             original = raw.len(),
             filtered = filtered_len,
@@ -342,7 +342,7 @@ impl DreamEngine {
         })
     }
 
-    fn light_phase(&self, text: &str) -> String {
+    fn light_phase(text: &str) -> String {
         let mut output = String::with_capacity(text.len() / 10);
 
         for line in text.lines() {
@@ -367,7 +367,8 @@ impl DreamEngine {
             }
 
             if trimmed.len() > 500 {
-                output.push_str(&trimmed[..500]);
+                let safe_bound = trimmed.floor_char_boundary(500);
+                output.push_str(&trimmed[..safe_bound]);
                 output.push_str("... [TRUNCATED]\n");
                 continue;
             }
@@ -648,5 +649,40 @@ Session distilled: GZMO runs on air-gapped infrastructure with real decisions.
         }
         let filtered = filter_episodic_for_consolidation(&raw, &excludes());
         assert!(filtered.len() < 400, "May 31 log should be mostly filtered");
+    }
+
+    #[test]
+    fn light_phase_truncates_safely_at_char_boundary() {
+        let mut s = String::new();
+        // Rocket emoji is 4 bytes. 126 * 4 = 504 bytes.
+        for _ in 0..126 {
+            s.push_str("🚀");
+        }
+        let out = DreamEngine::light_phase(&s);
+        assert!(out.contains("[TRUNCATED]"));
+        // 125 * 4 = 500. So it should perfectly fit 125 rockets, and truncate correctly.
+        assert_eq!(&out[..500], &s[..500]);
+
+        let mut s2 = String::new();
+        for _ in 0..130 {
+            s2.push_str("ä");
+        } // 'ä' is 2 bytes. 130 * 2 = 260.
+        for _ in 0..100 {
+            s2.push_str("🚀");
+        } // 100 * 4 = 400. 260 + 400 = 660 bytes.
+        let out2 = DreamEngine::light_phase(&s2);
+        assert!(out2.contains("[TRUNCATED]"));
+    }
+
+    #[test]
+    fn light_phase_empty_and_trivial_inputs() {
+        let empty_out = DreamEngine::light_phase("");
+        assert_eq!(empty_out, "");
+
+        let whitespace = "   \n\t\n  \n";
+        assert_eq!(DreamEngine::light_phase(whitespace), "");
+
+        let dashes = "---\n\n---\n";
+        assert_eq!(DreamEngine::light_phase(dashes), "");
     }
 }
