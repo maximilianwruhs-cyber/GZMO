@@ -322,8 +322,8 @@ mod tests {
             .await
             .expect_err("empty query must not hit a missing socket as live recall");
         assert!(
-            !err.to_string().contains("Honeypot recall"),
-            "must not invent facts: {err}"
+            err.to_string().contains("empty query"),
+            "must fail on query, not socket: {err}"
         );
     }
 }
