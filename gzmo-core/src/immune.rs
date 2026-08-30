@@ -374,6 +374,9 @@ pub fn apply_plan(
     max_apply: usize,
     confirm_apply: bool,
 ) -> Result<PathBuf> {
+    if plan.candidates.is_empty() {
+        return Ok(PathBuf::new());
+    }
     if !confirm_apply {
         anyhow::bail!("immune apply refused — pass confirm_apply / IMMUNE_APPLY=1");
     }
@@ -467,5 +470,51 @@ mod tests {
             "[STATE:EnginesEnabled] Clean-slate rebuild complete on CT101 living stack — [dreams] enabled"
         )
         .is_none());
+    }
+
+    #[test]
+    fn apply_plan_noop_on_empty() {
+        let vault = SqliteVault::open(":memory:").unwrap();
+        let plan = ImmunePlan {
+            schema: SCHEMA.into(),
+            night_id: "2024-12-12".into(),
+            generated_at: "test".into(),
+            dry_run: true,
+            truths_scanned: 0,
+            candidates: vec![],
+        };
+        let res = apply_plan(&vault, &plan, 5, false).unwrap();
+        assert_eq!(res, PathBuf::new());
+    }
+
+    #[test]
+    fn apply_plan_respects_bounds() {
+        let vault = SqliteVault::open(":memory:").unwrap();
+
+        let plan = ImmunePlan {
+            schema: SCHEMA.into(),
+            night_id: "test".into(),
+            generated_at: "test".into(),
+            dry_run: true,
+            truths_scanned: 0,
+            candidates: vec![
+                ImmuneCandidate {
+                    fact_id: "fake-1".into(),
+                    content: "test".into(),
+                    reason: "test".into(),
+                    against_truth: "test".into(),
+                    action: "test".into(),
+                },
+                ImmuneCandidate {
+                    fact_id: "fake-2".into(),
+                    content: "test".into(),
+                    reason: "test".into(),
+                    against_truth: "test".into(),
+                    action: "test".into(),
+                },
+            ],
+        };
+        let res = apply_plan(&vault, &plan, 1, true);
+        assert!(res.is_err());
     }
 }
