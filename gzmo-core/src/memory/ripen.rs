@@ -123,7 +123,8 @@ fn group_by_entity(
 ) -> Result<HashMap<String, Vec<EntityEntry>>> {
     let mut stmt = conn.prepare(
         "SELECT h.id, h.content, h.confidence, h.origin, h.recall_count,
-                h.is_latest, h.supersedes_id, h.decay_class, h.promoted_at
+                h.is_latest, h.supersedes_id, h.decay_class, h.promoted_at,
+                h.utility_score
          FROM honeypot h
          WHERE h.confidence >= ?1
          ORDER BY h.confidence DESC",
@@ -140,6 +141,7 @@ fn group_by_entity(
             supersedes_id: row.get(6)?,
             decay_class: row.get::<_, String>(7)?,
             promoted_at: row.get(8)?,
+            utility_score: row.get(9)?,
         })
     })?;
 
@@ -153,7 +155,9 @@ fn group_by_entity(
     }
 
     // Filter groups that meet the minimum card threshold
-    groups.retain(|_, entries| entries.len() >= config.min_entries_for_card);
+    groups.retain(|_, entries| {
+        entries.len() >= config.min_entries_for_card && entries.iter().any(|e| e.recall_count > 0)
+    });
 
     Ok(groups)
 }
@@ -171,8 +175,22 @@ fn resolve_contradictions(
             break;
         }
 
-        // Sort by confidence × recall_count (descending)
+        // Skip empty or zero-recall sets
+        if entries.is_empty() || !entries.iter().any(|e| e.recall_count > 0) {
+            continue;
+        }
+
+        // Sort: utility_score > 0 first, then by confidence × recall_count (descending)
         entries.sort_by(|a, b| {
+            let a_has_utility = a.utility_score > 0.0;
+            let b_has_utility = b.utility_score > 0.0;
+
+            if a_has_utility && !b_has_utility {
+                return std::cmp::Ordering::Less;
+            } else if !a_has_utility && b_has_utility {
+                return std::cmp::Ordering::Greater;
+            }
+
             let score_a = a.confidence * (1.0 + a.recall_count as f64);
             let score_b = b.confidence * (1.0 + b.recall_count as f64);
             score_b
@@ -267,6 +285,7 @@ struct EntityEntry {
     supersedes_id: Option<String>,
     decay_class: String,
     promoted_at: Option<String>,
+    utility_score: f64,
 }
 
 /// Extract entity label from "[TYPE:Name] observation" format.
@@ -362,6 +381,7 @@ mod tests {
                 supersedes_id: None,
                 decay_class: "CuratedVault".into(),
                 promoted_at: None,
+                utility_score: 0.0,
             },
             EntityEntry {
                 id: "2".into(),
@@ -373,11 +393,96 @@ mod tests {
                 supersedes_id: None,
                 decay_class: "SessionDistill".into(),
                 promoted_at: None,
+                utility_score: 0.0,
             },
         ];
         let summary = synthesize_summary(&entries);
         assert!(summary.contains("Runs on CT101"));
         assert!(summary.contains("Uses cloud LLM"));
+    }
+
+    #[test]
+    fn skips_zero_recall_sets() {
+        let entries = vec![EntityEntry {
+            id: "1".into(),
+            content: "Observation 1".into(),
+            confidence: 0.9,
+            origin: "ingest".into(),
+            recall_count: 0,
+            is_latest: true,
+            supersedes_id: None,
+            decay_class: "SessionDistill".into(),
+            promoted_at: None,
+            utility_score: 0.0,
+        }];
+        let mut groups = HashMap::new();
+        groups.insert("concept".to_string(), entries);
+
+        // This simulates a mocked db connection, resolve_contradictions doesn't actually use the connection
+        let conn = Connection::open_in_memory().unwrap();
+        let config = RipenConfig::default();
+
+        let cards = resolve_contradictions(&conn, groups, &config).unwrap();
+        assert!(cards.is_empty(), "Should skip sets with zero recall count");
+    }
+
+    #[test]
+    fn prefers_utility_score_facts() {
+        let entries = vec![
+            EntityEntry {
+                id: "1".into(),
+                content: "High confidence, no utility".into(),
+                confidence: 0.99,
+                origin: "ingest".into(),
+                recall_count: 10,
+                is_latest: true,
+                supersedes_id: None,
+                decay_class: "SessionDistill".into(),
+                promoted_at: None,
+                utility_score: 0.0,
+            },
+            EntityEntry {
+                id: "2".into(),
+                content: "Low confidence, high utility".into(),
+                confidence: 0.5,
+                origin: "ingest".into(),
+                recall_count: 1,
+                is_latest: true,
+                supersedes_id: None,
+                decay_class: "SessionDistill".into(),
+                promoted_at: None,
+                utility_score: 1.0,
+            },
+        ];
+
+        let mut groups = HashMap::new();
+        groups.insert("concept".to_string(), entries);
+
+        let conn = Connection::open_in_memory().unwrap();
+        let config = RipenConfig::default();
+
+        let cards = resolve_contradictions(&conn, groups, &config).unwrap();
+        assert_eq!(cards.len(), 1);
+
+        // The first supporting fact in the concept card should come from entry 2
+        let top_fact_id = &cards[0].supporting_facts[0].honeypot_id;
+        assert_eq!(
+            top_fact_id, "2",
+            "Entry with utility_score > 0 should rank higher"
+        );
+    }
+
+    #[test]
+    fn handles_empty_inputs_safely() {
+        let groups: HashMap<String, Vec<EntityEntry>> = HashMap::new();
+        let conn = Connection::open_in_memory().unwrap();
+        let config = RipenConfig::default();
+
+        let cards = resolve_contradictions(&conn, groups, &config).unwrap();
+        assert!(
+            cards.is_empty(),
+            "Should handle empty groups without panicking"
+        );
     }
 
     #[test]
