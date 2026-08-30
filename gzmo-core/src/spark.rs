@@ -843,8 +843,10 @@ fn stale_sweetness(days: f64, min_days: f64, max_days: f64) -> f64 {
 }
 
 fn anchor_importance(fact: &SemanticFact) -> f64 {
-    let bonus = (fact.confirmation_count as f64).max(1.0).ln();
-    fact.confidence * (1.0 + bonus * 0.1)
+    let confirm_bonus = (fact.confirmation_count as f64).max(1.0).ln();
+    let tags = extract_spark_concept_tags(&fact.content);
+    let lineage_bonus = (tags.len() as f64) * 0.1;
+    fact.confidence * (1.0 + confirm_bonus * 0.1 + lineage_bonus)
 }
 
 fn embeddings_usable(a: &[f32], b: &[f32]) -> bool {
@@ -1010,6 +1012,20 @@ mod selection_tests {
         let a = "[PEOPLE:Socrates] Developed the Socratic Elenchus.";
         let b = "[PEOPLE:Socrates] Attacked the alleged expertise of Athenians.";
         assert!(shares_spark_concept_tag(a, b));
+    }
+
+    #[test]
+    fn anchor_importance_lineage_bonus() {
+        let base = fact("Plain text without tags.", 0);
+        let rich = fact("[CONCEPT:A] [CONCEPT:B] Connected text.", 0);
+        let empty = fact("", 0);
+
+        let score_base = anchor_importance(&base);
+        let score_rich = anchor_importance(&rich);
+        let score_empty = anchor_importance(&empty);
+
+        assert!(score_rich > score_base);
+        assert_eq!(score_base, score_empty);
     }
 
     #[test]
