@@ -180,6 +180,18 @@ pub struct ScratchService {
 }
 
 impl ScratchService {
+    #[cfg(test)]
+    fn memory(scratch_max_tokens: usize) -> Self {
+        Self {
+            backend: ScratchBackend::Memory(Arc::new(RwLock::new(HashMap::new()))),
+            redis_enabled: false,
+            distill_queue: String::new(),
+            distill_fallback_dir: PathBuf::new(),
+            scratch_max_tokens,
+            chars_per_token: 3.5,
+        }
+    }
+
     pub async fn from_config(redis_cfg: &RedisConfig, ctx_mem: &ContextMemoryConfig) -> Self {
         let scratch_max_tokens = ctx_mem.scratch_max_tokens;
         let distill_queue = redis_cfg.distill_queue.clone();
@@ -348,40 +360,11 @@ impl ScratchService {
         let Some(payload) = self.read(scope).await? else {
             return Ok(None);
         };
-        if payload.snippets.is_empty() {
-            return Ok(None);
-        }
-
-        let mut lines = vec!["[RECALL]".to_string()];
-        let mut used = estimate_text_tokens("[RECALL]\n", self.chars_per_token);
-
-        for snip in &payload.snippets {
-            let line = match (&snip.fact_id, &snip.evidence_text) {
-                (Some(id), Some(ev)) if !ev.trim().is_empty() => format!(
-                    "- [{:.2}] ({}) {}\n  source_span: {}",
-                    snip.score,
-                    id,
-                    snip.content,
-                    ev.trim()
-                ),
-                (Some(id), _) => format!("- [{:.2}] ({}) {}", snip.score, id, snip.content),
-                (None, Some(ev)) if !ev.trim().is_empty() => format!(
-                    "- [{:.2}] {}\n  source_span: {}",
-                    snip.score,
-                    snip.content,
-                    ev.trim()
-                ),
-                _ => format!("- [{:.2}] {}", snip.score, snip.content),
-            };
-            let cost = estimate_text_tokens(&line, self.chars_per_token);
-            if used + cost > self.scratch_max_tokens {
-                break;
-            }
-            used += cost;
-            lines.push(line);
-        }
-
-        Ok(Some(lines.join("\n")))
+        Ok(format_recall_block(
+            &payload.snippets,
+            self.scratch_max_tokens,
+            self.chars_per_token,
+        ))
     }
 
     pub async fn enqueue_distill(&self, job: DistillJob) -> Result<()> {
@@ -469,6 +452,115 @@ impl ScratchService {
         let job: DistillJob = serde_json::from_str(&json)?;
         Ok(Some(job))
     }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn snip(content: &str) -> RecallSnippet {
+        RecallSnippet {
+            content: content.to_string(),
+            score: 1.0,
+            fact_id: None,
+            evidence_text: None,
+        }
+    }
+
+    #[test]
+    fn empty_scratch_is_none() {
+        assert!(
+            format_recall_block(&[], 2000, 3.5).is_none(),
+            "empty scratch must not inject a [RECALL] block"
+        );
+    }
+
+    #[test]
+    fn overflow_omits_snippets_that_do_not_fit() {
+        let snippets = vec![snip("alpha"), snip(&"overflow-payload-".repeat(80))];
+        let out = format_recall_block(&snippets, 30, 3.5)
+            .expect("first snippet must fit a 30-token budget");
+        assert!(out.contains("alpha"));
+        assert!(
+            !out.contains("overflow-payload-"),
+            "must stop at token bound"
+        );
+        assert!(
+            estimate_text_tokens(&out, 3.5) <= 30 + 8,
+            "joined block stays near the bound (header + per-line overhead)"
+        );
+    }
+
+    #[test]
+    fn overflow_too_tight_is_empty() {
+        let snippets = vec![snip(&"huge".repeat(100))];
+        assert!(
+            format_recall_block(&snippets, 8, 3.5).is_none(),
+            "nothing fits → no header-only inject"
+        );
+    }
+
+    #[tokio::test]
+    async fn write_empty_clears_scratch() {
+        let svc = ScratchService::memory(2000);
+        let scope = ScratchScope::Main {
+            session_id: "empty-bounds".into(),
+        };
+        svc.write(&scope, vec![snip("keep")]).await.unwrap();
+        assert!(svc.read(&scope).await.unwrap().is_some());
+        svc.write(&scope, vec![]).await.unwrap();
+        assert!(
+            svc.read(&scope).await.unwrap().is_none(),
+            "empty write is a clear"
+        );
+        assert!(svc.format_for_inject(&scope).await.unwrap().is_none());
+    }
+}
+
+/// Format snippets as a `[RECALL]` inject block.
+/// Empty scratch, or overflow that fits nothing, is `None`.
+pub fn format_recall_block(
+    snippets: &[RecallSnippet],
+    max_tokens: usize,
+    chars_per_token: f64,
+) -> Option<String> {
+    if snippets.is_empty() {
+        return None;
+    }
+
+    let mut lines = vec!["[RECALL]".to_string()];
+    let mut used = estimate_text_tokens("[RECALL]\n", chars_per_token);
+
+    for snip in snippets {
+        let line = match (&snip.fact_id, &snip.evidence_text) {
+            (Some(id), Some(ev)) if !ev.trim().is_empty() => format!(
+                "- [{:.2}] ({}) {}\n  source_span: {}",
+                snip.score,
+                id,
+                snip.content,
+                ev.trim()
+            ),
+            (Some(id), _) => format!("- [{:.2}] ({}) {}", snip.score, id, snip.content),
+            (None, Some(ev)) if !ev.trim().is_empty() => format!(
+                "- [{:.2}] {}\n  source_span: {}",
+                snip.score,
+                snip.content,
+                ev.trim()
+            ),
+            _ => format!("- [{:.2}] {}", snip.score, snip.content),
+        };
+        let cost = estimate_text_tokens(&line, chars_per_token);
+        if used + cost > max_tokens {
+            break;
+        }
+        used += cost;
+        lines.push(line);
+    }
+
+    if lines.len() <= 1 {
+        return None;
+    }
+    Some(lines.join("\n"))
 }
 
 /// Build a transcript string from archived messages for distill pipeline.
