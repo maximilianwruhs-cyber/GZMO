@@ -45,7 +45,44 @@ impl ProbeResult {
 }
 
 /// GET `{url}/models` — OpenAI-compatible liveness.
+
+/// Cheap health fail-closed check.
+/// Immediately fails probes if critical parameters (url, model) are empty or pathologically long.
+fn cheap_health_fail_closed(
+    probe_name: &'static str,
+    url: &str,
+    model: Option<&str>,
+) -> std::result::Result<(), ProbeResult> {
+    if url.trim().is_empty() {
+        return Err(ProbeResult::fail(probe_name, "url is empty (fail-closed)"));
+    }
+    if url.len() > 2048 {
+        return Err(ProbeResult::fail(
+            probe_name,
+            "url exceeds length bounds (fail-closed)",
+        ));
+    }
+    if let Some(m) = model {
+        if m.trim().is_empty() {
+            return Err(ProbeResult::fail(
+                probe_name,
+                "model is empty (fail-closed)",
+            ));
+        }
+        if m.len() > 256 {
+            return Err(ProbeResult::fail(
+                probe_name,
+                "model exceeds length bounds (fail-closed)",
+            ));
+        }
+    }
+    Ok(())
+}
+
 pub async fn probe_llm_models(profile: &EngineProfileConfig) -> ProbeResult {
+    if let Err(r) = cheap_health_fail_closed("llm", &profile.url, Some(profile.model.as_str())) {
+        return r;
+    }
     let base = profile.url.trim_end_matches('/');
     let url = format!("{base}/models");
     let client = match Client::builder().timeout(Duration::from_secs(8)).build() {
@@ -69,6 +106,9 @@ pub async fn probe_llm_models(profile: &EngineProfileConfig) -> ProbeResult {
 pub async fn probe_embeddings(cfg: &EmbeddingsConfig, redis_cfg: &RedisConfig) -> ProbeResult {
     if !cfg.enabled {
         return ProbeResult::pass("embeddings", "disabled in config");
+    }
+    if let Err(r) = cheap_health_fail_closed("embeddings", &cfg.url, Some(cfg.model.as_str())) {
+        return r;
     }
     match crate::memory::embeddings::Embedder::from_config(cfg, redis_cfg) {
         Ok(e) => match e.embed("health probe").await {
@@ -108,6 +148,9 @@ pub fn probe_neo4j_bolt(bolt_url: &str) -> ProbeResult {
 pub async fn probe_redis(cfg: &RedisConfig) -> ProbeResult {
     if !cfg.enabled {
         return ProbeResult::pass("redis", "disabled in config");
+    }
+    if let Err(r) = cheap_health_fail_closed("redis", &cfg.url, None) {
+        return r;
     }
     let client = match redis::Client::open(cfg.url.as_str()) {
         Ok(c) => c,
@@ -235,6 +278,9 @@ pub async fn probe_qdrant(cfg: &QdrantConfig) -> ProbeResult {
     if !cfg.enabled {
         return ProbeResult::pass("qdrant", "disabled in config");
     }
+    if let Err(r) = cheap_health_fail_closed("qdrant", &cfg.url, None) {
+        return r;
+    }
     let base = cfg.url.trim_end_matches('/');
     let url = format!("{base}/collections/{}", cfg.collection);
     let client = match Client::builder().timeout(Duration::from_secs(8)).build() {
@@ -270,6 +316,9 @@ pub async fn probe_rerank(cfg: &RerankConfig) -> ProbeResult {
     if !cfg.enabled {
         return ProbeResult::pass("rerank", "disabled in config");
     }
+    if let Err(r) = cheap_health_fail_closed("rerank", &cfg.url, Some(cfg.model.as_str())) {
+        return r;
+    }
     match Reranker::from_config(cfg) {
         Ok(r) => match r
             .rerank(
@@ -297,6 +346,9 @@ pub async fn probe_rerank(cfg: &RerankConfig) -> ProbeResult {
 pub async fn probe_librarian(cfg: &LibrarianConfig) -> ProbeResult {
     if !cfg.enabled {
         return ProbeResult::pass("librarian", "disabled in config");
+    }
+    if let Err(r) = cheap_health_fail_closed("librarian", &cfg.url, Some(cfg.model.as_str())) {
+        return r;
     }
     let profile = EngineProfileConfig {
         provider: "local".into(),
@@ -617,4 +669,57 @@ pub fn format_report(results: &[ProbeResult]) -> String {
         out.push_str(&format!("  [{mark}] {} — {}\n", r.name, r.detail));
     }
     out
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_cheap_health_fail_closed_valid() {
+        let res = cheap_health_fail_closed("test_probe", "http://localhost:8000", Some("model-v1"));
+        assert!(res.is_ok());
+    }
+
+    #[test]
+    fn test_cheap_health_fail_closed_empty_url() {
+        let res = cheap_health_fail_closed("test_probe", "   ", Some("model-v1"));
+        assert!(res.is_err());
+        assert_eq!(res.unwrap_err().detail, "url is empty (fail-closed)");
+    }
+
+    #[test]
+    fn test_cheap_health_fail_closed_long_url() {
+        let long_url = "a".repeat(2049);
+        let res = cheap_health_fail_closed("test_probe", &long_url, Some("model-v1"));
+        assert!(res.is_err());
+        assert_eq!(
+            res.unwrap_err().detail,
+            "url exceeds length bounds (fail-closed)"
+        );
+    }
+
+    #[test]
+    fn test_cheap_health_fail_closed_empty_model() {
+        let res = cheap_health_fail_closed("test_probe", "http://localhost", Some("   "));
+        assert!(res.is_err());
+        assert_eq!(res.unwrap_err().detail, "model is empty (fail-closed)");
+    }
+
+    #[test]
+    fn test_cheap_health_fail_closed_long_model() {
+        let long_model = "m".repeat(257);
+        let res = cheap_health_fail_closed("test_probe", "http://localhost", Some(&long_model));
+        assert!(res.is_err());
+        assert_eq!(
+            res.unwrap_err().detail,
+            "model exceeds length bounds (fail-closed)"
+        );
+    }
+
+    #[test]
+    fn test_cheap_health_fail_closed_none_model() {
+        let res = cheap_health_fail_closed("test_probe", "http://localhost:8000", None);
+        assert!(res.is_ok());
+    }
 }
