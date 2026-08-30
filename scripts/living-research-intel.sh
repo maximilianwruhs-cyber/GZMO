@@ -31,3 +31,6 @@ if [[ -f "$OUT/latest.json" ]]; then
 fi
 
 echo "[i] living research-intel drafts → $OUT/latest.md"
+if [[ "${JULES_DISPATCH:-}" == "1" ]]; then
+  echo "[i] Jules dispatch is on (one real-file mission / 7 days per file)"
+fi

@@ -7,6 +7,8 @@ Type=oneshot
 WorkingDirectory=/home/gzmo/Projects/GZMO
 Environment=GZMO_LIVING_HOME=/home/gzmo/.gzmo-living
 Environment=GZMO_CONFIG=/home/gzmo/.gzmo-living/gzmo.toml
+Environment=JULES_DISPATCH=1
+Environment=PATH=/home/gzmo/.local/bin:/usr/local/bin:/usr/bin:/bin
 EnvironmentFile=-/home/gzmo/.gzmo-living/.env
 ExecStart=/home/gzmo/Projects/GZMO/scripts/living-research-intel.sh
 Nice=10

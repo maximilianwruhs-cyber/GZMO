@@ -6,7 +6,9 @@ from __future__ import annotations
 import json
 import os
 import re
+import shutil
 import sqlite3
+import subprocess
 import sys
 import urllib.error
 import urllib.parse
@@ -14,6 +16,20 @@ import urllib.request
 import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
 from pathlib import Path
+
+# ponytail: keyword→existing file only; LLM file_to_touch is often invented
+FILE_ROUTE = [
+    (["rrf", "reciprocal rank", "hybrid search", "fusion", "bm25"], "gzmo-core/src/memory/recall_rrf.rs"),
+    (["decay", "half-life", "salience", "forgetting", "felt use"], "gzmo-core/src/memory/felt_use.rs"),
+    (["dedup", "honeypot", "promotion", "semantic fact"], "gzmo-core/src/memory/honeypot.rs"),
+    (["qdrant", "vector", "embedding", "cosine"], "gzmo-core/src/memory/qdrant_recall.rs"),
+    (["spark", "serendipity"], "gzmo-core/src/spark.rs"),
+    (["mcp"], "gzmo-core/src/mcp/serve.rs"),
+    (["vault", "sqlite"], "gzmo-core/src/memory/vault.rs"),
+    (["metabol"], "gzmo-core/src/metabolism.rs"),
+]
+JULES_REPO = "maximilianwruhs-cyber/GZMO"
+DISPATCH_COOLDOWN_DAYS = 7
 
 INTERNAL = {
     "ct101",
@@ -93,6 +109,84 @@ def sanitize_query(q: str) -> str:
     for tok in INTERNAL:
         q = q.replace(tok, "")
     return re.sub(r"\s+", " ", q).strip(" ,;-")
+
+
+def resolve_target_file(repo: Path, finding: dict) -> str | None:
+    hinted = (finding.get("file_to_touch") or "").strip().lstrip("./")
+    if hinted and hinted.lower() not in {"n/a", "na", "none", "-"} and (repo / hinted).is_file():
+        return hinted
+    blob = " ".join(str(finding.get(k) or "") for k in ("title", "summary", "why", "integration_point")).lower()
+    for kws, rel in FILE_ROUTE:
+        if any(k in blob for k in kws) and (repo / rel).is_file():
+            return rel
+    return None
+
+
+def already_dispatched(log: Path, rel: str, now: datetime, days: int = DISPATCH_COOLDOWN_DAYS) -> bool:
+    if not log.is_file():
+        return False
+    cutoff = now.timestamp() - days * 86400
+    for line in log.read_text(encoding="utf-8").splitlines():
+        try:
+            row = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if row.get("file") == rel and float(row.get("ts") or 0) >= cutoff:
+            return True
+    return False
+
+
+def synthesize_jules_prompt(finding: dict, rel: str) -> str:
+    title = (finding.get("title") or "research").replace("\n", " ").strip()
+    why = (finding.get("why") or finding.get("summary") or "")[:400]
+    return (
+        f"In {rel}, implement a small algorithmic enhancement inspired by: {title}.\n\n"
+        f"Why this draft was picked:\n{why}\n\n"
+        "Requirements:\n"
+        f"1. Pure Rust, match existing patterns in {rel} only.\n"
+        f"2. Offline unit tests in the file's tests module (empty inputs, bounds).\n"
+        f"3. STRICT BOUNDARY: ONLY modify {rel}. Do not touch research/, docs/, spikes/, or other crates.\n"
+        "4. cargo test -p gzmo-core and cargo clippy -p gzmo-core must pass with zero warnings.\n"
+    )
+
+
+def dispatch_jules(repo: Path, out: Path, findings: list[dict], living: Path | None = None) -> dict:
+    if living is not None and not output_dir_ok(out, living):
+        return {"ok": False, "advice": "refuse_output_path"}
+    log = out / "jules-dispatched.jsonl"
+    now = datetime.now(timezone.utc)
+    picked = None
+    rel = None
+    for f in findings:
+        if not f.get("benefit"):
+            continue
+        cand = resolve_target_file(repo, f)
+        if cand and not already_dispatched(log, cand, now):
+            picked, rel = f, cand
+            break
+    if not picked or not rel:
+        return {"ok": False, "advice": "no_new_file_mapped_draft"}
+    if shutil.which("jules") is None:
+        return {"ok": False, "advice": "jules_cli_missing"}
+    prompt = synthesize_jules_prompt(picked, rel)
+    (out / "jules-mission.md").write_text(prompt, encoding="utf-8")
+    res = subprocess.run(
+        ["jules", "remote", "new", "--repo", JULES_REPO, "--session", prompt],
+        capture_output=True,
+        text=True,
+        timeout=120,
+    )
+    row = {
+        "ts": now.timestamp(),
+        "file": rel,
+        "title": picked.get("title"),
+        "ok": res.returncode == 0,
+        "stdout": (res.stdout or "")[-500:],
+        "stderr": (res.stderr or "")[-300:],
+    }
+    with log.open("a", encoding="utf-8") as fh:
+        fh.write(json.dumps(row) + "\n")
+    return row
 
 
 def build_lens(repo: Path, living: Path) -> str:
@@ -413,7 +507,11 @@ def main(argv: list[str] | None = None) -> int:
             for f in (fetch.get("findings") or [])
         ]
     write_drafts(out, living, stamp, queries, items, fetch.get("errors") or {}, eval_err)
-    print(json.dumps({"ok": True, "out": str(out / "latest.md"), "findings": len(items), "vault_written": False}))
+    dispatched = None
+    if os.environ.get("JULES_DISPATCH") == "1":
+        dispatched = dispatch_jules(Path(args.repo), out, items, living)
+        print(f"[i] jules dispatch: {json.dumps(dispatched)}", file=sys.stderr)
+    print(json.dumps({"ok": True, "out": str(out / "latest.md"), "findings": len(items), "vault_written": False, "jules": dispatched}))
     return 0
 
 
