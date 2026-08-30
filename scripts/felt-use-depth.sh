@@ -17,8 +17,17 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 DATA="${GZMO_DATA_NEXT:-$ROOT/data-next}"
 OUT="$DATA/felt-use-depth"
 HOST="${CT101_SSH_HOST:-ct101}"
-VAULT_DB="${KEEP_QUALITY_VAULT_DB:-/opt/gzmo/data/vault.db}"
-GZMO_BIN="${CT101_GZMO_BIN:-/opt/gzmo/current/target/release/gzmo}"
+LIVING_VAULT="${GZMO_LIVING_HOME:-$HOME/.gzmo-living}/data/vault.db"
+if [[ -z "${KEEP_QUALITY_VAULT_DB:-}" && -f "$LIVING_VAULT" ]]; then
+  VAULT_DB="$LIVING_VAULT"
+else
+  VAULT_DB="${KEEP_QUALITY_VAULT_DB:-/opt/gzmo/data/vault.db}"
+fi
+if [[ -z "${CT101_GZMO_BIN:-}" && -x "$HOME/.local/bin/gzmo" ]]; then
+  GZMO_BIN="$HOME/.local/bin/gzmo"
+else
+  GZMO_BIN="${CT101_GZMO_BIN:-/opt/gzmo/current/target/release/gzmo}"
+fi
 MIN_GE3="${FELT_USE_MIN_GE3:-100}"
 MIN_SHARE="${FELT_USE_MIN_SHARE_GE3:-0.40}"
 mkdir -p "$OUT"
@@ -44,6 +53,14 @@ def ssh(cmd: str, timeout: int = 25) -> tuple[int, str, str]:
     )
     return p.returncode, p.stdout or "", p.stderr or ""
 
+
+def run_host(cmd: str, timeout: int = 25) -> tuple[int, str, str]:
+    # ponytail: local vault file ⇒ no SSH (this Keep is the living host)
+    if Path(vault).is_file():
+        p = subprocess.run(["bash", "-lc", cmd], capture_output=True, text=True, timeout=timeout)
+        return p.returncode, p.stdout or "", p.stderr or ""
+    return ssh(cmd, timeout)
+
 census = {"ok": False}
 sql = (
     f"sqlite3 '{vault}' \""
@@ -55,7 +72,7 @@ sql = (
     "(SELECT COALESCE(AVG(utility_score),0) FROM honeypot WHERE is_latest=1), "
     "(SELECT COALESCE(MAX(utility_score),0) FROM honeypot WHERE is_latest=1);\""
 )
-rc, stdout, stderr = ssh(sql)
+rc, stdout, stderr = run_host(sql)
 nums = [float(x) for x in re.findall(r"[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?", stdout.replace("|", " "))]
 # Prefer pipe-separated single line (counts are ints; avg/max may be real)
 if "|" in stdout:
@@ -96,10 +113,12 @@ else:
     }
 
 ripen = {"ok": False}
-rc2, ripen_out, ripen_err = ssh(
-    f"bash -lc 'cd /opt/gzmo && GZMO_CONFIG=/opt/gzmo/gzmo.toml {gzmo_bin} ripen status'",
-    timeout=40,
+ripen_cmd = (
+    f"{gzmo_bin} ripen status"
+    if Path(vault).is_file()
+    else f"bash -lc 'cd /opt/gzmo && GZMO_CONFIG=/opt/gzmo/gzmo.toml {gzmo_bin} ripen status'"
 )
+rc2, ripen_out, ripen_err = run_host(ripen_cmd, timeout=40)
 if rc2 == 0 and ripen_out.strip():
     dual = None
     dual_origin = None
