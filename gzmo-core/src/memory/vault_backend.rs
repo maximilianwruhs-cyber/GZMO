@@ -166,6 +166,9 @@ impl VaultBackend for SqliteVault {
         q_text: &str,
         limit: usize,
     ) -> Result<Vec<ScoredFact>> {
+        if q_emb.is_empty() && q_text.trim().is_empty() {
+            return Ok(Vec::new());
+        }
         if self.rerank_enabled() {
             SqliteVault::search_with_decay_reranked(self, q_emb, q_text, limit).await
         } else {
@@ -173,6 +176,9 @@ impl VaultBackend for SqliteVault {
         }
     }
     async fn keyword_search(&self, q_text: &str, limit: usize) -> Result<Vec<ScoredFact>> {
+        if q_text.trim().is_empty() {
+            return Ok(Vec::new());
+        }
         SqliteVault::keyword_search(self, q_text, limit)
     }
     async fn promote_truths(&self, truths: &[ExtractedTruth]) -> Result<()> {
@@ -192,5 +198,43 @@ impl VaultBackend for SqliteVault {
     }
     async fn stale_candidates(&self, limit: usize) -> Result<Vec<SemanticFact>> {
         SqliteVault::stale_candidates(self, limit)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::memory::vault::SqliteVault;
+    use std::env;
+
+    #[tokio::test]
+    async fn test_empty_query_returns_empty() {
+        let mut p = env::temp_dir();
+        p.push(format!(
+            "gzmo_test_empty_{}.db",
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+
+        let vault = SqliteVault::open(&p).expect("Failed to open temp vault");
+        let results = VaultBackend::search_with_decay(&vault, &[], "", 10)
+            .await
+            .expect("search should succeed");
+        assert!(
+            results.is_empty(),
+            "Empty query should return empty results"
+        );
+
+        let keyword_results = VaultBackend::keyword_search(&vault, "   ", 10)
+            .await
+            .expect("keyword search should succeed");
+        assert!(
+            keyword_results.is_empty(),
+            "Empty keyword query should return empty results"
+        );
+
+        let _ = std::fs::remove_file(p);
     }
 }
