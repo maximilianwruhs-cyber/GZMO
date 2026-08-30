@@ -1108,6 +1108,7 @@ impl SqliteVault {
         let ids: Vec<Uuid> = scored.iter().map(|(f, _)| f.id).collect();
         let utility = self.honeypot_utility_scores(&ids)?;
         apply_utility_boost(scored, &utility);
+        scored.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap_or(std::cmp::Ordering::Equal));
         Ok(())
     }
 
@@ -1117,10 +1118,19 @@ impl SqliteVault {
             return Ok(out);
         }
         let conn = self.pool.get()?;
-        let mut stmt = conn.prepare("SELECT utility_score FROM honeypot WHERE id = ?1")?;
-        for id in ids {
-            if let Ok(u) = stmt.query_row(params![id.to_string()], |row| row.get::<_, f64>(0)) {
-                out.insert(*id, u.max(0.0));
+        let id_strs: Vec<String> = ids.iter().map(|id| id.to_string()).collect();
+        let placeholders = vec!["?"; id_strs.len()].join(",");
+        let sql = format!(
+            "SELECT id, utility_score FROM honeypot WHERE is_latest = 1 AND id IN ({})",
+            placeholders
+        );
+        let mut stmt = conn.prepare(&sql)?;
+        let rows = stmt.query_map(rusqlite::params_from_iter(id_strs.iter()), |row| {
+            Ok((row.get::<_, String>(0)?, row.get::<_, f64>(1)?))
+        })?;
+        for row in rows.filter_map(|r| r.ok()) {
+            if let Ok(id) = Uuid::parse_str(&row.0) {
+                out.insert(id, row.1.max(0.0));
             }
         }
         Ok(out)
@@ -3375,6 +3385,45 @@ mod utility_recall_tests {
             .expect("filter");
         let _ = std::fs::remove_file(&path);
         assert_eq!(filtered, vec![new]);
+    }
+
+    #[test]
+    fn honeypot_utility_scores_handles_empty_zero_and_stale() {
+        let path = tempfile_db();
+        let vault = SqliteVault::open(&path).expect("open");
+
+        let empty_scores = vault.honeypot_utility_scores(&[]).unwrap();
+        assert!(
+            empty_scores.is_empty(),
+            "empty query should return empty map"
+        );
+
+        let id = insert_fact(&vault, "zero utility", "z.md", 0.0);
+        let scores = vault.honeypot_utility_scores(&[id]).unwrap();
+        assert_eq!(scores.get(&id).copied(), Some(0.0));
+
+        let conn = vault.db_conn().unwrap();
+        conn.execute(
+            "UPDATE honeypot SET utility_score = -5.0 WHERE id = ?1",
+            rusqlite::params![id.to_string()],
+        )
+        .unwrap();
+        let scores = vault.honeypot_utility_scores(&[id]).unwrap();
+        assert_eq!(
+            scores.get(&id).copied(),
+            Some(0.0),
+            "negative utility maxed to zero"
+        );
+
+        conn.execute(
+            "UPDATE honeypot SET is_latest = 0 WHERE id = ?1",
+            rusqlite::params![id.to_string()],
+        )
+        .unwrap();
+        let scores = vault.honeypot_utility_scores(&[id]).unwrap();
+        assert!(scores.is_empty(), "stale bounds should drop it");
+
+        let _ = std::fs::remove_file(&path);
     }
 
     #[test]
