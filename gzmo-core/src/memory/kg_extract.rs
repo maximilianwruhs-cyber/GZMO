@@ -12,7 +12,8 @@ use uuid::Uuid;
 use crate::gateway::{LlmGateway, ToolCall};
 use crate::memory::kg_promotion::{
     canonicalize_relation_type, is_valid_entity_name, is_valid_relation_endpoints,
-    normalize_entity_key, provenance_note, KG_BATCH_SIZE, MIN_EVIDENCE_CHARS,
+    normalize_entity_key, promotable_entities, promotable_relations, provenance_note,
+    KG_BATCH_SIZE, MIN_EVIDENCE_CHARS,
 };
 use crate::tools::{ToolRegistry, ToolResult};
 use crate::types::{Message, Role};
@@ -78,6 +79,44 @@ pub struct VerifiedRelation {
 pub struct VerifyStats {
     pub entities_dropped: usize,
     pub relations_dropped: usize,
+}
+
+/// Drop blank / invalid names and leftover-invalid edges before a KG write.
+fn filter_promotable(
+    entities: &[VerifiedEntity],
+    relations: &[VerifiedRelation],
+) -> (Vec<VerifiedEntity>, Vec<VerifiedRelation>) {
+    let allowed: HashSet<String> =
+        promotable_entities(entities.iter().map(|e| e.entity.name.as_str()))
+            .into_iter()
+            .collect();
+    let entities: Vec<VerifiedEntity> = entities
+        .iter()
+        .filter(|e| allowed.contains(e.entity.name.trim()))
+        .cloned()
+        .collect();
+    let keep: HashSet<(String, String, String)> = promotable_relations(relations.iter().map(|r| {
+        (
+            r.relation.from.as_str(),
+            r.relation.to.as_str(),
+            r.relation.relation_type.as_str(),
+        )
+    }))
+    .into_iter()
+    .collect();
+    let relations: Vec<VerifiedRelation> = relations
+        .iter()
+        .filter(|r| {
+            let t = canonicalize_relation_type(&r.relation.relation_type);
+            keep.contains(&(
+                r.relation.from.trim().to_string(),
+                r.relation.to.trim().to_string(),
+                t,
+            ))
+        })
+        .cloned()
+        .collect();
+    (entities, relations)
 }
 
 // ---------------------------------------------------------------------------
@@ -848,6 +887,7 @@ impl KgPromoter {
         date: NaiveDate,
         provenance_label: &str,
     ) -> Result<(usize, usize)> {
+        let (entities, relations) = filter_promotable(entities, relations);
         let mut entities_written = 0usize;
         let mut relations_written = 0usize;
 
@@ -1252,6 +1292,43 @@ mod tests {
             .unwrap();
         assert!(extraction.entities.is_empty());
         assert!(extraction.relations.is_empty());
+    }
+
+    #[test]
+    fn filter_promotable_drops_empty_and_stub_names() {
+        let junk = VerifiedEntity {
+            entity: KgEntity {
+                name: "x".into(),
+                entity_type: "Person".into(),
+                observations: vec!["nope".into()],
+            },
+            confidence: 1.0,
+            evidence: "x".into(),
+        };
+        let good = VerifiedEntity {
+            entity: KgEntity {
+                name: "Alice".into(),
+                entity_type: "Person".into(),
+                observations: vec!["runs backups".into()],
+            },
+            confidence: 1.0,
+            evidence: "Alice runs backups".into(),
+        };
+        let bad_rel = VerifiedRelation {
+            relation: KgRelation {
+                from: "x".into(),
+                to: "Alice".into(),
+                relation_type: "KNOWS".into(),
+            },
+            confidence: 1.0,
+            evidence: String::new(),
+        };
+        let (ents, rels) = filter_promotable(&[junk, good.clone()], &[bad_rel]);
+        assert_eq!(ents.len(), 1);
+        assert_eq!(ents[0].entity.name, "Alice");
+        assert!(rels.is_empty());
+        let (none, _) = filter_promotable(&[], &[]);
+        assert!(none.is_empty());
     }
 
     #[test]
