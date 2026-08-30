@@ -10,6 +10,9 @@ use uuid::Uuid;
 
 use crate::config::QdrantConfig;
 
+/// Upper bound clamped onto every caller-supplied `limit` search parameter.
+pub const MAX_SEARCH_LIMIT: usize = 100;
+
 #[derive(Clone)]
 pub struct QdrantRecall {
     http: Client,
@@ -87,9 +90,9 @@ impl QdrantRecall {
         limit: usize,
         with_payload: bool,
     ) -> Result<Vec<SearchHit>> {
-        if vector.is_empty() {
+        let Some(body) = Self::build_search_body(vector, limit, with_payload) else {
             return Ok(Vec::new());
-        }
+        };
         let url = format!(
             "{}/collections/{}/points/search",
             self.base_url, self.collection
@@ -97,11 +100,6 @@ impl QdrantRecall {
         // Do not add a Qdrant payload filter on `is_latest` here. Living points
         // predate the stamp; filtering now would empty the vector stream until a
         // full re-sync. SQLite `take_assertable_prefetch` is the current-time gate.
-        let body = serde_json::json!({
-            "vector": vector,
-            "limit": limit,
-            "with_payload": with_payload,
-        });
         let resp = self
             .http
             .post(&url)
@@ -120,6 +118,21 @@ impl QdrantRecall {
         );
         Ok(parsed.result)
     }
+
+    fn build_search_body(
+        vector: &[f32],
+        limit: usize,
+        with_payload: bool,
+    ) -> Option<serde_json::Value> {
+        if vector.is_empty() {
+            return None;
+        }
+        Some(serde_json::json!({
+            "vector": vector,
+            "limit": limit.clamp(1, MAX_SEARCH_LIMIT),
+            "with_payload": with_payload,
+        }))
+    }
 }
 
 fn parse_point_id(value: &serde_json::Value) -> Option<Uuid> {
@@ -130,5 +143,41 @@ fn parse_point_id(value: &serde_json::Value) -> Option<Uuid> {
             .and_then(|v| v.as_str())
             .and_then(|s| Uuid::parse_str(s).ok()),
         _ => None,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+
+    #[test]
+    fn test_build_search_body_clamps_limit() {
+        let vec = vec![0.1, 0.2];
+
+        let body_zero = QdrantRecall::build_search_body(&vec, 0, false).unwrap();
+        assert_eq!(body_zero["limit"], 1);
+
+        let body_normal = QdrantRecall::build_search_body(&vec, 10, false).unwrap();
+        assert_eq!(body_normal["limit"], 10);
+
+        let body_max = QdrantRecall::build_search_body(&vec, MAX_SEARCH_LIMIT + 50, false).unwrap();
+        assert_eq!(body_max["limit"], MAX_SEARCH_LIMIT);
+    }
+
+    #[test]
+    fn test_build_search_body_empty_vector() {
+        assert!(QdrantRecall::build_search_body(&[], 10, false).is_none());
+    }
+
+    #[test]
+    fn test_parse_point_id() {
+        let uuid_str = "123e4567-e89b-12d3-a456-426614174000";
+        let expected = Uuid::parse_str(uuid_str).unwrap();
+
+        assert_eq!(parse_point_id(&json!(uuid_str)), Some(expected));
+        assert_eq!(parse_point_id(&json!({"uuid": uuid_str})), Some(expected));
+        assert_eq!(parse_point_id(&json!({"id": uuid_str})), None);
+        assert_eq!(parse_point_id(&json!(42)), None);
     }
 }
