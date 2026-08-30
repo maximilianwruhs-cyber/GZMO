@@ -156,6 +156,15 @@ impl Embedder {
     }
 
     pub async fn embed(&self, text: &str) -> Result<Vec<f32>> {
+        let text = text.trim();
+        if text.is_empty() {
+            anyhow::bail!("Cannot embed empty string");
+        }
+        // Limit max embedding input bytes (e.g. 32768 bytes, which is typical for ~8k tokens max context)
+        if text.len() > 32768 {
+            anyhow::bail!("Input text exceeds maximum allowed bytes (32768)");
+        }
+
         if let Some(cache) = &self.cache {
             if let Some(vec) = cache.get(text).await {
                 debug!(dims = vec.len(), "Embedding cache hit");
@@ -163,7 +172,11 @@ impl Embedder {
             }
         }
 
-        let embedding = self.embed_remote(text).await?;
+        let mut embedding = self.embed_remote(text).await?;
+        normalize_embedding(&mut embedding);
+        if embedding.is_empty() || embedding.iter().all(|f| *f == 0.0) {
+            anyhow::bail!("Normalized vector is empty or zero");
+        }
         if let Some(cache) = &self.cache {
             cache.set(text, &embedding).await;
         }
@@ -217,6 +230,15 @@ fn decode_embedding(blob: &[u8]) -> Option<Vec<f32>> {
     )
 }
 
+fn normalize_embedding(embedding: &mut [f32]) {
+    let norm = embedding.iter().map(|&x| x * x).sum::<f32>().sqrt();
+    if norm > 0.0 {
+        for val in embedding.iter_mut() {
+            *val /= norm;
+        }
+    }
+}
+
 /// Open vault and attach embedder when `[embeddings].enabled`.
 pub async fn open_vault_with_embeddings(
     db_path: impl AsRef<std::path::Path>,
@@ -229,26 +251,14 @@ pub async fn open_vault_with_embeddings(
     let vault = if !embed_cfg.enabled {
         vault
     } else {
-        match Embedder::from_config(embed_cfg, redis_cfg) {
-            Ok(e) => match e.embed("gzmo vault probe").await {
-                Ok(v) if !v.is_empty() => {
-                    info!(dims = v.len(), url = %embed_cfg.url, "Embedding server ready");
-                    vault.with_embedder(Some(e))
-                }
-                Ok(_) => {
-                    warn!("Embedding server returned empty vector — vault runs without vectors");
-                    vault
-                }
-                Err(err) => {
-                    warn!("Embedding server unreachable ({err}) — vault runs without vectors");
-                    vault
-                }
-            },
-            Err(e) => {
-                warn!("Embeddings disabled — embedder init failed: {e}");
-                vault
-            }
-        }
+        let e = Embedder::from_config(embed_cfg, redis_cfg).context("Embedder init failed")?;
+        let v = e
+            .embed("gzmo vault probe")
+            .await
+            .context("Embedding server unreachable")?;
+        anyhow::ensure!(!v.is_empty(), "Embedding server returned empty vector");
+        info!(dims = v.len(), url = %embed_cfg.url, "Embedding server ready");
+        vault.with_embedder(Some(e))
     };
     let vault = attach_reranker(vault, rerank_cfg).await;
     let vault = if qdrant_cfg.enabled {
@@ -315,5 +325,33 @@ mod tests {
         assert!(k1.starts_with(EMBED_CACHE_PREFIX));
         assert_eq!(k1, k2);
         assert_ne!(k1, k3);
+    }
+
+    #[test]
+    fn normalize_embedding_scales_to_unit_length() {
+        let mut v = vec![3.0, 4.0];
+        normalize_embedding(&mut v);
+        assert_eq!(v, vec![0.6, 0.8]);
+
+        let mut zero_v = vec![0.0, 0.0];
+        normalize_embedding(&mut zero_v);
+        assert_eq!(zero_v, vec![0.0, 0.0]); // should not panic or become NaN
+    }
+
+    #[tokio::test]
+    async fn embed_rejects_empty_and_oversized_inputs() {
+        let embedder = Embedder {
+            http: Client::new(),
+            url: "http://localhost".to_string(),
+            model: "dummy".to_string(),
+            api_key: "".to_string(),
+            cache: None,
+        };
+
+        assert!(embedder.embed("").await.is_err());
+        assert!(embedder.embed("   \n ").await.is_err());
+
+        let oversized = "a".repeat(32769);
+        assert!(embedder.embed(&oversized).await.is_err());
     }
 }
