@@ -86,6 +86,37 @@ pub fn provenance_note(date: NaiveDate, confidence: f64, evidence: &str) -> Stri
     }
 }
 
+/// Names that may be written as KG entities. Empty / all-invalid input is a no-op.
+pub fn promotable_entities<'a>(names: impl IntoIterator<Item = &'a str>) -> Vec<String> {
+    names
+        .into_iter()
+        .filter(|n| is_valid_entity_name(n))
+        .map(|n| n.trim().to_string())
+        .collect()
+}
+
+/// `(from, to, type)` triples that may be written as KG relations.
+/// Empty input and leftover-invalid sets are a no-op (no invented edges).
+pub fn promotable_relations<'a>(
+    triples: impl IntoIterator<Item = (&'a str, &'a str, &'a str)>,
+) -> Vec<(String, String, String)> {
+    triples
+        .into_iter()
+        .filter_map(|(from, to, rel)| {
+            let relation_type = canonicalize_relation_type(rel);
+            if !is_valid_relation_endpoints(from, to, &relation_type) {
+                None
+            } else {
+                Some((
+                    from.trim().to_string(),
+                    to.trim().to_string(),
+                    relation_type,
+                ))
+            }
+        })
+        .collect()
+}
+
 /// Try to extract an entity name from vault content shaped like `[Type:Name] ...`.
 pub fn entity_label_from_fact(content: &str) -> String {
     if let Some(rest) = content.strip_prefix('[') {
@@ -116,5 +147,44 @@ mod tests {
         assert_eq!(canonicalize_relation_type("WROTE"), "AUTHORED_BY");
         assert_eq!(canonicalize_relation_type("author"), "AUTHORED_BY");
         assert_eq!(canonicalize_relation_type("HYPOTHESIZED_LINK"), "");
+    }
+
+    #[test]
+    fn empty_input_is_noop() {
+        assert!(
+            promotable_entities(std::iter::empty::<&str>()).is_empty(),
+            "empty entity input must not invent names"
+        );
+        assert!(
+            promotable_relations(std::iter::empty::<(&str, &str, &str)>()).is_empty(),
+            "empty relation input must not invent edges"
+        );
+    }
+
+    #[test]
+    fn no_valid_candidates_is_noop() {
+        assert!(
+            promotable_entities(["", " ", "x", "42"]).is_empty(),
+            "noise-only names are not candidates"
+        );
+        assert!(
+            promotable_relations([
+                ("Alice", "Bob", "HYPOTHESIZED_LINK"),
+                ("", "Bob", "KNOWS"),
+                ("Alice", "Alice", "KNOWS"),
+            ])
+            .is_empty(),
+            "no valid leftover must be a no-op — do not write"
+        );
+    }
+
+    #[test]
+    fn valid_candidates_survive() {
+        assert_eq!(promotable_entities(["  Alice  ", "x"]), vec!["Alice"]);
+        let rels = promotable_relations([("Alice", "Book", "WROTE")]);
+        assert_eq!(
+            rels,
+            vec![("Alice".into(), "Book".into(), "AUTHORED_BY".into())]
+        );
     }
 }
