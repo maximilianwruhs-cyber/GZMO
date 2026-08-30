@@ -209,6 +209,9 @@ pub fn find_latest_honeypot_by_entity(
     entity: &str,
     container_tag: &str,
 ) -> anyhow::Result<Option<(String, String)>> {
+    if entity.trim().is_empty() {
+        return Ok(None);
+    }
     let pattern = format!("%{}%", entity.replace('%', ""));
     let tag_pattern = format!("%:{}]%", entity.replace('%', ""));
     let row = conn.query_row(
@@ -229,8 +232,11 @@ pub fn find_latest_honeypot_by_entity(
 
 /// Mark prior honeypot rows non-latest (contradiction / update).
 pub fn supersede_honeypot(conn: &Connection, old_id: &str) -> anyhow::Result<()> {
+    if old_id.trim().is_empty() {
+        return Ok(());
+    }
     let now = Utc::now().to_rfc3339();
-    conn.execute(
+    let updated = conn.execute(
         "UPDATE honeypot
          SET is_latest = 0,
              valid_to = COALESCE(valid_to, ?1),
@@ -238,7 +244,9 @@ pub fn supersede_honeypot(conn: &Connection, old_id: &str) -> anyhow::Result<()>
          WHERE (id = ?2 OR vault_id = ?2) AND is_latest = 1",
         params![now, old_id],
     )?;
-    tracing::info!(old_id, superseded_at = %now, "Honeypot fact superseded (lifecycle update)");
+    if updated > 0 {
+        tracing::info!(old_id, superseded_at = %now, "Honeypot fact superseded (lifecycle update)");
+    }
     Ok(())
 }
 
@@ -417,5 +425,74 @@ mod tests {
             &derived_truth(0.50, false),
             "ingest"
         ));
+    }
+
+    #[test]
+    fn supersede_honeypot_handles_empty_and_already_superseded() {
+        let conn = Connection::open_in_memory().unwrap();
+        conn.execute_batch(
+            "CREATE TABLE honeypot (
+                id TEXT PRIMARY KEY,
+                vault_id TEXT,
+                content TEXT,
+                is_latest INTEGER,
+                valid_to TEXT,
+                gate_event TEXT,
+                promoted_at TEXT,
+                container_tag TEXT
+            );
+            INSERT INTO honeypot (id, vault_id, is_latest, content, promoted_at, container_tag) 
+            VALUES ('1', 'v1', 1, '[AGENT:Foo] does X', '2020-01-01T00:00:00Z', 'tag');
+            INSERT INTO honeypot (id, vault_id, is_latest, content, promoted_at, container_tag) 
+            VALUES ('2', 'v2', 0, '[AGENT:Bar] does Y', '2020-01-01T00:00:00Z', 'tag');",
+        )
+        .unwrap();
+
+        // Empty ID shouldn't do anything
+        assert!(supersede_honeypot(&conn, "   ").is_ok());
+
+        // Supersede an active fact
+        assert!(supersede_honeypot(&conn, "1").is_ok());
+        let is_latest: i32 = conn
+            .query_row("SELECT is_latest FROM honeypot WHERE id = '1'", [], |r| {
+                r.get(0)
+            })
+            .unwrap();
+        assert_eq!(is_latest, 0);
+        let valid_to: String = conn
+            .query_row("SELECT valid_to FROM honeypot WHERE id = '1'", [], |r| {
+                r.get(0)
+            })
+            .unwrap();
+        assert!(!valid_to.is_empty());
+
+        // Supersede an already superseded fact (should not error, and not log since rows updated = 0)
+        assert!(supersede_honeypot(&conn, "2").is_ok());
+    }
+
+    #[test]
+    fn find_latest_honeypot_by_entity_handles_empty() {
+        let conn = Connection::open_in_memory().unwrap();
+        conn.execute_batch(
+            "CREATE TABLE honeypot (
+                id TEXT PRIMARY KEY,
+                vault_id TEXT,
+                content TEXT,
+                is_latest INTEGER,
+                valid_to TEXT,
+                gate_event TEXT,
+                promoted_at TEXT,
+                container_tag TEXT
+            );
+            INSERT INTO honeypot (id, vault_id, is_latest, content, promoted_at, container_tag) 
+            VALUES ('1', 'v1', 1, '[AGENT:Foo] does X', '2020-01-01T00:00:00Z', 'tag');",
+        )
+        .unwrap();
+
+        let result = find_latest_honeypot_by_entity(&conn, "   ", "tag").unwrap();
+        assert!(result.is_none());
+
+        let result = find_latest_honeypot_by_entity(&conn, "AGENT:Foo", "tag").unwrap();
+        assert!(result.is_some());
     }
 }
