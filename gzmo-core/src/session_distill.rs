@@ -472,3 +472,45 @@ pub async fn run_distill_worker(
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::types::{Message, Role};
+    use chrono::TimeZone;
+
+    #[test]
+    fn test_build_transcript_empty() {
+        let session = Session {
+            id: "test-empty".to_string(),
+            name: Some("Test".to_string()),
+            created_at: Utc.with_ymd_and_hms(2023, 1, 1, 12, 0, 0).unwrap(),
+            last_active_at: Utc.with_ymd_and_hms(2023, 1, 1, 12, 0, 0).unwrap(),
+            messages: vec![],
+        };
+        let t = build_transcript(&session, 1000);
+        assert!(t.contains("Chat session test-empty — created 2023-01-01 12:00 UTC"));
+        assert!(!t.contains("USER:"));
+    }
+
+    #[test]
+    fn test_build_transcript_bounds() {
+        let session = Session {
+            id: "test-bounds".to_string(),
+            name: Some("Test".to_string()),
+            created_at: Utc.with_ymd_and_hms(2023, 1, 1, 12, 0, 0).unwrap(),
+            last_active_at: Utc.with_ymd_and_hms(2023, 1, 1, 12, 0, 0).unwrap(),
+            messages: vec![Message {
+                role: Role::User,
+                content: "Hello world this is a very long message that should be truncated"
+                    .to_string(),
+                is_meta: false,
+                tool_calls: None,
+                tool_call_id: None,
+            }],
+        };
+        let t = build_transcript(&session, 80);
+        assert!(t.contains("[TRUNCATED]"));
+        assert!(t.len() <= 150);
+    }
+}
