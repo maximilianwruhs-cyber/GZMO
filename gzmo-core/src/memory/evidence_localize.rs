@@ -4,7 +4,7 @@ use crate::types::EvidenceSpan;
 /// Expands the matched span to include a sentence window of ±1 sentence.
 pub fn localize_evidence(body: &str, verifier_quote: &str) -> EvidenceSpan {
     let verifier_quote = verifier_quote.trim();
-    if verifier_quote.is_empty() {
+    if verifier_quote.is_empty() || body.trim().is_empty() {
         return EvidenceSpan {
             evidence_text: String::new(),
             quote_verifier: String::new(),
@@ -282,6 +282,24 @@ mod tests {
         assert_eq!(
             span.evidence_text,
             "Der  Scout  fokussiert  auf  die  Struktur."
+        );
+    }
+
+    #[test]
+    fn empty_body_or_quote_is_no_span() {
+        let empty_quote = localize_evidence("A real sentence.", "   \n");
+        assert!(empty_quote.char_start.is_none());
+        assert!(empty_quote.evidence_text.is_empty());
+
+        let empty_body = localize_evidence("  \n", "Scout fokussiert");
+        assert!(empty_body.char_start.is_none());
+        assert!(
+            empty_body.evidence_text.is_empty(),
+            "empty body must not copy the quote as invented evidence"
+        );
+
+        assert!(
+            localize_observation_evidence("", "runs backups nightly on ZFS", "Alice", 1).is_none()
         );
     }
 
