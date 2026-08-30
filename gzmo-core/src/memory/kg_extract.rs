@@ -578,6 +578,14 @@ impl KgPromoter {
         system_prompt: &str,
         user_label: &str,
     ) -> Result<KgExtraction> {
+        if source.trim().is_empty() {
+            return Ok(KgExtraction {
+                internal_analysis: String::new(),
+                entities: Vec::new(),
+                relations: Vec::new(),
+            });
+        }
+
         let messages = vec![
             Message {
                 role: Role::System,
@@ -1186,6 +1194,64 @@ mod tests {
         ];
         let out = dedupe_relations(rels, &alias);
         assert_eq!(out.len(), 1);
+    }
+
+    #[tokio::test]
+    async fn test_extract_empty_string_yields_no_entities() {
+        use crate::gateway::{LlmGateway, LlmResponse, ToolDeclaration};
+        use crate::tools::ToolRegistry;
+        use crate::types::Message;
+        use async_trait::async_trait;
+        use std::sync::Arc;
+
+        struct MockGateway;
+
+        #[async_trait]
+        impl LlmGateway for MockGateway {
+            async fn complete(
+                &self,
+                _: &[Message],
+                _: &[ToolDeclaration],
+            ) -> anyhow::Result<LlmResponse> {
+                anyhow::bail!("mock error")
+            }
+            async fn complete_streaming(
+                &self,
+                _: &[Message],
+                _: &[ToolDeclaration],
+                _: Box<dyn Fn(String) + Send>,
+            ) -> anyhow::Result<LlmResponse> {
+                anyhow::bail!("mock error")
+            }
+            async fn complete_structured(
+                &self,
+                _: &[Message],
+                _: &str,
+                _: serde_json::Value,
+            ) -> anyhow::Result<String> {
+                anyhow::bail!("mock should not be called")
+            }
+        }
+
+        let promoter = KgPromoter::new(
+            Arc::new(MockGateway),
+            Arc::new(ToolRegistry::new()),
+            KgGateConfig::default(),
+        );
+
+        let extraction = promoter
+            .extract("", "test_schema", "test_prompt", "test_label")
+            .await
+            .unwrap();
+        assert!(extraction.entities.is_empty());
+        assert!(extraction.relations.is_empty());
+
+        let extraction = promoter
+            .extract("   \n \t  ", "test_schema", "test_prompt", "test_label")
+            .await
+            .unwrap();
+        assert!(extraction.entities.is_empty());
+        assert!(extraction.relations.is_empty());
     }
 
     #[test]
