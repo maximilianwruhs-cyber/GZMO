@@ -11,6 +11,11 @@ use gzmo_core::metabolism;
 pub async fn run(config: &GzmoConfig, limit: Option<usize>) -> Result<()> {
     info!("GZMO — promote mature vault → honeypot");
     let started = Utc::now();
+    if !metabolism::metabolism_needs_work(config) {
+        info!("promote skip — vault empty or missing");
+        metabolism::write_job_run(config, "promote", "rust", started, true, None);
+        return Ok(());
+    }
     let vault = SqliteVault::open(&config.memory.vault_db)?;
     match vault.promote_mature_to_honeypot(limit) {
         Ok(report) => {
