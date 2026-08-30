@@ -8,6 +8,33 @@ use tracing::{info, warn};
 
 use crate::config::QdrantConfig;
 
+/// `None` = sync disabled (no-op). `Some(db)` = resolved vault path ready to spawn.
+fn sync_preflight(
+    project_root: &Path,
+    cfg: &QdrantConfig,
+    vault_db: &Path,
+) -> Result<Option<PathBuf>> {
+    if !cfg.enabled || !cfg.sync_enabled {
+        return Ok(None);
+    }
+    if cfg.url.trim().is_empty() {
+        anyhow::bail!("qdrant url is empty");
+    }
+    let script = project_root.join("scripts/sync-vault-to-qdrant.py");
+    if !script.is_file() {
+        anyhow::bail!("Missing sync script: {}", script.display());
+    }
+    let vault_db = if vault_db.is_absolute() {
+        vault_db.to_path_buf()
+    } else {
+        project_root.join(vault_db)
+    };
+    if !vault_db.is_file() {
+        anyhow::bail!("vault db missing: {}", vault_db.display());
+    }
+    Ok(Some(vault_db))
+}
+
 /// Run `scripts/sync-vault-to-qdrant.py` from `project_root`.
 pub async fn sync_vault_to_qdrant(
     project_root: &Path,
@@ -25,20 +52,10 @@ pub async fn sync_vault_to_qdrant_filtered(
     since: Option<&str>,
     ids: Option<&[String]>,
 ) -> Result<()> {
-    if !cfg.enabled || !cfg.sync_enabled {
+    let Some(vault_db) = sync_preflight(project_root, cfg, vault_db)? else {
         return Ok(());
-    }
-
-    let script = project_root.join("scripts/sync-vault-to-qdrant.py");
-    if !script.is_file() {
-        anyhow::bail!("Missing sync script: {}", script.display());
-    }
-
-    let vault_db = if vault_db.is_absolute() {
-        vault_db.to_path_buf()
-    } else {
-        project_root.join(vault_db)
     };
+    let script = project_root.join("scripts/sync-vault-to-qdrant.py");
 
     info!(
         url = %cfg.url,
@@ -135,4 +152,60 @@ pub fn discover_project_root() -> PathBuf {
         }
     }
     std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::config::QdrantConfig;
+    use std::fs;
+
+    fn cfg(enabled: bool, sync: bool, url: &str) -> QdrantConfig {
+        QdrantConfig {
+            enabled,
+            url: url.into(),
+            collection: "vault".into(),
+            sync_enabled: sync,
+            sync_cron_hour: 0,
+            sync_cron_minute: 0,
+        }
+    }
+
+    #[test]
+    fn preflight_disabled_is_noop() {
+        let root = std::env::temp_dir();
+        assert!(
+            sync_preflight(&root, &cfg(false, true, "http://q"), Path::new("x"))
+                .unwrap()
+                .is_none()
+        );
+        assert!(
+            sync_preflight(&root, &cfg(true, false, "http://q"), Path::new("x"))
+                .unwrap()
+                .is_none()
+        );
+    }
+
+    #[test]
+    fn preflight_empty_url_or_missing_db_fails_closed() {
+        let root = std::env::temp_dir().join(format!(
+            "gzmo-qdrant-sync-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        fs::create_dir_all(root.join("scripts")).unwrap();
+        fs::write(root.join("scripts/sync-vault-to-qdrant.py"), b"#").unwrap();
+        let db = root.join("vault.db");
+
+        assert!(sync_preflight(&root, &cfg(true, true, "   "), &db).is_err());
+        assert!(sync_preflight(&root, &cfg(true, true, "http://q"), &db).is_err());
+
+        fs::write(&db, b"").unwrap();
+        let got = sync_preflight(&root, &cfg(true, true, "http://q"), &db).unwrap();
+        assert_eq!(got.as_deref(), Some(db.as_path()));
+        let _ = fs::remove_dir_all(&root);
+    }
 }
