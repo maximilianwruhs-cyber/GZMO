@@ -1,7 +1,9 @@
 //! Daemon mode — heartbeat + dreams + orchestrator.
 
 use std::sync::Arc;
-use std::time::Duration;
+use std::time::{Duration, SystemTime};
+
+use crate::idle_evolve::{idle_evolve_due, IDLE_EVOLVE_COOLDOWN};
 
 use anyhow::Result;
 use chrono::{Datelike, NaiveDate, Timelike, Utc};
@@ -421,6 +423,14 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
 
     // Heartbeat task — writes CheapCheck rows into HEARTBEAT.md
     let hb_dir = state_dir.join("HEARTBEAT.md");
+    let idle_stamp = match std::env::var("GZMO_LIVING_HOME") {
+        Ok(h) if !h.is_empty() => {
+            std::path::PathBuf::from(h).join("data/research-intel/last-idle-evolve")
+        }
+        _ => state_dir.join("research-intel/last-idle-evolve"),
+    };
+    let evolve_script =
+        qdrant_sync::discover_project_root().join("scripts/living-research-intel.sh");
     let heartbeat_handle = tokio::spawn(async move {
         let mut interval = tokio::time::interval(heartbeat.interval);
         loop {
@@ -440,7 +450,39 @@ pub async fn run(config: &GzmoConfig, identity: IdentityEngine) -> Result<()> {
                 for a in &anomalies {
                     info!(anomaly = %a);
                 }
+                continue;
             }
+            // Silent (all CheapChecks OK): at most one living-research evolve / 6h.
+            let stamp_mtime = std::fs::metadata(&idle_stamp)
+                .and_then(|m| m.modified())
+                .ok();
+            if !idle_evolve_due(stamp_mtime, SystemTime::now(), IDLE_EVOLVE_COOLDOWN) {
+                continue;
+            }
+            if !evolve_script.is_file() {
+                continue;
+            }
+            if let Some(parent) = idle_stamp.parent() {
+                let _ = std::fs::create_dir_all(parent);
+            }
+            let _ = std::fs::write(&idle_stamp, []);
+            let script = evolve_script.clone();
+            info!(script = %script.display(), "idle evolve starting");
+            tokio::spawn(async move {
+                match tokio::process::Command::new("nice")
+                    .args(["-n", "19", "bash"])
+                    .arg(&script)
+                    .status()
+                    .await
+                {
+                    Ok(s) if s.code() == Some(2) => {
+                        info!("idle evolve: no LLM (exit 2), continuing");
+                    }
+                    Ok(s) if s.success() => info!("idle evolve complete"),
+                    Ok(s) => error!(code = ?s.code(), "idle evolve failed"),
+                    Err(e) => error!(error = %e, "idle evolve spawn failed"),
+                }
+            });
         }
     });
 
