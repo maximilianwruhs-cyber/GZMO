@@ -270,7 +270,10 @@ mod tests {
     fn fts_drops_token_in_hyphenated_abstention() {
         let q = fts_match_query("zzzz-nonexistent-token-9f3a2");
         assert!(!q.to_lowercase().contains("token"), "{q}");
-        assert!(q.is_empty() || q.contains("zzzz") || q.contains("nonexistent"), "{q}");
+        assert!(
+            q.is_empty() || q.contains("zzzz") || q.contains("nonexistent"),
+            "{q}"
+        );
     }
 
     #[test]
