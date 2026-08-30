@@ -49,17 +49,42 @@ pub fn merge_interleaved_rank(a: &[Uuid], b: &[Uuid], cap: usize) -> Vec<Uuid> {
     out
 }
 
-/// Reciprocal rank fusion over ranked id lists (1-indexed ranks).
-pub fn rrf_fuse(rank_lists: &[Vec<Uuid>]) -> HashMap<Uuid, f64> {
+/// Reciprocal rank fusion over ranked id lists (1-indexed ranks) with stream weights.
+pub fn rrf_fuse_weighted(weighted_lists: &[(Vec<Uuid>, f64)]) -> HashMap<Uuid, f64> {
     let mut scores: HashMap<Uuid, f64> = HashMap::new();
-    for list in rank_lists {
+    for (list, weight) in weighted_lists {
         for (idx, id) in list.iter().enumerate() {
             let rank = (idx + 1) as f64;
-            let contrib = 1.0 / (RRF_K + rank);
+            let contrib = weight / (RRF_K + rank);
             *scores.entry(*id).or_insert(0.0) += contrib;
         }
     }
     scores
+}
+
+/// Reciprocal rank fusion over ranked id lists (1-indexed ranks).
+pub fn rrf_fuse(rank_lists: &[Vec<Uuid>]) -> HashMap<Uuid, f64> {
+    rrf_fuse_weighted(
+        &rank_lists
+            .iter()
+            .map(|l| (l.clone(), 1.0))
+            .collect::<Vec<_>>(),
+    )
+}
+
+/// Normalize positive RRF scores into the [0.0, 1.0] range by dividing by the maximum score.
+pub fn normalize_rrf_scores(scores: &HashMap<Uuid, f64>) -> HashMap<Uuid, f64> {
+    if scores.is_empty() {
+        return HashMap::new();
+    }
+    let max_score = scores.values().copied().fold(0.0f64, f64::max);
+    if max_score <= 0.0 {
+        return HashMap::new();
+    }
+    scores
+        .iter()
+        .map(|(&id, &score)| (id, score / max_score))
+        .collect()
 }
 
 /// Max `limit` items with at most `max_per_file` per `source_file` key.
@@ -318,5 +343,56 @@ mod tests {
         assert_eq!(one.len(), 1);
         assert_eq!(one[0].0.id, id);
         assert!((one[0].1 - 0.5).abs() < 1e-12);
+    }
+
+    #[test]
+    fn test_rrf_fuse_weighted_unequal_weights() {
+        let id1 = Uuid::new_v4();
+        let id2 = Uuid::new_v4();
+        let scores = rrf_fuse_weighted(&[(vec![id1], 2.0), (vec![id2], 0.5)]);
+        assert_eq!(scores[&id1], 2.0 / 61.0);
+        assert_eq!(scores[&id2], 0.5 / 61.0);
+        assert!(scores[&id1] > scores[&id2]);
+    }
+
+    #[test]
+    fn test_normalize_rrf_scores_empty() {
+        let scores: HashMap<Uuid, f64> = HashMap::new();
+        assert!(normalize_rrf_scores(&scores).is_empty());
+    }
+
+    #[test]
+    fn test_normalize_rrf_scores_single() {
+        let id = Uuid::new_v4();
+        let scores = HashMap::from([(id, 0.5)]);
+        let normalized = normalize_rrf_scores(&scores);
+        assert_eq!(normalized.len(), 1);
+        assert_eq!(normalized[&id], 1.0);
+    }
+
+    #[test]
+    fn test_normalize_rrf_scores_multi() {
+        let id1 = Uuid::new_v4();
+        let id2 = Uuid::new_v4();
+        let id3 = Uuid::new_v4();
+        let scores = HashMap::from([(id1, 2.0), (id2, 1.0), (id3, 0.5)]);
+        let normalized = normalize_rrf_scores(&scores);
+        assert_eq!(normalized[&id1], 1.0);
+        assert_eq!(normalized[&id2], 0.5);
+        assert_eq!(normalized[&id3], 0.25);
+    }
+
+    #[test]
+    fn test_rrf_fuse_backward_compatibility() {
+        let a = Uuid::new_v4();
+        let b = Uuid::new_v4();
+        let list1 = vec![a, b];
+        let list2 = vec![b, a];
+        let scores1 = rrf_fuse(&[list1.clone(), list2.clone()]);
+        let scores2 = rrf_fuse_weighted(&[(list1, 1.0), (list2, 1.0)]);
+        assert_eq!(scores1.len(), scores2.len());
+        for (id, score) in scores1 {
+            assert_eq!(score, scores2[&id]);
+        }
     }
 }
