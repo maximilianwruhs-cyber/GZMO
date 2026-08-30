@@ -534,6 +534,17 @@ fn vault_metabolism_counts(path: &Path) -> (Option<usize>, Option<usize>) {
     (honeypot, missing)
 }
 
+/// Algorithmic enhancement (hybrid search BM25 fusion / reasonkit-mem inspired):
+/// Overnight metabolism should skip work when there is nothing to ripen or promote; fail closed, no stub joules.
+pub fn metabolism_needs_work(config: &GzmoConfig) -> bool {
+    let (honeypot, missing) = vault_metabolism_counts(&config.memory.vault_db);
+
+    let has_honeypot = honeypot.unwrap_or(0) > 0;
+    let has_missing = missing.unwrap_or(0) > 0;
+
+    has_honeypot || has_missing
+}
+
 /// Soft Awattar shift advice for distill/dream (sibling note; cron not overwritten).
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PriceShiftAdvice {
@@ -779,5 +790,78 @@ mod tests {
         assert_eq!(done["jobs"]["spark"]["ok"], true);
 
         let _ = fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn needs_work_missing_db_fails_closed() {
+        let mut config = GzmoConfig::default();
+        let root = std::env::temp_dir().join(format!(
+            "gzmo-metab-needs-work-{}-{}",
+            std::process::id(),
+            Utc::now().timestamp_nanos_opt().unwrap_or(0)
+        ));
+        config.memory.vault_db = root.join("vault.db");
+        assert!(
+            !metabolism_needs_work(&config),
+            "Missing DB should fail closed (no work needed)"
+        );
+    }
+
+    #[test]
+    fn needs_work_detects_rows() {
+        let root = std::env::temp_dir().join(format!(
+            "gzmo-metab-needs-work-rows-{}-{}",
+            std::process::id(),
+            Utc::now().timestamp_nanos_opt().unwrap_or(0)
+        ));
+        let _ = fs::remove_dir_all(&root);
+        fs::create_dir_all(&root).unwrap();
+
+        let vault = root.join("vault.db");
+        let conn = rusqlite::Connection::open(&vault).unwrap();
+
+        conn.execute(
+            "CREATE TABLE honeypot (id INTEGER PRIMARY KEY, is_latest INTEGER)",
+            [],
+        )
+        .unwrap();
+
+        conn.execute(
+            "CREATE TABLE semantic_vault (id INTEGER PRIMARY KEY, embedding BLOB)",
+            [],
+        )
+        .unwrap();
+
+        let mut config = GzmoConfig::default();
+        config.memory.vault_db = vault;
+
+        // Empty -> false
+        assert!(!metabolism_needs_work(&config));
+
+        // Honeypot -> true
+        conn.execute("INSERT INTO honeypot (is_latest) VALUES (1)", [])
+            .unwrap();
+        assert!(metabolism_needs_work(&config));
+
+        // Clear honeypot, Missing embedding -> true
+        conn.execute("DELETE FROM honeypot", []).unwrap();
+        conn.execute("INSERT INTO semantic_vault (embedding) VALUES (NULL)", [])
+            .unwrap();
+        assert!(metabolism_needs_work(&config));
+
+        // Empty embedding length -> true
+        conn.execute("DELETE FROM semantic_vault", []).unwrap();
+        conn.execute("INSERT INTO semantic_vault (embedding) VALUES (X'')", [])
+            .unwrap();
+        assert!(metabolism_needs_work(&config));
+
+        // Has embedding -> false
+        conn.execute("DELETE FROM semantic_vault", []).unwrap();
+        conn.execute(
+            "INSERT INTO semantic_vault (embedding) VALUES (X'010203')",
+            [],
+        )
+        .unwrap();
+        assert!(!metabolism_needs_work(&config));
     }
 }
