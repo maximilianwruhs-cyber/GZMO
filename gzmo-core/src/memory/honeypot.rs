@@ -111,15 +111,15 @@ pub fn upsert_honeypot_row(
             ?1, ?2, ?3, ?4, ?5, ?6, 'fact', 1, ?7, ?8, ?9, 'obolus', ?10, 1, 0
         )
         ON CONFLICT(id) DO UPDATE SET
-            content = excluded.content,
-            content_norm = excluded.content_norm,
-            embedding = excluded.embedding,
-            origin = excluded.origin,
+            content = CASE WHEN COALESCE(honeypot.utility_score, 0.0) <= 1.0 THEN excluded.content ELSE honeypot.content END,
+            content_norm = CASE WHEN COALESCE(honeypot.utility_score, 0.0) <= 1.0 THEN excluded.content_norm ELSE honeypot.content_norm END,
+            embedding = CASE WHEN COALESCE(honeypot.utility_score, 0.0) <= 1.0 THEN excluded.embedding ELSE honeypot.embedding END,
+            origin = CASE WHEN COALESCE(honeypot.utility_score, 0.0) <= 1.0 THEN excluded.origin ELSE honeypot.origin END,
             confidence = MAX(confidence, excluded.confidence),
-            decay_class = excluded.decay_class,
-            source_file = excluded.source_file,
-            promoted_at = excluded.promoted_at,
-            is_latest = 1",
+            decay_class = CASE WHEN COALESCE(honeypot.utility_score, 0.0) <= 1.0 THEN excluded.decay_class ELSE honeypot.decay_class END,
+            source_file = CASE WHEN COALESCE(honeypot.utility_score, 0.0) <= 1.0 THEN excluded.source_file ELSE honeypot.source_file END,
+            promoted_at = CASE WHEN COALESCE(honeypot.utility_score, 0.0) <= 1.0 THEN excluded.promoted_at ELSE honeypot.promoted_at END,
+            is_latest = CASE WHEN COALESCE(honeypot.utility_score, 0.0) <= 1.0 THEN 1 ELSE honeypot.is_latest END",
         params![
             vault_id,
             vault_id,
@@ -133,7 +133,13 @@ pub fn upsert_honeypot_row(
             now,
         ],
     )?;
-    sync_honeypot_fts_row(conn, vault_id, &truth.content, content_norm)?;
+
+    let (saved_content, saved_content_norm): (String, String) = conn.query_row(
+        "SELECT content, content_norm FROM honeypot WHERE id = ?1",
+        rusqlite::params![vault_id],
+        |r| Ok((r.get(0)?, r.get(1)?)),
+    )?;
+    sync_honeypot_fts_row(conn, vault_id, &saved_content, &saved_content_norm)?;
     let _ = conn.execute(
         "UPDATE honeypot SET valid_from = COALESCE(valid_from, promoted_at) WHERE id = ?1",
         params![vault_id],
@@ -300,5 +306,347 @@ mod tests {
             0.95,
             Some("wave_01_foo.md"),
         )));
+    }
+}
+
+#[cfg(test)]
+mod test_upsert {
+    use super::*;
+    use crate::types::{DecayClass, ExtractedTruth};
+    use chrono::NaiveDate;
+    use rusqlite::Connection;
+    use uuid::Uuid;
+
+    #[test]
+    fn test_upsert_honeypot_row_preserves_high_utility() {
+        let conn = Connection::open_in_memory().unwrap();
+        conn.execute(
+            "CREATE TABLE honeypot (
+                id TEXT PRIMARY KEY,
+                vault_id TEXT,
+                content TEXT,
+                content_norm TEXT,
+                embedding BLOB,
+                origin TEXT,
+                memory_type TEXT,
+                graph_rel TEXT,
+                supersedes_id TEXT,
+                verify_pass INTEGER,
+                confidence REAL,
+                decay_class TEXT,
+                source_file TEXT,
+                container_tag TEXT,
+                promoted_at TEXT,
+                valid_from TEXT,
+                is_latest INTEGER,
+                recall_count INTEGER,
+                utility_score REAL DEFAULT 0.0
+            )",
+            [],
+        )
+        .unwrap();
+        conn.execute(
+            "CREATE VIRTUAL TABLE honeypot_fts USING fts5(content, content_norm)",
+            [],
+        )
+        .unwrap();
+
+        let id = Uuid::new_v4().to_string();
+        conn.execute(
+            "INSERT INTO honeypot (id, vault_id, content, content_norm, embedding, origin, verify_pass, confidence, utility_score) VALUES (?1, ?2, 'old', 'old', x'00', 'old', 1, 0.9, 5.0)",
+            [&id, &id],
+        )
+        .unwrap();
+
+        let truth = ExtractedTruth {
+            id: Uuid::new_v4(),
+            content: "new".to_string(),
+            confidence: 0.95,
+            mmr_score: 0.0,
+            source_date: NaiveDate::from_ymd_opt(2026, 6, 2).unwrap(),
+            decay_class: DecayClass::CuratedVault,
+            source_file: Some("src.md".to_string()),
+            evidence: None,
+        };
+
+        upsert_honeypot_row(&conn, &id, &truth, b"new", "new", "new").unwrap();
+
+        let content: String = conn
+            .query_row("SELECT content FROM honeypot WHERE id = ?1", [&id], |r| {
+                r.get(0)
+            })
+            .unwrap();
+
+        assert_eq!(content, "old");
+    }
+
+    #[test]
+    fn test_upsert_honeypot_row_updates_low_utility() {
+        let conn = Connection::open_in_memory().unwrap();
+        conn.execute(
+            "CREATE TABLE honeypot (
+                id TEXT PRIMARY KEY,
+                vault_id TEXT,
+                content TEXT,
+                content_norm TEXT,
+                embedding BLOB,
+                origin TEXT,
+                memory_type TEXT,
+                graph_rel TEXT,
+                supersedes_id TEXT,
+                verify_pass INTEGER,
+                confidence REAL,
+                decay_class TEXT,
+                source_file TEXT,
+                container_tag TEXT,
+                promoted_at TEXT,
+                valid_from TEXT,
+                is_latest INTEGER,
+                recall_count INTEGER,
+                utility_score REAL DEFAULT 0.0
+            )",
+            [],
+        )
+        .unwrap();
+        conn.execute(
+            "CREATE VIRTUAL TABLE honeypot_fts USING fts5(content, content_norm)",
+            [],
+        )
+        .unwrap();
+
+        let id = Uuid::new_v4().to_string();
+        conn.execute(
+            "INSERT INTO honeypot (id, vault_id, content, content_norm, embedding, origin, verify_pass, confidence, utility_score) VALUES (?1, ?2, 'old', 'old', x'00', 'old', 1, 0.9, 0.5)",
+            [&id, &id],
+        )
+        .unwrap();
+
+        let truth = ExtractedTruth {
+            id: Uuid::new_v4(),
+            content: "new".to_string(),
+            confidence: 0.95,
+            mmr_score: 0.0,
+            source_date: NaiveDate::from_ymd_opt(2026, 6, 2).unwrap(),
+            decay_class: DecayClass::CuratedVault,
+            source_file: Some("src.md".to_string()),
+            evidence: None,
+        };
+
+        upsert_honeypot_row(&conn, &id, &truth, b"new", "new", "new").unwrap();
+
+        let content: String = conn
+            .query_row("SELECT content FROM honeypot WHERE id = ?1", [&id], |r| {
+                r.get(0)
+            })
+            .unwrap();
+
+        assert_eq!(content, "new");
+    }
+
+    #[test]
+    fn test_upsert_honeypot_row_fts_preserves_high_utility() {
+        let conn = Connection::open_in_memory().unwrap();
+        conn.execute(
+            "CREATE TABLE honeypot (
+                id TEXT PRIMARY KEY,
+                vault_id TEXT,
+                content TEXT,
+                content_norm TEXT,
+                embedding BLOB,
+                origin TEXT,
+                memory_type TEXT,
+                graph_rel TEXT,
+                supersedes_id TEXT,
+                verify_pass INTEGER,
+                confidence REAL,
+                decay_class TEXT,
+                source_file TEXT,
+                container_tag TEXT,
+                promoted_at TEXT,
+                valid_from TEXT,
+                is_latest INTEGER,
+                recall_count INTEGER,
+                utility_score REAL DEFAULT 0.0
+            )",
+            [],
+        )
+        .unwrap();
+        conn.execute(
+            "CREATE VIRTUAL TABLE honeypot_fts USING fts5(content, content_norm)",
+            [],
+        )
+        .unwrap();
+
+        let id = Uuid::new_v4().to_string();
+        conn.execute(
+            "INSERT INTO honeypot (id, vault_id, content, content_norm, embedding, origin, verify_pass, confidence, utility_score) VALUES (?1, ?2, 'old', 'old', x'00', 'old', 1, 0.9, 5.0)",
+            [&id, &id],
+        )
+        .unwrap();
+
+        // insert to fts manually since trigger is removed
+        let rowid: i64 = conn
+            .query_row("SELECT rowid FROM honeypot WHERE id = ?1", [&id], |r| {
+                r.get(0)
+            })
+            .unwrap();
+        conn.execute(
+            "INSERT INTO honeypot_fts(rowid, content, content_norm) VALUES (?1, ?2, ?3)",
+            [
+                rusqlite::types::Value::Integer(rowid),
+                rusqlite::types::Value::Text("old".to_string()),
+                rusqlite::types::Value::Text("old".to_string()),
+            ],
+        )
+        .unwrap();
+
+        let truth = ExtractedTruth {
+            id: Uuid::new_v4(),
+            content: "new".to_string(),
+            confidence: 0.95,
+            mmr_score: 0.0,
+            source_date: NaiveDate::from_ymd_opt(2026, 6, 2).unwrap(),
+            decay_class: DecayClass::CuratedVault,
+            source_file: Some("src.md".to_string()),
+            evidence: None,
+        };
+
+        upsert_honeypot_row(&conn, &id, &truth, b"new", "new", "new").unwrap();
+
+        let fts_content: String = conn
+            .query_row(
+                "SELECT content FROM honeypot_fts WHERE rowid = ?1",
+                [rowid],
+                |r: &rusqlite::Row| r.get(0),
+            )
+            .unwrap();
+
+        assert_eq!(fts_content, "old");
+    }
+
+    #[test]
+    fn test_upsert_honeypot_row_updates_exact_bound_utility() {
+        let conn = Connection::open_in_memory().unwrap();
+        conn.execute(
+            "CREATE TABLE honeypot (
+                id TEXT PRIMARY KEY,
+                vault_id TEXT,
+                content TEXT,
+                content_norm TEXT,
+                embedding BLOB,
+                origin TEXT,
+                memory_type TEXT,
+                graph_rel TEXT,
+                supersedes_id TEXT,
+                verify_pass INTEGER,
+                confidence REAL,
+                decay_class TEXT,
+                source_file TEXT,
+                container_tag TEXT,
+                promoted_at TEXT,
+                valid_from TEXT,
+                is_latest INTEGER,
+                recall_count INTEGER,
+                utility_score REAL DEFAULT 0.0
+            )",
+            [],
+        )
+        .unwrap();
+        conn.execute(
+            "CREATE VIRTUAL TABLE honeypot_fts USING fts5(content, content_norm)",
+            [],
+        )
+        .unwrap();
+
+        let id = Uuid::new_v4().to_string();
+        conn.execute(
+            "INSERT INTO honeypot (id, vault_id, content, content_norm, embedding, origin, verify_pass, confidence, utility_score) VALUES (?1, ?2, 'old', 'old', x'00', 'old', 1, 0.9, 1.0)",
+            [&id, &id],
+        )
+        .unwrap();
+
+        let truth = ExtractedTruth {
+            id: Uuid::new_v4(),
+            content: "".to_string(),
+            confidence: 0.95,
+            mmr_score: 0.0,
+            source_date: NaiveDate::from_ymd_opt(2026, 6, 2).unwrap(),
+            decay_class: DecayClass::CuratedVault,
+            source_file: Some("src.md".to_string()),
+            evidence: None,
+        };
+
+        upsert_honeypot_row(&conn, &id, &truth, b"new", "", "new").unwrap();
+
+        let content: String = conn
+            .query_row("SELECT content FROM honeypot WHERE id = ?1", [&id], |r| {
+                r.get(0)
+            })
+            .unwrap();
+
+        assert_eq!(content, "");
+    }
+
+    #[test]
+    fn test_upsert_honeypot_row_preserves_empty_new_content() {
+        let conn = Connection::open_in_memory().unwrap();
+        conn.execute(
+            "CREATE TABLE honeypot (
+                id TEXT PRIMARY KEY,
+                vault_id TEXT,
+                content TEXT,
+                content_norm TEXT,
+                embedding BLOB,
+                origin TEXT,
+                memory_type TEXT,
+                graph_rel TEXT,
+                supersedes_id TEXT,
+                verify_pass INTEGER,
+                confidence REAL,
+                decay_class TEXT,
+                source_file TEXT,
+                container_tag TEXT,
+                promoted_at TEXT,
+                valid_from TEXT,
+                is_latest INTEGER,
+                recall_count INTEGER,
+                utility_score REAL DEFAULT 0.0
+            )",
+            [],
+        )
+        .unwrap();
+        conn.execute(
+            "CREATE VIRTUAL TABLE honeypot_fts USING fts5(content, content_norm)",
+            [],
+        )
+        .unwrap();
+
+        let id = Uuid::new_v4().to_string();
+        conn.execute(
+            "INSERT INTO honeypot (id, vault_id, content, content_norm, embedding, origin, verify_pass, confidence, utility_score) VALUES (?1, ?2, 'old', 'old', x'00', 'old', 1, 0.9, 1.1)",
+            [&id, &id],
+        )
+        .unwrap();
+
+        let truth = ExtractedTruth {
+            id: Uuid::new_v4(),
+            content: "".to_string(),
+            confidence: 0.95,
+            mmr_score: 0.0,
+            source_date: NaiveDate::from_ymd_opt(2026, 6, 2).unwrap(),
+            decay_class: DecayClass::CuratedVault,
+            source_file: Some("src.md".to_string()),
+            evidence: None,
+        };
+
+        upsert_honeypot_row(&conn, &id, &truth, b"", "", "").unwrap();
+
+        let content: String = conn
+            .query_row("SELECT content FROM honeypot WHERE id = ?1", [&id], |r| {
+                r.get(0)
+            })
+            .unwrap();
+
+        assert_eq!(content, "old");
     }
 }
