@@ -108,7 +108,7 @@ Multi-hour cron uses `spark_cron_slot_due` from `daemon.rs` to pick earliest mis
 > **THINKING — spark.rs:L3 promotion only**
 > - *Reviewed:* Promotes HYPOTHESIZED_LINK relations, not raw L2 truths.
 > - *Insight:* Serendipity without polluting honeypot with unverified facts.
-> - *Risk / limitation:* False-positive links still enter KG at L3.
+> - *Risk / limitation:* Unsupported / below-threshold links abstain (no quarantine promotion). A lying `supported=true` can still write L3.
 > - *Enhancement:* Decay L3 links without re-verification after N days. [GZMO-next]
 
 > **THINKING — spark_schedule.rs:LCG dice**

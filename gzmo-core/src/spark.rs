@@ -199,7 +199,8 @@ impl SparkEngine {
             Some(s) => s,
             None => {
                 info!("Spark selection found no anchor/recent pair — skipped");
-                let reason = "No curated anchor/recent pair passed smart selection (check vault ingest and [spark] gates).";
+                let reason =
+                    "No curated pair: empty pools, same-ingest recent slab, or [spark] gates.";
                 self.emit_spark_complete(date, false, 0, Some(reason), None);
                 self.record_skipped_spark(date, reason, None);
                 return Ok(SparkReport::skipped(date, reason));
@@ -223,30 +224,20 @@ impl SparkEngine {
                     let min_c = self.config.min_citation_chars;
                     repair_citations_from_facts(&selection, &mut v, min_c);
                     let citations_ok = citations_valid(&selection, &v, min_c);
-                    let strict_ok =
-                        v.supported && v.confidence >= self.config.min_confidence && citations_ok;
-                    let quarantine_ok = !strict_ok && citations_ok;
-                    let ok = if strict_ok {
-                        true
-                    } else if quarantine_ok {
-                        if v.confidence < self.config.quarantine_confidence {
-                            v.confidence = self.config.quarantine_confidence;
-                        }
-                        info!(
-                            supported = v.supported,
-                            confidence = v.confidence,
-                            "Spark citation-backed promotion (quarantine tier)"
-                        );
-                        true
-                    } else {
+                    let ok = spark_promote_ok(
+                        v.supported,
+                        v.confidence,
+                        citations_ok,
+                        self.config.min_confidence,
+                    );
+                    if !ok {
                         warn!(
                             supported = v.supported,
                             confidence = v.confidence,
                             citations_ok,
                             "Spark link failed verification or citations — abstaining"
                         );
-                        false
-                    };
+                    }
                     if ok {
                         (true, Some(v))
                     } else {
@@ -271,18 +262,26 @@ impl SparkEngine {
             (true, None)
         };
 
-        let kg_written = if promoted {
-            self.promote_phase(date, &selection, &hypothesis, verdict.as_ref())
-                .await
-        } else {
-            0
-        };
+        if !promoted {
+            let reason = "verification unsupported or citations failed — abstained";
+            self.emit_spark_complete(
+                date,
+                false,
+                0,
+                Some(reason),
+                Some(&selection.anchor.id.to_string()),
+            );
+            self.record_skipped_spark(date, reason, Some(&selection.anchor));
+            return Ok(SparkReport::skipped(date, reason));
+        }
 
-        if promoted {
-            let _ = felt_use::touch(&self.vault, selection.anchor.id, FeltUseKind::Bonded);
-            for r in &selection.recent {
-                let _ = felt_use::touch(&self.vault, r.id, FeltUseKind::Bonded);
-            }
+        let kg_written = self
+            .promote_phase(date, &selection, &hypothesis, verdict.as_ref())
+            .await;
+
+        let _ = felt_use::touch(&self.vault, selection.anchor.id, FeltUseKind::Bonded);
+        for r in &selection.recent {
+            let _ = felt_use::touch(&self.vault, r.id, FeltUseKind::Bonded);
         }
 
         spark_field::record_selection(
@@ -328,13 +327,9 @@ impl SparkEngine {
 
         self.emit_spark_complete(
             date,
-            promoted,
+            true,
             kg_written,
-            if promoted {
-                None
-            } else {
-                Some("verification or citation gate abstained")
-            },
+            None,
             Some(&selection.anchor.id.to_string()),
         );
 
@@ -354,6 +349,10 @@ impl SparkEngine {
             self.config.recent_max_age_hours,
             recent_fetch,
         )?;
+        if recent_pool_is_ingest_slab(&recent_raw) {
+            info!("Spark recent pool is one ingest slab — skipping");
+            return Ok(None);
+        }
         let recent = dedupe_recent_facts(recent_raw, self.config.recent_dedupe_similarity);
         let recent: Vec<_> = recent.into_iter().take(self.config.recent_limit).collect();
 
@@ -735,6 +734,27 @@ fn format_selection_bundle(selection: &SparkSelection) -> String {
     out
 }
 
+/// Promote only a supported, cited, above-threshold link.
+fn spark_promote_ok(
+    supported: bool,
+    confidence: f64,
+    citations_ok: bool,
+    min_confidence: f64,
+) -> bool {
+    supported && citations_ok && confidence >= min_confidence
+}
+
+/// Bulk ingest writes many facts in one second. That is not recent context.
+fn recent_pool_is_ingest_slab(recent: &[SemanticFact]) -> bool {
+    let Some(first) = recent.first() else {
+        return false;
+    };
+    recent.len() >= 2
+        && recent
+            .iter()
+            .all(|f| (f.created_at - first.created_at).num_seconds().abs() < 60)
+}
+
 /// Require quotable spans from anchor and at least one recent fact (LDR / dream firewall).
 fn citations_valid(selection: &SparkSelection, verdict: &SparkVerdict, min_chars: usize) -> bool {
     let a = verdict.evidence_anchor.trim();
@@ -1036,6 +1056,20 @@ mod selection_tests {
         let out = dedupe_recent_facts(vec![a, b], 0.99);
         assert_eq!(out.len(), 1);
     }
+
+    #[test]
+    fn same_minute_recent_pool_is_ingest_slab() {
+        let t = Utc::now();
+        let mut a = fact("chatgpt traditional", 0);
+        let mut b = fact("chatgpt fails personalization", 0);
+        a.created_at = t;
+        b.created_at = t + chrono::Duration::seconds(2);
+        assert!(recent_pool_is_ingest_slab(&[a.clone(), b.clone()]));
+        b.created_at = t + chrono::Duration::hours(2);
+        assert!(!recent_pool_is_ingest_slab(&[a.clone(), b]));
+        assert!(!recent_pool_is_ingest_slab(&[a]));
+        assert!(!recent_pool_is_ingest_slab(&[]));
+    }
 }
 
 #[cfg(test)]
@@ -1096,7 +1130,16 @@ mod citation_tests {
     }
 
     #[test]
-    fn quarantine_tier_accepts_verbatim_citations_when_unsupported() {
+    fn unsupported_verdict_does_not_promote_even_with_citations() {
+        assert!(!spark_promote_ok(false, 0.6, true, 0.85));
+        assert!(!spark_promote_ok(false, 0.95, true, 0.85));
+        assert!(spark_promote_ok(true, 0.9, true, 0.85));
+        assert!(!spark_promote_ok(true, 0.9, false, 0.85));
+        assert!(!spark_promote_ok(true, 0.5, true, 0.85));
+    }
+
+    #[test]
+    fn citations_can_be_valid_when_unsupported() {
         let selection = SparkSelection {
             anchor: SemanticFact {
                 id: Uuid::new_v4(),
