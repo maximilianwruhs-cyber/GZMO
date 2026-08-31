@@ -195,7 +195,7 @@ impl SparkEngine {
 
         info!(date = %date, "Starting spark cycle");
 
-        let selection = match self.select_phase()? {
+        let selection = match self.select_phase().await? {
             Some(s) => s,
             None => {
                 info!("Spark selection found no anchor/recent pair — skipped");
@@ -342,7 +342,7 @@ impl SparkEngine {
     }
 
     /// Phase 1 — scored curated anchor + recent pool (no LLM).
-    fn select_phase(&self) -> Result<Option<SparkSelection>> {
+    async fn select_phase(&self) -> Result<Option<SparkSelection>> {
         let recent_fetch = self.config.recent_limit.saturating_mul(4).max(16);
         let recent_raw = self.vault.spark_recent_pool(
             &self.config.anchor_decay_classes,
@@ -429,11 +429,33 @@ impl SparkEngine {
         };
         let (anchor, _, max_sim, expl) = scored.swap_remove(idx);
 
-        let recent: Vec<_> = recent
-            .into_iter()
-            .filter(|f| f.id != anchor.id)
-            .take(self.config.recent_limit)
-            .collect();
+        let recent = if self.vault.cognition_uses_honeypot() {
+            let associated = self
+                .vault
+                .cognition_associate_similar(&anchor.content, self.config.recent_limit)
+                .await?;
+            match spark_honeypot_recent(
+                associated,
+                anchor.id,
+                &anchor.content,
+                self.config.recent_limit,
+            ) {
+                Some(neighbors) => neighbors,
+                None => {
+                    info!(
+                        anchor_id = %anchor.id,
+                        "Spark honeypot associate returned no neighbors — skipping (fail closed)"
+                    );
+                    return Ok(None);
+                }
+            }
+        } else {
+            recent
+                .into_iter()
+                .filter(|f| f.id != anchor.id)
+                .take(self.config.recent_limit)
+                .collect()
+        };
 
         if recent.is_empty() {
             return Ok(None);
@@ -742,6 +764,28 @@ fn spark_promote_ok(
     min_confidence: f64,
 ) -> bool {
     supported && citations_ok && confidence >= min_confidence
+}
+
+/// Honeypot-layer neighbors for the picked anchor (M3). `None` = skip spark.
+fn spark_honeypot_recent(
+    associated: Vec<SemanticFact>,
+    anchor_id: Uuid,
+    anchor_content: &str,
+    recent_limit: usize,
+) -> Option<Vec<SemanticFact>> {
+    if anchor_content.trim().is_empty() {
+        return None;
+    }
+    let recent: Vec<_> = associated
+        .into_iter()
+        .filter(|f| f.id != anchor_id)
+        .take(recent_limit)
+        .collect();
+    if recent.is_empty() {
+        None
+    } else {
+        Some(recent)
+    }
 }
 
 /// Bulk ingest writes many facts in one second. That is not recent context.
@@ -1069,6 +1113,26 @@ mod selection_tests {
         assert!(!recent_pool_is_ingest_slab(&[a.clone(), b]));
         assert!(!recent_pool_is_ingest_slab(&[a]));
         assert!(!recent_pool_is_ingest_slab(&[]));
+    }
+
+    #[test]
+    fn empty_honeypot_associate_yields_no_pair() {
+        let anchor = fact("stale curated fact about dialectics", 30);
+        assert!(spark_honeypot_recent(vec![], anchor.id, &anchor.content, 8).is_none());
+
+        let mut only_self = fact("same-id neighbor", 1);
+        only_self.id = anchor.id;
+        assert!(spark_honeypot_recent(vec![only_self], anchor.id, &anchor.content, 8).is_none());
+
+        assert!(spark_honeypot_recent(vec![fact("x", 1)], anchor.id, "   ", 8).is_none());
+
+        let neighbor = fact("honeypot neighbor distillate", 1);
+        let nid = neighbor.id;
+        let out =
+            spark_honeypot_recent(vec![anchor.clone(), neighbor], anchor.id, &anchor.content, 8)
+                .expect("neighbors minus anchor is a pair");
+        assert_eq!(out.len(), 1);
+        assert_eq!(out[0].id, nid);
     }
 }
 
