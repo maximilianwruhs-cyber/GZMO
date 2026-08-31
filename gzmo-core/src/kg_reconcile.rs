@@ -50,6 +50,9 @@ pub struct ReconcileReport {
 /// Canonicalize entity type labels toward the shared ontology.
 pub fn canonicalize_entity_type(raw: &str) -> String {
     let upper = raw.trim().to_uppercase();
+    if upper.is_empty() {
+        return String::new();
+    }
     if CANONICAL_ENTITY_TYPES.contains(&upper.as_str()) {
         return upper;
     }
@@ -62,8 +65,7 @@ pub fn canonicalize_entity_type(raw: &str) -> String {
         "COMPANY" | "ORG" | "ORGANIZATION" | "LOCATION" | "CONCEPT" | "EVENT" => {
             "SYSTEMS".to_string()
         }
-        _ if !upper.is_empty() => upper,
-        _ => "SYSTEMS".to_string(),
+        _ => upper,
     }
 }
 
@@ -85,8 +87,15 @@ pub async fn run_kg_reconcile(
         anyhow::bail!("read_graph failed: {}", result.output);
     }
 
-    let graph: KnowledgeGraph =
-        serde_json::from_str(&result.output).context("parse read_graph JSON")?;
+    let output = result.output.trim();
+    if output.is_empty() {
+        return Ok(ReconcileReport {
+            dry_run: cfg.dry_run,
+            ..Default::default()
+        });
+    }
+
+    let graph: KnowledgeGraph = serde_json::from_str(output).context("parse read_graph JSON")?;
 
     let mut report = ReconcileReport {
         entities_scanned: graph.entities.len(),
@@ -97,6 +106,9 @@ pub async fn run_kg_reconcile(
 
     for entity in &graph.entities {
         let canonical = canonicalize_entity_type(&entity.entity_type);
+        if canonical.is_empty() {
+            continue; // Fail closed, no-op for empty entity types
+        }
         if canonical == entity.entity_type.to_uppercase() {
             continue;
         }
@@ -130,10 +142,31 @@ pub async fn run_kg_reconcile(
     let mut to_create: Vec<serde_json::Value> = Vec::new();
 
     for rel in &graph.relations {
+        // Find out if the relation type sanitizes to empty BEFORE it falls back to RELATED_TO.
+        let is_empty_sanitized = {
+            let mut out = String::with_capacity(rel.relation_type.len());
+            let mut prev_underscore = false;
+            for ch in rel.relation_type.chars() {
+                if ch.is_ascii_alphanumeric() {
+                    out.push(ch.to_ascii_uppercase());
+                    prev_underscore = false;
+                } else if !prev_underscore {
+                    out.push('_');
+                    prev_underscore = true;
+                }
+            }
+            out.trim_matches('_').is_empty()
+        };
+
+        if is_empty_sanitized {
+            continue;
+        }
+
         let canon = canonicalize_relation_type(&rel.relation_type);
         if canon.is_empty() {
             continue;
         }
+
         if canon == rel.relation_type {
             continue;
         }
@@ -203,16 +236,145 @@ pub async fn run_kg_reconcile(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::tools::ToolDef;
+    use crate::tools::ToolHandler;
+    use async_trait::async_trait;
+    use std::sync::Arc;
+    use tokio::sync::Mutex;
 
     #[test]
     fn canonicalize_entity_types() {
         assert_eq!(canonicalize_entity_type("person"), "PEOPLE");
         assert_eq!(canonicalize_entity_type("company"), "SYSTEMS");
         assert_eq!(canonicalize_entity_type("PROJECTS"), "PROJECTS");
+        assert_eq!(canonicalize_entity_type(""), "");
+        assert_eq!(canonicalize_entity_type("   "), "");
     }
 
     #[test]
     fn relation_canonicalization_matches_kg_promotion() {
         assert_eq!(canonicalize_relation_type("WROTE"), "AUTHORED_BY");
+    }
+
+    struct MockReadGraphTool {
+        output: String,
+    }
+
+    #[async_trait]
+    impl ToolHandler for MockReadGraphTool {
+        fn definition(&self) -> ToolDef {
+            ToolDef {
+                name: "mcp__memory__read_graph".to_string(),
+                description: "".to_string(),
+                parameters: serde_json::json!({}),
+            }
+        }
+        async fn execute(&self, _args: serde_json::Value) -> anyhow::Result<String> {
+            Ok(self.output.clone())
+        }
+    }
+
+    #[tokio::test]
+    async fn test_empty_graph_is_noop() {
+        let mut tools = ToolRegistry::new();
+        tools.register(Box::new(MockReadGraphTool {
+            output: "   ".to_string(),
+        }));
+
+        let cfg = KgReconcileConfig {
+            dry_run: false,
+            ..Default::default()
+        };
+        let report = run_kg_reconcile(&tools, &cfg).await.unwrap();
+
+        assert_eq!(report.entities_scanned, 0);
+        assert_eq!(report.relations_scanned, 0);
+    }
+
+    struct MockAddObsTool {
+        called: Arc<Mutex<bool>>,
+    }
+
+    #[async_trait]
+    impl ToolHandler for MockAddObsTool {
+        fn definition(&self) -> ToolDef {
+            ToolDef {
+                name: "mcp__memory__add_observations".to_string(),
+                description: "".to_string(),
+                parameters: serde_json::json!({}),
+            }
+        }
+        async fn execute(&self, _args: serde_json::Value) -> anyhow::Result<String> {
+            *self.called.lock().await = true;
+            Ok("ok".to_string())
+        }
+    }
+
+    struct MockCreateRelTool {
+        called: Arc<Mutex<bool>>,
+    }
+
+    #[async_trait]
+    impl ToolHandler for MockCreateRelTool {
+        fn definition(&self) -> ToolDef {
+            ToolDef {
+                name: "mcp__memory__create_relations".to_string(),
+                description: "".to_string(),
+                parameters: serde_json::json!({}),
+            }
+        }
+        async fn execute(&self, _args: serde_json::Value) -> anyhow::Result<String> {
+            *self.called.lock().await = true;
+            Ok("ok".to_string())
+        }
+    }
+
+    #[tokio::test]
+    async fn test_empty_relation_and_entity_types_are_noops() {
+        let mut tools = ToolRegistry::new();
+        let graph_json = serde_json::json!({
+            "entities": [
+                {
+                    "name": "E1",
+                    "type": "   ",
+                    "observations": []
+                }
+            ],
+            "relations": [
+                {
+                    "source": "E1",
+                    "target": "E2",
+                    "relationType": "!@#"
+                }
+            ]
+        });
+
+        tools.register(Box::new(MockReadGraphTool {
+            output: graph_json.to_string(),
+        }));
+
+        let obs_called = Arc::new(Mutex::new(false));
+        tools.register(Box::new(MockAddObsTool {
+            called: obs_called.clone(),
+        }));
+
+        let create_rel_called = Arc::new(Mutex::new(false));
+        tools.register(Box::new(MockCreateRelTool {
+            called: create_rel_called.clone(),
+        }));
+
+        let cfg = KgReconcileConfig {
+            dry_run: false,
+            ..Default::default()
+        };
+        let report = run_kg_reconcile(&tools, &cfg).await.unwrap();
+
+        assert_eq!(report.entities_scanned, 1);
+        assert_eq!(report.relations_scanned, 1);
+        assert_eq!(report.entity_notes_added, 0);
+        assert_eq!(report.relations_recanonicalized, 0);
+
+        assert!(!*obs_called.lock().await);
+        assert!(!*create_rel_called.lock().await);
     }
 }
