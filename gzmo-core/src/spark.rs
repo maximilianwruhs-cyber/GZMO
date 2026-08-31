@@ -1128,9 +1128,13 @@ mod selection_tests {
 
         let neighbor = fact("honeypot neighbor distillate", 1);
         let nid = neighbor.id;
-        let out =
-            spark_honeypot_recent(vec![anchor.clone(), neighbor], anchor.id, &anchor.content, 8)
-                .expect("neighbors minus anchor is a pair");
+        let out = spark_honeypot_recent(
+            vec![anchor.clone(), neighbor],
+            anchor.id,
+            &anchor.content,
+            8,
+        )
+        .expect("neighbors minus anchor is a pair");
         assert_eq!(out.len(), 1);
         assert_eq!(out[0].id, nid);
     }
