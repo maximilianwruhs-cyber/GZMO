@@ -391,7 +391,8 @@ pub fn collect_metabolism_board(config: &GzmoConfig) -> MetabolismBoard {
     }
 }
 
-fn read_wiki_plane_summary(config: &GzmoConfig) -> WikiPlaneSummary {
+/// Wiki / OKForge plane from `wiki-push-latest.json` (Observatory + metabolism).
+pub fn read_wiki_plane_summary(config: &GzmoConfig) -> WikiPlaneSummary {
     let wiki_meta = config
         .memory
         .vault_db

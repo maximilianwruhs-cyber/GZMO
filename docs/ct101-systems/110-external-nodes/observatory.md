@@ -1,77 +1,49 @@
-# GZMO Observatory — Read-Only Telemetry Dashboard
+# GZMO Observatory — Operator glass (production)
 
-**Source:** `gzmo-observatory/observatory/*.py`  
-**Parent:** [110-external-nodes/SYSTEM.md](./SYSTEM.md)
+**Surfaces:** `gzmo observatory` (TUI / `--json`) + OKForge `/observatory` on `:3000`  
+**Parent:** [110-external-nodes/SYSTEM.md](./SYSTEM.md)  
+**Gate:** `bash scripts/okforge-observatory-check.sh` → `data-next/okforge-observatory/`  
+**Forge ops:** [OKFORGE_PRODUCTION.md](../../OKFORGE_PRODUCTION.md)
 
 ---
 
 ## Capability
 
-Workstation-hosted **FastAPI + WebSocket** dashboard polling CT101 state every 5 seconds: chaos trajectory, vault/honeypot counts, synapse tail, dreams excerpt, Obolus ledger, Qdrant/Neo4j LAN stats, and local Prime GPU. **Read-only** — failures do not affect the daemon.
+Read-only operator glass for the **knowledge plane** (local forge + wiki push) and workstation unit honesty. It does **not** write the living vault. Overnight metabolism stays on the living host (`gzmo-daemon` on CT101 today).
+
+| Surface | What it is | What it is not |
+|---------|------------|----------------|
+| `gzmo observatory` | Health LED board (units + probes + wiki plane) | Chat cockpit |
+| `gzmo observatory --json` | Scriptable snapshot, fail-closed if OKForge wiki plane is DOWN | Living GREEN gate |
+| `http://127.0.0.1:3000/observatory` | In-forge agent-discovery UI | Public SKU / internet TLS |
+| FastAPI `:7777` (`gzmo-observatory.service`) | **Retired** | Do not start; do not require |
+
+Theater (sanitized scoreboard / wiki-mind demo) stays on `bash scripts/wiki-observatory-demo.sh` and is **not** this production bar.
 
 ---
 
 ## How it works
 
-### Application loop
+### LED honesty (telescope)
 
-```46:53:home/gzmo/gzmo-observatory/observatory/main.py
-async def poll_loop() -> None:
-    while True:
-        try:
-            payload = await asyncio.to_thread(collector.collect)
-            await broadcast(payload)
-        except Exception as exc:
-            await broadcast({"error": str(exc), "timestamp": ""})
-        await asyncio.sleep(POLL_INTERVAL_S)
+`gzmo-serve` and `gzmo-scheduler` **inactive** is **expected-offline** (UP), not a red outage. `gzmo-serve` **active** is DOWN (dual-writer risk). `llama-prime.service` inactive is UNKNOWN — judge the LLM via health probes, not the unit name.
+
+When `[wiki] backend = "okforge"`:
+
+- `okforge.service` — systemd
+- `okforge_http` — GET `/observatory` (401/403 still counts as up)
+- `wiki_push` — `wiki-push-latest.json` (`healthy`, `commit_sha`)
+
+Failed OKCP pushes **write** `healthy=false` so the glass cannot go silent.
+
+### Living wiki satellite (no second writer)
+
+```bash
+bash scripts/wiki-okforge-living-push.sh          # CT101 honeypot dump → local OKCP
+bash scripts/wiki-okforge-living-push.sh --dry-run
 ```
 
-WebSocket clients receive JSON snapshots; REST `/api/snapshot` returns latest bundle.
-
-### Collector bundle
-
-```43:54:home/gzmo/gzmo-observatory/observatory/collector.py
-    def collect(self) -> dict[str, Any]:
-        ts = datetime.now(timezone.utc).isoformat()
-        bundle = self._fetch_ct101_bundle()
-        chaos = bundle.get("chaos")
-        heartbeat = self._parse_heartbeat(bundle.get("heartbeat_raw", ""))
-        dreams = bundle.get("dreams", [])
-        synapse = self._normalize_synapse(bundle.get("synapse", {}))
-        memory = bundle.get("memory", {})
-        obolus = bundle.get("obolus", {})
-        memory = self._enrich_memory(memory)
-        prime = self._fetch_prime()
-```
-
-CT101 data fetched via `scripts/ct101-snapshot.py` — single SSH round-trip through PVE.
-
-### Remote on-demand queries
-
-```15:29:home/gzmo/gzmo-observatory/observatory/remote.py
-def run_remote_py(script: str, args: dict[str, Any] | None = None, timeout: float = 25.0) -> Any:
-    """Run a python script inside CT101, passing args as base64 JSON on argv[1]."""
-    payload = base64.b64encode(json.dumps(args or {}).encode()).decode()
-    remote = f"pct exec 101 -- python3 - {payload}"
-    result = subprocess.run(
-        [*PVE_SSH, remote],
-        input=script,
-        // ...
-    )
-```
-
-TTL-cached vault search, dreams deep-read, wiki browse — no persistent agent on CT101.
-
-### Config
-
-```12:18:home/gzmo/gzmo-observatory/observatory/config.py
-PVE_SSH = ["ssh", "-o", "BatchMode=yes", "-o", "ConnectTimeout=10", "pve"]
-GZMO_BIN = "/opt/gzmo/survey_GZMO/target/release/gzmo"
-GZMO_DATA = "/opt/gzmo/data"
-QDRANT_URL = "http://192.168.31.202:6333"
-NEO4J_HTTP = "http://192.168.31.202:7474"
-PRIME_URL = "http://127.0.0.1:8000"
-```
+Refuses if workstation `gzmo-serve` is active. Does not copy `vault.db`. Timer: `gzmo-wiki-okforge-push.timer` (05:30 UTC).
 
 ---
 
@@ -79,54 +51,34 @@ PRIME_URL = "http://127.0.0.1:8000"
 
 | Interface | Value |
 |-----------|-------|
-| HTTP port | `7777` (workstation) |
-| Poll interval | 5 s |
-| SSH path | `ssh pve` → `pct exec 101` |
-| Qdrant | Direct LAN to CT101 `:6333` |
-| Neo4j | Direct LAN to CT101 `:7474` |
-| Séance API | `POST /api/seance` — mentor ping/teach via SSH |
-| Static UI | `static/index.html`, JS panels (mind, vault, synapse, dreams, obolus) |
+| Forge UI | `http://127.0.0.1:3000/observatory` (`okforge.service`) |
+| CLI | `gzmo observatory` / `gzmo observatory --json` |
+| Wiki push | `gzmo wiki push` / `--from-json` living dump |
+| Production gate | `scripts/okforge-observatory-check.sh` |
+| Retired sidecar | `:7777` FastAPI — historical only |
 
 ---
 
-## THINKING nodes
+## Historical FastAPI sidecar (retired)
 
-> **THINKING — observatory:SSH single point**
-> - *Reviewed:* All CT101 bundle data transits PVE SSH batch mode.
-> - *Insight:* One round-trip minimizes latency vs multiple execs.
-> - *Risk / limitation:* SSH failure → entire dashboard shows error blob — no partial degrade.
-> - *Enhancement:* Per-subsystem fetch with last-good cache timestamps. [CT101-safe]
+The 2026-07 workstation dashboard (`gzmo-observatory/observatory/*.py`) polled CT101 every 5s via `ssh pve` → `pct exec 101`, plus LAN Qdrant/Neo4j. That unit is **disabled**. Insights still useful:
 
-> **THINKING — observatory:LAN sidecar reads**
-> - *Reviewed:* Qdrant/Neo4j queried directly from workstation to CT101 Docker ports.
-> - *Insight:* Bypasses SSH for vector/graph counts — faster enrichment.
-> - *Risk / limitation:* Assumes flat LAN trust; no TLS on sidecar HTTP.
-> - *Enhancement:* Read-only API tokens when sidecars exposed beyond LAN. [GZMO-next]
+> **THINKING — observatory:SSH single point**  
+> One round-trip minimized latency; SSH failure showed a single error blob. Prefer per-subsystem last-good timestamps if a remote poller is ever revived.
 
-> **THINKING — observatory:remote.py TTL cache**
-> - *Reviewed:* On-demand vault/wiki queries cached with TTL + thread lock.
-> - *Insight:* Protects CT101 SQLite from hammering on UI search typing.
-> - *Risk / limitation:* Stale search results up to TTL after vault writes.
-> - *Enhancement:* Cache bust webhook from daemon on major vault sync. [GZMO-next]
+> **THINKING — observatory:LAN sidecar reads**  
+> Direct Qdrant/Neo4j LAN reads bypassed SSH. Flat LAN trust; no TLS on sidecar HTTP.
+
+Do not re-enable `:7777` as a second control plane.
 
 ---
 
 ## Advancement
 
-| CT101 | GZMO-next |
-|-------|-----------|
-| SSH snapshot of legacy daemon | Poll GZMO-next metrics endpoint or shared Redis |
-| Workstation-only UI | Cloud-hosted Observatory read replica |
-| Manual `ct101-snapshot.py` | Structured health gRPC from future lab daemon |
+| Now | Later (deferred) |
+|-----|------------------|
+| Honest LEDs + `--json` + living OKCP satellite | Eight-view visual parity with old FastAPI UI |
+| Localhost forge + daily backup | Internet-facing TLS (`deploy/` Docker+Caddy) |
+| Soft-fail wiki (not living GREEN) | Public “mind” SKU |
 
----
-
-## Enhancement backlog
-
-| Rank | Item | Tag |
-|------|------|-----|
-| 1 | Partial degrade when SSH fails (show last snapshot age) | [CT101-safe] |
-| 2 | Discovery cycle status panel from `auto-triggers.jsonl` | [CT101-safe] |
-| 3 | LAN Prime health alongside loopback | [CT101-safe] |
-| 4 | GZMO-next instance switch in config | [GZMO-next] |
-| 5 | Auth gate on `:7777` if exposed beyond localhost | [GZMO-next] |
+Private R&D: do not publicize the OKForge / herdr mirrors as GZMO product.

@@ -228,8 +228,8 @@ async fn run_wiki_push_satellite(config: &GzmoConfig) -> Result<()> {
         40,
         false,
     )
-    .await?;
-    wiki_okf::write_push_report(&meta_path, &report)?;
+    .await;
+    let report = wiki_okf::record_push_result(&meta_path, "serve-catchup", report)?;
     info!(
         concepts = report.concepts_written,
         sha = %report.commit_sha,

@@ -60,7 +60,7 @@ Never invent a status report from `top`, legacy docs, or assumed paths. If `/sta
 - **"Thought Cabinet?"** → Weekly Sun 06:30 `cabinet-feed.sh` one-shot, or manual `cabinet-sim feed`. PulseLoop/`/chaos` stays chat-only — never thin scheduler.
 - **"Research budget?"** → Chat ritual: `research-budget check/spend` — not a scheduler job.
 - **"Wiki / knowledge concepts?"** → OKForge repo `gzmo/gzmo-next-memory` via `gzmo wiki push` / overnight distill-dream hooks (`OKFORGE_TOKEN` in `~/.config/okforge/env`). Browse at `http://127.0.0.1:3000/observatory`.
-- **"Observatory?"** → In-forge UI at `/observatory` (not the retired `:7777` FastAPI sidecar). Credentials: `~/.config/okforge/CREDENTIALS.md`. Production gate: `docs/OKFORGE_PRODUCTION.md`.
+- **"Observatory?"** → `gzmo observatory` (TUI) / `--json`, plus in-forge UI at `/observatory` (not the retired `:7777` FastAPI sidecar). Credentials: `~/.config/okforge/CREDENTIALS.md`. Production gate: `docs/OKFORGE_PRODUCTION.md` + `bash scripts/okforge-observatory-check.sh`.
 - **Legacy CT101** — Out of scope unless operator asks; see `docs/CT101_BOUNDARY.md`.
 
 ## Persona

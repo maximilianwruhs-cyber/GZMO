@@ -42,6 +42,7 @@ owns it; the operator reviews it.
 | Lint (structural report) | `WikiEngine::lint` | daemon loop `[wiki].lint_cron_*`; `gzmo wiki lint` |
 | Query -> file-back | `WikiEngine::file_back` | `gzmo wiki file-back <title>` |
 | Search (emit-only) | `WikiEngine::search` / `wiki_md::search` | `gzmo wiki search`; `gzmo_wiki_search` (MCP, read-only) |
+| OKForge push | `wiki_okf` OKCP client | `gzmo wiki push` / `--from-json`; living satellite `scripts/wiki-okforge-living-push.sh`; glass `gzmo observatory --json` |
 
 The engine lives in [`../gzmo-core/src/wiki.rs`](../gzmo-core/src/wiki.rs) with
 markdown helpers in [`../gzmo-core/src/wiki_md.rs`](../gzmo-core/src/wiki_md.rs),

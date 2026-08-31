@@ -231,6 +231,17 @@ log_path = "wiki/log.md"
 schema_path = "WIKI.md"
 # When true, ingest mirrors newly promoted vault facts into wiki pages.
 emit_on_ingest = true
+# Knowledge plane (optional): OKForge OKCP. Token from env, never git.
+# backend = "okforge"
+# [wiki.okforge]
+# url = "http://127.0.0.1:3000"
+# owner = "gzmo"
+# repo = "gzmo-next-memory"
+# token_env = "OKFORGE_TOKEN"
+# agent_id = "gzmo-next"
+# auto_commit = true
+# open_pr = false
+# Production: bash scripts/okforge-observatory-check.sh (not living GREEN).
 # Daemon Knowledge Gardener: daily index sync (UTC) after Qdrant sync (01:45).
 sync_cron_hour = 5
 sync_cron_minute = 30

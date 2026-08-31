@@ -1,0 +1,11 @@
+[Unit]
+Description=GZMO OKForge / Observatory check every 6h (UTC)
+
+[Timer]
+OnCalendar=*-*-* 01,07,13,19:00:00 UTC
+Persistent=true
+AccuracySec=5min
+Unit=gzmo-okforge-observatory-check.service
+
+[Install]
+WantedBy=timers.target

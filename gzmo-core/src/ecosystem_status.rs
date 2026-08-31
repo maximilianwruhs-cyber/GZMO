@@ -9,6 +9,7 @@ use rusqlite::Connection;
 use crate::assembly::{handoff_apply_target, AssemblyConfig};
 use crate::config::GzmoConfig;
 use crate::health::{collect_health_probes, ProbeResult};
+use crate::observatory_board::led_from_unit_policy;
 
 /// Fused-vs-live calibration status for operator surfaces (`gzmo status` / `/status`).
 fn calibration_pending_line() -> Option<(String, String)> {
@@ -151,10 +152,6 @@ pub async fn format_ecosystem_status(config: &GzmoConfig) -> String {
     let memory_files = count_files_with_ext(&config.memory.directory, "md");
     let session_files = count_files_with_ext(&config.session_distill.sessions_dir, "json");
 
-    let prime = user_systemd_unit("llama-prime.service").await;
-    let scheduler = user_systemd_unit("gzmo-scheduler.service").await;
-    let observatory = user_systemd_unit("okforge.service").await;
-
     let probes = collect_health_probes(config, None).await;
 
     let mut out = String::new();
@@ -219,14 +216,28 @@ pub async fn format_ecosystem_status(config: &GzmoConfig) -> String {
 
     out.push_str("### User systemd\n\n");
     out.push_str("| Unit | State |\n|---|---|\n");
-    out.push_str(&format!("| llama-prime.service | {prime} |\n"));
-    let serve = user_systemd_unit("gzmo-serve.service").await;
-    out.push_str(&format!("| gzmo-serve.service | {serve} |\n"));
-    out.push_str(&format!("| gzmo-scheduler.service | {scheduler} |\n"));
-    out.push_str(&format!(
-        "| okforge.service (/observatory) | {observatory} |\n"
-    ));
-    out.push_str("\n*Metabolism: `gzmo serve` (typed jobs). Lab parity: `gzmo-scheduler`. Chat is not a daemon.*\n\n");
+    for unit in [
+        "llama-prime.service",
+        "gzmo-serve.service",
+        "gzmo-scheduler.service",
+        "okforge.service",
+    ] {
+        let raw = user_systemd_unit(unit).await;
+        let led = led_from_unit_policy(unit, &raw);
+        let label = if unit == "okforge.service" {
+            "okforge.service (/observatory)"
+        } else {
+            unit
+        };
+        out.push_str(&format!(
+            "| {label} | {} — {} |\n",
+            led.state.label(),
+            led.detail
+        ));
+    }
+    out.push_str(
+        "\n*Serve/scheduler inactive is expected-offline on the telescope. Chat is not a daemon.*\n\n",
+    );
 
     // Wiki / OKForge plane (production signal)
     let wiki_meta = config

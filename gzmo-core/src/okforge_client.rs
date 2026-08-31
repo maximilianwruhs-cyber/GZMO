@@ -2,12 +2,42 @@
 //!
 //! Session → PATCH concept → commit. Token from env (never from git).
 
+use std::time::Duration;
+
 use anyhow::{bail, Context, Result};
 use reqwest::header::{AUTHORIZATION, CONTENT_TYPE};
 use serde::{Deserialize, Serialize};
 use tracing::info;
 
 use crate::config::WikiOkforgeConfig;
+
+/// Reachability probe for the local forge UI (no token, no write).
+/// Non-5xx (including 401/403) means the process answered.
+pub async fn probe_observatory(base_url: &str) -> Result<(u16, String), String> {
+    let base = base_url.trim().trim_end_matches('/');
+    if base.is_empty() {
+        return Err("okforge url empty".into());
+    }
+    let http = reqwest::Client::builder()
+        .timeout(Duration::from_secs(5))
+        .redirect(reqwest::redirect::Policy::limited(2))
+        .build()
+        .map_err(|e| e.to_string())?;
+    let mut last_err = format!("unreachable {base}");
+    for path in ["/observatory", "/", "/api/v1/version"] {
+        match http.get(format!("{base}{path}")).send().await {
+            Ok(resp) => {
+                let status = resp.status().as_u16();
+                if status < 500 {
+                    return Ok((status, path.to_string()));
+                }
+                last_err = format!("HTTP {status} {path}");
+            }
+            Err(e) => last_err = format!("{path}: {e}"),
+        }
+    }
+    Err(last_err)
+}
 
 #[derive(Debug, Clone)]
 pub struct OkforgeClient {
