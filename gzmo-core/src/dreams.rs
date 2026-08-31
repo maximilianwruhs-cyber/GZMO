@@ -149,7 +149,19 @@ impl DreamEngine {
                 )
                 .await
             {
-                Ok(hp) if !hp.trim().is_empty() => {
+                Ok(hp)
+                    if skip_dream_extract_for_empty_honeypot(
+                        self.dreams.honeypot_rem_enabled,
+                        self.vault.cognition_uses_honeypot(),
+                        &hp,
+                    ) =>
+                {
+                    info!(
+                        "Honeypot REM empty — skipping dream extraction (fail-closed, no episodic janitor soup)"
+                    );
+                    return Ok(honeypot_rem_skip_report(date, raw.len(), "empty"));
+                }
+                Ok(hp) => {
                     honeypot_rem_chars = hp.len();
                     rem_input = format!(
                         "{}\n\n### HONEYPOT ASSOCIATIONS (M3)\n{}\n",
@@ -162,8 +174,12 @@ impl DreamEngine {
                         "M3 honeypot REM substrate appended"
                     );
                 }
-                Ok(_) => {}
-                Err(e) => warn!("Honeypot REM context failed (episodic-only REM): {e}"),
+                Err(e) => {
+                    warn!(
+                        "Honeypot REM context failed — skipping dream extraction (fail-closed): {e}"
+                    );
+                    return Ok(honeypot_rem_skip_report(date, raw.len(), "error"));
+                }
             }
         }
 
@@ -486,6 +502,33 @@ impl DreamEngine {
     }
 }
 
+/// Fail-closed: when honeypot REM is the required substrate, empty/whitespace
+/// context skips extraction instead of falling back to episodic janitor soup.
+fn skip_dream_extract_for_empty_honeypot(
+    honeypot_rem_enabled: bool,
+    cognition_uses_honeypot: bool,
+    rem_context: &str,
+) -> bool {
+    honeypot_rem_enabled && cognition_uses_honeypot && rem_context.trim().is_empty()
+}
+
+fn honeypot_rem_skip_report(date: NaiveDate, original_bytes: usize, why: &str) -> DreamReport {
+    DreamReport {
+        date,
+        original_bytes,
+        compressed_bytes: 0,
+        entities_extracted: 0,
+        relations_extracted: 0,
+        kg_entities_written: 0,
+        kg_relations_written: 0,
+        truths_promoted: 0,
+        narrative: format!(
+            "# Dream Consolidation — {date}\n\n\
+             Skipped: honeypot REM context {why} (fail-closed — no episodic janitor soup).\n"
+        ),
+    }
+}
+
 const EPISODIC_SECTION_MARKER: &str = "### 🧠 INTERNAL";
 const SESSION_SECTION_MARKER: &str = "### 📓 SESSION";
 
@@ -639,6 +682,30 @@ Session distilled: GZMO runs on air-gapped infrastructure with real decisions.
             ..DreamsConfig::default()
         };
         assert!(!cfg.honeypot_rem_enabled);
+    }
+
+    #[test]
+    fn empty_honeypot_rem_helper_yields_skip() {
+        assert!(
+            skip_dream_extract_for_empty_honeypot(true, true, ""),
+            "empty rem must skip extraction"
+        );
+        assert!(
+            skip_dream_extract_for_empty_honeypot(true, true, " \n\t "),
+            "whitespace rem must skip extraction"
+        );
+        assert!(
+            !skip_dream_extract_for_empty_honeypot(true, true, "[HP-A0] distillate"),
+            "non-empty rem must extract"
+        );
+        assert!(
+            !skip_dream_extract_for_empty_honeypot(false, true, ""),
+            "disabled rem keeps episodic path"
+        );
+        assert!(
+            !skip_dream_extract_for_empty_honeypot(true, false, ""),
+            "cognition off honeypot keeps episodic path"
+        );
     }
 
     #[test]
