@@ -69,23 +69,9 @@ fn lymph_dir(vault_db: &Path) -> PathBuf {
 }
 
 fn load_or_new(dir: &Path, night_id: &str) -> NightLymph {
-    let path = dir.join("latest.json");
-    if let Ok(raw) = std::fs::read_to_string(&path) {
-        if let Ok(mut existing) = serde_json::from_str::<NightLymph>(&raw) {
-            if existing.night_id == night_id {
-                return existing;
-            }
-            // New night — keep sparks empty
-            existing = NightLymph {
-                schema: SCHEMA.into(),
-                night_id: night_id.to_string(),
-                updated_at: Utc::now().to_rfc3339(),
-                dream: None,
-                sparks: Vec::new(),
-                immune_plan: None,
-                immune_candidates: 0,
-                note: String::new(),
-            };
+    let dated_path = dir.join(format!("lymph-{}.json", night_id));
+    if let Ok(raw) = std::fs::read_to_string(&dated_path) {
+        if let Ok(existing) = serde_json::from_str::<NightLymph>(&raw) {
             return existing;
         }
     }
@@ -97,16 +83,31 @@ fn load_or_new(dir: &Path, night_id: &str) -> NightLymph {
         sparks: Vec::new(),
         immune_plan: None,
         immune_candidates: 0,
-        note: "Compact overnight filtrate — see DREAMS.md for full spark stream.".into(),
+        note: String::new(),
     }
 }
 
 fn write_lymph(dir: &Path, lymph: &NightLymph) -> Result<PathBuf> {
     std::fs::create_dir_all(dir)?;
-    let text = serde_json::to_string_pretty(lymph)? + "\n";
+    let mut text = serde_json::to_string_pretty(lymph)?;
+    text.push('\n');
+
     let dated = dir.join(format!("lymph-{}.json", lymph.night_id));
     std::fs::write(&dated, &text)?;
-    std::fs::write(dir.join("latest.json"), &text)?;
+
+    let latest_path = dir.join("latest.json");
+    let mut update_latest = true;
+    if let Ok(raw) = std::fs::read_to_string(&latest_path) {
+        if let Ok(latest_lymph) = serde_json::from_str::<NightLymph>(&raw) {
+            if lymph.night_id < latest_lymph.night_id {
+                update_latest = false;
+            }
+        }
+    }
+    if update_latest {
+        std::fs::write(&latest_path, &text)?;
+    }
+
     Ok(dated)
 }
 
@@ -258,5 +259,59 @@ mod tests {
             lymph_night_id(afternoon),
             NaiveDate::from_ymd_opt(2026, 7, 20).unwrap()
         );
+    }
+
+    #[test]
+    fn older_id_must_not_wipe_newer_latest() {
+        let dir =
+            std::env::temp_dir().join(format!("gzmo-lymph-test-older-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).unwrap();
+        let vault = dir.join("vault.db");
+
+        let newer_night = NaiveDate::from_ymd_opt(2026, 7, 25).unwrap();
+        let older_night = NaiveDate::from_ymd_opt(2026, 7, 24).unwrap();
+
+        // Write newer night first
+        record_spark(
+            &vault,
+            newer_night,
+            LymphSpark {
+                date: newer_night.to_string(),
+                promoted: true,
+                kg_relations: 1,
+                anchor_id: Some("newer".into()),
+                anchor_preview: Some("newer preview".into()),
+            },
+        )
+        .unwrap();
+
+        // Write older night
+        record_spark(
+            &vault,
+            older_night,
+            LymphSpark {
+                date: older_night.to_string(),
+                promoted: true,
+                kg_relations: 1,
+                anchor_id: Some("older".into()),
+                anchor_preview: Some("older preview".into()),
+            },
+        )
+        .unwrap();
+
+        // Check that latest.json is still newer_night
+        let raw = std::fs::read_to_string(lymph_dir(&vault).join("latest.json")).unwrap();
+        let lymph: NightLymph = serde_json::from_str(&raw).unwrap();
+        assert_eq!(lymph.night_id, newer_night.to_string());
+
+        // Check that older night sparks are kept
+        let old_raw =
+            std::fs::read_to_string(lymph_dir(&vault).join(format!("lymph-{}.json", older_night)))
+                .unwrap();
+        let old_lymph: NightLymph = serde_json::from_str(&old_raw).unwrap();
+        assert_eq!(old_lymph.sparks.len(), 1);
+
+        let _ = std::fs::remove_dir_all(&dir);
     }
 }
