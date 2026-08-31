@@ -27,16 +27,29 @@ pub enum ScratchScope {
 }
 
 impl ScratchScope {
-    pub fn redis_key(&self) -> String {
+    pub fn redis_key(&self) -> Result<String> {
         match self {
-            Self::Main { session_id } => format!("{SCRATCH_PREFIX}main:{session_id}"),
+            Self::Main { session_id } => {
+                if session_id.trim().is_empty() {
+                    anyhow::bail!("ScratchScope::Main requires non-empty session_id");
+                }
+                Ok(format!("{SCRATCH_PREFIX}main:{session_id}"))
+            }
             Self::Sub {
                 session_id,
                 task_id,
             } => {
-                format!("{SCRATCH_PREFIX}sub:{session_id}:{task_id}")
+                if session_id.trim().is_empty() || task_id.trim().is_empty() {
+                    anyhow::bail!("ScratchScope::Sub requires non-empty session_id and task_id");
+                }
+                Ok(format!("{SCRATCH_PREFIX}sub:{session_id}:{task_id}"))
             }
-            Self::Orch { job, step } => format!("{SCRATCH_PREFIX}orch:{job}:{step}"),
+            Self::Orch { job, step } => {
+                if job.trim().is_empty() || step.trim().is_empty() {
+                    anyhow::bail!("ScratchScope::Orch requires non-empty job and step");
+                }
+                Ok(format!("{SCRATCH_PREFIX}orch:{job}:{step}"))
+            }
         }
     }
 }
@@ -276,7 +289,7 @@ impl ScratchService {
     }
 
     pub async fn clear(&self, scope: &ScratchScope) -> Result<()> {
-        let key = scope.redis_key();
+        let key = scope.redis_key()?;
         match &self.backend {
             ScratchBackend::Redis(r) => {
                 r.fallback.write().await.remove(&key);
@@ -302,7 +315,7 @@ impl ScratchService {
             snippets,
             updated_at: Utc::now(),
         };
-        let key = scope.redis_key();
+        let key = scope.redis_key()?;
         match &self.backend {
             ScratchBackend::Redis(r) => {
                 let json = serde_json::to_string(&payload)?;
@@ -330,7 +343,7 @@ impl ScratchService {
     }
 
     pub async fn read(&self, scope: &ScratchScope) -> Result<Option<ScratchPayload>> {
-        let key = scope.redis_key();
+        let key = scope.redis_key()?;
         match &self.backend {
             ScratchBackend::Redis(r) => {
                 match r.conn().await {
@@ -514,6 +527,40 @@ mod tests {
             "empty write is a clear"
         );
         assert!(svc.format_for_inject(&scope).await.unwrap().is_none());
+    }
+
+    #[test]
+    fn redis_key_uniqueness() {
+        let s1 = ScratchScope::Main { session_id: "a".into() };
+        let s2 = ScratchScope::Sub { session_id: "a".into(), task_id: "b".into() };
+        let s3 = ScratchScope::Orch { job: "a".into(), step: "b".into() };
+        assert_ne!(s1.redis_key().unwrap(), s2.redis_key().unwrap());
+        assert_ne!(s2.redis_key().unwrap(), s3.redis_key().unwrap());
+        assert_ne!(s1.redis_key().unwrap(), s3.redis_key().unwrap());
+    }
+
+    #[test]
+    fn empty_scope_fails_key_generation() {
+        assert!(ScratchScope::Main { session_id: "".into() }.redis_key().is_err());
+        assert!(ScratchScope::Main { session_id: "   ".into() }.redis_key().is_err());
+
+        assert!(ScratchScope::Sub { session_id: "a".into(), task_id: "".into() }.redis_key().is_err());
+        assert!(ScratchScope::Sub { session_id: "".into(), task_id: "b".into() }.redis_key().is_err());
+        assert!(ScratchScope::Sub { session_id: "   ".into(), task_id: "b".into() }.redis_key().is_err());
+
+        assert!(ScratchScope::Orch { job: "a".into(), step: "".into() }.redis_key().is_err());
+        assert!(ScratchScope::Orch { job: "".into(), step: "b".into() }.redis_key().is_err());
+        assert!(ScratchScope::Orch { job: "   ".into(), step: "b".into() }.redis_key().is_err());
+    }
+
+    #[tokio::test]
+    async fn empty_scope_fails_service_methods() {
+        let svc = ScratchService::memory(2000);
+        let bad_scope = ScratchScope::Main { session_id: "  ".into() };
+
+        assert!(svc.read(&bad_scope).await.is_err());
+        assert!(svc.write(&bad_scope, vec![snip("test")]).await.is_err());
+        assert!(svc.clear(&bad_scope).await.is_err());
     }
 }
 
