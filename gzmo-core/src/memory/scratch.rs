@@ -531,9 +531,17 @@ mod tests {
 
     #[test]
     fn redis_key_uniqueness() {
-        let s1 = ScratchScope::Main { session_id: "a".into() };
-        let s2 = ScratchScope::Sub { session_id: "a".into(), task_id: "b".into() };
-        let s3 = ScratchScope::Orch { job: "a".into(), step: "b".into() };
+        let s1 = ScratchScope::Main {
+            session_id: "a".into(),
+        };
+        let s2 = ScratchScope::Sub {
+            session_id: "a".into(),
+            task_id: "b".into(),
+        };
+        let s3 = ScratchScope::Orch {
+            job: "a".into(),
+            step: "b".into(),
+        };
         assert_ne!(s1.redis_key().unwrap(), s2.redis_key().unwrap());
         assert_ne!(s2.redis_key().unwrap(), s3.redis_key().unwrap());
         assert_ne!(s1.redis_key().unwrap(), s3.redis_key().unwrap());
@@ -541,22 +549,62 @@ mod tests {
 
     #[test]
     fn empty_scope_fails_key_generation() {
-        assert!(ScratchScope::Main { session_id: "".into() }.redis_key().is_err());
-        assert!(ScratchScope::Main { session_id: "   ".into() }.redis_key().is_err());
+        assert!(ScratchScope::Main {
+            session_id: "".into()
+        }
+        .redis_key()
+        .is_err());
+        assert!(ScratchScope::Main {
+            session_id: "   ".into()
+        }
+        .redis_key()
+        .is_err());
 
-        assert!(ScratchScope::Sub { session_id: "a".into(), task_id: "".into() }.redis_key().is_err());
-        assert!(ScratchScope::Sub { session_id: "".into(), task_id: "b".into() }.redis_key().is_err());
-        assert!(ScratchScope::Sub { session_id: "   ".into(), task_id: "b".into() }.redis_key().is_err());
+        assert!(ScratchScope::Sub {
+            session_id: "a".into(),
+            task_id: "".into()
+        }
+        .redis_key()
+        .is_err());
+        assert!(ScratchScope::Sub {
+            session_id: "".into(),
+            task_id: "b".into()
+        }
+        .redis_key()
+        .is_err());
+        assert!(ScratchScope::Sub {
+            session_id: "   ".into(),
+            task_id: "b".into()
+        }
+        .redis_key()
+        .is_err());
 
-        assert!(ScratchScope::Orch { job: "a".into(), step: "".into() }.redis_key().is_err());
-        assert!(ScratchScope::Orch { job: "".into(), step: "b".into() }.redis_key().is_err());
-        assert!(ScratchScope::Orch { job: "   ".into(), step: "b".into() }.redis_key().is_err());
+        assert!(ScratchScope::Orch {
+            job: "a".into(),
+            step: "".into()
+        }
+        .redis_key()
+        .is_err());
+        assert!(ScratchScope::Orch {
+            job: "".into(),
+            step: "b".into()
+        }
+        .redis_key()
+        .is_err());
+        assert!(ScratchScope::Orch {
+            job: "   ".into(),
+            step: "b".into()
+        }
+        .redis_key()
+        .is_err());
     }
 
     #[tokio::test]
     async fn empty_scope_fails_service_methods() {
         let svc = ScratchService::memory(2000);
-        let bad_scope = ScratchScope::Main { session_id: "  ".into() };
+        let bad_scope = ScratchScope::Main {
+            session_id: "  ".into(),
+        };
 
         assert!(svc.read(&bad_scope).await.is_err());
         assert!(svc.write(&bad_scope, vec![snip("test")]).await.is_err());
