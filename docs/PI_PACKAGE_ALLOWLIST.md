@@ -29,12 +29,14 @@ Install with `bash scripts/pi-thin-diet.sh --apply-core` (or manually).
 
 | Spec | Why |
 |------|-----|
-| `npm:pi-mcp-adapter` | Reads `~/.pi/agent/mcp.json` — living/product MCP attach |
+| `npm:pi-mcp-adapter` **or** the adapter bundled inside `gzmo-pi` — **not both** | Reads `~/.pi/agent/mcp.json`. Git `gzmo-pi` already registers `node_modules/pi-mcp-adapter` as an extension; a second top-level `npm:pi-mcp-adapter` hard-fails Pi with tool/flag conflicts. |
 | **One** of `npm:gzmo-pi` **or** `git:github.com/maximilianwruhs-cyber/gzmo-pi` | GZMO Pi surface — **not both** |
 | `npm:hsp-pi` *(optional)* | Audio / HSP bridge when you use it |
 | `npm:pi-subagents` | **Keep one** subagent stack only |
 
-Default when both gzmo-pi sources are present: **prefer git**, remove npm (`--prefer-gzmo-pi git|npm` to override).
+Default when both gzmo-pi sources are present: **prefer git**, remove npm (`--prefer-gzmo-pi git|npm` to override).  
+With **git gzmo-pi**, omit standalone `npm:pi-mcp-adapter` (adapter comes from the package). With **npm gzmo-pi** that does not bundle the adapter extension, keep standalone `npm:pi-mcp-adapter`.  
+Also avoid `npm:pi-spark` together with `npm:pi-mega-compact` (compaction conflict).
 
 ---
 
@@ -60,6 +62,18 @@ bash scripts/pi-thin-diet.sh --apply-recommended --with lens,fff,plannotator,com
 | `fff` | `npm:@ff-labs/pi-fff` | Optional fuzzy file/content search |
 | `plannotator` | `npm:@plannotator/pi-extension` | Optional plan/PR annotation UI |
 | `compact` | `npm:pi-mega-compact` | Optional stronger compaction (situational) |
+
+---
+
+## Opt-in methodology (not default)
+
+| Spec | Status |
+|------|--------|
+| `git:github.com/obra/superpowers` | **Opt-in only** — operator must explicitly request. Not core. Not recommended default. |
+
+Superpowers is a strong gated build methodology (brainstorm → plan → TDD → subagent exec) with a first-class Pi package and session bootstrap. It conflicts with this kit’s defaults: thin remote, no auto-Socratic theater, ship-until-done. Matt process skills already cover grill/TDD/debug/review without bootstrap injection.
+
+If you deliberately opt in: install the package, hide Matt process twins so two methodologies do not fight, set `SUPERPOWERS_DISABLE_TELEMETRY=1`, and put a ship-mode override in `system.md` (user ship/build instructions win). Treat that as a doctrine fork — not a casual add.
 
 ---
 
