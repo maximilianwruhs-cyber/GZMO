@@ -1009,6 +1009,10 @@ impl SqliteVault {
         } else {
             Vec::new()
         };
+        let lexical_empty = fts_ids.is_empty()
+            && evidence_fts_ids.is_empty()
+            && graph_ids.is_empty()
+            && kw_ids.is_empty();
         let mut rank_lists = vec![fts_ids.clone()];
         if !evidence_fts_ids.is_empty() {
             rank_lists.push(evidence_fts_ids);
@@ -1019,39 +1023,43 @@ impl SqliteVault {
             rank_lists.push(kw_ids.clone());
         }
 
-        if let Some(embedder) = &self.embedder {
-            match embedder.embed(q).await {
-                Ok(emb) if !emb.is_empty() => {
-                    let mut qdrant_ids = Vec::new();
-                    if let Some(qdrant) = &self.qdrant {
-                        if let Ok(ids) = qdrant.search_ids(&emb, QDRANT_PREFETCH_K).await {
-                            qdrant_ids = self.take_assertable_prefetch(&ids, PREFETCH_K)?;
+        // k-NN cannot abstain: skip embed when every lexical stream is empty.
+        if !lexical_empty {
+            if let Some(embedder) = &self.embedder {
+                match embedder.embed(q).await {
+                    Ok(emb) if !emb.is_empty() => {
+                        let mut qdrant_ids = Vec::new();
+                        if let Some(qdrant) = &self.qdrant {
+                            if let Ok(ids) = qdrant.search_ids(&emb, QDRANT_PREFETCH_K).await {
+                                qdrant_ids = self.take_assertable_prefetch(&ids, PREFETCH_K)?;
+                            }
+                        }
+                        let scored = self.search_with_decay(&emb, q, PREFETCH_K)?;
+                        for (fact, _) in &scored {
+                            let sf = self.honeypot_source_file(fact.id)?;
+                            candidates.entry(fact.id).or_insert(RecallCandidate {
+                                fact: fact.clone(),
+                                source_file: sf,
+                            });
+                        }
+                        let local_ids: Vec<Uuid> = scored.into_iter().map(|(f, _)| f.id).collect();
+                        let vector_ids =
+                            merge_interleaved_rank(&qdrant_ids, &local_ids, PREFETCH_K);
+                        if !vector_ids.is_empty() {
+                            rank_lists.push(vector_ids);
+                        }
+                        let evidence_vector_ids =
+                            self.honeypot_evidence_vector_stream(&emb, container_tag, PREFETCH_K)?;
+                        if !evidence_vector_ids.is_empty() {
+                            rank_lists.push(evidence_vector_ids);
                         }
                     }
-                    let scored = self.search_with_decay(&emb, q, PREFETCH_K)?;
-                    for (fact, _) in &scored {
-                        let sf = self.honeypot_source_file(fact.id)?;
-                        candidates.entry(fact.id).or_insert(RecallCandidate {
-                            fact: fact.clone(),
-                            source_file: sf,
-                        });
+                    Ok(_) => {
+                        tracing::warn!(query = %q, "empty embedding — FTS-only recall");
                     }
-                    let local_ids: Vec<Uuid> = scored.into_iter().map(|(f, _)| f.id).collect();
-                    let vector_ids = merge_interleaved_rank(&qdrant_ids, &local_ids, PREFETCH_K);
-                    if !vector_ids.is_empty() {
-                        rank_lists.push(vector_ids);
+                    Err(e) => {
+                        tracing::warn!(error = %e, query = %q, "embed failed — FTS-only recall");
                     }
-                    let evidence_vector_ids =
-                        self.honeypot_evidence_vector_stream(&emb, container_tag, PREFETCH_K)?;
-                    if !evidence_vector_ids.is_empty() {
-                        rank_lists.push(evidence_vector_ids);
-                    }
-                }
-                Ok(_) => {
-                    tracing::warn!(query = %q, "empty embedding — FTS-only recall");
-                }
-                Err(e) => {
-                    tracing::warn!(error = %e, query = %q, "embed failed — FTS-only recall");
                 }
             }
         }
@@ -1095,6 +1103,7 @@ impl SqliteVault {
         // so phase B can still promote a high-Q fact that sat below `limit`.
         self.apply_rerank(q, RERANK_PREFETCH.max(limit), &mut scored)
             .await;
+        scored.retain(|(_, score)| *score > 0.0);
         self.apply_utility_select(&mut scored)?;
         scored.truncate(limit);
         Ok(scored)

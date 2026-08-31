@@ -7,6 +7,12 @@ use uuid::Uuid;
 use crate::types::SemanticFact;
 
 const RRF_K: f64 = 60.0;
+/// Shared by FTS MATCH and entity-token graph hints so they cannot drift.
+/// Porter stems `Use`→`us`; hyphenates `token` out of junk queries.
+const LEXICAL_STOP: &[&str] = &[
+    "what", "which", "does", "the", "and", "for", "how", "when", "where", "that", "this", "with",
+    "from", "into", "about", "use", "used", "using", "user", "useful", "usage", "token", "tokens",
+];
 pub const PREFETCH_K: usize = 50;
 /// Overfetch Qdrant so `filter_assertable_honeypot_ids` can still fill `PREFETCH_K`
 /// after dropping superseded points (GPM / Temporal Validity).
@@ -177,10 +183,6 @@ pub fn extract_entity_tokens(query: &str) -> Vec<String> {
         }
         rest = &rest[end + 1..];
     }
-    const STOP: &[&str] = &[
-        "what", "which", "does", "the", "and", "for", "how", "when", "where", "that", "this",
-        "with", "from", "into", "about",
-    ];
     for word in q.split_whitespace() {
         let w: String = word
             .trim_matches(|c: char| !c.is_alphanumeric())
@@ -189,7 +191,7 @@ pub fn extract_entity_tokens(query: &str) -> Vec<String> {
             continue;
         }
         let lower = w.to_lowercase();
-        if STOP.contains(&lower.as_str()) {
+        if LEXICAL_STOP.contains(&lower.as_str()) {
             continue;
         }
         out.push(w);
@@ -210,13 +212,7 @@ pub fn fts_match_query_broad(query: &str) -> String {
 }
 
 fn fts_match_query_mode(query: &str, _broad: bool) -> String {
-    // Porter stems `Use`→`us` and hyphenates `token` out of junk queries.
-    // Drop those query tokens so MATCH cannot form the 407-row `us` pool.
-    const STOP: &[&str] = &[
-        "what", "which", "does", "the", "and", "for", "how", "when", "where", "that", "this",
-        "with", "from", "into", "about", "use", "used", "using", "user", "useful", "usage",
-        "token", "tokens",
-    ];
+    // Drop LEXICAL_STOP tokens so MATCH cannot form the 407-row `us` pool.
     let mut words: Vec<String> = Vec::new();
     let mut seen = std::collections::HashSet::new();
     for w in query.split(|c: char| !c.is_alphanumeric()) {
@@ -224,7 +220,7 @@ fn fts_match_query_mode(query: &str, _broad: bool) -> String {
             continue;
         }
         let lower = w.to_lowercase();
-        if STOP.contains(&lower.as_str()) {
+        if LEXICAL_STOP.contains(&lower.as_str()) {
             continue;
         }
         if !seen.insert(lower) {
@@ -319,6 +315,19 @@ mod tests {
         let scores = rrf_fuse(&[vec![a, b, c], vec![a, c, b]]);
         assert!(scores[&a] > scores[&b]);
         assert!(scores[&a] > scores[&c]);
+    }
+
+    #[test]
+    fn extract_entity_tokens_drops_token_in_hyphenated_abstention() {
+        let t = extract_entity_tokens("zzzz-nonexistent-token-9f3a2");
+        assert!(!t.iter().any(|x| x.eq_ignore_ascii_case("token")), "{t:?}");
+    }
+
+    #[test]
+    fn extract_entity_tokens_felt_use_keeps_felt_drops_use() {
+        let t = extract_entity_tokens("Felt Use");
+        assert!(t.iter().any(|x| x == "Felt"), "{t:?}");
+        assert!(!t.iter().any(|x| x.eq_ignore_ascii_case("use")), "{t:?}");
     }
 
     #[test]
