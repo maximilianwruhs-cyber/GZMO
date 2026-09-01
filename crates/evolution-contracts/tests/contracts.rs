@@ -9,7 +9,7 @@ use evolution_contracts::{
     PROMOTION_SCHEMA,
 };
 use evolution_contracts::{
-    canonical_json_bytes, sha256_hex, verify_chain, AuditEvent, GENESIS_HASH,
+    canonical_json_bytes, sha256_hex, verify_chain, AuditError, AuditEvent, GENESIS_HASH,
 };
 use std::collections::{BTreeMap, BTreeSet};
 
@@ -1783,6 +1783,20 @@ fn audit_empty_chain_and_genesis_rules() {
     assert!(verify_chain(&[bad_genesis]).is_err());
 }
 
+/// Recompute `event_hash` from the same field set as private `AuditPreimage`.
+fn rehash_audit_event(event: &mut AuditEvent) {
+    let preimage = serde_json::json!({
+        "candidate_id": event.candidate_id.as_ref().map(|c| c.as_str()),
+        "event_type": event.event_type,
+        "occurred_at": event.occurred_at,
+        "payload_digest": event.payload_digest,
+        "previous_hash": event.previous_hash,
+        "schema": event.schema,
+        "sequence": event.sequence,
+    });
+    event.event_hash = sha256_hex(&canonical_json_bytes(&preimage).unwrap());
+}
+
 #[test]
 fn audit_multi_event_chain_links_and_rejects_gap_overflow_bad_link() {
     let e1 = AuditEvent::next(None, "candidate.observed", Some(audit_candidate_id()), &1u8).unwrap();
@@ -1790,32 +1804,46 @@ fn audit_multi_event_chain_links_and_rejects_gap_overflow_bad_link() {
     let e3 = AuditEvent::next(Some(&e2), "candidate.evaluated", Some(audit_candidate_id()), &3u8).unwrap();
     assert!(verify_chain(&[e1.clone(), e2.clone(), e3.clone()]).is_ok());
 
-    // Sequence gap (hash no longer matches stored sequence).
+    // Self-consistent sequence gap: event validates alone; chain hits InvalidChain.
     let mut gapped = e3.clone();
     gapped.sequence = 4;
-    assert!(verify_chain(&[e1.clone(), e2.clone(), gapped]).is_err());
+    rehash_audit_event(&mut gapped);
+    assert!(gapped.validate().is_ok(), "gapped event must be self-consistent");
+    let gap_err = verify_chain(&[e1.clone(), e2.clone(), gapped]).expect_err("sequence gap");
+    match &gap_err {
+        AuditError::InvalidChain(reason) => {
+            assert!(
+                reason.contains("sequence gap"),
+                "expected sequence-gap InvalidChain, got {reason}"
+            );
+        }
+        other => panic!("expected InvalidChain for sequence gap, got {other:?}"),
+    }
 
-    // Bad previous link.
-    let mut bad_link = e2.clone();
-    bad_link.previous_hash = e3.event_hash.clone();
-    assert!(verify_chain(&[e1.clone(), bad_link]).is_err());
+    // Self-consistent fork/splice: valid own hash, wrong previous_hash link.
+    let mut spliced = e2.clone();
+    spliced.previous_hash = e3.event_hash.clone();
+    rehash_audit_event(&mut spliced);
+    assert!(spliced.validate().is_ok(), "spliced event must be self-consistent");
+    let link_err = verify_chain(&[e1.clone(), spliced]).expect_err("bad previous link");
+    match &link_err {
+        AuditError::InvalidChain(reason) => {
+            assert!(
+                reason.contains("previous_hash"),
+                "expected previous_hash InvalidChain, got {reason}"
+            );
+        }
+        other => panic!("expected InvalidChain for bad link, got {other:?}"),
+    }
 
     // Checked overflow: craft a self-consistent u64::MAX event, then next must fail.
     let mut consistent_max = e1.clone();
     consistent_max.sequence = u64::MAX;
-    let preimage = serde_json::json!({
-        "candidate_id": consistent_max.candidate_id.as_ref().map(|c| c.as_str()),
-        "event_type": consistent_max.event_type,
-        "occurred_at": consistent_max.occurred_at,
-        "payload_digest": consistent_max.payload_digest,
-        "previous_hash": consistent_max.previous_hash,
-        "schema": consistent_max.schema,
-        "sequence": u64::MAX,
-    });
-    consistent_max.event_hash = sha256_hex(&canonical_json_bytes(&preimage).unwrap());
+    rehash_audit_event(&mut consistent_max);
     assert!(consistent_max.validate().is_ok());
     assert!(AuditEvent::next(Some(&consistent_max), "overflow.next", None, &0u8).is_err());
 }
+
 
 
 #[test]

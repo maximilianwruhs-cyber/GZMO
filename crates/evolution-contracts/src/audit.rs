@@ -352,6 +352,15 @@ impl serde::Serializer for FiniteChecker {
     fn serialize_u64(self, _: u64) -> Result<(), AuditError> {
         Ok(())
     }
+    fn serialize_i128(self, _: i128) -> Result<(), AuditError> {
+        // Pass-through: serde_json accepts in-range integers and rejects out-of-range.
+        Ok(())
+    }
+    fn serialize_u128(self, _: u128) -> Result<(), AuditError> {
+        // Pass-through: serde_json accepts in-range integers and rejects out-of-range.
+        Ok(())
+    }
+
     fn serialize_f32(self, v: f32) -> Result<(), AuditError> {
         if v.is_finite() {
             Ok(())
@@ -584,6 +593,26 @@ mod tests {
         })
         .is_err());
     }
+
+    #[test]
+    fn accepts_in_range_i128_u128() {
+        assert!(canonical_json_bytes(&0i128).is_ok());
+        assert!(canonical_json_bytes(&(i64::MAX as i128)).is_ok());
+        assert!(canonical_json_bytes(&(i64::MIN as i128)).is_ok());
+        assert!(canonical_json_bytes(&(u64::MAX as u128)).is_ok());
+        assert!(canonical_json_bytes(&0u128).is_ok());
+    }
+
+    #[test]
+    fn out_of_range_i128_u128_rejected_by_serde_json() {
+        // FiniteChecker must not reject these; serde_json does after pass-through.
+        // i64::MAX+1 still fits u64; use values outside both i64 and u64 ranges.
+        assert!(canonical_json_bytes(&(u64::MAX as i128 + 1)).is_err());
+        assert!(canonical_json_bytes(&(i64::MIN as i128 - 1)).is_err());
+        assert!(canonical_json_bytes(&(u64::MAX as u128 + 1)).is_err());
+    }
+
+
 
     #[test]
     fn preimage_excludes_event_hash_field_name() {
