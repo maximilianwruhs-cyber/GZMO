@@ -1,6 +1,9 @@
 # ADR-0006 — One vault owner, two socket clients
 
-**Status:** Accepted (2026-08-16) — implemented in-tree  
+**Historical status:** Accepted (2026-08-16) — implemented in-tree
+**Decision status:** Accepted
+**Implementation status:** Implemented
+**Superseded by:** — (remains current-runtime owner path until target successor cutover)
 **Related:** [ADR-0003](./ADR-0003-one-instance-metabolism.md), [ADR-0004](./ADR-0004-airgap-living-usp.md), [ADR-0005](./ADR-0005-flywheel-over-frozen-topology.md), [ADR-0007](./ADR-0007-one-product-living.md)
 
 ## Context
