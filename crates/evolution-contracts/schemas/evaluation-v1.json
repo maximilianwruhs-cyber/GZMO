@@ -67,8 +67,10 @@
   "properties": {
     "artifact_digests": {
       "additionalProperties": {
+        "pattern": "^sha256:[a-f0-9]{64}$",
         "type": "string"
       },
+      "description": "Map of artifact name → `sha256:<64 lowercase hex>` digest.",
       "type": "object"
     },
     "baseline_digest": {

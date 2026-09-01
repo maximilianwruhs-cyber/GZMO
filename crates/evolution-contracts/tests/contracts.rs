@@ -1980,3 +1980,119 @@ fn audit_schema_constant_is_stable() {
     assert_eq!(AUDIT_SCHEMA, "gzmo.evolution.audit/v1");
 }
 
+#[test]
+fn wire_types_reject_unknown_fields_top_level_and_nested() {
+    // Top-level roots.
+    let mut manifest = serde_json::to_value(fixture_repo_manifest()).unwrap();
+    manifest["unexpected_top"] = serde_json::json!(true);
+    assert!(
+        serde_json::from_value::<CandidateManifest>(manifest).is_err(),
+        "CandidateManifest must deny unknown fields"
+    );
+
+    let mut envelope = serde_json::to_value(fixture_envelope()).unwrap();
+    envelope["unexpected_top"] = serde_json::json!(1);
+    assert!(serde_json::from_value::<CapabilityEnvelope>(envelope).is_err());
+
+    let mut report = serde_json::to_value(report_with(
+        vec![GateResult::pass("tests")],
+        BTreeMap::new(),
+    ))
+    .unwrap();
+    report["unexpected_top"] = serde_json::json!("x");
+    assert!(serde_json::from_value::<EvaluationReport>(report).is_err());
+
+    let mut grant = serde_json::to_value(fixture_unverified_grant()).unwrap();
+    grant["unexpected_top"] = serde_json::json!(false);
+    assert!(serde_json::from_value::<UnverifiedAuthorityGrant>(grant).is_err());
+
+    let mut request = serde_json::to_value(fixture_promotion_request()).unwrap();
+    request["unexpected_top"] = serde_json::json!(0);
+    assert!(serde_json::from_value::<PromotionRequest>(request).is_err());
+
+    let audit = AuditEvent::next(None, "candidate.observed", None, &serde_json::json!({"k":1}))
+        .unwrap();
+    let mut audit_v = serde_json::to_value(&audit).unwrap();
+    audit_v["unexpected_top"] = serde_json::json!(true);
+    assert!(serde_json::from_value::<AuditEvent>(audit_v).is_err());
+
+    // Nested / tagged representatives.
+    let mut budget = serde_json::to_value(valid_budget()).unwrap();
+    budget["unexpected"] = serde_json::json!(1);
+    assert!(serde_json::from_value::<ResourceBudget>(budget).is_err());
+
+    let mut paths = serde_json::to_value(PathPolicy::stage1_default()).unwrap();
+    paths["unexpected"] = serde_json::json!([]);
+    assert!(serde_json::from_value::<PathPolicy>(paths).is_err());
+
+    let mut gate = serde_json::to_value(GateResult::pass("tests")).unwrap();
+    gate["unexpected"] = serde_json::json!("nope");
+    assert!(serde_json::from_value::<GateResult>(gate).is_err());
+
+    // Nested budget under envelope.
+    let mut env = serde_json::to_value(fixture_envelope()).unwrap();
+    env["budget"]["unexpected"] = serde_json::json!(99);
+    assert!(serde_json::from_value::<CapabilityEnvelope>(env).is_err());
+
+    // Nested gate under evaluation report.
+    let mut rep = serde_json::to_value(report_with(
+        vec![GateResult::pass("tests")],
+        BTreeMap::new(),
+    ))
+    .unwrap();
+    rep["gates"][0]["unexpected"] = serde_json::json!(true);
+    assert!(serde_json::from_value::<EvaluationReport>(rep).is_err());
+
+    // Nested request under grant.
+    let mut g = serde_json::to_value(fixture_unverified_grant()).unwrap();
+    g["request"]["unexpected"] = serde_json::json!("x");
+    assert!(serde_json::from_value::<UnverifiedAuthorityGrant>(g).is_err());
+}
+
+#[test]
+fn tagged_enums_still_parse_valid_and_reject_unknown_fields() {
+    let id = fixture_candidate_id();
+    let repo = fixture_repo_target(&id);
+    let repo_v = serde_json::to_value(&repo).unwrap();
+    let parsed: CandidateTarget = serde_json::from_value(repo_v.clone()).unwrap();
+    assert_eq!(parsed, repo);
+
+    let mut bad_repo = repo_v;
+    bad_repo["extra_field"] = serde_json::json!("bad");
+    assert!(
+        serde_json::from_value::<CandidateTarget>(bad_repo).is_err(),
+        "CandidateTarget must deny unknown fields on tagged variants"
+    );
+
+    let appliance = fixture_appliance_target();
+    let app_v = serde_json::to_value(&appliance).unwrap();
+    assert_eq!(
+        serde_json::from_value::<CandidateTarget>(app_v.clone()).unwrap(),
+        appliance
+    );
+    let mut bad_app = app_v;
+    bad_app["unexpected"] = serde_json::json!(1);
+    assert!(serde_json::from_value::<CandidateTarget>(bad_app).is_err());
+
+    let rule = TunableRule::IntegerRange { min: 1, max: 10 };
+    let rule_v = serde_json::to_value(&rule).unwrap();
+    assert_eq!(
+        serde_json::from_value::<TunableRule>(rule_v.clone()).unwrap(),
+        rule
+    );
+    let mut bad_rule = rule_v;
+    bad_rule["unexpected"] = serde_json::json!(true);
+    assert!(
+        serde_json::from_value::<TunableRule>(bad_rule).is_err(),
+        "TunableRule must deny unknown fields on tagged variants"
+    );
+
+    let float_rule = TunableRule::FloatRange { min: 0.0, max: 1.0 };
+    assert!(serde_json::from_value::<TunableRule>(serde_json::to_value(&float_rule).unwrap()).is_ok());
+    let enum_rule = TunableRule::EnumSet {
+        values: BTreeSet::from(["a".to_owned(), "b".to_owned()]),
+    };
+    assert!(serde_json::from_value::<TunableRule>(serde_json::to_value(&enum_rule).unwrap()).is_ok());
+    assert!(serde_json::from_value::<TunableRule>(serde_json::to_value(&TunableRule::Boolean).unwrap()).is_ok());
+}
+

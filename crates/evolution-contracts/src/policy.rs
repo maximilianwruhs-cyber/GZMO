@@ -78,6 +78,7 @@ pub struct ResourceBudget {
 }
 
 #[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
 struct RawResourceBudget {
     wall_seconds: u64,
     max_attempts: u8,
@@ -240,6 +241,7 @@ pub struct PathPolicy {
 }
 
 #[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
 struct RawPathPolicy {
     protected_paths: Vec<String>,
 }
@@ -461,7 +463,7 @@ pub enum TunableRule {
 }
 
 #[derive(Deserialize)]
-#[serde(rename_all = "snake_case", tag = "type")]
+#[serde(rename_all = "snake_case", tag = "type", deny_unknown_fields)]
 enum RawTunableRule {
     IntegerRange { min: i64, max: i64 },
     FloatRange { min: f64, max: f64 },
@@ -640,6 +642,7 @@ pub struct CapabilityEnvelope {
 }
 
 #[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
 struct RawCapabilityEnvelope {
     schema: String,
     envelope_id: String,

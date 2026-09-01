@@ -260,7 +260,7 @@ pub enum CandidateTarget {
 }
 
 #[derive(Deserialize)]
-#[serde(tag = "mode", rename_all = "snake_case")]
+#[serde(tag = "mode", rename_all = "snake_case", deny_unknown_fields)]
 enum RawCandidateTarget {
     Repository {
         owner: String,
@@ -393,6 +393,7 @@ pub struct CandidateManifest {
 }
 
 #[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
 struct RawCandidateManifest {
     schema: String,
     id: CandidateId,

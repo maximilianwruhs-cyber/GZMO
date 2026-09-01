@@ -53,8 +53,8 @@ pub struct GateResult {
     #[schemars(regex(pattern = r"^sha256:[a-f0-9]{64}$"))]
     pub artifact_digest: Option<String>,
 }
-
 #[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
 struct RawGateResult {
     name: String,
     class: GateClass,
@@ -132,11 +132,14 @@ pub struct EvaluationReport {
     pub gates: Vec<GateResult>,
     pub hard_floors_passed: bool,
     pub metrics: BTreeMap<String, f64>,
+    /// Map of artifact name → `sha256:<64 lowercase hex>` digest.
+    #[schemars(schema_with = "sha256_digest_map_schema")]
     pub artifact_digests: BTreeMap<String, String>,
     pub completed_at: DateTime<Utc>,
 }
 
 #[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
 struct RawEvaluationReport {
     schema: String,
     candidate_id: CandidateId,
@@ -351,6 +354,34 @@ fn validate_hex(field: &str, hex: &str, expected_len: usize) -> Result<(), Evalu
         )));
     }
     Ok(())
+}
+
+/// JSON Schema for `artifact_digests`: object whose values are sha256-qualified digests.
+fn sha256_digest_map_schema(
+    _gen: &mut schemars::gen::SchemaGenerator,
+) -> schemars::schema::Schema {
+    use schemars::schema::{
+        InstanceType, ObjectValidation, SchemaObject, StringValidation,
+    };
+    SchemaObject {
+        instance_type: Some(InstanceType::Object.into()),
+        object: Some(Box::new(ObjectValidation {
+            additional_properties: Some(Box::new(
+                SchemaObject {
+                    instance_type: Some(InstanceType::String.into()),
+                    string: Some(Box::new(StringValidation {
+                        pattern: Some(r"^sha256:[a-f0-9]{64}$".to_owned()),
+                        ..Default::default()
+                    })),
+                    ..Default::default()
+                }
+                .into(),
+            )),
+            ..Default::default()
+        })),
+        ..Default::default()
+    }
+    .into()
 }
 
 #[cfg(test)]

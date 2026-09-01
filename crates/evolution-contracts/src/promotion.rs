@@ -48,6 +48,7 @@ pub struct PromotionRequest {
 }
 
 #[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
 struct RawPromotionRequest {
     schema: String,
     candidate_id: CandidateId,
@@ -171,6 +172,7 @@ pub struct UnverifiedAuthorityGrant {
 }
 
 #[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
 struct RawUnverifiedAuthorityGrant {
     request: PromotionRequest,
     signer_key_id: String,

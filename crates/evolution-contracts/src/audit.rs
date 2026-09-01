@@ -49,6 +49,7 @@ pub struct AuditEvent {
 }
 
 #[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
 struct RawAuditEvent {
     schema: String,
     sequence: u64,

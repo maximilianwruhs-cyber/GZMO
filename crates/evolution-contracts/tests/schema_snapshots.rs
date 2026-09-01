@@ -375,6 +375,24 @@ fn evaluation_schema_constraints_and_runtime_extensions() {
     assert_min_items(&root, "gates", 1);
     let baseline = resolve_prop(&root, "baseline_digest");
     assert_string_pattern(&root, baseline, "sha256:");
+    let artifact_digests = resolve_prop(&root, "artifact_digests");
+    let map_values = artifact_digests
+        .get("additionalProperties")
+        .unwrap_or_else(|| panic!("artifact_digests.additionalProperties missing"));
+    assert_eq!(
+        map_values.get("type").and_then(|v| v.as_str()),
+        Some("string")
+    );
+    assert_string_pattern(&root, map_values, "sha256:");
+    let pattern = map_values
+        .get("pattern")
+        .and_then(|v| v.as_str())
+        .unwrap_or_default();
+    assert_eq!(
+        pattern.replace("\\.", "."),
+        r"^sha256:[a-f0-9]{64}$",
+        "artifact_digests values must be sha256-qualified digests"
+    );
     let dump = root.to_string();
     assert!(dump.contains("hard_floor") || dump.contains("pass") || dump.contains("fail"));
     assert_runtime_validation(&root, &["recomputed", "verdict"]);
