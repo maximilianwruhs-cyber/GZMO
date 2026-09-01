@@ -72,9 +72,9 @@
   "title": "AuditEvent",
   "type": "object",
   "x-gzmo-runtime-validation": [
-    "audit-hash-recomputation: event_hash must equal sha256 of canonical JSON preimage (all fields except event_hash); runtime validate recomputes this",
+    "audit-hash-recomputation: event_hash must equal sha256 of canonical JSON preimage (all fields except event_hash); runtime validate/recompute_event_hash recomputes this",
     "chain linkage (sequence+previous_hash) is verified by verify_chain, not by single-event schema",
-    "signature/digest boundary: schema validation alone never verifies an event hash or chain integrity; runtime remains authoritative"
+    "signature/digest boundary: schema validation alone never verifies an event hash or chain integrity; runtime validate/recompute_event_hash remains authoritative"
   ],
   "x-gzmo-schema-id": "gzmo.evolution.audit/v1"
 }

@@ -11,6 +11,11 @@ DOCS="$ROOT/docs"
 INDEX="$DOCS/ADR-INDEX.md"
 mkdir -p "$OUT"
 
+if ! command -v python3 >/dev/null 2>&1; then
+  echo "FAIL: python3 is required for scripts/adr-check.sh" >&2
+  exit 1
+fi
+
 export ROOT DOCS INDEX OUT
 python3 - <<'PY'
 from __future__ import annotations
@@ -46,7 +51,19 @@ ENTRY_DOCS = [
 LTL_RE = re.compile(r"little-tools-lab/docs/adr/000[12]-")
 ADR_FILE_RE = re.compile(r"^ADR-(\d{4})-.+\.md$")
 SUPERSEDED_BY_LINE_RE = re.compile(
-    r"^(?:- )?\*\*(?:Superseded by|Historical supersedes[^:]*):\*\*\s*(.*)$",
+    r"^(?:- )?\*\*Superseded by:\*\*\s*(.*)$",
+    re.MULTILINE,
+)
+HISTORICAL_SUPERSEDES_LINE_RE = re.compile(
+    r"^(?:- )?\*\*Historical supersedes[^:]*:\*\*\s*(.*)$",
+    re.MULTILINE,
+)
+SUPERSEDES_LINE_RE = re.compile(
+    r"^(?:- )?\*\*Supersedes:\*\*\s*(.*)$",
+    re.MULTILINE,
+)
+SPEC_LINE_RE = re.compile(
+    r"^(?:- )?\*\*Spec:\*\*\s*(.*)$",
     re.MULTILINE,
 )
 LINK_RE = re.compile(r"\[[^\]]*\]\(([^)]+)\)")
@@ -57,6 +74,10 @@ IMPL_STATUS_RE = re.compile(
     r"^(?:- )?\*\*Implementation status:\*\*\s*(.+)$", re.MULTILINE
 )
 META_BOLD_RE = re.compile(r"^(?:- )?(\*\*[^*]+:\*\*)")
+INDEX_ROW_RE = re.compile(
+    r"^\|\s*(\d{4})\s*\|\s*([^|]+)\|\s*([^|]+)\|\s*([^|]+)\|\s*([^|]+)\|\s*([^|]*)\|\s*$"
+)
+ADR_HREF_RE = re.compile(r"(?:^|/)ADR-(\d{4})-")
 
 checks: list[dict] = []
 errors: list[str] = []
@@ -66,6 +87,54 @@ def add(check_id: str, ok: bool, detail: str) -> None:
     checks.append({"id": check_id, "ok": ok, "detail": detail})
     if not ok:
         errors.append(f"{check_id}: {detail}")
+
+
+def resolve_repo_target(href: str, base: Path) -> Path | None:
+    href_path = href.split("#", 1)[0]
+    if not href_path:
+        return None
+    if href_path.startswith("http://") or href_path.startswith("https://"):
+        return None
+    if href_path.startswith("./"):
+        target = (base / href_path[2:]).resolve()
+    elif href_path.startswith("../") or (
+        not href_path.startswith("/") and "://" not in href_path
+    ):
+        target = (base / href_path).resolve()
+    else:
+        return None
+    try:
+        target.relative_to(root.resolve())
+    except ValueError:
+        return None
+    if "little-tools-lab" in str(target).replace("\\", "/"):
+        return None
+    return target
+
+
+def collect_relative_links(body: str, src: str, base: Path, sink: list[tuple[str, str, Path]]) -> None:
+    cleaned = body.strip()
+    if cleaned in {"—", "-", "—.", "n/a", "N/A"} or cleaned.startswith("—"):
+        return
+    for href in LINK_RE.findall(body):
+        target = resolve_repo_target(href, base)
+        if target is None:
+            continue
+        sink.append((src, href, target))
+
+
+def impl_token(raw: str) -> str:
+    impl = raw.strip()
+    for vocab in sorted(IMPL_VOCAB, key=len, reverse=True):
+        if (
+            impl == vocab
+            or impl.startswith(vocab + " ")
+            or impl.startswith(vocab + ";")
+            or impl.startswith(vocab + "—")
+            or impl.startswith(vocab + "-")
+        ):
+            return vocab
+    return impl
 
 
 # --- index present + provenance ---
@@ -128,15 +197,17 @@ for num in [f"{n:04d}" for n in range(3, 15)]:
     add(f"adr-{num}-present", present, str(adr_files[num].name) if present else f"missing ADR-{num}")
 
 # --- per-ADR status vocabulary + focus headings ---
-link_targets_needed: list[tuple[str, str]] = []
+link_targets_needed: list[tuple[str, str, Path]] = []
+file_meta: dict[str, dict[str, object]] = {}
 
 for num, path in sorted(adr_files.items()):
     text = path.read_text(encoding="utf-8")
     dm = DECISION_STATUS_RE.search(text)
     im = IMPL_STATUS_RE.search(text)
+    decision = None
+    impl = None
     if not dm:
         add(f"adr-{num}-decision-status", False, "missing Decision status line")
-        decision = None
     else:
         decision = dm.group(1)
         ok = decision in DECISION_VOCAB
@@ -148,19 +219,20 @@ for num, path in sorted(adr_files.items()):
     if not im:
         add(f"adr-{num}-implementation-status", False, "missing Implementation status line")
     else:
-        impl = im.group(1).strip()
-        # Allow trailing notes after vocabulary token
-        impl_token = impl
-        for vocab in sorted(IMPL_VOCAB, key=len, reverse=True):
-            if impl == vocab or impl.startswith(vocab + " ") or impl.startswith(vocab + ";") or impl.startswith(vocab + "—") or impl.startswith(vocab + "-"):
-                impl_token = vocab
-                break
-        ok = impl_token in IMPL_VOCAB
+        impl = impl_token(im.group(1))
+        ok = impl in IMPL_VOCAB
         add(
             f"adr-{num}-implementation-status",
             ok,
-            impl_token if ok else f"invalid implementation status {impl!r}",
+            impl if ok else f"invalid implementation status {im.group(1)!r}",
         )
+
+    file_meta[num] = {
+        "decision": decision,
+        "implementation": impl,
+        "superseded_by_targets": set(),
+        "path": path,
+    }
 
     if num in FOCUS_NUMS:
         if decision != "Accepted":
@@ -205,51 +277,116 @@ for num, path in sorted(adr_files.items()):
 
     for sm in SUPERSEDED_BY_LINE_RE.finditer(text):
         body = sm.group(1).strip()
-        if body in {"—", "-", "—.", "n/a", "N/A"} or body.startswith("—"):
-            continue
+        collect_relative_links(body, f"{num}:Superseded-by", docs, link_targets_needed)
         for href in LINK_RE.findall(body):
-            if href.startswith("http://") or href.startswith("https://"):
-                continue
-            # strip anchors
-            href_path = href.split("#", 1)[0]
-            if not href_path:
-                continue
-            link_targets_needed.append((num, href_path))
+            m = ADR_HREF_RE.search(href)
+            if m:
+                file_meta[num]["superseded_by_targets"].add(m.group(1))  # type: ignore[index]
 
-# Index table Superseded by links
-for href in LINK_RE.findall(index_text):
-    if "ADR-00" in href or "ADR-001" in href:
-        href_path = href.split("#", 1)[0]
-        if href_path:
-            link_targets_needed.append(("INDEX", href_path))
+    for sm in HISTORICAL_SUPERSEDES_LINE_RE.finditer(text):
+        collect_relative_links(
+            sm.group(1), f"{num}:Historical-supersedes", docs, link_targets_needed
+        )
 
-# --- superseded-by target existence ---
+    for sm in SUPERSEDES_LINE_RE.finditer(text):
+        collect_relative_links(sm.group(1), f"{num}:Supersedes", docs, link_targets_needed)
+
+    for sm in SPEC_LINE_RE.finditer(text):
+        collect_relative_links(sm.group(1), f"{num}:Spec", docs, link_targets_needed)
+
+# Index table rows: decision/implementation/superseded-by consistency
+index_rows: dict[str, dict[str, str]] = {}
+for line in index_text.splitlines():
+    m = INDEX_ROW_RE.match(line.strip())
+    if not m:
+        continue
+    num, _title, decision_cell, impl_cell, superseded_cell, _notes = m.groups()
+    decision_cell = decision_cell.strip()
+    impl_cell = impl_cell.strip()
+    superseded_cell = superseded_cell.strip()
+    index_rows[num] = {
+        "decision": decision_cell,
+        "implementation": impl_cell,
+        "superseded": superseded_cell,
+    }
+    for href in LINK_RE.findall(superseded_cell):
+        target = resolve_repo_target(href, docs)
+        if target is not None:
+            link_targets_needed.append((f"INDEX:{num}", href, target))
+
+add(
+    "index-table-rows",
+    set(index_rows) >= set(f"{n:04d}" for n in range(3, 15)),
+    "index table covers ADR-0003..0014"
+    if set(index_rows) >= set(f"{n:04d}" for n in range(3, 15))
+    else f"index table missing rows for {sorted(set(f'{n:04d}' for n in range(3, 15)) - set(index_rows))}",
+)
+
+status_drift: list[str] = []
+supersede_drift: list[str] = []
+for num, row in sorted(index_rows.items()):
+    meta = file_meta.get(num)
+    if meta is None:
+        status_drift.append(f"{num}: index row without ADR file")
+        continue
+    file_decision = meta.get("decision")
+    file_impl = meta.get("implementation")
+    if file_decision != row["decision"]:
+        status_drift.append(
+            f"{num}: decision index={row['decision']!r} file={file_decision!r}"
+        )
+    if file_impl != impl_token(row["implementation"]):
+        status_drift.append(
+            f"{num}: implementation index={row['implementation']!r} file={file_impl!r}"
+        )
+
+    index_targets = {
+        m.group(1)
+        for href in LINK_RE.findall(row["superseded"])
+        if (m := ADR_HREF_RE.search(href))
+    }
+    file_targets = set(meta.get("superseded_by_targets") or set())  # type: ignore[arg-type]
+    # Index may list successors while historical files omit a Superseded-by line.
+    # Require: every index target exists as a file, and if the file declares
+    # Superseded-by targets they must match the index set.
+    if file_targets and file_targets != index_targets:
+        supersede_drift.append(
+            f"{num}: superseded-by index={sorted(index_targets)} file={sorted(file_targets)}"
+        )
+    if row["decision"] == "Superseded" and not index_targets and row["superseded"] not in {"—", "-", "—."}:
+        # 0008 is allowed to be Superseded without a concrete successor link.
+        if num != "0008":
+            supersede_drift.append(f"{num}: Superseded without successor link in index")
+    if row["decision"] != "Superseded" and index_targets:
+        supersede_drift.append(
+            f"{num}: non-Superseded decision has superseded-by targets {sorted(index_targets)}"
+        )
+
+add(
+    "index-status-consistency",
+    len(status_drift) == 0,
+    "index decision/implementation match ADR files"
+    if not status_drift
+    else f"status drift: {status_drift}",
+)
+add(
+    "index-superseded-consistency",
+    len(supersede_drift) == 0,
+    "index superseded-by targets consistent with ADR files"
+    if not supersede_drift
+    else f"supersede drift: {supersede_drift}",
+)
+
+# --- relative forward/lineage target existence ---
 unresolved = []
-for src, href in link_targets_needed:
-    # resolve relative to docs/
-    if href.startswith("./"):
-        target = (docs / href[2:]).resolve()
-    elif href.startswith("../"):
-        target = (docs / href).resolve()
-    elif not href.startswith("/") and "://" not in href:
-        target = (docs / href).resolve()
-    else:
-        continue
-    # only enforce in-repo markdown targets under docs or root-relative ADR paths
-    try:
-        target.relative_to(root.resolve())
-    except ValueError:
-        # outside repo (e.g. little-tools-lab) — provenance only; skip existence
-        continue
-    if "little-tools-lab" in str(target).replace("\\", "/"):
-        continue
+for src, href, target in link_targets_needed:
     if not target.is_file():
         unresolved.append(f"{src}→{href}")
 
 add(
-    "superseded-by-targets",
+    "lineage-link-targets",
     len(unresolved) == 0,
-    "all Superseded by targets exist"
+    "all Supersedes/Superseded-by/Spec/index targets exist"
     if not unresolved
     else f"missing targets: {unresolved}",
 )
@@ -273,8 +410,9 @@ if "0006" in adr_files:
         else "ADR-0006 must remain Accepted/Implemented",
     )
 
-# --- entry docs must not depend on inaccessible LTL ADR-0001/0002 ---
+# --- entry docs: no inaccessible LTL ADR-0001/0002; require ADR-INDEX + ADR-0011 pointers ---
 ltl_hits = []
+missing_authority_pointer = []
 for p in ENTRY_DOCS:
     if not p.is_file():
         add(f"entry-{p.name}", False, f"missing entry doc {p}")
@@ -283,6 +421,10 @@ for p in ENTRY_DOCS:
     if LTL_RE.search(text):
         ltl_hits.append(str(p.relative_to(root)))
     add(f"entry-{p.name}-present", True, str(p.relative_to(root)))
+    has_index = "ADR-INDEX.md" in text
+    has_0011 = "ADR-0011" in text
+    if not (has_index and has_0011):
+        missing_authority_pointer.append(str(p.relative_to(root)))
 
 add(
     "no-ltl-authority-in-entry-docs",
@@ -290,6 +432,13 @@ add(
     "entry docs free of inaccessible LTL ADR-0001/0002 paths"
     if not ltl_hits
     else f"LTL ADR authority refs in: {ltl_hits}",
+)
+add(
+    "entry-docs-authority-pointer",
+    len(missing_authority_pointer) == 0,
+    "entry docs point at ADR-INDEX.md and ADR-0011"
+    if not missing_authority_pointer
+    else f"missing ADR-INDEX/ADR-0011 pointer in: {missing_authority_pointer}",
 )
 
 ok = all(c["ok"] for c in checks)

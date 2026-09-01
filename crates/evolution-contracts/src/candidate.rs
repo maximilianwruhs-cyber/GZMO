@@ -468,11 +468,18 @@ fn validate_safe_mission_id(value: &str) -> Result<(), ContractError> {
 
 
 /// Owner/repository names: no path separators; cannot repoint the target.
+///
+/// Allows the exact GitHub special name `.github` (community health files) while
+/// still rejecting leading `-`, slash repointing, `..`, trailing dots, and unsafe
+/// ref characters for every other value.
 fn validate_safe_owner_or_repository(field: &str, value: &str) -> Result<(), ContractError> {
     if value.contains('/') {
         return Err(ContractError::InvalidTarget(format!(
             "{field} must not contain '/'"
         )));
+    }
+    if value == ".github" {
+        return Ok(());
     }
     validate_safe_git_ref_component(field, value)
 }

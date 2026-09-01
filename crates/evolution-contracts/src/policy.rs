@@ -188,6 +188,8 @@ impl ResourceBudget {
 
 /// Observed resource consumption to compare against a signed budget.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields)]
+#[schemars(deny_unknown_fields, title = "ResourceUsage")]
 pub struct ResourceUsage {
     pub wall_seconds: u64,
     pub attempts: u8,
@@ -448,6 +450,81 @@ fn path_matches_protected(path: &str, pattern: &str) -> bool {
             || path.as_bytes().get(pattern.len()) == Some(&b'-'))
 }
 
+/// JSON Schema for tunables map: nonempty keys with dotted-identifier pattern.
+fn tunables_map_schema(
+    gen: &mut schemars::gen::SchemaGenerator,
+) -> schemars::schema::Schema {
+    use schemars::schema::{
+        InstanceType, ObjectValidation, SchemaObject, StringValidation,
+    };
+    let value_schema = gen.subschema_for::<TunableRule>();
+    SchemaObject {
+        instance_type: Some(InstanceType::Object.into()),
+        object: Some(Box::new(ObjectValidation {
+            additional_properties: Some(Box::new(value_schema)),
+            property_names: Some(Box::new(
+                SchemaObject {
+                    instance_type: Some(InstanceType::String.into()),
+                    string: Some(Box::new(StringValidation {
+                        min_length: Some(1),
+                        pattern: Some(r"^[A-Za-z0-9][A-Za-z0-9._-]*$".to_owned()),
+                        ..Default::default()
+                    })),
+                    ..Default::default()
+                }
+                .into(),
+            )),
+            ..Default::default()
+        })),
+        ..Default::default()
+    }
+    .into()
+}
+
+fn nonempty_unique_string_array_schema(
+    _gen: &mut schemars::gen::SchemaGenerator,
+) -> schemars::schema::Schema {
+    use schemars::schema::{ArrayValidation, InstanceType, SchemaObject, StringValidation};
+    let item: schemars::schema::Schema = SchemaObject {
+        instance_type: Some(InstanceType::String.into()),
+        string: Some(Box::new(StringValidation {
+            min_length: Some(1),
+            ..Default::default()
+        })),
+        ..Default::default()
+    }
+    .into();
+    SchemaObject {
+        instance_type: Some(InstanceType::Array.into()),
+        array: Some(Box::new(ArrayValidation {
+            items: Some(item.into()),
+            min_items: Some(1),
+            unique_items: Some(true),
+            ..Default::default()
+        })),
+        ..Default::default()
+    }
+    .into()
+}
+
+fn nonempty_unique_candidate_kinds_schema(
+    gen: &mut schemars::gen::SchemaGenerator,
+) -> schemars::schema::Schema {
+    use schemars::schema::{ArrayValidation, InstanceType, SchemaObject};
+    let item = gen.subschema_for::<CandidateKind>();
+    SchemaObject {
+        instance_type: Some(InstanceType::Array.into()),
+        array: Some(Box::new(ArrayValidation {
+            items: Some(item.into()),
+            min_items: Some(1),
+            unique_items: Some(true),
+            ..Default::default()
+        })),
+        ..Default::default()
+    }
+    .into()
+}
+
 /// Typed bounds for an operator-signed tunable key.
 #[derive(Debug, Clone, PartialEq, Serialize, JsonSchema)]
 #[serde(rename_all = "snake_case", tag = "type")]
@@ -595,7 +672,8 @@ impl TunableRule {
 
 /// Operator-facing allow/deny decision with an explicit denial reason.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "snake_case")]
+#[serde(rename_all = "snake_case", deny_unknown_fields)]
+#[schemars(deny_unknown_fields, title = "PolicyDecision")]
 pub enum PolicyDecision {
     Allowed,
     Denied { reason: String },
@@ -634,10 +712,12 @@ pub struct CapabilityEnvelope {
     pub expires_at: DateTime<Utc>,
     pub budget: ResourceBudget,
     pub paths: PathPolicy,
+    /// Tunable allowlist keyed by dotted identifiers (runtime validates keys).
+    #[schemars(schema_with = "tunables_map_schema")]
     pub tunables: BTreeMap<String, TunableRule>,
-    #[schemars(length(min = 1))]
+    #[schemars(length(min = 1), schema_with = "nonempty_unique_candidate_kinds_schema")]
     pub allowed_candidate_kinds: BTreeSet<CandidateKind>,
-    #[schemars(length(min = 1))]
+    #[schemars(length(min = 1), schema_with = "nonempty_unique_string_array_schema")]
     pub required_gates: Vec<String>,
 }
 
@@ -741,16 +821,48 @@ impl CapabilityEnvelope {
         Ok(())
     }
 
-    /// Authorize a float tunable assignment by key.
-    pub fn authorize_tunable(&self, key: &str, value: f64) -> Result<(), PolicyError> {
+    /// Reject requests outside the signed validity window.
+    ///
+    /// Accepts `issued_at <= now < expires_at`. Callers must supply wall-clock
+    /// time; authorization entry points never omit it.
+    pub fn validate_at(&self, now: DateTime<Utc>) -> Result<(), PolicyError> {
+        self.validate()?;
+        if now < self.issued_at {
+            return Err(PolicyError::Denied(format!(
+                "envelope not yet valid until {} (now={now})",
+                self.issued_at
+            )));
+        }
+        if now >= self.expires_at {
+            return Err(PolicyError::Denied(format!(
+                "envelope expired at {} (now={now})",
+                self.expires_at
+            )));
+        }
+        Ok(())
+    }
+
+    /// Authorize a float tunable assignment by key within the validity window.
+    pub fn authorize_tunable(
+        &self,
+        key: &str,
+        value: f64,
+        now: DateTime<Utc>,
+    ) -> Result<(), PolicyError> {
+        self.validate_at(now)?;
         let rule = self.tunables.get(key).ok_or_else(|| {
             PolicyError::Denied(format!("tunable key {key:?} is not in envelope"))
         })?;
         rule.authorize_f64(value)
     }
 
-    /// Authorize a candidate kind against the signed allowlist.
-    pub fn authorize_candidate_kind(&self, kind: CandidateKind) -> Result<(), PolicyError> {
+    /// Authorize a candidate kind against the signed allowlist within the window.
+    pub fn authorize_candidate_kind(
+        &self,
+        kind: CandidateKind,
+        now: DateTime<Utc>,
+    ) -> Result<(), PolicyError> {
+        self.validate_at(now)?;
         if self.allowed_candidate_kinds.contains(&kind) {
             Ok(())
         } else {
@@ -856,6 +968,41 @@ mod tests {
     fn issued_before_expiry() {
         let issued = Utc.with_ymd_and_hms(2026, 9, 1, 0, 0, 0).unwrap();
         let expires = Utc.with_ymd_and_hms(2026, 9, 2, 0, 0, 0).unwrap();
-        assert!(issued < expires);
+        let envelope = CapabilityEnvelope {
+            schema: ENVELOPE_SCHEMA.to_owned(),
+            envelope_id: "env-unit".to_owned(),
+            policy_version: "v1".to_owned(),
+            signer_key_id: "key-1".to_owned(),
+            issued_at: issued,
+            expires_at: expires,
+            budget: valid_budget(),
+            paths: PathPolicy::stage1_default(),
+            tunables: BTreeMap::new(),
+            allowed_candidate_kinds: BTreeSet::from([CandidateKind::Memory]),
+            required_gates: vec!["tests".to_owned()],
+        };
+        assert!(envelope.validate().is_ok());
+
+        let mut inverted = envelope.clone();
+        inverted.issued_at = expires;
+        inverted.expires_at = issued;
+        assert!(inverted.validate().is_err());
+
+        let mut equal = envelope.clone();
+        equal.expires_at = equal.issued_at;
+        assert!(equal.validate().is_err());
+
+        // Validity window: issued_at inclusive, expires_at exclusive.
+        assert!(envelope.validate_at(issued).is_ok());
+        assert!(envelope
+            .validate_at(issued + chrono::Duration::hours(12))
+            .is_ok());
+        assert!(envelope
+            .validate_at(issued - chrono::Duration::seconds(1))
+            .is_err());
+        assert!(envelope.validate_at(expires).is_err());
+        assert!(envelope
+            .validate_at(expires + chrono::Duration::seconds(1))
+            .is_err());
     }
 }

@@ -1,7 +1,9 @@
 # Spine focus — airgap living USP
 
-**Status:** Active (2026-08-16) — **one product: living Keep** ([ADR-0007](ADR-0007-one-product-living.md))  
-**Doctrine:** [ADR-0007](ADR-0007-one-product-living.md) (one SKU) · [ADR-0005](ADR-0005-flywheel-over-frozen-topology.md) (flywheel) · [ADR-0004](ADR-0004-airgap-living-usp.md) (airgap USP) · [ADR-0003](ADR-0003-one-instance-metabolism.md) (one writer)  
+**Architecture authority:** [ADR-INDEX.md](ADR-INDEX.md) · constitution [ADR-0011-self-developing-living-database.md](ADR-0011-self-developing-living-database.md).
+
+**Status:** Active (2026-08-16) — **one product: living Keep** (current constitution [ADR-0011](ADR-0011-self-developing-living-database.md); historical [ADR-0007](ADR-0007-one-product-living.md))  
+**Doctrine:** [ADR-0011](ADR-0011-self-developing-living-database.md) (constitution) · historical lineage [ADR-0007](ADR-0007-one-product-living.md) (one SKU) · [ADR-0005](ADR-0005-flywheel-over-frozen-topology.md) (flywheel) · [ADR-0004](ADR-0004-airgap-living-usp.md) (airgap USP) · [ADR-0003](ADR-0003-one-instance-metabolism.md) (one writer)  
 **Supersedes:** lite-as-bootstrap brand; co-primary “A + C”  
 **Unpark roadmap:** [UNPARK_ROADMAP.md](UNPARK_ROADMAP.md)  
 **Audience:** Operator deciding what to strengthen next  

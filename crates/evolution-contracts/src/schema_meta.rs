@@ -70,7 +70,13 @@ pub fn write_schema_value(path: &Path, root: RootSchema) -> Result<(), Box<dyn s
         fs::create_dir_all(parent)?;
     }
     let temp = path.with_extension("json.tmp");
-    fs::write(&temp, text)?;
-    fs::rename(&temp, path)?;
-    Ok(())
+    let write_result = (|| -> Result<(), Box<dyn std::error::Error>> {
+        fs::write(&temp, &text)?;
+        fs::rename(&temp, path)?;
+        Ok(())
+    })();
+    if write_result.is_err() {
+        let _ = fs::remove_file(&temp);
+    }
+    write_result
 }

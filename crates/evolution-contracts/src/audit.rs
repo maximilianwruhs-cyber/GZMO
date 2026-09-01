@@ -92,16 +92,30 @@ impl<'de> Deserialize<'de> for AuditEvent {
 }
 
 impl AuditEvent {
-    /// Append the next event, or start a chain when `previous` is `None`.
+    /// Append the next event using wall-clock time, or start a chain when
+    /// `previous` is `None`.
     ///
-    /// Genesis uses sequence `1` and [`GENESIS_HASH`]. A prior event is validated
-    /// first; sequence uses checked arithmetic. Payload and event hashes are
-    /// derived from canonical JSON only (never delimiter-free concatenation).
+    /// Genesis uses sequence `1` and [`GENESIS_HASH`]. Prefer [`Self::next_at`]
+    /// when the caller needs a stable timestamp for deterministic replay.
     pub fn next(
         previous: Option<&AuditEvent>,
         event_type: impl AsRef<str>,
         candidate_id: Option<CandidateId>,
         payload: &impl Serialize,
+    ) -> Result<Self, AuditError> {
+        Self::next_at(previous, event_type, candidate_id, payload, Utc::now())
+    }
+
+    /// Append the next event with an explicit `occurred_at` timestamp.
+    ///
+    /// Payload and event hashes are derived from canonical JSON only (never
+    /// delimiter-free concatenation). Sequence uses checked arithmetic.
+    pub fn next_at(
+        previous: Option<&AuditEvent>,
+        event_type: impl AsRef<str>,
+        candidate_id: Option<CandidateId>,
+        payload: &impl Serialize,
+        occurred_at: DateTime<Utc>,
     ) -> Result<Self, AuditError> {
         let event_type = event_type.as_ref();
         validate_event_type(event_type)?;
@@ -125,10 +139,10 @@ impl AuditEvent {
             event_type: event_type.to_owned(),
             candidate_id,
             payload_digest,
-            occurred_at: Utc::now(),
+            occurred_at,
             event_hash: String::new(),
         };
-        event.event_hash = event.compute_event_hash()?;
+        event.event_hash = event.recompute_event_hash()?;
         Ok(event)
     }
 
@@ -149,13 +163,19 @@ impl AuditEvent {
         validate_hash_hex("payload_digest", &self.payload_digest)?;
         validate_hash_hex("event_hash", &self.event_hash)?;
 
-        let expected = self.compute_event_hash()?;
+        let expected = self.recompute_event_hash()?;
         if self.event_hash != expected {
             return Err(AuditError::InvalidEvent(
                 "event_hash does not match recomputed preimage digest".to_owned(),
             ));
         }
         Ok(())
+    }
+
+    /// Recompute `event_hash` from the canonical preimage (all fields except
+    /// `event_hash`). Public so tests and replay tooling share one path.
+    pub fn recompute_event_hash(&self) -> Result<String, AuditError> {
+        Ok(sha256_hex(&canonical_json_bytes(&self.preimage())?))
     }
 
     fn preimage(&self) -> AuditPreimage<'_> {
@@ -168,10 +188,6 @@ impl AuditEvent {
             payload_digest: &self.payload_digest,
             occurred_at: self.occurred_at,
         }
-    }
-
-    fn compute_event_hash(&self) -> Result<String, AuditError> {
-        Ok(sha256_hex(&canonical_json_bytes(&self.preimage())?))
     }
 }
 
@@ -224,7 +240,13 @@ pub fn verify_chain(events: &[AuditEvent]) -> Result<(), AuditError> {
 
 /// Recursively sort object keys, preserve array order, compact UTF-8 JSON bytes.
 ///
-/// Rejects non-finite numbers and values that cannot serialize as JSON.
+/// This is **not** RFC 8785 / JSON Canonicalization Scheme (JCS). It sorts object
+/// keys lexicographically by UTF-8 code unit order as produced by `serde_json`,
+/// preserves array order, and emits compact UTF-8 without a trailing newline.
+/// Byte-order / Unicode normalization beyond that is intentionally out of scope.
+///
+/// Rejects non-finite floating-point leaves before serialization. Integers that
+/// serde_json cannot represent as JSON numbers still fail at encode time.
 pub fn canonical_json_bytes<T: Serialize>(value: &T) -> Result<Vec<u8>, AuditError> {
     // serde_json maps NaN/±Inf to JSON null; reject them explicitly first.
     reject_nonfinite(value)?;
@@ -236,8 +258,10 @@ pub fn canonical_json_bytes<T: Serialize>(value: &T) -> Result<Vec<u8>, AuditErr
         .map_err(|err| AuditError::CanonicalJson(format!("compact encode failed: {err}")))
 }
 
-
-/// SHA-256 digest as exactly 64 lowercase hex characters.
+/// SHA-256 digest as exactly 64 lowercase hex characters (no `sha256:` prefix).
+///
+/// Other evolution wire digests use algorithm-qualified forms such as
+/// `sha256:<hex>`. Audit chain hashes stay bare hex for historical chain layout.
 pub fn sha256_hex(bytes: &[u8]) -> String {
     let digest = Sha256::digest(bytes);
     let mut out = String::with_capacity(64);
@@ -267,13 +291,8 @@ fn canonicalize_value(value: Value) -> Result<Value, AuditError> {
             Ok(Value::Array(out))
         }
         Value::Number(number) => {
-            if let Some(float) = number.as_f64() {
-                if !float.is_finite() {
-                    return Err(AuditError::CanonicalJson(
-                        "non-finite JSON number rejected".to_owned(),
-                    ));
-                }
-            }
+            // serde_json::Number never stores non-finite floats; finiteness was
+            // already enforced by reject_nonfinite before to_value.
             Ok(Value::Number(number))
         }
         other => Ok(other),
@@ -620,7 +639,29 @@ mod tests {
         assert!(canonical_json_bytes(&(u64::MAX as u128 + 1)).is_err());
     }
 
-
+    #[test]
+    fn next_at_is_deterministic_for_fixed_timestamp() {
+        let at = Utc.with_ymd_and_hms(2026, 9, 1, 12, 0, 0).unwrap();
+        let first = AuditEvent::next_at(
+            None,
+            "candidate.observed",
+            None,
+            &serde_json::json!({"a": 1}),
+            at,
+        )
+        .unwrap();
+        let again = AuditEvent::next_at(
+            None,
+            "candidate.observed",
+            None,
+            &serde_json::json!({"a": 1}),
+            at,
+        )
+        .unwrap();
+        assert_eq!(first, again);
+        assert_eq!(first.occurred_at, at);
+        assert_eq!(first.recompute_event_hash().unwrap(), first.event_hash);
+    }
 
     #[test]
     fn preimage_excludes_event_hash_field_name() {

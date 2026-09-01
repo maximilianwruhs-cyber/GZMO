@@ -48,6 +48,8 @@ pub struct GateResult {
     pub name: String,
     pub class: GateClass,
     pub status: GateStatus,
+    /// Human-readable detail. Schema `maxLength` is character-oriented; runtime
+    /// enforces [`MAX_GATE_DETAIL_BYTES`] UTF-8 bytes.
     #[schemars(length(max = 4096))]
     pub detail: String,
     #[schemars(regex(pattern = r"^sha256:[a-f0-9]{64}$"))]
@@ -190,6 +192,56 @@ impl EvaluationReport {
         saw_hard_floor
     }
 
+    /// Ensure every required gate name is present exactly once as a hard-floor Pass.
+    ///
+    /// Rejects an empty required list, duplicate required names, and unsafe names.
+    /// Metric-class gates never satisfy a required hard floor even when they Pass.
+    pub fn covers_required_gates(&self, required: &[String]) -> Result<(), EvaluationError> {
+        if required.is_empty() {
+            return Err(EvaluationError::InvalidReport(
+                "required gates list must be nonempty".to_owned(),
+            ));
+        }
+
+        let mut seen_required = BTreeSet::new();
+        for name in required {
+            validate_safe_gate_name(name)?;
+            if !seen_required.insert(name.as_str()) {
+                return Err(EvaluationError::InvalidReport(format!(
+                    "required gates list contains duplicate name {name:?}"
+                )));
+            }
+        }
+
+        for name in required {
+            let matches: Vec<&GateResult> = self.gates.iter().filter(|g| g.name == *name).collect();
+            if matches.is_empty() {
+                return Err(EvaluationError::InvalidReport(format!(
+                    "required gate {name:?} is missing from evaluation report"
+                )));
+            }
+            if matches.len() != 1 {
+                return Err(EvaluationError::InvalidReport(format!(
+                    "required gate {name:?} must appear exactly once, found {}",
+                    matches.len()
+                )));
+            }
+            let gate = matches[0];
+            if gate.class != GateClass::HardFloor {
+                return Err(EvaluationError::InvalidReport(format!(
+                    "required gate {name:?} must be hard_floor, found {:?}",
+                    gate.class
+                )));
+            }
+            if gate.status != GateStatus::Pass {
+                return Err(EvaluationError::InvalidReport(format!(
+                    "required gate {name:?} must Pass, found {:?}",
+                    gate.status
+                )));
+            }
+        }
+        Ok(())
+    }
 
     /// Structural validation for an external evaluation report payload.
     pub fn validate(&self) -> Result<(), EvaluationError> {
@@ -200,6 +252,21 @@ impl EvaluationReport {
         }
         validate_algorithm_qualified_digest("baseline_digest", &self.baseline_digest)?;
         validate_algorithm_qualified_digest("candidate_digest", &self.candidate_digest)?;
+        let baseline_alg = digest_algorithm_prefix(&self.baseline_digest).ok_or_else(|| {
+            EvaluationError::InvalidReport(
+                "baseline_digest missing algorithm prefix after structural check".to_owned(),
+            )
+        })?;
+        let candidate_alg = digest_algorithm_prefix(&self.candidate_digest).ok_or_else(|| {
+            EvaluationError::InvalidReport(
+                "candidate_digest missing algorithm prefix after structural check".to_owned(),
+            )
+        })?;
+        if baseline_alg != candidate_alg {
+            return Err(EvaluationError::InvalidReport(format!(
+                "baseline_digest and candidate_digest algorithms must match, got {baseline_alg} vs {candidate_alg}"
+            )));
+        }
 
         if self.gates.is_empty() {
             return Err(EvaluationError::InvalidReport(
@@ -272,17 +339,33 @@ fn validate_safe_artifact_name(name: &str) -> Result<(), EvaluationError> {
             "artifact_digests key must not have edge whitespace: {name:?}"
         )));
     }
-    if name.contains("..") || name.contains('\\') || name.starts_with('/') {
+    if name.contains("..")
+        || name.contains('\\')
+        || name.starts_with('/')
+        || name.contains(':')
+        || artifact_key_has_windows_drive(name)
+    {
         return Err(EvaluationError::InvalidReport(format!(
             "artifact_digests key is unsafe: {name:?}"
         )));
     }
-    if name.chars().any(|c| c.is_control() || (c.is_whitespace() && c != ' ')) {
+    if name
+        .chars()
+        .any(|c| c.is_control() || (c.is_whitespace() && c != ' '))
+    {
         return Err(EvaluationError::InvalidReport(format!(
             "artifact_digests key contains control characters: {name:?}"
         )));
     }
     Ok(())
+}
+
+fn artifact_key_has_windows_drive(name: &str) -> bool {
+    let mut chars = name.chars();
+    match (chars.next(), chars.next()) {
+        (Some(letter), Some(':')) if letter.is_ascii_alphabetic() => true,
+        _ => false,
+    }
 }
 
 fn validate_safe_dotted_identifier(field: &str, value: &str) -> Result<(), String> {
@@ -315,6 +398,10 @@ fn validate_safe_dotted_identifier(field: &str, value: &str) -> Result<(), Strin
         ));
     }
     Ok(())
+}
+
+fn digest_algorithm_prefix(digest: &str) -> Option<&str> {
+    digest.split_once(':').map(|(alg, _)| alg)
 }
 
 fn validate_algorithm_qualified_digest(field: &str, digest: &str) -> Result<(), EvaluationError> {
@@ -419,6 +506,71 @@ mod tests {
         };
         assert!(!report.hard_floors_pass());
         assert!(report.validate().is_ok());
+    }
+
+    #[test]
+    fn covers_required_gates_enforces_hard_floor_pass() {
+        let report = EvaluationReport {
+            schema: EVALUATION_SCHEMA.to_owned(),
+            candidate_id: sample_id(),
+            baseline_digest: sha(1),
+            candidate_digest: sha(2),
+            gates: vec![
+                GateResult::pass("tests"),
+                GateResult {
+                    name: "latency".to_owned(),
+                    class: GateClass::Metric,
+                    status: GateStatus::Pass,
+                    detail: String::new(),
+                    artifact_digest: None,
+                },
+                GateResult::fail("faithfulness", "low"),
+            ],
+            hard_floors_passed: false,
+            metrics: BTreeMap::new(),
+            artifact_digests: BTreeMap::new(),
+            completed_at: Utc.with_ymd_and_hms(2026, 9, 1, 0, 0, 0).unwrap(),
+        };
+        assert!(report.validate().is_ok());
+
+        assert!(report
+            .covers_required_gates(&[String::new()])
+            .is_err());
+        assert!(report.covers_required_gates(&[]).is_err());
+        assert!(report
+            .covers_required_gates(&["tests".into(), "tests".into()])
+            .is_err());
+        assert!(report
+            .covers_required_gates(&["missing".into()])
+            .is_err());
+        assert!(report
+            .covers_required_gates(&["latency".into()])
+            .is_err());
+        assert!(report
+            .covers_required_gates(&["faithfulness".into()])
+            .is_err());
+        assert!(report
+            .covers_required_gates(&["tests".into()])
+            .is_ok());
+
+        let mut unavailable = report.clone();
+        unavailable.gates[0].status = GateStatus::Unavailable;
+        unavailable.hard_floors_passed = unavailable.hard_floors_pass();
+        assert!(unavailable
+            .covers_required_gates(&["tests".into()])
+            .is_err());
+
+        let complete = EvaluationReport {
+            gates: vec![
+                GateResult::pass("tests"),
+                GateResult::pass("faithfulness"),
+            ],
+            hard_floors_passed: true,
+            ..report
+        };
+        assert!(complete
+            .covers_required_gates(&["tests".into(), "faithfulness".into()])
+            .is_ok());
     }
 
     #[test]

@@ -29,9 +29,9 @@ Observe → Hypothesize → Build → Evaluate → Archive
 |---|---|---|
 | **M — Memory** | Verified facts, evidence, supersession, consolidation, derived indexes, outcome learning | Autonomous within fixed memory floors |
 | **T — Tunables** | Signed allowlisted numeric/enum parameters | Autonomous only inside the envelope after shadow evaluation and all hard floors |
-| **C — Candidates** | Code, schemas, models, runtimes, security/evaluator changes | Generate/build/evaluate only; no production authority |
+| **C — Candidates** | Code, schemas, models, and runtime artifacts proposed for build/evaluate | Generate/build/evaluate only; no production authority |
 | **P — Promotion** | Bind approved artifact to inactive production target | Operator signature over artifact, evaluation, policy, target, and expiry |
-| **A — Authority** | Roots, floors, evaluators, envelopes, allowed capabilities | Operator-only, out of agent write set |
+| **A — Authority** | Trust roots, floors, envelopes, allowed capabilities, evaluator binaries/fixtures/scoring policy, and security/authority control-plane artifacts | Operator-only, out of agent write set |
 
 ### Trusted evolution controls
 

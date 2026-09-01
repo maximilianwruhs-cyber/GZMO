@@ -32,6 +32,7 @@
           "$ref": "#/definitions/GateClass"
         },
         "detail": {
+          "description": "Human-readable detail. Schema `maxLength` is character-oriented; runtime enforces [`MAX_GATE_DETAIL_BYTES`] UTF-8 bytes.",
           "maxLength": 4096,
           "type": "string"
         },
@@ -125,8 +126,11 @@
   "type": "object",
   "x-gzmo-runtime-validation": [
     "recomputed-evaluation-verdict: hard_floors_passed must equal hard_floors_pass() over gate observations",
+    "covers-required-gates: every demanded name must exist exactly once as HardFloor with Pass; empty/duplicate/unsafe required lists reject",
     "gates must include at least one hard_floor class and unique names (partially beyond minItems)",
-    "runtime Deserialize/validate remains authoritative; schema does not recompute verdicts"
+    "baseline/candidate digest algorithms must match (sha256 with sha256, git-sha1 with git-sha1)",
+    "runtime Deserialize/validate remains authoritative; schema does not recompute verdicts or required-gate coverage",
+    "GateResult.detail maxLength in schema is character-oriented; runtime caps UTF-8 bytes at MAX_GATE_DETAIL_BYTES"
   ],
   "x-gzmo-schema-id": "gzmo.evolution.evaluation/v1"
 }

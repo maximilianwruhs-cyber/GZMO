@@ -35,8 +35,8 @@ pub const CANDIDATE_RUNTIME_VALIDATION: &[&str] = &[
 
 /// Cross-field invariants for capability envelopes.
 pub const ENVELOPE_RUNTIME_VALIDATION: &[&str] = &[
-    "time-window: issued_at must be strictly before expires_at",
-    "allowed_candidate_kinds: stage-1 allowlist is Memory|Tunable only (runtime enum subset check)",
+    "time-window: issued_at must be strictly before expires_at; authorize_* requires issued_at <= now < expires_at via validate_at",
+    "allowed_candidate_kinds: stage-1 allowlist is Memory|Tunable only (runtime enum subset check; schema enum is wider)",
     "energy-meter: max_energy_joules absence requires allow_missing_energy_meter",
     "signature-verification-boundary: envelope signature verification is outside this crate and outside schema validation",
 ];
@@ -44,8 +44,11 @@ pub const ENVELOPE_RUNTIME_VALIDATION: &[&str] = &[
 /// Cross-field invariants for evaluation reports.
 pub const EVALUATION_RUNTIME_VALIDATION: &[&str] = &[
     "recomputed-evaluation-verdict: hard_floors_passed must equal hard_floors_pass() over gate observations",
+    "covers-required-gates: every demanded name must exist exactly once as HardFloor with Pass; empty/duplicate/unsafe required lists reject",
     "gates must include at least one hard_floor class and unique names (partially beyond minItems)",
-    "runtime Deserialize/validate remains authoritative; schema does not recompute verdicts",
+    "baseline/candidate digest algorithms must match (sha256 with sha256, git-sha1 with git-sha1)",
+    "runtime Deserialize/validate remains authoritative; schema does not recompute verdicts or required-gate coverage",
+    "GateResult.detail maxLength in schema is character-oriented; runtime caps UTF-8 bytes at MAX_GATE_DETAIL_BYTES",
 ];
 
 /// Cross-field invariants for unverified authority grants / promotion.
@@ -58,9 +61,9 @@ pub const PROMOTION_RUNTIME_VALIDATION: &[&str] = &[
 
 /// Cross-field invariants for audit events.
 pub const AUDIT_RUNTIME_VALIDATION: &[&str] = &[
-    "audit-hash-recomputation: event_hash must equal sha256 of canonical JSON preimage (all fields except event_hash); runtime validate recomputes this",
+    "audit-hash-recomputation: event_hash must equal sha256 of canonical JSON preimage (all fields except event_hash); runtime validate/recompute_event_hash recomputes this",
     "chain linkage (sequence+previous_hash) is verified by verify_chain, not by single-event schema",
-    "signature/digest boundary: schema validation alone never verifies an event hash or chain integrity; runtime remains authoritative",
+    "signature/digest boundary: schema validation alone never verifies an event hash or chain integrity; runtime validate/recompute_event_hash remains authoritative",
 ];
 
 fn seal_for<T: schemars::JsonSchema>(

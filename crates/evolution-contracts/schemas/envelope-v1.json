@@ -241,10 +241,12 @@
     },
     "required_gates": {
       "items": {
+        "minLength": 1,
         "type": "string"
       },
       "minItems": 1,
-      "type": "array"
+      "type": "array",
+      "uniqueItems": true
     },
     "schema": {
       "pattern": "^gzmo\\.evolution\\.envelope/v1$",
@@ -257,6 +259,12 @@
     "tunables": {
       "additionalProperties": {
         "$ref": "#/definitions/TunableRule"
+      },
+      "description": "Tunable allowlist keyed by dotted identifiers (runtime validates keys).",
+      "propertyNames": {
+        "minLength": 1,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$",
+        "type": "string"
       },
       "type": "object"
     }
@@ -277,8 +285,8 @@
   "title": "CapabilityEnvelope",
   "type": "object",
   "x-gzmo-runtime-validation": [
-    "time-window: issued_at must be strictly before expires_at",
-    "allowed_candidate_kinds: stage-1 allowlist is Memory|Tunable only (runtime enum subset check)",
+    "time-window: issued_at must be strictly before expires_at; authorize_* requires issued_at <= now < expires_at via validate_at",
+    "allowed_candidate_kinds: stage-1 allowlist is Memory|Tunable only (runtime enum subset check; schema enum is wider)",
     "energy-meter: max_energy_joules absence requires allow_missing_energy_meter",
     "signature-verification-boundary: envelope signature verification is outside this crate and outside schema validation"
   ],

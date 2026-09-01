@@ -1,5 +1,7 @@
 # MACHINE — GZMO identity (canonical)
 
+**Architecture authority:** [docs/ADR-INDEX.md](docs/ADR-INDEX.md) · constitution [docs/ADR-0011-self-developing-living-database.md](docs/ADR-0011-self-developing-living-database.md).
+
 **Version:** 2026-06-04  
 **Scope:** What GZMO *is*. Infrastructure and milestones live in `docs/`.
 
@@ -35,7 +37,7 @@ The LLM **thinks** (extract, verify, dream). The pipeline **remembers**.
 - Not “ingest all Takeout now.”
 - Not Mem0/Zep/Supermemory reimplemented — those are patterns to borrow later.
 - Not a Foundry/Gotham (SEIP) platform — that research stays outside this repo.
-- **USP:** full living Keep on one airgapped box (local engines + sidecars + overnight + local MCP). See [docs/ADR-0004-airgap-living-usp.md](docs/ADR-0004-airgap-living-usp.md), [docs/ADR-0007-one-product-living.md](docs/ADR-0007-one-product-living.md), and [docs/AIRGAP_LIVING.md](docs/AIRGAP_LIVING.md). There is no lite SKU — clients attach; `~/.gzmo` is not the product.
+- **USP:** full living Keep on one airgapped box (local engines + sidecars + overnight + local MCP). See constitution [docs/ADR-0011-self-developing-living-database.md](docs/ADR-0011-self-developing-living-database.md); historical USP notes [docs/ADR-0004-airgap-living-usp.md](docs/ADR-0004-airgap-living-usp.md) / [docs/ADR-0007-one-product-living.md](docs/ADR-0007-one-product-living.md) (superseded); path [docs/AIRGAP_LIVING.md](docs/AIRGAP_LIVING.md). There is no lite SKU — clients attach; `~/.gzmo` is not the product.
 
 ---
 

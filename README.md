@@ -1,10 +1,12 @@
 # GZMO
 
+**Architecture authority:** [docs/ADR-INDEX.md](docs/ADR-INDEX.md) · constitution [docs/ADR-0011-self-developing-living-database.md](docs/ADR-0011-self-developing-living-database.md).
+
 **Sovereign overnight memory metabolism** — honeypot quality gate, supersession chains, local vault — airgap-capable on one box. Agents attach via **local stdio MCP**.
 
-**USP:** full living Keep on one airgapped machine (local engines + Redis/Qdrant/Neo4j + daemon). Not a cloud notebook. Not Mem0. Not a public webserver. **One product** — [docs/ADR-0007-one-product-living.md](docs/ADR-0007-one-product-living.md). There is no lite SKU.
+**USP:** full living Keep on one airgapped machine (local engines + Redis/Qdrant/Neo4j + daemon). Not a cloud notebook. Not Mem0. Not a public webserver. **One product** (historical ADR-0007, superseded by ADR-0011) — [docs/ADR-0007-one-product-living.md](docs/ADR-0007-one-product-living.md). There is no lite SKU.
 
-Doctrine: [docs/ADR-0004-airgap-living-usp.md](docs/ADR-0004-airgap-living-usp.md) · path: [docs/AIRGAP_LIVING.md](docs/AIRGAP_LIVING.md).
+Doctrine (historical ADR-0004, superseded by ADR-0011): [docs/ADR-0004-airgap-living-usp.md](docs/ADR-0004-airgap-living-usp.md) · path: [docs/AIRGAP_LIVING.md](docs/AIRGAP_LIVING.md).
 
 ## Install
 

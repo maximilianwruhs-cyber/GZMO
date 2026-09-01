@@ -196,51 +196,48 @@ impl UnverifiedAuthorityGrant {
     /// Structural validation for an external unverified grant payload.
     pub fn validate(&self) -> Result<(), PromotionError> {
         self.request.validate()?;
-        validate_safe_identifier("signer_key_id", &self.signer_key_id)
-            .map_err(|err| PromotionError::InvalidGrant(err.to_string()))?;
+        validate_safe_identifier_message("signer_key_id", &self.signer_key_id)
+            .map_err(PromotionError::InvalidGrant)?;
         validate_signature_hex(&self.signature_hex)?;
         Ok(())
     }
 }
 
 fn validate_safe_identifier(field: &str, value: &str) -> Result<(), PromotionError> {
+    validate_safe_identifier_message(field, value).map_err(PromotionError::InvalidRequest)
+}
+
+fn validate_safe_identifier_message(field: &str, value: &str) -> Result<(), String> {
     if value.is_empty() {
-        return Err(PromotionError::InvalidRequest(format!(
-            "{field} must be nonempty"
-        )));
+        return Err(format!("{field} must be nonempty"));
     }
     if value != value.trim() {
-        return Err(PromotionError::InvalidRequest(format!(
+        return Err(format!(
             "{field} must not have leading or trailing whitespace"
-        )));
+        ));
     }
     if value.contains("..") {
-        return Err(PromotionError::InvalidRequest(format!(
-            "{field} must not contain .."
-        )));
+        return Err(format!("{field} must not contain .."));
     }
     if value.contains('/') || value.contains('\\') {
-        return Err(PromotionError::InvalidRequest(format!(
-            "{field} must not contain path separators"
-        )));
+        return Err(format!("{field} must not contain path separators"));
     }
     if value.chars().any(|c| c.is_control() || c.is_whitespace()) {
-        return Err(PromotionError::InvalidRequest(format!(
+        return Err(format!(
             "{field} must not contain control or whitespace characters"
-        )));
+        ));
     }
     // Allow mixed-case tokens (e.g. system-B) with conservative punctuation.
-    if !value.chars().all(|c| {
-        c.is_ascii_alphanumeric() || c == '-' || c == '_' || c == '.'
-    }) {
-        return Err(PromotionError::InvalidRequest(format!(
+    if !value
+        .chars()
+        .all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_' || c == '.')
+    {
+        return Err(format!(
             "{field} must be ascii alphanumeric plus [._-], got {value:?}"
-        )));
+        ));
     }
     if value.starts_with('-') || value.ends_with('-') {
-        return Err(PromotionError::InvalidRequest(format!(
-            "{field} must not start or end with hyphen"
-        )));
+        return Err(format!("{field} must not start or end with hyphen"));
     }
     Ok(())
 }

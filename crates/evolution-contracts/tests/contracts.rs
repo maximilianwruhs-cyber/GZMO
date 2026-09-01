@@ -2,11 +2,11 @@ use chrono::{TimeZone, Utc};
 use evolution_contracts::{
     AuthorityTier, CandidateId, CandidateKind, CandidateManifest, CandidateState, CandidateTarget,
     CapabilityEnvelope, ContractError, EvaluationError, EvaluationReport, GateClass, GateResult,
-    GateStatus, PathPolicy, PolicyDecision, PolicyError, PromotionRequest, ResourceBudget,
-    ResourceUsage, TunableRule, UnverifiedAuthorityGrant, AUDIT_SCHEMA, CANDIDATE_SCHEMA,
-    ENVELOPE_SCHEMA, EVALUATION_SCHEMA, MAX_ADDED_LINES, MAX_ATTEMPTS, MAX_CHANGED_FILES,
-    MAX_ENERGY_JOULES, MAX_INPUT_TOKENS, MAX_OUTPUT_TOKENS, MAX_TOOL_CALLS, MAX_WALL_SECONDS,
-    PROMOTION_SCHEMA,
+    GateStatus, PathPolicy, PolicyDecision, PolicyError, PromotionError, PromotionRequest,
+    ResourceBudget, ResourceUsage, TunableRule, UnverifiedAuthorityGrant, AUDIT_SCHEMA,
+    CANDIDATE_SCHEMA, ENVELOPE_SCHEMA, EVALUATION_SCHEMA, MAX_ADDED_LINES, MAX_ATTEMPTS,
+    MAX_CHANGED_FILES, MAX_ENERGY_JOULES, MAX_INPUT_TOKENS, MAX_OUTPUT_TOKENS, MAX_TOOL_CALLS,
+    MAX_WALL_SECONDS, PROMOTION_SCHEMA,
 };
 use evolution_contracts::{
     canonical_json_bytes, sha256_hex, verify_chain, AuditError, AuditEvent, GENESIS_HASH,
@@ -168,17 +168,21 @@ fn fixture_envelope() -> CapabilityEnvelope {
     envelope
 }
 
+fn fixture_now() -> chrono::DateTime<Utc> {
+    Utc.with_ymd_and_hms(2026, 9, 15, 12, 0, 0).unwrap()
+}
+
 #[test]
 fn envelope_never_authorizes_code_or_protected_paths() {
     let envelope = fixture_envelope();
     assert!(envelope
-        .authorize_tunable("context.archive_threshold", 0.85)
+        .authorize_tunable("context.archive_threshold", 0.85, fixture_now())
         .is_ok());
     assert!(envelope
-        .authorize_tunable("context.archive_threshold", 0.30)
+        .authorize_tunable("context.archive_threshold", 0.30, fixture_now())
         .is_err());
     assert!(envelope
-        .authorize_candidate_kind(CandidateKind::Code)
+        .authorize_candidate_kind(CandidateKind::Code, fixture_now())
         .is_err());
     assert!(envelope
         .paths
@@ -366,10 +370,10 @@ fn tunable_rules_reject_non_finite_empty_and_reversed() {
 fn candidate_kind_allowlist_accepts_only_memory_and_tunable() {
     let envelope = fixture_envelope();
     assert!(envelope
-        .authorize_candidate_kind(CandidateKind::Memory)
+        .authorize_candidate_kind(CandidateKind::Memory, fixture_now())
         .is_ok());
     assert!(envelope
-        .authorize_candidate_kind(CandidateKind::Tunable)
+        .authorize_candidate_kind(CandidateKind::Tunable, fixture_now())
         .is_ok());
     for kind in [
         CandidateKind::Code,
@@ -382,7 +386,7 @@ fn candidate_kind_allowlist_accepts_only_memory_and_tunable() {
         CandidateKind::ProceduralSkill,
     ] {
         assert!(
-            envelope.authorize_candidate_kind(kind).is_err(),
+            envelope.authorize_candidate_kind(kind, fixture_now()).is_err(),
             "kind {kind} must be denied"
         );
     }
@@ -1404,7 +1408,7 @@ fn evaluation_rejects_oversized_detail() {
 
 
 #[test]
-fn evaluation_rejects_invalid_and_mixed_digest_algorithms() {
+fn evaluation_rejects_invalid_digest_algorithms() {
     let mut report = report_with(vec![GateResult::pass("tests")], BTreeMap::new());
     report.baseline_digest = "md5:deadbeef".to_owned();
     assert!(report.validate().is_err());
@@ -1783,18 +1787,9 @@ fn audit_empty_chain_and_genesis_rules() {
     assert!(verify_chain(&[bad_genesis]).is_err());
 }
 
-/// Recompute `event_hash` from the same field set as private `AuditPreimage`.
+/// Recompute `event_hash` via the production path (no test-side preimage clone).
 fn rehash_audit_event(event: &mut AuditEvent) {
-    let preimage = serde_json::json!({
-        "candidate_id": event.candidate_id.as_ref().map(|c| c.as_str()),
-        "event_type": event.event_type,
-        "occurred_at": event.occurred_at,
-        "payload_digest": event.payload_digest,
-        "previous_hash": event.previous_hash,
-        "schema": event.schema,
-        "sequence": event.sequence,
-    });
-    event.event_hash = sha256_hex(&canonical_json_bytes(&preimage).unwrap());
+    event.event_hash = event.recompute_event_hash().expect("recompute_event_hash");
 }
 
 #[test]
@@ -2094,5 +2089,285 @@ fn tagged_enums_still_parse_valid_and_reject_unknown_fields() {
     };
     assert!(serde_json::from_value::<TunableRule>(serde_json::to_value(&enum_rule).unwrap()).is_ok());
     assert!(serde_json::from_value::<TunableRule>(serde_json::to_value(&TunableRule::Boolean).unwrap()).is_ok());
+}
+
+#[test]
+fn envelope_validate_at_and_authorize_require_time_window() {
+    let envelope = fixture_envelope();
+    let issued = envelope.issued_at;
+    let expires = envelope.expires_at;
+
+    assert!(envelope.validate_at(issued).is_ok());
+    assert!(envelope.validate_at(issued + chrono::Duration::days(1)).is_ok());
+    assert!(envelope
+        .validate_at(issued - chrono::Duration::seconds(1))
+        .is_err());
+    assert!(envelope.validate_at(expires).is_err());
+    assert!(envelope
+        .validate_at(expires + chrono::Duration::seconds(1))
+        .is_err());
+
+    assert!(envelope
+        .authorize_tunable("context.archive_threshold", 0.85, issued)
+        .is_ok());
+    assert!(envelope
+        .authorize_tunable(
+            "context.archive_threshold",
+            0.85,
+            issued - chrono::Duration::seconds(1)
+        )
+        .is_err());
+    assert!(envelope
+        .authorize_candidate_kind(CandidateKind::Memory, expires)
+        .is_err());
+    assert!(envelope
+        .authorize_candidate_kind(CandidateKind::Memory, fixture_now())
+        .is_ok());
+}
+
+#[test]
+fn evaluation_covers_required_gates_cases() {
+    let report = report_with(
+        vec![
+            GateResult::pass("tests"),
+            GateResult::pass("faithfulness"),
+            GateResult {
+                name: "latency".to_owned(),
+                class: GateClass::Metric,
+                status: GateStatus::Pass,
+                detail: String::new(),
+                artifact_digest: None,
+            },
+        ],
+        BTreeMap::new(),
+    );
+    assert!(report
+        .covers_required_gates(&["tests".into(), "faithfulness".into()])
+        .is_ok());
+    assert!(report.covers_required_gates(&[]).is_err());
+    assert!(report
+        .covers_required_gates(&["tests".into(), "tests".into()])
+        .is_err());
+    assert!(report
+        .covers_required_gates(&["missing".into()])
+        .is_err());
+    assert!(report
+        .covers_required_gates(&["latency".into()])
+        .is_err());
+
+    let mut failed = report.clone();
+    failed.gates[0].status = GateStatus::Fail;
+    failed.hard_floors_passed = failed.hard_floors_pass();
+    assert!(failed
+        .covers_required_gates(&["tests".into()])
+        .is_err());
+
+    let mut unavailable = report.clone();
+    unavailable.gates[0].status = GateStatus::Unavailable;
+    unavailable.hard_floors_passed = unavailable.hard_floors_pass();
+    assert!(unavailable
+        .covers_required_gates(&["tests".into()])
+        .is_err());
+}
+
+#[test]
+fn evaluation_rejects_mixed_baseline_candidate_algorithms() {
+    let mut report = report_with(vec![GateResult::pass("tests")], BTreeMap::new());
+    report.baseline_digest = format!("sha256:{}", "a".repeat(64));
+    report.candidate_digest = format!("git-sha1:{}", "b".repeat(40));
+    let err = report.validate().expect_err("mixed algorithms");
+    match err {
+        EvaluationError::InvalidReport(msg) => {
+            assert!(
+                msg.contains("algorithms must match"),
+                "unexpected message: {msg}"
+            );
+        }
+        other => panic!("unexpected error {other:?}"),
+    }
+}
+
+#[test]
+fn evaluation_rejects_colon_and_drive_artifact_keys() {
+    let mut report = report_with(vec![GateResult::pass("tests")], BTreeMap::new());
+    report.artifact_digests.insert(
+        "C:report.json".to_owned(),
+        format!("sha256:{}", hex::encode([0x55; 32])),
+    );
+    assert!(report.validate().is_err());
+    report = report_with(vec![GateResult::pass("tests")], BTreeMap::new());
+    report.artifact_digests.insert(
+        "name:with:colon".to_owned(),
+        format!("sha256:{}", hex::encode([0x55; 32])),
+    );
+    assert!(report.validate().is_err());
+}
+
+#[test]
+fn audit_next_at_is_replay_stable_and_recompute_matches() {
+    let at = Utc.with_ymd_and_hms(2026, 9, 1, 7, 0, 0).unwrap();
+    let first = AuditEvent::next_at(
+        None,
+        "candidate.observed",
+        Some(audit_candidate_id()),
+        &audit_payload(),
+        at,
+    )
+    .unwrap();
+    let again = AuditEvent::next_at(
+        None,
+        "candidate.observed",
+        Some(audit_candidate_id()),
+        &audit_payload(),
+        at,
+    )
+    .unwrap();
+    assert_eq!(first, again);
+    assert_eq!(first.occurred_at, at);
+    assert_eq!(first.recompute_event_hash().unwrap(), first.event_hash);
+
+    let second = AuditEvent::next_at(
+        Some(&first),
+        "candidate.prepared",
+        Some(audit_candidate_id()),
+        &2u8,
+        at + chrono::Duration::seconds(1),
+    )
+    .unwrap();
+    assert!(verify_chain(&[first.clone(), second.clone()]).is_ok());
+    assert_eq!(second.recompute_event_hash().unwrap(), second.event_hash);
+}
+
+#[test]
+fn candidate_repository_allows_dot_github_and_rejects_tricks() {
+    let id = fixture_candidate_id();
+    let expected_branch = format!("evolve/{}", id.as_str());
+    let good = serde_json::json!({
+        "mode": "repository",
+        "owner": "gzmo-org",
+        "repository": ".github",
+        "base_branch": "main",
+        "candidate_branch": expected_branch,
+    });
+    assert!(serde_json::from_value::<CandidateTarget>(good).is_ok());
+
+    for bad in ["-evil", "repo/evil", "has..dots", "name.", "has:colon"] {
+        let value = serde_json::json!({
+            "mode": "repository",
+            "owner": "gzmo-org",
+            "repository": bad,
+            "base_branch": "main",
+            "candidate_branch": expected_branch,
+        });
+        assert!(
+            serde_json::from_value::<CandidateTarget>(value).is_err(),
+            "expected reject repository={bad:?}"
+        );
+    }
+}
+
+#[test]
+fn path_policy_direct_absolute_escape_trailing_dot_colon_cases() {
+    let paths = PathPolicy::stage1_default();
+    assert!(paths.check("/absolute").is_err());
+    assert!(paths.check("..\\escape").is_err());
+    assert!(paths.check("foo/../bar").is_err());
+    assert!(paths.check("name.").is_err());
+    assert!(paths.check("name:ads").is_err());
+    assert!(paths.check("docs/ADR-").is_err());
+}
+
+#[test]
+fn resource_usage_and_policy_decision_deny_unknown_fields() {
+    let mut usage = serde_json::json!({
+        "wall_seconds": 1,
+        "attempts": 1,
+        "changed_files": 1,
+        "added_lines": 1,
+        "tool_calls": 1,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "energy_joules": null
+    });
+    assert!(serde_json::from_value::<ResourceUsage>(usage.clone()).is_ok());
+    usage["unexpected"] = serde_json::json!(1);
+    assert!(serde_json::from_value::<ResourceUsage>(usage).is_err());
+
+    let allowed = serde_json::json!("allowed");
+    assert_eq!(
+        serde_json::from_value::<PolicyDecision>(allowed).unwrap(),
+        PolicyDecision::Allowed
+    );
+    let denied = serde_json::json!({"denied": {"reason": "x"}});
+    assert!(serde_json::from_value::<PolicyDecision>(denied).is_ok());
+    let bad = serde_json::json!({"denied": {"reason": "x", "extra": 1}});
+    assert!(serde_json::from_value::<PolicyDecision>(bad).is_err());
+}
+
+#[test]
+fn promotion_signer_key_error_is_not_double_prefixed() {
+    let mut grant = fixture_unverified_grant();
+    grant.signer_key_id = String::new();
+    let err = grant.validate().expect_err("empty signer");
+    let msg = err.to_string();
+    assert!(
+        msg.starts_with("invalid authority grant:"),
+        "expected InvalidGrant prefix, got {msg}"
+    );
+    assert!(
+        !msg.contains("invalid promotion request:"),
+        "signer_key_id must not be misclassified/double-prefixed: {msg}"
+    );
+    match err {
+        PromotionError::InvalidGrant(inner) => {
+            assert!(inner.contains("signer_key_id"));
+            assert!(!inner.contains("invalid promotion request"));
+        }
+        other => panic!("expected InvalidGrant, got {other:?}"),
+    }
+}
+
+#[test]
+fn candidate_charset_invalid_cases_are_named_and_lengthened() {
+    let id = fixture_candidate_id();
+    let expected_branch = format!("evolve/{}", id.as_str());
+    let named_invalid = [
+        ("empty", ""),
+        ("leading_space", " leading"),
+        ("trailing_space", "trailing "),
+        ("internal_space", "has space"),
+        ("double_dot", "has..dots"),
+        ("upstream_at", "has@{upstream}"),
+        ("backslash", "has\\slash"),
+        ("colon", "has:colon"),
+        ("tilde", "has~tilde"),
+        ("caret", "has^caret"),
+        ("question", "has?question"),
+        ("star", "has*star"),
+        ("bracket", "has[bracket"),
+        ("lock_suffix", "ends.lock"),
+        ("leading_slash", "/leading-slash"),
+        ("trailing_slash", "trailing-slash/"),
+        ("control_newline", "has\ncontrol"),
+        ("leading_dash", "-evil"),
+        ("trailing_dot", "name."),
+        ("hidden_component", ".hidden"),
+    ];
+    for (label, bad) in named_invalid {
+        for field in ["owner", "repository", "base_branch"] {
+            let mut value = serde_json::json!({
+                "mode": "repository",
+                "owner": "gzmo-org",
+                "repository": "gzmo",
+                "base_branch": "main",
+                "candidate_branch": expected_branch,
+            });
+            value[field] = serde_json::json!(bad);
+            assert!(
+                serde_json::from_value::<CandidateTarget>(value).is_err(),
+                "expected reject {field}={label}:{bad:?}"
+            );
+        }
+    }
 }
 

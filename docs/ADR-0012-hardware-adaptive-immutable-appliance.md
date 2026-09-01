@@ -15,9 +15,10 @@ GZMO ships as a **hardware-adaptive immutable appliance**:
 
 1. **Thor-first capability ladder.** Profiles are earned by measured qualification, never by SKU marketing labels:
    - Scout (not product): Pi-class / Orin Nano class — boot, inventory, bounded experiments.
-   - Living-Min: Jetson AGX Orin 64 GB class — full Living roles except optional code-candidate generation.
-   - Living-Reference: Jetson AGX Thor 128 GB — release qualification target with full staged-autonomy headroom.
+   - Living-Min / fallback full-Living reference: Jetson AGX Orin 64 GB class — full Living roles except optional code-candidate generation; remains the fallback full-Living reference until Thor is proven.
+   - Living-Reference (provisional): Jetson AGX Thor 128 GB — intended release qualification target with full staged-autonomy headroom, **provisional until** firmware trust roots, offline JetPack/runtime availability, storage endurance, thermals, independent role quality, sustained throughput, and energy envelopes all pass measured gates. Until then Thor must not be treated as a shipping Living claim.
    - Forge/portability: qualified x86-64 one-node path proving interfaces are not ARM-only.
+   - **Alternatives, not release targets:** DGX Spark and 96–128 GB Strix Halo class hosts may be used for portability experiments and comparative measurement; they are not Living release qualification targets under this ADR.
 2. **Installer / recovery courier.** Portable media is signed installer, recovery environment, and offline update courier. It may carry architecture-specific payloads; it never holds the sole copy of operator root keys, recovery keys, or living state.
 3. **BootTrust A/B.** A stable `BootTrust` seam (`verify_boot`, `unlock_state`, `stage_bundle`, `activate_inactive`, `mark_success`, `rollback`) drives immutable measured `system-A` / `system-B` slots with automatic failed-slot rollback and last-known-good fallback.
 4. **Encrypted internal NVMe layout.** Installed disk separates immutable system slots; encrypted `data` (PostgreSQL authority + audit); encrypted content-addressed `models`; encrypted quota-bound wipeable `candidates`; and last-known-good snapshots with restore receipts.

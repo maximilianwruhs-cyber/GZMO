@@ -12,6 +12,39 @@ use evolution_contracts::{
 use serde_json::Value;
 use std::fs;
 use std::path::PathBuf;
+use std::time::{SystemTime, UNIX_EPOCH};
+
+struct TempSchemaDir {
+    path: PathBuf,
+}
+
+impl TempSchemaDir {
+    fn new(label: &str) -> Self {
+        let nanos = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .expect("time")
+            .as_nanos();
+        let path = std::env::temp_dir().join(format!(
+            "gzmo-evolution-schemas-{label}-{}-{}",
+            std::process::id(),
+            nanos
+        ));
+        let _ = fs::remove_dir_all(&path);
+        fs::create_dir_all(&path).expect("create temp schema dir");
+        Self { path }
+    }
+
+    fn path(&self) -> &PathBuf {
+        &self.path
+    }
+}
+
+impl Drop for TempSchemaDir {
+    fn drop(&mut self) {
+        let _ = fs::remove_dir_all(&self.path);
+    }
+}
+
 
 const SCHEMA_FILES: &[&str] = &[
     "candidate-v1.json",
@@ -59,20 +92,8 @@ fn find_def<'a>(root: &'a Value, name: &str) -> Option<&'a Value> {
 }
 
 fn resolve_prop<'a>(root: &'a Value, prop: &str) -> &'a Value {
-    if let Some(v) = root.pointer(&format!("/properties/{prop}")) {
-        return v;
-    }
-    // Follow $ref at property level if present.
-    if let Some(r) = root.pointer(&format!("/properties/{prop}/$ref")) {
-        if let Some(s) = r.as_str() {
-            if let Some(name) = s.strip_prefix("#/definitions/") {
-                return find_def(root, name).unwrap_or_else(|| {
-                    panic!("missing definition {name} for property {prop}")
-                });
-            }
-        }
-    }
-    panic!("property {prop} missing on schema root");
+    root.pointer(&format!("/properties/{prop}"))
+        .unwrap_or_else(|| panic!("property {prop} missing on schema root"))
 }
 
 fn schema_string_constraints<'a>(root: &'a Value, node: &'a Value) -> &'a Value {
@@ -142,15 +163,18 @@ fn assert_runtime_validation(root: &Value, must_mention: &[&str]) {
             "runtime-validation must mention {needle:?}, got:\n{joined}"
         );
     }
-    // Honesty: schema must not claim to verify signatures/digests/hashes alone.
+    // Honesty: require explicit crypto/runtime boundary wording, not a bare "runtime" hit.
     let lower = joined.to_ascii_lowercase();
     assert!(
         lower.contains("outside")
             || lower.contains("boundary")
             || lower.contains("not verified")
-            || lower.contains("cannot")
-            || lower.contains("runtime"),
-        "runtime-validation should state schema limits honestly"
+            || lower.contains("cannot express")
+            || lower.contains("schema does not")
+            || lower.contains("runtime deserialize/validate remains authoritative")
+            || lower.contains("runtime validate")
+            || lower.contains("runtime remains authoritative"),
+        "runtime-validation must state schema/crypto boundary honestly, got:\n{joined}"
     );
 }
 
@@ -191,22 +215,12 @@ fn assert_additional_properties_false_where_object(root: &Value) {
 
 #[test]
 fn schema_snapshots_match_checked_in_pretty_json() {
-    let tmp = std::env::temp_dir().join(format!(
-        "gzmo-evolution-schemas-{}-{}",
-        std::process::id(),
-        std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .expect("time")
-            .as_nanos()
-    ));
-    let _ = fs::remove_dir_all(&tmp);
-    fs::create_dir_all(&tmp).expect("create temp schema dir");
-
-    export_all_schemas(&tmp).expect("export schemas into temp dir");
+    let tmp = TempSchemaDir::new("snap");
+    export_all_schemas(tmp.path()).expect("export schemas into temp dir");
 
     for name in SCHEMA_FILES {
-        let generated = fs::read(&tmp.join(name)).unwrap_or_else(|err| {
-            panic!("generated schema missing {}: {err}", tmp.join(name).display())
+        let generated = fs::read(tmp.path().join(name)).unwrap_or_else(|err| {
+            panic!("generated schema missing {}: {err}", tmp.path().join(name).display())
         });
         let checked = fs::read(crate_schemas_dir().join(name)).unwrap_or_else(|err| {
             panic!(
@@ -228,25 +242,20 @@ fn schema_snapshots_match_checked_in_pretty_json() {
         assert!(parsed.is_object(), "{name} root must be object");
     }
 
-    fs::remove_dir_all(&tmp).expect("cleanup temp schema dir");
-    assert!(!tmp.exists(), "temp schema dir must be removed");
+    // TempSchemaDir Drop removes the directory.
 }
 
 #[test]
 fn schema_export_is_deterministic_across_reruns() {
-    let a = std::env::temp_dir().join(format!("gzmo-schema-det-a-{}", std::process::id()));
-    let b = std::env::temp_dir().join(format!("gzmo-schema-det-b-{}", std::process::id()));
-    let _ = fs::remove_dir_all(&a);
-    let _ = fs::remove_dir_all(&b);
-    export_all_schemas(&a).unwrap();
-    export_all_schemas(&b).unwrap();
+    let a = TempSchemaDir::new("det-a");
+    let b = TempSchemaDir::new("det-b");
+    export_all_schemas(a.path()).unwrap();
+    export_all_schemas(b.path()).unwrap();
     for name in SCHEMA_FILES {
-        let left = fs::read(a.join(name)).unwrap();
-        let right = fs::read(b.join(name)).unwrap();
+        let left = fs::read(a.path().join(name)).unwrap();
+        let right = fs::read(b.path().join(name)).unwrap();
         assert_eq!(left, right, "nondeterministic export for {name}");
     }
-    let _ = fs::remove_dir_all(&a);
-    let _ = fs::remove_dir_all(&b);
 }
 
 #[test]
@@ -395,7 +404,7 @@ fn evaluation_schema_constraints_and_runtime_extensions() {
     );
     let dump = root.to_string();
     assert!(dump.contains("hard_floor") || dump.contains("pass") || dump.contains("fail"));
-    assert_runtime_validation(&root, &["recomputed", "verdict"]);
+    assert_runtime_validation(&root, &["recomputed", "verdict", "covers-required", "authoritative"]);
 }
 
 #[test]
@@ -479,10 +488,9 @@ fn checked_in_schemas_directory_has_exactly_five_files() {
 #[test]
 fn export_helpers_reject_unknown_paths_contract() {
     // Sanity: public helper exists and creates the fixed five names only.
-    let tmp = std::env::temp_dir().join(format!("gzmo-schema-names-{}", std::process::id()));
-    let _ = fs::remove_dir_all(&tmp);
-    export_all_schemas(&tmp).unwrap();
-    let mut names: Vec<_> = fs::read_dir(&tmp)
+    let tmp = TempSchemaDir::new("names");
+    export_all_schemas(tmp.path()).unwrap();
+    let mut names: Vec<_> = fs::read_dir(tmp.path())
         .unwrap()
         .map(|e| e.unwrap().file_name().to_string_lossy().into_owned())
         .collect();
@@ -490,7 +498,6 @@ fn export_helpers_reject_unknown_paths_contract() {
     let mut expected: Vec<_> = SCHEMA_FILES.iter().map(|s| (*s).to_owned()).collect();
     expected.sort();
     assert_eq!(names, expected);
-    let _ = fs::remove_dir_all(&tmp);
 }
 
 /// Ensure nested property lookup still works when definitions use $ref for CandidateId.
