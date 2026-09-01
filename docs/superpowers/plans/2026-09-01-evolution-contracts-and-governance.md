@@ -403,7 +403,7 @@ Expected: FAIL: policy types missing.
 
 - [ ] **Step 3: Implement resource budget validation**
 
-Reject zero wall time, zero attempts, unbounded file/line/tool/token values, and any used amount greater than its signed maximum. `max_energy_joules=None` means the meter is unavailable and the profile must explicitly allow that absence; it never means unlimited energy.
+`ResourceBudget` contains the fields from the master plan plus `allow_missing_energy_meter: bool`. Reject zero work limits and values above compile-time ceilings: `wall_seconds <= 86_400`, `max_attempts <= 5`, `max_changed_files <= 100`, `max_added_lines <= 10_000`, `max_tool_calls <= 500`, `max_input_tokens <= 5_000_000`, `max_output_tokens <= 1_000_000`, and `max_energy_joules <= 10_000_000` when present. `max_energy_joules=None` is valid only when `allow_missing_energy_meter=true`; it means the signed profile acknowledges that the meter is unavailable, never unlimited energy. Add `ResourceUsage::fits(&ResourceBudget)` and reject any used field over its signed maximum.
 
 - [ ] **Step 4: Implement path policy**
 
@@ -426,7 +426,7 @@ Normalize separators; reject absolute paths, `..`, symlink escape, and case-fold
 
 - [ ] **Step 5: Implement tunable rules**
 
-Rules are typed `IntegerRange`, `FloatRange`, `EnumSet`, or `Boolean`. The envelope digest covers policy version, expiry, rules, budgets, protected paths, required gates, and signer key ID. Signature verification belongs outside this pure crate; this crate exposes canonical bytes.
+`TunableRule` is exactly `IntegerRange { min: i64, max: i64 }`, `FloatRange { min: f64, max: f64 }`, `EnumSet { values: BTreeSet<String> }`, or `Boolean`. `CapabilityEnvelope` carries exact schema, envelope ID, policy version, signer key ID, issued/expiry timestamps, budget, path policy, tunable map, allowed candidate kinds, required gates, and `allow_missing_energy_meter`. Validate `issued_at < expires_at`, nonempty signer/policy/gates, valid budget/ranges, finite floats, nonempty enum sets, and an allowlist containing only `Memory` and/or `Tunable`. `PolicyDecision` is `Allowed` or `Denied { reason: String }`. The later envelope digest covers every field; signature verification remains outside this pure crate.
 
 Then add `pub mod policy; pub use policy::*;` to `lib.rs`; do not expose a module before its implementation compiles.
 
