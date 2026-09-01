@@ -130,7 +130,7 @@ pub struct AuditEvent {
 }
 ```
 
-Schema identifiers are fixed at `gzmo.evolution.candidate/v1`, `gzmo.evolution.envelope/v1`, `gzmo.evolution.evaluation/v1`, and `gzmo.evolution.audit/v1` until a signed schema migration introduces a new version.
+Schema identifiers are fixed at `gzmo.evolution.candidate/v1`, `gzmo.evolution.envelope/v1`, `gzmo.evolution.evaluation/v1`, `gzmo.evolution.promotion/v1`, and `gzmo.evolution.audit/v1` until a signed schema migration introduces a new version.
 
 ## End-to-End State Flow
 

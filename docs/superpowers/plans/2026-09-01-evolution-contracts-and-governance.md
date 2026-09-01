@@ -477,11 +477,11 @@ Expected: FAIL: evaluation types missing.
 
 - [ ] **Step 3: Implement gate semantics**
 
-`GateResult` carries name, class (`HardFloor` or `Metric`), status (`Pass`, `Fail`, `Unavailable`), detail, and artifact digest. A hard-floor `Fail` or `Unavailable` returns false. Metrics are reported but cannot change the result.
+Define `GateClass::{HardFloor, Metric}`, `GateStatus::{Pass, Fail, Unavailable}`, and `GateResult { name, class, status, detail, artifact_digest: Option<String> }`. Define `EvaluationReport` exactly as the master plan: schema, candidate ID, algorithm-qualified baseline/candidate digests, gates, stored `hard_floors_passed`, finite metric map, SHA-256 artifact-digest map, and completion time. Require nonempty unique safe gate names, at least one hard floor, details no longer than 4096 bytes, valid digests, finite metrics, and stored `hard_floors_passed == report.hard_floors_pass()`. A hard-floor `Fail` or `Unavailable` returns false; metrics never change it. Use custom validated `Deserialize` so JSON cannot forge the stored verdict.
 
 - [ ] **Step 4: Implement detached promotion binding**
 
-`AuthorityGrant` contains signer key ID, candidate/evaluation/policy digests, target, issued/expiry time, and detached signature bytes. It cannot be constructed by a deserialized candidate without later verification; name the raw type `UnverifiedAuthorityGrant` and return `VerifiedAuthorityGrant` only from the trusted verifier crate in later plans.
+Add `PROMOTION_SCHEMA = "gzmo.evolution.promotion/v1"`. Define `PromotionRequest { schema, candidate_id, candidate_digest, evaluation_digest, policy_digest, target, issued_at, expires_at, nonce }` and `UnverifiedAuthorityGrant { request, signer_key_id, signature_hex }`. Candidate digest is algorithm-qualified; evaluation/policy digests are `sha256:<64 lowercase hex>`; target/signer/nonce are safe nonempty identifiers; expiry is after issue and no more than 24 hours; `signature_hex` is exactly 128 lowercase hex characters (Ed25519 wire encoding, not verification). Custom validated deserialization rejects malformed structures. `validate_binding` compares candidate/evaluation/policy/target and rejects an expired request at a caller-supplied `now`. The pure crate never exposes `VerifiedAuthorityGrant`; that private trusted-verifier type is introduced only where cryptographic verification exists.
 
 Then add `pub mod evaluation; pub mod promotion; pub use evaluation::*; pub use promotion::*;` to `lib.rs` after both modules compile.
 
@@ -564,6 +564,7 @@ git commit -m "feat: add tamper-evident evolution audit contracts"
 - Create: `crates/evolution-contracts/schemas/envelope-v1.json`
 - Create: `crates/evolution-contracts/schemas/evaluation-v1.json`
 - Create: `crates/evolution-contracts/schemas/audit-v1.json`
+- Create: `crates/evolution-contracts/schemas/promotion-v1.json`
 - Create: `crates/evolution-contracts/tests/schema_snapshots.rs`
 
 **Interfaces:**
@@ -591,13 +592,13 @@ fn write_schema<T: schemars::JsonSchema>(path: &Path) -> Result<(), Box<dyn std:
 }
 ```
 
-Accept `--out <directory>`, create the directory, and write exactly the four filenames above.
+Accept `--out <directory>`, create the directory, and write exactly the five filenames above.
 
 - [ ] **Step 4: Generate snapshots**
 
 Run: `cargo run -p evolution-contracts --bin export_schemas -- --out crates/evolution-contracts/schemas`
 
-Expected: four JSON files.
+Expected: five JSON files.
 
 - [ ] **Step 5: Run the complete contract suite**
 
