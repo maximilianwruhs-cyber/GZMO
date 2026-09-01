@@ -56,3 +56,44 @@ fn enums_serialize_as_snake_case() {
     let id_json = serde_json::to_string(&id).unwrap();
     assert_eq!(id_json, "\"cand-20260901t070000z-felt-use-a1b2c3\"");
 }
+
+#[test]
+fn candidate_id_json_round_trip_valid() {
+    let raw = "\"cand-20260901t070000z-felt-use-a1b2c3\"";
+    let id: CandidateId = serde_json::from_str(raw).unwrap();
+    assert_eq!(id.as_str(), "cand-20260901t070000z-felt-use-a1b2c3");
+    assert_eq!(serde_json::to_string(&id).unwrap(), raw);
+}
+
+#[test]
+fn candidate_id_json_rejects_invalid_forms() {
+    let cases = [
+        "\"cand-UPPERCASEXXXX1\"",
+        "\"cand-path/../traverse\"",
+        "\"cand-has..dotsxxxxx\"",
+        "\"not-a-candidate-idxx\"",
+        "\"cand-short\"",
+        "\"cand--edge-hyphenxx\"",
+        "\"cand-trailing-hyphen-\"",
+        "\"CAND-20260901t070000z-felt-use-a1b2c3\"",
+    ];
+    for raw in cases {
+        assert!(
+            serde_json::from_str::<CandidateId>(raw).is_err(),
+            "expected JSON rejection for {raw}"
+        );
+    }
+}
+
+#[test]
+fn candidate_id_schema_constrains_length_and_pattern() {
+    let schema = schemars::schema_for!(CandidateId);
+    let value = serde_json::to_value(schema).unwrap();
+    assert_eq!(value["type"], "string");
+    assert_eq!(value["minLength"], 16);
+    assert_eq!(value["maxLength"], 96);
+    assert_eq!(
+        value["pattern"],
+        r"^cand-[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$"
+    );
+}

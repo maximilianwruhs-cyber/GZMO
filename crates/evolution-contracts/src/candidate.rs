@@ -1,7 +1,7 @@
 //! Candidate identity, kind, authority tier, and lifecycle state.
 
 use schemars::JsonSchema;
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize};
 use std::fmt;
 use thiserror::Error;
 
@@ -14,7 +14,7 @@ pub enum ContractError {
 }
 
 /// Strict candidate identifier: `cand-` + lowercase ASCII/digit/hyphen body.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 #[serde(transparent)]
 pub struct CandidateId(String);
 
@@ -37,6 +37,35 @@ impl CandidateId {
 impl fmt::Display for CandidateId {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_str(self.as_str())
+    }
+}
+
+impl<'de> Deserialize<'de> for CandidateId {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        let raw = String::deserialize(deserializer)?;
+        Self::parse(raw).map_err(serde::de::Error::custom)
+    }
+}
+
+impl JsonSchema for CandidateId {
+    fn schema_name() -> String {
+        "CandidateId".to_owned()
+    }
+
+    fn json_schema(_gen: &mut schemars::gen::SchemaGenerator) -> schemars::schema::Schema {
+        use schemars::schema::{InstanceType, SchemaObject, StringValidation};
+        SchemaObject {
+            instance_type: Some(InstanceType::String.into()),
+            string: Some(Box::new(StringValidation {
+                min_length: Some(16),
+                max_length: Some(96),
+                // Body is non-empty alnum edges; hyphens only inside; no dots.
+                pattern: Some(r"^cand-[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$".to_owned()),
+                ..Default::default()
+            })),
+            ..Default::default()
+        }
+        .into()
     }
 }
 
