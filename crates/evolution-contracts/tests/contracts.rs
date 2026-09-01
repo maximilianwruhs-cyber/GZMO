@@ -268,7 +268,7 @@ fn missing_energy_meter_is_signed_allowance_not_unlimited() {
     budget.allow_missing_energy_meter = true;
     assert!(budget.validate().is_ok());
 
-    let usage_with_energy = ResourceUsage {
+    let base = ResourceUsage {
         wall_seconds: 1,
         attempts: 1,
         changed_files: 1,
@@ -278,27 +278,39 @@ fn missing_energy_meter_is_signed_allowance_not_unlimited() {
         output_tokens: 1,
         energy_joules: Some(1),
     };
-    assert!(
-        !usage_with_energy.fits(&budget),
-        "missing meter must not grant unlimited energy"
-    );
-    let usage_without = ResourceUsage {
+    // No ceiling: positive energy never fits; missing energy does.
+    assert!(!base.fits(&budget));
+    assert!(ResourceUsage {
         energy_joules: None,
-        ..usage_with_energy.clone()
-    };
-    assert!(usage_without.fits(&budget));
+        ..base.clone()
+    }
+    .fits(&budget));
 
-    // When a meter ceiling is present, usage above it fails and at/under passes.
+    // Finite ceiling + missing usage energy requires allow_missing_energy_meter.
     budget.max_energy_joules = Some(10);
+    budget.allow_missing_energy_meter = false;
+    assert!(!ResourceUsage {
+        energy_joules: None,
+        ..base.clone()
+    }
+    .fits(&budget));
+    budget.allow_missing_energy_meter = true;
+    assert!(ResourceUsage {
+        energy_joules: None,
+        ..base.clone()
+    }
+    .fits(&budget));
+
+    // Reported energy still compared to the ceiling either way.
     budget.allow_missing_energy_meter = false;
     assert!(ResourceUsage {
         energy_joules: Some(10),
-        ..usage_with_energy.clone()
+        ..base.clone()
     }
     .fits(&budget));
     assert!(!ResourceUsage {
         energy_joules: Some(11),
-        ..usage_with_energy
+        ..base
     }
     .fits(&budget));
 }
@@ -406,6 +418,14 @@ fn path_policy_handles_escape_case_and_separators() {
     assert!(paths.check("foo//bar").is_err());
     assert!(paths.check("").is_err());
 
+    // Colon / ADS and Windows trailing-dot/space components.
+    assert!(paths.check("Cargo.toml:x").is_err());
+    assert!(paths.check("Cargo.toml::$DATA").is_err());
+    assert!(paths.check("Cargo.toml.").is_err());
+    assert!(paths.check("AGENTS.md ").is_err());
+    assert!(paths.check("src/foo:bar.rs").is_err());
+    assert!(paths.check("src/trailing. ").is_err());
+
     // Allowed ordinary paths.
     assert!(paths.check("src/main.rs").is_ok());
     assert!(paths.check("crates/other/src/lib.rs").is_ok());
@@ -418,7 +438,6 @@ fn policy_types_serde_round_trip() {
     let json = serde_json::to_string_pretty(&envelope).unwrap();
     let decoded: CapabilityEnvelope = serde_json::from_str(&json).unwrap();
     assert_eq!(decoded, envelope);
-    decoded.validate().unwrap();
 
     let decision = PolicyDecision::Denied {
         reason: "blocked".to_owned(),
@@ -439,7 +458,7 @@ fn policy_types_serde_round_trip() {
     let r_decoded: TunableRule = serde_json::from_str(&r_json).unwrap();
     assert_eq!(r_decoded, rule);
 
-    // Envelope rejects bad validity edges.
+    // Envelope rejects bad validity edges via validate().
     let mut expired = fixture_envelope();
     expired.expires_at = expired.issued_at;
     assert!(expired.validate().is_err());
@@ -457,6 +476,65 @@ fn policy_types_serde_round_trip() {
     let mut bad_schema = fixture_envelope();
     bad_schema.schema = "nope".to_owned();
     assert!(bad_schema.validate().is_err());
+}
+
+#[test]
+fn policy_json_deserialize_rejects_invalid_contracts() {
+    let good = serde_json::to_value(fixture_envelope()).unwrap();
+
+    // Code / Authority kinds cannot sneak in via JSON allowlist.
+    for kinds in [
+        serde_json::json!(["code"]),
+        serde_json::json!(["authority"]),
+        serde_json::json!(["memory", "code"]),
+        serde_json::json!(["tunable", "authority"]),
+    ] {
+        let mut value = good.clone();
+        value["allowed_candidate_kinds"] = kinds.clone();
+        assert!(
+            serde_json::from_value::<CapabilityEnvelope>(value).is_err(),
+            "expected reject for kinds {kinds}"
+        );
+    }
+
+    // Over-ceiling budget rejected on standalone and nested deserialize.
+    let mut over = serde_json::to_value(valid_budget()).unwrap();
+    over["wall_seconds"] = serde_json::json!(MAX_WALL_SECONDS + 1);
+    assert!(serde_json::from_value::<ResourceBudget>(over.clone()).is_err());
+    let mut env_over = good.clone();
+    env_over["budget"] = over;
+    assert!(serde_json::from_value::<CapabilityEnvelope>(env_over).is_err());
+
+    // Empty protected paths rejected.
+    let empty_paths = serde_json::json!({ "protected_paths": [] });
+    assert!(serde_json::from_value::<PathPolicy>(empty_paths).is_err());
+    let mut env_paths = good.clone();
+    env_paths["paths"] = serde_json::json!({ "protected_paths": [] });
+    assert!(serde_json::from_value::<CapabilityEnvelope>(env_paths).is_err());
+
+    // Invalid tunables: reversed integer range and empty enum set.
+    let reversed = serde_json::json!({ "type": "integer_range", "min": 5, "max": 1 });
+    assert!(serde_json::from_value::<TunableRule>(reversed).is_err());
+    let empty_enum = serde_json::json!({ "type": "enum_set", "values": [] });
+    assert!(serde_json::from_value::<TunableRule>(empty_enum).is_err());
+    let mut env_tunable = good.clone();
+    env_tunable["tunables"] = serde_json::json!({
+        "bad": { "type": "float_range", "min": 1.0, "max": 0.0 }
+    });
+    assert!(serde_json::from_value::<CapabilityEnvelope>(env_tunable).is_err());
+
+    // Invalid timestamps: issued_at >= expires_at.
+    let mut env_time = good.clone();
+    env_time["expires_at"] = env_time["issued_at"].clone();
+    assert!(serde_json::from_value::<CapabilityEnvelope>(env_time.clone()).is_err());
+    env_time["expires_at"] = serde_json::json!("2020-01-01T00:00:00Z");
+    assert!(serde_json::from_value::<CapabilityEnvelope>(env_time).is_err());
+
+    // Missing energy without allowance rejected on budget JSON.
+    let mut missing_energy = serde_json::to_value(valid_budget()).unwrap();
+    missing_energy["max_energy_joules"] = serde_json::Value::Null;
+    missing_energy["allow_missing_energy_meter"] = serde_json::json!(false);
+    assert!(serde_json::from_value::<ResourceBudget>(missing_energy).is_err());
 }
 
 #[test]
@@ -511,6 +589,12 @@ fn resource_usage_fits_rejects_any_over_budget_field() {
     .fits(&budget));
     assert!(!ResourceUsage {
         energy_joules: Some(budget.max_energy_joules.unwrap() + 1),
+        ..base.clone()
+    }
+    .fits(&budget));
+    // Finite ceiling without allow_missing rejects absent energy reading.
+    assert!(!ResourceUsage {
+        energy_joules: None,
         ..base
     }
     .fits(&budget));

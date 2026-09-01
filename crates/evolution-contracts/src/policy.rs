@@ -5,7 +5,7 @@
 use crate::{CandidateKind, ENVELOPE_SCHEMA};
 use chrono::{DateTime, Utc};
 use schemars::JsonSchema;
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize};
 use std::collections::{BTreeMap, BTreeSet};
 use thiserror::Error;
 
@@ -52,7 +52,7 @@ pub enum PolicyError {
 }
 
 /// Absolute ceilings for a single candidate attempt.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, JsonSchema)]
 pub struct ResourceBudget {
     pub wall_seconds: u64,
     pub max_attempts: u8,
@@ -66,6 +66,38 @@ pub struct ResourceBudget {
     pub max_energy_joules: Option<u64>,
     /// Explicit signed allowance that energy metering may be absent.
     pub allow_missing_energy_meter: bool,
+}
+
+#[derive(Deserialize)]
+struct RawResourceBudget {
+    wall_seconds: u64,
+    max_attempts: u8,
+    max_changed_files: u32,
+    max_added_lines: u32,
+    max_tool_calls: u32,
+    max_input_tokens: u64,
+    max_output_tokens: u64,
+    max_energy_joules: Option<u64>,
+    allow_missing_energy_meter: bool,
+}
+
+impl<'de> Deserialize<'de> for ResourceBudget {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        let raw = RawResourceBudget::deserialize(deserializer)?;
+        let value = Self {
+            wall_seconds: raw.wall_seconds,
+            max_attempts: raw.max_attempts,
+            max_changed_files: raw.max_changed_files,
+            max_added_lines: raw.max_added_lines,
+            max_tool_calls: raw.max_tool_calls,
+            max_input_tokens: raw.max_input_tokens,
+            max_output_tokens: raw.max_output_tokens,
+            max_energy_joules: raw.max_energy_joules,
+            allow_missing_energy_meter: raw.allow_missing_energy_meter,
+        };
+        value.validate().map_err(serde::de::Error::custom)?;
+        Ok(value)
+    }
 }
 
 impl ResourceBudget {
@@ -160,8 +192,11 @@ pub struct ResourceUsage {
 impl ResourceUsage {
     /// Return true when every used field is within the signed maximum.
     ///
-    /// A missing energy meter (`budget.max_energy_joules == None`) is never
-    /// unlimited energy: any positive observed energy fails the fit check.
+    /// Energy rules:
+    /// - `max_energy_joules = None` never means unlimited energy: any positive
+    ///   observed energy fails.
+    /// - Against a finite ceiling, `energy_joules = None` is accepted only when
+    ///   `allow_missing_energy_meter` is true (explicit signed allowance).
     pub fn fits(&self, budget: &ResourceBudget) -> bool {
         if self.wall_seconds > budget.wall_seconds
             || self.attempts > budget.max_attempts
@@ -180,7 +215,7 @@ impl ResourceUsage {
                 Some(_) => false,
             },
             Some(max) => match self.energy_joules {
-                None => true,
+                None => budget.allow_missing_energy_meter,
                 Some(used) => used <= max,
             },
         }
@@ -188,9 +223,25 @@ impl ResourceUsage {
 }
 
 /// Protected-path rules for candidate diffs and writes.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, JsonSchema)]
 pub struct PathPolicy {
     pub protected_paths: Vec<String>,
+}
+
+#[derive(Deserialize)]
+struct RawPathPolicy {
+    protected_paths: Vec<String>,
+}
+
+impl<'de> Deserialize<'de> for PathPolicy {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        let raw = RawPathPolicy::deserialize(deserializer)?;
+        let value = Self {
+            protected_paths: raw.protected_paths,
+        };
+        value.validate().map_err(serde::de::Error::custom)?;
+        Ok(value)
+    }
 }
 
 impl PathPolicy {
@@ -278,7 +329,14 @@ fn normalize_relative_path(path: &str) -> Result<String, PolicyError> {
                     "path escapes via ..: {path:?}"
                 )));
             }
-            other => out.push(other),
+            other => {
+                if component_is_forbidden(other) {
+                    return Err(PolicyError::InvalidPath(format!(
+                        "path component forbidden (colon or trailing dot/space): {other:?} in {path:?}"
+                    )));
+                }
+                out.push(other);
+            }
         }
     }
     if out.is_empty() {
@@ -287,6 +345,15 @@ fn normalize_relative_path(path: &str) -> Result<String, PolicyError> {
         )));
     }
     Ok(out.join("/"))
+}
+
+/// Reject NTFS ADS / drive markers and Windows-trimmed trailing dots/spaces.
+fn component_is_forbidden(component: &str) -> bool {
+    if component.contains(':') {
+        return true;
+    }
+    let trimmed = component.trim_end_matches(|c: char| c == ' ' || c == '\t' || c == '.');
+    trimmed != component || trimmed.is_empty()
 }
 
 fn normalize_protected_pattern(pattern: &str) -> Result<String, PolicyError> {
@@ -316,7 +383,14 @@ fn normalize_protected_pattern(pattern: &str) -> Result<String, PolicyError> {
                     "protected pattern escapes via ..: {pattern:?}"
                 )));
             }
-            other => parts.push(other),
+            other => {
+                if component_is_forbidden(other) {
+                    return Err(PolicyError::InvalidPath(format!(
+                        "protected pattern component forbidden: {other:?}"
+                    )));
+                }
+                parts.push(other);
+            }
         }
     }
     if parts.is_empty() {
@@ -362,13 +436,36 @@ fn path_matches_protected(path: &str, pattern: &str) -> bool {
 }
 
 /// Typed bounds for an operator-signed tunable key.
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Clone, PartialEq, Serialize, JsonSchema)]
 #[serde(rename_all = "snake_case", tag = "type")]
 pub enum TunableRule {
     IntegerRange { min: i64, max: i64 },
     FloatRange { min: f64, max: f64 },
     EnumSet { values: BTreeSet<String> },
     Boolean,
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all = "snake_case", tag = "type")]
+enum RawTunableRule {
+    IntegerRange { min: i64, max: i64 },
+    FloatRange { min: f64, max: f64 },
+    EnumSet { values: BTreeSet<String> },
+    Boolean,
+}
+
+impl<'de> Deserialize<'de> for TunableRule {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        let raw = RawTunableRule::deserialize(deserializer)?;
+        let value = match raw {
+            RawTunableRule::IntegerRange { min, max } => Self::IntegerRange { min, max },
+            RawTunableRule::FloatRange { min, max } => Self::FloatRange { min, max },
+            RawTunableRule::EnumSet { values } => Self::EnumSet { values },
+            RawTunableRule::Boolean => Self::Boolean,
+        };
+        value.validate().map_err(serde::de::Error::custom)?;
+        Ok(value)
+    }
 }
 
 impl TunableRule {
@@ -505,7 +602,7 @@ impl PolicyDecision {
 }
 
 /// Signed capability envelope (signature verification lives outside this crate).
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Clone, PartialEq, Serialize, JsonSchema)]
 pub struct CapabilityEnvelope {
     pub schema: String,
     pub envelope_id: String,
@@ -518,6 +615,42 @@ pub struct CapabilityEnvelope {
     pub tunables: BTreeMap<String, TunableRule>,
     pub allowed_candidate_kinds: BTreeSet<CandidateKind>,
     pub required_gates: Vec<String>,
+}
+
+#[derive(Deserialize)]
+struct RawCapabilityEnvelope {
+    schema: String,
+    envelope_id: String,
+    policy_version: String,
+    signer_key_id: String,
+    issued_at: DateTime<Utc>,
+    expires_at: DateTime<Utc>,
+    budget: ResourceBudget,
+    paths: PathPolicy,
+    tunables: BTreeMap<String, TunableRule>,
+    allowed_candidate_kinds: BTreeSet<CandidateKind>,
+    required_gates: Vec<String>,
+}
+
+impl<'de> Deserialize<'de> for CapabilityEnvelope {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        let raw = RawCapabilityEnvelope::deserialize(deserializer)?;
+        let value = Self {
+            schema: raw.schema,
+            envelope_id: raw.envelope_id,
+            policy_version: raw.policy_version,
+            signer_key_id: raw.signer_key_id,
+            issued_at: raw.issued_at,
+            expires_at: raw.expires_at,
+            budget: raw.budget,
+            paths: raw.paths,
+            tunables: raw.tunables,
+            allowed_candidate_kinds: raw.allowed_candidate_kinds,
+            required_gates: raw.required_gates,
+        };
+        value.validate().map_err(serde::de::Error::custom)?;
+        Ok(value)
+    }
 }
 
 impl CapabilityEnvelope {
@@ -665,14 +798,19 @@ mod tests {
         };
         assert!(!over.fits(&budget));
 
+        // Finite ceiling rejects missing energy unless allow_missing_energy_meter.
+        let missing = ResourceUsage {
+            energy_joules: None,
+            ..usage.clone()
+        };
+        assert!(!missing.fits(&budget));
+        budget.allow_missing_energy_meter = true;
+        assert!(missing.fits(&budget));
+
         budget.max_energy_joules = None;
         budget.allow_missing_energy_meter = true;
         assert!(!usage.fits(&budget));
-        let no_energy = ResourceUsage {
-            energy_joules: None,
-            ..usage
-        };
-        assert!(no_energy.fits(&budget));
+        assert!(missing.fits(&budget));
     }
 
     #[test]
