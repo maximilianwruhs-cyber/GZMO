@@ -533,13 +533,13 @@ Expected: FAIL: audit implementation missing.
 
 - [ ] **Step 3: Implement canonical JSON**
 
-Recursively sort JSON object keys, preserve array order, reject non-finite floats before serialization, and serialize without whitespace. Hash `schema || sequence || previous_hash || event_type || candidate_id || payload_digest || occurred_at` with SHA-256.
+Define `AuditEvent` with exact `AUDIT_SCHEMA`, sequence, previous hash, event type, optional candidate ID, payload digest, UTC timestamp, and stored event hash. `canonical_json_bytes` recursively sorts object keys, preserves array order, serializes compactly, and rejects non-JSON/non-finite values. `sha256_hex` returns exactly 64 lowercase hex characters. `AuditEvent::next(None, ...)` uses sequence 1 and a 64-zero genesis previous hash; `next(Some(previous), ...)` first validates the previous event, increments sequence with checked arithmetic, hashes the canonical payload, then hashes canonical JSON of a private `AuditPreimage` containing every event field except `event_hash`. This avoids ambiguous string concatenation. Event types are 1–128 lowercase ASCII characters from `[a-z0-9._-]`. Implement custom validated `Deserialize` that recomputes payload/event structure and rejects malformed hash lengths/case, zero sequence, invalid event type, or mismatched stored event hash.
 
 Then add `pub mod audit; pub use audit::*;` to `lib.rs` after the audit implementation compiles.
 
 - [ ] **Step 4: Implement chain verification**
 
-Require sequence starts at one, increments by one, every `previous_hash` equals the previous event hash, and each event hash recomputes exactly.
+`verify_chain(&[])` returns `Ok(())` for an uninitialized ledger. A nonempty chain must start at sequence 1 with the zero genesis hash, increment by exactly one, link each `previous_hash` to the preceding `event_hash`, carry exact schema/valid IDs/hashes/types, and recompute each event hash exactly. Test stable object-key ordering, array-order significance, sequence gaps/overflow, bad genesis/link, and tampering of every hashed field.
 
 - [ ] **Step 5: Run audit tests**
 

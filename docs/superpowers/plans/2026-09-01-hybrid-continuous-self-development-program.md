@@ -127,6 +127,7 @@ pub struct AuditEvent {
     pub candidate_id: Option<CandidateId>,
     pub payload_digest: String,
     pub occurred_at: chrono::DateTime<chrono::Utc>,
+    pub event_hash: String,
 }
 ```
 
