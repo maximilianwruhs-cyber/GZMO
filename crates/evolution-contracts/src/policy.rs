@@ -53,16 +53,25 @@ pub enum PolicyError {
 
 /// Absolute ceilings for a single candidate attempt.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, JsonSchema)]
+#[schemars(deny_unknown_fields, title = "ResourceBudget")]
 pub struct ResourceBudget {
+    #[schemars(range(min = 1, max = 86_400))]
     pub wall_seconds: u64,
+    #[schemars(range(min = 1, max = 5))]
     pub max_attempts: u8,
+    #[schemars(range(min = 1, max = 100))]
     pub max_changed_files: u32,
+    #[schemars(range(min = 1, max = 10_000))]
     pub max_added_lines: u32,
+    #[schemars(range(min = 1, max = 500))]
     pub max_tool_calls: u32,
+    #[schemars(range(min = 1, max = 5_000_000))]
     pub max_input_tokens: u64,
+    #[schemars(range(min = 1, max = 1_000_000))]
     pub max_output_tokens: u64,
     /// When `None`, the signed profile acknowledges a missing energy meter.
     /// That is never unlimited energy; see [`ResourceBudget::allow_missing_energy_meter`].
+    #[schemars(range(min = 1, max = 10_000_000))]
     pub max_energy_joules: Option<u64>,
     /// Explicit signed allowance that energy metering may be absent.
     pub allow_missing_energy_meter: bool,
@@ -224,7 +233,9 @@ impl ResourceUsage {
 
 /// Protected-path rules for candidate diffs and writes.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, JsonSchema)]
+#[schemars(deny_unknown_fields, title = "PathPolicy")]
 pub struct PathPolicy {
+    #[schemars(length(min = 1))]
     pub protected_paths: Vec<String>,
 }
 
@@ -438,10 +449,14 @@ fn path_matches_protected(path: &str, pattern: &str) -> bool {
 /// Typed bounds for an operator-signed tunable key.
 #[derive(Debug, Clone, PartialEq, Serialize, JsonSchema)]
 #[serde(rename_all = "snake_case", tag = "type")]
+#[schemars(deny_unknown_fields, title = "TunableRule")]
 pub enum TunableRule {
     IntegerRange { min: i64, max: i64 },
     FloatRange { min: f64, max: f64 },
-    EnumSet { values: BTreeSet<String> },
+    EnumSet {
+        #[schemars(length(min = 1))]
+        values: BTreeSet<String>,
+    },
     Boolean,
 }
 
@@ -603,17 +618,24 @@ impl PolicyDecision {
 
 /// Signed capability envelope (signature verification lives outside this crate).
 #[derive(Debug, Clone, PartialEq, Serialize, JsonSchema)]
+#[schemars(deny_unknown_fields, title = "CapabilityEnvelope")]
 pub struct CapabilityEnvelope {
+    #[schemars(regex(pattern = r"^gzmo\.evolution\.envelope/v1$"))]
     pub schema: String,
+    #[schemars(length(min = 1))]
     pub envelope_id: String,
+    #[schemars(length(min = 1))]
     pub policy_version: String,
+    #[schemars(length(min = 1))]
     pub signer_key_id: String,
     pub issued_at: DateTime<Utc>,
     pub expires_at: DateTime<Utc>,
     pub budget: ResourceBudget,
     pub paths: PathPolicy,
     pub tunables: BTreeMap<String, TunableRule>,
+    #[schemars(length(min = 1))]
     pub allowed_candidate_kinds: BTreeSet<CandidateKind>,
+    #[schemars(length(min = 1))]
     pub required_gates: Vec<String>,
 }
 

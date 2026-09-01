@@ -1,0 +1,286 @@
+{
+  "$id": "https://gzmo.dev/schemas/evolution/envelope-v1.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "definitions": {
+    "CandidateKind": {
+      "description": "Kind of evolutionary change being proposed.",
+      "enum": [
+        "memory",
+        "tunable",
+        "procedural_skill",
+        "code",
+        "schema",
+        "model",
+        "runtime",
+        "evaluator",
+        "security",
+        "authority"
+      ],
+      "type": "string"
+    },
+    "PathPolicy": {
+      "additionalProperties": false,
+      "description": "Protected-path rules for candidate diffs and writes.",
+      "properties": {
+        "protected_paths": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "protected_paths"
+      ],
+      "title": "PathPolicy",
+      "type": "object"
+    },
+    "ResourceBudget": {
+      "additionalProperties": false,
+      "description": "Absolute ceilings for a single candidate attempt.",
+      "properties": {
+        "allow_missing_energy_meter": {
+          "description": "Explicit signed allowance that energy metering may be absent.",
+          "type": "boolean"
+        },
+        "max_added_lines": {
+          "format": "uint32",
+          "maximum": 10000.0,
+          "minimum": 1.0,
+          "type": "integer"
+        },
+        "max_attempts": {
+          "format": "uint8",
+          "maximum": 5.0,
+          "minimum": 1.0,
+          "type": "integer"
+        },
+        "max_changed_files": {
+          "format": "uint32",
+          "maximum": 100.0,
+          "minimum": 1.0,
+          "type": "integer"
+        },
+        "max_energy_joules": {
+          "description": "When `None`, the signed profile acknowledges a missing energy meter. That is never unlimited energy; see [`ResourceBudget::allow_missing_energy_meter`].",
+          "format": "uint64",
+          "maximum": 10000000.0,
+          "minimum": 1.0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "max_input_tokens": {
+          "format": "uint64",
+          "maximum": 5000000.0,
+          "minimum": 1.0,
+          "type": "integer"
+        },
+        "max_output_tokens": {
+          "format": "uint64",
+          "maximum": 1000000.0,
+          "minimum": 1.0,
+          "type": "integer"
+        },
+        "max_tool_calls": {
+          "format": "uint32",
+          "maximum": 500.0,
+          "minimum": 1.0,
+          "type": "integer"
+        },
+        "wall_seconds": {
+          "format": "uint64",
+          "maximum": 86400.0,
+          "minimum": 1.0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "allow_missing_energy_meter",
+        "max_added_lines",
+        "max_attempts",
+        "max_changed_files",
+        "max_input_tokens",
+        "max_output_tokens",
+        "max_tool_calls",
+        "wall_seconds"
+      ],
+      "title": "ResourceBudget",
+      "type": "object"
+    },
+    "TunableRule": {
+      "description": "Typed bounds for an operator-signed tunable key.",
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "max": {
+              "format": "int64",
+              "type": "integer"
+            },
+            "min": {
+              "format": "int64",
+              "type": "integer"
+            },
+            "type": {
+              "enum": [
+                "integer_range"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "max",
+            "min",
+            "type"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "max": {
+              "format": "double",
+              "type": "number"
+            },
+            "min": {
+              "format": "double",
+              "type": "number"
+            },
+            "type": {
+              "enum": [
+                "float_range"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "max",
+            "min",
+            "type"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "enum": [
+                "enum_set"
+              ],
+              "type": "string"
+            },
+            "values": {
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1,
+              "type": "array",
+              "uniqueItems": true
+            }
+          },
+          "required": [
+            "type",
+            "values"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "enum": [
+                "boolean"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "type"
+          ],
+          "type": "object"
+        }
+      ],
+      "title": "TunableRule"
+    }
+  },
+  "description": "Signed capability envelope (signature verification lives outside this crate).",
+  "properties": {
+    "allowed_candidate_kinds": {
+      "items": {
+        "$ref": "#/definitions/CandidateKind"
+      },
+      "minItems": 1,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "budget": {
+      "$ref": "#/definitions/ResourceBudget"
+    },
+    "envelope_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "expires_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "issued_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "paths": {
+      "$ref": "#/definitions/PathPolicy"
+    },
+    "policy_version": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "required_gates": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "schema": {
+      "pattern": "^gzmo\\.evolution\\.envelope/v1$",
+      "type": "string"
+    },
+    "signer_key_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "tunables": {
+      "additionalProperties": {
+        "$ref": "#/definitions/TunableRule"
+      },
+      "type": "object"
+    }
+  },
+  "required": [
+    "allowed_candidate_kinds",
+    "budget",
+    "envelope_id",
+    "expires_at",
+    "issued_at",
+    "paths",
+    "policy_version",
+    "required_gates",
+    "schema",
+    "signer_key_id",
+    "tunables"
+  ],
+  "title": "CapabilityEnvelope",
+  "type": "object",
+  "x-gzmo-runtime-validation": [
+    "time-window: issued_at must be strictly before expires_at",
+    "allowed_candidate_kinds: stage-1 allowlist is Memory|Tunable only (runtime enum subset check)",
+    "energy-meter: max_energy_joules absence requires allow_missing_energy_meter",
+    "signature-verification-boundary: envelope signature verification is outside this crate and outside schema validation"
+  ],
+  "x-gzmo-schema-id": "gzmo.evolution.envelope/v1"
+}

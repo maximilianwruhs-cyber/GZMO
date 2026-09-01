@@ -42,11 +42,15 @@ pub enum GateStatus {
 
 /// One gate observation attached to an evaluation report.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, JsonSchema)]
+#[schemars(deny_unknown_fields, title = "GateResult")]
 pub struct GateResult {
+    #[schemars(length(min = 1), regex(pattern = r"^[a-z0-9](?:[a-z0-9._-]*[a-z0-9])?$"))]
     pub name: String,
     pub class: GateClass,
     pub status: GateStatus,
+    #[schemars(length(max = 4096))]
     pub detail: String,
+    #[schemars(regex(pattern = r"^sha256:[a-f0-9]{64}$"))]
     pub artifact_digest: Option<String>,
 }
 
@@ -115,11 +119,16 @@ impl GateResult {
 
 /// Comparative evaluation of a candidate against its baseline.
 #[derive(Debug, Clone, PartialEq, Serialize, JsonSchema)]
+#[schemars(deny_unknown_fields, title = "EvaluationReport")]
 pub struct EvaluationReport {
+    #[schemars(regex(pattern = r"^gzmo\.evolution\.evaluation/v1$"))]
     pub schema: String,
     pub candidate_id: CandidateId,
+    #[schemars(regex(pattern = r"^(sha256:[a-f0-9]{64}|git-sha1:[a-f0-9]{40})$"))]
     pub baseline_digest: String,
+    #[schemars(regex(pattern = r"^(sha256:[a-f0-9]{64}|git-sha1:[a-f0-9]{40})$"))]
     pub candidate_digest: String,
+    #[schemars(length(min = 1))]
     pub gates: Vec<GateResult>,
     pub hard_floors_passed: bool,
     pub metrics: BTreeMap<String, f64>,

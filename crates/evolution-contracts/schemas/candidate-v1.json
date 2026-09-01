@@ -1,0 +1,259 @@
+{
+  "$id": "https://gzmo.dev/schemas/evolution/candidate-v1.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "definitions": {
+    "AuthorityTier": {
+      "description": "Authority classification for a candidate kind.",
+      "enum": [
+        "memory",
+        "tunable",
+        "candidate",
+        "promotion",
+        "authority"
+      ],
+      "type": "string"
+    },
+    "CandidateId": {
+      "maxLength": 96,
+      "minLength": 16,
+      "pattern": "^cand-[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$",
+      "type": "string"
+    },
+    "CandidateKind": {
+      "description": "Kind of evolutionary change being proposed.",
+      "enum": [
+        "memory",
+        "tunable",
+        "procedural_skill",
+        "code",
+        "schema",
+        "model",
+        "runtime",
+        "evaluator",
+        "security",
+        "authority"
+      ],
+      "type": "string"
+    },
+    "CandidateTarget": {
+      "description": "Where a candidate will be built and evaluated.",
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "base_branch": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "candidate_branch": {
+              "minLength": 1,
+              "pattern": "^evolve/cand-[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$",
+              "type": "string"
+            },
+            "mode": {
+              "enum": [
+                "repository"
+              ],
+              "type": "string"
+            },
+            "owner": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "repository": {
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "required": [
+            "base_branch",
+            "candidate_branch",
+            "mode",
+            "owner",
+            "repository"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "inactive_target": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "mode": {
+              "enum": [
+                "appliance"
+              ],
+              "type": "string"
+            },
+            "node_id": {
+              "minLength": 1,
+              "pattern": "^[a-z0-9](?:[a-z0-9_-]*[a-z0-9])?$",
+              "type": "string"
+            },
+            "target_class": {
+              "minLength": 1,
+              "pattern": "^[a-z0-9](?:[a-z0-9_-]*[a-z0-9])?$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "mode",
+            "node_id",
+            "target_class"
+          ],
+          "type": "object"
+        }
+      ],
+      "title": "CandidateTarget"
+    },
+    "ResourceBudget": {
+      "additionalProperties": false,
+      "description": "Absolute ceilings for a single candidate attempt.",
+      "properties": {
+        "allow_missing_energy_meter": {
+          "description": "Explicit signed allowance that energy metering may be absent.",
+          "type": "boolean"
+        },
+        "max_added_lines": {
+          "format": "uint32",
+          "maximum": 10000.0,
+          "minimum": 1.0,
+          "type": "integer"
+        },
+        "max_attempts": {
+          "format": "uint8",
+          "maximum": 5.0,
+          "minimum": 1.0,
+          "type": "integer"
+        },
+        "max_changed_files": {
+          "format": "uint32",
+          "maximum": 100.0,
+          "minimum": 1.0,
+          "type": "integer"
+        },
+        "max_energy_joules": {
+          "description": "When `None`, the signed profile acknowledges a missing energy meter. That is never unlimited energy; see [`ResourceBudget::allow_missing_energy_meter`].",
+          "format": "uint64",
+          "maximum": 10000000.0,
+          "minimum": 1.0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "max_input_tokens": {
+          "format": "uint64",
+          "maximum": 5000000.0,
+          "minimum": 1.0,
+          "type": "integer"
+        },
+        "max_output_tokens": {
+          "format": "uint64",
+          "maximum": 1000000.0,
+          "minimum": 1.0,
+          "type": "integer"
+        },
+        "max_tool_calls": {
+          "format": "uint32",
+          "maximum": 500.0,
+          "minimum": 1.0,
+          "type": "integer"
+        },
+        "wall_seconds": {
+          "format": "uint64",
+          "maximum": 86400.0,
+          "minimum": 1.0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "allow_missing_energy_meter",
+        "max_added_lines",
+        "max_attempts",
+        "max_changed_files",
+        "max_input_tokens",
+        "max_output_tokens",
+        "max_tool_calls",
+        "wall_seconds"
+      ],
+      "title": "ResourceBudget",
+      "type": "object"
+    }
+  },
+  "description": "Immutable candidate declaration consumed by later evolution stages.",
+  "properties": {
+    "authority": {
+      "$ref": "#/definitions/AuthorityTier"
+    },
+    "baseline_digest": {
+      "pattern": "^(sha256:[a-f0-9]{64}|git-sha1:[a-f0-9]{40})$",
+      "type": "string"
+    },
+    "budget": {
+      "$ref": "#/definitions/ResourceBudget"
+    },
+    "created_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "id": {
+      "$ref": "#/definitions/CandidateId"
+    },
+    "kind": {
+      "$ref": "#/definitions/CandidateKind"
+    },
+    "mission_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "protected_paths": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "required_gates": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "schema": {
+      "pattern": "^gzmo\\.evolution\\.candidate/v1$",
+      "type": "string"
+    },
+    "target": {
+      "$ref": "#/definitions/CandidateTarget"
+    }
+  },
+  "required": [
+    "authority",
+    "baseline_digest",
+    "budget",
+    "created_at",
+    "id",
+    "kind",
+    "mission_id",
+    "protected_paths",
+    "required_gates",
+    "schema",
+    "target"
+  ],
+  "title": "CandidateManifest",
+  "type": "object",
+  "x-gzmo-runtime-validation": [
+    "kind-authority: authority must equal kind.authority_tier(); not expressible as a pure schema correlation",
+    "target-baseline: baseline_digest algorithm depends on target mode (repository→git-sha1, appliance→sha256)",
+    "candidate-id-branch: repository candidate_branch must equal evolve/<id> bound to manifest id",
+    "runtime Deserialize/validate remains authoritative; schema does not verify digests or bindings"
+  ],
+  "x-gzmo-schema-id": "gzmo.evolution.candidate/v1"
+}

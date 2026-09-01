@@ -30,14 +30,21 @@ pub enum AuditError {
 
 /// One tamper-evident audit ledger entry.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, JsonSchema)]
+#[schemars(deny_unknown_fields, title = "AuditEvent")]
 pub struct AuditEvent {
+    #[schemars(regex(pattern = r"^gzmo\.evolution\.audit/v1$"))]
     pub schema: String,
+    #[schemars(range(min = 1))]
     pub sequence: u64,
+    #[schemars(regex(pattern = r"^[a-f0-9]{64}$"), length(min = 64, max = 64))]
     pub previous_hash: String,
+    #[schemars(length(min = 1, max = 128), regex(pattern = r"^[a-z0-9._-]+$"))]
     pub event_type: String,
     pub candidate_id: Option<CandidateId>,
+    #[schemars(regex(pattern = r"^[a-f0-9]{64}$"), length(min = 64, max = 64))]
     pub payload_digest: String,
     pub occurred_at: DateTime<Utc>,
+    #[schemars(regex(pattern = r"^[a-f0-9]{64}$"), length(min = 64, max = 64))]
     pub event_hash: String,
 }
 

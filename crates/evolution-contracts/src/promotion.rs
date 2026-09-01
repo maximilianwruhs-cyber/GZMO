@@ -28,15 +28,22 @@ pub enum PromotionError {
 
 /// Operator-facing promotion binding payload (unsigned).
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, JsonSchema)]
+#[schemars(deny_unknown_fields, title = "PromotionRequest")]
 pub struct PromotionRequest {
+    #[schemars(regex(pattern = r"^gzmo\.evolution\.promotion/v1$"))]
     pub schema: String,
     pub candidate_id: CandidateId,
+    #[schemars(regex(pattern = r"^(sha256:[a-f0-9]{64}|git-sha1:[a-f0-9]{40})$"))]
     pub candidate_digest: String,
+    #[schemars(regex(pattern = r"^sha256:[a-f0-9]{64}$"))]
     pub evaluation_digest: String,
+    #[schemars(regex(pattern = r"^sha256:[a-f0-9]{64}$"))]
     pub policy_digest: String,
+    #[schemars(length(min = 1), regex(pattern = r"^[A-Za-z0-9][A-Za-z0-9._-]*[A-Za-z0-9]$|^[A-Za-z0-9]$"))]
     pub target: String,
     pub issued_at: DateTime<Utc>,
     pub expires_at: DateTime<Utc>,
+    #[schemars(length(min = 1), regex(pattern = r"^[A-Za-z0-9][A-Za-z0-9._-]*[A-Za-z0-9]$|^[A-Za-z0-9]$"))]
     pub nonce: String,
 }
 
@@ -153,10 +160,13 @@ impl PromotionRequest {
 ///
 /// This crate never promotes an unverified grant to a trusted type.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, JsonSchema)]
+#[schemars(deny_unknown_fields, title = "UnverifiedAuthorityGrant")]
 pub struct UnverifiedAuthorityGrant {
     pub request: PromotionRequest,
+    #[schemars(length(min = 1), regex(pattern = r"^[A-Za-z0-9][A-Za-z0-9._-]*[A-Za-z0-9]$|^[A-Za-z0-9]$"))]
     pub signer_key_id: String,
     /// Ed25519 signature as 128 lowercase hex characters (encoding only).
+    #[schemars(regex(pattern = r"^[a-f0-9]{128}$"), length(min = 128, max = 128))]
     pub signature_hex: String,
 }
 

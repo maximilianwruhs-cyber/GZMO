@@ -1,0 +1,101 @@
+{
+  "$id": "https://gzmo.dev/schemas/evolution/promotion-v1.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "definitions": {
+    "CandidateId": {
+      "maxLength": 96,
+      "minLength": 16,
+      "pattern": "^cand-[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$",
+      "type": "string"
+    },
+    "PromotionRequest": {
+      "additionalProperties": false,
+      "description": "Operator-facing promotion binding payload (unsigned).",
+      "properties": {
+        "candidate_digest": {
+          "pattern": "^(sha256:[a-f0-9]{64}|git-sha1:[a-f0-9]{40})$",
+          "type": "string"
+        },
+        "candidate_id": {
+          "$ref": "#/definitions/CandidateId"
+        },
+        "evaluation_digest": {
+          "pattern": "^sha256:[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "expires_at": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "issued_at": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "nonce": {
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*[A-Za-z0-9]$|^[A-Za-z0-9]$",
+          "type": "string"
+        },
+        "policy_digest": {
+          "pattern": "^sha256:[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "schema": {
+          "pattern": "^gzmo\\.evolution\\.promotion/v1$",
+          "type": "string"
+        },
+        "target": {
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*[A-Za-z0-9]$|^[A-Za-z0-9]$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "candidate_digest",
+        "candidate_id",
+        "evaluation_digest",
+        "expires_at",
+        "issued_at",
+        "nonce",
+        "policy_digest",
+        "schema",
+        "target"
+      ],
+      "title": "PromotionRequest",
+      "type": "object"
+    }
+  },
+  "description": "Wire-format authority grant prior to cryptographic verification.\n\nThis crate never promotes an unverified grant to a trusted type.",
+  "properties": {
+    "request": {
+      "$ref": "#/definitions/PromotionRequest"
+    },
+    "signature_hex": {
+      "description": "Ed25519 signature as 128 lowercase hex characters (encoding only).",
+      "maxLength": 128,
+      "minLength": 128,
+      "pattern": "^[a-f0-9]{128}$",
+      "type": "string"
+    },
+    "signer_key_id": {
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*[A-Za-z0-9]$|^[A-Za-z0-9]$",
+      "type": "string"
+    }
+  },
+  "required": [
+    "request",
+    "signature_hex",
+    "signer_key_id"
+  ],
+  "title": "UnverifiedAuthorityGrant",
+  "type": "object",
+  "x-gzmo-runtime-validation": [
+    "promotion-binding: request digests and target must match supplied binding values at use time",
+    "promotion-time-window: now must satisfy issued_at <= now < expires_at and TTL <= 24h",
+    "signature-verification-boundary: signature_hex is encoding-only (128 lowercase hex); cryptographic verification is outside schema and this crate",
+    "schema validation alone never verifies a signature or digest binding"
+  ],
+  "x-gzmo-schema-id": "gzmo.evolution.promotion/v1"
+}

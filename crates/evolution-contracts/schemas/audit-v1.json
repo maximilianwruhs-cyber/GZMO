@@ -1,0 +1,80 @@
+{
+  "$id": "https://gzmo.dev/schemas/evolution/audit-v1.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "definitions": {
+    "CandidateId": {
+      "maxLength": 96,
+      "minLength": 16,
+      "pattern": "^cand-[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$",
+      "type": "string"
+    }
+  },
+  "description": "One tamper-evident audit ledger entry.",
+  "properties": {
+    "candidate_id": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/CandidateId"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "event_hash": {
+      "maxLength": 64,
+      "minLength": 64,
+      "pattern": "^[a-f0-9]{64}$",
+      "type": "string"
+    },
+    "event_type": {
+      "maxLength": 128,
+      "minLength": 1,
+      "pattern": "^[a-z0-9._-]+$",
+      "type": "string"
+    },
+    "occurred_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "payload_digest": {
+      "maxLength": 64,
+      "minLength": 64,
+      "pattern": "^[a-f0-9]{64}$",
+      "type": "string"
+    },
+    "previous_hash": {
+      "maxLength": 64,
+      "minLength": 64,
+      "pattern": "^[a-f0-9]{64}$",
+      "type": "string"
+    },
+    "schema": {
+      "pattern": "^gzmo\\.evolution\\.audit/v1$",
+      "type": "string"
+    },
+    "sequence": {
+      "format": "uint64",
+      "minimum": 1.0,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "event_hash",
+    "event_type",
+    "occurred_at",
+    "payload_digest",
+    "previous_hash",
+    "schema",
+    "sequence"
+  ],
+  "title": "AuditEvent",
+  "type": "object",
+  "x-gzmo-runtime-validation": [
+    "audit-hash-recomputation: event_hash must equal sha256 of canonical JSON preimage (all fields except event_hash); runtime validate recomputes this",
+    "chain linkage (sequence+previous_hash) is verified by verify_chain, not by single-event schema",
+    "signature/digest boundary: schema validation alone never verifies an event hash or chain integrity; runtime remains authoritative"
+  ],
+  "x-gzmo-schema-id": "gzmo.evolution.audit/v1"
+}

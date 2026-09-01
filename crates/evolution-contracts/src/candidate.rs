@@ -238,15 +238,22 @@ impl fmt::Display for CandidateState {
 /// Where a candidate will be built and evaluated.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, JsonSchema)]
 #[serde(tag = "mode", rename_all = "snake_case")]
+#[schemars(deny_unknown_fields, title = "CandidateTarget")]
 pub enum CandidateTarget {
     Repository {
+        #[schemars(length(min = 1))]
         owner: String,
+        #[schemars(length(min = 1))]
         repository: String,
+        #[schemars(length(min = 1))]
         base_branch: String,
+        #[schemars(length(min = 1), regex(pattern = r"^evolve/cand-[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$"))]
         candidate_branch: String,
     },
     Appliance {
+        #[schemars(length(min = 1), regex(pattern = r"^[a-z0-9](?:[a-z0-9_-]*[a-z0-9])?$"))]
         node_id: String,
+        #[schemars(length(min = 1), regex(pattern = r"^[a-z0-9](?:[a-z0-9_-]*[a-z0-9])?$"))]
         target_class: String,
         inactive_target: Option<String>,
     },
@@ -365,15 +372,21 @@ impl CandidateTarget {
 
 /// Immutable candidate declaration consumed by later evolution stages.
 #[derive(Debug, Clone, PartialEq, Serialize, JsonSchema)]
+#[schemars(deny_unknown_fields, title = "CandidateManifest")]
 pub struct CandidateManifest {
+    #[schemars(regex(pattern = r"^gzmo\.evolution\.candidate/v1$"))]
     pub schema: String,
     pub id: CandidateId,
+    #[schemars(length(min = 1))]
     pub mission_id: String,
     pub kind: CandidateKind,
     pub authority: AuthorityTier,
     pub target: CandidateTarget,
+    #[schemars(regex(pattern = r"^(sha256:[a-f0-9]{64}|git-sha1:[a-f0-9]{40})$"))]
     pub baseline_digest: String,
+    #[schemars(length(min = 1))]
     pub required_gates: Vec<String>,
+    #[schemars(length(min = 1))]
     pub protected_paths: Vec<String>,
     pub budget: ResourceBudget,
     pub created_at: DateTime<Utc>,
