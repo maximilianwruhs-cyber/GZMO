@@ -308,10 +308,10 @@ impl CandidateTarget {
                 base_branch,
                 candidate_branch,
             } => {
-                validate_safe_git_name("owner", owner)?;
-                validate_safe_git_name("repository", repository)?;
-                validate_safe_git_name("base_branch", base_branch)?;
-                validate_safe_git_name("candidate_branch", candidate_branch)?;
+                validate_safe_owner_or_repository("owner", owner)?;
+                validate_safe_owner_or_repository("repository", repository)?;
+                validate_safe_git_ref("base_branch", base_branch)?;
+                validate_safe_git_ref("candidate_branch", candidate_branch)?;
                 let Some(id_part) = candidate_branch.strip_prefix("evolve/") else {
                     return Err(ContractError::InvalidTarget(
                         "candidate_branch must start with evolve/".to_owned(),
@@ -452,8 +452,115 @@ fn validate_safe_mission_id(value: &str) -> Result<(), ContractError> {
     validate_safe_token("mission_id", value).map_err(|msg| ContractError::InvalidManifest(msg))
 }
 
-fn validate_safe_git_name(field: &str, value: &str) -> Result<(), ContractError> {
-    validate_safe_token(field, value).map_err(ContractError::InvalidTarget)
+
+/// Owner/repository names: no path separators; cannot repoint the target.
+fn validate_safe_owner_or_repository(field: &str, value: &str) -> Result<(), ContractError> {
+    if value.contains('/') {
+        return Err(ContractError::InvalidTarget(format!(
+            "{field} must not contain '/'"
+        )));
+    }
+    validate_safe_git_ref_component(field, value)
+}
+
+/// Branch/ref names: slash-separated components, each independently safe.
+fn validate_safe_git_ref(field: &str, value: &str) -> Result<(), ContractError> {
+    if value.is_empty() {
+        return Err(ContractError::InvalidTarget(format!(
+            "{field} must be nonempty"
+        )));
+    }
+    if value != value.trim() {
+        return Err(ContractError::InvalidTarget(format!(
+            "{field} must not have leading or trailing whitespace"
+        )));
+    }
+    if value.starts_with('/') || value.ends_with('/') {
+        return Err(ContractError::InvalidTarget(format!(
+            "{field} must not have leading or trailing slash"
+        )));
+    }
+    if value.contains("//") {
+        return Err(ContractError::InvalidTarget(format!(
+            "{field} must not contain empty components (consecutive slashes)"
+        )));
+    }
+    // Whole-ref checks that also apply across component boundaries.
+    if value.contains("..") {
+        return Err(ContractError::InvalidTarget(format!(
+            "{field} must not contain .."
+        )));
+    }
+    if value.contains("@{") {
+        return Err(ContractError::InvalidTarget(format!(
+            "{field} must not contain @{{"
+        )));
+    }
+    if value == "@" {
+        return Err(ContractError::InvalidTarget(format!(
+            "{field} must not be bare @"
+        )));
+    }
+    for component in value.split('/') {
+        validate_safe_git_ref_component(field, component)?;
+    }
+    Ok(())
+}
+
+fn validate_safe_git_ref_component(field: &str, component: &str) -> Result<(), ContractError> {
+    if component.is_empty() {
+        return Err(ContractError::InvalidTarget(format!(
+            "{field} must not contain empty components"
+        )));
+    }
+    if component == "@" {
+        return Err(ContractError::InvalidTarget(format!(
+            "{field} must not contain bare @"
+        )));
+    }
+    if component.starts_with('.') || component.starts_with('-') {
+        return Err(ContractError::InvalidTarget(format!(
+            "{field} component must not begin with '.' or '-': {component:?}"
+        )));
+    }
+    if component.ends_with('.') {
+        return Err(ContractError::InvalidTarget(format!(
+            "{field} component must not end with '.': {component:?}"
+        )));
+    }
+    if component.ends_with(".lock") {
+        return Err(ContractError::InvalidTarget(format!(
+            "{field} component must not end with .lock"
+        )));
+    }
+    if component.contains("..") {
+        return Err(ContractError::InvalidTarget(format!(
+            "{field} must not contain .."
+        )));
+    }
+    if component.contains("@{") {
+        return Err(ContractError::InvalidTarget(format!(
+            "{field} must not contain @{{"
+        )));
+    }
+    for ch in component.chars() {
+        if ch.is_control()
+            || ch.is_whitespace()
+            || ch == '\\'
+            || ch == ':'
+            || ch == '~'
+            || ch == '^'
+            || ch == '?'
+            || ch == '*'
+            || ch == '['
+            || ch == '/'
+        {
+            return Err(ContractError::InvalidTarget(format!(
+                "{field} contains forbidden character {ch:?} in {component:?}"
+            )));
+        }
+    }
+    Ok(())
 }
 
 fn validate_safe_token(field: &str, value: &str) -> Result<(), String> {

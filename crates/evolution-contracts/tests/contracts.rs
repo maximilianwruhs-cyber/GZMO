@@ -874,6 +874,112 @@ fn candidate_target_rejects_unsafe_ref_and_path_syntax() {
 }
 
 #[test]
+fn candidate_target_rejects_ref_component_and_owner_path_tricks() {
+    let id = fixture_candidate_id();
+    let expected_branch = format!("evolve/{}", id.as_str());
+
+    let base_branch_invalid = [
+        ".hidden",
+        "main.",
+        "a//b",
+        "@",
+        "--upload-pack=x",
+        "feature/.hidden",
+        "feature/-evil",
+        "feature/main.",
+        "feature/@",
+    ];
+    for bad in base_branch_invalid {
+        let value = serde_json::json!({
+            "mode": "repository",
+            "owner": "gzmo-org",
+            "repository": "gzmo",
+            "base_branch": bad,
+            "candidate_branch": expected_branch,
+        });
+        assert!(
+            serde_json::from_value::<CandidateTarget>(value.clone()).is_err(),
+            "expected reject base_branch={bad:?}"
+        );
+
+        let mut manifest = fixture_repo_manifest();
+        if let CandidateTarget::Repository {
+            ref mut base_branch, ..
+        } = manifest.target
+        {
+            *base_branch = bad.to_owned();
+        }
+        assert!(
+            manifest.validate().is_err(),
+            "expected validate reject base_branch={bad:?}"
+        );
+    }
+
+    for (field, bad) in [("owner", "owner/evil"), ("repository", "repo/evil")] {
+        let mut value = serde_json::json!({
+            "mode": "repository",
+            "owner": "gzmo-org",
+            "repository": "gzmo",
+            "base_branch": "main",
+            "candidate_branch": expected_branch,
+        });
+        value[field] = serde_json::json!(bad);
+        assert!(
+            serde_json::from_value::<CandidateTarget>(value).is_err(),
+            "expected reject {field}={bad:?}"
+        );
+
+        let mut manifest = fixture_repo_manifest();
+        match &mut manifest.target {
+            CandidateTarget::Repository {
+                owner,
+                repository,
+                ..
+            } => {
+                if field == "owner" {
+                    *owner = bad.to_owned();
+                } else {
+                    *repository = bad.to_owned();
+                }
+            }
+            _ => unreachable!(),
+        }
+        assert!(
+            manifest.validate().is_err(),
+            "expected validate reject {field}={bad:?}"
+        );
+    }
+
+    // Valid slash-separated base branch with safe components.
+    let good = serde_json::json!({
+        "mode": "repository",
+        "owner": "gzmo-org",
+        "repository": "gzmo",
+        "base_branch": "feature/foo-bar",
+        "candidate_branch": expected_branch,
+    });
+    let decoded: CandidateTarget = serde_json::from_value(good).unwrap();
+    assert_eq!(
+        decoded,
+        CandidateTarget::Repository {
+            owner: "gzmo-org".to_owned(),
+            repository: "gzmo".to_owned(),
+            base_branch: "feature/foo-bar".to_owned(),
+            candidate_branch: expected_branch.clone(),
+        }
+    );
+
+    let mut manifest = fixture_repo_manifest();
+    if let CandidateTarget::Repository {
+        ref mut base_branch, ..
+    } = manifest.target
+    {
+        *base_branch = "feature/foo-bar".to_owned();
+    }
+    assert!(manifest.validate().is_ok());
+}
+
+#[test]
 fn candidate_appliance_rejects_bad_identifiers() {
     let cases = [
         serde_json::json!({
