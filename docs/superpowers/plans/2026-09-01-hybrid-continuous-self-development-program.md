@@ -97,6 +97,7 @@ pub struct CandidateManifest {
     pub schema: String,
     pub id: CandidateId,
     pub mission_id: String,
+    pub kind: CandidateKind,
     pub authority: AuthorityTier,
     pub target: CandidateTarget,
     pub baseline_digest: String,

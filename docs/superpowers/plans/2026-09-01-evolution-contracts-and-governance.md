@@ -257,7 +257,7 @@ git commit -m "feat: add shared evolution contract crate"
 - Modify: `crates/evolution-contracts/tests/contracts.rs`
 
 **Interfaces:**
-- Produces: `CandidateManifest`, `CandidateState::can_transition_to`, `CandidateKind::authority_tier`.
+- Produces: `CandidateManifest`, `CandidateTarget`, and `CandidateState::can_transition_to`; consumes the existing `CandidateKind::authority_tier`.
 - Consumes: `ResourceBudget` from Task 4. Execute Task 4 before Task 3 as recorded in the SDD ledger.
 
 - [ ] **Step 1: Write transition tests**
@@ -289,38 +289,11 @@ Run: `cargo test -p evolution-contracts candidate_cannot_skip`
 
 Expected: FAIL: transition method missing.
 
-- [ ] **Step 3: Implement the exact state graph**
+- [ ] **Step 3: Implement target, manifest, and the exact state graph**
 
 ```rust
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "snake_case")]
-pub enum CandidateKind {
-    Memory,
-    Tunable,
-    ProceduralSkill,
-    Code,
-    Schema,
-    Model,
-    Runtime,
-    Evaluator,
-    Security,
-    Authority,
-}
 
-impl CandidateKind {
-    pub fn authority_tier(self) -> AuthorityTier {
-        match self {
-            Self::Memory => AuthorityTier::Memory,
-            Self::Tunable => AuthorityTier::Tunable,
-            Self::Authority | Self::Evaluator | Self::Security => AuthorityTier::Authority,
-            Self::ProceduralSkill | Self::Code | Self::Schema | Self::Model | Self::Runtime => {
-                AuthorityTier::Candidate
-            }
-        }
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, JsonSchema)]
 #[serde(tag = "mode", rename_all = "snake_case")]
 pub enum CandidateTarget {
     Repository {
@@ -334,6 +307,21 @@ pub enum CandidateTarget {
         target_class: String,
         inactive_target: Option<String>,
     },
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, JsonSchema)]
+pub struct CandidateManifest {
+    pub schema: String,
+    pub id: CandidateId,
+    pub mission_id: String,
+    pub kind: CandidateKind,
+    pub authority: AuthorityTier,
+    pub target: CandidateTarget,
+    pub baseline_digest: String,
+    pub required_gates: Vec<String>,
+    pub protected_paths: Vec<String>,
+    pub budget: ResourceBudget,
+    pub created_at: DateTime<Utc>,
 }
 
 pub fn can_transition_to(self, next: Self) -> bool {
@@ -352,9 +340,9 @@ pub fn can_transition_to(self, next: Self) -> bool {
 
 Memory candidates may use the same graph with an internally generated bounded grant; they still cannot skip evaluation/audit.
 
-- [ ] **Step 4: Implement `CandidateManifest::validate`**
+- [ ] **Step 4: Implement validated manifest/target deserialization**
 
-Require exact schema, nonempty mission, nonempty required gates, authority matching `CandidateKind`, and an algorithm-qualified baseline digest (`git-sha1:<40 hex>` or `sha256:<64 hex>`). `CandidateTarget::Repository` requires fixed owner/repository/base branch plus `candidate_branch = evolve/<candidate-id>`; `CandidateTarget::Appliance` requires node ID, target class, and no Git branch.
+Require exact schema, safe nonempty mission ID, nonempty unique required gates, unique normalized protected paths, valid nested budget, authority equal to `kind.authority_tier()`, and an algorithm-qualified baseline digest (`git-sha1:<40 lowercase hex>` or `sha256:<64 lowercase hex>`). `CandidateTarget::Repository` requires nonempty safe owner/repository/base-branch values and `candidate_branch = evolve/<candidate-id>`; reject control characters, whitespace edges, `..`, `@{`, backslash, colon, `~`, `^`, `?`, `*`, `[`, `.lock`, and leading/trailing slash. `CandidateTarget::Appliance` requires lowercase safe node ID/target class, and any inactive target must be a safe relative identifier. Implement custom `Deserialize` for both target and manifest through private raw types that call validation, so invalid external JSON cannot construct a usable contract.
 
 - [ ] **Step 5: Run all candidate tests**
 
