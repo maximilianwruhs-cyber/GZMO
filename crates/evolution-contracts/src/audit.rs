@@ -11,8 +11,7 @@ use sha2::{Digest, Sha256};
 use thiserror::Error;
 
 /// Genesis previous-hash for the first event in a chain (64 zero hex digits).
-pub const GENESIS_HASH: &str =
-    "0000000000000000000000000000000000000000000000000000000000000000";
+pub const GENESIS_HASH: &str = "0000000000000000000000000000000000000000000000000000000000000000";
 
 /// Errors raised while building or verifying audit contracts.
 #[derive(Debug, Error, Clone, PartialEq, Eq)]
@@ -154,9 +153,7 @@ impl AuditEvent {
             )));
         }
         if self.sequence == 0 {
-            return Err(AuditError::InvalidEvent(
-                "sequence must be >= 1".to_owned(),
-            ));
+            return Err(AuditError::InvalidEvent("sequence must be >= 1".to_owned()));
         }
         validate_event_type(&self.event_type)?;
         validate_hash_hex("previous_hash", &self.previous_hash)?;
@@ -323,10 +320,7 @@ fn validate_hash_hex(field: &str, hex: &str) -> Result<(), AuditError> {
             hex.len()
         )));
     }
-    if !hex
-        .bytes()
-        .all(|b| matches!(b, b'0'..=b'9' | b'a'..=b'f'))
-    {
+    if !hex.bytes().all(|b| matches!(b, b'0'..=b'9' | b'a'..=b'f')) {
         return Err(AuditError::InvalidEvent(format!(
             "{field} must be lowercase 0-9a-f, got {hex:?}"
         )));
@@ -457,11 +451,7 @@ impl serde::Serializer for FiniteChecker {
     fn serialize_tuple(self, _: usize) -> Result<FiniteList, AuditError> {
         Ok(FiniteList)
     }
-    fn serialize_tuple_struct(
-        self,
-        _: &'static str,
-        _: usize,
-    ) -> Result<FiniteList, AuditError> {
+    fn serialize_tuple_struct(self, _: &'static str, _: usize) -> Result<FiniteList, AuditError> {
         Ok(FiniteList)
     }
     fn serialize_tuple_variant(
@@ -581,7 +571,6 @@ impl serde::ser::Error for AuditError {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -596,8 +585,13 @@ mod tests {
     #[test]
     fn next_links_and_verify_empty() {
         assert!(verify_chain(&[]).is_ok());
-        let first = AuditEvent::next(None, "candidate.observed", None, &serde_json::json!({"a":1}))
-            .unwrap();
+        let first = AuditEvent::next(
+            None,
+            "candidate.observed",
+            None,
+            &serde_json::json!({"a":1}),
+        )
+        .unwrap();
         assert_eq!(first.sequence, 1);
         assert_eq!(first.previous_hash, GENESIS_HASH);
         let second = AuditEvent::next(Some(&first), "candidate.prepared", None, &2u8).unwrap();
@@ -681,4 +675,3 @@ mod tests {
         assert!(text.contains("payload_digest"));
     }
 }
-

@@ -155,11 +155,19 @@ impl ResourceBudget {
 
         nonzero_u64("wall_seconds", self.wall_seconds, MAX_WALL_SECONDS)?;
         nonzero_u8("max_attempts", self.max_attempts, MAX_ATTEMPTS)?;
-        nonzero_u32("max_changed_files", self.max_changed_files, MAX_CHANGED_FILES)?;
+        nonzero_u32(
+            "max_changed_files",
+            self.max_changed_files,
+            MAX_CHANGED_FILES,
+        )?;
         nonzero_u32("max_added_lines", self.max_added_lines, MAX_ADDED_LINES)?;
         nonzero_u32("max_tool_calls", self.max_tool_calls, MAX_TOOL_CALLS)?;
         nonzero_u64("max_input_tokens", self.max_input_tokens, MAX_INPUT_TOKENS)?;
-        nonzero_u64("max_output_tokens", self.max_output_tokens, MAX_OUTPUT_TOKENS)?;
+        nonzero_u64(
+            "max_output_tokens",
+            self.max_output_tokens,
+            MAX_OUTPUT_TOKENS,
+        )?;
 
         match self.max_energy_joules {
             None => {
@@ -263,10 +271,7 @@ impl PathPolicy {
     /// Stage-1 default protected paths.
     pub fn stage1_default() -> Self {
         Self {
-            protected_paths: DEFAULT_PROTECTED
-                .iter()
-                .map(|p| (*p).to_owned())
-                .collect(),
+            protected_paths: DEFAULT_PROTECTED.iter().map(|p| (*p).to_owned()).collect(),
         }
     }
 
@@ -451,12 +456,8 @@ fn path_matches_protected(path: &str, pattern: &str) -> bool {
 }
 
 /// JSON Schema for tunables map: nonempty keys with dotted-identifier pattern.
-fn tunables_map_schema(
-    gen: &mut schemars::gen::SchemaGenerator,
-) -> schemars::schema::Schema {
-    use schemars::schema::{
-        InstanceType, ObjectValidation, SchemaObject, StringValidation,
-    };
+fn tunables_map_schema(gen: &mut schemars::gen::SchemaGenerator) -> schemars::schema::Schema {
+    use schemars::schema::{InstanceType, ObjectValidation, SchemaObject, StringValidation};
     let value_schema = gen.subschema_for::<TunableRule>();
     SchemaObject {
         instance_type: Some(InstanceType::Object.into()),
@@ -530,8 +531,14 @@ fn nonempty_unique_candidate_kinds_schema(
 #[serde(rename_all = "snake_case", tag = "type")]
 #[schemars(deny_unknown_fields, title = "TunableRule")]
 pub enum TunableRule {
-    IntegerRange { min: i64, max: i64 },
-    FloatRange { min: f64, max: f64 },
+    IntegerRange {
+        min: i64,
+        max: i64,
+    },
+    FloatRange {
+        min: f64,
+        max: f64,
+    },
     EnumSet {
         #[schemars(length(min = 1))]
         values: BTreeSet<String>,
@@ -715,7 +722,10 @@ pub struct CapabilityEnvelope {
     /// Tunable allowlist keyed by dotted identifiers (runtime validates keys).
     #[schemars(schema_with = "tunables_map_schema")]
     pub tunables: BTreeMap<String, TunableRule>,
-    #[schemars(length(min = 1), schema_with = "nonempty_unique_candidate_kinds_schema")]
+    #[schemars(
+        length(min = 1),
+        schema_with = "nonempty_unique_candidate_kinds_schema"
+    )]
     pub allowed_candidate_kinds: BTreeSet<CandidateKind>,
     #[schemars(length(min = 1), schema_with = "nonempty_unique_string_array_schema")]
     pub required_gates: Vec<String>,
@@ -786,8 +796,7 @@ impl CapabilityEnvelope {
                 "issued_at must be strictly before expires_at".to_owned(),
             ));
         }
-        if self.required_gates.is_empty()
-            || self.required_gates.iter().any(|g| g.trim().is_empty())
+        if self.required_gates.is_empty() || self.required_gates.iter().any(|g| g.trim().is_empty())
         {
             return Err(PolicyError::InvalidEnvelope(
                 "required_gates must be nonempty with nonempty names".to_owned(),

@@ -132,7 +132,9 @@ impl fmt::Display for AuthorityTier {
 }
 
 /// Kind of evolutionary change being proposed.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize, JsonSchema)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize, JsonSchema,
+)]
 #[serde(rename_all = "snake_case")]
 pub enum CandidateKind {
     Memory,
@@ -154,11 +156,9 @@ impl CandidateKind {
             Self::Memory => AuthorityTier::Memory,
             Self::Tunable => AuthorityTier::Tunable,
             Self::Authority | Self::Evaluator | Self::Security => AuthorityTier::Authority,
-            Self::ProceduralSkill
-            | Self::Code
-            | Self::Schema
-            | Self::Model
-            | Self::Runtime => AuthorityTier::Candidate,
+            Self::ProceduralSkill | Self::Code | Self::Schema | Self::Model | Self::Runtime => {
+                AuthorityTier::Candidate
+            }
         }
     }
 }
@@ -247,13 +247,22 @@ pub enum CandidateTarget {
         repository: String,
         #[schemars(length(min = 1))]
         base_branch: String,
-        #[schemars(length(min = 1), regex(pattern = r"^evolve/cand-[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$"))]
+        #[schemars(
+            length(min = 1),
+            regex(pattern = r"^evolve/cand-[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$")
+        )]
         candidate_branch: String,
     },
     Appliance {
-        #[schemars(length(min = 1), regex(pattern = r"^[a-z0-9](?:[a-z0-9_-]*[a-z0-9])?$"))]
+        #[schemars(
+            length(min = 1),
+            regex(pattern = r"^[a-z0-9](?:[a-z0-9_-]*[a-z0-9])?$")
+        )]
         node_id: String,
-        #[schemars(length(min = 1), regex(pattern = r"^[a-z0-9](?:[a-z0-9_-]*[a-z0-9])?$"))]
+        #[schemars(
+            length(min = 1),
+            regex(pattern = r"^[a-z0-9](?:[a-z0-9_-]*[a-z0-9])?$")
+        )]
         target_class: String,
         inactive_target: Option<String>,
     },
@@ -466,7 +475,6 @@ fn validate_safe_mission_id(value: &str) -> Result<(), ContractError> {
     validate_safe_token("mission_id", value).map_err(|msg| ContractError::InvalidManifest(msg))
 }
 
-
 /// Owner/repository names: no path separators; cannot repoint the target.
 ///
 /// Allows the exact GitHub special name `.github` (community health files) while
@@ -589,7 +597,9 @@ fn validate_safe_token(field: &str, value: &str) -> Result<(), String> {
         return Err(format!("{field} must be nonempty"));
     }
     if value != value.trim() {
-        return Err(format!("{field} must not have leading or trailing whitespace"));
+        return Err(format!(
+            "{field} must not have leading or trailing whitespace"
+        ));
     }
     if value.starts_with('/') || value.ends_with('/') {
         return Err(format!("{field} must not have leading or trailing slash"));
@@ -719,10 +729,7 @@ fn validate_baseline_digest(digest: &str, target: &CandidateTarget) -> Result<()
             hex.len()
         )));
     }
-    if !hex
-        .bytes()
-        .all(|b| matches!(b, b'0'..=b'9' | b'a'..=b'f'))
-    {
+    if !hex.bytes().all(|b| matches!(b, b'0'..=b'9' | b'a'..=b'f')) {
         return Err(ContractError::InvalidManifest(format!(
             "baseline_digest hex must be lowercase 0-9a-f, got {digest:?}"
         )));
@@ -813,8 +820,7 @@ fn normalize_manifest_protected_path(path: &str) -> Result<String, ContractError
                         "protected path component forbidden: {other:?}"
                     )));
                 }
-                let trimmed =
-                    other.trim_end_matches(|c: char| c == ' ' || c == '\t' || c == '.');
+                let trimmed = other.trim_end_matches(|c: char| c == ' ' || c == '\t' || c == '.');
                 if trimmed != other || trimmed.is_empty() {
                     return Err(ContractError::InvalidManifest(format!(
                         "protected path component forbidden: {other:?}"

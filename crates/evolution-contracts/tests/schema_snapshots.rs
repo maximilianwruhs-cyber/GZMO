@@ -45,7 +45,6 @@ impl Drop for TempSchemaDir {
     }
 }
 
-
 const SCHEMA_FILES: &[&str] = &[
     "candidate-v1.json",
     "envelope-v1.json",
@@ -136,10 +135,7 @@ fn assert_required(root: &Value, fields: &[&str]) {
         .unwrap_or_else(|| panic!("root missing required"));
     let set: Vec<&str> = required.iter().filter_map(|v| v.as_str()).collect();
     for f in fields {
-        assert!(
-            set.contains(f),
-            "required missing {f}, have {set:?}"
-        );
+        assert!(set.contains(f), "required missing {f}, have {set:?}");
     }
 }
 
@@ -159,7 +155,9 @@ fn assert_runtime_validation(root: &Value, must_mention: &[&str]) {
         .join("\n");
     for needle in must_mention {
         assert!(
-            joined.to_ascii_lowercase().contains(&needle.to_ascii_lowercase()),
+            joined
+                .to_ascii_lowercase()
+                .contains(&needle.to_ascii_lowercase()),
             "runtime-validation must mention {needle:?}, got:\n{joined}"
         );
     }
@@ -220,7 +218,10 @@ fn schema_snapshots_match_checked_in_pretty_json() {
 
     for name in SCHEMA_FILES {
         let generated = fs::read(tmp.path().join(name)).unwrap_or_else(|err| {
-            panic!("generated schema missing {}: {err}", tmp.path().join(name).display())
+            panic!(
+                "generated schema missing {}: {err}",
+                tmp.path().join(name).display()
+            )
         });
         let checked = fs::read(crate_schemas_dir().join(name)).unwrap_or_else(|err| {
             panic!(
@@ -286,9 +287,18 @@ fn candidate_schema_constraints_and_runtime_extensions() {
     // CandidateId constraints (inline or $ref).
     let id_node = resolve_prop(&root, "id");
     let id_schema = schema_string_constraints(&root, id_node);
-    assert_eq!(id_schema.get("type").and_then(|v| v.as_str()), Some("string"));
-    assert_eq!(id_schema.get("minLength").and_then(|v| v.as_u64()), Some(16));
-    assert_eq!(id_schema.get("maxLength").and_then(|v| v.as_u64()), Some(96));
+    assert_eq!(
+        id_schema.get("type").and_then(|v| v.as_str()),
+        Some("string")
+    );
+    assert_eq!(
+        id_schema.get("minLength").and_then(|v| v.as_u64()),
+        Some(16)
+    );
+    assert_eq!(
+        id_schema.get("maxLength").and_then(|v| v.as_u64()),
+        Some(96)
+    );
     assert_string_pattern(&root, id_schema, "cand-");
 
     let baseline = resolve_prop(&root, "baseline_digest");
@@ -353,13 +363,7 @@ fn envelope_schema_constraints_and_runtime_extensions() {
     assert!(dump.contains("protected_paths"));
     assert!(dump.contains("minItems"));
 
-    assert_runtime_validation(
-        &root,
-        &[
-            "time",
-            "signature",
-        ],
-    );
+    assert_runtime_validation(&root, &["time", "signature"]);
 }
 
 #[test]
@@ -404,7 +408,10 @@ fn evaluation_schema_constraints_and_runtime_extensions() {
     );
     let dump = root.to_string();
     assert!(dump.contains("hard_floor") || dump.contains("pass") || dump.contains("fail"));
-    assert_runtime_validation(&root, &["recomputed", "verdict", "covers-required", "authoritative"]);
+    assert_runtime_validation(
+        &root,
+        &["recomputed", "verdict", "covers-required", "authoritative"],
+    );
 }
 
 #[test]
@@ -424,14 +431,7 @@ fn promotion_schema_constraints_and_runtime_extensions() {
     assert!(dump.contains("candidate_digest") || dump.contains("PromotionRequest"));
     assert!(dump.contains("sha256:") || dump.contains("git-sha1:"));
 
-    assert_runtime_validation(
-        &root,
-        &[
-            "binding",
-            "time",
-            "signature",
-        ],
-    );
+    assert_runtime_validation(&root, &["binding", "time", "signature"]);
 }
 
 #[test]
@@ -513,8 +513,5 @@ fn candidate_id_definition_keeps_pattern_bounds() {
     let id_def = schema_string_constraints(&root, id_def);
     assert_eq!(id_def["minLength"], 16);
     assert_eq!(id_def["maxLength"], 96);
-    assert!(id_def["pattern"]
-        .as_str()
-        .unwrap()
-        .starts_with("^cand-"));
+    assert!(id_def["pattern"].as_str().unwrap().starts_with("^cand-"));
 }

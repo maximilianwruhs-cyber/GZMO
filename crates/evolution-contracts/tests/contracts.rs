@@ -1,5 +1,8 @@
 use chrono::{TimeZone, Utc};
 use evolution_contracts::{
+    canonical_json_bytes, sha256_hex, verify_chain, AuditError, AuditEvent, GENESIS_HASH,
+};
+use evolution_contracts::{
     AuthorityTier, CandidateId, CandidateKind, CandidateManifest, CandidateState, CandidateTarget,
     CapabilityEnvelope, ContractError, EvaluationError, EvaluationReport, GateClass, GateResult,
     GateStatus, PathPolicy, PolicyDecision, PolicyError, PromotionError, PromotionRequest,
@@ -7,9 +10,6 @@ use evolution_contracts::{
     CANDIDATE_SCHEMA, ENVELOPE_SCHEMA, EVALUATION_SCHEMA, MAX_ADDED_LINES, MAX_ATTEMPTS,
     MAX_CHANGED_FILES, MAX_ENERGY_JOULES, MAX_INPUT_TOKENS, MAX_OUTPUT_TOKENS, MAX_TOOL_CALLS,
     MAX_WALL_SECONDS, PROMOTION_SCHEMA,
-};
-use evolution_contracts::{
-    canonical_json_bytes, sha256_hex, verify_chain, AuditError, AuditEvent, GENESIS_HASH,
 };
 use std::collections::{BTreeMap, BTreeSet};
 
@@ -22,7 +22,10 @@ fn public_contract_has_stable_v1_names() {
             .as_str(),
         "cand-20260901t070000z-felt-use-a1b2c3"
     );
-    assert_eq!(CandidateKind::Code.authority_tier(), AuthorityTier::Candidate);
+    assert_eq!(
+        CandidateKind::Code.authority_tier(),
+        AuthorityTier::Candidate
+    );
     assert_eq!(CandidateState::Observed.to_string(), "observed");
 }
 
@@ -103,10 +106,7 @@ fn candidate_id_schema_constrains_length_and_pattern() {
     assert_eq!(value["type"], "string");
     assert_eq!(value["minLength"], 16);
     assert_eq!(value["maxLength"], 96);
-    assert_eq!(
-        value["pattern"],
-        r"^cand-[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$"
-    );
+    assert_eq!(value["pattern"], r"^cand-[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$");
 }
 
 fn valid_budget() -> ResourceBudget {
@@ -136,14 +136,14 @@ fn fixture_envelope() -> CapabilityEnvelope {
         "metabolism.max_batch_items".to_owned(),
         TunableRule::IntegerRange { min: 1, max: 100 },
     );
-    tunables.insert(
-        "feature.enabled".to_owned(),
-        TunableRule::Boolean,
-    );
+    tunables.insert("feature.enabled".to_owned(), TunableRule::Boolean);
     tunables.insert(
         "recall.mode".to_owned(),
         TunableRule::EnumSet {
-            values: ["fast", "thorough"].into_iter().map(str::to_owned).collect(),
+            values: ["fast", "thorough"]
+                .into_iter()
+                .map(str::to_owned)
+                .collect(),
         },
     );
 
@@ -197,7 +197,10 @@ fn resource_budget_enforces_every_absolute_ceiling() {
             "wall_seconds",
             Box::new(|b| b.wall_seconds = MAX_WALL_SECONDS + 1),
         ),
-        ("max_attempts", Box::new(|b| b.max_attempts = MAX_ATTEMPTS + 1)),
+        (
+            "max_attempts",
+            Box::new(|b| b.max_attempts = MAX_ATTEMPTS + 1),
+        ),
         (
             "max_changed_files",
             Box::new(|b| b.max_changed_files = MAX_CHANGED_FILES + 1),
@@ -386,7 +389,9 @@ fn candidate_kind_allowlist_accepts_only_memory_and_tunable() {
         CandidateKind::ProceduralSkill,
     ] {
         assert!(
-            envelope.authorize_candidate_kind(kind, fixture_now()).is_err(),
+            envelope
+                .authorize_candidate_kind(kind, fixture_now())
+                .is_err(),
             "kind {kind} must be denied"
         );
     }
@@ -404,13 +409,17 @@ fn path_policy_handles_escape_case_and_separators() {
     let paths = PathPolicy::stage1_default();
 
     // Protected via default patterns.
-    assert!(paths.check("docs/ADR-0014-constitutional-evolution.md").is_err());
+    assert!(paths
+        .check("docs/ADR-0014-constitutional-evolution.md")
+        .is_err());
     assert!(paths.check("docs/superpowers/specs/foo.md").is_err());
     assert!(paths.check(".github/workflows/ci.yml").is_err());
     assert!(paths.check("AGENTS.md").is_err());
     assert!(paths.check("Cargo.toml").is_err());
     assert!(paths.check("Cargo.lock").is_err());
-    assert!(paths.check("crates/evolution-contracts/src/lib.rs").is_err());
+    assert!(paths
+        .check("crates/evolution-contracts/src/lib.rs")
+        .is_err());
     assert!(paths.check("gzmo-evolver/src/main.rs").is_err());
 
     // Separator + case folding.
@@ -624,9 +633,18 @@ fn candidate_cannot_skip_evaluation_or_signature() {
 
 #[test]
 fn hard_candidate_is_never_tunable_authority() {
-    assert_eq!(CandidateKind::Code.authority_tier(), AuthorityTier::Candidate);
-    assert_eq!(CandidateKind::Schema.authority_tier(), AuthorityTier::Candidate);
-    assert_eq!(CandidateKind::Tunable.authority_tier(), AuthorityTier::Tunable);
+    assert_eq!(
+        CandidateKind::Code.authority_tier(),
+        AuthorityTier::Candidate
+    );
+    assert_eq!(
+        CandidateKind::Schema.authority_tier(),
+        AuthorityTier::Candidate
+    );
+    assert_eq!(
+        CandidateKind::Tunable.authority_tier(),
+        AuthorityTier::Tunable
+    );
 }
 
 #[test]
@@ -913,7 +931,8 @@ fn candidate_target_rejects_ref_component_and_owner_path_tricks() {
 
         let mut manifest = fixture_repo_manifest();
         if let CandidateTarget::Repository {
-            ref mut base_branch, ..
+            ref mut base_branch,
+            ..
         } = manifest.target
         {
             *base_branch = bad.to_owned();
@@ -941,9 +960,7 @@ fn candidate_target_rejects_ref_component_and_owner_path_tricks() {
         let mut manifest = fixture_repo_manifest();
         match &mut manifest.target {
             CandidateTarget::Repository {
-                owner,
-                repository,
-                ..
+                owner, repository, ..
             } => {
                 if field == "owner" {
                     *owner = bad.to_owned();
@@ -980,7 +997,8 @@ fn candidate_target_rejects_ref_component_and_owner_path_tricks() {
 
     let mut manifest = fixture_repo_manifest();
     if let CandidateTarget::Repository {
-        ref mut base_branch, ..
+        ref mut base_branch,
+        ..
     } = manifest.target
     {
         *base_branch = "feature/foo-bar".to_owned();
@@ -1105,7 +1123,6 @@ fn candidate_manifest_rejects_invalid_nested_budget_and_schema() {
     assert!(serde_json::from_value::<CandidateManifest>(value).is_err());
 }
 
-
 // Local hex helper so tests stay dependency-light if hex crate is absent.
 mod hex {
     pub fn encode(bytes: [u8; 32]) -> String {
@@ -1149,10 +1166,7 @@ fn fixture_signature_hex() -> String {
     hex::encode_n(64, 0xab)
 }
 
-fn report_with(
-    gates: Vec<GateResult>,
-    metrics: BTreeMap<String, f64>,
-) -> EvaluationReport {
+fn report_with(gates: Vec<GateResult>, metrics: BTreeMap<String, f64>) -> EvaluationReport {
     let mut artifact_digests = BTreeMap::new();
     artifact_digests.insert(
         "report.json".to_owned(),
@@ -1170,14 +1184,13 @@ fn report_with(
         completed_at: Utc.with_ymd_and_hms(2026, 9, 1, 12, 0, 0).unwrap(),
     };
     report.hard_floors_passed = report.hard_floors_pass();
-    report.validate().expect("report_with fixture must validate");
+    report
+        .validate()
+        .expect("report_with fixture must validate");
     report
 }
 
-fn report_unchecked(
-    gates: Vec<GateResult>,
-    metrics: BTreeMap<String, f64>,
-) -> EvaluationReport {
+fn report_unchecked(gates: Vec<GateResult>, metrics: BTreeMap<String, f64>) -> EvaluationReport {
     let mut report = EvaluationReport {
         schema: EVALUATION_SCHEMA.to_owned(),
         candidate_id: fixture_candidate_id(),
@@ -1192,7 +1205,6 @@ fn report_unchecked(
     report.hard_floors_passed = report.hard_floors_pass();
     report
 }
-
 
 fn fixture_promotion_request() -> PromotionRequest {
     let request = PromotionRequest {
@@ -1307,10 +1319,7 @@ fn all_hard_floors_pass_with_metric_noise() {
 #[test]
 fn evaluation_rejects_zero_hard_floors() {
     let mut report = report_with(
-        vec![
-            GateResult::pass("tests"),
-            GateResult::pass("faithfulness"),
-        ],
+        vec![GateResult::pass("tests"), GateResult::pass("faithfulness")],
         BTreeMap::new(),
     );
     report.gates = vec![GateResult {
@@ -1345,10 +1354,7 @@ fn hard_floors_pass_false_for_empty_and_metric_only_reports() {
     let passed = report_with(vec![GateResult::pass("tests")], BTreeMap::new());
     assert!(passed.hard_floors_pass());
 
-    let failed = report_with(
-        vec![GateResult::fail("tests", "nope")],
-        BTreeMap::new(),
-    );
+    let failed = report_with(vec![GateResult::fail("tests", "nope")], BTreeMap::new());
     assert!(!failed.hard_floors_pass());
 
     let unavailable = report_with(
@@ -1364,14 +1370,10 @@ fn hard_floors_pass_false_for_empty_and_metric_only_reports() {
     assert!(!unavailable.hard_floors_pass());
 }
 
-
 #[test]
 fn evaluation_rejects_duplicate_and_unsafe_gate_names() {
     let mut report = report_with(vec![GateResult::pass("tests")], BTreeMap::new());
-    report.gates = vec![
-        GateResult::pass("tests"),
-        GateResult::pass("tests"),
-    ];
+    report.gates = vec![GateResult::pass("tests"), GateResult::pass("tests")];
     report.hard_floors_passed = true;
     assert!(report.validate().is_err());
 
@@ -1405,7 +1407,6 @@ fn evaluation_rejects_oversized_detail() {
         "unexpected error: {err:?}"
     );
 }
-
 
 #[test]
 fn evaluation_rejects_invalid_digest_algorithms() {
@@ -1457,15 +1458,13 @@ fn evaluation_rejects_forged_hard_floor_verdict() {
     report.hard_floors_passed = true;
     assert!(report.validate().is_err());
 
-    let mut value = serde_json::to_value(
-        report_with(
-            vec![
-                GateResult::pass("tests"),
-                GateResult::fail("faithfulness", "below floor"),
-            ],
-            BTreeMap::new(),
-        ),
-    )
+    let mut value = serde_json::to_value(report_with(
+        vec![
+            GateResult::pass("tests"),
+            GateResult::fail("faithfulness", "below floor"),
+        ],
+        BTreeMap::new(),
+    ))
     .unwrap();
     value["hard_floors_passed"] = serde_json::json!(true);
     let err = serde_json::from_value::<EvaluationReport>(value).unwrap_err();
@@ -1648,7 +1647,6 @@ fn promotion_binding_rejects_expiry_at_supplied_now_and_mismatches() {
         .is_err());
 }
 
-
 #[test]
 fn promotion_serde_round_trip_valid() {
     let grant = fixture_unverified_grant();
@@ -1682,7 +1680,6 @@ fn promotion_schema_constant_is_stable() {
     assert_eq!(PROMOTION_SCHEMA, "gzmo.evolution.promotion/v1");
     assert_eq!(EVALUATION_SCHEMA, "gzmo.evolution.evaluation/v1");
 }
-
 
 fn audit_candidate_id() -> CandidateId {
     CandidateId::parse("cand-20260901t070000z-felt-use-a1b2c3").unwrap()
@@ -1742,10 +1739,7 @@ fn audit_canonical_json_rejects_nonfinite_numbers() {
     struct Nasty {
         value: f64,
     }
-    assert!(canonical_json_bytes(&Nasty {
-        value: f64::NAN
-    })
-    .is_err());
+    assert!(canonical_json_bytes(&Nasty { value: f64::NAN }).is_err());
     assert!(canonical_json_bytes(&Nasty {
         value: f64::INFINITY
     })
@@ -1760,7 +1754,9 @@ fn audit_canonical_json_rejects_nonfinite_numbers() {
 fn audit_sha256_hex_is_64_lowercase() {
     let digest = sha256_hex(b"gzmo-audit");
     assert_eq!(digest.len(), 64);
-    assert!(digest.bytes().all(|b| matches!(b, b'0'..=b'9' | b'a'..=b'f')));
+    assert!(digest
+        .bytes()
+        .all(|b| matches!(b, b'0'..=b'9' | b'a'..=b'f')));
     assert_eq!(digest, sha256_hex(b"gzmo-audit"));
     assert_ne!(digest, sha256_hex(b"gzmo-audit-2"));
 }
@@ -1794,16 +1790,32 @@ fn rehash_audit_event(event: &mut AuditEvent) {
 
 #[test]
 fn audit_multi_event_chain_links_and_rejects_gap_overflow_bad_link() {
-    let e1 = AuditEvent::next(None, "candidate.observed", Some(audit_candidate_id()), &1u8).unwrap();
-    let e2 = AuditEvent::next(Some(&e1), "candidate.prepared", Some(audit_candidate_id()), &2u8).unwrap();
-    let e3 = AuditEvent::next(Some(&e2), "candidate.evaluated", Some(audit_candidate_id()), &3u8).unwrap();
+    let e1 =
+        AuditEvent::next(None, "candidate.observed", Some(audit_candidate_id()), &1u8).unwrap();
+    let e2 = AuditEvent::next(
+        Some(&e1),
+        "candidate.prepared",
+        Some(audit_candidate_id()),
+        &2u8,
+    )
+    .unwrap();
+    let e3 = AuditEvent::next(
+        Some(&e2),
+        "candidate.evaluated",
+        Some(audit_candidate_id()),
+        &3u8,
+    )
+    .unwrap();
     assert!(verify_chain(&[e1.clone(), e2.clone(), e3.clone()]).is_ok());
 
     // Self-consistent sequence gap: event validates alone; chain hits InvalidChain.
     let mut gapped = e3.clone();
     gapped.sequence = 4;
     rehash_audit_event(&mut gapped);
-    assert!(gapped.validate().is_ok(), "gapped event must be self-consistent");
+    assert!(
+        gapped.validate().is_ok(),
+        "gapped event must be self-consistent"
+    );
     let gap_err = verify_chain(&[e1.clone(), e2.clone(), gapped]).expect_err("sequence gap");
     match &gap_err {
         AuditError::InvalidChain(reason) => {
@@ -1819,7 +1831,10 @@ fn audit_multi_event_chain_links_and_rejects_gap_overflow_bad_link() {
     let mut spliced = e2.clone();
     spliced.previous_hash = e3.event_hash.clone();
     rehash_audit_event(&mut spliced);
-    assert!(spliced.validate().is_ok(), "spliced event must be self-consistent");
+    assert!(
+        spliced.validate().is_ok(),
+        "spliced event must be self-consistent"
+    );
     let link_err = verify_chain(&[e1.clone(), spliced]).expect_err("bad previous link");
     match &link_err {
         AuditError::InvalidChain(reason) => {
@@ -1838,8 +1853,6 @@ fn audit_multi_event_chain_links_and_rejects_gap_overflow_bad_link() {
     assert!(consistent_max.validate().is_ok());
     assert!(AuditEvent::next(Some(&consistent_max), "overflow.next", None, &0u8).is_err());
 }
-
-
 
 #[test]
 fn audit_rejects_bad_schema_type_hash_and_candidate_id() {
@@ -1885,12 +1898,21 @@ fn audit_rejects_bad_schema_type_hash_and_candidate_id() {
 
 #[test]
 fn audit_tampering_every_hashed_field_breaks_chain() {
-    let first = AuditEvent::next(None, "candidate.observed", Some(audit_candidate_id()), &1).unwrap();
-    let second =
-        AuditEvent::next(Some(&first), "candidate.prepared", Some(audit_candidate_id()), &2).unwrap();
+    let first =
+        AuditEvent::next(None, "candidate.observed", Some(audit_candidate_id()), &1).unwrap();
+    let second = AuditEvent::next(
+        Some(&first),
+        "candidate.prepared",
+        Some(audit_candidate_id()),
+        &2,
+    )
+    .unwrap();
 
     let fields: Vec<(&str, Box<dyn Fn(&mut AuditEvent)>)> = vec![
-        ("schema", Box::new(|e: &mut AuditEvent| e.schema = "other".into())),
+        (
+            "schema",
+            Box::new(|e: &mut AuditEvent| e.schema = "other".into()),
+        ),
         ("sequence", Box::new(|e: &mut AuditEvent| e.sequence = 99)),
         (
             "previous_hash",
@@ -1903,7 +1925,8 @@ fn audit_tampering_every_hashed_field_breaks_chain() {
         (
             "candidate_id",
             Box::new(|e: &mut AuditEvent| {
-                e.candidate_id = Some(CandidateId::parse("cand-20260901t070000z-other-id-a1b2").unwrap())
+                e.candidate_id =
+                    Some(CandidateId::parse("cand-20260901t070000z-other-id-a1b2").unwrap())
             }),
         ),
         (
@@ -2005,8 +2028,13 @@ fn wire_types_reject_unknown_fields_top_level_and_nested() {
     request["unexpected_top"] = serde_json::json!(0);
     assert!(serde_json::from_value::<PromotionRequest>(request).is_err());
 
-    let audit = AuditEvent::next(None, "candidate.observed", None, &serde_json::json!({"k":1}))
-        .unwrap();
+    let audit = AuditEvent::next(
+        None,
+        "candidate.observed",
+        None,
+        &serde_json::json!({"k":1}),
+    )
+    .unwrap();
     let mut audit_v = serde_json::to_value(&audit).unwrap();
     audit_v["unexpected_top"] = serde_json::json!(true);
     assert!(serde_json::from_value::<AuditEvent>(audit_v).is_err());
@@ -2083,12 +2111,19 @@ fn tagged_enums_still_parse_valid_and_reject_unknown_fields() {
     );
 
     let float_rule = TunableRule::FloatRange { min: 0.0, max: 1.0 };
-    assert!(serde_json::from_value::<TunableRule>(serde_json::to_value(&float_rule).unwrap()).is_ok());
+    assert!(
+        serde_json::from_value::<TunableRule>(serde_json::to_value(&float_rule).unwrap()).is_ok()
+    );
     let enum_rule = TunableRule::EnumSet {
         values: BTreeSet::from(["a".to_owned(), "b".to_owned()]),
     };
-    assert!(serde_json::from_value::<TunableRule>(serde_json::to_value(&enum_rule).unwrap()).is_ok());
-    assert!(serde_json::from_value::<TunableRule>(serde_json::to_value(&TunableRule::Boolean).unwrap()).is_ok());
+    assert!(
+        serde_json::from_value::<TunableRule>(serde_json::to_value(&enum_rule).unwrap()).is_ok()
+    );
+    assert!(serde_json::from_value::<TunableRule>(
+        serde_json::to_value(&TunableRule::Boolean).unwrap()
+    )
+    .is_ok());
 }
 
 #[test]
@@ -2098,7 +2133,9 @@ fn envelope_validate_at_and_authorize_require_time_window() {
     let expires = envelope.expires_at;
 
     assert!(envelope.validate_at(issued).is_ok());
-    assert!(envelope.validate_at(issued + chrono::Duration::days(1)).is_ok());
+    assert!(envelope
+        .validate_at(issued + chrono::Duration::days(1))
+        .is_ok());
     assert!(envelope
         .validate_at(issued - chrono::Duration::seconds(1))
         .is_err());
@@ -2148,19 +2185,13 @@ fn evaluation_covers_required_gates_cases() {
     assert!(report
         .covers_required_gates(&["tests".into(), "tests".into()])
         .is_err());
-    assert!(report
-        .covers_required_gates(&["missing".into()])
-        .is_err());
-    assert!(report
-        .covers_required_gates(&["latency".into()])
-        .is_err());
+    assert!(report.covers_required_gates(&["missing".into()]).is_err());
+    assert!(report.covers_required_gates(&["latency".into()]).is_err());
 
     let mut failed = report.clone();
     failed.gates[0].status = GateStatus::Fail;
     failed.hard_floors_passed = failed.hard_floors_pass();
-    assert!(failed
-        .covers_required_gates(&["tests".into()])
-        .is_err());
+    assert!(failed.covers_required_gates(&["tests".into()]).is_err());
 
     let mut unavailable = report.clone();
     unavailable.gates[0].status = GateStatus::Unavailable;
@@ -2370,4 +2401,3 @@ fn candidate_charset_invalid_cases_are_named_and_lengthened() {
         }
     }
 }
-

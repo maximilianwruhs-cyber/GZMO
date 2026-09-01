@@ -44,7 +44,10 @@ pub enum GateStatus {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, JsonSchema)]
 #[schemars(deny_unknown_fields, title = "GateResult")]
 pub struct GateResult {
-    #[schemars(length(min = 1), regex(pattern = r"^[a-z0-9](?:[a-z0-9._-]*[a-z0-9])?$"))]
+    #[schemars(
+        length(min = 1),
+        regex(pattern = r"^[a-z0-9](?:[a-z0-9._-]*[a-z0-9])?$")
+    )]
     pub name: String,
     pub class: GateClass,
     pub status: GateStatus,
@@ -327,7 +330,6 @@ fn validate_safe_metric_name(name: &str) -> Result<(), EvaluationError> {
     validate_safe_dotted_identifier("metric name", name).map_err(EvaluationError::InvalidReport)
 }
 
-
 fn validate_safe_artifact_name(name: &str) -> Result<(), EvaluationError> {
     if name.is_empty() {
         return Err(EvaluationError::InvalidReport(
@@ -373,7 +375,9 @@ fn validate_safe_dotted_identifier(field: &str, value: &str) -> Result<(), Strin
         return Err(format!("{field} must be nonempty"));
     }
     if value != value.trim() {
-        return Err(format!("{field} must not have leading or trailing whitespace"));
+        return Err(format!(
+            "{field} must not have leading or trailing whitespace"
+        ));
     }
     if value.contains("..") {
         return Err(format!("{field} must not contain .."));
@@ -432,10 +436,7 @@ fn validate_hex(field: &str, hex: &str, expected_len: usize) -> Result<(), Evalu
             hex.len()
         )));
     }
-    if !hex
-        .bytes()
-        .all(|b| matches!(b, b'0'..=b'9' | b'a'..=b'f'))
-    {
+    if !hex.bytes().all(|b| matches!(b, b'0'..=b'9' | b'a'..=b'f')) {
         return Err(EvaluationError::InvalidReport(format!(
             "{field} hex must be lowercase 0-9a-f, got {hex:?}"
         )));
@@ -444,12 +445,8 @@ fn validate_hex(field: &str, hex: &str, expected_len: usize) -> Result<(), Evalu
 }
 
 /// JSON Schema for `artifact_digests`: object whose values are sha256-qualified digests.
-fn sha256_digest_map_schema(
-    _gen: &mut schemars::gen::SchemaGenerator,
-) -> schemars::schema::Schema {
-    use schemars::schema::{
-        InstanceType, ObjectValidation, SchemaObject, StringValidation,
-    };
+fn sha256_digest_map_schema(_gen: &mut schemars::gen::SchemaGenerator) -> schemars::schema::Schema {
+    use schemars::schema::{InstanceType, ObjectValidation, SchemaObject, StringValidation};
     SchemaObject {
         instance_type: Some(InstanceType::Object.into()),
         object: Some(Box::new(ObjectValidation {
@@ -486,7 +483,6 @@ mod tests {
             (0..32).map(|_| format!("{fill:02x}")).collect::<String>()
         )
     }
-
 
     #[test]
     fn hard_floor_fail_is_non_compensable() {
@@ -533,25 +529,17 @@ mod tests {
         };
         assert!(report.validate().is_ok());
 
-        assert!(report
-            .covers_required_gates(&[String::new()])
-            .is_err());
+        assert!(report.covers_required_gates(&[String::new()]).is_err());
         assert!(report.covers_required_gates(&[]).is_err());
         assert!(report
             .covers_required_gates(&["tests".into(), "tests".into()])
             .is_err());
-        assert!(report
-            .covers_required_gates(&["missing".into()])
-            .is_err());
-        assert!(report
-            .covers_required_gates(&["latency".into()])
-            .is_err());
+        assert!(report.covers_required_gates(&["missing".into()]).is_err());
+        assert!(report.covers_required_gates(&["latency".into()]).is_err());
         assert!(report
             .covers_required_gates(&["faithfulness".into()])
             .is_err());
-        assert!(report
-            .covers_required_gates(&["tests".into()])
-            .is_ok());
+        assert!(report.covers_required_gates(&["tests".into()]).is_ok());
 
         let mut unavailable = report.clone();
         unavailable.gates[0].status = GateStatus::Unavailable;
@@ -561,10 +549,7 @@ mod tests {
             .is_err());
 
         let complete = EvaluationReport {
-            gates: vec![
-                GateResult::pass("tests"),
-                GateResult::pass("faithfulness"),
-            ],
+            gates: vec![GateResult::pass("tests"), GateResult::pass("faithfulness")],
             hard_floors_passed: true,
             ..report
         };

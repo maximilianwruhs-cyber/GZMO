@@ -39,11 +39,17 @@ pub struct PromotionRequest {
     pub evaluation_digest: String,
     #[schemars(regex(pattern = r"^sha256:[a-f0-9]{64}$"))]
     pub policy_digest: String,
-    #[schemars(length(min = 1), regex(pattern = r"^[A-Za-z0-9][A-Za-z0-9._-]*[A-Za-z0-9]$|^[A-Za-z0-9]$"))]
+    #[schemars(
+        length(min = 1),
+        regex(pattern = r"^[A-Za-z0-9][A-Za-z0-9._-]*[A-Za-z0-9]$|^[A-Za-z0-9]$")
+    )]
     pub target: String,
     pub issued_at: DateTime<Utc>,
     pub expires_at: DateTime<Utc>,
-    #[schemars(length(min = 1), regex(pattern = r"^[A-Za-z0-9][A-Za-z0-9._-]*[A-Za-z0-9]$|^[A-Za-z0-9]$"))]
+    #[schemars(
+        length(min = 1),
+        regex(pattern = r"^[A-Za-z0-9][A-Za-z0-9._-]*[A-Za-z0-9]$|^[A-Za-z0-9]$")
+    )]
     pub nonce: String,
 }
 
@@ -164,7 +170,10 @@ impl PromotionRequest {
 #[schemars(deny_unknown_fields, title = "UnverifiedAuthorityGrant")]
 pub struct UnverifiedAuthorityGrant {
     pub request: PromotionRequest,
-    #[schemars(length(min = 1), regex(pattern = r"^[A-Za-z0-9][A-Za-z0-9._-]*[A-Za-z0-9]$|^[A-Za-z0-9]$"))]
+    #[schemars(
+        length(min = 1),
+        regex(pattern = r"^[A-Za-z0-9][A-Za-z0-9._-]*[A-Za-z0-9]$|^[A-Za-z0-9]$")
+    )]
     pub signer_key_id: String,
     /// Ed25519 signature as 128 lowercase hex characters (encoding only).
     #[schemars(regex(pattern = r"^[a-f0-9]{128}$"), length(min = 128, max = 128))]
@@ -270,10 +279,7 @@ fn validate_hex(field: &str, hex: &str, expected_len: usize) -> Result<(), Promo
             hex.len()
         )));
     }
-    if !hex
-        .bytes()
-        .all(|b| matches!(b, b'0'..=b'9' | b'a'..=b'f'))
-    {
+    if !hex.bytes().all(|b| matches!(b, b'0'..=b'9' | b'a'..=b'f')) {
         return Err(PromotionError::InvalidRequest(format!(
             "{field} hex must be lowercase 0-9a-f, got {hex:?}"
         )));
@@ -311,9 +317,7 @@ mod tests {
     fn sha(fill: u8) -> String {
         format!(
             "sha256:{}",
-            (0..32)
-                .map(|_| format!("{fill:02x}"))
-                .collect::<String>()
+            (0..32).map(|_| format!("{fill:02x}")).collect::<String>()
         )
     }
 
@@ -358,5 +362,3 @@ mod tests {
             .is_err());
     }
 }
-
-

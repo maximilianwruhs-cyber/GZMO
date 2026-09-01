@@ -25,13 +25,13 @@ fn run(args: Vec<String>) -> Result<(), String> {
 
 fn parse_out(args: Vec<String>) -> Result<PathBuf, String> {
     if args.len() != 2 {
-        return Err("accepts only `--out <directory>` (exactly two argv tokens after program name)".to_owned());
+        return Err(
+            "accepts only `--out <directory>` (exactly two argv tokens after program name)"
+                .to_owned(),
+        );
     }
     if args[0] != "--out" {
-        return Err(format!(
-            "first argument must be --out, got {:?}",
-            args[0]
-        ));
+        return Err(format!("first argument must be --out, got {:?}", args[0]));
     }
     if args[1].is_empty() || args[1].starts_with('-') {
         return Err("`--out` requires a nonempty directory path".to_owned());
