@@ -1,9 +1,10 @@
 use chrono::{TimeZone, Utc};
 use evolution_contracts::{
-    AuthorityTier, CandidateId, CandidateKind, CandidateState, CapabilityEnvelope, ContractError,
-    PathPolicy, PolicyDecision, PolicyError, ResourceBudget, ResourceUsage, TunableRule,
-    CANDIDATE_SCHEMA, ENVELOPE_SCHEMA, MAX_ADDED_LINES, MAX_ATTEMPTS, MAX_CHANGED_FILES,
-    MAX_ENERGY_JOULES, MAX_INPUT_TOKENS, MAX_OUTPUT_TOKENS, MAX_TOOL_CALLS, MAX_WALL_SECONDS,
+    AuthorityTier, CandidateId, CandidateKind, CandidateManifest, CandidateState, CandidateTarget,
+    CapabilityEnvelope, ContractError, PathPolicy, PolicyDecision, PolicyError, ResourceBudget,
+    ResourceUsage, TunableRule, CANDIDATE_SCHEMA, ENVELOPE_SCHEMA, MAX_ADDED_LINES, MAX_ATTEMPTS,
+    MAX_CHANGED_FILES, MAX_ENERGY_JOULES, MAX_INPUT_TOKENS, MAX_OUTPUT_TOKENS, MAX_TOOL_CALLS,
+    MAX_WALL_SECONDS,
 };
 use std::collections::{BTreeMap, BTreeSet};
 
@@ -598,4 +599,393 @@ fn resource_usage_fits_rejects_any_over_budget_field() {
         ..base
     }
     .fits(&budget));
+}
+
+#[test]
+fn candidate_cannot_skip_evaluation_or_signature() {
+    assert!(CandidateState::Observed.can_transition_to(CandidateState::Prepared));
+    assert!(CandidateState::Prepared.can_transition_to(CandidateState::Building));
+    assert!(CandidateState::Building.can_transition_to(CandidateState::Evaluating));
+    assert!(!CandidateState::Building.can_transition_to(CandidateState::ReviewReady));
+    assert!(CandidateState::Building.can_transition_to(CandidateState::Failed));
+    assert!(!CandidateState::ReviewReady.can_transition_to(CandidateState::Accepted));
+    assert!(CandidateState::ReviewReady.can_transition_to(CandidateState::PromotionPending));
+    assert!(CandidateState::ReviewReady.can_transition_to(CandidateState::Rejected));
+}
+
+#[test]
+fn hard_candidate_is_never_tunable_authority() {
+    assert_eq!(CandidateKind::Code.authority_tier(), AuthorityTier::Candidate);
+    assert_eq!(CandidateKind::Schema.authority_tier(), AuthorityTier::Candidate);
+    assert_eq!(CandidateKind::Tunable.authority_tier(), AuthorityTier::Tunable);
+}
+
+#[test]
+fn candidate_state_every_legal_and_illegal_transition() {
+    use CandidateState::*;
+    let legal: &[(CandidateState, CandidateState)] = &[
+        (Observed, Prepared),
+        (Observed, Failed),
+        (Prepared, Building),
+        (Prepared, Failed),
+        (Building, Evaluating),
+        (Building, Failed),
+        (Evaluating, Rejected),
+        (Evaluating, ReviewReady),
+        (Evaluating, Failed),
+        (ReviewReady, PromotionPending),
+        (ReviewReady, Rejected),
+        (ReviewReady, Failed),
+        (PromotionPending, Soaking),
+        (PromotionPending, Rejected),
+        (PromotionPending, Failed),
+        (Soaking, Accepted),
+        (Soaking, RolledBack),
+        (Soaking, Failed),
+    ];
+    let all = [
+        Observed,
+        Prepared,
+        Building,
+        Evaluating,
+        Rejected,
+        ReviewReady,
+        PromotionPending,
+        Soaking,
+        Accepted,
+        RolledBack,
+        Failed,
+    ];
+    for &from in &all {
+        for &to in &all {
+            let expected = legal.iter().any(|&(f, t)| f == from && t == to);
+            assert_eq!(
+                from.can_transition_to(to),
+                expected,
+                "{from:?} -> {to:?} expected {expected}"
+            );
+        }
+    }
+    // Terminal states never leave.
+    for terminal in [Rejected, Accepted, RolledBack, Failed] {
+        for &to in &all {
+            assert!(
+                !terminal.can_transition_to(to),
+                "{terminal:?} must not transition to {to:?}"
+            );
+        }
+    }
+}
+
+fn fixture_candidate_id() -> CandidateId {
+    CandidateId::parse("cand-20260901t070000z-felt-use-a1b2c3").unwrap()
+}
+
+fn fixture_repo_target(id: &CandidateId) -> CandidateTarget {
+    CandidateTarget::Repository {
+        owner: "gzmo-org".to_owned(),
+        repository: "gzmo".to_owned(),
+        base_branch: "main".to_owned(),
+        candidate_branch: format!("evolve/{}", id.as_str()),
+    }
+}
+
+fn fixture_appliance_target() -> CandidateTarget {
+    CandidateTarget::Appliance {
+        node_id: "ct101".to_owned(),
+        target_class: "living-appliance".to_owned(),
+        inactive_target: Some("slot-b".to_owned()),
+    }
+}
+
+fn fixture_repo_manifest() -> CandidateManifest {
+    let id = fixture_candidate_id();
+    CandidateManifest {
+        schema: CANDIDATE_SCHEMA.to_owned(),
+        id: id.clone(),
+        mission_id: "mission-felt-use-20260901".to_owned(),
+        kind: CandidateKind::Code,
+        authority: AuthorityTier::Candidate,
+        target: fixture_repo_target(&id),
+        baseline_digest: format!("git-sha1:{}", "a".repeat(40)),
+        required_gates: vec!["unit".to_owned(), "airgap".to_owned()],
+        protected_paths: vec![
+            "docs/ADR-0014-constitutional-evolution.md".to_owned(),
+            ".github/workflows/".to_owned(),
+        ],
+        budget: valid_budget(),
+        created_at: Utc.with_ymd_and_hms(2026, 9, 1, 7, 0, 0).unwrap(),
+    }
+}
+
+fn fixture_appliance_manifest() -> CandidateManifest {
+    CandidateManifest {
+        schema: CANDIDATE_SCHEMA.to_owned(),
+        id: fixture_candidate_id(),
+        mission_id: "mission-appliance-slot".to_owned(),
+        kind: CandidateKind::Runtime,
+        authority: AuthorityTier::Candidate,
+        target: fixture_appliance_target(),
+        baseline_digest: format!("sha256:{}", "b".repeat(64)),
+        required_gates: vec!["bundle-verify".to_owned()],
+        protected_paths: vec!["boot.sh".to_owned()],
+        budget: valid_budget(),
+        created_at: Utc.with_ymd_and_hms(2026, 9, 1, 8, 0, 0).unwrap(),
+    }
+}
+
+#[test]
+fn candidate_manifest_serde_round_trips_valid_targets() {
+    let repo = fixture_repo_manifest();
+    assert!(repo.validate().is_ok());
+    let repo_json = serde_json::to_string_pretty(&repo).unwrap();
+    let repo_decoded: CandidateManifest = serde_json::from_str(&repo_json).unwrap();
+    assert_eq!(repo_decoded, repo);
+
+    let appliance = fixture_appliance_manifest();
+    assert!(appliance.validate().is_ok());
+    let app_json = serde_json::to_string_pretty(&appliance).unwrap();
+    let app_decoded: CandidateManifest = serde_json::from_str(&app_json).unwrap();
+    assert_eq!(app_decoded, appliance);
+
+    // Target-only round trip.
+    let target = fixture_repo_target(&fixture_candidate_id());
+    let t_json = serde_json::to_string(&target).unwrap();
+    let t_decoded: CandidateTarget = serde_json::from_str(&t_json).unwrap();
+    assert_eq!(t_decoded, target);
+}
+
+#[test]
+fn candidate_manifest_rejects_kind_authority_mismatch() {
+    let mut bad = fixture_repo_manifest();
+    bad.authority = AuthorityTier::Tunable;
+    assert!(bad.validate().is_err());
+
+    let mut value = serde_json::to_value(fixture_repo_manifest()).unwrap();
+    value["authority"] = serde_json::json!("tunable");
+    assert!(serde_json::from_value::<CandidateManifest>(value.clone()).is_err());
+
+    value = serde_json::to_value(fixture_repo_manifest()).unwrap();
+    value["kind"] = serde_json::json!("memory");
+    // authority remains candidate while kind is memory
+    assert!(serde_json::from_value::<CandidateManifest>(value).is_err());
+}
+
+#[test]
+fn candidate_manifest_rejects_digest_algorithm_length_and_case() {
+    let mut repo = fixture_repo_manifest();
+    // Wrong algorithm for repository.
+    repo.baseline_digest = format!("sha256:{}", "a".repeat(64));
+    assert!(repo.validate().is_err());
+    // Wrong length.
+    repo.baseline_digest = format!("git-sha1:{}", "a".repeat(39));
+    assert!(repo.validate().is_err());
+    repo.baseline_digest = format!("git-sha1:{}", "a".repeat(41));
+    assert!(repo.validate().is_err());
+    // Uppercase hex rejected.
+    repo.baseline_digest = format!("git-sha1:{}", "A".repeat(40));
+    assert!(repo.validate().is_err());
+    // Non-hex.
+    repo.baseline_digest = format!("git-sha1:{}", "g".repeat(40));
+    assert!(repo.validate().is_err());
+
+    let mut app = fixture_appliance_manifest();
+    app.baseline_digest = format!("git-sha1:{}", "a".repeat(40));
+    assert!(app.validate().is_err());
+    app.baseline_digest = format!("sha256:{}", "a".repeat(63));
+    assert!(app.validate().is_err());
+    app.baseline_digest = format!("sha256:{}", "A".repeat(64));
+    assert!(app.validate().is_err());
+
+    let mut value = serde_json::to_value(fixture_repo_manifest()).unwrap();
+    value["baseline_digest"] = serde_json::json!(format!("git-sha1:{}", "A".repeat(40)));
+    assert!(serde_json::from_value::<CandidateManifest>(value).is_err());
+}
+
+#[test]
+fn candidate_manifest_binds_repo_branch_to_candidate_id() {
+    let mut bad = fixture_repo_manifest();
+    bad.target = CandidateTarget::Repository {
+        owner: "gzmo-org".to_owned(),
+        repository: "gzmo".to_owned(),
+        base_branch: "main".to_owned(),
+        candidate_branch: "evolve/cand-20260901t070000z-other-id-zzzz".to_owned(),
+    };
+    assert!(bad.validate().is_err());
+
+    let mut value = serde_json::to_value(fixture_repo_manifest()).unwrap();
+    value["target"]["candidate_branch"] =
+        serde_json::json!("evolve/cand-20260901t070000z-other-id-zzzz");
+    assert!(serde_json::from_value::<CandidateManifest>(value).is_err());
+}
+
+#[test]
+fn candidate_target_rejects_unsafe_ref_and_path_syntax() {
+    let id = fixture_candidate_id();
+    let expected_branch = format!("evolve/{}", id.as_str());
+    let unsafe_values = [
+        "",
+        " leading",
+        "trailing ",
+        "has space",
+        "has..dots",
+        "has@{upstream}",
+        "has\\slash",
+        "has:colon",
+        "has~tilde",
+        "has^caret",
+        "has?question",
+        "has*star",
+        "has[bracket",
+        "ends.lock",
+        "/leading-slash",
+        "trailing-slash/",
+        "has\ncontrol",
+    ];
+
+    for bad in unsafe_values {
+        for field in ["owner", "repository", "base_branch"] {
+            let mut value = serde_json::json!({
+                "mode": "repository",
+                "owner": "gzmo-org",
+                "repository": "gzmo",
+                "base_branch": "main",
+                "candidate_branch": expected_branch,
+            });
+            value[field] = serde_json::json!(bad);
+            assert!(
+                serde_json::from_value::<CandidateTarget>(value).is_err(),
+                "expected reject {field}={bad:?}"
+            );
+        }
+    }
+
+    // candidate_branch must be evolve/<valid-id> shape even standalone.
+    let mut bad_branch = serde_json::json!({
+        "mode": "repository",
+        "owner": "gzmo-org",
+        "repository": "gzmo",
+        "base_branch": "main",
+        "candidate_branch": "feature/not-evolve",
+    });
+    assert!(serde_json::from_value::<CandidateTarget>(bad_branch.clone()).is_err());
+    bad_branch["candidate_branch"] = serde_json::json!("evolve/not-a-valid-id");
+    assert!(serde_json::from_value::<CandidateTarget>(bad_branch).is_err());
+}
+
+#[test]
+fn candidate_appliance_rejects_bad_identifiers() {
+    let cases = [
+        serde_json::json!({
+            "mode": "appliance",
+            "node_id": "CT101",
+            "target_class": "living-appliance",
+            "inactive_target": "slot-b"
+        }),
+        serde_json::json!({
+            "mode": "appliance",
+            "node_id": "ct101",
+            "target_class": "Living-Appliance",
+            "inactive_target": "slot-b"
+        }),
+        serde_json::json!({
+            "mode": "appliance",
+            "node_id": "",
+            "target_class": "living-appliance",
+            "inactive_target": "slot-b"
+        }),
+        serde_json::json!({
+            "mode": "appliance",
+            "node_id": "ct101",
+            "target_class": "living-appliance",
+            "inactive_target": "../escape"
+        }),
+        serde_json::json!({
+            "mode": "appliance",
+            "node_id": "ct101",
+            "target_class": "living-appliance",
+            "inactive_target": "/absolute"
+        }),
+        serde_json::json!({
+            "mode": "appliance",
+            "node_id": "ct 101",
+            "target_class": "living-appliance",
+            "inactive_target": null
+        }),
+    ];
+    for value in cases {
+        assert!(
+            serde_json::from_value::<CandidateTarget>(value.clone()).is_err(),
+            "expected reject {value}"
+        );
+    }
+
+    let good = serde_json::json!({
+        "mode": "appliance",
+        "node_id": "ct101",
+        "target_class": "living-appliance",
+        "inactive_target": null
+    });
+    assert!(serde_json::from_value::<CandidateTarget>(good).is_ok());
+}
+
+#[test]
+fn candidate_manifest_rejects_duplicate_empty_gates_and_protected_paths() {
+    let mut empty_gates = fixture_repo_manifest();
+    empty_gates.required_gates.clear();
+    assert!(empty_gates.validate().is_err());
+
+    let mut blank_gate = fixture_repo_manifest();
+    blank_gate.required_gates = vec!["unit".to_owned(), "  ".to_owned()];
+    assert!(blank_gate.validate().is_err());
+
+    let mut dup_gates = fixture_repo_manifest();
+    dup_gates.required_gates = vec!["unit".to_owned(), "unit".to_owned()];
+    assert!(dup_gates.validate().is_err());
+
+    let mut empty_paths = fixture_repo_manifest();
+    empty_paths.protected_paths.clear();
+    assert!(empty_paths.validate().is_err());
+
+    let mut blank_path = fixture_repo_manifest();
+    blank_path.protected_paths = vec!["src/lib.rs".to_owned(), "".to_owned()];
+    assert!(blank_path.validate().is_err());
+
+    let mut dup_paths = fixture_repo_manifest();
+    dup_paths.protected_paths = vec!["docs/a.md".to_owned(), "docs\\a.md".to_owned()];
+    assert!(dup_paths.validate().is_err());
+
+    let mut value = serde_json::to_value(fixture_repo_manifest()).unwrap();
+    value["required_gates"] = serde_json::json!([]);
+    assert!(serde_json::from_value::<CandidateManifest>(value.clone()).is_err());
+    value = serde_json::to_value(fixture_repo_manifest()).unwrap();
+    value["protected_paths"] = serde_json::json!(["docs/a.md", "docs/a.md"]);
+    assert!(serde_json::from_value::<CandidateManifest>(value).is_err());
+}
+
+#[test]
+fn candidate_manifest_rejects_invalid_nested_budget_and_schema() {
+    let mut bad_budget = fixture_repo_manifest();
+    bad_budget.budget.wall_seconds = 0;
+    assert!(bad_budget.validate().is_err());
+
+    let mut value = serde_json::to_value(fixture_repo_manifest()).unwrap();
+    value["budget"]["wall_seconds"] = serde_json::json!(0);
+    assert!(serde_json::from_value::<CandidateManifest>(value.clone()).is_err());
+
+    value = serde_json::to_value(fixture_repo_manifest()).unwrap();
+    value["budget"]["wall_seconds"] = serde_json::json!(MAX_WALL_SECONDS + 1);
+    assert!(serde_json::from_value::<CandidateManifest>(value.clone()).is_err());
+
+    value = serde_json::to_value(fixture_repo_manifest()).unwrap();
+    value["schema"] = serde_json::json!("gzmo.evolution.candidate/v0");
+    assert!(serde_json::from_value::<CandidateManifest>(value.clone()).is_err());
+
+    value = serde_json::to_value(fixture_repo_manifest()).unwrap();
+    value["mission_id"] = serde_json::json!("");
+    assert!(serde_json::from_value::<CandidateManifest>(value.clone()).is_err());
+
+    value = serde_json::to_value(fixture_repo_manifest()).unwrap();
+    value["mission_id"] = serde_json::json!("bad mission id with spaces");
+    assert!(serde_json::from_value::<CandidateManifest>(value).is_err());
 }
