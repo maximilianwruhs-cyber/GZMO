@@ -426,7 +426,7 @@ Normalize separators; reject absolute paths, `..`, symlink escape, and case-fold
 
 - [ ] **Step 5: Implement tunable rules**
 
-`TunableRule` is exactly `IntegerRange { min: i64, max: i64 }`, `FloatRange { min: f64, max: f64 }`, `EnumSet { values: BTreeSet<String> }`, or `Boolean`. `CapabilityEnvelope` carries exact schema, envelope ID, policy version, signer key ID, issued/expiry timestamps, budget, path policy, tunable map, allowed candidate kinds, required gates, and `allow_missing_energy_meter`. Validate `issued_at < expires_at`, nonempty signer/policy/gates, valid budget/ranges, finite floats, nonempty enum sets, and an allowlist containing only `Memory` and/or `Tunable`. `PolicyDecision` is `Allowed` or `Denied { reason: String }`. The later envelope digest covers every field; signature verification remains outside this pure crate.
+`TunableRule` is exactly `IntegerRange { min: i64, max: i64 }`, `FloatRange { min: f64, max: f64 }`, `EnumSet { values: BTreeSet<String> }`, or `Boolean`. `CapabilityEnvelope` carries exact schema, envelope ID, policy version, signer key ID, issued/expiry timestamps, one `ResourceBudget` (whose nested `allow_missing_energy_meter` is the sole source of truth), path policy, tunable map, allowed candidate kinds, and required gates. Validate `issued_at < expires_at`, nonempty signer/policy/gates, valid budget/ranges, finite floats, nonempty enum sets, and an allowlist containing only `Memory` and/or `Tunable`. `PolicyDecision` is `Allowed` or `Denied { reason: String }`. The later envelope digest covers every field; signature verification remains outside this pure crate.
 
 Then add `pub mod policy; pub use policy::*;` to `lib.rs`; do not expose a module before its implementation compiles.
 
