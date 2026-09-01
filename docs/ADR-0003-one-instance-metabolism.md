@@ -1,10 +1,10 @@
 # ADR-0003 — One living instance, overnight metabolism first
 
-**Historical status:** Accepted (2026-07-16); host placement amended 2026-07-17; **process/topology superseded in part by [ADR-0005](./ADR-0005-flywheel-over-frozen-topology.md) (2026-07-21)**
-**Decision status:** Superseded
-**Implementation status:** Implemented
-**Superseded by:** [ADR-0011](./ADR-0011-self-developing-living-database.md) (one-writer invariant retained)
-**Related:** [ADR-0005](./ADR-0005-flywheel-over-frozen-topology.md), [ADR-0004](./ADR-0004-airgap-living-usp.md), [CT101_BOUNDARY.md](./CT101_BOUNDARY.md), [CONTINUOUS_UPGRADE.md](./CONTINUOUS_UPGRADE.md)
+- **Historical status:** Accepted (2026-07-16); host placement amended 2026-07-17; **process/topology superseded in part by [ADR-0005](./ADR-0005-flywheel-over-frozen-topology.md) (2026-07-21)**
+- **Decision status:** Superseded
+- **Implementation status:** Implemented
+- **Superseded by:** [ADR-0011](./ADR-0011-self-developing-living-database.md) (one-writer invariant retained)
+- **Related:** [ADR-0005](./ADR-0005-flywheel-over-frozen-topology.md), [ADR-0004](./ADR-0004-airgap-living-usp.md), [CT101_BOUNDARY.md](./CT101_BOUNDARY.md), [CONTINUOUS_UPGRADE.md](./CONTINUOUS_UPGRADE.md)
 
 ## Context
 

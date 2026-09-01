@@ -1,9 +1,9 @@
 # ADR-0011 — Self-developing Living Database Constitution
 
-**Decision status:** Accepted (2026-08-31)
-**Implementation status:** Not started
-**Supersedes:** [ADR-0003](./ADR-0003-one-instance-metabolism.md), [ADR-0004](./ADR-0004-airgap-living-usp.md), [ADR-0007](./ADR-0007-one-product-living.md); partial supersession of [ADR-0010](./ADR-0010-clean-sheet-onebox.md) (phases move to implementation plan)
-**Spec:** [2026-08-31-self-developing-living-database-design.md](./superpowers/specs/2026-08-31-self-developing-living-database-design.md) §§1, 4, 17
+- **Decision status:** Accepted (2026-08-31)
+- **Implementation status:** Not started
+- **Supersedes:** [ADR-0003](./ADR-0003-one-instance-metabolism.md), [ADR-0004](./ADR-0004-airgap-living-usp.md), [ADR-0007](./ADR-0007-one-product-living.md); partial supersession of [ADR-0010](./ADR-0010-clean-sheet-onebox.md) (phases move to implementation plan)
+- **Spec:** [2026-08-31-self-developing-living-database-design.md](./superpowers/specs/2026-08-31-self-developing-living-database-design.md) §§1, 4, 17
 
 ## Context
 

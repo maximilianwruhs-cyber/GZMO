@@ -1,9 +1,9 @@
 # ADR-0012 — Hardware-adaptive immutable appliance
 
-**Decision status:** Accepted (2026-08-31)
-**Implementation status:** Not started
-**Supersedes:** Partial supersession of [ADR-0010](./ADR-0010-clean-sheet-onebox.md) (one-box appliance phases move to implementation plan)
-**Spec:** [2026-08-31-self-developing-living-database-design.md](./superpowers/specs/2026-08-31-self-developing-living-database-design.md) §§5–6, 8
+- **Decision status:** Accepted (2026-08-31)
+- **Implementation status:** Not started
+- **Supersedes:** Partial supersession of [ADR-0010](./ADR-0010-clean-sheet-onebox.md) (one-box appliance phases move to implementation plan)
+- **Spec:** [2026-08-31-self-developing-living-database-design.md](./superpowers/specs/2026-08-31-self-developing-living-database-design.md) §§5–6, 8
 
 ## Context
 

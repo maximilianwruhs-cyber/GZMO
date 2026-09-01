@@ -1,9 +1,9 @@
 # ADR-0013 — Authoritative full-stack data plane
 
-**Decision status:** Accepted (2026-08-31)
-**Implementation status:** Not started
-**Supersedes:** [ADR-0009](./ADR-0009-pgvector-vault.md); partial supersession of [ADR-0010](./ADR-0010-clean-sheet-onebox.md) (storage phases move to implementation plan)
-**Spec:** [2026-08-31-self-developing-living-database-design.md](./superpowers/specs/2026-08-31-self-developing-living-database-design.md) §9
+- **Decision status:** Accepted (2026-08-31)
+- **Implementation status:** Not started
+- **Supersedes:** [ADR-0009](./ADR-0009-pgvector-vault.md); partial supersession of [ADR-0010](./ADR-0010-clean-sheet-onebox.md) (storage phases move to implementation plan)
+- **Spec:** [2026-08-31-self-developing-living-database-design.md](./superpowers/specs/2026-08-31-self-developing-living-database-design.md) §9
 
 ## Context
 

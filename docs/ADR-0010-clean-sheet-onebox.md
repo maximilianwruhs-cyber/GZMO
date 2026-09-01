@@ -1,11 +1,11 @@
 # ADR-0010 — Clean-Sheet One-Box Living Memory Prototype
 
-**Historical status:** Proposed (2026-08-22, gated)
-**Decision status:** Superseded
-**Implementation status:** Not started
-**Superseded by:** [ADR-0011](./ADR-0011-self-developing-living-database.md), [ADR-0012](./ADR-0012-hardware-adaptive-immutable-appliance.md), [ADR-0013](./ADR-0013-authoritative-full-stack-data-plane.md), [ADR-0014](./ADR-0014-constitutional-evolution.md) (phases move to implementation plan)
-**Related:** [ADR-0003](./ADR-0003-one-instance-metabolism.md), [ADR-0004](./ADR-0004-airgap-living-usp.md), [ADR-0007](./ADR-0007-one-product-living.md), [ADR-0008](./ADR-0008-edge-ssm-memory.md), [ADR-0009](./ADR-0009-pgvector-vault.md), [SOTA_FIXES_BACKLOG.md](./SOTA_FIXES_BACKLOG.md)
-**Decision date / owner:** Max, per phase (Phase 1 kickoff requires explicit GO)
+- **Historical status:** Proposed (2026-08-22, gated)
+- **Decision status:** Superseded
+- **Implementation status:** Not started
+- **Superseded by:** [ADR-0011](./ADR-0011-self-developing-living-database.md), [ADR-0012](./ADR-0012-hardware-adaptive-immutable-appliance.md), [ADR-0013](./ADR-0013-authoritative-full-stack-data-plane.md), [ADR-0014](./ADR-0014-constitutional-evolution.md) (phases move to implementation plan)
+- **Related:** [ADR-0003](./ADR-0003-one-instance-metabolism.md), [ADR-0004](./ADR-0004-airgap-living-usp.md), [ADR-0007](./ADR-0007-one-product-living.md), [ADR-0008](./ADR-0008-edge-ssm-memory.md), [ADR-0009](./ADR-0009-pgvector-vault.md), [SOTA_FIXES_BACKLOG.md](./SOTA_FIXES_BACKLOG.md)
+- **Decision date / owner:** Max, per phase (Phase 1 kickoff requires explicit GO)
 
 ---
 

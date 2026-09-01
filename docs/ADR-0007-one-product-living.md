@@ -1,10 +1,10 @@
 # ADR-0007 — One product: living Keep (no lite SKU)
 
-**Historical status:** Accepted (2026-08-16)
-**Decision status:** Superseded
-**Implementation status:** Implemented
-**Superseded by:** [ADR-0011](./ADR-0011-self-developing-living-database.md) (one-product invariant retained)
-**Related:** [ADR-0003](./ADR-0003-one-instance-metabolism.md), [ADR-0004](./ADR-0004-airgap-living-usp.md), [ADR-0005](./ADR-0005-flywheel-over-frozen-topology.md), [ADR-0006](./ADR-0006-owner-control-plane.md), [AIRGAP_LIVING.md](./AIRGAP_LIVING.md)
+- **Historical status:** Accepted (2026-08-16)
+- **Decision status:** Superseded
+- **Implementation status:** Implemented
+- **Superseded by:** [ADR-0011](./ADR-0011-self-developing-living-database.md) (one-product invariant retained)
+- **Related:** [ADR-0003](./ADR-0003-one-instance-metabolism.md), [ADR-0004](./ADR-0004-airgap-living-usp.md), [ADR-0005](./ADR-0005-flywheel-over-frozen-topology.md), [ADR-0006](./ADR-0006-owner-control-plane.md), [AIRGAP_LIVING.md](./AIRGAP_LIVING.md)
 
 ## Context
 

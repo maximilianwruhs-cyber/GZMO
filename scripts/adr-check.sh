@@ -46,16 +46,17 @@ ENTRY_DOCS = [
 LTL_RE = re.compile(r"little-tools-lab/docs/adr/000[12]-")
 ADR_FILE_RE = re.compile(r"^ADR-(\d{4})-.+\.md$")
 SUPERSEDED_BY_LINE_RE = re.compile(
-    r"^\*\*(?:Superseded by|Historical supersedes[^:]*):\*\*\s*(.*)$",
+    r"^(?:- )?\*\*(?:Superseded by|Historical supersedes[^:]*):\*\*\s*(.*)$",
     re.MULTILINE,
 )
 LINK_RE = re.compile(r"\[[^\]]*\]\(([^)]+)\)")
 DECISION_STATUS_RE = re.compile(
-    r"^\*\*Decision status:\*\*\s*(\w+)(?:\s|\(|$)", re.MULTILINE
+    r"^(?:- )?\*\*Decision status:\*\*\s*(\w+)(?:\s|\(|$)", re.MULTILINE
 )
 IMPL_STATUS_RE = re.compile(
-    r"^\*\*Implementation status:\*\*\s*(.+)$", re.MULTILINE
+    r"^(?:- )?\*\*Implementation status:\*\*\s*(.+)$", re.MULTILINE
 )
+META_BOLD_RE = re.compile(r"^(?:- )?(\*\*[^*]+:\*\*)")
 
 checks: list[dict] = []
 errors: list[str] = []
@@ -172,6 +173,35 @@ for num, path in sorted(adr_files.items()):
             not missing,
             "required headings present" if not missing else f"missing headings: {missing}",
         )
+
+    # Header metadata must render as separate lines (bullet list), not one paragraph.
+    header_lines = text.splitlines()
+    hi = 1
+    while hi < len(header_lines) and header_lines[hi].strip() == "":
+        hi += 1
+    meta_lines: list[str] = []
+    while hi < len(header_lines):
+        s = header_lines[hi]
+        if s.strip() == "" or s.startswith("##") or s.strip() == "---":
+            break
+        meta_lines.append(s)
+        hi += 1
+    bare_runon = False
+    for s in meta_lines:
+        if META_BOLD_RE.match(s) and not s.lstrip().startswith("- "):
+            bare_runon = True
+            break
+    for a, b in zip(meta_lines, meta_lines[1:]):
+        if re.match(r"^\*\*[^*]+:\*\*", a) and re.match(r"^\*\*[^*]+:\*\*", b):
+            bare_runon = True
+            break
+    add(
+        f"adr-{num}-meta-separated",
+        not bare_runon and len(meta_lines) >= 2,
+        "bullet metadata header"
+        if not bare_runon and len(meta_lines) >= 2
+        else "status/lineage headers would collapse into one Markdown paragraph",
+    )
 
     for sm in SUPERSEDED_BY_LINE_RE.finditer(text):
         body = sm.group(1).strip()

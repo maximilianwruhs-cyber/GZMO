@@ -1,11 +1,11 @@
 # ADR-0009 — pgvector Vault Consolidation (SQLite SoT + Qdrant Mirror → PostgreSQL+pgvector)
 
-**Historical status:** Proposed (2026-08-22, gated)
-**Decision status:** Superseded
-**Implementation status:** Not started
-**Superseded by:** [ADR-0013](./ADR-0013-authoritative-full-stack-data-plane.md) (pgvector spike retained as evidence)
-**Related:** [ADR-0003](./ADR-0003-one-instance-metabolism.md), [ADR-0004](./ADR-0004-airgap-living-usp.md), [ADR-0005](./ADR-0005-flywheel-over-frozen-topology.md), [ADR-0007](./ADR-0007-one-product-living.md), [ADR-0008](./ADR-0008-edge-ssm-memory.md), [CT101_BOUNDARY.md](./CT101_BOUNDARY.md), [INFRASTRUCTURE_MAP.md](./INFRASTRUCTURE_MAP.md), [SOTA_FIXES_BACKLOG.md](./SOTA_FIXES_BACKLOG.md)
-**Decision date / owner:** Max, after spike results (spike in `spikes/pgvector/`)
+- **Historical status:** Proposed (2026-08-22, gated)
+- **Decision status:** Superseded
+- **Implementation status:** Not started
+- **Superseded by:** [ADR-0013](./ADR-0013-authoritative-full-stack-data-plane.md) (pgvector spike retained as evidence)
+- **Related:** [ADR-0003](./ADR-0003-one-instance-metabolism.md), [ADR-0004](./ADR-0004-airgap-living-usp.md), [ADR-0005](./ADR-0005-flywheel-over-frozen-topology.md), [ADR-0007](./ADR-0007-one-product-living.md), [ADR-0008](./ADR-0008-edge-ssm-memory.md), [CT101_BOUNDARY.md](./CT101_BOUNDARY.md), [INFRASTRUCTURE_MAP.md](./INFRASTRUCTURE_MAP.md), [SOTA_FIXES_BACKLOG.md](./SOTA_FIXES_BACKLOG.md)
+- **Decision date / owner:** Max, after spike results (spike in `spikes/pgvector/`)
 
 ---
 

@@ -1,9 +1,9 @@
 # ADR-0014 — Constitutional evolution and promotion
 
-**Decision status:** Accepted (2026-08-31)
-**Implementation status:** Not started
-**Supersedes:** [ADR-0005](./ADR-0005-flywheel-over-frozen-topology.md); partial supersession of [ADR-0010](./ADR-0010-clean-sheet-onebox.md) (evolution phases move to implementation plan)
-**Spec:** [2026-08-31-self-developing-living-database-design.md](./superpowers/specs/2026-08-31-self-developing-living-database-design.md) §§10–12, 15
+- **Decision status:** Accepted (2026-08-31)
+- **Implementation status:** Not started
+- **Supersedes:** [ADR-0005](./ADR-0005-flywheel-over-frozen-topology.md); partial supersession of [ADR-0010](./ADR-0010-clean-sheet-onebox.md) (evolution phases move to implementation plan)
+- **Spec:** [2026-08-31-self-developing-living-database-design.md](./superpowers/specs/2026-08-31-self-developing-living-database-design.md) §§10–12, 15
 
 ## Context
 

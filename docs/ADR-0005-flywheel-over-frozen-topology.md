@@ -1,12 +1,12 @@
 # ADR-0005 — Continuous upgrade flywheel outranks frozen topology
 
-**Historical status:** Accepted (2026-07-21)
-**Decision status:** Superseded
-**Implementation status:** Implemented
-**Superseded by:** [ADR-0014](./ADR-0014-constitutional-evolution.md) (continuous improvement retained under capability envelopes)
-**Historical supersedes for process / topology / promotion:** conflicting bits of [ADR-0003](./ADR-0003-one-instance-metabolism.md), [ADR-0004](./ADR-0004-airgap-living-usp.md) (invariants retained), and [LTL ADR-0001](../../little-tools-lab/docs/adr/0001-two-stack-lab-not-ct101-graft.md) (provenance only; non-authoritative in GZMO)
-**Implements:** [CONTINUOUS_UPGRADE.md](./CONTINUOUS_UPGRADE.md)
-**Related:** uniqueness craft backlog · Brain Feed · beat-gate kit · [ADR-0007](./ADR-0007-one-product-living.md) (one product)
+- **Historical status:** Accepted (2026-07-21)
+- **Decision status:** Superseded
+- **Implementation status:** Implemented
+- **Superseded by:** [ADR-0014](./ADR-0014-constitutional-evolution.md) (continuous improvement retained under capability envelopes)
+- **Historical supersedes for process / topology / promotion:** conflicting bits of [ADR-0003](./ADR-0003-one-instance-metabolism.md), [ADR-0004](./ADR-0004-airgap-living-usp.md) (invariants retained), and [LTL ADR-0001](../../little-tools-lab/docs/adr/0001-two-stack-lab-not-ct101-graft.md) (provenance only; non-authoritative in GZMO)
+- **Implements:** [CONTINUOUS_UPGRADE.md](./CONTINUOUS_UPGRADE.md)
+- **Related:** uniqueness craft backlog · Brain Feed · beat-gate kit · [ADR-0007](./ADR-0007-one-product-living.md) (one product)
 
 ## Context
 

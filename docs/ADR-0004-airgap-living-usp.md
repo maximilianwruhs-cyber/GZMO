@@ -1,10 +1,10 @@
 # ADR-0004 — Airgap living is the USP (one box, full metabolism)
 
-**Historical status:** Accepted (2026-07-20); process amended by [ADR-0005](./ADR-0005-flywheel-over-frozen-topology.md) (2026-07-21); **lite-as-bootstrap brand superseded by [ADR-0007](./ADR-0007-one-product-living.md) (2026-08-16)**
-**Decision status:** Superseded
-**Implementation status:** Implemented
-**Superseded by:** [ADR-0011](./ADR-0011-self-developing-living-database.md) (airgap/one-box invariant retained)
-**Related:** [ADR-0005](./ADR-0005-flywheel-over-frozen-topology.md), [ADR-0003](./ADR-0003-one-instance-metabolism.md), [ADR-0007](./ADR-0007-one-product-living.md), [AIRGAP_LIVING.md](./AIRGAP_LIVING.md), [CONTINUOUS_UPGRADE.md](./CONTINUOUS_UPGRADE.md)
+- **Historical status:** Accepted (2026-07-20); process amended by [ADR-0005](./ADR-0005-flywheel-over-frozen-topology.md) (2026-07-21); **lite-as-bootstrap brand superseded by [ADR-0007](./ADR-0007-one-product-living.md) (2026-08-16)**
+- **Decision status:** Superseded
+- **Implementation status:** Implemented
+- **Superseded by:** [ADR-0011](./ADR-0011-self-developing-living-database.md) (airgap/one-box invariant retained)
+- **Related:** [ADR-0005](./ADR-0005-flywheel-over-frozen-topology.md), [ADR-0003](./ADR-0003-one-instance-metabolism.md), [ADR-0007](./ADR-0007-one-product-living.md), [AIRGAP_LIVING.md](./AIRGAP_LIVING.md), [CONTINUOUS_UPGRADE.md](./CONTINUOUS_UPGRADE.md)
 
 ## Context
 
