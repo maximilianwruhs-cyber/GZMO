@@ -546,8 +546,7 @@ fn envelope_rejects_duplicate_required_gates_and_unsafe_tunable_keys() {
     ] {
         let mut env = fixture_envelope();
         env.tunables.clear();
-        env.tunables
-            .insert(ok_key.to_owned(), TunableRule::Boolean);
+        env.tunables.insert(ok_key.to_owned(), TunableRule::Boolean);
         assert!(
             env.validate().is_ok(),
             "safe tunable key {ok_key:?} must pass validate"
@@ -563,7 +562,6 @@ fn envelope_rejects_duplicate_required_gates_and_unsafe_tunable_keys() {
         );
     }
 }
-
 
 #[test]
 fn policy_json_deserialize_rejects_invalid_contracts() {

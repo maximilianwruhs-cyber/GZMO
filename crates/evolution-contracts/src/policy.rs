@@ -511,7 +511,6 @@ fn validate_tunable_map_key(key: &str) -> Result<(), PolicyError> {
     Ok(())
 }
 
-
 fn nonempty_unique_string_array_schema(
     _gen: &mut schemars::gen::SchemaGenerator,
 ) -> schemars::schema::Schema {
