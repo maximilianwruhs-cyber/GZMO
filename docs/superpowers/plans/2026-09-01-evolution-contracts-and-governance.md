@@ -178,11 +178,12 @@ git commit -m "docs: establish constitutional ADR authority"
 - Modify: `Cargo.toml`
 - Create: `crates/evolution-contracts/Cargo.toml`
 - Create: `crates/evolution-contracts/src/lib.rs`
+- Create: `crates/evolution-contracts/src/candidate.rs`
 - Test: `crates/evolution-contracts/tests/contracts.rs`
 
 **Interfaces:**
 - Consumes: none beyond workspace libraries.
-- Produces: `CandidateId`, `AuthorityTier`, `CandidateKind`, `CandidateState`, `CandidateTarget`, schema constants.
+- Produces: `CandidateId`, `AuthorityTier`, `CandidateKind`, base `CandidateState`, schema constants.
 
 - [ ] **Step 1: Write a failing public-interface test**
 
@@ -215,22 +216,14 @@ Add `crates/evolution-contracts` to `workspace.members`. Add workspace dependenc
 schemars = { version = "0.8", features = ["chrono", "uuid1"] }
 ```
 
-Create crate manifest using workspace `serde`, `serde_json`, `chrono`, `uuid`, `sha2`, and `schemars`.
+Create crate manifest using workspace `serde`, `serde_json`, `chrono`, `uuid`, `sha2`, `thiserror`, and `schemars`.
 
 - [ ] **Step 4: Add the public module surface**
 
 ```rust
-pub mod audit;
 pub mod candidate;
-pub mod evaluation;
-pub mod policy;
-pub mod promotion;
 
-pub use audit::*;
 pub use candidate::*;
-pub use evaluation::*;
-pub use policy::*;
-pub use promotion::*;
 
 pub const CANDIDATE_SCHEMA: &str = "gzmo.evolution.candidate/v1";
 pub const ENVELOPE_SCHEMA: &str = "gzmo.evolution.envelope/v1";
@@ -238,9 +231,9 @@ pub const EVALUATION_SCHEMA: &str = "gzmo.evolution.evaluation/v1";
 pub const AUDIT_SCHEMA: &str = "gzmo.evolution.audit/v1";
 ```
 
-- [ ] **Step 5: Implement strict `CandidateId` parsing**
+- [ ] **Step 5: Implement strict identifiers and base enums**
 
-Accept only ASCII lowercase/digits/hyphens, prefix `cand-`, length 16–96, no `..`, and no leading/trailing hyphen after the prefix. Return `ContractError::InvalidCandidateId` otherwise.
+Implement `CandidateId` parsing plus `AuthorityTier`, `CandidateKind`, and `CandidateState` Serde/Schemars/Display representations. Accept only ASCII lowercase/digits/hyphens, prefix `cand-`, length 16–96, no `..`, and no leading/trailing hyphen after the prefix. Return `ContractError::InvalidCandidateId` otherwise. `CandidateManifest`, target fields, and legal transitions are deliberately added only after Task 4 creates `ResourceBudget`.
 
 - [ ] **Step 6: Run the interface test**
 
@@ -260,12 +253,12 @@ git commit -m "feat: add shared evolution contract crate"
 ### Task 3: Define Candidate State and Legal Transitions
 
 **Files:**
-- Create: `crates/evolution-contracts/src/candidate.rs`
+- Modify: `crates/evolution-contracts/src/candidate.rs`
 - Modify: `crates/evolution-contracts/tests/contracts.rs`
 
 **Interfaces:**
 - Produces: `CandidateManifest`, `CandidateState::can_transition_to`, `CandidateKind::authority_tier`.
-- Consumes: `ResourceBudget` from Task 4; define the field now and complete its implementation there.
+- Consumes: `ResourceBudget` from Task 4. Execute Task 4 before Task 3 as recorded in the SDD ledger.
 
 - [ ] **Step 1: Write transition tests**
 
@@ -382,6 +375,7 @@ git commit -m "feat: encode legal evolution candidate transitions"
 
 **Files:**
 - Create: `crates/evolution-contracts/src/policy.rs`
+- Modify: `crates/evolution-contracts/src/lib.rs`
 - Modify: `crates/evolution-contracts/tests/contracts.rs`
 
 **Interfaces:**
@@ -434,6 +428,8 @@ Normalize separators; reject absolute paths, `..`, symlink escape, and case-fold
 
 Rules are typed `IntegerRange`, `FloatRange`, `EnumSet`, or `Boolean`. The envelope digest covers policy version, expiry, rules, budgets, protected paths, required gates, and signer key ID. Signature verification belongs outside this pure crate; this crate exposes canonical bytes.
 
+Then add `pub mod policy; pub use policy::*;` to `lib.rs`; do not expose a module before its implementation compiles.
+
 - [ ] **Step 6: Run policy tests**
 
 Run: `cargo test -p evolution-contracts policy`
@@ -454,10 +450,11 @@ git commit -m "feat: define bounded evolution capability envelopes"
 **Files:**
 - Create: `crates/evolution-contracts/src/evaluation.rs`
 - Create: `crates/evolution-contracts/src/promotion.rs`
+- Modify: `crates/evolution-contracts/src/lib.rs`
 - Modify: `crates/evolution-contracts/tests/contracts.rs`
 
 **Interfaces:**
-- Produces: `GateResult`, `EvaluationReport::hard_floors_pass`, `PromotionRequest`, `AuthorityGrant`.
+- Produces: `GateResult`, `EvaluationReport::hard_floors_pass`, `PromotionRequest`, and `UnverifiedAuthorityGrant`.
 - Consumes: candidate ID/state, canonical artifact digests.
 
 - [ ] **Step 1: Write floor and grant tests**
@@ -498,6 +495,8 @@ Expected: FAIL: evaluation types missing.
 
 `AuthorityGrant` contains signer key ID, candidate/evaluation/policy digests, target, issued/expiry time, and detached signature bytes. It cannot be constructed by a deserialized candidate without later verification; name the raw type `UnverifiedAuthorityGrant` and return `VerifiedAuthorityGrant` only from the trusted verifier crate in later plans.
 
+Then add `pub mod evaluation; pub mod promotion; pub use evaluation::*; pub use promotion::*;` to `lib.rs` after both modules compile.
+
 - [ ] **Step 5: Run evaluation and promotion tests**
 
 Run: `cargo test -p evolution-contracts evaluation promotion`
@@ -517,6 +516,7 @@ git commit -m "feat: bind hard fitness floors to promotion requests"
 
 **Files:**
 - Create: `crates/evolution-contracts/src/audit.rs`
+- Modify: `crates/evolution-contracts/src/lib.rs`
 - Modify: `crates/evolution-contracts/tests/contracts.rs`
 
 **Interfaces:**
@@ -546,6 +546,8 @@ Expected: FAIL: audit implementation missing.
 - [ ] **Step 3: Implement canonical JSON**
 
 Recursively sort JSON object keys, preserve array order, reject non-finite floats before serialization, and serialize without whitespace. Hash `schema || sequence || previous_hash || event_type || candidate_id || payload_digest || occurred_at` with SHA-256.
+
+Then add `pub mod audit; pub use audit::*;` to `lib.rs` after the audit implementation compiles.
 
 - [ ] **Step 4: Implement chain verification**
 
@@ -593,7 +595,7 @@ Expected: FAIL: exporter/snapshots missing.
 - [ ] **Step 3: Implement the exporter**
 
 ```rust
-fn write_schema<T: schemars::JsonSchema>(path: &Path) -> anyhow::Result<()> {
+fn write_schema<T: schemars::JsonSchema>(path: &Path) -> Result<(), Box<dyn std::error::Error>> {
     let schema = schemars::schema_for!(T);
     let text = serde_json::to_string_pretty(&schema)? + "\n";
     std::fs::write(path, text)?;
