@@ -559,60 +559,82 @@ git commit -m "feat: add tamper-evident evolution audit contracts"
 ### Task 7: Export and Freeze JSON Schemas
 
 **Files:**
+- Modify: `crates/evolution-contracts/src/candidate.rs`
+- Modify: `crates/evolution-contracts/src/policy.rs`
+- Modify: `crates/evolution-contracts/src/evaluation.rs`
+- Modify: `crates/evolution-contracts/src/promotion.rs`
+- Modify: `crates/evolution-contracts/src/audit.rs`
 - Create: `crates/evolution-contracts/src/bin/export_schemas.rs`
 - Create: `crates/evolution-contracts/schemas/candidate-v1.json`
 - Create: `crates/evolution-contracts/schemas/envelope-v1.json`
 - Create: `crates/evolution-contracts/schemas/evaluation-v1.json`
-- Create: `crates/evolution-contracts/schemas/audit-v1.json`
 - Create: `crates/evolution-contracts/schemas/promotion-v1.json`
+- Create: `crates/evolution-contracts/schemas/audit-v1.json`
 - Create: `crates/evolution-contracts/tests/schema_snapshots.rs`
 
 **Interfaces:**
-- Produces: checked-in schemas used by non-Rust workers and offline bundle validation.
-- Consumes: Schemars derives on all public artifacts.
+- Produces: deterministic checked-in schemas used by non-Rust workers and offline bundle validation.
+- Consumes: every public v1 artifact and its existing runtime `validate`/custom-Deserialize contract.
 
-- [ ] **Step 1: Write the schema drift test**
+- [ ] **Step 1: Write failing schema snapshot and constraint tests**
 
-The test generates each schema to a temporary directory and byte-compares it with the checked-in pretty JSON plus one final newline.
+The test generates all five schemas into a unique standard-library temporary directory, byte-compares them with checked-in pretty JSON plus one final newline, and removes the directory. It also parses each schema and asserts `$id`, title, `x-gzmo-schema-id`, required fields, CandidateId/digest/signature/hash patterns and bounds, nonempty gate/path arrays where expressible, enum values, audit sequence minimum, and a nonempty `x-gzmo-runtime-validation` list for cross-field rules.
 
 - [ ] **Step 2: Run and confirm failure**
 
 Run: `cargo test -p evolution-contracts schema_snapshots`
 
-Expected: FAIL: exporter/snapshots missing.
+Expected: FAIL because exporter/snapshots are absent.
 
-- [ ] **Step 3: Implement the exporter**
+- [ ] **Step 3: Encode every expressible structural constraint**
+
+Use Schemars field annotations or focused custom `JsonSchema` implementations in the owning modules. At minimum encode:
+
+- exact top-level schema identifier and required fields;
+- CandidateId, safe identifiers, digest algorithms/length/case, signature/hash lengths;
+- `required_gates`, `protected_paths`, and evaluation `gates` with `minItems: 1`;
+- numeric resource maxima/minima and audit sequence `minimum: 1`;
+- closed enum/tag variants and `additionalProperties: false` wherever the Rust wire type denies unknown fields.
+
+JSON Schema cannot fully express kind↔authority, target↔baseline algorithm, candidate-ID↔branch, recomputed verdict, time-window/binding, or audit-hash checks. Add a root `x-gzmo-runtime-validation` array naming those exact invariants; runtime validated deserialization remains authoritative. A generated schema must never imply that schema validation alone verifies a signature, digest binding, or event hash.
+
+- [ ] **Step 4: Implement the deterministic exporter**
+
+Map exact roots: `CandidateManifest → candidate-v1.json`, `CapabilityEnvelope → envelope-v1.json`, `EvaluationReport → evaluation-v1.json`, `UnverifiedAuthorityGrant → promotion-v1.json`, and `AuditEvent → audit-v1.json`.
 
 ```rust
 fn write_schema<T: schemars::JsonSchema>(path: &Path) -> Result<(), Box<dyn std::error::Error>> {
     let schema = schemars::schema_for!(T);
-    let text = serde_json::to_string_pretty(&schema)? + "\n";
-    std::fs::write(path, text)?;
+    let value = serde_json::to_value(schema)?;
+    let sorted = recursively_sort_object_keys(value);
+    let text = serde_json::to_string_pretty(&sorted)? + "\n";
+    let temp = path.with_extension("json.tmp");
+    std::fs::write(&temp, text)?;
+    std::fs::rename(temp, path)?;
     Ok(())
 }
 ```
 
-Accept `--out <directory>`, create the directory, and write exactly the five filenames above.
+Accept only `--out <directory>`, create it, reject extra args, and write exactly the five filenames above in fixed order.
 
-- [ ] **Step 4: Generate snapshots**
+- [ ] **Step 5: Generate the checked-in schemas**
 
 Run: `cargo run -p evolution-contracts --bin export_schemas -- --out crates/evolution-contracts/schemas`
 
-Expected: five JSON files.
+Expected: five deterministic JSON files.
 
-- [ ] **Step 5: Run the complete contract suite**
+- [ ] **Step 6: Run focused contract and ADR gates**
 
 ```bash
-cargo fmt --all -- --check
-cargo clippy -p evolution-contracts --all-targets -- -D warnings
+cargo test -p evolution-contracts schema
 cargo test -p evolution-contracts
 bash tests/adr-index-test.sh
 bash scripts/adr-check.sh
 ```
 
-Expected: all pass.
+Expected: all pass. The controller runs workspace format/clippy/full-suite gates after the task review.
 
-- [ ] **Step 6: Commit**
+- [ ] **Step 7: Commit**
 
 ```bash
 git add crates/evolution-contracts
