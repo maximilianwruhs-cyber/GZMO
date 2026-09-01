@@ -61,6 +61,7 @@ bin/llama-*
 # ── Agent IDE / tooling (local only) ───────────────────────────────────────
 .pi/
 .Jules/
+.worktrees/
 
 # ── Python / eval artifacts ────────────────────────────────────────────────
 __pycache__/
