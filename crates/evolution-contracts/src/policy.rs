@@ -1,0 +1,698 @@
+//! Signed capability envelopes, resource budgets, path policy, and tunables.
+//!
+//! Pure domain values only: no signature verification, filesystem, or I/O.
+
+use crate::{CandidateKind, ENVELOPE_SCHEMA};
+use chrono::{DateTime, Utc};
+use schemars::JsonSchema;
+use serde::{Deserialize, Serialize};
+use std::collections::{BTreeMap, BTreeSet};
+use thiserror::Error;
+
+/// Absolute compile-time ceilings for signed resource budgets.
+pub const MAX_WALL_SECONDS: u64 = 86_400;
+pub const MAX_ATTEMPTS: u8 = 5;
+pub const MAX_CHANGED_FILES: u32 = 100;
+pub const MAX_ADDED_LINES: u32 = 10_000;
+pub const MAX_TOOL_CALLS: u32 = 500;
+pub const MAX_INPUT_TOKENS: u64 = 5_000_000;
+pub const MAX_OUTPUT_TOKENS: u64 = 1_000_000;
+pub const MAX_ENERGY_JOULES: u64 = 10_000_000;
+
+/// Stage-1 default protected path prefixes and files.
+pub const DEFAULT_PROTECTED: &[&str] = &[
+    ".github/workflows/",
+    "docs/superpowers/specs/",
+    "docs/ADR-",
+    "AGENTS.md",
+    "Cargo.toml",
+    "Cargo.lock",
+    "crates/evolution-contracts/",
+    "gzmo-evolver/",
+];
+
+/// Errors raised while validating or applying policy contracts.
+#[derive(Debug, Error, Clone, PartialEq, Eq)]
+pub enum PolicyError {
+    /// Resource budget failed structural or ceiling checks.
+    #[error("invalid resource budget: {0}")]
+    InvalidBudget(String),
+    /// Path was absolute, escaped, or matched a protected pattern.
+    #[error("path policy violation: {0}")]
+    InvalidPath(String),
+    /// Tunable rule failed structural checks.
+    #[error("invalid tunable rule: {0}")]
+    InvalidTunable(String),
+    /// Envelope failed structural checks.
+    #[error("invalid capability envelope: {0}")]
+    InvalidEnvelope(String),
+    /// Authorization or usage check denied the request.
+    #[error("policy denied: {0}")]
+    Denied(String),
+}
+
+/// Absolute ceilings for a single candidate attempt.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+pub struct ResourceBudget {
+    pub wall_seconds: u64,
+    pub max_attempts: u8,
+    pub max_changed_files: u32,
+    pub max_added_lines: u32,
+    pub max_tool_calls: u32,
+    pub max_input_tokens: u64,
+    pub max_output_tokens: u64,
+    /// When `None`, the signed profile acknowledges a missing energy meter.
+    /// That is never unlimited energy; see [`ResourceBudget::allow_missing_energy_meter`].
+    pub max_energy_joules: Option<u64>,
+    /// Explicit signed allowance that energy metering may be absent.
+    pub allow_missing_energy_meter: bool,
+}
+
+impl ResourceBudget {
+    /// Validate work limits against zero and compile-time ceilings.
+    pub fn validate(&self) -> Result<(), PolicyError> {
+        fn nonzero_u64(name: &str, value: u64, ceiling: u64) -> Result<(), PolicyError> {
+            if value == 0 {
+                return Err(PolicyError::InvalidBudget(format!(
+                    "{name} must be greater than zero"
+                )));
+            }
+            if value > ceiling {
+                return Err(PolicyError::InvalidBudget(format!(
+                    "{name} {value} exceeds ceiling {ceiling}"
+                )));
+            }
+            Ok(())
+        }
+        fn nonzero_u32(name: &str, value: u32, ceiling: u32) -> Result<(), PolicyError> {
+            if value == 0 {
+                return Err(PolicyError::InvalidBudget(format!(
+                    "{name} must be greater than zero"
+                )));
+            }
+            if value > ceiling {
+                return Err(PolicyError::InvalidBudget(format!(
+                    "{name} {value} exceeds ceiling {ceiling}"
+                )));
+            }
+            Ok(())
+        }
+        fn nonzero_u8(name: &str, value: u8, ceiling: u8) -> Result<(), PolicyError> {
+            if value == 0 {
+                return Err(PolicyError::InvalidBudget(format!(
+                    "{name} must be greater than zero"
+                )));
+            }
+            if value > ceiling {
+                return Err(PolicyError::InvalidBudget(format!(
+                    "{name} {value} exceeds ceiling {ceiling}"
+                )));
+            }
+            Ok(())
+        }
+
+        nonzero_u64("wall_seconds", self.wall_seconds, MAX_WALL_SECONDS)?;
+        nonzero_u8("max_attempts", self.max_attempts, MAX_ATTEMPTS)?;
+        nonzero_u32("max_changed_files", self.max_changed_files, MAX_CHANGED_FILES)?;
+        nonzero_u32("max_added_lines", self.max_added_lines, MAX_ADDED_LINES)?;
+        nonzero_u32("max_tool_calls", self.max_tool_calls, MAX_TOOL_CALLS)?;
+        nonzero_u64("max_input_tokens", self.max_input_tokens, MAX_INPUT_TOKENS)?;
+        nonzero_u64("max_output_tokens", self.max_output_tokens, MAX_OUTPUT_TOKENS)?;
+
+        match self.max_energy_joules {
+            None => {
+                if !self.allow_missing_energy_meter {
+                    return Err(PolicyError::InvalidBudget(
+                        "max_energy_joules is missing without allow_missing_energy_meter"
+                            .to_owned(),
+                    ));
+                }
+            }
+            Some(0) => {
+                return Err(PolicyError::InvalidBudget(
+                    "max_energy_joules must be greater than zero when present".to_owned(),
+                ));
+            }
+            Some(joules) if joules > MAX_ENERGY_JOULES => {
+                return Err(PolicyError::InvalidBudget(format!(
+                    "max_energy_joules {joules} exceeds ceiling {MAX_ENERGY_JOULES}"
+                )));
+            }
+            Some(_) => {}
+        }
+        Ok(())
+    }
+}
+
+/// Observed resource consumption to compare against a signed budget.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+pub struct ResourceUsage {
+    pub wall_seconds: u64,
+    pub attempts: u8,
+    pub changed_files: u32,
+    pub added_lines: u32,
+    pub tool_calls: u32,
+    pub input_tokens: u64,
+    pub output_tokens: u64,
+    pub energy_joules: Option<u64>,
+}
+
+impl ResourceUsage {
+    /// Return true when every used field is within the signed maximum.
+    ///
+    /// A missing energy meter (`budget.max_energy_joules == None`) is never
+    /// unlimited energy: any positive observed energy fails the fit check.
+    pub fn fits(&self, budget: &ResourceBudget) -> bool {
+        if self.wall_seconds > budget.wall_seconds
+            || self.attempts > budget.max_attempts
+            || self.changed_files > budget.max_changed_files
+            || self.added_lines > budget.max_added_lines
+            || self.tool_calls > budget.max_tool_calls
+            || self.input_tokens > budget.max_input_tokens
+            || self.output_tokens > budget.max_output_tokens
+        {
+            return false;
+        }
+
+        match budget.max_energy_joules {
+            None => match self.energy_joules {
+                None | Some(0) => true,
+                Some(_) => false,
+            },
+            Some(max) => match self.energy_joules {
+                None => true,
+                Some(used) => used <= max,
+            },
+        }
+    }
+}
+
+/// Protected-path rules for candidate diffs and writes.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+pub struct PathPolicy {
+    pub protected_paths: Vec<String>,
+}
+
+impl PathPolicy {
+    /// Stage-1 default protected paths.
+    pub fn stage1_default() -> Self {
+        Self {
+            protected_paths: DEFAULT_PROTECTED
+                .iter()
+                .map(|p| (*p).to_owned())
+                .collect(),
+        }
+    }
+
+    /// Normalize separators and reject absolute/`..`/empty-escape paths, then
+    /// deny case-folded matches against protected patterns.
+    pub fn check(&self, path: &str) -> Result<(), PolicyError> {
+        let normalized = normalize_relative_path(path)?;
+        let folded = case_fold(&normalized);
+        for raw_pattern in &self.protected_paths {
+            let pattern = normalize_protected_pattern(raw_pattern)?;
+            let folded_pattern = case_fold(&pattern);
+            if path_matches_protected(&folded, &folded_pattern) {
+                return Err(PolicyError::InvalidPath(format!(
+                    "path {path:?} matches protected pattern {raw_pattern:?}"
+                )));
+            }
+        }
+        Ok(())
+    }
+
+    /// Validate that every configured protected pattern is well-formed.
+    pub fn validate(&self) -> Result<(), PolicyError> {
+        if self.protected_paths.is_empty() {
+            return Err(PolicyError::InvalidPath(
+                "protected_paths must be nonempty".to_owned(),
+            ));
+        }
+        for raw in &self.protected_paths {
+            normalize_protected_pattern(raw)?;
+        }
+        Ok(())
+    }
+}
+
+fn case_fold(value: &str) -> String {
+    value.chars().flat_map(char::to_lowercase).collect()
+}
+
+fn normalize_relative_path(path: &str) -> Result<String, PolicyError> {
+    if path.is_empty() {
+        return Err(PolicyError::InvalidPath("path must be nonempty".to_owned()));
+    }
+    if path.starts_with('/')
+        || path.starts_with('\\')
+        || path_has_windows_drive(path)
+        || path.starts_with("\\\\")
+        || path.starts_with("//")
+    {
+        return Err(PolicyError::InvalidPath(format!(
+            "absolute path rejected: {path:?}"
+        )));
+    }
+
+    let unified = path.replace('\\', "/");
+    if unified.contains('\0') {
+        return Err(PolicyError::InvalidPath(
+            "path contains NUL byte".to_owned(),
+        ));
+    }
+
+    let mut out: Vec<&str> = Vec::new();
+    for component in unified.split('/') {
+        match component {
+            "" => {
+                // Reject empty components ("a//b") as symlink/escape ambiguity.
+                return Err(PolicyError::InvalidPath(format!(
+                    "path has empty component: {path:?}"
+                )));
+            }
+            "." => {
+                // Drop current-dir markers after separator normalization.
+            }
+            ".." => {
+                return Err(PolicyError::InvalidPath(format!(
+                    "path escapes via ..: {path:?}"
+                )));
+            }
+            other => out.push(other),
+        }
+    }
+    if out.is_empty() {
+        return Err(PolicyError::InvalidPath(format!(
+            "path resolves empty: {path:?}"
+        )));
+    }
+    Ok(out.join("/"))
+}
+
+fn normalize_protected_pattern(pattern: &str) -> Result<String, PolicyError> {
+    if pattern.is_empty() {
+        return Err(PolicyError::InvalidPath(
+            "protected pattern must be nonempty".to_owned(),
+        ));
+    }
+    if pattern.starts_with('/')
+        || pattern.starts_with('\\')
+        || path_has_windows_drive(pattern)
+        || pattern.starts_with("//")
+        || pattern.starts_with("\\\\")
+    {
+        return Err(PolicyError::InvalidPath(format!(
+            "absolute protected pattern rejected: {pattern:?}"
+        )));
+    }
+    let unified = pattern.replace('\\', "/");
+    let trailing_slash = unified.ends_with('/');
+    let mut parts: Vec<&str> = Vec::new();
+    for component in unified.split('/').filter(|c| !c.is_empty()) {
+        match component {
+            "." => {}
+            ".." => {
+                return Err(PolicyError::InvalidPath(format!(
+                    "protected pattern escapes via ..: {pattern:?}"
+                )));
+            }
+            other => parts.push(other),
+        }
+    }
+    if parts.is_empty() {
+        return Err(PolicyError::InvalidPath(format!(
+            "protected pattern resolves empty: {pattern:?}"
+        )));
+    }
+    let mut normalized = parts.join("/");
+    if trailing_slash {
+        normalized.push('/');
+    }
+    Ok(normalized)
+}
+
+fn path_has_windows_drive(path: &str) -> bool {
+    let mut chars = path.chars();
+    match (chars.next(), chars.next()) {
+        (Some(letter), Some(':')) if letter.is_ascii_alphabetic() => true,
+        _ => false,
+    }
+}
+
+fn path_matches_protected(path: &str, pattern: &str) -> bool {
+    if path == pattern {
+        return true;
+    }
+    if pattern.ends_with('/') {
+        return path.starts_with(pattern);
+    }
+    // Prefix token such as `docs/ADR-`.
+    if pattern.ends_with('-') {
+        return path.starts_with(pattern);
+    }
+    // Bare filename: match root or any nested segment.
+    if !pattern.contains('/') {
+        return path == pattern || path.ends_with(&format!("/{pattern}"));
+    }
+    // Directory-like pattern without trailing slash: boundary-aware prefix.
+    path.starts_with(pattern)
+        && (path.len() == pattern.len()
+            || path.as_bytes().get(pattern.len()) == Some(&b'/')
+            || path.as_bytes().get(pattern.len()) == Some(&b'-'))
+}
+
+/// Typed bounds for an operator-signed tunable key.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "snake_case", tag = "type")]
+pub enum TunableRule {
+    IntegerRange { min: i64, max: i64 },
+    FloatRange { min: f64, max: f64 },
+    EnumSet { values: BTreeSet<String> },
+    Boolean,
+}
+
+impl TunableRule {
+    /// Validate range order, finiteness, and nonempty enum sets.
+    pub fn validate(&self) -> Result<(), PolicyError> {
+        match self {
+            Self::IntegerRange { min, max } => {
+                if min > max {
+                    return Err(PolicyError::InvalidTunable(format!(
+                        "integer range min {min} > max {max}"
+                    )));
+                }
+            }
+            Self::FloatRange { min, max } => {
+                if !min.is_finite() || !max.is_finite() {
+                    return Err(PolicyError::InvalidTunable(
+                        "float range bounds must be finite".to_owned(),
+                    ));
+                }
+                if min > max {
+                    return Err(PolicyError::InvalidTunable(format!(
+                        "float range min {min} > max {max}"
+                    )));
+                }
+            }
+            Self::EnumSet { values } => {
+                if values.is_empty() {
+                    return Err(PolicyError::InvalidTunable(
+                        "enum set must be nonempty".to_owned(),
+                    ));
+                }
+                if values.iter().any(|v| v.is_empty()) {
+                    return Err(PolicyError::InvalidTunable(
+                        "enum set values must be nonempty".to_owned(),
+                    ));
+                }
+            }
+            Self::Boolean => {}
+        }
+        Ok(())
+    }
+
+    /// Authorize a floating-point assignment against this rule.
+    pub fn authorize_f64(&self, value: f64) -> Result<(), PolicyError> {
+        match self {
+            Self::FloatRange { min, max } => {
+                if !value.is_finite() {
+                    return Err(PolicyError::Denied(
+                        "tunable float value must be finite".to_owned(),
+                    ));
+                }
+                if value < *min || value > *max {
+                    return Err(PolicyError::Denied(format!(
+                        "value {value} outside float range [{min}, {max}]"
+                    )));
+                }
+                Ok(())
+            }
+            other => Err(PolicyError::Denied(format!(
+                "tunable rule {other:?} does not accept float values"
+            ))),
+        }
+    }
+
+    /// Authorize an integer assignment against this rule.
+    pub fn authorize_i64(&self, value: i64) -> Result<(), PolicyError> {
+        match self {
+            Self::IntegerRange { min, max } => {
+                if value < *min || value > *max {
+                    return Err(PolicyError::Denied(format!(
+                        "value {value} outside integer range [{min}, {max}]"
+                    )));
+                }
+                Ok(())
+            }
+            other => Err(PolicyError::Denied(format!(
+                "tunable rule {other:?} does not accept integer values"
+            ))),
+        }
+    }
+
+    /// Authorize a boolean assignment against this rule.
+    pub fn authorize_bool(&self, _value: bool) -> Result<(), PolicyError> {
+        match self {
+            Self::Boolean => Ok(()),
+            other => Err(PolicyError::Denied(format!(
+                "tunable rule {other:?} does not accept boolean values"
+            ))),
+        }
+    }
+
+    /// Authorize an enum-string assignment against this rule.
+    pub fn authorize_enum(&self, value: &str) -> Result<(), PolicyError> {
+        match self {
+            Self::EnumSet { values } => {
+                if values.contains(value) {
+                    Ok(())
+                } else {
+                    Err(PolicyError::Denied(format!(
+                        "value {value:?} not in enum set"
+                    )))
+                }
+            }
+            other => Err(PolicyError::Denied(format!(
+                "tunable rule {other:?} does not accept enum values"
+            ))),
+        }
+    }
+}
+
+/// Operator-facing allow/deny decision with an explicit denial reason.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum PolicyDecision {
+    Allowed,
+    Denied { reason: String },
+}
+
+impl PolicyDecision {
+    /// Convert a policy result into an allow/deny decision.
+    pub fn from_result(result: Result<(), PolicyError>) -> Self {
+        match result {
+            Ok(()) => Self::Allowed,
+            Err(err) => Self::Denied {
+                reason: err.to_string(),
+            },
+        }
+    }
+
+    /// True when the decision is [`PolicyDecision::Allowed`].
+    pub fn is_allowed(&self) -> bool {
+        matches!(self, Self::Allowed)
+    }
+}
+
+/// Signed capability envelope (signature verification lives outside this crate).
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
+pub struct CapabilityEnvelope {
+    pub schema: String,
+    pub envelope_id: String,
+    pub policy_version: String,
+    pub signer_key_id: String,
+    pub issued_at: DateTime<Utc>,
+    pub expires_at: DateTime<Utc>,
+    pub budget: ResourceBudget,
+    pub paths: PathPolicy,
+    pub tunables: BTreeMap<String, TunableRule>,
+    pub allowed_candidate_kinds: BTreeSet<CandidateKind>,
+    pub required_gates: Vec<String>,
+}
+
+impl CapabilityEnvelope {
+    /// Structural validation for a signed envelope payload.
+    pub fn validate(&self) -> Result<(), PolicyError> {
+        if self.schema != ENVELOPE_SCHEMA {
+            return Err(PolicyError::InvalidEnvelope(format!(
+                "schema must be {ENVELOPE_SCHEMA}"
+            )));
+        }
+        if self.envelope_id.trim().is_empty() {
+            return Err(PolicyError::InvalidEnvelope(
+                "envelope_id must be nonempty".to_owned(),
+            ));
+        }
+        if self.policy_version.trim().is_empty() {
+            return Err(PolicyError::InvalidEnvelope(
+                "policy_version must be nonempty".to_owned(),
+            ));
+        }
+        if self.signer_key_id.trim().is_empty() {
+            return Err(PolicyError::InvalidEnvelope(
+                "signer_key_id must be nonempty".to_owned(),
+            ));
+        }
+        if self.issued_at >= self.expires_at {
+            return Err(PolicyError::InvalidEnvelope(
+                "issued_at must be strictly before expires_at".to_owned(),
+            ));
+        }
+        if self.required_gates.is_empty()
+            || self.required_gates.iter().any(|g| g.trim().is_empty())
+        {
+            return Err(PolicyError::InvalidEnvelope(
+                "required_gates must be nonempty with nonempty names".to_owned(),
+            ));
+        }
+        self.budget.validate()?;
+        self.paths.validate()?;
+        for (key, rule) in &self.tunables {
+            if key.trim().is_empty() {
+                return Err(PolicyError::InvalidTunable(
+                    "tunable key must be nonempty".to_owned(),
+                ));
+            }
+            rule.validate()?;
+        }
+        if self.allowed_candidate_kinds.is_empty() {
+            return Err(PolicyError::InvalidEnvelope(
+                "allowed_candidate_kinds must be nonempty".to_owned(),
+            ));
+        }
+        for kind in &self.allowed_candidate_kinds {
+            match kind {
+                CandidateKind::Memory | CandidateKind::Tunable => {}
+                other => {
+                    return Err(PolicyError::InvalidEnvelope(format!(
+                        "allowed_candidate_kinds may only contain Memory or Tunable, found {other}"
+                    )));
+                }
+            }
+        }
+        Ok(())
+    }
+
+    /// Authorize a float tunable assignment by key.
+    pub fn authorize_tunable(&self, key: &str, value: f64) -> Result<(), PolicyError> {
+        let rule = self.tunables.get(key).ok_or_else(|| {
+            PolicyError::Denied(format!("tunable key {key:?} is not in envelope"))
+        })?;
+        rule.authorize_f64(value)
+    }
+
+    /// Authorize a candidate kind against the signed allowlist.
+    pub fn authorize_candidate_kind(&self, kind: CandidateKind) -> Result<(), PolicyError> {
+        if self.allowed_candidate_kinds.contains(&kind) {
+            Ok(())
+        } else {
+            Err(PolicyError::Denied(format!(
+                "candidate kind {kind} is not allowed by envelope"
+            )))
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use chrono::TimeZone;
+
+    fn valid_budget() -> ResourceBudget {
+        ResourceBudget {
+            wall_seconds: 3_600,
+            max_attempts: 2,
+            max_changed_files: 10,
+            max_added_lines: 400,
+            max_tool_calls: 50,
+            max_input_tokens: 100_000,
+            max_output_tokens: 20_000,
+            max_energy_joules: Some(1_000),
+            allow_missing_energy_meter: false,
+        }
+    }
+
+    #[test]
+    fn budget_rejects_zero_and_over_ceiling() {
+        let mut budget = valid_budget();
+        budget.wall_seconds = 0;
+        assert!(budget.validate().is_err());
+        budget = valid_budget();
+        budget.wall_seconds = MAX_WALL_SECONDS + 1;
+        assert!(budget.validate().is_err());
+        budget = valid_budget();
+        budget.max_attempts = MAX_ATTEMPTS + 1;
+        assert!(budget.validate().is_err());
+    }
+
+    #[test]
+    fn missing_energy_requires_explicit_allowance() {
+        let mut budget = valid_budget();
+        budget.max_energy_joules = None;
+        budget.allow_missing_energy_meter = false;
+        assert!(budget.validate().is_err());
+        budget.allow_missing_energy_meter = true;
+        assert!(budget.validate().is_ok());
+    }
+
+    #[test]
+    fn usage_fit_respects_energy_semantics() {
+        let mut budget = valid_budget();
+        let usage = ResourceUsage {
+            wall_seconds: 10,
+            attempts: 1,
+            changed_files: 1,
+            added_lines: 1,
+            tool_calls: 1,
+            input_tokens: 1,
+            output_tokens: 1,
+            energy_joules: Some(500),
+        };
+        assert!(usage.fits(&budget));
+        let over = ResourceUsage {
+            energy_joules: Some(1_001),
+            ..usage.clone()
+        };
+        assert!(!over.fits(&budget));
+
+        budget.max_energy_joules = None;
+        budget.allow_missing_energy_meter = true;
+        assert!(!usage.fits(&budget));
+        let no_energy = ResourceUsage {
+            energy_joules: None,
+            ..usage
+        };
+        assert!(no_energy.fits(&budget));
+    }
+
+    #[test]
+    fn path_policy_blocks_protected_and_escapes() {
+        let paths = PathPolicy::stage1_default();
+        assert!(paths
+            .check("docs/ADR-0014-constitutional-evolution.md")
+            .is_err());
+        assert!(paths.check("Docs\\ADR-0014-x.md").is_err());
+        assert!(paths.check("../Cargo.toml").is_err());
+        assert!(paths.check("/etc/passwd").is_err());
+        assert!(paths.check("C:\\Windows\\system32").is_err());
+        assert!(paths.check("src/lib.rs").is_ok());
+        assert!(paths.check("crates/other/src/lib.rs").is_ok());
+    }
+
+    #[test]
+    fn issued_before_expiry() {
+        let issued = Utc.with_ymd_and_hms(2026, 9, 1, 0, 0, 0).unwrap();
+        let expires = Utc.with_ymd_and_hms(2026, 9, 2, 0, 0, 0).unwrap();
+        assert!(issued < expires);
+    }
+}

@@ -3,8 +3,10 @@
 //! No filesystem, network, database, or process side effects.
 
 pub mod candidate;
+pub mod policy;
 
 pub use candidate::*;
+pub use policy::*;
 
 pub const CANDIDATE_SCHEMA: &str = "gzmo.evolution.candidate/v1";
 pub const ENVELOPE_SCHEMA: &str = "gzmo.evolution.envelope/v1";
