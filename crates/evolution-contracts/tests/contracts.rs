@@ -498,6 +498,74 @@ fn policy_types_serde_round_trip() {
 }
 
 #[test]
+fn envelope_rejects_duplicate_required_gates_and_unsafe_tunable_keys() {
+    let mut dup_gates = fixture_envelope();
+    dup_gates.required_gates = vec!["tests".to_owned(), "tests".to_owned()];
+    assert!(
+        matches!(
+            dup_gates.validate(),
+            Err(PolicyError::InvalidEnvelope(msg)) if msg.contains("duplicate")
+        ),
+        "duplicate required_gates must fail validate"
+    );
+
+    let mut json = serde_json::to_value(fixture_envelope()).unwrap();
+    json["required_gates"] = serde_json::json!(["tests", "tests"]);
+    assert!(
+        serde_json::from_value::<CapabilityEnvelope>(json).is_err(),
+        "duplicate required_gates must fail deserialize"
+    );
+
+    for bad_key in ["_foo", "a b", ".leading", "-dash", "has/slash", ""] {
+        let mut env = fixture_envelope();
+        env.tunables.clear();
+        env.tunables
+            .insert(bad_key.to_owned(), TunableRule::Boolean);
+        assert!(
+            env.validate().is_err(),
+            "unsafe tunable key {bad_key:?} must fail validate"
+        );
+
+        let mut value = serde_json::to_value(fixture_envelope()).unwrap();
+        value["tunables"] = serde_json::json!({
+            bad_key: { "type": "boolean" }
+        });
+        assert!(
+            serde_json::from_value::<CapabilityEnvelope>(value).is_err(),
+            "unsafe tunable key {bad_key:?} must fail deserialize"
+        );
+    }
+
+    for ok_key in [
+        "a",
+        "A1",
+        "context.archive_threshold",
+        "feature.enabled",
+        "metabolism.max_batch_items",
+        "x_y-z.0",
+    ] {
+        let mut env = fixture_envelope();
+        env.tunables.clear();
+        env.tunables
+            .insert(ok_key.to_owned(), TunableRule::Boolean);
+        assert!(
+            env.validate().is_ok(),
+            "safe tunable key {ok_key:?} must pass validate"
+        );
+
+        let mut value = serde_json::to_value(fixture_envelope()).unwrap();
+        value["tunables"] = serde_json::json!({
+            ok_key: { "type": "boolean" }
+        });
+        assert!(
+            serde_json::from_value::<CapabilityEnvelope>(value).is_ok(),
+            "safe tunable key {ok_key:?} must pass deserialize"
+        );
+    }
+}
+
+
+#[test]
 fn policy_json_deserialize_rejects_invalid_contracts() {
     let good = serde_json::to_value(fixture_envelope()).unwrap();
 

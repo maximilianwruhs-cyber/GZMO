@@ -482,6 +482,36 @@ fn tunables_map_schema(gen: &mut schemars::gen::SchemaGenerator) -> schemars::sc
     .into()
 }
 
+/// Tunable map keys must match frozen envelope schema `propertyNames`.
+///
+/// Pattern: `^[A-Za-z0-9][A-Za-z0-9._-]*$` (safe dotted identifiers; no leading
+/// underscore/punctuation, no whitespace).
+fn validate_tunable_map_key(key: &str) -> Result<(), PolicyError> {
+    if key.is_empty() {
+        return Err(PolicyError::InvalidTunable(
+            "tunable key must be nonempty".to_owned(),
+        ));
+    }
+    let mut chars = key.chars();
+    let Some(first) = chars.next() else {
+        return Err(PolicyError::InvalidTunable(
+            "tunable key must be nonempty".to_owned(),
+        ));
+    };
+    if !first.is_ascii_alphanumeric() {
+        return Err(PolicyError::InvalidTunable(format!(
+            "tunable key must match ^[A-Za-z0-9][A-Za-z0-9._-]*$, got {key:?}"
+        )));
+    }
+    if !chars.all(|c| c.is_ascii_alphanumeric() || c == '.' || c == '_' || c == '-') {
+        return Err(PolicyError::InvalidTunable(format!(
+            "tunable key must match ^[A-Za-z0-9][A-Za-z0-9._-]*$, got {key:?}"
+        )));
+    }
+    Ok(())
+}
+
+
 fn nonempty_unique_string_array_schema(
     _gen: &mut schemars::gen::SchemaGenerator,
 ) -> schemars::schema::Schema {
@@ -802,14 +832,20 @@ impl CapabilityEnvelope {
                 "required_gates must be nonempty with nonempty names".to_owned(),
             ));
         }
+        {
+            let mut seen = BTreeSet::new();
+            for gate in &self.required_gates {
+                if !seen.insert(gate.as_str()) {
+                    return Err(PolicyError::InvalidEnvelope(format!(
+                        "required_gates contains duplicate {gate:?}"
+                    )));
+                }
+            }
+        }
         self.budget.validate()?;
         self.paths.validate()?;
         for (key, rule) in &self.tunables {
-            if key.trim().is_empty() {
-                return Err(PolicyError::InvalidTunable(
-                    "tunable key must be nonempty".to_owned(),
-                ));
-            }
+            validate_tunable_map_key(key)?;
             rule.validate()?;
         }
         if self.allowed_candidate_kinds.is_empty() {
