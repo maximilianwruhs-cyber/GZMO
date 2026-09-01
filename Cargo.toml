@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["gzmo-core", "gzmo-cli", "gzmo-chaos", "gzmo-scheduler", "crates/eml-core"]
+members = ["gzmo-core", "gzmo-cli", "gzmo-chaos", "gzmo-scheduler", "crates/eml-core", "crates/evolution-contracts"]
 
 [workspace.package]
 version = "0.1.0"
@@ -56,6 +56,9 @@ redis = { version = "0.27", features = ["tokio-comp", "connection-manager"] }
 
 # Embedding cache keys
 sha2 = "0.10"
+
+# Schema generation
+schemars = { version = "0.8", features = ["chrono", "uuid1"] }
 
 
 
