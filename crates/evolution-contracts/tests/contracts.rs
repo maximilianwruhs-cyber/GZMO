@@ -3,9 +3,13 @@ use evolution_contracts::{
     AuthorityTier, CandidateId, CandidateKind, CandidateManifest, CandidateState, CandidateTarget,
     CapabilityEnvelope, ContractError, EvaluationError, EvaluationReport, GateClass, GateResult,
     GateStatus, PathPolicy, PolicyDecision, PolicyError, PromotionRequest, ResourceBudget,
-    ResourceUsage, TunableRule, UnverifiedAuthorityGrant, CANDIDATE_SCHEMA, ENVELOPE_SCHEMA,
-    EVALUATION_SCHEMA, MAX_ADDED_LINES, MAX_ATTEMPTS, MAX_CHANGED_FILES, MAX_ENERGY_JOULES,
-    MAX_INPUT_TOKENS, MAX_OUTPUT_TOKENS, MAX_TOOL_CALLS, MAX_WALL_SECONDS, PROMOTION_SCHEMA,
+    ResourceUsage, TunableRule, UnverifiedAuthorityGrant, AUDIT_SCHEMA, CANDIDATE_SCHEMA,
+    ENVELOPE_SCHEMA, EVALUATION_SCHEMA, MAX_ADDED_LINES, MAX_ATTEMPTS, MAX_CHANGED_FILES,
+    MAX_ENERGY_JOULES, MAX_INPUT_TOKENS, MAX_OUTPUT_TOKENS, MAX_TOOL_CALLS, MAX_WALL_SECONDS,
+    PROMOTION_SCHEMA,
+};
+use evolution_contracts::{
+    canonical_json_bytes, sha256_hex, verify_chain, AuditEvent, GENESIS_HASH,
 };
 use std::collections::{BTreeMap, BTreeSet};
 
@@ -1673,5 +1677,278 @@ fn promotion_json_deserialize_rejects_invalid_contracts() {
 fn promotion_schema_constant_is_stable() {
     assert_eq!(PROMOTION_SCHEMA, "gzmo.evolution.promotion/v1");
     assert_eq!(EVALUATION_SCHEMA, "gzmo.evolution.evaluation/v1");
+}
+
+
+fn audit_candidate_id() -> CandidateId {
+    CandidateId::parse("cand-20260901t070000z-felt-use-a1b2c3").unwrap()
+}
+
+fn audit_payload() -> serde_json::Value {
+    serde_json::json!({
+        "z_key": 1,
+        "a_key": [3, 1, 2],
+        "nested": {"b": true, "a": false}
+    })
+}
+
+#[test]
+fn audit_hash_is_stable_and_tamper_evident() {
+    let first = AuditEvent::next(
+        None,
+        "candidate.observed",
+        Some(audit_candidate_id()),
+        &audit_payload(),
+    )
+    .unwrap();
+    let second = AuditEvent::next(
+        Some(&first),
+        "candidate.prepared",
+        Some(audit_candidate_id()),
+        &audit_payload(),
+    )
+    .unwrap();
+    assert!(verify_chain(&[first.clone(), second.clone()]).is_ok());
+    let mut tampered = second;
+    tampered.payload_digest = "00".repeat(32);
+    assert!(verify_chain(&[first, tampered]).is_err());
+}
+
+#[test]
+fn audit_canonical_json_sorts_object_keys_and_preserves_array_order() {
+    let left = serde_json::json!({"b": 1, "a": [2, 1], "c": {"z": 0, "m": 1}});
+    let right = serde_json::json!({"c": {"m": 1, "z": 0}, "a": [2, 1], "b": 1});
+    let left_bytes = canonical_json_bytes(&left).unwrap();
+    let right_bytes = canonical_json_bytes(&right).unwrap();
+    assert_eq!(left_bytes, right_bytes);
+    assert_eq!(
+        std::str::from_utf8(&left_bytes).unwrap(),
+        r#"{"a":[2,1],"b":1,"c":{"m":1,"z":0}}"#
+    );
+
+    let flipped = serde_json::json!({"a": [1, 2], "b": 1, "c": {"m": 1, "z": 0}});
+    let flipped_bytes = canonical_json_bytes(&flipped).unwrap();
+    assert_ne!(left_bytes, flipped_bytes);
+}
+
+#[test]
+fn audit_canonical_json_rejects_nonfinite_numbers() {
+    // serde_json::Number cannot hold NaN/Inf directly; feed via f64 map that serializes.
+    #[derive(serde::Serialize)]
+    struct Nasty {
+        value: f64,
+    }
+    assert!(canonical_json_bytes(&Nasty {
+        value: f64::NAN
+    })
+    .is_err());
+    assert!(canonical_json_bytes(&Nasty {
+        value: f64::INFINITY
+    })
+    .is_err());
+    assert!(canonical_json_bytes(&Nasty {
+        value: f64::NEG_INFINITY
+    })
+    .is_err());
+}
+
+#[test]
+fn audit_sha256_hex_is_64_lowercase() {
+    let digest = sha256_hex(b"gzmo-audit");
+    assert_eq!(digest.len(), 64);
+    assert!(digest.bytes().all(|b| matches!(b, b'0'..=b'9' | b'a'..=b'f')));
+    assert_eq!(digest, sha256_hex(b"gzmo-audit"));
+    assert_ne!(digest, sha256_hex(b"gzmo-audit-2"));
+}
+
+#[test]
+fn audit_empty_chain_and_genesis_rules() {
+    assert_eq!(GENESIS_HASH.len(), 64);
+    assert!(GENESIS_HASH.chars().all(|c| c == '0'));
+    assert!(verify_chain(&[]).is_ok());
+
+    let first = AuditEvent::next(None, "candidate.observed", None, &audit_payload()).unwrap();
+    assert_eq!(first.schema, AUDIT_SCHEMA);
+    assert_eq!(first.sequence, 1);
+    assert_eq!(first.previous_hash, GENESIS_HASH);
+    assert!(first.candidate_id.is_none());
+    assert!(first.validate().is_ok());
+    assert!(verify_chain(std::slice::from_ref(&first)).is_ok());
+
+    let mut bad_genesis = first.clone();
+    bad_genesis.previous_hash = "11".repeat(32);
+    // Fix event_hash so only genesis/link rule fails after recompute path in validate.
+    // validate() recomputes hash, so mismatched previous_hash alone fails hash match.
+    assert!(bad_genesis.validate().is_err());
+    assert!(verify_chain(&[bad_genesis]).is_err());
+}
+
+#[test]
+fn audit_multi_event_chain_links_and_rejects_gap_overflow_bad_link() {
+    let e1 = AuditEvent::next(None, "candidate.observed", Some(audit_candidate_id()), &1u8).unwrap();
+    let e2 = AuditEvent::next(Some(&e1), "candidate.prepared", Some(audit_candidate_id()), &2u8).unwrap();
+    let e3 = AuditEvent::next(Some(&e2), "candidate.evaluated", Some(audit_candidate_id()), &3u8).unwrap();
+    assert!(verify_chain(&[e1.clone(), e2.clone(), e3.clone()]).is_ok());
+
+    // Sequence gap (hash no longer matches stored sequence).
+    let mut gapped = e3.clone();
+    gapped.sequence = 4;
+    assert!(verify_chain(&[e1.clone(), e2.clone(), gapped]).is_err());
+
+    // Bad previous link.
+    let mut bad_link = e2.clone();
+    bad_link.previous_hash = e3.event_hash.clone();
+    assert!(verify_chain(&[e1.clone(), bad_link]).is_err());
+
+    // Checked overflow: craft a self-consistent u64::MAX event, then next must fail.
+    let mut consistent_max = e1.clone();
+    consistent_max.sequence = u64::MAX;
+    let preimage = serde_json::json!({
+        "candidate_id": consistent_max.candidate_id.as_ref().map(|c| c.as_str()),
+        "event_type": consistent_max.event_type,
+        "occurred_at": consistent_max.occurred_at,
+        "payload_digest": consistent_max.payload_digest,
+        "previous_hash": consistent_max.previous_hash,
+        "schema": consistent_max.schema,
+        "sequence": u64::MAX,
+    });
+    consistent_max.event_hash = sha256_hex(&canonical_json_bytes(&preimage).unwrap());
+    assert!(consistent_max.validate().is_ok());
+    assert!(AuditEvent::next(Some(&consistent_max), "overflow.next", None, &0u8).is_err());
+}
+
+
+#[test]
+fn audit_rejects_bad_schema_type_hash_and_candidate_id() {
+    let ok = AuditEvent::next(
+        None,
+        "candidate.observed",
+        Some(audit_candidate_id()),
+        &audit_payload(),
+    )
+    .unwrap();
+
+    let mut bad = ok.clone();
+    bad.schema = "gzmo.evolution.audit/v0".to_owned();
+    assert!(bad.validate().is_err());
+
+    bad = ok.clone();
+    bad.event_type = "INVALID".to_owned();
+    assert!(bad.validate().is_err());
+    bad.event_type = "".to_owned();
+    assert!(bad.validate().is_err());
+    bad.event_type = format!("x{}", "a".repeat(128));
+    assert!(bad.validate().is_err());
+
+    bad = ok.clone();
+    bad.payload_digest = "GG".repeat(32);
+    assert!(bad.validate().is_err());
+    bad.payload_digest = "aa".repeat(31);
+    assert!(bad.validate().is_err());
+    bad.payload_digest = format!("AA{}", "aa".repeat(31));
+    assert!(bad.validate().is_err());
+
+    bad = ok.clone();
+    bad.event_hash = "11".repeat(32);
+    assert!(bad.validate().is_err());
+
+    bad = ok.clone();
+    bad.previous_hash = "FF".repeat(32);
+    assert!(bad.validate().is_err());
+
+    assert!(AuditEvent::next(None, "Bad Type", None, &0u8).is_err());
+    assert!(AuditEvent::next(None, "", None, &0u8).is_err());
+}
+
+#[test]
+fn audit_tampering_every_hashed_field_breaks_chain() {
+    let first = AuditEvent::next(None, "candidate.observed", Some(audit_candidate_id()), &1).unwrap();
+    let second =
+        AuditEvent::next(Some(&first), "candidate.prepared", Some(audit_candidate_id()), &2).unwrap();
+
+    let fields: Vec<(&str, Box<dyn Fn(&mut AuditEvent)>)> = vec![
+        ("schema", Box::new(|e: &mut AuditEvent| e.schema = "other".into())),
+        ("sequence", Box::new(|e: &mut AuditEvent| e.sequence = 99)),
+        (
+            "previous_hash",
+            Box::new(|e: &mut AuditEvent| e.previous_hash = "ab".repeat(32)),
+        ),
+        (
+            "event_type",
+            Box::new(|e: &mut AuditEvent| e.event_type = "candidate.other".into()),
+        ),
+        (
+            "candidate_id",
+            Box::new(|e: &mut AuditEvent| {
+                e.candidate_id = Some(CandidateId::parse("cand-20260901t070000z-other-id-a1b2").unwrap())
+            }),
+        ),
+        (
+            "payload_digest",
+            Box::new(|e: &mut AuditEvent| e.payload_digest = "cd".repeat(32)),
+        ),
+        (
+            "occurred_at",
+            Box::new(|e: &mut AuditEvent| {
+                e.occurred_at = Utc.with_ymd_and_hms(2020, 1, 1, 0, 0, 0).unwrap()
+            }),
+        ),
+        (
+            "event_hash",
+            Box::new(|e: &mut AuditEvent| e.event_hash = "ef".repeat(32)),
+        ),
+    ];
+
+    for (name, mutate) in fields {
+        let mut tampered = second.clone();
+        mutate(&mut tampered);
+        assert!(
+            verify_chain(&[first.clone(), tampered]).is_err(),
+            "expected chain failure after tampering {name}"
+        );
+    }
+}
+
+#[test]
+fn audit_serde_round_trip_and_rejects_invalid() {
+    let event = AuditEvent::next(
+        None,
+        "candidate.observed",
+        Some(audit_candidate_id()),
+        &audit_payload(),
+    )
+    .unwrap();
+    let json = serde_json::to_string(&event).unwrap();
+    let back: AuditEvent = serde_json::from_str(&json).unwrap();
+    assert_eq!(back, event);
+
+    let mut value = serde_json::to_value(&event).unwrap();
+    value["event_hash"] = serde_json::json!("00".repeat(32));
+    assert!(serde_json::from_value::<AuditEvent>(value).is_err());
+
+    let mut value = serde_json::to_value(&event).unwrap();
+    value["sequence"] = serde_json::json!(0);
+    assert!(serde_json::from_value::<AuditEvent>(value).is_err());
+
+    let mut value = serde_json::to_value(&event).unwrap();
+    value["event_type"] = serde_json::json!("BAD");
+    assert!(serde_json::from_value::<AuditEvent>(value).is_err());
+
+    let mut value = serde_json::to_value(&event).unwrap();
+    value["schema"] = serde_json::json!("gzmo.evolution.audit/v0");
+    assert!(serde_json::from_value::<AuditEvent>(value).is_err());
+
+    let mut value = serde_json::to_value(&event).unwrap();
+    value["payload_digest"] = serde_json::json!("AA".repeat(32));
+    assert!(serde_json::from_value::<AuditEvent>(value).is_err());
+
+    let mut value = serde_json::to_value(&event).unwrap();
+    value["candidate_id"] = serde_json::json!("cand-bad");
+    assert!(serde_json::from_value::<AuditEvent>(value).is_err());
+}
+
+#[test]
+fn audit_schema_constant_is_stable() {
+    assert_eq!(AUDIT_SCHEMA, "gzmo.evolution.audit/v1");
 }
 
