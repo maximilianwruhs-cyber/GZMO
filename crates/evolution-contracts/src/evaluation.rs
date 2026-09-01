@@ -162,14 +162,22 @@ impl<'de> Deserialize<'de> for EvaluationReport {
 impl EvaluationReport {
     /// Recompute whether every hard floor passed.
     ///
-    /// A hard-floor `Fail` or `Unavailable` always yields false. Metric gates
-    /// never compensate.
+    /// Returns false when no hard-floor gates are present. A hard-floor `Fail`
+    /// or `Unavailable` always yields false. Metric gates never compensate.
     pub fn hard_floors_pass(&self) -> bool {
-        self.gates
-            .iter()
-            .filter(|gate| gate.class == GateClass::HardFloor)
-            .all(|gate| gate.status == GateStatus::Pass)
+        let mut saw_hard_floor = false;
+        for gate in &self.gates {
+            if gate.class != GateClass::HardFloor {
+                continue;
+            }
+            saw_hard_floor = true;
+            if gate.status != GateStatus::Pass {
+                return false;
+            }
+        }
+        saw_hard_floor
     }
+
 
     /// Structural validation for an external evaluation report payload.
     pub fn validate(&self) -> Result<(), EvaluationError> {

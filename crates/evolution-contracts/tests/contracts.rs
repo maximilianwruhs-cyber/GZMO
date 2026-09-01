@@ -1145,29 +1145,46 @@ fn report_with(
     gates: Vec<GateResult>,
     metrics: BTreeMap<String, f64>,
 ) -> EvaluationReport {
-    let hard_floors_passed = gates
-        .iter()
-        .filter(|g| g.class == GateClass::HardFloor)
-        .all(|g| g.status == GateStatus::Pass);
     let mut artifact_digests = BTreeMap::new();
     artifact_digests.insert(
         "report.json".to_owned(),
         format!("sha256:{}", hex::encode([0x55; 32])),
     );
-    let report = EvaluationReport {
+    let mut report = EvaluationReport {
         schema: EVALUATION_SCHEMA.to_owned(),
         candidate_id: fixture_candidate_id(),
         baseline_digest: fixture_baseline_digest(),
         candidate_digest: fixture_candidate_digest(),
         gates,
-        hard_floors_passed,
+        hard_floors_passed: false,
         metrics,
         artifact_digests,
         completed_at: Utc.with_ymd_and_hms(2026, 9, 1, 12, 0, 0).unwrap(),
     };
+    report.hard_floors_passed = report.hard_floors_pass();
     report.validate().expect("report_with fixture must validate");
     report
 }
+
+fn report_unchecked(
+    gates: Vec<GateResult>,
+    metrics: BTreeMap<String, f64>,
+) -> EvaluationReport {
+    let mut report = EvaluationReport {
+        schema: EVALUATION_SCHEMA.to_owned(),
+        candidate_id: fixture_candidate_id(),
+        baseline_digest: fixture_baseline_digest(),
+        candidate_digest: fixture_candidate_digest(),
+        gates,
+        hard_floors_passed: false,
+        metrics,
+        artifact_digests: BTreeMap::new(),
+        completed_at: Utc.with_ymd_and_hms(2026, 9, 1, 12, 0, 0).unwrap(),
+    };
+    report.hard_floors_passed = report.hard_floors_pass();
+    report
+}
+
 
 fn fixture_promotion_request() -> PromotionRequest {
     let request = PromotionRequest {
@@ -1295,9 +1312,50 @@ fn evaluation_rejects_zero_hard_floors() {
         detail: String::new(),
         artifact_digest: None,
     }];
+    assert!(!report.hard_floors_pass());
     report.hard_floors_passed = true;
     assert!(report.validate().is_err());
 }
+
+#[test]
+fn hard_floors_pass_false_for_empty_and_metric_only_reports() {
+    let empty = report_unchecked(Vec::new(), BTreeMap::new());
+    assert!(!empty.hard_floors_pass());
+
+    let metric_only = report_unchecked(
+        vec![GateResult {
+            name: "throughput".to_owned(),
+            class: GateClass::Metric,
+            status: GateStatus::Pass,
+            detail: String::new(),
+            artifact_digest: None,
+        }],
+        [("gain".into(), 1.0)].into(),
+    );
+    assert!(!metric_only.hard_floors_pass());
+
+    let passed = report_with(vec![GateResult::pass("tests")], BTreeMap::new());
+    assert!(passed.hard_floors_pass());
+
+    let failed = report_with(
+        vec![GateResult::fail("tests", "nope")],
+        BTreeMap::new(),
+    );
+    assert!(!failed.hard_floors_pass());
+
+    let unavailable = report_with(
+        vec![GateResult {
+            name: "tests".to_owned(),
+            class: GateClass::HardFloor,
+            status: GateStatus::Unavailable,
+            detail: "offline".to_owned(),
+            artifact_digest: None,
+        }],
+        BTreeMap::new(),
+    );
+    assert!(!unavailable.hard_floors_pass());
+}
+
 
 #[test]
 fn evaluation_rejects_duplicate_and_unsafe_gate_names() {
@@ -1524,11 +1582,28 @@ fn promotion_binding_rejects_expiry_at_supplied_now_and_mismatches() {
     let pol = fixture_policy_digest();
     let target = "system-B";
 
-    // Exact expiry instant is expired.
+    // Time window: before / equal-issued / inside / equal-expiry / after.
     assert!(request
-        .validate_binding(&cand, &eval, &pol, target, request.expires_at)
+        .validate_binding(
+            &cand,
+            &eval,
+            &pol,
+            target,
+            request.issued_at - chrono::Duration::seconds(1),
+        )
         .is_err());
-    // Just before expiry is ok.
+    assert!(request
+        .validate_binding(&cand, &eval, &pol, target, request.issued_at)
+        .is_ok());
+    assert!(request
+        .validate_binding(
+            &cand,
+            &eval,
+            &pol,
+            target,
+            request.issued_at + chrono::Duration::hours(1),
+        )
+        .is_ok());
     assert!(request
         .validate_binding(
             &cand,
@@ -1538,6 +1613,18 @@ fn promotion_binding_rejects_expiry_at_supplied_now_and_mismatches() {
             request.expires_at - chrono::Duration::seconds(1),
         )
         .is_ok());
+    assert!(request
+        .validate_binding(&cand, &eval, &pol, target, request.expires_at)
+        .is_err());
+    assert!(request
+        .validate_binding(
+            &cand,
+            &eval,
+            &pol,
+            target,
+            request.expires_at + chrono::Duration::seconds(1),
+        )
+        .is_err());
 
     assert!(request
         .validate_binding("wrong-cand", &eval, &pol, target, request.issued_at)
@@ -1552,6 +1639,7 @@ fn promotion_binding_rejects_expiry_at_supplied_now_and_mismatches() {
         .validate_binding(&cand, &eval, &pol, "other-target", request.issued_at)
         .is_err());
 }
+
 
 #[test]
 fn promotion_serde_round_trip_valid() {

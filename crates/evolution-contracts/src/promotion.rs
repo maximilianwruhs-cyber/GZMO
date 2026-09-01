@@ -100,7 +100,10 @@ impl PromotionRequest {
         Ok(())
     }
 
-    /// Bind this request to concrete digests/target and reject expiry at `now`.
+    /// Bind this request to concrete digests/target and a valid `now` window.
+    ///
+    /// Rejects mismatching digests/target, `now < issued_at` (not yet valid),
+    /// and `now >= expires_at` (expired).
     pub fn validate_binding(
         &self,
         candidate_digest: &str,
@@ -129,6 +132,12 @@ impl PromotionRequest {
             return Err(PromotionError::BindingMismatch(
                 "target mismatch".to_owned(),
             ));
+        }
+        if now < self.issued_at {
+            return Err(PromotionError::BindingMismatch(format!(
+                "request not yet valid until {} (now={now})",
+                self.issued_at
+            )));
         }
         if now >= self.expires_at {
             return Err(PromotionError::BindingMismatch(format!(
@@ -324,7 +333,21 @@ mod tests {
             .validate_binding("other", &sha(2), &sha(3), "system-B", now)
             .is_err());
         assert!(req
+            .validate_binding(
+                &sha(1),
+                &sha(2),
+                &sha(3),
+                "system-B",
+                req.issued_at - Duration::seconds(1),
+            )
+            .is_err());
+        assert!(req
+            .validate_binding(&sha(1), &sha(2), &sha(3), "system-B", req.issued_at)
+            .is_ok());
+        assert!(req
             .validate_binding(&sha(1), &sha(2), &sha(3), "system-B", req.expires_at)
             .is_err());
     }
 }
+
+
