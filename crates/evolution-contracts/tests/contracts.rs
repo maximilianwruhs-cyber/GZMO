@@ -1,10 +1,11 @@
 use chrono::{TimeZone, Utc};
 use evolution_contracts::{
     AuthorityTier, CandidateId, CandidateKind, CandidateManifest, CandidateState, CandidateTarget,
-    CapabilityEnvelope, ContractError, PathPolicy, PolicyDecision, PolicyError, ResourceBudget,
-    ResourceUsage, TunableRule, CANDIDATE_SCHEMA, ENVELOPE_SCHEMA, MAX_ADDED_LINES, MAX_ATTEMPTS,
-    MAX_CHANGED_FILES, MAX_ENERGY_JOULES, MAX_INPUT_TOKENS, MAX_OUTPUT_TOKENS, MAX_TOOL_CALLS,
-    MAX_WALL_SECONDS,
+    CapabilityEnvelope, ContractError, EvaluationError, EvaluationReport, GateClass, GateResult,
+    GateStatus, PathPolicy, PolicyDecision, PolicyError, PromotionRequest, ResourceBudget,
+    ResourceUsage, TunableRule, UnverifiedAuthorityGrant, CANDIDATE_SCHEMA, ENVELOPE_SCHEMA,
+    EVALUATION_SCHEMA, MAX_ADDED_LINES, MAX_ATTEMPTS, MAX_CHANGED_FILES, MAX_ENERGY_JOULES,
+    MAX_INPUT_TOKENS, MAX_OUTPUT_TOKENS, MAX_TOOL_CALLS, MAX_WALL_SECONDS, PROMOTION_SCHEMA,
 };
 use std::collections::{BTreeMap, BTreeSet};
 
@@ -1095,3 +1096,494 @@ fn candidate_manifest_rejects_invalid_nested_budget_and_schema() {
     value["mission_id"] = serde_json::json!("bad mission id with spaces");
     assert!(serde_json::from_value::<CandidateManifest>(value).is_err());
 }
+
+
+// Local hex helper so tests stay dependency-light if hex crate is absent.
+mod hex {
+    pub fn encode(bytes: [u8; 32]) -> String {
+        const HEX: &[u8; 16] = b"0123456789abcdef";
+        let mut out = String::with_capacity(64);
+        for b in bytes {
+            out.push(HEX[(b >> 4) as usize] as char);
+            out.push(HEX[(b & 0xf) as usize] as char);
+        }
+        out
+    }
+
+    pub fn encode_n(n: usize, fill: u8) -> String {
+        const HEX: &[u8; 16] = b"0123456789abcdef";
+        let mut out = String::with_capacity(n * 2);
+        for _ in 0..n {
+            out.push(HEX[(fill >> 4) as usize] as char);
+            out.push(HEX[(fill & 0xf) as usize] as char);
+        }
+        out
+    }
+}
+
+fn fixture_candidate_digest() -> String {
+    format!("sha256:{}", hex::encode([0x11; 32]))
+}
+
+fn fixture_evaluation_digest() -> String {
+    format!("sha256:{}", hex::encode([0x22; 32]))
+}
+
+fn fixture_policy_digest() -> String {
+    format!("sha256:{}", hex::encode([0x33; 32]))
+}
+
+fn fixture_baseline_digest() -> String {
+    format!("sha256:{}", hex::encode([0x44; 32]))
+}
+
+fn fixture_signature_hex() -> String {
+    hex::encode_n(64, 0xab)
+}
+
+fn report_with(
+    gates: Vec<GateResult>,
+    metrics: BTreeMap<String, f64>,
+) -> EvaluationReport {
+    let hard_floors_passed = gates
+        .iter()
+        .filter(|g| g.class == GateClass::HardFloor)
+        .all(|g| g.status == GateStatus::Pass);
+    let mut artifact_digests = BTreeMap::new();
+    artifact_digests.insert(
+        "report.json".to_owned(),
+        format!("sha256:{}", hex::encode([0x55; 32])),
+    );
+    let report = EvaluationReport {
+        schema: EVALUATION_SCHEMA.to_owned(),
+        candidate_id: fixture_candidate_id(),
+        baseline_digest: fixture_baseline_digest(),
+        candidate_digest: fixture_candidate_digest(),
+        gates,
+        hard_floors_passed,
+        metrics,
+        artifact_digests,
+        completed_at: Utc.with_ymd_and_hms(2026, 9, 1, 12, 0, 0).unwrap(),
+    };
+    report.validate().expect("report_with fixture must validate");
+    report
+}
+
+fn fixture_promotion_request() -> PromotionRequest {
+    let request = PromotionRequest {
+        schema: PROMOTION_SCHEMA.to_owned(),
+        candidate_id: fixture_candidate_id(),
+        candidate_digest: fixture_candidate_digest(),
+        evaluation_digest: fixture_evaluation_digest(),
+        policy_digest: fixture_policy_digest(),
+        target: "system-B".to_owned(),
+        issued_at: Utc.with_ymd_and_hms(2026, 9, 1, 10, 0, 0).unwrap(),
+        expires_at: Utc.with_ymd_and_hms(2026, 9, 1, 18, 0, 0).unwrap(),
+        nonce: "nonce-fixture-001".to_owned(),
+    };
+    request
+        .validate()
+        .expect("fixture promotion request must validate");
+    request
+}
+
+fn fixture_unverified_grant() -> UnverifiedAuthorityGrant {
+    let grant = UnverifiedAuthorityGrant {
+        request: fixture_promotion_request(),
+        signer_key_id: "operator-key-1".to_owned(),
+        signature_hex: fixture_signature_hex(),
+    };
+    grant.validate().expect("fixture grant must validate");
+    grant
+}
+
+#[test]
+fn one_failed_hard_gate_rejects_any_metric_gain() {
+    let report = report_with(
+        vec![
+            GateResult::pass("tests"),
+            GateResult::fail("faithfulness", "0.79 < 0.90"),
+        ],
+        [("throughput_gain_pct".into(), 300.0)].into(),
+    );
+    assert!(!report.hard_floors_pass());
+}
+
+#[test]
+fn grant_binds_candidate_evaluation_policy_target_and_expiry() {
+    let request = fixture_promotion_request();
+    let now = Utc.with_ymd_and_hms(2026, 9, 1, 12, 0, 0).unwrap();
+    assert!(request
+        .validate_binding(
+            &fixture_candidate_digest(),
+            &fixture_evaluation_digest(),
+            &fixture_policy_digest(),
+            "system-B",
+            now,
+        )
+        .is_ok());
+    assert!(request
+        .validate_binding(
+            "other",
+            &fixture_evaluation_digest(),
+            &fixture_policy_digest(),
+            "system-B",
+            now,
+        )
+        .is_err());
+}
+
+#[test]
+fn hard_floor_unavailable_also_fails_regardless_of_metrics() {
+    let report = report_with(
+        vec![
+            GateResult::pass("tests"),
+            GateResult {
+                name: "integrity".to_owned(),
+                class: GateClass::HardFloor,
+                status: GateStatus::Unavailable,
+                detail: "runner offline".to_owned(),
+                artifact_digest: None,
+            },
+            GateResult {
+                name: "throughput".to_owned(),
+                class: GateClass::Metric,
+                status: GateStatus::Pass,
+                detail: String::new(),
+                artifact_digest: None,
+            },
+        ],
+        [("latency_improvement_pct".into(), 50.0)].into(),
+    );
+    assert!(!report.hard_floors_pass());
+    assert!(!report.hard_floors_passed);
+}
+
+#[test]
+fn all_hard_floors_pass_with_metric_noise() {
+    let report = report_with(
+        vec![
+            GateResult::pass("tests"),
+            GateResult::pass("faithfulness"),
+            GateResult {
+                name: "throughput".to_owned(),
+                class: GateClass::Metric,
+                status: GateStatus::Fail,
+                detail: "slower".to_owned(),
+                artifact_digest: None,
+            },
+        ],
+        BTreeMap::new(),
+    );
+    assert!(report.hard_floors_pass());
+    assert!(report.hard_floors_passed);
+}
+
+#[test]
+fn evaluation_rejects_zero_hard_floors() {
+    let mut report = report_with(
+        vec![
+            GateResult::pass("tests"),
+            GateResult::pass("faithfulness"),
+        ],
+        BTreeMap::new(),
+    );
+    report.gates = vec![GateResult {
+        name: "throughput".to_owned(),
+        class: GateClass::Metric,
+        status: GateStatus::Pass,
+        detail: String::new(),
+        artifact_digest: None,
+    }];
+    report.hard_floors_passed = true;
+    assert!(report.validate().is_err());
+}
+
+#[test]
+fn evaluation_rejects_duplicate_and_unsafe_gate_names() {
+    let mut report = report_with(vec![GateResult::pass("tests")], BTreeMap::new());
+    report.gates = vec![
+        GateResult::pass("tests"),
+        GateResult::pass("tests"),
+    ];
+    report.hard_floors_passed = true;
+    assert!(report.validate().is_err());
+
+    report = report_with(vec![GateResult::pass("tests")], BTreeMap::new());
+    report.gates = vec![GateResult::pass("../escape")];
+    report.hard_floors_passed = true;
+    assert!(report.validate().is_err());
+
+    report = report_with(vec![GateResult::pass("tests")], BTreeMap::new());
+    report.gates = vec![GateResult::pass("has space")];
+    report.hard_floors_passed = true;
+    assert!(report.validate().is_err());
+
+    report = report_with(vec![GateResult::pass("tests")], BTreeMap::new());
+    report.gates = vec![GateResult::pass("")];
+    report.hard_floors_passed = true;
+    assert!(report.validate().is_err());
+}
+
+#[test]
+fn evaluation_rejects_oversized_detail() {
+    let mut report = report_with(vec![GateResult::pass("tests")], BTreeMap::new());
+    report.gates = vec![GateResult::fail("tests", "x".repeat(4097))];
+    report.hard_floors_passed = false;
+    let err = report.validate().expect_err("detail over 4096 bytes");
+    assert!(
+        matches!(
+            err,
+            EvaluationError::InvalidGate(_) | EvaluationError::InvalidReport(_)
+        ),
+        "unexpected error: {err:?}"
+    );
+}
+
+
+#[test]
+fn evaluation_rejects_invalid_and_mixed_digest_algorithms() {
+    let mut report = report_with(vec![GateResult::pass("tests")], BTreeMap::new());
+    report.baseline_digest = "md5:deadbeef".to_owned();
+    assert!(report.validate().is_err());
+
+    report = report_with(vec![GateResult::pass("tests")], BTreeMap::new());
+    report.candidate_digest = format!("git-sha1:{}", "g".repeat(40));
+    assert!(report.validate().is_err());
+
+    report = report_with(vec![GateResult::pass("tests")], BTreeMap::new());
+    report.candidate_digest = format!("sha256:{}", "A".repeat(64));
+    assert!(report.validate().is_err());
+
+    report = report_with(vec![GateResult::pass("tests")], BTreeMap::new());
+    report.artifact_digests.insert(
+        "bundle.tar".to_owned(),
+        format!("git-sha1:{}", "a".repeat(40)),
+    );
+    assert!(report.validate().is_err());
+
+    report = report_with(vec![GateResult::pass("tests")], BTreeMap::new());
+    report.gates[0].artifact_digest = Some(format!("git-sha1:{}", "b".repeat(40)));
+    assert!(report.validate().is_err());
+}
+
+#[test]
+fn evaluation_rejects_nonfinite_metrics() {
+    let mut report = report_with(vec![GateResult::pass("tests")], BTreeMap::new());
+    report.metrics.insert("gain".to_owned(), f64::NAN);
+    assert!(report.validate().is_err());
+    report.metrics.insert("gain".to_owned(), f64::INFINITY);
+    assert!(report.validate().is_err());
+    report.metrics.insert("gain".to_owned(), f64::NEG_INFINITY);
+    assert!(report.validate().is_err());
+}
+
+#[test]
+fn evaluation_rejects_forged_hard_floor_verdict() {
+    let mut report = report_with(
+        vec![
+            GateResult::pass("tests"),
+            GateResult::fail("faithfulness", "below floor"),
+        ],
+        BTreeMap::new(),
+    );
+    assert!(!report.hard_floors_pass());
+    report.hard_floors_passed = true;
+    assert!(report.validate().is_err());
+
+    let mut value = serde_json::to_value(
+        report_with(
+            vec![
+                GateResult::pass("tests"),
+                GateResult::fail("faithfulness", "below floor"),
+            ],
+            BTreeMap::new(),
+        ),
+    )
+    .unwrap();
+    value["hard_floors_passed"] = serde_json::json!(true);
+    let err = serde_json::from_value::<EvaluationReport>(value).unwrap_err();
+    assert!(
+        err.to_string().contains("hard_floors_passed")
+            || err.to_string().contains("forged")
+            || err.to_string().contains("mismatch"),
+        "unexpected error: {err}"
+    );
+}
+
+#[test]
+fn evaluation_serde_round_trip_valid() {
+    let report = report_with(
+        vec![
+            GateResult::pass("tests"),
+            GateResult::pass("faithfulness"),
+            GateResult {
+                name: "holdout.memory_lifecycle".to_owned(),
+                class: GateClass::HardFloor,
+                status: GateStatus::Pass,
+                detail: String::new(),
+                artifact_digest: Some(format!("sha256:{}", hex::encode([0x66; 32]))),
+            },
+            GateResult {
+                name: "throughput".to_owned(),
+                class: GateClass::Metric,
+                status: GateStatus::Fail,
+                detail: "no gain".to_owned(),
+                artifact_digest: None,
+            },
+        ],
+        [("throughput_gain_pct".into(), 12.5)].into(),
+    );
+    let json = serde_json::to_string(&report).unwrap();
+    let back: EvaluationReport = serde_json::from_str(&json).unwrap();
+    assert_eq!(back, report);
+    assert!(back.hard_floors_pass());
+}
+
+#[test]
+fn promotion_rejects_malformed_signature_signer_nonce_target() {
+    let mut grant = fixture_unverified_grant();
+    grant.signature_hex = "ab".repeat(63); // 126 chars
+    assert!(grant.validate().is_err());
+
+    grant = fixture_unverified_grant();
+    grant.signature_hex = "AB".repeat(64); // uppercase
+    assert!(grant.validate().is_err());
+
+    grant = fixture_unverified_grant();
+    grant.signature_hex.push('0'); // 129
+    assert!(grant.validate().is_err());
+
+    grant = fixture_unverified_grant();
+    grant.signer_key_id.clear();
+    assert!(grant.validate().is_err());
+
+    grant = fixture_unverified_grant();
+    grant.signer_key_id = "bad signer".to_owned();
+    assert!(grant.validate().is_err());
+
+    let mut request = fixture_promotion_request();
+    request.nonce.clear();
+    assert!(request.validate().is_err());
+
+    request = fixture_promotion_request();
+    request.nonce = "has space".to_owned();
+    assert!(request.validate().is_err());
+
+    request = fixture_promotion_request();
+    request.target.clear();
+    assert!(request.validate().is_err());
+
+    request = fixture_promotion_request();
+    request.target = "../slot".to_owned();
+    assert!(request.validate().is_err());
+
+    request = fixture_promotion_request();
+    request.evaluation_digest = format!("git-sha1:{}", "a".repeat(40));
+    assert!(request.validate().is_err());
+
+    request = fixture_promotion_request();
+    request.policy_digest = format!("sha256:{}", "G".repeat(64));
+    assert!(request.validate().is_err());
+
+    request = fixture_promotion_request();
+    request.candidate_digest = "not-a-digest".to_owned();
+    assert!(request.validate().is_err());
+}
+
+#[test]
+fn promotion_rejects_equal_inverted_and_over_24h_expiry() {
+    let issued = Utc.with_ymd_and_hms(2026, 9, 1, 10, 0, 0).unwrap();
+
+    let mut request = fixture_promotion_request();
+    request.issued_at = issued;
+    request.expires_at = issued;
+    assert!(request.validate().is_err());
+
+    request = fixture_promotion_request();
+    request.issued_at = issued;
+    request.expires_at = issued - chrono::Duration::hours(1);
+    assert!(request.validate().is_err());
+
+    request = fixture_promotion_request();
+    request.issued_at = issued;
+    request.expires_at = issued + chrono::Duration::hours(24) + chrono::Duration::seconds(1);
+    assert!(request.validate().is_err());
+
+    request = fixture_promotion_request();
+    request.issued_at = issued;
+    request.expires_at = issued + chrono::Duration::hours(24);
+    assert!(request.validate().is_ok());
+}
+
+#[test]
+fn promotion_binding_rejects_expiry_at_supplied_now_and_mismatches() {
+    let request = fixture_promotion_request();
+    let cand = fixture_candidate_digest();
+    let eval = fixture_evaluation_digest();
+    let pol = fixture_policy_digest();
+    let target = "system-B";
+
+    // Exact expiry instant is expired.
+    assert!(request
+        .validate_binding(&cand, &eval, &pol, target, request.expires_at)
+        .is_err());
+    // Just before expiry is ok.
+    assert!(request
+        .validate_binding(
+            &cand,
+            &eval,
+            &pol,
+            target,
+            request.expires_at - chrono::Duration::seconds(1),
+        )
+        .is_ok());
+
+    assert!(request
+        .validate_binding("wrong-cand", &eval, &pol, target, request.issued_at)
+        .is_err());
+    assert!(request
+        .validate_binding(&cand, "wrong-eval", &pol, target, request.issued_at)
+        .is_err());
+    assert!(request
+        .validate_binding(&cand, &eval, "wrong-pol", target, request.issued_at)
+        .is_err());
+    assert!(request
+        .validate_binding(&cand, &eval, &pol, "other-target", request.issued_at)
+        .is_err());
+}
+
+#[test]
+fn promotion_serde_round_trip_valid() {
+    let grant = fixture_unverified_grant();
+    let json = serde_json::to_string(&grant).unwrap();
+    let back: UnverifiedAuthorityGrant = serde_json::from_str(&json).unwrap();
+    assert_eq!(back, grant);
+
+    let request = fixture_promotion_request();
+    let json = serde_json::to_string(&request).unwrap();
+    let back: PromotionRequest = serde_json::from_str(&json).unwrap();
+    assert_eq!(back, request);
+}
+
+#[test]
+fn promotion_json_deserialize_rejects_invalid_contracts() {
+    let mut value = serde_json::to_value(fixture_unverified_grant()).unwrap();
+    value["signature_hex"] = serde_json::json!("00".repeat(63));
+    assert!(serde_json::from_value::<UnverifiedAuthorityGrant>(value).is_err());
+
+    let mut value = serde_json::to_value(fixture_promotion_request()).unwrap();
+    value["schema"] = serde_json::json!("gzmo.evolution.promotion/v0");
+    assert!(serde_json::from_value::<PromotionRequest>(value.clone()).is_err());
+
+    value = serde_json::to_value(fixture_promotion_request()).unwrap();
+    value["expires_at"] = serde_json::json!(fixture_promotion_request().issued_at);
+    assert!(serde_json::from_value::<PromotionRequest>(value).is_err());
+}
+
+#[test]
+fn promotion_schema_constant_is_stable() {
+    assert_eq!(PROMOTION_SCHEMA, "gzmo.evolution.promotion/v1");
+    assert_eq!(EVALUATION_SCHEMA, "gzmo.evolution.evaluation/v1");
+}
+
