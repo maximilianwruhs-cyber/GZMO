@@ -4,7 +4,7 @@
 
 **Goal:** Operate the connected repository loop and air-gapped appliance loop continuously with one candidate, explicit budgets, unified status, signed offline handoff, exercised stop/rollback, and a clean retirement of duplicate legacy evolve paths after parity.
 
-**Architecture:** Connected development uses hardened system services with distinct `gzmo-evolver-coordinator` and `gzmo-evolver-worker` identities; only the coordinator can use the GitHub App, while only the worker can modify candidate worktrees. The Living owner performs daily observation and bounded internal evolution through `EvolutionController`, without GitHub or network credentials. Both emit the same candidate/evaluation/audit contracts. Portable signed bundles bridge approved artifacts across the airgap. Legacy script/idle paths run in shadow until parity, then are removed in one cutover.
+**Architecture:** Connected development uses hardened system services with distinct `gzmo-evolver-coordinator` and `gzmo-evolver-worker` identities; only the coordinator can use the GitHub App, while only the worker can modify independent candidate clones. The Living owner performs daily observation and bounded internal evolution through `EvolutionController`, without GitHub or network credentials. Both emit the same candidate/evaluation/audit contracts. Portable signed bundles bridge approved artifacts across the airgap. Legacy script/idle paths run in shadow until parity, then are removed in one cutover.
 
 **Tech Stack:** systemd system services plus appliance owner scheduler, Rust status/control, evolution-contracts, PostgreSQL audit, GitHub App, OMP with a qualified local code model in a private network namespace, signed tar.zst bundles, existing GZMO health/opportunity/keep-quality gates.
 
@@ -93,7 +93,7 @@ PrivateTmp=true
 ProtectSystem=strict
 ProtectHome=true
 ReadOnlyPaths=/etc/gzmo
-ReadWritePaths=/var/lib/gzmo-evolver/coordinator /var/lib/gzmo-evolver/worktrees /run/gzmo-evolver
+ReadWritePaths=/var/lib/gzmo-evolver/coordinator /var/lib/gzmo-evolver/workspaces /run/gzmo-evolver
 ```
 
 Create the local model and worker units:
@@ -123,7 +123,7 @@ PrivateDevices=true
 NoNewPrivileges=true
 RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
 ReadOnlyPaths=/run/gzmo-evolver/%i/request.json
-ReadWritePaths=/var/lib/gzmo-evolver/worktrees/%i /var/lib/gzmo-evolver/worker/%i
+ReadWritePaths=/var/lib/gzmo-evolver/workspaces/%i /var/lib/gzmo-evolver/worker/%i
 ExecStart=/usr/local/bin/gzmo-evolver worker --request /run/gzmo-evolver/%i/request.json
 ```
 

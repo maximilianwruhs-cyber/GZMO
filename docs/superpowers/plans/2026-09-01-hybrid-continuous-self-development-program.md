@@ -4,7 +4,7 @@
 
 **Goal:** Build a two-stage development system in which a connected repository runner continuously prepares evidence-gated pull requests now, then the air-gapped GZMO appliance later reuses the same candidate contracts without gaining authority over its own safeguards.
 
-**Architecture:** Stage 1 is a trusted, connected `gzmo-evolver` process outside the Living writer. It consumes the existing Opportunity Discovery mission, gives an uncredentialed sandbox worker one isolated worktree, evaluates the result, and opens a PR; it never merges. Stage 2 embeds the same contracts behind GZMO's Constitutional Spine: autonomous memory, envelope-bounded tunables, isolated hard candidates, operator-signed promotion, soak, and rollback.
+**Architecture:** Stage 1 is a trusted, connected `gzmo-evolver` process outside the Living writer. It consumes the existing Opportunity Discovery mission, gives an uncredentialed sandbox worker one independent clone from a coordinator-owned mirror, evaluates the normalized result, and opens a PR; it never merges. Stage 2 embeds the same contracts behind GZMO's Constitutional Spine: autonomous memory, envelope-bounded tunables, isolated hard candidates, operator-signed promotion, soak, and rollback.
 
 **Tech Stack:** Rust 2021, Tokio, Serde/Schemars, rusqlite for connected-runner state, Git CLI, GitHub App REST API, hardened system services with separate coordinator/worker identities, PostgreSQL/sqlx for the later appliance evolution ledger, existing GZMO opportunity/quality gates.
 
@@ -32,7 +32,7 @@ This stack implements continuous **development control**, not every North Star s
 | Order | Plan | Owns | Independently testable result |
 |---|---|---|---|
 | 1 | `2026-09-01-evolution-contracts-and-governance.md` | ADR index/0011–0014 plan, `crates/evolution-contracts`, canonical schemas | Candidate/policy/evaluation/audit artifacts round-trip and reject invalid transitions |
-| 2 | `2026-09-01-connected-repo-evolver.md` | `gzmo-evolver` mission/state/worktree/worker loop | One fixture mission produces one isolated candidate commit without credentials or main mutation |
+| 2 | `2026-09-01-connected-repo-evolver.md` | `gzmo-evolver` mission/state/independent-clone/worker loop | One fixture mission produces one isolated candidate commit without credentials or main mutation |
 | 3 | `2026-09-01-evaluation-and-pr-shepherd.md` | deterministic evaluator, GitHub App adapter, PR/CI shepherd | Passing candidate opens a PR; failing/protected candidate cannot push or open one |
 | 4 | `2026-09-01-airgapped-evolution-controller.md` | GZMO internal observer/controller/PostgreSQL evolution ledger | Offline controller autonomously advances Memory/Tunable candidates and blocks hard promotion |
 | 5 | `2026-09-01-continuous-evolution-operations.md` | cadence, resource circuit breakers, status, migration, legacy retirement | Daily/weekly loops run unattended, one candidate at a time, with drills for stop and rollback |
@@ -139,7 +139,7 @@ Schema identifiers are fixed at `gzmo.evolution.candidate/v1`, `gzmo.evolution.e
 Existing opportunity Sense/Rank
   → exactly one active mission
   → CandidateManifest + baseline digest
-  → isolated worktree + uncredentialed worker
+  → independent candidate clone + uncredentialed worker
   → candidate commit
   → deterministic gates + comparative fitness
   → rejected OR ReviewReady
@@ -233,7 +233,7 @@ Use a local fake GitHub server until the final opt-in live smoke.
 
 - [ ] **Step 2: Run safety and PR integration tests**
 
-Run: `cargo test -p gzmo-evolver evaluator github shepherd -- --nocapture`
+Run: `cargo test -p gzmo-evolver --all-targets -- --nocapture`
 
 Expected: hard-floor failure blocks push; protected-path mutation blocks PR; passing fixture opens exactly one mock PR; CI repair caps at two attempts.
 
@@ -253,7 +253,7 @@ git commit -m "feat: gate autonomous candidates before pull requests"
 ### Task 4: Soak Stage 1 Before Any Internal Evolution
 
 **Files:**
-- Runtime state only: `/var/lib/gzmo-evolver/coordinator/` and per-candidate worker paths under `/var/lib/gzmo-evolver/worktrees/`.
+- Runtime state only: `/var/lib/gzmo-evolver/coordinator/` and per-candidate worker paths under `/var/lib/gzmo-evolver/workspaces/`.
 
 **Interfaces:**
 - Consumes: merged Stage 1 runner.

@@ -4,7 +4,7 @@
 
 **Goal:** Evaluate repository candidates against immutable hard floors, then let a least-privileged trusted GitHub App push only approved `evolve/*` branches, open one transparent PR, and perform at most two evidence-bounded repairs without ever merging.
 
-**Architecture:** Evaluation runs outside the candidate worktree using policy and holdouts from the trusted base commit. A passing `EvaluationReport` moves the candidate to `ReviewReady`. Only then does the trusted GitHub adapter mint a short-lived installation token, restore a push URL, push the exact evaluated commit, publish a check run, and create/update the PR. CI or explicit review feedback may trigger a new isolated worker attempt; each new commit is fully reevaluated.
+**Architecture:** Evaluation runs outside the independent candidate workspace using policy and holdouts from the trusted base commit. A passing `EvaluationReport` moves the candidate to `ReviewReady`. Only then does the trusted GitHub adapter mint a short-lived installation token, temporarily supply a push destination to trusted Git—not the worker—push the exact evaluated normalized commit, publish a check run, and create/update the PR. CI or explicit review feedback may trigger a new isolated worker attempt; each new normalized commit is fully reevaluated.
 
 **Tech Stack:** Rust, evolution-contracts, Git CLI, Reqwest, GitHub App JWT/installation tokens, wiremock, Serde/TOML, SHA-256, existing cargo and shell quality gates.
 
@@ -27,8 +27,8 @@
 
 | Path | Responsibility |
 |---|---|
-| `config/repo-evolver.policy.toml.example` | Gate, budget, path, branch, and repair policy |
-| `gzmo-evolver/src/policy.rs` | Load trusted policy from base/operator path |
+| `config/repo-evolver.policy.toml` | Baseline-owned gate, budget, path, branch, and repair policy |
+| `gzmo-evolver/src/policy.rs` | Existing validated policy parser/digest; no second policy type |
 | `gzmo-evolver/src/diff_gate.rs` | Path, symlink, submodule, size, line, binary checks |
 | `gzmo-evolver/src/evaluator.rs` | Run trusted gates and comparative holdouts |
 | `gzmo-evolver/src/redact.rs` | Remove credentials and sensitive environment data from reports |
@@ -45,17 +45,17 @@
 
 ---
 
-### Task 1: Freeze Trusted Evaluation Policy
+### Task 1: Gate Candidate Diffs with the Existing Baseline Policy
 
 **Files:**
-- Create: `config/repo-evolver.policy.toml.example`
-- Create: `gzmo-evolver/src/policy.rs`
+- Modify: `gzmo-evolver/src/policy.rs` only if a read-only helper is needed
 - Create: `gzmo-evolver/src/diff_gate.rs`
+- Modify: `gzmo-evolver/src/lib.rs`
 - Test: `gzmo-evolver/tests/evaluator.rs`
 
 **Interfaces:**
-- Produces: `TrustedPolicy`, `DiffGate::evaluate`, policy digest.
-- Consumes: `CapabilityEnvelope`, candidate manifest, baseline commit.
+- Produces: `DiffGate::evaluate` and verified baseline-policy loading.
+- Consumes: existing `TrustedPolicy`, `CandidateManifest`, `GitRepository::read_file_at`, exact baseline commit, and normalized diff facts.
 
 - [ ] **Step 1: Write protected-path and budget tests**
 
@@ -74,85 +74,30 @@ fn protected_or_oversized_diff_fails_before_commands_run() {
 
 Run: `cargo test -p gzmo-evolver --test evaluator protected_or_oversized`
 
-Expected: FAIL: policy/diff gate missing.
+Expected: FAIL because `DiffGate` does not exist.
 
-- [ ] **Step 3: Define concrete default policy**
+- [ ] **Step 3: Load exactly the baseline-owned policy**
 
-```toml
-schema = "gzmo.repo_evolver.policy/v1"
-max_active_candidates = 1
-max_repair_attempts = 2
-allowed_branch_prefix = "evolve/"
+For candidate baseline `B`, obtain `config/repo-evolver.policy.toml` through `GitRepository::read_file_at(B, path)`, parse with the existing `TrustedPolicy::parse_toml`, and require `TrustedPolicy::digest()` equals the policy digest persisted with the CandidateRecord. Candidate workspace/HEAD is never a policy source. Operator overrides remain unsupported until a later trusted signer module can verify a detached grant.
 
-[budget]
-wall_seconds = 2700
-max_attempts = 1
-max_changed_files = 20
-max_added_lines = 1500
-max_tool_calls = 80
-max_input_tokens = 250000
-max_output_tokens = 50000
+- [ ] **Step 4: Implement deep diff inspection**
 
-protected_paths = [
-  ".github/workflows/",
-  "docs/superpowers/specs/",
-  "docs/ADR-",
-  "AGENTS.md",
-  "Cargo.toml",
-  "Cargo.lock",
-  "crates/evolution-contracts/",
-  "gzmo-evolver/",
-  "tests/evolution-holdouts/",
-]
+Use normalized facts from the independent candidate workspace plus trusted direct probes `git diff --raw -z`, `git diff --numstat -z`, and `git diff --check <base>..<candidate>`. Reject protected paths, absolute/parent/symlink escape, submodule/gitlink entries, binaries, files over 2 MiB, more than budgeted files/lines, whitespace errors, generated secrets, and any changed path outside the workspace. This repeats the pre-worker bounded check deliberately at the trusted evaluation boundary.
 
-[[gates]]
-name = "format"
-class = "hard_floor"
-argv = ["cargo", "fmt", "--all", "--", "--check"]
-timeout_seconds = 300
-
-[[gates]]
-name = "clippy"
-class = "hard_floor"
-argv = ["cargo", "clippy", "--all-targets", "--", "-D", "warnings"]
-timeout_seconds = 1200
-
-[[gates]]
-name = "tests"
-class = "hard_floor"
-argv = ["cargo", "test", "--all"]
-timeout_seconds = 1800
-
-[[gates]]
-name = "opportunity-contract"
-class = "hard_floor"
-argv = ["bash", "scripts/opportunity-discovery-check.sh"]
-timeout_seconds = 300
-```
-
-- [ ] **Step 4: Load policy from a trusted source**
-
-For a candidate based on commit `B`, read policy with `git show B:config/repo-evolver.policy.toml`; compare SHA-256 with the manifest policy digest. An operator path outside the repo may override only if its detached signature verifies in the later trusted signer module. Candidate HEAD is never the source.
-
-- [ ] **Step 5: Implement diff inspection**
-
-Use `git diff --raw -z`, `git diff --numstat -z`, and `git diff --check <base>..<candidate>`. Reject protected paths, absolute/parent paths, symlink targets escaping root, submodule/gitlink entries, binaries, files over 2 MiB, more than budgeted files/lines, whitespace errors, generated secrets, and changes outside the worktree.
-
-- [ ] **Step 6: Run policy/diff tests**
+- [ ] **Step 5: Run policy/diff tests**
 
 Run: `cargo test -p gzmo-evolver --test evaluator diff_gate`
 
-Expected: PASS.
+Expected: PASS, including baseline/candidate policy-digest mismatch and candidate attempt to edit the tracked policy.
 
-- [ ] **Step 7: Commit**
+- [ ] **Step 6: Commit**
 
 ```bash
-git add config/repo-evolver.policy.toml.example gzmo-evolver
+git add gzmo-evolver
 git commit -m "feat: gate candidate diffs with trusted policy"
 ```
 
 ---
-
 ### Task 2: Run Hard Gates and Immutable Holdouts
 
 **Files:**
@@ -272,7 +217,7 @@ Write under `<state_dir>/candidates/<id>/raw/` with directory mode 0700/files 06
 
 - [ ] **Step 5: Run reporting tests**
 
-Run: `cargo test -p gzmo-evolver report redaction`
+Run: `cargo test -p gzmo-evolver report && cargo test -p gzmo-evolver redaction`
 
 Expected: PASS.
 
@@ -382,7 +327,7 @@ Expected: FAIL: publisher missing.
 Trusted parent creates a mode-0700 temporary directory and askpass executable that reads the in-memory installation token over a one-use inherited pipe, not argv or disk. Run:
 
 ```text
-git -C <worktree> -c credential.helper= push
+git -C <candidate-workspace> -c credential.helper= push
   --force-with-lease=refs/heads/evolve/<id>:<expected-old-or-empty>
   https://x-access-token@github.com/<owner>/<repo>.git
   <evaluated-commit>:refs/heads/evolve/<id>
@@ -462,7 +407,7 @@ Include failing check names, bounded redacted log excerpts, review text from tru
 
 - [ ] **Step 5: Re-run the isolated worker**
 
-Worker receives the candidate worktree with remote push disabled. After commit, run the entire evaluator—not only failed checks. Push with lease only if all hard floors pass. Increment attempt and append audit.
+Worker receives the independent candidate workspace with both remote URLs disabled. After its commit, the trusted coordinator normalizes and reevaluates the entire candidate—not only failed checks. Push with lease only if all hard floors pass. Increment attempt and append audit.
 
 - [ ] **Step 6: Stop conditions**
 
