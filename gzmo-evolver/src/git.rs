@@ -1551,50 +1551,153 @@ fn prepare_candidate_inner<R: ProcessRunner, C: crate::mission::Clock, S: Candid
         .create_candidate(&prepared.manifest, &policy_digest, now)
         .map_err(|e| PrepareError::State(e.to_string()))?;
 
-    let git_result = git
-        .prepare(&prepared.manifest)
-        .map(|ws| ws.path().to_path_buf());
+    let git_result = match git.prepare(&prepared.manifest) {
+        Ok(ws) => PreparedWorkspacePath::from_workspace(&ws),
+        Err(err) => Err(err),
+    };
     settle_observed_after_git_prepare(store, &observed, baseline, clock.now(), git_result)
+}
+
+/// Private token binding a prepare-success workspace to confined cleanup invariants.
+///
+/// Carries `state_dir`, candidate id, and the canonical workspace path. Constructed only
+/// after a successful `GitRepository::prepare` (or an equivalent test validator). Recursive
+/// deletion is refused unless every confinement check still holds at removal time.
+#[derive(Debug, Clone)]
+struct PreparedWorkspacePath {
+    state_dir: PathBuf,
+    candidate_id: String,
+    /// Canonical absolute path of `<state_dir>/workspaces/<candidate_id>`.
+    path: PathBuf,
+}
+
+impl PreparedWorkspacePath {
+    /// Bind invariants from a successfully prepared independent workspace handle.
+    fn from_workspace<R: ProcessRunner>(ws: &GitWorkspace<'_, R>) -> Result<Self, GitError> {
+        Self::validate(ws.config.state_dir(), ws.candidate_id(), ws.path())
+    }
+
+    /// Validate and bind a workspace path under `<state_dir>/workspaces/<candidate_id>`.
+    ///
+    /// Checks: safe component id, immediate child of workspaces root, basename match,
+    /// real directory (no symlink), and real in-tree `.git` contained by the workspace.
+    fn validate(state_dir: &Path, candidate_id: &str, path: &Path) -> Result<Self, GitError> {
+        validate_safe_component(candidate_id)?;
+        let workspaces = state_dir.join(WORKSPACES_DIR);
+        if !workspaces.exists() {
+            return Err(GitError::Invalid(
+                "state workspaces/ directory is missing".to_owned(),
+            ));
+        }
+        reject_symlink_path(&workspaces)?;
+        let workspaces_root = canonicalize_path(&workspaces)?;
+        reject_symlink_path(path)?;
+        let meta = fs::symlink_metadata(path).map_err(|err| GitError::Io(err.to_string()))?;
+        if !meta.file_type().is_dir() {
+            return Err(GitError::Invalid(
+                "workspace path is not a real directory".to_owned(),
+            ));
+        }
+        let ws_canon = canonicalize_path(path)?;
+        if ws_canon.parent().map(Path::to_path_buf).as_ref() != Some(&workspaces_root) {
+            return Err(GitError::Invalid(
+                "workspace is not an immediate descendant of state workspaces/".to_owned(),
+            ));
+        }
+        let name = ws_canon
+            .file_name()
+            .and_then(|s| s.to_str())
+            .ok_or_else(|| GitError::Invalid("workspace basename invalid".to_owned()))?;
+        if name != candidate_id {
+            return Err(GitError::Invalid(
+                "workspace basename does not match candidate id".to_owned(),
+            ));
+        }
+        let git_dir = ws_canon.join(".git");
+        reject_symlink_path(&git_dir)?;
+        let git_meta =
+            fs::symlink_metadata(&git_dir).map_err(|err| GitError::Io(err.to_string()))?;
+        if !git_meta.file_type().is_dir() {
+            return Err(GitError::Invalid(
+                "workspace missing in-tree .git directory".to_owned(),
+            ));
+        }
+        let git_canon = canonicalize_path(&git_dir)?;
+        if !path_is_within(&git_canon, &ws_canon) {
+            return Err(GitError::Invalid(
+                "workspace .git escapes workspace root".to_owned(),
+            ));
+        }
+        Ok(Self {
+            state_dir: state_dir.to_path_buf(),
+            candidate_id: candidate_id.to_owned(),
+            path: ws_canon,
+        })
+    }
+
+    fn path(&self) -> &Path {
+        &self.path
+    }
+
+    /// Re-check every confinement invariant, then recursively remove only if still valid.
+    fn remove_confined(self) -> Result<(), GitError> {
+        let confirmed = Self::validate(&self.state_dir, &self.candidate_id, &self.path)?;
+        if confirmed.path != self.path || confirmed.candidate_id != self.candidate_id {
+            return Err(GitError::Invalid(
+                "workspace confinement changed before removal".to_owned(),
+            ));
+        }
+        remove_path_best_effort(&confirmed.path).map_err(|err| GitError::Io(err.to_string()))
+    }
 }
 
 /// Settle an Observed candidate from the independent-workspace prepare result.
 ///
 /// MirrorLockBusy stays resumable Observed; other Git faults terminalize Failed;
-/// Prepared transition failure removes the published workspace then Failed.
+/// Prepared transition failure removes the published workspace (only via a confined
+/// token that revalidates root/id/dir/.git) then Failed. Cleanup validation errors
+/// do not delete and are folded into the bounded terminal reason.
 fn settle_observed_after_git_prepare<S: CandidateStateOps>(
     store: &S,
     observed: &CandidateRecord,
     baseline: String,
     now: DateTime<Utc>,
-    git_result: Result<PathBuf, GitError>,
+    git_result: Result<PreparedWorkspacePath, GitError>,
 ) -> Result<PrepareOutcome, PrepareError> {
     match git_result {
-        Ok(ws_path) => match store.transition(
-            observed.id(),
-            CandidateState::Prepared,
-            crate::state::TransitionMetadata::empty().with_workspace(&ws_path),
-            now,
-        ) {
-            Ok(record) => Ok(PrepareOutcome {
-                record,
-                baseline: Some(baseline),
-                reused_active: false,
-            }),
-            Err(err) => {
-                let _ = remove_path_best_effort(&ws_path);
-                let reason = bound_reason(&format!("prepared transition failed: {err}"));
-                let _ = store.transition(
-                    observed.id(),
-                    CandidateState::Failed,
-                    crate::state::TransitionMetadata::terminal(reason.clone()),
-                    now,
-                );
-                Err(PrepareError::Failed {
-                    reason,
-                    candidate_id: observed.id().as_str().to_owned(),
-                })
+        Ok(ws) => {
+            let ws_path = ws.path().to_path_buf();
+            match store.transition(
+                observed.id(),
+                CandidateState::Prepared,
+                crate::state::TransitionMetadata::empty().with_workspace(&ws_path),
+                now,
+            ) {
+                Ok(record) => Ok(PrepareOutcome {
+                    record,
+                    baseline: Some(baseline),
+                    reused_active: false,
+                }),
+                Err(err) => {
+                    let mut reason = format!("prepared transition failed: {err}");
+                    if let Err(cleanup_err) = ws.remove_confined() {
+                        reason.push_str("; cleanup: ");
+                        reason.push_str(&cleanup_err.to_string());
+                    }
+                    let reason = bound_reason(&reason);
+                    let _ = store.transition(
+                        observed.id(),
+                        CandidateState::Failed,
+                        crate::state::TransitionMetadata::terminal(reason.clone()),
+                        now,
+                    );
+                    Err(PrepareError::Failed {
+                        reason,
+                        candidate_id: observed.id().as_str().to_owned(),
+                    })
+                }
             }
-        },
+        }
         Err(GitError::MirrorLockBusy) => {
             // Transient lease conflict: leave Observed for resumption; no workspace.
             Err(PrepareError::Git("mirror lease busy".to_owned()))
@@ -2471,6 +2574,44 @@ pub fn verify_git_trust<R: ProcessRunner>(
     Ok(())
 }
 
+/// Shared cfg(test) candidate manifest builder for unit and settle modules.
+#[cfg(test)]
+fn test_candidate_manifest(id: &str) -> CandidateManifest {
+    use chrono::TimeZone;
+    use evolution_contracts::{
+        AuthorityTier, CandidateId, CandidateKind, CandidateTarget, ResourceBudget,
+        CANDIDATE_SCHEMA,
+    };
+    CandidateManifest {
+        schema: CANDIDATE_SCHEMA.to_owned(),
+        id: CandidateId::parse(id).unwrap(),
+        mission_id: "felt-use-mass-growth".to_owned(),
+        kind: CandidateKind::Code,
+        authority: AuthorityTier::Candidate,
+        target: CandidateTarget::Repository {
+            owner: "maximilianwruhs-cyber".to_owned(),
+            repository: "GZMO".to_owned(),
+            base_branch: "main".to_owned(),
+            candidate_branch: format!("evolve/{id}"),
+        },
+        baseline_digest: "git-sha1:0123456789012345678901234567890123456789".to_owned(),
+        required_gates: vec!["tests".to_owned()],
+        protected_paths: vec!["SECRET/".to_owned()],
+        budget: ResourceBudget {
+            wall_seconds: 100,
+            max_attempts: 1,
+            max_changed_files: 20,
+            max_added_lines: 1500,
+            max_tool_calls: 10,
+            max_input_tokens: 1000,
+            max_output_tokens: 1000,
+            max_energy_joules: None,
+            allow_missing_energy_meter: true,
+        },
+        created_at: chrono::Utc.with_ymd_and_hms(2026, 9, 1, 12, 0, 0).unwrap(),
+    }
+}
+
 #[cfg(test)]
 mod unit_tests {
     use super::*;
@@ -2564,7 +2705,7 @@ mod unit_tests {
         let policy = PathPolicy {
             protected_paths: vec!["SECRET/".to_owned()],
         };
-        let manifest = dummy_manifest();
+        let manifest = test_candidate_manifest("cand-20260901t120000z-bet-01234567");
         let stats = merge_diff_records(r, n, &policy, &manifest).unwrap();
         assert_eq!(stats.added_lines, 3);
         assert_eq!(stats.files[0].path, "src/foo.rs");
@@ -2623,7 +2764,13 @@ mod unit_tests {
         let policy = PathPolicy {
             protected_paths: vec!["SECRET/".to_owned()],
         };
-        let err = merge_diff_records(raw, num, &policy, &dummy_manifest()).unwrap_err();
+        let err = merge_diff_records(
+            raw,
+            num,
+            &policy,
+            &test_candidate_manifest("cand-20260901t120000z-bet-01234567"),
+        )
+        .unwrap_err();
         assert!(
             err.to_string().contains("deleted") || err.to_string().contains("overflow"),
             "{err}"
@@ -2644,42 +2791,6 @@ mod unit_tests {
             Some("always")
         );
     }
-
-    fn dummy_manifest() -> CandidateManifest {
-        use chrono::TimeZone;
-        use evolution_contracts::{
-            AuthorityTier, CandidateId, CandidateKind, CandidateTarget, ResourceBudget,
-            CANDIDATE_SCHEMA,
-        };
-        CandidateManifest {
-            schema: CANDIDATE_SCHEMA.to_owned(),
-            id: CandidateId::parse("cand-20260901t120000z-bet-01234567").unwrap(),
-            mission_id: "felt-use-mass-growth".to_owned(),
-            kind: CandidateKind::Code,
-            authority: AuthorityTier::Candidate,
-            target: CandidateTarget::Repository {
-                owner: "maximilianwruhs-cyber".to_owned(),
-                repository: "GZMO".to_owned(),
-                base_branch: "main".to_owned(),
-                candidate_branch: "evolve/cand-20260901t120000z-bet-01234567".to_owned(),
-            },
-            baseline_digest: "git-sha1:0123456789012345678901234567890123456789".to_owned(),
-            required_gates: vec!["tests".to_owned()],
-            protected_paths: vec!["SECRET/".to_owned()],
-            budget: ResourceBudget {
-                wall_seconds: 100,
-                max_attempts: 1,
-                max_changed_files: 20,
-                max_added_lines: 1500,
-                max_tool_calls: 10,
-                max_input_tokens: 1000,
-                max_output_tokens: 1000,
-                max_energy_joules: None,
-                allow_missing_energy_meter: true,
-            },
-            created_at: chrono::Utc.with_ymd_and_hms(2026, 9, 1, 12, 0, 0).unwrap(),
-        }
-    }
 }
 
 #[cfg(test)]
@@ -2687,10 +2798,7 @@ mod prepare_settle_tests {
     use super::*;
     use crate::state::{StateError, StateStore};
     use chrono::TimeZone;
-    use evolution_contracts::{
-        AuthorityTier, CandidateId, CandidateKind, CandidateTarget, ResourceBudget,
-        CANDIDATE_SCHEMA,
-    };
+    use evolution_contracts::CandidateId;
     use std::sync::Mutex;
     use tempfile::TempDir;
 
@@ -2702,69 +2810,13 @@ mod prepare_settle_tests {
         format!("sha256:{}", "ab".repeat(32))
     }
 
-    fn test_manifest(id: &str) -> CandidateManifest {
-        CandidateManifest {
-            schema: CANDIDATE_SCHEMA.to_owned(),
-            id: CandidateId::parse(id).unwrap(),
-            mission_id: "felt-use-mass-growth".to_owned(),
-            kind: CandidateKind::Code,
-            authority: AuthorityTier::Candidate,
-            target: CandidateTarget::Repository {
-                owner: "maximilianwruhs-cyber".to_owned(),
-                repository: "GZMO".to_owned(),
-                base_branch: "main".to_owned(),
-                candidate_branch: format!("evolve/{id}"),
-            },
-            baseline_digest: "git-sha1:0123456789012345678901234567890123456789".to_owned(),
-            required_gates: vec!["tests".to_owned()],
-            protected_paths: vec!["SECRET/".to_owned()],
-            budget: ResourceBudget {
-                wall_seconds: 100,
-                max_attempts: 1,
-                max_changed_files: 20,
-                max_added_lines: 1500,
-                max_tool_calls: 10,
-                max_input_tokens: 1000,
-                max_output_tokens: 1000,
-                max_energy_joules: None,
-                allow_missing_energy_meter: true,
-            },
-            created_at: fixed_now(),
-        }
-    }
-
-    /// Private delegate around a real StateStore (no behavior of its own).
-    struct StoreDelegate {
-        inner: StateStore,
-    }
-
-    impl CandidateStateOps for StoreDelegate {
-        fn active_candidate(
-            &self,
-            repository: &str,
-        ) -> Result<Option<CandidateRecord>, StateError> {
-            self.inner.active_candidate(repository)
-        }
-        fn create_candidate(
-            &self,
-            manifest: &CandidateManifest,
-            policy_digest: &str,
-            now: DateTime<Utc>,
-        ) -> Result<CandidateRecord, StateError> {
-            self.inner.create_candidate(manifest, policy_digest, now)
-        }
-        fn transition(
-            &self,
-            id: &CandidateId,
-            next: CandidateState,
-            metadata: crate::state::TransitionMetadata,
-            now: DateTime<Utc>,
-        ) -> Result<CandidateRecord, StateError> {
-            self.inner.transition(id, next, metadata, now)
-        }
-        fn load(&self, id: &CandidateId) -> Result<CandidateRecord, StateError> {
-            self.inner.load(id)
-        }
+    /// State-dir shaped workspace with real nonsymlink in-tree `.git`.
+    fn make_confined_workspace(state_dir: &Path, candidate_id: &str) -> PathBuf {
+        let ws = state_dir.join(WORKSPACES_DIR).join(candidate_id);
+        fs::create_dir_all(&ws).unwrap();
+        fs::create_dir(ws.join(".git")).unwrap();
+        fs::write(ws.join("marker"), b"owned").unwrap();
+        ws
     }
 
     /// Fails only the first Prepared transition; Failed and other ops delegate.
@@ -2822,12 +2874,10 @@ mod prepare_settle_tests {
 
     #[test]
     fn mirror_lock_busy_after_observed_stays_resumable() {
-        let store = StoreDelegate {
-            inner: StateStore::open_in_memory().unwrap(),
-        };
+        let store = StateStore::open_in_memory().unwrap();
         let id = "cand-20260901t120000z-bet-mlbusy01";
         let observed = store
-            .create_candidate(&test_manifest(id), &policy_digest(), fixed_now())
+            .create_candidate(&test_candidate_manifest(id), &policy_digest(), fixed_now())
             .unwrap();
         assert_eq!(observed.state(), CandidateState::Observed);
 
@@ -2855,24 +2905,24 @@ mod prepare_settle_tests {
 
     #[test]
     fn prepared_transition_failure_removes_workspace_and_fails() {
-        let root = TempDir::new().unwrap();
+        let state = TempDir::new().unwrap();
         let store = FailPreparedOnce::new(StateStore::open_in_memory().unwrap());
         let id = "cand-20260901t120000z-bet-prepfail1";
         let observed = store
-            .create_candidate(&test_manifest(id), &policy_digest(), fixed_now())
+            .create_candidate(&test_candidate_manifest(id), &policy_digest(), fixed_now())
             .unwrap();
 
-        let ws_path = root.path().join("workspaces").join(id);
-        fs::create_dir_all(&ws_path).unwrap();
-        fs::write(ws_path.join("marker"), b"owned").unwrap();
+        let ws_path = make_confined_workspace(state.path(), id);
         assert!(ws_path.is_dir());
+        let token = PreparedWorkspacePath::validate(state.path(), id, &ws_path)
+            .expect("confined fixture must validate");
 
         let err = settle_observed_after_git_prepare(
             &store,
             &observed,
             "0123456789012345678901234567890123456789".to_owned(),
             fixed_now(),
-            Ok(ws_path.clone()),
+            Ok(token),
         )
         .unwrap_err();
 
@@ -2885,6 +2935,10 @@ mod prepare_settle_tests {
                     reason.contains("prepared transition failed") || reason.contains("illegal"),
                     "{reason}"
                 );
+                assert!(
+                    !reason.contains("cleanup:"),
+                    "successful confined cleanup must not report cleanup failure: {reason}"
+                );
                 assert!(reason.len() <= MAX_REASON_BYTES, "reason must be bounded");
                 assert_eq!(candidate_id, id);
             }
@@ -2893,7 +2947,7 @@ mod prepare_settle_tests {
 
         assert!(
             !ws_path.exists(),
-            "production recovery must remove the published workspace"
+            "production recovery must remove the confined published workspace"
         );
         let rec = store.load(observed.id()).unwrap();
         assert_eq!(rec.state(), CandidateState::Failed);
@@ -2905,5 +2959,84 @@ mod prepare_settle_tests {
             .active_candidate("maximilianwruhs-cyber/GZMO")
             .unwrap()
             .is_none());
+    }
+
+    #[test]
+    fn prepared_workspace_path_rejects_wrong_parent() {
+        let state = TempDir::new().unwrap();
+        let other = TempDir::new().unwrap();
+        let id = "cand-20260901t120000z-bet-badparent";
+        fs::create_dir_all(state.path().join(WORKSPACES_DIR)).unwrap();
+        let outsider = other.path().join(id);
+        fs::create_dir_all(&outsider).unwrap();
+        fs::create_dir(outsider.join(".git")).unwrap();
+        let err = PreparedWorkspacePath::validate(state.path(), id, &outsider).unwrap_err();
+        let msg = err.to_string();
+        assert!(
+            msg.contains("immediate descendant") || msg.contains("workspaces"),
+            "{msg}"
+        );
+    }
+
+    #[test]
+    fn prepared_workspace_path_rejects_wrong_basename() {
+        let state = TempDir::new().unwrap();
+        let id = "cand-20260901t120000z-bet-badbase01";
+        let wrong = "cand-20260901t120000z-bet-wrongbase";
+        let ws = make_confined_workspace(state.path(), wrong);
+        let err = PreparedWorkspacePath::validate(state.path(), id, &ws).unwrap_err();
+        let msg = err.to_string();
+        assert!(
+            msg.contains("basename") || msg.contains("candidate id"),
+            "{msg}"
+        );
+    }
+
+    #[test]
+    #[cfg(unix)]
+    fn prepared_workspace_path_rejects_symlink_workspace() {
+        let state = TempDir::new().unwrap();
+        let id = "cand-20260901t120000z-bet-symlink01";
+        let workspaces = state.path().join(WORKSPACES_DIR);
+        fs::create_dir_all(&workspaces).unwrap();
+        let real_target = state.path().join("real-target");
+        fs::create_dir_all(&real_target).unwrap();
+        fs::create_dir(real_target.join(".git")).unwrap();
+        let link = workspaces.join(id);
+        std::os::unix::fs::symlink(&real_target, &link).unwrap();
+        let err = PreparedWorkspacePath::validate(state.path(), id, &link).unwrap_err();
+        let msg = err.to_string();
+        assert!(
+            msg.contains("symlink") || msg.contains("trust") || msg.contains("directory"),
+            "{msg}"
+        );
+    }
+    #[test]
+    fn confined_remove_refuses_when_invariants_break() {
+        let state = TempDir::new().unwrap();
+        let id = "cand-20260901t120000z-bet-breakinv1";
+        let ws_path = make_confined_workspace(state.path(), id);
+        let token = PreparedWorkspacePath::validate(state.path(), id, &ws_path).unwrap();
+
+        // Break confinement after token mint: replace directory with a sibling escape via rename
+        // then leave a wrong-basename directory at the original path shape by moving content away.
+        let escape = state.path().join("escape-target");
+        fs::rename(&ws_path, &escape).unwrap();
+        fs::create_dir_all(state.path().join(WORKSPACES_DIR).join("not-the-id")).unwrap();
+
+        let err = token.remove_confined().unwrap_err();
+        let msg = err.to_string();
+        assert!(
+            msg.contains("not a real directory")
+                || msg.contains("missing")
+                || msg.contains("immediate")
+                || msg.contains("basename")
+                || msg.contains("io"),
+            "{msg}"
+        );
+        assert!(
+            escape.exists(),
+            "failed confined remove must not delete an escaped path"
+        );
     }
 }
