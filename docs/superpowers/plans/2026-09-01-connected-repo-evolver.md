@@ -655,6 +655,7 @@ The request may choose only the sealed executable/profile; no arbitrary args. Pr
 
 ```text
 <omp> -p --mode json --no-session --no-title --no-prewalk --no-pty
+  --model @code_candidate
   --profile <profile>
   --cwd <independent-workspace>
   --max-time <budget.wall_seconds>s
@@ -666,7 +667,7 @@ The request may choose only the sealed executable/profile; no arbitrary args. Pr
   @<untrusted-mission.md>
 ```
 
-Clear the environment and set exactly the fixed allowlist tested in Step 1. `HOME=<output-dir>/home` is a worker-owned 0700 per-candidate directory whose `.omp/profiles/<profile>` entry is a read-only bind of the validated installed profile; cache/session locations remain inside that home, while `--no-session` prevents transcript persistence. The sealed overlay disables project MCP/config authority and nonessential persistence; the installed named profile is coordinator/root-owned, read-only, and points only to the fixed loopback model endpoint. No provider/API/Git/SSH/proxy credential survives. The safe PATH deliberately excludes the OMP install directory; the parent is launched by its validated absolute path.
+Clear the environment and set exactly the fixed allowlist tested in Step 1. `HOME=<output-dir>/home` is a worker-owned 0700 per-candidate directory whose `.omp/profiles/<profile>` entry is a read-only bind of the validated installed profile; cache/session locations remain inside that home, while `--no-session` prevents transcript persistence. The coordinator validates that profile's `code_candidate` role resolves to one keyless model with a loopback base URL, and the sealed overlay re-pins `modelRoles.code_candidate` plus disables project MCP/config authority and nonessential persistence after project settings load; argv selects `--model @code_candidate`, never the project/default role. No provider/API/Git/SSH/proxy credential survives. The safe PATH deliberately excludes the OMP install directory; the parent is launched by its validated absolute path.
 
 - [ ] **Step 6: Render the bounded mission outside the worker**
 
