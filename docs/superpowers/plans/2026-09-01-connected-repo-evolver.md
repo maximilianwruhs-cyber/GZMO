@@ -560,6 +560,8 @@ git commit -m "feat: isolate candidates in independent no-push clones"
 
 **Files:**
 - Modify: `gzmo-evolver/Cargo.toml`
+- Modify: `Cargo.toml`
+- Modify: `Cargo.lock`
 - Create: `gzmo-evolver/src/worker.rs`
 - Modify: `gzmo-evolver/src/lib.rs`
 - Modify: `gzmo-evolver/src/main.rs`
@@ -583,7 +585,7 @@ const FORBIDDEN_ENV: &[&str] = &[
 ];
 ```
 
-Assert the worker sees only a dedicated HOME, fixed safe PATH, `GIT_CONFIG_GLOBAL=/dev/null`, `GIT_TERMINAL_PROMPT=0`, and loopback model configuration. Reject unknown request/receipt fields, digest mismatch, wrong candidate/UID, mutable or worker-owned request, symlink/path escape, output outside the candidate output root, missing usage, over-budget usage, and malformed OMP JSON.
+Assert the OMP child environment equals one fixed allowlist—dedicated HOME, `/usr/bin:/bin` PATH, locale, null Git config/noninteractive guards, loopback-only `NO_PROXY`/local-model endpoint—and contains no other inherited name; the listed forbidden names are explicit regression sentinels, not the whole defense. Reject unknown request/receipt fields, digest mismatch, wrong candidate/UID/GID/owner, mutable or worker-owned request, symlink/path escape, output outside the fixed candidate output root, untrusted/writable OMP executable or profile, OMP version mismatch, missing or inconsistent JSONL usage/tool events, over-budget usage, and malformed OMP JSON.
 
 - [ ] **Step 2: Run to verify failure**
 
@@ -596,84 +598,95 @@ Expected: FAIL because worker module/command does not exist.
 ```rust
 #[derive(Serialize)]
 pub struct WorkerRequest {
-    pub schema: String,
-    pub candidate_id: CandidateId,
-    pub manifest_digest: String,
-    pub policy_digest: String,
-    pub workspace: PathBuf,
-    pub mission_markdown: PathBuf,
-    pub output_dir: PathBuf,
-    pub omp_executable: PathBuf,
-    pub omp_profile: String,
-    pub expected_uid: u32,
-    pub budget: ResourceBudget,
-    pub issued_at: DateTime<Utc>,
-    pub deadline: DateTime<Utc>,
+    schema: String,
+    candidate_id: CandidateId,
+    manifest_digest: String,
+    policy_digest: String,
+    mission_digest: String,
+    system_prompt_digest: String,
+    omp_config_digest: String,
+    workspace: PathBuf,
+    mission_markdown: PathBuf,
+    system_prompt: PathBuf,
+    omp_config: PathBuf,
+    output_dir: PathBuf,
+    omp_executable: PathBuf,
+    omp_profile: String,
+    omp_version: String,
+    coordinator_uid: u32,
+    expected_uid: u32,
+    expected_gid: u32,
+    budget: ResourceBudget,
+    issued_at: DateTime<Utc>,
+    deadline: DateTime<Utc>,
 }
 
 #[derive(Serialize)]
 pub struct WorkerReceipt {
-    pub schema: String,
-    pub candidate_id: CandidateId,
-    pub manifest_digest: String,
-    pub policy_digest: String,
-    pub started_at: DateTime<Utc>,
-    pub completed_at: DateTime<Utc>,
-    pub exit_code: i32,
-    pub output_digest: String,
-    pub worker_head_digest: Option<String>,
-    pub usage: ResourceUsage,
+    schema: String,
+    candidate_id: CandidateId,
+    manifest_digest: String,
+    policy_digest: String,
+    omp_version: String,
+    started_at: DateTime<Utc>,
+    completed_at: DateTime<Utc>,
+    exit_code: i32,
+    output_digest: String,
+    worker_head_digest: Option<String>,
+    usage: ResourceUsage,
 }
 ```
 
-Use schemas `gzmo.repo_evolver.worker_request/v1` and `gzmo.repo_evolver.worker_receipt/v1`. Each type uses a private `#[serde(deny_unknown_fields)]` Raw form plus custom validated `Deserialize` for intrinsic fields: exact schema, `sha256:` manifest/policy/output digests, optional `git-sha1:` untrusted worker-head digest, safe profile, absolute lexically normalized paths, valid budget, `deadline == issued_at + budget.wall_seconds`, monotonic receipt timestamps, and nonnegative exit representation. Context-dependent checks are explicit: `load_sealed_request(path, expected_roots, current_uid)` verifies canonical path ownership, non-symlink request, Unix mode 0440, effective UID, companion file digests, and immediate-child workspace/output placement; `WorkerReceipt::validate_against(request)` verifies candidate/digest binding, exit zero, completion in `[issued_at, deadline]`, `usage.fits(request.budget)`, and the reported untrusted worker HEAD. The coordinator's later squash produces the distinct authoritative `candidate_digest`. Deserialization alone must not claim those external checks.
+Use schemas `gzmo.repo_evolver.worker_request/v1` and `gzmo.repo_evolver.worker_receipt/v1`. Fixed production roots are `/run/gzmo-evolver` (sealed requests), `/var/lib/gzmo-evolver-worker/output` (worker outputs/homes), `/var/lib/gzmo-evolver-worker/profiles` (trusted profiles), and `/run/netns/gzmo-evolver-model` (local-model network namespace); tests supply isolated roots through `WorkerRoots`. Fields remain private with getters and validated constructors; each type uses a private `#[serde(deny_unknown_fields)]` Raw form plus custom validated `Deserialize`. Intrinsic checks cover exact schema, algorithm-qualified digests, OMP version exactly matching probed `v18.x`, safe profile, absolute UTF-8 lexically normalized paths, distinct nonzero coordinator/worker IDs, valid budget, checked `deadline == issued_at + budget.wall_seconds`, monotonic timestamps, and nonnegative exit representation. `seal_worker_bundle` atomically publishes a coordinator-owned 0750/group-worker request directory under `<request-root>/<candidate-id>` containing 0440 `request.json`, canonical `manifest.json`, baseline `policy.toml`, `system-prompt.md`, `mission.md`, and strict `omp-overlay.yml`; all companion digests are verified. `load_sealed_request(path, WorkerRoots, current_uid, current_gid)` rejects every symlink component and checks canonical immediate-child roots, request/companion owner=`coordinator_uid`, group=`expected_gid`, exact modes, current effective UID/GID, worker-owned 0700 output dir, workspace placement, and an OMP executable/profile owned by root/coordinator and not worker/group/world-writable. `load_worker_receipt` caps size, checks worker ownership/mode and raw-output digest. `WorkerReceipt::validate_against(request, actual_head)` verifies candidate/digest/version binding, exit zero, completion inside `[issued_at, deadline]`, required HEAD equality, and `usage.fits`; deserialization alone never claims external checks.
 
 - [ ] **Step 4: Implement the hidden worker command under the worker identity**
 
-Add dependency `nix` with `user` feature on Unix. Hidden CLI:
+Add Unix-target dependency `nix` with `user` and `fs` features. Make global `--config` optional in Clap and require it only for public coordinator commands; the hidden worker never reads coordinator config. Hidden CLI:
 
 ```text
 gzmo-evolver worker --request /run/gzmo-evolver/<candidate-id>/request.json
 ```
 
-It verifies effective UID equals `expected_uid`, request owner/mode/path, manifest/policy companion digests, workspace branch/baseline, and output directory before spawning OMP. It refuses to run as root or coordinator UID.
+It requires request path under fixed `/run/gzmo-evolver`, verifies effective UID/GID against the sealed request, rejects UID 0 and the coordinator UID, validates all companions/executable/profile/workspace branch+baseline/output directory, and takes a per-output exclusive worker lease before spawning OMP. Production systemd supplies the workspace/profile mounts; tests inject roots/identity without requiring live OS users.
 
 - [ ] **Step 5: Construct fixed OMP argv in code**
 
-The request may choose executable/profile but no arbitrary args. Build exactly:
+The request may choose only the sealed executable/profile; no arbitrary args. Probe `omp --version`, require the sealed v18.x value, then build exactly:
 
 ```text
-<omp> -p --mode json --no-session
+<omp> -p --mode json --no-session --no-title --no-prewalk --no-pty
   --profile <profile>
   --cwd <independent-workspace>
   --max-time <budget.wall_seconds>s
   --approval-mode yolo
   --no-extensions --no-skills --no-rules
   --tools read,bash,edit,write,grep,glob,lsp
-  @<rendered-mission.md>
+  --config <sealed-omp-overlay.yml>
+  --append-system-prompt <sealed-system-prompt.md>
+  @<untrusted-mission.md>
 ```
 
-Clear the environment; set only fixed safe PATH, dedicated HOME, locale, Git identity/config guards, and loopback local-model profile variables required by the installed profile. No provider/API/Git/SSH/proxy credential survives.
+Clear the environment and set exactly the fixed allowlist tested in Step 1. `HOME=<output-dir>/home` is a worker-owned 0700 per-candidate directory whose `.omp/profiles/<profile>` entry is a read-only bind of the validated installed profile; cache/session locations remain inside that home, while `--no-session` prevents transcript persistence. The sealed overlay disables project MCP/config authority and nonessential persistence; the installed named profile is coordinator/root-owned, read-only, and points only to the fixed loopback model endpoint. No provider/API/Git/SSH/proxy credential survives. The safe PATH deliberately excludes the OMP install directory; the parent is launched by its validated absolute path.
 
 - [ ] **Step 6: Render the bounded mission outside the worker**
 
-The coordinator writes a read-only rendered mission that includes exact candidate/baseline, independent workspace, protected paths, required gates, signed budgets, no remote/main/credential/policy/evaluator changes, commit required, and stop-after-one-candidate. Append the untrusted approved mission Markdown under an explicit data delimiter; it cannot override the preceding policy.
+The coordinator renders two bounded artifacts, never one mixed-authority prompt. `system-prompt.md` is trusted policy: exact candidate/baseline/workspace, protected paths, required gates, signed budgets, no remote/main/credential/policy/evaluator changes, commit required, one candidate, then stop. `mission.md` contains only the approved untrusted Opportunity Markdown under a data label. OMP receives the first through `--append-system-prompt` and the second as the sole user `@file`, so later untrusted text cannot become system policy. Both are coordinator-owned 0440 companions bound by the request.
 
 - [ ] **Step 7: Enforce limits and parse OMP JSON fail-closed**
 
-`SystemdWorkerLauncher` starts only `gzmo-evolver-worker@<candidate-id>.service`, waits for its terminal state/receipt, and on deadline requests stop then kill of that unit cgroup. Unit-level cgroups enforce RSS/PIDs/wall/disk namespace; the launcher caps stdout/stderr bytes. Parse OMP JSON for tool-call/input/output-token usage; if the installed OMP format lacks required counters, mark usage unavailable and fail the candidate rather than treating zero as measured. After completion compute changed-file/line counts and candidate HEAD, fill `ResourceUsage`, and require `fits`.
+`SystemdWorkerLauncher` uses argv-only bounded `systemd-run --unit=gzmo-evolver-worker@<candidate-id>.service --collect --no-block --service-type=exec` rather than trusting a mutable template. It pins numeric User/Group, `UMask=0077`, `NoNewPrivileges`, strict system/home/device/kernel protections, a fixed prevalidated local-model `NetworkNamespacePath`, read-only request/profile/executable mounts, read-write workspace/output mounts, `MemoryMax=8G`, `TasksMax=128`, and `RuntimeMaxSec=<signed wall seconds>`, then executes the current trusted `gzmo-evolver worker --request …`. It polls only that exact unit; deadline/nonterminal failure runs `systemctl stop` then `systemctl kill --kill-whom=all --signal=KILL` and verifies inactive. System command output is capped at 1 MiB. Fixed identities, profile, namespace, and privilege to create the transient unit are operations-plan prerequisites; no live systemd/OMP process is required in this task's tests.
 
-Unit files and live OS identities are installed by the operations plan. Here, `FakeWorkerLauncher` and a fake worker fixture prove the contract; no live systemd/OMP service is required.
+Raw OMP stdout is capped at 8 MiB and stored worker-only. Parse the official OMP v18 `--mode json` JSONL contract: one `type=session, version=3` header; unique paired `tool_execution_start/end` IDs; assistant `message_end.message.usage` fields `input`, `output`, `cacheRead`, `cacheWrite`, `totalTokens`, and optional orchestration buckets; a terminal non-error `agent_end`. Count tool starts once; checked-sum every assistant turn's noncached+cache+orchestration input and output buckets and require consistency with `totalTokens`. Missing counters, malformed/truncated lines, duplicate/unpaired tools, nonterminal/error stop, overflow, or unknown numeric shapes fail rather than become zero. After OMP exits, fixed Git argv requires the recorded branch, clean committed workspace, HEAD different from and descended from baseline, and computes changed-file/added-line facts. Set attempts=1, wall time rounded up, energy absent only when signed policy allows, require `usage.fits`, and write the receipt atomically.
 
 - [ ] **Step 8: Require a verified receipt before accepting the candidate**
 
-Store raw bounded OMP output under worker-only output; receipt contains only sanitized summary hashes and usage. The coordinator independently validates receipt, candidate workspace branch/HEAD, manifest/policy digests, and budget before allowing Task 6 to record the candidate digest.
+The coordinator treats receipt and raw output as untrusted: cap/read nonsymlink files, validate ownership/modes, recompute the raw-output digest, parse canonical receipt, compare request/candidate/manifest/policy/OMP version and actual workspace HEAD/branch/diff facts independently, and require the signed budget before Task 6 may persist receipt/candidate metadata. A nonzero OMP exit may produce diagnostic files but never a valid success receipt.
 
 - [ ] **Step 9: Run focused worker tests**
 
 Run: `cargo test -p gzmo-evolver worker -- --nocapture`
 
-Expected: PASS for fake launcher/worker; request mutation, wrong UID/mode/path, forbidden env, timeout/kill, nonzero, malformed or missing usage, output cap, over-budget use, dirty workspace, and missing commit fail closed.
+Expected: PASS for exact OMP argv/environment and source-shaped v18 JSONL; sealed bundle/receipt happy path; fake transient-unit launcher/worker; request/companion mutation, wrong UID/GID/owner/mode/path, symlink swap, forbidden or extra env, untrusted executable/profile, duplicate launch, timeout stop+kill, nonzero exit, malformed/truncated/duplicate/unpaired JSON events, missing/inconsistent usage, output cap, over-budget use, dirty workspace, protected/special diff, and missing commit all fail closed. Hidden worker parses without `--config`; public commands still require it.
 
 - [ ] **Step 10: Commit**
 
