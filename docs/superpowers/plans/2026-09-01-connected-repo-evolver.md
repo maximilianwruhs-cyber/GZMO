@@ -255,7 +255,7 @@ git commit -m "feat: bootstrap connected repository evolver"
 - Test: `gzmo-evolver/src/state.rs`
 
 **Interfaces:**
-- Produces: `StateStore::{open,open_in_memory,create_candidate,transition,active_candidate,verify_audit_chain}`, `CoordinatorLock::try_acquire`, `CandidateRecord`, and `TransitionMetadata`.
+- Produces: `StateStore::{open,open_existing_readonly,open_in_memory,create_candidate,transition,active_candidate,verify_audit_chain}`, `CoordinatorLock::try_acquire`, `CandidateRecord`, and `TransitionMetadata`.
 - Consumes: `CandidateManifest`, `CandidateState`, `AuditEvent`, canonical JSON/digests.
 
 - [ ] **Step 1: Write one-active-candidate and atomic-transition tests**
@@ -320,7 +320,7 @@ Enable WAL, foreign keys, and `busy_timeout=5000`. Store canonical manifest JSON
 
 - [ ] **Step 4: Separate read-only state access from the coordinator lease**
 
-`StateStore::open` creates the state directory/database with directory mode 0700 and file mode 0600 on Unix but does not hold the process lock, so `status` can read while the coordinator is active. `CoordinatorLock::try_acquire(<state_dir>/runner.lock)` uses `fs2` exclusive locking and is held by Task 6 for a complete mutating run. Tests use a unique temporary state directory; `open_in_memory` requires no lock.
+`StateStore::open` creates the state directory/database with directory mode 0700 and file mode 0600 on Unix but does not hold the process lock. `StateStore::open_existing_readonly` opens an existing database read-only and returns `None` when state/database is absent, without creating any path; `status` uses only this method. `CoordinatorLock::try_acquire(<state_dir>/runner.lock)` uses `fs2` exclusive locking and is held by Task 6 for a complete mutating run. Tests use a unique temporary state directory; `open_in_memory` requires no lock.
 
 - [ ] **Step 5: Enforce candidate creation and transitions transactionally**
 
@@ -334,13 +334,13 @@ Enable WAL, foreign keys, and `busy_timeout=5000`. Store canonical manifest JSON
 
 - [ ] **Step 7: Add a real read-only `status` CLI**
 
-Add `status [--json]` only after `StateStore` exists. It opens state without the coordinator lock and prints no candidate or the current validated record/audit head. Retain Task 1 `config-check`; other future commands remain absent.
+Add `status [--json]` only after `StateStore` exists. It uses `open_existing_readonly`; absent state returns `initialized=false` without filesystem changes, while existing state prints the validated current record/audit head. Retain Task 1 `config-check`; other future commands remain absent.
 
 - [ ] **Step 8: Run focused state tests**
 
 Run: `cargo test -p gzmo-evolver state`
 
-Expected: PASS for one-active uniqueness, legal/illegal transitions, workspace/candidate/receipt metadata immutability, receipt pair/digest checks, terminal-reason rules, concurrent insert race, transaction rollback, stored-digest tamper, audit tamper, read-only status while lock held, and lock exclusion.
+Expected: PASS for one-active uniqueness, legal/illegal transitions, workspace/candidate/receipt metadata immutability, receipt pair/digest checks, terminal-reason rules, concurrent insert race, transaction rollback, stored-digest tamper, audit tamper, missing-state status with zero filesystem changes, read-only status while lock held, and lock exclusion.
 
 - [ ] **Step 9: Commit**
 
