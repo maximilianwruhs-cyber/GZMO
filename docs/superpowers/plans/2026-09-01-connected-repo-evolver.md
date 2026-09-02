@@ -464,6 +464,9 @@ git commit -m "feat: convert active opportunity into candidate manifest"
 - Create: `gzmo-evolver/src/git.rs`
 - Modify: `gzmo-evolver/src/lib.rs`
 - Modify: `gzmo-evolver/src/main.rs`
+- Modify: `Cargo.toml`
+- Modify: `gzmo-evolver/Cargo.toml`
+- Modify if dependency resolution changes: `Cargo.lock`
 - Test: `gzmo-evolver/tests/repo_loop.rs`
 
 **Interfaces:**
@@ -472,7 +475,7 @@ git commit -m "feat: convert active opportunity into candidate manifest"
 
 - [ ] **Step 1: Write a bare-remote independent-clone test**
 
-Create a temporary bare origin and trusted checkout with `main`. Assert:
+First close the Task 3 breaker ruling in `process.rs`: both Unix timeout tests use one bounded identity death-poll before sampling and identity-scoped cleanup, so asynchronous SIGKILL/reaping cannot flake the hard-floor gate. Then create a temporary bare origin and trusted checkout with `main`. Assert:
 
 ```rust
 let baseline = git_repo.refresh_and_resolve_baseline().unwrap();
@@ -496,20 +499,20 @@ Expected: FAIL because Git repository/workspace modules do not exist.
 
 - [ ] **Step 3: Maintain a coordinator-owned bare mirror**
 
-Read the configured remote URL from the trusted checkout and verify it resolves to the configured owner/repository. Under `<state_dir>/mirror.git`, create or update a bare mirror as the coordinator using explicit argv and no credential forwarding to workers:
+Read the raw `remote.origin.url` from the trusted checkout without applying `url.*.insteadOf`; use a direct `url` crate dependency plus strict handling for SCP syntax, and require a credential-free URL whose normalized path suffix and, for network URLs, host identify the configured GitHub owner/repository. Local/file URLs are accepted for hermetic tests; authenticated/private fetch is intentionally deferred to the later trusted GitHub adapter rather than inheriting ambient credentials. Every Git invocation clears the environment and sets only fixed `PATH`, coordinator-owned 0700 `HOME`, `LC_ALL=C`, `GIT_TERMINAL_PROMPT=0`, `GIT_CONFIG_NOSYSTEM=1`, `GIT_CONFIG_GLOBAL=/dev/null`, disabled hooks/fsmonitor/signing, and command-specific values. Fixed trusted limits: 900 seconds for clone/fetch, 120 seconds otherwise, 8 MiB combined output. Serialize mirror mutation with a distinct fs2 `<state_dir>/mirror.lock` (not the candidate `CoordinatorLock`). Under `<state_dir>/mirror.git`, create a new mirror in a unique 0700 sibling staging directory, fully validate it, then atomically rename it; on refresh verify the existing path is a real nonsymlink bare repository with the expected raw origin before fetching the configured base ref explicitly with prune/no-tags. No credential is embedded, inherited, logged, or forwarded to workers:
 
 ```text
 git clone --mirror <trusted-remote-url> <state_dir>/mirror.git
-git --git-dir <mirror> remote update --prune
+git --git-dir <mirror> fetch --prune --no-tags origin +refs/heads/<base_branch>:refs/heads/<base_branch>
 git --git-dir <mirror> rev-parse refs/heads/<base_branch>
-git --git-dir <mirror> show <baseline>:<policy_repo_path>
+git --git-dir <mirror> cat-file blob <baseline>:<policy_repo_path>
 ```
 
-Refuse a dirty trusted checkout, non-40-lowercase-hex baseline, missing base branch/policy, repository identity mismatch, submodule/gitlink in the baseline tree, or baseline not equal to the freshly fetched remote base. Mirror and coordinator state are unreadable to the worker OS identity.
+Refuse a dirty trusted checkout (tracked or untracked), a checkout HEAD other than the freshly fetched remote baseline, a non-40-lowercase-hex baseline, missing base branch/policy blob, repository identity mismatch, executable local Git config hooks/fsmonitor/URL rewrites, symlink or submodule/gitlink entries anywhere in the baseline tree, malformed mirror layout, or baseline not equal to the explicitly fetched remote base. Require the working-tree policy digest loaded by config to equal the parsed baseline policy digest. Mirror and coordinator state remain unreadable to the worker OS identity.
 
 - [ ] **Step 4: Clone an independent candidate repository**
 
-Do **not** use `git worktree`; linked worktrees share the common Git directory and would let the worker mutate trusted refs/config. Create `<state_dir>/workspaces/<candidate-id>` with:
+Do **not** use `git worktree`; linked worktrees share the common Git directory and would let the worker mutate trusted refs/config. Require the final path absent, clone into a unique nonsymlink sibling staging directory, validate completely, then atomically rename to `<state_dir>/workspaces/<candidate-id>`; every error removes only that staging directory. Create it with:
 
 ```text
 git clone --no-local --single-branch --no-tags --branch <base_branch> <mirror> <workspace>
@@ -521,15 +524,15 @@ git -C <workspace> config user.name "GZMO Evolver Candidate"
 git -C <workspace> config user.email "candidate@gzmo.invalid"
 ```
 
-Verify objects are copied independently: no `.git/objects/info/alternates`, no `objects` symlink, and workspace git-dir differs from mirror/trusted git-dir. Only after preparation succeeds does the coordinator transfer workspace ownership to the worker identity in the later system-service adapter.
+Verify objects are copied independently: no `.git/objects/info/alternates`, no objects/info/alternates environment, no `objects` symlink/hardlink optimization, and workspace git-dir differs from mirror/trusted git-dir. Require a normal in-workspace `.git` directory and scrub/verify all remote URLs and executable local Git config before the path can be recorded. Only after preparation succeeds does the coordinator transfer workspace ownership to the worker identity in the later system-service adapter.
 
 - [ ] **Step 5: Validate and normalize the post-worker candidate commit**
 
-Require recorded branch, clean workspace, HEAD descended from exact baseline, no merge commits in `baseline..HEAD`, no submodule/gitlink changes, and at least one change. The trusted coordinator then squashes `baseline..HEAD` into one commit with author/committer `GZMO Evolver Candidate <candidate@gzmo.invalid>`, message `evolve(<mission-id>): candidate`, and injected timestamp; verify the resulting `git-sha1:` digest and diff are stable. Worker-local commits are untrusted inputs and are never pushed directly.
+Require the recorded branch, clean workspace (including untracked files), HEAD descended from the exact baseline, no merge commits in `baseline..HEAD`, no symlink or submodule/gitlink entries/changes, and at least one change. The trusted coordinator creates the normalized commit with `git commit-tree` from the validated HEAD tree and exact baseline parent—never by invoking hooks—using author/committer `GZMO Evolver Candidate <candidate@gzmo.invalid>`, message `evolve(<mission-id>): candidate`, disabled signing, and injected UTC timestamp; update the candidate ref only with an expected-old-value check. Verify one parent, the resulting `git-sha1:` digest, clean worktree, and stable tree/diff. Worker-local commits are untrusted inputs and are never pushed directly.
 
 - [ ] **Step 6: Inspect bounded diff facts without evaluating quality**
 
-`diff_stats` uses `git diff --raw -z`, `--numstat -z`, and `--check` through argument vectors. It reports paths, modes, binary markers, added/deleted lines, and whitespace status. It rejects malformed output and paths that fail the manifest `PathPolicy`; it enforces manifest file/added-line ceilings before returning. The deeper trusted gate/holdout evaluator remains in the next plan.
+`diff_stats` uses `git diff --no-renames --raw -z`, `--numstat -z`, and `--check` through argument vectors against the exact baseline/candidate pair. It reports UTF-8 paths, modes, binary markers, checked added/deleted line totals, and whitespace status. It rejects malformed/truncated output, duplicate/inconsistent path records, special modes, path traversal, and paths that fail the manifest `PathPolicy`; it enforces manifest file/added-line ceilings before returning. `--check` exit 1 means `whitespace_ok=false`; other Git failures remain errors. The deeper trusted gate/holdout evaluator remains in the next plan.
 
 - [ ] **Step 7: Implement safe cleanup**
 
@@ -537,13 +540,13 @@ Cleanup accepts a validated terminal `CandidateRecord`. It removes only an indep
 
 - [ ] **Step 8: Add a real `prepare` CLI**
 
-`prepare [--json]` acquires `CoordinatorLock`, refreshes/validates mission, refreshes the mirror, loads and validates policy bytes from the baseline commit, creates `PreparedCandidate`, inserts `Observed`, transitions to `Prepared` while recording the independent workspace, then stops. Repeated prepare with an active candidate returns that candidate and creates nothing else.
+`prepare [--json]` acquires `CoordinatorLock`, opens validated state, and first returns any existing active candidate without refreshing mission/mirror or creating files. Otherwise it refreshes the mirror, requires the clean trusted checkout HEAD and working policy to match that baseline, loads/parses policy bytes from the baseline commit, and only then executes/validates the baseline-owned mission producer. It creates `PreparedCandidate`, inserts `Observed`, creates the independent workspace, and transitions to `Prepared` with immutable workspace metadata. A handled workspace/preparation failure cleans partial paths and transitions the new candidate to `Failed` with a bounded reason; a crash leaves resumable `Observed` data for Task 6. Update standalone `refresh` now that Git exists: verify mirror baseline, checkout HEAD, and baseline policy before executing the producer; it still does not open candidate state or acquire its lease. Repeated prepare with an active candidate returns it and creates nothing else.
 
 - [ ] **Step 9: Run focused Git/workspace tests**
 
 Run: `cargo test -p gzmo-evolver --test repo_loop`
 
-Expected: PASS for independent object storage, no trusted-ref mutation, disabled remotes, exact baseline/policy read, squash, diff limits, and cleanup; reject dirty checkout, stale/unknown base, submodule, shared objects/alternates, existing candidate, symlink/path escape, merge commit, empty/dirty workspace, and cleanup mismatch.
+Expected: PASS for bounded identity death-wait, independent object storage, no trusted-ref/config mutation, disabled remotes, exact baseline/policy read, deterministic squash, diff limits, failure-to-Failed handling, early active-candidate return, and cleanup; reject dirty/non-baseline checkout, embedded credentials/wrong network host, stale/unknown base, policy mismatch, symlink/gitlink, shared objects/alternates, existing or staged path collisions, executable Git config, merge commit, empty/dirty workspace, malformed diff output, and cleanup mismatch.
 
 - [ ] **Step 10: Commit**
 
