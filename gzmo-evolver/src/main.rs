@@ -6,8 +6,8 @@
 use anyhow::{bail, Context, Result};
 use clap::{Parser, Subcommand};
 use gzmo_evolver::{
-    prepare_candidate, verify_git_trust, CandidateRecord, CoordinatorLock, MissionAdapter,
-    RepoEvolverConfig, StateStore, SystemClock, SystemProcessRunner,
+    prepare_candidate, refresh_baseline_before_mission, CandidateRecord, CoordinatorLock,
+    MissionAdapter, RepoEvolverConfig, StateStore, SystemClock, SystemProcessRunner,
 };
 use serde::Serialize;
 use std::path::{Path, PathBuf};
@@ -42,11 +42,12 @@ enum Command {
         #[arg(long)]
         json: bool,
     },
-    /// Refresh the opportunity mission after verifying Git trust.
+    /// Refresh the opportunity mission after verifying mirror baseline + policy.
     ///
-    /// Verifies trusted checkout remote identity and cleanliness without
-    /// opening the candidate database or acquiring the coordinator lease.
-    /// Does not prepare a candidate or resolve/create workspaces.
+    /// Refreshes the coordinator mirror under the mirror lock, requires the clean
+    /// trusted checkout HEAD to equal the fetched baseline, and requires the
+    /// working-tree policy digest to match the baseline policy — without opening
+    /// the candidate database or acquiring the coordinator lease.
     Refresh {
         /// Emit machine-readable JSON instead of human text.
         #[arg(long)]
@@ -190,7 +191,9 @@ fn run() -> Result<()> {
             let cfg = RepoEvolverConfig::load(&cli.config)
                 .with_context(|| format!("loading config {}", cli.config.display()))?;
             let runner = SystemProcessRunner;
-            verify_git_trust(&cfg, &runner).context("verifying git trust before refresh")?;
+            // Trust-first: locked mirror refresh + HEAD/policy before producer.
+            let _baseline = refresh_baseline_before_mission(&cfg, &runner)
+                .context("verifying git baseline before refresh")?;
             let clock = SystemClock;
             let adapter = MissionAdapter::new(&cfg, &runner, &clock);
             let mission = adapter

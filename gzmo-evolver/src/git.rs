@@ -33,18 +33,22 @@ pub const MIRROR_STAGING_NAME: &str = "mirror.git.staging";
 pub const MIRROR_LOCK_NAME: &str = "mirror.lock";
 /// Independent workspace parent under the state root.
 pub const WORKSPACES_DIR: &str = "workspaces";
-/// Wall-clock timeout for trusted Git commands.
-pub const GIT_TIMEOUT_SECS: u64 = 300;
-/// Combined stdout+stderr capture ceiling for normal Git commands.
-pub const GIT_OUTPUT_CAP_BYTES: usize = 16 * 1024 * 1024;
-/// Capture ceiling for bounded blob reads (policy / small files).
+/// Wall-clock timeout for clone/fetch only.
+pub const GIT_FETCH_TIMEOUT_SECS: u64 = 900;
+/// Wall-clock timeout for every non-clone/fetch Git command.
+pub const GIT_TIMEOUT_SECS: u64 = 120;
+/// Combined stdout+stderr capture ceiling for normal Git commands (plan max 8 MiB).
+pub const GIT_OUTPUT_CAP_BYTES: usize = 8 * 1024 * 1024;
+/// Capture ceiling for bounded blob reads (stricter than 8 MiB).
 pub const GIT_BLOB_CAP_BYTES: usize = 1024 * 1024;
-/// Capture ceiling for tree listings and diff parsers.
-pub const GIT_DIFF_CAP_BYTES: usize = 32 * 1024 * 1024;
+/// Capture ceiling for tree listings and diff parsers (≤ 8 MiB).
+pub const GIT_DIFF_CAP_BYTES: usize = 8 * 1024 * 1024;
 /// Maximum accepted UTF-8 path component/length in diff parsers.
 pub const MAX_DIFF_PATH_BYTES: usize = 4096;
 /// Maximum number of diff path records accepted.
 pub const MAX_DIFF_FILES: usize = 10_000;
+/// Maximum number of baseline tree entries accepted by ls-tree scans.
+pub const MAX_TREE_ENTRIES: usize = 100_000;
 /// Disabled candidate fetch remote.
 pub const NO_FETCH_URL: &str = "no-fetch://candidate-worker";
 /// Disabled candidate push remote.
@@ -121,6 +125,15 @@ pub struct DiffFile {
     pub binary: bool,
 }
 
+/// How remote URLs are classified for this repository handle.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum GitAccessMode {
+    /// Production/CLI: GitHub HTTPS or SSH only (no local/file/git://).
+    Production,
+    /// Explicit debug/test fixture mode: local/file remotes allowed.
+    LocalFixture,
+}
+
 /// Coordinator view of the trusted checkout + bare mirror.
 pub struct GitRepository<'a, R: ProcessRunner> {
     config: &'a RepoEvolverConfig,
@@ -129,6 +142,7 @@ pub struct GitRepository<'a, R: ProcessRunner> {
     home: PathBuf,
     mirror_path: PathBuf,
     workspaces_dir: PathBuf,
+    access: GitAccessMode,
 }
 
 /// Independent candidate clone under coordinator state.
@@ -141,10 +155,28 @@ pub struct GitWorkspace<'a, R: ProcessRunner> {
     path: PathBuf,
     candidate_id: String,
     baseline: String,
+    access: GitAccessMode,
 }
 impl<'a, R: ProcessRunner> GitRepository<'a, R> {
-    /// Bind config + runner and ensure coordinator Git HOME exists (0700).
+    /// Production/CLI open: GitHub HTTPS/SSH remotes only.
     pub fn open(config: &'a RepoEvolverConfig, runner: &'a R) -> Result<Self, GitError> {
+        Self::open_with(config, runner, GitAccessMode::Production)
+    }
+
+    /// Explicit local-fixture open for hermetic tests/debug only (never used by main CLI).
+    pub fn open_for_local_fixture(
+        config: &'a RepoEvolverConfig,
+        runner: &'a R,
+    ) -> Result<Self, GitError> {
+        Self::open_with(config, runner, GitAccessMode::LocalFixture)
+    }
+
+    /// Bind config + runner under an explicit access mode.
+    pub fn open_with(
+        config: &'a RepoEvolverConfig,
+        runner: &'a R,
+        access: GitAccessMode,
+    ) -> Result<Self, GitError> {
         let state = config.state_dir();
         ensure_dir_0700(state)?;
         let home = state.join(GIT_HOME_NAME);
@@ -159,7 +191,13 @@ impl<'a, R: ProcessRunner> GitRepository<'a, R> {
             home,
             mirror_path: state.join(MIRROR_NAME),
             workspaces_dir,
+            access,
         })
+    }
+
+    /// Access mode bound at open.
+    pub fn access_mode(&self) -> GitAccessMode {
+        self.access
     }
 
     /// Absolute trusted checkout path.
@@ -336,8 +374,8 @@ impl<'a, R: ProcessRunner> GitRepository<'a, R> {
                 ));
             }
 
-            // Clone into staging (independent objects).
-            self.run_git(
+            // Clone into staging (independent objects). Mirror is coordinator-owned local path.
+            self.run_git_ex(
                 Some(self.workspaces_dir.as_path()),
                 &[
                     "clone".to_owned(),
@@ -350,6 +388,8 @@ impl<'a, R: ProcessRunner> GitRepository<'a, R> {
                     staging_name.clone(),
                 ],
                 GIT_OUTPUT_CAP_BYTES,
+                Duration::from_secs(GIT_FETCH_TIMEOUT_SECS),
+                true, // coordinator-owned mirror path may use file transport
             )?;
 
             reject_symlink_path(&staging)?;
@@ -446,6 +486,7 @@ impl<'a, R: ProcessRunner> GitRepository<'a, R> {
                 path: final_path.clone(),
                 candidate_id,
                 baseline,
+                access: self.access,
             })
         })();
 
@@ -461,7 +502,14 @@ impl<'a, R: ProcessRunner> GitRepository<'a, R> {
         let staging = self.config.state_dir().join(MIRROR_STAGING_NAME);
         let _ = remove_path_best_effort(&staging);
         // Parent is state_dir (same parent as final mirror) for atomic rename.
-        let out = self.run_git_allow_nonzero(
+        let allow_file = remote_is_local_fixture(remote_url);
+        if allow_file && self.access != GitAccessMode::LocalFixture {
+            let _ = remove_path_best_effort(&staging);
+            return Err(GitError::Trust(
+                "local/file remote requires LocalFixture access mode".to_owned(),
+            ));
+        }
+        let out = self.run_git_allow_nonzero_ex(
             Some(self.config.state_dir()),
             &[
                 "clone".to_owned(),
@@ -470,6 +518,8 @@ impl<'a, R: ProcessRunner> GitRepository<'a, R> {
                 MIRROR_STAGING_NAME.to_owned(),
             ],
             GIT_OUTPUT_CAP_BYTES,
+            Duration::from_secs(GIT_FETCH_TIMEOUT_SECS),
+            allow_file,
         )?;
         if out.status != 0 {
             let _ = remove_path_best_effort(&staging);
@@ -504,7 +554,13 @@ impl<'a, R: ProcessRunner> GitRepository<'a, R> {
     fn fetch_base_into_mirror(&self, mirror: &Path) -> Result<(), GitError> {
         let base = self.config.repo().base_branch();
         let refspec = format!("+refs/heads/{base}:refs/heads/{base}");
-        self.run_git(
+        // Fetch from origin: allow file only when origin is a classified local fixture remote.
+        let origin = self
+            .config_get_local(mirror, "remote.origin.url")?
+            .unwrap_or_default();
+        let allow_file =
+            remote_is_local_fixture(&origin) && self.access == GitAccessMode::LocalFixture;
+        self.run_git_ex(
             None,
             &[
                 "--git-dir".to_owned(),
@@ -516,6 +572,8 @@ impl<'a, R: ProcessRunner> GitRepository<'a, R> {
                 refspec,
             ],
             GIT_OUTPUT_CAP_BYTES,
+            Duration::from_secs(GIT_FETCH_TIMEOUT_SECS),
+            allow_file,
         )?;
         Ok(())
     }
@@ -543,6 +601,7 @@ impl<'a, R: ProcessRunner> GitRepository<'a, R> {
                 &raw,
                 self.config.repo().owner(),
                 self.config.repo().repository(),
+                self.access,
             )?;
         }
         // No alternates.
@@ -565,6 +624,7 @@ impl<'a, R: ProcessRunner> GitRepository<'a, R> {
             &raw,
             self.config.repo().owner(),
             self.config.repo().repository(),
+            self.access,
         )?;
         Ok(raw)
     }
@@ -742,22 +802,11 @@ impl<'a, R: ProcessRunner> GitRepository<'a, R> {
             ));
         }
 
-        // Probe one object file: must not be hardlinked to the mirror object.
-        if let Some((ws_obj, mirror_obj)) =
-            find_shared_object_pair(&objects, &self.mirror_path.join("objects"))?
-        {
-            #[cfg(unix)]
-            {
-                use std::os::unix::fs::MetadataExt;
-                let a = fs::metadata(&ws_obj)?;
-                let b = fs::metadata(&mirror_obj)?;
-                if a.dev() == b.dev() && a.ino() == b.ino() {
-                    return Err(GitError::Workspace(
-                        "workspace objects share inodes with mirror (hardlink optimization)"
-                            .to_owned(),
-                    ));
-                }
-            }
+        // Loose objects + pack/*.pack/*.idx (+ multi-pack) must not share inodes with mirror.
+        if objects_share_with_mirror(&objects, &self.mirror_path.join("objects"))? {
+            return Err(GitError::Workspace(
+                "workspace objects share inodes with mirror (hardlink optimization)".to_owned(),
+            ));
         }
         Ok(())
     }
@@ -844,7 +893,18 @@ impl<'a, R: ProcessRunner> GitRepository<'a, R> {
         args: &[String],
         cap: usize,
     ) -> Result<ProcessOutput, GitError> {
-        let out = self.run_git_allow_nonzero(cwd, args, cap)?;
+        self.run_git_ex(cwd, args, cap, Duration::from_secs(GIT_TIMEOUT_SECS), false)
+    }
+
+    fn run_git_ex(
+        &self,
+        cwd: Option<&Path>,
+        args: &[String],
+        cap: usize,
+        timeout: Duration,
+        allow_file_protocol: bool,
+    ) -> Result<ProcessOutput, GitError> {
+        let out = self.run_git_allow_nonzero_ex(cwd, args, cap, timeout, allow_file_protocol)?;
         if out.status != 0 {
             return Err(ProcessError::NonZeroExit {
                 code: out.status,
@@ -862,15 +922,31 @@ impl<'a, R: ProcessRunner> GitRepository<'a, R> {
         args: &[String],
         cap: usize,
     ) -> Result<ProcessOutput, GitError> {
+        self.run_git_allow_nonzero_ex(cwd, args, cap, Duration::from_secs(GIT_TIMEOUT_SECS), false)
+    }
+
+    fn run_git_allow_nonzero_ex(
+        &self,
+        cwd: Option<&Path>,
+        args: &[String],
+        cap: usize,
+        timeout: Duration,
+        allow_file_protocol: bool,
+    ) -> Result<ProcessOutput, GitError> {
+        if cap == 0 || cap > 8 * 1024 * 1024 {
+            return Err(GitError::Invalid(
+                "git output cap must be 1..=8 MiB".to_owned(),
+            ));
+        }
         let cwd = cwd.unwrap_or_else(|| self.config.state_dir()).to_path_buf();
-        let env = git_env(&self.home)?;
+        let env = git_env(&self.home, allow_file_protocol)?;
         let spec = ProcessSpec::new(
             &self.git_program,
             args.iter().cloned(),
             cwd,
             env,
             cap,
-            Duration::from_secs(GIT_TIMEOUT_SECS),
+            timeout,
         )?;
         match self.runner.run(&spec) {
             Ok(out) => Ok(out),
@@ -1143,11 +1219,11 @@ impl<'a, R: ProcessRunner> GitWorkspace<'a, R> {
         };
 
         let message = format!("evolve({mission_id}): candidate");
-        let ts = now.format("%s").to_string();
+        let ts = format!("{} +0000", now.timestamp());
         let author = format!("{CANDIDATE_AUTHOR_NAME} <{CANDIDATE_AUTHOR_EMAIL}>");
 
         // commit-tree with injected env timestamps; no hooks/signing via git_env.
-        let mut env = git_env(&self.home)?;
+        let mut env = git_env(&self.home, false)?;
         env.insert(
             "GIT_AUTHOR_NAME".to_owned(),
             CANDIDATE_AUTHOR_NAME.to_owned(),
@@ -1282,7 +1358,13 @@ impl<'a, R: ProcessRunner> GitWorkspace<'a, R> {
         args: &[String],
         cap: usize,
     ) -> Result<ProcessOutput, GitError> {
-        let env = git_env(&self.home)?;
+        if cap == 0 || cap > 8 * 1024 * 1024 {
+            return Err(GitError::Invalid(
+                "git output cap must be 1..=8 MiB".to_owned(),
+            ));
+        }
+        // Candidate workspace commands never enable file protocol.
+        let env = git_env(&self.home, false)?;
         let spec = ProcessSpec::new(
             &self.git_program,
             args.iter().cloned(),
@@ -1402,6 +1484,17 @@ pub fn prepare_candidate<R: ProcessRunner, C: crate::mission::Clock>(
     clock: &C,
     store: &crate::state::StateStore,
 ) -> Result<PrepareOutcome, PrepareError> {
+    prepare_candidate_with(config, runner, clock, store, GitAccessMode::Production)
+}
+
+/// Prepare using an explicit access mode (tests pass [`GitAccessMode::LocalFixture`]).
+pub fn prepare_candidate_with<R: ProcessRunner, C: crate::mission::Clock>(
+    config: &RepoEvolverConfig,
+    runner: &R,
+    clock: &C,
+    store: &crate::state::StateStore,
+    access: GitAccessMode,
+) -> Result<PrepareOutcome, PrepareError> {
     let repository = format!("{}/{}", config.repo().owner(), config.repo().repository());
     if let Some(active) = store
         .active_candidate(&repository)
@@ -1414,7 +1507,7 @@ pub fn prepare_candidate<R: ProcessRunner, C: crate::mission::Clock>(
         });
     }
 
-    let git = GitRepository::open(config, runner).map_err(PrepareError::from_git)?;
+    let git = GitRepository::open_with(config, runner, access).map_err(PrepareError::from_git)?;
     let baseline = git
         .refresh_and_resolve_baseline()
         .map_err(PrepareError::from_git)?;
@@ -1448,23 +1541,37 @@ pub fn prepare_candidate<R: ProcessRunner, C: crate::mission::Clock>(
 
     match git.prepare(&prepared.manifest) {
         Ok(ws) => {
-            let record = store
-                .transition(
-                    observed.id(),
-                    CandidateState::Prepared,
-                    crate::state::TransitionMetadata::empty().with_workspace(ws.path()),
-                    clock.now(),
-                )
-                .map_err(|e| PrepareError::State(e.to_string()))?;
-            Ok(PrepareOutcome {
-                record,
-                baseline: Some(baseline),
-                reused_active: false,
-            })
+            match store.transition(
+                observed.id(),
+                CandidateState::Prepared,
+                crate::state::TransitionMetadata::empty().with_workspace(ws.path()),
+                clock.now(),
+            ) {
+                Ok(record) => Ok(PrepareOutcome {
+                    record,
+                    baseline: Some(baseline),
+                    reused_active: false,
+                }),
+                Err(err) => {
+                    // Workspace was published but Prepared failed: remove only that path
+                    // and terminalize Observed -> Failed so prepare can recover.
+                    let _ = remove_path_best_effort(ws.path());
+                    let reason = bound_reason(&format!("prepared transition failed: {err}"));
+                    let _ = store.transition(
+                        observed.id(),
+                        CandidateState::Failed,
+                        crate::state::TransitionMetadata::terminal(reason.clone()),
+                        clock.now(),
+                    );
+                    Err(PrepareError::Failed {
+                        reason,
+                        candidate_id: observed.id().as_str().to_owned(),
+                    })
+                }
+            }
         }
         Err(err) => {
             let reason = bound_reason(&err.to_string());
-            // Best-effort remove any staging leftover already handled inside prepare.
             let _ = store.transition(
                 observed.id(),
                 CandidateState::Failed,
@@ -1537,7 +1644,7 @@ impl MirrorLock {
     }
 }
 
-fn git_env(home: &Path) -> Result<BTreeMap<String, String>, GitError> {
+fn git_env(home: &Path, allow_file_protocol: bool) -> Result<BTreeMap<String, String>, GitError> {
     let mut env = BTreeMap::new();
     env.insert("PATH".to_owned(), SAFE_PATH.to_owned());
     env.insert("HOME".to_owned(), path_to_string(home)?);
@@ -1547,7 +1654,7 @@ fn git_env(home: &Path) -> Result<BTreeMap<String, String>, GitError> {
     env.insert("GIT_CONFIG_GLOBAL".to_owned(), "/dev/null".to_owned());
     env.insert("GIT_CONFIG_SYSTEM".to_owned(), "/dev/null".to_owned());
     env.insert("GIT_OPTIONAL_LOCKS".to_owned(), "0".to_owned());
-    // Disable hooks/fsmonitor/signing; allow hermetic file transport; deny ext.
+    // Disable hooks/fsmonitor/signing; file protocol only when caller classified local fixture.
     env.insert("GIT_CONFIG_COUNT".to_owned(), "6".to_owned());
     env.insert("GIT_CONFIG_KEY_0".to_owned(), "core.hooksPath".to_owned());
     env.insert("GIT_CONFIG_VALUE_0".to_owned(), "/dev/null".to_owned());
@@ -1561,7 +1668,14 @@ fn git_env(home: &Path) -> Result<BTreeMap<String, String>, GitError> {
         "GIT_CONFIG_KEY_4".to_owned(),
         "protocol.file.allow".to_owned(),
     );
-    env.insert("GIT_CONFIG_VALUE_4".to_owned(), "always".to_owned());
+    env.insert(
+        "GIT_CONFIG_VALUE_4".to_owned(),
+        if allow_file_protocol {
+            "always".to_owned()
+        } else {
+            "never".to_owned()
+        },
+    );
     env.insert(
         "GIT_CONFIG_KEY_5".to_owned(),
         "protocol.ext.allow".to_owned(),
@@ -1585,27 +1699,18 @@ fn resolve_git_program() -> Result<PathBuf, GitError> {
 }
 
 /// Parse and validate a credential-free remote that identifies owner/repo.
-pub fn validate_remote_identity(raw: &str, owner: &str, repository: &str) -> Result<(), GitError> {
+pub fn validate_remote_identity(
+    raw: &str,
+    owner: &str,
+    repository: &str,
+    access: GitAccessMode,
+) -> Result<(), GitError> {
     let raw = raw.trim();
     if raw.is_empty() {
         return Err(GitError::Trust("remote URL is empty".to_owned()));
     }
     if raw.contains('\0') {
         return Err(GitError::Trust("remote URL contains NUL".to_owned()));
-    }
-    // Reject obvious embedded credentials before any parser details leak.
-    if raw.contains("://") {
-        if let Some(after_scheme) = raw.split("://").nth(1) {
-            let authority = after_scheme.split('/').next().unwrap_or("");
-            if authority.contains('@') {
-                let userinfo = authority.rsplit_once('@').map(|(u, _)| u).unwrap_or("");
-                if !userinfo.is_empty() {
-                    return Err(GitError::Trust(
-                        "remote URL must not embed credentials".to_owned(),
-                    ));
-                }
-            }
-        }
     }
 
     // SCP-like: git@host:path
@@ -1615,7 +1720,12 @@ pub fn validate_remote_identity(raw: &str, owner: &str, repository: &str) -> Res
 
     if let Ok(url) = Url::parse(raw) {
         match url.scheme() {
-            "http" | "https" | "ssh" | "git" => {
+            "git" => {
+                return Err(GitError::Trust(
+                    "git:// network transport is not allowed".to_owned(),
+                ));
+            }
+            "http" | "https" => {
                 if !url.username().is_empty() || url.password().is_some() {
                     return Err(GitError::Trust(
                         "remote URL must not embed credentials".to_owned(),
@@ -1633,7 +1743,37 @@ pub fn validate_remote_identity(raw: &str, owner: &str, repository: &str) -> Res
                 let path = url.path().trim_start_matches('/');
                 return match_owner_repo_path(path, owner, repository, Some(&host), true);
             }
+            "ssh" => {
+                // Allow ssh://git@github.com/... without password; reject other userinfo.
+                if url.password().is_some() {
+                    return Err(GitError::Trust(
+                        "remote URL must not embed credentials".to_owned(),
+                    ));
+                }
+                let user = url.username();
+                if !user.is_empty() && user != "git" {
+                    return Err(GitError::Trust(
+                        "remote URL must not embed credentials".to_owned(),
+                    ));
+                }
+                let host = url
+                    .host_str()
+                    .ok_or_else(|| GitError::Trust("network remote missing host".to_owned()))?
+                    .to_ascii_lowercase();
+                if host != "github.com" && host != "www.github.com" {
+                    return Err(GitError::Trust(
+                        "network remote host must be github.com".to_owned(),
+                    ));
+                }
+                let path = url.path().trim_start_matches('/');
+                return match_owner_repo_path(path, owner, repository, Some(&host), true);
+            }
             "file" => {
+                if access != GitAccessMode::LocalFixture {
+                    return Err(GitError::Trust(
+                        "file remote requires LocalFixture access mode".to_owned(),
+                    ));
+                }
                 if !url.username().is_empty() || url.password().is_some() {
                     return Err(GitError::Trust(
                         "file remote must not embed credentials".to_owned(),
@@ -1653,11 +1793,16 @@ pub fn validate_remote_identity(raw: &str, owner: &str, repository: &str) -> Res
         }
     }
 
-    // Bare local path (hermetic tests).
+    // Bare local path (hermetic tests only).
     let path = Path::new(raw);
     if path.is_absolute() || raw.starts_with('.') || raw.starts_with('/') {
         if raw.contains("://") {
             return Err(GitError::Trust("ambiguous remote URL".to_owned()));
+        }
+        if access != GitAccessMode::LocalFixture {
+            return Err(GitError::Trust(
+                "local path remote requires LocalFixture access mode".to_owned(),
+            ));
         }
         return Ok(());
     }
@@ -1665,6 +1810,25 @@ pub fn validate_remote_identity(raw: &str, owner: &str, repository: &str) -> Res
     Err(GitError::Trust(
         "remote URL could not be parsed as credential-free identity".to_owned(),
     ))
+}
+
+/// True when `raw` is a local path or file:// URL (not network).
+pub fn remote_is_local_fixture(raw: &str) -> bool {
+    let raw = raw.trim();
+    if raw.is_empty() || raw.contains('\0') {
+        return false;
+    }
+    if let Ok(url) = Url::parse(raw) {
+        return url.scheme() == "file";
+    }
+    if raw.contains("://") {
+        return false;
+    }
+    if parse_scp_syntax(raw).ok().flatten().is_some() {
+        return false;
+    }
+    let path = Path::new(raw);
+    path.is_absolute() || raw.starts_with('.') || raw.starts_with('/')
 }
 
 struct ScpRemote {
@@ -1824,8 +1988,10 @@ fn parse_ls_tree_reject_special(bytes: &[u8]) -> Result<(), GitError> {
     let mut i = 0;
     let mut count = 0usize;
     while i < bytes.len() {
-        if count >= MAX_DIFF_FILES {
-            return Err(GitError::Invalid("ls-tree exceeds file ceiling".to_owned()));
+        if count >= MAX_TREE_ENTRIES {
+            return Err(GitError::Invalid(
+                "ls-tree exceeds tree entry ceiling".to_owned(),
+            ));
         }
         let rest = &bytes[i..];
         let Some(nul) = rest.iter().position(|b| *b == 0) else {
@@ -1858,23 +2024,12 @@ fn parse_ls_tree_reject_special(bytes: &[u8]) -> Result<(), GitError> {
 }
 
 fn reject_special_mode(mode: &str) -> Result<(), GitError> {
-    // 120000 symlink, 160000 gitlink
-    if mode == "120000" || mode == "160000" {
-        return Err(GitError::Trust(format!(
-            "special git mode {mode} rejected (symlink/gitlink)"
-        )));
-    }
-    // Also reject unknown non-file/dir/exec modes beyond 100644/100755/040000/000000
+    // Exact allowlist only. 120000 symlink and 160000 gitlink are rejected.
     match mode {
         "100644" | "100755" | "040000" | "000000" | "" => Ok(()),
-        m if m.chars().all(|c| c.is_ascii_digit()) && m.len() == 6 => {
-            // Allow only normal blob modes already listed; anything else fails.
-            if m.starts_with("10") {
-                Ok(())
-            } else {
-                Err(GitError::Trust(format!("unsupported git mode {m}")))
-            }
-        }
+        "120000" | "160000" => Err(GitError::Trust(format!(
+            "special git mode {mode} rejected (symlink/gitlink)"
+        ))),
         other => Err(GitError::Trust(format!("unsupported git mode {other}"))),
     }
 }
@@ -2091,7 +2246,8 @@ fn merge_diff_records(
             manifest.budget.max_added_lines
         )));
     }
-    let deleted_u32 = u32::try_from(deleted_total).unwrap_or(u32::MAX);
+    let deleted_u32 = u32::try_from(deleted_total)
+        .map_err(|_| GitError::Invalid("deleted lines exceed u32".to_owned()))?;
 
     Ok(DiffStats {
         files,
@@ -2101,37 +2257,78 @@ fn merge_diff_records(
     })
 }
 
-fn find_shared_object_pair(
-    ws_objects: &Path,
-    mirror_objects: &Path,
-) -> Result<Option<(PathBuf, PathBuf)>, GitError> {
-    // Walk first fanout directory for a loose object.
-    let entries = match fs::read_dir(ws_objects) {
-        Ok(e) => e,
-        Err(_) => return Ok(None),
-    };
-    for entry in entries.flatten() {
-        let name = entry.file_name();
-        let name_str = name.to_string_lossy();
-        if name_str.len() != 2 || !name_str.chars().all(|c| c.is_ascii_hexdigit()) {
-            continue;
+fn objects_share_with_mirror(ws_objects: &Path, mirror_objects: &Path) -> Result<bool, GitError> {
+    #[cfg(unix)]
+    {
+        // Collect mirror inodes for loose + pack artifacts.
+        let mut mirror_inodes: BTreeSet<(u64, u64)> = BTreeSet::new();
+        collect_object_inodes(mirror_objects, &mut mirror_inodes)?;
+        if mirror_inodes.is_empty() {
+            return Ok(false);
         }
-        let dir = entry.path();
-        if !dir.is_dir() {
-            continue;
-        }
-        for obj in fs::read_dir(&dir).into_iter().flatten().flatten() {
-            if !obj.file_type().map(|t| t.is_file()).unwrap_or(false) {
-                continue;
+        let mut ws_inodes: BTreeSet<(u64, u64)> = BTreeSet::new();
+        collect_object_inodes(ws_objects, &mut ws_inodes)?;
+        for id in &ws_inodes {
+            if mirror_inodes.contains(id) {
+                return Ok(true);
             }
-            let ws_obj = obj.path();
-            let mirror_obj = mirror_objects.join(&name).join(obj.file_name());
-            if mirror_obj.is_file() {
-                return Ok(Some((ws_obj, mirror_obj)));
+        }
+        Ok(false)
+    }
+    #[cfg(not(unix))]
+    {
+        let _ = (ws_objects, mirror_objects);
+        Ok(false)
+    }
+}
+
+#[cfg(unix)]
+fn collect_object_inodes(objects: &Path, out: &mut BTreeSet<(u64, u64)>) -> Result<(), GitError> {
+    use std::os::unix::fs::MetadataExt;
+    if !objects.is_dir() {
+        return Ok(());
+    }
+    // Loose fanout: objects/??/*
+    if let Ok(entries) = fs::read_dir(objects) {
+        for entry in entries.flatten() {
+            let name = entry.file_name();
+            let name_str = name.to_string_lossy();
+            let path = entry.path();
+            if name_str.len() == 2 && name_str.chars().all(|c| c.is_ascii_hexdigit()) {
+                if path.is_dir() {
+                    if let Ok(objs) = fs::read_dir(&path) {
+                        for obj in objs.flatten() {
+                            if obj.file_type().map(|t| t.is_file()).unwrap_or(false) {
+                                let meta = fs::metadata(obj.path())?;
+                                out.insert((meta.dev(), meta.ino()));
+                            }
+                        }
+                    }
+                }
             }
         }
     }
-    Ok(None)
+    // Pack directory: *.pack, *.idx, multi-pack-index, *.rev, *.bitmap
+    let pack_dir = objects.join("pack");
+    if pack_dir.is_dir() {
+        if let Ok(entries) = fs::read_dir(&pack_dir) {
+            for entry in entries.flatten() {
+                let name = entry.file_name().to_string_lossy().into_owned();
+                let lower = name.to_ascii_lowercase();
+                let interesting = lower.ends_with(".pack")
+                    || lower.ends_with(".idx")
+                    || lower.ends_with(".rev")
+                    || lower.ends_with(".bitmap")
+                    || lower == "multi-pack-index"
+                    || lower.starts_with("multi-pack-index");
+                if interesting && entry.file_type().map(|t| t.is_file()).unwrap_or(false) {
+                    let meta = fs::metadata(entry.path())?;
+                    out.insert((meta.dev(), meta.ino()));
+                }
+            }
+        }
+    }
+    Ok(())
 }
 
 fn read_workspace_head_oid(workspace: &Path) -> Result<String, GitError> {
@@ -2265,15 +2462,42 @@ fn sanitize_path_for_error(path: &str) -> String {
         .collect()
 }
 
-/// Public helper used by standalone refresh: verify Git trust only.
+/// Production/CLI helper: locked mirror refresh + HEAD/policy verification.
+///
+/// Does **not** open the candidate DB or acquire CoordinatorLock.
+pub fn refresh_baseline_before_mission<R: ProcessRunner>(
+    config: &RepoEvolverConfig,
+    runner: &R,
+) -> Result<String, GitError> {
+    refresh_baseline_before_mission_with(config, runner, GitAccessMode::Production)
+}
+
+/// Same as [`refresh_baseline_before_mission`] with explicit access mode (tests use LocalFixture).
+pub fn refresh_baseline_before_mission_with<R: ProcessRunner>(
+    config: &RepoEvolverConfig,
+    runner: &R,
+    access: GitAccessMode,
+) -> Result<String, GitError> {
+    let git = GitRepository::open_with(config, runner, access)?;
+    git.refresh_and_resolve_baseline()
+}
+
+/// Verify remote identity + checkout hygiene without refreshing (no mission execution).
 pub fn verify_git_trust<R: ProcessRunner>(
     config: &RepoEvolverConfig,
     runner: &R,
 ) -> Result<(), GitError> {
-    let git = GitRepository::open(config, runner)?;
+    verify_git_trust_with(config, runner, GitAccessMode::Production)
+}
+
+/// Explicit-mode trust check (tests use LocalFixture).
+pub fn verify_git_trust_with<R: ProcessRunner>(
+    config: &RepoEvolverConfig,
+    runner: &R,
+    access: GitAccessMode,
+) -> Result<(), GitError> {
+    let git = GitRepository::open_with(config, runner, access)?;
     git.verify_trust()?;
-    // Also ensure remote identity matches even if checkout dirty check is the main gate.
-    let _ = git.read_and_validate_remote_identity()?;
     Ok(())
 }
 
@@ -2287,6 +2511,7 @@ mod unit_tests {
             "https://user:token@github.com/maximilianwruhs-cyber/GZMO.git",
             "maximilianwruhs-cyber",
             "GZMO",
+            GitAccessMode::Production,
         )
         .unwrap_err();
         let msg = err.to_string();
@@ -2304,6 +2529,7 @@ mod unit_tests {
             "https://gitlab.com/maximilianwruhs-cyber/GZMO.git",
             "maximilianwruhs-cyber",
             "GZMO",
+            GitAccessMode::Production,
         )
         .unwrap_err();
         assert!(err.to_string().contains("github.com"), "{err}");
@@ -2315,19 +2541,65 @@ mod unit_tests {
             "git@github.com:maximilianwruhs-cyber/GZMO.git",
             "maximilianwruhs-cyber",
             "GZMO",
+            GitAccessMode::Production,
         )
         .unwrap();
+        validate_remote_identity(
+            "ssh://git@github.com/maximilianwruhs-cyber/GZMO.git",
+            "maximilianwruhs-cyber",
+            "GZMO",
+            GitAccessMode::Production,
+        )
+        .unwrap();
+        let err = validate_remote_identity(
+            "ssh://other@github.com/maximilianwruhs-cyber/GZMO.git",
+            "maximilianwruhs-cyber",
+            "GZMO",
+            GitAccessMode::Production,
+        )
+        .unwrap_err();
+        assert!(
+            err.to_string().contains("credential") || err.to_string().contains("trust"),
+            "{err}"
+        );
+        let err = validate_remote_identity(
+            "git://github.com/maximilianwruhs-cyber/GZMO.git",
+            "maximilianwruhs-cyber",
+            "GZMO",
+            GitAccessMode::Production,
+        )
+        .unwrap_err();
+        assert!(err.to_string().contains("git://"), "{err}");
     }
 
     #[test]
     fn accepts_local_path_for_hermetic_tests() {
-        validate_remote_identity("/tmp/origin.git", "maximilianwruhs-cyber", "GZMO").unwrap();
+        validate_remote_identity(
+            "/tmp/origin.git",
+            "maximilianwruhs-cyber",
+            "GZMO",
+            GitAccessMode::LocalFixture,
+        )
+        .unwrap();
+        let err = validate_remote_identity(
+            "/tmp/origin.git",
+            "maximilianwruhs-cyber",
+            "GZMO",
+            GitAccessMode::Production,
+        )
+        .unwrap_err();
+        assert!(err.to_string().contains("LocalFixture"), "{err}");
     }
 
     #[test]
     fn accepts_file_url_for_hermetic_tests() {
-        validate_remote_identity("file:///tmp/origin.git", "maximilianwruhs-cyber", "GZMO")
-            .unwrap();
+        validate_remote_identity(
+            "file:///tmp/origin.git",
+            "maximilianwruhs-cyber",
+            "GZMO",
+            GitAccessMode::LocalFixture,
+        )
+        .unwrap();
     }
 
     #[test]
@@ -2345,6 +2617,81 @@ mod unit_tests {
         let stats = merge_diff_records(r, n, &policy, &manifest).unwrap();
         assert_eq!(stats.added_lines, 3);
         assert_eq!(stats.files[0].path, "src/foo.rs");
+    }
+
+    #[test]
+    fn limits_match_plan_ceilings() {
+        assert_eq!(GIT_FETCH_TIMEOUT_SECS, 900);
+        assert_eq!(GIT_TIMEOUT_SECS, 120);
+        assert_eq!(GIT_OUTPUT_CAP_BYTES, 8 * 1024 * 1024);
+        assert!(GIT_DIFF_CAP_BYTES <= 8 * 1024 * 1024);
+        assert!(GIT_BLOB_CAP_BYTES <= GIT_OUTPUT_CAP_BYTES);
+        assert!(MAX_TREE_ENTRIES > MAX_DIFF_FILES);
+    }
+
+    #[test]
+    fn reject_special_mode_exact_allowlist() {
+        reject_special_mode("100644").unwrap();
+        reject_special_mode("100755").unwrap();
+        assert!(reject_special_mode("100000").is_err());
+        assert!(reject_special_mode("101755").is_err());
+        assert!(reject_special_mode("120000").is_err());
+        assert!(reject_special_mode("160000").is_err());
+    }
+
+    #[test]
+    fn deleted_line_overflow_is_error() {
+        let raw = vec![
+            RawDiffEntry {
+                old_mode: "100644".into(),
+                new_mode: "100644".into(),
+                status: 'M',
+                path: "a.rs".into(),
+            },
+            RawDiffEntry {
+                old_mode: "100644".into(),
+                new_mode: "100644".into(),
+                status: 'M',
+                path: "b.rs".into(),
+            },
+        ];
+        let num = vec![
+            NumstatEntry {
+                path: "a.rs".into(),
+                added: Some(0),
+                deleted: Some(u32::MAX),
+                binary: false,
+            },
+            NumstatEntry {
+                path: "b.rs".into(),
+                added: Some(0),
+                deleted: Some(1),
+                binary: false,
+            },
+        ];
+        let policy = PathPolicy {
+            protected_paths: vec!["SECRET/".to_owned()],
+        };
+        let err = merge_diff_records(raw, num, &policy, &dummy_manifest()).unwrap_err();
+        assert!(
+            err.to_string().contains("deleted") || err.to_string().contains("overflow"),
+            "{err}"
+        );
+    }
+
+    #[test]
+    fn default_git_env_denies_file_protocol() {
+        let home = std::env::temp_dir();
+        let env = git_env(&home, false).unwrap();
+        assert_eq!(
+            env.get("GIT_CONFIG_VALUE_4").map(String::as_str),
+            Some("never")
+        );
+        let env = git_env(&home, true).unwrap();
+        assert_eq!(
+            env.get("GIT_CONFIG_VALUE_4").map(String::as_str),
+            Some("always")
+        );
     }
 
     fn dummy_manifest() -> CandidateManifest {
