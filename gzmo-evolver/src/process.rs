@@ -240,11 +240,10 @@ fn run_system(spec: &ProcessSpec) -> Result<ProcessOutput, ProcessError> {
 
         // Once drainers are gone the channel is permanently disconnected; do not
         // call recv again (it returns immediately and would hot-spin). Poll the
-        // child with a single sleep per iteration.
+        // child with a single sleep per iteration. The earlier
+        // `child_status.is_some() && stdout_done && stderr_done` break already
+        // covers exit+EOF, so this branch only runs while the child still lives.
         if stdout_done && stderr_done {
-            if child_status.is_some() {
-                break;
-            }
             thread::sleep(wait);
             continue;
         }
@@ -716,6 +715,36 @@ mod tests {
         assert!(!err.to_string().contains("xxxx"));
     }
 
+    /// Poll until `marker` exists or `deadline` elapses. Returns whether it appeared.
+    fn wait_for_marker(marker: &Path, deadline: Instant) -> bool {
+        while Instant::now() < deadline {
+            if marker.exists() {
+                // Ensure non-empty content is flushed.
+                if let Ok(text) = fs::read_to_string(marker) {
+                    if !text.trim().is_empty() {
+                        return true;
+                    }
+                }
+            }
+            thread::sleep(Duration::from_millis(20));
+        }
+        marker.exists()
+    }
+
+    /// True if `pid` still refers to a live process (ESRCH => gone).
+    fn pid_alive(pid: i32) -> bool {
+        if pid <= 1 {
+            return false;
+        }
+        // Prefer /proc to reduce pid-reuse false positives when the slot is
+        // recycled by an unrelated process quickly after reap.
+        let proc_path = PathBuf::from(format!("/proc/{pid}"));
+        if !proc_path.exists() {
+            return false;
+        }
+        unsafe { libc::kill(pid, 0) == 0 }
+    }
+
     #[test]
     fn system_runner_timeout_kills_child_and_grandchild() {
         let dir = TempDir::new().unwrap();
@@ -726,6 +755,7 @@ mod tests {
             &format!(
                 r#"#!/bin/bash
 set -euo pipefail
+# TERM/HUP-ignoring descendant records its own pid, then hangs.
 python3 - <<'PY' &
 import os, signal, time
 from pathlib import Path
@@ -740,34 +770,50 @@ wait
                 marker = marker.display()
             ),
         );
+        // Spec timeout long enough for python cold-start on a loaded host, still
+        // far below a hung-forever hang.
+        let timeout = Duration::from_secs(2);
         let spec = ProcessSpec::new(
             "/bin/bash",
             [script.to_string_lossy().into_owned()],
             dir.path(),
             base_env(),
             64 * 1024,
-            Duration::from_millis(400),
+            timeout,
         )
         .unwrap();
         let started = Instant::now();
         let err = SystemProcessRunner.run(&spec).unwrap_err();
+        let elapsed = started.elapsed();
         assert!(
             matches!(err, ProcessError::Timeout { .. }),
             "expected timeout, got {err:?}"
         );
         assert!(
-            started.elapsed() < Duration::from_secs(3),
-            "timeout path took too long: {:?}",
-            started.elapsed()
+            elapsed < timeout + Duration::from_secs(2),
+            "timeout path took too long: {elapsed:?}"
         );
-        thread::sleep(Duration::from_millis(200));
-        assert!(marker.exists(), "grandchild must have written its pid");
+        assert!(
+            elapsed >= timeout.saturating_sub(Duration::from_millis(200)),
+            "elapsed {elapsed:?} finished before product deadline {timeout:?}"
+        );
+
+        // Bounded readiness poll (no fixed cold-start sleep).
+        let ready_deadline = Instant::now() + Duration::from_secs(2);
+        assert!(
+            wait_for_marker(&marker, ready_deadline),
+            "grandchild must have written its pid within readiness window"
+        );
         let pid_text = fs::read_to_string(&marker).unwrap();
         let pid: i32 = pid_text.trim().parse().expect("pid");
         assert!(pid > 1);
-        let still_alive = unsafe { libc::kill(pid, 0) == 0 };
+        // Give the kernel a moment after killpg/wait, then require gone.
+        let dead_deadline = Instant::now() + Duration::from_secs(2);
+        while pid_alive(pid) && Instant::now() < dead_deadline {
+            thread::sleep(Duration::from_millis(20));
+        }
         assert!(
-            !still_alive,
+            !pid_alive(pid),
             "grandchild pid {pid} still alive after group kill"
         );
     }
@@ -782,8 +828,24 @@ wait
             &format!(
                 r#"#!/bin/bash
 set -euo pipefail
-# Record this process's pid, then close pipes and hang (descendant of bash).
-echo $$ > "{marker}"
+# Real descendant (not $$): ignores TERM/HUP, writes its own pid, then hangs.
+python3 - <<'PY' &
+import os, signal, time
+from pathlib import Path
+signal.signal(signal.SIGTERM, signal.SIG_IGN)
+signal.signal(signal.SIGHUP, signal.SIG_IGN)
+Path(r"{marker}").write_text(str(os.getpid()))
+while True:
+    time.sleep(0.2)
+PY
+# Script-side readiness: wait until the descendant has recorded its pid
+# before closing pipes, so the runner's wall clock still covers a closed-pipe hang.
+for _ in $(seq 1 100); do
+  if [ -s "{marker}" ]; then
+    break
+  fi
+  sleep 0.05
+done
 exec 1>&-
 exec 2>&-
 sleep 60
@@ -791,7 +853,9 @@ sleep 60
                 marker = marker.display()
             ),
         );
-        let timeout = Duration::from_millis(500);
+        // Product timeout: must still fire after pipes close; leave headroom for
+        // descendant cold-start inside the script readiness loop.
+        let timeout = Duration::from_secs(2);
         let spec = ProcessSpec::new(
             "/bin/bash",
             [script.to_string_lossy().into_owned()],
@@ -809,26 +873,30 @@ sleep 60
             "expected Timeout after closed pipes, got {err:?} elapsed={elapsed:?}"
         );
         assert!(
-            elapsed < Duration::from_secs(5),
+            elapsed < timeout + Duration::from_secs(2),
             "elapsed {elapsed:?} exceeded deadline bound"
         );
+        // Strict product timeout: wall clock must reach near the configured timeout.
         assert!(
-            elapsed >= timeout.saturating_sub(Duration::from_millis(100)),
-            "elapsed {elapsed:?} finished before deadline {timeout:?}"
+            elapsed >= timeout.saturating_sub(Duration::from_millis(200)),
+            "elapsed {elapsed:?} finished before product deadline {timeout:?}"
         );
 
-        // Causal reaping: descendant pid must have been written and must be gone.
+        // Bounded readiness poll for the descendant marker (not the direct child).
+        let ready_deadline = Instant::now() + Duration::from_secs(2);
         assert!(
-            marker.exists(),
-            "closed-pipes child must write descendant pid before hanging"
+            wait_for_marker(&marker, ready_deadline),
+            "closed-pipes descendant must write its own pid within readiness window"
         );
         let pid_text = fs::read_to_string(&marker).unwrap();
         let pid: i32 = pid_text.trim().parse().expect("descendant pid");
         assert!(pid > 1, "invalid pid {pid}");
-        thread::sleep(Duration::from_millis(100));
-        let still_alive = unsafe { libc::kill(pid, 0) == 0 };
+        let dead_deadline = Instant::now() + Duration::from_secs(2);
+        while pid_alive(pid) && Instant::now() < dead_deadline {
+            thread::sleep(Duration::from_millis(20));
+        }
         assert!(
-            !still_alive,
+            !pid_alive(pid),
             "descendant pid {pid} still alive after closed-pipes timeout kill/reap"
         );
     }
