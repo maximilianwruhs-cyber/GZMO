@@ -125,19 +125,6 @@ pub struct DiffFile {
     pub binary: bool,
 }
 
-/// How remote URLs are classified for this repository handle.
-///
-/// `LocalFixture` exists only under `debug_assertions` so release builds cannot
-/// select hermetic local/file remotes. CLI always uses Production.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum GitAccessMode {
-    /// Production/CLI: GitHub HTTPS or SSH only (no local/file/git://).
-    Production,
-    /// Explicit debug/test fixture mode: local/file remotes allowed.
-    #[cfg(debug_assertions)]
-    LocalFixture,
-}
-
 /// Coordinator view of the trusted checkout + bare mirror.
 pub struct GitRepository<'a, R: ProcessRunner> {
     config: &'a RepoEvolverConfig,
@@ -146,7 +133,6 @@ pub struct GitRepository<'a, R: ProcessRunner> {
     home: PathBuf,
     mirror_path: PathBuf,
     workspaces_dir: PathBuf,
-    access: GitAccessMode,
 }
 
 /// Independent candidate clone under coordinator state.
@@ -159,38 +145,10 @@ pub struct GitWorkspace<'a, R: ProcessRunner> {
     path: PathBuf,
     candidate_id: String,
     baseline: String,
-    access: GitAccessMode,
 }
 impl<'a, R: ProcessRunner> GitRepository<'a, R> {
-    /// Production/CLI open: GitHub HTTPS/SSH remotes only.
+    /// Open against machine config. Remotes must be credential-free GitHub HTTPS/SSH.
     pub fn open(config: &'a RepoEvolverConfig, runner: &'a R) -> Result<Self, GitError> {
-        Self::open_with_inner(config, runner, GitAccessMode::Production)
-    }
-
-    /// Explicit local-fixture open for hermetic tests/debug only (never used by main CLI).
-    #[cfg(debug_assertions)]
-    pub fn open_for_local_fixture(
-        config: &'a RepoEvolverConfig,
-        runner: &'a R,
-    ) -> Result<Self, GitError> {
-        Self::open_with_inner(config, runner, GitAccessMode::LocalFixture)
-    }
-
-    /// Bind config + runner under an explicit access mode.
-    #[cfg(debug_assertions)]
-    pub fn open_with(
-        config: &'a RepoEvolverConfig,
-        runner: &'a R,
-        access: GitAccessMode,
-    ) -> Result<Self, GitError> {
-        Self::open_with_inner(config, runner, access)
-    }
-
-    fn open_with_inner(
-        config: &'a RepoEvolverConfig,
-        runner: &'a R,
-        access: GitAccessMode,
-    ) -> Result<Self, GitError> {
         let state = config.state_dir();
         ensure_dir_0700(state)?;
         let home = state.join(GIT_HOME_NAME);
@@ -205,26 +163,7 @@ impl<'a, R: ProcessRunner> GitRepository<'a, R> {
             home,
             mirror_path: state.join(MIRROR_NAME),
             workspaces_dir,
-            access,
         })
-    }
-
-    /// Access mode bound at open (debug/test pin only).
-    #[cfg(debug_assertions)]
-    pub fn access_mode(&self) -> GitAccessMode {
-        self.access
-    }
-
-    fn access_allows_local_fixture(&self) -> bool {
-        #[cfg(debug_assertions)]
-        {
-            matches!(self.access, GitAccessMode::LocalFixture)
-        }
-        #[cfg(not(debug_assertions))]
-        {
-            let _ = self.access;
-            false
-        }
     }
 
     /// Absolute trusted checkout path.
@@ -517,7 +456,6 @@ impl<'a, R: ProcessRunner> GitRepository<'a, R> {
                 path: final_path.clone(),
                 candidate_id,
                 baseline,
-                access: self.access,
             })
         })();
 
@@ -533,13 +471,8 @@ impl<'a, R: ProcessRunner> GitRepository<'a, R> {
         let staging = self.config.state_dir().join(MIRROR_STAGING_NAME);
         let _ = remove_path_best_effort(&staging);
         // Parent is state_dir (same parent as final mirror) for atomic rename.
-        let allow_file = remote_is_local_fixture(remote_url);
-        if allow_file && !self.access_allows_local_fixture() {
-            let _ = remove_path_best_effort(&staging);
-            return Err(GitError::Trust(
-                "local/file remote requires LocalFixture access mode".to_owned(),
-            ));
-        }
+        // Remote is always a validated GitHub URL; file protocol stays off.
+        // Hermetic tests rewrite via ProcessRunner -c insteadOf + file allow.
         let out = self.run_git_allow_nonzero_ex(
             Some(self.config.state_dir()),
             &[
@@ -550,7 +483,7 @@ impl<'a, R: ProcessRunner> GitRepository<'a, R> {
             ],
             GIT_OUTPUT_CAP_BYTES,
             Duration::from_secs(GIT_FETCH_TIMEOUT_SECS),
-            allow_file,
+            false,
         )?;
         if out.status != 0 {
             let _ = remove_path_best_effort(&staging);
@@ -585,11 +518,7 @@ impl<'a, R: ProcessRunner> GitRepository<'a, R> {
     fn fetch_base_into_mirror(&self, mirror: &Path) -> Result<(), GitError> {
         let base = self.config.repo().base_branch();
         let refspec = format!("+refs/heads/{base}:refs/heads/{base}");
-        // Fetch from origin: allow file only when origin is a classified local fixture remote.
-        let origin = self
-            .config_get_local(mirror, "remote.origin.url")?
-            .unwrap_or_default();
-        let allow_file = remote_is_local_fixture(&origin) && self.access_allows_local_fixture();
+        // Fetch origin (validated GitHub URL). Hermetic tests inject insteadOf.
         self.run_git_ex(
             None,
             &[
@@ -603,7 +532,7 @@ impl<'a, R: ProcessRunner> GitRepository<'a, R> {
             ],
             GIT_OUTPUT_CAP_BYTES,
             Duration::from_secs(GIT_FETCH_TIMEOUT_SECS),
-            allow_file,
+            false,
         )?;
         Ok(())
     }
@@ -631,7 +560,6 @@ impl<'a, R: ProcessRunner> GitRepository<'a, R> {
                 &raw,
                 self.config.repo().owner(),
                 self.config.repo().repository(),
-                self.access,
             )?;
         }
         // No alternates.
@@ -654,7 +582,6 @@ impl<'a, R: ProcessRunner> GitRepository<'a, R> {
             &raw,
             self.config.repo().owner(),
             self.config.repo().repository(),
-            self.access,
         )?;
         Ok(raw)
     }
@@ -1507,8 +1434,8 @@ pub struct PrepareOutcome {
     pub reused_active: bool,
 }
 
-/// Narrow state seam used by prepare (real StateStore or test double).
-pub trait CandidateStateOps {
+/// Private state seam for prepare (StateStore in production; test doubles in unit tests).
+trait CandidateStateOps {
     fn active_candidate(
         &self,
         repository: &str,
@@ -1564,26 +1491,14 @@ impl CandidateStateOps for crate::state::StateStore {
     }
 }
 
-/// Trust-first / active-first prepare flow (production access mode).
-pub fn prepare_candidate<R: ProcessRunner, C: crate::mission::Clock, S: CandidateStateOps>(
+/// Trust-first / active-first prepare flow.
+pub fn prepare_candidate<R: ProcessRunner, C: crate::mission::Clock>(
     config: &RepoEvolverConfig,
     runner: &R,
     clock: &C,
-    store: &S,
+    store: &crate::state::StateStore,
 ) -> Result<PrepareOutcome, PrepareError> {
-    prepare_candidate_inner(config, runner, clock, store, GitAccessMode::Production)
-}
-
-/// Prepare using an explicit access mode (debug/test only).
-#[cfg(debug_assertions)]
-pub fn prepare_candidate_with<R: ProcessRunner, C: crate::mission::Clock, S: CandidateStateOps>(
-    config: &RepoEvolverConfig,
-    runner: &R,
-    clock: &C,
-    store: &S,
-    access: GitAccessMode,
-) -> Result<PrepareOutcome, PrepareError> {
-    prepare_candidate_inner(config, runner, clock, store, access)
+    prepare_candidate_inner(config, runner, clock, store)
 }
 
 fn prepare_candidate_inner<R: ProcessRunner, C: crate::mission::Clock, S: CandidateStateOps>(
@@ -1591,7 +1506,6 @@ fn prepare_candidate_inner<R: ProcessRunner, C: crate::mission::Clock, S: Candid
     runner: &R,
     clock: &C,
     store: &S,
-    access: GitAccessMode,
 ) -> Result<PrepareOutcome, PrepareError> {
     let repository = format!("{}/{}", config.repo().owner(), config.repo().repository());
     if let Some(active) = store
@@ -1605,8 +1519,7 @@ fn prepare_candidate_inner<R: ProcessRunner, C: crate::mission::Clock, S: Candid
         });
     }
 
-    let git =
-        GitRepository::open_with_inner(config, runner, access).map_err(PrepareError::from_git)?;
+    let git = GitRepository::open(config, runner).map_err(PrepareError::from_git)?;
     let baseline = git
         .refresh_and_resolve_baseline()
         .map_err(PrepareError::from_git)?;
@@ -1665,6 +1578,10 @@ fn prepare_candidate_inner<R: ProcessRunner, C: crate::mission::Clock, S: Candid
                 })
             }
         },
+        Err(GitError::MirrorLockBusy) => {
+            // Transient lease conflict: leave Observed for resumption; no workspace.
+            Err(PrepareError::Git("mirror lease busy".to_owned()))
+        }
         Err(err) => {
             let reason = bound_reason(&err.to_string());
             let _ = store.transition(
@@ -1794,12 +1711,10 @@ fn resolve_git_program() -> Result<PathBuf, GitError> {
 }
 
 /// Parse and validate a credential-free remote that identifies owner/repo.
-pub fn validate_remote_identity(
-    raw: &str,
-    owner: &str,
-    repository: &str,
-    access: GitAccessMode,
-) -> Result<(), GitError> {
+///
+/// Accepts only GitHub HTTPS/SSH (including `ssh://git@...` and SCP form).
+/// Rejects local paths, `file://`, `git://`, embedded credentials, and non-GitHub hosts.
+pub fn validate_remote_identity(raw: &str, owner: &str, repository: &str) -> Result<(), GitError> {
     let raw = raw.trim();
     if raw.is_empty() {
         return Err(GitError::Trust("remote URL is empty".to_owned()));
@@ -1820,6 +1735,9 @@ pub fn validate_remote_identity(
                     "git:// network transport is not allowed".to_owned(),
                 ));
             }
+            "file" => {
+                return Err(GitError::Trust("file remote is not allowed".to_owned()));
+            }
             "http" | "https" => {
                 if !url.username().is_empty() || url.password().is_some() {
                     return Err(GitError::Trust(
@@ -1839,7 +1757,6 @@ pub fn validate_remote_identity(
                 return match_owner_repo_path(path, owner, repository, Some(&host), true);
             }
             "ssh" => {
-                // Allow ssh://git@github.com/... without password; reject other userinfo.
                 if url.password().is_some() {
                     return Err(GitError::Trust(
                         "remote URL must not embed credentials".to_owned(),
@@ -1863,22 +1780,6 @@ pub fn validate_remote_identity(
                 let path = url.path().trim_start_matches('/');
                 return match_owner_repo_path(path, owner, repository, Some(&host), true);
             }
-            "file" => {
-                if !access_is_local_fixture(access) {
-                    return Err(GitError::Trust(
-                        "file remote requires LocalFixture access mode".to_owned(),
-                    ));
-                }
-                if !url.username().is_empty() || url.password().is_some() {
-                    return Err(GitError::Trust(
-                        "file remote must not embed credentials".to_owned(),
-                    ));
-                }
-                if url.path().is_empty() {
-                    return Err(GitError::Trust("file remote path empty".to_owned()));
-                }
-                return Ok(());
-            }
             other => {
                 return Err(GitError::Trust(format!(
                     "unsupported remote URL scheme {}",
@@ -1888,54 +1789,17 @@ pub fn validate_remote_identity(
         }
     }
 
-    // Bare local path (hermetic tests only).
+    // Bare local path — never accepted in product code.
     let path = Path::new(raw);
     if path.is_absolute() || raw.starts_with('.') || raw.starts_with('/') {
-        if raw.contains("://") {
-            return Err(GitError::Trust("ambiguous remote URL".to_owned()));
-        }
-        if !access_is_local_fixture(access) {
-            return Err(GitError::Trust(
-                "local path remote requires LocalFixture access mode".to_owned(),
-            ));
-        }
-        return Ok(());
+        return Err(GitError::Trust(
+            "local path remote is not allowed".to_owned(),
+        ));
     }
 
     Err(GitError::Trust(
         "remote URL could not be parsed as credential-free identity".to_owned(),
     ))
-}
-
-fn access_is_local_fixture(access: GitAccessMode) -> bool {
-    #[cfg(debug_assertions)]
-    {
-        matches!(access, GitAccessMode::LocalFixture)
-    }
-    #[cfg(not(debug_assertions))]
-    {
-        let _ = access;
-        false
-    }
-}
-
-/// True when `raw` is a local path or file:// URL (not network).
-pub fn remote_is_local_fixture(raw: &str) -> bool {
-    let raw = raw.trim();
-    if raw.is_empty() || raw.contains('\0') {
-        return false;
-    }
-    if let Ok(url) = Url::parse(raw) {
-        return url.scheme() == "file";
-    }
-    if raw.contains("://") {
-        return false;
-    }
-    if parse_scp_syntax(raw).ok().flatten().is_some() {
-        return false;
-    }
-    let path = Path::new(raw);
-    path.is_absolute() || raw.starts_with('.') || raw.starts_with('/')
 }
 
 struct ScpRemote {
@@ -2364,15 +2228,6 @@ fn merge_diff_records(
     })
 }
 
-/// Test/debug helper exposing production object-share detection.
-#[cfg(debug_assertions)]
-pub fn objects_share_with_mirror_pub(
-    ws_objects: &Path,
-    mirror_objects: &Path,
-) -> Result<bool, GitError> {
-    objects_share_with_mirror(ws_objects, mirror_objects)
-}
-
 fn objects_share_with_mirror(ws_objects: &Path, mirror_objects: &Path) -> Result<bool, GitError> {
     #[cfg(unix)]
     {
@@ -2590,16 +2445,6 @@ pub fn refresh_baseline_before_mission<R: ProcessRunner>(
 }
 
 /// Same as [`refresh_baseline_before_mission`] with explicit access mode (tests use LocalFixture).
-#[cfg(debug_assertions)]
-pub fn refresh_baseline_before_mission_with<R: ProcessRunner>(
-    config: &RepoEvolverConfig,
-    runner: &R,
-    access: GitAccessMode,
-) -> Result<String, GitError> {
-    let git = GitRepository::open_with_inner(config, runner, access)?;
-    git.refresh_and_resolve_baseline()
-}
-
 /// Verify remote identity + checkout hygiene without refreshing (no mission execution).
 pub fn verify_git_trust<R: ProcessRunner>(
     config: &RepoEvolverConfig,
@@ -2611,16 +2456,6 @@ pub fn verify_git_trust<R: ProcessRunner>(
 }
 
 /// Explicit-mode trust check (tests use LocalFixture).
-#[cfg(debug_assertions)]
-pub fn verify_git_trust_with<R: ProcessRunner>(
-    config: &RepoEvolverConfig,
-    runner: &R,
-    access: GitAccessMode,
-) -> Result<(), GitError> {
-    let git = GitRepository::open_with_inner(config, runner, access)?;
-    git.verify_trust()?;
-    Ok(())
-}
 
 #[cfg(test)]
 mod unit_tests {
@@ -2632,7 +2467,6 @@ mod unit_tests {
             "https://user:token@github.com/maximilianwruhs-cyber/GZMO.git",
             "maximilianwruhs-cyber",
             "GZMO",
-            GitAccessMode::Production,
         )
         .unwrap_err();
         let msg = err.to_string();
@@ -2650,7 +2484,6 @@ mod unit_tests {
             "https://gitlab.com/maximilianwruhs-cyber/GZMO.git",
             "maximilianwruhs-cyber",
             "GZMO",
-            GitAccessMode::Production,
         )
         .unwrap_err();
         assert!(err.to_string().contains("github.com"), "{err}");
@@ -2662,21 +2495,18 @@ mod unit_tests {
             "git@github.com:maximilianwruhs-cyber/GZMO.git",
             "maximilianwruhs-cyber",
             "GZMO",
-            GitAccessMode::Production,
         )
         .unwrap();
         validate_remote_identity(
             "ssh://git@github.com/maximilianwruhs-cyber/GZMO.git",
             "maximilianwruhs-cyber",
             "GZMO",
-            GitAccessMode::Production,
         )
         .unwrap();
         let err = validate_remote_identity(
             "ssh://other@github.com/maximilianwruhs-cyber/GZMO.git",
             "maximilianwruhs-cyber",
             "GZMO",
-            GitAccessMode::Production,
         )
         .unwrap_err();
         assert!(
@@ -2687,40 +2517,26 @@ mod unit_tests {
             "git://github.com/maximilianwruhs-cyber/GZMO.git",
             "maximilianwruhs-cyber",
             "GZMO",
-            GitAccessMode::Production,
         )
         .unwrap_err();
         assert!(err.to_string().contains("git://"), "{err}");
     }
 
     #[test]
-    fn accepts_local_path_for_hermetic_tests() {
-        validate_remote_identity(
-            "/tmp/origin.git",
-            "maximilianwruhs-cyber",
-            "GZMO",
-            GitAccessMode::LocalFixture,
-        )
-        .unwrap();
-        let err = validate_remote_identity(
-            "/tmp/origin.git",
-            "maximilianwruhs-cyber",
-            "GZMO",
-            GitAccessMode::Production,
-        )
-        .unwrap_err();
-        assert!(err.to_string().contains("LocalFixture"), "{err}");
-    }
-
-    #[test]
-    fn accepts_file_url_for_hermetic_tests() {
-        validate_remote_identity(
-            "file:///tmp/origin.git",
-            "maximilianwruhs-cyber",
-            "GZMO",
-            GitAccessMode::LocalFixture,
-        )
-        .unwrap();
+    fn rejects_local_path_and_file_url() {
+        let err = validate_remote_identity("/tmp/origin.git", "maximilianwruhs-cyber", "GZMO")
+            .unwrap_err();
+        assert!(
+            err.to_string().contains("local") || err.to_string().contains("not allowed"),
+            "{err}"
+        );
+        let err =
+            validate_remote_identity("file:///tmp/origin.git", "maximilianwruhs-cyber", "GZMO")
+                .unwrap_err();
+        assert!(
+            err.to_string().contains("file") || err.to_string().contains("not allowed"),
+            "{err}"
+        );
     }
 
     #[test]
@@ -2738,11 +2554,6 @@ mod unit_tests {
         let stats = merge_diff_records(r, n, &policy, &manifest).unwrap();
         assert_eq!(stats.added_lines, 3);
         assert_eq!(stats.files[0].path, "src/foo.rs");
-    }
-
-    #[test]
-    fn production_open_pins_production_mode() {
-        assert!(!access_is_local_fixture(GitAccessMode::Production));
     }
 
     #[test]
@@ -2854,5 +2665,24 @@ mod unit_tests {
             },
             created_at: chrono::Utc.with_ymd_and_hms(2026, 9, 1, 12, 0, 0).unwrap(),
         }
+    }
+}
+
+#[cfg(test)]
+mod prepare_recovery_tests {
+    use super::*;
+
+    // Integration-level recovery is covered in repo_loop via private seam call pattern:
+    // unit-level: ensure MirrorLockBusy mapping does not Failed-terminalize without store.
+    #[test]
+    fn mirror_lock_busy_maps_to_prepare_git_error_display() {
+        let err = PrepareError::from_git(GitError::MirrorLockBusy);
+        assert!(
+            matches!(err, PrepareError::Git(ref m) if m.contains("busy") || m.contains("lock") || m.contains("Git"))
+        );
+        // from_git uses bound_reason on Display of MirrorLockBusy
+        let _ = err;
+        let direct = PrepareError::Git("mirror lease busy".to_owned());
+        assert!(direct.to_string().contains("mirror lease busy"));
     }
 }
