@@ -22,6 +22,39 @@ pub const STATE_DB_NAME: &str = "state.db";
 pub const RUNNER_LOCK_NAME: &str = "runner.lock";
 /// Maximum UTF-8 byte length for a terminal reason.
 pub const MAX_TERMINAL_REASON_BYTES: usize = 4096;
+/// Schema version written via `PRAGMA user_version` for this task's layout.
+pub const STATE_SCHEMA_VERSION: i32 = 1;
+/// SQLite `application_id` identifying the evolver state database.
+pub const STATE_APPLICATION_ID: i32 = 0x475a_4d4f; // 'GZMO'
+
+const CANDIDATES_SQL: &str = "CREATE TABLE candidates (
+  id TEXT PRIMARY KEY,
+  repository TEXT NOT NULL,
+  manifest_json TEXT NOT NULL,
+  manifest_digest TEXT NOT NULL,
+  policy_digest TEXT NOT NULL,
+  state TEXT NOT NULL CHECK (state IN (
+    'observed','prepared','building','evaluating','rejected',
+    'review_ready','promotion_pending','soaking','accepted','rolled_back','failed'
+  )),
+  workspace TEXT,
+  candidate_digest TEXT,
+  terminal_reason TEXT,
+  worker_receipt_json TEXT,
+  receipt_digest TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+)";
+
+const ONE_ACTIVE_INDEX_SQL: &str = "CREATE UNIQUE INDEX one_active_candidate
+ON candidates(repository)
+WHERE state NOT IN ('rejected','accepted','rolled_back','failed')";
+
+const AUDIT_EVENTS_SQL: &str = "CREATE TABLE audit_events (
+  sequence INTEGER PRIMARY KEY,
+  event_json TEXT NOT NULL,
+  event_hash TEXT NOT NULL UNIQUE
+)";
 
 const SCHEMA_SQL: &str = r#"
 CREATE TABLE IF NOT EXISTS candidates (
@@ -71,12 +104,18 @@ pub enum StateError {
     /// Illegal lifecycle edge or metadata set-once violation.
     #[error("illegal transition: {0}")]
     IllegalTransition(String),
+    /// Repository already has a nonterminal candidate.
+    #[error("repository already has a nonterminal candidate: {0}")]
+    AlreadyActive(String),
     /// Coordinator lease is held by another process.
     #[error("coordinator lock busy")]
     LockBusy,
     /// Read-only store rejected a mutating call.
     #[error("state store is read-only")]
     ReadOnly,
+    /// Mutating write lost a race against another connection.
+    #[error("state write contention: {0}")]
+    Contention(String),
     /// Underlying evolution contract validation failed.
     #[error(transparent)]
     Contract(#[from] ContractError),
@@ -87,7 +126,11 @@ pub enum StateError {
 
 impl From<rusqlite::Error> for StateError {
     fn from(value: rusqlite::Error) -> Self {
-        Self::Db(value.to_string())
+        if is_busy_or_locked(&value) {
+            Self::Contention(value.to_string())
+        } else {
+            Self::Db(value.to_string())
+        }
     }
 }
 
@@ -177,6 +220,12 @@ impl TransitionMetadata {
         }
 
         if let Some(ws) = &self.workspace {
+            if ws.to_str().is_none() {
+                return Err(StateError::Invalid(format!(
+                    "workspace must be valid UTF-8, got {}",
+                    ws.display()
+                )));
+            }
             if !ws.is_absolute() {
                 return Err(StateError::Invalid(format!(
                     "workspace must be absolute, got {}",
@@ -318,13 +367,14 @@ impl CoordinatorLock {
     pub fn try_acquire(state_dir: impl AsRef<Path>) -> Result<Self, StateError> {
         let state_dir = state_dir.as_ref();
         if !state_dir.exists() {
-            fs::create_dir_all(state_dir).map_err(|err| StateError::Io(err.to_string()))?;
+            create_dir_0700(state_dir)?;
+        } else {
             set_dir_mode_0700(state_dir)?;
         }
         let lock_path = state_dir.join(RUNNER_LOCK_NAME);
         let file = open_lock_file(&lock_path)?;
         file.try_lock_exclusive().map_err(|err| {
-            if err.kind() == std::io::ErrorKind::WouldBlock {
+            if err.raw_os_error() == fs2::lock_contended_error().raw_os_error() {
                 StateError::LockBusy
             } else {
                 StateError::Io(err.to_string())
@@ -335,9 +385,12 @@ impl CoordinatorLock {
 }
 
 /// Coordinator candidate + audit persistence.
+#[derive(Debug)]
 pub struct StateStore {
     conn: Connection,
     readonly: bool,
+    /// Optional path used to chmod WAL/SHM sidecars after open.
+    db_path: Option<PathBuf>,
 }
 
 impl StateStore {
@@ -346,18 +399,20 @@ impl StateStore {
     /// Does **not** acquire the coordinator lease.
     pub fn open(state_dir: impl AsRef<Path>) -> Result<Self, StateError> {
         let state_dir = state_dir.as_ref();
-        fs::create_dir_all(state_dir).map_err(|err| StateError::Io(err.to_string()))?;
-        set_dir_mode_0700(state_dir)?;
+        create_dir_0700(state_dir)?;
 
         let db_path = state_dir.join(STATE_DB_NAME);
+        ensure_regular_db_file_0600(&db_path)?;
         let conn = Connection::open(&db_path).map_err(|err| StateError::Db(err.to_string()))?;
         configure_connection(&conn)?;
-        conn.execute_batch(SCHEMA_SQL)?;
+        initialize_or_verify_schema(&conn)?;
         set_file_mode_0600(&db_path)?;
+        set_sidecar_modes_0600(&db_path)?;
 
         Ok(Self {
             conn,
             readonly: false,
+            db_path: Some(db_path),
         })
     }
 
@@ -371,17 +426,19 @@ impl StateStore {
         if !state_dir.exists() || !db_path.exists() {
             return Ok(None);
         }
+        reject_nonregular_db(&db_path)?;
         let conn = Connection::open_with_flags(
             &db_path,
             rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY | rusqlite::OpenFlags::SQLITE_OPEN_NO_MUTEX,
         )
         .map_err(|err| StateError::Db(err.to_string()))?;
-        // Read-only connections still honor busy_timeout / FK; WAL query is fine.
         conn.busy_timeout(std::time::Duration::from_millis(5000))?;
         conn.pragma_update(None, "foreign_keys", "ON")?;
+        verify_schema(&conn)?;
         Ok(Some(Self {
             conn,
             readonly: true,
+            db_path: Some(db_path),
         }))
     }
 
@@ -389,10 +446,11 @@ impl StateStore {
     pub fn open_in_memory() -> Result<Self, StateError> {
         let conn = Connection::open_in_memory().map_err(|err| StateError::Db(err.to_string()))?;
         configure_connection(&conn)?;
-        conn.execute_batch(SCHEMA_SQL)?;
+        initialize_or_verify_schema(&conn)?;
         Ok(Self {
             conn,
             readonly: false,
+            db_path: None,
         })
     }
 
@@ -414,64 +472,67 @@ impl StateStore {
         let state = CandidateState::Observed;
         let state_text = state.to_string();
 
-        let tx = self
-            .conn
-            .unchecked_transaction()
-            .map_err(|err| StateError::Db(err.to_string()))?;
+        begin_immediate(&self.conn)?;
+        let result = (|| -> Result<CandidateRecord, StateError> {
+            let insert = self.conn.execute(
+                r#"
+                INSERT INTO candidates (
+                  id, repository, manifest_json, manifest_digest, policy_digest, state,
+                  workspace, candidate_digest, terminal_reason, worker_receipt_json, receipt_digest,
+                  created_at, updated_at
+                ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, NULL, NULL, NULL, NULL, NULL, ?7, ?7)
+                "#,
+                params![
+                    manifest.id.as_str(),
+                    repository,
+                    manifest_json,
+                    manifest_digest,
+                    policy_digest,
+                    state_text,
+                    now_text,
+                ],
+            );
+            match insert {
+                Ok(1) => {}
+                Ok(n) => {
+                    return Err(StateError::Db(format!(
+                        "expected 1 inserted candidate row, got {n}"
+                    )));
+                }
+                Err(err) if is_active_candidate_violation(&err) => {
+                    return Err(StateError::AlreadyActive(repository.clone()));
+                }
+                Err(err) => return Err(err.into()),
+            }
 
-        let insert = tx.execute(
-            r#"
-            INSERT INTO candidates (
-              id, repository, manifest_json, manifest_digest, policy_digest, state,
-              workspace, candidate_digest, terminal_reason, worker_receipt_json, receipt_digest,
-              created_at, updated_at
-            ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, NULL, NULL, NULL, NULL, NULL, ?7, ?7)
-            "#,
-            params![
-                manifest.id.as_str(),
-                repository,
-                manifest_json,
-                manifest_digest,
+            let payload = LifecyclePayload {
+                candidate_id: manifest.id.as_str(),
+                from_state: None,
+                to_state: state_text.as_str(),
                 policy_digest,
-                state_text,
-                now_text,
-            ],
-        );
-        match insert {
-            Ok(1) => {}
-            Ok(n) => {
-                return Err(StateError::Db(format!(
-                    "expected 1 inserted candidate row, got {n}"
-                )));
+                workspace: None,
+                candidate_digest: None,
+                receipt_digest: None,
+                terminal_reason: None,
+            };
+            append_audit_event(
+                &self.conn,
+                Some(manifest.id.clone()),
+                "candidate.observed",
+                &payload,
+                now,
+            )?;
+            self.conn.execute_batch("COMMIT")?;
+            if let Some(path) = &self.db_path {
+                let _ = set_sidecar_modes_0600(path);
             }
-            Err(err) if is_unique_violation(&err) => {
-                return Err(StateError::IllegalTransition(format!(
-                    "repository {repository} already has a nonterminal candidate"
-                )));
-            }
-            Err(err) => return Err(err.into()),
+            load_record_verified(&self.conn, &manifest.id)
+        })();
+
+        if result.is_err() {
+            let _ = self.conn.execute_batch("ROLLBACK");
         }
-
-        let payload = LifecyclePayload {
-            candidate_id: manifest.id.as_str(),
-            from_state: None,
-            to_state: state_text.as_str(),
-            policy_digest,
-            workspace: None,
-            candidate_digest: None,
-            receipt_digest: None,
-            terminal_reason: None,
-        };
-        append_audit_event(
-            &tx,
-            Some(manifest.id.clone()),
-            "candidate.observed",
-            &payload,
-            now,
-        )?;
-
-        tx.commit()?;
-        self.load(&manifest.id)
+        result
     }
 
     /// Apply a legal lifecycle transition and append a matching audit event atomically.
@@ -485,100 +546,115 @@ impl StateStore {
         self.require_mutable()?;
         metadata.validate_shape()?;
 
-        let tx = self
-            .conn
-            .unchecked_transaction()
-            .map_err(|err| StateError::Db(err.to_string()))?;
-
-        let current = load_record_in_tx(&tx, id)?;
-        if !current.state.can_transition_to(next) {
-            return Err(StateError::IllegalTransition(format!(
-                "{} cannot transition from {} to {}",
-                id.as_str(),
-                current.state,
-                next
-            )));
-        }
-
-        validate_terminal_reason_rules(next, metadata.terminal_reason())?;
-        let workspace = merge_set_once_path(
-            "workspace",
-            current.workspace.clone(),
-            metadata.workspace.clone(),
-        )?;
-        let candidate_digest = merge_set_once_string(
-            "candidate_digest",
-            current.candidate_digest.clone(),
-            metadata.candidate_digest.clone(),
-        )?;
-        let (worker_receipt_json, receipt_digest) = merge_receipt_set_once(
-            current.worker_receipt_json.clone(),
-            current.receipt_digest.clone(),
-            metadata.worker_receipt_json.clone(),
-            metadata.receipt_digest.clone(),
-        )?;
-        let terminal_reason = match (
-            current.terminal_reason.clone(),
-            metadata.terminal_reason.clone(),
-        ) {
-            (Some(existing), Some(new_reason)) if existing != new_reason => {
-                return Err(StateError::IllegalTransition(
-                    "terminal_reason is set-once and cannot change".to_owned(),
-                ));
+        begin_immediate(&self.conn)?;
+        let result = (|| -> Result<CandidateRecord, StateError> {
+            // Load without full-chain verify; chain is checked after commit via load.
+            let current = load_record_in_tx(&self.conn, id, None)?;
+            if !current.state.can_transition_to(next) {
+                return Err(StateError::IllegalTransition(format!(
+                    "{} cannot transition from {} to {}",
+                    id.as_str(),
+                    current.state,
+                    next
+                )));
             }
-            (Some(existing), _) => Some(existing),
-            (None, next_reason) => next_reason,
-        };
 
-        // Receipt JSON stored canonical when newly set.
-        let worker_receipt_json = match &worker_receipt_json {
-            Some(json) => Some(canonicalize_json_text(json)?),
-            None => None,
-        };
+            validate_terminal_reason_rules(next, metadata.terminal_reason())?;
+            let workspace = merge_set_once_path(
+                "workspace",
+                current.workspace.clone(),
+                metadata.workspace.clone(),
+            )?;
+            let candidate_digest = merge_set_once_string(
+                "candidate_digest",
+                current.candidate_digest.clone(),
+                metadata.candidate_digest.clone(),
+            )?;
 
-        let next_text = next.to_string();
-        let from_text = current.state.to_string();
-        let now_text = datetime_to_text(now);
-        let workspace_text = workspace.as_ref().map(|p| p.display().to_string());
+            // Canonicalize incoming receipt before set-once comparison.
+            let incoming_receipt_json = match &metadata.worker_receipt_json {
+                Some(json) => Some(canonicalize_json_text(json)?),
+                None => None,
+            };
+            let (worker_receipt_json, receipt_digest) = merge_receipt_set_once(
+                current.worker_receipt_json.clone(),
+                current.receipt_digest.clone(),
+                incoming_receipt_json,
+                metadata.receipt_digest.clone(),
+            )?;
 
-        tx.execute(
-            r#"
-            UPDATE candidates SET
-              state = ?1,
-              workspace = ?2,
-              candidate_digest = ?3,
-              terminal_reason = ?4,
-              worker_receipt_json = ?5,
-              receipt_digest = ?6,
-              updated_at = ?7
-            WHERE id = ?8
-            "#,
-            params![
-                next_text,
-                workspace_text,
-                candidate_digest,
-                terminal_reason,
-                worker_receipt_json,
-                receipt_digest,
-                now_text,
-                id.as_str(),
-            ],
-        )?;
+            let terminal_reason = match (
+                current.terminal_reason.clone(),
+                metadata.terminal_reason.clone(),
+            ) {
+                (Some(existing), Some(new_reason)) if existing != new_reason => {
+                    return Err(StateError::IllegalTransition(
+                        "terminal_reason is set-once and cannot change".to_owned(),
+                    ));
+                }
+                (Some(existing), _) => Some(existing),
+                (None, next_reason) => next_reason,
+            };
 
-        let payload = LifecyclePayload {
-            candidate_id: id.as_str(),
-            from_state: Some(from_text.as_str()),
-            to_state: next_text.as_str(),
-            policy_digest: current.policy_digest.as_str(),
-            workspace: workspace_text.as_deref(),
-            candidate_digest: candidate_digest.as_deref(),
-            receipt_digest: receipt_digest.as_deref(),
-            terminal_reason: terminal_reason.as_deref(),
-        };
-        let event_type = lifecycle_event_type(next);
-        append_audit_event(&tx, Some(id.clone()), event_type, &payload, now)?;
-        tx.commit()?;
-        self.load(id)
+            let next_text = next.to_string();
+            let from_text = current.state.to_string();
+            let now_text = datetime_to_text(now);
+            let workspace_text = workspace
+                .as_ref()
+                .map(|p| {
+                    p.to_str()
+                        .map(str::to_owned)
+                        .ok_or_else(|| StateError::Invalid("workspace must be valid UTF-8".into()))
+                })
+                .transpose()?;
+
+            self.conn.execute(
+                r#"
+                UPDATE candidates SET
+                  state = ?1,
+                  workspace = ?2,
+                  candidate_digest = ?3,
+                  terminal_reason = ?4,
+                  worker_receipt_json = ?5,
+                  receipt_digest = ?6,
+                  updated_at = ?7
+                WHERE id = ?8
+                "#,
+                params![
+                    next_text,
+                    workspace_text,
+                    candidate_digest,
+                    terminal_reason,
+                    worker_receipt_json,
+                    receipt_digest,
+                    now_text,
+                    id.as_str(),
+                ],
+            )?;
+
+            let payload = LifecyclePayload {
+                candidate_id: id.as_str(),
+                from_state: Some(from_text.as_str()),
+                to_state: next_text.as_str(),
+                policy_digest: current.policy_digest.as_str(),
+                workspace: workspace_text.as_deref(),
+                candidate_digest: candidate_digest.as_deref(),
+                receipt_digest: receipt_digest.as_deref(),
+                terminal_reason: terminal_reason.as_deref(),
+            };
+            let event_type = lifecycle_event_type(next);
+            append_audit_event(&self.conn, Some(id.clone()), event_type, &payload, now)?;
+            self.conn.execute_batch("COMMIT")?;
+            if let Some(path) = &self.db_path {
+                let _ = set_sidecar_modes_0600(path);
+            }
+            load_record_verified(&self.conn, id)
+        })();
+
+        if result.is_err() {
+            let _ = self.conn.execute_batch("ROLLBACK");
+        }
+        result
     }
 
     /// Return the single nonterminal candidate for `repository` (`owner/name`), if any.
@@ -586,7 +662,7 @@ impl StateStore {
         &self,
         repository: &str,
     ) -> Result<Option<CandidateRecord>, StateError> {
-        self.verify_audit_chain()?;
+        let events = load_and_verify_audit_events(&self.conn)?;
         let id: Option<String> = self
             .conn
             .query_row(
@@ -603,7 +679,11 @@ impl StateStore {
         match id {
             Some(raw) => {
                 let id = CandidateId::parse(raw)?;
-                Ok(Some(self.load(&id)?))
+                Ok(Some(load_record_in_tx(
+                    &self.conn,
+                    &id,
+                    Some(events.as_slice()),
+                )?))
             }
             None => Ok(None),
         }
@@ -611,62 +691,24 @@ impl StateStore {
 
     /// Load one candidate after verifying stored digests and the full audit chain.
     pub fn load(&self, id: &CandidateId) -> Result<CandidateRecord, StateError> {
-        self.verify_audit_chain()?;
-        let record = load_record_in_tx(&self.conn, id)?;
-        Ok(record)
+        load_record_verified(&self.conn, id)
     }
 
     /// Verify every stored audit event forms a valid hash-linked chain.
     pub fn verify_audit_chain(&self) -> Result<(), StateError> {
-        let events = self.load_audit_events()?;
-        verify_chain(&events)?;
-        // Also ensure stored event_hash column matches JSON.
-        for event in &events {
-            let stored: String = self.conn.query_row(
-                "SELECT event_hash FROM audit_events WHERE sequence = ?1",
-                params![event.sequence as i64],
-                |row| row.get(0),
-            )?;
-            if stored != event.event_hash {
-                return Err(StateError::Integrity(format!(
-                    "audit sequence {} event_hash column mismatch",
-                    event.sequence
-                )));
-            }
-        }
+        let _ = load_and_verify_audit_events(&self.conn)?;
         Ok(())
     }
 
     /// Highest-sequence audit event, if the ledger is nonempty.
     pub fn audit_head(&self) -> Result<Option<AuditEvent>, StateError> {
-        self.verify_audit_chain()?;
-        let events = self.load_audit_events()?;
+        let events = load_and_verify_audit_events(&self.conn)?;
         Ok(events.into_iter().next_back())
     }
 
     /// Ordered audit events (validated individually when decoded).
     pub fn load_audit_events(&self) -> Result<Vec<AuditEvent>, StateError> {
-        let mut stmt = self
-            .conn
-            .prepare("SELECT event_json FROM audit_events ORDER BY sequence ASC")?;
-        let rows = stmt.query_map([], |row| row.get::<_, String>(0))?;
-        let mut events = Vec::new();
-        for row in rows {
-            let json = row?;
-            let event: AuditEvent = serde_json::from_str(&json).map_err(|err| {
-                StateError::Integrity(format!("audit event json decode failed: {err}"))
-            })?;
-            // Confirm stored JSON is canonical for the event value.
-            let canonical = canonicalize_json_value(&event)?;
-            if canonical != json {
-                return Err(StateError::Integrity(format!(
-                    "audit sequence {} json is not canonical",
-                    event.sequence
-                )));
-            }
-            events.push(event);
-        }
-        Ok(events)
+        load_and_verify_audit_events(&self.conn)
     }
 
     fn require_mutable(&self) -> Result<(), StateError> {
@@ -697,13 +739,167 @@ fn configure_connection(conn: &Connection) -> Result<(), StateError> {
     Ok(())
 }
 
+fn begin_immediate(conn: &Connection) -> Result<(), StateError> {
+    conn.execute_batch("BEGIN IMMEDIATE").map_err(|err| {
+        if is_busy_or_locked(&err) {
+            StateError::Contention(err.to_string())
+        } else {
+            StateError::Db(err.to_string())
+        }
+    })
+}
+
+fn initialize_or_verify_schema(conn: &Connection) -> Result<(), StateError> {
+    let user_version: i32 = conn
+        .pragma_query_value(None, "user_version", |row| row.get(0))
+        .map_err(|err| StateError::Db(err.to_string()))?;
+    let application_id: i32 = conn
+        .pragma_query_value(None, "application_id", |row| row.get(0))
+        .map_err(|err| StateError::Db(err.to_string()))?;
+
+    let has_candidates = master_sql(conn, "candidates")?.is_some();
+    let has_audit = master_sql(conn, "audit_events")?.is_some();
+    let empty = !has_candidates && !has_audit;
+
+    if empty && user_version == 0 && application_id == 0 {
+        // Fresh database (or Task-2 empty open): install schema and stamp identity.
+        conn.execute_batch(SCHEMA_SQL)?;
+        conn.pragma_update(None, "application_id", STATE_APPLICATION_ID)?;
+        conn.pragma_update(None, "user_version", STATE_SCHEMA_VERSION)?;
+        return verify_schema(conn);
+    }
+
+    // Accept this task's valid version-0 DB (created before identity stamp) by
+    // upgrading the markers after structural verification.
+    if user_version == 0 && application_id == 0 && has_candidates && has_audit {
+        verify_schema_structure(conn)?;
+        conn.pragma_update(None, "application_id", STATE_APPLICATION_ID)?;
+        conn.pragma_update(None, "user_version", STATE_SCHEMA_VERSION)?;
+        return Ok(());
+    }
+
+    if user_version != 0 && user_version != STATE_SCHEMA_VERSION {
+        return Err(StateError::Integrity(format!(
+            "unsupported state schema user_version {user_version}; expected 0 or {STATE_SCHEMA_VERSION}"
+        )));
+    }
+    if application_id != 0 && application_id != STATE_APPLICATION_ID {
+        return Err(StateError::Integrity(format!(
+            "state database application_id {application_id:#x} does not match evolver id {STATE_APPLICATION_ID:#x}"
+        )));
+    }
+
+    // CREATE IF NOT EXISTS then verify the live objects match.
+    conn.execute_batch(SCHEMA_SQL)?;
+    if user_version == 0 || application_id == 0 {
+        conn.pragma_update(None, "application_id", STATE_APPLICATION_ID)?;
+        conn.pragma_update(None, "user_version", STATE_SCHEMA_VERSION)?;
+    }
+    verify_schema(conn)
+}
+
+fn verify_schema(conn: &Connection) -> Result<(), StateError> {
+    let user_version: i32 = conn
+        .pragma_query_value(None, "user_version", |row| row.get(0))
+        .map_err(|err| StateError::Db(err.to_string()))?;
+    if user_version != STATE_SCHEMA_VERSION && user_version != 0 {
+        return Err(StateError::Integrity(format!(
+            "unsupported state schema user_version {user_version}"
+        )));
+    }
+    let application_id: i32 = conn
+        .pragma_query_value(None, "application_id", |row| row.get(0))
+        .map_err(|err| StateError::Db(err.to_string()))?;
+    if application_id != STATE_APPLICATION_ID && application_id != 0 {
+        return Err(StateError::Integrity(format!(
+            "state database application_id mismatch: {application_id:#x}"
+        )));
+    }
+    verify_schema_structure(conn)
+}
+
+fn verify_schema_structure(conn: &Connection) -> Result<(), StateError> {
+    assert_master_sql(conn, "table", "candidates", CANDIDATES_SQL)?;
+    assert_master_sql(conn, "table", "audit_events", AUDIT_EVENTS_SQL)?;
+    assert_master_sql(conn, "index", "one_active_candidate", ONE_ACTIVE_INDEX_SQL)?;
+    Ok(())
+}
+
+fn master_sql(conn: &Connection, name: &str) -> Result<Option<String>, StateError> {
+    conn.query_row(
+        "SELECT sql FROM sqlite_master WHERE name = ?1",
+        params![name],
+        |row| row.get::<_, Option<String>>(0),
+    )
+    .optional()
+    .map(|opt| opt.flatten())
+    .map_err(|err| StateError::Db(err.to_string()))
+}
+
+fn assert_master_sql(
+    conn: &Connection,
+    kind: &str,
+    name: &str,
+    expected: &str,
+) -> Result<(), StateError> {
+    let sql: Option<String> = conn
+        .query_row(
+            "SELECT sql FROM sqlite_master WHERE type = ?1 AND name = ?2",
+            params![kind, name],
+            |row| row.get(0),
+        )
+        .optional()
+        .map_err(|err| StateError::Db(err.to_string()))?;
+    let Some(sql) = sql else {
+        return Err(StateError::Integrity(format!(
+            "missing {kind} {name} in state database"
+        )));
+    };
+    if normalize_sql(&sql) != normalize_sql(expected) {
+        return Err(StateError::Integrity(format!(
+            "state {kind} {name} definition mismatch"
+        )));
+    }
+    Ok(())
+}
+
+fn normalize_sql(sql: &str) -> String {
+    sql.split_whitespace().collect::<Vec<_>>().join(" ")
+}
+
+fn create_dir_0700(path: &Path) -> Result<(), StateError> {
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::DirBuilderExt;
+        let mut builder = fs::DirBuilder::new();
+        builder.recursive(true).mode(0o700);
+        match builder.create(path) {
+            Ok(()) => {}
+            Err(err) if err.kind() == std::io::ErrorKind::AlreadyExists => {}
+            Err(err) => return Err(StateError::Io(err.to_string())),
+        }
+        set_dir_mode_0700(path)?;
+        return Ok(());
+    }
+    #[cfg(not(unix))]
+    {
+        fs::create_dir_all(path).map_err(|err| StateError::Io(err.to_string()))?;
+        Ok(())
+    }
+}
+
 fn set_dir_mode_0700(path: &Path) -> Result<(), StateError> {
     #[cfg(unix)]
     {
         use std::os::unix::fs::PermissionsExt;
-        let mut perms = fs::metadata(path)
-            .map_err(|err| StateError::Io(err.to_string()))?
-            .permissions();
+        let meta = fs::symlink_metadata(path).map_err(|err| StateError::Io(err.to_string()))?;
+        if meta.file_type().is_symlink() {
+            return Err(StateError::Io(format!(
+                "state directory must not be a symlink: {}",
+                path.display()
+            )));
+        }
+        let mut perms = meta.permissions();
         perms.set_mode(0o700);
         fs::set_permissions(path, perms).map_err(|err| StateError::Io(err.to_string()))?;
     }
@@ -711,10 +907,64 @@ fn set_dir_mode_0700(path: &Path) -> Result<(), StateError> {
     Ok(())
 }
 
+fn ensure_regular_db_file_0600(path: &Path) -> Result<(), StateError> {
+    if path.exists() {
+        reject_nonregular_db(path)?;
+        set_file_mode_0600(path)?;
+        return Ok(());
+    }
+    create_db_file_0600(path)
+}
+
+fn reject_nonregular_db(path: &Path) -> Result<(), StateError> {
+    let meta = fs::symlink_metadata(path).map_err(|err| StateError::Io(err.to_string()))?;
+    if meta.file_type().is_symlink() {
+        return Err(StateError::Io(format!(
+            "state database must not be a symlink: {}",
+            path.display()
+        )));
+    }
+    if !meta.file_type().is_file() {
+        return Err(StateError::Io(format!(
+            "state database must be a regular file: {}",
+            path.display()
+        )));
+    }
+    Ok(())
+}
+
+fn create_db_file_0600(path: &Path) -> Result<(), StateError> {
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::OpenOptionsExt;
+        OpenOptions::new()
+            .create_new(true)
+            .write(true)
+            .read(true)
+            .mode(0o600)
+            .open(path)
+            .map_err(|err| StateError::Io(err.to_string()))?;
+        return Ok(());
+    }
+    #[cfg(not(unix))]
+    {
+        OpenOptions::new()
+            .create(true)
+            .write(true)
+            .read(true)
+            .open(path)
+            .map_err(|err| StateError::Io(err.to_string()))?;
+        Ok(())
+    }
+}
+
 fn set_file_mode_0600(path: &Path) -> Result<(), StateError> {
     #[cfg(unix)]
     {
         use std::os::unix::fs::PermissionsExt;
+        if !path.exists() {
+            return Ok(());
+        }
         let mut perms = fs::metadata(path)
             .map_err(|err| StateError::Io(err.to_string()))?
             .permissions();
@@ -722,6 +972,18 @@ fn set_file_mode_0600(path: &Path) -> Result<(), StateError> {
         fs::set_permissions(path, perms).map_err(|err| StateError::Io(err.to_string()))?;
     }
     let _ = path;
+    Ok(())
+}
+
+fn set_sidecar_modes_0600(db_path: &Path) -> Result<(), StateError> {
+    let wal = PathBuf::from(format!("{}-wal", db_path.display()));
+    let shm = PathBuf::from(format!("{}-shm", db_path.display()));
+    if wal.exists() {
+        set_file_mode_0600(&wal)?;
+    }
+    if shm.exists() {
+        set_file_mode_0600(&shm)?;
+    }
     Ok(())
 }
 
@@ -843,6 +1105,23 @@ fn lifecycle_event_type(state: CandidateState) -> &'static str {
     }
 }
 
+fn state_from_lifecycle_event(event_type: &str) -> Option<CandidateState> {
+    match event_type {
+        "candidate.observed" => Some(CandidateState::Observed),
+        "candidate.prepared" => Some(CandidateState::Prepared),
+        "candidate.building" => Some(CandidateState::Building),
+        "candidate.evaluating" => Some(CandidateState::Evaluating),
+        "candidate.rejected" => Some(CandidateState::Rejected),
+        "candidate.review_ready" => Some(CandidateState::ReviewReady),
+        "candidate.promotion_pending" => Some(CandidateState::PromotionPending),
+        "candidate.soaking" => Some(CandidateState::Soaking),
+        "candidate.accepted" => Some(CandidateState::Accepted),
+        "candidate.rolled_back" => Some(CandidateState::RolledBack),
+        "candidate.failed" => Some(CandidateState::Failed),
+        _ => None,
+    }
+}
+
 fn validate_terminal_reason_rules(
     next: CandidateState,
     reason: Option<&str>,
@@ -923,33 +1202,58 @@ fn merge_receipt_set_once(
         | (None, None, None, Some(_)) => Err(StateError::Invalid(
             "worker_receipt_json and receipt_digest must appear together".to_owned(),
         )),
-        // Corrupt current row: pair missing one side.
         (Some(_), None, _, _) | (None, Some(_), _, _) => Err(StateError::Integrity(
             "stored receipt pair is incomplete".to_owned(),
         )),
     }
 }
 
-fn is_unique_violation(err: &rusqlite::Error) -> bool {
+fn is_active_candidate_violation(err: &rusqlite::Error) -> bool {
     match err {
-        rusqlite::Error::SqliteFailure(info, _) => {
+        rusqlite::Error::SqliteFailure(info, Some(msg)) => {
             info.code == rusqlite::ErrorCode::ConstraintViolation
+                && (msg.contains("one_active_candidate")
+                    || msg.contains("candidates.repository")
+                    || (msg.to_lowercase().contains("unique")
+                        && msg.contains("repository")
+                        && !msg.contains("PRIMARY KEY")
+                        && !msg.contains("candidates.id")))
+        }
+        rusqlite::Error::SqliteFailure(info, None) => {
+            // Fall back: SQLITE_CONSTRAINT_UNIQUE without message is rare; reject
+            // only when extended code is unique AND not primary key if available.
+            info.extended_code == 2067 // SQLITE_CONSTRAINT_UNIQUE
         }
         _ => false,
     }
 }
 
+fn is_busy_or_locked(err: &rusqlite::Error) -> bool {
+    match err {
+        rusqlite::Error::SqliteFailure(info, _) => matches!(
+            info.code,
+            rusqlite::ErrorCode::DatabaseBusy | rusqlite::ErrorCode::DatabaseLocked
+        ),
+        _ => {
+            let text = err.to_string().to_lowercase();
+            text.contains("database is locked")
+                || text.contains("database is busy")
+                || text.contains("busy_snapshot")
+        }
+    }
+}
+
 fn append_audit_event(
-    tx: &rusqlite::Transaction<'_>,
+    conn: &Connection,
     candidate_id: Option<CandidateId>,
     event_type: &str,
     payload: &impl Serialize,
     now: DateTime<Utc>,
 ) -> Result<AuditEvent, StateError> {
-    let previous = latest_audit_event(tx)?;
+    let previous = latest_audit_event(conn)?;
     let event = AuditEvent::next_at(previous.as_ref(), event_type, candidate_id, payload, now)?;
     let event_json = canonicalize_json_value(&event)?;
-    tx.execute(
+    conn.execute(
         "INSERT INTO audit_events (sequence, event_json, event_hash) VALUES (?1, ?2, ?3)",
         params![event.sequence as i64, event_json, event.event_hash],
     )?;
@@ -975,7 +1279,50 @@ fn latest_audit_event(conn: &Connection) -> Result<Option<AuditEvent>, StateErro
     }
 }
 
-fn load_record_in_tx(conn: &Connection, id: &CandidateId) -> Result<CandidateRecord, StateError> {
+fn load_and_verify_audit_events(conn: &Connection) -> Result<Vec<AuditEvent>, StateError> {
+    let mut stmt =
+        conn.prepare("SELECT event_json, event_hash FROM audit_events ORDER BY sequence ASC")?;
+    let rows = stmt.query_map([], |row| {
+        Ok((row.get::<_, String>(0)?, row.get::<_, String>(1)?))
+    })?;
+    let mut events = Vec::new();
+    for row in rows {
+        let (json, stored_hash) = row?;
+        let event: AuditEvent = serde_json::from_str(&json).map_err(|err| {
+            StateError::Integrity(format!("audit event json decode failed: {err}"))
+        })?;
+        let canonical = canonicalize_json_value(&event)?;
+        if canonical != json {
+            return Err(StateError::Integrity(format!(
+                "audit sequence {} json is not canonical",
+                event.sequence
+            )));
+        }
+        if stored_hash != event.event_hash {
+            return Err(StateError::Integrity(format!(
+                "audit sequence {} event_hash column mismatch",
+                event.sequence
+            )));
+        }
+        events.push(event);
+    }
+    verify_chain(&events)?;
+    Ok(events)
+}
+
+fn load_record_verified(
+    conn: &Connection,
+    id: &CandidateId,
+) -> Result<CandidateRecord, StateError> {
+    let events = load_and_verify_audit_events(conn)?;
+    load_record_in_tx(conn, id, Some(events.as_slice()))
+}
+
+fn load_record_in_tx(
+    conn: &Connection,
+    id: &CandidateId,
+    events: Option<&[AuditEvent]>,
+) -> Result<CandidateRecord, StateError> {
     let row = conn
         .query_row(
             r#"
@@ -1012,7 +1359,40 @@ fn load_record_in_tx(conn: &Connection, id: &CandidateId) -> Result<CandidateRec
             id.as_str()
         )));
     };
-    materialize_record(row)
+    let record = materialize_record(row)?;
+    if let Some(events) = events {
+        cross_check_state_with_audit(&record, events)?;
+    }
+    Ok(record)
+}
+
+fn cross_check_state_with_audit(
+    record: &CandidateRecord,
+    events: &[AuditEvent],
+) -> Result<(), StateError> {
+    let id = record.id().as_str();
+    let latest = events.iter().rev().find(|event| {
+        event
+            .candidate_id
+            .as_ref()
+            .map(|cid| cid.as_str() == id)
+            .unwrap_or(false)
+            && state_from_lifecycle_event(&event.event_type).is_some()
+    });
+    let Some(event) = latest else {
+        return Err(StateError::Integrity(format!(
+            "no lifecycle audit event found for candidate {id}"
+        )));
+    };
+    let expected = state_from_lifecycle_event(&event.event_type).expect("filtered");
+    if expected != record.state() {
+        return Err(StateError::Integrity(format!(
+            "candidate {id} state {} does not match latest audit event {}",
+            record.state(),
+            event.event_type
+        )));
+    }
+    Ok(())
 }
 
 struct RawCandidateRow {
@@ -1101,7 +1481,17 @@ fn materialize_record(row: RawCandidateRow) -> Result<CandidateRecord, StateErro
 
     let workspace = match row.workspace {
         Some(text) => {
+            if !text.is_ascii() && std::str::from_utf8(text.as_bytes()).is_err() {
+                return Err(StateError::Integrity(
+                    "stored workspace is not valid UTF-8".to_owned(),
+                ));
+            }
             let path = PathBuf::from(&text);
+            if path.to_str().is_none() {
+                return Err(StateError::Integrity(
+                    "stored workspace is not valid UTF-8".to_owned(),
+                ));
+            }
             if !path.is_absolute() {
                 return Err(StateError::Integrity(format!(
                     "stored workspace is not absolute: {text}"
@@ -1133,16 +1523,12 @@ mod tests {
     use super::*;
     use chrono::TimeZone;
     use evolution_contracts::{AuthorityTier, CandidateKind, ResourceBudget, CANDIDATE_SCHEMA};
-    use std::sync::{Arc, Barrier};
+    use std::sync::{Arc, Barrier, Mutex};
     use std::thread;
     use tempfile::TempDir;
 
     fn fixed_now() -> DateTime<Utc> {
         Utc.with_ymd_and_hms(2026, 9, 1, 7, 0, 0).unwrap()
-    }
-
-    fn sha(n: u8) -> String {
-        format!("sha256:{}", format!("{n:x}").repeat(64)[..64].to_owned())
     }
 
     fn policy_digest() -> String {
@@ -1238,13 +1624,14 @@ mod tests {
                 now,
             )
             .unwrap();
-        assert!(store
+        let err = store
             .create_candidate(
                 &manifest("cand-20260901t080000z-two-bbbb2222"),
                 &policy_digest(),
                 now,
             )
-            .is_err());
+            .unwrap_err();
+        assert!(matches!(err, StateError::AlreadyActive(_)));
         store
             .transition(
                 &id("cand-20260901t070000z-one-aaaa1111"),
@@ -1281,7 +1668,6 @@ mod tests {
             .create_candidate(&manifest(mid.as_str()), &policy_digest(), now)
             .unwrap();
 
-        // Illegal skip.
         assert!(store
             .transition(
                 &mid,
@@ -1315,7 +1701,6 @@ mod tests {
                 now,
             )
             .unwrap();
-        // Illegal jump to accepted.
         assert!(store
             .transition(
                 &mid,
@@ -1332,7 +1717,6 @@ mod tests {
                 now,
             )
             .unwrap();
-        // Terminal cannot leave.
         assert!(store
             .transition(
                 &mid,
@@ -1379,7 +1763,6 @@ mod tests {
         assert_eq!(record.receipt_digest(), Some(receipt_digest.as_str()));
         assert_eq!(record.worker_receipt_json(), Some(receipt_json.as_str()));
 
-        // Set-once violations.
         assert!(store
             .transition(
                 &mid,
@@ -1398,27 +1781,24 @@ mod tests {
             )
             .is_err());
 
-        // Receipt pair required together.
-        assert!(
-            TransitionMetadata::empty()
-                .with_receipt(receipt_json.clone(), "sha256:dead".to_owned())
-                .validate_shape()
-                .is_err()
-                || store
-                    .transition(
-                        &mid,
-                        CandidateState::Building,
-                        TransitionMetadata {
-                            worker_receipt_json: Some(receipt_json.clone()),
-                            receipt_digest: None,
-                            ..TransitionMetadata::empty()
-                        },
-                        now,
-                    )
-                    .is_err()
-        );
+        // Receipt pair required together — independent assertions (no short-circuit).
+        assert!(TransitionMetadata::empty()
+            .with_receipt(receipt_json.clone(), "sha256:dead".to_owned())
+            .validate_shape()
+            .is_err());
+        assert!(store
+            .transition(
+                &mid,
+                CandidateState::Building,
+                TransitionMetadata {
+                    worker_receipt_json: Some(receipt_json.clone()),
+                    receipt_digest: None,
+                    ..TransitionMetadata::empty()
+                },
+                now,
+            )
+            .is_err());
 
-        // Mismatched digest rejected.
         assert!(store
             .transition(
                 &mid,
@@ -1429,7 +1809,13 @@ mod tests {
             )
             .is_err());
 
-        // Same values again are allowed (idempotent set-once).
+        // Non-canonical equivalent receipt text is still set-once-idempotent.
+        let noncanonical = r#"{
+  "files_changed": 1,
+  "ok": true,
+  "schema": "gzmo.repo_evolver.worker_receipt/v1"
+}"#;
+        assert_ne!(noncanonical, receipt_json);
         store
             .transition(
                 &mid,
@@ -1437,7 +1823,7 @@ mod tests {
                 TransitionMetadata::empty()
                     .with_workspace(ws)
                     .with_candidate_digest(cand_digest)
-                    .with_receipt(receipt_json, receipt_digest),
+                    .with_receipt(noncanonical, receipt_digest),
                 now,
             )
             .unwrap();
@@ -1452,7 +1838,6 @@ mod tests {
             .create_candidate(&manifest(mid.as_str()), &policy_digest(), now)
             .unwrap();
 
-        // Reason forbidden on nonterminal.
         assert!(store
             .transition(
                 &mid,
@@ -1487,7 +1872,6 @@ mod tests {
             )
             .unwrap();
 
-        // Required on failed.
         assert!(store
             .transition(
                 &mid,
@@ -1505,7 +1889,6 @@ mod tests {
             )
             .unwrap();
 
-        // Overlong reason rejected.
         let store2 = StateStore::open_in_memory().unwrap();
         let mid2 = id("cand-20260901t080000z-two-bbbb2222");
         store2
@@ -1523,39 +1906,83 @@ mod tests {
     }
 
     #[test]
-    fn illegal_transition_rolls_back_without_audit_append() {
-        let store = StateStore::open_in_memory().unwrap();
+    fn legal_transition_rolls_back_when_audit_append_fails() {
+        let dir = TempDir::new().unwrap();
+        let store = StateStore::open(dir.path()).unwrap();
         let now = fixed_now();
         let mid = id("cand-20260901t070000z-one-aaaa1111");
         store
             .create_candidate(&manifest(mid.as_str()), &policy_digest(), now)
             .unwrap();
-        let before = store.load_audit_events().unwrap().len();
-        assert!(store
+
+        // Corrupt audit head so next_at(prev.validate()) fails after UPDATE.
+        let json: String = store
+            .conn
+            .query_row(
+                "SELECT event_json FROM audit_events WHERE sequence = 1",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap();
+        let mut value: serde_json::Value = serde_json::from_str(&json).unwrap();
+        let hash = value
+            .get("event_hash")
+            .and_then(|v| v.as_str())
+            .unwrap()
+            .to_owned();
+        let mut chars: Vec<char> = hash.chars().collect();
+        chars[0] = if chars[0] == 'a' { 'b' } else { 'a' };
+        value["event_hash"] = serde_json::Value::String(chars.into_iter().collect());
+        // Keep event_hash column matching the corrupted JSON so load path is not
+        // the only failure mode; next_at validates the previous event hash.
+        let tampered = serde_json::to_string(&value).unwrap();
+        let bad_hash = value["event_hash"].as_str().unwrap().to_owned();
+        store
+            .conn
+            .execute(
+                "UPDATE audit_events SET event_json = ?1, event_hash = ?2 WHERE sequence = 1",
+                params![tampered, bad_hash],
+            )
+            .unwrap();
+
+        let err = store
             .transition(
                 &mid,
-                CandidateState::Evaluating,
+                CandidateState::Prepared,
                 TransitionMetadata::empty(),
-                now
+                now,
             )
-            .is_err());
-        let after = store.load_audit_events().unwrap().len();
-        assert_eq!(before, after);
-        let record = store.load(&mid).unwrap();
-        assert_eq!(record.state(), CandidateState::Observed);
-        assert!(store.verify_audit_chain().is_ok());
+            .unwrap_err();
+        assert!(
+            matches!(err, StateError::Audit(_) | StateError::Integrity(_)),
+            "expected audit failure, got {err:?}"
+        );
+
+        let state: String = store
+            .conn
+            .query_row(
+                "SELECT state FROM candidates WHERE id = ?1",
+                params![mid.as_str()],
+                |row| row.get(0),
+            )
+            .unwrap();
+        assert_eq!(state, "observed");
+        let count: i64 = store
+            .conn
+            .query_row("SELECT COUNT(*) FROM audit_events", [], |row| row.get(0))
+            .unwrap();
+        assert_eq!(count, 1);
     }
 
     #[test]
     fn concurrent_insert_race_enforced_by_partial_unique_index() {
         let dir = TempDir::new().unwrap();
         let state_dir = dir.path().join("coord");
-        // Prime schema via first open.
         drop(StateStore::open(&state_dir).unwrap());
 
         let barrier = Arc::new(Barrier::new(2));
         let state_dir = Arc::new(state_dir);
-        let results = Arc::new(std::sync::Mutex::new(Vec::new()));
+        let results = Arc::new(Mutex::new(Vec::new()));
 
         let mut handles = Vec::new();
         for (idx, cand) in [
@@ -1573,22 +2000,137 @@ mod tests {
                 barrier.wait();
                 let outcome =
                     store.create_candidate(&manifest(cand), &policy_digest(), fixed_now());
-                results.lock().unwrap().push((idx, outcome.is_ok()));
+                results.lock().unwrap().push((idx, outcome));
             }));
         }
         for h in handles {
             h.join().unwrap();
         }
         let outcomes = results.lock().unwrap();
-        let oks = outcomes.iter().filter(|(_, ok)| *ok).count();
-        let errs = outcomes.iter().filter(|(_, ok)| !*ok).count();
+        let oks = outcomes.iter().filter(|(_, r)| r.is_ok()).count();
+        let domain_errs = outcomes
+            .iter()
+            .filter(|(_, r)| matches!(r, Err(StateError::AlreadyActive(_))))
+            .count();
         assert_eq!(oks, 1, "exactly one insert must succeed: {outcomes:?}");
-        assert_eq!(errs, 1, "exactly one insert must fail: {outcomes:?}");
+        assert_eq!(
+            domain_errs, 1,
+            "loser must be AlreadyActive, not raw lock: {outcomes:?}"
+        );
 
         let store = StateStore::open(state_dir.as_path()).unwrap();
         let active = store.active_candidate(&repo_key()).unwrap().unwrap();
         assert_eq!(active.state(), CandidateState::Observed);
         assert!(store.verify_audit_chain().is_ok());
+    }
+
+    #[test]
+    fn concurrent_transition_race_reports_domain_contention() {
+        let dir = TempDir::new().unwrap();
+        let state_dir = dir.path().join("coord");
+        let store = StateStore::open(&state_dir).unwrap();
+        let mid = id("cand-20260901t070000z-one-aaaa1111");
+        store
+            .create_candidate(&manifest(mid.as_str()), &policy_digest(), fixed_now())
+            .unwrap();
+        drop(store);
+
+        let barrier = Arc::new(Barrier::new(2));
+        let state_dir = Arc::new(state_dir);
+        let results = Arc::new(Mutex::new(Vec::new()));
+        let mut handles = Vec::new();
+        for idx in 0..2 {
+            let barrier = Arc::clone(&barrier);
+            let state_dir = Arc::clone(&state_dir);
+            let results = Arc::clone(&results);
+            handles.push(thread::spawn(move || {
+                let store = StateStore::open(state_dir.as_path()).unwrap();
+                barrier.wait();
+                let outcome = store.transition(
+                    &id("cand-20260901t070000z-one-aaaa1111"),
+                    CandidateState::Prepared,
+                    TransitionMetadata::empty(),
+                    fixed_now(),
+                );
+                results.lock().unwrap().push((idx, outcome));
+            }));
+        }
+        for h in handles {
+            h.join().unwrap();
+        }
+        let outcomes = results.lock().unwrap();
+        let oks = outcomes.iter().filter(|(_, r)| r.is_ok()).count();
+        let domain_errs = outcomes
+            .iter()
+            .filter(|(_, r)| {
+                matches!(
+                    r,
+                    Err(StateError::Contention(_))
+                        | Err(StateError::IllegalTransition(_))
+                        | Err(StateError::Db(_))
+                )
+            })
+            .count();
+        // With BEGIN IMMEDIATE + busy_timeout, both may serialize successfully.
+        // Require: at least one success; if a loser exists it is not a bare
+        // "database is locked" Io/unclassified string — Contention/IllegalTransition/Db.
+        assert!(oks >= 1, "at least one transition succeeds: {outcomes:?}");
+        assert_eq!(
+            oks + domain_errs,
+            2,
+            "every outcome is success or domain error: {outcomes:?}"
+        );
+        for (_, r) in outcomes.iter() {
+            if let Err(err) = r {
+                let msg = err.to_string();
+                assert!(
+                    !msg.contains("database is locked") || matches!(err, StateError::Contention(_)),
+                    "loser must be domain Contention, got {err:?}"
+                );
+            }
+        }
+
+        let store = StateStore::open(state_dir.as_path()).unwrap();
+        let record = store.load(&mid).unwrap();
+        assert_eq!(record.state(), CandidateState::Prepared);
+        let events = store.load_audit_events().unwrap();
+        // observed + exactly one prepared
+        assert_eq!(
+            events
+                .iter()
+                .filter(|e| e.event_type == "candidate.prepared")
+                .count(),
+            1
+        );
+    }
+
+    #[test]
+    fn duplicate_id_is_not_reported_as_already_active() {
+        let store = StateStore::open_in_memory().unwrap();
+        let now = fixed_now();
+        let mid = "cand-20260901t070000z-one-aaaa1111";
+        store
+            .create_candidate(&manifest(mid), &policy_digest(), now)
+            .unwrap();
+        store
+            .transition(
+                &id(mid),
+                CandidateState::Failed,
+                TransitionMetadata::terminal("done"),
+                now,
+            )
+            .unwrap();
+        let err = store
+            .create_candidate(&manifest(mid), &policy_digest(), now)
+            .unwrap_err();
+        assert!(
+            !matches!(err, StateError::AlreadyActive(_)),
+            "duplicate primary key must not look like already-active: {err:?}"
+        );
+        assert!(
+            matches!(err, StateError::Db(_)),
+            "expected Db for primary-key collision, got {err:?}"
+        );
     }
 
     #[test]
@@ -1611,6 +2153,35 @@ mod tests {
     }
 
     #[test]
+    fn state_column_tamper_detected_against_audit_trail() {
+        let dir = TempDir::new().unwrap();
+        let store = StateStore::open(dir.path()).unwrap();
+        let mid = id("cand-20260901t070000z-one-aaaa1111");
+        store
+            .create_candidate(&manifest(mid.as_str()), &policy_digest(), fixed_now())
+            .unwrap();
+        store
+            .conn
+            .execute(
+                "UPDATE candidates SET state = 'accepted' WHERE id = ?1",
+                params![mid.as_str()],
+            )
+            .unwrap();
+        assert!(store.load(&mid).is_err());
+        // active_candidate filters nonterminal; accepted is terminal so None is
+        // also acceptable, but Integrity on load path is required above. Force
+        // a nonterminal tamper for active_candidate.
+        store
+            .conn
+            .execute(
+                "UPDATE candidates SET state = 'building' WHERE id = ?1",
+                params![mid.as_str()],
+            )
+            .unwrap();
+        assert!(store.active_candidate(&repo_key()).is_err());
+    }
+
+    #[test]
     fn audit_tamper_is_detected() {
         let dir = TempDir::new().unwrap();
         let store = StateStore::open(dir.path()).unwrap();
@@ -1618,7 +2189,6 @@ mod tests {
         store
             .create_candidate(&manifest(mid.as_str()), &policy_digest(), fixed_now())
             .unwrap();
-        // Flip a hex nibble inside stored event_json payload without fixing hash.
         let json: String = store
             .conn
             .query_row(
@@ -1671,7 +2241,6 @@ mod tests {
         store
             .create_candidate(&manifest(mid.as_str()), &policy_digest(), fixed_now())
             .unwrap();
-        drop(store);
 
         #[cfg(unix)]
         {
@@ -1684,7 +2253,19 @@ mod tests {
                 .mode()
                 & 0o777;
             assert_eq!(db_mode, 0o600);
+            // WAL/SHM must be 0600 while the store is still open.
+            for suffix in ["-wal", "-shm"] {
+                let side = PathBuf::from(format!(
+                    "{}{suffix}",
+                    state_dir.join(STATE_DB_NAME).display()
+                ));
+                if side.exists() {
+                    let mode = fs::metadata(&side).unwrap().permissions().mode() & 0o777;
+                    assert_eq!(mode, 0o600, "{} mode", side.display());
+                }
+            }
         }
+        drop(store);
 
         let lock = CoordinatorLock::try_acquire(&state_dir).unwrap();
         assert!(matches!(
@@ -1698,7 +2279,6 @@ mod tests {
         let active = ro.active_candidate(&repo_key()).unwrap().unwrap();
         assert_eq!(active.id().as_str(), mid.as_str());
         assert!(ro.audit_head().unwrap().is_some());
-        // Read-only must refuse mutation.
         assert!(matches!(
             ro.create_candidate(
                 &manifest("cand-20260901t090000z-three-cccc3333"),
@@ -1708,8 +2288,108 @@ mod tests {
             Err(StateError::ReadOnly)
         ));
         drop(lock);
-        // Lock released.
         let _lock2 = CoordinatorLock::try_acquire(&state_dir).unwrap();
+    }
+
+    #[test]
+    fn rejects_decoy_one_active_index_on_reopen() {
+        let dir = TempDir::new().unwrap();
+        let store = StateStore::open(dir.path()).unwrap();
+        store
+            .create_candidate(
+                &manifest("cand-20260901t070000z-one-aaaa1111"),
+                &policy_digest(),
+                fixed_now(),
+            )
+            .unwrap();
+        drop(store);
+
+        let conn = Connection::open(dir.path().join(STATE_DB_NAME)).unwrap();
+        conn.execute_batch(
+            "DROP INDEX one_active_candidate;
+             CREATE UNIQUE INDEX one_active_candidate ON candidates(id);",
+        )
+        .unwrap();
+        drop(conn);
+
+        let err = StateStore::open(dir.path()).unwrap_err();
+        assert!(
+            matches!(err, StateError::Integrity(_)),
+            "decoy index must fail schema verify: {err:?}"
+        );
+    }
+
+    #[test]
+    fn accepts_and_upgrades_valid_version_zero_database() {
+        let dir = TempDir::new().unwrap();
+        // Build a Task-2-shaped DB without identity stamps.
+        let db_path = dir.path().join(STATE_DB_NAME);
+        fs::create_dir_all(dir.path()).unwrap();
+        let conn = Connection::open(&db_path).unwrap();
+        conn.execute_batch(SCHEMA_SQL).unwrap();
+        // Explicitly leave user_version/application_id at 0.
+        drop(conn);
+
+        let store = StateStore::open(dir.path()).unwrap();
+        let version: i32 = store
+            .conn
+            .pragma_query_value(None, "user_version", |row| row.get(0))
+            .unwrap();
+        let app: i32 = store
+            .conn
+            .pragma_query_value(None, "application_id", |row| row.get(0))
+            .unwrap();
+        assert_eq!(version, STATE_SCHEMA_VERSION);
+        assert_eq!(app, STATE_APPLICATION_ID);
+        store
+            .create_candidate(
+                &manifest("cand-20260901t070000z-one-aaaa1111"),
+                &policy_digest(),
+                fixed_now(),
+            )
+            .unwrap();
+    }
+
+    #[test]
+    fn rejects_symlink_database_file() {
+        #[cfg(unix)]
+        {
+            let dir = TempDir::new().unwrap();
+            let real = dir.path().join("real.db");
+            File::create(&real).unwrap();
+            let link = dir.path().join(STATE_DB_NAME);
+            std::os::unix::fs::symlink(&real, &link).unwrap();
+            let err = StateStore::open(dir.path()).unwrap_err();
+            assert!(err.to_string().contains("symlink") || matches!(err, StateError::Io(_)));
+        }
+    }
+
+    #[test]
+    fn rejects_non_utf8_workspace_path() {
+        #[cfg(unix)]
+        {
+            use std::ffi::OsString;
+            use std::os::unix::ffi::OsStringExt;
+            let store = StateStore::open_in_memory().unwrap();
+            let now = fixed_now();
+            let mid = id("cand-20260901t070000z-one-aaaa1111");
+            store
+                .create_candidate(&manifest(mid.as_str()), &policy_digest(), now)
+                .unwrap();
+            let bad = PathBuf::from(OsString::from_vec(b"/tmp/ws-\xff".to_vec()));
+            let err = store
+                .transition(
+                    &mid,
+                    CandidateState::Prepared,
+                    TransitionMetadata::empty().with_workspace(bad),
+                    now,
+                )
+                .unwrap_err();
+            assert!(
+                matches!(err, StateError::Invalid(_)),
+                "expected Invalid for non-UTF-8 workspace, got {err:?}"
+            );
+        }
     }
 
     #[test]

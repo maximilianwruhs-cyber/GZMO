@@ -15,5 +15,6 @@ pub use policy::{
 };
 pub use state::{
     CandidateRecord, CoordinatorLock, StateError, StateStore, TransitionMetadata,
-    MAX_TERMINAL_REASON_BYTES, RUNNER_LOCK_NAME, STATE_DB_NAME,
+    MAX_TERMINAL_REASON_BYTES, RUNNER_LOCK_NAME, STATE_APPLICATION_ID, STATE_DB_NAME,
+    STATE_SCHEMA_VERSION,
 };
