@@ -497,12 +497,17 @@ impl StateStore {
             load_record_in_tx(&self.conn, &manifest.id, Some(events.as_slice()))
         })();
 
-        if let Err(err) = result {
+        let record = match result {
+            Ok(record) => record,
+            Err(err) => {
+                let _ = self.conn.execute_batch("ROLLBACK");
+                return Err(err);
+            }
+        };
+        if let Err(err) = self.conn.execute_batch("COMMIT") {
             let _ = self.conn.execute_batch("ROLLBACK");
-            return Err(err);
+            return Err(err.into());
         }
-        let record = result.expect("checked Err above");
-        self.conn.execute_batch("COMMIT")?;
         if let Some(path) = &self.db_path {
             let _ = set_sidecar_modes_0600(path);
         }
@@ -618,18 +623,25 @@ impl StateStore {
                 terminal_reason: terminal_reason.as_deref(),
             };
             let event_type = lifecycle_event_type(next);
-            append_audit_event(&self.conn, Some(id.clone()), event_type, &payload, now)?;
-            // Fully verify resulting record before COMMIT.
-            let events = load_and_verify_audit_events(&self.conn)?;
+            let appended =
+                append_audit_event(&self.conn, Some(id.clone()), event_type, &payload, now)?;
+            // Post-write chain is the verified prefix plus the event just linked.
+            let mut events = events;
+            events.push(appended);
             load_record_in_tx(&self.conn, id, Some(events.as_slice()))
         })();
 
-        if let Err(err) = result {
+        let record = match result {
+            Ok(record) => record,
+            Err(err) => {
+                let _ = self.conn.execute_batch("ROLLBACK");
+                return Err(err);
+            }
+        };
+        if let Err(err) = self.conn.execute_batch("COMMIT") {
             let _ = self.conn.execute_batch("ROLLBACK");
-            return Err(err);
+            return Err(err.into());
         }
-        let record = result.expect("checked Err above");
-        self.conn.execute_batch("COMMIT")?;
         if let Some(path) = &self.db_path {
             let _ = set_sidecar_modes_0600(path);
         }
@@ -975,13 +987,15 @@ fn set_file_mode_0600(path: &Path) -> Result<(), StateError> {
     Ok(())
 }
 
+fn sidecar_path(db_path: &Path, suffix: &str) -> PathBuf {
+    let mut os = db_path.as_os_str().to_owned();
+    os.push(suffix);
+    PathBuf::from(os)
+}
+
 fn set_sidecar_modes_0600(db_path: &Path) -> Result<(), StateError> {
-    let mut wal = db_path.as_os_str().to_owned();
-    wal.push("-wal");
-    let wal = PathBuf::from(wal);
-    let mut shm = db_path.as_os_str().to_owned();
-    shm.push("-shm");
-    let shm = PathBuf::from(shm);
+    let wal = sidecar_path(db_path, "-wal");
+    let shm = sidecar_path(db_path, "-shm");
     if wal.exists() {
         set_file_mode_0600(&wal)?;
     }
@@ -1979,6 +1993,95 @@ mod tests {
     }
 
     #[test]
+    fn commit_failure_rolls_back_and_leaves_autocommit() {
+        let dir = TempDir::new().unwrap();
+        let store = StateStore::open(dir.path()).unwrap();
+        let now = fixed_now();
+        let mid = id("cand-20260901t070000z-one-aaaa1111");
+        store
+            .create_candidate(&manifest(mid.as_str()), &policy_digest(), now)
+            .unwrap();
+
+        // Install deferred FK parent/child plus a trigger that poisons COMMIT
+        // when audit_events gains a row (no production hook required).
+        store
+            .conn
+            .execute_batch(
+                r#"
+                CREATE TABLE commit_fail_parent (id INTEGER PRIMARY KEY);
+                CREATE TABLE commit_fail_child (
+                  id INTEGER PRIMARY KEY,
+                  parent_id INTEGER NOT NULL,
+                  FOREIGN KEY (parent_id) REFERENCES commit_fail_parent(id)
+                    DEFERRABLE INITIALLY DEFERRED
+                );
+                CREATE TRIGGER audit_commit_fail AFTER INSERT ON audit_events
+                BEGIN
+                  INSERT INTO commit_fail_child(id, parent_id)
+                  VALUES (NEW.sequence, 999);
+                END;
+                "#,
+            )
+            .unwrap();
+
+        let err = store
+            .transition(
+                &mid,
+                CandidateState::Prepared,
+                TransitionMetadata::empty(),
+                now,
+            )
+            .unwrap_err();
+        assert!(
+            matches!(err, StateError::Db(_) | StateError::Contention(_)),
+            "expected COMMIT-time failure, got {err:?}"
+        );
+        assert!(
+            store.conn.is_autocommit(),
+            "connection must return to autocommit after COMMIT failure cleanup"
+        );
+
+        let state: String = store
+            .conn
+            .query_row(
+                "SELECT state FROM candidates WHERE id = ?1",
+                params![mid.as_str()],
+                |row| row.get(0),
+            )
+            .unwrap();
+        assert_eq!(state, "observed");
+        let count: i64 = store
+            .conn
+            .query_row("SELECT COUNT(*) FROM audit_events", [], |row| row.get(0))
+            .unwrap();
+        assert_eq!(count, 1);
+
+        // Remove poison apparatus and prove the store is still usable.
+        store
+            .conn
+            .execute_batch(
+                r#"
+                DROP TRIGGER IF EXISTS audit_commit_fail;
+                DROP TABLE IF EXISTS commit_fail_child;
+                DROP TABLE IF EXISTS commit_fail_parent;
+                "#,
+            )
+            .unwrap();
+
+        store
+            .transition(
+                &mid,
+                CandidateState::Prepared,
+                TransitionMetadata::empty(),
+                now,
+            )
+            .unwrap();
+        let record = store.load(&mid).unwrap();
+        assert_eq!(record.state(), CandidateState::Prepared);
+        assert!(store.conn.is_autocommit());
+    }
+
+    #[test]
     fn concurrent_insert_race_enforced_by_partial_unique_index() {
         let dir = TempDir::new().unwrap();
         let state_dir = dir.path().join("coord");
@@ -2260,22 +2363,27 @@ mod tests {
             use std::os::unix::fs::PermissionsExt;
             let dir_mode = fs::metadata(&state_dir).unwrap().permissions().mode() & 0o777;
             assert_eq!(dir_mode, 0o700);
-            let db_mode = fs::metadata(state_dir.join(STATE_DB_NAME))
-                .unwrap()
-                .permissions()
-                .mode()
-                & 0o777;
+            let db_path = state_dir.join(STATE_DB_NAME);
+            let db_mode = fs::metadata(&db_path).unwrap().permissions().mode() & 0o777;
             assert_eq!(db_mode, 0o600);
-            // WAL/SHM must be 0600 while the store is still open.
-            for suffix in ["-wal", "-shm"] {
-                let side = PathBuf::from(format!(
-                    "{}{suffix}",
-                    state_dir.join(STATE_DB_NAME).display()
-                ));
-                if side.exists() {
-                    let mode = fs::metadata(&side).unwrap().permissions().mode() & 0o777;
-                    assert_eq!(mode, 0o600, "{} mode", side.display());
-                }
+
+            // WAL/SHM must exist; force 0644 then prove helper restores 0600.
+            let wal = sidecar_path(&db_path, "-wal");
+            let shm = sidecar_path(&db_path, "-shm");
+            for side in [&wal, &shm] {
+                assert!(
+                    side.exists(),
+                    "{} must exist while store open",
+                    side.display()
+                );
+                let mut perms = fs::metadata(side).unwrap().permissions();
+                perms.set_mode(0o644);
+                fs::set_permissions(side, perms).unwrap();
+            }
+            set_sidecar_modes_0600(&db_path).unwrap();
+            for side in [&wal, &shm] {
+                let mode = fs::metadata(side).unwrap().permissions().mode() & 0o777;
+                assert_eq!(mode, 0o600, "{} mode", side.display());
             }
         }
         drop(store);
@@ -2405,25 +2513,29 @@ mod tests {
                 .unwrap();
 
             let db_path = state_dir.join(STATE_DB_NAME);
-            let mut wal = db_path.as_os_str().to_owned();
-            wal.push("-wal");
-            let wal = PathBuf::from(wal);
-            let mut shm = db_path.as_os_str().to_owned();
-            shm.push("-shm");
-            let shm = PathBuf::from(shm);
+            let wal = sidecar_path(&db_path, "-wal");
+            let shm = sidecar_path(&db_path, "-shm");
 
+            for side in [&wal, &shm] {
+                assert!(
+                    side.exists(),
+                    "{} must exist under non-UTF-8 state_dir",
+                    side.display()
+                );
+                let mut perms = fs::metadata(side).unwrap().permissions();
+                perms.set_mode(0o644);
+                fs::set_permissions(side, perms).unwrap();
+            }
             set_sidecar_modes_0600(&db_path).unwrap();
 
             for side in [&wal, &shm] {
-                if side.exists() {
-                    let mode = fs::metadata(side).unwrap().permissions().mode() & 0o777;
-                    assert_eq!(
-                        mode,
-                        0o600,
-                        "{} mode under non-UTF-8 state_dir",
-                        side.display()
-                    );
-                }
+                let mode = fs::metadata(side).unwrap().permissions().mode() & 0o777;
+                assert_eq!(
+                    mode,
+                    0o600,
+                    "{} mode under non-UTF-8 state_dir",
+                    side.display()
+                );
             }
             drop(store);
         }
