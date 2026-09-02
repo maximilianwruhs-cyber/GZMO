@@ -207,6 +207,10 @@ pub struct MissionAdapter<'a, R: ProcessRunner, C: Clock> {
     config: &'a RepoEvolverConfig,
     runner: &'a R,
     clock: &'a C,
+    /// Test-only: force a post-rename durability error on this adapter instance.
+    /// Production constructors leave this false; it is never a process-global.
+    #[cfg(test)]
+    force_post_rename_durability_error: bool,
 }
 
 impl<'a, R: ProcessRunner, C: Clock> MissionAdapter<'a, R, C> {
@@ -215,6 +219,23 @@ impl<'a, R: ProcessRunner, C: Clock> MissionAdapter<'a, R, C> {
             config,
             runner,
             clock,
+            #[cfg(test)]
+            force_post_rename_durability_error: false,
+        }
+    }
+
+    /// Test-only constructor that injects a post-rename durability failure.
+    #[cfg(test)]
+    fn with_forced_post_rename_durability_error(
+        config: &'a RepoEvolverConfig,
+        runner: &'a R,
+        clock: &'a C,
+    ) -> Self {
+        Self {
+            config,
+            runner,
+            clock,
+            force_post_rename_durability_error: true,
         }
     }
 
@@ -434,11 +455,20 @@ impl<'a, R: ProcessRunner, C: Clock> MissionAdapter<'a, R, C> {
 
         // Commit point: atomic CURRENT rename. After this succeeds the generation
         // must never be deleted by error paths.
-        match write_current_pointer(&missions_dir, &generation_id) {
+        #[cfg(test)]
+        let force_durability = self.force_post_rename_durability_error;
+        #[cfg(not(test))]
+        let force_durability = false;
+        match write_current_pointer(&missions_dir, &generation_id, force_durability) {
             Ok(CurrentWriteOutcome::Committed) => Ok(mission),
-            Ok(CurrentWriteOutcome::CommittedWithDurabilityError(msg)) => {
+            Ok(CurrentWriteOutcome::CommittedWithDurabilityError {
+                generation_id,
+                detail,
+            }) => {
                 // New pair is readable; surface durability failure so CLI is not success.
-                Err(MissionError::Durability(msg))
+                Err(MissionError::Durability(format!(
+                    "generation {generation_id}: CURRENT already advanced; durability not confirmed ({detail})"
+                )))
             }
             Err(err) => {
                 // Rename did not commit: clean unpublished generation, keep prior CURRENT.
@@ -925,16 +955,16 @@ enum CurrentWriteOutcome {
     /// Rename and post-rename durability steps all succeeded.
     Committed,
     /// Rename committed; a later durability step failed. Generation must be kept.
-    CommittedWithDurabilityError(String),
+    CommittedWithDurabilityError {
+        generation_id: String,
+        detail: String,
+    },
 }
-
-#[cfg(test)]
-static FORCE_POST_RENAME_DURABILITY_ERROR: std::sync::atomic::AtomicBool =
-    std::sync::atomic::AtomicBool::new(false);
 
 fn write_current_pointer(
     missions_dir: &Path,
     generation_id: &str,
+    force_post_rename_durability_error: bool,
 ) -> Result<CurrentWriteOutcome, MissionError> {
     let tmp = missions_dir.join(format!("CURRENT.{}.tmp", Uuid::new_v4()));
     let final_path = missions_dir.join(CURRENT_POINTER);
@@ -949,23 +979,26 @@ fn write_current_pointer(
     })?;
 
     // Post-commit: never delete the generation on failure here.
-    #[cfg(test)]
-    if FORCE_POST_RENAME_DURABILITY_ERROR.load(std::sync::atomic::Ordering::SeqCst) {
-        FORCE_POST_RENAME_DURABILITY_ERROR.store(false, std::sync::atomic::Ordering::SeqCst);
-        return Ok(CurrentWriteOutcome::CommittedWithDurabilityError(
-            "injected post-rename durability failure".to_owned(),
-        ));
+    // `force_post_rename_durability_error` is only ever true via a test-scoped
+    // MissionAdapter field; production always passes false.
+    if force_post_rename_durability_error {
+        return Ok(CurrentWriteOutcome::CommittedWithDurabilityError {
+            generation_id: generation_id.to_owned(),
+            detail: "injected post-rename durability failure".to_owned(),
+        });
     }
 
     if let Err(err) = set_file_mode_0600(&final_path) {
-        return Ok(CurrentWriteOutcome::CommittedWithDurabilityError(format!(
-            "chmod CURRENT after rename: {err}"
-        )));
+        return Ok(CurrentWriteOutcome::CommittedWithDurabilityError {
+            generation_id: generation_id.to_owned(),
+            detail: format!("chmod CURRENT after rename: {err}"),
+        });
     }
     if let Err(err) = fsync_dir(missions_dir) {
-        return Ok(CurrentWriteOutcome::CommittedWithDurabilityError(format!(
-            "fsync missions dir after rename: {err}"
-        )));
+        return Ok(CurrentWriteOutcome::CommittedWithDurabilityError {
+            generation_id: generation_id.to_owned(),
+            detail: format!("fsync missions dir after rename: {err}"),
+        });
     }
     Ok(CurrentWriteOutcome::Committed)
 }
@@ -2284,18 +2317,36 @@ repo_path = "config/repo-evolver.policy.toml"
             }
         });
 
-        FORCE_POST_RENAME_DURABILITY_ERROR.store(true, std::sync::atomic::Ordering::SeqCst);
-        let adapter = MissionAdapter::new(&env.config, &fake, &clock);
+        let adapter =
+            MissionAdapter::with_forced_post_rename_durability_error(&env.config, &fake, &clock);
         let err = adapter.refresh_and_load().unwrap_err();
+        let msg = err.to_string();
         assert!(
-            matches!(&err, MissionError::Durability(m) if m.contains("injected")),
+            matches!(&err, MissionError::Durability(_)),
             "CLI must not see success after post-commit failure: {err}"
+        );
+        assert!(
+            msg.contains("CURRENT already advanced; durability not confirmed"),
+            "operator text must state CURRENT advanced: {msg}"
+        );
+        assert!(
+            msg.contains("injected post-rename durability failure"),
+            "{msg}"
+        );
+        // Bound the message (no huge dump).
+        assert!(
+            msg.len() < 512,
+            "durability message must stay bounded: {msg}"
         );
 
         // CURRENT points at a readable pair despite the durability error.
         let loaded = adapter.load_current().unwrap();
         assert_eq!(loaded.bet_id, "felt-use-mass-growth");
         assert!(loaded.mission_md.exists());
+        assert!(
+            msg.contains(&loaded.generation_id),
+            "durability error must name committed generation id: {msg}"
+        );
         let gen_dir = env
             .state_dir
             .join(MISSIONS_DIR)

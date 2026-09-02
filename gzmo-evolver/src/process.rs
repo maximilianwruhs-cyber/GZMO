@@ -237,6 +237,18 @@ fn run_system(spec: &ProcessSpec) -> Result<ProcessOutput, ProcessError> {
         let wait = deadline
             .saturating_duration_since(now)
             .min(Duration::from_millis(20));
+
+        // Once drainers are gone the channel is permanently disconnected; do not
+        // call recv again (it returns immediately and would hot-spin). Poll the
+        // child with a single sleep per iteration.
+        if stdout_done && stderr_done {
+            if child_status.is_some() {
+                break;
+            }
+            thread::sleep(wait);
+            continue;
+        }
+
         match rx.recv_timeout(wait) {
             Ok(DrainEvent::Chunk { kind, data }) => match kind {
                 PipeKind::Stdout => stdout_buf.extend_from_slice(&data),
@@ -257,10 +269,11 @@ fn run_system(spec: &ProcessSpec) -> Result<ProcessOutput, ProcessError> {
                 return Err(ProcessError::Io(message));
             }
             Err(mpsc::RecvTimeoutError::Timeout) => {
-                // Poll again.
+                // Poll interval elapsed; loop re-checks deadline and child.
             }
             Err(mpsc::RecvTimeoutError::Disconnected) => {
-                // Drainers finished; mark pipes done and continue until child exits or deadline.
+                // Drainers finished; mark pipes done. Next iteration sleeps via
+                // the stdout_done&&stderr_done branch (no double sleep here).
                 stdout_done = true;
                 stderr_done = true;
             }
@@ -525,7 +538,7 @@ mod tests {
     use super::*;
     use std::fs;
     use std::os::unix::fs::PermissionsExt;
-    use std::sync::atomic::AtomicUsize;
+
     use tempfile::TempDir;
 
     fn write_executable(dir: &Path, name: &str, body: &str) -> PathBuf {
@@ -652,59 +665,55 @@ mod tests {
 
     #[test]
     fn system_runner_hard_cap_peak_memory_two_pipes() {
-        // Causal: concurrent writers cannot force retained reservation > cap.
-        // We instrument reservation by running a flood with tiny cap and asserting
-        // the error path; the AtomicUsize reservation is the sole retained path.
         let dir = TempDir::new().unwrap();
-        let script = write_executable(
+
+        // Success path near the cap: total retained lengths must stay ≤ cap.
+        let under = write_executable(
+            dir.path(),
+            "under_cap.sh",
+            "#!/bin/bash\npython3 - <<'PY'\nimport sys\nsys.stdout.write('a'*30)\nsys.stdout.flush()\nsys.stderr.write('b'*30)\nsys.stderr.flush()\nPY\n",
+        );
+        let under_spec = ProcessSpec::new(
+            "/bin/bash",
+            [under.to_string_lossy().into_owned()],
+            dir.path(),
+            base_env(),
+            64,
+            Duration::from_secs(5),
+        )
+        .unwrap();
+        let out = SystemProcessRunner.run(&under_spec).unwrap();
+        assert_eq!(out.status, 0);
+        assert_eq!(out.stdout.len(), 30);
+        assert_eq!(out.stderr.len(), 30);
+        assert!(
+            out.total_bytes() <= 64,
+            "retained output must honour combined cap, got {}",
+            out.total_bytes()
+        );
+
+        // Overflow path: concurrent writers beyond cap → OutputOverflow, no dump.
+        let over = write_executable(
             dir.path(),
             "hardcap.sh",
-            "#!/bin/bash\npython3 - <<'PY'\nimport os, sys, time\n# Two writers blasting simultaneously.
-def blast(fd, n):\n    os.write(fd, b'x'*n)\nimport threading\nt1=threading.Thread(target=blast, args=(1, 200_000))\nt2=threading.Thread(target=blast, args=(2, 200_000))\nt1.start(); t2.start(); t1.join(); t2.join()\ntime.sleep(1)\nPY\n",
+            "#!/bin/bash\npython3 - <<'PY'\nimport os, threading, time\ndef blast(fd, n):\n    os.write(fd, b'x'*n)\nt1=threading.Thread(target=blast, args=(1, 200_000))\nt2=threading.Thread(target=blast, args=(2, 200_000))\nt1.start(); t2.start(); t1.join(); t2.join()\ntime.sleep(1)\nPY\n",
         );
         let cap = 8192usize;
-        let spec = ProcessSpec::new(
+        let over_spec = ProcessSpec::new(
             "/bin/bash",
-            [script.to_string_lossy().into_owned()],
+            [over.to_string_lossy().into_owned()],
             dir.path(),
             base_env(),
             cap,
             Duration::from_secs(5),
         )
         .unwrap();
-        let err = SystemProcessRunner.run(&spec).unwrap_err();
+        let err = SystemProcessRunner.run(&over_spec).unwrap_err();
         assert!(
             matches!(err, ProcessError::OutputOverflow { cap: c } if c == cap),
             "got {err:?}"
         );
-        // Display stays bounded (no payload dump).
         assert!(!err.to_string().contains("xxxx"));
-        // Prove reservation primitive itself never exceeds cap under contention.
-        let reserved = AtomicUsize::new(0);
-        let mut accepted = 0usize;
-        for _ in 0..1000 {
-            let n = 100usize;
-            let mut current = reserved.load(Ordering::Relaxed);
-            loop {
-                if current.saturating_add(n) > cap {
-                    break;
-                }
-                match reserved.compare_exchange_weak(
-                    current,
-                    current + n,
-                    Ordering::AcqRel,
-                    Ordering::Relaxed,
-                ) {
-                    Ok(_) => {
-                        accepted += n;
-                        break;
-                    }
-                    Err(observed) => current = observed,
-                }
-            }
-        }
-        assert!(accepted <= cap);
-        assert!(reserved.load(Ordering::Relaxed) <= cap);
     }
 
     #[test]
@@ -752,26 +761,35 @@ wait
             started.elapsed()
         );
         thread::sleep(Duration::from_millis(200));
-        if marker.exists() {
-            let pid_text = fs::read_to_string(&marker).unwrap_or_default();
-            let pid: i32 = pid_text.trim().parse().unwrap_or(-1);
-            if pid > 1 {
-                let still_alive = unsafe { libc::kill(pid, 0) == 0 };
-                assert!(
-                    !still_alive,
-                    "grandchild pid {pid} still alive after group kill"
-                );
-            }
-        }
+        assert!(marker.exists(), "grandchild must have written its pid");
+        let pid_text = fs::read_to_string(&marker).unwrap();
+        let pid: i32 = pid_text.trim().parse().expect("pid");
+        assert!(pid > 1);
+        let still_alive = unsafe { libc::kill(pid, 0) == 0 };
+        assert!(
+            !still_alive,
+            "grandchild pid {pid} still alive after group kill"
+        );
     }
 
     #[test]
     fn system_runner_timeout_when_child_closes_pipes_and_keeps_running() {
         let dir = TempDir::new().unwrap();
+        let marker = dir.path().join("descendant-pid");
         let script = write_executable(
             dir.path(),
             "close_pipes.sh",
-            "#!/bin/bash\nexec 1>&-\nexec 2>&-\nsleep 60\n",
+            &format!(
+                r#"#!/bin/bash
+set -euo pipefail
+# Record this process's pid, then close pipes and hang (descendant of bash).
+echo $$ > "{marker}"
+exec 1>&-
+exec 2>&-
+sleep 60
+"#,
+                marker = marker.display()
+            ),
         );
         let timeout = Duration::from_millis(500);
         let spec = ProcessSpec::new(
@@ -790,16 +808,28 @@ wait
             matches!(err, ProcessError::Timeout { .. }),
             "expected Timeout after closed pipes, got {err:?} elapsed={elapsed:?}"
         );
-        // Causal: must not wait for the full sleep 60.
         assert!(
             elapsed < Duration::from_secs(5),
             "elapsed {elapsed:?} exceeded deadline bound"
         );
-        // Elapsed should be near the timeout, not far under without killing
-        // (we accept some scheduling slack).
         assert!(
             elapsed >= timeout.saturating_sub(Duration::from_millis(100)),
             "elapsed {elapsed:?} finished before deadline {timeout:?}"
+        );
+
+        // Causal reaping: descendant pid must have been written and must be gone.
+        assert!(
+            marker.exists(),
+            "closed-pipes child must write descendant pid before hanging"
+        );
+        let pid_text = fs::read_to_string(&marker).unwrap();
+        let pid: i32 = pid_text.trim().parse().expect("descendant pid");
+        assert!(pid > 1, "invalid pid {pid}");
+        thread::sleep(Duration::from_millis(100));
+        let still_alive = unsafe { libc::kill(pid, 0) == 0 };
+        assert!(
+            !still_alive,
+            "descendant pid {pid} still alive after closed-pipes timeout kill/reap"
         );
     }
 
