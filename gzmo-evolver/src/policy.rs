@@ -110,8 +110,8 @@ impl TrustedPolicy {
     pub fn parse_toml(bytes: &[u8]) -> Result<Self, PolicyParseError> {
         let text = std::str::from_utf8(bytes)
             .map_err(|err| PolicyParseError::InvalidToml(err.to_string()))?;
-        let raw: RawTrustedPolicy = toml::from_str(text)
-            .map_err(|err| PolicyParseError::InvalidToml(err.to_string()))?;
+        let raw: RawTrustedPolicy =
+            toml::from_str(text).map_err(|err| PolicyParseError::InvalidToml(err.to_string()))?;
         Self::from_raw(raw)
     }
 
@@ -263,8 +263,8 @@ impl TrustedPolicy {
 
     /// Canonical `sha256:<64 lowercase hex>` digest over validated typed JSON.
     pub fn digest(&self) -> Result<String, PolicyParseError> {
-        let json = serde_json::to_vec(self)
-            .map_err(|err| PolicyParseError::Digest(err.to_string()))?;
+        let json =
+            serde_json::to_vec(self).map_err(|err| PolicyParseError::Digest(err.to_string()))?;
         let hash = Sha256::digest(&json);
         let mut hex = String::with_capacity(64);
         for byte in hash {
@@ -603,15 +603,30 @@ wall_seconds = 2700
         );
         assert!(TrustedPolicy::parse_toml(bad.as_bytes()).is_err());
 
-        bad = VALID_POLICY_A.replace(
-            r#"class = "hard_floor""#,
-            r#"class = "metric""#,
-        );
+        bad = VALID_POLICY_A.replace(r#"class = "hard_floor""#, r#"class = "metric""#);
         // All four gates flipped to metric → no hard floor.
         assert!(TrustedPolicy::parse_toml(bad.as_bytes()).is_err());
 
-        bad = format!(
-            "{VALID_POLICY_A}\nunknown_authority = true\n"
+        // Top-level unknown keys must be rejected by RawTrustedPolicy.
+        // Place the key before any table so TOML attaches it to the root.
+        bad = VALID_POLICY_A.replacen(
+            r#"schema = "gzmo.repo_evolver.policy/v1""#,
+            "unknown_authority = true\nschema = \"gzmo.repo_evolver.policy/v1\"",
+            1,
+        );
+        assert!(TrustedPolicy::parse_toml(bad.as_bytes()).is_err());
+
+        // Nested unknown gate fields are rejected separately.
+        bad = VALID_POLICY_A.replace(
+            r#"timeout_seconds = 300
+
+[[gates]]
+name = "clippy""#,
+            r#"timeout_seconds = 300
+shell = true
+
+[[gates]]
+name = "clippy""#,
         );
         assert!(TrustedPolicy::parse_toml(bad.as_bytes()).is_err());
     }

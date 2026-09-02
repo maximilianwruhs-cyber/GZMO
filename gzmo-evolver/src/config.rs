@@ -121,19 +121,19 @@ impl RepoEvolverConfig {
     pub fn load(path: impl AsRef<Path>) -> Result<Self, ConfigError> {
         let path = path.as_ref();
         let bytes = fs::read(path).map_err(|err| ConfigError::Io(err.to_string()))?;
-        let text = std::str::from_utf8(&bytes)
-            .map_err(|err| ConfigError::InvalidToml(err.to_string()))?;
-        let raw: RawRepoEvolverConfig = toml::from_str(text)
-            .map_err(|err| ConfigError::InvalidToml(err.to_string()))?;
+        let text =
+            std::str::from_utf8(&bytes).map_err(|err| ConfigError::InvalidToml(err.to_string()))?;
+        let raw: RawRepoEvolverConfig =
+            toml::from_str(text).map_err(|err| ConfigError::InvalidToml(err.to_string()))?;
         Self::from_raw(raw)
     }
 
     fn from_raw(raw: RawRepoEvolverConfig) -> Result<Self, ConfigError> {
-        let repo_path = require_existing_absolute_path("repo.path", &raw.repo.path)?;
+        let repo_path = require_existing_directory("repo.path", &raw.repo.path)?;
         let worker_executable =
-            require_existing_absolute_path("worker.executable", &raw.worker.executable)?;
+            require_existing_executable("worker.executable", &raw.worker.executable)?;
 
-        let state_dir = parse_absolute_lexical_path("state_dir", &raw.state_dir)?;
+        let state_dir = resolve_state_dir("state_dir", &raw.state_dir)?;
         ensure_state_outside_repo(&state_dir, &repo_path)?;
 
         let remote = validate_safe_identifier("repo.remote", &raw.repo.remote)?;
@@ -146,18 +146,10 @@ impl RepoEvolverConfig {
         let markdown_rel =
             normalize_relative_path("mission.markdown_rel", &raw.mission.markdown_rel)?;
         let refresh_argv = validate_refresh_argv(&raw.mission.refresh_argv)?;
-        let policy_repo_path =
-            normalize_relative_path("policy.repo_path", &raw.policy.repo_path)?;
+        let policy_repo_path = normalize_relative_path("policy.repo_path", &raw.policy.repo_path)?;
 
-        let policy_abs = repo_path.join(&policy_repo_path);
-        if !policy_abs.is_file() {
-            return Err(ConfigError::Invalid(format!(
-                "policy.repo_path does not exist in repository working tree: {}",
-                policy_abs.display()
-            )));
-        }
-        let policy_bytes =
-            fs::read(&policy_abs).map_err(|err| ConfigError::Io(err.to_string()))?;
+        let policy_abs = resolve_policy_inside_repo(&repo_path, &policy_repo_path)?;
+        let policy_bytes = fs::read(&policy_abs).map_err(|err| ConfigError::Io(err.to_string()))?;
         let working_policy = TrustedPolicy::parse_toml(&policy_bytes)?;
         if working_policy.owner() != owner {
             return Err(ConfigError::Invalid(format!(
@@ -298,9 +290,14 @@ impl PolicyConfig {
     }
 }
 
-fn require_existing_absolute_path(field: &str, raw: &str) -> Result<PathBuf, ConfigError> {
+fn require_absolute_input(field: &str, raw: &str) -> Result<PathBuf, ConfigError> {
     if raw.trim().is_empty() {
         return Err(ConfigError::Invalid(format!("{field} must be nonempty")));
+    }
+    if raw.contains('\0') {
+        return Err(ConfigError::Invalid(format!(
+            "{field} must not contain NUL"
+        )));
     }
     let path = PathBuf::from(raw);
     if !path.is_absolute() {
@@ -308,21 +305,20 @@ fn require_existing_absolute_path(field: &str, raw: &str) -> Result<PathBuf, Con
             "{field} must be an absolute path, got {raw:?}"
         )));
     }
-    if raw.contains('\0') {
-        return Err(ConfigError::Invalid(format!(
-            "{field} must not contain NUL"
-        )));
-    }
+    Ok(path)
+}
+
+fn require_existing_directory(field: &str, raw: &str) -> Result<PathBuf, ConfigError> {
+    let path = require_absolute_input(field, raw)?;
     let meta = fs::metadata(&path).map_err(|err| {
         ConfigError::Invalid(format!(
             "{field} must exist and be accessible ({raw}): {err}"
         ))
     })?;
-    if path
-        .components()
-        .any(|c| matches!(c, Component::ParentDir))
-    {
-        // Still canonicalize below; parent components are resolved only when the path exists.
+    if !meta.is_dir() {
+        return Err(ConfigError::Invalid(format!(
+            "{field} must be a directory, got {raw}"
+        )));
     }
     let canonical = fs::canonicalize(&path).map_err(|err| {
         ConfigError::Invalid(format!(
@@ -335,8 +331,110 @@ fn require_existing_absolute_path(field: &str, raw: &str) -> Result<PathBuf, Con
             canonical.display()
         )));
     }
-    // Keep files and directories; caller decides which.
-    let _ = meta;
+    let canonical_meta = fs::metadata(&canonical).map_err(|err| {
+        ConfigError::Invalid(format!("{field} canonical path is not accessible: {err}"))
+    })?;
+    if !canonical_meta.is_dir() {
+        return Err(ConfigError::Invalid(format!(
+            "{field} must canonicalize to a directory"
+        )));
+    }
+    Ok(canonical)
+}
+
+fn require_existing_executable(field: &str, raw: &str) -> Result<PathBuf, ConfigError> {
+    let path = require_absolute_input(field, raw)?;
+    let meta = fs::metadata(&path).map_err(|err| {
+        ConfigError::Invalid(format!(
+            "{field} must exist and be accessible ({raw}): {err}"
+        ))
+    })?;
+    if !meta.is_file() {
+        return Err(ConfigError::Invalid(format!(
+            "{field} must be a regular file, got {raw}"
+        )));
+    }
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        if meta.permissions().mode() & 0o111 == 0 {
+            return Err(ConfigError::Invalid(format!(
+                "{field} must be executable, got {raw}"
+            )));
+        }
+    }
+    let canonical = fs::canonicalize(&path).map_err(|err| {
+        ConfigError::Invalid(format!(
+            "{field} must canonicalize to an absolute path ({raw}): {err}"
+        ))
+    })?;
+    if !canonical.is_absolute() {
+        return Err(ConfigError::Invalid(format!(
+            "{field} canonical path is not absolute: {}",
+            canonical.display()
+        )));
+    }
+    let canonical_meta = fs::metadata(&canonical).map_err(|err| {
+        ConfigError::Invalid(format!("{field} canonical path is not accessible: {err}"))
+    })?;
+    if !canonical_meta.is_file() {
+        return Err(ConfigError::Invalid(format!(
+            "{field} must canonicalize to a regular file"
+        )));
+    }
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        if canonical_meta.permissions().mode() & 0o111 == 0 {
+            return Err(ConfigError::Invalid(format!(
+                "{field} canonical path must be executable"
+            )));
+        }
+    }
+    Ok(canonical)
+}
+
+fn resolve_policy_inside_repo(
+    repo_path: &Path,
+    policy_repo_path: &Path,
+) -> Result<PathBuf, ConfigError> {
+    let joined = repo_path.join(policy_repo_path);
+    let meta = fs::symlink_metadata(&joined).map_err(|err| {
+        ConfigError::Invalid(format!(
+            "policy.repo_path does not exist in repository working tree ({}): {err}",
+            joined.display()
+        ))
+    })?;
+    if !meta.file_type().is_symlink() && !meta.is_file() {
+        return Err(ConfigError::Invalid(format!(
+            "policy.repo_path must be a regular file: {}",
+            joined.display()
+        )));
+    }
+    let canonical = fs::canonicalize(&joined).map_err(|err| {
+        ConfigError::Invalid(format!(
+            "policy.repo_path must canonicalize ({}): {err}",
+            joined.display()
+        ))
+    })?;
+    let canonical_meta = fs::metadata(&canonical).map_err(|err| {
+        ConfigError::Invalid(format!(
+            "policy.repo_path canonical target is not accessible: {err}"
+        ))
+    })?;
+    if !canonical_meta.is_file() {
+        return Err(ConfigError::Invalid(format!(
+            "policy.repo_path must resolve to a regular file: {}",
+            canonical.display()
+        )));
+    }
+    if !path_is_within(&canonical, repo_path) {
+        return Err(ConfigError::Invalid(format!(
+            "policy.repo_path escapes repository: {} is outside {}",
+            canonical.display(),
+            repo_path.display()
+        )));
+    }
     Ok(canonical)
 }
 
@@ -344,21 +442,78 @@ fn parse_absolute_lexical_path(field: &str, raw: &str) -> Result<PathBuf, Config
     if raw.trim().is_empty() {
         return Err(ConfigError::Invalid(format!("{field} must be nonempty")));
     }
+    if raw.contains('\0') {
+        return Err(ConfigError::Invalid(format!(
+            "{field} must not contain NUL"
+        )));
+    }
     let path = PathBuf::from(raw);
     if !path.is_absolute() {
         return Err(ConfigError::Invalid(format!(
             "{field} must be an absolute path, got {raw:?}"
         )));
     }
-    if raw.contains('\0') {
+    let normalized = normalize_absolute_lexical(&path)
+        .map_err(|err| ConfigError::Invalid(format!("{field} is not lexically safe: {err}")))?;
+    Ok(normalized)
+}
+
+/// Resolve `state_dir` that may not exist yet.
+///
+/// Lexically normalize (reject `..`), canonicalize the deepest existing ancestor,
+/// rejoin remaining safe components, and return the resulting absolute path.
+fn resolve_state_dir(field: &str, raw: &str) -> Result<PathBuf, ConfigError> {
+    let lexical = parse_absolute_lexical_path(field, raw)?;
+    let (existing, remainder) = split_existing_prefix(&lexical).map_err(|err| {
+        ConfigError::Invalid(format!("{field} cannot resolve existing ancestor: {err}"))
+    })?;
+    let canonical_prefix = fs::canonicalize(&existing).map_err(|err| {
+        ConfigError::Invalid(format!(
+            "{field} existing ancestor must canonicalize ({}): {err}",
+            existing.display()
+        ))
+    })?;
+    if !canonical_prefix.is_absolute() {
         return Err(ConfigError::Invalid(format!(
-            "{field} must not contain NUL"
+            "{field} canonical ancestor is not absolute: {}",
+            canonical_prefix.display()
         )));
     }
-    let normalized = normalize_absolute_lexical(&path).map_err(|err| {
-        ConfigError::Invalid(format!("{field} is not lexically safe: {err}"))
-    })?;
-    Ok(normalized)
+    let mut resolved = canonical_prefix;
+    for component in remainder {
+        match component {
+            Component::Normal(part) => resolved.push(part),
+            Component::CurDir => {}
+            Component::ParentDir => {
+                return Err(ConfigError::Invalid(format!(
+                    "{field} remainder must not contain '..'"
+                )));
+            }
+            Component::RootDir | Component::Prefix(_) => {
+                return Err(ConfigError::Invalid(format!(
+                    "{field} remainder must not introduce a new root"
+                )));
+            }
+        }
+    }
+    Ok(resolved)
+}
+
+fn split_existing_prefix(path: &Path) -> Result<(PathBuf, Vec<Component<'_>>), String> {
+    let components: Vec<Component<'_>> = path.components().collect();
+    if components.is_empty() {
+        return Err("path is empty".to_owned());
+    }
+    let mut end = components.len();
+    while end > 0 {
+        let candidate: PathBuf = components[..end].iter().collect();
+        if candidate.exists() {
+            let remainder = components[end..].to_vec();
+            return Ok((candidate, remainder));
+        }
+        end -= 1;
+    }
+    Err(format!("no existing ancestor for {}", path.display()))
 }
 
 fn normalize_absolute_lexical(path: &Path) -> Result<PathBuf, String> {
@@ -403,12 +558,7 @@ fn normalize_absolute_lexical(path: &Path) -> Result<PathBuf, String> {
 }
 
 fn ensure_state_outside_repo(state_dir: &Path, repo_path: &Path) -> Result<(), ConfigError> {
-    if state_dir == repo_path {
-        return Err(ConfigError::Invalid(
-            "state_dir must be outside the repository path".to_owned(),
-        ));
-    }
-    if state_dir.starts_with(repo_path) {
+    if path_is_within(state_dir, repo_path) {
         return Err(ConfigError::Invalid(format!(
             "state_dir {} is inside repository {}",
             state_dir.display(),
@@ -416,6 +566,14 @@ fn ensure_state_outside_repo(state_dir: &Path, repo_path: &Path) -> Result<(), C
         )));
     }
     Ok(())
+}
+
+/// True when `path` equals `root` or is a descendant of `root`.
+fn path_is_within(path: &Path, root: &Path) -> bool {
+    if path == root {
+        return true;
+    }
+    path.starts_with(root)
 }
 
 fn normalize_relative_path(field: &str, raw: &str) -> Result<PathBuf, ConfigError> {
@@ -467,7 +625,6 @@ fn normalize_relative_path(field: &str, raw: &str) -> Result<PathBuf, ConfigErro
             "{field} normalized to empty path"
         )));
     }
-    // Reject symlink-looking path tokens (no leading/trailing slash tricks).
     if raw.ends_with('/') || raw.ends_with('\\') {
         return Err(ConfigError::Invalid(format!(
             "{field} must not end with a path separator"
@@ -523,9 +680,7 @@ fn validate_safe_identifier(field: &str, value: &str) -> Result<String, ConfigEr
         )));
     }
     if value.contains("..") {
-        return Err(ConfigError::Invalid(format!(
-            "{field} must not contain .."
-        )));
+        return Err(ConfigError::Invalid(format!("{field} must not contain ..")));
     }
     if value
         .bytes()
@@ -573,10 +728,11 @@ fn validate_safe_git_ref(field: &str, value: &str) -> Result<String, ConfigError
                 "{field} component is unsafe: {component:?}"
             )));
         }
-        if component
-            .bytes()
-            .any(|b| b.is_ascii_whitespace() || b.is_ascii_control() || matches!(b, b'\\' | b'~' | b'^' | b':' | b'?' | b'*' | b'[' | b']'))
-        {
+        if component.bytes().any(|b| {
+            b.is_ascii_whitespace()
+                || b.is_ascii_control()
+                || matches!(b, b'\\' | b'~' | b'^' | b':' | b'?' | b'*' | b'[' | b']')
+        }) {
             return Err(ConfigError::Invalid(format!(
                 "{field} component contains unsafe characters: {component:?}"
             )));
@@ -589,8 +745,7 @@ fn validate_safe_git_ref(field: &str, value: &str) -> Result<String, ConfigError
 mod tests {
     use super::*;
     use std::fs::{self, File};
-
-    use std::os::unix::fs::OpenOptionsExt;
+    use std::os::unix::fs::{OpenOptionsExt, PermissionsExt};
     use tempfile::TempDir;
 
     const POLICY_TOML: &str = r#"
@@ -652,6 +807,7 @@ timeout_seconds = 300
 
     struct ConfigFixture {
         _root: TempDir,
+        root_path: PathBuf,
         repo: PathBuf,
         state_dir: PathBuf,
         worker: PathBuf,
@@ -662,9 +818,10 @@ timeout_seconds = 300
     impl ConfigFixture {
         fn new() -> Self {
             let root = TempDir::new().expect("tempdir");
-            let repo = root.path().join("repo");
-            let state_dir = root.path().join("state");
-            let worker = root.path().join("omp");
+            let root_path = root.path().to_path_buf();
+            let repo = root_path.join("repo");
+            let state_dir = root_path.join("state");
+            let worker = root_path.join("omp");
             fs::create_dir_all(repo.join("config")).unwrap();
             fs::create_dir_all(repo.join("scripts")).unwrap();
             File::create(repo.join("scripts/opportunity-next-mission.sh")).unwrap();
@@ -675,9 +832,10 @@ timeout_seconds = 300
             opts.write(true).create(true).mode(0o755);
             opts.open(&worker).unwrap();
 
-            let valid_config = root.path().join("repo-evolver.toml");
+            let valid_config = root_path.join("repo-evolver.toml");
             let fixture = Self {
                 _root: root,
+                root_path,
                 repo,
                 state_dir,
                 worker,
@@ -689,6 +847,15 @@ timeout_seconds = 300
         }
 
         fn write_valid_config(&self) {
+            self.write_config(
+                &self.state_dir,
+                &self.repo,
+                &self.worker,
+                "config/repo-evolver.policy.toml",
+            );
+        }
+
+        fn write_config(&self, state: &Path, repo: &Path, worker: &Path, policy_repo_path: &str) {
             let body = format!(
                 r#"
 state_dir = "{state}"
@@ -710,44 +877,23 @@ executable = "{worker}"
 profile = "gzmo-repo-evolver-worker"
 
 [policy]
-repo_path = "config/repo-evolver.policy.toml"
+repo_path = "{policy}"
 "#,
-                state = self.state_dir.display(),
-                repo = self.repo.display(),
-                worker = self.worker.display(),
+                state = state.display(),
+                repo = repo.display(),
+                worker = worker.display(),
+                policy = policy_repo_path,
             );
             fs::write(&self.valid_config, body).unwrap();
         }
 
         fn write_config_with_state(&self, state: PathBuf) {
-            let body = format!(
-                r#"
-state_dir = "{state}"
-
-[repo]
-path = "{repo}"
-remote = "origin"
-base_branch = "main"
-owner = "maximilianwruhs-cyber"
-repository = "GZMO"
-
-[mission]
-json_rel = "opportunity-discovery/next-mission.json"
-markdown_rel = "opportunity-discovery/next-mission.md"
-refresh_argv = ["bash", "scripts/opportunity-next-mission.sh"]
-
-[worker]
-executable = "{worker}"
-profile = "gzmo-repo-evolver-worker"
-
-[policy]
-repo_path = "config/repo-evolver.policy.toml"
-"#,
-                state = state.display(),
-                repo = self.repo.display(),
-                worker = self.worker.display(),
+            self.write_config(
+                &state,
+                &self.repo,
+                &self.worker,
+                "config/repo-evolver.policy.toml",
             );
-            fs::write(&self.valid_config, body).unwrap();
         }
 
         fn write_config_with_unknown_worker_field(&self, key: &str, value: &str) {
@@ -852,6 +998,7 @@ repo_path = "config/repo-evolver.policy.toml"
         });
         assert!(RepoEvolverConfig::load(&fixture.valid_config).is_err());
     }
+
     #[test]
     fn loads_normalized_paths_and_policy_digest() {
         let fixture = ConfigFixture::new();
@@ -877,5 +1024,92 @@ repo_path = "config/repo-evolver.policy.toml"
             cfg.working_policy().required_hard_floor_names(),
             vec!["format", "clippy", "tests", "opportunity-contract"]
         );
+    }
+
+    #[test]
+    fn rejects_worker_directory_and_non_executable_file() {
+        let fixture = ConfigFixture::new();
+
+        let dir_worker = fixture.root_path.join("worker-dir");
+        fs::create_dir_all(&dir_worker).unwrap();
+        fixture.write_config(
+            &fixture.state_dir,
+            &fixture.repo,
+            &dir_worker,
+            "config/repo-evolver.policy.toml",
+        );
+        assert!(RepoEvolverConfig::load(&fixture.valid_config).is_err());
+
+        let plain = fixture.root_path.join("not-exec");
+        fs::write(&plain, b"#!/bin/true\n").unwrap();
+        let mut perms = fs::metadata(&plain).unwrap().permissions();
+        perms.set_mode(0o644);
+        fs::set_permissions(&plain, perms).unwrap();
+        fixture.write_config(
+            &fixture.state_dir,
+            &fixture.repo,
+            &plain,
+            "config/repo-evolver.policy.toml",
+        );
+        assert!(RepoEvolverConfig::load(&fixture.valid_config).is_err());
+
+        // repo.path must be a directory, not a file.
+        fixture.write_config(
+            &fixture.state_dir,
+            &fixture.worker,
+            &fixture.worker,
+            "config/repo-evolver.policy.toml",
+        );
+        assert!(RepoEvolverConfig::load(&fixture.valid_config).is_err());
+    }
+
+    #[test]
+    fn rejects_state_inside_repo_via_symlink_alias() {
+        let fixture = ConfigFixture::new();
+        let alias = fixture.root_path.join("repo-alias");
+        std::os::unix::fs::symlink(&fixture.repo, &alias).unwrap();
+        // state under the alias still lands inside the canonical repository.
+        fixture.write_config_with_state(alias.join("nested-state"));
+        assert!(RepoEvolverConfig::load(&fixture.valid_config).is_err());
+
+        // Existing non-repo state that is only a symlink into the repo.
+        let outside_link = fixture.root_path.join("state-link");
+        let inside = fixture.repo.join("hidden-state");
+        fs::create_dir_all(&inside).unwrap();
+        std::os::unix::fs::symlink(&inside, &outside_link).unwrap();
+        fixture.write_config_with_state(outside_link);
+        assert!(RepoEvolverConfig::load(&fixture.valid_config).is_err());
+    }
+
+    #[test]
+    fn rejects_policy_symlink_escape_outside_repo() {
+        let fixture = ConfigFixture::new();
+        let outside_policy = fixture.root_path.join("outside-policy.toml");
+        fs::write(&outside_policy, POLICY_TOML).unwrap();
+        let escape_link = fixture.repo.join("config/escape-policy.toml");
+        std::os::unix::fs::symlink(&outside_policy, &escape_link).unwrap();
+        fixture.write_config(
+            &fixture.state_dir,
+            &fixture.repo,
+            &fixture.worker,
+            "config/escape-policy.toml",
+        );
+        assert!(RepoEvolverConfig::load(&fixture.valid_config).is_err());
+    }
+
+    #[test]
+    fn accepts_nonexistent_state_dir_outside_repo() {
+        let fixture = ConfigFixture::new();
+        let future = fixture.root_path.join("future/state/dir");
+        assert!(!future.exists());
+        fixture.write_config_with_state(future.clone());
+        let cfg = RepoEvolverConfig::load(&fixture.valid_config).unwrap();
+        assert_eq!(
+            cfg.state_dir(),
+            fs::canonicalize(fixture.root_path.as_path())
+                .unwrap()
+                .join("future/state/dir")
+        );
+        assert!(!cfg.state_dir().starts_with(cfg.repo().path()));
     }
 }

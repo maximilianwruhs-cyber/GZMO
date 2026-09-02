@@ -98,10 +98,7 @@ fn run() -> Result<()> {
 
 fn require_absolute_config(path: &Path) -> Result<()> {
     if !path.is_absolute() {
-        bail!(
-            "--config must be an absolute path, got {}",
-            path.display()
-        );
+        bail!("--config must be an absolute path, got {}", path.display());
     }
     Ok(())
 }
