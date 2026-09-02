@@ -5,7 +5,7 @@
 
 use anyhow::{bail, Context, Result};
 use clap::{Parser, Subcommand};
-use gzmo_evolver::RepoEvolverConfig;
+use gzmo_evolver::{CandidateRecord, RepoEvolverConfig, StateStore};
 use serde::Serialize;
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
@@ -29,6 +29,12 @@ struct Cli {
 enum Command {
     /// Load and validate machine config plus the working-tree trusted policy.
     ConfigCheck {
+        /// Emit machine-readable JSON instead of human text.
+        #[arg(long)]
+        json: bool,
+    },
+    /// Read-only coordinator status (never creates state or takes the lock).
+    Status {
         /// Emit machine-readable JSON instead of human text.
         #[arg(long)]
         json: bool,
@@ -67,6 +73,41 @@ struct BudgetReport {
     allow_missing_energy_meter: bool,
 }
 
+#[derive(Debug, Serialize)]
+struct StatusReport {
+    schema: &'static str,
+    initialized: bool,
+    state_dir: String,
+    repository: String,
+    active_candidate: Option<ActiveCandidateStatus>,
+    audit_head: Option<AuditHeadStatus>,
+}
+
+#[derive(Debug, Serialize)]
+struct ActiveCandidateStatus {
+    id: String,
+    state: String,
+    mission_id: String,
+    kind: String,
+    policy_digest: String,
+    manifest_digest: String,
+    workspace: Option<String>,
+    candidate_digest: Option<String>,
+    receipt_digest: Option<String>,
+    terminal_reason: Option<String>,
+    created_at: String,
+    updated_at: String,
+}
+
+#[derive(Debug, Serialize)]
+struct AuditHeadStatus {
+    sequence: u64,
+    event_type: String,
+    event_hash: String,
+    candidate_id: Option<String>,
+    occurred_at: String,
+}
+
 fn main() -> ExitCode {
     match run() {
         Ok(()) => ExitCode::SUCCESS,
@@ -85,11 +126,22 @@ fn run() -> Result<()> {
         Command::ConfigCheck { json } => {
             let cfg = RepoEvolverConfig::load(&cli.config)
                 .with_context(|| format!("loading config {}", cli.config.display()))?;
-            let report = build_report(&cfg);
+            let report = build_config_report(&cfg);
             if json {
                 println!("{}", serde_json::to_string_pretty(&report)?);
             } else {
-                print_human(&report);
+                print_config_human(&report);
+            }
+            Ok(())
+        }
+        Command::Status { json } => {
+            let cfg = RepoEvolverConfig::load(&cli.config)
+                .with_context(|| format!("loading config {}", cli.config.display()))?;
+            let report = build_status_report(&cfg)?;
+            if json {
+                println!("{}", serde_json::to_string_pretty(&report)?);
+            } else {
+                print_status_human(&report);
             }
             Ok(())
         }
@@ -103,7 +155,7 @@ fn require_absolute_config(path: &Path) -> Result<()> {
     Ok(())
 }
 
-fn build_report(cfg: &RepoEvolverConfig) -> ConfigCheckReport<'_> {
+fn build_config_report(cfg: &RepoEvolverConfig) -> ConfigCheckReport<'_> {
     let policy = cfg.working_policy();
     let budget = policy.budget();
     ConfigCheckReport {
@@ -135,7 +187,68 @@ fn build_report(cfg: &RepoEvolverConfig) -> ConfigCheckReport<'_> {
     }
 }
 
-fn print_human(report: &ConfigCheckReport<'_>) {
+fn build_status_report(cfg: &RepoEvolverConfig) -> Result<StatusReport> {
+    let repository = format!("{}/{}", cfg.repo().owner(), cfg.repo().repository());
+    let state_dir = cfg.state_dir().display().to_string();
+
+    match StateStore::open_existing_readonly(cfg.state_dir())
+        .with_context(|| format!("opening state dir {}", cfg.state_dir().display()))?
+    {
+        None => Ok(StatusReport {
+            schema: "gzmo.repo_evolver.status/v1",
+            initialized: false,
+            state_dir,
+            repository,
+            active_candidate: None,
+            audit_head: None,
+        }),
+        Some(store) => {
+            let active = store
+                .active_candidate(&repository)
+                .context("loading active candidate")?;
+            let head = store.audit_head().context("loading audit head")?;
+            Ok(StatusReport {
+                schema: "gzmo.repo_evolver.status/v1",
+                initialized: true,
+                state_dir,
+                repository,
+                active_candidate: active.as_ref().map(active_status),
+                audit_head: head.map(|event| AuditHeadStatus {
+                    sequence: event.sequence,
+                    event_type: event.event_type,
+                    event_hash: event.event_hash,
+                    candidate_id: event.candidate_id.map(|id| id.to_string()),
+                    occurred_at: event
+                        .occurred_at
+                        .to_rfc3339_opts(chrono::SecondsFormat::Millis, true),
+                }),
+            })
+        }
+    }
+}
+
+fn active_status(record: &CandidateRecord) -> ActiveCandidateStatus {
+    ActiveCandidateStatus {
+        id: record.id().as_str().to_owned(),
+        state: record.state().to_string(),
+        mission_id: record.manifest().mission_id.clone(),
+        kind: record.manifest().kind.to_string(),
+        policy_digest: record.policy_digest().to_owned(),
+        manifest_digest: record.manifest_digest().to_owned(),
+        workspace: record.workspace().map(|path| path.display().to_string()),
+        candidate_digest: record.candidate_digest().map(str::to_owned),
+        receipt_digest: record.receipt_digest().map(str::to_owned),
+        terminal_reason: record.terminal_reason().map(str::to_owned),
+        created_at: record
+            .created_at()
+            .to_rfc3339_opts(chrono::SecondsFormat::Millis, true),
+        updated_at: record
+            .updated_at()
+            .to_rfc3339_opts(chrono::SecondsFormat::Millis, true),
+    }
+}
+
+fn print_config_human(report: &ConfigCheckReport<'_>) {
     println!("config-check: ok");
     println!("  repo_path: {}", report.repo_path);
     println!("  state_dir: {}", report.state_dir);
@@ -164,4 +277,53 @@ fn print_human(report: &ConfigCheckReport<'_>) {
     println!("  mission_json_rel: {}", report.mission_json_rel);
     println!("  mission_markdown_rel: {}", report.mission_markdown_rel);
     println!("  refresh_argv: {:?}", report.refresh_argv);
+}
+
+fn print_status_human(report: &StatusReport) {
+    println!("status: initialized={}", report.initialized);
+    println!("  state_dir: {}", report.state_dir);
+    println!("  repository: {}", report.repository);
+    match &report.active_candidate {
+        None => println!("  active_candidate: none"),
+        Some(c) => {
+            println!(
+                "  active_candidate: id={} state={} mission_id={} kind={}",
+                c.id, c.state, c.mission_id, c.kind
+            );
+            println!("    policy_digest: {}", c.policy_digest);
+            println!("    manifest_digest: {}", c.manifest_digest);
+            println!(
+                "    workspace: {}",
+                c.workspace.as_deref().unwrap_or("none")
+            );
+            println!(
+                "    candidate_digest: {}",
+                c.candidate_digest.as_deref().unwrap_or("none")
+            );
+            println!(
+                "    receipt_digest: {}",
+                c.receipt_digest.as_deref().unwrap_or("none")
+            );
+            println!(
+                "    terminal_reason: {}",
+                c.terminal_reason.as_deref().unwrap_or("none")
+            );
+            println!("    created_at: {}", c.created_at);
+            println!("    updated_at: {}", c.updated_at);
+        }
+    }
+    match &report.audit_head {
+        None => println!("  audit_head: none"),
+        Some(h) => {
+            println!(
+                "  audit_head: sequence={} event_type={} event_hash={}",
+                h.sequence, h.event_type, h.event_hash
+            );
+            println!(
+                "    candidate_id: {}",
+                h.candidate_id.as_deref().unwrap_or("none")
+            );
+            println!("    occurred_at: {}", h.occurred_at);
+        }
+    }
 }
