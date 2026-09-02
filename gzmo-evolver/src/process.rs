@@ -715,11 +715,61 @@ mod tests {
         assert!(!err.to_string().contains("xxxx"));
     }
 
-    /// Poll until `marker` exists or `deadline` elapses. Returns whether it appeared.
+    /// Stable process identity: pid + kernel starttime (field 22 of `/proc/<pid>/stat`).
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    struct ProcIdentity {
+        pid: i32,
+        starttime: u64,
+    }
+
+    /// Parse field 22 (`starttime`) from `/proc/<pid>/stat`, handling `(comm)` parentheses.
+    fn read_starttime(pid: i32) -> Option<u64> {
+        if pid <= 1 {
+            return None;
+        }
+        let text = fs::read_to_string(format!("/proc/{pid}/stat")).ok()?;
+        let close = text.rfind(')')?;
+        let rest = text.get(close + 1..)?.trim_start();
+        // After the final `)`, fields resume at state (field 3). starttime is field 22
+        // => index 22 - 3 = 19 in the post-paren whitespace split.
+        let field = rest.split_whitespace().nth(19)?;
+        field.parse().ok()
+    }
+
+    fn read_identity(pid: i32) -> Option<ProcIdentity> {
+        let starttime = read_starttime(pid)?;
+        // Confirm the slot is live under this pid before accepting identity.
+        if unsafe { libc::kill(pid, 0) } != 0 {
+            return None;
+        }
+        Some(ProcIdentity { pid, starttime })
+    }
+
+    /// Alive only when the same pid still carries the captured starttime.
+    fn identity_alive(id: &ProcIdentity) -> bool {
+        match read_starttime(id.pid) {
+            Some(st) if st == id.starttime => unsafe { libc::kill(id.pid, 0) == 0 },
+            _ => false,
+        }
+    }
+
+    /// SIGKILL only the recorded identity (never a recycled pid with a new starttime).
+    fn force_kill_identity(id: &ProcIdentity) {
+        if identity_alive(id) {
+            unsafe {
+                let _ = libc::kill(id.pid, libc::SIGKILL);
+            }
+        }
+        let deadline = Instant::now() + Duration::from_secs(2);
+        while identity_alive(id) && Instant::now() < deadline {
+            thread::sleep(Duration::from_millis(20));
+        }
+    }
+
+    /// Poll until `marker` has non-empty content or `deadline` elapses.
     fn wait_for_marker(marker: &Path, deadline: Instant) -> bool {
         while Instant::now() < deadline {
             if marker.exists() {
-                // Ensure non-empty content is flushed.
                 if let Ok(text) = fs::read_to_string(marker) {
                     if !text.trim().is_empty() {
                         return true;
@@ -729,20 +779,45 @@ mod tests {
             thread::sleep(Duration::from_millis(20));
         }
         marker.exists()
+            && fs::read_to_string(marker)
+                .map(|t| !t.trim().is_empty())
+                .unwrap_or(false)
     }
 
-    /// True if `pid` still refers to a live process (ESRCH => gone).
-    fn pid_alive(pid: i32) -> bool {
-        if pid <= 1 {
-            return false;
-        }
-        // Prefer /proc to reduce pid-reuse false positives when the slot is
-        // recycled by an unrelated process quickly after reap.
-        let proc_path = PathBuf::from(format!("/proc/{pid}"));
-        if !proc_path.exists() {
-            return false;
-        }
-        unsafe { libc::kill(pid, 0) == 0 }
+    /// Parse `pid starttime` written by a descendant while it was alive.
+    fn identity_from_marker(marker: &Path) -> ProcIdentity {
+        let text = fs::read_to_string(marker).expect("marker readable");
+        let mut parts = text.split_whitespace();
+        let pid: i32 = parts.next().expect("pid field").parse().expect("pid int");
+        let starttime: u64 = parts
+            .next()
+            .expect("starttime field")
+            .parse()
+            .expect("starttime int");
+        assert!(pid > 1, "invalid pid {pid}");
+        ProcIdentity { pid, starttime }
+    }
+
+    /// Shared python descendant body: ignore TERM/HUP, record pid+starttime, hang.
+    fn descendant_python(marker: &Path) -> String {
+        format!(
+            r#"python3 - <<'PY' &
+import os, signal, time
+from pathlib import Path
+signal.signal(signal.SIGTERM, signal.SIG_IGN)
+signal.signal(signal.SIGHUP, signal.SIG_IGN)
+pid = os.getpid()
+stat = Path(f"/proc/{{pid}}/stat").read_text()
+rest = stat[stat.rfind(")") + 1 :].split()
+# field 22 starttime => index 19 after state (field 3)
+starttime = rest[19]
+Path(r"{marker}").write_text(f"{{pid}} {{starttime}}\n")
+while True:
+    time.sleep(0.2)
+PY
+"#,
+            marker = marker.display()
+        )
     }
 
     #[test]
@@ -755,23 +830,12 @@ mod tests {
             &format!(
                 r#"#!/bin/bash
 set -euo pipefail
-# TERM/HUP-ignoring descendant records its own pid, then hangs.
-python3 - <<'PY' &
-import os, signal, time
-from pathlib import Path
-signal.signal(signal.SIGTERM, signal.SIG_IGN)
-signal.signal(signal.SIGHUP, signal.SIG_IGN)
-Path(r"{marker}").write_text(str(os.getpid()))
-while True:
-    time.sleep(0.2)
-PY
+{descendant}
 wait
 "#,
-                marker = marker.display()
+                descendant = descendant_python(&marker)
             ),
         );
-        // Spec timeout long enough for python cold-start on a loaded host, still
-        // far below a hung-forever hang.
         let timeout = Duration::from_secs(2);
         let spec = ProcessSpec::new(
             "/bin/bash",
@@ -798,23 +862,24 @@ wait
             "elapsed {elapsed:?} finished before product deadline {timeout:?}"
         );
 
-        // Bounded readiness poll (no fixed cold-start sleep).
         let ready_deadline = Instant::now() + Duration::from_secs(2);
         assert!(
             wait_for_marker(&marker, ready_deadline),
-            "grandchild must have written its pid within readiness window"
+            "grandchild must have written pid+starttime within readiness window"
         );
-        let pid_text = fs::read_to_string(&marker).unwrap();
-        let pid: i32 = pid_text.trim().parse().expect("pid");
-        assert!(pid > 1);
-        // Give the kernel a moment after killpg/wait, then require gone.
-        let dead_deadline = Instant::now() + Duration::from_secs(2);
-        while pid_alive(pid) && Instant::now() < dead_deadline {
-            thread::sleep(Duration::from_millis(20));
-        }
+        let id = identity_from_marker(&marker);
+
+        // Capture leaked status, then unconditionally clean the same identity.
+        let leaked = identity_alive(&id);
+        force_kill_identity(&id);
         assert!(
-            !pid_alive(pid),
-            "grandchild pid {pid} still alive after group kill"
+            !leaked,
+            "grandchild identity pid={} starttime={} still alive after group kill",
+            id.pid, id.starttime
+        );
+        assert!(
+            !identity_alive(&id),
+            "grandchild identity must be dead after cleanup"
         );
     }
 
@@ -822,24 +887,15 @@ wait
     fn system_runner_timeout_when_child_closes_pipes_and_keeps_running() {
         let dir = TempDir::new().unwrap();
         let marker = dir.path().join("descendant-pid");
+        let closed_marker = dir.path().join("pipes-closed");
         let script = write_executable(
             dir.path(),
             "close_pipes.sh",
             &format!(
                 r#"#!/bin/bash
 set -euo pipefail
-# Real descendant (not $$): ignores TERM/HUP, writes its own pid, then hangs.
-python3 - <<'PY' &
-import os, signal, time
-from pathlib import Path
-signal.signal(signal.SIGTERM, signal.SIG_IGN)
-signal.signal(signal.SIGHUP, signal.SIG_IGN)
-Path(r"{marker}").write_text(str(os.getpid()))
-while True:
-    time.sleep(0.2)
-PY
-# Script-side readiness: wait until the descendant has recorded its pid
-# before closing pipes, so the runner's wall clock still covers a closed-pipe hang.
+{descendant}
+# Wait until the descendant has recorded identity before closing pipes.
 for _ in $(seq 1 100); do
   if [ -s "{marker}" ]; then
     break
@@ -848,13 +904,15 @@ for _ in $(seq 1 100); do
 done
 exec 1>&-
 exec 2>&-
+# Prove closed-pipe state via a direct file write (stdout/stderr already closed).
+echo closed > "{closed_marker}"
 sleep 60
 "#,
-                marker = marker.display()
+                descendant = descendant_python(&marker),
+                marker = marker.display(),
+                closed_marker = closed_marker.display()
             ),
         );
-        // Product timeout: must still fire after pipes close; leave headroom for
-        // descendant cold-start inside the script readiness loop.
         let timeout = Duration::from_secs(2);
         let spec = ProcessSpec::new(
             "/bin/bash",
@@ -876,28 +934,39 @@ sleep 60
             elapsed < timeout + Duration::from_secs(2),
             "elapsed {elapsed:?} exceeded deadline bound"
         );
-        // Strict product timeout: wall clock must reach near the configured timeout.
         assert!(
             elapsed >= timeout.saturating_sub(Duration::from_millis(200)),
             "elapsed {elapsed:?} finished before product deadline {timeout:?}"
         );
 
-        // Bounded readiness poll for the descendant marker (not the direct child).
         let ready_deadline = Instant::now() + Duration::from_secs(2);
         assert!(
             wait_for_marker(&marker, ready_deadline),
-            "closed-pipes descendant must write its own pid within readiness window"
+            "closed-pipes descendant must write pid+starttime within readiness window"
         );
-        let pid_text = fs::read_to_string(&marker).unwrap();
-        let pid: i32 = pid_text.trim().parse().expect("descendant pid");
-        assert!(pid > 1, "invalid pid {pid}");
-        let dead_deadline = Instant::now() + Duration::from_secs(2);
-        while pid_alive(pid) && Instant::now() < dead_deadline {
-            thread::sleep(Duration::from_millis(20));
-        }
+        // Causal: pipes must have closed before the runner finished the timeout path.
         assert!(
-            !pid_alive(pid),
-            "descendant pid {pid} still alive after closed-pipes timeout kill/reap"
+            wait_for_marker(&closed_marker, ready_deadline),
+            "closed-pipes script must record that stdout/stderr were closed before hang"
+        );
+        let closed_text = fs::read_to_string(&closed_marker).unwrap();
+        assert!(
+            closed_text.contains("closed"),
+            "unexpected closed marker content: {closed_text:?}"
+        );
+
+        let id = identity_from_marker(&marker);
+        let leaked = identity_alive(&id);
+        force_kill_identity(&id);
+        assert!(
+            !leaked,
+            "descendant identity pid={} starttime={} still alive after closed-pipes timeout kill/reap",
+            id.pid,
+            id.starttime
+        );
+        assert!(
+            !identity_alive(&id),
+            "descendant identity must be dead after cleanup"
         );
     }
 
