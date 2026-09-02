@@ -85,8 +85,8 @@ fn policy_digest_is_canonical_and_policy_is_bounded() {
     let first = TrustedPolicy::parse_toml(VALID_POLICY_A.as_bytes()).unwrap();
     let second = TrustedPolicy::parse_toml(VALID_POLICY_REORDERED.as_bytes()).unwrap();
     assert_eq!(first.digest().unwrap(), second.digest().unwrap());
-    assert!(first.budget.validate().is_ok());
-    assert!(first.protected_paths.check("Cargo.toml").is_err());
+    assert!(first.budget().validate().is_ok());
+    assert!(first.protected_paths().check("Cargo.toml").is_err());
 }
 ```
 
