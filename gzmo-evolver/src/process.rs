@@ -736,15 +736,6 @@ mod tests {
         field.parse().ok()
     }
 
-    fn read_identity(pid: i32) -> Option<ProcIdentity> {
-        let starttime = read_starttime(pid)?;
-        // Confirm the slot is live under this pid before accepting identity.
-        if unsafe { libc::kill(pid, 0) } != 0 {
-            return None;
-        }
-        Some(ProcIdentity { pid, starttime })
-    }
-
     /// Alive only when the same pid still carries the captured starttime.
     fn identity_alive(id: &ProcIdentity) -> bool {
         match read_starttime(id.pid) {
@@ -766,36 +757,49 @@ mod tests {
         }
     }
 
-    /// Poll until `marker` has non-empty content or `deadline` elapses.
-    fn wait_for_marker(marker: &Path, deadline: Instant) -> bool {
+    /// Fallible parser: exactly two whitespace fields `pid starttime`, pid > 1, no extras.
+    fn parse_identity_marker(text: &str) -> Option<ProcIdentity> {
+        let mut parts = text.split_whitespace();
+        let pid: i32 = parts.next()?.parse().ok()?;
+        let starttime: u64 = parts.next()?.parse().ok()?;
+        if parts.next().is_some() {
+            return None;
+        }
+        if pid <= 1 {
+            return None;
+        }
+        Some(ProcIdentity { pid, starttime })
+    }
+
+    /// Bounded poll that only returns when the marker parses as a complete identity.
+    /// Partial/nonempty garbage never counts as ready (no separate readiness vs parse contract).
+    fn wait_for_identity_marker(marker: &Path, deadline: Instant) -> Option<ProcIdentity> {
         while Instant::now() < deadline {
-            if marker.exists() {
-                if let Ok(text) = fs::read_to_string(marker) {
-                    if !text.trim().is_empty() {
-                        return true;
-                    }
+            if let Ok(text) = fs::read_to_string(marker) {
+                if let Some(id) = parse_identity_marker(&text) {
+                    return Some(id);
                 }
             }
             thread::sleep(Duration::from_millis(20));
         }
-        marker.exists()
-            && fs::read_to_string(marker)
-                .map(|t| !t.trim().is_empty())
-                .unwrap_or(false)
+        fs::read_to_string(marker)
+            .ok()
+            .and_then(|text| parse_identity_marker(&text))
     }
 
-    /// Parse `pid starttime` written by a descendant while it was alive.
-    fn identity_from_marker(marker: &Path) -> ProcIdentity {
-        let text = fs::read_to_string(marker).expect("marker readable");
-        let mut parts = text.split_whitespace();
-        let pid: i32 = parts.next().expect("pid field").parse().expect("pid int");
-        let starttime: u64 = parts
-            .next()
-            .expect("starttime field")
-            .parse()
-            .expect("starttime int");
-        assert!(pid > 1, "invalid pid {pid}");
-        ProcIdentity { pid, starttime }
+    /// Bounded poll for a non-identity text marker (e.g. closed-pipes proof).
+    fn wait_for_text_marker(marker: &Path, needle: &str, deadline: Instant) -> bool {
+        while Instant::now() < deadline {
+            if let Ok(text) = fs::read_to_string(marker) {
+                if text.contains(needle) {
+                    return true;
+                }
+            }
+            thread::sleep(Duration::from_millis(20));
+        }
+        fs::read_to_string(marker)
+            .map(|t| t.contains(needle))
+            .unwrap_or(false)
     }
 
     /// Shared python descendant body: ignore TERM/HUP, record pid+starttime, hang.
@@ -861,13 +865,10 @@ wait
             elapsed >= timeout.saturating_sub(Duration::from_millis(200)),
             "elapsed {elapsed:?} finished before product deadline {timeout:?}"
         );
-
         let ready_deadline = Instant::now() + Duration::from_secs(2);
-        assert!(
-            wait_for_marker(&marker, ready_deadline),
-            "grandchild must have written pid+starttime within readiness window"
-        );
-        let id = identity_from_marker(&marker);
+        let Some(id) = wait_for_identity_marker(&marker, ready_deadline) else {
+            panic!("grandchild must have written a complete pid+starttime marker within readiness window");
+        };
 
         // Capture leaked status, then unconditionally clean the same identity.
         let leaked = identity_alive(&id);
@@ -940,22 +941,15 @@ sleep 60
         );
 
         let ready_deadline = Instant::now() + Duration::from_secs(2);
-        assert!(
-            wait_for_marker(&marker, ready_deadline),
-            "closed-pipes descendant must write pid+starttime within readiness window"
-        );
+        let Some(id) = wait_for_identity_marker(&marker, ready_deadline) else {
+            panic!("closed-pipes descendant must write a complete pid+starttime marker within readiness window");
+        };
         // Causal: pipes must have closed before the runner finished the timeout path.
         assert!(
-            wait_for_marker(&closed_marker, ready_deadline),
+            wait_for_text_marker(&closed_marker, "closed", ready_deadline),
             "closed-pipes script must record that stdout/stderr were closed before hang"
         );
-        let closed_text = fs::read_to_string(&closed_marker).unwrap();
-        assert!(
-            closed_text.contains("closed"),
-            "unexpected closed marker content: {closed_text:?}"
-        );
 
-        let id = identity_from_marker(&marker);
         let leaked = identity_alive(&id);
         force_kill_identity(&id);
         assert!(
