@@ -70,6 +70,9 @@ fs2 = "0.4"
 # Unix process-group termination (killpg) for ProcessRunner
 libc = "0.2"
 
+# Unix identity/fs metadata for sealed worker ownership checks
+nix = { version = "0.31", default-features = false, features = ["user", "fs"] }
+
 # Strict remote URL parsing for credential-free Git identity checks
 url = "2"
 

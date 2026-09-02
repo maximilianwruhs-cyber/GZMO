@@ -1165,3 +1165,40 @@ fn diff_rejects_protected_path_change() {
         "{err:?}"
     );
 }
+
+#[test]
+fn public_commands_require_config_hidden_worker_does_not() {
+    // Build the binary path from the test exe location.
+    let mut bin = std::env::current_exe().unwrap();
+    bin.pop(); // deps
+    if bin.ends_with("deps") {
+        bin.pop();
+    }
+    bin.push("gzmo-evolver");
+    assert!(bin.is_file(), "missing binary {}", bin.display());
+
+    // Public command without --config must fail.
+    let out = std::process::Command::new(&bin)
+        .args(["status"])
+        .output()
+        .unwrap();
+    assert!(!out.status.success(), "status without --config must fail");
+    let err = String::from_utf8_lossy(&out.stderr);
+    assert!(
+        err.contains("--config") || err.contains("required"),
+        "stderr={err}"
+    );
+
+    // Hidden worker without --config should fail on request path validation,
+    // not on missing config.
+    let out = std::process::Command::new(&bin)
+        .args(["worker", "--request", "/tmp/no-such-request.json"])
+        .output()
+        .unwrap();
+    assert!(!out.status.success());
+    let err = String::from_utf8_lossy(&out.stderr);
+    assert!(
+        !err.contains("--config is required"),
+        "worker must not require --config; stderr={err}"
+    );
+}

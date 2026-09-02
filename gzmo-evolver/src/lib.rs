@@ -8,6 +8,8 @@ pub mod mission;
 pub mod policy;
 pub mod process;
 pub mod state;
+#[cfg(unix)]
+pub mod worker;
 pub use config::{
     ConfigError, MissionConfig, PolicyConfig, RepoConfig, RepoEvolverConfig, WorkerConfig,
 };
@@ -36,4 +38,15 @@ pub use state::{
     CandidateRecord, CoordinatorLock, StateError, StateStore, TransitionMetadata,
     MAX_TERMINAL_REASON_BYTES, RUNNER_LOCK_NAME, STATE_APPLICATION_ID, STATE_DB_NAME,
     STATE_SCHEMA_VERSION,
+};
+#[cfg(unix)]
+pub use worker::{
+    build_omp_args, load_sealed_request, load_worker_receipt, omp_child_env, parse_omp_jsonl,
+    probe_omp_version, render_mission_prompt, render_omp_overlay, render_system_prompt,
+    run_hidden_worker, run_worker_request, seal_worker_bundle, validate_code_candidate_profile,
+    EffectiveIdentity, FakeWorkerLauncher, OmpJsonlUsage, PathAuthority, SealWorkerInput,
+    SystemPathAuthority, SystemdWorkerLauncher, TestPathAuthority, WorkerCompanions, WorkerError,
+    WorkerLauncher, WorkerReceipt, WorkerRequest, WorkerRoots, FORBIDDEN_ENV, LOCAL_MODEL_BASE_URL,
+    OMP_OUTPUT_CAP_BYTES, PROD_MODEL_NETNS, PROD_OUTPUT_ROOT, PROD_PROFILE_ROOT, PROD_REQUEST_ROOT,
+    WORKER_NO_PROXY, WORKER_RECEIPT_SCHEMA, WORKER_REQUEST_SCHEMA, WORKER_SAFE_PATH,
 };

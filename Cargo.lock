@@ -972,11 +972,13 @@ name = "gzmo-evolver"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "async-trait",
  "chrono",
  "clap",
  "evolution-contracts",
  "fs2",
  "libc",
+ "nix",
  "rusqlite",
  "serde",
  "serde_json",

@@ -5,6 +5,8 @@
 
 use anyhow::{bail, Context, Result};
 use clap::{Parser, Subcommand};
+#[cfg(unix)]
+use gzmo_evolver::run_hidden_worker;
 use gzmo_evolver::{
     prepare_candidate, refresh_baseline_before_mission, CandidateRecord, CoordinatorLock,
     MissionAdapter, RepoEvolverConfig, StateStore, SystemClock, SystemProcessRunner,
@@ -21,8 +23,11 @@ use std::process::ExitCode;
 )]
 struct Cli {
     /// Absolute path to the machine-local placement configuration.
+    ///
+    /// Required for public coordinator commands. The hidden `worker` command
+    /// never loads coordinator config and ignores this flag.
     #[arg(long, value_name = "ABSOLUTE_PATH")]
-    config: PathBuf,
+    config: Option<PathBuf>,
 
     #[command(subcommand)]
     command: Command,
@@ -58,6 +63,13 @@ enum Command {
         /// Emit machine-readable JSON instead of human text.
         #[arg(long)]
         json: bool,
+    },
+    /// Hidden uncredentialed OMP worker (no coordinator config).
+    #[command(hide = true)]
+    Worker {
+        /// Absolute sealed request.json path under the request root.
+        #[arg(long, value_name = "ABSOLUTE_PATH")]
+        request: PathBuf,
     },
 }
 
@@ -162,12 +174,25 @@ fn main() -> ExitCode {
 
 fn run() -> Result<()> {
     let cli = Cli::parse();
-    require_absolute_config(&cli.config)?;
 
     match cli.command {
+        #[cfg(unix)]
+        Command::Worker { request } => {
+            // Hidden worker never reads coordinator config.
+            if cli.config.is_some() {
+                // Accept presence but do not load it; structural separation.
+            }
+            run_hidden_worker(&request).map_err(|err| anyhow::anyhow!("worker failed: {err}"))?;
+            Ok(())
+        }
+        #[cfg(not(unix))]
+        Command::Worker { .. } => {
+            bail!("worker command is only supported on Unix");
+        }
         Command::ConfigCheck { json } => {
-            let cfg = RepoEvolverConfig::load(&cli.config)
-                .with_context(|| format!("loading config {}", cli.config.display()))?;
+            let config_path = require_cli_config(cli.config.as_deref())?;
+            let cfg = RepoEvolverConfig::load(config_path)
+                .with_context(|| format!("loading config {}", config_path.display()))?;
             let report = build_config_report(&cfg);
             if json {
                 println!("{}", serde_json::to_string_pretty(&report)?);
@@ -177,8 +202,9 @@ fn run() -> Result<()> {
             Ok(())
         }
         Command::Status { json } => {
-            let cfg = RepoEvolverConfig::load(&cli.config)
-                .with_context(|| format!("loading config {}", cli.config.display()))?;
+            let config_path = require_cli_config(cli.config.as_deref())?;
+            let cfg = RepoEvolverConfig::load(config_path)
+                .with_context(|| format!("loading config {}", config_path.display()))?;
             let report = build_status_report(&cfg)?;
             if json {
                 println!("{}", serde_json::to_string_pretty(&report)?);
@@ -188,8 +214,9 @@ fn run() -> Result<()> {
             Ok(())
         }
         Command::Refresh { json } => {
-            let cfg = RepoEvolverConfig::load(&cli.config)
-                .with_context(|| format!("loading config {}", cli.config.display()))?;
+            let config_path = require_cli_config(cli.config.as_deref())?;
+            let cfg = RepoEvolverConfig::load(config_path)
+                .with_context(|| format!("loading config {}", config_path.display()))?;
             let runner = SystemProcessRunner;
             // Trust-first: locked mirror refresh + HEAD/policy before producer.
             let _baseline = refresh_baseline_before_mission(&cfg, &runner)
@@ -221,8 +248,9 @@ fn run() -> Result<()> {
             Ok(())
         }
         Command::Prepare { json } => {
-            let cfg = RepoEvolverConfig::load(&cli.config)
-                .with_context(|| format!("loading config {}", cli.config.display()))?;
+            let config_path = require_cli_config(cli.config.as_deref())?;
+            let cfg = RepoEvolverConfig::load(config_path)
+                .with_context(|| format!("loading config {}", config_path.display()))?;
             let _lock = CoordinatorLock::try_acquire(cfg.state_dir())
                 .context("acquiring coordinator lock")?;
             let store =
@@ -245,6 +273,12 @@ fn run() -> Result<()> {
             Ok(())
         }
     }
+}
+
+fn require_cli_config(config: Option<&Path>) -> Result<&Path> {
+    let path = config.ok_or_else(|| anyhow::anyhow!("--config is required for this command"))?;
+    require_absolute_config(path)?;
+    Ok(path)
 }
 
 fn require_absolute_config(path: &Path) -> Result<()> {

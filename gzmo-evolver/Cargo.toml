@@ -27,6 +27,8 @@ tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 clap = { workspace = true }
 libc = { workspace = true }
+async-trait = { workspace = true }
+nix = { version = "0.31", features = ["user", "fs"] }
 url = { workspace = true }
 
 [dev-dependencies]
