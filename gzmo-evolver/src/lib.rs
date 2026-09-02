@@ -3,13 +3,19 @@
 //! Later tasks add modules only when real implementations exist.
 
 pub mod config;
+pub mod git;
 pub mod mission;
 pub mod policy;
 pub mod process;
 pub mod state;
-
 pub use config::{
     ConfigError, MissionConfig, PolicyConfig, RepoConfig, RepoEvolverConfig, WorkerConfig,
+};
+pub use git::{
+    cleanup_workspace, prepare_candidate, verify_git_trust, DiffFile, DiffStats, GitError,
+    GitRepository, GitWorkspace, PrepareError, PrepareOutcome, CANDIDATE_AUTHOR_EMAIL,
+    CANDIDATE_AUTHOR_NAME, GIT_HOME_NAME, GIT_TIMEOUT_SECS, MIRROR_LOCK_NAME, MIRROR_NAME,
+    NO_FETCH_URL, NO_PUSH_URL, WORKSPACES_DIR,
 };
 pub use mission::{
     Clock, ManualClock, Mission, MissionAdapter, MissionError, PreparedCandidate, SystemClock,

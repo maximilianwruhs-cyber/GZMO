@@ -802,6 +802,19 @@ mod tests {
             .unwrap_or(false)
     }
 
+    /// Bounded poll that returns once the identity is dead, or `false` if still
+    /// alive when `deadline` expires. Used before leak sampling so asynchronous
+    /// SIGKILL/reaping cannot flake the hard-floor gate.
+    fn wait_for_identity_death(id: &ProcIdentity, deadline: Instant) -> bool {
+        while Instant::now() < deadline {
+            if !identity_alive(id) {
+                return true;
+            }
+            thread::sleep(Duration::from_millis(20));
+        }
+        !identity_alive(id)
+    }
+
     /// Shared python descendant body: ignore TERM/HUP, record pid+starttime, hang.
     fn descendant_python(marker: &Path) -> String {
         format!(
@@ -870,7 +883,9 @@ wait
             panic!("grandchild must have written a complete pid+starttime marker within readiness window");
         };
 
-        // Capture leaked status, then unconditionally clean the same identity.
+        // Death-poll before leak sampling: group kill/reap is asynchronous.
+        let death_deadline = Instant::now() + Duration::from_secs(2);
+        let _ = wait_for_identity_death(&id, death_deadline);
         let leaked = identity_alive(&id);
         force_kill_identity(&id);
         assert!(
@@ -950,6 +965,9 @@ sleep 60
             "closed-pipes script must record that stdout/stderr were closed before hang"
         );
 
+        // Death-poll before leak sampling: group kill/reap is asynchronous.
+        let death_deadline = Instant::now() + Duration::from_secs(2);
+        let _ = wait_for_identity_death(&id, death_deadline);
         let leaked = identity_alive(&id);
         force_kill_identity(&id);
         assert!(

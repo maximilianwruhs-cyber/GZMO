@@ -27,6 +27,7 @@ tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 clap = { workspace = true }
 libc = { workspace = true }
+url = { workspace = true }
 
 [dev-dependencies]
 tempfile = "3"

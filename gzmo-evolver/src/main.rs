@@ -6,8 +6,8 @@
 use anyhow::{bail, Context, Result};
 use clap::{Parser, Subcommand};
 use gzmo_evolver::{
-    CandidateRecord, MissionAdapter, RepoEvolverConfig, StateStore, SystemClock,
-    SystemProcessRunner,
+    prepare_candidate, verify_git_trust, CandidateRecord, CoordinatorLock, MissionAdapter,
+    RepoEvolverConfig, StateStore, SystemClock, SystemProcessRunner,
 };
 use serde::Serialize;
 use std::path::{Path, PathBuf};
@@ -42,11 +42,18 @@ enum Command {
         #[arg(long)]
         json: bool,
     },
-    /// Refresh the opportunity mission and publish an immutable snapshot.
+    /// Refresh the opportunity mission after verifying Git trust.
     ///
-    /// Never opens the candidate database, acquires the coordinator lease,
-    /// resolves Git, or prepares a candidate.
+    /// Verifies trusted checkout remote identity and cleanliness without
+    /// opening the candidate database or acquiring the coordinator lease.
+    /// Does not prepare a candidate or resolve/create workspaces.
     Refresh {
+        /// Emit machine-readable JSON instead of human text.
+        #[arg(long)]
+        json: bool,
+    },
+    /// Prepare exactly one active candidate workspace (active-first, trust-first).
+    Prepare {
         /// Emit machine-readable JSON instead of human text.
         #[arg(long)]
         json: bool,
@@ -134,6 +141,14 @@ struct RefreshReport {
     policy_digest: String,
 }
 
+#[derive(Debug, Serialize)]
+struct PrepareReport {
+    schema: &'static str,
+    reused_active: bool,
+    baseline: Option<String>,
+    candidate: ActiveCandidateStatus,
+}
+
 fn main() -> ExitCode {
     match run() {
         Ok(()) => ExitCode::SUCCESS,
@@ -174,8 +189,8 @@ fn run() -> Result<()> {
         Command::Refresh { json } => {
             let cfg = RepoEvolverConfig::load(&cli.config)
                 .with_context(|| format!("loading config {}", cli.config.display()))?;
-            // Config load already validated working-tree policy.
             let runner = SystemProcessRunner;
+            verify_git_trust(&cfg, &runner).context("verifying git trust before refresh")?;
             let clock = SystemClock;
             let adapter = MissionAdapter::new(&cfg, &runner, &clock);
             let mission = adapter
@@ -199,6 +214,30 @@ fn run() -> Result<()> {
                 println!("{}", serde_json::to_string_pretty(&report)?);
             } else {
                 print_refresh_human(&report);
+            }
+            Ok(())
+        }
+        Command::Prepare { json } => {
+            let cfg = RepoEvolverConfig::load(&cli.config)
+                .with_context(|| format!("loading config {}", cli.config.display()))?;
+            let _lock = CoordinatorLock::try_acquire(cfg.state_dir())
+                .context("acquiring coordinator lock")?;
+            let store =
+                StateStore::open(cfg.state_dir()).context("opening coordinator state store")?;
+            let runner = SystemProcessRunner;
+            let clock = SystemClock;
+            let outcome = prepare_candidate(&cfg, &runner, &clock, &store)
+                .context("preparing candidate workspace")?;
+            let report = PrepareReport {
+                schema: "gzmo.repo_evolver.prepare/v1",
+                reused_active: outcome.reused_active,
+                baseline: outcome.baseline,
+                candidate: active_status(&outcome.record),
+            };
+            if json {
+                println!("{}", serde_json::to_string_pretty(&report)?);
+            } else {
+                print_prepare_human(&report);
             }
             Ok(())
         }
@@ -396,4 +435,30 @@ fn print_refresh_human(report: &RefreshReport) {
     println!("  generation_id: {}", report.generation_id);
     println!("  mission_md: {}", report.mission_md);
     println!("  policy_digest: {}", report.policy_digest);
+}
+
+fn print_prepare_human(report: &PrepareReport) {
+    println!("prepare: ok reused_active={}", report.reused_active);
+    if let Some(baseline) = &report.baseline {
+        println!("  baseline: {baseline}");
+    } else {
+        println!("  baseline: (unchanged; active candidate reused)");
+    }
+    let c = &report.candidate;
+    println!(
+        "  candidate: id={} state={} mission_id={} kind={}",
+        c.id, c.state, c.mission_id, c.kind
+    );
+    println!("    policy_digest: {}", c.policy_digest);
+    println!("    manifest_digest: {}", c.manifest_digest);
+    println!(
+        "    workspace: {}",
+        c.workspace.as_deref().unwrap_or("none")
+    );
+    println!(
+        "    candidate_digest: {}",
+        c.candidate_digest.as_deref().unwrap_or("none")
+    );
+    println!("    created_at: {}", c.created_at);
+    println!("    updated_at: {}", c.updated_at);
 }
