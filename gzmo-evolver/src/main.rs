@@ -5,7 +5,10 @@
 
 use anyhow::{bail, Context, Result};
 use clap::{Parser, Subcommand};
-use gzmo_evolver::{CandidateRecord, RepoEvolverConfig, StateStore};
+use gzmo_evolver::{
+    CandidateRecord, MissionAdapter, RepoEvolverConfig, StateStore, SystemClock,
+    SystemProcessRunner,
+};
 use serde::Serialize;
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
@@ -35,6 +38,15 @@ enum Command {
     },
     /// Read-only coordinator status (never creates state or takes the lock).
     Status {
+        /// Emit machine-readable JSON instead of human text.
+        #[arg(long)]
+        json: bool,
+    },
+    /// Refresh the opportunity mission and publish an immutable snapshot.
+    ///
+    /// Never opens the candidate database, acquires the coordinator lease,
+    /// resolves Git, or prepares a candidate.
+    Refresh {
         /// Emit machine-readable JSON instead of human text.
         #[arg(long)]
         json: bool,
@@ -108,6 +120,20 @@ struct AuditHeadStatus {
     occurred_at: String,
 }
 
+#[derive(Debug, Serialize)]
+struct RefreshReport {
+    schema: &'static str,
+    bet_id: String,
+    title: String,
+    score: i64,
+    ship_bar: bool,
+    generated_at: String,
+    content_digest: String,
+    generation_id: String,
+    mission_md: String,
+    policy_digest: String,
+}
+
 fn main() -> ExitCode {
     match run() {
         Ok(()) => ExitCode::SUCCESS,
@@ -142,6 +168,37 @@ fn run() -> Result<()> {
                 println!("{}", serde_json::to_string_pretty(&report)?);
             } else {
                 print_status_human(&report);
+            }
+            Ok(())
+        }
+        Command::Refresh { json } => {
+            let cfg = RepoEvolverConfig::load(&cli.config)
+                .with_context(|| format!("loading config {}", cli.config.display()))?;
+            // Config load already validated working-tree policy.
+            let runner = SystemProcessRunner;
+            let clock = SystemClock;
+            let adapter = MissionAdapter::new(&cfg, &runner, &clock);
+            let mission = adapter
+                .refresh_and_load()
+                .context("refreshing opportunity mission")?;
+            let report = RefreshReport {
+                schema: "gzmo.repo_evolver.refresh/v1",
+                bet_id: mission.bet_id,
+                title: mission.title,
+                score: mission.score,
+                ship_bar: mission.ship_bar,
+                generated_at: mission
+                    .generated_at
+                    .to_rfc3339_opts(chrono::SecondsFormat::Millis, true),
+                content_digest: mission.content_digest,
+                generation_id: mission.generation_id,
+                mission_md: mission.mission_md.display().to_string(),
+                policy_digest: cfg.working_policy_digest().to_owned(),
+            };
+            if json {
+                println!("{}", serde_json::to_string_pretty(&report)?);
+            } else {
+                print_refresh_human(&report);
             }
             Ok(())
         }
@@ -326,4 +383,17 @@ fn print_status_human(report: &StatusReport) {
             println!("    occurred_at: {}", h.occurred_at);
         }
     }
+}
+
+fn print_refresh_human(report: &RefreshReport) {
+    println!("refresh: ok");
+    println!("  bet_id: {}", report.bet_id);
+    println!("  title: {}", report.title);
+    println!("  score: {}", report.score);
+    println!("  ship_bar: {}", report.ship_bar);
+    println!("  generated_at: {}", report.generated_at);
+    println!("  content_digest: {}", report.content_digest);
+    println!("  generation_id: {}", report.generation_id);
+    println!("  mission_md: {}", report.mission_md);
+    println!("  policy_digest: {}", report.policy_digest);
 }

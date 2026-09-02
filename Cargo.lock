@@ -976,6 +976,7 @@ dependencies = [
  "clap",
  "evolution-contracts",
  "fs2",
+ "libc",
  "rusqlite",
  "serde",
  "serde_json",

@@ -1,0 +1,12 @@
+{
+  "schema": "gzmo.opportunity.next_mission/v1",
+  "generated_at": "2026-09-01T12:00:00.000Z",
+  "ok": true,
+  "bet_id": "felt-use-mass-growth",
+  "title": "Felt Use mass + MemRL-style utility (organism not warehouse)",
+  "score": 23,
+  "ship_bar": true,
+  "mission_md": "/var/lib/gzmo-evolver/coordinator/mission-staging/example/opportunity-discovery/next-mission.md",
+  "advice": "opportunity_next_mission_ok — paste next-mission.md into a new agent (or cron opens Cloud Agent with this file)",
+  "automation_note": "Cursor Automations cannot start from bet status alone until a cron/PR trigger runs an agent with this mission card. PR babysitter only runs after a PR exists."
+}

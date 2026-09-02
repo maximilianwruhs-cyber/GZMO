@@ -67,6 +67,9 @@ clap = { version = "4", features = ["derive"] }
 # File locking
 fs2 = "0.4"
 
+# Unix process-group termination (killpg) for ProcessRunner
+libc = "0.2"
+
 
 [workspace.lints.rust]
 unused_mut = "allow"
