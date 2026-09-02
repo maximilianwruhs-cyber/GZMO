@@ -126,11 +126,15 @@ pub struct DiffFile {
 }
 
 /// How remote URLs are classified for this repository handle.
+///
+/// `LocalFixture` exists only under `debug_assertions` so release builds cannot
+/// select hermetic local/file remotes. CLI always uses Production.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum GitAccessMode {
     /// Production/CLI: GitHub HTTPS or SSH only (no local/file/git://).
     Production,
     /// Explicit debug/test fixture mode: local/file remotes allowed.
+    #[cfg(debug_assertions)]
     LocalFixture,
 }
 
@@ -160,19 +164,29 @@ pub struct GitWorkspace<'a, R: ProcessRunner> {
 impl<'a, R: ProcessRunner> GitRepository<'a, R> {
     /// Production/CLI open: GitHub HTTPS/SSH remotes only.
     pub fn open(config: &'a RepoEvolverConfig, runner: &'a R) -> Result<Self, GitError> {
-        Self::open_with(config, runner, GitAccessMode::Production)
+        Self::open_with_inner(config, runner, GitAccessMode::Production)
     }
 
     /// Explicit local-fixture open for hermetic tests/debug only (never used by main CLI).
+    #[cfg(debug_assertions)]
     pub fn open_for_local_fixture(
         config: &'a RepoEvolverConfig,
         runner: &'a R,
     ) -> Result<Self, GitError> {
-        Self::open_with(config, runner, GitAccessMode::LocalFixture)
+        Self::open_with_inner(config, runner, GitAccessMode::LocalFixture)
     }
 
     /// Bind config + runner under an explicit access mode.
+    #[cfg(debug_assertions)]
     pub fn open_with(
+        config: &'a RepoEvolverConfig,
+        runner: &'a R,
+        access: GitAccessMode,
+    ) -> Result<Self, GitError> {
+        Self::open_with_inner(config, runner, access)
+    }
+
+    fn open_with_inner(
         config: &'a RepoEvolverConfig,
         runner: &'a R,
         access: GitAccessMode,
@@ -195,9 +209,22 @@ impl<'a, R: ProcessRunner> GitRepository<'a, R> {
         })
     }
 
-    /// Access mode bound at open.
+    /// Access mode bound at open (debug/test pin only).
+    #[cfg(debug_assertions)]
     pub fn access_mode(&self) -> GitAccessMode {
         self.access
+    }
+
+    fn access_allows_local_fixture(&self) -> bool {
+        #[cfg(debug_assertions)]
+        {
+            matches!(self.access, GitAccessMode::LocalFixture)
+        }
+        #[cfg(not(debug_assertions))]
+        {
+            let _ = self.access;
+            false
+        }
     }
 
     /// Absolute trusted checkout path.
@@ -313,7 +340,11 @@ impl<'a, R: ProcessRunner> GitRepository<'a, R> {
     }
 
     /// Clone an independent candidate workspace for `manifest` from the mirror.
+    ///
+    /// Holds the mirror lease across clone/read so concurrent refresh cannot mutate
+    /// the bare mirror mid-stream. Nested acquisition returns MirrorLockBusy.
     pub fn prepare(&self, manifest: &CandidateManifest) -> Result<GitWorkspace<'a, R>, GitError> {
+        let _lease = MirrorLock::acquire(self.config.state_dir())?;
         manifest
             .validate()
             .map_err(|err| GitError::Invalid(err.to_string()))?;
@@ -503,7 +534,7 @@ impl<'a, R: ProcessRunner> GitRepository<'a, R> {
         let _ = remove_path_best_effort(&staging);
         // Parent is state_dir (same parent as final mirror) for atomic rename.
         let allow_file = remote_is_local_fixture(remote_url);
-        if allow_file && self.access != GitAccessMode::LocalFixture {
+        if allow_file && !self.access_allows_local_fixture() {
             let _ = remove_path_best_effort(&staging);
             return Err(GitError::Trust(
                 "local/file remote requires LocalFixture access mode".to_owned(),
@@ -558,8 +589,7 @@ impl<'a, R: ProcessRunner> GitRepository<'a, R> {
         let origin = self
             .config_get_local(mirror, "remote.origin.url")?
             .unwrap_or_default();
-        let allow_file =
-            remote_is_local_fixture(&origin) && self.access == GitAccessMode::LocalFixture;
+        let allow_file = remote_is_local_fixture(&origin) && self.access_allows_local_fixture();
         self.run_git_ex(
             None,
             &[
@@ -1477,22 +1507,90 @@ pub struct PrepareOutcome {
     pub reused_active: bool,
 }
 
-/// Trust-first / active-first prepare flow.
-pub fn prepare_candidate<R: ProcessRunner, C: crate::mission::Clock>(
-    config: &RepoEvolverConfig,
-    runner: &R,
-    clock: &C,
-    store: &crate::state::StateStore,
-) -> Result<PrepareOutcome, PrepareError> {
-    prepare_candidate_with(config, runner, clock, store, GitAccessMode::Production)
+/// Narrow state seam used by prepare (real StateStore or test double).
+pub trait CandidateStateOps {
+    fn active_candidate(
+        &self,
+        repository: &str,
+    ) -> Result<Option<CandidateRecord>, crate::state::StateError>;
+    fn create_candidate(
+        &self,
+        manifest: &CandidateManifest,
+        policy_digest: &str,
+        now: DateTime<Utc>,
+    ) -> Result<CandidateRecord, crate::state::StateError>;
+    fn transition(
+        &self,
+        id: &evolution_contracts::CandidateId,
+        next: CandidateState,
+        metadata: crate::state::TransitionMetadata,
+        now: DateTime<Utc>,
+    ) -> Result<CandidateRecord, crate::state::StateError>;
+    fn load(
+        &self,
+        id: &evolution_contracts::CandidateId,
+    ) -> Result<CandidateRecord, crate::state::StateError>;
 }
 
-/// Prepare using an explicit access mode (tests pass [`GitAccessMode::LocalFixture`]).
-pub fn prepare_candidate_with<R: ProcessRunner, C: crate::mission::Clock>(
+impl CandidateStateOps for crate::state::StateStore {
+    fn active_candidate(
+        &self,
+        repository: &str,
+    ) -> Result<Option<CandidateRecord>, crate::state::StateError> {
+        crate::state::StateStore::active_candidate(self, repository)
+    }
+    fn create_candidate(
+        &self,
+        manifest: &CandidateManifest,
+        policy_digest: &str,
+        now: DateTime<Utc>,
+    ) -> Result<CandidateRecord, crate::state::StateError> {
+        crate::state::StateStore::create_candidate(self, manifest, policy_digest, now)
+    }
+    fn transition(
+        &self,
+        id: &evolution_contracts::CandidateId,
+        next: CandidateState,
+        metadata: crate::state::TransitionMetadata,
+        now: DateTime<Utc>,
+    ) -> Result<CandidateRecord, crate::state::StateError> {
+        crate::state::StateStore::transition(self, id, next, metadata, now)
+    }
+    fn load(
+        &self,
+        id: &evolution_contracts::CandidateId,
+    ) -> Result<CandidateRecord, crate::state::StateError> {
+        crate::state::StateStore::load(self, id)
+    }
+}
+
+/// Trust-first / active-first prepare flow (production access mode).
+pub fn prepare_candidate<R: ProcessRunner, C: crate::mission::Clock, S: CandidateStateOps>(
     config: &RepoEvolverConfig,
     runner: &R,
     clock: &C,
-    store: &crate::state::StateStore,
+    store: &S,
+) -> Result<PrepareOutcome, PrepareError> {
+    prepare_candidate_inner(config, runner, clock, store, GitAccessMode::Production)
+}
+
+/// Prepare using an explicit access mode (debug/test only).
+#[cfg(debug_assertions)]
+pub fn prepare_candidate_with<R: ProcessRunner, C: crate::mission::Clock, S: CandidateStateOps>(
+    config: &RepoEvolverConfig,
+    runner: &R,
+    clock: &C,
+    store: &S,
+    access: GitAccessMode,
+) -> Result<PrepareOutcome, PrepareError> {
+    prepare_candidate_inner(config, runner, clock, store, access)
+}
+
+fn prepare_candidate_inner<R: ProcessRunner, C: crate::mission::Clock, S: CandidateStateOps>(
+    config: &RepoEvolverConfig,
+    runner: &R,
+    clock: &C,
+    store: &S,
     access: GitAccessMode,
 ) -> Result<PrepareOutcome, PrepareError> {
     let repository = format!("{}/{}", config.repo().owner(), config.repo().repository());
@@ -1507,7 +1605,8 @@ pub fn prepare_candidate_with<R: ProcessRunner, C: crate::mission::Clock>(
         });
     }
 
-    let git = GitRepository::open_with(config, runner, access).map_err(PrepareError::from_git)?;
+    let git =
+        GitRepository::open_with_inner(config, runner, access).map_err(PrepareError::from_git)?;
     let baseline = git
         .refresh_and_resolve_baseline()
         .map_err(PrepareError::from_git)?;
@@ -1540,36 +1639,32 @@ pub fn prepare_candidate_with<R: ProcessRunner, C: crate::mission::Clock>(
         .map_err(|e| PrepareError::State(e.to_string()))?;
 
     match git.prepare(&prepared.manifest) {
-        Ok(ws) => {
-            match store.transition(
-                observed.id(),
-                CandidateState::Prepared,
-                crate::state::TransitionMetadata::empty().with_workspace(ws.path()),
-                clock.now(),
-            ) {
-                Ok(record) => Ok(PrepareOutcome {
-                    record,
-                    baseline: Some(baseline),
-                    reused_active: false,
-                }),
-                Err(err) => {
-                    // Workspace was published but Prepared failed: remove only that path
-                    // and terminalize Observed -> Failed so prepare can recover.
-                    let _ = remove_path_best_effort(ws.path());
-                    let reason = bound_reason(&format!("prepared transition failed: {err}"));
-                    let _ = store.transition(
-                        observed.id(),
-                        CandidateState::Failed,
-                        crate::state::TransitionMetadata::terminal(reason.clone()),
-                        clock.now(),
-                    );
-                    Err(PrepareError::Failed {
-                        reason,
-                        candidate_id: observed.id().as_str().to_owned(),
-                    })
-                }
+        Ok(ws) => match store.transition(
+            observed.id(),
+            CandidateState::Prepared,
+            crate::state::TransitionMetadata::empty().with_workspace(ws.path()),
+            clock.now(),
+        ) {
+            Ok(record) => Ok(PrepareOutcome {
+                record,
+                baseline: Some(baseline),
+                reused_active: false,
+            }),
+            Err(err) => {
+                let _ = remove_path_best_effort(ws.path());
+                let reason = bound_reason(&format!("prepared transition failed: {err}"));
+                let _ = store.transition(
+                    observed.id(),
+                    CandidateState::Failed,
+                    crate::state::TransitionMetadata::terminal(reason.clone()),
+                    clock.now(),
+                );
+                Err(PrepareError::Failed {
+                    reason,
+                    candidate_id: observed.id().as_str().to_owned(),
+                })
             }
-        }
+        },
         Err(err) => {
             let reason = bound_reason(&err.to_string());
             let _ = store.transition(
@@ -1769,7 +1864,7 @@ pub fn validate_remote_identity(
                 return match_owner_repo_path(path, owner, repository, Some(&host), true);
             }
             "file" => {
-                if access != GitAccessMode::LocalFixture {
+                if !access_is_local_fixture(access) {
                     return Err(GitError::Trust(
                         "file remote requires LocalFixture access mode".to_owned(),
                     ));
@@ -1799,7 +1894,7 @@ pub fn validate_remote_identity(
         if raw.contains("://") {
             return Err(GitError::Trust("ambiguous remote URL".to_owned()));
         }
-        if access != GitAccessMode::LocalFixture {
+        if !access_is_local_fixture(access) {
             return Err(GitError::Trust(
                 "local path remote requires LocalFixture access mode".to_owned(),
             ));
@@ -1810,6 +1905,18 @@ pub fn validate_remote_identity(
     Err(GitError::Trust(
         "remote URL could not be parsed as credential-free identity".to_owned(),
     ))
+}
+
+fn access_is_local_fixture(access: GitAccessMode) -> bool {
+    #[cfg(debug_assertions)]
+    {
+        matches!(access, GitAccessMode::LocalFixture)
+    }
+    #[cfg(not(debug_assertions))]
+    {
+        let _ = access;
+        false
+    }
 }
 
 /// True when `raw` is a local path or file:// URL (not network).
@@ -2257,6 +2364,15 @@ fn merge_diff_records(
     })
 }
 
+/// Test/debug helper exposing production object-share detection.
+#[cfg(debug_assertions)]
+pub fn objects_share_with_mirror_pub(
+    ws_objects: &Path,
+    mirror_objects: &Path,
+) -> Result<bool, GitError> {
+    objects_share_with_mirror(ws_objects, mirror_objects)
+}
+
 fn objects_share_with_mirror(ws_objects: &Path, mirror_objects: &Path) -> Result<bool, GitError> {
     #[cfg(unix)]
     {
@@ -2469,16 +2585,18 @@ pub fn refresh_baseline_before_mission<R: ProcessRunner>(
     config: &RepoEvolverConfig,
     runner: &R,
 ) -> Result<String, GitError> {
-    refresh_baseline_before_mission_with(config, runner, GitAccessMode::Production)
+    let git = GitRepository::open(config, runner)?;
+    git.refresh_and_resolve_baseline()
 }
 
 /// Same as [`refresh_baseline_before_mission`] with explicit access mode (tests use LocalFixture).
+#[cfg(debug_assertions)]
 pub fn refresh_baseline_before_mission_with<R: ProcessRunner>(
     config: &RepoEvolverConfig,
     runner: &R,
     access: GitAccessMode,
 ) -> Result<String, GitError> {
-    let git = GitRepository::open_with(config, runner, access)?;
+    let git = GitRepository::open_with_inner(config, runner, access)?;
     git.refresh_and_resolve_baseline()
 }
 
@@ -2487,16 +2605,19 @@ pub fn verify_git_trust<R: ProcessRunner>(
     config: &RepoEvolverConfig,
     runner: &R,
 ) -> Result<(), GitError> {
-    verify_git_trust_with(config, runner, GitAccessMode::Production)
+    let git = GitRepository::open(config, runner)?;
+    git.verify_trust()?;
+    Ok(())
 }
 
 /// Explicit-mode trust check (tests use LocalFixture).
+#[cfg(debug_assertions)]
 pub fn verify_git_trust_with<R: ProcessRunner>(
     config: &RepoEvolverConfig,
     runner: &R,
     access: GitAccessMode,
 ) -> Result<(), GitError> {
-    let git = GitRepository::open_with(config, runner, access)?;
+    let git = GitRepository::open_with_inner(config, runner, access)?;
     git.verify_trust()?;
     Ok(())
 }
@@ -2617,6 +2738,11 @@ mod unit_tests {
         let stats = merge_diff_records(r, n, &policy, &manifest).unwrap();
         assert_eq!(stats.added_lines, 3);
         assert_eq!(stats.files[0].path, "src/foo.rs");
+    }
+
+    #[test]
+    fn production_open_pins_production_mode() {
+        assert!(!access_is_local_fixture(GitAccessMode::Production));
     }
 
     #[test]

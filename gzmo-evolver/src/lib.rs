@@ -12,13 +12,17 @@ pub use config::{
     ConfigError, MissionConfig, PolicyConfig, RepoConfig, RepoEvolverConfig, WorkerConfig,
 };
 pub use git::{
-    cleanup_workspace, prepare_candidate, prepare_candidate_with, refresh_baseline_before_mission,
-    refresh_baseline_before_mission_with, remote_is_local_fixture, validate_remote_identity,
-    verify_git_trust, verify_git_trust_with, DiffFile, DiffStats, GitAccessMode, GitError,
+    cleanup_workspace, prepare_candidate, refresh_baseline_before_mission,
+    validate_remote_identity, verify_git_trust, CandidateStateOps, DiffFile, DiffStats, GitError,
     GitRepository, GitWorkspace, PrepareError, PrepareOutcome, CANDIDATE_AUTHOR_EMAIL,
     CANDIDATE_AUTHOR_NAME, GIT_BLOB_CAP_BYTES, GIT_DIFF_CAP_BYTES, GIT_FETCH_TIMEOUT_SECS,
     GIT_HOME_NAME, GIT_OUTPUT_CAP_BYTES, GIT_TIMEOUT_SECS, MAX_DIFF_FILES, MAX_TREE_ENTRIES,
     MIRROR_LOCK_NAME, MIRROR_NAME, NO_FETCH_URL, NO_PUSH_URL, WORKSPACES_DIR,
+};
+#[cfg(debug_assertions)]
+pub use git::{
+    objects_share_with_mirror_pub, prepare_candidate_with, refresh_baseline_before_mission_with,
+    remote_is_local_fixture, verify_git_trust_with, GitAccessMode,
 };
 pub use mission::{
     Clock, ManualClock, Mission, MissionAdapter, MissionError, PreparedCandidate, SystemClock,

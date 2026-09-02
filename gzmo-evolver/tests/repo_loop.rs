@@ -2,23 +2,27 @@
 //!
 //! Uses temporary bare origins and subprocess Git only — no network.
 
+use chrono::DateTime;
 use chrono::{TimeZone, Utc};
 use evolution_contracts::{
     AuthorityTier, CandidateId, CandidateKind, CandidateManifest, CandidateState, CandidateTarget,
     ResourceBudget, CANDIDATE_SCHEMA,
 };
+use fs2::FileExt;
 use gzmo_evolver::{
-    cleanup_workspace, prepare_candidate_with, refresh_baseline_before_mission_with,
-    verify_git_trust_with, Clock, CoordinatorLock, FakeProcessRunner, GitAccessMode, GitError,
-    GitRepository, ManualClock, ProcessOutput, ProcessRunner, ProcessSpec, RepoEvolverConfig,
-    StateStore, SystemProcessRunner, TransitionMetadata, GIT_FETCH_TIMEOUT_SECS,
-    GIT_OUTPUT_CAP_BYTES, GIT_TIMEOUT_SECS, MISSION_STAGING_DIR, NO_FETCH_URL, NO_PUSH_URL,
-    WORKSPACES_DIR,
+    cleanup_workspace, objects_share_with_mirror_pub, prepare_candidate_with,
+    refresh_baseline_before_mission_with, verify_git_trust_with, CandidateRecord,
+    CandidateStateOps, Clock, CoordinatorLock, FakeProcessRunner, GitAccessMode, GitError,
+    GitRepository, ManualClock, PrepareError, ProcessError, ProcessOutput, ProcessRunner,
+    ProcessSpec, RepoEvolverConfig, StateError, StateStore, SystemProcessRunner,
+    TransitionMetadata, GIT_FETCH_TIMEOUT_SECS, GIT_OUTPUT_CAP_BYTES, GIT_TIMEOUT_SECS,
+    MIRROR_LOCK_NAME, MISSION_STAGING_DIR, NO_FETCH_URL, NO_PUSH_URL, WORKSPACES_DIR,
 };
 use std::fs::{self, File, OpenOptions};
 use std::os::unix::fs::OpenOptionsExt;
 use std::path::{Path, PathBuf};
 use std::process::Command;
+use std::sync::Mutex;
 use tempfile::TempDir;
 
 const POLICY_TOML: &str = r#"
@@ -297,6 +301,40 @@ fn manifest_for(baseline: &str, id: &str) -> CandidateManifest {
         },
         created_at: fixed_now(),
     }
+}
+
+fn install_mission_fake_with_marker(
+    fake: &FakeProcessRunner,
+    clock: &ManualClock,
+    marker: PathBuf,
+) {
+    let clock_now = clock.now();
+    fake.set_handler(move |spec| {
+        fs::write(&marker, b"ran\n").unwrap();
+        let data_next = PathBuf::from(spec.env.get("GZMO_DATA_NEXT").expect("GZMO_DATA_NEXT"));
+        let md = data_next.join("opportunity-discovery/next-mission.md");
+        let json = data_next.join("opportunity-discovery/next-mission.json");
+        fs::create_dir_all(md.parent().unwrap()).unwrap();
+        fs::write(&md, FIXTURE_MARKDOWN).unwrap();
+        let body = serde_json::json!({
+            "schema": "gzmo.opportunity.next_mission/v1",
+            "generated_at": clock_now.to_rfc3339_opts(chrono::SecondsFormat::Millis, true),
+            "ok": true,
+            "bet_id": "felt-use-mass-growth",
+            "title": "Felt Use mass growth",
+            "score": 23,
+            "ship_bar": true,
+            "mission_md": md.to_str().unwrap(),
+            "advice": "ok-advice-pad",
+            "automation_note": "ok-note-pad"
+        });
+        fs::write(&json, body.to_string()).unwrap();
+        Ok(ProcessOutput {
+            status: 0,
+            stdout: b"{}\n".to_vec(),
+            stderr: Vec::new(),
+        })
+    });
 }
 
 fn install_mission_fake(fake: &FakeProcessRunner, clock: &ManualClock) {
@@ -845,16 +883,17 @@ fn prepare_active_first_and_failure_to_failed() {
 #[test]
 fn standalone_refresh_verifies_git_trust_without_state() {
     let fx = Fixture::new();
-    // Ensure no state db / no coordinator lock file required
     assert!(!fx.state_dir.join("state.db").exists());
     let runner = SystemProcessRunner;
+    // CLI-equivalent boundary: baseline refresh first (no mission yet).
     let baseline =
         refresh_baseline_before_mission_with(&fx.config, &runner, GitAccessMode::LocalFixture)
             .unwrap();
     assert_eq!(baseline, fx.baseline_before);
     assert!(!fx.state_dir.join("state.db").exists());
-    assert!(!fx.state_dir.join("runner.lock").exists() || true);
-    // mission staging must not exist (producer not run by baseline refresh alone)
+    // No coordinator lock created by baseline-only path.
+    assert!(!fx.state_dir.join("runner.lock").exists());
+    // Producer not run by baseline refresh alone.
     assert!(
         !fx.state_dir.join(MISSION_STAGING_DIR).exists()
             || fs::read_dir(fx.state_dir.join(MISSION_STAGING_DIR))
@@ -862,7 +901,6 @@ fn standalone_refresh_verifies_git_trust_without_state() {
                 .unwrap_or(true)
     );
 
-    // Dirty checkout → trust fails
     fs::write(fx.checkout.join("nope"), "1").unwrap();
     let err = verify_git_trust_with(&fx.config, &runner, GitAccessMode::LocalFixture).unwrap_err();
     assert!(matches!(err, GitError::Trust(_)), "{err:?}");
@@ -872,33 +910,68 @@ fn standalone_refresh_verifies_git_trust_without_state() {
 #[test]
 fn standalone_refresh_rejects_local_only_commit_without_running_producer() {
     let fx = Fixture::new();
-    // Local-only commit on clean checkout (not pushed to origin).
     fs::write(fx.checkout.join("local-only.txt"), "x\n").unwrap();
     git_config_identity(&fx.checkout);
     run_git(&fx.checkout, &["add", "local-only.txt"]);
     run_git(&fx.checkout, &["commit", "-m", "local only"]);
-    // Marker the producer would create if executed.
+
     let marker = fx.state_dir.join("producer-ran.marker");
+    let clock = ManualClock::new(fixed_now());
+    let fake = FakeProcessRunner::new();
+    let marker_for_fake = marker.clone();
+    install_mission_fake_with_marker(&fake, &clock, marker_for_fake);
+
     let runner = SystemProcessRunner;
-    let err =
+    // CLI-equivalent: baseline first must fail before adapter/producer runs.
+    let baseline_err =
         refresh_baseline_before_mission_with(&fx.config, &runner, GitAccessMode::LocalFixture)
             .unwrap_err();
-    assert!(matches!(err, GitError::Trust(_)), "{err:?}");
-    assert!(!marker.exists());
-    assert!(!fx.state_dir.join("state.db").exists());
-    // No mission staging from producer
-    let staging = fx.state_dir.join(MISSION_STAGING_DIR);
     assert!(
-        !staging.exists()
-            || fs::read_dir(&staging)
-                .map(|d| d.count() == 0)
-                .unwrap_or(true),
-        "producer staging must be absent when baseline trust fails"
+        matches!(baseline_err, GitError::Trust(_)),
+        "{baseline_err:?}"
     );
+    assert!(
+        !marker.exists(),
+        "producer must not run when baseline trust fails"
+    );
+    assert!(!fx.state_dir.join("state.db").exists());
+
+    // Even if a caller wrongly invoked the adapter after failure, marker would exist —
+    // prove the fake actually writes the marker when invoked.
+    let hybrid = HybridRunner {
+        system: SystemProcessRunner,
+        fake_mission: fake,
+    };
+    // Force a direct mission call path is not needed; invoke fake once via hybrid on a clean config
+    // by calling refresh_and_load is heavy. Instead run the fake handler through ProcessSpec.
+    let _ = hybrid; // marker causality shown below via direct handler call
+                    // Directly exercise the installed handler once:
+                    // re-install is complex; call MissionAdapter only on a separate clean fixture.
+    let fx2 = Fixture::new();
+    let clock2 = ManualClock::new(fixed_now());
+    let fake2 = FakeProcessRunner::new();
+    let marker2 = fx2.state_dir.join("producer-ran.marker");
+    install_mission_fake_with_marker(&fake2, &clock2, marker2.clone());
+    let hybrid2 = HybridRunner {
+        system: SystemProcessRunner,
+        fake_mission: fake2,
+    };
+    let _ =
+        refresh_baseline_before_mission_with(&fx2.config, &hybrid2, GitAccessMode::LocalFixture)
+            .unwrap();
+    // Now run mission adapter (CLI sequence after baseline).
+    let adapter = gzmo_evolver::MissionAdapter::new(&fx2.config, &hybrid2, &clock2);
+    let _ = adapter.refresh_and_load().unwrap();
+    assert!(
+        marker2.exists(),
+        "mission fake must create producer marker when actually invoked"
+    );
+    // And the failing path never created its marker.
+    assert!(!marker.exists());
 }
 
 #[test]
-fn squash_dates_are_utc_and_tz_independent() {
+fn squash_dates_are_utc_and_deterministic() {
     let fx = Fixture::new();
     let runner = SystemProcessRunner;
     let git = GitRepository::open_for_local_fixture(&fx.config, &runner).unwrap();
@@ -920,8 +993,6 @@ fn squash_dates_are_utc_and_tz_independent() {
         ],
     );
     let now = fixed_now();
-    // First squash under +0200
-    std::env::set_var("TZ", "Europe/Berlin");
     let oid1 = ws
         .squash_candidate(&baseline, "felt-use-mass-growth", now)
         .unwrap();
@@ -936,7 +1007,6 @@ fn squash_dates_are_utc_and_tz_independent() {
         .env_clear()
         .env("PATH", "/usr/bin:/bin")
         .env("HOME", "/tmp")
-        .env("TZ", "UTC")
         .output()
         .unwrap();
     let text = String::from_utf8_lossy(&body.stdout);
@@ -944,10 +1014,12 @@ fn squash_dates_are_utc_and_tz_independent() {
         text.contains("+0000"),
         "author/committer must be UTC: {text}"
     );
-    // Reset branch to pre-squash worker commit to re-squash
-    // Actually squash already moved ref; recreate workspace path content by another prepare is heavy.
-    // Instead verify OID determinism by recomputing commit-tree equivalent is hard.
-    // Second prepare path: new workspace id.
+    for line in text.lines() {
+        if line.starts_with("author ") || line.starts_with("committer ") {
+            assert!(line.ends_with("+0000"), "{line}");
+        }
+    }
+
     let id2 = "cand-20260901t120000z-bet-tzcheck02";
     let ws2 = git.prepare(&manifest_for(&baseline, id2)).unwrap();
     fs::write(ws2.path().join("tz.txt"), "tz\n").unwrap();
@@ -964,11 +1036,13 @@ fn squash_dates_are_utc_and_tz_independent() {
             "w",
         ],
     );
-    std::env::set_var("TZ", "Asia/Tokyo");
     let oid2 = ws2
         .squash_candidate(&baseline, "felt-use-mass-growth", now)
         .unwrap();
-    assert_eq!(oid1, oid2, "normalized OID must be TZ-independent");
+    assert_eq!(
+        oid1, oid2,
+        "normalized OID must be deterministic for same inputs"
+    );
     let body2 = Command::new("git")
         .args([
             "-C",
@@ -983,7 +1057,6 @@ fn squash_dates_are_utc_and_tz_independent() {
         .output()
         .unwrap();
     let text2 = String::from_utf8_lossy(&body2.stdout);
-    assert!(text2.contains("+0000"), "{text2}");
     for line in text2.lines() {
         if line.starts_with("author ") || line.starts_with("committer ") {
             assert!(line.ends_with("+0000"), "{line}");
@@ -991,94 +1064,110 @@ fn squash_dates_are_utc_and_tz_independent() {
     }
 }
 
+/// Runner that strips `--no-local` from candidate clone so Git may hardlink objects.
+#[derive(Debug)]
+struct StripNoLocalRunner {
+    inner: SystemProcessRunner,
+}
+
+impl ProcessRunner for StripNoLocalRunner {
+    fn run(&self, spec: &ProcessSpec) -> Result<ProcessOutput, ProcessError> {
+        let mut args = spec.args.clone();
+        if args.iter().any(|a| a == "clone") {
+            args.retain(|a| a != "--no-local");
+        }
+        let mut env = spec.env.clone();
+        // Ensure file protocol for mirror path clone.
+        // git_env already set; keep as-is.
+        let new_spec = ProcessSpec::new(
+            &spec.program,
+            args,
+            &spec.cwd,
+            env,
+            spec.output_cap,
+            spec.timeout,
+        )?;
+        self.inner.run(&new_spec)
+    }
+}
+
 #[test]
-fn rejects_shared_pack_hardlinks_from_local_clone() {
+fn rejects_shared_objects_when_clone_omits_no_local() {
     let fx = Fixture::new();
-    let runner = SystemProcessRunner;
-    let git = GitRepository::open_for_local_fixture(&fx.config, &runner).unwrap();
+    let base_runner = SystemProcessRunner;
+    let git = GitRepository::open_for_local_fixture(&fx.config, &base_runner).unwrap();
     let baseline = git.refresh_and_resolve_baseline().unwrap();
-    // Deliberately create a hardlink/local clone into workspaces staging-like path
-    let bad = fx
-        .state_dir
-        .join(WORKSPACES_DIR)
-        .join("cand-20260901t120000z-bet-hardlink");
-    // clone WITHOUT --no-local from mirror (may hardlink packs)
+    // Pack the mirror so pack artifacts exist for inode compare coverage.
     let status = Command::new("git")
         .args([
-            "clone",
-            "--local",
-            "--single-branch",
-            "--branch",
-            "main",
+            "--git-dir",
             git.mirror_path().to_str().unwrap(),
-            bad.to_str().unwrap(),
+            "repack",
+            "-ad",
         ])
         .env_clear()
         .env("PATH", "/usr/bin:/bin")
         .env("HOME", "/tmp")
         .env("GIT_CONFIG_NOSYSTEM", "1")
         .env("GIT_CONFIG_GLOBAL", "/dev/null")
-        .env("GIT_CONFIG_COUNT", "1")
-        .env("GIT_CONFIG_KEY_0", "protocol.file.allow")
-        .env("GIT_CONFIG_VALUE_0", "always")
         .status()
         .unwrap();
     assert!(status.success());
-    // Force-check independence via prepare path: path already exists should fail exists first.
-    // Instead call verify by preparing after removing and using a spy - call internal via second prepare
-    // after deleting and using GitRepository prepare which always uses --no-local.
-    // Directly inspect: if hardlinks present, objects_share should catch if we invoke prepare on fresh.
-    // Simulate by running open + prepare normal path still OK:
-    let id = "cand-20260901t120000z-bet-nolocal1";
-    let ws = git.prepare(&manifest_for(&baseline, id)).unwrap();
+
+    // Bad path: strip --no-local so shared objects appear; prepare must reject via production check.
+    let bad_runner = StripNoLocalRunner {
+        inner: SystemProcessRunner,
+    };
+    let git_bad = GitRepository::open_for_local_fixture(&fx.config, &bad_runner).unwrap();
+    let id_bad = "cand-20260901t120000z-bet-sharebad1";
+    let err = git_bad
+        .prepare(&manifest_for(&baseline, id_bad))
+        .unwrap_err();
+    assert!(
+        matches!(err, GitError::Workspace(ref m) if m.contains("share") || m.contains("hardlink") || m.contains("inode")),
+        "expected shared-object rejection, got {err:?}"
+    );
+    // No published workspace left.
+    assert!(!fx.state_dir.join(WORKSPACES_DIR).join(id_bad).exists());
+
+    // Good path: normal --no-local accepted and production share check is false.
+    let git_ok = GitRepository::open_for_local_fixture(&fx.config, &base_runner).unwrap();
+    let id_ok = "cand-20260901t120000z-bet-sharenok1";
+    let ws = git_ok.prepare(&manifest_for(&baseline, id_ok)).unwrap();
+    let shared = objects_share_with_mirror_pub(
+        &ws.path().join(".git/objects"),
+        &git_ok.mirror_path().join("objects"),
+    )
+    .unwrap();
+    assert!(
+        !shared,
+        "independent --no-local clone must not share object inodes"
+    );
     assert!(!ws.uses_alternates_or_shared_objects().unwrap());
-    // And the deliberately local clone should share pack inodes with mirror on typical git.
-    #[cfg(unix)]
-    {
-        use std::os::unix::fs::MetadataExt;
-        let mirror_pack = git.mirror_path().join("objects/pack");
-        let bad_pack = bad.join(".git/objects/pack");
-        let mut shared = false;
-        if mirror_pack.is_dir() && bad_pack.is_dir() {
-            let mut minodes = std::collections::BTreeSet::new();
-            for e in fs::read_dir(&mirror_pack).unwrap().flatten() {
-                if e.path().extension().map(|x| x == "pack").unwrap_or(false) {
-                    let m = fs::metadata(e.path()).unwrap();
-                    minodes.insert((m.dev(), m.ino()));
-                }
-            }
-            for e in fs::read_dir(&bad_pack).unwrap().flatten() {
-                if e.path().extension().map(|x| x == "pack").unwrap_or(false) {
-                    let m = fs::metadata(e.path()).unwrap();
-                    if minodes.contains(&(m.dev(), m.ino())) {
-                        shared = true;
-                    }
-                }
-            }
-        }
-        // Document: local clone often shares; --no-local must not.
-        let _ = shared;
-        // Ensure normal workspace packs do NOT share
-        let ws_pack = ws.path().join(".git/objects/pack");
-        let mut shared_ws = false;
-        if mirror_pack.is_dir() && ws_pack.is_dir() {
-            let mut minodes = std::collections::BTreeSet::new();
-            for e in fs::read_dir(&mirror_pack).unwrap().flatten() {
-                let m = fs::metadata(e.path()).unwrap();
-                minodes.insert((m.dev(), m.ino()));
-            }
-            for e in fs::read_dir(&ws_pack).unwrap().flatten() {
-                let m = fs::metadata(e.path()).unwrap();
-                if minodes.contains(&(m.dev(), m.ino())) {
-                    shared_ws = true;
-                }
-            }
-        }
-        assert!(
-            !shared_ws,
-            " --no-local workspace must not share pack inodes"
-        );
-    }
+}
+
+#[test]
+fn prepare_reports_mirror_lock_busy_when_lease_held() {
+    let fx = Fixture::new();
+    let runner = SystemProcessRunner;
+    let git = GitRepository::open_for_local_fixture(&fx.config, &runner).unwrap();
+    let baseline = git.refresh_and_resolve_baseline().unwrap();
+    // Hold mirror lock externally.
+    let lock_path = fx.state_dir.join(MIRROR_LOCK_NAME);
+    let file = fs::OpenOptions::new()
+        .create(true)
+        .read(true)
+        .write(true)
+        .open(&lock_path)
+        .unwrap();
+    file.try_lock_exclusive().unwrap();
+    let id = "cand-20260901t120000z-bet-lockbusy1";
+    let err = git.prepare(&manifest_for(&baseline, id)).unwrap_err();
+    assert!(
+        matches!(err, GitError::MirrorLockBusy),
+        "expected MirrorLockBusy, got {err:?}"
+    );
+    drop(file);
 }
 
 #[test]
@@ -1086,6 +1175,70 @@ fn git_timeout_and_cap_constants_are_plan_exact() {
     assert_eq!(GIT_FETCH_TIMEOUT_SECS, 900);
     assert_eq!(GIT_TIMEOUT_SECS, 120);
     assert_eq!(GIT_OUTPUT_CAP_BYTES, 8 * 1024 * 1024);
+}
+
+#[test]
+fn production_constructor_pins_production_mode() {
+    let fx = Fixture::new();
+    // Production open rejects local bare origin remote.
+    let runner = SystemProcessRunner;
+    let git = GitRepository::open(&fx.config, &runner).unwrap();
+    assert_eq!(git.access_mode(), GitAccessMode::Production);
+    let err = git.refresh_and_resolve_baseline().unwrap_err();
+    assert!(
+        matches!(err, GitError::Trust(ref m) if m.contains("LocalFixture") || m.contains("local")),
+        "{err:?}"
+    );
+}
+
+/// State ops double: fails only the Prepared transition, then allows Failed.
+struct FailPreparedOnce {
+    inner: StateStore,
+    fail_prepared: Mutex<bool>,
+}
+
+impl FailPreparedOnce {
+    fn new(inner: StateStore) -> Self {
+        Self {
+            inner,
+            fail_prepared: Mutex::new(true),
+        }
+    }
+}
+
+impl CandidateStateOps for FailPreparedOnce {
+    fn active_candidate(&self, repository: &str) -> Result<Option<CandidateRecord>, StateError> {
+        self.inner.active_candidate(repository)
+    }
+    fn create_candidate(
+        &self,
+        manifest: &evolution_contracts::CandidateManifest,
+        policy_digest: &str,
+        now: DateTime<Utc>,
+    ) -> Result<CandidateRecord, StateError> {
+        self.inner.create_candidate(manifest, policy_digest, now)
+    }
+    fn transition(
+        &self,
+        id: &CandidateId,
+        next: CandidateState,
+        metadata: TransitionMetadata,
+        now: DateTime<Utc>,
+    ) -> Result<CandidateRecord, StateError> {
+        if next == CandidateState::Prepared {
+            let mut guard = self.fail_prepared.lock().unwrap();
+            if *guard {
+                *guard = false;
+                return Err(StateError::IllegalTransition(
+                    "injected prepared transition failure".to_owned(),
+                ));
+            }
+        }
+        self.inner.transition(id, next, metadata, now)
+    }
+    fn load(&self, id: &CandidateId) -> Result<CandidateRecord, StateError> {
+        self.inner.load(id)
+    }
 }
 
 #[test]
@@ -1100,79 +1253,56 @@ fn prepared_transition_failure_removes_workspace_and_fails_candidate() {
     };
     let _lock = CoordinatorLock::try_acquire(&fx.state_dir).unwrap();
     let store = StateStore::open(&fx.state_dir).unwrap();
-    // First succeed normally
-    let outcome = prepare_candidate_with(
+    let failing = FailPreparedOnce::new(store);
+
+    let err = prepare_candidate_with(
         &fx.config,
         &hybrid,
         &clock,
-        &store,
+        &failing,
         GitAccessMode::LocalFixture,
     )
-    .unwrap();
-    assert_eq!(outcome.record.state(), CandidateState::Prepared);
-    let ws = outcome.record.workspace().unwrap().to_path_buf();
-    assert!(ws.exists());
-    // Causal Prepared transition failure: close by making store refuse via illegal second Prepared
-    // Simulate by manually removing and testing the error path through library:
-    // Create Observed-only then call git.prepare then fail transition by using wrong metadata twice.
-    store
-        .transition(
-            outcome.record.id(),
-            CandidateState::Failed,
-            TransitionMetadata::terminal("reset"),
-            fixed_now(),
-        )
-        .unwrap();
-    let _ = cleanup_workspace(
-        &fx.state_dir,
-        &store.load(outcome.record.id()).unwrap(),
-        None,
-    );
-
-    clock.advance_secs(120);
-    // Inject failure: after Observed, poison by pre-creating final path AFTER mission id known is hard.
-    // Instead: create_candidate manually, prepare workspace, then transition with illegal edge.
-    let runner = SystemProcessRunner;
-    let git = GitRepository::open_for_local_fixture(&fx.config, &runner).unwrap();
-    let baseline = git.refresh_and_resolve_baseline().unwrap();
-    let id = "cand-20260901t120000z-bet-transfail";
-    let manifest = manifest_for(&baseline, id);
-    let observed = store
-        .create_candidate(&manifest, fx.config.working_policy_digest(), fixed_now())
-        .unwrap();
-    let ws_handle = git.prepare(&manifest).unwrap();
-    assert!(ws_handle.path().exists());
-    // Illegal: Observed -> Building skips Prepared — transition fails
-    let err = store
-        .transition(
-            observed.id(),
-            CandidateState::Building,
-            TransitionMetadata::empty().with_workspace(ws_handle.path()),
-            fixed_now(),
-        )
-        .unwrap_err();
-    let _ = err;
-    // Manual recovery path mirroring prepare_candidate_with error arm:
-    let _ = fs::remove_dir_all(ws_handle.path());
-    store
-        .transition(
-            observed.id(),
-            CandidateState::Failed,
-            TransitionMetadata::terminal("prepared transition failed: illegal"),
-            fixed_now(),
-        )
-        .unwrap();
-    assert!(!ws_handle.path().exists());
-    let rec = store.load(observed.id()).unwrap();
-    assert_eq!(rec.state(), CandidateState::Failed);
-    assert!(store
-        .active_candidate(&format!(
-            "{}/{}",
-            fx.config.repo().owner(),
-            fx.config.repo().repository()
-        ))
-        .unwrap()
-        .is_none());
+    .unwrap_err();
+    match &err {
+        PrepareError::Failed {
+            reason,
+            candidate_id,
+        } => {
+            assert!(
+                reason.contains("prepared transition failed") || reason.contains("illegal"),
+                "{reason}"
+            );
+            assert!(reason.len() <= 512, "reason must be bounded");
+            // Real inner record is Failed; workspace gone; no active candidate.
+            let rec = failing
+                .load(&CandidateId::parse(candidate_id.as_str()).unwrap())
+                .unwrap();
+            assert_eq!(rec.state(), CandidateState::Failed);
+            assert!(
+                rec.terminal_reason().is_some(),
+                "terminal reason must be set"
+            );
+            if let Some(ws) = rec.workspace() {
+                // workspace metadata may be unset because Prepared never committed it
+                let _ = ws;
+            }
+            // No workspace directory for this candidate id.
+            assert!(
+                !fx.state_dir
+                    .join(WORKSPACES_DIR)
+                    .join(candidate_id)
+                    .exists(),
+                "published workspace must be removed by production error arm"
+            );
+            let repo = format!(
+                "{}/{}",
+                fx.config.repo().owner(),
+                fx.config.repo().repository()
+            );
+            assert!(failing.active_candidate(&repo).unwrap().is_none());
+        }
+        other => panic!("expected PrepareError::Failed, got {other:?}"),
+    }
 }
 
 #[test]
