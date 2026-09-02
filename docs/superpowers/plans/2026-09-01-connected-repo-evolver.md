@@ -357,6 +357,9 @@ git commit -m "feat: persist one audited evolution candidate"
 - Create: `gzmo-evolver/src/mission.rs`
 - Modify: `gzmo-evolver/src/lib.rs`
 - Modify: `gzmo-evolver/src/main.rs`
+- Modify: `Cargo.toml`
+- Modify: `gzmo-evolver/Cargo.toml`
+- Modify if dependency resolution changes: `Cargo.lock`
 - Create: `gzmo-evolver/tests/fixtures/next-mission.json`
 - Create: `gzmo-evolver/tests/fixtures/next-mission.md`
 - Test: `gzmo-evolver/src/mission.rs`
@@ -398,7 +401,7 @@ Expected: FAIL because mission/process modules do not exist.
 
 - [ ] **Step 3: Define a narrow synchronous process seam**
 
-`ProcessRunner::run(ProcessSpec) -> ProcessOutput` is internal and accepts executable, argument vector, cwd, cleared/explicit environment, output byte cap, and timeout. `SystemProcessRunner` uses `std::process::Command`; tests use `FakeProcessRunner`. No method accepts a shell command string. Task 4 reuses this seam for Git; Task 5 has a separate async/cgroup worker launcher.
+`ProcessRunner::run(ProcessSpec) -> ProcessOutput` is internal and accepts an executable, argument vector, cwd, cleared/explicit environment, a combined stdout+stderr byte cap, and timeout. `SystemProcessRunner` uses `std::process::Command`, drains both pipes concurrently without buffering beyond the cap, and terminates/reaps the process group on Unix (the connected production platform) on overflow or timeout; add `libc` as a direct dependency only for Unix process-group termination. Tests use `FakeProcessRunner`. Mission refresh uses fixed trusted limits of 300 seconds and 1 MiB total output. No method accepts a shell command string. Task 4 reuses this seam for Git; Task 5 has a separate async/cgroup worker launcher.
 
 - [ ] **Step 4: Define the strict mission input**
 
@@ -414,14 +417,16 @@ struct NextMissionV1 {
     score: i64,
     ship_bar: bool,
     mission_md: PathBuf,
+    advice: String,
+    automation_note: String,
 }
 ```
 
-Reject schema mismatch, `ok=false`, `ship_bar=false`, blank/unsafe IDs or titles, timestamps outside the refresh interval (with at most five seconds forward clock tolerance), path escape, payload `mission_md` not resolving to the staged configured Markdown path, or Markdown without nonempty `## Mission`, `## Constraints`, and `## Verify` sections. Markdown is untrusted content; parsing never turns it into commands or policy.
+The two final string fields are part of the payload emitted today by `scripts/opportunity-next-mission.sh`; validate their UTF-8 byte lengths and discard them rather than turning them into authority. Reject schema mismatch, `ok=false`, `ship_bar=false`, blank/unsafe IDs or titles, oversized JSON (64 KiB), Markdown (256 KiB), or auxiliary strings (4 KiB each), timestamps outside the actual refresh start/end interval (with at most five seconds forward clock tolerance), path escape, payload `mission_md` not resolving exactly to the staged configured Markdown path, or Markdown without nonempty `## Mission`, `## Constraints`, and `## Verify` sections. Inject a clock into the adapter so both interval endpoints are deterministic in tests. Markdown is untrusted content; parsing never turns it into commands or policy.
 
 - [ ] **Step 5: Refresh via exact argv without a shell**
 
-Create a unique coordinator-owned staging root under `<state_dir>/mission-staging/`, set only a safe PATH/HOME plus `GZMO_DATA_NEXT=<staging-root>`, and invoke the validated `bash scripts/opportunity-next-mission.sh` argv through `ProcessRunner`. Read `json_rel`/`markdown_rel` beneath staging. Require exit zero, bounded stdout/stderr, both staged artifacts present, no symlinks/path escape, modification times at or after refresh start, and JSON `generated_at` inside the refresh interval. After full validation, atomically write Markdown to `<state_dir>/missions/latest.md` and reserialize sanitized JSON to `latest.json` with `mission_md` rebound to that final absolute Markdown path; then remove staging. On failure remove staging and leave prior validated latest artifacts untouched.
+Create a unique coordinator-owned 0700 staging root under `<state_dir>/mission-staging/`, set only a fixed safe `PATH`, a coordinator-owned 0700 `HOME`, and `GZMO_DATA_NEXT=<staging-root>`, and invoke the validated `bash scripts/opportunity-next-mission.sh` argv through `ProcessRunner`. Read `json_rel`/`markdown_rel` beneath staging. Require exit zero, bounded stdout/stderr, both staged artifacts present, no symlink at any path component, canonical containment, modification times at or after refresh start, and JSON `generated_at` inside the actual refresh interval. After full validation, create a 0700 immutable generation under `<state_dir>/missions/generations/<uuid>/` containing 0600 `mission.md` plus canonical sanitized `mission.json`, with `mission_md` rebound to that generation's absolute Markdown path. Fsync the files and generation directory before publishing. Atomically replace a 0600 `<state_dir>/missions/CURRENT` pointer containing only the validated generation basename; readers resolve and revalidate the immutable pair through that pointer, so the pair—not two independent files—is the publication unit. On any handled failure remove staging and the unpublished generation and leave the prior `CURRENT` target untouched; a later refresh removes abandoned temporary directories. Then remove staging.
 
 - [ ] **Step 6: Convert mission plus trusted inputs into a prepared candidate**
 
@@ -436,13 +441,13 @@ pub struct PreparedCandidate {
 
 - [ ] **Step 7: Add the real `refresh` CLI**
 
-Add `refresh [--json]`. It validates config/current policy, executes refresh, and prints only the validated mission metadata and content digest; it does not create state, resolve Git, or prepare a candidate. Retain existing commands.
+Add `refresh [--json]`. It validates config/current policy, executes refresh, and prints only validated mission metadata and content digest. It may update the coordinator-owned mission snapshot, but it does not open/mutate the candidate database, acquire the coordinator lease, resolve Git, or prepare a candidate. Retain existing commands.
 
 - [ ] **Step 8: Run focused mission/process tests**
 
 Run: `cargo test -p gzmo-evolver mission && cargo test -p gzmo-evolver process`
 
-Expected: PASS for valid refresh/conversion and rejection of stale timestamps/files, output overflow, timeout, nonzero exit, payload/config path mismatch, unsafe IDs/titles, missing sections, shell-string attempts, and overlong candidate IDs.
+Expected: PASS for valid refresh/conversion and rejection of stale timestamps/files, output overflow, timeout with process reaping, nonzero exit, actual producer payload mismatch, payload/config path mismatch, symlink ancestors, unsafe IDs/titles, oversized artifacts, missing sections, shell-string attempts, failed publication preserving prior `CURRENT`, and overlong candidate IDs.
 
 - [ ] **Step 9: Commit**
 
