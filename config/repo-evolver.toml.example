@@ -1,0 +1,20 @@
+state_dir = "/var/lib/gzmo-evolver/coordinator"
+
+[repo]
+path = "/srv/gzmo/GZMO"
+remote = "origin"
+base_branch = "main"
+owner = "maximilianwruhs-cyber"
+repository = "GZMO"
+
+[mission]
+json_rel = "opportunity-discovery/next-mission.json"
+markdown_rel = "opportunity-discovery/next-mission.md"
+refresh_argv = ["bash", "scripts/opportunity-next-mission.sh"]
+
+[worker]
+executable = "/usr/local/bin/omp"
+profile = "gzmo-repo-evolver-worker"
+
+[policy]
+repo_path = "config/repo-evolver.policy.toml"

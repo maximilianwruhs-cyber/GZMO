@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["gzmo-core", "gzmo-cli", "gzmo-chaos", "gzmo-scheduler", "crates/eml-core", "crates/evolution-contracts"]
+members = ["gzmo-core", "gzmo-cli", "gzmo-chaos", "gzmo-scheduler", "crates/eml-core", "crates/evolution-contracts", "gzmo-evolver"]
 
 [workspace.package]
 version = "0.1.0"
@@ -60,6 +60,12 @@ sha2 = "0.10"
 # Schema generation
 schemars = { version = "0.8", features = ["chrono", "uuid1"] }
 
+
+# CLI
+clap = { version = "4", features = ["derive"] }
+
+# File locking
+fs2 = "0.4"
 
 
 [workspace.lints.rust]

@@ -1,0 +1,54 @@
+schema = "gzmo.repo_evolver.policy/v1"
+owner = "maximilianwruhs-cyber"
+repository = "GZMO"
+candidate_kind = "code"
+max_active_candidates = 1
+max_repair_attempts = 2
+allowed_branch_prefix = "evolve/"
+
+[budget]
+wall_seconds = 2700
+max_attempts = 1
+max_changed_files = 20
+max_added_lines = 1500
+max_tool_calls = 80
+max_input_tokens = 250000
+max_output_tokens = 50000
+allow_missing_energy_meter = true
+
+[protected_paths]
+protected_paths = [
+  ".github/workflows/",
+  "docs/superpowers/specs/",
+  "docs/ADR-",
+  "AGENTS.md",
+  "Cargo.toml",
+  "Cargo.lock",
+  "crates/evolution-contracts/",
+  "gzmo-evolver/",
+  "config/repo-evolver.policy.toml",
+]
+
+[[gates]]
+name = "format"
+class = "hard_floor"
+argv = ["cargo", "fmt", "--all", "--", "--check"]
+timeout_seconds = 300
+
+[[gates]]
+name = "clippy"
+class = "hard_floor"
+argv = ["cargo", "clippy", "--all-targets", "--", "-D", "warnings"]
+timeout_seconds = 900
+
+[[gates]]
+name = "tests"
+class = "hard_floor"
+argv = ["cargo", "test", "--all"]
+timeout_seconds = 1800
+
+[[gates]]
+name = "opportunity-contract"
+class = "hard_floor"
+argv = ["bash", "scripts/opportunity-discovery-check.sh"]
+timeout_seconds = 300
