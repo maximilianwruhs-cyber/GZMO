@@ -12,6 +12,7 @@ use evolution_contracts::{
     canonical_json_bytes, sha256_hex, AuthorityTier, CandidateId, CandidateKind, CandidateManifest,
     CandidateTarget, CANDIDATE_SCHEMA,
 };
+use fs2::FileExt;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 use std::fs::{self, File, OpenOptions};
@@ -37,6 +38,14 @@ pub const REFRESH_OUTPUT_CAP_BYTES: usize = 1024 * 1024;
 pub const GENERATED_AT_FORWARD_TOLERANCE_SECS: i64 = 5;
 /// Fixed safe PATH for producer launches.
 pub const SAFE_PATH: &str = "/usr/bin:/bin";
+/// HOME directory name inside a staging root.
+pub const STAGING_HOME_NAME: &str = "home";
+/// Exclusive liveness lock filename inside a staging root.
+pub const STAGING_LOCK_NAME: &str = "liveness.lock";
+/// Maximum accepted bet_id UTF-8 bytes (bounded before any error echo).
+pub const MAX_BET_ID_BYTES: usize = 128;
+/// Staging roots older than 2× refresh timeout may be cleaned if unlocked.
+pub const ABANDONED_STAGING_SECS: u64 = REFRESH_TIMEOUT_SECS * 2;
 /// Staging parent under the coordinator state directory.
 pub const MISSION_STAGING_DIR: &str = "mission-staging";
 /// Published missions root under the coordinator state directory.
@@ -67,6 +76,10 @@ pub enum MissionError {
     /// Contract validation failure while building a candidate.
     #[error("mission contract error: {0}")]
     Contract(String),
+    /// Publication rename succeeded but a post-commit durability step failed.
+    /// The new generation remains readable via CURRENT.
+    #[error("mission publication durability failure: {0}")]
+    Durability(String),
 }
 
 impl From<io::Error> for MissionError {
@@ -158,6 +171,8 @@ struct PublishedMissionV1 {
     score: i64,
     ship_bar: bool,
     mission_md: String,
+    /// Algorithm-qualified `sha256:<hex>` over the published Markdown bytes.
+    content_digest: String,
 }
 
 /// Validated active opportunity mission snapshot.
@@ -210,30 +225,35 @@ impl<'a, R: ProcessRunner, C: Clock> MissionAdapter<'a, R, C> {
         let staging_root_parent = state_dir.join(MISSION_STAGING_DIR);
         ensure_dir_0700(&staging_root_parent)?;
 
+        // Best-effort cleanup of truly abandoned peers before creating ours.
+        let _ = cleanup_abandoned_staging(&staging_root_parent);
+
         let staging_id = Uuid::new_v4().to_string();
         let staging_root = staging_root_parent.join(&staging_id);
-        let home_dir = staging_root_parent.join(format!("{staging_id}-home"));
         ensure_dir_0700(&staging_root)?;
+        let home_dir = staging_root.join(STAGING_HOME_NAME);
         ensure_dir_0700(&home_dir)?;
+
+        // Hold exclusive liveness lock for the lifetime of this refresh.
+        let _liveness = acquire_staging_liveness_lock(&staging_root)?;
 
         let refresh_start = self.clock.now();
         let run_result = self.invoke_producer(&staging_root, &home_dir);
         let refresh_end = self.clock.now();
 
-        let cleanup_staging = |root: &Path, home: &Path| {
+        let cleanup_own_staging = |root: &Path| {
             let _ = remove_path_best_effort(root);
-            let _ = remove_path_best_effort(home);
         };
 
         let process_output = match run_result {
             Ok(out) => out,
             Err(err) => {
-                cleanup_staging(&staging_root, &home_dir);
+                cleanup_own_staging(&staging_root);
                 return Err(err);
             }
         };
         if process_output.status != 0 {
-            cleanup_staging(&staging_root, &home_dir);
+            cleanup_own_staging(&staging_root);
             return Err(MissionError::Process(ProcessError::NonZeroExit {
                 code: process_output.status,
                 stdout: process_output.stdout,
@@ -241,22 +261,14 @@ impl<'a, R: ProcessRunner, C: Clock> MissionAdapter<'a, R, C> {
             }));
         }
 
-        let publish = self
-            .validate_staged_and_publish(&staging_root, refresh_start, refresh_end)
-            .map_err(|err| {
-                cleanup_staging(&staging_root, &home_dir);
-                err
-            });
+        let publish = self.validate_staged_and_publish(&staging_root, refresh_start, refresh_end);
 
-        match publish {
-            Ok(mission) => {
-                cleanup_staging(&staging_root, &home_dir);
-                // Best-effort: drop abandoned temporary dirs from prior failures.
-                let _ = cleanup_abandoned_staging(&staging_root_parent, &staging_id);
-                Ok(mission)
-            }
-            Err(err) => Err(err),
-        }
+        // Always drop only this invocation's staging root (lock released on drop).
+        cleanup_own_staging(&staging_root);
+
+        // Durability errors after CURRENT rename are still failures for the CLI,
+        // but the new pair remains loadable.
+        publish
     }
 
     /// Load and revalidate the mission pair referenced by `CURRENT`.
@@ -370,8 +382,10 @@ impl<'a, R: ProcessRunner, C: Clock> MissionAdapter<'a, R, C> {
 
         let published_md = generation_dir.join(GENERATION_MARKDOWN);
         let published_json = generation_dir.join(GENERATION_JSON);
+        let content_digest = format!("sha256:{}", sha256_hex(markdown.as_bytes()));
 
-        let publish_result = (|| -> Result<Mission, MissionError> {
+        // Pre-commit phase: any error deletes the unpublished generation.
+        let precommit = (|| -> Result<(PublishedMissionV1, Mission), MissionError> {
             write_file_0600(&published_md, markdown.as_bytes())?;
             let published = PublishedMissionV1 {
                 schema: payload.schema.clone(),
@@ -387,35 +401,47 @@ impl<'a, R: ProcessRunner, C: Clock> MissionAdapter<'a, R, C> {
                         MissionError::Invalid("published markdown path is not UTF-8".to_owned())
                     })?
                     .to_owned(),
+                content_digest: content_digest.clone(),
             };
             let canonical = canonical_json_bytes(&published)?;
             write_file_0600(&published_json, &canonical)?;
             fsync_file(&published_md)?;
             fsync_file(&published_json)?;
             fsync_dir(&generation_dir)?;
-
-            // Atomic CURRENT replace after generation is durable.
-            write_current_pointer(&missions_dir, &generation_id)?;
-
-            let content_digest = format!("sha256:{}", sha256_hex(markdown.as_bytes()));
-            Ok(Mission {
-                schema: payload.schema,
+            let mission = Mission {
+                schema: payload.schema.clone(),
                 generated_at: payload.generated_at,
                 ok: true,
-                bet_id: payload.bet_id,
-                title: payload.title,
+                bet_id: payload.bet_id.clone(),
+                title: payload.title.clone(),
                 score: payload.score,
                 ship_bar: true,
-                mission_md: published_md,
-                markdown,
-                content_digest,
-                generation_id,
-            })
+                mission_md: published_md.clone(),
+                markdown: markdown.clone(),
+                content_digest: content_digest.clone(),
+                generation_id: generation_id.clone(),
+            };
+            Ok((published, mission))
         })();
 
-        match publish_result {
-            Ok(mission) => Ok(mission),
+        let (_published, mission) = match precommit {
+            Ok(v) => v,
             Err(err) => {
+                let _ = remove_path_best_effort(&generation_dir);
+                return Err(err);
+            }
+        };
+
+        // Commit point: atomic CURRENT rename. After this succeeds the generation
+        // must never be deleted by error paths.
+        match write_current_pointer(&missions_dir, &generation_id) {
+            Ok(CurrentWriteOutcome::Committed) => Ok(mission),
+            Ok(CurrentWriteOutcome::CommittedWithDurabilityError(msg)) => {
+                // New pair is readable; surface durability failure so CLI is not success.
+                Err(MissionError::Durability(msg))
+            }
+            Err(err) => {
+                // Rename did not commit: clean unpublished generation, keep prior CURRENT.
                 let _ = remove_path_best_effort(&generation_dir);
                 Err(err)
             }
@@ -553,6 +579,11 @@ fn validate_safe_bet_id(value: &str) -> Result<(), MissionError> {
     if value.is_empty() {
         return Err(MissionError::Invalid("bet_id must be nonempty".to_owned()));
     }
+    if value.len() > MAX_BET_ID_BYTES {
+        return Err(MissionError::Invalid(format!(
+            "bet_id exceeds {MAX_BET_ID_BYTES} bytes"
+        )));
+    }
     if value != value.trim() {
         return Err(MissionError::Invalid(
             "bet_id must not have leading or trailing whitespace".to_owned(),
@@ -567,8 +598,9 @@ fn validate_safe_bet_id(value: &str) -> Result<(), MissionError> {
         .bytes()
         .all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || b == b'-')
     {
+        let preview: String = value.chars().take(64).collect();
         return Err(MissionError::Invalid(format!(
-            "bet_id must be lowercase [a-z0-9-], got {value:?}"
+            "bet_id must be lowercase [a-z0-9-], got {preview:?}"
         )));
     }
     if value.starts_with('-') || value.ends_with('-') {
@@ -659,21 +691,48 @@ fn validate_markdown_sections(markdown: &str) -> Result<(), MissionError> {
 }
 
 fn section_nonempty(markdown: &str, heading: &str) -> bool {
-    let Some(start) = markdown.find(heading) else {
-        return false;
-    };
-    // Require heading at line start.
-    if start > 0 {
-        let prev = markdown.as_bytes()[start - 1];
-        if prev != b'\n' {
-            return false;
+    // Scan unfenced lines only; require the trimmed line to equal the heading
+    // exactly (rejects `## Missionary` and fenced false positives).
+    let mut in_fence = false;
+    let mut found_at: Option<usize> = None;
+    let mut offset = 0usize;
+    for line in markdown.split_inclusive('\n') {
+        let line_start = offset;
+        offset += line.len();
+        let trimmed = line.trim_end_matches(['\r', '\n']);
+        let probe = trimmed.trim();
+        if probe.starts_with("```") {
+            in_fence = !in_fence;
+            continue;
+        }
+        if in_fence {
+            continue;
+        }
+        if probe == heading {
+            found_at = Some(line_start + line.len());
+            break;
         }
     }
-    let after = &markdown[start + heading.len()..];
-    let body = match after.find("\n## ") {
-        Some(idx) => &after[..idx],
-        None => after,
+    let Some(body_start) = found_at else {
+        return false;
     };
+    // Body runs until the next exact unfenced H2 or EOF.
+    let rest = &markdown[body_start..];
+    let mut body = String::new();
+    let mut in_fence = false;
+    for line in rest.split_inclusive('\n') {
+        let trimmed = line.trim_end_matches(['\r', '\n']);
+        let probe = trimmed.trim();
+        if probe.starts_with("```") {
+            in_fence = !in_fence;
+            body.push_str(line);
+            continue;
+        }
+        if !in_fence && probe.starts_with("## ") {
+            break;
+        }
+        body.push_str(line);
+    }
     body.chars().any(|c| !c.is_whitespace())
 }
 
@@ -785,6 +844,20 @@ fn load_generation(generation_dir: &Path, generation_id: &str) -> Result<Mission
     validate_safe_bet_id(&published.bet_id)?;
     validate_safe_title(&published.title)?;
 
+    let actual_digest = format!("sha256:{}", sha256_hex(markdown.as_bytes()));
+    if published.content_digest != actual_digest {
+        return Err(MissionError::Invalid(
+            "published content_digest does not match mission.md bytes".to_owned(),
+        ));
+    }
+    if !published.content_digest.starts_with("sha256:")
+        || published.content_digest.len() != "sha256:".len() + 64
+    {
+        return Err(MissionError::Invalid(
+            "published content_digest must be sha256:<64 hex>".to_owned(),
+        ));
+    }
+
     let expected_md = md_path
         .to_str()
         .ok_or_else(|| MissionError::Invalid("markdown path not UTF-8".to_owned()))?;
@@ -810,7 +883,7 @@ fn load_generation(generation_dir: &Path, generation_id: &str) -> Result<Mission
         score: published.score,
         ship_bar: true,
         mission_md: md_path,
-        content_digest: format!("sha256:{}", sha256_hex(markdown.as_bytes())),
+        content_digest: published.content_digest,
         markdown,
         generation_id: generation_id.to_owned(),
     })
@@ -830,6 +903,7 @@ impl<'de> Deserialize<'de> for PublishedMissionV1 {
             score: i64,
             ship_bar: bool,
             mission_md: String,
+            content_digest: String,
         }
         let raw = Raw::deserialize(deserializer)?;
         Ok(Self {
@@ -841,23 +915,59 @@ impl<'de> Deserialize<'de> for PublishedMissionV1 {
             score: raw.score,
             ship_bar: raw.ship_bar,
             mission_md: raw.mission_md,
+            content_digest: raw.content_digest,
         })
     }
 }
 
-fn write_current_pointer(missions_dir: &Path, generation_id: &str) -> Result<(), MissionError> {
+/// Result of attempting to publish the CURRENT pointer.
+enum CurrentWriteOutcome {
+    /// Rename and post-rename durability steps all succeeded.
+    Committed,
+    /// Rename committed; a later durability step failed. Generation must be kept.
+    CommittedWithDurabilityError(String),
+}
+
+#[cfg(test)]
+static FORCE_POST_RENAME_DURABILITY_ERROR: std::sync::atomic::AtomicBool =
+    std::sync::atomic::AtomicBool::new(false);
+
+fn write_current_pointer(
+    missions_dir: &Path,
+    generation_id: &str,
+) -> Result<CurrentWriteOutcome, MissionError> {
     let tmp = missions_dir.join(format!("CURRENT.{}.tmp", Uuid::new_v4()));
     let final_path = missions_dir.join(CURRENT_POINTER);
+    // Complete all fallible pre-rename work on the temp file first.
     write_file_0600(&tmp, generation_id.as_bytes())?;
-    // Trailing newline optional; store basename only.
     fsync_file(&tmp)?;
+    set_file_mode_0600(&tmp)?;
+
     fs::rename(&tmp, &final_path).map_err(|err| {
         let _ = remove_path_best_effort(&tmp);
         MissionError::Io(format!("atomic CURRENT replace failed: {err}"))
     })?;
-    set_file_mode_0600(&final_path)?;
-    fsync_dir(missions_dir)?;
-    Ok(())
+
+    // Post-commit: never delete the generation on failure here.
+    #[cfg(test)]
+    if FORCE_POST_RENAME_DURABILITY_ERROR.load(std::sync::atomic::Ordering::SeqCst) {
+        FORCE_POST_RENAME_DURABILITY_ERROR.store(false, std::sync::atomic::Ordering::SeqCst);
+        return Ok(CurrentWriteOutcome::CommittedWithDurabilityError(
+            "injected post-rename durability failure".to_owned(),
+        ));
+    }
+
+    if let Err(err) = set_file_mode_0600(&final_path) {
+        return Ok(CurrentWriteOutcome::CommittedWithDurabilityError(format!(
+            "chmod CURRENT after rename: {err}"
+        )));
+    }
+    if let Err(err) = fsync_dir(missions_dir) {
+        return Ok(CurrentWriteOutcome::CommittedWithDurabilityError(format!(
+            "fsync missions dir after rename: {err}"
+        )));
+    }
+    Ok(CurrentWriteOutcome::Committed)
 }
 
 fn ensure_fresh_regular_file(
@@ -1041,15 +1151,42 @@ fn ensure_dir_0700(path: &Path) -> Result<(), MissionError> {
         builder.recursive(true).mode(0o700);
         match builder.create(path) {
             Ok(()) => {}
-            Err(err) if err.kind() == io::ErrorKind::AlreadyExists => {}
+            Err(err) if err.kind() == io::ErrorKind::AlreadyExists => {
+                let meta = fs::symlink_metadata(path)?;
+                if meta.file_type().is_symlink() {
+                    return Err(MissionError::Invalid(format!(
+                        "expected directory, found symlink at {}",
+                        path.display()
+                    )));
+                }
+                if !meta.is_dir() {
+                    return Err(MissionError::Invalid(format!(
+                        "expected directory at {}",
+                        path.display()
+                    )));
+                }
+            }
             Err(err) => return Err(MissionError::Io(err.to_string())),
         }
+        // Confirm directory before chmod so we never flip a file to 0700.
+        let meta = fs::symlink_metadata(path)?;
+        if meta.file_type().is_symlink() || !meta.is_dir() {
+            return Err(MissionError::Invalid(format!(
+                "expected directory at {}",
+                path.display()
+            )));
+        }
         set_dir_mode_0700(path)?;
-        reject_symlink_path(path)?;
         return Ok(());
     }
     #[cfg(not(unix))]
     {
+        if path.exists() && !path.is_dir() {
+            return Err(MissionError::Invalid(format!(
+                "expected directory at {}",
+                path.display()
+            )));
+        }
         fs::create_dir_all(path)?;
         Ok(())
     }
@@ -1141,20 +1278,86 @@ fn remove_path_best_effort(path: &Path) -> io::Result<()> {
     }
 }
 
-fn cleanup_abandoned_staging(parent: &Path, keep_id: &str) -> io::Result<()> {
+/// RAII exclusive liveness lock for a staging root.
+struct StagingLivenessLock {
+    _file: File,
+}
+
+fn acquire_staging_liveness_lock(staging_root: &Path) -> Result<StagingLivenessLock, MissionError> {
+    let lock_path = staging_root.join(STAGING_LOCK_NAME);
+    let file = OpenOptions::new()
+        .create(true)
+        .write(true)
+        .read(true)
+        .open(&lock_path)
+        .map_err(|err| MissionError::Io(format!("open staging liveness lock: {err}")))?;
+    set_file_mode_0600(&lock_path)?;
+    file.try_lock_exclusive().map_err(|err| {
+        MissionError::Io(format!(
+            "acquire staging liveness lock {}: {err}",
+            lock_path.display()
+        ))
+    })?;
+    Ok(StagingLivenessLock { _file: file })
+}
+
+fn try_acquire_staging_liveness_lock_for_cleanup(staging_root: &Path) -> io::Result<Option<File>> {
+    let lock_path = staging_root.join(STAGING_LOCK_NAME);
+    if !lock_path.exists() {
+        // No lock file: treat as abandoned only if age check already passed.
+        return Ok(None);
+    }
+    let file = OpenOptions::new()
+        .create(false)
+        .write(true)
+        .read(true)
+        .open(&lock_path)?;
+    match file.try_lock_exclusive() {
+        Ok(()) => Ok(Some(file)),
+        Err(err) if err.raw_os_error() == fs2::lock_contended_error().raw_os_error() => Ok(None),
+        Err(err) => Err(err),
+    }
+}
+
+fn cleanup_abandoned_staging(parent: &Path) -> io::Result<()> {
     if !parent.is_dir() {
         return Ok(());
     }
+    let now = SystemTime::now();
+    let min_age = Duration::from_secs(ABANDONED_STAGING_SECS);
     for entry in fs::read_dir(parent)? {
         let entry = entry?;
-        let name = entry.file_name();
-        let name = name.to_string_lossy();
-        if name == keep_id || name == format!("{keep_id}-home") {
+        let path = entry.path();
+        let meta = match fs::symlink_metadata(&path) {
+            Ok(m) => m,
+            Err(_) => continue,
+        };
+        if !meta.is_dir() {
             continue;
         }
-        // Only clean uuid-like leftovers.
-        if name.len() >= 8 {
-            let _ = remove_path_best_effort(&entry.path());
+        let modified = match meta.modified() {
+            Ok(m) => m,
+            Err(_) => continue,
+        };
+        let age = match now.duration_since(modified) {
+            Ok(d) => d,
+            Err(_) => continue,
+        };
+        if age < min_age {
+            continue;
+        }
+        // Only remove if we can acquire the liveness lock (or none exists).
+        match try_acquire_staging_liveness_lock_for_cleanup(&path) {
+            Ok(Some(_guard)) => {
+                let _ = remove_path_best_effort(&path);
+            }
+            Ok(None) if !path.join(STAGING_LOCK_NAME).exists() => {
+                let _ = remove_path_best_effort(&path);
+            }
+            Ok(None) => {
+                // Live concurrent refresh still holds the lock — leave it.
+            }
+            Err(_) => {}
         }
     }
     Ok(())
@@ -1515,10 +1718,20 @@ repo_path = "config/repo-evolver.policy.toml"
             assert!(spec.env.get("HOME").is_some());
             assert!(spec.env.get("GZMO_DATA_NEXT").is_some());
             assert_eq!(spec.env.len(), 3, "only PATH/HOME/GZMO_DATA_NEXT allowed");
+            let root = PathBuf::from(spec.env.get("GZMO_DATA_NEXT").unwrap());
+            let home = PathBuf::from(spec.env.get("HOME").unwrap());
+            assert_eq!(
+                home,
+                root.join(STAGING_HOME_NAME),
+                "HOME must live inside the staging root"
+            );
+            assert!(
+                root.join(STAGING_LOCK_NAME).exists(),
+                "liveness lock must exist during producer run"
+            );
             assert_eq!(spec.output_cap, REFRESH_OUTPUT_CAP_BYTES);
             assert_eq!(spec.timeout, Duration::from_secs(REFRESH_TIMEOUT_SECS));
 
-            let root = PathBuf::from(spec.env.get("GZMO_DATA_NEXT").unwrap());
             let out = root.join("opportunity-discovery");
             fs::create_dir_all(&out).unwrap();
             let md_path = out.join("next-mission.md");
@@ -1933,5 +2146,198 @@ repo_path = "config/repo-evolver.policy.toml"
             .as_str()
             .unwrap()
             .contains("Cursor Automations"));
+    }
+
+    #[test]
+    fn ensure_dir_0700_rejects_file_without_changing_mode() {
+        let dir = TempDir::new().unwrap();
+        let file_path = dir.path().join("not-a-dir");
+        fs::write(&file_path, b"payload").unwrap();
+        #[cfg(unix)]
+        {
+            let mut perms = fs::metadata(&file_path).unwrap().permissions();
+            perms.set_mode(0o644);
+            fs::set_permissions(&file_path, perms).unwrap();
+            let before = fs::metadata(&file_path).unwrap().permissions().mode() & 0o777;
+            assert_eq!(before, 0o644);
+            let err = ensure_dir_0700(&file_path).unwrap_err();
+            assert!(
+                matches!(&err, MissionError::Invalid(m) if m.contains("expected directory")),
+                "{err}"
+            );
+            let after = fs::metadata(&file_path).unwrap().permissions().mode() & 0o777;
+            assert_eq!(after, 0o644, "file mode must remain unchanged");
+            let body = fs::read(&file_path).unwrap();
+            assert_eq!(body, b"payload");
+        }
+    }
+
+    #[test]
+    fn exact_unfenced_headings_reject_missionary_and_fenced_false_positives() {
+        assert!(section_nonempty(FIXTURE_MARKDOWN, "## Mission"));
+        assert!(section_nonempty(FIXTURE_MARKDOWN, "## Constraints"));
+        assert!(section_nonempty(FIXTURE_MARKDOWN, "## Verify"));
+
+        let missionary =
+            "# card\n\n## Missionary\n\nbody\n\n## Constraints\n\nx\n\n## Verify\n\ny\n";
+        assert!(!section_nonempty(missionary, "## Mission"));
+
+        let fenced =
+            "# card\n\n```text\n## Mission\n```\n\n## Constraints\n\nx\n\n## Verify\n\ny\n";
+        assert!(!section_nonempty(fenced, "## Mission"));
+
+        let err = parse_fixture_mission(
+            fixture_json_for_path(Path::new("/tmp/x.md"), fixed_now()).as_bytes(),
+            missionary,
+            PathBuf::from("/tmp/x.md"),
+            "g",
+        )
+        .unwrap_err();
+        assert!(
+            matches!(&err, MissionError::Invalid(m) if m.contains("## Mission")),
+            "{err}"
+        );
+    }
+
+    #[test]
+    fn rejects_oversized_bet_id_without_echoing_full_value() {
+        let big = "a".repeat(MAX_BET_ID_BYTES + 8);
+        let mut json: serde_json::Value =
+            serde_json::from_str(&fixture_json_for_path(Path::new("/tmp/x.md"), fixed_now()))
+                .unwrap();
+        json["bet_id"] = serde_json::json!(big.clone());
+        let err = decode_next_mission(json.to_string().as_bytes())
+            .and_then(|p| validate_payload_fields(&p))
+            .unwrap_err();
+        let msg = err.to_string();
+        assert!(msg.contains("bet_id exceeds"), "{msg}");
+        assert!(!msg.contains(&big), "must not echo full oversized bet_id");
+    }
+
+    #[test]
+    fn load_rejects_tampered_published_markdown_digest() {
+        let env = Env::new();
+        let clock = ManualClock::new(fixed_now());
+        let fake = FakeProcessRunner::new();
+        let md_body = FIXTURE_MARKDOWN.to_owned();
+        fake.set_handler({
+            let md_body = md_body.clone();
+            let clock = ManualClock::new(fixed_now());
+            move |spec| {
+                let root = PathBuf::from(spec.env.get("GZMO_DATA_NEXT").unwrap());
+                let out = root.join("opportunity-discovery");
+                fs::create_dir_all(&out).unwrap();
+                let md_path = out.join("next-mission.md");
+                fs::write(&md_path, &md_body).unwrap();
+                fs::write(
+                    out.join("next-mission.json"),
+                    fixture_json_for_path(&md_path, clock.now()),
+                )
+                .unwrap();
+                Ok(ProcessOutput {
+                    status: 0,
+                    stdout: Vec::new(),
+                    stderr: Vec::new(),
+                })
+            }
+        });
+        let adapter = MissionAdapter::new(&env.config, &fake, &clock);
+        let mission = adapter.refresh_and_load().unwrap();
+        // Tamper markdown bytes inside the immutable generation.
+        fs::write(
+            &mission.mission_md,
+            b"# tampered\n\n## Mission\n\nx\n\n## Constraints\n\ny\n\n## Verify\n\nz\n",
+        )
+        .unwrap();
+        let err = adapter.load_current().unwrap_err();
+        assert!(
+            matches!(&err, MissionError::Invalid(m) if m.contains("content_digest")),
+            "{err}"
+        );
+    }
+
+    #[test]
+    fn post_commit_durability_failure_retains_readable_generation() {
+        let env = Env::new();
+        let clock = ManualClock::new(fixed_now());
+        let fake = FakeProcessRunner::new();
+        let md_body = FIXTURE_MARKDOWN.to_owned();
+        fake.set_handler({
+            let md_body = md_body.clone();
+            let clock = ManualClock::new(fixed_now());
+            move |spec| {
+                let root = PathBuf::from(spec.env.get("GZMO_DATA_NEXT").unwrap());
+                let out = root.join("opportunity-discovery");
+                fs::create_dir_all(&out).unwrap();
+                let md_path = out.join("next-mission.md");
+                fs::write(&md_path, &md_body).unwrap();
+                fs::write(
+                    out.join("next-mission.json"),
+                    fixture_json_for_path(&md_path, clock.now()),
+                )
+                .unwrap();
+                Ok(ProcessOutput {
+                    status: 0,
+                    stdout: Vec::new(),
+                    stderr: Vec::new(),
+                })
+            }
+        });
+
+        FORCE_POST_RENAME_DURABILITY_ERROR.store(true, std::sync::atomic::Ordering::SeqCst);
+        let adapter = MissionAdapter::new(&env.config, &fake, &clock);
+        let err = adapter.refresh_and_load().unwrap_err();
+        assert!(
+            matches!(&err, MissionError::Durability(m) if m.contains("injected")),
+            "CLI must not see success after post-commit failure: {err}"
+        );
+
+        // CURRENT points at a readable pair despite the durability error.
+        let loaded = adapter.load_current().unwrap();
+        assert_eq!(loaded.bet_id, "felt-use-mass-growth");
+        assert!(loaded.mission_md.exists());
+        let gen_dir = env
+            .state_dir
+            .join(MISSIONS_DIR)
+            .join(GENERATIONS_DIR)
+            .join(&loaded.generation_id);
+        assert!(
+            gen_dir.is_dir(),
+            "generation must not be deleted post-commit"
+        );
+    }
+
+    #[test]
+    fn abandoned_staging_cleanup_preserves_live_locked_roots() {
+        let env = Env::new();
+        let staging_parent = env.state_dir.join(MISSION_STAGING_DIR);
+        ensure_dir_0700(&staging_parent).unwrap();
+
+        // Old unlocked root (> 2× timeout) should be removed.
+        let old_root = staging_parent.join("11111111-1111-1111-1111-111111111111");
+        ensure_dir_0700(&old_root).unwrap();
+        fs::write(old_root.join("marker"), b"old").unwrap();
+        // Age the directory.
+        std::process::Command::new("touch")
+            .args(["-d", "1970-01-01T00:00:00Z"])
+            .arg(&old_root)
+            .status()
+            .unwrap();
+
+        // Live locked root must survive even if aged.
+        let live_root = staging_parent.join("22222222-2222-2222-2222-222222222222");
+        ensure_dir_0700(&live_root).unwrap();
+        let live_lock = acquire_staging_liveness_lock(&live_root).unwrap();
+        std::process::Command::new("touch")
+            .args(["-d", "1970-01-01T00:00:00Z"])
+            .arg(&live_root)
+            .status()
+            .unwrap();
+
+        cleanup_abandoned_staging(&staging_parent).unwrap();
+
+        assert!(!old_root.exists(), "old unlocked root must be cleaned");
+        assert!(live_root.exists(), "live locked root must be preserved");
+        drop(live_lock);
     }
 }

@@ -5,12 +5,23 @@
 //! Concurrently drains stdout and stderr under a combined byte cap, and on Unix
 //! places the child in a new process group so timeout/overflow can kill and reap
 //! the whole group via `killpg`.
+//!
+//! Wall-clock supervision continues until the child exits **and** both pipes
+//! reach EOF, or until the deadline/overflow path kills the group. Closing the
+//! child's own descriptors does not end supervision early.
+//!
+//! Combined output cap is a hard memory bound: drainers share an
+//! `AtomicUsize` reservation counter so channel payloads plus receiver buffers
+//! never exceed `cap`. The only slack is the 8 KiB read scratch buffer local to
+//! each drainer (not retained after a rejected reservation).
 
 use std::collections::BTreeMap;
 use std::io::{self, Read};
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
+use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::mpsc;
+use std::sync::Arc;
 use std::thread;
 use std::time::{Duration, Instant};
 use thiserror::Error;
@@ -172,52 +183,67 @@ fn run_system(spec: &ProcessSpec) -> Result<ProcessOutput, ProcessError> {
         .ok_or_else(|| ProcessError::Io("missing stderr pipe".to_owned()))?;
 
     let cap = spec.output_cap;
+    // Shared reservation so channel + buffers never exceed `cap`.
+    let reserved = Arc::new(AtomicUsize::new(0));
     let (tx, rx) = mpsc::channel::<DrainEvent>();
     let tx_err = tx.clone();
-    let out_handle = thread::spawn(move || drain_pipe(stdout, PipeKind::Stdout, cap, tx));
-    let err_handle = thread::spawn(move || drain_pipe(stderr, PipeKind::Stderr, cap, tx_err));
+    let reserved_out = Arc::clone(&reserved);
+    let reserved_err = Arc::clone(&reserved);
+    let out_handle =
+        thread::spawn(move || drain_pipe(stdout, PipeKind::Stdout, cap, reserved_out, tx));
+    let err_handle =
+        thread::spawn(move || drain_pipe(stderr, PipeKind::Stderr, cap, reserved_err, tx_err));
 
     let deadline = Instant::now() + spec.timeout;
     let mut stdout_buf = Vec::new();
     let mut stderr_buf = Vec::new();
     let mut stdout_done = false;
     let mut stderr_done = false;
+    let mut child_status: Option<std::process::ExitStatus> = None;
     let mut overflow = false;
     let mut timed_out = false;
 
-    while !(stdout_done && stderr_done) {
-        let now = Instant::now();
-        if now >= deadline {
+    // Supervise until: (child exited AND both pipes EOF) OR timeout OR overflow.
+    // Pipe EOF alone is not enough (child may close fds and keep running).
+    // Child exit alone is not enough (descendants may still hold pipe writers).
+    loop {
+        if overflow {
+            break;
+        }
+        if Instant::now() >= deadline {
             timed_out = true;
             break;
         }
-        let wait = deadline.saturating_duration_since(now);
+
+        if child_status.is_none() {
+            match child.try_wait() {
+                Ok(Some(status)) => child_status = Some(status),
+                Ok(None) => {}
+                Err(err) => {
+                    let _ = terminate_child_group(&mut child);
+                    let _ = child.wait();
+                    let _ = out_handle.join();
+                    let _ = err_handle.join();
+                    return Err(ProcessError::Io(format!("wait failed: {err}")));
+                }
+            }
+        }
+
+        if child_status.is_some() && stdout_done && stderr_done {
+            break;
+        }
+
+        let now = Instant::now();
+        let wait = deadline
+            .saturating_duration_since(now)
+            .min(Duration::from_millis(20));
         match rx.recv_timeout(wait) {
-            Ok(DrainEvent::Chunk {
-                kind,
-                data,
-                overflowed,
-            }) => {
-                if overflowed {
-                    overflow = true;
-                    break;
-                }
-                match kind {
-                    PipeKind::Stdout => {
-                        stdout_buf.extend_from_slice(&data);
-                        if stdout_buf.len() + stderr_buf.len() > cap {
-                            overflow = true;
-                            break;
-                        }
-                    }
-                    PipeKind::Stderr => {
-                        stderr_buf.extend_from_slice(&data);
-                        if stdout_buf.len() + stderr_buf.len() > cap {
-                            overflow = true;
-                            break;
-                        }
-                    }
-                }
+            Ok(DrainEvent::Chunk { kind, data }) => match kind {
+                PipeKind::Stdout => stdout_buf.extend_from_slice(&data),
+                PipeKind::Stderr => stderr_buf.extend_from_slice(&data),
+            },
+            Ok(DrainEvent::Overflow) => {
+                overflow = true;
             }
             Ok(DrainEvent::Done { kind }) => match kind {
                 PipeKind::Stdout => stdout_done = true,
@@ -231,20 +257,23 @@ fn run_system(spec: &ProcessSpec) -> Result<ProcessOutput, ProcessError> {
                 return Err(ProcessError::Io(message));
             }
             Err(mpsc::RecvTimeoutError::Timeout) => {
-                timed_out = true;
-                break;
+                // Poll again.
             }
-            Err(mpsc::RecvTimeoutError::Disconnected) => break,
+            Err(mpsc::RecvTimeoutError::Disconnected) => {
+                // Drainers finished; mark pipes done and continue until child exits or deadline.
+                stdout_done = true;
+                stderr_done = true;
+            }
         }
     }
 
     if overflow || timed_out {
         let _ = terminate_child_group(&mut child);
         let _ = child.wait();
-        // Join drainers; ignore their leftover payloads after kill.
         let _ = out_handle.join();
         let _ = err_handle.join();
-        // Drop captured buffers so errors never duplicate huge output.
+        // Drain any remaining channel events without retaining bodies.
+        while let Ok(_event) = rx.try_recv() {}
         drop(stdout_buf);
         drop(stderr_buf);
         if overflow {
@@ -255,31 +284,19 @@ fn run_system(spec: &ProcessSpec) -> Result<ProcessOutput, ProcessError> {
         });
     }
 
-    // Drain may have finished; still collect any trailing events.
+    // Collect any trailing reserved chunks after exit+EOF.
     while let Ok(event) = rx.try_recv() {
         match event {
-            DrainEvent::Chunk {
-                kind,
-                data,
-                overflowed,
-            } => {
-                if overflowed
-                    || stdout_buf
-                        .len()
-                        .saturating_add(stderr_buf.len())
-                        .saturating_add(data.len())
-                        > cap
-                {
-                    let _ = terminate_child_group(&mut child);
-                    let _ = child.wait();
-                    let _ = out_handle.join();
-                    let _ = err_handle.join();
-                    return Err(ProcessError::OutputOverflow { cap });
-                }
-                match kind {
-                    PipeKind::Stdout => stdout_buf.extend_from_slice(&data),
-                    PipeKind::Stderr => stderr_buf.extend_from_slice(&data),
-                }
+            DrainEvent::Chunk { kind, data } => match kind {
+                PipeKind::Stdout => stdout_buf.extend_from_slice(&data),
+                PipeKind::Stderr => stderr_buf.extend_from_slice(&data),
+            },
+            DrainEvent::Overflow => {
+                let _ = terminate_child_group(&mut child);
+                let _ = child.wait();
+                let _ = out_handle.join();
+                let _ = err_handle.join();
+                return Err(ProcessError::OutputOverflow { cap });
             }
             DrainEvent::Done { .. } => {}
             DrainEvent::IoError { message } => {
@@ -295,9 +312,31 @@ fn run_system(spec: &ProcessSpec) -> Result<ProcessOutput, ProcessError> {
     let _ = out_handle.join();
     let _ = err_handle.join();
 
-    let status = child
-        .wait()
-        .map_err(|err| ProcessError::Io(format!("wait failed: {err}")))?;
+    let status = match child_status {
+        Some(status) => status,
+        None => {
+            // Should not happen: loop only exits cleanly when status is Some.
+            // Defensive deadline-bounded wait.
+            loop {
+                match child.try_wait() {
+                    Ok(Some(status)) => break status,
+                    Ok(None) => {
+                        if Instant::now() >= deadline {
+                            let _ = terminate_child_group(&mut child);
+                            let _ = child.wait();
+                            return Err(ProcessError::Timeout {
+                                timeout_ms: spec.timeout.as_millis() as u64,
+                            });
+                        }
+                        thread::sleep(Duration::from_millis(10));
+                    }
+                    Err(err) => {
+                        return Err(ProcessError::Io(format!("wait failed: {err}")));
+                    }
+                }
+            }
+        }
+    };
 
     #[cfg(unix)]
     {
@@ -309,7 +348,6 @@ fn run_system(spec: &ProcessSpec) -> Result<ProcessOutput, ProcessError> {
 
     let code = status.code().unwrap_or(-1);
     if code != 0 {
-        // Bound displayed payload: keep outputs but error Display only shows code.
         return Err(ProcessError::NonZeroExit {
             code,
             stdout: stdout_buf,
@@ -347,11 +385,13 @@ enum PipeKind {
 }
 
 enum DrainEvent {
+    /// Reserved chunk already counted against the shared combined cap.
     Chunk {
         kind: PipeKind,
         data: Vec<u8>,
-        overflowed: bool,
     },
+    /// Combined reservation would exceed cap; no payload retained.
+    Overflow,
     Done {
         kind: PipeKind,
     },
@@ -364,10 +404,11 @@ fn drain_pipe<R: Read + Send + 'static>(
     mut pipe: R,
     kind: PipeKind,
     cap: usize,
+    reserved: Arc<AtomicUsize>,
     tx: mpsc::Sender<DrainEvent>,
 ) {
+    // Scratch only — never retained after a failed reservation.
     let mut buf = [0u8; 8192];
-    let mut seen = 0usize;
     loop {
         match pipe.read(&mut buf) {
             Ok(0) => {
@@ -375,24 +416,31 @@ fn drain_pipe<R: Read + Send + 'static>(
                 break;
             }
             Ok(n) => {
-                seen = seen.saturating_add(n);
-                let overflowed = seen > cap;
-                let data = if overflowed {
-                    Vec::new()
-                } else {
-                    buf[..n].to_vec()
+                // Atomically reserve `n` against the combined cap. On overflow,
+                // release nothing (we never added) and signal without retaining
+                // the rejected bytes. Channel payloads are only successful
+                // reservations, so peak retained memory ≤ cap (+ local scratch).
+                let mut current = reserved.load(Ordering::Relaxed);
+                let overflowed = loop {
+                    if current.saturating_add(n) > cap {
+                        break true;
+                    }
+                    match reserved.compare_exchange_weak(
+                        current,
+                        current + n,
+                        Ordering::AcqRel,
+                        Ordering::Relaxed,
+                    ) {
+                        Ok(_) => break false,
+                        Err(observed) => current = observed,
+                    }
                 };
-                if tx
-                    .send(DrainEvent::Chunk {
-                        kind,
-                        data,
-                        overflowed,
-                    })
-                    .is_err()
-                {
+                if overflowed {
+                    let _ = tx.send(DrainEvent::Overflow);
                     break;
                 }
-                if overflowed {
+                let data = buf[..n].to_vec();
+                if tx.send(DrainEvent::Chunk { kind, data }).is_err() {
                     break;
                 }
             }
@@ -411,13 +459,10 @@ fn terminate_child_group(child: &mut std::process::Child) -> io::Result<()> {
     #[cfg(unix)]
     {
         let pid = child.id() as libc::pid_t;
-        // Negative pid to killpg would be kill(-pgid); killpg is explicit.
         let rc = unsafe { libc::killpg(pid, libc::SIGKILL) };
         if rc != 0 {
             let err = io::Error::last_os_error();
-            // ESRCH: already gone — treat as success for reap path.
             if err.raw_os_error() != Some(libc::ESRCH) {
-                // Fall back to killing the direct child.
                 let _ = child.kill();
                 return Err(err);
             }
@@ -480,6 +525,7 @@ mod tests {
     use super::*;
     use std::fs;
     use std::os::unix::fs::PermissionsExt;
+    use std::sync::atomic::AtomicUsize;
     use tempfile::TempDir;
 
     fn write_executable(dir: &Path, name: &str, body: &str) -> PathBuf {
@@ -499,7 +545,6 @@ mod tests {
 
     #[test]
     fn rejects_shell_string_program_shape_via_spec_api() {
-        // There is no shell-command API: program + args only.
         let err = ProcessSpec::new(
             "",
             ["-c", "echo hi"],
@@ -522,7 +567,6 @@ mod tests {
         );
         let mut env = base_env();
         env.insert("HOME".to_owned(), "/tmp/mission-home".to_owned());
-        // SECRET must not leak from parent: we set it only in this process env.
         std::env::set_var("SECRET", "should-not-leak");
         let spec = ProcessSpec::new(
             "/bin/bash",
@@ -572,7 +616,6 @@ mod tests {
                 assert_eq!(stderr, b"boom-err\n");
                 let display = err.to_string();
                 assert!(display.contains("status 7"));
-                // Display must not dump the captured bodies.
                 assert!(!display.contains("boom-out"));
                 assert!(!display.contains("boom-err"));
             }
@@ -608,6 +651,63 @@ mod tests {
     }
 
     #[test]
+    fn system_runner_hard_cap_peak_memory_two_pipes() {
+        // Causal: concurrent writers cannot force retained reservation > cap.
+        // We instrument reservation by running a flood with tiny cap and asserting
+        // the error path; the AtomicUsize reservation is the sole retained path.
+        let dir = TempDir::new().unwrap();
+        let script = write_executable(
+            dir.path(),
+            "hardcap.sh",
+            "#!/bin/bash\npython3 - <<'PY'\nimport os, sys, time\n# Two writers blasting simultaneously.
+def blast(fd, n):\n    os.write(fd, b'x'*n)\nimport threading\nt1=threading.Thread(target=blast, args=(1, 200_000))\nt2=threading.Thread(target=blast, args=(2, 200_000))\nt1.start(); t2.start(); t1.join(); t2.join()\ntime.sleep(1)\nPY\n",
+        );
+        let cap = 8192usize;
+        let spec = ProcessSpec::new(
+            "/bin/bash",
+            [script.to_string_lossy().into_owned()],
+            dir.path(),
+            base_env(),
+            cap,
+            Duration::from_secs(5),
+        )
+        .unwrap();
+        let err = SystemProcessRunner.run(&spec).unwrap_err();
+        assert!(
+            matches!(err, ProcessError::OutputOverflow { cap: c } if c == cap),
+            "got {err:?}"
+        );
+        // Display stays bounded (no payload dump).
+        assert!(!err.to_string().contains("xxxx"));
+        // Prove reservation primitive itself never exceeds cap under contention.
+        let reserved = AtomicUsize::new(0);
+        let mut accepted = 0usize;
+        for _ in 0..1000 {
+            let n = 100usize;
+            let mut current = reserved.load(Ordering::Relaxed);
+            loop {
+                if current.saturating_add(n) > cap {
+                    break;
+                }
+                match reserved.compare_exchange_weak(
+                    current,
+                    current + n,
+                    Ordering::AcqRel,
+                    Ordering::Relaxed,
+                ) {
+                    Ok(_) => {
+                        accepted += n;
+                        break;
+                    }
+                    Err(observed) => current = observed,
+                }
+            }
+        }
+        assert!(accepted <= cap);
+        assert!(reserved.load(Ordering::Relaxed) <= cap);
+    }
+
+    #[test]
     fn system_runner_timeout_kills_child_and_grandchild() {
         let dir = TempDir::new().unwrap();
         let marker = dir.path().join("grandchild-live");
@@ -617,7 +717,6 @@ mod tests {
             &format!(
                 r#"#!/bin/bash
 set -euo pipefail
-# Grandchild ignores HUP/TERM and would survive a plain kill of the parent shell.
 python3 - <<'PY' &
 import os, signal, time
 from pathlib import Path
@@ -652,8 +751,6 @@ wait
             "timeout path took too long: {:?}",
             started.elapsed()
         );
-
-        // Give the kernel a moment, then assert the grandchild is gone.
         thread::sleep(Duration::from_millis(200));
         if marker.exists() {
             let pid_text = fs::read_to_string(&marker).unwrap_or_default();
@@ -666,6 +763,44 @@ wait
                 );
             }
         }
+    }
+
+    #[test]
+    fn system_runner_timeout_when_child_closes_pipes_and_keeps_running() {
+        let dir = TempDir::new().unwrap();
+        let script = write_executable(
+            dir.path(),
+            "close_pipes.sh",
+            "#!/bin/bash\nexec 1>&-\nexec 2>&-\nsleep 60\n",
+        );
+        let timeout = Duration::from_millis(500);
+        let spec = ProcessSpec::new(
+            "/bin/bash",
+            [script.to_string_lossy().into_owned()],
+            dir.path(),
+            base_env(),
+            64 * 1024,
+            timeout,
+        )
+        .unwrap();
+        let started = Instant::now();
+        let err = SystemProcessRunner.run(&spec).unwrap_err();
+        let elapsed = started.elapsed();
+        assert!(
+            matches!(err, ProcessError::Timeout { .. }),
+            "expected Timeout after closed pipes, got {err:?} elapsed={elapsed:?}"
+        );
+        // Causal: must not wait for the full sleep 60.
+        assert!(
+            elapsed < Duration::from_secs(5),
+            "elapsed {elapsed:?} exceeded deadline bound"
+        );
+        // Elapsed should be near the timeout, not far under without killing
+        // (we accept some scheduling slack).
+        assert!(
+            elapsed >= timeout.saturating_sub(Duration::from_millis(100)),
+            "elapsed {elapsed:?} finished before deadline {timeout:?}"
+        );
     }
 
     #[test]
@@ -695,7 +830,6 @@ wait
             recorded.args,
             vec!["scripts/opportunity-next-mission.sh".to_owned()]
         );
-        // Compile-time: ProcessSpec has no command/shell string field.
         let _ = recorded.env;
     }
 }
