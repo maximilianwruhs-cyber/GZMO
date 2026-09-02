@@ -56,36 +56,6 @@ const AUDIT_EVENTS_SQL: &str = "CREATE TABLE audit_events (
   event_hash TEXT NOT NULL UNIQUE
 )";
 
-const SCHEMA_SQL: &str = r#"
-CREATE TABLE IF NOT EXISTS candidates (
-  id TEXT PRIMARY KEY,
-  repository TEXT NOT NULL,
-  manifest_json TEXT NOT NULL,
-  manifest_digest TEXT NOT NULL,
-  policy_digest TEXT NOT NULL,
-  state TEXT NOT NULL CHECK (state IN (
-    'observed','prepared','building','evaluating','rejected',
-    'review_ready','promotion_pending','soaking','accepted','rolled_back','failed'
-  )),
-  workspace TEXT,
-  candidate_digest TEXT,
-  terminal_reason TEXT,
-  worker_receipt_json TEXT,
-  receipt_digest TEXT,
-  created_at TEXT NOT NULL,
-  updated_at TEXT NOT NULL
-);
-CREATE UNIQUE INDEX IF NOT EXISTS one_active_candidate
-ON candidates(repository)
-WHERE state NOT IN ('rejected','accepted','rolled_back','failed');
-
-CREATE TABLE IF NOT EXISTS audit_events (
-  sequence INTEGER PRIMARY KEY,
-  event_json TEXT NOT NULL,
-  event_hash TEXT NOT NULL UNIQUE
-);
-"#;
-
 /// Errors raised by coordinator state persistence.
 #[derive(Debug, Error)]
 pub enum StateError {
@@ -522,17 +492,21 @@ impl StateStore {
                 &payload,
                 now,
             )?;
-            self.conn.execute_batch("COMMIT")?;
-            if let Some(path) = &self.db_path {
-                let _ = set_sidecar_modes_0600(path);
-            }
-            load_record_verified(&self.conn, &manifest.id)
+            // Fully verify the resulting record before COMMIT.
+            let events = load_and_verify_audit_events(&self.conn)?;
+            load_record_in_tx(&self.conn, &manifest.id, Some(events.as_slice()))
         })();
 
-        if result.is_err() {
+        if let Err(err) = result {
             let _ = self.conn.execute_batch("ROLLBACK");
+            return Err(err);
         }
-        result
+        let record = result.expect("checked Err above");
+        self.conn.execute_batch("COMMIT")?;
+        if let Some(path) = &self.db_path {
+            let _ = set_sidecar_modes_0600(path);
+        }
+        Ok(record)
     }
 
     /// Apply a legal lifecycle transition and append a matching audit event atomically.
@@ -548,8 +522,9 @@ impl StateStore {
 
         begin_immediate(&self.conn)?;
         let result = (|| -> Result<CandidateRecord, StateError> {
-            // Load without full-chain verify; chain is checked after commit via load.
-            let current = load_record_in_tx(&self.conn, id, None)?;
+            // Verify chain and row↔audit inside the write transaction before trusting state.
+            let events = load_and_verify_audit_events(&self.conn)?;
+            let current = load_record_in_tx(&self.conn, id, Some(events.as_slice()))?;
             if !current.state.can_transition_to(next) {
                 return Err(StateError::IllegalTransition(format!(
                     "{} cannot transition from {} to {}",
@@ -644,17 +619,21 @@ impl StateStore {
             };
             let event_type = lifecycle_event_type(next);
             append_audit_event(&self.conn, Some(id.clone()), event_type, &payload, now)?;
-            self.conn.execute_batch("COMMIT")?;
-            if let Some(path) = &self.db_path {
-                let _ = set_sidecar_modes_0600(path);
-            }
-            load_record_verified(&self.conn, id)
+            // Fully verify resulting record before COMMIT.
+            let events = load_and_verify_audit_events(&self.conn)?;
+            load_record_in_tx(&self.conn, id, Some(events.as_slice()))
         })();
 
-        if result.is_err() {
+        if let Err(err) = result {
             let _ = self.conn.execute_batch("ROLLBACK");
+            return Err(err);
         }
-        result
+        let record = result.expect("checked Err above");
+        self.conn.execute_batch("COMMIT")?;
+        if let Some(path) = &self.db_path {
+            let _ = set_sidecar_modes_0600(path);
+        }
+        Ok(record)
     }
 
     /// Return the single nonterminal candidate for `repository` (`owner/name`), if any.
@@ -763,7 +742,7 @@ fn initialize_or_verify_schema(conn: &Connection) -> Result<(), StateError> {
 
     if empty && user_version == 0 && application_id == 0 {
         // Fresh database (or Task-2 empty open): install schema and stamp identity.
-        conn.execute_batch(SCHEMA_SQL)?;
+        install_schema(conn)?;
         conn.pragma_update(None, "application_id", STATE_APPLICATION_ID)?;
         conn.pragma_update(None, "user_version", STATE_SCHEMA_VERSION)?;
         return verify_schema(conn);
@@ -789,8 +768,8 @@ fn initialize_or_verify_schema(conn: &Connection) -> Result<(), StateError> {
         )));
     }
 
-    // CREATE IF NOT EXISTS then verify the live objects match.
-    conn.execute_batch(SCHEMA_SQL)?;
+    // Install any missing objects from the verified constants, then verify.
+    install_schema_if_missing(conn)?;
     if user_version == 0 || application_id == 0 {
         conn.pragma_update(None, "application_id", STATE_APPLICATION_ID)?;
         conn.pragma_update(None, "user_version", STATE_SCHEMA_VERSION)?;
@@ -816,6 +795,27 @@ fn verify_schema(conn: &Connection) -> Result<(), StateError> {
         )));
     }
     verify_schema_structure(conn)
+}
+
+fn install_schema(conn: &Connection) -> Result<(), StateError> {
+    // Single source of truth shared with verify_schema_structure.
+    for stmt in [CANDIDATES_SQL, ONE_ACTIVE_INDEX_SQL, AUDIT_EVENTS_SQL] {
+        conn.execute_batch(stmt)?;
+    }
+    Ok(())
+}
+
+fn install_schema_if_missing(conn: &Connection) -> Result<(), StateError> {
+    if master_sql(conn, "candidates")?.is_none() {
+        conn.execute_batch(CANDIDATES_SQL)?;
+    }
+    if master_sql(conn, "one_active_candidate")?.is_none() {
+        conn.execute_batch(ONE_ACTIVE_INDEX_SQL)?;
+    }
+    if master_sql(conn, "audit_events")?.is_none() {
+        conn.execute_batch(AUDIT_EVENTS_SQL)?;
+    }
+    Ok(())
 }
 
 fn verify_schema_structure(conn: &Connection) -> Result<(), StateError> {
@@ -976,8 +976,12 @@ fn set_file_mode_0600(path: &Path) -> Result<(), StateError> {
 }
 
 fn set_sidecar_modes_0600(db_path: &Path) -> Result<(), StateError> {
-    let wal = PathBuf::from(format!("{}-wal", db_path.display()));
-    let shm = PathBuf::from(format!("{}-shm", db_path.display()));
+    let mut wal = db_path.as_os_str().to_owned();
+    wal.push("-wal");
+    let wal = PathBuf::from(wal);
+    let mut shm = db_path.as_os_str().to_owned();
+    shm.push("-shm");
+    let shm = PathBuf::from(shm);
     if wal.exists() {
         set_file_mode_0600(&wal)?;
     }
@@ -2060,32 +2064,16 @@ mod tests {
         }
         let outcomes = results.lock().unwrap();
         let oks = outcomes.iter().filter(|(_, r)| r.is_ok()).count();
-        let domain_errs = outcomes
-            .iter()
-            .filter(|(_, r)| {
-                matches!(
-                    r,
-                    Err(StateError::Contention(_))
-                        | Err(StateError::IllegalTransition(_))
-                        | Err(StateError::Db(_))
-                )
-            })
-            .count();
-        // With BEGIN IMMEDIATE + busy_timeout, both may serialize successfully.
-        // Require: at least one success; if a loser exists it is not a bare
-        // "database is locked" Io/unclassified string — Contention/IllegalTransition/Db.
-        assert!(oks >= 1, "at least one transition succeeds: {outcomes:?}");
-        assert_eq!(
-            oks + domain_errs,
-            2,
-            "every outcome is success or domain error: {outcomes:?}"
-        );
+        // BEGIN IMMEDIATE serialises the read-modify-write: the loser blocks on
+        // the write lock, then reads the committed state and reports an illegal
+        // edge. A deferred transaction would instead fail on a stale snapshot
+        // (Contention/BUSY_SNAPSHOT).
+        assert_eq!(oks, 1, "exactly one transition succeeds: {outcomes:?}");
         for (_, r) in outcomes.iter() {
             if let Err(err) = r {
-                let msg = err.to_string();
                 assert!(
-                    !msg.contains("database is locked") || matches!(err, StateError::Contention(_)),
-                    "loser must be domain Contention, got {err:?}"
+                    matches!(err, StateError::IllegalTransition(_)),
+                    "loser must observe committed state as IllegalTransition, got {err:?}"
                 );
             }
         }
@@ -2168,9 +2156,6 @@ mod tests {
             )
             .unwrap();
         assert!(store.load(&mid).is_err());
-        // active_candidate filters nonterminal; accepted is terminal so None is
-        // also acceptable, but Integrity on load path is required above. Force
-        // a nonterminal tamper for active_candidate.
         store
             .conn
             .execute(
@@ -2179,6 +2164,34 @@ mod tests {
             )
             .unwrap();
         assert!(store.active_candidate(&repo_key()).is_err());
+
+        // Mutate path must refuse to launder forged Building into Evaluating.
+        let err = store
+            .transition(
+                &mid,
+                CandidateState::Evaluating,
+                TransitionMetadata::empty(),
+                fixed_now(),
+            )
+            .unwrap_err();
+        assert!(
+            matches!(err, StateError::Integrity(_)),
+            "tampered Building must fail in-tx audit cross-check, got {err:?}"
+        );
+        let state: String = store
+            .conn
+            .query_row(
+                "SELECT state FROM candidates WHERE id = ?1",
+                params![mid.as_str()],
+                |row| row.get(0),
+            )
+            .unwrap();
+        assert_eq!(state, "building");
+        let count: i64 = store
+            .conn
+            .query_row("SELECT COUNT(*) FROM audit_events", [], |row| row.get(0))
+            .unwrap();
+        assert_eq!(count, 1);
     }
 
     #[test]
@@ -2322,11 +2335,12 @@ mod tests {
     #[test]
     fn accepts_and_upgrades_valid_version_zero_database() {
         let dir = TempDir::new().unwrap();
-        // Build a Task-2-shaped DB without identity stamps.
+        // Build a Task-2-shaped DB without identity stamps from the same
+        // constants production installs (no SCHEMA_SQL drift).
         let db_path = dir.path().join(STATE_DB_NAME);
         fs::create_dir_all(dir.path()).unwrap();
         let conn = Connection::open(&db_path).unwrap();
-        conn.execute_batch(SCHEMA_SQL).unwrap();
+        install_schema(&conn).unwrap();
         // Explicitly leave user_version/application_id at 0.
         drop(conn);
 
@@ -2360,7 +2374,58 @@ mod tests {
             let link = dir.path().join(STATE_DB_NAME);
             std::os::unix::fs::symlink(&real, &link).unwrap();
             let err = StateStore::open(dir.path()).unwrap_err();
-            assert!(err.to_string().contains("symlink") || matches!(err, StateError::Io(_)));
+            assert!(
+                matches!(&err, StateError::Io(msg) if msg.contains("must not be a symlink")),
+                "expected symlink rejection, got {err:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn non_utf8_state_dir_still_chmods_wal_shm_sidecars() {
+        #[cfg(unix)]
+        {
+            use std::ffi::OsString;
+            use std::os::unix::ffi::OsStringExt;
+            use std::os::unix::fs::PermissionsExt;
+
+            let dir = TempDir::new().unwrap();
+            let mut state_os = dir.path().as_os_str().to_owned();
+            state_os.push("/");
+            state_os.push(OsString::from_vec(b"coord-\xff".to_vec()));
+            let state_dir = PathBuf::from(state_os);
+
+            let store = StateStore::open(&state_dir).unwrap();
+            store
+                .create_candidate(
+                    &manifest("cand-20260901t070000z-one-aaaa1111"),
+                    &policy_digest(),
+                    fixed_now(),
+                )
+                .unwrap();
+
+            let db_path = state_dir.join(STATE_DB_NAME);
+            let mut wal = db_path.as_os_str().to_owned();
+            wal.push("-wal");
+            let wal = PathBuf::from(wal);
+            let mut shm = db_path.as_os_str().to_owned();
+            shm.push("-shm");
+            let shm = PathBuf::from(shm);
+
+            set_sidecar_modes_0600(&db_path).unwrap();
+
+            for side in [&wal, &shm] {
+                if side.exists() {
+                    let mode = fs::metadata(side).unwrap().permissions().mode() & 0o777;
+                    assert_eq!(
+                        mode,
+                        0o600,
+                        "{} mode under non-UTF-8 state_dir",
+                        side.display()
+                    );
+                }
+            }
+            drop(store);
         }
     }
 
