@@ -14,10 +14,10 @@ use fs2::FileExt;
 use gzmo_evolver::{
     cleanup_workspace, prepare_candidate, refresh_baseline_before_mission,
     validate_remote_identity, Clock, CoordinatorLock, FakeProcessRunner, GitError, GitRepository,
-    ManualClock, MissionAdapter, PrepareError, ProcessError, ProcessOutput, ProcessRunner,
-    ProcessSpec, RepoEvolverConfig, StateStore, SystemProcessRunner, TransitionMetadata,
-    GIT_FETCH_TIMEOUT_SECS, GIT_OUTPUT_CAP_BYTES, GIT_TIMEOUT_SECS, MIRROR_LOCK_NAME,
-    MISSION_STAGING_DIR, NO_FETCH_URL, NO_PUSH_URL, WORKSPACES_DIR,
+    ManualClock, MissionAdapter, ProcessError, ProcessOutput, ProcessRunner, ProcessSpec,
+    RepoEvolverConfig, StateStore, SystemProcessRunner, TransitionMetadata, GIT_FETCH_TIMEOUT_SECS,
+    GIT_OUTPUT_CAP_BYTES, GIT_TIMEOUT_SECS, MIRROR_LOCK_NAME, MISSION_STAGING_DIR, NO_FETCH_URL,
+    NO_PUSH_URL, WORKSPACES_DIR,
 };
 use std::fs::{self, File, OpenOptions};
 use std::os::unix::fs::OpenOptionsExt;
@@ -293,13 +293,6 @@ repo_path = "config/repo-evolver.policy.toml"
 
     fn runner(&self) -> HermeticGitRunner {
         self.hermetic.clone()
-    }
-
-    fn git(&self) -> GitRepository<'_, HermeticGitRunner> {
-        // hermetic is cloned into temporary - need stable ref
-        // Use by holding hermetic on fixture - but open needs &R lifetime.
-        // Callers should use open with local runner binding.
-        unreachable!("use open with runner() binding")
     }
 
     fn trusted_main_oid(&self) -> String {
@@ -1104,84 +1097,6 @@ fn prepare_reports_mirror_lock_busy_when_lease_held() {
 }
 
 #[test]
-fn mirror_lock_busy_leaves_observed_not_failed() {
-    let fx = Fixture::new();
-    let runner = fx.runner();
-    let git = GitRepository::open(&fx.config, &runner).unwrap();
-    let baseline = git.refresh_and_resolve_baseline().unwrap();
-    let store = StateStore::open(&fx.state_dir).unwrap();
-    let id = "cand-20260901t120000z-bet-obsbusy01";
-    let observed = store
-        .create_candidate(
-            &manifest_for(&baseline, id),
-            fx.config.working_policy_digest(),
-            fixed_now(),
-        )
-        .unwrap();
-    assert_eq!(observed.state(), CandidateState::Observed);
-
-    let lock_path = fx.state_dir.join(MIRROR_LOCK_NAME);
-    let file = OpenOptions::new()
-        .create(true)
-        .read(true)
-        .write(true)
-        .open(&lock_path)
-        .unwrap();
-    file.try_lock_exclusive().unwrap();
-    let err = git.prepare(&manifest_for(&baseline, id)).unwrap_err();
-    assert!(matches!(err, GitError::MirrorLockBusy), "{err:?}");
-    drop(file);
-
-    let rec = store.load(observed.id()).unwrap();
-    assert_eq!(rec.state(), CandidateState::Observed);
-    assert!(rec.workspace().is_none());
-    assert!(!fx.state_dir.join(WORKSPACES_DIR).join(id).exists());
-
-    // Full prepare_candidate with lock held: refresh/prepare returns Git error, no Failed burn.
-    store
-        .transition(
-            observed.id(),
-            CandidateState::Failed,
-            TransitionMetadata::terminal("prior"),
-            fixed_now(),
-        )
-        .unwrap();
-    let clock = ManualClock::new(fixed_now());
-    let fake = FakeProcessRunner::new();
-    install_mission_fake(&fake, &clock);
-    let hybrid = HybridRunner {
-        git: fx.runner(),
-        fake_mission: fake,
-    };
-    let file = OpenOptions::new()
-        .create(true)
-        .read(true)
-        .write(true)
-        .open(&lock_path)
-        .unwrap();
-    file.try_lock_exclusive().unwrap();
-    let err = prepare_candidate(&fx.config, &hybrid, &clock, &store).unwrap_err();
-    match err {
-        PrepareError::Git(m) => {
-            assert!(
-                m.contains("busy")
-                    || m.contains("lock")
-                    || m.contains("mirror")
-                    || m.contains("lease"),
-                "{m}"
-            );
-        }
-        other => panic!("expected PrepareError::Git, got {other:?}"),
-    }
-    let repo = format!(
-        "{}/{}",
-        fx.config.repo().owner(),
-        fx.config.repo().repository()
-    );
-    assert!(store.active_candidate(&repo).unwrap().is_none());
-    drop(file);
-}
-
 fn git_timeout_and_cap_constants_are_plan_exact() {
     assert_eq!(GIT_FETCH_TIMEOUT_SECS, 900);
     assert_eq!(GIT_TIMEOUT_SECS, 120);

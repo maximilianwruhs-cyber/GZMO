@@ -1551,12 +1551,29 @@ fn prepare_candidate_inner<R: ProcessRunner, C: crate::mission::Clock, S: Candid
         .create_candidate(&prepared.manifest, &policy_digest, now)
         .map_err(|e| PrepareError::State(e.to_string()))?;
 
-    match git.prepare(&prepared.manifest) {
-        Ok(ws) => match store.transition(
+    let git_result = git
+        .prepare(&prepared.manifest)
+        .map(|ws| ws.path().to_path_buf());
+    settle_observed_after_git_prepare(store, &observed, baseline, clock.now(), git_result)
+}
+
+/// Settle an Observed candidate from the independent-workspace prepare result.
+///
+/// MirrorLockBusy stays resumable Observed; other Git faults terminalize Failed;
+/// Prepared transition failure removes the published workspace then Failed.
+fn settle_observed_after_git_prepare<S: CandidateStateOps>(
+    store: &S,
+    observed: &CandidateRecord,
+    baseline: String,
+    now: DateTime<Utc>,
+    git_result: Result<PathBuf, GitError>,
+) -> Result<PrepareOutcome, PrepareError> {
+    match git_result {
+        Ok(ws_path) => match store.transition(
             observed.id(),
             CandidateState::Prepared,
-            crate::state::TransitionMetadata::empty().with_workspace(ws.path()),
-            clock.now(),
+            crate::state::TransitionMetadata::empty().with_workspace(&ws_path),
+            now,
         ) {
             Ok(record) => Ok(PrepareOutcome {
                 record,
@@ -1564,13 +1581,13 @@ fn prepare_candidate_inner<R: ProcessRunner, C: crate::mission::Clock, S: Candid
                 reused_active: false,
             }),
             Err(err) => {
-                let _ = remove_path_best_effort(ws.path());
+                let _ = remove_path_best_effort(&ws_path);
                 let reason = bound_reason(&format!("prepared transition failed: {err}"));
                 let _ = store.transition(
                     observed.id(),
                     CandidateState::Failed,
                     crate::state::TransitionMetadata::terminal(reason.clone()),
-                    clock.now(),
+                    now,
                 );
                 Err(PrepareError::Failed {
                     reason,
@@ -1588,7 +1605,7 @@ fn prepare_candidate_inner<R: ProcessRunner, C: crate::mission::Clock, S: Candid
                 observed.id(),
                 CandidateState::Failed,
                 crate::state::TransitionMetadata::terminal(reason.clone()),
-                clock.now(),
+                now,
             );
             Err(PrepareError::Failed {
                 reason,
@@ -2444,7 +2461,6 @@ pub fn refresh_baseline_before_mission<R: ProcessRunner>(
     git.refresh_and_resolve_baseline()
 }
 
-/// Same as [`refresh_baseline_before_mission`] with explicit access mode (tests use LocalFixture).
 /// Verify remote identity + checkout hygiene without refreshing (no mission execution).
 pub fn verify_git_trust<R: ProcessRunner>(
     config: &RepoEvolverConfig,
@@ -2454,8 +2470,6 @@ pub fn verify_git_trust<R: ProcessRunner>(
     git.verify_trust()?;
     Ok(())
 }
-
-/// Explicit-mode trust check (tests use LocalFixture).
 
 #[cfg(test)]
 mod unit_tests {
@@ -2669,20 +2683,227 @@ mod unit_tests {
 }
 
 #[cfg(test)]
-mod prepare_recovery_tests {
+mod prepare_settle_tests {
     use super::*;
+    use crate::state::{StateError, StateStore};
+    use chrono::TimeZone;
+    use evolution_contracts::{
+        AuthorityTier, CandidateId, CandidateKind, CandidateTarget, ResourceBudget,
+        CANDIDATE_SCHEMA,
+    };
+    use std::sync::Mutex;
+    use tempfile::TempDir;
 
-    // Integration-level recovery is covered in repo_loop via private seam call pattern:
-    // unit-level: ensure MirrorLockBusy mapping does not Failed-terminalize without store.
+    fn fixed_now() -> DateTime<Utc> {
+        Utc.with_ymd_and_hms(2026, 9, 1, 12, 0, 0).unwrap()
+    }
+
+    fn policy_digest() -> String {
+        format!("sha256:{}", "ab".repeat(32))
+    }
+
+    fn test_manifest(id: &str) -> CandidateManifest {
+        CandidateManifest {
+            schema: CANDIDATE_SCHEMA.to_owned(),
+            id: CandidateId::parse(id).unwrap(),
+            mission_id: "felt-use-mass-growth".to_owned(),
+            kind: CandidateKind::Code,
+            authority: AuthorityTier::Candidate,
+            target: CandidateTarget::Repository {
+                owner: "maximilianwruhs-cyber".to_owned(),
+                repository: "GZMO".to_owned(),
+                base_branch: "main".to_owned(),
+                candidate_branch: format!("evolve/{id}"),
+            },
+            baseline_digest: "git-sha1:0123456789012345678901234567890123456789".to_owned(),
+            required_gates: vec!["tests".to_owned()],
+            protected_paths: vec!["SECRET/".to_owned()],
+            budget: ResourceBudget {
+                wall_seconds: 100,
+                max_attempts: 1,
+                max_changed_files: 20,
+                max_added_lines: 1500,
+                max_tool_calls: 10,
+                max_input_tokens: 1000,
+                max_output_tokens: 1000,
+                max_energy_joules: None,
+                allow_missing_energy_meter: true,
+            },
+            created_at: fixed_now(),
+        }
+    }
+
+    /// Private delegate around a real StateStore (no behavior of its own).
+    struct StoreDelegate {
+        inner: StateStore,
+    }
+
+    impl CandidateStateOps for StoreDelegate {
+        fn active_candidate(
+            &self,
+            repository: &str,
+        ) -> Result<Option<CandidateRecord>, StateError> {
+            self.inner.active_candidate(repository)
+        }
+        fn create_candidate(
+            &self,
+            manifest: &CandidateManifest,
+            policy_digest: &str,
+            now: DateTime<Utc>,
+        ) -> Result<CandidateRecord, StateError> {
+            self.inner.create_candidate(manifest, policy_digest, now)
+        }
+        fn transition(
+            &self,
+            id: &CandidateId,
+            next: CandidateState,
+            metadata: crate::state::TransitionMetadata,
+            now: DateTime<Utc>,
+        ) -> Result<CandidateRecord, StateError> {
+            self.inner.transition(id, next, metadata, now)
+        }
+        fn load(&self, id: &CandidateId) -> Result<CandidateRecord, StateError> {
+            self.inner.load(id)
+        }
+    }
+
+    /// Fails only the first Prepared transition; Failed and other ops delegate.
+    struct FailPreparedOnce {
+        inner: StateStore,
+        fail_prepared: Mutex<bool>,
+    }
+
+    impl FailPreparedOnce {
+        fn new(inner: StateStore) -> Self {
+            Self {
+                inner,
+                fail_prepared: Mutex::new(true),
+            }
+        }
+    }
+
+    impl CandidateStateOps for FailPreparedOnce {
+        fn active_candidate(
+            &self,
+            repository: &str,
+        ) -> Result<Option<CandidateRecord>, StateError> {
+            self.inner.active_candidate(repository)
+        }
+        fn create_candidate(
+            &self,
+            manifest: &CandidateManifest,
+            policy_digest: &str,
+            now: DateTime<Utc>,
+        ) -> Result<CandidateRecord, StateError> {
+            self.inner.create_candidate(manifest, policy_digest, now)
+        }
+        fn transition(
+            &self,
+            id: &CandidateId,
+            next: CandidateState,
+            metadata: crate::state::TransitionMetadata,
+            now: DateTime<Utc>,
+        ) -> Result<CandidateRecord, StateError> {
+            if next == CandidateState::Prepared {
+                let mut guard = self.fail_prepared.lock().unwrap();
+                if *guard {
+                    *guard = false;
+                    return Err(StateError::IllegalTransition(
+                        "injected prepared transition failure".to_owned(),
+                    ));
+                }
+            }
+            self.inner.transition(id, next, metadata, now)
+        }
+        fn load(&self, id: &CandidateId) -> Result<CandidateRecord, StateError> {
+            self.inner.load(id)
+        }
+    }
+
     #[test]
-    fn mirror_lock_busy_maps_to_prepare_git_error_display() {
-        let err = PrepareError::from_git(GitError::MirrorLockBusy);
+    fn mirror_lock_busy_after_observed_stays_resumable() {
+        let store = StoreDelegate {
+            inner: StateStore::open_in_memory().unwrap(),
+        };
+        let id = "cand-20260901t120000z-bet-mlbusy01";
+        let observed = store
+            .create_candidate(&test_manifest(id), &policy_digest(), fixed_now())
+            .unwrap();
+        assert_eq!(observed.state(), CandidateState::Observed);
+
+        let err = settle_observed_after_git_prepare(
+            &store,
+            &observed,
+            "0123456789012345678901234567890123456789".to_owned(),
+            fixed_now(),
+            Err(GitError::MirrorLockBusy),
+        )
+        .unwrap_err();
+        match err {
+            PrepareError::Git(ref m) => assert!(m.contains("mirror lease busy"), "{m}"),
+            other => panic!("expected PrepareError::Git, got {other:?}"),
+        }
+
+        let rec = store.load(observed.id()).unwrap();
+        assert_eq!(rec.state(), CandidateState::Observed);
+        assert!(rec.workspace().is_none());
+        assert!(store
+            .active_candidate("maximilianwruhs-cyber/GZMO")
+            .unwrap()
+            .is_some());
+    }
+
+    #[test]
+    fn prepared_transition_failure_removes_workspace_and_fails() {
+        let root = TempDir::new().unwrap();
+        let store = FailPreparedOnce::new(StateStore::open_in_memory().unwrap());
+        let id = "cand-20260901t120000z-bet-prepfail1";
+        let observed = store
+            .create_candidate(&test_manifest(id), &policy_digest(), fixed_now())
+            .unwrap();
+
+        let ws_path = root.path().join("workspaces").join(id);
+        fs::create_dir_all(&ws_path).unwrap();
+        fs::write(ws_path.join("marker"), b"owned").unwrap();
+        assert!(ws_path.is_dir());
+
+        let err = settle_observed_after_git_prepare(
+            &store,
+            &observed,
+            "0123456789012345678901234567890123456789".to_owned(),
+            fixed_now(),
+            Ok(ws_path.clone()),
+        )
+        .unwrap_err();
+
+        match &err {
+            PrepareError::Failed {
+                reason,
+                candidate_id,
+            } => {
+                assert!(
+                    reason.contains("prepared transition failed") || reason.contains("illegal"),
+                    "{reason}"
+                );
+                assert!(reason.len() <= MAX_REASON_BYTES, "reason must be bounded");
+                assert_eq!(candidate_id, id);
+            }
+            other => panic!("expected PrepareError::Failed, got {other:?}"),
+        }
+
         assert!(
-            matches!(err, PrepareError::Git(ref m) if m.contains("busy") || m.contains("lock") || m.contains("Git"))
+            !ws_path.exists(),
+            "production recovery must remove the published workspace"
         );
-        // from_git uses bound_reason on Display of MirrorLockBusy
-        let _ = err;
-        let direct = PrepareError::Git("mirror lease busy".to_owned());
-        assert!(direct.to_string().contains("mirror lease busy"));
+        let rec = store.load(observed.id()).unwrap();
+        assert_eq!(rec.state(), CandidateState::Failed);
+        assert!(
+            rec.terminal_reason().is_some(),
+            "terminal reason must be recorded"
+        );
+        assert!(store
+            .active_candidate("maximilianwruhs-cyber/GZMO")
+            .unwrap()
+            .is_none());
     }
 }
