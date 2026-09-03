@@ -2152,6 +2152,12 @@ pub fn canonical_profile_tree_digest(profile_dir: &Path) -> Result<String, Worke
     let mut entries: Vec<(String, u32, Vec<u8>)> = Vec::new();
     collect_profile_files(profile_dir, profile_dir, &mut entries)?;
     entries.sort_by(|a, b| a.0.cmp(&b.0));
+    let names: Vec<&str> = entries.iter().map(|(n, _, _)| n.as_str()).collect();
+    if names != PROFILE_ALLOWED_FILES {
+        return Err(WorkerError::Trust(format!(
+            "profile digest file set {names:?} must equal {PROFILE_ALLOWED_FILES:?}"
+        )));
+    }
     let mut preimage = Vec::new();
     preimage.extend_from_slice(b"gzmo.profile.v1\0");
     for (rel, mode, bytes) in entries {
@@ -2167,11 +2173,28 @@ pub fn canonical_profile_tree_digest(profile_dir: &Path) -> Result<String, Worke
     Ok(digest_bytes(&preimage))
 }
 
+/// Allowed relative paths inside a trusted OMP profile tree.
+const PROFILE_ALLOWED_FILES: &[&str] = &["agent/config.yml", "agent/models.yml"];
+const PROFILE_ALLOWED_DIRS: &[&str] = &[".", "agent"];
+
 fn collect_profile_files(
     root: &Path,
     dir: &Path,
     out: &mut Vec<(String, u32, Vec<u8>)>,
 ) -> Result<(), WorkerError> {
+    let dir_rel = if dir == root {
+        ".".to_owned()
+    } else {
+        dir.strip_prefix(root)
+            .map_err(|_| WorkerError::Trust("profile path escape".to_owned()))?
+            .to_string_lossy()
+            .replace('\\', "/")
+    };
+    if !PROFILE_ALLOWED_DIRS.iter().any(|d| *d == dir_rel) {
+        return Err(WorkerError::Trust(format!(
+            "profile contains disallowed directory {dir_rel}"
+        )));
+    }
     let mut kids: Vec<_> = fs::read_dir(dir)
         .map_err(|e| WorkerError::Io(e.to_string()))?
         .collect::<Result<Vec<_>, _>>()
@@ -2193,11 +2216,17 @@ fn collect_profile_files(
                 .map_err(|_| WorkerError::Trust("profile path escape".to_owned()))?
                 .to_string_lossy()
                 .replace('\\', "/");
-            if rel.is_empty() {
-                continue;
+            if !PROFILE_ALLOWED_FILES.iter().any(|f| *f == rel) {
+                return Err(WorkerError::Trust(format!(
+                    "profile contains disallowed file {rel}"
+                )));
             }
             let bytes = read_capped_nonsymlink(&path, MAX_WORKER_FILE_BYTES)?;
             out.push((rel, mode_perms(meta.mode()), bytes));
+        } else {
+            return Err(WorkerError::Trust(
+                "profile tree has unsupported entry type".to_owned(),
+            ));
         }
     }
     Ok(())
@@ -2211,17 +2240,13 @@ fn validate_mounted_worker_profile(
 ) -> Result<(), WorkerError> {
     require_absolute_utf8_normalized("mounted_profile", mounted)?;
     reject_symlink_component_path(mounted)?;
-    let st = authority.lstat(mounted)?;
-    if st.is_symlink || !st.is_dir {
-        return Err(WorkerError::Trust(
-            "mounted profile must be a real directory".to_owned(),
-        ));
-    }
-    if mode_perms(st.mode) & 0o022 != 0 {
-        return Err(WorkerError::Trust(
-            "mounted profile must not be group/world writable".to_owned(),
-        ));
-    }
+    // Directory + required files: owned by root or coordinator, never worker.
+    require_trusted_profile_node(mounted, request, authority, true)?;
+    let agent = mounted.join("agent");
+    require_trusted_profile_node(&agent, request, authority, true)?;
+    require_trusted_profile_node(&agent.join("config.yml"), request, authority, false)?;
+    require_trusted_profile_node(&agent.join("models.yml"), request, authority, false)?;
+
     validate_installed_profile_tree(mounted)?;
     let actual = canonical_profile_tree_digest(mounted)?;
     if actual != request.profile_digest() {
@@ -2237,6 +2262,54 @@ fn validate_mounted_worker_profile(
     Ok(())
 }
 
+fn require_trusted_profile_node(
+    path: &Path,
+    request: &WorkerRequest,
+    authority: &dyn PathAuthority,
+    is_dir: bool,
+) -> Result<(), WorkerError> {
+    reject_symlink_component_path(path)?;
+    let st = authority.lstat(path)?;
+    if st.is_symlink {
+        return Err(WorkerError::Trust(format!(
+            "profile path must not be symlink: {}",
+            path.display()
+        )));
+    }
+    if is_dir {
+        if !st.is_dir {
+            return Err(WorkerError::Trust(format!(
+                "profile path must be directory: {}",
+                path.display()
+            )));
+        }
+    } else if !st.is_file {
+        return Err(WorkerError::Trust(format!(
+            "profile path must be file: {}",
+            path.display()
+        )));
+    }
+    if mode_perms(st.mode) & 0o022 != 0 {
+        return Err(WorkerError::Trust(format!(
+            "profile path must not be group/world writable: {}",
+            path.display()
+        )));
+    }
+    if st.uid == request.expected_uid() {
+        return Err(WorkerError::Trust(format!(
+            "mounted profile must not be worker-owned: {}",
+            path.display()
+        )));
+    }
+    if st.uid != 0 && st.uid != request.coordinator_uid() {
+        return Err(WorkerError::Trust(format!(
+            "mounted profile owner must be root or coordinator: {}",
+            path.display()
+        )));
+    }
+    Ok(())
+}
+
 pub fn validate_code_candidate_profile(profile_dir: &Path) -> Result<(), WorkerError> {
     validate_installed_profile_tree(profile_dir)
 }
@@ -2248,6 +2321,19 @@ fn validate_installed_profile_tree(profile_dir: &Path) -> Result<(), WorkerError
         return Err(WorkerError::Trust(
             "profile must be a real directory tree".to_owned(),
         ));
+    }
+    let mut entries: Vec<(String, u32, Vec<u8>)> = Vec::new();
+    collect_profile_files(profile_dir, profile_dir, &mut entries)?;
+    let mut names: Vec<String> = entries.into_iter().map(|(n, _, _)| n).collect();
+    names.sort();
+    let expected: Vec<String> = PROFILE_ALLOWED_FILES
+        .iter()
+        .map(|s| (*s).to_owned())
+        .collect();
+    if names != expected {
+        return Err(WorkerError::Trust(format!(
+            "profile file set {names:?} must equal {expected:?}"
+        )));
     }
     let config_path = profile_dir.join("agent").join("config.yml");
     let models_path = profile_dir.join("agent").join("models.yml");
@@ -3761,7 +3847,17 @@ mod tests {
             trusted.insert(self.profile_path.clone());
             trusted.insert(self.profile_path.join("agent").join("config.yml"));
             trusted.insert(self.profile_path.join("agent").join("models.yml"));
-            // Also trust request companions after seal — mapped by request_root prefix.
+            // Mounted dest must appear coordinator-owned (simulates RO bind of trusted source).
+            let mounted = self
+                .output_dir
+                .join(WORKER_HOME_NAME)
+                .join(".omp")
+                .join("profiles")
+                .join("code-worker");
+            trusted.insert(mounted.clone());
+            trusted.insert(mounted.join("agent"));
+            trusted.insert(mounted.join("agent").join("config.yml"));
+            trusted.insert(mounted.join("agent").join("models.yml"));
             TestPathAuthority::new(
                 EffectiveIdentity {
                     uid: worker_uid,
@@ -4785,6 +4881,7 @@ mod tests {
         assert!(logged.iter().any(|c| c.iter().any(|a| a == "kill")));
     }
 
+    #[test]
     fn receipt_validate_against_requires_zero_and_head() {
         let digest = |c: char| format!("sha256:{}", c.to_string().repeat(64));
         let issued = Utc.with_ymd_and_hms(2026, 9, 1, 12, 0, 0).unwrap();
@@ -4852,6 +4949,33 @@ mod tests {
         )
         .unwrap();
         assert!(bad.validate_against(&req, head).is_err());
+        assert!(ok
+            .validate_against(&req, "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb")
+            .is_err());
+        let over = ResourceUsage {
+            wall_seconds: 9999,
+            attempts: 1,
+            changed_files: 1,
+            added_lines: 1,
+            tool_calls: 1,
+            input_tokens: 1,
+            output_tokens: 1,
+            energy_joules: None,
+        };
+        let over_r = WorkerReceipt::new(
+            req.candidate_id().clone(),
+            req.manifest_digest().to_owned(),
+            req.policy_digest().to_owned(),
+            req.omp_version().to_owned(),
+            req.issued_at(),
+            req.issued_at() + ChronoDuration::seconds(1),
+            0,
+            digest('f'),
+            Some(format!("git-sha1:{head}")),
+            over,
+        )
+        .unwrap();
+        assert!(over_r.validate_against(&req, head).is_err());
     }
 
     #[test]
@@ -5020,6 +5144,92 @@ mod tests {
                 || err.to_string().contains("profile")
                 || err.to_string().contains("Trust")
                 || err.to_string().contains("digest"),
+            "{err}"
+        );
+    }
+
+    #[test]
+    fn worker_owned_mounted_profile_is_rejected() {
+        let h = Harness::new();
+        let _req = h.seal("m");
+        h.materialize_profile_mount();
+        let worker_uid = h.real_uid;
+        let coordinator_uid = h.real_uid.wrapping_add(1000).max(1);
+        let mut trusted = BTreeSet::new();
+        trusted.insert(h.omp_exec.clone());
+        trusted.insert(h.profile_path.clone());
+        trusted.insert(h.profile_path.join("agent").join("config.yml"));
+        trusted.insert(h.profile_path.join("agent").join("models.yml"));
+        // Omit mounted dest from trusted → output_root mapping → worker owner.
+        let auth = TestPathAuthority::new(
+            EffectiveIdentity {
+                uid: worker_uid,
+                gid: h.real_gid.max(1),
+            },
+            coordinator_uid,
+            worker_uid,
+            h.real_gid.max(1),
+            &h.roots,
+            trusted,
+        );
+        let path = request_path(&h);
+        let runner = FakeProcessRunner::new();
+        let err = run_worker_request_with(&path, &h.roots, &auth, &runner).unwrap_err();
+        assert!(
+            err.to_string().contains("worker-owned") || err.to_string().contains("Trust"),
+            "{err}"
+        );
+    }
+
+    #[test]
+    fn profile_extra_files_rejected_on_seal_and_mount() {
+        let h = Harness::new();
+        fs::write(h.profile_path.join("agent").join("SYSTEM.md"), "nope\n").unwrap();
+        let manifest = sample_manifest(CAND_ID, &h.baseline);
+        let manifest_json = canonical_json_bytes(&manifest).unwrap();
+        let issued = Utc::now();
+        let input = SealWorkerInput {
+            candidate_id: CandidateId::parse(CAND_ID).unwrap(),
+            workspace: h.workspace.clone(),
+            output_dir: h.output_dir.clone(),
+            omp_executable: h.omp_exec.clone(),
+            omp_profile: "code-worker".to_owned(),
+            omp_version: OMP_VERSION.to_owned(),
+            coordinator_uid: h.real_uid.wrapping_add(1000).max(1),
+            expected_uid: h.real_uid,
+            expected_gid: h.real_gid.max(1),
+            budget: valid_budget(),
+            issued_at: issued,
+            companions: WorkerCompanions {
+                manifest_json: manifest_json.clone(),
+                policy_toml: b"x\n".to_vec(),
+                system_prompt_md: b"s\n".to_vec(),
+                mission_md: b"m\n".to_vec(),
+                omp_overlay_yml: render_omp_overlay(PROVIDER_MODEL).into_bytes(),
+            },
+            manifest_digest: digest_bytes(&manifest_json),
+            policy_digest: format!("sha256:{}", sha256_hex(b"p")),
+        };
+        let err = seal_worker_bundle(&h.roots, input).unwrap_err();
+        assert!(
+            err.to_string().contains("disallowed") || err.to_string().contains("SYSTEM"),
+            "{err}"
+        );
+        let _ = fs::remove_file(h.profile_path.join("agent").join("SYSTEM.md"));
+
+        fs::create_dir_all(h.profile_path.join("agent").join("hooks").join("pre")).unwrap();
+        fs::write(
+            h.profile_path
+                .join("agent")
+                .join("hooks")
+                .join("pre")
+                .join("x.ts"),
+            "export {}\n",
+        )
+        .unwrap();
+        let err = validate_code_candidate_profile(&h.profile_path).unwrap_err();
+        assert!(
+            err.to_string().contains("disallowed") || err.to_string().contains("hooks"),
             "{err}"
         );
     }
