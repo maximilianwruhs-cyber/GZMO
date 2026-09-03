@@ -178,9 +178,8 @@ fn run() -> Result<()> {
     match cli.command {
         #[cfg(unix)]
         Command::Worker { request } => {
-            // Hidden worker never reads coordinator config.
             if cli.config.is_some() {
-                // Accept presence but do not load it; structural separation.
+                bail!("hidden worker must not be invoked with --config");
             }
             run_hidden_worker(&request).map_err(|err| anyhow::anyhow!("worker failed: {err}"))?;
             Ok(())

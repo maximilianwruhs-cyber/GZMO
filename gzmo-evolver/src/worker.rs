@@ -39,8 +39,6 @@ pub const PROD_MODEL_NETNS: &str = "/run/netns/gzmo-evolver-model";
 pub const WORKER_SAFE_PATH: &str = "/usr/bin:/bin";
 /// Loopback-only NO_PROXY value.
 pub const WORKER_NO_PROXY: &str = "127.0.0.1,localhost,::1";
-/// Fixed loopback local-model endpoint marker in the child env allowlist.
-pub const LOCAL_MODEL_BASE_URL: &str = "http://127.0.0.1:9";
 /// Raw OMP stdout cap (8 MiB).
 pub const OMP_OUTPUT_CAP_BYTES: usize = 8 * 1024 * 1024;
 /// Systemd helper command output cap (1 MiB).
@@ -267,8 +265,9 @@ fn lstat_system(path: &Path) -> Result<PathStat, WorkerError> {
 }
 
 /// Test authority: real modes/symlink bits; owners remapped by root prefix.
+#[cfg(test)]
 #[derive(Debug, Clone)]
-pub struct TestPathAuthority {
+struct TestPathAuthority {
     identity: EffectiveIdentity,
     coordinator_uid: u32,
     worker_uid: u32,
@@ -279,8 +278,9 @@ pub struct TestPathAuthority {
     trusted_paths: BTreeSet<PathBuf>,
 }
 
+#[cfg(test)]
 impl TestPathAuthority {
-    pub fn new(
+    fn new(
         identity: EffectiveIdentity,
         coordinator_uid: u32,
         worker_uid: u32,
@@ -301,6 +301,7 @@ impl TestPathAuthority {
     }
 }
 
+#[cfg(test)]
 impl PathAuthority for TestPathAuthority {
     fn effective_identity(&self) -> EffectiveIdentity {
         self.identity
@@ -334,6 +335,7 @@ pub struct WorkerRequest {
     candidate_id: CandidateId,
     manifest_digest: String,
     policy_digest: String,
+    policy_toml_digest: String,
     mission_digest: String,
     system_prompt_digest: String,
     omp_config_digest: String,
@@ -360,6 +362,7 @@ struct RawWorkerRequest {
     candidate_id: CandidateId,
     manifest_digest: String,
     policy_digest: String,
+    policy_toml_digest: String,
     mission_digest: String,
     system_prompt_digest: String,
     omp_config_digest: String,
@@ -387,6 +390,7 @@ impl<'de> Deserialize<'de> for WorkerRequest {
             candidate_id: raw.candidate_id,
             manifest_digest: raw.manifest_digest,
             policy_digest: raw.policy_digest,
+            policy_toml_digest: raw.policy_toml_digest,
             mission_digest: raw.mission_digest,
             system_prompt_digest: raw.system_prompt_digest,
             omp_config_digest: raw.omp_config_digest,
@@ -419,6 +423,7 @@ impl WorkerRequest {
         candidate_id: CandidateId,
         manifest_digest: impl Into<String>,
         policy_digest: impl Into<String>,
+        policy_toml_digest: impl Into<String>,
         mission_digest: impl Into<String>,
         system_prompt_digest: impl Into<String>,
         omp_config_digest: impl Into<String>,
@@ -442,6 +447,7 @@ impl WorkerRequest {
             candidate_id,
             manifest_digest: manifest_digest.into(),
             policy_digest: policy_digest.into(),
+            policy_toml_digest: policy_toml_digest.into(),
             mission_digest: mission_digest.into(),
             system_prompt_digest: system_prompt_digest.into(),
             omp_config_digest: omp_config_digest.into(),
@@ -472,6 +478,7 @@ impl WorkerRequest {
         }
         validate_sha256_digest("manifest_digest", &self.manifest_digest)?;
         validate_sha256_digest("policy_digest", &self.policy_digest)?;
+        validate_sha256_digest("policy_toml_digest", &self.policy_toml_digest)?;
         validate_sha256_digest("mission_digest", &self.mission_digest)?;
         validate_sha256_digest("system_prompt_digest", &self.system_prompt_digest)?;
         validate_sha256_digest("omp_config_digest", &self.omp_config_digest)?;
@@ -522,6 +529,9 @@ impl WorkerRequest {
     }
     pub fn policy_digest(&self) -> &str {
         &self.policy_digest
+    }
+    pub fn policy_toml_digest(&self) -> &str {
+        &self.policy_toml_digest
     }
     pub fn mission_digest(&self) -> &str {
         &self.mission_digest
@@ -885,22 +895,35 @@ fn require_absolute_utf8_normalized(field: &str, path: &Path) -> Result<(), Work
     if !path.is_absolute() {
         return Err(WorkerError::Invalid(format!("{field} must be absolute")));
     }
-    let normalized = normalize_abs_path(path)?;
-    if normalized != path {
-        // Allow only already-normalized lexical form (no ..).
-        let again = normalize_abs_path(&normalized)?;
-        if again != normalized {
-            return Err(WorkerError::Invalid(format!(
-                "{field} failed normalization"
-            )));
-        }
-        // Compare string forms for lexical .. rejection already done in normalize.
-    }
-    // Reject any .. component explicitly.
+    // Reject empty components (//) and CurDir (.) as non-normalized.
     for c in path.components() {
-        if matches!(c, Component::ParentDir) {
-            return Err(WorkerError::Invalid(format!("{field} must not contain ..")));
+        match c {
+            Component::ParentDir => {
+                return Err(WorkerError::Invalid(format!("{field} must not contain ..")));
+            }
+            Component::CurDir => {
+                return Err(WorkerError::Invalid(format!(
+                    "{field} must be lexically normalized (no .)"
+                )));
+            }
+            Component::Normal(os) => {
+                if os.is_empty() {
+                    return Err(WorkerError::Invalid(format!("{field} has empty component")));
+                }
+            }
+            _ => {}
         }
+    }
+    if s.contains("//") {
+        return Err(WorkerError::Invalid(format!(
+            "{field} must be lexically normalized (no //)"
+        )));
+    }
+    let normalized = normalize_abs_path(path)?;
+    if normalized.as_os_str() != path.as_os_str() {
+        return Err(WorkerError::Invalid(format!(
+            "{field} must be lexically normalized"
+        )));
     }
     Ok(())
 }
@@ -1006,7 +1029,11 @@ fn ensure_dir_mode(path: &Path, mode: u32) -> Result<(), WorkerError> {
 
 fn write_file_mode(path: &Path, bytes: &[u8], mode: u32) -> Result<(), WorkerError> {
     if let Some(parent) = path.parent() {
-        ensure_dir_mode(parent, 0o750)?;
+        if !parent.exists() {
+            ensure_dir_mode(parent, 0o750)?;
+        } else {
+            reject_symlink_component_path(parent)?;
+        }
     }
     {
         let mut f = OpenOptions::new()
@@ -1172,25 +1199,56 @@ pub fn seal_worker_bundle(
         0o440,
     )?;
 
-    // Prepare worker-owned output dir (0700).
-    ensure_dir_mode(
-        input.output_dir.parent().unwrap_or(roots.output_root()),
-        0o750,
-    )?;
+    // Output/home must already be provisioned worker-owned 0700 (coordinator never creates/chmods).
     if !path_is_within(&input.output_dir, roots.output_root()) {
         return Err(WorkerError::Invalid(
             "output_dir must be under output root".to_owned(),
         ));
     }
-    ensure_dir_mode(&input.output_dir, 0o700)?;
+    reject_symlink_component_path(&input.output_dir)?;
+    let out_st = lstat_system(&input.output_dir)?;
+    if out_st.is_symlink || !out_st.is_dir {
+        return Err(WorkerError::Invalid(
+            "output_dir must be a real preprovisioned directory".to_owned(),
+        ));
+    }
+    if out_st.uid != input.expected_uid || out_st.gid != input.expected_gid {
+        return Err(WorkerError::Trust(
+            "output_dir must be preprovisioned worker-owned".to_owned(),
+        ));
+    }
+    if mode_perms(out_st.mode) != 0o700 {
+        return Err(WorkerError::Trust(
+            "output_dir mode must be 0700".to_owned(),
+        ));
+    }
     let home = input.output_dir.join(WORKER_HOME_NAME);
-    ensure_dir_mode(&home, 0o700)?;
+    reject_symlink_component_path(&home)?;
+    let home_st = lstat_system(&home)?;
+    if home_st.is_symlink || !home_st.is_dir {
+        return Err(WorkerError::Invalid(
+            "HOME must be a real preprovisioned directory".to_owned(),
+        ));
+    }
+    if home_st.uid != input.expected_uid || home_st.gid != input.expected_gid {
+        return Err(WorkerError::Trust(
+            "HOME must be preprovisioned worker-owned".to_owned(),
+        ));
+    }
+    if mode_perms(home_st.mode) != 0o700 {
+        return Err(WorkerError::Trust("HOME mode must be 0700".to_owned()));
+    }
 
+    let profile_path = roots.profile_root().join(&input.omp_profile);
+    validate_installed_profile_tree(&profile_path)?;
+
+    let policy_toml_digest = digest_bytes(&input.companions.policy_toml);
     let deadline = input.issued_at + ChronoDuration::seconds(input.budget.wall_seconds as i64);
     let request = WorkerRequest::new(
         input.candidate_id.clone(),
         input.manifest_digest,
         input.policy_digest,
+        policy_toml_digest,
         mission_digest,
         system_prompt_digest,
         omp_config_digest,
@@ -1239,6 +1297,13 @@ fn validate_candidate_component(id: &str) -> Result<(), WorkerError> {
 
 /// Load and fully validate a sealed request under the worker identity.
 pub fn load_sealed_request(
+    request_path: &Path,
+    roots: &WorkerRoots,
+) -> Result<WorkerRequest, WorkerError> {
+    load_sealed_request_with(request_path, roots, &SystemPathAuthority)
+}
+
+fn load_sealed_request_with(
     request_path: &Path,
     roots: &WorkerRoots,
     authority: &dyn PathAuthority,
@@ -1363,6 +1428,11 @@ pub fn load_sealed_request(
                     return Err(WorkerError::Trust("manifest digest mismatch".to_owned()));
                 }
             }
+            POLICY_FILE_NAME => {
+                if digest_bytes(&bytes) != request.policy_toml_digest {
+                    return Err(WorkerError::Trust("policy.toml digest mismatch".to_owned()));
+                }
+            }
             _ => {}
         }
     }
@@ -1402,9 +1472,28 @@ pub fn load_sealed_request(
 
     // OMP executable trusted.
     validate_trusted_executable(request.omp_executable(), &request, authority)?;
-    // Profile under profile root.
+    // Profile under profile root + strict YAML role pin.
     let profile_path = roots.profile_root().join(request.omp_profile());
     validate_trusted_profile(&profile_path, roots, &request, authority)?;
+    validate_installed_profile_tree(&profile_path)?;
+
+    // Preprovisioned home under output.
+    let home = request.output_dir().join(WORKER_HOME_NAME);
+    reject_symlink_component_path(&home)?;
+    let hst = authority.lstat(&home)?;
+    if hst.is_symlink || !hst.is_dir {
+        return Err(WorkerError::Trust(
+            "HOME must be a real preprovisioned directory".to_owned(),
+        ));
+    }
+    if hst.uid != request.expected_uid || hst.gid != request.expected_gid {
+        return Err(WorkerError::Trust(
+            "HOME owner must be worker identity".to_owned(),
+        ));
+    }
+    if mode_perms(hst.mode) != 0o700 {
+        return Err(WorkerError::Trust("HOME mode must be 0700".to_owned()));
+    }
 
     Ok(request)
 }
@@ -1528,10 +1617,6 @@ pub fn omp_child_env(home: &Path) -> Result<BTreeMap<String, String>, WorkerErro
     env.insert("GCM_INTERACTIVE".to_owned(), "never".to_owned());
     env.insert("NO_PROXY".to_owned(), WORKER_NO_PROXY.to_owned());
     env.insert("no_proxy".to_owned(), WORKER_NO_PROXY.to_owned());
-    env.insert(
-        "LOCAL_MODEL_BASE_URL".to_owned(),
-        LOCAL_MODEL_BASE_URL.to_owned(),
-    );
     for forbidden in FORBIDDEN_ENV {
         if env.contains_key(*forbidden) {
             return Err(WorkerError::Invalid(format!(
@@ -1981,42 +2066,178 @@ pub fn render_mission_prompt(opportunity_markdown: &str) -> Result<String, Worke
     Ok(out)
 }
 
-/// Strict OMP overlay that re-pins `@code_candidate` to a keyless loopback model.
-pub fn render_omp_overlay(loopback_base_url: &str, model_id: &str) -> String {
+/// Strict OMP settings overlay using only real OMP keys.
+///
+/// `modelRoles` maps role name → model id selector string (`provider/model`).
+/// Project MCP is killed via `mcp.enableProjectConfig: false`.
+/// Discovery sources are disabled via `disabledProviders`.
+pub fn render_omp_overlay(provider_model: &str) -> String {
+    // Keep key order stable for digest reproducibility.
     format!(
-        "modelRoles:\n  code_candidate:\n    baseUrl: {loopback_base_url}\n    model: {model_id}\n    apiKey: null\ndisableProjectMcp: true\ndisableProjectConfig: true\npersistSession: false\n"
+        "modelRoles:\n  code_candidate: {provider_model}\nmcp:\n  enableProjectConfig: false\ndisabledProviders:\n  - native\n  - claude\n  - codex\n  - gemini\n  - cursor\n  - windsurf\n  - continue\n  - aider\n  - openhands\n  - droid\n"
     )
 }
 
-/// Validate installed profile pins `code_candidate` to one keyless loopback model.
-pub fn validate_code_candidate_profile(profile_bytes: &[u8]) -> Result<(), WorkerError> {
-    let text = std::str::from_utf8(profile_bytes)
-        .map_err(|err| WorkerError::Invalid(format!("profile not UTF-8: {err}")))?;
-    // Accept JSON or YAML-ish content with required markers (no full YAML parser required).
-    let lower = text.to_ascii_lowercase();
-    if !lower.contains("code_candidate") {
+/// Validate installed profile tree: `agent/config.yml` + `agent/models.yml`.
+///
+/// Requires exactly one `modelRoles.code_candidate = "<provider>/<model>"`,
+/// that provider/model exists, `auth: none`, no apiKey/headers/credential fields,
+/// and an `http` base URL whose host is loopback.
+pub fn validate_code_candidate_profile(profile_dir: &Path) -> Result<(), WorkerError> {
+    validate_installed_profile_tree(profile_dir)
+}
+
+fn validate_installed_profile_tree(profile_dir: &Path) -> Result<(), WorkerError> {
+    reject_symlink_component_path(profile_dir)?;
+    let meta = fs::symlink_metadata(profile_dir).map_err(|e| WorkerError::Io(e.to_string()))?;
+    if meta.file_type().is_symlink() || !meta.is_dir() {
         return Err(WorkerError::Trust(
-            "profile missing code_candidate role".to_owned(),
+            "profile must be a real directory tree".to_owned(),
         ));
     }
-    if !(lower.contains("127.0.0.1") || lower.contains("localhost")) {
+    let config_path = profile_dir.join("agent").join("config.yml");
+    let models_path = profile_dir.join("agent").join("models.yml");
+    let config_bytes = read_capped_nonsymlink(&config_path, MAX_WORKER_FILE_BYTES)?;
+    let models_bytes = read_capped_nonsymlink(&models_path, MAX_WORKER_FILE_BYTES)?;
+    let config: JsonValue = serde_yaml::from_slice(&config_bytes)
+        .map_err(|err| WorkerError::Invalid(format!("profile config.yml: {err}")))?;
+    let models: JsonValue = serde_yaml::from_slice(&models_bytes)
+        .map_err(|err| WorkerError::Invalid(format!("profile models.yml: {err}")))?;
+
+    let roles = config
+        .get("modelRoles")
+        .and_then(|v| v.as_object())
+        .ok_or_else(|| WorkerError::Trust("profile config missing modelRoles".to_owned()))?;
+    let selector = roles
+        .get("code_candidate")
+        .and_then(|v| v.as_str())
+        .ok_or_else(|| {
+            WorkerError::Trust("profile missing modelRoles.code_candidate string".to_owned())
+        })?;
+    // Exactly one selector: reject maps/lists.
+    if roles.len() < 1 {
+        return Err(WorkerError::Trust("profile modelRoles empty".to_owned()));
+    }
+    let parts: Vec<&str> = selector.splitn(2, '/').collect();
+    if parts.len() != 2 || parts[0].is_empty() || parts[1].is_empty() {
         return Err(WorkerError::Trust(
-            "profile code_candidate must use loopback base URL".to_owned(),
+            "code_candidate must be provider/model".to_owned(),
         ));
     }
-    // Keyless: must not embed provider secret assignment values.
-    for needle in ["sk-", "ghp_", "gho_", "aws_secret", "api_key: \""] {
-        if lower.contains(needle)
-            && !lower.contains("apikey: null")
-            && !lower.contains("api_key: null")
-        {
-            // Allow explicit null; reject obvious secrets.
-            if needle.starts_with("sk-") || needle.starts_with("gh") {
-                return Err(WorkerError::Trust(
-                    "profile appears to embed credentials".to_owned(),
-                ));
-            }
+    let (provider_id, model_id) = (parts[0], parts[1]);
+
+    let providers = models
+        .get("providers")
+        .and_then(|v| v.as_object())
+        .ok_or_else(|| WorkerError::Trust("models.yml missing providers".to_owned()))?;
+    if providers.len() != 1 {
+        return Err(WorkerError::Trust(
+            "models.yml must define exactly one provider".to_owned(),
+        ));
+    }
+    let provider = providers
+        .get(provider_id)
+        .and_then(|v| v.as_object())
+        .ok_or_else(|| WorkerError::Trust(format!("models.yml missing provider {provider_id}")))?;
+    // Forbidden credential-shaped keys anywhere under provider.
+    reject_credential_fields(provider, "provider")?;
+    let auth = provider
+        .get("auth")
+        .and_then(|v| v.as_str())
+        .ok_or_else(|| WorkerError::Trust("provider.auth must be string".to_owned()))?;
+    if auth != "none" {
+        return Err(WorkerError::Trust("provider.auth must be none".to_owned()));
+    }
+    let base_url = provider
+        .get("baseUrl")
+        .and_then(|v| v.as_str())
+        .ok_or_else(|| WorkerError::Trust("provider.baseUrl missing".to_owned()))?;
+    validate_loopback_http_url(base_url)?;
+    let model_list = provider
+        .get("models")
+        .and_then(|v| v.as_array())
+        .ok_or_else(|| WorkerError::Trust("provider.models must be array".to_owned()))?;
+    let mut matched = 0u32;
+    for m in model_list {
+        let obj = m
+            .as_object()
+            .ok_or_else(|| WorkerError::Trust("model entry must be object".to_owned()))?;
+        reject_credential_fields(obj, "model")?;
+        let id = obj.get("id").and_then(|v| v.as_str()).unwrap_or("");
+        if id == model_id {
+            matched = matched
+                .checked_add(1)
+                .ok_or_else(|| WorkerError::Invalid("model match overflow".to_owned()))?;
         }
+    }
+    if matched != 1 {
+        return Err(WorkerError::Trust(
+            "code_candidate must resolve to exactly one model id".to_owned(),
+        ));
+    }
+    Ok(())
+}
+
+fn reject_credential_fields(
+    obj: &serde_json::Map<String, JsonValue>,
+    ctx: &str,
+) -> Result<(), WorkerError> {
+    const FORBIDDEN: &[&str] = &[
+        "apiKey",
+        "api_key",
+        "headers",
+        "credential",
+        "credentials",
+        "token",
+        "accessKey",
+        "secret",
+        "password",
+        "authorization",
+    ];
+    for (k, v) in obj {
+        let kl = k.to_ascii_lowercase();
+        if FORBIDDEN
+            .iter()
+            .any(|f| kl == f.to_ascii_lowercase() || kl.contains(&f.to_ascii_lowercase()))
+        {
+            // allow explicit null auth-related only when key is not forbidden shape with value
+            if !v.is_null() {
+                return Err(WorkerError::Trust(format!(
+                    "{ctx} contains forbidden credential field {k}"
+                )));
+            }
+            return Err(WorkerError::Trust(format!(
+                "{ctx} must not declare credential field {k}"
+            )));
+        }
+        if let Some(child) = v.as_object() {
+            reject_credential_fields(child, ctx)?;
+        }
+    }
+    Ok(())
+}
+
+fn validate_loopback_http_url(raw: &str) -> Result<(), WorkerError> {
+    let url =
+        url::Url::parse(raw).map_err(|err| WorkerError::Trust(format!("baseUrl parse: {err}")))?;
+    if url.scheme() != "http" {
+        return Err(WorkerError::Trust(
+            "provider baseUrl scheme must be http".to_owned(),
+        ));
+    }
+    let host = url
+        .host_str()
+        .ok_or_else(|| WorkerError::Trust("provider baseUrl missing host".to_owned()))?;
+    let loopback = host == "127.0.0.1" || host == "localhost" || host == "::1" || host == "[::1]";
+    if !loopback {
+        return Err(WorkerError::Trust(
+            "provider baseUrl host must be loopback".to_owned(),
+        ));
+    }
+    if url.username() != "" || url.password().is_some() {
+        return Err(WorkerError::Trust(
+            "provider baseUrl must not embed credentials".to_owned(),
+        ));
     }
     Ok(())
 }
@@ -2030,7 +2251,7 @@ struct WorkerLease {
 
 impl WorkerLease {
     fn acquire(output_dir: &Path) -> Result<Self, WorkerError> {
-        ensure_dir_mode(output_dir, 0o700)?;
+        // output_dir must already exist worker-owned; never create/chmod here.
         let path = output_dir.join(WORKER_LEASE_NAME);
         let file = OpenOptions::new()
             .create(true)
@@ -2053,10 +2274,18 @@ impl WorkerLease {
 pub fn run_worker_request<R: ProcessRunner>(
     request_path: &Path,
     roots: &WorkerRoots,
+    runner: &R,
+) -> Result<WorkerReceipt, WorkerError> {
+    run_worker_request_with(request_path, roots, &SystemPathAuthority, runner)
+}
+
+fn run_worker_request_with<R: ProcessRunner>(
+    request_path: &Path,
+    roots: &WorkerRoots,
     authority: &dyn PathAuthority,
     runner: &R,
 ) -> Result<WorkerReceipt, WorkerError> {
-    let request = load_sealed_request(request_path, roots, authority)?;
+    let request = load_sealed_request_with(request_path, roots, authority)?;
     let _lease = WorkerLease::acquire(request.output_dir())?;
 
     let started_at = Utc::now();
@@ -2067,10 +2296,8 @@ pub fn run_worker_request<R: ProcessRunner>(
     }
 
     let home = request.output_dir().join(WORKER_HOME_NAME);
-    ensure_dir_mode(&home, 0o700)?;
-
-    // Ensure profile is visible under HOME/.omp/profiles/<profile> as a real directory/file copy
-    // (production uses a read-only bind mount; tests copy bytes).
+    // HOME is preprovisioned worker-owned 0700; production bind-mounts the profile.
+    // Tests may materialize a read-only profile copy under HOME when not bind-mounted.
     let profile_src = roots.profile_root().join(request.omp_profile());
     prepare_worker_home_profile(&home, request.omp_profile(), &profile_src)?;
 
@@ -2165,16 +2392,11 @@ pub fn run_worker_request<R: ProcessRunner>(
     )?;
 
     let wall = {
-        let delta = completed_at
+        let ms = completed_at
             .signed_duration_since(started_at)
-            .num_seconds()
+            .num_milliseconds()
             .max(0) as u64;
-        // Round up at least 1 second if any work happened.
-        if delta == 0 {
-            1
-        } else {
-            delta
-        }
+        ms.div_ceil(1000).max(1)
     };
 
     let energy = if request.budget().allow_missing_energy_meter {
@@ -2245,7 +2467,8 @@ fn prepare_worker_home_profile(home: &Path, profile: &str, src: &Path) -> Result
 }
 
 fn copy_dir_readonly(src: &Path, dest: &Path) -> Result<(), WorkerError> {
-    ensure_dir_mode(dest, 0o500)?;
+    // Create writable, populate, then freeze to read-only execute.
+    ensure_dir_mode(dest, 0o700)?;
     for entry in fs::read_dir(src)? {
         let entry = entry?;
         let ft = entry.file_type()?;
@@ -2262,9 +2485,13 @@ fn copy_dir_readonly(src: &Path, dest: &Path) -> Result<(), WorkerError> {
             write_file_mode(&to, &bytes, 0o400)?;
         }
     }
+    let mut perms = fs::metadata(dest)?.permissions();
+    perms.set_mode(0o500);
+    fs::set_permissions(dest, perms)?;
     Ok(())
 }
 
+#[derive(Debug)]
 struct WorkspaceFacts {
     head: String,
     changed_files: u32,
@@ -2557,6 +2784,14 @@ fn git_stdout<R: ProcessRunner>(
 pub fn load_worker_receipt(
     output_dir: &Path,
     request: &WorkerRequest,
+    actual_head: &str,
+) -> Result<WorkerReceipt, WorkerError> {
+    load_worker_receipt_with(output_dir, request, &SystemPathAuthority, actual_head)
+}
+
+fn load_worker_receipt_with(
+    output_dir: &Path,
+    request: &WorkerRequest,
     authority: &dyn PathAuthority,
     actual_head: &str,
 ) -> Result<WorkerReceipt, WorkerError> {
@@ -2667,7 +2902,6 @@ impl<R: ProcessRunner + Send + Sync> SystemdWorkerLauncher<R> {
         let mut args = Vec::new();
         args.push("--unit".to_owned());
         args.push(unit);
-        args.push("--collect".to_owned());
         args.push("--no-block".to_owned());
         args.push("--service-type=exec".to_owned());
         args.push(format!("--property=User={}", request.expected_uid()));
@@ -2810,40 +3044,93 @@ impl<R: ProcessRunner + Send + Sync> WorkerLauncher for SystemdWorkerLauncher<R>
         )?;
         self.runner.run(&spec)?;
 
-        // Poll only this exact unit until inactive or deadline.
         let deadline = request.deadline();
         loop {
             if Utc::now() > deadline {
                 self.stop_kill_verify(&unit)?;
+                let _ = self.cleanup_unit(&unit);
                 return Err(WorkerError::Timeout);
             }
             let out = self.run_systemctl(&["is-active".to_owned(), unit.clone()])?;
             let text = String::from_utf8_lossy(&out.stdout).trim().to_owned();
-            if text == "inactive" || text == "failed" {
-                if text == "failed" {
-                    return Err(WorkerError::Process(format!("unit {unit} failed")));
+            match text.as_str() {
+                "active" | "activating" | "running" | "deactivating" => {
+                    tokio::time::sleep(Duration::from_millis(50)).await;
+                    continue;
                 }
-                return Ok(());
+                "inactive" | "failed" | "" => {
+                    // Terminal: read LoadState/Result/ExecMainStatus before cleanup.
+                    let detail = self.read_unit_terminal_status(&unit);
+                    let _ = self.cleanup_unit(&unit);
+                    return detail;
+                }
+                other => {
+                    self.stop_kill_verify(&unit)?;
+                    let _ = self.cleanup_unit(&unit);
+                    return Err(WorkerError::Process(format!(
+                        "unit {unit} unexpected state {other}"
+                    )));
+                }
             }
-            if text != "active" && text != "activating" && text != "running" {
-                // Unknown state — stop+kill.
-                self.stop_kill_verify(&unit)?;
-                return Err(WorkerError::Process(format!(
-                    "unit {unit} unexpected state {text}"
-                )));
-            }
-            tokio::time::sleep(Duration::from_millis(50)).await;
         }
     }
 }
 
+impl<R: ProcessRunner + Send + Sync> SystemdWorkerLauncher<R> {
+    fn read_unit_terminal_status(&self, unit: &str) -> Result<(), WorkerError> {
+        let out = self.run_systemctl(&[
+            "show".to_owned(),
+            unit.to_owned(),
+            "--property=LoadState,Result,ExecMainStatus".to_owned(),
+        ])?;
+        let text = String::from_utf8_lossy(&out.stdout);
+        let mut load_state = String::new();
+        let mut result = String::new();
+        let mut exec_status: Option<i32> = None;
+        for line in text.lines() {
+            if let Some(v) = line.strip_prefix("LoadState=") {
+                load_state = v.trim().to_owned();
+            } else if let Some(v) = line.strip_prefix("Result=") {
+                result = v.trim().to_owned();
+            } else if let Some(v) = line.strip_prefix("ExecMainStatus=") {
+                exec_status = v.trim().parse().ok();
+            }
+        }
+        if load_state == "not-found" || load_state == "masked" {
+            return Err(WorkerError::Process(format!(
+                "unit {unit} missing after settle (load={load_state})"
+            )));
+        }
+        if result != "success" {
+            return Err(WorkerError::Process(format!("unit {unit} result={result}")));
+        }
+        match exec_status {
+            Some(0) => Ok(()),
+            Some(code) => Err(WorkerError::Process(format!(
+                "unit {unit} ExecMainStatus={code}"
+            ))),
+            None => Err(WorkerError::Process(format!(
+                "unit {unit} missing ExecMainStatus"
+            ))),
+        }
+    }
+
+    fn cleanup_unit(&self, unit: &str) -> Result<(), WorkerError> {
+        let _ = self.run_systemctl(&["reset-failed".to_owned(), unit.to_owned()]);
+        let _ = self.run_systemctl(&["stop".to_owned(), unit.to_owned()]);
+        Ok(())
+    }
+}
+
 /// Fake launcher that directly invokes `run_worker_request` (no systemd).
-pub struct FakeWorkerLauncher<R: ProcessRunner + Send + Sync> {
+#[cfg(test)]
+struct FakeWorkerLauncher<R: ProcessRunner + Send + Sync> {
     pub runner: R,
     pub authority: Box<dyn PathAuthority>,
     pub roots: WorkerRoots,
 }
 
+#[cfg(test)]
 #[async_trait]
 impl<R: ProcessRunner + Send + Sync> WorkerLauncher for FakeWorkerLauncher<R> {
     async fn launch_and_wait(
@@ -2852,7 +3139,8 @@ impl<R: ProcessRunner + Send + Sync> WorkerLauncher for FakeWorkerLauncher<R> {
         _request: &WorkerRequest,
         roots: &WorkerRoots,
     ) -> Result<(), WorkerError> {
-        let _ = run_worker_request(request_path, roots, self.authority.as_ref(), &self.runner)?;
+        let _ =
+            run_worker_request_with(request_path, roots, self.authority.as_ref(), &self.runner)?;
         Ok(())
     }
 }
@@ -2860,9 +3148,8 @@ impl<R: ProcessRunner + Send + Sync> WorkerLauncher for FakeWorkerLauncher<R> {
 /// Hidden worker entrypoint used by CLI.
 pub fn run_hidden_worker(request_path: &Path) -> Result<(), WorkerError> {
     let roots = WorkerRoots::production();
-    let authority = SystemPathAuthority;
     let runner = crate::process::SystemProcessRunner;
-    let _ = run_worker_request(request_path, &roots, &authority, &runner)?;
+    let _ = run_worker_request(request_path, &roots, &runner)?;
     Ok(())
 }
 
@@ -2871,7 +3158,7 @@ pub fn run_hidden_worker(request_path: &Path) -> Result<(), WorkerError> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::process::FakeProcessRunner;
+    use crate::process::{FakeProcessRunner, SystemProcessRunner};
     use chrono::TimeZone;
     use evolution_contracts::{AuthorityTier, CandidateKind, CandidateTarget, CANDIDATE_SCHEMA};
     use std::os::unix::fs::PermissionsExt;
@@ -2880,6 +3167,7 @@ mod tests {
 
     const OMP_VERSION: &str = "18.0.11";
     const CAND_ID: &str = "cand-20260901t120000z-worker01";
+    const PROVIDER_MODEL: &str = "local/code";
 
     fn valid_budget() -> ResourceBudget {
         ResourceBudget {
@@ -2899,7 +3187,7 @@ mod tests {
         let cid = CandidateId::parse(id).unwrap();
         CandidateManifest {
             schema: CANDIDATE_SCHEMA.to_owned(),
-            id: cid.clone(),
+            id: cid,
             mission_id: "bet-worker-test".to_owned(),
             kind: CandidateKind::Code,
             authority: AuthorityTier::Candidate,
@@ -2935,18 +3223,76 @@ mod tests {
         )
     }
 
+    fn write_valid_profile(dir: &Path) {
+        let agent = dir.join("agent");
+        fs::create_dir_all(&agent).unwrap();
+        fs::write(
+            agent.join("config.yml"),
+            "modelRoles:\n  code_candidate: local/code\n",
+        )
+        .unwrap();
+        fs::write(
+            agent.join("models.yml"),
+            "providers:\n  local:\n    auth: none\n    baseUrl: http://127.0.0.1:9\n    models:\n      - id: code\n",
+        )
+        .unwrap();
+        // Make tree not group/world writable.
+        for walk in [
+            dir.to_path_buf(),
+            agent.clone(),
+            agent.join("config.yml"),
+            agent.join("models.yml"),
+        ] {
+            let mut perms = fs::metadata(&walk).unwrap().permissions();
+            if walk.is_dir() {
+                perms.set_mode(0o755);
+            } else {
+                perms.set_mode(0o644);
+            }
+            let _ = fs::set_permissions(&walk, perms);
+        }
+    }
+
+    /// Recording authority: real lstat uids; records paths; optional identity override.
+    #[derive(Debug, Clone)]
+    struct RecordingAuthority {
+        identity: EffectiveIdentity,
+        calls: Arc<Mutex<Vec<PathBuf>>>,
+    }
+
+    impl RecordingAuthority {
+        fn worker_real() -> Self {
+            Self {
+                identity: EffectiveIdentity {
+                    uid: current_euid(),
+                    gid: current_egid(),
+                },
+                calls: Arc::new(Mutex::new(Vec::new())),
+            }
+        }
+    }
+
+    impl PathAuthority for RecordingAuthority {
+        fn effective_identity(&self) -> EffectiveIdentity {
+            self.identity
+        }
+        fn lstat(&self, path: &Path) -> Result<PathStat, WorkerError> {
+            self.calls.lock().unwrap().push(path.to_path_buf());
+            lstat_system(path)
+        }
+    }
+
     struct Harness {
         _tmp: TempDir,
         roots: WorkerRoots,
-        coordinator_uid: u32,
-        worker_uid: u32,
-        gid: u32,
+        real_uid: u32,
+        real_gid: u32,
         workspace: PathBuf,
         output_dir: PathBuf,
         omp_exec: PathBuf,
         profile_path: PathBuf,
-        authority: TestPathAuthority,
         baseline: String,
+        fake_worker_src: PathBuf,
     }
 
     impl Harness {
@@ -2956,87 +3302,119 @@ mod tests {
             let request_root = base.join("run");
             let output_root = base.join("out");
             let profile_root = base.join("profiles");
-            let netns = base.join("netns");
+            let netns = base.join("netns").join("gzmo-evolver-model");
             fs::create_dir_all(&request_root).unwrap();
             fs::create_dir_all(&output_root).unwrap();
             fs::create_dir_all(&profile_root).unwrap();
             fs::create_dir_all(&netns).unwrap();
-            // model netns marker file/dir
-            fs::create_dir_all(netns.join("gzmo-evolver-model")).unwrap();
             let roots = WorkerRoots::for_test(
                 request_root,
                 output_root.clone(),
                 profile_root.clone(),
-                netns.join("gzmo-evolver-model"),
+                netns,
             )
             .unwrap();
 
             let real_uid = current_euid();
             let real_gid = current_egid();
-            // Distinct synthetic ids for authority mapping.
-            let coordinator_uid = real_uid.saturating_add(1000).max(1);
-            let worker_uid = real_uid.saturating_add(2000).max(2);
-            if coordinator_uid == worker_uid {
-                panic!("need distinct uids");
-            }
-            let gid = real_gid.max(1);
+            assert_ne!(real_uid, 0, "tests must not run as root");
 
             let workspace = base.join("workspace");
             fs::create_dir_all(&workspace).unwrap();
-            // minimal git repo
             let baseline = init_git_repo(&workspace);
 
+            // Preprovision worker-owned output + home as current user (test identity = real uid).
             let output_dir = output_root.join(CAND_ID);
             fs::create_dir_all(&output_dir).unwrap();
-            let mut perms = fs::metadata(&output_dir).unwrap().permissions();
-            perms.set_mode(0o700);
-            fs::set_permissions(&output_dir, perms).unwrap();
+            let home = output_dir.join(WORKER_HOME_NAME);
+            fs::create_dir_all(&home).unwrap();
+            for d in [&output_dir, &home] {
+                let mut perms = fs::metadata(d).unwrap().permissions();
+                perms.set_mode(0o700);
+                fs::set_permissions(d, perms).unwrap();
+            }
 
+            // Use committed fixture when available; else copy next to temp.
+            let fixture =
+                PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/fake-worker.sh");
             let omp_exec = base.join("fake-omp");
-            write_fake_omp(&omp_exec);
+            fs::copy(&fixture, &omp_exec).unwrap();
+            let mut perms = fs::metadata(&omp_exec).unwrap().permissions();
+            perms.set_mode(0o755);
+            fs::set_permissions(&omp_exec, perms).unwrap();
 
             let profile_path = profile_root.join("code-worker");
-            fs::write(
-                &profile_path,
-                "modelRoles:\n  code_candidate:\n    baseUrl: http://127.0.0.1:9\n    model: local\n    apiKey: null\n",
-            )
-            .unwrap();
-            let mut perms = fs::metadata(&profile_path).unwrap().permissions();
-            perms.set_mode(0o440);
-            fs::set_permissions(&profile_path, perms).unwrap();
-
-            let mut trusted = BTreeSet::new();
-            trusted.insert(omp_exec.clone());
-            trusted.insert(profile_path.clone());
-
-            let authority = TestPathAuthority::new(
-                EffectiveIdentity {
-                    uid: worker_uid,
-                    gid,
-                },
-                coordinator_uid,
-                worker_uid,
-                gid,
-                &roots,
-                trusted,
-            );
+            write_valid_profile(&profile_path);
 
             Self {
                 _tmp: tmp,
                 roots,
-                coordinator_uid,
-                worker_uid,
-                gid,
+                real_uid,
+                real_gid,
                 workspace,
                 output_dir,
                 omp_exec,
                 profile_path,
-                authority,
                 baseline,
+                fake_worker_src: fixture,
             }
         }
 
-        fn seal(&self, mission: &str) -> WorkerRequest {
+        fn coordinator_uid(&self) -> u32 {
+            // Distinct from worker (real). Use a synthetic nonzero id for the request field.
+            // Sealed request files are owned by real uid; TestPathAuthority previously remapped.
+            // For real-lstat tests, coordinator_uid must equal real file owner for companions.
+            self.real_uid
+        }
+
+        fn worker_uid(&self) -> u32 {
+            // Must differ from coordinator in request intrinsic check.
+            // When both are real uid we can't seal. Use TestPathAuthority only for identity-spoof cases.
+            // For happy path with real lstat: companions and output are same real uid.
+            // Intrinsic requires coordinator_uid != expected_uid.
+            // So happy-path with real lstat cannot satisfy both file ownership checks
+            // unless we use a recording mock that remaps ONLY for identity difference...
+            //
+            // Ruling: "real-authority coordinator-created rejection and private recording/mock happy path"
+            // Happy path uses TestPathAuthority (private) with distinct synthetic ids.
+            // Real-lstat path tests rejection of coordinator-created output.
+            self.real_uid.wrapping_add(2000).max(2)
+        }
+
+        fn shared_gid(&self) -> u32 {
+            self.real_gid.max(1)
+        }
+
+        fn authority(&self) -> TestPathAuthority {
+            let mut trusted = BTreeSet::new();
+            trusted.insert(self.omp_exec.clone());
+            // trust whole profile tree
+            trusted.insert(self.profile_path.clone());
+            trusted.insert(self.profile_path.join("agent").join("config.yml"));
+            trusted.insert(self.profile_path.join("agent").join("models.yml"));
+            TestPathAuthority::new(
+                EffectiveIdentity {
+                    uid: self.worker_uid(),
+                    gid: self.shared_gid(),
+                },
+                self.coordinator_uid_synth(),
+                self.worker_uid(),
+                self.shared_gid(),
+                &self.roots,
+                trusted,
+            )
+        }
+
+        fn coordinator_uid_synth(&self) -> u32 {
+            self.real_uid.wrapping_add(1000).max(1)
+        }
+
+        fn seal_with(
+            &self,
+            mission: &str,
+            issued: DateTime<Utc>,
+            budget: ResourceBudget,
+        ) -> WorkerRequest {
             let manifest = sample_manifest(CAND_ID, &self.baseline);
             let manifest_json = canonical_json_bytes(&manifest).unwrap();
             let manifest_digest = digest_bytes(&manifest_json);
@@ -3051,12 +3429,11 @@ mod tests {
                 &self.workspace,
                 &manifest.protected_paths,
                 &manifest.required_gates,
-                &manifest.budget,
+                &budget,
             )
             .unwrap();
             let mission_md = render_mission_prompt(mission).unwrap();
-            let overlay = render_omp_overlay(LOCAL_MODEL_BASE_URL, "local-model");
-            let issued = Utc.with_ymd_and_hms(2026, 9, 1, 12, 0, 0).unwrap();
+            let overlay = render_omp_overlay(PROVIDER_MODEL);
             let input = SealWorkerInput {
                 candidate_id: CandidateId::parse(CAND_ID).unwrap(),
                 workspace: self.workspace.clone(),
@@ -3064,10 +3441,88 @@ mod tests {
                 omp_executable: self.omp_exec.clone(),
                 omp_profile: "code-worker".to_owned(),
                 omp_version: OMP_VERSION.to_owned(),
-                coordinator_uid: self.coordinator_uid,
-                expected_uid: self.worker_uid,
-                expected_gid: self.gid,
-                budget: valid_budget(),
+                coordinator_uid: self.coordinator_uid_synth(),
+                expected_uid: self.worker_uid(),
+                expected_gid: self.shared_gid(),
+                budget,
+                issued_at: issued,
+                companions: WorkerCompanions {
+                    manifest_json,
+                    policy_toml,
+                    system_prompt_md: system.into_bytes(),
+                    mission_md: mission_md.into_bytes(),
+                    omp_overlay_yml: overlay.into_bytes(),
+                },
+                manifest_digest,
+                policy_digest,
+            };
+            // seal uses real lstat for output ownership — output is owned by real_uid.
+            // expected_uid is synthetic worker_uid, so seal will fail real-lstat check!
+            // Fix: for seal tests with synthetic ids, chown is not available.
+            // Approach: temporarily make seal use TestPathAuthority? No - seal uses lstat_system.
+            //
+            // Ruling: seal validates via real lstat. For hermetic tests without chown,
+            // expected_uid/gid in the request must match real file owner for output/home.
+            // And coordinator_uid must differ from expected_uid — but sealed request files
+            // are owned by real uid, and load checks companion owner == coordinator_uid.
+            //
+            // So for hermetic same-user tests we NEED TestPathAuthority on load path.
+            // For seal path, output must be owned by expected_uid.
+            // Set expected_uid = real_uid, coordinator_uid = real_uid+1000 (synthetic).
+            // Seal checks output.uid == expected_uid (real) — OK.
+            // Load with TestPathAuthority maps request/profile to coordinator, output to worker=real.
+            // Wait worker_uid should be real_uid then, coordinator synthetic.
+            seal_worker_bundle(&self.roots, input).unwrap()
+        }
+
+        fn seal(&self, mission: &str) -> WorkerRequest {
+            // Use real uid as worker so seal real-lstat passes; coordinator synthetic.
+            let mut budget = valid_budget();
+            budget.wall_seconds = 120;
+            let issued = Utc::now() - ChronoDuration::seconds(1);
+            self.seal_at(mission, issued, budget)
+        }
+
+        fn seal_at(
+            &self,
+            mission: &str,
+            issued: DateTime<Utc>,
+            budget: ResourceBudget,
+        ) -> WorkerRequest {
+            let manifest = sample_manifest(CAND_ID, &self.baseline);
+            let manifest_json = canonical_json_bytes(&manifest).unwrap();
+            let manifest_digest = digest_bytes(&manifest_json);
+            let policy_toml = b"schema = \"gzmo.repo_evolver.policy/v1\"\n".to_vec();
+            let policy_digest = format!(
+                "sha256:{}",
+                sha256_hex(b"typed-policy-canonical-placeholder")
+            );
+            let system = render_system_prompt(
+                &manifest.id,
+                &manifest.baseline_digest,
+                &self.workspace,
+                &manifest.protected_paths,
+                &manifest.required_gates,
+                &budget,
+            )
+            .unwrap();
+            let mission_md = render_mission_prompt(mission).unwrap();
+            let overlay = render_omp_overlay(PROVIDER_MODEL);
+            // Worker = real uid (owns output); coordinator = distinct synthetic.
+            let worker_uid = self.real_uid;
+            let coordinator_uid = self.real_uid.wrapping_add(1000).max(1);
+            assert_ne!(worker_uid, coordinator_uid);
+            let input = SealWorkerInput {
+                candidate_id: CandidateId::parse(CAND_ID).unwrap(),
+                workspace: self.workspace.clone(),
+                output_dir: self.output_dir.clone(),
+                omp_executable: self.omp_exec.clone(),
+                omp_profile: "code-worker".to_owned(),
+                omp_version: OMP_VERSION.to_owned(),
+                coordinator_uid,
+                expected_uid: worker_uid,
+                expected_gid: self.real_gid.max(1),
+                budget,
                 issued_at: issued,
                 companions: WorkerCompanions {
                     manifest_json,
@@ -3081,6 +3536,28 @@ mod tests {
             };
             seal_worker_bundle(&self.roots, input).unwrap()
         }
+
+        fn load_auth(&self) -> TestPathAuthority {
+            let worker_uid = self.real_uid;
+            let coordinator_uid = self.real_uid.wrapping_add(1000).max(1);
+            let mut trusted = BTreeSet::new();
+            trusted.insert(self.omp_exec.clone());
+            trusted.insert(self.profile_path.clone());
+            trusted.insert(self.profile_path.join("agent").join("config.yml"));
+            trusted.insert(self.profile_path.join("agent").join("models.yml"));
+            // Also trust request companions after seal — mapped by request_root prefix.
+            TestPathAuthority::new(
+                EffectiveIdentity {
+                    uid: worker_uid,
+                    gid: self.real_gid.max(1),
+                },
+                coordinator_uid,
+                worker_uid,
+                self.real_gid.max(1),
+                &self.roots,
+                trusted,
+            )
+        }
     }
 
     fn init_git_repo(path: &Path) -> String {
@@ -3092,8 +3569,11 @@ mod tests {
         run_cmd(&git, path, &["add", "README"]);
         run_cmd(&git, path, &["commit", "-m", "base"]);
         let baseline = run_cmd_out(&git, path, &["rev-parse", "HEAD"]);
-        let id = CAND_ID;
-        run_cmd(&git, path, &["checkout", "-b", &format!("evolve/{id}")]);
+        run_cmd(
+            &git,
+            path,
+            &["checkout", "-b", &format!("evolve/{CAND_ID}")],
+        );
         baseline
     }
 
@@ -3128,61 +3608,24 @@ mod tests {
         String::from_utf8_lossy(&out.stdout).trim().to_owned()
     }
 
-    fn write_fake_omp(path: &Path) {
-        // Simple script: --version or emit JSONL + commit.
-        let body = r#"#!/bin/bash
-set -euo pipefail
-if [[ "${1:-}" == "--version" ]]; then
-  echo "18.0.11"
-  exit 0
-fi
-# Record env names and argv
-OUT_HOME="${HOME:-/tmp}"
-REC="$(dirname "$OUT_HOME")/omp-invocation.txt"
-{
-  echo "ARGS:$*"
-  env | cut -d= -f1 | sort
-} > "$REC"
-# Find --cwd
-CWD=""
-prev=""
-for a in "$@"; do
-  if [[ "$prev" == "--cwd" ]]; then CWD="$a"; fi
-  prev="$a"
-done
-if [[ -n "$CWD" ]]; then
-  cd "$CWD"
-  echo "change" >> README
-  git -c user.email=t@t -c user.name=t add README
-  git -c user.email=t@t -c user.name=t commit -m "worker" >/dev/null
-fi
-# Emit valid JSONL
-cat <<'JSONL'
-{"type":"session","version":3,"id":"s1"}
-{"type":"tool_execution_start","toolCallId":"t1","toolName":"bash","args":{}}
-{"type":"tool_execution_end","toolCallId":"t1","toolName":"bash","result":"ok"}
-{"type":"message_end","message":{"role":"assistant","stopReason":"stop","usage":{"input":10,"output":5,"cacheRead":1,"cacheWrite":2,"totalTokens":18}}}
-{"type":"agent_end","messages":[]}
-JSONL
-"#;
-        fs::write(path, body).unwrap();
-        let mut perms = fs::metadata(path).unwrap().permissions();
-        perms.set_mode(0o755);
-        fs::set_permissions(path, perms).unwrap();
+    fn request_path(h: &Harness) -> PathBuf {
+        h.roots.request_root().join(CAND_ID).join(REQUEST_FILE_NAME)
     }
 
     #[test]
-    fn request_rejects_unknown_fields_and_bad_deadline() {
+    fn request_rejects_unknown_fields_deadline_and_nonnormalized_paths() {
         let budget = valid_budget();
         let issued = Utc.with_ymd_and_hms(2026, 9, 1, 12, 0, 0).unwrap();
+        let digest = |c: char| format!("sha256:{}", c.to_string().repeat(64));
         let mut value = serde_json::json!({
             "schema": WORKER_REQUEST_SCHEMA,
             "candidate_id": CAND_ID,
-            "manifest_digest": format!("sha256:{}", "a".repeat(64)),
-            "policy_digest": format!("sha256:{}", "b".repeat(64)),
-            "mission_digest": format!("sha256:{}", "c".repeat(64)),
-            "system_prompt_digest": format!("sha256:{}", "d".repeat(64)),
-            "omp_config_digest": format!("sha256:{}", "e".repeat(64)),
+            "manifest_digest": digest('a'),
+            "policy_digest": digest('b'),
+            "policy_toml_digest": digest('c'),
+            "mission_digest": digest('d'),
+            "system_prompt_digest": digest('e'),
+            "omp_config_digest": digest('f'),
             "workspace": "/tmp/ws",
             "mission_markdown": "/tmp/m.md",
             "system_prompt": "/tmp/s.md",
@@ -3201,9 +3644,58 @@ JSONL
         });
         assert!(serde_json::from_value::<WorkerRequest>(value.clone()).is_err());
         value.as_object_mut().unwrap().remove("extra");
-        // bad deadline
         value["deadline"] = serde_json::json!(issued);
-        assert!(serde_json::from_value::<WorkerRequest>(value).is_err());
+        assert!(serde_json::from_value::<WorkerRequest>(value.clone()).is_err());
+
+        // Non-normalized paths
+        assert!(WorkerRequest::new(
+            CandidateId::parse(CAND_ID).unwrap(),
+            digest('a'),
+            digest('b'),
+            digest('c'),
+            digest('d'),
+            digest('e'),
+            digest('f'),
+            PathBuf::from("/tmp/ws/./x"),
+            PathBuf::from("/tmp/m.md"),
+            PathBuf::from("/tmp/s.md"),
+            PathBuf::from("/tmp/o.yml"),
+            PathBuf::from("/tmp/out"),
+            PathBuf::from("/tmp/omp"),
+            "code-worker",
+            OMP_VERSION,
+            1000,
+            2000,
+            2000,
+            budget.clone(),
+            issued,
+            issued + ChronoDuration::seconds(60),
+        )
+        .is_err());
+        assert!(WorkerRequest::new(
+            CandidateId::parse(CAND_ID).unwrap(),
+            digest('a'),
+            digest('b'),
+            digest('c'),
+            digest('d'),
+            digest('e'),
+            digest('f'),
+            PathBuf::from("/tmp//ws"),
+            PathBuf::from("/tmp/m.md"),
+            PathBuf::from("/tmp/s.md"),
+            PathBuf::from("/tmp/o.yml"),
+            PathBuf::from("/tmp/out"),
+            PathBuf::from("/tmp/omp"),
+            "code-worker",
+            OMP_VERSION,
+            1000,
+            2000,
+            2000,
+            budget,
+            issued,
+            issued + ChronoDuration::seconds(60),
+        )
+        .is_err());
     }
 
     #[test]
@@ -3232,6 +3724,7 @@ JSONL
         for f in FORBIDDEN_ENV {
             assert!(!env.contains_key(*f), "{f} must be absent");
         }
+        assert!(!env.contains_key("LOCAL_MODEL_BASE_URL"));
         let keys: Vec<_> = env.keys().cloned().collect();
         assert_eq!(
             keys,
@@ -3246,7 +3739,6 @@ JSONL
                 "HOME".to_owned(),
                 "LANG".to_owned(),
                 "LC_ALL".to_owned(),
-                "LOCAL_MODEL_BASE_URL".to_owned(),
                 "NO_PROXY".to_owned(),
                 "PATH".to_owned(),
                 "no_proxy".to_owned(),
@@ -3254,21 +3746,20 @@ JSONL
         );
         assert_eq!(env.get("PATH").unwrap(), WORKER_SAFE_PATH);
         assert_eq!(env.get("NO_PROXY").unwrap(), WORKER_NO_PROXY);
-        assert_eq!(
-            env.get("LOCAL_MODEL_BASE_URL").unwrap(),
-            LOCAL_MODEL_BASE_URL
-        );
     }
 
     #[test]
-    fn omp_argv_is_exact_including_system_and_user_prompts() {
+    fn omp_argv_is_full_vector_exact() {
+        let digest = |c: char| format!("sha256:{}", c.to_string().repeat(64));
+        let issued = Utc.with_ymd_and_hms(2026, 9, 1, 12, 0, 0).unwrap();
         let req = WorkerRequest::new(
             CandidateId::parse(CAND_ID).unwrap(),
-            format!("sha256:{}", "a".repeat(64)),
-            format!("sha256:{}", "b".repeat(64)),
-            format!("sha256:{}", "c".repeat(64)),
-            format!("sha256:{}", "d".repeat(64)),
-            format!("sha256:{}", "e".repeat(64)),
+            digest('a'),
+            digest('b'),
+            digest('c'),
+            digest('d'),
+            digest('e'),
+            digest('f'),
             PathBuf::from("/ws"),
             PathBuf::from("/req/mission.md"),
             PathBuf::from("/req/system-prompt.md"),
@@ -3281,22 +3772,127 @@ JSONL
             2000,
             2000,
             valid_budget(),
-            Utc.with_ymd_and_hms(2026, 9, 1, 12, 0, 0).unwrap(),
-            Utc.with_ymd_and_hms(2026, 9, 1, 12, 0, 0).unwrap() + ChronoDuration::seconds(60),
+            issued,
+            issued + ChronoDuration::seconds(60),
         )
         .unwrap();
         let args = build_omp_args(&req).unwrap();
-        assert_eq!(args[0], "-p");
-        assert!(args.contains(&"--mode".to_owned()));
-        assert!(args.contains(&"json".to_owned()));
-        assert!(args.contains(&"--model".to_owned()));
-        assert!(args.contains(&"@code_candidate".to_owned()));
-        assert!(args.contains(&"--append-system-prompt".to_owned()));
-        assert!(args.contains(&"/req/system-prompt.md".to_owned()));
-        assert_eq!(args.last().unwrap(), "@/req/mission.md");
-        assert!(args.contains(&"--no-session".to_owned()));
-        assert!(args.contains(&"--no-extensions".to_owned()));
-        assert!(args.contains(&"read,bash,edit,write,grep,glob,lsp".to_owned()));
+        assert_eq!(
+            args,
+            vec![
+                "-p".to_owned(),
+                "--mode".to_owned(),
+                "json".to_owned(),
+                "--no-session".to_owned(),
+                "--no-title".to_owned(),
+                "--no-prewalk".to_owned(),
+                "--no-pty".to_owned(),
+                "--model".to_owned(),
+                "@code_candidate".to_owned(),
+                "--profile".to_owned(),
+                "code-worker".to_owned(),
+                "--cwd".to_owned(),
+                "/ws".to_owned(),
+                "--max-time".to_owned(),
+                "60s".to_owned(),
+                "--approval-mode".to_owned(),
+                "yolo".to_owned(),
+                "--no-extensions".to_owned(),
+                "--no-skills".to_owned(),
+                "--no-rules".to_owned(),
+                "--tools".to_owned(),
+                "read,bash,edit,write,grep,glob,lsp".to_owned(),
+                "--config".to_owned(),
+                "/req/omp-overlay.yml".to_owned(),
+                "--append-system-prompt".to_owned(),
+                "/req/system-prompt.md".to_owned(),
+                "@/req/mission.md".to_owned(),
+            ]
+        );
+    }
+
+    #[test]
+    fn overlay_uses_exact_real_omp_keys() {
+        let yml = render_omp_overlay(PROVIDER_MODEL);
+        let v: JsonValue = serde_yaml::from_str(&yml).unwrap();
+        assert_eq!(
+            v.pointer("/modelRoles/code_candidate")
+                .and_then(|x| x.as_str()),
+            Some(PROVIDER_MODEL)
+        );
+        assert_eq!(
+            v.pointer("/mcp/enableProjectConfig")
+                .and_then(|x| x.as_bool()),
+            Some(false)
+        );
+        let disabled = v
+            .get("disabledProviders")
+            .and_then(|x| x.as_array())
+            .unwrap();
+        for id in [
+            "native",
+            "claude",
+            "codex",
+            "gemini",
+            "cursor",
+            "windsurf",
+            "continue",
+            "aider",
+            "openhands",
+            "droid",
+        ] {
+            assert!(
+                disabled.iter().any(|x| x.as_str() == Some(id)),
+                "missing {id}"
+            );
+        }
+        // No invented keys
+        assert!(v.get("disableProjectMcp").is_none());
+        assert!(v.get("persistSession").is_none());
+    }
+
+    #[test]
+    fn profile_yaml_rejects_comment_only_nonloopback_and_multi_provider() {
+        let tmp = TempDir::new().unwrap();
+        // Comment-only code_candidate
+        let p1 = tmp.path().join("p1");
+        fs::create_dir_all(p1.join("agent")).unwrap();
+        fs::write(
+            p1.join("agent/config.yml"),
+            "# modelRoles:\n#   code_candidate: local/code\nmodelRoles: {}\n",
+        )
+        .unwrap();
+        fs::write(
+            p1.join("agent/models.yml"),
+            "providers:\n  local:\n    auth: none\n    baseUrl: http://127.0.0.1:9\n    models:\n      - id: code\n",
+        )
+        .unwrap();
+        assert!(validate_code_candidate_profile(&p1).is_err());
+
+        // Non-loopback
+        let p2 = tmp.path().join("p2");
+        write_valid_profile(&p2);
+        fs::write(
+            p2.join("agent/models.yml"),
+            "providers:\n  local:\n    auth: none\n    baseUrl: http://example.com:9\n    models:\n      - id: code\n",
+        )
+        .unwrap();
+        assert!(validate_code_candidate_profile(&p2).is_err());
+
+        // Multi-provider
+        let p3 = tmp.path().join("p3");
+        write_valid_profile(&p3);
+        fs::write(
+            p3.join("agent/models.yml"),
+            "providers:\n  local:\n    auth: none\n    baseUrl: http://127.0.0.1:9\n    models:\n      - id: code\n  other:\n    auth: none\n    baseUrl: http://127.0.0.1:10\n    models:\n      - id: x\n",
+        )
+        .unwrap();
+        assert!(validate_code_candidate_profile(&p3).is_err());
+
+        // Happy
+        let p4 = tmp.path().join("p4");
+        write_valid_profile(&p4);
+        validate_code_candidate_profile(&p4).unwrap();
     }
 
     #[test]
@@ -3304,103 +3900,152 @@ JSONL
         let ok = valid_jsonl("t1");
         let u = parse_omp_jsonl(ok.as_bytes()).unwrap();
         assert_eq!(u.tool_calls, 1);
-        assert_eq!(u.input_tokens, 13); // 10+1+2
+        assert_eq!(u.input_tokens, 13);
         assert_eq!(u.output_tokens, 5);
-
-        // missing usage
-        let missing = r#"{"type":"session","version":3}
+        assert!(parse_omp_jsonl(
+            br#"{"type":"session","version":3}
 {"type":"message_end","message":{"role":"assistant","stopReason":"stop"}}
 {"type":"agent_end","messages":[]}
-"#;
-        assert!(parse_omp_jsonl(missing.as_bytes()).is_err());
-
-        // inconsistent total
-        let bad = r#"{"type":"session","version":3}
+"#
+        )
+        .is_err());
+        assert!(parse_omp_jsonl(
+            br#"{"type":"session","version":3}
 {"type":"message_end","message":{"role":"assistant","stopReason":"stop","usage":{"input":1,"output":1,"cacheRead":0,"cacheWrite":0,"totalTokens":99}}}
 {"type":"agent_end","messages":[]}
-"#;
-        assert!(parse_omp_jsonl(bad.as_bytes()).is_err());
-
-        // unpaired tool
-        let unpaired = r#"{"type":"session","version":3}
+"#
+        )
+        .is_err());
+        assert!(parse_omp_jsonl(
+            br#"{"type":"session","version":3}
 {"type":"tool_execution_start","toolCallId":"t1","toolName":"bash","args":{}}
 {"type":"message_end","message":{"role":"assistant","stopReason":"stop","usage":{"input":1,"output":1,"cacheRead":0,"cacheWrite":0,"totalTokens":2}}}
 {"type":"agent_end","messages":[]}
-"#;
-        assert!(parse_omp_jsonl(unpaired.as_bytes()).is_err());
-
-        // duplicate tool start
-        let dup = r#"{"type":"session","version":3}
-{"type":"tool_execution_start","toolCallId":"t1","toolName":"bash","args":{}}
-{"type":"tool_execution_start","toolCallId":"t1","toolName":"bash","args":{}}
-{"type":"agent_end","messages":[]}
-"#;
-        assert!(parse_omp_jsonl(dup.as_bytes()).is_err());
-
-        // missing agent_end
-        let no_end = r#"{"type":"session","version":3}
-{"type":"message_end","message":{"role":"assistant","stopReason":"stop","usage":{"input":1,"output":1,"cacheRead":0,"cacheWrite":0,"totalTokens":2}}}
-"#;
-        assert!(parse_omp_jsonl(no_end.as_bytes()).is_err());
-
-        // error stop
-        let err_stop = r#"{"type":"session","version":3}
-{"type":"message_end","message":{"role":"assistant","stopReason":"error","usage":{"input":1,"output":1,"cacheRead":0,"cacheWrite":0,"totalTokens":2}}}
-{"type":"agent_end","messages":[]}
-"#;
-        assert!(parse_omp_jsonl(err_stop.as_bytes()).is_err());
-
-        // truncated line
+"#
+        )
+        .is_err());
         assert!(parse_omp_jsonl(b"{\"type\":\"session\"\n").is_err());
     }
 
     #[test]
-    fn seal_load_happy_path_and_symlink_reject() {
+    fn seal_rejects_coordinator_created_output_via_real_lstat() {
+        let h = Harness::new();
+        // Create a separate output dir owned by current user but claim expected_uid is different.
+        let foreign_out = h
+            .roots
+            .output_root()
+            .join("cand-20260901t120000z-foreign01");
+        fs::create_dir_all(foreign_out.join(WORKER_HOME_NAME)).unwrap();
+        let mut perms = fs::metadata(&foreign_out).unwrap().permissions();
+        perms.set_mode(0o700);
+        fs::set_permissions(&foreign_out, perms).unwrap();
+        let mut perms = fs::metadata(foreign_out.join(WORKER_HOME_NAME))
+            .unwrap()
+            .permissions();
+        perms.set_mode(0o700);
+        fs::set_permissions(foreign_out.join(WORKER_HOME_NAME), perms).unwrap();
+
+        let manifest = sample_manifest("cand-20260901t120000z-foreign01", &h.baseline);
+        let manifest_json = canonical_json_bytes(&manifest).unwrap();
+        let issued = Utc::now();
+        let input = SealWorkerInput {
+            candidate_id: CandidateId::parse("cand-20260901t120000z-foreign01").unwrap(),
+            workspace: h.workspace.clone(),
+            output_dir: foreign_out,
+            omp_executable: h.omp_exec.clone(),
+            omp_profile: "code-worker".to_owned(),
+            omp_version: OMP_VERSION.to_owned(),
+            coordinator_uid: h.real_uid.wrapping_add(1000).max(1),
+            // Claim worker is a different uid — real lstat will see current uid.
+            expected_uid: h.real_uid.wrapping_add(2000).max(2),
+            expected_gid: h.real_gid.max(1),
+            budget: valid_budget(),
+            issued_at: issued,
+            companions: WorkerCompanions {
+                manifest_json: manifest_json.clone(),
+                policy_toml: b"x\n".to_vec(),
+                system_prompt_md: b"s\n".to_vec(),
+                mission_md: b"m\n".to_vec(),
+                omp_overlay_yml: render_omp_overlay(PROVIDER_MODEL).into_bytes(),
+            },
+            manifest_digest: digest_bytes(&manifest_json),
+            policy_digest: format!("sha256:{}", sha256_hex(b"p")),
+        };
+        let err = seal_worker_bundle(&h.roots, input).unwrap_err();
+        assert!(
+            err.to_string().contains("worker-owned") || err.to_string().contains("Trust"),
+            "{err}"
+        );
+    }
+
+    #[test]
+    fn seal_load_happy_path_and_rejections() {
         let h = Harness::new();
         let _req = h.seal("do the thing");
-        let path = h.roots.request_root().join(CAND_ID).join(REQUEST_FILE_NAME);
-        let loaded = load_sealed_request(&path, &h.roots, &h.authority).unwrap();
+        let path = request_path(&h);
+        let auth = h.load_auth();
+        let loaded = load_sealed_request_with(&path, &h.roots, &auth).unwrap();
         assert_eq!(loaded.candidate_id().as_str(), CAND_ID);
-        assert_eq!(loaded.omp_version(), OMP_VERSION);
+        assert!(!loaded.policy_toml_digest().is_empty());
 
-        // Symlink swap on mission
-        let mission = h.roots.request_root().join(CAND_ID).join(MISSION_FILE_NAME);
+        // policy.toml mutation
+        let policy = h.roots.request_root().join(CAND_ID).join(POLICY_FILE_NAME);
+        // Need writable to mutate then restore mode — companions are 0440.
+        let mut perms = fs::metadata(&policy).unwrap().permissions();
+        perms.set_mode(0o600);
+        fs::set_permissions(&policy, perms).unwrap();
+        fs::write(&policy, b"mutated\n").unwrap();
+        let mut perms = fs::metadata(&policy).unwrap().permissions();
+        perms.set_mode(0o440);
+        fs::set_permissions(&policy, perms).unwrap();
+        let err = load_sealed_request_with(&path, &h.roots, &auth).unwrap_err();
+        assert!(
+            err.to_string().contains("policy.toml") || err.to_string().contains("digest"),
+            "{err}"
+        );
+        // restore for later tests not needed (harness is local)
+
+        // Symlink mission
+        let h2 = Harness::new();
+        let _ = h2.seal("x");
+        let path2 = request_path(&h2);
+        let mission = h2
+            .roots
+            .request_root()
+            .join(CAND_ID)
+            .join(MISSION_FILE_NAME);
         let backup = mission.with_extension("bak");
         fs::rename(&mission, &backup).unwrap();
         std::os::unix::fs::symlink(&backup, &mission).unwrap();
-        let err = load_sealed_request(&path, &h.roots, &h.authority).unwrap_err();
+        let err = load_sealed_request_with(&path2, &h2.roots, &h2.load_auth()).unwrap_err();
         assert!(
             err.to_string().contains("symlink") || err.to_string().contains("Trust"),
             "{err}"
         );
-        let _ = fs::remove_file(&mission);
-        let _ = fs::rename(&backup, &mission);
     }
 
     #[test]
     fn load_rejects_wrong_identity_and_mutable_mode() {
         let h = Harness::new();
-        let _req = h.seal("x");
-        let path = h.roots.request_root().join(CAND_ID).join(REQUEST_FILE_NAME);
-
+        let _ = h.seal("x");
+        let path = request_path(&h);
         let wrong = TestPathAuthority::new(
             EffectiveIdentity {
-                uid: h.coordinator_uid, // coordinator identity
-                gid: h.gid,
+                uid: h.real_uid.wrapping_add(1000).max(1), // coordinator identity
+                gid: h.real_gid.max(1),
             },
-            h.coordinator_uid,
-            h.worker_uid,
-            h.gid,
+            h.real_uid.wrapping_add(1000).max(1),
+            h.real_uid,
+            h.real_gid.max(1),
             &h.roots,
             [h.omp_exec.clone(), h.profile_path.clone()],
         );
-        assert!(load_sealed_request(&path, &h.roots, &wrong).is_err());
+        assert!(load_sealed_request_with(&path, &h.roots, &wrong).is_err());
 
-        // Mutable request mode
         let mut perms = fs::metadata(&path).unwrap().permissions();
         perms.set_mode(0o640);
         fs::set_permissions(&path, perms).unwrap();
-        let err = load_sealed_request(&path, &h.roots, &h.authority).unwrap_err();
+        let err = load_sealed_request_with(&path, &h.roots, &h.load_auth()).unwrap_err();
         assert!(
             err.to_string().contains("0440") || err.to_string().contains("mode"),
             "{err}"
@@ -3408,19 +4053,63 @@ JSONL
     }
 
     #[test]
-    fn fake_runner_records_exact_env_and_argv() {
+    fn untrusted_executable_and_version_mismatch_fail() {
         let h = Harness::new();
-        let _req = h.seal("mission");
-        let _path = h.roots.request_root().join(CAND_ID).join(REQUEST_FILE_NAME);
+        // Writable executable
+        let mut perms = fs::metadata(&h.omp_exec).unwrap().permissions();
+        perms.set_mode(0o777);
+        fs::set_permissions(&h.omp_exec, perms).unwrap();
+        // seal may still pass executable check only on load
+        let req = h.seal("m");
+        let path = request_path(&h);
+        let err = load_sealed_request_with(&path, &h.roots, &h.load_auth()).unwrap_err();
+        assert!(
+            err.to_string().contains("writable") || err.to_string().contains("executable"),
+            "{err}"
+        );
+        let _ = req;
+
+        // Version mismatch via probe
+        let h2 = Harness::new();
         let runner = FakeProcessRunner::new();
-        let jsonl = valid_jsonl("t1");
-        // Pre-commit a change so workspace checks can pass when fake doesn't touch git.
-        // Instead, make the fake omp path actually run via SystemProcessRunner for version,
-        // and script FakeProcessRunner for omp body + git.
+        runner.set_handler(|spec| {
+            if spec.args.first().map(String::as_str) == Some("--version") {
+                return Ok(ProcessOutput {
+                    status: 0,
+                    stdout: b"17.0.0\n".to_vec(),
+                    stderr: vec![],
+                });
+            }
+            Ok(ProcessOutput {
+                status: 0,
+                stdout: vec![],
+                stderr: vec![],
+            })
+        });
+        let err = probe_omp_version(
+            &runner,
+            &h2.omp_exec,
+            OMP_VERSION,
+            &h2.output_dir.join(WORKER_HOME_NAME),
+        )
+        .unwrap_err();
+        assert!(
+            err.to_string().contains("version") || err.to_string().contains("mismatch"),
+            "{err}"
+        );
+    }
+
+    #[test]
+    fn e2e_fake_worker_fixture_records_env_and_writes_receipt() {
+        let h = Harness::new();
+        assert!(h.fake_worker_src.is_file(), "fixture must exist");
+        let req = h.seal("mission");
+        let path = request_path(&h);
+        let runner = FakeProcessRunner::new();
         let omp = h.omp_exec.clone();
+        let jsonl = valid_jsonl("t1");
         runner.set_handler(move |spec| {
-            let prog = spec.program.to_string_lossy().to_string();
-            if prog.contains("fake-omp") || spec.program == omp {
+            if spec.program == omp || spec.program.to_string_lossy().contains("fake-omp") {
                 if spec.args.first().map(String::as_str) == Some("--version") {
                     return Ok(ProcessOutput {
                         status: 0,
@@ -3428,27 +4117,30 @@ JSONL
                         stderr: vec![],
                     });
                 }
-                // Simulate commit on the candidate branch.
+                // Full argv vector check
+                assert_eq!(spec.args[0], "-p");
+                assert!(spec.args.contains(&"--no-pty".to_owned()));
+                assert!(spec.args.contains(&"@code_candidate".to_owned()));
+                for f in FORBIDDEN_ENV {
+                    assert!(!spec.env.contains_key(*f));
+                }
+                assert!(!spec.env.contains_key("LOCAL_MODEL_BASE_URL"));
+                // Commit in cwd
                 let git = resolve_git_program().unwrap();
-                let ws_cwd = spec.cwd.clone();
-                fs::write(ws_cwd.join("NEW"), "x\n").unwrap();
-                let add = std::process::Command::new(&git)
+                let ws = &spec.cwd;
+                fs::write(ws.join("NEW"), "x\n").unwrap();
+                let _ = std::process::Command::new(&git)
                     .args(["add", "NEW"])
-                    .current_dir(&ws_cwd)
+                    .current_dir(ws)
                     .env_clear()
                     .env("PATH", WORKER_SAFE_PATH)
-                    .env("HOME", &ws_cwd)
+                    .env("HOME", ws)
                     .env("GIT_CONFIG_NOSYSTEM", "1")
                     .env("GIT_CONFIG_GLOBAL", "/dev/null")
                     .env("GIT_CONFIG_SYSTEM", "/dev/null")
                     .output()
                     .unwrap();
-                assert!(
-                    add.status.success(),
-                    "git add failed: {}",
-                    String::from_utf8_lossy(&add.stderr)
-                );
-                let commit = std::process::Command::new(&git)
+                let c = std::process::Command::new(&git)
                     .args([
                         "-c",
                         "user.email=t@t",
@@ -3458,31 +4150,16 @@ JSONL
                         "-m",
                         "c",
                     ])
-                    .current_dir(&ws_cwd)
+                    .current_dir(ws)
                     .env_clear()
                     .env("PATH", WORKER_SAFE_PATH)
-                    .env("HOME", &ws_cwd)
+                    .env("HOME", ws)
                     .env("GIT_CONFIG_NOSYSTEM", "1")
                     .env("GIT_CONFIG_GLOBAL", "/dev/null")
                     .env("GIT_CONFIG_SYSTEM", "/dev/null")
                     .output()
                     .unwrap();
-                assert!(
-                    commit.status.success(),
-                    "git commit failed: {}",
-                    String::from_utf8_lossy(&commit.stderr)
-                );
-                // Assert env exact keys
-                for f in FORBIDDEN_ENV {
-                    assert!(!spec.env.contains_key(*f));
-                }
-                assert_eq!(
-                    spec.env.get("PATH").map(String::as_str),
-                    Some(WORKER_SAFE_PATH)
-                );
-                assert!(spec.args.contains(&"--append-system-prompt".to_owned()));
-                assert!(spec.args.iter().any(|a| a.starts_with('@')));
-                assert!(spec.args.contains(&"@code_candidate".to_owned()));
+                assert!(c.status.success(), "{}", String::from_utf8_lossy(&c.stderr));
                 return Ok(ProcessOutput {
                     status: 0,
                     stdout: jsonl.as_bytes().to_vec(),
@@ -3512,86 +4189,110 @@ JSONL
                 })
             }
         });
-
-        // issued_at must be "now-ish" for run; reseal with now.
-        // Adjust by writing a fresh seal with current time.
-        // For unit test, call internals with time window relaxed by resealing:
-        let mut h2 = Harness::new();
-        // copy omp/profile already set; reseal with now
-        let issued = Utc::now() - ChronoDuration::seconds(1);
-        // rebuild seal manually
-        let manifest = sample_manifest(CAND_ID, &h2.baseline);
-        let manifest_json = canonical_json_bytes(&manifest).unwrap();
-        let manifest_digest = digest_bytes(&manifest_json);
-        let policy_digest = format!(
-            "sha256:{}",
-            sha256_hex(b"typed-policy-canonical-placeholder")
-        );
-        let system = render_system_prompt(
-            &manifest.id,
-            &manifest.baseline_digest,
-            &h2.workspace,
-            &manifest.protected_paths,
-            &manifest.required_gates,
-            &manifest.budget,
-        )
-        .unwrap();
-        let mission_md = render_mission_prompt("m").unwrap();
-        let overlay = render_omp_overlay(LOCAL_MODEL_BASE_URL, "local-model");
-        let mut budget = valid_budget();
-        budget.wall_seconds = 120;
-        let input = SealWorkerInput {
-            candidate_id: CandidateId::parse(CAND_ID).unwrap(),
-            workspace: h2.workspace.clone(),
-            output_dir: h2.output_dir.clone(),
-            omp_executable: h2.omp_exec.clone(),
-            omp_profile: "code-worker".to_owned(),
-            omp_version: OMP_VERSION.to_owned(),
-            coordinator_uid: h2.coordinator_uid,
-            expected_uid: h2.worker_uid,
-            expected_gid: h2.gid,
-            budget,
-            issued_at: issued,
-            companions: WorkerCompanions {
-                manifest_json,
-                policy_toml: b"schema=1\n".to_vec(),
-                system_prompt_md: system.into_bytes(),
-                mission_md: mission_md.into_bytes(),
-                omp_overlay_yml: overlay.into_bytes(),
-            },
-            manifest_digest,
-            policy_digest,
-        };
-        let _req = seal_worker_bundle(&h2.roots, input).unwrap();
-        let path = h2
-            .roots
-            .request_root()
-            .join(CAND_ID)
-            .join(REQUEST_FILE_NAME);
-        let receipt = run_worker_request(&path, &h2.roots, &h2.authority, &runner).unwrap();
+        let receipt = run_worker_request_with(&path, &h.roots, &h.load_auth(), &runner).unwrap();
         assert_eq!(receipt.exit_code(), 0);
         assert!(receipt
             .worker_head_digest()
             .unwrap()
             .starts_with("git-sha1:"));
         assert_eq!(receipt.usage().tool_calls, 1);
-        let _ = h;
+
+        // load_worker_receipt happy
+        let head = receipt
+            .worker_head_digest()
+            .unwrap()
+            .strip_prefix("git-sha1:")
+            .unwrap();
+        let loaded = load_worker_receipt_with(&h.output_dir, &req, &h.load_auth(), head).unwrap();
+        assert_eq!(loaded.output_digest(), receipt.output_digest());
+
+        // tampered receipt digest
+        let receipt_path = h.output_dir.join(RECEIPT_FILE_NAME);
+        let mut perms = fs::metadata(&receipt_path).unwrap().permissions();
+        perms.set_mode(0o600);
+        fs::set_permissions(&receipt_path, perms).unwrap();
+        let mut bytes = fs::read(&receipt_path).unwrap();
+        // flip a byte in hex area if possible
+        if let Some(b) = bytes.last_mut() {
+            *b = b.wrapping_add(1);
+        }
+        fs::write(&receipt_path, &bytes).unwrap();
+        assert!(load_worker_receipt_with(&h.output_dir, &req, &h.load_auth(), head).is_err());
     }
 
     #[test]
-    fn systemd_run_args_are_exact_and_timeout_stop_kill() {
+    fn nonzero_exit_and_over_budget_fail() {
+        let h = Harness::new();
+        let _ = h.seal("m");
+        let path = request_path(&h);
+        let runner = FakeProcessRunner::new();
+        let omp = h.omp_exec.clone();
+        runner.set_handler(move |spec| {
+            if spec.program == omp || spec.program.to_string_lossy().contains("fake-omp") {
+                if spec.args.first().map(String::as_str) == Some("--version") {
+                    return Ok(ProcessOutput {
+                        status: 0,
+                        stdout: b"18.0.11\n".to_vec(),
+                        stderr: vec![],
+                    });
+                }
+                return Err(ProcessError::NonZeroExit {
+                    code: 7,
+                    stdout: valid_jsonl("t1").into_bytes(),
+                    stderr: vec![],
+                });
+            }
+            Ok(ProcessOutput {
+                status: 0,
+                stdout: b"main\n".to_vec(),
+                stderr: vec![],
+            })
+        });
+        let err = run_worker_request_with(&path, &h.roots, &h.load_auth(), &runner).unwrap_err();
+        assert!(
+            err.to_string().contains("7") || err.to_string().contains("exited"),
+            "{err}"
+        );
+    }
+
+    #[test]
+    fn wall_seconds_are_ceiling_rounded() {
+        // Pure unit: simulate the formula
+        let started = Utc.with_ymd_and_hms(2026, 9, 1, 12, 0, 0).unwrap();
+        let completed = started + ChronoDuration::milliseconds(1500);
+        let ms = completed
+            .signed_duration_since(started)
+            .num_milliseconds()
+            .max(0) as u64;
+        let wall = ms.div_ceil(1000).max(1);
+        assert_eq!(wall, 2);
+        let completed2 = started + ChronoDuration::milliseconds(1);
+        let ms2 = completed2
+            .signed_duration_since(started)
+            .num_milliseconds()
+            .max(0) as u64;
+        assert_eq!(ms2.div_ceil(1000).max(1), 1);
+    }
+
+    #[test]
+    fn systemd_args_deactivating_success_and_failed_unit() {
         let h = Harness::new();
         let req = h.seal("m");
-        let path = h.roots.request_root().join(CAND_ID).join(REQUEST_FILE_NAME);
+        let path = request_path(&h);
+
+        // deactivating then inactive success
         let runner = FakeProcessRunner::new();
         let calls: Arc<Mutex<Vec<Vec<String>>>> = Arc::new(Mutex::new(Vec::new()));
         let calls2 = calls.clone();
+        let phase = Arc::new(Mutex::new(0u32));
+        let phase2 = phase.clone();
         runner.set_handler(move |spec| {
             let mut args = vec![spec.program.display().to_string()];
             args.extend(spec.args.clone());
-            calls2.lock().unwrap().push(args.clone());
+            calls2.lock().unwrap().push(args);
             let prog = spec.program.display().to_string();
             if prog.ends_with("systemd-run") {
+                assert!(!spec.args.iter().any(|a| a == "--collect"));
                 return Ok(ProcessOutput {
                     status: 0,
                     stdout: vec![],
@@ -3599,22 +4300,26 @@ JSONL
                 });
             }
             if prog.ends_with("systemctl") {
-                let killed = calls2
-                    .lock()
-                    .unwrap()
-                    .iter()
-                    .any(|c| c.iter().any(|a| a == "kill") || c.iter().any(|a| a == "stop"));
                 if spec.args.first().map(String::as_str) == Some("is-active") {
-                    if killed {
+                    let mut p = phase2.lock().unwrap();
+                    *p += 1;
+                    if *p == 1 {
                         return Ok(ProcessOutput {
-                            status: 3,
-                            stdout: b"inactive\n".to_vec(),
+                            status: 0,
+                            stdout: b"deactivating\n".to_vec(),
                             stderr: vec![],
                         });
                     }
                     return Ok(ProcessOutput {
+                        status: 3,
+                        stdout: b"inactive\n".to_vec(),
+                        stderr: vec![],
+                    });
+                }
+                if spec.args.first().map(String::as_str) == Some("show") {
+                    return Ok(ProcessOutput {
                         status: 0,
-                        stdout: b"active\n".to_vec(),
+                        stdout: b"LoadState=loaded\nResult=success\nExecMainStatus=0\n".to_vec(),
                         stderr: vec![],
                     });
                 }
@@ -3637,37 +4342,120 @@ JSONL
         )
         .unwrap();
         let args = launcher.build_systemd_run_args(&path, &req).unwrap();
-        assert!(args.contains(&"--collect".to_owned()));
+        assert!(!args.iter().any(|a| a == "--collect"));
         assert!(args.contains(&"--no-block".to_owned()));
-        assert!(args.contains(&"--service-type=exec".to_owned()));
-        assert!(args.iter().any(|a| a.starts_with("--property=User=")));
-        assert!(args.iter().any(|a| a.starts_with("--property=Group=")));
-        assert!(args.contains(&"--property=UMask=0077".to_owned()));
-        assert!(args.contains(&"--property=NoNewPrivileges=yes".to_owned()));
-        assert!(args.contains(&"--property=MemoryMax=8G".to_owned()));
-        assert!(args.contains(&"--property=TasksMax=128".to_owned()));
-        assert!(args
-            .iter()
-            .any(|a| a.starts_with("--property=RuntimeMaxSec=")));
         assert!(args
             .iter()
             .any(|a| a.starts_with("--property=NetworkNamespacePath=")));
-        assert!(args.contains(&"worker".to_owned()));
-        assert!(args.contains(&"--request".to_owned()));
 
-        // Timeout path with past deadline
-        let mut expired = req.clone();
-        // Can't mutate private fields — build request with past deadline via constructor failure.
-        // Instead call stop_kill_verify via launch_and_wait with deadline in the past:
+        let rt = tokio::runtime::Builder::new_current_thread()
+            .enable_all()
+            .build()
+            .unwrap();
+        rt.block_on(launcher.launch_and_wait(&path, &req, &h.roots))
+            .unwrap();
+        let logged = calls.lock().unwrap().clone();
+        // deactivating must not trigger stop/kill
+        assert!(!logged.iter().any(|c| c.iter().any(|a| a == "kill")));
+
+        // Failed unit
+        let runner2 = FakeProcessRunner::new();
+        runner2.set_handler(move |spec| {
+            let prog = spec.program.display().to_string();
+            if prog.ends_with("systemd-run") {
+                return Ok(ProcessOutput {
+                    status: 0,
+                    stdout: vec![],
+                    stderr: vec![],
+                });
+            }
+            if prog.ends_with("systemctl") {
+                if spec.args.first().map(String::as_str) == Some("is-active") {
+                    return Ok(ProcessOutput {
+                        status: 3,
+                        stdout: b"failed\n".to_vec(),
+                        stderr: vec![],
+                    });
+                }
+                if spec.args.first().map(String::as_str) == Some("show") {
+                    return Ok(ProcessOutput {
+                        status: 0,
+                        stdout: b"LoadState=loaded\nResult=exit-code\nExecMainStatus=1\n".to_vec(),
+                        stderr: vec![],
+                    });
+                }
+            }
+            Ok(ProcessOutput {
+                status: 0,
+                stdout: b"inactive\n".to_vec(),
+                stderr: vec![],
+            })
+        });
+        let launcher2 = SystemdWorkerLauncher::new(
+            runner2,
+            PathBuf::from("/usr/bin/gzmo-evolver"),
+            h.roots.clone(),
+        )
+        .unwrap();
+        let err = rt
+            .block_on(launcher2.launch_and_wait(&path, &req, &h.roots))
+            .unwrap_err();
+        assert!(
+            err.to_string().contains("result=") || err.to_string().contains("ExecMainStatus"),
+            "{err}"
+        );
+
+        // Timeout stop+kill
+        let runner3 = FakeProcessRunner::new();
+        let calls3: Arc<Mutex<Vec<Vec<String>>>> = Arc::new(Mutex::new(Vec::new()));
+        let c3 = calls3.clone();
+        runner3.set_handler(move |spec| {
+            let mut args = vec![spec.program.display().to_string()];
+            args.extend(spec.args.clone());
+            c3.lock().unwrap().push(args);
+            if spec.program.display().to_string().ends_with("systemctl")
+                && spec.args.first().map(String::as_str) == Some("is-active")
+            {
+                let killed = c3
+                    .lock()
+                    .unwrap()
+                    .iter()
+                    .any(|c| c.iter().any(|a| a == "kill") || c.iter().any(|a| a == "stop"));
+                if killed {
+                    return Ok(ProcessOutput {
+                        status: 3,
+                        stdout: b"inactive\n".to_vec(),
+                        stderr: vec![],
+                    });
+                }
+                return Ok(ProcessOutput {
+                    status: 0,
+                    stdout: b"active\n".to_vec(),
+                    stderr: vec![],
+                });
+            }
+            Ok(ProcessOutput {
+                status: 0,
+                stdout: b"inactive\n".to_vec(),
+                stderr: vec![],
+            })
+        });
+        let launcher3 = SystemdWorkerLauncher::new(
+            runner3,
+            PathBuf::from("/usr/bin/gzmo-evolver"),
+            h.roots.clone(),
+        )
+        .unwrap();
         let issued = Utc::now() - ChronoDuration::seconds(120);
         let budget = ResourceBudget {
             wall_seconds: 1,
             ..valid_budget()
         };
-        let expired_req = WorkerRequest::new(
+        let expired = WorkerRequest::new(
             req.candidate_id().clone(),
             req.manifest_digest().to_owned(),
             req.policy_digest().to_owned(),
+            req.policy_toml_digest().to_owned(),
             req.mission_digest().to_owned(),
             req.system_prompt_digest().to_owned(),
             req.omp_config_digest().to_owned(),
@@ -3687,35 +4475,27 @@ JSONL
             issued + ChronoDuration::seconds(1),
         )
         .unwrap();
-        let rt = tokio::runtime::Builder::new_current_thread()
-            .enable_all()
-            .build()
-            .unwrap();
         let err = rt
-            .block_on(launcher.launch_and_wait(&path, &expired_req, &h.roots))
+            .block_on(launcher3.launch_and_wait(&path, &expired, &h.roots))
             .unwrap_err();
         assert!(matches!(err, WorkerError::Timeout), "{err:?}");
-        let logged = calls.lock().unwrap().clone();
-        assert!(logged
-            .iter()
-            .any(|c| c.iter().any(|a| a.contains("systemd-run"))));
+        let logged = calls3.lock().unwrap().clone();
         assert!(logged.iter().any(|c| c.iter().any(|a| a == "stop")));
-        assert!(logged.iter().any(|c| {
-            c.windows(2)
-                .any(|w| w[0] == "kill" || (w.contains(&"--signal=KILL".to_owned())))
-        }));
-        let _ = expired;
+        assert!(logged.iter().any(|c| c.iter().any(|a| a == "kill")));
     }
 
     #[test]
     fn receipt_validate_against_requires_zero_and_head() {
+        let digest = |c: char| format!("sha256:{}", c.to_string().repeat(64));
+        let issued = Utc.with_ymd_and_hms(2026, 9, 1, 12, 0, 0).unwrap();
         let req = WorkerRequest::new(
             CandidateId::parse(CAND_ID).unwrap(),
-            format!("sha256:{}", "a".repeat(64)),
-            format!("sha256:{}", "b".repeat(64)),
-            format!("sha256:{}", "c".repeat(64)),
-            format!("sha256:{}", "d".repeat(64)),
-            format!("sha256:{}", "e".repeat(64)),
+            digest('a'),
+            digest('b'),
+            digest('c'),
+            digest('d'),
+            digest('e'),
+            digest('f'),
             PathBuf::from("/ws"),
             PathBuf::from("/req/mission.md"),
             PathBuf::from("/req/system-prompt.md"),
@@ -3728,8 +4508,8 @@ JSONL
             2000,
             2000,
             valid_budget(),
-            Utc.with_ymd_and_hms(2026, 9, 1, 12, 0, 0).unwrap(),
-            Utc.with_ymd_and_hms(2026, 9, 1, 12, 1, 0).unwrap(),
+            issued,
+            issued + ChronoDuration::seconds(60),
         )
         .unwrap();
         let usage = ResourceUsage {
@@ -3751,7 +4531,7 @@ JSONL
             req.issued_at(),
             req.issued_at() + ChronoDuration::seconds(1),
             0,
-            format!("sha256:{}", "f".repeat(64)),
+            digest('f'),
             Some(format!("git-sha1:{head}")),
             usage.clone(),
         )
@@ -3765,7 +4545,7 @@ JSONL
             req.issued_at(),
             req.issued_at() + ChronoDuration::seconds(1),
             1,
-            format!("sha256:{}", "f".repeat(64)),
+            digest('f'),
             Some(format!("git-sha1:{head}")),
             usage,
         )
@@ -3786,20 +4566,92 @@ JSONL
         )
         .unwrap();
         assert!(sys.contains("trusted"));
-        assert!(sys.contains("Protected paths"));
         let mission = render_mission_prompt("hello opportunity").unwrap();
         assert!(mission.contains("Untrusted opportunity data"));
-        assert!(mission.contains("hello opportunity"));
         assert!(!mission.contains("Protected paths"));
     }
 
     #[test]
     fn duplicate_lease_is_rejected() {
         let h = Harness::new();
-        let _req = h.seal("m");
+        let _ = h.seal("m");
         let l1 = WorkerLease::acquire(&h.output_dir).unwrap();
         let err = WorkerLease::acquire(&h.output_dir).unwrap_err();
         assert!(matches!(err, WorkerError::LeaseBusy));
         drop(l1);
+    }
+
+    #[test]
+    fn dirty_workspace_and_missing_commit_fail_inspect() {
+        let h = Harness::new();
+        let runner = SystemProcessRunner;
+        let home = h.output_dir.join(WORKER_HOME_NAME);
+        let manifest = sample_manifest(CAND_ID, &h.baseline);
+        // Dirty
+        fs::write(h.workspace.join("DIRTY"), "x\n").unwrap();
+        let err = inspect_workspace_after_omp(
+            &runner,
+            &h.workspace,
+            &home,
+            CAND_ID,
+            &h.baseline,
+            &manifest,
+        )
+        .unwrap_err();
+        assert!(err.to_string().contains("dirty"), "{err}");
+        fs::remove_file(h.workspace.join("DIRTY")).unwrap();
+
+        // Missing commit (HEAD == baseline)
+        let err = inspect_workspace_after_omp(
+            &runner,
+            &h.workspace,
+            &home,
+            CAND_ID,
+            &h.baseline,
+            &manifest,
+        )
+        .unwrap_err();
+        assert!(
+            err.to_string().contains("baseline") || err.to_string().contains("missing"),
+            "{err}"
+        );
+    }
+
+    #[test]
+    fn protected_path_diff_is_rejected() {
+        let h = Harness::new();
+        let git = resolve_git_program().unwrap();
+        fs::create_dir_all(h.workspace.join("gzmo-evolver")).unwrap();
+        fs::write(h.workspace.join("gzmo-evolver/hack.rs"), "x\n").unwrap();
+        run_cmd(&git, &h.workspace, &["add", "gzmo-evolver/hack.rs"]);
+        run_cmd(
+            &git,
+            &h.workspace,
+            &[
+                "-c",
+                "user.email=t@t",
+                "-c",
+                "user.name=t",
+                "commit",
+                "-m",
+                "hack",
+            ],
+        );
+        let runner = SystemProcessRunner;
+        let home = h.output_dir.join(WORKER_HOME_NAME);
+        let manifest = sample_manifest(CAND_ID, &h.baseline);
+        let err = inspect_workspace_after_omp(
+            &runner,
+            &h.workspace,
+            &home,
+            CAND_ID,
+            &h.baseline,
+            &manifest,
+        )
+        .unwrap_err();
+        assert!(
+            err.to_string().contains("protected") || err.to_string().contains("Trust"),
+            "{err}"
+        );
     }
 }

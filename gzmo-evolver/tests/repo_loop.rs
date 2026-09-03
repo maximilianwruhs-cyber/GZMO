@@ -1201,4 +1201,22 @@ fn public_commands_require_config_hidden_worker_does_not() {
         !err.contains("--config is required"),
         "worker must not require --config; stderr={err}"
     );
+
+    // Stronger separation: supplying --config on the hidden worker hard-fails.
+    let out = std::process::Command::new(&bin)
+        .args([
+            "--config",
+            "/tmp/no-such-config.toml",
+            "worker",
+            "--request",
+            "/tmp/no-such-request.json",
+        ])
+        .output()
+        .unwrap();
+    assert!(!out.status.success());
+    let err = String::from_utf8_lossy(&out.stderr);
+    assert!(
+        err.contains("must not be invoked with --config"),
+        "worker with --config must hard-fail; stderr={err}"
+    );
 }
