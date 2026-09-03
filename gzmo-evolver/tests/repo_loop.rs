@@ -1907,15 +1907,19 @@ impl RepoHarness {
 
 /// Bounded retry for LockBusy caused by fork/exec lock-fd inheritance under parallel tests.
 /// Never used by production code or the dedicated lock-race test.
-async fn run_once_retry_lock_busy(
+/// Retries only exact `RunnerError::LockBusy`; every other error breaks out immediately.
+async fn run_once_retry_lock_busy<R>(
     evolver: &RepoEvolver<
-        RunnerHybrid,
+        R,
         FakeStageLauncher,
         FakeRuntimeProvisioner,
         TestWorkerIdentity,
         ManualClock,
     >,
-) -> Result<RunOutcome, gzmo_evolver::RunnerError> {
+) -> Result<RunOutcome, gzmo_evolver::RunnerError>
+where
+    R: ProcessRunner + Send + Sync + 'static,
+{
     let mut last = None;
     for attempt in 0..8 {
         match evolver.run_once().await {
@@ -1930,15 +1934,18 @@ async fn run_once_retry_lock_busy(
     Err(last.unwrap_or(gzmo_evolver::RunnerError::LockBusy))
 }
 
-async fn resume_retry_lock_busy(
+async fn resume_retry_lock_busy<R>(
     evolver: &RepoEvolver<
-        RunnerHybrid,
+        R,
         FakeStageLauncher,
         FakeRuntimeProvisioner,
         TestWorkerIdentity,
         ManualClock,
     >,
-) -> Result<RunOutcome, gzmo_evolver::RunnerError> {
+) -> Result<RunOutcome, gzmo_evolver::RunnerError>
+where
+    R: ProcessRunner + Send + Sync + 'static,
+{
     let mut last = None;
     for attempt in 0..8 {
         match evolver.resume().await {
@@ -1953,9 +1960,9 @@ async fn resume_retry_lock_busy(
     Err(last.unwrap_or(gzmo_evolver::RunnerError::LockBusy))
 }
 
-async fn abort_retry_lock_busy(
+async fn abort_retry_lock_busy<R>(
     evolver: &RepoEvolver<
-        RunnerHybrid,
+        R,
         FakeStageLauncher,
         FakeRuntimeProvisioner,
         TestWorkerIdentity,
@@ -1963,7 +1970,10 @@ async fn abort_retry_lock_busy(
     >,
     id: &str,
     reason: &str,
-) -> Result<RunOutcome, gzmo_evolver::RunnerError> {
+) -> Result<RunOutcome, gzmo_evolver::RunnerError>
+where
+    R: ProcessRunner + Send + Sync + 'static,
+{
     let mut last = None;
     for attempt in 0..8 {
         match evolver.abort(id, reason).await {
@@ -2402,24 +2412,9 @@ async fn abort_rejects_foreign_repository_candidate() {
         (local_id, foreign_cid.as_str().to_owned())
     };
 
-    let err = {
-        let mut last = None;
-        let mut out = None;
-        for attempt in 0..8 {
-            match harness.evolver.abort(&foreign_id, "x").await {
-                Ok(_) => panic!("foreign abort must be rejected"),
-                Err(gzmo_evolver::RunnerError::LockBusy) => {
-                    last = Some(gzmo_evolver::RunnerError::LockBusy);
-                    tokio::time::sleep(std::time::Duration::from_millis(25 + attempt * 15)).await;
-                }
-                Err(e) => {
-                    out = Some(e);
-                    break;
-                }
-            }
-        }
-        out.unwrap_or_else(|| last.expect("abort LockBusy retries exhausted"))
-    };
+    let err = abort_retry_lock_busy(&harness.evolver, &foreign_id, "x")
+        .await
+        .expect_err("foreign abort must be rejected");
     assert!(
         err.to_string().contains("belongs to repository")
             || err.to_string().contains("not configured"),
@@ -2519,10 +2514,20 @@ async fn no_duplicate_launch_from_building_succeeded() {
 #[derive(Debug, Clone, Copy)]
 enum MirrorNetworkFault {
     Timeout,
-    NonZero,
+    /// status 128 + realistic fast-fail transport stderr (DNS/connect).
+    TransientNonZero,
+    /// status 128 + auth/permission stderr — permanent.
+    AuthNonZero,
+    /// status 128 + repository-not-found stderr — permanent.
+    RepoNotFoundNonZero,
+    /// status 128 + unknown/empty stderr — permanent.
+    UnknownNonZero,
 }
 
-/// Injects structural Timeout or nonzero only on mirror clone/fetch argv.
+/// Secret marker embedded only in injected stderr; must never appear in errors.
+const MIRROR_STDERR_SECRET: &str = "SECRET_TOKEN_do_not_leak_xyz";
+
+/// Injects structural Timeout or classified nonzero only on mirror clone/fetch argv.
 struct FaultyMirrorRunner {
     inner: HermeticGitRunner,
     fault: MirrorNetworkFault,
@@ -2541,11 +2546,44 @@ impl ProcessRunner for FaultyMirrorRunner {
                 MirrorNetworkFault::Timeout => {
                     return Err(ProcessError::Timeout { timeout_ms: 1 });
                 }
-                MirrorNetworkFault::NonZero => {
+                MirrorNetworkFault::TransientNonZero => {
+                    let stderr = format!(
+                        "fatal: unable to access 'https://github.com/example/x.git/': Could not resolve host: github.com\nleak:{MIRROR_STDERR_SECRET}\n"
+                    );
                     return Ok(ProcessOutput {
                         status: 128,
                         stdout: Vec::new(),
-                        stderr: Vec::new(),
+                        stderr: stderr.into_bytes(),
+                    });
+                }
+                MirrorNetworkFault::AuthNonZero => {
+                    let stderr = format!(
+                        "fatal: Authentication failed for 'https://github.com/example/x.git/'\nleak:{MIRROR_STDERR_SECRET}\n"
+                    );
+                    return Ok(ProcessOutput {
+                        status: 128,
+                        stdout: Vec::new(),
+                        stderr: stderr.into_bytes(),
+                    });
+                }
+                MirrorNetworkFault::RepoNotFoundNonZero => {
+                    let stderr = format!(
+                        "remote: Repository not found.\nfatal: repository 'https://github.com/example/x.git/' not found\nleak:{MIRROR_STDERR_SECRET}\n"
+                    );
+                    return Ok(ProcessOutput {
+                        status: 128,
+                        stdout: Vec::new(),
+                        stderr: stderr.into_bytes(),
+                    });
+                }
+                MirrorNetworkFault::UnknownNonZero => {
+                    let stderr = format!(
+                        "fatal: something unexplained happened\nleak:{MIRROR_STDERR_SECRET}\n"
+                    );
+                    return Ok(ProcessOutput {
+                        status: 128,
+                        stdout: Vec::new(),
+                        stderr: stderr.into_bytes(),
                     });
                 }
             }
@@ -2656,29 +2694,28 @@ fn observed_evolver_with_mirror_fault(
     (evolver, roots, id)
 }
 
+fn assert_no_stderr_secret(err: &gzmo_evolver::RunnerError) {
+    let msg = err.to_string();
+    assert!(
+        !msg.contains(MIRROR_STDERR_SECRET),
+        "stderr secret must not appear in error: {msg}"
+    );
+    let dbg = format!("{err:?}");
+    assert!(
+        !dbg.contains(MIRROR_STDERR_SECRET),
+        "stderr secret must not appear in debug: {dbg}"
+    );
+}
+
 #[tokio::test]
 async fn observed_mirror_timeout_is_contention_leaves_observed() {
     let fixture = Fixture::new();
     let (evolver, _roots, id) =
         observed_evolver_with_mirror_fault(&fixture, MirrorNetworkFault::Timeout);
-    let err = {
-        let mut last = None;
-        let mut out = None;
-        for attempt in 0..8 {
-            match evolver.resume().await {
-                Ok(o) => panic!("expected Contention, got Ok({o:?})"),
-                Err(gzmo_evolver::RunnerError::LockBusy) => {
-                    last = Some(gzmo_evolver::RunnerError::LockBusy);
-                    tokio::time::sleep(std::time::Duration::from_millis(25 + attempt * 15)).await;
-                }
-                Err(e) => {
-                    out = Some(e);
-                    break;
-                }
-            }
-        }
-        out.unwrap_or_else(|| last.expect("resume LockBusy retries exhausted"))
-    };
+    let err = resume_retry_lock_busy(&evolver)
+        .await
+        .expect_err("timeout must not succeed");
+    assert_no_stderr_secret(&err);
     assert!(
         matches!(err, gzmo_evolver::RunnerError::Contention(_)),
         "timeout must be Contention, got {err}"
@@ -2686,36 +2723,123 @@ async fn observed_mirror_timeout_is_contention_leaves_observed() {
     let store = StateStore::open(fixture.config.state_dir()).unwrap();
     let rec = store.load(&id).unwrap();
     assert_eq!(rec.state(), CandidateState::Observed);
+    if let Some(reason) = rec.terminal_reason() {
+        assert!(
+            !reason.contains(MIRROR_STDERR_SECRET),
+            "secret in terminal_reason: {reason}"
+        );
+    }
 }
 
 #[tokio::test]
-async fn observed_mirror_nonzero_terminalizes_not_contention() {
+async fn observed_mirror_transient_nonzero_is_contention_leaves_observed() {
     let fixture = Fixture::new();
     let (evolver, _roots, id) =
-        observed_evolver_with_mirror_fault(&fixture, MirrorNetworkFault::NonZero);
-    let err = {
-        let mut last = None;
-        let mut out = None;
-        for attempt in 0..8 {
-            match evolver.resume().await {
-                Ok(o) => panic!("expected terminal error, got Ok({o:?})"),
-                Err(gzmo_evolver::RunnerError::LockBusy) => {
-                    last = Some(gzmo_evolver::RunnerError::LockBusy);
-                    tokio::time::sleep(std::time::Duration::from_millis(25 + attempt * 15)).await;
-                }
-                Err(e) => {
-                    out = Some(e);
-                    break;
-                }
-            }
-        }
-        out.unwrap_or_else(|| last.expect("resume LockBusy retries exhausted"))
-    };
+        observed_evolver_with_mirror_fault(&fixture, MirrorNetworkFault::TransientNonZero);
+    let err = resume_retry_lock_busy(&evolver)
+        .await
+        .expect_err("transient transport must not succeed");
+    assert_no_stderr_secret(&err);
+    assert!(
+        matches!(err, gzmo_evolver::RunnerError::Contention(_)),
+        "fast transient status128 must be Contention, got {err}"
+    );
+    let msg = err.to_string();
+    assert!(
+        msg.contains("transport") || msg.contains("Contention") || msg.contains("contention"),
+        "{msg}"
+    );
+    assert!(!msg.contains("Could not resolve host"), "{msg}");
+    let store = StateStore::open(fixture.config.state_dir()).unwrap();
+    let rec = store.load(&id).unwrap();
+    assert_eq!(rec.state(), CandidateState::Observed);
+    if let Some(reason) = rec.terminal_reason() {
+        assert!(
+            !reason.contains(MIRROR_STDERR_SECRET),
+            "secret in terminal_reason: {reason}"
+        );
+    }
+}
+
+#[tokio::test]
+async fn observed_mirror_auth_nonzero_terminalizes_not_contention() {
+    let fixture = Fixture::new();
+    let (evolver, _roots, id) =
+        observed_evolver_with_mirror_fault(&fixture, MirrorNetworkFault::AuthNonZero);
+    let err = resume_retry_lock_busy(&evolver)
+        .await
+        .expect_err("auth failure must terminalize");
+    assert_no_stderr_secret(&err);
     assert!(
         !matches!(err, gzmo_evolver::RunnerError::Contention(_)),
-        "nonzero clone/fetch must not be Contention, got {err}"
+        "auth status128 must not be Contention, got {err}"
     );
+    assert!(!err.to_string().contains("Authentication failed"), "{err}");
     let store = StateStore::open(fixture.config.state_dir()).unwrap();
     let rec = store.load(&id).unwrap();
     assert_eq!(rec.state(), CandidateState::Failed);
+    if let Some(reason) = rec.terminal_reason() {
+        assert!(
+            !reason.contains(MIRROR_STDERR_SECRET),
+            "secret in terminal_reason: {reason}"
+        );
+        assert!(
+            !reason.contains("Authentication failed"),
+            "auth stderr must not leak into reason: {reason}"
+        );
+    }
+}
+
+#[tokio::test]
+async fn observed_mirror_repo_not_found_terminalizes_not_contention() {
+    let fixture = Fixture::new();
+    let (evolver, _roots, id) =
+        observed_evolver_with_mirror_fault(&fixture, MirrorNetworkFault::RepoNotFoundNonZero);
+    let err = resume_retry_lock_busy(&evolver)
+        .await
+        .expect_err("repository-not-found must terminalize");
+    assert_no_stderr_secret(&err);
+    assert!(
+        !matches!(err, gzmo_evolver::RunnerError::Contention(_)),
+        "repository-not-found must not be Contention, got {err}"
+    );
+    assert!(!err.to_string().contains("Repository not found"), "{err}");
+    let store = StateStore::open(fixture.config.state_dir()).unwrap();
+    let rec = store.load(&id).unwrap();
+    assert_eq!(rec.state(), CandidateState::Failed);
+    if let Some(reason) = rec.terminal_reason() {
+        assert!(
+            !reason.contains(MIRROR_STDERR_SECRET),
+            "secret in terminal_reason: {reason}"
+        );
+    }
+}
+
+#[tokio::test]
+async fn observed_mirror_unknown_nonzero_terminalizes_not_contention() {
+    let fixture = Fixture::new();
+    let (evolver, _roots, id) =
+        observed_evolver_with_mirror_fault(&fixture, MirrorNetworkFault::UnknownNonZero);
+    let err = resume_retry_lock_busy(&evolver)
+        .await
+        .expect_err("unknown nonzero must terminalize");
+    assert_no_stderr_secret(&err);
+    assert!(
+        !matches!(err, gzmo_evolver::RunnerError::Contention(_)),
+        "unknown status128 must not be Contention, got {err}"
+    );
+    assert!(!err.to_string().contains("something unexplained"), "{err}");
+    let store = StateStore::open(fixture.config.state_dir()).unwrap();
+    let rec = store.load(&id).unwrap();
+    assert_eq!(rec.state(), CandidateState::Failed);
+    if let Some(reason) = rec.terminal_reason() {
+        assert!(
+            !reason.contains(MIRROR_STDERR_SECRET),
+            "secret in terminal_reason: {reason}"
+        );
+        assert!(
+            !reason.contains("something unexplained"),
+            "unknown stderr must not leak: {reason}"
+        );
+    }
 }

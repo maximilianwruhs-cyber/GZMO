@@ -567,7 +567,7 @@ impl<'a, R: ProcessRunner> GitRepository<'a, R> {
         // Parent is state_dir (same parent as final mirror) for atomic rename.
         // Remote is always a validated GitHub URL; file protocol stays off.
         // Hermetic tests rewrite via ProcessRunner -c insteadOf + file allow.
-        let out = match self.run_mirror_network_ex(
+        let out = match self.run_git_allow_nonzero_ex(
             Some(self.config.state_dir()),
             &[
                 "clone".to_owned(),
@@ -578,6 +578,7 @@ impl<'a, R: ProcessRunner> GitRepository<'a, R> {
             GIT_OUTPUT_CAP_BYTES,
             Duration::from_secs(GIT_FETCH_TIMEOUT_SECS),
             false,
+            true,
         ) {
             Ok(o) => o,
             Err(err) => {
@@ -621,8 +622,8 @@ impl<'a, R: ProcessRunner> GitRepository<'a, R> {
         let base = self.config.repo().base_branch();
         let refspec = format!("+refs/heads/{base}:refs/heads/{base}");
         // Fetch origin (validated GitHub URL). Hermetic tests inject insteadOf.
-        // Only structural ProcessError::Timeout is Transport; nonzero stays Process.
-        match self.run_mirror_network_ex(
+        // classify_mirror_transport: Timeout + allowlisted fast transport stderr → Transport.
+        match self.run_git_allow_nonzero_ex(
             None,
             &[
                 "--git-dir".to_owned(),
@@ -636,6 +637,7 @@ impl<'a, R: ProcessRunner> GitRepository<'a, R> {
             GIT_OUTPUT_CAP_BYTES,
             Duration::from_secs(GIT_FETCH_TIMEOUT_SECS),
             false,
+            true,
         ) {
             Ok(out) if out.status == 0 => Ok(()),
             Ok(out) => Err(GitError::Process(format!(
@@ -970,7 +972,8 @@ impl<'a, R: ProcessRunner> GitRepository<'a, R> {
         timeout: Duration,
         allow_file_protocol: bool,
     ) -> Result<ProcessOutput, GitError> {
-        let out = self.run_git_allow_nonzero_ex(cwd, args, cap, timeout, allow_file_protocol)?;
+        let out =
+            self.run_git_allow_nonzero_ex(cwd, args, cap, timeout, allow_file_protocol, false)?;
         if out.status != 0 {
             return Err(ProcessError::NonZeroExit {
                 code: out.status,
@@ -988,9 +991,19 @@ impl<'a, R: ProcessRunner> GitRepository<'a, R> {
         args: &[String],
         cap: usize,
     ) -> Result<ProcessOutput, GitError> {
-        self.run_git_allow_nonzero_ex(cwd, args, cap, Duration::from_secs(GIT_TIMEOUT_SECS), false)
+        self.run_git_allow_nonzero_ex(
+            cwd,
+            args,
+            cap,
+            Duration::from_secs(GIT_TIMEOUT_SECS),
+            false,
+            false,
+        )
     }
 
+    /// Single Git execution path (caps/env/argv/redaction).
+    /// When `classify_mirror_transport`, Timeout and allowlisted LC_ALL=C stderr on
+    /// nonzero exit become `GitError::Transport` with fixed redacted text only.
     fn run_git_allow_nonzero_ex(
         &self,
         cwd: Option<&Path>,
@@ -998,6 +1011,7 @@ impl<'a, R: ProcessRunner> GitRepository<'a, R> {
         cap: usize,
         timeout: Duration,
         allow_file_protocol: bool,
+        classify_mirror_transport: bool,
     ) -> Result<ProcessOutput, GitError> {
         if cap == 0 || cap > 8 * 1024 * 1024 {
             return Err(GitError::Invalid(
@@ -1014,62 +1028,34 @@ impl<'a, R: ProcessRunner> GitRepository<'a, R> {
             cap,
             timeout,
         )?;
-        match self.runner.run(&spec) {
-            Ok(out) => Ok(out),
+        let out = match self.runner.run(&spec) {
+            Ok(out) => out,
             Err(ProcessError::NonZeroExit {
                 code,
                 stdout,
                 stderr,
-            }) => Ok(ProcessOutput {
+            }) => ProcessOutput {
                 status: code,
                 stdout,
                 stderr,
-            }),
-            Err(other) => Err(other.into()),
-        }
-    }
-
-    /// Mirror clone/fetch only: structural `ProcessError::Timeout` → `Transport`.
-    /// Nonzero exits and other process faults stay hard `Process`/`Io`/etc.
-    fn run_mirror_network_ex(
-        &self,
-        cwd: Option<&Path>,
-        args: &[String],
-        cap: usize,
-        timeout: Duration,
-        allow_file_protocol: bool,
-    ) -> Result<ProcessOutput, GitError> {
-        if cap == 0 || cap > 8 * 1024 * 1024 {
-            return Err(GitError::Invalid(
-                "git output cap must be 1..=8 MiB".to_owned(),
+            },
+            Err(ProcessError::Timeout { timeout_ms }) if classify_mirror_transport => {
+                return Err(GitError::Transport(format!(
+                    "timed out after {timeout_ms} ms"
+                )));
+            }
+            Err(other) => return Err(other.into()),
+        };
+        if classify_mirror_transport
+            && out.status != 0
+            && is_retryable_mirror_transport_stderr(&out.stderr)
+        {
+            // Stderr inspected only; never copied into the error.
+            return Err(GitError::Transport(
+                "mirror clone/fetch transport failure".to_owned(),
             ));
         }
-        let cwd = cwd.unwrap_or_else(|| self.config.state_dir()).to_path_buf();
-        let env = git_env(&self.home, allow_file_protocol)?;
-        let spec = ProcessSpec::new(
-            &self.git_program,
-            args.iter().cloned(),
-            cwd,
-            env,
-            cap,
-            timeout,
-        )?;
-        match self.runner.run(&spec) {
-            Ok(out) => Ok(out),
-            Err(ProcessError::NonZeroExit {
-                code,
-                stdout,
-                stderr,
-            }) => Ok(ProcessOutput {
-                status: code,
-                stdout,
-                stderr,
-            }),
-            Err(ProcessError::Timeout { timeout_ms }) => Err(GitError::Transport(format!(
-                "timed out after {timeout_ms} ms"
-            ))),
-            Err(other) => Err(other.into()),
-        }
+        Ok(out)
     }
 }
 
@@ -2099,6 +2085,57 @@ impl MirrorLock {
         })?;
         Ok(Self { _file: file })
     }
+}
+
+/// Inspect bounded LC_ALL=C stderr for clearly transient network faults only.
+/// Never copies stderr; phrases are fixed and case-stable under C locale.
+/// Auth, permission, repository-not-found, HTTP 4xx, and unknown text stay hard.
+fn is_retryable_mirror_transport_stderr(stderr: &[u8]) -> bool {
+    const BOUND: usize = 8192;
+    let sample = if stderr.len() > BOUND {
+        &stderr[..BOUND]
+    } else {
+        stderr
+    };
+    let text = String::from_utf8_lossy(sample);
+
+    // Permanent remote/auth faults always win over any incidental phrase.
+    const PERMANENT: &[&str] = &[
+        "Authentication failed",
+        "Authentication required",
+        "could not read Username",
+        "Permission denied",
+        "access denied",
+        "Repository not found",
+        "repository not found",
+        "The requested URL returned error: 4",
+        "HTTP/1.1 4",
+        "HTTP/2 4",
+    ];
+    for marker in PERMANENT {
+        if text.contains(marker) {
+            return false;
+        }
+    }
+
+    // Closed allowlist — never match bare "connection", "fetch", or "exited".
+    const TRANSIENT: &[&str] = &[
+        "Could not resolve host",
+        "Failed to connect",
+        "Could not connect",
+        "Connection reset",
+        "Connection timed out",
+        "Connection refused",
+        "early EOF",
+        "unexpected disconnect",
+        "The remote end hung up",
+        "SSL_read",
+        "SSL_ERROR",
+        "TLS read",
+        "TLS connect",
+        "The requested URL returned error: 5",
+    ];
+    TRANSIENT.iter().any(|marker| text.contains(*marker))
 }
 
 fn git_env(home: &Path, allow_file_protocol: bool) -> Result<BTreeMap<String, String>, GitError> {
