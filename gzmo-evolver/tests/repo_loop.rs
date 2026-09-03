@@ -2107,12 +2107,12 @@ async fn one_run_stops_at_evaluation_boundary() {
 #[tokio::test]
 async fn resume_after_building_receipt_without_relaunch() {
     let harness = RepoHarness::new().await;
-    let outcome = harness.evolver.run_once().await.unwrap();
+    let outcome = run_once_retry_lock_busy(&harness.evolver).await.unwrap();
     assert_eq!(outcome.state, CandidateState::Evaluating);
     let launches = *harness.launches.lock().unwrap();
 
     // Explicit resume at Evaluating returns unchanged.
-    let resumed = harness.evolver.resume().await.unwrap();
+    let resumed = resume_retry_lock_busy(&harness.evolver).await.unwrap();
     assert_eq!(resumed.state, CandidateState::Evaluating);
     assert_eq!(resumed.candidate_id, outcome.candidate_id);
     assert_eq!(*harness.launches.lock().unwrap(), launches);
@@ -2516,10 +2516,18 @@ enum MirrorNetworkFault {
     Timeout,
     /// status 128 + realistic fast-fail transport stderr (DNS/connect).
     TransientNonZero,
+    /// status 128 + HTTP 429 rate-limit stderr — transient.
+    RateLimitNonZero,
+    /// status 128 + GnuTLS handshake stderr — transient.
+    GnuTlsNonZero,
     /// status 128 + auth/permission stderr — permanent.
     AuthNonZero,
     /// status 128 + repository-not-found stderr — permanent.
     RepoNotFoundNonZero,
+    /// status 128 + HTTP 403 stderr — permanent.
+    ForbiddenNonZero,
+    /// status 128 + HTTP 404 stderr — permanent.
+    NotFoundHttpNonZero,
     /// status 128 + unknown/empty stderr — permanent.
     UnknownNonZero,
 }
@@ -2556,6 +2564,26 @@ impl ProcessRunner for FaultyMirrorRunner {
                         stderr: stderr.into_bytes(),
                     });
                 }
+                MirrorNetworkFault::RateLimitNonZero => {
+                    let stderr = format!(
+                        "fatal: unable to access 'https://github.com/example/x.git/': The requested URL returned error: 429\nleak:{MIRROR_STDERR_SECRET}\n"
+                    );
+                    return Ok(ProcessOutput {
+                        status: 128,
+                        stdout: Vec::new(),
+                        stderr: stderr.into_bytes(),
+                    });
+                }
+                MirrorNetworkFault::GnuTlsNonZero => {
+                    let stderr = format!(
+                        "fatal: unable to access 'https://github.com/example/x.git/': gnutls_handshake() failed: Error in the pull function.\nleak:{MIRROR_STDERR_SECRET}\n"
+                    );
+                    return Ok(ProcessOutput {
+                        status: 128,
+                        stdout: Vec::new(),
+                        stderr: stderr.into_bytes(),
+                    });
+                }
                 MirrorNetworkFault::AuthNonZero => {
                     let stderr = format!(
                         "fatal: Authentication failed for 'https://github.com/example/x.git/'\nleak:{MIRROR_STDERR_SECRET}\n"
@@ -2569,6 +2597,26 @@ impl ProcessRunner for FaultyMirrorRunner {
                 MirrorNetworkFault::RepoNotFoundNonZero => {
                     let stderr = format!(
                         "remote: Repository not found.\nfatal: repository 'https://github.com/example/x.git/' not found\nleak:{MIRROR_STDERR_SECRET}\n"
+                    );
+                    return Ok(ProcessOutput {
+                        status: 128,
+                        stdout: Vec::new(),
+                        stderr: stderr.into_bytes(),
+                    });
+                }
+                MirrorNetworkFault::ForbiddenNonZero => {
+                    let stderr = format!(
+                        "fatal: unable to access 'https://github.com/example/x.git/': The requested URL returned error: 403\nleak:{MIRROR_STDERR_SECRET}\n"
+                    );
+                    return Ok(ProcessOutput {
+                        status: 128,
+                        stdout: Vec::new(),
+                        stderr: stderr.into_bytes(),
+                    });
+                }
+                MirrorNetworkFault::NotFoundHttpNonZero => {
+                    let stderr = format!(
+                        "fatal: unable to access 'https://github.com/example/x.git/': The requested URL returned error: 404\nleak:{MIRROR_STDERR_SECRET}\n"
                     );
                     return Ok(ProcessOutput {
                         status: 128,
@@ -2840,6 +2888,111 @@ async fn observed_mirror_unknown_nonzero_terminalizes_not_contention() {
         assert!(
             !reason.contains("something unexplained"),
             "unknown stderr must not leak: {reason}"
+        );
+    }
+}
+
+#[tokio::test]
+async fn observed_mirror_rate_limit_nonzero_is_contention_leaves_observed() {
+    let fixture = Fixture::new();
+    let (evolver, _roots, id) =
+        observed_evolver_with_mirror_fault(&fixture, MirrorNetworkFault::RateLimitNonZero);
+    let err = resume_retry_lock_busy(&evolver)
+        .await
+        .expect_err("429 must not succeed");
+    assert_no_stderr_secret(&err);
+    assert!(
+        matches!(err, gzmo_evolver::RunnerError::Contention(_)),
+        "HTTP 429 must be Contention, got {err}"
+    );
+    let msg = err.to_string();
+    assert!(!msg.contains("429"), "{msg}");
+    assert!(!msg.contains(MIRROR_STDERR_SECRET), "{msg}");
+    let store = StateStore::open(fixture.config.state_dir()).unwrap();
+    let rec = store.load(&id).unwrap();
+    assert_eq!(rec.state(), CandidateState::Observed);
+    if let Some(reason) = rec.terminal_reason() {
+        assert!(
+            !reason.contains(MIRROR_STDERR_SECRET),
+            "secret in terminal_reason: {reason}"
+        );
+    }
+}
+
+#[tokio::test]
+async fn observed_mirror_gnutls_nonzero_is_contention_leaves_observed() {
+    let fixture = Fixture::new();
+    let (evolver, _roots, id) =
+        observed_evolver_with_mirror_fault(&fixture, MirrorNetworkFault::GnuTlsNonZero);
+    let err = resume_retry_lock_busy(&evolver)
+        .await
+        .expect_err("GnuTLS must not succeed");
+    assert_no_stderr_secret(&err);
+    assert!(
+        matches!(err, gzmo_evolver::RunnerError::Contention(_)),
+        "GnuTLS handshake must be Contention, got {err}"
+    );
+    let msg = err.to_string();
+    assert!(!msg.contains("gnutls_handshake"), "{msg}");
+    assert!(!msg.contains(MIRROR_STDERR_SECRET), "{msg}");
+    let store = StateStore::open(fixture.config.state_dir()).unwrap();
+    let rec = store.load(&id).unwrap();
+    assert_eq!(rec.state(), CandidateState::Observed);
+    if let Some(reason) = rec.terminal_reason() {
+        assert!(
+            !reason.contains(MIRROR_STDERR_SECRET),
+            "secret in terminal_reason: {reason}"
+        );
+    }
+}
+
+#[tokio::test]
+async fn observed_mirror_forbidden_nonzero_terminalizes_not_contention() {
+    let fixture = Fixture::new();
+    let (evolver, _roots, id) =
+        observed_evolver_with_mirror_fault(&fixture, MirrorNetworkFault::ForbiddenNonZero);
+    let err = resume_retry_lock_busy(&evolver)
+        .await
+        .expect_err("403 must terminalize");
+    assert_no_stderr_secret(&err);
+    assert!(
+        !matches!(err, gzmo_evolver::RunnerError::Contention(_)),
+        "HTTP 403 must not be Contention, got {err}"
+    );
+    assert!(!err.to_string().contains("403"), "{err}");
+    let store = StateStore::open(fixture.config.state_dir()).unwrap();
+    let rec = store.load(&id).unwrap();
+    assert_eq!(rec.state(), CandidateState::Failed);
+    if let Some(reason) = rec.terminal_reason() {
+        assert!(
+            !reason.contains(MIRROR_STDERR_SECRET),
+            "secret in terminal_reason: {reason}"
+        );
+        assert!(!reason.contains("403"), "status must not leak: {reason}");
+    }
+}
+
+#[tokio::test]
+async fn observed_mirror_http_404_nonzero_terminalizes_not_contention() {
+    let fixture = Fixture::new();
+    let (evolver, _roots, id) =
+        observed_evolver_with_mirror_fault(&fixture, MirrorNetworkFault::NotFoundHttpNonZero);
+    let err = resume_retry_lock_busy(&evolver)
+        .await
+        .expect_err("404 must terminalize");
+    assert_no_stderr_secret(&err);
+    assert!(
+        !matches!(err, gzmo_evolver::RunnerError::Contention(_)),
+        "HTTP 404 must not be Contention, got {err}"
+    );
+    assert!(!err.to_string().contains("404"), "{err}");
+    let store = StateStore::open(fixture.config.state_dir()).unwrap();
+    let rec = store.load(&id).unwrap();
+    assert_eq!(rec.state(), CandidateState::Failed);
+    if let Some(reason) = rec.terminal_reason() {
+        assert!(
+            !reason.contains(MIRROR_STDERR_SECRET),
+            "secret in terminal_reason: {reason}"
         );
     }
 }

@@ -2089,17 +2089,21 @@ impl MirrorLock {
 
 /// Inspect bounded LC_ALL=C stderr for clearly transient network faults only.
 /// Never copies stderr; phrases are fixed and case-stable under C locale.
-/// Auth, permission, repository-not-found, HTTP 4xx, and unknown text stay hard.
+/// Auth, permission, and repository-not-found markers stay permanent even when
+/// transient wording coexists. HTTP status is parsed from Git/Curl forms only:
+/// 408/425/429 and 5xx retry; other 4xx hard. Malformed/unknown status falls
+/// through to the closed phrase allowlist, then hard default.
 fn is_retryable_mirror_transport_stderr(stderr: &[u8]) -> bool {
     const BOUND: usize = 8192;
+    // Decisive git lines are emitted last; sample the tail of the already-capped buffer.
     let sample = if stderr.len() > BOUND {
-        &stderr[..BOUND]
+        &stderr[stderr.len() - BOUND..]
     } else {
         stderr
     };
     let text = String::from_utf8_lossy(sample);
 
-    // Permanent remote/auth faults always win over any incidental phrase.
+    // Permanent remote/auth faults always win over status and transient phrases.
     const PERMANENT: &[&str] = &[
         "Authentication failed",
         "Authentication required",
@@ -2108,14 +2112,16 @@ fn is_retryable_mirror_transport_stderr(stderr: &[u8]) -> bool {
         "access denied",
         "Repository not found",
         "repository not found",
-        "The requested URL returned error: 4",
-        "HTTP/1.1 4",
-        "HTTP/2 4",
     ];
     for marker in PERMANENT {
         if text.contains(marker) {
             return false;
         }
+    }
+
+    // Exact HTTP status from known Git/Curl forms only.
+    if let Some(status) = extract_http_status_from_mirror_stderr(&text) {
+        return matches!(status, 408 | 425 | 429) || (500..600).contains(&status);
     }
 
     // Closed allowlist — never match bare "connection", "fetch", or "exited".
@@ -2133,9 +2139,51 @@ fn is_retryable_mirror_transport_stderr(stderr: &[u8]) -> bool {
         "SSL_ERROR",
         "TLS read",
         "TLS connect",
-        "The requested URL returned error: 5",
+        "gnutls_handshake",
+        "GnuTLS recv error",
     ];
     TRANSIENT.iter().any(|marker| text.contains(*marker))
+}
+
+/// Parse HTTP status from Git/Curl stderr forms only.
+/// Recognizes `The requested URL returned error: NNN`, `HTTP/1.1 NNN`, `HTTP/2 NNN`.
+fn extract_http_status_from_mirror_stderr(text: &str) -> Option<u16> {
+    const PREFIXES: &[&str] = &["The requested URL returned error: ", "HTTP/1.1 ", "HTTP/2 "];
+    let mut earliest: Option<(usize, u16)> = None;
+    for prefix in PREFIXES {
+        let mut from = 0;
+        while let Some(rel) = text[from..].find(prefix) {
+            let abs = from + rel;
+            let after = abs + prefix.len();
+            if let Some(code) = parse_three_digit_http_status(&text[after..]) {
+                match earliest {
+                    Some((pos, _)) if pos <= abs => {}
+                    _ => earliest = Some((abs, code)),
+                }
+                break;
+            }
+            from = after;
+        }
+    }
+    earliest.map(|(_, code)| code)
+}
+
+fn parse_three_digit_http_status(s: &str) -> Option<u16> {
+    let b = s.as_bytes();
+    if b.len() < 3 {
+        return None;
+    }
+    if !b[..3].iter().all(|c| c.is_ascii_digit()) {
+        return None;
+    }
+    // Require end or a non-digit boundary so "5000" / "4xx" do not match.
+    if b.len() > 3 && b[3].is_ascii_digit() {
+        return None;
+    }
+    let hundreds = u16::from(b[0] - b'0');
+    let tens = u16::from(b[1] - b'0');
+    let ones = u16::from(b[2] - b'0');
+    Some(hundreds * 100 + tens * 10 + ones)
 }
 
 fn git_env(home: &Path, allow_file_protocol: bool) -> Result<BTreeMap<String, String>, GitError> {
@@ -2985,6 +3033,141 @@ fn test_candidate_manifest(id: &str) -> CandidateManifest {
 #[cfg(test)]
 mod unit_tests {
     use super::*;
+
+    #[test]
+    fn mirror_transport_phrase_table_and_precedence() {
+        const PERMANENT: &[&str] = &[
+            "Authentication failed",
+            "Authentication required",
+            "could not read Username",
+            "Permission denied",
+            "access denied",
+            "Repository not found",
+            "repository not found",
+        ];
+        const TRANSIENT: &[&str] = &[
+            "Could not resolve host",
+            "Failed to connect",
+            "Could not connect",
+            "Connection reset",
+            "Connection timed out",
+            "Connection refused",
+            "early EOF",
+            "unexpected disconnect",
+            "The remote end hung up",
+            "SSL_read",
+            "SSL_ERROR",
+            "TLS read",
+            "TLS connect",
+            "gnutls_handshake",
+            "GnuTLS recv error",
+        ];
+
+        for phrase in PERMANENT {
+            let stderr = format!("fatal: {phrase} for remote\n");
+            assert!(
+                !is_retryable_mirror_transport_stderr(stderr.as_bytes()),
+                "permanent phrase must stay hard: {phrase}"
+            );
+        }
+        for phrase in TRANSIENT {
+            let stderr = format!("fatal: unable to access: {phrase}\n");
+            assert!(
+                is_retryable_mirror_transport_stderr(stderr.as_bytes()),
+                "transient phrase must retry: {phrase}"
+            );
+        }
+
+        // Permanent wins when both classes are present.
+        let both = b"Could not resolve host\nAuthentication failed for 'https://x/'\n";
+        assert!(!is_retryable_mirror_transport_stderr(both));
+        let both_rev = b"Authentication failed\nConnection reset by peer\n";
+        assert!(!is_retryable_mirror_transport_stderr(both_rev));
+
+        // Empty / unknown stay hard.
+        assert!(!is_retryable_mirror_transport_stderr(b""));
+        assert!(!is_retryable_mirror_transport_stderr(
+            b"fatal: something unexplained happened\n"
+        ));
+        // Bare words never match alone.
+        assert!(!is_retryable_mirror_transport_stderr(
+            b"connection failed\n"
+        ));
+        assert!(!is_retryable_mirror_transport_stderr(b"fetch failed\n"));
+        assert!(!is_retryable_mirror_transport_stderr(
+            b"exited with status\n"
+        ));
+
+        // HTTP status forms — exact codes only.
+        let transient_statuses: &[(u16, &str)] = &[
+            (408, "The requested URL returned error: 408"),
+            (425, "The requested URL returned error: 425"),
+            (429, "The requested URL returned error: 429"),
+            (500, "The requested URL returned error: 500"),
+            (502, "HTTP/1.1 502"),
+            (503, "HTTP/2 503"),
+            (599, "The requested URL returned error: 599"),
+        ];
+        for (code, line) in transient_statuses {
+            let stderr = format!("fatal: unable to access: {line}\n");
+            assert!(
+                is_retryable_mirror_transport_stderr(stderr.as_bytes()),
+                "HTTP {code} must be transient via `{line}`"
+            );
+        }
+        let permanent_statuses: &[(u16, &str)] = &[
+            (400, "The requested URL returned error: 400"),
+            (401, "The requested URL returned error: 401"),
+            (403, "The requested URL returned error: 403"),
+            (404, "The requested URL returned error: 404"),
+            (401, "HTTP/1.1 401"),
+            (403, "HTTP/2 403"),
+            (404, "HTTP/1.1 404"),
+        ];
+        for (code, line) in permanent_statuses {
+            let stderr = format!("fatal: unable to access: {line}\n");
+            assert!(
+                !is_retryable_mirror_transport_stderr(stderr.as_bytes()),
+                "HTTP {code} must be permanent via `{line}`"
+            );
+        }
+
+        // Auth marker still wins over a retryable status in the same buffer.
+        let auth_and_429 =
+            b"Authentication failed for 'https://x/'\nThe requested URL returned error: 429\n";
+        assert!(!is_retryable_mirror_transport_stderr(auth_and_429));
+        let repo_and_dns = b"Repository not found.\nCould not resolve host: github.com\n";
+        assert!(!is_retryable_mirror_transport_stderr(repo_and_dns));
+
+        // Malformed status falls through; unknown stays hard, known phrase still matches.
+        assert!(!is_retryable_mirror_transport_stderr(
+            b"The requested URL returned error: 4xx\n"
+        ));
+        assert!(!is_retryable_mirror_transport_stderr(
+            b"The requested URL returned error: 5000\n"
+        ));
+        assert!(!is_retryable_mirror_transport_stderr(b"HTTP/1.1 abc\n"));
+        assert!(is_retryable_mirror_transport_stderr(
+            b"The requested URL returned error: xyz\nCould not resolve host: x\n"
+        ));
+
+        // Tail sampling: decisive phrase after >8 KiB prefix is still seen.
+        let mut tail_hit = vec![b'A'; 9000];
+        tail_hit.extend_from_slice(b"\nfatal: Could not resolve host: github.com\n");
+        assert!(is_retryable_mirror_transport_stderr(&tail_hit));
+
+        // Phrase only outside the retained tail is invisible → hard default.
+        let mut head_only = b"Could not resolve host: github.com\n".to_vec();
+        head_only.extend(std::iter::repeat(b'B').take(9000));
+        assert!(!is_retryable_mirror_transport_stderr(&head_only));
+
+        // Permanent marker only in discarded head must not leak into classification either;
+        // a transient phrase in the tail still retries (auth not in sample).
+        let mut perm_head_trans_tail = b"Authentication failed\n".to_vec();
+        perm_head_trans_tail.extend(std::iter::repeat(b'C').take(9000));
+        perm_head_trans_tail.extend_from_slice(b"Connection reset by peer\n");
+        assert!(is_retryable_mirror_transport_stderr(&perm_head_trans_tail));
+    }
 
     #[test]
     fn rejects_embedded_https_credentials() {
