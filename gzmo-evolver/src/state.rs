@@ -2383,6 +2383,27 @@ mod tests {
         assert_eq!(before, after);
     }
 
+    /// Bounded retry for `LockBusy` caused by fork/exec lock-fd inheritance under
+    /// parallel tests: a sibling test's forked `git` child transiently inherits a
+    /// just-released coordinator lock-file description until exec closes the CLOEXEC
+    /// fd, so a re-acquire can briefly observe the stale flock. Never used by
+    /// production code or the dedicated lock-race assertion; retries only exact
+    /// `StateError::LockBusy` and panics on any other error.
+    fn acquire_coordinator_lock_retrying_busy(state_dir: &std::path::Path) -> CoordinatorLock {
+        let mut last = None;
+        for attempt in 0..8 {
+            match CoordinatorLock::try_acquire(state_dir) {
+                Ok(lock) => return lock,
+                Err(StateError::LockBusy) => {
+                    last = Some(StateError::LockBusy);
+                    thread::sleep(std::time::Duration::from_millis(25 + attempt * 15));
+                }
+                Err(other) => panic!("unexpected coordinator lock error: {other:?}"),
+            }
+        }
+        panic!("coordinator lock still busy after bounded retry: {last:?}");
+    }
+
     #[test]
     fn open_creates_unix_modes_and_status_works_while_lock_held() {
         let dir = TempDir::new().unwrap();
@@ -2423,7 +2444,7 @@ mod tests {
         }
         drop(store);
 
-        let lock = CoordinatorLock::try_acquire(&state_dir).unwrap();
+        let lock = acquire_coordinator_lock_retrying_busy(&state_dir);
         assert!(matches!(
             CoordinatorLock::try_acquire(&state_dir),
             Err(StateError::LockBusy)
@@ -2444,7 +2465,7 @@ mod tests {
             Err(StateError::ReadOnly)
         ));
         drop(lock);
-        let _lock2 = CoordinatorLock::try_acquire(&state_dir).unwrap();
+        let _lock2 = acquire_coordinator_lock_retrying_busy(&state_dir);
     }
 
     #[test]
