@@ -567,7 +567,7 @@ impl<'a, R: ProcessRunner> GitRepository<'a, R> {
         // Parent is state_dir (same parent as final mirror) for atomic rename.
         // Remote is always a validated GitHub URL; file protocol stays off.
         // Hermetic tests rewrite via ProcessRunner -c insteadOf + file allow.
-        let out = match self.run_git_allow_nonzero_ex(
+        let out = match self.run_mirror_network_ex(
             Some(self.config.state_dir()),
             &[
                 "clone".to_owned(),
@@ -580,10 +580,6 @@ impl<'a, R: ProcessRunner> GitRepository<'a, R> {
             false,
         ) {
             Ok(o) => o,
-            Err(GitError::Process(msg) | GitError::Io(msg)) => {
-                let _ = remove_path_best_effort(&staging);
-                return Err(GitError::Transport(msg));
-            }
             Err(err) => {
                 let _ = remove_path_best_effort(&staging);
                 return Err(err);
@@ -591,7 +587,11 @@ impl<'a, R: ProcessRunner> GitRepository<'a, R> {
         };
         if out.status != 0 {
             let _ = remove_path_best_effort(&staging);
-            return Err(GitError::Transport("mirror clone failed".to_owned()));
+            // Permanent remote/auth/missing-ref failures stay hard Process.
+            return Err(GitError::Process(format!(
+                "mirror clone exited with status {}",
+                out.status
+            )));
         }
         if let Err(err) = self.validate_mirror_layout(&staging) {
             let _ = remove_path_best_effort(&staging);
@@ -621,7 +621,8 @@ impl<'a, R: ProcessRunner> GitRepository<'a, R> {
         let base = self.config.repo().base_branch();
         let refspec = format!("+refs/heads/{base}:refs/heads/{base}");
         // Fetch origin (validated GitHub URL). Hermetic tests inject insteadOf.
-        match self.run_git_ex(
+        // Only structural ProcessError::Timeout is Transport; nonzero stays Process.
+        match self.run_mirror_network_ex(
             None,
             &[
                 "--git-dir".to_owned(),
@@ -636,8 +637,11 @@ impl<'a, R: ProcessRunner> GitRepository<'a, R> {
             Duration::from_secs(GIT_FETCH_TIMEOUT_SECS),
             false,
         ) {
-            Ok(_) => Ok(()),
-            Err(GitError::Process(msg) | GitError::Io(msg)) => Err(GitError::Transport(msg)),
+            Ok(out) if out.status == 0 => Ok(()),
+            Ok(out) => Err(GitError::Process(format!(
+                "mirror fetch exited with status {}",
+                out.status
+            ))),
             Err(err) => Err(err),
         }
     }
@@ -1021,6 +1025,49 @@ impl<'a, R: ProcessRunner> GitRepository<'a, R> {
                 stdout,
                 stderr,
             }),
+            Err(other) => Err(other.into()),
+        }
+    }
+
+    /// Mirror clone/fetch only: structural `ProcessError::Timeout` → `Transport`.
+    /// Nonzero exits and other process faults stay hard `Process`/`Io`/etc.
+    fn run_mirror_network_ex(
+        &self,
+        cwd: Option<&Path>,
+        args: &[String],
+        cap: usize,
+        timeout: Duration,
+        allow_file_protocol: bool,
+    ) -> Result<ProcessOutput, GitError> {
+        if cap == 0 || cap > 8 * 1024 * 1024 {
+            return Err(GitError::Invalid(
+                "git output cap must be 1..=8 MiB".to_owned(),
+            ));
+        }
+        let cwd = cwd.unwrap_or_else(|| self.config.state_dir()).to_path_buf();
+        let env = git_env(&self.home, allow_file_protocol)?;
+        let spec = ProcessSpec::new(
+            &self.git_program,
+            args.iter().cloned(),
+            cwd,
+            env,
+            cap,
+            timeout,
+        )?;
+        match self.runner.run(&spec) {
+            Ok(out) => Ok(out),
+            Err(ProcessError::NonZeroExit {
+                code,
+                stdout,
+                stderr,
+            }) => Ok(ProcessOutput {
+                status: code,
+                stdout,
+                stderr,
+            }),
+            Err(ProcessError::Timeout { timeout_ms }) => Err(GitError::Transport(format!(
+                "timed out after {timeout_ms} ms"
+            ))),
             Err(other) => Err(other.into()),
         }
     }

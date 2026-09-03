@@ -593,6 +593,13 @@ where
             Err(GitError::MirrorLockBusy) => {
                 return Err(RunnerError::Contention("mirror lease busy".to_owned()));
             }
+            Err(GitError::Transport(msg)) => {
+                // Structural Timeout only — leave Observed for retry.
+                return Err(RunnerError::Contention(format!(
+                    "transient git transport: {}",
+                    RunnerError::bound(msg)
+                )));
+            }
             Err(GitError::Trust(msg)) => {
                 return self.fail(store, record.id(), &msg);
             }
@@ -603,8 +610,8 @@ where
                 return self.fail(store, record.id(), &msg);
             }
             Err(err) => {
-                // Process/Io/timeout → contention, leave Observed.
-                return Err(RunnerError::from_git(err));
+                // Permanent Process/Io and other hard faults terminalize.
+                return self.fail(store, record.id(), &RunnerError::bound(err));
             }
         };
         let expected = match record.manifest().baseline_digest.strip_prefix("git-sha1:") {

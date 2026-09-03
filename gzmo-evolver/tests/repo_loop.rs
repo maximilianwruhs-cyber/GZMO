@@ -1239,9 +1239,9 @@ fn public_commands_require_config_hidden_worker_does_not() {
 use async_trait::async_trait;
 use evolution_contracts::{sha256_hex, ResourceUsage};
 use gzmo_evolver::{
-    worker_runtime_dirs, EffectiveIdentity, RepoEvolver, RunOutcome, WorkerError, WorkerIdentity,
-    WorkerLauncher, WorkerReceipt, WorkerRequest, WorkerRoots, WorkerRuntimeProvisioner,
-    WorkerUnitState,
+    worker_runtime_dirs, EffectiveIdentity, PrepareOutcome, RepoEvolver, RunOutcome, WorkerError,
+    WorkerIdentity, WorkerLauncher, WorkerReceipt, WorkerRequest, WorkerRoots,
+    WorkerRuntimeProvisioner, WorkerUnitState,
 };
 use std::os::unix::fs::PermissionsExt;
 use std::sync::{Arc, Mutex};
@@ -1731,6 +1731,10 @@ struct RepoHarness {
     unit_state: Arc<Mutex<WorkerUnitState>>,
     launch_mode: Arc<Mutex<LaunchMode>>,
     stop_log: Arc<Mutex<Vec<&'static str>>>,
+    omp_version: String,
+    coordinator_uid: u32,
+    worker_uid: u32,
+    worker_gid: u32,
 }
 impl RepoHarness {
     async fn new() -> Self {
@@ -1790,10 +1794,11 @@ impl RepoHarness {
         let launch_mode = Arc::new(Mutex::new(LaunchMode::Happy));
         let stop_log = Arc::new(Mutex::new(Vec::new()));
 
+        let omp_version = "18.0.11".to_owned();
         let hybrid = RunnerHybrid {
             git: fixture.runner(),
             fake_mission,
-            omp_version: "18.0.11".to_owned(),
+            omp_version: omp_version.clone(),
         };
         let launcher = FakeStageLauncher {
             launches: launches.clone(),
@@ -1810,6 +1815,8 @@ impl RepoHarness {
 
         let real_uid = nix::unistd::Uid::effective().as_raw();
         let real_gid = nix::unistd::Gid::effective().as_raw();
+        let worker_uid = real_uid;
+        let worker_gid = real_gid.max(1);
         let coordinator_uid = real_uid.wrapping_add(1000).max(1);
         assert_ne!(coordinator_uid, real_uid);
 
@@ -1819,8 +1826,8 @@ impl RepoHarness {
             launcher,
             provisioner,
             TestWorkerIdentity {
-                uid: real_uid,
-                gid: real_gid.max(1),
+                uid: worker_uid,
+                gid: worker_gid,
             },
             ManualClock::new(fixed_now()),
             roots.clone(),
@@ -1842,6 +1849,10 @@ impl RepoHarness {
             unit_state,
             launch_mode,
             stop_log,
+            omp_version,
+            coordinator_uid,
+            worker_uid,
+            worker_gid,
         }
     }
 
@@ -1965,6 +1976,95 @@ async fn abort_retry_lock_busy(
         }
     }
     Err(last.unwrap_or(gzmo_evolver::RunnerError::LockBusy))
+}
+
+/// Production-shaped sealed bundle for boundary seeds; version/uids from harness.
+fn seal_for_test(harness: &RepoHarness, prep: &PrepareOutcome) -> WorkerRequest {
+    let id = prep.record.id().clone();
+    let ws = prep
+        .record
+        .workspace()
+        .expect("prepared workspace")
+        .to_path_buf();
+    let dirs = worker_runtime_dirs(
+        harness.roots.output_root(),
+        id.as_str(),
+        harness.fixture.config.worker().profile(),
+    )
+    .unwrap();
+    for d in &dirs {
+        fs::create_dir_all(d).unwrap();
+        let mut p = fs::metadata(d).unwrap().permissions();
+        p.set_mode(0o700);
+        fs::set_permissions(d, p).unwrap();
+    }
+    let hybrid = HybridRunner {
+        git: harness.fixture.runner(),
+        fake_mission: {
+            let f = FakeProcessRunner::new();
+            install_mission_fake(&f, &ManualClock::new(fixed_now()));
+            f
+        },
+    };
+    let mission = MissionAdapter::new(
+        &harness.fixture.config,
+        &hybrid,
+        &ManualClock::new(fixed_now()),
+    )
+    .load_current()
+    .unwrap();
+    let manifest_json = evolution_contracts::canonical_json_bytes(prep.record.manifest()).unwrap();
+    let policy_rel = harness
+        .fixture
+        .config
+        .policy()
+        .repo_path()
+        .to_str()
+        .unwrap()
+        .replace('\\', "/");
+    let baseline = prep
+        .record
+        .manifest()
+        .baseline_digest
+        .strip_prefix("git-sha1:")
+        .unwrap();
+    let hermetic = harness.fixture.runner();
+    let git = GitRepository::open(&harness.fixture.config, &hermetic).unwrap();
+    let policy_toml = git.read_file_at(baseline, &policy_rel).unwrap();
+    let system = gzmo_evolver::render_system_prompt(
+        &id,
+        &prep.record.manifest().baseline_digest,
+        &ws,
+        &prep.record.manifest().protected_paths,
+        &prep.record.manifest().required_gates,
+        &prep.record.manifest().budget,
+    )
+    .unwrap();
+    let mission_md = gzmo_evolver::render_mission_prompt(&mission.markdown).unwrap();
+    let overlay = gzmo_evolver::render_omp_overlay("local/code");
+    let input = gzmo_evolver::SealWorkerInput {
+        candidate_id: id,
+        workspace: ws,
+        output_dir: dirs[0].clone(),
+        omp_executable: harness.fixture.config.worker().executable().to_path_buf(),
+        omp_profile: harness.fixture.config.worker().profile().to_owned(),
+        omp_version: harness.omp_version.clone(),
+        coordinator_uid: harness.coordinator_uid,
+        expected_uid: harness.worker_uid,
+        expected_gid: harness.worker_gid,
+        budget: prep.record.manifest().budget.clone(),
+        issued_at: fixed_now(),
+        companions: gzmo_evolver::WorkerCompanions {
+            manifest_json,
+            policy_toml,
+            system_prompt_md: system.into_bytes(),
+            mission_md: mission_md.into_bytes(),
+            omp_overlay_yml: overlay.into_bytes(),
+        },
+        manifest_digest: prep.record.manifest_digest().to_owned(),
+        policy_digest: prep.record.policy_digest().to_owned(),
+    };
+    gzmo_evolver::seal_worker_bundle(&harness.roots, input).unwrap()
 }
 #[tokio::test]
 async fn one_run_stops_at_evaluation_boundary() {
@@ -2210,8 +2310,7 @@ async fn abort_building_stops_before_failed_and_preserves_artifacts() {
 
 #[tokio::test]
 async fn receipt_directory_trust_fault_terminalizes_exact_reason() {
-    // Deliberate setup: Prepared→Building seed + production seal_worker_bundle, then
-    // plant a directory at receipt.json so resume hits the regular-file Trust fault.
+    // Seed Building with sealed request, then plant a directory at receipt.json.
     let harness = RepoHarness::new().await;
     let lock = CoordinatorLock::try_acquire(harness.fixture.config.state_dir()).unwrap();
     let store = StateStore::open(harness.fixture.config.state_dir()).unwrap();
@@ -2224,7 +2323,6 @@ async fn receipt_directory_trust_fault_terminalizes_exact_reason() {
     };
     let prep = prepare_candidate(&harness.fixture.config, &hybrid, &clock, &store).unwrap();
     let id = prep.record.id().clone();
-    let ws = prep.record.workspace().unwrap().to_path_buf();
     store
         .transition(
             &id,
@@ -2236,90 +2334,8 @@ async fn receipt_directory_trust_fault_terminalizes_exact_reason() {
     drop(store);
     drop(lock);
 
-    let dirs = worker_runtime_dirs(
-        harness.roots.output_root(),
-        id.as_str(),
-        harness.fixture.config.worker().profile(),
-    )
-    .unwrap();
-    for d in &dirs {
-        fs::create_dir_all(d).unwrap();
-        let mut p = fs::metadata(d).unwrap().permissions();
-        p.set_mode(0o700);
-        fs::set_permissions(d, p).unwrap();
-    }
-    let hybrid = HybridRunner {
-        git: harness.fixture.runner(),
-        fake_mission: {
-            let f = FakeProcessRunner::new();
-            install_mission_fake(&f, &ManualClock::new(fixed_now()));
-            f
-        },
-    };
-    let mission = MissionAdapter::new(
-        &harness.fixture.config,
-        &hybrid,
-        &ManualClock::new(fixed_now()),
-    )
-    .load_current()
-    .unwrap();
-    let real_uid = nix::unistd::Uid::effective().as_raw();
-    let real_gid = nix::unistd::Gid::effective().as_raw().max(1);
-    let coordinator_uid = real_uid.wrapping_add(1000).max(1);
-    let manifest_json = evolution_contracts::canonical_json_bytes(prep.record.manifest()).unwrap();
-    let policy_rel = harness
-        .fixture
-        .config
-        .policy()
-        .repo_path()
-        .to_str()
-        .unwrap()
-        .replace('\\', "/");
-    let baseline = prep
-        .record
-        .manifest()
-        .baseline_digest
-        .strip_prefix("git-sha1:")
-        .unwrap();
-    let hermetic_runner = harness.fixture.runner();
-    let git = GitRepository::open(&harness.fixture.config, &hermetic_runner).unwrap();
-    let policy_toml = git.read_file_at(baseline, &policy_rel).unwrap();
-    let system = gzmo_evolver::render_system_prompt(
-        &id,
-        &prep.record.manifest().baseline_digest,
-        &ws,
-        &prep.record.manifest().protected_paths,
-        &prep.record.manifest().required_gates,
-        &prep.record.manifest().budget,
-    )
-    .unwrap();
-    let mission_md = gzmo_evolver::render_mission_prompt(&mission.markdown).unwrap();
-    let overlay = gzmo_evolver::render_omp_overlay("local/code");
-    let input = gzmo_evolver::SealWorkerInput {
-        candidate_id: id.clone(),
-        workspace: ws,
-        output_dir: dirs[0].clone(),
-        omp_executable: harness.fixture.config.worker().executable().to_path_buf(),
-        omp_profile: harness.fixture.config.worker().profile().to_owned(),
-        omp_version: "18.0.11".to_owned(),
-        coordinator_uid,
-        expected_uid: real_uid,
-        expected_gid: real_gid,
-        budget: prep.record.manifest().budget.clone(),
-        issued_at: fixed_now(),
-        companions: gzmo_evolver::WorkerCompanions {
-            manifest_json,
-            policy_toml,
-            system_prompt_md: system.into_bytes(),
-            mission_md: mission_md.into_bytes(),
-            omp_overlay_yml: overlay.into_bytes(),
-        },
-        manifest_digest: prep.record.manifest_digest().to_owned(),
-        policy_digest: prep.record.policy_digest().to_owned(),
-    };
-    gzmo_evolver::seal_worker_bundle(&harness.roots, input).unwrap();
-
-    let receipt_path = dirs[0].join("receipt.json");
+    let sealed = seal_for_test(&harness, &prep);
+    let receipt_path = sealed.output_dir().join("receipt.json");
     let _ = fs::remove_file(&receipt_path);
     fs::create_dir_all(&receipt_path).unwrap();
 
@@ -2420,17 +2436,7 @@ async fn abort_rejects_foreign_repository_candidate() {
 
 #[tokio::test]
 async fn prepared_sealed_request_reuse_on_resume() {
-    // Reach Evaluating (seals request), then force state back is illegal.
-    // Instead: prepare, seal via production Happy run interrupted at Building by
-    // SucceededNoReceipt → Failed with sealed request present. Then we can't reuse Prepared.
-    //
-    // Causal reuse: run Happy to Evaluating. Sealed request exists. Second run_once is
-    // Evaluating short-circuit — not reuse of seal.
-    //
-    // Real reuse: leave Prepared with sealed request already present.
-    // 1) prepare
-    // 2) seal via seal_worker_bundle
-    // 3) resume/run_once which seals-or-reuses then launches Happy
+    // Pre-seal at Prepared so run_once must reuse, not reseal.
     let harness = RepoHarness::new().await;
     let lock = CoordinatorLock::try_acquire(harness.fixture.config.state_dir()).unwrap();
     let store = StateStore::open(harness.fixture.config.state_dir()).unwrap();
@@ -2444,92 +2450,10 @@ async fn prepared_sealed_request_reuse_on_resume() {
     let prep = prepare_candidate(&harness.fixture.config, &hybrid, &clock, &store).unwrap();
     assert_eq!(prep.record.state(), CandidateState::Prepared);
     let id = prep.record.id().clone();
-    let ws = prep.record.workspace().unwrap().to_path_buf();
     drop(store);
     drop(lock);
 
-    let dirs = worker_runtime_dirs(
-        harness.roots.output_root(),
-        id.as_str(),
-        harness.fixture.config.worker().profile(),
-    )
-    .unwrap();
-    for d in &dirs {
-        fs::create_dir_all(d).unwrap();
-        let mut p = fs::metadata(d).unwrap().permissions();
-        p.set_mode(0o700);
-        fs::set_permissions(d, p).unwrap();
-    }
-    let hybrid = HybridRunner {
-        git: harness.fixture.runner(),
-        fake_mission: {
-            let f = FakeProcessRunner::new();
-            install_mission_fake(&f, &ManualClock::new(fixed_now()));
-            f
-        },
-    };
-    let mission = MissionAdapter::new(
-        &harness.fixture.config,
-        &hybrid,
-        &ManualClock::new(fixed_now()),
-    )
-    .load_current()
-    .unwrap();
-    let real_uid = nix::unistd::Uid::effective().as_raw();
-    let real_gid = nix::unistd::Gid::effective().as_raw().max(1);
-    let coordinator_uid = real_uid.wrapping_add(1000).max(1);
-    let manifest_json = evolution_contracts::canonical_json_bytes(prep.record.manifest()).unwrap();
-    let policy_rel = harness
-        .fixture
-        .config
-        .policy()
-        .repo_path()
-        .to_str()
-        .unwrap()
-        .replace('\\', "/");
-    let baseline = prep
-        .record
-        .manifest()
-        .baseline_digest
-        .strip_prefix("git-sha1:")
-        .unwrap();
-    let hermetic_runner = harness.fixture.runner();
-    let git = GitRepository::open(&harness.fixture.config, &hermetic_runner).unwrap();
-    let policy_toml = git.read_file_at(baseline, &policy_rel).unwrap();
-    let system = gzmo_evolver::render_system_prompt(
-        &id,
-        &prep.record.manifest().baseline_digest,
-        &ws,
-        &prep.record.manifest().protected_paths,
-        &prep.record.manifest().required_gates,
-        &prep.record.manifest().budget,
-    )
-    .unwrap();
-    let mission_md = gzmo_evolver::render_mission_prompt(&mission.markdown).unwrap();
-    let overlay = gzmo_evolver::render_omp_overlay("local/code");
-    let input = gzmo_evolver::SealWorkerInput {
-        candidate_id: id.clone(),
-        workspace: ws.clone(),
-        output_dir: dirs[0].clone(),
-        omp_executable: harness.fixture.config.worker().executable().to_path_buf(),
-        omp_profile: harness.fixture.config.worker().profile().to_owned(),
-        omp_version: "18.0.11".to_owned(),
-        coordinator_uid,
-        expected_uid: real_uid,
-        expected_gid: real_gid,
-        budget: prep.record.manifest().budget.clone(),
-        issued_at: fixed_now(),
-        companions: gzmo_evolver::WorkerCompanions {
-            manifest_json,
-            policy_toml,
-            system_prompt_md: system.into_bytes(),
-            mission_md: mission_md.into_bytes(),
-            omp_overlay_yml: overlay.into_bytes(),
-        },
-        manifest_digest: prep.record.manifest_digest().to_owned(),
-        policy_digest: prep.record.policy_digest().to_owned(),
-    };
-    gzmo_evolver::seal_worker_bundle(&harness.roots, input).unwrap();
+    let _ = seal_for_test(&harness, &prep);
     let req_path = harness
         .roots
         .request_root()
@@ -2553,13 +2477,7 @@ async fn prepared_sealed_request_reuse_on_resume() {
 
 #[tokio::test]
 async fn no_duplicate_launch_from_building_succeeded() {
-    // Seed Building with sealed request and unit already Succeeded without receipt;
-    // resume must not launch.
-    let harness = RepoHarness::new().await;
-    *harness.launch_mode.lock().unwrap() = LaunchMode::SucceededNoReceipt;
-    let _ = run_once_retry_lock_busy(&harness.evolver).await;
-    // Now Failed. Seed Building with Succeeded unit: after Failed we can't.
-    // Instead: prepare + Building seed + preset unit Succeeded + sealed request, launches=0.
+    // Seed Building with a sealed request and a Succeeded unit; resume must not launch.
     let harness = RepoHarness::new().await;
     let lock = CoordinatorLock::try_acquire(harness.fixture.config.state_dir()).unwrap();
     let store = StateStore::open(harness.fixture.config.state_dir()).unwrap();
@@ -2583,91 +2501,7 @@ async fn no_duplicate_launch_from_building_succeeded() {
     drop(store);
     drop(lock);
 
-    // Minimal sealed request so resume_building proceeds to unit inspect.
-    let dirs = worker_runtime_dirs(
-        harness.roots.output_root(),
-        id.as_str(),
-        harness.fixture.config.worker().profile(),
-    )
-    .unwrap();
-    for d in &dirs {
-        fs::create_dir_all(d).unwrap();
-        let mut p = fs::metadata(d).unwrap().permissions();
-        p.set_mode(0o700);
-        fs::set_permissions(d, p).unwrap();
-    }
-    let hybrid = HybridRunner {
-        git: harness.fixture.runner(),
-        fake_mission: {
-            let f = FakeProcessRunner::new();
-            install_mission_fake(&f, &ManualClock::new(fixed_now()));
-            f
-        },
-    };
-    let mission = MissionAdapter::new(
-        &harness.fixture.config,
-        &hybrid,
-        &ManualClock::new(fixed_now()),
-    )
-    .load_current()
-    .unwrap();
-    let real_uid = nix::unistd::Uid::effective().as_raw();
-    let real_gid = nix::unistd::Gid::effective().as_raw().max(1);
-    let coordinator_uid = real_uid.wrapping_add(1000).max(1);
-    let ws = prep.record.workspace().unwrap().to_path_buf();
-    let manifest_json = evolution_contracts::canonical_json_bytes(prep.record.manifest()).unwrap();
-    let policy_rel = harness
-        .fixture
-        .config
-        .policy()
-        .repo_path()
-        .to_str()
-        .unwrap()
-        .replace('\\', "/");
-    let baseline = prep
-        .record
-        .manifest()
-        .baseline_digest
-        .strip_prefix("git-sha1:")
-        .unwrap();
-    let hermetic_runner = harness.fixture.runner();
-    let git = GitRepository::open(&harness.fixture.config, &hermetic_runner).unwrap();
-    let policy_toml = git.read_file_at(baseline, &policy_rel).unwrap();
-    let system = gzmo_evolver::render_system_prompt(
-        &id,
-        &prep.record.manifest().baseline_digest,
-        &ws,
-        &prep.record.manifest().protected_paths,
-        &prep.record.manifest().required_gates,
-        &prep.record.manifest().budget,
-    )
-    .unwrap();
-    let mission_md = gzmo_evolver::render_mission_prompt(&mission.markdown).unwrap();
-    let overlay = gzmo_evolver::render_omp_overlay("local/code");
-    let input = gzmo_evolver::SealWorkerInput {
-        candidate_id: id.clone(),
-        workspace: ws,
-        output_dir: dirs[0].clone(),
-        omp_executable: harness.fixture.config.worker().executable().to_path_buf(),
-        omp_profile: harness.fixture.config.worker().profile().to_owned(),
-        omp_version: "18.0.11".to_owned(),
-        coordinator_uid,
-        expected_uid: real_uid,
-        expected_gid: real_gid,
-        budget: prep.record.manifest().budget.clone(),
-        issued_at: fixed_now(),
-        companions: gzmo_evolver::WorkerCompanions {
-            manifest_json,
-            policy_toml,
-            system_prompt_md: system.into_bytes(),
-            mission_md: mission_md.into_bytes(),
-            omp_overlay_yml: overlay.into_bytes(),
-        },
-        manifest_digest: prep.record.manifest_digest().to_owned(),
-        policy_digest: prep.record.policy_digest().to_owned(),
-    };
-    gzmo_evolver::seal_worker_bundle(&harness.roots, input).unwrap();
-
+    let _ = seal_for_test(&harness, &prep);
     *harness.unit_state.lock().unwrap() = WorkerUnitState::Succeeded;
     *harness.launches.lock().unwrap() = 0;
     let err = resume_retry_lock_busy(&harness.evolver).await.unwrap_err();
@@ -2680,4 +2514,208 @@ async fn no_duplicate_launch_from_building_succeeded() {
         0,
         "must not launch when unit already Succeeded"
     );
+}
+
+#[derive(Debug, Clone, Copy)]
+enum MirrorNetworkFault {
+    Timeout,
+    NonZero,
+}
+
+/// Injects structural Timeout or nonzero only on mirror clone/fetch argv.
+struct FaultyMirrorRunner {
+    inner: HermeticGitRunner,
+    fault: MirrorNetworkFault,
+}
+
+impl ProcessRunner for FaultyMirrorRunner {
+    fn run(&self, spec: &ProcessSpec) -> Result<ProcessOutput, ProcessError> {
+        let injected = self.inner.inject(spec)?;
+        let has_clone = injected.args.iter().any(|a| a == "clone");
+        let has_mirror = injected.args.iter().any(|a| a == "--mirror");
+        let has_fetch = injected.args.iter().any(|a| a == "fetch");
+        let has_origin = injected.args.iter().any(|a| a == "origin");
+        let mirror_network = (has_clone && has_mirror) || (has_fetch && has_origin);
+        if mirror_network {
+            match self.fault {
+                MirrorNetworkFault::Timeout => {
+                    return Err(ProcessError::Timeout { timeout_ms: 1 });
+                }
+                MirrorNetworkFault::NonZero => {
+                    return Ok(ProcessOutput {
+                        status: 128,
+                        stdout: Vec::new(),
+                        stderr: Vec::new(),
+                    });
+                }
+            }
+        }
+        self.inner.inner.run(&injected)
+    }
+}
+
+fn observed_evolver_with_mirror_fault(
+    fixture: &Fixture,
+    fault: MirrorNetworkFault,
+) -> (
+    RepoEvolver<
+        FaultyMirrorRunner,
+        FakeStageLauncher,
+        FakeRuntimeProvisioner,
+        TestWorkerIdentity,
+        ManualClock,
+    >,
+    WorkerRoots,
+    CandidateId,
+) {
+    let request_root = fixture.state_dir.join("run-requests");
+    let output_root = fixture.state_dir.join("worker-out");
+    let profile_root = fixture.state_dir.join("profiles");
+    let netns = fixture.state_dir.join("netns");
+    fs::create_dir_all(&request_root).unwrap();
+    fs::create_dir_all(&output_root).unwrap();
+    fs::create_dir_all(&profile_root).unwrap();
+    fs::create_dir_all(&netns).unwrap();
+    let profile = fixture.config.worker().profile().to_owned();
+    let profile_dir = profile_root.join(&profile);
+    fs::create_dir_all(profile_dir.join("agent")).unwrap();
+    fs::write(
+        profile_dir.join("agent/config.yml"),
+        "modelRoles:\n  code_candidate: local/code\n",
+    )
+    .unwrap();
+    fs::write(
+        profile_dir.join("agent/models.yml"),
+        "providers:\n  local:\n    auth: none\n    baseUrl: http://127.0.0.1:9\n    models:\n      - id: code\n        maxTokens: 16384\n        contextWindow: 32768\n",
+    )
+    .unwrap();
+    let fixture_omp =
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/fake-worker.sh");
+    fs::copy(&fixture_omp, fixture.config.worker().executable()).unwrap();
+    let mut perms = fs::metadata(fixture.config.worker().executable())
+        .unwrap()
+        .permissions();
+    perms.set_mode(0o755);
+    fs::set_permissions(fixture.config.worker().executable(), perms).unwrap();
+
+    let roots = WorkerRoots::for_test(request_root, output_root, profile_root, netns).unwrap();
+    let launches = Arc::new(Mutex::new(0u32));
+    let provision_calls = Arc::new(Mutex::new(0u32));
+    let unit_state = Arc::new(Mutex::new(WorkerUnitState::NotFound));
+    let launch_mode = Arc::new(Mutex::new(LaunchMode::Happy));
+    let stop_log = Arc::new(Mutex::new(Vec::new()));
+
+    let runner = FaultyMirrorRunner {
+        inner: fixture.runner(),
+        fault,
+    };
+    let real_uid = nix::unistd::Uid::effective().as_raw();
+    let real_gid = nix::unistd::Gid::effective().as_raw().max(1);
+    let coordinator_uid = real_uid.wrapping_add(1000).max(1);
+    let evolver = RepoEvolver::with_deps(
+        fixture.config.clone(),
+        runner,
+        FakeStageLauncher {
+            launches,
+            unit_state,
+            mode: launch_mode,
+            stop_log,
+            now: fixed_now(),
+        },
+        FakeRuntimeProvisioner {
+            roots: roots.clone(),
+            profile,
+            calls: provision_calls,
+        },
+        TestWorkerIdentity {
+            uid: real_uid,
+            gid: real_gid,
+        },
+        ManualClock::new(fixed_now()),
+        roots.clone(),
+        coordinator_uid,
+    )
+    .unwrap();
+
+    // Seed Observed without a mirror so resume hits clone/fetch under the fault.
+    let baseline = fixture.baseline_before.clone();
+    let id = CandidateId::parse("cand-20260901t120000z-bet-mirrorfault1").unwrap();
+    let lock = CoordinatorLock::try_acquire(fixture.config.state_dir()).unwrap();
+    let store = StateStore::open(fixture.config.state_dir()).unwrap();
+    let manifest = manifest_for(&baseline, id.as_str());
+    store
+        .create_candidate(
+            &manifest,
+            fixture.config.working_policy_digest(),
+            fixed_now(),
+        )
+        .unwrap();
+    drop(store);
+    drop(lock);
+    let _ = fs::remove_dir_all(fixture.state_dir.join(gzmo_evolver::MIRROR_NAME));
+    (evolver, roots, id)
+}
+
+#[tokio::test]
+async fn observed_mirror_timeout_is_contention_leaves_observed() {
+    let fixture = Fixture::new();
+    let (evolver, _roots, id) =
+        observed_evolver_with_mirror_fault(&fixture, MirrorNetworkFault::Timeout);
+    let err = {
+        let mut last = None;
+        let mut out = None;
+        for attempt in 0..8 {
+            match evolver.resume().await {
+                Ok(o) => panic!("expected Contention, got Ok({o:?})"),
+                Err(gzmo_evolver::RunnerError::LockBusy) => {
+                    last = Some(gzmo_evolver::RunnerError::LockBusy);
+                    tokio::time::sleep(std::time::Duration::from_millis(25 + attempt * 15)).await;
+                }
+                Err(e) => {
+                    out = Some(e);
+                    break;
+                }
+            }
+        }
+        out.unwrap_or_else(|| last.expect("resume LockBusy retries exhausted"))
+    };
+    assert!(
+        matches!(err, gzmo_evolver::RunnerError::Contention(_)),
+        "timeout must be Contention, got {err}"
+    );
+    let store = StateStore::open(fixture.config.state_dir()).unwrap();
+    let rec = store.load(&id).unwrap();
+    assert_eq!(rec.state(), CandidateState::Observed);
+}
+
+#[tokio::test]
+async fn observed_mirror_nonzero_terminalizes_not_contention() {
+    let fixture = Fixture::new();
+    let (evolver, _roots, id) =
+        observed_evolver_with_mirror_fault(&fixture, MirrorNetworkFault::NonZero);
+    let err = {
+        let mut last = None;
+        let mut out = None;
+        for attempt in 0..8 {
+            match evolver.resume().await {
+                Ok(o) => panic!("expected terminal error, got Ok({o:?})"),
+                Err(gzmo_evolver::RunnerError::LockBusy) => {
+                    last = Some(gzmo_evolver::RunnerError::LockBusy);
+                    tokio::time::sleep(std::time::Duration::from_millis(25 + attempt * 15)).await;
+                }
+                Err(e) => {
+                    out = Some(e);
+                    break;
+                }
+            }
+        }
+        out.unwrap_or_else(|| last.expect("resume LockBusy retries exhausted"))
+    };
+    assert!(
+        !matches!(err, gzmo_evolver::RunnerError::Contention(_)),
+        "nonzero clone/fetch must not be Contention, got {err}"
+    );
+    let store = StateStore::open(fixture.config.state_dir()).unwrap();
+    let rec = store.load(&id).unwrap();
+    assert_eq!(rec.state(), CandidateState::Failed);
 }
