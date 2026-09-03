@@ -1,272 +1,91 @@
-# GZMO — Solid Baseline (2026-07-09)
+# GZMO — Baseline (2026-09-03)
 
-## Status: ✅ PRODUCTION READY
+## Status: Offline workspace baseline GREEN
 
-**Build:** Compiles successfully  
-**Tests:** 133/133 passing (108 lib + 21 gzmo-cli + 3 gzmo-chaos + 1 live_cloud_probe)  
-**Warnings:** 15 (mostly unused imports/variables — non-blocking)
+The full 7-crate workspace compiles, formats, lints, and tests clean on one box
+with **no live infrastructure**. Living/production readiness is a *separate*
+gate that requires the CT101 home-lab (see "Operational gates" below).
 
----
+Verified at commit `98755cd` (the tree this doc is committed on top of):
 
-## Architecture
+| Gate | Command | Result |
+|------|---------|--------|
+| Format | `cargo fmt --all --check` | clean (exit 0) |
+| Lint | `cargo clippy --workspace --all-targets -- -D warnings` | 0 warnings (exit 0) |
+| Tests | `cargo test --workspace` | **730 passed, 0 failed, 5 ignored** |
 
-```
-GZMO/
-├── gzmo-core/          # Business logic (50+ modules)
-│   ├── src/
-│   │   ├── config.rs           # Configuration loading
-│   │   ├── gateway.rs          # LLM gateway (async/await)
-│   │   ├── memory/
-│   │   │   ├── vault.rs        # SQLite persistence (501 lines)
-│   │   │   ├── honeypot.rs     # Honeypot gate (268 lines)
-│   │   │   ├── recall_rrf.rs   # Reciprocal Rank Fusion (227 lines)
-│   │   │   ├── episodic.rs     # Episodic storage
-│   │   │   ├── kg_extract.rs   # Knowledge graph extraction
-│   │   │   ├── kg_promotion.rs # Fact promotion
-│   │   │   ├── ripen.rs        # Honeypot ripening engine
-│   │   │   └── profile.rs      # Profile management
-│   │   ├── session_distill.rs  # Session fact extraction (464 lines)
-│   │   ├── spark.rs            # Serendipitous recall (1078 lines)
-│   │   ├── orchestrator.rs     # Wave resolution (1042 lines)
-│   │   ├── ingest.rs           # Ingestion pipeline (759 lines)
-│   │   ├── dreams.rs           # Dream consolidation (621 lines)
-│   │   ├── synapse.rs          # Event bus (481 lines)
-│   │   ├── wiki.rs             # Wiki layer (501 lines)
-│   │   ├── identity.rs         # Identity engine (174 lines)
-│   │   ├── daemon.rs           # Daemon mode (270 lines)
-│   │   ├── context.rs          # Context management (394 lines)
-│   │   ├── platform_memory.rs  # Platform memory (390 lines)
-│   │   ├── platform_search.rs  # Platform search (190 lines)
-│   │   ├── watcher.rs          # File system watcher (316 lines)
-│   │   ├── scanner.rs          # Scanner (117 lines)
-│   │   ├── stealth.rs          # Stealth discovery (55 lines)
-│   │   ├── subagent.rs         # Subagent orchestration (267 lines)
-│   │   ├── kg_reconcile.rs     # KG reconciliation (214 lines)
-│   │   ├── health.rs           # Health checks (362 lines)
-│   │   ├── skills/             # Built-in skills (help, calculate, dice, poker, quote, sound, visual)
-│   │   ├── tools/              # Tool registry (shell, fs, web, sysadmin, memory, delegate)
-│   │   ├── mcp/                # MCP bridge (manager, serve, bridge)
-│   │   └── ...
-│   └── tests/
-│       └── live_cloud_probe.rs # Live cloud probe
-├── gzmo-cli/             # Thin binary
-│   └── src/
-│       ├── main.rs           # CLI entry point
-│       ├── chat.rs           # Chat command
-│       ├── daemon_cmd.rs     # Daemon command
-│       ├── dream_cmd.rs      # Dream command
-│       ├── spark_cmd.rs      # Spark command
-│       ├── ingest_cmd.rs     # Ingest command
-│       ├── ingest_dir_cmd.rs # Ingest directory
-│       ├── ingest_eval_cmd.rs# Ingest evaluation
-│       ├── memory_cmd.rs     # Memory commands
-│       ├── distill_cmd.rs    # Distill command
-│       ├── health_cmd.rs     # Health command
-│       ├── wiki_cmd.rs       # Wiki commands
-│       ├── mcp_serve_cmd.rs  # MCP serve
-│       ├── profile_cmd.rs    # Profile commands
-│       ├── embed_cmd.rs      # Embed command
-│       ├── init_cmd.rs       # Init command
-│       ├── tui/              # Terminal UI
-│       └── ...
-├── gzmo-chaos/           # Lorenz attractor engine
-│   └── src/
-│       └── lorenz.rs
-├── gzmo.toml.example   # Config template
-├── .env.template       # Secrets template
-└── scripts/            # Production ops
-```
+Workspace lints (`Cargo.toml`) keep `-D warnings` meaningful: `clippy::correctness`
+and `clippy::suspicious` are **deny**; noisy style/pedantic lints are allowed. The
+5 ignored tests are gzmo-core live probes (network + Prime `:8000` + OpenRouter key).
 
 ---
 
-## Core Pipeline
+## Workspace (7 crates)
 
-```
-session-distill → honeypot-gate → spark-link → evidence-locate → promote
-     ↓                ↓               ↓              ↓
-  Extract        Qualify        Hypothesize      Verify
-     ↓                ↓               ↓              ↓
-  Facts          Honeypot       Cross-domain     Evidence
-                  Gate           Connections      Localization
-     ↓                ↓               ↓              ↓
-  ──────────────────────────────────────────────────────
-                        ↓
-                   Promote to Core Memory
-                        ↓
-                   Feedback Tracking
-                        ↓
-                   Ripen Engine (hourly)
-                        ↓
-                   Knowledge Core
-```
+| Crate | Role | Passing tests |
+|-------|------|---------------|
+| `gzmo-core` | All business logic — config, LLM gateway, honeypot memory pipeline, ingest, dream, spark, skills, tools, MCP bridge | 370 (+5 ignored live) |
+| `gzmo-evolver` | Connected-host repository evolver coordinator (self-development loop) | 170 — lib 115 · repo_loop 54 · bin 1 |
+| `evolution-contracts` | Pure domain contracts for evolution candidates, envelopes, evaluation, audit (JSON schemas) | 96 — lib 17 · contracts 68 · schema_snapshots 10 · export_schemas 1 |
+| `gzmo-cli` | Thin `gzmo` binary — `main.rs` + `*_cmd.rs` + TUI | 51 |
+| `gzmo-chaos` | Lorenz attractor engine | 26 — lib 25 · doctest 1 |
+| `eml-core` | Exp-Minus-Log symbolic computation engine — ComplexBall arithmetic, RPN emit, zero-copy execution | 12 |
+| `gzmo-scheduler` | Thin cron runner for GZMO-next — ticks every 60s, spawns Little Tools Lab recipe scripts (no engines/vault/LLM/MCP) | 5 |
+
+Total: **730 passing**, 5 ignored (live), 0 failing.
 
 ---
 
-## What's Working
+## Line-ending invariant
 
-### ✅ Memory System
-- **SQLite Vault** — Full CRUD, embedding storage, fact lifecycle
-- **Session Distillation** — LLM-based fact extraction from transcripts
-- **Honeypot Gate** — Qualification filter, contradiction detection
-- **Spark Engine** — Serendipitous recall, cross-domain connections
-- **RRF Recall** — Reciprocal Rank Fusion multi-source recall
-- **Ripen Engine** — Honeypot ripening, concept card synthesis
-- **Episodic Storage** — File-based episodic memory
+`.gitattributes` pins `* text=auto eol=lf`. The repo targets Linux/WSL; every
+tracked shell script runs under bash. A Windows checkout with `core.autocrlf=true`
+was rewriting all 258 `.sh` scripts to CRLF, which breaks bash heredocs (syntax
+error, exit 2) and previously red-flagged the evolver gate. All committed blobs
+are already LF, so the attribute is content-neutral: it only pins the invariant
+and stops future Windows checkouts from regressing it.
 
-### ✅ Ingestion & Processing
-- **Ingest Pipeline** — File/directory ingestion, dry-run support
-- **Dream Consolidation** — Periodic dream cycles, memory consolidation
-- **Orchestrator** — Wave resolution, dependency tracking
-- **KG Reconciliation** — Knowledge graph consistency
-
-### ✅ LLM Integration
-- **Gateway** — Async/await, OpenAI-compatible, streaming support
-- **Context Management** — Sliding window, relevance scoring
-- **Agent Session** — Session management, tool integration
-
-### ✅ Tools & Skills
-- **Tools** — Shell, FS, Web, Sysadmin, Memory, Delegate
-- **Skills** — Help, Calculate, Dice, Poker, Quote, Sound, Visual
-- **MCP Bridge** — Model Context Protocol integration
-
-### ✅ Infrastructure
-- **Daemon Mode** — PID lockfile, background execution
-- **Synapse Bus** — Event bus, event serialization
-- **Wiki Layer** — Markdown-based, Obsidian-browsable
-- **Watcher** — File system monitoring
-- **Scanner** — Directory scanning
-- **Stealth Discovery** — Background discovery
-- **Health Checks** — System health monitoring
-- **Identity Engine** — Agent identity management
-
-### ✅ Testing
-- **133 tests passing** — Unit, integration, live probes
-- **Coverage** — Core pipeline, memory, tools, skills
-- **CI Ready** — `cargo test` passes clean
+Verify: `git ls-files --eol` reports `i/lf` for every text file.
 
 ---
 
-## What Needs Work
+## Operational gates (require live infra — NOT part of the offline baseline)
 
-### ⚠️ Warnings (15 total)
-- 12 in gzmo-core (unused imports, variables, fields)
-- 3 in gzmo-cli (unused imports, dead code)
-- **Status:** Non-blocking, can be cleaned up incrementally
+Living/production readiness is gated separately and needs the CT101 home-lab
+(SSH `ct101`, Prime LLM `:8000`, embeddings `:8081`, Qdrant `:6333`,
+`/opt/gzmo` deployment). Run these on the appliance, not in a sandbox:
 
-### 🔲 Phase 4 Tasks (from cognition-common handoff)
-- [ ] Dream/Spark consolidation (partial — dreams.rs exists)
-- [ ] Seed curator (not implemented)
-- [ ] Evidence locate (not implemented)
-- [ ] More integration tests (133 passing, could add edge cases)
-- [ ] Performance optimization (could profile hot paths)
-- [ ] Documentation (BASELINE.md created, could expand)
-
-### 🔲 Known Issues
-- Some unused imports/variables (cosine_similarity, PipelineConfig, etc.)
-- Patch tool can corrupt files (use write_file for clean rewrites)
-- 8xtract repository is private (cannot access source)
-- MEMNET framework is theoretical (documentation only)
+- `bash scripts/keep-quality-gate.sh` — continuous living quality bar (readiness + felt-use + spark + immune + ripen + lymph + attach + airgap honesty).
+- `bash scripts/verify-baseline-green.sh` — M4 eval + production E2E + platform hot-memory + Redis scratch.
+- `./scripts/verify-production.sh` — production E2E against live engines.
 
 ---
 
-## Commands
+## Reproduce the offline baseline
 
 ```bash
-# Build
-cargo build
+cargo fmt --all --check
+cargo clippy --workspace --all-targets -- -D warnings
+cargo test --workspace
+```
 
-# Test
-cargo test
+Run the live probes explicitly when infra is up:
 
-# Clippy
-cargo clippy --all-targets
-
-# Run daemon
-cargo run --bin gzmo -- daemon
-
-# Run chat
-cargo run --bin gzmo -- chat
-
-# Init
-cargo run --bin gzmo -- init
-
-# Dream consolidation
-cargo run --bin gzmo -- dream
-
-# Spark recall
-cargo run --bin gzmo -- spark
-
-# Ingest
-cargo run --bin gzmo -- ingest <path>
-
-# Memory dump
-cargo run --bin gzmo -- memory dump
-
-# Health check
-cargo run --bin gzmo -- health
-
-# Wiki sync
-cargo run --bin gzmo -- wiki sync
-
-# MCP serve
-cargo run --bin gzmo -- mcp-serve
+```bash
+cargo test -p gzmo-core --test live_cloud_probe -- --ignored --nocapture
 ```
 
 ---
 
-## Key Files
+## Environment
 
-- `gzmo-core/src/lib.rs` — Module declarations
-- `gzmo-core/src/config.rs` — Configuration (501 lines)
-- `gzmo-core/src/gateway.rs` — LLM gateway (501 lines)
-- `gzmo-core/src/memory/vault.rs` — SQLite vault (501 lines)
-- `gzmo-core/src/session_distill.rs` — Session distillation (464 lines)
-- `gzmo-core/src/spark.rs` — Spark engine (1078 lines)
-- `gzmo-core/src/orchestrator.rs` — Orchestrator (1042 lines)
-- `gzmo-core/src/ingest.rs` — Ingestion pipeline (759 lines)
-- `gzmo-core/src/dreams.rs` — Dream consolidation (621 lines)
-- `gzmo-core/src/synapse.rs` — Event bus (481 lines)
-- `gzmo-core/src/wiki.rs` — Wiki layer (501 lines)
-- `gzmo-cli/src/main.rs` — CLI entry point (220 lines)
+- Dual RTX 5070 Ti, Ryzen 9 9950X, 59 GB RAM, Proxmox home lab.
+- Works with multiple agent frameworks (herdr, tau, pi, openclaw).
 
 ---
 
-## Related Projects
+## Baseline date
 
-- **cognition-common** — `/home/gzmo/github-clone/little-tools-lab/cognition-common/`
-  - 29 tests passing
-  - Phase 3 complete
-  - Handoff: `/home/gzmo/github-clone/little-tools-lab/cognition-common/HANDOFF.md`
+2026-09-03 — offline workspace baseline recorded on top of `98755cd` (`origin/main`).
 
-- **smart-tree** — Rust-based directory traversal (10-24x speed improvement)
-- **RustyNanoKVM** — Pure-Rust KVM server for RISC-V SBCs
-- **MEMNET** — Semantic-routing architecture (theoretical)
-
----
-
-## User Preferences
-
-- Prefers comprehensive handoff documentation with code examples
-- Values practical, working artifacts over plans
-- Focus on cognition core: spark-link, rrf-recall, session-distill, honeypot-gate, rem-substrate, seed-curator, evidence-locate
-- Dual RTX 5070 Ti, Ryzen 9 9950X, 59GB RAM, Proxmox home lab
-- Works with multiple agent frameworks (herdr, tau, pi, openclaw)
-
----
-
-## Session Context
-
-- Last session: Completed cognition-common library integration phase
-- Previous work: Analyzed 8b-is repos (smart-tree, RustyNanoKVM), standardgalactic profile
-- User redirected from standardgalactic browsing to GZMO focus
-- User dismissed 8b-is analysis as not needed for GZMO baseline
-
----
-
-## Baseline Date
-
-2026-07-09
-
----
-
-*Baseline established. 133/133 tests passing. Ready for Phase 4.*
+*730/730 offline tests passing · fmt clean · clippy `-D warnings` clean.*
