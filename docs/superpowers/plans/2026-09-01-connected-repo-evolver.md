@@ -801,11 +801,11 @@ git commit -m "feat: orchestrate one repository candidate at a time"
 
 **Interfaces:**
 - Produces: hermetic acceptance proof for Stage 1 through `CandidateState::Evaluating` before any GitHub adapter or live system service exists.
-- Consumes: all connected runner interfaces with fake process/worker launchers and real local Git repositories.
+- Consumes: all connected runner interfaces with real `SystemProcessRunner` mission/Git subprocesses, a GitHub-shaped raw origin mapped to the temporary bare origin only by the test-owned transport wrapper, and fake runtime-provisioner/worker-launcher seams. Product code never accepts a local/file remote.
 
 - [ ] **Step 1: Add the complete failure matrix**
 
-Use real temporary bare Git origins/mirrors/independent clones and deterministic fake mission/worker processes. Cover:
+Build one matrix mapping every row below to a causal named test; reuse existing Task 1–6 unit/integration tests and add only missing scenarios—do not duplicate lower-level coverage or count assertions that never reach the named branch. Use real temporary bare Git origins/mirrors/independent clones. The vertical fixture executes its committed `scripts/opportunity-next-mission.sh` through the real `SystemProcessRunner`; only privileged runtime provisioning and OMP/systemd worker execution remain deterministic fakes.
 
 - dirty trusted checkout and stale/changed remote base;
 - malformed/hold/stale mission and two-active-mission refresh failure;
@@ -828,7 +828,7 @@ cargo clippy -p gzmo-evolver --all-targets -- -D warnings
 cargo test -p gzmo-evolver --all-targets -- --nocapture
 ```
 
-Expected: all pass. Tests may use local `file://`/filesystem Git only; no GitHub, public network, provider credentials, system services, or actual OMP process.
+Expected: all pass at default parallelism. Tests use a GitHub-shaped raw origin and a test-only exact URL rewrite to local filesystem Git; product APIs still reject `file://` and filesystem origins. No GitHub/public network, provider credentials, live system services, or actual OMP/model process. Any LockBusy fixture retry remains bounded, exact-error-only, and absent from contention assertions.
 
 - [ ] **Step 3: Run the hermetic vertical smoke**
 
@@ -838,7 +838,7 @@ Run the fixture integration test by exact name:
 cargo test -p gzmo-evolver --test repo_loop fixture_run_reaches_evaluating_without_remote_mutation -- --nocapture
 ```
 
-Expected: exactly one candidate reaches `evaluating`; its independent clone has one normalized candidate commit; trusted and remote main are unchanged; remote refs contain only main; receipt exposes no forbidden environment name; audit chain has Observed/Prepared/Building/Evaluating.
+Expected: exactly one candidate reaches `evaluating`; its independent clone has one normalized one-parent candidate commit with a nonempty bounded diff; trusted checkout and remote main are byte-identical; remote refs contain only main; the fake worker sees the exact allowed environment and no forbidden name; canonical receipt facts equal coordinator diff facts; audit states are exactly Observed/Prepared/Building/Evaluating; a repeated run performs no extra provision, launch, workspace, state, or remote mutation.
 
 The real OMP/systemd smoke is deliberately deferred to `2026-09-01-continuous-evolution-operations.md` after coordinator/worker/model system identities and the private model namespace exist. This subplan must not weaken the trust model to manufacture a live smoke.
 
