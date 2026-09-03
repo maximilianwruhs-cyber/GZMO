@@ -10,13 +10,22 @@ OUT="$DATA/opportunity-discovery"
 OPP="$ROOT/research/opportunities"
 mkdir -p "$OUT"
 
-# RFC3339 millis UTC — must fall inside MissionAdapter refresh window.
-# Prefer python for sub-second precision available on WSL/Ubuntu.
+# RFC3339 millis UTC for MissionAdapter refresh window.
+# Prefer GNU date (PATH=/usr/bin:/bin); python3 only as local fallback.
 utc_now() {
-  python3 - <<'PY'
+  if NOW="$(date -u +"%Y-%m-%dT%H:%M:%S.%3NZ" 2>/dev/null)" && [[ "$NOW" == *.*Z ]]; then
+    printf '%s\n' "$NOW"
+    return 0
+  fi
+  if command -v python3 >/dev/null 2>&1; then
+    python3 - <<'PY'
 from datetime import datetime, timezone
 print(datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z")
 PY
+    return 0
+  fi
+  echo "utc_now: need GNU date %3N or python3" >&2
+  exit 1
 }
 
 # Exactly one active bet (status: active) — two-active or zero fail closed.

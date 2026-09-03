@@ -1220,8 +1220,9 @@ impl<'a, R: ProcessRunner> GitWorkspace<'a, R> {
             ],
             GIT_DIFF_CAP_BYTES,
         )?;
-        // Git historically returned 1 for --check problems; 2.53+ returns 2.
-        // Both mean whitespace/conflict-marker issues for this exact argv.
+        // `git diff --check` (DIFF_FORMAT_CHECKDIFF) sets result bit 0x02 → exit 2 for
+        // whitespace/conflict-marker problems. Exit 1 only appears with `--exit-code`,
+        // which this argv never passes; mapping 1|2 keeps the dead 1 arm harmless.
         let whitespace_ok = match check.status {
             0 => true,
             1 | 2 => false,

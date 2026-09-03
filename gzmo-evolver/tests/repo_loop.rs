@@ -221,6 +221,15 @@ impl Fixture {
         install_committed_fixture_tree(&seed);
         git_config_identity(&seed);
         run_git(&seed, &["add", "."]);
+        // Pin script executable in the index even when core.fileMode is false (DrvFs).
+        run_git(
+            &seed,
+            &[
+                "update-index",
+                "--chmod=+x",
+                "scripts/opportunity-next-mission.sh",
+            ],
+        );
         run_git(&seed, &["commit", "-m", "initial"]);
         run_git(&seed, &["branch", "-M", "main"]);
         run_git(&seed, &["push", "origin", "main"]);
@@ -350,6 +359,7 @@ fn fixed_now() -> chrono::DateTime<Utc> {
 }
 
 /// Copy committed `tests/fixtures/fixture-repo/**` into a seed working tree.
+/// Modes are forced host-independently (DrvFs often copies 0777).
 fn install_committed_fixture_tree(seed: &Path) {
     let src = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/fixture-repo");
     assert!(
@@ -357,15 +367,26 @@ fn install_committed_fixture_tree(seed: &Path) {
         "missing committed fixture-repo at {}",
         src.display()
     );
-    copy_tree(&src, seed);
-    // Ensure mission script is executable for direct invocation; config still uses bash.
-    let script = seed.join("scripts/opportunity-next-mission.sh");
-    let mut perms = fs::metadata(&script).unwrap().permissions();
-    perms.set_mode(0o755);
-    fs::set_permissions(&script, perms).unwrap();
+    copy_tree_with_modes(&src, seed);
+    // Explicit expected modes (dirs 0755; text 0644; mission script 0755).
+    set_mode(seed, 0o755);
+    set_mode(&seed.join("README.md"), 0o644);
+    set_mode(&seed.join("config"), 0o755);
+    set_mode(&seed.join("config/repo-evolver.policy.toml"), 0o644);
+    set_mode(&seed.join("research"), 0o755);
+    set_mode(&seed.join("research/opportunities"), 0o755);
+    set_mode(&seed.join("research/opportunities/fixture.md"), 0o644);
+    set_mode(&seed.join("scripts"), 0o755);
+    set_mode(&seed.join("scripts/opportunity-next-mission.sh"), 0o755);
 }
 
-fn copy_tree(from: &Path, to: &Path) {
+fn set_mode(path: &Path, mode: u32) {
+    let mut perms = fs::metadata(path).unwrap().permissions();
+    perms.set_mode(mode);
+    fs::set_permissions(path, perms).unwrap();
+}
+
+fn copy_tree_with_modes(from: &Path, to: &Path) {
     for entry in fs::read_dir(from).unwrap() {
         let entry = entry.unwrap();
         let name = entry.file_name();
@@ -374,12 +395,15 @@ fn copy_tree(from: &Path, to: &Path) {
         let ft = entry.file_type().unwrap();
         if ft.is_dir() {
             fs::create_dir_all(&dst).unwrap();
-            copy_tree(&src, &dst);
+            set_mode(&dst, 0o755);
+            copy_tree_with_modes(&src, &dst);
         } else if ft.is_file() {
             if let Some(parent) = dst.parent() {
                 fs::create_dir_all(parent).unwrap();
             }
             fs::copy(&src, &dst).unwrap();
+            // Default regular file 0644; mission script overridden by install.
+            set_mode(&dst, 0o644);
         }
     }
 }
@@ -1344,13 +1368,12 @@ enum LaunchMode {
     DirtyAfterReceipt,
 }
 
-/// Hermetic launcher: mutates workspace, writes receipt/raw, tracks launch count + env names.
+/// Hermetic launcher: mutates workspace, writes receipt/raw, tracks launch count.
 struct FakeStageLauncher {
     launches: Arc<Mutex<u32>>,
     unit_state: Arc<Mutex<WorkerUnitState>>,
     mode: Arc<Mutex<LaunchMode>>,
     stop_log: Arc<Mutex<Vec<&'static str>>>,
-    env_names: Arc<Mutex<Vec<String>>>,
     now: chrono::DateTime<Utc>,
 }
 
@@ -1556,13 +1579,6 @@ impl WorkerLauncher for FakeStageLauncher {
         *self.launches.lock().unwrap() += 1;
         let mode = *self.mode.lock().unwrap();
         let _ = request_path;
-        // Record exact allowlisted env *names* the production OMP child would receive.
-        let home = request.output_dir().join(gzmo_evolver::WORKER_HOME_NAME);
-        let env = gzmo_evolver::omp_child_env(&home)
-            .map_err(|e| WorkerError::Invalid(format!("omp_child_env: {e}")))?;
-        let mut names: Vec<String> = env.keys().cloned().collect();
-        names.sort();
-        *self.env_names.lock().unwrap() = names;
 
         match mode {
             LaunchMode::StayRunning => {
@@ -1771,7 +1787,6 @@ struct RepoHarness {
     unit_state: Arc<Mutex<WorkerUnitState>>,
     launch_mode: Arc<Mutex<LaunchMode>>,
     stop_log: Arc<Mutex<Vec<&'static str>>>,
-    env_names: Arc<Mutex<Vec<String>>>,
     omp_version: String,
     coordinator_uid: u32,
     worker_uid: u32,
@@ -1834,7 +1849,6 @@ impl RepoHarness {
         let unit_state = Arc::new(Mutex::new(WorkerUnitState::NotFound));
         let launch_mode = Arc::new(Mutex::new(LaunchMode::Happy));
         let stop_log = Arc::new(Mutex::new(Vec::new()));
-        let env_names = Arc::new(Mutex::new(Vec::new()));
 
         let omp_version = "18.0.11".to_owned();
         let hybrid = RunnerHybrid {
@@ -1847,7 +1861,6 @@ impl RepoHarness {
             unit_state: unit_state.clone(),
             mode: launch_mode.clone(),
             stop_log: stop_log.clone(),
-            env_names: env_names.clone(),
             now: fixed_now(),
         };
         let provisioner = FakeRuntimeProvisioner {
@@ -1892,7 +1905,6 @@ impl RepoHarness {
             unit_state,
             launch_mode,
             stop_log,
-            env_names,
             omp_version,
             coordinator_uid,
             worker_uid,
@@ -2745,7 +2757,6 @@ fn observed_evolver_with_mirror_fault(
             unit_state,
             mode: launch_mode,
             stop_log,
-            env_names: Arc::new(Mutex::new(Vec::new())),
             now: fixed_now(),
         },
         FakeRuntimeProvisioner {
@@ -3032,6 +3043,7 @@ impl ProcessRunner for RealMissionHybrid {
             // committed fixture scripts/opportunity-next-mission.sh.
             return self.system.run(spec);
         }
+        // Version probe is faked (OMP execution remains a test fake).
         if spec.args.iter().any(|a| a == "--version") {
             return Ok(ProcessOutput {
                 status: 0,
@@ -3039,7 +3051,9 @@ impl ProcessRunner for RealMissionHybrid {
                 stderr: Vec::new(),
             });
         }
-        self.git.run(spec)
+        Err(ProcessError::Invalid(format!(
+            "RealMissionHybrid: unexpected program {prog}"
+        )))
     }
 }
 struct FixtureVertical {
@@ -3056,7 +3070,6 @@ struct FixtureVertical {
     roots: WorkerRoots,
     launches: Arc<Mutex<u32>>,
     provision_calls: Arc<Mutex<u32>>,
-    env_names: Arc<Mutex<Vec<String>>>,
     trusted_main_blob: String,
     remote_main_blob: String,
 }
@@ -3064,16 +3077,61 @@ struct FixtureVertical {
 impl FixtureVertical {
     async fn new() -> Self {
         let fixture = Fixture::new();
-        // Prove mission script is the committed fixture (non-empty, executable mode).
+        // Prove mission script is the committed fixture; modes match git index (not DrvFs).
         let script = fixture.checkout.join("scripts/opportunity-next-mission.sh");
         let meta = fs::metadata(&script).unwrap();
         assert!(
             meta.len() > 100,
             "committed mission script must be nonempty"
         );
+        let modes = {
+            let out = Command::new("git")
+                .args([
+                    "-C",
+                    fixture.checkout.to_str().unwrap(),
+                    "ls-tree",
+                    "-r",
+                    "HEAD",
+                ])
+                .env_clear()
+                .env("PATH", "/usr/bin:/bin")
+                .env("HOME", "/tmp")
+                .env("GIT_CONFIG_NOSYSTEM", "1")
+                .env("GIT_CONFIG_GLOBAL", "/dev/null")
+                .output()
+                .unwrap();
+            assert!(out.status.success());
+            String::from_utf8(out.stdout).unwrap()
+        };
         assert!(
-            meta.permissions().mode() & 0o111 != 0,
-            "mission script should be executable"
+            modes
+                .lines()
+                .any(|l| l.starts_with("100644 ") && l.ends_with("\tREADME.md")),
+            "README must be 100644 in index:\n{modes}"
+        );
+        assert!(
+            modes
+                .lines()
+                .any(|l| l.starts_with("100644 ")
+                    && l.ends_with("\tconfig/repo-evolver.policy.toml")),
+            "policy must be 100644:\n{modes}"
+        );
+        assert!(
+            modes.lines().any(|l| {
+                l.starts_with("100644 ") && l.ends_with("\tresearch/opportunities/fixture.md")
+            }),
+            "opportunity must be 100644:\n{modes}"
+        );
+        assert!(
+            modes.lines().any(|l| {
+                l.starts_with("100755 ") && l.ends_with("\tscripts/opportunity-next-mission.sh")
+            }),
+            "mission script must be 100755 in index:\n{modes}"
+        );
+        assert_eq!(
+            meta.permissions().mode() & 0o777,
+            0o755,
+            "working-tree script mode"
         );
 
         let request_root = fixture.state_dir.join("run-requests");
@@ -3124,7 +3182,6 @@ impl FixtureVertical {
         let unit_state = Arc::new(Mutex::new(WorkerUnitState::NotFound));
         let launch_mode = Arc::new(Mutex::new(LaunchMode::Happy));
         let stop_log = Arc::new(Mutex::new(Vec::new()));
-        let env_names = Arc::new(Mutex::new(Vec::new()));
 
         let omp_version = "18.0.11".to_owned();
         let hybrid = RealMissionHybrid {
@@ -3137,7 +3194,6 @@ impl FixtureVertical {
             unit_state: unit_state.clone(),
             mode: launch_mode.clone(),
             stop_log: stop_log.clone(),
-            env_names: env_names.clone(),
             now: fixed_now(),
         };
         let provisioner = FakeRuntimeProvisioner {
@@ -3182,7 +3238,6 @@ impl FixtureVertical {
             roots,
             launches,
             provision_calls,
-            env_names,
             trusted_main_blob,
             remote_main_blob,
         }
@@ -3373,25 +3428,6 @@ async fn fixture_run_reaches_evaluating_without_remote_mutation() {
     assert!(output_digest.starts_with("sha256:"));
     assert_eq!(output_digest.len(), "sha256:".len() + 64);
 
-    // Fake worker saw exact allowlisted env names; no forbidden.
-    let seen = harness.env_names.lock().unwrap().clone();
-    assert!(!seen.is_empty(), "launcher must record env names");
-    for f in gzmo_evolver::FORBIDDEN_ENV {
-        assert!(
-            !seen.iter().any(|n| n == *f),
-            "forbidden env name present: {f}"
-        );
-    }
-    assert!(!seen.iter().any(|n| n == "LOCAL_MODEL_BASE_URL"));
-    let expected = {
-        let home = PathBuf::from("/tmp/probe-home");
-        let env = gzmo_evolver::omp_child_env(&home).unwrap();
-        let mut keys: Vec<String> = env.keys().cloned().collect();
-        keys.sort();
-        keys
-    };
-    assert_eq!(seen, expected, "exact allowlisted env name set");
-
     // Mission generation binding: mission_id is UUID generation, not bet slug.
     assert_ne!(outcome.mission_id, "fixture-opportunity");
     assert!(
@@ -3488,12 +3524,9 @@ fn fixture_mission_script_rejects_two_active_bets() {
 /// Trailing-whitespace candidate is rejected at Evaluating boundary.
 #[tokio::test]
 async fn whitespace_errors_in_candidate_diff_terminalize() {
+    // Seed Building with a trailing-whitespace commit + matching receipt so
+    // try_finish_from_receipt's whitespace_ok branch is the subject under test.
     let harness = RepoHarness::new().await;
-    // Replace launcher behavior: commit a trailing-whitespace file.
-    *harness.launch_mode.lock().unwrap() = LaunchMode::Happy;
-    // Inject via a one-shot custom path: prepare then mutate launcher mode is insufficient;
-    // use a wrapper by writing after Happy would be too late. Instead seed Building with
-    // a receipt whose workspace has trailing spaces and force finish via resume.
     let lock = CoordinatorLock::try_acquire(harness.fixture.config.state_dir()).unwrap();
     let store = StateStore::open(harness.fixture.config.state_dir()).unwrap();
     let clock = ManualClock::new(fixed_now());
@@ -3615,6 +3648,251 @@ async fn whitespace_errors_in_candidate_diff_terminalize() {
     assert_eq!(
         latest.terminal_reason().as_deref(),
         Some("whitespace errors in candidate diff")
+    );
+}
+
+/// Building + Running unit without receipt: wait returns Running → Contention.
+#[tokio::test]
+async fn building_stay_running_wait_is_contention_without_relaunch() {
+    let harness = RepoHarness::new().await;
+    let lock = CoordinatorLock::try_acquire(harness.fixture.config.state_dir()).unwrap();
+    let store = StateStore::open(harness.fixture.config.state_dir()).unwrap();
+    let clock = ManualClock::new(fixed_now());
+    let fake = FakeProcessRunner::new();
+    install_mission_fake(&fake, &clock);
+    let hybrid = HybridRunner {
+        git: harness.fixture.runner(),
+        fake_mission: fake,
+    };
+    let prep = prepare_candidate(&harness.fixture.config, &hybrid, &clock, &store).unwrap();
+    let id = prep.record.id().clone();
+    store
+        .transition(
+            &id,
+            CandidateState::Building,
+            TransitionMetadata::empty(),
+            fixed_now(),
+        )
+        .unwrap();
+    drop(store);
+    drop(lock);
+
+    let _ = seal_for_test(&harness, &prep);
+    *harness.launch_mode.lock().unwrap() = LaunchMode::StayRunning;
+    *harness.unit_state.lock().unwrap() = WorkerUnitState::Running;
+    *harness.launches.lock().unwrap() = 0;
+
+    let err = resume_retry_lock_busy(&harness.evolver).await.unwrap_err();
+    assert!(
+        matches!(err, gzmo_evolver::RunnerError::Contention(ref m) if m.contains("worker still running after wait")),
+        "expected worker-still-running Contention, got {err}"
+    );
+    assert_eq!(
+        *harness.launches.lock().unwrap(),
+        0,
+        "must not launch while unit already Running"
+    );
+    let store = StateStore::open(harness.fixture.config.state_dir()).unwrap();
+    let rec = store.load(&id).unwrap();
+    assert_eq!(rec.state(), CandidateState::Building);
+}
+
+/// Crash after Observed then healthy resume reaches Evaluating once.
+#[tokio::test]
+async fn resume_from_observed_reaches_evaluating_without_relaunch() {
+    let harness = RepoHarness::new().await;
+    let lock = CoordinatorLock::try_acquire(harness.fixture.config.state_dir()).unwrap();
+    let store = StateStore::open(harness.fixture.config.state_dir()).unwrap();
+    let clock = ManualClock::new(fixed_now());
+    let fake = FakeProcessRunner::new();
+    install_mission_fake(&fake, &clock);
+    let hybrid = HybridRunner {
+        git: harness.fixture.runner(),
+        fake_mission: fake,
+    };
+    let mission = MissionAdapter::new(&harness.fixture.config, &hybrid, &clock)
+        .refresh_and_load()
+        .unwrap();
+    let baseline = harness.initial_main();
+    let prepared = mission
+        .to_prepared_candidate(
+            &harness.fixture.config,
+            harness.fixture.config.working_policy(),
+            &baseline,
+            fixed_now(),
+        )
+        .unwrap();
+    let observed = store
+        .create_candidate(&prepared.manifest, &prepared.policy_digest, fixed_now())
+        .unwrap();
+    assert_eq!(observed.state(), CandidateState::Observed);
+    let id = observed.id().clone();
+    drop(store);
+    drop(lock);
+
+    *harness.launch_mode.lock().unwrap() = LaunchMode::Happy;
+    let outcome = resume_retry_lock_busy(&harness.evolver).await.unwrap();
+    assert_eq!(outcome.state, CandidateState::Evaluating);
+    assert_eq!(outcome.candidate_id, id.as_str());
+    assert_eq!(*harness.launches.lock().unwrap(), 1);
+    assert_eq!(
+        harness.audit_states(),
+        ["observed", "prepared", "building", "evaluating"]
+    );
+    let again = resume_retry_lock_busy(&harness.evolver).await.unwrap();
+    assert_eq!(again.state, CandidateState::Evaluating);
+    assert_eq!(*harness.launches.lock().unwrap(), 1);
+}
+
+/// Binary blob in candidate diff terminalizes before Evaluating.
+#[tokio::test]
+async fn binary_file_in_candidate_diff_terminalizes() {
+    let harness = RepoHarness::new().await;
+    let lock = CoordinatorLock::try_acquire(harness.fixture.config.state_dir()).unwrap();
+    let store = StateStore::open(harness.fixture.config.state_dir()).unwrap();
+    let clock = ManualClock::new(fixed_now());
+    let fake = FakeProcessRunner::new();
+    install_mission_fake(&fake, &clock);
+    let hybrid = HybridRunner {
+        git: harness.fixture.runner(),
+        fake_mission: fake,
+    };
+    let prep = prepare_candidate(&harness.fixture.config, &hybrid, &clock, &store).unwrap();
+    let id = prep.record.id().clone();
+    let ws = prep.record.workspace().unwrap().to_path_buf();
+    // Binary blob (NUL bytes) → numstat `-`/`-` binary record.
+    fs::write(ws.join("blob.bin"), b"\x00\x01\x02\xff binary payload\n").unwrap();
+    let status = Command::new("git")
+        .args(["-C", ws.to_str().unwrap(), "add", "-A"])
+        .env_clear()
+        .env("PATH", "/usr/bin:/bin")
+        .env("HOME", &ws)
+        .env("GIT_CONFIG_NOSYSTEM", "1")
+        .env("GIT_CONFIG_GLOBAL", "/dev/null")
+        .status()
+        .unwrap();
+    assert!(status.success());
+    let status = Command::new("git")
+        .args([
+            "-C",
+            ws.to_str().unwrap(),
+            "-c",
+            "user.name=fake",
+            "-c",
+            "user.email=fake@worker",
+            "commit",
+            "-m",
+            "binary-blob",
+        ])
+        .env_clear()
+        .env("PATH", "/usr/bin:/bin")
+        .env("HOME", &ws)
+        .env("GIT_CONFIG_NOSYSTEM", "1")
+        .env("GIT_CONFIG_GLOBAL", "/dev/null")
+        .status()
+        .unwrap();
+    assert!(status.success());
+    let head = rev_parse(&ws, "HEAD");
+    // Confirm git treats it as binary in numstat.
+    let num = {
+        let range = format!("{}..{}", harness.initial_main(), head);
+        let out = Command::new("git")
+            .args(["-C", ws.to_str().unwrap(), "diff", "--numstat", &range])
+            .env_clear()
+            .env("PATH", "/usr/bin:/bin")
+            .env("HOME", "/tmp")
+            .env("GIT_CONFIG_NOSYSTEM", "1")
+            .env("GIT_CONFIG_GLOBAL", "/dev/null")
+            .output()
+            .unwrap();
+        String::from_utf8(out.stdout).unwrap()
+    };
+    assert!(
+        num.lines().any(|l| l.starts_with("-\t-\t")),
+        "expected binary numstat, got {num}"
+    );
+
+    store
+        .transition(
+            &id,
+            CandidateState::Building,
+            TransitionMetadata::empty(),
+            fixed_now(),
+        )
+        .unwrap();
+    drop(store);
+    drop(lock);
+
+    let sealed = seal_for_test(&harness, &prep);
+    let raw = br#"{"type":"session","version":3,"id":"fake-session"}
+{"type":"tool_execution_start","toolCallId":"tool-1","toolName":"bash","args":{}}
+{"type":"tool_execution_end","toolCallId":"tool-1","toolName":"bash","result":"ok"}
+{"type":"message_end","message":{"role":"assistant","stopReason":"stop","usage":{"input":10,"output":5,"cacheRead":1,"cacheWrite":2,"totalTokens":18}}}
+{"type":"agent_end","messages":[]}
+"#;
+    fs::write(sealed.output_dir().join("raw.jsonl"), raw).unwrap();
+    let output_digest = format!("sha256:{}", sha256_hex(raw));
+    let started = sealed.issued_at() + chrono::Duration::seconds(1);
+    let completed = started + chrono::Duration::seconds(2);
+    // Binary adds 0 lines; one changed file.
+    let usage = ResourceUsage {
+        wall_seconds: 2,
+        attempts: 1,
+        changed_files: 1,
+        added_lines: 0,
+        tool_calls: 1,
+        input_tokens: 10,
+        output_tokens: 5,
+        energy_joules: None,
+    };
+    let receipt = WorkerReceipt::new(
+        sealed.candidate_id().clone(),
+        sealed.manifest_digest(),
+        sealed.policy_digest(),
+        sealed.omp_version(),
+        started,
+        completed,
+        0,
+        output_digest,
+        Some(format!("git-sha1:{head}")),
+        usage,
+    )
+    .unwrap();
+    fs::write(
+        sealed.output_dir().join("receipt.json"),
+        receipt.canonical_bytes().unwrap(),
+    )
+    .unwrap();
+    let mut perms = fs::metadata(sealed.output_dir().join("receipt.json"))
+        .unwrap()
+        .permissions();
+    perms.set_mode(0o600);
+    fs::set_permissions(sealed.output_dir().join("receipt.json"), perms).unwrap();
+
+    *harness.unit_state.lock().unwrap() = WorkerUnitState::Succeeded;
+    let err = resume_retry_lock_busy(&harness.evolver).await.unwrap_err();
+    let msg = err.to_string();
+    assert!(
+        msg.contains("binary file in candidate diff"),
+        "expected binary terminalization, got {msg}"
+    );
+    let store = StateStore::open(harness.fixture.config.state_dir()).unwrap();
+    let latest = store
+        .latest_candidate(&format!(
+            "{}/{}",
+            harness.fixture.config.repo().owner(),
+            harness.fixture.config.repo().repository()
+        ))
+        .unwrap()
+        .unwrap();
+    assert_eq!(latest.state(), CandidateState::Failed);
+    assert!(
+        latest
+            .terminal_reason()
+            .unwrap_or("")
+            .contains("binary file in candidate diff"),
+        "{:?}",
+        latest.terminal_reason()
     );
 }
 

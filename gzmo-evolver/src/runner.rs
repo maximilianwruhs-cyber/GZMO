@@ -976,6 +976,19 @@ where
                 .fail(store, record.id(), "whitespace errors in candidate diff")
                 .map(Some);
         }
+        // Signed policy has no binary-byte budget; any binary path is hard-fail.
+        if let Some(bin) = stats.files.iter().find(|f| f.binary) {
+            return self
+                .fail(
+                    store,
+                    record.id(),
+                    &format!(
+                        "binary file in candidate diff: {}",
+                        RunnerError::bound(&bin.path)
+                    ),
+                )
+                .map(Some);
+        }
 
         let usage = receipt.usage();
         let observed_files = stats.files.len() as u32;
