@@ -109,6 +109,8 @@ pub enum WorkerError {
     Invalid(String),
     #[error("worker trust failure: {0}")]
     Trust(String),
+    #[error("worker path not found: {0}")]
+    NotFound(String),
     #[error("worker io error: {0}")]
     Io(String),
     #[error("worker process error: {0}")]
@@ -135,7 +137,11 @@ impl From<ProcessError> for WorkerError {
 
 impl From<io::Error> for WorkerError {
     fn from(value: io::Error) -> Self {
-        Self::Io(bound_reason(&value.to_string()))
+        if value.kind() == io::ErrorKind::NotFound {
+            Self::NotFound(bound_reason(&value.to_string()))
+        } else {
+            Self::Io(bound_reason(&value.to_string()))
+        }
     }
 }
 
@@ -272,7 +278,13 @@ fn current_egid() -> u32 {
 }
 
 fn lstat_system(path: &Path) -> Result<PathStat, WorkerError> {
-    let meta = fs::symlink_metadata(path).map_err(|err| WorkerError::Io(err.to_string()))?;
+    let meta = fs::symlink_metadata(path).map_err(|err| {
+        if err.kind() == io::ErrorKind::NotFound {
+            WorkerError::NotFound(bound_reason(&path.display().to_string()))
+        } else {
+            WorkerError::Io(bound_reason(&err.to_string()))
+        }
+    })?;
     let ft = meta.file_type();
     Ok(PathStat {
         uid: meta.uid(),
@@ -1270,6 +1282,20 @@ pub fn seal_worker_bundle(
         return Err(WorkerError::Trust("HOME mode must be 0700".to_owned()));
     }
 
+    // Profile runtime mount parents must already be worker-owned 0700 (never create/chmod).
+    let omp_dir = home.join(".omp");
+    let profiles_dir = omp_dir.join("profiles");
+    let profile_runtime = profiles_dir.join(&input.omp_profile);
+    let agent_runtime = profile_runtime.join("agent");
+    for (label, path) in [
+        ("HOME/.omp", omp_dir.as_path()),
+        ("HOME/.omp/profiles", profiles_dir.as_path()),
+        ("HOME/.omp/profiles/<profile>", profile_runtime.as_path()),
+        ("HOME/.omp/profiles/<profile>/agent", agent_runtime.as_path()),
+    ] {
+        require_preprovisioned_worker_runtime_dir(label, path, input.expected_uid, input.expected_gid)?;
+    }
+
     let profile_path = roots.profile_root().join(&input.omp_profile);
     validate_installed_profile_tree(&profile_path)?;
     let profile_digest = canonical_profile_tree_digest(&profile_path)?;
@@ -2232,6 +2258,39 @@ fn collect_profile_files(
     Ok(())
 }
 
+/// Seal-time real-lstat check: preprovisioned nonsymlink worker-owned 0700 dir.
+fn require_preprovisioned_worker_runtime_dir(
+    label: &str,
+    path: &Path,
+    expected_uid: u32,
+    expected_gid: u32,
+) -> Result<(), WorkerError> {
+    reject_symlink_component_path(path)?;
+    let st = match lstat_system(path) {
+        Ok(st) => st,
+        Err(WorkerError::NotFound(_)) => {
+            return Err(WorkerError::Trust(format!(
+                "{label} must be preprovisioned worker-owned 0700"
+            )));
+        }
+        Err(err) => return Err(err),
+    };
+    if st.is_symlink || !st.is_dir {
+        return Err(WorkerError::Invalid(format!(
+            "{label} must be a real preprovisioned directory"
+        )));
+    }
+    if st.uid != expected_uid || st.gid != expected_gid {
+        return Err(WorkerError::Trust(format!(
+            "{label} must be preprovisioned worker-owned"
+        )));
+    }
+    if mode_perms(st.mode) != 0o700 {
+        return Err(WorkerError::Trust(format!("{label} mode must be 0700")));
+    }
+    Ok(())
+}
+
 /// Worker-owned runtime directory under HOME (profile mount parents).
 fn require_worker_owned_runtime_dir(
     path: &Path,
@@ -2276,7 +2335,7 @@ fn require_trusted_profile_file(
     reject_symlink_component_path(path)?;
     let st = match authority.lstat(path) {
         Ok(st) => st,
-        Err(WorkerError::Io(msg)) if msg.contains("No such file") || msg.contains("not found") => {
+        Err(WorkerError::NotFound(_)) => {
             return Err(WorkerError::Trust(format!(
                 "profile config mount point missing: {}",
                 path.display()
@@ -2350,6 +2409,52 @@ fn remove_path_nofollow(path: &Path) -> Result<(), WorkerError> {
         Ok(()) => Ok(()),
         Err(_) => fs::remove_dir(path).map_err(|e| WorkerError::Io(e.to_string())),
     }
+}
+
+/// Symlink-safe wipe under profile mount root, preserving only a real `agent/` dir.
+fn clear_profile_mount_root_except_agent(mounted: &Path) -> Result<(), WorkerError> {
+    reject_symlink_component_path(mounted)?;
+    let meta = fs::symlink_metadata(mounted).map_err(|e| {
+        if e.kind() == io::ErrorKind::NotFound {
+            WorkerError::NotFound(bound_reason(&mounted.display().to_string()))
+        } else {
+            WorkerError::Io(e.to_string())
+        }
+    })?;
+    if meta.file_type().is_symlink() || !meta.is_dir() {
+        return Err(WorkerError::Trust(
+            "profile mount root must be a real directory".to_owned(),
+        ));
+    }
+
+    let kids: Vec<_> = fs::read_dir(mounted)
+        .map_err(|e| WorkerError::Io(e.to_string()))?
+        .collect::<Result<Vec<_>, _>>()
+        .map_err(|e| WorkerError::Io(e.to_string()))?;
+
+    let mut saw_agent = false;
+    for entry in kids {
+        let name = entry.file_name();
+        let path = entry.path();
+        if name == *"agent" {
+            let st = fs::symlink_metadata(&path).map_err(|e| WorkerError::Io(e.to_string()))?;
+            if st.file_type().is_symlink() || !st.is_dir() {
+                return Err(WorkerError::Trust(format!(
+                    "profile agent dir substituted or invalid: {}",
+                    path.display()
+                )));
+            }
+            saw_agent = true;
+            continue;
+        }
+        remove_path_nofollow(&path)?;
+    }
+    if !saw_agent {
+        return Err(WorkerError::Trust(
+            "profile agent dir missing under mount root".to_owned(),
+        ));
+    }
+    Ok(())
 }
 
 /// Symlink-safe wipe of prior OMP profile runtime under `agent/`, preserving config mounts.
@@ -2455,6 +2560,7 @@ fn prepare_mounted_worker_profile(
     require_trusted_profile_file(&agent.join("config.yml"), request, authority)?;
     require_trusted_profile_file(&agent.join("models.yml"), request, authority)?;
 
+    clear_profile_mount_root_except_agent(mounted)?;
     clear_agent_runtime_except_config_mounts(&agent)?;
     // Revalidate owner/mode/content/digest immediately before spawn.
     validate_mounted_worker_profile(mounted, roots, request, authority)?;
@@ -3282,10 +3388,9 @@ impl<R: ProcessRunner + Send + Sync> SystemdWorkerLauncher<R> {
         args.push("--property=ProtectKernelTunables=yes".to_owned());
         args.push("--property=ProtectKernelModules=yes".to_owned());
         args.push("--property=ProtectControlGroups=yes".to_owned());
-        args.push(format!(
-            "--property=NetworkNamespacePath={}",
-            path_to_string(self.roots.model_netns())?
-        ));
+        let netns = path_to_string(self.roots.model_netns())?;
+        validate_systemd_bind_path_component(&netns)?;
+        args.push(format!("--property=NetworkNamespacePath={netns}"));
         let request_bind = path_to_string(request_path.parent().unwrap_or(request_path))?;
         validate_systemd_bind_path_component(&request_bind)?;
         args.push(format!("--property=BindReadOnlyPaths={request_bind}"));
@@ -3308,14 +3413,12 @@ impl<R: ProcessRunner + Send + Sync> SystemdWorkerLauncher<R> {
             validate_systemd_bind_path_component(&exec_bind)?;
             args.push(format!("--property=BindReadOnlyPaths={exec_bind}"));
         }
-        args.push(format!(
-            "--property=BindPaths={}",
-            path_to_string(request.workspace())?
-        ));
-        args.push(format!(
-            "--property=BindPaths={}",
-            path_to_string(request.output_dir())?
-        ));
+        let workspace_bind = path_to_string(request.workspace())?;
+        validate_systemd_bind_path_component(&workspace_bind)?;
+        args.push(format!("--property=BindPaths={workspace_bind}"));
+        let output_bind = path_to_string(request.output_dir())?;
+        validate_systemd_bind_path_component(&output_bind)?;
+        args.push(format!("--property=BindPaths={output_bind}"));
         args.push("--property=MemoryMax=8G".to_owned());
         args.push("--property=TasksMax=128".to_owned());
         args.push(format!(
@@ -3753,12 +3856,22 @@ mod tests {
             fs::create_dir_all(&workspace).unwrap();
             let baseline = init_git_repo(&workspace);
 
-            // Preprovision worker-owned output + home as current user (test identity = real uid).
+            // Preprovision worker-owned output + home + profile runtime mount parents.
             let output_dir = output_root.join(CAND_ID);
-            fs::create_dir_all(&output_dir).unwrap();
             let home = output_dir.join(WORKER_HOME_NAME);
-            fs::create_dir_all(&home).unwrap();
-            for d in [&output_dir, &home] {
+            let omp = home.join(".omp");
+            let profiles = omp.join("profiles");
+            let profile_runtime = profiles.join("code-worker");
+            let agent_runtime = profile_runtime.join("agent");
+            for d in [
+                &output_dir,
+                &home,
+                &omp,
+                &profiles,
+                &profile_runtime,
+                &agent_runtime,
+            ] {
+                fs::create_dir_all(d).unwrap();
                 let mut perms = fs::metadata(d).unwrap().permissions();
                 perms.set_mode(0o700);
                 fs::set_permissions(d, perms).unwrap();
@@ -5401,9 +5514,10 @@ mod tests {
         let h = Harness::new();
         let req = h.seal("m");
         h.materialize_profile_mount();
-        let agent = h.mounted_profile_dir().join("agent");
+        let mounted = h.mounted_profile_dir();
+        let agent = mounted.join("agent");
 
-        // Prior runtime residue.
+        // Prior runtime residue under agent/.
         fs::write(agent.join("agent.db"), b"poison-db").unwrap();
         fs::create_dir_all(agent.join("blobs").join("x")).unwrap();
         fs::write(agent.join("blobs").join("x").join("b"), b"blob").unwrap();
@@ -5414,13 +5528,20 @@ mod tests {
         fs::create_dir_all(agent.join("cache")).unwrap();
         fs::write(agent.join("cache").join("m.sqlite"), b"cache").unwrap();
 
-        // Symlink whose target lives outside the profile tree.
+        // Root-level strays beside agent/ (validation scope requires cleanup here too).
+        fs::write(mounted.join("stray-root.txt"), b"root-file").unwrap();
+        fs::create_dir_all(mounted.join("stray-dir").join("nested")).unwrap();
+        fs::write(mounted.join("stray-dir").join("nested").join("x"), b"n").unwrap();
+
+        // Symlinks whose targets live outside the profile tree.
         let outside = h.output_dir.join("outside-secret.txt");
         fs::write(&outside, b"keep-me").unwrap();
         std::os::unix::fs::symlink(&outside, agent.join("escape.link")).unwrap();
+        let outside_root = h.output_dir.join("outside-root-secret.txt");
+        fs::write(&outside_root, b"keep-root").unwrap();
+        std::os::unix::fs::symlink(&outside_root, mounted.join("root-escape.link")).unwrap();
 
-        prepare_mounted_worker_profile(&h.mounted_profile_dir(), &h.roots, &req, &h.load_auth())
-            .unwrap();
+        prepare_mounted_worker_profile(&mounted, &h.roots, &req, &h.load_auth()).unwrap();
 
         assert!(agent.join("config.yml").is_file());
         assert!(agent.join("models.yml").is_file());
@@ -5430,15 +5551,20 @@ mod tests {
         assert!(!agent.join("tools").exists());
         assert!(!agent.join("cache").exists());
         assert!(!agent.join("escape.link").exists());
+        assert!(!mounted.join("stray-root.txt").exists());
+        assert!(!mounted.join("stray-dir").exists());
+        assert!(!mounted.join("root-escape.link").exists());
         assert_eq!(fs::read(&outside).unwrap(), b"keep-me");
+        assert_eq!(fs::read(&outside_root).unwrap(), b"keep-root");
 
-        // Repeated attempt: repollute and clear again (fresh runtime).
+        // Repeated attempt: repollute agent and mount root, clear again.
         fs::write(agent.join("agent.db"), b"again").unwrap();
         fs::create_dir_all(agent.join("cache")).unwrap();
-        prepare_mounted_worker_profile(&h.mounted_profile_dir(), &h.roots, &req, &h.load_auth())
-            .unwrap();
+        fs::write(mounted.join("again-root.txt"), b"x").unwrap();
+        prepare_mounted_worker_profile(&mounted, &h.roots, &req, &h.load_auth()).unwrap();
         assert!(!agent.join("agent.db").exists());
         assert!(!agent.join("cache").exists());
+        assert!(!mounted.join("again-root.txt").exists());
         assert!(agent.join("config.yml").is_file());
     }
 
@@ -5455,10 +5581,15 @@ mod tests {
         let err = prepare_mounted_worker_profile(&h.mounted_profile_dir(), &h.roots, &req, &auth)
             .unwrap_err();
         assert!(
-            err.to_string().contains("mount")
-                || err.to_string().contains("config")
-                || err.to_string().contains("Trust")
-                || err.to_string().contains("Io"),
+            matches!(
+                &err,
+                WorkerError::Trust(msg) if msg.starts_with("profile config mount point missing:")
+            ),
+            "expected exact missing-mount Trust, got {err}"
+        );
+        assert!(
+            err.to_string()
+                .contains("profile config mount point missing:"),
             "{err}"
         );
 
@@ -5572,6 +5703,203 @@ mod tests {
         let err = validate_code_candidate_profile(&h.profile_path).unwrap_err();
         assert!(
             err.to_string().contains("disallowed") || err.to_string().contains("hooks"),
+            "{err}"
+        );
+    }
+
+    fn sample_seal_input(h: &Harness, candidate_id: &str, output_dir: PathBuf) -> SealWorkerInput {
+        let manifest = sample_manifest(candidate_id, &h.baseline);
+        let manifest_json = canonical_json_bytes(&manifest).unwrap();
+        SealWorkerInput {
+            candidate_id: CandidateId::parse(candidate_id).unwrap(),
+            workspace: h.workspace.clone(),
+            output_dir,
+            omp_executable: h.omp_exec.clone(),
+            omp_profile: "code-worker".to_owned(),
+            omp_version: OMP_VERSION.to_owned(),
+            coordinator_uid: h.real_uid.wrapping_add(1000).max(1),
+            expected_uid: h.real_uid,
+            expected_gid: h.real_gid.max(1),
+            budget: valid_budget(),
+            issued_at: Utc::now(),
+            companions: WorkerCompanions {
+                manifest_json: manifest_json.clone(),
+                policy_toml: b"x\n".to_vec(),
+                system_prompt_md: b"s\n".to_vec(),
+                mission_md: b"m\n".to_vec(),
+                omp_overlay_yml: render_omp_overlay(PROVIDER_MODEL).into_bytes(),
+            },
+            manifest_digest: digest_bytes(&manifest_json),
+            policy_digest: format!("sha256:{}", sha256_hex(b"p")),
+        }
+    }
+
+    #[test]
+    fn seal_rejects_missing_or_wrong_mode_profile_runtime_parents() {
+        let h = Harness::new();
+        let home = h.output_dir.join(WORKER_HOME_NAME);
+        let parents = [
+            home.join(".omp"),
+            home.join(".omp").join("profiles"),
+            home.join(".omp").join("profiles").join("code-worker"),
+            home.join(".omp")
+                .join("profiles")
+                .join("code-worker")
+                .join("agent"),
+        ];
+
+        // Missing representative parent (deepest agent/) → seal-time Trust.
+        let _ = fs::remove_dir_all(parents[3].as_path());
+        let err = seal_worker_bundle(
+            &h.roots,
+            sample_seal_input(&h, CAND_ID, h.output_dir.clone()),
+        )
+        .unwrap_err();
+        assert!(
+            matches!(&err, WorkerError::Trust(_))
+                && (err.to_string().contains("preprovisioned")
+                    || err.to_string().contains("0700")
+                    || err.to_string().contains("agent")),
+            "{err}"
+        );
+
+        // Restore chain then wrong mode on .omp.
+        for d in &parents {
+            fs::create_dir_all(d).unwrap();
+            let mut perms = fs::metadata(d).unwrap().permissions();
+            perms.set_mode(0o700);
+            fs::set_permissions(d, perms).unwrap();
+        }
+        let mut perms = fs::metadata(&parents[0]).unwrap().permissions();
+        perms.set_mode(0o755);
+        fs::set_permissions(&parents[0], perms).unwrap();
+        let err = seal_worker_bundle(
+            &h.roots,
+            sample_seal_input(&h, CAND_ID, h.output_dir.clone()),
+        )
+        .unwrap_err();
+        assert!(
+            matches!(&err, WorkerError::Trust(_)) && err.to_string().contains("0700"),
+            "{err}"
+        );
+
+        // Restore mode; wrong mode on profiles/<profile>.
+        let mut perms = fs::metadata(&parents[0]).unwrap().permissions();
+        perms.set_mode(0o700);
+        fs::set_permissions(&parents[0], perms).unwrap();
+        let mut perms = fs::metadata(&parents[2]).unwrap().permissions();
+        perms.set_mode(0o750);
+        fs::set_permissions(&parents[2], perms).unwrap();
+        let err = seal_worker_bundle(
+            &h.roots,
+            sample_seal_input(&h, CAND_ID, h.output_dir.clone()),
+        )
+        .unwrap_err();
+        assert!(
+            matches!(&err, WorkerError::Trust(_)) && err.to_string().contains("0700"),
+            "{err}"
+        );
+    }
+
+    #[test]
+    fn systemd_path_properties_reject_delimiter_unsafe_components() {
+        let h = Harness::new();
+        let req = h.seal("m");
+        let path = request_path(&h);
+        let digest = |c: char| format!("sha256:{}", c.to_string().repeat(64));
+        let budget = req.budget().clone();
+        let issued = req.issued_at();
+        let deadline = req.deadline();
+
+        // Workspace with ':' must not emit malformed BindPaths.
+        let bad_ws = WorkerRequest::new(
+            req.candidate_id().clone(),
+            digest('a'),
+            digest('b'),
+            digest('c'),
+            digest('d'),
+            digest('e'),
+            digest('f'),
+            PathBuf::from("/tmp/ws:evil"),
+            req.mission_markdown().to_path_buf(),
+            req.system_prompt().to_path_buf(),
+            req.omp_config().to_path_buf(),
+            req.output_dir().to_path_buf(),
+            req.omp_executable().to_path_buf(),
+            req.omp_profile(),
+            req.profile_digest(),
+            req.omp_version(),
+            req.coordinator_uid(),
+            req.expected_uid(),
+            req.expected_gid(),
+            budget.clone(),
+            issued,
+            deadline,
+        )
+        .unwrap();
+        let launcher = SystemdWorkerLauncher::new(
+            FakeProcessRunner::new(),
+            PathBuf::from("/usr/bin/gzmo-evolver"),
+            h.roots.clone(),
+        )
+        .unwrap();
+        let err = launcher.build_systemd_run_args(&path, &bad_ws).unwrap_err();
+        assert!(
+            matches!(&err, WorkerError::Invalid(msg) if msg.contains("delimiter-unsafe")),
+            "{err}"
+        );
+
+        // Whitespace in output_dir.
+        let bad_out = WorkerRequest::new(
+            req.candidate_id().clone(),
+            digest('a'),
+            digest('b'),
+            digest('c'),
+            digest('d'),
+            digest('e'),
+            digest('f'),
+            req.workspace().to_path_buf(),
+            req.mission_markdown().to_path_buf(),
+            req.system_prompt().to_path_buf(),
+            req.omp_config().to_path_buf(),
+            PathBuf::from("/tmp/out dir"),
+            req.omp_executable().to_path_buf(),
+            req.omp_profile(),
+            req.profile_digest(),
+            req.omp_version(),
+            req.coordinator_uid(),
+            req.expected_uid(),
+            req.expected_gid(),
+            budget.clone(),
+            issued,
+            deadline,
+        )
+        .unwrap();
+        let err = launcher.build_systemd_run_args(&path, &bad_out).unwrap_err();
+        assert!(
+            matches!(&err, WorkerError::Invalid(msg) if msg.contains("delimiter-unsafe")),
+            "{err}"
+        );
+
+        // NetworkNamespacePath via roots with colon.
+        let bad_netns = h.roots.model_netns().parent().unwrap().join("net:ns");
+        fs::create_dir_all(&bad_netns).unwrap();
+        let roots = WorkerRoots::for_test(
+            h.roots.request_root().to_path_buf(),
+            h.roots.output_root().to_path_buf(),
+            h.roots.profile_root().to_path_buf(),
+            bad_netns,
+        )
+        .unwrap();
+        let launcher2 = SystemdWorkerLauncher::new(
+            FakeProcessRunner::new(),
+            PathBuf::from("/usr/bin/gzmo-evolver"),
+            roots,
+        )
+        .unwrap();
+        let err = launcher2.build_systemd_run_args(&path, &req).unwrap_err();
+        assert!(
+            matches!(&err, WorkerError::Invalid(msg) if msg.contains("delimiter-unsafe")),
             "{err}"
         );
     }
