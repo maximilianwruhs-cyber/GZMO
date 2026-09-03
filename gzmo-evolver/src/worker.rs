@@ -39,6 +39,26 @@ pub const PROD_MODEL_NETNS: &str = "/run/netns/gzmo-evolver-model";
 pub const WORKER_SAFE_PATH: &str = "/usr/bin:/bin";
 /// Loopback-only NO_PROXY value.
 pub const WORKER_NO_PROXY: &str = "127.0.0.1,localhost,::1";
+/// Exact OMP discovery-source ids disabled in the sealed overlay.
+pub const DISABLED_PROVIDERS: &[&str] = &[
+    "native",
+    "omp-plugins",
+    "claude",
+    "agent-plugins",
+    "codex",
+    "agents",
+    "claude-plugins",
+    "gemini",
+    "opencode",
+    "cursor",
+    "windsurf",
+    "cline",
+    "github",
+    "vscode",
+    "agents-md",
+    "mcp-json",
+    "ssh-json",
+];
 /// Raw OMP stdout cap (8 MiB).
 pub const OMP_OUTPUT_CAP_BYTES: usize = 8 * 1024 * 1024;
 /// Systemd helper command output cap (1 MiB).
@@ -346,6 +366,7 @@ pub struct WorkerRequest {
     output_dir: PathBuf,
     omp_executable: PathBuf,
     omp_profile: String,
+    profile_digest: String,
     omp_version: String,
     coordinator_uid: u32,
     expected_uid: u32,
@@ -373,6 +394,7 @@ struct RawWorkerRequest {
     output_dir: PathBuf,
     omp_executable: PathBuf,
     omp_profile: String,
+    profile_digest: String,
     omp_version: String,
     coordinator_uid: u32,
     expected_uid: u32,
@@ -401,6 +423,7 @@ impl<'de> Deserialize<'de> for WorkerRequest {
             output_dir: raw.output_dir,
             omp_executable: raw.omp_executable,
             omp_profile: raw.omp_profile,
+            profile_digest: raw.profile_digest,
             omp_version: raw.omp_version,
             coordinator_uid: raw.coordinator_uid,
             expected_uid: raw.expected_uid,
@@ -434,6 +457,7 @@ impl WorkerRequest {
         output_dir: PathBuf,
         omp_executable: PathBuf,
         omp_profile: impl Into<String>,
+        profile_digest: impl Into<String>,
         omp_version: impl Into<String>,
         coordinator_uid: u32,
         expected_uid: u32,
@@ -458,6 +482,7 @@ impl WorkerRequest {
             output_dir,
             omp_executable,
             omp_profile: omp_profile.into(),
+            profile_digest: profile_digest.into(),
             omp_version: omp_version.into(),
             coordinator_uid,
             expected_uid,
@@ -482,6 +507,7 @@ impl WorkerRequest {
         validate_sha256_digest("mission_digest", &self.mission_digest)?;
         validate_sha256_digest("system_prompt_digest", &self.system_prompt_digest)?;
         validate_sha256_digest("omp_config_digest", &self.omp_config_digest)?;
+        validate_sha256_digest("profile_digest", &self.profile_digest)?;
         validate_omp_version_string(&self.omp_version)?;
         validate_safe_profile(&self.omp_profile)?;
         require_absolute_utf8_normalized("workspace", &self.workspace)?;
@@ -562,6 +588,9 @@ impl WorkerRequest {
     }
     pub fn omp_profile(&self) -> &str {
         &self.omp_profile
+    }
+    pub fn profile_digest(&self) -> &str {
+        &self.profile_digest
     }
     pub fn omp_version(&self) -> &str {
         &self.omp_version
@@ -1119,9 +1148,11 @@ pub fn seal_worker_bundle(
     input: SealWorkerInput,
 ) -> Result<WorkerRequest, WorkerError> {
     roots.validate_intrinsic()?;
+    // May create/chmod only the request root (coordinator-owned staging area).
     ensure_dir_mode(roots.request_root(), 0o750)?;
-    ensure_dir_mode(roots.output_root(), 0o750)?;
-    ensure_dir_mode(roots.profile_root(), 0o755)?;
+    // output_root / profile_root must already exist; never create or chmod them.
+    verify_existing_root_dir("output_root", roots.output_root())?;
+    verify_existing_root_dir("profile_root", roots.profile_root())?;
 
     let id = input.candidate_id.as_str();
     validate_candidate_component(id)?;
@@ -1241,6 +1272,7 @@ pub fn seal_worker_bundle(
 
     let profile_path = roots.profile_root().join(&input.omp_profile);
     validate_installed_profile_tree(&profile_path)?;
+    let profile_digest = canonical_profile_tree_digest(&profile_path)?;
 
     let policy_toml_digest = digest_bytes(&input.companions.policy_toml);
     let deadline = input.issued_at + ChronoDuration::seconds(input.budget.wall_seconds as i64);
@@ -1259,6 +1291,7 @@ pub fn seal_worker_bundle(
         input.output_dir,
         input.omp_executable,
         input.omp_profile,
+        profile_digest,
         input.omp_version,
         input.coordinator_uid,
         input.expected_uid,
@@ -2072,10 +2105,16 @@ pub fn render_mission_prompt(opportunity_markdown: &str) -> Result<String, Worke
 /// Project MCP is killed via `mcp.enableProjectConfig: false`.
 /// Discovery sources are disabled via `disabledProviders`.
 pub fn render_omp_overlay(provider_model: &str) -> String {
-    // Keep key order stable for digest reproducibility.
-    format!(
-        "modelRoles:\n  code_candidate: {provider_model}\nmcp:\n  enableProjectConfig: false\ndisabledProviders:\n  - native\n  - claude\n  - codex\n  - gemini\n  - cursor\n  - windsurf\n  - continue\n  - aider\n  - openhands\n  - droid\n"
-    )
+    let mut out = String::new();
+    out.push_str("modelRoles:\n  code_candidate: ");
+    out.push_str(provider_model);
+    out.push_str("\nmcp:\n  enableProjectConfig: false\ndisabledProviders:\n");
+    for id in DISABLED_PROVIDERS {
+        out.push_str("  - ");
+        out.push_str(id);
+        out.push('\n');
+    }
+    out
 }
 
 /// Validate installed profile tree: `agent/config.yml` + `agent/models.yml`.
@@ -2083,6 +2122,121 @@ pub fn render_omp_overlay(provider_model: &str) -> String {
 /// Requires exactly one `modelRoles.code_candidate = "<provider>/<model>"`,
 /// that provider/model exists, `auth: none`, no apiKey/headers/credential fields,
 /// and an `http` base URL whose host is loopback.
+
+fn verify_existing_root_dir(name: &str, path: &Path) -> Result<(), WorkerError> {
+    require_absolute_utf8_normalized(name, path)?;
+    reject_symlink_component_path(path)?;
+    let st = lstat_system(path)?;
+    if st.is_symlink || !st.is_dir {
+        return Err(WorkerError::Trust(format!(
+            "{name} must be an existing nonsymlink directory"
+        )));
+    }
+    if mode_perms(st.mode) & 0o022 != 0 {
+        return Err(WorkerError::Trust(format!(
+            "{name} must not be group/world writable"
+        )));
+    }
+    Ok(())
+}
+
+/// Domain-separated canonical digest over the installed profile tree.
+pub fn canonical_profile_tree_digest(profile_dir: &Path) -> Result<String, WorkerError> {
+    reject_symlink_component_path(profile_dir)?;
+    let meta = fs::symlink_metadata(profile_dir).map_err(|e| WorkerError::Io(e.to_string()))?;
+    if meta.file_type().is_symlink() || !meta.is_dir() {
+        return Err(WorkerError::Trust(
+            "profile must be a real directory".to_owned(),
+        ));
+    }
+    let mut entries: Vec<(String, u32, Vec<u8>)> = Vec::new();
+    collect_profile_files(profile_dir, profile_dir, &mut entries)?;
+    entries.sort_by(|a, b| a.0.cmp(&b.0));
+    let mut preimage = Vec::new();
+    preimage.extend_from_slice(b"gzmo.profile.v1\0");
+    for (rel, mode, bytes) in entries {
+        preimage.extend_from_slice(rel.as_bytes());
+        preimage.push(0);
+        preimage.extend_from_slice(format!("{mode:o}").as_bytes());
+        preimage.push(0);
+        preimage.extend_from_slice(format!("{}", bytes.len()).as_bytes());
+        preimage.push(0);
+        preimage.extend_from_slice(&bytes);
+        preimage.push(0);
+    }
+    Ok(digest_bytes(&preimage))
+}
+
+fn collect_profile_files(
+    root: &Path,
+    dir: &Path,
+    out: &mut Vec<(String, u32, Vec<u8>)>,
+) -> Result<(), WorkerError> {
+    let mut kids: Vec<_> = fs::read_dir(dir)
+        .map_err(|e| WorkerError::Io(e.to_string()))?
+        .collect::<Result<Vec<_>, _>>()
+        .map_err(|e| WorkerError::Io(e.to_string()))?;
+    kids.sort_by_key(|e| e.file_name());
+    for entry in kids {
+        let path = entry.path();
+        let meta = fs::symlink_metadata(&path).map_err(|e| WorkerError::Io(e.to_string()))?;
+        if meta.file_type().is_symlink() {
+            return Err(WorkerError::Trust(
+                "profile tree must not contain symlinks".to_owned(),
+            ));
+        }
+        if meta.is_dir() {
+            collect_profile_files(root, &path, out)?;
+        } else if meta.is_file() {
+            let rel = path
+                .strip_prefix(root)
+                .map_err(|_| WorkerError::Trust("profile path escape".to_owned()))?
+                .to_string_lossy()
+                .replace('\\', "/");
+            if rel.is_empty() {
+                continue;
+            }
+            let bytes = read_capped_nonsymlink(&path, MAX_WORKER_FILE_BYTES)?;
+            out.push((rel, mode_perms(meta.mode()), bytes));
+        }
+    }
+    Ok(())
+}
+
+fn validate_mounted_worker_profile(
+    mounted: &Path,
+    roots: &WorkerRoots,
+    request: &WorkerRequest,
+    authority: &dyn PathAuthority,
+) -> Result<(), WorkerError> {
+    require_absolute_utf8_normalized("mounted_profile", mounted)?;
+    reject_symlink_component_path(mounted)?;
+    let st = authority.lstat(mounted)?;
+    if st.is_symlink || !st.is_dir {
+        return Err(WorkerError::Trust(
+            "mounted profile must be a real directory".to_owned(),
+        ));
+    }
+    if mode_perms(st.mode) & 0o022 != 0 {
+        return Err(WorkerError::Trust(
+            "mounted profile must not be group/world writable".to_owned(),
+        ));
+    }
+    validate_installed_profile_tree(mounted)?;
+    let actual = canonical_profile_tree_digest(mounted)?;
+    if actual != request.profile_digest() {
+        return Err(WorkerError::Trust(
+            "mounted profile_digest mismatch".to_owned(),
+        ));
+    }
+    let src = roots.profile_root().join(request.omp_profile());
+    let src_digest = canonical_profile_tree_digest(&src)?;
+    if src_digest != request.profile_digest() {
+        return Err(WorkerError::Trust("source profile_digest drift".to_owned()));
+    }
+    Ok(())
+}
+
 pub fn validate_code_candidate_profile(profile_dir: &Path) -> Result<(), WorkerError> {
     validate_installed_profile_tree(profile_dir)
 }
@@ -2114,9 +2268,11 @@ fn validate_installed_profile_tree(profile_dir: &Path) -> Result<(), WorkerError
         .ok_or_else(|| {
             WorkerError::Trust("profile missing modelRoles.code_candidate string".to_owned())
         })?;
-    // Exactly one selector: reject maps/lists.
-    if roles.len() < 1 {
-        return Err(WorkerError::Trust("profile modelRoles empty".to_owned()));
+    // Exactly one role: only code_candidate may be declared.
+    if roles.len() != 1 {
+        return Err(WorkerError::Trust(
+            "profile modelRoles must contain exactly one entry (code_candidate)".to_owned(),
+        ));
     }
     let parts: Vec<&str> = selector.splitn(2, '/').collect();
     if parts.len() != 2 || parts[0].is_empty() || parts[1].is_empty() {
@@ -2182,30 +2338,24 @@ fn reject_credential_fields(
     obj: &serde_json::Map<String, JsonValue>,
     ctx: &str,
 ) -> Result<(), WorkerError> {
+    // Exact case-insensitive equality only — never substring (maxTokens must pass).
     const FORBIDDEN: &[&str] = &[
-        "apiKey",
+        "apikey",
         "api_key",
         "headers",
+        "authheader",
+        "auth_header",
         "credential",
         "credentials",
         "token",
-        "accessKey",
+        "accesskey",
         "secret",
         "password",
         "authorization",
     ];
     for (k, v) in obj {
         let kl = k.to_ascii_lowercase();
-        if FORBIDDEN
-            .iter()
-            .any(|f| kl == f.to_ascii_lowercase() || kl.contains(&f.to_ascii_lowercase()))
-        {
-            // allow explicit null auth-related only when key is not forbidden shape with value
-            if !v.is_null() {
-                return Err(WorkerError::Trust(format!(
-                    "{ctx} contains forbidden credential field {k}"
-                )));
-            }
+        if FORBIDDEN.iter().any(|f| kl == *f) {
             return Err(WorkerError::Trust(format!(
                 "{ctx} must not declare credential field {k}"
             )));
@@ -2296,10 +2446,12 @@ fn run_worker_request_with<R: ProcessRunner>(
     }
 
     let home = request.output_dir().join(WORKER_HOME_NAME);
-    // HOME is preprovisioned worker-owned 0700; production bind-mounts the profile.
-    // Tests may materialize a read-only profile copy under HOME when not bind-mounted.
-    let profile_src = roots.profile_root().join(request.omp_profile());
-    prepare_worker_home_profile(&home, request.omp_profile(), &profile_src)?;
+    // Profile is bind-mounted read-only at HOME/.omp/profiles/<profile>. Never copy.
+    let mounted_profile = home
+        .join(".omp")
+        .join("profiles")
+        .join(request.omp_profile());
+    validate_mounted_worker_profile(&mounted_profile, roots, &request, authority)?;
 
     let probed = probe_omp_version(
         runner,
@@ -2445,50 +2597,6 @@ fn run_worker_request_with<R: ProcessRunner>(
     write_file_mode(&tmp, &receipt_bytes, 0o600)?;
     fs::rename(&tmp, &receipt_path)?;
     Ok(receipt)
-}
-
-fn prepare_worker_home_profile(home: &Path, profile: &str, src: &Path) -> Result<(), WorkerError> {
-    let dest_root = home.join(".omp").join("profiles");
-    ensure_dir_mode(&home.join(".omp"), 0o700)?;
-    ensure_dir_mode(&dest_root, 0o700)?;
-    let dest = dest_root.join(profile);
-    if dest.exists() {
-        return Ok(());
-    }
-    if src.is_dir() {
-        copy_dir_readonly(src, &dest)?;
-    } else if src.is_file() {
-        let bytes = read_capped_nonsymlink(src, MAX_WORKER_FILE_BYTES)?;
-        write_file_mode(&dest, &bytes, 0o400)?;
-    } else {
-        return Err(WorkerError::Trust("profile source missing".to_owned()));
-    }
-    Ok(())
-}
-
-fn copy_dir_readonly(src: &Path, dest: &Path) -> Result<(), WorkerError> {
-    // Create writable, populate, then freeze to read-only execute.
-    ensure_dir_mode(dest, 0o700)?;
-    for entry in fs::read_dir(src)? {
-        let entry = entry?;
-        let ft = entry.file_type()?;
-        let to = dest.join(entry.file_name());
-        if ft.is_symlink() {
-            return Err(WorkerError::Trust(
-                "profile tree must not contain symlinks".to_owned(),
-            ));
-        }
-        if ft.is_dir() {
-            copy_dir_readonly(&entry.path(), &to)?;
-        } else if ft.is_file() {
-            let bytes = read_capped_nonsymlink(&entry.path(), MAX_WORKER_FILE_BYTES)?;
-            write_file_mode(&to, &bytes, 0o400)?;
-        }
-    }
-    let mut perms = fs::metadata(dest)?.permissions();
-    perms.set_mode(0o500);
-    fs::set_permissions(dest, perms)?;
-    Ok(())
 }
 
 #[derive(Debug)]
@@ -2904,6 +3012,7 @@ impl<R: ProcessRunner + Send + Sync> SystemdWorkerLauncher<R> {
         args.push(unit);
         args.push("--no-block".to_owned());
         args.push("--service-type=exec".to_owned());
+        args.push("--property=RemainAfterExit=yes".to_owned());
         args.push(format!("--property=User={}", request.expected_uid()));
         args.push(format!("--property=Group={}", request.expected_gid()));
         args.push("--property=UMask=0077".to_owned());
@@ -2922,9 +3031,17 @@ impl<R: ProcessRunner + Send + Sync> SystemdWorkerLauncher<R> {
             "--property=BindReadOnlyPaths={}",
             path_to_string(request_path.parent().unwrap_or(request_path))?
         ));
+        let profile_src = self.roots.profile_root().join(request.omp_profile());
+        let profile_dst = request
+            .output_dir()
+            .join(WORKER_HOME_NAME)
+            .join(".omp")
+            .join("profiles")
+            .join(request.omp_profile());
         args.push(format!(
-            "--property=BindReadOnlyPaths={}",
-            path_to_string(self.roots.profile_root())?
+            "--property=BindReadOnlyPaths={}:{}",
+            path_to_string(&profile_src)?,
+            path_to_string(&profile_dst)?
         ));
         if let Some(parent) = request.omp_executable().parent() {
             args.push(format!(
@@ -3017,6 +3134,14 @@ impl<R: ProcessRunner + Send + Sync> SystemdWorkerLauncher<R> {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+enum UnitPoll {
+    Running,
+    Terminal,
+    Missing,
+    Unexpected(String),
+}
+
 #[async_trait]
 impl<R: ProcessRunner + Send + Sync> WorkerLauncher for SystemdWorkerLauncher<R> {
     async fn launch_and_wait(
@@ -3051,20 +3176,23 @@ impl<R: ProcessRunner + Send + Sync> WorkerLauncher for SystemdWorkerLauncher<R>
                 let _ = self.cleanup_unit(&unit);
                 return Err(WorkerError::Timeout);
             }
-            let out = self.run_systemctl(&["is-active".to_owned(), unit.clone()])?;
-            let text = String::from_utf8_lossy(&out.stdout).trim().to_owned();
-            match text.as_str() {
-                "active" | "activating" | "running" | "deactivating" => {
+            match self.poll_unit_state(&unit)? {
+                UnitPoll::Running => {
                     tokio::time::sleep(Duration::from_millis(50)).await;
-                    continue;
                 }
-                "inactive" | "failed" | "" => {
-                    // Terminal: read LoadState/Result/ExecMainStatus before cleanup.
+                UnitPoll::Terminal => {
                     let detail = self.read_unit_terminal_status(&unit);
                     let _ = self.cleanup_unit(&unit);
                     return detail;
                 }
-                other => {
+                UnitPoll::Missing => {
+                    self.stop_kill_verify(&unit)?;
+                    let _ = self.cleanup_unit(&unit);
+                    return Err(WorkerError::Process(format!(
+                        "unit {unit} not-found before terminal status read"
+                    )));
+                }
+                UnitPoll::Unexpected(other) => {
                     self.stop_kill_verify(&unit)?;
                     let _ = self.cleanup_unit(&unit);
                     return Err(WorkerError::Process(format!(
@@ -3077,11 +3205,54 @@ impl<R: ProcessRunner + Send + Sync> WorkerLauncher for SystemdWorkerLauncher<R>
 }
 
 impl<R: ProcessRunner + Send + Sync> SystemdWorkerLauncher<R> {
+    fn poll_unit_state(&self, unit: &str) -> Result<UnitPoll, WorkerError> {
+        let out = self.run_systemctl(&[
+            "show".to_owned(),
+            unit.to_owned(),
+            "--property=LoadState,ActiveState,SubState".to_owned(),
+        ])?;
+        let text = String::from_utf8_lossy(&out.stdout);
+        let mut load = String::new();
+        let mut active = String::new();
+        let mut sub = String::new();
+        for line in text.lines() {
+            if let Some(v) = line.strip_prefix("LoadState=") {
+                load = v.trim().to_owned();
+            } else if let Some(v) = line.strip_prefix("ActiveState=") {
+                active = v.trim().to_owned();
+            } else if let Some(v) = line.strip_prefix("SubState=") {
+                sub = v.trim().to_owned();
+            }
+        }
+        if load == "not-found" || load == "masked" {
+            return Ok(UnitPoll::Missing);
+        }
+        // RemainAfterExit keeps successful units as active/exited.
+        if active == "active" && (sub == "exited" || sub == "dead") {
+            return Ok(UnitPoll::Terminal);
+        }
+        if active == "failed" {
+            return Ok(UnitPoll::Terminal);
+        }
+        if matches!(
+            active.as_str(),
+            "active" | "activating" | "reloading" | "deactivating"
+        ) {
+            return Ok(UnitPoll::Running);
+        }
+        if active == "inactive" {
+            return Ok(UnitPoll::Terminal);
+        }
+        Ok(UnitPoll::Unexpected(format!(
+            "load={load} active={active} sub={sub}"
+        )))
+    }
+
     fn read_unit_terminal_status(&self, unit: &str) -> Result<(), WorkerError> {
         let out = self.run_systemctl(&[
             "show".to_owned(),
             unit.to_owned(),
-            "--property=LoadState,Result,ExecMainStatus".to_owned(),
+            "--property=LoadState,ActiveState,SubState,Result,ExecMainStatus".to_owned(),
         ])?;
         let text = String::from_utf8_lossy(&out.stdout);
         let mut load_state = String::new();
@@ -3116,8 +3287,8 @@ impl<R: ProcessRunner + Send + Sync> SystemdWorkerLauncher<R> {
     }
 
     fn cleanup_unit(&self, unit: &str) -> Result<(), WorkerError> {
-        let _ = self.run_systemctl(&["reset-failed".to_owned(), unit.to_owned()]);
         let _ = self.run_systemctl(&["stop".to_owned(), unit.to_owned()]);
+        let _ = self.run_systemctl(&["reset-failed".to_owned(), unit.to_owned()]);
         Ok(())
     }
 }
@@ -3233,7 +3404,7 @@ mod tests {
         .unwrap();
         fs::write(
             agent.join("models.yml"),
-            "providers:\n  local:\n    auth: none\n    baseUrl: http://127.0.0.1:9\n    models:\n      - id: code\n",
+            "providers:\n  local:\n    auth: none\n    baseUrl: http://127.0.0.1:9\n    models:\n      - id: code\n        maxTokens: 16384\n        contextWindow: 32768\n",
         )
         .unwrap();
         // Make tree not group/world writable.
@@ -3537,6 +3708,51 @@ mod tests {
             seal_worker_bundle(&self.roots, input).unwrap()
         }
 
+        fn materialize_profile_mount(&self) {
+            let dest = self
+                .output_dir
+                .join(WORKER_HOME_NAME)
+                .join(".omp")
+                .join("profiles")
+                .join("code-worker");
+            if dest.exists() {
+                let _ = fs::remove_dir_all(&dest);
+            }
+            fs::create_dir_all(dest.parent().unwrap()).unwrap();
+            // Copy profile tree (simulates systemd bind source contents at dest).
+            fn copy_tree(src: &Path, dst: &Path) {
+                fs::create_dir_all(dst).unwrap();
+                for e in fs::read_dir(src).unwrap() {
+                    let e = e.unwrap();
+                    let to = dst.join(e.file_name());
+                    if e.file_type().unwrap().is_dir() {
+                        copy_tree(&e.path(), &to);
+                    } else {
+                        fs::copy(e.path(), &to).unwrap();
+                    }
+                }
+            }
+            copy_tree(&self.profile_path, &dest);
+            // Ensure not group/world writable.
+            for walk in [dest.clone()] {
+                let mut stack = vec![walk];
+                while let Some(d) = stack.pop() {
+                    let meta = fs::symlink_metadata(&d).unwrap();
+                    let mut perms = meta.permissions();
+                    if meta.is_dir() {
+                        perms.set_mode(0o755);
+                        fs::set_permissions(&d, perms).unwrap();
+                        for e in fs::read_dir(&d).unwrap() {
+                            stack.push(e.unwrap().path());
+                        }
+                    } else {
+                        perms.set_mode(0o644);
+                        fs::set_permissions(&d, perms).unwrap();
+                    }
+                }
+            }
+        }
+
         fn load_auth(&self) -> TestPathAuthority {
             let worker_uid = self.real_uid;
             let coordinator_uid = self.real_uid.wrapping_add(1000).max(1);
@@ -3633,6 +3849,7 @@ mod tests {
             "output_dir": "/tmp/out",
             "omp_executable": "/tmp/omp",
             "omp_profile": "code-worker",
+            "profile_digest": digest('9'),
             "omp_version": OMP_VERSION,
             "coordinator_uid": 1000,
             "expected_uid": 2000,
@@ -3663,6 +3880,7 @@ mod tests {
             PathBuf::from("/tmp/out"),
             PathBuf::from("/tmp/omp"),
             "code-worker",
+            format!("sha256:{}", "a".repeat(64)),
             OMP_VERSION,
             1000,
             2000,
@@ -3687,6 +3905,7 @@ mod tests {
             PathBuf::from("/tmp/out"),
             PathBuf::from("/tmp/omp"),
             "code-worker",
+            format!("sha256:{}", "a".repeat(64)),
             OMP_VERSION,
             1000,
             2000,
@@ -3767,6 +3986,7 @@ mod tests {
             PathBuf::from("/out/c"),
             PathBuf::from("/usr/local/bin/omp"),
             "code-worker",
+            format!("sha256:{}", "a".repeat(64)),
             OMP_VERSION,
             1000,
             2000,
@@ -3825,30 +4045,20 @@ mod tests {
                 .and_then(|x| x.as_bool()),
             Some(false)
         );
-        let disabled = v
+        let disabled: Vec<String> = v
             .get("disabledProviders")
             .and_then(|x| x.as_array())
-            .unwrap();
-        for id in [
-            "native",
-            "claude",
-            "codex",
-            "gemini",
-            "cursor",
-            "windsurf",
-            "continue",
-            "aider",
-            "openhands",
-            "droid",
-        ] {
-            assert!(
-                disabled.iter().any(|x| x.as_str() == Some(id)),
-                "missing {id}"
-            );
-        }
-        // No invented keys
+            .unwrap()
+            .iter()
+            .map(|x| x.as_str().unwrap().to_owned())
+            .collect();
+        let expected: Vec<String> = DISABLED_PROVIDERS.iter().map(|s| (*s).to_owned()).collect();
+        assert_eq!(disabled, expected);
         assert!(v.get("disableProjectMcp").is_none());
         assert!(v.get("persistSession").is_none());
+        assert!(!disabled
+            .iter()
+            .any(|x| { matches!(x.as_str(), "continue" | "aider" | "openhands" | "droid") }));
     }
 
     #[test]
@@ -3889,10 +4099,36 @@ mod tests {
         .unwrap();
         assert!(validate_code_candidate_profile(&p3).is_err());
 
-        // Happy
+        // Extra roles rejected
         let p4 = tmp.path().join("p4");
         write_valid_profile(&p4);
-        validate_code_candidate_profile(&p4).unwrap();
+        fs::write(
+            p4.join("agent/config.yml"),
+            "modelRoles:
+  code_candidate: local/code
+  default: local/code
+",
+        )
+        .unwrap();
+        assert!(validate_code_candidate_profile(&p4).is_err());
+
+        // apiKey rejected; maxTokens accepted on happy path
+        let p5 = tmp.path().join("p5");
+        write_valid_profile(&p5);
+        validate_code_candidate_profile(&p5).unwrap();
+        fs::write(
+            p5.join("agent/models.yml"),
+            "providers:
+  local:
+    auth: none
+    baseUrl: http://127.0.0.1:9
+    apiKey: secret
+    models:
+      - id: code
+",
+        )
+        .unwrap();
+        assert!(validate_code_candidate_profile(&p5).is_err());
     }
 
     #[test]
@@ -4104,6 +4340,7 @@ mod tests {
         let h = Harness::new();
         assert!(h.fake_worker_src.is_file(), "fixture must exist");
         let req = h.seal("mission");
+        h.materialize_profile_mount();
         let path = request_path(&h);
         let runner = FakeProcessRunner::new();
         let omp = h.omp_exec.clone();
@@ -4224,6 +4461,7 @@ mod tests {
     fn nonzero_exit_and_over_budget_fail() {
         let h = Harness::new();
         let _ = h.seal("m");
+        h.materialize_profile_mount();
         let path = request_path(&h);
         let runner = FakeProcessRunner::new();
         let omp = h.omp_exec.clone();
@@ -4280,7 +4518,6 @@ mod tests {
         let req = h.seal("m");
         let path = request_path(&h);
 
-        // deactivating then inactive success
         let runner = FakeProcessRunner::new();
         let calls: Arc<Mutex<Vec<Vec<String>>>> = Arc::new(Mutex::new(Vec::new()));
         let calls2 = calls.clone();
@@ -4292,7 +4529,13 @@ mod tests {
             calls2.lock().unwrap().push(args);
             let prog = spec.program.display().to_string();
             if prog.ends_with("systemd-run") {
+                assert!(spec.args.iter().any(|a| a == "--property=RemainAfterExit=yes"));
                 assert!(!spec.args.iter().any(|a| a == "--collect"));
+                assert!(
+                    spec.args
+                        .iter()
+                        .any(|a| a.contains("BindReadOnlyPaths=") && a.contains(':'))
+                );
                 return Ok(ProcessOutput {
                     status: 0,
                     stdout: vec![],
@@ -4300,26 +4543,43 @@ mod tests {
                 });
             }
             if prog.ends_with("systemctl") {
-                if spec.args.first().map(String::as_str) == Some("is-active") {
-                    let mut p = phase2.lock().unwrap();
-                    *p += 1;
-                    if *p == 1 {
+                if spec.args.first().map(String::as_str) == Some("show") {
+                    let props = spec
+                        .args
+                        .iter()
+                        .find(|a| a.starts_with("--property="))
+                        .cloned()
+                        .unwrap_or_default();
+                    if props.contains("ActiveState") && !props.contains("Result") {
+                        let mut p = phase2.lock().unwrap();
+                        *p += 1;
+                        if *p == 1 {
+                            return Ok(ProcessOutput {
+                                status: 0,
+                                stdout: b"LoadState=loaded\nActiveState=active\nSubState=running\n"
+                                    .to_vec(),
+                                stderr: vec![],
+                            });
+                        }
+                        if *p == 2 {
+                            return Ok(ProcessOutput {
+                                status: 0,
+                                stdout:
+                                    b"LoadState=loaded\nActiveState=deactivating\nSubState=stop\n"
+                                        .to_vec(),
+                                stderr: vec![],
+                            });
+                        }
                         return Ok(ProcessOutput {
                             status: 0,
-                            stdout: b"deactivating\n".to_vec(),
+                            stdout: b"LoadState=loaded\nActiveState=active\nSubState=exited\n"
+                                .to_vec(),
                             stderr: vec![],
                         });
                     }
                     return Ok(ProcessOutput {
-                        status: 3,
-                        stdout: b"inactive\n".to_vec(),
-                        stderr: vec![],
-                    });
-                }
-                if spec.args.first().map(String::as_str) == Some("show") {
-                    return Ok(ProcessOutput {
                         status: 0,
-                        stdout: b"LoadState=loaded\nResult=success\nExecMainStatus=0\n".to_vec(),
+                        stdout: b"LoadState=loaded\nActiveState=active\nSubState=exited\nResult=success\nExecMainStatus=0\n".to_vec(),
                         stderr: vec![],
                     });
                 }
@@ -4342,11 +4602,11 @@ mod tests {
         )
         .unwrap();
         let args = launcher.build_systemd_run_args(&path, &req).unwrap();
+        assert!(args.contains(&"--property=RemainAfterExit=yes".to_owned()));
         assert!(!args.iter().any(|a| a == "--collect"));
-        assert!(args.contains(&"--no-block".to_owned()));
         assert!(args
             .iter()
-            .any(|a| a.starts_with("--property=NetworkNamespacePath=")));
+            .any(|a| a.starts_with("--property=BindReadOnlyPaths=") && a.contains(':')));
 
         let rt = tokio::runtime::Builder::new_current_thread()
             .enable_all()
@@ -4355,7 +4615,6 @@ mod tests {
         rt.block_on(launcher.launch_and_wait(&path, &req, &h.roots))
             .unwrap();
         let logged = calls.lock().unwrap().clone();
-        // deactivating must not trigger stop/kill
         assert!(!logged.iter().any(|c| c.iter().any(|a| a == "kill")));
 
         // Failed unit
@@ -4369,21 +4628,26 @@ mod tests {
                     stderr: vec![],
                 });
             }
-            if prog.ends_with("systemctl") {
-                if spec.args.first().map(String::as_str) == Some("is-active") {
-                    return Ok(ProcessOutput {
-                        status: 3,
-                        stdout: b"failed\n".to_vec(),
-                        stderr: vec![],
-                    });
-                }
-                if spec.args.first().map(String::as_str) == Some("show") {
+            if prog.ends_with("systemctl") && spec.args.first().map(String::as_str) == Some("show")
+            {
+                let props = spec
+                    .args
+                    .iter()
+                    .find(|a| a.starts_with("--property="))
+                    .cloned()
+                    .unwrap_or_default();
+                if props.contains("Result") {
                     return Ok(ProcessOutput {
                         status: 0,
-                        stdout: b"LoadState=loaded\nResult=exit-code\nExecMainStatus=1\n".to_vec(),
+                        stdout: b"LoadState=loaded\nActiveState=failed\nSubState=failed\nResult=exit-code\nExecMainStatus=1\n".to_vec(),
                         stderr: vec![],
                     });
                 }
+                return Ok(ProcessOutput {
+                    status: 0,
+                    stdout: b"LoadState=loaded\nActiveState=failed\nSubState=failed\n".to_vec(),
+                    stderr: vec![],
+                });
             }
             Ok(ProcessOutput {
                 status: 0,
@@ -4405,7 +4669,43 @@ mod tests {
             "{err}"
         );
 
-        // Timeout stop+kill
+        // not-found
+        let runner_nf = FakeProcessRunner::new();
+        runner_nf.set_handler(move |spec| {
+            let prog = spec.program.display().to_string();
+            if prog.ends_with("systemd-run") {
+                return Ok(ProcessOutput {
+                    status: 0,
+                    stdout: vec![],
+                    stderr: vec![],
+                });
+            }
+            if prog.ends_with("systemctl") && spec.args.first().map(String::as_str) == Some("show")
+            {
+                return Ok(ProcessOutput {
+                    status: 0,
+                    stdout: b"LoadState=not-found\nActiveState=inactive\nSubState=dead\n".to_vec(),
+                    stderr: vec![],
+                });
+            }
+            Ok(ProcessOutput {
+                status: 0,
+                stdout: b"inactive\n".to_vec(),
+                stderr: vec![],
+            })
+        });
+        let launcher_nf = SystemdWorkerLauncher::new(
+            runner_nf,
+            PathBuf::from("/usr/bin/gzmo-evolver"),
+            h.roots.clone(),
+        )
+        .unwrap();
+        let err = rt
+            .block_on(launcher_nf.launch_and_wait(&path, &req, &h.roots))
+            .unwrap_err();
+        assert!(err.to_string().contains("not-found"), "{err}");
+
+        // Timeout
         let runner3 = FakeProcessRunner::new();
         let calls3: Arc<Mutex<Vec<Vec<String>>>> = Arc::new(Mutex::new(Vec::new()));
         let c3 = calls3.clone();
@@ -4414,7 +4714,7 @@ mod tests {
             args.extend(spec.args.clone());
             c3.lock().unwrap().push(args);
             if spec.program.display().to_string().ends_with("systemctl")
-                && spec.args.first().map(String::as_str) == Some("is-active")
+                && spec.args.first().map(String::as_str) == Some("show")
             {
                 let killed = c3
                     .lock()
@@ -4423,14 +4723,14 @@ mod tests {
                     .any(|c| c.iter().any(|a| a == "kill") || c.iter().any(|a| a == "stop"));
                 if killed {
                     return Ok(ProcessOutput {
-                        status: 3,
-                        stdout: b"inactive\n".to_vec(),
+                        status: 0,
+                        stdout: b"LoadState=loaded\nActiveState=inactive\nSubState=dead\n".to_vec(),
                         stderr: vec![],
                     });
                 }
                 return Ok(ProcessOutput {
                     status: 0,
-                    stdout: b"active\n".to_vec(),
+                    stdout: b"LoadState=loaded\nActiveState=active\nSubState=running\n".to_vec(),
                     stderr: vec![],
                 });
             }
@@ -4466,6 +4766,7 @@ mod tests {
             req.output_dir().to_path_buf(),
             req.omp_executable().to_path_buf(),
             req.omp_profile().to_owned(),
+            req.profile_digest().to_owned(),
             req.omp_version().to_owned(),
             req.coordinator_uid(),
             req.expected_uid(),
@@ -4484,7 +4785,6 @@ mod tests {
         assert!(logged.iter().any(|c| c.iter().any(|a| a == "kill")));
     }
 
-    #[test]
     fn receipt_validate_against_requires_zero_and_head() {
         let digest = |c: char| format!("sha256:{}", c.to_string().repeat(64));
         let issued = Utc.with_ymd_and_hms(2026, 9, 1, 12, 0, 0).unwrap();
@@ -4503,6 +4803,7 @@ mod tests {
             PathBuf::from("/out/c"),
             PathBuf::from("/bin/omp"),
             "code-worker",
+            format!("sha256:{}", "a".repeat(64)),
             OMP_VERSION,
             1000,
             2000,
@@ -4651,6 +4952,74 @@ mod tests {
         .unwrap_err();
         assert!(
             err.to_string().contains("protected") || err.to_string().contains("Trust"),
+            "{err}"
+        );
+    }
+
+    #[test]
+    fn seal_rejects_group_writable_output_root() {
+        let h = Harness::new();
+        let mut perms = fs::metadata(h.roots.output_root()).unwrap().permissions();
+        perms.set_mode(0o775);
+        fs::set_permissions(h.roots.output_root(), perms).unwrap();
+        let manifest = sample_manifest(CAND_ID, &h.baseline);
+        let manifest_json = canonical_json_bytes(&manifest).unwrap();
+        let issued = Utc::now();
+        let input = SealWorkerInput {
+            candidate_id: CandidateId::parse(CAND_ID).unwrap(),
+            workspace: h.workspace.clone(),
+            output_dir: h.output_dir.clone(),
+            omp_executable: h.omp_exec.clone(),
+            omp_profile: "code-worker".to_owned(),
+            omp_version: OMP_VERSION.to_owned(),
+            coordinator_uid: h.real_uid.wrapping_add(1000).max(1),
+            expected_uid: h.real_uid,
+            expected_gid: h.real_gid.max(1),
+            budget: valid_budget(),
+            issued_at: issued,
+            companions: WorkerCompanions {
+                manifest_json: manifest_json.clone(),
+                policy_toml: b"x\n".to_vec(),
+                system_prompt_md: b"s\n".to_vec(),
+                mission_md: b"m\n".to_vec(),
+                omp_overlay_yml: render_omp_overlay(PROVIDER_MODEL).into_bytes(),
+            },
+            manifest_digest: digest_bytes(&manifest_json),
+            policy_digest: format!("sha256:{}", sha256_hex(b"p")),
+        };
+        let err = seal_worker_bundle(&h.roots, input).unwrap_err();
+        assert!(
+            err.to_string().contains("writable") || err.to_string().contains("Trust"),
+            "{err}"
+        );
+    }
+
+    #[test]
+    fn poisoned_mounted_profile_is_rejected() {
+        let h = Harness::new();
+        let _req = h.seal("m");
+        h.materialize_profile_mount();
+        let dest = h
+            .output_dir
+            .join(WORKER_HOME_NAME)
+            .join(".omp")
+            .join("profiles")
+            .join("code-worker")
+            .join("agent")
+            .join("models.yml");
+        fs::write(
+            &dest,
+            "providers:\n  local:\n    auth: none\n    baseUrl: http://example.com:9\n    models:\n      - id: code\n",
+        )
+        .unwrap();
+        let path = request_path(&h);
+        let runner = FakeProcessRunner::new();
+        let err = run_worker_request_with(&path, &h.roots, &h.load_auth(), &runner).unwrap_err();
+        assert!(
+            err.to_string().contains("loopback")
+                || err.to_string().contains("profile")
+                || err.to_string().contains("Trust")
+                || err.to_string().contains("digest"),
             "{err}"
         );
     }
