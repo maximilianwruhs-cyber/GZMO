@@ -703,13 +703,17 @@ git commit -m "feat: run bounded OMP candidate workers"
 
 **Files:**
 - Create: `gzmo-evolver/src/runner.rs`
+- Modify: `gzmo-evolver/src/mission.rs`
+- Modify: `gzmo-evolver/src/git.rs`
+- Modify: `gzmo-evolver/src/state.rs`
+- Modify: `gzmo-evolver/src/worker.rs`
 - Modify: `gzmo-evolver/src/lib.rs`
 - Modify: `gzmo-evolver/src/main.rs`
 - Modify: `gzmo-evolver/tests/repo_loop.rs`
 
 **Interfaces:**
-- Produces: `RepoEvolver::run_once()` / `resume()` ending at `CandidateState::Evaluating`, plus `abort()` and structured status.
-- Consumes: coordinator lock/state, mission, trusted policy, Git repository/independent workspace, worker launcher/request/receipt.
+- Produces: `RepoEvolver::run_once()` / `resume()` ending at `CandidateState::Evaluating`, `abort()`, one structured status, `GitRepository::open_or_prepare_workspace`, and worker launch/status/wait/stop/provision seams.
+- Consumes: coordinator lock/state, immutable mission generation, trusted baseline policy, Git repository/independent workspace, sealed worker runtime, launcher/request/receipt.
 
 - [ ] **Step 1: Write the vertical state/audit test**
 
@@ -735,46 +739,48 @@ Expected: FAIL because coordinator does not exist.
 
 - [ ] **Step 3: Implement the exact new-candidate sequence**
 
-`run_once` holds `CoordinatorLock` for the complete mutation. With no active candidate:
+`run_once` holds `CoordinatorLock` for the complete mutation. It first validates state/audit and returns/resumes any active candidate. With none, it calls the existing active-first `prepare_candidate` flow rather than duplicating it; that flow refreshes the mirror, requires clean checkout HEAD/baseline policy match, then refreshes the mission and creates the Observed/Prepared candidate. Change `Mission::to_prepared_candidate` so `manifest.mission_id` is the immutable mission generation UUID (candidate ID still carries the bet slug), and add `MissionAdapter::load_generation(id)`; every later stage reloads exactly that generation, never `CURRENT`.
 
-1. refresh and validate mission;
-2. refresh mirror and resolve exact remote baseline;
-3. read `config/repo-evolver.policy.toml` from that baseline, parse/validate it, and verify target config;
-4. create `PreparedCandidate` and atomically insert `Observed` + audit;
-5. create independent workspace and transition `Observed → Prepared` with immutable workspace metadata;
-6. render/seal WorkerRequest and transition `Prepared → Building` before launch;
-7. launch/wait for worker; independently validate receipt/workspace, squash candidate, check bounded diff;
-8. transition `Building → Evaluating` with immutable `git-sha1:` candidate digest and receipt digest;
-9. stop. This plan never evaluates quality, pushes, opens a PR, or advances past Evaluating.
+For a newly Prepared candidate:
 
-Every transition is state+audit atomic. A failure before candidate creation returns an error without state. A failure after creation transitions to `Failed` with a bounded reason when legal; if the database transition itself fails, preserve artifacts and return a recovery-required error.
+1. revalidate audit, manifest, exact baseline policy bytes/digest, mission generation/content digest, and independent workspace;
+2. resolve the fixed operations-installed worker UID/GID and invoke `WorkerRuntimeProvisioner` for `gzmo-evolver-worker-runtime@<candidate-id>.service`; this fixed unit may create only the six Task-5 output/HOME/runtime directories under the fixed output root as the fixed worker identity—no caller-supplied path/user/property—and must report successful terminal status; Task-5 seal then real-lstat revalidates every path;
+3. probe/validate the installed profile and OMP v18 executable, render the trusted system prompt/separate user mission/strict overlay, and seal or fully validate the deterministic request bundle without overwriting it;
+4. transition `Prepared → Building` before any worker launch;
+5. launch/wait; independently load and validate receipt/raw output/workspace HEAD/branch/diff facts and budget;
+6. normalize hostile worker history with an idempotent Git operation: use `receipt.completed_at` as the fixed UTC commit timestamp; if HEAD is already the exact one-parent normalized commit with expected tree/parent/identity/message/date, reuse it, otherwise validate and squash once via commit-tree/CAS;
+7. re-run bounded diff/path/budget checks and require receipt changed-files/added-lines/head facts to equal coordinator observations;
+8. transition `Building → Evaluating` atomically with immutable `git-sha1:` candidate digest plus canonical receipt JSON/`sha256:` digest, then stop. Never evaluate quality, push, open a PR, or advance past Evaluating.
+
+Every transition is state+audit atomic. Before candidate creation, failure leaves no state. After creation, deterministic content/trust failure transitions to `Failed` with a bounded reason when legal; transient provisioner/mirror lease contention leaves the persisted resumable state unchanged. A failed database transition preserves artifacts and returns an explicit recovery-required error.
+
 
 - [ ] **Step 4: Implement idempotent resume by persisted state**
 
-- `Observed`: recreate/verify baseline and policy, then prepare one workspace.
-- `Prepared`: verify workspace/baseline/branch/digests, seal request, transition to Building, launch.
-- `Building`: if a valid receipt exists, continue verification/squash; if the worker unit is active, wait within remaining deadline; otherwise transition Failed with `worker_lost_without_receipt`.
+- `Observed`: refresh current baseline and policy, require they still equal the manifest, reload the immutable mission generation, then `open_or_prepare_workspace`; an exact already-published baseline workspace is reused, any ambiguous/corrupt path fails closed.
+- `Prepared`: open/revalidate the recorded workspace and immutable mission/baseline policy; provision runtime; seal or validate the deterministic request; transition Building; launch.
+- `Building`: validate the sealed request against record/mission/policy/workspace. If a valid receipt exists, continue without relaunch. Otherwise inspect the exact worker unit: Running waits only to the persisted deadline; Succeeded without receipt or Failed/NotFound becomes `worker_lost_without_receipt`; never start a second unit from Building.
+- Crash after squash is idempotent: recognize the exact normalized commit using receipt time and continue the single state transition rather than resquashing.
 - `Evaluating`: return the existing outcome unchanged; the next plan owns evaluation.
-- terminal states: return unchanged and create nothing.
-- `ReviewReady|PromotionPending|Soaking`: refuse because those states belong to a later installed stage, not this runner version.
+- terminal latest candidate on explicit `resume`: return unchanged and create nothing. `ReviewReady|PromotionPending|Soaking` refuse as later-stage states. `run_once` may create a new candidate only when no active candidate exists.
 
-Never rerun a completed worker or overwrite workspace/policy/candidate digests. Revalidate audit chain before any resume action.
+Extend `WorkerLauncher` with typed `inspect`, `wait_existing`, and `stop`; unit states are `NotFound|Running|Succeeded|Failed` and never inferred from receipt presence. Extend StateStore with validated `latest_candidate(repository)` for status/resume. Never overwrite workspace/policy/mission/request/candidate/receipt digests. Revalidate the full audit chain before every resume action. Exclusive CoordinatorLock and Task-5 WorkerLease are the single-writer basis for path-based runtime cleanup; no worker child may exist while cleanup runs.
 
 - [ ] **Step 5: Implement explicit abort without deletion**
 
-`abort <candidate-id> --reason <text>` acquires the lock, validates audit/state, transitions any legal nonterminal pre-evaluation state to Failed, requests worker-unit stop if Building, and preserves workspace/request/receipt/raw output. `abort` cannot alter Evaluating or later states in this subplan; future plan supplies review lifecycle controls. Cleanup remains a separate trusted method with terminal checks.
+`abort <candidate-id> --reason <text>` acquires the lock, validates audit/state and exact id, and for Building first requests stop/kill and verifies the unit inactive before atomically transitioning a legal pre-evaluation state to Failed. Observed/Prepared transition directly. It preserves workspace/request/receipt/raw output and never invokes cleanup. Abort cannot alter Evaluating or later states; future review lifecycle owns them. Empty/oversized reasons reject before side effects; a stop or database failure returns recovery-required with artifacts preserved.
 
 - [ ] **Step 6: Implement one structured status model**
 
-`gzmo.repo_evolver.status/v1` includes repository, mission/candidate ID, state, baseline/candidate/policy/manifest/receipt digests, budget max/used/remaining, workspace, worker state/deadline, last audit sequence/hash, terminal reason, and exact next allowed action. Human output derives from this struct. Use algorithm-qualified digest field names; do not expose raw logs, mission body, environment, or credentials.
+Replace the earlier partial status with one serializable `gzmo.repo_evolver.status/v1` model built read-only from `latest_candidate`, verified audit, parsed persisted receipt, and typed worker-unit inspection. It includes repository, mission generation/candidate ID, state, baseline/candidate/policy/manifest/receipt digests, budget max/used/remaining (unknown remains null, never zero), workspace, worker state/deadline, last audit sequence/hash, terminal reason, and one exact next allowed action. Human output derives only from this model. Do not expose raw logs, mission body, environment, or credentials.
 
-Add public CLI commands `run`, `resume`, and `abort`; retain `config-check`, `status`, `refresh`, `prepare`, and hidden `worker`. Every command supports `--json` where output exists. No placeholder command remains.
+Add public CLI commands `run`, `resume`, and `abort`; retain `config-check`, `status`, `refresh`, `prepare`, and hidden `worker`. Every command with output supports `--json`. No placeholder command remains. Production construction uses the fixed systemd provisioner/launcher and fixed worker account; hermetic tests define their own fakes outside the product library.
 
 - [ ] **Step 7: Run all runner tests**
 
-Run: `cargo test -p gzmo-evolver --all-targets`
+Run: `cargo test -p gzmo-evolver runner -- --nocapture && cargo test -p gzmo-evolver --test repo_loop one_run_stops -- --nocapture`
 
-Expected: PASS for exact audit sequence, each crash boundary/resume path, worker-lost/receipt paths, repeated run idempotence, terminal handling, abort preservation, lock race, and no remote/trusted-checkout mutation.
+Expected: PASS for exact audit sequence, mission-generation binding, runtime provision-before-seal, every crash boundary/resume state, sealed-request reuse, worker Running/Succeeded/Failed/NotFound and receipt paths, no duplicate launch, post-squash resume, repeated run idempotence, terminal/later-state handling, abort stop-before-state and artifact preservation, status null-vs-zero semantics, coordinator/worker lock races, and no remote/trusted-checkout mutation.
 
 - [ ] **Step 8: Commit**
 
