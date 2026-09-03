@@ -19,7 +19,7 @@ use gzmo_evolver::{
     GIT_OUTPUT_CAP_BYTES, GIT_TIMEOUT_SECS, MIRROR_LOCK_NAME, MISSION_STAGING_DIR, NO_FETCH_URL,
     NO_PUSH_URL, WORKSPACES_DIR,
 };
-use std::fs::{self, File, OpenOptions};
+use std::fs::{self, OpenOptions};
 use std::os::unix::fs::OpenOptionsExt;
 use std::path::{Path, PathBuf};
 use std::process::Command;
@@ -217,11 +217,8 @@ impl Fixture {
             root.path(),
             &["clone", origin.to_str().unwrap(), seed.to_str().unwrap()],
         );
-        fs::create_dir_all(seed.join("config")).unwrap();
-        fs::create_dir_all(seed.join("scripts")).unwrap();
-        fs::write(seed.join("config/repo-evolver.policy.toml"), POLICY_TOML).unwrap();
-        fs::write(seed.join("README.md"), "hello evolver\n").unwrap();
-        File::create(seed.join("scripts/opportunity-next-mission.sh")).unwrap();
+        // Deterministic tree from committed fixture-repo/ (no ambient scripts).
+        install_committed_fixture_tree(&seed);
         git_config_identity(&seed);
         run_git(&seed, &["add", "."]);
         run_git(&seed, &["commit", "-m", "initial"]);
@@ -350,6 +347,41 @@ fn rev_parse(repo: &Path, rev: &str) -> String {
 
 fn fixed_now() -> chrono::DateTime<Utc> {
     Utc.with_ymd_and_hms(2026, 9, 1, 12, 0, 0).unwrap()
+}
+
+/// Copy committed `tests/fixtures/fixture-repo/**` into a seed working tree.
+fn install_committed_fixture_tree(seed: &Path) {
+    let src = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/fixture-repo");
+    assert!(
+        src.is_dir(),
+        "missing committed fixture-repo at {}",
+        src.display()
+    );
+    copy_tree(&src, seed);
+    // Ensure mission script is executable for direct invocation; config still uses bash.
+    let script = seed.join("scripts/opportunity-next-mission.sh");
+    let mut perms = fs::metadata(&script).unwrap().permissions();
+    perms.set_mode(0o755);
+    fs::set_permissions(&script, perms).unwrap();
+}
+
+fn copy_tree(from: &Path, to: &Path) {
+    for entry in fs::read_dir(from).unwrap() {
+        let entry = entry.unwrap();
+        let name = entry.file_name();
+        let src = entry.path();
+        let dst = to.join(&name);
+        let ft = entry.file_type().unwrap();
+        if ft.is_dir() {
+            fs::create_dir_all(&dst).unwrap();
+            copy_tree(&src, &dst);
+        } else if ft.is_file() {
+            if let Some(parent) = dst.parent() {
+                fs::create_dir_all(parent).unwrap();
+            }
+            fs::copy(&src, &dst).unwrap();
+        }
+    }
 }
 
 fn manifest_for(baseline: &str, id: &str) -> CandidateManifest {
@@ -1312,12 +1344,13 @@ enum LaunchMode {
     DirtyAfterReceipt,
 }
 
-/// Hermetic launcher: mutates workspace, writes receipt/raw, tracks launch count.
+/// Hermetic launcher: mutates workspace, writes receipt/raw, tracks launch count + env names.
 struct FakeStageLauncher {
     launches: Arc<Mutex<u32>>,
     unit_state: Arc<Mutex<WorkerUnitState>>,
     mode: Arc<Mutex<LaunchMode>>,
     stop_log: Arc<Mutex<Vec<&'static str>>>,
+    env_names: Arc<Mutex<Vec<String>>>,
     now: chrono::DateTime<Utc>,
 }
 
@@ -1523,6 +1556,13 @@ impl WorkerLauncher for FakeStageLauncher {
         *self.launches.lock().unwrap() += 1;
         let mode = *self.mode.lock().unwrap();
         let _ = request_path;
+        // Record exact allowlisted env *names* the production OMP child would receive.
+        let home = request.output_dir().join(gzmo_evolver::WORKER_HOME_NAME);
+        let env = gzmo_evolver::omp_child_env(&home)
+            .map_err(|e| WorkerError::Invalid(format!("omp_child_env: {e}")))?;
+        let mut names: Vec<String> = env.keys().cloned().collect();
+        names.sort();
+        *self.env_names.lock().unwrap() = names;
 
         match mode {
             LaunchMode::StayRunning => {
@@ -1731,6 +1771,7 @@ struct RepoHarness {
     unit_state: Arc<Mutex<WorkerUnitState>>,
     launch_mode: Arc<Mutex<LaunchMode>>,
     stop_log: Arc<Mutex<Vec<&'static str>>>,
+    env_names: Arc<Mutex<Vec<String>>>,
     omp_version: String,
     coordinator_uid: u32,
     worker_uid: u32,
@@ -1793,6 +1834,7 @@ impl RepoHarness {
         let unit_state = Arc::new(Mutex::new(WorkerUnitState::NotFound));
         let launch_mode = Arc::new(Mutex::new(LaunchMode::Happy));
         let stop_log = Arc::new(Mutex::new(Vec::new()));
+        let env_names = Arc::new(Mutex::new(Vec::new()));
 
         let omp_version = "18.0.11".to_owned();
         let hybrid = RunnerHybrid {
@@ -1805,6 +1847,7 @@ impl RepoHarness {
             unit_state: unit_state.clone(),
             mode: launch_mode.clone(),
             stop_log: stop_log.clone(),
+            env_names: env_names.clone(),
             now: fixed_now(),
         };
         let provisioner = FakeRuntimeProvisioner {
@@ -1849,6 +1892,7 @@ impl RepoHarness {
             unit_state,
             launch_mode,
             stop_log,
+            env_names,
             omp_version,
             coordinator_uid,
             worker_uid,
@@ -1908,17 +1952,12 @@ impl RepoHarness {
 /// Bounded retry for LockBusy caused by fork/exec lock-fd inheritance under parallel tests.
 /// Never used by production code or the dedicated lock-race test.
 /// Retries only exact `RunnerError::LockBusy`; every other error breaks out immediately.
-async fn run_once_retry_lock_busy<R>(
-    evolver: &RepoEvolver<
-        R,
-        FakeStageLauncher,
-        FakeRuntimeProvisioner,
-        TestWorkerIdentity,
-        ManualClock,
-    >,
+async fn run_once_retry_lock_busy<R, C>(
+    evolver: &RepoEvolver<R, FakeStageLauncher, FakeRuntimeProvisioner, TestWorkerIdentity, C>,
 ) -> Result<RunOutcome, gzmo_evolver::RunnerError>
 where
     R: ProcessRunner + Send + Sync + 'static,
+    C: Clock + Send + Sync + 'static,
 {
     let mut last = None;
     for attempt in 0..8 {
@@ -2706,6 +2745,7 @@ fn observed_evolver_with_mirror_fault(
             unit_state,
             mode: launch_mode,
             stop_log,
+            env_names: Arc::new(Mutex::new(Vec::new())),
             now: fixed_now(),
         },
         FakeRuntimeProvisioner {
@@ -2970,6 +3010,612 @@ async fn observed_mirror_forbidden_nonzero_terminalizes_not_contention() {
         );
         assert!(!reason.contains("403"), "status must not leak: {reason}");
     }
+}
+
+// --- Task 7: hermetic vertical fixture (real mission script + fake worker only) ---
+
+/// Git hermetic + real SystemProcessRunner for bash mission + omp --version fake.
+struct RealMissionHybrid {
+    git: HermeticGitRunner,
+    system: SystemProcessRunner,
+    omp_version: String,
+}
+
+impl ProcessRunner for RealMissionHybrid {
+    fn run(&self, spec: &ProcessSpec) -> Result<ProcessOutput, ProcessError> {
+        let prog = spec.program.to_string_lossy();
+        if prog.ends_with("git") || prog == "git" {
+            return self.git.run(spec);
+        }
+        if prog.ends_with("bash") || prog == "bash" || prog == "/bin/bash" {
+            // Production MissionAdapter path: real SystemProcessRunner executes the
+            // committed fixture scripts/opportunity-next-mission.sh.
+            return self.system.run(spec);
+        }
+        if spec.args.iter().any(|a| a == "--version") {
+            return Ok(ProcessOutput {
+                status: 0,
+                stdout: format!("{}\n", self.omp_version).into_bytes(),
+                stderr: Vec::new(),
+            });
+        }
+        self.git.run(spec)
+    }
+}
+struct FixtureVertical {
+    fixture: Fixture,
+    evolver: RepoEvolver<
+        RealMissionHybrid,
+        FakeStageLauncher,
+        FakeRuntimeProvisioner,
+        TestWorkerIdentity,
+        gzmo_evolver::SystemClock,
+    >,
+    store: StateStore,
+    initial_main: String,
+    roots: WorkerRoots,
+    launches: Arc<Mutex<u32>>,
+    provision_calls: Arc<Mutex<u32>>,
+    env_names: Arc<Mutex<Vec<String>>>,
+    trusted_main_blob: String,
+    remote_main_blob: String,
+}
+
+impl FixtureVertical {
+    async fn new() -> Self {
+        let fixture = Fixture::new();
+        // Prove mission script is the committed fixture (non-empty, executable mode).
+        let script = fixture.checkout.join("scripts/opportunity-next-mission.sh");
+        let meta = fs::metadata(&script).unwrap();
+        assert!(
+            meta.len() > 100,
+            "committed mission script must be nonempty"
+        );
+        assert!(
+            meta.permissions().mode() & 0o111 != 0,
+            "mission script should be executable"
+        );
+
+        let request_root = fixture.state_dir.join("run-requests");
+        let output_root = fixture.state_dir.join("worker-out");
+        let profile_root = fixture.state_dir.join("profiles");
+        let netns = fixture.state_dir.join("netns");
+        fs::create_dir_all(&request_root).unwrap();
+        fs::create_dir_all(&output_root).unwrap();
+        fs::create_dir_all(&profile_root).unwrap();
+        fs::create_dir_all(&netns).unwrap();
+
+        let profile = fixture.config.worker().profile().to_owned();
+        let profile_dir = profile_root.join(&profile);
+        fs::create_dir_all(profile_dir.join("agent")).unwrap();
+        fs::write(
+            profile_dir.join("agent/config.yml"),
+            "modelRoles:\n  code_candidate: local/code\n",
+        )
+        .unwrap();
+        fs::write(
+            profile_dir.join("agent/models.yml"),
+            "providers:\n  local:\n    auth: none\n    baseUrl: http://127.0.0.1:9\n    models:\n      - id: code\n        maxTokens: 16384\n        contextWindow: 32768\n",
+        )
+        .unwrap();
+        for walk in [
+            profile_dir.clone(),
+            profile_dir.join("agent"),
+            profile_dir.join("agent/config.yml"),
+            profile_dir.join("agent/models.yml"),
+        ] {
+            let mut p = fs::metadata(&walk).unwrap().permissions();
+            p.set_mode(if walk.is_dir() { 0o755 } else { 0o644 });
+            fs::set_permissions(&walk, p).unwrap();
+        }
+
+        let fixture_omp =
+            PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/fake-worker.sh");
+        fs::copy(&fixture_omp, fixture.config.worker().executable()).unwrap();
+        let mut perms = fs::metadata(fixture.config.worker().executable())
+            .unwrap()
+            .permissions();
+        perms.set_mode(0o755);
+        fs::set_permissions(fixture.config.worker().executable(), perms).unwrap();
+
+        let roots = WorkerRoots::for_test(request_root, output_root, profile_root, netns).unwrap();
+        let launches = Arc::new(Mutex::new(0u32));
+        let provision_calls = Arc::new(Mutex::new(0u32));
+        let unit_state = Arc::new(Mutex::new(WorkerUnitState::NotFound));
+        let launch_mode = Arc::new(Mutex::new(LaunchMode::Happy));
+        let stop_log = Arc::new(Mutex::new(Vec::new()));
+        let env_names = Arc::new(Mutex::new(Vec::new()));
+
+        let omp_version = "18.0.11".to_owned();
+        let hybrid = RealMissionHybrid {
+            git: fixture.runner(),
+            system: SystemProcessRunner,
+            omp_version: omp_version.clone(),
+        };
+        let launcher = FakeStageLauncher {
+            launches: launches.clone(),
+            unit_state: unit_state.clone(),
+            mode: launch_mode.clone(),
+            stop_log: stop_log.clone(),
+            env_names: env_names.clone(),
+            now: fixed_now(),
+        };
+        let provisioner = FakeRuntimeProvisioner {
+            roots: roots.clone(),
+            profile: profile.clone(),
+            calls: provision_calls.clone(),
+        };
+
+        let real_uid = nix::unistd::Uid::effective().as_raw();
+        let real_gid = nix::unistd::Gid::effective().as_raw();
+        let worker_uid = real_uid;
+        let worker_gid = real_gid.max(1);
+        let coordinator_uid = real_uid.wrapping_add(1000).max(1);
+        assert_ne!(coordinator_uid, real_uid);
+
+        let evolver = RepoEvolver::with_deps(
+            fixture.config.clone(),
+            hybrid,
+            launcher,
+            provisioner,
+            TestWorkerIdentity {
+                uid: worker_uid,
+                gid: worker_gid,
+            },
+            gzmo_evolver::SystemClock,
+            roots.clone(),
+            coordinator_uid,
+        )
+        .unwrap();
+
+        let store = StateStore::open(fixture.config.state_dir()).unwrap();
+        let initial_main = fixture.baseline_before.clone();
+        let trusted_main_blob = rev_parse(&fixture.checkout, "refs/heads/main^{tree}");
+        let remote_main_blob = rev_parse(&fixture.origin, "refs/heads/main^{tree}");
+        assert_eq!(trusted_main_blob, remote_main_blob);
+
+        Self {
+            fixture,
+            evolver,
+            store,
+            initial_main,
+            roots,
+            launches,
+            provision_calls,
+            env_names,
+            trusted_main_blob,
+            remote_main_blob,
+        }
+    }
+
+    fn remote_main(&self) -> String {
+        rev_parse(&self.fixture.origin, "refs/heads/main")
+    }
+
+    fn remote_branches(&self) -> Vec<String> {
+        let out = Command::new("git")
+            .args([
+                "--git-dir",
+                self.fixture.origin.to_str().unwrap(),
+                "for-each-ref",
+                "--format=%(refname:short)",
+                "refs/heads",
+            ])
+            .env_clear()
+            .env("PATH", "/usr/bin:/bin")
+            .env("HOME", "/tmp")
+            .env("GIT_CONFIG_NOSYSTEM", "1")
+            .env("GIT_CONFIG_GLOBAL", "/dev/null")
+            .output()
+            .unwrap();
+        assert!(out.status.success());
+        String::from_utf8_lossy(&out.stdout)
+            .lines()
+            .map(|s| s.trim().to_owned())
+            .filter(|s| !s.is_empty())
+            .collect()
+    }
+
+    fn audit_states(&self) -> Vec<String> {
+        let events = self.store.load_audit_events().unwrap();
+        events
+            .into_iter()
+            .filter_map(|e| {
+                e.event_type
+                    .strip_prefix("candidate.")
+                    .map(|s| s.to_owned())
+            })
+            .collect()
+    }
+
+    fn workspace_count(&self) -> usize {
+        let dir = self.fixture.config.state_dir().join(WORKSPACES_DIR);
+        if !dir.exists() {
+            return 0;
+        }
+        fs::read_dir(&dir)
+            .unwrap()
+            .filter_map(|e| e.ok())
+            .filter(|e| e.file_type().map(|t| t.is_dir()).unwrap_or(false))
+            .count()
+    }
+
+    fn trusted_main_oid(&self) -> String {
+        self.fixture.trusted_main_oid()
+    }
+
+    fn trusted_tree(&self) -> String {
+        rev_parse(&self.fixture.checkout, "refs/heads/main^{tree}")
+    }
+
+    fn remote_tree(&self) -> String {
+        rev_parse(&self.fixture.origin, "refs/heads/main^{tree}")
+    }
+}
+
+#[tokio::test]
+async fn fixture_run_reaches_evaluating_without_remote_mutation() {
+    let harness = FixtureVertical::new().await;
+
+    let outcome = run_once_retry_lock_busy(&harness.evolver).await.unwrap();
+    assert_eq!(outcome.state, CandidateState::Evaluating);
+    assert!(
+        outcome
+            .candidate_digest
+            .as_deref()
+            .unwrap()
+            .starts_with("git-sha1:"),
+        "candidate digest: {:?}",
+        outcome.candidate_digest
+    );
+    assert!(outcome.receipt_digest.is_some());
+    assert_eq!(*harness.launches.lock().unwrap(), 1);
+    let provisions_after_first = *harness.provision_calls.lock().unwrap();
+    assert!(provisions_after_first >= 1);
+
+    // Exact audit chain Observed→Prepared→Building→Evaluating.
+    assert!(harness.store.verify_audit_chain().is_ok());
+    assert_eq!(
+        harness.audit_states(),
+        ["observed", "prepared", "building", "evaluating"]
+    );
+
+    // Remote + trusted main byte/OID stable; only main ref.
+    assert_eq!(harness.remote_main(), harness.initial_main);
+    assert_eq!(harness.trusted_main_oid(), harness.initial_main);
+    assert_eq!(harness.trusted_tree(), harness.trusted_main_blob);
+    assert_eq!(harness.remote_tree(), harness.remote_main_blob);
+    assert_eq!(harness.remote_branches(), vec!["main".to_owned()]);
+
+    // Independent clone: one normalized one-parent candidate commit, nonempty diff.
+    let ws = PathBuf::from(outcome.workspace.as_ref().expect("workspace path"));
+    assert!(ws.join(".git").exists());
+    let head = rev_parse(&ws, "HEAD");
+    let digest = outcome.candidate_digest.as_ref().unwrap();
+    assert_eq!(digest, &format!("git-sha1:{head}"));
+    let parents = {
+        let out = Command::new("git")
+            .args([
+                "-C",
+                ws.to_str().unwrap(),
+                "rev-list",
+                "--parents",
+                "-n",
+                "1",
+                "HEAD",
+            ])
+            .env_clear()
+            .env("PATH", "/usr/bin:/bin")
+            .env("HOME", "/tmp")
+            .env("GIT_CONFIG_NOSYSTEM", "1")
+            .env("GIT_CONFIG_GLOBAL", "/dev/null")
+            .output()
+            .unwrap();
+        assert!(out.status.success());
+        String::from_utf8_lossy(&out.stdout)
+            .split_whitespace()
+            .map(|s| s.to_owned())
+            .collect::<Vec<_>>()
+    };
+    assert_eq!(parents.len(), 2, "exactly one parent: {parents:?}");
+    assert_eq!(parents[0], head);
+    assert_eq!(parents[1], harness.initial_main);
+
+    // Diff facts nonempty and match receipt.
+    let numstat = {
+        let range = format!("{}..{}", harness.initial_main, head);
+        let out = Command::new("git")
+            .args(["-C", ws.to_str().unwrap(), "diff", "--numstat", &range])
+            .env_clear()
+            .env("PATH", "/usr/bin:/bin")
+            .env("HOME", "/tmp")
+            .env("GIT_CONFIG_NOSYSTEM", "1")
+            .env("GIT_CONFIG_GLOBAL", "/dev/null")
+            .output()
+            .unwrap();
+        assert!(out.status.success());
+        String::from_utf8(out.stdout).expect("numstat utf8")
+    };
+    assert!(!numstat.trim().is_empty(), "diff must be nonempty");
+    let mut added_lines: u32 = 0;
+    let mut changed_files: u32 = 0;
+    for line in numstat.lines() {
+        let parts: Vec<&str> = line.split('\t').collect();
+        if parts.len() >= 3 {
+            changed_files += 1;
+            if parts[0] != "-" {
+                added_lines += parts[0].parse::<u32>().unwrap_or(0);
+            }
+        }
+    }
+    assert!(changed_files >= 1);
+    assert!(added_lines >= 1);
+
+    let store = StateStore::open(harness.fixture.config.state_dir()).unwrap();
+    let repo = format!(
+        "{}/{}",
+        harness.fixture.config.repo().owner(),
+        harness.fixture.config.repo().repository()
+    );
+    let record = store.latest_candidate(&repo).unwrap().unwrap();
+    assert_eq!(record.state(), CandidateState::Evaluating);
+    let receipt_json = record.worker_receipt_json().expect("receipt json");
+    let receipt: serde_json::Value = serde_json::from_str(receipt_json).unwrap();
+    assert_eq!(
+        receipt["usage"]["changed_files"].as_u64().unwrap() as u32,
+        changed_files
+    );
+    assert_eq!(
+        receipt["usage"]["added_lines"].as_u64().unwrap() as u32,
+        added_lines
+    );
+    let output_digest = receipt["output_digest"].as_str().unwrap();
+    assert!(output_digest.starts_with("sha256:"));
+    assert_eq!(output_digest.len(), "sha256:".len() + 64);
+
+    // Fake worker saw exact allowlisted env names; no forbidden.
+    let seen = harness.env_names.lock().unwrap().clone();
+    assert!(!seen.is_empty(), "launcher must record env names");
+    for f in gzmo_evolver::FORBIDDEN_ENV {
+        assert!(
+            !seen.iter().any(|n| n == *f),
+            "forbidden env name present: {f}"
+        );
+    }
+    assert!(!seen.iter().any(|n| n == "LOCAL_MODEL_BASE_URL"));
+    let expected = {
+        let home = PathBuf::from("/tmp/probe-home");
+        let env = gzmo_evolver::omp_child_env(&home).unwrap();
+        let mut keys: Vec<String> = env.keys().cloned().collect();
+        keys.sort();
+        keys
+    };
+    assert_eq!(seen, expected, "exact allowlisted env name set");
+
+    // Mission generation binding: mission_id is UUID generation, not bet slug.
+    assert_ne!(outcome.mission_id, "fixture-opportunity");
+    assert!(
+        outcome.mission_id.len() >= 32,
+        "mission_id should be generation UUID: {}",
+        outcome.mission_id
+    );
+    // Published CURRENT exists under missions/.
+    let current = harness
+        .fixture
+        .config
+        .state_dir()
+        .join(gzmo_evolver::MISSIONS_DIR)
+        .join(gzmo_evolver::CURRENT_POINTER);
+    assert!(current.is_file());
+    let gen = fs::read_to_string(&current).unwrap();
+    assert_eq!(gen.trim(), outcome.mission_id);
+
+    let ws_count = harness.workspace_count();
+    assert_eq!(ws_count, 1);
+
+    // Repeated run: no extra provision/launch/workspace/state/remote mutation.
+    let again = run_once_retry_lock_busy(&harness.evolver).await.unwrap();
+    assert_eq!(again.state, CandidateState::Evaluating);
+    assert_eq!(again.candidate_id, outcome.candidate_id);
+    assert_eq!(again.candidate_digest, outcome.candidate_digest);
+    assert_eq!(again.receipt_digest, outcome.receipt_digest);
+    assert_eq!(*harness.launches.lock().unwrap(), 1);
+    assert_eq!(
+        *harness.provision_calls.lock().unwrap(),
+        provisions_after_first
+    );
+    assert_eq!(harness.workspace_count(), ws_count);
+    assert_eq!(harness.remote_main(), harness.initial_main);
+    assert_eq!(harness.trusted_main_oid(), harness.initial_main);
+    assert_eq!(harness.remote_branches(), vec!["main".to_owned()]);
+    assert_eq!(
+        harness.audit_states(),
+        ["observed", "prepared", "building", "evaluating"]
+    );
+}
+
+/// Fixture mission script fails closed on two active bets (ok=false path).
+#[test]
+fn fixture_mission_script_rejects_two_active_bets() {
+    let dir = TempDir::new().unwrap();
+    let root = dir.path().join("repo");
+    fs::create_dir_all(root.join("research/opportunities")).unwrap();
+    fs::create_dir_all(root.join("scripts")).unwrap();
+    let script_src = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .join("tests/fixtures/fixture-repo/scripts/opportunity-next-mission.sh");
+    fs::copy(
+        &script_src,
+        root.join("scripts/opportunity-next-mission.sh"),
+    )
+    .unwrap();
+    let mut perms = fs::metadata(root.join("scripts/opportunity-next-mission.sh"))
+        .unwrap()
+        .permissions();
+    perms.set_mode(0o755);
+    fs::set_permissions(root.join("scripts/opportunity-next-mission.sh"), perms).unwrap();
+
+    for (name, id) in [("a.md", "bet-a"), ("b.md", "bet-b")] {
+        fs::write(
+            root.join("research/opportunities").join(name),
+            format!("status: active\nid: {id}\ntitle: T\nscore: 1\nship_bar: true\n"),
+        )
+        .unwrap();
+    }
+    let staging = dir.path().join("staging");
+    fs::create_dir_all(&staging).unwrap();
+    let out = Command::new("bash")
+        .arg("scripts/opportunity-next-mission.sh")
+        .current_dir(&root)
+        .env_clear()
+        .env("PATH", "/usr/bin:/bin")
+        .env("HOME", dir.path())
+        .env("GZMO_DATA_NEXT", &staging)
+        .output()
+        .unwrap();
+    assert_ne!(out.status.code(), Some(0), "two-active must fail");
+    let json = fs::read_to_string(staging.join("opportunity-discovery/next-mission.json")).unwrap();
+    let v: serde_json::Value = serde_json::from_str(&json).unwrap();
+    assert_eq!(v["ok"], false);
+    assert!(
+        v["advice"]
+            .as_str()
+            .unwrap_or("")
+            .contains("need_exactly_one_active_bet"),
+        "{json}"
+    );
+}
+
+/// Trailing-whitespace candidate is rejected at Evaluating boundary.
+#[tokio::test]
+async fn whitespace_errors_in_candidate_diff_terminalize() {
+    let harness = RepoHarness::new().await;
+    // Replace launcher behavior: commit a trailing-whitespace file.
+    *harness.launch_mode.lock().unwrap() = LaunchMode::Happy;
+    // Inject via a one-shot custom path: prepare then mutate launcher mode is insufficient;
+    // use a wrapper by writing after Happy would be too late. Instead seed Building with
+    // a receipt whose workspace has trailing spaces and force finish via resume.
+    let lock = CoordinatorLock::try_acquire(harness.fixture.config.state_dir()).unwrap();
+    let store = StateStore::open(harness.fixture.config.state_dir()).unwrap();
+    let clock = ManualClock::new(fixed_now());
+    let fake = FakeProcessRunner::new();
+    install_mission_fake(&fake, &clock);
+    let hybrid = HybridRunner {
+        git: harness.fixture.runner(),
+        fake_mission: fake,
+    };
+    let prep = prepare_candidate(&harness.fixture.config, &hybrid, &clock, &store).unwrap();
+    let id = prep.record.id().clone();
+    let ws = prep.record.workspace().unwrap().to_path_buf();
+    // Worker-shaped commit with trailing whitespace.
+    fs::write(ws.join("ws-bad.txt"), "line with trailing space \n").unwrap();
+    let status = Command::new("git")
+        .args(["-C", ws.to_str().unwrap(), "add", "-A"])
+        .env_clear()
+        .env("PATH", "/usr/bin:/bin")
+        .env("HOME", &ws)
+        .env("GIT_CONFIG_NOSYSTEM", "1")
+        .env("GIT_CONFIG_GLOBAL", "/dev/null")
+        .status()
+        .unwrap();
+    assert!(status.success());
+    let status = Command::new("git")
+        .args([
+            "-C",
+            ws.to_str().unwrap(),
+            "-c",
+            "user.name=fake",
+            "-c",
+            "user.email=fake@worker",
+            "commit",
+            "-m",
+            "ws-bad",
+        ])
+        .env_clear()
+        .env("PATH", "/usr/bin:/bin")
+        .env("HOME", &ws)
+        .env("GIT_CONFIG_NOSYSTEM", "1")
+        .env("GIT_CONFIG_GLOBAL", "/dev/null")
+        .status()
+        .unwrap();
+    assert!(status.success());
+    let head = rev_parse(&ws, "HEAD");
+    store
+        .transition(
+            &id,
+            CandidateState::Building,
+            TransitionMetadata::empty(),
+            fixed_now(),
+        )
+        .unwrap();
+    drop(store);
+    drop(lock);
+
+    let sealed = seal_for_test(&harness, &prep);
+    // Write receipt matching the whitespace commit (1 file, 1 line).
+    let raw = br#"{"type":"session","version":3,"id":"fake-session"}
+{"type":"tool_execution_start","toolCallId":"tool-1","toolName":"bash","args":{}}
+{"type":"tool_execution_end","toolCallId":"tool-1","toolName":"bash","result":"ok"}
+{"type":"message_end","message":{"role":"assistant","stopReason":"stop","usage":{"input":10,"output":5,"cacheRead":1,"cacheWrite":2,"totalTokens":18}}}
+{"type":"agent_end","messages":[]}
+"#;
+    fs::write(sealed.output_dir().join("raw.jsonl"), raw).unwrap();
+    let output_digest = format!("sha256:{}", sha256_hex(raw));
+    let started = sealed.issued_at() + chrono::Duration::seconds(1);
+    let completed = started + chrono::Duration::seconds(2);
+    let usage = ResourceUsage {
+        wall_seconds: 2,
+        attempts: 1,
+        changed_files: 1,
+        added_lines: 1,
+        tool_calls: 1,
+        input_tokens: 10,
+        output_tokens: 5,
+        energy_joules: None,
+    };
+    let receipt = WorkerReceipt::new(
+        sealed.candidate_id().clone(),
+        sealed.manifest_digest(),
+        sealed.policy_digest(),
+        sealed.omp_version(),
+        started,
+        completed,
+        0,
+        output_digest,
+        Some(format!("git-sha1:{head}")),
+        usage,
+    )
+    .unwrap();
+    fs::write(
+        sealed.output_dir().join("receipt.json"),
+        receipt.canonical_bytes().unwrap(),
+    )
+    .unwrap();
+    let mut perms = fs::metadata(sealed.output_dir().join("receipt.json"))
+        .unwrap()
+        .permissions();
+    perms.set_mode(0o600);
+    fs::set_permissions(sealed.output_dir().join("receipt.json"), perms).unwrap();
+    *harness.unit_state.lock().unwrap() = WorkerUnitState::Succeeded;
+    let err = resume_retry_lock_busy(&harness.evolver).await.unwrap_err();
+    let msg = err.to_string();
+    assert!(
+        msg.contains("whitespace"),
+        "expected whitespace terminalization branch, got {msg}"
+    );
+    let store = StateStore::open(harness.fixture.config.state_dir()).unwrap();
+    let latest = store
+        .latest_candidate(&format!(
+            "{}/{}",
+            harness.fixture.config.repo().owner(),
+            harness.fixture.config.repo().repository()
+        ))
+        .unwrap()
+        .unwrap();
+    assert_eq!(latest.state(), CandidateState::Failed);
+    assert_eq!(
+        latest.terminal_reason().as_deref(),
+        Some("whitespace errors in candidate diff")
+    );
 }
 
 #[tokio::test]

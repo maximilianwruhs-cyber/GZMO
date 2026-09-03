@@ -1220,13 +1220,15 @@ impl<'a, R: ProcessRunner> GitWorkspace<'a, R> {
             ],
             GIT_DIFF_CAP_BYTES,
         )?;
+        // Git historically returned 1 for --check problems; 2.53+ returns 2.
+        // Both mean whitespace/conflict-marker issues for this exact argv.
         let whitespace_ok = match check.status {
             0 => true,
-            1 => false,
+            1 | 2 => false,
             code => {
                 return Err(GitError::Process(format!(
                     "diff --check exited with status {code}"
-                )))
+                )));
             }
         };
 
@@ -3326,6 +3328,68 @@ mod unit_tests {
         .unwrap_err();
         assert!(
             err.to_string().contains("deleted") || err.to_string().contains("overflow"),
+            "{err}"
+        );
+    }
+
+    #[test]
+    fn merge_diff_rejects_changed_file_and_line_budget_caps() {
+        let policy = PathPolicy {
+            protected_paths: vec!["SECRET/".to_owned()],
+        };
+        let mut manifest = test_candidate_manifest("cand-20260901t120000z-bet-01234567");
+        manifest.budget.max_changed_files = 1;
+        manifest.budget.max_added_lines = 5;
+
+        let raw = vec![
+            RawDiffEntry {
+                old_mode: "100644".into(),
+                new_mode: "100644".into(),
+                status: 'M',
+                path: "a.rs".into(),
+            },
+            RawDiffEntry {
+                old_mode: "100644".into(),
+                new_mode: "100644".into(),
+                status: 'M',
+                path: "b.rs".into(),
+            },
+        ];
+        let num = vec![
+            NumstatEntry {
+                path: "a.rs".into(),
+                added: Some(1),
+                deleted: Some(0),
+                binary: false,
+            },
+            NumstatEntry {
+                path: "b.rs".into(),
+                added: Some(1),
+                deleted: Some(0),
+                binary: false,
+            },
+        ];
+        let err = merge_diff_records(raw, num, &policy, &manifest).unwrap_err();
+        assert!(
+            err.to_string().contains("changed files") && err.to_string().contains("exceed budget"),
+            "{err}"
+        );
+
+        let raw = vec![RawDiffEntry {
+            old_mode: "100644".into(),
+            new_mode: "100644".into(),
+            status: 'M',
+            path: "a.rs".into(),
+        }];
+        let num = vec![NumstatEntry {
+            path: "a.rs".into(),
+            added: Some(6),
+            deleted: Some(0),
+            binary: false,
+        }];
+        let err = merge_diff_records(raw, num, &policy, &manifest).unwrap_err();
+        assert!(
+            err.to_string().contains("added lines") && err.to_string().contains("exceed budget"),
             "{err}"
         );
     }
