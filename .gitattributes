@@ -1,0 +1,10 @@
+# Enforce LF line endings across all platforms.
+#
+# This repository targets Linux/WSL; every tracked shell script is executed
+# by bash under WSL. A Windows checkout with core.autocrlf=true rewrites
+# tracked text to CRLF, which breaks bash heredocs (syntax error, exit 2)
+# and corrupts the 258 committed scripts on disk.
+#
+# All committed blobs are already LF, so this is content-neutral: it only
+# pins the invariant and stops future Windows checkouts from regressing it.
+* text=auto eol=lf
