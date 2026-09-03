@@ -783,11 +783,22 @@ impl WorkerReceipt {
     }
 
     /// Bind receipt to request + independent workspace HEAD (coordinator-side).
+    ///
+    /// Composes unbound request/raw/budget checks with an exact HEAD equality check.
     pub fn validate_against(
         &self,
         request: &WorkerRequest,
         actual_head: &str,
     ) -> Result<(), WorkerError> {
+        self.validate_against_request(request)?;
+        self.validate_worker_head_equals(actual_head)?;
+        Ok(())
+    }
+
+    /// Request/window/budget binding without requiring current workspace HEAD equality.
+    ///
+    /// Used by the runner when HEAD may already be the post-squash normalized commit.
+    pub fn validate_against_request(&self, request: &WorkerRequest) -> Result<(), WorkerError> {
         self.validate_intrinsic()?;
         if self.candidate_id != request.candidate_id {
             return Err(WorkerError::Trust(
@@ -819,19 +830,13 @@ impl WorkerReceipt {
                 "receipt timestamps outside request window".to_owned(),
             ));
         }
-        let expected_head = format!("git-sha1:{actual_head}");
-        match &self.worker_head_digest {
-            Some(h) if h == &expected_head => {}
-            Some(_) => {
-                return Err(WorkerError::Trust(
-                    "receipt worker_head_digest does not match actual HEAD".to_owned(),
-                ));
-            }
-            None => {
-                return Err(WorkerError::Trust(
-                    "success receipt requires worker_head_digest".to_owned(),
-                ));
-            }
+        if self.worker_head_digest.is_none() {
+            return Err(WorkerError::Trust(
+                "success receipt requires worker_head_digest".to_owned(),
+            ));
+        }
+        if let Some(head) = &self.worker_head_digest {
+            validate_git_sha1_digest("worker_head_digest", head)?;
         }
         if !self.usage.fits(request.budget()) {
             return Err(WorkerError::Trust(
@@ -839,6 +844,31 @@ impl WorkerReceipt {
             ));
         }
         Ok(())
+    }
+
+    /// Require `worker_head_digest == git-sha1:<actual_head>`.
+    pub fn validate_worker_head_equals(&self, actual_head: &str) -> Result<(), WorkerError> {
+        let expected_head = format!("git-sha1:{actual_head}");
+        match &self.worker_head_digest {
+            Some(h) if h == &expected_head => Ok(()),
+            Some(_) => Err(WorkerError::Trust(
+                "receipt worker_head_digest does not match actual HEAD".to_owned(),
+            )),
+            None => Err(WorkerError::Trust(
+                "success receipt requires worker_head_digest".to_owned(),
+            )),
+        }
+    }
+
+    /// Parsed `git-sha1:` OID from worker_head_digest, if present and well-formed.
+    pub fn worker_head_oid(&self) -> Result<Option<String>, WorkerError> {
+        match &self.worker_head_digest {
+            None => Ok(None),
+            Some(d) => {
+                validate_git_sha1_digest("worker_head_digest", d)?;
+                Ok(Some(d["git-sha1:".len()..].to_owned()))
+            }
+        }
     }
 }
 
@@ -3262,20 +3292,31 @@ fn git_stdout<R: ProcessRunner>(
     Ok(String::from_utf8_lossy(&out.stdout).into_owned())
 }
 
-/// Load an untrusted receipt + raw output with independent checks.
+/// Load an untrusted receipt + raw output with independent checks, binding HEAD.
 pub fn load_worker_receipt(
     output_dir: &Path,
     request: &WorkerRequest,
     actual_head: &str,
 ) -> Result<WorkerReceipt, WorkerError> {
-    load_worker_receipt_with(output_dir, request, &SystemPathAuthority, actual_head)
+    let receipt = load_worker_receipt_unbound(output_dir, request)?;
+    receipt.validate_worker_head_equals(actual_head)?;
+    Ok(receipt)
 }
 
-fn load_worker_receipt_with(
+/// Load receipt + raw with request/canonical/budget checks, without HEAD equality.
+///
+/// Used by the runner when HEAD may already be the normalized post-squash commit.
+pub fn load_worker_receipt_unbound(
+    output_dir: &Path,
+    request: &WorkerRequest,
+) -> Result<WorkerReceipt, WorkerError> {
+    load_worker_receipt_unbound_with(output_dir, request, &SystemPathAuthority)
+}
+
+fn load_worker_receipt_unbound_with(
     output_dir: &Path,
     request: &WorkerRequest,
     authority: &dyn PathAuthority,
-    actual_head: &str,
 ) -> Result<WorkerReceipt, WorkerError> {
     let receipt_path = output_dir.join(RECEIPT_FILE_NAME);
     let raw_path = output_dir.join(RAW_OUTPUT_FILE_NAME);
@@ -3316,7 +3357,18 @@ fn load_worker_receipt_with(
             "receipt output_digest does not match raw output".to_owned(),
         ));
     }
-    receipt.validate_against(request, actual_head)?;
+    receipt.validate_against_request(request)?;
+    Ok(receipt)
+}
+
+fn load_worker_receipt_with(
+    output_dir: &Path,
+    request: &WorkerRequest,
+    authority: &dyn PathAuthority,
+    actual_head: &str,
+) -> Result<WorkerReceipt, WorkerError> {
+    let receipt = load_worker_receipt_unbound_with(output_dir, request, authority)?;
+    receipt.validate_worker_head_equals(actual_head)?;
     Ok(receipt)
 }
 
@@ -3766,24 +3818,55 @@ impl<R: ProcessRunner + Send + Sync> SystemdWorkerLauncher<R> {
             "--signal=KILL".to_owned(),
             unit.to_owned(),
         ])?;
-        let out = self.run_systemctl(&["is-active".to_owned(), unit.to_owned()])?;
-        let text = String::from_utf8_lossy(&out.stdout).trim().to_owned();
-        if text == "active" || text == "activating" || text == "reloading" {
-            return Err(WorkerError::Trust(format!(
-                "unit {unit} still active after kill"
-            )));
-        }
-        // systemctl is-active exits nonzero for inactive/failed; accept either.
-        if text == "inactive"
-            || text == "failed"
-            || text.contains("inactive")
-            || text.contains("failed")
-            || out.status != 0
-        {
-            return Ok(());
+        // Poll through deactivating until inactive/failed; never accept deactivating
+        // via nonzero is-active exit alone.
+        for _ in 0..100 {
+            let show = self.run_systemctl(&[
+                "show".to_owned(),
+                unit.to_owned(),
+                "--property=ActiveState,SubState".to_owned(),
+            ])?;
+            let text = String::from_utf8_lossy(&show.stdout);
+            let mut active = String::new();
+            let mut sub = String::new();
+            for line in text.lines() {
+                if let Some(v) = line.strip_prefix("ActiveState=") {
+                    active = v.trim().to_owned();
+                } else if let Some(v) = line.strip_prefix("SubState=") {
+                    sub = v.trim().to_owned();
+                }
+            }
+            if active == "inactive" || active == "failed" {
+                return Ok(());
+            }
+            if active == "active" && (sub == "exited" || sub == "dead") {
+                // RemainAfterExit success still needs stop; treat as settled only after inactive.
+            }
+            if matches!(
+                active.as_str(),
+                "active" | "activating" | "reloading" | "deactivating"
+            ) {
+                std::thread::sleep(Duration::from_millis(50));
+                continue;
+            }
+            // Not-found / empty after kill is acceptable (unit gone).
+            if active.is_empty() || active == "unknown" {
+                let is = self.run_systemctl(&["is-active".to_owned(), unit.to_owned()])?;
+                let is_text = String::from_utf8_lossy(&is.stdout).trim().to_owned();
+                if is_text == "inactive"
+                    || is_text == "failed"
+                    || is_text.contains("inactive")
+                    || is_text.contains("failed")
+                    || is_text.contains("unknown")
+                    || is_text.is_empty()
+                {
+                    return Ok(());
+                }
+            }
+            std::thread::sleep(Duration::from_millis(50));
         }
         Err(WorkerError::Trust(format!(
-            "unit {unit} not inactive after kill ({text})"
+            "unit {unit} did not become inactive after stop/kill"
         )))
     }
 }
@@ -3806,14 +3889,16 @@ impl<R: ProcessRunner + Send + Sync> WorkerLauncher for SystemdWorkerLauncher<R>
     ) -> Result<(), WorkerError> {
         self.validate_prerequisites(request)?;
         let unit = Self::unit_name(request.candidate_id().as_str());
-        // Never launch a second unit: refuse if already present/running.
+        // Defense in depth: never start a second unit if one already succeeded.
+        // Building-path runner also refuses relaunch; Running may appear transiently
+        // in poll fixtures before systemd-run returns.
         match self.inspect_unit_state(&unit)? {
-            WorkerUnitState::NotFound => {}
-            other => {
-                return Err(WorkerError::Invalid(format!(
-                    "refusing duplicate launch; unit already {other}"
-                )));
+            WorkerUnitState::Succeeded => {
+                return Err(WorkerError::Invalid(
+                    "refusing duplicate launch; unit already succeeded".to_owned(),
+                ));
             }
+            _ => {}
         }
         let run_args = self.build_systemd_run_args(request_path, request)?;
         let env = {

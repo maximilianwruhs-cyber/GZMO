@@ -1466,6 +1466,58 @@ impl<'a, R: ProcessRunner> GitWorkspace<'a, R> {
         Ok(Some(head))
     }
 
+    /// True when `commit` exists, descends from `baseline`, and shares HEAD's tree.
+    ///
+    /// Used after post-squash resume: receipt names the pre-squash worker HEAD while
+    /// workspace HEAD is already the normalized commit with the same tree.
+    pub fn worker_head_matches_normalized_tree(
+        &self,
+        worker_head: &str,
+        baseline: &str,
+        normalized_head: &str,
+    ) -> Result<bool, GitError> {
+        validate_oid(worker_head)?;
+        validate_oid(baseline)?;
+        validate_oid(normalized_head)?;
+        // Existence: rev-parse must succeed.
+        let resolved = self.run_git(
+            &[
+                "rev-parse".to_owned(),
+                "--verify".to_owned(),
+                worker_head.to_owned(),
+            ],
+            GIT_OUTPUT_CAP_BYTES,
+        );
+        if resolved.is_err() {
+            return Ok(false);
+        }
+        let mb = match self.merge_base(worker_head, baseline) {
+            Ok(m) => m,
+            Err(_) => return Ok(false),
+        };
+        if mb != baseline {
+            return Ok(false);
+        }
+        let worker_tree = {
+            let out = self.run_git(
+                &["rev-parse".to_owned(), format!("{worker_head}^{{tree}}")],
+                GIT_OUTPUT_CAP_BYTES,
+            )?;
+            parse_oid_stdout(&out.stdout)?
+        };
+        let norm_tree = {
+            let out = self.run_git(
+                &[
+                    "rev-parse".to_owned(),
+                    format!("{normalized_head}^{{tree}}"),
+                ],
+                GIT_OUTPUT_CAP_BYTES,
+            )?;
+            parse_oid_stdout(&out.stdout)?
+        };
+        Ok(worker_tree == norm_tree)
+    }
+
     /// Remove this workspace only when `record` is terminal and matches.
     pub fn cleanup(&self, record: &CandidateRecord) -> Result<(), GitError> {
         cleanup_workspace(self.config.state_dir(), record, Some(self.path.as_path()))

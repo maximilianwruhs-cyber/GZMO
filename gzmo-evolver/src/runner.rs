@@ -13,12 +13,13 @@ use crate::state::{
     MAX_TERMINAL_REASON_BYTES,
 };
 use crate::worker::{
-    canonical_profile_tree_digest, load_worker_receipt, probe_omp_version, render_mission_prompt,
-    render_omp_overlay, render_system_prompt, resolve_fixed_worker_identity, seal_worker_bundle,
-    try_load_existing_sealed_request, validate_code_candidate_profile, worker_runtime_dirs,
-    EffectiveIdentity, SealWorkerInput, SystemdWorkerLauncher, SystemdWorkerRuntimeProvisioner,
-    WorkerCompanions, WorkerError, WorkerLauncher, WorkerReceipt, WorkerRequest, WorkerRoots,
-    WorkerRuntimeProvisioner, WorkerUnitState, REQUEST_FILE_NAME, WORKER_SAFE_PATH,
+    canonical_profile_tree_digest, load_worker_receipt_unbound, probe_omp_version,
+    render_mission_prompt, render_omp_overlay, render_system_prompt, resolve_fixed_worker_identity,
+    seal_worker_bundle, try_load_existing_sealed_request, validate_code_candidate_profile,
+    worker_runtime_dirs, EffectiveIdentity, SealWorkerInput, SystemdWorkerLauncher,
+    SystemdWorkerRuntimeProvisioner, WorkerCompanions, WorkerError, WorkerLauncher, WorkerReceipt,
+    WorkerRequest, WorkerRoots, WorkerRuntimeProvisioner, WorkerUnitState, REQUEST_FILE_NAME,
+    WORKER_SAFE_PATH,
 };
 use chrono::{DateTime, Utc};
 use evolution_contracts::{
@@ -101,14 +102,28 @@ impl RunnerError {
             other => Self::Prepare(Self::bound(other)),
         }
     }
-
     fn from_git(err: GitError) -> Self {
         match err {
             GitError::MirrorLockBusy => Self::Contention("mirror lease busy".to_owned()),
+            // Transient transport/process faults leave Observed resumable.
+            GitError::Process(msg) | GitError::Io(msg) => {
+                let lower = msg.to_ascii_lowercase();
+                if lower.contains("timeout")
+                    || lower.contains("timed out")
+                    || lower.contains("fetch")
+                    || lower.contains("network")
+                    || lower.contains("connection")
+                    || lower.contains("temporary")
+                    || lower.contains("exited with status")
+                {
+                    Self::Contention(format!("transient git: {}", Self::bound(msg)))
+                } else {
+                    Self::Git(Self::bound(msg))
+                }
+            }
             other => Self::Git(Self::bound(other)),
         }
     }
-
     fn from_worker(err: WorkerError) -> Self {
         match err {
             WorkerError::LeaseBusy => Self::Contention("worker/runtime lease busy".to_owned()),
@@ -255,6 +270,25 @@ impl
 {
     /// Production construction: fixed systemd provisioner/launcher and worker account.
     pub fn production(config: RepoEvolverConfig) -> Result<Self, RunnerError> {
+        let coordinator_uid = nix::unistd::Uid::effective().as_raw();
+        if coordinator_uid == 0 {
+            return Err(RunnerError::Trust(
+                "coordinator must not run as root".to_owned(),
+            ));
+        }
+        Self::production_with_uid(config, coordinator_uid)
+    }
+
+    /// Read-only status construction: does not refuse root and does not require identity mutation.
+    pub fn for_status(config: RepoEvolverConfig) -> Result<Self, RunnerError> {
+        let coordinator_uid = nix::unistd::Uid::effective().as_raw().max(1);
+        Self::production_with_uid(config, coordinator_uid)
+    }
+
+    fn production_with_uid(
+        config: RepoEvolverConfig,
+        coordinator_uid: u32,
+    ) -> Result<Self, RunnerError> {
         let roots = WorkerRoots::production();
         roots
             .validate_intrinsic()
@@ -269,12 +303,6 @@ impl
             config.worker().profile().to_owned(),
         )
         .map_err(RunnerError::from_worker)?;
-        let coordinator_uid = nix::unistd::Uid::effective().as_raw();
-        if coordinator_uid == 0 {
-            return Err(RunnerError::Trust(
-                "coordinator must not run as root".to_owned(),
-            ));
-        }
         Ok(Self {
             config,
             runner: Arc::new(SystemProcessRunner),
@@ -401,6 +429,14 @@ where
             CandidateId::parse(candidate_id).map_err(|e| RunnerError::Invalid(e.to_string()))?;
         let (_lock, store) = self.acquire_lock_and_store()?;
         let record = store.load(&id)?;
+        if record.repository() != self.repository_key() {
+            return Err(RunnerError::Invalid(format!(
+                "candidate {} belongs to repository {}, not configured {}",
+                id.as_str(),
+                record.repository(),
+                self.repository_key()
+            )));
+        }
 
         match record.state() {
             CandidateState::Evaluating
@@ -562,8 +598,18 @@ where
             Err(GitError::MirrorLockBusy) => {
                 return Err(RunnerError::Contention("mirror lease busy".to_owned()));
             }
+            Err(GitError::Trust(msg)) => {
+                return self.fail(store, record.id(), &msg);
+            }
+            Err(GitError::Workspace(msg)) => {
+                return self.fail(store, record.id(), &msg);
+            }
+            Err(GitError::Invalid(msg)) => {
+                return self.fail(store, record.id(), &msg);
+            }
             Err(err) => {
-                return self.fail(store, record.id(), &RunnerError::bound(err));
+                // Process/Io/timeout → contention, leave Observed.
+                return Err(RunnerError::from_git(err));
             }
         };
         let expected = match record.manifest().baseline_digest.strip_prefix("git-sha1:") {
@@ -573,7 +619,7 @@ where
                     store,
                     record.id(),
                     "manifest baseline_digest missing git-sha1",
-                )
+                );
             }
         };
         if baseline != expected {
@@ -655,7 +701,12 @@ where
                     "runtime provisioner timeout".to_owned(),
                 ));
             }
-            Err(err) => return self.fail(store, record.id(), &RunnerError::bound(err)),
+            Err(err) => {
+                return Err(RunnerError::RecoveryRequired(format!(
+                    "runtime provision failed (Prepared preserved): {}",
+                    RunnerError::bound(err)
+                )));
+            }
         }
 
         let request = match self.ensure_sealed_request(&record, &mission, ws.path()) {
@@ -687,12 +738,37 @@ where
         record: CandidateRecord,
     ) -> Result<RunOutcome, RunnerError> {
         store.verify_audit_chain()?;
+        let git = GitRepository::open(&self.config, self.runner.as_ref())
+            .map_err(RunnerError::from_git)?;
+        let baseline = match record.manifest().baseline_digest.strip_prefix("git-sha1:") {
+            Some(v) => v.to_owned(),
+            None => return self.fail(store, record.id(), "baseline_digest missing prefix"),
+        };
+        if let Err(err) = self.revalidate_baseline_policy(&git, &baseline, record.policy_digest()) {
+            return self.fail(store, record.id(), &err);
+        }
+        if let Err(err) = self.load_bound_mission(record.manifest()) {
+            return self.fail(store, record.id(), &RunnerError::bound(err));
+        }
+        let ws = match git.open_existing_workspace(record.manifest()) {
+            Ok(ws) => ws,
+            Err(err) => return self.fail(store, record.id(), &RunnerError::bound(err)),
+        };
+        if let Some(path) = record.workspace() {
+            if path != ws.path() {
+                return self.fail(store, record.id(), "workspace path mismatch");
+            }
+        }
+
         let request = match try_load_existing_sealed_request(&self.roots, record.id())
             .map_err(RunnerError::from_worker)?
         {
             Some(r) => {
                 if let Err(err) = self.validate_request_against_record(&r, &record) {
                     return self.fail(store, record.id(), &err);
+                }
+                if r.workspace() != ws.path() {
+                    return self.fail(store, record.id(), "request workspace mismatch");
                 }
                 r
             }
@@ -725,7 +801,7 @@ where
             }
             Ok(WorkerUnitState::Succeeded) => {}
             Ok(WorkerUnitState::Failed) | Ok(WorkerUnitState::NotFound) => {
-                // Never start a second unit from Building.
+                // Never start a second unit from Building; NotFound/no receipt fails closed.
                 return self.fail(store, record.id(), "worker_lost_without_receipt");
             }
             Err(err) => return self.fail(store, record.id(), &RunnerError::bound(err)),
@@ -781,7 +857,6 @@ where
             None => self.fail(store, record.id(), "worker_lost_without_receipt"),
         }
     }
-
     fn try_finish_from_receipt(
         &self,
         store: &StateStore,
@@ -793,20 +868,13 @@ where
         let ws = git
             .open_existing_workspace(record.manifest())
             .map_err(RunnerError::from_git)?;
-        let head_before = ws.candidate_commit().map_err(RunnerError::from_git)?;
+        let head_now = ws.candidate_commit().map_err(RunnerError::from_git)?;
 
-        let receipt = match load_worker_receipt(request.output_dir(), request, &head_before) {
+        let receipt = match load_worker_receipt_unbound(request.output_dir(), request) {
             Ok(r) => r,
             Err(WorkerError::NotFound(_)) => return Ok(None),
             Err(err) => {
-                let msg = err.to_string();
-                if msg.contains("receipt must be a regular file")
-                    || msg.contains("No such file")
-                    || msg.contains("not found")
-                {
-                    return Ok(None);
-                }
-                // Deterministic content/trust failure → terminalize.
+                // Every Trust/Invalid/Io fault terminalizes with the exact reason.
                 return self
                     .fail(store, record.id(), &RunnerError::bound(err))
                     .map(Some);
@@ -825,16 +893,54 @@ where
                 .map(Some);
         }
 
-        let normalized = match ws.ensure_normalized_candidate(
-            baseline,
-            &record.manifest().mission_id,
-            receipt.completed_at(),
-        ) {
-            Ok(oid) => oid,
-            Err(err) => {
+        let mission_id = &record.manifest().mission_id;
+        let normalized = if let Some(already) = ws
+            .recognize_normalized_commit(baseline, mission_id, receipt.completed_at())
+            .map_err(RunnerError::from_git)?
+        {
+            // Post-squash resume: HEAD is already normalized. Receipt names pre-squash worker head.
+            let worker_oid = match receipt
+                .worker_head_oid()
+                .map_err(RunnerError::from_worker)?
+            {
+                Some(oid) => oid,
+                None => {
+                    return self
+                        .fail(
+                            store,
+                            record.id(),
+                            "success receipt requires worker_head_digest",
+                        )
+                        .map(Some);
+                }
+            };
+            let ok = ws
+                .worker_head_matches_normalized_tree(&worker_oid, baseline, &already)
+                .map_err(RunnerError::from_git)?;
+            if !ok {
+                return self
+                    .fail(
+                        store,
+                        record.id(),
+                        "receipt worker head does not match normalized tree",
+                    )
+                    .map(Some);
+            }
+            already
+        } else {
+            // Pre-squash: require exact HEAD equality then squash once.
+            if let Err(err) = receipt.validate_worker_head_equals(&head_now) {
                 return self
                     .fail(store, record.id(), &RunnerError::bound(err))
                     .map(Some);
+            }
+            match ws.ensure_normalized_candidate(baseline, mission_id, receipt.completed_at()) {
+                Ok(oid) => oid,
+                Err(err) => {
+                    return self
+                        .fail(store, record.id(), &RunnerError::bound(err))
+                        .map(Some);
+                }
             }
         };
 
@@ -853,16 +959,23 @@ where
         }
 
         let usage = receipt.usage();
-        let mut bound_usage = usage.clone();
-        bound_usage.changed_files = stats.files.len() as u32;
-        bound_usage.added_lines = stats.added_lines;
-        if !bound_usage.fits(&record.manifest().budget) || !usage.fits(&record.manifest().budget) {
+        let observed_files = stats.files.len() as u32;
+        let observed_lines = stats.added_lines;
+        if usage.changed_files != observed_files || usage.added_lines != observed_lines {
             return self
                 .fail(
                     store,
                     record.id(),
-                    "diff/usage exceeds budget after normalize",
+                    &format!(
+                        "receipt fact mismatch: usage files={} lines={} vs coordinator files={} lines={}",
+                        usage.changed_files, usage.added_lines, observed_files, observed_lines
+                    ),
                 )
+                .map(Some);
+        }
+        if !usage.fits(&record.manifest().budget) {
+            return self
+                .fail(store, record.id(), "receipt usage exceeds budget")
                 .map(Some);
         }
 

@@ -210,7 +210,7 @@ fn run() -> Result<()> {
                     .build()
                     .context("building tokio runtime")?;
                 let evolver =
-                    RepoEvolver::production(cfg).map_err(|e| anyhow::anyhow!("evolver: {e}"))?;
+                    RepoEvolver::for_status(cfg).map_err(|e| anyhow::anyhow!("evolver: {e}"))?;
                 let report = rt
                     .block_on(evolver.status())
                     .map_err(|e| anyhow::anyhow!("status: {e}"))?;
@@ -533,15 +533,31 @@ fn print_status_v1_human(report: &StatusV1) {
     }
     if let Some(u) = &report.budget_used {
         println!(
-            "  budget_used: wall={:?} files={:?} lines={:?} tools={:?} in={:?} out={:?}",
-            u.wall_seconds,
-            u.changed_files,
-            u.added_lines,
-            u.tool_calls,
-            u.input_tokens,
-            u.output_tokens
+            "  budget_used: wall={} files={} lines={} tools={} in={} out={}",
+            opt_num(u.wall_seconds),
+            opt_num(u.changed_files),
+            opt_num(u.added_lines),
+            opt_num(u.tool_calls),
+            opt_num(u.input_tokens),
+            opt_num(u.output_tokens)
         );
     }
+    if let Some(r) = &report.budget_remaining {
+        println!(
+            "  budget_remaining: wall={} files={} lines={} tools={} in={} out={}",
+            opt_num(r.wall_seconds),
+            opt_num(r.changed_files),
+            opt_num(r.added_lines),
+            opt_num(r.tool_calls),
+            opt_num(r.input_tokens),
+            opt_num(r.output_tokens)
+        );
+    }
+}
+
+fn opt_num<T: std::fmt::Display>(v: Option<T>) -> String {
+    v.map(|x| x.to_string())
+        .unwrap_or_else(|| "none".to_owned())
 }
 
 #[cfg(unix)]
