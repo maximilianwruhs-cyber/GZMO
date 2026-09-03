@@ -2232,66 +2232,74 @@ fn collect_profile_files(
     Ok(())
 }
 
-fn validate_mounted_worker_profile(
-    mounted: &Path,
-    roots: &WorkerRoots,
-    request: &WorkerRequest,
-    authority: &dyn PathAuthority,
-) -> Result<(), WorkerError> {
-    require_absolute_utf8_normalized("mounted_profile", mounted)?;
-    reject_symlink_component_path(mounted)?;
-    // Directory + required files: owned by root or coordinator, never worker.
-    require_trusted_profile_node(mounted, request, authority, true)?;
-    let agent = mounted.join("agent");
-    require_trusted_profile_node(&agent, request, authority, true)?;
-    require_trusted_profile_node(&agent.join("config.yml"), request, authority, false)?;
-    require_trusted_profile_node(&agent.join("models.yml"), request, authority, false)?;
-
-    validate_installed_profile_tree(mounted)?;
-    let actual = canonical_profile_tree_digest(mounted)?;
-    if actual != request.profile_digest() {
-        return Err(WorkerError::Trust(
-            "mounted profile_digest mismatch".to_owned(),
-        ));
-    }
-    let src = roots.profile_root().join(request.omp_profile());
-    let src_digest = canonical_profile_tree_digest(&src)?;
-    if src_digest != request.profile_digest() {
-        return Err(WorkerError::Trust("source profile_digest drift".to_owned()));
-    }
-    Ok(())
-}
-
-fn require_trusted_profile_node(
+/// Worker-owned runtime directory under HOME (profile mount parents).
+fn require_worker_owned_runtime_dir(
     path: &Path,
     request: &WorkerRequest,
     authority: &dyn PathAuthority,
-    is_dir: bool,
 ) -> Result<(), WorkerError> {
     reject_symlink_component_path(path)?;
     let st = authority.lstat(path)?;
     if st.is_symlink {
         return Err(WorkerError::Trust(format!(
-            "profile path must not be symlink: {}",
+            "profile runtime dir must not be symlink: {}",
             path.display()
         )));
     }
-    if is_dir {
-        if !st.is_dir {
+    if !st.is_dir {
+        return Err(WorkerError::Trust(format!(
+            "profile runtime dir must be directory: {}",
+            path.display()
+        )));
+    }
+    if st.uid != request.expected_uid() {
+        return Err(WorkerError::Trust(format!(
+            "profile runtime dir must be worker-owned: {}",
+            path.display()
+        )));
+    }
+    if mode_perms(st.mode) != 0o700 {
+        return Err(WorkerError::Trust(format!(
+            "profile runtime dir mode must be 0700: {}",
+            path.display()
+        )));
+    }
+    Ok(())
+}
+
+/// Trusted immutable config file mount point (root/coordinator-owned).
+fn require_trusted_profile_file(
+    path: &Path,
+    request: &WorkerRequest,
+    authority: &dyn PathAuthority,
+) -> Result<(), WorkerError> {
+    reject_symlink_component_path(path)?;
+    let st = match authority.lstat(path) {
+        Ok(st) => st,
+        Err(WorkerError::Io(msg)) if msg.contains("No such file") || msg.contains("not found") => {
             return Err(WorkerError::Trust(format!(
-                "profile path must be directory: {}",
+                "profile config mount point missing: {}",
                 path.display()
             )));
         }
-    } else if !st.is_file {
+        Err(err) => return Err(err),
+    };
+    if st.is_symlink {
         return Err(WorkerError::Trust(format!(
-            "profile path must be file: {}",
+            "profile config mount must not be symlink: {}",
             path.display()
         )));
     }
+    if !st.is_file {
+        return Err(WorkerError::Trust(format!(
+            "profile config mount must be regular file: {}",
+            path.display()
+        )));
+    }
+    // Nonwritable to group/world (owner write may exist on source; RO bind freezes bytes).
     if mode_perms(st.mode) & 0o022 != 0 {
         return Err(WorkerError::Trust(format!(
-            "profile path must not be group/world writable: {}",
+            "profile config mount must not be group/world writable: {}",
             path.display()
         )));
     }
@@ -2308,6 +2316,171 @@ fn require_trusted_profile_node(
         )));
     }
     Ok(())
+}
+
+const PROFILE_CONFIG_MOUNT_NAMES: &[&str] = &["config.yml", "models.yml"];
+
+fn is_profile_config_mount_name(name: &std::ffi::OsStr) -> bool {
+    PROFILE_CONFIG_MOUNT_NAMES
+        .iter()
+        .any(|n| name == std::ffi::OsStr::new(n))
+}
+
+/// Remove path without following symlinks (unlink symlink/file; recurse real dirs).
+fn remove_path_nofollow(path: &Path) -> Result<(), WorkerError> {
+    let meta = fs::symlink_metadata(path).map_err(|e| WorkerError::Io(e.to_string()))?;
+    let ft = meta.file_type();
+    if ft.is_symlink() || ft.is_file() {
+        fs::remove_file(path).map_err(|e| WorkerError::Io(e.to_string()))?;
+        return Ok(());
+    }
+    if meta.is_dir() {
+        let kids: Vec<_> = fs::read_dir(path)
+            .map_err(|e| WorkerError::Io(e.to_string()))?
+            .collect::<Result<Vec<_>, _>>()
+            .map_err(|e| WorkerError::Io(e.to_string()))?;
+        for entry in kids {
+            remove_path_nofollow(&entry.path())?;
+        }
+        fs::remove_dir(path).map_err(|e| WorkerError::Io(e.to_string()))?;
+        return Ok(());
+    }
+    // Special nodes: try unlink then rmdir.
+    match fs::remove_file(path) {
+        Ok(()) => Ok(()),
+        Err(_) => fs::remove_dir(path).map_err(|e| WorkerError::Io(e.to_string())),
+    }
+}
+
+/// Symlink-safe wipe of prior OMP profile runtime under `agent/`, preserving config mounts.
+fn clear_agent_runtime_except_config_mounts(agent_dir: &Path) -> Result<(), WorkerError> {
+    reject_symlink_component_path(agent_dir)?;
+    let meta = fs::symlink_metadata(agent_dir).map_err(|e| WorkerError::Io(e.to_string()))?;
+    if meta.file_type().is_symlink() || !meta.is_dir() {
+        return Err(WorkerError::Trust(
+            "profile agent dir must be a real directory".to_owned(),
+        ));
+    }
+
+    let mut saw_config = false;
+    let mut saw_models = false;
+    let kids: Vec<_> = fs::read_dir(agent_dir)
+        .map_err(|e| WorkerError::Io(e.to_string()))?
+        .collect::<Result<Vec<_>, _>>()
+        .map_err(|e| WorkerError::Io(e.to_string()))?;
+
+    for entry in kids {
+        let name = entry.file_name();
+        let path = entry.path();
+        if is_profile_config_mount_name(&name) {
+            let st = fs::symlink_metadata(&path).map_err(|e| WorkerError::Io(e.to_string()))?;
+            if st.file_type().is_symlink() || !st.is_file() {
+                return Err(WorkerError::Trust(format!(
+                    "profile config mount substituted or invalid: {}",
+                    path.display()
+                )));
+            }
+            if name == *"config.yml" {
+                saw_config = true;
+            } else if name == *"models.yml" {
+                saw_models = true;
+            }
+            continue;
+        }
+        remove_path_nofollow(&path)?;
+    }
+
+    if !saw_config {
+        return Err(WorkerError::Trust(
+            "profile config.yml mount point missing".to_owned(),
+        ));
+    }
+    if !saw_models {
+        return Err(WorkerError::Trust(
+            "profile models.yml mount point missing".to_owned(),
+        ));
+    }
+    Ok(())
+}
+
+fn validate_mounted_worker_profile(
+    mounted: &Path,
+    roots: &WorkerRoots,
+    request: &WorkerRequest,
+    authority: &dyn PathAuthority,
+) -> Result<(), WorkerError> {
+    require_absolute_utf8_normalized("mounted_profile", mounted)?;
+    reject_symlink_component_path(mounted)?;
+
+    // Parents stay worker-owned/writable for OMP runtime; only the two file mounts are trusted.
+    require_worker_owned_runtime_dir(mounted, request, authority)?;
+    let agent = mounted.join("agent");
+    require_worker_owned_runtime_dir(&agent, request, authority)?;
+
+    let config = agent.join("config.yml");
+    let models = agent.join("models.yml");
+    require_trusted_profile_file(&config, request, authority)?;
+    require_trusted_profile_file(&models, request, authority)?;
+
+    // After runtime cleanup the dest tree is exactly the two config files.
+    validate_installed_profile_tree(mounted)?;
+    let actual = canonical_profile_tree_digest(mounted)?;
+    if actual != request.profile_digest() {
+        return Err(WorkerError::Trust(
+            "mounted profile_digest mismatch".to_owned(),
+        ));
+    }
+    let src = roots.profile_root().join(request.omp_profile());
+    let src_digest = canonical_profile_tree_digest(&src)?;
+    if src_digest != request.profile_digest() {
+        return Err(WorkerError::Trust("source profile_digest drift".to_owned()));
+    }
+    Ok(())
+}
+
+/// Clear prior runtime state then revalidate immutable config mounts before OMP.
+fn prepare_mounted_worker_profile(
+    mounted: &Path,
+    roots: &WorkerRoots,
+    request: &WorkerRequest,
+    authority: &dyn PathAuthority,
+) -> Result<(), WorkerError> {
+    require_absolute_utf8_normalized("mounted_profile", mounted)?;
+    reject_symlink_component_path(mounted)?;
+    require_worker_owned_runtime_dir(mounted, request, authority)?;
+    let agent = mounted.join("agent");
+    require_worker_owned_runtime_dir(&agent, request, authority)?;
+
+    // Fail closed on missing/substituted mounts before deleting anything else.
+    require_trusted_profile_file(&agent.join("config.yml"), request, authority)?;
+    require_trusted_profile_file(&agent.join("models.yml"), request, authority)?;
+
+    clear_agent_runtime_except_config_mounts(&agent)?;
+    // Revalidate owner/mode/content/digest immediately before spawn.
+    validate_mounted_worker_profile(mounted, roots, request, authority)?;
+    Ok(())
+}
+
+fn validate_systemd_bind_path_component(path: &str) -> Result<(), WorkerError> {
+    if path.is_empty() {
+        return Err(WorkerError::Invalid(
+            "systemd bind path must not be empty".to_owned(),
+        ));
+    }
+    if path.contains(':') || path.contains('\0') || path.bytes().any(|b| b.is_ascii_whitespace()) {
+        return Err(WorkerError::Invalid(
+            "systemd bind path contains delimiter-unsafe characters".to_owned(),
+        ));
+    }
+    Ok(())
+}
+
+fn bind_read_only_path_pair(src: &Path, dst: &Path) -> Result<String, WorkerError> {
+    let s = path_to_string(src)?;
+    let d = path_to_string(dst)?;
+    validate_systemd_bind_path_component(&s)?;
+    validate_systemd_bind_path_component(&d)?;
+    Ok(format!("--property=BindReadOnlyPaths={s}:{d}"))
 }
 
 pub fn validate_code_candidate_profile(profile_dir: &Path) -> Result<(), WorkerError> {
@@ -2532,12 +2705,12 @@ fn run_worker_request_with<R: ProcessRunner>(
     }
 
     let home = request.output_dir().join(WORKER_HOME_NAME);
-    // Profile is bind-mounted read-only at HOME/.omp/profiles/<profile>. Never copy.
+    // File-level RO binds of config.yml/models.yml onto worker-owned profile runtime dirs.
     let mounted_profile = home
         .join(".omp")
         .join("profiles")
         .join(request.omp_profile());
-    validate_mounted_worker_profile(&mounted_profile, roots, &request, authority)?;
+    prepare_mounted_worker_profile(&mounted_profile, roots, &request, authority)?;
 
     let probed = probe_omp_version(
         runner,
@@ -3113,10 +3286,9 @@ impl<R: ProcessRunner + Send + Sync> SystemdWorkerLauncher<R> {
             "--property=NetworkNamespacePath={}",
             path_to_string(self.roots.model_netns())?
         ));
-        args.push(format!(
-            "--property=BindReadOnlyPaths={}",
-            path_to_string(request_path.parent().unwrap_or(request_path))?
-        ));
+        let request_bind = path_to_string(request_path.parent().unwrap_or(request_path))?;
+        validate_systemd_bind_path_component(&request_bind)?;
+        args.push(format!("--property=BindReadOnlyPaths={request_bind}"));
         let profile_src = self.roots.profile_root().join(request.omp_profile());
         let profile_dst = request
             .output_dir()
@@ -3124,16 +3296,17 @@ impl<R: ProcessRunner + Send + Sync> SystemdWorkerLauncher<R> {
             .join(".omp")
             .join("profiles")
             .join(request.omp_profile());
-        args.push(format!(
-            "--property=BindReadOnlyPaths={}:{}",
-            path_to_string(&profile_src)?,
-            path_to_string(&profile_dst)?
-        ));
+        // File-granularity binds only — never whole-tree profile bind (runtime must stay writable).
+        let src_config = profile_src.join("agent").join("config.yml");
+        let src_models = profile_src.join("agent").join("models.yml");
+        let dst_config = profile_dst.join("agent").join("config.yml");
+        let dst_models = profile_dst.join("agent").join("models.yml");
+        args.push(bind_read_only_path_pair(&src_config, &dst_config)?);
+        args.push(bind_read_only_path_pair(&src_models, &dst_models)?);
         if let Some(parent) = request.omp_executable().parent() {
-            args.push(format!(
-                "--property=BindReadOnlyPaths={}",
-                path_to_string(parent)?
-            ));
+            let exec_bind = path_to_string(parent)?;
+            validate_systemd_bind_path_component(&exec_bind)?;
+            args.push(format!("--property=BindReadOnlyPaths={exec_bind}"));
         }
         args.push(format!(
             "--property=BindPaths={}",
@@ -3804,39 +3977,32 @@ mod tests {
             if dest.exists() {
                 let _ = fs::remove_dir_all(&dest);
             }
-            fs::create_dir_all(dest.parent().unwrap()).unwrap();
-            // Copy profile tree (simulates systemd bind source contents at dest).
-            fn copy_tree(src: &Path, dst: &Path) {
-                fs::create_dir_all(dst).unwrap();
-                for e in fs::read_dir(src).unwrap() {
-                    let e = e.unwrap();
-                    let to = dst.join(e.file_name());
-                    if e.file_type().unwrap().is_dir() {
-                        copy_tree(&e.path(), &to);
-                    } else {
-                        fs::copy(e.path(), &to).unwrap();
-                    }
-                }
+            // Worker-owned runtime parents (0700); only config files simulate RO binds.
+            let omp = self.output_dir.join(WORKER_HOME_NAME).join(".omp");
+            let profiles = omp.join("profiles");
+            for d in [&omp, &profiles, &dest, &dest.join("agent")] {
+                fs::create_dir_all(d).unwrap();
+                let mut perms = fs::metadata(d).unwrap().permissions();
+                perms.set_mode(0o700);
+                fs::set_permissions(d, perms).unwrap();
             }
-            copy_tree(&self.profile_path, &dest);
-            // Ensure not group/world writable.
-            for walk in [dest.clone()] {
-                let mut stack = vec![walk];
-                while let Some(d) = stack.pop() {
-                    let meta = fs::symlink_metadata(&d).unwrap();
-                    let mut perms = meta.permissions();
-                    if meta.is_dir() {
-                        perms.set_mode(0o755);
-                        fs::set_permissions(&d, perms).unwrap();
-                        for e in fs::read_dir(&d).unwrap() {
-                            stack.push(e.unwrap().path());
-                        }
-                    } else {
-                        perms.set_mode(0o644);
-                        fs::set_permissions(&d, perms).unwrap();
-                    }
-                }
+            let agent = dest.join("agent");
+            for name in ["config.yml", "models.yml"] {
+                let src = self.profile_path.join("agent").join(name);
+                let dst = agent.join(name);
+                fs::copy(&src, &dst).unwrap();
+                let mut perms = fs::metadata(&dst).unwrap().permissions();
+                perms.set_mode(0o644);
+                fs::set_permissions(&dst, perms).unwrap();
             }
+        }
+
+        fn mounted_profile_dir(&self) -> PathBuf {
+            self.output_dir
+                .join(WORKER_HOME_NAME)
+                .join(".omp")
+                .join("profiles")
+                .join("code-worker")
         }
 
         fn load_auth(&self) -> TestPathAuthority {
@@ -3844,18 +4010,9 @@ mod tests {
             let coordinator_uid = self.real_uid.wrapping_add(1000).max(1);
             let mut trusted = BTreeSet::new();
             trusted.insert(self.omp_exec.clone());
-            trusted.insert(self.profile_path.clone());
-            trusted.insert(self.profile_path.join("agent").join("config.yml"));
-            trusted.insert(self.profile_path.join("agent").join("models.yml"));
-            // Mounted dest must appear coordinator-owned (simulates RO bind of trusted source).
-            let mounted = self
-                .output_dir
-                .join(WORKER_HOME_NAME)
-                .join(".omp")
-                .join("profiles")
-                .join("code-worker");
-            trusted.insert(mounted.clone());
-            trusted.insert(mounted.join("agent"));
+            // Source profile under profile_root maps coordinator automatically.
+            // Only the two mounted config files are trusted under output_root.
+            let mounted = self.mounted_profile_dir();
             trusted.insert(mounted.join("agent").join("config.yml"));
             trusted.insert(mounted.join("agent").join("models.yml"));
             TestPathAuthority::new(
@@ -4700,9 +4857,51 @@ mod tests {
         let args = launcher.build_systemd_run_args(&path, &req).unwrap();
         assert!(args.contains(&"--property=RemainAfterExit=yes".to_owned()));
         assert!(!args.iter().any(|a| a == "--collect"));
-        assert!(args
-            .iter()
-            .any(|a| a.starts_with("--property=BindReadOnlyPaths=") && a.contains(':')));
+        let src_config = h
+            .roots
+            .profile_root()
+            .join("code-worker")
+            .join("agent")
+            .join("config.yml");
+        let src_models = h
+            .roots
+            .profile_root()
+            .join("code-worker")
+            .join("agent")
+            .join("models.yml");
+        let dst_base = h
+            .output_dir
+            .join(WORKER_HOME_NAME)
+            .join(".omp")
+            .join("profiles")
+            .join("code-worker")
+            .join("agent");
+        let cfg_bind = bind_read_only_path_pair(&src_config, &dst_base.join("config.yml")).unwrap();
+        let models_bind =
+            bind_read_only_path_pair(&src_models, &dst_base.join("models.yml")).unwrap();
+        assert!(args.contains(&cfg_bind), "missing config bind: {args:?}");
+        assert!(args.contains(&models_bind), "missing models bind: {args:?}");
+        let tree_bind = format!(
+            "--property=BindReadOnlyPaths={}:{}",
+            h.roots.profile_root().join("code-worker").display(),
+            h.output_dir
+                .join(WORKER_HOME_NAME)
+                .join(".omp")
+                .join("profiles")
+                .join("code-worker")
+                .display()
+        );
+        assert!(
+            !args.contains(&tree_bind),
+            "must not whole-tree bind profile: {args:?}"
+        );
+        assert_eq!(
+            args.iter()
+                .filter(|a| a.contains("agent/config.yml") || a.contains("agent/models.yml"))
+                .count(),
+            2,
+            "exact two profile file binds required: {args:?}"
+        );
 
         let rt = tokio::runtime::Builder::new_current_thread()
             .enable_all()
@@ -5157,10 +5356,7 @@ mod tests {
         let coordinator_uid = h.real_uid.wrapping_add(1000).max(1);
         let mut trusted = BTreeSet::new();
         trusted.insert(h.omp_exec.clone());
-        trusted.insert(h.profile_path.clone());
-        trusted.insert(h.profile_path.join("agent").join("config.yml"));
-        trusted.insert(h.profile_path.join("agent").join("models.yml"));
-        // Omit mounted dest from trusted → output_root mapping → worker owner.
+        // Omit mounted config files from trusted → output_root mapping → worker owner.
         let auth = TestPathAuthority::new(
             EffectiveIdentity {
                 uid: worker_uid,
@@ -5179,6 +5375,152 @@ mod tests {
             err.to_string().contains("worker-owned") || err.to_string().contains("Trust"),
             "{err}"
         );
+    }
+
+    #[test]
+    fn trusted_config_with_worker_owned_parents_is_accepted() {
+        let h = Harness::new();
+        let _req = h.seal("m");
+        h.materialize_profile_mount();
+        let auth = h.load_auth();
+        let mounted = h.mounted_profile_dir();
+        // Parents map to worker via output_root; config files trusted.
+        let parent_st = auth.lstat(&mounted).unwrap();
+        assert_eq!(parent_st.uid, h.real_uid);
+        let agent_st = auth.lstat(&mounted.join("agent")).unwrap();
+        assert_eq!(agent_st.uid, h.real_uid);
+        let cfg_st = auth
+            .lstat(&mounted.join("agent").join("config.yml"))
+            .unwrap();
+        assert_eq!(cfg_st.uid, h.real_uid.wrapping_add(1000).max(1));
+        prepare_mounted_worker_profile(&mounted, &h.roots, &_req, &auth).unwrap();
+    }
+
+    #[test]
+    fn profile_runtime_cleanup_preserves_mounts_and_outside_symlink_targets() {
+        let h = Harness::new();
+        let req = h.seal("m");
+        h.materialize_profile_mount();
+        let agent = h.mounted_profile_dir().join("agent");
+
+        // Prior runtime residue.
+        fs::write(agent.join("agent.db"), b"poison-db").unwrap();
+        fs::create_dir_all(agent.join("blobs").join("x")).unwrap();
+        fs::write(agent.join("blobs").join("x").join("b"), b"blob").unwrap();
+        fs::create_dir_all(agent.join("hooks").join("pre")).unwrap();
+        fs::write(agent.join("hooks").join("pre").join("h.ts"), b"hook").unwrap();
+        fs::create_dir_all(agent.join("tools")).unwrap();
+        fs::write(agent.join("tools").join("t.js"), b"tool").unwrap();
+        fs::create_dir_all(agent.join("cache")).unwrap();
+        fs::write(agent.join("cache").join("m.sqlite"), b"cache").unwrap();
+
+        // Symlink whose target lives outside the profile tree.
+        let outside = h.output_dir.join("outside-secret.txt");
+        fs::write(&outside, b"keep-me").unwrap();
+        std::os::unix::fs::symlink(&outside, agent.join("escape.link")).unwrap();
+
+        prepare_mounted_worker_profile(&h.mounted_profile_dir(), &h.roots, &req, &h.load_auth())
+            .unwrap();
+
+        assert!(agent.join("config.yml").is_file());
+        assert!(agent.join("models.yml").is_file());
+        assert!(!agent.join("agent.db").exists());
+        assert!(!agent.join("blobs").exists());
+        assert!(!agent.join("hooks").exists());
+        assert!(!agent.join("tools").exists());
+        assert!(!agent.join("cache").exists());
+        assert!(!agent.join("escape.link").exists());
+        assert_eq!(fs::read(&outside).unwrap(), b"keep-me");
+
+        // Repeated attempt: repollute and clear again (fresh runtime).
+        fs::write(agent.join("agent.db"), b"again").unwrap();
+        fs::create_dir_all(agent.join("cache")).unwrap();
+        prepare_mounted_worker_profile(&h.mounted_profile_dir(), &h.roots, &req, &h.load_auth())
+            .unwrap();
+        assert!(!agent.join("agent.db").exists());
+        assert!(!agent.join("cache").exists());
+        assert!(agent.join("config.yml").is_file());
+    }
+
+    #[test]
+    fn missing_or_substituted_config_mount_is_rejected() {
+        let h = Harness::new();
+        let req = h.seal("m");
+        h.materialize_profile_mount();
+        let agent = h.mounted_profile_dir().join("agent");
+        let auth = h.load_auth();
+
+        // Missing mount.
+        fs::remove_file(agent.join("config.yml")).unwrap();
+        let err = prepare_mounted_worker_profile(&h.mounted_profile_dir(), &h.roots, &req, &auth)
+            .unwrap_err();
+        assert!(
+            err.to_string().contains("mount")
+                || err.to_string().contains("config")
+                || err.to_string().contains("Trust")
+                || err.to_string().contains("Io"),
+            "{err}"
+        );
+
+        // Restore then substitute with symlink.
+        h.materialize_profile_mount();
+        let agent = h.mounted_profile_dir().join("agent");
+        let outside = h.output_dir.join("fake-config.yml");
+        fs::write(&outside, b"modelRoles:\n  code_candidate: local/code\n").unwrap();
+        fs::remove_file(agent.join("config.yml")).unwrap();
+        std::os::unix::fs::symlink(&outside, agent.join("config.yml")).unwrap();
+        let err = prepare_mounted_worker_profile(
+            &h.mounted_profile_dir(),
+            &h.roots,
+            &req,
+            &h.load_auth(),
+        )
+        .unwrap_err();
+        assert!(
+            err.to_string().contains("symlink")
+                || err.to_string().contains("substituted")
+                || err.to_string().contains("Trust"),
+            "{err}"
+        );
+        assert_eq!(
+            fs::read(&outside).unwrap(),
+            b"modelRoles:\n  code_candidate: local/code\n"
+        );
+    }
+
+    #[test]
+    fn systemd_profile_binds_are_exact_file_level_pair() {
+        let h = Harness::new();
+        let req = h.seal("m");
+        let path = request_path(&h);
+        let launcher = SystemdWorkerLauncher::new(
+            FakeProcessRunner::new(),
+            PathBuf::from("/usr/bin/gzmo-evolver"),
+            h.roots.clone(),
+        )
+        .unwrap();
+        let args = launcher.build_systemd_run_args(&path, &req).unwrap();
+        let src_config = h.profile_path.join("agent").join("config.yml");
+        let src_models = h.profile_path.join("agent").join("models.yml");
+        let dst_agent = h.mounted_profile_dir().join("agent");
+        let cfg = bind_read_only_path_pair(&src_config, &dst_agent.join("config.yml")).unwrap();
+        let models = bind_read_only_path_pair(&src_models, &dst_agent.join("models.yml")).unwrap();
+        assert!(args.contains(&cfg), "{args:?}");
+        assert!(args.contains(&models), "{args:?}");
+        assert_eq!(
+            args.iter()
+                .filter(|a| a.contains("/agent/config.yml") || a.contains("/agent/models.yml"))
+                .count(),
+            2
+        );
+        assert!(!args.iter().any(|a| {
+            a.starts_with("--property=BindReadOnlyPaths=")
+                && a.contains(&format!(
+                    "{}:{}",
+                    h.profile_path.display(),
+                    h.mounted_profile_dir().display()
+                ))
+        }));
     }
 
     #[test]
