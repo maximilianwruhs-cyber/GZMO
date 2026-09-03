@@ -10,7 +10,7 @@ use gzmo_evolver::{
     MissionAdapter, RepoEvolverConfig, StateStore, SystemClock, SystemProcessRunner,
 };
 #[cfg(unix)]
-use gzmo_evolver::{run_hidden_worker, RepoEvolver, RunOutcome, StatusV1};
+use gzmo_evolver::{run_hidden_worker, RepoEvolver, RunOutcome, RunnerError, StatusV1};
 use serde::Serialize;
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
@@ -161,19 +161,150 @@ struct ActiveCandidateStatus {
     updated_at: String,
 }
 
+/// Structured lifecycle error under `--json` (stderr only; no secrets/logs).
+#[derive(Debug, Serialize)]
+struct LifecycleErrorV1<'a> {
+    schema: &'static str,
+    class: &'a str,
+    candidate_id: Option<&'a str>,
+    reason: &'a str,
+    retryable: bool,
+}
+
+fn bound_cli_reason(msg: &str) -> String {
+    const MAX: usize = 512;
+    let trimmed = msg.trim();
+    if trimmed.len() <= MAX {
+        trimmed.to_owned()
+    } else {
+        format!("{}...", trimmed.chars().take(MAX).collect::<String>())
+    }
+}
+
+/// Distinct unattended exit codes for typed lifecycle failures.
+/// 3 contention, 4 recovery-required, 5 candidate-failed, 6 later-stage, 7 lock-busy; else 1.
+#[cfg(unix)]
+fn emit_runner_error(err: &RunnerError, json: bool) -> ExitCode {
+    let (code, class, candidate_id, reason, retryable) = match err {
+        RunnerError::Contention(msg) => (3u8, "contention", None, bound_cli_reason(msg), true),
+        RunnerError::RecoveryRequired(msg) => {
+            (4, "recovery_required", None, bound_cli_reason(msg), false)
+        }
+        RunnerError::Failed {
+            reason,
+            candidate_id,
+        } => (
+            5,
+            "candidate_failed",
+            Some(candidate_id.as_str()),
+            bound_cli_reason(reason),
+            false,
+        ),
+        RunnerError::LaterStage(msg) => (6, "later_stage", None, bound_cli_reason(msg), false),
+        RunnerError::LockBusy => (
+            7,
+            "lock_busy",
+            None,
+            "coordinator lock busy".to_owned(),
+            true,
+        ),
+        other => (
+            1,
+            "error",
+            None,
+            bound_cli_reason(&other.to_string()),
+            false,
+        ),
+    };
+    if json {
+        let body = LifecycleErrorV1 {
+            schema: "gzmo.repo_evolver.lifecycle_error/v1",
+            class,
+            candidate_id,
+            reason: &reason,
+            retryable,
+        };
+        match serde_json::to_string(&body) {
+            Ok(s) => eprintln!("{s}"),
+            Err(_) => eprintln!(
+                "{{\"schema\":\"gzmo.repo_evolver.lifecycle_error/v1\",\"class\":\"error\",\"candidate_id\":null,\"reason\":\"serialize\",\"retryable\":false}}"
+            ),
+        }
+    } else {
+        eprintln!("error: {err}");
+    }
+    ExitCode::from(code)
+}
+
 fn main() -> ExitCode {
-    match run() {
-        Ok(()) => ExitCode::SUCCESS,
-        Err(err) => {
-            eprintln!("error: {err:#}");
-            ExitCode::FAILURE
+    let cli = Cli::parse();
+    match cli.command {
+        Command::Run { json } | Command::Resume { json } | Command::Abort { json, .. } => {
+            match run_lifecycle_entry(&cli.config, &cli.command) {
+                Ok(()) => ExitCode::SUCCESS,
+                #[cfg(unix)]
+                Err(LifecycleFailure::Runner(err)) => emit_runner_error(&err, json),
+                Err(LifecycleFailure::Other(err)) => {
+                    eprintln!("error: {err:#}");
+                    ExitCode::FAILURE
+                }
+            }
+        }
+        other => {
+            let cli = Cli {
+                config: cli.config,
+                command: other,
+            };
+            match run_non_lifecycle(cli) {
+                Ok(()) => ExitCode::SUCCESS,
+                Err(err) => {
+                    eprintln!("error: {err:#}");
+                    ExitCode::FAILURE
+                }
+            }
         }
     }
 }
 
-fn run() -> Result<()> {
-    let cli = Cli::parse();
+enum LifecycleFailure {
+    #[cfg(unix)]
+    Runner(RunnerError),
+    Other(anyhow::Error),
+}
 
+impl From<anyhow::Error> for LifecycleFailure {
+    fn from(value: anyhow::Error) -> Self {
+        Self::Other(value)
+    }
+}
+
+fn run_lifecycle_entry(
+    config: &Option<PathBuf>,
+    command: &Command,
+) -> Result<(), LifecycleFailure> {
+    let config_path = require_cli_config(config.as_deref())?;
+    let cfg = RepoEvolverConfig::load(config_path)
+        .with_context(|| format!("loading config {}", config_path.display()))?;
+    let (op, json) = match command {
+        Command::Run { json } => (LifecycleOp::Run, *json),
+        Command::Resume { json } => (LifecycleOp::Resume, *json),
+        Command::Abort {
+            candidate_id,
+            reason,
+            json,
+        } => (
+            LifecycleOp::Abort {
+                candidate_id: candidate_id.clone(),
+                reason: reason.clone(),
+            },
+            *json,
+        ),
+        _ => return Err(anyhow::anyhow!("internal: not a lifecycle command").into()),
+    };
+    run_lifecycle(cfg, json, op)
+}
+
+fn run_non_lifecycle(cli: Cli) -> Result<()> {
     match cli.command {
         #[cfg(unix)]
         Command::Worker { request } => {
@@ -285,34 +416,8 @@ fn run() -> Result<()> {
             }
             Ok(())
         }
-        Command::Run { json } => {
-            let config_path = require_cli_config(cli.config.as_deref())?;
-            let cfg = RepoEvolverConfig::load(config_path)
-                .with_context(|| format!("loading config {}", config_path.display()))?;
-            run_lifecycle(cfg, json, LifecycleOp::Run)
-        }
-        Command::Resume { json } => {
-            let config_path = require_cli_config(cli.config.as_deref())?;
-            let cfg = RepoEvolverConfig::load(config_path)
-                .with_context(|| format!("loading config {}", config_path.display()))?;
-            run_lifecycle(cfg, json, LifecycleOp::Resume)
-        }
-        Command::Abort {
-            candidate_id,
-            reason,
-            json,
-        } => {
-            let config_path = require_cli_config(cli.config.as_deref())?;
-            let cfg = RepoEvolverConfig::load(config_path)
-                .with_context(|| format!("loading config {}", config_path.display()))?;
-            run_lifecycle(
-                cfg,
-                json,
-                LifecycleOp::Abort {
-                    candidate_id,
-                    reason,
-                },
-            )
+        Command::Run { .. } | Command::Resume { .. } | Command::Abort { .. } => {
+            unreachable!("lifecycle commands are handled in main");
         }
     }
 }
@@ -326,30 +431,40 @@ enum LifecycleOp {
     },
 }
 
-fn run_lifecycle(cfg: RepoEvolverConfig, json: bool, op: LifecycleOp) -> Result<()> {
+fn run_lifecycle(
+    cfg: RepoEvolverConfig,
+    json: bool,
+    op: LifecycleOp,
+) -> Result<(), LifecycleFailure> {
     #[cfg(unix)]
     {
         let rt = tokio::runtime::Builder::new_current_thread()
             .enable_all()
             .build()
             .context("building tokio runtime")?;
-        let evolver = RepoEvolver::production(cfg).map_err(|e| anyhow::anyhow!("evolver: {e}"))?;
+        let evolver = match RepoEvolver::production(cfg) {
+            Ok(e) => e,
+            Err(err) => return Err(LifecycleFailure::Runner(err)),
+        };
         let outcome: RunOutcome = match op {
             LifecycleOp::Run => rt
                 .block_on(evolver.run_once())
-                .map_err(|e| anyhow::anyhow!("run: {e}"))?,
+                .map_err(LifecycleFailure::Runner)?,
             LifecycleOp::Resume => rt
                 .block_on(evolver.resume())
-                .map_err(|e| anyhow::anyhow!("resume: {e}"))?,
+                .map_err(LifecycleFailure::Runner)?,
             LifecycleOp::Abort {
                 candidate_id,
                 reason,
             } => rt
                 .block_on(evolver.abort(&candidate_id, &reason))
-                .map_err(|e| anyhow::anyhow!("abort: {e}"))?,
+                .map_err(LifecycleFailure::Runner)?,
         };
         if json {
-            println!("{}", serde_json::to_string_pretty(&outcome)?);
+            println!(
+                "{}",
+                serde_json::to_string_pretty(&outcome).map_err(anyhow::Error::from)?
+            );
         } else {
             print_run_outcome_human(&outcome);
         }
@@ -358,7 +473,7 @@ fn run_lifecycle(cfg: RepoEvolverConfig, json: bool, op: LifecycleOp) -> Result<
     #[cfg(not(unix))]
     {
         let _ = (cfg, json, op);
-        bail!("lifecycle commands require unix");
+        Err(anyhow::anyhow!("lifecycle commands require unix").into())
     }
 }
 
@@ -623,4 +738,71 @@ fn print_prepare_human(report: &PrepareReport) {
     );
     println!("    created_at: {}", c.created_at);
     println!("    updated_at: {}", c.updated_at);
+}
+
+#[cfg(all(test, unix))]
+mod lifecycle_error_tests {
+    use super::*;
+    use gzmo_evolver::RunnerError;
+
+    #[test]
+    fn lifecycle_error_codes_distinguish_lock_busy_and_failed() {
+        let lock = RunnerError::LockBusy;
+        let (code_lock, class_lock, _, _, retry_lock) = match &lock {
+            RunnerError::LockBusy => (
+                7u8,
+                "lock_busy",
+                None::<&str>,
+                "coordinator lock busy",
+                true,
+            ),
+            _ => unreachable!(),
+        };
+        let failed = RunnerError::Failed {
+            reason: "boom".into(),
+            candidate_id: "cand-20260901t120000z-bet-x".into(),
+        };
+        let (code_fail, class_fail, cand, reason, retry_fail) = match &failed {
+            RunnerError::Failed {
+                reason,
+                candidate_id,
+            } => (
+                5u8,
+                "candidate_failed",
+                Some(candidate_id.as_str()),
+                reason.as_str(),
+                false,
+            ),
+            _ => unreachable!(),
+        };
+        assert_ne!(code_lock, code_fail);
+        assert_ne!(class_lock, class_fail);
+        assert!(retry_lock);
+        assert!(!retry_fail);
+        assert_eq!(cand, Some("cand-20260901t120000z-bet-x"));
+        assert_eq!(reason, "boom");
+
+        // emit_runner_error path: structured JSON shape
+        let body_lock = LifecycleErrorV1 {
+            schema: "gzmo.repo_evolver.lifecycle_error/v1",
+            class: class_lock,
+            candidate_id: None,
+            reason: "coordinator lock busy",
+            retryable: true,
+        };
+        let body_fail = LifecycleErrorV1 {
+            schema: "gzmo.repo_evolver.lifecycle_error/v1",
+            class: class_fail,
+            candidate_id: cand,
+            reason,
+            retryable: false,
+        };
+        let jlock = serde_json::to_value(&body_lock).unwrap();
+        let jfail = serde_json::to_value(&body_fail).unwrap();
+        assert_eq!(jlock["class"], "lock_busy");
+        assert_eq!(jfail["class"], "candidate_failed");
+        assert_eq!(jlock["retryable"], true);
+        assert_eq!(jfail["retryable"], false);
+        assert!(jlock.get("stdout").is_none());
+    }
 }

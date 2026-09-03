@@ -2,6 +2,43 @@
 //!
 //! Later tasks add modules only when real implementations exist.
 
+use std::path::Path;
+
+/// Component-wise containment: true when `path` equals `root` or is a descendant.
+///
+/// Uses `Path::starts_with` semantics (not string prefix). Callers retain their own
+/// normalization and parent-dir rejection before invoking this helper.
+pub(crate) fn path_is_within(path: &Path, root: &Path) -> bool {
+    path.starts_with(root)
+}
+
+#[cfg(test)]
+mod path_is_within_tests {
+    use super::path_is_within;
+    use std::path::Path;
+
+    #[test]
+    fn containment_table() {
+        let cases: &[(&str, &str, bool)] = &[
+            ("/a/b", "/a/b", true),
+            ("/a/b/c", "/a/b", true),
+            ("/a/bc", "/a/b", false),
+            ("/a/b", "/a/b/c", false),
+            // Component prefix only; callers must reject `..` before invoking.
+            ("/a/../b", "/a", true),
+            ("/a/../b", "/b", false),
+            ("/x", "/y", false),
+        ];
+        for (path, root, expect) in cases {
+            assert_eq!(
+                path_is_within(Path::new(path), Path::new(root)),
+                *expect,
+                "path={path} root={root}"
+            );
+        }
+    }
+}
+
 pub mod config;
 pub mod git;
 pub mod mission;
@@ -54,10 +91,10 @@ pub use worker::{
     render_mission_prompt, render_omp_overlay, render_system_prompt, resolve_fixed_worker_identity,
     run_hidden_worker, run_worker_request, seal_worker_bundle, try_load_existing_sealed_request,
     validate_code_candidate_profile, worker_runtime_dirs, EffectiveIdentity, OmpJsonlUsage,
-    PathAuthority, SealWorkerInput, SystemPathAuthority, SystemdWorkerLauncher,
-    SystemdWorkerRuntimeProvisioner, WorkerCompanions, WorkerError, WorkerLauncher, WorkerReceipt,
-    WorkerRequest, WorkerRoots, WorkerRuntimeProvisioner, WorkerUnitState, DISABLED_PROVIDERS,
-    FORBIDDEN_ENV, OMP_OUTPUT_CAP_BYTES, PROD_MODEL_NETNS, PROD_OUTPUT_ROOT, PROD_PROFILE_ROOT,
-    PROD_REQUEST_ROOT, PROD_WORKER_USER, WORKER_HOME_NAME, WORKER_NO_PROXY, WORKER_RECEIPT_SCHEMA,
+    SealWorkerInput, SystemdWorkerLauncher, SystemdWorkerRuntimeProvisioner, WorkerCompanions,
+    WorkerError, WorkerLauncher, WorkerReceipt, WorkerRequest, WorkerRoots,
+    WorkerRuntimeProvisioner, WorkerUnitState, DISABLED_PROVIDERS, FORBIDDEN_ENV,
+    OMP_OUTPUT_CAP_BYTES, PROD_MODEL_NETNS, PROD_OUTPUT_ROOT, PROD_PROFILE_ROOT, PROD_REQUEST_ROOT,
+    PROD_WORKER_USER, WORKER_HOME_NAME, WORKER_NO_PROXY, WORKER_RECEIPT_SCHEMA,
     WORKER_REQUEST_SCHEMA, WORKER_SAFE_PATH,
 };

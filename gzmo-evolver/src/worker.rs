@@ -238,7 +238,7 @@ pub struct EffectiveIdentity {
 
 /// Ownership/mode view of a path (real or test-mapped).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct PathStat {
+pub(crate) struct PathStat {
     pub uid: u32,
     pub gid: u32,
     pub mode: u32,
@@ -248,14 +248,14 @@ pub struct PathStat {
 }
 
 /// Filesystem authority seam. Production uses real lstat; tests may map owners.
-pub trait PathAuthority: Send + Sync {
+pub(crate) trait PathAuthority: Send + Sync {
     fn effective_identity(&self) -> EffectiveIdentity;
     fn lstat(&self, path: &Path) -> Result<PathStat, WorkerError>;
 }
 
 /// Production authority using std metadata and geteuid/getegid.
 #[derive(Debug, Default, Clone, Copy)]
-pub struct SystemPathAuthority;
+pub(crate) struct SystemPathAuthority;
 
 impl PathAuthority for SystemPathAuthority {
     fn effective_identity(&self) -> EffectiveIdentity {
@@ -1028,7 +1028,7 @@ fn path_is_within(path: &Path, root: &Path) -> bool {
     let Ok(r) = normalize_abs_path(root) else {
         return false;
     };
-    p == r || p.starts_with(&r)
+    crate::path_is_within(&p, &r)
 }
 
 fn path_to_string(path: &Path) -> Result<String, WorkerError> {
@@ -1096,6 +1096,108 @@ fn ensure_dir_mode(path: &Path, mode: u32) -> Result<(), WorkerError> {
     let mut perms = meta.permissions();
     perms.set_mode(mode);
     fs::set_permissions(path, perms)?;
+    Ok(())
+}
+
+/// Create a directory (and parents) with an exact mode, never following symlinks on the leaf.
+fn create_dir_exact_mode(path: &Path, mode: u32) -> Result<(), WorkerError> {
+    if let Some(parent) = path.parent() {
+        if !parent.as_os_str().is_empty() && !parent.exists() {
+            fs::create_dir_all(parent)?;
+        }
+    }
+    if !path.exists() {
+        fs::create_dir(path)?;
+    }
+    reject_symlink_component_path(path)?;
+    let meta = fs::symlink_metadata(path)?;
+    if meta.file_type().is_symlink() || !meta.is_dir() {
+        return Err(WorkerError::Trust(format!(
+            "{} must be a real directory",
+            path.display()
+        )));
+    }
+    let mut perms = meta.permissions();
+    perms.set_mode(mode);
+    fs::set_permissions(path, perms)?;
+    Ok(())
+}
+
+/// Set group ownership via nix; fail closed when the operation is not permitted.
+fn set_path_group(path: &Path, gid: u32) -> Result<(), WorkerError> {
+    use nix::unistd::{chown, Gid};
+    chown(path, None, Some(Gid::from_raw(gid))).map_err(|err| {
+        WorkerError::Trust(format!(
+            "failed to set expected_gid on {}: {err}",
+            path.display()
+        ))
+    })?;
+    let st = lstat_system(path)?;
+    if st.gid != gid {
+        return Err(WorkerError::Trust(format!(
+            "group ownership mismatch after chgrp on {}",
+            path.display()
+        )));
+    }
+    Ok(())
+}
+
+/// Accept coordinator request-dir modes: plain 0750 or setgid 02750.
+fn is_request_dir_mode(mode: u32) -> bool {
+    let m = mode_perms(mode);
+    m == 0o750 || m == 0o2750
+}
+
+/// Request root is operations-preprovisioned (or created once as 02750). Never strip setgid.
+///
+/// Owner must be the live coordinator euid. `coordinator_uid` is recorded for worker-side
+/// companion checks and may differ only under the private test authority seam.
+fn ensure_request_root(
+    path: &Path,
+    _coordinator_uid: u32,
+    expected_gid: u32,
+) -> Result<(), WorkerError> {
+    require_absolute_utf8_normalized("request_root", path)?;
+    let euid = current_euid();
+    if path.exists() {
+        reject_symlink_component_path(path)?;
+        let st = lstat_system(path)?;
+        if st.is_symlink || !st.is_dir {
+            return Err(WorkerError::Trust(
+                "request_root must be a real nonsymlink directory".to_owned(),
+            ));
+        }
+        if st.uid != euid {
+            return Err(WorkerError::Trust(
+                "request_root must be owned by the current coordinator".to_owned(),
+            ));
+        }
+        if st.gid != expected_gid {
+            return Err(WorkerError::Trust(
+                "request_root gid must equal expected_gid".to_owned(),
+            ));
+        }
+        if !is_request_dir_mode(st.mode) {
+            return Err(WorkerError::Trust(
+                "request_root mode must be 0750 or 02750".to_owned(),
+            ));
+        }
+        // Never chmod an existing request root (setgid must survive).
+        return Ok(());
+    }
+    create_dir_exact_mode(path, 0o2750)?;
+    set_path_group(path, expected_gid)?;
+    let st = lstat_system(path)?;
+    if st.uid != euid {
+        return Err(WorkerError::Trust(
+            "request_root must be owned by the current coordinator after create".to_owned(),
+        ));
+    }
+    if st.gid != expected_gid || !is_request_dir_mode(st.mode) {
+        return Err(WorkerError::Trust(
+            "request_root create did not yield expected gid/mode".to_owned(),
+        ));
+    }
     Ok(())
 }
 
@@ -1191,8 +1293,12 @@ pub fn seal_worker_bundle(
     input: SealWorkerInput,
 ) -> Result<WorkerRequest, WorkerError> {
     roots.validate_intrinsic()?;
-    // May create/chmod only the request root (coordinator-owned staging area).
-    ensure_dir_mode(roots.request_root(), 0o750)?;
+    // Request root is coordinator-owned / expected_gid / 0750|02750; never strip setgid.
+    ensure_request_root(
+        roots.request_root(),
+        input.coordinator_uid,
+        input.expected_gid,
+    )?;
     // output_root / profile_root must already exist; never create or chmod them.
     verify_existing_root_dir("output_root", roots.output_root())?;
     verify_existing_root_dir("profile_root", roots.profile_root())?;
@@ -1212,7 +1318,9 @@ pub fn seal_worker_bundle(
     if staging.exists() {
         let _ = fs::remove_dir_all(&staging);
     }
-    ensure_dir_mode(&staging, 0o750)?;
+    // Staging inherits setgid when the request root carries it; force 02750 + expected_gid.
+    create_dir_exact_mode(&staging, 0o2750)?;
+    set_path_group(&staging, input.expected_gid)?;
 
     if input.companions.system_prompt_md.len() > MAX_PROMPT_BYTES
         || input.companions.mission_md.len() > MAX_PROMPT_BYTES
@@ -1369,6 +1477,24 @@ pub fn seal_worker_bundle(
     let req_bytes = request.canonical_bytes()?;
     write_file_mode(&staging.join(REQUEST_FILE_NAME), &req_bytes, 0o440)?;
 
+    // Every companion + request must carry expected_gid (worker-readable, coordinator-owned).
+    for name in [
+        MANIFEST_FILE_NAME,
+        POLICY_FILE_NAME,
+        SYSTEM_PROMPT_FILE_NAME,
+        MISSION_FILE_NAME,
+        OMP_OVERLAY_FILE_NAME,
+        REQUEST_FILE_NAME,
+    ] {
+        set_path_group(&staging.join(name), input.expected_gid)?;
+    }
+    let staging_st = lstat_system(&staging)?;
+    if staging_st.gid != input.expected_gid || !is_request_dir_mode(staging_st.mode) {
+        return Err(WorkerError::Trust(
+            "staging bundle must keep expected_gid and 0750/02750 before rename".to_owned(),
+        ));
+    }
+
     // fsync directory entries best-effort then atomic rename.
     if let Ok(dir) = File::open(&staging) {
         let _ = dir.sync_all();
@@ -1463,7 +1589,7 @@ fn load_sealed_request_with(
     // Request file ownership/mode.
     let st = authority.lstat(&request_path)?;
     require_coordinator_owned_file(&st, &request, "request.json")?;
-    // Bundle dir 0750 coordinator-owned.
+    // Bundle dir 0750 or setgid 02750, coordinator-owned, expected_gid.
     let dst = authority.lstat(bundle_dir)?;
     if dst.is_symlink || !dst.is_dir {
         return Err(WorkerError::Trust(
@@ -1475,9 +1601,9 @@ fn load_sealed_request_with(
             "bundle dir owner/group mismatch".to_owned(),
         ));
     }
-    if mode_perms(dst.mode) != 0o750 {
+    if !is_request_dir_mode(dst.mode) {
         return Err(WorkerError::Trust(
-            "bundle dir mode must be 0750".to_owned(),
+            "bundle dir mode must be 0750 or 02750".to_owned(),
         ));
     }
 
@@ -1797,7 +1923,7 @@ pub fn probe_omp_version<R: ProcessRunner>(
     Ok(probed)
 }
 
-fn parse_omp_version_output(text: &str) -> Result<String, WorkerError> {
+pub(crate) fn parse_omp_version_output(text: &str) -> Result<String, WorkerError> {
     // Accept first token that looks like 18.x.y or v18.x.y
     for raw in text.split_whitespace() {
         let t = raw
@@ -2182,12 +2308,7 @@ pub fn render_omp_overlay(provider_model: &str) -> String {
     out
 }
 
-/// Validate installed profile tree: `agent/config.yml` + `agent/models.yml`.
-///
-/// Requires exactly one `modelRoles.code_candidate = "<provider>/<model>"`,
-/// that provider/model exists, `auth: none`, no apiKey/headers/credential fields,
-/// and an `http` base URL whose host is loopback.
-
+/// Verify an existing nonsymlink root directory is not group/world writable.
 fn verify_existing_root_dir(name: &str, path: &Path) -> Result<(), WorkerError> {
     require_absolute_utf8_normalized(name, path)?;
     reject_symlink_component_path(path)?;
@@ -2350,7 +2471,7 @@ fn require_worker_owned_runtime_dir(
             path.display()
         )));
     }
-    if st.uid != request.expected_uid() {
+    if st.uid != request.expected_uid() || st.gid != request.expected_gid() {
         return Err(WorkerError::Trust(format!(
             "profile runtime dir must be worker-owned: {}",
             path.display()
@@ -2631,6 +2752,12 @@ fn bind_read_only_path_pair(src: &Path, dst: &Path) -> Result<String, WorkerErro
 pub fn validate_code_candidate_profile(profile_dir: &Path) -> Result<(), WorkerError> {
     validate_installed_profile_tree(profile_dir)
 }
+
+/// Validate installed profile tree: `agent/config.yml` + `agent/models.yml`.
+///
+/// Requires exactly one `modelRoles.code_candidate = "<provider>/<model>"`,
+/// that provider/model exists, `auth: none`, no apiKey/headers/credential fields,
+/// and an `http` base URL whose host is loopback.
 
 fn validate_installed_profile_tree(profile_dir: &Path) -> Result<(), WorkerError> {
     reject_symlink_component_path(profile_dir)?;
@@ -3602,15 +3729,9 @@ impl<R: ProcessRunner + Send + Sync> WorkerRuntimeProvisioner
         let unit = Self::unit_name(id);
         let start = self.run_systemctl(&["start".to_owned(), unit.clone()])?;
         if start.status != 0 {
-            // Transient busy is reported as LeaseBusy when systemctl indicates contention.
-            let combined = format!(
-                "{}{}",
-                String::from_utf8_lossy(&start.stdout),
-                String::from_utf8_lossy(&start.stderr)
-            );
-            if combined.contains("busy") || combined.contains("lock") {
-                return Err(WorkerError::LeaseBusy);
-            }
+            // Nonzero fixed-unit start is RecoveryRequired/Process — never classify from
+            // candidate/unit text (mission bet slugs can embed "lock"/"busy").
+            // Transient contention remains typed LeaseBusy / activating poll only.
             return Err(WorkerError::Process(format!(
                 "runtime unit {unit} start failed"
             )));
@@ -4304,9 +4425,19 @@ mod tests {
             let profile_root = base.join("profiles");
             let netns = base.join("netns").join("gzmo-evolver-model");
             fs::create_dir_all(&request_root).unwrap();
+            {
+                let mut perms = fs::metadata(&request_root).unwrap().permissions();
+                perms.set_mode(0o2750);
+                fs::set_permissions(&request_root, perms).unwrap();
+            }
             fs::create_dir_all(&output_root).unwrap();
             fs::create_dir_all(&profile_root).unwrap();
             fs::create_dir_all(&netns).unwrap();
+            {
+                let mut perms = fs::metadata(&request_root).unwrap().permissions();
+                perms.set_mode(0o2750);
+                fs::set_permissions(&request_root, perms).unwrap();
+            }
             let roots = WorkerRoots::for_test(
                 request_root,
                 output_root.clone(),
@@ -4466,22 +4597,8 @@ mod tests {
                 manifest_digest,
                 policy_digest,
             };
-            // seal uses real lstat for output ownership — output is owned by real_uid.
-            // expected_uid is synthetic worker_uid, so seal will fail real-lstat check!
-            // Fix: for seal tests with synthetic ids, chown is not available.
-            // Approach: temporarily make seal use TestPathAuthority? No - seal uses lstat_system.
-            //
-            // Ruling: seal validates via real lstat. For hermetic tests without chown,
-            // expected_uid/gid in the request must match real file owner for output/home.
-            // And coordinator_uid must differ from expected_uid — but sealed request files
-            // are owned by real uid, and load checks companion owner == coordinator_uid.
-            //
-            // So for hermetic same-user tests we NEED TestPathAuthority on load path.
-            // For seal path, output must be owned by expected_uid.
-            // Set expected_uid = real_uid, coordinator_uid = real_uid+1000 (synthetic).
-            // Seal checks output.uid == expected_uid (real) — OK.
-            // Load with TestPathAuthority maps request/profile to coordinator, output to worker=real.
-            // Wait worker_uid should be real_uid then, coordinator synthetic.
+            // Invariant: seal validates via real lstat, so expected_uid must be the real uid;
+            // load uses TestPathAuthority to map the request tree to a synthetic coordinator uid.
             seal_worker_bundle(&self.roots, input).unwrap()
         }
 
@@ -6466,5 +6583,87 @@ mod tests {
             matches!(&err, WorkerError::Invalid(msg) if msg.contains("delimiter-unsafe")),
             "{err}"
         );
+    }
+
+    #[tokio::test]
+    async fn runtime_provision_unit_not_found_with_lock_slug_is_process_not_lease_busy() {
+        let h = Harness::new();
+        let fake = FakeProcessRunner::new();
+        let cand = "cand-20260901t120000z-unlock-growth-aaaa1111";
+        fake.set_handler(move |spec| {
+            let joined = spec.args.join(" ");
+            if joined.contains("start") {
+                let unit = format!("gzmo-evolver-worker-runtime@{cand}.service");
+                let stderr = format!("Failed to start {unit}: Unit {unit} not found.\n");
+                return Ok(ProcessOutput {
+                    status: 1,
+                    stdout: vec![],
+                    stderr: stderr.into_bytes(),
+                });
+            }
+            Ok(ProcessOutput {
+                status: 0,
+                stdout: b"LoadState=not-found\nActiveState=inactive\nSubState=dead\nResult=\n"
+                    .to_vec(),
+                stderr: vec![],
+            })
+        });
+        let provisioner =
+            SystemdWorkerRuntimeProvisioner::new(fake, h.roots.clone(), "code-worker").unwrap();
+        let id = CandidateId::parse(cand).unwrap();
+        let err = provisioner.provision(&id).await.unwrap_err();
+        assert!(
+            matches!(err, WorkerError::Process(_)),
+            "must be Process/RecoveryRequired path, not LeaseBusy: {err:?}"
+        );
+        assert!(
+            !matches!(err, WorkerError::LeaseBusy),
+            "lock slug must not become LeaseBusy"
+        );
+    }
+
+    #[test]
+    fn seal_preserves_setgid_and_expected_gid_on_real_lstat() {
+        use std::os::unix::fs::MetadataExt;
+        let h = Harness::new();
+        // Pre-create request root as setgid 02750 with process group.
+        let root = h.roots.request_root();
+        let mut perms = fs::metadata(root).unwrap().permissions();
+        perms.set_mode(0o2750);
+        fs::set_permissions(root, perms).unwrap();
+        let before = fs::symlink_metadata(root).unwrap();
+        assert_eq!(before.mode() & 0o2777, 0o2750, "precondition setgid root");
+
+        let req = h.seal("mission body for setgid");
+        let after = fs::symlink_metadata(root).unwrap();
+        assert_eq!(
+            after.mode() & 0o2000,
+            0o2000,
+            "seal must not strip setgid from request root"
+        );
+        assert_eq!(after.gid(), h.shared_gid());
+
+        let bundle = root.join(CAND_ID);
+        let bst = fs::symlink_metadata(&bundle).unwrap();
+        assert!(
+            matches!(bst.mode() & 0o2777, 0o750 | 0o2750),
+            "bundle mode {:o}",
+            bst.mode() & 0o2777
+        );
+        assert_eq!(bst.gid(), req.expected_gid());
+        assert_eq!(bst.uid(), h.real_uid);
+
+        for name in [
+            REQUEST_FILE_NAME,
+            MANIFEST_FILE_NAME,
+            POLICY_FILE_NAME,
+            SYSTEM_PROMPT_FILE_NAME,
+            MISSION_FILE_NAME,
+            OMP_OVERLAY_FILE_NAME,
+        ] {
+            let st = fs::symlink_metadata(bundle.join(name)).unwrap();
+            assert_eq!(st.gid(), req.expected_gid(), "{name}");
+            assert_eq!(st.mode() & 0o777, 0o440, "{name}");
+        }
     }
 }

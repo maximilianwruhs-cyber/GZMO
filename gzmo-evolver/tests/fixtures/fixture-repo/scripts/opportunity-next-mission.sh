@@ -13,7 +13,7 @@ mkdir -p "$OUT"
 # RFC3339 millis UTC for MissionAdapter refresh window.
 # Prefer GNU date (PATH=/usr/bin:/bin); python3 only as local fallback.
 utc_now() {
-  if NOW="$(date -u +"%Y-%m-%dT%H:%M:%S.%3NZ" 2>/dev/null)" && [[ "$NOW" == *.*Z ]]; then
+  if NOW="$(date -u +"%Y-%m-%dT%H:%M:%S.%3NZ" 2>/dev/null)" && [[ "$NOW" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{3}Z$ ]]; then
     printf '%s\n' "$NOW"
     return 0
   fi

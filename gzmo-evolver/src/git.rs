@@ -680,6 +680,8 @@ impl<'a, R: ProcessRunner> GitRepository<'a, R> {
                 "mirror must not use objects/info/alternates".to_owned(),
             ));
         }
+        // Reject url.*.insteadOf / include / hooks / fsmonitor rewrites on the mirror itself.
+        self.reject_executable_local_git_config(mirror)?;
         Ok(())
     }
 
@@ -2150,25 +2152,27 @@ fn is_retryable_mirror_transport_stderr(stderr: &[u8]) -> bool {
 
 /// Parse HTTP status from Git/Curl stderr forms only.
 /// Recognizes `The requested URL returned error: NNN`, `HTTP/1.1 NNN`, `HTTP/2 NNN`.
+/// Prefers the last status in 400..=599 so a leading 2xx/3xx banner does not suppress
+/// a later failure; when only 1xx-3xx were seen, returns None so the phrase allowlist runs.
 fn extract_http_status_from_mirror_stderr(text: &str) -> Option<u16> {
-    const PREFIXES: &[&str] = &["The requested URL returned error: ", "HTTP/1.1 ", "HTTP/2 "];
-    let mut earliest: Option<(usize, u16)> = None;
+    const PREFIXES: &[&str] = &["The requested URL returned error:", "HTTP/1.1", "HTTP/2"];
+    let mut last_error: Option<u16> = None;
     for prefix in PREFIXES {
         let mut from = 0;
         while let Some(rel) = text[from..].find(prefix) {
             let abs = from + rel;
             let after = abs + prefix.len();
-            if let Some(code) = parse_three_digit_http_status(&text[after..]) {
-                match earliest {
-                    Some((pos, _)) if pos <= abs => {}
-                    _ => earliest = Some((abs, code)),
+            // Tolerate ASCII spaces/tabs between prefix and digits.
+            let rest = text[after..].trim_start_matches([' ', '\t']);
+            if let Some(code) = parse_three_digit_http_status(rest) {
+                if (400..=599).contains(&code) {
+                    last_error = Some(code);
                 }
-                break;
             }
-            from = after;
+            from = after.max(abs + 1);
         }
     }
-    earliest.map(|(_, code)| code)
+    last_error
 }
 
 fn parse_three_digit_http_status(s: &str) -> Option<u16> {
@@ -2900,14 +2904,7 @@ fn canonicalize_path(path: &Path) -> Result<PathBuf, GitError> {
 }
 
 fn path_is_within(path: &Path, root: &Path) -> bool {
-    let mut path_c = path.components();
-    for rc in root.components() {
-        match path_c.next() {
-            Some(pc) if pc == rc => {}
-            _ => return false,
-        }
-    }
-    true
+    crate::path_is_within(path, root)
 }
 
 fn path_to_string(path: &Path) -> Result<String, GitError> {
@@ -2985,6 +2982,7 @@ pub fn refresh_baseline_before_mission<R: ProcessRunner>(
     git.refresh_and_resolve_baseline()
 }
 
+/// Reserved for evaluation-plan trust checks (no Stage-1 product caller).
 /// Verify remote identity + checkout hygiene without refreshing (no mission execution).
 pub fn verify_git_trust<R: ProcessRunner>(
     config: &RepoEvolverConfig,
@@ -3152,6 +3150,20 @@ mod unit_tests {
         assert!(!is_retryable_mirror_transport_stderr(b"HTTP/1.1 abc\n"));
         assert!(is_retryable_mirror_transport_stderr(
             b"The requested URL returned error: xyz\nCould not resolve host: x\n"
+        ));
+
+        // Last 4xx/5xx wins over leading 2xx; 1xx-3xx alone fall through to phrases.
+        assert!(is_retryable_mirror_transport_stderr(
+            b"HTTP/1.1 200\nHTTP/1.1 503\n"
+        ));
+        assert!(is_retryable_mirror_transport_stderr(
+            b"HTTP/1.1 200\nConnection reset by peer\n"
+        ));
+        assert!(is_retryable_mirror_transport_stderr(
+            b"The requested URL returned error:\t429\n"
+        ));
+        assert!(!is_retryable_mirror_transport_stderr(
+            b"HTTP/1.1 200\nThe requested URL returned error: 403\n"
         ));
 
         // Tail sampling: decisive phrase after >8 KiB prefix is still seen.
@@ -3409,6 +3421,87 @@ mod unit_tests {
             Some("always")
         );
     }
+
+    #[test]
+    fn production_mirror_clone_and_fetch_process_specs_disable_file_protocol() {
+        use crate::process::{FakeProcessRunner, ProcessOutput, ProcessSpec};
+        use std::sync::{Arc, Mutex};
+
+        let recorded: Arc<Mutex<Vec<ProcessSpec>>> = Arc::new(Mutex::new(Vec::new()));
+        let rec = recorded.clone();
+        let fake = FakeProcessRunner::new();
+        fake.set_handler(move |spec: &ProcessSpec| {
+            rec.lock().unwrap().push(spec.clone());
+            Ok(ProcessOutput {
+                status: 0,
+                stdout: b"".to_vec(),
+                stderr: vec![],
+            })
+        });
+
+        // Production mirror clone/fetch always build env with allow_file_protocol=false.
+        let home = std::env::temp_dir().join("gzmo-evolver-git-home-i3");
+        let _ = fs::create_dir_all(&home);
+        for (label, args) in [
+            (
+                "clone",
+                vec![
+                    "clone".to_owned(),
+                    "--mirror".to_owned(),
+                    "https://github.com/o/r.git".to_owned(),
+                    "mirror-staging".to_owned(),
+                ],
+            ),
+            (
+                "fetch",
+                vec![
+                    "--git-dir".to_owned(),
+                    home.join("mirror").display().to_string(),
+                    "fetch".to_owned(),
+                    "--prune".to_owned(),
+                    "--no-tags".to_owned(),
+                    "origin".to_owned(),
+                    "+refs/heads/main:refs/heads/main".to_owned(),
+                ],
+            ),
+        ] {
+            let env = git_env(&home, false).unwrap();
+            let spec = ProcessSpec::new(
+                "/usr/bin/git",
+                args,
+                home.clone(),
+                env,
+                GIT_OUTPUT_CAP_BYTES,
+                std::time::Duration::from_secs(GIT_FETCH_TIMEOUT_SECS),
+            )
+            .unwrap();
+            let _ = fake.run(&spec).unwrap();
+            assert_eq!(
+                spec.env.get("GIT_CONFIG_VALUE_4").map(String::as_str),
+                Some("never"),
+                "{label} must disable file protocol"
+            );
+            assert_eq!(
+                spec.env.get("GIT_CONFIG_KEY_4").map(String::as_str),
+                Some("protocol.file.allow"),
+                "{label}"
+            );
+        }
+        let calls = recorded.lock().unwrap();
+        assert_eq!(calls.len(), 2);
+        for spec in calls.iter() {
+            assert_eq!(
+                spec.env.get("GIT_CONFIG_VALUE_4").map(String::as_str),
+                Some("never")
+            );
+        }
+        // Coordinator-owned mirror->workspace clone remains the only allow=true product path.
+        let env_ws = git_env(&home, true).unwrap();
+        assert_eq!(
+            env_ws.get("GIT_CONFIG_VALUE_4").map(String::as_str),
+            Some("always")
+        );
+    }
 }
 
 #[cfg(test)]
@@ -3630,31 +3723,32 @@ mod prepare_settle_tests {
         );
     }
     #[test]
+    #[cfg(unix)]
     fn confined_remove_refuses_when_invariants_break() {
         let state = TempDir::new().unwrap();
         let id = "cand-20260901t120000z-bet-breakinv1";
         let ws_path = make_confined_workspace(state.path(), id);
         let token = PreparedWorkspacePath::validate(state.path(), id, &ws_path).unwrap();
 
-        // Break confinement after token mint: replace directory with a sibling escape via rename
-        // then leave a wrong-basename directory at the original path shape by moving content away.
+        // After minting the token, replace the workspace with a symlink to an external target.
         let escape = state.path().join("escape-target");
-        fs::rename(&ws_path, &escape).unwrap();
-        fs::create_dir_all(state.path().join(WORKSPACES_DIR).join("not-the-id")).unwrap();
+        fs::create_dir_all(&escape).unwrap();
+        fs::write(escape.join("keep-me"), b"safe").unwrap();
+        fs::remove_dir_all(&ws_path).unwrap();
+        std::os::unix::fs::symlink(&escape, &ws_path).unwrap();
 
         let err = token.remove_confined().unwrap_err();
         let msg = err.to_string();
         assert!(
-            msg.contains("not a real directory")
-                || msg.contains("missing")
-                || msg.contains("immediate")
-                || msg.contains("basename")
-                || msg.contains("io"),
-            "{msg}"
+            msg.contains("symlink")
+                || msg.contains("not a real directory")
+                || msg.contains("Trust")
+                || msg.contains("trust"),
+            "must refuse symlink-swapped workspace: {msg}"
         );
         assert!(
-            escape.exists(),
-            "failed confined remove must not delete an escaped path"
+            escape.join("keep-me").is_file(),
+            "escape target must remain intact after refused confined remove"
         );
     }
 }

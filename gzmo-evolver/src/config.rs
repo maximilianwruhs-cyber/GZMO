@@ -568,12 +568,8 @@ fn ensure_state_outside_repo(state_dir: &Path, repo_path: &Path) -> Result<(), C
     Ok(())
 }
 
-/// True when `path` equals `root` or is a descendant of `root`.
 fn path_is_within(path: &Path, root: &Path) -> bool {
-    if path == root {
-        return true;
-    }
-    path.starts_with(root)
+    crate::path_is_within(path, root)
 }
 
 fn normalize_relative_path(field: &str, raw: &str) -> Result<PathBuf, ConfigError> {

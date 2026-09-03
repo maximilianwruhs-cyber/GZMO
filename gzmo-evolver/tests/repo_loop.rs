@@ -1804,6 +1804,11 @@ impl RepoHarness {
         let profile_root = fixture.state_dir.join("profiles");
         let netns = fixture.state_dir.join("netns");
         fs::create_dir_all(&request_root).unwrap();
+        {
+            let mut perms = fs::metadata(&request_root).unwrap().permissions();
+            perms.set_mode(0o2750);
+            fs::set_permissions(&request_root, perms).unwrap();
+        }
         fs::create_dir_all(&output_root).unwrap();
         fs::create_dir_all(&profile_root).unwrap();
         fs::create_dir_all(&netns).unwrap();
@@ -2710,6 +2715,11 @@ fn observed_evolver_with_mirror_fault(
     let profile_root = fixture.state_dir.join("profiles");
     let netns = fixture.state_dir.join("netns");
     fs::create_dir_all(&request_root).unwrap();
+    {
+        let mut perms = fs::metadata(&request_root).unwrap().permissions();
+        perms.set_mode(0o2750);
+        fs::set_permissions(&request_root, perms).unwrap();
+    }
     fs::create_dir_all(&output_root).unwrap();
     fs::create_dir_all(&profile_root).unwrap();
     fs::create_dir_all(&netns).unwrap();
@@ -3139,6 +3149,11 @@ impl FixtureVertical {
         let profile_root = fixture.state_dir.join("profiles");
         let netns = fixture.state_dir.join("netns");
         fs::create_dir_all(&request_root).unwrap();
+        {
+            let mut perms = fs::metadata(&request_root).unwrap().permissions();
+            perms.set_mode(0o2750);
+            fs::set_permissions(&request_root, perms).unwrap();
+        }
         fs::create_dir_all(&output_root).unwrap();
         fs::create_dir_all(&profile_root).unwrap();
         fs::create_dir_all(&netns).unwrap();
@@ -3392,6 +3407,10 @@ async fn fixture_run_reaches_evaluating_without_remote_mutation() {
         String::from_utf8(out.stdout).expect("numstat utf8")
     };
     assert!(!numstat.trim().is_empty(), "diff must be nonempty");
+    assert!(
+        numstat.lines().all(|l| !l.starts_with("-\t-")),
+        "vertical candidate diff must be nonbinary: {numstat}"
+    );
     let mut added_lines: u32 = 0;
     let mut changed_files: u32 = 0;
     for line in numstat.lines() {

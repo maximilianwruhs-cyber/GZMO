@@ -292,7 +292,8 @@ impl<'a, R: ProcessRunner, C: Clock> MissionAdapter<'a, R, C> {
         publish
     }
 
-    /// Load and revalidate the mission pair referenced by `CURRENT`.
+    /// Reserved helper for evaluation/tests: load the `CURRENT` mission pair.
+    /// Stage-1 product resume uses `load_generation` by immutable id.
     pub fn load_current(&self) -> Result<Mission, MissionError> {
         let missions = self.config.state_dir().join(MISSIONS_DIR);
         let current_path = missions.join(CURRENT_POINTER);
@@ -1158,14 +1159,7 @@ fn safe_join_under(root: &Path, rel: &Path) -> Result<PathBuf, MissionError> {
 }
 
 fn path_is_within(path: &Path, root: &Path) -> bool {
-    let mut path_iter = path.components();
-    for root_c in root.components() {
-        match path_iter.next() {
-            Some(c) if c == root_c => {}
-            _ => return false,
-        }
-    }
-    true
+    crate::path_is_within(path, root)
 }
 
 fn system_time_to_utc(time: SystemTime) -> Result<DateTime<Utc>, MissionError> {

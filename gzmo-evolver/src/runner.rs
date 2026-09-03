@@ -13,13 +13,12 @@ use crate::state::{
     MAX_TERMINAL_REASON_BYTES,
 };
 use crate::worker::{
-    canonical_profile_tree_digest, load_worker_receipt_unbound, probe_omp_version,
+    canonical_profile_tree_digest, load_worker_receipt_unbound, omp_child_env,
     render_mission_prompt, render_omp_overlay, render_system_prompt, resolve_fixed_worker_identity,
     seal_worker_bundle, try_load_existing_sealed_request, validate_code_candidate_profile,
     worker_runtime_dirs, EffectiveIdentity, SealWorkerInput, SystemdWorkerLauncher,
     SystemdWorkerRuntimeProvisioner, WorkerCompanions, WorkerError, WorkerLauncher, WorkerReceipt,
     WorkerRequest, WorkerRoots, WorkerRuntimeProvisioner, WorkerUnitState, REQUEST_FILE_NAME,
-    WORKER_SAFE_PATH,
 };
 use chrono::{DateTime, Utc};
 use evolution_contracts::{
@@ -27,7 +26,6 @@ use evolution_contracts::{
     ResourceBudget, ResourceUsage,
 };
 use serde::Serialize;
-use std::collections::BTreeMap;
 use std::path::Path;
 use std::sync::Arc;
 use std::time::Duration;
@@ -1334,15 +1332,8 @@ fn probe_omp_version_any<R: ProcessRunner>(
     omp: &Path,
     home: &Path,
 ) -> Result<String, WorkerError> {
-    let mut env = BTreeMap::new();
-    env.insert("PATH".to_owned(), WORKER_SAFE_PATH.to_owned());
-    env.insert("LC_ALL".to_owned(), "C".to_owned());
-    env.insert(
-        "HOME".to_owned(),
-        home.to_str()
-            .ok_or_else(|| WorkerError::Invalid("home path utf8".into()))?
-            .to_owned(),
-    );
+    // One --version spawn; reuse the strict module parser (rejects loose forms like "18.").
+    let env = omp_child_env(home)?;
     let spec = ProcessSpec::new(
         omp,
         ["--version".to_owned()],
@@ -1351,21 +1342,10 @@ fn probe_omp_version_any<R: ProcessRunner>(
         64 * 1024,
         Duration::from_secs(30),
     )?;
-    let out = runner.run(&spec)?;
+    let out = runner.run(&spec).map_err(WorkerError::from)?;
     let text = String::from_utf8_lossy(&out.stdout);
-    // Reuse official probe by extracting version then confirming.
-    let ver = {
-        let mut found = None;
-        for raw in text.split_whitespace() {
-            let t = raw.trim().trim_start_matches('v');
-            if t.starts_with("18.") && t.chars().all(|c| c.is_ascii_digit() || c == '.') {
-                found = Some(t.to_owned());
-                break;
-            }
-        }
-        found.ok_or_else(|| WorkerError::Trust("could not parse omp --version".into()))?
-    };
-    probe_omp_version(runner, omp, &ver, home)
+    let ver = crate::worker::parse_omp_version_output(&text)?;
+    Ok(ver)
 }
 
 #[cfg(test)]
@@ -1381,6 +1361,50 @@ mod tests {
         let json = serde_json::to_value(&snap).unwrap();
         assert!(json["wall_seconds"].is_null());
         assert!(json["changed_files"].is_null());
+    }
+
+    #[test]
+    fn probe_omp_version_any_spawns_once_and_rejects_loose() {
+        use crate::process::{FakeProcessRunner, ProcessOutput, ProcessSpec};
+        use std::sync::atomic::{AtomicUsize, Ordering};
+        use std::sync::Arc;
+        let calls = Arc::new(AtomicUsize::new(0));
+        let calls2 = calls.clone();
+        let fake = FakeProcessRunner::new();
+        fake.set_handler(move |spec: &ProcessSpec| {
+            calls2.fetch_add(1, Ordering::SeqCst);
+            assert_eq!(spec.args, vec!["--version".to_owned()]);
+            Ok(ProcessOutput {
+                status: 0,
+                stdout: b"omp 18.1.0\n".to_vec(),
+                stderr: vec![],
+            })
+        });
+        let home = std::env::temp_dir();
+        let omp = home.join("fake-omp-bin");
+        let ver = probe_omp_version_any(&fake, &omp, &home).unwrap();
+        assert_eq!(ver, "18.1.0");
+        assert_eq!(calls.load(Ordering::SeqCst), 1);
+
+        let calls_b = Arc::new(AtomicUsize::new(0));
+        let calls_b2 = calls_b.clone();
+        let fake_b = FakeProcessRunner::new();
+        fake_b.set_handler(move |_spec: &ProcessSpec| {
+            calls_b2.fetch_add(1, Ordering::SeqCst);
+            Ok(ProcessOutput {
+                status: 0,
+                stdout: b"omp 18.\n".to_vec(),
+                stderr: vec![],
+            })
+        });
+        let err = probe_omp_version_any(&fake_b, &omp, &home).unwrap_err();
+        assert!(
+            err.to_string().contains("omp")
+                || err.to_string().contains("version")
+                || err.to_string().contains("parse"),
+            "{err}"
+        );
+        assert_eq!(calls_b.load(Ordering::SeqCst), 1);
     }
 
     #[test]
