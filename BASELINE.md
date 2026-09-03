@@ -84,6 +84,24 @@ cargo test -p gzmo-core --test live_cloud_probe -- --ignored --nocapture
 
 ---
 
+## Open threads — pick up here
+
+Recorded for the next session (baseline above is current as of commit `67cc722`).
+
+1. **Wayfinder essential-improvements pass (original task, not started).** Map the
+   essential parts of the codebase for further improvement as decision tickets on the
+   GitHub issue tracker, then resolve them one at a time. This session diverted to
+   finish/merge the connected-repo-evolver work and refresh this baseline instead.
+2. **Branch/worktree cleanup (optional).** `feat/hybrid-continuous-self-development`
+   (`b02b873`) is fully merged into `main`; its worktree can be pruned:
+   `git worktree remove .worktrees/hybrid-continuous-self-development && git branch -d feat/hybrid-continuous-self-development`.
+3. **Commit identity.** Recent commits are authored as `maximilian.wruhs@siemens.com`
+   (this box's git config). They won't link to the `maximilianwruhs-cyber` GitHub
+   profile unless that email is verified there, or `git config user.email` is set to
+   the account's email before future commits.
+
+---
+
 ## Baseline date
 
 2026-09-03 — offline workspace baseline recorded on top of `98755cd` (`origin/main`).
