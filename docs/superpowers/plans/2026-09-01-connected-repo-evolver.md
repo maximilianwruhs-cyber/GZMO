@@ -749,7 +749,7 @@ For a newly Prepared candidate:
 4. transition `Prepared → Building` before any worker launch;
 5. launch/wait; independently load and validate receipt/raw output/workspace HEAD/branch/diff facts and budget;
 6. normalize hostile worker history with an idempotent Git operation: use `receipt.completed_at` as the fixed UTC commit timestamp; if HEAD is already the exact one-parent normalized commit with expected tree/parent/identity/message/date, reuse it, otherwise validate and squash once via commit-tree/CAS;
-7. re-run bounded diff/path/budget checks and require receipt changed-files/added-lines/head facts to equal coordinator observations;
+7. re-run bounded diff/path/budget checks, reject every binary diff because the signed policy has no binary-byte budget, and require receipt changed-files/added-lines/head facts to equal coordinator observations;
 8. transition `Building → Evaluating` atomically with immutable `git-sha1:` candidate digest plus canonical receipt JSON/`sha256:` digest, then stop. Never evaluate quality, push, open a PR, or advance past Evaluating.
 
 Every transition is state+audit atomic. Before candidate creation, failure leaves no state. After creation, deterministic content/trust failure transitions to `Failed` with a bounded reason when legal; transient provisioner/mirror lease contention leaves the persisted resumable state unchanged. A failed database transition preserves artifacts and returns an explicit recovery-required error.
@@ -838,7 +838,7 @@ Run the fixture integration test by exact name:
 cargo test -p gzmo-evolver --test repo_loop fixture_run_reaches_evaluating_without_remote_mutation -- --nocapture
 ```
 
-Expected: exactly one candidate reaches `evaluating`; its independent clone has one normalized one-parent candidate commit with a nonempty bounded diff; trusted checkout and remote main are byte-identical; remote refs contain only main; the fake worker sees the exact allowed environment and no forbidden name; canonical receipt facts equal coordinator diff facts; audit states are exactly Observed/Prepared/Building/Evaluating; a repeated run performs no extra provision, launch, workspace, state, or remote mutation.
+Expected: exactly one candidate reaches `evaluating`; its independent clone has one normalized one-parent candidate commit with a nonempty nonbinary bounded diff; trusted checkout and remote main are byte-identical; remote refs contain only main; canonical receipt facts equal coordinator diff facts; audit states are exactly Observed/Prepared/Building/Evaluating; a repeated run performs no extra provision, launch, workspace, state, or remote mutation. Exact OMP child environment/no-forbidden-name proof remains the causal Task-5 fake-executable test because this vertical intentionally replaces the privileged worker launcher rather than pretending to observe its child ProcessSpec.
 
 The real OMP/systemd smoke is deliberately deferred to `2026-09-01-continuous-evolution-operations.md` after coordinator/worker/model system identities and the private model namespace exist. This subplan must not weaken the trust model to manufacture a live smoke.
 
