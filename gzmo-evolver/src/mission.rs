@@ -306,8 +306,22 @@ impl<'a, R: ProcessRunner, C: Clock> MissionAdapter<'a, R, C> {
             .map_err(|err| MissionError::Io(format!("read CURRENT: {err}")))?;
         let basename = basename.trim();
         validate_generation_basename(basename)?;
-        let generation_dir = missions.join(GENERATIONS_DIR).join(basename);
-        load_generation(&generation_dir, basename)
+        self.load_generation(basename)
+    }
+
+    /// Load and revalidate an immutable published generation by exact id.
+    ///
+    /// Never consults `CURRENT`. Used by resume paths bound to
+    /// `manifest.mission_id` (the generation UUID).
+    pub fn load_generation(&self, generation_id: &str) -> Result<Mission, MissionError> {
+        validate_generation_basename(generation_id)?;
+        let generation_dir = self
+            .config
+            .state_dir()
+            .join(MISSIONS_DIR)
+            .join(GENERATIONS_DIR)
+            .join(generation_id);
+        load_generation(&generation_dir, generation_id)
     }
 
     fn invoke_producer(
@@ -529,7 +543,9 @@ impl Mission {
         let manifest = CandidateManifest {
             schema: CANDIDATE_SCHEMA.to_owned(),
             id,
-            mission_id: self.bet_id.clone(),
+            // Immutable mission generation UUID — never the mutable CURRENT pointer
+            // and never the bet slug (candidate id already carries the bet slug).
+            mission_id: self.generation_id.clone(),
             kind,
             authority,
             target,
@@ -1684,7 +1700,7 @@ repo_path = "config/repo-evolver.policy.toml"
         assert_eq!(prepared.manifest.required_gates, gates);
         assert_eq!(prepared.manifest.kind, CandidateKind::Code);
         assert_eq!(prepared.manifest.authority, AuthorityTier::Candidate);
-        assert_eq!(prepared.manifest.mission_id, "felt-use-mass-growth");
+        assert_eq!(prepared.manifest.mission_id, mission.generation_id);
         match &prepared.manifest.target {
             CandidateTarget::Repository {
                 owner,
@@ -1715,9 +1731,7 @@ repo_path = "config/repo-evolver.policy.toml"
         let env = Env::new();
         let mut mission = load_fixture("next-mission.json").unwrap();
         // 80-char bet forces truncation while preserving ts + hash suffix.
-        mission.bet_id = format!("bet-{}", "a".repeat(80));
-        // bet_id validation on conversion uses mission.bet_id as mission_id token —
-        // contracts allow broader tokens; ensure sanitize works.
+        // candidate id still carries the bet slug; mission_id is generation UUID.
         // Bypass bet_id field rules by calling build directly:
         let id = build_candidate_id(
             fixed_now(),

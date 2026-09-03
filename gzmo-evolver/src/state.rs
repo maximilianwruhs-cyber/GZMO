@@ -680,6 +680,41 @@ impl StateStore {
         }
     }
 
+    /// Return the most recently updated candidate for `repository`, including terminals.
+    ///
+    /// Used by status/resume when no active candidate exists. Fully revalidates
+    /// the chosen row against digests and the audit chain.
+    pub fn latest_candidate(
+        &self,
+        repository: &str,
+    ) -> Result<Option<CandidateRecord>, StateError> {
+        let events = load_and_verify_audit_events(&self.conn)?;
+        let id: Option<String> = self
+            .conn
+            .query_row(
+                r#"
+                SELECT id FROM candidates
+                WHERE repository = ?1
+                ORDER BY updated_at DESC, created_at DESC, id DESC
+                LIMIT 1
+                "#,
+                params![repository],
+                |row| row.get(0),
+            )
+            .optional()?;
+        match id {
+            Some(raw) => {
+                let id = CandidateId::parse(raw)?;
+                Ok(Some(load_record_in_tx(
+                    &self.conn,
+                    &id,
+                    Some(events.as_slice()),
+                )?))
+            }
+            None => Ok(None),
+        }
+    }
+
     /// Load one candidate after verifying stored digests and the full audit chain.
     pub fn load(&self, id: &CandidateId) -> Result<CandidateRecord, StateError> {
         load_record_verified(&self.conn, id)

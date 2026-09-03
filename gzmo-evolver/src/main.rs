@@ -5,12 +5,12 @@
 
 use anyhow::{bail, Context, Result};
 use clap::{Parser, Subcommand};
-#[cfg(unix)]
-use gzmo_evolver::run_hidden_worker;
 use gzmo_evolver::{
     prepare_candidate, refresh_baseline_before_mission, CandidateRecord, CoordinatorLock,
     MissionAdapter, RepoEvolverConfig, StateStore, SystemClock, SystemProcessRunner,
 };
+#[cfg(unix)]
+use gzmo_evolver::{run_hidden_worker, RepoEvolver, RunOutcome, StatusV1};
 use serde::Serialize;
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
@@ -48,11 +48,6 @@ enum Command {
         json: bool,
     },
     /// Refresh the opportunity mission after verifying mirror baseline + policy.
-    ///
-    /// Refreshes the coordinator mirror under the mirror lock, requires the clean
-    /// trusted checkout HEAD to equal the fetched baseline, and requires the
-    /// working-tree policy digest to match the baseline policy — without opening
-    /// the candidate database or acquiring the coordinator lease.
     Refresh {
         /// Emit machine-readable JSON instead of human text.
         #[arg(long)]
@@ -60,6 +55,29 @@ enum Command {
     },
     /// Prepare exactly one active candidate workspace (active-first, trust-first).
     Prepare {
+        /// Emit machine-readable JSON instead of human text.
+        #[arg(long)]
+        json: bool,
+    },
+    /// Run or resume one candidate through the Evaluating boundary.
+    Run {
+        /// Emit machine-readable JSON instead of human text.
+        #[arg(long)]
+        json: bool,
+    },
+    /// Resume the active/latest candidate without creating a new one.
+    Resume {
+        /// Emit machine-readable JSON instead of human text.
+        #[arg(long)]
+        json: bool,
+    },
+    /// Abort a pre-evaluation candidate without deleting artifacts.
+    Abort {
+        /// Candidate id to abort.
+        candidate_id: String,
+        /// Terminal reason (nonempty, bounded).
+        #[arg(long)]
+        reason: String,
         /// Emit machine-readable JSON instead of human text.
         #[arg(long)]
         json: bool,
@@ -106,41 +124,6 @@ struct BudgetReport {
 }
 
 #[derive(Debug, Serialize)]
-struct StatusReport {
-    schema: &'static str,
-    initialized: bool,
-    state_dir: String,
-    repository: String,
-    active_candidate: Option<ActiveCandidateStatus>,
-    audit_head: Option<AuditHeadStatus>,
-}
-
-#[derive(Debug, Serialize)]
-struct ActiveCandidateStatus {
-    id: String,
-    state: String,
-    mission_id: String,
-    kind: String,
-    policy_digest: String,
-    manifest_digest: String,
-    workspace: Option<String>,
-    candidate_digest: Option<String>,
-    receipt_digest: Option<String>,
-    terminal_reason: Option<String>,
-    created_at: String,
-    updated_at: String,
-}
-
-#[derive(Debug, Serialize)]
-struct AuditHeadStatus {
-    sequence: u64,
-    event_type: String,
-    event_hash: String,
-    candidate_id: Option<String>,
-    occurred_at: String,
-}
-
-#[derive(Debug, Serialize)]
 struct RefreshReport {
     schema: &'static str,
     bet_id: String,
@@ -160,6 +143,22 @@ struct PrepareReport {
     reused_active: bool,
     baseline: Option<String>,
     candidate: ActiveCandidateStatus,
+}
+
+#[derive(Debug, Serialize)]
+struct ActiveCandidateStatus {
+    id: String,
+    state: String,
+    mission_id: String,
+    kind: String,
+    policy_digest: String,
+    manifest_digest: String,
+    workspace: Option<String>,
+    candidate_digest: Option<String>,
+    receipt_digest: Option<String>,
+    terminal_reason: Option<String>,
+    created_at: String,
+    updated_at: String,
 }
 
 fn main() -> ExitCode {
@@ -204,20 +203,35 @@ fn run() -> Result<()> {
             let config_path = require_cli_config(cli.config.as_deref())?;
             let cfg = RepoEvolverConfig::load(config_path)
                 .with_context(|| format!("loading config {}", config_path.display()))?;
-            let report = build_status_report(&cfg)?;
-            if json {
-                println!("{}", serde_json::to_string_pretty(&report)?);
-            } else {
-                print_status_human(&report);
+            #[cfg(unix)]
+            {
+                let rt = tokio::runtime::Builder::new_current_thread()
+                    .enable_all()
+                    .build()
+                    .context("building tokio runtime")?;
+                let evolver =
+                    RepoEvolver::production(cfg).map_err(|e| anyhow::anyhow!("evolver: {e}"))?;
+                let report = rt
+                    .block_on(evolver.status())
+                    .map_err(|e| anyhow::anyhow!("status: {e}"))?;
+                if json {
+                    println!("{}", serde_json::to_string_pretty(&report)?);
+                } else {
+                    print_status_v1_human(&report);
+                }
+                Ok(())
             }
-            Ok(())
+            #[cfg(not(unix))]
+            {
+                let _ = cfg;
+                bail!("status requires unix runner");
+            }
         }
         Command::Refresh { json } => {
             let config_path = require_cli_config(cli.config.as_deref())?;
             let cfg = RepoEvolverConfig::load(config_path)
                 .with_context(|| format!("loading config {}", config_path.display()))?;
             let runner = SystemProcessRunner;
-            // Trust-first: locked mirror refresh + HEAD/policy before producer.
             let _baseline = refresh_baseline_before_mission(&cfg, &runner)
                 .context("verifying git baseline before refresh")?;
             let clock = SystemClock;
@@ -271,6 +285,80 @@ fn run() -> Result<()> {
             }
             Ok(())
         }
+        Command::Run { json } => {
+            let config_path = require_cli_config(cli.config.as_deref())?;
+            let cfg = RepoEvolverConfig::load(config_path)
+                .with_context(|| format!("loading config {}", config_path.display()))?;
+            run_lifecycle(cfg, json, LifecycleOp::Run)
+        }
+        Command::Resume { json } => {
+            let config_path = require_cli_config(cli.config.as_deref())?;
+            let cfg = RepoEvolverConfig::load(config_path)
+                .with_context(|| format!("loading config {}", config_path.display()))?;
+            run_lifecycle(cfg, json, LifecycleOp::Resume)
+        }
+        Command::Abort {
+            candidate_id,
+            reason,
+            json,
+        } => {
+            let config_path = require_cli_config(cli.config.as_deref())?;
+            let cfg = RepoEvolverConfig::load(config_path)
+                .with_context(|| format!("loading config {}", config_path.display()))?;
+            run_lifecycle(
+                cfg,
+                json,
+                LifecycleOp::Abort {
+                    candidate_id,
+                    reason,
+                },
+            )
+        }
+    }
+}
+
+enum LifecycleOp {
+    Run,
+    Resume,
+    Abort {
+        candidate_id: String,
+        reason: String,
+    },
+}
+
+fn run_lifecycle(cfg: RepoEvolverConfig, json: bool, op: LifecycleOp) -> Result<()> {
+    #[cfg(unix)]
+    {
+        let rt = tokio::runtime::Builder::new_current_thread()
+            .enable_all()
+            .build()
+            .context("building tokio runtime")?;
+        let evolver = RepoEvolver::production(cfg).map_err(|e| anyhow::anyhow!("evolver: {e}"))?;
+        let outcome: RunOutcome = match op {
+            LifecycleOp::Run => rt
+                .block_on(evolver.run_once())
+                .map_err(|e| anyhow::anyhow!("run: {e}"))?,
+            LifecycleOp::Resume => rt
+                .block_on(evolver.resume())
+                .map_err(|e| anyhow::anyhow!("resume: {e}"))?,
+            LifecycleOp::Abort {
+                candidate_id,
+                reason,
+            } => rt
+                .block_on(evolver.abort(&candidate_id, &reason))
+                .map_err(|e| anyhow::anyhow!("abort: {e}"))?,
+        };
+        if json {
+            println!("{}", serde_json::to_string_pretty(&outcome)?);
+        } else {
+            print_run_outcome_human(&outcome);
+        }
+        Ok(())
+    }
+    #[cfg(not(unix))]
+    {
+        let _ = (cfg, json, op);
+        bail!("lifecycle commands require unix");
     }
 }
 
@@ -316,46 +404,6 @@ fn build_config_report(cfg: &RepoEvolverConfig) -> ConfigCheckReport<'_> {
         mission_json_rel: cfg.mission().json_rel().display().to_string(),
         mission_markdown_rel: cfg.mission().markdown_rel().display().to_string(),
         refresh_argv: cfg.mission().refresh_argv(),
-    }
-}
-
-fn build_status_report(cfg: &RepoEvolverConfig) -> Result<StatusReport> {
-    let repository = format!("{}/{}", cfg.repo().owner(), cfg.repo().repository());
-    let state_dir = cfg.state_dir().display().to_string();
-
-    match StateStore::open_existing_readonly(cfg.state_dir())
-        .with_context(|| format!("opening state dir {}", cfg.state_dir().display()))?
-    {
-        None => Ok(StatusReport {
-            schema: "gzmo.repo_evolver.status/v1",
-            initialized: false,
-            state_dir,
-            repository,
-            active_candidate: None,
-            audit_head: None,
-        }),
-        Some(store) => {
-            let active = store
-                .active_candidate(&repository)
-                .context("loading active candidate")?;
-            let head = store.audit_head().context("loading audit head")?;
-            Ok(StatusReport {
-                schema: "gzmo.repo_evolver.status/v1",
-                initialized: true,
-                state_dir,
-                repository,
-                active_candidate: active.as_ref().map(active_status),
-                audit_head: head.map(|event| AuditHeadStatus {
-                    sequence: event.sequence,
-                    event_type: event.event_type,
-                    event_hash: event.event_hash,
-                    candidate_id: event.candidate_id.map(|id| id.to_string()),
-                    occurred_at: event
-                        .occurred_at
-                        .to_rfc3339_opts(chrono::SecondsFormat::Millis, true),
-                }),
-            })
-        }
     }
 }
 
@@ -411,53 +459,115 @@ fn print_config_human(report: &ConfigCheckReport<'_>) {
     println!("  refresh_argv: {:?}", report.refresh_argv);
 }
 
-fn print_status_human(report: &StatusReport) {
-    println!("status: initialized={}", report.initialized);
-    println!("  state_dir: {}", report.state_dir);
+#[cfg(unix)]
+fn print_status_v1_human(report: &StatusV1) {
+    println!("status: schema={}", report.schema);
     println!("  repository: {}", report.repository);
-    match &report.active_candidate {
-        None => println!("  active_candidate: none"),
-        Some(c) => {
-            println!(
-                "  active_candidate: id={} state={} mission_id={} kind={}",
-                c.id, c.state, c.mission_id, c.kind
-            );
-            println!("    policy_digest: {}", c.policy_digest);
-            println!("    manifest_digest: {}", c.manifest_digest);
-            println!(
-                "    workspace: {}",
-                c.workspace.as_deref().unwrap_or("none")
-            );
-            println!(
-                "    candidate_digest: {}",
-                c.candidate_digest.as_deref().unwrap_or("none")
-            );
-            println!(
-                "    receipt_digest: {}",
-                c.receipt_digest.as_deref().unwrap_or("none")
-            );
-            println!(
-                "    terminal_reason: {}",
-                c.terminal_reason.as_deref().unwrap_or("none")
-            );
-            println!("    created_at: {}", c.created_at);
-            println!("    updated_at: {}", c.updated_at);
-        }
+    println!(
+        "  candidate_id: {}",
+        report.candidate_id.as_deref().unwrap_or("none")
+    );
+    println!(
+        "  mission_generation_id: {}",
+        report.mission_generation_id.as_deref().unwrap_or("none")
+    );
+    println!("  state: {}", report.state.as_deref().unwrap_or("none"));
+    println!(
+        "  baseline_digest: {}",
+        report.baseline_digest.as_deref().unwrap_or("none")
+    );
+    println!(
+        "  candidate_digest: {}",
+        report.candidate_digest.as_deref().unwrap_or("none")
+    );
+    println!(
+        "  policy_digest: {}",
+        report.policy_digest.as_deref().unwrap_or("none")
+    );
+    println!(
+        "  manifest_digest: {}",
+        report.manifest_digest.as_deref().unwrap_or("none")
+    );
+    println!(
+        "  receipt_digest: {}",
+        report.receipt_digest.as_deref().unwrap_or("none")
+    );
+    println!(
+        "  workspace: {}",
+        report.workspace.as_deref().unwrap_or("none")
+    );
+    println!(
+        "  worker_state: {}",
+        report.worker_state.as_deref().unwrap_or("none")
+    );
+    println!(
+        "  worker_deadline: {}",
+        report.worker_deadline.as_deref().unwrap_or("none")
+    );
+    println!(
+        "  last_audit_sequence: {}",
+        report
+            .last_audit_sequence
+            .map(|s| s.to_string())
+            .unwrap_or_else(|| "none".to_owned())
+    );
+    println!(
+        "  last_audit_hash: {}",
+        report.last_audit_hash.as_deref().unwrap_or("none")
+    );
+    println!(
+        "  terminal_reason: {}",
+        report.terminal_reason.as_deref().unwrap_or("none")
+    );
+    println!("  next_action: {}", report.next_action);
+    if let Some(b) = &report.budget_max {
+        println!(
+            "  budget_max: wall={} files={} lines={} tools={} in={} out={}",
+            b.wall_seconds,
+            b.max_changed_files,
+            b.max_added_lines,
+            b.max_tool_calls,
+            b.max_input_tokens,
+            b.max_output_tokens
+        );
     }
-    match &report.audit_head {
-        None => println!("  audit_head: none"),
-        Some(h) => {
-            println!(
-                "  audit_head: sequence={} event_type={} event_hash={}",
-                h.sequence, h.event_type, h.event_hash
-            );
-            println!(
-                "    candidate_id: {}",
-                h.candidate_id.as_deref().unwrap_or("none")
-            );
-            println!("    occurred_at: {}", h.occurred_at);
-        }
+    if let Some(u) = &report.budget_used {
+        println!(
+            "  budget_used: wall={:?} files={:?} lines={:?} tools={:?} in={:?} out={:?}",
+            u.wall_seconds,
+            u.changed_files,
+            u.added_lines,
+            u.tool_calls,
+            u.input_tokens,
+            u.output_tokens
+        );
     }
+}
+
+#[cfg(unix)]
+fn print_run_outcome_human(outcome: &RunOutcome) {
+    println!("run: state={}", outcome.state);
+    println!("  candidate_id: {}", outcome.candidate_id);
+    println!("  mission_id: {}", outcome.mission_id);
+    println!("  baseline_digest: {}", outcome.baseline_digest);
+    println!(
+        "  candidate_digest: {}",
+        outcome.candidate_digest.as_deref().unwrap_or("none")
+    );
+    println!("  policy_digest: {}", outcome.policy_digest);
+    println!("  manifest_digest: {}", outcome.manifest_digest);
+    println!(
+        "  receipt_digest: {}",
+        outcome.receipt_digest.as_deref().unwrap_or("none")
+    );
+    println!(
+        "  workspace: {}",
+        outcome.workspace.as_deref().unwrap_or("none")
+    );
+    println!(
+        "  terminal_reason: {}",
+        outcome.terminal_reason.as_deref().unwrap_or("none")
+    );
 }
 
 fn print_refresh_human(report: &RefreshReport) {

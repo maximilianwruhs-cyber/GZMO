@@ -467,6 +467,97 @@ impl<'a, R: ProcessRunner> GitRepository<'a, R> {
         result
     }
 
+    /// Open an existing independent workspace or prepare a fresh one.
+    ///
+    /// An exact already-published baseline workspace for this candidate is reused.
+    /// Ambiguous or corrupt paths fail closed; missing path clones via [`Self::prepare`].
+    pub fn open_or_prepare_workspace(
+        &self,
+        manifest: &CandidateManifest,
+    ) -> Result<GitWorkspace<'a, R>, GitError> {
+        let candidate_id = manifest.id.as_str();
+        validate_safe_component(candidate_id)?;
+        let final_path = self.workspaces_dir.join(candidate_id);
+        if final_path.exists()
+            || final_path
+                .symlink_metadata()
+                .map(|m| m.file_type().is_symlink())
+                .unwrap_or(false)
+        {
+            self.open_existing_workspace(manifest)
+        } else {
+            self.prepare(manifest)
+        }
+    }
+
+    /// Open and fully revalidate an existing independent workspace for `manifest`.
+    pub fn open_existing_workspace(
+        &self,
+        manifest: &CandidateManifest,
+    ) -> Result<GitWorkspace<'a, R>, GitError> {
+        manifest
+            .validate()
+            .map_err(|err| GitError::Invalid(err.to_string()))?;
+        let baseline = match &manifest.baseline_digest {
+            d if d.starts_with("git-sha1:") => d["git-sha1:".len()..].to_owned(),
+            _ => {
+                return Err(GitError::Invalid(
+                    "manifest baseline_digest must be git-sha1:<40 hex>".to_owned(),
+                ))
+            }
+        };
+        validate_oid(&baseline)?;
+        let candidate_id = manifest.id.as_str().to_owned();
+        validate_safe_component(&candidate_id)?;
+        let path = self.workspaces_dir.join(&candidate_id);
+        let bound = PreparedWorkspacePath::validate(self.config.state_dir(), &candidate_id, &path)?;
+
+        let ws = GitWorkspace {
+            config: self.config,
+            runner: self.runner,
+            git_program: self.git_program.clone(),
+            home: self.home.clone(),
+            path: bound.path().to_path_buf(),
+            candidate_id: candidate_id.clone(),
+            baseline: baseline.clone(),
+        };
+
+        // Revalidate independence and remote neutering.
+        self.verify_disabled_remotes(ws.path())?;
+        self.verify_object_independence(ws.path())?;
+        self.reject_executable_local_git_config(ws.path())?;
+
+        let branch = ws.current_branch()?;
+        let expected_branch = format!("evolve/{candidate_id}");
+        if branch != expected_branch {
+            return Err(GitError::Workspace(format!(
+                "existing workspace branch {branch} does not match {expected_branch}"
+            )));
+        }
+
+        // HEAD must descend from the recorded baseline (baseline itself is OK for pre-worker).
+        let mb = ws.merge_base("HEAD", &baseline)?;
+        if mb != baseline {
+            return Err(GitError::Workspace(
+                "existing workspace HEAD does not descend from baseline".to_owned(),
+            ));
+        }
+
+        // Confirmed baseline still matches mirror when available.
+        if self.mirror_path.exists() {
+            self.validate_mirror_layout(&self.mirror_path)?;
+            let mirror_base =
+                self.rev_parse_mirror(&format!("refs/heads/{}", self.config.repo().base_branch()))?;
+            if mirror_base != baseline {
+                return Err(GitError::Trust(
+                    "mirror base branch does not match manifest baseline".to_owned(),
+                ));
+            }
+        }
+
+        Ok(ws)
+    }
+
     fn create_mirror_staged(&self, remote_url: &str) -> Result<(), GitError> {
         let staging = self.config.state_dir().join(MIRROR_STAGING_NAME);
         let _ = remove_path_best_effort(&staging);
@@ -1262,6 +1353,117 @@ impl<'a, R: ProcessRunner> GitWorkspace<'a, R> {
         self.require_clean_including_untracked()?;
         let _ = author; // identity enforced via env
         Ok(new_commit)
+    }
+
+    /// Recognize or create the exact normalized one-parent candidate commit.
+    ///
+    /// `completed_at` is the fixed UTC timestamp (from the worker receipt). When HEAD
+    /// is already the exact normalized commit (tree/parent/identity/message/date),
+    /// it is reused without resquashing.
+    pub fn ensure_normalized_candidate(
+        &self,
+        baseline: &str,
+        mission_id: &str,
+        completed_at: DateTime<Utc>,
+    ) -> Result<String, GitError> {
+        validate_oid(baseline)?;
+        validate_safe_mission_id(mission_id)?;
+        if let Some(existing) =
+            self.recognize_normalized_commit(baseline, mission_id, completed_at)?
+        {
+            return Ok(existing);
+        }
+        self.squash_candidate(baseline, mission_id, completed_at)
+    }
+
+    /// Return the HEAD OID when it is already the exact normalized candidate commit.
+    pub fn recognize_normalized_commit(
+        &self,
+        baseline: &str,
+        mission_id: &str,
+        completed_at: DateTime<Utc>,
+    ) -> Result<Option<String>, GitError> {
+        validate_oid(baseline)?;
+        validate_safe_mission_id(mission_id)?;
+        self.require_clean_including_untracked()?;
+        let branch = self.current_branch()?;
+        let expected_branch = format!("evolve/{}", self.candidate_id);
+        if branch != expected_branch {
+            return Ok(None);
+        }
+        let head = self.candidate_commit()?;
+        if head == baseline {
+            return Ok(None);
+        }
+        // Single parent must equal baseline.
+        let parents = self.run_git(
+            &[
+                "rev-list".to_owned(),
+                "--parents".to_owned(),
+                "-n".to_owned(),
+                "1".to_owned(),
+                head.clone(),
+            ],
+            GIT_OUTPUT_CAP_BYTES,
+        )?;
+        let parent_line = String::from_utf8_lossy(&parents.stdout);
+        let parts: Vec<&str> = parent_line.split_whitespace().collect();
+        if parts.len() != 2 || parts[0] != head || parts[1] != baseline {
+            return Ok(None);
+        }
+
+        // Identity + message + exact UTC date.
+        let show = self.run_git(
+            &[
+                "show".to_owned(),
+                "-s".to_owned(),
+                "--format=%an%n%ae%n%cn%n%ce%n%ad%n%cd%n%B".to_owned(),
+                "--date=format-local:%s %z".to_owned(),
+                head.clone(),
+            ],
+            GIT_OUTPUT_CAP_BYTES,
+        )?;
+        // Force UTC interpretation via env is not available here; compare both
+        // author and committer date lines after parsing show with fixed TZ via
+        // separate pretty formats that include the offset we wrote.
+        let show_utc = self.run_git(
+            &[
+                "show".to_owned(),
+                "-s".to_owned(),
+                "--format=%an%x00%ae%x00%cn%x00%ce%x00%aI%x00%cI%x00%B".to_owned(),
+                head.clone(),
+            ],
+            GIT_OUTPUT_CAP_BYTES,
+        )?;
+        let text = String::from_utf8_lossy(&show_utc.stdout);
+        let mut fields = text.split('\0');
+        let an = fields.next().unwrap_or("").trim();
+        let ae = fields.next().unwrap_or("").trim();
+        let cn = fields.next().unwrap_or("").trim();
+        let ce = fields.next().unwrap_or("").trim();
+        let a_iso = fields.next().unwrap_or("").trim();
+        let c_iso = fields.next().unwrap_or("").trim();
+        let body = fields.next().unwrap_or("").trim_end_matches('\n');
+        let _ = show; // keep diagnostic path available for future
+
+        if an != CANDIDATE_AUTHOR_NAME
+            || ae != CANDIDATE_AUTHOR_EMAIL
+            || cn != CANDIDATE_AUTHOR_NAME
+            || ce != CANDIDATE_AUTHOR_EMAIL
+        {
+            return Ok(None);
+        }
+        let expected_msg = format!("evolve({mission_id}): candidate");
+        if body.trim() != expected_msg {
+            return Ok(None);
+        }
+        let expected_ts = completed_at.timestamp();
+        if !iso_matches_utc_timestamp(a_iso, expected_ts)
+            || !iso_matches_utc_timestamp(c_iso, expected_ts)
+        {
+            return Ok(None);
+        }
+        Ok(Some(head))
     }
 
     /// Remove this workspace only when `record` is terminal and matches.
@@ -2072,6 +2274,14 @@ fn validate_safe_mission_id(id: &str) -> Result<(), GitError> {
         ));
     }
     Ok(())
+}
+
+fn iso_matches_utc_timestamp(iso: &str, expected_unix: i64) -> bool {
+    // Accept RFC3339 with Z or +00:00 offset equal to expected unix seconds.
+    match DateTime::parse_from_rfc3339(iso) {
+        Ok(dt) => dt.timestamp() == expected_unix && dt.offset().local_minus_utc() == 0,
+        Err(_) => false,
+    }
 }
 
 fn parse_ls_tree_reject_special(bytes: &[u8]) -> Result<(), GitError> {

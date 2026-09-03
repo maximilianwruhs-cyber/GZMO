@@ -16,6 +16,7 @@ use fs2::FileExt;
 use serde::{Deserialize, Deserializer, Serialize};
 use serde_json::Value as JsonValue;
 use std::collections::{BTreeMap, BTreeSet};
+use std::fmt;
 use std::fs::{self, File, OpenOptions};
 use std::io::{self, Read, Write};
 use std::os::unix::fs::{MetadataExt, OpenOptionsExt, PermissionsExt};
@@ -207,7 +208,7 @@ impl WorkerRoots {
         &self.model_netns
     }
 
-    fn validate_intrinsic(&self) -> Result<(), WorkerError> {
+    pub(crate) fn validate_intrinsic(&self) -> Result<(), WorkerError> {
         for (name, path) in [
             ("request_root", &self.request_root),
             ("output_root", &self.output_root),
@@ -1291,9 +1292,17 @@ pub fn seal_worker_bundle(
         ("HOME/.omp", omp_dir.as_path()),
         ("HOME/.omp/profiles", profiles_dir.as_path()),
         ("HOME/.omp/profiles/<profile>", profile_runtime.as_path()),
-        ("HOME/.omp/profiles/<profile>/agent", agent_runtime.as_path()),
+        (
+            "HOME/.omp/profiles/<profile>/agent",
+            agent_runtime.as_path(),
+        ),
     ] {
-        require_preprovisioned_worker_runtime_dir(label, path, input.expected_uid, input.expected_gid)?;
+        require_preprovisioned_worker_runtime_dir(
+            label,
+            path,
+            input.expected_uid,
+            input.expected_gid,
+        )?;
     }
 
     let profile_path = roots.profile_root().join(&input.omp_profile);
@@ -3313,15 +3322,298 @@ fn load_worker_receipt_with(
 
 // --- launcher ---------------------------------------------------------------
 
+/// Typed worker unit lifecycle states (never inferred from receipt presence).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum WorkerUnitState {
+    NotFound,
+    Running,
+    Succeeded,
+    Failed,
+}
+
+impl fmt::Display for WorkerUnitState {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::NotFound => f.write_str("not_found"),
+            Self::Running => f.write_str("running"),
+            Self::Succeeded => f.write_str("succeeded"),
+            Self::Failed => f.write_str("failed"),
+        }
+    }
+}
+
 /// Async launcher seam for a sealed worker request.
 #[async_trait]
 pub trait WorkerLauncher: Send + Sync {
+    /// Launch the exact worker unit and wait until terminal or deadline.
     async fn launch_and_wait(
         &self,
         request_path: &Path,
         request: &WorkerRequest,
         roots: &WorkerRoots,
     ) -> Result<(), WorkerError>;
+
+    /// Inspect the exact unit `gzmo-evolver-worker@<candidate-id>.service`.
+    async fn inspect(&self, candidate_id: &CandidateId) -> Result<WorkerUnitState, WorkerError>;
+
+    /// Wait on an already-running unit until terminal or `deadline`.
+    async fn wait_existing(
+        &self,
+        candidate_id: &CandidateId,
+        deadline: DateTime<Utc>,
+    ) -> Result<WorkerUnitState, WorkerError>;
+
+    /// Stop/kill the unit and verify it is inactive.
+    async fn stop(&self, candidate_id: &CandidateId) -> Result<(), WorkerError>;
+}
+
+/// Fixed-unit runtime provisioner keyed only by validated candidate id.
+///
+/// Creates only the six Task-5 output/HOME/runtime directories under the fixed
+/// output root as the fixed worker identity. No caller-supplied path/user/property.
+#[async_trait]
+pub trait WorkerRuntimeProvisioner: Send + Sync {
+    async fn provision(&self, candidate_id: &CandidateId) -> Result<(), WorkerError>;
+}
+
+/// Production fixed worker account name installed by operations.
+pub const PROD_WORKER_USER: &str = "gzmo-evolver-worker";
+
+/// Resolve the fixed operations-installed worker UID/GID.
+pub fn resolve_fixed_worker_identity() -> Result<EffectiveIdentity, WorkerError> {
+    let user = nix::unistd::User::from_name(PROD_WORKER_USER)
+        .map_err(|err| WorkerError::Trust(format!("lookup {PROD_WORKER_USER}: {err}")))?
+        .ok_or_else(|| {
+            WorkerError::Trust(format!(
+                "operations worker account {PROD_WORKER_USER} missing"
+            ))
+        })?;
+    let uid = user.uid.as_raw();
+    let gid = user.gid.as_raw();
+    if uid == 0 || gid == 0 {
+        return Err(WorkerError::Trust(
+            "worker account must not be root".to_owned(),
+        ));
+    }
+    Ok(EffectiveIdentity { uid, gid })
+}
+
+/// Six per-candidate directories the fixed runtime unit may create.
+pub fn worker_runtime_dirs(
+    output_root: &Path,
+    candidate_id: &str,
+    profile: &str,
+) -> Result<[PathBuf; 6], WorkerError> {
+    validate_candidate_component(candidate_id)?;
+    if profile.is_empty() || profile.contains('/') || profile.contains("..") {
+        return Err(WorkerError::Invalid("profile name unsafe".to_owned()));
+    }
+    let output_dir = output_root.join(candidate_id);
+    let home = output_dir.join(WORKER_HOME_NAME);
+    let omp = home.join(".omp");
+    let profiles = omp.join("profiles");
+    let profile_runtime = profiles.join(profile);
+    let agent = profile_runtime.join("agent");
+    Ok([output_dir, home, omp, profiles, profile_runtime, agent])
+}
+
+/// Coordinator-side load of an already sealed request without worker-identity rewrite.
+///
+/// Returns `Ok(None)` when the request directory is absent. Corruption fails closed.
+pub fn try_load_existing_sealed_request(
+    roots: &WorkerRoots,
+    candidate_id: &CandidateId,
+) -> Result<Option<WorkerRequest>, WorkerError> {
+    roots.validate_intrinsic()?;
+    let id = candidate_id.as_str();
+    validate_candidate_component(id)?;
+    let dir = roots.request_root().join(id);
+    if !dir.exists() {
+        return Ok(None);
+    }
+    reject_symlink_component_path(&dir)?;
+    let meta = fs::symlink_metadata(&dir).map_err(|e| WorkerError::Io(e.to_string()))?;
+    if meta.file_type().is_symlink() || !meta.is_dir() {
+        return Err(WorkerError::Trust(
+            "sealed request path must be a real directory".to_owned(),
+        ));
+    }
+    let request_path = dir.join(REQUEST_FILE_NAME);
+    reject_symlink_component_path(&request_path)?;
+    let bytes = read_capped_nonsymlink(&request_path, MAX_WORKER_FILE_BYTES)?;
+    let request: WorkerRequest = serde_json::from_slice(&bytes)
+        .map_err(|err| WorkerError::Invalid(format!("request decode: {err}")))?;
+    if request.candidate_id().as_str() != id {
+        return Err(WorkerError::Trust(
+            "sealed request candidate_id mismatch".to_owned(),
+        ));
+    }
+    let canonical = request.canonical_bytes()?;
+    if canonical != bytes {
+        return Err(WorkerError::Trust(
+            "sealed request is not canonical".to_owned(),
+        ));
+    }
+    // Rebind companion digests.
+    for (name, expected) in [
+        (MANIFEST_FILE_NAME, request.manifest_digest()),
+        (SYSTEM_PROMPT_FILE_NAME, request.system_prompt_digest()),
+        (MISSION_FILE_NAME, request.mission_digest()),
+        (OMP_OVERLAY_FILE_NAME, request.omp_config_digest()),
+    ] {
+        let p = dir.join(name);
+        let b = read_capped_nonsymlink(&p, MAX_WORKER_FILE_BYTES.max(MAX_PROMPT_BYTES))?;
+        if digest_bytes(&b) != expected {
+            return Err(WorkerError::Trust(format!(
+                "sealed companion {name} digest mismatch"
+            )));
+        }
+    }
+    let policy_bytes = read_capped_nonsymlink(&dir.join(POLICY_FILE_NAME), MAX_WORKER_FILE_BYTES)?;
+    if digest_bytes(&policy_bytes) != request.policy_toml_digest() {
+        return Err(WorkerError::Trust(
+            "sealed policy.toml digest mismatch".to_owned(),
+        ));
+    }
+    Ok(Some(request))
+}
+
+/// Production systemd runtime provisioner for the fixed unit name only.
+pub struct SystemdWorkerRuntimeProvisioner<R: ProcessRunner + Send + Sync> {
+    runner: R,
+    roots: WorkerRoots,
+    profile: String,
+}
+
+impl<R: ProcessRunner + Send + Sync> SystemdWorkerRuntimeProvisioner<R> {
+    pub fn new(
+        runner: R,
+        roots: WorkerRoots,
+        profile: impl Into<String>,
+    ) -> Result<Self, WorkerError> {
+        roots.validate_intrinsic()?;
+        let profile = profile.into();
+        if profile.is_empty() || profile.contains('/') || profile.contains("..") {
+            return Err(WorkerError::Invalid("profile name unsafe".to_owned()));
+        }
+        Ok(Self {
+            runner,
+            roots,
+            profile,
+        })
+    }
+
+    fn unit_name(candidate_id: &str) -> String {
+        format!("gzmo-evolver-worker-runtime@{candidate_id}.service")
+    }
+
+    fn run_systemctl(&self, args: &[String]) -> Result<ProcessOutput, WorkerError> {
+        let env = {
+            let mut e = BTreeMap::new();
+            e.insert("PATH".to_owned(), WORKER_SAFE_PATH.to_owned());
+            e.insert("LC_ALL".to_owned(), "C".to_owned());
+            e
+        };
+        let spec = ProcessSpec::new(
+            "/usr/bin/systemctl",
+            args.iter().cloned(),
+            PathBuf::from("/"),
+            env,
+            SYSTEMD_OUTPUT_CAP_BYTES,
+            Duration::from_secs(30),
+        )?;
+        match self.runner.run(&spec) {
+            Ok(out) => Ok(out),
+            Err(ProcessError::NonZeroExit {
+                code,
+                stdout,
+                stderr,
+            }) => Ok(ProcessOutput {
+                status: code,
+                stdout,
+                stderr,
+            }),
+            Err(other) => Err(other.into()),
+        }
+    }
+}
+
+#[async_trait]
+impl<R: ProcessRunner + Send + Sync> WorkerRuntimeProvisioner
+    for SystemdWorkerRuntimeProvisioner<R>
+{
+    async fn provision(&self, candidate_id: &CandidateId) -> Result<(), WorkerError> {
+        let id = candidate_id.as_str();
+        validate_candidate_component(id)?;
+        // Fixed unit only — no path/user/property from caller.
+        let unit = Self::unit_name(id);
+        let start = self.run_systemctl(&["start".to_owned(), unit.clone()])?;
+        if start.status != 0 {
+            // Transient busy is reported as LeaseBusy when systemctl indicates contention.
+            let combined = format!(
+                "{}{}",
+                String::from_utf8_lossy(&start.stdout),
+                String::from_utf8_lossy(&start.stderr)
+            );
+            if combined.contains("busy") || combined.contains("lock") {
+                return Err(WorkerError::LeaseBusy);
+            }
+            return Err(WorkerError::Process(format!(
+                "runtime unit {unit} start failed"
+            )));
+        }
+        // Poll until inactive/exited success.
+        for _ in 0..200 {
+            let out = self.run_systemctl(&[
+                "show".to_owned(),
+                unit.clone(),
+                "--property=LoadState,ActiveState,SubState,Result".to_owned(),
+            ])?;
+            let text = String::from_utf8_lossy(&out.stdout);
+            let mut load = String::new();
+            let mut active = String::new();
+            let mut sub = String::new();
+            let mut result = String::new();
+            for line in text.lines() {
+                if let Some(v) = line.strip_prefix("LoadState=") {
+                    load = v.trim().to_owned();
+                } else if let Some(v) = line.strip_prefix("ActiveState=") {
+                    active = v.trim().to_owned();
+                } else if let Some(v) = line.strip_prefix("SubState=") {
+                    sub = v.trim().to_owned();
+                } else if let Some(v) = line.strip_prefix("Result=") {
+                    result = v.trim().to_owned();
+                }
+            }
+            if load == "not-found" {
+                return Err(WorkerError::Process(format!(
+                    "runtime unit {unit} not-found"
+                )));
+            }
+            if active == "failed" || result == "failed" || result == "exit-code" {
+                return Err(WorkerError::Process(format!("runtime unit {unit} failed")));
+            }
+            if (active == "inactive" || (active == "active" && (sub == "exited" || sub == "dead")))
+                && (result.is_empty() || result == "success")
+            {
+                // Real-lstat seal authority revalidates every path afterward.
+                let _ = worker_runtime_dirs(self.roots.output_root(), id, &self.profile)?;
+                return Ok(());
+            }
+            if matches!(
+                active.as_str(),
+                "active" | "activating" | "reloading" | "deactivating"
+            ) {
+                tokio::time::sleep(Duration::from_millis(50)).await;
+                continue;
+            }
+            return Err(WorkerError::Process(format!(
+                "runtime unit {unit} unexpected state load={load} active={active} sub={sub}"
+            )));
+        }
+        Err(WorkerError::Timeout)
+    }
 }
 
 /// Systemd transient-unit launcher (argv-only, exact properties).
@@ -3514,6 +3806,15 @@ impl<R: ProcessRunner + Send + Sync> WorkerLauncher for SystemdWorkerLauncher<R>
     ) -> Result<(), WorkerError> {
         self.validate_prerequisites(request)?;
         let unit = Self::unit_name(request.candidate_id().as_str());
+        // Never launch a second unit: refuse if already present/running.
+        match self.inspect_unit_state(&unit)? {
+            WorkerUnitState::NotFound => {}
+            other => {
+                return Err(WorkerError::Invalid(format!(
+                    "refusing duplicate launch; unit already {other}"
+                )));
+            }
+        }
         let run_args = self.build_systemd_run_args(request_path, request)?;
         let env = {
             let mut e = BTreeMap::new();
@@ -3563,6 +3864,40 @@ impl<R: ProcessRunner + Send + Sync> WorkerLauncher for SystemdWorkerLauncher<R>
                 }
             }
         }
+    }
+
+    async fn inspect(&self, candidate_id: &CandidateId) -> Result<WorkerUnitState, WorkerError> {
+        let unit = Self::unit_name(candidate_id.as_str());
+        self.inspect_unit_state(&unit)
+    }
+
+    async fn wait_existing(
+        &self,
+        candidate_id: &CandidateId,
+        deadline: DateTime<Utc>,
+    ) -> Result<WorkerUnitState, WorkerError> {
+        let unit = Self::unit_name(candidate_id.as_str());
+        loop {
+            let state = self.inspect_unit_state(&unit)?;
+            match state {
+                WorkerUnitState::Running => {
+                    if Utc::now() > deadline {
+                        self.stop_kill_verify(&unit)?;
+                        let _ = self.cleanup_unit(&unit);
+                        return Err(WorkerError::Timeout);
+                    }
+                    tokio::time::sleep(Duration::from_millis(50)).await;
+                }
+                other => return Ok(other),
+            }
+        }
+    }
+
+    async fn stop(&self, candidate_id: &CandidateId) -> Result<(), WorkerError> {
+        let unit = Self::unit_name(candidate_id.as_str());
+        self.stop_kill_verify(&unit)?;
+        let _ = self.cleanup_unit(&unit);
+        Ok(())
     }
 }
 
@@ -3653,6 +3988,45 @@ impl<R: ProcessRunner + Send + Sync> SystemdWorkerLauncher<R> {
         let _ = self.run_systemctl(&["reset-failed".to_owned(), unit.to_owned()]);
         Ok(())
     }
+
+    fn inspect_unit_state(&self, unit: &str) -> Result<WorkerUnitState, WorkerError> {
+        match self.poll_unit_state(unit)? {
+            UnitPoll::Missing => Ok(WorkerUnitState::NotFound),
+            UnitPoll::Running => Ok(WorkerUnitState::Running),
+            UnitPoll::Terminal => {
+                // Distinguish success vs failure without cleanup.
+                let out = self.run_systemctl(&[
+                    "show".to_owned(),
+                    unit.to_owned(),
+                    "--property=LoadState,ActiveState,SubState,Result,ExecMainStatus".to_owned(),
+                ])?;
+                let text = String::from_utf8_lossy(&out.stdout);
+                let mut result = String::new();
+                let mut exec_status: Option<i32> = None;
+                let mut active = String::new();
+                for line in text.lines() {
+                    if let Some(v) = line.strip_prefix("Result=") {
+                        result = v.trim().to_owned();
+                    } else if let Some(v) = line.strip_prefix("ExecMainStatus=") {
+                        exec_status = v.trim().parse().ok();
+                    } else if let Some(v) = line.strip_prefix("ActiveState=") {
+                        active = v.trim().to_owned();
+                    }
+                }
+                if active == "failed" || (result != "success" && !result.is_empty()) {
+                    return Ok(WorkerUnitState::Failed);
+                }
+                match exec_status {
+                    Some(0) | None if result == "success" || result.is_empty() => {
+                        Ok(WorkerUnitState::Succeeded)
+                    }
+                    Some(_) => Ok(WorkerUnitState::Failed),
+                    None => Ok(WorkerUnitState::Failed),
+                }
+            }
+            UnitPoll::Unexpected(_) => Ok(WorkerUnitState::Failed),
+        }
+    }
 }
 
 /// Fake launcher that directly invokes `run_worker_request` (no systemd).
@@ -3674,6 +4048,22 @@ impl<R: ProcessRunner + Send + Sync> WorkerLauncher for FakeWorkerLauncher<R> {
     ) -> Result<(), WorkerError> {
         let _ =
             run_worker_request_with(request_path, roots, self.authority.as_ref(), &self.runner)?;
+        Ok(())
+    }
+
+    async fn inspect(&self, _candidate_id: &CandidateId) -> Result<WorkerUnitState, WorkerError> {
+        Ok(WorkerUnitState::NotFound)
+    }
+
+    async fn wait_existing(
+        &self,
+        _candidate_id: &CandidateId,
+        _deadline: DateTime<Utc>,
+    ) -> Result<WorkerUnitState, WorkerError> {
+        Ok(WorkerUnitState::NotFound)
+    }
+
+    async fn stop(&self, _candidate_id: &CandidateId) -> Result<(), WorkerError> {
         Ok(())
     }
 }
@@ -5875,7 +6265,9 @@ mod tests {
             deadline,
         )
         .unwrap();
-        let err = launcher.build_systemd_run_args(&path, &bad_out).unwrap_err();
+        let err = launcher
+            .build_systemd_run_args(&path, &bad_out)
+            .unwrap_err();
         assert!(
             matches!(&err, WorkerError::Invalid(msg) if msg.contains("delimiter-unsafe")),
             "{err}"
