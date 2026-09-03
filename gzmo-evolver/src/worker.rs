@@ -3810,7 +3810,7 @@ impl<R: ProcessRunner + Send + Sync> SystemdWorkerLauncher<R> {
         }
     }
 
-    fn stop_kill_verify(&self, unit: &str) -> Result<(), WorkerError> {
+    async fn stop_kill_verify(&self, unit: &str) -> Result<(), WorkerError> {
         let _ = self.run_systemctl(&["stop".to_owned(), unit.to_owned()])?;
         let _ = self.run_systemctl(&[
             "kill".to_owned(),
@@ -3828,25 +3828,19 @@ impl<R: ProcessRunner + Send + Sync> SystemdWorkerLauncher<R> {
             ])?;
             let text = String::from_utf8_lossy(&show.stdout);
             let mut active = String::new();
-            let mut sub = String::new();
             for line in text.lines() {
                 if let Some(v) = line.strip_prefix("ActiveState=") {
                     active = v.trim().to_owned();
-                } else if let Some(v) = line.strip_prefix("SubState=") {
-                    sub = v.trim().to_owned();
                 }
             }
             if active == "inactive" || active == "failed" {
                 return Ok(());
             }
-            if active == "active" && (sub == "exited" || sub == "dead") {
-                // RemainAfterExit success still needs stop; treat as settled only after inactive.
-            }
             if matches!(
                 active.as_str(),
                 "active" | "activating" | "reloading" | "deactivating"
             ) {
-                std::thread::sleep(Duration::from_millis(50));
+                tokio::time::sleep(Duration::from_millis(50)).await;
                 continue;
             }
             // Not-found / empty after kill is acceptable (unit gone).
@@ -3863,7 +3857,7 @@ impl<R: ProcessRunner + Send + Sync> SystemdWorkerLauncher<R> {
                     return Ok(());
                 }
             }
-            std::thread::sleep(Duration::from_millis(50));
+            tokio::time::sleep(Duration::from_millis(50)).await;
         }
         Err(WorkerError::Trust(format!(
             "unit {unit} did not become inactive after stop/kill"
@@ -3889,16 +3883,14 @@ impl<R: ProcessRunner + Send + Sync> WorkerLauncher for SystemdWorkerLauncher<R>
     ) -> Result<(), WorkerError> {
         self.validate_prerequisites(request)?;
         let unit = Self::unit_name(request.candidate_id().as_str());
-        // Defense in depth: never start a second unit if one already succeeded.
-        // Building-path runner also refuses relaunch; Running may appear transiently
-        // in poll fixtures before systemd-run returns.
+        // Never launch a second unit: refuse unless the exact unit is absent.
         match self.inspect_unit_state(&unit)? {
-            WorkerUnitState::Succeeded => {
-                return Err(WorkerError::Invalid(
-                    "refusing duplicate launch; unit already succeeded".to_owned(),
-                ));
+            WorkerUnitState::NotFound => {}
+            other => {
+                return Err(WorkerError::Invalid(format!(
+                    "refusing duplicate launch; unit already {other}"
+                )));
             }
-            _ => {}
         }
         let run_args = self.build_systemd_run_args(request_path, request)?;
         let env = {
@@ -3920,7 +3912,7 @@ impl<R: ProcessRunner + Send + Sync> WorkerLauncher for SystemdWorkerLauncher<R>
         let deadline = request.deadline();
         loop {
             if Utc::now() > deadline {
-                self.stop_kill_verify(&unit)?;
+                self.stop_kill_verify(&unit).await?;
                 let _ = self.cleanup_unit(&unit);
                 return Err(WorkerError::Timeout);
             }
@@ -3934,14 +3926,14 @@ impl<R: ProcessRunner + Send + Sync> WorkerLauncher for SystemdWorkerLauncher<R>
                     return detail;
                 }
                 UnitPoll::Missing => {
-                    self.stop_kill_verify(&unit)?;
+                    self.stop_kill_verify(&unit).await?;
                     let _ = self.cleanup_unit(&unit);
                     return Err(WorkerError::Process(format!(
                         "unit {unit} not-found before terminal status read"
                     )));
                 }
                 UnitPoll::Unexpected(other) => {
-                    self.stop_kill_verify(&unit)?;
+                    self.stop_kill_verify(&unit).await?;
                     let _ = self.cleanup_unit(&unit);
                     return Err(WorkerError::Process(format!(
                         "unit {unit} unexpected state {other}"
@@ -3967,7 +3959,7 @@ impl<R: ProcessRunner + Send + Sync> WorkerLauncher for SystemdWorkerLauncher<R>
             match state {
                 WorkerUnitState::Running => {
                     if Utc::now() > deadline {
-                        self.stop_kill_verify(&unit)?;
+                        self.stop_kill_verify(&unit).await?;
                         let _ = self.cleanup_unit(&unit);
                         return Err(WorkerError::Timeout);
                     }
@@ -3980,7 +3972,7 @@ impl<R: ProcessRunner + Send + Sync> WorkerLauncher for SystemdWorkerLauncher<R>
 
     async fn stop(&self, candidate_id: &CandidateId) -> Result<(), WorkerError> {
         let unit = Self::unit_name(candidate_id.as_str());
-        self.stop_kill_verify(&unit)?;
+        self.stop_kill_verify(&unit).await?;
         let _ = self.cleanup_unit(&unit);
         Ok(())
     }
@@ -5394,7 +5386,16 @@ mod tests {
                     if props.contains("ActiveState") && !props.contains("Result") {
                         let mut p = phase2.lock().unwrap();
                         *p += 1;
+                        // First show is the pre-launch inspect — unit must be NotFound.
                         if *p == 1 {
+                            return Ok(ProcessOutput {
+                                status: 0,
+                                stdout: b"LoadState=not-found\nActiveState=inactive\nSubState=dead\n"
+                                    .to_vec(),
+                                stderr: vec![],
+                            });
+                        }
+                        if *p == 2 {
                             return Ok(ProcessOutput {
                                 status: 0,
                                 stdout: b"LoadState=loaded\nActiveState=active\nSubState=running\n"
@@ -5402,7 +5403,7 @@ mod tests {
                                 stderr: vec![],
                             });
                         }
-                        if *p == 2 {
+                        if *p == 3 {
                             return Ok(ProcessOutput {
                                 status: 0,
                                 stdout:
@@ -5501,7 +5502,10 @@ mod tests {
         assert!(!logged.iter().any(|c| c.iter().any(|a| a == "kill")));
 
         // Failed unit
+        // Failed unit — first show is pre-launch NotFound, then terminal failed.
         let runner2 = FakeProcessRunner::new();
+        let phase_f = Arc::new(Mutex::new(0u32));
+        let phase_f2 = phase_f.clone();
         runner2.set_handler(move |spec| {
             let prog = spec.program.display().to_string();
             if prog.ends_with("systemd-run") {
@@ -5519,6 +5523,16 @@ mod tests {
                     .find(|a| a.starts_with("--property="))
                     .cloned()
                     .unwrap_or_default();
+                let mut p = phase_f2.lock().unwrap();
+                *p += 1;
+                if *p == 1 {
+                    return Ok(ProcessOutput {
+                        status: 0,
+                        stdout: b"LoadState=not-found\nActiveState=inactive\nSubState=dead\n"
+                            .to_vec(),
+                        stderr: vec![],
+                    });
+                }
                 if props.contains("Result") {
                     return Ok(ProcessOutput {
                         status: 0,
@@ -5592,12 +5606,21 @@ mod tests {
         let runner3 = FakeProcessRunner::new();
         let calls3: Arc<Mutex<Vec<Vec<String>>>> = Arc::new(Mutex::new(Vec::new()));
         let c3 = calls3.clone();
+        let phase_t = Arc::new(Mutex::new(0u32));
+        let phase_t2 = phase_t.clone();
         runner3.set_handler(move |spec| {
             let mut args = vec![spec.program.display().to_string()];
             args.extend(spec.args.clone());
             c3.lock().unwrap().push(args);
-            if spec.program.display().to_string().ends_with("systemctl")
-                && spec.args.first().map(String::as_str) == Some("show")
+            let prog = spec.program.display().to_string();
+            if prog.ends_with("systemd-run") {
+                return Ok(ProcessOutput {
+                    status: 0,
+                    stdout: vec![],
+                    stderr: vec![],
+                });
+            }
+            if prog.ends_with("systemctl") && spec.args.first().map(String::as_str) == Some("show")
             {
                 let killed = c3
                     .lock()
@@ -5608,6 +5631,16 @@ mod tests {
                     return Ok(ProcessOutput {
                         status: 0,
                         stdout: b"LoadState=loaded\nActiveState=inactive\nSubState=dead\n".to_vec(),
+                        stderr: vec![],
+                    });
+                }
+                let mut p = phase_t2.lock().unwrap();
+                *p += 1;
+                if *p == 1 {
+                    return Ok(ProcessOutput {
+                        status: 0,
+                        stdout: b"LoadState=not-found\nActiveState=inactive\nSubState=dead\n"
+                            .to_vec(),
                         stderr: vec![],
                     });
                 }
@@ -5763,6 +5796,60 @@ mod tests {
         )
         .unwrap();
         assert!(over_r.validate_against(&req, head).is_err());
+    }
+
+    #[test]
+    fn launch_refuses_when_unit_already_running_without_systemd_run() {
+        let h = Harness::new();
+        let req = h.seal("m");
+        let path = request_path(&h);
+        let runner = FakeProcessRunner::new();
+        let calls: Arc<Mutex<Vec<Vec<String>>>> = Arc::new(Mutex::new(Vec::new()));
+        let c = calls.clone();
+        runner.set_handler(move |spec| {
+            let mut args = vec![spec.program.display().to_string()];
+            args.extend(spec.args.clone());
+            c.lock().unwrap().push(args);
+            let prog = spec.program.display().to_string();
+            if prog.ends_with("systemctl") && spec.args.first().map(String::as_str) == Some("show")
+            {
+                return Ok(ProcessOutput {
+                    status: 0,
+                    stdout: b"LoadState=loaded\nActiveState=active\nSubState=running\n".to_vec(),
+                    stderr: vec![],
+                });
+            }
+            Ok(ProcessOutput {
+                status: 0,
+                stdout: b"inactive\n".to_vec(),
+                stderr: vec![],
+            })
+        });
+        let launcher = SystemdWorkerLauncher::new(
+            runner,
+            PathBuf::from("/usr/bin/gzmo-evolver"),
+            h.roots.clone(),
+        )
+        .unwrap();
+        let rt = tokio::runtime::Builder::new_current_thread()
+            .enable_all()
+            .build()
+            .unwrap();
+        let err = rt
+            .block_on(launcher.launch_and_wait(&path, &req, &h.roots))
+            .unwrap_err();
+        assert!(
+            err.to_string().contains("refusing duplicate launch"),
+            "{err}"
+        );
+        let logged = calls.lock().unwrap().clone();
+        assert!(
+            !logged.iter().any(|c| c
+                .first()
+                .map(|s| s.ends_with("systemd-run"))
+                .unwrap_or(false)),
+            "systemd-run must not be invoked: {logged:?}"
+        );
     }
 
     #[test]

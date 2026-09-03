@@ -72,6 +72,9 @@ pub enum GitError {
     /// Underlying process seam failure (no secret/output dump).
     #[error("git process error: {0}")]
     Process(String),
+    /// Transient mirror clone/fetch transport failure (retryable).
+    #[error("git transport error: {0}")]
+    Transport(String),
     /// Mirror lease held by another process.
     #[error("git mirror lock busy")]
     MirrorLockBusy,
@@ -564,7 +567,7 @@ impl<'a, R: ProcessRunner> GitRepository<'a, R> {
         // Parent is state_dir (same parent as final mirror) for atomic rename.
         // Remote is always a validated GitHub URL; file protocol stays off.
         // Hermetic tests rewrite via ProcessRunner -c insteadOf + file allow.
-        let out = self.run_git_allow_nonzero_ex(
+        let out = match self.run_git_allow_nonzero_ex(
             Some(self.config.state_dir()),
             &[
                 "clone".to_owned(),
@@ -575,12 +578,20 @@ impl<'a, R: ProcessRunner> GitRepository<'a, R> {
             GIT_OUTPUT_CAP_BYTES,
             Duration::from_secs(GIT_FETCH_TIMEOUT_SECS),
             false,
-        )?;
+        ) {
+            Ok(o) => o,
+            Err(GitError::Process(msg) | GitError::Io(msg)) => {
+                let _ = remove_path_best_effort(&staging);
+                return Err(GitError::Transport(msg));
+            }
+            Err(err) => {
+                let _ = remove_path_best_effort(&staging);
+                return Err(err);
+            }
+        };
         if out.status != 0 {
             let _ = remove_path_best_effort(&staging);
-            return Err(GitError::Trust(
-                "mirror clone failed without network credential inheritance".to_owned(),
-            ));
+            return Err(GitError::Transport("mirror clone failed".to_owned()));
         }
         if let Err(err) = self.validate_mirror_layout(&staging) {
             let _ = remove_path_best_effort(&staging);
@@ -610,7 +621,7 @@ impl<'a, R: ProcessRunner> GitRepository<'a, R> {
         let base = self.config.repo().base_branch();
         let refspec = format!("+refs/heads/{base}:refs/heads/{base}");
         // Fetch origin (validated GitHub URL). Hermetic tests inject insteadOf.
-        self.run_git_ex(
+        match self.run_git_ex(
             None,
             &[
                 "--git-dir".to_owned(),
@@ -624,8 +635,11 @@ impl<'a, R: ProcessRunner> GitRepository<'a, R> {
             GIT_OUTPUT_CAP_BYTES,
             Duration::from_secs(GIT_FETCH_TIMEOUT_SECS),
             false,
-        )?;
-        Ok(())
+        ) {
+            Ok(_) => Ok(()),
+            Err(GitError::Process(msg) | GitError::Io(msg)) => Err(GitError::Transport(msg)),
+            Err(err) => Err(err),
+        }
     }
 
     fn validate_mirror_layout(&self, mirror: &Path) -> Result<(), GitError> {
@@ -1209,54 +1223,8 @@ impl<'a, R: ProcessRunner> GitWorkspace<'a, R> {
             )));
         }
         let head = self.candidate_commit()?;
-        // HEAD must descend from baseline.
-        let mb = self.merge_base("HEAD", baseline)?;
-        if mb != baseline {
-            return Err(GitError::Workspace(
-                "HEAD does not descend from baseline".to_owned(),
-            ));
-        }
-        if head == baseline {
-            return Err(GitError::Workspace(
-                "candidate has no changes relative to baseline".to_owned(),
-            ));
-        }
-        // No merge commits in baseline..HEAD.
-        let merges = self.run_git(
-            &[
-                "rev-list".to_owned(),
-                "--merges".to_owned(),
-                format!("{baseline}..HEAD"),
-            ],
-            GIT_OUTPUT_CAP_BYTES,
-        )?;
-        if !String::from_utf8_lossy(&merges.stdout).trim().is_empty() {
-            return Err(GitError::Workspace(
-                "merge commits present in baseline..HEAD".to_owned(),
-            ));
-        }
-        // Reject symlink/gitlink in HEAD tree and in the diff against baseline.
-        self.reject_special_in_head()?;
-        let diff_raw = self.run_git(
-            &[
-                "diff".to_owned(),
-                "--no-renames".to_owned(),
-                "--raw".to_owned(),
-                "-z".to_owned(),
-                format!("{baseline}..HEAD"),
-            ],
-            GIT_DIFF_CAP_BYTES,
-        )?;
-        let raw_files = parse_raw_diff_z(&diff_raw.stdout)?;
-        if raw_files.is_empty() {
-            return Err(GitError::Workspace(
-                "candidate diff against baseline is empty".to_owned(),
-            ));
-        }
-        for f in &raw_files {
-            reject_special_mode(&f.old_mode)?;
-            reject_special_mode(&f.new_mode)?;
-        }
+        // Shared content invariants (also enforced on recognize path).
+        self.validate_candidate_content(baseline)?;
 
         let tree = {
             let out = self.run_git(
@@ -1355,6 +1323,62 @@ impl<'a, R: ProcessRunner> GitWorkspace<'a, R> {
         Ok(new_commit)
     }
 
+    /// Content invariants shared by squash and recognize paths.
+    ///
+    /// Requires: clean worktree already checked by caller; HEAD descends from baseline;
+    /// no merges in range; nonempty baseline..HEAD raw diff; no special modes in HEAD
+    /// tree or diff.
+    fn validate_candidate_content(&self, baseline: &str) -> Result<(), GitError> {
+        validate_oid(baseline)?;
+        let head = self.candidate_commit()?;
+        let mb = self.merge_base("HEAD", baseline)?;
+        if mb != baseline {
+            return Err(GitError::Workspace(
+                "HEAD does not descend from baseline".to_owned(),
+            ));
+        }
+        if head == baseline {
+            return Err(GitError::Workspace(
+                "candidate has no changes relative to baseline".to_owned(),
+            ));
+        }
+        let merges = self.run_git(
+            &[
+                "rev-list".to_owned(),
+                "--merges".to_owned(),
+                format!("{baseline}..HEAD"),
+            ],
+            GIT_OUTPUT_CAP_BYTES,
+        )?;
+        if !String::from_utf8_lossy(&merges.stdout).trim().is_empty() {
+            return Err(GitError::Workspace(
+                "merge commits present in baseline..HEAD".to_owned(),
+            ));
+        }
+        self.reject_special_in_head()?;
+        let diff_raw = self.run_git(
+            &[
+                "diff".to_owned(),
+                "--no-renames".to_owned(),
+                "--raw".to_owned(),
+                "-z".to_owned(),
+                format!("{baseline}..HEAD"),
+            ],
+            GIT_DIFF_CAP_BYTES,
+        )?;
+        let raw_files = parse_raw_diff_z(&diff_raw.stdout)?;
+        if raw_files.is_empty() {
+            return Err(GitError::Workspace(
+                "candidate diff against baseline is empty".to_owned(),
+            ));
+        }
+        for f in &raw_files {
+            reject_special_mode(&f.old_mode)?;
+            reject_special_mode(&f.new_mode)?;
+        }
+        Ok(())
+    }
+
     /// Recognize or create the exact normalized one-parent candidate commit.
     ///
     /// `completed_at` is the fixed UTC timestamp (from the worker receipt). When HEAD
@@ -1423,9 +1447,6 @@ impl<'a, R: ProcessRunner> GitWorkspace<'a, R> {
             ],
             GIT_OUTPUT_CAP_BYTES,
         )?;
-        // Force UTC interpretation via env is not available here; compare both
-        // author and committer date lines after parsing show with fixed TZ via
-        // separate pretty formats that include the offset we wrote.
         let show_utc = self.run_git(
             &[
                 "show".to_owned(),
@@ -1444,7 +1465,7 @@ impl<'a, R: ProcessRunner> GitWorkspace<'a, R> {
         let a_iso = fields.next().unwrap_or("").trim();
         let c_iso = fields.next().unwrap_or("").trim();
         let body = fields.next().unwrap_or("").trim_end_matches('\n');
-        let _ = show; // keep diagnostic path available for future
+        let _ = show;
 
         if an != CANDIDATE_AUTHOR_NAME
             || ae != CANDIDATE_AUTHOR_EMAIL
@@ -1463,6 +1484,9 @@ impl<'a, R: ProcessRunner> GitWorkspace<'a, R> {
         {
             return Ok(None);
         }
+        // Same content invariants as squash (nonempty diff, no special modes, etc.).
+        // Fail closed with GitError rather than Ok(None) so the runner terminalizes.
+        self.validate_candidate_content(baseline)?;
         Ok(Some(head))
     }
 

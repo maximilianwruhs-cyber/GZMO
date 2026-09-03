@@ -105,21 +105,8 @@ impl RunnerError {
     fn from_git(err: GitError) -> Self {
         match err {
             GitError::MirrorLockBusy => Self::Contention("mirror lease busy".to_owned()),
-            // Transient transport/process faults leave Observed resumable.
-            GitError::Process(msg) | GitError::Io(msg) => {
-                let lower = msg.to_ascii_lowercase();
-                if lower.contains("timeout")
-                    || lower.contains("timed out")
-                    || lower.contains("fetch")
-                    || lower.contains("network")
-                    || lower.contains("connection")
-                    || lower.contains("temporary")
-                    || lower.contains("exited with status")
-                {
-                    Self::Contention(format!("transient git: {}", Self::bound(msg)))
-                } else {
-                    Self::Git(Self::bound(msg))
-                }
+            GitError::Transport(msg) => {
+                Self::Contention(format!("transient git transport: {}", Self::bound(msg)))
             }
             other => Self::Git(Self::bound(other)),
         }
@@ -271,18 +258,14 @@ impl
     /// Production construction: fixed systemd provisioner/launcher and worker account.
     pub fn production(config: RepoEvolverConfig) -> Result<Self, RunnerError> {
         let coordinator_uid = nix::unistd::Uid::effective().as_raw();
-        if coordinator_uid == 0 {
-            return Err(RunnerError::Trust(
-                "coordinator must not run as root".to_owned(),
-            ));
-        }
         Self::production_with_uid(config, coordinator_uid)
     }
 
-    /// Read-only status construction: does not refuse root and does not require identity mutation.
+    /// Read-only status construction (root allowed). Mutation still refuses root.
     pub fn for_status(config: RepoEvolverConfig) -> Result<Self, RunnerError> {
-        let coordinator_uid = nix::unistd::Uid::effective().as_raw().max(1);
-        Self::production_with_uid(config, coordinator_uid)
+        let coordinator_uid = nix::unistd::Uid::effective().as_raw();
+        // Preserve real uid even when 0; mutating ops refuse root separately.
+        Self::production_with_uid(config, coordinator_uid.max(1))
     }
 
     fn production_with_uid(
@@ -381,8 +364,18 @@ where
         Ok((lock, store))
     }
 
+    fn refuse_root_mutation(&self) -> Result<(), RunnerError> {
+        if nix::unistd::Uid::effective().as_raw() == 0 {
+            return Err(RunnerError::Trust(
+                "coordinator must not run as root".to_owned(),
+            ));
+        }
+        Ok(())
+    }
+
     /// Run or resume until Evaluating (or terminal failure / later-stage refuse).
     pub async fn run_once(&self) -> Result<RunOutcome, RunnerError> {
+        self.refuse_root_mutation()?;
         let (_lock, store) = self.acquire_lock_and_store()?;
         let repo = self.repository_key();
         if let Some(active) = store.active_candidate(&repo)? {
@@ -401,6 +394,7 @@ where
 
     /// Explicit resume of latest/active candidate without creating a new one.
     pub async fn resume(&self) -> Result<RunOutcome, RunnerError> {
+        self.refuse_root_mutation()?;
         let (_lock, store) = self.acquire_lock_and_store()?;
         let repo = self.repository_key();
         let record = if let Some(active) = store.active_candidate(&repo)? {
@@ -415,6 +409,7 @@ where
 
     /// Abort a pre-evaluation candidate without deleting artifacts.
     pub async fn abort(&self, candidate_id: &str, reason: &str) -> Result<RunOutcome, RunnerError> {
+        self.refuse_root_mutation()?;
         if reason.is_empty() {
             return Err(RunnerError::Invalid(
                 "abort reason must be nonempty".to_owned(),
@@ -894,55 +889,72 @@ where
         }
 
         let mission_id = &record.manifest().mission_id;
-        let normalized = if let Some(already) = ws
-            .recognize_normalized_commit(baseline, mission_id, receipt.completed_at())
-            .map_err(RunnerError::from_git)?
-        {
-            // Post-squash resume: HEAD is already normalized. Receipt names pre-squash worker head.
-            let worker_oid = match receipt
-                .worker_head_oid()
-                .map_err(RunnerError::from_worker)?
-            {
-                Some(oid) => oid,
-                None => {
-                    return self
-                        .fail(
-                            store,
-                            record.id(),
-                            "success receipt requires worker_head_digest",
-                        )
-                        .map(Some);
+        let normalized =
+            match ws.recognize_normalized_commit(baseline, mission_id, receipt.completed_at()) {
+                Ok(Some(already)) => {
+                    // Post-squash resume: HEAD is already normalized. Receipt names pre-squash worker head.
+                    let worker_oid = match receipt.worker_head_oid() {
+                        Ok(Some(oid)) => oid,
+                        Ok(None) => {
+                            return self
+                                .fail(
+                                    store,
+                                    record.id(),
+                                    "success receipt requires worker_head_digest",
+                                )
+                                .map(Some);
+                        }
+                        Err(err) => {
+                            return self
+                                .fail(store, record.id(), &RunnerError::bound(err))
+                                .map(Some);
+                        }
+                    };
+                    match ws.worker_head_matches_normalized_tree(&worker_oid, baseline, &already) {
+                        Ok(true) => already,
+                        Ok(false) => {
+                            return self
+                                .fail(
+                                    store,
+                                    record.id(),
+                                    "receipt worker head does not match normalized tree",
+                                )
+                                .map(Some);
+                        }
+                        Err(err) => {
+                            return self
+                                .fail(store, record.id(), &RunnerError::bound(err))
+                                .map(Some);
+                        }
+                    }
                 }
-            };
-            let ok = ws
-                .worker_head_matches_normalized_tree(&worker_oid, baseline, &already)
-                .map_err(RunnerError::from_git)?;
-            if !ok {
-                return self
-                    .fail(
-                        store,
-                        record.id(),
-                        "receipt worker head does not match normalized tree",
-                    )
-                    .map(Some);
-            }
-            already
-        } else {
-            // Pre-squash: require exact HEAD equality then squash once.
-            if let Err(err) = receipt.validate_worker_head_equals(&head_now) {
-                return self
-                    .fail(store, record.id(), &RunnerError::bound(err))
-                    .map(Some);
-            }
-            match ws.ensure_normalized_candidate(baseline, mission_id, receipt.completed_at()) {
-                Ok(oid) => oid,
+                Ok(None) => {
+                    // Pre-squash: require exact HEAD equality then squash once.
+                    if let Err(err) = receipt.validate_worker_head_equals(&head_now) {
+                        return self
+                            .fail(store, record.id(), &RunnerError::bound(err))
+                            .map(Some);
+                    }
+                    match ws.ensure_normalized_candidate(
+                        baseline,
+                        mission_id,
+                        receipt.completed_at(),
+                    ) {
+                        Ok(oid) => oid,
+                        Err(err) => {
+                            return self
+                                .fail(store, record.id(), &RunnerError::bound(err))
+                                .map(Some);
+                        }
+                    }
+                }
                 Err(err) => {
+                    // Dirty/untracked and other content faults terminalize.
                     return self
                         .fail(store, record.id(), &RunnerError::bound(err))
                         .map(Some);
                 }
-            }
-        };
+            };
 
         let stats = match ws.diff_stats(baseline, &normalized, record.manifest()) {
             Ok(s) => s,

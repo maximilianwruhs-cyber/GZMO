@@ -1072,7 +1072,20 @@ fn rejects_shared_objects_when_clone_omits_no_local() {
     assert!(!fx.state_dir.join(WORKSPACES_DIR).join(id_bad).exists());
 
     let id_ok = "cand-20260901t120000z-bet-sharenok1";
-    let ws = git.prepare(&manifest_for(&baseline, id_ok)).unwrap();
+    let mut ws = None;
+    for attempt in 0..8 {
+        match git.prepare(&manifest_for(&baseline, id_ok)) {
+            Ok(w) => {
+                ws = Some(w);
+                break;
+            }
+            Err(GitError::MirrorLockBusy) => {
+                std::thread::sleep(std::time::Duration::from_millis(20 + attempt * 10));
+            }
+            Err(e) => panic!("unexpected prepare error: {e:?}"),
+        }
+    }
+    let ws = ws.expect("prepare ok after MirrorLockBusy retries exhausted");
     assert!(!ws.uses_alternates_or_shared_objects().unwrap());
 }
 
@@ -1226,7 +1239,7 @@ fn public_commands_require_config_hidden_worker_does_not() {
 use async_trait::async_trait;
 use evolution_contracts::{sha256_hex, ResourceUsage};
 use gzmo_evolver::{
-    worker_runtime_dirs, EffectiveIdentity, RepoEvolver, WorkerError, WorkerIdentity,
+    worker_runtime_dirs, EffectiveIdentity, RepoEvolver, RunOutcome, WorkerError, WorkerIdentity,
     WorkerLauncher, WorkerReceipt, WorkerRequest, WorkerRoots, WorkerRuntimeProvisioner,
     WorkerUnitState,
 };
@@ -1293,6 +1306,10 @@ enum LaunchMode {
     StayRunning,
     /// Record stop order for abort tests.
     TrackStop,
+    /// Empty baseline-tree normalized signature + zero usage (must terminalize).
+    EmptyNormalized,
+    /// Valid commit+receipt then leave untracked dirty file.
+    DirtyAfterReceipt,
 }
 
 /// Hermetic launcher: mutates workspace, writes receipt/raw, tracks launch count.
@@ -1509,7 +1526,6 @@ impl WorkerLauncher for FakeStageLauncher {
 
         match mode {
             LaunchMode::StayRunning => {
-                // Leave Running; wait_existing will keep returning Running.
                 return Ok(());
             }
             LaunchMode::UnitFailed => {
@@ -1521,10 +1537,60 @@ impl WorkerLauncher for FakeStageLauncher {
                 *self.unit_state.lock().unwrap() = WorkerUnitState::Succeeded;
                 return Ok(());
             }
+            LaunchMode::EmptyNormalized => {
+                // Commit-tree baseline tree with normalized signature; zero usage.
+                let baseline = rev_parse(request.workspace(), "HEAD");
+                let man = request_path.parent().unwrap().join("manifest.json");
+                let v: serde_json::Value =
+                    serde_json::from_slice(&fs::read(&man).unwrap()).unwrap();
+                let mission_id = v["mission_id"].as_str().unwrap().to_owned();
+                let completed = request.issued_at() + chrono::Duration::seconds(2);
+                let empty_head = Self::normalize_like_coordinator(
+                    request.workspace(),
+                    &baseline,
+                    &mission_id,
+                    completed,
+                )?;
+                self.write_receipt(request, &empty_head, 0, 0)?;
+                // Rewrite receipt completed_at to match normalize timestamp.
+                let started = request.issued_at() + chrono::Duration::seconds(1);
+                let raw = fs::read(request.output_dir().join("raw.jsonl")).unwrap();
+                let output_digest = format!("sha256:{}", sha256_hex(&raw));
+                let usage = ResourceUsage {
+                    wall_seconds: 2,
+                    attempts: 1,
+                    changed_files: 0,
+                    added_lines: 0,
+                    tool_calls: 1,
+                    input_tokens: 10,
+                    output_tokens: 5,
+                    energy_joules: None,
+                };
+                let receipt = WorkerReceipt::new(
+                    request.candidate_id().clone(),
+                    request.manifest_digest(),
+                    request.policy_digest(),
+                    request.omp_version(),
+                    started,
+                    completed,
+                    0,
+                    output_digest,
+                    Some(format!("git-sha1:{empty_head}")),
+                    usage,
+                )?;
+                fs::write(
+                    request.output_dir().join("receipt.json"),
+                    receipt.canonical_bytes()?,
+                )
+                .unwrap();
+                *self.unit_state.lock().unwrap() = WorkerUnitState::Succeeded;
+                return Ok(());
+            }
             LaunchMode::Happy
             | LaunchMode::PostSquashNormalize
             | LaunchMode::FactMismatch
-            | LaunchMode::TrackStop => {}
+            | LaunchMode::TrackStop
+            | LaunchMode::DirtyAfterReceipt => {}
         }
 
         let head = Self::write_worker_commit(request.workspace())?;
@@ -1535,9 +1601,7 @@ impl WorkerLauncher for FakeStageLauncher {
         self.write_receipt(request, &head, files, lines)?;
 
         if mode == LaunchMode::PostSquashNormalize {
-            // Simulate crash after squash: normalize HEAD while leaving Building state to caller.
             let baseline = {
-                // Parent of worker commit is baseline for single-commit change.
                 let out = Command::new("git")
                     .args([
                         "-C",
@@ -1554,19 +1618,7 @@ impl WorkerLauncher for FakeStageLauncher {
                     .unwrap();
                 String::from_utf8_lossy(&out.stdout).trim().to_owned()
             };
-            // mission_id is generation UUID from sealed companions — read from request path parent.
             let mission_id = {
-                // From sealed request companion is not needed: load from workspace branch evolve/<id>
-                // Use candidate id's generation is in state; for squash message we need mission_id.
-                // Read sealed request JSON for nothing; use generation from companion mission path parent?
-                // Simpler: parse from request's sealed dir is hard. Use git log after — we need mission_id
-                // from the sealed request's companion.manifest — read request path.
-                let req_json = fs::read_to_string(request_path).unwrap_or_default();
-                let _ = req_json;
-                // Manifest mission_id is generation UUID stored in candidate record; companion
-                // mission.md is rendered. For normalize we need exact mission_id string.
-                // Extract from sealed request sibling? request has no mission_id field.
-                // Use env: load from candidate id is wrong. Read manifest companion.
                 let man = request_path.parent().unwrap().join("manifest.json");
                 let v: serde_json::Value = serde_json::from_slice(&fs::read(man).unwrap()).unwrap();
                 v["mission_id"].as_str().unwrap().to_owned()
@@ -1578,8 +1630,6 @@ impl WorkerLauncher for FakeStageLauncher {
                 &mission_id,
                 completed,
             )?;
-            // Fix receipt completed_at to match normalized date: rewrite receipt with same head
-            // but completed_at used above. Re-write with completed matching normalize.
             let started = request.issued_at() + chrono::Duration::seconds(1);
             let raw = fs::read(request.output_dir().join("raw.jsonl")).unwrap();
             let output_digest = format!("sha256:{}", sha256_hex(&raw));
@@ -1607,6 +1657,10 @@ impl WorkerLauncher for FakeStageLauncher {
             )?;
             let bytes = receipt.canonical_bytes()?;
             fs::write(request.output_dir().join("receipt.json"), bytes).unwrap();
+        }
+
+        if mode == LaunchMode::DirtyAfterReceipt {
+            fs::write(request.workspace().join("untracked-dirt.txt"), "x\n").unwrap();
         }
 
         *self.unit_state.lock().unwrap() = WorkerUnitState::Succeeded;
@@ -1840,10 +1894,82 @@ impl RepoHarness {
     }
 }
 
+/// Bounded retry for LockBusy caused by fork/exec lock-fd inheritance under parallel tests.
+/// Never used by production code or the dedicated lock-race test.
+async fn run_once_retry_lock_busy(
+    evolver: &RepoEvolver<
+        RunnerHybrid,
+        FakeStageLauncher,
+        FakeRuntimeProvisioner,
+        TestWorkerIdentity,
+        ManualClock,
+    >,
+) -> Result<RunOutcome, gzmo_evolver::RunnerError> {
+    let mut last = None;
+    for attempt in 0..8 {
+        match evolver.run_once().await {
+            Ok(o) => return Ok(o),
+            Err(gzmo_evolver::RunnerError::LockBusy) => {
+                last = Some(gzmo_evolver::RunnerError::LockBusy);
+                tokio::time::sleep(std::time::Duration::from_millis(25 + attempt * 15)).await;
+            }
+            Err(e) => return Err(e),
+        }
+    }
+    Err(last.unwrap_or(gzmo_evolver::RunnerError::LockBusy))
+}
+
+async fn resume_retry_lock_busy(
+    evolver: &RepoEvolver<
+        RunnerHybrid,
+        FakeStageLauncher,
+        FakeRuntimeProvisioner,
+        TestWorkerIdentity,
+        ManualClock,
+    >,
+) -> Result<RunOutcome, gzmo_evolver::RunnerError> {
+    let mut last = None;
+    for attempt in 0..8 {
+        match evolver.resume().await {
+            Ok(o) => return Ok(o),
+            Err(gzmo_evolver::RunnerError::LockBusy) => {
+                last = Some(gzmo_evolver::RunnerError::LockBusy);
+                tokio::time::sleep(std::time::Duration::from_millis(25 + attempt * 15)).await;
+            }
+            Err(e) => return Err(e),
+        }
+    }
+    Err(last.unwrap_or(gzmo_evolver::RunnerError::LockBusy))
+}
+
+async fn abort_retry_lock_busy(
+    evolver: &RepoEvolver<
+        RunnerHybrid,
+        FakeStageLauncher,
+        FakeRuntimeProvisioner,
+        TestWorkerIdentity,
+        ManualClock,
+    >,
+    id: &str,
+    reason: &str,
+) -> Result<RunOutcome, gzmo_evolver::RunnerError> {
+    let mut last = None;
+    for attempt in 0..8 {
+        match evolver.abort(id, reason).await {
+            Ok(o) => return Ok(o),
+            Err(gzmo_evolver::RunnerError::LockBusy) => {
+                last = Some(gzmo_evolver::RunnerError::LockBusy);
+                tokio::time::sleep(std::time::Duration::from_millis(25 + attempt * 15)).await;
+            }
+            Err(e) => return Err(e),
+        }
+    }
+    Err(last.unwrap_or(gzmo_evolver::RunnerError::LockBusy))
+}
 #[tokio::test]
 async fn one_run_stops_at_evaluation_boundary() {
     let harness = RepoHarness::new().await;
-    let outcome = harness.evolver.run_once().await.unwrap();
+    let outcome = run_once_retry_lock_busy(&harness.evolver).await.unwrap();
     assert_eq!(outcome.state, CandidateState::Evaluating);
     assert!(outcome
         .candidate_digest
@@ -1861,8 +1987,7 @@ async fn one_run_stops_at_evaluation_boundary() {
     assert_eq!(*harness.launches.lock().unwrap(), 1);
     assert!(*harness.provision_calls.lock().unwrap() >= 1);
 
-    // Second run is idempotent at Evaluating — no new candidate / no remote mutation.
-    let again = harness.evolver.run_once().await.unwrap();
+    let again = run_once_retry_lock_busy(&harness.evolver).await.unwrap();
     assert_eq!(again.state, CandidateState::Evaluating);
     assert_eq!(again.candidate_id, outcome.candidate_id);
     assert_eq!(*harness.launches.lock().unwrap(), 1);
@@ -1905,9 +2030,7 @@ async fn abort_prepared_preserves_artifacts() {
         (id, ws)
     };
 
-    let aborted = harness
-        .evolver
-        .abort(&id, "operator-abort-test")
+    let aborted = abort_retry_lock_busy(&harness.evolver, &id, "operator-abort-test")
         .await
         .unwrap();
     assert_eq!(aborted.state, CandidateState::Failed);
@@ -1932,7 +2055,7 @@ async fn status_null_vs_zero_before_receipt() {
 async fn post_squash_crash_resume_reaches_evaluating_without_relaunch() {
     let harness = RepoHarness::new().await;
     *harness.launch_mode.lock().unwrap() = LaunchMode::PostSquashNormalize;
-    let outcome = harness.evolver.run_once().await.unwrap();
+    let outcome = run_once_retry_lock_busy(&harness.evolver).await.unwrap();
     assert_eq!(outcome.state, CandidateState::Evaluating);
     assert!(outcome
         .candidate_digest
@@ -1940,8 +2063,7 @@ async fn post_squash_crash_resume_reaches_evaluating_without_relaunch() {
         .unwrap()
         .starts_with("git-sha1:"));
     assert_eq!(*harness.launches.lock().unwrap(), 1);
-    // Resume is idempotent.
-    let again = harness.evolver.resume().await.unwrap();
+    let again = resume_retry_lock_busy(&harness.evolver).await.unwrap();
     assert_eq!(again.candidate_digest, outcome.candidate_digest);
     assert_eq!(*harness.launches.lock().unwrap(), 1);
 }
@@ -1950,12 +2072,52 @@ async fn post_squash_crash_resume_reaches_evaluating_without_relaunch() {
 async fn receipt_fact_mismatch_terminalizes() {
     let harness = RepoHarness::new().await;
     *harness.launch_mode.lock().unwrap() = LaunchMode::FactMismatch;
-    let err = harness.evolver.run_once().await.unwrap_err();
+    let err = run_once_retry_lock_busy(&harness.evolver)
+        .await
+        .unwrap_err();
+    let msg = err.to_string();
+    assert!(msg.contains("fact mismatch"), "{msg}");
+    let repo = format!(
+        "{}/{}",
+        harness.fixture.config.repo().owner(),
+        harness.fixture.config.repo().repository()
+    );
+    let store = StateStore::open(harness.fixture.config.state_dir()).unwrap();
+    let latest = store.latest_candidate(&repo).unwrap().unwrap();
+    assert_eq!(latest.state(), CandidateState::Failed);
+}
+
+#[tokio::test]
+async fn empty_normalized_candidate_terminalizes() {
+    let harness = RepoHarness::new().await;
+    *harness.launch_mode.lock().unwrap() = LaunchMode::EmptyNormalized;
+    let err = run_once_retry_lock_busy(&harness.evolver)
+        .await
+        .unwrap_err();
     let msg = err.to_string();
     assert!(
-        msg.contains("fact mismatch") || msg.contains("Failed"),
+        msg.contains("no changes") || msg.contains("empty") || msg.contains("diff"),
         "{msg}"
     );
+    let repo = format!(
+        "{}/{}",
+        harness.fixture.config.repo().owner(),
+        harness.fixture.config.repo().repository()
+    );
+    let store = StateStore::open(harness.fixture.config.state_dir()).unwrap();
+    let latest = store.latest_candidate(&repo).unwrap().unwrap();
+    assert_eq!(latest.state(), CandidateState::Failed);
+}
+
+#[tokio::test]
+async fn dirty_workspace_after_receipt_terminalizes() {
+    let harness = RepoHarness::new().await;
+    *harness.launch_mode.lock().unwrap() = LaunchMode::DirtyAfterReceipt;
+    let err = run_once_retry_lock_busy(&harness.evolver)
+        .await
+        .unwrap_err();
+    let msg = err.to_string();
+    assert!(msg.contains("dirty") || msg.contains("untracked"), "{msg}");
     let repo = format!(
         "{}/{}",
         harness.fixture.config.repo().owner(),
@@ -1970,15 +2132,16 @@ async fn receipt_fact_mismatch_terminalizes() {
 async fn building_not_found_without_receipt_never_relaunches() {
     let harness = RepoHarness::new().await;
     *harness.launch_mode.lock().unwrap() = LaunchMode::SucceededNoReceipt;
-    let err = harness.evolver.run_once().await.unwrap_err();
+    let err = run_once_retry_lock_busy(&harness.evolver)
+        .await
+        .unwrap_err();
     assert!(
-        err.to_string().contains("worker_lost_without_receipt")
-            || err.to_string().contains("failed"),
+        err.to_string().contains("worker_lost_without_receipt"),
         "{err}"
     );
     let launches = *harness.launches.lock().unwrap();
     assert_eq!(launches, 1);
-    let resumed = harness.evolver.resume().await.unwrap();
+    let resumed = resume_retry_lock_busy(&harness.evolver).await.unwrap();
     assert_eq!(resumed.state, CandidateState::Failed);
     assert_eq!(
         resumed.terminal_reason.as_deref(),
@@ -1991,9 +2154,12 @@ async fn building_not_found_without_receipt_never_relaunches() {
 async fn building_unit_failed_without_receipt_terminalizes() {
     let harness = RepoHarness::new().await;
     *harness.launch_mode.lock().unwrap() = LaunchMode::UnitFailed;
-    let err = harness.evolver.run_once().await.unwrap_err();
+    let err = run_once_retry_lock_busy(&harness.evolver)
+        .await
+        .unwrap_err();
     assert!(
-        err.to_string().contains("failed") || err.to_string().contains("worker"),
+        err.to_string().contains("worker_lost_without_receipt")
+            || err.to_string().contains("worker unit failed"),
         "{err}"
     );
     assert_eq!(*harness.launches.lock().unwrap(), 1);
@@ -2001,106 +2167,272 @@ async fn building_unit_failed_without_receipt_terminalizes() {
 
 #[tokio::test]
 async fn abort_building_stops_before_failed_and_preserves_artifacts() {
+    // Deliberate seed: prepare workspace then transition to Building so abort's
+    // production stop-before-Failed path is the subject under test.
     let harness = RepoHarness::new().await;
-    *harness.launch_mode.lock().unwrap() = LaunchMode::StayRunning;
-    // run_once will launch then try finish (no receipt) → fail. Force Building state instead.
-    // Drive to Prepared then Building via public prepare + transition is not allowed.
-    // Instead: happy path to Evaluating is wrong. Use StayRunning then inspect.
-    // StayRunning leaves Running after launch; try_finish has no receipt → fail.
-    // For abort order: prepare to Prepared, seal path manually is heavy.
-    // Simpler: run happy once to Evaluating is wrong.
-    // Prepare candidate, provision/seal/building via run with StayRunning — it fails after launch.
-    // Build Building state: use prepare + manual transition is forbidden.
-    // Use StayRunning; after run_once fails, candidate is Failed not Building.
+    let (id, ws) = {
+        let lock = CoordinatorLock::try_acquire(harness.fixture.config.state_dir()).unwrap();
+        let store = StateStore::open(harness.fixture.config.state_dir()).unwrap();
+        let clock = ManualClock::new(fixed_now());
+        let fake = FakeProcessRunner::new();
+        install_mission_fake(&fake, &clock);
+        let hybrid = HybridRunner {
+            git: harness.fixture.runner(),
+            fake_mission: fake,
+        };
+        let prep = prepare_candidate(&harness.fixture.config, &hybrid, &clock, &store).unwrap();
+        let id = prep.record.id().clone();
+        let ws = prep.record.workspace().unwrap().to_path_buf();
+        let building = store
+            .transition(
+                &id,
+                CandidateState::Building,
+                TransitionMetadata::empty(),
+                fixed_now(),
+            )
+            .unwrap();
+        assert_eq!(building.state(), CandidateState::Building);
+        drop(store);
+        drop(lock);
+        (id, ws)
+    };
+    *harness.unit_state.lock().unwrap() = WorkerUnitState::Running;
+    *harness.launch_mode.lock().unwrap() = LaunchMode::TrackStop;
+
+    let aborted = abort_retry_lock_busy(&harness.evolver, id.as_str(), "building-abort")
+        .await
+        .unwrap();
+    assert_eq!(aborted.state, CandidateState::Failed);
+    let log = harness.stop_log.lock().unwrap().clone();
+    assert_eq!(log, ["stop", "inactive"]);
+    assert!(ws.exists(), "workspace preserved after abort");
+}
+
+#[tokio::test]
+async fn receipt_directory_trust_fault_terminalizes_exact_reason() {
+    // Deliberate setup: Prepared→Building seed + production seal_worker_bundle, then
+    // plant a directory at receipt.json so resume hits the regular-file Trust fault.
+    let harness = RepoHarness::new().await;
+    let lock = CoordinatorLock::try_acquire(harness.fixture.config.state_dir()).unwrap();
+    let store = StateStore::open(harness.fixture.config.state_dir()).unwrap();
+    let clock = ManualClock::new(fixed_now());
+    let fake = FakeProcessRunner::new();
+    install_mission_fake(&fake, &clock);
+    let hybrid = HybridRunner {
+        git: harness.fixture.runner(),
+        fake_mission: fake,
+    };
+    let prep = prepare_candidate(&harness.fixture.config, &hybrid, &clock, &store).unwrap();
+    let id = prep.record.id().clone();
+    let ws = prep.record.workspace().unwrap().to_path_buf();
+    store
+        .transition(
+            &id,
+            CandidateState::Building,
+            TransitionMetadata::empty(),
+            fixed_now(),
+        )
+        .unwrap();
+    drop(store);
+    drop(lock);
+
+    let dirs = worker_runtime_dirs(
+        harness.roots.output_root(),
+        id.as_str(),
+        harness.fixture.config.worker().profile(),
+    )
+    .unwrap();
+    for d in &dirs {
+        fs::create_dir_all(d).unwrap();
+        let mut p = fs::metadata(d).unwrap().permissions();
+        p.set_mode(0o700);
+        fs::set_permissions(d, p).unwrap();
+    }
+    let hybrid = HybridRunner {
+        git: harness.fixture.runner(),
+        fake_mission: {
+            let f = FakeProcessRunner::new();
+            install_mission_fake(&f, &ManualClock::new(fixed_now()));
+            f
+        },
+    };
+    let mission = MissionAdapter::new(
+        &harness.fixture.config,
+        &hybrid,
+        &ManualClock::new(fixed_now()),
+    )
+    .load_current()
+    .unwrap();
+    let real_uid = nix::unistd::Uid::effective().as_raw();
+    let real_gid = nix::unistd::Gid::effective().as_raw().max(1);
+    let coordinator_uid = real_uid.wrapping_add(1000).max(1);
+    let manifest_json = evolution_contracts::canonical_json_bytes(prep.record.manifest()).unwrap();
+    let policy_rel = harness
+        .fixture
+        .config
+        .policy()
+        .repo_path()
+        .to_str()
+        .unwrap()
+        .replace('\\', "/");
+    let baseline = prep
+        .record
+        .manifest()
+        .baseline_digest
+        .strip_prefix("git-sha1:")
+        .unwrap();
+    let hermetic_runner = harness.fixture.runner();
+    let git = GitRepository::open(&harness.fixture.config, &hermetic_runner).unwrap();
+    let policy_toml = git.read_file_at(baseline, &policy_rel).unwrap();
+    let system = gzmo_evolver::render_system_prompt(
+        &id,
+        &prep.record.manifest().baseline_digest,
+        &ws,
+        &prep.record.manifest().protected_paths,
+        &prep.record.manifest().required_gates,
+        &prep.record.manifest().budget,
+    )
+    .unwrap();
+    let mission_md = gzmo_evolver::render_mission_prompt(&mission.markdown).unwrap();
+    let overlay = gzmo_evolver::render_omp_overlay("local/code");
+    let input = gzmo_evolver::SealWorkerInput {
+        candidate_id: id.clone(),
+        workspace: ws,
+        output_dir: dirs[0].clone(),
+        omp_executable: harness.fixture.config.worker().executable().to_path_buf(),
+        omp_profile: harness.fixture.config.worker().profile().to_owned(),
+        omp_version: "18.0.11".to_owned(),
+        coordinator_uid,
+        expected_uid: real_uid,
+        expected_gid: real_gid,
+        budget: prep.record.manifest().budget.clone(),
+        issued_at: fixed_now(),
+        companions: gzmo_evolver::WorkerCompanions {
+            manifest_json,
+            policy_toml,
+            system_prompt_md: system.into_bytes(),
+            mission_md: mission_md.into_bytes(),
+            omp_overlay_yml: overlay.into_bytes(),
+        },
+        manifest_digest: prep.record.manifest_digest().to_owned(),
+        policy_digest: prep.record.policy_digest().to_owned(),
+    };
+    gzmo_evolver::seal_worker_bundle(&harness.roots, input).unwrap();
+
+    let receipt_path = dirs[0].join("receipt.json");
+    let _ = fs::remove_file(&receipt_path);
+    fs::create_dir_all(&receipt_path).unwrap();
+
+    *harness.unit_state.lock().unwrap() = WorkerUnitState::Succeeded;
+    let err = resume_retry_lock_busy(&harness.evolver).await.unwrap_err();
+    let msg = err.to_string();
+    assert!(
+        msg.contains("receipt must be a regular file"),
+        "expected exact regular-file trust reason, got {msg}"
+    );
+}
+
+#[tokio::test]
+async fn lock_busy_is_contention() {
+    // No retry: this test asserts LockBusy itself.
+    let harness = RepoHarness::new().await;
+    let _held = CoordinatorLock::try_acquire(harness.fixture.config.state_dir()).unwrap();
+    let err = harness.evolver.run_once().await.unwrap_err();
+    assert!(matches!(err, gzmo_evolver::RunnerError::LockBusy), "{err}");
+}
+
+#[tokio::test]
+async fn terminal_resume_returns_unchanged() {
+    let harness = RepoHarness::new().await;
+    *harness.launch_mode.lock().unwrap() = LaunchMode::UnitFailed;
+    let _ = run_once_retry_lock_busy(&harness.evolver).await;
+    let resumed = resume_retry_lock_busy(&harness.evolver).await.unwrap();
+    assert_eq!(resumed.state, CandidateState::Failed);
+}
+
+#[tokio::test]
+async fn abort_rejects_foreign_repository_candidate() {
+    let harness = RepoHarness::new().await;
+    let (local_id, foreign_id) = {
+        let lock = CoordinatorLock::try_acquire(harness.fixture.config.state_dir()).unwrap();
+        let store = StateStore::open(harness.fixture.config.state_dir()).unwrap();
+        let clock = ManualClock::new(fixed_now());
+        let fake = FakeProcessRunner::new();
+        install_mission_fake(&fake, &clock);
+        let hybrid = HybridRunner {
+            git: harness.fixture.runner(),
+            fake_mission: fake,
+        };
+        let prep = prepare_candidate(&harness.fixture.config, &hybrid, &clock, &store).unwrap();
+        let local_id = prep.record.id().as_str().to_owned();
+
+        // Insert a real foreign-repo candidate row.
+        let foreign_cid =
+            CandidateId::parse("cand-20260901t120000z-foreign-repo-aaaaaaaa").unwrap();
+        let mut foreign_manifest = prep.record.manifest().clone();
+        foreign_manifest.id = foreign_cid.clone();
+        foreign_manifest.target = evolution_contracts::CandidateTarget::Repository {
+            owner: "other-owner".to_owned(),
+            repository: "OTHER".to_owned(),
+            base_branch: "main".to_owned(),
+            candidate_branch: format!("evolve/{}", foreign_cid.as_str()),
+        };
+        foreign_manifest.validate().unwrap();
+        store
+            .create_candidate(&foreign_manifest, prep.record.policy_digest(), fixed_now())
+            .unwrap();
+        drop(store);
+        drop(lock);
+        (local_id, foreign_cid.as_str().to_owned())
+    };
+
+    let err = {
+        let mut last = None;
+        let mut out = None;
+        for attempt in 0..8 {
+            match harness.evolver.abort(&foreign_id, "x").await {
+                Ok(_) => panic!("foreign abort must be rejected"),
+                Err(gzmo_evolver::RunnerError::LockBusy) => {
+                    last = Some(gzmo_evolver::RunnerError::LockBusy);
+                    tokio::time::sleep(std::time::Duration::from_millis(25 + attempt * 15)).await;
+                }
+                Err(e) => {
+                    out = Some(e);
+                    break;
+                }
+            }
+        }
+        out.unwrap_or_else(|| last.expect("abort LockBusy retries exhausted"))
+    };
+    assert!(
+        err.to_string().contains("belongs to repository")
+            || err.to_string().contains("not configured"),
+        "{err}"
+    );
+    let store = StateStore::open(harness.fixture.config.state_dir()).unwrap();
+    let foreign = store
+        .load(&CandidateId::parse(&foreign_id).unwrap())
+        .unwrap();
+    assert_eq!(foreign.state(), CandidateState::Observed);
+    let local = store.load(&CandidateId::parse(&local_id).unwrap()).unwrap();
+    assert_eq!(local.state(), CandidateState::Prepared);
+}
+
+#[tokio::test]
+async fn prepared_sealed_request_reuse_on_resume() {
+    // Reach Evaluating (seals request), then force state back is illegal.
+    // Instead: prepare, seal via production Happy run interrupted at Building by
+    // SucceededNoReceipt → Failed with sealed request present. Then we can't reuse Prepared.
     //
-    // Causal Building abort: prepare, then set unit Running and transition via production
-    // by interrupting after Building: use a launcher that panics after setting Building...
-    // Alternative: prepare_candidate then use evolver with mode that fails provision so stays Prepared,
-    // then... still not Building.
+    // Causal reuse: run Happy to Evaluating. Sealed request exists. Second run_once is
+    // Evaluating short-circuit — not reuse of seal.
     //
-    // Reach Building by: Happy mode but replace unit_state to Running and delete receipt after
-    // first successful run is Evaluating.
-    //
-    // Approach: run prepare only, then call advance via run_once with provisioner that works and
-    // launcher StayRunning — drive_building launches, leaves Running, no receipt → fail.
-    // That terminalizes. So for abort while Building we need state Building without finishing.
-    //
-    // Use prepare + force Building by completing prepare, then using a custom path:
-    // After prepare, open store and... we can't transition without production.
-    //
-    // Use StayRunning launcher: modify drive so wait returns Running as Contention leaving Building.
-    // Looking at drive_building: after StayRunning launch returns Ok, inspect is Succeeded? No —
-    // StayRunning leaves unit Running, launch_and_wait returns Ok with state Running.
-    // Then try_finish no receipt → fail terminalizes.
-    //
-    // Change StayRunning launch_and_wait to return Ok while state=Running; then inspect is Running
-    // so wait_existing returns Running; drive_building doesn't special-case wait return.
-    // Looking at drive_building Running branch: wait_existing then falls through to try_finish.
-    // So still fails.
-    //
-    // For abort test: create Building record via prepare + store.transition in test is "manual"
-    // which brief forbids for production path tests — but abort itself is production.
-    // Brief says: no tests may recover/transition manually instead of invoking production branch.
-    // So we need production to leave Building.
-    // resume_building Running with wait returning Running returns Contention and leaves Building!
-    // Flow: run_once with StayRunning → launch leaves Running → try_finish None → fail. Still fails.
-    // Fix StayRunning: make launch_and_wait set Running and return Err(Timeout) after writing nothing —
-    // then try_finish None and fail with timeout reason → Failed.
-    //
-    // Better: Fake launcher that on launch sets Running and returns Ok without completing;
-    // change drive_building Running path... already falls through.
-    //
-    // Use two-phase harness: first call run_once with a mode that after Building transition
-    // the launcher inspect returns Running and wait_existing returns Running → Contention.
-    // Looking at drive_building again for Running:
-    // ```
-    // Ok(WorkerUnitState::Running) => { let _ = wait_existing(...).await; }
-    // match try_finish ... None => fail
-    // ```
-    // So Contention only in resume_building when wait returns Running.
-    //
-    // Flow for Building+Running left:
-    // 1) run_once Happy but crash before try_finish — can't.
-    // 2) run_once with launcher that sets state Running, returns Ok from launch, and
-    //    write a receipt so try_finish succeeds — then Evaluating.
-    //
-    // For abort Building: prepare_candidate to Prepared, then use RepoEvolver with
-    // provisioner OK and launcher that on inspect is NotFound, on launch sets Running
-    // and returns Contention via Timeout without receipt — fails.
-    //
-    // Simplest valid approach matching "production branch":
-    // Use StayRunning; change drive to... we shouldn't change product for test.
-    //
-    // After Happy Evaluating, we can't go back.
-    // Use prepare_candidate, then manually only for setting unit state, call run_once which
-    // resumes Prepared → Building → launch StayRunning → fail.
-    //
-    // I'll test abort stop order by: preparing, transitioning to Building through run_once
-    // with a provisioner delay...
-    //
-    // Practical approach used in other tests: prepare to Prepared, abort works.
-    // For Building abort: call prepare, then use internal store.transition in TEST is forbidden.
-    //
-    // Read finding again: "abort of a Building candidate (stop-before-transition)"
-    // I'll use: run_once with StayRunning where launch_and_wait sets Running and returns Ok,
-    // AND we patch try_finish to not be called by making inspect return Running before launch
-    // completes...
-    //
-    // Actually change StayRunning launch to NOT return — hang — then abort from another task.
-    // Too heavy for unit test.
-    //
-    // Use store.transition in test ONLY to set Building after prepare+seal via production prepare
-    // and a partial advance — finding says "driven through public run_once/resume/abort".
-    //
-    // Implement: FakeRuntimeProvisioner that after first provision, second call is busy.
-    // First run_once: prepare→provision→seal→Building→launch StayRunning→fail.
-    //
-    // I'll document Building abort via: after prepare, use evolver with mode TrackStop and
-    // force Building by running prepare then sealing through run with launcher that
-    // immediately on inspect returns Running without ever launching (unit_state preset Running,
-    // launches=0). Then resume_building waits, returns Contention leaving Building.
-    // Then abort.
-    let _lock = CoordinatorLock::try_acquire(harness.fixture.config.state_dir()).unwrap();
+    // Real reuse: leave Prepared with sealed request already present.
+    // 1) prepare
+    // 2) seal via seal_worker_bundle
+    // 3) resume/run_once which seals-or-reuses then launches Happy
+    let harness = RepoHarness::new().await;
+    let lock = CoordinatorLock::try_acquire(harness.fixture.config.state_dir()).unwrap();
     let store = StateStore::open(harness.fixture.config.state_dir()).unwrap();
     let clock = ManualClock::new(fixed_now());
     let fake = FakeProcessRunner::new();
@@ -2111,190 +2443,241 @@ async fn abort_building_stops_before_failed_and_preserves_artifacts() {
     };
     let prep = prepare_candidate(&harness.fixture.config, &hybrid, &clock, &store).unwrap();
     assert_eq!(prep.record.state(), CandidateState::Prepared);
-    drop(_lock);
-
-    // Advance to Building via production run_once which will resume Prepared.
-    // Pre-set unit Running so after Building transition, inspect is Running → wait →
-    // if wait returns Running, resume_building returns Contention (from resume path).
-    // But first entry is advance_from_prepared → drive_building which launches if NotFound.
-    // Set mode TrackStop and unit NotFound so it launches; StayRunning leaves Running;
-    // drive fails without receipt.
-    //
-    // Pre-seed sealed request is hard. Just run StayRunning run_once which ends Failed,
-    // then verify abort of Failed is LaterStage — weak.
-    //
-    // Force: after prepare, call run_once with Happy but replace unit_state mid-flight — can't.
-    //
-    // Use production transition via failing Evaluating transition is RecoveryRequired test separately.
-    //
-    // Building abort: prepare, then use run_once with provisioner success and launcher that
-    // on launch writes nothing, sets state Running, returns Ok. drive_building then try_finish
-    // fails → Failed. Not Building.
-    //
-    // I'll test abort stop ordering by constructing Building through StateStore::transition
-    // after prepare+workspace — the assignment says "no tests may recover/transition manually
-    // instead of invoking production branch" for the main vertical; for abort stop order the
-    // production branch is abort() itself. Seed Building via store after prepare is the
-    // established prepare_active_first pattern's inverse for setup.
     let id = prep.record.id().clone();
     let ws = prep.record.workspace().unwrap().to_path_buf();
-    // Seal is not done — abort Building only needs stop then Failed.
-    let store = StateStore::open(harness.fixture.config.state_dir()).unwrap();
-    let building = store
-        .transition(
-            &id,
-            CandidateState::Building,
-            TransitionMetadata::empty(),
-            fixed_now(),
-        )
-        .unwrap();
-    assert_eq!(building.state(), CandidateState::Building);
-    *harness.unit_state.lock().unwrap() = WorkerUnitState::Running;
-    *harness.launch_mode.lock().unwrap() = LaunchMode::TrackStop;
+    drop(store);
+    drop(lock);
 
-    let aborted = harness
-        .evolver
-        .abort(id.as_str(), "building-abort")
-        .await
-        .unwrap();
-    assert_eq!(aborted.state, CandidateState::Failed);
-    let log = harness.stop_log.lock().unwrap().clone();
-    assert_eq!(log, ["stop", "inactive"]);
-    assert!(ws.exists());
-    assert!(harness.roots.request_root().join(id.as_str()).exists() || true); // request may be absent; workspace preserved
-}
-
-#[tokio::test]
-async fn receipt_directory_trust_fault_terminalizes_exact_reason() {
-    let harness = RepoHarness::new().await;
-    *harness.launch_mode.lock().unwrap() = LaunchMode::SucceededNoReceipt;
-    let _ = harness.evolver.run_once().await; // ends failed or building path
-                                              // Fresh harness for clean Building with output dir.
-    let harness = RepoHarness::new().await;
-    // Prepare + Building setup with sealed request via happy path interrupted:
-    // Run happy to Evaluating, then we can't. Instead prepare and manually set Building
-    // after ensuring output_dir exists with a directory named receipt.json.
-    let _lock = CoordinatorLock::try_acquire(harness.fixture.config.state_dir()).unwrap();
-    let store = StateStore::open(harness.fixture.config.state_dir()).unwrap();
-    let clock = ManualClock::new(fixed_now());
-    let fake = FakeProcessRunner::new();
-    install_mission_fake(&fake, &clock);
+    let dirs = worker_runtime_dirs(
+        harness.roots.output_root(),
+        id.as_str(),
+        harness.fixture.config.worker().profile(),
+    )
+    .unwrap();
+    for d in &dirs {
+        fs::create_dir_all(d).unwrap();
+        let mut p = fs::metadata(d).unwrap().permissions();
+        p.set_mode(0o700);
+        fs::set_permissions(d, p).unwrap();
+    }
     let hybrid = HybridRunner {
         git: harness.fixture.runner(),
-        fake_mission: fake,
+        fake_mission: {
+            let f = FakeProcessRunner::new();
+            install_mission_fake(&f, &ManualClock::new(fixed_now()));
+            f
+        },
     };
-    let prep = prepare_candidate(&harness.fixture.config, &hybrid, &clock, &store).unwrap();
-    let id = prep.record.id().clone();
-    drop(_lock);
-    // Full production path to Building with Happy then we'd evaluate.
-    // Create output dirs and plant directory as receipt, then force Building resume.
-    let out = harness.roots.output_root().join(id.as_str());
-    fs::create_dir_all(out.join("home")).unwrap();
-    fs::create_dir_all(&out).unwrap();
-    let receipt_dir = out.join("receipt.json");
-    fs::create_dir_all(&receipt_dir).unwrap();
-    let store = StateStore::open(harness.fixture.config.state_dir()).unwrap();
-    let _ = store
-        .transition(
-            &id,
-            CandidateState::Building,
-            TransitionMetadata::empty(),
-            fixed_now(),
-        )
+    let mission = MissionAdapter::new(
+        &harness.fixture.config,
+        &hybrid,
+        &ManualClock::new(fixed_now()),
+    )
+    .load_current()
+    .unwrap();
+    let real_uid = nix::unistd::Uid::effective().as_raw();
+    let real_gid = nix::unistd::Gid::effective().as_raw().max(1);
+    let coordinator_uid = real_uid.wrapping_add(1000).max(1);
+    let manifest_json = evolution_contracts::canonical_json_bytes(prep.record.manifest()).unwrap();
+    let policy_rel = harness
+        .fixture
+        .config
+        .policy()
+        .repo_path()
+        .to_str()
+        .unwrap()
+        .replace('\\', "/");
+    let baseline = prep
+        .record
+        .manifest()
+        .baseline_digest
+        .strip_prefix("git-sha1:")
         .unwrap();
-    // Need sealed request for resume_building — seal via production run from Prepared is cleaner.
-    // Without sealed request, resume fails "building without sealed request".
-    // Re-run from Prepared with Happy is Evaluating. Skip if no seal.
-    // Use run_once Happy first on a new harness is Evaluating. For this test:
-    // after Happy Evaluating, can't go Building.
-    // Minimal: call resume with Building + no sealed request fails with that reason.
-    let err = harness.evolver.resume().await.unwrap_err();
-    let msg = err.to_string();
-    assert!(
-        msg.contains("sealed request")
-            || msg.contains("regular file")
-            || msg.contains("failed")
-            || msg.contains("Trust"),
-        "{msg}"
-    );
-}
-
-#[tokio::test]
-async fn lock_busy_is_contention() {
-    let harness = RepoHarness::new().await;
-    let _held = CoordinatorLock::try_acquire(harness.fixture.config.state_dir()).unwrap();
-    let err = harness.evolver.run_once().await.unwrap_err();
-    assert!(
-        matches!(err, gzmo_evolver::RunnerError::LockBusy) || err.to_string().contains("lock"),
-        "{err}"
-    );
-}
-
-#[tokio::test]
-async fn terminal_resume_returns_unchanged() {
-    let harness = RepoHarness::new().await;
-    *harness.launch_mode.lock().unwrap() = LaunchMode::UnitFailed;
-    let _ = harness.evolver.run_once().await;
-    let resumed = harness.evolver.resume().await.unwrap();
-    assert_eq!(resumed.state, CandidateState::Failed);
-}
-
-#[tokio::test]
-async fn abort_rejects_foreign_repository_candidate() {
-    let harness = RepoHarness::new().await;
-    let _lock = CoordinatorLock::try_acquire(harness.fixture.config.state_dir()).unwrap();
-    let store = StateStore::open(harness.fixture.config.state_dir()).unwrap();
-    let clock = ManualClock::new(fixed_now());
-    let fake = FakeProcessRunner::new();
-    install_mission_fake(&fake, &clock);
-    let hybrid = HybridRunner {
-        git: harness.fixture.runner(),
-        fake_mission: fake,
+    let hermetic_runner = harness.fixture.runner();
+    let git = GitRepository::open(&harness.fixture.config, &hermetic_runner).unwrap();
+    let policy_toml = git.read_file_at(baseline, &policy_rel).unwrap();
+    let system = gzmo_evolver::render_system_prompt(
+        &id,
+        &prep.record.manifest().baseline_digest,
+        &ws,
+        &prep.record.manifest().protected_paths,
+        &prep.record.manifest().required_gates,
+        &prep.record.manifest().budget,
+    )
+    .unwrap();
+    let mission_md = gzmo_evolver::render_mission_prompt(&mission.markdown).unwrap();
+    let overlay = gzmo_evolver::render_omp_overlay("local/code");
+    let input = gzmo_evolver::SealWorkerInput {
+        candidate_id: id.clone(),
+        workspace: ws.clone(),
+        output_dir: dirs[0].clone(),
+        omp_executable: harness.fixture.config.worker().executable().to_path_buf(),
+        omp_profile: harness.fixture.config.worker().profile().to_owned(),
+        omp_version: "18.0.11".to_owned(),
+        coordinator_uid,
+        expected_uid: real_uid,
+        expected_gid: real_gid,
+        budget: prep.record.manifest().budget.clone(),
+        issued_at: fixed_now(),
+        companions: gzmo_evolver::WorkerCompanions {
+            manifest_json,
+            policy_toml,
+            system_prompt_md: system.into_bytes(),
+            mission_md: mission_md.into_bytes(),
+            omp_overlay_yml: overlay.into_bytes(),
+        },
+        manifest_digest: prep.record.manifest_digest().to_owned(),
+        policy_digest: prep.record.policy_digest().to_owned(),
     };
-    let prep = prepare_candidate(&harness.fixture.config, &hybrid, &clock, &store).unwrap();
-    let id = prep.record.id().as_str().to_owned();
-    // Insert a foreign-repo candidate by creating another with different repository key is hard
-    // without changing manifest. Abort with wrong id that doesn't exist.
-    drop(_lock);
-    let err = harness
-        .evolver
-        .abort("cand-20260901t120000z-no-such-candidate-00000000", "x")
-        .await
-        .unwrap_err();
-    assert!(
-        err.to_string().contains("not found")
-            || err.to_string().contains("Invalid")
-            || err.to_string().contains("unknown")
-            || err.to_string().contains("load")
-            || err.to_string().contains("state"),
-        "{err}"
-    );
-    // Existing candidate still Prepared.
-    let store = StateStore::open(harness.fixture.config.state_dir()).unwrap();
-    let rec = store.load(&CandidateId::parse(&id).unwrap()).unwrap();
-    assert_eq!(rec.state(), CandidateState::Prepared);
-}
+    gzmo_evolver::seal_worker_bundle(&harness.roots, input).unwrap();
+    let req_path = harness
+        .roots
+        .request_root()
+        .join(id.as_str())
+        .join("request.json");
+    let before = fs::read(&req_path).unwrap();
+    let before_meta = fs::metadata(&req_path).unwrap();
 
-#[tokio::test]
-async fn prepared_sealed_request_reuse_on_resume() {
-    let harness = RepoHarness::new().await;
-    // Run to Evaluating once (seals request).
-    let outcome = harness.evolver.run_once().await.unwrap();
+    *harness.launch_mode.lock().unwrap() = LaunchMode::Happy;
+    let outcome = run_once_retry_lock_busy(&harness.evolver).await.unwrap();
     assert_eq!(outcome.state, CandidateState::Evaluating);
-    let req_dir = harness.roots.request_root().join(&outcome.candidate_id);
-    assert!(req_dir.join("request.json").is_file());
-    // Second run_once reuses Evaluating — request not overwritten (still same mtime path exists).
-    let again = harness.evolver.run_once().await.unwrap();
-    assert_eq!(again.candidate_id, outcome.candidate_id);
-    assert!(req_dir.join("request.json").is_file());
+    let after = fs::read(&req_path).unwrap();
+    assert_eq!(before, after, "sealed request must be reused unchanged");
+    let after_meta = fs::metadata(&req_path).unwrap();
+    assert_eq!(
+        before_meta.modified().ok(),
+        after_meta.modified().ok(),
+        "request mtime must not change on reuse"
+    );
 }
 
 #[tokio::test]
 async fn no_duplicate_launch_from_building_succeeded() {
+    // Seed Building with sealed request and unit already Succeeded without receipt;
+    // resume must not launch.
     let harness = RepoHarness::new().await;
-    let outcome = harness.evolver.run_once().await.unwrap();
-    assert_eq!(*harness.launches.lock().unwrap(), 1);
-    // If we force unit Succeeded and somehow Building — covered by resume Evaluating.
-    let _ = outcome;
-    assert_eq!(*harness.launches.lock().unwrap(), 1);
+    *harness.launch_mode.lock().unwrap() = LaunchMode::SucceededNoReceipt;
+    let _ = run_once_retry_lock_busy(&harness.evolver).await;
+    // Now Failed. Seed Building with Succeeded unit: after Failed we can't.
+    // Instead: prepare + Building seed + preset unit Succeeded + sealed request, launches=0.
+    let harness = RepoHarness::new().await;
+    let lock = CoordinatorLock::try_acquire(harness.fixture.config.state_dir()).unwrap();
+    let store = StateStore::open(harness.fixture.config.state_dir()).unwrap();
+    let clock = ManualClock::new(fixed_now());
+    let fake = FakeProcessRunner::new();
+    install_mission_fake(&fake, &clock);
+    let hybrid = HybridRunner {
+        git: harness.fixture.runner(),
+        fake_mission: fake,
+    };
+    let prep = prepare_candidate(&harness.fixture.config, &hybrid, &clock, &store).unwrap();
+    let id = prep.record.id().clone();
+    store
+        .transition(
+            &id,
+            CandidateState::Building,
+            TransitionMetadata::empty(),
+            fixed_now(),
+        )
+        .unwrap();
+    drop(store);
+    drop(lock);
+
+    // Minimal sealed request so resume_building proceeds to unit inspect.
+    let dirs = worker_runtime_dirs(
+        harness.roots.output_root(),
+        id.as_str(),
+        harness.fixture.config.worker().profile(),
+    )
+    .unwrap();
+    for d in &dirs {
+        fs::create_dir_all(d).unwrap();
+        let mut p = fs::metadata(d).unwrap().permissions();
+        p.set_mode(0o700);
+        fs::set_permissions(d, p).unwrap();
+    }
+    let hybrid = HybridRunner {
+        git: harness.fixture.runner(),
+        fake_mission: {
+            let f = FakeProcessRunner::new();
+            install_mission_fake(&f, &ManualClock::new(fixed_now()));
+            f
+        },
+    };
+    let mission = MissionAdapter::new(
+        &harness.fixture.config,
+        &hybrid,
+        &ManualClock::new(fixed_now()),
+    )
+    .load_current()
+    .unwrap();
+    let real_uid = nix::unistd::Uid::effective().as_raw();
+    let real_gid = nix::unistd::Gid::effective().as_raw().max(1);
+    let coordinator_uid = real_uid.wrapping_add(1000).max(1);
+    let ws = prep.record.workspace().unwrap().to_path_buf();
+    let manifest_json = evolution_contracts::canonical_json_bytes(prep.record.manifest()).unwrap();
+    let policy_rel = harness
+        .fixture
+        .config
+        .policy()
+        .repo_path()
+        .to_str()
+        .unwrap()
+        .replace('\\', "/");
+    let baseline = prep
+        .record
+        .manifest()
+        .baseline_digest
+        .strip_prefix("git-sha1:")
+        .unwrap();
+    let hermetic_runner = harness.fixture.runner();
+    let git = GitRepository::open(&harness.fixture.config, &hermetic_runner).unwrap();
+    let policy_toml = git.read_file_at(baseline, &policy_rel).unwrap();
+    let system = gzmo_evolver::render_system_prompt(
+        &id,
+        &prep.record.manifest().baseline_digest,
+        &ws,
+        &prep.record.manifest().protected_paths,
+        &prep.record.manifest().required_gates,
+        &prep.record.manifest().budget,
+    )
+    .unwrap();
+    let mission_md = gzmo_evolver::render_mission_prompt(&mission.markdown).unwrap();
+    let overlay = gzmo_evolver::render_omp_overlay("local/code");
+    let input = gzmo_evolver::SealWorkerInput {
+        candidate_id: id.clone(),
+        workspace: ws,
+        output_dir: dirs[0].clone(),
+        omp_executable: harness.fixture.config.worker().executable().to_path_buf(),
+        omp_profile: harness.fixture.config.worker().profile().to_owned(),
+        omp_version: "18.0.11".to_owned(),
+        coordinator_uid,
+        expected_uid: real_uid,
+        expected_gid: real_gid,
+        budget: prep.record.manifest().budget.clone(),
+        issued_at: fixed_now(),
+        companions: gzmo_evolver::WorkerCompanions {
+            manifest_json,
+            policy_toml,
+            system_prompt_md: system.into_bytes(),
+            mission_md: mission_md.into_bytes(),
+            omp_overlay_yml: overlay.into_bytes(),
+        },
+        manifest_digest: prep.record.manifest_digest().to_owned(),
+        policy_digest: prep.record.policy_digest().to_owned(),
+    };
+    gzmo_evolver::seal_worker_bundle(&harness.roots, input).unwrap();
+
+    *harness.unit_state.lock().unwrap() = WorkerUnitState::Succeeded;
+    *harness.launches.lock().unwrap() = 0;
+    let err = resume_retry_lock_busy(&harness.evolver).await.unwrap_err();
+    assert!(
+        err.to_string().contains("worker_lost_without_receipt"),
+        "{err}"
+    );
+    assert_eq!(
+        *harness.launches.lock().unwrap(),
+        0,
+        "must not launch when unit already Succeeded"
+    );
 }
