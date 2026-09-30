@@ -9,6 +9,10 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 DATA="${GZMO_DATA_NEXT:-$ROOT/data-next}"
 OUT="$DATA/ops-health"
 HOST="${CT101_SSH_HOST:-ct101}"
+LIVE_MODE="${HERDR_LIVE_MODE:-local}"   # local (CUTOVER A 2026-09-30) | remote (CT101-style SSH, reversible)
+LIVING_ROOT="${GZMO_LIVING_ROOT:-$HOME/.gzmo}"
+GZMO_BIN="${GZMO_LIVING_BIN:-$HOME/github-clone/GZMO/target/release/gzmo}"
+MIN_FACTS="${CT101_MIN_VAULT_FACTS:-100}"
 PRIME_URL="${PRIME_PROBE_URL:-http://127.0.0.1:8000/v1/models}"
 OKFORGE_URL="${OKFORGE_PROBE_URL:-http://127.0.0.1:3000/observatory}"
 mkdir -p "$OUT"
@@ -33,12 +37,12 @@ probe_http() {
   curl -sf --max-time 5 "$url" >/dev/null 2>&1
 }
 
-serve="$(systemctl --user is-active gzmo-serve.service 2>/dev/null || true)"
-serve="$(printf '%s\n' "$serve" | head -1)"
-if [[ "$serve" == "active" ]]; then
-  row FAIL "dual-writer" "workstation gzmo-serve active — living claim conflict risk"
+living_d="$(systemctl --user is-active gzmo-daemon.service 2>/dev/null || true)"; living_d="$(printf '%s\n' "$living_d" | head -1)"
+lab_s="$(systemctl --user is-active gzmo-serve.service 2>/dev/null || true)"; lab_s="$(printf '%s\n' "$lab_s" | head -1)"
+if [[ "$living_d" == "active" && "$lab_s" == "active" ]]; then
+  row WARN "dual-writer" "living+lab both active (different roots; watch vault writes)"
 else
-  row PASS "dual-writer" "serve=${serve:-inactive}"
+  row PASS "dual-writer" "living=${living_d:-inactive} lab=${lab_s:-inactive}"
 fi
 
 if probe_http "$PRIME_URL"; then
@@ -53,45 +57,54 @@ else
   row WARN "okforge" "unreachable $OKFORGE_URL (soft)"
 fi
 
-# CT101 living probes (SSH)
-if ssh -o ConnectTimeout=8 -o BatchMode=yes "$HOST" 'true' 2>/dev/null; then
-  row PASS "ct101-ssh" "$HOST"
-  daemon="$(ssh -o ConnectTimeout=8 -o BatchMode=yes "$HOST" 'systemctl is-active gzmo-daemon' 2>/dev/null || true)"
-  if [[ "$daemon" == "active" ]]; then
-    row PASS "gzmo-daemon" "active"
+# Living host probes — local-first since CUTOVER A (2026-09-30); HERDR_LIVE_MODE=remote for CT101-style SSH.
+if [[ "$LIVE_MODE" == "remote" ]]; then
+  if ssh -o ConnectTimeout=8 -o BatchMode=yes "$HOST" 'true' 2>/dev/null; then
+    row PASS "living-host-ssh" "$HOST"
+    daemon="$(ssh -o ConnectTimeout=8 -o BatchMode=yes "$HOST" 'systemctl is-active gzmo-daemon' 2>/dev/null || true)"
+    [[ "$daemon" == "active" ]] && row PASS "gzmo-daemon" "active (remote)" || row FAIL "gzmo-daemon" "state=$daemon"
+    sidecars="$(ssh -o ConnectTimeout=8 -o BatchMode=yes "$HOST" 'docker ps --format "{{.Names}}:{{.Status}}"' 2>/dev/null || true)"
+    for name in sidecar-redis sidecar-qdrant sidecar-neo4j; do
+      echo "$sidecars" | grep -q "${name}:Up" && row PASS "$name" "Up (remote)" || row FAIL "$name" "not Up"
+    done
+    ssh -o ConnectTimeout=8 -o BatchMode=yes "$HOST" 'curl -sf --max-time 3 http://127.0.0.1:6333/collections >/dev/null' && row PASS "qdrant-local" "6333 (remote)" || row FAIL "qdrant-local" "6333 unreachable on $HOST"
+    ssh -o ConnectTimeout=8 -o BatchMode=yes "$HOST" 'redis-cli ping 2>/dev/null | grep -q PONG || docker exec sidecar-redis redis-cli ping 2>/dev/null | grep -q PONG' && row PASS "redis-local" "PONG (remote)" || row WARN "redis-local" "ping soft-fail"
   else
-    row FAIL "gzmo-daemon" "state=$daemon"
-  fi
-  sidecars="$(ssh -o ConnectTimeout=8 -o BatchMode=yes "$HOST" 'docker ps --format "{{.Names}}:{{.Status}}"' 2>/dev/null || true)"
-  for name in sidecar-redis sidecar-qdrant sidecar-neo4j; do
-    if echo "$sidecars" | grep -q "${name}:Up"; then
-      row PASS "$name" "Up"
-    else
-      row FAIL "$name" "not Up"
-    fi
-  done
-  # Redis/Qdrant HTTP from CT101 localhost
-  if ssh -o ConnectTimeout=8 -o BatchMode=yes "$HOST" 'curl -sf --max-time 3 http://127.0.0.1:6333/collections >/dev/null'; then
-    row PASS "qdrant-local" "6333"
-  else
-    row FAIL "qdrant-local" "6333 unreachable on CT101"
-  fi
-  if ssh -o ConnectTimeout=8 -o BatchMode=yes "$HOST" 'redis-cli ping 2>/dev/null | grep -q PONG || docker exec sidecar-redis redis-cli ping 2>/dev/null | grep -q PONG'; then
-    row PASS "redis-local" "PONG"
-  else
-    row WARN "redis-local" "ping soft-fail"
+    row FAIL "living-host-ssh" "cannot reach $HOST"
   fi
 else
-  row FAIL "ct101-ssh" "cannot reach $HOST"
+  # --- local living host (workstation) ---
+  if [[ "$living_d" == "active" ]]; then row PASS "living-daemon" "gzmo-daemon active (local)"; else row FAIL "living-daemon" "state=${living_d:-inactive}"; fi
+  sidecars="$(docker ps --format '{{.Names}}:{{.Status}}' 2>/dev/null || true)"
+  for name in sidecar-redis sidecar-qdrant sidecar-neo4j; do
+    echo "$sidecars" | grep -q "${name}:Up" && row PASS "$name" "Up (local)" || row FAIL "$name" "not Up"
+  done
+  # vault facts — python fallback (sqlite3 CLI often absent on this box)
+  facts="$(python3 - "$LIVING_ROOT/data/vault.db" <<'PYF' 2>/dev/null || echo 0
+import sqlite3, sys
+try:
+    print(sqlite3.connect(sys.argv[1]).execute("SELECT COUNT(*) FROM semantic_vault").fetchone()[0])
+except Exception:
+    print(0)
+PYF
+)"
+  facts="${facts:-0}"
+  if [[ "$facts" =~ ^[0-9]+$ ]] && (( facts >= MIN_FACTS )); then row PASS "vault-facts" "$facts (min $MIN_FACTS, local)"; else row FAIL "vault-facts" "${facts} < min ${MIN_FACTS} (local)"; fi
+  curl -sf --max-time 3 http://127.0.0.1:6333/collections >/dev/null 2>&1 && row PASS "qdrant-local" "6333 (local)" || row WARN "qdrant-local" "6333 soft-fail (local)"
+  docker exec sidecar-redis redis-cli ping 2>/dev/null | grep -q PONG && row PASS "redis-local" "PONG (local)" || row WARN "redis-local" "ping soft-fail (local)"
 fi
 
-# Living smoke soft (reuse script if present)
-if [[ -x "$ROOT/scripts/ct101-living-smoke.sh" ]]; then
-  if bash "$ROOT/scripts/ct101-living-smoke.sh" >/dev/null 2>&1; then
-    row PASS "living-smoke" "ct101-living-smoke.sh PASS"
+# Living smoke — local: mentor ping → pong (strongest single signal); remote: reuse ct101-living-smoke.sh
+if [[ "$LIVE_MODE" == "remote" ]]; then
+  if [[ -x "$ROOT/scripts/ct101-living-smoke.sh" ]] && bash "$ROOT/scripts/ct101-living-smoke.sh" >/dev/null 2>&1; then
+    row PASS "living-smoke" "ct101-living-smoke.sh PASS (remote)"
   else
-    row FAIL "living-smoke" "ct101-living-smoke.sh FAIL"
+    row FAIL "living-smoke" "ct101-living-smoke.sh FAIL (remote)"
   fi
+else
+  # local living smoke = mentor ping → pong (strongest single signal; daemon owns control plane)
+  mentor="$(cd "$LIVING_ROOT" && GZMO_CONFIG="$LIVING_ROOT/gzmo.toml" "$GZMO_BIN" mentor ping 2>&1 || true)"
+  echo "$mentor" | grep -qi 'pong' && row PASS "living-smoke" "mentor ping → pong (local)" || row FAIL "living-smoke" "mentor: ${mentor:0:80}"
 fi
 
 # --- Energy telemetry (read-only: RAPL + GPU) — C4 dual-metering ---

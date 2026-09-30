@@ -1,0 +1,184 @@
+{
+  "task_id": "s0-baseline-run2",
+  "name": "wayfinder-bench s0 baseline",
+  "date": "2026-09-30T18:5x+02:00",
+  "route_results": [
+    {
+      "budget_j": 0.5,
+      "model": "gzmo-flash",
+      "tier": "tiny",
+      "expected_tier": "tiny",
+      "pass": true
+    },
+    {
+      "budget_j": 1.0,
+      "model": "gzmo-flash",
+      "tier": "tiny",
+      "expected_tier": "balanced",
+      "pass": false,
+      "anomaly": "AOS-001"
+    },
+    {
+      "budget_j": 5.0,
+      "model": "qwen3.8-27b-abliterated",
+      "tier": "balanced",
+      "expected_tier": "balanced",
+      "pass": true
+    },
+    {
+      "budget_j": 10.0,
+      "model": "qwen3.8-27b-abliterated",
+      "tier": "balanced",
+      "expected_tier": "heavy",
+      "pass": false,
+      "anomaly": "AOS-002"
+    },
+    {
+      "budget_j": 15.0,
+      "model": "gzmo-cloud",
+      "tier": "heavy",
+      "expected_tier": "heavy",
+      "pass": true
+    }
+  ],
+  "escalation_results": [
+    {
+      "tier": "WeakGenerator",
+      "signal": "Pass",
+      "budget_remaining_j": 5.0,
+      "action": "Stay",
+      "profile": "gzmo-flash",
+      "pass": true
+    },
+    {
+      "tier": "WeakGenerator",
+      "signal": "ToolFailure",
+      "budget_remaining_j": 5.0,
+      "action": "Escalate",
+      "profile": "qwen3.8-27b-abliterated (CriticProfile)",
+      "pass": true
+    },
+    {
+      "tier": "WeakGenerator",
+      "signal": "CompilerError",
+      "budget_remaining_j": 5.0,
+      "action": "Escalate",
+      "profile": "qwen3.8-27b-abliterated (CriticProfile)",
+      "pass": true
+    },
+    {
+      "tier": "WeakGenerator",
+      "signal": "VerifierFail",
+      "budget_remaining_j": 5.0,
+      "action": "Escalate",
+      "profile": "qwen3.8-27b-abliterated (CriticProfile)",
+      "pass": true
+    },
+    {
+      "tier": "WeakGenerator",
+      "signal": "BudgetExhausted",
+      "budget_remaining_j": 0.5,
+      "action": "FailClosed",
+      "profile": "gzmo-flash",
+      "pass": true
+    },
+    {
+      "tier": "CriticProfile",
+      "signal": "Pass",
+      "budget_remaining_j": 5.0,
+      "action": "Stay",
+      "profile": "qwen3.8-27b-abliterated",
+      "pass": true
+    },
+    {
+      "tier": "CriticProfile",
+      "signal": "VerifierFail",
+      "budget_remaining_j": 5.0,
+      "action": "FailClosed",
+      "profile": "qwen3.8-27b-abliterated",
+      "pass": true
+    },
+    {
+      "tier": "CriticProfile",
+      "signal": "BudgetExhausted",
+      "budget_remaining_j": 0.5,
+      "action": "FailClosed",
+      "profile": "qwen3.8-27b-abliterated",
+      "pass": true
+    },
+    {
+      "tier": "StrongFallback",
+      "signal": "Pass",
+      "budget_remaining_j": 5.0,
+      "action": "Stay",
+      "profile": "gzmo-cloud",
+      "pass": true
+    },
+    {
+      "tier": "StrongFallback",
+      "signal": "ToolFailure",
+      "budget_remaining_j": 5.0,
+      "action": "Stay",
+      "profile": "gzmo-cloud",
+      "pass": true
+    },
+    {
+      "tier": "StrongFallback",
+      "signal": "VerifierFail",
+      "budget_remaining_j": 5.0,
+      "action": "Stay",
+      "profile": "gzmo-cloud",
+      "pass": true
+    },
+    {
+      "tier": "StrongFallback",
+      "signal": "BudgetExhausted",
+      "budget_remaining_j": 0.5,
+      "action": "FailClosed",
+      "profile": "gzmo-cloud",
+      "pass": true
+    }
+  ],
+  "cast_results": [
+    {
+      "task_type": "code-generation",
+      "roles": {
+        "planner": "qwen3.8-27b-abliterated",
+        "worker": "qwen3.8-27b-abliterated (verifier: code_stitch_compile)",
+        "critic": "gzmo-cloud"
+      },
+      "pass": true
+    },
+    {
+      "task_type": "chat",
+      "roles": {
+        "planner": "qwen3.8-27b-abliterated",
+        "worker": "qwen3.8-27b-abliterated (verifier: code_stitch_compile)",
+        "critic": "qwen3.8-27b-abliterated (critic-chat)"
+      },
+      "pass": true
+    },
+    {
+      "task_type": "search",
+      "roles": {
+        "planner": "qwen3.8-27b-abliterated",
+        "worker": "qwen3.8-27b-abliterated (verifier: code_stitch_compile)",
+        "critic": "gzmo-cloud"
+      },
+      "pass": true
+    }
+  ],
+  "energy_deltas_uj": {
+    "core": {
+      "before": 796876499,
+      "after": 822182944,
+      "delta": 25306445
+    },
+    "package-0": {
+      "before": 48498866423,
+      "after": 56405013498,
+      "delta": 7906147075
+    }
+  },
+  "summary": "s0-baseline-run2: route 3/5 (2 anomalies AOS-001/002) \u00b7 escalate 12/12 \u00b7 cast 3/3 \u00b7 core \u039425.3 J"
+}
