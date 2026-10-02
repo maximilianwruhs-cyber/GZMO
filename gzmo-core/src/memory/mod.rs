@@ -8,6 +8,7 @@ pub mod episodic;
 pub mod evidence_localize;
 pub mod felt_use;
 pub mod filter;
+pub mod halflife;
 pub mod honeypot;
 pub mod kg_extract;
 pub mod kg_promotion;

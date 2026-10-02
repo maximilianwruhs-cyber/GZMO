@@ -48,7 +48,7 @@ fn default_semantic_decay_class() -> String {
 }
 
 /// Classification of memory decay rates (Atkinson-Shiffrin model).
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 pub enum DecayClass {
     /// Raw tool outputs, chat transcripts — 30 day half-life
     Episodic,
