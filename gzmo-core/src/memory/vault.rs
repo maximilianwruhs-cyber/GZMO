@@ -23,11 +23,13 @@ use crate::memory::lifecycle::{
     classify_truth_pair, extract_primary_entity, find_latest_honeypot_by_entity,
     is_unverified_derived, supersede_honeypot, LifecycleKind,
 };
+use crate::memory::halflife::{metabolic_score, HalflifeParams};
 use crate::memory::qdrant_recall::QdrantRecall;
 use crate::memory::recall_rrf::{
-    apply_utility_boost, diversify_by_source_file, extract_entity_tokens, fts_match_query,
-    fts_match_query_broad, merge_interleaved_rank, rrf_fuse, RecallCandidate, PREFETCH_K,
-    QDRANT_PREFETCH_K, RERANK_PREFETCH,
+    apply_metabolic_boost, apply_utility_boost, diversify_by_source_file, extract_entity_tokens,
+    fact_age_days, fts_match_query, fts_match_query_broad, merge_interleaved_rank,
+    metabolic_boost_enabled, rrf_fuse, RecallCandidate, PREFETCH_K, QDRANT_PREFETCH_K,
+    RERANK_PREFETCH,
 };
 use crate::memory::rerank::Reranker;
 use crate::types::{DecayClass, ExtractedTruth, SemanticFact};
@@ -60,7 +62,7 @@ pub struct PromoteMatureReport {
     pub skipped: usize,
 }
 
-fn parse_decay_class(s: &str) -> DecayClass {
+pub(crate) fn parse_decay_class(s: &str) -> DecayClass {
     match s {
         "CuratedVault" | "curated_vault" => DecayClass::CuratedVault,
         "SessionDistill" | "session_distill" => DecayClass::SessionDistill,
@@ -1100,19 +1102,38 @@ impl SqliteVault {
         Ok(scored)
     }
 
-    /// MemRL phase B: Q-select inside the relevance pool (honeypot `utility_score`).
-    fn apply_utility_select(&self, scored: &mut Vec<(SemanticFact, f64)>) -> Result<()> {
+    /// MemRL phase B: Q-select inside the relevance pool (honeypot `utility_score`),
+    /// followed by metabolic half-life boost when `GZMO_METABOLIC_BOOST` is enabled.
+    pub(crate) fn apply_utility_select(&self, scored: &mut Vec<(SemanticFact, f64)>) -> Result<()> {
         if scored.len() <= 1 {
             return Ok(());
         }
         let ids: Vec<Uuid> = scored.iter().map(|(f, _)| f.id).collect();
-        let utility = self.honeypot_utility_scores(&ids)?;
+        let inputs = self.metabolic_inputs(&ids)?;
+        let utility: HashMap<Uuid, f64> = inputs.iter().map(|(&id, &(u, _))| (id, u)).collect();
         apply_utility_boost(scored, &utility);
         scored.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap_or(std::cmp::Ordering::Equal));
+
+        if metabolic_boost_enabled() {
+            let now = Utc::now();
+            let params = HalflifeParams::default();
+            let mut metabolic = HashMap::with_capacity(scored.len());
+            for (f, _) in scored.iter() {
+                let (utility_q, recall_count) = inputs.get(&f.id).copied().unwrap_or((0.0, 0));
+                let age_days = fact_age_days(f.created_at, now);
+                let decay_class = parse_decay_class(&f.decay_class);
+                let m = metabolic_score(age_days, decay_class, utility_q, recall_count, &params);
+                metabolic.insert(f.id, m);
+            }
+            apply_metabolic_boost(scored, &metabolic);
+            scored.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap_or(std::cmp::Ordering::Equal));
+        }
+
         Ok(())
     }
 
-    fn honeypot_utility_scores(&self, ids: &[Uuid]) -> Result<HashMap<Uuid, f64>> {
+    /// Fetch both `utility_score` and `recall_count` from honeypot for active facts.
+    pub(crate) fn metabolic_inputs(&self, ids: &[Uuid]) -> Result<HashMap<Uuid, (f64, u32)>> {
         let mut out = HashMap::new();
         if ids.is_empty() {
             return Ok(out);
@@ -1121,19 +1142,30 @@ impl SqliteVault {
         let id_strs: Vec<String> = ids.iter().map(|id| id.to_string()).collect();
         let placeholders = vec!["?"; id_strs.len()].join(",");
         let sql = format!(
-            "SELECT id, utility_score FROM honeypot WHERE is_latest = 1 AND id IN ({})",
+            "SELECT id, utility_score, recall_count FROM honeypot WHERE is_latest = 1 AND id IN ({})",
             placeholders
         );
         let mut stmt = conn.prepare(&sql)?;
         let rows = stmt.query_map(rusqlite::params_from_iter(id_strs.iter()), |row| {
-            Ok((row.get::<_, String>(0)?, row.get::<_, f64>(1)?))
+            Ok((
+                row.get::<_, String>(0)?,
+                row.get::<_, f64>(1)?,
+                row.get::<_, i64>(2)?,
+            ))
         })?;
         for row in rows.filter_map(|r| r.ok()) {
             if let Ok(id) = Uuid::parse_str(&row.0) {
-                out.insert(id, row.1.max(0.0));
+                let utility = row.1.max(0.0);
+                let recall = row.2.max(0) as u32;
+                out.insert(id, (utility, recall));
             }
         }
         Ok(out)
+    }
+
+    pub(crate) fn honeypot_utility_scores(&self, ids: &[Uuid]) -> Result<HashMap<Uuid, f64>> {
+        let inputs = self.metabolic_inputs(ids)?;
+        Ok(inputs.into_iter().map(|(id, (u, _))| (id, u)).collect())
     }
 
     async fn search_recall_legacy(
@@ -3424,6 +3456,108 @@ mod utility_recall_tests {
         assert!(scores.is_empty(), "stale bounds should drop it");
 
         let _ = std::fs::remove_file(&path);
+    }
+
+    #[test]
+    fn metabolic_inputs_handles_empty_zero_and_recall_count() {
+        let path = tempfile_db();
+        let vault = SqliteVault::open(&path).expect("open");
+
+        let empty = vault.metabolic_inputs(&[]).unwrap();
+        assert!(empty.is_empty(), "empty query should return empty map");
+
+        let id = insert_fact(&vault, "fact with recall", "rec.md", 3.5);
+        let conn = vault.db_conn().unwrap();
+        conn.execute(
+            "UPDATE honeypot SET recall_count = 7 WHERE id = ?1",
+            rusqlite::params![id.to_string()],
+        )
+        .unwrap();
+
+        let inputs = vault.metabolic_inputs(&[id]).unwrap();
+        let (u, r) = inputs.get(&id).copied().expect("entry present");
+        assert!((u - 3.5).abs() < 1e-9);
+        assert_eq!(r, 7);
+
+        // Negative recall count clamped to 0, negative utility clamped to 0
+        conn.execute(
+            "UPDATE honeypot SET recall_count = -3, utility_score = -2.0 WHERE id = ?1",
+            rusqlite::params![id.to_string()],
+        )
+        .unwrap();
+        let inputs_neg = vault.metabolic_inputs(&[id]).unwrap();
+        let (u_neg, r_neg) = inputs_neg.get(&id).copied().expect("entry present");
+        assert_eq!(u_neg, 0.0);
+        assert_eq!(r_neg, 0);
+
+        // Stale record excluded
+        conn.execute(
+            "UPDATE honeypot SET is_latest = 0 WHERE id = ?1",
+            rusqlite::params![id.to_string()],
+        )
+        .unwrap();
+        let inputs_stale = vault.metabolic_inputs(&[id]).unwrap();
+        assert!(inputs_stale.is_empty(), "stale record should be excluded");
+
+        let _ = std::fs::remove_file(&path);
+    }
+
+    #[tokio::test]
+    async fn search_recall_respects_metabolic_boost_toggle() {
+        let path = tempfile_db();
+        let vault = SqliteVault::open(&path).expect("open");
+
+        // Create two facts matching query "gadget"
+        let old_fact = insert_fact(
+            &vault,
+            "gadget alpha sits in the historical storage archive",
+            "old.md",
+            2.0,
+        );
+        let fresh_fact = insert_fact(
+            &vault,
+            "gadget beta sits in the modern active workbench",
+            "new.md",
+            2.0,
+        );
+
+        // Make old_fact 180 days old with 0 recalls:
+        let conn = vault.db_conn().unwrap();
+        let old_promoted = (Utc::now() - chrono::Duration::days(180)).to_rfc3339();
+        conn.execute(
+            "UPDATE honeypot SET promoted_at = ?1, recall_count = 0 WHERE id = ?2",
+            rusqlite::params![old_promoted, old_fact.to_string()],
+        )
+        .unwrap();
+
+        // Make fresh_fact promoted now with 10 recalls:
+        let fresh_promoted = Utc::now().to_rfc3339();
+        conn.execute(
+            "UPDATE honeypot SET promoted_at = ?1, recall_count = 10 WHERE id = ?2",
+            rusqlite::params![fresh_promoted, fresh_fact.to_string()],
+        )
+        .unwrap();
+
+        // 1. With GZMO_METABOLIC_BOOST off (default / unset):
+        std::env::remove_var("GZMO_METABOLIC_BOOST");
+        let hits_off = vault.search_recall("gadget", 5).await.expect("search off");
+        assert!(hits_off.len() >= 2);
+
+        // 2. With GZMO_METABOLIC_BOOST enabled ("1"):
+        std::env::set_var("GZMO_METABOLIC_BOOST", "1");
+        let hits_on = vault.search_recall("gadget", 5).await.expect("search on");
+        std::env::remove_var("GZMO_METABOLIC_BOOST");
+
+        assert!(hits_on.len() >= 2);
+        assert_eq!(
+            hits_on[0].0.id,
+            fresh_fact,
+            "metabolic boost must promote fresh active fact to top position"
+        );
+
+        let _ = std::fs::remove_file(&path);
+        let _ = std::fs::remove_file(format!("{}-wal", path.display()));
+        let _ = std::fs::remove_file(format!("{}-shm", path.display()));
     }
 
     #[test]

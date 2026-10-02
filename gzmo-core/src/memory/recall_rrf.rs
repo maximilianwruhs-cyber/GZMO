@@ -2,6 +2,7 @@
 
 use std::collections::HashMap;
 
+use chrono::{DateTime, Utc};
 use uuid::Uuid;
 
 use crate::types::SemanticFact;
@@ -153,6 +154,104 @@ pub fn apply_utility_boost(scored: &mut Vec<(SemanticFact, f64)>, utility: &Hash
             .then_with(|| i.cmp(&j))
     });
     *scored = order.into_iter().map(|i| scored[i].clone()).collect();
+}
+
+/// Base factor offset for metabolic score: lower bound when metabolic score `m == 0.0`.
+pub const METABOLIC_FACTOR_BASE: f64 = 0.5;
+
+/// Multiplier scale applied to metabolic score `m` in `[0.0, 1.0]`.
+pub const METABOLIC_FACTOR_SCALE: f64 = 1.0;
+
+/// Neutral metabolic score used when a fact has no precomputed entry.
+/// With base 0.5 and scale 1.0, m = 0.5 yields factor = 0.5 + 1.0 * 0.5 = 1.0 (exact neutral).
+pub const METABOLIC_NEUTRAL_M: f64 = 0.5;
+
+/// Env toggle for metabolic recall boost: `GZMO_METABOLIC_BOOST`.
+/// Accepted truthy values: "1", "true", "on" (case-insensitive).
+/// Defaults to OFF for safety.
+pub fn metabolic_boost_enabled() -> bool {
+    match std::env::var("GZMO_METABOLIC_BOOST") {
+        Ok(v) => {
+            let t = v.trim();
+            t == "1" || t.eq_ignore_ascii_case("true") || t.eq_ignore_ascii_case("on")
+        }
+        Err(_) => false,
+    }
+}
+
+/// Compute fact age in elapsed days from created_at timestamp relative to `now`.
+/// Future timestamps clamp deterministically to 0.0 days.
+pub fn fact_age_days(created_at: DateTime<Utc>, now: DateTime<Utc>) -> f64 {
+    (now - created_at).num_seconds().max(0) as f64 / 86_400.0
+}
+
+/// Multiply each score by a bounded metabolic factor in `[0.5 ..= 1.5]`.
+/// `metabolic` is precomputed per fact id (score already in `[0..=1]`).
+///
+/// ## Factor Variant Rationale
+/// We select the symmetric promoting/damping variant `factor = METABOLIC_FACTOR_BASE + METABOLIC_FACTOR_SCALE * m`
+/// in `[0.5, 1.5]` (with base 0.5, scale 1.0, and neutral 0.5):
+/// - Stale, fully decayed facts (`m = 0.0`) are damped down to 0.5 (-50%), preventing outdated
+///   knowledge from dominating fresh signals.
+/// - Fresh, curated, and frequently recalled facts (`m = 1.0`) receive up to a 1.5x boost (+50%),
+///   promoting curated knowledge when relevance scores are in a competitive band.
+/// - Unmeasured or missing facts take neutral `METABOLIC_NEUTRAL_M = 0.5`, producing an exact
+///   1.0 multiplier (neither penalty nor unearned boost).
+/// - The parameters are exposed as consts (`METABOLIC_FACTOR_BASE`, `METABOLIC_FACTOR_SCALE`,
+///   `METABOLIC_NEUTRAL_M`) so S2b can retune (e.g. to pure damping `0.75 + 0.25 * m`) without
+///   modifying call sites.
+/// - Non-zero lower bound (0.5) ensures scores are never zeroed out, and bounds checks prevent NaN.
+pub fn apply_metabolic_boost(
+    scored: &mut Vec<(SemanticFact, f64)>,
+    metabolic: &HashMap<Uuid, f64>,
+) {
+    if scored.is_empty() || metabolic.is_empty() {
+        return;
+    }
+    let orig: Vec<f64> = scored.iter().map(|(_, s)| *s).collect();
+    for (f, score) in scored.iter_mut() {
+        let m = metabolic
+            .get(&f.id)
+            .copied()
+            .unwrap_or(METABOLIC_NEUTRAL_M);
+        let m_clamped = if m.is_nan() || m < 0.0 {
+            0.0
+        } else if m > 1.0 {
+            1.0
+        } else {
+            m
+        };
+        let factor = METABOLIC_FACTOR_BASE + METABOLIC_FACTOR_SCALE * m_clamped;
+        if !score.is_nan() {
+            *score *= factor;
+        }
+    }
+    let mut order: Vec<usize> = (0..scored.len()).collect();
+    order.sort_by(|&i, &j| {
+        scored[j]
+            .1
+            .partial_cmp(&scored[i].1)
+            .unwrap_or(std::cmp::Ordering::Equal)
+            .then_with(|| {
+                orig[j]
+                    .partial_cmp(&orig[i])
+                    .unwrap_or(std::cmp::Ordering::Equal)
+            })
+            .then_with(|| i.cmp(&j))
+    });
+    *scored = order.into_iter().map(|i| scored[i].clone()).collect();
+}
+
+/// Bounded metabolic boost stage gated behind `GZMO_METABOLIC_BOOST`.
+/// When disabled, `scored` is guaranteed unchanged.
+pub fn apply_metabolic_stage(
+    scored: &mut Vec<(SemanticFact, f64)>,
+    metabolic: &HashMap<Uuid, f64>,
+) {
+    if !metabolic_boost_enabled() {
+        return;
+    }
+    apply_metabolic_boost(scored, metabolic);
 }
 
 /// Tokens for graph / entity-aligned honeypot matching.
@@ -433,5 +532,133 @@ mod tests {
         for (id, score) in scores1 {
             assert_eq!(score, scores2[&id]);
         }
+    }
+
+    #[test]
+    fn metabolic_boost_neutral_when_map_empty() {
+        let a = Uuid::new_v4();
+        let b = Uuid::new_v4();
+        let mut scored = vec![
+            (dummy_fact(a, "first").fact, 0.8),
+            (dummy_fact(b, "second").fact, 0.4),
+        ];
+        let original = scored.clone();
+        apply_metabolic_boost(&mut scored, &HashMap::new());
+        assert_eq!(scored.len(), 2);
+        assert_eq!(scored[0].0.id, original[0].0.id);
+        assert!((scored[0].1 - original[0].1).abs() < 1e-12);
+        assert_eq!(scored[1].0.id, original[1].0.id);
+        assert!((scored[1].1 - original[1].1).abs() < 1e-12);
+    }
+
+    #[test]
+    fn metabolic_boost_high_metabolic_promotes_vs_low_twin() {
+        let a = Uuid::new_v4();
+        let b = Uuid::new_v4();
+        // Twins with equal base score
+        let mut scored = vec![
+            (dummy_fact(a, "fact a").fact, 0.5),
+            (dummy_fact(b, "fact b").fact, 0.5),
+        ];
+        let mut metabolic = HashMap::new();
+        metabolic.insert(a, 0.1); // low metabolic: factor = 0.5 + 0.1 = 0.6 -> 0.30
+        metabolic.insert(b, 0.9); // high metabolic: factor = 0.5 + 0.9 = 1.4 -> 0.70
+        apply_metabolic_boost(&mut scored, &metabolic);
+
+        assert_eq!(scored[0].0.id, b, "high metabolic must outrank low metabolic twin");
+        assert_eq!(scored[1].0.id, a);
+        assert!(scored[0].1 > scored[1].1);
+    }
+
+    #[test]
+    fn metabolic_boost_factor_bounds_respected() {
+        let id_min = Uuid::new_v4();
+        let id_max = Uuid::new_v4();
+        let id_neg = Uuid::new_v4();
+        let id_over = Uuid::new_v4();
+        let id_nan = Uuid::new_v4();
+        let id_missing = Uuid::new_v4();
+
+        let mut scored = vec![
+            (dummy_fact(id_min, "min").fact, 1.0),
+            (dummy_fact(id_max, "max").fact, 1.0),
+            (dummy_fact(id_neg, "neg").fact, 1.0),
+            (dummy_fact(id_over, "over").fact, 1.0),
+            (dummy_fact(id_nan, "nan").fact, 1.0),
+            (dummy_fact(id_missing, "missing").fact, 1.0),
+        ];
+
+        let mut metabolic = HashMap::new();
+        metabolic.insert(id_min, 0.0);
+        metabolic.insert(id_max, 1.0);
+        metabolic.insert(id_neg, -0.5); // clamped to 0.0 -> factor 0.5
+        metabolic.insert(id_over, 2.5); // clamped to 1.0 -> factor 1.5
+        metabolic.insert(id_nan, f64::NAN); // clamped to 0.0 -> factor 0.5
+
+        apply_metabolic_boost(&mut scored, &metabolic);
+
+        for (fact, score) in &scored {
+            assert!(!score.is_nan(), "score must not be NaN for {}", fact.content);
+            assert!(*score > 0.0, "score must not be zeroed out for {}", fact.content);
+            assert!(
+                *score >= 0.5 - 1e-12 && *score <= 1.5 + 1e-12,
+                "score {} out of bounds [0.5, 1.5] for {}",
+                score,
+                fact.content
+            );
+        }
+
+        let map: HashMap<Uuid, f64> = scored.into_iter().map(|(f, s)| (f.id, s)).collect();
+        assert!((map[&id_min] - 0.5).abs() < 1e-12);
+        assert!((map[&id_max] - 1.5).abs() < 1e-12);
+        assert!((map[&id_neg] - 0.5).abs() < 1e-12);
+        assert!((map[&id_over] - 1.5).abs() < 1e-12);
+        assert!((map[&id_nan] - 0.5).abs() < 1e-12);
+        assert!((map[&id_missing] - 1.0).abs() < 1e-12, "missing must take neutral factor 1.0");
+    }
+
+    #[test]
+    fn metabolic_stage_toggle_env_off_is_unchanged() {
+        let a = Uuid::new_v4();
+        let b = Uuid::new_v4();
+        let mut scored = vec![
+            (dummy_fact(a, "first").fact, 0.8),
+            (dummy_fact(b, "second").fact, 0.4),
+        ];
+        let original = scored.clone();
+        let mut metabolic = HashMap::new();
+        metabolic.insert(a, 0.1);
+        metabolic.insert(b, 0.9);
+
+        // Env off or unset:
+        std::env::remove_var("GZMO_METABOLIC_BOOST");
+        apply_metabolic_stage(&mut scored, &metabolic);
+        assert_eq!(scored[0].0.id, original[0].0.id);
+        assert!((scored[0].1 - original[0].1).abs() < 1e-12);
+        assert_eq!(scored[1].0.id, original[1].0.id);
+        assert!((scored[1].1 - original[1].1).abs() < 1e-12);
+
+        // Explicit "0":
+        std::env::set_var("GZMO_METABOLIC_BOOST", "0");
+        apply_metabolic_stage(&mut scored, &metabolic);
+        assert_eq!(scored[0].0.id, original[0].0.id);
+        assert!((scored[0].1 - original[0].1).abs() < 1e-12);
+
+        // Explicit "1" enables it:
+        std::env::set_var("GZMO_METABOLIC_BOOST", "1");
+        apply_metabolic_stage(&mut scored, &metabolic);
+        assert_eq!(scored[0].0.id, b, "enabled stage must apply boost");
+        std::env::remove_var("GZMO_METABOLIC_BOOST");
+    }
+
+    #[test]
+    fn fact_age_days_future_clamps_to_zero() {
+        let now = chrono::Utc::now();
+        let future = now + chrono::Duration::days(5);
+        assert_eq!(fact_age_days(future, now), 0.0);
+
+        let past = now - chrono::Duration::seconds(86_400 * 3);
+        let age = fact_age_days(past, now);
+        assert!((age - 3.0).abs() < 1e-6);
     }
 }
