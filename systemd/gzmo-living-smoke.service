@@ -1,12 +1,12 @@
 [Unit]
-Description=Living host product smoke (compat alias → gzmo-living-smoke.service, CUTOVER A)
+Description=Living host product smoke (CUTOVER A: local-first, CT101 fallback)
 After=network-online.target
 
 [Service]
 Type=oneshot
 WorkingDirectory=%h/github-clone/GZMO
 Environment=CT101_SSH_HOST=ct101
-ExecStart=/bin/bash %h/github-clone/GZMO/scripts/ct101-living-smoke.sh
+ExecStart=/bin/bash %h/github-clone/GZMO/scripts/living-smoke.sh
 StandardOutput=journal
 StandardError=journal
 
