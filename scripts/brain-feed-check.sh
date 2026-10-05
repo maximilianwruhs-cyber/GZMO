@@ -9,6 +9,12 @@ DATA="${GZMO_DATA_NEXT:-$ROOT/data-next}"
 OUT="$DATA/brain-feed"
 HOST="${CT101_SSH_HOST:-ct101}"
 VAULT_DB="${KEEP_QUALITY_VAULT_DB:-/opt/gzmo/data/vault.db}"
+# CUTOVER A (2026-09-30): on the workstation the living vault lives under ~/.gzmo — prefer it when present.
+if [[ -z "${KEEP_QUALITY_VAULT_DB:-}" ]]; then
+  for _cand in "$HOME/.gzmo-living/data/vault.db" "$HOME/.gzmo/data/vault.db"; do
+    if [[ -f "$_cand" ]]; then VAULT_DB="$_cand"; break; fi
+  done
+fi
 MIN_NONZERO_RECALL="${KEEP_QUALITY_MIN_NONZERO_RECALL:-1}"
 mkdir -p "$OUT"
 LOG="$OUT/gate.log"
@@ -92,11 +98,24 @@ if [[ -f "$DATA/felt-use-depth/latest.json" ]] \
     row PASS "felt-use-depth" "$advice"
   else
     # Nonzero still required for Brain Feed P0; depth thin is HOLD not RED
-    felt_raw="$(ssh -o ConnectTimeout=12 -o BatchMode=yes "$HOST" "sqlite3 '$VAULT_DB' \"
+    if [[ -f "$VAULT_DB" ]]; then
+      # Local vault ⇒ stdlib sqlite3 (no SSH, no sqlite3 CLI needed)
+      felt_raw="$(python3 -c '
+import sqlite3, sys
+con = sqlite3.connect(sys.argv[1])
+latest, nonzero = con.execute(
+    "SELECT (SELECT COUNT(*) FROM honeypot WHERE is_latest=1), "
+    "(SELECT COUNT(*) FROM honeypot WHERE is_latest=1 AND recall_count>0)"
+).fetchone()
+print(f"{latest}|{nonzero}")
+' "$VAULT_DB" 2>/dev/null || echo "")"
+    else
+      felt_raw="$(ssh -o ConnectTimeout=12 -o BatchMode=yes "$HOST" "sqlite3 '$VAULT_DB' \"
 SELECT
   (SELECT COUNT(*) FROM honeypot WHERE is_latest=1),
   (SELECT COUNT(*) FROM honeypot WHERE is_latest=1 AND recall_count>0);
 \"" 2>/dev/null || echo "")"
+    fi
     if [[ "$felt_raw" =~ ^([0-9]+)\|([0-9]+)$ ]]; then
       latest="${BASH_REMATCH[1]}"
       nonzero="${BASH_REMATCH[2]}"

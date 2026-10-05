@@ -18,6 +18,11 @@ DATA="${GZMO_DATA_NEXT:-$ROOT/data-next}"
 OUT="$DATA/felt-use-depth"
 HOST="${CT101_SSH_HOST:-ct101}"
 LIVING_VAULT="${GZMO_LIVING_HOME:-$HOME/.gzmo-living}/data/vault.db"
+# CUTOVER A (2026-09-30): living daemon root is ~/.gzmo on the workstation;
+# fall back to it when the legacy ~/.gzmo-living layout is absent (no SSH needed).
+if [[ -z "${GZMO_LIVING_HOME:-}" && ! -f "$LIVING_VAULT" && -f "$HOME/.gzmo/data/vault.db" ]]; then
+  LIVING_VAULT="$HOME/.gzmo/data/vault.db"
+fi
 if [[ -z "${KEEP_QUALITY_VAULT_DB:-}" && -f "$LIVING_VAULT" ]]; then
   VAULT_DB="$LIVING_VAULT"
 else
@@ -62,17 +67,28 @@ def run_host(cmd: str, timeout: int = 25) -> tuple[int, str, str]:
     return ssh(cmd, timeout)
 
 census = {"ok": False}
-sql = (
-    f"sqlite3 '{vault}' \""
+CENSUS_SQL = (
     "SELECT "
     "(SELECT COUNT(*) FROM honeypot WHERE is_latest=1), "
     "(SELECT COUNT(*) FROM honeypot WHERE is_latest=1 AND recall_count>=1), "
     "(SELECT COUNT(*) FROM honeypot WHERE is_latest=1 AND recall_count>=3), "
     "(SELECT COUNT(*) FROM honeypot WHERE is_latest=1 AND utility_score>0), "
     "(SELECT COALESCE(AVG(utility_score),0) FROM honeypot WHERE is_latest=1), "
-    "(SELECT COALESCE(MAX(utility_score),0) FROM honeypot WHERE is_latest=1);\""
+    "(SELECT COALESCE(MAX(utility_score),0) FROM honeypot WHERE is_latest=1)"
 )
-rc, stdout, stderr = run_host(sql)
+if Path(vault).is_file():
+    # Local vault ⇒ stdlib sqlite3 (no sqlite3 CLI, no login-PATH dependency).
+    import sqlite3 as _sqlite
+    try:
+        con = _sqlite.connect(vault)
+        row = con.execute(CENSUS_SQL).fetchone()
+        con.close()
+        stdout, stderr, rc = "|".join(str(x) for x in row), "", 0
+    except Exception as e:  # census must never kill the feed
+        stdout, stderr, rc = "", f"local_sqlite: {e}"[:240], 1
+else:
+    sql = f"sqlite3 '{vault}' \"{CENSUS_SQL}\""
+    rc, stdout, stderr = run_host(sql)
 nums = [float(x) for x in re.findall(r"[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?", stdout.replace("|", " "))]
 # Prefer pipe-separated single line (counts are ints; avg/max may be real)
 if "|" in stdout:
