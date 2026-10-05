@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Living-stack production readiness gate (CT101 sole overnight brain).
+# Living-stack production readiness gate (living host — local-first since CUTOVER A 2026-09-30).
 # Exit 0 = LIVING GREEN. Laptop product GREEN is separate (product-readiness-gate.sh).
 #
 #   bash scripts/living-readiness-gate.sh
@@ -12,6 +12,26 @@ OUT="$DATA/living-readiness"
 HOST="${CT101_SSH_HOST:-ct101}"
 GZMO_BIN="${CT101_GZMO_BIN:-/opt/gzmo/current/target/release/gzmo}"
 MIN_FACTS="${CT101_MIN_VAULT_FACTS:-100}"
+
+# CUTOVER A (2026-09-30): workstation owns living — local-first, SSH fallback.
+LIVE_ROOT="${GZMO_LIVING_ROOT:-$HOME/.gzmo}"
+LOCAL_BIN="${GZMO_LIVING_BIN:-$HOME/github-clone/GZMO/target/release/gzmo}"
+[[ -x "$LOCAL_BIN" ]] || LOCAL_BIN="$HOME/.local/bin/gzmo"
+# Mode: LIVING_HOST (explicit) > HERDR_LIVE_MODE > auto-detect (local vault + daemon).
+LIVE_MODE="${HERDR_LIVE_MODE:-auto}"
+if [[ -n "${LIVING_HOST:-}" && "${LIVING_HOST}" != "auto" ]]; then LIVE_MODE="$LIVING_HOST"; fi
+if [[ "$LIVE_MODE" == "auto" ]]; then
+  if [[ -f "$LIVE_ROOT/data/vault.db" ]] && systemctl --user is-active gzmo-daemon.service >/dev/null 2>&1; then
+    LIVE_MODE="local"
+  else
+    LIVE_MODE="$HOST"
+  fi
+fi
+if [[ "$LIVE_MODE" == "local" ]]; then
+  LIVE_CWD="$LIVE_ROOT"; LIVE_CFG="$LIVE_ROOT/gzmo.toml"; LIVE_BIN="$LOCAL_BIN"
+else
+  LIVE_CWD="/opt/gzmo"; LIVE_CFG="/opt/gzmo/gzmo.toml"; LIVE_BIN="$GZMO_BIN"
+fi
 mkdir -p "$OUT"
 LOG="$OUT/gate.log"
 : >"$LOG"
@@ -36,7 +56,11 @@ ssh_ct() {
   ssh -o ConnectTimeout=12 -o BatchMode=yes "$HOST" "$@"
 }
 
-echo "=== Living readiness gate (CT101) ===" | tee -a "$LOG"
+run_living() { # $1 = command string, executed on the living host (local or ssh)
+  if [[ "$LIVE_MODE" == "local" ]]; then bash -lc "$1"; else ssh_ct "bash -lc '$1'"; fi
+}
+
+echo "=== Living readiness gate (mode=$LIVE_MODE) ===" | tee -a "$LOG"
 
 # 1) Dual-writer doctrine
 SERVE="$(systemctl --user is-active gzmo-serve.service 2>/dev/null || true)"
@@ -49,18 +73,18 @@ else
   row PASS "dual-writer" "workstation serve=${SERVE:-inactive} scheduler=${SCHED:-inactive}"
 fi
 
-# 2) CT101 living smoke (daemon/sidecars/vault/health/mentor)
-SMOKE_LOG="$OUT/ct101-living-smoke.log"
-if bash "$ROOT/scripts/ct101-living-smoke.sh" >"$SMOKE_LOG" 2>&1; then
+# 2) Living smoke (daemon/sidecars/vault/health/mentor) — local-first since CUTOVER A
+SMOKE_LOG="$OUT/living-smoke.log"
+if bash "$ROOT/scripts/living-smoke.sh" >"$SMOKE_LOG" 2>&1; then
   facts="$(grep -E 'vault facts=' "$SMOKE_LOG" | tail -1 | sed -E 's/.*facts=([0-9]+).*/\1/' || true)"
-  row PASS "ct101-living-smoke" "daemon+sidecars+vault${facts:+ ($facts facts)}+health+mentor"
+  row PASS "living-smoke" "daemon+sidecars+vault${facts:+ ($facts facts)}+health+mentor (mode=$LIVE_MODE)"
 else
-  row FAIL "ct101-living-smoke" "see $SMOKE_LOG"
+  row FAIL "living-smoke" "see $SMOKE_LOG"
 fi
 
 # 3) Parse living health probes (required OK set)
 HEALTH_LOG="$OUT/ct101-health.log"
-if ssh_ct "bash -lc 'cd /opt/gzmo && GZMO_CONFIG=/opt/gzmo/gzmo.toml $GZMO_BIN health'" >"$HEALTH_LOG" 2>&1; then
+if run_living "cd '$LIVE_CWD' && GZMO_CONFIG='$LIVE_CFG' $LIVE_BIN health" >"$HEALTH_LOG" 2>&1; then
   :
 else
   # health may exit non-zero on WARN; still parse
@@ -87,8 +111,12 @@ else
   row HOLD "health:rerank" "not OK (non-blocking if embeddings/qdrant green)"
 fi
 
-# 4) Vault floor
-facts="$(ssh_ct 'sqlite3 /opt/gzmo/data/vault.db "SELECT COUNT(*) FROM semantic_vault;"' 2>/dev/null || echo 0)"
+# 4) Vault floor (local: stdlib sqlite — CLI often absent on the workstation)
+if [[ "$LIVE_MODE" == "local" ]]; then
+  facts="$(python3 -c 'import sqlite3,sys; print(sqlite3.connect(sys.argv[1]).execute("SELECT COUNT(*) FROM semantic_vault").fetchone()[0])' "$LIVE_ROOT/data/vault.db" 2>/dev/null || echo 0)"
+else
+  facts="$(ssh_ct 'sqlite3 /opt/gzmo/data/vault.db "SELECT COUNT(*) FROM semantic_vault;"' 2>/dev/null || echo 0)"
+fi
 if [[ "$facts" =~ ^[0-9]+$ ]] && (( facts >= MIN_FACTS )); then
   row PASS "vault-floor" "semantic_vault=$facts (min $MIN_FACTS)"
 else
@@ -212,7 +240,7 @@ else
 fi
 
 # Verdict
-export OUT pass fail hold
+export OUT pass fail hold LIVE_MODE
 set +e
 python3 - <<'PY'
 import json, os
@@ -224,10 +252,11 @@ pass_n = int(os.environ["pass"])
 fail_n = int(os.environ["fail"])
 hold_n = int(os.environ["hold"])
 verdict = "GREEN" if fail_n == 0 else "RED"
+mode = os.environ.get("LIVE_MODE", "?")
 advice = (
-    "living_ready — CT101 metabolism production gate GREEN"
+    f"living_ready — metabolism production gate GREEN (mode={mode})"
     if verdict == "GREEN"
-    else "living_hold — fix FAIL rows before claiming living-stack readiness"
+    else f"living_hold — fix FAIL rows before claiming living-stack readiness (mode={mode})"
 )
 payload = {
     "schema": "gzmo.living.readiness/v1",
@@ -237,7 +266,7 @@ payload = {
     "advice": advice,
     "counts": {"pass": pass_n, "fail": fail_n, "hold": hold_n},
     "owner": {
-        "living": "CT101 gzmo-daemon /opt/gzmo/",
+        "living": f"mode={os.environ.get('LIVE_MODE','?')} — local ~/.gzmo daemon or CT101 /opt/gzmo (remote)",
         "lab": "workstation data-next/",
         "doc": "docs/CT101_BOUNDARY.md",
     },
