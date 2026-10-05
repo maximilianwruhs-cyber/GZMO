@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # One-shot nightburst operator bundle (no always-on serve required).
 # Runs organ-trace → faithfulness → concept-gate → serendipity → hsp-sonify → scoreboard.
+# CUTOVER A (2026-10-05): local-first — living steps resolve on the workstation;
+# CT101 = legacy fallback (scoreboard source order: local → ct101 → lab).
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"

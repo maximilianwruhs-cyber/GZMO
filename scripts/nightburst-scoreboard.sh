@@ -2,19 +2,32 @@
 # Thin nightburst scoreboard: metabolism + wiki + Arena → sanitized JSON/HTML.
 # Local stranger-demo surface (OKForge /observatory remains agent-discovery).
 #
-# By default prefers CT101 living scheduler-runs (avoids lab 2020 stubs in
-# workstation data-next/). Override: SCOREBOARD_SOURCE=lab
+# CUTOVER A (2026-10-05): local-first — prefers ~/.gzmo/data/scheduler-runs when
+# fresh; CT101 scp = legacy fallback; lab data-next/ = last resort.
+# Override: SCOREBOARD_SOURCE=local|living|lab  ("living" = explicit CT101)
 set -euo pipefail
 
 ROOT="${GZMO_CLONE_ROOT:-$HOME/github-clone}/GZMO"
 DATA="$ROOT/data-next"
 OUT_DIR="$DATA/arena"
 HOST="${CT101_SSH_HOST:-ct101}"
-SOURCE="${SCOREBOARD_SOURCE:-living}"
+LIVE_ROOT="${GZMO_LIVING_ROOT:-$HOME/.gzmo}"
+LOCAL_RUNS="$LIVE_ROOT/data/scheduler-runs"
+SOURCE="${SCOREBOARD_SOURCE:-auto}"
 mkdir -p "$OUT_DIR"
 
-RUNS_DIR="$DATA/scheduler-runs"
-if [[ "$SOURCE" == "living" ]]; then
+if [[ "$SOURCE" == "auto" ]]; then
+  if [[ -f "$LOCAL_RUNS/latest-distill.json" ]] && find "$LOCAL_RUNS/latest-distill.json" -mtime -7 | grep -q .; then
+    SOURCE="local"
+  else
+    SOURCE="living"
+  fi
+fi
+
+RUNS_DIR="$DATA/scheduler-runs"   # lab — last resort
+if [[ "$SOURCE" == "local" ]]; then
+  RUNS_DIR="$LOCAL_RUNS"
+elif [[ "$SOURCE" == "living" ]]; then
   LIVING_RUNS="$DATA/scheduler-runs-living"
   mkdir -p "$LIVING_RUNS"
   if scp -o ConnectTimeout=10 -o BatchMode=yes \
@@ -26,7 +39,9 @@ if [[ "$SOURCE" == "living" ]]; then
   fi
 fi
 
-exec python3 - "$DATA" "$OUT_DIR" "$RUNS_DIR" <<'PY'
+echo "[info] scoreboard source=$SOURCE runs=$RUNS_DIR" >&2
+
+exec python3 - "$DATA" "$OUT_DIR" "$RUNS_DIR" "$SOURCE" <<'PY'
 import json
 import sys
 from datetime import datetime, timezone
@@ -35,6 +50,7 @@ from pathlib import Path
 data = Path(sys.argv[1])
 out_dir = Path(sys.argv[2])
 runs = Path(sys.argv[3])
+source = sys.argv[4] if len(sys.argv) > 4 else "?"
 wiki_meta = data / "wiki-push-latest.json"
 arena = out_dir / "latest.json"
 watchdog = runs / "latest-watchdog.json"
@@ -145,6 +161,7 @@ price_pub = {
 board = {
     "schema": "gzmo.nightburst.scoreboard/v1",
     "generated_at": datetime.now(timezone.utc).isoformat(),
+    "source": source,
     "scheduler_runs_dir": str(runs),
     "metabolism": jobs,
     "watchdog": watch_pub,
@@ -197,6 +214,7 @@ html = f"""<!DOCTYPE html>
   <h1>GZMO nightburst scoreboard</h1>
   <p class="sub">Sanitized local demo — no tokens, no session bodies. Generated {board['generated_at']}</p>
   <p>
+    <span class="pill">runs={source}</span>
     <span class="pill">watchdog: {"STALE" if watch_pub.get("stale") else "fresh"}</span>
     <span class="pill">wiki sha {wiki_sha}</span>
     <span class="pill">arena z={arena_z}</span>
